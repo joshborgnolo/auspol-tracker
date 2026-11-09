@@ -15,7 +15,7 @@
    else, and its canonical is the modern Past cycles page. build.mjs writes
    it on every federal build. */
 import { modernRunner, dataClock, press, words, hasCls, find, findAll } from "./harvest.mjs";
-import { sectionBlocks, sectionsOf } from "./blocks.mjs";
+import { sectionBlocks, sectionsOf, csOpen } from "./blocks.mjs";
 import { retroPage, panelHTML, ctlHTML, read, esc } from "./page.mjs";
 import vm from "node:vm";
 
@@ -59,6 +59,16 @@ export function retroCycles({ root, dataset, shellPages, footer, siteUrl = "http
     if (m !== m0) press(h, isTab(m.full));
     const secs = readAll(h);
     secs.forEach((s, i) => { if (i < 4) ((variants[i] = variants[i] || {})[slug(c.l) + "|" + slug(m.l)] = s); });
+    /* each scorecard row opened in turn, as a click on the modern row opens
+       it (one at a time): every term ranked at this point, and the records */
+    const cs = secs[0].blocks.find((b) => b.k === "cs");
+    const csRows = cs ? cs.groups.flatMap((g) => g.rows) : [];
+    csRows.forEach((r, i) => {
+      const row = findAll(h.tree, (t) => hasCls(t, "rd-cs-row"))[i];
+      if (!row || !press(h, (t) => t === row)) return;
+      const item = findAll(h.tree, (t) => hasCls(t, "rd-cs-item"))[i];
+      r.open = csOpen(item);
+    });
   }
   // the final polls: each basis, its chips' own press
   const basisChips = findAll(find(h0.tree, (t) => hasCls(t, "rd-acc-basis")) || [], (t) => t.tag === "button").map((b) => ({ l: words(b), on: pressed(b) || hasCls(b, "on") }));

@@ -193,10 +193,36 @@ function scorecard(t) {
         strip: st ? { gl: iv(".rd-cs-gl").map((g) => g.l), b80: iv(".rd-cs-b80")[0] || null, b50: iv(".rd-cs-b50")[0] || null, dots: iv(".rd-cs-dot").map((d) => [d.l, d.t]), mean: (iv(".rd-cs-mean")[0] || {}).l, cur: (iv(".rd-cs-cur")[0] || {}).l } : null,
         avg: avg ? { b: W(find(avg, (y) => y.tag === "b")), s: W(find(avg, (y) => y.tag === "span")) } : null,
         rank: rank ? { b: W(find(rank, (y) => y.tag === "b")), s: W(find(rank, (y) => y.tag === "span")) } : null,
+        open: csOpen(x),
       });
     }
   }
   return { k: "cs", head: head ? els(head).map(W) : [], groups };
+}
+/* a scorecard row opened: every term ranked at this point (its value, a
+   "≈" where the month was filled in, the line to its next election's
+   figure, the outcome), and the measure's records at any point in a term */
+export function csOpen(item) {
+  const csl = q(item, ".rd-csl");
+  if (!csl) return null;
+  const hd = q(csl, ".rd-csl-h"), hs = q(csl, ".rd-csl-hs");
+  const bgt = q(csl, ".rd-csl-bgt");
+  const at = (c) => { const i = bgt && q(bgt, c); return i ? [pctOf(styleOf(i).left), pctOf(styleOf(i).width)] : null; };
+  const rows = qa(csl, ".rd-csl-row").map((r) => {
+    const v = q(r, ".rd-csl-v"), ip = q(r, ".rd-csl-ip"), run = q(r, ".rd-csl-run"), ring = q(r, ".rd-csl-ring"), dot = q(r, ".rd-csl-dot"), oc = q(r, ".rd-csl-oc"), un = oc && q(oc, ".rd-csl-under");
+    return { k: +(styleOf(r)["--k"] || 0), n: W(q(r, ".rd-csl-k")), pty: styleOf(q(r, ".rd-csl-pty")).background || null, who: W(find(q(r, ".rd-csl-name"), (y) => y.tag === "b")), yr: W(q(r, ".rd-csl-yr")),
+      v: ip ? W(v).replace(W(ip), "").trim() : W(v), ip: ip ? 1 : 0, run: run ? [pctOf(styleOf(run).left), pctOf(styleOf(run).width)] : null, ring: ring ? pctOf(styleOf(ring).left) : null, dot: dot ? pctOf(styleOf(dot).left) : null,
+      el: W(q(r, ".rd-csl-el")), oc: un ? W(oc).replace(W(un), "").trim() : W(oc), under: un ? W(un) : "", cur: hasCls(r, "cur") };
+  }).sort((a, b) => a.k - b.k);
+  return {
+    head: W(find(hd, (y) => y.tag === "b")), hs: hs ? W(hs).replace(/^·\s*|\s*·$/g, "").trim() : "",
+    scale: qa(csl, ".rd-csl-scale").flatMap((s) => els(s).map((x) => [pctOf(styleOf(x).left), W(x)])), nx: W(q(csl, ".rd-csl-nxh")),
+    b80: at(".rd-csl-b80"), b50: at(".rd-csl-b50"), mean: at(".rd-csl-mean") ? at(".rd-csl-mean")[0] : null, rows,
+    recs: qa(item, ".rd-csr-list").map((l) => ({ h: W(q(l, ".rd-csr-h")), rows: qa(l, ".rd-csr-row").map((r) => {
+      const oc = q(r, ".rd-csr-oc"), un = oc && q(oc, ".rd-csl-under");
+      return { v: W(q(r, ".rd-csr-v")), color: styleOf(q(r, ".rd-csr-v")).color || null, when: W(q(r, ".rd-csr-when")), oc: un ? W(oc).replace(W(un), "").trim() : W(oc), under: un ? W(un) : "", cur: hasCls(r, "cur") };
+    }) })),
+  };
 }
 function accSum(t) { return { k: "tiles", tiles: qa(t, ".rd-acc-firm").map((f) => ({ b: W(find(f, (x) => x.tag === "b")), v: W(q(f, ".rd-acc-fv")), s: W(els(f).filter((x) => x.tag === "span" && !hasCls(x, "rd-acc-fv")).pop()) })) }; }
 function table(t) {

@@ -294,10 +294,35 @@ fieldset legend { padding: 0 3px; font-weight: 700; font-size: 12px; }
 .rp-wvaxis span:last-child, .rp-csscale span:last-child, .rp-accaxis span:last-child { transform: translateX(-100%); }
 .rp-csscale { height: 24px; }
 .rp-dptd, .rp-wvtd, .rp-cstd, .rp-acctd { width: 38%; min-width: 180px; padding-top: 6px !important; }
-.rp-cs tbody th small { max-width: 220px; white-space: normal; }
+.rp-cs > tbody > tr > th small { max-width: 220px; white-space: normal; }
 .rp-csnow { font-size: 14px; }
 .rp-badge { display: inline-block; padding: 0 5px; background: var(--rt-face); box-shadow: var(--rt-thin-up); font-size: 11px; font-weight: 700; white-space: nowrap; }
 .rp-twell { max-width: 760px; }
+/* a scorecard row that opens: the era's tree-view box, the row in the selection navy when open */
+.rp-csopenable { cursor: pointer; }
+.rp-csx { display: inline-grid; place-items: center; width: 11px; height: 11px; margin: 0 6px 0 0; vertical-align: 1px; border: 1px solid #808080; background: #fff; font: 700 10px/1 Tahoma, sans-serif; color: #000; }
+.rp-csx:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+.rp-cs tr.rp-csrow.open > * { background: var(--rt-sel); color: #fff; }
+.rp-cs tr.rp-csrow.open small, .rp-cs tr.rp-csrow.open b, .rp-cs tr.rp-csrow.open .rp-up, .rp-cs tr.rp-csrow.open .rp-dn { color: #fff !important; }
+.rp-cs tr.rp-csrow.open .tb::before { background: #fff; }
+.rp-csopen > td { padding: 0 0 8px 18px !important; background: #fff !important; border-bottom: 1px solid var(--rt-sh); }
+.rp-csl { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 12px; margin-top: 0; padding: 8px 10px 9px; background: #ffffe1; border: 1px solid #000; border-top: 0; box-shadow: 2px 2px 0 rgba(0, 0, 0, .18); }
+.rp-cslh { margin: 0 0 4px; font-size: 12px; } .rp-cslh span { color: #404040; }
+.rp-csltab { background: #fff; box-shadow: var(--rt-sunken); }
+.rp-csltab th, .rp-csltab td { padding: 2px 6px; border-bottom: 1px solid #f0eee8; }
+.rp-csltab tbody th { font-weight: 700; white-space: nowrap; }
+.rp-csltab .rp-cur > * { background: #e8eefc; }
+.rp-csk { color: #404040; width: 2em; }
+.rp-pty { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border: 1px solid rgba(0, 0, 0, .5); vertical-align: 0; }
+.rp-yr { color: #404040; font-weight: 400; }
+.rp-ip { color: #404040; cursor: help; }
+.rp-recs { display: grid; gap: 8px; align-content: start; }
+fieldset.rp-rec { margin: 0; min-width: 0; padding: 2px 6px 6px; border: 1px solid #808080; box-shadow: 1px 1px 0 #fff, inset 1px 1px 0 #fff; background: #fff; }
+.rp-rect td { padding: 2px 5px; font-size: 11px; }
+.rp-rect .rp-cur > * { background: #e8eefc; }
+.tb-r { top: 3px; width: 9px; height: 9px; margin-left: -4.5px; border: 2px solid #000; border-radius: 50%; background: #fff; }
+.tb-csl .tb-w { top: 7px; height: 2px; background: #606060; }
+.tb-csl .tb-d { width: 9px; height: 9px; margin-left: -4.5px; top: 3px; }
 
 /* ----- bars: preferred PM, the mood, decidedness, progress ----- */
 .rp-hbars { display: grid; gap: 10px; margin: 4px 0 8px; max-width: 640px; }
@@ -385,6 +410,7 @@ fieldset legend { padding: 0 3px; font-weight: 700; font-size: 12px; }
   .rp-smgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 860px) {
+  .rp-csl { grid-template-columns: minmax(0, 1fr); }
   .rp-frame { padding-top: 6px; padding-bottom: 14px; }
   .rp-pair2 { grid-template-columns: minmax(0, 1fr); }
   .rp-statrow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -396,9 +422,17 @@ fieldset legend { padding: 0 3px; font-weight: 700; font-size: 12px; }
 @media (max-width: 640px) {
   .rp-cols { grid-template-columns: minmax(0, 1fr); }
   /* the scorecard scrolls sideways on a phone, its measure riding along */
-  .rp-cs tbody th, .rp-cs thead th:first-child { position: sticky; left: 0; z-index: 1; min-width: 128px; max-width: 150px; background: #fff; box-shadow: 1px 0 0 #ece9e2; }
-  .rp-cs thead th:first-child { z-index: 2; background: var(--rt-face); box-shadow: var(--rt-raised); }
-  .rp-cs tr.rp-csg > th { position: sticky; left: 0; z-index: 1; background: #e7e4dd; }
+  .rp-cs > tbody > tr > th, .rp-cs > thead > tr > th:first-child { position: sticky; left: 0; z-index: 1; min-width: 128px; max-width: 150px; background: #fff; box-shadow: 1px 0 0 #ece9e2; }
+  .rp-cs > thead > tr > th:first-child { z-index: 2; background: var(--rt-face); box-shadow: var(--rt-raised); }
+  .rp-cs > tbody > tr.rp-csg > th { position: sticky; left: 0; z-index: 1; background: #e7e4dd; }
+  .rp-cs > tbody > tr.rp-csrow.open > th { background: var(--rt-sel); }
+  /* an opened ranking stays on the screen while the scorecard scrolls sideways under it */
+  .rp-csopen > td { padding-left: 0 !important; }
+  .rp-csl { position: sticky; left: 0; max-width: calc(100vw - 2 * clamp(20px, 5vw, 64px) - 24px); }
+  .rp-cslstrip, .rp-cslel { display: none; }
+  .rp-csl { padding: 6px; }
+  .rp-csltab th, .rp-csltab td { padding: 2px 4px; font-size: 11px; }
+  .rp-csltab tbody th { white-space: normal; }
   /* the wide lists keep a working width and scroll sideways instead of wrapping every cell */
   .rp-cs { min-width: 640px; }
   .rp-acc { min-width: 560px; }
@@ -793,11 +827,30 @@ function trackbar(o) {
   for (const d of o.dots || []) parts.push(`<i class="tb-p" style="left:${num(d[0])}%"${d[1] ? ` title="${esc(d[1])}"` : ""}></i>`);
   if (o.mean != null) parts.push(`<i class="tb-m" style="left:${num(o.mean)}%"></i>`);
   if (o.ci) parts.push(`<i class="tb-w" style="left:${num(o.ci[0])}%;width:${num(o.ci[1])}%"></i>`);
+  if (o.ring != null) parts.push(`<i class="tb-r" style="left:${num(o.ring)}%;border-color:${o.color || "#000"}"></i>`);
   if (o.dot != null) parts.push(`<i class="tb-d" style="left:${num(o.dot)}%;background:${o.color || "#000"}"></i>`);
   return `<span class="tb${o.cls ? " " + o.cls : ""}" role="img"${o.title ? ` aria-label="${esc(o.title)}" title="${esc(o.title)}"` : ' aria-hidden="true"'}>${parts.join("")}</span>`;
 }
 const pairHTML = (a, b, pa, pb) => `<b class="rp-pair"><span class="rp-k-${pa || "alp"}">${esc(a)}</span><span class="rp-dash">–</span><span class="rp-k-${pb || "lnp"}">${esc(b)}</span></b>`;
 
+/* a scorecard row opened: every term at this point, ranked, as a details
+   list in the row (each term's value, its line on to the next election's
+   figure, the outcome), and the measure's records beside it in group boxes */
+function csRanked(r) {
+  const O = r.open, pc = (c) => (c ? col(c) : "#808080");
+  const grid = O.scale.map((s) => s[0]);
+  // a measure with no election figure (the leaders' ratings) has no next-election column or ring
+  const hasEl = O.rows.some((x) => x.el);
+  const rows = O.rows.map((x) => `<tr class="${x.cur ? "rp-cur" : ""}"><td class="r rp-csk">${esc(x.n)}</td><th scope="row"><i class="rp-pty" style="background:${pc(x.pty)}"></i>${esc(x.who)} <span class="rp-yr">${esc(x.yr)}</span></th>`
+    + `<td class="r"><b>${esc(x.v)}</b>${x.ip ? ' <span class="rp-ip" title="Filled in from the months either side">≈</span>' : ""}</td>`
+    + `<td class="rp-cstd rp-cslstrip">${trackbar({ grid, band80: O.b80, band50: O.b50, mean: O.mean, ci: hasEl ? x.run : null, dot: x.dot, color: pc(x.pty), cls: "tb-csl", ring: hasEl ? x.ring : null })}</td>`
+    + (hasEl ? `<td class="r rp-cslel">${esc(x.el)}</td>` : "") + `<td>${esc(x.oc)}${x.under ? `<small>${esc(x.under)}</small>` : ""}</td></tr>`).join("");
+  const recs = O.recs.map((g) => `<fieldset class="rp-rec"><legend>${esc(g.h)}</legend><table class="rp-t rp-rect"><tbody>${g.rows.map((x) => `<tr class="${x.cur ? "rp-cur" : ""}"><td class="r"><b${x.color ? ` style="color:${col(x.color)}"` : ""}>${esc(x.v)}</b></td><td>${esc(x.when)}</td><td>${esc(x.oc)}${x.under ? `<small>${esc(x.under)}</small>` : ""}</td></tr>`).join("")}</tbody></table></fieldset>`).join("");
+  return `<div class="rp-csl"><div class="rp-cslmain"><p class="rp-cslh"><b>${esc(O.head)}</b>${O.hs ? ` <span>${esc(O.hs)}</span>` : ""}</p>`
+    + `<table class="rp-t rp-csltab"><thead><tr><th scope="col" class="r">#</th><th scope="col">Term</th><th scope="col" class="r">At this point</th><th scope="col" class="rp-csscale rp-cslstrip">${O.scale.map(([l, t]) => `<span style="left:${num(l)}%">${esc(t)}</span>`).join("")}</th>${hasEl ? `<th scope="col" class="r rp-cslel">${esc(O.nx || "Next election")}</th>` : ""}<th scope="col">Outcome</th></tr></thead><tbody>${rows}</tbody></table>`
+    + `<p class="rp-keyline">The square is each term at this point${hasEl ? ", the line runs on to its next election’s figure (the ring)" : ""}; the band is the middle half and middle 80% of past terms, the tick their average.${O.rows.some((x) => x.ip) ? " ≈ marks a month filled in from the months either side." : ""}</p></div>`
+    + (recs ? `<div class="rp-recs">${recs}</div>` : "") + `</div>`;
+}
 const BLOCK = {
   hed: (b) => `<h3 class="rp-hed${b.top ? " rp-hed-top" : ""}">${esc(b.t)}</h3>`,
   dek: (b) => P("rp-dek", b.t),
@@ -922,17 +975,21 @@ const BLOCK = {
   chart: (b, o) => chartFrame(b, o),
   smgrid: (b, o) => `<div class="rp-smgrid">${b.items.map((x) => chartFrame({ ...x, small: true }, o)).join("")}</div>`,
   // the past-terms scorecard: a row per measure, this term's figure against every past term's at the same point
-  cs(b) {
+  cs(b, o) {
     const h = b.head;
+    let ri0 = 0;
     return `<div class="rp-well"><table class="rp-t rp-cs"><thead><tr><th scope="col">${esc(h[0] || "Measure")}</th><th scope="col" class="r">${esc(h[1] || "Now")}</th><th scope="col">${esc(h[2] || "")}</th><th scope="col">${esc(h[3] || "")}</th><th scope="col">${esc(h[4] || "")}</th></tr></thead><tbody>`
       + b.groups.map((g) => `<tr class="rp-csg"><th scope="rowgroup" colspan="2"><b>${esc(g.name)}</b> <span>${esc(g.unit)}</span></th><td class="rp-csscale">${g.scale.map(([l, t]) => `<span style="left:${num(l)}%">${esc(t)}</span>`).join("")}</td><td colspan="2"></td></tr>`
         + g.rows.map((r) => {
           const c = r.color ? col(r.color.replace("-text", "")) : "#000";
-          return `<tr><th scope="row"><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="r"><b class="rp-csnow" style="color:${r.color ? col(r.color) : "#000"}">${esc(r.now)}</b></td>`
+          const ri = ri0++, isOpen = o && o.open === ri && r.open;
+          const opener = r.open ? `<button type="button" class="rp-csx" data-csrow="${ri}" aria-expanded="${!!isOpen}" aria-label="${isOpen ? "Close" : "Open"} ${esc(r.name)}: every term ranked" title="${isOpen ? "Close the ranking" : "Rank every term"}">${isOpen ? "−" : "+"}</button>` : "";
+          return `<tr class="rp-csrow${r.open ? " rp-csopenable" : ""}${isOpen ? " open" : ""}"${r.open ? ` data-csrow="${ri}"` : ""}><th scope="row">${opener}<b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="r"><b class="rp-csnow" style="color:${r.color ? col(r.color) : "#000"}">${esc(r.now)}</b></td>`
             + `<td class="rp-cstd">${r.strip ? trackbar({ grid: r.strip.gl, band80: r.strip.b80 ? [r.strip.b80.l, r.strip.b80.w] : null, band50: r.strip.b50 ? [r.strip.b50.l, r.strip.b50.w] : null, dots: r.strip.dots, mean: r.strip.mean, dot: r.strip.cur, color: c, cls: "tb-cs", title: r.name + ": " + r.now }) : ""}</td>`
-            + `<td>${r.avg ? `${arrows(r.avg.b)}<small>${esc(r.avg.s)}</small>` : ""}</td><td>${r.rank ? `<b>${esc(r.rank.b)}</b>${r.rank.s ? `<small>${esc(r.rank.s)}</small>` : ""}` : ""}</td></tr>`;
+            + `<td>${r.avg ? `${arrows(r.avg.b)}<small>${esc(r.avg.s)}</small>` : ""}</td><td>${r.rank ? `<b>${esc(r.rank.b)}</b>${r.rank.s ? `<small>${esc(r.rank.s)}</small>` : ""}` : ""}</td></tr>`
+            + (isOpen ? `<tr class="rp-csopen"><td colspan="5">${csRanked(r)}</td></tr>` : "");
         }).join("")).join("")
-      + `</tbody></table></div>`;
+      + `</tbody></table></div>${b.groups.some((g) => g.rows.some((r) => r.open)) ? `<p class="rp-keyline">Click a measure to rank every term at this point, with its records.</p>` : ""}`;
   },
   tiles: (b) => `<div class="rp-tiles">${b.tiles.map((t) => `<fieldset class="rp-tile"><legend>${esc(t.b)}</legend><b>${esc(t.v)}</b>${t.s ? `<span>${esc(t.s)}</span>` : ""}</fieldset>`).join("")}</div>`,
   table: (b) => `<div class="rp-well rp-twell"><table class="rp-t rp-gt">${b.caption ? `<caption>${esc(b.caption)}</caption>` : ""}<thead><tr>${b.head.map((x) => `<th scope="col"${x.num ? ' class="r"' : ""}>${esc(x.t)}</th>`).join("")}</tr></thead><tbody>`
@@ -994,7 +1051,7 @@ for (const p of D.panels) PANEL[p.id] = p;
 
 /* ----------------------------------------------------------------- the state */
 const defaults = () => {
-  const st = { v: D.def, tool: {}, p: {} };
+  const st = { v: D.def, tool: {}, p: {}, open: null };
   for (const c of TOOL) st.tool[c.id] = c.def;
   for (const p of D.panels) { st.p[p.id] = {}; for (const c of p.ctl || []) st.p[p.id][c.id] = c.def; }
   return st;
@@ -1003,6 +1060,8 @@ const ctlOf = (p, id) => (p.ctl || []).find((c) => c.id === id) || TOOL.find((c)
 function toHash(st) {
   const d = defaults(), kv = [];
   if (st.v !== d.v) kv.push("v=" + st.v);
+  // a scorecard row opened to its ranking: the panel and the row
+  if (st.open) kv.push("open=" + st.open.p + "." + st.open.i);
   for (const c of TOOL) if (st.tool[c.id] !== d.tool[c.id]) kv.push(c.id + "=" + encodeURIComponent(st.tool[c.id]));
   for (const p of D.panels) {
     const own = (p.ctl || []).map((c) => st.p[p.id][c.id]);
@@ -1017,6 +1076,7 @@ function fromHash(h) {
     const k = kv.slice(0, i), v = kv.slice(i + 1);
     let dv = v; try { dv = decodeURIComponent(v); } catch (e) {}
     if (k === "v" && D.views.some((x) => x.id === v)) st.v = v;
+    else if (k === "open") { const m = /^([\w-]+)\.(\d+)$/.exec(v); if (m && PANEL[m[1]]) st.open = { p: m[1], i: +m[2] }; }
     else if (TOOL.some((c) => c.id === k)) { const c = TOOL.find((x) => x.id === k); if (c.opts.some((o) => o.v === dv)) st.tool[k] = dv; }
     else if (PANEL[k]) {
       const vals = v.split(".").map((x) => { try { return decodeURIComponent(x); } catch (e) { return x; } });
@@ -1040,14 +1100,14 @@ function panelKey(p, s) { return (p.keys || (p.ctl || []).map((c) => c.id)).map(
 function drawPanel(p, force) {
   const sec = document.getElementById(p.id);
   if (!sec) return;
-  const key = panelKey(p, st), v = variantOf(p, st);
+  const key = panelKey(p, st) + "#" + (st.open && st.open.p === p.id ? st.open.i : ""), v = variantOf(p, st);
   if (!v) return;
   const body = sec.querySelector(".rp-body");
   const specs = {};
   R.resetIds();
-  const html = R.blocks(v.blocks, { idp: p.id + "-", specs });
+  const html = R.blocks(v.blocks, { idp: p.id + "-", specs, open: st.open && st.open.p === p.id ? st.open.i : null });
   // the page as built holds each panel's opening view; any other is drawn here
-  const onScreen = drawn[p.id] ? drawn[p.id].key : p.def;
+  const onScreen = drawn[p.id] ? drawn[p.id].key : p.def + "#";
   if (force || onScreen !== key) {
     body.innerHTML = html;
     const meta = sec.querySelector(".rp-capm");
@@ -1255,6 +1315,16 @@ document.addEventListener("click", (e) => {
   if (!drop.hidden && !e.target.closest(".rt-drop")) closeMenu();
   const tab = e.target.closest("[data-rp-tab]");
   if (tab) { setView(tab.dataset.rpTab); return; }
+  // a scorecard row opens to every term ranked at this point; a second click closes it
+  const csr = !e.target.closest("a") && e.target.closest("[data-csrow]");
+  if (csr) {
+    const sec = csr.closest(".rp-panel"), i = +csr.dataset.csrow;
+    st.open = st.open && st.open.p === sec.id && st.open.i === i ? null : { p: sec.id, i };
+    render();
+    const again = sec.querySelector(`button[data-csrow="${i}"]`);
+    if (again) again.focus({ preventScroll: true });
+    return;
+  }
   const pt = e.target.closest(".rp-ptabs [data-ctl]");
   if (pt) {
     const sec = pt.closest(".rp-panel");

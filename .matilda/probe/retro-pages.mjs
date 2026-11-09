@@ -104,6 +104,14 @@ await page.setViewport({ width: 1440, height: 950 });
 await go("/cycles/retro/");
 check("Past cycles is marked in the navbar", await page.evaluate(() => document.querySelector('.rt-pages a[href="/cycles/retro/"]').getAttribute("aria-current") === "page"));
 check("opens on All measures with the toolbar", JSON.stringify(await visible()) === JSON.stringify(["measures"]) && await page.evaluate(() => !document.querySelector(".rp-tool").hidden));
+// a scorecard row opens to every term ranked at this point, and closes again
+await page.click("#measures tr.rp-csopenable[data-csrow='7'] th");
+await sleep(250);
+const op = await page.evaluate(() => ({ rows: document.querySelectorAll("#measures .rp-csltab tbody tr").length, cur: (document.querySelector("#measures .rp-csltab tr.rp-cur th") || {}).textContent, recs: document.querySelectorAll("#measures fieldset.rp-rec").length, hash: location.hash, exp: document.querySelector('#measures button[data-csrow="7"]').getAttribute("aria-expanded") }));
+check("a scorecard row opens to every term ranked, this term among them, and its records", op.rows > 10 && /2025/.test(op.cur || "") && op.recs >= 1 && op.exp === "true" && /open=measures\.7/.test(op.hash), op);
+await page.click('#measures button[data-csrow="7"]');
+await sleep(250);
+check("a second click closes it", await page.evaluate(() => !document.querySelector("#measures .rp-csopen") && !/open=/.test(location.hash)));
 const c0 = await hed("measures");
 await page.click('.rp-tool input[value="change-since-election"]'); await sleep(250);
 const c1 = await hed("measures");

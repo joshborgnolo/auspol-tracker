@@ -23,7 +23,7 @@ for (const p of D.panels) PANEL[p.id] = p;
 
 /* ----------------------------------------------------------------- the state */
 const defaults = () => {
-  const st = { v: D.def, tool: {}, p: {} };
+  const st = { v: D.def, tool: {}, p: {}, open: null };
   for (const c of TOOL) st.tool[c.id] = c.def;
   for (const p of D.panels) { st.p[p.id] = {}; for (const c of p.ctl || []) st.p[p.id][c.id] = c.def; }
   return st;
@@ -32,6 +32,8 @@ const ctlOf = (p, id) => (p.ctl || []).find((c) => c.id === id) || TOOL.find((c)
 function toHash(st) {
   const d = defaults(), kv = [];
   if (st.v !== d.v) kv.push("v=" + st.v);
+  // a scorecard row opened to its ranking: the panel and the row
+  if (st.open) kv.push("open=" + st.open.p + "." + st.open.i);
   for (const c of TOOL) if (st.tool[c.id] !== d.tool[c.id]) kv.push(c.id + "=" + encodeURIComponent(st.tool[c.id]));
   for (const p of D.panels) {
     const own = (p.ctl || []).map((c) => st.p[p.id][c.id]);
@@ -46,6 +48,7 @@ function fromHash(h) {
     const k = kv.slice(0, i), v = kv.slice(i + 1);
     let dv = v; try { dv = decodeURIComponent(v); } catch (e) {}
     if (k === "v" && D.views.some((x) => x.id === v)) st.v = v;
+    else if (k === "open") { const m = /^([\w-]+)\.(\d+)$/.exec(v); if (m && PANEL[m[1]]) st.open = { p: m[1], i: +m[2] }; }
     else if (TOOL.some((c) => c.id === k)) { const c = TOOL.find((x) => x.id === k); if (c.opts.some((o) => o.v === dv)) st.tool[k] = dv; }
     else if (PANEL[k]) {
       const vals = v.split(".").map((x) => { try { return decodeURIComponent(x); } catch (e) { return x; } });
@@ -69,14 +72,14 @@ function panelKey(p, s) { return (p.keys || (p.ctl || []).map((c) => c.id)).map(
 function drawPanel(p, force) {
   const sec = document.getElementById(p.id);
   if (!sec) return;
-  const key = panelKey(p, st), v = variantOf(p, st);
+  const key = panelKey(p, st) + "#" + (st.open && st.open.p === p.id ? st.open.i : ""), v = variantOf(p, st);
   if (!v) return;
   const body = sec.querySelector(".rp-body");
   const specs = {};
   R.resetIds();
-  const html = R.blocks(v.blocks, { idp: p.id + "-", specs });
+  const html = R.blocks(v.blocks, { idp: p.id + "-", specs, open: st.open && st.open.p === p.id ? st.open.i : null });
   // the page as built holds each panel's opening view; any other is drawn here
-  const onScreen = drawn[p.id] ? drawn[p.id].key : p.def;
+  const onScreen = drawn[p.id] ? drawn[p.id].key : p.def + "#";
   if (force || onScreen !== key) {
     body.innerHTML = html;
     const meta = sec.querySelector(".rp-capm");
@@ -284,6 +287,16 @@ document.addEventListener("click", (e) => {
   if (!drop.hidden && !e.target.closest(".rt-drop")) closeMenu();
   const tab = e.target.closest("[data-rp-tab]");
   if (tab) { setView(tab.dataset.rpTab); return; }
+  // a scorecard row opens to every term ranked at this point; a second click closes it
+  const csr = !e.target.closest("a") && e.target.closest("[data-csrow]");
+  if (csr) {
+    const sec = csr.closest(".rp-panel"), i = +csr.dataset.csrow;
+    st.open = st.open && st.open.p === sec.id && st.open.i === i ? null : { p: sec.id, i };
+    render();
+    const again = sec.querySelector(`button[data-csrow="${i}"]`);
+    if (again) again.focus({ preventScroll: true });
+    return;
+  }
   const pt = e.target.closest(".rp-ptabs [data-ctl]");
   if (pt) {
     const sec = pt.closest(".rp-panel");

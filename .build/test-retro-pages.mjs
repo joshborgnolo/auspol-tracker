@@ -75,6 +75,29 @@ const block = (p, k) => opening(p).blocks.find((b) => b.k === k);
   assert.deepEqual(dir.figs.map((f) => f.v), [DN.right.toFixed(1), DN.wrong.toFixed(1)], "the national mood is directionNow's");
   const cs = block(P(cyc, "measures"), "cs").groups[0].rows[0];
   assert.equal(cs.now, (on ? L.onImp.a : S.alp).toFixed(1) + "%", "the scorecard's two-party row quotes the headline");
+  /* every scorecard row opens to every term ranked at this point, in every
+     Compare with / Measure view: as many terms as its own head counts, this
+     term among them at the row's own figure, and the records beside them */
+  for (const [k, v] of Object.entries(P(cyc, "measures").variants)) {
+    for (const row of v.blocks.find((b) => b.k === "cs").groups.flatMap((g) => g.rows)) {
+      const o = row.open;
+      assert.ok(o && o.rows.length > 1, `Past cycles · ${k} · ${row.name}: opens to its ranking`);
+      const n = +((/(\d+) terms/.exec(o.head) || [])[1]);
+      assert.equal(o.rows.length, n, `Past cycles · ${k} · ${row.name}: the ranking lists the ${n} terms its head counts`);
+      const cur = o.rows.filter((x) => x.cur);
+      assert.ok(cur.length === 1 && cur[0].v === row.now.replace(/%$/, ""), `Past cycles · ${k} · ${row.name}: this term ranked at the row's own figure`);
+      assert.ok(o.rows.every((x, i) => +x.n === i + 1), `Past cycles · ${k} · ${row.name}: ranked in order`);
+      assert.ok(o.recs.length >= 1 && o.recs.every((g) => g.rows.length), `Past cycles · ${k} · ${row.name}: its records`);
+    }
+  }
+  {
+    const c2 = vm.createContext({ window: {}, console });
+    vm.runInContext(R(".build/retro/render.client.js"), c2);
+    const R2 = c2.window.RT_R;
+    const v0 = P(cyc, "measures").variants[P(cyc, "measures").def];
+    const shut = R2.blocks(v0.blocks, { idp: "m-" }), open = R2.blocks(v0.blocks, { idp: "m-", open: 0 });
+    assert.ok(!/class="rp-csopen"/.test(shut) && /class="rp-csopen"/.test(open) && /data-csrow="0"[^>]*aria-expanded="true"/.test(open), "a scorecard row draws its ranking only when opened");
+  }
   const tiles = block(P(cyc, "final"), "tiles").tiles;
   assert.equal(tiles[0].v, ACC.meanAbs.toFixed(1) + " pts", "the final polls' average miss is the accuracy record's");
 }

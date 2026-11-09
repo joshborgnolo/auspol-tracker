@@ -254,11 +254,30 @@ function trackbar(o) {
   for (const d of o.dots || []) parts.push(`<i class="tb-p" style="left:${num(d[0])}%"${d[1] ? ` title="${esc(d[1])}"` : ""}></i>`);
   if (o.mean != null) parts.push(`<i class="tb-m" style="left:${num(o.mean)}%"></i>`);
   if (o.ci) parts.push(`<i class="tb-w" style="left:${num(o.ci[0])}%;width:${num(o.ci[1])}%"></i>`);
+  if (o.ring != null) parts.push(`<i class="tb-r" style="left:${num(o.ring)}%;border-color:${o.color || "#000"}"></i>`);
   if (o.dot != null) parts.push(`<i class="tb-d" style="left:${num(o.dot)}%;background:${o.color || "#000"}"></i>`);
   return `<span class="tb${o.cls ? " " + o.cls : ""}" role="img"${o.title ? ` aria-label="${esc(o.title)}" title="${esc(o.title)}"` : ' aria-hidden="true"'}>${parts.join("")}</span>`;
 }
 const pairHTML = (a, b, pa, pb) => `<b class="rp-pair"><span class="rp-k-${pa || "alp"}">${esc(a)}</span><span class="rp-dash">–</span><span class="rp-k-${pb || "lnp"}">${esc(b)}</span></b>`;
 
+/* a scorecard row opened: every term at this point, ranked, as a details
+   list in the row (each term's value, its line on to the next election's
+   figure, the outcome), and the measure's records beside it in group boxes */
+function csRanked(r) {
+  const O = r.open, pc = (c) => (c ? col(c) : "#808080");
+  const grid = O.scale.map((s) => s[0]);
+  // a measure with no election figure (the leaders' ratings) has no next-election column or ring
+  const hasEl = O.rows.some((x) => x.el);
+  const rows = O.rows.map((x) => `<tr class="${x.cur ? "rp-cur" : ""}"><td class="r rp-csk">${esc(x.n)}</td><th scope="row"><i class="rp-pty" style="background:${pc(x.pty)}"></i>${esc(x.who)} <span class="rp-yr">${esc(x.yr)}</span></th>`
+    + `<td class="r"><b>${esc(x.v)}</b>${x.ip ? ' <span class="rp-ip" title="Filled in from the months either side">≈</span>' : ""}</td>`
+    + `<td class="rp-cstd rp-cslstrip">${trackbar({ grid, band80: O.b80, band50: O.b50, mean: O.mean, ci: hasEl ? x.run : null, dot: x.dot, color: pc(x.pty), cls: "tb-csl", ring: hasEl ? x.ring : null })}</td>`
+    + (hasEl ? `<td class="r rp-cslel">${esc(x.el)}</td>` : "") + `<td>${esc(x.oc)}${x.under ? `<small>${esc(x.under)}</small>` : ""}</td></tr>`).join("");
+  const recs = O.recs.map((g) => `<fieldset class="rp-rec"><legend>${esc(g.h)}</legend><table class="rp-t rp-rect"><tbody>${g.rows.map((x) => `<tr class="${x.cur ? "rp-cur" : ""}"><td class="r"><b${x.color ? ` style="color:${col(x.color)}"` : ""}>${esc(x.v)}</b></td><td>${esc(x.when)}</td><td>${esc(x.oc)}${x.under ? `<small>${esc(x.under)}</small>` : ""}</td></tr>`).join("")}</tbody></table></fieldset>`).join("");
+  return `<div class="rp-csl"><div class="rp-cslmain"><p class="rp-cslh"><b>${esc(O.head)}</b>${O.hs ? ` <span>${esc(O.hs)}</span>` : ""}</p>`
+    + `<table class="rp-t rp-csltab"><thead><tr><th scope="col" class="r">#</th><th scope="col">Term</th><th scope="col" class="r">At this point</th><th scope="col" class="rp-csscale rp-cslstrip">${O.scale.map(([l, t]) => `<span style="left:${num(l)}%">${esc(t)}</span>`).join("")}</th>${hasEl ? `<th scope="col" class="r rp-cslel">${esc(O.nx || "Next election")}</th>` : ""}<th scope="col">Outcome</th></tr></thead><tbody>${rows}</tbody></table>`
+    + `<p class="rp-keyline">The square is each term at this point${hasEl ? ", the line runs on to its next election’s figure (the ring)" : ""}; the band is the middle half and middle 80% of past terms, the tick their average.${O.rows.some((x) => x.ip) ? " ≈ marks a month filled in from the months either side." : ""}</p></div>`
+    + (recs ? `<div class="rp-recs">${recs}</div>` : "") + `</div>`;
+}
 const BLOCK = {
   hed: (b) => `<h3 class="rp-hed${b.top ? " rp-hed-top" : ""}">${esc(b.t)}</h3>`,
   dek: (b) => P("rp-dek", b.t),
@@ -383,17 +402,21 @@ const BLOCK = {
   chart: (b, o) => chartFrame(b, o),
   smgrid: (b, o) => `<div class="rp-smgrid">${b.items.map((x) => chartFrame({ ...x, small: true }, o)).join("")}</div>`,
   // the past-terms scorecard: a row per measure, this term's figure against every past term's at the same point
-  cs(b) {
+  cs(b, o) {
     const h = b.head;
+    let ri0 = 0;
     return `<div class="rp-well"><table class="rp-t rp-cs"><thead><tr><th scope="col">${esc(h[0] || "Measure")}</th><th scope="col" class="r">${esc(h[1] || "Now")}</th><th scope="col">${esc(h[2] || "")}</th><th scope="col">${esc(h[3] || "")}</th><th scope="col">${esc(h[4] || "")}</th></tr></thead><tbody>`
       + b.groups.map((g) => `<tr class="rp-csg"><th scope="rowgroup" colspan="2"><b>${esc(g.name)}</b> <span>${esc(g.unit)}</span></th><td class="rp-csscale">${g.scale.map(([l, t]) => `<span style="left:${num(l)}%">${esc(t)}</span>`).join("")}</td><td colspan="2"></td></tr>`
         + g.rows.map((r) => {
           const c = r.color ? col(r.color.replace("-text", "")) : "#000";
-          return `<tr><th scope="row"><b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="r"><b class="rp-csnow" style="color:${r.color ? col(r.color) : "#000"}">${esc(r.now)}</b></td>`
+          const ri = ri0++, isOpen = o && o.open === ri && r.open;
+          const opener = r.open ? `<button type="button" class="rp-csx" data-csrow="${ri}" aria-expanded="${!!isOpen}" aria-label="${isOpen ? "Close" : "Open"} ${esc(r.name)}: every term ranked" title="${isOpen ? "Close the ranking" : "Rank every term"}">${isOpen ? "−" : "+"}</button>` : "";
+          return `<tr class="rp-csrow${r.open ? " rp-csopenable" : ""}${isOpen ? " open" : ""}"${r.open ? ` data-csrow="${ri}"` : ""}><th scope="row">${opener}<b>${esc(r.name)}</b><small>${esc(r.sub)}</small></th><td class="r"><b class="rp-csnow" style="color:${r.color ? col(r.color) : "#000"}">${esc(r.now)}</b></td>`
             + `<td class="rp-cstd">${r.strip ? trackbar({ grid: r.strip.gl, band80: r.strip.b80 ? [r.strip.b80.l, r.strip.b80.w] : null, band50: r.strip.b50 ? [r.strip.b50.l, r.strip.b50.w] : null, dots: r.strip.dots, mean: r.strip.mean, dot: r.strip.cur, color: c, cls: "tb-cs", title: r.name + ": " + r.now }) : ""}</td>`
-            + `<td>${r.avg ? `${arrows(r.avg.b)}<small>${esc(r.avg.s)}</small>` : ""}</td><td>${r.rank ? `<b>${esc(r.rank.b)}</b>${r.rank.s ? `<small>${esc(r.rank.s)}</small>` : ""}` : ""}</td></tr>`;
+            + `<td>${r.avg ? `${arrows(r.avg.b)}<small>${esc(r.avg.s)}</small>` : ""}</td><td>${r.rank ? `<b>${esc(r.rank.b)}</b>${r.rank.s ? `<small>${esc(r.rank.s)}</small>` : ""}` : ""}</td></tr>`
+            + (isOpen ? `<tr class="rp-csopen"><td colspan="5">${csRanked(r)}</td></tr>` : "");
         }).join("")).join("")
-      + `</tbody></table></div>`;
+      + `</tbody></table></div>${b.groups.some((g) => g.rows.some((r) => r.open)) ? `<p class="rp-keyline">Click a measure to rank every term at this point, with its records.</p>` : ""}`;
   },
   tiles: (b) => `<div class="rp-tiles">${b.tiles.map((t) => `<fieldset class="rp-tile"><legend>${esc(t.b)}</legend><b>${esc(t.v)}</b>${t.s ? `<span>${esc(t.s)}</span>` : ""}</fieldset>`).join("")}</div>`,
   table: (b) => `<div class="rp-well rp-twell"><table class="rp-t rp-gt">${b.caption ? `<caption>${esc(b.caption)}</caption>` : ""}<thead><tr>${b.head.map((x) => `<th scope="col"${x.num ? ' class="r"' : ""}>${esc(x.t)}</th>`).join("")}</tr></thead><tbody>`
