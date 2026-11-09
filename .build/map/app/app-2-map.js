@@ -434,6 +434,8 @@ function drawGeo(m, alpha, streetA) {
     if (!inBox(g.bb[i], x0, y0, x1, y1) && !sa) continue;
     let c = fillDiv(m, i);
     if (ball > 0) c = ball >= 1 || !c ? th.nodata : mixC(c, th.nodata, ball);
+    // Unsupported/loading surface ground never falls back to the seat's colour.
+    if (look && look.surf > 0) c = th.nodata;
     // (another year's map, under a year morph, quiets with the zoom alone)
     const qn = m === M() ? quietness(i, now) : quietAll();
     if (c && qn > 0) c = towards(c, th.bg, qn);
@@ -445,7 +447,7 @@ function drawGeo(m, alpha, streetA) {
   // as it is; plain land in a year no seat holds one
   const isls = (m.isl || []).filter((q) => inBox(q.mbb, x0, y0, x1, y1));
   const islFill = (q) => {
-    let c = q.owner == null ? th.nodata : fillDiv(m, q.owner);
+    let c = q.owner == null || (look && look.surf > 0) ? th.nodata : fillDiv(m, q.owner);
     const qn = q.owner != null && m === M() ? quietness(q.owner, now) : 0;
     if (c && qn > 0) c = towards(c, th.bg, qn);
     return [c ? css(c) : pat, filt && q.owner != null && !passes(m, q.owner)];
@@ -454,7 +456,7 @@ function drawGeo(m, alpha, streetA) {
     const islOf = (m.isl || []).map(islFill);
     const waterOf = (lab) => {
       if (lab >= m.divs.length) return islOf[lab - m.divs.length];
-      const f = fillOf[lab]; return f && sf && !(sf.none && sf.none[lab]) ? [sf.top, f[1]] : f;
+      const f = fillOf[lab]; return f && sf && sf.top && !(sf.none && sf.none[lab]) ? [sf.top, f[1]] : f;
     };
     layWaters(m, g, st, waterOf, alpha * sa);
   }
@@ -1034,7 +1036,7 @@ function visibleBooths(m) {
   const b = m.booth, out = [], sd = selDiv();
   if (sd == null && T.k < K_IN) return out;
   const [x0, y0, x1, y1] = viewBox(), pad = 24 / T.k;
-  if (sd != null) for (const j of b.byDiv[sd]) if (!Number.isNaN(b.x[j])) out.push(j);
+  if (sd != null) for (const j of b.byDiv[sd]) if (!Number.isNaN(b.x[j]) && surfacePlaceShown(m, j)) out.push(j);
   // (a surface, or the census areas' own ground, is the reading of the whole ground:
   // only an opened seat lays its own places on either)
   if (T.k >= K_IN && drawOf(m) !== "surface" && drawOf(m) !== "areas") for (let j = 0; j < b.n; j++) {
@@ -1072,8 +1074,8 @@ function drawBooths(m) {
   }
   ctx.globalAlpha = ovA;
   const ring = (j, w, col) => { const x = b.x[j] * T.k + T.x, y = b.y[j] * T.k + T.y, r = rad(boothSizeVotes(b, j)); boothShape(ctx, b.ty[j], x, y, r + 2.4); ctx.lineWidth = w; ctx.strokeStyle = css(col); ctx.stroke(); };
-  if (S.hover && S.hover.kind === "booth") ring(S.hover.i, 1.6, th.ink);
-  if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) ring(S.sel.booth, 2.4, th.ink);
+  if (S.hover && S.hover.kind === "booth" && surfacePlaceShown(m, S.hover.i)) ring(S.hover.i, 1.6, th.ink);
+  if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth]) && surfacePlaceShown(m, S.sel.booth)) ring(S.sel.booth, 2.4, th.ink);
   ctx.restore();
 }
 
@@ -1109,7 +1111,7 @@ function drawLabels(m) {
   // (a surface's ground changes under a label, so it takes the lettering that holds on anything)
   const dw = drawOf(m);
   const groundOf = (i) => { if (dw === "surface" || dw === "areas") return th.dark ? [120, 120, 120] : [190, 190, 190]; const c = dw === "balloons" ? th.nodata : fillDiv(m, i); if (!c) return th.nodata; let g = towards(c, th.bg, quietness(i, now)); if (sd != null && i !== sd) g = towards(g, th.bg, th.veil); return g; };
-  if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth])) {
+  if (S.sel.level === "booth" && !Number.isNaN(b.x[S.sel.booth]) && surfacePlaceShown(m, S.sel.booth)) {
     const j = S.sel.booth; put(dn(b.name[j]), b.x[j] * T.k + T.x, b.y[j] * T.k + T.y - rad(boothSizeVotes(b, j)) - 13, 13, 600, groundOf(sd), th.ink, true);
   }
   // the towns: ahead of the seats' names while the view is wide (a city names
@@ -2410,7 +2412,7 @@ function drawIslands(m, alpha = 1) {
     const k = Math.min((r.w - 2 * pad) / s.w, (r.h - top - 2 * pad) / s.h);
     const ox = r.x + (r.w - s.w * k) / 2, oy = r.y + top + (r.h - top - s.h * k) / 2;
     const places = c.docked && sd != null && s.seat === sd && s.booths.length > 0;
-    let col = own == null || drawOf(m) === "balloons" ? th.nodata : fillDiv(m, own);
+    let col = own == null || drawOf(m) === "balloons" || drawOf(m) === "surface" ? th.nodata : fillDiv(m, own);
     if (col && own != null) {
       if (own === sd) col = towards(col, th.bg, quietness(own, now));
       if (sd != null && own !== sd) col = towards(col, th.bg, th.veil);
@@ -2431,7 +2433,7 @@ function drawIslands(m, alpha = 1) {
     // its early-voting centre) sit side by side
     const dots = [];
     if (places) {
-      for (const j of s.booths.slice().sort((p, q) => boothSizeVotes(b, q) - boothSizeVotes(b, p))) {
+      for (const j of s.booths.filter(j => surfacePlaceShown(m, j)).sort((p, q) => boothSizeVotes(b, q) - boothSizeVotes(b, p))) {
         const rr = clamp(3.4 * voteScale(boothSizeVotes(b, j)), 2.6, 8);
         let x = ox + (b.raw.lon[j] - s.lon0) * s.cos * k, y = oy + (s.lat1 - b.raw.lat[j]) * k;
         for (const d of dots) if (Math.hypot(d.x - x, d.y - y) < d.r + rr) x = d.x + d.r + rr + 2;

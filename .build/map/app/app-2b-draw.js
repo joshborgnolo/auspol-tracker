@@ -1,37 +1,15 @@
-/* =============================== how the map is drawn ===============================
-   A lens says what each place reads; the drawing says how that reaches the page.
-     Seats     every seat filled with its own figure (the map as it has always been)
-     Balloons  a circle at every polling place, its area the votes behind the reading
-               (a lead for a lead, a party's votes for a party's share), so a big safe
-               booth outweighs a marginal one and an empty seat holds no ink
-     Surface   the polling places' figures blended into one continuous field, in steps,
-               with a line where the two sides meet. No seat's boundary shapes it
-
-   Both read the lens through boothValue, so every lens's own colours, keys and tooltips
-   carry over. They apply to the map view alone: the chamber and the list keep their seats.
-
-   The surface's field is an estimate at every point and says so in its key. It comes from
-   the polling places' votes on a pyramid of grids (surfaceEngine): each level, coarser
-   than the last, holds the votes and the vote-weighted figure within a cell or so of each
-   node; walking back down, a node keeps its own level's figure where enough votes stand
-   behind it and otherwise takes the level above's, smoothly (cubic B-spline subdivision).
-   So a suburb reads its own booths while the Simpson Desert reads the nearest towns a
-   long way off, and the whole costs a pass over the grid, not over booths times pixels.
-   There is one field for a reading, set in kilometres: the zoom never enters into it, so
-   zooming magnifies a place and can't change what it reads. (It used to be smoothed by the
-   screen, seven pixels' worth, and a spot read differently at every zoom and even, by the
-   way a raster was reused, at the same zoom by the way the reader came to it.)
-
-   Colour is decided a cell at a time: a cell whose corners share a step is filled flat,
-   and only the few cells a step's edge crosses are worked out pixel by pixel, antialiased,
-   which is what keeps a screen of this cheap enough to redo as the reader zooms.
-   The raster comes back through a worker and is laid on as a canvas pattern through the
-   seats' own fill paths (drawGeo), so the coast, the sea cut, the islands, the filters and
-   the veil over an opened seat all work on it as they do on a flat fill. */
-
+/* Surface describes nearby ordinary polling-place results only. It never
+   paints unlocated votes, invents local counts or extrapolates past 25 km.
+   See .build/map/surface-audit.md for the audited method and its limits. */
 const DRAWS = [["seats", "Seats"], ["balloons", "Balloons"], ["surface", "Surface"], ["areas", "Areas"], ["chart", "Chart"]];
 // a seat type belongs to the whole seat, and so does its exhausted share: nothing to blend
-const surfaceFits = (m) => !(S.lens === "cls" || (S.lens === "informal" && infModeOf(m) === "exhaust"));
+function surfaceReason(m) {
+  if (S.lens === "seifa") return "Census figures use census areas, not a smoothed polling-place surface. Use Areas or Seats.";
+  if (S.lens === "cls" || (S.lens === "informal" && infModeOf(m) === "exhaust")) return "This figure belongs to the whole seat. Use Seats.";
+  if ((S.lens === "tpp" && S.tppMode === "swing") || (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap())) return "These changes do not have comparable local count bases for a surface. Use Seats or Balloons.";
+  return "";
+}
+const surfaceFits = (m) => !surfaceReason(m);
 // Areas is the Census lens's own drawing: it needs a census pack for the frame's vintage
 // and a lane the pack serves (the homeless lane is an SA2 estimate, never an SA1 count)
 const areasFits = (m) => {
@@ -44,7 +22,7 @@ const areasFits = (m) => {
 };
 // the drawing in force on an election (the chamber and the list keep their seats)
 // (Chart lays its own plot over the stage: the map beneath keeps its seats)
-const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" || S.draw === "chart" ? "seats" : (S.draw === "surface" && !surfaceFits(m)) || (S.draw === "areas" && !areasFits(m)) ? "seats" : S.draw);
+const drawOf = (m) => (S.view !== "map" || !m || m.house === "senate" || S.draw === "chart" ? "seats" : S.draw === "surface" && !surfaceFits(m) ? (areasFits(m) ? "areas" : "seats") : S.draw === "areas" && !areasFits(m) ? "seats" : S.draw);
 
 /* ----- the contest -----
    Labor v the Coalition is counted at every polling place. Labor v One Nation and the
@@ -250,12 +228,7 @@ function surfaceWeight(m, j) {
   if (S.lens === "senpref") { const s = spOf(m), c = s && spCells(s.booths[b.id[j]]); return c ? c.x + c.y : 0; }
   return b.formal[j];
 }
-/* places with no spot on the map: the remote and mobile teams above all (Lingiari's 35 in 2025
-   took 13,984 votes, 81.5% Labor, in communities right across the seat), and most of a
-   frame's places before the AEC's coordinates begin. We know the seat, not the spot: so a
-   seat's unplaced votes are shared evenly over its land, which is where they were cast, or
-   the surface would read the seat from its towns alone. */
-const SPOT_MIN = 0.02;   // of a seat's placed votes: under this its unplaced votes change nothing
+/* Nominal positions for Balloons only. Surface never uses these positions. */
 function seatSpots(m, i) {
   const c = m._spots || (m._spots = []);
   if (c[i]) return c[i];
@@ -279,289 +252,163 @@ function unitsPerKm(m) {
   const R = Math.PI / 180, dLat = (b[1] - a[1]) * R, dLon = (b[0] - a[0]) * R * Math.cos(a[1] * R);
   return 10 / (6371 * Math.hypot(dLat, dLon));
 }
-// polling places, in the pyramid's terms
+// Surface uses a measure's actual denominator, independently of balloon sizing.
+function surfaceDenominator(m, j) {
+  const b = m.booth, D = m.divs[b.d[j]], raw = b.raw;
+  switch (S.lens) {
+    case "winner": { const t = raw.tcp[j]; return t ? t[0] + t[1] : 0; }
+    case "tpp": { const A = axisOf(m), t = raw.tpp[j]; return A ? A.t[j] : t ? t[0] + t[1] : 0; }
+    case "informal": return b.votes[j];
+    case "flow": return (raw.fl[j] || []).reduce((n, [ci, a, c]) => n + (D.c[ci].b === S.from ? a + c : 0), 0);
+    case "senate": { const s = svOf(m), row = s && s.booths[b.id[j]]; return row ? row[0] : 0; }
+    case "senpref": { const s = spOf(m), c = s && spCells(s.booths[b.id[j]]); return c ? c.x + c.y : 0; }
+    case "fp": return b.formal[j];
+    default: return 0;
+  }
+}
+function surfaceEligible(m, j) {
+  const b = m.booth;
+  return b.ty[j] === 1 && Number.isFinite(b.x[j]) && Number.isFinite(b.y[j])
+    && Number.isFinite(b.raw.lat[j]) && Math.abs(b.raw.lat[j]) <= 90
+    && Number.isFinite(b.raw.lon[j]) && Math.abs(b.raw.lon[j]) <= 180;
+}
+const SURF_MAX_KM = 25, SURF_MIN_KM = 2, SURF_MIN_MASS = 100, SURF_FADE_MASS = 400;
 function surfaceData(m) {
-  const b = m.booth, fam = S.lens === "winner", n = b.n;
-  const idx = [], vals = [], seatN = new Int32Array(m.divs.length), placed = new Float64Array(m.divs.length), loose = new Map();
+  if (!surfaceFits(m)) return null;
+  const b = m.booth, fam = S.lens === "winner", idx = [], vals = [], weights = [];
   const fams = FAMS.slice(), famAt = Object.fromEntries(fams.map((f, k) => [f, k]));
-  const A = fam ? null : axisOf(m);
-  for (let j = 0; j < n; j++) {
-    const w = surfaceWeight(m, j); if (!(w > 0)) continue;
+  const seatN = new Int32Array(m.divs.length), seatVotes = new Float64Array(m.divs.length);
+  for (let j = 0; j < b.n; j++) {
+    if (!surfaceEligible(m, j)) continue;
+    const w = surfaceDenominator(m, j); if (!(w > 0) || !Number.isFinite(w)) continue;
     let val;
-    if (fam) {
-      const tc = finalVotes(m, j), D = m.divs[b.d[j]]; if (!tc || !(tc[0] + tc[1])) continue;
-      val = tc[0] / (tc[0] + tc[1]);
-      if (!Number.isNaN(b.x[j])) vals.push([famAt[D.A.b], famAt[D.B.b], val]);
-    } else {
-      val = drawValue(m, j); if (val == null || Number.isNaN(val)) continue;
-      if (!Number.isNaN(b.x[j])) vals.push(val);
-    }
-    if (Number.isNaN(b.x[j])) { const i = b.d[j], q = loose.get(i) || { w: 0, s: 0 }; q.w += w; q.s += val * w; loose.set(i, q); continue; }
-    idx.push(j); seatN[b.d[j]]++; placed[b.d[j]] += w;
+    if (fam) { const t = b.raw.tcp[j], d = m.divs[b.d[j]]; val = [famAt[d.A.b], famAt[d.B.b], t[0] / w]; }
+    else { val = boothValue(m, j); if (!Number.isFinite(val)) continue; }
+    idx.push(j); vals.push(val); weights.push(w); seatN[b.d[j]]++; seatVotes[b.d[j]] += b.formal[j];
   }
-  if (idx.length < 12) return null;
-  const extra = [];
-  for (const [i, q] of loose) {
-    if (q.w < SPOT_MIN * placed[i]) continue;
-    const spots = seatSpots(m, i), v = q.s / q.w, D = m.divs[i];
-    for (const [sx, sy] of spots) extra.push([sx, sy, q.w / spots.length, fam ? [famAt[D.A.b], famAt[D.B.b], v] : v]);
-    seatN[i]++;
-  }
-  const c = idx.length + extra.length, x = new Float32Array(c), y = new Float32Array(c), w = new Float32Array(c), late = new Float32Array(c);
-  let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
-  const u = unitsPerKm(m), lateAt = SURF_LATE * u;
-  idx.forEach((j, k) => {
-    x[k] = b.x[j]; y[k] = b.y[j]; w[k] = surfaceWeight(m, j);
-    // an early voting centre takes its votes from across a district, so it joins from the coarser levels only
-    late[k] = b.ty[j] === 5 ? lateAt : 0;
-    bx0 = Math.min(bx0, x[k]); bx1 = Math.max(bx1, x[k]); by0 = Math.min(by0, y[k]); by1 = Math.max(by1, y[k]);
-  });
-  extra.forEach(([sx, sy, sw, sv], e) => { const k = idx.length + e; x[k] = sx; y[k] = sy; w[k] = sw; late[k] = lateAt; vals.push(sv); });
-  const none = m.divs.map((d) => seatN[d.i] === 0);
-  const th = TH, D = { n: c, x, y, w, late, bx0, by0, bx1, by1, u, M0: SURF_M0, ink: rgba32(th.ink) };
+  if (!idx.length) return null;
+  const n = idx.length, x = Float64Array.from(idx, (j) => b.x[j]), y = Float64Array.from(idx, (j) => b.y[j]);
+  const p = m.proj, rad = Math.PI / 180, parallels = p.parallels().map((v) => Math.sin(v * rad));
+  const pn = (parallels[0] + parallels[1]) / 2, pc = 1 + parallels[0] * (2 * pn - parallels[0]), tr = p.translate();
+  const centre = p.center(), cr = Math.sqrt(pc - 2 * pn * Math.sin(centre[1] * rad)) / pn, ct = centre[0] * rad * pn;
+  const D = { n, x, y, w: Float64Array.from(weights), lon: Float64Array.from(idx, (j) => b.raw.lon[j]), lat: Float64Array.from(idx, (j) => b.raw.lat[j]),
+    projection: { k: p.scale(), tx: tr[0], ty: tr[1], n: pn, c: pc, r0: Math.sqrt(pc) / pn, cx: cr * Math.sin(ct), cy: Math.sqrt(pc) / pn - cr * Math.cos(ct), rotate: p.rotate()[0] },
+    u: unitsPerKm(m), maxKm: SURF_MAX_KM, minKm: SURF_MIN_KM, minMass: SURF_MIN_MASS, fadeMass: SURF_FADE_MASS,
+    bg: rgba32(TH.nodata), ink: rgba32(TH.ink), boothIndex: idx, seatN, seatVotes };
   if (fam) {
-    // only the groups that lead somewhere, or finish in anyone's two, get a channel of their own
-    const used = fams.filter((f, k) => vals.some((q) => q[0] === k || q[1] === k));
-    const remap = fams.map((f) => used.indexOf(f));
-    D.ch = used.map(() => new Float32Array(c));
+    const used = fams.filter((f, k) => vals.some((q) => q[0] === k || q[1] === k)), remap = fams.map((f) => used.indexOf(f));
+    D.ch = used.map(() => new Float64Array(n));
     vals.forEach((q, k) => { D.ch[remap[q[0]]][k] += q[2]; D.ch[remap[q[1]]][k] += 1 - q[2]; });
     const nb = LEAD_STEPS.length + 1;
     D.fam = true; D.nb = nb; D.lo = 0; D.hi = 100;
     D.band = new Uint8Array(4096).map((_, k) => { const v = (100 * k) / 4095; let q = 0; while (q < LEAD_STEPS.length && v >= LEAD_STEPS[q]) q++; return q; });
     D.col = new Uint32Array(used.length * nb);
     used.forEach((f, u) => { for (let q = 0; q < nb; q++) D.col[u * nb + q] = rgba32(RAMP.gain[f][Math.round(LEAD_RAMP_AT[q] * 100)]); });
-    D.line = 1; D.ids = used;
+    D.ids = used;
   } else {
-    D.ch = [Float32Array.from(vals)];
+    D.ch = [Float64Array.from(vals)];
     const sc = surfaceScale(m), e = sc.edges;
-    D.fam = false; D.lo = sc.lo; D.hi = sc.hi; D.line = sc.line;
+    D.fam = false; D.lo = sc.lo; D.hi = sc.hi;
     D.band = new Uint8Array(4096).map((_, k) => { const v = sc.lo + ((sc.hi - sc.lo) * k) / 4095; let q = 0; while (q < e.length && v >= e[q]) q++; return q; });
-    D.col = Uint32Array.from({ length: e.length + 1 }, (_, k) => { const c1 = colorOf(bandMid(sc, k)); return rgba32(c1 || th.nodata); });
+    D.col = Uint32Array.from({ length: e.length + 1 }, (_, k) => rgba32(colorOf(bandMid(sc, k)) || TH.nodata));
   }
-  return { D, none };
+  return { D, none: m.divs.map(d => seatN[d.i] === 0) };
 }
-const SURF_M0 = 6000;     // votes: under this a level's figure gives way to the level above
-const SURF_LATE = 7;      // km: the cell at which an early voting centre joins
 
-/* the surface: one field for a reading, made once, and pictures of it. Self-contained: a worker runs
-   this very text. D is a reading's places; the field is a function of the spot alone, so a view, a zoom
-   and a screen only choose where to look at it (what the map is for: zooming in magnifies a place, it
-   doesn't ask a different question of it).
-   A lattice in kilometres, never in pixels. The whole frame comes first (build), every 8km (C0, D.u being
-   map units a kilometre), filled from a pyramid above it. Finer levels, to 1km, are only worth having where
-   votes stand behind them, so they live in tiles made as a view first needs them (tile): a level's figure
-   counts where its votes reach M0 and otherwise gives way to the level above, smoothly (cubic B-spline
-   subdivision). Sampling is a cubic B-spline too, so the field is smooth at any magnification. A view too
-   wide to show a tile's finest lattice reads its mip, the average of the field over that coarser cell, and
-   one as wide as the frame's own 8km reads the frame: the whole country needs no tiles at all, so a
-   reading's first picture is quick, and the tiles a closer view asks for are made once and kept. */
+/* A local descriptive surface, not a model of residents. Distances are great-circle
+   kilometres; a compact kernel has exactly zero influence outside its radius.
+   Four nearest distinct sites set bandwidth (2–25 km); vote counts set the blend.
+   Support is kernel-weighted ballots, not a confidence interval. */
 function surfaceEngine() {
-  const CELL = 3, PAD = 3, KA = 7, TN = 128, MG = 20, FINE = 3, built = new WeakMap(), wx = new Float64Array(4), wy = new Float64Array(4);
-  // [1 4 6 4 1]/16 each way, on a whole grid
-  const blur = (a, nx, ny) => {
-    const t = new Float32Array(nx * ny);
-    for (let j = 0; j < ny; j++) { const o = j * nx; for (let i = 0; i < nx; i++) {
-      const i1 = i > 0 ? i - 1 : 0, i2 = i > 1 ? i - 2 : 0, i3 = i < nx - 1 ? i + 1 : i, i4 = i < nx - 2 ? i + 2 : nx - 1;
-      t[o + i] = (a[o + i2] + 4 * a[o + i1] + 6 * a[o + i] + 4 * a[o + i3] + a[o + i4]) / 16;
-    } }
-    for (let j = 0; j < ny; j++) {
-      const j1 = (j > 0 ? j - 1 : 0) * nx, j2 = (j > 1 ? j - 2 : 0) * nx, j3 = (j < ny - 1 ? j + 1 : j) * nx, j4 = (j < ny - 2 ? j + 2 : ny - 1) * nx, o = j * nx;
-      for (let i = 0; i < nx; i++) a[o + i] = (t[j2 + i] + 4 * t[j1 + i] + 6 * t[o + i] + 4 * t[j3 + i] + t[j4 + i]) / 16;
-    }
-  };
-  // a coarse level's nodes fall on every second node of the one below it: the cubic B-spline's rule
-  const subdivide = (a, Co, Fi) => {
-    const ox = Fi.ix - 2 * Co.ix, oy = Fi.iy - 2 * Co.iy, cnx = Co.nx, cny = Co.ny;
-    const tmp = new Float32Array(Fi.nx * cny), out = new Float32Array(Fi.nx * Fi.ny);
-    for (let j = 0; j < cny; j++) { const o = j * cnx, t = j * Fi.nx;
-      for (let i = 0; i < Fi.nx; i++) {
-        const u = i + ox, h = u >> 1, i0 = h < 0 ? 0 : h >= cnx ? cnx - 1 : h, i1 = i0 + 1 < cnx ? i0 + 1 : i0, im = i0 > 0 ? i0 - 1 : 0;
-        tmp[t + i] = u & 1 ? (a[o + i0] + a[o + i1]) / 2 : (a[o + im] + 6 * a[o + i0] + a[o + i1]) / 8;
-      }
-    }
-    for (let j = 0; j < Fi.ny; j++) {
-      const u = j + oy, h = u >> 1, j0 = h < 0 ? 0 : h >= cny ? cny - 1 : h, j1 = j0 + 1 < cny ? j0 + 1 : j0, jm = j0 > 0 ? j0 - 1 : 0, o = j * Fi.nx;
-      const r0 = j0 * Fi.nx, r1 = j1 * Fi.nx, rm = jm * Fi.nx;
-      if (u & 1) for (let i = 0; i < Fi.nx; i++) out[o + i] = (tmp[r0 + i] + tmp[r1 + i]) / 2;
-      else for (let i = 0; i < Fi.nx; i++) out[o + i] = (tmp[rm + i] + 6 * tmp[r0 + i] + tmp[r1 + i]) / 8;
-    }
-    return out;
-  };
-  // a level's votes and vote-weighted figures, within a cell or so of its nodes
-  const pile = (D, G, on) => {
-    const { n, x, y, w, late, ch } = D, nc = ch.length, { c, ix, iy, nx, ny } = G, W = new Float32Array(nx * ny), N = ch.map((_, q) => (!on || on[q] ? new Float32Array(nx * ny) : null));
-    for (let k = 0; k < n; k++) {
-      if (c < late[k]) continue;
-      const gx = x[k] / c - ix, gy = y[k] / c - iy, i = Math.floor(gx), j = Math.floor(gy);
-      if (i < 0 || j < 0 || i >= nx - 1 || j >= ny - 1) continue;
-      const fx = gx - i, fy = gy - j, o = j * nx + i, wa = w[k] * (1 - fx) * (1 - fy), wb = w[k] * fx * (1 - fy), wc = w[k] * (1 - fx) * fy, wd = w[k] * fx * fy;
-      W[o] += wa; W[o + 1] += wb; W[o + nx] += wc; W[o + nx + 1] += wd;
-      for (let q = 0; q < nc; q++) { const A = N[q]; if (!A) continue; const v = ch[q][k]; A[o] += wa * v; A[o + 1] += wb * v; A[o + nx] += wc * v; A[o + nx + 1] += wd * v; }
-    }
-    blur(W, nx, ny); for (let q = 0; q < nc; q++) if (N[q]) blur(N[q], nx, ny);
-    G.W = W; G.N = N;
-  };
-  // a level's figures over the one above it, where its votes reach
-  const settle = (D, G, U, q) => {
-    const W = G.W, A = G.N[q], M2 = D.M0 * D.M0;
-    for (let k = 0; k < U.length; k++) { const wv = W[k]; if (!(wv > 1e-3)) continue; const m = wv * KA, t = (m * m) / (m * m + M2); U[k] += t * (A[k] / wv - U[k]); }
-    return U;
-  };
-  // the whole frame, every 8km
+  const cache = new WeakMap(), RAD = Math.PI / 180, EARTH = 6371;
+  const vector = (D, x, y) => D.projection ? [Math.cos(y * RAD) * Math.cos(x * RAD), Math.cos(y * RAD) * Math.sin(x * RAD), Math.sin(y * RAD)] : [x / D.u, y / D.u, 0];
+  const squaredRadius = (D, km) => D.projection ? (2 * Math.sin(km / (2 * EARTH))) ** 2 : km * km;
+  const distanceKm = (D, squared) => D.projection ? 2 * EARTH * Math.asin(Math.min(1, Math.sqrt(squared) / 2)) : Math.sqrt(squared);
   function build(D) {
-    let S = built.get(D);
-    if (S) return S;
-    const { n, w, ch } = D, nc = ch.length, C0 = 8 * D.u, CF = C0 / 2 ** FINE, pad = 8 * C0;
-    const x0 = D.bx0 - pad, y0 = D.by0 - pad, x1 = D.bx1 + pad, y1 = D.by1 + pad, ext = Math.max(x1 - x0, y1 - y0);
-    let top = 0; while (C0 * 2 ** top < ext / 3) top++;
-    const Ls = [];
-    for (let l = 0; l <= top; l++) {
-      const c = C0 * 2 ** l, ix = Math.floor(x0 / c) - PAD, iy = Math.floor(y0 / c) - PAD, G = { c, ix, iy, nx: Math.ceil(x1 / c) + PAD - ix + 1, ny: Math.ceil(y1 / c) + PAD - iy + 1 };
-      pile(D, G); Ls.push(G);
+    let c = cache.get(D); if (c) return c;
+    const sites = new Map();
+    for (let i = 0; i < D.n; i++) {
+      if (!(D.w[i] > 0)) continue;
+      const x = D.projection ? D.lon[i] : D.x[i], y = D.projection ? D.lat[i] : D.y[i], key = `${x},${y}`;
+      if (!sites.has(key)) sites.set(key, { point: vector(D, x, y), indices: [] });
+      sites.get(key).indices.push(i);
     }
-    let sw = 0; const sn = new Float64Array(nc);
-    for (let k = 0; k < n; k++) { sw += w[k]; for (let q = 0; q < nc; q++) sn[q] += w[k] * ch[q][k]; }
-    const T0 = Ls[top], F = [];
-    for (let q = 0; q < nc; q++) { const a = new Float32Array(T0.nx * T0.ny), mean = sn[q] / sw; for (let k = 0; k < a.length; k++) a[k] = T0.W[k] > 1e-3 ? T0.N[q][k] / T0.W[k] : mean; F.push(a); }
-    for (let l = top - 1; l >= 0; l--) { for (let q = 0; q < nc; q++) F[q] = settle(D, Ls[l], subdivide(F[q], Ls[l + 1], Ls[l]), q); if (l) Ls[l].W = Ls[l].N = null; }
-    // the tiles worth making: where a fine level's votes could reach M0, and a little round
-    const G = Ls[0], want = new Set(), span = TN * CF, reach = 2 * C0, floorM = 0.5 * D.M0;
-    for (let j = 0, o = 0; j < G.ny; j++) for (let i = 0; i < G.nx; i++, o++) {
-      if (G.W[o] * KA < floorM) continue;
-      const x = (G.ix + i) * C0, y = (G.iy + j) * C0;
-      for (const dx of [-reach, reach]) for (const dy of [-reach, reach]) want.add(Math.floor((x + dx) / span) * 65536 + Math.floor((y + dy) / span));
+    function tree(rows, depth) {
+      if (!rows.length) return null;
+      const axis = depth % (D.projection ? 3 : 2), mid = rows.length >> 1;
+      rows.sort((a, b) => a.point[axis] - b.point[axis]);
+      return { ...rows[mid], axis, left: tree(rows.slice(0, mid), depth + 1), right: tree(rows.slice(mid + 1), depth + 1) };
     }
-    G.W = G.N = null;
-    S = { C0, CF, span, G, F, want, tiles: new Map(), nc };
-    built.set(D, S);
-    return S;
+    c = tree([...sites.values()], 0); cache.set(D, c); return c;
   }
-  // a tile: its lattice's finest levels over the frame's, and each coarser cell's average for a wide view
-  function tile(D, S, tx, ty) {
-    const key = tx * 65536 + ty;
-    let t = S.tiles.get(key);
-    if (t !== undefined) return t;
-    if (!S.want.has(key)) { S.tiles.set(key, null); return null; }
-    const ix0 = tx * TN - MG, iy0 = ty * TN - MG, ix1 = ix0 + TN + 2 * MG, iy1 = iy0 + TN + 2 * MG, Ls = [];
-    for (let l = 0; l <= FINE; l++) { const s = 2 ** l, ix = Math.floor(ix0 / s) - PAD, iy = Math.floor(iy0 / s) - PAD; Ls.push({ c: S.CF * s, ix, iy, nx: Math.ceil(ix1 / s) + PAD - ix + 1, ny: Math.ceil(iy1 / s) + PAD - iy + 1 }); }
-    // (a group with nothing here stays at nothing: most tiles need two or three of a Winner field's six)
-    const Top = Ls[FINE], g = S.G, on = new Array(S.nc).fill(false), F = S.F.map((A, q) => { const a = new Float32Array(Top.nx * Top.ny); for (let j = 0, o = 0; j < Top.ny; j++) { const v = Math.max(0, Math.min(g.ny - 1, Top.iy + j - g.iy)); for (let i = 0; i < Top.nx; i++, o++) { const s = A[v * g.nx + Math.max(0, Math.min(g.nx - 1, Top.ix + i - g.ix))]; a[o] = s; if (s > 1e-3) on[q] = true; } } return a; });
-    if (!D.fam) on.fill(true);
-    for (let l = 0; l < FINE; l++) pile(D, Ls[l], on);
-    for (let l = FINE - 1; l >= 0; l--) { for (let q = 0; q < S.nc; q++) F[q] = on[q] ? settle(D, Ls[l], subdivide(F[q], Ls[l + 1], Ls[l]), q) : null; Ls[l].W = Ls[l].N = null; }
-    const G0 = Ls[0], mips = [{ G: G0, F }];
-    for (let m = 1; m <= FINE; m++) {
-      const P = mips[m - 1], g0 = P.G, ix = Math.ceil(g0.ix / 2) + 1, iy = Math.ceil(g0.iy / 2) + 1, nx = Math.floor((g0.ix + g0.nx - 2) / 2) - ix + 1, ny = Math.floor((g0.iy + g0.ny - 2) / 2) - iy + 1, G = { c: g0.c * 2, ix, iy, nx, ny };
-      const down = P.F.map((A) => {
-        if (!A) return null;
-        const a = new Float32Array(nx * ny), r = g0.nx;
-        for (let j = 0, o = 0; j < ny; j++) { const c = (2 * (iy + j) - g0.iy) * r; for (let i = 0; i < nx; i++, o++) { const k = c + 2 * (ix + i) - g0.ix; a[o] = (4 * A[k] + 2 * (A[k - 1] + A[k + 1] + A[k - r] + A[k + r]) + A[k - r - 1] + A[k - r + 1] + A[k + r - 1] + A[k + r + 1]) / 16; } }
-        return a;
-      });
-      mips.push({ G, F: down });
-    }
-    S.tiles.set(key, (t = mips));
-    return t;
+  // Inverse of the map's unreflected, unrotated-screen conic equal-area projection.
+  // Frame fits supply their parallels, longitude rotation, scale and centre offset.
+  function lonlat(D, x, y) {
+    const p = D.projection;
+    if (!p) return [x, y];
+    const X = (x - p.tx) / p.k + (p.cx || 0), Y = p.r0 + (y - p.ty) / p.k - (p.cy || 0);
+    const theta = Math.atan2(p.n < 0 ? -X : X, p.n < 0 ? -Y : Y);
+    const lon = theta / p.n / RAD - p.rotate;
+    const lat = Math.asin(Math.max(-1, Math.min(1, (p.c - (X * X + Y * Y) * p.n * p.n) / (2 * p.n)))) / RAD;
+    return [lon, lat];
   }
-  // the field at a spot, off a lattice: a cubic B-spline of its four nearest nodes each way
-  function read(G, F, x, y, out) {
-    const u = x / G.c - G.ix, v = y / G.c - G.iy, i = Math.floor(u), j = Math.floor(v), a = u - i, b = v - j, nx = G.nx, ny = G.ny;
-    const a2 = a * a, a3 = a2 * a, b2 = b * b, b3 = b2 * b;
-    wx[0] = (1 - 3 * a + 3 * a2 - a3) / 6; wx[1] = (4 - 6 * a2 + 3 * a3) / 6; wx[2] = (1 + 3 * a + 3 * a2 - 3 * a3) / 6; wx[3] = a3 / 6;
-    wy[0] = (1 - 3 * b + 3 * b2 - b3) / 6; wy[1] = (4 - 6 * b2 + 3 * b3) / 6; wy[2] = (1 + 3 * b + 3 * b2 - 3 * b3) / 6; wy[3] = b3 / 6;
-    const inner = i >= 1 && j >= 1 && i < nx - 2 && j < ny - 2;
-    for (let q = 0; q < F.length; q++) {
-      const A = F[q];
-      if (!A) { out[q] = 0; continue; }
-      let s = 0;
-      if (inner) {
-        for (let dj = 0, o = (j - 1) * nx + i - 1; dj < 4; dj++, o += nx) s += wy[dj] * (wx[0] * A[o] + wx[1] * A[o + 1] + wx[2] * A[o + 2] + wx[3] * A[o + 3]);
-      } else for (let dj = 0; dj < 4; dj++) {
-        const jj = j + dj - 1, r = (jj < 0 ? 0 : jj >= ny ? ny - 1 : jj) * nx; let row = 0;
-        for (let di = 0; di < 4; di++) { const ii = i + di - 1; row += wx[di] * A[r + (ii < 0 ? 0 : ii >= nx ? nx - 1 : ii)]; }
-        s += wy[dj] * row;
+  function sample(D, x, y) {
+    const root = build(D), ll = lonlat(D, x, y), point = vector(D, ll[0], ll[1]), max = D.maxKm || 25;
+    const max2 = squaredRadius(D, max), nearestFour = [];
+    const squaredDistance = (node) => (node.point[0] - point[0]) ** 2 + (node.point[1] - point[1]) ** 2 + (node.point[2] - point[2]) ** 2;
+    // Three-dimensional unit-sphere chords preserve great-circle distance order.
+    // The spatial tree avoids scanning every booth in a city for every pixel.
+    function nearest(node) {
+      if (!node) return;
+      const d2 = squaredDistance(node), delta = point[node.axis] - node.point[node.axis];
+      if (d2 < max2) { nearestFour.push(d2); nearestFour.sort((a, b) => a - b); if (nearestFour.length > 4) nearestFour.pop(); }
+      nearest(delta < 0 ? node.left : node.right);
+      if (delta * delta < (nearestFour.length === 4 ? nearestFour[3] : max2)) nearest(delta < 0 ? node.right : node.left);
+    }
+    nearest(root);
+    if (!nearestFour.length) return null;
+    const radius = nearestFour.length === 4 ? Math.min(max, Math.max(D.minKm || 2, 2 * distanceKm(D, nearestFour[3]))) : max, radius2 = squaredRadius(D, radius);
+    const values = new Float64Array(D.ch.length); let mass = 0, count = 0, nearestKm = Infinity;
+    function accumulate(node) {
+      if (!node) return;
+      const d2 = squaredDistance(node), delta = point[node.axis] - node.point[node.axis];
+      if (d2 < radius2) {
+        const km = distanceKm(D, d2), t = km / radius, kernel = (1 - t) ** 4 * (1 + 4 * t);
+        for (const i of node.indices) {
+          const w = kernel * D.w[i]; mass += w; count++; nearestKm = Math.min(nearestKm, km);
+          for (let q = 0; q < values.length; q++) values[q] += w * D.ch[q][i];
+        }
       }
-      out[q] = s;
+      accumulate(delta < 0 ? node.left : node.right);
+      if (delta * delta < radius2) accumulate(delta < 0 ? node.right : node.left);
     }
+    accumulate(root);
+    if (mass < (D.minMass || 100)) return null;
+    for (let q = 0; q < values.length; q++) values[q] /= mass;
+    const a = Math.min(1, Math.max(0, (mass - (D.minMass || 100)) / (D.fadeMass || 400)));
+    return { values, mass, count, nearest: nearestKm, radius, alpha: a * a * (3 - 2 * a) };
   }
-  let lastKey = null, lastTile = null, lastS = null;
-  function sample(D, S, x, y, mip, out) {
-    if (mip >= FINE) { read(S.G, S.F, x, y, out); return; }
-    const tx = Math.floor(x / S.span), ty = Math.floor(y / S.span), key = tx * 65536 + ty;
-    if (S !== lastS || key !== lastKey) { lastS = S; lastKey = key; lastTile = tile(D, S, tx, ty); }
-    const t = lastTile;
-    if (t) read(t[mip].G, t[mip].F, x, y, out); else read(S.G, S.F, x, y, out);
-  }
-  // the reading at a spot, whatever is on the screen
-  function at(D, x, y) {
-    const S = build(D), out = new Float64Array(S.nc);
-    sample(D, S, x, y, 0, out);
-    return out;
-  }
-  // the picture of a window J of the field
+  function at(D, x, y) { return sample(D, x, y); }
   function raster(D, J) {
-    const S = build(D), nc = S.nc, p = J.px, c0 = CELL * p, W = J.nx, H = J.ny, cw = Math.ceil(W / CELL), chh = Math.ceil(H / CELL), row = cw + 1;
-    const mip = Math.max(0, Math.min(FINE, Math.round(Math.log2(c0 / S.CF)))), F = Array.from({ length: nc }, () => new Float32Array(row * (chh + 1))), v = new Float64Array(nc);
-    for (let j = 0, o = 0; j <= chh; j++) for (let i = 0; i <= cw; i++, o++) { sample(D, S, J.x0 + i * c0, J.y0 + j * c0, mip, v); for (let q = 0; q < nc; q++) F[q][o] = v[q]; }
-    const out = new Uint32Array(W * H);
-    const { band, col, lo, hi, line, fam, nb, ink } = D, sc = 4095 / (hi - lo);
-    const bandOf = (s) => { const k = ((s - lo) * sc) | 0; return band[k < 0 ? 0 : k > 4095 ? 4095 : k]; };
-    const CL = new Int16Array(row * (chh + 1)), SD = new Int8Array(row * (chh + 1));
-    const lead = (at2) => { let a = 0, b = -1, va = -1, vb = -1; for (let q = 0; q < nc; q++) { const s = at2(q); if (s > va) { vb = va; b = a; va = s; a = q; } else if (s > vb) { vb = s; b = q; } } return [a, b, va, vb < 0 ? 0 : vb]; };
-    for (let o = 0; o < CL.length; o++) {
-      if (fam) { let a = 0, va = -1, vb = -1; for (let q = 0; q < nc; q++) { const s = F[q][o]; if (s > va) { vb = va; va = s; a = q; } else if (s > vb) vb = s; } CL[o] = a * nb + bandOf(100 * (va - Math.max(vb, 0))); SD[o] = a; }
-      else { const s = F[0][o]; CL[o] = bandOf(s); SD[o] = line != null && s >= line ? 1 : 0; }
-    }
-    // flat cells, edge cells, and those the line crosses or nearly does
-    const FL = new Uint8Array(cw * chh);
-    for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
-      const a = j * row + i, b = a + 1, c = a + row, d = c + 1;
-      if (CL[a] !== CL[b] || CL[a] !== CL[c] || CL[a] !== CL[d]) FL[j * cw + i] = 1;
-      if (line != null && (SD[a] !== SD[b] || SD[a] !== SD[c] || SD[a] !== SD[d])) FL[j * cw + i] = 2;
-    }
-    if (line != null) for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
-      if (FL[j * cw + i] !== 2) continue;
-      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ni = i + di, nj = j + dj; if (ni >= 0 && nj >= 0 && ni < cw && nj < chh && FL[nj * cw + ni] < 2) FL[nj * cw + ni] = 3; }
-    }
-    const LN = CELL + 1, lc = new Int32Array(LN * LN), ls = new Float32Array(LN * LN), lw = J.lw;
-    const inkR = ink & 255, inkG = (ink >> 8) & 255, inkB = (ink >> 16) & 255;
-    for (let j = 0; j < chh; j++) for (let i = 0; i < cw; i++) {
-      const f = FL[j * cw + i], px0 = i * CELL, py0 = j * CELL;
-      if (!f) {
-        const c = col[CL[j * row + i]], xe = Math.min(W, px0 + CELL), ye = Math.min(H, py0 + CELL);
-        for (let yy = py0; yy < ye; yy++) { const o = yy * W; for (let xx = px0; xx < xe; xx++) out[o + xx] = c; }
-        continue;
-      }
-      const k00 = j * row + i, k10 = k00 + 1, k01 = k00 + row, k11 = k01 + 1, lineOn = line != null && f >= 2;
-      let ta = 0, tb = 1;
-      if (fam) { const r = lead((q) => (F[q][k00] + F[q][k10] + F[q][k01] + F[q][k11]) / 4); ta = r[0]; tb = r[1] < 0 ? r[0] : r[1]; }
-      for (let b = 0, o = 0; b < LN; b++) { const t = b / CELL; for (let a = 0; a < LN; a++, o++) {
-        const u = a / CELL, w00 = (1 - u) * (1 - t), w10 = u * (1 - t), w01 = (1 - u) * t, w11 = u * t;
-        if (fam) {
-          let ia = 0, va = -1, vb = -1;
-          for (let q = 0; q < nc; q++) { const A = F[q], s = A[k00] * w00 + A[k10] * w10 + A[k01] * w01 + A[k11] * w11; if (s > va) { vb = va; va = s; ia = q; } else if (s > vb) vb = s; }
-          lc[o] = col[ia * nb + bandOf(100 * (va - Math.max(vb, 0)))];
-          const A = F[ta], B = F[tb]; ls[o] = (A[k00] - B[k00]) * w00 + (A[k10] - B[k10]) * w10 + (A[k01] - B[k01]) * w01 + (A[k11] - B[k11]) * w11;
-        } else {
-          const A = F[0], s = A[k00] * w00 + A[k10] * w10 + A[k01] * w01 + A[k11] * w11;
-          lc[o] = col[bandOf(s)]; if (lineOn) ls[o] = s - line;
-        }
-      } }
-      for (let b = 0; b < CELL; b++) { const yy = py0 + b; if (yy >= H) break; for (let a = 0; a < CELL; a++) {
-        const xx = px0 + a; if (xx >= W) break;
-        const o = b * LN + a, c0a = lc[o], c1 = lc[o + 1], c2 = lc[o + LN], c3 = lc[o + LN + 1];
-        let R = ((c0a & 255) + (c1 & 255) + (c2 & 255) + (c3 & 255)) / 4, G = (((c0a >> 8) & 255) + ((c1 >> 8) & 255) + ((c2 >> 8) & 255) + ((c3 >> 8) & 255)) / 4, B = (((c0a >> 16) & 255) + ((c1 >> 16) & 255) + ((c2 >> 16) & 255) + ((c3 >> 16) & 255)) / 4;
-        if (lineOn) {
-          const s0 = ls[o], s1 = ls[o + 1], s2 = ls[o + LN], s3 = ls[o + LN + 1], m = (s0 + s1 + s2 + s3) / 4, gx = (s1 + s3 - s0 - s2) / 2, gy = (s2 + s3 - s0 - s1) / 2, g = Math.sqrt(gx * gx + gy * gy);
-          const dist = g > 1e-6 ? Math.abs(m) / g : 9, cov = dist >= lw / 2 + 0.5 ? 0 : dist <= lw / 2 - 0.5 ? 1 : lw / 2 + 0.5 - dist;
-          if (cov > 0) { R += (inkR - R) * cov; G += (inkG - G) * cov; B += (inkB - B) * cov; }
-        }
-        out[yy * W + xx] = ((255 << 24) | (B << 16) | (G << 8) | (R | 0)) >>> 0;
-      } }
+    const out = new Uint32Array(J.nx * J.ny), { band, col, lo, hi, fam, nb } = D, scale = 4095 / (hi - lo);
+    const bg = D.bg || 0xffeeeeee, bandOf = (v) => band[Math.max(0, Math.min(4095, Math.floor((v - lo) * scale)))];
+    // Every pixel samples the same field as the tooltip. No interpolating across
+    // missing cells: an unsupported pixel stays neutral at every zoom.
+    for (let y = 0, o = 0; y < J.ny; y++) for (let x = 0; x < J.nx; x++, o++) {
+      const s = sample(D, J.x0 + (x + 0.5) * J.px, J.y0 + (y + 0.5) * J.px);
+      if (!s) { out[o] = bg; continue; }
+      let color;
+      if (fam) {
+        let winner = 0, first = -Infinity, second = -Infinity;
+        s.values.forEach((v, q) => { if (v > first) { second = first; first = v; winner = q; } else if (v > second) second = v; });
+        color = col[winner * nb + bandOf(100 * (first - Math.max(0, second)))];
+      } else color = col[bandOf(s.values[0])];
+      const a = s.alpha, r = (bg & 255) + a * ((color & 255) - (bg & 255)), g = ((bg >>> 8) & 255) + a * (((color >>> 8) & 255) - ((bg >>> 8) & 255)), b = ((bg >>> 16) & 255) + a * (((color >>> 16) & 255) - ((bg >>> 16) & 255));
+      out[o] = (0xff000000 | (Math.round(b) << 16) | (Math.round(g) << 8) | Math.round(r)) >>> 0;
     }
     return { rgba: out.buffer };
   }
-  return { at, raster };
+  return { at, raster, lonlat };
 }
 
 /* ----- the rasters -----
@@ -576,12 +423,11 @@ function surfaceWorker() {
   try {
     const src = `const E=(${surfaceEngine})();const sets=new Map();onmessage=async(e)=>{const q=e.data;if(q.t==="set"){sets.set(q.key,q.D);while(sets.size>3)sets.delete(sets.keys().next().value);return;}
 const D=sets.get(q.key);
-if(q.t==="at"){if(D)postMessage({t:"at",key:q.key,id:q.id,x:q.x,y:q.y,v:E.at(D,q.x,q.y)});return;}
 if(!D){postMessage({id:q.id,key:q.key,J:q.J,gone:true});return;}
 const r=E.raster(D,q.J);let bitmap=null;try{bitmap=await createImageBitmap(new ImageData(new Uint8ClampedArray(r.rgba),q.J.nx,q.J.ny));}catch(x){}
 const moved=bitmap?[bitmap]:[r.rgba];postMessage({id:q.id,key:q.key,J:q.J,bitmap,rgba:bitmap?null:r.rgba},moved);};`;
     SF.wk = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
-    SF.wk.onmessage = (e) => (e.data.t === "at" ? surfaceHeard(e.data) : surfaceDone(e.data));
+    SF.wk.onmessage = (e) => surfaceDone(e.data);
     SF.wk.onerror = () => { SF.dead = true; SF.wk = null; SF.busy = false; SF.sent = null; schedule(); };
   } catch (e) { SF.dead = true; SF.wk = null; }
   return SF.wk;
@@ -614,19 +460,11 @@ async function surfaceDone(q) {
 }
 const closeLayer = (L) => { if (L.src && L.src.close) L.src.close(); };
 function surfaceStart(m, key) {
-  // the reading before crossfades away, carried onto this election's plane; another jurisdiction's just goes
-  const old = [SF.base, SF.view].filter(Boolean);
-  if (SF.old) SF.old.forEach(closeLayer);
+  for (const L of [SF.base, SF.view, ...(SF.old || [])].filter(Boolean)) closeLayer(L);
   SF.old = null; SF.base = SF.view = null;
-  if (old.length && SF.m === m) SF.old = old;
-  else if (old.length && SF.m && !reduceMotion && jurOf(SF.m.year) === jurOf(m.year)) {
-    const A = frameMap(SF.m, m);
-    old.forEach((L) => L.pat.setTransform(new DOMMatrix([A.a * L.J.px, 0, 0, A.a * L.J.px, A.a * L.J.x0 + A.bx, A.a * L.J.y0 + A.by])));
-    SF.old = old;
-  } else old.forEach(closeLayer);
   SF.key = key; SF.m = m; SF.sent = null; SF.here = null;
   const d = surfaceData(m);
-  SF.empty = !d; SF.data = d ? d.D : null; SF.none = d ? d.none : null; SF.ids = d ? d.D.ids || null : null;
+  SF.empty = !d; SF.data = d ? d.D : null; SF.sources = new Set(d ? d.D.boothIndex : []); SF.none = d ? d.none : null; SF.ids = d ? d.D.ids || null : null;
   SF.t1 = performance.now();
 }
 const SNAP = (v, c) => Math.floor(v / c) * c;
@@ -640,7 +478,8 @@ function surfaceTick(m) {
     surfaceJob({ base: true, px, x0, y0, nx: Math.ceil((1.16 * hw) / c + 1) * 3, ny: Math.ceil((1.16 * hh) / c + 1) * 3, lw: 1.5 });
     return;
   }
-  const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
+  // Two CSS pixels are sufficient for the smoothed field; point readings remain exact.
+  const q = 0.5, want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
   if (want >= SF.base.J.px * 0.8) { if (SF.view) { closeLayer(SF.view); SF.view = null; } return; }
   const [vx0, vy0, vx1, vy1] = viewBox(), V = SF.view;
   if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.x0 <= vx0 && V.y0 <= vy0 && V.x1 >= vx1 && V.y1 >= vy1) return;
@@ -660,45 +499,39 @@ function surfaceLook(m, a) {
   const [vx0, vy0, vx1, vy1] = viewBox(), V = SF.view, full = V && V.x0 <= vx0 && V.y0 <= vy0 && V.x1 >= vx1 && V.y1 >= vy1;
   if (SF.base && !full) ls.push({ pat: SF.base.pat, a: a * ease(fa) });
   if (V) ls.push({ pat: V.pat, a: a * ease(fa) });
-  if (!ls.length) return null;
+  if (!ls.length) return { ls: [], top: null, under: true, none: null };
   return { ls, top: ls[ls.length - 1].pat, under: a < 1 || (!SF.old && ls[0].a < 1), none: SF.none };
 }
 // the field at a spot on the plane: a figure, or who leads there and by how much. It's the one field's
 // own value, asked of whoever holds it, so nothing on the screen can touch it
 const surfaceWords = (v) => {
-  if (!SF.ids) return { v: v[0] };
-  const r = [...v].map((x, k) => [SF.ids[k], x]).sort((p, q) => q[1] - p[1]);
-  return { fam: r[0][0], lead: 100 * (r[0][1] - Math.max(r[1] ? r[1][1] : 0, 0)) };
+  if (!v) return null;
+  const support = { count: v.count, nearest: v.nearest, radius: v.radius, mass: v.mass };
+  if (!SF.ids) return { v: v.values[0], ...support };
+  const r = [...v.values].map((x, k) => [SF.ids[k], x]).sort((p, q) => q[1] - p[1]);
+  return { fam: r[0][0], lead: 100 * (r[0][1] - Math.max(r[1] ? r[1][1] : 0, 0)), ...support };
 };
-let askId = 0;
-const askWaiting = new Map();
+// Point queries use the same engine locally, so they never queue behind a raster job.
 function surfaceAt(x, y) {
-  return new Promise((done) => {
-    if (!SF.data) { done(null); return; }
-    if (!SF.wk) { done(surfaceWords(pageEngine().at(SF.data, x, y))); return; }
-    if (SF.sent !== SF.key) { SF.wk.postMessage({ t: "set", key: SF.key, D: SF.data }); SF.sent = SF.key; }
-    const id = ++askId; askWaiting.set(id, done);
-    SF.wk.postMessage({ t: "at", key: SF.key, id, x, y });
-  });
+  return Promise.resolve(SF.data ? surfaceWords(pageEngine().at(SF.data, x, y)) : null);
 }
-function surfaceHeard(q) {
-  const done = askWaiting.get(q.id); askWaiting.delete(q.id);
-  if (done) done(q.key === SF.key ? surfaceWords(q.v) : null);
-}
+// Overlay markers show exactly the input records used for the current field.
+const surfacePlaceShown = (m, j) => drawOf(m) !== "surface" || (SF.m === m && SF.key === readingKey(m) && SF.sources && SF.sources.has(j));
 // the tooltip's reading: the latest answer for the pointer, the next on its way
 function surfaceAsk(x, y) {
   if (SF.asking) { SF.askNext = [x, y]; return; }
   SF.asking = true;
   surfaceAt(x, y).then((a) => {
-    SF.asking = false; SF.here = a;
+    SF.asking = false;
+    if (!SF.askNext) SF.here = a;
     if (SF.askNext) { const [nx, ny] = SF.askNext; SF.askNext = null; surfaceAsk(nx, ny); }
     tipRefresh();
   });
 }
 
 /* ----- the Areas drawing: the census's own areas, painted as counted -----
-   Seats rolls the census up to each seat, and Surface smooths it between the polling
-   places; Areas stops at the finest rung the census itself publishes: the SA1 areas,
+   Seats rolls the census up to each seat; Areas uses the finest geography this
+   pack carries: the SA1 areas,
    each painted with the figure the census counted there — a counted figure at every
    point the census counted people, paper where it counted none (empty land) and where
    the ABS suppresses a figure. The whole Census lens carries over — every People
@@ -788,11 +621,12 @@ function areasUnpack(D) {
     const rings = g.type === "Polygon" ? g.arcs : g.type === "MultiPolygon" ? g.arcs.flat() : [];
     return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity] };
   });
+  const codes = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map(g => g.properties.SA1_CODE21);
   const n = geoms.length, decN = (o) => new Uint16Array(U8(o.b).buffer), dec32 = (o) => new Uint32Array(U8(o.b).buffer);
   const incBands = decN(D.meta.incBands), pop = dec32(D.meta.pop), area = dec32(D.meta.area), sa2i = decN(D.meta.sa2i);
   for (const [k, arr] of Object.entries(lanes)) if (arr.length !== n) throw new Error(`areas pack lane ${k} length ${arr.length} != ${n}`);
   if (incBands.length !== n * 16 || pop.length !== n || area.length !== n || sa2i.length !== n) throw new Error("areas pack meta length drift");
-  return { vintage: D.vintage, caps: D.caps, marks: D.marks, sa2names: D.meta.sa2names, lanes, types, geoms, arcs, incBands, pop, area, sa2i };
+  return { vintage: D.vintage, caps: D.caps, marks: D.marks, sa2names: D.meta.sa2names, codes, lanes, types, geoms, arcs, incBands, pop, area, sa2i };
 }
 // the income-quartile shares at the frame's own cuts: the builder's walk, verbatim
 function areasIncShare(P, m, i, lane) {
@@ -924,7 +758,7 @@ function areasHit(m, x, y) {
   for (const gi of cell2) {
     const b = pr.bb[gi];
     if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
-    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
+    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, code: AR.pack.codes[gi], sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
   }
   return null;
 }
@@ -1040,7 +874,8 @@ function areasTick(m) {
     areasJob({ base: true, px, x0: hx0 - 0.08 * hw, y0: hy0 - 0.08 * hh, nx: (1.16 * hw) / px, ny: (1.16 * hh) / px });
     return;
   }
-  const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
+  // Two CSS pixels are sufficient for the smoothed field; point readings remain exact.
+  const q = 0.5, want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
   if (want >= AR.base.J.px * 0.8) { AR.view = null; return; }
   const [vx0, vy0, vx1, vy1] = viewBox(), V = AR.view;
   if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.J.x0 <= vx0 && V.J.y0 <= vy0 && V.J.x0 + V.J.nx * V.J.px >= vx1 && V.J.y0 + V.J.ny * V.J.px >= vy1) return;
@@ -1102,9 +937,9 @@ function drawLook(m) {
   const d = drawOf(m), now = performance.now();
   let e = 1, from = d;
   if (drawFade) { const t = clamp((now - drawFade.t0) / DRAW_MS, 0, 1); if (t < 1) { needFrame = true; e = ease(t); from = drawFade.from; } else drawFade = null; }
-  const surf = (d === "surface" ? e : 0) + (from === "surface" && d !== "surface" ? 1 - e : 0), ball = (d === "balloons" ? e : 0) + (from === "balloons" && d !== "balloons" ? 1 - e : 0);
+  const surf = (d === "surface" ? e : 0) + (from === "surface" && d !== "surface" && surfaceFits(m) ? 1 - e : 0), ball = (d === "balloons" ? e : 0) + (from === "balloons" && d !== "balloons" ? 1 - e : 0);
   const are = (d === "areas" ? e : 0) + (from === "areas" && d !== "areas" ? 1 - e : 0);
-  return { surf, ball, sf: surf > 0 && m.booth.n ? surfaceLook(m, surf) : null, are, ar: are > 0 ? areasLook(m) : null };
+  return { surf, ball, sf: surf > 0 ? surfaceLook(m, surf) : null, are, ar: are > 0 ? areasLook(m) : null };
 }
 
 /* ----- the balloons -----
@@ -1405,14 +1240,14 @@ function drawOpts(m) {
   const fits = surfaceFits(m);
   const areasNo = areasFits(m) ? "" : S.lens !== "seifa" ? "Areas paints the census’s own areas — pick the Census lens" : S.index === "hl" ? "The homeless lane stays as seats: the census counts that one per SA2 estimate, never as a share of every census area" : "No census-areas pack reads this frame’s census yet";
   return DRAWS.map(([k, t]) => ({ k, t, why: k === "chart" && !chartFits(m) ? "Chart plots a figure: pick Two-party, Primary, Census or another lens with numbers"
-    : k === "surface" && !fits ? (S.lens === "cls" ? "A seat type belongs to the whole seat, so there is nothing to blend" : "This is a whole seat’s figure, so there is nothing to blend")
+    : k === "surface" && !fits ? surfaceReason(m)
     : k === "areas" && areasNo ? areasNo : "" }));
 }
 function drawRowHTML(m) {
-  const on = S.draw;
+  const on = S.draw === "chart" ? "chart" : drawOf(m);
   return `<div class="lg-draw" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}</div>`;
 }
-/* ----- what the balloons and the surface leave out -----
+/* ----- what the balloons leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither
    drawing has anywhere to put them; nor have the places with no spot (balloonPlace). The key
    says how many votes that is in the place chosen and, where the balloons read the two-party
@@ -1461,16 +1296,24 @@ function undrawnHTML(m, est) {
 // the note under the drawing's name: what the picture is, and for a built contest what it stands on
 function drawNoteHTML(m) {
   const d = drawOf(m);
-  if (d === "seats") return "";
+  if (d === "seats") return S.draw === "surface" ? `<div class="lg-note">${esc(surfaceReason(m))}</div>` : "";
   const est = !m.standIn && placesLackMemo(m);
   if (d === "balloons") return balloonKey(m, est) + undrawnHTML(m, est);
   if (d === "areas") {
     const vin = areasVintage(m), got = AR.packs[vin] && AR.packs[vin].pack, near = m.demoInterp && m.demoInterp.nearestSide === vin;
-    return `<div class="lg-note">${got ? `The census’s ${int(got.geoms.length)} census areas, each as counted at the ${vin} census${near ? ` — the nearest single census, ${vin}, since this frame blends two` : ""}. Empty land stays paper, and so does any area the ABS suppresses a figure for.` : "Loading the census areas…"}</div>`;
+    return `${S.draw === "surface" ? `<div class="lg-note">Census figures are shown as Areas; Surface is unavailable for this measure.</div>` : ""}<div class="lg-note">${got ? `The census’s ${int(got.geoms.length)} census areas, each as counted at the ${vin} census${near ? ` — the nearest single census, ${vin}, since this frame blends two` : ""}. Empty land stays paper, and so does any area the ABS suppresses a figure for.` : "Loading the census areas…"}</div>`;
   }
-  if (axisNow(m) !== "AC") return `<div class="lg-note">Built from first preferences and ${axisByBonham(m, axisNow(m)) ? "estimated flows" : "Senate ballots"}.</div>${undrawnHTML(m, est)}`;
-  const off = S.axis !== "AC" && S.lens === "tpp" && S.tppMode !== "swing" && axisFrame(m) == null;
-  return `<div class="lg-note">${off ? "One Nation stood too thinly here for its contests." : est ? "Smoothed, from first preferences: an estimate." : S.lens === "winner" ? "A smoothed estimate. Deeper means a bigger lead." : "A smoothed estimate, not a count."}</div>${undrawnHTML(m, est)}`;
+  const modelled = axisNow(m) !== "AC";
+  const selected = selDiv(), st = S.sel.level === "state" ? S.sel.st : null;
+  const data = SF.m === m && SF.key === readingKey(m) ? SF.data : null;
+  let total = 0, included = 0, sites = 0;
+  for (const d of m.divs) {
+    if (selected != null ? d.i !== selected : st && d.st !== st) continue;
+    total += d.formal;
+    if (data) { included += data.seatVotes[d.i]; sites += data.seatN[d.i]; }
+  }
+  const coverage = data ? `${int(sites)} polling places · ${f0(total ? 100 * included / total : 0)}% of this selection’s formal House votes.` : SF.m === m && SF.empty ? "No eligible local results for this measure. Choose Seats or Balloons." : "Loading local results…";
+  return `<div class="lg-note">${modelled ? "Modelled contest, smoothed from ordinary polling places." : "Nearby ordinary polling-place results, smoothed."} Within 25 km. Pale edges mean less local support; neutral land has no estimate. This describes where votes were cast, not where voters live.</div><div class="lg-undrawn">${coverage} Early centres, mobile teams and unlocated votes remain in seat totals, outside the surface.</div>`;
 }
 // the key's ramp in the surface's steps
 function surfaceRampCss(m) {

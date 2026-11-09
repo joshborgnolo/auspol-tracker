@@ -1,0 +1,433 @@
+{
+  "audited": "2026-11-09",
+  "scope": "Every shipped core frame; all source voting types and counted local TPP/TCP/informal availability. Holdout is 2025 ordinary polling places, every 29th eligible record, removing all records at the same site. It tests prediction of held-out polling-place results, not residents or unsampled land.",
+  "frames": [
+    {
+      "frame": "1993",
+      "formal": 10576779,
+      "booths": 8431,
+      "ordinaryLocated": 6538,
+      "ordinaryFormal": 8447814,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 826751,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 6387,
+      "ordinaryFormalPct": 79.87
+    },
+    {
+      "frame": "1996",
+      "formal": 10883852,
+      "booths": 8463,
+      "ordinaryLocated": 6756,
+      "ordinaryFormal": 8711994,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 698315,
+      "ordinaryTpp": 6756,
+      "ordinaryTcp": 6756,
+      "ordinaryInformal": 6756,
+      "ordinaryFormalPct": 80.05
+    },
+    {
+      "frame": "1998",
+      "formal": 11109063,
+      "booths": 8311,
+      "ordinaryLocated": 6856,
+      "ordinaryFormal": 8557287,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 575349,
+      "ordinaryTpp": 6813,
+      "ordinaryTcp": 6856,
+      "ordinaryInformal": 6813,
+      "ordinaryFormalPct": 77.03
+    },
+    {
+      "frame": "2001",
+      "formal": 11474074,
+      "booths": 8213,
+      "ordinaryLocated": 7194,
+      "ordinaryFormal": 9241835,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 412981,
+      "ordinaryTpp": 7194,
+      "ordinaryTcp": 7194,
+      "ordinaryInformal": 7194,
+      "ordinaryFormalPct": 80.55
+    },
+    {
+      "frame": "2004",
+      "formal": 11715132,
+      "booths": 8234,
+      "ordinaryLocated": 6849,
+      "ordinaryFormal": 8803831,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 823175,
+      "ordinaryTpp": 6849,
+      "ordinaryTcp": 6849,
+      "ordinaryInformal": 6849,
+      "ordinaryFormalPct": 75.15
+    },
+    {
+      "frame": "2007",
+      "formal": 12419992,
+      "booths": 8235,
+      "ordinaryLocated": 7722,
+      "ordinaryFormal": 9881425,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 72858,
+      "ordinaryTpp": 7722,
+      "ordinaryTcp": 7722,
+      "ordinaryInformal": 7722,
+      "ordinaryFormalPct": 79.56
+    },
+    {
+      "frame": "2010",
+      "formal": 12402363,
+      "booths": 8951,
+      "ordinaryLocated": 7758,
+      "ordinaryFormal": 9411104,
+      "locatedEarlyFormal": 914209,
+      "unlocatedFormal": 106648,
+      "ordinaryTpp": 7758,
+      "ordinaryTcp": 7758,
+      "ordinaryInformal": 7758,
+      "ordinaryFormalPct": 75.88
+    },
+    {
+      "frame": "2013",
+      "formal": 12914927,
+      "booths": 9146,
+      "ordinaryLocated": 7696,
+      "ordinaryFormal": 8700235,
+      "locatedEarlyFormal": 1861856,
+      "unlocatedFormal": 115450,
+      "ordinaryTpp": 7696,
+      "ordinaryTcp": 7696,
+      "ordinaryInformal": 7696,
+      "ordinaryFormalPct": 67.37
+    },
+    {
+      "frame": "2016",
+      "formal": 13541101,
+      "booths": 8328,
+      "ordinaryLocated": 6822,
+      "ordinaryFormal": 8479938,
+      "locatedEarlyFormal": 2500252,
+      "unlocatedFormal": 196390,
+      "ordinaryTpp": 6822,
+      "ordinaryTcp": 6822,
+      "ordinaryInformal": 6822,
+      "ordinaryFormalPct": 62.62
+    },
+    {
+      "frame": "2019",
+      "formal": 14253393,
+      "booths": 8875,
+      "ordinaryLocated": 7167,
+      "ordinaryFormal": 7649462,
+      "locatedEarlyFormal": 3999236,
+      "unlocatedFormal": 172436,
+      "ordinaryTpp": 7167,
+      "ordinaryTcp": 7167,
+      "ordinaryInformal": 7167,
+      "ordinaryFormalPct": 53.67
+    },
+    {
+      "frame": "2022",
+      "formal": 14659042,
+      "booths": 8479,
+      "ordinaryLocated": 7041,
+      "ordinaryFormal": 6556848,
+      "locatedEarlyFormal": 4900418,
+      "unlocatedFormal": 17672,
+      "ordinaryTpp": 7041,
+      "ordinaryTcp": 7041,
+      "ordinaryInformal": 7041,
+      "ordinaryFormalPct": 44.73
+    },
+    {
+      "frame": "2025",
+      "formal": 15490236,
+      "booths": 8940,
+      "ordinaryLocated": 6964,
+      "ordinaryFormal": 6247958,
+      "locatedEarlyFormal": 5973315,
+      "unlocatedFormal": 98039,
+      "ordinaryTpp": 6964,
+      "ordinaryTcp": 6964,
+      "ordinaryInformal": 6964,
+      "ordinaryFormalPct": 40.33
+    },
+    {
+      "frame": "nsw15",
+      "formal": 4404334,
+      "booths": 3324,
+      "ordinaryLocated": 2382,
+      "ordinaryFormal": 2770498,
+      "locatedEarlyFormal": 187182,
+      "unlocatedFormal": 285173,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 2382,
+      "ordinaryFormalPct": 62.9
+    },
+    {
+      "frame": "nsw19",
+      "formal": 4551886,
+      "booths": 2946,
+      "ordinaryLocated": 2516,
+      "ordinaryFormal": 2784592,
+      "locatedEarlyFormal": 486228,
+      "unlocatedFormal": 14644,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 2516,
+      "ordinaryFormalPct": 61.17
+    },
+    {
+      "frame": "nsw23",
+      "formal": 4701930,
+      "booths": 3117,
+      "ordinaryLocated": 2619,
+      "ordinaryFormal": 2377483,
+      "locatedEarlyFormal": 1318949,
+      "unlocatedFormal": 3503,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 2619,
+      "ordinaryFormalPct": 50.56
+    },
+    {
+      "frame": "qld17",
+      "formal": 2703941,
+      "booths": 1701,
+      "ordinaryLocated": 1097,
+      "ordinaryFormal": 1008202,
+      "locatedEarlyFormal": 6878,
+      "unlocatedFormal": 569906,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 1097,
+      "ordinaryFormalPct": 37.29
+    },
+    {
+      "frame": "qld20",
+      "formal": 2868324,
+      "booths": 1810,
+      "ordinaryLocated": 1419,
+      "ordinaryFormal": 778903,
+      "locatedEarlyFormal": 966342,
+      "unlocatedFormal": 0,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 1419,
+      "ordinaryInformal": 1419,
+      "ordinaryFormalPct": 27.16
+    },
+    {
+      "frame": "qld24",
+      "formal": 3105945,
+      "booths": 1668,
+      "ordinaryLocated": 1251,
+      "ordinaryFormal": 832544,
+      "locatedEarlyFormal": 1216582,
+      "unlocatedFormal": 12786,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 1251,
+      "ordinaryInformal": 1251,
+      "ordinaryFormalPct": 26.8
+    },
+    {
+      "frame": "sa22",
+      "formal": 1091173,
+      "booths": 695,
+      "ordinaryLocated": 689,
+      "ordinaryFormal": 663420,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 546,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 689,
+      "ordinaryInformal": 689,
+      "ordinaryFormalPct": 60.8
+    },
+    {
+      "frame": "sa26",
+      "formal": 1115864,
+      "booths": 753,
+      "ordinaryLocated": 682,
+      "ordinaryFormal": 481926,
+      "locatedEarlyFormal": 345931,
+      "unlocatedFormal": 1908,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 669,
+      "ordinaryInformal": 682,
+      "ordinaryFormalPct": 43.19
+    },
+    {
+      "frame": "vic14",
+      "formal": 3355707,
+      "booths": 1786,
+      "ordinaryLocated": 1713,
+      "ordinaryFormal": 1947065,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 16697,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 1713,
+      "ordinaryInformal": 1713,
+      "ordinaryFormalPct": 58.02
+    },
+    {
+      "frame": "vic18",
+      "formal": 3514474,
+      "booths": 1794,
+      "ordinaryLocated": 1686,
+      "ordinaryFormal": 1658325,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 11282,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 1686,
+      "ordinaryInformal": 1686,
+      "ordinaryFormalPct": 47.19
+    },
+    {
+      "frame": "vic22",
+      "formal": 3665035,
+      "booths": 1755,
+      "ordinaryLocated": 1755,
+      "ordinaryFormal": 1273678,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 0,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 1755,
+      "ordinaryInformal": 1755,
+      "ordinaryFormalPct": 34.75
+    },
+    {
+      "frame": "wa17",
+      "formal": 1321640,
+      "booths": 752,
+      "ordinaryLocated": 736,
+      "ordinaryFormal": 825454,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 13254,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 736,
+      "ordinaryFormalPct": 62.46
+    },
+    {
+      "frame": "wa21",
+      "formal": 1411990,
+      "booths": 736,
+      "ordinaryLocated": 645,
+      "ordinaryFormal": 481022,
+      "locatedEarlyFormal": 0,
+      "unlocatedFormal": 51759,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 0,
+      "ordinaryInformal": 645,
+      "ordinaryFormalPct": 34.07
+    },
+    {
+      "frame": "wa25",
+      "formal": 1527968,
+      "booths": 743,
+      "ordinaryLocated": 680,
+      "ordinaryFormal": 643413,
+      "locatedEarlyFormal": 399851,
+      "unlocatedFormal": 0,
+      "ordinaryTpp": 0,
+      "ordinaryTcp": 596,
+      "ordinaryInformal": 680,
+      "ordinaryFormalPct": 42.11
+    }
+  ],
+  "holdout": [
+    {
+      "maxKm": 10,
+      "groups": {
+        "Inner Metropolitan": {
+          "sample": 62,
+          "predicted": 62,
+          "medianAbsoluteErrorPP": 2.63,
+          "meanAbsoluteErrorPP": 3.66
+        },
+        "Outer Metropolitan": {
+          "sample": 60,
+          "predicted": 58,
+          "medianAbsoluteErrorPP": 1.43,
+          "meanAbsoluteErrorPP": 2.63
+        },
+        "Rural": {
+          "sample": 87,
+          "predicted": 41,
+          "medianAbsoluteErrorPP": 4.45,
+          "meanAbsoluteErrorPP": 4.65
+        },
+        "Provincial": {
+          "sample": 32,
+          "predicted": 30,
+          "medianAbsoluteErrorPP": 2.02,
+          "meanAbsoluteErrorPP": 2.79
+        }
+      }
+    },
+    {
+      "maxKm": 25,
+      "groups": {
+        "Inner Metropolitan": {
+          "sample": 62,
+          "predicted": 62,
+          "medianAbsoluteErrorPP": 2.63,
+          "meanAbsoluteErrorPP": 3.66
+        },
+        "Outer Metropolitan": {
+          "sample": 60,
+          "predicted": 59,
+          "medianAbsoluteErrorPP": 1.42,
+          "meanAbsoluteErrorPP": 2.65
+        },
+        "Rural": {
+          "sample": 87,
+          "predicted": 62,
+          "medianAbsoluteErrorPP": 4.35,
+          "meanAbsoluteErrorPP": 4.94
+        },
+        "Provincial": {
+          "sample": 32,
+          "predicted": 31,
+          "medianAbsoluteErrorPP": 1.91,
+          "meanAbsoluteErrorPP": 2.76
+        }
+      }
+    },
+    {
+      "maxKm": 50,
+      "groups": {
+        "Inner Metropolitan": {
+          "sample": 62,
+          "predicted": 62,
+          "medianAbsoluteErrorPP": 2.63,
+          "meanAbsoluteErrorPP": 3.66
+        },
+        "Outer Metropolitan": {
+          "sample": 60,
+          "predicted": 60,
+          "medianAbsoluteErrorPP": 1.43,
+          "meanAbsoluteErrorPP": 2.84
+        },
+        "Rural": {
+          "sample": 87,
+          "predicted": 73,
+          "medianAbsoluteErrorPP": 4.73,
+          "meanAbsoluteErrorPP": 5.72
+        },
+        "Provincial": {
+          "sample": 32,
+          "predicted": 32,
+          "medianAbsoluteErrorPP": 1.97,
+          "meanAbsoluteErrorPP": 3.18
+        }
+      }
+    }
+  ]
+}

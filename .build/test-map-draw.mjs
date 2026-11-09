@@ -1,20 +1,5 @@
-/* test-map-draw.mjs – pins /map/'s drawings (app-2b-draw.js): seats, balloons and the surface.
-
-   - surfaceEngine, the field and its pictures, is a worker's text: it runs here in a bare vm
-     context, so anything it reached for outside itself would fail. On small made-up elections
-     it must give back what went in: a flat field, a line where two sides meet, the votes'
-     weight, and no neighbourhood claimed by a handful of votes.
-   - there is one field: what a spot reads can't turn on the zoom, the window or what was
-     asked before it, and a picture at any grain shows the same side (a reader found a seat's
-     patch flipping sides as they zoomed, and two answers at one zoom, on 2026-11-06).
-   - the contests' numbers are the site's: FP_ON and the Senate tables in flows.mjs.
-   - the contests are offered where the data says they should be: One Nation in three seats
-     in four, with Senate orders to read.
-   - the wiring that a screenshot through the URL can't see: the buttons reach their handler
-     (they once didn't), the URL carries both choices both ways, the key holds its height
-     through every drawing.
-   Run: node .build/test-map-draw.mjs
-   The browser's side is in .matilda/probe/map-draw.mjs <baseUrl>. */
+/* Map drawings and bounded Surface: real count bases, geographic support,
+   zoom invariance and app wiring. Browser QA: test-map-surface-browser.mjs. */
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -27,96 +12,99 @@ const R = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const draw = R(".build/map/app/app-2b-draw.js"), ui = R(".build/map/app/app-6-ui.js");
 const between = (a, b) => { const i = draw.indexOf(a), j = draw.indexOf(b, i); assert.ok(i >= 0 && j > i, a); return draw.slice(i, j); };
 
-/* ----- the raster, alone ----- */
+/* ----- local surface: arithmetic, support, geography and render invariance ----- */
 const src = between("function surfaceEngine() {", "\n/* ----- the rasters -----");
-const engine = () => vm.runInNewContext(`(${src})()`, {});
-const E = engine(), raster = E.raster;
+const engine = () => vm.runInNewContext(`(${src})()`, {}), E = engine();
 const pts = (list) => {
-  const n = list.length, D = { u: 1, n, x: new Float32Array(n), y: new Float32Array(n), w: new Float32Array(n), late: new Float32Array(n), bx0: Infinity, by0: Infinity, bx1: -Infinity, by1: -Infinity };
-  list.forEach(([x, y, w], k) => { D.x[k] = x; D.y[k] = y; D.w[k] = w; D.bx0 = Math.min(D.bx0, x); D.bx1 = Math.max(D.bx1, x); D.by0 = Math.min(D.by0, y); D.by1 = Math.max(D.by1, y); });
+  const D = { n: list.length, u: 1, maxKm: 25, minKm: 2, minMass: 100, fadeMass: 400, bg: 0xffeeeeee,
+    x: Float64Array.from(list, q => q[0]), y: Float64Array.from(list, q => q[1]), w: Float64Array.from(list, q => q[2]), ch: [Float64Array.from(list, q => q[3])],
+    lo: 0, hi: 100, fam: false, band: new Uint8Array(4096).map((_, k) => Math.min(9, Math.floor(10*k/4096))), col: Uint32Array.from({length:10}, (_, k) => (0xff000000 | 10+20*k) >>> 0) };
   return D;
 };
-// ten steps across 0..100, each its own colour, the ink apart from them all
-const steps = (D, line = null) => {
-  D.lo = 0; D.hi = 100; D.line = line; D.fam = false; D.M0 = 3500; D.ink = 0xff010203;
-  D.band = new Uint8Array(4096).map((_, k) => Math.min(9, Math.floor(((100 * k) / 4095) / 10)));
-  D.col = Uint32Array.from({ length: 10 }, (_, k) => (0xff000000 | (k * 20 + 10)) >>> 0);
-  return D;
-};
-const J = { px: 1, x0: 0, y0: 0, nx: 300, ny: 300, lw: 1.5 };
-const px = (r, x, y) => new Uint32Array(r.rgba)[y * J.nx + x];
-const grid = (fn) => { const l = []; for (let y = 10; y < 300; y += 40) for (let x = 10; x < 300; x += 40) l.push(fn(x, y)); return l; };
-
-{ // the same figure everywhere gives one colour and no line
-  const l = grid((x, y) => [x, y, 2000]), D = steps(pts(l), 50); D.ch = [Float32Array.from(l, () => 62)];
-  const r = raster(D, J), a = new Uint32Array(r.rgba);
-  assert.ok(a.every((c) => c === a[0]), "a flat reading is one colour");
-  assert.equal(a[0], D.col[6], "in its own step");
-  assert.ok(Math.abs(E.at(D, 150, 150)[0] - 62) < 1e-3, "and reads as itself");
+{
+  const D = pts([[0,0,1000,20],[0,0,3000,80]]), s = E.at(D,0,0);
+  assert.equal(s.values[0],65,'the pooled share uses its ballot denominator');
+  assert.equal(s.count,2); assert.equal(s.radius,25,'co-located records do not shrink the bandwidth');
+  assert.equal(E.at(D,25,0),null,'no value at the hard radius');
+  assert.equal(E.at(D,100,0),null,'empty country never inherits a national or seat average');
+  assert.equal(E.at(pts([[0,0,99,95]]),0,0),null,'too little ballot support is not painted');
+  const A = pts([[0,0,1000,20]]), B = pts([[0,0,1000,20],[26,0,1e9,100]]);
+  assert.equal(E.at(A,0,0).values[0],E.at(B,0,0).values[0],'an arbitrarily large distant outlier has zero influence');
 }
-{ // two sides: each keeps its figure, and the line runs between them
-  const l = grid((x, y) => [x, y, 2000]), D = steps(pts(l), 50); D.ch = [Float32Array.from(l, ([x]) => (x < 150 ? 35 : 75))];
-  const r = raster(D, J), a = new Uint32Array(r.rgba);
-  assert.equal(px(r, 40, 150), D.col[3], "the left side reads its own step");
-  assert.equal(px(r, 260, 150), D.col[7], "the right side reads its own");
-  const xs = [];
-  // (the line is antialiased, so a pixel of it is never quite the ink; this field's steps run from 70 to 150, so under 60 is line)
-  const dark = (c) => (c & 255) < 60;
-  let rows = 0;
-  for (let y = 0; y < 300; y += 10) { let hit = false; for (let x = 0; x < 300; x++) if (dark(a[y * J.nx + x])) { hit = true; xs.push(x); } if (hit) rows++; }
-  assert.equal(rows, 30, `the line is drawn all the way down (${rows} of 30 rows)`);
-  assert.ok(xs.every((x) => x > 120 && x < 180), "and only between the two sides");
-}
-{ // votes weigh: a big place outweighs a small one beside it
-  const l = [[140, 150, 40000], [160, 150, 400]], D = steps(pts([...l, [10, 10, 1], [290, 290, 1]]), null); D.ch = [Float32Array.from([40, 60, 50, 50])];
-  const v = E.at(D, 150, 150)[0];
-  assert.ok(Math.abs(v - 40) < 2, `the big place's figure leads (${v.toFixed(1)})`);
-}
-{ // a handful of votes can't claim a neighbourhood: the level above speaks for it
-  const l = [...grid((x, y) => [x, y, 3000]).filter(([x, y]) => Math.hypot(x - 150, y - 150) > 70), [150, 150, 10]];
-  const D = steps(pts(l), null); D.ch = [Float32Array.from(l, (q, k) => (k === l.length - 1 ? 95 : 40))];
-  const v = E.at(D, 150, 150)[0];
-  assert.ok(v < 50, `ten votes at 95 don't move the ground around them (${v.toFixed(1)})`);
-}
-{ // where nobody voted the field still reaches, smoothly, from the nearest places
-  const l = [[20, 150, 9000], [280, 150, 9000]], D = steps(pts(l), null); D.ch = [Float32Array.from([20, 80])];
-  const mid = E.at(D, 150, 150)[0];
-  assert.ok(mid > 30 && mid < 70, `the empty middle lies between its two towns (${mid.toFixed(1)})`);
-}
-{ // who leads: two groups, each ahead on its own ground, deeper as the lead grows, a line where they meet
-  const l = grid((x, y) => [x, y, 2000]), D = pts(l);
-  D.ch = [Float32Array.from(l, ([x]) => (x < 150 ? 0.7 : 0.375)), Float32Array.from(l, ([x]) => (x < 150 ? 0.3 : 0.625))];
-  Object.assign(D, { fam: true, nb: 4, lo: 0, hi: 100, line: 1, M0: 3500, ink: 0xff010203, band: new Uint8Array(4096).map((_, k) => Math.min(3, Math.floor((100 * k) / 4095 / 10))), col: Uint32Array.from({ length: 8 }, (_, k) => (0xff000000 | (k * 25 + 20)) >>> 0) });
-  const r = raster(D, J);
-  assert.equal(px(r, 40, 150), D.col[0 * 4 + 3], "the first leads the left by forty");
-  assert.equal(px(r, 260, 150), D.col[1 * 4 + 2], "the second leads the right by twenty-five");
-}
-
-{ // one field: a small town of one side in a big district of the other, as a Hume in Sydney's shadow
-  const l = [], at = [];
-  for (let y = 10; y < 900; y += 30) for (let x = 10; x < 900; x += 30) { if (Math.hypot(x - 450, y - 450) < 60) continue; l.push([x, y, 9000]); at.push(70); } // the district, at 70
-  for (const [x, y] of [[450, 450], [444, 456], [456, 444], [456, 456], [444, 444]]) { l.push([x, y, 3000]); at.push(25); } // the town, at 25
-  const D = steps(pts(l), 50); D.ch = [Float32Array.from(at)];
-  const read = () => [...E.at(D, 450, 450)], first = read();
-  assert.ok(first[0] < 50, `the town keeps its own side (${first[0].toFixed(1)})`);
-  // every grain, every window, either way, wide or close, with a stranger's question in between
-  const looks = [];
-  for (const px of [4, 2.83, 2, 1.41, 1, 0.71, 0.5, 0.25, 0.125, 0.5, 2, 4]) {
-    const nx = 3 * Math.ceil(600 / 3), c = 3 * px, x0 = Math.floor((450 - (nx * px) / 2) / c) * c, y0 = Math.floor((450 - (nx * px) / 2) / c) * c;
-    const r = raster(D, { px, x0, y0, nx, ny: nx, lw: 1.5 }), a = new Uint32Array(r.rgba);
-    looks.push((a[Math.round((450 - y0) / px) * nx + Math.round((450 - x0) / px)] & 255));
-    assert.deepEqual(read(), first, `at grain ${px} the spot reads what it read`);
+{
+  const D = pts([[-1,-1,1000,20],[1,-1,1000,40],[-1,1,1000,60],[1,1,1000,80]]), s = E.at(D,0,0);
+  assert.ok(Math.abs(s.values[0]-50)<1e-10); assert.ok(s.radius<3,'dense neighbourhoods retain local detail');
+  assert.ok(s.alpha>=0 && s.alpha<=1);
+  const first = E.at(D,0,0).values[0];
+  for(const px of [0.1,0.5,1,2]) {
+    const J={px,x0:-10,y0:-10,nx:40,ny:40}, out=new Uint32Array(E.raster(D,J).rgba);
+    for(let y=0;y<J.ny;y++) for(let x=0;x<J.nx;x++) {
+      const q=E.at(D,J.x0+(x+0.5)*px,J.y0+(y+0.5)*px);
+      if(!q) assert.equal(out[y*J.nx+x],D.bg,'unsupported pixels stay neutral at every zoom');
+    }
+    assert.equal(E.at(D,0,0).values[0],first,'rendering never changes the field');
   }
-  assert.ok(looks.every((v) => v < 110), `the picture holds the town's side at every grain (its side's steps are under 110): ${looks.join(" ")}`);
-  const other = engine(), D2 = steps(pts(l), 50); D2.ch = [Float32Array.from(at)];
-  other.at(D2, 10, 10); other.at(D2, 880, 880);
-  assert.equal(other.at(D2, 450, 450)[0], first[0], "a fresh engine, asked in another order, gives the same figure to the digit");
+  assert.equal(engine().at(D,0,0).values[0],first,'worker and fallback use the same field');
+  const B=pts([[-2,-2,1000,20],[2,-2,1000,40],[-2,2,1000,60],[2,2,1000,80]]);B.u=2;
+  assert.equal(E.at(B,0,0).values[0],first,'map scaling preserves kilometre distances');
 }
-{ // a frame's scale is in kilometres: the same places at a different scale give the same reading
-  const l = [...grid((x, y) => [x, y, 2000]), [150, 150, 9000]], val = l.map(([x], k) => (k === l.length - 1 ? 20 : x < 150 ? 40 : 60));
-  const A = steps(pts(l), 50); A.ch = [Float32Array.from(val)];
-  const B = steps(pts(l.map(([x, y, w]) => [x * 2, y * 2, w])), 50); B.u = 2; B.ch = [Float32Array.from(val)];
-  assert.ok(Math.abs(E.at(A, 150, 150)[0] - E.at(B, 300, 300)[0]) < 0.05, "a kilometre is a kilometre on any frame's plane");
+{
+  const D=pts([[0,0,1000,20],[0,0,3000,80]]);D.fam=true;D.nb=10;D.ch=[new Float64Array([0.2,0.8]),new Float64Array([0.8,0.2])];D.col=new Uint32Array(20).fill(0xff123456);
+  const s=E.at(D,0,0);assert.ok(Math.abs(s.values[0]+s.values[1]-1)<1e-10,'final-count shares conserve ballot mass');
+  assert.equal(s.values[0],0.65);
+}
+{
+  // Actual conic projection, independent forward math. Same Earth radius as haversine.
+  const rad=Math.PI/180,n=(Math.sin(-18*rad)+Math.sin(-36*rad))/2,c=1+Math.sin(-18*rad)*(2*n-Math.sin(-18*rad)),r0=Math.sqrt(c)/n;
+  const centreRho=Math.sqrt(c-2*n*Math.sin(-27*rad))/n, centreTheta=3*rad*n;
+  const projection={k:1200,tx:500,ty:440,n,c,r0,rotate:-132,cx:centreRho*Math.sin(centreTheta),cy:r0-centreRho*Math.cos(centreTheta)};
+  const project=(lon,lat)=>{const rho=Math.sqrt(c-2*n*Math.sin(lat*rad))/n,t=(lon-132)*rad*n;return [projection.tx+projection.k*(rho*Math.sin(t)-projection.cx),projection.ty-projection.k*(r0-rho*Math.cos(t)-projection.cy)];};
+  for(const [lon,lat] of [[130,-25],[133,-22],[151.2,-33.9],[115.9,-31.9],[147,-43],[96.8,-12.2]]) {
+    const xy=project(lon,lat),D=pts([[...xy,2000,42]]);D.projection=projection;D.lon=[lon];D.lat=[lat];
+    const ll=E.lonlat(D,...xy);assert.ok(Math.abs(ll[0]-lon)<1e-8&&Math.abs(ll[1]-lat)<1e-8,'inverse projection returns original geography');
+    assert.ok(Math.abs(E.at(D,...xy).values[0]-42)<1e-9);
+    assert.equal(E.at(D,...project(lon,lat+26/6371/rad)),null,'26 km on Earth is out of support in every tested region');
+  }
+}
+{
+  // Compare the spatial index with a full distance scan, including duplicated sites,
+  // excluded records and neighbours on both sides of a longitude wrap.
+  const rad=Math.PI/180,n=(Math.sin(-18*rad)+Math.sin(-36*rad))/2,c=1+Math.sin(-18*rad)*(2*n-Math.sin(-18*rad)),r0=Math.sqrt(c)/n;
+  const projection={k:1200,tx:500,ty:440,n,c,r0,rotate:-132};
+  const project=(lon,lat)=>{const rho=Math.sqrt(c-2*n*Math.sin(lat*rad))/n,t=(lon-132)*rad*n;return [500+1200*rho*Math.sin(t),440-1200*(r0-rho*Math.cos(t))];};
+  const dist=(a,b)=>{const h=Math.sin((a[1]-b[1])*rad/2)**2+Math.cos(a[1]*rad)*Math.cos(b[1]*rad)*Math.sin((a[0]-b[0])*rad/2)**2;return 12742*Math.asin(Math.sqrt(Math.min(1,h)));};
+  for(const lon of [130,151.2,179.98]) {
+    const rows=Array.from({length:85},(_,i)=>{const q=i%79;return [lon+0.26*Math.sin(q*2.7),-25+0.26*Math.cos(q*1.7),i%11?500+i*13:0,(i*37)%101];});
+    rows[0]=[lon,-25,0,100];
+    const D=pts(rows.map(([x,y,w,v])=>[...project(x,y),w,v]));D.projection=projection;D.lon=rows.map(q=>q[0]>180?q[0]-360:q[0]);D.lat=rows.map(q=>q[1]);
+    for(let j=0;j<15;j++) {
+      const ll=[lon+0.2*Math.sin(j),-25+0.2*Math.cos(j)],near=rows.map((r,i)=>({i,d:dist(ll,r)})).filter(q=>D.w[q.i]>0&&q.d<25);
+      const sites=[...new Map(near.map(q=>[rows[q.i].slice(0,2).join(','),q.d])).values()].sort((a,b)=>a-b);
+      const radius=sites.length>=4?Math.min(25,Math.max(2,2*sites[3])):25;
+      let mass=0,total=0,count=0;
+      for(const q of near)if(q.d<radius){const t=q.d/radius,w=(1-t)**4*(1+4*t)*D.w[q.i];mass+=w;total+=w*D.ch[0][q.i];count++;}
+      const actual=E.at(D,...project(...ll));
+      if(mass<100)assert.equal(actual,null);else {
+        assert.ok(Math.abs(actual.values[0]-total/mass)<1e-8,'indexed value matches full great-circle scan');
+        assert.ok(Math.abs(actual.mass-mass)<1e-6,'indexed support matches full scan');
+        assert.equal(actual.count,count);assert.ok(Math.abs(actual.radius-radius)<1e-8);
+      }
+    }
+  }
+}
+// Input eligibility and denominator tests use the application functions directly.
+{
+  const input=between('function surfaceDenominator(m, j) {','const SURF_MAX_KM');
+  const context={S:{lens:'informal',from:'grn'},axisOf:()=>null,svOf:()=>({booths:{1:[900]}}),spOf:()=>({booths:{1:[]}}),spCells:()=>({x:12,y:18})};
+  vm.createContext(context);vm.runInContext(input,context);
+  const b={ty:[1],x:[0],y:[0],d:[0],id:[1],formal:[800],votes:[1000],raw:{lat:[-25],lon:[130],tcp:[[300,400]],tpp:[[350,450]],fl:[[[0,25,35,40]]]}};
+  const m={booth:b,divs:[{c:[{b:'grn'}]}]};
+  for(const [lens,w] of [['informal',1000],['winner',700],['tpp',800],['flow',60],['senate',900],['senpref',30],['fp',800],['seifa',0]]) {context.S.lens=lens;assert.equal(context.surfaceDenominator(m,0),w,`${lens} uses its own denominator`);}
+  assert.ok(context.surfaceEligible(m,0));
+  for(const t of [2,3,4,5]) {b.ty[0]=t;assert.equal(context.surfaceEligible(m,0),false,'non-local voting types excluded even with coordinates');}
+  b.ty[0]=1;b.raw.lat[0]=null;assert.equal(context.surfaceEligible(m,0),false,'unlocated ordinary booth excluded');
+  const body=between('function surfaceData(m) {','/* A local descriptive surface');
+  assert.ok(!body.includes('drawValue(')&&!body.includes('seatSpots(')&&!body.includes('estBooths('),'no imputed local data or synthetic locations enter the surface');
 }
 
 /* ----- the contests' numbers ----- */
