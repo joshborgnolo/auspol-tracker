@@ -64,6 +64,15 @@
   src: url("/assets/fonts/crimsontext-700-latin.2fcaf682.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* the waters' names on the map's sea (an atlas's italic) */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-italic-400-latin.381a244e.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ------- palette: the editorial surfaces the live site runs in ------- */
 :root {
@@ -80,7 +89,7 @@
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* the party colours outside the canvas: keys, tallies, timeline, the same
      bright set the map paints (readTheme's table in app-1-base.js; keep in step) */
-  --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #14ad4a; --m-onp: #ff8c00; --m-ind: #9b62d0; --m-csa: #00a9c4; --m-oth: #9a9a9a;
+  --m-alp: #f7310a; --m-lnp: #1432d5; --m-grn: #14ad4a; --m-onp: #ff8c00; --m-ind: #9b62d0; --m-csa: #00a9c4; --m-oth: #9a9a9a;
   /* the pinned tab bar's height: the view sticks just under it */
   --pin-top: 62px;
   color-scheme: light;
@@ -96,12 +105,13 @@
     --line-2:    oklch(0.312 0.010 66);
     --accent:    oklch(0.70 0.080 205);
     --surface:   oklch(0.235 0.010 65);
-    --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d;
+    --m-alp: #f7310a; --m-lnp: #4f7fff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d;
     color-scheme: dark;
   }
 }
 </style>
-<link rel="stylesheet" href="/map/map.css?v=2bebf3f5">
+<script>try{if(/[#&]retro=1(&|$)/.test(location.hash)||localStorage.getItem("auspol.map.retro")==="1")document.documentElement.classList.add("mp-retro")}catch(e){}</script>
+<link rel="stylesheet" href="/map/map.css?v=c381559c">
 <!--map-data-warm:begin-->
 <script id="map-data-warm">(function(){var V={"core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","geo-1993-lo.json":"d5b83add","geo-1996-lo.json":"b3def3ba","geo-1998-lo.json":"e2c51765","geo-2001-lo.json":"a6606c1d","geo-2004-lo.json":"9b0b7073","geo-2007-lo.json":"84db9ed0","geo-2010-lo.json":"9c64b19a","geo-2013-lo.json":"e9d33398","geo-2016-lo.json":"22cd3463","geo-2019-lo.json":"227cc556","geo-2022-lo.json":"db82df02","geo-2025-lo.json":"f0de0b6d","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-lo.json":"23ad692a","geo-qld17-lo.json":"e66797d1","geo-qld20-lo.json":"e66797d1","geo-qld24-lo.json":"e66797d1","geo-sa22-lo.json":"75ee7453","geo-sa26-lo.json":"73866149","geo-vic14-lo.json":"54485f1e","geo-vic18-lo.json":"54485f1e","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-lo.json":"46e32585","geo-wa21-lo.json":"1cd95bf6","geo-wa25-lo.json":"513ef944","islands.json":"10fe4949","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a"};var NOW_OF={"now":"2025","nswnow":"nsw23","qldnow":"qld24","wanow":"wa25"},NOW_DATA={"now":"data-now.json","nswnow":"data-now-nsw.json","qldnow":"data-now-qld.json","wanow":"data-now-wa.json"};var y=(location.hash.match(/[#&]y=(\w+)/)||[])[1]||"now";var ry=NOW_OF[y]||y;if(!V["res-"+ry+".json"]){y="now";ry="2025";}var b=(/[#&]l=seifa(&|$)/.test(location.hash)||!V["core-"+ry+".json"]?"res-":"core-")+ry+".json";var q=function(n){var v=V[n];return "/map/data/"+n+(v?"?v="+v:"");};var W=window.__warm={};var go=function(n){W["/map/data/"+n]=fetch(q(n)).then(function(r){return r.json();});};[b,"geo-"+ry+"-lo.json","islands.json"].forEach(go);if(NOW_DATA[y])go(NOW_DATA[y]);})();</script>
 <!--map-data-warm:end-->
@@ -115,7 +125,7 @@
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
 /* this page's dark-mode rules, for a reader who chose dark on a light device */
-:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #f7310a; --m-lnp: #014dff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d; color-scheme: dark; }
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --surface: oklch(0.235 0.010 65); --m-alp: #f7310a; --m-lnp: #4f7fff; --m-grn: #22c35a; --m-onp: #ff9500; --m-ind: #b07ee0; --m-csa: #00c2e0; --m-oth: #7d7d7d; color-scheme: dark; }
 </style>
 <!--/shell:head-->
 </head>
@@ -186,14 +196,10 @@
         <button type="button" class="rd-tab" role="tab" data-view="list" aria-selected="false"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M5.5 4h8M5.5 8h8M5.5 12h8"/><path d="M2.5 4h.01M2.5 8h.01M2.5 12h.01" stroke-width="2"/></svg><span class="tw" data-t="List">List</span></button>
       </div>
       <button type="button" class="mp-fsgo" id="fsgo" aria-label="Full screen" title="Full screen (F)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
+      <button type="button" class="mp-retgo" id="retrogo" aria-pressed="false" title="Retro view: the map as a desktop program from about 2000">Retro</button>
     </div>
     <div class="rd-tabs mp-lensrow">
-      <div class="mp-lenses" id="lenses" hidden></div>
-      <div class="mp-search">
-        <label><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
-          <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search a seat, member or place" aria-label="Search seats, members, suburbs and polling places" aria-controls="sugg" aria-expanded="false"><kbd aria-hidden="true">/</kbd></label>
-        <div class="sugg" id="sugg" role="listbox" hidden></div>
-      </div>
+      <div class="mp-lenses" id="lenses" role="tablist" aria-label="Colour the seats by"></div>
     </div>
     <div class="mp-fig">
       <div class="mp-view" id="view">
@@ -201,12 +207,18 @@
           <canvas id="cv" class="grab" aria-label="Map of the federal electoral divisions. Choose a seat with search or the list view."></canvas>
           <div class="mp-loading" id="loading">Loading the map</div>
           <div class="mp-filter" id="filterpill" hidden></div>
-          <div class="mp-zoom" id="zoomer"><button type="button" id="zfs" aria-label="Full screen" title="Full screen (F)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 9V4h-5M4 15v5h5" stroke="white" stroke-width="4.1"/><path d="M20 9V4h-5M4 15v5h5" stroke="currentColor" stroke-width="1.9"/></svg></button><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="white" stroke-width="3.9"/><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M2 7h10" stroke="white" stroke-width="3.9"/><path d="M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zback" aria-label="Jump back" title="Jump back (B)" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5 4 10l5 5M4 10h11a5.5 5.5 0 0 1 0 11h-2.5" stroke="white" stroke-width="4.1"/><path d="M9 5 4 10l5 5" stroke="currentColor" stroke-width="1.9"/><path d="M4 10h11a5.5 5.5 0 0 1 0 11h-2.5" stroke="currentColor" stroke-width="1.9"/></svg></button></div>
+          <div class="mp-zoom" id="zoomer"><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="white" stroke-width="3.9"/><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M2 7h10" stroke="white" stroke-width="3.9"/><path d="M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zback" aria-label="Jump back" title="Jump back (B)" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5 4 10l5 5M4 10h11a5.5 5.5 0 0 1 0 11h-2.5" stroke="white" stroke-width="4.1"/><path d="M9 5 4 10l5 5" stroke="currentColor" stroke-width="1.9"/><path d="M4 10h11a5.5 5.5 0 0 1 0 11h-2.5" stroke="currentColor" stroke-width="1.9"/></svg></button></div>
           <div class="mp-credit" id="credit" hidden><span class="mp-credit-long">Streets: </span>Powered by <a href="https://www.esri.com/" rel="noopener">Esri</a> · <span class="mp-credit-long">Esri, </span>TomTom, Garmin, © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a><span class="mp-credit-long"> contributors</span></div>
           <div class="mp-list" id="list" hidden></div>
           <div class="mp-tip" id="tip" hidden></div>
         </div>
-        <div class="mp-legend" id="legend" hidden></div>
+        <div class="mp-legend" id="legend" hidden>
+          <div class="mp-search">
+            <label><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
+              <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search a seat, member or place" aria-label="Search seats, members, suburbs and polling places" aria-controls="sugg" aria-expanded="false"><kbd aria-hidden="true">/</kbd></label>
+            <div class="sugg" id="sugg" role="listbox" hidden></div>
+          </div>
+        </div>
         <div class="mp-frames" id="frames-jump" role="group" aria-label="View elections"></div>
         <div class="mp-time" id="time" role="group" aria-label="Election"></div>
       </div>
@@ -221,7 +233,7 @@
         <h3>Results</h3>
         <p>Every figure is the Australian Electoral Commission’s final count for that election: first preferences, the final two candidates, the two-party count against Labor and the Coalition, informal ballots and the flow of each excluded candidate’s preferences. Polling places are the AEC’s own booths; their ordinary votes add up, candidate by candidate, to each seat’s ordinary-vote total.</p>
         <p>The map has four geographic drawings and a Chart view. Seats fills each seat with its figure. Balloons shows results at polling places, with circle area proportional to the votes behind the reading. Areas shows the census’s own small areas. Surface smooths nearby ordinary polling-place results, with each measure weighted by the ballots in its own count. It describes where votes were cast, not where voters live. The blend uses a smaller neighbourhood in towns and never reaches beyond 25 km. Pale edges indicate less local support; neutral land has no supported estimate. Early-voting centres, hospital and mobile teams, postal and declaration votes, and places without coordinates do not paint the land. Their results remain in the seat totals. Surface is unavailable for census measures, seat-only figures, and changes lacking comparable local counts. Census selections use Areas where a suitable pack exists, otherwise Seats.</p>
-        <p>Chart sets the map aside and compares seats by their figures. For census measures it plots the census figure against Labor’s two-party share, with a least-squares line and a 95% confidence band. Pearson’s correlation describes the relationship across seats; a permutation test with 2,000 shuffles checks how often a relationship this strong arises after redistributing the two-party shares. The seat-type view compares those relationships within each type. These comparisons do not establish how individual residents voted.</p>
+        <p>Chart sets the map aside and draws the seats themselves, each a dot coloured by who won or holds it. On the census tab it sets each seat’s census figure against Labor’s two-party share and fits a least-squares line, with a 95% confidence interval for the line; r is Pearson’s correlation. Every seat is counted, not sampled, so significance comes from a permutation test: the seats’ two-party shares are shuffled among them 2,000 times, and a correlation is significant when shuffles match or beat it less than 1 time in 20. It then holds the AEC’s seat type fixed, taking the slope within the four types (and shuffling only within them), and tests each type on its own, since much of a census pattern runs between city and country seats. On the two-party tab, How votes were cast sets each seat’s on-the-day two-party vote against its final count, its postal votes or its early-centre votes, for seats whose final two were Labor and the Coalition. The other tabs stack the seats along their figure, a histogram whose blocks are seats, with the national figure marked.</p>
         <p>How votes were cast splits formal votes by the way they were cast. Early centres take ordinary votes, counted like those on the day, and they began in 2010. A declaration vote is sealed in an envelope and checked against the roll first: most early votes cast outside a person’s own seat, and every early vote before 2010. The 2025 graphic groups early centres with postal votes, and declaration votes with absent and other votes; each skew is Labor’s share of that group’s two-party count minus its share of the selected area’s full two-party count. The Effect on count option shows the change in cumulative Labor 2PP as the groups are added from bottom to top, using the selected area’s two-party vote totals. This is an illustrative sequence, not actual election-night reporting; batches overlap and postal and declaration votes arrive over several days. Mobile teams take votes before election day; the 2025 bands include them with on-the-day ordinary votes. Earlier elections give mobile teams their own row where they took at least 5% of the votes. Labor’s two-party share of each pile is the AEC’s two-party count by vote type from 2016. From 1996 to 2013 it is the final two by vote type, in seats where those were Labor and the Coalition. The 1993 count stops short of that.</p>
         <p>Where an election has no two-party or final count by polling place, which covers every state election’s two-party count, 1993, and several states’ final counts, Balloons estimates each place from its first preferences, then adjusts the figures to the seat’s real count. Surface leaves those missing local counts unpainted; explicitly modelled alternative contests remain labelled as estimates.</p>
         <p>Labor v One Nation, the Coalition v One Nation, and the Greens v One Nation, Labor and the Coalition are not counted, except in the few seats whose final two were that pair. Everywhere else they are built: each place’s first preferences, with other parties’ votes split by how those parties’ voters ranked the two on the Senate ballot at that place, or in that state for a state election. In the 2025 frames, Labor v One Nation is levelled to the site’s own preference table. South Australia 2026’s Labor v One Nation uses estimates of that election’s own splits. The One Nation pairings are offered only where One Nation stood in at least three seats in four and those orderings exist; the Greens pairings ride the federal frames’ ballots alone.</p>
@@ -246,7 +258,7 @@
 </main>
 <script src="/map/vendor/d3-7.9.0.min.js"></script>
 <script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
-<script src="/map/map.js?v=9d6b29fe"></script>
+<script src="/map/map.js?v=5e254146"></script>
 <!--shell:footer-->
 <div class="sh-frame">
   <footer class="sh-foot">

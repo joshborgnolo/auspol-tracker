@@ -19,7 +19,7 @@ const item = async (text) => { await page.evaluate((t) => [...document.querySele
 
 const nav = await page.evaluate(() => [...document.querySelectorAll(".rt-nav .rt-ni, .rt-pages a")].filter((e) => e.offsetParent).map((e) => e.textContent.trim()));
 check("the navbar: Home, Edit, View, Favorites, Help, then the site's pages", nav.slice(0, 5).join("|") === "Home|Edit|View|Favorites|Help" && nav.includes("Past cycles") && nav.includes("More pages"), nav);
-check("Home is the site's home page", await page.evaluate(() => document.querySelector(".rt-nav a.rt-ni").getAttribute("href") === "/"));
+check("Home is the site's home page, in its retro dress", await page.evaluate(() => document.querySelector(".rt-nav a.rt-ni").getAttribute("href") === "/retro/"));
 let m = await open("edit");
 check("Edit opens its menu, focus on the first item", !m.hidden && m.items[0].startsWith("Find a seat") && m.focus.startsWith("Find a seat"), m);
 check("Clear filters is off with no filter on", m.items.some((t) => t === "(off) Clear filters"), m.items);

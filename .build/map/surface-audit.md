@@ -1,6 +1,6 @@
 # Surface audit and redesign
 
-Audited 9 November 2026. Implementation is local until published through the site's normal deployment process.
+Audited 9 November 2026. Integrated with main through `79f7c629` for publication.
 
 ## Findings
 
@@ -91,11 +91,11 @@ Calculation regressions cover distant-outlier immunity, finite support, correct 
 
 Final local validation:
 
-- Passed: `test-map-draw`, `test-map-areas`, `test-map-chart`, `test-map-primary-breakdowns`, `test-map-vote-bands`, `test-map-senate`, `test-map-islands`, `test-map-history`, and `test-map-surface-browser`.
-- Passed: assembly and `git diff --check`. The assembled script includes the starting checkout's previously unassembled Chart/UI changes; source changes remain confined to Surface, its controls and explanations.
+- Passed: `test-map-draw`, `test-map-areas`, `test-map-chart`, `test-map-primary-breakdowns`, `test-map-vote-bands`, `test-map-senate`, `test-map-islands`, `test-map-history`, `test-map-page`, `test-map-ocean`, and `test-map-surface-browser`.
+- Passed: assembly, asset-reference checks and `git diff --check`. The integrated release preserves main’s current Chart/UI changes; changes against main are confined to Surface, its controls, explanations and audit.
 - Browser check: no JavaScript errors. Initial Surface appeared in about 1.9 seconds; Sydney's detailed raster in about 2.0 seconds (down from about 10.4 seconds before the final rendering adjustment). These are one local headless-Chrome run, not a cross-device performance guarantee. Detailed rasters sample approximately every two CSS pixels; numeric readings remain exact samples of the defined field.
-- Existing baseline failure: `test-map-page` stops at the missing Retro switch and before-paint Retro script. Both are absent in `HEAD:map/index.html` at starting commit `64479eb8`.
-- Existing baseline failure: `test-map-ocean` finds `map/data/land.json` stale against its geometry source. The source, generated land, builder and test are unchanged from starting commit `64479eb8`.
+- The initial checkout (`64479eb8`) lacked the Retro switch and before-paint script. Integration preserves main’s current markup, and `test-map-page` now passes.
+- The initial checkout had stale `map/data/land.json`. Integration includes main’s rebuilt land file, and `test-map-ocean` now passes.
 - The full repository-wide `npm test` was not run. This report does not claim an entirely passing repository suite.
 
 ## Remaining limits

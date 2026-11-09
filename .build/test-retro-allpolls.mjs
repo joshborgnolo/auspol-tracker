@@ -5,13 +5,16 @@
    head); the renderer's filters, sorts, links and phone columns; the page
    is the retro map's twin (shared chrome and Favorites, linked both ways)
    and is linked from nowhere else; and every data commit carries it
-   (SITE_FILES). The browser half is driven by .matilda/probe/allpolls-retro.mjs. */
+   (SITE_FILES). The seven tabs are the modern table's facets: each tab's
+   rows are pinned to its facet's row set and default scope, its figures to
+   the dataset, and the rules it lifts (facetRules) to the modern source. The
+   browser half is driven by .matilda/probe/allpolls-retro.mjs. */
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { retroAllPolls } from "./retro/allpolls.mjs";
+import { retroAllPolls, facetRules } from "./retro/allpolls.mjs";
 import { shellPages, mainChrome } from "./site-shell.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -100,7 +103,7 @@ assert.ok(RA.view(D, { ...st0, q: "not counted" }).rows.every((r) => r.na), "fin
 }
 // the link round-trips the view; the defaults ride no hash
 assert.equal(RA.toHash(D, st0), "", "the page as it opens has no hash");
-for (const st of [{ ...st0, m: "pri" }, { ...st0, m: "ld", h: new Set(["Resolve", "Wolf & Smith"]), t: "6w" }, { ...st0, c: D.rival === "lnp" ? "on" : "lnp", q: "Nov 2026", s: { k: "pb", d: 1 } }]) {
+for (const st of [{ ...st0, m: "pri" }, { ...st0, m: "pri", s: { k: "p.onp", d: -1 } }, { ...st0, m: "ld", h: new Set(["Resolve", "Wolf & Smith"]), t: "6w" }, { ...st0, c: D.rival === "lnp" ? "on" : "lnp", q: "Nov 2026", s: { k: "pb", d: 1 } }]) {
   const back = RA.fromHash(D, "#" + RA.toHash(D, st));
   assert.deepEqual(plain({ ...back, h: back.h ? [...back.h].sort() : null }), plain({ ...st, h: st.h ? [...st.h].sort() : null }), "the hash round-trips " + RA.toHash(D, st));
 }
@@ -114,20 +117,106 @@ assert.equal(RA.fromHash(D, "#h=Nobody&m=zzz&s=bogus.d").h, null, "an unknown po
 // the CSV: a head and a line per poll in view
 assert.equal(RA.csv(D, st0, V0).trim().split("\r\n").length, P.length + 1, "the CSV holds every poll in view");
 
+// ---- the four facets past the vote: each tab's rows are its modern facet's ---------------
+{
+  const dirOnly = grab("directionOnlyPolls"), issOnly = grab("issuesOnlyPolls"), conf = grab("confidenceOnlyPolls");
+  const tab = (m, extra = {}) => RA.view(D, { ...st0, m, ...extra });
+  assert.equal(D.totalAll, P.length + dirOnly.length + issOnly.length, "the archive's extent: every poll, the direction-only and the issues-only waves");
+  // Leadership: FACET_SCOPE.leadership - a Better PM question or a net rating
+  const hasLd = (p) => (Array.isArray(p.ppmSets) ? p.ppmSets.length : p.ppm ? 1 : 0) > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null));
+  assert.equal(tab("ld").rows.length, P.filter(hasLd).length, "Leadership lists the polls with a leadership figure, as the modern facet scopes it");
+  // Direction: every poll with a reading, and SEC Newgate's direction-only waves; the figures as printed
+  const V = tab("dir");
+  assert.equal(V.rows.length, P.filter((p) => p.dir).length + dirOnly.filter((p) => p.dir).length, "Direction: the polls with a reading and the direction-only waves");
+  const byIdx = new Map(P.concat(dirOnly, issOnly).map((p, i) => [i, p]));
+  for (const r of V.rows) {
+    const d = byIdx.get(r.i).dir;
+    assert.deepEqual([r.dir.r, r.dir.w, r.dir.u, r.dir.n], [d.right, d.wrong, d.unsure > 0 ? d.unsure : null, d.net], `${r.h} ${r.f}: direction as printed`);
+    assert.equal(r.dir.c.n, d.chg && d.chg.net != null ? d.chg.net : null, `${r.h} ${r.f}: its change on the previous poll`);
+  }
+  // Issues: the polls with issues figures, SEC Newgate's and Ipsos's waves; each cell's verdict recomputed here from the shares
+  const I = tab("iss");
+  assert.equal(I.rows.length, P.filter((p) => p.iss).length + dirOnly.filter((p) => p.iss).length + issOnly.filter((p) => p.iss).length, "Issues: the polls with issues figures and the issues-only waves");
+  for (const r of I.rows) {
+    const p = byIdx.get(r.i);
+    D.issMap.forEach(([id], k) => {
+      const own = (p.iss.own && p.iss.own[id]) || (id === "col" && p.iss.bp ? { alp: p.iss.bp.alp, lnp: p.iss.bp.lnp, onp: p.iss.bp.onp, grn: p.iss.bp.grn } : null);
+      const c = r.iss.m[k];
+      assert.equal(!!c, !!own, `${r.h} ${r.f} ${id}: asked or not`);
+      if (!own) return;
+      const ps = ["alp", "lnp", "onp", "grn"].filter((q) => own[q] != null).map((q) => [q, +own[q]]).sort((a, b) => b[1] - a[1]);
+      if (!ps.length) return;
+      assert.equal(c.w, ps[0][0], `${r.h} ${r.f} ${id}: the party rated best`);
+      if (ps.length > 1) assert.equal(c.lv, ps[0][1] - ps[1][1] < 0.5, `${r.h} ${r.f} ${id}: level under half a point`);
+    });
+  }
+  // Demographics: the age split reads each poll's printed 18–34 and 55+ where it has them, first group less second
+  const A = tab("dem", { g: "age" });
+  assert.ok(A.rows.length > 50 && A.rows.every((r) => r.dg && r.dg.age), "Demographics on age: the polls with an age pair");
+  for (const r of A.rows) {
+    const p = P[r.i], age = p.grp && p.grp.d && p.grp.d.age;
+    const a = age && age.find((x) => x[0] === "18–34"), b = age && age.find((x) => x[0] === "55+");
+    if (r.dg.age.lab === "18–34 v 55+" && a && b) assert.equal(r.dg.age.g.alp, +(a[1][0] - b[1][0]).toFixed(1), `${r.h} ${r.f}: Labor's 18–34 less 55+`);
+  }
+  // Offcuts: one table per cut family, a poll in each family it carries
+  const O = tab("dem", { g: "country" });
+  assert.ok(O.fams && O.fams.length >= 3 && O.groups === null, "Offcuts stacks its families");
+  assert.ok(O.fams.every((x) => x.list.every((r) => r.dg.country.fams[x.fam.id])), "each family's table holds that family's polls");
+  // Confidence: the gauges' releases, never polls, one lane at a time
+  const Cc = tab("conf"), Cb = tab("conf", { b: true });
+  assert.equal(Cc.rows.length + Cb.rows.length, conf.length, "the two lanes hold every release");
+  assert.ok(Cb.rows.every((r) => ["business", "nabBusiness"].includes(r.cf.k)) && Cc.rows.every((r) => !["business", "nabBusiness"].includes(r.cf.k)), "the business gauges in their lane");
+  for (const r of Cc.rows.concat(Cb.rows)) {
+    const c = conf[r.i - P.length - dirOnly.length - issOnly.length].conf;
+    assert.equal(r.cf.v, c.v, `${r.h} ${r.f}: the figure as printed`);
+    assert.equal(r.cf.chg, c.chg != null ? c.chg : c.chgCalc != null ? c.chgCalc : null, `${r.h} ${r.f}: the printed change, else the calculated one`);
+  }
+  // the count, as the modern table words it
+  assert.equal(RA.countHTML(D, st0, V0), `<b>${P.length}</b> of ${D.totalAll} polls`, "the vote tabs count against the archive");
+  assert.equal(RA.countHTML(D, { ...st0, m: "conf" }, Cc), `<b>${Cc.rows.length}</b> of ${conf.length} releases`, "Confidence counts releases");
+  // the facets' rules are the modern source's: the splits it offers, the issues it tables, the lanes it splits
+  const asset = R(".build/newtracker/assets/d1a1d215-370c-4ebc-878b-7eeea9ad8102.js");
+  const rules = facetRules(grab("demoGroups"));
+  assert.deepEqual(rules.DEM_SPLITS.map((x) => x.id), [...asset.slice(asset.indexOf("const DEM_SPLITS = ["), asset.indexOf("const DEM_KEYS")).matchAll(/\{ id: "(\w+)", label: "/g)].map((m) => m[1]), "the splits are the modern facet's");
+  assert.deepEqual(D.issMap.map((x) => x[0]), JSON.parse(asset.match(/const ISS_MAP = (\[[^\]]*\]);/)[1]), "the six issues are the modern facet's");
+  assert.deepEqual(rules.CONF_BUS_LANES, ["business", "nabBusiness"], "the business lanes are the modern facet's");
+  // every tab's header and rows draw, on a desk and on a phone, with the same column count
+  for (const m of RA.TABS.map((t) => t.id)) for (const ph of [false, true]) {
+    const st = { ...st0, m, ph }, Vm = RA.view(D, st), head = RA.headHTML(D, st), body = RA.bodyHTML(D, st, Vm, null, 0);
+    const n = RA.ncols(D, st), firstRow = body.match(/<tr class="ap-r[^>]*>([\s\S]*?)<\/tr>/);
+    assert.equal((head.match(/<th /g) || []).length, n, `${m}${ph ? " (phone)" : ""}: a head per column`);
+    assert.ok(firstRow && (firstRow[1].match(/<t[hd] /g) || []).length === n, `${m}${ph ? " (phone)" : ""}: a cell per column`);
+  }
+  // the links carry the split and the lane
+  for (const st of [{ ...st0, m: "dem", g: "income" }, { ...st0, m: "conf", b: true, s: { k: "conf.chg", d: 1 } }]) {
+    const back = RA.fromHash(D, "#" + RA.toHash(D, st));
+    assert.deepEqual(plain({ ...back, h: null }), plain({ ...st, h: null }), "the hash round-trips " + RA.toHash(D, st));
+  }
+  assert.equal(RA.fromHash(D, "#m=iss&s=dir.n.d").s.k, "pub", "a sort from another tab falls back to the newest first");
+  assert.equal((html.match(/data-ap-tab="/g) || []).length, 7, "seven measure tabs, then the way back");
+}
+
 // ---- the page: its links, its look, and nothing pretending to be a browser ---------------
 const json = html.match(/<script type="application\/json" id="ap-data">([\s\S]*?)<\/script>/)[1];
 assert.ok(!/<\/script/i.test(json) && JSON.parse(json).rows.length === P.length, "the data block parses and can't close its script early");
 assert.ok(html.includes(`<link rel="canonical" href="https://auspoltracker.com/allpolls/">`), "its canonical is the modern All polls page");
 assert.ok(html.includes(R(".build/retro/chrome.css")) && R("map/map.css").includes(R(".build/retro/chrome.css")), "the page and the retro map wear the one chrome");
+// the chrome's own inks survive a page's era link colours (allpolls.css's bare a:visited outranks a lone class and loads after chrome.css): navbar, kicker and menu links declare their visited inks (was the purple-kicker bug of 2026-11-09)
+{
+  const chrome = R(".build/retro/chrome.css");
+  for (const [sel, ink] of [[".rt-nav .rt-ni:visited, .rt-pages a:visited", "#fff"], [".rt-kicker:visited", "#ffd94a"], [".rt-drop a:visited", "#000"]])
+    assert.ok(chrome.includes(`${sel} { color: ${ink}; }`), `the chrome's links hold ${ink} when visited (${sel}) – a page's bare a:visited must never recolour the shared chrome`);
+}
 assert.ok(html.includes('<a href="/allpolls/retro/" aria-current="page">All polls</a>'), "the navbar marks this page");
 assert.ok(D.pages.more.some((p) => p.label === "Electoral map" && p.href === "/map/#retro=1"), "the Electoral map opens in its retro view");
-assert.ok(D.pages.tabs.every((p) => p.href !== "/") && D.pages.tabs.some((p) => p.href === "/cycles/"), "the bar's views but Now (the navbar's Home)");
+assert.ok(D.pages.tabs.every((p) => p.href !== "/" && p.href !== "/retro/") && D.pages.tabs.some((p) => p.href === "/cycles/retro/"), "the bar's views but Now (the navbar's Home), Past cycles opening its retro twin");
+assert.ok(html.includes('<a class="rt-ni" href="/retro/" title="auspol tracker’s home page">') && html.includes('<a class="rt-kicker" href="/retro/">'), "Home and the banner open the retro Now page");
 assert.ok(/data-rt-menu="edit"[\s\S]*data-rt-menu="view"[\s\S]*data-rt-menu="fav"[\s\S]*data-rt-menu="help"/.test(html), "Edit, View, Favorites and Help, as on the retro map");
 assert.ok(!/rt-titlebar|rt-menubar|rt-toolbar|rt-address|rt-status|rt-taskbar|rt-start/.test(html), "no pretend browser or desktop");
 assert.ok(!/text-transform:\s*uppercase/i.test(html), "no small caps");
 assert.ok(R(".build/retro/allpolls.client.js").includes('FAV_KEY = "auspol.map.favs"') && R(".build/retro/allpolls.client.js").includes("list.unshift({ t: favLabel(), h, p: HERE });"), "Favorites are the retro map's list, this page's entries carrying their page");
-// linked from the retro map's navbar and from nowhere else (the map's script, and the page itself)
-assert.ok(R("map/map.js").includes('const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };'), "the retro map's navbar opens it");
+// linked from the retro pages' navbars and from nowhere else (the map's script, the page itself, its retro Now and Past cycles siblings)
+assert.ok(R("map/map.js").includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };'), "the retro map's navbar opens it");
 assert.ok(!R("sitemap.xml").includes("allpolls/retro"), "not in the sitemap");
 {
   const htmls = [];
@@ -137,8 +226,9 @@ assert.ok(!R("sitemap.xml").includes("allpolls/retro"), "not in the sitemap");
     if (f.isDirectory()) walk(rel); else if (f.name.endsWith(".html")) htmls.push(rel);
   } };
   walk(".");
-  const linking = htmls.filter((f) => path.normalize(f) !== path.normalize("allpolls/retro/index.html") && R(f).includes("/allpolls/retro/"));
-  assert.deepEqual(linking, [], "no other page links it");
+  const RETRO_FAMILY = ["allpolls/retro/index.html", "retro/index.html", "cycles/retro/index.html"].map((f) => path.normalize(f));
+  const linking = htmls.filter((f) => !RETRO_FAMILY.includes(path.normalize(f)) && R(f).includes("/allpolls/retro/"));
+  assert.deepEqual(linking, [], "no page outside the retro family links it");
 }
 
-console.log(`PASS: retro All polls – ${P.length} polls current with the dataset, today's figures and head as the headline's, month lines, filters, sorts, hash, phone columns, CSV, the retro map's twin, unlisted, in SITE_FILES`);
+console.log(`PASS: retro All polls – ${P.length} polls current with the dataset, today's figures and head as the headline's, month lines, the seven facets' rows and figures (direction, issues, groups, gauges), filters, sorts, hash, phone columns, CSV, the retro map's twin, unlisted, in SITE_FILES`);

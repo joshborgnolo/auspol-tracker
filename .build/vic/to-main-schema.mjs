@@ -93,10 +93,16 @@ const HOUSE = {
   "Resolve": "Resolve", "RedBridge/Accent": "RedBridge/Accent", "DemosAU/Premier National": "DemosAU",
   "Freshwater": "Freshwater", "Roy Morgan": "Roy Morgan", "Newspoll": "Newspoll",
   "Wolf & Smith": "Wolf & Smith", "YouGov (MRP)": "YouGov (MRP)",
+  /* News Corp's internal research/data-analytics unit, branded the
+     "Lighthouse Political Monitor" in the Herald Sun from Nov 2026 — a
+     distinct house from Newspoll (filed short like "Resolve" for the
+     Resolve Political Monitor) */
+  "Lighthouse/Growth Intelligence Centre": "Lighthouse",
 };
 const FIRM_KEY_TO_HOUSE = {
   resolve: "Resolve", "redbridge-accent": "RedBridge/Accent", demosau: "DemosAU", freshwater: "Freshwater",
   roymorgan: "Roy Morgan", newspoll: "Newspoll", "wolf-smith": "Wolf & Smith", "yougov-mrp": "YouGov (MRP)",
+  "lighthouse-growth-intelligence-centre": "Lighthouse",
 };
 
 const eraAt = (slot, iso) => (VIC_ERAS[slot] || []).find((e) => iso >= e.from && (!e.to || iso <= e.to)) || null;

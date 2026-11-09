@@ -1269,6 +1269,12 @@ html.mp-fs .mp-tip { z-index: 260; }
 .mp-fj-menu { display: none; }
 .lg-bmenu .st-scm button:disabled { color: var(--ink-faint); cursor: not-allowed; }
 .lg-bmenu .st-scm button:disabled:hover { background: none; }
+/* a whole menu greyed by the state (the two-party contest under Seats): the
+   trigger reads like an unfit Draw chip, still titled with the reason — the
+   lg-sub's ink rule is specific, so these out-specify it outright */
+.lg-bmenu > .st-sclab:disabled { color: var(--ink-faint); cursor: not-allowed; }
+.mp-legend .lg-sub .lg-bmenu > .st-sclab:disabled { color: var(--ink-faint); }
+.mp-legend .lg-sub .lg-bmenu > .st-sclab:disabled:hover { color: var(--ink-faint); text-decoration: none; }
 
 /* ------- the lens's own block under Base (legendHTML's lg-sub) -------
    A lens's settings and notes hang beneath the Base row as its children —
@@ -1327,6 +1333,10 @@ html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-fami
    at its right */
 .rt-nav { display: flex; align-items: center; height: 26px; padding: 0 6px 0 4px; background: #061436; font: 400 12px/1 var(--rt-font); }
 .rt-nav .rt-ni, .rt-pages a { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 9px; color: #fff; text-decoration: none; font: inherit; background: none; white-space: nowrap; cursor: pointer; }
+/* a page's own link inks never recolour the chrome: era pages paint bare
+   content links blue→purple (a:visited outranks a lone class and pages see
+   it after this file), so the chrome's anchors declare their visited inks */
+.rt-nav .rt-ni:visited, .rt-pages a:visited { color: #fff; }
 .rt-nav .rt-ni svg { flex: none; }
 .rt-nav .rt-ni:hover, .rt-pages a:hover { background: #1c3f94; color: #fff; }
 .rt-nav .rt-ni[aria-expanded="true"] { background: #fff; color: #000; box-shadow: inset 1px 1px #808080; }
@@ -1340,6 +1350,7 @@ html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-fami
 .rt-pagesb { display: none !important; }
 /* the banner's kicker: the site's name over the page's */
 .rt-kicker { font: 700 12px/1 var(--rt-font); color: #ffd94a; text-decoration: none; text-shadow: 1px 1px 0 #000; }
+.rt-kicker:visited { color: #ffd94a; }
 .rt-kicker:hover { text-decoration: underline; }
 .rt-bline { display: flex; align-items: baseline; gap: 16px; min-width: 0; }
 /* the views: tab buttons along the banner's foot, the way back at their end */
@@ -1354,6 +1365,7 @@ html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-fami
 .rt-drop { position: fixed; z-index: 400; min-width: 200px; max-width: min(420px, calc(100vw - 8px)); max-height: calc(100vh - 40px); overflow: auto; padding: 2px; background: var(--rt-face); box-shadow: var(--rt-raised), 2px 2px 0 rgba(0, 0, 0, .35); font: 400 12px/1 var(--rt-font); color: #000; }
 .rt-drop[hidden] { display: none; }
 .rt-drop a, .rt-drop button { display: flex; align-items: center; width: 100%; min-height: 24px; padding: 0 18px 0 0; color: #000; background: none; text-decoration: none; white-space: nowrap; font: inherit; text-align: left; cursor: pointer; }
+.rt-drop a:visited { color: #000; }
 .rt-drop .rt-ck { flex: none; width: 22px; text-align: center; font-size: 11px; }
 .rt-drop .rt-it { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .rt-drop .rt-kb { margin-left: auto; padding-left: 28px; }

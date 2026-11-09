@@ -2,8 +2,9 @@
 # Daily crosstabs catch-up: vote-switching.mjs + demographics.mjs + issues.mjs
 # + confidence.mjs (ANZ–Roy Morgan consumer confidence + Roy Morgan business
 # confidence, for the Snapshot's "Economic sentiment" panel)
-# + macro.mjs (ABS CPI + GDP-per-capita and OECD aggregates via their data
-# APIs, for that panel's "Inflation & growth" view)
+# + macro.mjs (ABS CPI + GDP-per-capita and the OECD aggregates/member
+# median via their data APIs and the OECD's monthly inflation release
+# PDFs, for that panel's "Inflation & growth" view)
 # -> if any file changed -> validate -> render-card -> build -> commit -> push.
 # Run in CI by crosstabs-update.yml.
 #
@@ -152,7 +153,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/macro.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src .build/emrs-src "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/macro.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src .build/emrs-src .build/macro-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

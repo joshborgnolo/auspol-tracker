@@ -339,8 +339,12 @@ freshness_sync() {
 # allpolls/retro/index.html joined 2026-11-08: the retro All polls page
 # (.build/retro/allpolls.mjs), which the federal build writes from the same
 # dataset, so every refresh rewrites it with the new poll's row.
+# retro/index.html and cycles/retro/index.html joined 2026-11-09: the retro
+# Now and Past cycles pages (.build/retro/now.mjs, cycles.mjs), read off the
+# modern pages this build writes, so every refresh rewrites them too.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html allpolls/retro/index.html info/index.html
+  retro/index.html cycles/retro/index.html
   disagreement/index.html leans/index.html flows/index.html
   flows-explained/index.html preference-flows/index.html
   public-opinion/index.html beyond-the-vote/index.html ad-hocs/index.html

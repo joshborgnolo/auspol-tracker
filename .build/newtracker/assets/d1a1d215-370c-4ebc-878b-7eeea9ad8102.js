@@ -8700,11 +8700,15 @@ function infoTerms(D) {
         <span className="info-p"><b>Inflation &amp; growth is a third tab.</b> It charts the ABS
         and OECD's official series as published: Australia's headline inflation (the monthly CPI
         era's printed annual change, spliced onto the earlier quarterly series derived from the
-        ABS's own published index numbers), real GDP per person and real net national disposable
+        ABS's own published index numbers), its own deviation from the Reserve Bank's 2–3%
+        band at its midpoint, real GDP per person and real net national disposable
         income per person (chain volume, seasonally
-        adjusted), with the OECD-wide averages, the US/UK/Canada average
-        (computed here from the three members' own OECD series — the members whose OECD figures
-        stay current, where an all-member average would arrive months late) and the G20's inflation aggregate as dashed
+        adjusted), with the OECD-wide average, the OECD countries' own median and the
+        median deviation from each member's own central-bank target (the two median lines are
+        computed here — from the members' OECD-published prints and, since 2026, from the
+        OECD's monthly release table; the deviation is each country's print minus its own bank's
+        target midpoint — Australia's 2.5%, most others' 2% — taken over the countries
+        carrying both a print and a formal target that month) as dashed
         context, and the Reserve Bank's 2–3% inflation target as a shaded band. Nothing is
         smoothed, adjusted or estimated — the prints refresh daily from the ABS and OECD data
         APIs.</span>

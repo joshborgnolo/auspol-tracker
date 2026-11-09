@@ -880,7 +880,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"ea67e5dc","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"a936d831","senate-prefs-2025.json":"5f6d6a12","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"a936d831","senate-prefs-2025.json":"5f6d6a12","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -3488,25 +3488,38 @@ function seaQuad(g, sea, q, s = 1, ox = 0, oy = 0, line = 0) {
 let seaCv = null, seaLay = null, prepKnown = null;
 /* An island the AEC draws and Esri's sea covers whole (Curtis Island, in
    Bass: Esri has it only as a reserve laid over its sea) would be cut away
-   with the sea. Each small ring of the seats' (under ~100 km2) is tested at
-   a point inside it against the sea of the tile it lies in, once a tile, and
-   one the sea swallows is cut back out of the mask, its AEC coast drawn. */
+   with the sea. Each small ring of the seats' (under ~100 km2) that is not
+   the seat's main body is tested at a few points inside it against the sea
+   of the tiles they lie in, once a tile, and one the sea holds at every
+   point read is cut back out of the mask, its AEC coast drawn.
+   Never the main body: a city seat is under 100 km2 itself, and the AEC
+   draws it across its harbour, so a seat whose middle fell on the water
+   (Warringah 2025 and Sydney 2010 and 2001, the middle of their bounds in
+   Port Jackson) was "rescued" whole and its AEC polygon laid back over
+   the harbour, angular across the water, while its neighbours' years
+   (North Sydney's middle is on land) showed Esri's harbour. One point
+   could equally read a river-split piece of land as sea, hence several. */
 // (a seat's small rings, made the first time the seat is in view at street zoom)
 function islets(g, i) {
   const all = (g.islets ??= []);
   if (all[i]) return all[i];
   const out = (all[i] = []), P = g.proj, ps = g.polys(i);
   if (ps) {
-    for (const pg of ps) {
-      const r = pg.outer; if (Math.abs(ringArea(r)) > 5) continue;
+    let main = 0, top = -1;
+    ps.forEach((pg, k) => { const a = Math.abs(ringArea(pg.outer)); if (a > top) { top = a; main = k; } });
+    ps.forEach((pg, k) => {
+      const r = pg.outer; if (k === main || Math.abs(ringArea(r)) > 5) return;
       const [cx, cy] = ringMid(r);
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
       for (let k = 0; k < r.length; k += 2) { x0 = Math.min(x0, r[k]); x1 = Math.max(x1, r[k]); y0 = Math.min(y0, r[k + 1]); y1 = Math.max(y1, r[k + 1]); }
-      const pt = ringInside(r, cx, cy), path = new Path2D();
+      const path = new Path2D();
       for (let k = 0; k < r.length; k += 2) (k ? path.lineTo : path.moveTo).call(path, r[k], r[k + 1]);
       path.closePath();
-      out.push({ i, bb: [[x0, y0], [x1, y1]], at: merc(P.invert(pt)), path, seen: new WeakMap() });
-    }
+      // the middle, and the middle of the widest span a quarter and three quarters down
+      const pts = [ringInside(r, cx, cy), ringInside(r, NaN, y0 + (y1 - y0) / 4), ringInside(r, NaN, y0 + (3 * (y1 - y0)) / 4)]
+        .filter((p, k, a) => isFinite(p[0]) && a.findIndex((q) => q[0] === p[0] && q[1] === p[1]) === k);
+      out.push({ i, bb: [[x0, y0], [x1, y1]], at: pts.map((p) => ({ m: merc(P.invert(p)), seen: new WeakMap() })), path });
+    });
   }
   return out;
 }
@@ -3529,14 +3542,20 @@ function rescue(st, sg) {
   hitCtx.setTransform(1, 0, 0, 1, 0, 0);
   for (let i = 0; i < m.divs.length; i++) if (inBox(g.bb[i], x0, y0, x1, y1)) for (const r of islets(g, i)) {
     if (!inBox(r.bb, x0, y0, x1, y1)) continue;
-    for (const { tz, tx, ty, a: [sea, , s = 1, ox = 0, oy = 0] } of st.seas) {
-      const n = 2 ** tz, u = r.at[0] * n - tx, v = r.at[1] * n - ty;
-      if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
-      let wet = r.seen.get(sea);
-      if (wet == null) r.seen.set(sea, (wet = hitCtx.isPointInPath(sea, (u + ox) / s, (v + oy) / s)));
-      if (wet) st.saved.push(r);
-      break;
+    // saved when every point a tile in hand reads is sea (and one at least is read)
+    let read = 0, dry = false;
+    for (const p of r.at) {
+      for (const { tz, tx, ty, a: [sea, , s = 1, ox = 0, oy = 0] } of st.seas) {
+        const n = 2 ** tz, u = p.m[0] * n - tx, v = p.m[1] * n - ty;
+        if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
+        let wet = p.seen.get(sea);
+        if (wet == null) p.seen.set(sea, (wet = hitCtx.isPointInPath(sea, (u + ox) / s, (v + oy) / s)));
+        read++; if (!wet) dry = true;
+        break;
+      }
+      if (dry) break;
     }
+    if (read && !dry) st.saved.push(r);
   }
   if (!st.saved.length) return;
   sg.save();
@@ -5124,14 +5143,13 @@ function areasUnpack(D) {
   });
   const geoms = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map((g) => {
     const rings = g.type === "Polygon" ? g.arcs : g.type === "MultiPolygon" ? g.arcs.flat() : [];
-    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity] };
+    return { r: rings, bb: [Infinity, Infinity, -Infinity, -Infinity], code: g.properties && g.properties.SA1_CODE21 };
   });
-  const codes = D.topo.objects[Object.keys(D.topo.objects)[0]].geometries.map(g => g.properties.SA1_CODE21);
   const n = geoms.length, decN = (o) => new Uint16Array(U8(o.b).buffer), dec32 = (o) => new Uint32Array(U8(o.b).buffer);
   const incBands = decN(D.meta.incBands), pop = dec32(D.meta.pop), area = dec32(D.meta.area), sa2i = decN(D.meta.sa2i);
   for (const [k, arr] of Object.entries(lanes)) if (arr.length !== n) throw new Error(`areas pack lane ${k} length ${arr.length} != ${n}`);
   if (incBands.length !== n * 16 || pop.length !== n || area.length !== n || sa2i.length !== n) throw new Error("areas pack meta length drift");
-  return { vintage: D.vintage, caps: D.caps, marks: D.marks, sa2names: D.meta.sa2names, codes, lanes, types, geoms, arcs, incBands, pop, area, sa2i };
+  return { vintage: D.vintage, caps: D.caps, marks: D.marks, sa2names: D.meta.sa2names, lanes, types, geoms, arcs, incBands, pop, area, sa2i };
 }
 // the income-quartile shares at the frame's own cuts: the builder's walk, verbatim
 function areasIncShare(P, m, i, lane) {
@@ -5263,7 +5281,7 @@ function areasHit(m, x, y) {
   for (const gi of cell2) {
     const b = pr.bb[gi];
     if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
-    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, code: AR.pack.codes[gi], sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi] };
+    if (areasInside(pr, AR.pack.geoms[gi], x, y)) return { i: gi, sa2: AR.pack.sa2names[AR.pack.sa2i[gi]], pop: AR.pack.pop[gi], code: AR.pack.geoms[gi].code };
   }
   return null;
 }
@@ -5379,8 +5397,7 @@ function areasTick(m) {
     areasJob({ base: true, px, x0: hx0 - 0.08 * hw, y0: hy0 - 0.08 * hh, nx: (1.16 * hw) / px, ny: (1.16 * hh) / px });
     return;
   }
-  // Two CSS pixels are sufficient for the smoothed field; point readings remain exact.
-  const q = 0.5, want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
+  const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
   if (want >= AR.base.J.px * 0.8) { AR.view = null; return; }
   const [vx0, vy0, vx1, vy1] = viewBox(), V = AR.view;
   if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.J.x0 <= vx0 && V.J.y0 <= vy0 && V.J.x0 + V.J.nx * V.J.px >= vx1 && V.J.y0 + V.J.ny * V.J.px >= vy1) return;
@@ -10787,6 +10804,12 @@ function renderLegend() {
   // (its coloured cells) as the map and chamber, so it needs the same key —
   // census measure picker, ramps and switchers included
   if (!m) { el.hidden = true; return; }
+  // a year still loading is a shell record (loadYear registers it before the
+  // fetch): nothing the key measures is on it yet — leave what's shown for the
+  // load's landing renders (2026-11-09: the Handbook years' multi-second
+  // geometry build threw here — m.areas didn't exist under legendHTML — and
+  // the legend-meta fetch landing in the gap aborted the whole boot)
+  if (!m.search) return;
   el.hidden = false;
   // Keep the live search field (and its listeners/focus) when rebuilding controls.
   const search = SEARCH_EL;
@@ -10937,12 +10960,13 @@ function senLegendHeight(sm, w, probe) {
 // the current pick's own word beside its chevron, the panel opening to its
 // items (2026-11-08: native <select>s leave the panel for it)
 const LG_CHEVRON = `<svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-function lgMenu(key, items, cur, aria) {
+function lgMenu(key, items, cur, aria, off) {
   const text = (items.find(([v]) => v === cur) || items.find(([v, t]) => t != null))[1] ?? "";
   // a curious value of `null` is a group heading, not a pickable item
-  // (an item's third and fourth places: unavailable here, and why)
+  // (an item's third and fourth places: unavailable here, and why; `off` greys the whole
+  // menu out where the state can't use it, the reason its trigger's hover title)
   const itemHtml = ([v, t, off, why]) => v === null ? `<span class="lg-mgroup">${esc(t)}</span>` : `<button type="button" data-lg-val="${key}:${v}" role="menuitemradio" aria-checked="${v === cur}" tabindex="-1"${off ? ` disabled title="${esc(why || "")}"` : ""}>${esc(t)}</button>`;
-  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
+  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger${off ? ` disabled title="${esc(off)}"` : ""} aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
 }
 function lgMenuParts(wrap) {
   return !wrap ? null : { menu: wrap.querySelector(":scope > .st-scm"), trigger: wrap.querySelector("[data-lg-trigger],[data-basis-trigger]") };
@@ -11030,7 +11054,7 @@ function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
-  const opt = (name, cur, list) => lgMenu(name, list, cur, name);
+  const opt = (name, cur, list, off) => lgMenu(name, list, cur, name, off);
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
   // the Draw switch leads the strip's close on the map view — its note right after
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
@@ -11045,8 +11069,12 @@ function legendHTML(m) {
     case "tpp": {
       const sw = S.tppMode === "swing", pair = axisNow(m);
       h += `<div class="lg-t">Two-party preferred: <button type="button" class="flip" data-flip="tpp">${sw ? `swing since ${prev}` : "share"}<span>⇄</span></button></div>`;
-      // as balloons or a surface, where One Nation stood widely, the two parties can be another two
-      if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts(m))}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      // as balloons or a surface, where One Nation stood widely, the two parties can be another two.
+      // As seats the pairing has no say, so the row hangs greyed, the pick kept for the walk back
+      if (!sw && S.view === "map" && axisFrame(m) != null) {
+        const off = S.draw === "seats" ? `Seats counts Labor v ${coalW(0)} — the other contests paint as balloons or a surface` : "";
+        h += `<div class="lg-t lg-contest"${off ? ` title="${off}"` : ""}>${opt("axis", pair, axisOpts(m), off)}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      }
       if (pair !== "AC") break;
       if (boothsOn && sw) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;
       break;
@@ -11424,7 +11452,7 @@ function tipFor(h) {
     // on Areas the census's own area answers first, with its counted figure
     const arh = drawOf(m) === "areas" && AR.pack ? AR.here : null;
     const first = arh && arh.v != null
-      ? `<div class="tv">This census area: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">SA1 ${esc(arh.code)} · within ${esc(arh.sa2)}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
+      ? `<div class="tv">This census area: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">Census SA1 ${esc(arh.code)} · within ${esc(arh.sa2)}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
       : surf ? (h.isl ? `<div class="tv">No surface drawn for this island; select a polling place for its result</div>` : here ? `<div class="tv">Nearby polling places: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div><div class="ts">${int(here.count)} contributing places · nearest ${f1(here.nearest)} km · smoothed estimate</div>` : `<div class="tv">No supported local estimate here</div>`) : "";
     return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${first}<div class="${here || first ? "ts" : "tv"}">${here || first ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
@@ -12006,7 +12034,9 @@ function resize() {
   const moved = keyOnly && !atLastFit() && !flight;
   Wpx = r.width; Hpx = r.height;
   canvas.width = Math.round(Wpx * dpr); canvas.height = Math.round(Hpx * dpr);
-  if (M()) {
+  // a year still loading has no geometry to frame against (its shell record is
+  // registered before the fetch) — the load's landing calls resize() itself
+  if (M() && M().geo) {
     setExtent();
     // the step into or out of full screen brings its own camera (app-7-full.js)
     if (FS.move) { const mv = FS.move; FS.move = null; mv(); }
@@ -13218,13 +13248,16 @@ function rtHouseSVG() {
     <path d="M105.6 2.4 h10 v6 h-10z" fill="#00247d" stroke="#cfe0ff" stroke-width=".6"/><path d="M105.6 2.4 h4 v3 h-4z" fill="#cf142b" opacity=".85"/></svg>`;
 }
 /* the site's pages with a retro twin: in this view their links open the
-   twin (All polls at /allpolls/retro/, built by .build/retro/allpolls.mjs,
-   which links back here with retro=1) */
-const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };
+   twin (All polls at /allpolls/retro/, built by .build/retro/allpolls.mjs;
+   Past cycles at /cycles/retro/ and the front page at /retro/, the navbar's
+   Home, built by .build/retro/cycles.mjs and now.mjs), each linking back
+   here with retro=1 */
+const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };
 // the site's pages, read off the shell's own tabs and More menu (so they never drift from it); the home page is the navbar's Home
 function rtPages() {
   const twin = (h) => RT_TWIN[h] || h;
-  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: twin(a.getAttribute("href")) })).filter((p) => p.href !== "/");
+  // (Now is the navbar's Home, so it leaves the list before its link turns into the twin's)
+  const tabs = $$(".sh-tabs-set a.sh-tab").filter((a) => a.getAttribute("href") !== "/").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: twin(a.getAttribute("href")) }));
   const more = $$("#sh-menu a.sh-menu-item").filter((a) => !tabs.some((t) => t.href === twin(a.getAttribute("href")))).map((a) => ({ label: (a.querySelector(".sh-menu-t") || a).textContent.trim(), href: twin(a.getAttribute("href")), on: a.dataset.id === "map" }));
   return { tabs, more };
 }
@@ -13240,11 +13273,11 @@ function rtBuild() {
   const top = document.createElement("div");
   top.className = "rt-top rt-only";
   top.innerHTML = `<nav class="rt-nav" aria-label="Site and page">
-      <a class="rt-ni" href="/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}
+      <a class="rt-ni" href="/retro/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}
       <span class="rt-navgap"></span>
       <span class="rt-pages">${pages.map((p) => `<a href="${esc(p.href)}">${esc(p.label)}</a>`).join("")}${menu("more", `More pages ${RT_ICON.dd}`)}</span>${menu("pages", `Pages ${RT_ICON.dd}`).replace('class="rt-ni"', 'class="rt-ni rt-pagesb"')}
     </nav>
-    <div class="rt-banner"><a class="rt-home" href="/" title="auspol tracker: the interactive tracker">${rtFlagSVG()}</a><div class="rt-bcol"><a class="rt-kicker" href="/">auspol tracker</a><span class="rt-bline"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></span></div>${rtHouseSVG()}</div>
+    <div class="rt-banner"><a class="rt-home" href="/retro/" title="auspol tracker: the tracker’s home page">${rtFlagSVG()}</a><div class="rt-bcol"><a class="rt-kicker" href="/retro/">auspol tracker</a><span class="rt-bline"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></span></div>${rtHouseSVG()}</div>
     <div class="rt-tabs" role="tablist" aria-label="View"></div>`;
   eb.before(top);
   // the view tabs: proxies for the eyebrow's switch (it parks in full screen's plate), full screen, and the way back

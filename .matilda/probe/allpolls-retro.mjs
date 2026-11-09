@@ -1,7 +1,9 @@
 // Probe: the retro All polls page (/allpolls/retro/, .build/retro/allpolls.mjs) in a browser —
 // its navbar menus (Edit, View, Favorites shared with the retro map, Help, More pages, the
-// phone's Pages), the tabs, the pollster checklist, find, time, contest, the sort, a poll opened
-// in its row, the CSV, the phone's columns, and the hop from the retro map's navbar and back.
+// phone's Pages), the seven facet tabs (Direction, Issues, Demographics with its splits and
+// Offcuts families, Confidence with its lanes), the pollster checklist, find, time, contest, the
+// sort, a poll opened in its row, the CSV, the phone's columns, and the hop from the retro map's
+// navbar and back.
 // usage: node .matilda/probe/allpolls-retro.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 const base = process.argv[2];
@@ -36,10 +38,49 @@ check("the arrows walk the bar to View: the tabs, the contests, the order, the w
 await page.keyboard.press("Escape"); await sleep(150);
 check("Escape closes the menu, focus back on its button", await page.evaluate(() => document.querySelector(".rt-drop").hidden && document.activeElement.dataset.rtMenu === "view"));
 // the tabs
-for (const [tab, want] of [["pri", /ALP|ON|L\/NP/], ["ld", /Better PM/], ["tpp", /Implied/]]) {
+for (const [tab, want, pick] of [["pri", /ALP.*ON.*L\/NP/], ["ld", /Better PM.*Albanese/], ["dir", /Right.*Wrong.*Unsure.*Net/], ["iss", /Cost of living.*Housing.*Economy/],
+                                  ["dem", /Groups.*ALP/, "g"], ["conf", /Gauge.*Figure.*Change/, "b"], ["tpp", /Implied.*Lean/, "c"]]) {
   await page.click(`[data-ap-tab="${tab}"]`); await sleep(200);
-  const t = await page.evaluate(() => ({ head: document.querySelector("#ap-head").textContent, sel: document.querySelector('.rt-tabs [aria-selected="true"]').dataset.apTab, cap: document.querySelector("#ap-cap").textContent, contest: !document.querySelector(".ap-cwrap").hidden }));
-  check(`the ${tab} tab draws its columns`, want.test(t.head) && t.sel === tab && t.contest === (tab === "tpp"), t);
+  const t = await page.evaluate(() => ({ head: document.querySelector("#ap-head").textContent, sel: document.querySelector('.rt-tabs [aria-selected="true"]').dataset.apTab, cap: document.querySelector("#ap-cap").textContent,
+    pickers: ["c", "g", "b"].filter((k) => !document.querySelector(".ap-" + k + "wrap").hidden).join(""), count: document.querySelector("#ap-count").textContent, rows: document.querySelectorAll("tr.ap-r").length }));
+  check(`the ${tab} tab draws its columns, its own picker beside them`, want.test(t.head) && t.sel === tab && t.pickers === (pick || ""), t);
+}
+// each facet's own rows: Leadership the polls with a leader figure, Direction and Issues the waves that ask no vote too, Confidence releases
+{
+  const rowsOf = async (m) => { await go("m=" + m); return st(); };
+  const tpp = await rowsOf("tpp"), ld = await rowsOf("ld"), dir = await rowsOf("dir"), iss = await rowsOf("iss"), conf = await rowsOf("conf");
+  check("Leadership lists only the polls with a leadership figure", ld.rows < tpp.rows && / of \d+ polls$/.test(ld.count), ld.count);
+  check("Direction adds SEC Newgate's waves", dir.houses.includes("SEC Newgate") && !tpp.houses.includes("SEC Newgate"), dir.houses);
+  check("Issues adds Ipsos's waves", iss.houses.includes("Ipsos") && !tpp.houses.includes("Ipsos"), iss.houses);
+  check("Confidence counts releases, not polls", / releases$/.test(conf.count) && conf.months.every((x) => / releases?$/.test(x)), conf.count);
+  await go("m=iss");
+  m = await open("houses", "#ap-hbtn");
+  check("the pollster checklist lists the tab's own pollsters", m.items.some((x) => x.startsWith("Ipsos")), m.items.slice(0, 6));
+  await page.keyboard.press("Escape");
+  await go("m=iss&h=Ipsos");
+  await page.click('[data-ap-tab="tpp"]'); await sleep(200);
+  check("a tab without the picked pollster drops the pick", (await st()).hash === "" && (await page.evaluate(() => document.querySelector("#ap-hbtn").textContent.trim())) === "All pollsters");
+  // the split picker, and Offcuts' families
+  await go("m=dem");
+  await page.select("#ap-g", "gender"); await sleep(200);
+  check("the split picker redraws the pairs", /g=gender/.test((await st()).hash) && (await page.evaluate(() => [...document.querySelectorAll("td.c-g")].every((td) => td.textContent === "Women v men"))));
+  await page.select("#ap-g", "country"); await sleep(200);
+  const fams = await page.evaluate(() => [...document.querySelectorAll("tr.ap-fam th b")].map((b) => b.textContent));
+  check("Offcuts stacks a table per cut family", fams.length >= 3 && fams.includes("Birth country") && (await page.evaluate(() => !document.querySelector("tr.ap-m:not(.ap-fam)"))), fams);
+  // the gauges' lanes
+  await go("m=conf");
+  await page.select("#ap-b", "1"); await sleep(200);
+  const bus = await st();
+  check("the lane picker turns to the business gauges", /b=1/.test(bus.hash) && bus.houses.includes("NAB") && !bus.houses.includes("Westpac–MI"), bus.houses);
+  check("NAB's figure names its net balance", await page.evaluate(() => [...document.querySelectorAll("tr.ap-r")].some((tr) => /NAB/.test(tr.textContent) && /net balance/.test(tr.textContent))));
+  // a sort by a dotted key survives the link (the keys carry dots: p.onp, dir.n)
+  await go("m=pri&s=p.onp.d");
+  check("a party column's sort survives the link", await page.evaluate(() => document.querySelector('[data-sort="p.onp"] .ap-sd').textContent === "▼" && !document.querySelector("tr.ap-m")));
+  // a direction row opens with its figures first
+  await go("m=dir");
+  await page.click("tr.ap-r td.c-n"); await sleep(200);
+  check("a Direction row opens on its direction figures", await page.evaluate(() => { const d = document.querySelector(".ap-det dt"); return d && d.textContent === "Direction"; }));
+  await go();
 }
 // the pollster checklist stays open while it's ticked
 m = await open("houses", "#ap-hbtn");

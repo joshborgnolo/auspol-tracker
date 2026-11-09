@@ -19,10 +19,14 @@ import { coverOf } from "./extract-ipsos.mjs";
 import { infographicDataOf } from "./infogram.mjs";
 
 const RB = ".build/redbridge-src";
+// the dir carries more than Accent report caches: afr-seen.json (the AFR
+// reader's settled-story ledger) and its afr-<date>-<id>.json provenance
+// files have no report-text .txt twin — same guard as issues.mjs
 const report = (date) => {
   for (const f of fs.readdirSync(RB).filter((x) => x.endsWith(".json"))) {
     const j = JSON.parse(fs.readFileSync(path.join(RB, f), "utf8"));
-    if (j.date === date) return fs.readFileSync(path.join(RB, f.replace(/\.json$/, ".txt")), "utf8");
+    const txt = path.join(RB, f.replace(/\.json$/, ".txt"));
+    if (j.date === date && fs.existsSync(txt)) return fs.readFileSync(txt, "utf8");
   }
   throw new Error("no cached report for " + date);
 };
@@ -66,8 +70,8 @@ assert.deepEqual(gd.ownership.col.total, { alp: 29, lnp: 19, onp: 13, grn: 6, eq
 assert.ok(gd.salience.col.dims.vote.Coalition, "December's vote groups print the Coalition whole");
 
 // ---- a wave printed twice agrees: each report's previous wave is the one before's own ----
-// afr-seen.json (the reader's settled-story ledger) shares the dir but is no report
 const byDate = fs.readdirSync(RB).filter((f) => f.endsWith(".json"))
+  .filter((f) => fs.existsSync(path.join(RB, f.replace(/\.json$/, ".txt"))))
   .map((f) => JSON.parse(fs.readFileSync(path.join(RB, f), "utf8")).date)
   .filter((d) => typeof d === "string").sort();
 let compared = 0;

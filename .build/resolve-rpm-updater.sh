@@ -95,6 +95,20 @@ case "$READ_LAST" in
 esac
 [ -n "$READ_WARN" ] && [ -z "$WARN" ] && WARN="article: $READ_WARN"
 
+# The wave's topical questions: resolve-oneoffs-file.mjs files the article's
+# embedded one-off charts into data/resolve-one-offs.json itself (figures
+# verbatim from the publisher's Datawrapper datasets). A failure is a
+# warning, never a block; the 7-day review tripwire stands behind it.
+OOFF_OUT="$(node .build/resolve-oneoffs-file.mjs --apply 2>&1)"
+OOFF_CODE=$?
+echo "$OOFF_OUT" >> "$LOG"
+OOFF_LAST="$(echo "$OOFF_OUT" | tail -1)"
+case "$OOFF_LAST" in
+  RESOLVE_ONEOFF_STATUS*) [ $OOFF_CODE -ne 0 ] && WARN="one-offs filer aborted: $OOFF_LAST"
+    echo "$OOFF_LAST" | grep -q '"applied":true' && { log "one-offs: $OOFF_LAST"; CHANGED=1; } ;;
+  *) WARN="one-offs filer printed no RESOLVE_ONEOFF_STATUS line: $OOFF_LAST" ;;
+esac
+
 if [ $CHANGED -eq 0 ]; then
   warn_check
   exit 0
@@ -110,10 +124,13 @@ if ! refresh_site; then
   exit 1
 fi
 
-FILES=(data/resolve-political-monitor.csv data/polls.json data/demographics.json data/issues.json .build/resolve-rpm-src/ "${SITE_FILES[@]}")
+FILES=(data/resolve-political-monitor.csv data/polls.json data/demographics.json data/issues.json data/resolve-one-offs.json .build/resolve-rpm-src/ .build/newtracker/adhoc-themes.mjs "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update Resolve monitor data $(date '+%Y-%m-%d')"
-[ -n "$ASSIM_OUT" ] || MSG="Resolve: fieldwork, sample and release time from the SMH article $(date '+%Y-%m-%d')"
+if [ -z "$ASSIM_OUT" ]; then
+  MSG="Resolve: fieldwork, sample and release time from the SMH article $(date '+%Y-%m-%d')"
+  echo "$OOFF_LAST" | grep -q '"applied":true' && MSG="Resolve: the wave's one-off questions $(date '+%Y-%m-%d')"
+fi
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1

@@ -2572,15 +2572,16 @@ for (const y of ["sa22", "sa26"]) {
   const rt = part("app-8-retro.js"), rcss = part("retro.css"), html = R("map/index.html"), ui = part("app-6-ui.js"), base = part("app-1-base.js");
   assert.ok(html.includes('id="retrogo"') && html.includes('localStorage.getItem("auspol.map.retro")==="1")document.documentElement.classList.add("mp-retro")'), "the eyebrow's Retro switch, and the head's inline script setting the look before the first paint");
   assert.ok(!/rt-titlebar|rt-menubar|rt-toolbar|rt-address|rt-status|rt-taskbar|rt-start/.test(rt + rcss), "no pretend browser or desktop: no title bar, menu bar, toolbar, address bar, status bar or taskbar");
-  assert.ok(rt.includes('href="/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}'), "the navbar: Home (the site's home page), then Edit, View, Favorites and Help menus");
+  assert.ok(rt.includes('href="/retro/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}'), "the navbar: Home (the site's home page, in its retro dress), then Edit, View, Favorites and Help menus");
   assert.ok(rt.includes('case "edit": return [') && rt.includes('"Find a seat or place…"') && rt.includes('"Copy link to this view"') && rt.includes('{ label: "Clear filters", disabled: !filtered, act: rtClearFilters }'), "Edit finds, copies the view's link and clears the filters");
   assert.ok(rt.includes('{ label: "Full screen", kb: "F", act: () => fsEnter() }') && rt.includes('{ label: "Modern view", act: () => rtSet(false) }'), "View switches views, opens full screen, toggles city names and leaves the look");
   assert.ok(rt.includes('const RT_KEY = "auspol.map.retro", RT_FAV_KEY = "auspol.map.favs";') && rt.includes("location.reload();") && rt.includes('!/^(retro|fs)=/.test(kv)'), "Favorites are views saved in this browser, their links without the look; a pick reloads on that view");
   assert.ok(ui.includes('if (typeof rtIsOn === "function" && rtIsOn()) p.set("retro", "1");'), "the look rides the link");
   assert.ok(base.includes('if (r.classList.contains("mp-retro")) return false;') && base.includes("if (typeof retroTheme === \"function\" && typeof rtIsOn === \"function\" && rtIsOn()) retroTheme(T);"), "the canvases take the flat palette, light whatever the device's theme");
   assert.ok(R(".build/retro/chrome.css").includes("html:root.mp-retro {"), "the look's tokens (the retro pages' shared chrome) outrank the page's dark ones (:root.sh-dark)");
-  // the retro All polls page is this view's twin: the navbar opens it for All polls, and the two share Favorites
-  assert.ok(rt.includes('const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };') && rt.includes("href: twin(a.getAttribute(\"href\"))"), "the navbar's All polls opens the retro All polls page");
+  // the retro All polls, Past cycles and Now pages are this view's twins: the navbar opens them (Now is Home), and they share Favorites
+  assert.ok(rt.includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };') && rt.includes("href: twin(a.getAttribute(\"href\"))"), "the navbar's All polls and Past cycles open their retro twins");
+  assert.ok(rt.includes('<a class="rt-ni" href="/retro/" title="auspol tracker’s home page">') && rt.includes('<a class="rt-kicker" href="/retro/">') && rt.includes('filter((a) => a.getAttribute("href") !== "/")'), "Home and the banner open the retro Now page, and Now leaves the page list (it is Home)");
   assert.ok(rt.includes('const rtFavPage = (f) => (typeof f.p === "string" ? f.p : "/map/");') && rt.includes('if (!rtFavHere(f)) { location.href = rtFavPage(f) + (f.h ? "#" + f.h : ""); return; }'), "a Favorite saved on the retro All polls page opens that page");
   assert.ok(rt.includes('if (e.key === "ArrowDown" || e.key === "ArrowUp") {') && rt.includes("e.preventDefault(); e.stopPropagation();"), "an open menu keeps the arrows from the map's year and lane walks");
 }
@@ -2638,6 +2639,19 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(css.includes(".lg-toolbar"), "the panel's toolbar row carries its flex rule");
 }
 
+// a still-loading year is a shell record (loadYear registers it before its
+// fetch): renderers that can fire in the gap — the legend from the legend-meta
+// completion, resize from the stage observer — leave it alone (2026-11-09: a
+// direct open of a Handbook year raced that meta fetch into legendHTML's
+// m.areas and the boot died; the fix is pinned by the throttled-boot recipe in
+// .matilda/map-1993-catch.mjs)
+{
+  const ui = part("app-6-ui.js");
+  assert.ok(ui.includes("if (!m.search) return;") && ui.indexOf("if (!m) { el.hidden = true; return; }") < ui.indexOf("if (!m.search) return;"), "the legend leaves a still-loading year's shell record alone");
+  assert.ok(ui.includes("if (M() && M().geo) {"), "resize frames geometry only once the year's record carries it");
+  assert.ok(js.includes("if (!m.search) return;") && js.includes("if (M() && M().geo)"), "both guards ship in the bundle");
+}
+
 // the strip's draw note rides UNDER the Draw row on every lens (user call
 // 2026-11-08 — it floated above it on the winner lens); and fullscreen keeps
 // the search on the Base row, not on its own line under it
@@ -2693,6 +2707,29 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(base.includes("if (!PHONE.matches || y == null || FS.on) return;") && base.includes("if (!spot || !PHONE.matches || FS.on) return null;"), "the phone's walk hold stands down in full screen (no page to hold)");
   assert.ok(css.includes(".fs:not(.phone) .mp-legend { min-height: 0 !important; }"), "the wide panel's key takes its own height (its hold is the page stage's)");
   assert.ok(!/\.fs[^{]*\{[^}]*text-transform:\s*uppercase/.test(css), "no small caps in the full-screen plates");
+}
+
+// the street-zoom islet rescue (islets/rescue, app-2-map.js) never saves a seat's main body:
+// Warringah 2025 and Sydney 2010/2001 are under its ~100km2 cap whole, the middle of their
+// bounds in Port Jackson, and were laid back over the harbour as AEC land (user-reported
+// 2026-11-09: the 2025 polygon angular across the harbour, 2016-22 fine)
+{
+  const src = part("app-2-map.js");
+  const grab = (re) => { const m = src.match(re); assert.ok(m, `found ${re}`); return m[0]; };
+  const body = [
+    grab(/^const ringArea = .*$/m), grab(/^const ringMid = .*$/m),
+    grab(/^function islets\(g, i\) \{[\s\S]*?\n\}/m), grab(/^function ringInside\(r, cx, cy\) \{[\s\S]*?\n\}/m),
+  ].join("\n");
+  const { islets } = new Function("Path2D", "merc", `${body}; return { islets };`)(class { moveTo() {} lineTo() {} closePath() {} }, (p) => p);
+  const sq = (x, y, w) => Float64Array.from([x, y, x + w, y, x + w, y + w, x, y + w]);
+  const geo = (rings) => ({ proj: { invert: (p) => p }, polys: () => rings.map((outer) => ({ outer, holes: [] })) });
+  assert.equal(islets(geo([sq(0, 0, 2)]), 0).length, 0, "a small seat's only ring (a city seat across its harbour) is never an islet");
+  const two = islets(geo([sq(0, 0, 1.5), sq(5, 5, 1)]), 0);
+  assert.equal(two.length, 1, "of two small rings, the main (larger) one is never an islet");
+  assert.equal(two[0].bb[0][0], 5, "the smaller ring is the islet");
+  assert.ok(two[0].at.length >= 2 && two[0].at.every((p) => isFinite(p.m[0]) && isFinite(p.m[1])), "an islet is read at several points inside it, every one of which must be sea");
+  assert.equal(islets(geo([sq(0, 0, 20), sq(30, 30, 1)]), 0).length, 1, "an island off a big seat (Curtis Island off Tasmania, in Bass) is still an islet");
+  assert.ok(src.includes("if (read && !dry) st.saved.push(r);"), "a ring is saved only when every point a tile in hand reads is sea");
 }
 
 console.log("PASS: map page – an ext menu page outside the main build, linked in both designs and the shell, two-column menus, assembled assets current, data present, plan years seated by the plan, NSW's 2023 and Victoria's 2022 frames on their own timeline rows, in the sitemap");

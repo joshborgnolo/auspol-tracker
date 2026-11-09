@@ -6,8 +6,8 @@
       "alp": 50.9
     },
     "imp": 50.9,
-    "pub": 49.4,
-    "on": 50.9,
+    "pub": 49,
+    "on": 50.7,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -212,6 +212,7 @@
       "2026-10-26|DemosAU",
       "2026-10-27|Essential",
       "2026-10-29|Newspoll",
+      "2026-11-03|Spectre Strategy",
       "2026-11-03|YouGov",
       "2026-11-06|RedBridge/Accent",
       "2026-11-07|Resolve"
@@ -317,27 +318,27 @@
       }
     },
     "prim": {
-      "alp": 26.4,
+      "alp": 26.3,
       "grn": 13.5,
-      "lnp": 23,
-      "onp": 26.1,
-      "oth": 10.9
+      "lnp": 22.9,
+      "onp": 26.3,
+      "oth": 10.8
     },
     "leaders": {
-      "alb_fav": -20.8,
+      "alb_fav": -22.9,
       "alb_net": -23.6,
-      "hanson_fav": -9.2,
+      "hanson_fav": -6.2,
       "hanson_net": -1.5,
-      "taylor_fav": -2.1,
-      "taylor_net": -4.7
+      "taylor_fav": -2.3,
+      "taylor_net": -4.6
     },
     "lean": {
       "key": "alp_lnp|imp",
       "v": {
         "Agenda C Synesis": 0.8,
-        "DemosAU": -0.7,
+        "DemosAU": -0.6,
         "DemosAU (MRP)": 0.2,
-        "Essential": -1,
+        "Essential": -0.9,
         "Fox & Hedgehog": -1,
         "Freshwater": -0.7,
         "Newspoll": 1.4,
@@ -345,7 +346,7 @@
         "RedBridge/Accent (MRP)": 0.1,
         "Resolve": -0.2,
         "Roy Morgan": 0.1,
-        "Spectre Strategy": -0.8,
+        "Spectre Strategy": -1.1,
         "Wolf & Smith": 0,
         "YouGov": 0.1,
         "YouGov (MRP)": -0.2
@@ -678,6 +679,13 @@
       "kind": "poll",
       "text": "RedBridge/Accent (fieldwork 2–6 Nov, n=1,005) added — the two-party preferred estimate moved 51.3 → 50.9 (Labor v the Coalition, implied flows). Primary votes: Labor 26.6 → 26.4, the Coalition 22.4 → 23.0, the Greens 13.4 → 13.5, others 11.2 → 10.9. Leader ratings: Albanese’s net favourability −18.4 → −20.8, Taylor’s net favourability −1.6 → −2.1, Hanson’s net favourability −8.2 → −9.2. House effect (Labor v the Coalition, implied flows; positive leans Labor): RedBridge/Accent +0.3 → +0.2.",
       "url": "https://www.afr.com/politics/federal/blow-for-pm-as-coalition-closes-in-on-labor-20261108-p61cbv"
+    },
+    {
+      "date": "2026-11-09",
+      "label": "9 Nov 2026",
+      "kind": "poll",
+      "text": "Spectre Strategy (fieldwork 28 Oct–3 Nov, n=2,093) added — the two-party preferred estimate held at 50.9 (Labor v the Coalition, implied flows). Primary votes: Labor 26.4 → 26.3, the Coalition 23.0 → 22.9, One Nation 26.1 → 26.3, others 10.9 → 10.8. Leader ratings: Albanese’s net favourability −20.8 → −22.9, Taylor’s net approval −4.7 → −4.6, Taylor’s net favourability −2.1 → −2.3, Hanson’s net favourability −9.2 → −6.2. House effect (Labor v the Coalition, implied flows; positive leans Labor): Spectre Strategy −0.8 → −1.1.",
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-november-2026-lrxjw-682xb"
     }
   ]
 }

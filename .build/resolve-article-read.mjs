@@ -113,12 +113,15 @@ export function windowOf(text, articleDay) {
 }
 
 // an exact sample beside the survey wording ("surveyed 2250 voters", "the
-// 2250 voters Resolve Political Monitor surveyed"); "more than 2200" is not one
+// 2250 voters Resolve Political Monitor surveyed", "The survey of 2,250
+// voters was conducted by Resolve Political Monitor"); "more than 2200" is
+// not one
 export function sampleOf(text) {
   const pats = [
-    /(?<!more than |over |about |around |almost |nearly )\b(\d,?\d{3})\s+(?:voters|respondents|Australians|people)\s+(?:\S+\s+){0,5}?(?:surveyed|polled|were surveyed)/i,
+    /(?<!more than |over |about |around |almost |nearly )\b(\d,?\d{3})\s+(?:voters|respondents|Australians|people)\s+(?:\S+\s+){0,5}?(?:surveyed|polled|were surveyed|conducted)/i,
     /\bsurveyed\s+(\d,?\d{3})\s+(?:voters|respondents|Australians|people)/i,
     /\bsample\s+of\s+(\d,?\d{3})\b/i,
+    /\bsurvey\s+of\s+(?!more than |over |about |around |almost |nearly )(\d,?\d{3})\s+(?:voters|respondents|Australians|people)\b/i,
   ];
   for (const p of pats) {
     const m = text.match(p);

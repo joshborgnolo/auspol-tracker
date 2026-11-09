@@ -257,12 +257,12 @@ function eq(name, got, want) {
   // a dated-house ticket from Essential on down, with YouGov and Spectre's
   // standing slots ahead of it: the horizon bounds further slots, never the
   // first, and both houses' next slots sit past 28 days (YouGov re-anchored
-  // 2026-10-07 when its 6 Oct wave landed; Spectre's 139-day cadence is
-  // ~twenty weeks out).
+  // 2026-10-07 when its 6 Oct wave landed; Spectre's 120-day cadence is
+  // ~seventeen weeks out).
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
      ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"], ["YouGov", "49 days"],
-     ["Spectre Strategy", "82 days"], ["DemosAU", "any day now"]]);
+     ["Spectre Strategy", "163 days"], ["DemosAU", "any day now"]]);
   {
     const da = firm(rows, "DemosAU");
     eq("DemosAU's window opens on the measured 1st, and is open on the 1st", da && panelWhen(da), "open now");
@@ -497,7 +497,7 @@ function eq(name, got, want) {
     [["Resolve", "tomorrow"], ["Newspoll", "tomorrow"],
      ["Roy Morgan", "2 days"], ["Essential", "4 days"],
      ["YouGov", "10 days"], ["RedBridge/Accent", "22 days"],
-     ["Spectre Strategy", "43 days"]]);
+     ["Spectre Strategy", "124 days"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);
   /* every vacated weekday accumulates: Morgan rolled four Mondays along to
@@ -581,12 +581,12 @@ function eq(name, got, want) {
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const sp = firm(rows, "Spectre Strategy");
-  eq("the slow house holds its standing slot", sp && npFmt(sp.release), "Thu 10 Dec");
-  eq("panel counts it plainly", sp && panelWhen(sp), "in 78 days");
-  eq("the window claim is the measured spread", sp && spreadLabel(sp), " ± 18 days");
+  eq("the slow house holds its standing slot", sp && npFmt(sp.release), "Tue 9 Mar");
+  eq("panel counts it plainly", sp && panelWhen(sp), "in 167 days");
+  eq("the window claim is the measured spread", sp && spreadLabel(sp), " ± 26 days");
   eq("one standing slot - no further slots this far out", rows.filter((r) => r.pollster === "Spectre Strategy").length, 1);
   eq("on the bar as a hedged countdown", items.filter((i) => i.firm === "Spectre Strategy").map((i) => [i.when, i.maybe]),
-    [["60 days", true]]);
+    [["141 days", true]]);
   eq("the horizon still bounds the weekly house's further slots", rows.filter((r) => r.pollster === "Roy Morgan").length, 4);
 }
 

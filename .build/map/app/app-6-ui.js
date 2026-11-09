@@ -114,6 +114,12 @@ function renderLegend() {
   // (its coloured cells) as the map and chamber, so it needs the same key —
   // census measure picker, ramps and switchers included
   if (!m) { el.hidden = true; return; }
+  // a year still loading is a shell record (loadYear registers it before the
+  // fetch): nothing the key measures is on it yet — leave what's shown for the
+  // load's landing renders (2026-11-09: the Handbook years' multi-second
+  // geometry build threw here — m.areas didn't exist under legendHTML — and
+  // the legend-meta fetch landing in the gap aborted the whole boot)
+  if (!m.search) return;
   el.hidden = false;
   // Keep the live search field (and its listeners/focus) when rebuilding controls.
   const search = SEARCH_EL;
@@ -264,12 +270,13 @@ function senLegendHeight(sm, w, probe) {
 // the current pick's own word beside its chevron, the panel opening to its
 // items (2026-11-08: native <select>s leave the panel for it)
 const LG_CHEVRON = `<svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-function lgMenu(key, items, cur, aria) {
+function lgMenu(key, items, cur, aria, off) {
   const text = (items.find(([v]) => v === cur) || items.find(([v, t]) => t != null))[1] ?? "";
   // a curious value of `null` is a group heading, not a pickable item
-  // (an item's third and fourth places: unavailable here, and why)
+  // (an item's third and fourth places: unavailable here, and why; `off` greys the whole
+  // menu out where the state can't use it, the reason its trigger's hover title)
   const itemHtml = ([v, t, off, why]) => v === null ? `<span class="lg-mgroup">${esc(t)}</span>` : `<button type="button" data-lg-val="${key}:${v}" role="menuitemradio" aria-checked="${v === cur}" tabindex="-1"${off ? ` disabled title="${esc(why || "")}"` : ""}>${esc(t)}</button>`;
-  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
+  return `<span class="lg-bmenu"><button type="button" class="st-sclab" data-lg-trigger${off ? ` disabled title="${esc(off)}"` : ""} aria-haspopup="menu" aria-expanded="false" aria-controls="lgmenu-${key}" aria-label="${aria}">${esc(text)} ${LG_CHEVRON}</button><span class="st-scm" id="lgmenu-${key}" hidden role="menu" aria-label="${aria}">${items.map(itemHtml).join("")}</span></span>`;
 }
 function lgMenuParts(wrap) {
   return !wrap ? null : { menu: wrap.querySelector(":scope > .st-scm"), trigger: wrap.querySelector("[data-lg-trigger],[data-basis-trigger]") };
@@ -357,7 +364,7 @@ function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
   const aus = m.areas.AUS;
   const boothsOn = boothsShown();
-  const opt = (name, cur, list) => lgMenu(name, list, cur, name);
+  const opt = (name, cur, list, off) => lgMenu(name, list, cur, name, off);
   const partyOpts = famEraOpts(m).map((f) => [f, famLeg(f)]);
   // the Draw switch leads the strip's close on the map view — its note right after
   const drawRow = S.view === "map" ? drawRowHTML(m) : "";
@@ -372,8 +379,12 @@ function legendHTML(m) {
     case "tpp": {
       const sw = S.tppMode === "swing", pair = axisNow(m);
       h += `<div class="lg-t">Two-party preferred: <button type="button" class="flip" data-flip="tpp">${sw ? `swing since ${prev}` : "share"}<span>⇄</span></button></div>`;
-      // as balloons or a surface, where One Nation stood widely, the two parties can be another two
-      if (!sw && S.view === "map" && S.draw !== "seats" && axisFrame(m) != null) h += `<div class="lg-t lg-contest">${opt("axis", S.axis, axisOpts(m))}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      // as balloons or a surface, where One Nation stood widely, the two parties can be another two.
+      // As seats the pairing has no say, so the row hangs greyed, the pick kept for the walk back
+      if (!sw && S.view === "map" && axisFrame(m) != null) {
+        const off = S.draw === "seats" ? `Seats counts Labor v ${coalW(0)} — the other contests paint as balloons or a surface` : "";
+        h += `<div class="lg-t lg-contest"${off ? ` title="${off}"` : ""}>${opt("axis", pair, axisOpts(m), off)}<span>${pair === "AC" ? "counted" : "estimate"}</span></div>`;
+      }
       if (pair !== "AC") break;
       if (boothsOn && sw) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;
       break;
@@ -751,7 +762,7 @@ function tipFor(h) {
     // on Areas the census's own area answers first, with its counted figure
     const arh = drawOf(m) === "areas" && AR.pack ? AR.here : null;
     const first = arh && arh.v != null
-      ? `<div class="tv">This census area: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">SA1 ${esc(arh.code)} · within ${esc(arh.sa2)}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
+      ? `<div class="tv">This census area: ${esc(valueText(arh.v, "div", { m, d }))}</div><div class="ts">Census SA1 ${esc(arh.code)} · within ${esc(arh.sa2)}</div><div class="ts">A census area of ${int(arh.pop)} residents, as counted at the ${areasVintage(m)} census</div>`
       : surf ? (h.isl ? `<div class="tv">No surface drawn for this island; select a polling place for its result</div>` : here ? `<div class="tv">Nearby polling places: ${esc(here.fam ? `${FAM_NAME[here.fam]} by ${f0(here.lead)}` : valueText(here.v, "div", { m, d }))}</div><div class="ts">${int(here.count)} contributing places · nearest ${f1(here.nearest)} km · smoothed estimate</div>` : `<div class="tv">No supported local estimate here</div>`) : "";
     return `<div class="tn">${ds(d.n)}<span>${h.isl ? esc(h.isl) + " · " : ""}${STATE_SHORT[d.st]}${sp}</span></div>${first}<div class="${here || first ? "ts" : "tv"}">${here || first ? "The whole seat: " : ""}${esc(valueText(v, "div", { m, d }))}</div><div class="ts">${ds(holder.n)}, ${esc(leaderName(holder))}${S.lens === "winner" ? ` · ${d.by ? "by-election" : "margin"} ${f1(d.margin)}` : ""}</div>${goes}`;
   }
@@ -1333,7 +1344,9 @@ function resize() {
   const moved = keyOnly && !atLastFit() && !flight;
   Wpx = r.width; Hpx = r.height;
   canvas.width = Math.round(Wpx * dpr); canvas.height = Math.round(Hpx * dpr);
-  if (M()) {
+  // a year still loading has no geometry to frame against (its shell record is
+  // registered before the fetch) — the load's landing calls resize() itself
+  if (M() && M().geo) {
     setExtent();
     // the step into or out of full screen brings its own camera (app-7-full.js)
     if (FS.move) { const mv = FS.move; FS.move = null; mv(); }
