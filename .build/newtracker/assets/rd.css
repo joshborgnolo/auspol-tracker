@@ -47,6 +47,10 @@ body.rd {
   --rd-maxw: 1152px;
   --rd-gutter: clamp(20px, 5vw, 64px);
   --rd-sec-pad: 56px;
+  /* the quiet frame a control-dense section's head wears (rd-framed): the
+     retro caption bar translated to the design's own idiom - a tint of the
+     page's ink, not a navy */
+  --tint-sec: color-mix(in oklab, var(--ink) 5%, var(--surface));
 }
 body.rd.dark {
   --band-opacity: 0.22;
@@ -82,6 +86,7 @@ body.rd.dark {
   --on-fill-onp: oklch(0.20 0.030 58);
   --on-fill-grn: oklch(0.20 0.030 150);
   --on-fill-oth: oklch(0.20 0.010 70);
+  --tint-sec: color-mix(in oklab, var(--ink) 9%, var(--surface));
 }
 @media (max-width: 640px) {
   body.rd { --rd-sec-pad: 36px; }
@@ -142,6 +147,8 @@ body.rd .rd-sec + .rd-sec { padding-top: var(--rd-sec-pad); }
      2026-10-25: final-polls 2647px, the all-polls table 2955px) */
   body.rd .rd-sec.rd-acc { contain-intrinsic-size: auto 2400px; }
   body.rd .rd-sec.rd-ap { contain-intrinsic-size: auto 2900px; }
+  /* a folded section is a heading and air, not a 1200px placeholder */
+  body.rd .rd-sec.rd-shut { contain-intrinsic-size: 120px; }
   /* skipped content must not be skipped on the printed page */
   @media print { body.rd .rd-sec { content-visibility: visible; } }
 }
@@ -151,6 +158,10 @@ body.rd .rd-eyebrow {
   font-size: 13px; color: var(--ink-3);
 }
 body.rd .rd-sec.rd-first .rd-eyebrow { border-top: 0; padding-top: 0; }
+/* a control-dense section wears its head as a quiet tint band: the retro
+   caption bar in the design's own idiom - title, meta and tools read as one
+   addressed group ("one question, one panel"), without the era's navy */
+body.rd .rd-sec.rd-framed .rd-eyebrow { background: var(--tint-sec); border-radius: 10px; padding: 10px 14px 9px; }
 body.rd .rd-title {
   margin: 0; font-family: var(--sans);
   font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
@@ -158,6 +169,20 @@ body.rd .rd-title {
 }
 body.rd .rd-meta { font-size: 13px; color: var(--ink-3); }
 body.rd .rd-eyebrow-tools { margin-left: auto; display: flex; align-items: baseline; gap: 20px; }
+/* a section's roll-up switch (the retro panel shade in this design's idiom):
+   the word at the eyebrow line's right end; the folded section keeps its
+   head and releases its body. The visual line stays slim while the 44px
+   inflated tap band carries the hit area, as the rd-chips' does */
+body.rd .rd-fold {
+  all: unset; cursor: pointer; position: relative;
+  display: inline-flex; align-items: center; min-height: 24px;
+  font-size: 13px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
+}
+body.rd .rd-fold::after { content: ""; position: absolute; inset: -10px -6px; }
+body.rd .rd-fold:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+body.rd .rd-fold:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+/* the folded section: everything but its eyebrow leaves the page */
+body.rd .rd-sec.rd-shut > :not(.rd-eyebrow) { display: none !important; }
 body.rd .rd-hed {
   margin: 16px 0 0; max-width: 1000px;
   font-family: var(--serif); font-weight: 700;
@@ -195,6 +220,49 @@ body.rd .rd-ctitle .rd-ctitle-meta { font-weight: 400; color: var(--ink-3); marg
   body.rd .rd-subdek { font-size: 15px; }
 }
 
+/* ---------- the Now tab's topic strip --------------------------------------
+   A compact row of section chips across the top of the snapshot (RdNowNav):
+   sticky so the index is still on hand deep in the page, the scroll-spy's
+   current chip wearing the pressed-tab look of an rd-tab. On a phone the row
+   slides sideways, locked to its own axis (overflow-y: clip, one 44px band of
+   buttons, so the strip never wobbles vertically - the overflow-x:auto trap
+   computes overflow-y to auto). */
+body.rd .rd-nownav {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 4px;
+  padding-bottom: 1px;
+  overflow-x: auto; overflow-y: hidden; overflow-y: clip; scrollbar-width: none;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+body.rd .rd-nownav::-webkit-scrollbar { display: none; }
+body.rd .rd-nownav-c {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: 0 0 auto;
+  min-height: 44px; padding: 0 12px; display: inline-flex; align-items: center;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  font-size: 14px; color: var(--ink-3); white-space: nowrap;
+}
+body.rd .rd-nownav-c[aria-current="true"] { border-bottom-color: var(--ink); font-weight: 600; color: var(--ink); }
+body.rd .rd-nownav-c:hover { color: var(--ink); }
+body.rd .rd-nownav-c:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+@media (max-width: 640px) {
+  body.rd .rd-nownav-c { padding: 0 10px; font-size: 13px; }
+}
+
+/* ---------- the Now tab's closer rhythm --------------------------------------
+   The opening keeps the page's full generosity; every section after it sits
+   a rung tighter, so the page reads more than it scrolls (the retro brief's
+   tighter secondary sections, in Now's own scale). Scoped to body.rd-now -
+   the class the app sets only while Now is the active tab (73de0c58 App) -
+   so Past cycles, All polls and the rest keep their geometry untouched,
+   the All-polls pin lattice included. */
+body.rd-now { --rd-sec-pad: 40px; }
+@media (max-width: 640px) { body.rd-now { --rd-sec-pad: 30px; } }
+@media (min-width: 641px) {
+  body.rd-now .rd-sec:not(.rd-first) .rd-hed { font-size: 40px; }
+  body.rd-now .rd-sec:not(.rd-first) .rd-dek { font-size: 16px; }
+  body.rd-now .rd-sec:not(.rd-first) .rd-sub { margin-top: 36px; font-size: 26px; }
+}
+
 /* ---------- keys, notes, feet --------------------------------------------- */
 body.rd .rd-key {
   display: flex; flex-wrap: wrap; align-items: center; column-gap: 24px; row-gap: 8px;
@@ -230,6 +298,14 @@ body.rd .rd-how:focus-visible { outline: 2px solid var(--accent); outline-offset
 body.rd .rd-tabs {
   display: flex; align-items: center; gap: 4px;
   border-bottom: 1px solid var(--line);
+}
+/* a control row's visible name (the retro toolbar's bold label, adopted
+   2026-11-09): a row of chips or tabs never floats unnamed. Word first,
+   control right, sentence case, no colon - as the era's toolbars ran */
+body.rd .rd-cl {
+  flex: 0 0 auto; display: inline-flex; align-items: center;
+  font-size: 13px; font-weight: 600; color: var(--ink-2); white-space: nowrap;
+  margin-right: 6px;
 }
 body.rd .rd-tab {
   all: unset; box-sizing: border-box; cursor: pointer;
@@ -1029,8 +1105,12 @@ body.rd .chart:has(+ .rd-ckey) + .rd-ckey { padding-right: 44px; min-height: 26p
 body.rd .axis-label.x.strong { font-weight: 600; fill: var(--ink); }
 
 /* ---------- primary vote ---------------------------------------------------- */
+/* the stats strip boxed as one well: related figures hang together in a
+   hairline frame on the page surface (the retro stat group, hairline not
+   bevel) - still the page's own tokens, so dark mode follows */
 body.rd .rd-pv-stats {
   margin-top: 32px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 32px; row-gap: 10px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 14px 20px 12px;
 }
 body.rd .rd-pv-bracket {
   display: flex; align-items: center; gap: 10px; grid-row: 1;
@@ -1451,6 +1531,10 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-ld-grid:not(.one):not(.free) .rd-ld-noteup { margin-top: -19.5px; }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
+/* one question per well: the two leader panels boxed as hairline frames on
+   the page surface (the retro group-box translation; both panels take the
+   same frame so the subgrid's shared rows keep pairing) */
+body.rd .rd-ld-panel { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0 18px 14px; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }
 body.rd .rd-ld-panel .rd-subdek { font-size: 15px; min-height: 45px; }
 body.rd .rd-ld-panel .rd-tabs { margin-top: 20px; }
@@ -2828,17 +2912,6 @@ body.rd {
   --rd-rowbg: var(--bg);
 }
 body.rd.dark { --rd-whisker: #5C5751; --rd-avgline: #6E6964; }
-body.rd .rd-snap-nav button {
-  all: unset; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
-}
-body.rd .rd-snap-nav button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-body.rd .rd-snap-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-/* the snapshot's index rides a row whose left side (title + poll-count
-   meta) is its own, so it carries the eyebrow's 16px rhythm rather than
-   the 20px of the tabs' own rows, and vanishes wholesale once the four
-   links can no longer hold the row's one line */
-body.rd .rd-snap-nav { gap: 16px; }
-@media (max-width: 1189px) { body.rd .rd-snap-nav { display: none; } }
 body.rd .rd-ap-tabs { margin-top: 28px; }
 /* each facet heads the table with its own head and dek (2026-10-08), so a
    switch adds or drops lines above the held table. The pin scrolls them

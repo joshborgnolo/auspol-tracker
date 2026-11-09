@@ -756,13 +756,13 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       ? <span className="rd-cal-track">{RD_CAL_TRACK[w.tracked]}</span> : null}</span>);
 
   return (
-    <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
+    <RdSec id="latest-polls" cls="rd-polls rd-framed" facet={facet} fold title="Latest and next polls"
            meta={new Set(allRows.map((e) => e.poll.pollster.replace(/\s*\(.*\)$/, ""))).size + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
       <p className="rd-dek rd-pl-dek">
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
       </p>
-      <RdTabs swipe value={facet} onChange={pickFacet} options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
+      <RdTabs swipe value={facet} onChange={pickFacet} label="Measure" options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
               ariaLabel="Poll table view" className="rd-pl-tabs">
         {!narrow && controls}
       </RdTabs>
