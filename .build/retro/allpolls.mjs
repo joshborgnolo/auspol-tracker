@@ -368,9 +368,10 @@ const HOUSE = `<svg class="rt-house" viewBox="0 0 210 58" aria-hidden="true"><g 
    Electoral map opens in its retro view. */
 /* The site's pages that have a retro twin, and where it is: the navbar of
    every retro page (this one, the Electoral map's retro view, and the Now
-   and Past cycles twins, .build/retro/now.mjs and cycles.mjs) opens the
+   and Past cycles twins, .build/retro/now.mjs and cycles.mjs, and the
+   Info twin, info.mjs) opens the
    twin, so a reader in the old look stays in it. Home is the Now twin. */
-export const RETRO_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/", "/map/": "/map/#retro=1" };
+export const RETRO_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/", "/info/": "/info/retro/", "/map/": "/map/#retro=1" };
 export function retroPages(shellPages) {
   const twin = (p) => (RETRO_TWIN[p.href] ? { ...p, href: RETRO_TWIN[p.href] } : p);
   const tabs = shellPages.tabs.filter((t) => t.href !== "/").map(twin);
@@ -501,7 +502,7 @@ ${read("allpolls.css")}
 </main>
 ${F ? `<footer class="ap-foot">
   <div class="ap-about"><p>${esc(F.lede)}</p><p>${esc(F.disc)}</p></div>
-  <div class="ap-ways"><p>${esc(F.infoLead)}<a href="/info/">${esc(F.infoWord)}</a>. ${esc(F.spot)} <a href="/feedback/">${esc(F.linkWord)}</a>.</p><p>${esc(F.archLead)}<a href="${esc(F.archHref)}">${esc(F.archWord)}</a>${esc(F.archTail)}</p></div>
+  <div class="ap-ways"><p>${esc(F.infoLead)}<a href="/info/retro/">${esc(F.infoWord)}</a>. ${esc(F.spot)} <a href="/feedback/">${esc(F.linkWord)}</a>.</p><p>${esc(F.archLead)}<a href="${esc(F.archHref)}">${esc(F.archWord)}</a>${esc(F.archTail)}</p></div>
 </footer>` : ""}
 </div>
 <div class="rt-drop" role="menu" hidden></div>

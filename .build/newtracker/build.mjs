@@ -2001,7 +2001,9 @@ if (!VIC) {
   writeAtomic(path.join(dir, "index.html"), retroHtml);
   console.log(`  + allpolls/retro/ · the retro All polls page, ${retroD.rows.length} polls`);
 }
-/* ---- 5a''. the retro Now and Past cycles pages ---------------------------
+/* ---- 5a''. the retro Now, Past cycles and Info pages ---------------------
+   (info/retro/ joined 2026-11-09: .build/retro/info.mjs, the modern Info
+   page's entries in the same dress)
    /retro/ (Home in every retro navbar) and /cycles/retro/: the front page
    and Past cycles in the same dress, their words, figures and charts the
    modern pages' own, read by running this build's own scripts in node
@@ -2014,6 +2016,7 @@ if (!VIC) {
     const { modernRunner, dataClock } = await import("../retro/harvest.mjs");
     const { retroNow } = await import("../retro/now.mjs");
     const { retroCycles } = await import("../retro/cycles.mjs");
+    const { retroInfo } = await import("../retro/info.mjs");
     const { shellPages } = await import("../site-shell.mjs");
     let footer = null;
     try { footer = mainChrome().footer; } catch (e) { console.warn(`  retro pages: colophon words missed (${e.message}) – the pages go without their colophon`); }
@@ -2021,13 +2024,14 @@ if (!VIC) {
     const runner = modernRunner({ root: base, clock: dataClock(dataset) });
     const now = retroNow({ root: base, dataset, shellPages: shellPages(), footer, siteUrl: SITE_URL, runner });
     const cyc = retroCycles({ root: base, dataset, shellPages: shellPages(), footer, siteUrl: SITE_URL, runner });
-    for (const [rel, html] of [["retro", now.html], [path.join("cycles", "retro"), cyc.html]]) {
+    const inf = retroInfo({ root: base, dataset, shellPages: shellPages(), footer, siteUrl: SITE_URL, runner });
+    for (const [rel, html] of [["retro", now.html], [path.join("cycles", "retro"), cyc.html], [path.join("info", "retro"), inf.html]]) {
       fs.mkdirSync(path.join(base, rel), { recursive: true });
       writeAtomic(path.join(base, rel, "index.html"), html);
     }
-    console.log(`  + retro/, cycles/retro/ · the retro Now and Past cycles pages, ${now.panels.length} + ${cyc.panels.length} panels`);
+    console.log(`  + retro/, cycles/retro/, info/retro/ · the retro Now, Past cycles and Info pages, ${now.panels.length} + ${cyc.panels.length} panels, ${inf.terms.length} entries`);
   } catch (e) {
-    console.warn(`  retro pages: the modern page's harvest failed (${e.message}) – retro/ and cycles/retro/ keep their committed copies`);
+    console.warn(`  retro pages: the modern page's harvest failed (${e.message}) – retro/, cycles/retro/ and info/retro/ keep their committed copies`);
   }
 }
 

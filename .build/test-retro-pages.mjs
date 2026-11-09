@@ -42,7 +42,7 @@ assert.equal(R("retro/index.html"), now.html, "retro/index.html is current – r
 assert.equal(R("cycles/retro/index.html"), cyc.html, "cycles/retro/index.html is current – run node .build/newtracker/build.mjs and commit it");
 const build = R(".build/newtracker/build.mjs");
 assert.ok(build.includes('const { retroNow } = await import("../retro/now.mjs");') && build.includes('const { retroCycles } = await import("../retro/cycles.mjs");'), "build.mjs writes both pages (block 5a'')");
-assert.ok(build.indexOf("5a''. the retro Now and Past cycles pages") > build.indexOf("for (const t of tabs) {"), "after the tab documents the harvest reads");
+assert.ok(build.indexOf("5a''. the retro Now, Past cycles and Info pages") > build.indexOf("for (const t of tabs) {"), "after the tab documents the harvest reads");
 assert.ok(/SITE_FILES=\([\s\S]*?retro\/index\.html cycles\/retro\/index\.html[\s\S]*?\)/.test(R(".build/git-push-main.sh")), "SITE_FILES commits both pages");
 assert.ok(R("package.json").includes("node .build/test-retro-pages.mjs"), "npm test runs this test");
 
@@ -171,7 +171,7 @@ for (const [file, html, here, canon, title] of [["retro/index.html", now.html, "
   assert.ok(!/<\/script/i.test(json) && JSON.parse(json).panels.length >= 5, `${file}: the data block parses and can't close its script early`);
 }
 assert.ok(R(".build/retro/pages.client.js").includes('const FAV_KEY = "auspol.map.favs"') && R(".build/retro/pages.client.js").includes("list.unshift({ t: favLabel(), h, p: HERE });"), "Favorites are the retro map's list, these pages' entries carrying their page");
-assert.ok(R("map/map.js").includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };'), "the retro map's navbar opens them");
+assert.ok(R("map/map.js").includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/", "/info/": "/info/retro/" };'), "the retro map's navbar opens them");
 assert.ok(R("allpolls/retro/index.html").includes('<a href="/cycles/retro/">Past cycles</a>') && R("allpolls/retro/index.html").includes('href="/retro/"'), "the retro All polls page's navbar opens them");
 const sitemap = R("sitemap.xml");
 assert.ok(!/\/retro\//.test(sitemap), "neither is in the sitemap");
@@ -183,7 +183,7 @@ assert.ok(!/\/retro\//.test(sitemap), "neither is in the sitemap");
     if (f.isDirectory()) walk(rel); else if (f.name.endsWith(".html")) htmls.push(rel);
   } };
   walk(".");
-  const FAMILY = ["allpolls/retro/index.html", "retro/index.html", "cycles/retro/index.html"].map((f) => path.normalize(f));
+  const FAMILY = ["allpolls/retro/index.html", "retro/index.html", "cycles/retro/index.html", "info/retro/index.html"].map((f) => path.normalize(f));
   const linking = htmls.filter((f) => !FAMILY.includes(path.normalize(f)) && /["'(]\/(cycles\/)?retro\//.test(R(f)));
   assert.deepEqual(linking, [], "no page outside the retro family links them");
 }

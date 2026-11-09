@@ -188,7 +188,7 @@ function menuItems(k) {
     }
     case "help": return [
       ...(D.notes ? [{ label: D.notes, act: () => { const n = document.getElementById("rp-notes"); if (n) n.scrollIntoView({ behavior: "smooth", block: "start" }); } }] : []),
-      { label: "How the tracker works", href: "/info/" },
+      { label: "How the tracker works", href: "/info/retro/" },
       { label: "Send feedback…", href: "/feedback/" },
     ];
     case "more": return D.pages.more.map((p) => ({ label: p.label, href: p.href }));

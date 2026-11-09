@@ -342,9 +342,11 @@ freshness_sync() {
 # retro/index.html and cycles/retro/index.html joined 2026-11-09: the retro
 # Now and Past cycles pages (.build/retro/now.mjs, cycles.mjs), read off the
 # modern pages this build writes, so every refresh rewrites them too.
+# info/retro/index.html joined the same day (.build/retro/info.mjs): Info's
+# entries quote the live interval and final-poll record, so it moves too.
 SITE_FILES=(index.html feed.xml sitemap.xml robots.txt vic/index.html
   cycles/index.html allpolls/index.html allpolls/retro/index.html info/index.html
-  retro/index.html cycles/retro/index.html
+  retro/index.html cycles/retro/index.html info/retro/index.html
   disagreement/index.html leans/index.html flows/index.html
   flows-explained/index.html preference-flows/index.html
   public-opinion/index.html beyond-the-vote/index.html ad-hocs/index.html

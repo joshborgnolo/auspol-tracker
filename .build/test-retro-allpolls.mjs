@@ -216,7 +216,7 @@ assert.ok(!/rt-titlebar|rt-menubar|rt-toolbar|rt-address|rt-status|rt-taskbar|rt
 assert.ok(!/text-transform:\s*uppercase/i.test(html), "no small caps");
 assert.ok(R(".build/retro/allpolls.client.js").includes('FAV_KEY = "auspol.map.favs"') && R(".build/retro/allpolls.client.js").includes("list.unshift({ t: favLabel(), h, p: HERE });"), "Favorites are the retro map's list, this page's entries carrying their page");
 // linked from the retro pages' navbars and from nowhere else (the map's script, the page itself, its retro Now and Past cycles siblings)
-assert.ok(R("map/map.js").includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };'), "the retro map's navbar opens it");
+assert.ok(R("map/map.js").includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/", "/info/": "/info/retro/" };'), "the retro map's navbar opens it");
 assert.ok(!R("sitemap.xml").includes("allpolls/retro"), "not in the sitemap");
 {
   const htmls = [];
@@ -226,7 +226,7 @@ assert.ok(!R("sitemap.xml").includes("allpolls/retro"), "not in the sitemap");
     if (f.isDirectory()) walk(rel); else if (f.name.endsWith(".html")) htmls.push(rel);
   } };
   walk(".");
-  const RETRO_FAMILY = ["allpolls/retro/index.html", "retro/index.html", "cycles/retro/index.html"].map((f) => path.normalize(f));
+  const RETRO_FAMILY = ["allpolls/retro/index.html", "retro/index.html", "cycles/retro/index.html", "info/retro/index.html"].map((f) => path.normalize(f));
   const linking = htmls.filter((f) => !RETRO_FAMILY.includes(path.normalize(f)) && R(f).includes("/allpolls/retro/"));
   assert.deepEqual(linking, [], "no page outside the retro family links it");
 }

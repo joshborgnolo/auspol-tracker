@@ -29,6 +29,8 @@ export const ICONS = {
   grid: `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 2.5h13v11h-13z" fill="none" stroke="currentColor"/><path d="M1.5 6.2h13M1.5 9.8h13M6 2.5v11" stroke="currentColor"/><circle cx="9.5" cy="4.4" r="1" fill="currentColor"/><circle cx="12" cy="8" r="1" fill="currentColor"/><circle cx="10.5" cy="11.7" r="1" fill="currentColor"/></svg>`,
   target: `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/></svg>`,
   shade: RT_ICON.shade,
+  faq: `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6" fill="#fff" stroke="currentColor" stroke-width="1.2"/><path d="M5.9 6.1c0-1.3 1-2.1 2.2-2.1s2.1.8 2.1 1.9c0 1.5-2 1.7-2 3.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8.2" cy="11.5" r=".95" fill="currentColor"/></svg>`,
+  calc: `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5h10v13H3z" fill="#fff" stroke="currentColor"/><path d="M4.8 3.3h6.4v2.6H4.8z" fill="currentColor"/><path d="M5 8h1.4M7.3 8h1.4M9.6 8H11M5 10.2h1.4M7.3 10.2h1.4M9.6 10.2H11M5 12.4h1.4M7.3 12.4h1.4M9.6 12.4H11" stroke="currentColor" stroke-width="1.3"/></svg>`,
 };
 
 /* the page: { here, modern, title, meta, desc, views: [{id, label, short, icon}],
@@ -61,6 +63,7 @@ export function retroPage(o) {
 ${read("chrome.css")}
 ${read("pages.css")}
 ${viewCss}
+${o.css || ""}
 </style>
 </head>
 <body>
@@ -83,7 +86,7 @@ ${o.notes ? `<section class="rp-panel rp-notes" id="rp-notes" aria-labelledby="r
 </main>
 ${F ? `<footer class="rp-foot-site">
   <div><p>${esc(F.lede)}</p><p>${esc(F.disc)}</p></div>
-  <div><p>${esc(F.infoLead)}<a href="/info/">${esc(F.infoWord)}</a>. ${esc(F.spot)} <a href="/feedback/">${esc(F.linkWord)}</a>.</p><p>${esc(F.archLead)}<a href="${esc(F.archHref)}">${esc(F.archWord)}</a>${esc(F.archTail)}</p></div>
+  <div><p>${esc(F.infoLead)}<a href="/info/retro/">${esc(F.infoWord)}</a>. ${esc(F.spot)} <a href="/feedback/">${esc(F.linkWord)}</a>.</p><p>${esc(F.archLead)}<a href="${esc(F.archHref)}">${esc(F.archWord)}</a>${esc(F.archTail)}</p></div>
 </footer>` : ""}
 </div>
 <div class="rt-drop" role="menu" hidden></div>
@@ -103,7 +106,7 @@ ${read("next.client.js")}
 <script>
 ${read("render.client.js")}
 </script>
-<script>
+${o.client ? `<script>\n${o.client}\n</script>\n` : ""}<script>
 ${read("pages.client.js")}
 </script>
 </body>

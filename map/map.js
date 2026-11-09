@@ -13843,9 +13843,10 @@ function rtHouseSVG() {
 /* the site's pages with a retro twin: in this view their links open the
    twin (All polls at /allpolls/retro/, built by .build/retro/allpolls.mjs;
    Past cycles at /cycles/retro/ and the front page at /retro/, the navbar's
-   Home, built by .build/retro/cycles.mjs and now.mjs), each linking back
+   Home, built by .build/retro/cycles.mjs and now.mjs; Info at /info/retro/,
+   info.mjs), each linking back
    here with retro=1 */
-const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };
+const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/", "/info/": "/info/retro/" };
 // the site's pages, read off the shell's own tabs and More menu (so they never drift from it); the home page is the navbar's Home
 function rtPages() {
   const twin = (h) => RT_TWIN[h] || h;
