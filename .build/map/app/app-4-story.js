@@ -803,10 +803,10 @@ function areaHedDek(m, st) {
       if (!r) { const ab = idx.length ? spAbsent(m, m.divs[idx[0]].st) : null; return { hed: ab ? `${spName(ab, true)} had no Senate ticket in ${STATE_NAME[m.divs[idx[0]].st]}` : `Too few of these ballots to read here`, dek: ab ? `So no ballot there could rank it against ${ab === SP_PAIRS[S.spPair][0] ? spB() : spA()}. Choose another contest in the key.` : "" }; }
       const per = idx.map((i) => ({ i, v: spDivValue(m, m.divs[i]) })).filter((x) => x.v != null).sort((p, q) => q.v - p.v);
       const hi = per[0], lo = per[per.length - 1];
-      if (gvt) return { hed: `${f0(r.share)}% of ${spWho()} Senate tickets put ${spA()} ahead of ${spB()}${where}`,
-        dek: `In ${m.year} a party-box vote copied the party's lodged group voting ticket, so these shares read the parties' own orders over ${int(r.n)} ticket-bound ballots — how voters numbered their own papers is published only from 2016.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""}` };
-      return { hed: `${f0(r.share)}% of ${spWho()} Senate voters ranked ${spA()} ahead of ${spB()}${where}`,
-        dek: `${int(r.n)} of these ballots numbered either party; another ${f0(r.nei)}% numbered neither.${per.length > 1 ? ` Seat by seat it ran from ${f0(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f0(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""} Senate ballots show how voters rank parties everywhere, including contests the House never counted.` };
+      if (gvt) return { hed: `${f1(r.share)}% of ${spWho()} Senate tickets put ${spA()} ahead of ${spB()}${where}`,
+        dek: `In ${m.year} a party-box vote copied the party's lodged group voting ticket, so these shares read the parties' own orders over ${int(r.n)} ticket-bound ballots — how voters numbered their own papers is published only from 2016.${per.length > 1 ? ` Seat by seat it ran from ${f1(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f1(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""}` };
+      return { hed: `${f1(r.share)}% of ${spWho()} Senate voters ranked ${spA()} ahead of ${spB()}${where}`,
+        dek: `${int(r.n)} of these ballots numbered either party; another ${f1(r.nei)}% numbered neither.${per.length > 1 ? ` Seat by seat it ran from ${f1(lo.v)}% in ${ds(m.divs[lo.i].n)} to ${f1(hi.v)}% in ${ds(m.divs[hi.i].n)}.` : ""} Senate ballots show how voters rank parties everywhere, including contests the House never counted.` };
     }
     case "flow": {
       const F = S.from, name = possW(F), rival = vsW();
@@ -1282,10 +1282,10 @@ function seatHedDek(m, d) {
       const gvt = spGvtYear(m.year) != null;
       const c = spCells(s.divs[d.n]), v = spDivValue(m, d), aus = spArea(m, m.areas.AUS.idx);
       if (v == null) return { hed: `Too few ${spWho()} Senate ${gvt ? "tickets" : "ballots"} in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
-      if (gvt) return { hed: `${f0(v)}% of ${spWho()} Senate tickets in ${ds(d.n)} put ${spA()} ahead of ${spB()}`,
-        dek: `${int(c.x + c.y)} ticket-bound ballots named a party of the pair.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
-      return { hed: `${f0(v)}% of ${spWho()} Senate voters in ${ds(d.n)} ranked ${spA()} ahead of ${spB()}`,
-        dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across Australia, ${f0(aus.share)}%.` : ""}` };
+      if (gvt) return { hed: `${f1(v)}% of ${spWho()} Senate tickets in ${ds(d.n)} put ${spA()} ahead of ${spB()}`,
+        dek: `${int(c.x + c.y)} ticket-bound ballots named a party of the pair.${aus ? ` Across Australia, ${f1(aus.share)}%.` : ""}` };
+      return { hed: `${f1(v)}% of ${spWho()} Senate voters in ${ds(d.n)} ranked ${spA()} ahead of ${spB()}`,
+        dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across Australia, ${f1(aus.share)}%.` : ""}` };
     }
     case "flow": {
       const F = S.from, nm = possW(F), rival = vsW();
@@ -1449,7 +1449,7 @@ function storyBooth(m, j) {
     if (S.lens === "senpref") {
       const v = spBoothValue(m, j), dv = spDivValue(m, D);
       if (v == null) { hed = spNoValue(m, "booth", D); dek = ""; }
-      else { const c = spCells(spOf(m).booths[b.id[j]]); hed = `${f0(v)}% of ${spWho()} Senate voters here ranked ${spA()} ahead of ${spB()}`; dek = `${int(c.x + c.y)} of their ballots here numbered either party.${dv != null ? ` In ${ds(D.n)} as a whole, ${f0(dv)}%.` : ""}`; }
+      else { const c = spCells(spOf(m).booths[b.id[j]]); hed = `${f1(v)}% of ${spWho()} Senate voters here ranked ${spA()} ahead of ${spB()}`; dek = `${int(c.x + c.y)} of their ballots here numbered either party.${dv != null ? ` In ${ds(D.n)} as a whole, ${f1(dv)}%.` : ""}`; }
     }
     if (S.lens === "informal") {
       if (infModeOf(m) === "exhaust") { hed = `${f1(D.exhPct)}% of ${ds(D.n)}’s ballots exhausted before the final two`; dek = "New South Wales re-counts ballots by district, not by polling place — the rate shown is the district’s."; }
