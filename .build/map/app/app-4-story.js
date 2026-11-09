@@ -68,9 +68,14 @@ function upLink() {
 /* every head reads the same way down, whatever the lens or level: the place,
    its figures (the seats first), then the lens's own finding in a line of
    prose under them — the figures never wait below a headline. A head with no
-   figures block (a seat outside any count) keeps the finding as its lead. */
+   figures block (a seat outside any count) keeps the finding as its lead.
+   A finding after figures rides its own ruled junction (the state head's
+   figures close with their own rule; the .st-stat + .st-sec suppression
+   keeps the count at one there) — the seat and place heads' sections never
+   close with one, so their finding draws it itself */
 function head(title, meta, hed, dek, stat) {
-  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${findingHTML(hed, dek, !stat)}`;
+  const find = findingHTML(hed, dek, !stat);
+  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
 }
 // the lens's finding under the figures: its headline as a bold lead sentence, the dek after it
 function findingHTML(hed, dek, lead) {
@@ -203,11 +208,21 @@ function seatPrimariesStat(m, d) {
   cols.sort((a, b) => (alpShown ? (order[a[4]] ?? 5) - (order[b[4]] ?? 5) || b[1] - a[1] : b[1] - a[1]));
   const bigness = cols.some((c) => c[2] == null) ? null : cols.reduce((x, c) => x + c[2], 0);
   cols.push(["oth", Math.max(0.05, 100 - cols.reduce((x, c) => x + c[1], 0)), bigness == null ? null : -bigness, "Others", "oth"]);
-  const cells = cols.map((c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`).join("");
+  // the head's "Others" opener, on the same open state: the lump unfurls
+  // into the families under the column line and the minor-parties lump
+  const othrows = statOthersRows(p, cols);
+  const open = othrows.length > 0 && !!statScopeOf(m).open;
+  const shown = open ? cols.slice(0, -1) : cols;
+  const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${!open && othrows.length && c[4] === "oth"
+    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" ${tone(c[0])} title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
+    : `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`}`;
   // the eyebrow reads "Primaries" plain (user call 2026-11-08): who is in and
   // share of what is told by the columns themselves, not a parenthetical
-  const grid = `<span class="st-grid st-fps st-n${cols.length} st-seatfps" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cells}${bigness != null ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since ${p.py}${d.by ? " (the by-election is judged against the general election's count)" : ""}">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
-  return `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Primaries</span>${grid}</div></div>`;
+  const grid = `<span class="st-grid st-fps st-n${cols.length} st-seatfps" style="grid-template-columns:repeat(${2 * shown.length - 1},auto)" role="group" aria-label="${esc(shown.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${shown.map(cell).join("")}${bigness != null ? shown.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since ${p.py}${d.by ? " (the by-election is judged against the general election's count)" : ""}">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
+  const sec = `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Primaries</span>${grid}`;
+  if (!open) return `${sec}</div></div>`;
+  const bits = othrows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${bigness != null && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
+  return `${sec}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(othrows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button></div></div>`;
 }
 
 function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
@@ -466,6 +481,50 @@ function statOthersToggle() {
   renderStory(true);
   const b = $("#story [data-othx]"); if (b) b.focus({ preventScroll: true });
 }
+/* the head's primary row under the Senate lens: the pool's SENATE first
+   preferences (the lens's own deck — house figures would lie under its
+   label). Same columns, thresholds and Others opener as statPrimaryGrid,
+   without the smaller-parties breakouts (the deck counts family shares
+   only). The deltas compare the previous election's senate deck, loaded
+   beside the frame's own (loadSenateDeck); the previous pool reads the
+   seats its file can name (a new division sits out of its side of the
+   comparison). By-election seats sit out (no senate vote), as in senArea */
+function senFpStat(m, idx) {
+  const s = svOf(m); if (!s) return null;
+  const py = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const s0 = py != null ? SV[py] || null : null;
+  const votes = {}, votes0 = {}; let tot = 0, tot0 = 0;
+  for (const i of idx) {
+    const d = m.divs[i]; if (d.by) continue;
+    const r = s.divs[d.n];
+    if (r) { tot += r[0]; FAMS.forEach((f, fi) => { votes[f] = (votes[f] || 0) + (r[1 + fi] || 0); }); }
+    if (s0) { const r0 = s0.divs[d.n]; if (r0) { tot0 += r0[0]; FAMS.forEach((f, fi) => { votes0[f] = (votes0[f] || 0) + (r0[1 + fi] || 0); }); } }
+  }
+  if (!tot) return null;
+  const fp = {}, fpSw = {};
+  for (const f of FAMS) {
+    fp[f] = (100 * (votes[f] || 0)) / tot;
+    fpSw[f] = tot0 ? fp[f] - (100 * (votes0[f] || 0)) / tot0 : null;
+  }
+  const showChange = fpSw.alp != null;
+  const fpBloc = ["grn", "onp"].filter((f) => fp[f] >= 10).sort((a, b) => fp[b] - fp[a]).map((f) => [f, fp[f], fpSw[f], legW(f), f]);
+  const othSw = showChange ? -(fpSw.alp + fpSw.lnp + fpBloc.reduce((x, r) => x + r[2], 0)) : null;
+  const all = [["alp", fp.alp, fpSw.alp, "Labor", "alp"], ["lnp", fp.lnp, fpSw.lnp, oppNameW(), "lnp"], ...fpBloc,
+    ["oth", Math.max(0.05, 100 - fp.alp - fp.lnp - fpBloc.reduce((x, r) => x + r[1], 0)), othSw, "Others", "oth"]];
+  const shown = new Set(all.map((c) => c[4]));
+  const rows = ["grn", "onp", "ind"].filter((f) => !shown.has(f) && fp[f] >= 0.05).sort((a, b) => fp[b] - fp[a]).map((f) => [f, fp[f], fpSw[f], famLeg(f), f]);
+  if (fp.oth >= 0.05) rows.push(["oth", fp.oth, fpSw.oth, "All other parties", "oth"]);
+  const open = rows.length > 0 && !!statScopeOf(m).open;
+  const cols = open ? all.slice(0, -1) : all;
+  const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${!open && rows.length && c[4] === "oth"
+    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" ${tone(c[0])} title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
+    : `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`}`;
+  const smalls = (cs) => (showChange ? cs.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : "");
+  const grid = `<span class="st-grid st-fps st-n${all.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map(cell).join("")}${smalls(cols)}</span>`;
+  if (!open) return { alp: fp.alp, lnp: fp.lnp, grid };
+  const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
+  return { alp: fp.alp, lnp: fp.lnp, grid: `${grid}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button>` };
+}
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
 function statClassArea(m, idx) {
@@ -648,10 +707,15 @@ function seatStat(m, st, label, noteDef = null) {
   // a row of figures with a line of changes under them, its size set by how many columns it has
   const row = (cls, cols, under) => `<span class="st-grid ${cls} st-n${cols.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)">${cols.map(([f, t], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${t}</b>`).join("")}${under ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${under(c)}</small>`).join("") : ""}</span>`;
   // the primary vote: a party on 10% or more stands apart from "others". Greens and One Nation are
-  // their own family; the rest share "oth", so a party there (Xenophon's in SA, 2016) is read from the candidates
+  // their own family; the rest share "oth", so a party there (Xenophon's in SA, 2016) is read from the candidates.
+  // (Under the Senate lens the row reads the pool's SENATE first preferences, labelled as such;
+  // every other lens takes the House primaries. A state election has no Senate deck — house row stands.)
   const fpA = A.fp.alp, fpL = A.fp.lnp;
   let fpRow = "";
-  if (fpA != null && fpL != null) {
+  if (S.lens === "senate" && svYear(m.year) != null) {
+    const sf = senFpStat(m, idx);
+    if (sf) fpRow = `<span class="st-lab">Senate primaries (Labor and ${coalW()} share ${f1(sf.alp + sf.lnp)}%)</span>${sf.grid}`;
+  } else if (fpA != null && fpL != null) {
     fpRow = `<span class="st-lab">Primaries (Labor and ${coalW()} share ${f1(fpA + fpL)}%)</span>${statPrimaryGrid(m, A, "", true)}`;
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
@@ -694,7 +758,7 @@ function informalHTML(m, st) {
 // named seat sits inside the choice (Rural and NSW keep the One Nation
 // note; Inner-metro and Queensland don't)
 const NOW_AUS_DEK = {
-  now: { t: " The figures here are the 2025 election’s, adjusted for seat changes. One Nation has taken two seats from the Coalition: New England after Barnaby Joyce’s defection in December 2025, and Farrer after David Farley won it in the May 2026 by-election.", seats: ["New England", "Farrer"] },
+  now: { t: " These figures are the 2025 election’s adjusted for changes since then. One Nation has taken two seats from the Coalition and two independents co-founded and joined Community Strong (see below).", seats: ["New England", "Farrer"] },
   nswnow: { t: " Labor holds one seat it didn’t win at the election: Katelin McInerney won Kiama at the September 2025 by-election. Jacqui Scruby took Pittwater from the Liberals as an independent.", seats: ["Kiama", "Pittwater"] },
   qldnow: { t: " The LNP holds one seat it didn’t win at the election: Wayde Chiesa took Hinchinbrook from Katter’s Australian. Labor keeps Stafford — Jimmy Sullivan was expelled from it in May 2025 and died in April 2026; Luke Richmond won the seat back in May.", seats: ["Hinchinbrook", "Stafford"] },
 };

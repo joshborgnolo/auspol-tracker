@@ -653,6 +653,13 @@ button { cursor: pointer; background: none; border: 0; }
    divides it. (No .st-dek suppression: the senate head ends on a dek with no
    rule behind it, so its first section must keep its own.) */
 #story .st-stat + .st-sec { border-top: 0; }
+/* the seat and place heads' figures are their own .st-sec sections and never
+   close with the head stat's rule, so their finding draws its ruled junction
+   itself (the state head's .st-stat closes with one, and the suppression
+   above strips this one's) — there the section's spacing goes with it,
+   leaving the finding's own 12px as the one gap */
+#story .st-stat + .st-sec.st-findsec { margin-top: 0; padding-top: 0; }
+.st-findsec > .st-find { margin-top: 12px; }
 /* the polling-place story separates with the head double rule under every
    lens — that includes its FIRST junction, where the head-adjacent
    suppression wrongly zeroes the line (there is no head rule above it to
@@ -661,8 +668,9 @@ button { cursor: pointer; background: none; border: 0; }
 #story[data-view="booth"][data-lens] .st-sec { border-top: 4px double var(--twin); }
 /* the polling-place dek is running copy; it reads in the winner story's
    Commissioner and takes the same double rule above it as the sections that
-   follow it (both user calls made on the opening dek's rendering) */
-#story[data-view="booth"][data-lens] .st-dek, #story[data-view="booth"][data-lens] .st-find { font-family: "Commissioner", var(--sans); border-top: 4px double var(--twin); padding-top: 7px; }
+   follow it (both user calls made on the opening dek's rendering). A booth
+   finding's own rule comes from its .st-sec junction wrap instead */
+#story[data-view="booth"][data-lens] .st-dek { font-family: "Commissioner", var(--sans); border-top: 4px double var(--twin); padding-top: 7px; }
 
 /* ------- the list view ------- */
 .mp-list { position: absolute; inset: 0; display: flex; flex-direction: column; }

@@ -545,6 +545,13 @@ function loadSenateVote(y, bg) {
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
+/* the senate deck AND the previous election's: the head's primaries deltas
+   under the senate lens compare them, pooled over the same seats */
+function loadSenateDeck(y, bg) {
+  const b = svYear(y);
+  if (b == null) return Promise.resolve(null);
+  return Promise.all([loadSenateVote(y, bg), loadSenateVote(prevYearOf(b), bg)]);
+}
 const senGap = () => S.senMode !== "share";
 const stoodFor = (d, fam) => d.c.some((c) => c.b === fam);
 function senDivValue(m, d) {
