@@ -9979,14 +9979,43 @@ function vtFinding(rows) {
   return `${say}.`;
 }
 // (area: a state's or the country's, which also says what the balloons and the surface leave out)
-// The 2025 graphic pools counts before taking shares or subtracting the area's
+// The graphic pools counts before taking shares or subtracting the area's
 // two-party result. Mobile teams stay with ordinary on-the-day votes, as in
-// the national vote-type table; they must not disappear in a three-band chart.
-const VT_BANDS = [
-  ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
-  ["early", "Early centres & postal", ["ppvc", "post"], "From about 9:30 pm"],
-  ["day", "On the day", ["day", "mob"], "From about 7 pm"],
-];
+// the national vote-type table; they must not disappear in the chart.
+// The count's publication cadence is era-specific, so the bands' membership
+// and release labels live per election and are quoted from the AEC's own
+// per-election statements (aec-count-timing-statements): clock times exist
+// only for 2025; 2016 and 2019 counted postal votes first on the Tuesday
+// (2016's last pre-poll counts rolled to the Monday), 2022 on the Sunday.
+// Bands always count from the bottom up, the on-the-day ordinary votes first.
+const VT_ERAS = {
+  2025: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["early", "Early centres & postal", ["ppvc", "post"], "From about 9:30 pm"],
+    ["day", "On the day", ["day", "mob"], "From about 7 pm"],
+  ],
+  2022: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Sunday"],
+    ["early", "Early centres", ["ppvc"], "On the night, the biggest late"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+  2019: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Tuesday"],
+    ["early", "Early centres", ["ppvc"], "On the night"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+  2016: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Tuesday"],
+    ["early", "Early centres", ["ppvc"], "On the night, the rest Monday"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+};
+// an election only draws the chart where every seat's piles split the final
+// two (test-map-page.mjs pins that coverage from 2016 on); "now" rides 2025's
+function vtBandsFor(y) { return VT_ERAS[y === "now" ? 2025 : +y] || null; }
 let vtMode = "skew", vtLast = null;
 /* the Skew/Effect switch redraws its own block alone, its buttons held where
    they stood on screen: re-rendering the whole story let the page reflow under
@@ -10032,7 +10061,7 @@ function vtBands(divs) {
   // The vote-type counts exhaust each seat's official two-party total.
   const base = total2[0] + total2[1] > 0 ? 100 * total2[0] / (total2[0] + total2[1]) : null;
   const complete = divs.every((d) => d.vt2);
-  const bands = VT_BANDS.map(([k, l, keys, time]) => {
+  const bands = (vtBandsFor(M().year) || []).map(([k, l, keys, time]) => {
     const v = divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
     const t = keys.reduce((p, key) => [p[0] + (counts[key]?.[0] || 0), p[1] + (counts[key]?.[1] || 0)], [0, 0]);
     const n = t[0] + t[1], lab = n > 0 ? 100 * t[0] / n : null;
@@ -10080,7 +10109,7 @@ function vtBandsBlock(divs, area, geography) {
   return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
 }
 function vtBlock(divs, area, geography) {
-  if (M().year === 2025 || M().year === "now") return vtBandsBlock(divs, area, geography);
+  if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography);
   const { rows, tot, seats2 } = vtRows(divs), two = rows.some((r) => r.lab != null);
   const notes = [vtFinding(rows)];
   if (!two) notes.push(M().year === 1993 ? "The 1993 count doesn’t split the final two by how votes were cast." : `The count splits these votes two-party only where the final two were Labor and ${coalW(0)}.`);
@@ -10139,7 +10168,7 @@ function storyArea(m, st) {
   }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
   const castScope = vtScope(m, st), cast = castScope.divs;
-  if (cast.length) h += vtBlock(cast, true, m.year === 2025 || m.year === "now" ? castScope.geography : undefined);
+  if (cast.length) h += vtBlock(cast, true, vtBandsFor(m.year) ? castScope.geography : undefined);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)

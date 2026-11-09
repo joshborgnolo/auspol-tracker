@@ -28,13 +28,13 @@ const ctx = vm.createContext({
   coalW: () => "the Coalition",
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx);
-const api = vm.runInContext("({ vtBands, vtScope, vtBlock, statScopeOf })", ctx);
+const api = vm.runInContext("({ vtBands, vtBandsFor, vtScope, vtBlock, statScopeOf })", ctx);
 const close = (a, b, note) => assert.ok(Math.abs(a - b) < 1e-9, `${note}: ${a} vs ${b}`);
 
 // Independent count oracle: no rounded vote-type percentages or equal
-// weighting of seats. Each band's counts and the area's totals are pooled.
-const keys = [["pre", "abs", "prov"], ["ppvc", "post"], ["day", "mob"]];
-function checkPool(divs, label) {
+// weighting of seats. Each band's counts and the area's totals are pooled,
+// under the frame's own eras (postal votes change bands with the election).
+function checkPool(divs, label, eraBands) {
   const result = api.vtBands(divs);
   const total = divs.reduce((n, d) => n + d.c.reduce((s, c) => s + c[4], 0), 0);
   const two = divs.reduce((p, d) => [p[0] + d.tpp[0], p[1] + d.tpp[1]], [0, 0]);
@@ -42,9 +42,10 @@ function checkPool(divs, label) {
   close(result.base, 100 * two[0] / (two[0] + two[1]), `${label}: official area 2PP`);
   close(result.bands.reduce((n, b) => n + b.share, 0), 100, `${label}: shares sum to 100`);
   assert.equal(result.bands.reduce((n, b) => n + b.v, 0), total, `${label}: every vote is in one band`);
+  assert.equal(result.bands.length, eraBands.length, `${label}: the era's own set of bands`);
   let weightedSkew = 0;
   result.bands.forEach((b, i) => {
-    const p = divs.reduce((p, d) => keys[i].reduce((p, k) => [p[0] + (d.vt2[k]?.[0] || 0), p[1] + (d.vt2[k]?.[1] || 0)], p), [0, 0]);
+    const p = divs.reduce((p, d) => eraBands[i][2].reduce((p, k) => [p[0] + (d.vt2[k]?.[0] || 0), p[1] + (d.vt2[k]?.[1] || 0)], p), [0, 0]);
     const n = p[0] + p[1];
     if (n) close(b.skew, 100 * p[0] / n - result.base, `${label}: ${b.k} skew from pooled counts`);
     else assert.equal(b.skew, null, `${label}: an empty pile has no skew`);
@@ -52,11 +53,13 @@ function checkPool(divs, label) {
   });
   close(weightedSkew, 0, `${label}: weighted skews balance`);
   // Independently build successive electorate pools in counting order.
-  const order = ["day", "mob", "ppvc", "post", "pre", "abs", "prov"];
-  const stages = [2, 4, 7].map((end) => {
-    const p = divs.reduce((p, d) => order.slice(0, end).reduce((p, k) => [p[0] + (d.vt2[k]?.[0] || 0), p[1] + (d.vt2[k]?.[1] || 0)], p), [0, 0]);
-    return p[0] + p[1] ? 100 * p[0] / (p[0] + p[1]) : null;
-  });
+  const stages = [];
+  let stageKeys = [];
+  for (const [, , pileKeys] of eraBands.slice().reverse()) {
+    stageKeys = stageKeys.concat(pileKeys);
+    const p = divs.reduce((p, d) => stageKeys.reduce((p, k) => [p[0] + (d.vt2[k]?.[0] || 0), p[1] + (d.vt2[k]?.[1] || 0)], p), [0, 0]);
+    stages.push(p[0] + p[1] ? 100 * p[0] / (p[0] + p[1]) : null);
+  }
   result.bands.slice().reverse().forEach((b, i) => {
     if (stages[i] != null) close(b.cumulative, stages[i], `${label}: cumulative ${b.k} 2PP`);
     else assert.equal(b.cumulative, null);
@@ -67,7 +70,8 @@ function checkPool(divs, label) {
   return result;
 }
 
-const national = checkPool(current.res.divs, "nationwide");
+const bands25 = api.vtBandsFor(2025);
+const national = checkPool(current.res.divs, "nationwide", bands25);
 assert.deepEqual(Array.from(national.bands, (b) => b.share.toFixed(1)), ["6.8", "52.2", "41.0"]);
 assert.deepEqual(Array.from(national.bands, (b) => b.skew.toFixed(1)), ["3.0", "-2.6", "2.7"]);
 assert.deepEqual(Array.from(national.bands, (b) => b.effect == null ? null : b.effect.toFixed(1)), ["0.2", "-3.0", null]);
@@ -79,7 +83,7 @@ for (const st of Object.keys(states)) {
   assert.ok(scope.divs.every((d) => d.st === st));
   assert.equal(scope.geography, short[st]);
   assert.ok(api.vtBlock(scope.divs, true, scope.geography).includes(`Skew on ${short[st]} 2PP`));
-  checkPool(scope.divs, st);
+  checkPool(scope.divs, st, bands25);
 }
 // a Seat type filter scopes the pool in every lens, nationwide or inside a state
 S.f.st = null;
@@ -90,18 +94,18 @@ for (const lens of ["winner", "tpp", "cls"]) {
     const scope = api.vtScope(current, "AUS");
     assert.ok(scope.divs.every((d) => d.cls === cls));
     assert.equal(scope.geography, `${CLS_LOWER[cls]} seats`);
-    checkPool(scope.divs, `${lens} ${cls}`);
+    checkPool(scope.divs, `${lens} ${cls}`, bands25);
   }
 }
 S.lens = "winner";
-for (const d of current.res.divs) checkPool([d], d.n);
+for (const d of current.res.divs) checkPool([d], d.n, bands25);
 
 // the two filters compound: a seat type inside a state pools their intersection
 S.f.st = "NSW"; S.f.cls = "Rural";
 let scope = api.vtScope(current, "NSW");
 assert.equal(scope.geography, "rural seats in NSW");
 assert.equal(scope.divs.length, current.res.divs.filter((d) => d.st === "NSW" && d.cls === "Rural" && d.vt).length);
-checkPool(scope.divs, "NSW rural");
+checkPool(scope.divs, "NSW rural", bands25);
 // with neither on, every lens reads the whole frame
 S.f.st = null; S.f.cls = null;
 S.lens = "tpp";
@@ -156,10 +160,39 @@ const nsw = api.vtScope(current, "NSW");
 assert.ok(api.vtBlock(nsw.divs, true, nsw.geography).includes("Change in cumulative 2PP"), "mode persists across geography changes");
 vm.runInContext('vtMode = "skew"', ctx);
 assert.ok(api.vtBlock(nsw.divs, true, nsw.geography).includes("Skew on NSW 2PP"));
+
+// the earlier eras where the piles split every seat's final two: postal votes
+// leave the election-night band and the labels quote the AEC's per-election
+// count statements (2016/2019 postal first counted Tuesday, 2022 Sunday)
+assert.ok(JSON.stringify(api.vtBandsFor("now")) === JSON.stringify(bands25), "now rides 2025's era");
+const ERA_CFG = {
+  2022: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Sunday"], ["early", "Early centres", ["ppvc"], "On the night, the biggest late"], ["day", "On the day", ["day", "mob"], "On the night"]],
+  2019: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Tuesday"], ["early", "Early centres", ["ppvc"], "On the night"], ["day", "On the day", ["day", "mob"], "On the night"]],
+  2016: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Tuesday"], ["early", "Early centres", ["ppvc"], "On the night, the rest Monday"], ["day", "On the day", ["day", "mob"], "On the night"]],
+};
+for (const y of [2022, 2019, 2016]) {
+  const res = JSON.parse(read(`map/data/core-${y}.json`));
+  current = { year: y, res };
+  current.divs = res.divs;
+  const eraBands = api.vtBandsFor(y);
+  assert.ok(JSON.stringify(eraBands) === JSON.stringify(ERA_CFG[y]), `${y}: the band config quotes the AEC's per-election statements`);
+  checkPool(res.divs, `${y} nationwide`, eraBands);
+  const html = api.vtBlock(res.divs, true, "nationwide");
+  assert.equal((html.match(/role="listitem"/g) || []).length, 4, `${y}: postal gets its own band`);
+  for (const t of eraBands.map((b) => b[3])) assert.ok(html.includes(`<small class="vt-time">${t}</small>`), `${y}: band label “${t}”`);
+  assert.ok(!html.includes("<table") && !html.includes('class="stack"'), `${y}: the chart replaces the old graphic`);
+  const seat = api.vtBlock([res.divs[0]]);
+  assert.ok(seat.includes("vt-band-post") && !seat.includes("<table"), `${y}: a seat draws the chart`);
+}
 // Historical frames keep their existing breakdown and unavailable-data copy.
 current = { year: 1993 };
 const old = api.vtBlock([{ n: "Historic", vt: { ord: 100 } }]);
 assert.ok(old.includes("<table") && old.includes("The 1993 count"));
 assert.ok(!old.includes("vt-bands"));
+for (const y of [2013, 2010]) {
+  current = { year: y };
+  const html = api.vtBlock([{ n: "Old", vt: { ord: 100, post: 10 }, vt2: { day: [60, 40], post: [10, 0] } }]);
+  assert.ok(html.includes("<table") && !html.includes("vt-bands"), `${y}: classic-seat coverage keeps the table, not the chart`);
+}
 
-console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes and missing data");
+console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes, missing data, and the 2016/2019/2022 eras");

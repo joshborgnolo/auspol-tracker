@@ -189,9 +189,11 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
   assert.ok(js.includes('if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;'),
     "the fp-change legend explains the unjoined booths' hatch");
 }
-assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes('if (cast.length) h += vtBlock(cast, true, m.year === 2025 || m.year === "now" ? castScope.geography : undefined);'), "a seat, a state and the country share one How votes were cast block");
+assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true, vtBandsFor(m.year) ? castScope.geography : undefined);"), "a seat, a state and the country share one How votes were cast block");
 assert.ok(js.includes("const castScope = vtScope(m, st), cast = castScope.divs;") && js.includes("const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool); the area block reads election results, since Now blanks a by-election's piles");
-assert.ok(js.includes('if (M().year === 2025 || M().year === "now") return vtBandsBlock('), "the Now frame shows the band chart, not the old table");
+assert.ok(js.includes("if (vtBandsFor(M().year)) return vtBandsBlock("), "2016 on, the elections' frames show the band chart, not the old table");
+assert.ok(js.includes("function vtBandsFor(y) { return VT_ERAS[y === \"now\" ? 2025 : +y] || null; }"), "band eras: 2016/2019/2022/2025 (+now riding 2025's era)");
+assert.ok(js.includes('"From Tuesday"') && js.includes('"From Sunday"'), "the 2016/2019/2022 band labels quote the AEC's per-election count sequencing (2016 & 2019 postal first counted Tuesday, 2022 postal first counted Sunday)");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
 assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the
