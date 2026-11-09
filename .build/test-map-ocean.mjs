@@ -109,6 +109,25 @@ for (const [n, size, spots] of SEA_NAMES) {
   }
 }
 
+// ---- the inland waters' names (harbours, bays, lakes, rivers): shown from street zoom on
+// Esri's own water, so their spots can't be tested against the AEC's land (the AEC draws its
+// seats across every harbour); each was checked against Esri's sea tiles when chosen, and the
+// paint lays a name only where its room reads as water there (roomWet)
+const wn = map2.match(/@water-names-begin \*\/([\s\S]*?)\/\* @water-names-end \*\//);
+assert.ok(wn, "app-2-map.js marks WATER_NAMES for this test");
+const WATER_NAMES = new Function(`${wn[1]}; return WATER_NAMES;`)();
+for (const want of ["Sydney Harbour", "Botany Bay", "Lake Macquarie", "Port Phillip", "Western Port", "Moreton Bay", "River Derwent", "Swan River", "Darwin Harbour", "Lake Alexandrina"]) assert.ok(WATER_NAMES.some(([n]) => n === want), `water named: ${want}`);
+assert.equal(new Set(WATER_NAMES.map(([n]) => n)).size, WATER_NAMES.length, "each water named once");
+for (const [n, size, spots] of WATER_NAMES) {
+  assert.ok(!/[A-Z]{2}/.test(n) && n.split(" ").every((w) => /^[A-Z][a-z]+$/.test(w) || ["of", "St"].includes(w)), `${n}: written in sentence case`);
+  assert.ok(size >= 11 && size <= 13, `${n}: a size below the seas' (11-13px)`);
+  assert.ok(spots.length >= 1 && spots.every((sp) => sp.length === 3 && sp[0] > 112 && sp[0] < 154.5 && sp[1] > -44.5 && sp[1] < -9 && Math.abs(sp[2]) <= 90), `${n}: spots [lon, lat, deg] in the frame, reading left to right`);
+}
+assert.ok(map2.includes('if (kind) { if (kind === "water") out.sea.push(') && map2.includes('"Water area large scale": "water"'), "Esri's lakes and broad rivers join its sea: they read as water at street zoom, as the harbours do");
+assert.ok(map2.includes('for (const s of lab.spots) if (s.kind !== "water") spots.push('), "Esri's own water names give way to the atlas lettering's (drawWaterNames)");
+assert.ok(/drawSeaNames\(m, placed\);\s*drawWaterNames\(m, placed, obst\);\s*\/\/ the streets' own names last/.test(map2), "the waters' names after the seas', before the streets'");
+assert.ok(map2.includes("if (i % 3 === 1) { n++; wet++; continue; }") && map2.includes("return n > 0 && wet / n >= 0.8;"), "a water's name stands where its letters' middle is all water and four-fifths of its room is");
+
 // ---- the paint order
 const ui = R(".build/map/app/app-6-ui.js");
 const fr = ui.slice(ui.indexOf("function frame(ts)"));
@@ -117,7 +136,7 @@ assert.ok(R(".build/map/app/app-3-chamber.js").includes("drawOcean(m, 1 - p / 0.
 const laySea = map2.slice(map2.indexOf("function laySea("), map2.indexOf("\n}\n", map2.indexOf("function laySea(")));
 assert.ok(laySea.indexOf('"destination-out"') < laySea.indexOf("oceanUnder(m)") && laySea.indexOf("oceanUnder(m)") < laySea.indexOf("ctx.drawImage(seaLay"), "laySea: cut the seats from Esri's sea, lay the ocean back beneath, then the sheet's marks on the water");
 assert.ok(laySea.includes("ctx.globalCompositeOperation = st.op; ctx.drawImage(seaLay"), "laySea: the sheet's marks multiply onto the ocean as the streets do onto the land");
-assert.ok(/if \(L\.name === "Marine area"\) out\.sea\.push\([^)]*\); else out\.fills\[kind\]\.push/.test(map2), "Esri's Marine area is the sea mask only, never a water fill tinting the ocean");
+assert.ok(/if \(kind === "water"\) out\.sea\.push\([^)]*\); else out\.fills\[kind\]\.push/.test(map2) && map2.includes('"Marine area": "water"'), "Esri's Marine area (and its lakes) are the sea mask only, never a water fill tinting the ocean");
 assert.ok(/L\.clip\(st\.known\);[\s\S]{0,260}L\.fillStyle = css\(TH\.bg\); L\.fillRect\(0, 0, W, H\);/.test(map2), "layWaters: plain land under the seats' waters, so Esri's land beyond them never shows the sea");
 assert.ok(map2.includes("ctx.save(); ctx.clip(box); layPaper(a); ctx.restore();"), "an island's box shows the sea's paper");
 const html = R("map/index.html"), italic = html.match(/font-style: italic;\s*font-weight: 400;[^}]*url\("\/assets\/fonts\/(crimsontext-italic-400-latin\.[0-9a-f]+\.woff2)"\)/);

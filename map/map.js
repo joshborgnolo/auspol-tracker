@@ -1968,7 +1968,7 @@ function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
   const sa = st && st.known ? seaA() : 0;
-  if (streetA !== undefined) seaNow = sa > 0 ? { m, sa } : null;
+  if (streetA !== undefined) { seaNow = sa > 0 ? { m, sa } : null; streetSt = sa > 0 ? st : null; }
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y);
@@ -2730,6 +2730,7 @@ function drawLabels(m) {
   townSince = since;
   // the waters' names, after everything named on the land (it keeps its room first)
   drawSeaNames(m, placed);
+  drawWaterNames(m, placed, obst);
   // the streets' own names last, clear of every label above and every booth
   const sA = streetK();
   if (sA > 0.02 && streetDrawn.length) drawStreetNames(placed, obst, sA);
@@ -2830,6 +2831,7 @@ const maskLand = (K, x, y) => { const i = Math.floor((x - K.x0) * K.s), j = Math
 // italic unless given); lift: how far its middle stands above the spot (the Tropic's name
 // sits over its line, a degree on its own)
 function seaLayout(m, K, G, txt, size, spot, font = seaFont(size), lift = 0) {
+  const dry = typeof K === "function" ? K : (x, y) => maskLand(K, (x - T.x) / T.k, (y - T.y) / T.k);
   const p = m.proj([spot[0], spot[1]]); if (!p) return null;
   const ax = p[0] * T.k + T.x, ay = p[1] * T.k + T.y;
   const lines = txt.split("\n"), lh = size * 1.08, advs = lines.map((ln) => seaAdvOf(ln, font));
@@ -2855,12 +2857,12 @@ function seaLayout(m, K, G, txt, size, spot, font = seaFont(size), lift = 0) {
   });
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const [x, y] of pts) {
-    if (maskLand(K, (x - T.x) / T.k, (y - T.y) / T.k)) return null;
+    if (dry(x, y)) return null;
     x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
   }
   const [c0, c1, c2, c3] = clearGround(2);
   if (x0 < c0 || y0 < c1 || x1 > c2 || y1 > c3) return null;
-  return { glyphs, box: [x0, y0, x1, y1] };
+  return { glyphs, box: [x0, y0, x1, y1], pts };
 }
 function drawSeaNames(m, placed) {
   const fade = 1 - smooth(0, 0.35, streetK());
@@ -2883,6 +2885,208 @@ function drawSeaNames(m, placed) {
   drawGratLabels(m, K, G, placed, seen, now, ovA * fade);
   for (const k of [...seaSince.keys()]) if (!seen.has(k)) seaSince.delete(k);
 }
+/* ----- the inland waters' names -----
+   Harbours, bays, inlets, lakes and rivers, named as the oceans are (italic, the
+   sea's deeper blue, a soft edge of the sea's own colour) from the moment the
+   streets' coast takes over and they read as water (seaA) - below that zoom the
+   AEC draws its seats across them and there is no water there to name. Three
+   sources, in this order of claim on the room:
+     WATER_NAMES   the tidal waters, which Esri's sea carries unnamed: each entry
+                   the name, its size, and its spots ([lon, lat, deg], deg its
+                   line's turn anticlockwise from level), tried in turn;
+     Esri's lakes  every named lake, reservoir and broad river Esri labels, level,
+                   at Esri's own label point;
+     Esri's rivers a River's name along its line, its letters following the bends.
+   A harbour's or a lake's name stands only where the line through its letters'
+   middle lies all on water and four-fifths of its outline does (a name may
+   brush a headland, as an atlas's does), read off the tiles' own sea; so a
+   reservoir's name waits until the reservoir is big enough to hold it. A
+   river's runs along its line wherever the line is smooth enough to letter.
+   Esri never names these waters itself here (drawStreetNames leaves them). */
+/* @water-names-begin */
+const WATER_NAMES = [
+  ["Sydney Harbour", 12.5, [[151.265, -33.84, 15], [151.245, -33.851, 30], [151.218, -33.853, -15]]],
+  ["Middle Harbour", 11.5, [[151.255, -33.817, -45]]],
+  ["North Harbour", 11, [[151.275, -33.806, -45]]],
+  ["Parramatta River", 11, [[151.15, -33.842, 0], [151.08, -33.83, 45]]],
+  ["Botany Bay", 12.5, [[151.2, -34.0, 0], [151.18, -33.995, 15]]],
+  ["Port Hacking", 11.5, [[151.14, -34.075, -15]]],
+  ["Broken Bay", 12, [[151.29, -33.565, 15]]],
+  ["Pittwater", 11.5, [[151.31, -33.61, 75]]],
+  ["Brisbane Water", 11.5, [[151.337, -33.462, 60]]],
+  ["Tuggerah Lake", 12, [[151.5, -33.32, -30]]],
+  ["Lake Macquarie", 12.5, [[151.62, -33.05, 30], [151.6, -33.08, -30]]],
+  ["Lake Illawarra", 12, [[150.85, -34.53, 45]]],
+  ["Port Stephens", 12, [[152.05, -32.71, 0]]],
+  ["Jervis Bay", 12.5, [[150.75, -35.08, 0]]],
+  ["Twofold Bay", 11.5, [[149.93, -37.08, 0]]],
+  ["Port Phillip", 13, [[144.86, -38.13, 0], [144.95, -37.95, 0], [144.75, -38.05, 0]]],
+  ["Hobsons Bay", 11, [[144.88, -37.875, 0]]],
+  ["Corio Bay", 11.5, [[144.4, -38.09, 15]]],
+  ["Western Port", 12.5, [[145.35, -38.43, 0], [145.08, -38.47, 0]]],
+  ["Corner Inlet", 12, [[146.35, -38.78, 0]]],
+  ["Lake Wellington", 12, [[147.33, -38.1, 0]]],
+  ["Lake Victoria", 11.5, [[147.56, -38.03, 15]]],
+  ["Lake King", 11.5, [[147.75, -37.93, 0]]],
+  ["Moreton Bay", 13, [[153.27, -27.27, 84], [153.3, -27.1, 84]]],
+  ["Brisbane River", 11, [[153.16, -27.38, 60]]],
+  ["The Broadwater", 11.5, [[153.41, -27.94, -75]]],
+  ["Pumicestone Passage", 11, [[153.147, -26.897, -75]]],
+  ["River Derwent", 12, [[147.36, -42.92, -60], [147.38, -42.95, -60]]],
+  ["Tamar River", 11.5, [[146.78, -41.08, -45]]],
+  ["Macquarie Harbour", 12, [[145.35, -42.3, -30]]],
+  ["Swan River", 11.5, [[115.81, -32.003, 15], [115.87, -31.965, 0]]],
+  ["Cockburn Sound", 12, [[115.73, -32.18, 60]]],
+  ["Peel Inlet", 11.5, [[115.75, -32.6, 0]]],
+  ["King George Sound", 12, [[117.97, -35.05, 0]]],
+  ["Princess Royal Harbour", 11, [[117.89, -35.06, -30]]],
+  ["Roebuck Bay", 12, [[122.3, -18.05, 0]]],
+  ["Lake Alexandrina", 12.5, [[139.1, -35.45, 0]]],
+  ["Lake Albert", 11.5, [[139.32, -35.62, 15]]],
+  ["Darwin Harbour", 12, [[130.83, -12.48, 15]]],
+];
+/* @water-names-end */
+const RIVER_NAME = /\bRiver\b/;
+const LAKE_SIZE = 11.5, RIVER_SIZE = 11, WATER_GAP = 320; // px between two labels of one water
+let streetSt = null, waterSince = new Map();
+// whether a name's room is water, kept per name, spot and quarter-octave of zoom until a tile arrives
+const waterFit = new Map();
+// the street sheet's sea at a screen point: true, false, or null where no tile is in hand
+function wetAt(sx, sy) {
+  const st = streetSt; if (!st || !proj) return null;
+  const ll = proj.invert([(sx - T.x) / T.k, (sy - T.y) / T.k]); if (!ll) return null;
+  const p = merc(ll);
+  for (const { tz, tx, ty, a: [sea, , s = 1, ox = 0, oy = 0] } of st.seas) {
+    const n = 2 ** tz, u = p[0] * n - tx, v = p[1] * n - ty;
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) continue;
+    return hitCtx.isPointInPath(sea, (u + ox) / s, (v + oy) / s);
+  }
+  return null;
+}
+// a laid name's room on water: the line through the middle of its letters all wet, and
+// four-fifths of every point read (seaLayout's points run in threes: top, middle, foot).
+// Each read spends the paint's budget (wetBudget); null when a tile is missing or it ran out
+let wetBudget = 0;
+function roomWet(pts) {
+  let wet = 0, n = 0;
+  for (let i = 1; i < pts.length; i += 3) { if (wetBudget-- <= 0) return null; const w = wetAt(pts[i][0], pts[i][1]); if (w == null) return null; if (!w) return false; }
+  for (let i = 0; i < pts.length; i++) {
+    if (i % 3 === 1) { n++; wet++; continue; }
+    if (wetBudget-- <= 0) return null;
+    const w = wetAt(pts[i][0], pts[i][1]);
+    if (w == null) return null;
+    n++; if (w) wet++;
+  }
+  return n > 0 && wet / n >= 0.8;
+}
+// a spot's tries: its own turn, then turned up to 45 degrees either way, each also moved
+// a line's height to either side of the spot
+const WATER_TURNS = [0, 15, -15, 30, -30, 45, -45], WATER_NUDGE = [0, 0.9, -0.9];
+function drawWaterNames(m, placed, obst) {
+  const sa = seaNow && seaNow.m === m ? seaNow.sa : 0;
+  if (!streetSt || sa <= 0.01 || !streetDrawn.length) { waterSince.clear(); return; }
+  const G = gratOf(m.proj), th = TH, now = performance.now(), seen = new Map(), live = new Set();
+  const kq = Math.round(Math.log2(T.k) * 4), never = () => false;
+  const hits = (b) => overlaps(b, placed) || overlaps(b, obst);
+  const near = (name, x, y) => (seen.get(name) || []).some(([a, b]) => Math.hypot(a - x, b - y) < WATER_GAP);
+  const note = (name, x, y) => { if (!seen.has(name)) seen.set(name, []); seen.get(name).push([x, y]); };
+  wetBudget = 1500;
+  const lay = (key, txt, size, spot) => {
+    const L = seaLayout(m, never, G, txt, size, spot); if (!L) return null;
+    const fk = `${key}|${kq}`;
+    let ok = waterFit.get(fk);
+    if (ok == null) { ok = roomWet(L.pts); if (ok == null) { if (wetBudget <= 0) needFrame = true; return null; } waterFit.set(fk, ok); }
+    return ok ? L : null;
+  };
+  // a spot and its tries, the first on water and clear of every label and booth
+  const layTries = (key, txt, size, spot) => {
+    const p = m.proj([spot[0], spot[1]]); if (!p) return null;
+    const ax = p[0] * T.k + T.x, ay = p[1] * T.k + T.y, d0 = spot[2] || 0;
+    for (const nu of WATER_NUDGE) for (const dt of WATER_TURNS) {
+      const deg = d0 + dt, a = (-deg * Math.PI) / 180, off = nu * size * 1.1;
+      const ll = nu ? proj.invert([(ax - Math.sin(a) * off - T.x) / T.k, (ay + Math.cos(a) * off - T.y) / T.k]) : spot;
+      if (!ll) continue;
+      const L = lay(`${key}|${nu}|${dt}`, txt, size, [ll[0], ll[1], deg]);
+      if (L && !hits(L.box)) return L;
+    }
+    return null;
+  };
+  const put = (txt, size, L, x, y, halo) => {
+    placed.push(L.box); note(txt, x, y); live.add(txt);
+    layGlyphs(L.glyphs, seaFont(size), th.seaInk, ovA * sa * waterFade(txt, now), halo);
+  };
+  ctx.save();
+  // the tidal waters
+  for (const [txt, size, spots] of WATER_NAMES) {
+    for (let i = 0; i < spots.length; i++) {
+      const p = m.proj([spots[i][0], spots[i][1]]); if (!p) continue;
+      const x = p[0] * T.k + T.x, y = p[1] * T.k + T.y;
+      if (near(txt, x, y)) break;
+      const L = layTries(`w|${txt}|${i}`, txt, size, spots[i]);
+      if (L) { put(txt, size, L, x, y); break; }
+    }
+  }
+  // Esri's lakes, at its own label points
+  const lakes = [], rivers = [];
+  for (const e of streetDrawn) { const lab = tileLabels(e); for (const sp of lab.spots) if (sp.kind === "water") lakes.push(sp); for (const r of lab.rivers) rivers.push(r); }
+  for (const sp of lakes) {
+    const x = sp.x * T.k + T.x, y = sp.y * T.k + T.y;
+    if (x < 0 || y < 0 || x > Wpx || y > Hpx || near(sp.name, x, y)) continue;
+    const ll = proj.invert([sp.x, sp.y]); if (!ll) continue;
+    const L = lay(`e|${sp.name}|${sp.x.toFixed(3)},${sp.y.toFixed(3)}`, sp.name, LAKE_SIZE, ll);
+    if (L && !hits(L.box)) put(sp.name, LAKE_SIZE, L, x, y);
+  }
+  // Esri's rivers, along their lines, longest first
+  rivers.sort((a, b) => b.q.length - a.q.length);
+  const halo = th.dark ? "rgba(0,0,0,0.4)" : css(th.bg, 0.8);
+  for (const r of rivers) {
+    const L = riverLayout(r.q, r.name, RIVER_SIZE); if (!L || near(r.name, L.x, L.y) || L.boxes.some(hits)) continue;
+    placed.push(...L.boxes); note(r.name, L.x, L.y); live.add(r.name);
+    layGlyphs(L.glyphs, seaFont(RIVER_SIZE), th.seaInk, ovA * sa * waterFade(r.name, now), halo);
+  }
+  ctx.restore();
+  for (const k of [...waterSince.keys()]) if (!live.has(k)) waterSince.delete(k);
+}
+function waterFade(key, now) {
+  if (!waterSince.has(key)) waterSince.set(key, now);
+  const t = clamp((now - waterSince.get(key)) / SEA_FADE, 0, 1); if (t < 1) needFrame = true;
+  return t;
+}
+// a river's name along its line (map-plane points q): centred at the middle of the line in
+// view (or a third either side), each letter on the line at its own place and turned to it,
+// the whole reading left to right; none where the line bends too sharply under the name
+function riverLayout(q, txt, size) {
+  const m = q.length / 2; if (m < 2) return null;
+  const font = seaFont(size), adv = seaAdvOf(txt, font), w = adv[txt.length] * 1.06; // a little air between the letters
+  let X = new Float64Array(m), Y = new Float64Array(m);
+  for (let i = 0; i < m; i++) { X[i] = q[2 * i] * T.k + T.x; Y[i] = q[2 * i + 1] * T.k + T.y; }
+  if (X[m - 1] < X[0]) { X = X.reverse(); Y = Y.reverse(); }
+  const L = new Float64Array(m);
+  for (let i = 1; i < m; i++) L[i] = L[i - 1] + Math.hypot(X[i] - X[i - 1], Y[i] - Y[i - 1]);
+  const len = L[m - 1]; if (len < w + 24) return null;
+  const at = (d) => { let i = 1; while (i < m - 1 && L[i] < d) i++; const u = (d - L[i - 1]) / (L[i] - L[i - 1] || 1); return [X[i - 1] + (X[i] - X[i - 1]) * u, Y[i - 1] + (Y[i] - Y[i - 1]) * u]; };
+  const turn = (d) => { const a = at(d - size * 0.6), b = at(d + size * 0.6); return Math.atan2(b[1] - a[1], b[0] - a[0]); };
+  const [c0, c1, c2, c3] = clearGround(4);
+  for (const f of [0.5, 0.33, 0.67]) {
+    const c = len * f, s0 = c - w / 2; if (s0 < 8 || c + w / 2 > len - 8) continue;
+    const mid = at(c); if (mid[0] < c0 || mid[1] < c1 || mid[0] > c2 || mid[1] > c3) continue;
+    const glyphs = [], boxes = []; let prev = null, bend = 0, ok = true;
+    for (let i = 0; i < txt.length; i++) {
+      const d = s0 + ((adv[i] + adv[i + 1]) / 2) * 1.06, a = turn(d), [x, y] = at(d);
+      if (Math.abs(a) > Math.PI * 0.55) { ok = false; break; } // it would read upside down here
+      if (prev != null) { const da = Math.abs(((a - prev + 3 * Math.PI) % (2 * Math.PI)) - Math.PI); if (da > 0.45) { ok = false; break; } bend += da; }
+      prev = a;
+      // the letters' middle on the line: the baseline a third of the size below it
+      const bx = x - Math.sin(a) * 0.32 * size, by = y + Math.cos(a) * 0.32 * size;
+      if (bx < c0 || by < c1 || bx > c2 || by > c3) { ok = false; break; }
+      if (txt[i] !== " ") glyphs.push([txt[i], bx, by, a]);
+      boxes.push([x - size * 0.45, y - size * 0.55, x + size * 0.45, y + size * 0.55]);
+    }
+    if (!ok || bend > 1.2) continue;
+    return { glyphs, boxes, x: mid[0], y: mid[1] };
+  }
+  return null;
+}
 // a label's strength as it fades in from the frame it first found room (keyed by its text)
 function seaFade(key, now) {
   if (!seaSince.has(key)) seaSince.set(key, now);
@@ -2892,11 +3096,11 @@ function seaFade(key, now) {
 // glyphs laid as seaLayout set them: a soft edge of the sea's own colour first, under every
 // glyph (it lifts the lines of latitude and longitude out from beneath the letters), then
 // the letters
-function layGlyphs(glyphs, font, ink, a) {
+function layGlyphs(glyphs, font, ink, a, halo = css(TH.sea)) {
   ctx.font = font; ctx.lineJoin = "round"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
   for (const pass of [0, 1]) {
     ctx.globalAlpha = a * (pass ? 1 : 0.8);
-    if (pass) ctx.fillStyle = css(ink); else { ctx.strokeStyle = css(TH.sea); ctx.lineWidth = 3.4; }
+    if (pass) ctx.fillStyle = css(ink); else { ctx.strokeStyle = halo; ctx.lineWidth = 3.4; }
     for (const [ch, x, y, rot] of glyphs) {
       ctx.setTransform(dpr * Math.cos(rot), dpr * Math.sin(rot), -dpr * Math.sin(rot), dpr * Math.cos(rot), dpr * x, dpr * y);
       if (pass) ctx.fillText(ch, 0, 0); else ctx.strokeText(ch, 0, 0);
@@ -3263,7 +3467,7 @@ function drainTiles() {
   while (tileQueue.length && performance.now() - t0 < TILE_BUDGET) {
     const t = tileQueue.shift();
     if (!t.buf) continue;
-    try { const pr = mvtParse(new Uint8Array(t.buf)); t.cv = renderTile(pr, t.dark, t.z, tilePx()); t.sea = seaPath(pr.sea); t.names = pr.names; t.spots = pr.spots; t.ready = performance.now(); }
+    try { const pr = mvtParse(new Uint8Array(t.buf)); t.cv = renderTile(pr, t.dark, t.z, tilePx()); t.sea = seaPath(pr.sea); t.names = pr.names; t.spots = pr.spots; t.rivers = pr.rivers; t.ready = performance.now(); waterFit.clear(); }
     catch { t.failed = true; }
     t.buf = null;
   }
@@ -3286,9 +3490,9 @@ const SPOT_OF = (n) => (n === "Park or farming/label" ? "park" : n === "Water po
 function mvtParse(buf) {
   const vint = (b, st) => { let x = 0, s = 0; for (;;) { const v = b[st.i++]; x += (v & 127) * 2 ** s; s += 7; if (!(v & 128)) return x; } };
   const packed = (b) => { const st = { i: 0 }, out = []; while (st.i < b.length) out.push(vint(b, st)); return out; };
-  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] }, sea: [], names: [], spots: [] };
+  const out = { roads: [], tuns: [], rail: [], waterL: [], fills: { urban: [], park: [], water: [] }, sea: [], names: [], spots: [], rivers: [] };
   for (let i = 0; i <= 10; i++) { out.roads.push([]); out.tuns.push([]); }
-  const FILL_OF = { "Urban area": "urban", "Park or farming": "park", "Golf course": "park", Airport: "park", Zoo: "park", "Marine area": "water", "Water area": "water" };
+  const FILL_OF = { "Urban area": "urban", "Park or farming": "park", "Golf course": "park", Airport: "park", Zoo: "park", "Marine area": "water", "Water area": "water", "Water area large scale": "water" };
   const root = { i: 0 };
   while (root.i < buf.length) {
     const tag = vint(buf, root), no = tag >> 3, wire = tag & 7;
@@ -3308,7 +3512,8 @@ function mvtParse(buf) {
     }
     const kind = FILL_OF[L.name], isRoad = L.name === "Road" || L.name === "Road tunnel";
     const spot = SPOT_OF(L.name);
-    if (!kind && !isRoad && !spot && L.name !== "Road/label" && L.name !== "Railroad" && L.name !== "Water line") return;
+    const river = /^Water line( large scale)?\/label$/.test(L.name);
+    if (!kind && !isRoad && !spot && !river && L.name !== "Road/label" && L.name !== "Railroad" && L.name !== "Water line") return;
     const vals = L.valsr.map((v) => {
       const vs = { i: 0 }; let o = null;
       while (vs.i < v.length) { const t = vint(v, vs), no = t >> 3, w = t & 7;
@@ -3329,8 +3534,16 @@ function mvtParse(buf) {
       const parts = decodeParts(f.geom);
       if (!parts.length) continue;
       // (Esri's sea is the map's sea mask, where the ocean's own paper goes: the sheet leaves
-      // it unfilled, so its water grey never tints the ocean the streets are multiplied onto)
-      if (kind) { if (L.name === "Marine area") out.sea.push({ ext: L.extent, parts }); else out.fills[kind].push({ ext: L.extent, parts }); continue; }
+      // it unfilled, so its water grey never tints the ocean the streets are multiplied onto.
+      // Its lakes, reservoirs and broad rivers join it, so Lake Burley Griffin reads as water
+      // as Port Jackson does - the AEC draws its seats across both)
+      if (kind) { if (kind === "water") out.sea.push({ ext: L.extent, parts }); else out.fills[kind].push({ ext: L.extent, parts }); continue; }
+      // a river's name along its own line (the inland waters' names)
+      if (river) {
+        const name = tags._name_global || tags._name;
+        if (name && f.type === 2 && RIVER_NAME.test(name)) for (const pt of parts) out.rivers.push({ name, ext: L.extent, pts: pt });
+        continue;
+      }
       // names: a road's along its label line (route shields carry only _name - left out),
       // a park's or a water's at its label point
       if (L.name === "Road/label") {
@@ -3710,7 +3923,12 @@ function tileLabels(e) {
     return { name: r.name, rank: r.rank, q };
   });
   const spots = (t.spots || []).map((s) => { const p = at(s.x, s.y, s.ext); return { name: s.name, kind: s.kind, x: p[0], y: p[1] }; });
-  return (t.lab = { roads, spots });
+  const rivers = (t.rivers || []).map((r) => {
+    const q = new Float64Array(r.pts.length);
+    for (let i = 0; i < r.pts.length; i += 2) { const p = at(r.pts[i], r.pts[i + 1], r.ext); q[i] = p[0]; q[i + 1] = p[1]; }
+    return { name: r.name, q };
+  });
+  return (t.lab = { roads, spots, rivers });
 }
 function drawStreetNames(placed, obst, alpha) {
   if (!proj || alpha <= 0.02 || !streetDrawn.length) return;
@@ -3722,7 +3940,7 @@ function drawStreetNames(placed, obst, alpha) {
   for (const e of streetDrawn) {
     const lab = tileLabels(e);
     for (const r of lab.roads) if (z >= NAME_Z[r.rank]) roads.push({ r, f: e.f });
-    for (const s of lab.spots) spots.push({ s, f: e.f });
+    for (const s of lab.spots) if (s.kind !== "water") spots.push({ s, f: e.f });
   }
   roads.sort((a, b) => a.r.rank - b.r.rank || b.r.q.length - a.r.q.length);
   ctx.lineJoin = "round"; ctx.textBaseline = "middle"; ctx.textAlign = "center";
