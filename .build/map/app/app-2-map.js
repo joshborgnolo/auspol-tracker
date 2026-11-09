@@ -428,14 +428,17 @@ function drawGeo(m, alpha, streetA) {
   // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface (or the
   // census's own areas raster) is laid through these same fills
   const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf || look.ar : null;
+  // (how far a surface has come in over the seats: none until its first picture arrives)
+  const sfIn = look && look.sf && look.sf.ls.length ? look.surf : 0;
   if (look) ballNow = ball;
   const fills = [], fillOf = new Array(m.divs.length);
   for (let i = 0; i < m.divs.length; i++) {
     if (!inBox(g.bb[i], x0, y0, x1, y1) && !sa) continue;
     let c = fillDiv(m, i);
     if (ball > 0) c = ball >= 1 || !c ? th.nodata : mixC(c, th.nodata, ball);
-    // Unsupported/loading surface ground never falls back to the seat's colour.
-    if (look && look.surf > 0) c = th.nodata;
+    // under a surface a seat's colour gives way to plain ground as the surface comes in, so a seat with no
+    // counted place, which the surface leaves alone, ends plain too (the seats hold until its first picture)
+    if (sfIn > 0 && c) c = mixC(c, th.nodata, sfIn);
     // (another year's map, under a year morph, quiets with the zoom alone)
     const qn = m === M() ? quietness(i, now) : quietAll();
     if (c && qn > 0) c = towards(c, th.bg, qn);
@@ -447,7 +450,8 @@ function drawGeo(m, alpha, streetA) {
   // as it is; plain land in a year no seat holds one
   const isls = (m.isl || []).filter((q) => inBox(q.mbb, x0, y0, x1, y1));
   const islFill = (q) => {
-    let c = q.owner == null || (look && look.surf > 0) ? th.nodata : fillDiv(m, q.owner);
+    let c = q.owner == null ? th.nodata : fillDiv(m, q.owner);
+    if (sfIn > 0 && c) c = mixC(c, th.nodata, sfIn);
     const qn = q.owner != null && m === M() ? quietness(q.owner, now) : 0;
     if (c && qn > 0) c = towards(c, th.bg, qn);
     return [c ? css(c) : pat, filt && q.owner != null && !passes(m, q.owner)];

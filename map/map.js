@@ -1979,14 +1979,17 @@ function drawGeo(m, alpha, streetA) {
   // the map's drawing (app-2b-draw.js): balloons stand on plain land; a surface (or the
   // census's own areas raster) is laid through these same fills
   const look = m === M() ? drawLook(m) : null, ball = look ? look.ball : 0, sf = look ? look.sf || look.ar : null;
+  // (how far a surface has come in over the seats: none until its first picture arrives)
+  const sfIn = look && look.sf && look.sf.ls.length ? look.surf : 0;
   if (look) ballNow = ball;
   const fills = [], fillOf = new Array(m.divs.length);
   for (let i = 0; i < m.divs.length; i++) {
     if (!inBox(g.bb[i], x0, y0, x1, y1) && !sa) continue;
     let c = fillDiv(m, i);
     if (ball > 0) c = ball >= 1 || !c ? th.nodata : mixC(c, th.nodata, ball);
-    // Unsupported/loading surface ground never falls back to the seat's colour.
-    if (look && look.surf > 0) c = th.nodata;
+    // under a surface a seat's colour gives way to plain ground as the surface comes in, so a seat with no
+    // counted place, which the surface leaves alone, ends plain too (the seats hold until its first picture)
+    if (sfIn > 0 && c) c = mixC(c, th.nodata, sfIn);
     // (another year's map, under a year morph, quiets with the zoom alone)
     const qn = m === M() ? quietness(i, now) : quietAll();
     if (c && qn > 0) c = towards(c, th.bg, qn);
@@ -1998,7 +2001,8 @@ function drawGeo(m, alpha, streetA) {
   // as it is; plain land in a year no seat holds one
   const isls = (m.isl || []).filter((q) => inBox(q.mbb, x0, y0, x1, y1));
   const islFill = (q) => {
-    let c = q.owner == null || (look && look.surf > 0) ? th.nodata : fillDiv(m, q.owner);
+    let c = q.owner == null ? th.nodata : fillDiv(m, q.owner);
+    if (sfIn > 0 && c) c = mixC(c, th.nodata, sfIn);
     const qn = q.owner != null && m === M() ? quietness(q.owner, now) : 0;
     if (c && qn > 0) c = towards(c, th.bg, qn);
     return [c ? css(c) : pat, filt && q.owner != null && !passes(m, q.owner)];
@@ -4522,16 +4526,59 @@ function hitTest(px, py) {
   return null;
 }
 
-/* Surface describes nearby ordinary polling-place results only. It never
-   paints unlocated votes, invents local counts or extrapolates past 25 km.
-   See .build/map/surface-audit.md for the audited method and its limits. */
+/* =============================== how the map is drawn ===============================
+   A lens says what each place reads; the drawing says how that reaches the page.
+     Seats     every seat filled with its own figure (the map as it has always been)
+     Balloons  a circle at every polling place, its area the votes behind the reading
+               (a lead for a lead, a party's votes for a party's share), so a big safe
+               booth outweighs a marginal one and an empty seat holds no ink
+     Surface   the ordinary polling places' own counts blended into one continuous field,
+               in steps, with a line where the two sides meet. No seat's boundary shapes
+               it, and it reaches no further than 25 km from a place
+     Areas     the census's own small areas, each painted as counted
+     Chart     the seats themselves as dots (app-2c-chart.js)
+
+   Balloons and Surface read the lens through boothValue, so every lens's own colours, keys
+   and tooltips carry over. They apply to the map view alone: the chamber and the list keep
+   their seats.
+
+   The surface describes where votes were cast, not where voters live, and only from the
+   ordinary polling places with a spot on the map: no early centre, mobile team or postal
+   vote, no estimate and no seat's figure stands in for a missing count. A spot blends the
+   places within a bandwidth (twice the distance of the fourth nearest, 2 to 25 km) by their
+   ballots under a compact kernel, so past 25 km nothing reaches and the land stays plain,
+   and its colour fades in as the ballots behind it pass 100 to 500. There is one field for a
+   reading, set in kilometres: the zoom never enters into it, so zooming magnifies a place and
+   can't change what it reads. .build/map/surface-audit.md has the method, its checks and its
+   limits.
+
+   The field is exact wherever it's asked: the tooltip asks it directly. A raster reads it
+   exactly on a lattice of pixel corners, coarse where the field is broad and down to the
+   pixel where it's narrow or bends, and fills between by interpolation, working colour out
+   pixel by pixel only where a step's edge or the line crosses; that's what keeps a screen of
+   it cheap enough to redo as the reader zooms. The raster comes back through a worker and is
+   laid on as a canvas pattern through the seats' own fill paths (drawGeo), so the coast, the
+   sea cut, the islands, the filters and the veil over an opened seat all work on it as they
+   do on a flat fill. */
 const DRAWS = [["seats", "Seats"], ["balloons", "Balloons"], ["surface", "Surface"], ["areas", "Areas"], ["chart", "Chart"]];
 // a seat type belongs to the whole seat, and so does its exhausted share: nothing to blend
 function surfaceReason(m) {
   if (S.lens === "seifa") return "Census figures use census areas, not a smoothed polling-place surface. Use Areas or Seats.";
   if (S.lens === "cls" || (S.lens === "informal" && infModeOf(m) === "exhaust")) return "This figure belongs to the whole seat. Use Seats.";
   if ((S.lens === "tpp" && S.tppMode === "swing") || (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap())) return "These changes do not have comparable local count bases for a surface. Use Seats or Balloons.";
+  if (m && !surfaceCounted(m)) return "This election’s polling places have no count of this figure. Use Seats, or Balloons for estimates.";
   return "";
+}
+// whether any place the surface may use counts this reading's figure (one pass, kept per reading)
+let surfCounted = { key: null, has: false };
+function surfaceCounted(m) {
+  const b = m.booth, key = `${readingKey(m)}|${b ? b.n : 0}|${svOf(m) ? 1 : 0}|${spOf(m) ? 1 : 0}`;
+  if (surfCounted.key !== key) {
+    let has = false;
+    if (b) for (let j = 0; j < b.n && !has; j++) has = surfaceEligible(m, j) && surfaceDenominator(m, j) > 0 && (S.lens === "winner" || Number.isFinite(boothValue(m, j)));
+    surfCounted = { key, has };
+  }
+  return surfCounted.has;
 }
 const surfaceFits = (m) => !surfaceReason(m);
 // Areas is the Census lens's own drawing: it needs a census pack for the frame's vintage
@@ -4824,7 +4871,7 @@ function surfaceData(m) {
     D.ch = used.map(() => new Float64Array(n));
     vals.forEach((q, k) => { D.ch[remap[q[0]]][k] += q[2]; D.ch[remap[q[1]]][k] += 1 - q[2]; });
     const nb = LEAD_STEPS.length + 1;
-    D.fam = true; D.nb = nb; D.lo = 0; D.hi = 100;
+    D.fam = true; D.nb = nb; D.lo = 0; D.hi = 100; D.line = 1;
     D.band = new Uint8Array(4096).map((_, k) => { const v = (100 * k) / 4095; let q = 0; while (q < LEAD_STEPS.length && v >= LEAD_STEPS[q]) q++; return q; });
     D.col = new Uint32Array(used.length * nb);
     used.forEach((f, u) => { for (let q = 0; q < nb; q++) D.col[u * nb + q] = rgba32(RAMP.gain[f][Math.round(LEAD_RAMP_AT[q] * 100)]); });
@@ -4832,7 +4879,7 @@ function surfaceData(m) {
   } else {
     D.ch = [Float64Array.from(vals)];
     const sc = surfaceScale(m), e = sc.edges;
-    D.fam = false; D.lo = sc.lo; D.hi = sc.hi;
+    D.fam = false; D.lo = sc.lo; D.hi = sc.hi; D.line = sc.line;
     D.band = new Uint8Array(4096).map((_, k) => { const v = sc.lo + ((sc.hi - sc.lo) * k) / 4095; let q = 0; while (q < e.length && v >= e[q]) q++; return q; });
     D.col = Uint32Array.from({ length: e.length + 1 }, (_, k) => rgba32(colorOf(bandMid(sc, k)) || TH.nodata));
   }
@@ -4842,29 +4889,16 @@ function surfaceData(m) {
 /* A local descriptive surface, not a model of residents. Distances are great-circle
    kilometres; a compact kernel has exactly zero influence outside its radius.
    Four nearest distinct sites set bandwidth (2–25 km); vote counts set the blend.
-   Support is kernel-weighted ballots, not a confidence interval. */
+   Support is kernel-weighted ballots, not a confidence interval.
+   at() is the field itself, exact at any spot. A raster reads it exactly on a lattice of pixel
+   corners: coarse where the bandwidth is wide, finer where it is narrow or the field bends (a
+   cell is never wider than a quarter of the bandwidth at its corners, and its centre, read
+   exactly, must agree with its corners' blend to a tenth of a point), and fills between them
+   by interpolation, working colour out pixel by pixel only where a step's edge or the line
+   crosses. Where support ends, every pixel is read exactly at its centre, so a spot with no
+   estimate is never painted. Self-contained: a worker runs this text. */
 function surfaceEngine() {
-  const cache = new WeakMap(), RAD = Math.PI / 180, EARTH = 6371;
-  const vector = (D, x, y) => D.projection ? [Math.cos(y * RAD) * Math.cos(x * RAD), Math.cos(y * RAD) * Math.sin(x * RAD), Math.sin(y * RAD)] : [x / D.u, y / D.u, 0];
-  const squaredRadius = (D, km) => D.projection ? (2 * Math.sin(km / (2 * EARTH))) ** 2 : km * km;
-  const distanceKm = (D, squared) => D.projection ? 2 * EARTH * Math.asin(Math.min(1, Math.sqrt(squared) / 2)) : Math.sqrt(squared);
-  function build(D) {
-    let c = cache.get(D); if (c) return c;
-    const sites = new Map();
-    for (let i = 0; i < D.n; i++) {
-      if (!(D.w[i] > 0)) continue;
-      const x = D.projection ? D.lon[i] : D.x[i], y = D.projection ? D.lat[i] : D.y[i], key = `${x},${y}`;
-      if (!sites.has(key)) sites.set(key, { point: vector(D, x, y), indices: [] });
-      sites.get(key).indices.push(i);
-    }
-    function tree(rows, depth) {
-      if (!rows.length) return null;
-      const axis = depth % (D.projection ? 3 : 2), mid = rows.length >> 1;
-      rows.sort((a, b) => a.point[axis] - b.point[axis]);
-      return { ...rows[mid], axis, left: tree(rows.slice(0, mid), depth + 1), right: tree(rows.slice(mid + 1), depth + 1) };
-    }
-    c = tree([...sites.values()], 0); cache.set(D, c); return c;
-  }
+  const cache = new WeakMap(), RAD = Math.PI / 180, EARTH = 6371, CELL_KM = 4;
   // Inverse of the map's unreflected, unrotated-screen conic equal-area projection.
   // Frame fits supply their parallels, longitude rotation, scale and centre offset.
   function lonlat(D, x, y) {
@@ -4876,60 +4910,258 @@ function surfaceEngine() {
     const lat = Math.asin(Math.max(-1, Math.min(1, (p.c - (X * X + Y * Y) * p.n * p.n) / (2 * p.n)))) / RAD;
     return [lon, lat];
   }
-  function sample(D, x, y) {
-    const root = build(D), ll = lonlat(D, x, y), point = vector(D, ll[0], ll[1]), max = D.maxKm || 25;
-    const max2 = squaredRadius(D, max), nearestFour = [];
-    const squaredDistance = (node) => (node.point[0] - point[0]) ** 2 + (node.point[1] - point[1]) ** 2 + (node.point[2] - point[2]) ** 2;
-    // Three-dimensional unit-sphere chords preserve great-circle distance order.
-    // The spatial tree avoids scanning every booth in a city for every pixel.
-    function nearest(node) {
-      if (!node) return;
-      const d2 = squaredDistance(node), delta = point[node.axis] - node.point[node.axis];
-      if (d2 < max2) { nearestFour.push(d2); nearestFour.sort((a, b) => a - b); if (nearestFour.length > 4) nearestFour.pop(); }
-      nearest(delta < 0 ? node.left : node.right);
-      if (delta * delta < (nearestFour.length === 4 ? nearestFour[3] : max2)) nearest(delta < 0 ? node.right : node.left);
+  // a spot as a point on the unit sphere (chords keep great-circle order), or in plain kilometres
+  const Q = new Float64Array(3);
+  function spot(D, x, y) {
+    if (!D.projection) { Q[0] = x / D.u; Q[1] = y / D.u; Q[2] = 0; return; }
+    const ll = lonlat(D, x, y), la = ll[1] * RAD, lo = ll[0] * RAD, c = Math.cos(la);
+    Q[0] = c * Math.cos(lo); Q[1] = c * Math.sin(lo); Q[2] = Math.sin(la);
+  }
+  /* The places, once per reading: records at one spot are one site (they share its bandwidth;
+     each record's ballots still count), its ballots and ballot-weighted figures pooled, and the
+     sites filed by row and column of 4km cells on the map's plane. A window on the plane wide
+     enough for R km anywhere near the sites (uMax: the most the projection stretches a
+     kilometre there) holds every site within R km; the true distance decides. */
+  function build(D) {
+    let I = cache.get(D); if (I) return I;
+    const P = D.projection, nc = D.ch.length, at = new Map(), first = [], members = [];
+    for (let i = 0; i < D.n; i++) {
+      if (!(D.w[i] > 0)) continue;
+      const key = P ? D.lon[i] + "," + D.lat[i] : D.x[i] + "," + D.y[i];
+      let s = at.get(key);
+      if (s === undefined) { s = first.length; at.set(key, s); first.push(i); members.push([]); }
+      members[s].push(i);
     }
-    nearest(root);
-    if (!nearestFour.length) return null;
-    const radius = nearestFour.length === 4 ? Math.min(max, Math.max(D.minKm || 2, 2 * distanceKm(D, nearestFour[3]))) : max, radius2 = squaredRadius(D, radius);
-    const values = new Float64Array(D.ch.length); let mass = 0, count = 0, nearestKm = Infinity;
-    function accumulate(node) {
-      if (!node) return;
-      const d2 = squaredDistance(node), delta = point[node.axis] - node.point[node.axis];
-      if (d2 < radius2) {
-        const km = distanceKm(D, d2), t = km / radius, kernel = (1 - t) ** 4 * (1 + 4 * t);
-        for (const i of node.indices) {
-          const w = kernel * D.w[i]; mass += w; count++; nearestKm = Math.min(nearestKm, km);
-          for (let q = 0; q < values.length; q++) values[q] += w * D.ch[q][i];
+    const ns = first.length;
+    let uNom = D.u, stretch = 1;
+    if (P) {
+      uNom = P.k / EARTH;
+      let lo = Infinity, hi = -Infinity;
+      for (const i of first) { if (D.lat[i] < lo) lo = D.lat[i]; if (D.lat[i] > hi) hi = D.lat[i]; }
+      // Albers: a parallel's scale is n·ρ/cos φ, a meridian's its inverse; every direction lies between
+      for (let f = lo - 1; f <= hi + 1.0001; f += 0.05) {
+        const phi = Math.max(-89.5, Math.min(89.5, f)) * RAD, rho = Math.sqrt(Math.max(0, P.c - 2 * P.n * Math.sin(phi))) / Math.abs(P.n), h = (Math.abs(P.n) * rho) / Math.cos(phi);
+        if (h > 0) stretch = Math.max(stretch, h, 1 / h);
+      }
+      stretch *= 1.02;
+    }
+    const cs = CELL_KM * uNom, cx = new Int32Array(ns), cy = new Int32Array(ns), ord = Array.from({ length: ns }, (_, s) => s);
+    for (let s = 0; s < ns; s++) { cx[s] = Math.floor(D.x[first[s]] / cs); cy[s] = Math.floor(D.y[first[s]] / cs); }
+    ord.sort((a, b) => cy[a] - cy[b] || cx[a] - cx[b]);
+    const X = new Float64Array(ns), Y = new Float64Array(ns), Z = new Float64Array(ns), W = new Float64Array(ns), V = new Float64Array(ns * nc), C = new Int32Array(ns);
+    const cy0 = ns ? cy[ord[0]] : 0, rows = ns ? cy[ord[ns - 1]] - cy0 + 1 : 0, cellX = [], cellAt = [], cellRow = [];
+    ord.forEach((s, k) => {
+      const i0 = first[s];
+      if (P) { const la = D.lat[i0] * RAD, lo = D.lon[i0] * RAD, c = Math.cos(la); X[k] = c * Math.cos(lo); Y[k] = c * Math.sin(lo); Z[k] = Math.sin(la); }
+      else { X[k] = D.x[i0] / D.u; Y[k] = D.y[i0] / D.u; }
+      for (const i of members[s]) { W[k] += D.w[i]; C[k]++; for (let q = 0; q < nc; q++) V[k * nc + q] += D.w[i] * D.ch[q][i]; }
+      const n = cellX.length;
+      if (!n || cellX[n - 1] !== cx[s] || cellRow[n - 1] !== cy[s] - cy0) { cellX.push(cx[s]); cellAt.push(k); cellRow.push(cy[s] - cy0); }
+    });
+    cellAt.push(ns);
+    const rowAt = new Int32Array(rows + 1);
+    for (let r = 0, c = 0; r <= rows; r++) { while (c < cellRow.length && cellRow[c] < r) c++; rowAt[r] = c; }
+    I = { ns, nc, X, Y, Z, W, V, C, cs, cy0, rows, rowAt, cellX: Int32Array.from(cellX), cellAt: Int32Array.from(cellAt), uNom, uMax: uNom * stretch, uMin: uNom / stretch, P: !!P, best: new Float64Array(4), d4: 0 };
+    cache.set(D, I);
+    return I;
+  }
+  const r2Of = (I, km) => (I.P ? (2 * Math.sin(km / (2 * EARTH))) ** 2 : km * km);
+  const kmOf = (I, d2) => (I.P ? 2 * EARTH * Math.asin(Math.min(1, Math.sqrt(d2) / 2)) : Math.sqrt(d2));
+  // the sites within R km of the spot in Q (at x, y on the plane): how many, and the four nearest (distance², in I.best)
+  function nearest4(I, x, y, R) {
+    const R2 = r2Of(I, R), Rm = R * I.uMax, cs = I.cs, b = I.best, qx = Q[0], qy = Q[1], qz = Q[2];
+    b[0] = b[1] = b[2] = b[3] = Infinity;
+    let n = 0;
+    const r0 = Math.max(0, Math.floor((y - Rm) / cs) - I.cy0), r1 = Math.min(I.rows - 1, Math.floor((y + Rm) / cs) - I.cy0), c0 = Math.floor((x - Rm) / cs), c1 = Math.floor((x + Rm) / cs);
+    for (let r = r0; r <= r1; r++) {
+      let lo = I.rowAt[r], hi = I.rowAt[r + 1];
+      const end = hi;
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (I.cellX[mid] < c0) lo = mid + 1; else hi = mid; }
+      for (let c = lo; c < end && I.cellX[c] <= c1; c++) for (let k = I.cellAt[c], ke = I.cellAt[c + 1]; k < ke; k++) {
+        const dx = I.X[k] - qx, dy = I.Y[k] - qy, dz = I.Z[k] - qz, d2 = dx * dx + dy * dy + dz * dz;
+        if (d2 < R2) { n++; if (d2 < b[3]) { let p = 3; while (p > 0 && b[p - 1] > d2) { b[p] = b[p - 1]; p--; } b[p] = d2; } }
+      }
+    }
+    return n;
+  }
+  /* The field at x, y into vals (its figures); returns its kernel-weighted ballots, or 0 where
+     support falls short. F.radius, F.count, F.nearest and F.alpha describe it. */
+  const F = { mass: 0, radius: 0, count: 0, nearest: Infinity, alpha: 0 };
+  function field(D, I, x, y, vals) {
+    spot(D, x, y);
+    const max = D.maxKm || 25, min = D.minKm || 2, nc = I.nc;
+    // the bandwidth: twice the fourth nearest site's distance, within [min, max]; max where fewer than four stand within max.
+    // (The search starts near the last spot's fourth nearest, which a neighbouring spot's is close to; it only widens.)
+    let radius = max;
+    for (let R = Math.max(Math.min(min, max) / 2, Math.min(max / 2, 1.25 * I.d4)); ; R = Math.min(2 * R, max / 2)) {
+      if (nearest4(I, x, y, R) >= 4) { const d4 = kmOf(I, I.best[3]); I.d4 = d4; radius = Math.min(max, Math.max(min, 2 * d4)); break; }
+      if (R >= max / 2) { I.d4 = max / 2; break; }
+    }
+    const R2 = r2Of(I, radius), Rm = radius * I.uMax, cs = I.cs, qx = Q[0], qy = Q[1], qz = Q[2];
+    for (let q = 0; q < nc; q++) vals[q] = 0;
+    let mass = 0, count = 0, nearest = Infinity;
+    const r0 = Math.max(0, Math.floor((y - Rm) / cs) - I.cy0), r1 = Math.min(I.rows - 1, Math.floor((y + Rm) / cs) - I.cy0), c0 = Math.floor((x - Rm) / cs), c1 = Math.floor((x + Rm) / cs);
+    for (let r = r0; r <= r1; r++) {
+      let lo = I.rowAt[r], hi = I.rowAt[r + 1];
+      const end = hi;
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (I.cellX[mid] < c0) lo = mid + 1; else hi = mid; }
+      for (let c = lo; c < end && I.cellX[c] <= c1; c++) for (let k = I.cellAt[c], ke = I.cellAt[c + 1]; k < ke; k++) {
+        const dx = I.X[k] - qx, dy = I.Y[k] - qy, dz = I.Z[k] - qz, d2 = dx * dx + dy * dy + dz * dz;
+        if (!(d2 < R2)) continue;
+        const km = kmOf(I, d2), t = km / radius, u = 1 - t, kern = u * u * u * u * (1 + 4 * t);
+        mass += kern * I.W[k]; count += I.C[k]; if (km < nearest) nearest = km;
+        for (let q = 0; q < nc; q++) vals[q] += kern * I.V[k * nc + q];
+      }
+    }
+    F.radius = radius; F.count = count; F.nearest = nearest; F.mass = mass;
+    const need = D.minMass || 100;
+    if (mass < need) { F.alpha = 0; return 0; }
+    for (let q = 0; q < nc; q++) vals[q] /= mass;
+    const a = Math.min(1, Math.max(0, (mass - need) / (D.fadeMass || 400)));
+    F.alpha = a * a * (3 - 2 * a);
+    return mass;
+  }
+  function at(D, x, y) {
+    const I = build(D); if (!I.ns) return null;
+    const values = new Float64Array(I.nc);
+    if (!field(D, I, x, y, values)) return null;
+    return { values, mass: F.mass, count: F.count, nearest: F.nearest, radius: F.radius, alpha: F.alpha };
+  }
+  // the most support any spot within hd km of x, y could have: every site at its nearest, under the widest kernel
+  function bound(D, I, x, y, hd, need) {
+    spot(D, x, y);
+    const max = D.maxKm || 25, R = max + hd, R2 = r2Of(I, Math.min(R, Math.PI * EARTH)), Rm = R * I.uMax, cs = I.cs, qx = Q[0], qy = Q[1], qz = Q[2];
+    let s = 0;
+    const r0 = Math.max(0, Math.floor((y - Rm) / cs) - I.cy0), r1 = Math.min(I.rows - 1, Math.floor((y + Rm) / cs) - I.cy0), c0 = Math.floor((x - Rm) / cs), c1 = Math.floor((x + Rm) / cs);
+    for (let r = r0; r <= r1; r++) {
+      let lo = I.rowAt[r], hi = I.rowAt[r + 1];
+      const end = hi;
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (I.cellX[mid] < c0) lo = mid + 1; else hi = mid; }
+      for (let c = lo; c < end && I.cellX[c] <= c1; c++) for (let k = I.cellAt[c], ke = I.cellAt[c + 1]; k < ke; k++) {
+        const dx = I.X[k] - qx, dy = I.Y[k] - qy, dz = I.Z[k] - qz, d2 = dx * dx + dy * dy + dz * dz;
+        if (!(d2 < R2)) continue;
+        const t = Math.max(0, kmOf(I, d2) - hd) / max;
+        if (t < 1) { const u = 1 - t; s += u * u * u * u * (1 + 4 * t) * I.W[k]; if (s >= need) return s; }
+      }
+    }
+    return s;
+  }
+  // the picture of a window J of the field (pixel (i, j) covers x0 + i·px … x0 + (i + 1)·px)
+  function raster(D, J) {
+    const Wd = J.nx, Ht = J.ny, out = new Uint32Array(Wd * Ht), bg = (D.bg || 0xffeeeeee) >>> 0, I = build(D);
+    if (!I.ns) { out.fill(bg); return { rgba: out.buffer }; }
+    const { band, col, lo, hi, fam, nb } = D, nc = I.nc, sc = 4095 / (hi - lo), px = J.px, x0 = J.x0, y0 = J.y0;
+    const line = D.line == null ? null : D.line, lw = J.lw || 1.5, ink = (D.ink || 0xff000000) >>> 0, need = D.minMass || 100, fade = D.fadeMass || 400;
+    const bgR = bg & 255, bgG = (bg >>> 8) & 255, bgB = (bg >>> 16) & 255, inkR = ink & 255, inkG = (ink >>> 8) & 255, inkB = (ink >>> 16) & 255;
+    const bandOf = (v) => { const k = ((v - lo) * sc) | 0; return band[k < 0 ? 0 : k > 4095 ? 4095 : k]; };
+    const idxOf = (A, o) => {
+      if (!fam) return bandOf(A[o]);
+      let a = 0, va = -Infinity, vb = -Infinity;
+      for (let q = 0; q < nc; q++) { const v = A[o + q]; if (v > va) { vb = va; va = v; a = q; } else if (v > vb) vb = v; }
+      return a * nb + bandOf(100 * (va - Math.max(0, vb)));
+    };
+    const pack = (r, g, b) => (0xff000000 | (Math.round(b) << 16) | (Math.round(g) << 8) | Math.round(r)) >>> 0;
+    const tint = (c, a) => pack(bgR + a * ((c & 255) - bgR), bgG + a * (((c >>> 8) & 255) - bgG), bgB + a * (((c >>> 16) & 255) - bgB));
+    const alphaOf = (mass) => { const t = Math.min(1, Math.max(0, (mass - need) / fade)); return t * t * (3 - 2 * t); };
+    // the exact field at lattice corners, read once each: alpha (−1: no estimate), support, bandwidth on the plane, figures
+    const G = 32, KW = Wd + G + 1, seen = new Map(), vals = new Float64Array(nc);
+    let cap = 4096, nA = new Float32Array(cap), nM = new Float32Array(cap), nR = new Float32Array(cap), nV = new Float32Array(cap * nc), nn = 0;
+    const node = (i, j) => {
+      const key = j * KW + i;
+      let id = seen.get(key);
+      if (id !== undefined) return id;
+      if (nn === cap) { cap *= 2; const a = new Float32Array(cap), mm = new Float32Array(cap), r = new Float32Array(cap), v = new Float32Array(cap * nc); a.set(nA); mm.set(nM); r.set(nR); v.set(nV); nA = a; nM = mm; nR = r; nV = v; }
+      id = nn++;
+      if (field(D, I, x0 + i * px, y0 + j * px, vals)) { nA[id] = F.alpha; nM[id] = F.mass; nR[id] = F.radius * I.uNom; for (let q = 0; q < nc; q++) nV[id * nc + q] = vals[q]; }
+      else nA[id] = -1;
+      seen.set(key, id);
+      return id;
+    };
+    const fill = (i, j, s, c) => { const i1 = Math.min(i + s, Wd), j1 = Math.min(j + s, Ht); for (let y = j; y < j1; y++) out.fill(c, y * Wd + i, y * Wd + i1); };
+    const exacts = (i, j, s) => {
+      for (let y = j, y1 = Math.min(j + s, Ht); y < y1; y++) for (let x = i, x1 = Math.min(i + s, Wd); x < x1; x++)
+        out[y * Wd + x] = field(D, I, x0 + (x + 0.5) * px, y0 + (y + 0.5) * px, vals) ? tint(col[idxOf(vals, 0)], F.alpha) : bg;
+    };
+    const maybe = (i, j, s) => bound(D, I, x0 + (i + s / 2) * px, y0 + (j + s / 2) * px, (s * px * Math.SQRT1_2) / I.uMin, need) >= need;
+    // scratch for a cell's pixel corners: interpolated colour, alpha and the line's signed figure
+    const LN = G + 1, sR = new Float32Array(LN * LN), sG = new Float32Array(LN * LN), sB = new Float32Array(LN * LN), sA = new Float32Array(LN * LN), sF = new Float32Array(LN * LN), iv = new Float64Array(nc);
+    // a cell no wider than a quarter of its bandwidth, with no more than a quarter's change in strength across it, and
+    // its centre within a thousandth of the scale (a tenth of a point on a share) of the corners' blend
+    const FR = 0.25, AVAR = 0.25, AEX = 0.02, tol = (fam ? 1 : hi - lo) * 0.001;
+    function paint(i, j, s, a, b, c, d, amin) {
+      const ia = idxOf(nV, a * nc), ib = idxOf(nV, b * nc), ic = idxOf(nV, c * nc), id = idxOf(nV, d * nc);
+      // the line: where the reading crosses its middle (50 on a two-sided share), or where the lead passes
+      // between the two groups strongest across this cell
+      let lineOn = false, ta = 0, tb = 0;
+      if (line != null) {
+        let fa, fb, fc, fd;
+        if (fam) {
+          let va = -Infinity, vb = -Infinity;
+          for (let q = 0; q < nc; q++) { const v = nV[a * nc + q] + nV[b * nc + q] + nV[c * nc + q] + nV[d * nc + q]; if (v > va) { vb = va; tb = ta; va = v; ta = q; } else if (v > vb) { vb = v; tb = q; } }
+          if (vb === -Infinity) tb = ta;
+          fa = nV[a * nc + ta] - nV[a * nc + tb]; fb = nV[b * nc + ta] - nV[b * nc + tb]; fc = nV[c * nc + ta] - nV[c * nc + tb]; fd = nV[d * nc + ta] - nV[d * nc + tb];
+        } else { fa = nV[a * nc] - line; fb = nV[b * nc] - line; fc = nV[c * nc] - line; fd = nV[d * nc] - line; }
+        const up = (fa >= 0) + (fb >= 0) + (fc >= 0) + (fd >= 0), gx = (fb - fa + fd - fc) / (2 * s), gy = (fc - fa + fd - fb) / (2 * s), g = Math.sqrt(gx * gx + gy * gy);
+        const near = (up > 0 && up < 4) || (g > 1e-9 && Math.min(Math.abs(fa), Math.abs(fb), Math.abs(fc), Math.abs(fd)) / g < lw / 2 + 1.5);
+        lineOn = fam ? ta !== tb && near : near;
+        if (fam && !lineOn) { const lead = (o) => { let k = 0; for (let q = 1; q < nc; q++) if (nV[o + q] > nV[o + k]) k = q; return k; }; const la = lead(a * nc); lineOn = la !== lead(b * nc) || la !== lead(c * nc) || la !== lead(d * nc); }
+      }
+      if (!lineOn && ia === ib && ia === ic && ia === id && amin >= 1) { fill(i, j, s, col[ia]); return; }
+      const ni = Math.min(s, Wd - i), nj = Math.min(s, Ht - j), sat = amin >= 1;
+      for (let v = 0; v <= nj; v++) {
+        const tv = v / s;
+        for (let u = 0; u <= ni; u++) {
+          const tu = u / s, w00 = (1 - tu) * (1 - tv), w10 = tu * (1 - tv), w01 = (1 - tu) * tv, w11 = tu * tv, o = v * LN + u;
+          for (let q = 0; q < nc; q++) iv[q] = w00 * nV[a * nc + q] + w10 * nV[b * nc + q] + w01 * nV[c * nc + q] + w11 * nV[d * nc + q];
+          // (support blends near-linearly, strength doesn't: the support is what's interpolated)
+          const al = sat ? 1 : alphaOf(w00 * nM[a] + w10 * nM[b] + w01 * nM[c] + w11 * nM[d]), cc = col[idxOf(iv, 0)];
+          sR[o] = bgR + al * ((cc & 255) - bgR); sG[o] = bgG + al * (((cc >>> 8) & 255) - bgG); sB[o] = bgB + al * (((cc >>> 16) & 255) - bgB); sA[o] = al;
+          if (lineOn) sF[o] = fam ? iv[ta] - iv[tb] : iv[0] - line;
         }
       }
-      accumulate(delta < 0 ? node.left : node.right);
-      if (delta * delta < radius2) accumulate(delta < 0 ? node.right : node.left);
+      for (let v = 0; v < nj; v++) for (let u = 0; u < ni; u++) {
+        const o = v * LN + u;
+        let R = (sR[o] + sR[o + 1] + sR[o + LN] + sR[o + LN + 1]) / 4, Gn = (sG[o] + sG[o + 1] + sG[o + LN] + sG[o + LN + 1]) / 4, B = (sB[o] + sB[o + 1] + sB[o + LN] + sB[o + LN + 1]) / 4;
+        if (lineOn) {
+          const f0 = sF[o], f1 = sF[o + 1], f2 = sF[o + LN], f3 = sF[o + LN + 1], m = (f0 + f1 + f2 + f3) / 4, gx = (f1 + f3 - f0 - f2) / 2, gy = (f2 + f3 - f0 - f1) / 2, g = Math.sqrt(gx * gx + gy * gy);
+          const dist = g > 1e-6 ? Math.abs(m) / g : 9, cov = dist >= lw / 2 + 0.5 ? 0 : dist <= lw / 2 - 0.5 ? 1 : lw / 2 + 0.5 - dist;
+          // (ink on pale ground shows long after a fill has faded, so the line fades the faster, with the square)
+          if (cov > 0) { const al = (sA[o] + sA[o + 1] + sA[o + LN] + sA[o + LN + 1]) / 4, k = cov * al * al; R += (inkR - R) * k; Gn += (inkG - Gn) * k; B += (inkB - B) * k; }
+        }
+        out[(j + v) * Wd + i + u] = pack(R, Gn, B);
+      }
     }
-    accumulate(root);
-    if (mass < (D.minMass || 100)) return null;
-    for (let q = 0; q < values.length; q++) values[q] /= mass;
-    const a = Math.min(1, Math.max(0, (mass - (D.minMass || 100)) / (D.fadeMass || 400)));
-    return { values, mass, count, nearest: nearestKm, radius, alpha: a * a * (3 - 2 * a) };
-  }
-  function at(D, x, y) { return sample(D, x, y); }
-  function raster(D, J) {
-    const out = new Uint32Array(J.nx * J.ny), { band, col, lo, hi, fam, nb } = D, scale = 4095 / (hi - lo);
-    const bg = D.bg || 0xffeeeeee, bandOf = (v) => band[Math.max(0, Math.min(4095, Math.floor((v - lo) * scale)))];
-    // Every pixel samples the same field as the tooltip. No interpolating across
-    // missing cells: an unsupported pixel stays neutral at every zoom.
-    for (let y = 0, o = 0; y < J.ny; y++) for (let x = 0; x < J.nx; x++, o++) {
-      const s = sample(D, J.x0 + (x + 0.5) * J.px, J.y0 + (y + 0.5) * J.px);
-      if (!s) { out[o] = bg; continue; }
-      let color;
-      if (fam) {
-        let winner = 0, first = -Infinity, second = -Infinity;
-        s.values.forEach((v, q) => { if (v > first) { second = first; first = v; winner = q; } else if (v > second) second = v; });
-        color = col[winner * nb + bandOf(100 * (first - Math.max(0, second)))];
-      } else color = col[bandOf(s.values[0])];
-      const a = s.alpha, r = (bg & 255) + a * ((color & 255) - (bg & 255)), g = ((bg >>> 8) & 255) + a * (((color >>> 8) & 255) - ((bg >>> 8) & 255)), b = ((bg >>> 16) & 255) + a * (((color >>> 16) & 255) - ((bg >>> 16) & 255));
-      out[o] = (0xff000000 | (Math.round(b) << 16) | (Math.round(g) << 8) | Math.round(r)) >>> 0;
+    function cell(i, j, s) {
+      if (i >= Wd || j >= Ht) return;
+      const a = node(i, j), b = node(i + s, j), c = node(i, j + s), d = node(i + s, j + s);
+      const Aa = nA[a], Ab = nA[b], Ac = nA[c], Ad = nA[d], none = (Aa < 0) + (Ab < 0) + (Ac < 0) + (Ad < 0);
+      if (none === 4) {
+        // nothing at the corners: plain ground, unless some spot inside could still reach support
+        if (s <= 2) exacts(i, j, s);
+        else if (!maybe(i, j, s)) fill(i, j, s, bg);
+        else split(i, j, s);
+        return;
+      }
+      const amin = Math.min(Aa, Ab, Ac, Ad);
+      // where support begins or fades to nothing, every pixel is read at its own centre
+      if (none || amin < AEX) { if (s > 4) split(i, j, s); else exacts(i, j, s); return; }
+      if (s > 1) {
+        if (s * px > FR * Math.min(nR[a], nR[b], nR[c], nR[d]) || Math.max(Aa, Ab, Ac, Ad) - amin > AVAR) { split(i, j, s); return; }
+        // the field bends where its bandwidth turns: the centre, read exactly, has to agree with the corners' blend
+        const e = node(i + (s >> 1), j + (s >> 1));
+        if (nA[e] < AEX) { split(i, j, s); return; }
+        if (fam) {
+          // only the two groups that lead at the centre decide the colour
+          let ta = 0, tb = -1;
+          for (let q = 1; q < nc; q++) { const v = nV[e * nc + q]; if (v > nV[e * nc + ta]) { tb = ta; ta = q; } else if (tb < 0 || v > nV[e * nc + tb]) tb = q; }
+          for (const q of tb < 0 ? [ta] : [ta, tb]) if (Math.abs(nV[e * nc + q] - (nV[a * nc + q] + nV[b * nc + q] + nV[c * nc + q] + nV[d * nc + q]) / 4) > tol) { split(i, j, s); return; }
+        } else if (Math.abs(nV[e * nc] - (nV[a * nc] + nV[b * nc] + nV[c * nc] + nV[d * nc]) / 4) > tol) { split(i, j, s); return; }
+        if (amin < 1 && Math.abs(nM[e] - (nM[a] + nM[b] + nM[c] + nM[d]) / 4) > 0.02 * Math.max(nM[e], need)) { split(i, j, s); return; }
+      }
+      paint(i, j, s, a, b, c, d, amin);
     }
+    function split(i, j, s) { const h = s >> 1; cell(i, j, h); cell(i + h, j, h); cell(i, j + h, h); cell(i + h, j + h, h); }
+    for (let j = 0; j < Ht; j += G) for (let i = 0; i < Wd; i += G) cell(i, j, G);
     return { rgba: out.buffer };
   }
   return { at, raster, lonlat };
@@ -4984,8 +5216,16 @@ async function surfaceDone(q) {
 }
 const closeLayer = (L) => { if (L.src && L.src.close) L.src.close(); };
 function surfaceStart(m, key) {
-  for (const L of [SF.base, SF.view, ...(SF.old || [])].filter(Boolean)) closeLayer(L);
+  // the reading before crossfades away, carried onto this election's plane; another jurisdiction's just goes
+  const old = [SF.base, SF.view].filter(Boolean);
+  if (SF.old) SF.old.forEach(closeLayer);
   SF.old = null; SF.base = SF.view = null;
+  if (old.length && SF.m === m) SF.old = old;
+  else if (old.length && SF.m && !reduceMotion && jurOf(SF.m.year) === jurOf(m.year)) {
+    const A = frameMap(SF.m, m);
+    old.forEach((L) => L.pat.setTransform(new DOMMatrix([A.a * L.J.px, 0, 0, A.a * L.J.px, A.a * L.J.x0 + A.bx, A.a * L.J.y0 + A.by])));
+    SF.old = old;
+  } else old.forEach(closeLayer);
   SF.key = key; SF.m = m; SF.sent = null; SF.here = null;
   const d = surfaceData(m);
   SF.empty = !d; SF.data = d ? d.D : null; SF.sources = new Set(d ? d.D.boothIndex : []); SF.none = d ? d.none : null; SF.ids = d ? d.D.ids || null : null;
@@ -5002,8 +5242,8 @@ function surfaceTick(m) {
     surfaceJob({ base: true, px, x0, y0, nx: Math.ceil((1.16 * hw) / c + 1) * 3, ny: Math.ceil((1.16 * hh) / c + 1) * 3, lw: 1.5 });
     return;
   }
-  // Two CSS pixels are sufficient for the smoothed field; point readings remain exact.
-  const q = 0.5, want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
+  // the view's raster at the screen's own grain, to 1.5 device pixels a CSS pixel
+  const q = Math.min(dpr, 1.5), want = 2 ** (Math.round(2 * Math.log2(1 / (T.k * q))) / 2);
   if (want >= SF.base.J.px * 0.8) { if (SF.view) { closeLayer(SF.view); SF.view = null; } return; }
   const [vx0, vy0, vx1, vy1] = viewBox(), V = SF.view;
   if (V && Math.abs(Math.log2(V.J.px / want)) < 0.26 && V.x0 <= vx0 && V.y0 <= vy0 && V.x1 >= vx1 && V.y1 >= vy1) return;
