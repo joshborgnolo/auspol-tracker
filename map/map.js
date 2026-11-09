@@ -10200,8 +10200,10 @@ function seatHedDek(m, d) {
     case "winner": {
       if (d.by) {
         if (m.year === "now" && d.n === "Farrer") {
-          const hed = `One Nation’s David Farley won Farrer at the May 2026 by-election`;
-          const dek = `He beat the independent Michelle Milthorpe ${f1(d.winPct)}–${f1(100 - d.winPct)} after preferences. Sussan Ley had held the seat for the Liberals since 2001; their candidate, Raissa Butkowski, ran third on ${f1(d.fp.lnp ? (100 * d.c.find((c) => c.ab === "LP").v) / d.formal : 0)}% of first preferences. Labor didn’t stand.`;
+          // copy as dictated 2026-11-09: the Ley tenure is the by-election's
+          // one line of history, the final count's margin speaks for itself
+          const hed = `David Farley won Farrer for One Nation in the May 2026 by-election`;
+          const dek = `Former Liberal leader Sussan Ley had held the seat for the Liberals since 2001.`;
           return { hed, dek };
         }
         // every other by-election seat: the record speaks for itself
@@ -10221,7 +10223,7 @@ function seatHedDek(m, d) {
       let hed;
       const ch = d.change;
       if (ch.kind === "re") hed = close ? `${ds(d.win.n)} held ${ds(d.n)} by ${int(d.votesMargin)} votes` : `${ds(d.win.n)} held ${ds(d.n)}`;
-      else if (ch.kind === "held") hed = `${ds(d.win.n)} kept ${ds(d.n)} for ${ds(wParty)}`;
+      else if (ch.kind === "held") hed = `${ds(d.win.n)} retained ${ds(d.n)} for ${ds(wParty)}`;
       else if (ch.kind === "gain") hed = ch.prev && FAM(ch.prev[2]) === d.win.fam ? `${ds(d.win.n)} won ${ds(d.n)} from ${ds(ch.prev[3])}` : `${ds(d.win.n)} won ${ds(d.n)} from ${ds(theParty(ch.prev[2]))}`;
       else if (ch.kind === "new") hed = `${ds(d.win.n)} won the new seat of ${ds(d.n)}`;
       else hed = `${ds(d.win.n)} won ${ds(d.n)}`;
@@ -10337,7 +10339,9 @@ function storyDiv(m, i) {
   const { hed, dek } = seatHedDek(m, d);
   const meta = `${d.cls ? esc(CLS_SHORT[d.cls]) + " · " : ""}${esc(STATE_TITLE[d.st])}${d.by ? ` · by-election, ${longDate(d.by.date)}` : ""}`;
   // the seat's figures lead its card (the Final count, any notional two-party
-  // count, the primaries), and the lens's finding follows them in prose
+  // count, the primaries); the winner lens's verdict closes with the final
+  // count, above the primaries (user call 2026-11-09) — every other lens's
+  // finding follows the figures in prose
   let figs = seatFinalStat(m, d);
   /* the AEC's notional two-party count, where the final pair wasn't the
      majors: the same head-block idiom as the Final count (the name of the
@@ -10347,8 +10351,10 @@ function storyDiv(m, i) {
     const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coal, "", true, ["Labor", coal]);
     figs += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
   }
+  const seatFind = S.lens === "winner" && (hed || dek);
+  if (seatFind) figs += findingHTML(hed, dek, false);
   figs += seatPrimariesStat(m, d);
-  let h = head(d.n, meta, hed, dek, figs);
+  let h = head(d.n, meta, seatFind ? "" : hed, seatFind ? "" : dek, figs);
   const prevDiv = d.by ? d.by.prev : null;
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
