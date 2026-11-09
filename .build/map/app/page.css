@@ -319,7 +319,6 @@ button { cursor: pointer; background: none; border: 0; }
 .st-up svg { flex: none; }
 .st-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .st-head h2 { font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; }
-.st-head .rd-meta { flex-basis: 100%; margin-top: 3px; }
 .st-hed { margin-top: 14px; font-family: var(--serif); font-weight: 700; font-size: 32px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
 /* the Winner lens's head: result, swing, seats, each seat count's change beneath it */
 .st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 8px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; position: relative; }
