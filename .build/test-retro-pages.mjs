@@ -64,6 +64,13 @@ const block = (p, k) => opening(p).blocks.find((b) => b.k === k);
   assert.deepEqual(pv.stats.map((s) => [s.name, s.v]), L.primaryOrder.map((id) => [NAME[id], L.primary[id].toFixed(1)]), "the primary votes are latest.primary, in the site's order");
   const hb = block(P(now, "leaders"), "hbars").bars[0];
   assert.deepEqual([hb.a.v, hb.b.v], [LN.alb_pref.v.toFixed(1), LN.taylor_pref.v.toFixed(1)], "preferred PM, head to head, is leaderNow's");
+  // Leaders' two tab strips (Preferred PM, Net approval), every pairing; the three-way bar's three shares
+  const ld = P(now, "leaders");
+  assert.equal(ld.ctl.length, 2, "Leaders offers both of the modern section's tab strips");
+  assert.equal(Object.keys(ld.variants).length, ld.ctl[0].opts.length * ld.ctl[1].opts.length, "every pairing of the two strips");
+  const three = ld.variants[ld.ctl[0].opts.find((o) => /three/i.test(o.v)).v + "|" + ld.ctl[1].def].blocks.find((b) => b.k === "hbars").bars[0];
+  const want3 = [["Albanese", LN.alb_pref3.v], ["Hanson", LN.hanson_pref3.v], ["Taylor", LN.taylor_pref3.v]].sort((x, y) => y[1] - x[1]);
+  assert.deepEqual(three.segs.map((g) => [g.name, g.v]), want3.map(([n, v]) => [n, v.toFixed(1)]), "the three-way bar: all three leaders, leaderNow's three-way shares");
   const dir = block(P(now, "mood"), "dir");
   assert.deepEqual(dir.figs.map((f) => f.v), [DN.right.toFixed(1), DN.wrong.toFixed(1)], "the national mood is directionNow's");
   const cs = block(P(cyc, "measures"), "cs").groups[0].rows[0];

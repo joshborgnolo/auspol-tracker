@@ -186,10 +186,13 @@ R.chart = function chart(spec, o = {}) {
   // the axes over everything
   out.push(`<path class="rc-axis" d="M${L} ${T}V${T + ph}H${w - Rm}"/>`);
   // words on the plot: the modern chart's notes (▲ Labor ahead …)
-  for (const [nx, ny, dy, t] of spec.notes) {
+  for (const [nx, ny, dy, t, end] of spec.notes) {
     if (ny == null || ny < y0 || ny > y1) continue;
-    const x = nx === "left" ? L + (small ? 3 : 6) : X(nx);
-    out.push(`<text class="rc-note" x="${num(x)}" y="${num(Y(ny) + dy * 0.9)}" font-size="${small ? 9 : 10}">${esc(t)}</text>`);
+    const x = nx === "left" ? L + (small ? 3 : 6) : X(nx), nf = small ? 9 : 10;
+    // alternatives: the longest wording that fits before its span ends, else the shortest
+    const room = end != null ? X(end) - x - 6 : w - Rm - x - 4;
+    const words = Array.isArray(t) ? (t.find((s) => textW(s, nf) <= room) || t[t.length - 1]) : t;
+    out.push(`<text class="rc-note" x="${num(x)}" y="${num(Y(ny) + dy * 0.9)}" font-size="${nf}">${esc(words)}</text>`);
   }
   // each line's name at its end, pushed apart where two ends meet
   if (endW) {
@@ -304,13 +307,19 @@ const BLOCK = {
     };
     return `<div class="rp-well"><table class="rp-t rp-polls"><thead>${head}</thead><tbody>${b.rows.map((r) => row(r, false) + (r.subs || []).map((s) => row(s, true)).join("")).join("")}</tbody></table></div>`;
   },
-  // preferred PM: a bar per contest, each leader's share, "neither" between
+  // preferred PM: a bar per question, each leader's share in turn, "neither" after the first (as the modern bar sets it)
   hbars: (b) => `<div class="rp-hbars">${b.bars.map((x) => {
-    const pa = partyOf(x.a && x.a.name) || "alp", pb = partyOf(x.b && x.b.name) || "lnp";
-    const wa = x.a && x.a.w != null ? x.a.w : x.a ? parseFloat(x.a.v) : 0, wb = x.b && x.b.w != null ? x.b.w : x.b ? parseFloat(x.b.v) : 0, wn = x.neither && x.neither.w != null ? x.neither.w : Math.max(0, 100 - wa - wb);
-    return `<div class="rp-hb"><p class="rp-hbtop"><b>${esc(x.title)}</b><span class="rp-k-${pa}">${esc(x.lead)}</span></p>`
-      + `<div class="rp-hbbar" role="img" aria-label="${esc(`${x.a ? x.a.name + " " + x.a.v : ""}, ${x.b ? x.b.name + " " + x.b.v : ""}`)}"><span class="rp-hbseg rp-b-${pa}" style="width:${num(wa)}%">${x.a ? `${esc(x.a.name)} <b>${esc(x.a.v)}</b>` : ""}</span><span class="rp-hbseg rp-hbn" style="width:${num(wn)}%">${x.neither ? esc(x.neither.t) : ""}</span><span class="rp-hbseg rp-b-${pb}" style="width:${num(wb)}%">${x.b ? `${esc(x.b.name)} <b>${esc(x.b.v)}</b>` : ""}</span></div>`
-      + (x.ci.length ? `<p class="rp-hbci"><span>${esc(x.ci[0] || "")}</span><span>${esc(x.ci[1] || "")}</span></p>` : "") + `</div>`;
+    const segs = (x.segs && x.segs.length ? x.segs : [x.a, x.b]).filter(Boolean);
+    const sum = segs.reduce((t, g) => t + (g.w != null ? g.w : parseFloat(g.v) || 0), 0);
+    const wn = x.neither && x.neither.w != null ? x.neither.w : Math.max(0, 100 - sum);
+    const seg = (g) => { const p = partyOf(g.name) || "oth"; return `<span class="rp-hbseg rp-b-${p}" style="width:${num(g.w != null ? g.w : parseFloat(g.v) || 0)}%">${esc(g.name)} <b>${esc(g.v)}</b></span>`; };
+    const nei = x.neither ? `<span class="rp-hbseg rp-hbn" style="width:${num(wn)}%">${esc(x.neither.t)}</span>` : "";
+    // head to head, "neither" sits between the two; in the three-way question it closes the bar
+    const parts = segs.length === 2 ? [seg(segs[0]), nei, seg(segs[1])] : [...segs.map(seg), nei];
+    const p0 = partyOf(segs[0] && segs[0].name) || "alp";
+    return `<div class="rp-hb"><p class="rp-hbtop"><b>${esc(x.title)}</b><span class="rp-k-${p0}">${esc(x.lead)}</span></p>`
+      + `<div class="rp-hbbar${segs.length > 2 ? " rp-hb3" : ""}" role="img" aria-label="${esc(segs.map((g) => g.name + " " + g.v).join(", "))}">${parts.join("")}</div>`
+      + (x.ci.length ? `<p class="rp-hbci">${x.ci.map((c) => `<span>${esc(c)}</span>`).join("")}</p>` : "") + `</div>`;
   }).join("")}</div>`,
   // net approval: a row per leader, the reading on a trackbar with its interval
   dp: (b) => `<div class="rp-well"><table class="rp-t rp-dp"><thead><tr><th scope="col">Leader</th><th scope="col" class="rp-dpaxis">${(b.axis || []).map(([l, t]) => `<span style="left:${num(l)}%">${esc(t)}</span>`).join("")}</th><th scope="col" class="r">${esc(b.head[2] || "Now")}</th><th scope="col" class="r">${esc(b.head[3] || "Change")}</th></tr></thead><tbody>`

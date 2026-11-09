@@ -58,6 +58,15 @@ await page.click('.rt-tabs [data-rp-tab="polls"]'); await sleep(150);
 await page.click('#polls .rp-ptabs [data-v="primary"]'); await sleep(250);
 const pl = await page.evaluate(() => ({ head: document.querySelector("#polls thead").textContent, dis: document.querySelector('#polls select[data-ctl="c"]').disabled, rows: document.querySelectorAll("#polls tbody tr").length }));
 check("latest polls: the primary tab, its contest switch off", pl.dis && pl.rows >= 6, pl);
+// Leaders: the Preferred PM strip's three-way view draws all three leaders; Net approval's favourability re-reads the ratings
+await page.click('.rt-tabs [data-rp-tab="leaders"]'); await sleep(150);
+const ldA = await page.evaluate(() => [...document.querySelectorAll("#leaders .rp-dp tbody td.r b")].map((b) => b.textContent));
+await page.click('#leaders .rp-ptabs [data-ctl="a"][data-v="three-way"]'); await sleep(250);
+const ld3 = await page.evaluate(() => ({ segs: [...document.querySelectorAll("#leaders .rp-hb3 .rp-hbseg:not(.rp-hbn)")].map((s) => s.textContent.trim()), hash: location.hash }));
+check("Leaders: the three-way view draws all three leaders' shares", ld3.segs.length === 3 && ld3.segs.some((s) => /^Hanson/.test(s)) && /leaders=three-way\./.test(ld3.hash), ld3);
+await page.click('#leaders .rp-ptabs [data-ctl="b"][data-v="favourability"]'); await sleep(250);
+const ldB = await page.evaluate(() => [...document.querySelectorAll("#leaders .rp-dp tbody td.r b")].map((b) => b.textContent));
+check("Leaders: favourability re-reads the net ratings", ldB.length === 3 && JSON.stringify(ldB) !== JSON.stringify(ldA), [ldA, ldB]);
 // a pasted link opens its view, drawn
 await go("/retro/", "v=voters&who=place.greens");
 const pasted = await page.evaluate(() => ({ view: document.documentElement.dataset.rpView, hed: document.querySelector("#who .rp-hed").textContent, tab: document.querySelector('#who .rp-ptabs [aria-selected="true"]').dataset.v, party: document.querySelector('#who select[data-ctl="p"]').value }));

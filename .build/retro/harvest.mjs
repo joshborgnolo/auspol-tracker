@@ -331,7 +331,12 @@ export function chartSpec(P, extra = {}) {
     dots: [...dots].map(([k, xy]) => { const [c, h] = k.split("|"); return [c, +h, xy]; }),
     marks: (P.marks || []).filter((m) => fin(m.x) && fin(m.y)).map((m) => [xi(m.x), r2(m.y), m.color || "var(--ink)", m.label || ""]),
     refs: (P.refLines || []).filter((r) => fin(r.y)).map((r) => [r2(r.y), r.label || ""]),
-    notes: (P.notes || []).filter((n) => n && n.text).map((n) => [n.x === "left" || !fin(n.x) ? "left" : xi(n.x), fin(n.y) ? r2(n.y) : null, n.dy || 0, String(n.text)]),
+    /* a note's words, or its alternatives longest first (the modern chart
+       fits the longest its span holds), and where that span ends */
+    notes: (P.notes || []).filter((n) => n && n.text).map((n) => {
+      const end = Array.isArray(n.span) && n.span[1] && fin(n.span[1].data) ? xi(n.span[1].data) : null;
+      return [n.x === "left" || !fin(n.x) ? "left" : xi(n.x), fin(n.y) ? r2(n.y) : null, n.dy || 0, Array.isArray(n.text) ? n.text.map(String) : String(n.text), end];
+    }),
     events: (P.events || []).filter((e) => fin(e.x)).map((e) => [xi(e.x), String(e.short || e.label || "")]),
     h: P.heightPx || 300,
     ...extra,

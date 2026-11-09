@@ -112,7 +112,8 @@ export function panelHTML(p, bodyHTML, ctlHTML = "") {
 export function ctlHTML(p) {
   if (!p.ctl || !p.ctl.length) return "";
   return `<div class="rp-ctl" role="toolbar" aria-label="${esc(p.title)} options">${p.ctl.map((c) => {
-    if (c.kind === "tabs") return `<span class="rp-ptabs" role="tablist" aria-label="${esc(c.label)}">${c.opts.map((x) => `<button type="button" role="tab" data-ctl="${esc(c.id)}" data-v="${esc(x.v)}" aria-selected="${x.v === c.def}">${esc(x.l)}</button>`).join("")}</span>`;
+    // a strip names itself where a panel has two (Leaders' Preferred PM and Net approval)
+    if (c.kind === "tabs") return `${c.show ? `<span class="rp-ctlgrp"><span class="rp-cl">${esc(c.label)}</span>` : ""}<span class="rp-ptabs" role="tablist" aria-label="${esc(c.label)}">${c.opts.map((x) => `<button type="button" role="tab" data-ctl="${esc(c.id)}" data-v="${esc(x.v)}" aria-selected="${x.v === c.def}">${esc(x.l)}</button>`).join("")}</span>${c.show ? "</span>" : ""}`;
     if (c.kind === "radio") return `<span class="rp-radios" role="radiogroup" aria-label="${esc(c.label)}"><span class="rp-cl">${esc(c.label)}</span>${c.opts.map((x) => `<label><input type="radio" name="${esc(p.id + "-" + c.id)}" data-ctl="${esc(c.id)}" value="${esc(x.v)}"${x.v === c.def ? " checked" : ""}> ${esc(x.l)}</label>`).join("")}</span>`;
     return `<label class="rp-sel"><span class="rp-cl">${esc(c.label)}</span><select data-ctl="${esc(c.id)}">${c.opts.map((x) => `<option value="${esc(x.v)}"${x.v === c.def ? " selected" : ""}>${esc(x.l)}</option>`).join("")}</select></label>`;
   }).join("")}</div>`;

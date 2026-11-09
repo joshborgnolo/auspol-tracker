@@ -95,10 +95,11 @@ function headBars(t) {
     const top = q(hb, ".rd-hb-top"), segs = qa(hb, ".rd-hb-seg");
     const seg = (s) => s && { name: W(q(s, ".rd-hb-name")), v: W(find(s, (x) => x.tag === "b")), w: wOf(s) };
     const cis = q(hb, ".rd-hb-cis");
+    // every leader's segment (two head to head, three in the three-way question), "neither" apart
     const ab = segs.filter((s) => !hasCls(s, "rd-hb-neither"));
     const ne = segs.find((s) => hasCls(s, "rd-hb-neither"));
     return { title: W(find(top, (x) => x.tag === "b")), lead: W(find(top, (x) => x.tag === "span")),
-      a: seg(ab[0]), b: seg(ab[1]), neither: ne ? { t: W(ne), w: wOf(ne) } : null,
+      a: seg(ab[0]), b: seg(ab[1]), segs: ab.map(seg), neither: ne ? { t: W(ne), w: wOf(ne) } : null,
       ci: cis ? els(cis).map(W).filter(Boolean) : [] };
   }) };
 }

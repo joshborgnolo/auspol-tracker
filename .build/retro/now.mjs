@@ -35,7 +35,7 @@ const PANELS = [
   { id: "primary", view: "vote", comp: "PrimaryVotePanel" },
   { id: "decided", view: "vote", comp: "UndecidedPanel", tabs: "rd-un-tabs" },
   { id: "polls", view: "polls", comp: "PollsterTable", tabs: "rd-pl-tabs", flip: true },
-  { id: "leaders", view: "leaders", comp: "LeadershipSection" },
+  { id: "leaders", view: "leaders", comp: "LeadershipSection", ldTabs: true },
   { id: "who", view: "voters", comp: "DemographicsPanel", tabs: "rd-wv-tabs", chips: true },
   { id: "switching", view: "voters", comp: "OnSourcesPanel" },
   { id: "mood", view: "mood", comp: "DirectionPanel", tabs: "rd-mood-tabs" },
@@ -70,6 +70,29 @@ function harvestPanel(M, p, heroProps) {
   const h0 = mount();
   const base = read(h0);
   const ctl = [], variants = {};
+  if (p.ldTabs) {
+    /* Leaders: two sub-panels, each with its own tabs (Preferred PM: two-way,
+       three-way or both; Net approval: approval, favourability or both) -
+       every pairing harvested, each sub-panel's tab pressed inside it */
+    const subs = (h) => findAll(h.tree, (t) => hasCls(t, "rd-ld-panel"));
+    const strips = subs(h0).map((sp) => ({
+      label: words(find(sp, (t) => hasCls(t, "rd-sub"))),
+      tabs: findAll(find(sp, (t) => hasCls(t, "rd-tabs")), (t) => t.tag === "button" && hasCls(t, "rd-tab")).map((b) => ({ l: words(b), on: b.props["aria-pressed"] === true })),
+    })).filter((x) => x.tabs.length > 1);
+    if (strips.length !== 2) throw new Error("retro Now: the leadership section's two tab strips didn't read");
+    const ids = ["a", "b"];
+    strips.forEach((x, i) => { const d = x.tabs.find((t) => t.on) || x.tabs[0]; ctl.push({ id: ids[i], kind: "tabs", show: true, label: x.label, opts: x.tabs.map((t) => ({ v: slug(t.l), l: t.l })), def: slug(d.l) }); });
+    for (const ta of strips[0].tabs) for (const tb of strips[1].tabs) {
+      const h = mount();
+      for (const [i, t] of [[0, ta], [1, tb]]) {
+        if (t.on) continue;
+        const btn = find(subs(h)[i], (x) => x.tag === "button" && hasCls(x, "rd-tab") && words(x) === t.l);
+        press(h, (x) => x === btn);
+      }
+      variants[slug(ta.l) + "|" + slug(tb.l)] = read(h);
+    }
+    return { ...base, ctl, variants, def: ctl.map((c) => c.def).join("|") };
+  }
   const tabs = p.tabs ? tabsOf(h0.tree, p.tabs) : null;
   if (p.chips) {
     // who votes for whom: every group tab for every party chip
