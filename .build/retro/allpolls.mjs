@@ -360,8 +360,13 @@ const HOUSE = `<svg class="rt-house" viewBox="0 0 210 58" aria-hidden="true"><g 
    the bar's views but Now, which is Home, then the More menu's), with the
    two retro pages pointing at each other: All polls is this page, the
    Electoral map opens in its retro view. */
+/* The site's pages that have a retro twin, and where it is: the navbar of
+   every retro page (this one, the Electoral map's retro view, and the Now
+   and Past cycles twins, .build/retro/now.mjs and cycles.mjs) opens the
+   twin, so a reader in the old look stays in it. Home is the Now twin. */
+export const RETRO_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/", "/map/": "/map/#retro=1" };
 export function retroPages(shellPages) {
-  const twin = (p) => (p.href === "/allpolls/" ? { ...p, href: "/allpolls/retro/" } : p.href === "/map/" ? { ...p, href: "/map/#retro=1" } : p);
+  const twin = (p) => (RETRO_TWIN[p.href] ? { ...p, href: RETRO_TWIN[p.href] } : p);
   const tabs = shellPages.tabs.filter((t) => t.href !== "/").map(twin);
   const more = shellPages.menu.filter((m) => !shellPages.tabs.some((t) => t.href === m.href)).map(twin);
   return { tabs: tabs.map(({ label, href }) => ({ label, href })), more: more.map(({ label, href }) => ({ label, href })) };
@@ -413,11 +418,11 @@ ${read("allpolls.css")}
 <div class="ap-frame">
 <div class="rt-top">
   <nav class="rt-nav" aria-label="Site and page">
-    <a class="rt-ni" href="/" title="auspol tracker’s home page">${ICON.home}Home</a>${mi("edit", "Edit")}${mi("view", "View")}${mi("fav", "Favorites", ICON.star)}${mi("help", "Help")}
+    <a class="rt-ni" href="/retro/" title="auspol tracker’s home page">${ICON.home}Home</a>${mi("edit", "Edit")}${mi("view", "View")}${mi("fav", "Favorites", ICON.star)}${mi("help", "Help")}
     <span class="rt-navgap"></span>
     <span class="rt-pages">${pages.tabs.map((p) => `<a href="${esc(p.href)}"${p.href === "/allpolls/retro/" ? ' aria-current="page"' : ""}>${esc(p.label)}</a>`).join("")}${mi("more", `More pages ${ICON.dd}`)}</span>${mi("pages", `Pages ${ICON.dd}`).replace('class="rt-ni"', 'class="rt-ni rt-pagesb"')}
   </nav>
-  <div class="rt-banner"><a class="rt-home" href="/" title="auspol tracker: the interactive tracker">${FLAG}</a><div class="rt-bcol"><a class="rt-kicker" href="/">auspol tracker</a><span class="rt-bline"><h1 class="rt-btitle">All polls</h1><span class="rt-bmeta">${esc(meta)}</span></span></div>${HOUSE}</div>
+  <div class="rt-banner"><a class="rt-home" href="/retro/" title="auspol tracker: the tracker’s home page">${FLAG}</a><div class="rt-bcol"><a class="rt-kicker" href="/retro/">auspol tracker</a><span class="rt-bline"><h1 class="rt-btitle">All polls</h1><span class="rt-bmeta">${esc(meta)}</span></span></div>${HOUSE}</div>
   <div class="rt-tabs" role="tablist" aria-label="Measure">${RA.TABS.map((x) => `<button type="button" role="tab" data-ap-tab="${x.id}" aria-selected="${x.id === st.m}">${ICON[x.id]}<span class="rt-tl">${x.label}</span><span class="ap-ts">${x.short}</span></button>`).join("")}<button type="button" class="rt-modern" data-ap="modern" title="Back to the modern look">${ICON.modern}<span class="rt-tl">Modern view</span></button></div>
 </div>
 <main id="ap-main">
@@ -503,3 +508,6 @@ ${client}
 `;
   return { html, data: D };
 }
+
+// the art every retro page's banner and navbar wear (.build/retro/page.mjs draws the Now and Past cycles twins with it)
+export { ICON as RT_ICON, FLAG as RT_FLAG, HOUSE as RT_HOUSE };

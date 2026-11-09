@@ -70,13 +70,16 @@ function rtHouseSVG() {
     <path d="M105.6 2.4 h10 v6 h-10z" fill="#00247d" stroke="#cfe0ff" stroke-width=".6"/><path d="M105.6 2.4 h4 v3 h-4z" fill="#cf142b" opacity=".85"/></svg>`;
 }
 /* the site's pages with a retro twin: in this view their links open the
-   twin (All polls at /allpolls/retro/, built by .build/retro/allpolls.mjs,
-   which links back here with retro=1) */
-const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };
+   twin (All polls at /allpolls/retro/, built by .build/retro/allpolls.mjs;
+   Past cycles at /cycles/retro/ and the front page at /retro/, the navbar's
+   Home, built by .build/retro/cycles.mjs and now.mjs), each linking back
+   here with retro=1 */
+const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };
 // the site's pages, read off the shell's own tabs and More menu (so they never drift from it); the home page is the navbar's Home
 function rtPages() {
   const twin = (h) => RT_TWIN[h] || h;
-  const tabs = $$(".sh-tabs-set a.sh-tab").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: twin(a.getAttribute("href")) })).filter((p) => p.href !== "/");
+  // (Now is the navbar's Home, so it leaves the list before its link turns into the twin's)
+  const tabs = $$(".sh-tabs-set a.sh-tab").filter((a) => a.getAttribute("href") !== "/").map((a) => ({ label: (a.querySelector(".sh-tab-long") || a).textContent.replace(/\s+/g, " ").trim(), href: twin(a.getAttribute("href")) }));
   const more = $$("#sh-menu a.sh-menu-item").filter((a) => !tabs.some((t) => t.href === twin(a.getAttribute("href")))).map((a) => ({ label: (a.querySelector(".sh-menu-t") || a).textContent.trim(), href: twin(a.getAttribute("href")), on: a.dataset.id === "map" }));
   return { tabs, more };
 }
@@ -92,11 +95,11 @@ function rtBuild() {
   const top = document.createElement("div");
   top.className = "rt-top rt-only";
   top.innerHTML = `<nav class="rt-nav" aria-label="Site and page">
-      <a class="rt-ni" href="/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}
+      <a class="rt-ni" href="/retro/" title="auspol tracker’s home page">${RT_ICON.home}Home</a>${menu("edit", "Edit")}${menu("view", "View")}${menu("fav", "Favorites", RT_ICON.star)}${menu("help", "Help")}
       <span class="rt-navgap"></span>
       <span class="rt-pages">${pages.map((p) => `<a href="${esc(p.href)}">${esc(p.label)}</a>`).join("")}${menu("more", `More pages ${RT_ICON.dd}`)}</span>${menu("pages", `Pages ${RT_ICON.dd}`).replace('class="rt-ni"', 'class="rt-ni rt-pagesb"')}
     </nav>
-    <div class="rt-banner"><a class="rt-home" href="/" title="auspol tracker: the interactive tracker">${rtFlagSVG()}</a><div class="rt-bcol"><a class="rt-kicker" href="/">auspol tracker</a><span class="rt-bline"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></span></div>${rtHouseSVG()}</div>
+    <div class="rt-banner"><a class="rt-home" href="/retro/" title="auspol tracker: the tracker’s home page">${rtFlagSVG()}</a><div class="rt-bcol"><a class="rt-kicker" href="/retro/">auspol tracker</a><span class="rt-bline"><span class="rt-btitle" aria-hidden="true">Electoral map</span><span class="rt-bmeta" aria-hidden="true"></span></span></div>${rtHouseSVG()}</div>
     <div class="rt-tabs" role="tablist" aria-label="View"></div>`;
   eb.before(top);
   // the view tabs: proxies for the eyebrow's switch (it parks in full screen's plate), full screen, and the way back

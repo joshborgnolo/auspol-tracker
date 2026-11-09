@@ -209,13 +209,14 @@ assert.ok(html.includes(R(".build/retro/chrome.css")) && R("map/map.css").includ
 }
 assert.ok(html.includes('<a href="/allpolls/retro/" aria-current="page">All polls</a>'), "the navbar marks this page");
 assert.ok(D.pages.more.some((p) => p.label === "Electoral map" && p.href === "/map/#retro=1"), "the Electoral map opens in its retro view");
-assert.ok(D.pages.tabs.every((p) => p.href !== "/") && D.pages.tabs.some((p) => p.href === "/cycles/"), "the bar's views but Now (the navbar's Home)");
+assert.ok(D.pages.tabs.every((p) => p.href !== "/" && p.href !== "/retro/") && D.pages.tabs.some((p) => p.href === "/cycles/retro/"), "the bar's views but Now (the navbar's Home), Past cycles opening its retro twin");
+assert.ok(html.includes('<a class="rt-ni" href="/retro/" title="auspol tracker’s home page">') && html.includes('<a class="rt-kicker" href="/retro/">'), "Home and the banner open the retro Now page");
 assert.ok(/data-rt-menu="edit"[\s\S]*data-rt-menu="view"[\s\S]*data-rt-menu="fav"[\s\S]*data-rt-menu="help"/.test(html), "Edit, View, Favorites and Help, as on the retro map");
 assert.ok(!/rt-titlebar|rt-menubar|rt-toolbar|rt-address|rt-status|rt-taskbar|rt-start/.test(html), "no pretend browser or desktop");
 assert.ok(!/text-transform:\s*uppercase/i.test(html), "no small caps");
 assert.ok(R(".build/retro/allpolls.client.js").includes('FAV_KEY = "auspol.map.favs"') && R(".build/retro/allpolls.client.js").includes("list.unshift({ t: favLabel(), h, p: HERE });"), "Favorites are the retro map's list, this page's entries carrying their page");
-// linked from the retro map's navbar and from nowhere else (the map's script, and the page itself)
-assert.ok(R("map/map.js").includes('const RT_TWIN = { "/allpolls/": "/allpolls/retro/" };'), "the retro map's navbar opens it");
+// linked from the retro pages' navbars and from nowhere else (the map's script, the page itself, its retro Now and Past cycles siblings)
+assert.ok(R("map/map.js").includes('const RT_TWIN = { "/": "/retro/", "/cycles/": "/cycles/retro/", "/allpolls/": "/allpolls/retro/" };'), "the retro map's navbar opens it");
 assert.ok(!R("sitemap.xml").includes("allpolls/retro"), "not in the sitemap");
 {
   const htmls = [];
@@ -225,8 +226,9 @@ assert.ok(!R("sitemap.xml").includes("allpolls/retro"), "not in the sitemap");
     if (f.isDirectory()) walk(rel); else if (f.name.endsWith(".html")) htmls.push(rel);
   } };
   walk(".");
-  const linking = htmls.filter((f) => path.normalize(f) !== path.normalize("allpolls/retro/index.html") && R(f).includes("/allpolls/retro/"));
-  assert.deepEqual(linking, [], "no other page links it");
+  const RETRO_FAMILY = ["allpolls/retro/index.html", "retro/index.html", "cycles/retro/index.html"].map((f) => path.normalize(f));
+  const linking = htmls.filter((f) => !RETRO_FAMILY.includes(path.normalize(f)) && R(f).includes("/allpolls/retro/"));
+  assert.deepEqual(linking, [], "no page outside the retro family links it");
 }
 
 console.log(`PASS: retro All polls – ${P.length} polls current with the dataset, today's figures and head as the headline's, month lines, the seven facets' rows and figures (direction, issues, groups, gauges), filters, sorts, hash, phone columns, CSV, the retro map's twin, unlisted, in SITE_FILES`);

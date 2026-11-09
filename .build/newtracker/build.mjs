@@ -2001,6 +2001,35 @@ if (!VIC) {
   writeAtomic(path.join(dir, "index.html"), retroHtml);
   console.log(`  + allpolls/retro/ · the retro All polls page, ${retroD.rows.length} polls`);
 }
+/* ---- 5a''. the retro Now and Past cycles pages ---------------------------
+   /retro/ (Home in every retro navbar) and /cycles/retro/: the front page
+   and Past cycles in the same dress, their words, figures and charts the
+   modern pages' own, read by running this build's own scripts in node
+   (.build/retro/harvest.mjs) off the tab documents 5a just wrote. Federal
+   only. A modern refactor the harvest can't follow warns here and keeps the
+   pages as committed, so a cosmetic main-page edit can never hold the poll
+   pipeline hostage; test-retro-pages.mjs then fails until it is mended. */
+if (!VIC) {
+  try {
+    const { modernRunner, dataClock } = await import("../retro/harvest.mjs");
+    const { retroNow } = await import("../retro/now.mjs");
+    const { retroCycles } = await import("../retro/cycles.mjs");
+    const { shellPages } = await import("../site-shell.mjs");
+    let footer = null;
+    try { footer = mainChrome().footer; } catch (e) { console.warn(`  retro pages: colophon words missed (${e.message}) – the pages go without their colophon`); }
+    const base = path.dirname(OUT), dataset = fs.readFileSync(DA(DATASET), "utf8");
+    const runner = modernRunner({ root: base, clock: dataClock(dataset) });
+    const now = retroNow({ root: base, dataset, shellPages: shellPages(), footer, siteUrl: SITE_URL, runner });
+    const cyc = retroCycles({ root: base, dataset, shellPages: shellPages(), footer, siteUrl: SITE_URL, runner });
+    for (const [rel, html] of [["retro", now.html], [path.join("cycles", "retro"), cyc.html]]) {
+      fs.mkdirSync(path.join(base, rel), { recursive: true });
+      writeAtomic(path.join(base, rel, "index.html"), html);
+    }
+    console.log(`  + retro/, cycles/retro/ · the retro Now and Past cycles pages, ${now.panels.length} + ${cyc.panels.length} panels`);
+  } catch (e) {
+    console.warn(`  retro pages: the modern page's harvest failed (${e.message}) – retro/ and cycles/retro/ keep their committed copies`);
+  }
+}
 
 /* The root document starts its first screen with only the modules that
    screen draws; the rest load once the app has painted (loadLate, the
