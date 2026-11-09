@@ -510,6 +510,15 @@ ${F ? `<footer class="ap-foot">
 ${read("select.client.js")}
 </script>
 <script>
+(function () {
+  window.AP = window.AP || {};
+${read("../newtracker/assets/np-project.js")}
+})();
+</script>
+<script>
+${read("next.client.js")}
+</script>
+<script>
 ${client}
 </script>
 </body>

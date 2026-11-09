@@ -92,6 +92,15 @@ ${F ? `<footer class="rp-foot-site">
 ${read("select.client.js")}
 </script>
 <script>
+(function () {
+  window.AP = window.AP || {};
+${read("../newtracker/assets/np-project.js")}
+})();
+</script>
+<script>
+${read("next.client.js")}
+</script>
+<script>
 ${read("render.client.js")}
 </script>
 <script>

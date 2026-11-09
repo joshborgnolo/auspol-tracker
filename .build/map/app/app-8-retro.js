@@ -110,8 +110,6 @@ function rtBuild() {
     t.innerHTML = `${b.querySelector("svg") ? b.querySelector("svg").outerHTML : ""}<span class="rt-tl">${esc(b.textContent.trim())}</span>`;
     row.append(t);
   }
-  // the next polls at the row's left, in the grey the tabs leave (rtNext)
-  row.insertAdjacentHTML("afterbegin", `<div class="rt-next" hidden><b class="rt-nx-lab">Next polls:</b></div>`);
   row.insertAdjacentHTML("beforeend", `<button type="button" data-rt-do="fs" title="Full screen (F)">${RT_ICON.fs}<span class="rt-tl">Full screen</span></button><button type="button" class="rt-modern" data-rt-do="modern" title="Back to the modern look">${RT_ICON.modern}<span class="rt-tl">Modern view</span></button>`);
   const drop = document.createElement("div");
   drop.className = "rt-drop"; drop.hidden = true; drop.setAttribute("role", "menu");
@@ -122,57 +120,11 @@ function rtBuild() {
   if (meta) new MutationObserver(() => rtSync()).observe(meta, { childList: true, characterData: true, subtree: true });
   const mv = $(".mp-views");
   if (mv) new MutationObserver(() => rtSync()).observe(mv, { attributes: true, subtree: true, attributeFilter: ["aria-selected"] });
-  // the next polls follow the modern navbar's countdown, which re-reads itself every minute
-  const sn = $(".sh-next");
-  if (sn) new MutationObserver(() => rtNext()).observe(sn, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
-  if (window.ResizeObserver) new ResizeObserver(() => rtNextFit()).observe(row);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => rtNextFit());
-  rtNext();
+  // the next polls at the row's left, in the grey the tabs leave (.build/retro/next.client.js, appended after the app; at boot it finds the row itself)
+  if (window.rtNextMount) window.rtNextMount(row);
   // the left panel's caption keeps its shade button through every story render
   const story = $("#story");
   if (story) new MutationObserver(() => rtShadeBtn()).observe(story, { childList: true });
-}
-/* the next polls, as the modern navbar shows them (site-shell.js fills
-   .sh-next from the houses' publication rhythms: overdue first, then the
-   dated counts, then the "any day now" houses), read off its list so the two
-   looks never disagree; each pollster links to where it publishes, as there.
-   As many whole entries as clear the tab buttons show and the rest park; with
-   no room for one (the phone's full-width tabs) the strip stands down. */
-const rtOwnText = (el) => (el ? [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join("").trim() : "");
-function rtNext() {
-  const box = $(".rt-next"), sn = $(".sh-next");
-  if (!box) return;
-  for (const el of $$(".rt-nx-item", box)) el.remove();
-  if (sn && sn.title) box.title = sn.title;
-  for (const it of sn && !sn.hidden ? $$(".sh-tn-item", sn) : []) {
-    const a = it.querySelector("a.sh-tn-link"), w = it.querySelector(".sh-tn-when");
-    const firm = a ? rtOwnText(a) : (it.querySelector(".sh-tn-firm") || it).textContent.trim();
-    if (!firm) continue;
-    const el = document.createElement("span");
-    el.className = "rt-nx-item";
-    el.innerHTML = (a ? `<a class="rt-nx-firm" href="${esc(a.getAttribute("href"))}" target="_blank" rel="noopener noreferrer" title="Where ${esc(firm)} publishes">${esc(firm)}</a>` : `<span class="rt-nx-firm">${esc(firm)}</span>`) +
-      ` <span class="rt-nx-when${w && w.classList.contains("sh-tn-overdue") ? " rt-nx-over" : ""}">${esc(rtOwnText(w))}${it.querySelector(".sh-tn-maybe") ? `<span class="rt-nx-maybe"> (maybe)</span>` : ""}</span>`;
-    box.append(el);
-  }
-  rtNextFit();
-}
-function rtNextFit() {
-  const box = $(".rt-next");
-  if (!box) return;
-  const items = $$(".rt-nx-item", box);
-  for (const el of items) el.classList.remove("rt-nx-park");
-  box.classList.remove("rt-nx-none");
-  box.hidden = !items.length;
-  if (!items.length || !rtIsOn() || getComputedStyle(box).display === "none") return;
-  // the room: from the strip's left edge to the first tab button, less a clearance
-  const tab = box.parentElement.querySelector("button");
-  if (!tab) return;
-  const room = tab.getBoundingClientRect().left - box.getBoundingClientRect().left - 24;
-  const gap = parseFloat(getComputedStyle(box).columnGap) || 0;
-  let used = box.firstElementChild.offsetWidth, k = 0;
-  for (; k < items.length && used + gap + items[k].offsetWidth <= room; k++) used += gap + items[k].offsetWidth;
-  for (let j = k; j < items.length; j++) items[j].classList.add("rt-nx-park");
-  box.classList.toggle("rt-nx-none", k === 0);
 }
 // the panel caption's little button rolls the panel up to its caption, as the old panels did
 function rtShadeBtn() {
@@ -325,7 +277,6 @@ function rtSet(on, o = {}) {
   if (o.persist !== false) { try { if (on) localStorage.setItem(RT_KEY, "1"); else localStorage.removeItem(RT_KEY); } catch (e) {} }
   if (!on) { rtCloseMenu(); const s = $("#story"); if (s) s.classList.remove("rt-shut"); }
   rtSync();
-  if (on) rtNextFit();
   if (o.boot) return;
   // the look's palette and type change every measure: the canvases, the strip, the eyebrow and the stage re-read it
   if (TH) themeChanged();

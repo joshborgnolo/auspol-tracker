@@ -81,6 +81,26 @@ html.mp-retro body { background: var(--rt-face); color: var(--rt-ink); font-fami
 .rt-tabs button[aria-selected="true"] { height: 36px; font-weight: 700; background: #e7e4dd; box-shadow: inset -1px 0 var(--rt-dk), inset 1px 1px var(--rt-hi), inset -2px 0 var(--rt-sh); margin-bottom: -1px; position: relative; z-index: 1; }
 .rt-tabs .rt-modern { margin-left: 10px; }
 .rt-tabs svg { flex: none; }
+/* the next polls in the grey left of the tab buttons (next.client.js): the modern
+   navbar's countdown in plain era type, each pollster an underlined link,
+   overdue in red; entries that don't clear the tabs park, unseen but
+   measurable, and on the phone's full-width tabs the strip stands down */
+.rt-next { flex: 1 1 0; min-width: 0; align-self: flex-end; position: relative; display: flex; align-items: center; column-gap: 14px; height: 32px; margin-right: auto; padding-left: 2px; overflow: hidden; white-space: nowrap; font: 400 12px/1 var(--rt-font); color: #000; }
+.rt-next[hidden], .rt-next.rt-nx-none { visibility: hidden; }
+.rt-nx-lab { flex: none; font-weight: 700; }
+.rt-nx-item { flex: none; }
+.rt-nx-item.rt-nx-park { position: absolute; visibility: hidden; left: 0; }
+.rt-nx-firm { color: #000; }
+a.rt-nx-firm, a.rt-nx-firm:visited { color: #0000cc; text-decoration: underline; }
+a.rt-nx-firm:hover { color: #cc0000; }
+a.rt-nx-firm:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+.rt-nx-over { color: #c00000; font-weight: 700; }
+.rt-nx-maybe { color: #555; }
+/* no room beside the tabs: a line of its own over them, the tabs still at the right */
+.rt-tabs.rt-nx-own { flex-wrap: wrap; row-gap: 2px; }
+.rt-tabs.rt-nx-own .rt-next { flex: 0 0 100%; height: 20px; margin-right: 0; }
+@media (max-width: 860px) { .rt-next { display: none; } }
+
 /* the navbar's menus */
 .rt-drop { position: fixed; z-index: 400; min-width: 200px; max-width: min(420px, calc(100vw - 8px)); max-height: calc(100vh - 40px); overflow: auto; padding: 2px; background: var(--rt-face); box-shadow: var(--rt-raised), 2px 2px 0 rgba(0, 0, 0, .35); font: 400 12px/1 var(--rt-font); color: #000; }
 .rt-drop[hidden] { display: none; }
@@ -772,6 +792,843 @@ new MutationObserver(() => { if (on()) enhanceAll(); else close(false); }).obser
 const start = () => { if (on()) enhanceAll(); };
 if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", start); else start();
 window.RT_SELECT = { enhance, enhanceAll, close };
+})();
+
+</script>
+<script>
+(function () {
+  window.AP = window.AP || {};
+/* ====================================================================
+   NEXT EXPECTED POLLS – the projection
+
+   Sits under Latest polls and answers the obvious next question: when does
+   the next one land? Each house's own recent rhythm drives it – see
+   pollCadence in gen-data for how cadence and publication lag are measured.
+
+   Lives in the PLAIN layer (ahead of every component that consumes it, and
+   after ed2260de sets window.AP) so there is EXACTLY ONE implementation:
+   the page runs it from here, and .build/newtracker/sim-next-polls.mjs
+   evals this same file against mocked Sydney clocks instead of mirroring
+   it. Top-level consts of a classic script land in the shared global
+   lexical scope, so the panel bundle's DAY_MS references (and 73de0c58's
+   easternNow call) keep resolving from here. Never re-declare these names
+   in a later script – a duplicate top-level const is a parse error for the
+   whole script.
+
+   Dates are computed here rather than at build time so the panel stays
+   right as the page ages: a slot whose moment has passed without that
+   release being added is marked overdue where it stands, not rolled
+   forward onto a date nobody has published on the strength of a guess. The
+   one bound on that is NP_ASSUME_SKIP_DAYS below: a dated slot that stays
+   unrecorded past its grace is treated as one that did not happen, and the
+   projection names the house's next plausible date instead. The vacated
+   slot dates ride the rows as `missedSlots` so a renderer can leave a mark
+   where a promised date came and went; publisher-confirmed absences stay
+   unrecorded, as before.
+   ==================================================================== */
+const DAY_MS = 86400000;
+const NP_HORIZON_DAYS = 28;   // how far out a house's 2nd, 3rd… slots reach
+/* A poll CAN run a day or two late (Roy Morgan files the odd Tuesday after
+   its Monday), so two full days of grace: a dated slot still unrecorded
+   three mornings on is treated as skipped - the house's next plausible date
+   takes the row, rolled to exactly as a publisher-confirmed absence rolls
+   it (the walk's skip step). The bar shows "1 day overdue", then "2 days
+   overdue", and on the third morning the slot is gone rather than counting
+   red forever. Only a DATE can break a promise this way: a loose window
+   (a calendar-month bracket, the summer resumption) has no single day to
+   miss and keeps its seat until the wave is recorded. */
+const NP_ASSUME_SKIP_DAYS = 2;
+/* A house nobody has timed keeps its whole day: with no hour recorded there is
+   no moment to say has passed, so the row stays "today" until today is over
+   rather than being rolled off the list by an hour we invented for it. */
+const NP_UNTIMED_MINS = 24 * 60;
+/* A TIMED house counts to its measured mid-hour while its recorded clock
+   times span no more than two hours - Resolve's 6pm, Morgan's 4pm-ish,
+   Newspoll's 7-9pm mid-8pm, RedBridge's 6-or-8pm, YouGov's 5-6am all fit.
+   A span past that keeps no one hour: Essential files somewhere across
+   1:00-4:36am (216 minutes), and counting the slot down to any single hour
+   of that morning is a claim the record doesn't make. (The Next-expected
+   panel's inHours has always counted releaseMins for every timed house;
+   this gate is what grants the ticker the same count.) */
+const NP_COUNT_SPAN = 2 * 60;
+/* "Now", in the frame this schedule is written in.
+
+   Every date on this page is an Australian calendar date and every release
+   hour is an eastern one, so "today" has to be Sydney's today - not the
+   reader's. A reader in London at 11pm on the 25th is looking at a schedule
+   that is already on the 26th, and was being told a poll due in four hours
+   was "tomorrow". The day comes back as UTC midnight, which is the frame
+   Date.parse("YYYY-MM-DD") produces and the frame everything here compares
+   in, and the clock as minutes past it. */
+/* one formatter, made once: building an Intl formatter is the slow part of
+   asking the time, and every render of the tab bar and the polls table asks */
+let npEastFmt = null;
+function easternNow() {
+  const d = new Date();
+  try {
+    const p = {};
+    npEastFmt = npEastFmt || new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    });
+    for (const x of npEastFmt.formatToParts(d)) p[x.type] = x.value;
+    // some engines still render midnight as hour 24 rather than 0
+    return { day: Date.UTC(+p.year, +p.month - 1, +p.day), mins: (+p.hour % 24) * 60 + +p.minute };
+  } catch (e) {
+    return { day: Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()),
+             mins: d.getHours() * 60 + d.getMinutes() };
+  }
+}
+
+/* THE SUMMER BREAK. Nobody publishes federal voting intention between
+   Christmas and the second week of January: across the 22 summers since
+   2004/05 in the record, at most one poll per summer closed fieldwork
+   between 22 Dec and 5 Jan, and in 2025/26 not one house published between
+   23 Dec and 8 Jan. Where the houses come BACK is not a rhythm - last
+   summer Roy Morgan on 12 Jan, Resolve 18 Jan, Newspoll 19 Jan, YouGov
+   27 Jan, Essential 28 Jan, RedBridge 1 Feb. So a dated slot that falls in
+   the dead zone is not a date at all: it becomes the resumption window, 9
+   Jan to 1 Feb, as a loose row (every window consumer already reads that
+   shape - see the calendar-month path), and the walk stops there. The
+   walk-forward backtest had slots touching Dec/Jan hitting 3 of 8.
+   Month-day strings, eastern calendar dates. */
+const NP_SUMMER_DEAD = ["12-23", "01-08"];   // no federal release inside, inclusive
+const NP_SUMMER_BACK = ["01-09", "02-01"];   // the span last summer's houses resumed across
+function npInSummer(ms) {
+  const md = new Date(ms).toISOString().slice(5, 10);
+  return md >= NP_SUMMER_DEAD[0] || md <= NP_SUMMER_DEAD[1];
+}
+
+/* A MONTH-END rhythm (RedBridge/Accent for the AFR): one wave a month, out
+   on the house's weekday nearest the month's last day - Sun 1 Mar, 29 Mar,
+   3 May, 31 May, 28 Jun, 2 Aug, 30 Aug 2026, every 2026 release. Measured
+   as an interval it is 28 or 35 days and a weekly-snapped ±, which drifts
+   against the calendar; stated as the rule it has been exact. Declared in
+   pollsterRules (release.monthEnd); the rule's own record is measured by
+   gen-data, which runs THIS function (so the two cannot drift apart).
+
+   From a release at `fromMs`, the slot is the `dow` nearest the last day of
+   the month AFTER the month-end that release belonged to (the month-end
+   nearest it: 1 Mar belongs to February's). Nearest in whole days, so the
+   distances are 3 and 4 and never tie. UTC-midnight day stamps in and out,
+   the frame everything here compares in. */
+function npMonthEndSlot(fromMs, dow) {
+  const d = new Date(fromMs);
+  const y = d.getUTCFullYear(), m = d.getUTCMonth();
+  const endPrev = Date.UTC(y, m, 0), endThis = Date.UTC(y, m + 1, 0);
+  const base = new Date(fromMs - endPrev < endThis - fromMs ? endPrev : endThis);
+  const target = Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 2, 0);
+  let k = dow - new Date(target).getUTCDay();
+  if (k > 3) k -= 7;
+  if (k < -3) k += 7;
+  return target + k * DAY_MS;
+}
+
+/* The window a row counts with must be the one its ± claims, and for a
+   weekday house that is whole weeks, not days. Essential's gaps scatter
+   ±4 days, but no Sunday or Friday filing can come of that – the only
+   dates the wave can land on are this Wednesday or the ones either side,
+   i.e. ±1 week. Measuring in raw days puts the window's far edge on a day
+   the house cannot publish: Essential's row was counting down to a Sunday
+   when the wave is really open until the Wednesday after. Houses with no
+   weekday habit (and loose houses, whose raw span IS the claim) keep the
+   day spread. Same +3 as the label: the snap itself can move 3 days. */
+function spreadDays(c, sp) {
+  return c.releaseDow != null && !c.loose ? 7 * Math.floor((sp + 3) / 7) : sp;
+}
+
+/* The projection, lifted out of the panel because the tab bar runs it too.
+   Two places working out "when is the next poll" from the same cadence table
+   would drift apart the moment either changed, and a countdown in the navbar
+   has to be the same claim the panel makes. Moved, not rewritten.
+   `nowOverride` ({day, mins}) is the sim/health-check seam: the page never
+   passes it and always reads the live Sydney clock. */
+/* The same minute gives the same answer, and nothing downstream edits it, so
+   the page's clock keeps one projection per minute: a switch re-renders the
+   tab bar and the polls table, and each used to work the schedule out afresh.
+   `opts.horizonDays` widens the horizon a caller asks for (the Latest-polls
+   calendar lays two months of slots out of the one projection); the memo
+   keys on the pair, so the default call's cache is never poisoned by a
+   wider one. `opts.includeTracked` admits gen-data's `tracked` cadence rows -
+   the direction and issues monitors and the economic-confidence gauges,
+   which schedule releases but file no poll; every other consumer keeps the
+   default false, because a tab-bar countdown or a "next poll" that includes
+   a national-mood survey or a confidence index is a mis-speak, labelled or
+   not. The two calendar folds then split the tracked rows between them:
+   Latest polls keeps direction/issues, Economic sentiment keeps
+   confidence. */
+let npProjMemo = null;
+function npProject(nowOverride, opts) {
+  const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
+  const tracked = !!(opts && opts.includeTracked);
+  /* opts.cadence projects a supplied list instead of D.pollCadence - the
+     Latest-and-next table's sub-rows pass D.subCadence (a house's MRP or
+     pooled series), which no other consumer walks. Not memoised: one
+     caller, a handful of rows */
+  if (opts && opts.cadence) return npProjectAt(nowOverride || easternNow(), horizonDays, true, opts.cadence);
+  if (!nowOverride) {
+    const e = easternNow(), k = e.day + e.mins * 60000;
+    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays && npProjMemo.t === tracked) return npProjMemo.v;
+    const v = npProjectAt(e, horizonDays, tracked);
+    npProjMemo = { k, h: horizonDays, t: tracked, v };
+    return v;
+  }
+  return npProjectAt(nowOverride, horizonDays, tracked);
+}
+function npProjectAt(nowOverride, horizonDays, includeTracked, series) {
+  const { D } = window.AP;
+  const cad = (series || D.pollCadence || []).filter((c) => includeTracked || !c.tracked);
+  if (!cad.length) return { rows: [], t0: 0, nowMs: 0 };
+  const eNow = nowOverride || easternNow();
+  const t0 = eNow.day;
+  const nowMs = t0 + eNow.mins * 60000;
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+
+  /* A four-week horizon rather than a fixed count: it answers "what lands this
+     month" and sizes itself to how busy the field actually is. A weekly house
+     appears four times inside it, a monthly one once – which is the honest
+     shape of the schedule, not a repetition bug. The horizon bounds how many
+     FURTHER slots of the walk show, never the first: every house holds one
+     standing next slot no matter how far out it sits (Spectre Strategy's is
+     ~twenty weeks away for most of the year), because a panel that stays
+     silent on a slow house only pretends not to know when it lands next. */
+  const rows = [];
+  const horizon = t0 + (horizonDays || NP_HORIZON_DAYS) * DAY_MS;
+  cad.forEach((c) => {
+    /* eveningBeforeMins (gen-data, from pollsterRules.release.eveningBefore):
+       the house's wave is readable the EVENING BEFORE its canon stamp -
+       News24's wave drops ~9pm Tuesday while its byline, rewritten overnight,
+       reads next-morning 5:00AM. Everything gen-data measures (habit day,
+       releaseMins, the anchors) is read off those canon stamps, so the row
+       arrives claiming a Wednesday-morning release a reader has never seen.
+       Shift the projection onto the eve it can act on: the stamped
+       "Wednesday 5am" becomes "Tuesday 9pm", and the walker, the overdue
+       arithmetic and every label downstream then run on the true
+       availability. The measured span/anchors are stamp facts and would
+       contradict the shifted day, so the declared drop time replaces them. */
+    if (c.eveningBeforeMins != null && c.releaseDow != null)
+      c = { ...c,
+        releaseDow: (c.releaseDow + 6) % 7,
+        releaseMins: c.eveningBeforeMins,
+        releaseFrom: c.eveningBeforeMins, releaseTo: c.eveningBeforeMins,
+        releaseMid: c.eveningBeforeMins, releaseVals: null };
+    /* A CALENDAR-MONTH rhythm (DemosAU) has no day to project: one wave per
+       month on no particular day of it, so the slot IS the month - the
+       day-of-month range the house has actually filed on (calDays, measured
+       by gen-data over the published sequence; the bare month where it is
+       absent) of the month after the last recorded wave. Shaped here as a
+       loose window whose centre and spread are the range's own mid and
+       half-span, so every window consumer (the panel's span and "open now",
+       the bar's countdown, the missed count from the close) reads it
+       without a special case of its own. */
+    if (c.calMonth) {
+      const ld = new Date(Date.parse(c.last));
+      let sm = (ld.getUTCMonth() + 1) % 12;
+      let sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
+      /* A slot month named in `skippedMonths` was confirmed absent at the
+         publisher by the house's agent - the month-grain counterpart of the
+         dated path's `skipped` roll below, and the same off-ramp from the
+         never-rolled-forward-on-a-guess rule: the slot steps one month at a
+         time to the next UNVERIFIED month rather than holding red on a
+         window verified never filed. */
+      while ((c.skippedMonths || []).includes(`${sy}-${String(sm + 1).padStart(2, "0")}`)) {
+        sm += 1;
+        if (sm > 11) { sm = 0; sy += 1; }
+      }
+      const lastDay = Date.UTC(sy, sm + 1, 0); // the next month's day 0 = this slot's last day
+      const open = Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1);
+      /* a habit reaching past the 28th is not owed a day a shorter month
+         doesn't have: clamp the close to the slot month's own last day */
+      const close = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
+      const calSpread = (close - open) / 2 / DAY_MS;
+      const release = (open + close) / 2;
+      const missed = close < t0;
+      /* The next window is the house's standing claim and holds its seat
+         whatever the horizon - the dated walk's i === 0 rule below - and a
+         MOOT slot keeps its seat until a release moves the anchor, the
+         hold-the-slot rule everything else obeys */
+      rows.push({
+        ...c, field: open, release, missed, ahead: 0,
+        overdue: missed,
+        spread: calSpread, winHalf: calSpread,
+        inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((open - t0) / DAY_MS),
+        closesIn: Math.round((close - t0) / DAY_MS),
+      });
+      return;
+    }
+    /* A house that keeps a weekday is projected onto it. Interval alone put
+       Essential on a Thursday and YouGov on a Tuesday, when between them they
+       have published on a Wednesday thirteen times out of fourteen dated
+       releases - the interval is a median over waves whose fieldwork has
+       shifted by a day or two, and it carries that drift into the answer.
+       Nudged to the NEAREST matching weekday, never more than three days, so
+       this corrects a rounding error rather than overriding the cadence: a
+       house whose interval says three weeks does not get moved a fortnight to
+       land on a Wednesday. Uses the same getDay() the row is printed with, so
+       the date shown always falls on the weekday claimed for it. */
+    const snap = (ms) => {
+      if (c.releaseDow == null) return ms;
+      let d = c.releaseDow - new Date(ms).getUTCDay();
+      if (d > 3) d -= 7;
+      if (d < -3) d += 7;
+      return ms + d * DAY_MS;
+    };
+    // the moment a projected release is expected, which is the date plus the
+    // hour the house keeps – the thing that is compared against now
+    const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
+    const relOf = (f) => dayFloor(snap(f + c.lag * DAY_MS));
+
+    /* The next slot after the last recorded release. A slot whose moment has
+       passed without that release being added is overdue, not wrong: the
+       wave may already be out and simply not entered yet, or it may be
+       running late, and this page cannot tell which. Either way the honest
+       row is the one the data on record actually supports, left where it is
+       and marked overdue - for two days of grace, after which a DATED slot
+       is reckoned a skipped one and the walk moves to the house's next
+       plausible date (NP_ASSUME_SKIP_DAYS; the roll the skip lists take,
+       below). A slot leaves the two ways the record can no longer back it:
+       a new release moves `c.last` past it, or the sky has sat on it past
+       its grace. */
+    /* a month-end house steps month-end to month-end, not by interval:
+       its slot IS the release day, so field and release coincide (and the
+       slot-relative tails below need no weekday-snap shift) */
+    const monthEnd = !!c.monthEnd && c.releaseDow != null;
+    const stepFrom = (rel) => npMonthEndSlot(rel, c.releaseDow);
+    let field = monthEnd ? stepFrom(Date.parse(c.last)) : Date.parse(c.last) + c.cadence * DAY_MS;
+    let release = monthEnd ? field : relOf(field);
+    /* A slot named in `skipped` was confirmed absent at the publisher by the
+       house's agent, the morning after it passed - so it is not an open bet
+       and not overdue, it just isn't coming. Roll to the house's next
+       possible release date: one week on for a dated house (the only step a
+       weekly-slipping house can take; Essential's 28-day cadence slips to
+       35, not 56), a full cadence otherwise. The honest row then is the
+       next UNVERIFIED expectation, not a "(or N days ago)" asterisk on a
+       release verified never filed. */
+    /* A month-end house's late step is a week too: RedBridge's record is 28
+       or 35 days and nothing else (29 Mar -> 3 May, 28 Jun -> 2 Aug), so a
+       confirmed-absent Sunday rolls to the Sunday after it. Skip that one as
+       well and the wave is not late any more, it is gone - the slot is the
+       next month-end's, stepped from the original slot. */
+    let rolled = false;
+    /* every ASSUMED skip's vacated slot, so a renderer can leave a mark
+       where a promised date came and went (confirmed absentees in the
+       skipped lists deliberately leave no trace) */
+    const missedSlots = [];
+    {
+      const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+      let meSlot = release;
+      /* One roll step, shared by the confirmed absentees (skipped lists) and
+         the assumed ones (a dated slot past its grace, below): a month-end
+         house's first step is its measured late week, its second the next
+         month-end; a dated house's is one week; anyone else's a cadence. */
+      const rollOn = () => {
+        rolled = true;
+        if (monthEnd) {
+          if (release === meSlot) release = meSlot + 7 * DAY_MS;
+          else release = meSlot = stepFrom(meSlot);
+          field = release;
+          return;
+        }
+        field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
+        release = relOf(field);
+      };
+      while ((c.skipped || []).includes(isoDay(release))) rollOn();
+      /* The assumed skip: a dated slot still unrecorded past its grace is
+         one the wave did not keep, so the walk moves on to the next
+         plausible date rather than counting red forever (the bar's "1 day
+         overdue" / "2 days overdue" are the grace showing). Only a DATED
+         promise can break this way - a loose window names no single day and
+         holds its seat until the wave lands; and a slot in the summer break
+         is no date to be late for (rolling it would manufacture a January
+         date that reads overdue inside the resumption window), so a roll
+         stops at the break and the summer branch below shapes it instead. */
+      if (!c.loose)
+        while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) {
+          missedSlots.push(release);
+          rollOn();
+        }
+    }
+    /* A loose house earns its place when its WINDOW opens inside the horizon,
+       not when its centre falls inside it: DemosAU's next centre is 30 days
+       out and its window opens in 13, so testing the centre would hide a house
+       that may well file next week. */
+    const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
+    /* i === 0 rides past the horizon on purpose: the next slot is the house's
+       one standing claim, and dropping it because it sits more than four
+       weeks out is how a quarterly house went unmentioned on the panel for
+       most of the year. The horizon's job ends at slot two. */
+    for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
+      /* a slot in the summer break: the house's next claim is the
+         resumption window (NP_SUMMER_BACK of the January after), shaped as
+         a loose row; a further slot there is not projected at all */
+      /* (noSummer: a series that publishes from waves already in hand -
+         the pooled Newspoll quarter came out on 26 Dec 2025) */
+      if (!c.noSummer && npInSummer(release)) {
+        if (i === 0) {
+          const d = new Date(release);
+          const y = d.getUTCFullYear() + (d.getUTCMonth() === 11 ? 1 : 0);
+          const at = (md) => Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3, 5));
+          const open = at(NP_SUMMER_BACK[0]), close = at(NP_SUMMER_BACK[1]);
+          const half = (close - open) / 2 / DAY_MS;
+          const missed = close < t0;
+          rows.push({
+            ...c, field, release: (open + close) / 2, ahead: 0,
+            loose: true, summer: true, overdue: missed, missed,
+            spread: half, winHalf: half, slotEarly: null, slotLate: null, rolled: false,
+            missedSlots: missedSlots.length ? missedSlots.slice() : null,
+            inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
+            opensIn: Math.round((open - t0) / DAY_MS),
+            closesIn: Math.round((close - t0) / DAY_MS),
+          });
+        }
+        break;
+      }
+      const overdue = due(release) <= nowMs;
+      /* Each further wave is one more interval of drift, so the window widens
+         as sqrt(waves) – the second Essential is a looser bet than the first.
+         A house on a fixed weekly schedule barely moves; an erratic one
+         visibly fans out, which is the point. */
+      const sp = Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)));
+      /* The window is measured in the units the ± states it in – whole
+         weeks for a weekday house (Essential's ±4 days is a ±1 week claim),
+         raw days for everyone else. See spreadDays. */
+      const winHalf = spreadDays(c, sp);
+      /* The tails a label names as alternatives must re-reference to THIS
+         slot, not to the median interval they were measured around.
+         Essential's median gap is 31.5 days with ±3.5 of scatter, but the
+         projected slot snaps back 3.5 days to the 28-day Wednesday – the
+         nearest end of the record – so relative to the slot the only
+         alternative the record offers is the 35-day Wednesday a WEEK LATE;
+         the symmetric ± it carried named a 21-day Wednesday the house has
+         never filed on. slotEarly/slotLate rebase the measured tails by how
+         far the weekday snap moved this slot (zero when it sits exactly a
+         cadence of weeks out: tail 2+ slots stay symmetric, which is right
+         – a 63-day claim's alternatives genuinely are 56 and 70). Only a
+         dated house gets the pair; everyone else's tails stay as measured.
+         Clamped at zero, since an alternative cannot sit off the record. */
+      const slotShift = c.releaseDow != null && !c.loose && c.spreadEarly != null
+        ? (release - (field + c.lag * DAY_MS)) / DAY_MS
+        : null;
+      rows.push({
+        ...c, field, release, overdue, ahead: i,
+        spread: sp, winHalf,
+        slotEarly: slotShift == null ? null : Math.max(0, c.spreadEarly + slotShift),
+        slotLate: slotShift == null ? null : Math.max(0, c.spreadLate - slotShift),
+        /* This slot already landed on the house's measured late step because
+           a confirmed skip pushed it there: it IS the late alternative the
+           ± would name. Flag it so the row labels don't offer a further
+           +1-week date the record never shows (Essential slips 28→35, and
+           the rolled 35-day slot then had 42 named as its miss) - only the
+           first row of a walk can sit on it. */
+        rolled: rolled && i === 0,
+        missedSlots: missedSlots.length ? missedSlots.slice() : null,
+        inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
+        /* Overdue is not missed while the ± window is still open: the row
+           counts on toward the far edge of it, and is only red once that too
+           has passed. */
+        closesIn: Math.round((release + winHalf * DAY_MS - t0) / DAY_MS),
+        missed: overdue && release + winHalf * DAY_MS < t0,
+      });
+      // an overdue slot isn't a base to project the next one from – that
+      // would stack a guess on a slot nothing has confirmed yet
+      if (overdue || c.loose) break;   // loose: one window per house, same reason
+      if (monthEnd) { field = release = stepFrom(release); continue; }
+      field += c.cadence * DAY_MS;
+      release = dayFloor(snap(field + c.lag * DAY_MS));
+    }
+  });
+  /* Ordered by when each entry's wave is assumed to land – for a dated row
+     that is the date, for a window the day it opens. An overdue row whose
+     window is still open sorts at the FAR edge, not the date just missed:
+     the assumption is that its poll has not been published, and while the
+     window stays open the soonest it can land is that edge – so Essential
+     sits under "in 3 days" and "in 5 days", at its own "in 6 days", instead
+     of claiming the top of the list with yesterday's slot. A missed row –
+     edge passed, dated OR loose – drops to the foot: there is no date left
+     to give it. (Loose rows used to keep their window-open date here, which
+     put a house whose window closed months ago at the TOP of the list.) */
+  const first = (r) => (r.missed ? Infinity
+    : r.loose ? r.release - r.spread * DAY_MS
+    : r.overdue ? r.release + (r.winHalf != null ? r.winHalf : r.spread) * DAY_MS
+    : r.release);
+  rows.sort((a, b) => first(a) - first(b));
+  return { rows, t0, nowMs };
+}
+window.AP.nextPolls = npProject;
+
+/* ====================================================================
+   THE NEXT-POLL ROLL – what the tab bar's countdown shows
+
+   Moved here from the main page's NextPollTicker so that every bar that
+   carries the countdown – the main page's and the satellites' (site-shell.js
+   runs this file) – builds the same roll from the same projection. The
+   ticker keeps the fit pass (how much of the roll the bar has room for);
+   the roll itself, and every phrase in it, is here.
+   ==================================================================== */
+const TN_DAY = 86400000;
+const tnUntil = (ms) => {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
+  const h = Math.round(mins / 60);
+  if (h < 36) return h + (h === 1 ? " hour" : " hours");
+  const d = Math.round(h / 24);
+  if (d < 14) return d + (d === 1 ? " day" : " days");
+  const w = Math.round(d / 7);
+  return w + (w === 1 ? " week" : " weeks");
+};
+function npTickerItems(proj) {
+  const rows = proj ? proj.rows : [];
+  const nowMs = proj ? proj.nowMs : 0;
+  const t0 = proj ? proj.t0 : 0;
+  /* A house that keeps a weekday can only publish ON that weekday, and the
+     countdown has to respect that or it says something impossible. Essential
+     files on Wednesdays; projected onto Wed 26 Aug and missed, its +-7 day
+     window was still technically open on the Monday after, so this used to
+     read "any time" - naming a moment that cannot happen until Wednesday. The
+     next slot is the next Wednesday, and that is what it counts to.
+
+     The window's EARLY edge still does the work it should: it decides which
+     slot is the EARLIEST plausible one, and the answer is the first matching
+     weekday on or after that. Roy Morgan, due at midnight today on a Monday
+     schedule, is still today rather than a week away.
+
+     Houses with no weekday habit keep the plain window: the earliest the wave
+     could land, or "any time" once that has passed. */
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+  const targetOf = (r) => {
+    const half = r.winHalf || 0;
+    if (r.releaseDow == null)
+      return { at: Math.max(r.release - half * TN_DAY, nowMs), byDay: false };
+    /* The window's EARLY edge is measured, not mirrored: no weekday house has
+       ever filed a slot early, so counting to release - ±half names a date
+       with no precedent - Resolve was counting down to Sun 6 Sep when its
+       real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
+       countdown on the projected day itself. The projection's slotEarly
+       (tails rebased to the slot's own place in the record) is the same
+       measure relative to the slot, and takes precedence where it exists. */
+    const widen = Math.sqrt((r.ahead || 0) + 1);
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null
+      ? 7 * Math.floor((se * widen + 3) / 7)
+      : half;
+    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
+    t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
+    return { at: t, byDay: true };
+  };
+
+  /* A house whose slot is a WINDOW rather than a date - DemosAU's
+     calendar-month bracket - only belongs on the bar while the window is
+     open: before the bracket opens, a countdown to its edge misreads a day
+     range as a date; after it closes unrecorded, the panel's red row is
+     where the lateness is told. While the window IS open the row reads
+     "any day now" and sits at the tail of the roll - "some time in the
+     next N days" is weaker information than every dated count the bar
+     carries, so every slot leads it. */
+  const isWindowRow = (r) => r.loose && r.releaseDow == null;
+  const windowOpen = (r) => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
+  const windowItems = rows
+    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
+    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
+
+  /* A slot whose whole tolerance has passed without its release being
+     recorded leads the bar in red, counting the days it is late - the same
+     claim the panel's red row makes, on the same `missed` flag. A late
+     WINDOW counts from its close - and a window, having no date it could
+     break, is the only lateness that can persist here; a late DAY counts
+     from the day itself, matching the number the panel prints, and only
+     for the two days of grace NP_ASSUME_SKIP_DAYS grants a dated slot
+     before the projection treats it as skipped and moves the expectation
+     on ("1 day overdue", "2 days overdue", gone on the third morning -
+     never "N days" into double figures). A row leaves for a real reason
+     only: the release recorded, or the slot reckoned skipped. */
+  const overdueItems = rows
+    .filter((r) => r.missed && !isWindowRow(r))
+    .map((r) => {
+      const days = Math.round(
+        (t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
+      return {
+        firm: r.pollster, site: r.site, overdue: true, days,
+        when: days === 1 ? "1 day overdue" : days + " days overdue",
+      };
+    })
+    .sort((a, b) => b.days - a.days);
+
+  /* Re-sorted on the rolled target rather than left in the panel's order.
+     The panel sorts a missed wave by the slot it missed, because a reader
+     looking at the schedule wants to see it is late; the bar is answering
+     "what lands next", and after rolling, a Monday house due today comes
+     before a Wednesday one that slipped a week.
+
+     Two slots on the SAME day break their day-floor tie on the house's
+     due moment - a weekday target carries no hour of its own (it is the
+     slot's midnight by design), but the houses still land in an order on
+     the day: a Sunday 6pm wave before a Sunday 9pm one, rather than
+     whichever came first in the cadence rows. A house nobody has timed
+     keeps its 24*60 day-end default, so a vague "today" trails the
+     same-day counts that can name their hour. */
+  const dueOf = (it) => it.t.at + (it.t.byDay
+    ? (it.r.releaseMins == null ? 24 * 60 : it.r.releaseMins) * 60000
+    : 0);
+  const upcomingItems = rows
+    .filter((r) => !r.missed && !isWindowRow(r))
+    .map((r) => ({ r, t: targetOf(r) }))
+    .sort((a, b) => dueOf(a) - dueOf(b))
+    /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
+       soonest from EVERY house, and a weekly house's second slot inside the
+       coming week only repeats a name instead of adding another house to
+       the roll. There is no count or day-window cap here - how much of the
+       roll actually shows is a space decision measured live on the bar
+       itself (the fit pass below). */
+    .filter(((seen) => ({ r }) =>
+      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
+    .map(({ r, t }) => {
+      const half = r.winHalf || 0;
+      let when;
+      if (t.byDay) {
+        const days = Math.round((t.at - t0) / TN_DAY);
+        /* "Any moment now" starts when the publication window does - the slot
+           date plus the hour the house keeps - not at the day's first minute:
+           Roy Morgan files Mondays after four, and a 9am reader told the wave
+           is moments away is being lied to for seven hours. An untimed house
+           has no hour to open at, so it keeps its whole day (the projection's
+           same 24*60 default): "today" throughout. */
+        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
+        /* The same hour that lets the slot say "any moment now" lets the wait
+           before it count itself: a house with a measured (or declared) hour
+           and under twelve of them to go reads "5 hours" - minutes in the
+           last hour, both from tnUntil, bare like the day counts beside it
+           ("2 days") - instead of the vaguer "today". A house nobody has
+           timed has no hour to count to and keeps "today", and twelve hours
+           plus out the day is still the honest claim. */
+        const left = dueMs - nowMs;
+        /* ...unless the house keeps no one hour - a recorded span past two
+           hours (NP_COUNT_SPAN). Essential files somewhere across 1-4:36am,
+           so its slot morning reads "any moment now" for as long as the
+           wait to the EARLIEST hour is no longer than the house's own span
+           of hours, and "today" before that - the span's span is the honest
+           window. A two-hours-or-less habit counts to the measured MID
+           instead: Newspoll's 7-9pm mid-8pm and RedBridge's 6-or-8pm used
+           to sit out here beside Essential (the bar was a span of one hour
+           or more), a rule that called an evening house hourless for filing
+           at 7pm the once - and left the ticker vaguer than the panel,
+           which has counted the same mid for every timed house all along
+           (rd-polls.jsx inHours). */
+        const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
+        /* "Any moment now" EXPIRES when the house's own filing band shuts
+           - and then the whole ITEM does: a shut band resolves the
+           evening. The phrase claims the release is dropping as it
+           speaks, and a house whose measured filing hours have closed is
+           plainly not about to (a 9:44pm promise over Newspoll's 7-9pm
+           window, 11 Oct 2026); but the rest of its evening can't offer
+           "today" either - the wait is settled and there is no maybe, so
+           the slot LEAVES THE BAR until its day ends rather than linger
+           as "today (maybe)". The slot DAY is untouched - the row holds
+           its overdue grace and the roll walk as before, and the red
+           overdue items flag it from tomorrow; only the countdown item
+           goes. */
+        const bandShut = r.releaseTo != null && nowMs > t.at + r.releaseTo * 60000;
+        if (days === 0 && bandShut) return null;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+             : hourless ? (t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000
+               ? "any moment now" : "today")
+             : r.releaseMins != null && Math.round(left / 3600000) < 12
+             ? tnUntil(left) : "today")
+             : days === 1 ? "tomorrow"
+             /* exact day counts past "tomorrow" - the panel's own phrasing
+                ("in 12 days") - so the bar and the panel name the same slot
+                the same way; tnUntil's week rounding ("2 weeks") made them
+                disagree */
+             : days + " days";
+      } else {
+        /* No day pinned, so nothing is "moment" away - the wave is due some
+           DAY inside a measured range, and the countdown says so. ("Moment"
+           is the weekday houses' word above: theirs is a date with an hour.)
+           Sub-day resolution only inside 36 hours; past that, the same exact
+           day count the weekday houses get */
+        when = t.at <= nowMs ? "any day now"
+             : Math.round((t.at - nowMs) / 3600000) < 36
+             ? tnUntil(t.at - nowMs)
+             : Math.round((t.at - t0) / TN_DAY) + " days";
+      }
+      /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
+         house can only file on its weekday, so every alternative date is a
+         slot of its own, a week apart: the hedge belongs only while two
+         slots from now on are both in play – a window wider than a week, or
+         a slot rolled more than one slot-week past the projected one (a
+         one-week roll is just the old window's own far edge, still this
+         wave). A still-open window after a missed slot is not future doubt
+         – its earlier dates are past days the wave publicly did not land
+         on, so Essential rolled from a missed 26 Aug to 2 Sep reads
+         "2 days", full stop. (r.overdue reads "slot moment passed" and
+         fires on exactly that case – it is npProject's missed + still-open
+         flag, not future doubt.) Non-weekday houses keep the day-spread
+         rule. "any moment/day now" is left alone - it already says what
+         the hedge would. */
+      /* ...and a weekday house whose record names a LATER slot than the one
+         counted - Newspoll's Sunday or the one after, Essential's Wednesday
+         or the next - is hedged too: "tomorrow (maybe)", since the bar says
+         the earliest date, not the only one. The late alternative is the
+         panel's own (slotLate, widened by sqrt(waves), in whole weeks); a
+         rolled slot already sits on it, and a count past the slot, inside
+         the window, is nearer the far edge by as much. */
+      const lateW = r.releaseDow != null && !r.rolled
+        ? Math.floor(((r.slotLate != null ? r.slotLate : r.spreadLate || 0) * Math.sqrt((r.ahead || 0) + 1) + 3) / 7)
+        : 0;
+      const laterSlot = t.byDay && lateW >= 1 && t.at < r.release + lateW * 7 * TN_DAY;
+      const maybe = when !== "any moment now" && when !== "any day now" &&
+        (half > 7 || !!r.loose || laterSlot ||
+         (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
+         (r.releaseDow == null && half > 0));
+      return { firm: r.pollster, when, maybe, site: r.site };
+    })
+    /* the shut-band slots nulled above are gone from the roll entirely
+       (their houses' LATER slots were already evicted one-per-house) */
+    .filter(Boolean);
+
+  /* Overdue leads: an already-blown forecast is more news than any
+     countdown. The tail is the fit pass's business - the candidate list is
+     the whole roll (one slot per house, nearest first), and the bar shows
+     as much of it as clears the neighbours. Window-house rows trail it all:
+     "any day now" is weaker information than every dated count. */
+  const items = [...overdueItems, ...upcomingItems, ...windowItems];
+  return items;
+}
+window.AP.nextPollItems = npTickerItems;
+window.AP.npMonthEndSlot = npMonthEndSlot;
+
+})();
+</script>
+<script>
+/* =============================== the retro pages' next polls ===============================
+   The tab buttons sit at the right of every retro page's tab row, and the
+   grey they leave at its left carries the next polls, as the modern navbar's
+   "Next" countdown shows them: overdue first, then the dated counts, then the
+   "any day now" houses, each pollster an underlined link to where it
+   publishes, overdue in red, "(maybe)" in grey. As many whole entries as
+   clear the first tab button show and the rest park (unseen, still
+   measurable); on the phone's full-width tabs (chrome.css, 860px and below)
+   the strip stands down.
+   One list, two readers, never a projection of its own:
+   - the Electoral map wears the site's shell, whose site-shell.js fills
+     .sh-next every minute: the strip copies that list, so the two looks
+     can never disagree;
+   - the retro All polls, Now and Past cycles pages wear no shell: they
+     inline the main page's np-project.js (page.mjs, allpolls.mjs), the one
+     implementation the shell runs too, and feed it the same live
+     /assets/auspol-now.json the shell reads, re-reading the roll each
+     minute as the shell does.
+   Inlined on those three pages; appended to map.js by assemble.mjs, where
+   the retro view's tab row is built later (app-8-retro.js calls
+   window.rtNextMount on it). */
+(function () {
+  "use strict";
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var ownText = function (el) {
+    if (!el) return "";
+    var t = "";
+    for (var i = 0; i < el.childNodes.length; i++) if (el.childNodes[i].nodeType === 3) t += el.childNodes[i].textContent;
+    return t.trim();
+  };
+  var NOTE = "Projected from each house’s recent publication intervals – the earliest each wave could land, not the likeliest. A dated slot that passes unrecorded counts up as overdue for two days, then the expectation moves on to the house’s next plausible date";
+  var boxes = [], last = [];
+
+  /* the room: beside the tabs, from the strip's left edge to the first tab
+     button less a clearance; where not one entry fits there (the retro All
+     polls page's seven tabs fill its row; Now and Past cycles below about
+     1100px), the strip takes a line of its own over the tabs, the row's
+     whole width. (Both settled in one pass, so the row's resize observer
+     sees one size and doesn't loop.) */
+  function fit(box) {
+    var row = box.parentElement, items = box.querySelectorAll(".rt-nx-item"), i;
+    for (i = 0; i < items.length; i++) items[i].classList.remove("rt-nx-park");
+    box.classList.remove("rt-nx-none");
+    row.classList.remove("rt-nx-own");
+    box.hidden = !items.length;
+    if (!items.length || getComputedStyle(box).display === "none") return;
+    var tab = row.querySelector("button");
+    if (!tab || box.getBoundingClientRect().height < 1) return;
+    var gap = parseFloat(getComputedStyle(box).columnGap) || 0;
+    var take = function (room) {
+      var used = box.firstElementChild.offsetWidth, k = 0;
+      for (; k < items.length && used + gap + items[k].offsetWidth <= room; k++) used += gap + items[k].offsetWidth;
+      return k;
+    };
+    var k = take(tab.getBoundingClientRect().left - box.getBoundingClientRect().left - 24);
+    if (k === 0) {
+      row.classList.add("rt-nx-own");
+      var br = box.getBoundingClientRect();
+      k = take(row.getBoundingClientRect().right - br.left - 8);
+      if (k === 0) row.classList.remove("rt-nx-own");
+    }
+    for (i = k; i < items.length; i++) items[i].classList.add("rt-nx-park");
+    box.classList.toggle("rt-nx-none", k === 0);
+  }
+  function draw(box) {
+    var old = box.querySelectorAll(".rt-nx-item");
+    for (var i = 0; i < old.length; i++) old[i].remove();
+    for (var j = 0; j < last.length; j++) {
+      var it = last[j];
+      if (!it.firm) continue;
+      var el = document.createElement("span");
+      el.className = "rt-nx-item";
+      el.innerHTML = (it.site ? '<a class="rt-nx-firm" href="' + esc(it.site) + '" target="_blank" rel="noopener noreferrer" title="Where ' + esc(it.firm) + ' publishes">' + esc(it.firm) + "</a>" : '<span class="rt-nx-firm">' + esc(it.firm) + "</span>") +
+        ' <span class="rt-nx-when' + (it.overdue ? " rt-nx-over" : "") + '">' + esc(it.when) + (it.maybe ? '<span class="rt-nx-maybe"> (maybe)</span>' : "") + "</span>";
+      box.appendChild(el);
+    }
+    fit(box);
+  }
+  function show(items, note) {
+    last = items || [];
+    for (var i = 0; i < boxes.length; i++) { if (note) boxes[i].title = note; draw(boxes[i]); }
+  }
+
+  // a tab row takes the strip at its left (once)
+  function mount(row) {
+    if (!row || row.querySelector(".rt-next")) return;
+    row.insertAdjacentHTML("afterbegin", '<div class="rt-next" hidden title="' + esc(NOTE) + '"><b class="rt-nx-lab">Next polls:</b></div>');
+    var box = row.firstElementChild;
+    boxes.push(box);
+    // (a row shown later – the map's retro view switched on – resizes from nothing, and refits)
+    if (window.ResizeObserver) new ResizeObserver(function () { fit(box); }).observe(row);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fit(box); });
+    draw(box);
+  }
+  window.rtNextMount = mount;
+
+  // reader one: the shell's own countdown (the map)
+  var sn = document.querySelector(".sh-next");
+  if (sn) {
+    var read = function () {
+      var out = [], its = sn.hidden ? [] : sn.querySelectorAll(".sh-tn-item");
+      for (var i = 0; i < its.length; i++) {
+        var a = its[i].querySelector("a.sh-tn-link"), w = its[i].querySelector(".sh-tn-when");
+        out.push({ firm: a ? ownText(a) : (its[i].querySelector(".sh-tn-firm") || its[i]).textContent.trim(), site: a ? a.getAttribute("href") : null, when: ownText(w), overdue: !!(w && w.classList.contains("sh-tn-overdue")), maybe: !!its[i].querySelector(".sh-tn-maybe") });
+      }
+      show(out, sn.title);
+    };
+    new MutationObserver(read).observe(sn, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
+    read();
+  } else if (window.AP && window.AP.nextPollItems && window.fetch) {
+    // reader two: the main page's projection on the live data (the shell-less retro pages)
+    fetch("/assets/auspol-now.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (n) {
+      if (!n || !n.pollCadence) return;
+      var roll = function () {
+        try { window.AP.D = { pollCadence: n.pollCadence }; show(window.AP.nextPollItems(window.AP.nextPolls())); } catch (e) {}
+      };
+      roll();
+      setInterval(roll, 60000);
+    }).catch(function () {});
+  }
+  var rows = document.querySelectorAll(".rt-tabs");
+  for (var r = 0; r < rows.length; r++) mount(rows[r]);
 })();
 
 </script>
