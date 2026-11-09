@@ -1,9 +1,9 @@
 {
  "_about": "W4 of .build/analysis/seat-model-plan.md — vote layer: national nowcast ΔV (gen-data §7e primaryNow vs certified 2025), per-state swing deviations (self-centred per house, DL-pooled, shrunk toward 0), and differential-swing β for age/gender (Resolve difference-in-differences vs its 2025-05-03 baseline wave, self-centred so Σ w_g β_g = 0). lnp = combined Coalition. Deviations/β are pp. NOT ESTIMABLE: education/income/location/housing/generation — no May-2025 baseline wave carries them (the polling-day Resolve wave carries age/gender/state only). Tas/NT/ACT are composition-only. Marginals, not joints; no interaction terms exist for layer 3. Structural uncertainty exceeds everything these SEs express — intervals are floor, not ceiling.",
  "_provenance": {
-  "generated": "2026-11-08",
+  "generated": "2026-11-09",
   "inputs": {
-   "data/polls.json": "fd1228813b2a000c",
+   "data/polls.json": "09e750d0575f58b3",
    "data/demographics.json": "eb36eadb745d4ba7",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0",
@@ -11,18 +11,18 @@
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
-   "captured": "primaryNow: alp 26.5 lnp 22.8 grn 13.5 onp 26 oth 10.9 | n=7"
+   "captured": "primaryNow: alp 26.3 lnp 22.7 grn 13.5 onp 26.3 oth 11 | n=9"
   }
  },
  "national": {
   "nowcast": {
-   "alp": 26.5,
-   "lnp": 22.8,
+   "alp": 26.3,
+   "lnp": 22.7,
    "grn": 13.5,
-   "on": 26,
-   "oth": 10.9
+   "on": 26.3,
+   "oth": 11
   },
-  "nPolls": 7,
+  "nPolls": 9,
   "result2025": {
    "alp": 34.56,
    "lnp": 31.82,
@@ -31,11 +31,11 @@
    "oth": 15.01
   },
   "delta": {
-   "alp": -8.06,
-   "lnp": -9.02,
-   "on": 19.6,
+   "alp": -8.26,
+   "lnp": -9.12,
+   "on": 19.9,
    "grn": 1.3,
-   "oth": -4.11
+   "oth": -4.01
   },
   "note": "Δ = nowcast − certified 2025, pp, 5-key (lnp combined Coalition). Uncertainty deliberately not printed at this layer: W5 takes the estimator's own within gen-data."
  },
