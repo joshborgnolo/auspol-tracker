@@ -16,6 +16,23 @@ html.mp-retro main.mp { padding: 10px 0 20px; }
 html.mp-retro .mp * { font-family: var(--rt-font); letter-spacing: 0; }
 html.mp-retro .mp-sec { padding-top: 0; }
 
+/* the next polls in the grey left of the tab buttons (rtNext): the modern
+   navbar's countdown in plain era type, each pollster an underlined link,
+   overdue in red; entries that don't clear the tabs park, unseen but
+   measurable, and on the phone's full-width tabs the strip stands down */
+.rt-next { flex: 1 1 0; min-width: 0; align-self: flex-end; position: relative; display: flex; align-items: center; column-gap: 14px; height: 32px; margin-right: auto; padding-left: 2px; overflow: hidden; white-space: nowrap; font: 400 12px/1 var(--rt-font); color: #000; }
+.rt-next[hidden], .rt-next.rt-nx-none { visibility: hidden; }
+.rt-nx-lab { flex: none; font-weight: 700; }
+.rt-nx-item { flex: none; }
+.rt-nx-item.rt-nx-park { position: absolute; visibility: hidden; left: 0; }
+.rt-nx-firm { color: #000; }
+a.rt-nx-firm, a.rt-nx-firm:visited { color: #0000cc; text-decoration: underline; }
+a.rt-nx-firm:hover { color: #cc0000; }
+a.rt-nx-firm:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+.rt-nx-over { color: #c00000; font-weight: 700; }
+.rt-nx-maybe { color: #555; }
+@media (max-width: 860px) { .rt-next { display: none; } }
+
 /* the banner (chrome.css) stands in for the eyebrow */
 html.mp-retro .mp-sec > .rd-eyebrow { display: none; }
 
