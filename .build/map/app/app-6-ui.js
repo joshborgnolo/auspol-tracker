@@ -725,12 +725,22 @@ function jumpHTML() {
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
   return `<div class="lg-jump lg-row" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}</div>`;
 }
+/* the jump row leaves the strip only when a seat is chosen (or in another view), never
+   for zoom. It once hid at 3 x HOME.k: the stage is the strip's remainder and HOME.k is
+   the country's fit to that stage, so the row's going grew the stage, lowered HOME.k,
+   crossed back under 3 x and brought the row back — the stage flipped 30px every frame
+   while the zoom sat in that band (user report 2026-11-10: the map "jumps up and down
+   aggressively" at one zoom). Holding its line instead would only leave a hole, and the
+   cities stay good jump targets at any depth. Zooming never resizes the stage. */
+function jumpRowVis(cit) {
+  if (cit) cit.hidden = S.view !== "map" || selDiv() != null;
+}
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
   const cit = $("#cities");
-  // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
+  // the strip's jump row hides while a seat is chosen —
   // re-fixed here because renderLegend re-creates it on every render
-  if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
+  jumpRowVis(cit);
   $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
   $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
   renderFrames();
@@ -856,8 +866,7 @@ function updateHint() {
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover to check local coverage, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   // the row stays while a jump selection is live, so it can be toggled back off
-  const citRow = $("#cities");
-  if (citRow) citRow.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
+  jumpRowVis($("#cities"));
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
