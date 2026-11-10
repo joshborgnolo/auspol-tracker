@@ -1289,21 +1289,40 @@ const VT_ERAS = {
 // an election only draws the chart where every seat's piles split the final
 // two (test-map-page.mjs pins that coverage from 2016 on); "now" rides 2025's
 function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "now" ? 2025 : +y] || null; }
-/* The Senate's own band set, timed by the Senate count's own clock, not the
-   House's: in 2025 the early-centre Senate ballots were never touched on
+/* The Senate's own band sets, timed by the Senate count's own clock in
+   the AEC's count-fortnight statements, not copied from the House's rows.
+   2025 moved the game: early-centre Senate ballots were never touched on
    election night — their count opened Monday 5 May at out-posted centres,
    while election-night Senate first preferences came from polling places'
-   ordinary piles once their division's House count ended. Labels and
-   membership from the AEC's own account of that sequencing (per user
-   instruction): the day pile ("Election night, after House count"), early
-   centres ("From Monday, 5 May"), everything else over following days.
-   Earlier eras wait on sourced Senate timing per year — never the House's
-   labels transplanted. */
+   ordinary piles once their division's House count ended (the user-supplied
+   labels year). 2019/2022 counted both chambers in one program, so they keep
+   the House layout but the Senate's own basis: 2019 election night covered
+   every day-cast ballot (HoR AND Senate) plus ">90% of pre-poll votes"
+   (media/media-releases/2019/05-20, quotes verbatim), the remaining Senate
+   pre-poll first preferences finishing Monday–Tuesday (.../05-21), postal in
+   close seats Sunday and everywhere from Tuesday (.../05-20a); 2022's Count
+   Timeline says "First preferences were also counted for every Senate ballot
+   paper" on election night (media/2022/05-27) with postal from Sunday in
+   every division (.../05-22, .../05-27). 2016 is out on DATA grounds (its
+   polling-place product's intra-division row attribution provably drifts —
+   build_senate_piles.py's docstring), not for want of timing evidence. */
 const VT_ERAS_SEN = {
   2025: [
     ["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"],
     ["early", "Early centres", ["ppvc"], "From Monday, 5 May"],
     ["day", "On the day", ["day", "mob"], "Election night, after House count"],
+  ],
+  2022: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Sunday"],
+    ["early", "Early centres", ["ppvc"], "On the night"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+  2019: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Tuesday"],
+    ["early", "Early centres", ["ppvc"], "On the night"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
   ],
 };
 // the measure toggle's parties and words. 2PP stays the default reading of

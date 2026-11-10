@@ -264,15 +264,21 @@ assert.ok(js.includes("else if (d.vt) h += vtBlock([d]);") && js.includes("if (!
 assert.ok(js.includes("const castScope = vtScope(m, st, senCast), cast = castScope.divs;") && js.includes('const cls = clsFilter(m), pst = st === "AUS" ? null : st, key = senate ? "vts" : "vt";') && js.includes("const divs = m.res.divs.filter((d) => d[key] && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool, its field per chamber); the area block reads election results, since Now blanks a by-election's piles");
 assert.ok(js.includes('if (senate) return vtBandsFor(M().year, true) ? vtBandsBlock(divs, area, geography, true) : "";') && js.includes("if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography, false);"), "2016 on, the elections' frames show the band chart, not the old table; the Senate lane renders only with a Senate era");
 assert.ok(js.includes('function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "now" ? 2025 : +y] || null; }'), "band eras: 2016/2019/2022/2025 House (+now riding 2025's era), Senate's own accessor alongside");
-// the Senate cast lane's 2025 era: the Senate count's own sequencing, as the
-// user dictated it — early-centre Senate ballots were NOT counted on election
-// night (out-posted centres from Monday 5 May), the night's Senate first
-// preferences came from election-day polling places after the House count
+// the Senate cast lane's eras: 2025 as the user dictated it (early-centre
+// Senate ballots NOT on the night; out-posted centres from Monday 5 May), and
+// 2019/2022 quoted in their AEC count-fortnight terms (both chambers in one
+// counting program those years — so those two mirror the House layout)
 {
-  const sen = js.indexOf("const VT_ERAS_SEN = {");
-  assert.ok(sen > -1 && js.slice(sen, sen + 700).includes('["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"]'), "Senate 2025: postal with the declarations, over following days");
-  assert.ok(js.slice(sen, sen + 700).includes('["early", "Early centres", ["ppvc"], "From Monday, 5 May"]'), "Senate 2025's early-centre ballots counted from Monday, not on the night");
-  assert.ok(js.slice(sen, sen + 700).includes('["day", "On the day", ["day", "mob"], "Election night, after House count"]'), "Senate 2025's day band is election-night, after the House count");
+  const sen = js.indexOf("const VT_ERAS_SEN = {"), senEnd = js.indexOf("const VT_PARTIES_SEN = ");
+  assert.ok(sen > -1 && senEnd > sen);
+  const era = js.slice(sen, senEnd);
+  assert.ok(era.includes('["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"]'), "Senate 2025: postal with the declarations, over following days");
+  assert.ok(era.includes('["early", "Early centres", ["ppvc"], "From Monday, 5 May"]'), "Senate 2025's early-centre ballots counted from Monday, not on the night");
+  assert.ok(era.includes('["day", "On the day", ["day", "mob"], "Election night, after House count"]'), "Senate 2025's day band is election-night, after the House count");
+  assert.ok(era.includes('["post", "Postal", ["post"], "From Sunday"]'), "Senate 2022's postal counted from Sunday");
+  assert.ok(era.includes('["post", "Postal", ["post"], "From Tuesday"]'), "Senate 2019's postal counted from Tuesday");
+  const nights = era.match(/\["day", "On the day", \["day", "mob"\], "On the night"\]/g) || [];
+  assert.equal(nights.length, 2, "Senate 2019 & 2022 both chambers on the night");
   assert.ok(js.includes("const VT_PARTIES_SEN = VT_PARTIES.slice(1);"), "the Senate lane has no 2PP button: ALP L/NP GRN ON OTH");
   assert.ok(js.includes("vtSenParty") && js.includes("function setVtSenParty(party)"), "the Senate measure rides its own selection (vtParty's tpp choice can't leak it)");
   assert.ok(js.includes('<small>${int(tot)}${senate ? " Senate" : ""} formal</small>'), "the block names the chamber in its total tag");

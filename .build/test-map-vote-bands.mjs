@@ -281,16 +281,23 @@ for (const y of [2013, 2010]) {
   assert.ok(html.includes("<table") && !html.includes("vt-bands"), `${y}: classic-seat coverage keeps the table, not the chart`);
 }
 
-// 2. the Senate's own cast chart, its own era — the early-centre Senate
-// ballots of 2025 never joined the election-night count (out-posted centres
-// from Monday 5 May; the day's Senate first prefs counted after each
-// division's House count); postal rides the declaration pile over days.
-const ERA_SEN_2025 = [["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"], ["early", "Early centres", ["ppvc"], "From Monday, 5 May"], ["day", "On the day", ["day", "mob"], "Election night, after House count"]];
-assert.ok(JSON.stringify(api.vtBandsFor(2025, true)) === JSON.stringify(ERA_SEN_2025), "the Senate era is the Senate count's, not the House's");
+// 2. the Senate's own cast chart, its own eras — quoted word-for-word from
+// the AEC's count-fortnight statements (see the const's comment): in 2025 the
+// early-centre Senate ballots never joined the election-night count (out-
+// posted centres from Monday 5 May; the day's Senate first prefs counted
+// after each division's House count); in 2019/2022 both chambers shared one
+// counting program (night covered day-cast + in-division early ballots,
+// postal Tuesday/Sunday, declarations over days).
+const ERA_SEN = {
+  2025: [["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"], ["early", "Early centres", ["ppvc"], "From Monday, 5 May"], ["day", "On the day", ["day", "mob"], "Election night, after House count"]],
+  2022: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Sunday"], ["early", "Early centres", ["ppvc"], "On the night"], ["day", "On the day", ["day", "mob"], "On the night"]],
+  2019: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Tuesday"], ["early", "Early centres", ["ppvc"], "On the night"], ["day", "On the day", ["day", "mob"], "On the night"]],
+};
+for (const y of [2025, 2022, 2019]) assert.ok(JSON.stringify(api.vtBandsFor(y, true)) === JSON.stringify(ERA_SEN[y]), `${y}: the Senate era is the Senate count's, quoted`);
 assert.equal(api.vtBandsFor("now", true).length, 3, "\"now\" rides the Senate's 2025");
-// no Senate eras before sourced timing reaches them
-for (const y of [2016, 2019, 2022, 2013]) assert.equal(api.vtBandsFor(y, true), null, `${y}: no Senate cast era yet (2025's is the user-sourced one)`);
-function checkSen(divs, label, fi) {
+// no Senate eras without sourced Senate timing (2016's is sourced but its venue lane is provably dirty: producer docstring)
+for (const y of [2016, 2013, 2010]) assert.equal(api.vtBandsFor(y, true), null, `${y}: no Senate cast era`);
+function checkSen(divs, label, fi, eraBands) {
   assert.ok(divs.every((d) => d.vts), `${label}: every seat's Senate piles are on file`);
   const fams = {}, pileN = {}, famTot = [0, 0, 0, 0, 0];
   let tot = 0;
@@ -306,7 +313,7 @@ function checkSen(divs, label, fi) {
   const expBase = (100 * famTot[fi]) / tot;
   close(result.base, expBase, `${label}: area ${FAMS5[fi]} primary share over its formal`);
   result.bands.forEach((b, i) => {
-    const keys = ERA_SEN_2025[i][2];
+    const keys = eraBands[i][2];
     const famA = keys.reduce((n, k) => n + (fams[k] ? fams[k][fi] : 0), 0);
     const v = keys.reduce((n, k) => n + (pileN[k] || 0), 0);
     assert.equal(b.a, famA, `${label}: ${b.k} ${FAMS5[fi]} ballots pool the seats`);
@@ -331,8 +338,24 @@ current.divs = current.res.divs;
 current.areas = Object.fromEntries(Object.entries(current.res.agg).map(([st, a]) => [st, { formal: a.formal, idx: current.res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));
 for (const [fi, fam] of FAMS5.entries()) {
   vm.runInContext(`vtSenParty = "${fam}"`, ctx);
-  for (const [divs, label] of partyPools25()) checkSen(divs, `sen ${label} ${fam}`, fi);
+  for (const [divs, label] of partyPools25()) checkSen(divs, `sen ${label} ${fam}`, fi, ERA_SEN[2025]);
 }
+// and every era's bands carry exactly (national oracles per year, onp as the lane)
+for (const y of [2022, 2019]) {
+  const res = JSON.parse(read(`map/data/core-${y}.json`));
+  current = { year: y, elements: [], res };
+  current.divs = res.divs;
+  current.areas = Object.fromEntries(Object.entries(res.agg).map(([st, a]) => [st, { formal: a.formal, idx: res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));
+  vm.runInContext('vtSenParty = "onp"', ctx);
+  checkSen(res.divs, `${y} senate onp`, 3, ERA_SEN[y]);
+  const eraHtml = api.vtBlock(res.divs, true, "nationwide", true);
+  for (const [, , , time] of ERA_SEN[y]) assert.ok(eraHtml.includes(time), `${y}: the quoted "${time}" reaches the page`);
+}
+vm.runInContext('vtSenParty = "alp"', ctx);
+// the chrome checks ride the 2025 frame (formal tag below)
+current = { year: 2025, res: JSON.parse(read("map/data/core-2025.json")) };
+current.divs = current.res.divs;
+current.areas = Object.fromEntries(Object.entries(current.res.agg).map(([st, a]) => [st, { formal: a.formal, idx: current.res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));
 assert.ok(api.vtBands([{ n: "Nos", vt: {}, vt3: {} }], true).bands.every((b) => b.skew === null), "no Senate figures without the Senate piles");
 // chrome: five buttons, no 2PP; the ALP default; the chamber named in the total
 vm.runInContext('vtSenParty = "alp"', ctx);
@@ -356,4 +379,4 @@ assert.ok(!senHtml.includes("9:30"), "the House's release times never leak into 
   vm.runInContext('vtSenParty = "alp"', ctx);
 }
 
-console.log("PASS: map vote bands — House lanes (pools, eras, toggle, missing data) plus the Senate lens's own cast chart (its own era, five measures, piles-as-denominators, missing-vts nulls)");
+console.log("PASS: map vote bands — House lanes (pools, eras, toggle, missing data) plus the Senate lens's own cast chart across its three quoted eras (2025/2022/2019; 2016 stays out on data grounds)");
