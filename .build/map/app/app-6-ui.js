@@ -780,6 +780,10 @@ function tipFor(h) {
 // all — an explicit lens pick drops the shelf (2026-11-08)
 let clsLensShelved = false;
 function select(sel, opts = {}) {
+  // a state-election frame already frames its one state: its "state" view is
+  // the frame again, not a slice of it (a seat's way up read "Victoria ·
+  // vic22" over the identical figure block the frame head carries)
+  if (sel.level === "state" && STATE_YEARS.has(S.year)) sel = { level: "aus" };
   const prevDiv = selDiv();
   S.sel = sel;
   /* the State filter IS the map's state selection: a state arrived at any
@@ -1118,8 +1122,9 @@ async function setYear(y) {
     else S.sel = { level: "div", st: s.st, div: ni };
   }
   if (s.isl && S.sel !== s) S.sel = { ...S.sel, isl: s.isl }; // still out at the island
-  // a state the new frame doesn't hold (New South Wales open, on to Victoria's election) opens the whole frame
-  if (S.sel.level === "state" && !b.areas[S.sel.st]) S.sel = { level: "aus" };
+  // a state the new frame doesn't hold (New South Wales open, on to Victoria's election) opens the whole
+  // frame — as does a state-election frame's own "state" view, which is the frame again
+  if (S.sel.level === "state" && (!b.areas[S.sel.st] || STATE_YEARS.has(y))) S.sel = { level: "aus" };
   // …and the filters follow the frame: a state election has one state and no
   // AEC seat types, so both stand aside there; a federal frame keeps the
   // State filter while its state is still the selection, and a seat type it has
