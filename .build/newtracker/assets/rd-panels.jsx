@@ -430,11 +430,10 @@ function RdPrimary({ rangeId, setRangeId }) {
      AES together, a hollow diamond on the result's scale; its tip quotes
      both readings. It is the best estimate of how the group voted, NOT the
      base "since the election" is measured from (pelGrp, else aesGrp: the
-     same instruments at both ends), so it takes the dotted lead-in to the
-     line's first month only where one source stands behind it - there the
-     mark and the base are the same figure. Where both do, the gap between
-     the mark and the line is partly the two instruments, and no lead-in
-     draws it as movement. */
+     same instruments at both ends). Each mark takes the dotted lead-in to
+     its line's first month all the same (owner call 2026-11-11): the eye
+     needs the join, and the stat rows say what the change is measured
+     from. */
   const evGrp = G && !base && D.demoVote && D.demoVote.sets && D.demoVote.sets[sel.setId] ? D.demoVote.sets[sel.setId].groups[sel.label] || null : null;
   const evOf = (kk) => (evGrp && evGrp[kk]) || null;
   const evOn = !!(evGrp && parts && parts.some((p) => evOf(p.id)) && D.demoVote.x >= xDomain[0] - 1e-6);
@@ -445,13 +444,12 @@ function RdPrimary({ rangeId, setRangeId }) {
                    sub: rdVoteSub(evGrp, evOf(p.id)) })) : [];
   const evLeads = evOn ? parts.filter((p) => evOf(p.id)).map((p) => {
     const pLive = series(live(p.id), p.id);
-    const one = evGrp.src !== "both";
     return pLive.length && pLive[0].x > D.demoVote.x
       ? { id: "ev-ld-" + p.id, label: p.name, color: p.color, dash: RD_ELECTION_LEAD, rdWidth: 2.5,
           endCap: false, opacity: hidden[p.id] ? 0 : 1,
-          /* both sources: a single point - nothing drawn, but the spine's
-             election stop still tips the estimate under the line's label */
-          points: one ? [{ x: D.demoVote.x, y: evOf(p.id)[0] }, pLive[0]] : [{ x: D.demoVote.x, y: evOf(p.id)[0] }] }
+          /* every mark joins its line (owner call 2026-11-11), whichever
+             sources stand behind it */
+          points: [{ x: D.demoVote.x, y: evOf(p.id)[0] }, pLive[0]] }
       : null;
   }).filter(Boolean) : [];
   const shownScatter = React.useMemo(() => scatter.concat(evPts).map((d) => (hideC[d.party] ? { ...d, op: 0 } : d)), [scatter, evPts, hideC]);
@@ -3979,10 +3977,9 @@ function RdDemographics({ rangeId = "all" }) {
        The all-voters line is led back to the result. */
     /* (2026-11-10) the two readings are now ONE mark: gen-data DEMO_VOTE's
        estimate of each group's vote, a hollow diamond whose tip quotes
-       both. A group led by one source alone (generations, language) keeps
-       the dotted lead-in; where both stand behind the mark the gap to the
-       line is partly the two instruments, so only a single point rides at
-       the election for the guide tip to read. */
+       both. Every mark takes the dotted lead-in to its line's first month,
+       and all voters' ring at the election is the counted result (owner
+       call 2026-11-11). */
     const ev = D.demoVote && D.demoVote.sets && D.demoVote.sets[c.st.id];
     const evG = (g) => (ev && ev.groups[g.label]) || null;
     const evOf = (g) => (evG(g) && evG(g)[party]) || null;
@@ -3997,7 +3994,7 @@ function RdDemographics({ rangeId = "all" }) {
       .map((r) => {
         const p0 = { x: elX, y: evOf(r.l.g)[0] };
         return { id: "ev-" + r.l.g.label, label: r.l.g.label, color: colorOf(r), dash: RD_ELECTION_LEAD, rdWidth: 2.2,
-                 endCap: false, clipX: r.clip, points: evG(r.l.g).src !== "both" ? [p0, { x: r.rows[0].x, y: r.rows[0].y }] : [p0] };
+                 endCap: false, clipX: r.clip, points: [p0, { x: r.rows[0].x, y: r.rows[0].y }] };
       })
       .concat(allSeries.points.length
         ? [{ id: "ae-all-" + c.st.id, label: "All voters", color: "var(--ink)", dash: RD_ELECTION_LEAD, dashed: true, rdWidth: 1.5,
@@ -4037,7 +4034,10 @@ function RdDemographics({ rangeId = "all" }) {
         series={[allSeries, ...rowsOf.map((r) => lineOf(r, colorOf(r)))].concat(leLeads, elLeads)}
         areas={rowsOf.map((r) => bandOf(r, colorOf(r))).filter((a) => a.points.length >= 2)}
         spine={(leN != null ? [{ x: le.x, y: leN }] : elN != null ? [{ x: elX, y: elN }] : []).concat(c.allPts.map((d) => ({ x: d.x, y: d.y })))}
-        marks={leOn ? rowsOf.filter((r) => leY(r.l.g) != null).map((r) => ({ x: le.x, y: leY(r.l.g), color: colorOf(r) })) : []}
+        /* all voters' ring at the election is the counted result, on every
+           chart that reaches it (owner call 2026-11-11) */
+        marks={(leOn ? rowsOf.filter((r) => leY(r.l.g) != null).map((r) => ({ x: le.x, y: leY(r.l.g), color: colorOf(r) })) : [])
+          .concat(leOn && leN != null ? [{ x: le.x, y: leN, color: "var(--ink)" }] : elOn && elN != null ? [{ x: elX, y: elN, color: "var(--ink)" }] : [])}
         ringAtX={leOn ? le.x : null}
         scatter={elPts.length ? (cross ? cross.scatter : c.dots).concat(elPts) : (cross ? cross.scatter : c.dots)} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
         fade={A ? t : 1} pollFacet="demographics" pollSplit={tab.id}
@@ -4124,6 +4124,7 @@ function RdDemographics({ rangeId = "all" }) {
         { kind: "dot", color: "var(--ink-3)", label: "One poll" },
         { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
         { kind: "dash", color: "var(--ink)", label: "All voters" },
+        { kind: "ring", label: rdElecYear + " election result" },
       ].concat(D.demoVote && tab.sets.some((st) => D.demoVote.sets[st.id] && Object.values(D.demoVote.sets[st.id].groups).some((g) => g[party] != null))
         ? [{ kind: "diamond", color: "var(--ink-3)", label: RD_VOTE_LABEL }] : [])} />
       {sigSets.length > 0 && (

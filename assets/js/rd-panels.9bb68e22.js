@@ -23,6 +23,12 @@ const rdPartyStart = id => rdCap(rdPartyIn(id));
 const rdPlural = id => id === "grn" || id === "oth";
 const RD_ELECTION_LEAD = "0.5 4";
 const RD_AES_NUDGE = narrow => narrow ? 0.05 : 0.03;
+const RD_VOTE_LABEL = "Estimated vote at the 2025 election";
+const rdVoteSub = (grp, c) => {
+  const polls = grp.polls ? grp.polls.n + " poll" + (grp.polls.n === 1 ? "" : "s") + " from " + rdList(grp.polls.houses.map(demoHouse)) : "";
+  const aes = grp.aesN != null ? grp.aesN.toLocaleString() + " respondents in this group" : "";
+  return c[2] != null && c[3] != null ? "Polls in the six weeks before polling day " + c[2].toFixed(1) + " (" + polls + "); Australian Election Study " + c[3].toFixed(1) + " (" + aes + "); weighted together, ±" + c[1].toFixed(1) : c[2] != null ? "From the polls in the six weeks before polling day: " + polls + ", ±" + c[1].toFixed(1) : "From the Australian Election Study 2025, a post-election survey: " + aes + ", ±" + c[1].toFixed(1);
+};
 function RdPrimary({
   rangeId,
   setRangeId
@@ -313,16 +319,12 @@ function RdPrimary({
       }).filter(Boolean);
     }).concat(inDom(q.x) ? soloDotsOf(q) : []);
   }), [T, G, xDomain[0], xDomain[1], hvKey]);
-  const pelOf = kk => pelGrp && pelGrp[kk] || null;
-  const pelOn = !!(pelGrp && parts && parts.some(p => pelOf(p.id)) && D.demoElection.x >= xDomain[0] - 1e-6);
-  const aeSet = G && !base && D.demoAes && D.demoAes.sets ? D.demoAes.sets[sel.setId] || null : null;
-  const aeGrp = aeSet ? aeSet.groups[sel.label] || null : null;
-  const aeOf = kk => aeGrp && aeGrp[kk] || null;
-  const aeOn = !!(aeSet && parts && parts.some(p => aeOf(p.id)) && D.demoAes.x >= xDomain[0] - 1e-6);
-  const aePts = aeOn ? parts.filter(p => aeOf(p.id)).map(p => ({
-    x: D.demoAes.x + (pelOn ? RD_AES_NUDGE(narrow) : 0),
-    y: aeOf(p.id)[1],
-    gv: aeOf(p.id)[0],
+  const evGrp = G && !base && D.demoVote && D.demoVote.sets && D.demoVote.sets[sel.setId] ? D.demoVote.sets[sel.setId].groups[sel.label] || null : null;
+  const evOf = kk => evGrp && evGrp[kk] || null;
+  const evOn = !!(evGrp && parts && parts.some(p => evOf(p.id)) && D.demoVote.x >= xDomain[0] - 1e-6);
+  const evPts = evOn ? parts.filter(p => evOf(p.id)).map(p => ({
+    x: D.demoVote.x,
+    y: evOf(p.id)[0],
     color: p.color,
     label: p.name,
     party: p.id,
@@ -330,28 +332,14 @@ function RdPrimary({
     hollow: true,
     size: 1.6,
     meta: {
-      pollster: "Australian Election Study 2025"
+      pollster: RD_VOTE_LABEL
     },
-    sub: "Vote at the May 2025 election, post-election survey, " + aeGrp.n.toLocaleString() + " respondents in this group, not pooled"
+    sub: rdVoteSub(evGrp, evOf(p.id))
   })) : [];
-  const pelPts = pelOn ? parts.filter(p => pelOf(p.id)).map(p => ({
-    x: D.demoElection.x,
-    y: pelOf(p.id)[0],
-    color: p.color,
-    label: p.name,
-    party: p.id,
-    shape: "triangle",
-    hollow: true,
-    size: 1.6,
-    meta: {
-      pollster: "Polls at the 2025 election"
-    },
-    sub: "Over the six weeks before polling day: " + pelGrp.n + " poll" + (pelGrp.n === 1 ? "" : "s") + " from " + rdList(pelGrp.houses.map(demoHouse)) + ", pooled as the lines are, ±" + pelOf(p.id)[1].toFixed(1)
-  })) : [];
-  const pelLeads = pelOn ? parts.filter(p => pelOf(p.id)).map(p => {
+  const evLeads = evOn ? parts.filter(p => evOf(p.id)).map(p => {
     const pLive = series(live(p.id), p.id);
-    return pLive.length && pLive[0].x > D.demoElection.x ? {
-      id: "pel-ld-" + p.id,
+    return pLive.length && pLive[0].x > D.demoVote.x ? {
+      id: "ev-ld-" + p.id,
       label: p.name,
       color: p.color,
       dash: RD_ELECTION_LEAD,
@@ -359,32 +347,15 @@ function RdPrimary({
       endCap: false,
       opacity: hidden[p.id] ? 0 : 1,
       points: [{
-        x: D.demoElection.x,
-        y: pelOf(p.id)[0]
+        x: D.demoVote.x,
+        y: evOf(p.id)[0]
       }, pLive[0]]
     } : null;
   }).filter(Boolean) : [];
-  const aeLeads = aeOn && !pelOn ? parts.filter(p => aeOf(p.id)).map(p => {
-    const pLive = series(live(p.id), p.id);
-    return pLive.length && pLive[0].x > D.demoAes.x ? {
-      id: "ae-ld-" + p.id,
-      label: p.name,
-      color: p.color,
-      dash: RD_ELECTION_LEAD,
-      rdWidth: 2.5,
-      endCap: false,
-      opacity: hidden[p.id] ? 0 : 1,
-      points: [{
-        x: D.demoAes.x,
-        y: aeOf(p.id)[1],
-        gv: aeOf(p.id)[0]
-      }, pLive[0]]
-    } : null;
-  }).filter(Boolean) : [];
-  const shownScatter = React.useMemo(() => scatter.concat(aePts, pelPts).map(d => hideC[d.party] ? {
+  const shownScatter = React.useMemo(() => scatter.concat(evPts).map(d => hideC[d.party] ? {
     ...d,
     op: 0
-  } : d), [scatter, aePts, pelPts, hideC]);
+  } : d), [scatter, evPts, hideC]);
   const marks = base && partsChart ? partsChart.map(p => ({
     x: base.x,
     y: base[p.id],
@@ -412,15 +383,11 @@ function RdPrimary({
     x: base.x,
     y: base.alp
   } : null;
-  const pelStop = pelOn ? {
-    x: D.demoElection.x,
-    y: pelOf("alp") ? pelOf("alp")[0] : pelPts[0].y
+  const evStop = evOn ? {
+    x: D.demoVote.x,
+    y: evOf("alp") ? evOf("alp")[0] : evPts[0].y
   } : null;
-  const aesStop = !pelStop && aeOn ? {
-    x: D.demoAes.x,
-    y: aeOf("alp") ? aeOf("alp")[1] : aePts[0].y
-  } : null;
-  const elecStop = gElecStop || pelStop || aesStop;
+  const elecStop = gElecStop || evStop;
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
   const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
   const [evtOpen, setEvtOpen] = useState(null);
@@ -441,7 +408,7 @@ function RdPrimary({
     };
     return (parts || []).every(p => next[p.id]) ? {} : next;
   });
-  const yTop = G ? Math.max(40, Math.ceil(Math.max(...gMonths.flatMap(m => GRPV_KEYS.map(kk => m[kk] + m.ci[kk])).concat(aePts.map(d => d.y), pelPts.map(d => d.y))) * 1.0001 / 10) * 10) : pvx ? Math.max(40, Math.ceil(Math.max(...pvx.months.flatMap(m => GRPV_KEYS.map(kk => (m[kk] || 0) + (m.ci && m.ci[kk] || 0)))) * 1.0001 / 5) * 5) : 40;
+  const yTop = G ? Math.max(40, Math.ceil(Math.max(...gMonths.flatMap(m => GRPV_KEYS.map(kk => m[kk] + m.ci[kk])).concat(evPts.map(d => d.y))) * 1.0001 / 10) * 10) : pvx ? Math.max(40, Math.ceil(Math.max(...pvx.months.flatMap(m => GRPV_KEYS.map(kk => (m[kk] || 0) + (m.ci && m.ci[kk] || 0)))) * 1.0001 / 5) * 5) : 40;
   const yTickSet = [0, 10, 20, 30, 40, 50, 60, 70].filter(t => t <= yTop);
   const stat = p => React.createElement("button", {
     key: p.id,
@@ -675,7 +642,7 @@ function RdPrimary({
     yTickFmt: v => v === 0 ? "" : v + "%",
     baseline: true,
     xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null),
-    series: chartSeries.concat(leads).concat(aeLeads).concat(pelLeads),
+    series: chartSeries.concat(leads).concat(evLeads),
     spine: (elecStop ? [elecStop] : []).concat(series(live("alp"), "alp")),
     areas: areas,
     scatter: shownScatter,
@@ -691,12 +658,9 @@ function RdPrimary({
       if (elecStop && i === 0) return gElecStop ? [{
         label: "",
         value: "The election result"
-      }] : pelStop ? [{
-        label: "",
-        value: "The polls over the six weeks before polling day" + (aeOn ? "; the diamonds are the Australian Election Study 2025’s" : "")
       }] : [{
         label: "",
-        value: "Australian Election Study 2025" + (aeGrp ? ", " + aeGrp.n.toLocaleString() + " respondents" : "") + "; never pooled"
+        value: evGrp.src === "both" ? "Estimated from the polls before the election and the Australian Election Study 2025" : evGrp.src === "polls" ? "The polls over the six weeks before polling day" : "Australian Election Study 2025, " + evGrp.aesN.toLocaleString() + " respondents"
       }];
       const d = pts[elecStop ? i - 1 : i];
       if (!d || !d.ci || d.election) return d && d.election ? [{
@@ -712,17 +676,13 @@ function RdPrimary({
     copy: {
       title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""),
       sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : pvx ? ". Monthly averages of " + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
-      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (pelOn ? " The triangles at the election are the polls’ own figures for " + sel.who + " over the six weeks before polling day, which the changes are measured from." : "") + (aeOn ? " The diamonds at the election are the Australian Election Study 2025’s figures, never pooled." : "") + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "") + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
+      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." + (evOn ? " The diamonds at the election are estimates of how " + sel.who + " voted, from " + (evGrp.src === "both" ? "the polls before polling day and the Australian Election Study 2025 together." : evGrp.src === "polls" ? "the polls over the six weeks before polling day." : "the Australian Election Study 2025.") : "") + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "") + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "") : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
         kind: p.id === "oth" ? "dashed" : "line"
-      })).concat(pelOn ? [{
-        label: "Polls at the 2025 election",
-        color: "var(--ink-3)",
-        kind: "triangle"
-      }] : []).concat(aeOn ? [{
-        label: "Australian Election Study 2025",
+      })).concat(evOn ? [{
+        label: RD_VOTE_LABEL,
         color: "var(--ink-3)",
         kind: "diamond"
       }] : [])
@@ -752,15 +712,10 @@ function RdPrimary({
     }, base ? {
       kind: "ring",
       label: rdElecYear + " election result"
-    } : null, pelOn ? {
-      kind: "triangle",
-      color: "var(--ink-3)",
-      label: "Polls at the " + rdElecYear + " election"
-    } : null, aeOn ? {
+    } : null, evOn ? {
       kind: "diamond",
       color: "var(--ink-3)",
-      label: "Australian Election Study 2025",
-      href: D.demoAes.src
+      label: RD_VOTE_LABEL
     } : null]
   }, React.createElement("span", {
     className: "rd-grow"
@@ -4898,62 +4853,33 @@ function RdDemographics({
         y: leN
       }, allSeries.points[0]]
     }] : []) : [];
-    const pe = D.demoElection && D.demoElection.sets && D.demoElection.sets[c.st.id];
-    const peOf = g => pe && pe.groups[g.label] && pe.groups[g.label][party] || null;
-    const peX = D.demoElection ? D.demoElection.x : null;
-    const peOn = !!pe && !pm && !leOn && c.allPts.length && peX < c.allPts[0].x && rowsOf.some(r => peOf(r.l.g)) && (xDom[0] <= peX + 1e-6 || rangeId === "all");
-    const peSub = g => {
-      const pg = pe.groups[g.label];
-      return "Over the six weeks before polling day: " + pg.n + " poll" + (pg.n === 1 ? "" : "s") + " from " + rdList(pg.houses.map(demoHouse)) + ", pooled as the lines are, ±" + pg[party][1].toFixed(1);
-    };
-    const pePts = peOn ? rowsOf.filter(r => peOf(r.l.g)).map(r => ({
-      x: peX,
-      y: peOf(r.l.g)[0],
-      color: colorOf(r),
-      shape: "triangle",
-      hollow: true,
-      size: 1.6,
-      label: r.l.g.label,
-      meta: {
-        pollster: "Polls at the 2025 election"
-      },
-      sub: peSub(r.l.g)
-    })) : [];
-    const ae = D.demoAes && D.demoAes.sets && D.demoAes.sets[c.st.id];
-    const aeOf = g => ae && ae.groups[g.label] && ae.groups[g.label][party] || null;
-    const aeOn = !!ae && !pm && !leOn && c.allPts.length && D.demoAes.x < c.allPts[0].x && rowsOf.some(r => aeOf(r.l.g)) && (xDom[0] <= D.demoAes.x + 1e-6 || rangeId === "all");
-    const aeX = aeOn ? D.demoAes.x : null;
-    const aeSub = g => "Vote at the May 2025 election, post-election survey, " + ae.groups[g.label].n.toLocaleString() + " respondents in this group, not pooled";
-    const aeRows = aeOn ? rowsOf.filter(r => aeOf(r.l.g)) : [];
-    const aePts = aeRows.map(r => ({
-      x: aeX + (peOn ? RD_AES_NUDGE(narrow) : 0),
-      y: aeOf(r.l.g)[1],
-      gv: aeOf(r.l.g)[0],
+    const ev = D.demoVote && D.demoVote.sets && D.demoVote.sets[c.st.id];
+    const evG = g => ev && ev.groups[g.label] || null;
+    const evOf = g => evG(g) && evG(g)[party] || null;
+    const elX = D.demoVote ? D.demoVote.x : null;
+    const elOn = !!ev && !pm && !leOn && c.allPts.length && elX < c.allPts[0].x && rowsOf.some(r => evOf(r.l.g)) && (xDom[0] <= elX + 1e-6 || rangeId === "all");
+    const elPts = elOn ? rowsOf.filter(r => evOf(r.l.g)).map(r => ({
+      x: elX,
+      y: evOf(r.l.g)[0],
       color: colorOf(r),
       shape: "diamond",
       hollow: true,
       size: 1.6,
       label: r.l.g.label,
       meta: {
-        pollster: "Australian Election Study 2025"
+        pollster: RD_VOTE_LABEL
       },
-      sub: aeSub(r.l.g)
-    }));
-    const elOn = peOn || aeOn;
-    const elX = peOn ? peX : aeX;
-    const elN = elOn ? (peOn ? D.demoElection.elec : D.demoAes.elec)[party] : null;
-    const elLeads = elOn ? rowsOf.filter(r => r.rows.length && (peOn && peOf(r.l.g) || aeOn && aeOf(r.l.g))).map(r => {
-      const pv = peOn ? peOf(r.l.g) : null;
-      const p0 = pv ? {
-        x: peX,
-        y: pv[0]
-      } : {
-        x: aeX,
-        y: aeOf(r.l.g)[1],
-        gv: aeOf(r.l.g)[0]
+      sub: rdVoteSub(evG(r.l.g), evOf(r.l.g))
+    })) : [];
+    const elN = elOn ? D.demoVote.elec[party] : null;
+    const elSrc = elOn ? [...new Set(rowsOf.filter(r => evOf(r.l.g)).map(r => evG(r.l.g).src))] : [];
+    const elLeads = elOn ? rowsOf.filter(r => r.rows.length && evOf(r.l.g)).map(r => {
+      const p0 = {
+        x: elX,
+        y: evOf(r.l.g)[0]
       };
       return {
-        id: (pv ? "pe-" : "ae-") + r.l.g.label,
+        id: "ev-" + r.l.g.label,
         label: r.l.g.label,
         color: colorOf(r),
         dash: RD_ELECTION_LEAD,
@@ -4978,13 +4904,12 @@ function RdDemographics({
         y: elN
       }, allSeries.points[0]]
     }] : []) : [];
-    const elPts = pePts.concat(aePts);
     const xDomA = elOn && elX < xDomL[0] ? [elX - 0.05, xDomL[1]] : xDomL;
     const yDomA = elPts.length ? [yDom[0], Math.max(yDom[1], Math.ceil(Math.max(...elPts.map(p => p.y)) / 10) * 10)] : yDom;
     const lead0 = leOn || elOn;
     const ciLead = i => i === 0 ? [{
       label: "",
-      value: leOn ? "The election result" : peOn ? "Groups: the polls over the six weeks before polling day; all voters: the result" + (aeOn ? "; diamonds: the Australian Election Study 2025" : "") : "Groups: Australian Election Study 2025; all voters: the result"
+      value: leOn ? "The election result" : elSrc.includes("both") ? "Groups: estimated from the polls before the election and the Australian Election Study 2025; all voters: the result" : elSrc[0] === "polls" ? "Groups: the polls over the six weeks before polling day; all voters: the result" : "Groups: Australian Election Study 2025; all voters: the result"
     }] : ciLoc(i - 1);
     return (React.createElement("div", {
         className: "card rd-card rd-wv-chart",
@@ -5027,11 +4952,19 @@ function RdDemographics({
           x: d.x,
           y: d.y
         }))),
-        marks: leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
+        marks: (leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
           x: le.x,
           y: leY(r.l.g),
           color: colorOf(r)
-        })) : [],
+        })) : []).concat(leOn && leN != null ? [{
+          x: le.x,
+          y: leN,
+          color: "var(--ink)"
+        }] : elOn && elN != null ? [{
+          x: elX,
+          y: elN,
+          color: "var(--ink)"
+        }] : []),
         ringAtX: leOn ? le.x : null,
         scatter: elPts.length ? (cross ? cross.scatter : c.dots).concat(elPts) : cross ? cross.scatter : c.dots,
         scatterOut: cross ? cross.scatterOut : [],
@@ -5057,12 +4990,8 @@ function RdDemographics({
             label: "All voters",
             color: "var(--ink)",
             kind: "dashed"
-          }]).concat(pePts.length ? [{
-            label: "Polls at the 2025 election",
-            color: pColor,
-            kind: "triangle"
-          }] : []).concat(aePts.length ? [{
-            label: "Australian Election Study 2025",
+          }]).concat(elPts.length ? [{
+            label: RD_VOTE_LABEL,
             color: pColor,
             kind: "diamond"
           }] : [])
@@ -5200,15 +5129,13 @@ function RdDemographics({
       kind: "dash",
       color: "var(--ink)",
       label: "All voters"
-    }].concat(D.demoElection && tab.sets.some(st => D.demoElection.sets[st.id] && Object.values(D.demoElection.sets[st.id].groups).some(g => g[party] != null)) ? [{
-      kind: "triangle",
-      color: "var(--ink-3)",
-      label: "Polls at the 2025 election"
-    }] : []).concat(D.demoAes && tab.sets.some(st => D.demoAes.sets[st.id] && Object.values(D.demoAes.sets[st.id].groups).some(g => g[party] != null)) ? [{
+    }, {
+      kind: "ring",
+      label: rdElecYear + " election result"
+    }].concat(D.demoVote && tab.sets.some(st => D.demoVote.sets[st.id] && Object.values(D.demoVote.sets[st.id].groups).some(g => g[party] != null)) ? [{
       kind: "diamond",
       color: "var(--ink-3)",
-      label: "Australian Election Study 2025",
-      href: D.demoAes.src
+      label: RD_VOTE_LABEL
     }] : [])
   }), sigSets.length > 0 && React.createElement("details", {
     className: "rd-evdrop rd-tsig"

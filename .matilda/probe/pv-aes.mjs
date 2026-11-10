@@ -6,7 +6,7 @@
    election month: the polls over the six weeks before polling day and the
    Australian Election Study 2025 weighted together, or the one source that
    cut the group (AES: generations; polls: language). No triangles.
-   Lead-ins join the lines only where one source stands behind the mark; the
+   Lead-ins join every mark to its line (2026-11-11); the
    diamond's tip quotes the readings and the stop's column tip names them.
    Every other subpop view and the all-voters view stay untouched, and nothing
    hits the boundary.
@@ -85,7 +85,7 @@ for (const [grp, expD] of [["Men", 5], ["Women", 5], ["Gen Z", 5], ["Millennials
   ok(`${grp}: no boundary`, !s.burned);
   /* one source (generations: the AES) keeps the lead-ins; both, none */
   const gen = ["Gen Z", "Millennials", "Gen X", "Boomers"].includes(grp);
-  ok(`${grp}: ${gen ? "lead-ins from the diamonds (one source)" : "no lead-ins (two sources behind the mark)"}`, gen ? s.evLeads >= 4 : s.evLeads === 0, `ev=${s.evLeads}`);
+  ok(`${grp}: lead-ins from the diamonds`, s.evLeads >= 4, `ev=${s.evLeads}`);
 
   if (grp === "Men") {
     const box = await page.evaluate(() => {

@@ -3,9 +3,8 @@
 // the group's vote, the polls over the six weeks before polling day and the
 // Australian Election Study 2025 weighted together (the polls alone for
 // language at home, the AES alone for generations). No triangles any more.
-// - A group both sources cut takes NO dotted lead-in (the gap to the line is
-//   partly the two instruments); one-source groups keep theirs; the
-//   all-voters line is always led back to the result.
+// - Every diamond takes the dotted lead-in to its line's first month, and the
+//   all-voters line is led back to the result, ringed there (2026-11-11).
 // - None on the Place tab (the AEC count marks those).
 // The key names the estimate; a diamond's tip quotes both readings and the
 // margin; the election-month guide reads the groups at the estimate (from
@@ -102,7 +101,8 @@ for (const vw of [1280, 390]) {
       /* lead-ins: all voters only; the two groups ride as single points */
       const leads = await page.evaluate(() => ({ all: document.querySelectorAll('#who-votes .rd-wv-chart [data-series^="ae-all-"]').length,
         ev: [...document.querySelectorAll('#who-votes .rd-wv-chart path[data-series^="ev-"]')].filter((n) => /L/.test(n.getAttribute("d") || "")).length }));
-      check("all voters led back to the result; no group lead-in where both sources stand", leads.all >= 1 && leads.ev === 0, JSON.stringify(leads));
+      const ring = await page.evaluate(() => [...document.querySelectorAll("#who-votes .rd-wv-chart")].map((c) => c.querySelectorAll("svg g.rd-mark").length));
+      check("all voters led back to the result and ringed there; both groups lead in from their diamonds", leads.all >= 1 && leads.ev >= 2 && ring[0] >= 1, JSON.stringify({ leads, ring }));
       await page.mouse.move(5, 5);
     }
     await click(page, "#who-votes .rd-wv-tabs .rd-tab, #who-votes .rd-wv-tabs button", "Age");
@@ -116,7 +116,7 @@ for (const vw of [1280, 390]) {
         head: (card.querySelector(".rd-chead-t") || {}).firstChild?.textContent || "",
         ev: [...card.querySelectorAll('path[data-series^="ev-"]')].filter((n) => /L/.test(n.getAttribute("d") || "")).length })));
       const lg = leadsG.find((c) => /generation/i.test(c.head)), la = leadsG.find((c) => /age/i.test(c.head) && !/generation/i.test(c.head));
-      check("generations (one source) keep their lead-ins, ages (both) take none", lg && lg.ev >= 3 && la && la.ev === 0, JSON.stringify(leadsG));
+      check("generations and ages all lead in from their diamonds", lg && lg.ev >= 3 && la && la.ev >= 3, JSON.stringify(leadsG));
     }
     if (party === "Labor") {
       const el = await page.$("#who-votes .rd-wv-charts");
