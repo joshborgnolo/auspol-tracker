@@ -1229,7 +1229,10 @@ function paintMiniChamber() {
      2026-11-10: it drew the House's 150 chairs). Not interactive today — the
      chair-hit map below stays the House's, so senator clicks would navigate
      to the wrong seat (its hover/click handlers stand down on miniCh.senate) */
-  const sm = (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  /* …and never without its plan: senateGeom() is the floor file's seats, so
+     drawing with the senators' deck alone left its canvas blank (2026-11-10).
+     Floor loads with the lane (loadSenateFloor at switch, boot and year-walk) */
+  const sm = (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? (senFloor ? SENY[isNowY(m.year) ? "now" : m.year] || null : null) : null;
   const dm = sm || m;
   miniCh.senate = !!sm;
   if (sm && miniCh.hover != null) miniCh.hover = null;
