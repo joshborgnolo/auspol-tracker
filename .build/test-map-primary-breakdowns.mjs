@@ -28,7 +28,7 @@ const ctx = vm.createContext({
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat,senMovesNote})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat,senMovesNote,seatSpRows,boothSpRows})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -222,5 +222,23 @@ assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout 
     "These figures are the 2025 election’s Senate, adjusted for changes since then. Tammy Tyrrell has joined Labor. One Nation, the Liberals and the Greens replaced a senator each."
   );
   assert.equal(api.senMovesNote(mkDeck([["Dep Example", "SA", "ALP", "alp"]]), mkDeck([["Dep Example", "SA", "ALP", "alp"]]), 2025), "", "an unmoved chamber carries no note");
+}
+// a seat's and a polling place's flows chart reads the Senate's own ballots
+// where the lane reads them — seat cells, place cells, same split bars
+{
+  vmS.spPair = "AC";
+  const macArr = (rows) => { const a = new Array(54).fill(0); for (const [d, x, y] of rows) { const k = { grn: 0, onp: 3, oth: 6 }[d]; a[k] = x; a[k + 1] = y; } return a; };
+  const deck = {
+    divs: { Braddon: macArr([["grn", 80, 20], ["onp", 30, 70], ["oth", 10, 10]]) },
+    booths: { 4848: macArr([["grn", 3, 7]]) },
+  };
+  const sm = { year: 2025, spData: deck, divs: [{ n: "Braddon" }], booth: { id: [4848] } };
+  const sp = api.seatSpRows(sm, sm.divs[0]);
+  assert.ok(sp.includes("Greens") && sp.includes(">100 ballots<") && sp.includes(">80%<"), "a seat's Senate flows split the seat's own deck cells");
+  assert.ok(sp.includes("One Nation") && sp.includes(">70%<") && sp.includes("Others and independents") && sp.includes(">20 ballots<") && sp.includes(">50%<"), "every donor cohort of the cell");
+  const sb = api.boothSpRows(sm, 0);
+  assert.ok(sb.includes("Greens") && sb.includes(">10 ballots<") && sb.includes(">30%<"), "a polling place's own Senate-flow cells");
+  assert.equal(api.seatSpRows({ year: 2025, spData: {}, divs: [{ n: "Braddon" }] }, { n: "Braddon" }), "", "no deck cell, no seat chart");
+  delete vmS.spPair;
 }
 console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");

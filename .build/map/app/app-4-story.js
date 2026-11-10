@@ -266,6 +266,24 @@ function areaFlowRows(m, idx) {
   if (!rows.length) return "";
   return flowRows(rows, { fam: "alp" }, { fam: S.vs === "onp" ? "onp" : "lnp" }, ["Labor", S.vs === "onp" ? "One Nation" : coalW(1).replace(/^The /, "")]);
 }
+/* a donor cohort's slot in a seat or place's counts — the same walk
+   spSlot()'s takes for the current pair */
+const spSlotFor = (donor) => { let k = 0; for (const p of ["AC", "AO", "CO"]) for (const dd of SP_DONORS[p]) { if (p === S.spPair && dd === donor) return 3 * k; k++; } return -1; };
+const spCellFor = (arr, donor) => { const k = spSlotFor(donor); return k < 0 || !arr ? { x: 0, y: 0 } : { x: arr[k] || 0, y: arr[k + 1] || 0 }; };
+/* one shared bar chart of the Senate-reading's contest: rows of
+   [donor, ranked-first-ahead, ranked-second-ahead], in menu order — the group
+   ticket years' counts read as tickets, the way the lens's finding says */
+function spRowsHtml(m, rows) {
+  const word = spGvtYear(m.year) != null ? "tickets" : "ballots";
+  const [pa, pb] = SP_PAIRS[S.spPair];
+  return rows.map(([d, x, y]) => { const t = x + y, pc = (100 * x) / t; return `<div class="flow"><div class="fh"><div>${d === "oth" ? "Others and independents" : famLeg(d)}</div><span>${int(t)} ${word}</span></div><div class="fb"><i style="width:calc(${pc}% - 1px);${swc(pa)}"></i><i style="flex:1;${swc(pb)}"></i></div><div class="fl"><span><b class="${tx(pa)}">${f0(pc)}%</b> to ${spName(pa)}</span><span>${spName(pb)} <b class="${tx(pb)}">${f0(100 - pc)}%</b></span></div></div>`; }).join("");
+}
+/* every donor cohort's triplet for the lens's pair, over one set of cells */
+function spRowSet(m, cellsFor) {
+  const rows = [];
+  for (const d of SP_DONORS[S.spPair]) { const a = cellsFor(d); if (a.x + a.y > 0) rows.push([d, a.x, a.y]); }
+  return rows.length ? spRowsHtml(m, rows) : "";
+}
 /* the Senate-ballot reading's take on the flows chart: for the contest the
    story reads, one row per donor cohort — a seat's tallies gathered over the
    view's seats from the same cells spCells()'s walk indexes (by-elections
@@ -274,20 +292,25 @@ function areaFlowRows(m, idx) {
    tickets, like the lens's own finding does */
 function areaSpRows(m, idx) {
   const s = spOf(m); if (!s) return "";
-  const word = spGvtYear(m.year) != null ? "tickets" : "ballots";
-  const [pa, pb] = SP_PAIRS[S.spPair];
-  const rows = [];
-  for (const d of SP_DONORS[S.spPair]) {
-    let k = -1, kk = 0, x = 0, y = 0;
-    for (const p of ["AC", "AO", "CO"]) for (const dd of SP_DONORS[p]) { if (p === S.spPair && dd === d) k = 3 * kk; kk++; }
+  return spRowSet(m, (d) => {
+    let x = 0, y = 0;
     for (const i of idx) {
       const dv = m.divs[i], arr = dv.by || spAbsent(m, dv.st) ? null : s.divs[dv.n];
-      if (arr) { x += arr[k] || 0; y += arr[k + 1] || 0; }
+      if (arr) { const c = spCellFor(arr, d); x += c.x; y += c.y; }
     }
-    if (x + y > 0) rows.push([d, x, y]);
-  }
-  if (!rows.length) return "";
-  return rows.map(([d, x, y]) => { const t = x + y, pc = (100 * x) / t; return `<div class="flow"><div class="fh"><div>${d === "oth" ? "Others and independents" : famLeg(d)}</div><span>${int(t)} ${word}</span></div><div class="fb"><i style="width:calc(${pc}% - 1px);${swc(pa)}"></i><i style="flex:1;${swc(pb)}"></i></div><div class="fl"><span><b class="${tx(pa)}">${f0(pc)}%</b> to ${spName(pa)}</span><span>${spName(pb)} <b class="${tx(pb)}">${f0(100 - pc)}%</b></span></div></div>`; }).join("");
+    return { x, y };
+  });
+}
+/* and a single division's own read of the same chart (its seat story in a
+   Senate lane — the House count's final two lives in the other lanes) */
+function seatSpRows(m, d) {
+  const s = spOf(m), cells = s && s.divs && s.divs[d.n];
+  return cells ? spRowSet(m, (dd) => spCellFor(cells, dd)) : "";
+}
+/* and a polling place's own read, from the deck's place cells */
+function boothSpRows(m, j) {
+  const s = spOf(m), cells = s && m.booth && s.booths && s.booths[m.booth.id[j]];
+  return cells ? spRowSet(m, (dd) => spCellFor(cells, dd)) : "";
 }
 function decileRows(get, labelFor) {
   return `<div class="dec">${IX.map((ix) => { const v = get(ix); const cells = Array.from({ length: 10 }, (_, k) => `<i style="${v && k + 1 <= v ? `background:${css(RAMP.seifa[Math.round((k / 9) * 100)])}` : ""}"></i>`).join(""); return `<div class="nm">${IX_NAME[ix]}<small>${IX_ABBR[ix]}${v ? ` · decile ${v}` : " · no score"}${labelFor ? labelFor(ix, v) : ""}</small></div><div class="cells" role="img" aria-label="Decile ${v ?? "unknown"} of 10">${cells}</div>`; }).join("")}</div>`;
@@ -935,7 +958,11 @@ function areaHedDek(m, st) {
         if (!aus) { const inPool = new Set(idx), ch = (m.changes || []).filter((x) => inPool.has(m.byName.get(x.div))); if (ch.length) { const ns = [...new Set(ch.map((x) => x.div))].map((n) => ds(n)); note = `Since the election: ${ns.length > 2 ? `${ns.slice(0, -1).join(", ")} and ${ns[ns.length - 1]}` : ns.join(" and ")} ${ns.length > 1 ? "have" : "has"} changed hands or party.`; } }
         if (aus) dek += NOW_AUS_DEK[m.year]?.t ?? "";
         else if (note) dek += ` ${note}`;
-        const noteDef = aus && m.year === "now" && note ? NOW_AUS_DEK[m.year] : null;
+        // the curated note follows its named seats wherever the pool holds
+        // them all — the whole of New South Wales keeps it (Farrer and New
+        // England, Wentworth and Warringah, all sit in it), a seat-type or
+        // another state drops it (user call 2026-11-10)
+        const noteDef = m.year === "now" && NOW_AUS_DEK[m.year]?.seats?.every((n) => idx.some((i) => m.divs[i].n === n)) ? NOW_AUS_DEK[m.year] : null;
         return { hed, dek: noteDef ? "" : note, stat: seatStat(m, st, `${hed}. ${dek}`, noteDef) };
       }
       const maj = Math.floor(N / 2) + 1;
@@ -1414,7 +1441,10 @@ function storyArea(m, st) {
   }
   // (a seat-type filter keeps the changes in its own seats)
   const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
-  if (isNowY(m.year) && aus && chList.length) {
+  // the pool's own changed seats list at every scope: the curated note's
+  // "(see below)" points at it, so it renders wherever that note can (user
+  // call 2026-11-10 — New South Wales keeps the note and its referent)
+  if (isNowY(m.year) && chList.length) {
     const ch = chList.slice().reverse();
     const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
     h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
@@ -1616,8 +1646,13 @@ function storyDiv(m, i) {
   const moved = movedTo(m, d);
   const winPartyOf = moved ? (c) => (c === d.win ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
   h += `<div class="st-sec"><h3>The candidates <small>by primary vote${d.by ? `, change on ${frameBaseY(m.year)}` : ""}</small></h3>${candRows(d.c, d.formal, null, 7, d.by ? (c) => byChange(c, d, prevDiv) : null, winPartyOf)}</div>`;
-  const fl = flowRows(d.flows, d.A, d.B);
-  if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`;
+  // the flows chart's data follows the lane like the rest of the page: the
+  // Senate's own ballots where the lens reads them (a by-election had none —
+  // the House record stands under it), the House count's final two in the
+  // other lenses (user call 2026-11-10: the section changes with the lens)
+  const spf = (S.lens === "senate" || S.lens === "senpref") && !d.by ? seatSpRows(m, d) : "";
+  if (spf) h += `<div class="st-sec"><h3>Where preferences went <small>on Senate ${spGvtYear(m.year) != null ? "tickets" : "ballots"}</small></h3>${spf}</div>`;
+  else { const fl = flowRows(d.flows, d.A, d.B); if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`; }
   if (d.vt) h += vtBlock([d]);
   const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
   const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
@@ -1781,8 +1816,9 @@ function storyBooth(m, j) {
   const wk = D.c.indexOf(D.win);
   const winPartyOf = moved ? (c) => (c.k === wk ? `${partyName(c.ab, c.pn)} · now ${moved}` : partyName(c.ab, c.pn)) : null;
   if (b.formal[j]) h += `<div class="st-sec"><h3>The candidates <small>by primary vote here. Tick = whole seat</small></h3>${candRows(cands, b.formal[j], (c) => (100 * D.c[c.k].v) / D.formal, 0, pf ? (c) => { const same = D.c.filter((x) => x.b === c.b).length === 1; return same ? (100 * c.v) / b.formal[j] - pf[c.b] : null; } : () => null, winPartyOf)}</div>`;
-  const fl = raw.fl[j];
-  if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; }
+  const sbooth = (S.lens === "senate" || S.lens === "senpref") && !D.by ? boothSpRows(m, j) : "";
+  if (sbooth) h += `<div class="st-sec"><h3>Where preferences went here <small>on Senate ${spGvtYear(m.year) != null ? "tickets" : "ballots"}</small></h3>${sbooth}</div>`;
+  else { const fl = raw.fl[j]; if (fl && fl.length) { const fb = flowRows(fl.map(([ci, ta, tb]) => ({ cand: D.c[ci], ta, tb })), D.A, D.B); if (fb) h += `<div class="st-sec"><h3>Where preferences went here</h3>${fb}</div>`; } }
   const dec = raw.dec[j], vdec = raw.vdec[j], dr = raw.demo && raw.demo[j], dc = demoBoothCopy(m);
   const incRow = dr ? incFact(m, { loinc: dr[6], hiqinc: dr[16], medIncWeekly: raw.medinc ? raw.medinc[j] : null }) : "";
   const origB = isCob() && raw.cob && raw.cob[j] ? raw.cob[j][m.cobPos[S.cob]] : null;
