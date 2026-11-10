@@ -28,7 +28,7 @@ const ctx = vm.createContext({
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat,senMovesNote})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -210,5 +210,17 @@ assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout 
   assert.ok(Math.abs(full.v - 65) < 1e-9, "pools every division: 65% ranked Labor ahead");
   assert.ok(Math.abs(full.sw - 12.5) < 1e-9, "delta over the pooled previous split (65% − 52.5%)");
   assert.equal(api.senTwoStat({ year: 2025, res: {}, divs: [] }, []), null, "no eligible divisions, no figure");
+}
+// the Now chamber's movements note names real changes only: joined parties
+// and senator replacements — not surname respellings or family-level re-codes
+{
+  const mkDeck = (rows) => ({ divs: rows.map(([n, st, ab, fam]) => ({ n, st, hold: { ab, fam } })) });
+  const d25 = mkDeck([["Deb O'Neill", "NSW", "ALP", "alp"], ["Peter Whish-Wilson", "TAS", "GRN", "grn"], ["Wendy Askew", "TAS", "LP", "lnp"], ["Warwick Stacey", "NSW", "ON", "onp"], ["Tammy Tyrrell", "TAS", "IND", "ind"], ["James McGrath", "QLD", "LP", "lnp"]]);
+  const dNow = mkDeck([["Deborah O'Neill", "NSW", "ALP", "alp"], ["Sean Bell", "NSW", "ON", "onp"], ["Chris Gatenby", "TAS", "LP", "lnp"], ["Vanessa Bleyer", "TAS", "GRN", "grn"], ["Tammy Tyrrell", "TAS", "ALP", "alp"], ["James McGrath", "QLD", "LNP", "lnp"]]);
+  assert.equal(
+    api.senMovesNote(dNow, d25, 2025).trim(),
+    "These figures are the 2025 election’s Senate, adjusted for changes since then. Tammy Tyrrell has joined Labor. One Nation, the Liberals and the Greens replaced a senator each."
+  );
+  assert.equal(api.senMovesNote(mkDeck([["Dep Example", "SA", "ALP", "alp"]]), mkDeck([["Dep Example", "SA", "ALP", "alp"]]), 2025), "", "an unmoved chamber carries no note");
 }
 console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");

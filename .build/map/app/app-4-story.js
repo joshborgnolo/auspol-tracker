@@ -592,6 +592,38 @@ function senTwoStat(m, idx) {
   const v = (100 * x) / (x + y);
   return { v, sw: x0 + y0 > 0 ? v - (100 * x0) / (x0 + y0) : null };
 }
+/* the Now senate chamber's note beside its seats row: the base chamber is the
+   election's own, with the movements since named plainly — who joined a side
+   from outside it, and which parties changed their senator — in the House
+   row's own words shape ("…election's, adjusted for changes since then.").
+   A surname respelling (Deb/Deborah O'Neill) and a family-level re-code
+   (the Queenslanders' LNP) are not movements */
+function senMovesNote(dn, d0, yr) {
+  const keyOf = (d) => `${d.st}|${d.n.split(/\s+/).pop().toLowerCase()}`;
+  const goneByKey = new Map(d0.divs.map((d) => [keyOf(d), d]));
+  const switched = [], arrived = [];
+  for (const d of dn.divs) {
+    const b = goneByKey.get(keyOf(d));
+    if (b) { goneByKey.delete(keyOf(d)); if (b.hold.fam !== d.hold.fam) switched.push(d); }
+    else arrived.push(d);
+  }
+  const left = [...goneByKey.values()], replaced = [];
+  for (const a of arrived) {
+    const j = left.findIndex((l) => l.st === a.st && l.hold.ab === a.hold.ab);
+    if (j >= 0) { replaced.push(a.hold.ab); left.splice(j, 1); }
+  }
+  if (!switched.length && !replaced.length) return "";
+  const word = (ab) => ({ ALP: "Labor", LP: "the Liberals", NP: "the Nationals", LNP: "the LNP", GRN: "the Greens", ON: "One Nation", ONP: "One Nation", UAP: "the United Australia Party", UAPP: "the United Australia Party", JLN: "the Jacqui Lambie Network", AV: "Advance Australia", IND: "an independent" })[ab] || ab;
+  const pieces = [];
+  for (const d of switched) pieces.push(`${ds(d.n)} has joined ${word(d.hold.ab)}`);
+  if (replaced.length) {
+    const cnt = {};
+    for (const ab of replaced) cnt[ab] = (cnt[ab] || 0) + 1;
+    const who = Object.keys(cnt).map(word);
+    pieces.push(who.length === 1 && cnt[Object.keys(cnt)[0]] === 1 ? `${who[0]} replaced a senator` : `${listAnd(who)} replaced a senator each`);
+  }
+  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then. ${pieces.map(cap).join(". ")}.`;
+}
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
 function statClassArea(m, idx) {
@@ -730,14 +762,23 @@ function seatStat(m, st, label, noteDef = null) {
   // State filter is on, and a Seat type filter pools that type's seats in it
   const cls = clsFilter(m);
   const { A, idx, N, cnt } = scopeArea(m, st);
+  // the Senate figure rows answer every lane whose story is the Senate's
+  // data: the Senate lens itself, and the Preferences tab's Senate-ballot
+  // reading on federal frames (user call 2026-11-10 — the head follows the
+  // source). Nowhere else; the House's own rows stand in every other lens
+  const senLanes = S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null);
   // the Senate lens's seats are the chamber's where its deck has loaded: the
   // senators' family tally over this head's scope (the whole deck, or the
   // filter state's own senators), changed on the previous election's chamber —
   // the House's own row stands everywhere else, and under a seat-type scope
   // (which has no senator bearing). A moved-seat note only reads the House pair
-  const deck = S.lens === "senate" && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  const deck = senLanes && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
   const deckSt = deck && st !== "AUS" ? st : null;
-  const deckP = deck ? SENY[isNowY(m.year) ? (m.res && m.res.prev) : prevYearOf(m.year)] || null : null;
+  // the chamber delta rides the base election — on Now, today's against the
+  // 2025 election's chamber, exactly as the lower house's seats do (never
+  // against the election before that, as m.res.prev would price it)
+  const deckP = deck ? SENY[isNowY(m.year) ? frameBaseY(m.year) : prevYearOf(m.year)] || null : null;
+  const senNote = deck && deckP && isNowY(m.year) && st === "AUS" ? senMovesNote(deck, deckP, frameBaseY(m.year)) : "";
   const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
@@ -772,9 +813,9 @@ function seatStat(m, st, label, noteDef = null) {
   // the Senate lens's two-party row reads the ballots' own ranked split,
   // Labor's slate against the Coalition's; the House's count stands elsewhere
   // (and on this lens until its ballot deck lands)
-  const stp = S.lens === "senate" && spYear(m.year) != null ? senTwoStat(m, idx) : null;
+  const stp = senLanes && spYear(m.year) != null ? senTwoStat(m, idx) : null;
   if (stp) {
-    two = twoPartyFigures("Ranked ahead on Senate ballots", stp.v, "alp", "Labor", 100 - stp.v, "lnp", coalW(1).replace(/^The /, ""), fg) + swingFigure(stp.sw);
+    two = twoPartyFigures(spGvtYear(m.year) != null ? "Ranked ahead on Senate tickets" : "Ranked ahead on Senate ballots", stp.v, "alp", "Labor", 100 - stp.v, "lnp", coalW(1).replace(/^The /, ""), fg) + swingFigure(stp.sw);
   } else if (A.tpp != null) {
     // an "as it stands" frame's swing is the base election's — shown like any
     // election frame's (user call: the now views carry swings too)
@@ -798,7 +839,7 @@ function seatStat(m, st, label, noteDef = null) {
   // every other lens takes the House primaries. A state election has no Senate deck — house row stands.)
   const fpA = A.fp.alp, fpL = A.fp.lnp;
   let fpRow = "";
-  if (S.lens === "senate" && svYear(m.year) != null) {
+  if (senLanes && svYear(m.year) != null) {
     const sf = senFpStat(m, idx);
     if (sf) fpRow = `<span class="st-lab">Senate primaries (Labor and ${coalW()} share ${f1(sf.alp + sf.lnp)}%)</span>${sf.grid}`;
   } else if (fpA != null && fpL != null) {
@@ -816,7 +857,7 @@ function seatStat(m, st, label, noteDef = null) {
   // votes that won them: the two-party count, then the primaries
   const sections = [];
   // the word-note about seats that moved since the election sits under the count's legend
-  sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote}`);
+  sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote || (senNote ? `<span class="st-seat-note">${senNote.trim()}</span>` : "")}`);
   if (two) sections.push(two);
   if (fpRow) sections.push(fpRow);
   return `<h3 class="st-stat" aria-label="${esc(label)}">${sep}${sections.join(sep)}${sep}</h3>`;
