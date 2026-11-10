@@ -47,12 +47,19 @@ for (const [ll, st] of [[[133.9, -23.7], "NT"], [[146.8, -42], "TAS"], [[117.9, 
 // ---- the graticule, exact
 const grat = map2.match(/@grat-begin[^*]*\*\/([\s\S]*?)\/\* @grat-end \*\//);
 assert.ok(grat, "app-2-map.js marks gratOf for this test");
-const { gratOf, degLat, degLon, TROPIC } = new Function("GRAT_STEP", `${grat[1]}; return { gratOf, degLat, degLon, TROPIC };`)(10);
-// the Tropic of Capricorn at the year's mean axial tilt (IAU 2006, to the arcsecond's tenth)
+const { gratOf, degLat, degLon, tropicOn } = new Function("GRAT_STEP", `${grat[1]}; return { gratOf, degLat, degLon, tropicOn };`)(10);
+// the Tropic of Capricorn: each day's own mean axial tilt (arc-second true over the timeline)
 {
-  const T = (2026.5 - 2000) / 100, eps = (84381.406 - 46.836769 * T) / 3600;
-  assert.ok(Math.abs(-TROPIC - eps) < 0.0002, `the Tropic of Capricorn lies at the mean axial tilt for 2026 (${eps.toFixed(4)}°)`);
+  const secs = (iso) => -tropicOn(iso) * 3600; // in arcseconds south of the equator
+  assert.ok(Math.abs(secs("2000-01-01T12:00:00Z") - 84381.448) < 0.01, "the Tropic sits on J2000.0's mean obliquity, 23°26′21.448″ south");
+  // the datebook figures the frames span: 23°26′24.7″ south at 1993, 23°26′09.2″ at 2026
+  assert.ok(Math.abs(secs("1993-01-01") - 84384.7) < 0.2, `the Tropic at 1993 stands 23°26′24.7″ south (reads ${secs("1993-01-01").toFixed(1)}″)`);
+  assert.ok(Math.abs(secs("2026-01-01") - 84369.2) < 0.2, `the Tropic at 2026 stands 23°26′09.2″ south (reads ${secs("2026-01-01").toFixed(1)}″)`);
+  // and creeps north about half a second of arc a year the while between elections
+  const creep = (secs("1993-03-13") - secs("2025-05-03")) / ((Date.parse("2025-05-03") - Date.parse("1993-03-13")) / (365.25 * 864e5));
+  assert.ok(creep > 0.43 && creep < 0.51, `the drift north runs about half an arcsecond a year (${creep.toFixed(3)}″ between the 1993 and 2025 election days)`);
 }
+const TR = tropicOn("2025-05-03"); // one framed day's own tropic, for the graticule work below
 // a line's degree as an atlas marks it
 for (const [v, want] of [[degLat(-30), "30°S"], [degLat(0), "0°"], [degLat(10), "10°N"], [degLon(130), "130°E"], [degLon(310), "50°W"], [degLon(-40), "40°W"], [degLon(180), "180°"], [degLon(0), "0°"], [degLon(170), "170°E"]]) assert.equal(v, want, `degree mark ${want}`);
 const fed = { type: "MultiPoint", coordinates: [[112.9, -43.7], [153.7, -10.6]] };
@@ -64,7 +71,7 @@ const fits = [
 ];
 for (const [name, ext, size] of fits) {
   const P = geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize(size, ext);
-  const G = gratOf(P), tol = 1e-9 * P.scale();
+  const G = gratOf(P, TR), tol = 1e-9 * P.scale();
   let worst = 0;
   for (let lat = -80; lat <= 80; lat += 10) for (let lon = -40; lon <= 310; lon += 2.5) {
     const p = P([lon, lat]), r = G.R.get(lat), t = G.t0 + (lon - 132) * G.dt;
@@ -72,7 +79,7 @@ for (const [name, ext, size] of fits) {
   }
   assert.ok(worst < tol, `${name}: every parallel is a circle about the apex and every meridian a ray from it (worst ${worst.toExponential(2)} of ${P.scale().toFixed(0)})`);
   let wt = 0;
-  for (let lon = -40; lon <= 310; lon += 2.5) { const p = P([lon, TROPIC]), t = G.t0 + (lon - 132) * G.dt; wt = Math.max(wt, Math.hypot(p[0] - (G.C[0] + G.Rt * Math.cos(t)), p[1] - (G.C[1] + G.Rt * Math.sin(t)))); }
+  for (let lon = -40; lon <= 310; lon += 2.5) { const p = P([lon, TR]), t = G.t0 + (lon - 132) * G.dt; wt = Math.max(wt, Math.hypot(p[0] - (G.C[0] + G.Rt * Math.cos(t)), p[1] - (G.C[1] + G.Rt * Math.sin(t)))); }
   assert.ok(wt < tol, `${name}: the Tropic of Capricorn is drawn on its own circle (worst ${wt.toExponential(2)})`);
   // the apex lies to the south, below the country (the waters' names curve over it)
   assert.ok(G.C[1] > P([132, -44])[1], `${name}: the apex lies south of the map`);
@@ -80,13 +87,16 @@ for (const [name, ext, size] of fits) {
   const half = 180 * Math.abs(G.dt), cutW = P([-47.9999, -30]), cutE = P([311.9999, -30]);
   const angW = Math.atan2(cutW[1] - G.C[1], cutW[0] - G.C[0]), angE = Math.atan2(cutE[1] - G.C[1], cutE[0] - G.C[0]);
   assert.ok(Math.abs(Math.min(angW, angE) - (G.t0 - half)) < 1e-5 && Math.abs(Math.max(angW, angE) - (G.t0 + half)) < 1e-5, `${name}: the fan ends at the cut`);
-  // gratOf keeps one answer a projection, and makes a new one when its fit changes
-  assert.equal(gratOf(P), G, `${name}: gratOf is kept on the projection`);
+  // gratOf keeps one answer a projection, a new one when its fit or its day moves
+  assert.equal(gratOf(P, TR), G, `${name}: gratOf is kept on the projection`);
+  const G93 = gratOf(P, tropicOn("1993-03-13"));
+  assert.notEqual(G93, G, `${name}: another day's Tropic gets its own circle worked out`);
+  assert.ok(G93.Rt < G.Rt, `${name}: the 1993 tropic stands south of 2025's, nearer the apex`);
 }
 {
-  const P = geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fed), G = gratOf(P);
+  const P = geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fed), G = gratOf(P, TR);
   P.scale(P.scale() * 2);
-  assert.notEqual(gratOf(P), G, "gratOf: a projection refitted gets its apex worked out again");
+  assert.notEqual(gratOf(P, TR), G, "gratOf: a projection refitted gets its apex worked out again");
 }
 
 // ---- the waters' names
