@@ -281,4 +281,79 @@ for (const y of [2013, 2010]) {
   assert.ok(html.includes("<table") && !html.includes("vt-bands"), `${y}: classic-seat coverage keeps the table, not the chart`);
 }
 
-console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes, missing data, the 2016/2019/2022 eras, and the party toggle (2PP/ALP/L-NP/GRN/ON/OTH) in four pools per measure");
+// 2. the Senate's own cast chart, its own era — the early-centre Senate
+// ballots of 2025 never joined the election-night count (out-posted centres
+// from Monday 5 May; the day's Senate first prefs counted after each
+// division's House count); postal rides the declaration pile over days.
+const ERA_SEN_2025 = [["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"], ["early", "Early centres", ["ppvc"], "From Monday, 5 May"], ["day", "On the day", ["day", "mob"], "Election night, after House count"]];
+assert.ok(JSON.stringify(api.vtBandsFor(2025, true)) === JSON.stringify(ERA_SEN_2025), "the Senate era is the Senate count's, not the House's");
+assert.equal(api.vtBandsFor("now", true).length, 3, "\"now\" rides the Senate's 2025");
+// no Senate eras before sourced timing reaches them
+for (const y of [2016, 2019, 2022, 2013]) assert.equal(api.vtBandsFor(y, true), null, `${y}: no Senate cast era yet (2025's is the user-sourced one)`);
+function checkSen(divs, label, fi) {
+  assert.ok(divs.every((d) => d.vts), `${label}: every seat's Senate piles are on file`);
+  const fams = {}, pileN = {}, famTot = [0, 0, 0, 0, 0];
+  let tot = 0;
+  for (const d of divs) for (const [k, p] of Object.entries(d.vts)) {
+    const t = (fams[k] ??= [0, 0, 0, 0, 0]);
+    let pt = 0;
+    for (let i = 0; i < 5; i++) { t[i] += p[i]; famTot[i] += p[i]; pt += p[i]; }
+    pileN[k] = (pileN[k] || 0) + pt;
+    tot += pt;
+  }
+  const result = api.vtBands(divs, true);
+  assert.equal(result.tot, tot, `${label}: the piles' ballots are the formal vote`);
+  const expBase = (100 * famTot[fi]) / tot;
+  close(result.base, expBase, `${label}: area ${FAMS5[fi]} primary share over its formal`);
+  result.bands.forEach((b, i) => {
+    const keys = ERA_SEN_2025[i][2];
+    const famA = keys.reduce((n, k) => n + (fams[k] ? fams[k][fi] : 0), 0);
+    const v = keys.reduce((n, k) => n + (pileN[k] || 0), 0);
+    assert.equal(b.a, famA, `${label}: ${b.k} ${FAMS5[fi]} ballots pool the seats`);
+    assert.equal(b.n, v, `${label}: ${b.k} denominates on its own ballots`);
+    if (v > 0) { close(b.lab, (100 * famA) / v, `${label}: ${b.k} share`); close(b.skew, (100 * famA) / v - expBase, `${label}: ${b.k} skew ${FAMS5[fi]}`); }
+    else assert.equal(b.skew, null, `${label}: an empty pile has no skew`);
+  });
+  let counted = 0, famC = 0;
+  for (const b of result.bands.slice().reverse()) {
+    const before = counted > 0 ? (100 * famC) / counted : null;
+    counted += b.n; famC += b.a;
+    close(b.cumulative, (100 * famC) / counted, `${label}: cumulative ${b.k}`);
+    if (before != null) close(b.effect, b.cumulative - before, `${label}: ${b.k} changes the preceding count`);
+    else assert.equal(b.effect, null, `${label}: the opening count has no effect`);
+  }
+  close(result.bands[0].cumulative, expBase, `${label}: the count settles on the area share`);
+  return result;
+}
+// the five measures pooled over national + filter pools, the handle's own lane
+current = { year: 2025, res: JSON.parse(read("map/data/core-2025.json")) };
+current.divs = current.res.divs;
+current.areas = Object.fromEntries(Object.entries(current.res.agg).map(([st, a]) => [st, { formal: a.formal, idx: current.res.divs.flatMap((d, i) => (st === "AUS" || d.st === st ? [i] : [])) }]));
+for (const [fi, fam] of FAMS5.entries()) {
+  vm.runInContext(`vtSenParty = "${fam}"`, ctx);
+  for (const [divs, label] of partyPools25()) checkSen(divs, `sen ${label} ${fam}`, fi);
+}
+assert.ok(api.vtBands([{ n: "Nos", vt: {}, vt3: {} }], true).bands.every((b) => b.skew === null), "no Senate figures without the Senate piles");
+// chrome: five buttons, no 2PP; the ALP default; the chamber named in the total
+vm.runInContext('vtSenParty = "alp"', ctx);
+const senHtml = api.vtBlock(current.res.divs, true, "nationwide", true);
+assert.equal((senHtml.match(/vt-mode"/g) || []).length, 7, "five parties plus the two measure buttons");
+assert.ok(!senHtml.includes('data-vt-party="tpp"'), "no 2PP in the Senate");
+assert.match(senHtml, /data-vt-party="alp" aria-pressed="true"/);
+assert.ok(senHtml.includes("15,871,189 Senate formal"), "the chamber's own formal count, tagged");
+assert.ok(senHtml.includes("National Labor primary skew"), "ALP is the Senate default measure");
+assert.ok(senHtml.includes("From Monday, 5 May") && senHtml.includes("Election night, after House count") && senHtml.includes("Over following days"), "the Senate era's own timing labels");
+assert.ok(!senHtml.includes("9:30"), "the House's release times never leak into the Senate's bands");
+{
+  const grn = {}, N = {};
+  for (const d of current.res.divs) for (const [k, p] of Object.entries(d.vts)) { grn[k] = (grn[k] || 0) + p[2]; N[k] = (N[k] || 0) + p.reduce((a, v) => a + v, 0); }
+  vm.runInContext('vtSenParty = "grn"', ctx);
+  const g = api.vtBlock(current.res.divs, true, "nationwide", true);
+  const dayV = N.day + N.mob, base = (100 * Object.values(grn).reduce((a, v) => a + v, 0)) / Object.values(N).reduce((a, v) => a + v, 0);
+  const want = `${(100 * (grn.day + grn.mob)) / dayV - base > 0 ? "+" : "−"}${Math.abs((100 * (grn.day + grn.mob)) / dayV - base).toFixed(1)}`;
+  assert.ok(g.includes("National Greens primary skew") && g.includes(`vt-skew t-grn">${want}`), `Greens' day skew ${want} in the Greens tone`);
+  assert.equal(api.vtBlock([current.res.divs[0]], true, null, true).includes("Skew on Bean Greens primary"), true, "Bean's Senate cast heading takes the seat's name");
+  vm.runInContext('vtSenParty = "alp"', ctx);
+}
+
+console.log("PASS: map vote bands — House lanes (pools, eras, toggle, missing data) plus the Senate lens's own cast chart (its own era, five measures, piles-as-denominators, missing-vts nulls)");

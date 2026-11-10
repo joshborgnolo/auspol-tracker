@@ -148,6 +148,25 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
         const got = [0, 0, 0, 0, 0];
         for (const p of Object.values(d.vt3)) for (let i = 0; i < 5; i++) got[i] += p[i];
         assert.deepEqual(got, want, `${y} ${d.n}: first-preference piles add up to the final count`);
+        // the Senate's equivalent lane (build_senate_piles.py): vts, the same
+        // five groupings per pile — but 2016 stays out (its polling-place
+        // product misattributes some ordinary votes between tickets)
+        if (y === 2016) {
+          assert.ok(!d.vts, `${y} ${d.n}: no Senate piles (2016's venue lane isn't exact)`);
+        } else {
+          assert.ok(d.vts, `${y} ${d.n} has Senate piles (python3 -I .build/map/build_senate_piles.py, then assemble)`);
+          const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)).divs[d.n];
+          let svTot = 0;
+          const famSV = [0, 0, 0, 0, 0];
+          for (const [k, p] of Object.entries(d.vts)) {
+            assert.ok(["day", "mob", "ppvc", "pre", "post", "abs", "prov"].includes(k), `${y} ${d.n}: unknown Senate pile ${k}`);
+            assert.equal(p.length, 5, `${y} ${d.n}: five Senate groupings in pile ${k}`);
+            svTot += p.reduce((a, v) => a + v, 0);
+            for (let i = 0; i < 5; i++) famSV[i] += p[i];
+          }
+          assert.equal(svTot, sv[0], `${y} ${d.n}: Senate piles exhaust the Senate's formal votes`);
+          assert.deepEqual(famSV, [sv[1], sv[2], sv[3], sv[4], sv[5] + sv[6]], `${y} ${d.n}: Senate piles add up to the Senate deck's families`);
+        }
       } else if (classic) {
         assert.ok(d.vt2, `${y} ${d.n}: a Labor v Coalition seat has piles`);
         const A = d.tcp[fam.indexOf("alp")][1], C = d.tcp[fam.indexOf("lnp")][1];
@@ -178,6 +197,27 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
     assert.equal(share3("mob", "grn"), 5.1, "2025 Greens primary with mobile teams: remote communities are not heartland");
     assert.equal(share3("post", "onp"), 6.8, "2025 One Nation primary by post");
     assert.equal(share3("abs", "grn"), 19.4, "2025 Greens primary among absentees: the biggest share of any pile");
+  }
+  // the Senate's own pile oracles (vts): Australia's Senate first preferences
+  // per pile against its formal vote, the deck's own family shares beneath
+  {
+    const V = {}, NV = {};
+    for (const d of r.divs) for (const [k, p] of Object.entries(d.vts)) { const t = (V[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) t[i] += p[i]; NV[k] = (NV[k] || 0) + p.reduce((a, v) => a + v, 0); }
+    const totV = Object.values(NV).reduce((a, v) => a + v, 0);
+    const SV_I = { alp: 0, lnp: 1, grn: 2, onp: 3, oth: 4 };
+    const shareV = (ks, f) => Math.round((1000 * ks.reduce((a, k) => a + V[k][SV_I[f]], 0)) / ks.reduce((a, k) => a + NV[k], 0)) / 10;
+    const PILES2 = ["day", "mob", "ppvc", "pre", "post", "abs", "prov"];
+    assert.equal(totV, 15871189, "2025 Senate piles reach the Senate's formal count");
+    assert.deepEqual(PILES2.map((k) => shareV([k], "alp").toFixed(1)), ["35.0", "40.4", "35.8", "32.8", "34.9", "31.8", "32.2"], "2025 Senate ALP per pile (mobile teams its strongest; the declaration piles run 2+ points under the day's 35.0)");
+    assert.equal(shareV(["day", "mob"], "grn"), 13.5, "2025 Senate Greens on the day");
+    assert.equal(shareV(["ppvc"], "grn"), 10.1, "2025 Senate Greens at early centres");
+    assert.equal(shareV(["abs"], "grn"), 16.6, "2025 Senate Greens among absentees");
+    assert.equal(shareV(["post"], "lnp"), 35.0, "2025 Senate Coalition by post");
+    const senJSON = JSON.parse(R("map/data/senate-vote-2025.json"));
+    const svRows = Object.values(senJSON.divs), svDen = svRows.reduce((a, x) => a + x[0], 0);
+    const natF = (i) => Math.round((1000 * svRows.reduce((a, x) => a + x[i], 0)) / svDen) / 10;
+    const natOth = Math.round((1000 * svRows.reduce((a, x) => a + x[5] + x[6], 0)) / svDen) / 10;
+    assert.deepEqual([natF(1), natF(2), natF(3), natF(4), natOth], [35.1, 29.9, 11.7, 5.7, 17.6], "2025 Senate families pooled: ALP, Coalition, Greens, One Nation, other");
   }
 }
 // the primary-change same-place lane (build_map_data.py's prevFp join): every
@@ -220,10 +260,24 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
   assert.ok(js.includes('if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;'),
     "the fp-change legend explains the unjoined booths' hatch");
 }
-assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true, vtBandsFor(m.year) ? castScope.geography : undefined);"), "a seat, a state and the country share one How votes were cast block");
-assert.ok(js.includes("const castScope = vtScope(m, st), cast = castScope.divs;") && js.includes("const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool); the area block reads election results, since Now blanks a by-election's piles");
-assert.ok(js.includes("if (vtBandsFor(M().year)) return vtBandsBlock("), "2016 on, the elections' frames show the band chart, not the old table");
-assert.ok(js.includes("function vtBandsFor(y) { return VT_ERAS[y === \"now\" ? 2025 : +y] || null; }"), "band eras: 2016/2019/2022/2025 (+now riding 2025's era)");
+assert.ok(js.includes("else if (d.vt) h += vtBlock([d]);") && js.includes("if (!(senLanes && !senCast) && cast.length) h += vtBlock(cast, true, vtBandsFor(m.year, senCast) ? castScope.geography : undefined, senCast);"), "a seat, a state and the country share one How votes were cast block, chamber-swapped by lens: the Senate lenses read the Senate piles, never House piles in a Senate story");
+assert.ok(js.includes("const castScope = vtScope(m, st, senCast), cast = castScope.divs;") && js.includes('const cls = clsFilter(m), pst = st === "AUS" ? null : st, key = senate ? "vts" : "vt";') && js.includes("const divs = m.res.divs.filter((d) => d[key] && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool, its field per chamber); the area block reads election results, since Now blanks a by-election's piles");
+assert.ok(js.includes('if (senate) return vtBandsFor(M().year, true) ? vtBandsBlock(divs, area, geography, true) : "";') && js.includes("if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography, false);"), "2016 on, the elections' frames show the band chart, not the old table; the Senate lane renders only with a Senate era");
+assert.ok(js.includes('function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "now" ? 2025 : +y] || null; }'), "band eras: 2016/2019/2022/2025 House (+now riding 2025's era), Senate's own accessor alongside");
+// the Senate cast lane's 2025 era: the Senate count's own sequencing, as the
+// user dictated it — early-centre Senate ballots were NOT counted on election
+// night (out-posted centres from Monday 5 May), the night's Senate first
+// preferences came from election-day polling places after the House count
+{
+  const sen = js.indexOf("const VT_ERAS_SEN = {");
+  assert.ok(sen > -1 && js.slice(sen, sen + 700).includes('["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"]'), "Senate 2025: postal with the declarations, over following days");
+  assert.ok(js.slice(sen, sen + 700).includes('["early", "Early centres", ["ppvc"], "From Monday, 5 May"]'), "Senate 2025's early-centre ballots counted from Monday, not on the night");
+  assert.ok(js.slice(sen, sen + 700).includes('["day", "On the day", ["day", "mob"], "Election night, after House count"]'), "Senate 2025's day band is election-night, after the House count");
+  assert.ok(js.includes("const VT_PARTIES_SEN = VT_PARTIES.slice(1);"), "the Senate lane has no 2PP button: ALP L/NP GRN ON OTH");
+  assert.ok(js.includes("vtSenParty") && js.includes("function setVtSenParty(party)"), "the Senate measure rides its own selection (vtParty's tpp choice can't leak it)");
+  assert.ok(js.includes('<small>${int(tot)}${senate ? " Senate" : ""} formal</small>'), "the block names the chamber in its total tag");
+}
+assert.ok(js.includes("vts: d.vts || null"), "a seat keeps its Senate piles");
 assert.ok(js.includes('"From Tuesday"') && js.includes('"From Sunday"'), "the 2016/2019/2022 band labels quote the AEC's per-election count sequencing (2016 & 2019 postal first counted Tuesday, 2022 postal first counted Sunday)");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
 assert.ok(js.includes("vt3: d.vt3 || null"), "a seat keeps its piles' first-preference split");

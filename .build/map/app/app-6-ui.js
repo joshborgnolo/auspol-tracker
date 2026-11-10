@@ -1555,7 +1555,7 @@ $("#story").addEventListener("pointermove", (e) => {
 });
 $("#story").addEventListener("click", (e) => {
   const voteParty = e.target.closest("[data-vt-party]");
-  if (voteParty) { setVtParty(voteParty.dataset.vtParty); return; }
+  if (voteParty) { (vtLast && vtLast.senate ? setVtSenParty : setVtParty)(voteParty.dataset.vtParty); return; }
   const voteMode = e.target.closest("[data-vt-mode]");
   if (voteMode) { setVtMode(voteMode.dataset.vtMode); return; }
   const closeTgl = e.target.closest("[data-close-toggle]");
