@@ -15172,6 +15172,85 @@
      }
     }
    }
+  },
+  {
+   "pollster": "Roy Morgan",
+   "date": "2026-11-08",
+   "dateStart": "2026-10-26",
+   "dateEnd": "2026-11-08",
+   "sample": 2574,
+   "article": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026",
+   "source": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026",
+   "read": "published table",
+   "dims": {
+    "state": {
+     "NSW": {
+      "alp": 28,
+      "lnp": 22.5,
+      "onp": 23.5,
+      "grn": 12,
+      "oth": 14
+     },
+     "Vic": {
+      "alp": 23.5,
+      "lnp": 27.5,
+      "onp": 19,
+      "grn": 14,
+      "oth": 16
+     },
+     "Qld": {
+      "alp": 20,
+      "lnp": 20,
+      "onp": 35,
+      "grn": 15.5,
+      "oth": 9.5
+     },
+     "SA": {
+      "alp": 27.5,
+      "lnp": 25,
+      "onp": 18,
+      "grn": 19,
+      "oth": 10.5
+     },
+     "WA": {
+      "alp": 29,
+      "lnp": 16,
+      "onp": 27.5,
+      "grn": 19,
+      "oth": 8.5
+     },
+     "Tas": {
+      "alp": 30.5,
+      "lnp": 18,
+      "onp": 20,
+      "grn": 18.5,
+      "oth": 13
+     }
+    },
+    "location": {
+     "Capital cities": {
+      "alp": 27.5,
+      "lnp": 22.5,
+      "onp": 20,
+      "grn": 17.5,
+      "oth": 12.5
+     },
+     "Regional/rural areas": {
+      "alp": 21.5,
+      "lnp": 21.5,
+      "onp": 32,
+      "grn": 11,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 25.5,
+    "lnp": 22,
+    "onp": 24.5,
+    "grn": 15,
+    "oth": 13
+   }
   }
  ],
  "skipped": [

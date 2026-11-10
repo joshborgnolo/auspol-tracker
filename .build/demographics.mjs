@@ -469,6 +469,39 @@ const ROYMORGAN_DEMO = {
       },
     },
   },
+  // The fortnight after the demo agent's first machine-filed wave. Entered by
+  // hand because the release's shapes moved under the reader: the City/Country
+  // table is now a printed HTML table (the reader knows only table images for
+  // it), Tasmania has broken out into its own printed four-week table (its
+  // "Oct 12 – Nov 8" column, pooled n=231 — the same row shape the machine
+  // layer files with `tas` provenance), and only the five-state table still
+  // ships as an image. State cells were read off that image (sandbox OCR,
+  // no Vision on the CI box) and every one is triple-verified: each prose
+  // figure in the release's own state analysis matches (ALP NSW 28/Vic
+  // 23.5/Qld 20/SA 27.5/WA 29; ON Qld 35/WA 27.5/NSW 23.5/Vic 19; L-NP Vic
+  // 27.5; GRN SA 19/WA 19/Vic 14/NSW 12), and every state column sums to the
+  // printed TOTAL of 100. City/Country, Tasmania and `total` are from the
+  // printed HTML tables; `total` is the city table's Australia column, which
+  // matches the poll row exactly. Tas rides the four-week print — window
+  // caveat lives only in the machine store, as with every hand wave.
+  "2026-11-08": {
+    source: "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026",
+    total: { alp: 25.5, lnp: 22, onp: 24.5, grn: 15, oth: 13 },
+    dims: {
+      state: {
+        NSW: { alp: 28, lnp: 22.5, onp: 23.5, grn: 12, oth: 14 },
+        Vic: { alp: 23.5, lnp: 27.5, onp: 19, grn: 14, oth: 16 },
+        Qld: { alp: 20, lnp: 20, onp: 35, grn: 15.5, oth: 9.5 },
+        SA: { alp: 27.5, lnp: 25, onp: 18, grn: 19, oth: 10.5 },
+        WA: { alp: 29, lnp: 16, onp: 27.5, grn: 19, oth: 8.5 },
+        Tas: { alp: 30.5, lnp: 18, onp: 20, grn: 18.5, oth: 13 },
+      },
+      location: {
+        "Capital cities": { alp: 27.5, lnp: 22.5, onp: 20, grn: 17.5, oth: 12.5 },
+        "Regional/rural areas": { alp: 21.5, lnp: 21.5, onp: 32, grn: 11, oth: 14 },
+      },
+    },
+  },
 };
 
 /* Fox & Hedgehog breakdowns, hand-entered from each release's full-report
