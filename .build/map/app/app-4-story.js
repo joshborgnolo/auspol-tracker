@@ -1289,26 +1289,41 @@ const VT_ERAS = {
 // an election only draws the chart where every seat's piles split the final
 // two (test-map-page.mjs pins that coverage from 2016 on); "now" rides 2025's
 function vtBandsFor(y) { return VT_ERAS[y === "now" ? 2025 : +y] || null; }
-let vtMode = "skew", vtLast = null;
-/* the Skew/Effect switch redraws its own block alone, its buttons held where
+// the measure toggle's parties and words. 2PP stays the default reading of
+// the bands; each other measure is that grouping's first-preference share of
+// a pile, pooled straight from each seat's vt3 first-preference piles
+const VT_PARTIES = [["tpp", "2PP"], ["alp", "Labor"], ["lnp", "Coalition"], ["grn", "Greens"], ["onp", "One Nation"], ["oth", "Other"]];
+// mid-sentence measures by party: heading noun (appended " primary"), owner in the skew note
+const VT_WORDS = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "other candidates" };
+const VT_POSS = { alp: "Labor's", lnp: "the Coalition's", grn: "the Greens'", onp: "One Nation's", oth: "other candidates'" };
+let vtMode = "skew", vtParty = "tpp", vtLast = null;
+/* a Skew/Effect or party switch redraws its own block alone, its buttons held where
    they stood on screen: re-rendering the whole story let the page reflow under
    the reader (it shrank for a frame and the browser pulled the page up) */
-function setVtMode(mode) {
-  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
-  vtMode = mode;
-  const old = $("#story .vt-chart"), btn = old && old.querySelector(`[data-vt-mode="${mode}"]`);
-  if (!old || !vtLast) { renderStory(true); $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true }); return; }
+function vtRedraw(sel) {
+  const old = $("#story .vt-chart"), btn = old && old.querySelector(sel);
+  if (!old || !vtLast) { renderStory(true); $(`#story ${sel}`)?.focus({ preventScroll: true }); return; }
   const top = btn.getBoundingClientRect().top, html = document.documentElement, anchor = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
   const box = document.createElement("div");
   box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography);
   const next = box.firstElementChild;
   old.replaceWith(next);
-  const nb = next.querySelector(`[data-vt-mode="${mode}"]`);
+  const nb = next.querySelector(sel);
   const shift = Math.round(nb.getBoundingClientRect().top - top);
   if (shift) { if (FS.on && FS.scroll && FS.scroll.contains(next)) FS.scroll.scrollTop += shift; else window.scrollBy(0, shift); }
   html.style.overflowAnchor = anchor;
   nb.focus({ preventScroll: true });
+}
+function setVtMode(mode) {
+  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
+  vtMode = mode;
+  vtRedraw(`[data-vt-mode="${mode}"]`);
+}
+function setVtParty(party) {
+  if (!VT_PARTIES.some(([k]) => k === party) || party === vtParty) return;
+  vtParty = party;
+  vtRedraw(`[data-vt-party="${party}"]`);
 }
 // the margin list's two reads — tightest margins ("Most marginal") or widest
 // ("Safest"); the head's up/down toggle flips it and re-renders like setVtMode
@@ -1320,8 +1335,9 @@ function setCloseSafe(safe) {
   $("#story [data-close-toggle]")?.focus({ preventScroll: true });
 }
 function vtBands(divs) {
-  const counts = {}, total2 = [0, 0];
+  const counts = {}, total2 = [0, 0], fpart = { i: -1, counts: {}, total: 0 };
   let tot = 0;
+  for (const [i, [k]] of VT_PARTIES.entries()) if (k === vtParty) fpart.i = i - 1; // tpp is VT_PARTIES[0]: fams in vt3 order behind it
   for (const d of divs) {
     const v = d.vt;
     tot += (v.ord || 0) + (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0);
@@ -1330,15 +1346,23 @@ function vtBands(divs) {
       t[0] += p[0]; t[1] += p[1];
       total2[0] += p[0]; total2[1] += p[1];
     }
+    if (fpart.i < 0 || !d.vt3) continue;
+    for (const [k, p] of Object.entries(d.vt3)) {
+      fpart.counts[k] = (fpart.counts[k] || 0) + p[fpart.i];
+      fpart.total += p[fpart.i];
+    }
   }
-  // The vote-type counts exhaust each seat's official two-party total.
-  const base = total2[0] + total2[1] > 0 ? 100 * total2[0] / (total2[0] + total2[1]) : null;
-  const complete = divs.every((d) => d.vt2);
+  // The vote-type counts exhaust each seat's official two-party total;
+  // a party measure reads the same piles' first preferences instead
+  const primary = fpart.i >= 0;
+  const base = primary ? (tot > 0 ? (100 * fpart.total) / tot : null) : total2[0] + total2[1] > 0 ? (100 * total2[0]) / (total2[0] + total2[1]) : null;
+  const complete = primary ? divs.every((d) => d.vt3) : divs.every((d) => d.vt2);
   const bands = (vtBandsFor(M().year) || []).map(([k, l, keys, time]) => {
     const v = divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
-    const t = keys.reduce((p, key) => [p[0] + (counts[key]?.[0] || 0), p[1] + (counts[key]?.[1] || 0)], [0, 0]);
-    const n = t[0] + t[1], lab = n > 0 ? 100 * t[0] / n : null;
-    return { k, l, time, v, a: t[0], n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
+    const a = primary ? keys.reduce((n, key) => n + (fpart.counts[key] || 0), 0) : keys.reduce((n, key) => n + (counts[key]?.[0] || 0), 0);
+    const n = primary ? v : keys.reduce((n, key) => n + (counts[key]?.[0] || 0) + (counts[key]?.[1] || 0), 0);
+    const lab = n > 0 ? (100 * a) / n : null;
+    return { k, l, time, v, a, n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
   });
   // Counting order runs up the graphic: day, early/postal, then declarations.
   // Pool actual two-party counts, not rounded shares or primary-vote totals.
@@ -1364,22 +1388,26 @@ function vtBandsBlock(divs, area, geography) {
   const { bands, tot } = vtBands(divs);
   if (!tot) return "";
   vtLast = { divs, area, geography };
-  const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
-  const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
+  const effect = vtMode === "effect", prim = vtParty !== "tpp", place = geography || divs[0].n.replace(/'/g, "’");
+  // the measure noun: "2PP", or "<Party> primary"
+  const word = prim ? `${VT_WORDS[vtParty]} primary` : "2PP";
+  const heading = effect ? `Change in cumulative ${word}` : place === "nationwide" ? `National ${word} skew` : `Skew on ${place} ${word}`;
+  const parties = `<div class="vt-modes vt-parties" role="group" aria-label="Vote-type party">${VT_PARTIES.map(([k, lab]) => `<button type="button" class="vt-mode" data-vt-party="${k}" aria-pressed="${vtParty === k}">${lab}</button>`).join("")}</div>`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
+  const measure = prim ? word : "Labor 2PP";
   const rows = bands.map((r) => {
     const value = effect ? r.effect : r.skew, text = effect && value == null ? "—" : sgn(value);
-    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? "vt-alp" : "vt-lnp") : "";
+    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? (prim ? `t-${vtParty}` : "vt-alp") : prim ? "" : "vt-lnp") : "";
     const reading = effect
-      ? value != null ? `${text} percentage-point change in ${place} cumulative Labor 2PP` : r.k === "day" && r.cumulative != null ? "Opening count; no preceding group" : "Change in cumulative two-party share unavailable"
-      : value == null ? "two-party skew unavailable" : `${text} percentage points on ${place} Labor 2PP`;
+      ? value != null ? `${text} percentage-point change in ${place} cumulative ${measure}` : r.k === "day" && r.cumulative != null ? "Opening count; no preceding group" : `Change in cumulative ${prim ? "primary" : "two-party"} share unavailable`
+      : value == null ? `${prim ? "primary" : "two-party"} skew unavailable` : `${text} percentage points on ${place} ${measure}`;
     return `<div class="vt-band vt-band-${r.k}" role="listitem" style="--vt-share:${r.share}" aria-label="${esc(`${f1(r.share)}%, ${r.l}; counting ${r.time.toLowerCase()}; ${reading}`)}"><b class="vt-share">${f1(r.share)}%</b><span class="vt-label">${esc(r.l)}<small class="vt-time">${esc(r.time)}</small></span><b class="vt-skew ${tone}">${text}</b></div>`;
   }).join("");
   const notes = effect
-    ? ["Percentage-point change in Labor’s cumulative 2PP when each group is added, counting from bottom to top. The opening count has no preceding group.", "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
-    : ["Skews are percentage points in Labor’s two-party share. Mobile teams are included with on-the-day ordinary votes."];
+    ? [`Percentage-point change in ${prim ? `the cumulative ${word}` : "Labor’s cumulative 2PP"} when each group is added, counting from bottom to top. The opening count has no preceding group.`, "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
+    : [`Skews are percentage points in ${prim ? `${VT_POSS[vtParty]} primary share` : "Labor’s two-party share"}. Mobile teams are included with on-the-day ordinary votes.`];
   if (area) notes.push("Postal, absent and declaration votes have no place on the map, so balloons and the surface leave them out.");
-  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
+  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${parties}${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : prim ? `${word} skews` : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
 }
 function vtBlock(divs, area, geography) {
   if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography);

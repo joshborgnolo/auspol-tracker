@@ -568,6 +568,9 @@ button { cursor: pointer; background: none; border: 0; }
 .vt-chart > h3 { flex-wrap: wrap; }
 .vt-modes { display: inline-flex; gap: 2px; margin-top: 12px; padding: 3px; border: 1px solid var(--line); border-radius: 7px; }
 .vt-mode { min-height: 26px; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; line-height: 1.2; color: var(--ink-2); }
+/* the party row: wider than the measure pair, so it wraps as its own bands and nests close to the measure row under it */
+.vt-parties { display: flex; flex-wrap: wrap; row-gap: 4px; }
+.vt-parties + .vt-modes { margin-top: 6px; }
 .vt-mode:hover { background: var(--surface); color: var(--ink); }
 .vt-mode[aria-pressed="true"] { background: var(--line-2); color: var(--ink); }
 .vt-mode:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

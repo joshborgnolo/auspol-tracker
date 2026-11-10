@@ -134,20 +134,51 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
         for (const [k, p] of Object.entries(d.vt2)) assert.ok(k in d.vt || ["day", "mob"].includes(k), `${y} ${d.n}: unknown pile ${k}`);
         assert.equal(sum2(d.vt2.pre), d.vt.pre, `${y} ${d.n}: declaration pre-poll votes all reach the two-party count`);
         assert.equal(sum2(d.vt2.post), d.vt.post, `${y} ${d.n}: postal votes all reach the two-party count`);
+        // first-preference piles beside them (vote-type chart's party toggle): alp/lnp/grn/onp/oth, "oth" pooling independents
+        assert.ok(d.vt3, `${y} ${d.n} has its first-preference piles (build_vote_piles.py, then assemble)`);
+        assert.deepEqual(Object.keys(d.vt3).sort(), Object.keys(d.vt2).sort(), `${y} ${d.n}: first-preference piles mirror the two-party piles`);
+        for (const [k, p] of Object.entries(d.vt3)) {
+          assert.equal(p.length, 5, `${y} ${d.n}: five first-preference groupings in pile ${k}`);
+          assert.equal(p.reduce((a, v) => a + v, 0), sum2(d.vt2[k]), `${y} ${d.n}: pile ${k} first preferences reach the two-party pile`);
+        }
+        // each grouping's piles add up to the final count of its candidates
+        const F5I = { alp: 0, lnp: 1, grn: 2, onp: 3, ind: 4, oth: 4 };
+        const want = [0, 0, 0, 0, 0];
+        for (const c of d.c) want[F5I[c[3]]] += c[4];
+        const got = [0, 0, 0, 0, 0];
+        for (const p of Object.values(d.vt3)) for (let i = 0; i < 5; i++) got[i] += p[i];
+        assert.deepEqual(got, want, `${y} ${d.n}: first-preference piles add up to the final count`);
       } else if (classic) {
         assert.ok(d.vt2, `${y} ${d.n}: a Labor v Coalition seat has piles`);
         const A = d.tcp[fam.indexOf("alp")][1], C = d.tcp[fam.indexOf("lnp")][1];
         assert.deepEqual(add(d.vt2), [A, C], `${y} ${d.n}: the piles add up to the final two`);
+        assert.ok(!d.vt3, `${y} ${d.n}: no first-preference piles before 2016`);
       } else assert.ok(!d.vt2, `${y} ${d.n}: no two-party split from a final two of another pair`);
     });
   }
-  assert.ok(JSON.parse(R("map/data/res-1993.json")).divs.every((d) => !d.vt2), "1993's count stops at the division: no piles");
+  assert.ok(JSON.parse(R("map/data/res-1993.json")).divs.every((d) => !d.vt2 && !d.vt3), "1993's count stops at the division: no piles");
   // the national figures quoted when this shipped: the headline is the AEC's own, and the piles reach it
   const r = JSON.parse(R("map/data/res-2025.json")), T = {};
   for (const d of r.divs) for (const [k, p] of Object.entries(d.vt2)) { const t = (T[k] ??= [0, 0]); t[0] += p[0]; t[1] += p[1]; }
   const lab = (k) => Math.round((1000 * T[k][0]) / (T[k][0] + T[k][1])) / 10;
   assert.deepEqual([lab("day"), lab("ppvc"), lab("post")], [58.0, 53.0, 51.6], "2025 on the day, early centres, postal");
   assert.deepEqual(add(Object.fromEntries(Object.entries(T))), r.agg.AUS.tpp.slice(0, 2), "2025's piles add up to the national two-party count");
+  // the primary piles' own headline oracles (vt3): Australia's first preferences per pile, and its formal splits
+  const F3 = {}, P3 = { alp: 0, lnp: 1, grn: 2, onp: 3, oth: 4 };
+  for (const d of r.divs) for (const [k, p] of Object.entries(d.vt3)) { const t = (F3[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) t[i] += p[i]; }
+  const formal3 = (k) => F3[k].reduce((a, v) => a + v, 0);
+  const share3 = (k, f) => Math.round((1000 * F3[k][P3[f]]) / formal3(k)) / 10;
+  {
+    const tot3 = Object.values(F3).reduce((a, p) => a + p.reduce((x, v) => x + v, 0), 0);
+    assert.equal(tot3, 15490236, "2025 first-preference piles reach the national formal count");
+    const nat3 = (i) => Math.round((1000 * ["day", "mob", "ppvc", "pre", "post", "abs", "prov"].reduce((a, k) => a + (F3[k] ? F3[k][i] : 0), 0)) / tot3) / 10;
+    assert.deepEqual([nat3(0), nat3(1), nat3(2), nat3(3), nat3(4)], [34.6, 31.8, 12.2, 6.4, 15.0], "2025's piles add up to the national primaries: Labor, Coalition, Greens, One Nation, other");
+    assert.deepEqual([share3("day", "alp"), share3("ppvc", "alp"), share3("post", "alp")], [34.7, 34.7, 34.5], "2025 Labor primary on the day, at early centres, by post");
+    assert.deepEqual([share3("day", "grn"), share3("post", "grn")], [14.2, 9.5], "2025 Greens primary on the day and by post");
+    assert.equal(share3("mob", "grn"), 5.1, "2025 Greens primary with mobile teams: remote communities are not heartland");
+    assert.equal(share3("post", "onp"), 6.8, "2025 One Nation primary by post");
+    assert.equal(share3("abs", "grn"), 19.4, "2025 Greens primary among absentees: the biggest share of any pile");
+  }
 }
 // the primary-change same-place lane (build_map_data.py's prevFp join): every
 // federal frame from 2007 carries the previous election's family shares at
@@ -195,6 +226,7 @@ assert.ok(js.includes("if (vtBandsFor(M().year)) return vtBandsBlock("), "2016 o
 assert.ok(js.includes("function vtBandsFor(y) { return VT_ERAS[y === \"now\" ? 2025 : +y] || null; }"), "band eras: 2016/2019/2022/2025 (+now riding 2025's era)");
 assert.ok(js.includes('"From Tuesday"') && js.includes('"From Sunday"'), "the 2016/2019/2022 band labels quote the AEC's per-election count sequencing (2016 & 2019 postal first counted Tuesday, 2022 postal first counted Sunday)");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
+assert.ok(js.includes("vt3: d.vt3 || null"), "a seat keeps its piles' first-preference split");
 assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the
 // 2001-census edition's own nine (its B 06 prints a whole-UK row the

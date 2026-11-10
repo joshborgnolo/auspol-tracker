@@ -161,6 +161,92 @@ assert.ok(api.vtBlock(nsw.divs, true, nsw.geography).includes("Change in cumulat
 vm.runInContext('vtMode = "skew"', ctx);
 assert.ok(api.vtBlock(nsw.divs, true, nsw.geography).includes("Skew on NSW 2PP"));
 
+// the party toggle: the same bands read by first preferences (vt3). A party's
+// skew is its primary share of the pile against its share of the whole formal
+// vote; effects ride cumulative primary shares instead of the two-party count.
+const FAMS5 = ["alp", "lnp", "grn", "onp", "oth"];
+function checkPoolParty(divs, label, eraBands, fi) {
+  assert.ok(divs.every((d) => d.vt3), `${label}: every seat's first-preference piles are on file`);
+  const fams = {}, famTot = [0, 0, 0, 0, 0];
+  for (const d of divs) for (const [k, p] of Object.entries(d.vt3)) { const t = (fams[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) { t[i] += p[i]; famTot[i] += p[i]; } }
+  const total = divs.reduce((n, d) => n + d.c.reduce((s, c) => s + c[4], 0), 0);
+  const result = api.vtBands(divs);
+  assert.equal(result.tot, total, `${label}: formal votes conserved`);
+  const expBase = (100 * famTot[fi]) / total;
+  close(result.base, expBase, `${label}: area ${FAMS5[fi]} primary share`);
+  const expV = (keys) => (keys.includes("day") ? divs.reduce((s, d) => s + (d.vt.ord || 0) - (d.vt.ppvc || 0), 0) : keys.reduce((s, k) => s + divs.reduce((x, d) => x + (d.vt[k] || 0), 0), 0));
+  result.bands.forEach((b, i) => {
+    const keys = eraBands[i][2];
+    const famA = keys.reduce((n, k) => n + (fams[k] ? fams[k][fi] : 0), 0);
+    assert.equal(b.a, famA, `${label}: ${b.k} ${FAMS5[fi]} votes pool the seats`);
+    assert.equal(b.n, expV(keys), `${label}: ${b.k} denominates on its formal votes`);
+    const expLab = b.n > 0 ? (100 * famA) / b.n : null;
+    if (expLab != null) { close(b.lab, expLab, `${label}: ${b.k} share`); close(b.skew, expLab - expBase, `${label}: ${b.k} skew ${FAMS5[fi]} primary`); }
+    else assert.equal(b.skew, null, `${label}: an empty pile has no skew`);
+  });
+  let counted = 0, famC = 0;
+  for (const b of result.bands.slice().reverse()) {
+    const before = counted > 0 ? (100 * famC) / counted : null;
+    counted += b.n; famC += b.a;
+    close(b.cumulative, (100 * famC) / counted, `${label}: cumulative ${b.k} ${FAMS5[fi]} primary`);
+    if (before != null) close(b.effect, b.cumulative - before, `${label}: ${b.k} changes the preceding count`);
+    else assert.equal(b.effect, null, `${label}: the opening count has no effect`);
+  }
+  close(result.bands[0].cumulative, expBase, `${label}: the final addition reaches the area primary share`);
+  return result;
+}
+const partyPools25 = () => {
+  const pools = [[current.res.divs, "nationwide"]];
+  for (const st of ["NSW", "TAS"]) {
+    S.f.st = st;
+    pools.push([api.vtScope(current, st).divs, st]);
+    S.f.st = null;
+  }
+  S.f.cls = "Rural";
+  pools.push([api.vtScope(current, "AUS").divs, "rural"]);
+  S.f.cls = null;
+  pools.push([[current.res.divs[0]], "Bean"]);
+  assert.equal(api.vtScope(current, "AUS").geography, "nationwide", "party checks keep the filters clean");
+  return pools;
+};
+const VT_WORDS_HTML = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "other candidates" };
+for (const [fi, fam] of FAMS5.entries()) {
+  vm.runInContext(`vtParty = "${fam}"`, ctx);
+  for (const [divs, label] of partyPools25()) checkPoolParty(divs, `${label} ${fam}`, bands25, fi);
+  assert.ok(api.vtBlock(current.res.divs, true, "nationwide").includes(`National ${VT_WORDS_HTML[fam]} primary skew`), `${fam}'s heading`);
+}
+
+// the toggle's own chrome and copy, nationwide Greens
+vm.runInContext('vtParty = "grn"', ctx);
+const grnHtml = api.vtBlock(current.res.divs, true, "nationwide");
+assert.ok(grnHtml.includes('class="vt-modes vt-parties"') && grnHtml.indexOf('class="vt-modes vt-parties"') < grnHtml.indexOf('aria-label="Vote-type measure"'), "the party row sits above the measure row");
+assert.match(grnHtml, /data-vt-party="tpp" aria-pressed="false"[\s\S]*data-vt-party="grn" aria-pressed="true"/);
+for (const lab of ["2PP", "Labor", "Coalition", "Greens", "One Nation", "Other"]) assert.ok(grnHtml.includes(`>${lab}</button>`), `party button ${lab}`);
+assert.ok(grnHtml.includes("National Greens primary skew"));
+assert.ok(grnHtml.includes("Skews are percentage points in the Greens' primary share"), "the skew note names the measure");
+{
+  const grnF = {}, tot = current.res.divs.reduce((n, d) => n + d.c.reduce((s, c) => s + c[4], 0), 0);
+  for (const d of current.res.divs) for (const [k, p] of Object.entries(d.vt3)) grnF[k] = (grnF[k] || 0) + p[2];
+  const dayV = current.res.divs.reduce((s, d) => s + (d.vt.ord || 0) - (d.vt.ppvc || 0), 0);
+  const daySkew = (100 * (grnF.day + grnF.mob)) / dayV - (100 * Object.values(grnF).reduce((a, v) => a + v, 0)) / tot;
+  const want = `${daySkew > 0 ? "+" : "−"}${Math.abs(daySkew).toFixed(1)}`;
+  assert.ok(grnHtml.includes(`vt-skew t-grn">${want}`), `the day band reads the computed Greens skew ${want} in the Greens tone`);
+}
+assert.ok(api.vtBlock([current.res.divs[0]]).includes("Skew on Bean Greens primary"), "a seat names the measure in its heading");
+vm.runInContext('vtMode = "effect"', ctx);
+assert.ok(api.vtBlock(current.res.divs, true, "nationwide").includes("Change in cumulative Greens primary"));
+vm.runInContext('vtMode = "skew"', ctx);
+// 2PP stays the default view: a fresh draw presses 2PP, not the last party
+vm.runInContext('vtParty = "tpp"', ctx);
+const back = api.vtBlock(current.res.divs, true, "nationwide");
+assert.match(back, /data-vt-party="tpp" aria-pressed="true"/);
+assert.ok(back.includes("National 2PP skew"), "back at the two-party default");
+// no party figures without the party's piles
+vm.runInContext('vtParty = "onp"', ctx);
+const tinyNo3 = api.vtBands([{ n: "Tiny", vt: { ord: 2, pre: 1 }, vt2: { day: [0, 2], pre: [1, 0] } }]);
+assert.ok(tinyNo3.bands.every((b) => b.skew === null && b.effect === null && b.cumulative === null), "no inventing party figures without the first-preference piles");
+vm.runInContext('vtParty = "tpp"', ctx);
+
 // the earlier eras where the piles split every seat's final two: postal votes
 // leave the election-night band and the labels quote the AEC's per-election
 // count statements (2016/2019 postal first counted Tuesday, 2022 Sunday)
@@ -195,4 +281,4 @@ for (const y of [2013, 2010]) {
   assert.ok(html.includes("<table") && !html.includes("vt-bands"), `${y}: classic-seat coverage keeps the table, not the chart`);
 }
 
-console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes, missing data, and the 2016/2019/2022 eras");
+console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes, missing data, the 2016/2019/2022 eras, and the party toggle (2PP/Labor/Coalition/Greens/One Nation/Other) in four pools per measure");

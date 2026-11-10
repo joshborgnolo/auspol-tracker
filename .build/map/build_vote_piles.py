@@ -3,7 +3,12 @@
 
 Adds vt2 to every division of map/data/res-<year>.json, beside vt (the formal
 votes in each pile): {pile: [labor, coalition]}, a pile left out when it holds
-no votes. The story column reads it for "How votes were cast".
+no votes. The story column reads it for "How votes were cast". From 2016 it
+also adds vt3, the first-preference piles behind the cast chart's party
+toggle: {pile: [alp, lnp, grn, onp, oth]}, "oth" pooling independents with the
+rest, from the AEC's first-preference count by vote type (fpvvt). A pile's
+five always add to every formal vote cast that way, and each family's piles to
+its final count; both are asserted against the res file before writing.
 
   day    ordinary votes at polling places
   mob    ordinary votes taken by hospital, remote and other mobile teams
@@ -43,6 +48,7 @@ SRC = ROOT / ".build/aec-flow-src"
 ORACLE = SRC / "booth/oracle"
 OUT = ROOT / "map/data"
 COALITION = {"LP", "LNP", "NP", "CLP", "NAT", "LNQ"}  # as build_map_data.py
+FAMS5 = ("alp", "lnp", "grn", "onp", "oth")  # vt3's columns: "oth" pools independents
 TYPES = (("Ordinary", "ord"), ("Absent", "abs"), ("Provisional", "prov"), ("PrePoll", "pre"), ("Postal", "post"))
 DECL = {"ABSENT": "abs", "PRE POLL": "pre", "POSTAL": "post", "PROVISIONAL": "prov"}
 ORDER = ("day", "mob", "ppvc", "pre", "post", "abs", "prov")
@@ -155,14 +161,66 @@ def fix_ppvc(res):
         d["vt"]["ppvc"] = formal[i]
 
 
+def fp_piles(year, res):
+    """2016 on: each family's first preferences by how they were cast, {division: {pile: [5]}}.
+
+    The AEC file is candidate by vote type; a row's family is the res file's own
+    bucket for that ballot position (its bucketing is canonical). The join is by
+    ballot position, so each row's party and total must also be that candidate's.
+    Ordinary is split by kind of polling place from the res booths' own first
+    preferences, exactly as the two-party piles are."""
+    divs = {d["id"]: d for d in res["divs"]}
+    out = {d["id"]: {s: [0] * 5 for _, s in TYPES} for d in res["divs"]}
+    rows_of = collections.defaultdict(list)
+    for r in rows(ORACLE / f"fpvvt-{year}.csv.gz"):
+        if r["DivisionNm"].strip() and int(r["CandidateID"]) != 999:
+            rows_of[int(r["DivisionID"])].append(r)
+    for did, div in divs.items():
+        got = out[did]
+        want = div["c"]
+        fam = ["oth" if c[3] == "ind" else c[3] for c in want]
+        for r in rows_of[did]:
+            bp = int(r["BallotPosition"]) - 1
+            assert (r["PartyAb"] or "IND") == want[bp][1], f"{year} {div['n']}: ballot {bp + 1} is {want[bp][1]}, the count says {r['PartyAb'] or 'IND'}"
+            assert int(r["TotalVotes"]) == want[bp][4], f"{year} {div['n']}: ballot {bp + 1} total {r['TotalVotes']} v {want[bp][4]}"
+            f = FAMS5.index(fam[bp])
+            for t, s in TYPES:
+                got[s][f] += int(r[t + "Votes"])
+        fp_tot = [sum(got[s][f] for _, s in TYPES) for f in range(5)]
+        final = [sum(c[4] for k, c in enumerate(want) if fam[k] == f) for f in FAMS5]
+        assert fp_tot == final, f"{year} {div['n']}: piles {fp_tot} v final count {final}"
+    # ordinary, by kind of place, from the booths (the same lane as booth_split, per family)
+    b = res["booths"]
+    kinds = {}
+    for i, div in enumerate(res["divs"]):
+        kinds[i] = {k: [0] * 5 for k in ("day", "mob", "ppvc")}
+        columns = ["oth" if c[3] == "ind" else c[3] for c in div["c"]]
+        for j, d in enumerate(b["d"]):
+            if d != i:
+                continue
+            k = "ppvc" if b["ty"][j] == EARLY else "day" if b["ty"][j] == PLACE else "mob"
+            for c, v in enumerate(b["v"][j]):
+                kinds[i][k][FAMS5.index(columns[c])] += v
+    for i, div in enumerate(res["divs"]):
+        got = out[div["id"]]
+        ord5 = [sum(kinds[i][k][f] for k in ("day", "mob", "ppvc")) for f in range(5)]
+        assert ord5 == got["ord"], f"{year} {div['n']}: places {ord5} v ordinary {got['ord']}"
+        for k in ("day", "mob", "ppvc"):
+            got[k] = list(kinds[i][k])
+        del got["ord"]
+    return out
+
+
 def build(year, res):
     fix_ppvc(res)
     source = "tppvt" if year >= 2016 else "tcpcvt" if year >= 2004 else "hppdop"
     tv = tppvt(year) if source == "tppvt" else tcpcvt(year) if source == "tcpcvt" else hppdop(year, res)
+    fp = fp_piles(year, res) if source == "tppvt" else None
     kinds, missing = booth_split(res)
     made = 0
     for i, d in enumerate(res["divs"]):
         d.pop("vt2", None)
+        d.pop("vt3", None)
         if source != "tppvt" and not classic(d):
             continue
         v = tv.get(d["id"])
@@ -183,12 +241,20 @@ def build(year, res):
             want = [d["tcp"][sides[0]][1], d["tcp"][sides[1]][1]]
         assert tot == list(want), f"{year} {d['n']}: piles {tot} v final count {want}"
         vt2 = {k: piles[k] for k in ORDER if sum(piles[k])}
+        vt3 = None
+        if fp:
+            fp5 = fp[d["id"]]
+            # the five kinds of vote cross-count the two-party piles pile for pile
+            assert not missing[i] and all(sum(fp5[k]) == sum(piles[k]) for k in ORDER), f"{year} {d['n']}: first-preference piles don't reach the two-party totals"
+            vt3 = {k: fp5[k] for k in ORDER if sum(fp5[k])}
         # beside vt, so the file reads in order
         rebuilt = {}
         for k, x in d.items():
             rebuilt[k] = x
             if k == "vt":
                 rebuilt["vt2"] = vt2
+                if vt3:
+                    rebuilt["vt3"] = vt3
         d.clear()
         d.update(rebuilt)
         made += 1
