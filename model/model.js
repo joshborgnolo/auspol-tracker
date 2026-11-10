@@ -1,7 +1,7 @@
 /* the Election model – assembled from .build/model by .build/model/assemble.mjs; edit the parts, not this file */
 (() => {
 "use strict";
-const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=096a851b","forecast":"/data/seat-model-2028-forecast.json?v=eca9e102","inputs":"/model/data/inputs.json?v=50858b89","evidence":"/model/data/evidence.json?v=ed85ff73","senate":"/data/senate-rankings-2025.json?v=edeb9db9","vic":"/data/seat-model-vic-2026.json?v=4b3591ce","inputsVic":"/model/data/inputs-vic.json?v=a57ee2d4","reasons":"/model/data/reasons.json?v=ff974063","worker":"/model/js/worker.mjs?v=f5696011"};
+const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=0228015e","forecast":"/data/seat-model-2028-forecast.json?v=6f0cb697","inputs":"/model/data/inputs.json?v=a5087e5b","evidence":"/model/data/evidence.json?v=ff73718d","senate":"/data/senate-rankings-2025.json?v=edeb9db9","vic":"/data/seat-model-vic-2026.json?v=67f75903","inputsVic":"/model/data/inputs-vic.json?v=a57ee2d4","reasons":"/model/data/reasons.json?v=2dca3c90","worker":"/model/js/worker.mjs?v=f5696011"};
 /* views.mjs: the /model/ page's written lines and head figures, by rule - one implementation.
    assemble.mjs imports it to write the page's static head (what a reader sees before the script runs,
    and what a crawler reads) and inlines the same source into model.js, which redraws the head with it

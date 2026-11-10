@@ -223,13 +223,13 @@
       "grn|age|35–54": -1,
       "grn|education|TAFE or trade": 1,
       "grn|language|English only": -1,
+      "grn|state|SA": 1,
       "grn|working|Full time": -1,
       "lnp|housing|Renting": -1,
       "lnp|language|Other language": 1,
       "lnp|location|Inner metro": 1,
       "lnp|location|Provincial": -1,
       "lnp|location|Rural": -1,
-      "lnp|state|NSW": -1,
       "lnp|state|Qld": -1,
       "lnp|state|Vic": 1,
       "onp|state|ACT/NT/Tas": -1,
@@ -256,6 +256,11 @@
         "party": "grn",
         "group": "English only",
         "setLabel": "By language at home"
+      },
+      "grn|state|SA": {
+        "party": "grn",
+        "group": "SA",
+        "setLabel": "By state"
       },
       "grn|working|Full time": {
         "party": "grn",
@@ -286,11 +291,6 @@
         "party": "lnp",
         "group": "Rural",
         "setLabel": "By location"
-      },
-      "lnp|state|NSW": {
-        "party": "lnp",
-        "group": "NSW",
-        "setLabel": "By state"
       },
       "lnp|state|Qld": {
         "party": "lnp",
@@ -700,6 +700,18 @@
       "label": "10 Nov 2026",
       "kind": "conf",
       "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 66.2 → 63.1; Westpac–MI consumer sentiment 80.4 → 78.2; Roy Morgan business confidence 76.5 → 81.7; NAB business confidence −13 → −15."
+    },
+    {
+      "date": "2026-11-11",
+      "label": "11 Nov 2026",
+      "kind": "finding",
+      "text": "SA voters (by state) now break significantly toward the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-11-11",
+      "label": "11 Nov 2026",
+      "kind": "finding",
+      "text": "NSW voters (by state) no longer break significantly away from the Coalition, relative to all voters."
     }
   ]
 }
