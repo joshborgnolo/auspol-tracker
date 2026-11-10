@@ -2,12 +2,13 @@
 """Each federal division's Senate first preferences by how they were cast.
 
 Adds vts to every division of map/data/res-<year>.json for the eras the
-Senate cast chart covers (2019, 2022, 2025 — 2016 is out, see the runnote
-below), beside vt/vt2/vt3: {pile: [alp, lnp, grn, onp, oth]}, "oth" pooling
-independents as vt3 does — the Senate's own buckets come from
-senate_vote.py's canonical bucket lane. The Senate has no two-party piles:
-every formal Senate ballot has exactly one first preference, so a pile's
-five always exhaust it, and that is asserted before writing.
+Senate cast chart covers (2025, 2022, 2019 in their day/early venue
+shapes, 2016 in its ordinary-total shape), beside vt/vt2/vt3: {pile:
+[alp, lnp, grn, onp, oth]}, "oth" pooling independents as vt3 does — the
+Senate's own buckets come from senate_vote.py's canonical bucket lane. The
+Senate has no two-party piles: every formal Senate ballot has exactly one
+first preference, so a pile's five always exhaust it, and that is asserted
+before writing.
 
     day    ordinary votes at polling places
     mob    ordinary votes taken by mobile teams
@@ -45,12 +46,17 @@ Patches the res files in place, so run it after anything that rewrites them
 (geo_build.mjs, handbook_geo.mjs, build_vote_piles.py), then assemble.
 test-map-page fails if an era res file comes back without vts.
 
-2016 is deliberately outside YEARS: its polling-place product misattributes
+2016 gets a narrower shape — its polling-place product misattributes
 ~176 of 22,702 candidates' ordinary votes between tickets (whole-division
 totals reconcile, but the per-candidate and per-family venue splits shift
 by tens of votes — e.g. FFP's bp1/bp2 pair in Boothby off by 553/452), so
-no venue split can be trusted at the exactness this store's own contract
-demands; the other three eras reconcile candidate by candidate, exactly.
+the day/early-centre venue lane can't be trusted there. 2016's vts
+therefore carries ONLY the vote-type piles its div file witnesses exactly:
+one "ord" pile (every ordinary ballot — day, mobile AND early centres
+together, never opened) plus the declaration piles. That is why 2016's
+era bands read "Election night, rest from Monday" over one ordinary band
+(admitted in its own labels); the other three eras reconcile candidate by
+candidate exactly and carry the full venue split.
 
 Run: python3 -I .build/map/build_senate_piles.py
 """
@@ -64,18 +70,19 @@ import senate_vote as sv
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "map/data"
-YEARS = (2019, 2022, 2025)  # see the docstring: 2016's venue lane is not exact
+YEARS = (2016, 2019, 2022, 2025)  # 2016 rides its ordinary-total shape (module docstring)
 FAMS5 = ("alp", "lnp", "grn", "onp", "oth")
 ORDER = ("day", "mob", "ppvc", "pre", "post", "abs", "prov")
 EARLY, PLACE = 5, 1  # polling-place types: an early voting centre, a plain polling place
 DECL = (("PrePollVotes", "pre"), ("PostalVotes", "post"), ("AbsentVotes", "abs"), ("ProvisionalVotes", "prov"))
+ORDER16 = ("ord", "pre", "post", "abs", "prov")  # 2016's shape: one ordinary pile, never venue-split
 
 
-def build(year, res, senate_vote_rows):
+def buckets_of(year):
+    """the Senate's own buckets (senate_vote.bucket), keyed by (division,
+    candidate): a CandidateID alone isn't a join key (2019's Bean collision)"""
     div_rows = sv.rows(Path(sv.SRC) / f"div-{year}.csv.gz")
     grp = "Group" if "Group" in div_rows[0] else "Ticket"
-    # the Senate's own buckets (senate_vote.bucket), keyed by (division,
-    # candidate): a CandidateID alone isn't a join key
     members = collections.defaultdict(set)  # (state, group) -> its candidates' names
     for r in div_rows:
         if r["BallotPosition"] != "0":
@@ -87,36 +94,47 @@ def build(year, res, senate_vote_rows):
     by_div = collections.defaultdict(list)
     for r in div_rows:
         by_div[int(r["DivisionID"])].append(r)
-    b = res["booths"]
-    ty_of = {b["id"][j]: b["ty"][j] for j in range(len(b["id"]))}
-    # each candidate's ordinary votes by kind of place, from the polling-place downloads
+    return by_div, f5_of
+
+
+def build(year, res, senate_vote_rows):
+    by_div, f5_of = buckets_of(year)
+    split = year != 2016  # 2016's venue lane can't be warranted exact: one ord pile instead
     cand_place = collections.defaultdict(lambda: {"day": [0] * 5, "mob": [0] * 5, "ppvc": [0] * 5})
-    for st in sv.STATES:
-        for r in sv.rows(Path(sv.SRC) / f"pp-{year}-{st}.csv.gz"):
-            cid = r["CandidateID"]
-            if cid == "0":  # the informal ballots' row: not first preferences
-                continue
-            did = int(r["DivisionID"])
-            pp = int(r["PollingPlaceID"])
-            assert pp in ty_of, f"{year} {st}: polling place {pp} has no House counterpart in the res booths"
-            kind = "ppvc" if ty_of[pp] == EARLY else "day" if ty_of[pp] == PLACE else "mob"
-            cand_place[(did, cid)][kind][f5_of[(did, cid)]] += int(r["OrdinaryVotes"])
+    if split:
+        b = res["booths"]
+        ty_of = {b["id"][j]: b["ty"][j] for j in range(len(b["id"]))}
+        # each candidate's ordinary votes by kind of place, from the polling-place downloads
+        for st in sv.STATES:
+            for r in sv.rows(Path(sv.SRC) / f"pp-{year}-{st}.csv.gz"):
+                cid = r["CandidateID"]
+                if cid == "0":  # the informal ballots' row: not first preferences
+                    continue
+                did = int(r["DivisionID"])
+                pp = int(r["PollingPlaceID"])
+                assert pp in ty_of, f"{year} {st}: polling place {pp} has no House counterpart in the res booths"
+                kind = "ppvc" if ty_of[pp] == EARLY else "day" if ty_of[pp] == PLACE else "mob"
+                cand_place[(did, cid)][kind][f5_of[(did, cid)]] += int(r["OrdinaryVotes"])
+    order = ORDER if split else ORDER16
     piles_of = {}
     for d in res["divs"]:
         did, name = d["id"], d["n"]
         assert by_div.get(did), f"{year} {name}: no Senate count"
-        got = {s: [0] * 5 for s in ORDER}
+        got = {s: [0] * 5 for s in order}
         total = 0
         for r in by_div[did]:
             cid = r["CandidateID"]
             f = f5_of[(did, cid)]
-            # the venue lane must reconcile the candidate's own ordinary votes
-            places = cand_place[(did, cid)]
-            want_ord = int(r["OrdinaryVotes"])
-            got_ord = sum(places[k][f] for k in ("day", "mob", "ppvc"))
-            assert got_ord == want_ord, f"{year} {name}: {r['CandidateDetails']}: polling places add {got_ord} v ordinary {want_ord}"
-            for k in ("day", "mob", "ppvc"):
-                got[k][f] += places[k][f]
+            if split:
+                # the venue lane must reconcile the candidate's own ordinary votes
+                places = cand_place[(did, cid)]
+                want_ord = int(r["OrdinaryVotes"])
+                got_ord = sum(places[k][f] for k in ("day", "mob", "ppvc"))
+                assert got_ord == want_ord, f"{year} {name}: {r['CandidateDetails']}: polling places add {got_ord} v ordinary {want_ord}"
+                for k in ("day", "mob", "ppvc"):
+                    got[k][f] += places[k][f]
+            else:
+                got["ord"][f] += int(r["OrdinaryVotes"])
             for t, s in DECL:
                 got[s][f] += int(r[t])
             total += int(r["TotalVotes"])
@@ -126,9 +144,9 @@ def build(year, res, senate_vote_rows):
         # and each family's piles must be its Senate total, the deck's own
         row = senate_vote_rows[name]
         want = row[1:5] + [row[5] + row[6]]
-        got5 = [sum(got[s][f] for s in ORDER) for f in range(5)]
+        got5 = [sum(got[s][f] for s in order) for f in range(5)]
         assert got5 == want, f"{year} {name}: family piles {got5} v the Senate deck's {want}"
-        piles_of[did] = {s: got[s] for s in ORDER if sum(got[s])}
+        piles_of[did] = {s: got[s] for s in order if sum(got[s])}
     return piles_of
 
 

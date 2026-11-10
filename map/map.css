@@ -586,6 +586,8 @@ button { cursor: pointer; background: none; border: 0; }
 .vt-band-late { background: color-mix(in srgb, var(--m-ind) 17%, var(--bg)); }
 .vt-band-early { background: color-mix(in srgb, var(--m-lnp) 18%, var(--bg)); }
 .vt-band-day { background: color-mix(in srgb, var(--m-alp) 18%, var(--bg)); }
+/* 2016's Senate lane: one ordinary band (no venue split is warrantable in its product — build_senate_piles.py), worn as its era's opening band */
+.vt-band-ord { background: color-mix(in srgb, var(--m-alp) 18%, var(--bg)); }
 .vt-share { padding-right: 10px; font-size: clamp(20px, 8cqw, 36px); font-weight: 700; line-height: 1; letter-spacing: -.025em; white-space: nowrap; }
 /* the three bands share one set of columns, the figures' sized to the widest of
    them: the dividers line up band to band, and no figure runs over its divider

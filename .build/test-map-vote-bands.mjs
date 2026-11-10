@@ -292,11 +292,14 @@ const ERA_SEN = {
   2025: [["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"], ["early", "Early centres", ["ppvc"], "From Monday, 5 May"], ["day", "On the day", ["day", "mob"], "Election night, after House count"]],
   2022: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Sunday"], ["early", "Early centres", ["ppvc"], "On the night"], ["day", "On the day", ["day", "mob"], "On the night"]],
   2019: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Tuesday"], ["early", "Early centres", ["ppvc"], "On the night"], ["day", "On the day", ["day", "mob"], "On the night"]],
+  // 2016's own narrower truth (build_senate_piles.py): the venue lane there
+  // misattributes rows between tickets, so 2016 shows one whole ordinary band
+  2016: [["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"], ["post", "Postal", ["post"], "From Tuesday"], ["ord", "Ordinary votes", ["ord"], "Election night, rest from Monday"]],
 };
-for (const y of [2025, 2022, 2019]) assert.ok(JSON.stringify(api.vtBandsFor(y, true)) === JSON.stringify(ERA_SEN[y]), `${y}: the Senate era is the Senate count's, quoted`);
+for (const y of [2025, 2022, 2019, 2016]) assert.ok(JSON.stringify(api.vtBandsFor(y, true)) === JSON.stringify(ERA_SEN[y]), `${y}: the Senate era is the Senate count's, quoted`);
 assert.equal(api.vtBandsFor("now", true).length, 3, "\"now\" rides the Senate's 2025");
-// no Senate eras without sourced Senate timing (2016's is sourced but its venue lane is provably dirty: producer docstring)
-for (const y of [2016, 2013, 2010]) assert.equal(api.vtBandsFor(y, true), null, `${y}: no Senate cast era`);
+// no Senate eras where nothing supports them
+for (const y of [2013, 2010]) assert.equal(api.vtBandsFor(y, true), null, `${y}: no Senate cast era`);
 function checkSen(divs, label, fi, eraBands) {
   assert.ok(divs.every((d) => d.vts), `${label}: every seat's Senate piles are on file`);
   const fams = {}, pileN = {}, famTot = [0, 0, 0, 0, 0];
@@ -341,7 +344,7 @@ for (const [fi, fam] of FAMS5.entries()) {
   for (const [divs, label] of partyPools25()) checkSen(divs, `sen ${label} ${fam}`, fi, ERA_SEN[2025]);
 }
 // and every era's bands carry exactly (national oracles per year, onp as the lane)
-for (const y of [2022, 2019]) {
+for (const y of [2022, 2019, 2016]) {
   const res = JSON.parse(read(`map/data/core-${y}.json`));
   current = { year: y, elements: [], res };
   current.divs = res.divs;
@@ -379,4 +382,4 @@ assert.ok(!senHtml.includes("9:30"), "the House's release times never leak into 
   vm.runInContext('vtSenParty = "alp"', ctx);
 }
 
-console.log("PASS: map vote bands — House lanes (pools, eras, toggle, missing data) plus the Senate lens's own cast chart across its three quoted eras (2025/2022/2019; 2016 stays out on data grounds)");
+console.log("PASS: map vote bands — House lanes (pools, eras, toggle, missing data) plus the Senate lens's own cast chart across its four eras (2025/2022/2019 venue-split; 2016 in its one-ordinary-band shape)");

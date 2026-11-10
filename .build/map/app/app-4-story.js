@@ -1303,9 +1303,14 @@ function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "
    close seats Sunday and everywhere from Tuesday (.../05-20a); 2022's Count
    Timeline says "First preferences were also counted for every Senate ballot
    paper" on election night (media/2022/05-27) with postal from Sunday in
-   every division (.../05-22, .../05-27). 2016 is out on DATA grounds (its
-   polling-place product's intra-division row attribution provably drifts —
-   build_senate_piles.py's docstring), not for want of timing evidence. */
+   every division (.../05-22, .../05-27). 2016's timing is quoted too
+   (media/media-releases/2016/07-03e: polling places' Senate ballots on the
+   night, pre-poll Senate ordinary "may also start on Monday", postal verified
+   Monday and counted from Tuesday) — but 2016's venue-split data is provably
+   dirty (the producer docstring), so its era shows one whole "Ordinary votes"
+   band with its own timing instead of a day/early-centre split it can't
+   warrant: an ordinary pile means the 2016 chart carries no day/mob/ppvc
+   split, admitted in the band's own label. */
 const VT_ERAS_SEN = {
   2025: [
     ["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"],
@@ -1323,6 +1328,11 @@ const VT_ERAS_SEN = {
     ["post", "Postal", ["post"], "From Tuesday"],
     ["early", "Early centres", ["ppvc"], "On the night"],
     ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+  2016: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Tuesday"],
+    ["ord", "Ordinary votes", ["ord"], "Election night, rest from Monday"],
   ],
 };
 // the measure toggle's parties and words. 2PP stays the default reading of
@@ -1453,11 +1463,11 @@ function vtBandsBlock(divs, area, geography, senate) {
   const parties = `<div class="vt-modes vt-parties" role="group" aria-label="Vote-type party">${partyList.map(([k, lab]) => `<button type="button" class="vt-mode" data-vt-party="${k}" aria-pressed="${selected === k}">${lab}</button>`).join("")}</div>`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
   const measure = prim ? word : "Labor 2PP";
-  const rows = bands.map((r) => {
+  const rows = bands.map((r, ri) => {
     const value = effect ? r.effect : r.skew, text = effect && value == null ? "—" : sgn(value);
     const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? (prim ? `t-${senate ? vtSenParty : vtParty}` : "vt-alp") : prim ? "" : "vt-lnp") : "";
     const reading = effect
-      ? value != null ? `${text} percentage-point change in ${place} cumulative ${measure}` : r.k === "day" && r.cumulative != null ? "Opening count; no preceding group" : `Change in cumulative ${prim ? "primary" : "two-party"} share unavailable`
+      ? value != null ? `${text} percentage-point change in ${place} cumulative ${measure}` : ri === bands.length - 1 && r.cumulative != null ? "Opening count; no preceding group" : `Change in cumulative ${prim ? "primary" : "two-party"} share unavailable`
       : value == null ? `${prim ? "primary" : "two-party"} skew unavailable` : `${text} percentage points on ${place} ${measure}`;
     return `<div class="vt-band vt-band-${r.k}" role="listitem" style="--vt-share:${r.share}" aria-label="${esc(`${f1(r.share)}%, ${r.l}; counting ${r.time.toLowerCase()}; ${reading}`)}"><b class="vt-share">${f1(r.share)}%</b><span class="vt-label">${esc(r.l)}<small class="vt-time">${esc(r.time)}</small></span><b class="vt-skew ${tone}">${text}</b></div>`;
   }).join("");

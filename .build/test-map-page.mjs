@@ -149,24 +149,22 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
         for (const p of Object.values(d.vt3)) for (let i = 0; i < 5; i++) got[i] += p[i];
         assert.deepEqual(got, want, `${y} ${d.n}: first-preference piles add up to the final count`);
         // the Senate's equivalent lane (build_senate_piles.py): vts, the same
-        // five groupings per pile — but 2016 stays out (its polling-place
-        // product misattributes some ordinary votes between tickets)
-        if (y === 2016) {
-          assert.ok(!d.vts, `${y} ${d.n}: no Senate piles (2016's venue lane isn't exact)`);
-        } else {
-          assert.ok(d.vts, `${y} ${d.n} has Senate piles (python3 -I .build/map/build_senate_piles.py, then assemble)`);
-          const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)).divs[d.n];
-          let svTot = 0;
-          const famSV = [0, 0, 0, 0, 0];
-          for (const [k, p] of Object.entries(d.vts)) {
-            assert.ok(["day", "mob", "ppvc", "pre", "post", "abs", "prov"].includes(k), `${y} ${d.n}: unknown Senate pile ${k}`);
-            assert.equal(p.length, 5, `${y} ${d.n}: five Senate groupings in pile ${k}`);
-            svTot += p.reduce((a, v) => a + v, 0);
-            for (let i = 0; i < 5; i++) famSV[i] += p[i];
-          }
-          assert.equal(svTot, sv[0], `${y} ${d.n}: Senate piles exhaust the Senate's formal votes`);
-          assert.deepEqual(famSV, [sv[1], sv[2], sv[3], sv[4], sv[5] + sv[6]], `${y} ${d.n}: Senate piles add up to the Senate deck's families`);
+        // five groupings per pile — venue-split everywhere but 2016, whose
+        // polling-place product is provably dirty: 2016 keeps one "ord" pile
+        const pilesUnion = y === 2016 ? ["ord", "pre", "post", "abs", "prov"] : ["day", "mob", "ppvc", "pre", "post", "abs", "prov"];
+        assert.ok(d.vts, `${y} ${d.n} has Senate piles (python3 -I .build/map/build_senate_piles.py, then assemble)`);
+        if (y === 2016) assert.ok(d.vts.ord && !d.vts.day && !d.vts.ppvc && !d.vts.mob, `${y} ${d.n}: 2016's one ordinary pile, never venue-split`);
+        const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)).divs[d.n];
+        let svTot = 0;
+        const famSV = [0, 0, 0, 0, 0];
+        for (const [k, p] of Object.entries(d.vts)) {
+          assert.ok(pilesUnion.includes(k), `${y} ${d.n}: pile ${k} outside ${y}'s shape`);
+          assert.equal(p.length, 5, `${y} ${d.n}: five Senate groupings in pile ${k}`);
+          svTot += p.reduce((a, v) => a + v, 0);
+          for (let i = 0; i < 5; i++) famSV[i] += p[i];
         }
+        assert.equal(svTot, sv[0], `${y} ${d.n}: Senate piles exhaust the Senate's formal votes`);
+        assert.deepEqual(famSV, [sv[1], sv[2], sv[3], sv[4], sv[5] + sv[6]], `${y} ${d.n}: Senate piles add up to the Senate deck's families`);
       } else if (classic) {
         assert.ok(d.vt2, `${y} ${d.n}: a Labor v Coalition seat has piles`);
         const A = d.tcp[fam.indexOf("alp")][1], C = d.tcp[fam.indexOf("lnp")][1];
@@ -218,6 +216,22 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
     const natF = (i) => Math.round((1000 * svRows.reduce((a, x) => a + x[i], 0)) / svDen) / 10;
     const natOth = Math.round((1000 * svRows.reduce((a, x) => a + x[5] + x[6], 0)) / svDen) / 10;
     assert.deepEqual([natF(1), natF(2), natF(3), natF(4), natOth], [35.1, 29.9, 11.7, 5.7, 17.6], "2025 Senate families pooled: ALP, Coalition, Greens, One Nation, other");
+  }
+  // and 2016's own ordinary-shaped lane: one "ord" band, postal with the
+  // declarations, the same deck contract — its National totals pinned here
+  {
+    const r16 = JSON.parse(R("map/data/res-2016.json"));
+    const V = {}, NV = {};
+    for (const d of r16.divs) for (const [k, p] of Object.entries(d.vts)) { const t = (V[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) t[i] += p[i]; NV[k] = (NV[k] || 0) + p.reduce((a, v) => a + v, 0); }
+    const totV = Object.values(NV).reduce((a, v) => a + v, 0);
+    assert.equal(totV, 13838900, "2016 Senate piles reach the Senate's formal count");
+    const sh = (ks, i) => Math.round((1000 * ks.reduce((a, k) => a + V[k][i], 0)) / ks.reduce((a, k) => a + NV[k], 0)) / 10;
+    assert.equal(sh(["ord"], 0), 30.3, "2016 Senate ALP among ordinary votes (day & early centres)");
+    assert.equal(sh(["pre", "abs", "prov", "post"], 1), 35.8, "2016 Senate Coalition across the late piles");
+    assert.equal(sh(["post"], 2), 7.0, "2016 Senate Greens by post");
+    const SI = ["alp", "lnp", "grn", "onp", "oth"];
+    const nat16 = (i) => Math.round((1000 * r16.divs.reduce((a, d) => a + Object.values(d.vts).reduce((s, p) => s + p[SI.indexOf(i)], 0), 0)) / totV) / 10;
+    assert.deepEqual([nat16("alp"), nat16("lnp"), nat16("grn"), nat16("onp"), nat16("oth")], [29.8, 35.2, 8.7, 4.3, 22.1], "2016 Senate families pooled: ALP, Coalition, Greens, One Nation, other");
   }
 }
 // the primary-change same-place lane (build_map_data.py's prevFp join): every
