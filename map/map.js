@@ -10942,7 +10942,7 @@ function vtBandsFor(y) { return VT_ERAS[y === "now" ? 2025 : +y] || null; }
 // the measure toggle's parties and words. 2PP stays the default reading of
 // the bands; each other measure is that grouping's first-preference share of
 // a pile, pooled straight from each seat's vt3 first-preference piles
-const VT_PARTIES = [["tpp", "2PP"], ["alp", "Labor"], ["lnp", "Coalition"], ["grn", "Greens"], ["onp", "One Nation"], ["oth", "Other"]];
+const VT_PARTIES = [["tpp", "2PP"], ["alp", "ALP"], ["lnp", "L/NP"], ["grn", "GRN"], ["onp", "ON"], ["oth", "OTH"]];
 // mid-sentence measures by party: heading noun (appended " primary"), owner in the skew note
 const VT_WORDS = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "other candidates" };
 const VT_POSS = { alp: "Labor's", lnp: "the Coalition's", grn: "the Greens'", onp: "One Nation's", oth: "other candidates'" };

@@ -221,7 +221,7 @@ vm.runInContext('vtParty = "grn"', ctx);
 const grnHtml = api.vtBlock(current.res.divs, true, "nationwide");
 assert.ok(grnHtml.includes('class="vt-modes vt-parties"') && grnHtml.indexOf('class="vt-modes vt-parties"') < grnHtml.indexOf('aria-label="Vote-type measure"'), "the party row sits above the measure row");
 assert.match(grnHtml, /data-vt-party="tpp" aria-pressed="false"[\s\S]*data-vt-party="grn" aria-pressed="true"/);
-for (const lab of ["2PP", "Labor", "Coalition", "Greens", "One Nation", "Other"]) assert.ok(grnHtml.includes(`>${lab}</button>`), `party button ${lab}`);
+for (const lab of ["2PP", "ALP", "L/NP", "GRN", "ON", "OTH"]) assert.ok(grnHtml.includes(`>${lab}</button>`), `party button ${lab}`);
 assert.ok(grnHtml.includes("National Greens primary skew"));
 assert.ok(grnHtml.includes("Skews are percentage points in the Greens' primary share"), "the skew note names the measure");
 {
@@ -281,4 +281,4 @@ for (const y of [2013, 2010]) {
   assert.ok(html.includes("<table") && !html.includes("vt-bands"), `${y}: classic-seat coverage keeps the table, not the chart`);
 }
 
-console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes, missing data, the 2016/2019/2022 eras, and the party toggle (2PP/Labor/Coalition/Greens/One Nation/Other) in four pools per measure");
+console.log("PASS: map vote bands — nationwide, 8 states, 4 seat types, 150 seats, weighted skews and cumulative effects, scope changes, missing data, the 2016/2019/2022 eras, and the party toggle (2PP/ALP/L-NP/GRN/ON/OTH) in four pools per measure");
