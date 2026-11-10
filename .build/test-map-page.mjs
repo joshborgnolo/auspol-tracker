@@ -2561,7 +2561,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ui.includes("if (STATE_YEARS.has(y)) { S.f.st = null; S.f.cls = null; }") && ui.includes("if (S.f.cls && !b.divs.some((d) => d.cls === S.f.cls)) S.f.cls = null;"), "the filters follow the frame: a state election drops both, a frame without the type drops it");
   assert.ok(!list.includes('sel("State", "st"') && !list.includes('sel("Seat type", "cls"') && list.includes('sel(isNowY(m.year) ? "Held by" : "Won by", "win"'), "the list bar keeps only its own filters (held by, margin): State and Seat type are the strip's rows");
   assert.ok(list.includes("function filterWords(m, listOnly)") && ui.includes("const on = !!(S.f.win || S.f.margin || S.f.range);") && ui.includes("filterWords(m, true)"), "the map's pill names only the list's own filters — the State and Seat type rows name themselves");
-  assert.ok(ch3.includes('cls: sen || S.lens !== "cls" ? null : clsFilter(m)') && ch3.includes('cls: S.lens === "cls" ? clsFilter(m) : null') && ch3.includes("offType ? th.ink"), "the chambers dim by the filters like the map; only the Seat type lens keeps the picked type's ladder tone with the rest ghosted");
+  assert.ok(ch3.includes('cls: sen || S.lens !== "cls" ? null : clsFilter(m)') && ch3.includes('cls: sm ? null : (S.lens === "cls" ? clsFilter(m) : null)') && ch3.includes("offType ? th.ink"), "the chambers dim by the filters like the map; only the Seat type lens keeps the picked type's ladder tone with the rest ghosted");
   assert.ok(st.includes("const chamberMark = cls ?"), "the chamber section's small names the filter it marks");
   assert.ok(css.includes(".mp-legend .lg-filter button[aria-pressed=\"true\"]") && css.includes(".lg-typefilter button i"), "the rows' chips mark their pick, the type swatches styled");
   // the polling-places key takes the hint's very slot in the foot line —
@@ -2574,6 +2574,12 @@ for (const y of ["sa22", "sa26"]) {
     assert.equal(uiP.split('class="lg-foot"').length, 2, "one foot line carries both the hint and the polling-places key");
     assert.ok(uiP.includes('el.style.display = keyGate ? "none" : "";'), "the hint stands down while the key owns the slot");
     assert.ok(cssP.includes(".lg-foot > .lg-shapes { flex: 1 1 auto") && !cssP.includes("@media (max-width: 560px) { .mp-legend > .lg-foot { display: none; } }"), "the key keeps the hint's geometry in the foot, phone included");
+    // the little chamber in the Senate lanes is the Senate's own floor
+    // (user report 2026-11-10 — it drew the House's seats)
+    const ch = part("app-3-chamber.js"), st3 = part("app-4-story.js");
+    assert.ok(ch.includes('SENY[isNowY(m.year) ? "now" : m.year]') && ch.includes("miniCh.senate = !!sm;") && ch.includes("const sd = sm ? null : selDiv();"), "the Senate lanes' mini chamber draws the senators' floor from the head's own deck");
+    assert.ok(uiP.includes("if (!c || miniCh.senate)") && uiP.includes("if (c) { if (miniCh.senate) return;"), "senator chairs stay unhit while the hit-map is the House's");
+    assert.ok(st3.includes('"The Senate, each member a chair"'), "the canvas names the Senate when it draws it");
   }
 }
 

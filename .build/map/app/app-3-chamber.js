@@ -1224,8 +1224,17 @@ const miniCh = { canvas: null, drawn: null, F: null };
 function paintMiniChamber() {
   const c = $("#minich"); if (!c) { miniCh.canvas = null; return; }
   const m = M(); if (!m) return;
+  /* the Senate lanes' little chamber is the chamber itself: the senators'
+     floor from the same deck the head's seats row counts (user report
+     2026-11-10: it drew the House's 150 chairs). Not interactive today — the
+     chair-hit map below stays the House's, so senator clicks would navigate
+     to the wrong seat (its hover/click handlers stand down on miniCh.senate) */
+  const sm = (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  const dm = sm || m;
+  miniCh.senate = !!sm;
+  if (sm && miniCh.hover != null) miniCh.hover = null;
   const w = c.clientWidth || 300;
-  const geom = chamberGeom(m);
+  const geom = chamberGeom(dm);
   const pad = { t: 4, r: 4, b: 22, l: 4 };
   const bw = geom.box.x1 - geom.box.x0, bh = geom.box.y1 - geom.box.y0;
   const h = Math.round(((w - 8) * bh) / bw + 26);
@@ -1234,10 +1243,10 @@ function paintMiniChamber() {
   const g = c.getContext("2d");
   g.setTransform(r, 0, 0, r, 0, 0);
   g.clearRect(0, 0, w, h);
-  const sd = selDiv();
+  const sd = sm ? null : selDiv();
   // the chamber keeps its own marks of the figures-menu pick: a state's seats
   // lit, a seat type in its lens colours with other kinds sat back
-  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: S.lens === "cls" ? clsFilter(m) : null, pad, labels: true });
+  const out = drawChamber(g, dm, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: sm ? null : (S.sel.level === "state" ? S.sel.st : null), cls: sm ? null : (S.lens === "cls" ? clsFilter(m) : null), pad, labels: true });
   miniCh.canvas = c; miniCh.drawn = out.drawn;
 }
 function miniHit(px, py) {

@@ -1527,7 +1527,8 @@ canvas.addEventListener("dblclick", (e) => {
 // the small chamber in the story
 $("#story").addEventListener("pointermove", (e) => {
   const c = e.target.closest("#minich");
-  if (!c) { if (miniCh.hover != null) { miniCh.hover = null; miniCh.dirty = true; S.hover = null; hideTip(); schedule(); } return; }
+  // the Senate lanes' little chamber shows senators: not hit-mapped today
+  if (!c || miniCh.senate) { if (miniCh.hover != null) { miniCh.hover = null; miniCh.dirty = true; S.hover = null; hideTip(); schedule(); } return; }
   const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top);
   if (i !== miniCh.hover) { miniCh.hover = i; miniCh.dirty = true; S.hover = i == null ? null : { kind: "div", i }; schedule(); }
   if (i != null) showTipAt(tipFor({ kind: "div", i }), e.clientX, e.clientY); else hideTip();
@@ -1543,7 +1544,7 @@ $("#story").addEventListener("click", (e) => {
   const primary = e.target.closest("[data-pv-action]");
   if (primary) { statBreakdownClick(primary); return; }
   const c = e.target.closest("#minich");
-  if (c) { const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
+  if (c) { if (miniCh.senate) return; const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
   const g = e.target.closest("g[data-year]"); if (g) { setYear(yearOf(g.dataset.year)); }
 });
 // a tap names the fixed view's spot before any handler acts on it

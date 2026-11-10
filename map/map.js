@@ -8259,8 +8259,17 @@ const miniCh = { canvas: null, drawn: null, F: null };
 function paintMiniChamber() {
   const c = $("#minich"); if (!c) { miniCh.canvas = null; return; }
   const m = M(); if (!m) return;
+  /* the Senate lanes' little chamber is the chamber itself: the senators'
+     floor from the same deck the head's seats row counts (user report
+     2026-11-10: it drew the House's 150 chairs). Not interactive today — the
+     chair-hit map below stays the House's, so senator clicks would navigate
+     to the wrong seat (its hover/click handlers stand down on miniCh.senate) */
+  const sm = (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  const dm = sm || m;
+  miniCh.senate = !!sm;
+  if (sm && miniCh.hover != null) miniCh.hover = null;
   const w = c.clientWidth || 300;
-  const geom = chamberGeom(m);
+  const geom = chamberGeom(dm);
   const pad = { t: 4, r: 4, b: 22, l: 4 };
   const bw = geom.box.x1 - geom.box.x0, bh = geom.box.y1 - geom.box.y0;
   const h = Math.round(((w - 8) * bh) / bw + 26);
@@ -8269,10 +8278,10 @@ function paintMiniChamber() {
   const g = c.getContext("2d");
   g.setTransform(r, 0, 0, r, 0, 0);
   g.clearRect(0, 0, w, h);
-  const sd = selDiv();
+  const sd = sm ? null : selDiv();
   // the chamber keeps its own marks of the figures-menu pick: a state's seats
   // lit, a seat type in its lens colours with other kinds sat back
-  const out = drawChamber(g, m, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: S.sel.level === "state" ? S.sel.st : null, cls: S.lens === "cls" ? clsFilter(m) : null, pad, labels: true });
+  const out = drawChamber(g, dm, w, h, { big: false, sel: sd, hover: miniCh.hover ?? null, state: sm ? null : (S.sel.level === "state" ? S.sel.st : null), cls: sm ? null : (S.lens === "cls" ? clsFilter(m) : null), pad, labels: true });
   miniCh.canvas = c; miniCh.drawn = out.drawn;
 }
 function miniHit(px, py) {
@@ -10760,7 +10769,7 @@ function storyArea(m, st) {
     // members, or the seat type whose kind stays lit
     // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
     const chamberMark = cls ? `${CLS_SHORT[cls].replace(" ", "-")} seats lit${aus ? "" : ` in ${STATE_NAME[st]}`}` : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
-    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair"></canvas></div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${(S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? "The Senate, each member a chair" : `${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair`}"></canvas></div></div>`;
   }
   // (a seat-type filter keeps the changes in its own seats)
   const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
@@ -13125,7 +13134,8 @@ canvas.addEventListener("dblclick", (e) => {
 // the small chamber in the story
 $("#story").addEventListener("pointermove", (e) => {
   const c = e.target.closest("#minich");
-  if (!c) { if (miniCh.hover != null) { miniCh.hover = null; miniCh.dirty = true; S.hover = null; hideTip(); schedule(); } return; }
+  // the Senate lanes' little chamber shows senators: not hit-mapped today
+  if (!c || miniCh.senate) { if (miniCh.hover != null) { miniCh.hover = null; miniCh.dirty = true; S.hover = null; hideTip(); schedule(); } return; }
   const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top);
   if (i !== miniCh.hover) { miniCh.hover = i; miniCh.dirty = true; S.hover = i == null ? null : { kind: "div", i }; schedule(); }
   if (i != null) showTipAt(tipFor({ kind: "div", i }), e.clientX, e.clientY); else hideTip();
@@ -13141,7 +13151,7 @@ $("#story").addEventListener("click", (e) => {
   const primary = e.target.closest("[data-pv-action]");
   if (primary) { statBreakdownClick(primary); return; }
   const c = e.target.closest("#minich");
-  if (c) { const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
+  if (c) { if (miniCh.senate) return; const r = c.getBoundingClientRect(), i = miniHit(e.clientX - r.left, e.clientY - r.top); if (i != null) goDiv(i); return; }
   const g = e.target.closest("g[data-year]"); if (g) { setYear(yearOf(g.dataset.year)); }
 });
 // a tap names the fixed view's spot before any handler acts on it
