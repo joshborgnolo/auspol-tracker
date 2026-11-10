@@ -541,11 +541,14 @@ function legendHTML(m) {
     // the zoom hint rides the strip too, off the stage's top-left overlay with
     // the cities — re-rendered fresh every write, and updateHint fills it by id
     // (its line ends with the search field on a laptop, right-aligned: placeSearch)
-    h += `<div class="lg-foot"><div class="lg-hint mp-hint" id="hint"></div></div>`;
-    // the polling-places key forms the control panel's tail under the Draw row
-    // once polling places are on the picture — zoomed deep enough, or equally
-    // by its draw (seats) or a chosen seat (user call, 2026-11-08)
-    if (boothsOn && drawOf(m) !== "balloons" && (drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL)) h += `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>`;
+    // the polling-places key lives in that very slot: once the picture holds
+    // polling places, the circles/squares caption stands where the hint did —
+    // in the foot line with the search field, not a rule lower in the label
+    // column's indent (user call, 2026-11-10: "same position as the first
+    // text, not a different position"; the hint stands down for it in
+    // updateHint, the two are alternatives by construction)
+    const pollKey = boothsOn && drawOf(m) !== "balloons" && (drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL);
+    h += `<div class="lg-foot"><div class="lg-hint mp-hint" id="hint"></div>${pollKey ? `<div class="lg-shapes"><span><i></i>Polling place</span><span><i class="sq"></i>Early voting</span><span>Size: votes</span></div>` : ""}</div>`;
   }
 
   return h;
@@ -845,7 +848,11 @@ function filtersChanged() {
 }
 function updateHint() {
   const el = $("#hint"); if (!el) return;
-  const show = S.view === "map" && selDiv() == null && (T.k < K_ALL || drawOf(M()) === "surface") && !!M();
+  // the polling-places key owns the slot while polling places are on the
+  // picture (renderLegend's pollKey) — the hint itself stands down in it
+  const keyGate = !!(M() && boothsShown() && drawOf(M()) !== "balloons" && (drawOf(M()) === "seats" || selDiv() != null || T.k >= K_ALL));
+  el.style.display = keyGate ? "none" : "";
+  const show = S.view === "map" && !keyGate && selDiv() == null && (T.k < K_ALL || drawOf(M()) === "surface") && !!M();
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover to check local coverage, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   // the row stays while a jump selection is live, so it can be toggled back off

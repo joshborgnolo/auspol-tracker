@@ -2562,6 +2562,17 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(ch3.includes('cls: sen || S.lens !== "cls" ? null : clsFilter(m)') && ch3.includes('cls: S.lens === "cls" ? clsFilter(m) : null') && ch3.includes("offType ? th.ink"), "the chambers dim by the filters like the map; only the Seat type lens keeps the picked type's ladder tone with the rest ghosted");
   assert.ok(st.includes("const chamberMark = cls ?"), "the chamber section's small names the filter it marks");
   assert.ok(css.includes(".mp-legend .lg-filter button[aria-pressed=\"true\"]") && css.includes(".lg-typefilter button i"), "the rows' chips mark their pick, the type swatches styled");
+  // the polling-places key takes the hint's very slot in the foot line —
+  // not a separate rule-lower block in the label column's indent (user
+  // call 2026-11-10): one gate (pollKey/keyGate) decides which of the two
+  // emblems shows, and the hint stands down for it
+  {
+    const uiP = part("app-6-ui.js"), cssP = part("page.css");
+    assert.ok(uiP.includes('id="hint"></div>${pollKey ? `<div class="lg-shapes">') && uiP.includes("const pollKey = boothsOn && drawOf(m) !== \"balloons\""), "the polling-places key nests in lg-foot beside the hint, gated once");
+    assert.equal(uiP.split('class="lg-foot"').length, 2, "one foot line carries both the hint and the polling-places key");
+    assert.ok(uiP.includes('el.style.display = keyGate ? "none" : "";'), "the hint stands down while the key owns the slot");
+    assert.ok(cssP.includes(".lg-foot > .lg-shapes { flex: 1 1 auto") && !cssP.includes("@media (max-width: 560px) { .mp-legend > .lg-foot { display: none; } }"), "the key keeps the hint's geometry in the foot, phone included");
+  }
 }
 
 // one head in every lens and at every level (2026-11-08, user call on the side
@@ -2698,7 +2709,7 @@ for (const y of ["sa22", "sa26"]) {
   const ui = part("app-6-ui.js");
   const hintIx = ui.indexOf('id="hint"'), shapesIx = ui.indexOf("lg-shapes", hintIx);
   assert.ok(shapesIx > hintIx, "gated as its emission place — the polling-places key rides after the hint");
-  assert.ok(ui.includes('if (boothsOn && drawOf(m) !== "balloons" && (drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL))'), "…showing only when polling places are on the picture");
+  assert.ok(ui.includes('const pollKey = boothsOn && drawOf(m) !== "balloons" && (drawOf(m) === "seats" || selDiv() != null || T.k >= K_ALL);'), "…showing only when polling places are on the picture");
 }
 
 // the now views carry the base election's swings (user call 2026-11-07 —

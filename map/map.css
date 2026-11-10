@@ -1382,14 +1382,24 @@ html.mp-fs .mp-tip { z-index: 260; }
   }
   html:not(.mp-retro) .mp-legend .lg-foot > .mp-search { flex: none; width: 260px; max-width: 50%; margin: 0 0 0 auto; } /* fixed: the hint's words change as the map zooms, and the field mustn't breathe with them */
   html:not(.mp-retro) .mp-legend .lg-foot > .mp-search label { height: 28px; }
+  /* the polling-places key is the hint's own slot, exactly — same line,
+     same left edge, same height, the search field's line unchanged
+     (user call 2026-11-10); its generic block styles never apply in here */
+  html:not(.mp-retro) .mp-legend .lg-foot > .lg-shapes { flex: 1 1 auto; min-width: 0; margin: 0; padding: 0; border: 0; gap: 12px; display: flex; align-items: center; min-height: 29px; box-sizing: border-box; }
   html:not(.mp-retro) .mp-legend .lg-foot > .lg-hint::before {
     content: ""; flex: none; width: 14px; height: 14px; background: currentColor;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='7' r='5.8' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M7 6.2V10' stroke='%23000' stroke-width='1.3'/%3E%3Ccircle cx='7' cy='4.2' r='.8'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='7' r='5.8' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M7 6.2V10' stroke='%23000' stroke-width='1.3'/%3E%3Ccircle cx='7' cy='4.2' r='.8'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 }
-/* a phone's hint is off (its search stands atop the map): no foot line */
-@media (max-width: 560px) { .mp-legend > .lg-foot { display: none; } }
+/* a phone's hint is off (its search stands atop the map): no foot line — but
+   the polling-places key, which moved into that line, keeps standing alone */
+@media (max-width: 560px) {
+  html:not(.mp-retro) .mp-legend > .lg-foot > .lg-hint, html:not(.mp-retro) .mp-legend > .lg-foot > .mp-search { display: none; }
+  html:not(.mp-retro) .mp-legend > .lg-foot { border-top: 0; margin-top: 6px; padding-top: 0; }
+  html:not(.mp-retro) .mp-legend > .lg-foot > .lg-shapes { min-height: 0; }
+  .mp-retro .mp-legend > .lg-foot { display: none; }
+}
 /* the View elections row under the map hangs its wrap the same way: the
    frames that don't fit carry on under Federal, not under the tag */
 @media (min-width: 561px) {
