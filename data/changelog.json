@@ -381,11 +381,11 @@
     "sig": {},
     "sigMeta": {},
     "conf": {
-      "business": 76.5,
-      "consumer": 66.2,
+      "business": 81.7,
+      "consumer": 63.1,
       "demosauConsumer": 38.7,
-      "nabBusiness": -13,
-      "westpacConsumer": 80.4
+      "nabBusiness": -15,
+      "westpacConsumer": 78.2
     }
   },
   "entries": [
@@ -694,6 +694,12 @@
       "kind": "poll",
       "text": "Roy Morgan (fieldwork 26 Oct–8 Nov, n=2,574) added — the two-party preferred estimate moved 50.9 → 51.0 (Labor v the Coalition, implied flows). Primary votes: the Coalition 22.9 → 22.7, others 10.8 → 11.0. Leader ratings: Albanese’s net approval −23.6 → −23.5. National direction: right track 24.0 → 23.9, wrong track 64.4 → 64.7 (net −40.4 → −40.8). House effect (Labor v the Coalition, implied flows; positive leans Labor): Roy Morgan held at +0.1.",
       "url": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026"
+    },
+    {
+      "date": "2026-11-10",
+      "label": "10 Nov 2026",
+      "kind": "conf",
+      "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 66.2 → 63.1; Westpac–MI consumer sentiment 80.4 → 78.2; Roy Morgan business confidence 76.5 → 81.7; NAB business confidence −13 → −15."
     }
   ]
 }
