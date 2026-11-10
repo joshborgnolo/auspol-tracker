@@ -1,0 +1,56 @@
+{
+ "house": "Essential",
+ "waves": [
+  {
+   "election": "2013-09-07",
+   "dateStart": null,
+   "date": "2013-09-05",
+   "sample": null,
+   "tpp": { "alp": 48 },
+   "total": { "alp": 35, "lnp": 43, "grn": 10, "onp": null, "oth": 12 },
+   "dims": {}
+  },
+  {
+   "election": "2016-07-02",
+   "dateStart": "2016-06-27",
+   "date": "2016-06-30",
+   "sample": 1212,
+   "tpp": { "alp": 49.5 },
+   "total": { "alp": 34.5, "lnp": 42.5, "grn": 11.5, "onp": null, "oth": 10.5, "nxt": 1.5 },
+   "dims": {
+    "voted": {
+     "Have voted": { "alp": 33, "lnp": 45, "grn": 10, "onp": null, "oth": 10, "nxt": 2, "alp2": 46 },
+     "Have not voted": { "alp": 35, "lnp": 41, "grn": 12, "onp": null, "oth": 11, "nxt": 1, "alp2": 51 }
+    }
+   }
+  },
+  {
+   "election": "2019-05-18",
+   "dateStart": "2019-05-10",
+   "date": "2019-05-14",
+   "sample": 1201,
+   "tpp": { "alp": 51.5 },
+   "total": { "alp": 36.2, "lnp": 38.5, "grn": 9.1, "onp": 6.6, "oth": 9.6 },
+   "dims": {}
+  }
+ ],
+ "sources": [
+  { "url": "https://essentialvision.com.au/federal-politics-voting-intention-7", "archived": "src/essential/post-vi-7_2013-09.html", "note": "wayback 20130911174849; 2013 final wave post (weekly federal politics post 7)" },
+  { "url": "https://essentialvision.com.au/documents/essential_report_130905.pdf", "archived": "src/essential/tables-2013-09-05.pdf", "note": "wayback 20160304053432; 2013 final report PDF (published 5/9/13), text in tables-2013-09-05.txt" },
+  { "url": "https://essentialvision.com.au/federal-voting-intention-22", "archived": "src/essential/post-fvi-22_2016.html", "note": "wayback 20160703id_; 2016 special pre-election wave post" },
+  { "url": "https://essentialvision.com.au/uploads/2016/07/Essential-Report_160701.pdf", "archived": "src/essential/tables-2016-07-01.pdf", "note": "wayback 20160806100601; 2016 special pre-election report PDF, text in tables-2016-07-01.txt" },
+  { "url": "https://essentialvision.com.au/federal-voting-intention-131", "archived": "src/essential/post-fvi-131_2019.html", "note": "wayback 20190518id_; 2019 final weekly wave post" },
+  { "url": "https://essentialvision.com.au/uploads/2019/05/Essential-Report-140519-D1.pdf", "archived": "src/essential/tables-2019-05-14.pdf", "note": "wayback 20190518230038; 2019 final report PDF, text in tables-2019-05-14.txt" }
+ ],
+ "notes": [
+  "Essential never printed voting-intention crosstabs by gender/age/state in its weekly reports — checked the full text of all three final-week PDFs: no VI demographic tables exist. Dims are none for 2013/2019 and only the printed already-voted split for 2016. That split (22% of enrolled respondents said they had already voted) reads {Have/Have not} voted with per-cell 2PP as printed (L–NP shown: Have-voted 54–46, Have-not 49–51; alp2 recorded).",
+  "2013 final wave column '5/9/13': Liberal National 43 / Labor 35 / Greens 10 / Other+Independent 12; 2PP 52–48 (2010 flows); don't-know excluded. The report's About page (sample, fieldwork dates, house panel) is not readable in the saved copies — the 2013-era subsetted fonts strip most of it in extraction — so sample and fieldwork window are null rather than transcribed from an unverifiable reading.",
+  "2016 special pre-election poll conducted online 27–30 June 2016, n=1,212 (Your Source); printed to the nearest 0.5 point (components sum to 100.5); NXT printed as its own SA-only column, kept as 'nxt' beside the five standard keys (oth excludes NXT as printed). Publication 1 July 2016.",
+  "2019 weekly omnibus 10–14 May 2019, n=1,201 (Qualtrics), published 14 May; components printed Liberal 36.2 / National 3.6 with the report's own combined line reading 38.5 (rounding); 2PP 51.5 Labor (2016 flows); Publication 14 May 2019.",
+  "2022 not probed: Essential suspended its voting-intention question after the 2019 election and resumed only in late 2023 — there is no 2022 final-week Essential VI cross-tab to file."
+ ],
+ "gaps": [
+  "2013 wave sample and fieldwork window — About page of tables-2013-09-05.pdf is font-mangled in every extraction tried (pdftotext both layouts)",
+  "All three elections: voting-intention crosstabs by gender/age/state — never printed by Essential in this product era"
+ ]
+}

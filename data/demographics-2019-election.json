@@ -1,0 +1,494 @@
+{
+ "_about": "Final and near-final pre-election demographic polling for the 2019 federal election, assembled from the lanes in .build/analysis/election-demographics (agent-scraped lane JSONs; every figure traceable to a verbatim source saved under src/). Shares are the houses' printed figures, re-based to decided voters where a printed undecided share existed (und kept on the wave). Non-standard keys besides alp/lnp/grn/onp/oth: pup, sample, trend2pp, nxt, kap, uap, note, ind, caution. See provenance for per-house sources; gaps record what was probed and not found. Fieldwork dates/samples are null where the surviving copies don't carry them.",
+ "election": "2019-05-18",
+ "waves": [
+  {
+   "pollster": "Newspoll",
+   "date": "2019-03-10",
+   "publication": "26 March 2019 (The Australian 'Federal election graphic', Newspoll quarterly demographic tables)",
+   "pool": "Newspoll quarterly demographic reanalysis, surveys conducted between 24 January and 10 March 2019, 6,393 interviews",
+   "adjacentQuarter": true,
+   "dateStart": "2019-01-24",
+   "sample": 6393,
+   "tpp": {
+    "alp": 53
+   },
+   "total": {
+    "alp": 39,
+    "lnp": 37,
+    "grn": 9,
+    "onp": 6,
+    "oth": 9
+   },
+   "dims": {
+    "state": {
+     "NSW (inc. ACT)": {
+      "alp": 39,
+      "lnp": 36,
+      "grn": 10,
+      "onp": 6,
+      "oth": 9,
+      "alp2": 54,
+      "lnp2": 46
+     },
+     "VIC": {
+      "alp": 42,
+      "lnp": 40,
+      "grn": null,
+      "onp": null,
+      "oth": 7,
+      "alp2": 53,
+      "lnp2": 47
+     },
+     "QLD": {
+      "alp": 37,
+      "lnp": 35,
+      "grn": 9,
+      "onp": 9,
+      "oth": 10,
+      "alp2": 53,
+      "lnp2": 47
+     },
+     "SA": {
+      "alp": 39,
+      "lnp": 32,
+      "grn": 6,
+      "onp": 5,
+      "oth": 18,
+      "alp2": 56,
+      "lnp2": 44
+     },
+     "WA": {
+      "alp": 38,
+      "lnp": 39,
+      "grn": 8,
+      "onp": null,
+      "oth": 9,
+      "alp2": 51,
+      "lnp2": 49
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 40,
+      "lnp": 37,
+      "grn": 7,
+      "onp": 6,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 39,
+      "lnp": 37,
+      "grn": 10,
+      "onp": 6,
+      "oth": 8
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 46,
+      "lnp": 28,
+      "grn": 14,
+      "onp": 4,
+      "oth": 8
+     },
+     "35–49": {
+      "alp": 39,
+      "lnp": 35,
+      "grn": 9,
+      "onp": 7,
+      "oth": 10
+     },
+     "50+": {
+      "alp": 35,
+      "lnp": 44,
+      "grn": 5,
+      "onp": 6,
+      "oth": 10
+     }
+    },
+    "cities": {
+     "Five capitals": {
+      "alp": 39,
+      "lnp": 38,
+      "grn": 9,
+      "onp": 5,
+      "oth": 9,
+      "alp2": 53,
+      "lnp2": 47
+     },
+     "Non-capitals": {
+      "alp": 39,
+      "lnp": 36,
+      "grn": 7,
+      "onp": 7,
+      "oth": 10,
+      "alp2": 53,
+      "lnp2": 47
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Newspoll",
+   "date": "2019-05-12",
+   "publication": "14 May 2019 (The Australian state-breakdown piece; relayed by Poll Bludger same day)",
+   "pool": "Newspoll state breakdowns 'aggregated from the results of its last five polls going back to the start of April' (The Australian's pre-election pooled table)",
+   "dateStart": "2019-04-01",
+   "total": null,
+   "dims": {
+    "state": {
+     "NSW": {
+      "alp2": 49,
+      "lnp2": 51
+     },
+     "VIC": {
+      "alp2": 54,
+      "lnp2": 46
+     },
+     "QLD": {
+      "alp2": 50,
+      "lnp2": 50
+     },
+     "SA": {
+      "alp2": 52,
+      "lnp2": 48
+     },
+     "WA": {
+      "alp2": 48,
+      "lnp2": 52
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Roy Morgan",
+   "date": "2019-05-12",
+   "dateStart": "2019-05-10",
+   "sample": 1265,
+   "und": 5,
+   "tpp": {
+    "alp": 52
+   },
+   "total": {
+    "alp": 37.4,
+    "lnp": 40.5,
+    "grn": 10.5,
+    "onp": 4.2,
+    "uap": 3.7,
+    "oth": 8.9
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2019-05-14",
+   "dateStart": "2019-05-10",
+   "sample": 1201,
+   "tpp": {
+    "alp": 51.5
+   },
+   "total": {
+    "alp": 36.2,
+    "lnp": 38.5,
+    "grn": 9.1,
+    "onp": 6.6,
+    "oth": 9.6
+   }
+  },
+  {
+   "pollster": "Ipsos (Fairfax Ipsos)",
+   "date": "2019-05-15",
+   "dateStart": "2019-05-12",
+   "sample": 1842,
+   "tpp": {
+    "alp": 51
+   },
+   "total": {
+    "alp": 33,
+    "lnp": 39,
+    "grn": 13,
+    "onp": 4,
+    "uap": 3,
+    "oth": null
+   },
+   "dims": {
+    "voteTiming": {
+     "Already voted (early voters)": {
+      "alp": 33,
+      "lnp": 41,
+      "alp2": 47,
+      "lnp2": 53,
+      "note": null
+     }
+    }
+   }
+  }
+ ],
+ "provenance": [
+  {
+   "file": "lanes/essential.json",
+   "house": "Essential",
+   "sources": [
+    {
+     "url": "https://essentialvision.com.au/federal-politics-voting-intention-7",
+     "archived": "src/essential/post-vi-7_2013-09.html",
+     "note": "wayback 20130911174849; 2013 final wave post (weekly federal politics post 7)"
+    },
+    {
+     "url": "https://essentialvision.com.au/documents/essential_report_130905.pdf",
+     "archived": "src/essential/tables-2013-09-05.pdf",
+     "note": "wayback 20160304053432; 2013 final report PDF (published 5/9/13), text in tables-2013-09-05.txt"
+    },
+    {
+     "url": "https://essentialvision.com.au/federal-voting-intention-22",
+     "archived": "src/essential/post-fvi-22_2016.html",
+     "note": "wayback 20160703id_; 2016 special pre-election wave post"
+    },
+    {
+     "url": "https://essentialvision.com.au/uploads/2016/07/Essential-Report_160701.pdf",
+     "archived": "src/essential/tables-2016-07-01.pdf",
+     "note": "wayback 20160806100601; 2016 special pre-election report PDF, text in tables-2016-07-01.txt"
+    },
+    {
+     "url": "https://essentialvision.com.au/federal-voting-intention-131",
+     "archived": "src/essential/post-fvi-131_2019.html",
+     "note": "wayback 20190518id_; 2019 final weekly wave post"
+    },
+    {
+     "url": "https://essentialvision.com.au/uploads/2019/05/Essential-Report-140519-D1.pdf",
+     "archived": "src/essential/tables-2019-05-14.pdf",
+     "note": "wayback 20190518230038; 2019 final report PDF, text in tables-2019-05-14.txt"
+    }
+   ]
+  },
+  {
+   "file": "lanes/ipsos.json",
+   "house": "Ipsos (Fairfax Ipsos)",
+   "sources": [
+    {
+     "url": "https://www.smh.com.au/politics/federal/fairfaxipsos-poll-dead-heat-on-election-eve-20160630-gpvmom.html",
+     "archived": "src/ipsos/smh-2016-06-30-fairfax-ipsos-dead-heat-gpvmom.html (+ -body.txt extracted body)",
+     "note": "PRIMARY SOURCE: SMH final 2016 Ipsos article, full body captured live"
+    },
+    {
+     "url": "https://www.pollbludger.net/2016/06/30/fairfax-ipsos-50-50-3/",
+     "archived": "src/ipsos/pb-2016-06-30-fairfax-ipsos-50-50-galaxy-51-49.html (+ .json)",
+     "note": "PB relay cross-check of the 2016 Ipsos final (also carries the Galaxy final — see lanes/galaxy.json)"
+    },
+    {
+     "url": "https://www.smh.com.au/federal-election-2019/ipsos-poll-shows-election-contest-tightens-to-51-49-20190516-p51o6t.html",
+     "archived": "src/ipsos/smh-2019-05-16-ipsos-51-49.html (+ -body.txt extracted body; amp variant fetched identical)",
+     "note": "PRIMARY SOURCE: SMH final 2019 Ipsos article, full body captured live"
+    },
+    {
+     "url": "https://www.pollbludger.net/2019/05/16/ipsos-51-49-labor-4/",
+     "archived": "src/ipsos/pb-2019-05-16-ipsos-51-49-labor.html (+ .json)",
+     "note": "PB relay cross-check of the 2019 Ipsos final (adds 'conducted Sunday to Wednesday', n=1842, ON/UAP flow detail)"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2016_Australian_federal_election",
+     "archived": "src/newspoll/wikipedia-opinion-polling-2016-wikitext.txt",
+     "note": "cross-check: Ipsos 26-29 Jun 2016 row 40/33/13/14 others, 50-50"
+    }
+   ]
+  },
+  {
+   "file": "lanes/morgan.json",
+   "house": "Roy Morgan",
+   "sources": [
+    {
+     "url": "https://web.archive.org/web/20130909000722/http://www.roymorgan.com/findings/5169-l-np-set-to-win-federal-election-as-alp-primary-vote-collapses-201309090007",
+     "archived": "src/morgan/2013-final-wb20130909000722.html (+ src/morgan/2013-final.txt, src/morgan/2013-tables.json — 34 tables parsed verbatim by the prior agent)",
+     "note": "finding 5169 full demographic release: national/state/cities/age tables, gender 2PP in prose, undecided 1.5%"
+    },
+    {
+     "url": "https://roymorgan.com/morgan-poll (historical table mirrors)",
+     "archived": "src/morgan/roymorgan-table-primary-2016-excerpt.txt (slices of .build/roymorgan-src/primary-2013-2025.txt + tpp-1901-2022.txt)",
+     "note": "Morgan's own wave series: last 2016 wave = May 21/22 & 28/29 (32.5/37.5(3.5)/13/n.a./5/12, 2PP ALP 51.0 L-NP 49.0 multi-mode), then the election result — proves no June 2016 Morgan wave exists"
+    },
+    {
+     "url": "https://web.archive.org/web/20160531110325/http://www.roymorgan.com/findings/6831-morgan-poll-federal-voting-intention-may-30-2016-201605300615",
+     "archived": "src/morgan/2016-final-6831-wb20160531110325.html (+ src/morgan/2016-final-6831-tables.txt extracted)",
+     "note": "finding 6831 FULL release (May 30 2016): national primaries, SA primaries, state/gender/age 2PP prose, n=3099, und 2.5%, method face-to-face+SMS — re-fetched when IA recovered"
+    },
+    {
+     "url": "https://www.pollbludger.net/2016/05/30/newspoll-bludgertrack-broken-down/",
+     "archived": "src/morgan/pb-2016-05-30-newspoll-bludgertrack-broken-down.html",
+     "note": "PB UPDATE block relaying finding 6831 (independent corroboration)"
+    },
+    {
+     "url": "https://web.archive.org/web/20190516002222/http://www.roymorgan.com/findings/7975-alp-regains-initiative-with-a-week-to-go-201905140553",
+     "archived": "src/morgan/2019-final-7975-wb20190516002222.html",
+     "note": "finding 7975 Morgan-original release page (dated May 14 2019; identical figures to the ABIX mirror; carries no state/age/gender analysis)"
+    },
+    {
+     "url": "https://abix.com.au/2019/05/13/alp-regains-initiative-with-a-week-to-go-alp-52-cf-l-np-48/",
+     "archived": "src/morgan/2019-final-7975-abix.html",
+     "note": "ABIX verbatim mirror of finding 7975 (final face-to-face Morgan poll, n=1265, undecided-can't-say 5%)"
+    },
+    {
+     "url": "https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/",
+     "archived": "src/morgan/2019-sms-7980-abix.html",
+     "note": "ABIX mirror of finding 7980 — special SMS expectations poll (no VI)"
+    },
+    {
+     "url": "https://roymorgan.com/findings/8981-alp-retains-lead-over-the-l-np-in-the-final-week-and-set-to-win-the-federal-election",
+     "archived": "src/morgan/2022-final-live.html (+ src/morgan/2022-final-next.json — __NEXT_DATA__ dump)",
+     "note": "finding 8981 live page; national toplines + respondent-allocated 2PP"
+    },
+    {
+     "url": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/06/07003954/8981-Federal-Voting-Election-Summary-May-20-2022.pdf",
+     "archived": "src/morgan/2022-election-summary-8981.pdf (+ .txt)",
+     "note": "PDF twin of finding 8981 (dated Friday, 20 May 2022)"
+    },
+    {
+     "url": "https://roymorgan.com/findings/8977-roy-morgan-poll-on-federal-voting-intention-may-2022-202205161214",
+     "archived": "src/morgan/2022-may16-8977-live.html (+ src/morgan/2022-may16-8977-next.json)",
+     "note": "finding 8977 live page: May 9-15 2022 wave, n=1366, prose state 2PPs"
+    },
+    {
+     "url": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/06/06234845/8977-Federal-Voting-Intention-Election-Week-May-2022.pdf",
+     "archived": "src/morgan/2022-may-8977.pdf (+ .txt)",
+     "note": "PDF twin of finding 8977 (dated Tuesday, 17 May 2022)"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2019_Australian_federal_election",
+     "archived": "src/newspoll/wikipedia-opinion-polling-2019-wikitext.txt",
+     "note": "cross-check: 10-12 May 2019 Morgan row 38.5/35.5/10/4/12(3.5 UAP, 8.5 Ind/Oth), 2PP 52/48; also shows nothing from Morgan after it in the campaign"
+    }
+   ]
+  },
+  {
+   "file": "lanes/newspoll.json",
+   "house": "Newspoll",
+   "sources": [
+    {
+     "url": "https://www.pollbludger.net/2016/05/30/newspoll-bludgertrack-broken/",
+     "archived": "src/newspoll/pb-2016-05-30-newspoll-bludgertrack-broken-down.html",
+     "note": "relay of the 30 May 2016 published Newspoll state breakdowns (last-4-polls pool)"
+    },
+    {
+     "url": "https://www.pollbludger.net/2016/06/28/four-days-go/",
+     "archived": "src/newspoll/pb-2016-06-28-with-four-days-to-go.html",
+     "note": "relay of the June-2016 Newspoll breakdowns (last-3-polls pool; state/gender/age/metro tables)"
+    },
+    {
+     "url": "https://www.pollbludger.net/2016/10/03/newspoll-quarterly-breakdowns-august-september-2016/",
+     "archived": "src/newspoll/pb-2016-10-03-quarterly-breakdowns-aug-sep-2016.html",
+     "note": "era-evidence for the quarterly product's shape ('state, gender, age and capitals/non-capitals'); also proves no Apr–Jun 2016 quarterly existed — this one 'aggregat[es] all the polling the organisation has conducted since the election'"
+    },
+    {
+     "url": "https://www.pollbludger.net/2019/03/26/newspoll-breakdowns-bludgertrack-redux/",
+     "archived": "src/newspoll/pb-2019-03-26-newspoll-breakdowns-bludgertrack-redux.html",
+     "note": "relay of the Jan–Mar 2019 quarterly (2PP by state)"
+    },
+    {
+     "url": "https://www.pollbludger.net/2019/07/31/federal-election-plus-two-months/",
+     "archived": "src/newspoll/pb-2019-07-31-federal-election-plus-two-months.html",
+     "note": "gap evidence: YouGov Galaxy Newspoll return discussion, two months post-election"
+    },
+    {
+     "url": "https://www.pollbludger.net/2019/08/14/various-stuff-thats-happening/",
+     "archived": "src/newspoll/pb-2019-08-14-various-stuff-thats-happening.html",
+     "note": "gap evidence: 'Newspoll's no-show this week' — poll cadence broken post-2019"
+    },
+    {
+     "url": "https://www.pollbludger.net/2019/09/22/slicing-and-dicing/",
+     "archived": "src/newspoll/pb-2019-09-22-slicing-and-dicing.html",
+     "note": "gap evidence: YouGov methodology overhaul announced Sep 2019"
+    },
+    {
+     "url": "https://www.pollbludger.net/2022/03/25/polls-newspoll-breakdowns-seat-polls-and-trust-in-government/",
+     "archived": "src/newspoll/pb-2022-03-25-polls-newspoll-breakdowns-seat-polls-trust.html",
+     "note": "relay of the Jan–Mar 2022 quarterly breakdowns (state/age/income/gender 2PP)"
+    },
+    {
+     "url": "https://www.pollbludger.net/2022/05/20/newspoll-53-47-to-labor-15/",
+     "archived": "src/newspoll/pb-2022-05-20-newspoll-53-47-to-labor.html",
+     "note": "relay of the final 2022 Newspoll national figures"
+    },
+    {
+     "url": "https://www.pollbludger.net/2013/12/28/newspoll-quarterly-aggregates/",
+     "archived": "src/newspoll/pb-2013-12-28-quarterly-aggregates-oct-dec-2013.html",
+     "note": "2013 gap/cadence evidence: first post-election quarterly = Oct–Dec 2013 pool of 'four post-election polls' with dims 'state, gender, age and city/non-city'"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2022_Australian_federal_election",
+     "archived": "src/newspoll/wikipedia-opinion-polling-2022-wikitext.txt",
+     "note": "wikitext pulled via action=raw — Newspoll citation URLs/dates; newest Newspoll state row is the Jan–Mar 2021 quarterly (confirms Wikipedia carries nothing newer by-state for 2022)"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2016_Australian_federal_election",
+     "archived": "src/newspoll/wikipedia-opinion-polling-2016-wikitext.txt",
+     "note": "only 2PP-by-state section on the 2016 page is the BludgerTrack aggregate (Lane A material); cdn.newsapi.com.au image refs show The Australian published Newspoll table images in-era"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2019_Australian_federal_election",
+     "archived": "src/newspoll/wikipedia-opinion-polling-2019-wikitext.txt",
+     "note": "no demographic/state sections at all"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2013_Australian_federal_election",
+     "archived": "src/newspoll/wikipedia-opinion-polling-2013-wikitext.txt",
+     "note": "no demographic/state sections at all"
+    },
+    {
+     "url": "https://theaustralianatnewscorpau.files.wordpress.com/2016/06/web_news_fed_elect_newspoll.pdf",
+     "archived": "src/newspoll/newspoll-2016-final-week.pdf",
+     "note": "wayback 20190131223227; June-2016 pool demographic tables (5,385 interviews) — supersedes the two relay-fragment waves this lane carried"
+    },
+    {
+     "url": "http://resources.news.com.au/files/2013/09/07/1226713/866636-aus-news-file-federal-newspoll-130907.pdf",
+     "archived": "src/newspoll/2013-09-07-federal-newspoll-election-eve.pdf",
+     "note": "wayback 20131008053515; 2013 election-eve Newspoll table card"
+    },
+    {
+     "url": "https://www.pollbludger.net/2019/05/14/newspoll-state-breakdowns-april-may-2019/",
+     "archived": "src/newspoll/pb-2019-05-14-newspoll-state-breakdowns-april-may.html",
+     "note": "relay of The Australian's pre-election April–May five-poll state-breakdowns table"
+    }
+   ]
+  }
+ ],
+ "notes": [
+  "Essential: Essential never printed voting-intention crosstabs by gender/age/state in its weekly reports — checked the full text of all three final-week PDFs: no VI demographic tables exist. Dims are none for 2013/2019 and only the printed already-voted split for 2016. That split (22% of enrolled respondents said they had already voted) reads {Have/Have not} voted with per-cell 2PP as printed (L–NP shown: Have-voted 54–46, Have-not 49–51; alp2 recorded).",
+  "Essential: 2013 final wave column '5/9/13': Liberal National 43 / Labor 35 / Greens 10 / Other+Independent 12; 2PP 52–48 (2010 flows); don't-know excluded. The report's About page (sample, fieldwork dates, house panel) is not readable in the saved copies — the 2013-era subsetted fonts strip most of it in extraction — so sample and fieldwork window are null rather than transcribed from an unverifiable reading.",
+  "Essential: 2016 special pre-election poll conducted online 27–30 June 2016, n=1,212 (Your Source); printed to the nearest 0.5 point (components sum to 100.5); NXT printed as its own SA-only column, kept as 'nxt' beside the five standard keys (oth excludes NXT as printed). Publication 1 July 2016.",
+  "Essential: 2019 weekly omnibus 10–14 May 2019, n=1,201 (Qualtrics), published 14 May; components printed Liberal 36.2 / National 3.6 with the report's own combined line reading 38.5 (rounding); 2PP 51.5 Labor (2016 flows); Publication 14 May 2019.",
+  "Essential: 2022 not probed: Essential suspended its voting-intention question after the 2019 election and resumed only in late 2023 — there is no 2022 final-week Essential VI cross-tab to file.",
+  "Ipsos (Fairfax Ipsos): Row sums: 2016 final 40+33+13+14=100 (others component derived/confirmed by Wikipedia; SMH prints only the 27% combined non-major figure and the three named parties). 2019 final printed figures sum 92 with ~8 unprinted — flagged rather than derived, per never-invent rule.",
+  "Ipsos (Fairfax Ipsos): Neither final printed state/age/gender VI breakdowns in any open source: the 2016 SMH article embeds Fairfax's 'yourvote' election interactive (theage.com.au/interactive/2016/yourvote/v17/index.html) which is the only plausible carrier of state splits for 2016, and it was not retrievable this pass (live interactive is Flash-era and Wayback was offline).",
+  "Ipsos (Fairfax Ipsos): Ipsos's own ipsos.com/en-au post-election releases (e.g. the 2016 'Election Review' and 2019 post-mortems) carry leader-approval and issues material, not demographic VI tables; checked via web search, nothing fetchable at ipsos.com for these waves.",
+  "CHECK Roy Morgan 2019-05-12: printed totals sum 101.5",
+  "Roy Morgan: PUP KEYING (2013): the lane brief asked PUP be treated as inside oth with onp:null. The source PRINTS Palmer United Party as its own column, separate from 'Ind./Other', so for verbatim fidelity PUP is filed as its own 'pup' key (same pattern as the 'uap'/'nxt' keys used here and by the Newspoll lane); merge pup+oth downstream if a 4-party schema is needed. onp:null — One Nation was not in the field in 2013 (its 2013-era vote was inside Ind./Other).",
+  "Roy Morgan: Every 2013 state/city/age row sums to exactly 100 with the five printed columns; national sum 100. 2016 wave sums 100 (ONP printed 'n/a' → null). 2019 wave sums 100. 2022 waves sum 100 (34+34+13+4+1+5+9). No row exceeded 100.5.",
+  "Roy Morgan: L-NP PARENTHETICAL in 2013/2016 tables: 'L-NP 44 (3)' prints a bracketed second figure. In 2016 Morgan's own table header context (NXT column era) and the era's Morgan conventions this is the National-party component; in the 2013 release its definition is not restated on the page — filed as 'lnpParen' information only via this note: NSW (5.5), VIC (2), QLD (0.5), WA (5), SA (1), national (3), CapCities (0.5), Country (7); 2016 May 21/22&28/29 wave: (3.5). Do not treat as a party share.",
+  "Roy Morgan: 2013 DUAL 2PP FORMS: each state's 2PP appears twice — the 'vs 2010 election' single table (filed as alp2/lnp2) and the 4-week trend table Sep 4-6 column (filed as trend2pp). Example NSW 48.5/51.5 vs 47/53. Both forms printed in the same release; no reconciliation attempted.",
+  "Roy Morgan: 2016 MORGAN GAP RESOLVED: handoff expected an SMS poll ~1 Jul 2016 (L-NP 50.5). Disproven by Morgan's own historical tables (last wave May 21/22 & 28/29, then the election), the ABIX release index (consumer-confidence posts but no federal VI release 25 Jun-4 Jul 2016), Poll Bludger's 1 Jul 2016 final-roundup (which lists 'final results from Newspoll, Galaxy, ReachTEL, Ipsos and Essential Research' — no Morgan), and Wikipedia's 2016 table. The 'L-NP 50.5' memory belongs to the final Newspoll (50.5-49.5 Coalition). Live roymorgan.com does not serve pre-2021 findings (5169 and 7980 slugs both 404 live — saved as src/morgan/2019-sms-7980-live-404.html); all legacy-release content here therefore comes via Wayback captures (IA was 'Temporarily Offline' most of the pass, recovered near the end and yielded 6831 + 7975).",
+  "Roy Morgan: 2022 GENDER: female/male 2PP trend charts exist only as images inside findings 8977/8981 (no printed endpoint figures) — not transcribed (pixel-reading a trend line would invent numbers).",
+  "Roy Morgan: 2022 8981 fieldwork: exact dates/n not printed ('Roy Morgan continued interviewing throughout this week'); date filed as the 20 May 2022 publication date with dateStart null.",
+  "Newspoll: PRODUCT TIMELINE (from the full Poll Bludger WP index, saved searches 'quarterly'/'breakdowns'/'aggregates'): Newspoll quarterly breakdown posts exist at 2012-12-29, 2013-04-01, then a 2013-12-28 post covering Oct–Dec 2013 ('four post-election polls… total samples ranging from 554 in SA to 1352 in NSW'); 2015 onwards quarterly-ish (2015-04-06, 2015-12-28, 2016-03-28 'January-March 2016', 2016-10-03 'August-September 2016', 2017-04-11 'February-March 2017', 2017-10-09, 2018-07-09 'state breakdowns', 2018-12-26, 2019-03-26, 2019-12-26 'November-December 2019', 2020 (May/June-Aug/Nov-Dec), 2021 QVA Jan-Mar/Apr-Jun/Jul-Sep/Dec, 2022-03-25 (Jan–Mar 2022), 2022-12-26 ('July to December' aggregate).",
+  "Newspoll: Quarterly tables in this product print primary vote AND 2PP by STATE, GENDER, AGE (bands 18–34/35–49/50–64/65+ in the 2022 vintage; 2013–2016 banding '18-34/…' per era), and METRO/city vs non-city; 2022 vintage added income cohorts. Only the relayed fragments above are captured verbatim; the full matrices sit behind The Australian's paywall and in Wayback — archive.org was offline ('Temporarily Offline') for this whole pass so no archived article/PDF could be fetched.",
+  "Newspoll: GhostWhoVotes (the era's verbatim-tables mirror, cited by Poll Bludger's 2013 Q4 post) is gone: ghostwhovotes.wordpress.com holds only a 2010 'Inactive' post (WordPress REST found:1), and the tables moved to Twitter screenshots, unscrapeable headlessly. theaustraliannewscorpau.files.wordpress.com → wordpress.com blog is DELETED (410).",
+  "Newspoll: Blind filename probes on the OPEN origin CDN origin.theaustralian.com.au/wp-content/uploads/<YYYY>/<MM>/newspoll.pdf all 404 for 2013/10, 2016/05, 2016/06, 2016/10, 2019/03, 2019/07, 2022/03, 2022/05(Newspoll.pdf too), 2022/06 — Newspoll PDF uploads of the modern 'Newspoll (pooled)' kind do not exist for these waves (matches the auto-skill's note that only SOME 2025-26 pooled waves have PDFs).",
+  "Newspoll: 2016 mid-campaign Newspoll breakdowns cadence detail: (a) published ~29–30 May 2016 pool = 'last four Newspoll surveys going back to the start of April' (Newspoll was fortnightly: fieldwork windows approx 31 Mar–3 Apr, 14–17 Apr, 28 Apr–1 May, 12–15 May); (b) published ~27–28 June 2016 pool = 'the last three Newspoll surveys'. Exact fieldwork spans could not be pinned from the open relay text — dateStart/date left approximate (date = approximate publication date).",
+  "Newspoll: Row-sum self-checks: Jan–Mar 2022 age/state/gender rows are 2PP pairs summing 100; 2022-05 national row sums 91 printed (rest unprinted). No row exceeded 100.5.",
+  "Newspoll: Consolidated 2026-11-10: the 2013 election-eve card, the 2016 June-pool table PDF and the scanned Jan–Mar 2019 quarterly PDF all recovered from Wayback (News Corp assets host + files.wordpress.com mirror). June-2016 superseded two relay-fragment waves; Q1-2019 remains flagged adjacentQuarter; the 2019 pre-election record = Q1 table + 14-May state-breakdowns pool."
+ ],
+ "gaps": [
+  "Essential: 2013 wave sample and fieldwork window — About page of tables-2013-09-05.pdf is font-mangled in every extraction tried (pdftotext both layouts)",
+  "Essential: All three elections: voting-intention crosstabs by gender/age/state — never printed by Essential in this product era",
+  "Ipsos (Fairfax Ipsos): State/age/gender splits for both finals — not printed by Fairfax/SMH/The Age in either year and not relayed by Poll Bludger; the only sub-total in print is the 2019 early-voter cohort (filed). Probe lines: theage interactive 'yourvote/v17' (2016, interactive iframe, needs Wayback — IA offline all pass); Ipsos Australia press office never published crosstub PDFs for these waves.",
+  "Ipsos (Fairfax Ipsos): 2019 final: the ~8pt unprinted remainder (undecided + other parties) — Ipsos-era Fairfax practice was to report decideds; the residual split was not published in the captured sources.",
+  "Roy Morgan: 2013-09-07: NOTHING missing from the release itself (full demographic pack captured).",
+  "Roy Morgan: 2016-07-02: any June 2016 Morgan wave — none exists (see notes; the expected ~1 Jul SMS poll is a false memory of the final Newspoll). The 6831 release itself is now fully captured (state/gender/age 2PPs filed); remaining unfilled cells are those the release never printed (non-SA state primaries, age/gender primaries).",
+  "Roy Morgan: 2019-05-18: nothing further — Morgan's own original release of 7975 (captured) carries no demographic analysis beyond what is filed. Probed and ruled out: live roymorgan.com legacy slugs (404); ABIX index complete May 12-21 2019 (only 7975 + the 7980 expectations SMS exist from Morgan that fortnight); Wikipedia contradictory-slug candidates 7952/7966/7968 are earlier May waves, not finals.",
+  "Roy Morgan: 2022-05-21: printed state/age figures for the FINAL week (8981) do not exist in the release (national only); gender 2PP exists only as chart images.",
+  "Newspoll: 2013-09-07 election: NO Jul–Sep 2013 Newspoll quarterly exists. Probed: Poll Bludger WP index Oct–Nov 2013 (2013-09-10→2013-11-20 listing shows only per-poll Newspoll posts + state one-offs NSW/Vic), the 2013-12-28 post itself ('four post-election polls' = Oct–Dec pool), GhostWhoVotes (dead), origin-CDN PDF probes (404). The era's quarterly cadence shows Q2 and Q3 2013 were both skipped (campaign + election). Nothing more exists to find.",
+  "Newspoll: 2016-07-02 election: the PRINTED full tables (primary+2PP by state; June piece's gender/age/metro cells) — only fragmentary swings survive in open relays; needs Wayback captures of the ~30 May and ~28 June 2016 Australian articles (IA offline this pass) or screenshot sources.",
+  "Newspoll: 2019-05-18 election: NO Apr–Jun 2019 quarterly exists — Newspoll (YouGov Galaxy) paused after its 2019 miss; the first post-election breakdown product was 'November-December 2019' (relayed 2019-12-26, post-election, out of scope). Nearest preceding quarterly = Jan–Mar 2019, filed above as adjacentQuarter. Campaign-era state breakouts were not published (checked Poll Bludger Apr–Jul 2019 'quarterly'/'breakdowns'/'aggregates' result sets, all read in full text).",
+  "Newspoll: 2022-05-21 election: Jan–Mar 2022 quarterly PRIMARY-VOTE cells (only 2PP cells relayed); any election-eve state/age breakouts Newspoll may have run in May 2022 (none found in relays). The Australian article text for the 25 Mar 2022 piece is paywalled; Wayback needed.",
+  "Newspoll: 2019 Newspoll election-week demographic TABLE — no PDF/table page exists on any recovered News Corp host (checked 2019/04,05,06 folders of two hosts); the May-14 state breakdowns pool is the last pre-election Newspoll demographic product of that campaign",
+  "Newspoll: 2013 Newspoll sex/age columns — did not exist in the 2013 printed table format"
+ ]
+}

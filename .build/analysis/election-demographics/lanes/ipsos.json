@@ -1,0 +1,51 @@
+{
+ "house": "Ipsos (Fairfax Ipsos)",
+ "_about": "Lane C. Ipsos final pre-election polls for 2016 and 2019. Both finals' full SMH article bodies were captured live from smh.com.au (the page embeds the complete body in its GraphQL asset payload — paywall does not gate the JSON). Poll Bludger relays saved as cross-checks. NEITHER final printed state/age/gender voting-intention breakdowns in these sources; the only sub-total printed is the 2019 already-voted cohort.",
+ "waves": [
+  {
+   "election": "2016-07-02",
+   "finding": "final Fairfax-Ipsos poll of the 2016 election (SMH/The Age, 'Dead heat on election eve as final poll points to cliffhanger', Mark Kenny; first published 2016-06-30)",
+   "dateStart": "2016-06-26",
+   "date": "2016-06-29",
+   "sample": 1377,
+   "method": "nationwide survey by telephone (Ipsos for Fairfax)",
+   "tpp": { "alp": 50, "lnp": 50 },
+   "total": { "alp": 33, "lnp": 40, "grn": 13, "onp": null, "oth": 14 },
+   "dims": {},
+   "tppResp": { "alp": 51, "lnp": 49 },
+   "note": "Headline 50-50 is the 2013-election preference-flow basis; respondent-allocated preferences give Labor 51-49 (SMH: 'identical outcome to that returned in the last two fortnightly Fairfax-Ipsos polls'; a 4.5 per cent swing to Labor since 2013). Primaries: 'Coalition primary vote sits at 40' (up 1), Labor 33 ('persistently low'), Greens 13 (down 1); SMH prints the combined 'Greens and other crossbench parties and independents' at 27% → others 14 implied (Wikipedia's table row prints Others 14 explicitly). One Nation/NXT not broken out by Ipsos. Fieldwork window per SMH 'between Sunday June 26 and Wednesday 29'; the Poll Bludger relay says 'conducted Monday to Wednesday' — SMH kept as the primary-source window (26-29 Jun). PPM Turnbull 49-35. Approvals: Turnbull 49/41 (net +8), Shorten 42/50. Expectations: 'some 6 in 10 voters declared they expect Malcolm Turnbull to be returned, compared to just 17 per cent who think Bill Shorten will win'."
+  },
+  {
+   "election": "2019-05-18",
+   "finding": "final Ipsos poll for the ex-Fairfax papers (SMH/The Age, 'Ipsos poll shows election contest tightens to 51-49', David Crowe; published 2019-05-16)",
+   "dateStart": "2019-05-12",
+   "date": "2019-05-15",
+   "sample": 1842,
+   "method": "telephone, 46 per cent of the sample mobile; margin of error 2.3% (SMH)",
+   "tpp": { "alp": 51, "lnp": 49 },
+   "total": { "alp": 33, "lnp": 39, "grn": 13, "onp": 4, "uap": 3, "oth": null },
+   "dims": {
+    "voteTiming": {
+     "Already voted (early voters)": { "alp": 33, "lnp": 41, "alp2": 47, "lnp2": 53, "note": "primaries printed as '41 per cent said they were Coalition voters while 33 per cent favoured Labor'; 2PP 'those who have already voted favour the Coalition over Labor by 53 to 47 per cent'; 'almost one third of voters told Ipsos they had voted early or intended to do so'" }
+    }
+   },
+   "note": "2PP identical 51-49 to Labor on BOTH bases (2016-election-flow basis allocates One Nation and UAP preferences 53-47 to the Coalition; respondent-allocated also 51-49). Primaries printed sum 92 (39+33+13+4+3); remaining ~8% (undecided + other parties) NOT printed in either the SMH body or the PB relay — oth filed null rather than derived. Approvals: Morrison 48/43 (net +5), Shorten 43/48 (net −5); PPM Morrison leads 47-40 (PB relay; SMH body confirms the lead, numbers in PB). Expectation of winner: ALP 55 / Coalition 32 / undecided 13."
+  }
+ ],
+ "sources": [
+  { "url": "https://www.smh.com.au/politics/federal/fairfaxipsos-poll-dead-heat-on-election-eve-20160630-gpvmom.html", "archived": "src/ipsos/smh-2016-06-30-fairfax-ipsos-dead-heat-gpvmom.html (+ -body.txt extracted body)", "note": "PRIMARY SOURCE: SMH final 2016 Ipsos article, full body captured live" },
+  { "url": "https://www.pollbludger.net/2016/06/30/fairfax-ipsos-50-50-3/", "archived": "src/ipsos/pb-2016-06-30-fairfax-ipsos-50-50-galaxy-51-49.html (+ .json)", "note": "PB relay cross-check of the 2016 Ipsos final (also carries the Galaxy final — see lanes/galaxy.json)" },
+  { "url": "https://www.smh.com.au/federal-election-2019/ipsos-poll-shows-election-contest-tightens-to-51-49-20190516-p51o6t.html", "archived": "src/ipsos/smh-2019-05-16-ipsos-51-49.html (+ -body.txt extracted body; amp variant fetched identical)", "note": "PRIMARY SOURCE: SMH final 2019 Ipsos article, full body captured live" },
+  { "url": "https://www.pollbludger.net/2019/05/16/ipsos-51-49-labor-4/", "archived": "src/ipsos/pb-2019-05-16-ipsos-51-49-labor.html (+ .json)", "note": "PB relay cross-check of the 2019 Ipsos final (adds 'conducted Sunday to Wednesday', n=1842, ON/UAP flow detail)" },
+  { "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2016_Australian_federal_election", "archived": "src/newspoll/wikipedia-opinion-polling-2016-wikitext.txt", "note": "cross-check: Ipsos 26-29 Jun 2016 row 40/33/13/14 others, 50-50" }
+ ],
+ "notes": [
+  "Row sums: 2016 final 40+33+13+14=100 (others component derived/confirmed by Wikipedia; SMH prints only the 27% combined non-major figure and the three named parties). 2019 final printed figures sum 92 with ~8 unprinted — flagged rather than derived, per never-invent rule.",
+  "Neither final printed state/age/gender VI breakdowns in any open source: the 2016 SMH article embeds Fairfax's 'yourvote' election interactive (theage.com.au/interactive/2016/yourvote/v17/index.html) which is the only plausible carrier of state splits for 2016, and it was not retrievable this pass (live interactive is Flash-era and Wayback was offline).",
+  "Ipsos's own ipsos.com/en-au post-election releases (e.g. the 2016 'Election Review' and 2019 post-mortems) carry leader-approval and issues material, not demographic VI tables; checked via web search, nothing fetchable at ipsos.com for these waves."
+ ],
+ "gaps": [
+  "State/age/gender splits for both finals — not printed by Fairfax/SMH/The Age in either year and not relayed by Poll Bludger; the only sub-total in print is the 2019 early-voter cohort (filed). Probe lines: theage interactive 'yourvote/v17' (2016, interactive iframe, needs Wayback — IA offline all pass); Ipsos Australia press office never published crosstub PDFs for these waves.",
+  "2019 final: the ~8pt unprinted remainder (undecided + other parties) — Ipsos-era Fairfax practice was to report decideds; the residual split was not published in the captured sources."
+ ]
+}

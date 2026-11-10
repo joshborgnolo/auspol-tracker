@@ -1,0 +1,51 @@
+{
+ "house": "Resolve Strategic",
+ "_about": "Lane B. Campaign-period 2022 age breakdowns retrospectively printed in Poll Bludger's 2023-07-05 post relaying the Age/Herald quarterly breakdowns piece; final-poll national row from Bludger's election-eve coverage.",
+ "waves": [
+  {
+   "election": "2022-05-21",
+   "dateStart": "2022-05-12",
+   "date": "2022-05-17",
+   "sample": 2049,
+   "tpp": { "alp": 52 },
+   "total": { "alp": 31, "lnp": 34, "grn": 14, "onp": 6, "uap": 4, "ind": 6, "oth": 4 },
+   "dims": {
+    "age": {
+     "18–34": { "alp": 31, "lnp": 27, "grn": 22 },
+     "35–54": { "alp": 34, "lnp": 32, "grn": 12 },
+     "55+": { "alp": 33, "lnp": 46, "grn": 5 }
+    },
+    "gender": {
+     "Women": { "grn": 19 },
+     "Men": { "grn": 9 }
+    }
+   },
+   "note": "FINAL Resolve Strategic poll of the 2022 campaign. Window/post body says 'conducted Thursday through to today' (post dated Tue 2022-05-17T18:41 AEST) = Thu 12 – Tue 17 May 2022, 'sample of 2049 … added several hundred telephone responses to the customary online responses'. TOTAL row and tpp from the Poll Bludger 2022-05-17 campaign report (tpp 'based on historic preference flows'). AGE row cohorts printed retrospectively in the 2023-07-05 Poll Bludger post comparing the Apr–Jun 2023 quarterly wave against 'the pre-election poll': 18–34 ALP 31 LNP 27 GRN 22; 35–54 ('In between') ALP 34 LNP 32 GRN 12; 55+ ALP 33 LNP 46 GRN 5. GENDER: only the Greens split was ever printed for this poll ('Greens 19% support among women compared with 9% among men'). Age-dim minority parties (ON/UAP/OTH) never broken out in print.",
+   "sumCheck": "total 31+34+14+6+4+6+4 = 99 (<= 100.5 OK); printed rows partial by design (no undecided line printed)"
+  }
+ ],
+ "sources": [
+  {
+   "url": "https://www.pollbludger.net/2023/07/05/resolve-strategic-state-and-age-breakdowns-open-thread/",
+   "archived": "src/pollbludger/resolve-2023-07-05-state-age-breakdowns.html",
+   "note": "Poll Bludger post 2023-07-05 relaying the Age/Herald Resolve Strategic quarterly breakdowns (their piece: https://www.smh.com.au/politics/federal/labor-loses-ground-in-queensland-holds-winning-lead-nationwide-20230627-p5djy5.html – paywalled, not fetched). Prints campaign-period age cohorts vs the then-current quarterly wave. Provenance quote: 'We did get quarterly breakdowns, courtesy of the Age/Herald on Sunday, but from Resolve Strategic rather than Newspoll … They do, however, include fresh state results for Western Australia and South Australia and age cohort breakdowns.' Fieldwork frame printed for the 2023 wave (NOT the 2022 poll): 'The polls were conducted April 12 to 16, May 10 to 14 and June 6 to 11, with a combined national sample of 4587.'"
+  },
+  {
+   "url": "https://www.pollbludger.net/2022/05/17/resolve-strategic-coalition-34-labor-31-greens-14/",
+   "archived": "src/pollbludger/resolve-2022-05-17-campaign-final.html",
+   "note": "Poll Bludger election-eve report of the FINAL 2022 Resolve poll: national primaries, historic-flows 2PP 52-48 to Labor, leader ratings, NSW/Vic/Qld figures discussed only as Bludger's own calculations ('By my calculation…'), not printed Resolve tables."
+  }
+ ],
+ "notes": [
+  "The lane brief described 'state breakdowns' as campaign-period figures – in the 2023-07-05 post the state numbers printed (WA ALP 46 LNP 29 GRN 12 ON 3; SA ALP 46 LNP 22 GRN 14 ON 6) belong to the Apr–Jun 2023 quarterly wave, NOT the 2022 campaign. They postdate the 2022-05-21 election by ~13 months and are recorded here only as context: WA(2023Q2) {alp:46,lnp:29,grn:12,onp:3}, SA(2023Q2) {alp:46,lnp:22,grn:14,onp:6}; the same post prints the election results they were compared against (WA ALP 36.8 etc.).",
+  "2023-07-05 post's 2023-wave age figures (for contrast, NOT filed): 18–34 ALP 44 LNP 19 GRN 23; 35–54 ALP 39 LNP 29 GRN 11; 55+ ALP 42 LNP 37 GRN 4. Post: 'the Coalition's deterioration since the election has been concentrated among the young and old'.",
+  "Age figures in the 2023 post for 'the pre-election poll' match the coordinator's sanity-check figures exactly (18–34 31/27/22, 35–54 34/32/12, 55+ 33/46/5; 'Greens up one to 23%' implies GRN 22 pre-election).",
+  "No Resolve table for gender or states by party primary from the 2022 campaign final poll was printed in these posts; Bludger notes Resolve's breakdowns 'remain limited to gender and the three largest states'.",
+  "Resolve Strategic published poll-level detail in its own 'Resolve Political Monitor' SMH interactive; the May 2022 vintage was not archived here (Wayback/IA offline during this pass, 2026-11-10)."
+ ],
+ "gaps": [
+  "2022 campaign-period STATE breakdowns (NSW/Vic/Qld primaries as printed by Resolve): only Bludger's own 2PP calculations exist in the relay posts; the Age/Herald 17–18 May 2022 articles are paywalled and were not archived on this pass (web.archive.org was returning 'Temporarily Offline', 2026-11-10 ~17:00 AEST).",
+  "Major-party primary splits by AGE (full party set incl. ON/UAP/OTH) from the 2022 pre-election poll – only ALP/LNP/GRN were printed.",
+  "The 2019-era Resolve product does not exist: Resolve Strategic's first federal poll was April 2021, so no 2013/2016/2019 rows."
+ ]
+}

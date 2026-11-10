@@ -1,0 +1,5204 @@
+{{Short description|none}}
+{{Use dmy dates|date=September 2026}}
+{{Use Australian English|date=December 2013}}
+This article collates results of [[opinion polls]] that were conducted in relation to voting intentions of the Australian public in the lead-up to the [[2013 Australian federal election]].<ref name="how">{{cite web |last1=Goot |first1=Murray |title=How the Pollsters Called the Horse Race: Changing polling technologies, cost pressures, and the concentration on the two-party-preferred |url=https://press-files.anu.edu.au/downloads/press/p309171/html/ch08.xhtml?referer=69&page=15 |publisher=Abbott's Gambit: The 2013 Australian Federal Election |access-date=8 December 2025 |archive-url=https://web.archive.org/web/20251208144711/https://press-files.anu.edu.au/downloads/press/p309171/html/ch08.xhtml?referer=69&page=15 |archive-date=8 December 2025 |date=2015}}</ref>
+
+==Polling firms==
+[[Galaxy Research]], [[Newspoll]], and [[Nielsen Holdings|Nielsen Australia]] conduct telephone polls of federal voting intentions. [[Essential Research]] reports a rolling average of its two most recent polls, which are conducted each weekend using online surveys.{{citation needed|date=February 2022}}
+
+Through late February 2013, [[Roy Morgan Research]] released separate polls conducted by face-to-face interviews and telephone polling. Face-to-face polling was conducted each weekend, though the data published was usually an average of two weeks' polling. Telephone polls were conducted sporadically. Since the end of February 2013, Morgan has released a "multi-mode" poll, consisting of face-to-face, online, and SMS polling.<ref>{{cite web |url=http://www.roymorgan.com/findings/morgan-poll-update-april-30-2013-201304300237 |title=L-NP 58% (up 3.5%) lead gains strongly over ALP 42% (down 3.5%) Before Government reveals Federal Budget Deficit of $12 Billion |date=30 April 2013 |publisher=Roy Morgan Research |access-date=7 May 2013 |archive-date=12 May 2013 |archive-url=https://web.archive.org/web/20130512214610/http://www.roymorgan.com/findings/morgan-poll-update-april-30-2013-201304300237 |url-status=dead }}</ref>
+
+All of the firms report [[two-party-preferred vote]] estimates calculated according to the flow of preferences at the last election. Roy Morgan additionally reports two-party preferred estimates calculated according to respondents' reported preferences (which is usually reported as the head line number in Roy Morgan publications). To ensure comparability between the results reported by different firms, the tables and charts below report only two-party-preferred vote estimates calculated according to the first method.{{citation needed|date=February 2022}}
+
+The polls reported here typically have sample sizes in excess of 1,000, with margins of error of approximately three per cent.{{citation needed|date=February 2022}}
+
+Since the 2010 election, voters were regularly polled as to which party they would vote for were an election held on the day of the survey: [[Australian Labor Party|Labor]] (ALP), the [[Coalition (Australia)|Coalition]], the [[Australian Greens|Greens]], or some other candidate. Each firm reports its calculation of the [[two-party preferred vote]] (TPP) based on the flow of preferences at the previous election.
+
+Sources for Galaxy, Essential, and Nielsen are provided for each poll; Newspoll<ref name=Newspoll>{{cite web |url=http://polling.newspoll.com.au.tmp.anchor.net.au/cgi-bin/polling/display_poll_data.pl?url_caller=&mode=trend&page=show_polls&question_set_id=1 |title=Opinion Polls |publisher=Newspoll |accessdate=15 April 2013 |archive-url=https://web.archive.org/web/20160303135154/http://polling.newspoll.com.au.tmp.anchor.net.au/cgi-bin/polling/display_poll_data.pl?url_caller=&mode=trend&page=show_polls&question_set_id=1 |archive-date=3 March 2016 |url-status=dead }}</ref> and Morgan<ref>{{cite web |url=http://www.roymorgan.com/morganpoll/federal-voting |title=Federal Voting |accessdate=14 May 2013 |publisher=Roy Morgan Research}}</ref> maintain databases of their polling.
+
+==Graphical summary==
+{{Switcher|[[File:Opinion polls Australia 2013.svg|1000px]]
+|Primary vote (combined [[Local regression|local regressions (LOESS)]] trend line)
+|[[File:Opinion polls Australia 2013 TPP.svg|1000px]]
+|[[Two-party-preferred vote]] (combined [[Local regression|local regressions (LOESS)]] trend line)
+|[[File:TPP polling by firm Aus fed 2013.png|633px]]
+|[[Two-party-preferred vote]] (Labor, by polling firm)
+}}
+
+==Voting intention==
+{| class="sortable wikitable nowrap tpl-blanktable" style="text-align:center;font-size:95%"
+|-
+! rowspan=3 class=unsortable | Date
+! rowspan=3 | Firm
+! rowspan=3 class=unsortable | Sample<br/>size
+! colspan=7 |Primary vote
+! colspan=2 class=unsortable style=background:#ebbce3 |[[Two-party-preferred vote|TPP vote]]
+|-
+! width=35px; style="background:#06667c" | {{coloured link|white|Liberal–National Coalition|L/NP}}
+! width=35px; style="background:#F00011" | {{coloured link|white|Australian Labor Party|ALP}}
+! width=35px; style=background:#10C25B | {{coloured link|white|Australian Greens|GRN}}
+! width=35px; style=background:#FFED00 | {{coloured link|black|Palmer United Party|PUP}}
+! width=35px; style="background:#B50204" | {{coloured link|white|Katter's Australian Party|KAP}}
+! width=35px; style=background:#888888 | {{coloured link|white|Independent politicians in Australia|IND}}
+! width=35px; style="background:lightgray" | {{tooltip|OTH|Other (including independents unless otherwise stated)}}
+! width=35px; style="background:#F00011" | {{coloured link|white|Australian Labor Party|ALP}}
+! width=35px; style="background:#06667c" | {{coloured link|white|Liberal–National Coalition|L/NP}}
+|-
+! data-sort-type="number" style="background:{{Australian politics/party colours|Coalition}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Labor}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Greens}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Palmer United Party}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|KAP}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Independent}};"|
+! data-sort-type="number" style="background:lightgray;"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Labor}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Coalition}};"|
+|- style=background:#b0e9db
+| align=right | '''7 Sep 2013'''
+| colspan=2 | '''[[2013 Australian federal election|2013 election]]'''
+| 45.5%
+| 33.4%
+| 8.6%
+| 5.5%
+| 1.0%
+| 1.4%
+| 4.5%
+| 46.5%
+| '''53.5%'''
+|-
+! style=text-align:right | 7 Sep 2013
+| style=text-align:left | Morgan (exit poll 2)<ref name="guardian7sep">{{cite web |last1=Davidson |first1=Helen |title=Australian election 2013 - polling day as it happened |url=https://www.theguardian.com/world/2013/sep/06/australian-election-2013-polling-day-live-blog |work=The Guardian |access-date=8 December 2025 |archive-url=https://web.archive.org/web/20240507115920/https://www.theguardian.com/world/2013/sep/06/australian-election-2013-polling-day-live-blog |archive-date=7 May 2024 |date=7 September 2013}}</ref>
+| {{N/A}}
+| 42%
+| 33.5%
+| 11%
+| 5%
+| {{N/A}}
+| {{N/A}}
+| 8%
+| 48%
+! style=background:#B6CDFB; | 52%
+|-
+! style=text-align:right | 7 Sep 2013
+| style=text-align:left | Morgan (exit poll 1)<ref name="guardian7sep"/>
+| {{N/A}}
+| 42%
+| 34.5%
+| 11%
+| 5%
+| {{N/A}}
+| {{N/A}}
+| 7.5%
+| 48%
+! style=background:#B6CDFB; | 52%
+|-
+! style=text-align:right | 4 – 6 Sep 2013
+| style=text-align:left | Morgan<ref name="how"/>
+| 4,937
+| 44%
+| 31.5%
+| 10.5%
+| 6.5%
+| 1%
+| {{N/A}}
+| 6.5%
+| 46.5%
+! style=background:#B6CDFB; | 53.5%
+|-
+! style=text-align:right | 5 Sep 2013
+| style=text-align:left | ReachTEL<ref name="how"/>
+| 3,512
+| 43.5%
+| 33.7%
+| 10.2%
+| 7.0%
+| 1.1%
+| {{N/A}}
+| 4.6%
+| 47%
+! style=background:#B6CDFB; | 53%
+|-
+! style=text-align:right | 5 Sep 2013
+| style=text-align:left | Lonergan<ref name="how"/>
+| 862
+| 42%
+| 34%
+| 14%
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| 10%
+| 49.2%
+! style=background:#B6CDFB; | 50.8%
+|-
+! style=text-align:right | 4 – 5 Sep 2013
+| style=text-align:left | Nielsen<ref name="how"/>
+| 1,431
+| 46%
+| 33%
+| 11%
+| 4%
+| 1%
+| 2%
+| 2%
+| 46%
+! style=background:#B6CDFB; | 54%
+|-
+! style=text-align:right | 3 – 5 Sep 2013
+| style=text-align:left | Newspoll<ref name="how"/>
+| 2,511
+| 46%
+| 33%
+| 9%
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| 12%
+| 46%
+! style=background:#B6CDFB; | 54%
+|-
+! style=text-align:right | 2 – 4 Sep 2013
+| style=text-align:left | Galaxy<ref name="how"/>
+| 1,503
+| 45%
+| 35%
+| 9%
+| 5%
+| {{N/A}}
+| {{N/A}}
+| 6%
+| 47%
+! style=background:#B6CDFB; | 53%
+|-
+! style=text-align:right | 1 – 4 Sep 2013
+| style=text-align:left | Essential<ref name="how"/><ref>{{cite web |title=The Essential Report |url=http://essentialvision.com.au/documents/essential_report_130905.pdf |publisher=Essential Research |access-date=9 December 2025 |archive-url=https://web.archive.org/web/20160304053432/http://essentialvision.com.au/documents/essential_report_130905.pdf |archive-date=4 March 2016 |date=5 September 2013}}</ref>
+| 1,035
+| 43%
+| 35%
+| 10%
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| 10%
+| 48%
+! style=background:#B6CDFB; | 52%
+|-
+! style=text-align:right | 30 Aug – 2 Sep 2013
+| style=text-align:left | AMR<ref name="how"/>
+| 1,101
+| 44%
+| 34%
+| 10%
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| 12%
+| 47%
+! style=background:#B6CDFB; | 53%
+|}
+
+==Sub-national polling==
+===Queensland===
+{| class="sortable wikitable nowrap tpl-blanktable" style="text-align:center;font-size:95%"
+|-
+! rowspan=3 class=unsortable | Date
+! rowspan=3 | Firm
+! rowspan=3 class=unsortable | Sample<br/>size
+! colspan=7 |Primary vote
+! colspan=2 class=unsortable style=background:#ebbce3 |[[Two-party-preferred vote|TPP vote]]
+|-
+! width=35px; style="background:#1456F1" | {{coloured link|white|Liberal National Party of Queensland|LNP}}
+! width=35px; style="background:#F00011" | {{coloured link|white|Australian Labor Party|ALP}}
+! width=35px; style=background:#10C25B | {{coloured link|white|Australian Greens|GRN}}
+! width=35px; style=background:#FFED00 | {{coloured link|black|Palmer United Party|PUP}}
+! width=35px; style="background:#B50204" | {{coloured link|white|Katter's Australian Party|KAP}}
+! width=35px; style=background:#888888 | {{coloured link|white|Independent politicians in Australia|IND}}
+! width=35px; style="background:lightgray" | {{tooltip|OTH|Other (including independents unless otherwise stated)}}
+! width=35px; style="background:#1456F1" | {{coloured link|white|Liberal National Party of Queensland|LNP}}
+! width=35px; style="background:#F00011" | {{coloured link|white|Australian Labor Party|ALP}}
+|-
+! data-sort-type="number" style="background:{{Australian politics/party colours|LNP}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Labor}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Greens}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Palmer United Party}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|KAP}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Independent}};"|
+! data-sort-type="number" style="background:lightgray;"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|LNP}};"|
+! data-sort-type="number" style="background:{{Australian politics/party colours|Labor}};"|
+|- style=background:#b0e9db
+| align=right | '''7 Sep 2013'''
+| colspan=2 | '''[[Results of the 2013 Australian federal election in Queensland|2013 election]]'''
+| 45.7%
+| 29.8%
+| 6.2%
+| 11.0%
+| 3.7%
+| 0.4%
+| 3.2%
+| '''57.0%'''
+| 43.0%
+|-
+! style=text-align:right | 7 Sep 2013
+| style=text-align:left | Morgan (exit poll)<ref name="guardian7sep"/><ref>{{cite tweet |number=376225414890266624 |user=10NewsQLD |title=RT @_AdamTodd: Morgan-Ten News exit poll has the Palmer United Party polling 9.5% in Queensland |author=10 News Queensland |date=2013-09-07 |access-date=2025-12-08 |archive-url=https://archive.today/20251208145026/https://x.com/10NewsQLD/status/376225414890266624 |archive-date=2025-12-08}}</ref>
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| 9.5%
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+| {{N/A}}
+|}
+
+==Data table==
+{| class="toccolours" cellpadding="5" cellspacing="0" style="text-align:center; margin-right:.5em; margin-top:.4em; font-size:90%;"
+|-
+|+'''House of Representatives<br />(lower house) polling'''
+|-
+!
+!
+|-
+! Date
+! Firm
+! colspan="4" |Primary vote
+! colspan=2 | [[Two-party-preferred vote|TPP vote]]
+|-
+! colspan=2 | 
+! style="background:#00bfff;" | [[Liberal/National coalition|L/NP]]<sup>*</sup>
+! style="background:#f66;" | [[Australian Labor Party|Labor]]
+! style="background:#90ee90;" | [[Australian Greens|Green]]
+! style="background:#ff0;" | Other
+! style="background:#f66;" | Labor
+! style="background:#00bfff;" | L/NP
+|-
+!
+|-
+! 4–6 Sep 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|45%
+| 31.5%
+| 9.5%
+| 14%
+| style="background:#f66;" | 44.5% <!-- Morgan reports a TPP based on survey responses and flow at the previous election. The latter is used here because it is the method used by all other polling firms. -->
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 5 Sep 2013
+| style="text-align:left;" | ReachTEL<ref name=5Sep13>{{cite web |url=http://www.reachtel.com.au/blog/7-news-national-poll-5september13 |title=7 News National Poll |date=6 September 2013 |publisher=ReachTEL |accessdate=6 September 2013 |archive-date=7 September 2013 |archive-url=https://web.archive.org/web/20130907161748/http://www.reachtel.com.au/blog/7-news-national-poll-5september13 |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43.5%
+| 33.7%
+| 10.2%
+| 12.7%
+| style="background:#f66;" | 47% 
+| style="background:#00bfff;" | '''53%'''
+|-
+! 4–5 Sep 2013
+| style="text-align:left;" | Nielsen<ref name=Nlsn6Sep13>{{cite web |url=https://www.theage.com.au/politics/federal/last-poll-confirms-labor-wipeout-20130906-2taew.html |title=Last poll confirms Labor wipeout |date=6 September 2013 |access-date=7 September 2013 |work=The Age}}</ref>
+| style="background:#B6CDFB"|46%
+| 33%
+| 11%
+| 10%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 3–5 Sep 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 33%
+| 9%
+| 12%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 4 Sep 2013
+| style="text-align:left;" | ReachTEL<ref name=4Sep13>{{cite web |url=http://www.reachtel.com.au/blog/7-news-national-poll-4september13 |title=7 News National Poll |date=4 September 2013 |publisher=ReachTEL |accessdate=4 September 2013 |archive-date=8 September 2013 |archive-url=https://web.archive.org/web/20130908065537/http://www.reachtel.com.au/blog/7-news-national-poll-4september13 |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43.6%
+| 32.7%
+| 10.0%
+| 13.7%
+| style="background:#f66;" | 47% 
+| style="background:#00bfff;" | '''53%'''
+|-
+! 2–4 Sep 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/09/galaxy-130906.jpg |title=2–4 September 2013 |author=Galaxy Research |publisher=GhostWhoVotes}}</ref>
+| style="background:#B6CDFB"|45%
+| 35%
+| 9%
+| 11%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 1–4 Sep 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130905.pdf |title=Essential Report |publisher=Essential Research |date=5 September 2013 |access-date=6 September 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304053432/http://essentialvision.com.au/documents/essential_report_130905.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43%
+| 35%
+| 10%
+| 12%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 3 Sept 2013
+| style="text-align:left;" | ReachTEL<ref name=3Sep13>{{cite web |url=http://www.reachtel.com.au/blog/7-news-national-poll-3september13 |title=7 News National Poll |date=3 September 2013 |publisher=ReachTEL |accessdate=3 September 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|44.2%
+| 35.3%
+| 9.7%
+| 10.7%
+| style="background:#f66;" | 48% 
+| style="background:#00bfff;" | '''52%'''
+|-
+! 30 Aug–1 Sep 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|43%
+| 34%
+| 11%
+| 12%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 30 Aug–1 Sep 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 33%
+| 10%
+| 11%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 29 Aug–1 Sep 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130902.pdf |title=Essential Report |publisher=Essential Research |date=2 September 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|44%
+| 35%
+| 11%
+| 10%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 28–29 Aug 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://www.galaxyresearch.com.au/28-29-august-2013/ |title=28–29 August 2013: Labor fades as voters warm to Tony Abbott |publisher=Galaxy Research |accessdate=2 September 2013}}</ref>
+| style="background:#B6CDFB"|46%
+| 35%
+| 10%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 28–29 Aug 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|44%
+| 30.5%
+| 12%
+| 13.5%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 26 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=26Aug13>{{cite web |url=http://www.reachtel.com.au/blog/7-news-national-poll-26august13 |title=7 News National Poll |date=27 August 2013 |publisher=ReachTEL |accessdate=28 August 2013 |archive-date=31 August 2013 |archive-url=https://web.archive.org/web/20130831054248/http://www.reachtel.com.au/blog/7-news-national-poll-26august13 |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46.5%
+| 35.7%
+| 10.1%
+| 7.7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 21–25 Aug 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130826.pdf |title=Essential Report |publisher=Essential Research |date=26 August 2013 |access-date=26 August 2013 |archive-date=18 September 2013 |archive-url=https://web.archive.org/web/20130918231300/http://essentialvision.com.au/documents/essential_report_130826.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43%
+| 38%
+| 11%
+| 9%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 23–25 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 37%
+| 9%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 23–25 Aug 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|45%
+| 34.5%
+| 11%
+| 9.5%
+| style="background:#f66;" | 47.5%
+| style="background:#00bfff;" | '''52.5%'''
+|-
+! 18–22 Aug 2013
+| style="text-align:left;" | Nielsen<ref name=Nlsn23Aug13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/08/nielsen-130824.png |title=Estimates of federal voting intention and leadership approval (%) |date=23 August 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 10%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 16–18 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 34%
+| 9%
+| 10%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 16–18 Aug 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|44.5%
+| 36.5%
+| 9.5%
+| 9.5%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 16–18 Aug 2013
+| style="text-align:left;" | AMR<ref name=AMR>{{cite web |url=http://www.amr-australia.com/asset/cms/AMR_Federal_Election_Poll_19.08.2013.pdf |title=Federal Election Poll&nbsp;– 16th August to 18th August 2013: Voting Intention and Rudd vs Abbott |date=19 August 2013 |publisher=AMR |accessdate=22 August 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|41%
+| 38%
+| 10%
+| 11%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 14–18 Aug 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130819.pdf |title=Essential Report |publisher=Essential Research |date=19 August 2013 |access-date=19 August 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102818/http://essentialvision.com.au/documents/essential_report_130819.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 40%
+| 8%
+| 8%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 14–15 Aug 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/08/galaxy-130818.pdf |title=14–15 August 2013 |author=Galaxy Research |publisher=GhostWhoVotes}}</ref>
+| style="background:#B6CDFB"|45%
+| 36%
+| 10%
+| 9%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 12–13 Aug 2013
+| style="text-align:left;" | Morgan (phone)<ref>{{cite web |url=http://www.roymorgan.com/findings/5109-morgan-poll-better-pm-approvals-201308140551 |title=46% of electors say Kevin Rudd is the 'Better PM', just 3% ahead of Tony Abbott at 43%, but neither has the electorate's approval |date=14 August 2013 |accessdate=15 August 2013}}</ref>
+| style="background:#B6CDFB"|52%
+| 31%
+| 9%
+| 8%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 9–12 Aug 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130812.pdf |title=Essential Report |publisher=Essential Research |date=13 August 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|43%
+| 39%
+| 8%
+| 10%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 9–11 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 35%
+| 11%
+| 8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 9–11 Aug 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|44%
+| 36.5%
+| 10.5%
+| 9%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 10 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=10Aug13>{{cite web |url=http://www.reachtel.com.au/blog/7-news-national-poll-10august13 |title=7 News National Poll |date=10 August 2013 |publisher=ReachTEL |accessdate=5 August 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46.9%
+| 36.9%
+| 8.9%
+| 7.4%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 7–9 Aug 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://twitpic.com/d7i4od |title=Sunday Herald Galaxy Poll 7–9 August 2013 |author=Galaxy Research |publisher=GhostWhoVotes}}</ref>
+| style="background:#B6CDFB"|45%
+| 38%
+| 10%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 6–8 Aug 2013
+| style="text-align:left;" | Nielsen<ref name=Nlsn8Aug13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/07/nielsen-130715.png |title=Estimates of federal voting intention and leadership approval (%) |date=8 August 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|46%
+| 37%
+| 10%
+| 8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 4 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13>{{cite web |url=http://www.reachtel.com.au/blog/7-news-national-poll-4august13 |title=7 News National Poll |date=4 August 2013 |publisher=ReachTEL |accessdate=5 August 2013 |archive-date=7 August 2013 |archive-url=https://web.archive.org/web/20130807092138/http://www.reachtel.com.au/blog/7-news-national-poll-4august13 |url-status=dead }}</ref>
+| style="background:#B6CDFB"|45.7%
+| 37.5%
+| 8.2%
+| 8.6%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 2–4 Aug 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|43%
+| 38%
+| 9.5%
+| 9.5%
+| style="background:#f66;" | 49.5%
+| style="background:#00bfff;" | '''50.5%'''
+|-
+! 2–4 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 37%
+| 9%
+| 10%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 1–4 Aug 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130805.pdf |title=Essential Report |publisher=Essential Research |date=5 August 2013 |access-date=5 August 2013 |archive-date=8 August 2013 |archive-url=https://web.archive.org/web/20130808120916/http://essentialvision.com.au/documents/essential_report_130805.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43%
+| 38%
+| 9%
+| 10%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 26–28 Jul 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|41.5%
+| 38.5%
+| 10.5%
+| 9.5%
+| style="background:#f66;" | '''50.5%'''
+| style="background:#00bfff;" | 49.5%
+|-
+! 25–28 Jul 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130729.pdf |title=Essential Report |publisher=Essential Research |date=29 July 2013 |access-date=29 July 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102927/http://essentialvision.com.au/documents/essential_report_130729.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 39%
+| 9%
+| 8%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 23–25 Jul 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/07/galaxy-130728.jpg |title=23–25 July 2013 |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|44%
+| 40%
+| 9%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 18–22 Jul 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130723.pdf |title=Essential Report |publisher=Essential Research |date=23 July 2013 |access-date=23 July 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102807/http://essentialvision.com.au/documents/essential_report_130723.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|45%
+| 39%
+| 7%
+| 9%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 19–21 Jul 2013
+| style="text-align:left;" | Morgan (multi)
+| 41%
+| 41.5%
+| 9%
+| 8.5%
+| style="background:#f66;" | '''52%'''
+| style="background:#00bfff;" | 48%
+|-
+! 19–21 Jul 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 37%
+| 10%
+| 8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 18 Jul 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#B6CDFB"|45.4%
+| 39.3%
+| 8.3%
+| 7.0%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 12–14 Jul 2013
+| style="text-align:left;" | Morgan (multi)
+| 41%
+| 42%
+| 7%
+| 10%
+| style="background:#f66;" | '''51.5%'''
+| style="background:#00bfff;" | 48.5%
+|-
+! 11–14 Jul 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130715A.pdf |title=Essential Report |publisher=Essential Research |date=15 July 2013 |access-date=15 July 2013 |archive-date=21 July 2013 |archive-url=https://web.archive.org/web/20130721051628/http://essentialvision.com.au/documents/essential_report_130715A.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 39%
+| 7%
+| 8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 11–13 Jul 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnJul13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/07/nielsen-130715.png |title=Estimates of federal voting intention and leadership approval (%) |date=14 July 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|44%
+| 39%
+| 9%
+| 8%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 5–8 Jul 2013
+| style="text-align:left;" | AMR<ref name=AMR />
+| style="background:#B6CDFB"|43%
+| 42%
+| 7%
+| 8%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 5–7 Jul 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|42%
+| 38%
+| 9%
+| 11%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 5–7 Jul 2013
+| style="text-align:left;" | Morgan (multi)
+| 39.5%
+| 41.5%
+| 8.5%
+| 10.5%
+| style="background:#f66;" | '''52.5%'''
+| style="background:#00bfff;" | 47.5%
+|-
+! 4–7 Jul 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130708.pdf |title=Essential Report |publisher=Essential Research |date=8 July 2013 |access-date=8 July 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304042605/http://essentialvision.com.au/documents/essential_report_130708.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 38%
+| 8%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 28–30 Jun 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43%
+| 35%
+| 11%
+| 11%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 28–30 Jun 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|40.5%
+| 39.5%
+| 8.5%
+| 11.5%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 27–30 Jun 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130701.pdf |title=Essential Report |publisher=Essential Research |date=1 July 2013 |access-date=1 July 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102013/http://essentialvision.com.au/documents/essential_report_130701.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 36%
+| 9%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 27–28 Jun 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/06/galaxy-130630.pdf |title=27–28 June 2013 |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|44%
+| 38%
+| 10%
+| 8%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 27 Jun 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#B6CDFB"|45.1%
+| 38.3%
+| 8.7%
+| 7.8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+!26 June 2013
+| colspan="12" |'''[[Kevin Rudd]] is elected Prime Minister in [[June 2013 Australian Labor Party leadership spill|Labor leadership spill]]'''
+|- style="background:#DADADA;"
+|-
+! 21–23 Jun 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 29%
+| 9%
+| 14%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 21–23 Jun 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|47%
+| 30.5%
+| 9%
+| 13.5%
+| style="background:#f66;" | 43.5%
+| style="background:#00bfff;" | '''56.5%'''
+|-
+! 20–23 Jun 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130624.pdf |title=Essential Report |publisher=Essential Research |date=24 June 2013 |access-date=24 June 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102828/http://essentialvision.com.au/documents/essential_report_130624.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 8%
+| 11%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 14–16 Jun 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|44.5%
+| 33%
+| 9%
+| 13.5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 13–16 Jun 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130617.pdf |title=Essential Report |publisher=Essential Research |date=17 June 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 8%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 13–15 Jun 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnJun13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/06/nielsen-130617.png |title=Estimates of federal voting intention and leadership approval (%) |date=16 June 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|47%
+| 29%
+| 11%
+| 12%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 11–13 Jun 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/06/galaxy-130616.pdf |title=11–13 June 2013 |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|47%
+| 32%
+| 11%
+| 10%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 7–10 Jun 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|46%
+| 31%
+| 9.5%
+| 13.5%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 6–10 Jun 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130611.pdf |title=Essential Report |publisher=Essential Research |date=11 June 2013 |access-date=11 June 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304060601/http://essentialvision.com.au/documents/essential_report_130611.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 36%
+| 8%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 31 May–2 Jun 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|49%
+| 30%
+| 9%
+| 12%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 31 May–2 Jun 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|45.5%
+| 31.5%
+| 9.5%
+| 13.5%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 30 May–2 Jun 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130603.pdf |title=Essential Report |publisher=Essential Research |date=3 June 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 35%
+| 8%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 24–26 May 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|45.5%
+| 33.5%
+| 9.5%
+| 11.5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 23–26 May 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130527.pdf |title=Essential Report |publisher=Essential Research |date=27 May 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 8%
+| 10%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 17–19 May 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 31%
+| 9%
+| 14%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 17–19 May 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|45.5%
+| 32%
+| 10%
+| 12.5%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 16–19 May 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130520.pdf |title=Essential Report |publisher=Essential Research |date=20 May 2013 |access-date=20 May 2013 |archive-date=12 January 2018 |archive-url=https://web.archive.org/web/20180112160339/http://essentialvision.com.au/documents/essential_report_130520.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 35%
+| 8%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 16–18 May 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnMay13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/05/nielsen-130520.png |title=Estimates of federal voting intention and leadership approval (%) |date=20 May 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|44%
+| 32%
+| 11%
+| 13%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 15–16 May 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/05/galaxy-130518.pdf |title=15–16 May 2013 |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|46%
+| 34%
+| 10%
+| 10%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 10–12 May 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|46.5%
+| 32%
+| 9.5%
+| 12%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 9–12 May 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130513.pdf |title=Essential Report |publisher=Essential Research |date=13 May 2013 |access-date=13 May 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304050032/http://essentialvision.com.au/documents/essential_report_130513.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 10%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 3–5 May 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 31%
+| 10%
+| 12%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 3–5 May 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|46%
+| 32%
+| 8.5%
+| 13.5%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 2–5 May 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130506.pdf |title=Essential Report |publisher=Essential Research |date=6 May 2013 |access-date=6 May 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304042334/http://essentialvision.com.au/documents/essential_report_130506.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 33%
+| 9%
+| 10%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 2 May 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#B6CDFB"|48.5%
+| 29.3%
+| 10.2%
+| 11.9%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 26–28 Apr 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|48%
+| 30.5%
+| 11%
+| 10.5%
+| style="background:#f66;" | 43.5%
+| style="background:#00bfff;" | '''56.5%'''
+|-
+! 25–28 Apr 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130429.pdf |title=Essential Report |publisher=Essential Research |date=29 April 2013 |access-date=29 April 2013 |archive-date=3 May 2013 |archive-url=https://web.archive.org/web/20130503200111/http://essentialvision.com.au/documents/essential_report_130429.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 18–22 Apr 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|44%
+| 32.5%
+| 10.5%
+| 13%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 18–22 Apr 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130422.pdf |title=Essential Report |publisher=Essential Research |date=22 April 2013 |access-date=22 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102832/http://essentialvision.com.au/documents/essential_report_130422.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 19–21 Apr 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 32%
+| 10%
+| 12%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 11–14 Apr 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|47.5%
+| 32%
+| 10.5%
+| 10%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 11–14 Apr 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130415.pdf |title=Essential Report |publisher=Essential Research |date=15 April 2013 |access-date=22 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102045/http://essentialvision.com.au/documents/essential_report_130415.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 11–13 Apr 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnApr13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/03/nielsen-130318.png |title=Estimates of federal voting intention and leadership approval (%) |date=15 April 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|49%
+| 29%
+| 12%
+| 11%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 9–11 Apr 2013
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/04/galaxy-130414.pdf |title=9–11 April 2013 |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|47%
+| 33%
+| 12%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 2 May 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#B6CDFB"|49.8%
+| 31.3%
+| 10.2%
+| 8.8%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 5–7 Apr 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 32%
+| 11%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 4–7 Apr 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|46.5%
+| 31%
+| 10%
+| 12.5%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 4–7 Apr 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130408.pdf |title=Essential Report |publisher=Essential Research |date=8 April 2013 |access-date=15 April 2013 |archive-date=10 April 2013 |archive-url=https://web.archive.org/web/20130410141642/http://essentialvision.com.au/documents/essential_report_130408.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 9%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 29 Mar–1 Apr 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|49%
+| 30%
+| 11%
+| 10%
+| style="background:#f66;" | 42.5%
+| style="background:#00bfff;" | '''57.5%'''
+|-
+! 28 Mar–1 Apr 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130402.pdf |title=Essential Report |publisher=Essential Research |date=2 April 2013 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304064249/http://essentialvision.com.au/documents/essential_report_130402.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 22–24 Mar 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|50%
+| 30%
+| 10%
+| 10%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 21–24 Mar 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://blogs.crikey.com.au/pollbludger/files/2013/03/Essential-Report_130325.pdf |title=Essential Report |work=Poll Bludger |author=Essential Research |date=25 March 2013}}</ref>
+| style="background:#B6CDFB"|47%
+| 33%
+| 11%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 22–23 Mar 2013
+| style="text-align:left;" | Galaxy<ref name=GlxyMar13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/03/galaxy-130324.pdf |title=22–23 March 2013 |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|47%
+| 32%
+| 12%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 21–24 Mar 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|46.5%
+| 30.5%
+| 10.5%
+| 12.5%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 22–25 Mar 2013
+| style="text-align:left;" | AMR<ref name=AMR />
+| style="background:#B6CDFB"|49%
+| 33%
+| 9%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 14–17 Mar 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130318.pdf |title=Essential Report |publisher=Essential Research |date=18 March 2013 |access-date=15 April 2013 |archive-date=19 April 2013 |archive-url=https://web.archive.org/web/20130419225941/http://essentialvision.com.au/documents/essential_report_130318.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 9%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 14–17 Mar 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|46%
+| 33%
+| 11%
+| 10.5%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 14–16 Mar 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2013/03/nielsen-130318.png |title=Estimates of federal voting intention and leadership approval (%) |date=18 March 2013 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|47%
+| 31%
+| 10%
+| 12%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 7–10 Mar 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130311.pdf |title=Essential Report |work=Poll Bludger |author=Essential Research |date=11 March 2013 |access-date=15 April 2013 |archive-date=24 March 2015 |archive-url=https://web.archive.org/web/20150324035632/http://essentialvision.com.au/documents/essential_report_130311.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 7–10 Mar 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|47%
+| 31.5%
+| 11%
+| 10.5%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 8–10 Mar 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 34%
+| 11%
+| 11%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 5–7 Mar 2013
+| style="text-align:left;" | Galaxy<ref name=GlxyNov12Mar13>{{cite web |url=http://www.galaxyresearch.com.au/5-7-march-2013/ |title=5–7 March 2013: Support for federal Labor slides further |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|48%
+| 32%
+| 11%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 28 Feb–3 Mar 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130304.pdf |title=Essential Report |publisher=Essential Research |date=11 March 2013 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304041717/http://essentialvision.com.au/documents/essential_report_130304.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 28 Feb–3 Mar 2013
+| style="text-align:left;" | Morgan (multi)
+| style="background:#B6CDFB"|45%
+| 33%
+| 10.5%
+| 11.5%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 21–24 Feb 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130225.pdf |title=Essential Report |publisher=Essential Research |date=25 March 2013 |access-date=15 April 2013 |archive-date=15 December 2013 |archive-url=https://web.archive.org/web/20131215125334/http://essentialvision.com.au/documents/essential_report_130225.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 16–17/23–24 Feb 2013
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|44%
+| 33.5%
+| 10%
+| 12.5%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 22–24 Feb 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 31%
+| 11%
+| 11%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 14–17 Feb 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130218.pdf |title=Essential Report |publisher=Essential Research |date=18 February 2013 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102052/http://essentialvision.com.au/documents/essential_report_130218.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 14–16 Feb 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#B6CDFB"|47%
+| 30%
+| 11%
+| 12%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 7–10 Feb 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130211.pdf |title=Essential Report |publisher=Essential Research |date=11 February 2013 |access-date=15 April 2013 |archive-date=12 January 2018 |archive-url=https://web.archive.org/web/20180112160645/http://essentialvision.com.au/documents/essential_report_130211.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 9–10 Feb 2013
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45%
+| 33.5%
+| 9%
+| 12.5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 1–4 Feb 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130205.pdf |title=Essential Report |publisher=Essential Research |date=5 February 2013 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103216/http://essentialvision.com.au/documents/essential_report_130205.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 2–3 Feb 2013
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|42.5%
+| 38.5%
+| 8.5%
+| 10.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 1–3 Feb 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 32%
+| 9%
+| 11%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 1–3 Feb 2013
+| style="text-align:left;" | Galaxy<ref name=GlxyNov12Mar13/>
+| style="background:#B6CDFB"|48%
+| 35%
+| 10%
+| 7%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 23–28 Jan 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130129.pdf |title=Essential Report |publisher=Essential Research |date=29 January 2013 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103825/http://essentialvision.com.au/documents/essential_report_130129.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 35%
+| 10%
+| 7%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 19–20/26–27 Jan 2013
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|39%
+| 36%
+| 12%
+| 13%
+| style="background:#f66;" | 49.5%
+| style="background:#00bfff;" | '''50.5%'''
+|-
+! 16–20 Jan 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130121A.pdf |title=Essential Report |publisher=Essential Research |date=21 January 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 36%
+| 9%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 9–13 Jan 2013
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_130114.pdf |title=Essential Report |publisher=Essential Research |date=14 January 2013 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 36%
+| 8%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 11–13 Jan 2013
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 38%
+| 9%
+| 9%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 5–6/12–13 Jan 2013
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41.5%
+| 36.5%
+| 10.5%
+| 11.5%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 12–16 Dec 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121217.pdf |title=Essential Report |publisher=Essential Research |date=17 December 2012 |access-date=15 April 2013 |archive-date=23 December 2012 |archive-url=https://web.archive.org/web/20121223051512/http://essentialvision.com.au/documents/essential_report_121217.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 36%
+| 8%
+| 8%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 8–9/15–16 Dec 2012
+| style="text-align:left;" | Morgan (face)
+| 37.5%
+| 40%
+| 12%
+| 10.5%
+| style="background:#f66;" | '''53.5%'''
+| style="background:#00bfff;" | 46.5%
+|-
+! 13–15 Dec 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#B6CDFB"|43%
+| 35%
+| 10%
+| 12%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 5–9 Dec 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121210.pdf |title=Essential Report |publisher=Essential Research |date=10 December 2012 |access-date=15 April 2013 |archive-date=23 December 2012 |archive-url=https://web.archive.org/web/20121223051520/http://essentialvision.com.au/documents/essential_report_121210.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 36%
+| 8%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 7–9 Dec 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 32%
+| 11%
+| 11%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 28 Nov–2 Dec 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121203.pdf |title=Essential Report |publisher=Essential Research |date=3 December 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103207/http://essentialvision.com.au/documents/essential_report_121203.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 37%
+| 9%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 24–25 Nov/1–2 Dec 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|40.5%
+| 36%
+| 10.5%
+| 13%
+| style="background:#f66;" | 49.5%
+| style="background:#00bfff;" | '''50.5%'''
+|-
+! 29–30 Nov 2012
+| style="text-align:left;" | Galaxy<ref name=GlxyNov12Mar13/>
+| style="background:#B6CDFB"|48%
+| 34%
+| 11%
+| 7%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 27–29 Nov 2012
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|44.5%
+| 36.5%
+| 8.5%
+| 10.5%
+| style="background:#f66;" | 47.5%
+| style="background:#00bfff;" | '''52.5%'''
+|-
+! 23–25 Nov 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43%
+| 36%
+| 11%
+| 10%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 21–25 Nov 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121126.pdf |title=Essential Report |publisher=Essential Research |date=26 November 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304042822/http://essentialvision.com.au/documents/essential_report_121126.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 36%
+| 10%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 14–18 Nov 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121119.pdf |title=Essential Report |publisher=Essential Research |date=19 November 2012 |access-date=15 April 2013 |archive-date=5 March 2016 |archive-url=https://web.archive.org/web/20160305052255/http://essentialvision.com.au/documents/essential_report_121119.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 36%
+| 10%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 10–11/17–18 Nov 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|38.5%
+| 36.5%
+| 11.5%
+| 13.5%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 15–17 Nov 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#B6CDFB"|45%
+| 34%
+| 12%
+| 10%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 9–11 Nov 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43%
+| 36%
+| 10%
+| 11%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 7–11 Nov 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121112.pdf |title=Essential Report |publisher=Essential Research |date=12 November 2012 |access-date=15 April 2013 |archive-date=27 October 2015 |archive-url=https://web.archive.org/web/20151027063347/http://essentialvision.com.au/documents/essential_report_121112.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|45%
+| 37%
+| 9%
+| 8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 2–6 Nov 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121107.pdf |title=Essential Report |publisher=Essential Research |date=7 November 2012 |access-date=15 April 2013 |archive-date=16 October 2015 |archive-url=https://web.archive.org/web/20151016144147/http://essentialvision.com.au/documents/essential_report_121107.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 37%
+| 9%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 2–4 Nov 2012
+| style="text-align:left;" | Galaxy<ref name=GlxyAprNov12>{{cite web |url=http://www.galaxyresearch.com.au/2-4-november-2012/ |title=2–4 November 2012: Federal leaders fail to impress |publisher=Galaxy Research}}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 11%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 27–28 Oct/3–4 Nov 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 35.5%
+| 10%
+| 11.5%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 26–28 Oct 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|41%
+| 36%
+| 10%
+| 13%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 25–28 Oct 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121029.pdf |title=Essential Report |publisher=Essential Research |date=29 October 2012 |access-date=15 April 2013 |archive-date=10 October 2015 |archive-url=https://web.archive.org/web/20151010162012/http://essentialvision.com.au/documents/essential_report_121029.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 36%
+| 9%
+| 7%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 13–14/20–21 Oct 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|38.5%
+| 37.5%
+| 12.5%
+| 11.5%
+| style="background:#f66;" | 42.5%
+| style="background:#00bfff;" | '''57.5%'''
+|-
+! 17–21 Oct 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121022.pdf |title=Essential Report |publisher=Essential Research |date=22 October 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 36%
+| 9%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 18–20 Oct 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2012/10/nielsen-121022.png |title=The final count: Estimates of federal voting intention and leadership approval (%) |date=12 October 2012 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|43%
+| 34%
+| 11%
+| 12%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 10–14 Oct 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121014.pdf |title=Essential Report |publisher=Essential Research |date=14 October 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 36%
+| 9%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 5–7 Oct 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 33%
+| 10%
+| 12%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 3–7 Oct 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121008.pdf |title=Essential Report |publisher=Essential Research |date=8 October 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304043940/http://essentialvision.com.au/documents/essential_report_121008.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 37%
+| 9%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 29–30 Sep/6–7 Oct 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 37%
+| 10.5%
+| 9.5%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 26–30 Sep 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_121001.pdf |title=Essential Report |publisher=Essential Research |date=1 October 2012 |access-date=15 April 2013 |archive-date=15 October 2012 |archive-url=https://web.archive.org/web/20121015025321/http://essentialvision.com.au/documents/essential_report_121001.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 36%
+| 9%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 22–23 Sep 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41.5%
+| 37.5%
+| 10%
+| 11%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 19–23 Sep 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120924.pdf |title=Essential Report |publisher=Essential Research |date=24 September 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102823/http://essentialvision.com.au/documents/essential_report_120924.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 35%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 17–20 Sep 2012
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|47%
+| 39.5%
+| 8%
+| 5.5%
+| style="background:#f66;" | 47.5%
+| style="background:#00bfff;" | '''52.5%'''
+|-
+! 14–16 Sep 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|41%
+| 36%
+| 12%
+| 11%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 12–16 Sep 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120917.pdf |title=Essential Report |publisher=Essential Research |date=17 September 2012 |access-date=15 April 2013 |archive-date=21 October 2012 |archive-url=https://web.archive.org/web/20121021181132/http://essentialvision.com.au/documents/essential_report_120917.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 8–9/15–16 Sep 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|40.5%
+| 35%
+| 12%
+| 12.5%
+| style="background:#f66;" | 49.5%
+| style="background:#00bfff;" | '''50.5%'''
+|-
+! 13–15 Sep 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#B6CDFB"|45%
+| 34%
+| 10%
+| 11%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 29 Aug–2 Sep 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120903.pdf |title=Essential Report |publisher=Essential Research |date=3 September 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304042631/http://essentialvision.com.au/documents/essential_report_120903.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 9%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 31 Aug–2 Sep 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 33%
+| 8%
+| 13%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 1–2 Sep 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41.5%
+| 34.5%
+| 11.5%
+| 12.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 22–26 Aug 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120827.pdf |title=Essential Report |publisher=Essential Research |date=27 August 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103211/http://essentialvision.com.au/documents/essential_report_120827.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 23–25 Aug 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#B6CDFB"|45%
+| 32%
+| 11%
+| 13%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 15–19 Aug 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120820.pdf |title=Essential Report |publisher=Essential Research |date=20 August 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103840/http://essentialvision.com.au/documents/essential_report_120820.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 17–19 Aug 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 35%
+| 11%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 11–12/18–19 Aug 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|44%
+| 34.5%
+| 10%
+| 11.5%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 8–12 Aug 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120813.pdf |title=Essential Report |publisher=Essential Research |date=13 August 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103200/http://essentialvision.com.au/documents/essential_report_120813.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 3–5 Aug 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 33%
+| 10%
+| 12%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 1–5 Aug 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120807.pdf |title=Essential Report |publisher=Essential Research |date=7 August 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 33%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 28–29 Jul/4–5 Aug 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43.5%
+| 32%
+| 11.5%
+| 13%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 25–29 Jul 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120730.pdf |title=Essential Report |publisher=Essential Research |date=30 July 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304101951/http://essentialvision.com.au/documents/essential_report_120730.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 33%
+| 10%
+| 8%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 26–28 Jul 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#B6CDFB"|47%
+| 30%
+| 12%
+| 11%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 20–22 Jul 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 28%
+| 11%
+| 15%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 18–22 Jul 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120723.pdf |title=Essential Report |publisher=Essential Research |date=23 July 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 33%
+| 10%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 14–15/21–22 Jul 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 31.5%
+| 12%
+| 13.5%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 11–15 Jul 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120716.pdf |title=Essential Report |publisher=Essential Research |date=16 July 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102916/http://essentialvision.com.au/documents/essential_report_120716.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 10%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 6–8 Jul 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 31%
+| 11%
+| 10%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 4–8 Jul 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120709.pdf |title=Essential Report |publisher=Essential Research |date=9 July 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304043222/http://essentialvision.com.au/documents/essential_report_120709.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 30 Jun–1/7–8 Jul 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 29.5%
+| 14.5%
+| 13%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 27 Jun–1 Jul 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120702.pdf |title=Essential Report |publisher=Essential Research |date=2 July 2012 |access-date=15 April 2013 |archive-date=6 March 2016 |archive-url=https://web.archive.org/web/20160306121055/http://essentialvision.com.au/documents/essential_report_120702.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 22–24 Jun 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 30%
+| 12%
+| 12%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 20–24 Jun 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120625.pdf |title=Essential Report |publisher=Essential Research |date=25 June 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102106/http://essentialvision.com.au/documents/essential_report_120625.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 33%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 16–17/23–24 Jun 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 29.5%
+| 14.5%
+| 13%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 13–17 Jun 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_180612.pdf |title=Essential Report |publisher=Essential Research |date=18 June 2012 |access-date=15 April 2013 |archive-date=11 July 2012 |archive-url=https://web.archive.org/web/20120711050151/http://essentialvision.com.au/documents/essential_report_180612.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 33%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 15–17 Jun 2012
+| style="text-align:left;" | Galaxy<ref name=GlxyAprNov12/>
+| style="background:#B6CDFB"|49%
+| 31%
+| 12%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 6–11 Jun 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120612.pdf |title=Essential Report |publisher=Essential Research |date=12 June 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102038/http://essentialvision.com.au/documents/essential_report_120612.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 9–10 Jun 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|42.5%
+| 33%
+| 12.5%
+| 12%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 7–10 Jun 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 31%
+| 14%
+| 11%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 2–3 Jun 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45%
+| 32.5%
+| 10.5%
+| 12%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 31 May–2 Jun 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2012/06/nielsen-120604.png |title=Estimates of federal voting intention and leadership approval |date=12 June 2012 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|48%
+| 26%
+| 14%
+| 12%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 30 May–3 Jun 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120604.pdf |title=Essential Report |publisher=Essential Research |date=4 June 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102802/http://essentialvision.com.au/documents/essential_report_120604.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|50%
+| 33%
+| 10%
+| 7%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 26–27 May 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|49%
+| 27.5%
+| 13%
+| 10.5%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 23–27 May 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120528.pdf |title=Essential Report |publisher=Essential Research |date=28 May 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102847/http://essentialvision.com.au/documents/essential_report_120528.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|50%
+| 33%
+| 10%
+| 7%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 25–27 May 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 32%
+| 12%
+| 10%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 16–20 May 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120521.pdf |title=Essential Report |publisher=Essential Research |date=21 May 2012 |access-date=15 April 2013 |archive-date=12 January 2018 |archive-url=https://web.archive.org/web/20180112214712/http://essentialvision.com.au/documents/essential_report_120521.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 33%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 19–20 May 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 32%
+| 10.5%
+| 12%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 12–13 May 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46%
+| 30.5%
+| 12%
+| 11.5%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 11–13 May 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 30%
+| 12%
+| 13%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 9–13 May 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120514.pdf |title=Essential Report |publisher=Essential Research |date=14 May 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|50%
+| 30%
+| 11%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 9–10 May 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#B6CDFB"|49%
+| 28%
+| 12%
+| 12%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 9–10 May 2012
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|50.5%
+| 29%
+| 10%
+| 10.5%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 5–6 May 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 29.5%
+| 12%
+| 13%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 2–6 May 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120507.pdf |title=Essential Report |publisher=Essential Research |date=7 May 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304044104/http://essentialvision.com.au/documents/essential_report_120507.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|50%
+| 29%
+| 11%
+| 9%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 27–29 Apr 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|51%
+| 27%
+| 11%
+| 11%
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | '''59%'''
+|-
+! 27–29 Apr 2012
+| style="text-align:left;" | Galaxy<ref name=GlxyAprNov12/>
+| style="background:#B6CDFB"|49%
+| 30%
+| 13%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 25–29 Apr 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120430.pdf |title=Essential Report |publisher=Essential Research |date=30 April 2012 |access-date=15 April 2013 |archive-date=15 December 2013 |archive-url=https://web.archive.org/web/20131215223734/http://essentialvision.com.au/documents/essential_report_120430.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|50%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 21–22 Apr 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|47.5%
+| 30%
+| 12%
+| 10.5%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 18–22 Apr 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120423.pdf |title=Essential Report |publisher=Essential Research |date=23 April 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102840/http://essentialvision.com.au/documents/essential_report_120423.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 17–19 Apr 2012
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|47.5%
+| 30%
+| 11.5%
+| 11.5%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 13–15 Apr 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 29%
+| 12%
+| 11%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 11–15 Apr 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120416.pdf |title=Essential Report |publisher=Essential Research |date=16 April 2012 |access-date=15 April 2013 |archive-date=27 September 2013 |archive-url=https://web.archive.org/web/20130927121833/http://essentialvision.com.au/documents/essential_report_120416.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 7–8/14–15 Apr 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 31%
+| 12.5%
+| 10%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 4–9 Apr 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120410.pdf |title=Essential Report |publisher=Essential Research |date=10 April 2012 |access-date=15 April 2013 |archive-date=25 April 2012 |archive-url=https://web.archive.org/web/20120425130921/http://essentialvision.com.au/documents/essential_report_120410.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|50%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 31 Mar–1 Apr 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 32%
+| 13%
+| 10.5%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 28 Mar–1 Apr 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120402.pdf |title=Essential Report |publisher=Essential Research |date=2 April 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304103830/http://essentialvision.com.au/documents/essential_report_120402.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 33%
+| 11%
+| 8%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 29–31 Mar 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#B6CDFB"|47%
+| 27%
+| 13%
+| 12%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 21–25 Mar 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120326.pdf |title=Essential Report |publisher=Essential Research |date=26 March 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102757/http://essentialvision.com.au/documents/essential_report_120326.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 10%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 24–25 Mar 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45%
+| 36.5%
+| 12.5%
+| 6%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 23–25 Mar 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 28%
+| 11%
+| 14%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 14–18 Mar 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120319.pdf |title=Essential Report |publisher=Essential Research |date=19 March 2012 |access-date=15 April 2013 |archive-date=24 March 2012 |archive-url=https://web.archive.org/web/20120324184821/http://essentialvision.com.au/documents/essential_report_120319.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 32%
+| 11%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 10–11/17–18 Mar 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 37%
+| 10.5%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 9–11 Mar 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43%
+| 31%
+| 12%
+| 14%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 7–11 Mar 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120312.pdf |title=Essential Report |publisher=Essential Research |date=12 March 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102058/http://essentialvision.com.au/documents/essential_report_120312.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 10%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 3–4 Mar 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43.5%
+| 39%
+| 10%
+| 7.5%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 29 Feb–4 Mar 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120305.pdf |title=Essential Report |publisher=Essential Research |date=6 March 2012 |access-date=15 April 2013 |archive-date=12 January 2018 |archive-url=https://web.archive.org/web/20180112160447/http://essentialvision.com.au/documents/essential_report_120305.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 25–26 Feb 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|42.5%
+| 37.5%
+| 11%
+| 9%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 23–26 Feb 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 35%
+| 11%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 22–26 Feb 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120227.pdf |title=Essential Report |publisher=Essential Research |date=27 February 2012 |access-date=15 April 2013 |archive-date=4 March 2016 |archive-url=https://web.archive.org/web/20160304102956/http://essentialvision.com.au/documents/essential_report_120227.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 11%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 23–24 Feb 2012
+| style="text-align:left;" | Galaxy<ref name=GlxyOct11Feb12>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2012/02/galaxy-120225.pdf |title=February 2012 polling |work=GhostWhoVotes |author=Galaxy Research |date=25 February 2012}}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 12%
+| 7%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 22–23 Feb 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#B6CDFB"|44%
+| 34%
+| 12%
+| 11%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 15–19 Feb 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://essentialvision.com.au/documents/essential_report_120220.pdf |title=Essential Report |publisher=Essential Research |date=20 February 2012 |access-date=15 April 2013 |archive-date=6 March 2016 |archive-url=https://web.archive.org/web/20160306092351/http://essentialvision.com.au/documents/essential_report_120220.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 33%
+| 11%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 11–12/18–19 Feb 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41.5%
+| 37%
+| 14.5%
+| 7%
+| style="background:#f66;" | '''51.5%'''
+| style="background:#00bfff;" | 48.5%
+|-
+! 10–12 Feb 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 32%
+| 11%
+| 11%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 8–10 Feb 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120213.pdf |title=Essential Report |publisher=Essential Research |date=13 February 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 10%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 7–8 Feb 2012
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|41.5%
+| 37%
+| 14.5%
+| 7%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 4–5 Feb 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 38.5%
+| 9.5%
+| 6.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 1–5 Feb 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120206.pdf |title=Essential Report |publisher=Essential Research |date=6 February 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 33%
+| 11%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 2–4 Feb 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnDec11Feb12>{{cite web |url=http://ghostwhovotes.files.wordpress.com/2012/02/nielsen-120225.png |title=Estimates of federal voting intention and leadership approval |date=12 February 2012 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|45%
+| 33%
+| 13%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 28–29 Jan 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41.5%
+| 39.5%
+| 9.5%
+| 6.5%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 27–29 Jan 2012
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 30%
+| 12%
+| 13%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 25–29 Jan 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120130.pdf |title=Essential Report |publisher=Essential Research |date=30 January 2012 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 27–28 Jan 2012
+| style="text-align:left;" | Galaxy<ref name=GlxyOct11Feb12/>
+| style="background:#B6CDFB"|48%
+| 34%
+| 12%
+| 6%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 18–22 Jan 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120123.pdf |title=Essential Report |publisher=Essential Research |date=23 January 2012 |access-date=15 April 2013 |archive-date=30 April 2012 |archive-url=https://web.archive.org/web/20120430045405/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120123.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 35%
+| 10%
+| 7%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 14–15/21–22 Jan 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|42.5%
+| 38.5%
+| 12%
+| 7%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 17–18 Jan 2012
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|46.5%
+| 35.5%
+| 9%
+| 9%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 11–15 Jan 2012
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120116.pdf |title=Essential Report |publisher=Essential Research |date=16 January 2012 |access-date=15 April 2013 |archive-date=16 March 2012 |archive-url=https://web.archive.org/web/20120316073351/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120116.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 35%
+| 9%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 7–8 Jan 2012
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45%
+| 37%
+| 10.5%
+| 7.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 14–18 Dec 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_191211.pdf |title=Essential Report |publisher=Essential Research |date=19 December 2011 |access-date=15 April 2013 |archive-date=27 January 2012 |archive-url=https://web.archive.org/web/20120127203207/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_191211.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 9%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 10–11/17–18 Dec 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 36.5%
+| 13%
+| 7.5%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 7–11 Dec 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_121211.pdf |title=Essential Report |publisher=Essential Research |date=12 December 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 10%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 8–10 Dec 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnDec11Feb12/>
+| style="background:#B6CDFB"|49%
+| 29%
+| 11%
+| 11%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 2–4 Dec 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 31%
+| 13%
+| 12%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 30 Nov–4 Dec 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_051211.pdf |title=Essential Report |publisher=Essential Research |date=5 December 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 10%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 26–27 Nov/3–4 Dec 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 36.5%
+| 13%
+| 7.5%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 23–27 Nov 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_281111.pdf |title=Essential Report |publisher=Essential Research |date=28 November 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 11%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 19–20 Nov 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 36.5%
+| 12%
+| 6%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 18–20 Nov 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 30%
+| 10%
+| 12%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 16–20 Nov 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_211111.pdf |title=Essential Report |publisher=Essential Research |date=21 November 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 34%
+| 10%
+| 7%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 9–13 Nov 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_141111.pdf |title=Essential Report |publisher=Essential Research |date=14 November 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 5–6/12–13 Nov 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|47%
+| 34.5%
+| 11.5%
+| 7%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 10–12 Nov 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11>{{cite web |url=http://blogs.crikey.com.au/pollbludger/files/2011/11/Nielsen-Poll-table-Nov-2011.pdf |title=Estimates of Federal Voting Intention & Leadership Approval |date=November 2011 |author=Nielsen |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|45%
+| 30%
+| 14%
+| 12%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 3–6 Nov 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 32%
+| 12%
+| 12%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 2–6 Nov 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_071111.pdf |title=Essential Report |publisher=Essential Research |date=7 November 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 35%
+| 9%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 2–3 Nov 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|45%
+| 34%
+| 12.5%
+| 8.5%
+| style="background:#f66;" | 47.5%
+| style="background:#00bfff;" | '''52.5%'''
+|-
+! 26–30 Oct 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_311011.pdf |title=Essential Report |publisher=Essential Research |date=31 October 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 10%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 29–30 Oct 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 34%
+| 13.5%
+| 6%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 25–26 Oct 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|47%
+| 31%
+| 12.5%
+| 9.6%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 22–23 Oct 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|49.5%
+| 35%
+| 10.5%
+| 5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 21–23 Oct 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 29%
+| 15%
+| 11%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 19–23 Oct 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_241011.pdf |title=Essential Report |publisher=Essential Research |date=24 October 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 32%
+| 11%
+| 8%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 15–16 Oct 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|44%
+| 36.5%
+| 10%
+| 9.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 14–16 Oct 2011
+| style="text-align:left;" | Galaxy<ref name=GlxyOct11Feb12/>
+| style="background:#B6CDFB"|51%
+| 29%
+| 12%
+| 8%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 12–16 Oct 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_171011.pdf |title=Essential Report |publisher=Essential Research |date=17 October 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 33%
+| 11%
+| 8%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 13–15 Oct 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|48%
+| 30%
+| 12%
+| 10%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 8–9 Oct 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43.5%
+| 38.5%
+| 11%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 7–9 Oct 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|49%
+| 29%
+| 12%
+| 10%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 4–9 Oct 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_101011.pdf |title=Essential Report |publisher=Essential Research |date=10 October 2011 |access-date=15 April 2013 |archive-date=9 December 2011 |archive-url=https://web.archive.org/web/20111209093559/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_101011.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|48%
+| 33%
+| 10%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 27 Sep–2 Oct 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_031011.pdf |title=Essential Report |publisher=Essential Research |date=3 October 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 33%
+| 11%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 24–25 Sep/1–2 Oct 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 35.5%
+| 10%
+| 8%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 20–25 Sep 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_260911.pdf |title=Essential Report |publisher=Essential Research |date=26 September 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 12%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 16–18 Sep 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|48%
+| 26%
+| 13%
+| 13%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 13–18 Sep 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_190911.pdf |title=Essential Report |publisher=Essential Research |date=19 September 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 10–11/17–18 Sep 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 35.5%
+| 10%
+| 8%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 7–11 Sep 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120911.pdf |title=Essential Report |publisher=Essential Research |date=12 September 2011 |access-date=15 April 2013 |archive-date=30 April 2012 |archive-url=https://web.archive.org/web/20120430045426/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_120911.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 10%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 8–10 Sep 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|48%
+| 27%
+| 13%
+| 12%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 2–4 Sep 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|50%
+| 27%
+| 12%
+| 11%
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | '''59%'''
+|-
+! 31 Aug–4 Sep 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_050911.pdf |title=Essential Report |publisher=Essential Research |date=5 September 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 30%
+| 11%
+| 10%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 27–28 Aug/3–4 Sep 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 32.5%
+| 12.5%
+| 8.5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 24–28 Aug 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_290811.pdf |title=Essential Report |publisher=Essential Research |date=29 August 2011 |access-date=15 April 2013 |archive-date=10 April 2012 |archive-url=https://web.archive.org/web/20120410213824/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_290811.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 19–21 Aug 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 27%
+| 14%
+| 12%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 17–21 Aug 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_220811.pdf |title=Essential Report |publisher=Essential Research |date=22 August 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|50%
+| 32%
+| 10%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 13–14/20–21 Aug 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|49.5%
+| 32.5%
+| 11%
+| 7%
+| style="background:#f66;" | 44.5%
+| style="background:#00bfff;" | '''55.5%'''
+|-
+! 10–14 Aug 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_150811.pdf |title=Essential Report |publisher=Essential Research |date=15 August 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|50%
+| 31%
+| 10%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 11–13 Aug 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|48%
+| 28%
+| 12%
+| 11%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 9–10 Aug 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|49%
+| 29.5%
+| 12%
+| 9.5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 5–7 Aug 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|50%
+| 30%
+| 10%
+| 10%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 3–7 Aug 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_080811.pdf |title=Essential Report |publisher=Essential Research |date=8 August 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|50%
+| 31%
+| 10%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 30–31 Jul/6–7 Aug 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|47.5%
+| 34.5%
+| 12%
+| 6%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! c. 3 Aug 2011
+| style="text-align:left;" | Galaxy<ref>{{cite web |url=http://blogs.crikey.com.au/pollbludger/2011/08/03/galaxy-56-44-2/ |title=Galaxy: 56–44 to Coalition |work=Poll Bludger |publisher=Crikey |date=3 August 2011}}</ref>
+| style="background:#B6CDFB"|48%
+| 31%
+| 13%
+| 8%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 27–31 Jul 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_010811.pdf |title=Essential Report |publisher=Essential Research |date=1 August 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 22–24 Jul 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|47%
+| 29%
+| 13%
+| 11%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 20–24 Jul 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_250711.pdf |title=Essential Report |publisher=Essential Research |date=25 July 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 32%
+| 11%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 16–17/23–24 Jul 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|47%
+| 34.5%
+| 12%
+| 6.5%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 13–17 Jul 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_180711.pdf |title=Essential Report |publisher=Essential Research |date=18 July 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 31%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 14–16 Jul 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|51%
+| 26%
+| 11%
+| 15%
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | '''61%'''
+|-
+! 13–14 Jul 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|52.5%
+| 27.5%
+| 10.5%
+| 9.5%
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | '''60%'''
+|-
+! 9–10 Jul 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|48%
+| 33.5%
+| 11.5%
+| 7%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 8–10 Jul 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|49%
+| 27%
+| 12%
+| 12%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 6–10 Jul 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_110711.pdf |title=Essential Report |publisher=Essential Research |date=11 July 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|50%
+| 30%
+| 11%
+| 9%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | '''57%'''
+|-
+! 29 Jun–3 Jul 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_040711.pdf |title=Essential Report |publisher=Essential Research |date=4 July 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|49%
+| 32%
+| 11%
+| 9%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 25–26 Jun/1–2 Jul 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|49%
+| 31.5%
+| 11.5%
+| 8%
+| style="background:#f66;" | 43.5%
+| style="background:#00bfff;" | '''56.5%'''
+|-
+! 24–26 Jun 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 30%
+| 11%
+| 13%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 22–26 Jun 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_270611.pdf |title=Essential Report |publisher=Essential Research |date=27 June 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|48%
+| 32%
+| 11%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 11–12/18–19 Jun 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 35%
+| 11.5%
+| 7%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 15–19 Jun 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_200611.pdf |title=Essential Report |publisher=Essential Research |date=20 June 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 32%
+| 12%
+| 9%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 14–16 Jun 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|49%
+| 27%
+| 12%
+| 12%
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | '''59%'''
+|-
+! 8–13 Jun 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_140611.pdf |title=Essential Report |publisher=Essential Research |date=14 June 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 34%
+| 12%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 10–12 Jun 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 31%
+| 11%
+| 12%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 4–5 Jun 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 33.5%
+| 12%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 1–5 Jun 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_140611.pdf |title=Essential Report |publisher=Essential Research |date=14 June 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 34%
+| 12%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 31 May–2 Jun 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|50%
+| 30%
+| 9.5%
+| 10.5%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | '''58%'''
+|-
+! 25–29 May 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_300511.pdf |title=Essential Report |publisher=Essential Research |date=30 May 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 34%
+| 12%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 27–29 May 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 34%
+| 14%
+| 8%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 21–22/28–29 May 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|45.5%
+| 36%
+| 12%
+| 6.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 18–22 May 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_230511.pdf |title=Essential Report |publisher=Essential Research |date=23 May 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 34%
+| 12%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 14–15 May 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|44.5%
+| 36%
+| 13%
+| 6.5%
+| style="background:#f66;" | 48.5%
+| style="background:#00bfff;" | '''51.5%'''
+|-
+! 13–15 May 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|46%
+| 33%
+| 10%
+| 11%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 11–15 May 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_160511.pdf |title=Essential Report |publisher=Essential Research |date=16 May 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 36%
+| 11%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 12–14 May 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|47%
+| 31%
+| 10%
+| 13%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 7–8 May 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|48%
+| 34%
+| 11%
+| 7%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 4–8 May 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_090511.pdf |title=Essential Report |publisher=Essential Research |date=9 May 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 3–4 May 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|46%
+| 34%
+| 11%
+| 9%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 29 Apr–1 May 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 33%
+| 12%
+| 11%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 28 Apr–1 May 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_020511.pdf |title=Essential Report |publisher=Essential Research |date=2 May 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 9%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 23–24/30 Apr–1 May 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46%
+| 37%
+| 10.5%
+| 6.5%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 20–26 Apr 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_270411.pdf |title=Essential Report |publisher=Essential Research |date=27 April 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 13–17 Apr 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_180411.pdf |title=Essential Report |publisher=Essential Research |date=18 April 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 11%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 9–10/16–17 Apr 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46%
+| 35%
+| 11.5%
+| 7.5%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 14–16 Apr 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|47%
+| 31%
+| 12%
+| 11%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 6–10 Apr 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_110411.pdf |title=Essential Report |publisher=Essential Research |date=11 April 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 35%
+| 11%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 2–3 Apr 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|48%
+| 36.5%
+| 9.5%
+| 6%
+| style="background:#f66;" | 46.5%
+| style="background:#00bfff;" | '''53.5%'''
+|-
+! 1–3 Apr 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 32%
+| 12%
+| 12%
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | '''55%'''
+|-
+! 30 Mar–3 Apr 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_040411.pdf |title=Essential Report |publisher=Essential Research |date=4 April 2011 |access-date=15 April 2013 |archive-date=5 April 2011 |archive-url=https://web.archive.org/web/20110405143056/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_040411.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 36%
+| 10%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 26–27 Mar 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|47%
+| 35.5%
+| 11.5%
+| 6%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 23–27 Mar 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_280311.pdf |title=Essential Report |publisher=Essential Research |date=28 March 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 37%
+| 10%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 22–24 Mar 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|47%
+| 34.5%
+| 10%
+| 8.5%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 19–20 Mar 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|40%
+| 39.5%
+| 12.5%
+| 8%
+| style="background:#f66;" | '''52.5%'''
+| style="background:#00bfff;" | 47.5%
+|-
+! 18–20 Mar 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|40%
+| 36%
+| 12%
+| 12%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 16–20 Mar 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_210311.pdf |title=Essential Report |publisher=Essential Research |date=21 March 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 36%
+| 10%
+| 8%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 16–17 Mar 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|42.5%
+| 35.5%
+| 12%
+| 10%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 12–13 Mar 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|44.5%
+| 38%
+| 11.5%
+| 6%
+| style="background:#f66;" | 49.5%
+| style="background:#00bfff;" | '''50.5%'''
+|-
+! 9–13 Mar 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_140311.pdf |title=Essential Report |publisher=Essential Research |date=14 March 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|47%
+| 35%
+| 10%
+| 8%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 10–12 Mar 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|45%
+| 33%
+| 12%
+| 10%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 8–10 Mar 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|47.5%
+| 31.5%
+| 10%
+| 11%
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | '''56%'''
+|-
+! 5–6 Mar 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|46.5%
+| 37%
+| 9.5%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 4–6 Mar 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|45%
+| 30%
+| 15%
+| 10%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 2–6 Mar 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_070311.pdf |title=Essential Report |publisher=Essential Research |date=7 March 2011 |access-date=15 April 2013 |archive-date=29 April 2013 |archive-url=https://web.archive.org/web/20130429132926/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_070311.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|47%
+| 36%
+| 10%
+| 7%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 26–27 Feb 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41%
+| 41%
+| 11.5%
+| 6.5%
+| style="background:#f66;" | '''53.5%'''
+| style="background:#00bfff;" | 46.5%
+|-
+! 22–27 Feb 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_280211.pdf |title=Essential Report |publisher=Essential Research |date=28 February 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|45%
+| 37%
+| 10%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 21–23 Feb 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|45.5%
+| 36%
+| 9.5%
+| 9%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | '''53%'''
+|-
+! 18–20 Feb 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|41%
+| 36%
+| 13%
+| 10%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 15–20 Feb 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_210211.pdf |title=Essential Report |publisher=Essential Research |date=21 February 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|43%
+| 39%
+| 11%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 12–13/19–20 Feb 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 39.5%
+| 11.5%
+| 6%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 8–13 Feb 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_140211.pdf |title=Essential Report |publisher=Essential Research |date=14 February 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|44%
+| 40%
+| 10%
+| 6%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 10–12 Feb 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#B6CDFB"|46%
+| 32%
+| 12%
+| 9%
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | '''54%'''
+|-
+! 4–6 Feb 2011
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|44%
+| 32%
+| 14%
+| 10%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 1–6 Feb 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_070211.pdf |title=Essential Report |publisher=Essential Research |date=7 February 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 38%
+| 10%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 29–30 Jan/5–6 Feb 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 39%
+| 12.5%
+| 5.5%
+| style="background:#f66;" | '''51.5%'''
+| style="background:#00bfff;" | 48.5%
+|-
+! 1–3 Feb 2011
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|42.5%
+| 35%
+| 12%
+| 10.5%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 25–30 Jan 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_310111.pdf |title=Essential Report |publisher=Essential Research |date=31 January 2011 |access-date=15 April 2013 |archive-date=30 April 2012 |archive-url=https://web.archive.org/web/20120430045353/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_310111.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|45%
+| 37%
+| 11%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 18–23 Jan 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_240111.pdf |title=Essential Report |publisher=Essential Research |date=24 January 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|45%
+| 37%
+| 11%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 15–16/22–23 Jan 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41.5%
+| 40.5%
+| 11.5%
+| 6.5%
+| style="background:#f66;" | '''52.5%'''
+| style="background:#00bfff;" | 47.5%
+|-
+! 11–16 Jan 2011
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_170111.pdf |title=Essential Report |publisher=Essential Research |date=17 January 2011 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 38%
+| 10%
+| 6%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 8–9 Jan 2011
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|44%
+| 38.5%
+| 13%
+| 4.5%
+| style="background:#f66;" | '''50.5%'''
+| style="background:#00bfff;" | 49.5%
+|-
+! 14–19 Dec 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_201210.pdf |title=Essential Report |publisher=Essential Research |date=20 December 2010 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 38%
+| 10%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 11–12 Dec 2010
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|43%
+| 38%
+| 13.5%
+| 5.5%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 8–12 Dec 2010
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|46%
+| 31%
+| 13.5%
+| 9.5%
+| style="background:#f66;" | 45.5%
+| style="background:#00bfff;" | '''54.5%'''
+|-
+! 7–12 Dec 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_131210.pdf |title=Essential Report |publisher=Essential Research |date=13 December 2010 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|46%
+| 38%
+| 10%
+| 7%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 4–5 Dec 2010
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|40.5%
+| 40.5%
+| 13.5%
+| 5.5%
+| style="background:#f66;" | '''53%'''
+| style="background:#00bfff;" | 47%
+|-
+! 3–5 Dec 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|41%
+| 34%
+| 14%
+| 11%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 30 Nov–5 Dec 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_061210.pdf |title=Essential Report |publisher=Essential Research |date=6 December 2010 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|45%
+| 38%
+| 11%
+| 6%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 23–28 Nov 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_291110.pdf |title=Essential Report |publisher=Essential Research |date=29 November 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424040129/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_291110.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 38%
+| 11%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 20–21/27–28 Nov 2010
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|42%
+| 40.5%
+| 12%
+| 5.5%
+| style="background:#f66;" | '''52.5%'''
+| style="background:#00bfff;" | 47.5%
+|-
+! 19–21 Nov 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|39%
+| 36%
+| 14%
+| 11%
+| style="background:#f66;" | '''52%'''
+| style="background:#00bfff;" | 48%
+|-
+! 16–21 Nov 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_221110.pdf |title=Essential Report |publisher=Essential Research |date=22 November 2010 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|45%
+| 38%
+| 10%
+| 8%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 18–20 Nov 2010
+| style="text-align:left;" | Nielsen<ref name=NlsnOct10Mar11>{{cite web |url=http://twitpic.com/493v83 |title=Estimates of Federal Voting Intention and Leadership Approval |date=14 March 2011 |author=Nielsen |publisher=Twitpic.com |work=GhostWhoVotes |format=PNG}}</ref>
+| style="background:#B6CDFB"|43%
+| 35%
+| 13%
+| 8%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 9–14 Nov 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_151110.pdf |title=Essential Report |publisher=Essential Research |date=15 November 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424044857/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_151110.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|45%
+| 39%
+| 10%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 6–7/13–14 Nov 2010
+| style="text-align:left;" | Morgan (face)
+| 40%
+| 41%
+| 12%
+| 7%
+| style="background:#f66;" | '''54%'''
+| style="background:#00bfff;" | 46%
+|-
+! 5–7 Nov 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43%
+| 34%
+| 13%
+| 10%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 2–7 Nov 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_081110.pdf |title=Essential Report |publisher=Essential Research |date=8 November 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424052250/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_081110.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|46%
+| 39%
+| 8%
+| 7%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 26–31 Oct 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_011110.pdf |title=Essential Report |publisher=Essential Research |date=1 November 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424042540/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_011110.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 41%
+| 8%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 23–24/30–31 Oct 2010
+| style="text-align:left;" | Morgan (face)
+| 40.5%
+| 43%
+| 10.5%
+| 6%
+| style="background:#f66;" | '''54%'''
+| style="background:#00bfff;" | 46%
+|-
+! 22–24 Oct 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43%
+| 33%
+| 14%
+| 10%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | '''52%'''
+|-
+! 19–24 Oct 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_251010.pdf |title=Essential Report |publisher=Essential Research |date=25 October 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424034850/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_251010.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 41%
+| 8%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 21–23 Oct 2010
+| style="text-align:left;" | Nielsen<ref name=NlsnOct10Mar11/>
+| style="background:#B6CDFB"|43%
+| 34%
+| 14%
+| 8%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | '''51%'''
+|-
+! 12–17 Oct 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_181010.pdf |title=Essential Report |publisher=Essential Research |date=18 October 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424041320/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_181010.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 40%
+| 9%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 9–10/16–17 Oct 2010
+| style="text-align:left;" | Morgan (face)
+| 40.5%
+| 43%
+| 10.5%
+| 6%
+| style="background:#f66;" | '''54%'''
+| style="background:#00bfff;" | 46%
+|-
+! 8–10 Oct 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|42%
+| 35%
+| 14%
+| 9%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 5–10 Oct 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_111010.pdf |title=Essential Report |publisher=Essential Research |date=11 October 2010 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|44%
+| 41%
+| 8%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 2–3 Oct 2010
+| style="text-align:left;" | Morgan (face)
+| 38.5%
+| 44%
+| 12%
+| 5.5%
+| style="background:#f66;" | '''55.5%'''
+| style="background:#00bfff;" | 44.5%
+|-
+! 30 Sep–1 Oct 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_041010.pdf |title=Essential Report |publisher=Essential Research |date=4 October 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424043721/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_041010.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 42%
+| 8%
+| 8%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 21–26 Sep 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_270910.pdf |title=Essential Report |publisher=Essential Research |date=27 September 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424040112/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_270910.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43%
+| 42%
+| 9%
+| 6%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 18–19 Sep 2010
+| style="text-align:left;" | Morgan (face)
+| style="background:#B6CDFB"|41%
+| 40.5%
+| 13%
+| 5.5%
+| style="background:#f66;" | '''53.5%'''
+| style="background:#00bfff;" | 46.5%
+|-
+! 14–19 Sep 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_200910.pdf |title=Essential Report |publisher=Essential Research |date=20 September 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424042502/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_200910.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|45%
+| 40%
+| 9%
+| 6%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 15–16 Sep 2010
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|42.5%
+| 35.5%
+| 15%
+| 7%
+| style="background:#f66;" | '''50.5%'''
+| style="background:#00bfff;" | 49.5%
+|-
+! 10–12 Sep 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|41%
+| 34%
+| 14%
+| 11%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 7–12 Sep 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_130910.pdf |title=Essential Report |publisher=Essential Research |date=13 September 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424040116/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_130910.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 39%
+| 10%
+| 6%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 31 Aug–5 Sep 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_060910.pdf |title=Essential Report |publisher=Essential Research |date=6 September 2010 }}{{Dead link|date=March 2026 |bot=InternetArchiveBot }}</ref>
+| style="background:#B6CDFB"|43%
+| 39%
+| 11%
+| 8%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! 28–29 Aug/4–5 Sep 2010
+| style="text-align:left;" | Morgan (face)
+| 39.5%
+| 40.5%
+| 15%
+| 5%
+| style="background:#f66;" | '''54.5%'''
+| style="background:#00bfff;" | 45.5%
+|-
+! 24–29 Aug 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_310810.pdf |title=Essential Report |publisher=Essential Research |date=31 August 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424034949/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_310810.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|44%
+| 38%
+| 11%
+| 7%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 50%
+|-
+! 25–26 Aug 2010
+| style="text-align:left;" | Morgan (phone)
+| style="background:#B6CDFB"|40%
+| 36%
+| 13%
+| 11%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+! style="background:#b0e9db;" | '''[[2010 Australian federal election|2010 election]]'''
+| style="background:#b0e9db;" | 
+| style="background:#b0e9db;" | 43.3%
+| style="background:#b0e9db;" | 38.0%
+| style="background:#b0e9db;" | 11.8%
+| style="background:#b0e9db;" | 7.0%
+| style="background:#f66;" | '''50.1%'''
+| style="background:#00bfff;" | 49.9%
+|-
+! c. 21 Aug 2010
+| style="text-align:left;" | Nielsen<ref name=Nlsnpre2010>{{cite web |url=http://blogs.crikey.com.au/pollbludger/2010/08/21/newspoll-nielsen-westpoll/ |title=Newspoll, Nielsen, Westpoll |date=21 August 2010 |work=Poll Bludger |publisher=Crikey}}</ref>
+| style="background:#B6CDFB"|41.5%
+| 39%
+| 12%
+| 7.5%
+| style="background:#f66;" | '''52%'''
+| style="background:#00bfff;" | 48%
+|-
+! 17–19 Aug 2010
+| style="text-align:left;" | Newspoll
+| style="background:#B6CDFB"|43.4%
+| 36.2%
+| 13.9%
+| 6.5%
+| style="background:#f66;" | '''50.2%'''
+| style="background:#00bfff;" | 49.8%
+|-
+! 13–19 Aug 2010
+| style="text-align:left;" | Essential<ref group=e>{{cite web |url=http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_200810.pdf |title=Essential Report |publisher=Essential Research |date=20 August 2010 |access-date=15 April 2013 |archive-date=24 April 2012 |archive-url=https://web.archive.org/web/20120424044849/http://www.essentialmedia.com.au/wp-content/themes/rockwell/documents/essential_report_200810.pdf |url-status=dead }}</ref>
+| style="background:#B6CDFB"|43%
+| 38%
+| 12%
+| 7%
+| style="background:#f66;" | '''51%'''
+| style="background:#00bfff;" | 49%
+|-
+| colspan=9 style="font-size:80%; background:#cef; text-align:center;" | *[[Liberal Party of Australia|Liberal]]–[[National Party of Australia|National]] [[Coalition (Australia)|Coalition]]
+|}
+{{Clear}}
+
+==Better Prime Minister and approval==
+Since the 2010 election, Newspoll and Nielsen have regularly polled voters as to whom they believe would be the best prime minister and on their satisfaction with the performance of the prime minister, [[Kevin Rudd]] (and previously [[Julia Gillard]]), and of the leader of the opposition, [[Tony Abbott]].
+
+Sources for Nielsen are provided for each poll; Newspoll maintains a database of its polling.<ref name=Newspoll/>
+{| class="wikitable" style="float:left;"
+|-
+| [[File:Combined BPM polling Aus fed 2013.png|450px]]
+| [[File:Combined net satisfaction polling Aus fed 2013.png|450px]]
+|}
+{| class="toccolours" cellpadding="5" cellspacing="0" style="text-align:center; margin-right:.5em; margin-top:.4em; font-size:90%;"
+|-
+|+ '''Better Prime Minister and satisfaction polling^'''
+|-
+! Date
+! Firm
+! colspan=2 | Better PM
+!
+! colspan=2 | Rudd
+! colspan=2 | Abbott
+|-
+!
+!
+! Rudd
+! Abbott
+!
+! Satisfied
+! Dissatisfied
+! Satisfied
+! Dissatisfied
+|-
+!
+|-
+! 4–5 Sep 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 45%
+|
+| style="background:#f66;" | 33%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 44%
+| style="background:#00bfff;" | 50%
+|-
+! 4–5 Aug 2013
+| style="text-align:left;" | Nielsen<ref name=Nlsn6Sep13/>
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 46%
+|
+| style="background:#f66;" | 43%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 46%
+| style="background:#00bfff;" | 51%
+|-
+! 5 Sep 2013
+| style="text-align:left;" | ReachTEL<ref name=5Sep13 />
+| style="background:#f66;" | 47.1%
+| style="background:#00bfff;" | 52.9%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 4 Sep 2013
+| style="text-align:left;" | ReachTEL<ref name=4Sep13 />
+| style="background:#f66;" | 45.9%
+| style="background:#00bfff;" | 54.1%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 3 Sep 2013
+| style="text-align:left;" | ReachTEL<ref name=3Sep13 />
+| style="background:#f66;" | 47.1%
+| style="background:#00bfff;" | 52.9%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 30 Aug–1 Sep 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | 43%
+|
+| style="background:#f66;" | 32%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 51%
+|-
+! 26 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=26Aug13 />
+| style="background:#f66;" | 46.4%
+| style="background:#00bfff;" | 53.6%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 23–25 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 49%
+|-
+! 18–22 Aug 2013
+| style="text-align:left;" | Nielsen<ref name=Nlsn23Aug13/>
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | 45%
+|
+| style="background:#f66;" | 43%
+| style="background:#f66;" | 51%
+| style="background:#00bfff;" | 44%
+| style="background:#00bfff;" | 52%
+|-
+! 16–18 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 41%
+|
+| style="background:#f66;" | 35%
+| style="background:#f66;" | 54%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 51%
+|-
+! 9–11 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 39%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | 38%
+| style="background:#00bfff;" | 52%
+|-
+! 10 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=10Aug13 />
+| style="background:#f66;" | 46.8%
+| style="background:#00bfff;" | 53.2%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 6–8 Aug 2013
+| style="text-align:left;" | Nielsen<ref name=Nlsn8Aug13/>
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 42%
+|
+| style="background:#f66;" | 48%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 45%
+| style="background:#00bfff;" | 52%
+|-
+! 2–4 Aug 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 33%
+|
+| style="background:#f66;" | 38%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 56%
+|-
+! 4 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#f66;" | 49.1%
+| style="background:#00bfff;" | 50.9%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 19–21 Jul 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 34%
+|
+| style="background:#f66;" | 42%
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | 35%
+| style="background:#00bfff;" | 56%
+|-
+! 18 Jul 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#f66;" | 52.4%
+| style="background:#00bfff;" | 47.6%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 11–13 Jul 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnJul13/>
+| style="background:#f66;" | 55%
+| style="background:#00bfff;" | 41%
+|
+| style="background:#f66;" | 51%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 35%
+| style="background:#00bfff;" | 56%
+|-
+! 5–7 Jul 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 53%
+| style="background:#00bfff;" | 31%
+|
+| style="background:#f66;" | 43%
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 56%
+|-
+! 28–30 Jun 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | 35%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 35%
+| style="background:#00bfff;" | 56%
+|-
+! 27 Jun 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#f66;" | 51.6%
+| style="background:#00bfff;" | 48.4%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+!
+!
+! Gillard
+! Abbott
+!
+! colspan=2 | Gillard
+! colspan=2 | Abbott
+|-
+! 21–23 Jun 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 33%
+| style="background:#00bfff;" | 45%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 53%
+|-
+! 13–15 Jun 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnJun13/>
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | 50%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 61%
+| style="background:#00bfff;" | 44%
+| style="background:#00bfff;" | 53%
+|-
+! 31 May–2 Jun 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 35%
+| style="background:#00bfff;" | 43%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 37%
+| style="background:#00bfff;" | 53%
+|-
+! 17–19 May 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 31%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 37%
+| style="background:#00bfff;" | 54%
+|-
+! 16–18 May 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnMay13/>
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 46%
+|
+| style="background:#f66;" | 40%
+| style="background:#f66;" | 56%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 54%
+|-
+! 3–5 May 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 37%
+| style="background:#00bfff;" | 42%
+|
+| style="background:#f66;" | 29%
+| style="background:#f66;" | 61%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 51%
+|-
+! 3 May 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#f66;" | 40.6%
+| style="background:#00bfff;" | 59.4%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 19–21 Apr 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 35%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 53%
+|-
+! 11–14 Apr 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnApr13/>
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 50%
+|
+| style="background:#f66;" | 37%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 43%
+| style="background:#00bfff;" | 53%
+|-
+! 4 Aug 2013
+| style="text-align:left;" | ReachTEL<ref name=4Aug13 />
+| style="background:#f66;" | 43.6%
+| style="background:#00bfff;" | 56.5%
+| 
+| colspan=4 | ''<small>not asked</small>''
+|-
+! 4–7 Apr 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 37%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 35%
+| style="background:#00bfff;" | 54%
+|-
+! 22–24 Mar 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 35%
+| style="background:#00bfff;" | 43%
+|
+| style="background:#f66;" | 26%
+| style="background:#f66;" | 65%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 50%
+|-
+! 14–16 Mar 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 49%
+|
+| style="background:#f66;" | 38%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 43%
+| style="background:#00bfff;" | 53%
+|-
+! 8–10 Mar 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 32%
+| style="background:#f66;" | 57%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 55%
+|-
+! 22–24 Feb 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 33%
+| style="background:#00bfff;" | 55%
+|-
+! 14–16 Feb 2013
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 49%
+|
+| style="background:#f66;" | 40%
+| style="background:#f66;" | 56%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 55%
+|-
+! 1–3 Feb 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | 39%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 33%
+| style="background:#00bfff;" | 56%
+|-
+! 11–13 Jan 2013
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 33%
+|
+| style="background:#f66;" | 38%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | 29%
+| style="background:#00bfff;" | 58%
+|-
+! 13–15 Dec 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 46%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 63%
+|-
+! 7–9 Dec 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 34%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 28%
+| style="background:#00bfff;" | 59%
+|-
+! 23–25 Nov 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 33%
+|
+| style="background:#f66;" | 37%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 30%
+| style="background:#00bfff;" | 61%
+|-
+! 15–17 Nov 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnNov12Mar13/>
+| style="background:#f66;" | 51%
+| style="background:#00bfff;" | 42%
+|
+| style="background:#f66;" | 47%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 60%
+|-
+! 9–11 Nov 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 32%
+|
+| style="background:#f66;" | 37%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 27%
+| style="background:#00bfff;" | 63%
+|-
+! 26–28 Oct 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 34%
+|
+| style="background:#f66;" | 35%
+| style="background:#f66;" | 51%
+| style="background:#00bfff;" | 30%
+| style="background:#00bfff;" | 58%
+|-
+! 18–20 Oct 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 47%
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | 37%
+| style="background:#00bfff;" | 60%
+|-
+! 5–7 Oct 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 33%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 33%
+| style="background:#00bfff;" | 55%
+|-
+! 14–16 Sep 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 32%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 30%
+| style="background:#00bfff;" | 60%
+|-
+! 13–15 Sep 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 44%
+|
+| style="background:#f66;" | 42%
+| style="background:#f66;" | 53%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 59%
+|-
+! 2–4 Sep 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 31%
+| style="background:#f66;" | 57%
+| style="background:#00bfff;" | 31%
+| style="background:#00bfff;" | 59%
+|-
+! 23–25 Aug 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 45%
+|
+| style="background:#f66;" | 39%
+| style="background:#f66;" | 57%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 57%
+|-
+! 17–19 Aug 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 38%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 27%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 54%
+|-
+! 3–5 Aug 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 29%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 32%
+| style="background:#00bfff;" | 56%
+|-
+! 26–28 Jul 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnJulOct12/>
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 48%
+|
+| style="background:#f66;" | 37%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 56%
+|-
+! 20–22 Jul 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 29%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 30%
+| style="background:#00bfff;" | 61%
+|-
+! 6–8 Jul 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 39%
+|
+| style="background:#f66;" | 27%
+| style="background:#f66;" | 61%
+| style="background:#00bfff;" | 32%
+| style="background:#00bfff;" | 57%
+|-
+! 22–24 Jun 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 31%
+| style="background:#00bfff;" | 58%
+|-
+! 7–10 Jun 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 32%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 32%
+| style="background:#00bfff;" | 59%
+|-
+! 31 May–2 Jun 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | 46%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 57%
+|-
+! 25–27 May 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 31%
+| style="background:#00bfff;" | 60%
+|-
+! 11–13 May 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 27%
+| style="background:#f66;" | 63%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 56%
+|-
+! 9–10 May 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 50%
+|
+| style="background:#f66;" | 35%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 44%
+| style="background:#00bfff;" | 52%
+|-
+! 27–29 Apr 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 41%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 63%
+| style="background:#00bfff;" | 33%
+| style="background:#00bfff;" | 55%
+|-
+! 13–15 Apr 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 41%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 35%
+| style="background:#00bfff;" | 54%
+|-
+! 29–31 Mar 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 48%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 56%
+|-
+! 23–25 Mar 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 31%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 32%
+| style="background:#00bfff;" | 58%
+|-
+! 9–11 Mar 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 32%
+| style="background:#00bfff;" | 58%
+|-
+! 24–26 Feb 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 26%
+| style="background:#f66;" | 64%
+| style="background:#00bfff;" | 31%
+| style="background:#00bfff;" | 57%
+|-
+! 22–23 Feb 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnFebJun12/>
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 47%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 56%
+|-
+! 10–12 Feb 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 37%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 32%
+| style="background:#f66;" | 57%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 52%
+|-
+! 2–4 Feb 2012
+| style="text-align:left;" | Nielsen<ref name=NlsnDec11Feb12/>
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | 46%
+|
+| style="background:#f66;" | 40%
+| style="background:#f66;" | 55%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 54%
+|-
+! 27–29 Jan 2012
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 33%
+| style="background:#f66;" | 55%
+| style="background:#00bfff;" | 32%
+| style="background:#00bfff;" | 55%
+|-
+! 8–10 Dec 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnDec11Feb12/>
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 46%
+|
+| style="background:#f66;" | 35%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 53%
+|-
+! 2–4 Dec 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 36%
+|
+| style="background:#f66;" | 36%
+| style="background:#f66;" | 56%
+| style="background:#00bfff;" | 33%
+| style="background:#00bfff;" | 57%
+|-
+! 18–20 Nov 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 35%
+|
+| style="background:#f66;" | 34%
+| style="background:#f66;" | 55%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 55%
+|-
+! 10–12 Nov 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 45%
+|
+| style="background:#f66;" | 39%
+| style="background:#f66;" | 57%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 54%
+|-
+! 4–6 Nov 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 57%
+|-
+! 21–23 Oct 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 39%
+|
+| style="background:#f66;" | 31%
+| style="background:#f66;" | 61%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 55%
+|-
+! 13–15 Oct 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | 48%
+|
+| style="background:#f66;" | 33%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 54%
+|-
+! 7–9 Oct 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 35%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 60%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 53%
+|-
+! 16–18 Sep 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 35%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 27%
+| style="background:#f66;" | 61%
+| style="background:#00bfff;" | 34%
+| style="background:#00bfff;" | 54%
+|-
+! 8–10 Sep 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 48%
+|
+| style="background:#f66;" | 32%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 43%
+| style="background:#00bfff;" | 52%
+|-
+! 2–4 Sep 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 34%
+| style="background:#00bfff;" | 43%
+|
+| style="background:#f66;" | 23%
+| style="background:#f66;" | 68%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 52%
+|-
+! 19–21 Aug 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 38%
+| style="background:#00bfff;" | 39%
+|
+| style="background:#f66;" | 29%
+| style="background:#f66;" | 61%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 55%
+|-
+! 11–13 Aug 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | 47%
+|
+| style="background:#f66;" | 38%
+| style="background:#f66;" | 57%
+| style="background:#00bfff;" | 43%
+| style="background:#00bfff;" | 52%
+|-
+! 5–7 Aug 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 33%
+| style="background:#f66;" | 58%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 52%
+|-
+! 22–24 Jul 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 41%
+|
+| style="background:#f66;" | 32%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 52%
+|-
+! 14–16 Jul 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 40%
+| style="background:#00bfff;" | 51%
+|
+| style="background:#f66;" | 34%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 47%
+| style="background:#00bfff;" | 48%
+|-
+! 8–10 Jul 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 38%
+| style="background:#00bfff;" | 43%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 49%
+|-
+! 24–26 Jun 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 28%
+| style="background:#f66;" | 62%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 52%
+|-
+! 14–16 Jun 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 46%
+|
+| style="background:#f66;" | 37%
+| style="background:#f66;" | 59%
+| style="background:#00bfff;" | 46%
+| style="background:#00bfff;" | 50%
+|-
+! 10–12 Jun 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 30%
+| style="background:#f66;" | 55%
+| style="background:#00bfff;" | 35%
+| style="background:#00bfff;" | 52%
+|-
+! 27–29 May 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 44%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 35%
+| style="background:#f66;" | 54%
+| style="background:#00bfff;" | 37%
+| style="background:#00bfff;" | 53%
+|-
+! 13–15 May 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 38%
+|
+| style="background:#f66;" | 34%
+| style="background:#f66;" | 55%
+| style="background:#00bfff;" | 38%
+| style="background:#00bfff;" | 51%
+|-
+! 12–14 May 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 44%
+|
+| style="background:#f66;" | 43%
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 45%
+| style="background:#00bfff;" | 50%
+|-
+! 29 Apr–1 May 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 36%
+|
+| style="background:#f66;" | 38%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 48%
+|-
+! 14–16 Apr 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 42%
+|
+| style="background:#f66;" | 45%
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 51%
+|-
+! 1–3 Apr 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 46%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 39%
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | 36%
+| style="background:#00bfff;" | 53%
+|-
+! 18–20 Mar 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 31%
+|
+| style="background:#f66;" | 40%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 33%
+| style="background:#00bfff;" | 54%
+|-
+! 10–12 Mar 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 51%
+| style="background:#00bfff;" | 42%
+|
+| style="background:#f66;" | 47%
+| style="background:#f66;" | 47%
+| style="background:#00bfff;" | 43%
+| style="background:#00bfff;" | 52%
+|-
+! 4–6 Mar 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 45%
+| style="background:#00bfff;" | 36%
+|
+| style="background:#f66;" | 39%
+| style="background:#f66;" | 51%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 51%
+|-
+! 18–20 Feb 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 53%
+| style="background:#00bfff;" | 31%
+|
+| style="background:#f66;" | 50%
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 38%
+| style="background:#00bfff;" | 49%
+|-
+! 10–12 Feb 2011
+| style="text-align:left;" | Nielsen<ref name=NlsnFebNov11/>
+| style="background:#f66;" | 51%
+| style="background:#00bfff;" | 41%
+|
+| style="background:#f66;" | 52%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 46%
+| style="background:#00bfff;" | 49%
+|-
+! 4–6 Feb 2011
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 48%
+| style="background:#00bfff;" | 35%
+|
+| style="background:#f66;" | 45%
+| style="background:#f66;" | 42%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 44%
+|-
+! 3–5 Dec 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 32%
+|
+| style="background:#f66;" | 45%
+| style="background:#f66;" | 38%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 43%
+|-
+! 19–21 Nov 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 54%
+| style="background:#00bfff;" | 31%
+|
+| style="background:#f66;" | 46%
+| style="background:#f66;" | 37%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 45%
+|-
+! 18–20 Nov 2010
+| style="text-align:left;" | Nielsen<ref name=NlsnOct10Mar11/>
+| style="background:#f66;" | 53%
+| style="background:#00bfff;" | 40%
+|
+| style="background:#f66;" | 54%
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 47%
+| style="background:#00bfff;" | 48%
+|-
+! 5–7 Nov 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 49%
+| style="background:#00bfff;" | 34%
+|
+| style="background:#f66;" | 41%
+| style="background:#f66;" | 41%
+| style="background:#00bfff;" | 44%
+| style="background:#00bfff;" | 42%
+|-
+! 22–24 Oct 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 53%
+| style="background:#00bfff;" | 32%
+|
+| style="background:#f66;" | 44%
+| style="background:#f66;" | 37%
+| style="background:#00bfff;" | 41%
+| style="background:#00bfff;" | 46%
+|-
+! 21–23 Oct 2010
+| style="text-align:left;" | Nielsen<ref name=NlsnOct10Mar11/>
+| style="background:#f66;" | 53%
+| style="background:#00bfff;" | 39%
+|
+| style="background:#f66;" | 54%
+| style="background:#f66;" | 39%
+| style="background:#00bfff;" | 45%
+| style="background:#00bfff;" | 50%
+|-
+! 8–10 Oct 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 52%
+| style="background:#00bfff;" | 31%
+|
+| style="background:#f66;" | 48%
+| style="background:#f66;" | 33%
+| style="background:#00bfff;" | 39%
+| style="background:#00bfff;" | 47%
+|-
+! 10–12 Sep 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 34%
+|
+| style="background:#f66;" | 44%
+| style="background:#f66;" | 36%
+| style="background:#00bfff;" | 48%
+| style="background:#00bfff;" | 38%
+|-
+! style="background:#b0e9db;" | '''[[2010 Australian federal election|2010 election]]'''
+| style="background:#b0e9db;" | –
+| style="background:#b0e9db;" | –
+| style="background:#b0e9db;" | –
+|
+| style="background:#b0e9db;" | –
+| style="background:#b0e9db;" | –
+| style="background:#b0e9db;" | –
+| style="background:#b0e9db;" | –
+|-
+! 17–19 Aug 2010
+| style="text-align:left;" | Newspoll
+| style="background:#f66;" | 50%
+| style="background:#00bfff;" | 37%
+|
+| style="background:#f66;" | 44%
+| style="background:#f66;" | 43%
+| style="background:#00bfff;" | 42%
+| style="background:#00bfff;" | 50%
+|-
+| colspan=9 style="font-size:80%; background:#cef; text-align:center;" | ^ Remainder were uncommitted.
+|}
+{{Clear}}
+
+==References==
+{{reflist|30em}}
+
+;Essential Research polling
+{{reflist|group=e|30em}}
+
+{{2013 Australian federal election}}
+
+[[Category:2013 Australian federal election]]
+[[Category:Opinion polling in Australia|2013]]
+[[Category:Opinion polling for elections|Australia]]

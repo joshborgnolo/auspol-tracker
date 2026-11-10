@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://abix.com.au/xmlrpc.php">
+
+<title>Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal Election &#8211; ABIX</title>
+<script type="text/javascript">
+  WebFontConfig = {"google":{"families":["Fira+Sans:b:latin,latin-ext","Roboto:r,i,b,bi:latin,latin-ext"]},"api_url":"https:\/\/fonts-api.wp.com\/css"};
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = '/wp-content/plugins/custom-fonts/js/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+	})();
+</script><style id="jetpack-custom-fonts-css">.wf-active body, .wf-active button, .wf-active input, .wf-active select, .wf-active textarea{font-family:"Roboto",sans-serif}.wf-active h1{font-family:"Fira Sans",sans-serif;font-weight:700;font-style:normal}.wf-active h2{font-family:"Fira Sans",sans-serif;font-weight:700;font-style:normal}.wf-active h3{font-family:"Fira Sans",sans-serif;font-weight:700;font-style:normal}.wf-active h4{font-family:"Fira Sans",sans-serif;font-weight:700;font-style:normal}.wf-active h5{font-family:"Fira Sans",sans-serif;font-weight:700;font-style:normal}.wf-active h6{font-family:"Fira Sans",sans-serif;font-style:normal;font-weight:700}.wf-active .site-title{font-weight:700;font-style:normal}.wf-active .entry-title{font-style:normal;font-weight:700}.wf-active .comments-title, .wf-active .widget-title{font-style:normal;font-weight:700}.wf-active .comment-reply-title, .wf-active #respond h3.comment-reply-title{font-family:"Fira Sans",sans-serif;font-weight:700;font-style:normal}.wf-active .testimonials .entry-title{font-weight:700;font-style:normal}</style>
+<meta name='robots' content='max-image-preview:large' />
+<meta name="google-site-verification" content="GZoQ6cfR7xIT-tJxvvqiR-wIWk_rFW9k1LS1K1KUOhQ" />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=11689'
+					+ '&is_singular=1';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9hYml4LmNvbS5hdQ%3D%3D"
+		+ "&wpcomid=68346293"
+		+ "&time=" + Math.floor( Date.now() / 1000 );
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="ABIX &raquo; Feed" href="https://abix.com.au/feed/" />
+<link rel="alternate" type="application/rss+xml" title="ABIX &raquo; Comments Feed" href="https://abix.com.au/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="ABIX &raquo; Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal&nbsp;Election Comments Feed" href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<script type="application/ld+json">{"@context":"https:\/\/schema.org","@graph":[{"@type":"Person","@id":"https:\/\/abix.com.au\/author\/roymorgansocial\/#person","name":"roymorgansocial","image":"https:\/\/secure.gravatar.com\/avatar\/cc6aa2167c624d1a9f7745e25d7dae8af9bf8dd8619fe138d0d4837d5b3f6cee?s=512&d=identicon&r=g","url":"http:\/\/abix.com.au","givenName":"Roy Morgan","familyName":"Market Research Company","worksFor":{"@id":"https:\/\/abix.com.au\/#organization"}},{"@type":"Article","headline":"Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal&nbsp;Election","datePublished":"2019-05-16T21:52:40+00:00","dateModified":"2019-05-16T21:52:40+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/abix.com.au\/2019\/05\/17\/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election\/"},"description":"Original article by Roy Morgan Market Research Update - Page: Online : 17-May-19 A special Roy Morgan SMS Poll conducted over the last few days shows a large majority of 66% of Australian electors think the ALP will win this week's Federal Election compared to only 34% that think the L-NP Coalition will win. ALP","publisher":{"@id":"https:\/\/abix.com.au\/#organization"},"author":{"@id":"https:\/\/abix.com.au\/author\/roymorgansocial\/#person"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/abix.com.au\/"},{"@type":"ListItem","position":2,"name":"Summaries","item":"https:\/\/abix.com.au\/summaries\/"},{"@type":"ListItem","position":3,"name":"Two-thirds of Australians think the ALP is set to win tomorrow's Federal Election"}]}]}</script><style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='/_static/??-eJxtzEsKgDAMANELWaMiVBfiWUobpP9iUry+KIIgLh8MA0cROifGxBCrKKFuNhE45KK0fwxUE8RsakCCHYNiNKJk4o9aTdTA/zFYj+/31pWvcenlPMhRdpN0JymjNIE=&cssminify=yes' type='text/css' media='all' />
+<style id="wp-emoji-styles-inline-css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="wp-block-library-inline-css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#3858e9;--wp-admin-theme-color--rgb:56,88,233;--wp-admin-theme-color-darker-10:#2145e6;--wp-admin-theme-color-darker-10--rgb:33.0384615385,68.7307692308,230.4615384615;--wp-admin-theme-color-darker-20:#183ad6;--wp-admin-theme-color-darker-20--rgb:23.6923076923,58.1538461538,214.3076923077;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}body.admin-color-fresh{--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){body.admin-color-fresh{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}:root .has-text-align-center{text-align:center}:root .has-text-align-left{text-align:left}:root .has-text-align-right{text-align:right}:root .has-inline-color,:root .has-link-color a,:root .has-text-color{-webkit-text-fill-color:currentColor}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;overflow-wrap:normal!important;padding:0;position:absolute;width:1px;word-break:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style^=border-color],[style*=";border-color"],[style*="; border-color"]){border-style:solid}html :where([style^=border-top-color],[style*=";border-top-color"],[style*="; border-top-color"]){border-top-style:solid}html :where([style^=border-right-color],[style*=";border-right-color"],[style*="; border-right-color"]){border-right-style:solid}html :where([style^=border-bottom-color],[style*=";border-bottom-color"],[style*="; border-bottom-color"]){border-bottom-style:solid}html :where([style^=border-left-color],[style*=";border-left-color"],[style*="; border-left-color"]){border-left-style:solid}html :where([style^=border-width],[style*=";border-width"],[style*="; border-width"]){border-style:solid}html :where([style^=border-top-width],[style*=";border-top-width"],[style*="; border-top-width"]){border-top-style:solid}html :where([style^=border-right-width],[style*=";border-right-width"],[style*="; border-right-width"]){border-right-style:solid}html :where([style^=border-bottom-width],[style*=";border-bottom-width"],[style*="; border-bottom-width"]){border-bottom-style:solid}html :where([style^=border-left-width],[style*=";border-left-width"],[style*="; border-left-width"]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}@supports (not (-webkit-backdrop-filter:blur(1px))) and (not (-moz-appearance:none)){mtd[columnalign=right]{text-align:-webkit-right}mtd[columnalign=left]{text-align:-webkit-left}menclose[notation~=top]{border-top:.065em solid;padding-top:.1em}menclose[notation~=bottom]{border-bottom:.065em solid;padding-bottom:.1em}}
+
+/*# sourceURL=/wp-content/plugins/gutenberg-core/v24.3.1/build/styles/block-library/common.min.css */
+</style>
+<style id="wp-block-library-inline-css-extra">
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+/*# sourceURL=wp-block-library-inline-css */
+</style>
+
+<style id="classic-theme-styles-inline-css">
+.wp-block-button__link{background-color:#32373c;border-radius:9999px;box-shadow:none;color:#fff;font-size:1.125em;padding:calc(.667em + 2px) calc(1.333em + 2px);text-decoration:none}.wp-block-file__button{background:#32373c;color:#fff}.wp-block-accordion-heading{margin:0}.wp-block-accordion-heading__toggle{background-color:inherit!important;color:inherit!important}.wp-block-accordion-heading__toggle:not(:focus-visible){outline:none}.wp-block-accordion-heading__toggle:focus,.wp-block-accordion-heading__toggle:hover{background-color:inherit!important;border:none;box-shadow:none;color:inherit;padding:var(--wp--preset--spacing--20,1em) 0;text-decoration:none}.wp-block-accordion-heading__toggle:focus-visible{outline:auto;outline-offset:0}.wp-block-tab:not(.has-text-color){color:inherit!important}.wp-block-tab:not(.has-background){background-color:inherit!important}.wp-block-tab:focus,.wp-block-tab:hover{text-decoration:none}.wp-block-tab:focus-visible{outline:auto;outline-offset:0}
+/*# sourceURL=/wp-content/plugins/gutenberg-core/v24.3.1/build/styles/block-library/classic.min.css */
+</style>
+
+<style id="coblocks-inline-format-inline-css">
+.uppercase{text-transform:uppercase}
+/*# sourceURL=coblocks-inline-format-inline-css */
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-12-1' href='/_static/??-eJx9jcEKg0AMRH+oaVhorR7Eb9E16IpZg8min2889FZ6GYbhPQYPgbhlo2zIBWQtU8qKcdvJd5be0AmmMfW0Ejv2jKoP/K0daZzIXNdvB6PzvyJ+A8MgO6mCJ6fCYLN/6e113IZXU9WfUL/DcgHSTkDo&cssminify=yes' type='text/css' media='all' />
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--text-shadow--light: 0.05em 0.05em 0.1em rgba(0, 0, 0, 0.3);--wp--preset--text-shadow--strong: 0.1em 0.1em 0.25em rgba(0, 0, 0, 0.5);--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}.has-light-text-shadow{text-shadow: var(--wp--preset--text-shadow--light) !important;}.has-strong-text-shadow{text-shadow: var(--wp--preset--text-shadow--strong) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-14-1' href='/_static/??-eJyFj9EOwiAMRX9IrM6Y6YPxUwxjHTKBklFc/HuZOjOjmW+97T29LfRBKPKMnsElEWzSxkdokYNUF5FbfVDkXgOIyY+z0xV9TR3IxOQks1FvKgMuL4xQJWNrGOVSxbiA+cBJzsl4BRo9diYD8Xf5tZPP6DBCSBU4YtNA5JvF/7Yh7GF9Pjx3a4eVJZ1LDdk1kXOQRhKWlGRD/kOIxkrTDejRHdblvtiudsWmbO9O95rb&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-15-1' href='/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id="jetpack-global-styles-frontend-style-inline-css">
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+/*# sourceURL=jetpack-global-styles-frontend-style-inline-css */
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-18-1' href='/_static/??-eJyNjcsKAjEMRX/ImhmUURfip0inLW3GNCmmQfx7H7gRN+7ugcs5cGsuCPfEHaq5RpaRFZbUmw+XD4MaQ5VolBS0+GuKPsb7eyLndVBdwd+iM3KA2ZAiqAT05Eiy6Bf8KHtJ9RkvW8gks6fX4VSP426/mQ7TMA7LA38FSqA=&cssminify=yes' type='text/css' media='all' />
+<script id="jetpack_related-posts-js-extra">
+var related_posts_js_options = {"post_heading":"h4"};
+//# sourceURL=jetpack_related-posts-js-extra
+</script>
+<script id="wpcom-actionbar-placeholder-js-extra">
+var actionbardata = {"siteID":"68346293","postID":"11689","siteURL":"https://abix.com.au","xhrURL":"https://abix.com.au/wp-admin/admin-ajax.php","nonce":"18ac36356d","isLoggedIn":"","statusMessage":"","statusSubscribed":"","subsEmailDefault":"instantly","proxyScriptUrl":"https://s0.wp.com/wp-content/js/wpcom-proxy-request.js?m=1513050504i&amp;ver=20211021","shortlink":"https://wp.me/p4CLZz-32x","i18n":{"followedText":"New posts from this site will now appear in your \u003Ca href=\"https://wordpress.com/reader\"\u003EReader\u003C/a\u003E","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Copied to clipboard."}};
+//# sourceURL=wpcom-actionbar-placeholder-js-extra
+</script>
+<script id="jetpack-mu-wpcom-settings-js-before">
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/"};
+//# sourceURL=jetpack-mu-wpcom-settings-js-before
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/_static/??/wp-content/mu-plugins/jetpack-plugin/sun/_inc/build/related-posts/related-posts.min.js,/wp-content/js/rlt-proxy.js?m=1788794984j'></script>
+<script id="rlt-proxy-js-after">
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+//# sourceURL=rlt-proxy-js-after
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://abixnews.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+<link rel="canonical" href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/" />
+<link rel='shortlink' href='https://wp.me/p4CLZz-32x' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Fabix.com.au%2F2019%2F05%2F17%2Ftwo-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Fabix.com.au%2F2019%2F05%2F17%2Ftwo-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal Election" />
+<meta property="og:url" content="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/" />
+<meta property="og:description" content="Original article by Roy Morgan Market Research Update &#8211; Page: Online : 17-May-19 A special Roy Morgan SMS Poll conducted over the last few days shows a large majority of 66% of Australian ele…" />
+<meta property="article:published_time" content="2019-05-16T21:52:40+00:00" />
+<meta property="article:modified_time" content="2019-05-16T21:52:40+00:00" />
+<meta property="og:site_name" content="ABIX" />
+<meta property="og:image" content="https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=200&#038;ts=1794290943" />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<meta name="twitter:text:title" content="Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal&nbsp;Election" />
+<meta name="twitter:image" content="https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=240" />
+<meta name="twitter:card" content="summary" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=32" sizes="16x16" />
+<link rel="icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=32" sizes="16x16" />
+<link rel="apple-touch-icon" href="https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=114" />
+<link rel='openid.server' href='https://abix.com.au/?openidserver=1' />
+<link rel='openid.delegate' href='https://abix.com.au/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://abix.com.au/osd.xml" title="ABIX" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+<meta name="theme-color" content="#f3f3f3" />
+<meta name="description" content="Original article by Roy Morgan Market Research Update - Page: Online : 17-May-19 A special Roy Morgan SMS Poll conducted over the last few days shows a large majority of 66% of Australian electors think the ALP will win this week&#039;s Federal Election compared to only 34% that think the L-NP Coalition will win. ALP&hellip;" />
+	<style type="text/css" id="motif-header-css">
+					.site-title,
+			.site-description {
+				clip: rect(1px, 1px, 1px, 1px);
+				position: absolute;
+			}
+			</style>
+	<noscript><style>.jetpack-comments{visibility:visible!important}</style></noscript><style type="text/css" id="custom-colors-css">.site-title a, .site-description { color: #333333;}
+.main-navigation a, .menu-toggle { color: #FFFFFF;}
+.main-navigation a:hover, .main-navigation ul :hover > a,.main-navigation ul ul :hover > a, .main-navigation li.current_page_item a, .main-navigation li.current-menu-item a, .main-navigation li.current_page_ancestor a, .main-navigation li.current-menu-ancestor a { color: #FFFFFF;}
+.main-navigation ul ul li { border-top-color: #FFFFFF;}
+.main-navigation ul ul ul li { border-top-color: #FFFFFF;}
+.footer-widget-area { color: #9E9E9E;}
+.footer-widget-area .widget ul > li, .footer-widget-area .widget ol > li, .footer-widget-area .widget_calendar table, .footer-widget-area .widget_calendar td { border-color: #9E9E9E;}
+.footer-widget-area .search-field { background-color: #9E9E9E;}
+body { background-color: #f3f3f3;}
+.main-navigation, .footer-widget-area { background-color: #2e2e2e;}
+.main-navigation ul ul { background-color: #343434;}
+.main-navigation ul ul ul { background-color: #3A3A3A;}
+.entry-title, .entry-title a { color: #333333;}
+.entry-title a:hover { color: #333333;}
+.entry-meta, .entry-meta a, .featured-post { color: #6B6B6B;}
+.entry-meta a:hover { color: #8E8E8E;}
+button,html input[type="button"],input[type="reset"],input[type="submit"] { color: #ea2e25;}
+button:hover,html input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:hover { background-color: #ea2e25;}
+a { color: #DA1F15;}
+a:hover { color: #EA2E25;}
+.page-links a { color: #D01E14;}
+.page-links a:hover { background-color: #ea2e25;}
+.post-navigation a,.paging-navigation a { color: #D01E14;}
+.post-navigation a:hover,.paging-navigation a:hover { background-color: #D01E14;}
+.comment-navigation a { color: #ea2e25;}
+.comment-navigation a:hover { background-color: #ea2e25;}
+</style>
+			<link rel="stylesheet" id="custom-css-css" type="text/css" href="https://s0.wp.com/?custom-css=1&#038;csblog=4CLZz&#038;cscache=6&#038;csrev=81" />
+			</head>
+
+<body class="wp-singular post-template-default single single-post postid-11689 single-format-standard wp-theme-pubmotif customizer-styles-applied not-multi-author jetpack-reblog-enabled custom-colors">
+<div id="page" class="hfeed site">
+		<header id="masthead" class="site-header" role="banner">
+
+		<div class="site-branding">
+						<div class="site-image">
+				<a href="https://abix.com.au/" title="ABIX" rel="home" class="header-image-link">
+					<img src="https://abix.com.au/wp-content/uploads/2014/06/header-v2.png" width="1140" height="110" alt="" />
+				</a>
+			</div><!-- .header-image -->
+			
+			<a href="https://abix.com.au/" class="site-logo-link" rel="home" itemprop="url"></a>
+			<h1 class="site-title"><a href="https://abix.com.au/" title="ABIX" rel="home">ABIX</a></h1>
+
+							<h2 class="site-description">Australia&#039;s News Summarising Service</h2>
+					</div><!-- .site-branding -->
+
+		<nav id="site-navigation" class="main-navigation" role="navigation">
+			<h1 class="menu-toggle">Menu</h1>
+			<div class="screen-reader-text skip-link"><a href="#content" title="Skip to content">Skip to content</a></div>
+
+			<div class="menu-top-nav-container"><ul id="menu-top-nav" class="menu"><li id="menu-item-71" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-71"><a href="https://abix.com.au/">Home</a></li>
+<li id="menu-item-108" class="menu-item menu-item-type-post_type menu-item-object-page current_page_parent menu-item-108"><a href="https://abix.com.au/summaries/">Summaries</a></li>
+<li id="menu-item-68" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-68"><a href="https://abix.com.au/features-2/">Features</a></li>
+<li id="menu-item-69" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-69"><a href="https://abix.com.au/subscriptions/">Subscriptions</a></li>
+<li id="menu-item-67" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-67"><a href="https://abix.com.au/about/">About</a>
+<ul class="sub-menu">
+	<li id="menu-item-202" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-202"><a href="https://abix.com.au/about/terms-of-use/">Terms of Use</a></li>
+	<li id="menu-item-201" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-201"><a href="https://abix.com.au/about/privacy-policy/">Privacy Policy</a></li>
+</ul>
+</li>
+<li id="menu-item-70" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-70"><a href="https://abix.com.au/contact-us/">Contact Us</a></li>
+</ul></div>		</nav><!-- #site-navigation -->
+	</header><!-- #masthead -->
+
+	<div id="content" class="site-content">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main" role="main">
+
+		
+			
+<article id="post-11689" class="post-11689 post type-post status-publish format-standard hentry category-o75-public-administration tag-australia-politics-and-government tag-elections-australia tag-public-opinion-polls-australia">
+
+	<header class="entry-header">
+				<h1 class="entry-title">Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal&nbsp;Election</h1>
+		
+				<div class="entry-meta">
+			<span class="date"><a href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/" title="Permalink to Two-thirds of Australians think the ALP is set to win tomorrow&#8217;s Federal&nbsp;Election" rel="bookmark"><time class="entry-date published" datetime="2019-05-17T07:52:40+10:00">May 17, 2019</time></a></span><span class="author vcard"><a class="url fn n" href="https://abix.com.au/author/roymorgansocial/" title="View all posts by roymorgansocial">roymorgansocial</a></span>
+						<span class="comments-link"><a href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/#respond">Leave a comment</a></span>
+			
+			
+		</div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	
+		<div class="entry-content">
+		<p><em>Original article by Roy Morgan<br />
+</em>Market Research Update &#8211; Page: Online : 17-May-19</p>
+<p>A special Roy Morgan SMS Poll conducted over the last few days shows a large majority of 66% of Australian electors think the ALP will win this week&#8217;s Federal Election compared to only 34% that think the L-NP Coalition will win. ALP supporters are particularly confident with 81% saying they think the ALP will win, while a bare majority of 53% of L-NP supporters think the L-NP will win. Greens supporters are even more confident about an ALP victory with 84% expecting an ALP victory while 64.5% of supporters of Independents/Others expect an ALP win. Young Australians are more confident of an ALP victory than their older peers with 80% of 18-24 year olds expecting an ALP victory compared to 74.5% of 25-34 year olds, 65% of 35-49 year olds, 61.5% of 50-64 year olds and 59% of those aged 65+ years old. Click here for full details</p>
+<p><strong>CORPORATES<br />
+</strong>MORGAN POLL, ROY MORGAN LIMITED, AUSTRALIAN LABOR PARTY, LIBERAL PARTY OF AUSTRALIA, NATIONAL PARTY OF AUSTRALIA, AUSTRALIAN GREENS</p>
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-email"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-email-11689"
+				class="share-email sd-button share-icon"
+				href="mailto:?subject=%5BShared%20Post%5D%20Two-thirds%20of%20Australians%20think%20the%20ALP%20is%20set%20to%20win%20tomorrow%27s%20Federal%20Election&#038;body=https%3A%2F%2Fabix.com.au%2F2019%2F05%2F17%2Ftwo-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election%2F&#038;share=email"
+				target="_blank"
+				aria-labelledby="sharing-email-11689"
+				data-email-share-error-title="Do you have email set up?" data-email-share-error-text="If you&#039;re having problems sharing via email, you might not have email set up for your browser. You may need to create a new email yourself." data-email-share-nonce="074e747eb8" data-email-share-track-url="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/?share=email">
+				<span id="sharing-email-11689" hidden>Email a link to a friend (Opens in new window)</span>
+				<span>Email</span>
+			</a></li><li class="share-twitter"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-twitter-11689"
+				class="share-twitter sd-button share-icon"
+				href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/?share=twitter"
+				target="_blank"
+				aria-labelledby="sharing-twitter-11689"
+				>
+				<span id="sharing-twitter-11689" hidden>Share on X (Opens in new window)</span>
+				<span>X</span>
+			</a></li><li class="share-facebook"><a rel="nofollow noopener noreferrer"
+				data-shared="sharing-facebook-11689"
+				class="share-facebook sd-button share-icon"
+				href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/?share=facebook"
+				target="_blank"
+				aria-labelledby="sharing-facebook-11689"
+				>
+				<span id="sharing-facebook-11689" hidden>Share on Facebook (Opens in new window)</span>
+				<span>Facebook</span>
+			</a></li><li class="share-end"></li></ul></div></div></div>
+<div id='jp-relatedposts' class='jp-relatedposts' >
+	<h3 class="jp-relatedposts-headline"><em>Related</em></h3>
+</div></div>			</div><!-- .entry-content -->
+	
+		<footer class="entry-meta">
+		<span class="categories-links"><a href="https://abix.com.au/category/o-public-administration-and-safety/o75-public-administration/" rel="category tag">O75 Public Administration</a></span><span class="tags-links"><a href="https://abix.com.au/tag/australia-politics-and-government/" rel="tag">AUSTRALIA - POLITICS AND GOVERNMENT</a>, <a href="https://abix.com.au/tag/elections-australia/" rel="tag">ELECTIONS - AUSTRALIA</a>, <a href="https://abix.com.au/tag/public-opinion-polls-australia/" rel="tag">PUBLIC OPINION POLLS - AUSTRALIA</a></span>	</footer><!-- .entry-meta -->
+	
+</article><!-- #post-## -->
+
+				<nav role="navigation" id="nav-below" class="post-navigation">
+		<h1 class="screen-reader-text">Post navigation</h1>
+
+	
+		<div class="nav-previous"><a href="https://abix.com.au/2019/05/17/bob-hawke-australias-23rd-prime-minister-dies-aged-89/" rel="prev"><span class="meta-nav">&larr;</span> Bob Hawke, Australia&#8217;s 23rd prime minister, dies aged&nbsp;89</a></div>		<div class="nav-next"><a href="https://abix.com.au/2019/05/17/warning-as-housing-stock-piles-up/" rel="next">Warning as housing stock piles&nbsp;up <span class="meta-nav">&rarr;</span></a></div>
+	
+	</nav><!-- #nav-below -->
+	
+			
+	<div id="comments" class="comments-area">
+
+	
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/#respond" style="display:none;">Cancel reply</a></small></h3><form action="https://abix.com.au/wp-comments-post.php" method="post" id="commentform" class="comment-form"><div class="jetpack-comments" data-jetpack-comments="{&quot;postId&quot;:11689,&quot;loginUrl&quot;:&quot;https://abixnews.wordpress.com/wp-login.php?redirect_to=https%3A%2F%2Fabix.com.au%2F2019%2F05%2F17%2Ftwo-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election%2F&quot;,&quot;logoutUrl&quot;:&quot;&quot;,&quot;submit&quot;:{&quot;id&quot;:&quot;submit&quot;,&quot;name&quot;:&quot;submit&quot;,&quot;class&quot;:&quot;submit&quot;,&quot;wrapClass&quot;:&quot;&quot;,&quot;label&quot;:&quot;Comment&quot;},&quot;subscriptions&quot;:[{&quot;name&quot;:&quot;subscribe&quot;,&quot;label&quot;:&quot;Notify me of new comments by email.&quot;,&quot;checked&quot;:false},{&quot;name&quot;:&quot;subscribe_blog&quot;,&quot;label&quot;:&quot;Subscribe to keep up with ABIX.&quot;,&quot;checked&quot;:false}]}"><p class="comment-form-comment"><label for="comment">Comment</label><textarea id="comment" name="comment" rows="4" required></textarea></p><p class="comment-form-author"><label for="author">Name</label><input id="author" name="author" type="text" value="" required /></p><p class="comment-form-email"><label for="email">Email</label><input id="email" name="email" type="email" value="" required /></p><p class="comment-form-url"><label for="url">Website</label><input id="url" name="url" type="text" value="" maxlength="200" /></p><p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Comment" /> </p></div><noscript><style>.jetpack-comments{display:none!important}</style><p>Turn on JavaScript to leave a comment.</p></noscript><input type='hidden' name='comment_post_ID' value='11689' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="415354e6a9" /></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="123"/><script>
+document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );
+</script>
+</p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+		
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+<div id="secondary" class="widget-area sidebar-widget-area" role="complementary">
+		<aside id="text-5" class="widget widget_text">			<div class="textwidget"><p align="center"><a href="https://www.roymorgan.com/abix" target="_blank" class="button-trial" style="color:#FFF" rel="noopener">Register free</a></p>
+</div>
+		</aside><aside id="categories-3" class="widget widget_categories"><h1 class="widget-title">Categories</h1><form action="https://abix.com.au" method="get"><label class="screen-reader-text" for="cat">Categories</label><select  name='cat' id='cat' class='postform'>
+	<option value='-1'>Select Category</option>
+	<option class="level-0" value="242066425">A: Agriculture, Forestry and Fishing</option>
+	<option class="level-1" value="242065853">&nbsp;&nbsp;&nbsp;A01 Agriculture</option>
+	<option class="level-1" value="242065880">&nbsp;&nbsp;&nbsp;A02 Aquaculture</option>
+	<option class="level-1" value="242065898">&nbsp;&nbsp;&nbsp;A04 Fishing Hunting and Trapping</option>
+	<option class="level-1" value="242065907">&nbsp;&nbsp;&nbsp;A05 Agriculture Forestry and Fishing Support Services</option>
+	<option class="level-0" value="242066447">B: Mining</option>
+	<option class="level-1" value="242065953">&nbsp;&nbsp;&nbsp;B06 Coal Mining</option>
+	<option class="level-1" value="242065964">&nbsp;&nbsp;&nbsp;B07 Oil and Gas Extraction</option>
+	<option class="level-1" value="242065977">&nbsp;&nbsp;&nbsp;B08 Metal Ore Mining</option>
+	<option class="level-1" value="242065997">&nbsp;&nbsp;&nbsp;B09 Non Metallic Mineral Mining and Quarrying</option>
+	<option class="level-1" value="242066010">&nbsp;&nbsp;&nbsp;B10 Exploration and Other Mining Support Services</option>
+	<option class="level-0" value="38867020">C: Manufacturing</option>
+	<option class="level-1" value="242066042">&nbsp;&nbsp;&nbsp;C11 Food Product Manufacturing</option>
+	<option class="level-1" value="242066051">&nbsp;&nbsp;&nbsp;C12 Beverage and Tobacco Product Manufacturing</option>
+	<option class="level-1" value="242066059">&nbsp;&nbsp;&nbsp;C13 Textile Leather Clothing and Footwear Manufacturing</option>
+	<option class="level-1" value="242066085">&nbsp;&nbsp;&nbsp;C15 Pulp Paper and Converted Paper Product Manufacturing</option>
+	<option class="level-1" value="242066105">&nbsp;&nbsp;&nbsp;C17 Petroleum and Coal Product Manufacturing</option>
+	<option class="level-1" value="242066116">&nbsp;&nbsp;&nbsp;C18 Basic Chemical and Chemical Product Manufacturing</option>
+	<option class="level-1" value="242066129">&nbsp;&nbsp;&nbsp;C19 Polymer Product and Rubber Product Manufacturing</option>
+	<option class="level-1" value="242066732">&nbsp;&nbsp;&nbsp;C21 Primary Metal and Metal Product Manufacturing</option>
+	<option class="level-1" value="242066753">&nbsp;&nbsp;&nbsp;C23 Transport Equipment Manufacturing</option>
+	<option class="level-1" value="242066770">&nbsp;&nbsp;&nbsp;C24 Machinery and Equipment Manufacturing</option>
+	<option class="level-0" value="242067001">D: Electricity, Gas and Water Supply</option>
+	<option class="level-1" value="242067035">&nbsp;&nbsp;&nbsp;D26 Electricity Supply</option>
+	<option class="level-1" value="242067041">&nbsp;&nbsp;&nbsp;D27 Gas Supply</option>
+	<option class="level-1" value="242067052">&nbsp;&nbsp;&nbsp;D28 Water Supply Sewerage and Drainage Services</option>
+	<option class="level-1" value="242067083">&nbsp;&nbsp;&nbsp;D29 Waste Collection Treatment and Disposal Services</option>
+	<option class="level-0" value="242067105">E: Construction</option>
+	<option class="level-1" value="242067125">&nbsp;&nbsp;&nbsp;E30 Building Construction</option>
+	<option class="level-1" value="242067129">&nbsp;&nbsp;&nbsp;E31 Heavy and Civil Engineering Construction</option>
+	<option class="level-1" value="242067141">&nbsp;&nbsp;&nbsp;E32 Construction Services</option>
+	<option class="level-0" value="242067169">F: Wholesale Trade</option>
+	<option class="level-1" value="242067181">&nbsp;&nbsp;&nbsp;F33 Basic Material Wholesaling</option>
+	<option class="level-1" value="242067196">&nbsp;&nbsp;&nbsp;F34 Machinery and Equipment Wholesaling</option>
+	<option class="level-1" value="242067202">&nbsp;&nbsp;&nbsp;F35 Motor Vehicle and Motor Vehicle Parts Wholesaling</option>
+	<option class="level-1" value="242067218">&nbsp;&nbsp;&nbsp;F36 Grocery Liquor and Tobacco Product Wholesaling</option>
+	<option class="level-1" value="242067227">&nbsp;&nbsp;&nbsp;F37 Other Goods Wholesaling</option>
+	<option class="level-0" value="242067324">G: Retail Trade</option>
+	<option class="level-1" value="242067344">&nbsp;&nbsp;&nbsp;G39 Motor Vehicle and Motor Vehicle Parts Retailing</option>
+	<option class="level-1" value="242067357">&nbsp;&nbsp;&nbsp;G40 Fuel Retailing</option>
+	<option class="level-1" value="242067368">&nbsp;&nbsp;&nbsp;G41 Food Retailing</option>
+	<option class="level-1" value="242067378">&nbsp;&nbsp;&nbsp;G42 Other Store Based Retailing</option>
+	<option class="level-1" value="242067386">&nbsp;&nbsp;&nbsp;G43 Non Store Retailing and Retail Commission Based Buying and or Selling</option>
+	<option class="level-0" value="242067416">H: Accommodation and Food Services</option>
+	<option class="level-1" value="242067428">&nbsp;&nbsp;&nbsp;H44 Accommodation</option>
+	<option class="level-1" value="242067446">&nbsp;&nbsp;&nbsp;H45 Food and Beverage Services</option>
+	<option class="level-0" value="242067457">I: Transport Postal and Warehousing</option>
+	<option class="level-1" value="242067477">&nbsp;&nbsp;&nbsp;I46 Road Transport</option>
+	<option class="level-1" value="242067488">&nbsp;&nbsp;&nbsp;I47 Rail Transport</option>
+	<option class="level-1" value="242067498">&nbsp;&nbsp;&nbsp;I48 Water Transport</option>
+	<option class="level-1" value="242067508">&nbsp;&nbsp;&nbsp;I49 Air and Space Transport</option>
+	<option class="level-1" value="242067517">&nbsp;&nbsp;&nbsp;I50 Other Transport</option>
+	<option class="level-1" value="242067525">&nbsp;&nbsp;&nbsp;I52 Transport Support Services</option>
+	<option class="level-1" value="242067538">&nbsp;&nbsp;&nbsp;I53 Warehousing and Storage Services</option>
+	<option class="level-0" value="242067564">J: Information Media and Telecommunications</option>
+	<option class="level-1" value="242067577">&nbsp;&nbsp;&nbsp;J55 Motion Picture and Sound Recording Activities</option>
+	<option class="level-1" value="242067580">&nbsp;&nbsp;&nbsp;J56 Broadcasting except Internet</option>
+	<option class="level-1" value="242067586">&nbsp;&nbsp;&nbsp;J57 Internet Publishing and Broadcasting</option>
+	<option class="level-1" value="242067593">&nbsp;&nbsp;&nbsp;J58 Telecommunications Services</option>
+	<option class="level-1" value="242067602">&nbsp;&nbsp;&nbsp;J59 Internet Service Providers Web Search Portals and Data Processing Services</option>
+	<option class="level-1" value="242067607">&nbsp;&nbsp;&nbsp;J60 Library and Other Information Services</option>
+	<option class="level-0" value="242067720">K: Financial and Insurance Services</option>
+	<option class="level-1" value="242067728">&nbsp;&nbsp;&nbsp;K62 Finance</option>
+	<option class="level-1" value="242067735">&nbsp;&nbsp;&nbsp;K63 Insurance and Superannuation Funds</option>
+	<option class="level-1" value="242067739">&nbsp;&nbsp;&nbsp;K64 Auxiliary Finance and Insurance Services</option>
+	<option class="level-0" value="242067755">L: Rental, Hiring and Real Estate Services</option>
+	<option class="level-1" value="242067771">&nbsp;&nbsp;&nbsp;L6611 Passenger Car Rental and Hiring</option>
+	<option class="level-1" value="242067831">&nbsp;&nbsp;&nbsp;L6632 Video and Other Electronic Media Rental and Hiring</option>
+	<option class="level-1" value="242067847">&nbsp;&nbsp;&nbsp;L67 Property Operators and Real Estate Services</option>
+	<option class="level-0" value="242068723">M: Professional, Scientific and Technical Services</option>
+	<option class="level-1" value="242068733">&nbsp;&nbsp;&nbsp;M69 Professional Scientific and Technical Services</option>
+	<option class="level-1" value="242068750">&nbsp;&nbsp;&nbsp;M6921 Architectural Services</option>
+	<option class="level-1" value="242068753">&nbsp;&nbsp;&nbsp;M6923 Engineering Design and Engineering Consulting Services</option>
+	<option class="level-1" value="242068759">&nbsp;&nbsp;&nbsp;M6931 Legal Services</option>
+	<option class="level-1" value="242068766">&nbsp;&nbsp;&nbsp;M6932 Accounting Services</option>
+	<option class="level-1" value="242068778">&nbsp;&nbsp;&nbsp;M6940 Advertising Services</option>
+	<option class="level-1" value="242068784">&nbsp;&nbsp;&nbsp;M6950 Market Research and Statistical Services</option>
+	<option class="level-1" value="242068791">&nbsp;&nbsp;&nbsp;M6962 Management Advice and Related Consulting Services</option>
+	<option class="level-1" value="242068803">&nbsp;&nbsp;&nbsp;M70 Computer System Design and Related Services</option>
+	<option class="level-0" value="242068823">N: Administrative and Support Services</option>
+	<option class="level-1" value="242068844">&nbsp;&nbsp;&nbsp;N7211 Employment Placement and Recruitment Services</option>
+	<option class="level-1" value="242068846">&nbsp;&nbsp;&nbsp;N7212 Labour Supply Services</option>
+	<option class="level-1" value="242068853">&nbsp;&nbsp;&nbsp;N7220 Travel Agency and Tour Arrangement Services</option>
+	<option class="level-1" value="242068863">&nbsp;&nbsp;&nbsp;N7293 Credit Reporting and Debt Collection Services</option>
+	<option class="level-1" value="242068871">&nbsp;&nbsp;&nbsp;N7294 Call Centre Operation</option>
+	<option class="level-1" value="242068882">&nbsp;&nbsp;&nbsp;N73 Building Cleaning Pest Control and Other Support Services</option>
+	<option class="level-0" value="242068898">O: Public Administration and Safety</option>
+	<option class="level-1" value="242068914">&nbsp;&nbsp;&nbsp;O75 Public Administration</option>
+	<option class="level-1" value="242068933">&nbsp;&nbsp;&nbsp;O7540 Justice</option>
+	<option class="level-1" value="242068944">&nbsp;&nbsp;&nbsp;O76 Defence</option>
+	<option class="level-1" value="242068953">&nbsp;&nbsp;&nbsp;O77 Public Order Safety and Regulatory Services</option>
+	<option class="level-0" value="242068974">P: Education and Training</option>
+	<option class="level-1" value="242069004">&nbsp;&nbsp;&nbsp;P80 Preschool and School Education</option>
+	<option class="level-1" value="242069011">&nbsp;&nbsp;&nbsp;P81 Tertiary Education</option>
+	<option class="level-1" value="242069017">&nbsp;&nbsp;&nbsp;P82 Adult Community and Other Education</option>
+	<option class="level-0" value="242069037">Q: Health Care and Social Assistance</option>
+	<option class="level-1" value="242069055">&nbsp;&nbsp;&nbsp;Q84 Hospitals</option>
+	<option class="level-1" value="242069062">&nbsp;&nbsp;&nbsp;Q85 Medical and Other Health Care Services</option>
+	<option class="level-1" value="242069069">&nbsp;&nbsp;&nbsp;Q86 Residential Care Services</option>
+	<option class="level-1" value="242069088">&nbsp;&nbsp;&nbsp;Q87 Social Assistance Services</option>
+	<option class="level-0" value="242069109">R: Arts and Recreation Services</option>
+	<option class="level-1" value="242069122">&nbsp;&nbsp;&nbsp;R89 Heritage Activities</option>
+	<option class="level-1" value="242069133">&nbsp;&nbsp;&nbsp;R90 Creative and Performing Arts Activities</option>
+	<option class="level-1" value="242069149">&nbsp;&nbsp;&nbsp;R91 Sports and Recreation Activities</option>
+	<option class="level-1" value="242069171">&nbsp;&nbsp;&nbsp;R9131 Amusement Parks and Centres Operation</option>
+	<option class="level-1" value="242069178">&nbsp;&nbsp;&nbsp;R92 Gambling Activities</option>
+	<option class="level-0" value="242069200">S: Other Services</option>
+	<option class="level-1" value="242069242">&nbsp;&nbsp;&nbsp;S95 Personal and Other Services</option>
+	<option class="level-1" value="242069251">&nbsp;&nbsp;&nbsp;S9551 Business and Professional Association Services</option>
+	<option class="level-0" value="1">Uncategorized</option>
+</select>
+</form><script>
+( ( dropdownId ) => {
+	const dropdown = document.getElementById( dropdownId );
+	function onSelectChange() {
+		setTimeout( () => {
+			if ( 'escape' === dropdown.dataset.lastkey ) {
+				return;
+			}
+			if ( dropdown.value && parseInt( dropdown.value ) > 0 && dropdown instanceof HTMLSelectElement ) {
+				dropdown.parentElement.submit();
+			}
+		}, 250 );
+	}
+	function onKeyUp( event ) {
+		if ( 'Escape' === event.key ) {
+			dropdown.dataset.lastkey = 'escape';
+		} else {
+			delete dropdown.dataset.lastkey;
+		}
+	}
+	function onClick() {
+		delete dropdown.dataset.lastkey;
+	}
+	dropdown.addEventListener( 'keyup', onKeyUp );
+	dropdown.addEventListener( 'click', onClick );
+	dropdown.addEventListener( 'change', onSelectChange );
+})( "cat" );
+
+//# sourceURL=WP_Widget_Categories%3A%3Awidget
+</script>
+</aside><aside id="wp_tag_cloud-3" class="widget wp_widget_tag_cloud"><h1 class="widget-title">Tags</h1><a href="https://abix.com.au/tag/australia-politics-and-government/" class="tag-cloud-link tag-link-243670312 tag-link-position-1" style="font-size: 22pt;" aria-label="AUSTRALIA - POLITICS AND GOVERNMENT (3,557 items)">AUSTRALIA - POLITICS AND GOVERNMENT</a>
+<a href="https://abix.com.au/tag/banks-and-banking/" class="tag-cloud-link tag-link-6636463 tag-link-position-2" style="font-size: 10.079207920792pt;" aria-label="BANKS AND BANKING (486 items)">BANKS AND BANKING</a>
+<a href="https://abix.com.au/tag/banks-and-banking-australia/" class="tag-cloud-link tag-link-243670324 tag-link-position-3" style="font-size: 12.990099009901pt;" aria-label="BANKS AND BANKING - AUSTRALIA (796 items)">BANKS AND BANKING - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/business-and-politics-australia/" class="tag-cloud-link tag-link-243358850 tag-link-position-4" style="font-size: 11.049504950495pt;" aria-label="BUSINESS AND POLITICS - AUSTRALIA (574 items)">BUSINESS AND POLITICS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/business-forecasting-australia/" class="tag-cloud-link tag-link-242046925 tag-link-position-5" style="font-size: 13.544554455446pt;" aria-label="BUSINESS FORECASTING - AUSTRALIA (867 items)">BUSINESS FORECASTING - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/central-australia/" class="tag-cloud-link tag-link-791430 tag-link-position-6" style="font-size: 8.970297029703pt;" aria-label="CENTRAL - AUSTRALIA (410 items)">CENTRAL - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/consumer-behavior-australia/" class="tag-cloud-link tag-link-252889184 tag-link-position-7" style="font-size: 12.158415841584pt;" aria-label="CONSUMER BEHAVIOR - AUSTRALIA (698 items)">CONSUMER BEHAVIOR - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/consumer-confidence-australia/" class="tag-cloud-link tag-link-253662486 tag-link-position-8" style="font-size: 10.217821782178pt;" aria-label="CONSUMER CONFIDENCE - AUSTRALIA (505 items)">CONSUMER CONFIDENCE - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/corporate-profits-australia/" class="tag-cloud-link tag-link-242046924 tag-link-position-9" style="font-size: 10.217821782178pt;" aria-label="CORPORATE PROFITS - AUSTRALIA (499 items)">CORPORATE PROFITS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/economic-indicators-australia/" class="tag-cloud-link tag-link-251814831 tag-link-position-10" style="font-size: 16.316831683168pt;" aria-label="ECONOMIC INDICATORS - AUSTRALIA (1,381 items)">ECONOMIC INDICATORS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/elections-australia/" class="tag-cloud-link tag-link-33111454 tag-link-position-11" style="font-size: 8.1386138613861pt;" aria-label="ELECTIONS - AUSTRALIA (352 items)">ELECTIONS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/energy-industries-australia/" class="tag-cloud-link tag-link-243358831 tag-link-position-12" style="font-size: 8.8316831683168pt;" aria-label="ENERGY INDUSTRIES - AUSTRALIA (398 items)">ENERGY INDUSTRIES - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/industrial-relations-australia/" class="tag-cloud-link tag-link-31719006 tag-link-position-13" style="font-size: 10.079207920792pt;" aria-label="INDUSTRIAL RELATIONS - AUSTRALIA (490 items)">INDUSTRIAL RELATIONS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/interest-rates-australia/" class="tag-cloud-link tag-link-34138294 tag-link-position-14" style="font-size: 11.049504950495pt;" aria-label="INTEREST RATES - AUSTRALIA (570 items)">INTEREST RATES - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/investments/" class="tag-cloud-link tag-link-9705 tag-link-position-15" style="font-size: 9.9405940594059pt;" aria-label="INVESTMENTS (474 items)">INVESTMENTS</a>
+<a href="https://abix.com.au/tag/iron-mines-and-mining-western-australia/" class="tag-cloud-link tag-link-245174015 tag-link-position-16" style="font-size: 9.2475247524752pt;" aria-label="IRON MINES AND MINING - WESTERN AUSTRALIA (422 items)">IRON MINES AND MINING - WESTERN AUSTRALIA</a>
+<a href="https://abix.com.au/tag/iron-ore-western-australia/" class="tag-cloud-link tag-link-253661928 tag-link-position-17" style="font-size: 8.8316831683168pt;" aria-label="IRON ORE - WESTERN AUSTRALIA (398 items)">IRON ORE - WESTERN AUSTRALIA</a>
+<a href="https://abix.com.au/tag/labor-unions-australia/" class="tag-cloud-link tag-link-253659441 tag-link-position-18" style="font-size: 10.910891089109pt;" aria-label="LABOR UNIONS - AUSTRALIA (556 items)">LABOR UNIONS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/marketing-research-australia/" class="tag-cloud-link tag-link-252889186 tag-link-position-19" style="font-size: 16.871287128713pt;" aria-label="MARKETING RESEARCH - AUSTRALIA (1,528 items)">MARKETING RESEARCH - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/mass-media-australia/" class="tag-cloud-link tag-link-244758748 tag-link-position-20" style="font-size: 16.871287128713pt;" aria-label="MASS MEDIA - AUSTRALIA (1,526 items)">MASS MEDIA - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/mergers-and-acquisitions-australia/" class="tag-cloud-link tag-link-243358811 tag-link-position-21" style="font-size: 12.29702970297pt;" aria-label="MERGERS AND ACQUISITIONS - AUSTRALIA (704 items)">MERGERS AND ACQUISITIONS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/mining-corporations-australia/" class="tag-cloud-link tag-link-243358848 tag-link-position-22" style="font-size: 17.148514851485pt;" aria-label="MINING CORPORATIONS - AUSTRALIA (1,582 items)">MINING CORPORATIONS - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/monetary-policy-australia/" class="tag-cloud-link tag-link-251814829 tag-link-position-23" style="font-size: 9.9405940594059pt;" aria-label="MONETARY POLICY - AUSTRALIA (482 items)">MONETARY POLICY - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/political-parties-australia-platforms/" class="tag-cloud-link tag-link-245174009 tag-link-position-24" style="font-size: 12.158415841584pt;" aria-label="POLITICAL PARTIES - AUSTRALIA - PLATFORMS (684 items)">POLITICAL PARTIES - AUSTRALIA - PLATFORMS</a>
+<a href="https://abix.com.au/tag/real-estate-australia-residential/" class="tag-cloud-link tag-link-246909274 tag-link-position-25" style="font-size: 8.970297029703pt;" aria-label="REAL ESTATE - AUSTRALIA - RESIDENTIAL (402 items)">REAL ESTATE - AUSTRALIA - RESIDENTIAL</a>
+<a href="https://abix.com.au/tag/retail-trade-australia/" class="tag-cloud-link tag-link-243670356 tag-link-position-26" style="font-size: 10.772277227723pt;" aria-label="RETAIL TRADE - AUSTRALIA (551 items)">RETAIL TRADE - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/strategic-planning-australia/" class="tag-cloud-link tag-link-242046928 tag-link-position-27" style="font-size: 10.356435643564pt;" aria-label="STRATEGIC PLANNING - AUSTRALIA (510 items)">STRATEGIC PLANNING - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/taxation-government-policy-australia/" class="tag-cloud-link tag-link-247219107 tag-link-position-28" style="font-size: 8.2772277227723pt;" aria-label="TAXATION - GOVERNMENT POLICY - AUSTRALIA (365 items)">TAXATION - GOVERNMENT POLICY - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/television-broadcasting-australia/" class="tag-cloud-link tag-link-244758784 tag-link-position-29" style="font-size: 9.3861386138614pt;" aria-label="TELEVISION BROADCASTING - AUSTRALIA (437 items)">TELEVISION BROADCASTING - AUSTRALIA</a>
+<a href="https://abix.com.au/tag/virus-diseases-australia/" class="tag-cloud-link tag-link-695982352 tag-link-position-30" style="font-size: 8pt;" aria-label="VIRUS DISEASES - AUSTRALIA (342 items)">VIRUS DISEASES - AUSTRALIA</a></aside></div><!-- #secondary -->
+
+	</div><!-- #content -->
+
+	
+<div id="tertiary" class="widget-area footer-widget-area" role="complementary">
+		<div class="first footer-widgets">
+		<aside id="widget_contact_info-2" class="widget widget_contact_info"><h1 class="widget-title">Contact Information</h1><div itemscope itemtype="http://schema.org/LocalBusiness"><div class="confit-address" itemscope itemtype="http://schema.org/PostalAddress" itemprop="address"><a href="https://maps.google.com/maps?z=16&#038;q=tonic%2Bhouse%2C%2B386%2Bflinders%2Blane%2C%2Bmelbourne%2C%2Bvictoria%2B3001" target="_blank" rel="noopener noreferrer">Tonic House,<br/>386 Flinders Lane,<br/>Melbourne, Victoria 3001</a></div><div class="confit-phone"><span itemprop="telephone"><a href="tel:Phone:%201800%20633%20813">Phone: 1800 633 813</a></span></div><div class="confit-hours" itemprop="openingHours">email: abix@roymorgan.com</div></div></aside>	</div><!-- .first -->
+	
+		<div class="second footer-widgets">
+		<aside id="text-2" class="widget widget_text"><h1 class="widget-title">About ABIX</h1>			<div class="textwidget">ABIX gives you Australia's best news and journal summaries, delivered each weekday to keep your staff, members or researchers at the forefront of their industry.</div>
+		</aside>	</div><!-- .second -->
+	
+		<div class="third footer-widgets">
+		<aside id="pages-2" class="widget widget_pages"><h1 class="widget-title">Navigation</h1>
+			<ul>
+				<li class="page_item page-item-1 page_item_has_children"><a href="https://abix.com.au/about/">About</a>
+<ul class='children'>
+	<li class="page_item page-item-197"><a href="https://abix.com.au/about/privacy-policy/">Privacy Policy</a></li>
+	<li class="page_item page-item-191"><a href="https://abix.com.au/about/terms-of-use/">Terms of Use</a></li>
+</ul>
+</li>
+<li class="page_item page-item-39"><a href="https://abix.com.au/contact-us/">Contact Us</a></li>
+<li class="page_item page-item-20"><a href="https://abix.com.au/features-2/">Features</a></li>
+<li class="page_item page-item-26"><a href="https://abix.com.au/subscriptions/">Subscriptions</a></li>
+<li class="page_item page-item-103 current_page_parent"><a href="https://abix.com.au/summaries/">Summaries</a></li>
+			</ul>
+
+			</aside>	</div><!-- .third -->
+	</div><!-- #tertiary -->
+
+	<footer id="colophon" class="site-footer">
+
+		
+		<div class="site-info"  role="contentinfo">
+						<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Blog at WordPress.com.</a>
+			
+					</div><!-- .site-info -->
+
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/files/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/pub/motif/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="grofiles-cards-js" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=202646fffb5f6f8dc7a9c7ad08f16ba2e694fddff32cc1793b3fe3b32aaa232a52550e"></script>
+<script id="wpgroho-js-extra">
+var WPGroHo = {"my_hash":""};
+//# sourceURL=wpgroho-js-extra
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	</div>
+			<div id="actionbar" dir="ltr" style="display: none;"
+				class="actnbr-pub-motif" role="region" aria-label="Site actions">
+			<span class="actnbr-live" aria-live="polite"></span>
+			<ul>
+										<li class="actnbr-btn">
+							<a class="actnbr-action actnbr-actn-comment" href="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/#respond">
+								<svg class="actnbr-icon actnbr-icon-comment" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="currentColor"><path d="M18 4H6c-1.1 0-2 .9-2 2v12.9c0 .6.5 1.1 1.1 1.1.3 0 .5-.1.8-.3L8.5 17H18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 11c0 .3-.2.5-.5.5H7.9l-2.4 2.4V6c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v9z"/></svg>								<span>Comment							</span>
+							</a>
+						</li>
+											<li class="actnbr-btn actnbr-hidden">
+										<a class="actnbr-action actnbr-actn-follow " href="" role="button" aria-haspopup="dialog" aria-expanded="false">
+				<svg class="actnbr-icon actnbr-icon-bell" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M17 11.5c0 1.353.17 2.368.976 3 .266.209.602.376 1.024.5v1H5v-1c.422-.124.757-.291 1.024-.5.806-.632.976-1.647.976-3V9c0-2.8 2.2-5 5-5s5 2.2 5 5v2.5ZM15.5 9v2.5c0 .93.066 1.98.515 2.897l.053.103H7.932a4.018 4.018 0 0 0 .053-.103c.449-.917.515-1.967.515-2.897V9c0-1.972 1.528-3.5 3.5-3.5s3.5 1.528 3.5 3.5Zm-5.492 9.008c0-.176.023-.346.065-.508h3.854A1.996 1.996 0 0 1 12 20c-1.1 0-1.992-.892-1.992-1.992Z"/></svg>				<span>Subscribe</span>
+			</a>
+			<a class="actnbr-action actnbr-actn-following  no-display" href="" role="button">
+				<svg class="actnbr-icon actnbr-icon-check" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M7 12L10 15L17 8" vector-effect="non-scaling-stroke"/></svg>				<span>Subscribed</span>
+			</a>
+									<div class="actnbr-popover actnbr-panel actnbr-notice" id="follow-bubble" role="dialog" aria-label="Subscribe to ABIX">
+								<div class="actnbr-follow-bubble">
+								<div class="actnbr-panel__group"><a class="actnbr-menu__item actnbr-sitename" href="https://abix.com.au"><img loading='lazy' alt='' src='https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=50&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png' srcset='https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=50&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=75&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1.5x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=100&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 2x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=150&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 3x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=200&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 4x' class='avatar avatar-50' height='50' width='50' /><span class="actnbr-menu__label">ABIX</span></a></div>																	<div class="actnbr-panel__group">
+										<div class="actnbr-message no-display" aria-live="polite"></div>
+										<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" class="no-display">
+																							<div class="actnbr-follow-count">Join 122 other subscribers</div>
+																							<input type="email" name="email" placeholder="Want updates? Enter your email" class="actnbr-email-field" aria-label="Email address" />
+											<input type="hidden" name="action" value="subscribe" />
+											<input type="hidden" name="blog_id" value="68346293" />
+											<input type="hidden" name="source" value="https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/" />
+											<input type="hidden" name="sub-type" value="actionbar-follow" />
+											<input type="hidden" id="_wpnonce" name="_wpnonce" value="c221f3f62b" />											<button type="submit" class="actnbr-button">Sign me up</button>
+										</form>
+										<p class="actnbr-login-nudge">
+											Have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fabix.com.au%252F2019%252F05%252F17%252Ftwo-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election%252F">Log in now.</a>										</p>
+									</div>
+																	</div>
+							</div>
+						</li>
+									<li class="actnbr-ellipsis actnbr-hidden">
+					<button type="button" class="actnbr-more-toggle" aria-haspopup="true" aria-expanded="false" aria-label="More options">
+						<svg class="actnbr-icon actnbr-icon-more-horizontal" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="currentColor"><path d="M11 13h2v-2h-2v2zm-6 0h2v-2H5v2zm12-2v2h2v-2h-2z"/></svg>					</button>
+					<div class="actnbr-popover actnbr-menu" role="menu" aria-label="Site options">
+						<div class="actnbr-menu__group" role="group"><a role="menuitem" class="actnbr-menu__item actnbr-sitename" href="https://abix.com.au"><img loading='lazy' alt='' src='https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=50&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png' srcset='https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=50&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=75&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1.5x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=100&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 2x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=150&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 3x, https://secure.gravatar.com/blavatar/87826582a06da621724d18456d360f07ec33d0ec3506fbb42225c063991060d8?s=200&#038;d=https%3A%2F%2Fs-ssl.wordpress.com%2Fi%2Flogo%2Fwpcom-gray-white.png 4x' class='avatar avatar-50' height='50' width='50' /><span class="actnbr-menu__label">ABIX</span></a></div><div class="actnbr-menu__group" role="group"><a role="menuitem" class="actnbr-menu__item actnbr-shortlink" href="https://wp.me/p4CLZz-32x"><span class="actnbr-menu__label actnbr-shortlink__text">Copy shortlink</span><span class="actnbr-menu__icon actnbr-shortlink__icon"><svg class="actnbr-icon actnbr-icon-copy" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 4.5h11a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 .5-.5ZM3 5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Zm17 3v10.75c0 .69-.56 1.25-1.25 1.25H6v1.5h12.75a2.75 2.75 0 0 0 2.75-2.75V8H20Z"/></svg></span><span class="actnbr-menu__icon actnbr-shortlink__icon-copied"><svg class="actnbr-icon actnbr-icon-check" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M7 12L10 15L17 8" vector-effect="non-scaling-stroke"/></svg></span></a><a role="menuitem" class="actnbr-menu__item actnbr-reader" href="https://wordpress.com/reader/blogs/68346293/posts/11689"><span class="actnbr-menu__label">View post in Reader</span></a></div><div class="actnbr-menu__group" role="group"><a role="menuitem" class="actnbr-menu__item actnbr-subs" href="https://subscribe.wordpress.com/"><span class="actnbr-menu__label">Manage subscriptions</span></a><a role="menuitem" class="actnbr-menu__item actnbr-signup" href="https://wordpress.com/start/"><span class="actnbr-menu__label">Sign up</span></a><a role="menuitem" class="actnbr-menu__item actnbr-login" href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fabix.com.au%252F2019%252F05%252F17%252Ftwo-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election%252F"><span class="actnbr-menu__label">Log in</span></a></div><div class="actnbr-menu__group" role="group"><a role="menuitem" class="actnbr-menu__item flb-report" href="https://wordpress.com/abuse/?report_url=https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/" target="_blank" rel="noopener noreferrer"><span class="actnbr-menu__label">Report this content</span><span class="actnbr-menu__icon"><svg class="actnbr-icon actnbr-icon-external" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" fill="currentColor"><path d="M19.5 4.5h-7V6h4.44l-5.97 5.97 1.06 1.06L18 7.06v4.44h1.5v-7Zm-13 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3H17v3a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h3V5.5h-3Z"/></svg></span></a></div><div class="actnbr-menu__group" role="group"><a role="menuitem" class="actnbr-menu__item actnbr-fold" href=""><span class="actnbr-menu__label">Collapse this bar</span></a></div>					</div>
+				</li>
+			</ul>
+		</div>
+		<script>
+window.addEventListener( "DOMContentLoaded", function () {
+				var link = document.createElement( "link" );
+				link.href = "\/wp-content\/mu-plugins\/jetpack-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-newsletter\/src\/..\/build\/action-bar.css?ver=35dd33285eb46dc308dd";
+				link.rel = "stylesheet";
+				document.head.appendChild( link );
+
+				var script = document.createElement( "script" );
+				script.src = "\/wp-content\/mu-plugins\/jetpack-plugin\/sun\/jetpack_vendor\/automattic\/jetpack-newsletter\/src\/..\/build\/action-bar.js?ver=35dd33285eb46dc308dd";
+				document.body.appendChild( script );
+			} );
+</script>
+
+	<script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/":11689};
+	</script>
+				
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/_static/??-eJyNzE0SwiAMQOELSVOnHR0XjmepNLQBErAQf24vLpxx6f57Dx7Z2CQVpQKryVEXkgKRAha4KSquk8wRt86XHfzguiI3kvUKnCo58AVkutMyVUryjy6BsokkwbhktRhHz29GYqPOLWjMJua2MBvm+OqYPu8Ln/fH03AY+7Ef/Bt6cUf6'></script>
+<script id="jetpack-testimonial-theme-supports-js-after">
+const jetpack_testimonial_theme_supports = false
+//# sourceURL=jetpack-testimonial-theme-supports-js-after
+</script>
+<script id="jetpack-comments-js-before">
+window.JetpackComments = {"version":"0.9.0","styleUrl":"/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-comments/build/comments.css?m=1792508237i\u0026minify=false\u0026ver=086b4237cea33d146f43-1792508237","requireNameEmail":true,"mustLogIn":false,"site":{"name":"ABIX","iconUrl":""},"manageSubscriptionsUrl":"https://subscribe.wordpress.com/?site=abix.com.au","tracks":{"platform":"simple"},"strings":{"reply":"Reply","commentLabel":"Comment","replyLabel":"Reply","placeholder":"Write a comment...","replyPlaceholder":"Write a reply...","name":"Name","email":"Email","emailHint":"Address never made public","emailHasAccount":"That email belongs to a WordPress.com account. Log in with WordPress.com to use it, or enter a different email.","website":"Website (optional)","intro":"Enter your name and email to comment.","continueAsGuest":"Continue as a guest","postWithoutSaving":"No, thanks. I just want to post a comment","save":"Save","saveDetails":"Save my name, email, and website in this browser for the next time I comment.","close":"Close","manageSubscriptions":"Manage subscription","mustLogIn":"You must be logged in to post a comment.","logIn":"Log in","logInWithWordPress":"Log in with WordPress.com","logOut":"Log out","change":"Change","editProfile":"Edit profile","addYourName":"Add your name","cancel":"Cancel","signInFailed":"We could not sign you in. Please try again.","tooLong":"This comment is too long to post. Shorten it to send it.","signInRateLimited":"Too many sign-in attempts. Please wait a moment and try again."},"assetsUrl":"https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-comments/build/","loaderUrl":"https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-comments/build/editor-loader.js?m=1794245653i&amp;minify=false\u0026ver=f3e152544d2a82c5141d","maxLength":65525,"blocks":true,"editorLocale":{"block title\u0004Paragraph":["Paragraph"],"block title\u0004List":["List"],"block title\u0004List Item":["List Item"],"block title\u0004Quote":["Quote"],"block title\u0004Code":["Code"],"block title\u0004Embed":["Embed"],"block title\u0004Image":["Image"]},"editor":{"blockTools":"Block tools","addBlock":"Add block","embedUrl":"https://public-api.wordpress.com/wpcom/v2/sites/68346293/comments/embed","images":true,"imageError":"This image could not be loaded. Check its URL and try again."},"isLoggedIn":false,"avatarUrl":"https://0.gravatar.com/avatar/?s=80\u0026d=identicon\u0026forcedefault=y\u0026r=G","commenter":{"author":"","email":"","url":""},"user":null,"identity":{"blogId":68346293,"canSignIn":true,"connect":{"url":"https://public-api.wordpress.com/connect/?comment_identity=1\u0026blog_id=68346293\u0026challenge=jxbM_9kQyQ3XCOOB-mlTadkY8m402XCY8c9fTwpzt-k\u0026origin=https%3A%2F%2Fabix.com.au\u0026expires=1794293943\u0026signature=ff0d14e013b30c30288e9717fba2dbc4e2ed13838f0eefe72ac7521b60ebe0f8","expires":1794293943,"challenge":"jxbM_9kQyQ3XCOOB-mlTadkY8m402XCY8c9fTwpzt-k"},"connectUrl":"https://public-api.wordpress.com/wpcom/v2/sites/68346293/comments/identity/connect","emailUrl":"https://public-api.wordpress.com/wpcom/v2/sites/68346293/comments/identity/email","origin":"https://public-api.wordpress.com","codeField":"jetpack_comment_identity_code","passportField":"jetpack_comment_identity_passport","displayCookie":"jetpack_comment_identity_display","cookieHash":"653166773dc88127bd3afe0b6dfe5ea7","cookiePath":"/","cookieDomain":"","defaultAvatar":"https://0.gravatar.com/avatar/?s=80\u0026d=identicon\u0026forcedefault=y\u0026r=G","logoutUrl":"/wp-admin/admin-ajax.php","logoutAction":"jetpack_comments_identity_logout"}};(function(){function n(){Array.prototype.forEach.call(document.forms,function(f){var i;if(f.querySelector(".jetpack-comments")&&!f.querySelector('[name="jetpack_comments_form_nonce"]')){i=document.createElement("input");i.type="hidden";i.name="jetpack_comments_form_nonce";i.value="bc345fd673";f.appendChild(i);}});}n();document.addEventListener("DOMContentLoaded",n);})();window.addEventListener("load",function(){Array.prototype.forEach.call(document.querySelectorAll(".jetpack-comments"),function(e){if(!/\bis-(mounted|plain)\b/.test(e.className)){e.className+=" is-plain";}});});
+//# sourceURL=jetpack-comments-js-before
+</script>
+<script data-wp-strategy="defer" defer id="jetpack-comments-js" src="/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/sun/jetpack_vendor/automattic/jetpack-comments/build/comments.js?m=1794254603i&#038;minify=false&#038;ver=086b4237cea33d146f43-1792508237"></script>
+<script id="sharing-js-js-extra">
+var sharing_js_options = {"lang":"en","counts":"1","is_stats_active":"1"};
+//# sourceURL=sharing-js-js-extra
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/_static/??/wp-content/mu-plugins/akismet-3.0/_inc/akismet-frontend.js,/wp-content/mu-plugins/jetpack-plugin/sun/_inc/build/sharedaddy/sharing.min.js?m=1787944794j'></script>
+<script id="sharing-js-js-after">
+window.WPCOM_sharing_popups = window.WPCOM_sharing_popups || {};
+window.WPCOM_sharing_popups[ "twitter" ] = "menubar=1,resizable=1,width=600,height=350";
+window.WPCOM_sharing_popups = window.WPCOM_sharing_popups || {};
+window.WPCOM_sharing_popups[ "facebook" ] = "menubar=1,resizable=1,width=600,height=400";
+//# sourceURL=sharing-js-js-after
+</script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/","ext":".png","svgUrl":"https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?m=1783090810i&ver=7.1.4-alpha-64893"}}
+</script>
+<script type="module">
+/*! This file is auto-generated */
+var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof HTMLScriptElement))throw new Error("Element missing: "+e);const r=JSON.parse(t.text),s=(window._wpemojiSettings=r,"wpEmojiSettingsSupports"),o=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(s,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const r=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===r[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,r){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!r(e,"\ud83e\udec8")}return!1}function f(e,t,n,r){let a;const s=(a="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),o=(s.textBaseline="top",s.font="600 32px Arial",{});return e.forEach(e=>{o[e]=t(s,e,n,r)}),o}function a(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}r.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(s));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(o),u.toString(),c.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"});const a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=e=>{i(n=e.data),a.terminate(),t(n)})}catch(e){}i(n=f(o,u,c,p))}t(n)}).then(e=>{for(const n in e)r.supports[n]=e[n],r.supports.everything=r.supports.everything&&r.supports[n],"flag"!==n&&(r.supports.everythingExceptFlag=r.supports.everythingExceptFlag&&r.supports[n]);var t;r.supports.everythingExceptFlag=r.supports.everythingExceptFlag&&!r.supports.flag,r.supports.everything||((t=r.source||{}).concatemoji?a(t.concatemoji):t.wpemoji&&t.twemoji&&(a(t.twemoji),a(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+</script>
+<script src="//stats.wp.com/w.js?71" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'68346293','blog_tz':'10','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+		// Prevent sending pageview tracking from WP-Admin pages.
+		_stq.push(['view', {'blog':'68346293','v':'wpcom','tz':'10','user_id':'0','post':'11689','subd':'abixnews'}]);
+		_stq.push(['extra', {'crypt':'UE5tW3cvZGRRWERkVjN2enY5VE9oZmosfkFFZW0wTDRFa1ovd1hzc1lkWmhBdmlUWi1XZEw3ZTh2R19OMGN0XyswVmhuSjVOVSUxZ0IuWDYyVUpodEoucXJlR0p3cm1DJlVYQXIwTjB3V1hKQUorJnU3LVZNTW4xMlg1R0kxbGtbZXJjeFJhQ242X1pzZklZQSZMQzBMZlNKS21xby5sWE54TXJGRXhGMEUranYlc3JMPzEzc2gxQzljRzR1WVAlLmxIWFpvYU58WCtwUHEvLlsuSUJTVU16b1JLYSxQOVdIQU0teGVrdDQsN3RNTzlkRi4sfDNnMStfR3doLg=='}]);
+_stq.push([ 'clickTrackerInit', '68346293', '11689' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<meta id="bilmur" property="bilmur:data" content="" data-provider="wordpress.com" data-service="simple" data-site-tz="Etc/GMT-10" data-custom-props="{&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/motif&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}"   >
+		<script defer src="/wp-content/js/bilmur.min.js?i=19&amp;m=202646"></script> 	
+</body>
+</html>

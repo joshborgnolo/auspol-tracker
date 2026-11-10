@@ -1,0 +1,27 @@
+{
+ "_about": "Final-election pre-2025 demographic polling stores. Lanes scrape sources into lanes/*.json (schema below); build-stores.mjs merges them into data/demographics-<year>-election.json mirroring the 2025 store's shape. src/<lane>/ keeps verbatim evidence copies.",
+ "cycles": [
+  { "year": 2013, "election": "2013-09-07" },
+  { "year": 2016, "election": "2016-07-02" },
+  { "year": 2019, "election": "2019-05-18" },
+  { "year": 2022, "election": "2022-05-21" }
+ ],
+ "laneSchema": {
+  "house": "display name",
+  "waves": [
+   {
+    "election": "2022-05-21",
+    "dateStart": "fieldwork start YYYY-MM-DD (null if only a publication date exists)",
+    "date": "fieldwork end YYYY-MM-DD, else publication date",
+    "sample": "integer or null",
+    "tpp": { "alp": "published 2PP ALP share, or omitted" },
+    "und": "printed undecided share, or omitted",
+    "total": { "alp": 0, "lnp": 0, "grn": 0, "onp": 0, "oth": 0 },
+    "dims": { "gender": { "Men": { "alp": 0, "lnp": 0 } }, "age": { "18–34": {} } }
+   }
+  ],
+ "sources": [{ "url": "", "archived": "src/<lane>/<file>", "note": "" }],
+ "notes": ["method and caveats"],
+ "gaps": ["probed but yielded nothing"]
+ }
+}

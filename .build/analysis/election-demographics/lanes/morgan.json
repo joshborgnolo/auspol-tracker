@@ -1,0 +1,154 @@
+{
+ "house": "Roy Morgan",
+ "_about": "Lane C (this lane runs second under that name; the prior agent's Lane C handoff covered these houses). Roy Morgan final pre-election waves for 2013, 2016, 2019 and 2022 with whatever demographic breakdowns the sources print. 2013 comes from the full multi-mode demographic release (finding 5169) saved verbatim as wayback HTML/text + 34 parsed tables. 2016: Morgan's own historical tables (repo mirror) prove their last 2016 wave was May 21/22 & 28/29 (finding 6831) — Morgan ran NO June 2016 wave. 2019: final face-to-face wave (finding 7975) from the ABIX mirror, exact-match with Wikipedia's table. 2022: final release 8981 (national only, live roymorgan.com) plus the penultimate week 8977 (state 2PPs in prose, live).",
+ "waves": [
+  {
+   "election": "2013-09-07",
+   "finding": "Roy Morgan finding No. 5169 (\"L-NP set to win Federal Election as ALP primary vote collapses\")",
+   "dateStart": "2013-09-04",
+   "date": "2013-09-06",
+   "sample": 4937,
+   "und": 1.5,
+   "method": "multi-mode (SMS, Online and telephone interviewing) over three nights; Australian electors 18+",
+   "tpp": { "alp": 46.5, "lnp": 53.5 },
+   "total": { "alp": 31.5, "lnp": 44, "grn": 10.5, "onp": null, "pup": 6.5, "oth": 7.5 },
+   "dims": {
+    "state": {
+     "New South Wales": { "alp": 32.5, "lnp": 43, "grn": 9.5, "pup": 6.5, "oth": 8.5, "alp2": 48.5, "lnp2": 51.5, "sample": 1456, "trend2pp": "ALP 47 / L-NP 53" },
+     "Victoria": { "alp": 30, "lnp": 41, "grn": 16, "pup": 5.5, "oth": 7.5, "alp2": 49.5, "lnp2": 50.5, "sample": 1308, "trend2pp": "ALP 50.5 / L-NP 49.5" },
+     "Queensland": { "alp": 30, "lnp": 47, "grn": 6, "pup": 10.5, "oth": 6.5, "alp2": 42, "lnp2": 58, "sample": 947, "trend2pp": "ALP 43 / L-NP 57" },
+     "Western Australia": { "alp": 27, "lnp": 51, "grn": 11.5, "pup": 6, "oth": 4.5, "alp2": 41.5, "lnp2": 58.5, "sample": 455, "trend2pp": "ALP 39.5 / L-NP 60.5" },
+     "South Australia": { "alp": 28.5, "lnp": 46, "grn": 10, "pup": 4, "oth": 11.5, "alp2": 44.5, "lnp2": 55.5, "sample": 409, "trend2pp": "ALP 43 / L-NP 57" },
+     "Tasmania": { "alp": 34, "lnp": 36.5, "grn": 15.5, "pup": 4.5, "oth": 9.5, "alp2": 55, "lnp2": 45, "sample": 162, "trend2pp": "ALP 52.5 / L-NP 47.5" }
+    },
+    "cities": {
+     "Capital Cities": { "alp": 31.5, "lnp": 45, "grn": 12, "pup": 6, "oth": 5.5, "alp2": 46.5, "lnp2": 53.5, "sample": 2968 },
+     "Country Areas": { "alp": 31, "lnp": 42, "grn": 9, "pup": 8, "oth": 10, "alp2": 47, "lnp2": 53, "sample": 1969 }
+    },
+    "age": {
+     "18-24": { "alp": 30.5, "lnp": 33, "grn": 19, "pup": 5.5, "oth": 12, "alp2": 54.5, "lnp2": 45.5, "sample": 332 },
+     "25-34": { "alp": 33, "lnp": 33, "grn": 18, "pup": 6.5, "oth": 9.5, "alp2": 55.5, "lnp2": 44.5, "sample": 640 },
+     "35-49": { "alp": 32.5, "lnp": 39.5, "grn": 11.5, "pup": 8.5, "oth": 8, "alp2": 50, "lnp2": 50, "sample": 1280 },
+     "50-64": { "alp": 30.5, "lnp": 49, "grn": 6.5, "pup": 7, "oth": 7, "alp2": 42, "lnp2": 58, "sample": 1494 },
+     "65+": { "alp": 28, "lnp": 56, "grn": 6.5, "pup": 4, "oth": 5.5, "alp2": 38, "lnp2": 62, "sample": 1191 }
+    },
+    "gender": {
+     "Men": { "alp2": 44.5, "lnp2": 55.5 },
+     "Women": { "alp2": 48.5, "lnp2": 51.5 }
+    }
+   },
+   "note": "ANALYSIS BY STATE tables print each cell once as 'vs 2010 Federal Election' tables (alp2/lnp2 here) and again as 4-week trend tables whose Sep 4-6 column differs slightly (trend2pp kept verbatim alongside). Gender exists ONLY as prose 2PP: 'Analysis by Gender shows Women now favouring the L-NP (51.5%) cf. ALP (48.5%) ... Men favouring the L-NP (55.5%) cf. ALP (44.5%)'. No gender primaries printed."
+  },
+  {
+   "election": "2016-07-02",
+   "finding": "Roy Morgan finding 6831 (\"Election now too close to call: ALP 51% cf. L-NP 49%. Minor Parties 'won' last night's Leaders' debate.\") — Morgan's LAST 2016 wave; published 30 May 2016",
+   "dateStart": "2016-05-21",
+   "date": "2016-05-29",
+   "sample": 3099,
+   "und": 2.5,
+   "method": "multi-mode via face-to-face and SMS interviewing over the last two weekends; Australian electors 18+",
+   "tpp": { "alp": 51, "lnp": 49 },
+   "total": { "alp": 32.5, "lnp": 37.5, "grn": 13, "onp": null, "nxt": 5, "kap": 1, "pup": 0, "oth": 11 },
+   "dims": {
+    "state": {
+     "New South Wales": { "alp2": 46.5, "lnp2": 53.5 },
+     "Victoria": { "alp2": 57.5, "lnp2": 42.5 },
+     "Queensland": { "alp2": 48, "lnp2": 52 },
+     "Western Australia": { "alp2": 50.5, "lnp2": 49.5 },
+     "South Australia": { "alp": 25, "lnp": 31, "nxt": 26.5, "grn": 8.5, "oth": 9, "alp2": 51, "lnp2": 49 },
+     "Tasmania": { "alp2": 63, "lnp2": 37 }
+    },
+    "gender": {
+     "Men": { "alp2": 48.5, "lnp2": 51.5 },
+     "Women": { "alp2": 53.5, "lnp2": 46.5 }
+    },
+    "age": {
+     "18-24": { "alp2": 59.5, "lnp2": 40.5 },
+     "25-34": { "alp2": 64.5, "lnp2": 35.5 },
+     "35-49": { "alp2": 49.5, "lnp2": 50.5 },
+     "50-64": { "alp2": 47.5, "lnp2": 52.5 },
+     "65+": { "alp2": 42.5, "lnp2": 57.5 }
+    }
+   },
+   "tppResp": "headline 51/49 is respondent-allocated ('allocated preferences based on how people say they will vote'); previous-election-flow basis prints ALP 51.5 / L-NP 48.5",
+   "note": "Full release re-fetched from Wayback after IA recovered (capture 20160531110325). National primaries verbatim from the release: L-NP 37.5 (up 1), ALP 32.5 (down 0.5), Greens 13 (down 2.5), NXT 5 (unchanged), Katter's Australian Party 1 (up 0.5), Palmer United 0 (unchanged), Independents/Others 11 (up 1.5). Only SA gets printed primaries ('Liberals (31%), NXT (26.5%) and the ALP (25%) with support for the Greens (8.5%) and Independent/Others (9%)'); all other state/age/gender splits are 2PP-only prose. NOT an election-eve wave: Morgan's tables show the next reading after this wave is the 2 July 2016 election result itself."
+  },
+  {
+   "election": "2019-05-18",
+   "finding": "Roy Morgan finding 7975 (\"ALP regains initiative with a week to go: ALP 52% cf. L-NP 48%\") — final Morgan VI wave of the 2019 campaign; published 14 May 2019 per Morgan's own finding page (the ABIX mirror cross-posted 13 May its time)",
+   "dateStart": "2019-05-10",
+   "date": "2019-05-12",
+   "sample": 1265,
+   "und": 5,
+   "method": "face-to-face interviewing, representative cross-section of Australian electors 18+",
+   "tpp": { "alp": 52, "lnp": 48 },
+   "total": { "alp": 35.5, "lnp": 38.5, "grn": 10, "onp": 4, "uap": 3.5, "oth": 8.5 },
+   "dims": {},
+   "note": "Figures verified against BOTH the ABIX mirror and Morgan's own original release page (Wayback capture 20190516002222, re-fetched after IA recovered): identical, and the original likewise carries NO state/age/gender analysis — this was a slim release. Wikipedia's 2019 table carries identical figures (fieldwork 10-12 May; Morgan's original says only 'concluding on the weekend'). Preference basis: respondent's stated preferences. Follow-up special SMS poll (finding 7980, published 17 May 2019) asked only who would WIN: 66% ALP / 34% L-NP nationally — by supporter (ALP 81%, L-NP 53% for own side, Greens 84% ALP, Independents/Others 64.5% ALP) and by age (18-24: 80, 25-34: 74.5, 35-49: 65, 50-64: 61.5, 65+: 59 expecting an ALP win) — expectations only, no voting intention."
+  },
+  {
+   "election": "2022-05-21",
+   "finding": "Roy Morgan finding 8977 (\"ALP 53% leads the L-NP 47% and set to win the Election...\") — penultimate week",
+   "dateStart": "2022-05-09",
+   "date": "2022-05-15",
+   "sample": 1366,
+   "und": 6,
+   "method": "telephone and online interviewing of Australian electors 18+",
+   "tpp": { "alp": 53, "lnp": 47 },
+   "total": { "alp": 34, "lnp": 34, "grn": 13, "onp": 4, "uap": 1, "oth": 5, "ind": 9 },
+   "dims": {
+    "state": {
+     "New South Wales": { "alp2": 52, "lnp2": 48 },
+     "Victoria": { "alp2": 57, "lnp2": 43 },
+     "Queensland": { "alp2": 47, "lnp2": 53 },
+     "Western Australia": { "alp2": 54.5, "lnp2": 45.5, "caution": "release says 'from a small sample'" },
+     "South Australia": { "alp2": 49, "lnp2": 51, "caution": "release says 'from a small sample'" },
+     "Tasmania": { "alp2": 58, "lnp2": 42, "caution": "release says 'from a small sample'" }
+    }
+   },
+   "note": "State figures are 2PP-only (2019-election-flow basis), printed in prose. 'oth' = printed 'Other Parties' 5%; 'ind' = printed 'Independents' 9% (release's umbrella: minor parties and independents 32%)."
+  },
+  {
+   "election": "2022-05-21",
+   "finding": "Roy Morgan finding 8981 (\"ALP retains lead over the L-NP in the final week and set to win the Federal Election\") — THE FINAL pre-election release; published Friday 20 May 2022",
+   "dateStart": null,
+   "date": "2022-05-20",
+   "sample": null,
+   "method": "Roy Morgan Single Source weekly tracking, 'interviewing throughout this week'; release prints no wave n (chart caption: average interviews per fortnight n=2,000, May 2019-May 2022)",
+   "tpp": { "alp": 53, "lnp": 47 },
+   "tppResp": { "alp": 56.5, "lnp": 43.5 },
+   "total": { "alp": 34, "lnp": 34, "grn": 13, "onp": 4, "uap": 1, "oth": 5, "ind": 9 },
+   "dims": {},
+   "note": "National figures only — the final-week release carries NO state/age/gender splits. Headline tpp is the 2019-election-flows basis; respondent-allocated preferences produce ALP 56.5 / L-NP 43.5 (both printed). PDF (8981-Federal-Voting-Election-Summary-May-20-2022.pdf) is prose-identical; its only charts are national + female + male 2PP trend charts (figures only as image lines, no printed endpoints)."
+  }
+ ],
+ "sources": [
+  { "url": "https://web.archive.org/web/20130909000722/http://www.roymorgan.com/findings/5169-l-np-set-to-win-federal-election-as-alp-primary-vote-collapses-201309090007", "archived": "src/morgan/2013-final-wb20130909000722.html (+ src/morgan/2013-final.txt, src/morgan/2013-tables.json — 34 tables parsed verbatim by the prior agent)", "note": "finding 5169 full demographic release: national/state/cities/age tables, gender 2PP in prose, undecided 1.5%" },
+  { "url": "https://roymorgan.com/morgan-poll (historical table mirrors)", "archived": "src/morgan/roymorgan-table-primary-2016-excerpt.txt (slices of .build/roymorgan-src/primary-2013-2025.txt + tpp-1901-2022.txt)", "note": "Morgan's own wave series: last 2016 wave = May 21/22 & 28/29 (32.5/37.5(3.5)/13/n.a./5/12, 2PP ALP 51.0 L-NP 49.0 multi-mode), then the election result — proves no June 2016 Morgan wave exists" },
+  { "url": "https://web.archive.org/web/20160531110325/http://www.roymorgan.com/findings/6831-morgan-poll-federal-voting-intention-may-30-2016-201605300615", "archived": "src/morgan/2016-final-6831-wb20160531110325.html (+ src/morgan/2016-final-6831-tables.txt extracted)", "note": "finding 6831 FULL release (May 30 2016): national primaries, SA primaries, state/gender/age 2PP prose, n=3099, und 2.5%, method face-to-face+SMS — re-fetched when IA recovered" },
+  { "url": "https://www.pollbludger.net/2016/05/30/newspoll-bludgertrack-broken-down/", "archived": "src/morgan/pb-2016-05-30-newspoll-bludgertrack-broken-down.html", "note": "PB UPDATE block relaying finding 6831 (independent corroboration)" },
+  { "url": "https://web.archive.org/web/20190516002222/http://www.roymorgan.com/findings/7975-alp-regains-initiative-with-a-week-to-go-201905140553", "archived": "src/morgan/2019-final-7975-wb20190516002222.html", "note": "finding 7975 Morgan-original release page (dated May 14 2019; identical figures to the ABIX mirror; carries no state/age/gender analysis)" },
+  { "url": "https://abix.com.au/2019/05/13/alp-regains-initiative-with-a-week-to-go-alp-52-cf-l-np-48/", "archived": "src/morgan/2019-final-7975-abix.html", "note": "ABIX verbatim mirror of finding 7975 (final face-to-face Morgan poll, n=1265, undecided-can't-say 5%)" },
+  { "url": "https://abix.com.au/2019/05/17/two-thirds-of-australians-think-the-alp-is-set-to-win-tomorrows-federal-election/", "archived": "src/morgan/2019-sms-7980-abix.html", "note": "ABIX mirror of finding 7980 — special SMS expectations poll (no VI)" },
+  { "url": "https://roymorgan.com/findings/8981-alp-retains-lead-over-the-l-np-in-the-final-week-and-set-to-win-the-federal-election", "archived": "src/morgan/2022-final-live.html (+ src/morgan/2022-final-next.json — __NEXT_DATA__ dump)", "note": "finding 8981 live page; national toplines + respondent-allocated 2PP" },
+  { "url": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/06/07003954/8981-Federal-Voting-Election-Summary-May-20-2022.pdf", "archived": "src/morgan/2022-election-summary-8981.pdf (+ .txt)", "note": "PDF twin of finding 8981 (dated Friday, 20 May 2022)" },
+  { "url": "https://roymorgan.com/findings/8977-roy-morgan-poll-on-federal-voting-intention-may-2022-202205161214", "archived": "src/morgan/2022-may16-8977-live.html (+ src/morgan/2022-may16-8977-next.json)", "note": "finding 8977 live page: May 9-15 2022 wave, n=1366, prose state 2PPs" },
+  { "url": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/06/06234845/8977-Federal-Voting-Intention-Election-Week-May-2022.pdf", "archived": "src/morgan/2022-may-8977.pdf (+ .txt)", "note": "PDF twin of finding 8977 (dated Tuesday, 17 May 2022)" },
+  { "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2019_Australian_federal_election", "archived": "src/newspoll/wikipedia-opinion-polling-2019-wikitext.txt", "note": "cross-check: 10-12 May 2019 Morgan row 38.5/35.5/10/4/12(3.5 UAP, 8.5 Ind/Oth), 2PP 52/48; also shows nothing from Morgan after it in the campaign" }
+ ],
+ "notes": [
+  "PUP KEYING (2013): the lane brief asked PUP be treated as inside oth with onp:null. The source PRINTS Palmer United Party as its own column, separate from 'Ind./Other', so for verbatim fidelity PUP is filed as its own 'pup' key (same pattern as the 'uap'/'nxt' keys used here and by the Newspoll lane); merge pup+oth downstream if a 4-party schema is needed. onp:null — One Nation was not in the field in 2013 (its 2013-era vote was inside Ind./Other).",
+  "Every 2013 state/city/age row sums to exactly 100 with the five printed columns; national sum 100. 2016 wave sums 100 (ONP printed 'n/a' → null). 2019 wave sums 100. 2022 waves sum 100 (34+34+13+4+1+5+9). No row exceeded 100.5.",
+  "L-NP PARENTHETICAL in 2013/2016 tables: 'L-NP 44 (3)' prints a bracketed second figure. In 2016 Morgan's own table header context (NXT column era) and the era's Morgan conventions this is the National-party component; in the 2013 release its definition is not restated on the page — filed as 'lnpParen' information only via this note: NSW (5.5), VIC (2), QLD (0.5), WA (5), SA (1), national (3), CapCities (0.5), Country (7); 2016 May 21/22&28/29 wave: (3.5). Do not treat as a party share.",
+  "2013 DUAL 2PP FORMS: each state's 2PP appears twice — the 'vs 2010 election' single table (filed as alp2/lnp2) and the 4-week trend table Sep 4-6 column (filed as trend2pp). Example NSW 48.5/51.5 vs 47/53. Both forms printed in the same release; no reconciliation attempted.",
+  "2016 MORGAN GAP RESOLVED: handoff expected an SMS poll ~1 Jul 2016 (L-NP 50.5). Disproven by Morgan's own historical tables (last wave May 21/22 & 28/29, then the election), the ABIX release index (consumer-confidence posts but no federal VI release 25 Jun-4 Jul 2016), Poll Bludger's 1 Jul 2016 final-roundup (which lists 'final results from Newspoll, Galaxy, ReachTEL, Ipsos and Essential Research' — no Morgan), and Wikipedia's 2016 table. The 'L-NP 50.5' memory belongs to the final Newspoll (50.5-49.5 Coalition). Live roymorgan.com does not serve pre-2021 findings (5169 and 7980 slugs both 404 live — saved as src/morgan/2019-sms-7980-live-404.html); all legacy-release content here therefore comes via Wayback captures (IA was 'Temporarily Offline' most of the pass, recovered near the end and yielded 6831 + 7975).",
+  "2022 GENDER: female/male 2PP trend charts exist only as images inside findings 8977/8981 (no printed endpoint figures) — not transcribed (pixel-reading a trend line would invent numbers).",
+  "2022 8981 fieldwork: exact dates/n not printed ('Roy Morgan continued interviewing throughout this week'); date filed as the 20 May 2022 publication date with dateStart null."
+ ],
+ "gaps": [
+  "2013-09-07: NOTHING missing from the release itself (full demographic pack captured).",
+  "2016-07-02: any June 2016 Morgan wave — none exists (see notes; the expected ~1 Jul SMS poll is a false memory of the final Newspoll). The 6831 release itself is now fully captured (state/gender/age 2PPs filed); remaining unfilled cells are those the release never printed (non-SA state primaries, age/gender primaries).",
+  "2019-05-18: nothing further — Morgan's own original release of 7975 (captured) carries no demographic analysis beyond what is filed. Probed and ruled out: live roymorgan.com legacy slugs (404); ABIX index complete May 12-21 2019 (only 7975 + the 7980 expectations SMS exist from Morgan that fortnight); Wikipedia contradictory-slug candidates 7952/7966/7968 are earlier May waves, not finals.",
+  "2022-05-21: printed state/age figures for the FINAL week (8981) do not exist in the release (national only); gender 2PP exists only as chart images."
+ ]
+}

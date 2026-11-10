@@ -1,0 +1,31 @@
+{
+ "house": "Galaxy Research (News Corp tabloids)",
+ "_about": "Lane C. Galaxy final pre-election poll 2016 (published in News Corp tabloids, 30 Jun 2016). The on-the-day open record is the Poll Bludger relay plus Wikipedia's tabulated row; News tabloid print crosstabs (state/age/gender) never surfaced on the open web and galaxyresearch.com.au is dead (Wayback offline all pass). Scope note: the 2019 final YouGov-Galaxy (13-15 May, Herald Sun) is outside this lane's brief (Lane brief: Galaxy 2016 only); its open figures sit on Wikipedia's 2019 table and the SMH-side relays.",
+ "waves": [
+  {
+   "election": "2016-07-02",
+   "finding": "final Galaxy poll of the 2016 campaign, News Corp tabloids (published 30 Jun 2016)",
+   "dateStart": "2016-06-28",
+   "date": "2016-06-29",
+   "sample": 1768,
+   "method": "landline (Wikipedia table mode column)",
+   "tpp": { "alp": 49, "lnp": 51 },
+   "total": { "alp": 36, "lnp": 43, "grn": 10, "onp": null, "oth": 11 },
+   "dims": {},
+   "note": "PB relay (30 Jun 2016): 'The News Corporation tabloids have a Galaxy poll of 1768 respondents which give the Coalition a lead of 51-49 on two-party preferred, compared with 50-50 in a similar poll a week ago. The primary votes are 43% for the Coalition (up one), 36% for Labor (down one) and 10% for the Greens (down one).' The relay prints no Others figure; Wikipedia's 2016 table row (28-29 Jun, n=1768) prints Others 11%. Sum 43+36+10+11=100."
+  }
+ ],
+ "sources": [
+  { "url": "https://www.pollbludger.net/2016/06/30/fairfax-ipsos-50-50-3/", "archived": "src/galaxy/pb-2016-06-30-fairfax-ipsos-50-50-galaxy-51-49.html (+ .json)", "note": "PB relay carrying both the Ipsos and Galaxy 2016 finals (copied into src/galaxy for lane self-containment; original fetch under src/ipsos)" },
+  { "url": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2016_Australian_federal_election", "archived": "src/newspoll/wikipedia-opinion-polling-2016-wikitext.txt", "note": "Galaxy final row: 28-29 Jun 2016, 43/36/10/11 others, 2PP 51-49 Coalition, n=1768, landline" }
+ ],
+ "notes": [
+  "No Galaxy demographic crosstabs (state/age/gender) were published on the open web for the 2016 final: News tabloids printed them in-paper only, and neither Galaxy's own site (galaxyresearch.com.au — house defunct since the 2017 YouGov merger) nor GhostWhoVotes carried this wave's tables in retrievable form.",
+  "Same PB post carries two Galaxy SEAT polls (Adelaide: Labor 53-47 over Liberal Casey; Port Adelaide: Butler 76-33, sample ~500 each) — seat-level, out of lane scope, recorded here as fragments only.",
+  "Galaxy-era history from the repo skill (auspol-galaxy-archive): the Galaxy back catalogue only survives as a Wayback reconstruction; with IA 'Temporarily Offline' all pass, no galaxyresearch.com.au prefix probes could run."
+ ],
+ "gaps": [
+  "2016 final crosstabs (age/gender/state as printed in the News tabloids 1 Jul 2016 editions) — not on the open web; probe line = web.archive.org CDX prefix galaxyresearch.com.au with filter original:.*pdf around 2016-07 (IA offline all pass).",
+  "2019 final YouGov-Galaxy (13-15 May, national, Herald Sun 'Echoes of Gough as Bill charges on', 17 May 2019) — out of this lane's brief; Wikipedia's 2019 wikitext carries the row (saved at src/newspoll/wikipedia-opinion-polling-2019-wikitext.txt); Herald Sun original paywalled; no open crosstabs."
+ ]
+}
