@@ -880,7 +880,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"f7910904","core-2019.json":"d74b631c","core-2022.json":"3e1dc467","core-2025.json":"4a83664f","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"358475b1","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"9be38f02","res-2019.json":"21586d6e","res-2022.json":"2bbcc5b9","res-2025.json":"6aa485bd","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"f7910904","core-2019.json":"d74b631c","core-2022.json":"3e1dc467","core-2025.json":"4a83664f","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"358475b1","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"9be38f02","res-2019.json":"21586d6e","res-2022.json":"2bbcc5b9","res-2025.json":"6aa485bd","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -1981,6 +1981,299 @@ function oceanUnder(m) {
   ctx.restore();
 }
 
+/* ----- the water in the seats -----
+   The AEC draws its divisions across the water: Sydney Harbour, Botany Bay, the
+   Parramatta and the Swan lie inside seats (Western Port too from 2019; Moreton Bay
+   and the Torres Strait in Queensland's own districts), and so do the lakes,
+   reservoirs and wider reaches of the rivers. Street zoom has always cut them back to Esri's sea; these
+   are cut out of the seats at every zoom before it, from water_build.mjs's files:
+   the seats' area less the ABS's land, kept where wide enough to be water, each piece
+   tagged with the frames whose seats cover it (a frame cuts only its own pieces and
+   strokes only their shores, so no frame gets a second coast beside its own).
+     water.json       the pieces a country or state view can show (over 5 km2, to
+                      500 m) and the big dry lakes, loaded with the map
+     water-<city>.json  all of it round one capital (to 25 m; the dry lakes to 100 m),
+                      fetched as a city view first nears it
+   A city file takes over from the country file as the zoom passes WATER_MPP (metres a
+   pixel; the coarse shapes never reach the city views, where they would cut the land),
+   and Esri's sea from both between seaA's zooms, the cuts laid so the water is whole all
+   the way across (waterLook, drawWater).
+   The salt lakes of the interior (Kati Thanda-Lake Eyre, Torrens, Gairdner, Mackay,
+   Amadeus...) are dry most years: Geoscience Australia's non-perennial lakes are drawn
+   over the seats' colour as an atlas draws a salt lake - a pale wash, short level
+   dashes and a broken outline - and never cut to water, Esri's sea included. */
+const WATER_MPP = [900, 1300], WATER_PREFETCH = 1600, WATER_FADE = 260;
+let WATER = null, waterP = null, waterUid = 0;
+const waterTiles = new Map(); // city -> { src, p } (src null until it lands)
+// a file's arcs to lon/lat once, each geometry's bounds with them
+function waterSrc(t) {
+  const mk = (topo) => {
+    const tf = topo.transform, arcs = topo.arcs.map((a) => {
+      const o = new Float64Array(a.length * 2);
+      let x = 0, y = 0;
+      for (let i = 0; i < a.length; i++) {
+        if (tf) { x += a[i][0]; y += a[i][1]; o[2 * i] = x * tf.scale[0] + tf.translate[0]; o[2 * i + 1] = y * tf.scale[1] + tf.translate[1]; }
+        else { o[2 * i] = a[i][0]; o[2 * i + 1] = a[i][1]; }
+      }
+      return o;
+    });
+    const geoms = {};
+    for (const [k, o] of Object.entries(topo.objects)) geoms[k] = o.geometries.filter((g) => g.arcs).map((g) => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      const walk = (a) => { if (typeof a !== "number") return a.forEach(walk); const A = arcs[a < 0 ? ~a : a]; for (let i = 0; i < A.length; i += 2) { if (A[i] < x0) x0 = A[i]; if (A[i] > x1) x1 = A[i]; if (A[i + 1] < y0) y0 = A[i + 1]; if (A[i + 1] > y1) y1 = A[i + 1]; } };
+      walk(g.arcs);
+      return { g, p: g.properties || {}, gbb: [x0, y0, x1, y1] };
+    });
+    return { arcs, geoms };
+  };
+  return { frames: t.frames, caps: t.caps, tiles: t.tiles, lp: t.lp || null, w: mk(t.water), d: mk(t.dry), at: performance.now(), sets: new WeakMap() };
+}
+const loadWater = () => waterP || (waterP = getJSON("/map/data/water.json", true).then((t) => { WATER = waterSrc(t); schedule(); }).catch(() => { waterP = null; }));
+function loadWaterTile(cap) {
+  let e = waterTiles.get(cap);
+  if (e) return e;
+  waterTiles.set(cap, (e = { src: null, p: null }));
+  e.p = getJSON(`/map/data/water-${cap}.json`, true).then((t) => { e.src = waterSrc(t); schedule(); }).catch(() => { waterTiles.delete(cap); });
+  return e;
+}
+// a frame's view of a file: its pieces, shores and mouths (those its seats cover) and every dry
+// lake, each with its bounds on the frame's plane; their paths are made as each is first seen
+function waterSet(src, m) {
+  let s = src.sets.get(m);
+  if (s && s.P === m.proj) return s;
+  const P = m.proj, bit = src.frames.indexOf(String(nowRy(m.year)));
+  const pbb = ([x0, y0, x1, y1]) => {
+    let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+    for (const u of [0, 0.5, 1]) for (const v of [0, 0.5, 1]) { const q = P([x0 + u * (x1 - x0), y0 + v * (y1 - y0)]); if (!q) continue; a = Math.min(a, q[0]); c = Math.max(c, q[0]); b = Math.min(b, q[1]); d = Math.max(d, q[1]); }
+    const ex = 0.02 * (c - a) + 0.05, ey = 0.02 * (d - b) + 0.05;
+    return [[a - ex, b - ey], [c + ex, d + ey]];
+  };
+  const mine = (it) => bit >= 0 && (it.p.f & (1 << bit));
+  const items = (G, keep) => (G || []).filter(keep).map((it) => ({ ...it, bb: pbb(it.gbb), path: null, uid: ++waterUid }));
+  s = { P, src, parcs: [new Map(), new Map()], water: items(src.w.geoms.water, mine), shore: items(src.w.geoms.shore, mine), mouth: items(src.w.geoms.mouth, mine), dry: items(src.d.geoms.dry, () => true) };
+  src.sets.set(m, s);
+  return s;
+}
+// an item's path on the frame's plane (rings closed for the areas, open for the lines)
+function waterPath(s, it, dry) {
+  if (it.path) return it.path;
+  const arcs = dry ? s.src.d.arcs : s.src.w.arcs, cache = s.parcs[dry ? 1 : 0], P = s.P, p = new Path2D();
+  const proj = (a) => {
+    let o = cache.get(a);
+    if (!o) { const A = arcs[a]; o = new Float32Array(A.length); for (let i = 0; i < A.length; i += 2) { const q = P([A[i], A[i + 1]]); o[i] = q[0]; o[i + 1] = q[1]; } cache.set(a, o); }
+    return o;
+  };
+  const line = (ring, close) => {
+    let first = true;
+    for (const a of ring) {
+      const o = proj(a < 0 ? ~a : a), n = o.length / 2, rev = a < 0;
+      for (let k = 0; k < n; k++) {
+        const i = rev ? n - 1 - k : k;
+        if (first) { p.moveTo(o[2 * i], o[2 * i + 1]); first = false; } else if (k) p.lineTo(o[2 * i], o[2 * i + 1]);
+      }
+    }
+    if (close && !first) p.closePath();
+  };
+  const g = it.g;
+  if (g.type === "Polygon") g.arcs.forEach((r) => line(r, true));
+  else if (g.type === "MultiPolygon") g.arcs.forEach((pg) => pg.forEach((r) => line(r, true)));
+  else if (g.type === "LineString") line(g.arcs, false);
+  else if (g.type === "MultiLineString") g.arcs.forEach((l) => line(l, false));
+  return (it.path = p);
+}
+// metres a CSS pixel at the middle of the view, on a frame's plane
+function mppOf(m) {
+  if (!m._kmU || m._kmU.P !== m.proj) {
+    const c = m.proj.invert([500, 440]) || [134, -27], a = m.proj(c), b = m.proj([c[0] + 0.1, c[1]]);
+    m._kmU = { P: m.proj, u: Math.hypot(b[0] - a[0], b[1] - a[1]) / (0.1 * 111.32 * Math.cos((c[1] * Math.PI) / 180)) };
+  }
+  return 1000 / (m._kmU.u * T.k);
+}
+// the lon/lat bounds of the view
+function viewGeo(m) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [u, v] of [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5]]) {
+    const q = m.proj.invert([(u * Wpx - T.x) / T.k, (v * Hpx - T.y) / T.k]); if (!q) continue;
+    x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]);
+  }
+  return [x0, y0, x1, y1];
+}
+const geoMeets = (a, b) => !(a[2] < b[0] || a[0] > b[2] || a[3] < b[1] || a[1] > b[3]);
+/* what a paint draws of the water: each set with each item's strength. A city's file is
+   asked for as the zoom passes WATER_PREFETCH m a pixel over it and, once in, has the city
+   alone below WATER_MPP[0] (fading in over WATER_FADE as it lands); the country file has
+   it above WATER_MPP[1], the two blending between, where they differ by under half a pixel
+   (so two cuts at part strength never leave half an edge standing). A city whose file is not
+   in yet keeps the country file's shapes, but only down to WATER_LO_FLOOR (they would cut
+   the land closer in; the city keeps its seats' colour there, as it always did, until its
+   file lands) */
+const WATER_LO_FLOOR = [250, 400];
+// a seat whose results' label point stands on the water it is drawn across (Kingsford Smith's
+// in Botany Bay, Redcliffe's in Moreton Bay) takes the point on its land water_build.mjs found,
+// so its name stands on its colour, wherever the water shows
+function applyWaterLabels(m) {
+  if (m._wlp === WATER) return;
+  m._wlp = WATER;
+  const L = WATER.lp && WATER.lp[String(nowRy(m.year))];
+  if (!L || !m.divs) return;
+  for (const d of m.divs) { const p = L[d.n]; if (!p) continue; d.lp = p; const q = m.proj(p); d.lpx = q[0]; d.lpy = q[1]; }
+}
+function waterLook(m) {
+  if (!m || !m.proj) return null;
+  if (!WATER) { loadWater(); return null; }
+  applyWaterLabels(m);
+  const now = performance.now(), mpp = mppOf(m), z = smooth(WATER_MPP[0], WATER_MPP[1], mpp);
+  const fade = (src) => { const f = clamp((now - src.at) / WATER_FADE, 0, 1); if (f < 1) needFrame = true; return f; };
+  const out = [], vg = viewGeo(m), caps = WATER.caps || [], hiW = caps.map(() => 0);
+  if (mpp < WATER_PREFETCH) caps.forEach((cap, c) => {
+    const bb = WATER.tiles && WATER.tiles[cap];
+    if (!bb || !geoMeets(bb, vg)) return;
+    const e = loadWaterTile(cap);
+    if (!e.src || z >= 1) return;
+    hiW[c] = (1 - z) * fade(e.src);
+    if (hiW[c] > 0.004) { const w = hiW[c]; out.push({ s: waterSet(e.src, m), w: () => w }); }
+  });
+  const lo = fade(WATER) * smooth(WATER_LO_FLOOR[0], WATER_LO_FLOOR[1], mpp), loW = hiW.map((h) => (1 - h) * lo);
+  if (loW.some((w) => w > 0.004)) out.push({ s: waterSet(WATER, m), w: (it) => loW[it.p.c] ?? lo, lo: true });
+  return out.length ? out : null;
+}
+// the items of a kind in view, each with its strength
+function waterItems(look, kind) {
+  const [x0, y0, x1, y1] = viewBox(), out = [];
+  for (const L of look || []) for (const it of L.s[kind]) { if (!inBox(it.bb, x0, y0, x1, y1)) continue; const w = L.w(it); if (w > 0.004) out.push([L, it, w]); }
+  return out;
+}
+let waterNow = null; // the paint's water, for drawFocus: { m, pieces (those drawn at half strength or more), sig }
+// the pieces as one path, and the land about them (a rect over the whole plane less the pieces,
+// even-odd) for clipping to: made only when the veil or an outline wants them, and kept while the
+// same pieces are in (a paint making them afresh each frame left the collector a big path a frame)
+let waterPaths = { sig: "", wet: null, land: null };
+function waterWet(m) {
+  if (!waterNow || waterNow.m !== m || !waterNow.pieces.length) return null;
+  if (waterPaths.sig !== waterNow.sig) {
+    const wet = new Path2D();
+    for (const [L, it] of waterNow.pieces) wet.addPath(waterPath(L.s, it));
+    const land = new Path2D(); land.rect(-1e5, -1e5, 2e5, 2e5); land.addPath(wet);
+    waterPaths = { sig: waterNow.sig, wet, land };
+  }
+  return waterPaths;
+}
+/* The cut. With nothing to blend (each item at full strength, no sea of Esri's in) the
+   pieces come straight out of the canvas, and the seats' coast stroke over each mouth with
+   them (its outer half would stand on the water). Otherwise all of that is laid on a layer
+   first, each at its strength and adding up, so the country file's shape and a city file's
+   sum to one where both lie, and Esri's sea handed the water where it has come in: inside
+   st.known the layer keeps its full strength where Esri's sea lies too (laySea cuts that at
+   sa after) and (1 - sa) where it doesn't, so the water is whole at every step of the
+   handover, never the seats' colour showing through mid-way; once Esri's sea has it all
+   (sa 1) ours is cut only outside its tiles. The ocean is laid back into the holes, the
+   shores stroked like the coast. The dry lakes go on last, over the fills. */
+function drawWater(m, alpha, st, sa) {
+  const look = waterLook(m);
+  if (m === M()) waterNow = null;
+  if (!look) return;
+  const th = TH, W = canvas.width, H = canvas.height, mt = [dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y];
+  const pieces = waterItems(look, "water"), mouths = waterItems(look, "mouth");
+  const handover = sa > 0 && st && st.known, taken = handover && sa >= 0.999;
+  if (pieces.length) {
+    const full = pieces.every((q) => q[2] >= 0.996) && mouths.every((q) => q[2] >= 0.996);
+    // (a cut takes the source's alpha: opaque fills and strokes, whatever the last ones were)
+    const cut = (g) => {
+      g.setTransform(...mt); g.fillStyle = g.strokeStyle = "#000"; g.lineCap = "butt"; g.lineJoin = "round"; g.lineWidth = 1.8 / T.k;
+      for (const [L, it, w] of pieces) { g.globalAlpha = w; g.fill(waterPath(L.s, it), "evenodd"); }
+      for (const [L, it, w] of mouths) { g.globalAlpha = w; g.stroke(waterPath(L.s, it)); }
+    };
+    // (once Esri's sea has the water wherever its tiles are in, ours is cut only where they aren't)
+    const outside = (g) => { const o = new Path2D(); o.rect(-1, -1, W + 2, H + 2); o.addPath(st.known); g.setTransform(1, 0, 0, 1, 0, 0); g.clip(o, "evenodd"); };
+    if (full && (!handover || taken)) {
+      ctx.save(); if (taken) outside(ctx);
+      ctx.globalCompositeOperation = "destination-out"; cut(ctx);
+      ctx.restore();
+    } else {
+      const Lr = waterLayer();
+      Lr.globalCompositeOperation = "lighter"; cut(Lr);
+      if (taken) { Lr.setTransform(1, 0, 0, 1, 0, 0); Lr.globalAlpha = 1; Lr.globalCompositeOperation = "destination-out"; Lr.fill(st.known); }
+      else if (handover) {
+        // (the layer where Esri's sea lies, on the sea layer laySea makes afresh after)
+        if (!seaLay) seaLay = document.createElement("canvas");
+        if (seaLay.width !== W || seaLay.height !== H) { seaLay.width = W; seaLay.height = H; }
+        const S2 = seaLay.getContext("2d");
+        S2.setTransform(1, 0, 0, 1, 0, 0); S2.globalAlpha = 1; S2.globalCompositeOperation = "source-over"; S2.clearRect(0, 0, W, H);
+        S2.drawImage(Lr.canvas, 0, 0); S2.globalCompositeOperation = "destination-in"; S2.drawImage(seaCv, 0, 0);
+        Lr.setTransform(1, 0, 0, 1, 0, 0); Lr.globalAlpha = sa; Lr.globalCompositeOperation = "destination-out"; Lr.fill(st.known);
+        Lr.globalCompositeOperation = "lighter"; Lr.drawImage(seaLay, 0, 0);
+      }
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = "destination-out"; ctx.drawImage(Lr.canvas, 0, 0); ctx.restore();
+    }
+    // the ocean back into the holes, within the pieces' bounds (laySea lays it whole after, where Esri's sea is in)
+    if (!sa) {
+      let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+      for (const [, it] of pieces) { a = Math.min(a, it.bb[0][0]); b = Math.min(b, it.bb[0][1]); c = Math.max(c, it.bb[1][0]); d = Math.max(d, it.bb[1][1]); }
+      ctx.save(); ctx.setTransform(...mt); ctx.beginPath(); ctx.rect(a, b, c - a, d - b); ctx.clip(); oceanUnder(m); ctx.restore();
+    }
+    // the shores, as the coast is drawn: whole where no sea of Esri's has come in, fading where one has
+    const shoreItems = waterItems(look, "shore");
+    ctx.save(); ctx.setTransform(...mt); ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    const shores = (k) => { for (const [L, it, w] of shoreItems) { ctx.globalAlpha = alpha * w * k; ctx.stroke(waterPath(L.s, it)); } };
+    if (!handover) shores(1);
+    else {
+      ctx.save(); outside(ctx); ctx.setTransform(...mt); shores(1); ctx.restore();
+      if (sa < 1) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clip(st.known); ctx.setTransform(...mt); shores(1 - sa); ctx.restore(); }
+    }
+    ctx.restore();
+    if (m === M()) {
+      const half = pieces.filter((q) => q[2] >= 0.5);
+      waterNow = { m, pieces: half, sig: `${m.year}|${half.map((q) => q[1].uid).join(",")}` };
+    }
+  }
+  drawDryLakes(look, alpha);
+}
+// the cut's own layer: the scratch layer (layer()) has just been laid on the canvas by the seats'
+// waters at these zooms, and clearing it again the same frame made the browser keep or flush that
+// copy first, every other frame 10-20ms at street zoom's door
+let waterLay = null;
+function waterLayer() {
+  const W = canvas.width, H = canvas.height;
+  if (!waterLay) waterLay = document.createElement("canvas");
+  if (waterLay.width !== W || waterLay.height !== H) { waterLay.width = W; waterLay.height = H; }
+  const L = waterLay.getContext("2d");
+  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
+  L.clearRect(0, 0, W, H);
+  return L;
+}
+// the dry lakes: a pale wash of the sea's colour, short level dashes and a broken outline
+let dryTile = null;
+function dryPattern() {
+  const s = Math.round(9 * dpr), th = TH;
+  if (!dryTile || dryTile._th !== th || dryTile._dpr !== dpr) {
+    dryTile = document.createElement("canvas"); dryTile.width = dryTile.height = s; dryTile._th = th; dryTile._dpr = dpr;
+    const g = dryTile.getContext("2d"), w = Math.max(1, Math.round(dpr * 0.9)), len = Math.round(4 * dpr);
+    g.fillStyle = css(th.seaMark, th.dark ? 0.8 : 0.75);
+    g.fillRect(0, Math.round(s * 0.25), len, w);
+    g.fillRect(Math.round(s / 2), Math.round(s * 0.75), len, w);
+  }
+  return ctx.createPattern(dryTile, "repeat");
+}
+function drawDryLakes(look, alpha) {
+  const shown = waterItems(look, "dry");
+  if (!shown.length) return;
+  const th = TH, pat = dryPattern();
+  pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
+  ctx.save(); ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); ctx.lineJoin = "round";
+  for (const [L, it, w] of shown) {
+    const p = waterPath(L.s, it, true);
+    ctx.globalAlpha = alpha * w; ctx.fillStyle = css(th.sea, th.dark ? 0.5 : 0.62); ctx.fill(p, "evenodd");
+    ctx.fillStyle = pat; ctx.fill(p, "evenodd");
+  }
+  ctx.strokeStyle = css(th.seaMark, 0.9); ctx.lineWidth = 0.8 / T.k; ctx.setLineDash([3 / T.k, 2.2 / T.k]);
+  for (const [L, it, w] of shown) { ctx.globalAlpha = alpha * w; ctx.stroke(waterPath(L.s, it, true)); }
+  ctx.restore();
+}
+// the dry lakes in view at half strength or more, cut back out of Esri's sea (prepStreets)
+function dryInView(m) {
+  return waterItems(waterLook(m), "dry").filter((q) => q[2] >= 0.5).map(([L, it]) => waterPath(L.s, it, true));
+}
+
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
@@ -2078,6 +2371,7 @@ function drawGeo(m, alpha, streetA) {
     }
   }
   ctx.restore();
+  drawWater(m, alpha, st, sa);
   if (sa) laySea(m, st, alpha * sa);
   if (streetA !== undefined && !sa) warmWaters();
 }
@@ -2261,21 +2555,31 @@ function drawFocus(m, pathOf) {
   // where Esri's sea has taken the coast (drawGeo) the veil follows the seats'
   // waters and lies on the sea alike, so its edge is never the AEC's coast
   const sea = seaNow && seaNow.m === m && !pathOf ? seaNow : null;
+  // the water cut out of the seats (drawWater): the veil lies on it as on the sea, and the
+  // outlines keep to the land, as the sea's edge does at street zoom
+  const wp = (sd != null || S.sel.level === "state" || (S.hover && S.hover.kind === "div")) ? waterWet(m) : null;
+  const wet = wp && wp.wet, land = wp && wp.land;
   if (sea && sea.sa > 0.5 && (sd != null || S.sel.level === "state")) {
     veilSea(sd, sd != null ? th.veil : th.veil * 0.85);
   } else if (sd != null) {
     const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(P(sd));
     for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
     ctx.fillStyle = css(th.bg, th.veil); ctx.fill(v, "evenodd");
+    if (wet) { ctx.save(); ctx.clip(P(sd)); ctx.fill(wet, "evenodd"); ctx.restore(); }
   } else if (S.sel.level === "state") {
     ctx.fillStyle = css(th.bg, th.veil * 0.85);
+    // (the sea is left clear with a state open, the water in the other states' seats too)
+    if (land) { ctx.save(); ctx.clip(land, "evenodd"); }
     for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(P(d.i));
     for (const q of m.isl || []) if (q.owner == null || m.divs[q.owner].st !== S.sel.st) ctx.fill(q.mpath);
+    if (land) ctx.restore();
   }
   // a seat's outline takes in its islands; its coast is left to the sea's edge where Esri's draws it
   const outline = (i) => {
-    if (sea && sea.sa > 0.5) { ctx.stroke(g.edgeOf(i)); return; }
-    ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
+    if (land) { ctx.save(); ctx.clip(land, "evenodd"); }
+    if (sea && sea.sa > 0.5) ctx.stroke(g.edgeOf(i));
+    else { ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath); }
+    if (land) ctx.restore();
   };
   const h = S.hover;
   if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; outline(h.i); }
@@ -2580,6 +2884,8 @@ function drawYearMorph(mo, t) {
   ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
   for (const q of m.isl || []) ctx.stroke(q.mpath);
   ctx.restore();
+  // (the water in the new election's seats, cut as they settle: drawWater)
+  drawWater(m, 1, null, 0);
 }
 
 // A booth's dot. Its size is a 1,000-vote booth's radius times the square
@@ -3879,6 +4185,15 @@ function prepStreets(alpha) {
   // colour first; on the dark page they are quiet already
   const st = { a: alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k)), op: dark ? "screen" : "multiply", known: some ? known : null, seas, saved: [] };
   if (some) rescue(st, sg);
+  // (a dry lake stays land, its seat's colour under its salt-lake marks: drawDryLakes)
+  if (some) {
+    const dl = dryInView(M());
+    if (dl.length) {
+      sg.save(); sg.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); sg.globalCompositeOperation = "destination-out";
+      for (const p of dl) sg.fill(p, "evenodd");
+      sg.restore();
+    }
+  }
   prepKnown = st.known;
   return st;
 }

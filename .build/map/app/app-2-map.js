@@ -427,6 +427,299 @@ function oceanUnder(m) {
   ctx.restore();
 }
 
+/* ----- the water in the seats -----
+   The AEC draws its divisions across the water: Sydney Harbour, Botany Bay, the
+   Parramatta and the Swan lie inside seats (Western Port too from 2019; Moreton Bay
+   and the Torres Strait in Queensland's own districts), and so do the lakes,
+   reservoirs and wider reaches of the rivers. Street zoom has always cut them back to Esri's sea; these
+   are cut out of the seats at every zoom before it, from water_build.mjs's files:
+   the seats' area less the ABS's land, kept where wide enough to be water, each piece
+   tagged with the frames whose seats cover it (a frame cuts only its own pieces and
+   strokes only their shores, so no frame gets a second coast beside its own).
+     water.json       the pieces a country or state view can show (over 5 km2, to
+                      500 m) and the big dry lakes, loaded with the map
+     water-<city>.json  all of it round one capital (to 25 m; the dry lakes to 100 m),
+                      fetched as a city view first nears it
+   A city file takes over from the country file as the zoom passes WATER_MPP (metres a
+   pixel; the coarse shapes never reach the city views, where they would cut the land),
+   and Esri's sea from both between seaA's zooms, the cuts laid so the water is whole all
+   the way across (waterLook, drawWater).
+   The salt lakes of the interior (Kati Thanda-Lake Eyre, Torrens, Gairdner, Mackay,
+   Amadeus...) are dry most years: Geoscience Australia's non-perennial lakes are drawn
+   over the seats' colour as an atlas draws a salt lake - a pale wash, short level
+   dashes and a broken outline - and never cut to water, Esri's sea included. */
+const WATER_MPP = [900, 1300], WATER_PREFETCH = 1600, WATER_FADE = 260;
+let WATER = null, waterP = null, waterUid = 0;
+const waterTiles = new Map(); // city -> { src, p } (src null until it lands)
+// a file's arcs to lon/lat once, each geometry's bounds with them
+function waterSrc(t) {
+  const mk = (topo) => {
+    const tf = topo.transform, arcs = topo.arcs.map((a) => {
+      const o = new Float64Array(a.length * 2);
+      let x = 0, y = 0;
+      for (let i = 0; i < a.length; i++) {
+        if (tf) { x += a[i][0]; y += a[i][1]; o[2 * i] = x * tf.scale[0] + tf.translate[0]; o[2 * i + 1] = y * tf.scale[1] + tf.translate[1]; }
+        else { o[2 * i] = a[i][0]; o[2 * i + 1] = a[i][1]; }
+      }
+      return o;
+    });
+    const geoms = {};
+    for (const [k, o] of Object.entries(topo.objects)) geoms[k] = o.geometries.filter((g) => g.arcs).map((g) => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      const walk = (a) => { if (typeof a !== "number") return a.forEach(walk); const A = arcs[a < 0 ? ~a : a]; for (let i = 0; i < A.length; i += 2) { if (A[i] < x0) x0 = A[i]; if (A[i] > x1) x1 = A[i]; if (A[i + 1] < y0) y0 = A[i + 1]; if (A[i + 1] > y1) y1 = A[i + 1]; } };
+      walk(g.arcs);
+      return { g, p: g.properties || {}, gbb: [x0, y0, x1, y1] };
+    });
+    return { arcs, geoms };
+  };
+  return { frames: t.frames, caps: t.caps, tiles: t.tiles, lp: t.lp || null, w: mk(t.water), d: mk(t.dry), at: performance.now(), sets: new WeakMap() };
+}
+const loadWater = () => waterP || (waterP = getJSON("/map/data/water.json", true).then((t) => { WATER = waterSrc(t); schedule(); }).catch(() => { waterP = null; }));
+function loadWaterTile(cap) {
+  let e = waterTiles.get(cap);
+  if (e) return e;
+  waterTiles.set(cap, (e = { src: null, p: null }));
+  e.p = getJSON(`/map/data/water-${cap}.json`, true).then((t) => { e.src = waterSrc(t); schedule(); }).catch(() => { waterTiles.delete(cap); });
+  return e;
+}
+// a frame's view of a file: its pieces, shores and mouths (those its seats cover) and every dry
+// lake, each with its bounds on the frame's plane; their paths are made as each is first seen
+function waterSet(src, m) {
+  let s = src.sets.get(m);
+  if (s && s.P === m.proj) return s;
+  const P = m.proj, bit = src.frames.indexOf(String(nowRy(m.year)));
+  const pbb = ([x0, y0, x1, y1]) => {
+    let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+    for (const u of [0, 0.5, 1]) for (const v of [0, 0.5, 1]) { const q = P([x0 + u * (x1 - x0), y0 + v * (y1 - y0)]); if (!q) continue; a = Math.min(a, q[0]); c = Math.max(c, q[0]); b = Math.min(b, q[1]); d = Math.max(d, q[1]); }
+    const ex = 0.02 * (c - a) + 0.05, ey = 0.02 * (d - b) + 0.05;
+    return [[a - ex, b - ey], [c + ex, d + ey]];
+  };
+  const mine = (it) => bit >= 0 && (it.p.f & (1 << bit));
+  const items = (G, keep) => (G || []).filter(keep).map((it) => ({ ...it, bb: pbb(it.gbb), path: null, uid: ++waterUid }));
+  s = { P, src, parcs: [new Map(), new Map()], water: items(src.w.geoms.water, mine), shore: items(src.w.geoms.shore, mine), mouth: items(src.w.geoms.mouth, mine), dry: items(src.d.geoms.dry, () => true) };
+  src.sets.set(m, s);
+  return s;
+}
+// an item's path on the frame's plane (rings closed for the areas, open for the lines)
+function waterPath(s, it, dry) {
+  if (it.path) return it.path;
+  const arcs = dry ? s.src.d.arcs : s.src.w.arcs, cache = s.parcs[dry ? 1 : 0], P = s.P, p = new Path2D();
+  const proj = (a) => {
+    let o = cache.get(a);
+    if (!o) { const A = arcs[a]; o = new Float32Array(A.length); for (let i = 0; i < A.length; i += 2) { const q = P([A[i], A[i + 1]]); o[i] = q[0]; o[i + 1] = q[1]; } cache.set(a, o); }
+    return o;
+  };
+  const line = (ring, close) => {
+    let first = true;
+    for (const a of ring) {
+      const o = proj(a < 0 ? ~a : a), n = o.length / 2, rev = a < 0;
+      for (let k = 0; k < n; k++) {
+        const i = rev ? n - 1 - k : k;
+        if (first) { p.moveTo(o[2 * i], o[2 * i + 1]); first = false; } else if (k) p.lineTo(o[2 * i], o[2 * i + 1]);
+      }
+    }
+    if (close && !first) p.closePath();
+  };
+  const g = it.g;
+  if (g.type === "Polygon") g.arcs.forEach((r) => line(r, true));
+  else if (g.type === "MultiPolygon") g.arcs.forEach((pg) => pg.forEach((r) => line(r, true)));
+  else if (g.type === "LineString") line(g.arcs, false);
+  else if (g.type === "MultiLineString") g.arcs.forEach((l) => line(l, false));
+  return (it.path = p);
+}
+// metres a CSS pixel at the middle of the view, on a frame's plane
+function mppOf(m) {
+  if (!m._kmU || m._kmU.P !== m.proj) {
+    const c = m.proj.invert([500, 440]) || [134, -27], a = m.proj(c), b = m.proj([c[0] + 0.1, c[1]]);
+    m._kmU = { P: m.proj, u: Math.hypot(b[0] - a[0], b[1] - a[1]) / (0.1 * 111.32 * Math.cos((c[1] * Math.PI) / 180)) };
+  }
+  return 1000 / (m._kmU.u * T.k);
+}
+// the lon/lat bounds of the view
+function viewGeo(m) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [u, v] of [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5]]) {
+    const q = m.proj.invert([(u * Wpx - T.x) / T.k, (v * Hpx - T.y) / T.k]); if (!q) continue;
+    x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]);
+  }
+  return [x0, y0, x1, y1];
+}
+const geoMeets = (a, b) => !(a[2] < b[0] || a[0] > b[2] || a[3] < b[1] || a[1] > b[3]);
+/* what a paint draws of the water: each set with each item's strength. A city's file is
+   asked for as the zoom passes WATER_PREFETCH m a pixel over it and, once in, has the city
+   alone below WATER_MPP[0] (fading in over WATER_FADE as it lands); the country file has
+   it above WATER_MPP[1], the two blending between, where they differ by under half a pixel
+   (so two cuts at part strength never leave half an edge standing). A city whose file is not
+   in yet keeps the country file's shapes, but only down to WATER_LO_FLOOR (they would cut
+   the land closer in; the city keeps its seats' colour there, as it always did, until its
+   file lands) */
+const WATER_LO_FLOOR = [250, 400];
+// a seat whose results' label point stands on the water it is drawn across (Kingsford Smith's
+// in Botany Bay, Redcliffe's in Moreton Bay) takes the point on its land water_build.mjs found,
+// so its name stands on its colour, wherever the water shows
+function applyWaterLabels(m) {
+  if (m._wlp === WATER) return;
+  m._wlp = WATER;
+  const L = WATER.lp && WATER.lp[String(nowRy(m.year))];
+  if (!L || !m.divs) return;
+  for (const d of m.divs) { const p = L[d.n]; if (!p) continue; d.lp = p; const q = m.proj(p); d.lpx = q[0]; d.lpy = q[1]; }
+}
+function waterLook(m) {
+  if (!m || !m.proj) return null;
+  if (!WATER) { loadWater(); return null; }
+  applyWaterLabels(m);
+  const now = performance.now(), mpp = mppOf(m), z = smooth(WATER_MPP[0], WATER_MPP[1], mpp);
+  const fade = (src) => { const f = clamp((now - src.at) / WATER_FADE, 0, 1); if (f < 1) needFrame = true; return f; };
+  const out = [], vg = viewGeo(m), caps = WATER.caps || [], hiW = caps.map(() => 0);
+  if (mpp < WATER_PREFETCH) caps.forEach((cap, c) => {
+    const bb = WATER.tiles && WATER.tiles[cap];
+    if (!bb || !geoMeets(bb, vg)) return;
+    const e = loadWaterTile(cap);
+    if (!e.src || z >= 1) return;
+    hiW[c] = (1 - z) * fade(e.src);
+    if (hiW[c] > 0.004) { const w = hiW[c]; out.push({ s: waterSet(e.src, m), w: () => w }); }
+  });
+  const lo = fade(WATER) * smooth(WATER_LO_FLOOR[0], WATER_LO_FLOOR[1], mpp), loW = hiW.map((h) => (1 - h) * lo);
+  if (loW.some((w) => w > 0.004)) out.push({ s: waterSet(WATER, m), w: (it) => loW[it.p.c] ?? lo, lo: true });
+  return out.length ? out : null;
+}
+// the items of a kind in view, each with its strength
+function waterItems(look, kind) {
+  const [x0, y0, x1, y1] = viewBox(), out = [];
+  for (const L of look || []) for (const it of L.s[kind]) { if (!inBox(it.bb, x0, y0, x1, y1)) continue; const w = L.w(it); if (w > 0.004) out.push([L, it, w]); }
+  return out;
+}
+let waterNow = null; // the paint's water, for drawFocus: { m, pieces (those drawn at half strength or more), sig }
+// the pieces as one path, and the land about them (a rect over the whole plane less the pieces,
+// even-odd) for clipping to: made only when the veil or an outline wants them, and kept while the
+// same pieces are in (a paint making them afresh each frame left the collector a big path a frame)
+let waterPaths = { sig: "", wet: null, land: null };
+function waterWet(m) {
+  if (!waterNow || waterNow.m !== m || !waterNow.pieces.length) return null;
+  if (waterPaths.sig !== waterNow.sig) {
+    const wet = new Path2D();
+    for (const [L, it] of waterNow.pieces) wet.addPath(waterPath(L.s, it));
+    const land = new Path2D(); land.rect(-1e5, -1e5, 2e5, 2e5); land.addPath(wet);
+    waterPaths = { sig: waterNow.sig, wet, land };
+  }
+  return waterPaths;
+}
+/* The cut. With nothing to blend (each item at full strength, no sea of Esri's in) the
+   pieces come straight out of the canvas, and the seats' coast stroke over each mouth with
+   them (its outer half would stand on the water). Otherwise all of that is laid on a layer
+   first, each at its strength and adding up, so the country file's shape and a city file's
+   sum to one where both lie, and Esri's sea handed the water where it has come in: inside
+   st.known the layer keeps its full strength where Esri's sea lies too (laySea cuts that at
+   sa after) and (1 - sa) where it doesn't, so the water is whole at every step of the
+   handover, never the seats' colour showing through mid-way; once Esri's sea has it all
+   (sa 1) ours is cut only outside its tiles. The ocean is laid back into the holes, the
+   shores stroked like the coast. The dry lakes go on last, over the fills. */
+function drawWater(m, alpha, st, sa) {
+  const look = waterLook(m);
+  if (m === M()) waterNow = null;
+  if (!look) return;
+  const th = TH, W = canvas.width, H = canvas.height, mt = [dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y];
+  const pieces = waterItems(look, "water"), mouths = waterItems(look, "mouth");
+  const handover = sa > 0 && st && st.known, taken = handover && sa >= 0.999;
+  if (pieces.length) {
+    const full = pieces.every((q) => q[2] >= 0.996) && mouths.every((q) => q[2] >= 0.996);
+    // (a cut takes the source's alpha: opaque fills and strokes, whatever the last ones were)
+    const cut = (g) => {
+      g.setTransform(...mt); g.fillStyle = g.strokeStyle = "#000"; g.lineCap = "butt"; g.lineJoin = "round"; g.lineWidth = 1.8 / T.k;
+      for (const [L, it, w] of pieces) { g.globalAlpha = w; g.fill(waterPath(L.s, it), "evenodd"); }
+      for (const [L, it, w] of mouths) { g.globalAlpha = w; g.stroke(waterPath(L.s, it)); }
+    };
+    // (once Esri's sea has the water wherever its tiles are in, ours is cut only where they aren't)
+    const outside = (g) => { const o = new Path2D(); o.rect(-1, -1, W + 2, H + 2); o.addPath(st.known); g.setTransform(1, 0, 0, 1, 0, 0); g.clip(o, "evenodd"); };
+    if (full && (!handover || taken)) {
+      ctx.save(); if (taken) outside(ctx);
+      ctx.globalCompositeOperation = "destination-out"; cut(ctx);
+      ctx.restore();
+    } else {
+      const Lr = waterLayer();
+      Lr.globalCompositeOperation = "lighter"; cut(Lr);
+      if (taken) { Lr.setTransform(1, 0, 0, 1, 0, 0); Lr.globalAlpha = 1; Lr.globalCompositeOperation = "destination-out"; Lr.fill(st.known); }
+      else if (handover) {
+        // (the layer where Esri's sea lies, on the sea layer laySea makes afresh after)
+        if (!seaLay) seaLay = document.createElement("canvas");
+        if (seaLay.width !== W || seaLay.height !== H) { seaLay.width = W; seaLay.height = H; }
+        const S2 = seaLay.getContext("2d");
+        S2.setTransform(1, 0, 0, 1, 0, 0); S2.globalAlpha = 1; S2.globalCompositeOperation = "source-over"; S2.clearRect(0, 0, W, H);
+        S2.drawImage(Lr.canvas, 0, 0); S2.globalCompositeOperation = "destination-in"; S2.drawImage(seaCv, 0, 0);
+        Lr.setTransform(1, 0, 0, 1, 0, 0); Lr.globalAlpha = sa; Lr.globalCompositeOperation = "destination-out"; Lr.fill(st.known);
+        Lr.globalCompositeOperation = "lighter"; Lr.drawImage(seaLay, 0, 0);
+      }
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = "destination-out"; ctx.drawImage(Lr.canvas, 0, 0); ctx.restore();
+    }
+    // the ocean back into the holes, within the pieces' bounds (laySea lays it whole after, where Esri's sea is in)
+    if (!sa) {
+      let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+      for (const [, it] of pieces) { a = Math.min(a, it.bb[0][0]); b = Math.min(b, it.bb[0][1]); c = Math.max(c, it.bb[1][0]); d = Math.max(d, it.bb[1][1]); }
+      ctx.save(); ctx.setTransform(...mt); ctx.beginPath(); ctx.rect(a, b, c - a, d - b); ctx.clip(); oceanUnder(m); ctx.restore();
+    }
+    // the shores, as the coast is drawn: whole where no sea of Esri's has come in, fading where one has
+    const shoreItems = waterItems(look, "shore");
+    ctx.save(); ctx.setTransform(...mt); ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    const shores = (k) => { for (const [L, it, w] of shoreItems) { ctx.globalAlpha = alpha * w * k; ctx.stroke(waterPath(L.s, it)); } };
+    if (!handover) shores(1);
+    else {
+      ctx.save(); outside(ctx); ctx.setTransform(...mt); shores(1); ctx.restore();
+      if (sa < 1) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clip(st.known); ctx.setTransform(...mt); shores(1 - sa); ctx.restore(); }
+    }
+    ctx.restore();
+    if (m === M()) {
+      const half = pieces.filter((q) => q[2] >= 0.5);
+      waterNow = { m, pieces: half, sig: `${m.year}|${half.map((q) => q[1].uid).join(",")}` };
+    }
+  }
+  drawDryLakes(look, alpha);
+}
+// the cut's own layer: the scratch layer (layer()) has just been laid on the canvas by the seats'
+// waters at these zooms, and clearing it again the same frame made the browser keep or flush that
+// copy first, every other frame 10-20ms at street zoom's door
+let waterLay = null;
+function waterLayer() {
+  const W = canvas.width, H = canvas.height;
+  if (!waterLay) waterLay = document.createElement("canvas");
+  if (waterLay.width !== W || waterLay.height !== H) { waterLay.width = W; waterLay.height = H; }
+  const L = waterLay.getContext("2d");
+  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
+  L.clearRect(0, 0, W, H);
+  return L;
+}
+// the dry lakes: a pale wash of the sea's colour, short level dashes and a broken outline
+let dryTile = null;
+function dryPattern() {
+  const s = Math.round(9 * dpr), th = TH;
+  if (!dryTile || dryTile._th !== th || dryTile._dpr !== dpr) {
+    dryTile = document.createElement("canvas"); dryTile.width = dryTile.height = s; dryTile._th = th; dryTile._dpr = dpr;
+    const g = dryTile.getContext("2d"), w = Math.max(1, Math.round(dpr * 0.9)), len = Math.round(4 * dpr);
+    g.fillStyle = css(th.seaMark, th.dark ? 0.8 : 0.75);
+    g.fillRect(0, Math.round(s * 0.25), len, w);
+    g.fillRect(Math.round(s / 2), Math.round(s * 0.75), len, w);
+  }
+  return ctx.createPattern(dryTile, "repeat");
+}
+function drawDryLakes(look, alpha) {
+  const shown = waterItems(look, "dry");
+  if (!shown.length) return;
+  const th = TH, pat = dryPattern();
+  pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
+  ctx.save(); ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); ctx.lineJoin = "round";
+  for (const [L, it, w] of shown) {
+    const p = waterPath(L.s, it, true);
+    ctx.globalAlpha = alpha * w; ctx.fillStyle = css(th.sea, th.dark ? 0.5 : 0.62); ctx.fill(p, "evenodd");
+    ctx.fillStyle = pat; ctx.fill(p, "evenodd");
+  }
+  ctx.strokeStyle = css(th.seaMark, 0.9); ctx.lineWidth = 0.8 / T.k; ctx.setLineDash([3 / T.k, 2.2 / T.k]);
+  for (const [L, it, w] of shown) { ctx.globalAlpha = alpha * w; ctx.stroke(waterPath(L.s, it, true)); }
+  ctx.restore();
+}
+// the dry lakes in view at half strength or more, cut back out of Esri's sea (prepStreets)
+function dryInView(m) {
+  return waterItems(waterLook(m), "dry").filter((q) => q[2] >= 0.5).map(([L, it]) => waterPath(L.s, it, true));
+}
+
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
@@ -524,6 +817,7 @@ function drawGeo(m, alpha, streetA) {
     }
   }
   ctx.restore();
+  drawWater(m, alpha, st, sa);
   if (sa) laySea(m, st, alpha * sa);
   if (streetA !== undefined && !sa) warmWaters();
 }
@@ -707,21 +1001,31 @@ function drawFocus(m, pathOf) {
   // where Esri's sea has taken the coast (drawGeo) the veil follows the seats'
   // waters and lies on the sea alike, so its edge is never the AEC's coast
   const sea = seaNow && seaNow.m === m && !pathOf ? seaNow : null;
+  // the water cut out of the seats (drawWater): the veil lies on it as on the sea, and the
+  // outlines keep to the land, as the sea's edge does at street zoom
+  const wp = (sd != null || S.sel.level === "state" || (S.hover && S.hover.kind === "div")) ? waterWet(m) : null;
+  const wet = wp && wp.wet, land = wp && wp.land;
   if (sea && sea.sa > 0.5 && (sd != null || S.sel.level === "state")) {
     veilSea(sd, sd != null ? th.veil : th.veil * 0.85);
   } else if (sd != null) {
     const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(P(sd));
     for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
     ctx.fillStyle = css(th.bg, th.veil); ctx.fill(v, "evenodd");
+    if (wet) { ctx.save(); ctx.clip(P(sd)); ctx.fill(wet, "evenodd"); ctx.restore(); }
   } else if (S.sel.level === "state") {
     ctx.fillStyle = css(th.bg, th.veil * 0.85);
+    // (the sea is left clear with a state open, the water in the other states' seats too)
+    if (land) { ctx.save(); ctx.clip(land, "evenodd"); }
     for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(P(d.i));
     for (const q of m.isl || []) if (q.owner == null || m.divs[q.owner].st !== S.sel.st) ctx.fill(q.mpath);
+    if (land) ctx.restore();
   }
   // a seat's outline takes in its islands; its coast is left to the sea's edge where Esri's draws it
   const outline = (i) => {
-    if (sea && sea.sa > 0.5) { ctx.stroke(g.edgeOf(i)); return; }
-    ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
+    if (land) { ctx.save(); ctx.clip(land, "evenodd"); }
+    if (sea && sea.sa > 0.5) ctx.stroke(g.edgeOf(i));
+    else { ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath); }
+    if (land) ctx.restore();
   };
   const h = S.hover;
   if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; outline(h.i); }
@@ -1026,6 +1330,8 @@ function drawYearMorph(mo, t) {
   ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
   for (const q of m.isl || []) ctx.stroke(q.mpath);
   ctx.restore();
+  // (the water in the new election's seats, cut as they settle: drawWater)
+  drawWater(m, 1, null, 0);
 }
 
 // A booth's dot. Its size is a 1,000-vote booth's radius times the square
@@ -2325,6 +2631,15 @@ function prepStreets(alpha) {
   // colour first; on the dark page they are quiet already
   const st = { a: alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k)), op: dark ? "screen" : "multiply", known: some ? known : null, seas, saved: [] };
   if (some) rescue(st, sg);
+  // (a dry lake stays land, its seat's colour under its salt-lake marks: drawDryLakes)
+  if (some) {
+    const dl = dryInView(M());
+    if (dl.length) {
+      sg.save(); sg.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); sg.globalCompositeOperation = "destination-out";
+      for (const p of dl) sg.fill(p, "evenodd");
+      sg.restore();
+    }
+  }
   prepKnown = st.known;
   return st;
 }
