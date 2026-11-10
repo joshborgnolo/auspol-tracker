@@ -880,7 +880,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -1750,8 +1750,10 @@ const inBox = (b, x0, y0, x1, y1) => b && !(b[1][0] < x0 || b[0][0] > x1 || b[1]
    from it, so they are drawn as just that, worked out on the screen in full
    precision: an arc stroked through the map's transform turns to chords at
    street zoom (and to float error past it); these hold at every zoom. The
-   Tropic of Capricorn runs dashed among them, and every line is marked with
-   its degree where it meets the edge of the map (drawGratLabels). */
+   Tropic of Capricorn runs dashed among them, laid at its degree of the day
+   the frame shows (the election's own day; today's on an "as it stands"
+   frame, worked out live — tropicOf), and every line is marked with its
+   degree where it meets the edge of the map (drawGratLabels). */
 const PAPER_CSS = 384, GRAT_STEP = 10;
 let paperTile = null, oceanA = 1;
 function paperOf() {
@@ -1833,31 +1835,43 @@ function layPaper(alpha, under) {
   ctx.restore();
 }
 /* @grat-begin (test-map-ocean.mjs runs this against d3's own projection) */
-// the Tropic of Capricorn: the sun's southernmost noon overhead, at the Earth's mean axial
-// tilt for 2026 (IAU 2006: 23° 26′ 09″)
-const TROPIC = -23.4358;
+// the Tropic of Capricorn: the sun's southernmost noon overhead on a day — the line of the
+// Earth's mean axial tilt then, which eases north about half a second of arc a year (1993's
+// election read it at 23°26′24.6″ south, January 2026 at 23°26′09″), so its degree is worked
+// out for a day at a time below, never stamped once for the map. tropicOn answers a day's
+// degree: the IAU mean-obliquity polynomial in Julian centuries from J2000.0, arc-second
+// true over the timeline's whole span
+function tropicOn(iso) {
+  const t = (Date.parse(iso) / 864e5 + 2440587.5 - 2451545) / 36525;
+  return -(84381.448 - 46.815 * t - 0.00059 * t * t + 0.001813 * t * t * t) / 3600;
+}
 // a line's degree as an atlas marks it: 30°S, 130°E, the equator and the antimeridian bare
 const degLat = (lat) => (lat ? `${Math.abs(lat)}°${lat < 0 ? "S" : "N"}` : "0°");
 const degLon = (lon) => { const l = ((((lon + 180) % 360) + 360) % 360) - 180; return l === 0 || l === -180 ? `${Math.abs(l)}°` : `${Math.abs(l)}°${l > 0 ? "E" : "W"}`; };
 // a projection's apex and the radius of each parallel's circle, in its plane: the central
-// meridian (132E) stands upright, and the apex is where another meridian's ray meets it
-function gratOf(P) {
+// meridian (132E) stands upright, and the apex is where another meridian's ray meets it.
+// The Tropic's circle answers for the day trop names, so that degree rides the cache's key
+function gratOf(P, trop) {
   const k = P.scale(), [tx, ty] = P.translate();
-  if (P._grat && P._grat.k === k && P._grat.tx === tx && P._grat.ty === ty) return P._grat;
+  if (P._grat && P._grat.k === k && P._grat.tx === tx && P._grat.ty === ty && P._grat.trop === trop) return P._grat;
   const c0 = P([132, -10]), a = P([172, -10]), b = P([172, -60]);
   const C = [c0[0], a[1] + ((c0[0] - a[0]) / (b[0] - a[0])) * (b[1] - a[1])];
   const ang = (lon) => { const p = P([lon, -30]); return Math.atan2(p[1] - C[1], p[0] - C[0]); };
   const R = new Map();
   for (let lat = -80; lat <= 80; lat += GRAT_STEP) { const p = P([132, lat]); R.set(lat, Math.hypot(p[0] - C[0], p[1] - C[1])); }
   // a meridian's angle runs straight with its longitude (t0 at 132E, dt a degree)
-  const pt = P([132, TROPIC]), Rt = Math.hypot(pt[0] - C[0], pt[1] - C[1]);
-  return (P._grat = { k, tx, ty, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R, Rt });
+  const pt = P([132, trop]), Rt = Math.hypot(pt[0] - C[0], pt[1] - C[1]);
+  return (P._grat = { k, tx, ty, trop, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R, Rt });
 }
 /* @grat-end */
+// a frame's own Tropic: the election day's degree on a dated frame — 1993's line stands
+// 16″ of arc south of 2025's — and today's on an "as it stands" frame, live at every draw
+// (midnight rolls it on), for the reader looking at the country now
+const tropicOf = (m) => tropicOn(m && m.date && !isNowY(m.year) ? m.date : new Date().toISOString().slice(0, 10));
 // the lines of latitude and longitude every GRAT_STEP degrees; under: see layPaper
 function layGrat(m, alpha) {
   const P = m && m.proj; if (!P) return;
-  const G = gratOf(P), s = dpr * T.k, cx = dpr * T.x + s * G.C[0], cy = dpr * T.y + s * G.C[1];
+  const G = gratOf(P, tropicOf(m)), s = dpr * T.k, cx = dpr * T.x + s * G.C[0], cy = dpr * T.y + s * G.C[1];
   const x0 = -4, y0 = -4, x1 = canvas.width + 4, y1 = canvas.height + 4;
   // the view as the apex sees it: how near and far it lies, the angles it spans
   const inside = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
@@ -2868,7 +2882,7 @@ function drawSeaNames(m, placed) {
   const fade = 1 - smooth(0, 0.35, streetK());
   const K = fade > 0.01 ? seaMaskOf(m) : null;
   if (!K) { seaSince.clear(); return; }
-  const G = gratOf(m.proj), th = TH, now = performance.now(), seen = new Set();
+  const G = gratOf(m.proj, tropicOf(m)), th = TH, now = performance.now(), seen = new Set();
   ctx.save();
   ctx.lineJoin = "round"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
   for (const [txt, size, spots] of SEA_NAMES) {
@@ -2985,7 +2999,7 @@ const WATER_TURNS = [0, 15, -15, 30, -30, 45, -45], WATER_NUDGE = [0, 0.9, -0.9]
 function drawWaterNames(m, placed, obst) {
   const sa = seaNow && seaNow.m === m ? seaNow.sa : 0;
   if (!streetSt || sa <= 0.01 || !streetDrawn.length) { waterSince.clear(); return; }
-  const G = gratOf(m.proj), th = TH, now = performance.now(), seen = new Map(), live = new Set();
+  const G = gratOf(m.proj, tropicOf(m)), th = TH, now = performance.now(), seen = new Map(), live = new Set();
   const kq = Math.round(Math.log2(T.k) * 4), never = () => false;
   const hits = (b) => overlaps(b, placed) || overlaps(b, obst);
   const near = (name, x, y) => (seen.get(name) || []).some(([a, b]) => Math.hypot(a - x, b - y) < WATER_GAP);
@@ -3142,13 +3156,13 @@ function drawGratLabels(m, K, G, placed, seen, now, a) {
   ctx.save();
   // the Tropic of Capricorn's name, over its line
   {
-    const txt = "Tropic of Capricorn", size = 12, font = seaFont(size), w = seaAdvOf(txt, font).at(-1), rt = G.Rt * T.k, lift = 0.3 * size + 3;
+    const txt = "Tropic of Capricorn", size = 12, font = seaFont(size), w = seaAdvOf(txt, font).at(-1), rt = G.Rt * T.k, lift = 0.3 * size + 3, trop = tropicOf(m);
     // (from each end of the view inward, a step at a time, until it finds open water)
     const ends = [];
     for (let k = 0; k < 10; k++) ends.push(parallelAt(rt, R0 - 28 * k, w, -1), parallelAt(rt, L0 + 28 * k, w, 1));
     let lay = null;
     for (const lon of [...ends.filter((l) => l != null), 154.6, 110.4]) {
-      const Lb = seaLayout(m, K, G, txt, size, [lon, TROPIC], font, lift);
+      const Lb = seaLayout(m, K, G, txt, size, [lon, trop], font, lift);
       if (Lb && !overlaps(Lb.box, placed)) { lay = Lb; break; }
     }
     if (lay) { placed.push(lay.box); seen.add(txt); layGlyphs(lay.glyphs, font, th.seaInk, a * seaFade(txt, now)); }

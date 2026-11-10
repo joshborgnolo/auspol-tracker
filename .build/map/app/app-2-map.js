@@ -199,8 +199,10 @@ const inBox = (b, x0, y0, x1, y1) => b && !(b[1][0] < x0 || b[0][0] > x1 || b[1]
    from it, so they are drawn as just that, worked out on the screen in full
    precision: an arc stroked through the map's transform turns to chords at
    street zoom (and to float error past it); these hold at every zoom. The
-   Tropic of Capricorn runs dashed among them, and every line is marked with
-   its degree where it meets the edge of the map (drawGratLabels). */
+   Tropic of Capricorn runs dashed among them, laid at its degree of the day
+   the frame shows (the election's own day; today's on an "as it stands"
+   frame, worked out live — tropicOf), and every line is marked with its
+   degree where it meets the edge of the map (drawGratLabels). */
 const PAPER_CSS = 384, GRAT_STEP = 10;
 let paperTile = null, oceanA = 1;
 function paperOf() {
@@ -282,31 +284,43 @@ function layPaper(alpha, under) {
   ctx.restore();
 }
 /* @grat-begin (test-map-ocean.mjs runs this against d3's own projection) */
-// the Tropic of Capricorn: the sun's southernmost noon overhead, at the Earth's mean axial
-// tilt for 2026 (IAU 2006: 23° 26′ 09″)
-const TROPIC = -23.4358;
+// the Tropic of Capricorn: the sun's southernmost noon overhead on a day — the line of the
+// Earth's mean axial tilt then, which eases north about half a second of arc a year (1993's
+// election read it at 23°26′24.6″ south, January 2026 at 23°26′09″), so its degree is worked
+// out for a day at a time below, never stamped once for the map. tropicOn answers a day's
+// degree: the IAU mean-obliquity polynomial in Julian centuries from J2000.0, arc-second
+// true over the timeline's whole span
+function tropicOn(iso) {
+  const t = (Date.parse(iso) / 864e5 + 2440587.5 - 2451545) / 36525;
+  return -(84381.448 - 46.815 * t - 0.00059 * t * t + 0.001813 * t * t * t) / 3600;
+}
 // a line's degree as an atlas marks it: 30°S, 130°E, the equator and the antimeridian bare
 const degLat = (lat) => (lat ? `${Math.abs(lat)}°${lat < 0 ? "S" : "N"}` : "0°");
 const degLon = (lon) => { const l = ((((lon + 180) % 360) + 360) % 360) - 180; return l === 0 || l === -180 ? `${Math.abs(l)}°` : `${Math.abs(l)}°${l > 0 ? "E" : "W"}`; };
 // a projection's apex and the radius of each parallel's circle, in its plane: the central
-// meridian (132E) stands upright, and the apex is where another meridian's ray meets it
-function gratOf(P) {
+// meridian (132E) stands upright, and the apex is where another meridian's ray meets it.
+// The Tropic's circle answers for the day trop names, so that degree rides the cache's key
+function gratOf(P, trop) {
   const k = P.scale(), [tx, ty] = P.translate();
-  if (P._grat && P._grat.k === k && P._grat.tx === tx && P._grat.ty === ty) return P._grat;
+  if (P._grat && P._grat.k === k && P._grat.tx === tx && P._grat.ty === ty && P._grat.trop === trop) return P._grat;
   const c0 = P([132, -10]), a = P([172, -10]), b = P([172, -60]);
   const C = [c0[0], a[1] + ((c0[0] - a[0]) / (b[0] - a[0])) * (b[1] - a[1])];
   const ang = (lon) => { const p = P([lon, -30]); return Math.atan2(p[1] - C[1], p[0] - C[0]); };
   const R = new Map();
   for (let lat = -80; lat <= 80; lat += GRAT_STEP) { const p = P([132, lat]); R.set(lat, Math.hypot(p[0] - C[0], p[1] - C[1])); }
   // a meridian's angle runs straight with its longitude (t0 at 132E, dt a degree)
-  const pt = P([132, TROPIC]), Rt = Math.hypot(pt[0] - C[0], pt[1] - C[1]);
-  return (P._grat = { k, tx, ty, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R, Rt });
+  const pt = P([132, trop]), Rt = Math.hypot(pt[0] - C[0], pt[1] - C[1]);
+  return (P._grat = { k, tx, ty, trop, C, t0: ang(132), dt: (ang(142) - ang(122)) / 20, R, Rt });
 }
 /* @grat-end */
+// a frame's own Tropic: the election day's degree on a dated frame — 1993's line stands
+// 16″ of arc south of 2025's — and today's on an "as it stands" frame, live at every draw
+// (midnight rolls it on), for the reader looking at the country now
+const tropicOf = (m) => tropicOn(m && m.date && !isNowY(m.year) ? m.date : new Date().toISOString().slice(0, 10));
 // the lines of latitude and longitude every GRAT_STEP degrees; under: see layPaper
 function layGrat(m, alpha) {
   const P = m && m.proj; if (!P) return;
-  const G = gratOf(P), s = dpr * T.k, cx = dpr * T.x + s * G.C[0], cy = dpr * T.y + s * G.C[1];
+  const G = gratOf(P, tropicOf(m)), s = dpr * T.k, cx = dpr * T.x + s * G.C[0], cy = dpr * T.y + s * G.C[1];
   const x0 = -4, y0 = -4, x1 = canvas.width + 4, y1 = canvas.height + 4;
   // the view as the apex sees it: how near and far it lies, the angles it spans
   const inside = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
@@ -1317,7 +1331,7 @@ function drawSeaNames(m, placed) {
   const fade = 1 - smooth(0, 0.35, streetK());
   const K = fade > 0.01 ? seaMaskOf(m) : null;
   if (!K) { seaSince.clear(); return; }
-  const G = gratOf(m.proj), th = TH, now = performance.now(), seen = new Set();
+  const G = gratOf(m.proj, tropicOf(m)), th = TH, now = performance.now(), seen = new Set();
   ctx.save();
   ctx.lineJoin = "round"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
   for (const [txt, size, spots] of SEA_NAMES) {
@@ -1434,7 +1448,7 @@ const WATER_TURNS = [0, 15, -15, 30, -30, 45, -45], WATER_NUDGE = [0, 0.9, -0.9]
 function drawWaterNames(m, placed, obst) {
   const sa = seaNow && seaNow.m === m ? seaNow.sa : 0;
   if (!streetSt || sa <= 0.01 || !streetDrawn.length) { waterSince.clear(); return; }
-  const G = gratOf(m.proj), th = TH, now = performance.now(), seen = new Map(), live = new Set();
+  const G = gratOf(m.proj, tropicOf(m)), th = TH, now = performance.now(), seen = new Map(), live = new Set();
   const kq = Math.round(Math.log2(T.k) * 4), never = () => false;
   const hits = (b) => overlaps(b, placed) || overlaps(b, obst);
   const near = (name, x, y) => (seen.get(name) || []).some(([a, b]) => Math.hypot(a - x, b - y) < WATER_GAP);
@@ -1591,13 +1605,13 @@ function drawGratLabels(m, K, G, placed, seen, now, a) {
   ctx.save();
   // the Tropic of Capricorn's name, over its line
   {
-    const txt = "Tropic of Capricorn", size = 12, font = seaFont(size), w = seaAdvOf(txt, font).at(-1), rt = G.Rt * T.k, lift = 0.3 * size + 3;
+    const txt = "Tropic of Capricorn", size = 12, font = seaFont(size), w = seaAdvOf(txt, font).at(-1), rt = G.Rt * T.k, lift = 0.3 * size + 3, trop = tropicOf(m);
     // (from each end of the view inward, a step at a time, until it finds open water)
     const ends = [];
     for (let k = 0; k < 10; k++) ends.push(parallelAt(rt, R0 - 28 * k, w, -1), parallelAt(rt, L0 + 28 * k, w, 1));
     let lay = null;
     for (const lon of [...ends.filter((l) => l != null), 154.6, 110.4]) {
-      const Lb = seaLayout(m, K, G, txt, size, [lon, TROPIC], font, lift);
+      const Lb = seaLayout(m, K, G, txt, size, [lon, trop], font, lift);
       if (Lb && !overlaps(Lb.box, placed)) { lay = Lb; break; }
     }
     if (lay) { placed.push(lay.box); seen.add(txt); layGlyphs(lay.glyphs, font, th.seaInk, a * seaFade(txt, now)); }
