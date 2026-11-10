@@ -9952,35 +9952,26 @@ function senTwoStat(m, idx) {
 }
 /* the Now senate chamber's note beside its seats row: the base chamber is the
    election's own, with the movements since named plainly — who joined a side
-   from outside it, and which parties changed their senator — in the House
-   row's own words shape ("…election's, adjusted for changes since then.").
-   A surname respelling (Deb/Deborah O'Neill) and a family-level re-code
-   (the Queenslanders' LNP) are not movements */
-function senMovesNote(dn, d0, yr) {
-  const keyOf = (d) => `${d.st}|${d.n.split(/\s+/).pop().toLowerCase()}`;
-  const goneByKey = new Map(d0.divs.map((d) => [keyOf(d), d]));
-  const switched = [], arrived = [];
-  for (const d of dn.divs) {
-    const b = goneByKey.get(keyOf(d));
-    if (b) { goneByKey.delete(keyOf(d)); if (b.hold.fam !== d.hold.fam) switched.push(d); }
-    else arrived.push(d);
-  }
-  const left = [...goneByKey.values()], replaced = [];
-  for (const a of arrived) {
-    const j = left.findIndex((l) => l.st === a.st && l.hold.ab === a.hold.ab);
-    if (j >= 0) { replaced.push(a.hold.ab); left.splice(j, 1); }
-  }
-  if (!switched.length && !replaced.length) return "";
+   and who replaced whom in it — in the House row's own words shape
+   ("…election's, adjusted for changes since then.") */
+function senChangeNote(m, yr, st) {
+  // the whole window back to election day: the hand-checked list carries the
+  // pre-seating moves (Cox's defection, Dolega's appointment) that the
+  // seating-day base deck has already absorbed. And the note follows the
+  // head's pool to its state — at every filter the moves that touch that
+  // state, net-zero ones (a party replacing its own senator) included
+  const items = (m.senChanges || []).filter((c) => st === "AUS" || c.st === st);
+  if (!items.length) return "";
   const word = (ab) => ({ ALP: "Labor", LP: "the Liberals", NP: "the Nationals", LNP: "the LNP", GRN: "the Greens", ON: "One Nation", ONP: "One Nation", UAP: "the United Australia Party", UAPP: "the United Australia Party", JLN: "the Jacqui Lambie Network", AV: "Advance Australia", IND: "an independent" })[ab] || ab;
-  const pieces = [];
-  for (const d of switched) pieces.push(`${ds(d.n)} has joined ${word(d.hold.ab)}`);
+  const joined = items.filter((c) => c.kind !== "replaced"), replaced = items.filter((c) => c.kind === "replaced");
+  // (the list's texts lead with the name — the rows bold-state them, the note says the verb itself)
+  const clause = (c) => { const v = c.text.startsWith(c.who) ? c.text.slice(c.who.length).trimStart() : c.text; return `${c.who}${v.startsWith(",") ? v : ` ${v}`}`; };
+  const pieces = joined.map(clause);
   if (replaced.length) {
-    const cnt = {};
-    for (const ab of replaced) cnt[ab] = (cnt[ab] || 0) + 1;
-    const who = Object.keys(cnt).map(word);
-    pieces.push(who.length === 1 && cnt[Object.keys(cnt)[0]] === 1 ? `${who[0]} replaced a senator` : `${listAnd(who)} replaced a senator each`);
+    const who = replaced.map((c) => word(c.to));
+    pieces.push(replaced.length === 1 ? `${word(replaced[0].to)} replaced a senator` : `${listAnd(who)} replaced a senator each`);
   }
-  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then. ${pieces.map(cap).join(". ")}.`;
+  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then${scopeWhere(m, st)}. ${pieces.map(cap).join(". ")}.`;
 }
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
@@ -10136,8 +10127,18 @@ function seatStat(m, st, label, noteDef = null) {
   // 2025 election's chamber, exactly as the lower house's seats do (never
   // against the election before that, as m.res.prev would price it)
   const deckP = deck ? SENY[isNowY(m.year) ? frameBaseY(m.year) : prevYearOf(m.year)] || null : null;
-  const senNote = deck && deckP && isNowY(m.year) && st === "AUS" ? senMovesNote(deck, deckP, frameBaseY(m.year)) : "";
+  const senNote = deck && isNowY(m.year) && m.senChanges ? senChangeNote(m, frameBaseY(m.year), st) : "";
   const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
+  /* the base deck's day is the senators' seating day ("the election's senators"
+     handed over 1 July 2025), so moves between election day and that snapshot —
+     Cox defection, Urquhart-replaced — sit silently inside it. Undo them here
+     (family level: a party-room move swaps no seats) so the delta line reads
+     the election's own composition, as the note does */
+  const tallyElecDay = (dd, sel) => {
+    const c = tallyOf(dd, sel);
+    for (const x of m.senChanges || []) if (x.from && x.to && x.date < (dd.asOf || "") && (!sel || x.st === sel)) { const f0 = FAM(x.from), f1 = FAM(x.to); if (f0 !== f1) { c[f1] = (c[f1] || 0) - 1; c[f0] = (c[f0] || 0) + 1; } }
+    return c;
+  };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
   const seatsNote = !deck && noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
@@ -10145,7 +10146,7 @@ function seatStat(m, st, label, noteDef = null) {
   // series on an election frame, else the pool's seat-by-seat reversion — and
   // the previous chamber's tally where the deck reads
   const sCnt = deck ? tallyOf(deck, deckSt) : cnt;
-  const base = deck ? { c: deckP ? tallyOf(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  const base = deck ? { c: deckP ? tallyElecDay(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
   const a = sCnt.alp || 0, l = sCnt.lnp || 0;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
@@ -12621,6 +12622,8 @@ function setLens(id) {
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
   recolor(true); renderLegend(); renderStory(true); writeURL();
+  // the head line follows the lens (the senate lenses say the current Senate)
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
 }
@@ -12852,6 +12855,14 @@ function tlGlide(r0) {
 }
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
+  /* the senate lanes' line names the chamber like the head does (user call
+     2026-11-10): the current Senate, with its last move off the senate
+     change window rather than the House list's */
+  const senLens = !sen && m.year === "now" && (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && (SENM || SENY.now);
+  if (senLens) {
+    const deck = SENM || SENY.now, moved = (m.senChanges || []).reduce((a, c) => (c.date > a ? c.date : a), "") || deck.asOf;
+    return `The current Senate, last changed ${longDate(moved)} · ${deck.divs.length} senators`;
+  }
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   // the federal Now names its last move over a data tick: the newest "Since the election" entry
   const changed = (m.changes || []).reduce((a, c) => (c.date > a ? c.date : a), "") || m.asOf;

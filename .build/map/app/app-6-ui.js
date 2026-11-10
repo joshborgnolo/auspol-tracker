@@ -1011,6 +1011,8 @@ function setLens(id) {
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
   recolor(true); renderLegend(); renderStory(true); writeURL();
+  // the head line follows the lens (the senate lenses say the current Senate)
+  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
 }
@@ -1242,6 +1244,14 @@ function tlGlide(r0) {
 }
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
+  /* the senate lanes' line names the chamber like the head does (user call
+     2026-11-10): the current Senate, with its last move off the senate
+     change window rather than the House list's */
+  const senLens = !sen && m.year === "now" && (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && (SENM || SENY.now);
+  if (senLens) {
+    const deck = SENM || SENY.now, moved = (m.senChanges || []).reduce((a, c) => (c.date > a ? c.date : a), "") || deck.asOf;
+    return `The current Senate, last changed ${longDate(moved)} · ${deck.divs.length} senators`;
+  }
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   // the federal Now names its last move over a data tick: the newest "Since the election" entry
   const changed = (m.changes || []).reduce((a, c) => (c.date > a ? c.date : a), "") || m.asOf;

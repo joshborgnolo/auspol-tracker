@@ -14,7 +14,7 @@ const labels = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation
 let current, focusCount = 0;
 const vmS = { year: 2025, f: { st: null, cls: null } };
 const ctx = vm.createContext({
-  FAMS, CLS, STATES, STATE_TITLE: names, CLS_SHORT: Object.fromEntries(CLS.map((c) => [c, c.replace(" Metropolitan", " metro")])),
+  FAMS, CLS, STATES, STATE_TITLE: names, STATE_NAME: names, CLS_SHORT: Object.fromEntries(CLS.map((c) => [c, c.replace(" Metropolitan", " metro")])),
   STATE_YEARS: new Set(["nsw23"]), S: vmS, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
   SA_YEARS: new Set(), VIC_YEARS: new Set(), WA_YEARS: new Set(), QLD_YEARS: new Set(),
   css: (c) => c, esc: (s) => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"), f1: (n) => n.toFixed(1), sgn: (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1),
@@ -28,7 +28,7 @@ const ctx = vm.createContext({
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat,senMovesNote,seatSpRows,boothSpRows})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat,senChangeNote,seatSpRows,boothSpRows})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -211,17 +211,30 @@ assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout 
   assert.ok(Math.abs(full.sw - 12.5) < 1e-9, "delta over the pooled previous split (65% − 52.5%)");
   assert.equal(api.senTwoStat({ year: 2025, res: {}, divs: [] }, []), null, "no eligible divisions, no figure");
 }
-// the Now chamber's movements note names real changes only: joined parties
-// and senator replacements — not surname respellings or family-level re-codes
+// the Now chamber's movements note reads the hand-checked change list, scoped
+// the figure pool's way: every move of the window, net-zero joins and
+// replacements alike, national or per state (user call 2026-11-10)
 {
-  const mkDeck = (rows) => ({ divs: rows.map(([n, st, ab, fam]) => ({ n, st, hold: { ab, fam } })) });
-  const d25 = mkDeck([["Deb O'Neill", "NSW", "ALP", "alp"], ["Peter Whish-Wilson", "TAS", "GRN", "grn"], ["Wendy Askew", "TAS", "LP", "lnp"], ["Warwick Stacey", "NSW", "ON", "onp"], ["Tammy Tyrrell", "TAS", "IND", "ind"], ["James McGrath", "QLD", "LP", "lnp"]]);
-  const dNow = mkDeck([["Deborah O'Neill", "NSW", "ALP", "alp"], ["Sean Bell", "NSW", "ON", "onp"], ["Chris Gatenby", "TAS", "LP", "lnp"], ["Vanessa Bleyer", "TAS", "GRN", "grn"], ["Tammy Tyrrell", "TAS", "ALP", "alp"], ["James McGrath", "QLD", "LNP", "lnp"]]);
+  const mStub = { senChanges: [
+    { date: "2025-05-08", kind: "joined", who: "P Roomer", st: "NT", to: "LP", text: "moved from the Nationals to the Liberal party room" },
+    { date: "2025-05-27", kind: "replaced", who: "R Stander", st: "TAS", to: "ALP", replaces: "R Leaver", text: "joined Labor in the Senate, replacing R Leaver" },
+    { date: "2025-06-02", kind: "left", who: "D Cox", st: "WA", from: "GRN", to: "ALP", text: "left the Greens for Labor" },
+    { date: "2025-09-18", kind: "replaced", who: "S Bell", st: "NSW", to: "ON", replaces: "W Stacey", text: "replaced W Stacey for One Nation" },
+    { date: "2026-05-14", kind: "joined", who: "T Joiner", st: "TAS", to: "ALP", text: "joined Labor" },
+    { date: "2026-08-13", kind: "replaced", who: "C Gatenby", st: "TAS", to: "LP", replaces: "W Askew", text: "replaced W Askew for the Liberals" },
+    { date: "2026-08-20", kind: "replaced", who: "V Bleyer", st: "TAS", to: "GRN", replaces: "P Whish", text: "replaced P Whish for the Greens" },
+  ] };
   assert.equal(
-    api.senMovesNote(dNow, d25, 2025).trim(),
-    "These figures are the 2025 election’s Senate, adjusted for changes since then. Tammy Tyrrell has joined Labor. One Nation, the Liberals and the Greens replaced a senator each."
+    api.senChangeNote(mStub, 2025, "AUS").trim(),
+    "These figures are the 2025 election’s Senate, adjusted for changes since then. P Roomer moved from the Nationals to the Liberal party room. D Cox left the Greens for Labor. T Joiner joined Labor. Labor, One Nation, the Liberals and the Greens replaced a senator each."
   );
-  assert.equal(api.senMovesNote(mkDeck([["Dep Example", "SA", "ALP", "alp"]]), mkDeck([["Dep Example", "SA", "ALP", "alp"]]), 2025), "", "an unmoved chamber carries no note");
+  assert.equal(
+    api.senChangeNote(mStub, 2025, "TAS").trim(),
+    "These figures are the 2025 election’s Senate, adjusted for changes since then in Tasmania. T Joiner joined Labor. Labor, the Liberals and the Greens replaced a senator each."
+  );
+  assert.equal(api.senChangeNote(mStub, 2025, "NSW").trim(), "These figures are the 2025 election’s Senate, adjusted for changes since then in New South Wales. One Nation replaced a senator.", "scoped: a state's own moves, net-zero included");
+  assert.equal(api.senChangeNote(mStub, 2025, "VIC"), "", "a state the window never touched carries no note");
+  assert.equal(api.senChangeNote({ senChanges: null }, 2025, "AUS"), "", "a chamber with no list carries no note");
 }
 // a seat's and a polling place's flows chart reads the Senate's own ballots
 // where the lane reads them — seat cells, place cells, same split bars
