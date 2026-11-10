@@ -570,6 +570,28 @@ function senFpStat(m, idx) {
   const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
   return { alp: fp.alp, lnp: fp.lnp, grid: `${grid}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button>` };
 }
+/* the Senate lens's two-party row: not a count anyone publishes (the Senate
+   elects proportionally) but the whole ballot's own order pooled — the share
+   ranking Labor's slate ahead of the Coalition's, from the deck's tp
+   triplets (every formal ballot from 2016; the ticket era's lodged orders
+   before). The Senate lens's head reads this where every other lens reads
+   the House's two-party count; the delta rides the previous deck like
+   senFpStat's, and by-election seats sit out with it */
+function senTwoStat(m, idx) {
+  const s = spOf(m); if (!s || !s.tp) return null;
+  const py = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const s0 = py != null ? SPD[py] || null : null;
+  let x = 0, y = 0, x0 = 0, y0 = 0;
+  for (const i of idx) {
+    const d = m.divs[i]; if (d.by) continue;
+    const t = s.tp[d.n];
+    if (t) { x += t[0]; y += t[1]; }
+    if (s0 && s0.tp) { const t0 = s0.tp[d.n]; if (t0) { x0 += t0[0]; y0 += t0[1]; } }
+  }
+  if (!x && !y) return null;
+  const v = (100 * x) / (x + y);
+  return { v, sw: x0 + y0 > 0 ? v - (100 * x0) / (x0 + y0) : null };
+}
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
 function statClassArea(m, idx) {
@@ -708,23 +730,36 @@ function seatStat(m, st, label, noteDef = null) {
   // State filter is on, and a Seat type filter pools that type's seats in it
   const cls = clsFilter(m);
   const { A, idx, N, cnt } = scopeArea(m, st);
+  // the Senate lens's seats are the chamber's where its deck has loaded: the
+  // senators' family tally over this head's scope (the whole deck, or the
+  // filter state's own senators), changed on the previous election's chamber —
+  // the House's own row stands everywhere else, and under a seat-type scope
+  // (which has no senator bearing). A moved-seat note only reads the House pair
+  const deck = S.lens === "senate" && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  const deckSt = deck && st !== "AUS" ? st : null;
+  const deckP = deck ? SENY[isNowY(m.year) ? (m.res && m.res.prev) : prevYearOf(m.year)] || null : null;
+  const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
-  const seatsNote = noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
+  const seatsNote = !deck && noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
   // the change line's base: the whole frame's official series, a state's own
-  // series on an election frame, else the pool's seat-by-seat reversion
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  // series on an election frame, else the pool's seat-by-seat reversion — and
+  // the previous chamber's tally where the deck reads
+  const sCnt = deck ? tallyOf(deck, deckSt) : cnt;
+  const base = deck ? { c: deckP ? tallyOf(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  const a = sCnt.alp || 0, l = sCnt.lnp || 0;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
+  const seatMdl = deck || m, seatIdx = deck ? deck.divs.filter((d) => !deckSt || d.st === deckSt).map((d) => d.i) : idx, seatN = deck ? seatIdx.length : N;
   const parties = new Map();
-  for (const i of idx) {
-    const h = m.divs[i].hold, k = crossLabel(h);
+  for (const i of seatIdx) {
+    const h = seatMdl.divs[i].hold, k = crossLabel(h);
     if (h.fam === "alp" || h.fam === "lnp" || k === "Independents") continue;
     parties.set(k, [holdFam(h), (parties.get(k) || [0, 0])[1] + 1]);
   }
   const blocE = [...parties.entries()].filter(([, r]) => r[1] > 14).sort(([, p], [, q]) => q[1] - p[1]);
   const bloc = blocE.map(([, r]) => r);
-  const rest = N - a - l - bloc.reduce((x, r) => x + r[1], 0);
+  const rest = seatN - a - l - bloc.reduce((x, r) => x + r[1], 0);
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
@@ -734,7 +769,13 @@ function seatStat(m, st, label, noteDef = null) {
   // frame (which holds rather than won)
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
   let two = "";
-  if (A.tpp != null) {
+  // the Senate lens's two-party row reads the ballots' own ranked split,
+  // Labor's slate against the Coalition's; the House's count stands elsewhere
+  // (and on this lens until its ballot deck lands)
+  const stp = S.lens === "senate" && spYear(m.year) != null ? senTwoStat(m, idx) : null;
+  if (stp) {
+    two = twoPartyFigures("Ranked ahead on Senate ballots", stp.v, "alp", "Labor", 100 - stp.v, "lnp", coalW(1).replace(/^The /, ""), fg) + swingFigure(stp.sw);
+  } else if (A.tpp != null) {
     // an "as it stands" frame's swing is the base election's — shown like any
     // election frame's (user call: the now views carry swings too)
     const twoSw = swingFigure(A.tppSw);
@@ -765,9 +806,9 @@ function seatStat(m, st, label, noteDef = null) {
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
-  const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
+  const gv = m.gov, gN = (sCnt[gv] || 0), shareTxt = gN && seatN ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / seatN)}% of ${seatN})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
-  const mk = statSeatMakeup(m, idx, blocE.map(([k]) => k));
+  const mk = statSeatMakeup(seatMdl, seatIdx, blocE.map(([k]) => k));
   // a double rule crowns the head, divides the sections and closes it — every
   // label (Two-party, Primaries, Seats) sits just under one
   const sep = `<span class="st-sep" aria-hidden="true"></span>`;

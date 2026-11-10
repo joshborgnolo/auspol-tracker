@@ -1527,6 +1527,19 @@ for (const y of ["sa22", "sa26"]) {
   assert.equal(Object.keys(JSON.parse(R("map/data/senate-prefs-2004.json")).booths).length, 0, "2004's ticket record holds no polling places");
   for (const y of [2007, 2010, 2013]) assert.ok(Object.keys(JSON.parse(R(`map/data/senate-prefs-${y}.json`)).booths).length > 8000, `senate-prefs-${y} reads polling places too`);
   for (const y of [2016, 2019, 2022, 2025]) assert.ok(!JSON.parse(R(`map/data/senate-prefs-${y}.json`)).gvt, `senate-prefs-${y} stays a ballot tally`);
+  // every deck carries the whole-ballot ranked-ahead triplet per division
+  // (tp): Labor's slate against the Coalition's, for the Senate head's
+  // two-party row — ballots from 2016, lodged ticket orders before
+  for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
+    const f = JSON.parse(R(`map/data/senate-prefs-${y}.json`));
+    assert.equal(Object.keys(f.tp || {}).length, Object.keys(f.divs).length, `senate-prefs-${y}: every division carries its tp triplet`);
+    assert.ok(f.tp.Hunter && f.tp.Hunter.length === 3, `senate-prefs-${y}: tp rows are [Labor ahead, Coalition ahead, neither]`);
+    let x = 0, yc = 0, ne = 0;
+    for (const t of Object.values(f.tp)) { x += t[0]; yc += t[1]; ne += t[2] || 0; }
+    const v = (100 * x) / (x + yc);
+    assert.ok(v > 40 && v < 60 && ne / (x + yc + ne) >= 0 && ne / (x + yc + ne) < 0.15, `senate-prefs-${y}: the national ranked split lies in the plausible band (${v.toFixed(1)}% Labor ahead)`);
+    if (f.gvt) assert.equal(ne, 0, `senate-prefs-${y}: a complete ticket record has no ballots naming neither (every lodged ticket numbered every candidate)`);
+  }
   assert.ok(js.includes('spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots"'), "the Preferences key's switch calls the ticket years tickets");
   assert.ok(js.includes(" Senate tickets put ") && js.includes("Lodged group voting tickets,"), "the story and the legend present the ticket years as the parties' orders");
   assert.ok(js.includes("No Senate preference record for "), "years before the AEC's record get their own message");
@@ -2561,6 +2574,9 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes("const figs = stat || seatStat(m, st, `${hed}.`, aus && m.year === \"now\" ? NOW_AUS_DEK.now : null);") && st.includes("let h = head(title, meta, winnerish || quiet ? \"\" : hed, quiet ? \"\" : dek, figs);"), "every lens's area head carries the one figures block; the Winner and Seat type lenses add only a dek, the two-party lens nothing");
   assert.ok(st.indexOf("sections.push(`<span class=\"st-lab\">Seats${shareTxt}</span>") < st.indexOf("if (two) sections.push(two);") && st.indexOf("if (two) sections.push(two);") < st.indexOf("if (fpRow) sections.push(fpRow);"), "the seats lead the figures, then the two-party count, then the primaries");
   assert.ok(st.includes('if (S.lens === "senate" && svYear(m.year) != null)') && st.includes("const sf = senFpStat(m, idx);") && st.includes("Senate primaries (Labor and ${coalW()} share") && st.includes('const s0 = py != null ? SV[py] || null : null;'), "the Senate lens's head primaries row reads the pool's SENATE deck, labelled as such, with deltas on the previous election's deck");
+  assert.ok(st.includes('const stp = S.lens === "senate" && spYear(m.year) != null ? senTwoStat(m, idx) : null;') && st.includes('twoPartyFigures("Ranked ahead on Senate ballots"'), "the Senate lens's two-party row is the ballots' own ranked split: Labor's slate ranked ahead of the Coalition's, with the previous deck's as its delta");
+  assert.ok(st.includes('const deck = S.lens === "senate" && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;') && st.includes("const tallyOf = (dd, sel)") && st.includes("statSeatMakeup(seatMdl, seatIdx,"), "the Senate lens's seats row is the chamber's own tally and makeup (the House's stands where the Senate isn't read, and under a seat-type scope)");
+  assert.ok(part("app-6-ui.js").includes('Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)])') && part("app-3b-senate.js").includes("function loadSenatePrefsPair") && part("app-3b-senate.js").includes("function loadSenatePair"), "the Senate lens pulls its vote, ballot and chamber decks, each election paired with its previous for the head's deltas");
   assert.ok(part("app-3b-senate.js").includes("function loadSenateDeck(y, bg) {") && part("app-6-ui.js").includes("loadSenateDeck(S.year)") && part("app-6-ui.js").includes("loadSenateDeck(y)"), "the Senate's vote decks load in pairs — the frame's own and the previous election's, for the head's deltas");
   assert.ok(st.includes("return { hed: hedWord, dek: \"\", quiet: true, note:"), "the two-party lens's figure is its finding: no line repeats it");
   assert.ok(st.includes("let figs = seatFinalStat(m, d);") && st.includes('const seatFind = S.lens === "winner" && (hed || dek);') && st.includes('let h = head(d.n, meta, seatFind ? "" : hed, seatFind ? "" : dek, figs);'), "a seat's figures lead its card; the winner lens's verdict closes with the final count, every other lens's finding follows them");

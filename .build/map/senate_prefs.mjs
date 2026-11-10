@@ -48,6 +48,18 @@ function cells(tab, patterns, pairs, donors) {
   }
   return out;
 }
+/* every formal ballot, Labor's slate against the Coalition's: [ranked Labor ahead (or named
+   only it), ranked the Coalition ahead, named neither]. The Senate lens head's two-party row
+   reads these: a "Senate two-party preferred" has no official count, but the order a ballot
+   ranked the slates IS the hypothetical run-off's tally */
+function tpCell(tab, patterns) {
+  let x = 0, y = 0, nei = 0;
+  for (const t of Object.values(tab)) for (const [i, n] of Object.entries(t)) {
+    const p = patterns[+i], ix = p.indexOf("A"), iy = p.indexOf("C");
+    if (ix < 0 && iy < 0) nei += n; else if (iy < 0 || (ix >= 0 && ix < iy)) x += n; else y += n;
+  }
+  return [x, y, nei];
+}
 for (const year of YEARS) {
   const R = JSON.parse(fs.readFileSync(path.join(ROOT, `data/senate-rankings-${year}.json`), "utf8"));
   const B = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(ROOT, `.build/aec-flow-src/senate-ballots/booth-rankings-${year}.json.gz`))).toString());
@@ -61,8 +73,9 @@ for (const year of YEARS) {
   const absent = Object.fromEntries(Object.entries(named).map(([st, o]) => [st, Object.entries(o).filter(([, n]) => n === 0).map(([ch]) => FAMC[ch])]).filter(([, a]) => a.length));
   for (const [name, d] of Object.entries(R.divisions)) divs[name] = cells(d.t, R.patterns, pairs, donors);
   for (const [id, t] of Object.entries(B.booths)) if (!id.startsWith("special:")) booths[id] = cells(t, B.patterns, pairs, donors);
+  const tp = Object.fromEntries(Object.entries(R.divisions).map(([name, d]) => [name, tpCell(d.t, R.patterns)]));
   // check: each division's place counts never exceed its all-ballot counts
-  const out = { year, pairs, donors, absent, source: `Every formal Senate ballot, ${year} (AEC ballot-level files), by the order it ranked the pair's two parties; via data/senate-rankings-${year}.json and the polling-place table beside it`, divs, booths };
+  const out = { year, pairs, donors, absent, source: `Every formal Senate ballot, ${year} (AEC ballot-level files), by the order it ranked the pair's two parties; via data/senate-rankings-${year}.json and the polling-place table beside it`, divs, booths, tp };
   const f = path.join(ROOT, `map/data/senate-prefs-${year}.json`);
   fs.writeFileSync(f, JSON.stringify(out));
   console.log(`senate-prefs-${year}.json: absent ${JSON.stringify(absent)}, ${Object.keys(divs).length} divisions, ${Object.keys(booths).length} polling places, ${fs.statSync(f).size} bytes`);

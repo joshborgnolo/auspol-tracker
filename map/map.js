@@ -880,7 +880,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"e0834529","senate-prefs-2007.json":"ba73d577","senate-prefs-2010.json":"6cbe91d0","senate-prefs-2013.json":"951bff08","senate-prefs-2016.json":"d1f9e239","senate-prefs-2019.json":"4747b5b9","senate-prefs-2022.json":"a936d831","senate-prefs-2025.json":"5f6d6a12","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"b2de5ced","core-2019.json":"b30c1039","core-2022.json":"5fd4d3ac","core-2025.json":"45645943","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"6e97359d","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"b5a1f336","res-2019.json":"b8a6d9a3","res-2022.json":"c63800ac","res-2025.json":"cb668a2e","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -8892,6 +8892,21 @@ function loadSenatePrefs(y) {
   return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
 }
 const spOf = (m) => SPD[spYear(m.year)] || null;
+/* the ballot decks, this election's and the previous one's, while the Senate
+   lens is up: the head's ranked-ahead row carries the previous deck's split
+   as its delta */
+function loadSenatePrefsPair(y) {
+  const b = spYear(y);
+  if (b == null) return Promise.resolve(null);
+  return Promise.all([loadSenatePrefs(y), loadSenatePrefs(prevYearOf(b))]);
+}
+/* the chamber, this election's and the previous one's, while the Senate lens
+   is up: the head's seats row is the senators' tally, changed on the previous
+   chamber */
+function loadSenatePair(y) {
+  const p = prevYearOf(y);
+  return Promise.all([loadSenate(y), p != null ? loadSenate(p) : null]);
+}
 // the slot of the chosen contest and voters in a seat's 27 counts
 function spSlot() {
   let k = 0;
@@ -9849,6 +9864,28 @@ function senFpStat(m, idx) {
   const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
   return { alp: fp.alp, lnp: fp.lnp, grid: `${grid}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button>` };
 }
+/* the Senate lens's two-party row: not a count anyone publishes (the Senate
+   elects proportionally) but the whole ballot's own order pooled — the share
+   ranking Labor's slate ahead of the Coalition's, from the deck's tp
+   triplets (every formal ballot from 2016; the ticket era's lodged orders
+   before). The Senate lens's head reads this where every other lens reads
+   the House's two-party count; the delta rides the previous deck like
+   senFpStat's, and by-election seats sit out with it */
+function senTwoStat(m, idx) {
+  const s = spOf(m); if (!s || !s.tp) return null;
+  const py = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
+  const s0 = py != null ? SPD[py] || null : null;
+  let x = 0, y = 0, x0 = 0, y0 = 0;
+  for (const i of idx) {
+    const d = m.divs[i]; if (d.by) continue;
+    const t = s.tp[d.n];
+    if (t) { x += t[0]; y += t[1]; }
+    if (s0 && s0.tp) { const t0 = s0.tp[d.n]; if (t0) { x0 += t0[0]; y0 += t0[1]; } }
+  }
+  if (!x && !y) return null;
+  const v = (100 * x) / (x + y);
+  return { v, sw: x0 + y0 > 0 ? v - (100 * x0) / (x0 + y0) : null };
+}
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
 function statClassArea(m, idx) {
@@ -9987,23 +10024,36 @@ function seatStat(m, st, label, noteDef = null) {
   // State filter is on, and a Seat type filter pools that type's seats in it
   const cls = clsFilter(m);
   const { A, idx, N, cnt } = scopeArea(m, st);
+  // the Senate lens's seats are the chamber's where its deck has loaded: the
+  // senators' family tally over this head's scope (the whole deck, or the
+  // filter state's own senators), changed on the previous election's chamber —
+  // the House's own row stands everywhere else, and under a seat-type scope
+  // (which has no senator bearing). A moved-seat note only reads the House pair
+  const deck = S.lens === "senate" && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  const deckSt = deck && st !== "AUS" ? st : null;
+  const deckP = deck ? SENY[isNowY(m.year) ? (m.res && m.res.prev) : prevYearOf(m.year)] || null : null;
+  const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
-  const seatsNote = noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
+  const seatsNote = !deck && noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
   // the change line's base: the whole frame's official series, a state's own
-  // series on an election frame, else the pool's seat-by-seat reversion
-  const a = cnt.alp || 0, l = cnt.lnp || 0, base = cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  // series on an election frame, else the pool's seat-by-seat reversion — and
+  // the previous chamber's tally where the deck reads
+  const sCnt = deck ? tallyOf(deck, deckSt) : cnt;
+  const base = deck ? { c: deckP ? tallyOf(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  const a = sCnt.alp || 0, l = sCnt.lnp || 0;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
+  const seatMdl = deck || m, seatIdx = deck ? deck.divs.filter((d) => !deckSt || d.st === deckSt).map((d) => d.i) : idx, seatN = deck ? seatIdx.length : N;
   const parties = new Map();
-  for (const i of idx) {
-    const h = m.divs[i].hold, k = crossLabel(h);
+  for (const i of seatIdx) {
+    const h = seatMdl.divs[i].hold, k = crossLabel(h);
     if (h.fam === "alp" || h.fam === "lnp" || k === "Independents") continue;
     parties.set(k, [holdFam(h), (parties.get(k) || [0, 0])[1] + 1]);
   }
   const blocE = [...parties.entries()].filter(([, r]) => r[1] > 14).sort(([, p], [, q]) => q[1] - p[1]);
   const bloc = blocE.map(([, r]) => r);
-  const rest = N - a - l - bloc.reduce((x, r) => x + r[1], 0);
+  const rest = seatN - a - l - bloc.reduce((x, r) => x + r[1], 0);
   const seats = [["alp", a], ["lnp", l], ...bloc, ...(bloc.length && !rest ? [] : [["oth", rest]])];
   // the base counts seats by family, and "oth" there is several parties, so it can't split one out
   const unsplit = bloc.some((r) => r[0] === "oth");
@@ -10013,7 +10063,13 @@ function seatStat(m, st, label, noteDef = null) {
   // frame (which holds rather than won)
   const fg = A.tpp != null && (m.gov === "alp" || m.gov === "lnp") ? `<span class="st-fg st-fg-${m.gov}"><b>${isNowY(m.year) ? "govt" : "formed govt"}</b></span>` : "";
   let two = "";
-  if (A.tpp != null) {
+  // the Senate lens's two-party row reads the ballots' own ranked split,
+  // Labor's slate against the Coalition's; the House's count stands elsewhere
+  // (and on this lens until its ballot deck lands)
+  const stp = S.lens === "senate" && spYear(m.year) != null ? senTwoStat(m, idx) : null;
+  if (stp) {
+    two = twoPartyFigures("Ranked ahead on Senate ballots", stp.v, "alp", "Labor", 100 - stp.v, "lnp", coalW(1).replace(/^The /, ""), fg) + swingFigure(stp.sw);
+  } else if (A.tpp != null) {
     // an "as it stands" frame's swing is the base election's — shown like any
     // election frame's (user call: the now views carry swings too)
     const twoSw = swingFigure(A.tppSw);
@@ -10044,9 +10100,9 @@ function seatStat(m, st, label, noteDef = null) {
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
-  const gv = m.gov, gN = (cnt[gv] || 0), shareTxt = gN && N ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / N)}% of ${N})` : "";
+  const gv = m.gov, gN = (sCnt[gv] || 0), shareTxt = gN && seatN ? ` (${gv === "alp" ? "Labor" : coalW()} ${isNowY(m.year) ? "has" : "won"} ${f1((100 * gN) / seatN)}% of ${seatN})` : "";
   // the make-up bar under the seat row, the timeline rungs' read
-  const mk = statSeatMakeup(m, idx, blocE.map(([k]) => k));
+  const mk = statSeatMakeup(seatMdl, seatIdx, blocE.map(([k]) => k));
   // a double rule crowns the head, divides the sections and closes it — every
   // label (Two-party, Primaries, Seats) sits just under one
   const sep = `<span class="st-sep" aria-hidden="true"></span>`;
@@ -12380,11 +12436,13 @@ function setLens(id) {
   if (id === "flow" && S.lens === "senpref" && !lensFlip) return;
   if (FED_LENS.has(id) && STATE_YEARS.has(S.year) && !(id === "senpref" && SEN_PREF_STATE_FRAMES.has(S.year))) return;
   // the Senate's votes load with their lens, the previous election's beside
-  // them for the head's deltas (about 120KB a year, gzipped)
-  if (id === "senate" && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]))) {
+  // them for the head's deltas (about 120KB a year, gzipped) — as do the
+  // head's other decks: the chamber pair for its seats row, and the ballots'
+  // ranked-ahead pair for its two-party row
+  if (id === "senate" && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || !SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) {
     const spot = takeSpot();
     showLoading(true);
-    loadSenateDeck(S.year).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
+    Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)]).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
       .catch(() => showLoading(true, "The Senate’s votes didn’t load. Try again."));
     return;
   }
@@ -12487,7 +12545,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateDeck(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[y] != null && !STATE_YEARS.has(y) ? loadSenatePrefs(AXIS_FRAMES[y]) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? Promise.all([loadSenateDeck(y), loadSenatePrefsPair(y), loadSenatePair(y)]) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[y] != null && !STATE_YEARS.has(y) ? loadSenatePrefs(AXIS_FRAMES[y]) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -13187,7 +13245,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   renderFrames();
   const meta = loadLegendMeta();
   showLoading(true);
-  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateDeck(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)]) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   warmHi(S.year); // the landing frame earns its hi geometry at once; every other frame's waits for its first visit
   Y[S.year].viewedAt = performance.now();
   // a deep-linked birthplace picks what the year's own menu can't print

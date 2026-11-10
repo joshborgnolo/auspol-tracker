@@ -154,7 +154,23 @@ for year, ev in EVENT.items():
     absent = {st: [f for f in ("alp", "lnp", "grn", "onp") if f not in fam_by_state[st]] for st in STATES}
     absent = {st: miss for st, miss in absent.items() if miss}
 
+    # -- the whole ballot, Labor's slate against the Coalition's (the Senate head's two-party
+    # row): every above-the-line vote by its ticket's order of the pair — the same tp triplet
+    # senate_prefs.mjs emits per division from every formal ballot
+    def tp_for(state, votes):
+        tally = [0.0, 0.0, 0.0]
+        for letter, n in votes.items():
+            if not n or (state, letter) not in tnos_of:
+                continue
+            for tno in tnos_of[(state, letter)]:
+                pat = patterns[(state, letter, tno)]
+                ix, iy = pat.find("A"), pat.find("C")
+                slot = 2 if (ix < 0 and iy < 0) else (0 if (iy < 0 or 0 <= ix < iy) else 1)
+                tally[slot] += n / n_tickets[(state, letter)]
+        return [emit_num(v) for v in tally]
+
     divs = {dn: cells_for(div_state[dn], votes) for dn, votes in atl_div.items()}
+    tp = {dn: tp_for(div_state[dn], votes) for dn, votes in atl_div.items()}
 
     booths = {}
     if year != 2004:
@@ -174,7 +190,7 @@ for year, ev in EVENT.items():
     total = sum(n for v in atl_div.values() for n in v.values())
     out = {"year": year, "pairs": PAIRS, "donors": DONORS, "absent": absent, "gvt": True,
            "source": f"The parties' lodged group voting tickets, {year} (AEC SenateGroupVotingTicketsDownload, SenateFirstPrefsByDivision/PollingPlaceByVoteType); every above-the-line ballot was counted as its party's ticket — below-the-line voters are outside this record",
-           "divs": divs, "booths": booths}
+           "divs": divs, "booths": booths, "tp": tp}
     p = os.path.join(ROOT, f"map/data/senate-prefs-{year}.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"))

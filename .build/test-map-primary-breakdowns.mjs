@@ -22,13 +22,13 @@ const ctx = vm.createContext({
   prevYearOf: (y) => (y === 2025 ? 2022 : null), flowSeat: (d) => !!d.flowOk, ds: (s) => String(s), int: (v) => Math.round(v).toLocaleString("en-AU"), f0: (v) => Math.round(v).toString(),
   SP_PAIRS: { AC: ["alp", "lnp"], AO: ["alp", "onp"], CO: ["lnp", "onp"], GO: ["grn", "onp"], GA: ["grn", "alp"], GC: ["grn", "lnp"] },
   SP_DONORS: { AC: ["grn", "onp", "oth"], AO: ["lnp", "grn", "oth"], CO: ["alp", "grn", "oth"], GO: ["alp", "lnp", "oth"], GA: ["lnp", "onp", "oth"], GC: ["alp", "onp", "oth"] },
-  spOf: (m) => m.spData || null, spAbsent: () => null, spGvtYear: (y) => (vmS.gvt ? 2013 : null),
+  SPD: {}, spOf: (m) => (m && m.spData) || ctx.SPD[2025] || null, spAbsent: () => null, spGvtYear: (y) => (vmS.gvt ? 2013 : null),
   spName: (fam) => (fam === "alp" ? "Labor" : fam === "onp" ? "One Nation" : "the Coalition"),
   isNowY: (y) => y === "now", frameBaseY: () => 2025, M: () => current, FS: { on: false },
   $: () => ({ focus() { focusCount++; } }),
 });
 vm.runInContext(read(".build/map/app/app-4-story.js"), ctx, { filename: "app-4-story.js" });
-const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows})",ctx);
+const api = vm.runInContext("({statClassArea,statPrimaryCols,statOthersRows,statPrimaryGrid,statScopeOf,statFold,statBreakdownRows,statBreakdownView,statBreakdown,statBreakdownClick,statBreakdowns,seatPrimariesStat,areaFlowRows,areaSpRows,senTwoStat})",ctx);
 function model(year) {
   const res = JSON.parse(read(`map/data/core-${year}.json`));
   const divs = res.divs.map((d,i) => ({i, cls:d.cls, st:d.st, formal:d.c.reduce((n,c) => n+c[4],0), c:d.c.map((c) => ({ab:c[1],pn:c[2],fam:c[3],v:c[4]}))}));
@@ -196,5 +196,19 @@ assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout 
   delete vmS.gvt;
   assert.equal(api.areaSpRows({ divs: [] }, [0]), "", "no Senate deck, no chart");
   delete vmS.spPair; delete vmS.spFrom;
+}
+// the Senate lens's two-party row: the whole ballot's ranked split, pooled by
+// division from the deck's tp triplets (by-election seats sit out), with the
+// previous election's deck as its delta
+{
+  ctx.SPD[2025] = { tp: { A: [600, 400, 50], B: [700, 300, 0] } };
+  ctx.SPD[2022] = { tp: { A: [500, 500, 0], B: [550, 450, 0] } };
+  const partial = api.senTwoStat({ year: 2025, res: { prev: 2022 }, divs: [{ n: "A" }, { n: "B", by: true }] }, [0, 1]);
+  assert.ok(Math.abs(partial.v - 60) < 1e-9, "a by-election seat sits out: the pool is whole ballots, 60%");
+  assert.ok(Math.abs(partial.sw - 10) < 1e-9, "the delta rides the previous deck (60% − 50%)");
+  const full = api.senTwoStat({ year: 2025, res: { prev: 2022 }, divs: [{ n: "A" }, { n: "B" }] }, [0, 1]);
+  assert.ok(Math.abs(full.v - 65) < 1e-9, "pools every division: 65% ranked Labor ahead");
+  assert.ok(Math.abs(full.sw - 12.5) < 1e-9, "delta over the pooled previous split (65% − 52.5%)");
+  assert.equal(api.senTwoStat({ year: 2025, res: {}, divs: [] }, []), null, "no eligible divisions, no figure");
 }
 console.log("Map primary breakdowns: counted pools, scope labels, cycle/list navigation, Others expansion, historical and Now frames passed.");

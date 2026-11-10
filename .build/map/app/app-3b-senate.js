@@ -625,6 +625,21 @@ function loadSenatePrefs(y) {
   return (SPDP[k] ??= getJSON(`/map/data/senate-prefs-${k}.json`).then((j) => (SPD[k] = j)).catch((e) => { delete SPDP[k]; throw e; }));
 }
 const spOf = (m) => SPD[spYear(m.year)] || null;
+/* the ballot decks, this election's and the previous one's, while the Senate
+   lens is up: the head's ranked-ahead row carries the previous deck's split
+   as its delta */
+function loadSenatePrefsPair(y) {
+  const b = spYear(y);
+  if (b == null) return Promise.resolve(null);
+  return Promise.all([loadSenatePrefs(y), loadSenatePrefs(prevYearOf(b))]);
+}
+/* the chamber, this election's and the previous one's, while the Senate lens
+   is up: the head's seats row is the senators' tally, changed on the previous
+   chamber */
+function loadSenatePair(y) {
+  const p = prevYearOf(y);
+  return Promise.all([loadSenate(y), p != null ? loadSenate(p) : null]);
+}
 // the slot of the chosen contest and voters in a seat's 27 counts
 function spSlot() {
   let k = 0;

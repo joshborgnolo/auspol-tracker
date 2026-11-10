@@ -974,11 +974,13 @@ function setLens(id) {
   if (id === "flow" && S.lens === "senpref" && !lensFlip) return;
   if (FED_LENS.has(id) && STATE_YEARS.has(S.year) && !(id === "senpref" && SEN_PREF_STATE_FRAMES.has(S.year))) return;
   // the Senate's votes load with their lens, the previous election's beside
-  // them for the head's deltas (about 120KB a year, gzipped)
-  if (id === "senate" && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]))) {
+  // them for the head's deltas (about 120KB a year, gzipped) — as do the
+  // head's other decks: the chamber pair for its seats row, and the ballots'
+  // ranked-ahead pair for its two-party row
+  if (id === "senate" && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || !SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) {
     const spot = takeSpot();
     showLoading(true);
-    loadSenateDeck(S.year).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
+    Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)]).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
       .catch(() => showLoading(true, "The Senate’s votes didn’t load. Try again."));
     return;
   }
@@ -1081,7 +1083,7 @@ async function setYear(y) {
   const ready = Y[y] && Y[y].divs;
   if (!ready) { ywait = { t0: performance.now(), dir }; schedule(); }
   // the Senate's chamber moves with the timeline: that election's Senate too
-  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? loadSenateDeck(y) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[y] != null && !STATE_YEARS.has(y) ? loadSenatePrefs(AXIS_FRAMES[y]) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
+  try { await Promise.all([needPpl() ? loadYear(y).then(() => loadPpl(y)) : loadYear(y), S.house === "senate" ? loadSenate(y) : null, S.lens === "senate" ? Promise.all([loadSenateDeck(y), loadSenatePrefsPair(y), loadSenatePair(y)]) : null, S.lens === "senpref" ? loadSenatePrefs(y) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[y] != null && !STATE_YEARS.has(y) ? loadSenatePrefs(AXIS_FRAMES[y]) : null]); } catch (e) { if (tok === yearTok) { ywait = null; stampDone(); } console.error(e && e.stack || e); showLoading(true, "That election didn’t load. Try again."); return; }
   if (tok === yearTok) ywait = null;
   showLoading(false);
   const b = Y[y];
@@ -1781,7 +1783,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   renderFrames();
   const meta = loadLegendMeta();
   showLoading(true);
-  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? loadSenateDeck(S.year) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
+  try { await Promise.all([loadYear(S.year), meta, S.lens === "senate" ? Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)]) : null, S.lens === "senpref" ? loadSenatePrefs(S.year) : null, S.axis !== "AC" && S.lens === "tpp" && AXIS_FRAMES[S.year] != null && !STATE_YEARS.has(S.year) ? loadSenatePrefs(AXIS_FRAMES[S.year]) : null]); } catch (err) { showLoading(true, "The map’s data didn’t load. Reload the page to try again."); return; }
   warmHi(S.year); // the landing frame earns its hi geometry at once; every other frame's waits for its first visit
   Y[S.year].viewedAt = performance.now();
   // a deep-linked birthplace picks what the year's own menu can't print
