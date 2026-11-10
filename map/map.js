@@ -8812,12 +8812,24 @@ function loadSenateVote(y, bg) {
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
+/* the chamber's own informal count (map/data/senate-informal-<year>.json, .build/map/senate_informal.py,
+   the AEC's SenateInformalByDivision product): informal ballots by seat 2007-2025 (the product starts
+   2007 — an earlier Senate lane has no count and shows no line, never the House's figure) */
+const SI = {}, SIP = {}, SI_YEARS = new Set([2007, 2010, 2013, 2016, 2019, 2022, 2025]);
+function loadSenateInformal(y, bg) {
+  const k = svYear(y);
+  if (k == null || !SI_YEARS.has(k)) return Promise.resolve(null);
+  if (SI[k]) return Promise.resolve(SI[k]);
+  return (SIP[k] ??= getJSON(`/map/data/senate-informal-${k}.json`, bg).then((j) => (SI[k] = j)).catch((e) => { delete SIP[k]; throw e; }));
+}
+const siOf = (m) => SI[svYear(m.year)] || null;
 /* the senate deck AND the previous election's: the head's primaries deltas
-   under the senate lens compare them, pooled over the same seats */
+   under the senate lens compare them, pooled over the same seats; plus the
+   era's own informal count */
 function loadSenateDeck(y, bg) {
   const b = svYear(y);
   if (b == null) return Promise.resolve(null);
-  return Promise.all([loadSenateVote(y, bg), loadSenateVote(prevYearOf(b), bg)]);
+  return Promise.all([loadSenateVote(y, bg), loadSenateVote(prevYearOf(b), bg), loadSenateInformal(y, bg)]);
 }
 const senGap = () => S.senMode !== "share";
 const stoodFor = (d, fam) => d.c.some((c) => c.b === fam);
@@ -10166,6 +10178,21 @@ function informalHTML(m, st) {
   // exhaustion instead, so the rate line still earns its place there
   if (S.lens === "informal" && infModeOf(m) !== "exhaust") return "";
   const { A } = scopeArea(m, st);
+  /* a Senate-figures head reads the chamber's own informal count (the AEC's
+     informal-by-division Senate product, 2007–2025): pooled over the head's
+     seats exactly like the House's below. Where no file exists (an earlier
+     Senate lane, or the deck still loading) there is no line — never the
+     House's figure under a Senate head */
+  const senDeck = (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !clsFilter(m) ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  if (senDeck) {
+    const si = siOf(m);
+    if (!si) return "";
+    let f = 0, i = 0, ff = 0, ii = 0;
+    for (const d of m.divs) { const r = si.divs[d.n]; if (!r) continue; ff += r[0]; ii += r[1]; if (st === "AUS" || d.st === st) { f += r[0]; i += r[1]; } }
+    if (!(f + i) || !(ff + ii)) return "";
+    const cmp = st !== "AUS" ? ` (vs national average ${f1((100 * ii) / (ff + ii))}%)` : "";
+    return `<div class="st-inf"><b>Informal votes:</b> ${f1((100 * i) / (f + i))}%${cmp}</div>`;
+  }
   if (A.infPct == null) return "";
   /* a filtered view contrasts itself with the frame's average, the same
      comparison word the seat view's informal line carries (user call) */
@@ -10654,9 +10681,15 @@ function storyArea(m, st) {
      2025"); the meta counts the seats behind the figures, naming the state
      where a seat type narrows it ("New South Wales · 12 divisions") */
   const filt = cls ? CLS_SHORT[cls] : aus ? null : STATE_TITLE[st];
-  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? "The House today" : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`);
-  // never the date — the eyebrow line above the map already carries it
-  const meta = `${cls && !aus ? `${esc(STATE_TITLE[st])} · ` : ""}${N} ${isNowY(m.year) ? (N === 1 ? "member" : "members") : seatNoun()}`;
+  // the Senate lanes' head reads the chamber (the same gate as the figures')
+  const senLanes = S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null);
+  const senDeck = senLanes && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
+  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? (senDeck ? "The Senate today" : "The House today") : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`);
+  // never the date — the eyebrow line above the map already carries it; on
+  // the today head the member count is the chamber's senators under the
+  // Senate lanes (an election frame's divisions stand either way)
+  const senSt = senDeck && !aus ? st : null, senN = senDeck && isNowY(m.year) ? senDeck.divs.filter((d) => !senSt || d.st === senSt).length : N;
+  const meta = `${cls && !aus ? `${esc(STATE_TITLE[st])} · ` : ""}${senN} ${isNowY(m.year) ? (senN === 1 ? "member" : "members") : seatNoun()}`;
   /* the figures block is every lens's: the seats, the two-party count and the
      primaries for the filtered pool. The Winner and Seat type lenses say no
      more than their figures (a dek only where words carry what figures can't);
@@ -12490,7 +12523,7 @@ function setLens(id) {
   // the Senate's head-figure decks in pairs, vote primaries, ballot trip and
   // the chamber for its seats — for the Senate lens, and for the Preferences
   // tab's Senate-ballot reading on a federal frame (user call 2026-11-10)
-  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))))) {
+  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) || (SI_YEARS.has(svYear(S.year)) && !SI[svYear(S.year)]))) {
     const spot = takeSpot();
     showLoading(true);
     Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)]).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })

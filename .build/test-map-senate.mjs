@@ -97,5 +97,17 @@ for (const y of [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 202
 }
 assert.ok(js.includes('{ id: "senate", label: "Senate" }'), "the Senate is a lens");
 assert.ok(js.includes("getJSON(`/map/data/senate-vote-${k}.json`, bg)"), "the lens loads each election's Senate votes (bg: the background preload's, at low priority)");
+// ---- the Senate lens's own informal count (.build/map/senate_informal.py; the AEC's
+// informal-by-division product — 2007–2025, none earlier, never the House's figure)
+const SEN_INF = { 2007: 2.55, 2010: 3.75, 2013: 2.96, 2016: 3.94, 2019: 3.81, 2022: 3.42, 2025: 3.45 };
+for (const y of Object.keys(SEN_INF).map(Number)) {
+  const si = JSON.parse(R(`map/data/senate-informal-${y}.json`)), sv = JSON.parse(R(`map/data/senate-vote-${y}.json`));
+  assert.deepEqual(Object.keys(si.divs).sort(), Object.keys(sv.divs).sort(), `${y}: informal covers exactly the vote deck's divisions`);
+  let f = 0, i = 0;
+  for (const r of Object.values(si.divs)) { f += r[0]; i += r[1]; assert.ok(r[0] > 0 && r[1] >= 0, `${y}: counts parse`); }
+  assert.equal(Math.round((10000 * i) / (f + i)) / 100, SEN_INF[y], `${y}: the AEC's national Senate informal share`);
+}
+assert.ok(!fs.existsSync(path.join(ROOT, "map", "data", "senate-informal-2004.json")), "no informal product for 2004 — an earlier Senate lane carries no count");
+assert.ok(js.includes("getJSON(`/map/data/senate-informal-${k}.json`, bg)"), "the Senate lens loads the chamber's own informal count");
 
 console.log(`test-map-senate: ok – ${S.length} senators as at ${now.asOf}, floor ${floor.plan}`);

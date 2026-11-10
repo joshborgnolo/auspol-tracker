@@ -987,7 +987,7 @@ function setLens(id) {
   // the Senate's head-figure decks in pairs, vote primaries, ballot trip and
   // the chamber for its seats — for the Senate lens, and for the Preferences
   // tab's Senate-ballot reading on a federal frame (user call 2026-11-10)
-  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))))) {
+  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) || (SI_YEARS.has(svYear(S.year)) && !SI[svYear(S.year)]))) {
     const spot = takeSpot();
     showLoading(true);
     Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year)]).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })

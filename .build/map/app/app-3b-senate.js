@@ -545,12 +545,24 @@ function loadSenateVote(y, bg) {
 }
 const svOf = (m) => SV[svYear(m.year)] || null;
 const svShare = (r, fam) => (r && r[0] ? (100 * r[1 + FAMS.indexOf(fam)]) / r[0] : null);
+/* the chamber's own informal count (map/data/senate-informal-<year>.json, .build/map/senate_informal.py,
+   the AEC's SenateInformalByDivision product): informal ballots by seat 2007-2025 (the product starts
+   2007 — an earlier Senate lane has no count and shows no line, never the House's figure) */
+const SI = {}, SIP = {}, SI_YEARS = new Set([2007, 2010, 2013, 2016, 2019, 2022, 2025]);
+function loadSenateInformal(y, bg) {
+  const k = svYear(y);
+  if (k == null || !SI_YEARS.has(k)) return Promise.resolve(null);
+  if (SI[k]) return Promise.resolve(SI[k]);
+  return (SIP[k] ??= getJSON(`/map/data/senate-informal-${k}.json`, bg).then((j) => (SI[k] = j)).catch((e) => { delete SIP[k]; throw e; }));
+}
+const siOf = (m) => SI[svYear(m.year)] || null;
 /* the senate deck AND the previous election's: the head's primaries deltas
-   under the senate lens compare them, pooled over the same seats */
+   under the senate lens compare them, pooled over the same seats; plus the
+   era's own informal count */
 function loadSenateDeck(y, bg) {
   const b = svYear(y);
   if (b == null) return Promise.resolve(null);
-  return Promise.all([loadSenateVote(y, bg), loadSenateVote(prevYearOf(b), bg)]);
+  return Promise.all([loadSenateVote(y, bg), loadSenateVote(prevYearOf(b), bg), loadSenateInformal(y, bg)]);
 }
 const senGap = () => S.senMode !== "share";
 const stoodFor = (d, fam) => d.c.some((c) => c.b === fam);
