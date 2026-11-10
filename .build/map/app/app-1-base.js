@@ -1366,6 +1366,9 @@ function applyNow(m, now) {
     m.divs[i].hold = { n: h.n, ab: h.ab, pn: partyName(h.ab), fam: FAM(h.ab) };
   }
   m.changes = now.changes;
+  // the Senate's own change list, read instead of House's where a head's
+  // figures are the chamber's (the "Since the election" section, storyArea)
+  m.senChanges = now.senChanges || null;
   m.asOf = now.asOf;
 }
 

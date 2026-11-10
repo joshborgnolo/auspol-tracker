@@ -1032,6 +1032,24 @@ def main():
             {"div": "Warringah", "date": "2026-06-25", "kind": "founded", "who": "Zali Steggall", "from": "IND", "to": "CSA",
              "text": "Zali Steggall co-founded Community Strong Australia"},
         ],
+        # every change in the Senate since the 2025 election (dates: APH Parliamentary Handbook's
+        # casual-vacancies list and the members' own announcements, verified 2026-11-10)
+        "senChanges": [
+            {"date": "2025-05-08", "kind": "joined", "who": "Jacinta Nampijinpa Price", "st": "NT", "to": "LP",
+             "text": "Jacinta Nampijinpa Price moved from the Nationals to the Liberal party room"},
+            {"date": "2025-05-27", "kind": "replaced", "who": "Josh Dolega", "st": "TAS", "to": "ALP", "replaces": "Anne Urquhart",
+             "text": "Josh Dolega joined Labor in the Senate, replacing Anne Urquhart"},
+            {"date": "2025-06-02", "kind": "left", "who": "Dorinda Cox", "st": "WA", "from": "GRN", "to": "ALP",
+             "text": "Dorinda Cox left the Greens for Labor"},
+            {"date": "2025-09-18", "kind": "replaced", "who": "Sean Bell", "st": "NSW", "to": "ON", "replaces": "Warwick Stacey",
+             "text": "Sean Bell replaced Warwick Stacey for One Nation"},
+            {"date": "2026-05-14", "kind": "joined", "who": "Tammy Tyrrell", "st": "TAS", "to": "ALP",
+             "text": "Tammy Tyrrell, an ex-Lambie independent, joined Labor"},
+            {"date": "2026-08-13", "kind": "replaced", "who": "Chris Gatenby", "st": "TAS", "to": "LP", "replaces": "Wendy Askew",
+             "text": "Chris Gatenby replaced Wendy Askew for the Liberals"},
+            {"date": "2026-08-20", "kind": "replaced", "who": "Vanessa Bleyer", "st": "TAS", "to": "GRN", "replaces": "Peter Whish-Wilson",
+             "text": "Vanessa Bleyer replaced Peter Whish-Wilson for the Greens"},
+        ],
         # who holds each changed seat today
         "holders": {"New England": {"n": "Barnaby Joyce", "ab": "ON"}, "Farrer": {"n": "David Farley", "ab": "ON"},
                     "Wentworth": {"n": "Allegra Spender", "ab": "CSA"}, "Warringah": {"n": "Zali Steggall", "ab": "CSA"}},

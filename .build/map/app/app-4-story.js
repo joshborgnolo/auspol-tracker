@@ -1443,11 +1443,20 @@ function storyArea(m, st) {
   const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
   // the pool's own changed seats list at every scope: the curated note's
   // "(see below)" points at it, so it renders wherever that note can (user
-  // call 2026-11-10 — New South Wales keeps the note and its referent)
-  if (isNowY(m.year) && chList.length) {
-    const ch = chList.slice().reverse();
+  // call 2026-11-10 — New South Wales keeps the note and its referent); under
+  // the Senate lanes the chamber's own change list stands in place of the
+  // House's (user report 2026-11-10), state-scoped the same way, each row
+  // linking to the senator it names
+  const list = senDeck && m.senChanges ? m.senChanges.filter((c) => st === "AUS" || c.st === st) : chList;
+  if (isNowY(m.year) && list.length) {
+    const ch = list.slice().reverse();
     const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
-    h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
+    const senRow = (c) => {
+      const i = senDeck.byName.get(c.who);
+      const inner = `<span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(STATE_SHORT[c.st])}.</b> ${ds(c.text)}.</span>`;
+      return i == null ? `<span>${inner}</span>` : `<button type="button" data-sgo="sen:${i}">${inner}</button>`;
+    };
+    h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${senDeck ? ch.map(senRow).join("") : ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
     // the federal Now's figures-basis qualifier leads its seats note in the
     // head instead ("The figures here are the 2025 election's, adjusted for
     // seat changes…", user call) — the state Now frames keep it here

@@ -109,5 +109,18 @@ for (const y of Object.keys(SEN_INF).map(Number)) {
 }
 assert.ok(!fs.existsSync(path.join(ROOT, "map", "data", "senate-informal-2004.json")), "no informal product for 2004 — an earlier Senate lane carries no count");
 assert.ok(js.includes("getJSON(`/map/data/senate-informal-${k}.json`, bg)"), "the Senate lens loads the chamber's own informal count");
+// ---- the Senate's own "Since the election" list (build_map_data.py's senChanges → data-now.json →
+// storyArea's senate-lane rendering)
+const senChanges = JSON.parse(R("map/data/data-now.json")).senChanges;
+assert.equal(senChanges.length, 7, "seven senate changes since the 2025 election");
+assert.deepEqual(senChanges.map((c) => c.date), ["2025-05-08", "2025-05-27", "2025-06-02", "2025-09-18", "2026-05-14", "2026-08-13", "2026-08-20"], "the seven dates (Handbook casual vacancies + announcements)");
+{
+  const inDeck = new Set(JSON.parse(R("map/data/senate-now.json")).senators.map((s) => s.n));
+  for (const c of senChanges) assert.ok(inDeck.has(c.who), `${c.who} sits in the deck its row links to`);
+  assert(senChanges.some((c) => /Dorinda Cox left the Greens for Labor/.test(c.text)), "Cox's defection");
+  assert(senChanges.some((c) => /Tammy Tyrrell.*joined Labor/.test(c.text)), "Tyrrell's defection");
+  assert.equal(senChanges.filter((c) => c.kind === "replaced").length, 4, "four same-party replacements");
+}
+assert.ok(js.includes("m.senChanges = now.senChanges || null"), "the senate change list rides the data-now payload into the model");
 
 console.log(`test-map-senate: ok – ${S.length} senators as at ${now.asOf}, floor ${floor.plan}`);
