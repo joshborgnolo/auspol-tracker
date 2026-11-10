@@ -1,9 +1,9 @@
-/* macro.mjs – builds data/macro.json, the ABS/OECD price and output series
-   behind the "Inflation & growth" view of the Snapshot's Economic sentiment
-   panel (rd-panels.jsx RdConfidence's third tab), and its Info glossary entry.
-   Nine display lanes, six data-API pulls plus the OECD's monthly inflation
-   release PDFs — all OFFICIAL publications, fetched from the ABS and OECD
-   public data APIs, never hand-entered:
+/* macro.mjs – builds data/macro.json, the ABS/OECD price, labour and output
+   series behind the "Inflation & growth" view of the Snapshot's Economic
+   sentiment panel (rd-panels.jsx RdConfidence's third tab), and its Info
+   glossary entry. Ten display lanes, seven data-API pulls plus the OECD's
+   monthly inflation release PDFs — all OFFICIAL publications, fetched from
+   the ABS and OECD public data APIs, never hand-entered:
 
      cpi        – all-groups CPI, Australia, annual change, quarterly 1949→.
                   ABS CPI dataflow: MEASURE 3 (percentage change to
@@ -33,6 +33,12 @@
                   annual change, quarterly. Same ANA_AGG derivation as
                   gdppc from the ABS's chain-volume levels
                   (M1.NNDI_PCA.20.AUS.Q), 1974→.
+     unemp      – unemployment rate, Australia, monthly, seasonally
+                  adjusted, persons aged 15+. The ABS's PRINTED labour-
+                  force measure (LF dataflow: M13 = "Unemployment rate",
+                  persons, 15 and over, sa), 1978→; read straight off the
+                  source and rounded to the publication's 1dp — the one
+                  lane drawn as a level, not an annual change.
      oecdCpi    – OECD total, all-items CPI, y/y, monthly; the OECD's printed
                   measure (DF_PRICES_ALL: OECD.M.N.CPI.PA._T.N.GY), no
                   arithmetic on our side.
@@ -92,10 +98,10 @@
    - --check computes everything, prints MACRO_STATUS, never writes
    - --fixture-dir <dir> reads source CSVs from a fixture directory instead
      of the live APIs: abs-cpi-index.csv, abs-cpi-yoy.csv, abs-gdppc.csv,
-     abs-rnndi.csv, oecd-cpi.csv, oecd-gdp.csv (test seam; every file must
-     be present, the run never falls back to live fetches in fixture mode;
-     in fixture mode the release-PDF probe is skipped and the median
-     lane's release era reads the committed store only) */
+     abs-rnndi.csv, abs-unemp.csv, oecd-cpi.csv, oecd-gdp.csv (test seam;
+     every file must be present, the run never falls back to live fetches
+     in fixture mode; in fixture mode the release-PDF probe is skipped and
+     the median lane's release era reads the committed store only) */
 /* MACRO_LIB=1: import the pure helpers (tests) without running the pulls. */
 import { readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -136,6 +142,12 @@ const SOURCES = {
     url: `${ABS_BF}/ABS,ANA_AGG,1.0.0/M1.NNDI_PCA.20.AUS.Q`,
     accept: "application/vnd.sdmx.data+csv",
     cite: "ABS Australian National Accounts (cat 5204.0/06), real net national disposable income per capita, chain volume measures, seasonally adjusted — data API ABS,ANA_AGG measure M1, item NNDI_PCA",
+  },
+  unemp: {
+    fixture: "abs-unemp.csv",
+    url: `${ABS_BF}/ABS,LF,1.0.0/M13.3.1599.20.AUS.M`,
+    accept: "application/vnd.sdmx.data+csv",
+    cite: "ABS Labour Force (cat 6202.0), unemployment rate, persons, 15 and over, seasonally adjusted — data API ABS,LF measure M13",
   },
   /* One all-areas pull of the CPI dataflow reads the OECD and G20 totals
      AND every member country's series (the all-areas response carries all
@@ -296,13 +308,15 @@ const MED_DAM = (ry, rm) =>
 // OECD histories are tamer but padded on the same logic. The gap lane is
 // MEASURED on its computation (2026-11-09): −2.2 (2015's oil crash) to
 // +7.9 (mid-2022's energy spike) — the band pads both tails.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, ausGap: 125, gdppc: 200, rnndi: 200, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdp: 40 };
+// The unemployment band is measured on its live series too (2026-11-10):
+// 3.4 (Oct 2022) to 11.2 (Dec 1992) — the band pads both tails.
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, ausGap: 125, gdppc: 200, rnndi: 200, unemp: 550, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdp: 40 };
 /* the median/gap lanes' newest reference month trails the others by the
    release lag (~2 months) plus the daily run's day: ~75d steady state,
    ~90d across a slow December/January stretch — 110d trips only when the
    monthly release feed has truly died. */
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -808,7 +822,7 @@ if (!process.env.MACRO_LIB) {
     texts[k] = await readSource(spec);
     await sleep(400);
   }
-  const absCpiIdx = texts.cpiIndex, absCpiYoy = texts.cpiYoy, absGdp = texts.gdppcLvl, absRnndi = texts.rnndipcLvl;
+  const absCpiIdx = texts.cpiIndex, absCpiYoy = texts.cpiYoy, absGdp = texts.gdppcLvl, absRnndi = texts.rnndipcLvl, absUnemp = texts.unemp;
   const oecdCpiRows = texts.oecdCpi, oecdGdpRows = texts.oecdGdp;
 
   // cpi — quarterly, derived from the ABS's own quarterly index numbers.
@@ -834,6 +848,13 @@ if (!process.env.MACRO_LIB) {
   if (rnndiLevels.length < 200) throw guard(`rnndi levels: ${rnndiLevels.length} rows — key/basis changed upstream?`);
   const rnndi = yoyFromLevels(rnndiLevels, 4);
 
+  // unemp — the ABS's printed monthly unemployment rate, seasonally
+  // adjusted. The API's OBS_VALUE carries full precision; the ABS prints
+  // the rate at 1dp (its download's DECIMALS=1), so the lane rounds to
+  // what the publication prints.
+  const unempRows = absFiltered(parseSdmxCsv(absUnemp), { MEASURE: "M13", SEX: 3, AGE: 1599, TSEST: 20, REGION: "AUS" });
+  const unemp = printedRows(unempRows).map((x) => ({ date: x.date, v: Math.round(x.v * 10) / 10 }));
+
   // OECD lanes off the one all-areas pull: the aggregate total is a
   // printed measure (no arithmetic); the member median and the median
   // target deviation are computed here and spliced with the release-PDF
@@ -857,7 +878,7 @@ if (!process.env.MACRO_LIB) {
     writeAtomic(MED_STORE, medStoreNext);
   }
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, ausGap, gdppc, rnndi, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdp })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, ausGap, gdppc, rnndi, unemp, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdp })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -873,12 +894,13 @@ if (!process.env.MACRO_LIB) {
 
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const doc = {
-    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). Rows: {date: ISO period end, v: percent}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
     cpi: { label: "Inflation (headline CPI)", basis: "derived from ABS index numbers", rows: cpi },
     cpiMonthly: { label: "Inflation (monthly CPI)", basis: "ABS printed measure", rows: cpiMonthly },
     ausGap: { label: "Australia over its target", basis: "headline CPI minus the RBA's 2–3% band midpoint (computed)", rows: ausGap },
     gdppc: { label: "GDP per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: gdppc },
     rnndi: { label: "Real net national disposable income per capita (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: rnndi },
+    unemp: { label: "Unemployment rate", basis: "ABS printed measure (seasonally adjusted)", rows: unemp },
     oecdCpi: { label: "OECD average inflation", basis: "OECD printed measure", rows: oecdCpi },
     oecdCpiMed: { label: "OECD median inflation", basis: "median of the 38 member countries' prints (computed)", rows: oecdCpiMed },
     oecdCpiGap: { label: "Median deviation from inflation target", basis: "median of members' prints minus their own central-bank targets (computed; band targets at midpoint)", rows: oecdCpiGap },
@@ -886,7 +908,7 @@ if (!process.env.MACRO_LIB) {
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
+  const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);

@@ -8703,7 +8703,8 @@ function infoTerms(D) {
         ABS's own published index numbers), its own deviation from the Reserve Bank's 2–3%
         band at its midpoint, real GDP per person and real net national disposable
         income per person (chain volume, seasonally
-        adjusted), with the OECD-wide average, the OECD countries' own median and the
+        adjusted) and the unemployment rate (the ABS's monthly seasonally adjusted print —
+        a level, not an annual change), with the OECD-wide average, the OECD countries' own median and the
         median deviation from each member's own central-bank target (the two median lines are
         computed here — from the members' OECD-published prints and, since 2026, from the
         OECD's monthly release table; the deviation is each country's print minus its own bank's

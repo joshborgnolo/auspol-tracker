@@ -251,6 +251,9 @@ const qIso = (year, q) => `${year}-Q${q}`;
      0.1–0.4pt off the derived quarterly line (inside the handoff guard)
    - GDP-pc levels: 210 quarters 1974-Q1→2026-Q2, *1.005^q → y/y 2.0
    - RNNDI-pc levels: 210 quarters 1974-Q1→2026-Q2, *1.006^q → y/y 2.4
+   - unemployment rate: 584 months 1978-02→2026-09, constant 4.44567…
+     (ABS-shaped 8-decimal precision → the lane rounds to the published
+     4.4)
    - OECD CPI: one merged all-areas feed — the OECD aggregate (68 printed
      months) plus a 26-member, 846-month grid for the median lane
      (member i = 2.0+0.2i → every month's median 4.5, constant); the
@@ -285,6 +288,18 @@ const absRnndiCsv = (() => {
   for (let i = 0; i < 210; i++) {
     rows.push(`ABS:ANA_AGG(1.0.0),M1,NNDI_PCA,20,AUS,Q,${qIso(y, q)},${(14000 * Math.pow(1.006, i)).toFixed(2)},,,,`);
     if (++q === 5) { q = 1; y++; }
+  }
+  return rows.join("\n") + "\n";
+})();
+/* 584 monthly unemployment-rate rows 1978-02→2026-09, the LF download's
+   own 8-decimal shape — downstream rounding to the published 1dp is the
+   lane's job and is pinned below */
+const absUnempCsv = (() => {
+  const rows = ["DATAFLOW,MEASURE,SEX,AGE,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT,DECIMALS"];
+  let y = 1978, m = 2;
+  for (let i = 0; i < 584; i++) {
+    rows.push(`ABS:LF(1.0.0),M13,3,1599,20,AUS,M,${y}-${String(m).padStart(2, "0")},4.44567890,PCT,0,,,1`);
+    if (++m === 13) { m = 1; y++; }
   }
   return rows.join("\n") + "\n";
 })();
@@ -323,6 +338,7 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-cpi-yoy.csv"), absMonthlyCpiCsv(cpiMonthly));
   fs.writeFileSync(path.join(dir, "abs-gdppc.csv"), absGdpCsv);
   fs.writeFileSync(path.join(dir, "abs-rnndi.csv"), absRnndiCsv);
+  fs.writeFileSync(path.join(dir, "abs-unemp.csv"), absUnempCsv);
   fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi));
   fs.writeFileSync(path.join(dir, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
 };
@@ -340,6 +356,7 @@ assert.equal(st.rows.cpiMonthly, 9);
 assert.equal(st.rows.ausGap, 127, "118 target-era quarters + the 9 printed months");
 assert.equal(st.rows.gdppc, 210 - 4);
 assert.equal(st.rows.rnndi, 210 - 4);
+assert.equal(st.rows.unemp, 584, "the labour-force series 1978-02→2026-09");
 assert.equal(st.rows.oecdCpi, 68);
 assert.equal(st.rows.oecdCpiMed, 840, "846 grid months minus the 2026 months the splice hands to the store era");
 assert.equal(st.rows.oecdCpiGap, 316, "the gap lane runs 1999-09→2025-12 (15 with-both members at its start)");
@@ -348,6 +365,7 @@ assert.equal(st.newest.cpi, "2026-09-30");
 assert.equal(st.newest.cpiMonthly, "2026-09-30");
 assert.equal(st.newest.gdppc, "2026-06-30");
 assert.equal(st.newest.rnndi, "2026-06-30");
+assert.equal(st.newest.unemp, "2026-09-30");
 assert.equal(st.newest.oecdCpiMed, "2025-12-31", "the archive era caps at Dec 2025");
 assert.equal(st.newest.oecdCpiGap, "2025-12-31", "the gap lane's archive era shares the median's cap");
 assert.ok(Math.abs(st.cpiHandoffDrift - 0.1) < 1e-9, "printed↔derived handoff drift is the fixture's known 0.1pt");
@@ -356,6 +374,8 @@ assert.equal(doc.cpi.rows[0].v, 4.5, "index-derived y/y rounds the fixture's kno
 assert.equal(doc.cpi.rows[0].date, "1962-03-31", "first y/y is the fifth quarter on file");
 assert.deepEqual(doc.gdppc.rows[0], { date: "1975-03-31", v: 2.0 });
 assert.deepEqual(doc.rnndi.rows[0], { date: "1975-03-31", v: 2.4 }, "1.006^4 levels growth is RNNDI y/y 2.4");
+assert.deepEqual(doc.unemp.rows[0], { date: "1978-02-28", v: 4.4 }, "8-decimal source reads round to the published 4.4");
+assert.deepEqual(doc.unemp.rows.at(-1), { date: "2026-09-30", v: 4.4 });
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
 assert.deepEqual(doc.ausGap.rows[0], { date: "1996-09-30", v: 2.0 }, "the deviation lane opens at the band's adoption quarter, 4.5 − 2.5");
 assert.deepEqual(doc.ausGap.rows.at(-1), { date: "2026-09-30", v: 2.1 }, "newest printed month minus the midpoint");
@@ -462,7 +482,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -481,6 +501,8 @@ for (const k of KEYS) {
 assert.ok(live.cpi.rows[0].date <= "1955-01-01", "quarterly CPI reaches the mid-50s");
 assert.ok(live.gdppc.rows[0].date <= "1980-01-01", "GDP pc reaches the 70s");
 assert.ok(live.rnndi.rows[0].date <= "1980-01-01", "RNNDI reaches the 70s");
+assert.ok(live.unemp.rows[0].date <= "1978-03-31", "the unemployment rate reaches its 1978 start");
+assert.equal(live.unemp.rows[0].v.toFixed(1), String(live.unemp.rows[0].v), "the unemp lane files the published 1dp");
 assert.ok(live.oecdCpi.rows[0].date <= "1975-01-01", "OECD CPI reaches the 70s");
 assert.ok(live.oecdCpiMed.rows[0].date <= "1975-01-01", "OECD member median reaches the 70s");
 assert.ok(live.oecdCpiGap.rows[0].date <= "1999-03-31", "the target-deviation lane opens 1999");

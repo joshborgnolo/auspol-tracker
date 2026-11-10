@@ -2229,10 +2229,12 @@ const CONF_HISTORY_FILE = (() => {
   catch { return null; }
 })();
 /* The Economic sentiment panel's "Inflation & growth" view (§5m): the ABS
-   CPI and GDP-per-capita series and their OECD comparators, built by
+   CPI, GDP-per-capita and unemployment-rate series and their OECD
+   comparators, built by
    .build/macro.mjs straight off the ABS and OECD data APIs — the payloads
    stay the published (or index-derived, per the file's _about) annual
-   changes, per-row {date, v}; dots and any splice are render-side. */
+   changes (the unemployment lane rides its published level), per-row
+   {date, v}; dots and any splice are render-side. */
 const MACRO_FILE = (() => {
   if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
@@ -7315,7 +7317,9 @@ const confDeep = (() => {
    data/macro.json (built by .build/macro.mjs off the ABS and OECD data
    APIs) passes through as-is: cpi/cpiMonthly inflation, the ausGap
    deviation-from-target derivation, gdppc real GDP per capita and rnndi
-   real net national disposable income per capita, and the OECD comparators
+   real net national disposable income per capita, the unemp unemployment
+   rate (the only lane drawn as a level, not an annual change), and the
+   OECD comparators
    (oecdCpi printed aggregates; oecdCpiMed and oecdCpiGap the extractor's
    member-country medians). The view reads the raw {date, v} rows and
    splices the quarterly CPI history onto the printed monthly era
@@ -7323,7 +7327,7 @@ const confDeep = (() => {
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"]) {
+  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };
