@@ -160,6 +160,42 @@ read off the four-band tables with the site's own `ageStandardise`.
   matters more.
 - **Education.** See §3. No change.
 
+## 6. One estimate of each group's vote (`combine-test.py`, `backtest-2013-22.py` → `out/`)
+
+Added 2026-11-10 (owner: "proceed as you recommend"). Sections 1–5 ask what "since the election" should be
+measured from. This asks a different question: what is the best estimate of how each group voted?
+
+- **Answer: both sources, as gaps from all voters, added to the count.** gen-data `DEMO_VOTE` weights each
+  source by 1 / (its sampling variance + 1.5²). The charts draw it as the one mark at the election.
+- **"Since the election" is unchanged.** It still reads the polls' own election-time figures (the AES for
+  generations). Measured from the combined figure, about 40% of the poll-v-AES difference would read as change.
+
+| Typical miss on state gaps (RMSE, points) | Cells | Polls | AES | Plain mean | Weighted |
+|---|---|---|---|---|---|
+| 2025, states and region classes | 37 | 2.26 | 3.14 | 2.00 | 1.68 |
+| 2013–2022, states | 76 | 2.52 | 2.77 | 1.98 | 1.99 |
+| 2013 | 33 | 2.20 | 2.03 | 1.82 | 1.85 |
+| 2016 | 23 | 2.74 | 2.72 | 1.70 | 1.73 |
+| 2019 | 14 | 3.02 | 3.67 | 2.51 | 2.54 |
+| 2022 (two-party-preferred only) | 6 | 1.97 | 3.81 | 2.37 | 2.23 |
+
+- **The two sources' errors are unrelated.** r = +0.08 in 2025 and +0.12 over 2013–2022. That is why the mean
+  beats both, at every election but 2022's six cells.
+- **Both carry about the same error beyond sampling.** In 2025 it was 1.74 points a cell for the polls and 1.64
+  for the AES. The earlier tables print too few samples to measure it.
+- **The best fixed weight on the polls, fitted on 2013–2022, is 0.55.** The rule gives them 0.54 there and
+  0.60–0.65 in 2025, when five houses were pooled.
+- **Gender is a standing difference, not noise.** The AES shows a wider gender gap than the polls at every
+  election tested: Coalition among men +4.5 against Newspoll's −1 (2016) and 0 (2019); Labor's two-party vote
+  among women +4.7 against Newspoll's 0 (2022); and 2025. Nothing counted says which is right, so the estimate
+  sits between them and its margin spans both.
+- **Age is noise.** Polls less AES for the Coalition among 18–34s ran +3.9, +7.6 and +2.0 in 2016–2022, and −7.2
+  in 2025.
+- **Census and booths are not used.** `../subpop-votes-2025` found the booth regression gives the Coalition
+  between −16% and +9% among 18–34s and fails on education. Gender can't be read from booths at all.
+- **Limits.** The 2013–2022 polls are one or two houses an election, the 2019 Newspoll table is the January–March
+  quarter, and the AES's two-party figure is built from where minor-party voters say their preferences went.
+
 ## Files and rerunning (from the repo root)
 
 - **`extract-bludgertrack.mjs [current.xml]` → `bludgertrack-2022-25.json`.** Fetches the live feed when no file is
@@ -169,6 +205,10 @@ read off the four-band tables with the site's own `ageStandardise`.
 - **`lib.mjs`.** Shared readers, the release checks, gaps and variances, and the AEC count by state and class from
   `.build/aec-flow-src/booth/oracle/fpvvt-2025.csv.gz`.
 - **Reports:**
+  - `python3 .build/analysis/group-poll-error-2025/combine-test.py > …/out/combine-test.txt` (reads
+    `out/group-error.json`)
+  - `/usr/bin/python3 .build/analysis/group-poll-error-2025/backtest-2013-22.py <2_aes67to25_integrated_general_v1.dta>
+    > …/out/backtest-2013-22.txt` (needs pandas; the AES integrated file is licensed and not committed)
   - `node .build/analysis/group-poll-error-2025/group-error.mjs > …/out/group-error.txt` (also writes
     `out/group-error.json`)
   - `node .build/analysis/group-poll-error-2025/education-split.mjs > …/out/education-split.txt`

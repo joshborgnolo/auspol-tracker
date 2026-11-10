@@ -1,18 +1,16 @@
-// Probe: Who votes for whom's election-time marks (2026-11-03).
-// - The polls at the election (gen-data DEMO_ELECTION, the houses' own tables
-//   over the six weeks before polling day): one open triangle per group at May
-//   2025 on the Gender, By age, Education, By housing, By work status and By
-//   language at home charts, with the dotted lead-ins.
-// - The Australian Election Study 2025 (DEMO_AES, from the respondent file via
-//   .build/extract-aes-2025.py): one hollow diamond per group on those charts
-//   bar language (not asked), standing alone; on By generation (which no house
-//   cut before the election) the diamonds alone, with the lead-ins.
+// Probe: Who votes for whom's election-time marks (2026-11-10).
+// One hollow diamond per group at May 2025: gen-data DEMO_VOTE's estimate of
+// the group's vote, the polls over the six weeks before polling day and the
+// Australian Election Study 2025 weighted together (the polls alone for
+// language at home, the AES alone for generations). No triangles any more.
+// - A group both sources cut takes NO dotted lead-in (the gap to the line is
+//   partly the two instruments); one-source groups keep theirs; the
+//   all-voters line is always led back to the result.
 // - None on the Place tab (the AEC count marks those).
-// The key names both; a diamond's tip reads the AES's share, the group's
-// respondents and "not pooled"; a triangle's tip names the polls and the six
-// weeks; the election-month guide reads the groups' figures at the polls'
-// election-time values (from the payload) and all voters at the result; no
-// page errors. Screens to OUT (default $CLAUDE_JOB_DIR/tmp or /tmp).
+// The key names the estimate; a diamond's tip quotes both readings and the
+// margin; the election-month guide reads the groups at the estimate (from
+// the payload) and all voters at the result; no page errors. Screens to OUT
+// (default $CLAUDE_JOB_DIR/tmp or /tmp).
 // Run: node .matilda/probe/wv-aes.mjs  (PAGE=<url> to test a served build)
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
@@ -68,11 +66,9 @@ for (const vw of [1280, 390]) {
     await click(page, "#who-votes .rd-wv-tabs .rd-tab, #who-votes .rd-wv-tabs button", "Gender");
     await settle(900);
     const g = await diamonds(page);
-    check(`${party}: Gender chart ${want ? "has 2" : "has no"} AES points and 2 poll triangles`, (g[0] && g[0].n) === (want ? 2 : 0) && (g[0] && g[0].tri) === 2, JSON.stringify(g));
-    const key = await page.evaluate(() => /Australian Election Study 2025/.test(document.querySelector("#who-votes .rd-sm-key")?.textContent || ""));
-    check(`${party}: key ${want ? "names" : "omits"} the study`, key === want);
-    const keyP = await page.evaluate(() => /Polls at the 2025 election/.test(document.querySelector("#who-votes .rd-sm-key")?.textContent || ""));
-    check(`${party}: key names the polls at the election`, keyP);
+    check(`${party}: Gender chart has 2 estimate diamonds and no triangles`, (g[0] && g[0].n) === 2 && (g[0] && g[0].tri) === 0, JSON.stringify(g));
+    const key = await page.evaluate(() => document.querySelector("#who-votes .rd-sm-key")?.textContent || "");
+    check(`${party}: key names the estimate and has no triangle entry`, /Estimated vote at the 2025 election/.test(key) && !/Polls at the 2025 election/.test(key));
     if (party === "Labor") {
       await page.evaluate(() => document.querySelector("#who-votes .rd-wv-charts").scrollIntoView({ block: "center" }));
       await settle(400);
@@ -88,51 +84,45 @@ for (const vw of [1280, 390]) {
       await page.mouse.move(box.x, box.y);
       await settle(400);
       const tip = await page.evaluate(() => [...document.querySelectorAll("#who-votes .rd-wv-chart .tooltip, #who-votes .rd-wv-chart [class*=tip]")].map((n) => n.textContent.trim()).filter(Boolean).join(" | "));
-      check("tip names the AES, its share, the group's respondents, not pooled", /Australian Election Study 2025/.test(tip) && /not pooled/.test(tip)
-        && (/Men ?30\.9/.test(tip) && /940 respondents/.test(tip) || /Women ?36\.2/.test(tip) && /1,004 respondents/.test(tip)), tip.slice(0, 200));
+      const V = await page.evaluate(() => { const E = window.AUSPOL.demoVote.sets.gender.groups; return { men: E.Men.alp, women: E.Women.alp }; });
+      const f = (v) => v.toFixed(1);
+      check("tip names the estimate, both readings, their bases and the margin", /Estimated vote at the 2025 election/.test(tip) && /Polls in the six weeks before polling day/.test(tip) && /Australian Election Study/.test(tip) && /weighted together, ±/.test(tip)
+        && (tip.includes("Men" + f(V.men[0])) && tip.includes(f(V.men[2])) && tip.includes(f(V.men[3])) || tip.includes("Women" + f(V.women[0])) && tip.includes(f(V.women[2])) && tip.includes(f(V.women[3]))), tip.slice(0, 260));
+      check("the estimate sits between the two readings", [V.men, V.women].every((c) => c[0] >= Math.min(c[2], c[3]) - 0.3 && c[0] <= Math.max(c[2], c[3]) + 0.3), JSON.stringify(V));
       await el.screenshot({ path: `${OUT}/wv-aes-gender-tip-${vw}.png` });
-      /* a triangle's tip: the polls over the six weeks */
-      await page.mouse.move(5, 5);
-      await settle(200);
-      const tbox = await boxOf(3);
-      await page.mouse.move(tbox.x, tbox.y);
-      await settle(400);
-      const ttip = await page.evaluate(() => [...document.querySelectorAll("#who-votes .rd-wv-chart .tooltip, #who-votes .rd-wv-chart [class*=tip]")].map((n) => n.textContent.trim()).filter(Boolean).join(" | "));
-      check("triangle tip names the polls at the election and the six weeks", /Polls at the 2025 election/.test(ttip) && /six weeks before polling day/.test(ttip) && /polls? from/.test(ttip), ttip.slice(0, 200));
-      /* the guide at the election x, well above the marks: the lead-ins'
-         rows - the groups' figures at the polls' election-time values, all
-         voters at the result */
-      const want = await page.evaluate(() => { const E = window.AUSPOL.demoElection.sets.gender.groups; return { men: E.Men.alp[0].toFixed(1), women: E.Women.alp[0].toFixed(1) }; });
+      /* the guide at the election x, well above the marks: the groups at
+         the estimate, all voters at the result */
       const svgTop = await page.evaluate(() => document.querySelector("#who-votes .rd-wv-chart svg").getBoundingClientRect().bottom - 80);
       await page.mouse.move(5, 5);
       await settle(200);
       await page.mouse.move(box.x + 4, svgTop);
       await settle(400);
       const guide = await page.evaluate(() => [...document.querySelectorAll("#who-votes .rd-wv-chart .tooltip, #who-votes .rd-wv-chart [class*=tip]")].map((n) => n.textContent.trim()).filter(Boolean).join(" | "));
-      check("election-month guide: groups at the polls' election-time figures, all voters at the result", /May 2025/.test(guide) && guide.includes("Women" + want.women) && guide.includes("Men" + want.men) && /All voters ?34\.6/.test(guide) && /Groups: the polls over the six weeks before polling day/.test(guide), guide.slice(0, 220));
-      /* lead-ins: two groups from their triangles + all voters, dotted */
-      const leads = await page.evaluate(() => ({ pe: document.querySelectorAll('#who-votes .rd-wv-chart [data-series^="pe-"]').length, all: document.querySelectorAll('#who-votes .rd-wv-chart [data-series^="ae-all-"]').length, ae: document.querySelectorAll('#who-votes .rd-wv-chart [data-series^="ae-"]:not([data-series^="ae-all-"])').length }));
-      check("dotted lead-ins drawn from the triangles (2 groups + all voters), none from the diamonds", leads.pe >= 2 && leads.all >= 1 && leads.ae === 0, JSON.stringify(leads));
+      check("election-month guide: groups at the estimate, all voters at the result", /May 2025/.test(guide) && guide.includes("Women" + f(V.women[0])) && guide.includes("Men" + f(V.men[0])) && /All voters ?34\.6/.test(guide) && /Groups: estimated from the polls before the election and the Australian Election Study 2025/.test(guide), guide.slice(0, 260));
+      /* lead-ins: all voters only; the two groups ride as single points */
+      const leads = await page.evaluate(() => ({ all: document.querySelectorAll('#who-votes .rd-wv-chart [data-series^="ae-all-"]').length,
+        ev: [...document.querySelectorAll('#who-votes .rd-wv-chart path[data-series^="ev-"]')].filter((n) => /L/.test(n.getAttribute("d") || "")).length }));
+      check("all voters led back to the result; no group lead-in where both sources stand", leads.all >= 1 && leads.ev === 0, JSON.stringify(leads));
       await page.mouse.move(5, 5);
     }
     await click(page, "#who-votes .rd-wv-tabs .rd-tab, #who-votes .rd-wv-tabs button", "Age");
     await settle(900);
     const a = await diamonds(page);
     const byGen = a.find((c) => /generation/i.test(c.head)), byAge = a.find((c) => /age/i.test(c.head));
-    check(`${party}: By generation has 4 AES points, no triangles`, (byGen && byGen.n) === 4 && byGen.tri === 0, JSON.stringify(a));
-    check(`${party}: By age has 3 AES points and 3 triangles`, (byAge && byAge.n) === 3 && byAge.tri === 3);
+    check(`${party}: By generation has 4 diamonds, no triangles`, (byGen && byGen.n) === 4 && byGen.tri === 0, JSON.stringify(a));
+    check(`${party}: By age has 3 diamonds, no triangles`, (byAge && byAge.n) === 3 && byAge.tri === 0);
     if (party === "Labor") {
       const leadsG = await page.evaluate(() => [...document.querySelectorAll("#who-votes .rd-wv-chart")].map((card) => ({
         head: (card.querySelector(".rd-chead-t") || {}).firstChild?.textContent || "",
-        ae: card.querySelectorAll('[data-series^="ae-"]:not([data-series^="ae-all-"])').length, pe: card.querySelectorAll('[data-series^="pe-"]').length })));
+        ev: [...card.querySelectorAll('path[data-series^="ev-"]')].filter((n) => /L/.test(n.getAttribute("d") || "")).length })));
       const lg = leadsG.find((c) => /generation/i.test(c.head)), la = leadsG.find((c) => /age/i.test(c.head) && !/generation/i.test(c.head));
-      check("generations lead in from the diamonds, ages from the triangles", lg && lg.ae >= 3 && lg.pe === 0 && la && la.pe >= 3 && la.ae === 0, JSON.stringify(leadsG));
+      check("generations (one source) keep their lead-ins, ages (both) take none", lg && lg.ev >= 3 && la && la.ev === 0, JSON.stringify(leadsG));
     }
     if (party === "Labor") {
       const el = await page.$("#who-votes .rd-wv-charts");
       await el.screenshot({ path: `${OUT}/wv-aes-age-${vw}.png` });
     }
-    for (const [tabName, want2, tri2] of [["Education", { education: 3 }, { education: 3 }], ["Home", { housing: 3, "work status": 3, language: 0 }, { housing: 3, "work status": 3, language: 2 }], ["Place", { state: 0, location: 0 }, { state: 0, location: 0 }]]) {
+    for (const [tabName, want2, tri2] of [["Education", { education: 3 }, { education: 0 }], ["Home", { housing: 3, "work status": 3, language: 2 }, { housing: 0, "work status": 0, language: 0 }], ["Place", { state: 0, location: 0 }, { state: 0, location: 0 }]]) {
       await click(page, "#who-votes .rd-wv-tabs .rd-tab, #who-votes .rd-wv-tabs button", tabName);
       await settle(900);
       const cs = await diamonds(page);
@@ -140,7 +130,7 @@ for (const vw of [1280, 390]) {
         const c = cs.find((x) => x.head.toLowerCase().includes(lab));
         /* Place's state panels draw no cards with a by-line head of their
            own; a missing card counts as none */
-        check(`${party}: ${tabName} / ${lab} has ${n} AES points and ${tri2[lab]} triangles`, (c ? c.n : 0) === n && (c ? c.tri : 0) === tri2[lab], JSON.stringify(cs));
+        check(`${party}: ${tabName} / ${lab} has ${n} diamonds and ${tri2[lab]} triangles`, (c ? c.n : 0) === n && (c ? c.tri : 0) === tri2[lab], JSON.stringify(cs));
       }
       if (party === "Labor" && tabName === "Home") {
         const el = await page.$("#who-votes .rd-wv-charts");

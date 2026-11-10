@@ -1,0 +1,33 @@
+37 cells with truth, polls and AES
+all truth cells                    n=37  RMSE polls 2.26 (sampling 1.43)  AES 3.14 (sampling 2.67)  mean 2.00  inv-var 1.63 (polls wt 0.79)  best w=0.65: 1.90  r(err) +0.08
+states (5 houses pooled)           n=25  RMSE polls 1.52 (sampling 0.94)  AES 3.43 (sampling 2.84)  mean 2.05  inv-var 1.45 (polls wt 0.91)  best w=0.90: 1.50  r(err) +0.27
+region class (RedBridge only)      n=12  RMSE polls 3.30 (sampling 2.13)  AES 2.43 (sampling 2.28)  mean 1.89  inv-var 1.96 (polls wt 0.53)  best w=0.35: 1.81  r(err) -0.16
+states ex SA                       n=20  RMSE polls 1.01 (sampling 0.73)  AES 2.22 (sampling 2.43)  mean 1.39  inv-var 1.01 (polls wt 0.92)  best w=0.95: 1.00  r(err) +0.39
+party alp                          n= 9  RMSE polls 2.72 (sampling 1.77)  AES 3.57 (sampling 3.05)  mean 2.20  inv-var 1.69 (polls wt 0.74)  best w=0.65: 2.12  r(err) -0.05
+party lnp                          n= 9  RMSE polls 2.54 (sampling 1.78)  AES 1.96 (sampling 3.02)  mean 1.50  inv-var 1.58 (polls wt 0.74)  best w=0.40: 1.45  r(err) -0.16
+party grn                          n= 9  RMSE polls 1.91 (sampling 1.22)  AES 2.69 (sampling 2.24)  mean 1.59  inv-var 1.59 (polls wt 0.75)  best w=0.65: 1.50  r(err) -0.04
+party onp                          n= 5  RMSE polls 1.87 (sampling 0.74)  AES 1.88 (sampling 1.77)  mean 1.22  inv-var 1.43 (polls wt 0.88)  best w=0.50: 1.22  r(err) -0.11
+party oth                          n= 5  RMSE polls 1.64 (sampling 0.81)  AES 5.15 (sampling 2.77)  mean 3.30  inv-var 1.87 (polls wt 0.93)  best w=1.00: 1.64  r(err) +0.87
+bootstrap over cells: mean beats polls in 75%, beats AES in 100%
+  Newspoll   states n=25  house 1.47  AES 3.43  mean 2.22
+  YouGov     states n=25  house 2.22  AES 3.43  mean 2.00
+  Resolve    states n=15  house 1.48  AES 2.15  mean 1.52
+  DemosAU    states n=20  house 2.02  AES 2.22  mean 1.60
+  RedBridge  states n= 9  house 2.48  AES 1.83  mean 1.70
+
+truth cells n=37: non-sampling error  polls 1.74  AES 1.64
+truth cells            n= 37  RMS polls−AES 3.73  sampling alone 3.04  excess 2.16  (per instrument if shared equally 1.53)
+demographic cells      n=100  RMS polls−AES 2.99  sampling alone 2.06  excess 2.17  (per instrument if shared equally 1.53)
+  gender               n= 10  RMS polls−AES 2.35  sampling alone 1.19  excess 2.03  (per instrument if shared equally 1.44)
+  age                  n= 20  RMS polls−AES 2.59  sampling alone 2.09  excess 1.52  (per instrument if shared equally 1.08)
+  education            n= 15  RMS polls−AES 2.71  sampling alone 1.80  excess 2.03  (per instrument if shared equally 1.43)
+  work                 n= 20  RMS polls−AES 3.89  sampling alone 2.22  excess 3.19  (per instrument if shared equally 2.26)
+  housing              n= 15  RMS polls−AES 2.86  sampling alone 2.10  excess 1.94  (per instrument if shared equally 1.37)
+  income               n= 20  RMS polls−AES 2.92  sampling alone 2.35  excess 1.73  (per instrument if shared equally 1.22)
+  gender     polls' weight: sampling-only 0.92; with instrument error 0.59; combined 95% margin ±2.4
+  age        polls' weight: sampling-only 0.87; with instrument error 0.67; combined 95% margin ±2.7
+  education  polls' weight: sampling-only 0.85; with instrument error 0.64; combined 95% margin ±2.6
+  work       polls' weight: sampling-only 0.85; with instrument error 0.66; combined 95% margin ±2.8
+  housing    polls' weight: sampling-only 0.84; with instrument error 0.65; combined 95% margin ±2.7
+  income     polls' weight: sampling-only 0.72; with instrument error 0.61; combined 95% margin ±3.0
+truth cells: rule-weighted combination RMSE 1.68 (plain mean 2.00, polls 2.26, AES 3.14)

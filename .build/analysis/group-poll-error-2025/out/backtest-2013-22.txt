@@ -1,0 +1,104 @@
+backtest-2013-22.py: the polls-plus-AES combination tested at four earlier elections.
+
+INSTR 1.5 (points of error beyond sampling, each instrument), DEFF 1.5. Gaps in points.
+
+1. STATES: each estimate's gap against the count's (typical miss, RMSE, points)
+                              cells   polls    AES   plain mean   weighted   polls' sampling   AES's sampling   r(errors)
+   all four elections           76    2.52   2.77       1.98       1.99            2.70            2.94     +0.12
+     primaries                  65    2.45   2.74       1.97       1.99            2.21            2.59     +0.16
+     two-party-preferred        11    2.91   2.95       2.04       2.01            4.63            4.46     -0.04
+     2013                       33    2.20   2.03       1.82       1.85            2.50            1.99     +0.49
+     2016                       23    2.74   2.72       1.70       1.73            2.45            2.92     -0.21
+     2019                       14    3.02   3.67       2.51       2.54            1.67            3.72     +0.11
+     2022                        6    1.97   3.81       2.37       2.23            5.31            4.76     +0.29
+
+   The polls' sampling column is a ceiling, not a measure: most of these tables print no cell samples and the
+   design effect is assumed, so no error-beyond-sampling figure is read off these years (2025's: 1.74 and 1.64).
+   Best single weight on the polls, fitted here: 0.55 (RMSE 1.97); the rule's mean weight on the polls: 0.54.
+
+2. AGE AND GENDER: polls against the AES (no truth)
+   gender   20 cells   RMS polls - AES 3.30   sampling alone 1.55   beyond sampling 2.91 (each instrument 2.06)
+   age      51 cells   RMS polls - AES 3.83   sampling alone 2.76   beyond sampling 2.65 (each instrument 1.88)
+
+   Cell by cell (poll gap, AES gap, difference, z):
+   2013 age    18-24  alp   polls   -1.0  AES   +3.0  diff   -4.0  z  -0.9  [Roy Morgan]
+   2016 age    18–34  alp   polls   +3.0  AES   +2.9  diff   +0.1  z  +0.0  [Newspoll]
+   2019 age    18–34  alp   polls   +7.0  AES   +2.4  diff   +4.6  z  +1.4  [Newspoll]
+   2022 age    18–34  alp   polls   +0.0  AES   +5.0  diff   -5.0  z  -1.4  [Resolve Strategic]
+   2013 age    25-34  alp   polls   +1.5  AES   +4.0  diff   -2.5  z  -0.8  [Roy Morgan]
+   2013 age    35-49  alp   polls   +1.0  AES   -0.4  diff   +1.4  z  +0.7  [Roy Morgan]
+   2016 age    35–49  alp   polls   +0.0  AES   +2.0  diff   -2.0  z  -0.8  [Newspoll]
+   2019 age    35–49  alp   polls   +0.0  AES   +0.0  diff   -0.0  z  -0.0  [Newspoll]
+   2022 age    35–54  alp   polls   +3.0  AES   +0.6  diff   +2.4  z  +0.9  [Resolve Strategic]
+   2016 age    50+    alp   polls   -4.0  AES   -2.6  diff   -1.4  z  -1.0  [Newspoll]
+   2019 age    50+    alp   polls   -4.0  AES   -1.5  diff   -2.5  z  -1.2  [Newspoll]
+   2013 age    50-64  alp   polls   -1.0  AES   +0.6  diff   -1.6  z  -0.9  [Roy Morgan]
+   2022 age    55+    alp   polls   +2.0  AES   -3.6  diff   +5.6  z  +2.6  [Resolve Strategic]
+   2013 age    65+    alp   polls   -3.6  AES   -4.5  diff   +0.9  z  +0.5  [Roy Morgan]
+   2016 age    18-24  alp2  polls   +8.5  AES  +12.2  diff   -3.7  z  -0.6  [Roy Morgan]
+   2022 age    18–34  alp2  polls  +11.0  AES  +15.2  diff   -4.2  z  -1.1  [Newspoll]
+   2016 age    25-34  alp2  polls  +13.5  AES  +11.8  diff   +1.7  z  +0.4  [Roy Morgan]
+   2016 age    35-49  alp2  polls   -1.5  AES   +0.8  diff   -2.3  z  -0.8  [Roy Morgan]
+   2022 age    35–49  alp2  polls   +5.0  AES   -0.2  diff   +5.2  z  +1.3  [Newspoll]
+   2016 age    50-64  alp2  polls   -3.5  AES   -0.2  diff   -3.3  z  -1.3  [Roy Morgan]
+   2022 age    50–64  alp2  polls   -5.0  AES   -4.0  diff   -1.0  z  -0.3  [Newspoll]
+   2016 age    65+    alp2  polls   -8.5  AES  -13.9  diff   +5.4  z  +2.1  [Roy Morgan]
+   2022 age    65+    alp2  polls  -13.0  AES  -11.9  diff   -1.1  z  -0.3  [Newspoll]
+   2013 age    18-24  grn   polls   +8.6  AES   +2.9  diff   +5.7  z  +1.8  [Roy Morgan]
+   2016 age    18–34  grn   polls   +4.0  AES  +10.2  diff   -6.2  z  -2.9  [Newspoll]
+   2019 age    18–34  grn   polls   +5.0  AES  +15.9  diff  -10.9  z  -3.8  [Newspoll]
+   2022 age    18–34  grn   polls   +8.0  AES  +10.7  diff   -2.7  z  -0.9  [Resolve Strategic]
+   2013 age    25-34  grn   polls   +7.6  AES   +2.4  diff   +5.2  z  +2.3  [Roy Morgan]
+   2013 age    35-49  grn   polls   +1.0  AES   +3.1  diff   -2.1  z  -1.5  [Roy Morgan]
+   2016 age    35–49  grn   polls   +1.0  AES   -1.1  diff   +2.1  z  +1.4  [Newspoll]
+   2019 age    35–49  grn   polls   +0.0  AES   -2.9  diff   +2.9  z  +1.6  [Newspoll]
+   2022 age    35–54  grn   polls   -2.0  AES   -0.7  diff   -1.3  z  -0.7  [Resolve Strategic]
+   2016 age    50+    grn   polls   -3.0  AES   -4.9  diff   +1.9  z  +2.0  [Newspoll]
+   2019 age    50+    grn   polls   -4.0  AES   -8.2  diff   +4.2  z  +3.2  [Newspoll]
+   2013 age    50-64  grn   polls   -4.1  AES   -0.7  diff   -3.4  z  -3.4  [Roy Morgan]
+   2022 age    55+    grn   polls   -9.0  AES   -6.2  diff   -2.8  z  -2.2  [Resolve Strategic]
+   2013 age    65+    grn   polls   -4.1  AES   -5.8  diff   +1.7  z  +1.7  [Roy Morgan]
+   2013 age    18-24  lnp   polls  -11.2  AES  -10.6  diff   -0.6  z  -0.1  [Roy Morgan]
+   2016 age    18–34  lnp   polls   -6.0  AES   -9.9  diff   +3.9  z  +1.5  [Newspoll]
+   2019 age    18–34  lnp   polls   -9.0  AES  -16.6  diff   +7.6  z  +2.4  [Newspoll]
+   2022 age    18–34  lnp   polls   -7.0  AES   -9.0  diff   +2.0  z  +0.6  [Resolve Strategic]
+   2013 age    25-34  lnp   polls  -11.2  AES   -3.6  diff   -7.6  z  -2.4  [Roy Morgan]
+   2013 age    35-49  lnp   polls   -4.6  AES   -2.7  diff   -1.9  z  -0.9  [Roy Morgan]
+   2016 age    35–49  lnp   polls   -1.0  AES   -3.8  diff   +2.8  z  +1.1  [Newspoll]
+   2019 age    35–49  lnp   polls   -2.0  AES   +2.8  diff   -4.8  z  -1.6  [Newspoll]
+   2022 age    35–54  lnp   polls   -2.0  AES   -2.3  diff   +0.3  z  +0.1  [Resolve Strategic]
+   2016 age    50+    lnp   polls   +5.0  AES   +7.2  diff   -2.2  z  -1.5  [Newspoll]
+   2019 age    50+    lnp   polls   +7.0  AES   +8.8  diff   -1.8  z  -0.9  [Newspoll]
+   2013 age    50-64  lnp   polls   +5.0  AES   -0.3  diff   +5.3  z  +2.8  [Roy Morgan]
+   2022 age    55+    lnp   polls  +12.0  AES   +7.5  diff   +4.5  z  +2.0  [Resolve Strategic]
+   2013 age    65+    lnp   polls  +12.2  AES  +11.0  diff   +1.2  z  +0.6  [Roy Morgan]
+   2016 gender Men    alp   polls   +0.0  AES   -3.8  diff   +3.8  z  +2.7  [Newspoll]
+   2019 gender Men    alp   polls   +1.0  AES   -1.6  diff   +2.6  z  +1.4  [Newspoll]
+   2016 gender Women  alp   polls   -1.0  AES   +3.7  diff   -4.7  z  -3.4  [Newspoll]
+   2019 gender Women  alp   polls   +0.0  AES   +1.7  diff   -1.7  z  -0.9  [Newspoll]
+   2013 gender Men    alp2  polls   -2.0  AES   -1.1  diff   -0.9  z  -0.7  [Roy Morgan]
+   2016 gender Men    alp2  polls   -2.5  AES   -4.9  diff   +2.4  z  +1.4  [Roy Morgan]
+   2022 gender Men    alp2  polls   +0.0  AES   -4.9  diff   +4.9  z  +2.3  [Newspoll]
+   2013 gender Women  alp2  polls   +2.0  AES   +1.1  diff   +0.9  z  +0.7  [Roy Morgan]
+   2016 gender Women  alp2  polls   +2.5  AES   +4.9  diff   -2.4  z  -1.5  [Roy Morgan]
+   2022 gender Women  alp2  polls   +0.0  AES   +4.7  diff   -4.7  z  -2.2  [Newspoll]
+   2016 gender Men    grn   polls   -1.0  AES   -2.1  diff   +1.1  z  +1.3  [Newspoll]
+   2019 gender Men    grn   polls   -2.0  AES   -2.9  diff   +0.9  z  +0.8  [Newspoll]
+   2022 gender Men    grn   polls   -5.0  AES   -3.5  diff   -1.5  z  -1.2  [Resolve Strategic]
+   2016 gender Women  grn   polls   +1.0  AES   +2.1  diff   -1.1  z  -1.2  [Newspoll]
+   2019 gender Women  grn   polls   +1.0  AES   +3.1  diff   -2.1  z  -1.7  [Newspoll]
+   2022 gender Women  grn   polls   +5.0  AES   +3.3  diff   +1.7  z  +1.2  [Resolve Strategic]
+   2016 gender Men    lnp   polls   -1.0  AES   +4.5  diff   -5.5  z  -3.8  [Newspoll]
+   2019 gender Men    lnp   polls   +0.0  AES   +4.4  diff   -4.4  z  -2.4  [Newspoll]
+   2016 gender Women  lnp   polls   +1.0  AES   -4.3  diff   +5.3  z  +3.7  [Newspoll]
+   2019 gender Women  lnp   polls   +0.0  AES   -4.6  diff   +4.6  z  +2.4  [Newspoll]
+
+   The 2025 differences, at each earlier election (polls - AES, points):
+   Labor, women (2025: -3.1)                    2016  -4.7  2019  -1.7
+   Greens, women (2025: -2.9)                   2016  -1.1  2019  -2.1  2022  +1.7
+   Labor 2PP, women                             2013  +0.9  2016  -2.4  2022  -4.7
+   Coalition, 18-34 (2025: -7.2)                2016  +3.9  2019  +7.6  2022  +2.0
+   Labor, 18-34                                 2016  +0.1  2019  +4.6  2022  -5.0
+   Labor 2PP, 18-34                             2022  -4.2
+   Coalition, oldest band                       2013  +1.2  2016  -2.2  2019  -1.8  2022  +4.5
+   Labor 2PP, 65+                               2016  +5.4  2022  -1.1

@@ -5771,6 +5771,74 @@ const DEMO_ELECTION = (() => {
   if (!Object.keys(sets).length) return null;
   return { x: DEMO_STATE_ELECTION.x, window: SPARSE_K.label, src: src.source, elec: ELEC, sets };
 })();
+/* How each group voted at the 2025 election: ONE estimate from the two
+   election-time readings (user call 2026-11-10: "proceed as you recommend").
+   No ballot records a voter's age or sex, so the polls before the election
+   (DEMO_ELECTION) and the Australian Election Study after it (DEMO_AES) are
+   each an instrument, and neither is the truth. Where the count does settle
+   it - each state's and each AEC region class's gap from the nation, 37
+   cells - the two missed by about the same amount beyond their sampling
+   error (polls 1.7 points a cell, the AES 1.6), their misses were unrelated
+   (r +0.08), and a weighted mean beat either alone (typical miss 1.7 points,
+   against the polls' 2.3 and the AES's 3.1). On the demographic cells the
+   two disagree beyond sampling by the same 2.2 points as on the counted
+   cells. At 2013-2022 (76 state cells, backtest-2013-22.py) the mean again
+   beat both: 2.0 points against the polls' 2.5 and the AES's 2.8.
+   (.build/analysis/group-poll-error-2025/combine-test.py and README s6.)
+   So each cell is the 2025 result plus a weighted mean of the two GAPS from
+   all voters - a gap, because each source's own miss on the level cancels
+   in it and the count supplies the level exactly:
+   - each source's weight is 1 / (its sampling variance + DEMO_INSTR²), the
+     instrument error counted once for each, which leaves the polls about
+     60-65% and the AES 35-40%;
+   - a group only one source cut (the generations: AES; language at home:
+     polls) keeps that source, its margin widened by the same DEMO_INSTR;
+   - an AES cell resting on fewer than DEMO_VOTE_MIN respondents for the
+     party (One Nation in most groups: 38 in the whole file) sits out where
+     the polls cut the group - its binomial margin at a share near zero is
+     too narrow to weigh by.
+   A group is then taken to the result's total, as DEMO_ELECTION's is.
+   This is the mark the charts draw at the election. It is NOT what "since
+   the election" is measured from: that stays the polls' own reading
+   (DEMO_ELECTION; the AES for generations), the same instruments at both
+   ends - measured from this, about 40% of the two instruments' difference
+   would read as change. Per party: [the estimate, its 95% margin, the
+   polls' figure or null, the AES's or null - both on the result's scale]. */
+const DEMO_INSTR = 1.5;
+const DEMO_VOTE_MIN = 10;
+const DEMO_VOTE = (() => {
+  if (!DEMO_ELECTION && !DEMO_AES) return null;
+  const E = DEMO_ELECTION || DEMO_AES;
+  const ELEC = E.elec, ELEC_T = total(ELEC), T2 = DEMO_INSTR * DEMO_INSTR;
+  const sets = {};
+  for (const set of DEMO_SETS) for (const group of set.groups) {
+    const pg = DEMO_ELECTION && DEMO_ELECTION.sets[set.id] && DEMO_ELECTION.sets[set.id].groups[group];
+    const ag = DEMO_AES && DEMO_AES.sets[set.id] && DEMO_AES.sets[set.id].groups[group];
+    if (!pg && !ag) continue;
+    const cell = {}; let both = false;
+    for (const k of DEMO_KEYS) {
+      const p = pg && pg[k], a = ag && ag[k] && ag[k][2] != null ? ag[k] : null;
+      const aUse = a && !(p && ag.n * a[0] / 100 < DEMO_VOTE_MIN);
+      const parts = [];
+      if (p) parts.push([p[0] - ELEC[k], (p[1] / 1.96) ** 2 + T2]);
+      if (aUse) parts.push([a[0] - DEMO_AES.all[k], (a[2] / 1.96) ** 2 + T2]);
+      if (!parts.length) { cell[k] = null; continue; }
+      if (parts.length === 2) both = true;
+      const w = parts.reduce((s, q) => s + 1 / q[1], 0);
+      cell[k] = { v: Math.max(0, ELEC[k] + parts.reduce((s, q) => s + q[0] / q[1], 0) / w), ci: 1.96 * Math.sqrt(1 / w),
+                  p: p ? p[0] : null, a: aUse ? a[1] : null };
+    }
+    if (DEMO_KEYS.some((k) => !cell[k])) continue;
+    const t = DEMO_KEYS.reduce((s, k) => s + cell[k].v, 0);
+    (sets[set.id] ||= { groups: {} }).groups[group] = {
+      src: both ? "both" : pg ? "polls" : "aes",
+      polls: pg ? { n: pg.n, houses: pg.houses } : null, aesN: ag ? ag.n : null,
+      ...Object.fromEntries(DEMO_KEYS.map((k) => [k, [r1(ELEC_T * cell[k].v / t), r1(cell[k].ci), cell[k].p, cell[k].a]])),
+    };
+  }
+  if (!Object.keys(sets).length) return null;
+  return { x: E.x, elec: ELEC, instr: DEMO_INSTR, aesSrc: DEMO_AES ? DEMO_AES.src : null, sets };
+})();
 
 /* One figure per group and party, built as the headline is. Each poll says
    how far a group sits from that poll's own all-voters figure – One Nation
@@ -9192,6 +9260,9 @@ window.AUSPOL = (function () {
      over the six weeks before polling day, pooled as the current figures
      are - the baseline "since the election" reads from. */
   const demoElection = ${JSON.stringify(DEMO_ELECTION)};
+  /* The vote by group at the 2025 election (§7g DEMO_VOTE): the polls then
+     and the AES in one estimate, the mark the charts draw at the election */
+  const demoVote = ${JSON.stringify(DEMO_VOTE)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -9337,7 +9408,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
