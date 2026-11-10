@@ -213,6 +213,7 @@ def demo_cells(year):
     z = zipfile.ZipFile(V["gcp"])
     newl = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
+    lab = gcp_newlanes.load_lab(V["gcp"], prefix="3", era=str(year))
     inc, inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "3")
     HL = gcp_newlanes.hl_alloc_of(
         2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
@@ -289,6 +290,7 @@ def demo_cells(year):
         citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
             (ancv, ancp, ancns) = arc[code]
         hle = HL.get(code, {}).get("e", 0.0)
+        uel, lfd = lab[code]
         aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         out[code] = ([safe(oth, eng + oth),
@@ -298,7 +300,6 @@ def demo_cells(year):
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
                       safe(lom, aud), safe(him, aud),
-                      safe(hiqm, aud),
                       gcp_newlanes.y12less_cell(sch6, safe),
                       safe(indt[0], indt[1]),
                       gcp_newlanes.u15_cell(bands, safe),
@@ -306,7 +307,9 @@ def demo_cells(year):
                       safe(ptn, ptt - ptns),
                       safe(p - citz, p),
                       safe(ceb3, cebt - cebns),
-                      safe(hle, p)],
+                      safe(hle, p),
+                      safe(hiqm, aud),
+                      safe(uel, lfd)],
                      [safe(c, den09) for c in cob],
                      rel, ten, anc)
     print(f"GCP {year} demo cells: {len(out)} SA1s")

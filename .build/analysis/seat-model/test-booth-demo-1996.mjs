@@ -174,7 +174,7 @@ for (const [file, year, nDivs, nBooths, geo, near, miss, empty] of STORES) {
   // portfolio, nothing more
   const CROSS_KEYS = new Set(["persons", "cov", "langOther", "fborn",
     "uni", "blue", "u15", "age", "cob", "rel", "ten", "pt", "noncit",
-    "atsci", "onepar", "loinc", "hiinc", "hiqinc", "incMed"]);
+    "atsci", "onepar", "loinc", "hiinc", "hiqinc", "incMed", "unemp"]);
   let crossKeys = 0, badShare = 0;
   for (const b of d.booths) {
     if (!b.demo) continue;

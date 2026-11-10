@@ -192,6 +192,7 @@ def main():
     gcp, vic_persons = load_gcp_vic()
     nlt = gcp_newlanes.load(GCP_ZIP, prefix="2", era="2016")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="2", era="2016")
+    lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="2", era="2016")
     inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2016", "2")
     HL = gcp_newlanes.hl_alloc_of(2016, "c7")
     sa1 = read_sa1_polygons(YEAR)
@@ -236,6 +237,7 @@ def main():
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
                                   "ancP": 0, "ancNS": 0,
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+                                  "ueN": 0.0, "lfD": 0.0,
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -287,6 +289,9 @@ def main():
         for ii in range(len(gcp_newlanes.INC_BANDS)):
             a["incBandH"][ii] += hh[ii]
         a["ancNS"] += ancns
+        labU, labLF = lab[code]
+        a["ueN"] += labU
+        a["lfD"] += labLF
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -329,6 +334,7 @@ def main():
             "bigfam": (round(a["ceb3"] / (a["cebt"] - a["cebns"]), 4)
                        if a["cebt"] - a["cebns"] > 0 else None),
             "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
+            "unemp": round(a["ueN"] / a["lfD"], 4) if a["lfD"] else None,
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
@@ -365,6 +371,7 @@ def main():
               "ancP": 0, "ancNS": 0,
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+              "ueN": 0.0, "lfD": 0.0,
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():

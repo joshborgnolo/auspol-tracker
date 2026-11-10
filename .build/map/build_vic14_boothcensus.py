@@ -198,6 +198,7 @@ def demo_cells():
     if not os.path.exists(BCP_ZIP):
         fail(f"missing BCP input {BCP_ZIP}")
     base = gcp_newlanes.demo_base(BCP_ZIP, prefix="2", era=ERA)
+    lab = gcp_newlanes.load_lab(BCP_ZIP, prefix="2", era=ERA)
     if len(base) != BCP_VIC_ROWS:
         fail(f"BCP Vic rows {len(base)} != pin {BCP_VIC_ROWS}")
     out = {}
@@ -219,13 +220,15 @@ def demo_cells():
                 return None
             v = _num / _den
             return round(v, 4) if 0 <= v <= 1 else None
+        uel, lfd = lab[code]
         out[code] = [safe(oth, eng + oth),
                      safe(bands[8] + bands[9] + bands[10], bsum),
                      safe(bands[3] + bands[4], bsum),
                      safe(tot - cobns - aust, tot - cobns),
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
-                     None, None]
+                     None, None] \
+            + [None] * 9 + [safe(uel, lfd)]
     if len(out) != BCP_VIC_ROWS:
         fail(f"demo cells {len(out)} != pin {BCP_VIC_ROWS}")
     print(f"BCP {YEAR} demo cells: {len(out)} SA1s")

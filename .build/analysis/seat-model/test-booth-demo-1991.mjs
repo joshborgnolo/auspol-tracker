@@ -147,6 +147,9 @@ const nat91 = {
   onepar: 0.1285, oneparD: 4298710,
   pt: 0.1091, noncit: 0.123,
   loinc: 0.25, hiinc: 0.0051, hiqinc: 0.25, incMed: 699,
+  // the 2026-11-10 labour lane is absent on the 1991 print (its AURIN
+  // workspace carries no labour-force table) — null on both 91 sides
+  unemp: null,
 };
 for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   [d93, 1993, 147, 8431, 6399, 2012, 1891, 141],
@@ -185,7 +188,7 @@ for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   // key outside that portfolio is the leak the gate catches
   const CROSS_KEYS = new Set(["persons", "cov", "langOther", "fborn",
     "uni", "blue", "u15", "age", "loinc", "hiinc", "incMed", "hiqinc",
-    "cob", "rel", "ten", "pt", "noncit", "atsci", "onepar"]);
+    "cob", "rel", "ten", "pt", "noncit", "atsci", "onepar", "unemp"]);
   let shellKeys = 0, shellBad = 0, nulls = 0, shellDud = 0;
   for (const b of d.booths) {
     if (b.demo === null) {
@@ -249,7 +252,7 @@ for (const [d, year, f, c1fn] of [
   const ALLOWED = new Set(["persons", "cov", "age", "langOther",
     "fborn", "uni", "blue", "u15", "loinc", "hiinc", "hiqinc",
     "y12less", "atsci", "onepar", "rel", "ten", "incMed", "pt",
-    "noncit", "anc", "bigfam", "hl"]);
+    "noncit", "anc", "bigfam", "hl", "unemp"]);
   for (const b of d.booths) {
     const fb = c1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

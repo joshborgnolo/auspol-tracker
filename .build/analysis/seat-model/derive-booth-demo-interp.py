@@ -67,7 +67,7 @@ YEARS = {
 }
 LANES = ("langOther", "fborn", "uni", "blue", "loinc",
          "hiqinc", "y12less", "atsci", "u15", "onepar",
-         "pt", "noncit", "bigfam", "hl")
+         "pt", "noncit", "bigfam", "hl", "unemp")
 # INCOME_SPAN: election frames whose MEASURED census side prints no
 # income table at all (the 1996 AURIN workspace), so the income lanes
 # blend the two adjacent income-CARRYING census editions instead, at

@@ -235,6 +235,12 @@ B25_FAM_COLS = ["OPF_Total_P", "CF_no_children_P", "CF_Total_P",
 B32_TEN_COLS = ["O_OR_Total", "O_MTG_Total", "R_Tot_Total",
                 "R_ST_h_auth_Total", "Oth_ten_type_Total",
                 "Ten_type_NS_Total"]
+# B42B's labour-force totals (Persons block): unemployed looking for
+# work over the stated labour force (Tot_LF excludes status-not-stated
+# by construction — the lane's ex-not-stated basis, 2026-11-10)
+BCP_B42B = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B42B_AUST_SA1_short.csv")
+B42B_COLS = ["P_Unem_look_Tot_Tot", "P_Tot_LF_Tot"]
 # the cross-era key orders the whole lane stack shares (the venue-era
 # drivers emit relvec/tenvec in these orders; the voter store has the
 # identical constants — see the there-asserted national shares)
@@ -320,6 +326,7 @@ def load_bcp():
                      54800, 54805)
     b24 = bcp_table(z, BCP_B24, "region_id", B24_COLS, 54800, 54805)
     b46 = bcp_table(z, BCP_B46, "region_id", B46_COLS, 54800, 54805)
+    b42 = bcp_table(z, BCP_B42B, "region_id", B42B_COLS, 54800, 54805)
     out = {}
     for code, g in g01.items():
         row09 = b09.get(code)
@@ -338,6 +345,7 @@ def load_bcp():
         row08b = b08b.get(code)
         row24 = b24.get(code)
         row46 = b46.get(code)
+        row42 = b42.get(code)
         mtw = None
         if row46 is not None:
             tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b, ttot, tns = row46
@@ -374,6 +382,8 @@ def load_bcp():
             "famN": None if row25 is None else row25[0],
             "famD": None if row25 is None else row25[4],
             "hle": HL_ALLOC.get(code, {}).get("e"),
+            "labU": None if row42 is None else row42[0],
+            "labLF": None if row42 is None else row42[1],
         }
     n05 = sum(1 for c in out.values() if c["aus"] is None)
     n40 = sum(1 for c in out.values() if c["uni"] is None)
@@ -385,10 +395,11 @@ def load_bcp():
     n08 = sum(1 for c in out.values() if c["ancn"] is None)
     n24 = sum(1 for c in out.values() if c["ceb3"] is None)
     n46 = sum(1 for c in out.values() if c["mtw"] is None)
+    n42 = sum(1 for c in out.values() if c["labU"] is None)
     print(f"BCP 2011: {len(out)} SA1s (B09 short {n05}, B40B short {n40}, "
           f"B45B short {n45}, B07 short {n07}, B14 short {n14}, "
           f"B25 short {n25}, B32 short {n32}, B08 short {n08}, "
-          f"B24 short {n24}, B46 short {n46})")
+          f"B24 short {n24}, B46 short {n46}, B42B short {n42})")
     return out
 
 
@@ -708,6 +719,11 @@ def shares(rec):
         ancd = rec["ancP"] - (rec.get("ancns") or 0)
         out["anc"] = {k: bounded(rec["ancn"][i], ancd)
                       for i, k in enumerate(ANC_KEYS)}
+    # the labour-force lane (2026-11-10): unemployed looking for work of
+    # the stated labour force — the table's Tot_LF excludes the
+    # status-not-stated by construction
+    if rec.get("labLF") is not None:
+        out["unemp"] = bounded(rec["labU"], rec["labLF"])
     return out
 
 
@@ -745,7 +761,9 @@ def main():
              or sa1.get(k, {}).get("mtw") is None
              or sa1.get(k, {}).get("ceb3") is None
              or sa1.get(k, {}).get("ancn") is None
-             or sa1.get(k, {}).get("ancP") is None}
+             or sa1.get(k, {}).get("ancP") is None
+             or sa1.get(k, {}).get("labU") is None
+             or sa1.get(k, {}).get("labLF") is None}
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
@@ -769,7 +787,8 @@ def main():
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancn": [0] * len(ANC_KEYS),
                                   "ancns": 0, "ancP": 0,
-                                  "hle": 0.0})
+                                  "hle": 0.0,
+                                  "labU": 0, "labLF": 0})
     for key, dv in ced.items():
         r = sa1[key]
         ir = inc[key]
@@ -810,6 +829,8 @@ def main():
         acc["ancns"] += r["ancns"]
         acc["ancP"] += r["ancP"]
         acc["hle"] += r["hle"] or 0.0
+        acc["labU"] += r["labU"]
+        acc["labLF"] += r["labLF"]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -854,7 +875,8 @@ def main():
                 "ancn": (list(row["ancn"]) if row["ancn"] is not None
                          else None),
                 "ancns": row["ancns"], "ancP": row["ancP"],
-                "hle": row["hle"]})
+                "hle": row["hle"],
+                "labU": row["labU"], "labLF": row["labLF"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
@@ -880,7 +902,7 @@ def main():
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot",
                   "famN", "famD", "ceb3", "cebns", "cebt",
-                  "ancns", "ancP"):
+                  "ancns", "ancP", "labU", "labLF"):
             nat[k] += dv[k]
         for i in range(len(REL_KEYS)):
             nat.setdefault("relvec", [0] * len(REL_KEYS))
@@ -951,6 +973,8 @@ def main():
             "hl": round(nat["hle"] / nat["pers"], 4),
             "anc": {k: round(nat["ancn"][i] / (nat["ancP"] - nat["ancns"]), 4)
                     for i, k in enumerate(ANC_KEYS)},
+            "unemp": (round(nat["labU"] / nat["labLF"], 4)
+                      if nat["labLF"] else None),
         },
     }
     out = {
@@ -1044,7 +1068,7 @@ def main():
             "sourceUrls": {
                 "bcp": "ABS 2011 Census Basic Community Profile, SA1 for "
                        "AUST (B01/B07/B09/B14/B25/B26/B28/B32/B40B/"
-                       "B45B), abs.gov.au census datapacks",
+                       "B42B/B45B), abs.gov.au census datapacks",
                 "ced": "ABS ASGS Vol 3 July 2011, CED to SA1 allocation "
                        "(1270055003_ced_2011_aust_csv.zip)",
                 "venue": "data/booth-seifa-2013.json",

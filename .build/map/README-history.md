@@ -238,6 +238,58 @@ node .build/map/assemble.mjs
 node .build/test-map-boundary-vintages.mjs
 ```
 
+# The "Unemployed and looking for work" census lane (unemp, 2026-11-10/11)
+
+The census People section carries a labour-force lane as its 18th measure
+(`unemp` at DM cell 17): unemployed looking for work as a share of the
+stated labour force (the era prints' printed total-labour-force cells
+already exclude status-not-stated — the ex-not-stated house convention).
+Its reads, all pinned in `gcp_newlanes.load_lab` / the seat-model derives:
+
+- 2021 GCP G43 `lfs_Unmplyed_lookng_for_wrk_P`/`lfs_Tot_LF_P`
+- 2016 GCP G43B `P_Tot_Unemp_Tot`/`P_Tot_LF_Tot`
+- 2011 BCP B42B `P_Unem_look_Tot_Tot`/`P_Tot_LF_Tot`
+- 2006 BCP CD B41 cells B5982/B5992 (opaque ids; the lane extends the
+  derive script's hand-decoded cell map)
+- 2001 BCP sheet `B 25`, the PERSONS block's Total row (cols I/J) —
+  extract-bcp-2001-tally.py's `lab01` field, per-CD workbooks
+- 1996 AURIN `cd_b18b` `persons_total_unemp_tot`/`persons_total_lab_frce`
+
+The 1991 AURIN workspace prints NO labour-force table, so 1993 and 1996
+omit the lane by the era-hole doctrine (regeneration of the county file
+would extend it there; the fetch was not made). Interp blending follows
+the standing null-rule: a side missing the print leaves the demoI lane
+null and the display nearest-to-measured (1996 sits nearest c1=1996 in
+doctrine terms but its guard is the c0=1991 measured store, so it omits).
+National sanity reads after the measures: 0.0506 residents / 0.0487 voter-
+footprint (2021), 0.0919 (1996 edition), 0.0739 (2001 edition, B 25).
+
+App surface: DM/DM_NAME/DM_SHORT/DM_VERB/DM_POP/DM_RANGE `[0, 22]` + a
+red-family ramp `seq(8, 0.13)` + `DM_TOP`; the areas-sa1-2021 pack packs it
+(`caps [0, 25]`, AUS mark 0.0506, its sa26 lane-oracle re-verified, the
+lane ending the AREAS_LANES set with it) and `AREAS_LANES` lists it.
+
+Also shipped in this renewal and fixed here: **the eight GCP-era state
+frames' booth demo tuples carried hiqinc inserted at cell 8 while the
+federal DM contract places it at 16** (the 747d2cd1 income-ship commit
+wrote both families that way and no probe ever joined a state row against
+the app). Every browser-side positional reader of cells 8..16 on nsw15/19/
+23, vic14/18/22, qld17/20/24 and sa22/26 therefore mislabelled every
+labour-of-lanes up-17 cell on those frames since 2026-11-09 (the four
+8-cell frames nsw15/19/vic14/vic18 only carried the base six plus null
+income slots; they now carry unemp at cell 17 visibly, the arc cells'
+positions stay null by design). `build_map_data.demo_cells` remains the
+single federal emit map; the state boothcensus writers now emit the same
+order verbatim plus `unemp`, and test-map-page's exact slog pins (Balmain
+Public, Adelaide, Toorak Central) are re-encoded in the federal DM order.
+
+Lane-list rebuild commands are the standing per-family chain (README's
+"Rebuild and verification" + the state-frame groupings in this file's
+own chains); the seat-model chain runs derive-booth-seifa-voter (4
+years), derive-booth-demo-{2016,2013,2011,2006,2004c1,90s} —
+demo-2001 and demo-2001-frame need the 2001 tally refreshed with the
+labour lane's extractor first — and derive-booth-demo-interp.
+
 # Boundary product recovery (November 2026)
 
 The state-frame boundary products land ignored in `.build/map/src/` and

@@ -212,6 +212,7 @@ def load_cells(dbf):
     base = gcp_newlanes.demo_base(GCP_ZIP, era="2021")   # national prefix ""
     nlt = gcp_newlanes.load(GCP_ZIP, era="2021")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, era="2021")
+    lab = gcp_newlanes.load_lab(GCP_ZIP, era="2021")
     inc, cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "")
     z = zipfile.ZipFile(GCP_ZIP)
     f09 = read_table(z, "G09F", ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"])
@@ -222,7 +223,7 @@ def load_cells(dbf):
     g02 = read_table(z, "G02", ["Median_age_persons", "Median_tot_hhd_inc_weekly"])
     z.close()
     for tag, d in (("G09F", f09), ("G09G", g09), ("G09H", h09), ("G02", g02),
-                   ("nlt", nlt), ("arc", arc), ("inc", inc)):
+                   ("nlt", nlt), ("arc", arc), ("inc", inc), ("lab", lab)):
         if set(d) != set(base):
             fail(f"GCP {tag} SA1 universe != G01's ({len(d)} vs {len(base)})")
 
@@ -251,6 +252,7 @@ def load_cells(dbf):
             "ancvec": ancv, "ancP": ancp, "ancNS": ancns,
             "incAd": aud, "bandsAd": bands_ad, "hh": hh,
             "ageMed": ageM02, "incMed": incM02,
+            "labU": lab[code][0], "labLF": lab[code][1],
             "jur": dbf[code]["jur"],
         }
     persons = sum(r["p"] for r in rec.values())
@@ -332,6 +334,7 @@ SHARES = {
     "pt": (lambda r: r["ptn"], lambda r: r["ptt"] - r["ptNS"]),
     "noncit": (lambda r: r["p"] - r["citz"], lambda r: r["p"]),
     "bigfam": (lambda r: r["ceb3"], lambda r: r["cebT"] - r["cebNS"]),
+    "unemp": (lambda r: r["labU"], lambda r: r["labLF"]),
     "a65": (lambda r: r["bands"][8] + r["bands"][9] + r["bands"][10], _bands_sum),
     "a2034": (lambda r: r["bands"][3] + r["bands"][4], _bands_sum),
     "a1824": (lambda r: r["bands"][2] * AGE_1824_OF_1519 + r["bands"][3], _bands_sum),
@@ -382,7 +385,7 @@ def inc_masses(band, cutlo, cuthi):
 
 
 LANE_ORDER = (["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar",
-               "pt", "noncit", "bigfam", "loinc", "hiqinc",
+               "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc",
                "a65", "a2034", "a1824", "a3554", "a75"]
               + [f"rel.{k}" for k in gcp_newlanes.REL_KEYS]
               + [f"ten.{k}" for k in ["mort", "rent", "own", "rentPub"]]

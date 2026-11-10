@@ -244,7 +244,8 @@ def load_bcp():
     occupancy of the eight stated major groups, pop15."""
     for st in STATES:
         for t in ("B01", "B07", "B08_A", "B08_B", "B09", "B12", "B13",
-                  "B15_B", "B23", "B24", "B32", "B39_B", "B44_B", "B45"):
+                  "B15_B", "B23", "B24", "B32", "B39_B", "B41_B", "B44_B",
+                  "B45"):
             if not (CD06 / f"CD_{st}_{t}.csv").exists():
                 fail(f"missing cd06 extracts ({CD06}); see module "
                      f"docstring")
@@ -257,6 +258,9 @@ def load_bcp():
     b12 = bcp_table("B12", B12_COLS)
     b39 = bcp_table("B39_B", B39_COLS)
     b44 = bcp_table("B44_B", B44_COLS)
+    # B41_B's opaque cell ids: B5982 = unemployed total, B5992 = stated
+    # labour force (the 2026-11-10 labour lane)
+    b41 = bcp_table("B41_B", ["B5982", "B5992"])
     b07 = bcp_table("B07", [B07_NS_TOTAL])
     rel_cells = [c for k in REL_KEYS for c in B13_REL[k]]
     b13 = bcp_table("B13", rel_cells + [B13_NS, B13_TOT])
@@ -318,6 +322,7 @@ def load_bcp():
             "ancn": b08a[code][:len(ANC_KEYS)],
             "ancns": b08a[code][-1],
             "ancP": b08b[code][0],
+            "labU": int(b41[code][0]), "labLF": int(b41[code][1]),
         }
     print(f"BCP 2006: {len(out)} CDs")
     return out
@@ -453,6 +458,11 @@ def shares(rec):
         ancd = rec["ancP"] - (rec.get("ancns") or 0)
         out["anc"] = {k: bounded(rec["ancn"][i], ancd)
                       for i, k in enumerate(ANC_KEYS)}
+    # the labour-force lane (2026-11-10): unemployed looking for work of
+    # the stated labour force — B41's printed totals exclude the
+    # status-not-stated
+    if rec.get("labLF") is not None:
+        out["unemp"] = bounded(rec["labU"], rec["labLF"])
     return out
 
 
@@ -499,7 +509,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                                   "mtw": {"n": 0, "t": 0, "ns": 0},
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancn": [0] * len(ANC_KEYS),
-                                  "ancns": 0, "ancP": 0})
+                                  "ancns": 0, "ancP": 0,
+                                  "labU": 0, "labLF": 0})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -539,6 +550,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             acc["ancn"][i] += r["ancn"][i]
         acc["ancns"] += r["ancns"]
         acc["ancP"] += r["ancP"]
+        acc["labU"] += r["labU"]
+        acc["labLF"] += r["labLF"]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -580,7 +593,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                 "ceb3": row["ceb3"], "cebns": row["cebns"],
                 "cebt": row["cebt"],
                 "ancn": list(row["ancn"]),
-                "ancns": row["ancns"], "ancP": row["ancP"]})
+                "ancns": row["ancns"], "ancP": row["ancP"],
+                "labU": row["labU"], "labLF": row["labLF"]})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
@@ -601,7 +615,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot",
                   "famN", "famD", "ceb3", "cebns", "cebt",
-                  "ancns", "ancP"):
+                  "ancns", "ancP", "labU", "labLF"):
             nat[k] += dv[k]
         for i in range(len(REL_KEYS)):
             nat.setdefault("relvec", [0] * len(REL_KEYS))
@@ -671,6 +685,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             "bigfam": round(nat["ceb3"] / (nat["cebt"] - nat["cebns"]), 4),
             "anc": {k: round(nat["ancn"][i] / (nat["ancP"] - nat["ancns"]), 4)
                     for i, k in enumerate(ANC_KEYS)},
+            "unemp": (round(nat["labU"] / nat["labLF"], 4)
+                      if nat["labLF"] else None),
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -759,7 +775,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             "sourceUrls": {
                 "bcp": "ABS 2006 Census Basic Community Profile, "
                        "collection districts (B01/B07/B09/B12/B13/"
-                       "B15_B/B24/B26/B28/B32/B39_B/B44_B), "
+                       "B15_B/B24/B26/B28/B32/B39_B/B41_B/B44_B), "
                        "abs.gov.au archive census06bcp.zip",
                 "alloc": f"{alloc_path.name} (derive-ced-era-alloc.py)",
                 "venue": f"data/booth-seifa-{year}.json",

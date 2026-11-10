@@ -312,6 +312,40 @@ def u15_cell(bands, safe):
     return safe(bands[0] + bands[1], sum(bands))
 
 
+# ---- the labour-force lane (2026-11-10) -----------------------------
+# unemployed-looking-for-work of the stated labour force; the table's
+# printed total-labour-force figure excludes status-not-stated by
+# construction. Table ids mirror derive-booth-seifa-voter.py's
+# new_lane_tables lab block exactly (G43 in 2021, G43B in 2016); the
+# 2011 BCP's labour table is B42B (B43 is industry).
+_LAB = {
+    "2021": dict(table="G43",
+                 cols=("lfs_Unmplyed_lookng_for_wrk_P", "lfs_Tot_LF_P")),
+    "2016": dict(table="G43B",
+                 cols=("P_Tot_Unemp_Tot", "P_Tot_LF_Tot")),
+    "2011": dict(table="B42B",
+                 cols=("P_Unem_look_Tot_Tot", "P_Tot_LF_Tot")),
+}
+
+
+def load_lab(gcp_zip, prefix="", era="2021", rows_pin=None,
+             key_col=None):
+    """The labour-force lane's raw counts per SA1 for one prefix ->
+    {code: (unemployed, statedLabourForce)}. Universes assert against
+    the era's row pin like the other loaders."""
+    v = VINTAGES[era]
+    lab = _LAB[era]
+    memb = v["member"].format
+    idc = key_col or v["key"]
+    pin = rows_pin or v["rows"]
+    z = zipfile.ZipFile(gcp_zip)
+    g = _table(z, memb(table=lab["table"]), idc, list(lab["cols"]),
+               pin, prefix)
+    print(f"GCP labour cells: {len(g)} SA1s (prefix {prefix or 'AU'}, "
+          f"era {era})")
+    return g
+
+
 # ---- the six canonical venue-demo cells' raw counts -----------------
 # the [lang, a65, a2034, fborn, uni, blue] reads every frame's booth-
 # level census join shares, keyed one row plainly so each caller folds/

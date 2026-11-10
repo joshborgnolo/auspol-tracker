@@ -278,7 +278,7 @@ def demo_cells(dm):
             dm["fborn"], dm["uni"], dm["blue"], dm.get("loinc"), dm.get("hiinc"),
             dm.get("y12less"), dm.get("atsci"), dm.get("u15"), dm.get("onepar"),
             dm.get("pt"), dm.get("noncit"), dm.get("bigfam"), dm.get("hl"),
-            dm.get("hiqinc")]
+            dm.get("hiqinc"), dm.get("unemp")]
 
 
 def cob_cells(dm, keys):
@@ -660,6 +660,7 @@ def build_year(year, hist, base2001):
                                "a1824": a18, "a3554": a35, "a75": a75x, "cob": dd.get("cob"),
                                "y12less": dc[8], "atsci": dc[9], "u15": dc[10], "onepar": dc[11],
                                "pt": dc[12], "noncit": dc[13], "bigfam": dc[14], "hl": dc[15],
+                               "unemp": dc[17],
                                "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten"),
                                "anc": (dm or {}).get("anc")}
                 if dm.get("age") and dm.get("persons"):

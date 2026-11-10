@@ -800,7 +800,7 @@ function areasLane() {
   return S.index;
 }
 // the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
-const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
   "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
   "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
@@ -1463,9 +1463,7 @@ function balloonWord(m) {
 function balloonKey(m, est) {
   const s = balScale(), nice = [50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
   const big = nice.filter((v) => Math.sqrt(v) * s <= 9.5).pop() || 50, list = [big, nice[Math.max(0, nice.indexOf(big) - 2)], nice[Math.max(0, nice.indexOf(big) - 4)]].filter((v, k, a) => a.indexOf(v) === k);
-  // (the box keeps the tallest circle's height, 9.5 px across zooms: a box sized to the
-  //  zoom's own biggest circle grew the strip a pixel at a time, nudging the stage)
-  const H = Math.ceil(2 * 9.5 + 2);
+  const R = Math.sqrt(big) * s, H = Math.ceil(2 * R + 2);
   let x = 0, circles = "", labels = "";
   for (const v of list) { const r = Math.max(0.8, Math.sqrt(v) * s); circles += `<circle cx="${(x + r + 1).toFixed(1)}" cy="${(H - 1 - r).toFixed(1)}" r="${r.toFixed(1)}"/>`; x += 2 * r + 2; labels += `${labels ? ", " : ""}${int(v)}`; }
   return `<div class="lg-bal"><svg width="${Math.ceil(x + 2)}" height="${H}" viewBox="0 0 ${Math.ceil(x + 2)} ${H}" aria-hidden="true">${circles}</svg><span>${est && (S.lens === "winner" || S.lens === "tpp") ? "Estimated lead, votes" : balloonWord(m)}: ${labels}</span></div>`;

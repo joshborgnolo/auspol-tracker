@@ -273,7 +273,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "atsci", "u15", "onepar", "rel", "ten",
-    "pt", "noncit", "bigfam", "hl", "anc"]);
+    "pt", "noncit", "bigfam", "hl", "anc", "unemp"]);
   for (const b of d.booths) {
     const fb = nc1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

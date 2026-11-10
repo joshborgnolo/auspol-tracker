@@ -197,6 +197,7 @@ def demo_cells():
     if not os.path.exists(GCP_ZIP):
         fail(f"missing GCP input {GCP_ZIP}")
     base = gcp_newlanes.demo_base(GCP_ZIP, prefix="2", era=ERA)
+    lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="2", era=ERA)
     if len(base) != GCP_VIC_ROWS:
         fail(f"GCP Vic rows {len(base)} != pin {GCP_VIC_ROWS}")
     out = {}
@@ -218,13 +219,15 @@ def demo_cells():
                 return None
             v = _num / _den
             return round(v, 4) if 0 <= v <= 1 else None
+        uel, lfd = lab[code]
         out[code] = [safe(oth, eng + oth),
                      safe(bands[8] + bands[9] + bands[10], bsum),
                      safe(bands[3] + bands[4], bsum),
                      safe(tot - cobns - aust, tot - cobns),
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
-                     None, None]
+                     None, None] \
+            + [None] * 9 + [safe(uel, lfd)]
     if len(out) != GCP_VIC_ROWS:
         fail(f"demo cells {len(out)} != pin {GCP_VIC_ROWS}")
     print(f"GCP {YEAR} demo cells: {len(out)} SA1s")

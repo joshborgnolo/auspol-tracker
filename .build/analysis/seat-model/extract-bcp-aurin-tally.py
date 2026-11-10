@@ -302,6 +302,15 @@ def tally_1996():
         tally[c]["ptot"] = _sub_int(r, "total_persons")
         tally[c]["ptns"] = _sub_int(r, "not_stated_persons")
 
+    # b18b age by labour force status (Persons block): unemployed
+    # looking for work over the stated labour force — the 2026-11-10
+    # labour lane; 1991's archived workspace prints no labour table,
+    # so only this edition carries the fields
+    for r in read("cd_b18b_census_1996.csv"):
+        c = r["cd_code"]
+        tally[c]["labU"] = _sub_int(r, "persons_total_unemp_tot")
+        tally[c]["labLF"] = _sub_int(r, "persons_total_lab_frce")
+
     return tally
 
 

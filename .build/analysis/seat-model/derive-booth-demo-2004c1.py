@@ -103,7 +103,8 @@ def main():
                                   "mtw": {"n": 0, "t": 0, "ns": 0},
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancn": [0] * len(d06.ANC_KEYS),
-                                  "ancns": 0, "ancP": 0})
+                                  "ancns": 0, "ancP": 0,
+                                  "labU": 0, "labLF": 0})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -139,6 +140,8 @@ def main():
             acc["ancn"][i] += r["ancn"][i]
         acc["ancns"] += r["ancns"]
         acc["ancP"] += r["ancP"]
+        acc["labU"] += r["labU"]
+        acc["labLF"] += r["labLF"]
 
     nat = defaultdict(int)
     for dv in divsum.values():
@@ -154,7 +157,8 @@ def main():
             nat["sch6"][i] += dv["sch6"][i]
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot", "famN",
-                  "famD", "ceb3", "cebns", "cebt", "ancns", "ancP"):
+                  "famD", "ceb3", "cebns", "cebt", "ancns", "ancP",
+                  "labU", "labLF"):
             nat[k] += dv[k]
         for i in range(len(d06.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d06.REL_KEYS))
@@ -207,6 +211,8 @@ def main():
         "anc": {k: round(nat["ancn"][i]
                          / (nat["ancP"] - nat["ancns"]), 4)
                 for i, k in enumerate(d06.ANC_KEYS)},
+        "unemp": (round(nat["labU"] / nat["labLF"], 4)
+                  if nat["labLF"] else None),
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -254,7 +260,8 @@ def main():
                 "ceb3": r["ceb3"], "cebns": r["cebns"],
                 "cebt": r["cebt"],
                 "ancn": r["ancn"], "ancns": r["ancns"],
-                "ancP": r["ancP"]})
+                "ancP": r["ancP"],
+                "labU": r["labU"], "labLF": r["labLF"]})
         out_booths.append(rec)
 
     divstate = {b["div"]: b["state"] for b in booths}

@@ -190,6 +190,7 @@ def main():
     gcp, nsw_persons = load_gcp_nsw()
     nlt = gcp_newlanes.load(GCP_ZIP, prefix="1")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="1", era="2021")
+    lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="1", era="2021")
     inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "1")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
     assign = load_assign_map()
@@ -229,6 +230,7 @@ def main():
                                   "incAud": 0.0, "incLo": 0.0,
                                   "incHi": 0.0, "incHiQ": 0.0,
                                   "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+                                  "ueN": 0.0, "lfD": 0.0,
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -280,6 +282,9 @@ def main():
         a["incHiQ"] += hiqm
         for i in range(len(gcp_newlanes.INC_BANDS)):
             a["incBandH"][i] += hh[i]
+        uel, lfd = lab[code]
+        a["ueN"] += uel
+        a["lfD"] += lfd
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist in order:
         if dist not in acc:
@@ -325,6 +330,7 @@ def main():
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
+            "unemp": round(a["ueN"] / a["lfD"], 4) if a["lfD"] else None,
         }
         if a["incAud"] > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -358,6 +364,7 @@ def main():
               "ancP": 0, "ancNS": 0,
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+              "ueN": 0.0, "lfD": 0.0,
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():

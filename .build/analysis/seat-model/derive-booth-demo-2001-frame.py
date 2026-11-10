@@ -208,6 +208,8 @@ def shares(rec):
         if ancd > 0:
             s["anc"] = {k: round(rec["anc01"][i] / ancd, 4)
                         for i, k in enumerate(ANC_KEYS01)}
+    if rec.get("lab01") is not None and rec["lab01"][1] > 0:
+        s["unemp"] = round(rec["lab01"][0] / rec["lab01"][1], 4)
     return s
 
 
@@ -223,7 +225,7 @@ def demo_of(r, inc=None):
                 "onepar": None, "rel": None, "ten": None,
                 "loinc": None, "hiinc": None, "hiqinc": None,
                 "incMed": None,
-                "pt": None, "noncit": None, "anc": None}
+                "pt": None, "noncit": None, "anc": None, "unemp": None}
     return shares({
         "pers": r["pers"], "bands": r["bands"], "eng": r["eng"],
         "oth": r["oth"], "aus": r["aus"], "totc": r["totc"],
@@ -245,7 +247,8 @@ def demo_of(r, inc=None):
         "tw01": r.get("tw01"),
         "anc01": r.get("anc01"),
         "ancP01": r.get("ancp01"),
-        "ancNS01": r.get("ancns01")})
+        "ancNS01": r.get("ancns01"),
+        "lab01": r.get("lab01")})
 
 
 def main():
@@ -302,7 +305,8 @@ def main():
                                   "cit01": 0,
                                   "tw01": [0] * 3,
                                   "anc01": [0] * len(ANC_KEYS01),
-                                  "ancP01": 0, "ancNS01": 0})
+                                  "ancP01": 0, "ancNS01": 0,
+                                  "lab01": [0] * 2})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -345,6 +349,8 @@ def main():
             acc["anc01"][i] += r["anc01"][i]
         acc["ancP01"] += r["ancp01"]
         acc["ancNS01"] += r["ancns01"]
+        acc["lab01"][0] += r["lab01"][0]
+        acc["lab01"][1] += r["lab01"][1]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     nat = defaultdict(int)
@@ -368,6 +374,9 @@ def main():
             nat["anc01"][i] += dv["anc01"][i]
         nat["ancP01"] = nat.get("ancP01", 0) + dv["ancP01"]
         nat["ancNS01"] = nat.get("ancNS01", 0) + dv["ancNS01"]
+        nat.setdefault("lab01", [0] * 2)
+        for i in range(2):
+            nat["lab01"][i] += dv["lab01"][i]
         for k in ("relNS", "relTot", "indig", "indigDen",
                   "famN", "famD"):
             nat[k] += dv[k]
@@ -420,6 +429,8 @@ def main():
         "anc": {k: round(nat["anc01"][i]
                          / (nat["ancP01"] - nat["ancNS01"]), 4)
                 for i, k in enumerate(ANC_KEYS01)},
+        "unemp": (round(nat["lab01"][0] / nat["lab01"][1], 4)
+                  if nat["lab01"][1] else None),
     }
     # measured-once pin (the 2004 lane's own figure): the tally total
     # (18,652,828) less the 8,249 people of the dropped offshore class

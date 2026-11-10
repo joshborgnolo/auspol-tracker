@@ -173,6 +173,7 @@ function buildRamps() {
       agemed: seq(86, 0.14), a1824: seq(185, 0.13), a3554: seq(128, 0.14), a75: seq(26, 0.14),
       y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
+      unemp: seq(8, 0.13),
       rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10) },
   };
 }
@@ -241,7 +242,7 @@ const famEraOpts = (m) => FAMS.filter((f) => !(FAM_FORMED[f] && Number.isFinite(
 // DM's order is POSITIONAL against the booth demo cell tuple, so the
 // folded-away pairs (income shares, age bands, schooling reads) keep their
 // slots here; the menu folds each pair into one entry via DM_MENU below
-const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "hiqinc"];
+const DM = ["lang", "a65", "a2034", "fborn", "uni", "blue", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "hiqinc", "unemp"];
 // the Household-income lens lane id: its block sits below with the other
 // select lenses — declared early because the menu fold needs it
 const LENS_INC = "inc";
@@ -254,10 +255,10 @@ const LENS_EDU = "edu";
 // folded into the Age entry where a65 sat, the two schooling reads folded
 // into the Education entry where uni sat
 const DM_MENU = (() => { const ks = []; for (const k of DM) { if (k === "a65") { ks.push(LENS_AGE); continue; } if (k === "a2034") continue; if (k === "loinc") { ks.push(LENS_INC); continue; } if (k === "uni") { ks.push(LENS_EDU); continue; } if (k !== "hiinc" && k !== "y12less" && k !== "hiqinc") ks.push(k); } return ks; })();
-const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", age: "Age", fborn: "Born overseas", uni: "University educated", edu: "Education", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in bottom household-income quarter", hiinc: "Adults in high-income households", hiqinc: "Adults in top household-income quarter", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless" };
-const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", age: "Age", fborn: "Born overseas", uni: "University", edu: "Education", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", hiqinc: "Top income quarter", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless" };
-const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work", y12less: "of people aged 15+ left schooling before Year 12", atsci: "identify as Aboriginal and/or Torres Strait Islander", u15: "are children under 15", onepar: "of families are one-parent families", pt: "of employed people travelled to work by public transport", noncit: "were not counted as Australian citizens", bigfam: "of women aged 15+ have had more than two children", hl: "were counted homeless in the ABS census estimate" };
-const DM_RANGE = { lang: [0, 60], fborn: [0, 65], uni: [2, 55], blue: [9, 48], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15] };
+const DM_NAME = { lang: "Language other than English at home", a65: "Aged 65 and over", a2034: "Aged 20 to 34", age: "Age", fborn: "Born overseas", uni: "University educated", edu: "Education", blue: "Blue-collar workers", inc: "Household income", loinc: "Adults in bottom household-income quarter", hiinc: "Adults in high-income households", hiqinc: "Adults in top household-income quarter", y12less: "Year 12 or less", atsci: "Indigenous Australians", u15: "Children under 15", onepar: "One-parent families", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "More than two children", hl: "Homeless", unemp: "Unemployed and looking for work" };
+const DM_SHORT = { lang: "Other language", a65: "Aged 65+", a2034: "Aged 20–34", age: "Age", fborn: "Born overseas", uni: "University", edu: "Education", blue: "Blue collar", inc: "Income", loinc: "Lower income", hiinc: "Higher income", hiqinc: "Top income quarter", y12less: "No Year 12", atsci: "Indigenous", u15: "Under 15", onepar: "One-parent", pt: "Public transport to work", noncit: "Non-citizens", bigfam: "3+ children", hl: "Homeless", unemp: "Unemployed" };
+const DM_VERB = { lang: "speak a language other than English at home", a65: "are aged 65 or over", a2034: "are aged 20 to 34", fborn: "were born overseas", uni: "hold a university qualification", blue: "work in a trade, drive machinery or do labouring work", y12less: "of people aged 15+ left schooling before Year 12", atsci: "identify as Aboriginal and/or Torres Strait Islander", u15: "are children under 15", onepar: "of families are one-parent families", pt: "of employed people travelled to work by public transport", noncit: "were not counted as Australian citizens", bigfam: "of women aged 15+ have had more than two children", hl: "were counted homeless in the ABS census estimate", unemp: "were unemployed and looking for work" };
+const DM_RANGE = { lang: [0, 60], fborn: [0, 65], uni: [2, 55], blue: [9, 48], y12less: [10, 72], atsci: [0, 55], u15: [6, 28], onepar: [8, 30], pt: [0, 35], noncit: [0, 40], bigfam: [8, 45], hl: [0, 15], unemp: [0, 22] };
 // the Religion and Housing-tenure select lenses: S.index is the menu
 // ("rel"/"ten") and S.rel/S.ten the picked option; a lane share rides the
 // division dicts (demo.rel/.ten), the parallel B rows, and the pooled
@@ -358,7 +359,7 @@ const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TEN
 // aged 15+, occupation and the journey to work of employed people, one-parent families of
 // families, children ever born of women aged 15+, tenure of dwellings, and the income shares of
 // adults (households, in the era prints that count households)
-const DM_POP = { uni: "people aged 15+", y12less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+" };
+const DM_POP = { uni: "people aged 15+", y12less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+", unemp: "people in the labour force" };
 const DM_PRED = { y12less: "left schooling before Year 12", onepar: "are one-parent families", pt: "travelled to work by public transport", bigfam: "have had more than two children" };
 function censusWho(m, k = S.index) {
   let pop = "residents", pred;
@@ -880,7 +881,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"87f32785","core-1993.json":"70b6dee1","core-1996.json":"0341c079","core-1998.json":"ce621702","core-2001.json":"77ca8273","core-2004.json":"8f92357f","core-2007.json":"c2656d8b","core-2010.json":"e1bbaf37","core-2013.json":"597fc3ab","core-2016.json":"5c81d907","core-2019.json":"cd400a1b","core-2022.json":"6715dc8d","core-2025.json":"452cf437","core-nsw15.json":"5f3e3e15","core-nsw19.json":"8bb6ac26","core-nsw23.json":"2d69d304","core-qld17.json":"3982f5a4","core-qld20.json":"a12c1401","core-qld24.json":"28e702b3","core-sa22.json":"42e747b6","core-sa26.json":"77e5941f","core-vic14.json":"ddc57527","core-vic18.json":"a80e45a6","core-vic22.json":"94a00ef8","core-wa17.json":"06ad6389","core-wa21.json":"cc2db554","core-wa25.json":"d043ed4a","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"358475b1","data-nsw15.json":"3b556056","data-nsw19.json":"4bc6fcb6","data-nsw23.json":"51559fc2","data-qld17.json":"68e415b7","data-qld20.json":"9d06d530","data-qld24.json":"c3814e41","data-sa22.json":"ce7c7299","data-sa26.json":"b1e1a327","data-vic14.json":"ef46d0d5","data-vic18.json":"3fbcb151","data-vic22.json":"8541dddd","data-wa17.json":"4d87bbb3","data-wa21.json":"c89fba09","data-wa25.json":"dbd68e1c","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"d1feb8d1","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"d1feb8d1","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"23ad692a","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"e66797d1","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"e66797d1","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"e66797d1","geo-sa22-hi.json":"188cd494","geo-sa22-lo.json":"75ee7453","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"73866149","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"54485f1e","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"54485f1e","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"7dd2d4e3","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"46e32585","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"1cd95bf6","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"513ef944","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"b70bb4b6","res-1996.json":"af4baf34","res-1998.json":"4ff84f52","res-2001.json":"6ff4e4ae","res-2004.json":"feb13d77","res-2007.json":"d2371c43","res-2010.json":"cde04a5c","res-2013.json":"2ce3b64d","res-2016.json":"9711100d","res-2019.json":"11c0f7fe","res-2022.json":"5e9562a0","res-2025.json":"425c7625","res-nsw15.json":"f39f4406","res-nsw19.json":"e6a54d8a","res-nsw23.json":"9d6c33ea","res-qld17.json":"6c812a4c","res-qld20.json":"bdedac6c","res-qld24.json":"3fc54b23","res-sa22.json":"c6acb997","res-sa26.json":"9ec5416a","res-vic14.json":"58b777e6","res-vic18.json":"41e7eef2","res-vic22.json":"73169621","res-wa17.json":"06ad6389","res-wa21.json":"cc2db554","res-wa25.json":"d043ed4a","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"c600f94c","core-1993.json":"44e73023","core-1996.json":"0341c079","core-1998.json":"d884a0f2","core-2001.json":"77ca8273","core-2004.json":"8545846d","core-2007.json":"7750f097","core-2010.json":"beef25b6","core-2013.json":"495dd68c","core-2016.json":"247d1711","core-2019.json":"f14ef4b3","core-2022.json":"22547679","core-2025.json":"097d93a3","core-nsw15.json":"deddd063","core-nsw19.json":"378a7735","core-nsw23.json":"32446ce6","core-qld17.json":"fe207447","core-qld20.json":"a297ebb1","core-qld24.json":"d2f14cdb","core-sa22.json":"078f4b93","core-sa26.json":"8067756f","core-vic14.json":"4d270976","core-vic18.json":"419d2c19","core-vic22.json":"37b97739","core-wa17.json":"ae87e6df","core-wa21.json":"6ef21915","core-wa25.json":"0ba71f08","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"358475b1","data-nsw15.json":"1a5d338f","data-nsw19.json":"1c37d3d9","data-nsw23.json":"63963c8b","data-qld17.json":"2fd4dcf2","data-qld20.json":"bc6da081","data-qld24.json":"a584eabe","data-sa22.json":"3622ec39","data-sa26.json":"1598a7bf","data-vic14.json":"f6a0159f","data-vic18.json":"f0b7e75c","data-vic22.json":"8f9cd949","data-wa17.json":"d0838bb3","data-wa21.json":"93dfa2cc","data-wa25.json":"bc9083f1","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"1b5e545d","res-1996.json":"af4baf34","res-1998.json":"0b13b51a","res-2001.json":"6ff4e4ae","res-2004.json":"c8fdeec9","res-2007.json":"165c8592","res-2010.json":"8680c6e5","res-2013.json":"9170f119","res-2016.json":"ad1f0401","res-2019.json":"2528382d","res-2022.json":"100586d0","res-2025.json":"930debe5","res-nsw15.json":"2450a7b3","res-nsw19.json":"63f399a2","res-nsw23.json":"aa07ca94","res-qld17.json":"e4f8da6c","res-qld20.json":"f0a0effa","res-qld24.json":"ef53480f","res-sa22.json":"be837a63","res-sa26.json":"fe769dab","res-vic14.json":"e9ecce71","res-vic18.json":"0bb49362","res-vic22.json":"ad31f062","res-wa17.json":"ae87e6df","res-wa21.json":"6ef21915","res-wa25.json":"0ba71f08","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -960,7 +961,7 @@ function deriveDiv(d, i, year) {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
     exhPct: flows.some((f) => f.exh != null) ? (100 * exhTot) / formal : null,
     A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
-    tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, vt2: d.vt2 || null, vt3: d.vt3 || null, vts: d.vts || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
+    tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, vt2: d.vt2 || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
   };
 }
@@ -1335,7 +1336,7 @@ function applyNow(m, now) {
     const fi = m.byName.get(name);
     if (fi == null) continue;
     const D = deriveDiv(by.div, fi, m.year);
-    D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.vts = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
+    D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
     D.by = { date: by.date, event: by.event ?? by.nswEvent, formal: by.formal, informal: by.informal, turnout: by.turnout, enrolment: by.enrolment, prev: m.divs[fi] };
     D.change = { kind: "by", prev: m.divs[fi].h.filter((h) => !h[4]).pop() };
     m.divs[fi] = D;
@@ -1981,299 +1982,6 @@ function oceanUnder(m) {
   ctx.restore();
 }
 
-/* ----- the water in the seats -----
-   The AEC draws its divisions across the water: Sydney Harbour, Botany Bay, the
-   Parramatta and the Swan lie inside seats (Western Port too from 2019; Moreton Bay
-   and the Torres Strait in Queensland's own districts), and so do the lakes,
-   reservoirs and wider reaches of the rivers. Street zoom has always cut them back to Esri's sea; these
-   are cut out of the seats at every zoom before it, from water_build.mjs's files:
-   the seats' area less the ABS's land, kept where wide enough to be water, each piece
-   tagged with the frames whose seats cover it (a frame cuts only its own pieces and
-   strokes only their shores, so no frame gets a second coast beside its own).
-     water.json       the pieces a country or state view can show (over 5 km2, to
-                      500 m) and the big dry lakes, loaded with the map
-     water-<city>.json  all of it round one capital (to 25 m; the dry lakes to 100 m),
-                      fetched as a city view first nears it
-   A city file takes over from the country file as the zoom passes WATER_MPP (metres a
-   pixel; the coarse shapes never reach the city views, where they would cut the land),
-   and Esri's sea from both between seaA's zooms, the cuts laid so the water is whole all
-   the way across (waterLook, drawWater).
-   The salt lakes of the interior (Kati Thanda-Lake Eyre, Torrens, Gairdner, Mackay,
-   Amadeus...) are dry most years: Geoscience Australia's non-perennial lakes are drawn
-   over the seats' colour as an atlas draws a salt lake - a pale wash, short level
-   dashes and a broken outline - and never cut to water, Esri's sea included. */
-const WATER_MPP = [900, 1300], WATER_PREFETCH = 1600, WATER_FADE = 260;
-let WATER = null, waterP = null, waterUid = 0;
-const waterTiles = new Map(); // city -> { src, p } (src null until it lands)
-// a file's arcs to lon/lat once, each geometry's bounds with them
-function waterSrc(t) {
-  const mk = (topo) => {
-    const tf = topo.transform, arcs = topo.arcs.map((a) => {
-      const o = new Float64Array(a.length * 2);
-      let x = 0, y = 0;
-      for (let i = 0; i < a.length; i++) {
-        if (tf) { x += a[i][0]; y += a[i][1]; o[2 * i] = x * tf.scale[0] + tf.translate[0]; o[2 * i + 1] = y * tf.scale[1] + tf.translate[1]; }
-        else { o[2 * i] = a[i][0]; o[2 * i + 1] = a[i][1]; }
-      }
-      return o;
-    });
-    const geoms = {};
-    for (const [k, o] of Object.entries(topo.objects)) geoms[k] = o.geometries.filter((g) => g.arcs).map((g) => {
-      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-      const walk = (a) => { if (typeof a !== "number") return a.forEach(walk); const A = arcs[a < 0 ? ~a : a]; for (let i = 0; i < A.length; i += 2) { if (A[i] < x0) x0 = A[i]; if (A[i] > x1) x1 = A[i]; if (A[i + 1] < y0) y0 = A[i + 1]; if (A[i + 1] > y1) y1 = A[i + 1]; } };
-      walk(g.arcs);
-      return { g, p: g.properties || {}, gbb: [x0, y0, x1, y1] };
-    });
-    return { arcs, geoms };
-  };
-  return { frames: t.frames, caps: t.caps, tiles: t.tiles, lp: t.lp || null, w: mk(t.water), d: mk(t.dry), at: performance.now(), sets: new WeakMap() };
-}
-const loadWater = () => waterP || (waterP = getJSON("/map/data/water.json", true).then((t) => { WATER = waterSrc(t); schedule(); }).catch(() => { waterP = null; }));
-function loadWaterTile(cap) {
-  let e = waterTiles.get(cap);
-  if (e) return e;
-  waterTiles.set(cap, (e = { src: null, p: null }));
-  e.p = getJSON(`/map/data/water-${cap}.json`, true).then((t) => { e.src = waterSrc(t); schedule(); }).catch(() => { waterTiles.delete(cap); });
-  return e;
-}
-// a frame's view of a file: its pieces, shores and mouths (those its seats cover) and every dry
-// lake, each with its bounds on the frame's plane; their paths are made as each is first seen
-function waterSet(src, m) {
-  let s = src.sets.get(m);
-  if (s && s.P === m.proj) return s;
-  const P = m.proj, bit = src.frames.indexOf(String(nowRy(m.year)));
-  const pbb = ([x0, y0, x1, y1]) => {
-    let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
-    for (const u of [0, 0.5, 1]) for (const v of [0, 0.5, 1]) { const q = P([x0 + u * (x1 - x0), y0 + v * (y1 - y0)]); if (!q) continue; a = Math.min(a, q[0]); c = Math.max(c, q[0]); b = Math.min(b, q[1]); d = Math.max(d, q[1]); }
-    const ex = 0.02 * (c - a) + 0.05, ey = 0.02 * (d - b) + 0.05;
-    return [[a - ex, b - ey], [c + ex, d + ey]];
-  };
-  const mine = (it) => bit >= 0 && (it.p.f & (1 << bit));
-  const items = (G, keep) => (G || []).filter(keep).map((it) => ({ ...it, bb: pbb(it.gbb), path: null, uid: ++waterUid }));
-  s = { P, src, parcs: [new Map(), new Map()], water: items(src.w.geoms.water, mine), shore: items(src.w.geoms.shore, mine), mouth: items(src.w.geoms.mouth, mine), dry: items(src.d.geoms.dry, () => true) };
-  src.sets.set(m, s);
-  return s;
-}
-// an item's path on the frame's plane (rings closed for the areas, open for the lines)
-function waterPath(s, it, dry) {
-  if (it.path) return it.path;
-  const arcs = dry ? s.src.d.arcs : s.src.w.arcs, cache = s.parcs[dry ? 1 : 0], P = s.P, p = new Path2D();
-  const proj = (a) => {
-    let o = cache.get(a);
-    if (!o) { const A = arcs[a]; o = new Float32Array(A.length); for (let i = 0; i < A.length; i += 2) { const q = P([A[i], A[i + 1]]); o[i] = q[0]; o[i + 1] = q[1]; } cache.set(a, o); }
-    return o;
-  };
-  const line = (ring, close) => {
-    let first = true;
-    for (const a of ring) {
-      const o = proj(a < 0 ? ~a : a), n = o.length / 2, rev = a < 0;
-      for (let k = 0; k < n; k++) {
-        const i = rev ? n - 1 - k : k;
-        if (first) { p.moveTo(o[2 * i], o[2 * i + 1]); first = false; } else if (k) p.lineTo(o[2 * i], o[2 * i + 1]);
-      }
-    }
-    if (close && !first) p.closePath();
-  };
-  const g = it.g;
-  if (g.type === "Polygon") g.arcs.forEach((r) => line(r, true));
-  else if (g.type === "MultiPolygon") g.arcs.forEach((pg) => pg.forEach((r) => line(r, true)));
-  else if (g.type === "LineString") line(g.arcs, false);
-  else if (g.type === "MultiLineString") g.arcs.forEach((l) => line(l, false));
-  return (it.path = p);
-}
-// metres a CSS pixel at the middle of the view, on a frame's plane
-function mppOf(m) {
-  if (!m._kmU || m._kmU.P !== m.proj) {
-    const c = m.proj.invert([500, 440]) || [134, -27], a = m.proj(c), b = m.proj([c[0] + 0.1, c[1]]);
-    m._kmU = { P: m.proj, u: Math.hypot(b[0] - a[0], b[1] - a[1]) / (0.1 * 111.32 * Math.cos((c[1] * Math.PI) / 180)) };
-  }
-  return 1000 / (m._kmU.u * T.k);
-}
-// the lon/lat bounds of the view
-function viewGeo(m) {
-  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-  for (const [u, v] of [[0, 0], [0.5, 0], [1, 0], [1, 0.5], [1, 1], [0.5, 1], [0, 1], [0, 0.5], [0.5, 0.5]]) {
-    const q = m.proj.invert([(u * Wpx - T.x) / T.k, (v * Hpx - T.y) / T.k]); if (!q) continue;
-    x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]);
-  }
-  return [x0, y0, x1, y1];
-}
-const geoMeets = (a, b) => !(a[2] < b[0] || a[0] > b[2] || a[3] < b[1] || a[1] > b[3]);
-/* what a paint draws of the water: each set with each item's strength. A city's file is
-   asked for as the zoom passes WATER_PREFETCH m a pixel over it and, once in, has the city
-   alone below WATER_MPP[0] (fading in over WATER_FADE as it lands); the country file has
-   it above WATER_MPP[1], the two blending between, where they differ by under half a pixel
-   (so two cuts at part strength never leave half an edge standing). A city whose file is not
-   in yet keeps the country file's shapes, but only down to WATER_LO_FLOOR (they would cut
-   the land closer in; the city keeps its seats' colour there, as it always did, until its
-   file lands) */
-const WATER_LO_FLOOR = [250, 400];
-// a seat whose results' label point stands on the water it is drawn across (Kingsford Smith's
-// in Botany Bay, Redcliffe's in Moreton Bay) takes the point on its land water_build.mjs found,
-// so its name stands on its colour, wherever the water shows
-function applyWaterLabels(m) {
-  if (m._wlp === WATER) return;
-  m._wlp = WATER;
-  const L = WATER.lp && WATER.lp[String(nowRy(m.year))];
-  if (!L || !m.divs) return;
-  for (const d of m.divs) { const p = L[d.n]; if (!p) continue; d.lp = p; const q = m.proj(p); d.lpx = q[0]; d.lpy = q[1]; }
-}
-function waterLook(m) {
-  if (!m || !m.proj) return null;
-  if (!WATER) { loadWater(); return null; }
-  applyWaterLabels(m);
-  const now = performance.now(), mpp = mppOf(m), z = smooth(WATER_MPP[0], WATER_MPP[1], mpp);
-  const fade = (src) => { const f = clamp((now - src.at) / WATER_FADE, 0, 1); if (f < 1) needFrame = true; return f; };
-  const out = [], vg = viewGeo(m), caps = WATER.caps || [], hiW = caps.map(() => 0);
-  if (mpp < WATER_PREFETCH) caps.forEach((cap, c) => {
-    const bb = WATER.tiles && WATER.tiles[cap];
-    if (!bb || !geoMeets(bb, vg)) return;
-    const e = loadWaterTile(cap);
-    if (!e.src || z >= 1) return;
-    hiW[c] = (1 - z) * fade(e.src);
-    if (hiW[c] > 0.004) { const w = hiW[c]; out.push({ s: waterSet(e.src, m), w: () => w }); }
-  });
-  const lo = fade(WATER) * smooth(WATER_LO_FLOOR[0], WATER_LO_FLOOR[1], mpp), loW = hiW.map((h) => (1 - h) * lo);
-  if (loW.some((w) => w > 0.004)) out.push({ s: waterSet(WATER, m), w: (it) => loW[it.p.c] ?? lo, lo: true });
-  return out.length ? out : null;
-}
-// the items of a kind in view, each with its strength
-function waterItems(look, kind) {
-  const [x0, y0, x1, y1] = viewBox(), out = [];
-  for (const L of look || []) for (const it of L.s[kind]) { if (!inBox(it.bb, x0, y0, x1, y1)) continue; const w = L.w(it); if (w > 0.004) out.push([L, it, w]); }
-  return out;
-}
-let waterNow = null; // the paint's water, for drawFocus: { m, pieces (those drawn at half strength or more), sig }
-// the pieces as one path, and the land about them (a rect over the whole plane less the pieces,
-// even-odd) for clipping to: made only when the veil or an outline wants them, and kept while the
-// same pieces are in (a paint making them afresh each frame left the collector a big path a frame)
-let waterPaths = { sig: "", wet: null, land: null };
-function waterWet(m) {
-  if (!waterNow || waterNow.m !== m || !waterNow.pieces.length) return null;
-  if (waterPaths.sig !== waterNow.sig) {
-    const wet = new Path2D();
-    for (const [L, it] of waterNow.pieces) wet.addPath(waterPath(L.s, it));
-    const land = new Path2D(); land.rect(-1e5, -1e5, 2e5, 2e5); land.addPath(wet);
-    waterPaths = { sig: waterNow.sig, wet, land };
-  }
-  return waterPaths;
-}
-/* The cut. With nothing to blend (each item at full strength, no sea of Esri's in) the
-   pieces come straight out of the canvas, and the seats' coast stroke over each mouth with
-   them (its outer half would stand on the water). Otherwise all of that is laid on a layer
-   first, each at its strength and adding up, so the country file's shape and a city file's
-   sum to one where both lie, and Esri's sea handed the water where it has come in: inside
-   st.known the layer keeps its full strength where Esri's sea lies too (laySea cuts that at
-   sa after) and (1 - sa) where it doesn't, so the water is whole at every step of the
-   handover, never the seats' colour showing through mid-way; once Esri's sea has it all
-   (sa 1) ours is cut only outside its tiles. The ocean is laid back into the holes, the
-   shores stroked like the coast. The dry lakes go on last, over the fills. */
-function drawWater(m, alpha, st, sa) {
-  const look = waterLook(m);
-  if (m === M()) waterNow = null;
-  if (!look) return;
-  const th = TH, W = canvas.width, H = canvas.height, mt = [dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y];
-  const pieces = waterItems(look, "water"), mouths = waterItems(look, "mouth");
-  const handover = sa > 0 && st && st.known, taken = handover && sa >= 0.999;
-  if (pieces.length) {
-    const full = pieces.every((q) => q[2] >= 0.996) && mouths.every((q) => q[2] >= 0.996);
-    // (a cut takes the source's alpha: opaque fills and strokes, whatever the last ones were)
-    const cut = (g) => {
-      g.setTransform(...mt); g.fillStyle = g.strokeStyle = "#000"; g.lineCap = "butt"; g.lineJoin = "round"; g.lineWidth = 1.8 / T.k;
-      for (const [L, it, w] of pieces) { g.globalAlpha = w; g.fill(waterPath(L.s, it), "evenodd"); }
-      for (const [L, it, w] of mouths) { g.globalAlpha = w; g.stroke(waterPath(L.s, it)); }
-    };
-    // (once Esri's sea has the water wherever its tiles are in, ours is cut only where they aren't)
-    const outside = (g) => { const o = new Path2D(); o.rect(-1, -1, W + 2, H + 2); o.addPath(st.known); g.setTransform(1, 0, 0, 1, 0, 0); g.clip(o, "evenodd"); };
-    if (full && (!handover || taken)) {
-      ctx.save(); if (taken) outside(ctx);
-      ctx.globalCompositeOperation = "destination-out"; cut(ctx);
-      ctx.restore();
-    } else {
-      const Lr = waterLayer();
-      Lr.globalCompositeOperation = "lighter"; cut(Lr);
-      if (taken) { Lr.setTransform(1, 0, 0, 1, 0, 0); Lr.globalAlpha = 1; Lr.globalCompositeOperation = "destination-out"; Lr.fill(st.known); }
-      else if (handover) {
-        // (the layer where Esri's sea lies, on the sea layer laySea makes afresh after)
-        if (!seaLay) seaLay = document.createElement("canvas");
-        if (seaLay.width !== W || seaLay.height !== H) { seaLay.width = W; seaLay.height = H; }
-        const S2 = seaLay.getContext("2d");
-        S2.setTransform(1, 0, 0, 1, 0, 0); S2.globalAlpha = 1; S2.globalCompositeOperation = "source-over"; S2.clearRect(0, 0, W, H);
-        S2.drawImage(Lr.canvas, 0, 0); S2.globalCompositeOperation = "destination-in"; S2.drawImage(seaCv, 0, 0);
-        Lr.setTransform(1, 0, 0, 1, 0, 0); Lr.globalAlpha = sa; Lr.globalCompositeOperation = "destination-out"; Lr.fill(st.known);
-        Lr.globalCompositeOperation = "lighter"; Lr.drawImage(seaLay, 0, 0);
-      }
-      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = "destination-out"; ctx.drawImage(Lr.canvas, 0, 0); ctx.restore();
-    }
-    // the ocean back into the holes, within the pieces' bounds (laySea lays it whole after, where Esri's sea is in)
-    if (!sa) {
-      let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
-      for (const [, it] of pieces) { a = Math.min(a, it.bb[0][0]); b = Math.min(b, it.bb[0][1]); c = Math.max(c, it.bb[1][0]); d = Math.max(d, it.bb[1][1]); }
-      ctx.save(); ctx.setTransform(...mt); ctx.beginPath(); ctx.rect(a, b, c - a, d - b); ctx.clip(); oceanUnder(m); ctx.restore();
-    }
-    // the shores, as the coast is drawn: whole where no sea of Esri's has come in, fading where one has
-    const shoreItems = waterItems(look, "shore");
-    ctx.save(); ctx.setTransform(...mt); ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.lineJoin = "round"; ctx.lineCap = "round";
-    const shores = (k) => { for (const [L, it, w] of shoreItems) { ctx.globalAlpha = alpha * w * k; ctx.stroke(waterPath(L.s, it)); } };
-    if (!handover) shores(1);
-    else {
-      ctx.save(); outside(ctx); ctx.setTransform(...mt); shores(1); ctx.restore();
-      if (sa < 1) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clip(st.known); ctx.setTransform(...mt); shores(1 - sa); ctx.restore(); }
-    }
-    ctx.restore();
-    if (m === M()) {
-      const half = pieces.filter((q) => q[2] >= 0.5);
-      waterNow = { m, pieces: half, sig: `${m.year}|${half.map((q) => q[1].uid).join(",")}` };
-    }
-  }
-  drawDryLakes(look, alpha);
-}
-// the cut's own layer: the scratch layer (layer()) has just been laid on the canvas by the seats'
-// waters at these zooms, and clearing it again the same frame made the browser keep or flush that
-// copy first, every other frame 10-20ms at street zoom's door
-let waterLay = null;
-function waterLayer() {
-  const W = canvas.width, H = canvas.height;
-  if (!waterLay) waterLay = document.createElement("canvas");
-  if (waterLay.width !== W || waterLay.height !== H) { waterLay.width = W; waterLay.height = H; }
-  const L = waterLay.getContext("2d");
-  L.setTransform(1, 0, 0, 1, 0, 0); L.globalAlpha = 1; L.globalCompositeOperation = "source-over";
-  L.clearRect(0, 0, W, H);
-  return L;
-}
-// the dry lakes: a pale wash of the sea's colour, short level dashes and a broken outline
-let dryTile = null;
-function dryPattern() {
-  const s = Math.round(9 * dpr), th = TH;
-  if (!dryTile || dryTile._th !== th || dryTile._dpr !== dpr) {
-    dryTile = document.createElement("canvas"); dryTile.width = dryTile.height = s; dryTile._th = th; dryTile._dpr = dpr;
-    const g = dryTile.getContext("2d"), w = Math.max(1, Math.round(dpr * 0.9)), len = Math.round(4 * dpr);
-    g.fillStyle = css(th.seaMark, th.dark ? 0.8 : 0.75);
-    g.fillRect(0, Math.round(s * 0.25), len, w);
-    g.fillRect(Math.round(s / 2), Math.round(s * 0.75), len, w);
-  }
-  return ctx.createPattern(dryTile, "repeat");
-}
-function drawDryLakes(look, alpha) {
-  const shown = waterItems(look, "dry");
-  if (!shown.length) return;
-  const th = TH, pat = dryPattern();
-  pat.setTransform(new DOMMatrix().scale(1 / (dpr * T.k)));
-  ctx.save(); ctx.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); ctx.lineJoin = "round";
-  for (const [L, it, w] of shown) {
-    const p = waterPath(L.s, it, true);
-    ctx.globalAlpha = alpha * w; ctx.fillStyle = css(th.sea, th.dark ? 0.5 : 0.62); ctx.fill(p, "evenodd");
-    ctx.fillStyle = pat; ctx.fill(p, "evenodd");
-  }
-  ctx.strokeStyle = css(th.seaMark, 0.9); ctx.lineWidth = 0.8 / T.k; ctx.setLineDash([3 / T.k, 2.2 / T.k]);
-  for (const [L, it, w] of shown) { ctx.globalAlpha = alpha * w; ctx.stroke(waterPath(L.s, it, true)); }
-  ctx.restore();
-}
-// the dry lakes in view at half strength or more, cut back out of Esri's sea (prepStreets)
-function dryInView(m) {
-  return waterItems(waterLook(m), "dry").filter((q) => q[2] >= 0.5).map(([L, it]) => waterPath(L.s, it, true));
-}
-
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
@@ -2371,7 +2079,6 @@ function drawGeo(m, alpha, streetA) {
     }
   }
   ctx.restore();
-  drawWater(m, alpha, st, sa);
   if (sa) laySea(m, st, alpha * sa);
   if (streetA !== undefined && !sa) warmWaters();
 }
@@ -2555,31 +2262,21 @@ function drawFocus(m, pathOf) {
   // where Esri's sea has taken the coast (drawGeo) the veil follows the seats'
   // waters and lies on the sea alike, so its edge is never the AEC's coast
   const sea = seaNow && seaNow.m === m && !pathOf ? seaNow : null;
-  // the water cut out of the seats (drawWater): the veil lies on it as on the sea, and the
-  // outlines keep to the land, as the sea's edge does at street zoom
-  const wp = (sd != null || S.sel.level === "state" || (S.hover && S.hover.kind === "div")) ? waterWet(m) : null;
-  const wet = wp && wp.wet, land = wp && wp.land;
   if (sea && sea.sa > 0.5 && (sd != null || S.sel.level === "state")) {
     veilSea(sd, sd != null ? th.veil : th.veil * 0.85);
   } else if (sd != null) {
     const v = new Path2D(); v.rect(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2); v.addPath(P(sd));
     for (const q of m.isl || []) if (q.owner === sd) v.addPath(q.mpath);
     ctx.fillStyle = css(th.bg, th.veil); ctx.fill(v, "evenodd");
-    if (wet) { ctx.save(); ctx.clip(P(sd)); ctx.fill(wet, "evenodd"); ctx.restore(); }
   } else if (S.sel.level === "state") {
     ctx.fillStyle = css(th.bg, th.veil * 0.85);
-    // (the sea is left clear with a state open, the water in the other states' seats too)
-    if (land) { ctx.save(); ctx.clip(land, "evenodd"); }
     for (const d of m.divs) if (d.st !== S.sel.st) ctx.fill(P(d.i));
     for (const q of m.isl || []) if (q.owner == null || m.divs[q.owner].st !== S.sel.st) ctx.fill(q.mpath);
-    if (land) ctx.restore();
   }
   // a seat's outline takes in its islands; its coast is left to the sea's edge where Esri's draws it
   const outline = (i) => {
-    if (land) { ctx.save(); ctx.clip(land, "evenodd"); }
-    if (sea && sea.sa > 0.5) ctx.stroke(g.edgeOf(i));
-    else { ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath); }
-    if (land) ctx.restore();
+    if (sea && sea.sa > 0.5) { ctx.stroke(g.edgeOf(i)); return; }
+    ctx.stroke(P(i)); for (const q of m.isl || []) if (q.owner === i) ctx.stroke(q.mpath);
   };
   const h = S.hover;
   if (h && h.kind === "div" && h.i !== sd) { ctx.strokeStyle = css(th.ink, 0.9); ctx.lineWidth = 1.6 / T.k; outline(h.i); }
@@ -2884,8 +2581,6 @@ function drawYearMorph(mo, t) {
   ctx.strokeStyle = css(th.coast, 0.55); ctx.lineWidth = 0.7 / T.k; ctx.stroke(g.coast);
   for (const q of m.isl || []) ctx.stroke(q.mpath);
   ctx.restore();
-  // (the water in the new election's seats, cut as they settle: drawWater)
-  drawWater(m, 1, null, 0);
 }
 
 // A booth's dot. Its size is a 1,000-vote booth's radius times the square
@@ -4185,15 +3880,6 @@ function prepStreets(alpha) {
   // colour first; on the dark page they are quiet already
   const st = { a: alpha * (dark ? 0.85 : 0.5 + 0.5 * smooth(300, 1000, T.k)), op: dark ? "screen" : "multiply", known: some ? known : null, seas, saved: [] };
   if (some) rescue(st, sg);
-  // (a dry lake stays land, its seat's colour under its salt-lake marks: drawDryLakes)
-  if (some) {
-    const dl = dryInView(M());
-    if (dl.length) {
-      sg.save(); sg.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); sg.globalCompositeOperation = "destination-out";
-      for (const p of dl) sg.fill(p, "evenodd");
-      sg.restore();
-    }
-  }
   prepKnown = st.known;
   return st;
 }
@@ -5895,7 +5581,7 @@ function areasLane() {
   return S.index;
 }
 // the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
-const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
   "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
   "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
@@ -6558,9 +6244,7 @@ function balloonWord(m) {
 function balloonKey(m, est) {
   const s = balScale(), nice = [50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
   const big = nice.filter((v) => Math.sqrt(v) * s <= 9.5).pop() || 50, list = [big, nice[Math.max(0, nice.indexOf(big) - 2)], nice[Math.max(0, nice.indexOf(big) - 4)]].filter((v, k, a) => a.indexOf(v) === k);
-  // (the box keeps the tallest circle's height, 9.5 px across zooms: a box sized to the
-  //  zoom's own biggest circle grew the strip a pixel at a time, nudging the stage)
-  const H = Math.ceil(2 * 9.5 + 2);
+  const R = Math.sqrt(big) * s, H = Math.ceil(2 * R + 2);
   let x = 0, circles = "", labels = "";
   for (const v of list) { const r = Math.max(0.8, Math.sqrt(v) * s); circles += `<circle cx="${(x + r + 1).toFixed(1)}" cy="${(H - 1 - r).toFixed(1)}" r="${r.toFixed(1)}"/>`; x += 2 * r + 2; labels += `${labels ? ", " : ""}${int(v)}`; }
   return `<div class="lg-bal"><svg width="${Math.ceil(x + 2)}" height="${H}" viewBox="0 0 ${Math.ceil(x + 2)} ${H}" aria-hidden="true">${circles}</svg><span>${est && (S.lens === "winner" || S.lens === "tpp") ? "Estimated lead, votes" : balloonWord(m)}: ${labels}</span></div>`;
@@ -10269,26 +9953,35 @@ function senTwoStat(m, idx) {
 }
 /* the Now senate chamber's note beside its seats row: the base chamber is the
    election's own, with the movements since named plainly — who joined a side
-   and who replaced whom in it — in the House row's own words shape
-   ("…election's, adjusted for changes since then.") */
-function senChangeNote(m, yr, st) {
-  // the whole window back to election day: the hand-checked list carries the
-  // pre-seating moves (Cox's defection, Dolega's appointment) that the
-  // seating-day base deck has already absorbed. And the note follows the
-  // head's pool to its state — at every filter the moves that touch that
-  // state, net-zero ones (a party replacing its own senator) included
-  const items = (m.senChanges || []).filter((c) => st === "AUS" || c.st === st);
-  if (!items.length) return "";
-  const word = (ab) => ({ ALP: "Labor", LP: "the Liberals", NP: "the Nationals", LNP: "the LNP", GRN: "the Greens", ON: "One Nation", ONP: "One Nation", UAP: "the United Australia Party", UAPP: "the United Australia Party", JLN: "the Jacqui Lambie Network", AV: "Advance Australia", IND: "an independent" })[ab] || ab;
-  const joined = items.filter((c) => c.kind !== "replaced"), replaced = items.filter((c) => c.kind === "replaced");
-  // (the list's texts lead with the name — the rows bold-state them, the note says the verb itself)
-  const clause = (c) => { const v = c.text.startsWith(c.who) ? c.text.slice(c.who.length).trimStart() : c.text; return `${c.who}${v.startsWith(",") ? v : ` ${v}`}`; };
-  const pieces = joined.map(clause);
-  if (replaced.length) {
-    const who = replaced.map((c) => word(c.to));
-    pieces.push(replaced.length === 1 ? `${word(replaced[0].to)} replaced a senator` : `${listAnd(who)} replaced a senator each`);
+   from outside it, and which parties changed their senator — in the House
+   row's own words shape ("…election's, adjusted for changes since then.").
+   A surname respelling (Deb/Deborah O'Neill) and a family-level re-code
+   (the Queenslanders' LNP) are not movements */
+function senMovesNote(dn, d0, yr) {
+  const keyOf = (d) => `${d.st}|${d.n.split(/\s+/).pop().toLowerCase()}`;
+  const goneByKey = new Map(d0.divs.map((d) => [keyOf(d), d]));
+  const switched = [], arrived = [];
+  for (const d of dn.divs) {
+    const b = goneByKey.get(keyOf(d));
+    if (b) { goneByKey.delete(keyOf(d)); if (b.hold.fam !== d.hold.fam) switched.push(d); }
+    else arrived.push(d);
   }
-  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then${scopeWhere(m, st)}. ${pieces.map(cap).join(". ")}.`;
+  const left = [...goneByKey.values()], replaced = [];
+  for (const a of arrived) {
+    const j = left.findIndex((l) => l.st === a.st && l.hold.ab === a.hold.ab);
+    if (j >= 0) { replaced.push(a.hold.ab); left.splice(j, 1); }
+  }
+  if (!switched.length && !replaced.length) return "";
+  const word = (ab) => ({ ALP: "Labor", LP: "the Liberals", NP: "the Nationals", LNP: "the LNP", GRN: "the Greens", ON: "One Nation", ONP: "One Nation", UAP: "the United Australia Party", UAPP: "the United Australia Party", JLN: "the Jacqui Lambie Network", AV: "Advance Australia", IND: "an independent" })[ab] || ab;
+  const pieces = [];
+  for (const d of switched) pieces.push(`${ds(d.n)} has joined ${word(d.hold.ab)}`);
+  if (replaced.length) {
+    const cnt = {};
+    for (const ab of replaced) cnt[ab] = (cnt[ab] || 0) + 1;
+    const who = Object.keys(cnt).map(word);
+    pieces.push(who.length === 1 && cnt[Object.keys(cnt)[0]] === 1 ? `${who[0]} replaced a senator` : `${listAnd(who)} replaced a senator each`);
+  }
+  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then. ${pieces.map(cap).join(". ")}.`;
 }
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
@@ -10444,18 +10137,8 @@ function seatStat(m, st, label, noteDef = null) {
   // 2025 election's chamber, exactly as the lower house's seats do (never
   // against the election before that, as m.res.prev would price it)
   const deckP = deck ? SENY[isNowY(m.year) ? frameBaseY(m.year) : prevYearOf(m.year)] || null : null;
-  const senNote = deck && isNowY(m.year) && m.senChanges ? senChangeNote(m, frameBaseY(m.year), st) : "";
+  const senNote = deck && deckP && isNowY(m.year) && st === "AUS" ? senMovesNote(deck, deckP, frameBaseY(m.year)) : "";
   const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
-  /* the base deck's day is the senators' seating day ("the election's senators"
-     handed over 1 July 2025), so moves between election day and that snapshot —
-     Cox defection, Urquhart-replaced — sit silently inside it. Undo them here
-     (family level: a party-room move swaps no seats) so the delta line reads
-     the election's own composition, as the note does */
-  const tallyElecDay = (dd, sel) => {
-    const c = tallyOf(dd, sel);
-    for (const x of m.senChanges || []) if (x.from && x.to && x.date < (dd.asOf || "") && (!sel || x.st === sel)) { const f0 = FAM(x.from), f1 = FAM(x.to); if (f0 !== f1) { c[f1] = (c[f1] || 0) - 1; c[f0] = (c[f0] || 0) + 1; } }
-    return c;
-  };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
   const seatsNote = !deck && noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
@@ -10463,7 +10146,7 @@ function seatStat(m, st, label, noteDef = null) {
   // series on an election frame, else the pool's seat-by-seat reversion — and
   // the previous chamber's tally where the deck reads
   const sCnt = deck ? tallyOf(deck, deckSt) : cnt;
-  const base = deck ? { c: deckP ? tallyElecDay(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  const base = deck ? { c: deckP ? tallyOf(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
   const a = sCnt.alp || 0, l = sCnt.lnp || 0;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
@@ -10752,7 +10435,7 @@ function areaHedDek(m, st) {
 
 // the census people measures, area level: who holds the fifth of seats at each end
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats where the most people aged 15+ hold a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12less: ["seats where the most residents aged 15+ left school before Year 12", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
-  pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"] };
+  pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"], unemp: ["seats with the most people out of work", "with the fewest"] };
 // Ancestry option phrases, generated per option of the select menu
 const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.entries(ANC_NAME) : []).map(([k, n]) => [k, [`seats where the most residents named ${n} ancestry`, "with the fewest"]]));
 const REL_TOP = { norel: ["seats where the most residents say they have no religion", "with the fewest"], cath: ["seats with the most Catholic residents", "with the most of another faith"], angl: ["seats with the most Anglican residents", "with the fewest"], unch: ["seats with the most Uniting Church residents", "with the fewest"], pres: ["seats with the most Presbyterian residents", "with the fewest"], orth: ["seats with the most Orthodox residents", "with the fewest"], budd: ["seats with the most Buddhist residents", "with the fewest"], isl: ["seats with the most Muslim residents", "with the fewest"], hind: ["seats with the most Hindu residents", "with the fewest"], jew: ["seats with the most Jewish residents", "with the fewest"] };
@@ -10940,94 +10623,27 @@ const VT_ERAS = {
 };
 // an election only draws the chart where every seat's piles split the final
 // two (test-map-page.mjs pins that coverage from 2016 on); "now" rides 2025's
-function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "now" ? 2025 : +y] || null; }
-/* The Senate's own band sets, timed by the Senate count's own clock in
-   the AEC's count-fortnight statements, not copied from the House's rows.
-   2025 moved the game: early-centre Senate ballots were never touched on
-   election night — their count opened Monday 5 May at out-posted centres,
-   while election-night Senate first preferences came from polling places'
-   ordinary piles once their division's House count ended (the user-supplied
-   labels year). 2019/2022 counted both chambers in one program, so they keep
-   the House layout but the Senate's own basis: 2019 election night covered
-   every day-cast ballot (HoR AND Senate) plus ">90% of pre-poll votes"
-   (media/media-releases/2019/05-20, quotes verbatim), the remaining Senate
-   pre-poll first preferences finishing Monday–Tuesday (.../05-21), postal in
-   close seats Sunday and everywhere from Tuesday (.../05-20a); 2022's Count
-   Timeline says "First preferences were also counted for every Senate ballot
-   paper" on election night (media/2022/05-27) with postal from Sunday in
-   every division (.../05-22, .../05-27). 2016's timing is quoted too
-   (media/media-releases/2016/07-03e: polling places' Senate ballots on the
-   night, pre-poll Senate ordinary "may also start on Monday", postal verified
-   Monday and counted from Tuesday) — but 2016's venue-split data is provably
-   dirty (the producer docstring), so its era shows one whole "Ordinary votes"
-   band with its own timing instead of a day/early-centre split it can't
-   warrant: an ordinary pile means the 2016 chart carries no day/mob/ppvc
-   split, admitted in the band's own label. */
-const VT_ERAS_SEN = {
-  2025: [
-    ["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"],
-    ["early", "Early centres", ["ppvc"], "From Monday, 5 May"],
-    ["day", "On the day", ["day", "mob"], "Election night, after House count"],
-  ],
-  2022: [
-    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
-    ["post", "Postal", ["post"], "From Sunday"],
-    ["early", "Early centres", ["ppvc"], "On the night"],
-    ["day", "On the day", ["day", "mob"], "On the night"],
-  ],
-  2019: [
-    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
-    ["post", "Postal", ["post"], "From Tuesday"],
-    ["early", "Early centres", ["ppvc"], "On the night"],
-    ["day", "On the day", ["day", "mob"], "On the night"],
-  ],
-  2016: [
-    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
-    ["post", "Postal", ["post"], "From Tuesday"],
-    ["ord", "Ordinary votes", ["ord"], "Election night, rest from Monday"],
-  ],
-};
-// the measure toggle's parties and words. 2PP stays the default reading of
-// the bands; each other measure is that grouping's first-preference share of
-// a pile, pooled straight from each seat's vt3 first-preference piles
-const VT_PARTIES = [["tpp", "2PP"], ["alp", "ALP"], ["lnp", "L/NP"], ["grn", "GRN"], ["onp", "ON"], ["oth", "OTH"]];
-const VT_PARTIES_SEN = VT_PARTIES.slice(1); // no 2PP in the Senate: ALP L/NP GRN ON OTH
-// mid-sentence measures by party: heading noun (appended " primary"), owner in the skew note
-const VT_WORDS = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "other candidates" };
-const VT_POSS = { alp: "Labor's", lnp: "the Coalition's", grn: "the Greens'", onp: "One Nation's", oth: "other candidates'" };
-let vtMode = "skew", vtParty = "tpp", vtSenParty = "alp", vtLast = null;
-/* a Skew/Effect or party switch redraws its own block alone, its buttons held where
+function vtBandsFor(y) { return VT_ERAS[y === "now" ? 2025 : +y] || null; }
+let vtMode = "skew", vtLast = null;
+/* the Skew/Effect switch redraws its own block alone, its buttons held where
    they stood on screen: re-rendering the whole story let the page reflow under
    the reader (it shrank for a frame and the browser pulled the page up) */
-function vtRedraw(sel) {
-  const old = $("#story .vt-chart"), btn = old && old.querySelector(sel);
-  if (!old || !vtLast) { renderStory(true); $(`#story ${sel}`)?.focus({ preventScroll: true }); return; }
+function setVtMode(mode) {
+  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
+  vtMode = mode;
+  const old = $("#story .vt-chart"), btn = old && old.querySelector(`[data-vt-mode="${mode}"]`);
+  if (!old || !vtLast) { renderStory(true); $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true }); return; }
   const top = btn.getBoundingClientRect().top, html = document.documentElement, anchor = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
   const box = document.createElement("div");
-  box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography, vtLast.senate);
+  box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography);
   const next = box.firstElementChild;
   old.replaceWith(next);
-  const nb = next.querySelector(sel);
+  const nb = next.querySelector(`[data-vt-mode="${mode}"]`);
   const shift = Math.round(nb.getBoundingClientRect().top - top);
   if (shift) { if (FS.on && FS.scroll && FS.scroll.contains(next)) FS.scroll.scrollTop += shift; else window.scrollBy(0, shift); }
   html.style.overflowAnchor = anchor;
   nb.focus({ preventScroll: true });
-}
-function setVtMode(mode) {
-  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
-  vtMode = mode;
-  vtRedraw(`[data-vt-mode="${mode}"]`);
-}
-function setVtParty(party) {
-  if (!VT_PARTIES.some(([k]) => k === party) || party === vtParty) return;
-  vtParty = party;
-  vtRedraw(`[data-vt-party="${party}"]`);
-}
-function setVtSenParty(party) {
-  if (!VT_PARTIES_SEN.some(([k]) => k === party) || party === vtSenParty) return;
-  vtSenParty = party;
-  vtRedraw(`[data-vt-party="${party}"]`);
 }
 // the margin list's two reads — tightest margins ("Most marginal") or widest
 // ("Safest"); the head's up/down toggle flips it and re-renders like setVtMode
@@ -11038,50 +10654,26 @@ function setCloseSafe(safe) {
   renderStory(true);
   $("#story [data-close-toggle]")?.focus({ preventScroll: true });
 }
-function vtBands(divs, senate) {
-  const counts = {}, total2 = [0, 0], fpart = { i: -1, counts: {}, total: 0 };
-  const parties = senate ? VT_PARTIES_SEN : VT_PARTIES;
-  for (const [i, [k]] of parties.entries()) if (k === (senate ? vtSenParty : vtParty)) fpart.i = senate ? i : i - 1; // tpp is VT_PARTIES[0]: fams in 5-wide order behind it
+function vtBands(divs) {
+  const counts = {}, total2 = [0, 0];
   let tot = 0;
-  const pileN = {}; // senate: the pile's ballots = its five families' sum
   for (const d of divs) {
-    if (!senate) {
-      const v = d.vt;
-      tot += (v.ord || 0) + (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0);
-      for (const [k, p] of Object.entries(d.vt2 || {})) {
-        const t = (counts[k] ??= [0, 0]);
-        t[0] += p[0]; t[1] += p[1];
-        total2[0] += p[0]; total2[1] += p[1];
-      }
-      if (fpart.i < 0 || !d.vt3) continue;
-      for (const [k, p] of Object.entries(d.vt3)) {
-        fpart.counts[k] = (fpart.counts[k] || 0) + p[fpart.i];
-        fpart.total += p[fpart.i];
-      }
-      continue;
-    }
-    if (!d.vts) continue;
-    for (const [k, p] of Object.entries(d.vts)) {
-      const pt = p[0] + p[1] + p[2] + p[3] + p[4];
-      pileN[k] = (pileN[k] || 0) + pt;
-      tot += pt;
-      fpart.counts[k] = (fpart.counts[k] || 0) + p[fpart.i];
-      fpart.total += p[fpart.i];
+    const v = d.vt;
+    tot += (v.ord || 0) + (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0);
+    for (const [k, p] of Object.entries(d.vt2 || {})) {
+      const t = (counts[k] ??= [0, 0]);
+      t[0] += p[0]; t[1] += p[1];
+      total2[0] += p[0]; total2[1] += p[1];
     }
   }
-  // The vote-type counts exhaust each seat's official two-party total;
-  // a party measure reads the same piles' first preferences instead; the
-  // Senate's piles are nothing BUT first preferences (its five exhaust every
-  // pile), so each band denominates on the pile's own ballots
-  const primary = senate || fpart.i >= 0;
-  const base = primary ? (tot > 0 ? (100 * fpart.total) / tot : null) : total2[0] + total2[1] > 0 ? (100 * total2[0]) / (total2[0] + total2[1]) : null;
-  const complete = senate ? divs.every((d) => d.vts) : (fpart.i >= 0 ? divs.every((d) => d.vt3) : divs.every((d) => d.vt2));
-  const bands = (vtBandsFor(M().year, senate) || []).map(([k, l, keys, time]) => {
-    const v = senate ? keys.reduce((n, key) => n + (pileN[key] || 0), 0) : divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
-    const a = primary ? keys.reduce((n, key) => n + (fpart.counts[key] || 0), 0) : keys.reduce((n, key) => n + (counts[key]?.[0] || 0), 0);
-    const n = primary ? v : keys.reduce((n, key) => n + (counts[key]?.[0] || 0) + (counts[key]?.[1] || 0), 0);
-    const lab = n > 0 ? (100 * a) / n : null;
-    return { k, l, time, v, a, n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
+  // The vote-type counts exhaust each seat's official two-party total.
+  const base = total2[0] + total2[1] > 0 ? 100 * total2[0] / (total2[0] + total2[1]) : null;
+  const complete = divs.every((d) => d.vt2);
+  const bands = (vtBandsFor(M().year) || []).map(([k, l, keys, time]) => {
+    const v = divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
+    const t = keys.reduce((p, key) => [p[0] + (counts[key]?.[0] || 0), p[1] + (counts[key]?.[1] || 0)], [0, 0]);
+    const n = t[0] + t[1], lab = n > 0 ? 100 * t[0] / n : null;
+    return { k, l, time, v, a: t[0], n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
   });
   // Counting order runs up the graphic: day, early/postal, then declarations.
   // Pool actual two-party counts, not rounded shares or primary-vote totals.
@@ -11096,42 +10688,36 @@ function vtBands(divs, senate) {
 }
 // A figures-menu choice changes the chart's electorate pool as well as its
 // heading. A map state or seat selection takes precedence over that menu.
-function vtScope(m, st, senate) {
+function vtScope(m, st) {
   // the head's own pool: the area, narrowed by the seat-type filter where one is on
-  const cls = clsFilter(m), pst = st === "AUS" ? null : st, key = senate ? "vts" : "vt";
-  const divs = m.res.divs.filter((d) => d[key] && (!pst || d.st === pst) && (!cls || d.cls === cls));
+  const cls = clsFilter(m), pst = st === "AUS" ? null : st;
+  const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));
   const geography = cls && pst ? `${CLS_LOWER[cls]} seats in ${STATE_SHORT[pst]}` : cls ? `${CLS_LOWER[cls]} seats` : pst ? STATE_SHORT[pst] : "nationwide";
   return { divs, geography };
 }
-function vtBandsBlock(divs, area, geography, senate) {
-  const { bands, tot } = vtBands(divs, senate);
+function vtBandsBlock(divs, area, geography) {
+  const { bands, tot } = vtBands(divs);
   if (!tot) return "";
-  vtLast = { divs, area, geography, senate };
-  const effect = vtMode === "effect", prim = senate || vtParty !== "tpp", place = geography || divs[0].n.replace(/'/g, "’");
-  const partyList = senate ? VT_PARTIES_SEN : VT_PARTIES, selected = senate ? vtSenParty : vtParty;
-  // the measure noun: "2PP", or "<Party> primary"
-  const word = prim ? `${VT_WORDS[senate ? vtSenParty : vtParty]} primary` : "2PP";
-  const heading = effect ? `Change in cumulative ${word}` : place === "nationwide" ? `National ${word} skew` : `Skew on ${place} ${word}`;
-  const parties = `<div class="vt-modes vt-parties" role="group" aria-label="Vote-type party">${partyList.map(([k, lab]) => `<button type="button" class="vt-mode" data-vt-party="${k}" aria-pressed="${selected === k}">${lab}</button>`).join("")}</div>`;
+  vtLast = { divs, area, geography };
+  const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
+  const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
-  const measure = prim ? word : "Labor 2PP";
-  const rows = bands.map((r, ri) => {
+  const rows = bands.map((r) => {
     const value = effect ? r.effect : r.skew, text = effect && value == null ? "—" : sgn(value);
-    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? (prim ? `t-${senate ? vtSenParty : vtParty}` : "vt-alp") : prim ? "" : "vt-lnp") : "";
+    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? "vt-alp" : "vt-lnp") : "";
     const reading = effect
-      ? value != null ? `${text} percentage-point change in ${place} cumulative ${measure}` : ri === bands.length - 1 && r.cumulative != null ? "Opening count; no preceding group" : `Change in cumulative ${prim ? "primary" : "two-party"} share unavailable`
-      : value == null ? `${prim ? "primary" : "two-party"} skew unavailable` : `${text} percentage points on ${place} ${measure}`;
+      ? value != null ? `${text} percentage-point change in ${place} cumulative Labor 2PP` : r.k === "day" && r.cumulative != null ? "Opening count; no preceding group" : "Change in cumulative two-party share unavailable"
+      : value == null ? "two-party skew unavailable" : `${text} percentage points on ${place} Labor 2PP`;
     return `<div class="vt-band vt-band-${r.k}" role="listitem" style="--vt-share:${r.share}" aria-label="${esc(`${f1(r.share)}%, ${r.l}; counting ${r.time.toLowerCase()}; ${reading}`)}"><b class="vt-share">${f1(r.share)}%</b><span class="vt-label">${esc(r.l)}<small class="vt-time">${esc(r.time)}</small></span><b class="vt-skew ${tone}">${text}</b></div>`;
   }).join("");
   const notes = effect
-    ? [`Percentage-point change in ${prim ? `the cumulative ${word}` : "Labor’s cumulative 2PP"} when each group is added, counting from bottom to top. The opening count has no preceding group.`, "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
-    : [`Skews are percentage points in ${prim ? `${VT_POSS[senate ? vtSenParty : vtParty]} primary share` : "Labor’s two-party share"}. Mobile teams are included with on-the-day ordinary votes.`];
+    ? ["Percentage-point change in Labor’s cumulative 2PP when each group is added, counting from bottom to top. The opening count has no preceding group.", "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
+    : ["Skews are percentage points in Labor’s two-party share. Mobile teams are included with on-the-day ordinary votes."];
   if (area) notes.push("Postal, absent and declaration votes have no place on the map, so balloons and the surface leave them out.");
-  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)}${senate ? " Senate" : ""} formal</small></h3>${parties}${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : prim ? `${word} skews` : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
+  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
 }
-function vtBlock(divs, area, geography, senate) {
-  if (senate) return vtBandsFor(M().year, true) ? vtBandsBlock(divs, area, geography, true) : "";
-  if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography, false);
+function vtBlock(divs, area, geography) {
+  if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography);
   const { rows, tot, seats2 } = vtRows(divs), two = rows.some((r) => r.lab != null);
   const notes = [vtFinding(rows)];
   if (!two) notes.push(M().year === 1993 ? "The 1993 count doesn’t split the final two by how votes were cast." : `The count splits these votes two-party only where the final two were Labor and ${coalW(0)}.`);
@@ -11213,14 +10799,8 @@ function storyArea(m, st) {
     if (m.year !== "now") h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
-  /* the cast section reads Senate ballots in the lenses that read the Senate
-     count (same swap as the preferences section's), but only where the Senate
-     count has an era here: no House piles masquerading in the Senate lens, and
-     no invented timing for the Senate's earlier years (2025's sequencing is
-     the user's own instruction; earlier Senates wait on sourced timing) */
-  const senCast = (S.lens === "senate" || S.lens === "senpref") && vtBandsFor(m.year, true) != null;
-  const castScope = vtScope(m, st, senCast), cast = castScope.divs;
-  if (!(senLanes && !senCast) && cast.length) h += vtBlock(cast, true, vtBandsFor(m.year, senCast) ? castScope.geography : undefined, senCast);
+  const castScope = vtScope(m, st), cast = castScope.divs;
+  if (cast.length) h += vtBlock(cast, true, vtBandsFor(m.year) ? castScope.geography : undefined);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
@@ -11418,8 +10998,7 @@ function storyDiv(m, i) {
   const spf = (S.lens === "senate" || S.lens === "senpref") && !d.by ? seatSpRows(m, d) : "";
   if (spf) h += `<div class="st-sec"><h3>Where preferences went <small>on Senate ${spGvtYear(m.year) != null ? "tickets" : "ballots"}</small></h3>${spf}</div>`;
   else { const fl = flowRows(d.flows, d.A, d.B); if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`; }
-  if (S.lens === "senate" || S.lens === "senpref") { if (!d.by && d.vts && vtBandsFor(M().year, true)) h += vtBlock([d], undefined, undefined, true); }
-  else if (d.vt) h += vtBlock([d]);
+  if (d.vt) h += vtBlock([d]);
   const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
   const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
   /* the national view's plain line, with the seat's comparison inside it
@@ -12757,22 +12336,12 @@ function jumpHTML() {
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
   return `<div class="lg-jump lg-row" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}</div>`;
 }
-/* the jump row leaves the strip only when a seat is chosen (or in another view), never
-   for zoom. It once hid at 3 x HOME.k: the stage is the strip's remainder and HOME.k is
-   the country's fit to that stage, so the row's going grew the stage, lowered HOME.k,
-   crossed back under 3 x and brought the row back — the stage flipped 30px every frame
-   while the zoom sat in that band (user report 2026-11-10: the map "jumps up and down
-   aggressively" at one zoom). Holding its line instead would only leave a hole, and the
-   cities stay good jump targets at any depth. Zooming never resizes the stage. */
-function jumpRowVis(cit) {
-  if (cit) cit.hidden = S.view !== "map" || selDiv() != null;
-}
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
   const cit = $("#cities");
-  // the strip's jump row hides while a seat is chosen —
+  // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
   // re-fixed here because renderLegend re-creates it on every render
-  jumpRowVis(cit);
+  if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
   $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
   renderFrames();
@@ -12898,7 +12467,8 @@ function updateHint() {
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover to check local coverage, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   // the row stays while a jump selection is live, so it can be toggled back off
-  jumpRowVis($("#cities"));
+  const citRow = $("#cities");
+  if (citRow) citRow.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
@@ -13052,8 +12622,6 @@ function setLens(id) {
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
   recolor(true); renderLegend(); renderStory(true); writeURL();
-  // the head line follows the lens (the senate lenses say the current Senate)
-  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
 }
@@ -13285,14 +12853,6 @@ function tlGlide(r0) {
 }
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
-  /* the senate lanes' line names the chamber like the head does (user call
-     2026-11-10): the current Senate, with its last move off the senate
-     change window rather than the House list's */
-  const senLens = !sen && m.year === "now" && (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && (SENM || SENY.now);
-  if (senLens) {
-    const deck = SENM || SENY.now, moved = (m.senChanges || []).reduce((a, c) => (c.date > a ? c.date : a), "") || deck.asOf;
-    return `The current Senate, last changed ${longDate(moved)} · ${deck.divs.length} senators`;
-  }
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   // the federal Now names its last move over a data tick: the newest "Since the election" entry
   const changed = (m.changes || []).reduce((a, c) => (c.date > a ? c.date : a), "") || m.asOf;
@@ -13586,8 +13146,6 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
-  const voteParty = e.target.closest("[data-vt-party]");
-  if (voteParty) { (vtLast && vtLast.senate ? setVtSenParty : setVtParty)(voteParty.dataset.vtParty); return; }
   const voteMode = e.target.closest("[data-vt-mode]");
   if (voteMode) { setVtMode(voteMode.dataset.vtMode); return; }
   const closeTgl = e.target.closest("[data-close-toggle]");
@@ -13757,7 +13315,7 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   // A focused chart toggle keeps its native keyboard activation.
-  if (e.key === " " && e.target.closest("[data-vt-mode],[data-vt-party]")) return;
+  if (e.key === " " && e.target.closest("[data-vt-mode]")) return;
   if (e.key === "b") { if (S.view === "map" && !$("#zback").hidden) { e.preventDefault(); goAus(); } }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
   if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }

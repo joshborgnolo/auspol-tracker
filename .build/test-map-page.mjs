@@ -134,105 +134,20 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
         for (const [k, p] of Object.entries(d.vt2)) assert.ok(k in d.vt || ["day", "mob"].includes(k), `${y} ${d.n}: unknown pile ${k}`);
         assert.equal(sum2(d.vt2.pre), d.vt.pre, `${y} ${d.n}: declaration pre-poll votes all reach the two-party count`);
         assert.equal(sum2(d.vt2.post), d.vt.post, `${y} ${d.n}: postal votes all reach the two-party count`);
-        // first-preference piles beside them (vote-type chart's party toggle): alp/lnp/grn/onp/oth, "oth" pooling independents
-        assert.ok(d.vt3, `${y} ${d.n} has its first-preference piles (build_vote_piles.py, then assemble)`);
-        assert.deepEqual(Object.keys(d.vt3).sort(), Object.keys(d.vt2).sort(), `${y} ${d.n}: first-preference piles mirror the two-party piles`);
-        for (const [k, p] of Object.entries(d.vt3)) {
-          assert.equal(p.length, 5, `${y} ${d.n}: five first-preference groupings in pile ${k}`);
-          assert.equal(p.reduce((a, v) => a + v, 0), sum2(d.vt2[k]), `${y} ${d.n}: pile ${k} first preferences reach the two-party pile`);
-        }
-        // each grouping's piles add up to the final count of its candidates
-        const F5I = { alp: 0, lnp: 1, grn: 2, onp: 3, ind: 4, oth: 4 };
-        const want = [0, 0, 0, 0, 0];
-        for (const c of d.c) want[F5I[c[3]]] += c[4];
-        const got = [0, 0, 0, 0, 0];
-        for (const p of Object.values(d.vt3)) for (let i = 0; i < 5; i++) got[i] += p[i];
-        assert.deepEqual(got, want, `${y} ${d.n}: first-preference piles add up to the final count`);
-        // the Senate's equivalent lane (build_senate_piles.py): vts, the same
-        // five groupings per pile — venue-split everywhere but 2016, whose
-        // polling-place product is provably dirty: 2016 keeps one "ord" pile
-        const pilesUnion = y === 2016 ? ["ord", "pre", "post", "abs", "prov"] : ["day", "mob", "ppvc", "pre", "post", "abs", "prov"];
-        assert.ok(d.vts, `${y} ${d.n} has Senate piles (python3 -I .build/map/build_senate_piles.py, then assemble)`);
-        if (y === 2016) assert.ok(d.vts.ord && !d.vts.day && !d.vts.ppvc && !d.vts.mob, `${y} ${d.n}: 2016's one ordinary pile, never venue-split`);
-        const sv = JSON.parse(R(`map/data/senate-vote-${y}.json`)).divs[d.n];
-        let svTot = 0;
-        const famSV = [0, 0, 0, 0, 0];
-        for (const [k, p] of Object.entries(d.vts)) {
-          assert.ok(pilesUnion.includes(k), `${y} ${d.n}: pile ${k} outside ${y}'s shape`);
-          assert.equal(p.length, 5, `${y} ${d.n}: five Senate groupings in pile ${k}`);
-          svTot += p.reduce((a, v) => a + v, 0);
-          for (let i = 0; i < 5; i++) famSV[i] += p[i];
-        }
-        assert.equal(svTot, sv[0], `${y} ${d.n}: Senate piles exhaust the Senate's formal votes`);
-        assert.deepEqual(famSV, [sv[1], sv[2], sv[3], sv[4], sv[5] + sv[6]], `${y} ${d.n}: Senate piles add up to the Senate deck's families`);
       } else if (classic) {
         assert.ok(d.vt2, `${y} ${d.n}: a Labor v Coalition seat has piles`);
         const A = d.tcp[fam.indexOf("alp")][1], C = d.tcp[fam.indexOf("lnp")][1];
         assert.deepEqual(add(d.vt2), [A, C], `${y} ${d.n}: the piles add up to the final two`);
-        assert.ok(!d.vt3, `${y} ${d.n}: no first-preference piles before 2016`);
       } else assert.ok(!d.vt2, `${y} ${d.n}: no two-party split from a final two of another pair`);
     });
   }
-  assert.ok(JSON.parse(R("map/data/res-1993.json")).divs.every((d) => !d.vt2 && !d.vt3), "1993's count stops at the division: no piles");
+  assert.ok(JSON.parse(R("map/data/res-1993.json")).divs.every((d) => !d.vt2), "1993's count stops at the division: no piles");
   // the national figures quoted when this shipped: the headline is the AEC's own, and the piles reach it
   const r = JSON.parse(R("map/data/res-2025.json")), T = {};
   for (const d of r.divs) for (const [k, p] of Object.entries(d.vt2)) { const t = (T[k] ??= [0, 0]); t[0] += p[0]; t[1] += p[1]; }
   const lab = (k) => Math.round((1000 * T[k][0]) / (T[k][0] + T[k][1])) / 10;
   assert.deepEqual([lab("day"), lab("ppvc"), lab("post")], [58.0, 53.0, 51.6], "2025 on the day, early centres, postal");
   assert.deepEqual(add(Object.fromEntries(Object.entries(T))), r.agg.AUS.tpp.slice(0, 2), "2025's piles add up to the national two-party count");
-  // the primary piles' own headline oracles (vt3): Australia's first preferences per pile, and its formal splits
-  const F3 = {}, P3 = { alp: 0, lnp: 1, grn: 2, onp: 3, oth: 4 };
-  for (const d of r.divs) for (const [k, p] of Object.entries(d.vt3)) { const t = (F3[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) t[i] += p[i]; }
-  const formal3 = (k) => F3[k].reduce((a, v) => a + v, 0);
-  const share3 = (k, f) => Math.round((1000 * F3[k][P3[f]]) / formal3(k)) / 10;
-  {
-    const tot3 = Object.values(F3).reduce((a, p) => a + p.reduce((x, v) => x + v, 0), 0);
-    assert.equal(tot3, 15490236, "2025 first-preference piles reach the national formal count");
-    const nat3 = (i) => Math.round((1000 * ["day", "mob", "ppvc", "pre", "post", "abs", "prov"].reduce((a, k) => a + (F3[k] ? F3[k][i] : 0), 0)) / tot3) / 10;
-    assert.deepEqual([nat3(0), nat3(1), nat3(2), nat3(3), nat3(4)], [34.6, 31.8, 12.2, 6.4, 15.0], "2025's piles add up to the national primaries: Labor, Coalition, Greens, One Nation, other");
-    assert.deepEqual([share3("day", "alp"), share3("ppvc", "alp"), share3("post", "alp")], [34.7, 34.7, 34.5], "2025 Labor primary on the day, at early centres, by post");
-    assert.deepEqual([share3("day", "grn"), share3("post", "grn")], [14.2, 9.5], "2025 Greens primary on the day and by post");
-    assert.equal(share3("mob", "grn"), 5.1, "2025 Greens primary with mobile teams: remote communities are not heartland");
-    assert.equal(share3("post", "onp"), 6.8, "2025 One Nation primary by post");
-    assert.equal(share3("abs", "grn"), 19.4, "2025 Greens primary among absentees: the biggest share of any pile");
-  }
-  // the Senate's own pile oracles (vts): Australia's Senate first preferences
-  // per pile against its formal vote, the deck's own family shares beneath
-  {
-    const V = {}, NV = {};
-    for (const d of r.divs) for (const [k, p] of Object.entries(d.vts)) { const t = (V[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) t[i] += p[i]; NV[k] = (NV[k] || 0) + p.reduce((a, v) => a + v, 0); }
-    const totV = Object.values(NV).reduce((a, v) => a + v, 0);
-    const SV_I = { alp: 0, lnp: 1, grn: 2, onp: 3, oth: 4 };
-    const shareV = (ks, f) => Math.round((1000 * ks.reduce((a, k) => a + V[k][SV_I[f]], 0)) / ks.reduce((a, k) => a + NV[k], 0)) / 10;
-    const PILES2 = ["day", "mob", "ppvc", "pre", "post", "abs", "prov"];
-    assert.equal(totV, 15871189, "2025 Senate piles reach the Senate's formal count");
-    assert.deepEqual(PILES2.map((k) => shareV([k], "alp").toFixed(1)), ["35.0", "40.4", "35.8", "32.8", "34.9", "31.8", "32.2"], "2025 Senate ALP per pile (mobile teams its strongest; the declaration piles run 2+ points under the day's 35.0)");
-    assert.equal(shareV(["day", "mob"], "grn"), 13.5, "2025 Senate Greens on the day");
-    assert.equal(shareV(["ppvc"], "grn"), 10.1, "2025 Senate Greens at early centres");
-    assert.equal(shareV(["abs"], "grn"), 16.6, "2025 Senate Greens among absentees");
-    assert.equal(shareV(["post"], "lnp"), 35.0, "2025 Senate Coalition by post");
-    const senJSON = JSON.parse(R("map/data/senate-vote-2025.json"));
-    const svRows = Object.values(senJSON.divs), svDen = svRows.reduce((a, x) => a + x[0], 0);
-    const natF = (i) => Math.round((1000 * svRows.reduce((a, x) => a + x[i], 0)) / svDen) / 10;
-    const natOth = Math.round((1000 * svRows.reduce((a, x) => a + x[5] + x[6], 0)) / svDen) / 10;
-    assert.deepEqual([natF(1), natF(2), natF(3), natF(4), natOth], [35.1, 29.9, 11.7, 5.7, 17.6], "2025 Senate families pooled: ALP, Coalition, Greens, One Nation, other");
-  }
-  // and 2016's own ordinary-shaped lane: one "ord" band, postal with the
-  // declarations, the same deck contract — its National totals pinned here
-  {
-    const r16 = JSON.parse(R("map/data/res-2016.json"));
-    const V = {}, NV = {};
-    for (const d of r16.divs) for (const [k, p] of Object.entries(d.vts)) { const t = (V[k] ??= [0, 0, 0, 0, 0]); for (let i = 0; i < 5; i++) t[i] += p[i]; NV[k] = (NV[k] || 0) + p.reduce((a, v) => a + v, 0); }
-    const totV = Object.values(NV).reduce((a, v) => a + v, 0);
-    assert.equal(totV, 13838900, "2016 Senate piles reach the Senate's formal count");
-    const sh = (ks, i) => Math.round((1000 * ks.reduce((a, k) => a + V[k][i], 0)) / ks.reduce((a, k) => a + NV[k], 0)) / 10;
-    assert.equal(sh(["ord"], 0), 30.3, "2016 Senate ALP among ordinary votes (day & early centres)");
-    assert.equal(sh(["pre", "abs", "prov", "post"], 1), 35.8, "2016 Senate Coalition across the late piles");
-    assert.equal(sh(["post"], 2), 7.0, "2016 Senate Greens by post");
-    const SI = ["alp", "lnp", "grn", "onp", "oth"];
-    const nat16 = (i) => Math.round((1000 * r16.divs.reduce((a, d) => a + Object.values(d.vts).reduce((s, p) => s + p[SI.indexOf(i)], 0), 0)) / totV) / 10;
-    assert.deepEqual([nat16("alp"), nat16("lnp"), nat16("grn"), nat16("onp"), nat16("oth")], [29.8, 35.2, 8.7, 4.3, 22.1], "2016 Senate families pooled: ALP, Coalition, Greens, One Nation, other");
-  }
 }
 // the primary-change same-place lane (build_map_data.py's prevFp join): every
 // federal frame from 2007 carries the previous election's family shares at
@@ -274,33 +189,12 @@ assert.equal(R("map/map.css"), part("page.css") + "\n" + R(".build/retro/chrome.
   assert.ok(js.includes('if (boothsOn && ch && m.res.booths && m.res.booths.prevFp) h += `<div class="lg-note"><span class="lg-hatch"></span>Place not used last time</div>`;'),
     "the fp-change legend explains the unjoined booths' hatch");
 }
-assert.ok(js.includes("else if (d.vt) h += vtBlock([d]);") && js.includes("if (!(senLanes && !senCast) && cast.length) h += vtBlock(cast, true, vtBandsFor(m.year, senCast) ? castScope.geography : undefined, senCast);"), "a seat, a state and the country share one How votes were cast block, chamber-swapped by lens: the Senate lenses read the Senate piles, never House piles in a Senate story");
-assert.ok(js.includes("const castScope = vtScope(m, st, senCast), cast = castScope.divs;") && js.includes('const cls = clsFilter(m), pst = st === "AUS" ? null : st, key = senate ? "vts" : "vt";') && js.includes("const divs = m.res.divs.filter((d) => d[key] && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool, its field per chamber); the area block reads election results, since Now blanks a by-election's piles");
-assert.ok(js.includes('if (senate) return vtBandsFor(M().year, true) ? vtBandsBlock(divs, area, geography, true) : "";') && js.includes("if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography, false);"), "2016 on, the elections' frames show the band chart, not the old table; the Senate lane renders only with a Senate era");
-assert.ok(js.includes('function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "now" ? 2025 : +y] || null; }'), "band eras: 2016/2019/2022/2025 House (+now riding 2025's era), Senate's own accessor alongside");
-// the Senate cast lane's eras: 2025 as the user dictated it (early-centre
-// Senate ballots NOT on the night; out-posted centres from Monday 5 May), and
-// 2019/2022 quoted in their AEC count-fortnight terms (both chambers in one
-// counting program those years — so those two mirror the House layout)
-{
-  const sen = js.indexOf("const VT_ERAS_SEN = {"), senEnd = js.indexOf("const VT_PARTIES_SEN = ");
-  assert.ok(sen > -1 && senEnd > sen);
-  const era = js.slice(sen, senEnd);
-  assert.ok(era.includes('["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"]'), "Senate 2025: postal with the declarations, over following days");
-  assert.ok(era.includes('["early", "Early centres", ["ppvc"], "From Monday, 5 May"]'), "Senate 2025's early-centre ballots counted from Monday, not on the night");
-  assert.ok(era.includes('["day", "On the day", ["day", "mob"], "Election night, after House count"]'), "Senate 2025's day band is election-night, after the House count");
-  assert.ok(era.includes('["post", "Postal", ["post"], "From Sunday"]'), "Senate 2022's postal counted from Sunday");
-  assert.ok(era.includes('["post", "Postal", ["post"], "From Tuesday"]'), "Senate 2019's postal counted from Tuesday");
-  const nights = era.match(/\["day", "On the day", \["day", "mob"\], "On the night"\]/g) || [];
-  assert.equal(nights.length, 2, "Senate 2019 & 2022 both chambers on the night");
-  assert.ok(js.includes("const VT_PARTIES_SEN = VT_PARTIES.slice(1);"), "the Senate lane has no 2PP button: ALP L/NP GRN ON OTH");
-  assert.ok(js.includes("vtSenParty") && js.includes("function setVtSenParty(party)"), "the Senate measure rides its own selection (vtParty's tpp choice can't leak it)");
-  assert.ok(js.includes('<small>${int(tot)}${senate ? " Senate" : ""} formal</small>'), "the block names the chamber in its total tag");
-}
-assert.ok(js.includes("vts: d.vts || null"), "a seat keeps its Senate piles");
+assert.ok(js.includes("if (d.vt) h += vtBlock([d]);") && js.includes("if (cast.length) h += vtBlock(cast, true, vtBandsFor(m.year) ? castScope.geography : undefined);"), "a seat, a state and the country share one How votes were cast block");
+assert.ok(js.includes("const castScope = vtScope(m, st), cast = castScope.divs;") && js.includes("const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));"), "every frame's chart follows the page's filters (the head's own pool); the area block reads election results, since Now blanks a by-election's piles");
+assert.ok(js.includes("if (vtBandsFor(M().year)) return vtBandsBlock("), "2016 on, the elections' frames show the band chart, not the old table");
+assert.ok(js.includes("function vtBandsFor(y) { return VT_ERAS[y === \"now\" ? 2025 : +y] || null; }"), "band eras: 2016/2019/2022/2025 (+now riding 2025's era)");
 assert.ok(js.includes('"From Tuesday"') && js.includes('"From Sunday"'), "the 2016/2019/2022 band labels quote the AEC's per-election count sequencing (2016 & 2019 postal first counted Tuesday, 2022 postal first counted Sunday)");
 assert.ok(js.includes("vt2: d.vt2 || null"), "a seat keeps its piles' two-party split");
-assert.ok(js.includes("vt3: d.vt3 || null"), "a seat keeps its piles' first-preference split");
 assert.ok(!/\.stackl/.test(R("map/map.css")), "the old two-column legend is gone");
 // the birthplace menus' two eras: the 2021-GCP ten-country set, and the
 // 2001-census edition's own nine (its B 06 prints a whole-UK row the
@@ -1142,7 +1036,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.ok(Array.isArray(d.relKeys) && d.relKeys[0] === "norel" && d.relKeys.length === 10, `${y}: relKeys leads with norel (10 options)`);
     assert.ok(Array.isArray(d.tenKeys) && d.tenKeys[0] === "mort" && d.tenKeys.length === 4, `${y}: tenKeys leads with mort (4 options)`);
     const i = d.booths.demo.findIndex((x) => x !== null);
-    assert.equal(d.booths.demo[i].length, 17, `${y}: demo rows are 17-wide (12 + 4 lanes of the 2026-10-31 arc + hiqinc, the top-quarter income share)`);
+    assert.equal(d.booths.demo[i].length, 18, `${y}: demo rows are 17-wide (12 + 4 lanes of the 2026-10-31 arc + hiqinc, the top-quarter income share)`);
     assert.ok(Array.isArray(d.booths.rel[i]) && d.booths.rel[i].length === 10, `${y}: parallel booth religion rows`);
     assert.ok(Array.isArray(d.booths.ten[i]) && d.booths.ten[i].length === 4, `${y}: parallel booth tenure rows`);
     assert.ok(Array.isArray(d.booths.anc[i]) && d.booths.anc[i].length === 12, `${y}: parallel booth ancestry rows`);
@@ -1197,7 +1091,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
   assert.ok(sa.incomeCuts && sa.incomeCuts.hiEdgeWeekly === 4000 && sa.incomeCuts.dollarsYear === 2021, "sa26 incomeCuts: GCP-era band read at its 2021-era cuts");
   if ("seifaCuts" in sa) assert.equal(sa.seifaCuts, null, "sa26 has no voter-footprint SEIFA cuts");
-  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of sa.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `${d.n}: demo row`);
     for (const ix of IXS) {
@@ -1258,14 +1152,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa26 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 17 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is ten people cells plus the six of the 2026-10-31 arcs plus pt/noncit (income slots populated)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12 && an.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const adl = B.n.indexOf("Adelaide");
     assert.ok(adl >= 0, "sa26: the Adelaide booth exists");
     assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa26: the Adelaide booth's SA1 national deciles");
-    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.2701, 0.1675, 0.0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213], "sa26: the Adelaide booth's SA1 people cells, the six lanes of the 2026-10-31 arcs");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.1675, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213, 0.2701, 0.0268], "sa26: the Adelaide booth's SA1 people cells (positional DM order + unemp@17, 2026-11-10)");
     assert.deepEqual(B.anc[adl], [0.3067, 0.2578, 0.08, 0.0933, 0.1778, 0.0267, 0.0578, 0.0267, 0, 0.0222, 0.0178, 0], "sa26: the Adelaide booth's Ancestry row (English leads)");
     assert.deepEqual(B.rel[adl], [0.5602, 0.1713, 0.0556, 0.0463, 0.0, 0.0139, 0.0278, 0.0185, 0.0278, 0.0], "sa26: the Adelaide booth's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[adl], [0.2656, 0.5391, 0.1953, 0.0234], "sa26: the Adelaide booth's Housing-tenure row");
@@ -1437,14 +1331,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa22 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 17 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is ten people cells plus the six of the 2026-10-31 arcs plus pt/noncit (income slots populated)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `sa22 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const adl = B.n.indexOf("Adelaide");
     assert.ok(adl >= 0, "sa22: the Adelaide booth exists");
     assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa22: the Adelaide booth's SA1 national deciles");
-    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.2701, 0.1675, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213], "sa22: the Adelaide booth's SA1 people cells, the six lanes of the 2026-10-31 arcs (income slots re-pinned after the family-offset fix, 2026-11-04)");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.1675, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213, 0.2701, 0.0268], "sa22: the Adelaide booth's SA1 people cells (positional DM order + unemp@17, 2026-11-10)");
     assert.deepEqual(B.anc[adl], [0.3067, 0.2578, 0.08, 0.0933, 0.1778, 0.0267, 0.0578, 0.0267, 0, 0.0222, 0.0178, 0], "sa22: the Adelaide booth's Ancestry row");
     assert.deepEqual(B.rel[adl], [0.5602, 0.1713, 0.0556, 0.0463, 0.0, 0.0139, 0.0278, 0.0185, 0.0278, 0.0], "sa22: the Adelaide booth's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[adl], [0.2656, 0.5391, 0.1953, 0.0234], "sa22: the Adelaide booth's Housing-tenure row");
@@ -1469,7 +1363,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   }
   // the census lanes splice exactly as sa26's
   {
-    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"], IXS = ["irsad", "irsd", "ier", "ieo"];
+    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
     assert.equal(res.divs.length, 47, "sa22: 47 districts with census rows");
     const dec = new Set(res.divs.map((d) => d.seifa.irsad.dec));
     assert.ok(dec.size >= 8, "sa22 IRSAD deciles spread across the range (a monotone join bug collapses them)");
@@ -1795,7 +1689,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes("optional-preferential, so a ballot leaves the count when its numbered candidates are gone"), "map.js: the exhausted legend note explains the scheme");
   assert.ok(js.includes('m.res.flOpv ? lgMenu("infm",'), "map.js: the switcher is offered only on the optional-preferential frame");
   // the census lanes (the same splice contract as the SA frames')
-  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
     assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace and ancestry dicts`);
@@ -1848,14 +1742,14 @@ for (const y of ["sa22", "sa26"]) {
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `nsw23 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 17 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is ten people cells plus the six of the 2026-10-31 arcs plus pt/noncit (income slots populated)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `nsw23 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const balmain = B.n.indexOf("Balmain Public");
     assert.ok(balmain >= 0, "nsw23: the Balmain Public booth exists");
     assert.deepEqual(B.dec[balmain], [10, 10, 7, 10], "nsw23: Balmain Public's SA1 national deciles");
-    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, 0.117, 0.4897, 0.5325, 0.1409, 0.0, 0.1681, 0.1457, 0.0312, 0.1185, 0.108, 0.0022], "nsw23: Balmain Public's SA1 people cells, the six lanes of the 2026-10-31 arcs");
+    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, 0.117, 0.4897, 0.1409, 0.0, 0.1681, 0.1457, 0.0312, 0.1185, 0.108, 0.0022, 0.5325, 0.0271], "nsw23: Balmain Public's SA1 people cells (the positional DM order with hiqinc at the income pair's cell-16 tail, and unemp@17, 2026-11-10)");
     assert.deepEqual(B.anc[balmain], [0.4446, 0.3376, 0.1996, 0.1162, 0.0254, 0.0544, 0.0417, 0.0073, 0.0109, 0.0127, 0, 0], "nsw23: Balmain Public's Ancestry row");
     assert.deepEqual(B.rel[balmain], [0.5301, 0.2477, 0.102, 0.031, 0.031, 0.0164, 0.0055, 0, 0, 0.0219], "nsw23: Balmain Public's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[balmain], [0.3252, 0.3496, 0.3049, 0], "nsw23: Balmain Public's Housing-tenure row");
@@ -2328,7 +2222,7 @@ for (const y of ["sa22", "sa26"]) {
   // no preferences lane yet (the SA frames' are modelled by sa_flow_lane.py)
   assert.ok(!("flBasis" in res) && res.divs.every((d) => Array.isArray(d.fl) && d.fl.length === 0), "vic22: no preferences lane");
   // the census lanes (the same splice contract as the other state frames')
-  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
     assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace and ancestry dicts`);
@@ -2378,14 +2272,14 @@ for (const y of ["sa22", "sa26"]) {
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `vic22 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 17 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: demo is ten people cells plus the six of the 2026-10-31 arcs plus pt/noncit (income slots populated)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `vic22 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const toorak = B.n.indexOf("Toorak Central");
     assert.ok(toorak >= 0, "vic22: the Toorak Central booth exists");
     assert.deepEqual(B.dec[toorak], [9, 8, 5, 9], "vic22: Toorak Central's SA1 national deciles");
-    assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, 0.1549, 0.429, 0.451, 0.1627, 0.0, 0.1233, 0.1111, 0.0617, 0.1462, 0.163, 0.0002], "vic22: Toorak Central's SA1 people cells, the six lanes of the 2026-10-31 arcs");
+    assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, 0.1549, 0.429, 0.1627, 0, 0.1233, 0.1111, 0.0617, 0.1462, 0.163, 0.0002, 0.451, 0.0595], "vic22: Toorak Central's SA1 people cells (positional DM order + unemp@17, 2026-11-10)");
     assert.deepEqual(B.anc[toorak], [0.453, 0.2091, 0.1498, 0.1324, 0.0627, 0.0836, 0.0279, 0, 0, 0.0209, 0, 0], "vic22: Toorak Central's Ancestry row");
     assert.deepEqual(B.rel[toorak], [0.4064, 0.3039, 0.1378, 0.0212, 0.0318, 0.0353, 0, 0, 0, 0.0318], "vic22: Toorak Central's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[toorak], [0.2578, 0.3672, 0.375, 0], "vic22: Toorak Central's Housing-tenure row");
@@ -2538,7 +2432,7 @@ for (const y of ["sa22", "sa26"]) {
       const bad = B.cob.filter((x, k) => (x === null) !== (B.demo[k] === null));
       assert.equal(bad.length, 0, `${frame}: cob rows null exactly where the people cells are`);
     }
-    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar"], IXS = ["irsad", "irsd", "ier", "ieo"];
+    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
     const dc = new Set(res.divs.map((d) => d.seifa.irsad.dec));
     assert.ok(dc.size >= 7, `${frame} IRSAD deciles spread across the range (a monotone join bug collapses them)`);
     for (const d of res.divs) {
@@ -2703,7 +2597,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(st.includes('const stp = senLanes && spYear(m.year) != null ? senTwoStat(m, idx) : null;') && st.includes('twoPartyFigures(spGvtYear(m.year) != null ? "Ranked ahead on Senate tickets" : "Ranked ahead on Senate ballots"'), "the Senate lanes' two-party row is the ballots' own ranked split, labelled as tickets in the ticket era, with the previous deck's as its delta");
   assert.ok(st.includes('const deck = senLanes && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;') && st.includes("const tallyOf = (dd, sel)") && st.includes("statSeatMakeup(seatMdl, seatIdx,"), "the Senate lanes' seats row is the chamber's own tally and makeup (the House's stands where the Senate isn't read, and under a seat-type scope)");
   assert.ok(st.includes('SENY[isNowY(m.year) ? frameBaseY(m.year) : prevYearOf(m.year)]'), "the Now chamber's seats delta rides the base election's chamber (2025), like the lower house's seats — never the election before it (user call 2026-11-10)");
-  assert.ok(st.includes("function senChangeNote(m, yr, st)") && st.includes("election’s Senate, adjusted for changes since then") && st.includes('seatsNote || (senNote ? `<span class="st-seat-note">') && st.includes("scopeWhere(m, st)"), "the Now Senate seats row explains its own movements — the whole window back to election day, scoped with the figure pool (user call 2026-11-10)");
+  assert.ok(st.includes("function senMovesNote(dn, d0, yr)") && st.includes("election’s Senate, adjusted for changes since then") && st.includes('seatsNote || (senNote ? `<span class="st-seat-note">'), "the Now Senate seats row explains its own movements — joined parties and replaced senators, not respellings or re-codes (user call 2026-11-10)");
   assert.ok(part("app-6-ui.js").includes('Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year), loadSenateFloor()])') && part("app-3b-senate.js").includes("function loadSenatePrefsPair") && part("app-3b-senate.js").includes("function loadSenatePair") && part("app-3b-senate.js").includes("function loadSenateFloor"), "the Senate lens pulls its vote, ballot, chamber and seating-plan decks, each election paired with its previous for the head's deltas");
   assert.ok(part("app-3b-senate.js").includes("function loadSenateDeck(y, bg) {") && part("app-6-ui.js").includes("loadSenateDeck(S.year)") && part("app-6-ui.js").includes("loadSenateDeck(y)"), "the Senate's vote decks load in pairs — the frame's own and the previous election's, for the head's deltas");
   assert.ok(st.includes("return { hed: hedWord, dek: \"\", quiet: true, note:"), "the two-party lens's figure is its finding: no line repeats it");

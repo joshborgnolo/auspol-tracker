@@ -369,7 +369,7 @@ eq(d.incomeCuts, {
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "atsci", "u15", "onepar", "rel", "ten", "pt", "noncit",
-    "bigfam", "hl", "anc"]);
+    "bigfam", "hl", "anc", "unemp"]);
   let nullBoth = 0, blended = 0;
   const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   for (const b of d.booths) {

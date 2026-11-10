@@ -257,6 +257,8 @@ def demo_cells():
     base = {}
     n = 0
     z = zipfile.ZipFile(GCP_ZIP)
+    lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="1", era="2016")
+
     with io.TextIOWrapper(z.open(MEMBER(table="G01")), encoding="utf-8-sig") as fh:
         rdr = csv.DictReader(fh)
         miss = [c for c in want if c not in (rdr.fieldnames or [])]
@@ -319,13 +321,15 @@ def demo_cells():
                 return None
             v = num / den
             return round(v, 4) if 0 <= v <= 1 else None
+        uel, lfd = lab[code]
         out[code] = [safe(oth, eng + oth),
                      safe(bands[8] + bands[9] + bands[10], bsum),
                      safe(bands[3] + bands[4], bsum),
                      safe(tot - cobns - aust, tot - cobns),
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
-                     None, None]
+                     None, None] \
+            + [None] * 9 + [safe(uel, lfd)]
     print(f"GCP demo cells: {len(out)} SA1s (era {YEAR})")
     return out
 

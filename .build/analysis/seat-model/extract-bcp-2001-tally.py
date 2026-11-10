@@ -282,6 +282,7 @@ def parse_cd(member_name, wb):
                 "ind01": None, "b1ov": None,
                 "cit01": None, "tw01": None, "anc01": None,
                 "ancp01": None, "ancns01": None,
+                "lab01": None,
                 "shortCd": True}
 
     def sheet_rows(name, minc, maxc):
@@ -679,6 +680,22 @@ def parse_cd(member_name, wb):
             occ_ns = tot
         elif lab.startswith("inadequately"):
             occ_other = tot
+
+    # ---- B 25 age by labour force status (three stacked M/F/P blocks;
+    # the PERSONS block's Total row: col I = total unemployed, col J =
+    # total labour force as stated). 2026-11-10 labour lane.
+    labU = labLF = None
+    if "B 25" in wb.sheetnames:
+        sect = None
+        for row in sheet_rows("B 25", 1, 13):
+            for cell in row:
+                if isinstance(cell, str) \
+                        and cell.strip().lower() == "persons":
+                    sect = "p"
+                    break
+            if sect == "p" and label_of(row) == "total":
+                labU, labLF = cell_of(row, 8), cell_of(row, 9)
+                break
     missing = [k for k, v in {"aus": aus, "cobns": cobns,
                               "b6_ov": b6_ov, "b6_total": b6_total,
                               "eng": eng, "oth": oth,
@@ -703,6 +720,7 @@ def parse_cd(member_name, wb):
                               "b1_cit": b1_cit,
                               "tw01": tw01,
                               "ancp": ancp, "ancns": ancns,
+                              "labU": labU, "labLF": labLF,
                               }.items()
                if v is None]
     missing += [f"rel01.{k}" for k, v in rel.items() if v is None]
@@ -783,6 +801,8 @@ def parse_cd(member_name, wb):
         "tw01": tw01,
         "anc01": [anc[k] for k in ANC01_KEYS],
         "ancp01": ancp, "ancns01": ancns,
+        "lab01": ([labU, labLF] if labU is not None
+                  and labLF is not None else None),
         "_recons": recons or None,
     }
 

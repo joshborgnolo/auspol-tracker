@@ -236,6 +236,7 @@ def demo_cells():
         fail(f"GCP G01 rows {n} (pin {GCP_ROWS}), SA {len(base)} (pin {GCP_SA_ROWS})")
     newl = gcp_newlanes.load(GCP_ZIP, prefix="4")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="4", era="2021")
+    lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="4", era="2021")
     inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "4")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
     extra = {}
@@ -292,6 +293,7 @@ def demo_cells():
         citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
             (ancv, ancp, ancns) = arc[code]
         hle = HL.get(code, {}).get("e", 0.0)
+        uel, lfd = lab[code]
         aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         out[code] = ([safe(oth, eng + oth),
@@ -301,7 +303,6 @@ def demo_cells():
                       safe(uni, pop15 - eduns),
                       safe(blue, occd),
                       safe(lom, aud), safe(him, aud),
-                      safe(hiqm, aud),
                       gcp_newlanes.y12less_cell(sch6, safe),
                       safe(indt[0], indt[1]),
                       gcp_newlanes.u15_cell(bands, safe),
@@ -309,7 +310,9 @@ def demo_cells():
                       safe(ptn, ptt - ptns),
                       safe(p - citz, p),
                       safe(ceb3, cebt - cebns),
-                      safe(hle, p)],
+                      safe(hle, p),
+                      safe(hiqm, aud),
+                      safe(uel, lfd)],
                      [safe(c, den09) for c in cob],
                      rel, ten, anc)
     print(f"GCP demo cells: {len(out)} SA1s")

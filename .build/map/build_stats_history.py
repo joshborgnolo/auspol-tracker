@@ -305,7 +305,7 @@ def with_demo(doc, year):
                      'cob': dv.get('cob'),
                      'y12less': dc[8], 'atsci': dc[9], 'u15': dc[10],
                      'onepar': dc[11], 'pt': dc[12], 'noncit': dc[13],
-                     'bigfam': dc[14], 'hl': dc[15],
+                     'bigfam': dc[14], 'hl': dc[15], 'unemp': dc[17],
                      'rel': dv.get('rel'),
                      'ten': dv.get('ten')}
         if dm and dm.get('age') and dm.get('persons'):

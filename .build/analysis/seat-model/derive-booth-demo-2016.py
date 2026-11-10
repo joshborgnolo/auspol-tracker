@@ -239,6 +239,8 @@ def load_gcp16():
         if code not in nlt["G01c"] or code not in nlt["Gmtw"] \
                 or code not in nlt["Gceb"] or code not in nlt["G08"]:
             fail(f"GCP G01c/Gmtw/Gceb/G08 SA1 set mismatch at {code}")
+        if code not in nlt["lab"]:
+            fail(f"GCP G43B SA1 set mismatch at {code}")
         bluen, occd = occ_of(g57[code])
         uni = g46[code][0] + g46[code][1] + g46[code][2]
         ir = inc[code]
@@ -262,7 +264,8 @@ def load_gcp16():
                      nlt["G01c"][code][0], nlt["Gmtw"][code],
                      nlt["Gceb"][code], nlt["G08"][code],
                      HL_ALLOC.get(code, {}).get("e", 0.0),
-                     ir[5])                        # hiq mass (tail)
+                     ir[5],                       # hiq mass (tail)
+                     nlt["lab"][code])            # labour counts (tail)
     print(f"GCP 2016: {len(out)} SA1s "
           f"(G01/G07/G09/G14/G46B/G57B + G28/G29/G33 income)")
     meta = {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
@@ -450,7 +453,7 @@ def gcp_to_rec(row):
             "bluen": row[9], "occd": row[10],
             "pop15": row[0] - row[3][0] - row[3][1],
             "inct": row[11], "incl": row[12], "inch": row[13],
-            "incq": row[-1],
+            "incq": row[28],
             "incbh": list(row[15]),
             "sch6": sc6of(row[17]),
             "indig": row[18][0],
@@ -458,7 +461,8 @@ def gcp_to_rec(row):
             "relvec": list(row[19]) if row[19] is not None else None,
             "relNS": row[20][0], "relTot": row[20][1],
             "ten6": list(row[21]),
-            "famN": row[22][0], "famD": row[22][1]}
+            "famN": row[22][0], "famD": row[22][1],
+            "labU": row[29][0], "labLF": row[29][1]}
 
 
 def sc6of(y12t):
@@ -534,6 +538,7 @@ def main():
                                   "inct": 0.0, "incl": 0.0, "inch": 0.0,
                                   "incq": 0.0,
                                   "incbh": [0.0] * len(INC_BANDS),
+                                  "labU": 0, "labLF": 0,
                                   "newL": voter.acc_new()})
     for code, dv in alloc.items():
         row = gcp.get(code)
@@ -552,7 +557,9 @@ def main():
         acc["inct"] += row[11]
         acc["incl"] += row[12]
         acc["inch"] += row[13]
-        acc["incq"] += row[-1]
+        acc["incq"] += row[28]
+        acc["labU"] += row[29][0]
+        acc["labLF"] += row[29][1]
         for i in range(len(INC_BANDS)):
             acc["incbh"][i] += row[15][i]
         voter.acc_row(acc["newL"], row, 1.0)

@@ -353,7 +353,15 @@ def shares(r):
         vals["noncit"] = round((per - r["citz"]) / per, 4)
     else:
         vals["noncit"] = None
-    for k in ("langOther", "fborn", "uni", "blue", "u15", "pt", "noncit"):
+    # the labour-force lane (2026-11-10): the '96 AURIN print's b18b
+    # reads; None where the archived workspace prints no labour table
+    # (the '91 editions) — same null contract as the era holes
+    if r.get("labU") is not None and (r.get("labLF") or 0) > 0:
+        vals["unemp"] = round(r["labU"] / r["labLF"], 4)
+    else:
+        vals["unemp"] = None
+    for k in ("langOther", "fborn", "uni", "blue", "u15", "pt", "noncit",
+              "unemp"):
         x = vals[k]
         if x is not None and not (0 <= x <= 1):
             return None
@@ -651,15 +659,19 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     if census == 2001:
         # the 2001 BCP tally's own vector-list contract (extract-bcp-
         # 2001-tally.py): tw01 is [short-list-pt-journeys, jtw-universe,
-        # not-stated] per CD and cit01 the australian-citizens count —
-        # bridge them onto the 1991/1996 cohort names so shares()
-        # never senses which print family wrote the numbers
+        # not-stated] per CD, cit01 the australian-citizens count, and
+        # (2026-11-10) lab01 the labour lane's [unemployed, stated
+        # labour force] — bridge them onto the 1991/1996 cohort names
+        # so shares() never senses which print family wrote the numbers
         for r in people.values():
             tw = r.get("tw01")
             if tw is not None and len(tw) == 3:
                 r["ptn"], r["ptot"], r["ptns"] = tw[0], tw[1], tw[2]
             if r.get("cit01") is not None:
                 r["citz"] = r["cit01"]
+            lb = r.get("lab01")
+            if lb is not None and len(lb) == 2:
+                r["labU"], r["labLF"] = lb[0], lb[1]
     venues = load_venues(year)
     polys = era_polygons(census)
     buckets = ct_index(polys)
@@ -774,6 +786,7 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "ten": {k: 0 for k in TEN_KEYS}, "tenDen": 0,
         "atsciN": 0, "atsciD": 0, "oneparN": 0, "oneparD": 0,
         "citz": 0, "ptn": 0, "ptot": 0, "ptns": 0,
+        "labU": 0, "labLF": 0,
         "inc": [0] * len(INC91_ANNUAL_EDGES), "incTot": 0,
         "incT": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
         "incHH": [0] * len(ilanes.INC_BANDS_01),
@@ -794,7 +807,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         for k in ("eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd"):
             acc[k] += r[k]
-        for k in ("citz", "ptn", "ptot", "ptns", "incTot"):
+        for k in ("citz", "ptn", "ptot", "ptns", "labU", "labLF",
+                  "incTot"):
             acc[k] += r.get(k) or 0
         if r.get("inc") is not None:
             for i in range(len(INC91_ANNUAL_EDGES)):
@@ -885,7 +899,7 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd", "cobDen", "relDen", "tenDen",
                   "atsciN", "atsciD", "oneparN", "oneparD",
-                  "citz", "ptn", "ptot", "ptns"):
+                  "citz", "ptn", "ptot", "ptns", "labU", "labLF"):
             nat[k] += dv[k]
         for i in range(11):
             nat["bands"][i] += dv["bands"][i]
@@ -943,6 +957,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                if nat["ptot"] - nat["ptns"] > 0 else None),
         "noncit": (round((nat["pers"] - nat["citz"]) / nat["pers"], 4)
                    if nat["pers"] > 0 else None),
+        "unemp": (round(nat["labU"] / nat["labLF"], 4)
+                  if nat["labLF"] > 0 else None),
     })
     if era_inc is not None:
         if census == 2001:

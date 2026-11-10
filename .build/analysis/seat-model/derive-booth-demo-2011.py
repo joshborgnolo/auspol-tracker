@@ -136,7 +136,8 @@ def sum_divisions(alloc, sa1, inc):
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancn": [0] * len(d13.ANC_KEYS),
                                   "ancns": 0, "ancP": 0,
-                                  "hle": 0.0})
+                                  "hle": 0.0,
+                                  "labU": 0, "labLF": 0})
     for key, dv in alloc.items():
         r = sa1.get(key)
         ir = inc.get(key)
@@ -180,6 +181,8 @@ def sum_divisions(alloc, sa1, inc):
         acc["ancns"] += r["ancns"]
         acc["ancP"] += r["ancP"]
         acc["hle"] += r["hle"] or 0.0
+        acc["labU"] += r["labU"]
+        acc["labLF"] += r["labLF"]
     return divsum
 
 
@@ -208,7 +211,7 @@ def national_of(divsum):
             nat["ten6"][i] += dv["ten6"][i]
         for k in ("indig", "indigDen", "relNS", "relTot",
                   "famN", "famD", "ceb3", "cebns", "cebt",
-                  "ancns", "ancP"):
+                  "ancns", "ancP", "labU", "labLF"):
             nat[k] += dv[k]
         for i in range(len(d13.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d13.REL_KEYS))
@@ -264,6 +267,8 @@ def national_of(divsum):
         "hl": round(nat["hle"] / nat["pers"], 4),
         "anc": {k: round(nat["ancn"][i] / (nat["ancP"] - nat["ancns"]), 4)
                 for i, k in enumerate(d13.ANC_KEYS)},
+        "unemp": (round(nat["labU"] / nat["labLF"], 4)
+                  if nat["labLF"] else None),
     }
 
 
@@ -354,7 +359,8 @@ def main():
                     "ancn": (list(row["ancn"]) if row["ancn"] is not None
                              else None),
                     "ancns": row["ancns"], "ancP": row["ancP"],
-                    "hle": row["hle"]})
+                    "hle": row["hle"],
+                    "labU": row["labU"], "labLF": row["labLF"]})
             out_booths.append(rec)
 
         divisions = []

@@ -42,7 +42,7 @@ assert.ok(codes.every((c) => typeof c === "string" && /^\d{11}$/.test(c)), "ever
 assert.equal(new Set(codes).size, N, "SA1 codes unique");
 
 /* ---------------- lanes ---------------- */
-const EXPECT_LANES = ["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+const EXPECT_LANES = ["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
   "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
   "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
