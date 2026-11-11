@@ -743,6 +743,8 @@ function compactPanelHTML(m) {
 function townsToggleHTML(on) {
   return `<button type="button" class="lg-jtoggle" data-towns role="switch" aria-checked="${on}"><span class="lg-sw" aria-hidden="true"></span>City names</button>`;
 }
+// the Water switch beside it (user call 2026-11-11: the inland lakes and the
+// ocean paper itself off and on, as the cities' names are)
 function waterToggleHTML(on) {
   return `<button type="button" class="lg-jtoggle" data-water role="switch" aria-checked="${on}"><span class="lg-sw" aria-hidden="true"></span>Water</button>`;
 }

@@ -196,6 +196,7 @@ function rtMenuItems(k) {
       { label: "List", radio: S.view === "list", act: () => setView("list") },
       { sep: true },
       { label: "Full screen", kb: "F", act: () => fsEnter() },
+      { label: "Water", check: !S.waterOff, disabled: S.view !== "map", act: () => { const b = $("[data-water]"); if (b) b.click(); } },
       { label: "City names", check: !S.townsOff, disabled: S.view !== "map", act: () => { const b = $("[data-towns]"); if (b) b.click(); } },
       { sep: true },
       { label: "Modern view", act: () => rtSet(false) },

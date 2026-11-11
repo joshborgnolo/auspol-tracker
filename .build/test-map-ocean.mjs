@@ -148,7 +148,19 @@ assert.ok(laySea.indexOf('"destination-out"') < laySea.indexOf("oceanUnder(m)") 
 assert.ok(laySea.includes("ctx.globalCompositeOperation = st.op; ctx.drawImage(seaLay"), "laySea: the sheet's marks multiply onto the ocean as the streets do onto the land");
 assert.ok(/if \(kind === "water"\) out\.sea\.push\([^)]*\); else out\.fills\[kind\]\.push/.test(map2) && map2.includes('"Marine area": "water"'), "Esri's Marine area (and its lakes) are the sea mask only, never a water fill tinting the ocean");
 assert.ok(/L\.clip\(st\.known\);[\s\S]{0,260}L\.fillStyle = css\(TH\.bg\); L\.fillRect\(0, 0, W, H\);/.test(map2), "layWaters: plain land under the seats' waters, so Esri's land beyond them never shows the sea");
-assert.ok(map2.includes("ctx.save(); ctx.clip(box); layPaper(a); ctx.restore();"), "an island's box shows the sea's paper");
+assert.ok(/ctx\.save\(\); ctx\.clip\(box\);\s*if \(S\.waterOff\) \{\s*ctx\.fillStyle = css\(th\.bg\);[^}]*\}\s*else layPaper\(a\);\s*ctx\.restore\(\);/.test(map2), "an island's box shows the sea's paper (flat ground under the Water switch)");
+// ---- the legend's Water switch: the whole sea and every inland water off and on (2026-11-11)
+assert.ok(/function drawOcean\(m, alpha\) \{\s*oceanA = alpha;\s*if \(S\.waterOff\) flatGround\(alpha\);\s*else \{\s*layPaper\(alpha\);\s*layGrat\(m, alpha\);\s*\}/.test(map2) && map2.includes("function flatGround(alpha)"), "drawOcean: the Water switch lays flat page ground, no sea paper or lines");
+assert.ok(map2.includes("const sa = st && st.known && !S.waterOff ? seaA() : 0;"), "drawGeo: Esri's sea mask (the coast's cut and every inland lake) stands down on the Water switch");
+assert.ok(map2.includes("if (!S.waterOff) drawWater(m, alpha, st, sa);") && map2.includes("if (!S.waterOff) drawWater(m, 1, null, 0);"), "the old water cuts (lakes, shores, dry lakes) stand down on the Water switch");
+assert.ok(map2.includes("const dl = S.waterOff ? [] : dryInView(M());"), "prepStreets asks no water layer on the Water switch");
+assert.ok(map2.includes("function drawSeaNames(m, placed) {\n  if (S.waterOff) { seaSince.clear(); return; }") && map2.includes("function drawWaterNames(m, placed, obst) {\n  if (S.waterOff) { waterSince.clear(); return; }"), "the seas' and waters' names hide with the water");
+const drawApp = R(".build/map/app/app-2b-draw.js"), uiApp = R(".build/map/app/app-6-ui.js"), retroApp = R(".build/map/app/app-8-retro.js");
+assert.ok(uiApp.includes('data-water role="switch" aria-checked="${on}"><span class="lg-sw" aria-hidden="true"></span>Water</button>'), "a Water switch in the City-names switch's shape");
+assert.ok(drawApp.includes("${waterToggleHTML(!S.waterOff)}${townsToggleHTML(!S.townsOff)}"), "the Draw row closes with the Water switch beside City names");
+assert.ok(uiApp.includes('["water", S.waterOff ? "Show water" : "Hide water"], ["towns", S.townsOff ? "Show city names" : "Hide city names"]'), "the phone panel carries the Water item directly above Show city names");
+assert.ok(uiApp.includes('v === "water") { S.waterOff = !S.waterOff; renderLegend(); schedule();') && uiApp.includes('closest("[data-water]")'), "the Water switch flips S.waterOff from the menu and in place");
+assert.ok(retroApp.includes('{ label: "Water", check: !S.waterOff, disabled: S.view !== "map", act: () => { const b = $("[data-water]"); if (b) b.click(); } },'), "the retro View menu carries the Water item above City names");
 const html = R("map/index.html"), italic = html.match(/font-style: italic;\s*font-weight: 400;[^}]*url\("\/assets\/fonts\/(crimsontext-italic-400-latin\.[0-9a-f]+\.woff2)"\)/);
 assert.ok(italic && fs.existsSync(path.join(ROOT, "assets/fonts", italic[1])), "map/index.html serves Crimson Text's italic for the waters' names");
 const base = R(".build/map/app/app-1-base.js");

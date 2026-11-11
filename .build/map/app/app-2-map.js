@@ -413,13 +413,27 @@ function layLand(m, alpha, all) {
   ctx.strokeStyle = css(th.coast, 0.55); for (const s of shown) ctx.stroke(s.coast);
   ctx.restore();
 }
-// the sea beneath a frame, at alpha (the map's own, fading into the chamber)
+// the sea beneath a frame, at alpha (the map's own, fading into the chamber);
+// the legend's Water switch leaves it out: flat page ground under the map, no
+// paper, no lines — the map stands on the land alone (S.waterOff, drawGeo's too)
 function drawOcean(m, alpha) {
   oceanA = alpha;
-  layPaper(alpha);
-  layGrat(m, alpha);
+  if (S.waterOff) flatGround(alpha);
+  else {
+    layPaper(alpha);
+    layGrat(m, alpha);
+  }
   const cross = !!(ymorph && ymorph.to === m && ymorph.cross);
   if (cross || STATE_YEARS.has(m.year)) layLand(m, alpha, cross);
+}
+// the Water switch's substitute for the sea paper: the page's own colour, flat
+function flatGround(alpha) {
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = css(TH.bg);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
 }
 // the sea again, beneath what's drawn: into the holes a cut has opened (laySea)
 function oceanUnder(m) {
@@ -724,7 +738,8 @@ function dryInView(m) {
 function drawGeo(m, alpha, streetA) {
   const g = geoOf(m), th = TH, now = performance.now();
   const st = streetA > 0 ? prepStreets(streetA) : null;
-  const sa = st && st.known ? seaA() : 0;
+  // the Water switch: no sea of Esri's — the seats hold their AEC coasts, lakes and all
+  const sa = st && st.known && !S.waterOff ? seaA() : 0;
   if (streetA !== undefined) { seaNow = sa > 0 ? { m, sa } : null; streetSt = sa > 0 ? st : null; }
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -818,7 +833,8 @@ function drawGeo(m, alpha, streetA) {
     }
   }
   ctx.restore();
-  drawWater(m, alpha, st, sa);
+  // the Water switch: the old water cuts stand down with the sea and lakes
+  if (!S.waterOff) drawWater(m, alpha, st, sa);
   if (sa) laySea(m, st, alpha * sa);
   if (streetA !== undefined && !sa) warmWaters();
 }
@@ -1332,7 +1348,7 @@ function drawYearMorph(mo, t) {
   for (const q of m.isl || []) ctx.stroke(q.mpath);
   ctx.restore();
   // (the water in the new election's seats, cut as they settle: drawWater)
-  drawWater(m, 1, null, 0);
+  if (!S.waterOff) drawWater(m, 1, null, 0);
 }
 
 // A booth's dot. Its size is a 1,000-vote booth's radius times the square
@@ -1635,6 +1651,7 @@ function seaLayout(m, K, G, txt, size, spot, font = seaFont(size), lift = 0) {
   return { glyphs, box: [x0, y0, x1, y1], pts };
 }
 function drawSeaNames(m, placed) {
+  if (S.waterOff) { seaSince.clear(); return; }
   const fade = 1 - smooth(0, 0.35, streetK());
   const K = fade > 0.01 ? seaMaskOf(m) : null;
   if (!K) { seaSince.clear(); return; }
@@ -1753,6 +1770,7 @@ function roomWet(pts) {
 // a line's height to either side of the spot
 const WATER_TURNS = [0, 15, -15, 30, -30, 45, -45], WATER_NUDGE = [0, 0.9, -0.9];
 function drawWaterNames(m, placed, obst) {
+  if (S.waterOff) { waterSince.clear(); return; }
   const sa = seaNow && seaNow.m === m ? seaNow.sa : 0;
   if (!streetSt || sa <= 0.01 || !streetDrawn.length) { waterSince.clear(); return; }
   const G = gratOf(m.proj, tropicOf(m)), th = TH, now = performance.now(), seen = new Map(), live = new Set();
@@ -2634,7 +2652,7 @@ function prepStreets(alpha) {
   if (some) rescue(st, sg);
   // (a dry lake stays land, its seat's colour under its salt-lake marks: drawDryLakes)
   if (some) {
-    const dl = dryInView(M());
+    const dl = S.waterOff ? [] : dryInView(M());
     if (dl.length) {
       sg.save(); sg.setTransform(dpr * T.k, 0, 0, dpr * T.k, dpr * T.x, dpr * T.y); sg.globalCompositeOperation = "destination-out";
       for (const p of dl) sg.fill(p, "evenodd");
@@ -2988,9 +3006,13 @@ function drawIslands(m, alpha = 1) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalAlpha = a;
     // the box: the sea's own paper (no lines: a window on the island's waters), a hairline frame
+    // (flat ground under the Water switch, as the map's own sea)
     const box = new Path2D();
     if (box.roundRect) box.roundRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1, 3); else box.rect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
-    ctx.save(); ctx.clip(box); layPaper(a); ctx.restore();
+    ctx.save(); ctx.clip(box);
+    if (S.waterOff) { ctx.fillStyle = css(th.bg); ctx.fillRect(r.x, r.y, r.w, r.h); }
+    else layPaper(a);
+    ctx.restore();
     ctx.lineWidth = 1; ctx.strokeStyle = css(th.ink3, 0.32); ctx.stroke(box);
     // the island, north up, filling the box less a margin; its seat's colour,
     // quieted, veiled and filtered as the map's own shapes are (an island in no
