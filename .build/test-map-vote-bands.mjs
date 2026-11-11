@@ -222,6 +222,7 @@ const grnHtml = api.vtBlock(current.res.divs, true, "nationwide");
 assert.ok(grnHtml.includes('class="vt-modes vt-parties"') && grnHtml.indexOf('class="vt-modes vt-parties"') < grnHtml.indexOf('aria-label="Vote-type measure"'), "the party row sits above the measure row");
 assert.match(grnHtml, /data-vt-party="tpp" aria-pressed="false"[\s\S]*data-vt-party="grn" aria-pressed="true"/);
 for (const lab of ["2PP", "ALP", "L/NP", "GRN", "ON", "OTH"]) assert.ok(grnHtml.includes(`>${lab}</button>`), `party button ${lab}`);
+assert.ok(grnHtml.includes('class="vt-mode" data-vt-party="tpp"') && grnHtml.includes('class="vt-mode t-grn" data-vt-party="grn"') && grnHtml.includes('class="vt-mode t-oth" data-vt-party="oth"'), "party buttons wear the family tone class, 2PP stays untoned");
 assert.ok(grnHtml.includes("National Greens primary skew"));
 assert.ok(grnHtml.includes("Skews are percentage points in the Greens' primary share"), "the skew note names the measure");
 {
@@ -363,7 +364,7 @@ assert.ok(api.vtBands([{ n: "Nos", vt: {}, vt3: {} }], true).bands.every((b) => 
 // chrome: five buttons, no 2PP; the ALP default; the chamber named in the total
 vm.runInContext('vtSenParty = "alp"', ctx);
 const senHtml = api.vtBlock(current.res.divs, true, "nationwide", true);
-assert.equal((senHtml.match(/vt-mode"/g) || []).length, 7, "five parties plus the two measure buttons");
+assert.equal((senHtml.match(/class="vt-mode[ "]/g) || []).length, 7, "five parties plus the two measure buttons");
 assert.ok(!senHtml.includes('data-vt-party="tpp"'), "no 2PP in the Senate");
 assert.match(senHtml, /data-vt-party="alp" aria-pressed="true"/);
 assert.ok(senHtml.includes("15,871,189 Senate formal"), "the chamber's own formal count, tagged");

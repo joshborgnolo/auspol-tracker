@@ -1467,7 +1467,7 @@ function vtBandsBlock(divs, area, geography, senate) {
   // the measure noun: "2PP", or "<Party> primary"
   const word = prim ? `${VT_WORDS[senate ? vtSenParty : vtParty]} primary` : "2PP";
   const heading = effect ? `Change in cumulative ${word}` : place === "nationwide" ? `National ${word} skew` : `Skew on ${place} ${word}`;
-  const parties = `<div class="vt-modes vt-parties" role="group" aria-label="Vote-type party">${partyList.map(([k, lab]) => `<button type="button" class="vt-mode" data-vt-party="${k}" aria-pressed="${selected === k}">${lab}</button>`).join("")}</div>`;
+  const parties = `<div class="vt-modes vt-parties" role="group" aria-label="Vote-type party">${partyList.map(([k, lab]) => `<button type="button" class="vt-mode${k === "tpp" ? "" : ` t-${k}`}" data-vt-party="${k}" aria-pressed="${selected === k}">${lab}</button>`).join("")}</div>`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
   const measure = prim ? word : "Labor 2PP";
   const rows = bands.map((r, ri) => {
