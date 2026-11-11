@@ -70,7 +70,7 @@ SUBMAJORS = {
     33: "Construction Trades Workers",
     34: "Electrotechnology and Telecommunications Trades Workers",
     35: "Food Trades Workers",
-    36: "Skilled Animal, Agricultural and Horticultural Workers",
+    36: "Skilled Animal and Horticultural Workers",
     39: "Other Technicians and Trades Workers",
     41: "Health and Welfare Support Workers",
     42: "Carers and Aides",
@@ -96,7 +96,7 @@ SUBMAJORS = {
     83: "Factory Process Workers",
     84: "Farm, Forestry and Garden Workers",
     85: "Food Preparation Assistants",
-    86: "Other Labourers",
+    89: "Other Labourers",
 }
 
 # ---- the seven classes (menu order) -----------------------------------
@@ -107,7 +107,7 @@ OCC_CLASSES = {
     "farmwrk": {"title": "Farm workers", "codes": (84,)},
     "hospmgr": {"title": "Hospitality, retail & service managers", "codes": (14,)},
     "trades": {"title": "Tradespeople", "codes": (32, 33, 34)},
-    "routine": {"title": "Routine manual workers", "codes": (71, 72, 73, 74, 81, 82, 83, 85, 86)},
+    "routine": {"title": "Routine manual workers", "codes": (71, 72, 73, 74, 81, 82, 83, 85, 89)},
 }
 OCC_KEYS = list(OCC_CLASSES)
 OCC_RESIDUAL = (31, 35, 36, 39, 41, 42, 43, 44, 45,
@@ -124,11 +124,12 @@ if set(_CLASS_BY_CODE) | set(OCC_RESIDUAL) != set(SUBMAJORS):
 if len(SUBMAJORS) != 43:
     raise SystemExit("occ_lanes: sub-major table drifted off 43")
 
-# ABS supplementary output codes that never name a real sub-major group
-# (not-stated/not-applicable placeholders); they fold OUT of the basis,
-# never into a class. An unrecognised code always hard-fails instead.
-PSEUDO_CODES = {0}
-
+# ABS supplementary output codes shipped beside the 43 real groups (the
+# 2021 valueset at src/census-occ/occp-valueset-2021.csv carries them
+# verbatim): two-digit nfd placeholders ("10 Managers, nfd" .. "80
+# Labourers, nfd"), 09 Inadequately described, and the wordy &&/@@
+# placeholders. They fold OUT of the basis, never into a class; an
+# unrecognised code hard-fails instead — a shifted spreadsheet needs eyes.
 _CODE_RE = re.compile(r"^\s*[\"']?(\d{2,6})")
 _CED_RE = re.compile(r"(?i)\bCED\s*(\d{3})\b")
 _SA2_RE = re.compile(r"(?<!\d)(\d{9})(?!\d)")
@@ -143,22 +144,21 @@ def _fold_code(raw):
 
     Returns (submajor:int|None, fold_out:bool). Any code whose leading
     2-digit prefix is a real sub-major group folds to that parent (3–6
-    digit detail levels come along free); ABS supplementary output cells
-    fold out of the basis via fold_out=True; anything else is a hard
-    fail — a shifted spreadsheet needs eyes, never a silent fallback."""
+    digit detail levels come along free); ABS supplementary cells fold out
+    of the basis via fold_out=True; anything else is a hard fail."""
     s = str(raw).strip()
     m = _CODE_RE.match(s)
     if not m:
-        return None, True            # wordy cell (geography, "Not stated", ...)
+        return None, True            # wordy cell (geography, "&&"/"@@" placeholders)
     body = m.group(1)
     digits = int(body)
-    if digits in PSEUDO_CODES:
-        return None, True            # e.g. 0000 Not applicable
+    if digits == 0:
+        return None, True            # 0000-style placeholders
     sub = int(body[:2])
     if sub in SUBMAJORS:
         return sub, False
-    if sub >= 90 or digits >= 900:
-        return None, True            # ABS supplementary output series
+    if sub % 10 == 0 or sub == 9 or sub >= 90 or digits >= 900:
+        return None, True            # nfd / 09 inadequately-described / supplementary
     _fail(f"unrecognised ANZSCO code {body!r} in header")
 
 
@@ -252,6 +252,36 @@ def sha16(path):
     return h.hexdigest()[:16]
 
 
+def check_valueset(path=None):
+    """Benchmark SUBMAJORS against ABS's own OCCP valueset at
+    src/census-occ/occp-valueset-2021.csv (the FactTable metadata download
+    the module's table was corrected to: 2026-11-11 — code 89 "Other
+    Labourers" (never 86), 36's census-output title, every supplementary
+    output row). Fails on any set or title drift; nothing about the
+    2021-era OCCP output may change without touching ABS's own file."""
+    p = path or os.path.join(SRC, "occp-valueset-2021.csv")
+    with open(p, newline="", encoding="utf-8-sig") as f:
+        rows = list(csv.DictReader(f))
+    vals = {r["ValueCode"].strip(): r["ValueName"].strip()
+            for r in rows
+            if r.get("GroupName", "").strip() == "2021 2-digit occupations"}
+    real_codes = set()
+    for code_s, name in vals.items():
+        if code_s.isdigit() and int(code_s) in SUBMAJORS:
+            real_codes.add(int(code_s))
+            if name != SUBMAJORS[int(code_s)]:
+                _fail(f"valueset {code_s}: ABS titles it {name!r} vs "
+                      f"{SUBMAJORS[int(code_s)]!r} in SUBMAJORS")
+    if real_codes != set(SUBMAJORS):
+        _fail(f"valueset real-code set {sorted(real_codes)} != SUBMAJORS")
+    supp = set(vals) - {str(c) for c in SUBMAJORS}
+    want_supp = {f"{m}0" for m in range(1, 9)} | {"09", "&&", "@@"}
+    if supp != want_supp:
+        _fail(f"valueset supplementary rows drifted: {sorted(supp)} "
+              f"!= {sorted(want_supp)} documented ones")
+    return True
+
+
 def load_occ(name, path=None):
     """load_occ("sa2-2021") → (counts, provenance) for the committed
     source at .build/map/src/census-occ/<name>.csv (+ <name>.json)."""
@@ -302,6 +332,7 @@ def shares(counts):
 
 
 def self_test():
+    check_valueset()
     toy = os.path.join(SRC, "testdata", "toy.csv")
     counts = parse_tb_csv(toy)
     assert set(counts) == {"CED101", "CED102", "101011001"}, \

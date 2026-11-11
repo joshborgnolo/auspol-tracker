@@ -12,6 +12,7 @@ Two files beside this README:
 
 | file | contents |
 |---|---|
+| `occp-valueset-2021.csv` | ABS's official OCCP 2-digit value dictionary (FactTable metadata) — `occ_lanes.py`'s code/title table is benchmarked against it on every self-test |
 | `sa2-2021.csv` | SA2 (2021) × all 43 sub-major groups, persons |
 | `ced-2021.csv` | CED (2021) × all 43 sub-major groups, persons |
 

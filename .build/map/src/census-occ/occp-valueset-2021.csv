@@ -1,0 +1,55 @@
+FactTableCode,FactTableName,FieldCode,FieldName,ValueSetCode,ValueSetName,ValueCode,ValueName,GroupName
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,10,"Managers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,11,"Chief Executives, General Managers and Legislators",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,12,Farmers and Farm Managers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,13,Specialist Managers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,14,"Hospitality, Retail and Service Managers",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,20,"Professionals, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,21,Arts and Media Professionals,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,22,"Business, Human Resource and Marketing Professionals",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,23,"Design, Engineering, Science and Transport Professionals",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,24,Education Professionals,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,25,Health Professionals,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,26,ICT Professionals,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,27,"Legal, Social and Welfare Professionals",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,30,"Technicians and Trades Workers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,31,"Engineering, ICT and Science Technicians",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,32,Automotive and Engineering Trades Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,33,Construction Trades Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,34,Electrotechnology and Telecommunications Trades Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,35,Food Trades Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,36,Skilled Animal and Horticultural Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,39,Other Technicians and Trades Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,40,"Community and Personal Service Workers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,41,Health and Welfare Support Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,42,Carers and Aides,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,43,Hospitality Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,44,Protective Service Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,45,Sports and Personal Service Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,50,"Clerical and Administrative Workers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,51,Office Managers and Program Administrators,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,52,Personal Assistants and Secretaries,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,53,General Clerical Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,54,Inquiry Clerks and Receptionists,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,55,Numerical Clerks,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,56,Clerical and Office Support Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,59,Other Clerical and Administrative Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,60,"Sales Workers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,61,Sales Representatives and Agents,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,62,Sales Assistants and Salespersons,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,63,Sales Support Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,70,"Machinery Operators and Drivers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,71,Machine and Stationary Plant Operators,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,72,Mobile Plant Operators,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,73,Road and Rail Drivers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,74,Storepersons,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,80,"Labourers, nfd",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,81,Cleaners and Laundry Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,82,Construction and Mining Labourers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,83,Factory Process Workers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,84,"Farm, Forestry and Garden Workers",2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,85,Food Preparation Assistants,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,89,Other Labourers,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,09,Inadequately described,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,&&,Not stated,2021 2-digit occupations
+Person Records,Person Records,2431098,OCCP Occupation,2431098_OCCP2,2431098_OCCP2,@@,Not applicable,2021 2-digit occupations
