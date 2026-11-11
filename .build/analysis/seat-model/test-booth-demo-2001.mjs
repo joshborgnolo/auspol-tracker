@@ -87,6 +87,9 @@ eq(c.national, {
     lebanese: 0.0094 },
   // the 2026-11-10 labour lane (the 2001 BCP's B 25 read)
   unemp: 0.0739,
+  // married over the 15+ stated marital-status share (B 04 print)
+  mar: { marr: 0.5146, never: 0.315, sep: 0.0343, div: 0.074,
+         wid: 0.062 },
 }, "c0 national (2001 census anchors)");
 eq(d.incomeCuts, {
   loQuantile: 0.25, loCutWeekly: 456.13,
@@ -98,6 +101,7 @@ eq(d.incomeCuts, {
 eq(d.ancKeys, ["english", "australian", "irish", "scottish",
   "chinese", "italian", "german", "indian", "filipino", "dutch",
   "vietnamese", "lebanese"], "c0 ancKeys");
+eq(d.marKeys, ["marr", "never", "sep", "div", "wid"], "c0 marKeys");
 ok(!("bigfam" in c.national) && !("hl" in c.national),
   "c0: no children/homeless tables in the 2001 product");
 {
@@ -186,6 +190,9 @@ eq(c1c.national, {
     lebanese: 0.01 },
   // the 2026-11-10 labour lane (the 2006 BCP's CD B41 read)
   unemp: 0.0522,
+  // marital over the 15+ stated-status share (the 2006 BCP's B05)
+  mar: { marr: 0.4968, never: 0.3313, sep: 0.031, div: 0.082,
+         wid: 0.0589 },
 }, "c1 national (2006 census anchors)");
 eq(c1.incomeCuts, {
   loQuantile: 0.25, loCutWeekly: 603.75,
@@ -197,6 +204,7 @@ eq(c1.incomeCuts, {
 eq(c1.ancKeys, ["english", "australian", "irish", "scottish",
   "chinese", "italian", "german", "indian", "filipino", "dutch",
   "vietnamese", "lebanese"], "c1 ancKeys");
+eq(c1.marKeys, ["marr", "never", "sep", "div", "wid"], "c1 marKeys");
 ok(!("hl" in c1c.national), "c1: no 2006 homelessness edition");
 {
   const divs = new Map(c1.divisions.map((x) => [x.div, x]));
@@ -256,7 +264,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   eq(d.counts.demoI.national.noncit, 0.1309,
     "demoI national noncit blend");
   for (const [lane, keys] of [["rel", d.relKeys], ["ten", d.tenKeys],
-      ["anc", d.ancKeys]]) {
+      ["anc", d.ancKeys], ["mar", d.marKeys]]) {
     for (const k of keys) {
       eq(d.counts.demoI.national[lane][k],
         LN(c.national[lane][k], c1c.national[lane][k]),
@@ -277,7 +285,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "atsci", "u15", "onepar", "rel", "ten",
-    "pt", "noncit", "bigfam", "hl", "anc", "unemp"]);
+    "pt", "noncit", "bigfam", "hl", "anc", "unemp", "mar"]);
   for (const b of d.booths) {
     const fb = nc1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

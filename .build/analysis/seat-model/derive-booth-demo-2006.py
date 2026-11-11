@@ -203,6 +203,17 @@ B08_PERS = "B1246"
 ANC_KEYS = ["english", "australian", "irish", "scottish", "chinese",
             "italian", "german", "indian", "filipino", "dutch",
             "vietnamese", "lebanese"]
+# the Marital status menu (2026-11-11): B05's PERSONS,Total cells for
+# the five registered categories, in MAR_KEYS order (cell ids verified
+# against BCP2006_cell_desc_dp.xls); no not-stated column exists on the
+# 2006 B05, so the five cells' own sum is the lane's stated basis —
+# people aged 15+ (the table is 15+ by construction)
+MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
+B05_MAR = ["B737",  # PERSONS,Total,Married
+           "B741",  # PERSONS,Total,Never Married
+           "B738",  # PERSONS,Total,Separated
+           "B739",  # PERSONS,Total,Divorced
+           "B740"]  # PERSONS,Total,Widowed
 
 
 def bcp_table(table, cols, pin_rows=PIN_ROWS):
@@ -243,9 +254,9 @@ def load_bcp():
     """Per CD: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns,
     occupancy of the eight stated major groups, pop15."""
     for st in STATES:
-        for t in ("B01", "B07", "B08_A", "B08_B", "B09", "B12", "B13",
-                  "B15_B", "B23", "B24", "B32", "B39_B", "B41_B", "B44_B",
-                  "B45"):
+        for t in ("B01", "B05", "B07", "B08_A", "B08_B", "B09", "B12",
+                  "B13", "B15_B", "B23", "B24", "B32", "B39_B", "B41_B",
+                  "B44_B", "B45"):
             if not (CD06 / f"CD_{st}_{t}.csv").exists():
                 fail(f"missing cd06 extracts ({CD06}); see module "
                      f"docstring")
@@ -261,6 +272,9 @@ def load_bcp():
     # B41_B's opaque cell ids: B5982 = unemployed total, B5992 = stated
     # labour force (the 2026-11-10 labour lane)
     b41 = bcp_table("B41_B", ["B5982", "B5992"])
+    # B05's five registered-marital Total cells, MAR_KEYS order
+    # (2026-11-11)
+    b05 = bcp_table("B05", B05_MAR)
     b07 = bcp_table("B07", [B07_NS_TOTAL])
     rel_cells = [c for k in REL_KEYS for c in B13_REL[k]]
     b13 = bcp_table("B13", rel_cells + [B13_NS, B13_TOT])
@@ -323,6 +337,7 @@ def load_bcp():
             "ancns": b08a[code][-1],
             "ancP": b08b[code][0],
             "labU": int(b41[code][0]), "labLF": int(b41[code][1]),
+            "marvec": tuple(int(x) for x in b05[code]),
         }
     print(f"BCP 2006: {len(out)} CDs")
     return out
@@ -463,6 +478,12 @@ def shares(rec):
     # status-not-stated
     if rec.get("labLF") is not None:
         out["unemp"] = bounded(rec["labU"], rec["labLF"])
+    # the Marital status menu (2026-11-11): the registered-status five,
+    # of people 15+ with a stated status (their own sum the basis)
+    if rec.get("marvec") is not None:
+        mard = sum(rec["marvec"])
+        out["mar"] = {k: bounded(rec["marvec"][i], mard)
+                      for i, k in enumerate(MAR_KEYS)}
     return out
 
 
@@ -510,7 +531,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancn": [0] * len(ANC_KEYS),
                                   "ancns": 0, "ancP": 0,
-                                  "labU": 0, "labLF": 0})
+                                  "labU": 0, "labLF": 0,
+                                  "marvec": [0] * len(MAR_KEYS)})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -552,6 +574,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         acc["ancP"] += r["ancP"]
         acc["labU"] += r["labU"]
         acc["labLF"] += r["labLF"]
+        for i in range(len(MAR_KEYS)):
+            acc["marvec"][i] += r["marvec"][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -594,7 +618,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                 "cebt": row["cebt"],
                 "ancn": list(row["ancn"]),
                 "ancns": row["ancns"], "ancP": row["ancP"],
-                "labU": row["labU"], "labLF": row["labLF"]})
+                "labU": row["labU"], "labLF": row["labLF"],
+                "marvec": (list(row["marvec"]) if row["marvec"]
+                           is not None else None)})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
@@ -631,6 +657,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         for i in range(len(ANC_KEYS)):
             nat.setdefault("ancn", [0] * len(ANC_KEYS))
             nat["ancn"][i] += dv["ancn"][i]
+        for i in range(len(MAR_KEYS)):
+            nat.setdefault("marvec", [0] * len(MAR_KEYS))
+            nat["marvec"][i] += dv["marvec"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -687,6 +716,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                     for i, k in enumerate(ANC_KEYS)},
             "unemp": (round(nat["labU"] / nat["labLF"], 4)
                       if nat["labLF"] else None),
+            "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
+                    for i, k in enumerate(MAR_KEYS)},
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -774,7 +805,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         "_provenance": {
             "sourceUrls": {
                 "bcp": "ABS 2006 Census Basic Community Profile, "
-                       "collection districts (B01/B07/B09/B12/B13/"
+                       "collection districts (B01/B05/B07/B09/B12/B13/"
                        "B15_B/B24/B26/B28/B32/B39_B/B41_B/B44_B), "
                        "abs.gov.au archive census06bcp.zip",
                 "alloc": f"{alloc_path.name} (derive-ced-era-alloc.py)",
@@ -793,6 +824,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
         "ancKeys": list(ANC_KEYS),
+        "marKeys": list(MAR_KEYS),
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
                           "per division"),

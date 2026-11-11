@@ -1106,6 +1106,9 @@ const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.ent
 // the Occupation classes' phrases (2021-census-era frames only), hand-written
 // per class since the basis is workers, the lens's political cleavage basis
 const OCC_TOP = { socprof: ["seats where the most workers work in education, health, welfare, the arts or media", "with the fewest"], biztech: ["seats where the most workers are business or technical professionals or corporate managers", "with the fewest"], farmer: ["seats where the most workers are farmers or farm managers", "with the fewest"], farmwrk: ["seats where the most workers do farm, forestry or garden work", "with the fewest"], hospmgr: ["seats with the most hospitality, retail and service managers", "with the fewest"], trades: ["seats where the most workers are tradespeople", "with the fewest"], routine: ["seats where the most workers do routine manual work", "with the fewest"] };
+// Marital status option phrases, per option of the select menu (the
+// census counts only people aged 15+ on this measure)
+const MAR_TOP = Object.fromEntries((typeof MAR_NAME !== "undefined" ? Object.entries(MAR_NAME) : []).map(([k, n]) => [k, [`seats where the most people aged 15+ ${MARISMS[k]}`, "with the fewest"]]));
 const REL_TOP = { norel: ["seats where the most residents say they have no religion", "with the fewest"], cath: ["seats with the most Catholic residents", "with the most of another faith"], angl: ["seats with the most Anglican residents", "with the fewest"], unch: ["seats with the most Uniting Church residents", "with the fewest"], pres: ["seats with the most Presbyterian residents", "with the fewest"], orth: ["seats with the most Orthodox residents", "with the fewest"], budd: ["seats with the most Buddhist residents", "with the fewest"], isl: ["seats with the most Muslim residents", "with the fewest"], hind: ["seats with the most Hindu residents", "with the fewest"], jew: ["seats with the most Jewish residents", "with the fewest"] };
 const TEN_TOP = { mort: ["seats with the most homes owned with a mortgage", "with the fewest"], rent: ["seats with the most rented homes", "with the fewest"], own: ["seats with the most homes owned outright", "with the fewest"], rentPub: ["seats with the most public housing", "with the fewest"] };
 // the pair-of-phrases for a birthplace country, against the Australia-born share
@@ -1200,7 +1203,7 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isOcc() ? OCC_TOP[S.occ] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : isEdu() ? DM_TOP[S.eduMode] : DM_TOP[k];
+  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isOcc() ? OCC_TOP[S.occ] : isMar() ? MAR_TOP[S.mar] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : isEdu() ? DM_TOP[S.eduMode] : DM_TOP[k];
   const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
   const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;

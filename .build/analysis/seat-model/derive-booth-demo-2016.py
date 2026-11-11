@@ -241,6 +241,8 @@ def load_gcp16():
             fail(f"GCP G01c/Gmtw/Gceb/G08 SA1 set mismatch at {code}")
         if code not in nlt["lab"]:
             fail(f"GCP G43B SA1 set mismatch at {code}")
+        if code not in nlt["mar"]:
+            fail(f"GCP G05 SA1 set mismatch at {code}")
         bluen, occd = occ_of(g57[code])
         uni = g46[code][0] + g46[code][1] + g46[code][2]
         ir = inc[code]
@@ -265,7 +267,8 @@ def load_gcp16():
                      nlt["Gceb"][code], nlt["G08"][code],
                      HL_ALLOC.get(code, {}).get("e", 0.0),
                      ir[5],                       # hiq mass (tail)
-                     nlt["lab"][code])            # labour counts (tail)
+                     nlt["lab"][code],            # labour counts (tail)
+                     nlt["mar"][code])            # marital five (tail)
     print(f"GCP 2016: {len(out)} SA1s "
           f"(G01/G07/G09/G14/G46B/G57B + G28/G29/G33 income)")
     meta = {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
@@ -462,7 +465,8 @@ def gcp_to_rec(row):
             "relNS": row[20][0], "relTot": row[20][1],
             "ten6": list(row[21]),
             "famN": row[22][0], "famD": row[22][1],
-            "labU": row[29][0], "labLF": row[29][1]}
+            "labU": row[29][0], "labLF": row[29][1],
+            "marvec": row[30] if len(row) > 30 else None}
 
 
 def sc6of(y12t):
@@ -687,6 +691,9 @@ def main():
             "menu four shares (ten, key order in tenKeys, "
             "owned-with-mortgage leading) over the "
             "ex-tenure-not-stated occupied-private-dwellings basis; "
+            "G05's Marital status menu five shares (mar, key order "
+            "in marKeys, married leading) of people aged 15+ over "
+            "their own printed-category sum; "
             "G28's one-parent share of families; the under-15 share "
             "of the stated ages); blue-collar over the eight "
             "stated ANZSCO groups. Income lanes are the voter store's "
@@ -740,6 +747,7 @@ def main():
         "relKeys": list(voter.REL_KEYS),
         "tenKeys": list(voter.TEN_KEYS),
         "ancKeys": list(voter.ANC_KEYS),
+        "marKeys": list(voter.MAR_KEYS),
         "deliveryBasis": (
             "venue-proxy per booth (2016-census SA1 of the premises, "
             "point-in-polygon); CG-plurality whole-allocated 2016 GCP "

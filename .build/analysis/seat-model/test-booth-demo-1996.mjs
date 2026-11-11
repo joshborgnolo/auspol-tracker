@@ -140,6 +140,10 @@ const nat96 = {
   // the 2026-11-10 labour lane (the edition's cd_b18b read:
   // unemployed over the stated labour force)
   unemp: 0.0919,
+  // the marital-status lane (the cd_b04 five-cell print over the
+  // 15+ stated-status share; visitors and not-stated sit outside)
+  mar: { marr: 0.533, never: 0.3049, sep: 0.0337, div: 0.0642,
+         wid: 0.0641 },
 };
 const STORES = [
   ["data/booth-demo-1993-c1.json", 1993, 147, 8431, 6383, 2109, 1891, 157],
@@ -177,7 +181,8 @@ for (const [file, year, nDivs, nBooths, geo, near, miss, empty] of STORES) {
   // portfolio, nothing more
   const CROSS_KEYS = new Set(["persons", "cov", "langOther", "fborn",
     "uni", "blue", "u15", "age", "cob", "rel", "ten", "pt", "noncit",
-    "atsci", "onepar", "loinc", "hiinc", "hiqinc", "incMed", "unemp"]);
+    "atsci", "onepar", "loinc", "hiinc", "hiqinc", "incMed", "unemp",
+    "mar"]);
   let crossKeys = 0, badShare = 0;
   for (const b of d.booths) {
     if (!b.demo) continue;

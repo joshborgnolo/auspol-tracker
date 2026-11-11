@@ -75,6 +75,10 @@ TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 # the Ancestry menu's twelve options (the extractor's ANC01_KEYS,
 # the site's cross-era order)
 ANC_KEYS_01 = xt.ANC01_KEYS
+# the Marital status menu's five registered categories (the B 04
+# extractor's mar01 vector order), of people 15+ with a stated status
+# — no not-stated column on this era's print either (2026-11-11)
+MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2003ed.json"
@@ -99,7 +103,7 @@ def load_tally():
     need_new = {"rel01", "rel01ns", "rel01tot",
                 "sch01", "fam01", "ten01", "ind01", "b1ov",
                 "cit01", "tw01", "anc01", "ancp01", "ancns01",
-                "lab01"}
+                "mar01", "lab01"}
     for code, r in d.items():
         if any(k not in r for k in need):
             fail(f"2001 tally {code} row shape drift")
@@ -109,7 +113,7 @@ def load_tally():
             fail(f"2001 tally {code} new-lane fields drift")
         if len(r["rel01"]) != len(REL_KEYS_01) \
                 or len(r["fam01"]) != 5 or len(r["ten01"]) != 6 \
-                or len(r["sch01"]) != 6:
+                or len(r["sch01"]) != 6 or len(r["mar01"]) != 5:
             fail(f"2001 tally {code} new-lane widths drift")
         if len(r["tw01"]) != 3 or len(r["anc01"]) != len(ANC_KEYS_01):
             fail(f"2001 tally {code} 2026-10 lane widths drift")
@@ -178,6 +182,7 @@ def main():
                                   "tw01": [0] * 3,
                                   "anc01": [0] * len(ANC_KEYS_01),
                                   "ancP01": 0, "ancNS01": 0,
+                                  "mar01": [0] * 5,
                                   "lab01": [0] * 2})
     for code, dv in alloc.items():
         r = people.get(code)
@@ -221,6 +226,8 @@ def main():
             acc["anc01"][i] += r["anc01"][i]
         acc["ancP01"] += r["ancp01"]
         acc["ancNS01"] += r["ancns01"]
+        for i in range(5):
+            acc["mar01"][i] += r["mar01"][i]
         acc["lab01"][0] += r["lab01"][0]
         acc["lab01"][1] += r["lab01"][1]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
@@ -307,6 +314,14 @@ def main():
         # excludes the not-stated
         if rec.get("lab01") is not None and rec["lab01"][1] > 0:
             s["unemp"] = round(rec["lab01"][0] / rec["lab01"][1], 4)
+        # the Marital status menu (2026-11-11): the registered-status
+        # five, of people 15+ with a stated status (their own sum the
+        # basis)
+        if rec.get("mar01") is not None:
+            mard = sum(rec["mar01"])
+            if mard > 0:
+                s["mar"] = {k: round(rec["mar01"][i] / mard, 4)
+                            for i, k in enumerate(MAR_KEYS)}
         return s
 
     nat = defaultdict(int)
@@ -333,6 +348,9 @@ def main():
             nat["anc01"][i] += dv["anc01"][i]
         nat["ancP01"] = nat.get("ancP01", 0) + dv["ancP01"]
         nat["ancNS01"] = nat.get("ancNS01", 0) + dv["ancNS01"]
+        nat.setdefault("mar01", [0] * 5)
+        for i in range(5):
+            nat["mar01"][i] += dv["mar01"][i]
         nat.setdefault("lab01", [0] * 2)
         nat["lab01"][0] += dv["lab01"][0]
         nat["lab01"][1] += dv["lab01"][1]
@@ -387,6 +405,8 @@ def main():
                 for i, k in enumerate(ANC_KEYS_01)},
         "unemp": (round(nat["lab01"][0] / nat["lab01"][1], 4)
                   if nat["lab01"][1] else None),
+        "mar": {k: round(nat["mar01"][i] / sum(nat["mar01"]), 4)
+                for i, k in enumerate(MAR_KEYS)},
     }
     # measured-once pin (first verified run): the tally's own total
     # (18,652,828) less the 8,249 people in the dropped offshore class
@@ -447,6 +467,7 @@ def main():
                 "anc01": r.get("anc01"),
                 "ancP01": r.get("ancp01"),
                 "ancNS01": r.get("ancns01"),
+                "mar01": r.get("mar01"),
                 "lab01": r.get("lab01")})
             if rec["demo"] is None:
                 geo_empty += 1
@@ -576,6 +597,7 @@ def main():
         "relKeys": list(REL_KEYS_01),
         "tenKeys": list(TEN_KEYS),
         "ancKeys": list(ANC_KEYS_01),
+        "marKeys": list(MAR_KEYS),
         "deliveryBasis": (
             "venue-CD lookup per booth (the venue seifa store's own "
             "2001-CD geo of the premises); exact CD sum per division "

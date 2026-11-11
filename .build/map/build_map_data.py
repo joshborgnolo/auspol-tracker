@@ -381,7 +381,7 @@ def demo_interp_of(dm, di):
     for k, v in di.items():
         if k in ("persons", "cov"):
             continue
-        if k in ("age", "rel", "ten", "anc"):
+        if k in ("age", "rel", "ten", "anc", "mar"):
             # dict lanes fall back per option: a select option missing on
             # either census side shows the measured option's figure
             if v is not None:
@@ -552,6 +552,9 @@ def build_year(year, hist, base2001):
     relkeys = (vstore.get("relKeys") or None) if vstore else None
     tenkeys = (vstore.get("tenKeys") or None) if vstore else None
     anckeys = vstore.get("ancKeys", []) if vstore else []
+    # the Marital status select menu's five options (2026-11-11;
+    # None-when-absent like the other era-gated lanes)
+    markeys = (vstore.get("marKeys") or None) if vstore else None
     # the previous election's ordinary first preferences at each polling
     # place, summed to the family's shares — the same-place read every booth's
     # primary-change number (and the booth card's change column) reads off
@@ -662,7 +665,8 @@ def build_year(year, hist, base2001):
                                "pt": dc[12], "noncit": dc[13], "bigfam": dc[14], "hl": dc[15],
                                "unemp": dc[17],
                                "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten"),
-                               "anc": (dm or {}).get("anc")}
+                               "anc": (dm or {}).get("anc"),
+                               "mar": (dm or {}).get("mar")}
                 if dm.get("age") and dm.get("persons"):
                     age_bands_w[0] += dm["persons"]
                     for i, k in enumerate(AGE_BAND_KEYS):
@@ -734,6 +738,9 @@ def build_year(year, hist, base2001):
         B["rel"].append(select_cells(dirow, "rel", relkeys) if dcrow else None)
         B["ten"].append(select_cells(dirow, "ten", tenkeys) if dcrow else None)
         B["anc"].append(select_cells(dirow, "anc", anckeys) if dcrow else None)
+        # the Marital status menu rows ride the same per-option blend
+        # doctrine (every side that covers it covers all five options)
+        B["mar"].append(select_cells(dirow, "mar", markeys) if dcrow else None)
         # the household-median lane is dollars, not a share, so it never
         # joins the demo cell tuple: a parallel lane, interp per the
         # nearest-side convention like the rest of the dollar figures;
@@ -759,6 +766,8 @@ def build_year(year, hist, base2001):
         del B["ten"]
     if not any(B["anc"]):
         del B["anc"]
+    if not any(B["mar"]):
+        del B["mar"]
     if not any(B["medinc"]):
         del B["medinc"]
     for k in ("ageMed", "a1824", "a3554", "a75"):
@@ -854,7 +863,10 @@ def build_year(year, hist, base2001):
            "tenKeys": tenkeys,
            # the Ancestry select menu's twelve options (B["anc"] rows +
            # rec.demo.anc dicts follow; the 2026-10-31 lanes arc)
-           "ancKeys": anckeys if vstore else None}
+           "ancKeys": anckeys if vstore else None,
+           # the Marital status select menu's five options, B["mar"] rows
+           # and rec.demo.mar dicts follow (2026-11-11)
+           "marKeys": markeys if vstore else None}
     if vstore and vstore.get("demoInterp"):
         # the people-interp blend record (f, c0/c1, nearestSide,
         # nullRule) on interpolated years; the app's demo copy reads

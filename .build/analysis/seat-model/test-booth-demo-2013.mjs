@@ -167,6 +167,11 @@ eq(d.counts.national, {
     lebanese: 0.0102 },
   // the 2026-11-10 labour lane (the 2011 BCP's B42B read)
   unemp: 0.0561,
+  /* marital over the 15+ stated-status share (the 2011 BCP's B05;
+     the read's own five-cell total is the basis -- G05's "total"
+     folds in ~3% not-stated, which the share basis excludes) */
+  mar: { marr: 0.4878, never: 0.343, sep: 0.0304, div: 0.084,
+         wid: 0.0548 },
 }, "counts.national");
 
 // 4. division anchors (measured blocks; the demoI interp block has its
@@ -178,6 +183,8 @@ let divs;
 // Scotland subset to read)
 const COB_KEYS8 = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"];
 eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
+eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
+  "marKeys contract");
 
 // 4. division anchors
 {
@@ -202,6 +209,8 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
       indian: 0.0192, filipino: 0.0115, dutch: 0.013, vietnamese: 0.013,
       lebanese: 0.0092 },
     unemp: 0.057,
+    mar: { marr: 0.2901, never: 0.5823, sep: 0.0234, div: 0.0793,
+      wid: 0.025 },
   }, "Sydney row");
   const M = divs.get("Melbourne");
   eq([M.persons, M.langOther, M.fborn, M.uni, M.blue,
@@ -233,6 +242,8 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
       indian: 0.0081, filipino: 0.01, dutch: 0.0124, vietnamese: 0.003,
       lebanese: 0.0006 },
     unemp: 0.0703,
+    mar: { marr: 0.4521, never: 0.4054, sep: 0.0344, div: 0.0726,
+      wid: 0.0356 },
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(L));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];
@@ -340,7 +351,8 @@ eq(d.incomeCuts, {
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   const NL = new Set(["langOther", "fborn", "uni", "blue", "age0_14",
     "age65ov", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar"]);
-  const SELK = { rel: [...d.relKeys], ten: [...d.tenKeys] };
+  const SELK = { rel: [...d.relKeys], ten: [...d.tenKeys],
+    mar: [...d.marKeys] };
   for (const k of NL) {
     eq(d.counts.demoI.national[k],
       LN(d.counts.national[k], far.counts.national[k]),
@@ -373,7 +385,7 @@ eq(d.incomeCuts, {
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "atsci", "u15", "onepar", "rel", "ten", "pt", "noncit",
-    "bigfam", "hl", "anc", "unemp"]);
+    "bigfam", "hl", "anc", "unemp", "mar"]);
   let nullBoth = 0, blended = 0;
   const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   for (const b of d.booths) {

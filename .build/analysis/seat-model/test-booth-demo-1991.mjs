@@ -150,6 +150,10 @@ const nat91 = {
   // AURIN workspace's b20 table's p_unemployed/p_labour_force): the
   // stated labour force's unemployed share nation-wide
   unemp: 0.1161,
+  // the marital-status lane, fetched fresh the same day (AURIN's own
+  // b06 print — five cells over the 15+ stated-status share)
+  mar: { marr: 0.5614, never: 0.2937, sep: 0.0286, div: 0.0529,
+         wid: 0.0634 },
   loinc: 0.25, hiinc: 0.0051, hiqinc: 0.25, incMed: 699,
 };
 for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
@@ -189,7 +193,8 @@ for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   // key outside that portfolio is the leak the gate catches
   const CROSS_KEYS = new Set(["persons", "cov", "langOther", "fborn",
     "uni", "blue", "u15", "age", "loinc", "hiinc", "incMed", "hiqinc",
-    "cob", "rel", "ten", "pt", "noncit", "atsci", "onepar", "unemp"]);
+    "cob", "rel", "ten", "pt", "noncit", "atsci", "onepar", "unemp",
+    "mar"]);
   let shellKeys = 0, shellBad = 0, nulls = 0, shellDud = 0;
   for (const b of d.booths) {
     if (b.demo === null) {
@@ -253,7 +258,7 @@ for (const [d, year, f, c1fn] of [
   const ALLOWED = new Set(["persons", "cov", "age", "langOther",
     "fborn", "uni", "blue", "u15", "loinc", "hiinc", "hiqinc",
     "y12less", "atsci", "onepar", "rel", "ten", "incMed", "pt",
-    "noncit", "anc", "bigfam", "hl", "unemp"]);
+    "noncit", "anc", "bigfam", "hl", "unemp", "mar"]);
   for (const b of d.booths) {
     const fb = c1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

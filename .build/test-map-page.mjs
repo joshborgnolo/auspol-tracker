@@ -369,7 +369,8 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
         `summary.tpp.1996.${st} (${SUM_J.tpp["1996"][st]}) must equal the certified division sum (${share})`);
     }
   }
-  assert.equal(Object.keys(D.booths).length, 26, "17 result lanes plus approximate-location provenance + census demo rows + the map-people-fill arc's three cohort cob/rel/ten lanes + the medinc booth column the frame's 1991-era census income print fills + the Age family's four lanes");
+  assert.equal(Object.keys(D.booths).length, 27, "17 result lanes plus approximate-location provenance + census demo rows + the map-people-fill arc's three cohort cob/rel/ten lanes + the marital-status cohort (2026-11-11) + the medinc booth column the frame's 1991-era census income print fills + the Age family's four lanes");
+  assert.deepEqual(D.marKeys, ["marr", "never", "sep", "div", "wid"], "1996 carries the Marital status menu's five options in their order");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 46.372) < 0.005, "1996 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -565,7 +566,8 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
   const B = D.booths;
-  assert.equal(Object.keys(B).length, 26, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure + ancestry rows + the household-median dollar lane + the age family's median and three new share lanes)");
+  assert.equal(Object.keys(B).length, 27, "the booth lane is the full columnar (16 + census demo + birthplace + religion + tenure + ancestry rows + the Marital status cohort (2026-11-11) + the household-median dollar lane + the age family's median and three new share lanes)");
+  assert.deepEqual(D.marKeys, ["marr", "never", "sep", "div", "wid"], "2001 carries the Marital status menu's five options");
   {
     const alp2 = 100 * D.agg.AUS.tpp[0] / (D.agg.AUS.tpp[0] + D.agg.AUS.tpp[1]);
     assert.ok(Math.abs(alp2 - 49.05) < 0.005, "2001 national TPP matches divs.txt's canonical figure exactly (got " + alp2.toFixed(2) + ")");
@@ -657,7 +659,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     // demo rows: 0..1 shares or null per lane, and the birthplace dict's
     // own country shares the same inside it (the interp contract joined
     // its object-valued cob key 2026-10-28)
-    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
+    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "mar"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
   // every interp year rides the income cuts of the nearest census
   // side (hi edges differ across the 2001/2006/2011 grids, so the hi
@@ -1820,7 +1822,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace and ancestry dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `nsw23 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `nsw23 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -2353,7 +2355,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace and ancestry dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `vic22 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `vic22 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {

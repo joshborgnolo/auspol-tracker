@@ -180,6 +180,7 @@ def demo_main(frame, year):
     nlt = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
     lab = gcp_newlanes.load_lab(V["gcp"], prefix="3", era=str(year))
+    mar = gcp_newlanes.load_mar(V["gcp"], prefix="3", era=str(year))
     inc, _inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "3")
     HL = gcp_newlanes.hl_alloc_of(
         2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
@@ -215,6 +216,7 @@ def demo_main(frame, year):
                                   "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
                                   "ancP": 0, "ancNS": 0,
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "ueN": 0.0, "lfD": 0.0,
@@ -272,6 +274,8 @@ def demo_main(frame, year):
         labU, labLF = lab[code]
         a["ueN"] += labU
         a["lfD"] += labLF
+        for i in range(len(gcp_newlanes.MAR_KEYS)):
+            a["marN"][i] += mar[code][i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -288,6 +292,7 @@ def demo_main(frame, year):
                 return None, nm
         tn = a["tenN"]
         tend = tn[0] + tn[1] + tn[2] + tn[4]
+        mard = sum(a["marN"])
         s = {
             "lang": round(a["oth"] / (a["eng"] + a["oth"]), 4),
             "a65": round((a["bands"][8] + a["bands"][9] + a["bands"][10]) / bsum, 4),
@@ -318,6 +323,9 @@ def demo_main(frame, year):
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
+            "mar": {k: (round(a["marN"][i] / mard, 4)
+                        if mard > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
         }
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -347,6 +355,7 @@ def demo_main(frame, year):
               "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
               "ceb3": 0, "cebns": 0, "cebt": 0,
               "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
               "ancP": 0, "ancNS": 0,
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
@@ -357,7 +366,7 @@ def demo_main(frame, year):
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "marN", "incBandH"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -383,6 +392,7 @@ def demo_main(frame, year):
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
+        "marKeys": list(gcp_newlanes.MAR_KEYS),
         "demo": {nm: demo[nm] for nm in order},
         "state": {**st_shares, "persons": persons, "sa1": st_acc["n"],
                   "sentinelSa1": len(QLD_SENTINELS[year]), "sentinelPersons": sentinel_persons},

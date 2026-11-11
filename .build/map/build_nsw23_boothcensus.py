@@ -238,6 +238,7 @@ def demo_cells():
     newl = gcp_newlanes.load(GCP_ZIP, prefix="1")
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="1", era="2021")
     lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="1", era="2021")
+    mar = gcp_newlanes.load_mar(GCP_ZIP, prefix="1", era="2021")
     inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "1")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
     extra = {}
@@ -295,6 +296,8 @@ def demo_cells():
             (ancv, ancp, ancns) = arc[code]
         hle = HL.get(code, {}).get("e", 0.0)
         anc = [safe(v, ancp - ancns) for v in ancv]
+        marv = mar[code]
+        marsh = [safe(v, sum(marv)) for v in marv]
         uel, lfd = lab[code]
         aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         out[code] = ([safe(oth, eng + oth),
@@ -315,7 +318,7 @@ def demo_cells():
                       safe(hiqm, aud),
                       safe(uel, lfd)],
                      [safe(c, den09) for c in cob],
-                     rel, ten, anc)
+                     rel, ten, anc, marsh)
     print(f"GCP demo cells: {len(out)} SA1s")
     return out
 
@@ -341,8 +344,8 @@ def main():
             fail(f"{year}: cobKeys already set — the lane is not this script's on a stale data build (rerun build_{year}_data.py first)")
         out_sa1, suppressions = set(), 0
         counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0}
-        dec_col, demo_col, cob_col, rel_col, ten_col, anc_col = \
-            [], [], [], [], [], []
+        dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, mar_col = \
+            [], [], [], [], [], [], []
         for k in range(n):
             lat, _lon, ty = B["lat"][k], B["lon"][k], B["ty"][k]
             if ty == 4:
@@ -353,6 +356,7 @@ def main():
                 rel_col.append(None)
                 ten_col.append(None)
                 anc_col.append(None)
+                mar_col.append(None)
                 continue
             if lat is None:
                 fail(f"{year} booth {B['n'][k]!r}: no coordinates — every fixed booth must carry the venue roll's coords before the census join")
@@ -379,6 +383,7 @@ def main():
             rel_col.append(list(dm[2]))
             ten_col.append(list(dm[3]))
             anc_col.append(list(dm[4]))
+            mar_col.append(list(dm[5]))
         B["dec"] = dec_col
         B["vdec"] = [None] * n  # NSWEC releases no votes-by-SA1 product; the
         # voter-footprint lane is a federal AEC read and stays empty by design
@@ -387,10 +392,12 @@ def main():
         B["rel"] = rel_col
         B["ten"] = ten_col
         B["anc"] = anc_col
+        B["mar"] = mar_col
         data["cobKeys"] = COB_KEYS
         data["relKeys"] = list(gcp_newlanes.REL_KEYS)
         data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
         data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
+        data["marKeys"] = list(gcp_newlanes.MAR_KEYS)
         unused_inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "1")
         data["incomeCuts"] = inc_cutrec
         with open(path, "w") as f:

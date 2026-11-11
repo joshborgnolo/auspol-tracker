@@ -197,6 +197,7 @@ def main():
     nlt = gcp_newlanes.load(BCP_ZIP, prefix="2", era="2011")
     arc = gcp_newlanes.load_arc31(BCP_ZIP, prefix="2", era="2011")
     lab = gcp_newlanes.load_lab(BCP_ZIP, prefix="2", era="2011")
+    mar = gcp_newlanes.load_mar(BCP_ZIP, prefix="2", era="2011")
     inc, _inc_cutrec = gcp_newlanes.state_income_bcp(BCP_ZIP, "2")
     HL = gcp_newlanes.hl_alloc_of(2011, "c7")
     sa1 = read_sa1_polygons(YEAR)
@@ -242,6 +243,7 @@ def main():
                                   "ancP": 0, "ancNS": 0,
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS14),
                                   "ueN": 0.0, "lfD": 0.0,
+                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -296,6 +298,9 @@ def main():
         labU, labLF = lab[code]
         a["ueN"] += labU
         a["lfD"] += labLF
+        marvec = mar[code]
+        for i in range(len(gcp_newlanes.MAR_KEYS)):
+            a["marN"][i] += marvec[i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -305,6 +310,7 @@ def main():
         bsum = sum(a["bands"])
         fb_den = a["tot"] - a["cobns"]
         uni_den = a["pop15"] - a["eduns"]
+        mard = sum(a["marN"])
         for nm, v in (("bands", bsum), ("fb_den", fb_den),
                       ("uni_den", uni_den), ("occd", a["occd"]),
                       ("eng+oth", a["eng"] + a["oth"])):
@@ -342,6 +348,9 @@ def main():
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
+            "mar": {k: (round(a["marN"][i] / mard, 4)
+                        if mard > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
         }
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -377,13 +386,14 @@ def main():
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS14),
               "ueN": 0.0, "lfD": 0.0,
+              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "marN", "incBandH"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -404,6 +414,7 @@ def main():
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
+        "marKeys": list(gcp_newlanes.MAR_KEYS),
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],
                   "sentinelSa1": len(sent), "sentinelPersons": sentinel_persons},

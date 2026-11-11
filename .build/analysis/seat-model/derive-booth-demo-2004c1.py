@@ -104,7 +104,8 @@ def main():
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancn": [0] * len(d06.ANC_KEYS),
                                   "ancns": 0, "ancP": 0,
-                                  "labU": 0, "labLF": 0})
+                                  "labU": 0, "labLF": 0,
+                                  "marvec": [0] * len(d06.MAR_KEYS)})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -142,6 +143,8 @@ def main():
         acc["ancP"] += r["ancP"]
         acc["labU"] += r["labU"]
         acc["labLF"] += r["labLF"]
+        for i in range(len(d06.MAR_KEYS)):
+            acc["marvec"][i] += r["marvec"][i]
 
     nat = defaultdict(int)
     for dv in divsum.values():
@@ -174,6 +177,9 @@ def main():
         nat.setdefault("ancn", [0] * len(d06.ANC_KEYS))
         for i in range(len(d06.ANC_KEYS)):
             nat["ancn"][i] += dv["ancn"][i]
+        nat.setdefault("marvec", [0] * len(d06.MAR_KEYS))
+        for i in range(len(d06.MAR_KEYS)):
+            nat["marvec"][i] += dv["marvec"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -213,6 +219,8 @@ def main():
                 for i, k in enumerate(d06.ANC_KEYS)},
         "unemp": (round(nat["labU"] / nat["labLF"], 4)
                   if nat["labLF"] else None),
+        "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
+                for i, k in enumerate(d06.MAR_KEYS)},
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -261,7 +269,9 @@ def main():
                 "cebt": r["cebt"],
                 "ancn": r["ancn"], "ancns": r["ancns"],
                 "ancP": r["ancP"],
-                "labU": r["labU"], "labLF": r["labLF"]})
+                "labU": r["labU"], "labLF": r["labLF"],
+                "marvec": (list(r["marvec"]) if r["marvec"] is not None
+                           else None)})
         out_booths.append(rec)
 
     divstate = {b["div"]: b["state"] for b in booths}
@@ -342,6 +352,7 @@ def main():
             "medianBasis": "households (shares are per-adult)",
         },
         "ancKeys": list(d06.ANC_KEYS),
+        "marKeys": list(d06.MAR_KEYS),
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

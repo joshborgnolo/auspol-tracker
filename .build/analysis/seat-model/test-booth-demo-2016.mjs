@@ -71,10 +71,15 @@ eq(c.national, {
   hl: 0.005,
   // the 2026-11-10 labour lane (the 2016 GCP's G43B read)
   unemp: 0.0684,
+  // marital over the 15+ stated-status share (the 2016 GCP's G05)
+  mar: { marr: 0.4811, never: 0.3499, sep: 0.0318, div: 0.0854,
+         wid: 0.0519 },
 }, "national row (2016 census)");
 eq(d.ancKeys, ["english", "australian", "irish", "scottish",
   "chinese", "italian", "german", "indian", "filipino", "dutch",
   "vietnamese", "lebanese"], "ancKeys (the Ancestry menu's twelve)");
+eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
+  "marKeys (the Marital status menu's five)");
 eq([d.incomeCuts.loCutWeekly, d.incomeCuts.hiNationalShare,
   d.incomeCuts.dollarsYear, d.incomeCuts.hiEdgeWeekly],
   [895.8, 0.09093, 2016, 4000], "incomeCuts (2016 dollars)");

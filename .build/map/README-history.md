@@ -305,6 +305,60 @@ years), derive-booth-demo-{2016,2013,2011,2006,2004c1,90s} —
 demo-2001 and demo-2001-frame need the 2001 tally refreshed with the
 labour lane's extractor first — and derive-booth-demo-interp.
 
+# The "Marital status" census select lane (mar, 11 November 2026)
+
+The census People menu gains a fifth select lens: **Marital status** —
+the registered marital-status five (Married, Never married, Separated,
+Divorced, Widowed; the menu's `marKeys` order marr/never/sep/div/wid)
+as a share of people aged 15+ with a stated status. Every edition's
+marital print folds a not-stated slice into its total (or prints none at
+all from 2001 back), so the menu's basis is the five printed categories'
+OWN SUM everywhere — the same ex-not-stated convention G14's religion
+menu rides. Its reads, in `gcp_newlanes.load_mar` and the seat-model
+derive/extract chains:
+
+- 2021 GCP G05 `P_Tot_{Married,Separated,Divorced,Widowed,Never_married}`
+- 2016 GCP G05 same cells (`P_Tot_Never_Married` capitalised differently)
+- 2011 BCP B05 same cells (as 2016's capitalisation)
+- 2006 BCP CD B05 `PERSONS,Total,<cat>` (cell ids B737/B738/B739/B740/
+  B741 from BCP2006_cell_desc_dp.xls)
+- 2001 BCP sheet `B 04` — Age by registered marital status by sex, the
+  printed Total row's five category pair-blocks (Males+Females), less
+  the sheet's Overseas-visitors row (extract-bcp-2001-tally.py's `mar01`)
+- 1996 AURIN `cd_b04_census_1996` — Age by registered marital status by
+  sex, `total_<cat>_m/f` less the matched `overseas_vis_*` columns
+- 1991 AURIN `b06_age_by_marital_status_by_sex_cd_1991` (`m_*/f_*` totals,
+  "separated (not divorced)" the era's Sep option) — fetched through the
+  standing WFS lane 2026-11-11, no not-stated column anywhere here
+
+National sanity reads (share of 15+ with a stated status): 0.465
+married (2021 GCP), 0.487 (2001 B 04), 0.533 (1996 AURIN), 0.561 (1991
+AURIN). The 2001-ward drift (down about five points of married share per
+decade through the era) is what the legend should show.
+
+App surface mirrors the 2026-10-31 select-lens machinery (`anc` the
+model): `LENS_MAR`/`MAR_NAME`/`MARISMS`/`MAR_RANGE` + ramp `seq(163,
+0.12)` + `censusWho` basis override (people aged 15+) + MAR_TOP +
+menu/picker/URL (`ma` param)/clamps in app-6-ui + `MAR`-family emitters
+through demo_interp_of + map/data assembly (`marKeys`/`B["mar"]`/
+`demo.mar` everywhere else select lanes ride); the areas-sa1-2021 pack
+packs `mar.{marr,never,sep,div,wid}` lanes and AREAS_LANES pins them;
+core-split's pplLanes names `mar` (a lane name missing there never asks
+for its res file).
+
+Lane-list rebuild commands: the standing seat-model chain
+(extract-bcp-2001-tally for the 2001-era families and
+extract-bcp-aurin-tally per '90s edition, then
+derive-booth-demo-{2001,2001-frame,2004c1,2006,2011,2013,2016,90s,
+interp} and derive-booth-seifa-voter), `.build/map/gcp_newlanes.py`'s
+readers feeding build_areas_sa1 + every state demo builder,
+build_<frame>_data → build_<frame>_boothcensus → geo_build per state
+family, then build_map_data (its OWN OUT default) and assemble. The
+only source nuclear to this lane beyond committed mirrors is
+`b06_age_by_marital_status_by_sex_cd_1991.csv` in
+cache/bcp-1991-aurin (recaptured from AURIN; the 1996 b04 and 2001 B 04
+read out of existing downloads).
+
 # Boundary product recovery (November 2026)
 
 The state-frame boundary products land ignored in `.build/map/src/` and

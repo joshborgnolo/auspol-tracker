@@ -87,6 +87,9 @@ const NATIONAL = {
          vietnamese: 0.0095, lebanese: 0.01 },
   // the 2026-11-10 labour lane (the 2006 BCP's CD B41 read)
   unemp: 0.0522,
+  // marital over the 15+ stated-status share (the 2006 BCP's B05)
+  mar: { marr: 0.4968, never: 0.3313, sep: 0.031, div: 0.082,
+         wid: 0.0589 },
 };
 // 2006 edition's incomeCuts record (the $3,000+ top-band edition)
 const INC_CUTS = {

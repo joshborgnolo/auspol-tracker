@@ -307,7 +307,8 @@ def with_demo(doc, year):
                      'onepar': dc[11], 'pt': dc[12], 'noncit': dc[13],
                      'bigfam': dc[14], 'hl': dc[15], 'unemp': dc[17],
                      'rel': dv.get('rel'),
-                     'ten': dv.get('ten')}
+                     'ten': dv.get('ten'),
+                     'mar': dv.get('mar')}
         if dm and dm.get('age') and dm.get('persons'):
             age_bands_w[0] += dm['persons']
             for i, k in enumerate(common.AGE_BAND_KEYS):
@@ -360,6 +361,12 @@ def with_demo(doc, year):
     tenkeys = store.get('tenKeys')
     if tenkeys:
         doc['tenKeys'] = list(tenkeys)
+    # the Marital status menu (2026-11-11): the registered-status five,
+    # with keys only where the era can offer them — like every other
+    # era-gated cohort menu
+    markeys = store.get('marKeys')
+    if markeys:
+        doc['marKeys'] = list(markeys)
     n_cob = n_rel = n_ten = 0
     for bid in doc['booths']['id']:
         vb = by_booth.get(bid)
@@ -367,16 +374,19 @@ def with_demo(doc, year):
         cob_b = (blk or {}).get('cob')
         rel_b = (blk or {}).get('rel')
         ten_b = (blk or {}).get('ten')
+        mar_b = (blk or {}).get('mar')
         c_row = [cob_b.get(k) for k in cobkeys] if (cobkeys and isinstance(cob_b, dict)) else None
         r_row = [rel_b.get(k) for k in (relkeys or [])] if (relkeys and isinstance(rel_b, dict)) else None
         t_row = [ten_b.get(k) for k in (tenkeys or [])] if (tenkeys and isinstance(ten_b, dict)) else None
+        m_row = [mar_b.get(k) for k in (markeys or [])] if (markeys and isinstance(mar_b, dict)) else None
         doc['booths'].setdefault('cob', []).append(c_row)
         doc['booths'].setdefault('rel', []).append(r_row)
         doc['booths'].setdefault('ten', []).append(t_row)
+        doc['booths'].setdefault('mar', []).append(m_row)
         n_cob += (c_row is not None)
         n_rel += (r_row is not None)
         n_ten += (t_row is not None)
-    for kk in ('cob', 'rel', 'ten'):
+    for kk in ('cob', 'rel', 'ten', 'mar'):
         if not any(x is not None for x in doc['booths'][kk]):
             del doc['booths'][kk]
     doc['demoBasis'] = 'venue'

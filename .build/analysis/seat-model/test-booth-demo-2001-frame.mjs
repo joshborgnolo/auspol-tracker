@@ -118,6 +118,9 @@ eq(c.national, {
   },
   // the 2026-11-10 labour lane (the 2001 BCP's B 25 read)
   unemp: 0.0739,
+  // marital over the 15+ stated-status share (B 04 print again)
+  mar: { marr: 0.5146, never: 0.315, sep: 0.0343, div: 0.074,
+         wid: 0.062 },
 }, "national == the 2004 lane's figure (same tally, same offshore drop)");
 // booth order == the venue store's
 {
