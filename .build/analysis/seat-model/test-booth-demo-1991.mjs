@@ -146,10 +146,11 @@ const nat91 = {
   atsci: 0.0163, atsciD: 16307305,
   onepar: 0.1285, oneparD: 4298710,
   pt: 0.1091, noncit: 0.123,
+  // the 2026-11-10 labour lane, fetched for 1991 2026-11-11 (the
+  // AURIN workspace's b20 table's p_unemployed/p_labour_force): the
+  // stated labour force's unemployed share nation-wide
+  unemp: 0.1161,
   loinc: 0.25, hiinc: 0.0051, hiqinc: 0.25, incMed: 699,
-  // the 2026-11-10 labour lane is absent on the 1991 print (its AURIN
-  // workspace carries no labour-force table) — null on both 91 sides
-  unemp: null,
 };
 for (const [d, year, nDivs, nBooths, geo, near, miss, empty] of [
   [d93, 1993, 147, 8431, 6399, 2012, 1891, 141],

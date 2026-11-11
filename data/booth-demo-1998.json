@@ -3,12 +3,12 @@
   "_provenance": {
     "files": {
       ".build/analysis/seat-model/seifa-src/cd-1996-ced-1998set.json": "c520c89e901242c6",
-      ".build/analysis/seat-model/cache/bcp-1996-aurin-tally.json": "e390ba261fa19452",
+      ".build/analysis/seat-model/cache/bcp-1996-aurin-tally.json": "e7df38dafe32b761",
       "data/booth-locations-history.json": "9c739398df90ea4b",
-      "data/booth-demo-1998-c1.json": "aafe6047ddf834a2"
+      "data/booth-demo-1998-c1.json": "0013cec5bc984c86"
     },
-    "extractedAt": "2026-11-10",
-    "interpolatedAt": "2026-11-10"
+    "extractedAt": "2026-11-11",
+    "interpolatedAt": "2026-11-11"
   },
   "election": 1998,
   "censusEdition": 1996,

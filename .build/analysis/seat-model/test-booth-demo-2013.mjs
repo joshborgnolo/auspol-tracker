@@ -165,6 +165,8 @@ eq(d.counts.national, {
     scottish: 0.0894, chinese: 0.0433, italian: 0.0458, german: 0.0448,
     indian: 0.0196, filipino: 0.0112, dutch: 0.0167, vietnamese: 0.011,
     lebanese: 0.0102 },
+  // the 2026-11-10 labour lane (the 2011 BCP's B42B read)
+  unemp: 0.0561,
 }, "counts.national");
 
 // 4. division anchors (measured blocks; the demoI interp block has its
@@ -199,6 +201,7 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
       scottish: 0.0856, chinese: 0.1397, italian: 0.0346, german: 0.0367,
       indian: 0.0192, filipino: 0.0115, dutch: 0.013, vietnamese: 0.013,
       lebanese: 0.0092 },
+    unemp: 0.057,
   }, "Sydney row");
   const M = divs.get("Melbourne");
   eq([M.persons, M.langOther, M.fborn, M.uni, M.blue,
@@ -229,6 +232,7 @@ eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
       scottish: 0.0593, chinese: 0.0133, italian: 0.013, german: 0.0368,
       indian: 0.0081, filipino: 0.01, dutch: 0.0124, vietnamese: 0.003,
       lebanese: 0.0006 },
+    unemp: 0.0703,
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(L));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];

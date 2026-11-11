@@ -85,6 +85,8 @@ const NATIONAL = {
          scottish: 0.0822, chinese: 0.0367, italian: 0.0468,
          german: 0.0445, indian: 0.0129, filipino: 0.0088, dutch: 0.017,
          vietnamese: 0.0095, lebanese: 0.01 },
+  // the 2026-11-10 labour lane (the 2006 BCP's CD B41 read)
+  unemp: 0.0522,
 };
 // 2006 edition's incomeCuts record (the $3,000+ top-band edition)
 const INC_CUTS = {

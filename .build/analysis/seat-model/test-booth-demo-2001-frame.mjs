@@ -116,6 +116,8 @@ eq(c.national, {
     chinese: 0.032, italian: 0.0461, german: 0.0426, indian: 0.009,
     filipino: 0.0075, dutch: 0.0155, vietnamese: 0.009, lebanese: 0.0094,
   },
+  // the 2026-11-10 labour lane (the 2001 BCP's B 25 read)
+  unemp: 0.0739,
 }, "national == the 2004 lane's figure (same tally, same offshore drop)");
 // booth order == the venue store's
 {

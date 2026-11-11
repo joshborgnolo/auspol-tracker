@@ -254,17 +254,32 @@ Its reads, all pinned in `gcp_newlanes.load_lab` / the seat-model derives:
 - 2001 BCP sheet `B 25`, the PERSONS block's Total row (cols I/J) —
   extract-bcp-2001-tally.py's `lab01` field, per-CD workbooks
 - 1996 AURIN `cd_b18b` `persons_total_unemp_tot`/`persons_total_lab_frce`
+- 1991 AURIN `b20_age_by_lbr_frc_stat_pt_ft_by_sex_cd_1991`
+  `p_unemployed`/`p_labour_force` (fetched 2026-11-11; the printed
+  totals sit beside their own lbr_frc_stat_no_stated block, so the
+  read is the era's own ex-not-stated print)
 
-The 1991 AURIN workspace prints NO labour-force table, so 1993 and 1996
-omit the lane by the era-hole doctrine (regeneration of the county file
-would extend it there; the fetch was not made). Interp blending follows
-the standing null-rule: a side missing the print leaves the demoI lane
-null and the display nearest-to-measured (1996 sits nearest c1=1996 in
-doctrine terms but its guard is the c0=1991 measured store, so it omits).
-National sanity reads after the measures: 0.0506 residents / 0.0487 voter-
-footprint (2021), 0.0919 (1996 edition), 0.0739 (2001 edition, B 25).
+The archived AURIN workspaces were first read as printing no 1991
+labour table, so 1993, 1996 and 2001 shipped the lane whole-null.
+2026-11-11: the 1991 edition's b20 table turned up in the Census1991
+workspace after all (55 named tables vs the fetched 13) and the lane
+was regenerated onto both '91-era frames plus the 2001 frame — whose
+own 2001 tally had carried `lab01` since the lane landed but whose
+derive chain had never been re-run with it. 1998 blends by its
+standing interp doctrine (c0 1996 / c1 2001 both read now, where the
+c0-side hole had pinned it to the 2001 measured value). National
+sanity reads after the measures: 0.0506 residents / 0.0487 voter-
+footprint (2021), 0.1161 (1991 edition, B 20), 0.0919 (1996 edition),
+0.0739 (2001 edition, B 25), 0.0522 (2006 edition, B41), 0.0561
+(2011 edition), 0.0684 (2016 edition). The lane guard rails the same
+way as the rest: at DM_LENGTH 99th-percentile era maxima run
+0.32 (1991 recession), so the display range widened [0, 22] →
+[0, 32] with the era's landing (2004's p99 sits 0.220 — the GCP
+era's frames rescaled one ramp shade lighter against the widened
+domain).
 
-App surface: DM/DM_NAME/DM_SHORT/DM_VERB/DM_POP/DM_RANGE `[0, 22]` + a
+App surface: DM/DM_NAME/DM_SHORT/DM_VERB/DM_POP/DM_RANGE `[0, 32]`
+(widened from `[0, 22]` at the era landing above) + a
 red-family ramp `seq(8, 0.13)` + `DM_TOP`; the areas-sa1-2021 pack packs it
 (`caps [0, 25]`, AUS mark 0.0506, its sa26 lane-oracle re-verified, the
 lane ending the AREAS_LANES set with it) and `AREAS_LANES` lists it.

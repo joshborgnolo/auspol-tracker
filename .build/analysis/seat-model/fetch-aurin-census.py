@@ -65,6 +65,11 @@ T1991 = {
     "b11_language_spoken_home_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b13_religion_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b16_qualification_hi_level_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
+    # the labour lane's 1991 table (2026-11-11): age by labour force
+    # status by sex, the p_unemployed/p_labour_force printed totals
+    # beside a separate lbr-frc-stat-not-stated block (the era's own
+    # ex-not-stated print, the house lane convention)
+    "b20_age_by_lbr_frc_stat_pt_ft_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b22_occupation_by_age_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b27_yr_individual_inc_by_sex_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",
     "b29_yr_hsld_inc_cd_1991": "datasource-AU_Govt_ABS_Census-UoM_AURIN_DB_Census1991",

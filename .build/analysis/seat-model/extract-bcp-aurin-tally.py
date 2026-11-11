@@ -199,6 +199,17 @@ def tally_1991():
         tally[c]["inc"] = [_sub_int(r, f"{b}_hslds") for b in INC91_BANDS]
         tally[c]["incTot"] = _sub_int(r, "tot_hslds")
 
+    # b20 age by labour force status by sex (Persons block totals):
+    # p_unemployed over the printed p_labour_force — the 2026-11-10
+    # labour lane's 1991 edition (fetched 2026-11-11); the print
+    # carries its own lbr_frc_stat_no_stated block, so the labour-force
+    # cell is the stated labour force, the era's ex-not-stated print —
+    # the same read as 1996's cd_b18b below
+    for r in read("b20_age_by_lbr_frc_stat_pt_ft_by_sex_cd_1991.csv"):
+        c = r["cd_code_1991"]
+        tally[c]["labU"] = _sub_int(r, "p_unemployed")
+        tally[c]["labLF"] = _sub_int(r, "p_labour_force")
+
     return tally
 
 
@@ -304,8 +315,8 @@ def tally_1996():
 
     # b18b age by labour force status (Persons block): unemployed
     # looking for work over the stated labour force — the 2026-11-10
-    # labour lane; 1991's archived workspace prints no labour table,
-    # so only this edition carries the fields
+    # labour lane; since 2026-11-11 the 1991 edition's b20 read joins
+    # it above, so both archived editions carry the fields
     for r in read("cd_b18b_census_1996.csv"):
         c = r["cd_code"]
         tally[c]["labU"] = _sub_int(r, "persons_total_unemp_tot")

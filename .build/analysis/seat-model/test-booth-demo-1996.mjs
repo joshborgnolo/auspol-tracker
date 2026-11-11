@@ -137,6 +137,9 @@ const nat96 = {
   atsci: 0.0197, atsciD: 17878649,
   onepar: 0.1393, oneparD: 4511391,
   pt: 0.0876, noncit: 0.112,
+  // the 2026-11-10 labour lane (the edition's cd_b18b read:
+  // unemployed over the stated labour force)
+  unemp: 0.0919,
 };
 const STORES = [
   ["data/booth-demo-1993-c1.json", 1993, 147, 8431, 6383, 2109, 1891, 157],

@@ -3,10 +3,10 @@
   "_provenance": {
     "files": {
       ".build/analysis/seat-model/seifa-src/cd-1996-ced-1993set.json": "f92b80e73fe138cc",
-      ".build/analysis/seat-model/cache/bcp-1996-aurin-tally.json": "e390ba261fa19452",
+      ".build/analysis/seat-model/cache/bcp-1996-aurin-tally.json": "e7df38dafe32b761",
       "data/booth-locations-history.json": "9c739398df90ea4b"
     },
-    "extractedAt": "2026-11-10"
+    "extractedAt": "2026-11-11"
   },
   "election": 1993,
   "censusEdition": 1996,

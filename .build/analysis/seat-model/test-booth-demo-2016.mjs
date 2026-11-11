@@ -69,6 +69,8 @@ eq(c.national, {
     indian: 0.0281, filipino: 0.0136, dutch: 0.0154,
     vietnamese: 0.0133, lebanese: 0.0103 },
   hl: 0.005,
+  // the 2026-11-10 labour lane (the 2016 GCP's G43B read)
+  unemp: 0.0684,
 }, "national row (2016 census)");
 eq(d.ancKeys, ["english", "australian", "irish", "scottish",
   "chinese", "italian", "german", "indian", "filipino", "dutch",

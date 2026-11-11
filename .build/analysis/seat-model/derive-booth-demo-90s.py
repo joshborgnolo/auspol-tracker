@@ -353,9 +353,9 @@ def shares(r):
         vals["noncit"] = round((per - r["citz"]) / per, 4)
     else:
         vals["noncit"] = None
-    # the labour-force lane (2026-11-10): the '96 AURIN print's b18b
-    # reads; None where the archived workspace prints no labour table
-    # (the '91 editions) — same null contract as the era holes
+    # the labour-force lane (2026-11-10): the AURIN prints' reads —
+    # '96's b18b, '91's b20 (fetched 2026-11-11); None wherever the
+    # archived tally carries no labour fields
     if r.get("labU") is not None and (r.get("labLF") or 0) > 0:
         vals["unemp"] = round(r["labU"] / r["labLF"], 4)
     else:
