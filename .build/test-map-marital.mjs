@@ -102,6 +102,25 @@ try {
   check("nsw15's menu shows no Marital status entry", await page.evaluate(() => !document.body.textContent.includes("Marital status")));
   await page.close();
 
+  // 6. the Chart view invalidates on an option swap (it used to memoise the
+  // figure without the select-lens keys: a Widowed→Never married swap
+  // redrew nothing until the view changed and came back)
+  page = await scenario("y=2025&l=seifa&i=mar&ma=marr&draw=chart");
+  await page.waitForFunction(() => __map.S.index === "mar" && __map.S.draw === "chart" && document.querySelector("#chartv .ch-plot svg"), { timeout: 120000 });
+  const trig = await page.evaluate(() => !!document.querySelector('[aria-controls="lgmenu-mar"]'));
+  check("the chart view shows the marital picker", trig);
+  const figBefore = await page.evaluate(() => `${document.querySelector("#chartv .ch-plot").innerHTML}@@${document.querySelector("#chartv .ch-hed").textContent}`);
+  await page.evaluate(async () => {
+    const item = document.querySelector('#lgmenu-mar [data-lg-val="mar:wid"]');
+    item.click();
+    await new Promise((r) => setTimeout(r, 400));
+  });
+  const moved = await page.evaluate(() => __map.S.mar === "wid");
+  check("the option moved to Widowed", moved);
+  const figAfter = await page.evaluate(() => `${document.querySelector("#chartv .ch-plot").innerHTML}@@${document.querySelector("#chartv .ch-hed").textContent}`);
+  check("the chart repaints when the marital option moves in chart view", figBefore !== figAfter);
+  await page.close();
+
   check("no page errors anywhere in the probes", errors.length === 0);
   console.log(`test-map-marital: ok — ${checks.length} checks`);
 } finally {

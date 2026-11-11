@@ -12195,7 +12195,10 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL || drawOf(M()) !== "seats"));
-const legendState = () => [S.sel.level, S.sel.st, S.sel.div, S.sel.booth, SF.key, SF.data ? SF.data.n : 0, SF.empty, ...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+// the select-lens option keys ride the key too: the chart's statKey derives
+// from this line, and a swapped option (Widowed to Never married) must
+// invalidate a chart the same way a swapped index does
+const legendState = () => [S.sel.level, S.sel.st, S.sel.div, S.sel.booth, SF.key, SF.data ? SF.data.n : 0, SF.empty, ...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.mar, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 // the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
 let lensFlip = false;
 const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? (spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots") : "Counted in the House"}<span>⇄</span></button>`);
