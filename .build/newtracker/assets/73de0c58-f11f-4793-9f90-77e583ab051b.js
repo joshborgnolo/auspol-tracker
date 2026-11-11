@@ -1988,13 +1988,14 @@ const TABS = [
   { id: "flows-explained", label: "Preference flows explained", menu: true,
     tip: "How preferences decide the two-party figure" },
   /* Electoral map (2026-10-25): every federal seat and polling place since
-     2004, on the map, in the chamber and in a list - a page OUTSIDE this
+     2004, plus the state elections and the Senate, on the map, in the
+     chamber and in a list - a page OUTSIDE this
      build (ext), the satellite renamed Electoral map at /map/ (sources
      .build/map/; /maps/ from earlier today is a redirect). The menu links it;
      it has no view here, so it takes no path of this page's, no stop on the
      page turn and no menu-page view, and build.mjs emits no document for it */
   { id: "map", label: "Electoral map", menu: true, ext: true,
-    tip: "Every federal seat and polling place since 2004, on the map and in the chamber" },
+    tip: "Every federal seat and polling place since 2004, plus state elections and the Senate, on the map and in the chamber" },
   /* Election model (2026-11-01), the menu's sixth page: who would win the House, from 20,000
      simulated elections on the polls, seat by seat, with every setting open to change - a page
      OUTSIDE this build (ext), the satellite at /model/ (.build/model/), linked as the map is */
