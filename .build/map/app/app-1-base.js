@@ -397,12 +397,12 @@ const isEdu = () => S.index === LENS_EDU;
 // children reads fold into the one menu entry, u15's menu slot, the way
 // the schooling reads fold into Education; Children under 15 is the
 // landing view. Each read keeps its own DM id for the dicts, ranges,
-// ramps and top-of lists — FAM_* names only the lens's own menu, chip
-// and note texts
-const FAM_MODES = ["u15", "onepar", "bigfam"];
-const FAM_NAME = { u15: "Children under 15", onepar: "One-parent families", bigfam: "More than two children" };
-const FAM_SHORT = { u15: "Under 15", onepar: "One-parent", bigfam: "3+ children" };
-const FAM_NOTE = { u15: "Share of residents who are children under 15", onepar: "Share of families that are one-parent families", bigfam: "Share of women aged 15+ who have had more than two children" };
+// ramps and top-of lists — FAMC_* names only the lens's own menu, chip
+// and note texts (FAM_NAME long since names the party families)
+const FAMC_MODES = ["u15", "onepar", "bigfam"];
+const FAMC_NAME = { u15: "Children under 15", onepar: "One-parent families", bigfam: "More than two children" };
+const FAMC_SHORT = { u15: "Under 15", onepar: "One-parent", bigfam: "3+ children" };
+const FAMC_NOTE = { u15: "Share of residents who are children under 15", onepar: "Share of families that are one-parent families", bigfam: "Share of women aged 15+ who have had more than two children" };
 const isFam = () => S.index === LENS_FAM;
 const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === LENS_IND ? INDISMS[S.ind] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : k === LENS_FAM ? DM_VERB[S.famMode] : DM_VERB[k]);
 // whose share a census measure is, and what it says of them: the bases the builders divide by
@@ -908,7 +908,7 @@ const S = {
   // the Education lens's read: the university-qualification share, or the
   // left-school-early one (an EDU_MODES value; the university read lands)
   eduMode: "uni",
-  // the Family-composition lens's read (a FAM_MODES value; the
+  // the Family-composition lens's read (a FAMC_MODES value; the
   // children-under-15 read lands)
   famMode: "u15",
   // the Born overseas lens's birthplace-country sub-view (a COB_NAME key, null = all overseas-born)
