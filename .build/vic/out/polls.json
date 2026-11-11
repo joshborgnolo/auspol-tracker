@@ -127,7 +127,7 @@
   },
   "meta": {
     "source": "data/vic-polls.json",
-    "generated": "2026-10-30"
+    "generated": "2026-11-11"
   },
   "metricRules": {
     "favFirms": [
@@ -1444,6 +1444,38 @@
       "tpp_alp": 44,
       "tpp_lnp": 56,
       "url": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/"
+    },
+    {
+      "date": "2026-11-07",
+      "dateStart": "2026-11-02",
+      "pollster": "Resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "alp": 22,
+      "lnp": 30,
+      "grn": 13,
+      "onp": 23,
+      "ind": 6,
+      "oth": 7,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theage.com.au/politics/victoria/half-of-victorians-open-to-a-one-nation-coalition-as-carroll-faces-labor-wipeout-20261109-p61cjv.html"
+    },
+    {
+      "date": "2026-11-10",
+      "dateStart": "2026-11-03",
+      "pollster": "RedBridge/Accent",
+      "client": "Australian Financial Review",
+      "sample": 1008,
+      "alp": 23,
+      "lnp": 31,
+      "grn": 15,
+      "onp": 22,
+      "ind": 9,
+      "oth": null,
+      "tpp_alp": 43,
+      "tpp_lnp": 57,
+      "url": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z"
     }
   ],
   "ppm": [
@@ -1875,6 +1907,26 @@
       "oppName": "Wilson",
       "pmName": "Carroll",
       "han": 19,
+      "extra": null
+    },
+    {
+      "date": "2026-11-07",
+      "firm": "Resolve",
+      "alb": 21,
+      "opp": 35,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 15,
+      "extra": null
+    },
+    {
+      "date": "2026-11-10",
+      "firm": "RedBridge/Accent",
+      "alb": 18,
+      "opp": 29,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 11,
       "extra": null
     }
   ],
@@ -2361,6 +2413,16 @@
           "dis": 43
         }
       }
+    },
+    {
+      "date": "2026-11-07",
+      "firm": "Resolve",
+      "alb": -16,
+      "opp": 24,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 9,
+      "detail": null
     }
   ],
   "ppmHeadToHead": [],
@@ -2417,6 +2479,12 @@
       "date": "2026-10-29",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 54.5,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-11-10",
+      "firm": "RedBridge/Accent",
+      "alpVsOnp_alp": 55,
       "lnpVsOnp_lnp": null
     }
   ],

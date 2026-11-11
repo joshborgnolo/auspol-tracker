@@ -1,8 +1,8 @@
 {
-  "generated": "2026-10-30",
+  "generated": "2026-11-11",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-10-30 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-10-30 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-11 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-11 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -1928,6 +1928,59 @@
         "pollbludger"
       ],
       "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "2-7 Nov",
+      "fwStart": "2026-11-02",
+      "fwEnd": "2026-11-07",
+      "approxDate": false,
+      "primary": {
+        "alp": 22,
+        "lnp": 30,
+        "grn": 13,
+        "onp": 23,
+        "ind": 6,
+        "oth": 7
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/half-of-victorians-open-to-a-one-nation-coalition-as-carroll-faces-labor-wipeout-20261109-p61cjv.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 1008,
+      "dateLabel": "3–10 Nov",
+      "fwStart": "2026-11-03",
+      "fwEnd": "2026-11-10",
+      "approxDate": false,
+      "primary": {
+        "alp": 23,
+        "lnp": 31,
+        "grn": 15,
+        "onp": 22,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 43
+      },
+      "alt": {
+        "alpVOnp": 55
+      },
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z"
     }
   ],
   "threeParty": [
@@ -3894,6 +3947,60 @@
       ]
     },
     {
+      "series": "approval",
+      "dateLabel": "2–7 Nov 2026",
+      "date": "2026-11-07",
+      "fwStart": "2026-11-02",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "carroll",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -16,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/half-of-victorians-open-to-a-one-nation-coalition-as-carroll-faces-labor-wipeout-20261109-p61cjv.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "2–7 Nov 2026",
+      "date": "2026-11-07",
+      "fwStart": "2026-11-02",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 24,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/half-of-victorians-open-to-a-one-nation-coalition-as-carroll-faces-labor-wipeout-20261109-p61cjv.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "2–7 Nov 2026",
+      "date": "2026-11-07",
+      "fwStart": "2026-11-02",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "pickering",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 9,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/half-of-victorians-open-to-a-one-nation-coalition-as-carroll-faces-labor-wipeout-20261109-p61cjv.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
       "series": "preferredPremier",
       "dateLabel": "30 Oct–5 Nov 2026",
       "date": "2026-11-05",
@@ -3911,6 +4018,46 @@
       "sourceUrl": "https://www.pollbludger.net/2026/11/09/demosau-labor-18-coalition-33-one-nation-21-in-victoria/",
       "provenance": [
         "pollbludger"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "2–7 Nov 2026",
+      "date": "2026-11-07",
+      "fwStart": "2026-11-02",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "values": {
+        "carroll": 21,
+        "wilson": 35,
+        "pickering": 15
+      },
+      "dk": 29,
+      "net": 14,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/half-of-victorians-open-to-a-one-nation-coalition-as-carroll-faces-labor-wipeout-20261109-p61cjv.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "3–10 Nov 2026",
+      "date": "2026-11-10",
+      "fwStart": "2026-11-03",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "values": {
+        "carroll": 18,
+        "wilson": 29,
+        "pickering": 11
+      },
+      "dk": 42,
+      "net": 11,
+      "sourceUrl": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z",
+      "provenance": [
+        "wikipedia"
       ]
     }
   ]
