@@ -124,6 +124,19 @@ const WIKI_RAW = `https://en.wikipedia.org/w/index.php?title=${WIKI_TITLE}&actio
 const WIKI_FILE = process.env.N24_WIKI_FILE ?? null;
 const WIKI_DEBUG = !!process.env.N24_WIKI_DEBUG;
 export const MAX_WIKI_ADDS = 4; // fortnightly series: >4 new fallback waves in one run = upstream layout shift
+
+/* Witness-date corrections: a wave the witnesses date X that YouGov's own
+   APC methodology statement — the fieldwork authority — dates Y is filed at
+   Y, and every candidate lane canonicalises the witness date to the filed
+   date before any dedupe match or write, so Wikipedia's and News24's
+   unrevised pages can never re-file the wave next run. One home, exported
+   for healer.mjs's dedupe (the second consumer — keep them together).
+   2026-09-21 -> 2026-09-22: News24's article and Wikipedia's table say the
+   wave's fieldwork ended 21 Sep; News24_Pulse_22_09_26_APC_Methodology_
+   Statement.pdf states "Fieldwork dates 15th September – 22nd September
+   2026" — user call 2026-11-12 trusts the statement for fieldwork dates. */
+export const WITNESS_DATE_FIX = { "2026-09-21": "2026-09-22" };
+const canonWaveDate = (d) => WITNESS_DATE_FIX[d] ?? d;
 const NEWS24_FILE = process.env.N24_NEWS24_FILE ?? null;
 // News24's own Pulse topic page lists each release the morning it lands —
 // usually before Wikipedia does — so it is a second discovery source beside
@@ -1267,6 +1280,17 @@ try {
     recs.push(p.rec);
   }
 
+  // Witness dates the APC statement overruled are canonicalised before any
+  // match or write (WITNESS_DATE_FIX) — otherwise News24's unrevised page
+  // would re-file the wave under its own stated window next run.
+  for (const rec of recs) {
+    const c = canonWaveDate(rec.date);
+    if (c !== rec.date) {
+      console.error(`N24_NOTE witness fieldwork end ${rec.date} filed as ${c} (APC statement is the fieldwork authority)`);
+      rec.date = c;
+    }
+  }
+
   const guardFails = [];
   const newPolls = [], newPpm = [], newAppr = [], newAlt = [], newPpmH = [], sources = [];
   for (const rec of recs.sort((a, b) => (a.date < b.date ? -1 : 1))) {
@@ -1362,6 +1386,15 @@ try {
     for (const n of pulseNotes) console.error(`N24_NOTE ${n}`);
     status.fallback.pulse = pulse.map((w) => w.date);
     waves = [...waves, ...pulse];
+    // same witness-date canonicalisation as the RSS lane — Wikipedia and the
+    // Pulse page both still carry the wave's unrevised window
+    for (const w of waves) {
+      const c = canonWaveDate(w.date);
+      if (c !== w.date) {
+        console.error(`N24_NOTE witness fieldwork end ${w.date} filed as ${c} (APC statement is the fieldwork authority)`);
+        w.date = c;
+      }
+    }
     if (WIKI_DEBUG) console.error("N24_WIKI " + JSON.stringify(waves));
     status.fallback.checked = waves.length;
     status.fallback.unparsed = unparsed.slice(0, 10);

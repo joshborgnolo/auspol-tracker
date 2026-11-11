@@ -363,6 +363,11 @@ async function acceptN24({ llm, evidenceDir, D }) {
   const n24 = await n24Lib();
   const text = readFileSync(join(evidenceDir, "wiki.txt"), "utf8");
   const existing = new Set(D.polls.filter((p) => p.pollster === "YouGov").map((p) => p.date));
+  // A wave re-dated on the pollster's APC statement (WITNESS_DATE_FIX, one
+  // home in extract-news24.mjs) still dedupes under the date the witnesses
+  // recite, or a wounded wiki lane would file it twice.
+  for (const [witness, canon] of Object.entries(n24.WITNESS_DATE_FIX ?? {}))
+    if (existing.has(canon)) existing.add(witness);
   const out = { accepted: [], rejected: [], rows: [], sources: [], proofs: [] };
   const seen = new Set();
   for (const w of llm.waves) {
