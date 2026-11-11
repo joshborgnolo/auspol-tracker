@@ -617,35 +617,26 @@ function senTwoStat(m, idx) {
 }
 /* the Now senate chamber's note beside its seats row: the base chamber is the
    election's own, with the movements since named plainly — who joined a side
-   from outside it, and which parties changed their senator — in the House
-   row's own words shape ("…election's, adjusted for changes since then.").
-   A surname respelling (Deb/Deborah O'Neill) and a family-level re-code
-   (the Queenslanders' LNP) are not movements */
-function senMovesNote(dn, d0, yr) {
-  const keyOf = (d) => `${d.st}|${d.n.split(/\s+/).pop().toLowerCase()}`;
-  const goneByKey = new Map(d0.divs.map((d) => [keyOf(d), d]));
-  const switched = [], arrived = [];
-  for (const d of dn.divs) {
-    const b = goneByKey.get(keyOf(d));
-    if (b) { goneByKey.delete(keyOf(d)); if (b.hold.fam !== d.hold.fam) switched.push(d); }
-    else arrived.push(d);
-  }
-  const left = [...goneByKey.values()], replaced = [];
-  for (const a of arrived) {
-    const j = left.findIndex((l) => l.st === a.st && l.hold.ab === a.hold.ab);
-    if (j >= 0) { replaced.push(a.hold.ab); left.splice(j, 1); }
-  }
-  if (!switched.length && !replaced.length) return "";
+   and who replaced whom in it — in the House row's own words shape
+   ("…election's, adjusted for changes since then.") */
+function senChangeNote(m, yr, st) {
+  // the whole window back to election day: the hand-checked list carries the
+  // pre-seating moves (Cox's defection, Dolega's appointment) that the
+  // seating-day base deck has already absorbed. And the note follows the
+  // head's pool to its state — at every filter the moves that touch that
+  // state, net-zero ones (a party replacing its own senator) included
+  const items = (m.senChanges || []).filter((c) => st === "AUS" || c.st === st);
+  if (!items.length) return "";
   const word = (ab) => ({ ALP: "Labor", LP: "the Liberals", NP: "the Nationals", LNP: "the LNP", GRN: "the Greens", ON: "One Nation", ONP: "One Nation", UAP: "the United Australia Party", UAPP: "the United Australia Party", JLN: "the Jacqui Lambie Network", AV: "Advance Australia", IND: "an independent" })[ab] || ab;
-  const pieces = [];
-  for (const d of switched) pieces.push(`${ds(d.n)} has joined ${word(d.hold.ab)}`);
+  const joined = items.filter((c) => c.kind !== "replaced"), replaced = items.filter((c) => c.kind === "replaced");
+  // (the list's texts lead with the name — the rows bold-state them, the note says the verb itself)
+  const clause = (c) => { const v = c.text.startsWith(c.who) ? c.text.slice(c.who.length).trimStart() : c.text; return `${c.who}${v.startsWith(",") ? v : ` ${v}`}`; };
+  const pieces = joined.map(clause);
   if (replaced.length) {
-    const cnt = {};
-    for (const ab of replaced) cnt[ab] = (cnt[ab] || 0) + 1;
-    const who = Object.keys(cnt).map(word);
-    pieces.push(who.length === 1 && cnt[Object.keys(cnt)[0]] === 1 ? `${who[0]} replaced a senator` : `${listAnd(who)} replaced a senator each`);
+    const who = replaced.map((c) => word(c.to));
+    pieces.push(replaced.length === 1 ? `${word(replaced[0].to)} replaced a senator` : `${listAnd(who)} replaced a senator each`);
   }
-  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then. ${pieces.map(cap).join(". ")}.`;
+  return ` These figures are the ${yr} election’s Senate, adjusted for changes since then${scopeWhere(m, st)}. ${pieces.map(cap).join(". ")}.`;
 }
 // Pool actual election counts, not averages of seat percentages. On a Now
 // frame res.divs remains the base election; by-elections only replace m.divs.
@@ -801,8 +792,18 @@ function seatStat(m, st, label, noteDef = null) {
   // 2025 election's chamber, exactly as the lower house's seats do (never
   // against the election before that, as m.res.prev would price it)
   const deckP = deck ? SENY[isNowY(m.year) ? frameBaseY(m.year) : prevYearOf(m.year)] || null : null;
-  const senNote = deck && deckP && isNowY(m.year) && st === "AUS" ? senMovesNote(deck, deckP, frameBaseY(m.year)) : "";
+  const senNote = deck && isNowY(m.year) && m.senChanges ? senChangeNote(m, frameBaseY(m.year), st) : "";
   const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
+  /* the base deck's day is the senators' seating day ("the election's senators"
+     handed over 1 July 2025), so moves between election day and that snapshot —
+     Cox defection, Urquhart-replaced — sit silently inside it. Undo them here
+     (family level: a party-room move swaps no seats) so the delta line reads
+     the election's own composition, as the note does */
+  const tallyElecDay = (dd, sel) => {
+    const c = tallyOf(dd, sel);
+    for (const x of m.senChanges || []) if (x.from && x.to && x.date < (dd.asOf || "") && (!sel || x.st === sel)) { const f0 = FAM(x.from), f1 = FAM(x.to); if (f0 !== f1) { c[f1] = (c[f1] || 0) - 1; c[f0] = (c[f0] || 0) + 1; } }
+    return c;
+  };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
   const seatsNote = !deck && noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
@@ -810,7 +811,7 @@ function seatStat(m, st, label, noteDef = null) {
   // series on an election frame, else the pool's seat-by-seat reversion — and
   // the previous chamber's tally where the deck reads
   const sCnt = deck ? tallyOf(deck, deckSt) : cnt;
-  const base = deck ? { c: deckP ? tallyOf(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
+  const base = deck ? { c: deckP ? tallyElecDay(deckP, deckSt) : null } : cls ? scopeSeatBase(m, { k: "cls", cls }, idx, cnt) : st === "AUS" || !isNowY(m.year) ? seatBase(m, st) : scopeSeatBase(m, { k: "st", st }, idx, cnt);
   const a = sCnt.alp || 0, l = sCnt.lnp || 0;
   // a crossbench party on 15 seats or more stands apart from "others"; independents are never a party.
   // (none has yet, at any level: the Greens and One Nation are the likely first)
@@ -1099,7 +1100,7 @@ function areaHedDek(m, st) {
 
 // the census people measures, area level: who holds the fifth of seats at each end
 const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats where the most people aged 15+ hold a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12less: ["seats where the most residents aged 15+ left school before Year 12", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
-  pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"], unemp: ["seats with the most people out of work", "with the fewest"] };
+  pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"] };
 // Ancestry option phrases, generated per option of the select menu
 const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.entries(ANC_NAME) : []).map(([k, n]) => [k, [`seats where the most residents named ${n} ancestry`, "with the fewest"]]));
 const REL_TOP = { norel: ["seats where the most residents say they have no religion", "with the fewest"], cath: ["seats with the most Catholic residents", "with the most of another faith"], angl: ["seats with the most Anglican residents", "with the fewest"], unch: ["seats with the most Uniting Church residents", "with the fewest"], pres: ["seats with the most Presbyterian residents", "with the fewest"], orth: ["seats with the most Orthodox residents", "with the fewest"], budd: ["seats with the most Buddhist residents", "with the fewest"], isl: ["seats with the most Muslim residents", "with the fewest"], hind: ["seats with the most Hindu residents", "with the fewest"], jew: ["seats with the most Jewish residents", "with the fewest"] };
@@ -1287,27 +1288,94 @@ const VT_ERAS = {
 };
 // an election only draws the chart where every seat's piles split the final
 // two (test-map-page.mjs pins that coverage from 2016 on); "now" rides 2025's
-function vtBandsFor(y) { return VT_ERAS[y === "now" ? 2025 : +y] || null; }
-let vtMode = "skew", vtLast = null;
-/* the Skew/Effect switch redraws its own block alone, its buttons held where
+function vtBandsFor(y, senate) { return (senate ? VT_ERAS_SEN : VT_ERAS)[y === "now" ? 2025 : +y] || null; }
+/* The Senate's own band sets, timed by the Senate count's own clock in
+   the AEC's count-fortnight statements, not copied from the House's rows.
+   2025 moved the game: early-centre Senate ballots were never touched on
+   election night — their count opened Monday 5 May at out-posted centres,
+   while election-night Senate first preferences came from polling places'
+   ordinary piles once their division's House count ended (the user-supplied
+   labels year). 2019/2022 counted both chambers in one program, so they keep
+   the House layout but the Senate's own basis: 2019 election night covered
+   every day-cast ballot (HoR AND Senate) plus ">90% of pre-poll votes"
+   (media/media-releases/2019/05-20, quotes verbatim), the remaining Senate
+   pre-poll first preferences finishing Monday–Tuesday (.../05-21), postal in
+   close seats Sunday and everywhere from Tuesday (.../05-20a); 2022's Count
+   Timeline says "First preferences were also counted for every Senate ballot
+   paper" on election night (media/2022/05-27) with postal from Sunday in
+   every division (.../05-22, .../05-27). 2016's timing is quoted too
+   (media/media-releases/2016/07-03e: polling places' Senate ballots on the
+   night, pre-poll Senate ordinary "may also start on Monday", postal verified
+   Monday and counted from Tuesday) — but 2016's venue-split data is provably
+   dirty (the producer docstring), so its era shows one whole "Ordinary votes"
+   band with its own timing instead of a day/early-centre split it can't
+   warrant: an ordinary pile means the 2016 chart carries no day/mob/ppvc
+   split, admitted in the band's own label. */
+const VT_ERAS_SEN = {
+  2025: [
+    ["late", "Postal, declaration & other", ["pre", "abs", "prov", "post"], "Over following days"],
+    ["early", "Early centres", ["ppvc"], "From Monday, 5 May"],
+    ["day", "On the day", ["day", "mob"], "Election night, after House count"],
+  ],
+  2022: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Sunday"],
+    ["early", "Early centres", ["ppvc"], "On the night"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+  2019: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Tuesday"],
+    ["early", "Early centres", ["ppvc"], "On the night"],
+    ["day", "On the day", ["day", "mob"], "On the night"],
+  ],
+  2016: [
+    ["late", "Early, by declaration & absent and other", ["pre", "abs", "prov"], "Over following days"],
+    ["post", "Postal", ["post"], "From Tuesday"],
+    ["ord", "Ordinary votes", ["ord"], "Election night, rest from Monday"],
+  ],
+};
+// the measure toggle's parties and words. 2PP stays the default reading of
+// the bands; each other measure is that grouping's first-preference share of
+// a pile, pooled straight from each seat's vt3 first-preference piles
+const VT_PARTIES = [["tpp", "2PP"], ["alp", "ALP"], ["lnp", "L/NP"], ["grn", "GRN"], ["onp", "ON"], ["oth", "OTH"]];
+const VT_PARTIES_SEN = VT_PARTIES.slice(1); // no 2PP in the Senate: ALP L/NP GRN ON OTH
+// mid-sentence measures by party: heading noun (appended " primary"), owner in the skew note
+const VT_WORDS = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "other candidates" };
+const VT_POSS = { alp: "Labor's", lnp: "the Coalition's", grn: "the Greens'", onp: "One Nation's", oth: "other candidates'" };
+let vtMode = "skew", vtParty = "tpp", vtSenParty = "alp", vtLast = null;
+/* a Skew/Effect or party switch redraws its own block alone, its buttons held where
    they stood on screen: re-rendering the whole story let the page reflow under
    the reader (it shrank for a frame and the browser pulled the page up) */
-function setVtMode(mode) {
-  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
-  vtMode = mode;
-  const old = $("#story .vt-chart"), btn = old && old.querySelector(`[data-vt-mode="${mode}"]`);
-  if (!old || !vtLast) { renderStory(true); $(`#story [data-vt-mode="${mode}"]`)?.focus({ preventScroll: true }); return; }
+function vtRedraw(sel) {
+  const old = $("#story .vt-chart"), btn = old && old.querySelector(sel);
+  if (!old || !vtLast) { renderStory(true); $(`#story ${sel}`)?.focus({ preventScroll: true }); return; }
   const top = btn.getBoundingClientRect().top, html = document.documentElement, anchor = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
   const box = document.createElement("div");
-  box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography);
+  box.innerHTML = vtBandsBlock(vtLast.divs, vtLast.area, vtLast.geography, vtLast.senate);
   const next = box.firstElementChild;
   old.replaceWith(next);
-  const nb = next.querySelector(`[data-vt-mode="${mode}"]`);
+  const nb = next.querySelector(sel);
   const shift = Math.round(nb.getBoundingClientRect().top - top);
   if (shift) { if (FS.on && FS.scroll && FS.scroll.contains(next)) FS.scroll.scrollTop += shift; else window.scrollBy(0, shift); }
   html.style.overflowAnchor = anchor;
   nb.focus({ preventScroll: true });
+}
+function setVtMode(mode) {
+  if (!["skew", "effect"].includes(mode) || mode === vtMode) return;
+  vtMode = mode;
+  vtRedraw(`[data-vt-mode="${mode}"]`);
+}
+function setVtParty(party) {
+  if (!VT_PARTIES.some(([k]) => k === party) || party === vtParty) return;
+  vtParty = party;
+  vtRedraw(`[data-vt-party="${party}"]`);
+}
+function setVtSenParty(party) {
+  if (!VT_PARTIES_SEN.some(([k]) => k === party) || party === vtSenParty) return;
+  vtSenParty = party;
+  vtRedraw(`[data-vt-party="${party}"]`);
 }
 // the margin list's two reads — tightest margins ("Most marginal") or widest
 // ("Safest"); the head's up/down toggle flips it and re-renders like setVtMode
@@ -1318,26 +1386,50 @@ function setCloseSafe(safe) {
   renderStory(true);
   $("#story [data-close-toggle]")?.focus({ preventScroll: true });
 }
-function vtBands(divs) {
-  const counts = {}, total2 = [0, 0];
+function vtBands(divs, senate) {
+  const counts = {}, total2 = [0, 0], fpart = { i: -1, counts: {}, total: 0 };
+  const parties = senate ? VT_PARTIES_SEN : VT_PARTIES;
+  for (const [i, [k]] of parties.entries()) if (k === (senate ? vtSenParty : vtParty)) fpart.i = senate ? i : i - 1; // tpp is VT_PARTIES[0]: fams in 5-wide order behind it
   let tot = 0;
+  const pileN = {}; // senate: the pile's ballots = its five families' sum
   for (const d of divs) {
-    const v = d.vt;
-    tot += (v.ord || 0) + (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0);
-    for (const [k, p] of Object.entries(d.vt2 || {})) {
-      const t = (counts[k] ??= [0, 0]);
-      t[0] += p[0]; t[1] += p[1];
-      total2[0] += p[0]; total2[1] += p[1];
+    if (!senate) {
+      const v = d.vt;
+      tot += (v.ord || 0) + (v.pre || 0) + (v.post || 0) + (v.abs || 0) + (v.prov || 0);
+      for (const [k, p] of Object.entries(d.vt2 || {})) {
+        const t = (counts[k] ??= [0, 0]);
+        t[0] += p[0]; t[1] += p[1];
+        total2[0] += p[0]; total2[1] += p[1];
+      }
+      if (fpart.i < 0 || !d.vt3) continue;
+      for (const [k, p] of Object.entries(d.vt3)) {
+        fpart.counts[k] = (fpart.counts[k] || 0) + p[fpart.i];
+        fpart.total += p[fpart.i];
+      }
+      continue;
+    }
+    if (!d.vts) continue;
+    for (const [k, p] of Object.entries(d.vts)) {
+      const pt = p[0] + p[1] + p[2] + p[3] + p[4];
+      pileN[k] = (pileN[k] || 0) + pt;
+      tot += pt;
+      fpart.counts[k] = (fpart.counts[k] || 0) + p[fpart.i];
+      fpart.total += p[fpart.i];
     }
   }
-  // The vote-type counts exhaust each seat's official two-party total.
-  const base = total2[0] + total2[1] > 0 ? 100 * total2[0] / (total2[0] + total2[1]) : null;
-  const complete = divs.every((d) => d.vt2);
-  const bands = (vtBandsFor(M().year) || []).map(([k, l, keys, time]) => {
-    const v = divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
-    const t = keys.reduce((p, key) => [p[0] + (counts[key]?.[0] || 0), p[1] + (counts[key]?.[1] || 0)], [0, 0]);
-    const n = t[0] + t[1], lab = n > 0 ? 100 * t[0] / n : null;
-    return { k, l, time, v, a: t[0], n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
+  // The vote-type counts exhaust each seat's official two-party total;
+  // a party measure reads the same piles' first preferences instead; the
+  // Senate's piles are nothing BUT first preferences (its five exhaust every
+  // pile), so each band denominates on the pile's own ballots
+  const primary = senate || fpart.i >= 0;
+  const base = primary ? (tot > 0 ? (100 * fpart.total) / tot : null) : total2[0] + total2[1] > 0 ? (100 * total2[0]) / (total2[0] + total2[1]) : null;
+  const complete = senate ? divs.every((d) => d.vts) : (fpart.i >= 0 ? divs.every((d) => d.vt3) : divs.every((d) => d.vt2));
+  const bands = (vtBandsFor(M().year, senate) || []).map(([k, l, keys, time]) => {
+    const v = senate ? keys.reduce((n, key) => n + (pileN[key] || 0), 0) : divs.reduce((n, d) => n + (k === "day" ? (d.vt.ord || 0) - (d.vt.ppvc || 0) : keys.reduce((s, t) => s + (d.vt[t] || 0), 0)), 0);
+    const a = primary ? keys.reduce((n, key) => n + (fpart.counts[key] || 0), 0) : keys.reduce((n, key) => n + (counts[key]?.[0] || 0), 0);
+    const n = primary ? v : keys.reduce((n, key) => n + (counts[key]?.[0] || 0) + (counts[key]?.[1] || 0), 0);
+    const lab = n > 0 ? (100 * a) / n : null;
+    return { k, l, time, v, a, n, share: tot > 0 ? 100 * v / tot : 0, lab, skew: complete && lab != null && base != null ? lab - base : null };
   });
   // Counting order runs up the graphic: day, early/postal, then declarations.
   // Pool actual two-party counts, not rounded shares or primary-vote totals.
@@ -1352,36 +1444,42 @@ function vtBands(divs) {
 }
 // A figures-menu choice changes the chart's electorate pool as well as its
 // heading. A map state or seat selection takes precedence over that menu.
-function vtScope(m, st) {
+function vtScope(m, st, senate) {
   // the head's own pool: the area, narrowed by the seat-type filter where one is on
-  const cls = clsFilter(m), pst = st === "AUS" ? null : st;
-  const divs = m.res.divs.filter((d) => d.vt && (!pst || d.st === pst) && (!cls || d.cls === cls));
+  const cls = clsFilter(m), pst = st === "AUS" ? null : st, key = senate ? "vts" : "vt";
+  const divs = m.res.divs.filter((d) => d[key] && (!pst || d.st === pst) && (!cls || d.cls === cls));
   const geography = cls && pst ? `${CLS_LOWER[cls]} seats in ${STATE_SHORT[pst]}` : cls ? `${CLS_LOWER[cls]} seats` : pst ? STATE_SHORT[pst] : "nationwide";
   return { divs, geography };
 }
-function vtBandsBlock(divs, area, geography) {
-  const { bands, tot } = vtBands(divs);
+function vtBandsBlock(divs, area, geography, senate) {
+  const { bands, tot } = vtBands(divs, senate);
   if (!tot) return "";
-  vtLast = { divs, area, geography };
-  const effect = vtMode === "effect", place = geography || divs[0].n.replace(/'/g, "’");
-  const heading = effect ? "Change in cumulative 2PP" : place === "nationwide" ? "National 2PP skew" : `Skew on ${place} 2PP`;
+  vtLast = { divs, area, geography, senate };
+  const effect = vtMode === "effect", prim = senate || vtParty !== "tpp", place = geography || divs[0].n.replace(/'/g, "’");
+  const partyList = senate ? VT_PARTIES_SEN : VT_PARTIES, selected = senate ? vtSenParty : vtParty;
+  // the measure noun: "2PP", or "<Party> primary"
+  const word = prim ? `${VT_WORDS[senate ? vtSenParty : vtParty]} primary` : "2PP";
+  const heading = effect ? `Change in cumulative ${word}` : place === "nationwide" ? `National ${word} skew` : `Skew on ${place} ${word}`;
+  const parties = `<div class="vt-modes vt-parties" role="group" aria-label="Vote-type party">${partyList.map(([k, lab]) => `<button type="button" class="vt-mode" data-vt-party="${k}" aria-pressed="${selected === k}">${lab}</button>`).join("")}</div>`;
   const modes = `<div class="vt-modes" role="group" aria-label="Vote-type measure"><button type="button" class="vt-mode" data-vt-mode="skew" aria-pressed="${!effect}">Skew</button><button type="button" class="vt-mode" data-vt-mode="effect" aria-pressed="${effect}">Effect</button></div>`;
-  const rows = bands.map((r) => {
+  const measure = prim ? word : "Labor 2PP";
+  const rows = bands.map((r, ri) => {
     const value = effect ? r.effect : r.skew, text = effect && value == null ? "—" : sgn(value);
-    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? "vt-alp" : "vt-lnp") : "";
+    const tone = value != null && Math.abs(value) >= 0.05 ? (value > 0 ? (prim ? `t-${senate ? vtSenParty : vtParty}` : "vt-alp") : prim ? "" : "vt-lnp") : "";
     const reading = effect
-      ? value != null ? `${text} percentage-point change in ${place} cumulative Labor 2PP` : r.k === "day" && r.cumulative != null ? "Opening count; no preceding group" : "Change in cumulative two-party share unavailable"
-      : value == null ? "two-party skew unavailable" : `${text} percentage points on ${place} Labor 2PP`;
+      ? value != null ? `${text} percentage-point change in ${place} cumulative ${measure}` : ri === bands.length - 1 && r.cumulative != null ? "Opening count; no preceding group" : `Change in cumulative ${prim ? "primary" : "two-party"} share unavailable`
+      : value == null ? `${prim ? "primary" : "two-party"} skew unavailable` : `${text} percentage points on ${place} ${measure}`;
     return `<div class="vt-band vt-band-${r.k}" role="listitem" style="--vt-share:${r.share}" aria-label="${esc(`${f1(r.share)}%, ${r.l}; counting ${r.time.toLowerCase()}; ${reading}`)}"><b class="vt-share">${f1(r.share)}%</b><span class="vt-label">${esc(r.l)}<small class="vt-time">${esc(r.time)}</small></span><b class="vt-skew ${tone}">${text}</b></div>`;
   }).join("");
   const notes = effect
-    ? ["Percentage-point change in Labor’s cumulative 2PP when each group is added, counting from bottom to top. The opening count has no preceding group.", "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
-    : ["Skews are percentage points in Labor’s two-party share. Mobile teams are included with on-the-day ordinary votes."];
+    ? [`Percentage-point change in ${prim ? `the cumulative ${word}` : "Labor’s cumulative 2PP"} when each group is added, counting from bottom to top. The opening count has no preceding group.`, "Illustrative sequence, not actual election-night reporting: batches overlap, and postal and declaration votes arrive over several days. Mobile teams are included with on-the-day ordinary votes."]
+    : [`Skews are percentage points in ${prim ? `${VT_POSS[senate ? vtSenParty : vtParty]} primary share` : "Labor’s two-party share"}. Mobile teams are included with on-the-day ordinary votes.`];
   if (area) notes.push("Postal, absent and declaration votes have no place on the map, so balloons and the surface leave them out.");
-  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)} formal</small></h3>${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
+  return `<div class="st-sec vt-chart"><h3>How votes were cast <small>${int(tot)}${senate ? " Senate" : ""} formal</small></h3>${parties}${modes}<p class="vt-skew-head">${esc(heading)}</p><div class="vt-bands" role="list" aria-label="${esc(`Formal vote shares and ${effect ? "effect on count" : prim ? `${word} skews` : "two-party skews"}, ${place}`)}">${rows}</div>${notes.map((n) => `<p class="st-note">${n}</p>`).join("")}</div>`;
 }
-function vtBlock(divs, area, geography) {
-  if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography);
+function vtBlock(divs, area, geography, senate) {
+  if (senate) return vtBandsFor(M().year, true) ? vtBandsBlock(divs, area, geography, true) : "";
+  if (vtBandsFor(M().year)) return vtBandsBlock(divs, area, geography, false);
   const { rows, tot, seats2 } = vtRows(divs), two = rows.some((r) => r.lab != null);
   const notes = [vtFinding(rows)];
   if (!two) notes.push(M().year === 1993 ? "The 1993 count doesn’t split the final two by how votes were cast." : `The count splits these votes two-party only where the final two were Labor and ${coalW(0)}.`);
@@ -1463,8 +1561,14 @@ function storyArea(m, st) {
     if (m.year !== "now") h += `<p class="st-note" style="margin-top:22px">The figures below are the ${frameBaseY(m.year)} election’s.</p>`;
   }
   // (from the results file: "Now" blanks a by-election's piles, and these figures are the election's)
-  const castScope = vtScope(m, st), cast = castScope.divs;
-  if (cast.length) h += vtBlock(cast, true, vtBandsFor(m.year) ? castScope.geography : undefined);
+  /* the cast section reads Senate ballots in the lenses that read the Senate
+     count (same swap as the preferences section's), but only where the Senate
+     count has an era here: no House piles masquerading in the Senate lens, and
+     no invented timing for the Senate's earlier years (2025's sequencing is
+     the user's own instruction; earlier Senates wait on sourced timing) */
+  const senCast = (S.lens === "senate" || S.lens === "senpref") && vtBandsFor(m.year, true) != null;
+  const castScope = vtScope(m, st, senCast), cast = castScope.divs;
+  if (!(senLanes && !senCast) && cast.length) h += vtBlock(cast, true, vtBandsFor(m.year, senCast) ? castScope.geography : undefined, senCast);
   const close = idx.map((i) => m.divs[i]).filter((d) => !d.by).sort((a, b) => closeSafe ? b.margin - a.margin : a.margin - b.margin).slice(0, 6).map((d) => ({ i: d.i, v: d.margin }));
   // a hairline margin (Bradfield '25, 26 votes) vanishes at one decimal — show
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
@@ -1662,7 +1766,8 @@ function storyDiv(m, i) {
   const spf = (S.lens === "senate" || S.lens === "senpref") && !d.by ? seatSpRows(m, d) : "";
   if (spf) h += `<div class="st-sec"><h3>Where preferences went <small>on Senate ${spGvtYear(m.year) != null ? "tickets" : "ballots"}</small></h3>${spf}</div>`;
   else { const fl = flowRows(d.flows, d.A, d.B); if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`; }
-  if (d.vt) h += vtBlock([d]);
+  if (S.lens === "senate" || S.lens === "senpref") { if (!d.by && d.vts && vtBandsFor(M().year, true)) h += vtBlock([d], undefined, undefined, true); }
+  else if (d.vt) h += vtBlock([d]);
   const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
   const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
   /* the national view's plain line, with the seat's comparison inside it

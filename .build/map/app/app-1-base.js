@@ -959,7 +959,7 @@ function deriveDiv(d, i, year) {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
     exhPct: flows.some((f) => f.exh != null) ? (100 * exhTot) / formal : null,
     A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
-    tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, vt2: d.vt2 || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
+    tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, vt2: d.vt2 || null, vt3: d.vt3 || null, vts: d.vts || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
   };
 }
@@ -1334,7 +1334,7 @@ function applyNow(m, now) {
     const fi = m.byName.get(name);
     if (fi == null) continue;
     const D = deriveDiv(by.div, fi, m.year);
-    D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
+    D.inf = by.informal; D.infPct = (100 * by.informal) / (by.informal + by.formal); D.vt = null; D.vts = null; D.lp = m.divs[fi].lp; D.lpx = m.divs[fi].lpx; D.lpy = m.divs[fi].lpy;
     D.by = { date: by.date, event: by.event ?? by.nswEvent, formal: by.formal, informal: by.informal, turnout: by.turnout, enrolment: by.enrolment, prev: m.divs[fi] };
     D.change = { kind: "by", prev: m.divs[fi].h.filter((h) => !h[4]).pop() };
     m.divs[fi] = D;
