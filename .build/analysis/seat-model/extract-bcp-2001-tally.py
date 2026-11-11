@@ -15,6 +15,14 @@ matter; the people lanes need six, and the new-lane arc adds five more:
                         not-stated row exists in the 2001 product, so
                         the lane's basis is persons ex-overseas; the
                         store names it)
+  B 04  Age by registered marital     the five printed categories'
+                        status by sex                Total row,
+                        Males+Females each, less the overseas-visitors
+                        row: the /map/ Marital status menu (2026-11-11).
+                        No not-stated column prints on this era's table,
+                        so the five categories' own sum is the menu's
+                        stated basis (shares of people aged 15+ with a
+                        stated status — the GCP-era G05 convention)
   B 03  Age by sex          THREE column-block layout (0-29 | 30-59 |
                         60-100+), five-year subtotal rows - merged to
                         the pipeline's 11 G01 bands
@@ -295,8 +303,8 @@ def parse_cd(member_name, wb):
     # address" codes, ~32 sheets, none of the demographic tables):
     # keep the B 01 headcount and null the lanes before any lane reads
     if any(s not in wb.sheetnames for s in
-           ("B 05A", "B 05B", "B 06", "B 08", "B 10", "B 12", "B 17",
-            "B 19", "B 23", "B 27B", "B 28")):
+           ("B 04", "B 05A", "B 05B", "B 06", "B 08", "B 10", "B 12",
+            "B 17", "B 19", "B 23", "B 27B", "B 28")):
         pers_tot = None
         for row in wb_get(wb, "B 01", 1, 4):
             lab = label_of(row)
@@ -316,6 +324,7 @@ def parse_cd(member_name, wb):
                 "ind01": None, "b1ov": None,
                 "cit01": None, "tw01": None, "anc01": None,
                 "ancp01": None, "ancns01": None,
+                "mar01": None,
                 "lab01": None,
                 "inds01": None, "inds01ns": None, "inds01tot": None,
                 "shortCd": True}
@@ -422,6 +431,29 @@ def parse_cd(member_name, wb):
                     + (rel.get("isl") or 0) + (rel.get("jew") or 0)
                     + (rel.get("norel") or 0) + (rel_ineq or 0)
                     + (rel_ns or 0) + (b10_ov or 0))
+    # ---- B 04 registered marital status (15+): the printed Total row's
+    # five categories, Males+Females per category (Married B/C,
+    # Separated E/F, Divorced H/I, Widowed K/L, Never married N/O),
+    # less the table's overseas-visitors row (the as-enumerated basis
+    # every later edition's GCP-era total uses); no not-stated column
+    # exists in this print, so the five categories' own sum is the
+    # lane's stated basis
+    mar01 = None
+    mar01_ov = [0] * 5
+    for row in sheet_rows("B 04", 1, 19):
+        lab = label_of(row)
+        cats = [cell_of(row, 1) + cell_of(row, 2),
+                cell_of(row, 13) + cell_of(row, 14),
+                cell_of(row, 4) + cell_of(row, 5),
+                cell_of(row, 7) + cell_of(row, 8),
+                cell_of(row, 10) + cell_of(row, 11)]
+        if lab == "total":
+            mar01 = cats
+        elif lab == "overseas visitors":
+            mar01_ov = cats
+    if mar01 is not None:
+        mar01 = [x - y for x, y in zip(mar01, mar01_ov)]
+
     # ---- B 12 highest schooling completed (15+, excl overseas
     # visitors): the printed level rows; "Still at school" is excluded
     # from the stated-level basis to hold the 2011+ GCP-gnu basis
@@ -777,6 +809,7 @@ def parse_cd(member_name, wb):
                               "fam_opf": fam_opf,
                               "fam_other": fam_other,
                               "fam_tot": fam_tot,
+                              "mar01": mar01,
                               "ten_own": ten_own,
                               "ten_renttot": ten_renttot,
                               "ten_stha": ten_stha,
@@ -863,6 +896,7 @@ def parse_cd(member_name, wb):
         "sch01ns": sch_ns,
         "fam01": [fam_cf_child, fam_cf_nochild, fam_opf, fam_other,
                   fam_tot],
+        "mar01": mar01,
         "ten01": [ten_own, ten_purch + ten_rentbuy, ten_renttot,
                   ten_stha, ten_othtype, ten_tenns],
         "fiTot01": fi_tot,
@@ -899,6 +933,7 @@ def merge_shards(pattern, out_path):
     sc = [0] * 6
     fc = [0] * 5
     tc = [0] * 6
+    mr = [0] * 5
     ind = pers = less_ov = cit = pt = ptt = ptns = ancp = ancns = 0
     full = [r for r in tally.values() if r.get("rel01tot") is not None]
     for r in full:
@@ -910,6 +945,7 @@ def merge_shards(pattern, out_path):
             sc[i] += r["sch01"][i]
         for i in range(5):
             fc[i] += r["fam01"][i]
+            mr[i] += r["mar01"][i]
         for i in range(6):
             tc[i] += r["ten01"][i]
         ind += r["ind01"]
@@ -933,6 +969,7 @@ def merge_shards(pattern, out_path):
     ten_den = tc[0] + tc[1] + tc[2] + tc[4]
     ancden = ancp - ancns
     indsden = sum(inds)
+    mar_den = sum(mr)
     print("national new-lane shares (2001 census, full-table CDs):",
           {"norel": round(relc['norel'] / relnat_den, 4),
            "cath": round(relc['cath'] / relnat_den, 4),
@@ -957,7 +994,10 @@ def merge_shards(pattern, out_path):
                    for k in ANC01_KEYS},
            "inds": {k: round(inds[i] / indsden, 4)
                     for i, k in enumerate(IND01_KEYS)},
-           "indsNCNS": round(indsns / indstot, 4)})
+           "indsNCNS": round(indsns / indstot, 4),
+           "mar": {k: round(mr[i] / mar_den, 4)
+                   for i, k in enumerate(
+                       ["marr", "never", "sep", "div", "wid"])}})
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump({"tally": tally}, fh)
         fh.write("\n")

@@ -71,6 +71,12 @@ eq(c.national, {
   hl: 0.005,
   // the 2026-11-10 labour lane (the 2016 GCP's G43B read)
   unemp: 0.0684,
+  // the industry select lane (the 2016 GCP's G51C/D read)
+  ind: { ag: 0.0251, mining: 0.0164, manuf: 0.0674, utils: 0.0101,
+         constr: 0.09, whole: 0.0299, retail: 0.1042, accom: 0.0729,
+         transport: 0.0492, media: 0.0167, rental: 0.0374, fin: 0.0171,
+         prof: 0.0765, admin: 0.0358, pubadm: 0.0703, educ: 0.0916,
+         health: 0.1336, arts: 0.0165, othersvc: 0.0393 },
   // marital over the 15+ stated-status share (the 2016 GCP's G05)
   mar: { marr: 0.4811, never: 0.3499, sep: 0.0318, div: 0.0854,
          wid: 0.0519 },

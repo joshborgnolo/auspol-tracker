@@ -88,6 +88,12 @@ eq(c.national, {
     lebanese: 0.0094 },
   // the 2026-11-10 labour lane (the 2001 BCP's B 25 read)
   unemp: 0.0739,
+  // the industry select lane (the 2001 BCP's B 26B read, ANZSIC-1993)
+  ind: { ag: 0.0399, mining: 0.0089, manuf: 0.1252, utils: 0.0074,
+         constr: 0.069, whole: 0.0541, retail: 0.1501, accom: 0.0506,
+         transport: 0.0439, comms: 0.0183, fin: 0.0387, propbiz: 0.1138,
+         pubadm: 0.0445, educ: 0.0737, health: 0.0997, arts: 0.0251,
+         othersvc: 0.037 },
   // married over the 15+ stated marital-status share (B 04 print)
   mar: { marr: 0.5146, never: 0.315, sep: 0.0343, div: 0.074,
          wid: 0.062 },
@@ -192,6 +198,12 @@ eq(c1c.national, {
     lebanese: 0.01 },
   // the 2026-11-10 labour lane (the 2006 BCP's CD B41 read)
   unemp: 0.0522,
+  // the industry select lane (the 2006 BCP's CD B43C/D read, ANZSIC-2006)
+  ind: { ag: 0.0316, mining: 0.012, manuf: 0.1074, utils: 0.0101,
+         constr: 0.08, whole: 0.0447, retail: 0.1166, accom: 0.0648,
+         transport: 0.0482, media: 0.0199, rental: 0.0393, fin: 0.0174,
+         prof: 0.0679, admin: 0.0323, pubadm: 0.0686, educ: 0.0787,
+         health: 0.1079, arts: 0.0144, othersvc: 0.0381 },
   // marital over the 15+ stated-status share (the 2006 BCP's B05)
   mar: { marr: 0.4968, never: 0.3313, sep: 0.031, div: 0.082,
          wid: 0.0589 },
@@ -287,7 +299,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "y12", "y10less", "atsci", "u15", "onepar", "rel", "ten",
-    "pt", "noncit", "bigfam", "hl", "anc", "unemp", "mar"]);
+    "pt", "noncit", "bigfam", "hl", "anc", "unemp", "ind", "mar"]);
   for (const b of d.booths) {
     const fb = nc1b.get(`${b.div}|${b.boothId}`);
     if (b.demoI === null) {

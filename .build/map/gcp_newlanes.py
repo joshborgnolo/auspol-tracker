@@ -435,6 +435,59 @@ def load_ind(gcp_zip, prefix="", era="2021", rows_pin=None,
     return out
 
 
+# ---- the Marital status menu's lanes (2026-11-11) -------------------
+# the registered marital status five, of people aged 15+ with a stated
+# status: the era's marital table (G05 in the GCP editions, B05 in the
+# 2011 BCP) prints Married/Separated/Divorced/Widowed/Never-married per
+# age band per sex plus person totals, and the GCP totals fold a
+# not-stated slice in, so the shares' basis is the five printed
+# categories' own sum (the same ex-not-stated basis G14's religion
+# shares use). The 2016/2011 prints capitalise "Never_Married" where
+# 2021's keeps it lower-case (verified from the packs' own headers
+# 2026-11-11).
+MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
+_MAR = {
+    "2021": dict(table="G05",
+                 cols=("P_Tot_Married", "P_Tot_Never_married",
+                       "P_Tot_Separated", "P_Tot_Divorced",
+                       "P_Tot_Widowed")),
+    "2016": dict(table="G05",
+                 cols=("P_Tot_Married", "P_Tot_Never_Married",
+                       "P_Tot_Separated", "P_Tot_Divorced",
+                       "P_Tot_Widowed")),
+    "2011": dict(table="B05",
+                 cols=("P_Tot_Married", "P_Tot_Never_Married",
+                       "P_Tot_Separated", "P_Tot_Divorced",
+                       "P_Tot_Widowed")),
+}
+
+
+def load_mar(gcp_zip, prefix="", era="2021", rows_pin=None,
+             key_col=None):
+    """The Marital status menu's raw counts per SA1 for one prefix ->
+    {code: (married, neverMarried, separated, divorced, widowed)}
+    (MAR_KEYS order), people aged 15+. Universes assert against the
+    era's row pin like the other loaders."""
+    v = VINTAGES[era]
+    mar = _MAR[era]
+    memb = v["member"].format
+    idc = key_col or v["key"]
+    pin = rows_pin or v["rows"]
+    z = zipfile.ZipFile(gcp_zip)
+    g = _table(z, memb(table=mar["table"]), idc, list(mar["cols"]),
+               pin, prefix)
+    print(f"GCP marital cells: {len(g)} SA1s (prefix {prefix or 'AU'}, "
+          f"era {era})")
+    return g
+
+
+def mar_shares(vec, safe):
+    """The five Marital status menu shares (MAR_KEYS order) from the
+    load_mar counts tuple, over their own stated sum."""
+    tot = sum(vec)
+    return tuple(safe(v, tot) for v in vec)
+
+
 # ---- the six canonical venue-demo cells' raw counts -----------------
 # the [lang, a65, a2034, fborn, uni, blue] reads every frame's booth-
 # level census join shares, keyed one row plainly so each caller folds/

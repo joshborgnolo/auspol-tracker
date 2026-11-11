@@ -217,6 +217,17 @@ B42C_IND_CELLS = ["B6452", "B6462", "B6472", "B6482", "B6492",
                   "B6552", "B6562", "B6572", "B6582", "B6592",
                   "B6602", "B6612", "B6622"]
 B42D_IND_CELLS = ["B6632", "B6642", "B6652"]
+# the Marital status menu (2026-11-11): B05's PERSONS,Total cells for
+# the five registered categories, in MAR_KEYS order (cell ids verified
+# against BCP2006_cell_desc_dp.xls); no not-stated column exists on the
+# 2006 B05, so the five cells' own sum is the lane's stated basis —
+# people aged 15+ (the table is 15+ by construction)
+MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
+B05_MAR = ["B737",  # PERSONS,Total,Married
+           "B741",  # PERSONS,Total,Never Married
+           "B738",  # PERSONS,Total,Separated
+           "B739",  # PERSONS,Total,Divorced
+           "B740"]  # PERSONS,Total,Widowed
 
 
 def bcp_table(table, cols, pin_rows=PIN_ROWS):
@@ -257,9 +268,9 @@ def load_bcp():
     """Per CD: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns,
     occupancy of the eight stated major groups, pop15."""
     for st in STATES:
-        for t in ("B01", "B07", "B08_A", "B08_B", "B09", "B12", "B13",
-                  "B15_B", "B23", "B24", "B32", "B39_B", "B41_B", "B44_B",
-                  "B45"):
+        for t in ("B01", "B05", "B07", "B08_A", "B08_B", "B09", "B12",
+                  "B13", "B15_B", "B23", "B24", "B32", "B39_B", "B41_B",
+                  "B44_B", "B45"):
             if not (CD06 / f"CD_{st}_{t}.csv").exists():
                 fail(f"missing cd06 extracts ({CD06}); see module "
                      f"docstring")
@@ -283,6 +294,9 @@ def load_bcp():
     # not-stated and overall totals (BCP2006_cell_desc_dp.xls)
     b42c = bcp_table("B42_C", B42C_IND_CELLS)
     b42d = bcp_table("B42_D", B42D_IND_CELLS)
+    # B05's five registered-marital Total cells, MAR_KEYS order
+    # (2026-11-11)
+    b05 = bcp_table("B05", B05_MAR)
     b07 = bcp_table("B07", [B07_NS_TOTAL])
     rel_cells = [c for k in REL_KEYS for c in B13_REL[k]]
     b13 = bcp_table("B13", rel_cells + [B13_NS, B13_TOT])
@@ -352,6 +366,7 @@ def load_bcp():
             "indns": (int(b42d[code][1])
                       if b42d.get(code) else None),
             "indt": (int(b42d[code][2]) if b42d.get(code) else None),
+            "marvec": tuple(int(x) for x in b05[code]),
         }
     print(f"BCP 2006: {len(out)} CDs")
     return out
@@ -501,6 +516,12 @@ def shares(rec):
         if indd > 0:
             out["ind"] = {k: bounded(rec["indn"][i], indd)
                           for i, k in enumerate(IND_KEYS)}
+    # the Marital status menu (2026-11-11): the registered-status five,
+    # of people 15+ with a stated status (their own sum the basis)
+    if rec.get("marvec") is not None:
+        mard = sum(rec["marvec"])
+        out["mar"] = {k: bounded(rec["marvec"][i], mard)
+                      for i, k in enumerate(MAR_KEYS)}
     return out
 
 
@@ -549,7 +570,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                                   "ancn": [0] * len(ANC_KEYS),
                                   "ancns": 0, "ancP": 0,
                                   "labU": 0, "labLF": 0,
-                                  "indn": [0] * len(IND_KEYS)})
+                                  "indn": [0] * len(IND_KEYS),
+                                  "marvec": [0] * len(MAR_KEYS)})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -593,6 +615,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         acc["labLF"] += r["labLF"]
         for i in range(len(IND_KEYS)):
             acc["indn"][i] += r["indn"][i]
+        for i in range(len(MAR_KEYS)):
+            acc["marvec"][i] += r["marvec"][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -637,7 +661,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                 "ancns": row["ancns"], "ancP": row["ancP"],
                 "labU": row["labU"], "labLF": row["labLF"],
                 "indn": (list(row["indn"]) if row["indn"] is not None
-                         else None)})
+                         else None),
+                "marvec": (list(row["marvec"]) if row["marvec"]
+                           is not None else None)})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
@@ -677,6 +703,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         for i in range(len(IND_KEYS)):
             nat.setdefault("indn", [0] * len(IND_KEYS))
             nat["indn"][i] += dv["indn"][i]
+        for i in range(len(MAR_KEYS)):
+            nat.setdefault("marvec", [0] * len(MAR_KEYS))
+            nat["marvec"][i] += dv["marvec"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -738,6 +767,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             "ind": ({k: round(nat["indn"][i] / sum(nat["indn"]), 4)
                      for i, k in enumerate(IND_KEYS)}
                     if sum(nat["indn"]) else None),
+            "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
+                    for i, k in enumerate(MAR_KEYS)},
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -829,7 +860,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         "_provenance": {
             "sourceUrls": {
                 "bcp": "ABS 2006 Census Basic Community Profile, "
-                       "collection districts (B01/B07/B09/B12/B13/"
+                       "collection districts (B01/B05/B07/B09/B12/B13/"
                        "B15_B/B24/B26/B28/B32/B39_B/B41_B/B44_B), "
                        "abs.gov.au archive census06bcp.zip",
                 "alloc": f"{alloc_path.name} (derive-ced-era-alloc.py)",
@@ -851,6 +882,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         # the Industry picker's nineteen ANZSIC-2006 divisions (B42's
         # Persons totals across B42_C/B42_D)
         "indKeys": list(IND_KEYS),
+        "marKeys": list(MAR_KEYS),
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
                           "per division"),

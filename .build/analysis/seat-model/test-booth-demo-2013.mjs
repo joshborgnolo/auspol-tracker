@@ -167,6 +167,12 @@ eq(d.counts.national, {
     lebanese: 0.0102 },
   // the 2026-11-10 labour lane (the 2011 BCP's B42B read)
   unemp: 0.0561,
+  // the industry select lane (the 2011 BCP's B43C/D read)
+  ind: { ag: 0.0254, mining: 0.0179, manuf: 0.0919, utils: 0.0118,
+         constr: 0.0843, whole: 0.0411, retail: 0.1077, accom: 0.0661,
+         transport: 0.0487, media: 0.0181, rental: 0.0384, fin: 0.0162,
+         prof: 0.0743, admin: 0.0329, pubadm: 0.0702, educ: 0.0819,
+         health: 0.1189, arts: 0.0154, othersvc: 0.0385 },
   /* marital over the 15+ stated-status share (the 2011 BCP's B05;
      the read's own five-cell total is the basis -- G05's "total"
      folds in ~3% not-stated, which the share basis excludes) */
@@ -209,6 +215,11 @@ eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
       indian: 0.0192, filipino: 0.0115, dutch: 0.013, vietnamese: 0.013,
       lebanese: 0.0092 },
     unemp: 0.057,
+    ind: { ag: 0.0008, mining: 0.0021, manuf: 0.0406, utils: 0.0054,
+      constr: 0.0357, whole: 0.0411, retail: 0.0741, accom: 0.0958,
+      transport: 0.0332, media: 0.0629, rental: 0.1027, fin: 0.0188,
+      prof: 0.1679, admin: 0.0438, pubadm: 0.0533, educ: 0.0802,
+      health: 0.0837, arts: 0.0303, othersvc: 0.0274 },
     mar: { marr: 0.2901, never: 0.5823, sep: 0.0234, div: 0.0793,
       wid: 0.025 },
   }, "Sydney row");
@@ -242,6 +253,11 @@ eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
       indian: 0.0081, filipino: 0.01, dutch: 0.0124, vietnamese: 0.003,
       lebanese: 0.0006 },
     unemp: 0.0703,
+    ind: { ag: 0.0373, mining: 0.0413, manuf: 0.0405, utils: 0.0114,
+      constr: 0.0832, whole: 0.0153, retail: 0.0778, accom: 0.0604,
+      transport: 0.0423, media: 0.0086, rental: 0.0071, fin: 0.0115,
+      prof: 0.0387, admin: 0.0292, pubadm: 0.1947, educ: 0.1058,
+      health: 0.1048, arts: 0.0247, othersvc: 0.0656 },
     mar: { marr: 0.4521, never: 0.4054, sep: 0.0344, div: 0.0726,
       wid: 0.0356 },
   }, "Lingiari row (printed)");
@@ -385,7 +401,7 @@ eq(d.incomeCuts, {
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
     "y12less", "y12", "y10less", "atsci", "u15", "onepar", "rel", "ten", "pt", "noncit",
-    "bigfam", "hl", "anc", "unemp", "mar"]);
+    "bigfam", "hl", "anc", "unemp", "ind", "mar"]);
   let nullBoth = 0, blended = 0;
   const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
   for (const b of d.booths) {

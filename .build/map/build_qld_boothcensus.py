@@ -215,6 +215,7 @@ def demo_cells(year):
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
     lab = gcp_newlanes.load_lab(V["gcp"], prefix="3", era=str(year))
     ind = gcp_newlanes.load_ind(V["gcp"], prefix="3", era=str(year))
+    mar = gcp_newlanes.load_mar(V["gcp"], prefix="3", era=str(year))
     inc, inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "3")
     HL = gcp_newlanes.hl_alloc_of(
         2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
@@ -297,6 +298,8 @@ def demo_cells(year):
         indsh = [safe(v, ivd) for v in iv]
         aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
+        marv = mar[code]
+        marsh = [safe(v, sum(marv)) for v in marv]
         out[code] = ([safe(oth, eng + oth),
                       safe(bands[8] + bands[9] + bands[10], bsum),
                       safe(bands[3] + bands[4], bsum),
@@ -316,7 +319,7 @@ def demo_cells(year):
                       safe(hiqm, aud),
                       safe(uel, lfd)],
                      [safe(c, den09) for c in cob],
-                     rel, ten, anc, indsh)
+                     rel, ten, anc, indsh, marsh)
     print(f"GCP {year} demo cells: {len(out)} SA1s")
     return out
 
@@ -344,8 +347,8 @@ def run_frame(frame):
     unlocated_ok = ERA_UNLOCATED_OK[frame]
     sa1s, suppressions = set(), 0
     counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0, "unlocated": 0}
-    dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, ind_col = \
-        [], [], [], [], [], [], []
+    dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, ind_col, \
+        mar_col = [], [], [], [], [], [], [], []
     for k in range(n):
         lat, ty = B["lat"][k], B["ty"][k]
         if ty == 4:
@@ -357,6 +360,7 @@ def run_frame(frame):
             ten_col.append(None)
             anc_col.append(None)
             ind_col.append(None)
+            mar_col.append(None)
             continue
         if lat is None:
             if not unlocated_ok:
@@ -370,6 +374,7 @@ def run_frame(frame):
             ten_col.append(None)
             anc_col.append(None)
             ind_col.append(None)
+            mar_col.append(None)
             continue
         code = pip(year, B["lon"][k], lat)
         if code is None:
@@ -396,6 +401,7 @@ def run_frame(frame):
         ten_col.append(list(dm[3]))
         anc_col.append(list(dm[4]))
         ind_col.append(list(dm[5]))
+        mar_col.append(list(dm[6]))
     B["dec"] = dec_col
     B["vdec"] = [None] * n  # the ECQ releases no votes-by-SA1 product; the
     # voter-footprint lane is a federal AEC read and stays empty by design
@@ -405,11 +411,13 @@ def run_frame(frame):
     B["ten"] = ten_col
     B["anc"] = anc_col
     B["ind"] = ind_col
+    B["mar"] = mar_col
     data["cobKeys"] = COB_KEYS
     data["relKeys"] = list(gcp_newlanes.REL_KEYS)
     data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
     data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
     data["indKeys"] = list(gcp_newlanes.IND_KEYS)
+    data["marKeys"] = list(gcp_newlanes.MAR_KEYS)
     _unused_inc, income_cuts = gcp_newlanes.state_income(
         VINTAGES[year]["gcp"], str(year), "3")
     data["incomeCuts"] = income_cuts

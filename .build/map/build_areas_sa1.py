@@ -214,6 +214,7 @@ def load_cells(dbf):
     arc = gcp_newlanes.load_arc31(GCP_ZIP, era="2021")
     lab = gcp_newlanes.load_lab(GCP_ZIP, era="2021")
     ind = gcp_newlanes.load_ind(GCP_ZIP, era="2021")
+    mar = gcp_newlanes.load_mar(GCP_ZIP, era="2021")
     inc, cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "")
     z = zipfile.ZipFile(GCP_ZIP)
     f09 = read_table(z, "G09F", ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"])
@@ -225,7 +226,7 @@ def load_cells(dbf):
     z.close()
     for tag, d in (("G09F", f09), ("G09G", g09), ("G09H", h09), ("G02", g02),
                    ("nlt", nlt), ("arc", arc), ("inc", inc), ("lab", lab),
-                   ("ind", ind)):
+                   ("ind", ind), ("mar", mar)):
         if set(d) != set(base):
             fail(f"GCP {tag} SA1 universe != G01's ({len(d)} vs {len(base)})")
 
@@ -256,6 +257,7 @@ def load_cells(dbf):
             "ageMed": ageM02, "incMed": incM02,
             "labU": lab[code][0], "labLF": lab[code][1],
             "indv": ind[code][0],
+            "marvec": mar[code],
             "jur": dbf[code]["jur"],
         }
     persons = sum(r["p"] for r in rec.values())
@@ -362,6 +364,9 @@ for _i, _k in enumerate(gcp_newlanes.ANC_KEYS):
 _INDDEN = lambda r: sum(r["indv"])  # noqa: E731
 for _i, _k in enumerate(gcp_newlanes.IND_KEYS):
     SHARES[f"ind.{_k}"] = ((lambda i: (lambda r: r["indv"][i]))(_i), _INDDEN)
+_MARDEN = lambda r: sum(r["marvec"])  # noqa: E731
+for _i, _k in enumerate(gcp_newlanes.MAR_KEYS):
+    SHARES[f"mar.{_k}"] = ((lambda i: (lambda r: r["marvec"][i]))(_i), _MARDEN)
 
 # the income quartile lanes are cut-relative: the seat stores measure them
 # against each frame-universe's own incomeCuts record (national cuts on the
@@ -402,6 +407,7 @@ LANE_ORDER = (["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15",
               + [f"cob.{k}" for k in COB_KEYS]
               + [f"anc.{k}" for k in gcp_newlanes.ANC_KEYS]
               + [f"ind.{k}" for k in gcp_newlanes.IND_KEYS]
+              + [f"mar.{k}" for k in gcp_newlanes.MAR_KEYS]
               + ["ageMed", "incMed"]
               + [f"sf.{ix}" for ix in IX])
 if set(LANE_ORDER) != set(SHARES) | {"ageMed", "incMed", "loinc", "hiqinc"} | {f"sf.{ix}" for ix in IX}:
@@ -609,7 +615,8 @@ def cross_check_sa26(rec, universe_cuts):
             a["hiqinc"][0] += hi_m
             a["hiqinc"][1] += r["incAd"]
     GROUP_OF = {"cob": None, "rel": None, "ten": None, "anc": None,
-                "ind": None}
+                "ind": None,
+                "mar": None}
     checks = []
     for k in list(SHARES) + ["loinc", "hiqinc"]:
         if "." in k:

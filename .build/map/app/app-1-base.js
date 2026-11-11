@@ -172,7 +172,8 @@ function buildRamps() {
       y12: seq(115, 0.12), y10less: seq(245, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       unemp: seq(8, 0.13),
-      rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10), occ: seq(210, 0.11), ind: seq(168, 0.11) },
+      rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10),
+      occ: seq(210, 0.11), ind: seq(168, 0.11), mar: seq(163, 0.12) },
   };
 }
 
@@ -322,7 +323,17 @@ const LENS_IND = "ind";
 const IND_NAME = { ag: "Agriculture, forestry and fishing", mining: "Mining", manuf: "Manufacturing", utils: "Electricity, gas, water and waste", constr: "Construction", whole: "Wholesale trade", retail: "Retail trade", accom: "Accommodation and food", transport: "Transport and warehousing", media: "Information media and telecommunications", rental: "Rental, hiring and real estate", fin: "Financial and insurance", prof: "Professional and technical services", admin: "Administrative and support services", pubadm: "Public administration", educ: "Education and training", health: "Health care and social assistance", arts: "Arts and recreation", othersvc: "Other services", comms: "Communication services", propbiz: "Property and business services" };
 const INDISMS = { ag: "work in agriculture, forestry or fishing", mining: "work in mining", manuf: "work in manufacturing", utils: "work in electricity, gas, water and waste", constr: "work in construction", whole: "work in wholesale trade", retail: "work in retail trade", accom: "work in accommodation and food", transport: "work in transport and warehousing", media: "work in information media and telecommunications", rental: "work in rental, hiring and real estate", fin: "work in financial and insurance services", prof: "work in professional and technical services", admin: "work in administrative and support services", pubadm: "work in public administration", educ: "work in education and training", health: "work in health care and social assistance", arts: "work in arts and recreation", othersvc: "work in other services", comms: "work in communication services", propbiz: "work in property and business services" };
 const IND_RANGE = { ag: [0, 20], mining: [0, 25], manuf: [0, 40], utils: [0, 6], constr: [0, 35], whole: [0, 25], retail: [0, 40], accom: [0, 35], transport: [0, 35], media: [0, 20], rental: [0, 15], fin: [0, 15], prof: [0, 45], admin: [0, 15], pubadm: [0, 45], educ: [0, 35], health: [0, 50], arts: [0, 8], othersvc: [0, 18], comms: [0, 10], propbiz: [0, 35] };
-const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_EDU || S.index === LENS_FAM || S.index === LENS_IMM || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC || S.index === LENS_OCC || S.index === LENS_IND;
+// the Marital status select lens (2026-11-11): S.index === LENS_MAR and
+// S.mar the picked option — the registered marital status five, of people
+// aged 15+ with a stated status (the census tables' not-stated slice sits
+// outside the basis — the same ex-not-stated convention the Religion
+// menu's shares ride). A partnered-but-never-married person counts under
+// their relationship type, distinct from this registered-status read
+const LENS_MAR = "mar";
+const MAR_NAME = { marr: "Married", never: "Never married", sep: "Separated", div: "Divorced", wid: "Widowed" };
+const MARISMS = { marr: "are married", never: "have never married", sep: "are separated from a marriage", div: "are divorced", wid: "are widowed" };
+const MAR_RANGE = { marr: [10, 75], never: [10, 85], sep: [0, 10], div: [0, 25], wid: [0, 32] };
+const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_EDU || S.index === LENS_FAM || S.index === LENS_IMM || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC || S.index === LENS_OCC || S.index === LENS_IND || S.index === LENS_MAR;
 // the Household-income lane: S.index === "inc" and S.incMode the picked
 // measure — the median weekly household income spectrum lands by default;
 // the bottom-quartile and top-quartile shares ride the same legend picker
@@ -422,7 +433,7 @@ const IMM_MODES = ["lang", "fborn", "noncit", "anc"];
 const IMM_NAME = { lang: "Language other than English at home", fborn: "Born overseas", noncit: "Non-citizens", anc: "Ancestry" };
 const IMM_SHORT = { lang: "Other language", fborn: "Born overseas", noncit: "Non-citizens", anc: "Ancestry" };
 const isImm = () => S.index === LENS_IMM;
-const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === LENS_IND ? INDISMS[S.ind] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : k === LENS_FAM ? DM_VERB[S.famMode] : k === LENS_IMM ? (S.immMode === "anc" ? ANCISMS[S.anc] : S.immMode === "fborn" && S.cob != null ? COB_VERB[S.cob] : DM_VERB[S.immMode]) : DM_VERB[k]);
+const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === LENS_IND ? INDISMS[S.ind] : k === LENS_MAR ? MARISMS[S.mar] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : k === LENS_FAM ? DM_VERB[S.famMode] : k === LENS_IMM ? (S.immMode === "anc" ? ANCISMS[S.anc] : S.immMode === "fborn" && S.cob != null ? COB_VERB[S.cob] : DM_VERB[S.immMode]) : DM_VERB[k]);
 // whose share a census measure is, and what it says of them: the bases the builders divide by
 // (build_areas_sa1.py's SHARES and the state demo builders), so copy never sets a measure over
 // the wrong people. Most measures are shares of residents; schooling and degrees are of people
@@ -434,6 +445,8 @@ const DM_PRED = { y10less: "finished school at Year 10 or earlier", onepar: "are
 function censusWho(m, k = S.index) {
   let pop = "residents", pred;
   if (k === LENS_TEN) { pop = "dwellings"; pred = TENESMS[S.ten]; }
+  // marital status counts people aged 15 and over (the census's basis)
+  else if (k === LENS_MAR) { pop = "people aged 15+"; pred = MARISMS[S.mar]; }
   else if (k === LENS_INC) {
     const hh = m && m.incomeCuts && m.incomeCuts.basis === "households", frag = S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m);
     pop = hh ? "households" : "adults"; pred = hh ? `earn ${frag}${incEpoch(m)}` : INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "";
@@ -479,6 +492,8 @@ const isTen = () => S.index === LENS_TEN && S.ten != null;
 const isAnc = () => (S.index === LENS_ANC || S.index === LENS_IMM && S.immMode === "anc") && S.anc != null;
 const isOcc = () => S.index === LENS_OCC && S.occ != null;
 const isInd = () => S.index === LENS_IND && S.ind != null;
+// the Marital status select lens's pick lands on the menu's own contract
+const isMar = () => S.index === LENS_MAR && S.mar != null;
 // the active people-lane figure of a division: a share as a fraction
 // (cob-aware, religion/tenure select-aware), or the income view's datum —
 // the median lane reads DOLLARS (medIncWeekly), the shares the band keys
@@ -490,6 +505,7 @@ const demoShare = (d) => {
   if (isAnc()) return d.demo && d.demo.anc ? d.demo.anc[S.anc] : null;
   if (isOcc()) return d.demo && d.demo.occ ? d.demo.occ[S.occ] : null;
   if (isInd()) return d.demo && d.demo.ind ? d.demo.ind[S.ind] : null;
+  if (isMar()) return d.demo && d.demo.mar ? d.demo.mar[S.mar] : null;
   if (isInc()) return d.demo ? d.demo[INC_KEY[S.incMode]] : null;
   // age: median is years (ageMed); the five share views ride their keys
   if (isAge()) return d.demo ? d.demo[AGE_KEY[S.ageMode]] : null;
@@ -510,6 +526,7 @@ const demoAreaShare = (demo) => {
   if (isAnc()) return demo && demo.anc ? demo.anc[S.anc] : null;
   if (isOcc()) return demo && demo.occ ? demo.occ[S.occ] : null;
   if (isInd()) return demo && demo.ind ? demo.ind[S.ind] : null;
+  if (isMar()) return demo && demo.mar ? demo.mar[S.mar] : null;
   if (isInc()) return demo ? demo[INC_KEY[S.incMode]] : null;
   if (isAge()) return demo ? demo[AGE_KEY[S.ageMode]] : null;
   if (isEdu()) return demo ? demo[S.eduMode] : null;
@@ -526,6 +543,7 @@ const demoBoothShare = (raw, j, pos) => {
   if (isAnc()) { const r = raw.anc && raw.anc[j]; return r ? r[pos[S.anc]] : null; }
   if (isOcc()) { const r = raw.occ && raw.occ[j]; return r ? r[pos[S.occ]] : null; }
   if (isInd()) { const r = raw.ind && raw.ind[j]; return r ? r[pos[S.ind]] : null; }
+  if (isMar()) { const r = raw.mar && raw.mar[j]; return r ? r[pos[S.mar]] : null; }
   // income: the share views ride the demo tuple's cells 6/17; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
   if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[{ lo: 6, hiq: 17 }[S.incMode]] : null; }
@@ -574,18 +592,19 @@ const incMedRange = (m) => {
   if (m) m._incMedRange = r;
   return r;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInd() ? IND_RANGE[S.ind] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : isFam() ? DM_RANGE[S.famMode] : isImm() ? DM_RANGE[S.immMode] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInd() ? "ind" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : isFam() ? S.famMode : isImm() ? S.immMode : S.index];
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInd() ? IND_RANGE[S.ind] : isMar() ? MAR_RANGE[S.mar] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : isFam() ? DM_RANGE[S.famMode] : isImm() ? DM_RANGE[S.immMode] : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInd() ? "ind" : isMar() ? "mar" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : isFam() ? S.famMode : isImm() ? S.immMode : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
-// the model's positional map for the active select lane (cob/rel/ten/anc)
-const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) : isInd() ? (m.indPos || {}) : (m.cobPos || {}));
+// the model's positional map for the active select lane (cob/rel/ten/anc/occ/ind/mar)
+const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) : isInd() ? (m.indPos || {}) : isMar() ? (m.marPos || {}) : (m.cobPos || {}));
 const relFor = (m) => (m.relKeys || []).map((k) => [k, REL_NAME[k]]);
 const tenFor = (m) => (m.tenKeys || []).map((k) => [k, TEN_NAME[k]]);
 const ancFor = (m) => (m.ancKeys || []).map((k) => [k, ANC_NAME[k]]);
 const occFor = (m) => (m.occKeys || []).map((k) => [k, OCC_NAME[k]]);
+const marFor = (m) => (m.marKeys || []).map((k) => [k, MAR_NAME[k]]);
 // a select lane's sub-select label: the ideology/noun phrase the
 // legend and menu land on
-const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : isOcc() ? OCC_NAME[k] : ANC_NAME[k]);
+const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : isOcc() ? OCC_NAME[k] : isMar() ? MAR_NAME[k] : ANC_NAME[k]);
 // the People lanes' floor: 1993/1996/1998 are the statistics-era
 // interp blend entrance (1991↔1996 and 1996↔2001 day-share blends,
 // derive-booth-demo-90s.py's stores at the venue-nearest
@@ -947,6 +966,9 @@ const S = {
   // the Ancestry select lens's picked option (an ANC_NAME key;
   // English is the landing view, first of the twelve)
   anc: "english",
+  // the Marital status select lens's picked option (a MAR_NAME key;
+  // Married is the landing view, first of the five)
+  mar: "marr",
   view: "map", sel: { level: "aus" }, hover: null, seat: null,
   listUnit: "seats", sort: null, q: "",
   f: { st: null, cls: null, win: null, margin: null, range: null },
@@ -1137,6 +1159,11 @@ function demoOf(m, idx) {
     if (m.indKeys && m.indKeys.length) {
       demo.ind = {};
       for (const k of m.indKeys) { const xs = ds.filter((x) => x.ind && x.ind[k] != null); demo.ind[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.ind[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    // the Marital status select pools, the same vote-weighted way
+    if (m.marKeys && m.marKeys.length) {
+      demo.mar = {};
+      for (const k of m.marKeys) { const xs = ds.filter((x) => x.mar && x.mar[k] != null); demo.mar[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.mar[k]))) / sum(xs.map((x) => x.p)) : null; }
     }
   }
   return demo;
@@ -1544,6 +1571,9 @@ async function loadYear(year, bg) {
     // entry reads whichever list the frame packs (era-gap keys stay off)
     m.indKeys = res.indKeys || null;
     m.indPos = m.indKeys ? Object.fromEntries(m.indKeys.map((k, i) => [k, i])) : null;
+    // the Marital status menu + per-option positional map (2026-11-11)
+    m.marKeys = res.marKeys || null;
+    m.marPos = m.marKeys ? Object.fromEntries(m.marKeys.map((k, i) => [k, i])) : null;
     // lane-presence gates: a People lane that carries no figures anywhere
     // this year stays out of its menus and copy (the homeless lane's
     // census floor is the 2011 edition onward — the 2013 election on /

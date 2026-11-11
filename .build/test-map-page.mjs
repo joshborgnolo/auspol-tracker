@@ -660,7 +660,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     // demo rows: 0..1 shares or null per lane, and the birthplace dict's
     // own country shares the same inside it (the interp contract joined
     // its object-valued cob key 2026-10-28)
-    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "mar"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
+    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "ind", "mar"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
   // every interp year rides the income cuts of the nearest census
   // side (hi edges differ across the 2001/2006/2011 grids, so the hi
@@ -989,10 +989,10 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('const COB_NAME = { uk: "the United Kingdom", eng: "England", ind: "India", chn: "China", nzl: "New Zealand", phl: "Philippines", vnm: "Vietnam", zaf: "South Africa", ita: "Italy", lka: "Sri Lanka", sct: "Scotland" };'), "the curated birthplace keys and display names in one literal (whole-UK first for the 2001 edition's own row)");
   assert.ok(base.includes('const COB_BORN = { uk: "the United Kingdom"') && base.includes('phl: "the Philippines"'), "the picker's Born-in labels (whole-UK and the Philippines take their article)");
   assert.ok(base.includes('const COB_SHORT = { uk: "the UK", eng: "ENG", ind: "IND", chn: "CHN", nzl: "NZ", phl: "PHL", vnm: "VNM", zaf: "ZAF", ita: "ITA", lka: "LKA", sct: "SCT" };'), "the compact head stubs: alpha-3, alpha-2 where the short form is natural (NZ, the UK)");
-  assert.ok(ui.includes('isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]'), "the lens head names the chosen country (no more stale Born overseas)");
+  assert.ok(ui.includes('isCob() ? `Born in ${COB_SHORT[S.cob]}` : isImm()'), "the lens head names the chosen country (no more stale Born overseas)");
   assert.ok(base.includes('const COB_VERB = { uk: "were born in the United Kingdom"') && base.includes('sct: "were born in Scotland"'), "per-country story verbs");
   assert.ok(base.includes("const COB_RANGE = {") && base.includes("sct: [0, 3]"), "per-country range caps (Scotland's tiny 3% cap)");
-  assert.ok(base.includes('const isCob = () => S.index === "fborn" && S.cob != null;'), "the fborn-only sub-view guard");
+  assert.ok(base.includes('const isCob = () => (S.index === "fborn" || S.index === LENS_IMM && S.immMode === "fborn") && S.cob != null;'), "the fborn-only sub-view guard (the immigration fold widens it, keeping its own fborn clause)");
   assert.ok(base.includes("const demoShare = (d) =>") && base.includes("const demoBoothShare = (raw, j, pos) =>") && base.includes("const demoRange = () =>") && base.includes("const demoRamp = () =>"), "the select-aware lane accessors at every seam");
   assert.ok(base.includes('m.cobKeys = res.cobKeys || null;') && base.includes("map((k, i) => [k, i])"), "loadYear records the year's country order and its positional spots");
   assert.ok(base.includes("demo.cob = {};") && base.includes("m.cobKeys"), "area pools sum the country shares with the same pool weights");
@@ -1034,7 +1034,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('else if (k === "incv") S.incMode = v;'), "the picker change handler is wired");
   assert.ok(ui.includes('S.incMode') && ui.includes('if (i === "loinc" || i === "hiinc") { S.index = LENS_INC;'), "legacy loinc/hiinc hashes alias onto the lens with the share view picked");
   assert.ok(ui.includes('p.set("iv", S.incMode);') && ui.includes('p.get("iv")'), "the hash carries the income view both ways");
-  assert.ok(ui.includes('S.incMode, S.ageMode, S.eduMode, S.party'), "the legend's refresh key re-reads on a measure switch");
+  assert.ok(ui.includes('S.incMode, S.ageMode, S.eduMode, S.famMode, S.immMode, S.party'), "the legend's refresh key re-reads on a measure switch (the fold lanes' mode keys riding beside it)");
   assert.ok(ui.includes("Income: ${INC_SHORT[S.incMode]}"), "the lens head names the picked measure");
   assert.ok(ui.includes('`Median weekly household income${incEpochBrk}${incMedNote}`'), "the median legend note names itself in census-year dollars and carries the no-national-line caveat where the frame lacks it");
   assert.ok(ui.includes("mny(ausShare)"), "the Australia line formats in dollars on the median view");
@@ -1882,7 +1882,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "ind", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `nsw23 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `nsw23 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -2415,7 +2415,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "ind", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `vic22 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `vic22 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {

@@ -292,6 +292,12 @@ IND18_COLS = ["P_Ag_For_Fshg_Tot", "P_Mining_Tot", "P_Manufact_Tot",
               "P_Public_admin_sfty_Tot", "P_Educ_trng_Tot",
               "P_HlthCare_SocAs_Tot", "P_Art_recn_Tot"]
 IND_D_COLS = ["P_Oth_scs_Tot", "P_ID_NS_Tot", "P_Tot_Tot"]
+# the Marital status menu's registered-marital-status five, of people
+# aged 15+ with a stated status (the GCP editions' G05 and the 2011
+# BCP's B05; their table totals fold a not-stated slice in, so the
+# shares' basis is the five printed categories' own sum — the same
+# ex-not-stated basis G14's religion shares ride, 2026-11-11)
+MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
 GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
 GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
 GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
@@ -391,17 +397,18 @@ XW11_ROWS = 58769
 XW11_SOURCES = 54805
 XW11_SHORT = {"31501140101", "31501140102", "31501140104",
               "50806121812", "60203106418"}
-DEMO_BASIS = ("2021 Census GCP G01, G07, G08, G09F/G09G/G09H, G14, "
-              "G28, G32/G33, G37, G43, G49B, G60B and G62 @ SA1 (Ed3), plus "
+DEMO_BASIS = ("2021 Census GCP G01, G05, G07, G08, G09F/G09G/G09H, "
+              "G14, G28, G32/G33, G37, G43, G49B, G60B and G62 "
+              "@ SA1 (Ed3), plus "
               "the ABS Estimating-homelessness 2049.0 SA2 estimates "
               "down-allocated by population share "
               "(cache/homeless-sa1-2021-alloc.json); "
               "every lane's votes are "
               "in Ed3 space before folding, walking older geographies "
               "via ABS correspondences")
-_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G07, "
-              "G08, G09F/G09G/G09H, G14, G28, G32/G33, G37, G49B, G60B "
-              "and G62 SA1 "
+_DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G05, "
+              "G07, G08, G09F/G09G/G09H, G14, G28, G32/G33, G37, G49B, "
+              "G60B and G62 SA1 "
               "tables (G01: age-band structure (u15 the under-15 share "
               "of the stated ages); language "
               "spoken at home English-only vs other; the "
@@ -464,7 +471,12 @@ _DEMO_TAIL = (" The demo block folds the 2021-census GCP G01, G07, "
               "G43's labour-force status (added 2026-11-10): the "
               "unemployed-looking-for-work share of the stated labour "
               "force (lfs_Tot_LF_* excludes status-not-stated by "
-              "construction). "
+              "construction). G05's registered marital status (added "
+              "2026-11-11): the Marital status menu's five shares "
+              "(mar, key order in marKeys, married leading) of people "
+              "aged 15+, over the five printed categories' own sum — "
+              "the table's Total folds a not-stated slice in, so its "
+              "ex-not-stated basis is their sum. "
               "— all by the same per-SA1 vote "
               "weights — age shares "
               "renormalise over the 11 bands, which exclude "
@@ -740,6 +752,9 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
                                  "2021Census_G08_AUST_SA1.csv")
         mlab = "2021Census_G43_AUST_SA1.csv"
         lab_cols = ["lfs_Unmplyed_lookng_for_wrk_P", "lfs_Tot_LF_P"]
+        mmar = "2021Census_G05_AUST_SA1.csv"
+        mar_cols = ["P_Tot_Married", "P_Tot_Never_married",
+                    "P_Tot_Separated", "P_Tot_Divorced", "P_Tot_Widowed"]
         tram_col = "One_met_Tram_or_lt_rail_P"
         three_trn_col = "Three_meth_Tr_2_oth_meth_P"
         resp_sfx = "resp"
@@ -755,6 +770,9 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
                                  "2016Census_G08_AUS_SA1.csv")
         mlab = "2016Census_G43B_AUS_SA1.csv"
         lab_cols = ["P_Tot_Unemp_Tot", "P_Tot_LF_Tot"]
+        mmar = "2016Census_G05_AUS_SA1.csv"
+        mar_cols = ["P_Tot_Married", "P_Tot_Never_Married",
+                    "P_Tot_Separated", "P_Tot_Divorced", "P_Tot_Widowed"]
         tram_col = "One_met_Tram_incl_lt_rail_P"
         three_trn_col = "Three_meth_Trn_two_othr_met_P"
         resp_sfx = "Resp"
@@ -852,6 +870,12 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
         fail(f"GCP {mind} C/D SA1 sets diverge")
     tbl["ind"] = {c: (rv + (ind_d[c][0],), ind_d[c][1], ind_d[c][2])
                   for c, rv in ind_c.items()}
+    # the Marital status menu (2026-11-11): the era marital table's
+    # person totals in MAR_KEYS order; the table's own Total folds a
+    # not-stated slice in, so the menu's shares base on the five cells'
+    # sum, never it
+    tbl["mar"] = read_p_cols(z, zpf(mmar), idcol,
+                             mar_cols, rows_pin, "mar")
     return tbl
 
 
@@ -945,6 +969,8 @@ def load_gcp21():
             fail(f"GCP G43 SA1 set mismatch at {code}")
         if code not in nlt["ind"]:
             fail(f"GCP G54 SA1 set mismatch at {code}")
+        if code not in nlt["mar"]:
+            fail(f"GCP G05 SA1 set mismatch at {code}")
         # the ten-country cob tuple, in COB_KEYS order, indexed on the
         # GCP_G09{F,G,H}_COLS orders above
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
@@ -970,7 +996,8 @@ def load_gcp21():
             + (HL_ALLOC[2021].get(code, {}).get("e", 0.0),
                ir[5]) \
             + (nlt["lab"][code],) \
-            + (nlt["ind"][code],)
+            + (nlt["ind"][code],) \
+            + (nlt["mar"][code],)
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -1093,14 +1120,16 @@ def acc_new():
             "hlE": 0.0,
             "ueN": 0.0, "lfD": 0.0,
             "indN": [0.0] * len(IND_KEYS),
-            "indNS": 0.0, "indT": 0.0}
+            "indNS": 0.0, "indT": 0.0,
+            "marN": [0.0] * len(MAR_KEYS)}
 
 
 def acc_row(acc, r, w):
-    """Weight-add row r's new-lane tail (r[17..30]) into acc; any
+    """Weight-add row r's new-lane tail (r[17..31]) into acc; any
     reader of the GCP/BCP universes emits the same tail layout (slot
     29 slot — the labour counts — appended 2026-11-10; slot 30 the
-    industry triple appended 2026-11-11; incq stays 28)."""
+    industry triple appended 2026-11-11; incq stays 28; slot 31 —
+    the marital five — appended 2026-11-11)."""
     acc["pers"] += w * r[0]
     acc["y12n"] += w * r[17][0]
     acc["y12cn"] += w * r[17][1]
@@ -1139,6 +1168,11 @@ def acc_row(acc, r, w):
             acc["indN"][i] += w * r[30][0][i]
         acc["indNS"] += w * r[30][1]
         acc["indT"] += w * r[30][2]
+    # the marital five appends after the industry triple on the GCP
+    # unit rows that carry it — slot 31 (2026-11-11)
+    if len(r) > 31:
+        for i in range(len(MAR_KEYS)):
+            acc["marN"][i] += w * r[31][i]
 
 
 def acc_merge(dst, src):
@@ -1156,6 +1190,8 @@ def acc_merge(dst, src):
         dst["ancN"][i] += src["ancN"][i]
     for i in range(len(IND_KEYS)):
         dst["indN"][i] += src["indN"][i]
+    for i in range(len(MAR_KEYS)):
+        dst["marN"][i] += src["marN"][i]
 
 
 def emit_new(acc):
@@ -1172,6 +1208,7 @@ def emit_new(acc):
     cebD = acc["cebT"] - acc["cebNS"]
     ancD = acc["ancP"] - acc["ancNS"]
     indden = sum(acc["indN"])
+    marD = sum(acc["marN"])
     return {
         "y12less": round(acc["y12n"] / yd, 4) if yd > 0 else None,
         "y12": round(acc["y12cn"] / yd, 4) if yd > 0 else None,
@@ -1204,6 +1241,9 @@ def emit_new(acc):
         "ind": ({k: round(acc["indN"][i] / indden, 4)
                  for i, k in enumerate(IND_KEYS)}
                 if indden else None),
+        "mar": {k: (round(acc["marN"][i] / marD, 4)
+                    if marD > 0 else None)
+                for i, k in enumerate(MAR_KEYS)},
     }
 
 
@@ -1576,7 +1616,7 @@ def gcp11():
                 "sch6", "indig", "indigDen", "relvec", "relNS",
                 "relTot", "ten6", "famN", "famD", "citz", "mtw",
                 "ceb3", "ancn", "ancP", "labU", "labLF",
-                "indn", "indns", "indt")):
+                "indn", "indns", "indt", "marvec")):
             continue  # short-table SA1s: coverage drop, never null maths
         y12t = (sum(r["sch6"][1:]), r["sch6"][0], sum(r["sch6"][2:]),
                 sum(r["sch6"]))
@@ -1600,7 +1640,8 @@ def gcp11():
                      # null when a short-table SA1 carries no sector
                      # like every lane hole the interp blend reads)
                      ((tuple(r["indn"]), r["indns"], r["indt"])
-                      if r.get("indn") is not None else None))
+                      if r.get("indn") is not None else None),
+                     tuple(r["marvec"]))
     print(f"gcp11: BCP 2011 in the _GCP layout, {len(out)} SA1s")
     _GCP11 = (out, {"loCutWeekly": cut, "hiEdgeWeekly": 4000,
                     "hiNationalShare": hishare, "loQuantile": INC_LO_Q,
@@ -1649,7 +1690,8 @@ def blend_demo(c0blk, c1blk, f):
                   if a0 is not None or a1 is not None else None)
     # the select-family lanes blend per option like the age bands do
     for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
-                        ("anc", ANC_KEYS), ("ind", IND_KEYS)):
+                        ("anc", ANC_KEYS), ("ind", IND_KEYS),
+                        ("mar", MAR_KEYS)):
         d0 = c0blk.get(which) if c0blk else None
         d1 = c1blk.get(which) if c1blk else None
         out[which] = ({k: lane_blend(None if d0 is None
@@ -2022,7 +2064,8 @@ def build(year):
                   "unemp"):
             nbi[k] = lane_blend(nb0.get(k), nb1.get(k), f)
         for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
-                            ("anc", ANC_KEYS), ("ind", IND_KEYS)):
+                            ("anc", ANC_KEYS), ("ind", IND_KEYS),
+                            ("mar", MAR_KEYS)):
             d0, d1 = nb0.get(which), nb1.get(which)
             nbi[which] = ({k: lane_blend(
                 None if d0 is None else d0.get(k),
@@ -2345,11 +2388,12 @@ def build(year):
                 **({"crosswalkEd1": "ABS CG_SA1_2011_SA1_2016 (ASGS Ed2 correspondences page)"}
                    if year == 2016 else {}),
                 **({"gcpInterp": "ABS 2016 Census GCP datapack (SA1, "
-                                 "G01/G07/G09/G14/G28/G29/G33/G46B/G57B)"}
+                                 "G01/G05/G07/G09/G14/G28/G29/G33/G46B/"
+                                 "G57B)"}
                    if demo_interp is not None else {}),
                 **({"bcpInterp": "ABS 2011 Census Basic Community "
                                  "Profile, SA1 for AUST "
-                                 "(B01/B07/B09/B14/B16/B25/B26/B28/"
+                                 "(B01/B05/B07/B09/B14/B16/B25/B26/B28/"
                                  "B32/B40B/B45B)"}
                    if demo_interp is not None and interp["c0"] == 2011
                    else {}),
@@ -2390,6 +2434,7 @@ def build(year):
         # shared print family's own order; the GCP editions' industry
         # tables, 2021 G54/2016 G51 persons blocks)
         "indKeys": list(IND_KEYS),
+        "marKeys": list(MAR_KEYS),
         "incomeCuts": {
             "loQuantile": gcp_meta["loQuantile"],
             "loCutWeekly": gcp_meta["loCutWeekly"],

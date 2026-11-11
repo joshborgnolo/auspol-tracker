@@ -138,7 +138,8 @@ def sum_divisions(alloc, sa1, inc):
                                   "ancns": 0, "ancP": 0,
                                   "hle": 0.0,
                                   "labU": 0, "labLF": 0,
-                                  "indn": [0] * len(d13.IND_KEYS)})
+                                  "indn": [0] * len(d13.IND_KEYS),
+                                  "marvec": [0] * len(d13.MAR_KEYS)})
     for key, dv in alloc.items():
         r = sa1.get(key)
         ir = inc.get(key)
@@ -186,6 +187,8 @@ def sum_divisions(alloc, sa1, inc):
         acc["labLF"] += r["labLF"]
         for i in range(len(d13.IND_KEYS)):
             acc["indn"][i] += r["indn"][i]
+        for i in range(len(d13.MAR_KEYS)):
+            acc["marvec"][i] += r["marvec"][i]
     return divsum
 
 
@@ -229,6 +232,9 @@ def national_of(divsum):
             nat.setdefault("ancn", [0] * len(d13.ANC_KEYS))
             nat["ancn"][i] += dv["ancn"][i]
         nat["hle"] = nat.get("hle", 0.0) + dv["hle"]
+        for i in range(len(d13.MAR_KEYS)):
+            nat.setdefault("marvec", [0] * len(d13.MAR_KEYS))
+            nat["marvec"][i] += dv["marvec"][i]
     nat_b = sum(nat[b] for b in d13.BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -280,6 +286,8 @@ def national_of(divsum):
         "ind": ({k: round(nat["indn"][i] / sum(nat["indn"]), 4)
                  for i, k in enumerate(d13.IND_KEYS)}
                 if sum(nat["indn"]) else None),
+        "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
+                for i, k in enumerate(d13.MAR_KEYS)},
     }
 
 
@@ -373,7 +381,9 @@ def main():
                     "hle": row["hle"],
                     "labU": row["labU"], "labLF": row["labLF"],
                     "indn": (list(row["indn"]) if row["indn"] is not None
-                             else None)})
+                             else None),
+                    "marvec": (list(row["marvec"]) if row["marvec"]
+                               is not None else None)})
             out_booths.append(rec)
 
         divisions = []
@@ -497,6 +507,7 @@ def main():
             # the Industry picker's nineteen ANZSIC-2006 divisions —
             # the 2013 store's own key list (same census universe)
             "indKeys": list(d13.IND_KEYS),
+            "marKeys": list(d13.MAR_KEYS),
             "counts": counts,
             "divisions": divisions,
             "booths": out_booths,

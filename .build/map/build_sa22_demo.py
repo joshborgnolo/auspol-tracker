@@ -191,6 +191,7 @@ def main():
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="4", era="2021")
     lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="4", era="2021")
     ind = gcp_newlanes.load_ind(GCP_ZIP, prefix="4", era="2021")
+    mar = gcp_newlanes.load_mar(GCP_ZIP, prefix="4", era="2021")
     inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "4")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
     sa1 = read_sa1_polygons()
@@ -235,6 +236,7 @@ def main():
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "ueN": 0.0, "lfD": 0.0,
                                   "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
+                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -294,6 +296,8 @@ def main():
         iv, _ivns, _ivt = ind[code]
         for i in range(len(gcp_newlanes.IND_KEYS)):
             a["indN"][i] += iv[i]
+        for i in range(len(gcp_newlanes.MAR_KEYS)):
+            a["marN"][i] += mar[code][i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -311,6 +315,7 @@ def main():
         indden = sum(a["indN"])
         tn = a["tenN"]
         tend = tn[0] + tn[1] + tn[2] + tn[4]
+        mard = sum(a["marN"])
         s = {
             "lang": round(a["oth"] / (a["eng"] + a["oth"]), 4),
             "a65": round((a["bands"][8] + a["bands"][9] + a["bands"][10]) / bsum, 4),
@@ -348,6 +353,9 @@ def main():
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
+            "mar": {k: (round(a["marN"][i] / mard, 4)
+                        if mard > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
         }
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -383,6 +391,7 @@ def main():
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "ueN": 0.0, "lfD": 0.0,
               "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
+              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
@@ -390,7 +399,7 @@ def main():
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
             elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH",
-                        "indN"):
+                        "indN", "marN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -413,6 +422,7 @@ def main():
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
         # the Industry picker's nineteen ANZSIC-2006 divisions
         "indKeys": list(gcp_newlanes.IND_KEYS),
+        "marKeys": list(gcp_newlanes.MAR_KEYS),
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],
                   "sentinelSa1": len(SA_SENTINELS), "sentinelPersons": sentinel_persons},

@@ -87,6 +87,12 @@ const NATIONAL = {
          vietnamese: 0.0095, lebanese: 0.01 },
   // the 2026-11-10 labour lane (the 2006 BCP's CD B41 read)
   unemp: 0.0522,
+  // the industry select lane (the 2006 BCP's CD B43C/D read)
+  ind: { ag: 0.0316, mining: 0.012, manuf: 0.1074, utils: 0.0101,
+         constr: 0.08, whole: 0.0447, retail: 0.1166, accom: 0.0648,
+         transport: 0.0482, media: 0.0199, rental: 0.0393, fin: 0.0174,
+         prof: 0.0679, admin: 0.0323, pubadm: 0.0686, educ: 0.0787,
+         health: 0.1079, arts: 0.0144, othersvc: 0.0381 },
   // marital over the 15+ stated-status share (the 2006 BCP's B05)
   mar: { marr: 0.4968, never: 0.3313, sep: 0.031, div: 0.082,
          wid: 0.0589 },

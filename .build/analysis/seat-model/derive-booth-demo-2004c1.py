@@ -105,7 +105,8 @@ def main():
                                   "ancn": [0] * len(d06.ANC_KEYS),
                                   "ancns": 0, "ancP": 0,
                                   "labU": 0, "labLF": 0,
-                                  "indn": [0] * len(d06.IND_KEYS)})
+                                  "indn": [0] * len(d06.IND_KEYS),
+                                  "marvec": [0] * len(d06.MAR_KEYS)})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -145,6 +146,8 @@ def main():
         acc["labLF"] += r["labLF"]
         for i in range(len(d06.IND_KEYS)):
             acc["indn"][i] += r["indn"][i]
+        for i in range(len(d06.MAR_KEYS)):
+            acc["marvec"][i] += r["marvec"][i]
 
     nat = defaultdict(int)
     for dv in divsum.values():
@@ -180,6 +183,9 @@ def main():
         nat.setdefault("indn", [0] * len(d06.IND_KEYS))
         for i in range(len(d06.IND_KEYS)):
             nat["indn"][i] += dv["indn"][i]
+        nat.setdefault("marvec", [0] * len(d06.MAR_KEYS))
+        for i in range(len(d06.MAR_KEYS)):
+            nat["marvec"][i] += dv["marvec"][i]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -224,6 +230,8 @@ def main():
         "ind": ({k: round(nat["indn"][i] / sum(nat["indn"]), 4)
                  for i, k in enumerate(d06.IND_KEYS)}
                 if sum(nat["indn"]) else None),
+        "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
+                for i, k in enumerate(d06.MAR_KEYS)},
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -274,7 +282,9 @@ def main():
                 "ancP": r["ancP"],
                 "labU": r["labU"], "labLF": r["labLF"],
                 "indn": (list(r["indn"]) if r["indn"] is not None
-                         else None)})
+                         else None),
+                "marvec": (list(r["marvec"]) if r["marvec"] is not None
+                           else None)})
         out_booths.append(rec)
 
     divstate = {b["div"]: b["state"] for b in booths}
@@ -358,6 +368,7 @@ def main():
         # the Industry picker's nineteen ANZSIC-2006 divisions — the
         # 2006 store's own key list (same census, same prints)
         "indKeys": list(d06.IND_KEYS),
+        "marKeys": list(d06.MAR_KEYS),
         "counts": counts,
         "divisions": divisions,
         "booths": out_booths,

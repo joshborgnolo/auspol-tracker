@@ -290,6 +290,97 @@ years), derive-booth-demo-{2016,2013,2011,2006,2004c1,90s} —
 demo-2001 and demo-2001-frame need the 2001 tally refreshed with the
 labour lane's extractor first — and derive-booth-demo-interp.
 
+# The "Marital status" census select lane (mar, 11 November 2026)
+
+The census People menu gains a fifth select lens: **Marital status** —
+the registered marital-status five (Married, Never married, Separated,
+Divorced, Widowed; the menu's `marKeys` order marr/never/sep/div/wid)
+as a share of people aged 15+ with a stated status. Every edition's
+marital print folds a not-stated slice into its total (or prints none at
+all from 2001 back), so the menu's basis is the five printed categories'
+OWN SUM everywhere — the same ex-not-stated convention G14's religion
+menu rides. Its reads, in `gcp_newlanes.load_mar` and the seat-model
+derive/extract chains:
+
+- 2021 GCP G05 `P_Tot_{Married,Separated,Divorced,Widowed,Never_married}`
+- 2016 GCP G05 same cells (`P_Tot_Never_Married` capitalised differently)
+- 2011 BCP B05 same cells (as 2016's capitalisation)
+- 2006 BCP CD B05 `PERSONS,Total,<cat>` (cell ids B737/B738/B739/B740/
+  B741 from BCP2006_cell_desc_dp.xls)
+- 2001 BCP sheet `B 04` — Age by registered marital status by sex, the
+  printed Total row's five category pair-blocks (Males+Females), less
+  the sheet's Overseas-visitors row (extract-bcp-2001-tally.py's `mar01`)
+- 1996 AURIN `cd_b04_census_1996` — Age by registered marital status by
+  sex, `total_<cat>_m/f` less the matched `overseas_vis_*` columns
+- 1991 AURIN `b06_age_by_marital_status_by_sex_cd_1991` (`m_*/f_*` totals,
+  "separated (not divorced)" the era's Sep option) — fetched through the
+  standing WFS lane 2026-11-11, no not-stated column anywhere here
+
+National sanity reads (share of 15+ with a stated status): 0.465
+married (2021 GCP), 0.487 (2001 B 04), 0.533 (1996 AURIN), 0.561 (1991
+AURIN). The 2001-ward drift (down about five points of married share per
+decade through the era) is what the legend should show.
+
+App surface mirrors the 2026-10-31 select-lens machinery (`anc` the
+model): `LENS_MAR`/`MAR_NAME`/`MARISMS`/`MAR_RANGE` + ramp `seq(163,
+0.12)` + `censusWho` basis override (people aged 15+) + MAR_TOP +
+menu/picker/URL (`ma` param)/clamps in app-6-ui + `MAR`-family emitters
+through demo_interp_of + map/data assembly (`marKeys`/`B["mar"]`/
+`demo.mar` everywhere else select lanes ride); the areas-sa1-2021 pack
+packs `mar.{marr,never,sep,div,wid}` lanes and AREAS_LANES pins them;
+core-split's pplLanes names `mar` (a lane name missing there never asks
+for its res file).
+
+Lane-list rebuild commands: the standing seat-model chain
+(extract-bcp-2001-tally for the 2001-era families and
+extract-bcp-aurin-tally per '90s edition, then
+derive-booth-demo-{2001,2001-frame,2004c1,2006,2011,2013,2016,90s,
+interp} and derive-booth-seifa-voter), `.build/map/gcp_newlanes.py`'s
+readers feeding build_areas_sa1 + every state demo builder,
+build_<frame>_data → build_<frame>_boothcensus → geo_build per state
+family, then build_map_data (its OWN OUT default) and assemble. The
+only source nuclear to this lane beyond committed mirrors is
+`b06_age_by_marital_status_by_sex_cd_1991.csv` in
+cache/bcp-1991-aurin (recaptured from AURIN; the 1996 b04 and 2001 B 04
+read out of existing downloads).
+
+# Restoring the Marital status lane and the Industry stale land's other lanes (12 November 2026)
+
+The industry picker's own era land (`0c08ffe8`) assembled its app sources from a pre-marital tree (predating the
+marital lens `109379e4` and the '91 labour `b20` lane `7557a90b`), so one stale push rewrote the four app files and the
+federal demo stores with the marital code absent — the third recorded build of that land silently reverting a newer
+lane (the vote-type piles `eff82523` and the zoom-jitter `8dd13969` restored separately the same day). This restore
+carried the marital lane onto the industry's tail: `109379e4` re-landed by a no-commit cherry-pick onto the current tip
+(the union keeps every industry-era addition, marital elements appending AFTER `ind` at every positional tail — the
+per-SA1/demo tuples emit `… rel, ten, anc, lab, ind, mar`), plus the Safari black-sea dwell fix (`59857df9`'s
+`frame(ts) { raf = 0; unstill(); chartTick(); … }` pair — the fourth recorded casualty of the same stale land; its
+`layPaper` half was already live) re-applied alongside.
+
+Positional contract where it matters: store lane dicts keep `demo.ind` beside `demo.mar`; lane-duty text orders the
+select family `("anc", "unemp", "ind", "mar")`. The seat-model store pins and the map cohort pins never had the Industry
+lane's half (its land skipped the test half at ship) — this restore measures and pins the year-list national and
+Sydney/Lingiari `ind` objects beside `mar`, in the stores' own emission order (`ag, mining, manuf, utils, constr, whole,
+retail, accom, transport, media, rental, fin, prof, admin, pubadm, educ, health, arts, othersvc`; ANZSIC-1993's
+seventeen-key order on the '96/'01 prints).
+
+**The stats-era res assembly recipe** (the part of the chain that wasn't recoverable from any file): the four stats-era
+publics — `res-{1993,1996,1998,2001}.json` — are the freshly-built `data-<y>.json` lifts (from build_stats_history and
+build_map_data), minus `indKeys` and the industry cohort rows everywhere they appear (`B["ind"]` and `div.demo.ind` —
+the frozen-era doctrine at HEAD family keeps the 1993-class publics pre-industry period documents), plus the
+`lp` anchors and `boundarySource` from the same `handbook_geo.mjs` pass as ever. Sequence: stats builders → the
+industry strip → handbook. Hand-keep the ordering: the res-history `h` join and the vote-piles/areas latch re-run AFTER
+the lift, since each pass rewrites these docs wholesale. The geography-side invariant survives: handbook writes `res-`
+for 1996/2001 directly but lifts the 93/98-class `data-` intermediates into `res-` itself, so the 93 class needs no
+separate lift, and `indKeys`/`ind` stay off all four regardless (2021 GCP's `b06`-era '91 lane still prints no industry
+table — same era-hole doctrine as labour's).
+
+Verification of this restore: the whole map fleet (test-map-areas, -chart, -occ, -water, -vote-bands,
+-primary-breakdowns, -senate, -boundary-vintages, -islands, -urban, -history, -page, -geo, -geo-build, -ocean, -draw,
+-and-marital incl. their 12 browser probes) green; the seat-model store suites (90s, 2001, 2006, 2013, 2016,
+seifa-voter incl. the interp blends' demoI key-sets) green; era-era figure reads unchanged (married share of people aged
+15+ with a stated status: 56.1% at the '91 print, 53.3 ('96), 51.5 (2001), 49.7 (2006), 48.8 (2011), 48.1 (2016), and
+47.4% at the 2025 frame), industry's own sanity (`2021: health 0.155`) alongside.
+
 # The Industry select lens (ind, 2026-11-11)
 
 The Census → People menu's industry picker (S.index === LENS_IND, S.ind

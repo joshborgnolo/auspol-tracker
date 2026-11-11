@@ -251,6 +251,16 @@ BCP_B43C = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
             "2011Census_B43C_AUST_SA1_short.csv")
 BCP_B43D = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
             "2011Census_B43D_AUST_SA1_short.csv")
+# B05's registered-marital-status totals (Persons block): the five
+# printed categories of people aged 15+ in MAR_KEYS order; their own
+# sum is the lane's stated basis (2026-11-11)
+BCP_B05 = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+           "2011Census_B05_AUST_SA1_short.csv")
+B05_COLS = ["P_Tot_Married", "P_Tot_Never_Married", "P_Tot_Separated",
+            "P_Tot_Divorced", "P_Tot_Widowed"]
+# the Marital status menu's key order, shared cross-era with the voter
+# store's MAR_KEYS (the GCP-era prints drop the capital M on Never-married)
+MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
 # the cross-era key orders the whole lane stack shares (the venue-era
 # drivers emit relvec/tenvec in these orders; the voter store has the
 # identical constants — see the there-asserted national shares)
@@ -354,6 +364,7 @@ def load_bcp():
     b42 = bcp_table(z, BCP_B42B, "region_id", B42B_COLS, 54800, 54805)
     b43c = bcp_table(z, BCP_B43C, "region_id", B43C_COLS, 54800, 54805)
     b43d = bcp_table(z, BCP_B43D, "region_id", B43D_COLS, 54800, 54805)
+    b05 = bcp_table(z, BCP_B05, "region_id", B05_COLS, 54800, 54805)
     out = {}
     for code, g in g01.items():
         row09 = b09.get(code)
@@ -375,6 +386,7 @@ def load_bcp():
         row42 = b42.get(code)
         row43c = b43c.get(code)
         row43d = b43d.get(code)
+        row05 = b05.get(code)
         mtw = None
         if row46 is not None:
             tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b, ttot, tns = row46
@@ -420,6 +432,7 @@ def load_bcp():
                      else row43c + (row43d[0],)),
             "indns": None if row43d is None else row43d[1],
             "indt": None if row43d is None else row43d[2],
+            "marvec": None if row05 is None else row05,
         }
     n05 = sum(1 for c in out.values() if c["aus"] is None)
     n40 = sum(1 for c in out.values() if c["uni"] is None)
@@ -433,11 +446,12 @@ def load_bcp():
     n46 = sum(1 for c in out.values() if c["mtw"] is None)
     n42 = sum(1 for c in out.values() if c["labU"] is None)
     n43 = sum(1 for c in out.values() if c["indn"] is None)
+    nmar = sum(1 for c in out.values() if c["marvec"] is None)
     print(f"BCP 2011: {len(out)} SA1s (B09 short {n05}, B40B short {n40}, "
           f"B45B short {n45}, B07 short {n07}, B14 short {n14}, "
           f"B25 short {n25}, B32 short {n32}, B08 short {n08}, "
           f"B24 short {n24}, B46 short {n46}, B42B short {n42}, "
-          f"B43 short {n43})")
+          f"B43 short {n43}, B05 short {nmar})")
     return out
 
 
@@ -772,6 +786,12 @@ def shares(rec):
         if indd > 0:
             out["ind"] = {k: bounded(rec["indn"][i], indd)
                           for i, k in enumerate(IND_KEYS)}
+    # the Marital status menu (2026-11-11): the registered-status five,
+    # of people 15+ with a stated status (their own sum the basis)
+    if rec.get("marvec") is not None:
+        mard = sum(rec["marvec"])
+        out["mar"] = {k: bounded(rec["marvec"][i], mard)
+                      for i, k in enumerate(MAR_KEYS)}
     return out
 
 
@@ -812,7 +832,8 @@ def main():
              or sa1.get(k, {}).get("ancP") is None
              or sa1.get(k, {}).get("labU") is None
              or sa1.get(k, {}).get("labLF") is None
-             or sa1.get(k, {}).get("indn") is None}
+             or sa1.get(k, {}).get("indn") is None
+             or sa1.get(k, {}).get("marvec") is None}
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
@@ -838,7 +859,8 @@ def main():
                                   "ancns": 0, "ancP": 0,
                                   "hle": 0.0,
                                   "labU": 0, "labLF": 0,
-                                  "indn": [0] * len(IND_KEYS)})
+                                  "indn": [0] * len(IND_KEYS),
+                                  "marvec": [0] * len(MAR_KEYS)})
     for key, dv in ced.items():
         r = sa1[key]
         ir = inc[key]
@@ -883,6 +905,8 @@ def main():
         acc["labLF"] += r["labLF"]
         for i in range(len(IND_KEYS)):
             acc["indn"][i] += r["indn"][i]
+        for i in range(len(MAR_KEYS)):
+            acc["marvec"][i] += r["marvec"][i]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -930,7 +954,9 @@ def main():
                 "hle": row["hle"],
                 "labU": row["labU"], "labLF": row["labLF"],
                 "indn": (list(row["indn"]) if row["indn"] is not None
-                         else None)})
+                         else None),
+                "marvec": (list(row["marvec"]) if row["marvec"] is not None
+                           else None)})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
@@ -971,6 +997,9 @@ def main():
             nat.setdefault("ancn", [0] * len(ANC_KEYS))
             nat["ancn"][i] += dv["ancn"][i]
         nat["hle"] = nat.get("hle", 0.0) + dv["hle"]
+        for i in range(len(MAR_KEYS)):
+            nat.setdefault("marvec", [0] * len(MAR_KEYS))
+            nat["marvec"][i] += dv["marvec"][i]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -1037,6 +1066,8 @@ def main():
             "ind": ({k: round(nat["indn"][i] / sum(nat["indn"]), 4)
                      for i, k in enumerate(IND_KEYS)}
                     if sum(nat["indn"]) else None),
+            "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
+                    for i, k in enumerate(MAR_KEYS)},
         },
     }
     out = {
@@ -1077,7 +1108,11 @@ def main():
             "tenKeys, owned-with-mortgage leading) over B32's "
             "ex-tenure-not-stated occupied-private-dwellings basis "
             "(rented-public a state-or-territory-housing-authority "
-            "landlord within that base), B25's one-parent share of "
+            "landlord within that base), B05's Marital status menu "
+            "five shares (mar, key order in marKeys, married leading) "
+            "of people aged 15+ over their own printed-category sum "
+            "(the table's not-stated slice outside the basis), "
+            "B25's one-parent share of "
             "families, and the under-15 share of the stated ages; "
             "then the first-2026-10-31 people-lanes lines: B46's "
             "commute-by-public-transport share (any train, bus, tram "
@@ -1155,6 +1190,7 @@ def main():
         # the Industry picker's nineteen ANZSIC-2006 divisions (the
         # shared print family's own order; B43C/D's persons block)
         "indKeys": list(IND_KEYS),
+        "marKeys": list(MAR_KEYS),
         "deliveryBasis": ("venue-proxy per booth (SA1 of the premises); "
                           "exact CED-2011 census sum per division"),
         "incomeCuts": {

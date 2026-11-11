@@ -149,6 +149,22 @@ def tally_1991():
         tally[c]["eng"] = eng
         tally[c]["oth"] = tot - eng - ns
 
+    # b06 age by marital status by sex: the five printed categories'
+    # Total columns (the era print carries no not-stated column —
+    # the five categories' own sum is the stated basis, 2026-11-11).
+    # Column naming is the AURIN schema's own: "separated (not
+    # divorced)" = the /map/ Marital status menu's "sep" option
+    for r in read("b06_age_by_marital_status_by_sex_cd_1991.csv"):
+        c = r["cd_code_1991"]
+        tally[c]["mar"] = [
+            _sub_int(r, "m_married") + _sub_int(r, "f_married"),
+            _sub_int(r, "m_never_married") + _sub_int(r, "f_never_married"),
+            _sub_int(r, "m_separtd_no_divorced")
+            + _sub_int(r, "f_separtd_no_divorced"),
+            _sub_int(r, "m_divorced") + _sub_int(r, "f_divorced"),
+            _sub_int(r, "m_widowed") + _sub_int(r, "f_widowed"),
+        ]
+
     for r in read("b08_birthplace_ctry_by_sex_cd_1991.csv"):
         c = r["cd_code_1991"]
         tally[c]["aus"] = _sub_int(r, "p_born_aus_p")
@@ -250,6 +266,30 @@ def tally_1996():
         tally[c]["aus"] = _sub_int(r, "australian_p")
         tally[c]["totc"] = _sub_int(r, "total_p")
         tally[c]["cobns"] = _sub_int(r, "not_stated_p")
+
+    # b04 age by registered marital status by sex: the five printed
+    # categories' Total columns less the overseas-visitors columns
+    # (the as-enumerated basis the GCP-era tables' totals carry;
+    # no not-stated column on this print, 2026-11-11)
+    for r in read("cd_b04_census_1996.csv"):
+        c = r["cd_code"]
+        tally[c]["mar"] = [
+            _sub_int(r, "total_marr_m") + _sub_int(r, "total_marr_f")
+            - _sub_int(r, "overseas_vis_marr_m")
+            - _sub_int(r, "overseas_vis_marr_f"),
+            _sub_int(r, "total_nev_marr_m") + _sub_int(r, "total_nev_marr_f")
+            - _sub_int(r, "overseas_vis_nev_marr_m")
+            - _sub_int(r, "overseas_vis_nev_marr_f"),
+            _sub_int(r, "total_sep_m") + _sub_int(r, "total_sep_f")
+            - _sub_int(r, "overseas_vis_sep_m")
+            - _sub_int(r, "overseas_vis_sep_f"),
+            _sub_int(r, "total_div_m") + _sub_int(r, "total_div_f")
+            - _sub_int(r, "overseas_vis_div_m")
+            - _sub_int(r, "overseas_vis_div_f"),
+            _sub_int(r, "total_wid_m") + _sub_int(r, "total_wid_f")
+            - _sub_int(r, "overseas_vis_wid_m")
+            - _sub_int(r, "overseas_vis_wid_f"),
+        ]
 
     for r in read("cd_b08_census_1996.csv"):
         c = r["cd_code"]
@@ -655,6 +695,12 @@ def main():
                              for r in tally.values())),
         "onepar": _sharef(sum(r["oneparN"] or 0 for r in tally.values()),
                           sum(r["oneparD"] or 0 for r in tally.values())),
+        "mar": {k: _sharef(sum(r["mar"][i] for r in tally.values()
+                              if r.get("mar")),
+                          sum(sum(r["mar"]) for r in tally.values()
+                              if r.get("mar")))
+                for i, k in enumerate(
+                    ["marr", "never", "sep", "div", "wid"])},
     }
 
     out = {
@@ -680,7 +726,9 @@ def main():
     print("  lanes: norel", profile["rel"]["norel"], "cath",
           profile["rel"]["cath"], "own", profile["ten"]["own"],
           "rent", profile["ten"]["rent"], "atsci", profile["atsci"],
-          "onepar", profile["onepar"], "uk", profile["cob"]["uk"])
+          "onepar", profile["onepar"], "uk", profile["cob"]["uk"],
+          "mar(married)", profile["mar"]["marr"],
+          "mar(never)", profile["mar"]["never"])
 
 
 if __name__ == "__main__":
