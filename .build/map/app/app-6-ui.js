@@ -9,7 +9,7 @@ function lensShort() {
     case "senpref": return `${famLeg(S.spFrom)} Senate: ${spA(true)} v ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isInd() ? `Industry: ${IND_NAME[S.ind]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isFam() ? `Family: ${FAMC_SHORT[S.famMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isInd() ? `Industry: ${IND_NAME[S.ind]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isFam() ? `Family: ${FAMC_SHORT[S.famMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : isImm() ? `Immigration: ${IMM_SHORT[S.immMode]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -90,7 +90,7 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL || drawOf(M()) !== "seats"));
-const legendState = () => [S.sel.level, S.sel.st, S.sel.div, S.sel.booth, SF.key, SF.data ? SF.data.n : 0, SF.empty, ...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.famMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.ind, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.sel.level, S.sel.st, S.sel.div, S.sel.booth, SF.key, SF.data ? SF.data.n : 0, SF.empty, ...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.famMode, S.immMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.ind, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
 // the select-lens option keys ride the key too — every option swap must
 // invalidate the views this list feeds (the legend itself and the
 // Chart view's stat key): an option cell missing here repaints nothing
@@ -312,14 +312,13 @@ function applyOpt(k, v) {
   if (k === "vs") { S.vs = v; if (S.from === v) S.from = v === "onp" ? "lnp" : "onp"; }
   else if (k === "sppair") { S.spPair = v; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
   else if (k === "spfrom") S.spFrom = v;
-  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "famv") S.famMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english"; else if (k === "occ") S.occ = v || "socprof"; else if (k === "ind") S.ind = v || "ag";
+  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "famv") S.famMode = v; else if (k === "immv") S.immMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english"; else if (k === "occ") S.occ = v || "socprof"; else if (k === "ind") S.ind = v || "ag";
   lensParamChanged();
 }
 function censusSelects(m, cls = "") {
   const peopleExtra = [
     ...(m.relKeys && m.relKeys.length ? [[LENS_REL, "Religion"]] : []),
     ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
-    ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
     ...(m.occKeys && m.occKeys.length ? [[LENS_OCC, "Occupation"]] : []),
     ...(m.indKeys && m.indKeys.length ? [[LENS_IND, "Industry"]] : []),
   ];
@@ -357,15 +356,25 @@ function censusSelects(m, cls = "") {
       const famOpts = FAMC_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false);
       if (S.index === LENS_FAM && famOpts.length > 1) out.push(lgMenu("famv", famOpts.map((k) => [k, FAMC_NAME[k]]), S.famMode, "Family view"));
     }
+    // on Immigration the same picker reads the four views: the language
+    // share lands, Born overseas, Non-citizens and Ancestry beside it
+    // (Ancestry appears only where the frame's census print carries the
+    // ancestry table; the shares gate on the printed can-share lane)
+    {
+      const immOpts = IMM_MODES.filter((k) => k === "anc" ? !!(m.ancKeys && m.ancKeys.length) : !m.hasLane || m.hasLane[k] !== false);
+      if (S.index === LENS_IMM && immOpts.length > 1) out.push(lgMenu("immv", immOpts.map((k) => [k, IMM_NAME[k]]), S.immMode, "Immigration view"));
+    }
     // on Born overseas a second picker reads a birthplace country per year
     // (the year's own census-edition menu; the informal lens's own
-    // measure-switcher idiom)
-    if (S.index === "fborn" && m.cobKeys && m.cobKeys.length) out.push(lgMenu("cob", [["", "All overseas-born"], ...m.cobKeys.map((k) => [k, `Born in ${COB_BORN[k]}`])], S.cob, "Birthplace country"));
+    // measure-switcher idiom) — under the Immigration fold the option
+    // stays, riding the immigration read
+    if ((S.index === "fborn" || S.index === LENS_IMM && S.immMode === "fborn") && m.cobKeys && m.cobKeys.length) out.push(lgMenu("cob", [["", "All overseas-born"], ...m.cobKeys.map((k) => [k, `Born in ${COB_BORN[k]}`])], S.cob, "Birthplace country"));
     // the Religion and Housing-tenure lenses' own option pickers
     // (No religion and owned-with-mortgage are the landing views)
     if (S.index === LENS_REL && m.relKeys && m.relKeys.length) out.push(lgMenu("rel", m.relKeys.map((k) => [k, REL_NAME[k]]), S.rel, "Religion"));
     if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) out.push(lgMenu("ten", m.tenKeys.map((k) => [k, TEN_NAME[k]]), S.ten, "Housing tenure"));
-    if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) out.push(lgMenu("anc", m.ancKeys.map((k) => [k, ANC_NAME[k]]), S.anc, "Ancestry"));
+    // the Ancestry picker rides along when its folded-home read is picked
+    if ((S.index === LENS_ANC || S.index === LENS_IMM && S.immMode === "anc") && m.ancKeys && m.ancKeys.length) out.push(lgMenu("anc", m.ancKeys.map((k) => [k, ANC_NAME[k]]), S.anc, "Ancestry"));
     // the Occupation classes picker (2021-census-era frames alone publish occKeys)
     if (S.index === LENS_OCC && m.occKeys && m.occKeys.length) out.push(lgMenu("occ", m.occKeys.map((k) => [k, OCC_NAME[k]]), S.occ, "Occupation"));
     // the Industry divisions picker (every frame with a print era's
@@ -524,6 +533,7 @@ function legendHTML(m) {
           : isTen() ? `Share of dwellings that ${TENESMS[S.ten]}`
           : isAnc() ? `Share of residents who ${ANCISMS[S.anc]} (people could name up to two ancestries, so the options don't add up to a whole)`
           : isOcc() ? `Share of workers who ${OCCISMS[S.occ]} (the seven classes aren't exhaustive — technicians, service, clerical and sales workers sit in no class — so the options don't add up to a whole)`
+          : isImm() ? NOTE_ARC[S.immMode] || `Share of ${censusWho(m).phrase}`
           : S.index === "pt" ? ptNote
           : NOTE_ARC[S.index] || `Share of ${censusWho(m).phrase}`;
         const basisTail = m.demoInterp ? `interpolated between the ${m.demoInterp.c0} and ${m.demoInterp.c1} censuses to election day${m.demoBasis === "venue" ? `, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in` : `, where each ${boothsOn ? "place’s" : "seat’s"} voters live`}.` : m.demoBasis === "venue" ? `${m.year < 2004 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
@@ -1146,12 +1156,16 @@ async function setYear(y) {
   if (!(b.indKeys || []).includes(S.ind)) S.ind = (b.indKeys || [])[0] || "ag";
   // a People lane the frame's era never printed (menu omits it) drops
   // the selection to the always-printed language share
-  if (b.hasLane && (DM.includes(S.index) || S.index === LENS_EDU || S.index === LENS_FAM) && b.hasLane[S.index] === false) S.index = "lang";
+  if (b.hasLane && (DM.includes(S.index) || S.index === LENS_EDU || S.index === LENS_FAM || S.index === LENS_IMM) && b.hasLane[S.index] === false) { S.index = LENS_IMM; S.immMode = "lang"; }
   // a schooling read the era never prints falls back to the frame's own
   // (the statistics-era frames keep University educated alone)
   if (S.index === LENS_EDU && b.hasLane && b.hasLane[S.eduMode] === false) S.eduMode = EDU_MODES.find((k) => b.hasLane[k] !== false) || "uni";
   // a family read the era never prints falls back the same way
   if (S.index === LENS_FAM && b.hasLane && b.hasLane[S.famMode] === false) S.famMode = FAMC_MODES.find((k) => b.hasLane[k] !== false) || "u15";
+  // an immigration read the era never prints falls back the same way —
+  // the Ancestry view gates on the frame's own ancestry table, its pickers'
+  // way, over the share lanes' hasLane slots
+  if (S.index === LENS_IMM && ((S.immMode === "anc" && !(b.ancKeys && b.ancKeys.length)) || (S.immMode !== "anc" && b.hasLane && b.hasLane[S.immMode] === false))) S.immMode = IMM_MODES.find((k) => k === "anc" ? !!(b.ancKeys && b.ancKeys.length) : !b.hasLane || b.hasLane[k] !== false) || "lang";
   if (b.hasIx && IX.includes(S.index) && b.hasIx[S.index] === false) S.index = "irsd";
   if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";
   if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
@@ -1434,7 +1448,7 @@ function writeURL() {
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
   if (S.lens === "senpref") { p.set("sp", S.spPair); p.set("p", S.spFrom); }
-  if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isFam() && S.famMode !== "u15") p.set("fv", S.famMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); if (isOcc()) p.set("oc", S.occ); if (isInd()) p.set("in", S.ind); }
+  if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isFam() && S.famMode !== "u15") p.set("fv", S.famMode); if (isImm() && S.immMode !== "lang") p.set("mv", S.immMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); if (isOcc()) p.set("oc", S.occ); if (isInd()) p.set("in", S.ind); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.draw !== "seats") p.set("draw", S.draw);
   // the chart's own switches ride along: the seat-type split and the vote-type comparison
@@ -1488,11 +1502,15 @@ function readURL() {
   // the family reads' own ids pre-date the fold: a legacy u15/onepar/
   // bigfam hash lands on the Family composition lens with its read picked
   else if (FAMC_MODES.includes(i)) { S.index = LENS_FAM; S.famMode = i; }
-  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_FAM || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_IND)) S.index = i;
+  // the immigration reads' ids pre-date that fold the same way, and the
+  // old standalone Ancestry entry joins them (its sub-option riding "an")
+  else if (IMM_MODES.includes(i) || i === LENS_ANC) { S.index = LENS_IMM; S.immMode = i === LENS_ANC ? "anc" : i; }
+  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_FAM || i === LENS_IMM || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_IND)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
   const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
   const ev = p.get("ev"); S.eduMode = EDU_MODES.includes(ev) ? ev : ev === "y12less" ? "y10less" : EDU_MODES.includes(i) ? i : i === "y12less" ? "y10less" : "uni";
   const fv = p.get("fv"); S.famMode = FAMC_MODES.includes(fv) ? fv : FAMC_MODES.includes(i) ? i : "u15";
+  const mv = p.get("mv"); S.immMode = IMM_MODES.includes(mv) ? mv : IMM_MODES.includes(i) ? i : i === LENS_ANC ? "anc" : "lang";
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
@@ -1878,6 +1896,9 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   if (bmc && bmc.hasLane && S.index === LENS_EDU && bmc.hasLane[S.eduMode] === false) S.eduMode = EDU_MODES.find((k) => bmc.hasLane[k] !== false) || "uni";
   // a family read the boot frame's era never printed falls back the same way
   if (bmc && bmc.hasLane && S.index === LENS_FAM && bmc.hasLane[S.famMode] === false) S.famMode = FAMC_MODES.find((k) => bmc.hasLane[k] !== false) || "u15";
+  // the immigration read's too — its Ancestry view gating on the boot
+  // frame's ancestry table the same way
+  if (bmc && S.index === LENS_IMM && ((S.immMode === "anc" && !(bmc.ancKeys && bmc.ancKeys.length)) || (S.immMode !== "anc" && bmc.hasLane && bmc.hasLane[S.immMode] === false))) S.immMode = IMM_MODES.find((k) => k === "anc" ? !!(bmc.ancKeys && bmc.ancKeys.length) : !bmc.hasLane || bmc.hasLane[k] !== false) || "lang";
   if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine(); holdEyebrow();

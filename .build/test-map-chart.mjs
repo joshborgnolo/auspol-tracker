@@ -115,7 +115,7 @@ assert.ok(page.includes("Chart sets the map aside") && page.includes("permutatio
 {
   const consts = ["DM_VERB", "RELISMS", "TENESMS", "ANCISMS", "OCCISMS", "INDISMS", "MARISMS", "COB_VERB", "AGE_VERB", "DM_POP", "DM_PRED"].map((k) => { const m = base.match(new RegExp(`^const ${k} = .*$`, "m")); assert.ok(m, k); return m[0]; }).join("\n");
   const fn = cut(base, "function censusWho(", "\n// ") ;
-  const ctx = { S: { index: "lang", eduMode: "uni", famMode: "u15", ten: "mort", rel: "cath", anc: "irish", occ: "farmer", mar: "div", cob: null, ageMode: "a65", incMode: "lo", ind: "ag" }, LENS_TEN: "ten", LENS_INC: "inc", LENS_EDU: "edu", LENS_FAM: "fam", LENS_AGE: "age", LENS_REL: "rel", LENS_ANC: "anc", LENS_OCC: "occ", LENS_MAR: "mar", LENS_IND: "ind", INC_VERB: { lo: () => "live in households earning under $X" }, incLoFrag: () => "under $X", incHiQFrag: () => "over $Y", incEpoch: () => "" };
+  const ctx = { S: { index: "lang", eduMode: "uni", famMode: "u15", immMode: "lang", ten: "mort", rel: "cath", anc: "irish", occ: "farmer", mar: "div", cob: null, ageMode: "a65", incMode: "lo", ind: "ag" }, LENS_TEN: "ten", LENS_INC: "inc", LENS_EDU: "edu", LENS_FAM: "fam", LENS_IMM: "imm", LENS_AGE: "age", LENS_REL: "rel", LENS_ANC: "anc", LENS_OCC: "occ", LENS_MAR: "mar", LENS_IND: "ind", INC_VERB: { lo: () => "live in households earning under $X" }, incLoFrag: () => "under $X", incHiQFrag: () => "over $Y", incEpoch: () => "" };
   const dmV = cut(base, "const dmVerb = ", "\n");
   const who = vm.runInNewContext(`${consts}\n${dmV}\n${fn.replace(/\n$/, "")}\n(k) => censusWho(null, k).phrase`, ctx);
   const set = (o) => Object.assign(ctx.S, o);

@@ -1134,6 +1134,36 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(story.includes("isFam() ? DM_TOP[S.famMode]"), "the area ranking phrases follow the picked read");
 }
 
+// Language other than English at home, Born overseas, Non-citizens and
+// Ancestry ride one People-menu Immigration entry on the Family-composition
+// pattern, the language share landing. Each share keeps its DM lane for
+// the dicts, ranges, ramps and rankings, the birthplace-country and
+// ancestry sub-pickers ride underneath their reads, the hash gains mv,
+// legacy lang/fborn/noncit (and the standalone anc) hashes alias in, and
+// the Ancestry read appears only where the frame prints its ancestry table
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
+  assert.ok(base.includes('const LENS_IMM = "imm";') && base.includes('const IMM_MODES = ["lang", "fborn", "noncit", "anc"];'), "the Immigration lane id and its four reads, the language share first");
+  assert.ok(base.includes('if (k === "lang") { ks.push(LENS_IMM); continue; }') && base.includes('k !== "fborn" && k !== "noncit"'), "the People menu folds the four reads into the one Immigration entry where lang sat (DM stays positional against the demo tuple)");
+  assert.ok(base.includes('imm: "Immigration"'), "the menu entry labels itself in the name tables");
+  assert.ok(base.includes('immMode: "lang"'), "the language share is the landing read");
+  assert.ok(base.includes('if (isImm()) return d.demo ? d.demo[S.immMode] : null;') && base.includes('DM.indexOf(S.immMode)'), "the read rides its own demo-dict key and demo-tuple cell");
+  assert.ok(base.includes('DM_RANGE[S.immMode]') && base.includes('isImm() ? S.immMode :'), "range and ramp follow the picked read");
+  assert.ok(base.includes('S.index === LENS_IMM && S.immMode === "fborn"') && base.includes('S.index === LENS_IMM && S.immMode === "anc"'), "the birthplace-country and ancestry sub-lenses ride their folded reads in the share chains");
+  assert.ok(base.includes("m.hasLane[LENS_IMM] = m.hasLane.lang;"), "the menu gate rides the language share");
+  assert.ok(!ui.includes('[LENS_ANC, "Ancestry"]'), "the standalone Ancestry menu entry folded away into Immigration");
+  assert.ok(ui.includes('lgMenu("immv",'), "the immigration picker rides the panel dropdown idiom");
+  assert.ok(ui.includes("IMM_MODES.filter((k) =>"), "the picker offers only reads the frame printed (Ancestry gated on its table)");
+  assert.ok(ui.includes('else if (k === "immv") S.immMode = v;'), "the picker change handler is wired");
+  assert.ok(ui.includes("IMM_MODES.includes(i)") && ui.includes('p.get("mv")'), "legacy lang/fborn/noncit/anc hashes alias onto the lens");
+  assert.ok(ui.includes('p.set("mv", S.immMode);'), "the hash carries the immigration read");
+  assert.ok(ui.includes("S.ageMode, S.eduMode, S.famMode, S.immMode"), "the legend's refresh key re-reads on an immigration switch");
+  assert.ok(ui.includes("Immigration: ${IMM_SHORT[S.immMode]}"), "the lens head names the picked read");
+  assert.ok(ui.includes("isImm() ? NOTE_ARC[S.immMode]"), "the legend note follows the folded read's own copy");
+  assert.ok(ui.includes("b.hasLane[S.immMode] === false") && ui.includes("bmc.hasLane[S.immMode] === false"), "a year swap or boot frame falls back when a share never printed");
+  assert.ok(story.includes("isImm() ? DM_TOP[S.immMode]"), "the area ranking phrases follow the picked read");
+}
+
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain
 // lanes + Religion (norel-first) and Housing-tenure (mort-first) select
 // families. Every lane rides every census edition (2001 BCP → 2021 GCP), the
