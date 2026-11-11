@@ -5977,7 +5977,8 @@
       "dateStart": "2026-09-15",
       "pollster": "YouGov",
       "client": "News24",
-      "sample": 1500,
+      "sample": 1471,
+      "sampleEff": 862,
       "alp": 26,
       "lnp": 21,
       "grn": 14,
@@ -5987,6 +5988,7 @@
       "tpp_alp": 52,
       "tpp_lnp": 48,
       "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+      "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_22_09_26_APC_Methodology_Statement.pdf",
       "published": "2026-09-23T05:00"
     },
     {
