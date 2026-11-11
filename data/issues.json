@@ -1548,6 +1548,102 @@
      "top3": 2
     }
    }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-11-06",
+   "dateStart": "2026-11-02",
+   "sample": 1005,
+   "sampleEff": 826,
+   "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2026-federal-poll",
+   "read": "summary table and tables by group",
+   "question": "rank top 3 of 14",
+   "issues": {
+    "col": {
+     "r1": 48,
+     "r2": 18,
+     "r3": 11,
+     "top3": 77
+    },
+    "health": {
+     "r1": 7,
+     "r2": 12,
+     "r3": 13,
+     "top3": 32
+    },
+    "housing": {
+     "r1": 8,
+     "r2": 13,
+     "r3": 9,
+     "top3": 30
+    },
+    "crime": {
+     "r1": 6,
+     "r2": 10,
+     "r3": 13,
+     "top3": 29
+    },
+    "immigration": {
+     "r1": 8,
+     "r2": 7,
+     "r3": 10,
+     "top3": 25
+    },
+    "climate": {
+     "r1": 3,
+     "r2": 6,
+     "r3": 5,
+     "top3": 14
+    },
+    "environment": {
+     "r1": 1,
+     "r2": 3,
+     "r3": 5,
+     "top3": 9
+    },
+    "economy": {
+     "r1": 6,
+     "r2": 9,
+     "r3": 8,
+     "top3": 23
+    },
+    "security": {
+     "r1": 1,
+     "r2": 3,
+     "r3": 4,
+     "top3": 8
+    },
+    "education": {
+     "r1": 2,
+     "r2": 2,
+     "r3": 4,
+     "top3": 8
+    },
+    "tax": {
+     "r1": 2,
+     "r2": 4,
+     "r3": 5,
+     "top3": 11
+    },
+    "debt": {
+     "r1": 3,
+     "r2": 5,
+     "r3": 6,
+     "top3": 14
+    },
+    "energy": {
+     "r1": 1,
+     "r2": 3,
+     "r3": 3,
+     "top3": 7
+    },
+    "transport": {
+     "r1": 1,
+     "r2": 2,
+     "r3": 5,
+     "top3": 8
+    }
+   }
   }
  ],
  "salienceGroups": [
@@ -10488,6 +10584,1048 @@
        "r2": 3,
        "r3": 5,
        "not": 88
+      }
+     }
+    }
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-11-06",
+   "dateStart": "2026-11-02",
+   "sample": 1005,
+   "sampleEff": 826,
+   "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2026-federal-poll",
+   "issues": {
+    "col": {
+     "vote": {
+      "Labor": {
+       "r1": 52,
+       "r2": 12,
+       "r3": 11,
+       "not": 25
+      },
+      "Coalition": {
+       "r1": 54,
+       "r2": 16,
+       "r3": 9,
+       "not": 21
+      },
+      "One Nation": {
+       "r1": 38,
+       "r2": 24,
+       "r3": 15,
+       "not": 23
+      },
+      "Greens": {
+       "r1": 51,
+       "r2": 18,
+       "r3": 5,
+       "not": 26
+      },
+      "Others": {
+       "r1": 43,
+       "r2": 29,
+       "r3": 5,
+       "not": 23
+      },
+      "Undecided": {
+       "r1": 56,
+       "r2": 11,
+       "r3": 12,
+       "not": 21
+      }
+     },
+     "softness": {
+      "Solid": {
+       "r1": 44,
+       "r2": 22,
+       "r3": 10,
+       "not": 24
+      },
+      "Soft": {
+       "r1": 51,
+       "r2": 16,
+       "r3": 10,
+       "not": 23
+      },
+      "Very soft": {
+       "r1": 53,
+       "r2": 12,
+       "r3": 13,
+       "not": 22
+      }
+     },
+     "generation": {
+      "Gen Z": {
+       "r1": 55,
+       "r2": 17,
+       "r3": 5,
+       "not": 23
+      },
+      "Millennials": {
+       "r1": 58,
+       "r2": 19,
+       "r3": 8,
+       "not": 15
+      },
+      "Gen X": {
+       "r1": 44,
+       "r2": 17,
+       "r3": 13,
+       "not": 26
+      },
+      "Boomers": {
+       "r1": 40,
+       "r2": 19,
+       "r3": 13,
+       "not": 28
+      }
+     },
+     "gender": {
+      "Women": {
+       "r1": 47,
+       "r2": 20,
+       "r3": 11,
+       "not": 22
+      },
+      "Men": {
+       "r1": 50,
+       "r2": 16,
+       "r3": 10,
+       "not": 24
+      }
+     },
+     "location": {
+      "Inner metro": {
+       "r1": 48,
+       "r2": 13,
+       "r3": 13,
+       "not": 26
+      },
+      "Outer metro": {
+       "r1": 53,
+       "r2": 17,
+       "r3": 9,
+       "not": 21
+      },
+      "Provincial": {
+       "r1": 45,
+       "r2": 19,
+       "r3": 10,
+       "not": 26
+      },
+      "Rural": {
+       "r1": 44,
+       "r2": 24,
+       "r3": 10,
+       "not": 22
+      }
+     },
+     "education": {
+      "Below Year 12": {
+       "r1": 39,
+       "r2": 27,
+       "r3": 13,
+       "not": 21
+      },
+      "Year 12": {
+       "r1": 56,
+       "r2": 14,
+       "r3": 12,
+       "not": 18
+      },
+      "TAFE or trade": {
+       "r1": 45,
+       "r2": 22,
+       "r3": 10,
+       "not": 23
+      },
+      "University": {
+       "r1": 50,
+       "r2": 13,
+       "r3": 9,
+       "not": 28
+      }
+     },
+     "housing": {
+      "Own outright": {
+       "r1": 39,
+       "r2": 21,
+       "r3": 14,
+       "not": 26
+      },
+      "Mortgage": {
+       "r1": 57,
+       "r2": 12,
+       "r3": 10,
+       "not": 21
+      },
+      "Renting and other": {
+       "r1": 47,
+       "r2": 23,
+       "r3": 7,
+       "not": 23
+      }
+     }
+    },
+    "health": {
+     "vote": {
+      "Labor": {
+       "r1": 8,
+       "r2": 21,
+       "r3": 15,
+       "not": 56
+      },
+      "Coalition": {
+       "r1": 7,
+       "r2": 10,
+       "r3": 9,
+       "not": 74
+      },
+      "One Nation": {
+       "r1": 8,
+       "r2": 8,
+       "r3": 7,
+       "not": 77
+      },
+      "Greens": {
+       "r1": 2,
+       "r2": 8,
+       "r3": 18,
+       "not": 72
+      },
+      "Others": {
+       "r1": 10,
+       "r2": 11,
+       "r3": 23,
+       "not": 56
+      },
+      "Undecided": {
+       "r1": 11,
+       "r2": 9,
+       "r3": 19,
+       "not": 61
+      }
+     },
+     "softness": {
+      "Solid": {
+       "r1": 7,
+       "r2": 10,
+       "r3": 11,
+       "not": 72
+      },
+      "Soft": {
+       "r1": 6,
+       "r2": 16,
+       "r3": 14,
+       "not": 64
+      },
+      "Very soft": {
+       "r1": 8,
+       "r2": 7,
+       "r3": 12,
+       "not": 73
+      }
+     },
+     "generation": {
+      "Gen Z": {
+       "r1": 3,
+       "r2": 10,
+       "r3": 9,
+       "not": 78
+      },
+      "Millennials": {
+       "r1": 5,
+       "r2": 9,
+       "r3": 14,
+       "not": 72
+      },
+      "Gen X": {
+       "r1": 6,
+       "r2": 11,
+       "r3": 17,
+       "not": 66
+      },
+      "Boomers": {
+       "r1": 12,
+       "r2": 16,
+       "r3": 11,
+       "not": 61
+      }
+     },
+     "gender": {
+      "Women": {
+       "r1": 8,
+       "r2": 15,
+       "r3": 15,
+       "not": 62
+      },
+      "Men": {
+       "r1": 6,
+       "r2": 9,
+       "r3": 10,
+       "not": 75
+      }
+     },
+     "location": {
+      "Inner metro": {
+       "r1": 7,
+       "r2": 11,
+       "r3": 10,
+       "not": 72
+      },
+      "Outer metro": {
+       "r1": 7,
+       "r2": 10,
+       "r3": 13,
+       "not": 70
+      },
+      "Provincial": {
+       "r1": 8,
+       "r2": 14,
+       "r3": 11,
+       "not": 67
+      },
+      "Rural": {
+       "r1": 8,
+       "r2": 13,
+       "r3": 16,
+       "not": 63
+      }
+     },
+     "education": {
+      "Below Year 12": {
+       "r1": 11,
+       "r2": 10,
+       "r3": 9,
+       "not": 70
+      },
+      "Year 12": {
+       "r1": 5,
+       "r2": 16,
+       "r3": 12,
+       "not": 67
+      },
+      "TAFE or trade": {
+       "r1": 7,
+       "r2": 11,
+       "r3": 12,
+       "not": 70
+      },
+      "University": {
+       "r1": 8,
+       "r2": 11,
+       "r3": 16,
+       "not": 65
+      }
+     },
+     "housing": {
+      "Own outright": {
+       "r1": 12,
+       "r2": 13,
+       "r3": 12,
+       "not": 63
+      },
+      "Mortgage": {
+       "r1": 4,
+       "r2": 13,
+       "r3": 14,
+       "not": 69
+      },
+      "Renting and other": {
+       "r1": 5,
+       "r2": 9,
+       "r3": 13,
+       "not": 73
+      }
+     }
+    },
+    "housing": {
+     "vote": {
+      "Labor": {
+       "r1": 10,
+       "r2": 14,
+       "r3": 9,
+       "not": 67
+      },
+      "Coalition": {
+       "r1": 4,
+       "r2": 9,
+       "r3": 10,
+       "not": 77
+      },
+      "One Nation": {
+       "r1": 6,
+       "r2": 10,
+       "r3": 8,
+       "not": 76
+      },
+      "Greens": {
+       "r1": 10,
+       "r2": 25,
+       "r3": 10,
+       "not": 55
+      },
+      "Others": {
+       "r1": 13,
+       "r2": 9,
+       "r3": 7,
+       "not": 71
+      },
+      "Undecided": {
+       "r1": 12,
+       "r2": 29,
+       "r3": 7,
+       "not": 52
+      }
+     },
+     "softness": {
+      "Solid": {
+       "r1": 8,
+       "r2": 12,
+       "r3": 11,
+       "not": 69
+      },
+      "Soft": {
+       "r1": 8,
+       "r2": 13,
+       "r3": 7,
+       "not": 72
+      },
+      "Very soft": {
+       "r1": 6,
+       "r2": 14,
+       "r3": 7,
+       "not": 73
+      }
+     },
+     "generation": {
+      "Gen Z": {
+       "r1": 12,
+       "r2": 23,
+       "r3": 11,
+       "not": 54
+      },
+      "Millennials": {
+       "r1": 8,
+       "r2": 15,
+       "r3": 12,
+       "not": 65
+      },
+      "Gen X": {
+       "r1": 9,
+       "r2": 11,
+       "r3": 6,
+       "not": 74
+      },
+      "Boomers": {
+       "r1": 6,
+       "r2": 8,
+       "r3": 7,
+       "not": 79
+      }
+     },
+     "gender": {
+      "Women": {
+       "r1": 9,
+       "r2": 14,
+       "r3": 11,
+       "not": 66
+      },
+      "Men": {
+       "r1": 6,
+       "r2": 13,
+       "r3": 7,
+       "not": 74
+      }
+     },
+     "location": {
+      "Inner metro": {
+       "r1": 8,
+       "r2": 13,
+       "r3": 6,
+       "not": 73
+      },
+      "Outer metro": {
+       "r1": 7,
+       "r2": 16,
+       "r3": 7,
+       "not": 70
+      },
+      "Provincial": {
+       "r1": 8,
+       "r2": 11,
+       "r3": 15,
+       "not": 66
+      },
+      "Rural": {
+       "r1": 9,
+       "r2": 12,
+       "r3": 10,
+       "not": 69
+      }
+     },
+     "education": {
+      "Below Year 12": {
+       "r1": 7,
+       "r2": 20,
+       "r3": 12,
+       "not": 61
+      },
+      "Year 12": {
+       "r1": 11,
+       "r2": 12,
+       "r3": 10,
+       "not": 67
+      },
+      "TAFE or trade": {
+       "r1": 9,
+       "r2": 12,
+       "r3": 8,
+       "not": 71
+      },
+      "University": {
+       "r1": 4,
+       "r2": 14,
+       "r3": 8,
+       "not": 74
+      }
+     },
+     "housing": {
+      "Own outright": {
+       "r1": 4,
+       "r2": 7,
+       "r3": 7,
+       "not": 82
+      },
+      "Mortgage": {
+       "r1": 3,
+       "r2": 12,
+       "r3": 7,
+       "not": 78
+      },
+      "Renting and other": {
+       "r1": 18,
+       "r2": 23,
+       "r3": 14,
+       "not": 45
+      }
+     }
+    },
+    "crime": {
+     "vote": {
+      "Labor": {
+       "r1": 5,
+       "r2": 11,
+       "r3": 14,
+       "not": 70
+      },
+      "Coalition": {
+       "r1": 8,
+       "r2": 13,
+       "r3": 12,
+       "not": 67
+      },
+      "One Nation": {
+       "r1": 11,
+       "r2": 11,
+       "r3": 13,
+       "not": 65
+      },
+      "Greens": {
+       "r1": 2,
+       "r2": 5,
+       "r3": 12,
+       "not": 81
+      },
+      "Others": {
+       "r1": 2,
+       "r2": 7,
+       "r3": 6,
+       "not": 85
+      },
+      "Undecided": {
+       "r1": 0,
+       "r2": 9,
+       "r3": 11,
+       "not": 80
+      }
+     },
+     "softness": {
+      "Solid": {
+       "r1": 6,
+       "r2": 10,
+       "r3": 12,
+       "not": 72
+      },
+      "Soft": {
+       "r1": 8,
+       "r2": 10,
+       "r3": 13,
+       "not": 69
+      },
+      "Very soft": {
+       "r1": 9,
+       "r2": 10,
+       "r3": 12,
+       "not": 69
+      }
+     },
+     "generation": {
+      "Gen Z": {
+       "r1": 3,
+       "r2": 10,
+       "r3": 11,
+       "not": 76
+      },
+      "Millennials": {
+       "r1": 4,
+       "r2": 10,
+       "r3": 12,
+       "not": 74
+      },
+      "Gen X": {
+       "r1": 8,
+       "r2": 9,
+       "r3": 17,
+       "not": 66
+      },
+      "Boomers": {
+       "r1": 9,
+       "r2": 11,
+       "r3": 10,
+       "not": 70
+      }
+     },
+     "gender": {
+      "Women": {
+       "r1": 8,
+       "r2": 12,
+       "r3": 14,
+       "not": 66
+      },
+      "Men": {
+       "r1": 5,
+       "r2": 8,
+       "r3": 11,
+       "not": 76
+      }
+     },
+     "location": {
+      "Inner metro": {
+       "r1": 5,
+       "r2": 10,
+       "r3": 9,
+       "not": 76
+      },
+      "Outer metro": {
+       "r1": 7,
+       "r2": 11,
+       "r3": 13,
+       "not": 69
+      },
+      "Provincial": {
+       "r1": 5,
+       "r2": 9,
+       "r3": 16,
+       "not": 70
+      },
+      "Rural": {
+       "r1": 8,
+       "r2": 9,
+       "r3": 14,
+       "not": 69
+      }
+     },
+     "education": {
+      "Below Year 12": {
+       "r1": 8,
+       "r2": 5,
+       "r3": 16,
+       "not": 71
+      },
+      "Year 12": {
+       "r1": 3,
+       "r2": 11,
+       "r3": 7,
+       "not": 79
+      },
+      "TAFE or trade": {
+       "r1": 7,
+       "r2": 11,
+       "r3": 14,
+       "not": 68
+      },
+      "University": {
+       "r1": 6,
+       "r2": 10,
+       "r3": 14,
+       "not": 70
+      }
+     },
+     "housing": {
+      "Own outright": {
+       "r1": 9,
+       "r2": 11,
+       "r3": 10,
+       "not": 70
+      },
+      "Mortgage": {
+       "r1": 7,
+       "r2": 12,
+       "r3": 13,
+       "not": 68
+      },
+      "Renting and other": {
+       "r1": 2,
+       "r2": 7,
+       "r3": 14,
+       "not": 77
+      }
+     }
+    },
+    "immigration": {
+     "vote": {
+      "Labor": {
+       "r1": 2,
+       "r2": 4,
+       "r3": 2,
+       "not": 92
+      },
+      "Coalition": {
+       "r1": 7,
+       "r2": 6,
+       "r3": 16,
+       "not": 71
+      },
+      "One Nation": {
+       "r1": 20,
+       "r2": 17,
+       "r3": 19,
+       "not": 44
+      },
+      "Greens": {
+       "r1": 1,
+       "r2": 0,
+       "r3": 2,
+       "not": 97
+      },
+      "Others": {
+       "r1": 3,
+       "r2": 1,
+       "r3": 2,
+       "not": 94
+      },
+      "Undecided": {
+       "r1": 5,
+       "r2": 3,
+       "r3": 8,
+       "not": 84
+      }
+     },
+     "softness": {
+      "Solid": {
+       "r1": 11,
+       "r2": 7,
+       "r3": 12,
+       "not": 70
+      },
+      "Soft": {
+       "r1": 5,
+       "r2": 7,
+       "r3": 9,
+       "not": 79
+      },
+      "Very soft": {
+       "r1": 3,
+       "r2": 9,
+       "r3": 5,
+       "not": 83
+      }
+     },
+     "generation": {
+      "Gen Z": {
+       "r1": 3,
+       "r2": 7,
+       "r3": 7,
+       "not": 83
+      },
+      "Millennials": {
+       "r1": 5,
+       "r2": 5,
+       "r3": 8,
+       "not": 82
+      },
+      "Gen X": {
+       "r1": 9,
+       "r2": 7,
+       "r3": 13,
+       "not": 71
+      },
+      "Boomers": {
+       "r1": 12,
+       "r2": 8,
+       "r3": 11,
+       "not": 69
+      }
+     },
+     "gender": {
+      "Women": {
+       "r1": 8,
+       "r2": 5,
+       "r3": 10,
+       "not": 77
+      },
+      "Men": {
+       "r1": 8,
+       "r2": 8,
+       "r3": 11,
+       "not": 73
+      }
+     },
+     "location": {
+      "Inner metro": {
+       "r1": 7,
+       "r2": 6,
+       "r3": 10,
+       "not": 77
+      },
+      "Outer metro": {
+       "r1": 8,
+       "r2": 6,
+       "r3": 11,
+       "not": 75
+      },
+      "Provincial": {
+       "r1": 10,
+       "r2": 9,
+       "r3": 10,
+       "not": 71
+      },
+      "Rural": {
+       "r1": 8,
+       "r2": 7,
+       "r3": 10,
+       "not": 75
+      }
+     },
+     "education": {
+      "Below Year 12": {
+       "r1": 15,
+       "r2": 8,
+       "r3": 11,
+       "not": 66
+      },
+      "Year 12": {
+       "r1": 6,
+       "r2": 8,
+       "r3": 7,
+       "not": 79
+      },
+      "TAFE or trade": {
+       "r1": 9,
+       "r2": 8,
+       "r3": 12,
+       "not": 71
+      },
+      "University": {
+       "r1": 4,
+       "r2": 5,
+       "r3": 10,
+       "not": 81
+      }
+     },
+     "housing": {
+      "Own outright": {
+       "r1": 11,
+       "r2": 7,
+       "r3": 12,
+       "not": 70
+      },
+      "Mortgage": {
+       "r1": 4,
+       "r2": 7,
+       "r3": 12,
+       "not": 77
+      },
+      "Renting and other": {
+       "r1": 9,
+       "r2": 7,
+       "r3": 6,
+       "not": 78
+      }
+     }
+    },
+    "economy": {
+     "vote": {
+      "Labor": {
+       "r1": 7,
+       "r2": 3,
+       "r3": 8,
+       "not": 82
+      },
+      "Coalition": {
+       "r1": 8,
+       "r2": 15,
+       "r3": 8,
+       "not": 69
+      },
+      "One Nation": {
+       "r1": 6,
+       "r2": 11,
+       "r3": 7,
+       "not": 76
+      },
+      "Greens": {
+       "r1": 1,
+       "r2": 4,
+       "r3": 2,
+       "not": 93
+      },
+      "Others": {
+       "r1": 7,
+       "r2": 11,
+       "r3": 9,
+       "not": 73
+      },
+      "Undecided": {
+       "r1": 3,
+       "r2": 10,
+       "r3": 13,
+       "not": 74
+      }
+     },
+     "softness": {
+      "Solid": {
+       "r1": 6,
+       "r2": 8,
+       "r3": 6,
+       "not": 80
+      },
+      "Soft": {
+       "r1": 6,
+       "r2": 9,
+       "r3": 9,
+       "not": 76
+      },
+      "Very soft": {
+       "r1": 5,
+       "r2": 13,
+       "r3": 8,
+       "not": 74
+      }
+     },
+     "generation": {
+      "Gen Z": {
+       "r1": 3,
+       "r2": 4,
+       "r3": 9,
+       "not": 84
+      },
+      "Millennials": {
+       "r1": 3,
+       "r2": 7,
+       "r3": 7,
+       "not": 83
+      },
+      "Gen X": {
+       "r1": 8,
+       "r2": 15,
+       "r3": 4,
+       "not": 73
+      },
+      "Boomers": {
+       "r1": 7,
+       "r2": 9,
+       "r3": 10,
+       "not": 74
+      }
+     },
+     "gender": {
+      "Women": {
+       "r1": 5,
+       "r2": 7,
+       "r3": 5,
+       "not": 83
+      },
+      "Men": {
+       "r1": 6,
+       "r2": 11,
+       "r3": 11,
+       "not": 72
+      }
+     },
+     "location": {
+      "Inner metro": {
+       "r1": 8,
+       "r2": 11,
+       "r3": 8,
+       "not": 73
+      },
+      "Outer metro": {
+       "r1": 6,
+       "r2": 9,
+       "r3": 8,
+       "not": 77
+      },
+      "Provincial": {
+       "r1": 6,
+       "r2": 9,
+       "r3": 7,
+       "not": 78
+      },
+      "Rural": {
+       "r1": 4,
+       "r2": 7,
+       "r3": 7,
+       "not": 82
+      }
+     },
+     "education": {
+      "Below Year 12": {
+       "r1": 5,
+       "r2": 6,
+       "r3": 3,
+       "not": 86
+      },
+      "Year 12": {
+       "r1": 4,
+       "r2": 7,
+       "r3": 7,
+       "not": 82
+      },
+      "TAFE or trade": {
+       "r1": 5,
+       "r2": 11,
+       "r3": 8,
+       "not": 76
+      },
+      "University": {
+       "r1": 9,
+       "r2": 10,
+       "r3": 9,
+       "not": 72
+      }
+     },
+     "housing": {
+      "Own outright": {
+       "r1": 8,
+       "r2": 9,
+       "r3": 10,
+       "not": 73
+      },
+      "Mortgage": {
+       "r1": 6,
+       "r2": 13,
+       "r3": 7,
+       "not": 74
+      },
+      "Renting and other": {
+       "r1": 2,
+       "r2": 5,
+       "r3": 6,
+       "not": 87
       }
      }
     }
@@ -20212,6 +21350,108 @@
      "lnp": 23,
      "onp": 25,
      "equal": 22
+    }
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-11-06",
+   "dateStart": "2026-11-02",
+   "sample": 1005,
+   "sampleEff": 826,
+   "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2026-federal-poll",
+   "read": "summary table and tables by group",
+   "question": "best able to deal with",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "equal",
+    "none",
+    "unsure"
+   ],
+   "issues": {
+    "col": {
+     "alp": 18,
+     "lnp": 24,
+     "onp": 20,
+     "grn": 9,
+     "equal": 7,
+     "none": 10,
+     "unsure": 12
+    },
+    "health": {
+     "alp": 25,
+     "lnp": 22,
+     "onp": 14,
+     "grn": 9,
+     "equal": 10,
+     "none": 7,
+     "unsure": 13
+    },
+    "housing": {
+     "alp": 19,
+     "lnp": 18,
+     "onp": 18,
+     "grn": 10,
+     "equal": 9,
+     "none": 12,
+     "unsure": 14
+    },
+    "security": {
+     "alp": 20,
+     "lnp": 26,
+     "onp": 19,
+     "grn": 4,
+     "equal": 10,
+     "none": 6,
+     "unsure": 15
+    },
+    "climate": {
+     "alp": 14,
+     "lnp": 11,
+     "onp": 12,
+     "grn": 29,
+     "equal": 8,
+     "none": 12,
+     "unsure": 14
+    },
+    "immigration": {
+     "alp": 18,
+     "lnp": 15,
+     "onp": 37,
+     "grn": 6,
+     "equal": 4,
+     "none": 6,
+     "unsure": 14
+    },
+    "crime": {
+     "alp": 18,
+     "lnp": 22,
+     "onp": 22,
+     "grn": 6,
+     "equal": 10,
+     "none": 7,
+     "unsure": 15
+    },
+    "economy": {
+     "alp": 20,
+     "lnp": 29,
+     "onp": 14,
+     "grn": 7,
+     "equal": 6,
+     "none": 9,
+     "unsure": 15
+    },
+    "tax": {
+     "alp": 20,
+     "lnp": 26,
+     "onp": 16,
+     "grn": 7,
+     "equal": 6,
+     "none": 9,
+     "unsure": 16
     }
    }
   },

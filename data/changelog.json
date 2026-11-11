@@ -3,9 +3,9 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 51
+      "alp": 50.9
     },
-    "imp": 51,
+    "imp": 50.9,
     "pub": 48.9,
     "on": 50.8,
     "momSig": false,
@@ -219,10 +219,12 @@
       "2026-11-08|Roy Morgan"
     ],
     "moves": {
+      "alp|education|TAFE or trade": -1,
       "alp|state|Non-NSW/Vic/Qld": 1,
       "grn|age|35–54": -1,
       "grn|education|TAFE or trade": 1,
       "grn|language|English only": -1,
+      "grn|location|Provincial": 1,
       "grn|state|SA": 1,
       "grn|working|Full time": -1,
       "lnp|housing|Renting": -1,
@@ -237,6 +239,11 @@
       "oth|working|Retired": -1
     },
     "movesMeta": {
+      "alp|education|TAFE or trade": {
+        "party": "alp",
+        "group": "TAFE or trade",
+        "setLabel": "Education"
+      },
       "alp|state|Non-NSW/Vic/Qld": {
         "party": "alp",
         "group": "Non-NSW/Vic/Qld",
@@ -256,6 +263,11 @@
         "party": "grn",
         "group": "English only",
         "setLabel": "By language at home"
+      },
+      "grn|location|Provincial": {
+        "party": "grn",
+        "group": "Provincial",
+        "setLabel": "By location"
       },
       "grn|state|SA": {
         "party": "grn",
@@ -321,7 +333,7 @@
     "prim": {
       "alp": 26.3,
       "grn": 13.5,
-      "lnp": 22.7,
+      "lnp": 22.8,
       "onp": 26.3,
       "oth": 11
     },
@@ -337,7 +349,7 @@
       "key": "alp_lnp|imp",
       "v": {
         "Agenda C Synesis": 0.8,
-        "DemosAU": -0.7,
+        "DemosAU": -0.6,
         "DemosAU (MRP)": 0.2,
         "Essential": -0.9,
         "Fox & Hedgehog": -1,
@@ -378,8 +390,14 @@
       "immigration": "Immigration",
       "security": "National security"
     },
-    "sig": {},
-    "sigMeta": {},
+    "sig": {
+      "iss|health|imp": -1,
+      "iss|immigration|imp": -1
+    },
+    "sigMeta": {
+      "iss|health|imp": "the share naming health a top-three issue",
+      "iss|immigration|imp": "the share naming immigration a top-three issue"
+    },
     "conf": {
       "business": 81.7,
       "consumer": 63.1,
@@ -712,6 +730,30 @@
       "label": "11 Nov 2026",
       "kind": "finding",
       "text": "NSW voters (by state) no longer break significantly away from the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-11",
+      "label": "11 Nov 2026",
+      "kind": "finding",
+      "text": "The fall in the share naming health a top-three issue over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-11-11",
+      "label": "11 Nov 2026",
+      "kind": "finding",
+      "text": "The fall in the share naming immigration a top-three issue over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-11-11",
+      "label": "11 Nov 2026",
+      "kind": "finding",
+      "text": "TAFE or trade voters (by education) now break significantly away from Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-11",
+      "label": "11 Nov 2026",
+      "kind": "finding",
+      "text": "Provincial voters (by location) now break significantly toward the Greens, relative to all voters."
     }
   ]
 }

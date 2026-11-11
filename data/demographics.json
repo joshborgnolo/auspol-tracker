@@ -15097,6 +15097,177 @@
    }
   },
   {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-11-06",
+   "dateStart": "2026-11-02",
+   "dateEnd": "2026-11-06",
+   "sample": 1005,
+   "article": "https://www.afr.com/politics/federal/blow-for-pm-as-coalition-closes-in-on-labor-20261108-p61cbv",
+   "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 25,
+      "lnp": 21,
+      "onp": 33,
+      "grn": 14,
+      "oth": 7
+     },
+     "Soft": {
+      "alp": 28,
+      "lnp": 24,
+      "onp": 25,
+      "grn": 14,
+      "oth": 9
+     },
+     "Very soft": {
+      "alp": 24,
+      "lnp": 44,
+      "onp": 14,
+      "grn": 7,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 26,
+      "lnp": 18,
+      "onp": 16,
+      "grn": 36,
+      "oth": 4
+     },
+     "Millennials": {
+      "alp": 28,
+      "lnp": 25,
+      "onp": 24,
+      "grn": 15,
+      "oth": 8
+     },
+     "Gen X": {
+      "alp": 21,
+      "lnp": 25,
+      "onp": 33,
+      "grn": 11,
+      "oth": 10
+     },
+     "Boomers": {
+      "alp": 28,
+      "lnp": 27,
+      "onp": 34,
+      "grn": 1,
+      "oth": 10
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 26,
+      "lnp": 25,
+      "onp": 26,
+      "grn": 15,
+      "oth": 8
+     },
+     "Men": {
+      "alp": 26,
+      "lnp": 24,
+      "onp": 30,
+      "grn": 11,
+      "oth": 9
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "lnp": 30,
+      "onp": 17,
+      "grn": 15,
+      "oth": 7
+     },
+     "Outer metro": {
+      "alp": 25,
+      "lnp": 25,
+      "onp": 31,
+      "grn": 13,
+      "oth": 6
+     },
+     "Provincial": {
+      "alp": 22,
+      "lnp": 21,
+      "onp": 33,
+      "grn": 17,
+      "oth": 7
+     },
+     "Rural": {
+      "alp": 24,
+      "lnp": 20,
+      "onp": 34,
+      "grn": 10,
+      "oth": 12
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 19,
+      "lnp": 19,
+      "onp": 44,
+      "grn": 8,
+      "oth": 10
+     },
+     "Year 12": {
+      "alp": 33,
+      "lnp": 19,
+      "onp": 24,
+      "grn": 17,
+      "oth": 7
+     },
+     "TAFE or trade": {
+      "alp": 21,
+      "lnp": 26,
+      "onp": 31,
+      "grn": 12,
+      "oth": 10
+     },
+     "University": {
+      "alp": 30,
+      "lnp": 28,
+      "onp": 21,
+      "grn": 14,
+      "oth": 7
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 26,
+      "lnp": 30,
+      "onp": 31,
+      "grn": 4,
+      "oth": 9
+     },
+     "Mortgage": {
+      "alp": 26,
+      "lnp": 29,
+      "onp": 25,
+      "grn": 12,
+      "oth": 8
+     },
+     "Renting and other": {
+      "alp": 27,
+      "lnp": 12,
+      "onp": 28,
+      "grn": 26,
+      "oth": 7
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 25,
+    "onp": 28,
+    "grn": 13,
+    "oth": 8
+   }
+  },
+  {
    "pollster": "Resolve",
    "date": "2026-11-08",
    "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",

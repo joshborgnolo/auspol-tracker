@@ -6353,6 +6353,7 @@
       "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1005,
+      "sampleEff": 826,
       "alp": 26,
       "lnp": 25,
       "grn": 13,
@@ -6362,7 +6363,51 @@
       "tpp_alp": 47,
       "tpp_lnp": 53,
       "tpp_flows": 49,
-      "url": "https://www.afr.com/politics/federal/blow-for-pm-as-coalition-closes-in-on-labor-20261108-p61cbv"
+      "tpp_split": {
+        "grn": 82,
+        "onp": 17,
+        "oth": 58
+      },
+      "tpp_split_on": {
+        "lnp": 41,
+        "grn": 88,
+        "oth": 74
+      },
+      "firmness": {
+        "all": [
+          51,
+          41,
+          8
+        ],
+        "alp": [
+          49,
+          44,
+          7
+        ],
+        "lnp": [
+          45,
+          40,
+          15
+        ],
+        "onp": [
+          60,
+          36,
+          4
+        ],
+        "grn": [
+          53,
+          43,
+          4
+        ],
+        "oth": [
+          46,
+          43,
+          11
+        ]
+      },
+      "url": "https://www.afr.com/politics/federal/blow-for-pm-as-coalition-closes-in-on-labor-20261108-p61cbv",
+      "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2026-federal-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf"
     },
     {
       "date": "2026-11-07",
@@ -9282,7 +9327,20 @@
       "opp": -5,
       "oppName": "Taylor",
       "han": -14,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 28,
+          "dis": 51
+        },
+        "opp": {
+          "app": 22,
+          "dis": 27
+        },
+        "han": {
+          "app": 35,
+          "dis": 49
+        }
+      }
     },
     {
       "date": "2026-11-07",
