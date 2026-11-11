@@ -102,7 +102,8 @@ eq(c.national, {
     uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
     vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
   },
-  u15: 0.2088, y12less: 0.5756, atsci: 0.0209, onepar: 0.1545,
+  u15: 0.2088, y12less: 0.5756, y12: 0.4244, y10less: 0.4679,
+  atsci: 0.0209, onepar: 0.1545,
   rel: {
     norel: 0.1716, cath: 0.2956, angl: 0.2292, unch: 0.0737,
     pres: 0.0377, orth: 0.0335, budd: 0.0211, isl: 0.0167,

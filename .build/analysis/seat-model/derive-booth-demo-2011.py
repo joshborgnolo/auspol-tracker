@@ -255,6 +255,8 @@ def national_of(divsum):
         "incMed": d13.band_median14(nat["incbh"]),
         "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
         "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+        "y12": round(nat["sch6"][0] / sum(nat["sch6"]), 4),
+        "y10less": round(sum(nat["sch6"][2:]) / sum(nat["sch6"]), 4),
         "atsci": round(nat["indig"] / nat["indigDen"], 4),
         "onepar": round(nat["famN"] / nat["famD"], 4),
         "rel": {k: round(nat["relvec"][i]

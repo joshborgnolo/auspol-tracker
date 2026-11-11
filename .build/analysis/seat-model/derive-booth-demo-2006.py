@@ -441,6 +441,8 @@ def shares(rec):
         sc = rec["sch6"]
         scd = sum(sc)
         out["y12less"] = bounded(sum(sc[1:]), scd) if scd > 0 else None
+        out["y12"] = bounded(sc[0], scd) if scd > 0 else None
+        out["y10less"] = bounded(sum(sc[2:]), scd) if scd > 0 else None
     if rec.get("indig") is not None and rec.get("indigDen"):
         out["atsci"] = bounded(rec["indig"], rec["indigDen"])
     if rec.get("relvec") is not None and rec.get("relTot") is not None:
@@ -693,6 +695,8 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                     for i, k in enumerate(COB_KEYS8)},
             "u15": round((nat["0_4"] + nat["5_14"]) / nat_b, 4),
             "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+            "y12": round(nat["sch6"][0] / sum(nat["sch6"]), 4),
+            "y10less": round(sum(nat["sch6"][2:]) / sum(nat["sch6"]), 4),
             "atsci": round(nat["indig"] / nat["indigDen"], 4),
             "onepar": round(nat["famN"] / nat["famD"], 4),
             "rel": {k: round(nat["relvec"][i]

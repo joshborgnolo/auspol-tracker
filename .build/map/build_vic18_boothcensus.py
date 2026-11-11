@@ -227,7 +227,7 @@ def demo_cells():
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
                      None, None] \
-            + [None] * 9 + [safe(uel, lfd)]
+            + [None] * 10 + [safe(uel, lfd)]
     if len(out) != GCP_VIC_ROWS:
         fail(f"demo cells {len(out)} != pin {GCP_VIC_ROWS}")
     print(f"GCP {YEAR} demo cells: {len(out)} SA1s")

@@ -936,7 +936,11 @@ def load_gcp21():
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
                g09[2], h09[6], h09[5])
         sc = school[code]
-        y12t = (sc[1] + sc[2] + sc[3] + sc[4] + sc[5], sum(sc))
+        # the schooling lanes' four counts: below-Year-12 (the y12less
+        # numerator), Year 12 itself, Year 10 or less, and the stated
+        # sum every share divides by
+        y12t = (sc[1] + sc[2] + sc[3] + sc[4] + sc[5], sc[0],
+                sc[2] + sc[3] + sc[4] + sc[5], sum(sc))
         indig, nonind = nlt["G07"][code]
         indt = (indig, indig + nonind)
         relvec, relns, reltot = nlt["G14"][code]
@@ -1065,7 +1069,8 @@ def acc_new():
     """The new-lane lane accumulator (zero-weight); pers rides here too
     because the noncit share's denominator is the weighted persons."""
     return {"pers": 0.0,
-            "y12n": 0.0, "y12d": 0.0, "atN": 0.0, "atD": 0.0,
+            "y12n": 0.0, "y12cn": 0.0, "y10n": 0.0, "y12d": 0.0,
+            "atN": 0.0, "atD": 0.0,
             "relN": [0.0] * len(REL_KEYS), "relNS": 0.0, "relTot": 0.0,
             "tenN": [0.0] * 6, "famN": 0.0, "famD": 0.0,
             "citz": 0.0, "ptN": 0.0, "ptT": 0.0, "ptNS": 0.0,
@@ -1083,7 +1088,9 @@ def acc_row(acc, r, w):
     slot 30 — the marital five — 2026-11-11)."""
     acc["pers"] += w * r[0]
     acc["y12n"] += w * r[17][0]
-    acc["y12d"] += w * r[17][1]
+    acc["y12cn"] += w * r[17][1]
+    acc["y10n"] += w * r[17][2]
+    acc["y12d"] += w * r[17][3]
     acc["atN"] += w * r[18][0]
     acc["atD"] += w * r[18][1]
     for i in range(len(REL_KEYS)):
@@ -1113,7 +1120,8 @@ def acc_row(acc, r, w):
 
 
 def acc_merge(dst, src):
-    for k in ("pers", "y12n", "y12d", "atN", "atD", "relNS", "relTot",
+    for k in ("pers", "y12n", "y12cn", "y10n", "y12d", "atN", "atD",
+              "relNS", "relTot",
               "famN", "famD", "citz", "ptN", "ptT", "ptNS",
               "cebN", "cebNS", "cebT", "ancP", "ancNS", "hlE",
               "ueN", "lfD"):
@@ -1144,6 +1152,8 @@ def emit_new(acc):
     marD = sum(acc["marN"])
     return {
         "y12less": round(acc["y12n"] / yd, 4) if yd > 0 else None,
+        "y12": round(acc["y12cn"] / yd, 4) if yd > 0 else None,
+        "y10less": round(acc["y10n"] / yd, 4) if yd > 0 else None,
         "atsci": round(acc["atN"] / ad, 4) if ad > 0 else None,
         "onepar": round(acc["famN"] / acc["famD"], 4)
         if acc["famD"] > 0 else None,
@@ -1542,7 +1552,8 @@ def gcp11():
                 "relTot", "ten6", "famN", "famD", "citz", "mtw",
                 "ceb3", "ancn", "ancP", "labU", "labLF", "marvec")):
             continue  # short-table SA1s: coverage drop, never null maths
-        y12t = (sum(r["sch6"][1:]), sum(r["sch6"]))
+        y12t = (sum(r["sch6"][1:]), r["sch6"][0], sum(r["sch6"][2:]),
+                sum(r["sch6"]))
         out[code] = (r["pers"], r["eng"], r["oth"], tuple(r["ages"]),
                      r["aus"], r["totc"], r["cobns"], r["uni"],
                      r["eduns"], r["bluen"], r["occd"],
@@ -1594,7 +1605,8 @@ def blend_demo(c0blk, c1blk, f):
         and c0blk["persons"] is not None and c1blk["persons"] is not None
         else None}
     for k in ("langOther", "fborn", "uni", "blue", "loinc", "hiinc",
-              "hiqinc", "y12less", "atsci", "u15", "onepar", "pt",
+              "hiqinc", "y12less", "y12", "y10less", "atsci", "u15",
+              "onepar", "pt",
               "noncit", "bigfam", "hl", "unemp"):
         out[k] = lane_blend(c0blk.get(k) if c0blk else None,
                             c1blk.get(k) if c1blk else None, f)
@@ -1974,6 +1986,7 @@ def build(year):
         nb0, nb1 = nat_block(s0["nat"]), nat_block(s1["nat"])
         for k in ("langOther", "fborn", "uni", "blue", "age0_14",
                   "age65ov", "loinc", "hiinc", "hiqinc", "y12less",
+                  "y12", "y10less",
                   "atsci", "onepar", "pt", "noncit", "bigfam", "hl",
                   "unemp"):
             nbi[k] = lane_blend(nb0.get(k), nb1.get(k), f)

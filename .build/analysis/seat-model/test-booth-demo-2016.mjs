@@ -56,7 +56,7 @@ eq(c.national, {
   blue: 0.2913, age0_14: 0.1867, age65ov: 0.1571, loinc: 0.2523,
   hiinc: 0.0911,
   hiqinc: 0.2466, incMed: 1447,
-  u15: 0.1867, y12less: 0.4318, atsci: 0.0292, onepar: 0.1581,
+  u15: 0.1867, y12less: 0.4318, y12: 0.5682, y10less: 0.3326, atsci: 0.0292, onepar: 0.1581,
   rel: { norel: 0.3274, cath: 0.2502, angl: 0.1466, unch: 0.0411,
     pres: 0.0247, orth: 0.0258, budd: 0.0263, isl: 0.0283, hind: 0.0205,
     jew: 0.004 },

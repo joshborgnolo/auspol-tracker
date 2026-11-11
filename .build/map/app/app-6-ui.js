@@ -1487,11 +1487,13 @@ function readURL() {
   // hi once sat)
   if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hiq"; }
   else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i; }
-  else if (i === "uni" || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y12less" : "uni"; }
+  // schooling-read hashes: the legacy y12less id lands on its nearest
+  // living read ("Year 10 or less", its left-early half)
+  else if (EDU_MODES.includes(i) || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y10less" : i; }
   else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_MAR)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
   const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
-  const ev = p.get("ev"); S.eduMode = ev === "y12less" ? "y12less" : (i === "y12less" ? "y12less" : "uni");
+  const ev = p.get("ev"); S.eduMode = EDU_MODES.includes(ev) ? ev : ev === "y12less" ? "y10less" : EDU_MODES.includes(i) ? i : i === "y12less" ? "y10less" : "uni";
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";

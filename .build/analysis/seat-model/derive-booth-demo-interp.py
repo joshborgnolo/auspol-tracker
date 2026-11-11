@@ -66,7 +66,8 @@ YEARS = {
     2013: {"c0": 2011, "c1": 2016},
 }
 LANES = ("langOther", "fborn", "uni", "blue", "loinc",
-         "hiqinc", "y12less", "atsci", "u15", "onepar",
+         "hiqinc", "y12less", "y12", "y10less", "atsci", "u15",
+         "onepar",
          "pt", "noncit", "bigfam", "hl", "unemp")
 # INCOME_SPAN: election frames whose MEASURED census side prints no
 # income table at all (the 1996 AURIN workspace), so the income lanes

@@ -153,7 +153,7 @@ eq(d.counts.national, {
     vnm: 0.0091, zaf: 0.0072, ita: 0.0091, lka: 0.0043 },
   incMed: 1235,
   u15: 0.1929,
-  y12less: 0.4803,
+  y12less: 0.4803, y12: 0.5197, y10less: 0.3743,
   atsci: 0.0267,
   onepar: 0.1417,
   rel: { norel: 0.2437, cath: 0.2767, angl: 0.1871, unch: 0.0542,
@@ -194,7 +194,7 @@ eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
     div: "Sydney", state: "NSW", persons: 170700, cov: 1,
     langOther: 0.3277, fborn: 0.4686, uni: 0.4751, blue: 0.1316,
     age: S.age,
-    u15: 0.0912, y12less: 0.186, atsci: 0.0147,
+    u15: 0.0912, y12less: 0.186, y12: 0.814, y10less: 0.1462, atsci: 0.0147,
     rel: { norel: 0.3971, cath: 0.23, angl: 0.1112, unch: 0.0199,
       pres: 0.0197, orth: 0.0318, budd: 0.0737, isl: 0.0205, hind: 0.0142,
       jew: 0.0119 },
@@ -227,7 +227,7 @@ eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
     div: "Lingiari", state: "NT", persons: 109461, cov: 1,
     langOther: 0.4016, fborn: 0.1179, uni: 0.1317, blue: 0.3522,
     age: L.age,
-    u15: 0.2553, y12less: 0.6456, atsci: 0.4577,
+    u15: 0.2553, y12less: 0.6456, y12: 0.3544, y10less: 0.5088, atsci: 0.4577,
     rel: { norel: 0.2512, cath: 0.2265, angl: 0.1299, unch: 0.1076,
       pres: 0.0156, orth: 0.0041, budd: 0.0145, isl: 0.0106, hind: 0.004,
       jew: 0.0005 },
@@ -350,7 +350,7 @@ eq(d.incomeCuts, {
   eq(d.demoInterp.f, sf._pcti.f, "demoInterp.f == seifa _pcti.f");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   const NL = new Set(["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov", "loinc", "hiinc", "y12less", "atsci", "u15", "onepar"]);
+    "age65ov", "loinc", "hiinc", "y12less", "y12", "y10less", "atsci", "u15", "onepar"]);
   const SELK = { rel: [...d.relKeys], ten: [...d.tenKeys],
     mar: [...d.marKeys] };
   for (const k of NL) {
@@ -384,7 +384,7 @@ eq(d.incomeCuts, {
   let keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
-    "y12less", "atsci", "u15", "onepar", "rel", "ten", "pt", "noncit",
+    "y12less", "y12", "y10less", "atsci", "u15", "onepar", "rel", "ten", "pt", "noncit",
     "bigfam", "hl", "anc", "unemp", "mar"]);
   let nullBoth = 0, blended = 0;
   const farB = new Map(far.booths.map((x) => [`${x.div}|${x.boothId}`, x]));
@@ -403,7 +403,7 @@ eq(d.incomeCuts, {
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
     blended++;
     for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
-      "atsci", "u15", "onepar", "loinc", "hiqinc"]) {
+      "y12", "y10less", "atsci", "u15", "onepar", "loinc", "hiqinc"]) {
       const a = b.demo && b.demo[k], fb = farB.get(`${b.div}|${b.boothId}`);
       const x = fb.demo && fb.demo[k];
       if (a != null && x != null) {

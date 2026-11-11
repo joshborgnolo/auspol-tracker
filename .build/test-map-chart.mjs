@@ -125,7 +125,8 @@ assert.ok(page.includes("Chart sets the map aside") && page.includes("permutatio
   set({ index: "pt" }); assert.equal(who("pt"), "employed people who travelled to work by public transport");
   set({ index: "bigfam" }); assert.equal(who("bigfam"), "women aged 15+ who have had more than two children");
   set({ index: "edu", eduMode: "uni" }); assert.equal(who("edu"), "people aged 15+ who hold a university qualification");
-  set({ index: "edu", eduMode: "y12less" }); assert.equal(who("edu"), "people aged 15+ who left schooling before Year 12");
+  set({ index: "edu", eduMode: "y12" }); assert.equal(who("edu"), "people aged 15+ who finished Year 12 as their highest level of schooling");
+  set({ index: "edu", eduMode: "y10less" }); assert.equal(who("edu"), "people aged 15+ who finished school at Year 10 or earlier");
   set({ index: "ten", ten: "mort" }); assert.equal(who("ten"), "dwellings that are owned with a mortgage");
   set({ index: "occ", occ: "farmer" }); assert.equal(who("occ"), "workers who are farmers or farm managers");
   set({ index: "mar", mar: "div" }); assert.equal(who("mar"), "people aged 15+ who are divorced");

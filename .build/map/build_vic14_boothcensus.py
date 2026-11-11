@@ -228,7 +228,7 @@ def demo_cells():
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
                      None, None] \
-            + [None] * 9 + [safe(uel, lfd)]
+            + [None] * 10 + [safe(uel, lfd)]
     if len(out) != BCP_VIC_ROWS:
         fail(f"demo cells {len(out)} != pin {BCP_VIC_ROWS}")
     print(f"BCP {YEAR} demo cells: {len(out)} SA1s")

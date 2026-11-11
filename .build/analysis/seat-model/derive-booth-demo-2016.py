@@ -247,7 +247,9 @@ def load_gcp16():
         uni = g46[code][0] + g46[code][1] + g46[code][2]
         ir = inc[code]
         sc = r[14:20]
-        y12t = (sum(sc[1:]), sum(sc))
+        # the voter tail's four schooling counts — the same quartet
+        # the GCP-2021 and BCP-2011 unit builders emit at slot 17
+        y12t = (sum(sc[1:]), sc[0], sum(sc[2:]), sum(sc))
         indig, nonind = nlt["G07"][code]
         relvec, relns, reltot = nlt["G14"][code]
         out[code] = (r[0], r[12], r[13],           # pers, eng, oth
@@ -470,11 +472,14 @@ def gcp_to_rec(row):
 
 
 def sc6of(y12t):
-    """The _GCP tail's (less, stated) y12 pair -> the six-level
-    schooling counts d13.shares expects (the less mass is the five
-    sub-Year-12 levels' sum; Year 12 is the stated remainder)."""
-    less, stated = y12t
-    return [stated - less, less, 0, 0, 0, 0]
+    """The _GCP tail's (less, year12, year10less, stated) y12 quad ->
+    the six-level schooling counts d13.shares expects: slot 1 carries
+    the below-Year-12 remainder after slot 2's Year-10-or-less mass,
+    so the read functions' sub-sums all land on their true figures
+    (sum(sc[1:]) = less, sc[0] = Year 12, sum(sc[2:]) = Year 10 or
+    less, sum(sc) = stated)."""
+    less, yr12, y10, stated = y12t
+    return [yr12, less - y10, y10, 0, 0, 0]
 
 
 def ced_of(gcp, sa11):

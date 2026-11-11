@@ -81,6 +81,8 @@ for (const spec of STORES) {
   check(national && national.cob && national.rel && national.ten,
         `${tag}: national cohort dicts at counts.national`);
   check(national.y12less === undefined, `${tag}: no year-of-schooling lane on the '90s frame`);
+  check(national.y12 === undefined && national.y10less === undefined,
+        `${tag}: the two schooling lanes share the floor too`);
   const nd = (k) => national[k];
   if (spec.nat.norel != null) {
     check(Math.abs(national.rel.norel - spec.nat.norel) < 0.0005,

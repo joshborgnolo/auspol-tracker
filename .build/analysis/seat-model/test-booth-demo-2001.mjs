@@ -68,7 +68,8 @@ eq(c.national, {
     uk: 0.0585, ind: 0.0054, chn: 0.0081, nzl: 0.0201, phl: 0.0059,
     vnm: 0.0087, zaf: 0.0045, ita: 0.0124, lka: 0.003,
   },
-  u15: 0.2088, y12less: 0.5756, atsci: 0.0209, onepar: 0.1545,
+  u15: 0.2088, y12less: 0.5756, y12: 0.4244, y10less: 0.4679,
+  atsci: 0.0209, onepar: 0.1545,
   rel: { norel: 0.1716, cath: 0.2956, angl: 0.2292, unch: 0.0737,
     pres: 0.0377, orth: 0.0335, budd: 0.0211, isl: 0.0167, hind: 0.0057,
     jew: 0.005 },
@@ -174,7 +175,8 @@ eq([c1c.booths, c1c.boothsPip, c1c.boothsPipMiss, c1c.boothsPipEmpty,
 eq(c1c.national, {
   persons: 19813809, langOther: 0.1681, fborn: 0.2388, uni: 0.1765,
   blue: 0.3204, age0_14: 0.1985, age65ov: 0.1333,
-  u15: 0.1985, y12less: 0.5313, atsci: 0.0243, onepar: 0.1577,
+  u15: 0.1985, y12less: 0.5313, y12: 0.4687, y10less: 0.4204,
+  atsci: 0.0243, onepar: 0.1577,
   rel: { norel: 0.21, cath: 0.2909, angl: 0.2109, unch: 0.0644,
     pres: 0.0338, orth: 0.0328, budd: 0.0238, isl: 0.0193, hind: 0.0084,
     jew: 0.005 },
@@ -250,7 +252,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   }, "2004 incomeCutsI = the nearest (2006) edge + both sides");
   const LN = (a, b) => Math.round(((1 - f) * a + f * b) * 1e4) / 1e4;
   for (const k of ["langOther", "fborn", "uni", "blue", "age0_14",
-    "age65ov", "y12less", "atsci", "u15", "onepar", "loinc", "hiqinc",
+    "age65ov", "y12less", "y12", "y10less", "atsci", "u15", "onepar", "loinc", "hiqinc",
     "pt", "noncit"]) {
     eq(d.counts.demoI.national[k],
       LN(c.national[k], c1c.national[k]), `demoI national ${k}`);
@@ -284,7 +286,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
   let bothNullC = 0, blendC = 0, keyok = true;
   const KEYS = new Set(["persons", "cov", "langOther", "fborn", "uni",
     "blue", "age", "loinc", "hiinc", "hiqinc", "incMed",
-    "y12less", "atsci", "u15", "onepar", "rel", "ten",
+    "y12less", "y12", "y10less", "atsci", "u15", "onepar", "rel", "ten",
     "pt", "noncit", "bigfam", "hl", "anc", "unemp", "mar"]);
   for (const b of d.booths) {
     const fb = nc1b.get(`${b.div}|${b.boothId}`);
@@ -296,7 +298,7 @@ ok(!("demoInterp" in c1) && !("incomeCutsI" in c1),
     blendC++;
     if (!Object.keys(b.demoI).every((k) => KEYS.has(k))) keyok = false;
     for (const k of ["langOther", "fborn", "uni", "blue", "y12less",
-      "atsci", "onepar", "loinc", "hiqinc"]) {
+      "y12", "y10less", "atsci", "onepar", "loinc", "hiqinc"]) {
       const a = b.demo && b.demo[k], x = fb.demo && fb.demo[k];
       if (a != null && x != null) {
         if (b.demoI[k] !== LN(a, x)) keyok = false;

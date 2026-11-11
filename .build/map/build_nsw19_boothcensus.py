@@ -329,7 +329,7 @@ def demo_cells():
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
                      None, None] \
-            + [None] * 9 + [safe(uel, lfd)]
+            + [None] * 10 + [safe(uel, lfd)]
     print(f"GCP demo cells: {len(out)} SA1s (era {YEAR})")
     return out
 

@@ -558,10 +558,11 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
   assert.equal((D.tenKeys || []).length, 4, "2001 tenKeys has four tenures (mort first)");
   assert.equal(D.tenKeys[0], "mort");
   const lingiari01 = D.divs.find(x => x.n === "Lingiari");
-  assert.ok(lingiari01 && lingiari01.demo && lingiari01.demo.atsci != null && lingiari01.demo.y12less != null && lingiari01.demo.onepar != null && lingiari01.demo.rel && lingiari01.demo.ten, "2001 Lingiari carries the new lanes (indigenous/year-12/families/religion/tenure)");
+  assert.ok(lingiari01 && lingiari01.demo && lingiari01.demo.atsci != null && lingiari01.demo.y12 != null && lingiari01.demo.y10less != null && lingiari01.demo.onepar != null && lingiari01.demo.rel && lingiari01.demo.ten, "2001 Lingiari carries the new lanes (indigenous/year-12/year-10/families/religion/tenure)");
   assert.ok(lingiari01.demo.atsci > 0.34, "2001 Lingiari is among the nation's most Indigenous seats");
   assert.ok(Math.abs(lingiari01.demo.atsci - 0.3509) < 0.002, "2001 Lingiari Indigenous share is the measured 2001-census read");
-  assert.ok(Math.abs(lingiari01.demo.y12less - 0.6998) < 0.002, "2001 Lingiari Year-12-or-less at 70%, the era's education floor");
+  assert.ok(Math.abs(lingiari01.demo.y12 - 0.3002) < 0.002, "2001 Lingiari Year-12 share at 30%, the era's education floor");
+  assert.ok(Math.abs(lingiari01.demo.y10less - 0.5699) < 0.002, "2001 Lingiari Year-10-or-less share at 57%, the era's schooling tail");
   const tally = {};
   for (const d of D.divs) for (const c of d.c) if (c[6] === 1) tally[c[1]] = (tally[c[1]] || 0) + 1;
   assert.deepEqual(tally, { ALP: 65, LP: 68, NP: 13, CLP: 1, IND: 3 }, "the 2001 House: Howard's 82 Coalition seats, 65 Labor, 3 independents");
@@ -1017,7 +1018,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), map2 = part("app-2-map.js"), story = part("app-4-story.js"), list = part("app-5-list.js");
   assert.ok(base.includes('const LENS_INC = "inc";') && base.includes('const INC_MODES = ["med", "lo", "hiq"];'), "the income lane id and its three measures, median first (the high view is the top income quarter since 2026-11-01)");
   assert.ok(base.includes('if (k === "loinc") { ks.push(LENS_INC); continue; }') && base.includes('if (k === "a65") { ks.push(LENS_AGE); continue; }'), "the People menu folds the income pair into Household income and the age pair into Age (DM stays positional against the demo tuple)");
-  assert.ok(base.includes(`"hiinc" && k !== "y12less" && k !== "hiqinc"`), "the menu folds hiinc, the schooling reads, and hiqinc out of the people stack (the three menu folds)");
+  assert.ok(base.includes(`"hiinc" && k !== "y12" && k !== "y10less" && k !== "hiqinc"`), "the menu folds hiinc, the schooling reads, and hiqinc out of the people stack (the three menu folds)");
   assert.ok(base.includes('"hiqinc"'), "hiqinc is a DM lane at the demo tuple's appended cell");
   assert.ok(base.includes('const INC_KEY = { med: "medIncWeekly", lo: "loinc", hiq: "hiqinc" };'), "the income view's demo key per measure (the quartile-paired demo key runs edition-comparable where the old top-band share was not)");
   assert.ok(base.includes('const INC_NAME = { med: "Median household income", lo: "Adults in bottom household-income quarter", hiq: "Adults in top household-income quarter" };'), "the income view's display name per measure (top and bottom household-income quarters, sentence case)");
@@ -1044,7 +1045,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('INC_TOP = { med: ["seats where households earn the most"'), "the median ranking phrase");
   assert.ok(list.includes("incMed()") && list.includes("mny(v)"), "the list column prices the median view in dollars");
   assert.ok(base.includes('const incHiQFrag = (m) =>'), "the top-quarter lane reads its edition's own quartile cut out of the frame record, blend spans named as ranges");
-  assert.ok(base.includes('r[{ lo: 6, hiq: 16 }[S.incMode]]'), "the top-quarter booth share rides the tuple's appended cell");
+  assert.ok(base.includes('r[{ lo: 6, hiq: 17 }[S.incMode]]'), "the top-quarter booth share rides the tuple's appended cell");
   assert.ok(ui.includes('S.incMode = i === "loinc" ? "lo" : "hiq"'), "legacy loinc/hiinc and hi hashes all steer onto the top-quarter measure (the only hi left)");
   assert.ok(ui.includes('iv === "hiq"'), "hiq rides the url measure id as itself");
 }
@@ -1085,7 +1086,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // statistics-era '90s) offers it nowhere
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
-  assert.ok(base.includes('const LENS_EDU = "edu";') && base.includes('const EDU_MODES = ["uni", "y12less"];'), "the Education lane id and its two reads, university first");
+  assert.ok(base.includes('const LENS_EDU = "edu";') && base.includes('const EDU_MODES = ["uni", "y12", "y10less"];'), "the Education lane id and its three reads, university first (year-12-or-less split into Year 12 and Year 10 or less on 2026-11-11)");
   assert.ok(base.includes('if (k === "uni") { ks.push(LENS_EDU); continue; }'), "the People menu folds the schooling pair into the one Education entry (DM stays positional against the demo tuple)");
   assert.ok(base.includes('uni: "University educated", edu: "Education",') && base.includes('uni: "University", edu: "Education",'), "the menu entry labels itself Education in both name tables");
   assert.ok(base.includes('eduMode: "uni"'), "University educated is the landing read");
@@ -1095,7 +1096,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('lgMenu("eduv",' ), "the education picker rides the panel dropdown idiom");
   assert.ok(ui.includes("EDU_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false)"), "the picker offers only reads the frame printed");
   assert.ok(ui.includes('else if (k === "eduv") S.eduMode = v;'), "the picker change handler is wired");
-  assert.ok(ui.includes('if (i === "uni" || i === "y12less") { S.index = LENS_EDU;') && ui.includes('p.get("ev")'), "legacy uni/y12less hashes alias onto the lens with that read picked");
+  assert.ok(ui.includes('EDU_MODES.includes(i) || i === "y12less"') && ui.includes('"y10less"') && ui.includes('p.get("ev")'), "legacy uni/y12less hashes alias onto the lens, y12less onto its nearest living read");
   assert.ok(ui.includes('p.set("ev", S.eduMode);'), "the hash carries the schooling read");
   assert.ok(ui.includes("S.ageMode, S.eduMode"), "the legend's refresh key re-reads on a schooling switch");
   assert.ok(ui.includes("Education: ${EDU_SHORT[S.eduMode]}"), "the lens head names the picked read");
@@ -1110,11 +1111,11 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // venue stores, the GCP-era readers and the /map/ lens machinery
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
-  assert.ok(base.includes('"y12less", "atsci", "u15", "onepar"') && base.includes('"loinc", "hiinc", "y12less"'), "the DM list carries the four plain lanes after the income pair");
-  for (const k of ["y12less", "atsci", "u15", "onepar"]) {
+  assert.ok(base.includes('"y12", "y10less", "atsci", "u15", "onepar"') && base.includes('"loinc", "hiinc", "y12", "y10less"'), "the DM list carries the schooling pair and the plain lanes after the income pair");
+  for (const k of ["y12", "y10less", "atsci", "u15", "onepar"]) {
     assert.ok(new RegExp(`\\b${k}:`).test(base), `the DM_* maps carry ${k} (name/short/verb/range)`);
   }
-  assert.ok(base.includes('y12less: "Year 12 or less"'), "the lane's display name per the user");
+  assert.ok(base.includes('y12: "Year 12"') && base.includes('y10less: "Year 10 or less"'), "the schooling lanes' display names per the user");
   assert.ok(base.includes('atsci: "Indigenous Australians"'), "the indigenous lane's display name");
   assert.ok(base.includes('rel: seq(88, 0.12), ten: seq(258, 0.12)'), "the select lenses own their own ramp hues");
   assert.ok(base.includes('const REL_NAME = { norel: "No religion"'), "the Religion menu leads with No religion");
@@ -1166,13 +1167,13 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
     assert.ok(Array.isArray(d.relKeys) && d.relKeys[0] === "norel" && d.relKeys.length === 10, `${y}: relKeys leads with norel (10 options)`);
     assert.ok(Array.isArray(d.tenKeys) && d.tenKeys[0] === "mort" && d.tenKeys.length === 4, `${y}: tenKeys leads with mort (4 options)`);
     const i = d.booths.demo.findIndex((x) => x !== null);
-    assert.equal(d.booths.demo[i].length, 18, `${y}: demo rows are 17-wide (12 + 4 lanes of the 2026-10-31 arc + hiqinc, the top-quarter income share)`);
+    assert.equal(d.booths.demo[i].length, 19, `${y}: demo rows are 19-wide (12 + 4 lanes of the 2026-10-31 arc + hiqinc, the top-quarter income share, plus the two schooling reads of 2026-11-11)`);
     assert.ok(Array.isArray(d.booths.rel[i]) && d.booths.rel[i].length === 10, `${y}: parallel booth religion rows`);
     assert.ok(Array.isArray(d.booths.ten[i]) && d.booths.ten[i].length === 4, `${y}: parallel booth tenure rows`);
     assert.ok(Array.isArray(d.booths.anc[i]) && d.booths.anc[i].length === 12, `${y}: parallel booth ancestry rows`);
     const lin = d.divs.find((x) => x.n === "Lingiari");
     assert.ok(lin.demo.atsci != null && lin.demo.rel && lin.demo.rel.norel != null && lin.demo.ten && lin.demo.ten.mort != null, `${y}: Lingiari carries atsci/rel/ten`);
-    assert.ok(lin.demo.onepar != null && lin.demo.y12less != null && lin.demo.u15 != null, `${y}: Lingiari carries onepar/y12less/u15`);
+    assert.ok(lin.demo.onepar != null && lin.demo.y12 != null && lin.demo.y10less != null && lin.demo.u15 != null, `${y}: Lingiari carries onepar/y12/y10less/u15`);
     if (+y >= 2013) {
       assert.ok(lin.demo.pt != null && lin.demo.noncit != null && lin.demo.bigfam != null && lin.demo.hl != null && lin.demo.anc && lin.demo.anc.australian != null, `${y}: Lingiari carries the 2026-10-31 lanes (pt/noncit/bigfam/hl/anc)`);
     }
@@ -1221,7 +1222,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(sa.demoBasis, "sa1", "sa26 records the SA1 census basis");
   assert.ok(sa.incomeCuts && sa.incomeCuts.hiEdgeWeekly === 4000 && sa.incomeCuts.dollarsYear === 2021, "sa26 incomeCuts: GCP-era band read at its 2021-era cuts");
   if ("seifaCuts" in sa) assert.equal(sa.seifaCuts, null, "sa26 has no voter-footprint SEIFA cuts");
-  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of sa.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `${d.n}: demo row`);
     for (const ix of IXS) {
@@ -1282,14 +1283,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa26 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 19 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: demo is eighteen people cells plus unemp (the positional DM order, 2026-11-11)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12 && an.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa26 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const adl = B.n.indexOf("Adelaide");
     assert.ok(adl >= 0, "sa26: the Adelaide booth exists");
     assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa26: the Adelaide booth's SA1 national deciles");
-    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.1675, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213, 0.2701, 0.0268], "sa26: the Adelaide booth's SA1 people cells (positional DM order + unemp@17, 2026-11-10)");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.8325, 0.067, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213, 0.2701, 0.0268], "sa26: the Adelaide booth's SA1 people cells (the positional DM order with hiqinc at the income pair's cell-17 tail, and unemp@18, 2026-11-11)");
     assert.deepEqual(B.anc[adl], [0.3067, 0.2578, 0.08, 0.0933, 0.1778, 0.0267, 0.0578, 0.0267, 0, 0.0222, 0.0178, 0], "sa26: the Adelaide booth's Ancestry row (English leads)");
     assert.deepEqual(B.rel[adl], [0.5602, 0.1713, 0.0556, 0.0463, 0.0, 0.0139, 0.0278, 0.0185, 0.0278, 0.0], "sa26: the Adelaide booth's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[adl], [0.2656, 0.5391, 0.1953, 0.0234], "sa26: the Adelaide booth's Housing-tenure row");
@@ -1461,14 +1462,14 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `sa22 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 19 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `sa22 ${B.n[k]}: demo is eighteen people cells plus unemp (the positional DM order, 2026-11-11)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `sa22 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const adl = B.n.indexOf("Adelaide");
     assert.ok(adl >= 0, "sa22: the Adelaide booth exists");
     assert.deepEqual(B.dec[adl], [8, 7, 2, 10], "sa22: the Adelaide booth's SA1 national deciles");
-    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.1675, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213, 0.2701, 0.0268], "sa22: the Adelaide booth's SA1 people cells (positional DM order + unemp@17, 2026-11-10)");
+    assert.deepEqual(B.demo[adl], [0.2928, 0.1545, 0.3648, 0.4629, 0.5625, 0.1793, 0.2433, 0.1315, 0.8325, 0.067, 0, 0.0472, 0.1579, 0.042, 0.2747, 0.0286, 0.0213, 0.2701, 0.0268], "sa22: the Adelaide booth's SA1 people cells (the positional DM order with hiqinc at the income pair's cell-17 tail, and unemp@18, 2026-11-11)");
     assert.deepEqual(B.anc[adl], [0.3067, 0.2578, 0.08, 0.0933, 0.1778, 0.0267, 0.0578, 0.0267, 0, 0.0222, 0.0178, 0], "sa22: the Adelaide booth's Ancestry row");
     assert.deepEqual(B.rel[adl], [0.5602, 0.1713, 0.0556, 0.0463, 0.0, 0.0139, 0.0278, 0.0185, 0.0278, 0.0], "sa22: the Adelaide booth's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[adl], [0.2656, 0.5391, 0.1953, 0.0234], "sa22: the Adelaide booth's Housing-tenure row");
@@ -1493,7 +1494,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   }
   // the census lanes splice exactly as sa26's
   {
-    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
+    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
     assert.equal(res.divs.length, 47, "sa22: 47 districts with census rows");
     const dec = new Set(res.divs.map((d) => d.seifa.irsad.dec));
     assert.ok(dec.size >= 8, "sa22 IRSAD deciles spread across the range (a monotone join bug collapses them)");
@@ -1819,10 +1820,10 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(js.includes("optional-preferential, so a ballot leaves the count when its numbered candidates are gone"), "map.js: the exhausted legend note explains the scheme");
   assert.ok(js.includes('m.res.flOpv ? lgMenu("infm",'), "map.js: the switcher is offered only on the optional-preferential frame");
   // the census lanes (the same splice contract as the SA frames')
-  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace, ancestry and marital dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `nsw23 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `nsw23 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -1872,14 +1873,14 @@ for (const y of ["sa22", "sa26"]) {
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `nsw23 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 19 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `nsw23 ${B.n[k]}: demo is eighteen people cells plus unemp (the positional DM order, 2026-11-11)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `nsw23 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const balmain = B.n.indexOf("Balmain Public");
     assert.ok(balmain >= 0, "nsw23: the Balmain Public booth exists");
     assert.deepEqual(B.dec[balmain], [10, 10, 7, 10], "nsw23: Balmain Public's SA1 national deciles");
-    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, 0.117, 0.4897, 0.1409, 0.0, 0.1681, 0.1457, 0.0312, 0.1185, 0.108, 0.0022, 0.5325, 0.0271], "nsw23: Balmain Public's SA1 people cells (the positional DM order with hiqinc at the income pair's cell-16 tail, and unemp@17, 2026-11-10)");
+    assert.deepEqual(B.demo[balmain], [0.1004, 0.175, 0.1767, 0.286, 0.6157, 0.0452, 0.117, 0.4897, 0.8591, 0.1074, 0, 0.1681, 0.1457, 0.0312, 0.1185, 0.108, 0.0022, 0.5325, 0.0271], "nsw23: Balmain Public's SA1 people cells (the positional DM order with hiqinc at the income pair's cell-17 tail, and unemp@18, 2026-11-11)");
     assert.deepEqual(B.anc[balmain], [0.4446, 0.3376, 0.1996, 0.1162, 0.0254, 0.0544, 0.0417, 0.0073, 0.0109, 0.0127, 0, 0], "nsw23: Balmain Public's Ancestry row");
     assert.deepEqual(B.rel[balmain], [0.5301, 0.2477, 0.102, 0.031, 0.031, 0.0164, 0.0055, 0, 0, 0.0219], "nsw23: Balmain Public's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[balmain], [0.3252, 0.3496, 0.3049, 0], "nsw23: Balmain Public's Housing-tenure row");
@@ -2352,10 +2353,10 @@ for (const y of ["sa22", "sa26"]) {
   // no preferences lane yet (the SA frames' are modelled by sa_flow_lane.py)
   assert.ok(!("flBasis" in res) && res.divs.every((d) => Array.isArray(d.fl) && d.fl.length === 0), "vic22: no preferences lane");
   // the census lanes (the same splice contract as the other state frames')
-  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the birthplace, ancestry and marital dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `vic22 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `vic22 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -2402,14 +2403,14 @@ for (const y of ["sa22", "sa26"]) {
       const d = B.dec[k];
       if (d !== null) assert.ok(Array.isArray(d) && d.length === 4 && d.every((x) => x === null || (Number.isInteger(x) && x >= 1 && x <= 10)), `vic22 ${B.n[k]}: dec is four national deciles or nulls`);
       const dm = B.demo[k];
-      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 18 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: demo is seventeen people cells plus unemp (the positional DM order, 2026-11-10)`);
+      if (dm !== null) assert.ok(Array.isArray(dm) && dm.length === 19 && dm.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)), `vic22 ${B.n[k]}: demo is eighteen people cells plus unemp (the positional DM order, 2026-11-11)`);
       const an = B.anc[k];
       if (an !== null) assert.ok(Array.isArray(an) && an.length === 12, `vic22 ${B.n[k]}: anc rides its twelve ancestry shares`);
     }
     const toorak = B.n.indexOf("Toorak Central");
     assert.ok(toorak >= 0, "vic22: the Toorak Central booth exists");
     assert.deepEqual(B.dec[toorak], [9, 8, 5, 9], "vic22: Toorak Central's SA1 national deciles");
-    assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, 0.1549, 0.429, 0.1627, 0, 0.1233, 0.1111, 0.0617, 0.1462, 0.163, 0.0002, 0.451, 0.0595], "vic22: Toorak Central's SA1 people cells (positional DM order + unemp@17, 2026-11-10)");
+    assert.deepEqual(B.demo[toorak], [0.1329, 0.2133, 0.2733, 0.2612, 0.565, 0.0774, 0.1549, 0.429, 0.8373, 0.0437, 0, 0.1233, 0.1111, 0.0617, 0.1462, 0.163, 0.0002, 0.451, 0.0595], "vic22: Toorak Central's SA1 people cells (the positional DM order with hiqinc at the income pair's cell-17 tail, and unemp@18, 2026-11-11)");
     assert.deepEqual(B.anc[toorak], [0.453, 0.2091, 0.1498, 0.1324, 0.0627, 0.0836, 0.0279, 0, 0, 0.0209, 0, 0], "vic22: Toorak Central's Ancestry row");
     assert.deepEqual(B.rel[toorak], [0.4064, 0.3039, 0.1378, 0.0212, 0.0318, 0.0353, 0, 0, 0, 0.0318], "vic22: Toorak Central's Religion row (No-religion leads)");
     assert.deepEqual(B.ten[toorak], [0.2578, 0.3672, 0.375, 0], "vic22: Toorak Central's Housing-tenure row");
@@ -2562,7 +2563,7 @@ for (const y of ["sa22", "sa26"]) {
       const bad = B.cob.filter((x, k) => (x === null) !== (B.demo[k] === null));
       assert.equal(bad.length, 0, `${frame}: cob rows null exactly where the people cells are`);
     }
-    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
+    const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
     const dc = new Set(res.divs.map((d) => d.seifa.irsad.dec));
     assert.ok(dc.size >= 7, `${frame} IRSAD deciles spread across the range (a monotone join bug collapses them)`);
     for (const d of res.divs) {

@@ -195,6 +195,8 @@ def main():
         "u15": round((nat["bands"][0] + nat["bands"][1]) /
                      (nat["pers"] - 0), 4),
         "y12less": round(sum(nat["sch6"][1:]) / sum(nat["sch6"]), 4),
+        "y12": round(nat["sch6"][0] / sum(nat["sch6"]), 4),
+        "y10less": round(sum(nat["sch6"][2:]) / sum(nat["sch6"]), 4),
         "atsci": round(nat["indig"] / nat["indigDen"], 4),
         "onepar": round(nat["famN"] / nat["famD"], 4),
         "rel": {k: round(nat["relvec"][i]

@@ -330,7 +330,8 @@ SHARES = {
     "fborn": (lambda r: (r["cobTot"] - r["cobNS"]) - r["aust"], lambda r: r["cobTot"] - r["cobNS"]),
     "uni": (lambda r: r["uni3"], lambda r: (r["p"] - r["bands"][0] - r["bands"][1]) - r["eduNS"]),
     "blue": (lambda r: r["blue"], lambda r: r["occ8"]),
-    "y12less": (lambda r: sum(r["sch6"][1:]), lambda r: sum(r["sch6"])),
+    "y12": (lambda r: r["sch6"][0], lambda r: sum(r["sch6"])),
+    "y10less": (lambda r: sum(r["sch6"][2:]), lambda r: sum(r["sch6"])),
     "atsci": (lambda r: r["indN"], lambda r: r["indD"]),
     "u15": (lambda r: r["bands"][0] + r["bands"][1], _bands_sum),
     "onepar": (lambda r: r["famN"], lambda r: r["famD"]),
@@ -390,7 +391,7 @@ def inc_masses(band, cutlo, cuthi):
     return lo_mass, hi_mass
 
 
-LANE_ORDER = (["lang", "fborn", "uni", "blue", "y12less", "atsci", "u15", "onepar",
+LANE_ORDER = (["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar",
                "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc",
                "a65", "a2034", "a1824", "a3554", "a75"]
               + [f"rel.{k}" for k in gcp_newlanes.REL_KEYS]

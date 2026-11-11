@@ -257,8 +257,12 @@ def main():
         }
         if rec.get("sch01") is not None:
             sc = rec["sch01"]  # [y11..dng five below-Y12, y12] stated
-            s["y12less"] = (round(sum(sc[:5]) / sum(sc), 4)
-                            if sum(sc) > 0 else None)
+            tot = sum(sc)
+            s["y12less"] = round(sum(sc[:5]) / tot, 4) \
+                if tot > 0 else None
+            s["y12"] = round(sc[5] / tot, 4) if tot > 0 else None
+            s["y10less"] = round(sum(sc[1:5]) / tot, 4) \
+                if tot > 0 else None
         if rec.get("indig") is not None and rec.get("indigDen"):
             s["atsci"] = round(rec["indig"] / rec["indigDen"], 4)
         if rec.get("rel01") is not None and rec.get("relTot") is not None:
@@ -381,6 +385,8 @@ def main():
         "u15": round((nat["bands"][0] + nat["bands"][1]) /
                      nat["pers"], 4),
         "y12less": round(sum(nat["sch01"][:5]) / sum(nat["sch01"]), 4),
+        "y12": round(nat["sch01"][5] / sum(nat["sch01"]), 4),
+        "y10less": round(sum(nat["sch01"][1:5]) / sum(nat["sch01"]), 4),
         "atsci": round(nat["indig"] / nat["indigDen"], 4),
         "onepar": round(nat["famN"] / nat["famD"], 4),
         "rel": {k: round(nat["rel01"][i]

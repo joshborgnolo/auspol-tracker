@@ -209,7 +209,7 @@ def demo_main(frame, year):
                                   "pop15": 0, "blue": 0, "occd": 0,
                                   "cobN": [0] * len(COB_KEYS),
                                   "bands": [0] * len(DEMO_BANDS), "n": 0,
-                                  "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
+                                  "ylN": 0, "ylD": 0, "y12n": 0, "y10n": 0, "atN": 0, "atD": 0,
                                   "relN": [0] * len(gcp_newlanes.REL_KEYS),
                                   "relNS": 0, "relTot": 0,
                                   "tenN": [0] * 6, "famN": 0, "famD": 0,
@@ -240,6 +240,8 @@ def demo_main(frame, year):
         a["n"] += 1
         sch6, indt, (relvec, relns, reltot), ten6, fam = nlt[code]
         a["ylN"] += sum(sch6[1:])
+        a["y12n"] += sch6[0]
+        a["y10n"] += sum(sch6[2:])
         a["ylD"] += sum(sch6)
         a["atN"] += indt[0]
         a["atD"] += indt[1]
@@ -304,6 +306,8 @@ def demo_main(frame, year):
                     for i, k in enumerate(COB_KEYS)},
             "u15": round((a["bands"][0] + a["bands"][1]) / bsum, 4),
             "y12less": round(a["ylN"] / a["ylD"], 4) if a["ylD"] else None,
+            "y12": round(a["y12n"] / a["ylD"], 4) if a["ylD"] else None,
+            "y10less": round(a["y10n"] / a["ylD"], 4) if a["ylD"] else None,
             "atsci": round(a["atN"] / a["atD"], 4) if a["atD"] else None,
             "onepar": round(a["famN"] / a["famD"], 4) if a["famD"] else None,
             "rel": {k: (round(a["relN"][i] / (a["relTot"] - a["relNS"]), 4)
@@ -348,7 +352,7 @@ def demo_main(frame, year):
               "uni": 0, "eduns": 0, "pop15": 0, "blue": 0, "occd": 0,
               "cobN": [0] * len(COB_KEYS),
               "bands": [0] * len(DEMO_BANDS), "n": 0,
-              "ylN": 0, "ylD": 0, "atN": 0, "atD": 0,
+              "ylN": 0, "ylD": 0, "y12n": 0, "y10n": 0, "atN": 0, "atD": 0,
               "relN": [0] * len(gcp_newlanes.REL_KEYS),
               "relNS": 0, "relTot": 0, "tenN": [0] * 6,
               "famN": 0, "famD": 0,

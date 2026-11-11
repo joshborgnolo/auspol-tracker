@@ -307,6 +307,19 @@ def y12less_cell(school6, safe):
     return safe(sum(school6[1:]), sum(school6))
 
 
+def y12_cell(school6, safe):
+    """Year 12 as the highest completed school year, of the stated
+    schooling sum — the /map/ People lane that replaced Year 12 or
+    less's complement half (2026-11-11)."""
+    return safe(school6[0], sum(school6))
+
+
+def y10less_cell(school6, safe):
+    """Year 10 or below (Year 10, Year 9, Year 8 or below, did not go
+    to school) of the stated schooling sum — the companion lane."""
+    return safe(sum(school6[2:]), sum(school6))
+
+
 def u15_cell(bands, safe):
     """Under-15 share of the stated ages."""
     return safe(bands[0] + bands[1], sum(bands))
