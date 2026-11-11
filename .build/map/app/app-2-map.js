@@ -269,8 +269,9 @@ function paperOf() {
 // destination-over fill (laySea's, into the holes its cut opens)
 function layPaper(alpha, under) {
   const tile = paperOf(), n = tile.width, f = Math.log2(T.k) - Math.floor(Math.log2(T.k));
-  if (!tile._pat || tile._ctx !== ctx) { tile._pat = ctx.createPattern(tile, "repeat"); tile._ctx = ctx; }
-  const pat = tile._pat, copies = [[2 ** f, 1], [2 ** (f - 1), f]];
+  // (fresh every draw, never held: a pattern kept across frames is a snapshot Safari's
+  // GPU-side canvas doesn't re-make after hibernation, and the sea paints black)
+  const pat = ctx.createPattern(tile, "repeat"), copies = [[2 ** f, 1], [2 ** (f - 1), f]];
   if (under) copies.reverse();
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = pat;
   for (const [s, a] of copies) {

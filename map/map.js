@@ -1824,8 +1824,9 @@ function paperOf() {
 // destination-over fill (laySea's, into the holes its cut opens)
 function layPaper(alpha, under) {
   const tile = paperOf(), n = tile.width, f = Math.log2(T.k) - Math.floor(Math.log2(T.k));
-  if (!tile._pat || tile._ctx !== ctx) { tile._pat = ctx.createPattern(tile, "repeat"); tile._ctx = ctx; }
-  const pat = tile._pat, copies = [[2 ** f, 1], [2 ** (f - 1), f]];
+  // (fresh every draw, never held: a pattern kept across frames is a snapshot Safari's
+  // GPU-side canvas doesn't re-make after hibernation, and the sea paints black)
+  const pat = ctx.createPattern(tile, "repeat"), copies = [[2 ** f, 1], [2 ** (f - 1), f]];
   if (under) copies.reverse();
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = pat;
   for (const [s, a] of copies) {
@@ -13345,8 +13346,17 @@ addEventListener("resize", lensOverflow);
 /* =============================== the frame =============================== */
 let raf = 0;
 function schedule() { if (!raf) raf = requestAnimationFrame(frame); }
+/* a still canvas must not quite sit still: Safari hibernates an unpainted 2D
+   canvas's GPU surface (the sea painting black ~half a minute into a dwell,
+   its store still fine: a user-reported light-mode bug of 2026-11), and a
+   repaint is its only wake. One soft tick well past any hibernate horizon. */
+const STILL_MS = 20000;
+let still = 0;
+function unstill() { clearTimeout(still); if (!document.hidden) still = setTimeout(() => { still = 0; if (!raf) schedule(); }, STILL_MS); }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
 function frame(ts) {
   raf = 0;
+  unstill();
   chartTick();
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

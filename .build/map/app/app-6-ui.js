@@ -1312,8 +1312,17 @@ addEventListener("resize", lensOverflow);
 /* =============================== the frame =============================== */
 let raf = 0;
 function schedule() { if (!raf) raf = requestAnimationFrame(frame); }
+/* a still canvas must not quite sit still: Safari hibernates an unpainted 2D
+   canvas's GPU surface (the sea painting black ~half a minute into a dwell,
+   its store still fine: a user-reported light-mode bug of 2026-11), and a
+   repaint is its only wake. One soft tick well past any hibernate horizon. */
+const STILL_MS = 20000;
+let still = 0;
+function unstill() { clearTimeout(still); if (!document.hidden) still = setTimeout(() => { still = 0; if (!raf) schedule(); }, STILL_MS); }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
 function frame(ts) {
   raf = 0;
+  unstill();
   chartTick();
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

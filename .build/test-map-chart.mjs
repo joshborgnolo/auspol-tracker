@@ -140,7 +140,7 @@ assert.ok(draw.includes(`S.draw === "chart" ? "seats"`), "the map beneath a char
 assert.ok(draw.includes(`why: k === "chart" && !chartFits(m) ? "Chart plots a figure`), "the button (and the phone's Draw menu) says why a lens has no chart");
 assert.ok(ui.includes(`!(S.draw === "chart" && chartFits(my)) ? [false, true] : [false]`), "a chart's key holds only the seats' face");
 assert.ok(/chartSync\(m\);[^\n]*\n\s*\/\/ the key shows/.test(ui), "the chart's class is set before the key is measured");
-assert.ok(/function frame\(ts\) \{\n\s*raf = 0;\n\s*chartTick\(\);/.test(ui), "every frame ticks the chart");
+assert.ok(/function frame\(ts\) \{\n\s*raf = 0;\n\s*unstill\(\);\n\s*chartTick\(\);/.test(ui), "every frame ticks the chart (the still-page tick armed first)");
 assert.ok(ui.includes(`p.set("cs", "type")`) && ui.includes(`p.get("cs") === "type"`) && ui.includes(`p.set("cv", CH.vs)`) && ui.includes(`CH_VS[cv]`), "the URL carries the chart's switches both ways");
 assert.ok(story.includes("!chartOn(m) && !(S.lens"), "the rail's Across-the-seats histogram steps aside under a chart");
 for (const sel of ["#credit", ".lg-ramp", ".lg-ticks", ".lg-ends", "#cities", "#hint"]) assert.ok(new RegExp(`\\.ch-on [^{]*${sel.replace(".", "\\.")}`).test(css), `${sel} hides under a chart`);
