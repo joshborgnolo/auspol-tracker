@@ -1105,6 +1105,35 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(story.includes("isEdu() ? DM_TOP[S.eduMode]"), "the area ranking phrases follow the picked read");
 }
 
+// ── the Family-composition lens (2026-11-11): the fold's fourth sibling —
+// Children under 15, One-parent families and More than two children ride
+// one People-menu entry on the Education pattern, the under-15 read
+// landing. Each read keeps its own DM lane for the dicts, ranges, ramps
+// and area rankings, the hash gains fv, legacy u15/onepar/bigfam hashes
+// alias in, and a frame whose census era printed no children-ever-born
+// table offers More than two children nowhere
+{
+  const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
+  assert.ok(base.includes('const LENS_FAM = "fam";') && base.includes('const FAMC_MODES = ["u15", "onepar", "bigfam"];'), "the Family-composition lane id and its three reads, under-15 first");
+  assert.ok(!base.includes('const FAM_NAME = { u15:'), "the lens consts keep clear of FAM_NAME (the party-family names) — they are FAMC_*");
+  assert.ok(base.includes('if (k === "u15") { ks.push(LENS_FAM); continue; }') && base.includes('k !== "onepar" && k !== "bigfam"'), "the People menu folds the three reads into the one Family composition entry where u15 sat (DM stays positional against the demo tuple)");
+  assert.ok(base.includes('fam: "Family composition"') && base.includes('fam: "Family"'), "the menu entry labels itself in both name tables");
+  assert.ok(base.includes('famMode: "u15"'), "Children under 15 is the landing read");
+  assert.ok(base.includes('if (isFam()) return d.demo ? d.demo[S.famMode] : null;') && base.includes('DM.indexOf(S.famMode)'), "the read rides its own demo-dict key and demo-tuple cell");
+  assert.ok(base.includes('DM_RANGE[S.famMode]') && base.includes('isFam() ? S.famMode :'), "range and ramp follow the picked read");
+  assert.ok(base.includes("m.hasLane[LENS_FAM] = m.hasLane.u15;"), "the menu gate rides the under-15 read");
+  assert.ok(ui.includes('lgMenu("famv",'), "the family picker rides the panel dropdown idiom");
+  assert.ok(ui.includes("FAMC_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false)"), "the picker offers only reads the frame printed");
+  assert.ok(ui.includes('else if (k === "famv") S.famMode = v;'), "the picker change handler is wired");
+  assert.ok(ui.includes("FAMC_MODES.includes(i)") && ui.includes('p.get("fv")'), "legacy u15/onepar/bigfam hashes alias onto the lens");
+  assert.ok(ui.includes('p.set("fv", S.famMode);'), "the hash carries the family read");
+  assert.ok(ui.includes("S.ageMode, S.eduMode, S.famMode"), "the legend's refresh key re-reads on a family switch");
+  assert.ok(ui.includes("Family: ${FAMC_SHORT[S.famMode]}"), "the lens head names the picked read");
+  assert.ok(ui.includes("isFam() ? FAMC_NOTE[S.famMode]"), "the legend note names the picked read");
+  assert.ok(ui.includes("b.hasLane[S.famMode] === false") && ui.includes("bmc.hasLane[S.famMode] === false"), "a year swap or boot frame falls back to the frame's own publication when a read never printed");
+  assert.ok(story.includes("isFam() ? DM_TOP[S.famMode]"), "the area ranking phrases follow the picked read");
+}
+
 // ── the six new People lanes (2026-10-29): y12less/atsci/u15/onepar plain
 // lanes + Religion (norel-first) and Housing-tenure (mort-first) select
 // families. Every lane rides every census edition (2001 BCP → 2021 GCP), the

@@ -9,7 +9,7 @@ function lensShort() {
     case "senpref": return `${famLeg(S.spFrom)} Senate: ${spA(true)} v ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isInd() ? `Industry: ${IND_NAME[S.ind]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isFam() ? `Family: ${FAM_SHORT[S.famMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isInd() ? `Industry: ${IND_NAME[S.ind]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isFam() ? `Family: ${FAMC_SHORT[S.famMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -354,8 +354,8 @@ function censusSelects(m, cls = "") {
     // children beside it (a frame whose census era has no children-
     // ever-born table drops More than two children)
     {
-      const famOpts = FAM_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false);
-      if (S.index === LENS_FAM && famOpts.length > 1) out.push(lgMenu("famv", famOpts.map((k) => [k, FAM_NAME[k]]), S.famMode, "Family view"));
+      const famOpts = FAMC_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false);
+      if (S.index === LENS_FAM && famOpts.length > 1) out.push(lgMenu("famv", famOpts.map((k) => [k, FAMC_NAME[k]]), S.famMode, "Family view"));
     }
     // on Born overseas a second picker reads a birthplace country per year
     // (the year's own census-edition menu; the informal lens's own
@@ -518,7 +518,7 @@ function legendHTML(m) {
         const headNote = isInc() ? incNote
           : isAge() ? ageNote
           : isEdu() ? EDU_NOTE[S.eduMode]
-          : isFam() ? FAM_NOTE[S.famMode]
+          : isFam() ? FAMC_NOTE[S.famMode]
           : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}`
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
           : isTen() ? `Share of dwellings that ${TENESMS[S.ten]}`
@@ -1149,7 +1149,7 @@ async function setYear(y) {
   // (the statistics-era frames keep University educated alone)
   if (S.index === LENS_EDU && b.hasLane && b.hasLane[S.eduMode] === false) S.eduMode = EDU_MODES.find((k) => b.hasLane[k] !== false) || "uni";
   // a family read the era never prints falls back the same way
-  if (S.index === LENS_FAM && b.hasLane && b.hasLane[S.famMode] === false) S.famMode = FAM_MODES.find((k) => b.hasLane[k] !== false) || "u15";
+  if (S.index === LENS_FAM && b.hasLane && b.hasLane[S.famMode] === false) S.famMode = FAMC_MODES.find((k) => b.hasLane[k] !== false) || "u15";
   if (b.hasIx && IX.includes(S.index) && b.hasIx[S.index] === false) S.index = "irsd";
   if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";
   if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
@@ -1485,12 +1485,12 @@ function readURL() {
   else if (EDU_MODES.includes(i) || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y10less" : i; }
   // the family reads' own ids pre-date the fold: a legacy u15/onepar/
   // bigfam hash lands on the Family composition lens with its read picked
-  else if (FAM_MODES.includes(i)) { S.index = LENS_FAM; S.famMode = i; }
+  else if (FAMC_MODES.includes(i)) { S.index = LENS_FAM; S.famMode = i; }
   else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_FAM || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_IND)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
   const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
   const ev = p.get("ev"); S.eduMode = EDU_MODES.includes(ev) ? ev : ev === "y12less" ? "y10less" : EDU_MODES.includes(i) ? i : i === "y12less" ? "y10less" : "uni";
-  const fv = p.get("fv"); S.famMode = FAM_MODES.includes(fv) ? fv : FAM_MODES.includes(i) ? i : "u15";
+  const fv = p.get("fv"); S.famMode = FAMC_MODES.includes(fv) ? fv : FAMC_MODES.includes(i) ? i : "u15";
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
@@ -1875,7 +1875,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   // back to University educated, the era's only education lane
   if (bmc && bmc.hasLane && S.index === LENS_EDU && bmc.hasLane[S.eduMode] === false) S.eduMode = EDU_MODES.find((k) => bmc.hasLane[k] !== false) || "uni";
   // a family read the boot frame's era never printed falls back the same way
-  if (bmc && bmc.hasLane && S.index === LENS_FAM && bmc.hasLane[S.famMode] === false) S.famMode = FAM_MODES.find((k) => bmc.hasLane[k] !== false) || "u15";
+  if (bmc && bmc.hasLane && S.index === LENS_FAM && bmc.hasLane[S.famMode] === false) S.famMode = FAMC_MODES.find((k) => bmc.hasLane[k] !== false) || "u15";
   if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine(); holdEyebrow();

@@ -113,9 +113,9 @@ assert.ok(page.includes("Chart sets the map aside") && page.includes("permutatio
 
 /* ----- whose share: censusWho ----- */
 {
-  const consts = ["DM_VERB", "RELISMS", "TENESMS", "ANCISMS", "OCCISMS", "MARISMS", "COB_VERB", "AGE_VERB", "DM_POP", "DM_PRED"].map((k) => { const m = base.match(new RegExp(`^const ${k} = .*$`, "m")); assert.ok(m, k); return m[0]; }).join("\n");
+  const consts = ["DM_VERB", "RELISMS", "TENESMS", "ANCISMS", "OCCISMS", "INDISMS", "MARISMS", "COB_VERB", "AGE_VERB", "DM_POP", "DM_PRED"].map((k) => { const m = base.match(new RegExp(`^const ${k} = .*$`, "m")); assert.ok(m, k); return m[0]; }).join("\n");
   const fn = cut(base, "function censusWho(", "\n// ") ;
-  const ctx = { S: { index: "lang", eduMode: "uni", ten: "mort", rel: "cath", anc: "irish", occ: "farmer", mar: "div", cob: null, ageMode: "a65", incMode: "lo" }, LENS_TEN: "ten", LENS_INC: "inc", LENS_EDU: "edu", LENS_AGE: "age", LENS_REL: "rel", LENS_ANC: "anc", LENS_OCC: "occ", LENS_MAR: "mar", INC_VERB: { lo: () => "live in households earning under $X" }, incLoFrag: () => "under $X", incHiQFrag: () => "over $Y", incEpoch: () => "" };
+  const ctx = { S: { index: "lang", eduMode: "uni", famMode: "u15", ten: "mort", rel: "cath", anc: "irish", occ: "farmer", mar: "div", cob: null, ageMode: "a65", incMode: "lo", ind: "ag" }, LENS_TEN: "ten", LENS_INC: "inc", LENS_EDU: "edu", LENS_FAM: "fam", LENS_AGE: "age", LENS_REL: "rel", LENS_ANC: "anc", LENS_OCC: "occ", LENS_MAR: "mar", LENS_IND: "ind", INC_VERB: { lo: () => "live in households earning under $X" }, incLoFrag: () => "under $X", incHiQFrag: () => "over $Y", incEpoch: () => "" };
   const dmV = cut(base, "const dmVerb = ", "\n");
   const who = vm.runInNewContext(`${consts}\n${dmV}\n${fn.replace(/\n$/, "")}\n(k) => censusWho(null, k).phrase`, ctx);
   const set = (o) => Object.assign(ctx.S, o);
@@ -127,6 +127,9 @@ assert.ok(page.includes("Chart sets the map aside") && page.includes("permutatio
   set({ index: "edu", eduMode: "uni" }); assert.equal(who("edu"), "people aged 15+ who hold a university qualification");
   set({ index: "edu", eduMode: "y12" }); assert.equal(who("edu"), "people aged 15+ who finished Year 12 as their highest level of schooling");
   set({ index: "edu", eduMode: "y10less" }); assert.equal(who("edu"), "people aged 15+ who finished school at Year 10 or earlier");
+  set({ index: "fam", famMode: "u15" }); assert.equal(who("fam"), "residents who are children under 15");
+  set({ index: "fam", famMode: "onepar" }); assert.equal(who("fam"), "families that are one-parent families");
+  set({ index: "fam", famMode: "bigfam" }); assert.equal(who("fam"), "women aged 15+ who have had more than two children");
   set({ index: "ten", ten: "mort" }); assert.equal(who("ten"), "dwellings that are owned with a mortgage");
   set({ index: "occ", occ: "farmer" }); assert.equal(who("occ"), "workers who are farmers or farm managers");
   set({ index: "mar", mar: "div" }); assert.equal(who("mar"), "people aged 15+ who are divorced");
