@@ -174,7 +174,7 @@ function buildRamps() {
       y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       unemp: seq(8, 0.13),
-      rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10) },
+      rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10), occ: seq(210, 0.11) },
   };
 }
 
@@ -279,7 +279,24 @@ const LENS_ANC = "anc";
 const ANC_NAME = { english: "English", australian: "Australian", irish: "Irish", scottish: "Scottish", chinese: "Chinese", italian: "Italian", german: "German", indian: "Indian", filipino: "Filipino", dutch: "Dutch", vietnamese: "Vietnamese", lebanese: "Lebanese" };
 const ANCISMS = { english: "named English ancestry", australian: "named Australian ancestry", irish: "named Irish ancestry", scottish: "named Scottish ancestry", chinese: "named Chinese ancestry", italian: "named Italian ancestry", german: "named German ancestry", indian: "named Indian ancestry", filipino: "named Filipino ancestry", dutch: "named Dutch ancestry", vietnamese: "named Vietnamese ancestry", lebanese: "named Lebanese ancestry" };
 const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scottish: [0, 22], chinese: [0, 35], italian: [0, 25], german: [0, 18], indian: [0, 30], filipino: [0, 18], dutch: [0, 6], vietnamese: [0, 22], lebanese: [0, 35] };
-const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_EDU || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
+// the Occupation select lens (the 2026-11-11 Oesch-class arc): S.index ===
+// LENS_OCC and S.occ the picked class. Seven politically-charged classes
+// keyed from ANZSCO sub-major (2-digit) groups — the GCP packs top out at
+// 1-digit, so the lane rides the manual 2021 TableBuilder export folded by
+// .build/map/occ_lanes.py; only 2021-census-era frames publish occKeys.
+// The classes are deliberately NOT a partition: the remaining 19
+// sub-majors (technicians, community/personal services, clerical, sales)
+// carry no class, so the options never sum to 100
+const LENS_OCC = "occ";
+const OCC_NAME = { socprof: "Sociocultural professionals", biztech: "Business & technical professionals and managers", farmer: "Farmers", farmwrk: "Farm workers", hospmgr: "Hospitality, retail & service managers", trades: "Tradespeople", routine: "Routine manual workers" };
+const OCCISMS = { socprof: "work in education, health, welfare, the arts or media", biztech: "are business or technical professionals or corporate managers", farmer: "are farmers or farm managers", farmwrk: "do farm, forestry or garden work", hospmgr: "manage hospitality, retail or service businesses", trades: "work as tradespeople", routine: "do routine manual work" };
+// PROVISIONAL PLACEHOLDER caps: the store-landing pass (occ_lanes OCC_RANGE
+// job) measures each class's division maximum across the occ frames and
+// writes the real caps, per the ANC_RANGE way; Phase A is era-null, so
+// nothing reads these until then (the map suite fails a placeholder that
+// survives landing)
+const OCC_RANGE = { socprof: [0, 40], biztech: [0, 40], farmer: [0, 20], farmwrk: [0, 12], hospmgr: [0, 20], trades: [0, 30], routine: [0, 40] };
+const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_EDU || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC || S.index === LENS_OCC;
 // the Household-income lane: S.index === "inc" and S.incMode the picked
 // measure — the median weekly household income spectrum lands by default;
 // the bottom-quartile and top-quartile shares ride the same legend picker
@@ -352,7 +369,7 @@ const EDU_NAME = { uni: "University educated", y12less: "Year 12 or less" };
 const EDU_SHORT = { uni: "University", y12less: "No Year 12" };
 const EDU_NOTE = { uni: "Share of people aged 15+ who hold a university qualification", y12less: "Share of people aged 15+ who left schooling before Year 12" };
 const isEdu = () => S.index === LENS_EDU;
-const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : DM_VERB[k]);
+const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : DM_VERB[k]);
 // whose share a census measure is, and what it says of them: the bases the builders divide by
 // (build_areas_sa1.py's SHARES and the state demo builders), so copy never sets a measure over
 // the wrong people. Most measures are shares of residents; schooling and degrees are of people
@@ -367,7 +384,7 @@ function censusWho(m, k = S.index) {
   else if (k === LENS_INC) {
     const hh = m && m.incomeCuts && m.incomeCuts.basis === "households", frag = S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m);
     pop = hh ? "households" : "adults"; pred = hh ? `earn ${frag}${incEpoch(m)}` : INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "";
-  } else {
+  } else if (k === LENS_OCC) { pop = "workers"; pred = OCCISMS[S.occ]; } else {
     const key = k === LENS_EDU ? S.eduMode : k;
     pop = DM_POP[key] || "residents";
     pred = DM_PRED[key] || dmVerb(m, k);
@@ -407,6 +424,7 @@ const isCob = () => S.index === "fborn" && S.cob != null;
 const isRel = () => S.index === LENS_REL && S.rel != null;
 const isTen = () => S.index === LENS_TEN && S.ten != null;
 const isAnc = () => S.index === LENS_ANC && S.anc != null;
+const isOcc = () => S.index === LENS_OCC && S.occ != null;
 // the active people-lane figure of a division: a share as a fraction
 // (cob-aware, religion/tenure select-aware), or the income view's datum —
 // the median lane reads DOLLARS (medIncWeekly), the shares the band keys
@@ -416,6 +434,7 @@ const demoShare = (d) => {
   if (isRel()) return d.demo && d.demo.rel ? d.demo.rel[S.rel] : null;
   if (isTen()) return d.demo && d.demo.ten ? d.demo.ten[S.ten] : null;
   if (isAnc()) return d.demo && d.demo.anc ? d.demo.anc[S.anc] : null;
+  if (isOcc()) return d.demo && d.demo.occ ? d.demo.occ[S.occ] : null;
   if (isInc()) return d.demo ? d.demo[INC_KEY[S.incMode]] : null;
   // age: median is years (ageMed); the five share views ride their keys
   if (isAge()) return d.demo ? d.demo[AGE_KEY[S.ageMode]] : null;
@@ -429,6 +448,7 @@ const demoAreaShare = (demo) => {
   if (isRel()) return demo && demo.rel ? demo.rel[S.rel] : null;
   if (isTen()) return demo && demo.ten ? demo.ten[S.ten] : null;
   if (isAnc()) return demo && demo.anc ? demo.anc[S.anc] : null;
+  if (isOcc()) return demo && demo.occ ? demo.occ[S.occ] : null;
   if (isInc()) return demo ? demo[INC_KEY[S.incMode]] : null;
   if (isAge()) return demo ? demo[AGE_KEY[S.ageMode]] : null;
   if (isEdu()) return demo ? demo[S.eduMode] : null;
@@ -441,6 +461,7 @@ const demoBoothShare = (raw, j, pos) => {
   if (isRel()) { const r = raw.rel && raw.rel[j]; return r ? r[pos[S.rel]] : null; }
   if (isTen()) { const r = raw.ten && raw.ten[j]; return r ? r[pos[S.ten]] : null; }
   if (isAnc()) { const r = raw.anc && raw.anc[j]; return r ? r[pos[S.anc]] : null; }
+  if (isOcc()) { const r = raw.occ && raw.occ[j]; return r ? r[pos[S.occ]] : null; }
   // income: the share views ride the demo tuple's cells 6/16; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
   if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[{ lo: 6, hiq: 16 }[S.incMode]] : null; }
@@ -485,17 +506,18 @@ const incMedRange = (m) => {
   if (m) m._incMedRange = r;
   return r;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : S.index];
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc)
-const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : (m.cobPos || {}));
+const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) : (m.cobPos || {}));
 const relFor = (m) => (m.relKeys || []).map((k) => [k, REL_NAME[k]]);
 const tenFor = (m) => (m.tenKeys || []).map((k) => [k, TEN_NAME[k]]);
 const ancFor = (m) => (m.ancKeys || []).map((k) => [k, ANC_NAME[k]]);
+const occFor = (m) => (m.occKeys || []).map((k) => [k, OCC_NAME[k]]);
 // a select lane's sub-select label: the ideology/noun phrase the
 // legend and menu land on
-const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : ANC_NAME[k]);
+const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : isOcc() ? OCC_NAME[k] : ANC_NAME[k]);
 // the People lanes' floor: 1993/1996/1998 are the statistics-era
 // interp blend entrance (1991↔1996 and 1996↔2001 day-share blends,
 // derive-booth-demo-90s.py's stores at the venue-nearest
@@ -1032,6 +1054,11 @@ function demoOf(m, idx) {
       demo.anc = {};
       for (const k of m.ancKeys) { const xs = ds.filter((x) => x.anc && x.anc[k] != null); demo.anc[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.anc[k]))) / sum(xs.map((x) => x.p)) : null; }
     }
+    // the Occupation classes pool, same vote-weighted way (2021-era frames)
+    if (m.occKeys && m.occKeys.length) {
+      demo.occ = {};
+      for (const k of m.occKeys) { const xs = ds.filter((x) => x.occ && x.occ[k] != null); demo.occ[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.occ[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
   }
   return demo;
 }
@@ -1427,6 +1454,11 @@ async function loadYear(year, bg) {
     // the Ancestry menu + per-option positional map (2026-10-31 lanes arc)
     m.ancKeys = res.ancKeys || null;
     m.ancPos = m.ancKeys ? Object.fromEntries(m.ancKeys.map((k, i) => [k, i])) : null;
+    // the Occupation-classes menu (2026-11-11 Oesch-class arc; published by
+    // the 2021-census-era frames alone — a frame without occKeys never
+    // gets the menu entry, and every consumer clamps on the key list)
+    m.occKeys = res.occKeys || null;
+    m.occPos = m.occKeys ? Object.fromEntries(m.occKeys.map((k, i) => [k, i])) : null;
     // lane-presence gates: a People lane that carries no figures anywhere
     // this year stays out of its menus and copy (the homeless lane's
     // census floor is the 2011 edition onward — the 2013 election on /
@@ -5360,7 +5392,7 @@ const bandMid = (S0, k) => { const e = S0.edges, n = e.length; return k === 0 ? 
 const LEAD_STEPS = [5, 10, 20, 30, 40, 60];
 const LEAD_RAMP_AT = [0.2, 0.31, 0.42, 0.52, 0.61, 0.7, 0.8];
 const rgba32 = (c) => ((255 << 24) | (Math.round(c[2]) << 16) | (Math.round(c[1]) << 8) | Math.round(c[0])) >>> 0;
-const readingKey = (m) => [m.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, axisNow(m), m.ppl ? 1 : 0, TH.dark].join("|");
+const readingKey = (m) => [m.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, axisNow(m), m.ppl ? 1 : 0, TH.dark].join("|");
 // the votes a place counts for in a blend: a group's own where the reading is that group's
 function surfaceWeight(m, j) {
   const b = m.booth;
@@ -5891,6 +5923,7 @@ function areasLane() {
   if (isRel()) return `rel.${S.rel}`;
   if (isTen()) return `ten.${S.ten}`;
   if (isAnc()) return `anc.${S.anc}`;
+  if (isOcc()) return `occ.${S.occ}`;
   if (isInc()) return S.incMode === "med" ? "incMed" : S.incMode === "lo" ? "loinc" : "hiqinc";
   if (isAge()) return S.ageMode === "med" ? "ageMed" : S.ageMode;
   if (isEdu()) return S.eduMode;
@@ -10757,6 +10790,9 @@ const DM_TOP = { lang: ["seats with the most residents speaking another language
   pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"], unemp: ["seats with the most people out of work", "with the fewest"] };
 // Ancestry option phrases, generated per option of the select menu
 const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.entries(ANC_NAME) : []).map(([k, n]) => [k, [`seats where the most residents named ${n} ancestry`, "with the fewest"]]));
+// the Occupation classes' phrases (2021-census-era frames only), hand-written
+// per class since the basis is workers, the lens's political cleavage basis
+const OCC_TOP = { socprof: ["seats where the most workers work in education, health, welfare, the arts or media", "with the fewest"], biztech: ["seats where the most workers are business or technical professionals or corporate managers", "with the fewest"], farmer: ["seats where the most workers are farmers or farm managers", "with the fewest"], farmwrk: ["seats where the most workers do farm, forestry or garden work", "with the fewest"], hospmgr: ["seats with the most hospitality, retail and service managers", "with the fewest"], trades: ["seats where the most workers are tradespeople", "with the fewest"], routine: ["seats where the most workers do routine manual work", "with the fewest"] };
 const REL_TOP = { norel: ["seats where the most residents say they have no religion", "with the fewest"], cath: ["seats with the most Catholic residents", "with the most of another faith"], angl: ["seats with the most Anglican residents", "with the fewest"], unch: ["seats with the most Uniting Church residents", "with the fewest"], pres: ["seats with the most Presbyterian residents", "with the fewest"], orth: ["seats with the most Orthodox residents", "with the fewest"], budd: ["seats with the most Buddhist residents", "with the fewest"], isl: ["seats with the most Muslim residents", "with the fewest"], hind: ["seats with the most Hindu residents", "with the fewest"], jew: ["seats with the most Jewish residents", "with the fewest"] };
 const TEN_TOP = { mort: ["seats with the most homes owned with a mortgage", "with the fewest"], rent: ["seats with the most rented homes", "with the fewest"], own: ["seats with the most homes owned outright", "with the fewest"], rentPub: ["seats with the most public housing", "with the fewest"] };
 // the pair-of-phrases for a birthplace country, against the Australia-born share
@@ -10851,7 +10887,7 @@ function areaDemo(m, st, idx, where, isNowM) {
   const topOf = (xs) => fams.map((f) => [f, seatCount(m, xs, f)]).filter((x) => x[1]).sort((a, b) => b[1] - a[1]);
   const verbOf = (f) => (isNowM ? (f === "ind" || f === "grn" ? "hold" : "holds") : "won");
   const ht = topOf(high), lt = topOf(low);
-  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : isEdu() ? DM_TOP[S.eduMode] : DM_TOP[k];
+  const top = isCob() ? COB_TOP[S.cob] : isRel() ? REL_TOP[S.rel] : isTen() ? TEN_TOP[S.ten] : isAnc() ? ANC_TOP[S.anc] : isOcc() ? OCC_TOP[S.occ] : isInc() ? INC_TOP[S.incMode] : isAge() ? AGE_TOP[S.ageMode] : isEdu() ? DM_TOP[S.eduMode] : DM_TOP[k];
   const hed = `${cap(FAM_PL[ht[0][0]])} ${verbOf(ht[0][0])} ${ht[0][1]} of the ${q} ${top[0]}${where}`;
   const rest = lt.slice(1).map(([f, n]) => `${FAM_PL[f]} ${n}`);
   const dek = `Of the ${q} ${top[1]}, ${FAM_PL[lt[0][0]]} ${verbOf(lt[0][0])} ${lt[0][1]}${rest.length ? `, ${listAnd(rest)}` : ""}. Overall, ${share}. ${note}`;
@@ -12043,7 +12079,7 @@ function lensShort() {
     case "senpref": return `${famLeg(S.spFrom)} Senate: ${spA(true)} v ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -12342,7 +12378,7 @@ function applyOpt(k, v) {
   if (k === "vs") { S.vs = v; if (S.from === v) S.from = v === "onp" ? "lnp" : "onp"; }
   else if (k === "sppair") { S.spPair = v; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
   else if (k === "spfrom") S.spFrom = v;
-  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english";
+  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english"; else if (k === "occ") S.occ = v || "socprof";
   lensParamChanged();
 }
 function censusSelects(m, cls = "") {
@@ -12350,6 +12386,7 @@ function censusSelects(m, cls = "") {
     ...(m.relKeys && m.relKeys.length ? [[LENS_REL, "Religion"]] : []),
     ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
     ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
+    ...(m.occKeys && m.occKeys.length ? [[LENS_OCC, "Occupation"]] : []),
   ];
   const out = [lgMenu("index", [
     [null, "Advantage, ABS SEIFA"],
@@ -12385,6 +12422,8 @@ function censusSelects(m, cls = "") {
     if (S.index === LENS_REL && m.relKeys && m.relKeys.length) out.push(lgMenu("rel", m.relKeys.map((k) => [k, REL_NAME[k]]), S.rel, "Religion"));
     if (S.index === LENS_TEN && m.tenKeys && m.tenKeys.length) out.push(lgMenu("ten", m.tenKeys.map((k) => [k, TEN_NAME[k]]), S.ten, "Housing tenure"));
     if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) out.push(lgMenu("anc", m.ancKeys.map((k) => [k, ANC_NAME[k]]), S.anc, "Ancestry"));
+    // the Occupation classes picker (2021-census-era frames alone publish occKeys)
+    if (S.index === LENS_OCC && m.occKeys && m.occKeys.length) out.push(lgMenu("occ", m.occKeys.map((k) => [k, OCC_NAME[k]]), S.occ, "Occupation"));
   }
   return out;
 }
@@ -12536,6 +12575,7 @@ function legendHTML(m) {
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
           : isTen() ? `Share of dwellings that ${TENESMS[S.ten]}`
           : isAnc() ? `Share of residents who ${ANCISMS[S.anc]} (people could name up to two ancestries, so the options don't add up to a whole)`
+          : isOcc() ? `Share of workers who ${OCCISMS[S.occ]} (the seven classes aren't exhaustive — technicians, service, clerical and sales workers sit in no class — so the options don't add up to a whole)`
           : S.index === "pt" ? ptNote
           : NOTE_ARC[S.index] || `Share of ${censusWho(m).phrase}`;
         const basisTail = m.demoInterp ? `interpolated between the ${m.demoInterp.c0} and ${m.demoInterp.c1} censuses to election day${m.demoBasis === "venue" ? `, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in` : `, where each ${boothsOn ? "place’s" : "seat’s"} voters live`}.` : m.demoBasis === "venue" ? `${m.year < 2004 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
@@ -13153,6 +13193,7 @@ async function setYear(y) {
   if (!(b.relKeys || []).includes(S.rel)) S.rel = (b.relKeys || [])[0] || "norel";
   if (!(b.tenKeys || []).includes(S.ten)) S.ten = (b.tenKeys || [])[0] || "mort";
   if (!(b.ancKeys || []).includes(S.anc)) S.anc = (b.ancKeys || [])[0] || "english";
+  if (!(b.occKeys || []).includes(S.occ)) S.occ = (b.occKeys || [])[0] || "socprof";
   // a People lane the frame's era never printed (menu omits it) drops
   // the selection to the always-printed language share
   if (b.hasLane && (DM.includes(S.index) || S.index === LENS_EDU) && b.hasLane[S.index] === false) S.index = "lang";
@@ -13164,6 +13205,7 @@ async function setYear(y) {
   if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
   if (!b.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   if (!b.ancKeys && S.index === LENS_ANC) S.index = "irsad";
+  if (!b.occKeys && S.index === LENS_OCC) S.index = "irsad";
   proj = b.proj; // the year now shown (a year loaded ahead keeps the live projection)
   // carry the selection across by seat name and polling-place ID
   const s = S.sel;
@@ -13456,7 +13498,7 @@ function writeURL() {
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
   if (S.lens === "senpref") { p.set("sp", S.spPair); p.set("p", S.spFrom); }
-  if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); }
+  if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); if (isOcc()) p.set("oc", S.occ); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.draw !== "seats") p.set("draw", S.draw);
   // the chart's own switches ride along: the seat-type split and the vote-type comparison
@@ -13505,7 +13547,7 @@ function readURL() {
   if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hiq"; }
   else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i; }
   else if (i === "uni" || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y12less" : "uni"; }
-  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_REL || i === LENS_TEN || i === LENS_ANC)) S.index = i;
+  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
   const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
   const ev = p.get("ev"); S.eduMode = ev === "y12less" ? "y12less" : (i === "y12less" ? "y12less" : "uni");
@@ -13513,6 +13555,7 @@ function readURL() {
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
   S.anc = ANC_NAME[p.get("an")] ? p.get("an") : "english";
+  S.occ = OCC_NAME[p.get("oc")] ? p.get("oc") : "socprof";
   if (p.get("im") === "exhaust") S.infMode = "exhaust";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
@@ -13872,6 +13915,8 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   if (bmc && !(bmc.tenKeys || []).includes(S.ten)) S.ten = (bmc.tenKeys || [])[0] || "mort";
   if (bmc && !(bmc.ancKeys || []).includes(S.anc)) S.anc = (bmc.ancKeys || [])[0] || "english";
   if (bmc && !bmc.ancKeys && S.index === LENS_ANC) S.index = "irsad";
+  if (bmc && !(bmc.occKeys || []).includes(S.occ)) S.occ = (bmc.occKeys || [])[0] || "socprof";
+  if (bmc && !bmc.occKeys && S.index === LENS_OCC) S.index = "irsad";
   if (bmc && !bmc.relKeys && S.index === LENS_REL) S.index = "irsad";
   if (bmc && !bmc.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   // yesterday's hash on a statistics-era frame: the schooling read falls

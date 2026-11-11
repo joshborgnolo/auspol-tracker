@@ -172,7 +172,7 @@ function buildRamps() {
       y12less: seq(115, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       unemp: seq(8, 0.13),
-      rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10) },
+      rel: seq(88, 0.12), ten: seq(258, 0.12), anc: seq(228, 0.10), occ: seq(210, 0.11) },
   };
 }
 
@@ -277,7 +277,24 @@ const LENS_ANC = "anc";
 const ANC_NAME = { english: "English", australian: "Australian", irish: "Irish", scottish: "Scottish", chinese: "Chinese", italian: "Italian", german: "German", indian: "Indian", filipino: "Filipino", dutch: "Dutch", vietnamese: "Vietnamese", lebanese: "Lebanese" };
 const ANCISMS = { english: "named English ancestry", australian: "named Australian ancestry", irish: "named Irish ancestry", scottish: "named Scottish ancestry", chinese: "named Chinese ancestry", italian: "named Italian ancestry", german: "named German ancestry", indian: "named Indian ancestry", filipino: "named Filipino ancestry", dutch: "named Dutch ancestry", vietnamese: "named Vietnamese ancestry", lebanese: "named Lebanese ancestry" };
 const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scottish: [0, 22], chinese: [0, 35], italian: [0, 25], german: [0, 18], indian: [0, 30], filipino: [0, 18], dutch: [0, 6], vietnamese: [0, 22], lebanese: [0, 35] };
-const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_EDU || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC;
+// the Occupation select lens (the 2026-11-11 Oesch-class arc): S.index ===
+// LENS_OCC and S.occ the picked class. Seven politically-charged classes
+// keyed from ANZSCO sub-major (2-digit) groups — the GCP packs top out at
+// 1-digit, so the lane rides the manual 2021 TableBuilder export folded by
+// .build/map/occ_lanes.py; only 2021-census-era frames publish occKeys.
+// The classes are deliberately NOT a partition: the remaining 19
+// sub-majors (technicians, community/personal services, clerical, sales)
+// carry no class, so the options never sum to 100
+const LENS_OCC = "occ";
+const OCC_NAME = { socprof: "Sociocultural professionals", biztech: "Business & technical professionals and managers", farmer: "Farmers", farmwrk: "Farm workers", hospmgr: "Hospitality, retail & service managers", trades: "Tradespeople", routine: "Routine manual workers" };
+const OCCISMS = { socprof: "work in education, health, welfare, the arts or media", biztech: "are business or technical professionals or corporate managers", farmer: "are farmers or farm managers", farmwrk: "do farm, forestry or garden work", hospmgr: "manage hospitality, retail or service businesses", trades: "work as tradespeople", routine: "do routine manual work" };
+// PROVISIONAL PLACEHOLDER caps: the store-landing pass (occ_lanes OCC_RANGE
+// job) measures each class's division maximum across the occ frames and
+// writes the real caps, per the ANC_RANGE way; Phase A is era-null, so
+// nothing reads these until then (the map suite fails a placeholder that
+// survives landing)
+const OCC_RANGE = { socprof: [0, 40], biztech: [0, 40], farmer: [0, 20], farmwrk: [0, 12], hospmgr: [0, 20], trades: [0, 30], routine: [0, 40] };
+const isDemo = () => DM.includes(S.index) || S.index === LENS_INC || S.index === LENS_AGE || S.index === LENS_EDU || S.index === LENS_REL || S.index === LENS_TEN || S.index === LENS_ANC || S.index === LENS_OCC;
 // the Household-income lane: S.index === "inc" and S.incMode the picked
 // measure — the median weekly household income spectrum lands by default;
 // the bottom-quartile and top-quartile shares ride the same legend picker
@@ -350,7 +367,7 @@ const EDU_NAME = { uni: "University educated", y12less: "Year 12 or less" };
 const EDU_SHORT = { uni: "University", y12less: "No Year 12" };
 const EDU_NOTE = { uni: "Share of people aged 15+ who hold a university qualification", y12less: "Share of people aged 15+ who left schooling before Year 12" };
 const isEdu = () => S.index === LENS_EDU;
-const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : DM_VERB[k]);
+const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : DM_VERB[k]);
 // whose share a census measure is, and what it says of them: the bases the builders divide by
 // (build_areas_sa1.py's SHARES and the state demo builders), so copy never sets a measure over
 // the wrong people. Most measures are shares of residents; schooling and degrees are of people
@@ -365,7 +382,7 @@ function censusWho(m, k = S.index) {
   else if (k === LENS_INC) {
     const hh = m && m.incomeCuts && m.incomeCuts.basis === "households", frag = S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m);
     pop = hh ? "households" : "adults"; pred = hh ? `earn ${frag}${incEpoch(m)}` : INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "";
-  } else {
+  } else if (k === LENS_OCC) { pop = "workers"; pred = OCCISMS[S.occ]; } else {
     const key = k === LENS_EDU ? S.eduMode : k;
     pop = DM_POP[key] || "residents";
     pred = DM_PRED[key] || dmVerb(m, k);
@@ -405,6 +422,7 @@ const isCob = () => S.index === "fborn" && S.cob != null;
 const isRel = () => S.index === LENS_REL && S.rel != null;
 const isTen = () => S.index === LENS_TEN && S.ten != null;
 const isAnc = () => S.index === LENS_ANC && S.anc != null;
+const isOcc = () => S.index === LENS_OCC && S.occ != null;
 // the active people-lane figure of a division: a share as a fraction
 // (cob-aware, religion/tenure select-aware), or the income view's datum —
 // the median lane reads DOLLARS (medIncWeekly), the shares the band keys
@@ -414,6 +432,7 @@ const demoShare = (d) => {
   if (isRel()) return d.demo && d.demo.rel ? d.demo.rel[S.rel] : null;
   if (isTen()) return d.demo && d.demo.ten ? d.demo.ten[S.ten] : null;
   if (isAnc()) return d.demo && d.demo.anc ? d.demo.anc[S.anc] : null;
+  if (isOcc()) return d.demo && d.demo.occ ? d.demo.occ[S.occ] : null;
   if (isInc()) return d.demo ? d.demo[INC_KEY[S.incMode]] : null;
   // age: median is years (ageMed); the five share views ride their keys
   if (isAge()) return d.demo ? d.demo[AGE_KEY[S.ageMode]] : null;
@@ -427,6 +446,7 @@ const demoAreaShare = (demo) => {
   if (isRel()) return demo && demo.rel ? demo.rel[S.rel] : null;
   if (isTen()) return demo && demo.ten ? demo.ten[S.ten] : null;
   if (isAnc()) return demo && demo.anc ? demo.anc[S.anc] : null;
+  if (isOcc()) return demo && demo.occ ? demo.occ[S.occ] : null;
   if (isInc()) return demo ? demo[INC_KEY[S.incMode]] : null;
   if (isAge()) return demo ? demo[AGE_KEY[S.ageMode]] : null;
   if (isEdu()) return demo ? demo[S.eduMode] : null;
@@ -439,6 +459,7 @@ const demoBoothShare = (raw, j, pos) => {
   if (isRel()) { const r = raw.rel && raw.rel[j]; return r ? r[pos[S.rel]] : null; }
   if (isTen()) { const r = raw.ten && raw.ten[j]; return r ? r[pos[S.ten]] : null; }
   if (isAnc()) { const r = raw.anc && raw.anc[j]; return r ? r[pos[S.anc]] : null; }
+  if (isOcc()) { const r = raw.occ && raw.occ[j]; return r ? r[pos[S.occ]] : null; }
   // income: the share views ride the demo tuple's cells 6/16; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
   if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[{ lo: 6, hiq: 16 }[S.incMode]] : null; }
@@ -483,17 +504,18 @@ const incMedRange = (m) => {
   if (m) m._incMedRange = r;
   return r;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : S.index];
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc)
-const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : (m.cobPos || {}));
+const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) : (m.cobPos || {}));
 const relFor = (m) => (m.relKeys || []).map((k) => [k, REL_NAME[k]]);
 const tenFor = (m) => (m.tenKeys || []).map((k) => [k, TEN_NAME[k]]);
 const ancFor = (m) => (m.ancKeys || []).map((k) => [k, ANC_NAME[k]]);
+const occFor = (m) => (m.occKeys || []).map((k) => [k, OCC_NAME[k]]);
 // a select lane's sub-select label: the ideology/noun phrase the
 // legend and menu land on
-const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : ANC_NAME[k]);
+const selName = (m, k) => (isRel() ? REL_NAME[k] : isTen() ? TEN_NAME[k] : isOcc() ? OCC_NAME[k] : ANC_NAME[k]);
 // the People lanes' floor: 1993/1996/1998 are the statistics-era
 // interp blend entrance (1991↔1996 and 1996↔2001 day-share blends,
 // derive-booth-demo-90s.py's stores at the venue-nearest
@@ -1030,6 +1052,11 @@ function demoOf(m, idx) {
       demo.anc = {};
       for (const k of m.ancKeys) { const xs = ds.filter((x) => x.anc && x.anc[k] != null); demo.anc[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.anc[k]))) / sum(xs.map((x) => x.p)) : null; }
     }
+    // the Occupation classes pool, same vote-weighted way (2021-era frames)
+    if (m.occKeys && m.occKeys.length) {
+      demo.occ = {};
+      for (const k of m.occKeys) { const xs = ds.filter((x) => x.occ && x.occ[k] != null); demo.occ[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.occ[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
   }
   return demo;
 }
@@ -1425,6 +1452,11 @@ async function loadYear(year, bg) {
     // the Ancestry menu + per-option positional map (2026-10-31 lanes arc)
     m.ancKeys = res.ancKeys || null;
     m.ancPos = m.ancKeys ? Object.fromEntries(m.ancKeys.map((k, i) => [k, i])) : null;
+    // the Occupation-classes menu (2026-11-11 Oesch-class arc; published by
+    // the 2021-census-era frames alone — a frame without occKeys never
+    // gets the menu entry, and every consumer clamps on the key list)
+    m.occKeys = res.occKeys || null;
+    m.occPos = m.occKeys ? Object.fromEntries(m.occKeys.map((k, i) => [k, i])) : null;
     // lane-presence gates: a People lane that carries no figures anywhere
     // this year stays out of its menus and copy (the homeless lane's
     // census floor is the 2011 edition onward — the 2013 election on /

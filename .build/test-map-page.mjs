@@ -1135,6 +1135,28 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('isRel() ? REL_NAME[S.rel] : isTen()'), "the Religion head is the option itself (no 'Religion:' prefix, 2026-10-31 user call)");
   assert.ok(!ui.includes('`Religion: ${REL_NAME[S.rel]}`'), "the prefixed Religion head is gone");
   assert.ok(ui.includes('isAnc() ? `${ANC_NAME[S.anc]} ancestry`'), "the Ancestry head names the picked ancestry (German ancestry), the tenure pattern");
+  // the Occupation classes lens (the 2026-11-11 Oesch-class arc): seven
+  // classes from ANZSCO sub-major groups on one select-lens row, and only
+  // 2021-census-era frames publish it (Phase A ships it era-null)
+  assert.ok(base.includes('const LENS_OCC = "occ"'), "the Occupation lens id");
+  assert.ok(base.includes('const OCC_NAME = { socprof: "Sociocultural professionals"'), "the classes lead with sociocultural professionals");
+  assert.ok(base.includes('trades: "Tradespeople"') && base.includes('routine: "Routine manual workers"'), "the manual halves of the Oesch split");
+  assert.ok(base.includes('const OCCISMS = {') && base.includes('farmwrk: "do farm, forestry or garden work"'), "the per-class story verbs (farm labourers kept apart from routine manual)");
+  assert.ok(base.includes('const OCC_RANGE = {') && base.includes('farmer: [0, 20]'), "provisional range caps until the stores land (Phase B replaces them)");
+  assert.ok(base.includes('const isOcc = () => S.index === LENS_OCC && S.occ != null;'), "the select-view guard");
+  assert.ok(base.includes("m.occKeys = res.occKeys || null;") && base.includes("m.occPos"), "loadYear records the occ key order and its positional spots");
+  assert.ok(base.includes("demo.occ = {};"), "the Occupation pools sum shares of workers the ancestry way");
+  assert.ok(/if \(isOcc\(\)\) return d\.demo && d\.demo\.occ \? d\.demo\.occ\[S\.occ\] : null;/.test(base) && /if \(isOcc\(\)\) \{ const r = raw\.occ && raw\.occ\[j\]/.test(base), "the demo reads ride occ at the division and booth seams");
+  assert.ok(base.includes('const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) :'), "the booth seams pick the occ key order too");
+  assert.ok(base.includes('occ: seq(210, 0.11)'), "the lens's own ramp hue beside the four select lenses");
+  assert.ok(ui.includes('lgMenu("occ"'), "the legend's Occupation picker");
+  assert.ok(ui.includes('[[LENS_OCC, "Occupation"]]'), "the People optgroup lists the lens only when occKeys printed");
+  assert.ok(ui.includes('if (isOcc()) p.set("oc", S.occ);') && ui.includes('S.occ = OCC_NAME[p.get("oc")] ? p.get("oc") : "socprof";'), "the hash carries and restores the picked class");
+  assert.ok(ui.includes('isOcc() ? `Occupation: ${OCC_NAME[S.occ]}`'), "the head names the picked class with its lens prefix");
+  assert.ok(ui.includes('k === "occ"'), "the picker's change handler is wired");
+  assert.ok(/if \(!b\.occKeys && S\.index === LENS_OCC\) S\.index = "irsad";/.test(ui) && /if \(!\(b\.occKeys \|\| \[\]\)\.includes\(S\.occ\)\) S\.occ =/.test(ui), "year swaps clamp the lens and the picked class");
+  assert.ok(story.includes("const OCC_TOP = {") && story.includes('farmer: ["seats where the most workers are farmers or farm managers"'), "area stories phrase the classes against their worker base");
+  assert.ok(!("occKeys" in JSON.parse(R("map/data/res-2016.json"))), "2016-census frames stay era-null");
   // the data files' structure at every fed stop: relKeys (norel first),
   // tenKeys (mort first), 12-wide demo rows, division rel/ten dicts
   for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
