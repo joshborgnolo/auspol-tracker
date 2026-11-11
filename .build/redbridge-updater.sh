@@ -18,6 +18,19 @@ mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
 . "$REPO/.build/git-push-main.sh"
 
+# The ubuntu-24.04 CI image dropped poppler-utils (20261101 image build) and
+# this caller declares no apt_packages, so a new Accent PDF died on
+# "spawnSync /usr/bin/pdftotext ENOENT" (2026-11-11). Self-provision when
+# missing; Linux CI only — the laptop keeps its Homebrew install, which the
+# extractor's own path list already covers.
+if [ "$(uname)" = Linux ] && [ "${GITHUB_ACTIONS:-}" = true ] && ! command -v pdftotext >/dev/null 2>&1; then
+  if sudo -n apt-get update -qq && sudo -n apt-get install -y -qq poppler-utils >/dev/null 2>&1; then
+    log "poppler-utils installed (CI image ships no pdftotext)"
+  else
+    log "WARN poppler-utils install failed; the extract would die on pdftotext"
+  fi
+fi
+
 # One repo-wide lock across all writing wrappers; freshness_sync (shared,
 # with wedge recovery) replaces the inline ff-only block below.
 acquire_slot_lock
