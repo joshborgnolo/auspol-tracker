@@ -3,21 +3,21 @@
  "_provenance": {
   "generated": "2026-11-11",
   "inputs": {
-   "data/polls.json": "09e750d0575f58b3",
-   "data/demographics.json": "a7b63e90e0fb6d2e",
+   "data/polls.json": "5212853b961c34dc",
+   "data/demographics.json": "734a95a50814ad15",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0",
    "data/aes-2025-groups.json": "00823a6ddedb8345"
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
-   "captured": "primaryNow: alp 26.3 lnp 22.7 grn 13.5 onp 26.3 oth 11 | n=9"
+   "captured": "primaryNow: alp 26.3 lnp 22.8 grn 13.5 onp 26.3 oth 11 | n=9"
   }
  },
  "national": {
   "nowcast": {
    "alp": 26.3,
-   "lnp": 22.7,
+   "lnp": 22.8,
    "grn": 13.5,
    "on": 26.3,
    "oth": 11
@@ -32,7 +32,7 @@
   },
   "delta": {
    "alp": -8.26,
-   "lnp": -9.12,
+   "lnp": -9.02,
    "on": 19.9,
    "grn": 1.3,
    "oth": -4.01
@@ -731,6 +731,7 @@
     "DemosAU 2026-10-26",
     "Essential 2026-10-27",
     "YouGov 2026-11-03",
+    "RedBridge/Accent 2026-11-06",
     "Resolve 2026-11-08",
     "Roy Morgan 2026-11-08"
    ]
