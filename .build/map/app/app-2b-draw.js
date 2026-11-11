@@ -263,7 +263,7 @@ const bandMid = (S0, k) => { const e = S0.edges, n = e.length; return k === 0 ? 
 const LEAD_STEPS = [5, 10, 20, 30, 40, 60];
 const LEAD_RAMP_AT = [0.2, 0.31, 0.42, 0.52, 0.61, 0.7, 0.8];
 const rgba32 = (c) => ((255 << 24) | (Math.round(c[2]) << 16) | (Math.round(c[1]) << 8) | Math.round(c[0])) >>> 0;
-const readingKey = (m) => [m.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.mar, axisNow(m), m.ppl ? 1 : 0, TH.dark].join("|");
+const readingKey = (m) => [m.year, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.famMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.ind, axisNow(m), m.ppl ? 1 : 0, TH.dark].join("|");
 // the votes a place counts for in a blend: a group's own where the reading is that group's
 function surfaceWeight(m, j) {
   const b = m.booth;
@@ -795,10 +795,10 @@ function areasLane() {
   if (isTen()) return `ten.${S.ten}`;
   if (isAnc()) return `anc.${S.anc}`;
   if (isOcc()) return `occ.${S.occ}`;
-  if (isMar()) return `mar.${S.mar}`;
   if (isInc()) return S.incMode === "med" ? "incMed" : S.incMode === "lo" ? "loinc" : "hiqinc";
   if (isAge()) return S.ageMode === "med" ? "ageMed" : S.ageMode;
   if (isEdu()) return S.eduMode;
+  if (isFam()) return S.famMode;
   return S.index;
 }
 // the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
@@ -807,7 +807,7 @@ const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12", "y10less", "
   "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
   "anc.english", "anc.australian", "anc.irish", "anc.scottish", "anc.chinese", "anc.italian", "anc.german", "anc.indian", "anc.filipino", "anc.dutch", "anc.vietnamese", "anc.lebanese",
-  "mar.marr", "mar.never", "mar.sep", "mar.div", "mar.wid",
+  "ind.ag", "ind.mining", "ind.manuf", "ind.utils", "ind.constr", "ind.whole", "ind.retail", "ind.accom", "ind.transport", "ind.media", "ind.rental", "ind.fin", "ind.prof", "ind.admin", "ind.pubadm", "ind.educ", "ind.health", "ind.arts", "ind.othersvc",
   "ageMed", "incMed",
   "sf.irsad", "sf.irsd", "sf.ier", "sf.ieo"]);
 // gcp_newlanes.INC_BANDS, verbatim: the weekly income bands the masses follow
@@ -1466,9 +1466,7 @@ function balloonWord(m) {
 function balloonKey(m, est) {
   const s = balScale(), nice = [50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
   const big = nice.filter((v) => Math.sqrt(v) * s <= 9.5).pop() || 50, list = [big, nice[Math.max(0, nice.indexOf(big) - 2)], nice[Math.max(0, nice.indexOf(big) - 4)]].filter((v, k, a) => a.indexOf(v) === k);
-  // (the box keeps the tallest circle's height, 9.5 px across zooms: a box sized to the
-  //  zoom's own biggest circle grew the strip a pixel at a time, nudging the stage)
-  const H = Math.ceil(2 * 9.5 + 2);
+  const R = Math.sqrt(big) * s, H = Math.ceil(2 * R + 2);
   let x = 0, circles = "", labels = "";
   for (const v of list) { const r = Math.max(0.8, Math.sqrt(v) * s); circles += `<circle cx="${(x + r + 1).toFixed(1)}" cy="${(H - 1 - r).toFixed(1)}" r="${r.toFixed(1)}"/>`; x += 2 * r + 2; labels += `${labels ? ", " : ""}${int(v)}`; }
   return `<div class="lg-bal"><svg width="${Math.ceil(x + 2)}" height="${H}" viewBox="0 0 ${Math.ceil(x + 2)} ${H}" aria-hidden="true">${circles}</svg><span>${est && (S.lens === "winner" || S.lens === "tpp") ? "Estimated lead, votes" : balloonWord(m)}: ${labels}</span></div>`;
@@ -1484,8 +1482,8 @@ function drawOpts(m) {
 }
 function drawRowHTML(m) {
   const on = S.draw === "chart" ? "chart" : drawOf(m);
-  // (the City-names switch closes the row, at its far end)
-  return `<div class="lg-draw lg-row" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}<span class="lg-jgap"></span>${townsToggleHTML(!S.townsOff)}</div>`;
+  // (the Water and City-names switches close the row, at its far end)
+  return `<div class="lg-draw lg-row" role="group" aria-label="Draw the map as"><span>Draw</span>${drawOpts(m).map(({ k, t, why }) => `<button type="button" data-draw="${k}" aria-pressed="${on === k && !why}"${why ? ` disabled title="${why}"` : ""}><span class="tw" data-t="${t}">${t}</span></button>`).join("")}<span class="lg-jgap"></span>${waterToggleHTML(!S.waterOff)}${townsToggleHTML(!S.townsOff)}</div>`;
 }
 /* ----- what the balloons leave out -----
    Postal, absent and declaration votes are counted by seat, not at a place, so neither

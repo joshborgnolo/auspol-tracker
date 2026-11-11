@@ -180,7 +180,7 @@ def demo_main(frame, year):
     nlt = gcp_newlanes.load(V["gcp"], prefix="3", era=str(year))
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="3", era=str(year))
     lab = gcp_newlanes.load_lab(V["gcp"], prefix="3", era=str(year))
-    mar = gcp_newlanes.load_mar(V["gcp"], prefix="3", era=str(year))
+    ind = gcp_newlanes.load_ind(V["gcp"], prefix="3", era=str(year))
     inc, _inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "3")
     HL = gcp_newlanes.hl_alloc_of(
         2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(
@@ -216,10 +216,10 @@ def demo_main(frame, year):
                                   "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
-                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
                                   "ancP": 0, "ancNS": 0,
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "ueN": 0.0, "lfD": 0.0,
+                                  "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -276,8 +276,9 @@ def demo_main(frame, year):
         labU, labLF = lab[code]
         a["ueN"] += labU
         a["lfD"] += labLF
-        for i in range(len(gcp_newlanes.MAR_KEYS)):
-            a["marN"][i] += mar[code][i]
+        iv, _ivns, _ivt = ind[code]
+        for i in range(len(gcp_newlanes.IND_KEYS)):
+            a["indN"][i] += iv[i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -292,9 +293,9 @@ def demo_main(frame, year):
                       ("eng+oth", a["eng"] + a["oth"])):
             if v <= 0:
                 return None, nm
+        indden = sum(a["indN"])
         tn = a["tenN"]
         tend = tn[0] + tn[1] + tn[2] + tn[4]
-        mard = sum(a["marN"])
         s = {
             "lang": round(a["oth"] / (a["eng"] + a["oth"]), 4),
             "a65": round((a["bands"][8] + a["bands"][9] + a["bands"][10]) / bsum, 4),
@@ -324,12 +325,14 @@ def demo_main(frame, year):
                        if a["cebt"] - a["cebns"] > 0 else None),
             "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
             "unemp": round(a["ueN"] / a["lfD"], 4) if a["lfD"] else None,
+            # the industry picker (2026-11-11): ANZSIC-2006 division
+            # shares over the divisions' own summed counts
+            "ind": ({k: round(a["indN"][i] / indden, 4)
+                     for i, k in enumerate(gcp_newlanes.IND_KEYS)}
+                    if indden else None),
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
-            "mar": {k: (round(a["marN"][i] / mard, 4)
-                        if mard > 0 else None)
-                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
         }
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -359,18 +362,19 @@ def demo_main(frame, year):
               "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
               "ceb3": 0, "cebns": 0, "cebt": 0,
               "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
-              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
               "ancP": 0, "ancNS": 0,
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "ueN": 0.0, "lfD": 0.0,
+              "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN", "marN", "incBandH"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH",
+                        "indN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -396,7 +400,8 @@ def demo_main(frame, year):
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
-        "marKeys": list(gcp_newlanes.MAR_KEYS),
+        # the Industry picker's nineteen ANZSIC-2006 divisions
+        "indKeys": list(gcp_newlanes.IND_KEYS),
         "demo": {nm: demo[nm] for nm in order},
         "state": {**st_shares, "persons": persons, "sa1": st_acc["n"],
                   "sentinelSa1": len(QLD_SENTINELS[year]), "sentinelPersons": sentinel_persons},
@@ -432,7 +437,10 @@ def demo_main(frame, year):
                   "order in tenKeys) over the ex-tenure-not-stated "
                   "occupied-private-dwellings basis; the family table's "
                   "one-parent share of families; the under-15 share of "
-                  "the stated ages). p is census persons; n the "
+                  "the stated ages), and the industry-by-age table's "
+                  "nineteen ANZSIC-2006 divisions (ind, key order in "
+                  "indKeys) each shared over the divisions' own summed "
+                  "counts. p is census persons; n the "
                   "SA1 count. The four QLD sentinel SA1s (migratory/offshore/"
                   "no-usual-address) carry no polygon and sit outside the join, "
                   f"holding {sentinel_persons} persons statewide."),

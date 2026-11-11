@@ -75,10 +75,9 @@ TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 # the Ancestry menu's twelve options (the extractor's ANC01_KEYS,
 # the site's cross-era order)
 ANC_KEYS_01 = xt.ANC01_KEYS
-# the Marital status menu's five registered categories (the B 04
-# extractor's mar01 vector order), of people 15+ with a stated status
-# — no not-stated column on this era's print either (2026-11-11)
-MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
+# the Industry picker's ANZSIC-1993 seventeen (the extractor's
+# IND01_KEYS — the shared gcp_newlanes.IND_KEYS93 order)
+IND_KEYS_01 = xt.IND01_KEYS
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2003ed.json"
@@ -103,7 +102,7 @@ def load_tally():
     need_new = {"rel01", "rel01ns", "rel01tot",
                 "sch01", "fam01", "ten01", "ind01", "b1ov",
                 "cit01", "tw01", "anc01", "ancp01", "ancns01",
-                "mar01", "lab01"}
+                "lab01", "inds01", "inds01ns", "inds01tot"}
     for code, r in d.items():
         if any(k not in r for k in need):
             fail(f"2001 tally {code} row shape drift")
@@ -113,10 +112,12 @@ def load_tally():
             fail(f"2001 tally {code} new-lane fields drift")
         if len(r["rel01"]) != len(REL_KEYS_01) \
                 or len(r["fam01"]) != 5 or len(r["ten01"]) != 6 \
-                or len(r["sch01"]) != 6 or len(r["mar01"]) != 5:
+                or len(r["sch01"]) != 6:
             fail(f"2001 tally {code} new-lane widths drift")
         if len(r["tw01"]) != 3 or len(r["anc01"]) != len(ANC_KEYS_01):
             fail(f"2001 tally {code} 2026-10 lane widths drift")
+        if len(r["inds01"]) != len(IND_KEYS_01):
+            fail(f"2001 tally {code} industry width drift")
         if r.get("cobn") is None and not r.get("shortCd"):
             fail(f"2001 tally {code}: cobn missing off a full profile")
         if r.get("cobn") is not None and len(r["cobn"]) != len(COB_KEYS01):
@@ -182,8 +183,8 @@ def main():
                                   "tw01": [0] * 3,
                                   "anc01": [0] * len(ANC_KEYS_01),
                                   "ancP01": 0, "ancNS01": 0,
-                                  "mar01": [0] * 5,
-                                  "lab01": [0] * 2})
+                                  "lab01": [0] * 2,
+                                  "inds01": [0] * len(IND_KEYS_01)})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -226,10 +227,10 @@ def main():
             acc["anc01"][i] += r["anc01"][i]
         acc["ancP01"] += r["ancp01"]
         acc["ancNS01"] += r["ancns01"]
-        for i in range(5):
-            acc["mar01"][i] += r["mar01"][i]
         acc["lab01"][0] += r["lab01"][0]
         acc["lab01"][1] += r["lab01"][1]
+        for i in range(len(IND_KEYS_01)):
+            acc["inds01"][i] += r["inds01"][i]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     def shares(rec):
@@ -318,14 +319,14 @@ def main():
         # excludes the not-stated
         if rec.get("lab01") is not None and rec["lab01"][1] > 0:
             s["unemp"] = round(rec["lab01"][0] / rec["lab01"][1], 4)
-        # the Marital status menu (2026-11-11): the registered-status
-        # five, of people 15+ with a stated status (their own sum the
-        # basis)
-        if rec.get("mar01") is not None:
-            mard = sum(rec["mar01"])
-            if mard > 0:
-                s["mar"] = {k: round(rec["mar01"][i] / mard, 4)
-                            for i, k in enumerate(MAR_KEYS)}
+        # the industry picker (2026-11-11): each ANZSIC-1993 division
+        # of the divisions' own (stated-industry) sum — B 26B's printed
+        # Persons totals; Non-classifiable and Not stated sit out
+        if rec.get("inds01") is not None:
+            indd = sum(rec["inds01"])
+            if indd > 0:
+                s["ind"] = {k: round(rec["inds01"][i] / indd, 4)
+                            for i, k in enumerate(IND_KEYS_01)}
         return s
 
     nat = defaultdict(int)
@@ -352,12 +353,12 @@ def main():
             nat["anc01"][i] += dv["anc01"][i]
         nat["ancP01"] = nat.get("ancP01", 0) + dv["ancP01"]
         nat["ancNS01"] = nat.get("ancNS01", 0) + dv["ancNS01"]
-        nat.setdefault("mar01", [0] * 5)
-        for i in range(5):
-            nat["mar01"][i] += dv["mar01"][i]
         nat.setdefault("lab01", [0] * 2)
         nat["lab01"][0] += dv["lab01"][0]
         nat["lab01"][1] += dv["lab01"][1]
+        nat.setdefault("inds01", [0] * len(IND_KEYS_01))
+        for i in range(len(IND_KEYS_01)):
+            nat["inds01"][i] += dv["inds01"][i]
         for k in ("relNS", "relTot", "indig", "indigDen",
                   "famN", "famD"):
             nat[k] += dv[k]
@@ -411,8 +412,9 @@ def main():
                 for i, k in enumerate(ANC_KEYS_01)},
         "unemp": (round(nat["lab01"][0] / nat["lab01"][1], 4)
                   if nat["lab01"][1] else None),
-        "mar": {k: round(nat["mar01"][i] / sum(nat["mar01"]), 4)
-                for i, k in enumerate(MAR_KEYS)},
+        "ind": ({k: round(nat["inds01"][i] / sum(nat["inds01"]), 4)
+                 for i, k in enumerate(IND_KEYS_01)}
+                if sum(nat["inds01"]) else None),
     }
     # measured-once pin (first verified run): the tally's own total
     # (18,652,828) less the 8,249 people in the dropped offshore class
@@ -446,7 +448,7 @@ def main():
                            "loinc": None, "hiinc": None, "hiqinc": None,
                            "incMed": None,
                            "pt": None, "noncit": None, "anc": None,
-                           "unemp": None}
+                           "unemp": None, "ind": None}
         else:
             inc = inc_map.get(str(key))
             rec["demo"] = shares({
@@ -473,8 +475,8 @@ def main():
                 "anc01": r.get("anc01"),
                 "ancP01": r.get("ancp01"),
                 "ancNS01": r.get("ancns01"),
-                "mar01": r.get("mar01"),
-                "lab01": r.get("lab01")})
+                "lab01": r.get("lab01"),
+                "inds01": r.get("inds01")})
             if rec["demo"] is None:
                 geo_empty += 1
         out_booths.append(rec)
@@ -570,7 +572,11 @@ def main():
         "own wording reads the store's incomeCuts.hiEdgeWeekly), "
         "incMed the band-interpolated median weekly household income "
         "in 2001 dollars on the HOUSEHOLD basis (ABS's own "
-        "published-median basis).")
+        "published-median basis). The industry picker (ind, indKeys "
+        "order) reads B 26B's ANZSIC-1993 industry totals as shares "
+        "of the divisions' stated sum — Non-classifiable and Not "
+        "stated sit out of the lane's basis like every lane's "
+        "unstated rows.")
     out = {
         "_about": about,
         "_provenance": {
@@ -603,7 +609,9 @@ def main():
         "relKeys": list(REL_KEYS_01),
         "tenKeys": list(TEN_KEYS),
         "ancKeys": list(ANC_KEYS_01),
-        "marKeys": list(MAR_KEYS),
+        # the Industry picker's ANZSIC-1993 seventeen (the census's own
+        # print edition; the shared IND_KEYS93 order)
+        "indKeys": list(IND_KEYS_01),
         "deliveryBasis": (
             "venue-CD lookup per booth (the venue seifa store's own "
             "2001-CD geo of the premises); exact CD sum per division "

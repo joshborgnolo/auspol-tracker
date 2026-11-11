@@ -89,10 +89,18 @@ TEN_KEYS = ["mort", "rent", "own", "rentPub"]
 ANC_KEYS = ["english", "australian", "irish", "scottish", "chinese",
             "italian", "german", "indian", "filipino", "dutch",
             "vietnamese", "lebanese"]
-# the Marital status menu's registered-status five (2026-11-11; the
-# GCP-era stores carry marKeys in this order; older era stores that
-# never printed it read null whole-side by the fallback doctrine)
-MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
+# the Industry picker's union key order across the prints the lanes
+# straddle (2026-11-11): the ANZSIC-2006 nineteen (the GCP-era
+# editions' own order) with the two ANZSIC-1993-only divisions
+# (comms/propbiz) sitting beside their 2006 descendants. A key a
+# census side never prints blends to null like every one-sided lane
+# — comms/propbiz stay null on the 2006-and-later sides, the four
+# ANZSIC-2006-only keys (media/rental/prof/admin) null on the 1993
+# sides
+IND_ALL = ["ag", "mining", "manuf", "utils", "constr", "whole",
+           "retail", "accom", "transport", "media", "rental", "comms",
+           "fin", "prof", "admin", "propbiz", "pubadm", "educ",
+           "health", "arts", "othersvc"]
 # hl = share of residents estimated homeless by the ABS Census
 # "Estimating homelessness" product (derive-booth-homeless.py lands
 # it on each 2011+ census-side store — pre-2011 eras had no edition)
@@ -161,7 +169,7 @@ def blend_demo(c0blk, c1blk, f, nearest_blk, hi_mixed):
                    for b in AGE_BANDS}
                   if a0 is not None or a1 is not None else None)
     for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
-                        ("anc", ANC_KEYS), ("mar", MAR_KEYS)):
+                        ("anc", ANC_KEYS), ("ind", IND_ALL)):
         d0 = c0blk.get(which) if c0blk else None
         d1 = c1blk.get(which) if c1blk else None
         out[which] = ({k: lane_blend(None if d0 is None
@@ -289,7 +297,7 @@ def main():
                              lane_blend(mn.get("hiinc"),
                                         fn.get("hiinc"), f)))
         for which, keys in (("rel", REL_KEYS), ("ten", TEN_KEYS),
-                            ("anc", ANC_KEYS), ("mar", MAR_KEYS)):
+                            ("anc", ANC_KEYS), ("ind", IND_ALL)):
             d0, d1 = mn.get(which), fn.get(which)
             ni[which] = (
                 {k: lane_blend(None if d0 is None else d0.get(k),

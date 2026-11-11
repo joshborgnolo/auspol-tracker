@@ -241,8 +241,8 @@ def load_gcp16():
             fail(f"GCP G01c/Gmtw/Gceb/G08 SA1 set mismatch at {code}")
         if code not in nlt["lab"]:
             fail(f"GCP G43B SA1 set mismatch at {code}")
-        if code not in nlt["mar"]:
-            fail(f"GCP G05 SA1 set mismatch at {code}")
+        if code not in nlt["ind"]:
+            fail(f"GCP G51 SA1 set mismatch at {code}")
         bluen, occd = occ_of(g57[code])
         uni = g46[code][0] + g46[code][1] + g46[code][2]
         ir = inc[code]
@@ -270,7 +270,7 @@ def load_gcp16():
                      HL_ALLOC.get(code, {}).get("e", 0.0),
                      ir[5],                       # hiq mass (tail)
                      nlt["lab"][code],            # labour counts (tail)
-                     nlt["mar"][code])            # marital five (tail)
+                     nlt["ind"][code])            # industry triple (tail)
     print(f"GCP 2016: {len(out)} SA1s "
           f"(G01/G07/G09/G14/G46B/G57B + G28/G29/G33 income)")
     meta = {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
@@ -468,7 +468,7 @@ def gcp_to_rec(row):
             "ten6": list(row[21]),
             "famN": row[22][0], "famD": row[22][1],
             "labU": row[29][0], "labLF": row[29][1],
-            "marvec": row[30] if len(row) > 30 else None}
+            "indn": list(row[30][0])}
 
 
 def sc6of(y12t):
@@ -696,12 +696,12 @@ def main():
             "menu four shares (ten, key order in tenKeys, "
             "owned-with-mortgage leading) over the "
             "ex-tenure-not-stated occupied-private-dwellings basis; "
-            "G05's Marital status menu five shares (mar, key order "
-            "in marKeys, married leading) of people aged 15+ over "
-            "their own printed-category sum; "
             "G28's one-parent share of families; the under-15 share "
             "of the stated ages); blue-collar over the eight "
-            "stated ANZSCO groups. Income lanes are the voter store's "
+            "stated ANZSCO groups; G51's industry-of-employment "
+            "nineteen ANZSIC-2006 divisions (ind, key order in "
+            "indKeys) each shared over the divisions' stated sum. "
+            "Income lanes are the voter store's "
             "algorithm on the 2016 GCP's G28/G29 (16-band grid, "
             "FI/HI stems): household masses re-weighted to adults at "
             "data/income-dist.json's factors; loinc the adult share "
@@ -752,7 +752,9 @@ def main():
         "relKeys": list(voter.REL_KEYS),
         "tenKeys": list(voter.TEN_KEYS),
         "ancKeys": list(voter.ANC_KEYS),
-        "marKeys": list(voter.MAR_KEYS),
+        # the Industry picker's nineteen ANZSIC-2006 divisions — the
+        # voter store's own key list (2016 GCP G51's persons block)
+        "indKeys": list(voter.IND_KEYS),
         "deliveryBasis": (
             "venue-proxy per booth (2016-census SA1 of the premises, "
             "point-in-polygon); CG-plurality whole-allocated 2016 GCP "

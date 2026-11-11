@@ -197,7 +197,7 @@ def main():
     nlt = gcp_newlanes.load(BCP_ZIP, prefix="2", era="2011")
     arc = gcp_newlanes.load_arc31(BCP_ZIP, prefix="2", era="2011")
     lab = gcp_newlanes.load_lab(BCP_ZIP, prefix="2", era="2011")
-    mar = gcp_newlanes.load_mar(BCP_ZIP, prefix="2", era="2011")
+    ind = gcp_newlanes.load_ind(BCP_ZIP, prefix="2", era="2011")
     inc, _inc_cutrec = gcp_newlanes.state_income_bcp(BCP_ZIP, "2")
     HL = gcp_newlanes.hl_alloc_of(2011, "c7")
     sa1 = read_sa1_polygons(YEAR)
@@ -243,7 +243,7 @@ def main():
                                   "ancP": 0, "ancNS": 0,
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS14),
                                   "ueN": 0.0, "lfD": 0.0,
-                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
+                                  "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -300,9 +300,9 @@ def main():
         labU, labLF = lab[code]
         a["ueN"] += labU
         a["lfD"] += labLF
-        marvec = mar[code]
-        for i in range(len(gcp_newlanes.MAR_KEYS)):
-            a["marN"][i] += marvec[i]
+        iv, _ivns, _ivt = ind[code]
+        for i in range(len(gcp_newlanes.IND_KEYS)):
+            a["indN"][i] += iv[i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -312,12 +312,12 @@ def main():
         bsum = sum(a["bands"])
         fb_den = a["tot"] - a["cobns"]
         uni_den = a["pop15"] - a["eduns"]
-        mard = sum(a["marN"])
         for nm, v in (("bands", bsum), ("fb_den", fb_den),
                       ("uni_den", uni_den), ("occd", a["occd"]),
                       ("eng+oth", a["eng"] + a["oth"])):
             if v <= 0:
                 return None, nm
+        indden = sum(a["indN"])
         tn = a["tenN"]
         tend = tn[0] + tn[1] + tn[2] + tn[4]
         s = {
@@ -349,12 +349,14 @@ def main():
                        if a["cebt"] - a["cebns"] > 0 else None),
             "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
             "unemp": round(a["ueN"] / a["lfD"], 4) if a["lfD"] else None,
+            # the industry picker (2026-11-11): ANZSIC-2006 division
+            # shares over the divisions' own summed counts
+            "ind": ({k: round(a["indN"][i] / indden, 4)
+                     for i, k in enumerate(gcp_newlanes.IND_KEYS)}
+                    if indden else None),
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
-            "mar": {k: (round(a["marN"][i] / mard, 4)
-                        if mard > 0 else None)
-                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
         }
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -390,14 +392,15 @@ def main():
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS14),
               "ueN": 0.0, "lfD": 0.0,
-              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
+              "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN", "marN", "incBandH"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH",
+                        "indN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -418,7 +421,8 @@ def main():
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
-        "marKeys": list(gcp_newlanes.MAR_KEYS),
+        # the Industry picker's nineteen ANZSIC-2006 divisions
+        "indKeys": list(gcp_newlanes.IND_KEYS),
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],
                   "sentinelSa1": len(sent), "sentinelPersons": sentinel_persons},
@@ -448,7 +452,7 @@ def main():
                   "university (bachelor and above, B40B) over "
                   "the B01 aged-15+ population less level-of-education-not-stated; blue-"
                   "collar (trades, machinery operators and drivers, labourers, B45B) over the "
-                  "eight stated ANZSCO groups; the new lane set mirrors the federal 2011-era stores (year-12-or-less over B01's six printed stated schooling levels; B07 Tot-row Indigenous/ Indigenous-plus-non-Indigenous; B14's Religion menu ten shares (rel, key order in relKeys) over the ex-affiliation-not-stated persons basis; B32's Housing-tenure menu four shares (ten, key order in tenKeys) over the ex-tenure-not-stated occupied-private-dwellings basis; B25's one-parent share of families; the under-15 share of the stated ages). Income lanes are the 2011 edition's 14-band grid in 2011 dollars (its $4,000+ open top band is the same dollar edge the GCP grids pin), the state-universe quantile cuts Victoria's own. p is census persons; n the SA1 count. The "
+                  "eight stated ANZSCO groups; the new lane set mirrors the federal 2011-era stores (year-12-or-less over B01's six printed stated schooling levels; B07 Tot-row Indigenous/ Indigenous-plus-non-Indigenous; B14's Religion menu ten shares (rel, key order in relKeys) over the ex-affiliation-not-stated persons basis; B32's Housing-tenure menu four shares (ten, key order in tenKeys) over the ex-tenure-not-stated occupied-private-dwellings basis; B25's one-parent share of families; the under-15 share of the stated ages), and B43's industry-of-employment nineteen ANZSIC-2006 divisions (ind, key order in indKeys) each shared over the divisions' own summed counts. Income lanes are the 2011 edition's 14-band grid in 2011 dollars (its $4,000+ open top band is the same dollar edge the GCP grids pin), the state-universe quantile cuts Victoria's own. p is census persons; n the SA1 count. The "
                   "four Vic sentinel SA1s (migratory/offshore) carry no polygon and sit "
                   f"outside the join, holding {sentinel_persons} persons statewide."),
     }

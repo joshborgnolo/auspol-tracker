@@ -127,12 +127,14 @@ COB_MENU_FOR_CENSUS = {1991: COB91_MENU, 1996: COB96_MENU,
 REL_KEYS = ["norel", "cath", "angl", "unch", "pres", "orth", "budd",
             "isl", "hind", "jew"]
 TEN_KEYS = ["mort", "rent", "own", "rentPub"]
-# the Marital status menu's key order (2026-11-11): the five printed
-# categories of the era marital prints (1991's B06 and 1996's B04 —
-# both registered marital status — and the 2001 BCP's B 04), of people
-# aged 15+ with a stated status; no era print carries a not-stated
-# column, so the five categories' own sum is the stated basis
-MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
+# the industry picker's ANZSIC-1993 seventeen (mirrors
+# gcp_newlanes.IND_KEYS93; the '90s/2001 prints all use the 1993
+# edition divisions). The '91 AURIN workspace prints no industry
+# table, so the 1991-census side's lane is whole-null like labour's
+IND93_KEYS = ["ag", "mining", "manuf", "utils", "constr", "whole",
+              "retail", "accom", "transport", "comms", "fin",
+              "propbiz", "pubadm", "educ", "health", "arts",
+              "othersvc"]
 
 UNIT_COUNT = {1991: 31401, 1996: 34327, 2001: 35289}
 STATE_OF_ID = {1: "ACT", 2: "NSW", 3: "VIC", 4: "QLD", 5: "WA",
@@ -359,9 +361,9 @@ def shares(r):
         vals["noncit"] = round((per - r["citz"]) / per, 4)
     else:
         vals["noncit"] = None
-    # the labour-force lane (2026-11-10): the AURIN prints' reads —
-    # '96's b18b, '91's b20 (fetched 2026-11-11); None wherever the
-    # archived tally carries no labour fields
+    # the labour-force lane (2026-11-10): the '96 AURIN print's b18b
+    # reads; None where the archived workspace prints no labour table
+    # (the '91 editions) — same null contract as the era holes
     if r.get("labU") is not None and (r.get("labLF") or 0) > 0:
         vals["unemp"] = round(r["labU"] / r["labLF"], 4)
     else:
@@ -382,7 +384,7 @@ def lane_shares(c):
     policy as the 2001-era balance classes."""
     if c is None or c.get("cob") is None:
         return {"cob": None, "rel": None, "ten": None, "atsci": None,
-                "onepar": None, "mar": None}
+                "onepar": None, "ind": None}
 
     def _bounded(v):
         return None if v is None or not (0 <= v <= 1) else round(v, 4)
@@ -398,6 +400,7 @@ def lane_shares(c):
     tenden = c["tenDen"]
     atscid = c["atsciD"]
     onepard = c["oneparD"]
+    indden = c.get("indDen")
     return {
         "cob": {k: _share_of(v, cobden)
                 for k, v in (c["cob"] or {}).items()},
@@ -412,10 +415,14 @@ def lane_shares(c):
         "atsciD": atscid,
         "onepar": _share_of(c["oneparN"], onepard),
         "oneparD": onepard,
-        "mar": ({k: _share_of(c["mar"][i], c["marDen"])
-                 for i, k in enumerate(MAR_KEYS)}
-                if c.get("mar") is not None else None),
-        "marDen": c.get("marDen"),
+        # the industry picker (2026-11-11): each ANZSIC-1993 division's
+        # share of the divisions' own sum, whole-null where the census
+        # print carries no industry table ('91 AURIN) or the record
+        # never entered the lane pool
+        "ind": (None if not indden else
+                {k: _share_of(v, indden)
+                 for k, v in (c["ind"] or {}).items()}),
+        "indDen": indden,
     }
 
 
@@ -460,13 +467,23 @@ def lane_cohorts(r, census):
                 "atsciD": r["atsciD"] if census == 1991 else r["pers"],
                 "oneparN": r.get("oneparN"),
                 "oneparD": r.get("oneparD"),
-                "mar": r.get("mar"),
-                "marDen": (sum(r["mar"]) if r.get("mar") is not None
-                           else None),
                 }
         if census == 1996:
             out["cobDen"] = r["totc"] - r["cobns"] \
                 - (r.get("cobOV") or 0)
+            # cd_b19a's ANZSIC-1993 industry vector (the 1991 workspace
+            # prints no industry table: the lane is whole-null there)
+            indv = r.get("inds96")
+            if indv is not None:
+                out["ind"] = {k: indv[i] for i, k in enumerate(
+                    IND93_KEYS)}
+                out["indDen"] = sum(indv)
+            else:
+                out["ind"] = None
+                out["indDen"] = None
+        else:
+            out["ind"] = None
+            out["indDen"] = None
         return out
     if census == 2001:
         # the c1-of-1998 reader's own tallies ride extract-bcp-2001-
@@ -489,6 +506,11 @@ def lane_cohorts(r, census):
                    "rentPub": t01[3]}
             ten_den = t01[0] + t01[1] + t01[2] + t01[4]
         fam = r.get("fam01") or []
+        indv01 = r.get("inds01")
+        ind01 = indd01 = None
+        if indv01 is not None:
+            ind01 = {k: indv01[i] for i, k in enumerate(IND93_KEYS)}
+            indd01 = sum(indv01)
         return {"cob": cobv, "cobDen": cob_den,
                 "rel": relv,
                 "relDen": ((r.get("rel01tot") or 0)
@@ -498,9 +520,7 @@ def lane_cohorts(r, census):
                 "atsciD": (r.get("b1Persons") or 0) - (r.get("b1ov") or 0),
                 "oneparN": fam[2] if len(fam) > 4 else None,
                 "oneparD": fam[4] if len(fam) > 4 else None,
-                "mar": r.get("mar01"),
-                "marDen": (sum(r["mar01"]) if r.get("mar01") is not None
-                           else None)}
+                "ind": ind01, "indDen": indd01}
     fail(f"lane_cohorts has no lane read on census {census}")
 
 
@@ -688,11 +708,6 @@ def build_store(year, census, alloc_name, tally_name, out_name):
             lb = r.get("lab01")
             if lb is not None and len(lb) == 2:
                 r["labU"], r["labLF"] = lb[0], lb[1]
-            # mar01 the marital lane's five counts — same bridging
-            # onto the era name (extract-bcp-2001-tally.py's B 04)
-            mar01 = r.get("mar01")
-            if mar01 is not None and len(mar01) == 5:
-                r["mar"] = mar01
     venues = load_venues(year)
     polys = era_polygons(census)
     buckets = ct_index(polys)
@@ -808,7 +823,7 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "atsciN": 0, "atsciD": 0, "oneparN": 0, "oneparD": 0,
         "citz": 0, "ptn": 0, "ptot": 0, "ptns": 0,
         "labU": 0, "labLF": 0,
-        "mar": [0] * len(MAR_KEYS), "marDen": 0,
+        "ind": {k: 0 for k in IND93_KEYS}, "indDen": 0,
         "inc": [0] * len(INC91_ANNUAL_EDGES), "incTot": 0,
         "incT": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
         "incHH": [0] * len(ilanes.INC_BANDS_01),
@@ -859,10 +874,10 @@ def build_store(year, census, alloc_name, tally_name, out_name):
             acc["atsciD"] += cohort["atsciD"] or 0
             acc["oneparN"] += cohort["oneparN"] or 0
             acc["oneparD"] += cohort["oneparD"] or 0
-            if cohort.get("mar") is not None:
-                for i in range(len(MAR_KEYS)):
-                    acc["mar"][i] += cohort["mar"][i]
-                acc["marDen"] += cohort["marDen"] or 0
+            if cohort.get("ind") is not None:
+                for k, v in cohort["ind"].items():
+                    acc["ind"][k] += v or 0
+                acc["indDen"] += cohort["indDen"] or 0
 
     # venue geo blocks (PIP first, then the era-linework nearest
     # rescue within NEAREST_CAP_M metres — see its note)
@@ -892,8 +907,8 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                 d = shares(r)
                 if d is not None:
                     ls = lane_shares(lane_cohorts(r, census))
-                    for lane_k in ("cob", "rel", "ten", "atsci",
-                                   "onepar", "mar"):
+                    for lane_k in ("cob", "rel", "ten", "atsci", "onepar",
+                                   "ind"):
                         d[lane_k] = ls[lane_k]
                     d["loinc"], d["hiinc"], d["hiqinc"], \
                         d["incMed"] = inc_pack(code, None)
@@ -909,7 +924,7 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         row = {"div": name, "state": divname_of[name],
                **shares(divsum[name])}
         ls = lane_shares(divsum[name])
-        for lane_k in ("cob", "rel", "ten", "atsci", "onepar", "mar"):
+        for lane_k in ("cob", "rel", "ten", "atsci", "onepar", "ind"):
             row[lane_k] = ls[lane_k]
         acc = divsum[name]
         row["loinc"], row["hiinc"], row["hiqinc"], row["incMed"] = \
@@ -922,22 +937,20 @@ def build_store(year, census, alloc_name, tally_name, out_name):
     nat["cob"] = defaultdict(int)
     nat["rel"] = defaultdict(int)
     nat["ten"] = defaultdict(int)
+    nat["ind"] = defaultdict(int)
     for dv in divsum.values():
         for k in ("pers", "eng", "oth", "aus", "totc", "cobns", "uni",
                   "eduns", "bluen", "occd", "cobDen", "relDen", "tenDen",
                   "atsciN", "atsciD", "oneparN", "oneparD",
                   "citz", "ptn", "ptot", "ptns", "labU", "labLF",
-                  "marDen"):
+                  "indDen"):
             nat[k] += dv[k]
         for i in range(11):
             nat["bands"][i] += dv["bands"][i]
         for lane_set, lane_key in (("cob", "cob"), ("rel", "rel"),
-                                   ("ten", "ten")):
+                                   ("ten", "ten"), ("ind", "ind")):
             for k in dv[lane_key]:
                 nat[lane_key][k] += dv[lane_key][k]
-        for i in range(len(MAR_KEYS)):
-            nat.setdefault("mar", [0] * len(MAR_KEYS))
-            nat["mar"][i] += dv["mar"][i]
     off = alloc_d.get("offshoreClass", {}) or {}
     off_pop = sum(v.get("population", 0) for v in off.values())
     census_nat = sum(r["pers"] for r in people.values())
@@ -990,10 +1003,11 @@ def build_store(year, census, alloc_name, tally_name, out_name):
                    if nat["pers"] > 0 else None),
         "unemp": (round(nat["labU"] / nat["labLF"], 4)
                   if nat["labLF"] > 0 else None),
-        "mar": ({k: round(nat["mar"][i] / nat["marDen"], 4)
-                 if nat["marDen"] else None
-                 for i, k in enumerate(MAR_KEYS)}
-                if nat["mar"] else None),
+        # the industry picker's national profile (1996/2001 prints);
+        # the '91 workspace prints no industry table, so null there
+        "ind": ({k: round(nat["ind"][k] / nat["indDen"], 4)
+                 for k in IND93_KEYS}
+                if nat["indDen"] else None),
     })
     if era_inc is not None:
         if census == 2001:
@@ -1039,7 +1053,14 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "blue-collar occupation, birthplace-country menu (cob, the "
         "measured census side's own menu era — " +
         str(census) + " ), religion (rel), housing tenure (ten), "
-        "the Indigenous status and one-parent lanes. The era's "
+        "the Indigenous status and one-parent lanes. The industry "
+        "picker (ind) reads the edition's own industry-of-employment "
+        "print — the ANZSIC-1993 divisions at cd_b19a (1996) and the "
+        "2001 BCP's B 26B sheet — as shares of employed people with a "
+        "stated industry (not-stated and non-classifiable responses "
+        "sit out beside every lane's read); the 1991 AURIN workspace "
+        "prints no industry table, so ind stays whole-null on "
+        "'91-side stores like the labour lane. The era's "
         "print holes read null at every level rather than a "
         "cross-era substitute: the 1991 BCP prints no Hindu row "
         "and no India/Sri Lanka birthplace, the 1996 BCP's "
@@ -1096,7 +1117,10 @@ def build_store(year, census, alloc_name, tally_name, out_name):
         "cobKeys": list(menu),
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
-        "marKeys": list(MAR_KEYS),
+        # the industry picker's division ids this edition prints
+        # (whole-null at '91: its AURIN workspace has no industry
+        # table — every level's ind lane reads null there)
+        "indKeys": list(IND93_KEYS) if census != 1991 else None,
         **({"incomeCuts": era_inc} if era_inc is not None else {}),
         "deliveryBasis": (
             f"venue PIP of the history-location-store coordinates "

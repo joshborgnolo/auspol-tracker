@@ -359,57 +359,80 @@ def load_lab(gcp_zip, prefix="", era="2021", rows_pin=None,
     return g
 
 
-# ---- the Marital status menu's lanes (2026-11-11) -------------------
-# the registered marital status five, of people aged 15+ with a stated
-# status: the era's marital table (G05 in the GCP editions, B05 in the
-# 2011 BCP) prints Married/Separated/Divorced/Widowed/Never-married per
-# age band per sex plus person totals, and the GCP totals fold a
-# not-stated slice in, so the shares' basis is the five printed
-# categories' own sum (the same ex-not-stated basis G14's religion
-# shares use). The 2016/2011 prints capitalise "Never_Married" where
-# 2021's keeps it lower-case (verified from the packs' own headers
-# 2026-11-11).
-MAR_KEYS = ["marr", "never", "sep", "div", "wid"]
-_MAR = {
-    "2021": dict(table="G05",
-                 cols=("P_Tot_Married", "P_Tot_Never_married",
-                       "P_Tot_Separated", "P_Tot_Divorced",
-                       "P_Tot_Widowed")),
-    "2016": dict(table="G05",
-                 cols=("P_Tot_Married", "P_Tot_Never_Married",
-                       "P_Tot_Separated", "P_Tot_Divorced",
-                       "P_Tot_Widowed")),
-    "2011": dict(table="B05",
-                 cols=("P_Tot_Married", "P_Tot_Never_Married",
-                       "P_Tot_Separated", "P_Tot_Divorced",
-                       "P_Tot_Widowed")),
+# ---- the Industry picker's lanes (2026-11-11 arc) -------------------
+# the nineteen ANZSIC-2006 one-digit divisions as shares of employed
+# people with a stated industry; the picker's denominator is the
+# divisions' own sum, so both the printed Inadequately-described/Not-
+# stated cells AND overseas visitors stay out by construction (the
+# industries print employed persons ex overseas visitors). The
+# GCP-era tables share one print family across ALL THREE editions:
+# industry-by-age-by-sex, whose P persons block sits in the C/D split
+# files — 2021 G54C/G54D, 2016 G51C/G51D, 2011 BCP B43C/B43D — with
+# stems identical across the family (verified from each pack's header
+# 2026-11-11). The ANZSIC-1993 older frames (2001 BCP B 26A/B, 1996
+# AURIN cd_b19a/b) ride IND_KEYS93: the fifteen divisions with a
+# one-to-one 2006 bridge keep the shared key, 'Communication services'
+# and 'Property and business services' split differently under the
+# 2006 edition and stay era-only keys (comms/propbiz) beside the four
+# ANZSIC-2006-only keys (media/rental/prof/admin) they prefaced.
+IND_KEYS = ["ag", "mining", "manuf", "utils", "constr", "whole",
+            "retail", "accom", "transport", "media", "rental", "fin",
+            "prof", "admin", "pubadm", "educ", "health", "arts",
+            "othersvc"]
+IND_KEYS93 = ["ag", "mining", "manuf", "utils", "constr", "whole",
+              "retail", "accom", "transport", "comms", "fin",
+              "propbiz", "pubadm", "educ", "health", "arts", "othersvc"]
+# ABS print stems per key, the GCP/BCP family (column-verified 2026-11-11
+# against 2021 G54C/D, 2016 G51C/D and 2011 B43C/D, all identical)
+_IND_STEM = {
+    "ag": "Ag_For_Fshg", "mining": "Mining", "manuf": "Manufact",
+    "utils": "El_Gas_Wt_Waste", "constr": "Constru",
+    "whole": "WhlesaleTde", "retail": "RetTde", "accom": "Accom_food",
+    "transport": "Trans_post_wrehsg", "media": "Info_media_teleco",
+    "rental": "RtnHir_REst", "fin": "Fin_Insur",
+    "prof": "Pro_scien_tec", "admin": "Admin_supp",
+    "pubadm": "Public_admin_sfty", "educ": "Educ_trng",
+    "health": "HlthCare_SocAs", "arts": "Art_recn",
+    "othersvc": "Oth_scs",
 }
+# C file: the first eighteen divisions' P Tot cells; D file: Persons
+# other-services + inadequately-described/not-stated + the total
+# (2011's BCP member template rides the short-header names)
+_INDC = {k: t for k, t in (
+    ("2021", ("G54C", "G54D")),
+    ("2016", ("G51C", "G51D")),
+    ("2011", ("B43C", "B43D")),
+)}
 
 
-def load_mar(gcp_zip, prefix="", era="2021", rows_pin=None,
+def load_ind(gcp_zip, prefix="", era="2021", rows_pin=None,
              key_col=None):
-    """The Marital status menu's raw counts per SA1 for one prefix ->
-    {code: (married, neverMarried, separated, divorced, widowed)}
-    (MAR_KEYS order), people aged 15+. Universes assert against the
-    era's row pin like the other loaders."""
+    """The industry lanes' raw counts per SA1 for one prefix ->
+    {code: (indvec, id_ns, totEmployed)} with indvec in IND_KEYS order
+    and id_ns the printed inadequately-described/not-stated persons
+    (kept beside the totals for the era notes; every caller's own
+    safe() divides a division by the divisions' sum). Universe asserts
+    run against the era's row pin like the other loaders."""
     v = VINTAGES[era]
-    mar = _MAR[era]
+    tc, td = _INDC[era]
     memb = v["member"].format
     idc = key_col or v["key"]
     pin = rows_pin or v["rows"]
+    stems = [_IND_STEM[k] for k in IND_KEYS]
     z = zipfile.ZipFile(gcp_zip)
-    g = _table(z, memb(table=mar["table"]), idc, list(mar["cols"]),
+    c = _table(z, memb(table=tc), idc,
+               [f"P_{s}_Tot" for s in stems[:18]], pin, prefix)
+    d = _table(z, memb(table=td), idc,
+               [f"P_{stems[18]}_Tot", "P_ID_NS_Tot", "P_Tot_Tot"],
                pin, prefix)
-    print(f"GCP marital cells: {len(g)} SA1s (prefix {prefix or 'AU'}, "
-          f"era {era})")
-    return g
-
-
-def mar_shares(vec, safe):
-    """The five Marital status menu shares (MAR_KEYS order) from the
-    load_mar counts tuple, over their own stated sum."""
-    tot = sum(vec)
-    return tuple(safe(v, tot) for v in vec)
+    if set(c) != set(d):
+        _fail(f"GCP industry {tc}/{td} universes diverge")
+    out = {}
+    for code in c:
+        out[code] = (c[code] + (d[code][0],), d[code][1], d[code][2])
+    print(f"GCP industry cells: {len(out)} SA1s (prefix "
+          f"{prefix or 'AU'}, era {era})")
+    return out
 
 
 # ---- the six canonical venue-demo cells' raw counts -----------------

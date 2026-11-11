@@ -149,22 +149,6 @@ def tally_1991():
         tally[c]["eng"] = eng
         tally[c]["oth"] = tot - eng - ns
 
-    # b06 age by marital status by sex: the five printed categories'
-    # Total columns (the era print carries no not-stated column —
-    # the five categories' own sum is the stated basis, 2026-11-11).
-    # Column naming is the AURIN schema's own: "separated (not
-    # divorced)" = the /map/ Marital status menu's "sep" option
-    for r in read("b06_age_by_marital_status_by_sex_cd_1991.csv"):
-        c = r["cd_code_1991"]
-        tally[c]["mar"] = [
-            _sub_int(r, "m_married") + _sub_int(r, "f_married"),
-            _sub_int(r, "m_never_married") + _sub_int(r, "f_never_married"),
-            _sub_int(r, "m_separtd_no_divorced")
-            + _sub_int(r, "f_separtd_no_divorced"),
-            _sub_int(r, "m_divorced") + _sub_int(r, "f_divorced"),
-            _sub_int(r, "m_widowed") + _sub_int(r, "f_widowed"),
-        ]
-
     for r in read("b08_birthplace_ctry_by_sex_cd_1991.csv"):
         c = r["cd_code_1991"]
         tally[c]["aus"] = _sub_int(r, "p_born_aus_p")
@@ -214,17 +198,6 @@ def tally_1991():
         c = r["cd_code_1991"]
         tally[c]["inc"] = [_sub_int(r, f"{b}_hslds") for b in INC91_BANDS]
         tally[c]["incTot"] = _sub_int(r, "tot_hslds")
-
-    # b20 age by labour force status by sex (Persons block totals):
-    # p_unemployed over the printed p_labour_force — the 2026-11-10
-    # labour lane's 1991 edition (fetched 2026-11-11); the print
-    # carries its own lbr_frc_stat_no_stated block, so the labour-force
-    # cell is the stated labour force, the era's ex-not-stated print —
-    # the same read as 1996's cd_b18b below
-    for r in read("b20_age_by_lbr_frc_stat_pt_ft_by_sex_cd_1991.csv"):
-        c = r["cd_code_1991"]
-        tally[c]["labU"] = _sub_int(r, "p_unemployed")
-        tally[c]["labLF"] = _sub_int(r, "p_labour_force")
 
     return tally
 
@@ -277,30 +250,6 @@ def tally_1996():
         tally[c]["aus"] = _sub_int(r, "australian_p")
         tally[c]["totc"] = _sub_int(r, "total_p")
         tally[c]["cobns"] = _sub_int(r, "not_stated_p")
-
-    # b04 age by registered marital status by sex: the five printed
-    # categories' Total columns less the overseas-visitors columns
-    # (the as-enumerated basis the GCP-era tables' totals carry;
-    # no not-stated column on this print, 2026-11-11)
-    for r in read("cd_b04_census_1996.csv"):
-        c = r["cd_code"]
-        tally[c]["mar"] = [
-            _sub_int(r, "total_marr_m") + _sub_int(r, "total_marr_f")
-            - _sub_int(r, "overseas_vis_marr_m")
-            - _sub_int(r, "overseas_vis_marr_f"),
-            _sub_int(r, "total_nev_marr_m") + _sub_int(r, "total_nev_marr_f")
-            - _sub_int(r, "overseas_vis_nev_marr_m")
-            - _sub_int(r, "overseas_vis_nev_marr_f"),
-            _sub_int(r, "total_sep_m") + _sub_int(r, "total_sep_f")
-            - _sub_int(r, "overseas_vis_sep_m")
-            - _sub_int(r, "overseas_vis_sep_f"),
-            _sub_int(r, "total_div_m") + _sub_int(r, "total_div_f")
-            - _sub_int(r, "overseas_vis_div_m")
-            - _sub_int(r, "overseas_vis_div_f"),
-            _sub_int(r, "total_wid_m") + _sub_int(r, "total_wid_f")
-            - _sub_int(r, "overseas_vis_wid_m")
-            - _sub_int(r, "overseas_vis_wid_f"),
-        ]
 
     for r in read("cd_b08_census_1996.csv"):
         c = r["cd_code"]
@@ -355,12 +304,27 @@ def tally_1996():
 
     # b18b age by labour force status (Persons block): unemployed
     # looking for work over the stated labour force — the 2026-11-10
-    # labour lane; since 2026-11-11 the 1991 edition's b20 read joins
-    # it above, so both archived editions carry the fields
+    # labour lane; 1991's archived workspace prints no labour table,
+    # so only this edition carries the fields
     for r in read("cd_b18b_census_1996.csv"):
         c = r["cd_code"]
         tally[c]["labU"] = _sub_int(r, "persons_total_unemp_tot")
         tally[c]["labLF"] = _sub_int(r, "persons_total_lab_frce")
+
+    # b19a industry of employment by age by sex: the ANZSIC-1993
+    # seventeen divisions' printed persons totals (IND96_COLS in the
+    # site key order), with non-classifiable and not-stated beside
+    # them — the 2026-11-11 industry-picker arc. b19b's total column
+    # prints the employed total. Like labour, the 1991 archived
+    # workspace carries no industry table, so only this edition does
+    for r in read("cd_b19a_census_1996.csv"):
+        c = r["cd_code"]
+        tally[c]["inds96"] = [_sub_int(r, col) for col in IND96_COLS]
+        tally[c]["inds96ns"] = (_sub_int(r, "total_non_clsfble_ec_unts_p")
+                                + _sub_int(r, "total_not_stated_persons"))
+    for r in read("cd_b19b_census_1996.csv"):
+        c = r["cd_code"]
+        tally[c]["inds96tot"] = _sub_int(r, "total_total_persons")
 
     return tally
 
@@ -416,6 +380,21 @@ TEN91_COLS = {"mort": ["being_purchased_occ_priv_dwl"],
 TEN96_COLS = {"mort": ["total_being_pur"], "rent": ["total_rented"],
               "own": ["total_fully_owned"],
               "rentPub": []}  # the 1996 BCP prints no landlord arm
+# cd_b19a's per-division persons-total columns in the site's industry
+# key order (gcp_newlanes.IND_KEYS93, replicated here to keep this
+# script self-standing; column spellings verified from the file's own
+# header 2026-11-11)
+IND96_COLS = [
+    "total_ag_frst_fshng_persons", "total_mining_persons",
+    "total_manfctrng_persons", "total_elctrcty_gas_wtr_p",
+    "total_cnstrction_persons", "total_whlsle_trde_persons",
+    "total_retail_trde_persons", "total_accm_cafe_rstrnts_p",
+    "total_trnsprt_strge_persons", "total_cmmnctn_serv_persons",
+    "total_fnance_insur_persons", "total_prpty_bsnss_serv_p",
+    "total_gvnmt_admn_def_persons", "total_eductn_persons",
+    "total_hlth_comm_serv_persons", "total_cltrl_rec_serv_persons",
+    "total_prsnl_oth_serv_persons",
+]
 
 
 def lanes_1991(tally):
@@ -676,12 +655,6 @@ def main():
                              for r in tally.values())),
         "onepar": _sharef(sum(r["oneparN"] or 0 for r in tally.values()),
                           sum(r["oneparD"] or 0 for r in tally.values())),
-        "mar": {k: _sharef(sum(r["mar"][i] for r in tally.values()
-                              if r.get("mar")),
-                          sum(sum(r["mar"]) for r in tally.values()
-                              if r.get("mar")))
-                for i, k in enumerate(
-                    ["marr", "never", "sep", "div", "wid"])},
     }
 
     out = {
@@ -707,9 +680,7 @@ def main():
     print("  lanes: norel", profile["rel"]["norel"], "cath",
           profile["rel"]["cath"], "own", profile["ten"]["own"],
           "rent", profile["ten"]["rent"], "atsci", profile["atsci"],
-          "onepar", profile["onepar"], "uk", profile["cob"]["uk"],
-          "mar(married)", profile["mar"]["marr"],
-          "mar(never)", profile["mar"]["never"])
+          "onepar", profile["onepar"], "uk", profile["cob"]["uk"])
 
 
 if __name__ == "__main__":

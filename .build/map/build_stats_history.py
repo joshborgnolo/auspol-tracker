@@ -309,7 +309,7 @@ def with_demo(doc, year):
                      'unemp': dc[18],
                      'rel': dv.get('rel'),
                      'ten': dv.get('ten'),
-                     'mar': dv.get('mar')}
+                     'ind': dv.get('ind')}
         if dm and dm.get('age') and dm.get('persons'):
             age_bands_w[0] += dm['persons']
             for i, k in enumerate(common.AGE_BAND_KEYS):
@@ -362,12 +362,13 @@ def with_demo(doc, year):
     tenkeys = store.get('tenKeys')
     if tenkeys:
         doc['tenKeys'] = list(tenkeys)
-    # the Marital status menu (2026-11-11): the registered-status five,
-    # with keys only where the era can offer them — like every other
-    # era-gated cohort menu
-    markeys = store.get('marKeys')
-    if markeys:
-        doc['marKeys'] = list(markeys)
+    # the Industry picker's division ids for this frame's print family
+    # (the 2026-11-11 arc): the 1996/2001 prints' ANZSIC-1993 seventeen;
+    # the 1991-side stores carry indKeys:null (the '91 print has no
+    # industry table) and emit no menu, like the labour lane
+    indkeys = store.get('indKeys')
+    if indkeys:
+        doc['indKeys'] = list(indkeys)
     n_cob = n_rel = n_ten = 0
     for bid in doc['booths']['id']:
         vb = by_booth.get(bid)
@@ -375,19 +376,19 @@ def with_demo(doc, year):
         cob_b = (blk or {}).get('cob')
         rel_b = (blk or {}).get('rel')
         ten_b = (blk or {}).get('ten')
-        mar_b = (blk or {}).get('mar')
+        ind_b = (blk or {}).get('ind')
         c_row = [cob_b.get(k) for k in cobkeys] if (cobkeys and isinstance(cob_b, dict)) else None
         r_row = [rel_b.get(k) for k in (relkeys or [])] if (relkeys and isinstance(rel_b, dict)) else None
         t_row = [ten_b.get(k) for k in (tenkeys or [])] if (tenkeys and isinstance(ten_b, dict)) else None
-        m_row = [mar_b.get(k) for k in (markeys or [])] if (markeys and isinstance(mar_b, dict)) else None
+        i_row = [ind_b.get(k) for k in (indkeys or [])] if (indkeys and isinstance(ind_b, dict)) else None
         doc['booths'].setdefault('cob', []).append(c_row)
         doc['booths'].setdefault('rel', []).append(r_row)
         doc['booths'].setdefault('ten', []).append(t_row)
-        doc['booths'].setdefault('mar', []).append(m_row)
+        doc['booths'].setdefault('ind', []).append(i_row)
         n_cob += (c_row is not None)
         n_rel += (r_row is not None)
         n_ten += (t_row is not None)
-    for kk in ('cob', 'rel', 'ten', 'mar'):
+    for kk in ('cob', 'rel', 'ten', 'ind'):
         if not any(x is not None for x in doc['booths'][kk]):
             del doc['booths'][kk]
     doc['demoBasis'] = 'venue'

@@ -185,7 +185,7 @@ def demo_main(frame):
     nlt = gcp_newlanes.load(V["gcp"], prefix="5", era=str(year))
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="5", era=str(year))
     lab = gcp_newlanes.load_lab(V["gcp"], prefix="5", era=str(year))
-    mar = gcp_newlanes.load_mar(V["gcp"], prefix="5", era=str(year))
+    ind = gcp_newlanes.load_ind(V["gcp"], prefix="5", era=str(year))
     inc, _inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "5")
     HL = gcp_newlanes.hl_alloc_of(2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(2016, "c7")
     sa1 = read_sa1_polygons(year)
@@ -219,10 +219,10 @@ def demo_main(frame):
                                   "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
                                   "ceb3": 0, "cebns": 0, "cebt": 0,
                                   "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
-                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
                                   "ancP": 0, "ancNS": 0,
                                   "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "ueN": 0.0, "lfD": 0.0,
+                                  "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
                                   "hlE": 0.0})
         r = gcp[code]
         a["p"] += r[0]
@@ -279,8 +279,9 @@ def demo_main(frame):
         labU, labLF = lab[code]
         a["ueN"] += labU
         a["lfD"] += labLF
-        for i in range(len(gcp_newlanes.MAR_KEYS)):
-            a["marN"][i] += mar[code][i]
+        iv, _ivns, _ivt = ind[code]
+        for i in range(len(gcp_newlanes.IND_KEYS)):
+            a["indN"][i] += iv[i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
     for dist, _bb, _polys in districts:
         if dist not in acc:
@@ -295,9 +296,9 @@ def demo_main(frame):
                       ("eng+oth", a["eng"] + a["oth"])):
             if v <= 0:
                 return None, nm
+        indden = sum(a["indN"])
         tn = a["tenN"]
         tend = tn[0] + tn[1] + tn[2] + tn[4]
-        mard = sum(a["marN"])
         s = {
             "lang": round(a["oth"] / (a["eng"] + a["oth"]), 4),
             "a65": round((a["bands"][8] + a["bands"][9] + a["bands"][10]) / bsum, 4),
@@ -327,12 +328,14 @@ def demo_main(frame):
                        if a["cebt"] - a["cebns"] > 0 else None),
             "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
             "unemp": round(a["ueN"] / a["lfD"], 4) if a["lfD"] else None,
+            # the industry picker (2026-11-11): ANZSIC-2006 division
+            # shares over the divisions' own summed counts
+            "ind": ({k: round(a["indN"][i] / indden, 4)
+                     for i, k in enumerate(gcp_newlanes.IND_KEYS)}
+                    if indden else None),
             "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
                         if a["ancP"] - a["ancNS"] > 0 else None)
                     for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
-            "mar": {k: (round(a["marN"][i] / mard, 4)
-                        if mard > 0 else None)
-                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
         }
         if a.get("incAud", 0) > 0:
             s["loinc"] = round(a["incLo"] / a["incAud"], 4)
@@ -361,18 +364,19 @@ def demo_main(frame):
               "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
               "ceb3": 0, "cebns": 0, "cebt": 0,
               "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
-              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
               "ancP": 0, "ancNS": 0,
               "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "ueN": 0.0, "lfD": 0.0,
+              "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
               "hlE": 0.0}
     for a in acc.values():
         for k2, v2 in a.items():
             if k2 == "bands":
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
-            elif k2 in ("cobN", "relN", "tenN", "ancN", "marN", "incBandH"):
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH",
+                        "indN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -398,7 +402,8 @@ def demo_main(frame):
         "relKeys": list(gcp_newlanes.REL_KEYS),
         "tenKeys": ["mort", "rent", "own", "rentPub"],
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
-        "marKeys": list(gcp_newlanes.MAR_KEYS),
+        # the Industry picker's nineteen ANZSIC-2006 divisions
+        "indKeys": list(gcp_newlanes.IND_KEYS),
         "demo": {nm: demo[nm] for nm in order},
         "state": {**st_shares, "persons": persons, "sa1": st_acc["n"],
                   "sentinelSa1": len(WA_SENTINELS[year]), "sentinelPersons": sentinel_persons},
@@ -418,8 +423,12 @@ def demo_main(frame):
                   "the district its polygon centroid lies in (boundary SA1s are "
                   "not split; the state total is never moved). Bases match the "
                   "federal and other-state stores (ex-not-stated; see the qld "
-                  "frame stores for the full per-lane specification). p is "
-                  "census persons; n the SA1 count. The four WA sentinel SA1s "
+                  "frame stores for the full per-lane specification). The "
+                  "industry picker (ind, key order in indKeys) reads the "
+                  "edition's industry-of-employment nineteen ANZSIC-2006 "
+                  "divisions, each shared over the divisions' own summed "
+                  "counts. p is census persons; n the SA1 count. The four WA "
+                  "sentinel SA1s "
                   "(migratory/offshore/no-usual-address) carry no polygon and "
                   f"sit outside the join, holding {sentinel_persons} persons "
                   "statewide."),

@@ -254,32 +254,17 @@ Its reads, all pinned in `gcp_newlanes.load_lab` / the seat-model derives:
 - 2001 BCP sheet `B 25`, the PERSONS block's Total row (cols I/J) —
   extract-bcp-2001-tally.py's `lab01` field, per-CD workbooks
 - 1996 AURIN `cd_b18b` `persons_total_unemp_tot`/`persons_total_lab_frce`
-- 1991 AURIN `b20_age_by_lbr_frc_stat_pt_ft_by_sex_cd_1991`
-  `p_unemployed`/`p_labour_force` (fetched 2026-11-11; the printed
-  totals sit beside their own lbr_frc_stat_no_stated block, so the
-  read is the era's own ex-not-stated print)
 
-The archived AURIN workspaces were first read as printing no 1991
-labour table, so 1993, 1996 and 2001 shipped the lane whole-null.
-2026-11-11: the 1991 edition's b20 table turned up in the Census1991
-workspace after all (55 named tables vs the fetched 13) and the lane
-was regenerated onto both '91-era frames plus the 2001 frame — whose
-own 2001 tally had carried `lab01` since the lane landed but whose
-derive chain had never been re-run with it. 1998 blends by its
-standing interp doctrine (c0 1996 / c1 2001 both read now, where the
-c0-side hole had pinned it to the 2001 measured value). National
-sanity reads after the measures: 0.0506 residents / 0.0487 voter-
-footprint (2021), 0.1161 (1991 edition, B 20), 0.0919 (1996 edition),
-0.0739 (2001 edition, B 25), 0.0522 (2006 edition, B41), 0.0561
-(2011 edition), 0.0684 (2016 edition). The lane guard rails the same
-way as the rest: at DM_LENGTH 99th-percentile era maxima run
-0.32 (1991 recession), so the display range widened [0, 22] →
-[0, 32] with the era's landing (2004's p99 sits 0.220 — the GCP
-era's frames rescaled one ramp shade lighter against the widened
-domain).
+The 1991 AURIN workspace prints NO labour-force table, so 1993 and 1996
+omit the lane by the era-hole doctrine (regeneration of the county file
+would extend it there; the fetch was not made). Interp blending follows
+the standing null-rule: a side missing the print leaves the demoI lane
+null and the display nearest-to-measured (1996 sits nearest c1=1996 in
+doctrine terms but its guard is the c0=1991 measured store, so it omits).
+National sanity reads after the measures: 0.0506 residents / 0.0487 voter-
+footprint (2021), 0.0919 (1996 edition), 0.0739 (2001 edition, B 25).
 
-App surface: DM/DM_NAME/DM_SHORT/DM_VERB/DM_POP/DM_RANGE `[0, 32]`
-(widened from `[0, 22]` at the era landing above) + a
+App surface: DM/DM_NAME/DM_SHORT/DM_VERB/DM_POP/DM_RANGE `[0, 22]` + a
 red-family ramp `seq(8, 0.13)` + `DM_TOP`; the areas-sa1-2021 pack packs it
 (`caps [0, 25]`, AUS mark 0.0506, its sa26 lane-oracle re-verified, the
 lane ending the AREAS_LANES set with it) and `AREAS_LANES` lists it.
@@ -305,59 +290,77 @@ years), derive-booth-demo-{2016,2013,2011,2006,2004c1,90s} —
 demo-2001 and demo-2001-frame need the 2001 tally refreshed with the
 labour lane's extractor first — and derive-booth-demo-interp.
 
-# The "Marital status" census select lane (mar, 11 November 2026)
+# The Industry select lens (ind, 2026-11-11)
 
-The census People menu gains a fifth select lens: **Marital status** —
-the registered marital-status five (Married, Never married, Separated,
-Divorced, Widowed; the menu's `marKeys` order marr/never/sep/div/wid)
-as a share of people aged 15+ with a stated status. Every edition's
-marital print folds a not-stated slice into its total (or prints none at
-all from 2001 back), so the menu's basis is the five printed categories'
-OWN SUM everywhere — the same ex-not-stated convention G14's religion
-menu rides. Its reads, in `gcp_newlanes.load_mar` and the seat-model
-derive/extract chains:
+The Census → People menu's industry picker (S.index === LENS_IND, S.ind
+the picked division): nineteen ANZSIC-2006 one-digit divisions
+(ag..othersvc), as shares of employed people with a stated industry.
+The picker's denominator is the divisions' own sum — the print's
+inadequately-described/not-stated cells stay out by construction (the
+unemp lane's same ex-not-stated convention).
 
-- 2021 GCP G05 `P_Tot_{Married,Separated,Divorced,Widowed,Never_married}`
-- 2016 GCP G05 same cells (`P_Tot_Never_Married` capitalised differently)
-- 2011 BCP B05 same cells (as 2016's capitalisation)
-- 2006 BCP CD B05 `PERSONS,Total,<cat>` (cell ids B737/B738/B739/B740/
-  B741 from BCP2006_cell_desc_dp.xls)
-- 2001 BCP sheet `B 04` — Age by registered marital status by sex, the
-  printed Total row's five category pair-blocks (Males+Females), less
-  the sheet's Overseas-visitors row (extract-bcp-2001-tally.py's `mar01`)
-- 1996 AURIN `cd_b04_census_1996` — Age by registered marital status by
-  sex, `total_<cat>_m/f` less the matched `overseas_vis_*` columns
-- 1991 AURIN `b06_age_by_marital_status_by_sex_cd_1991` (`m_*/f_*` totals,
-  "separated (not divorced)" the era's Sep option) — fetched through the
-  standing WFS lane 2026-11-11, no not-stated column anywhere here
+The reads, all pinned in `gcp_newlanes.load_ind` / the seat-model
+derives / `IND_KEYS`/`IND_KEYS93`:
 
-National sanity reads (share of 15+ with a stated status): 0.465
-married (2021 GCP), 0.487 (2001 B 04), 0.533 (1996 AURIN), 0.561 (1991
-AURIN). The 2001-ward drift (down about five points of married share per
-decade through the era) is what the legend should show.
+- 2021 GCP G54C/G54D `P_<div>_Tot` persons columns (the industry-by-age
+  table family; 2016 G51 and 2011 BCP B43 share the exact stems —
+  column-verified against all three packs' own headers, 2026-11-11)
+- 2006 BCP table B42's Persons `_Total` cells (B6452..B6652 per
+  descriptor, straddling the B42_C/B42_D split files)
+- 2001 BCP sheet `B 26B`, the PERSONS block's col-I Total per
+  ANZSIC-1993 division row — extract-bcp-2001-tally.py's `inds01`
+  field, per-CD workbooks, labels verified label-by-label and the
+  identities pinned by the printed Total reconciliation check
+- 1996 AURIN `cd_b19a` persons totals per division (+ `cd_b19b`), the
+  extract-bcp-aurin-tally.py `inds96` field
+- 1991 AURIN: NO industry table in the archived workspace (labour
+  force's same hole — the '91-side stores carry indKeys:null and
+  industry never shows there, by the identical era-hole doctrine)
 
-App surface mirrors the 2026-10-31 select-lens machinery (`anc` the
-model): `LENS_MAR`/`MAR_NAME`/`MARISMS`/`MAR_RANGE` + ramp `seq(163,
-0.12)` + `censusWho` basis override (people aged 15+) + MAR_TOP +
-menu/picker/URL (`ma` param)/clamps in app-6-ui + `MAR`-family emitters
-through demo_interp_of + map/data assembly (`marKeys`/`B["mar"]`/
-`demo.mar` everywhere else select lanes ride); the areas-sa1-2021 pack
-packs `mar.{marr,never,sep,div,wid}` lanes and AREAS_LANES pins them;
-core-split's pplLanes names `mar` (a lane name missing there never asks
-for its res file).
+Key sets record what each era prints: IND_KEYS (the nineteen) on every
+GCP/BCP-era store including the 2006 census, IND_KEYS93 (seventeen) on
+the 2001/1996 prints. Fifteen divisions correspond one-to-one
+(`ag`…`othersvc`); ANZSIC-2006-only keys (`media`, `rental`, `prof`,
+`admin`) sit beside ANZSIC-1993-only keys (`comms`, `propbiz`), the
+interp/`IND_ALL` machinery blending the 21-key union so the 2001↔2006
+classification seam gets the shared fifteen and the era-only keys sit
+null inside it (the standing one-sided-lane doctrine, nearest-measured
+never-an-invented-share). Every store's own `indKeys` list is what the
+menu copes — the app never fabricate a key the frame's print lacks.
 
-Lane-list rebuild commands: the standing seat-model chain
-(extract-bcp-2001-tally for the 2001-era families and
-extract-bcp-aurin-tally per '90s edition, then
-derive-booth-demo-{2001,2001-frame,2004c1,2006,2011,2013,2016,90s,
-interp} and derive-booth-seifa-voter), `.build/map/gcp_newlanes.py`'s
-readers feeding build_areas_sa1 + every state demo builder,
-build_<frame>_data → build_<frame>_boothcensus → geo_build per state
-family, then build_map_data (its OWN OUT default) and assemble. The
-only source nuclear to this lane beyond committed mirrors is
-`b06_age_by_marital_status_by_sex_cd_1991.csv` in
-cache/bcp-1991-aurin (recaptured from AURIN; the 1996 b04 and 2001 B 04
-read out of existing downloads).
+National sanity reads, share of stated-industry employees — 2021 GCP:
+health 0.1550, retail 0.0962, constr 0.0947, educ 0.0938, prof 0.0826;
+2011 BCP: health 0.1189, retail 0.1077, manuf 0.0919; 2006 BCP: retail
+0.1166, health 0.1079, manuf 0.1074; 2001 BCP: retail 0.1501, manuf
+0.1252, propbiz 0.1138; 1996 BCP: retail 0.1406, manuf 0.1308,
+propbiz 0.1018 (the figures hold as census publication numbers atop
+every store's own national record, the area stores' national pools
+computing beside their seats).
+
+App surface: IND_NAME/INDISMS/IND_RANGE tables beside the select-lens
+consts, ramp `seq(168, 0.11)`, an "Industry" entry in the People menu
++ its option picker, `in=<key>` hash slot, IND_TOP's generated phrase
+families, the AREAS pack's nineteen ind.* lanes beside cap-and-mark
+rows, core-split's PPL_LANES and build_map_data/build_stats_history's
+their emissions (division `ind` dicts, booth `B.ind`, `indKeys`).
+
+The frozen-era stance (never revisited): the stats-era res files for
+1996 and 2001 are period documents (every modern lane era has left
+them as-is — their lane machinery predates those arcs' spans), so
+industry rides exactly the unemp lane's reach: 1993/1996 never carry a
+lane (the '91 print exists for neither labour nor industry), 1998
+gets it interpolated on the 1996 print's measure, res-2001 stays a
+deliberately stale statistics-era exhibit like unemp's own floor — not
+an industry decision, every modern-era machinery's house convention.
+Every GCP-era frame, both federal venue-era bases (2004's interp and
+2001's measured store), the 2001 election's own seam, and every state
+frame prints every industry lane into the page today.
+
+Lane-list rebuild commands are the same standing per-family chain as
+unemp's (tally refreshes → seat-model derives → demo-interp → state
+demo/boothcensus joints → emitters) — the only industrial-era
+difference: `extract-bcp-2001-tally.py`'s nine-zip full pass precedes
+the whole thing when the 2001 tally lacks `inds01`.
 
 # Boundary product recovery (November 2026)
 

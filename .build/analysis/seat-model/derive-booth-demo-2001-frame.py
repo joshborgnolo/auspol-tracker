@@ -84,9 +84,7 @@ TEN_KEYS = lane.TEN_KEYS
 ilanes = lane.ilanes
 INC_BANDS01 = lane.INC_BANDS01
 ANC_KEYS01 = lane.ANC_KEYS_01
-# the Marital status menu's five registered categories (d01's mar01
-# slot order; 2026-11-11)
-MAR_KEYS = lane.MAR_KEYS
+IND_KEYS01 = lane.IND_KEYS_01
 
 TALLY = SM / "cache/bcp-2001-cd-tally.json"
 ALLOC = SM / "seifa-src/cd-2001-ced-2001set.json"
@@ -216,11 +214,13 @@ def shares(rec):
                         for i, k in enumerate(ANC_KEYS01)}
     if rec.get("lab01") is not None and rec["lab01"][1] > 0:
         s["unemp"] = round(rec["lab01"][0] / rec["lab01"][1], 4)
-    if rec.get("mar01") is not None:
-        mard = sum(rec["mar01"])
-        if mard > 0:
-            s["mar"] = {k: round(rec["mar01"][i] / mard, 4)
-                        for i, k in enumerate(MAR_KEYS)}
+    # the industry picker (2026-11-11): the ANZSIC-1993 divisions'
+    # shares of their stated sum — lock-step with the 2004 lane
+    if rec.get("inds01") is not None:
+        indd = sum(rec["inds01"])
+        if indd > 0:
+            s["ind"] = {k: round(rec["inds01"][i] / indd, 4)
+                        for i, k in enumerate(IND_KEYS01)}
     return s
 
 
@@ -236,8 +236,8 @@ def demo_of(r, inc=None):
                 "onepar": None, "rel": None, "ten": None,
                 "loinc": None, "hiinc": None, "hiqinc": None,
                 "incMed": None,
-                "pt": None, "noncit": None, "anc": None, "unemp": None,
-                "mar": None}
+                "pt": None, "noncit": None, "anc": None,
+                "unemp": None, "ind": None}
     return shares({
         "pers": r["pers"], "bands": r["bands"], "eng": r["eng"],
         "oth": r["oth"], "aus": r["aus"], "totc": r["totc"],
@@ -260,8 +260,8 @@ def demo_of(r, inc=None):
         "anc01": r.get("anc01"),
         "ancP01": r.get("ancp01"),
         "ancNS01": r.get("ancns01"),
-        "mar01": r.get("mar01"),
-        "lab01": r.get("lab01")})
+        "lab01": r.get("lab01"),
+        "inds01": r.get("inds01")})
 
 
 def main():
@@ -319,8 +319,8 @@ def main():
                                   "tw01": [0] * 3,
                                   "anc01": [0] * len(ANC_KEYS01),
                                   "ancP01": 0, "ancNS01": 0,
-                                  "mar01": [0] * 5,
-                                  "lab01": [0] * 2})
+                                  "lab01": [0] * 2,
+                                  "inds01": [0] * len(IND_KEYS01)})
     for code, dv in alloc.items():
         r = people.get(code)
         if r is None:
@@ -363,10 +363,10 @@ def main():
             acc["anc01"][i] += r["anc01"][i]
         acc["ancP01"] += r["ancp01"]
         acc["ancNS01"] += r["ancns01"]
-        for i in range(5):
-            acc["mar01"][i] += r["mar01"][i]
         acc["lab01"][0] += r["lab01"][0]
         acc["lab01"][1] += r["lab01"][1]
+        for i in range(len(IND_KEYS01)):
+            acc["inds01"][i] += r["inds01"][i]
     no_lanes_pop = sum(people[c]["pers"] for c in no_lanes)
 
     nat = defaultdict(int)
@@ -390,12 +390,12 @@ def main():
             nat["anc01"][i] += dv["anc01"][i]
         nat["ancP01"] = nat.get("ancP01", 0) + dv["ancP01"]
         nat["ancNS01"] = nat.get("ancNS01", 0) + dv["ancNS01"]
-        nat.setdefault("mar01", [0] * 5)
-        for i in range(5):
-            nat["mar01"][i] += dv["mar01"][i]
         nat.setdefault("lab01", [0] * 2)
         for i in range(2):
             nat["lab01"][i] += dv["lab01"][i]
+        nat.setdefault("inds01", [0] * len(IND_KEYS01))
+        for i in range(len(IND_KEYS01)):
+            nat["inds01"][i] += dv["inds01"][i]
         for k in ("relNS", "relTot", "indig", "indigDen",
                   "famN", "famD"):
             nat[k] += dv[k]
@@ -452,8 +452,9 @@ def main():
                 for i, k in enumerate(ANC_KEYS01)},
         "unemp": (round(nat["lab01"][0] / nat["lab01"][1], 4)
                   if nat["lab01"][1] else None),
-        "mar": {k: round(nat["mar01"][i] / sum(nat["mar01"]), 4)
-                for i, k in enumerate(MAR_KEYS)},
+        "ind": ({k: round(nat["inds01"][i] / sum(nat["inds01"]), 4)
+                 for i, k in enumerate(IND_KEYS01)}
+                if sum(nat["inds01"]) else None),
     }
     # measured-once pin (the 2004 lane's own figure): the tally total
     # (18,652,828) less the 8,249 people of the dropped offshore class
@@ -593,7 +594,11 @@ def main():
         "d13's); OCCUPATION is the ASCO classification (pre-ANZSCO): "
         "blue-collar maps {Tradespersons, Intermediate Production & "
         "Transport, Labourers} onto the ANZSCO 3/7/8 lane (broadly "
-        "comparable per ABS, the named definitional wobble). Birthplace "
+        "comparable per ABS, the named definitional wobble). The "
+        "industry picker (ind, indKeys order) reads B 26B's "
+        "ANZSIC-1993 industry totals as shares of the divisions' "
+        "stated sum, Non-classifiable and Not stated beside the read. "
+        "Birthplace "
         "countries ride cobKeys/cob (the /map/ Born-overseas country "
         "menu: whole-UK leading as eng leads the 2021-era menu, then "
         "the era's eight, all read from the same B 06 table).")
@@ -644,7 +649,9 @@ def main():
             "medianBasis": "households (shares are per-adult)",
         },
         "ancKeys": list(ANC_KEYS01),
-        "marKeys": list(MAR_KEYS),
+        # the Industry picker's ANZSIC-1993 seventeen (the census's own
+        # print edition; the shared IND_KEYS93 order)
+        "indKeys": list(IND_KEYS01),
         "deliveryBasis": (
             "venue-CD join per booth (inherit lane: the 2004 seifa "
             "store's own 2001-CD geo for the same premises; point-in-"

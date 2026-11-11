@@ -9,7 +9,7 @@ function lensShort() {
     case "senpref": return `${famLeg(S.spFrom)} Senate: ${spA(true)} v ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? "Exhausted ballots" : "Informal";
     case "cls": return "Seat type";
-    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isMar() ? `Marital status: ${MAR_NAME[S.mar]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
+    case "seifa": return isDemo() ? (isRel() ? REL_NAME[S.rel] : isTen() ? TEN_NAME[S.ten] : isAnc() ? `${ANC_NAME[S.anc]} ancestry` : isOcc() ? `Occupation: ${OCC_NAME[S.occ]}` : isInd() ? `Industry: ${IND_NAME[S.ind]}` : isInc() ? `Income: ${INC_SHORT[S.incMode]}` : isAge() ? `Age: ${AGE_SHORT[S.ageMode]}` : isEdu() ? `Education: ${EDU_SHORT[S.eduMode]}` : isFam() ? `Family: ${FAM_SHORT[S.famMode]}` : isCob() ? `Born in ${COB_SHORT[S.cob]}` : DM_SHORT[S.index]) : `${IX_ABBR[S.index]} decile`;
   }
   return "";
 }
@@ -90,10 +90,11 @@ let legendKey = "";
 // (boothsAs: the key's measure asks for one side or the other, below)
 let boothsAs = null;
 const boothsShown = () => boothsAs ?? (S.view === "map" && (selDiv() != null || T.k >= K_ALL || drawOf(M()) !== "seats"));
-// the select-lens option keys ride the key too: the chart's statKey derives
-// from this line, and a swapped option (Widowed to Never married) must
-// invalidate a chart the same way a swapped index does
-const legendState = () => [S.sel.level, S.sel.st, S.sel.div, S.sel.booth, SF.key, SF.data ? SF.data.n : 0, SF.empty, ...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.mar, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+const legendState = () => [S.sel.level, S.sel.st, S.sel.div, S.sel.booth, SF.key, SF.data ? SF.data.n : 0, SF.empty, ...(panelMQ.matches ? [S.f.st, S.f.cls] : []), S.view, boothsShown(), S.draw, S.axis, S.draw === "balloons" ? Math.round(2 * Math.log2(Math.max(1, T.k / HOME.k))) : 0, S.lens, S.tppMode, S.fpMode, S.senMode, S.infMode, S.incMode, S.ageMode, S.eduMode, S.famMode, S.party, S.from, S.vs, S.spPair, S.spFrom, S.index, S.cob, S.rel, S.ten, S.anc, S.occ, S.ind, S.year, S.seat, S.house, S.senLens, TH && TH.dark].join("|");
+// the select-lens option keys ride the key too — every option swap must
+// invalidate the views this list feeds (the legend itself and the
+// Chart view's stat key): an option cell missing here repaints nothing
+// on that lane's swap anywhere downstream
 // the Preferences key's source switch: the House's counted splits, or the Senate's ballots (federal years)
 let lensFlip = false;
 const flowSrcBtn = (m) => (STATE_YEARS.has(m.year) || (spYear(m.year) == null && S.lens !== "senpref") ? "" : ` <button type="button" class="flip" data-flip="flowsrc">${S.lens === "senpref" ? (spGvtYear(m.year) != null ? "Senate tickets" : "Senate ballots") : "Counted in the House"}<span>⇄</span></button>`);
@@ -306,12 +307,12 @@ function applyOpt(k, v) {
   if (k === "fcls") { S.f.cls = v || null; filtersChanged(); return; }
   if (k === "draw") return setDraw(v);
   if (k === "fjump") { const ys = FRAME_JUMPS[+v] && FRAME_JUMPS[+v][1]; if (ys && !ys.includes(S.year)) setYear(ys[ys.length - 1]); return; }
-  if (k === "jump") { if (v === "towns") { S.townsOff = !S.townsOff; renderLegend(); schedule(); } else flyToCity(+v); return; }
+  if (k === "jump") { if (v === "towns") { S.townsOff = !S.townsOff; renderLegend(); schedule(); } else if (v === "water") { S.waterOff = !S.waterOff; renderLegend(); schedule(); } else flyToCity(+v); return; }
   if (k === "axis") return setAxis(v);
   if (k === "vs") { S.vs = v; if (S.from === v) S.from = v === "onp" ? "lnp" : "onp"; }
   else if (k === "sppair") { S.spPair = v; if (!SP_DONORS[S.spPair].includes(S.spFrom)) S.spFrom = SP_DONORS[S.spPair][0]; }
   else if (k === "spfrom") S.spFrom = v;
-  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english"; else if (k === "occ") S.occ = v || "socprof"; else if (k === "mar") S.mar = v || "marr";
+  else if (k === "party") S.party = v; else if (k === "from") S.from = v; else if (k === "index") S.index = v; else if (k === "infm") S.infMode = v; else if (k === "incv") S.incMode = v; else if (k === "agev") S.ageMode = v; else if (k === "eduv") S.eduMode = v; else if (k === "famv") S.famMode = v; else if (k === "cob") S.cob = v || null; else if (k === "rel") S.rel = v || "norel"; else if (k === "ten") S.ten = v || "mort"; else if (k === "anc") S.anc = v || "english"; else if (k === "occ") S.occ = v || "socprof"; else if (k === "ind") S.ind = v || "ag";
   lensParamChanged();
 }
 function censusSelects(m, cls = "") {
@@ -320,7 +321,7 @@ function censusSelects(m, cls = "") {
     ...(m.tenKeys && m.tenKeys.length ? [[LENS_TEN, "Housing tenure"]] : []),
     ...(m.ancKeys && m.ancKeys.length ? [[LENS_ANC, "Ancestry"]] : []),
     ...(m.occKeys && m.occKeys.length ? [[LENS_OCC, "Occupation"]] : []),
-    ...(m.marKeys && m.marKeys.length ? [[LENS_MAR, "Marital status"]] : []),
+    ...(m.indKeys && m.indKeys.length ? [[LENS_IND, "Industry"]] : []),
   ];
   const out = [lgMenu("index", [
     [null, "Advantage, ABS SEIFA"],
@@ -338,14 +339,23 @@ function censusSelects(m, cls = "") {
     // lands, the aged shares beside it (a65/a2034 as menu lanes until
     // 2026-10-31, three new brackets same day)
     if (S.index === LENS_AGE) out.push(lgMenu("agev", AGE_MODES.map((k) => [k, AGE_NAME[k]]), S.ageMode, "Age view"));
-    // on Education the same picker reads the two schooling views: the
-    // university share lands, the left-school-early read beside it
-    // (uni/y12less as standalone menu lanes until 2026-10-31). The picker
+    // on Education the same picker now reads the three schooling views:
+    // the university share lands, the two highest-school-year reads
+    // beside it ("Year 12 or less" split into "Year 12" and "Year 10
+    // or less" on 2026-11-11). The picker
     // appears only between reads the frame actually printed: the
     // statistics-era frames carry the qualification read alone
     {
       const eduOpts = EDU_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false);
       if (S.index === LENS_EDU && eduOpts.length > 1) out.push(lgMenu("eduv", eduOpts.map((k) => [k, EDU_NAME[k]]), S.eduMode, "Education view"));
+    }
+    // on Family composition the same picker reads the three views:
+    // Children under 15 lands, One-parent families and More than two
+    // children beside it (a frame whose census era has no children-
+    // ever-born table drops More than two children)
+    {
+      const famOpts = FAM_MODES.filter((k) => !m.hasLane || m.hasLane[k] !== false);
+      if (S.index === LENS_FAM && famOpts.length > 1) out.push(lgMenu("famv", famOpts.map((k) => [k, FAM_NAME[k]]), S.famMode, "Family view"));
     }
     // on Born overseas a second picker reads a birthplace country per year
     // (the year's own census-edition menu; the informal lens's own
@@ -358,8 +368,9 @@ function censusSelects(m, cls = "") {
     if (S.index === LENS_ANC && m.ancKeys && m.ancKeys.length) out.push(lgMenu("anc", m.ancKeys.map((k) => [k, ANC_NAME[k]]), S.anc, "Ancestry"));
     // the Occupation classes picker (2021-census-era frames alone publish occKeys)
     if (S.index === LENS_OCC && m.occKeys && m.occKeys.length) out.push(lgMenu("occ", m.occKeys.map((k) => [k, OCC_NAME[k]]), S.occ, "Occupation"));
-    // the Marital status lens's own option picker (Married lands)
-    if (S.index === LENS_MAR && m.marKeys && m.marKeys.length) out.push(lgMenu("mar", m.marKeys.map((k) => [k, MAR_NAME[k]]), S.mar, "Marital status"));
+    // the Industry divisions picker (every frame with a print era's
+    // industry table — the GCP-era nineteen or the '93 seventeen)
+    if (S.index === LENS_IND && m.indKeys && m.indKeys.length) out.push(lgMenu("ind", m.indKeys.map((k) => [k, IND_NAME[k]]), S.ind, "Industry"));
   }
   return out;
 }
@@ -507,12 +518,12 @@ function legendHTML(m) {
         const headNote = isInc() ? incNote
           : isAge() ? ageNote
           : isEdu() ? EDU_NOTE[S.eduMode]
+          : isFam() ? FAM_NOTE[S.famMode]
           : isCob() ? `Share of residents born in ${COB_NAME[S.cob]}`
           : isRel() ? `Share of residents who ${RELISMS[S.rel]}`
           : isTen() ? `Share of dwellings that ${TENESMS[S.ten]}`
           : isAnc() ? `Share of residents who ${ANCISMS[S.anc]} (people could name up to two ancestries, so the options don't add up to a whole)`
           : isOcc() ? `Share of workers who ${OCCISMS[S.occ]} (the seven classes aren't exhaustive — technicians, service, clerical and sales workers sit in no class — so the options don't add up to a whole)`
-          : isMar() ? `Share of people aged 15+ who ${MARISMS[S.mar]} (registered marital status; those who never stated one sit outside the share)`
           : S.index === "pt" ? ptNote
           : NOTE_ARC[S.index] || `Share of ${censusWho(m).phrase}`;
         const basisTail = m.demoInterp ? `interpolated between the ${m.demoInterp.c0} and ${m.demoInterp.c1} censuses to election day${m.demoBasis === "venue" ? `, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in` : `, where each ${boothsOn ? "place’s" : "seat’s"} voters live`}.` : m.demoBasis === "venue" ? `${m.year < 2004 ? 2001 : m.year < 2013 ? 2006 : 2011} census, of the census areas ${boothsOn ? "the places stand" : "the polling places stand"} in.` : m.demoBasis === "sa1" ? `${m.demoYear ?? 2021} census, of the SA1 census area${boothsOn ? " each polling place stands in" : "s that make up each district"}.` : `2021 census, where each ${boothsOn ? "place’s" : "seat’s"} voters live.`;
@@ -719,16 +730,21 @@ function compactPanelHTML(m) {
   if (S.view === "map") {
     pairs.push(["Draw", lgMenu("draw", drawOpts(m).map(({ k, t, why }) => [k, t, !!why, why]), drawOf(m), "Draw the map as")]);
     const j = stOfYear(S.year);
-    pairs.push(["Jump to", lgMenu("jump", [[null, "City"], ...CITIES.map(([n, st], k) => (!j || st === j ? [String(k), n] : null)).filter(Boolean), [null, "On the map"], ["towns", S.townsOff ? "Show city names" : "Hide city names"]], "", "Go to a city")]);
+    pairs.push(["Jump to", lgMenu("jump", [[null, "City"], ...CITIES.map(([n, st], k) => (!j || st === j ? [String(k), n] : null)).filter(Boolean), [null, "On the map"], ["water", S.waterOff ? "Show water" : "Hide water"], ["towns", S.townsOff ? "Show city names" : "Hide city names"]], "", "Go to a city")]);
   }
   return pairs.length ? `<div class="lg-cgrid">${pairs.map(([l, c]) => `<span class="lg-label">${l}</span><span class="lg-cg">${c}</span>`).join("")}</div>` : "";
 }
 /* the City-names switch, closing the Draw row: it changes what's drawn, so it
    sits with the drawings, and it looks like a switch, not like a chosen city
    (it wore the chosen-chip style at the Jump-to row's end — user call
-   2026-11-10, design A). Its words never change, so flipping it moves nothing */
+   2026-11-10, design A). Its words never change, so flipping it moves nothing.
+   The Water switch rides beside it (user call 2026-11-11: the inland lakes
+   and the ocean paper itself off and on, as the cities' names are) */
 function townsToggleHTML(on) {
   return `<button type="button" class="lg-jtoggle" data-towns role="switch" aria-checked="${on}"><span class="lg-sw" aria-hidden="true"></span>City names</button>`;
+}
+function waterToggleHTML(on) {
+  return `<button type="button" class="lg-jtoggle" data-water role="switch" aria-checked="${on}"><span class="lg-sw" aria-hidden="true"></span>Water</button>`;
 }
 /* the map's Jump-to row: cities are jump targets, independent of the filters */
 function jumpHTML() {
@@ -736,22 +752,12 @@ function jumpHTML() {
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
   return `<div class="lg-jump lg-row" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}</div>`;
 }
-/* the jump row leaves the strip only when a seat is chosen (or in another view), never
-   for zoom. It once hid at 3 x HOME.k: the stage is the strip's remainder and HOME.k is
-   the country's fit to that stage, so the row's going grew the stage, lowered HOME.k,
-   crossed back under 3 x and brought the row back — the stage flipped 30px every frame
-   while the zoom sat in that band (user report 2026-11-10: the map "jumps up and down
-   aggressively" at one zoom). Holding its line instead would only leave a hole, and the
-   cities stay good jump targets at any depth. Zooming never resizes the stage. */
-function jumpRowVis(cit) {
-  if (cit) cit.hidden = S.view !== "map" || selDiv() != null;
-}
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
   const cit = $("#cities");
-  // the strip's jump row hides while a seat is chosen —
+  // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
   // re-fixed here because renderLegend re-creates it on every render
-  jumpRowVis(cit);
+  if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
   $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
   renderFrames();
@@ -877,7 +883,8 @@ function updateHint() {
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover to check local coverage, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   // the row stays while a jump selection is live, so it can be toggled back off
-  jumpRowVis($("#cities"));
+  const citRow = $("#cities");
+  if (citRow) citRow.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
@@ -1031,8 +1038,6 @@ function setLens(id) {
   $$("#lenses .rd-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.lens === id)));
   startChamberGlide();
   recolor(true); renderLegend(); renderStory(true); writeURL();
-  // the head line follows the lens (the senate lenses say the current Senate)
-  $("#mp-meta").textContent = metaLine(); holdEyebrow();
   if (S.view === "list") renderList(true);
   if (hold) hold.land();
 }
@@ -1131,22 +1136,27 @@ async function setYear(y) {
   if (!(b.tenKeys || []).includes(S.ten)) S.ten = (b.tenKeys || [])[0] || "mort";
   if (!(b.ancKeys || []).includes(S.anc)) S.anc = (b.ancKeys || [])[0] || "english";
   if (!(b.occKeys || []).includes(S.occ)) S.occ = (b.occKeys || [])[0] || "socprof";
-  // the Marital status menu appears only where the frame's stores carry
-  // it; an unknown option falls back to the menu's landing view
-  if (!(b.marKeys || []).includes(S.mar)) S.mar = (b.marKeys || [])[0] || "marr";
+  // Industry's menu rides the frame's own era list: an option the era
+  // never prints lands its first division (the GCP-era way like the
+  // '93-era keys' era-gap clamps — a frame lacks industry only where
+  // the '91 census side were the measured print (the app reads an era
+  // hole round the stats-era floor, never a picker there))
+  if (!(b.indKeys || []).includes(S.ind)) S.ind = (b.indKeys || [])[0] || "ag";
   // a People lane the frame's era never printed (menu omits it) drops
   // the selection to the always-printed language share
-  if (b.hasLane && (DM.includes(S.index) || S.index === LENS_EDU) && b.hasLane[S.index] === false) S.index = "lang";
+  if (b.hasLane && (DM.includes(S.index) || S.index === LENS_EDU || S.index === LENS_FAM) && b.hasLane[S.index] === false) S.index = "lang";
   // a schooling read the era never prints falls back to the frame's own
   // (the statistics-era frames keep University educated alone)
   if (S.index === LENS_EDU && b.hasLane && b.hasLane[S.eduMode] === false) S.eduMode = EDU_MODES.find((k) => b.hasLane[k] !== false) || "uni";
+  // a family read the era never prints falls back the same way
+  if (S.index === LENS_FAM && b.hasLane && b.hasLane[S.famMode] === false) S.famMode = FAM_MODES.find((k) => b.hasLane[k] !== false) || "u15";
   if (b.hasIx && IX.includes(S.index) && b.hasIx[S.index] === false) S.index = "irsd";
   if (S.party === "onp" && !famEraOpts(b).includes("onp")) S.party = "lnp";
   if (!b.relKeys && S.index === LENS_REL) S.index = "irsad";
   if (!b.tenKeys && S.index === LENS_TEN) S.index = "irsad";
   if (!b.ancKeys && S.index === LENS_ANC) S.index = "irsad";
   if (!b.occKeys && S.index === LENS_OCC) S.index = "irsad";
-  if (!b.marKeys && S.index === LENS_MAR) S.index = "irsad";
+  if (!b.indKeys && S.index === LENS_IND) S.index = "irsad";
   proj = b.proj; // the year now shown (a year loaded ahead keeps the live projection)
   // carry the selection across by seat name and polling-place ID
   const s = S.sel;
@@ -1270,14 +1280,6 @@ function tlGlide(r0) {
 }
 function metaLine(m = M(), sen = senOn() ? SENM : null) {
   if (!m) return "";
-  /* the senate lanes' line names the chamber like the head does (user call
-     2026-11-10): the current Senate, with its last move off the senate
-     change window rather than the House list's */
-  const senLens = !sen && m.year === "now" && (S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && (SENM || SENY.now);
-  if (senLens) {
-    const deck = SENM || SENY.now, moved = (m.senChanges || []).reduce((a, c) => (c.date > a ? c.date : a), "") || deck.asOf;
-    return `The current Senate, last changed ${longDate(moved)} · ${deck.divs.length} senators`;
-  }
   if (sen) return sen.lc ? `${STATE_POSS[stOfYear(sen.year)]} Legislative Council from ${longDate(sen.asOf)} · ${sen.divs.length} members` : sen.year === "now" ? `The Senate as it sits, ${longDate(sen.asOf)} · ${sen.divs.length} senators` : `The Senate from ${longDate(sen.asOf)}, after the ${sen.year} election · ${sen.divs.length} senators`;
   // the federal Now names its last move over a data tick: the newest "Since the election" entry
   const changed = (m.changes || []).reduce((a, c) => (c.date > a ? c.date : a), "") || m.asOf;
@@ -1329,17 +1331,8 @@ addEventListener("resize", lensOverflow);
 /* =============================== the frame =============================== */
 let raf = 0;
 function schedule() { if (!raf) raf = requestAnimationFrame(frame); }
-/* a still canvas must not quite sit still: Safari hibernates an unpainted 2D
-   canvas's GPU surface (the sea painting black ~half a minute into a dwell,
-   its store still fine: a user-reported light-mode bug of 2026-11), and a
-   repaint is its only wake. One soft tick well past any hibernate horizon. */
-const STILL_MS = 20000;
-let still = 0;
-function unstill() { clearTimeout(still); if (!document.hidden) still = setTimeout(() => { still = 0; if (!raf) schedule(); }, STILL_MS); }
-document.addEventListener("visibilitychange", () => { if (!document.hidden) schedule(); });
 function frame(ts) {
   raf = 0;
-  unstill();
   chartTick();
   const m = M(); const th = TH;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1439,7 +1432,7 @@ function writeURL() {
   if (S.lens === "senate") { p.set("p", S.party); if (!senGap()) p.set("m", "share"); }
   if (S.lens === "flow") { p.set("p", S.from); if (S.vs !== "lnp") p.set("f", S.vs); }
   if (S.lens === "senpref") { p.set("sp", S.spPair); p.set("p", S.spFrom); }
-  if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); if (isOcc()) p.set("oc", S.occ); if (isMar() && S.mar !== "marr") p.set("ma", S.mar); }
+  if (S.lens === "seifa") { p.set("i", S.index); if (isInc() && S.incMode !== "med") p.set("iv", S.incMode); if (isAge() && S.ageMode !== "med") p.set("av", S.ageMode); if (isEdu() && S.eduMode !== "uni") p.set("ev", S.eduMode); if (isFam() && S.famMode !== "u15") p.set("fv", S.famMode); if (isCob()) p.set("cb", S.cob); if (isRel() && S.rel !== "norel") p.set("rl", S.rel); if (isTen() && S.ten !== "mort") p.set("tn", S.ten); if (isAnc()) p.set("an", S.anc); if (isOcc()) p.set("oc", S.occ); if (isInd()) p.set("in", S.ind); }
   if (S.lens === "informal" && S.infMode === "exhaust") p.set("im", "exhaust");
   if (S.draw !== "seats") p.set("draw", S.draw);
   // the chart's own switches ride along: the seat-type split and the vote-type comparison
@@ -1490,16 +1483,20 @@ function readURL() {
   // schooling-read hashes: the legacy y12less id lands on its nearest
   // living read ("Year 10 or less", its left-early half)
   else if (EDU_MODES.includes(i) || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y10less" : i; }
-  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_MAR)) S.index = i;
+  // the family reads' own ids pre-date the fold: a legacy u15/onepar/
+  // bigfam hash lands on the Family composition lens with its read picked
+  else if (FAM_MODES.includes(i)) { S.index = LENS_FAM; S.famMode = i; }
+  else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_FAM || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_IND)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
   const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
   const ev = p.get("ev"); S.eduMode = EDU_MODES.includes(ev) ? ev : ev === "y12less" ? "y10less" : EDU_MODES.includes(i) ? i : i === "y12less" ? "y10less" : "uni";
+  const fv = p.get("fv"); S.famMode = FAM_MODES.includes(fv) ? fv : FAM_MODES.includes(i) ? i : "u15";
   S.cob = COB_NAME[p.get("cb")] ? p.get("cb") : null;
   S.rel = REL_NAME[p.get("rl")] ? p.get("rl") : "norel";
   S.ten = TEN_NAME[p.get("tn")] ? p.get("tn") : "mort";
   S.anc = ANC_NAME[p.get("an")] ? p.get("an") : "english";
   S.occ = OCC_NAME[p.get("oc")] ? p.get("oc") : "socprof";
-  S.mar = MAR_NAME[p.get("ma")] ? p.get("ma") : "marr";
+  S.ind = IND_NAME[p.get("in")] ? p.get("in") : "ag";
   if (p.get("im") === "exhaust") S.infMode = "exhaust";
   const v = p.get("v"); if (v === "chamber" || v === "list") S.view = v;
   const o = p.get("o"); if (o === "plan" || o === "sort") S.seat = o;
@@ -1584,8 +1581,6 @@ $("#story").addEventListener("pointermove", (e) => {
   c.style.cursor = i != null ? "pointer" : "";
 });
 $("#story").addEventListener("click", (e) => {
-  const voteParty = e.target.closest("[data-vt-party]");
-  if (voteParty) { (vtLast && vtLast.senate ? setVtSenParty : setVtParty)(voteParty.dataset.vtParty); return; }
   const voteMode = e.target.closest("[data-vt-mode]");
   if (voteMode) { setVtMode(voteMode.dataset.vtMode); return; }
   const closeTgl = e.target.closest("[data-close-toggle]");
@@ -1669,6 +1664,13 @@ document.addEventListener("click", (e) => {
   if (tn) {
     S.townsOff = !S.townsOff;
     tn.setAttribute("aria-checked", String(!S.townsOff));
+    schedule(); return;
+  }
+  // its neighbour: the water beneath the map off and on (the same in-place flip)
+  const wt = e.target.closest("[data-water]");
+  if (wt) {
+    S.waterOff = !S.waterOff;
+    wt.setAttribute("aria-checked", String(!S.waterOff));
     schedule(); return;
   }
   const t = e.target.closest("[data-go],[data-lens],[data-view],[data-sort],[data-unit],[data-unseat],[data-unrange],[data-distclose],[data-dist],[data-listbooths],[data-showmap],[data-more],[data-clear],[data-n],[data-flip],[data-seat],[data-house],[data-slens],[data-sgo],[data-draw]");
@@ -1755,7 +1757,7 @@ document.addEventListener("keydown", (e) => {
     else goUp();
   }
   // A focused chart toggle keeps its native keyboard activation.
-  if (e.key === " " && e.target.closest("[data-vt-mode],[data-vt-party]")) return;
+  if (e.key === " " && e.target.closest("[data-vt-mode]")) return;
   if (e.key === "b") { if (S.view === "map" && !$("#zback").hidden) { e.preventDefault(); goAus(); } }
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); (lensHover ? walkLens : walkYear)(e.key === "ArrowRight" ? 1 : -1); }
   if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); walkLane(e.key === "ArrowDown" ? 1 : -1); }
@@ -1861,13 +1863,19 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   if (bmc && !bmc.ancKeys && S.index === LENS_ANC) S.index = "irsad";
   if (bmc && !(bmc.occKeys || []).includes(S.occ)) S.occ = (bmc.occKeys || [])[0] || "socprof";
   if (bmc && !bmc.occKeys && S.index === LENS_OCC) S.index = "irsad";
+  // Industry's era-gap clamps, the select lenses' way: an option the
+  // frame's print never offers lands its first division; a frame with
+  // no industry lane at all (the '91-side stats era and res-2001's
+  // frozen statistics-era print) never carries the menu
+  if (bmc && !(bmc.indKeys || []).includes(S.ind)) S.ind = (bmc.indKeys || [])[0] || "ag";
+  if (bmc && !bmc.indKeys && S.index === LENS_IND) S.index = "irsad";
   if (bmc && !bmc.relKeys && S.index === LENS_REL) S.index = "irsad";
   if (bmc && !bmc.tenKeys && S.index === LENS_TEN) S.index = "irsad";
-  if (bmc && !(bmc.marKeys || []).includes(S.mar)) S.mar = (bmc.marKeys || [])[0] || "marr";
-  if (bmc && !bmc.marKeys && S.index === LENS_MAR) S.index = "irsad";
   // yesterday's hash on a statistics-era frame: the schooling read falls
   // back to University educated, the era's only education lane
   if (bmc && bmc.hasLane && S.index === LENS_EDU && bmc.hasLane[S.eduMode] === false) S.eduMode = EDU_MODES.find((k) => bmc.hasLane[k] !== false) || "uni";
+  // a family read the boot frame's era never printed falls back the same way
+  if (bmc && bmc.hasLane && S.index === LENS_FAM && bmc.hasLane[S.famMode] === false) S.famMode = FAM_MODES.find((k) => bmc.hasLane[k] !== false) || "u15";
   if (S.house === "senate") { try { await Promise.all([loadSenateFloor(), loadSenate(S.year)]); syncSenate(); applySenFromURL(); loadSenates(); } catch (e) { S.house = "reps"; } }
   showLoading(false);
   $("#mp-meta").textContent = metaLine(); holdEyebrow();

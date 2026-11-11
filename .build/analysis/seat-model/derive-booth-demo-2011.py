@@ -138,7 +138,7 @@ def sum_divisions(alloc, sa1, inc):
                                   "ancns": 0, "ancP": 0,
                                   "hle": 0.0,
                                   "labU": 0, "labLF": 0,
-                                  "marvec": [0] * len(d13.MAR_KEYS)})
+                                  "indn": [0] * len(d13.IND_KEYS)})
     for key, dv in alloc.items():
         r = sa1.get(key)
         ir = inc.get(key)
@@ -184,8 +184,8 @@ def sum_divisions(alloc, sa1, inc):
         acc["hle"] += r["hle"] or 0.0
         acc["labU"] += r["labU"]
         acc["labLF"] += r["labLF"]
-        for i in range(len(d13.MAR_KEYS)):
-            acc["marvec"][i] += r["marvec"][i]
+        for i in range(len(d13.IND_KEYS)):
+            acc["indn"][i] += r["indn"][i]
     return divsum
 
 
@@ -216,6 +216,9 @@ def national_of(divsum):
                   "famN", "famD", "ceb3", "cebns", "cebt",
                   "ancns", "ancP", "labU", "labLF"):
             nat[k] += dv[k]
+        for i in range(len(d13.IND_KEYS)):
+            nat.setdefault("indn", [0] * len(d13.IND_KEYS))
+            nat["indn"][i] += dv["indn"][i]
         for i in range(len(d13.REL_KEYS)):
             nat.setdefault("relvec", [0] * len(d13.REL_KEYS))
             nat["relvec"][i] += dv["relvec"][i]
@@ -226,9 +229,6 @@ def national_of(divsum):
             nat.setdefault("ancn", [0] * len(d13.ANC_KEYS))
             nat["ancn"][i] += dv["ancn"][i]
         nat["hle"] = nat.get("hle", 0.0) + dv["hle"]
-        for i in range(len(d13.MAR_KEYS)):
-            nat.setdefault("marvec", [0] * len(d13.MAR_KEYS))
-            nat["marvec"][i] += dv["marvec"][i]
     nat_b = sum(nat[b] for b in d13.BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -277,8 +277,9 @@ def national_of(divsum):
                 for i, k in enumerate(d13.ANC_KEYS)},
         "unemp": (round(nat["labU"] / nat["labLF"], 4)
                   if nat["labLF"] else None),
-        "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
-                for i, k in enumerate(d13.MAR_KEYS)},
+        "ind": ({k: round(nat["indn"][i] / sum(nat["indn"]), 4)
+                 for i, k in enumerate(d13.IND_KEYS)}
+                if sum(nat["indn"]) else None),
     }
 
 
@@ -371,8 +372,8 @@ def main():
                     "ancns": row["ancns"], "ancP": row["ancP"],
                     "hle": row["hle"],
                     "labU": row["labU"], "labLF": row["labLF"],
-                    "marvec": (list(row["marvec"]) if row["marvec"]
-                               is not None else None)})
+                    "indn": (list(row["indn"]) if row["indn"] is not None
+                             else None)})
             out_booths.append(rec)
 
         divisions = []
@@ -493,7 +494,9 @@ def main():
             "relKeys": list(d13.REL_KEYS),
             "tenKeys": list(d13.TEN_KEYS),
             "ancKeys": list(d13.ANC_KEYS),
-            "marKeys": list(d13.MAR_KEYS),
+            # the Industry picker's nineteen ANZSIC-2006 divisions —
+            # the 2013 store's own key list (same census universe)
+            "indKeys": list(d13.IND_KEYS),
             "counts": counts,
             "divisions": divisions,
             "booths": out_booths,
