@@ -930,7 +930,7 @@ function RdHero(p) {
         y1: d.hi
       })), xDomain[0])
     });
-  const cloudFor = (id, b) => !showScatter ? [] : D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).map(q => {
+  const cloudFor = (id, b) => !showScatter ? [] : D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1] && !q.noAgg).map(q => {
     const pair = iScatOf(id, b)(q);
     return pair ? {
       x: q.x,
@@ -987,7 +987,7 @@ function RdHero(p) {
     });
     if (sc.other) sc.other.forEach(d => v.push(d.a));
     if (showScatter) D.individualPolls.forEach(q => {
-      if (q.x < xDomain[0] || q.x > xDomain[1]) return;
+      if (q.x < xDomain[0] || q.x > xDomain[1] || q.noAgg) return;
       const pair = iScatOf(id, b)(q);
       if (pair) v.push(pair[0].y);
     });

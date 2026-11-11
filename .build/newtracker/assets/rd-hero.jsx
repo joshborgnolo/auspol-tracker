@@ -723,9 +723,13 @@ function RdHero(p) {
 
   /* the dots: each poll's reading of Labor's share in the chosen contest,
      coloured by the contest. A poll that published both contests is one
-     fieldwork asked two ways, so its dot travels between them. */
+     fieldwork asked two ways, so its dot travels between them. A
+     no-aggregate wave (EMRS (Tas) is the live one) carries full figures in
+     the archive tables, but a Tasmania-only reading is not a national
+     figure drawn beside the national line – its home is the
+     Who-votes-for-whom territory view, so it joins no cloud here. */
   const cloudFor = (id, b) => (!showScatter ? [] : D.individualPolls
-    .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+    .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1] && !q.noAgg)
     .map((q) => {
       const pair = iScatOf(id, b)(q);
       return pair ? { x: q.x, y: pair[0].y, color: M[id].b.color, label: M[id].a.name + " v " + M[id].b.name, meta: q } : null;
@@ -759,7 +763,9 @@ function RdHero(p) {
     sc.main.forEach((d) => { v.push(d.a); if (d.ci95) v.push(d.a - d.ci95, d.a + d.ci95); });
     if (sc.other) sc.other.forEach((d) => v.push(d.a));
     if (showScatter) D.individualPolls.forEach((q) => {
-      if (q.x < xDomain[0] || q.x > xDomain[1]) return;
+      // no-aggregate rows never widen the window – the undrawn cloud must
+      // not price the axis either (cloudFor above skips the same rows)
+      if (q.x < xDomain[0] || q.x > xDomain[1] || q.noAgg) return;
       const pair = iScatOf(id, b)(q);
       if (pair) v.push(pair[0].y);
     });
