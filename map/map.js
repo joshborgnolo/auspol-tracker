@@ -6707,7 +6707,9 @@ function balloonWord(m) {
 function balloonKey(m, est) {
   const s = balScale(), nice = [50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
   const big = nice.filter((v) => Math.sqrt(v) * s <= 9.5).pop() || 50, list = [big, nice[Math.max(0, nice.indexOf(big) - 2)], nice[Math.max(0, nice.indexOf(big) - 4)]].filter((v, k, a) => a.indexOf(v) === k);
-  const R = Math.sqrt(big) * s, H = Math.ceil(2 * R + 2);
+  // (the box keeps the tallest circle's height, 9.5 px across zooms: a box sized to the
+  //  zoom's own biggest circle grew the strip a pixel at a time, nudging the stage)
+  const H = Math.ceil(2 * 9.5 + 2);
   let x = 0, circles = "", labels = "";
   for (const v of list) { const r = Math.max(0.8, Math.sqrt(v) * s); circles += `<circle cx="${(x + r + 1).toFixed(1)}" cy="${(H - 1 - r).toFixed(1)}" r="${r.toFixed(1)}"/>`; x += 2 * r + 2; labels += `${labels ? ", " : ""}${int(v)}`; }
   return `<div class="lg-bal"><svg width="${Math.ceil(x + 2)}" height="${H}" viewBox="0 0 ${Math.ceil(x + 2)} ${H}" aria-hidden="true">${circles}</svg><span>${est && (S.lens === "winner" || S.lens === "tpp") ? "Estimated lead, votes" : balloonWord(m)}: ${labels}</span></div>`;
@@ -12845,12 +12847,22 @@ function jumpHTML() {
   const cities = CITIES.map(([n, st], k) => !j || st === j ? `<button type="button" data-city="${k}">${n}</button>` : "").join("");
   return `<div class="lg-jump lg-row" id="cities" role="group" aria-label="Go to a city"><b>Jump to</b>${cities}</div>`;
 }
+/* the jump row leaves the strip only when a seat is chosen (or in another view), never
+   for zoom. It once hid at 3 x HOME.k: the stage is the strip's remainder and HOME.k is
+   the country's fit to that stage, so the row's going grew the stage, lowered HOME.k,
+   crossed back under 3 x and brought the row back — the stage flipped 30px every frame
+   while the zoom sat in that band (user report 2026-11-10: the map "jumps up and down
+   aggressively" at one zoom). Holding its line instead would only leave a hole, and the
+   cities stay good jump targets at any depth. Zooming never resizes the stage. */
+function jumpRowVis(cit) {
+  if (cit) cit.hidden = S.view !== "map" || selDiv() != null;
+}
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
   const cit = $("#cities");
-  // the strip's jump row hides while a seat is chosen or the view is deep-zoomed —
+  // the strip's jump row hides while a seat is chosen —
   // re-fixed here because renderLegend re-creates it on every render
-  if (cit) cit.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
+  jumpRowVis(cit);
   $$("#state-filters [data-state]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === (S.f.st || ""))));
   $$("#type-filters [data-cls]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cls === (S.f.cls || ""))));
   renderFrames();
@@ -12976,8 +12988,7 @@ function updateHint() {
   el.textContent = !show ? "" : drawOf(M()) === "balloons" ? "Balloons join where they’d overlap; zoom in to part them" : drawOf(M()) === "surface" ? "Hover to check local coverage, or choose a seat to see its polling places" : "Zoom in, or choose a seat, to see its polling places";
   el.style.opacity = show ? "1" : "0";
   // the row stays while a jump selection is live, so it can be toggled back off
-  const citRow = $("#cities");
-  if (citRow) citRow.hidden = S.view !== "map" || selDiv() != null || (T.k > HOME.k * 3 && S.sel.level !== "state");
+  jumpRowVis($("#cities"));
   // the jump-back control lives wherever the default view no longer is
   $("#zback").hidden = !(S.view === "map" && (S.sel.level !== "aus" || T.k > HOME.k * 1.001));
 }
