@@ -366,9 +366,9 @@
       }
     },
     "dir": {
-      "right": 23.9,
-      "wrong": 64.7,
-      "net": -40.8
+      "right": 22.3,
+      "wrong": 65.2,
+      "net": -42.9
     },
     "issLead": {
       "climate": "alp",
@@ -391,10 +391,12 @@
       "security": "National security"
     },
     "sig": {
+      "dir|net": -1,
       "iss|health|imp": -1,
       "iss|immigration|imp": -1
     },
     "sigMeta": {
+      "dir|net": "the right-track-minus-wrong-track net",
       "iss|health|imp": "the share naming health a top-three issue",
       "iss|immigration|imp": "the share naming immigration a top-three issue"
     },
@@ -754,6 +756,12 @@
       "label": "11 Nov 2026",
       "kind": "finding",
       "text": "Provincial voters (by location) now break significantly toward the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-11-12",
+      "label": "12 Nov 2026",
+      "kind": "finding",
+      "text": "The fall in the right-track-minus-wrong-track net over the past month is now statistically significant."
     }
   ]
 }
