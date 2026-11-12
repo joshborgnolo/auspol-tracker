@@ -1,10 +1,10 @@
 {
  "_about": "W4 of .build/analysis/seat-model-plan.md — vote layer: national nowcast ΔV (gen-data §7e primaryNow vs certified 2025), per-state swing deviations (self-centred per house, DL-pooled, shrunk toward 0), and differential-swing β for age/gender (Resolve difference-in-differences vs its 2025-05-03 baseline wave, self-centred so Σ w_g β_g = 0). lnp = combined Coalition. Deviations/β are pp. NOT ESTIMABLE: education/income/location/housing/generation — no May-2025 baseline wave carries them (the polling-day Resolve wave carries age/gender/state only). Tas/NT/ACT are composition-only. Marginals, not joints; no interaction terms exist for layer 3. Structural uncertainty exceeds everything these SEs express — intervals are floor, not ceiling.",
  "_provenance": {
-  "generated": "2026-11-11",
+  "generated": "2026-11-12",
   "inputs": {
-   "data/polls.json": "5212853b961c34dc",
-   "data/demographics.json": "734a95a50814ad15",
+   "data/polls.json": "8d96594d99a65ed0",
+   "data/demographics.json": "f8edb96e6284f612",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0",
    "data/aes-2025-groups.json": "00823a6ddedb8345"
@@ -209,7 +209,7 @@
      "compositionOnly": false
     },
     "grn": {
-     "dev": 0.29,
+     "dev": 0.28,
      "se": 0.42,
      "houses": [
       "Resolve",
@@ -259,7 +259,7 @@
      "compositionOnly": false
     },
     "on": {
-     "dev": 2.07,
+     "dev": 2.08,
      "se": 1.01,
      "houses": [
       "Resolve",
@@ -283,7 +283,7 @@
      "compositionOnly": false
     },
     "oth": {
-     "dev": -0.05,
+     "dev": -0.06,
      "se": 0.41,
      "houses": [
       "Resolve",
@@ -297,7 +297,7 @@
    },
    "SA": {
     "alp": {
-     "dev": -0.11,
+     "dev": -0.1,
      "se": 0.7,
      "houses": [
       "Resolve",
@@ -309,7 +309,7 @@
      "compositionOnly": false
     },
     "lnp": {
-     "dev": 1.17,
+     "dev": 1.18,
      "se": 1.31,
      "houses": [
       "Resolve",
@@ -359,7 +359,7 @@
    },
    "WA": {
     "alp": {
-     "dev": -0.12,
+     "dev": -0.13,
      "se": 0.62,
      "houses": [
       "Resolve",
@@ -1144,7 +1144,7 @@
       "Resolve:NSW -1.76±2.24",
       "Newspoll (pooled):NSW 0.23±1.17",
       "DemosAU (MRP):NSW -0.78±0.81",
-      "YouGov:NSW -0.4±1",
+      "YouGov:NSW -0.39±1.01",
       "Roy Morgan:NSW 1.41±0.91"
      ]
     },
@@ -1155,7 +1155,7 @@
       "Resolve:NSW -3.04±2.17",
       "Newspoll (pooled):NSW -1.26±0.96",
       "DemosAU (MRP):NSW 1.34±0.77",
-      "YouGov:NSW -1.47±0.93",
+      "YouGov:NSW -1.48±0.93",
       "Roy Morgan:NSW -0.86±0.83"
      ]
     },
@@ -1166,7 +1166,7 @@
       "Resolve:NSW 2.95±1.41",
       "Newspoll (pooled):NSW 1.31±1.18",
       "DemosAU (MRP):NSW -0.14±0.8",
-      "YouGov:NSW 0.71±1.03",
+      "YouGov:NSW 0.72±1.03",
       "Roy Morgan:NSW 1.27±0.89"
      ]
     },
@@ -1177,7 +1177,7 @@
       "Resolve:NSW 0.56±1.5",
       "Newspoll (pooled):NSW -0.02±0.83",
       "DemosAU (MRP):NSW 0.39±0.59",
-      "YouGov:NSW 1.36±0.79",
+      "YouGov:NSW 1.36±0.8",
       "Roy Morgan:NSW -1.04±0.67"
      ]
     },
@@ -1188,7 +1188,7 @@
       "Resolve:NSW 0.97±1.7",
       "Newspoll (pooled):NSW -0.25±0.77",
       "DemosAU (MRP):NSW -0.8±0.59",
-      "YouGov:NSW 0.49±0.77",
+      "YouGov:NSW 0.48±0.77",
       "Roy Morgan:NSW -0.48±0.67"
      ]
     }
@@ -1201,7 +1201,7 @@
       "Resolve:Vic -2.24±2.42",
       "Newspoll (pooled):Vic 0.47±1.26",
       "DemosAU (MRP):Vic 0.46±0.88",
-      "YouGov:Vic -1.93±1.05",
+      "YouGov:Vic -1.94±1.05",
       "Roy Morgan:Vic -0.2±0.96"
      ]
     },
@@ -1212,7 +1212,7 @@
       "Resolve:Vic 6.29±2.32",
       "Newspoll (pooled):Vic 3.07±1.15",
       "DemosAU (MRP):Vic 0.67±0.83",
-      "YouGov:Vic 2.99±1.09",
+      "YouGov:Vic 3±1.1",
       "Roy Morgan:Vic 4.41±0.98"
      ]
     },
@@ -1223,12 +1223,12 @@
       "Resolve:Vic -1.11±1.5",
       "Newspoll (pooled):Vic -4.46±1.2",
       "DemosAU (MRP):Vic -0.9±0.86",
-      "YouGov:Vic -1.53±1.09",
+      "YouGov:Vic -1.54±1.09",
       "Roy Morgan:Vic -4.07±0.89"
      ]
     },
     "grn": {
-     "rawDev": 0.35,
+     "rawDev": 0.34,
      "rawSe": 0.46,
      "obs": [
       "Resolve:Vic -0.98±1.79",
@@ -1245,7 +1245,7 @@
       "Resolve:Vic -2.49±1.91",
       "Newspoll (pooled):Vic -0.55±0.75",
       "DemosAU (MRP):Vic -0.09±0.62",
-      "YouGov:Vic -0.89±0.74",
+      "YouGov:Vic -0.88±0.74",
       "Roy Morgan:Vic 0.26±0.7"
      ]
     }
@@ -1274,13 +1274,13 @@
      ]
     },
     "on": {
-     "rawDev": 2.95,
+     "rawDev": 2.96,
      "rawSe": 1.2,
      "obs": [
       "Resolve:Qld -1.44±1.84",
       "Newspoll (pooled):Qld 4.48±1.51",
       "DemosAU (MRP):Qld 1.04±1.02",
-      "YouGov:Qld 4.73±1.34",
+      "YouGov:Qld 4.74±1.34",
       "Roy Morgan:Qld 5.32±1.17"
      ]
     },
@@ -1296,7 +1296,7 @@
      ]
     },
     "oth": {
-     "rawDev": -0.06,
+     "rawDev": -0.07,
      "rawSe": 0.45,
      "obs": [
       "Resolve:Qld 2.54±2",
@@ -1309,24 +1309,24 @@
    },
    "SA": {
     "alp": {
-     "rawDev": -0.21,
+     "rawDev": -0.2,
      "rawSe": 0.97,
      "obs": [
       "Resolve:Rest of Australia 2.41±3.74",
       "Newspoll (pooled):SA -0.88±2.45",
       "DemosAU (MRP):SA 2.11±1.76",
-      "YouGov:SA -1.74±2.09",
+      "YouGov:SA -1.72±2.1",
       "Roy Morgan:SA -1.86±1.88"
      ]
     },
     "lnp": {
-     "rawDev": 1.51,
+     "rawDev": 1.52,
      "rawSe": 1.48,
      "obs": [
       "Resolve:Rest of Australia 1.53±3.52",
       "Newspoll (pooled):SA -2.18±1.76",
       "DemosAU (MRP):SA 1.42±1.5",
-      "YouGov:SA 0.58±1.87",
+      "YouGov:SA 0.59±1.87",
       "Roy Morgan:SA 6.29±1.82"
      ]
     },
@@ -1348,7 +1348,7 @@
       "Resolve:Rest of Australia 0.06±2.56",
       "Newspoll (pooled):SA -0.38±1.82",
       "DemosAU (MRP):SA -0.97±1.26",
-      "YouGov:SA -0.94±1.64",
+      "YouGov:SA -0.95±1.64",
       "Roy Morgan:SA 2.29±1.61"
      ]
     },
@@ -1359,20 +1359,20 @@
       "Resolve:Rest of Australia -0.74±2.7",
       "Newspoll (pooled):SA 2.26±1.57",
       "DemosAU (MRP):SA -0.29±1.12",
-      "YouGov:SA -0.76±1.34",
+      "YouGov:SA -0.78±1.35",
       "Roy Morgan:SA 0.89±1.32"
      ]
     }
    },
    "WA": {
     "alp": {
-     "rawDev": -0.2,
+     "rawDev": -0.21,
      "rawSe": 0.8,
      "obs": [
       "Resolve:Rest of Australia 2.41±3.74",
       "Newspoll (pooled):WA -0.17±2.02",
       "DemosAU (MRP):WA -1.18±1.4",
-      "YouGov:WA 1.96±1.78",
+      "YouGov:WA 1.95±1.79",
       "Roy Morgan:WA -1.1±1.54"
      ]
     },
@@ -1383,7 +1383,7 @@
       "Resolve:Rest of Australia 1.53±3.52",
       "Newspoll (pooled):WA 2.72±1.8",
       "DemosAU (MRP):WA -2.68±1.24",
-      "YouGov:WA 0.56±1.66",
+      "YouGov:WA 0.56±1.67",
       "Roy Morgan:WA -3.89±1.35"
      ]
     },
@@ -1394,7 +1394,7 @@
       "Resolve:Rest of Australia -1.45±2.15",
       "Newspoll (pooled):WA -2.28±2",
       "DemosAU (MRP):WA 2.27±1.45",
-      "YouGov:WA -1.53±1.77",
+      "YouGov:WA -1.55±1.77",
       "Roy Morgan:WA 1.55±1.58"
      ]
     },
@@ -1405,7 +1405,7 @@
       "Resolve:Rest of Australia 0.06±2.56",
       "Newspoll (pooled):WA -1.93±1.38",
       "DemosAU (MRP):WA 0.48±1.06",
-      "YouGov:WA -4.21±1.14",
+      "YouGov:WA -4.2±1.14",
       "Roy Morgan:WA 0.44±1.25"
      ]
     },
@@ -1416,7 +1416,7 @@
       "Resolve:Rest of Australia -0.74±2.7",
       "Newspoll (pooled):WA 1.66±1.26",
       "DemosAU (MRP):WA 1.11±0.99",
-      "YouGov:WA 1.27±1.22",
+      "YouGov:WA 1.27±1.23",
       "Roy Morgan:WA 1.93±1.13"
      ]
     }
@@ -1424,10 +1424,10 @@
    "TAS": {
     "alp": {
      "rawDev": 2.57,
-     "rawSe": 2.69,
+     "rawSe": 2.7,
      "obs": [
       "Resolve:Rest of Australia 2.41±3.74",
-      "YouGov:ACT/NT/Tas 2.74±3.88"
+      "YouGov:ACT/NT/Tas 2.73±3.89"
      ]
     },
     "lnp": {
@@ -1435,7 +1435,7 @@
      "rawSe": 3.86,
      "obs": [
       "Resolve:Rest of Australia 1.53±3.52",
-      "YouGov:ACT/NT/Tas 9.25±3.49"
+      "YouGov:ACT/NT/Tas 9.25±3.5"
      ]
     },
     "on": {
@@ -1443,7 +1443,7 @@
      "rawSe": 6.5,
      "obs": [
       "Resolve:Rest of Australia -1.45±2.15",
-      "YouGov:ACT/NT/Tas -14.45±2.47"
+      "YouGov:ACT/NT/Tas -14.46±2.48"
      ]
     },
     "grn": {
@@ -1451,25 +1451,25 @@
      "rawSe": 1.9,
      "obs": [
       "Resolve:Rest of Australia 0.06±2.56",
-      "YouGov:ACT/NT/Tas 0.19±2.83"
+      "YouGov:ACT/NT/Tas 0.19±2.84"
      ]
     },
     "oth": {
-     "rawDev": 0.33,
+     "rawDev": 0.34,
      "rawSe": 2,
      "obs": [
       "Resolve:Rest of Australia -0.74±2.7",
-      "YouGov:ACT/NT/Tas 1.61±2.96"
+      "YouGov:ACT/NT/Tas 1.65±2.97"
      ]
     }
    },
    "NT": {
     "alp": {
      "rawDev": 2.57,
-     "rawSe": 2.69,
+     "rawSe": 2.7,
      "obs": [
       "Resolve:Rest of Australia 2.41±3.74",
-      "YouGov:ACT/NT/Tas 2.74±3.88"
+      "YouGov:ACT/NT/Tas 2.73±3.89"
      ]
     },
     "lnp": {
@@ -1477,7 +1477,7 @@
      "rawSe": 3.86,
      "obs": [
       "Resolve:Rest of Australia 1.53±3.52",
-      "YouGov:ACT/NT/Tas 9.25±3.49"
+      "YouGov:ACT/NT/Tas 9.25±3.5"
      ]
     },
     "on": {
@@ -1485,7 +1485,7 @@
      "rawSe": 6.5,
      "obs": [
       "Resolve:Rest of Australia -1.45±2.15",
-      "YouGov:ACT/NT/Tas -14.45±2.47"
+      "YouGov:ACT/NT/Tas -14.46±2.48"
      ]
     },
     "grn": {
@@ -1493,25 +1493,25 @@
      "rawSe": 1.9,
      "obs": [
       "Resolve:Rest of Australia 0.06±2.56",
-      "YouGov:ACT/NT/Tas 0.19±2.83"
+      "YouGov:ACT/NT/Tas 0.19±2.84"
      ]
     },
     "oth": {
-     "rawDev": 0.33,
+     "rawDev": 0.34,
      "rawSe": 2,
      "obs": [
       "Resolve:Rest of Australia -0.74±2.7",
-      "YouGov:ACT/NT/Tas 1.61±2.96"
+      "YouGov:ACT/NT/Tas 1.65±2.97"
      ]
     }
    },
    "ACT": {
     "alp": {
      "rawDev": 2.57,
-     "rawSe": 2.69,
+     "rawSe": 2.7,
      "obs": [
       "Resolve:Rest of Australia 2.41±3.74",
-      "YouGov:ACT/NT/Tas 2.74±3.88"
+      "YouGov:ACT/NT/Tas 2.73±3.89"
      ]
     },
     "lnp": {
@@ -1519,7 +1519,7 @@
      "rawSe": 3.86,
      "obs": [
       "Resolve:Rest of Australia 1.53±3.52",
-      "YouGov:ACT/NT/Tas 9.25±3.49"
+      "YouGov:ACT/NT/Tas 9.25±3.5"
      ]
     },
     "on": {
@@ -1527,7 +1527,7 @@
      "rawSe": 6.5,
      "obs": [
       "Resolve:Rest of Australia -1.45±2.15",
-      "YouGov:ACT/NT/Tas -14.45±2.47"
+      "YouGov:ACT/NT/Tas -14.46±2.48"
      ]
     },
     "grn": {
@@ -1535,15 +1535,15 @@
      "rawSe": 1.9,
      "obs": [
       "Resolve:Rest of Australia 0.06±2.56",
-      "YouGov:ACT/NT/Tas 0.19±2.83"
+      "YouGov:ACT/NT/Tas 0.19±2.84"
      ]
     },
     "oth": {
-     "rawDev": 0.33,
+     "rawDev": 0.34,
      "rawSe": 2,
      "obs": [
       "Resolve:Rest of Australia -0.74±2.7",
-      "YouGov:ACT/NT/Tas 1.61±2.96"
+      "YouGov:ACT/NT/Tas 1.65±2.97"
      ]
     }
    }
