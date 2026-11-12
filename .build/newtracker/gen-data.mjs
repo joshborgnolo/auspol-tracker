@@ -3902,9 +3902,16 @@ const linksOf = (p) => {
   // (no redirect off the article page), so it links alongside the release
   if (p.tablesUrl) out.push({ k: "tables", t: "Demographic tables (PDF)", href: p.tablesUrl,
     title: "The Australian’s published demographic and breakdown tables for this poll" });
-  if (p.methodUrl && !both) out.push({ k: "method", t: "APC methodology", href: p.methodUrl, title: "This poll’s Australian Polling Council methodology statement" });
+  /* RedBridge/Accent's APC statement is the wave's accent-research.com
+     publication in full - label the link what it opens, not the statement's
+     Polling-Council role alone (user call 2026-11-12) */
+  const methodLabel = /^redbridge/i.test(house) ? "Full publication" : "APC methodology";
+  if (p.methodUrl && !both) out.push({ k: "method", t: methodLabel, href: p.methodUrl,
+    title: /^redbridge/i.test(house)
+      ? "The full Accent Research publication – this poll’s Australian Polling Council methodology statement"
+      : "This poll’s Australian Polling Council methodology statement" });
   else if (!p.methodUrl && waiting && at.method && !(!rel && at.release === at.method))
-    out.push({ k: "method", pending: true, t: "APC methodology: not yet out", href: at.method,
+    out.push({ k: "method", pending: true, t: methodLabel + ": not yet out", href: at.method,
       title: by + " hasn’t posted this poll’s Australian Polling Council methodology statement yet. This opens the page where it files them." });
   if (p.url && !urlOwn) {
     const h = hostOf(p.url);
