@@ -284,6 +284,7 @@ export const THEME_OF = {
   "life-decision-delays": "cost-of-living",
   "next-generation-outlook": "cost-of-living",
   "wealthy-income-threshold": "cost-of-living",
+  "housing-cost-income-share": "cost-of-living",
   // resolve
   "cost-of-living-blame": "cost-of-living",
   "unexpected-expense-struggle": "cost-of-living",
@@ -549,6 +550,8 @@ export const THEME_OF = {
   "reasons-for-voting-one-nation": "cut",
   "news-story-week": "cut",
   "feelings-way-things-going": "cut",
+  "mortgage-rate-rise-pressure": "cut",
+  "rent-rise-pressure": "cut",
   // secnewgate
   "car-purchase-intentions": "cut",
   "news-consumption": "cut",
