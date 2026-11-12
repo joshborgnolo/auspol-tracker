@@ -571,6 +571,163 @@
      }
     }
    }
+  },
+  "2026-11-06": {
+   "src": {
+    "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf",
+    "tables": "Table 42"
+   },
+   "total": {
+    "r": 19,
+    "w": 67,
+    "u": 14
+   },
+   "dims": {
+    "vote": {
+     "Labor": {
+      "r": 48,
+      "w": 33,
+      "u": 19
+     },
+     "Coalition": {
+      "r": 8,
+      "w": 79,
+      "u": 13
+     },
+     "One Nation": {
+      "r": 4,
+      "w": 92,
+      "u": 4
+     },
+     "Greens": {
+      "r": 21,
+      "w": 62,
+      "u": 17
+     },
+     "Other parties and candidates": {
+      "r": 16,
+      "w": 65,
+      "u": 19
+     },
+     "Undecided / will not vote": {
+      "r": 10,
+      "w": 61,
+      "u": 29
+     }
+    },
+    "softness": {
+     "Solid": {
+      "r": 22,
+      "w": 68,
+      "u": 10
+     },
+     "Soft": {
+      "r": 19,
+      "w": 64,
+      "u": 17
+     },
+     "Very soft": {
+      "r": 6,
+      "w": 75,
+      "u": 19
+     }
+    },
+    "generation": {
+     "Gen-Z": {
+      "r": 22,
+      "w": 56,
+      "u": 22
+     },
+     "Millennials": {
+      "r": 18,
+      "w": 69,
+      "u": 13
+     },
+     "Gen-X": {
+      "r": 16,
+      "w": 67,
+      "u": 17
+     },
+     "Baby Boomers": {
+      "r": 20,
+      "w": 71,
+      "u": 9
+     }
+    },
+    "gender": {
+     "Women": {
+      "r": 16,
+      "w": 67,
+      "u": 17
+     },
+     "Men": {
+      "r": 21,
+      "w": 67,
+      "u": 12
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "r": 22,
+      "w": 62,
+      "u": 16
+     },
+     "Outer Metropolitan": {
+      "r": 16,
+      "w": 68,
+      "u": 16
+     },
+     "Provincial": {
+      "r": 20,
+      "w": 69,
+      "u": 11
+     },
+     "Rural": {
+      "r": 18,
+      "w": 71,
+      "u": 11
+     }
+    },
+    "education": {
+     "Less than year 12": {
+      "r": 15,
+      "w": 70,
+      "u": 15
+     },
+     "Year 12 or equivalent": {
+      "r": 23,
+      "w": 62,
+      "u": 15
+     },
+     "TAFE, trade or vocational": {
+      "r": 16,
+      "w": 71,
+      "u": 13
+     },
+     "University degree": {
+      "r": 22,
+      "w": 63,
+      "u": 15
+     }
+    },
+    "ownership": {
+     "Owned outright": {
+      "r": 20,
+      "w": 70,
+      "u": 10
+     },
+     "Owned with a mortgage": {
+      "r": 20,
+      "w": 68,
+      "u": 12
+     },
+     "Renting and other": {
+      "r": 17,
+      "w": 63,
+      "u": 20
+     }
+    }
+   }
   }
  }
 }

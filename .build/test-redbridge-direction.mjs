@@ -5,8 +5,11 @@
    APC-statement caches (.build/redbridge-src/<slug>.{json,txt}) — never a
    live fetch.
 
-   Oracles: the three section-bearing statement caches (Nov-2025, Jan-2026,
-   May-2026) and the committed store waves they reproduce. Integration:
+   Oracles: the four section-bearing statement caches (Nov-2025, Jan-2026,
+   May-2026, Nov-2026 — the last with its "Generally headed in / the right
+   direction" stacked header, the wrap era that blinded the header triple
+   check until the phrase-level pin) and the committed store waves they
+   reproduce. Integration:
    run() in a tmp sandbox (tmp polls.json + tmp store; the real caches
    read-only) writes exactly the _about provenance move and reproduces the
    committed waves figure for figure; a re-run is changed:false. Guard
@@ -30,19 +33,20 @@ const SRC = path.join(ROOT, ".build", "redbridge-src");
 const STORE = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "redbridge-direction-groups.json"), "utf8"));
 const POLLS = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
 
-// The three section-bearing waves the committed store records, keyed to
+// The section-bearing waves the committed store records, keyed to
 // their caches (the table numbers are print facts of the statements —
 // change them here if a reissued statement re-flows, never in the parser).
 const SECTION_WAVES = {
   "2025-11-13": "afr-redbridge-group-and-accent-research-november-2025-federal-poll",
   "2026-01-29": "afr,-redbridge-group-and-accent-research-january-2026-federal-poll",
   "2026-05-28": "afr,-redbridge-group-and-accent-research-may-2026-federal-poll",
+  "2026-11-06": "afr-redbridge-group-and-accent-research-november-2026-federal-poll",
 };
 const slack = (slug, ext) => path.join(SRC, `${slug}.${ext}`);
 const parseCache = (slug) => parseDirectionTables(fs.readFileSync(slack(slug, "txt"), "utf8"));
 const cacheRec = (slug) => JSON.parse(fs.readFileSync(slack(slug, "json"), "utf8"));
 
-// ---- 1. the three section caches read as the committed store, figure for figure
+// ---- 1. the section caches read as the committed store, figure for figure
 {
   for (const [date, slug] of Object.entries(SECTION_WAVES)) {
     const want = STORE.waves[date];
@@ -115,7 +119,7 @@ async function sandbox() {
   const st = await run({ pollsPath, storePath, writeFiles: true });
   assert.equal(st.exit, 0, `row-filing run: ${st.guard ?? ""}`);
   assert.deepEqual(st.filedRows, ["2026-05-28"], "the missing May-2026 row files");
-  assert.deepEqual(st.filedWaves.sort(), Object.keys(STORE.waves).sort(), "all three waves file into an empty store");
+  assert.deepEqual(st.filedWaves.sort(), Object.keys(STORE.waves).sort(), "every store wave files into an empty store");
   const filed = JSON.parse(fs.readFileSync(pollsPath, "utf8"));
   const row = filed.direction.find((d) => d.pollster === DIR_POLLSTER && d.date === "2026-05-28");
   assert.ok(row, "the row is in polls.json");

@@ -11,10 +11,13 @@
 //      "direction" (wordings drift: "…headed in the right or wrong
 //      direction…" vs May-2026's "Voters' views on the direction Australia
 //      is heading in…"). The caption is never trusted alone — the table's
-//      own header stack must carry "headed in the … right direction",
-//      "…wrong direction" and "Not sure" (header wraps/truncations ride
-//      along: May-2026 prints "Generally headed in the wrong / direction"
-//      split over two lines).
+//      own header stack must carry the "headed in … right direction",
+//      "…wrong direction" and "Not sure" phrases, regardless of where the
+//      wrap point falls (header wraps/truncations ride along: May-2026
+//      prints "Generally headed in the wrong / direction" split over two
+//      lines; Nov-2026 stacks "Generally headed in" over "the right/wrong
+//      direction", so the check keys the phrases, never the word stream
+//      across a wrap point).
 // Table NUMBERS are never an anchor — they drift per statement (Nov-2025
 // Tables 47–48, Jan-2026 Table 27, May-2026 Table 38).
 //
@@ -120,7 +123,7 @@ function parseRows(block, notes) {
   if (headIdx < 0)
     return `Table ${block.n}: no "All voters" row after the caption — the header stack or the total row moved`;
   const header = collapse(body.slice(0, headIdx).join(" ")).toLowerCase();
-  if (!/headed in the/.test(header) || !/right direction/.test(header) ||
+  if (!/headed in\b/.test(header) || !/right direction/.test(header) ||
       !/wrong direction/.test(header) || !/not sure/.test(header))
     return `Table ${block.n}: caption names direction but the header stack doesn't read as the right/wrong/not-sure triple`;
   const dims = {};
