@@ -32,6 +32,7 @@ import csv
 import io
 import json
 import os
+import re
 import zipfile
 
 _REPO = os.path.abspath(os.path.join(os.path.dirname(
@@ -486,6 +487,186 @@ def mar_shares(vec, safe):
     load_mar counts tuple, over their own stated sum."""
     tot = sum(vec)
     return tuple(safe(v, tot) for v in vec)
+
+
+# ---- the Immigration lens's arrival-year and English-proficiency lanes
+# (2026-11-12) ----------------------------------------------
+# YARP (year of arrival in Australia) rides each edition's birthplace-
+# by-arrival table's Tot columns — 2021/2016 G10C, 2011 BCP B10C — each
+# print running decade bands to single years at the tail; the band keys
+# are the print's own (era-native, stored verbatim in arrKeys — older
+# years re-label per edition, never re-resolved onto a shared grid).
+# ENGLP (proficiency in spoken English) rides the proficiency-by-
+# arrival table's persons totals — 2021 G11A-D / 2016 G11A-D (their
+# speaks-other-language class stems drift: 2021 UOLSE_, 2016 SOLSE_),
+# 2011 BCP B11A/B11B — the read is among speakers of a language other
+# than English: "not well or not at all" over that plus "very well or
+# well", with proficiency-not-stated and English-only speakers outside
+# the pair by construction. The AURIN '96-side and BCP-era 2006/2001
+# editions of the same two families live in their own derive scripts
+# (nearest-side doctrine: interpolated frames read one cohort, the
+# 1991-era frame is an era hole — English proficiency was not a census
+# question until 1996). Column spellings verified from each pack's own
+# headers 2026-11-12.
+ARR_KEYS_ERA = {
+    "2021": ["bef51", "51_60", "61_70", "71_80", "81_90", "91_00",
+             "01_10", "11_15", "16_21"],
+    "2016": ["bef46", "46_55", "56_65", "66_75", "76_85", "86_95",
+             "96_05", "06_10", "11_16"],
+    "2011": ["bef41", "41_50", "51_60", "61_70", "71_80", "81_90",
+             "91_00", "01_05", "06_11"],
+}
+# per era: the arrival table id, per-slot band columns (the final slot
+# folds the print's single-year tail), the not-stated and total
+# columns, and the proficiency table ids/class column stems (2011's
+# BCP keeps P-class totals in B11A, its speaks-other-language grand
+# total in B11B).
+_ARR_ERA = {
+    "2021": dict(at="G10C",
+                 bands=[["Tot_Before_1951"], ["Tot_1951_1960"],
+                        ["Tot_1961_1970"], ["Tot_1971_1980"],
+                        ["Tot_1981_1990"], ["Tot_1991_2000"],
+                        ["Tot_2001_2010"], ["Tot_2011_2015"],
+                        ["Tot_2016", "Tot_2017", "Tot_2018", "Tot_2019",
+                         "Tot_2020", "Tot_2021"]],
+                 ns="Tot_Yr_arrival_NS", tot="Tot_Tot",
+                 pt=("G11A", "G11B", "G11C", "G11D"),
+                 stems=("UOLSE_VWW", "UOLSE_NWNAA")),
+    "2016": dict(at="G10C",
+                 bands=[["Tot_Before_1946"], ["Tot_1946_1955"],
+                        ["Tot_1956_1965"], ["Tot_1966_1975"],
+                        ["Tot_1976_1985"], ["Tot_1986_1995"],
+                        ["Tot_1996_2005"], ["Tot_2006_2010"],
+                        ["Tot_2011", "Tot_2012", "Tot_2013", "Tot_2014",
+                         "Tot_2015", "Tot_2016"]],
+                 ns="Tot_Yr_arrival_NS", tot="Tot_Tot",
+                 pt=("G11A", "G11B", "G11C", "G11D"),
+                 stems=("SOLSE_VWW", "SOLSE_NWNAA")),
+    "2011": dict(at="B10C",
+                 bands=[["Tot_Before_1941"], ["Tot_1941_1950"],
+                        ["Tot_1951_1960"], ["Tot_1961_1970"],
+                        ["Tot_1971_1980"], ["Tot_1981_1990"],
+                        ["Tot_1991_2000"], ["Tot_2001_2005"],
+                        ["Tot_2006", "Tot_2007", "Tot_2008", "Tot_2009",
+                         "Tot_2010", "Tot_2011"]],
+                 ns="Tot_Yr_arrival_NS", tot="Tot_Tot"),
+}
+_PROF_2011 = dict(pa="B11A", pb="B11B",
+                  stems=("P_SOL_SE_VW_W_Y_a_Total",
+                         "P_SOL_SE_NW_NA_Total"),
+                  tot="P_SOL_SE_Tot_Total")
+
+
+def load_arr_eng(gcp_zip, prefix="", era="2021", rows_pin=None,
+                 key_col=None):
+    """The arrival-year and English-proficiency lanes' counts per SA1
+    for one prefix -> {code: (arrv, arr_ns, arr_tot, prof_good,
+    prof_poor)} — arrv the band-count tuple in ARR_KEYS_ERA[era]
+    order (overseas-born who stated an arrival year); prof_good the
+    speaks-other-language "very well or well" persons, prof_poor the
+    "not well or not at all" persons (each era's pair stays a pair —
+    proficiency-not-stated never joins it). Universe and band-sum
+    asserts run against the era's row pin like the other loaders."""
+    v = VINTAGES[era]
+    a = _ARR_ERA[era]
+    memb = v["member"].format
+    idc = key_col or v["key"]
+    pin = rows_pin or v["rows"]
+    z = zipfile.ZipFile(gcp_zip)
+    flat = [c for blk in a["bands"] for c in blk] + [a["ns"], a["tot"]]
+    idx = {c: i for i, c in enumerate(flat)}
+    ar = _table(z, memb(table=a["at"]), idc, flat, pin, prefix)
+    bands_of = {}
+    for code, r in ar.items():
+        bands = tuple(sum(r[idx[c]] for c in blk) for blk in a["bands"])
+        bands_of[code] = (bands, r[idx[a["ns"]]], r[idx[a["tot"]]])
+    # ABS perturbs each cell independently at SA1 scale, so the band
+    # family's national sum drifts a couple of percent from the
+    # printed Tot's own national sum (measured 2026-11-12: −1.54% at
+    # 2021, −1.3% at 2016, reconciling exactly at the 2011 BCP print —
+    # the income lanes carry the same ~3% convention). The guard
+    # casts wide enough to catch a mis-mapped column (a decades-mass
+    # mis-stem, ~10%+) without chasing perturbation noise.
+    sb = sum(sum(r[0]) for r in bands_of.values())
+    sn = sum(r[1] for r in bands_of.values())
+    st = sum(r[2] for r in bands_of.values())
+    if st and abs(sb + sn - st) / st > 0.04:
+        _fail(f"GCP arrival {a['at']} national band drift "
+              f"{(sb + sn - st) / st:+.2%}")
+    prof = {}
+    if era == "2011":
+        p = _PROF_2011
+        g = _table(z, memb(table=p["pa"]), idc, list(p["stems"]),
+                   pin, prefix)
+        t = _table(z, memb(table=p["pb"]), idc, [p["tot"]], pin, prefix)
+        if set(g) != set(bands_of) or set(t) != set(bands_of):
+            _fail("GCP arrival/proficiency universes diverge (2011)")
+        for code, r in g.items():
+            if r[0] + r[1] > t[code][0]:
+                _fail("GCP proficiency pair exceeds its SOL total "
+                      f"(2011) at {code}")
+            prof[code] = r
+    else:
+        stems = a["stems"]
+        # the G11 split files re-print a boundary cohort in the next
+        # part (measured 2026-11-12: A25_34 ships in both G11A and
+        # G11B at 2021) — each cohort is claimed by its first part;
+        # summing by (part, cohort) would double-count it
+        seen, aggs = set(), {}
+        for tab in a["pt"]:
+            name = memb(table=tab)
+            if name not in z.namelist():
+                _fail(f"GCP zip lacks {name}")
+            with io.TextIOWrapper(z.open(name),
+                                  encoding="utf-8-sig") as fh:
+                rdr = csv.DictReader(fh)
+                ages = [c[:c.index("_" + stems[0] + "_T")]
+                        for c in (rdr.fieldnames or [])
+                        # age-cohort columns only — the print's grand-
+                        # total block T_VWW_T rides the same suffix and
+                        # would double-count every cell
+                        if c.endswith("_" + stems[0] + "_T")
+                        and re.match(r"A\d", c)]
+                if not ages:
+                    _fail(f"GCP {name} header drift, no {stems[0]} "
+                          "cohorts")
+                for s in stems:
+                    miss = [f"{x}_{s}_T" for x in ages
+                            if f"{x}_{s}_T" not in rdr.fieldnames]
+                    if miss:
+                        _fail(f"GCP {name} header drift, missing "
+                              f"{miss[:3]}")
+                ages = [x for x in ages if x not in seen]
+                seen.update(ages)
+                for row in rdr:
+                    c = row[idc]
+                    if prefix and not c.startswith(prefix):
+                        continue
+                    gg, pp = aggs.get(c, (0, 0))
+                    aggs[c] = (gg + sum(int(row[f"{x}_{stems[0]}_T"])
+                                        for x in ages),
+                               pp + sum(int(row[f"{x}_{stems[1]}_T"])
+                                        for x in ages))
+        if set(aggs) != set(bands_of):
+            _fail("GCP arrival/proficiency universes diverge")
+        prof = aggs
+    # the pair shares the overseas-born universe, so nationally it
+    # must sit well inside the arrival table's printed total (a
+    # mis-stemmed class read would double it; perturbation noise keeps
+    # per-SA1 checks useless, same lesson as the band drift above)
+    sg = sum(r[0] for r in prof.values())
+    sp = sum(r[1] for r in prof.values())
+    st = sum(r[2] for r in bands_of.values())
+    if st and sg + sp > st * 1.02:
+        _fail(f"GCP proficiency pair {(sg + sp) / st:.1%} exceeds the "
+              "overseas-born base")
+    out = {}
+    for code, (bands, arr_ns, arr_tot) in bands_of.items():
+        gg, pp = prof[code]
+        out[code] = (bands, arr_ns, arr_tot, gg, pp)
+    print(f"GCP arrival/proficiency cells: {len(out)} SA1s (prefix "
+          f"{prefix or 'AU'}, era {era})")
+    return out
 
 
 # ---- the six canonical venue-demo cells' raw counts -----------------

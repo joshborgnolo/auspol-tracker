@@ -431,10 +431,21 @@ const isFam = () => S.index === LENS_FAM;
 // view. Each share keeps its DM id for the dicts, ranges, ramps and
 // top-of lists, and Ancestry keeps its select lens's — IMM_* names only
 // the lens's own menu, chip and note texts
-const IMM_MODES = ["lang", "fborn", "noncit", "anc"];
-const IMM_NAME = { lang: "Language other than English at home", fborn: "Born overseas", noncit: "Non-citizens", anc: "Ancestry" };
-const IMM_SHORT = { lang: "Other language", fborn: "Born overseas", noncit: "Non-citizens", anc: "Ancestry" };
+const IMM_MODES = ["lang", "fborn", "arrmed", "arr10", "engpoor", "noncit", "anc"];
+const IMM_NAME = { lang: "Language other than English at home", fborn: "Born overseas", arrmed: "Median year of arrival", arr10: "Arrived in the last decade", engpoor: "English spoken not well or not at all", noncit: "Non-citizens", anc: "Ancestry" };
+const IMM_SHORT = { lang: "Other language", fborn: "Born overseas", arrmed: "Median arrival", arr10: "Newer arrivals", engpoor: "Weak English", noncit: "Non-citizens", anc: "Ancestry" };
 const isImm = () => S.index === LENS_IMM;
+// the Immigration lens's arrival and English-proficiency arcs (2026-11-12):
+// two share reads beside the year-median idiom — the first census lane to
+// read a YEAR at all. The three reads carry their own demo-dict scalars
+// emitted by build_map_data (arrMed/arr10/engpoor); the era grids are each
+// frame print's own — the open first band reads null like ageMed (its pile
+// frames: the '06-print editions), division-level only today (no booth
+// lanes yet), and the menu omits a frame the lanes never printed (the
+// '91-side frames by construction, plus every state-frame lens before its
+// own era lands)
+const arrMed = () => isImm() && S.immMode === "arrmed";
+const ARR_IMM_DEMOKEY = { arrmed: "arrMed", arr10: "arr10", engpoor: "engpoor" };
 const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === LENS_IND ? INDISMS[S.ind] : k === LENS_MAR ? MARISMS[S.mar] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : k === LENS_FAM ? DM_VERB[S.famMode] : k === LENS_IMM ? (S.immMode === "anc" ? ANCISMS[S.anc] : S.immMode === "fborn" && S.cob != null ? COB_VERB[S.cob] : DM_VERB[S.immMode]) : DM_VERB[k]);
 // whose share a census measure is, and what it says of them: the bases the builders divide by
 // (build_areas_sa1.py's SHARES and the state demo builders), so copy never sets a measure over
@@ -442,8 +453,8 @@ const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TEN
 // aged 15+, occupation and the journey to work of employed people, one-parent families of
 // families, children ever born of women aged 15+, tenure of dwellings, and the income shares of
 // adults (households, in the era prints that count households)
-const DM_POP = { uni: "people aged 15+", y12: "people aged 15+", y10less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+", unemp: "people in the labour force" };
-const DM_PRED = { y10less: "finished school at Year 10 or earlier", onepar: "are one-parent families", pt: "travelled to work by public transport", bigfam: "have had more than two children" };
+const DM_POP = { uni: "people aged 15+", y12: "people aged 15+", y10less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+", unemp: "people in the labour force", arr10: "overseas-born residents who stated their arrival year", engpoor: "residents who speak a language other than English" };
+const DM_PRED = { y10less: "finished school at Year 10 or earlier", onepar: "are one-parent families", pt: "travelled to work by public transport", bigfam: "have had more than two children", arr10: "arrived in the census's own final ten years", engpoor: "speak English not well or not at all" };
 function censusWho(m, k = S.index) {
   let pop = "residents", pred;
   if (k === LENS_TEN) { pop = "dwellings"; pred = TENESMS[S.ten]; }
@@ -517,7 +528,10 @@ const demoShare = (d) => {
   if (isFam()) return d.demo ? d.demo[S.famMode] : null;
   // immigration: the three shares ride their own demo keys too (ancestry
   // and the birthplace views joined the cob/anc select chains above)
-  if (isImm()) return d.demo ? d.demo[S.immMode] : null;
+  if (isImm()) {
+    if (ARR_IMM_DEMOKEY[S.immMode]) return d.demo ? d.demo[ARR_IMM_DEMOKEY[S.immMode]] : null;
+    return d.demo ? d.demo[S.immMode] : null;
+  }
   return d.demo ? d.demo[S.index] : null;
 };
 // ...and of the year model's AUS/area pool (demo dicts built in deriveAreas)
@@ -533,7 +547,10 @@ const demoAreaShare = (demo) => {
   if (isAge()) return demo ? demo[AGE_KEY[S.ageMode]] : null;
   if (isEdu()) return demo ? demo[S.eduMode] : null;
   if (isFam()) return demo ? demo[S.famMode] : null;
-  if (isImm()) return demo ? demo[S.immMode] : null;
+  if (isImm()) {
+    if (ARR_IMM_DEMOKEY[S.immMode]) return demo ? demo[ARR_IMM_DEMOKEY[S.immMode]] : null;
+    return demo ? demo[S.immMode] : null;
+  }
   return demo ? demo[S.index] : null;
 };
 // ...and of one booth row (fraction): the select lanes ride their
@@ -559,8 +576,13 @@ const demoBoothShare = (raw, j, pos) => {
   if (isEdu()) { const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.eduMode)] : null; }
   // family composition: u15 11, onepar 12, bigfam 15, the same positional way
   if (isFam()) { const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.famMode)] : null; }
-  // immigration: the positional tuple again (lang 0, fborn 3, noncit 14)
-  if (isImm()) { const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.immMode)] : null; }
+  // immigration: the positional tuple again (lang 0, fborn 3, noncit 14);
+  // the arrival/proficiency arc rides division-level demo scalars —
+  // its sentinels return null at booth level today
+  if (isImm()) {
+    if (ARR_IMM_DEMOKEY[S.immMode]) return null;
+    const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.immMode)] : null;
+  }
   const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.index)] : null;
 };
 // the median-age lane's colour domain per year: the year's own division
@@ -594,8 +616,66 @@ const incMedRange = (m) => {
   if (m) m._incMedRange = r;
   return r;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInd() ? IND_RANGE[S.ind] : isMar() ? MAR_RANGE[S.mar] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : isFam() ? DM_RANGE[S.famMode] : isImm() ? DM_RANGE[S.immMode] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInd() ? "ind" : isMar() ? "mar" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : isFam() ? S.famMode : isImm() ? S.immMode : S.index];
+// the Immigration arrival lanes' band spans, era grid by era grid —
+// letter-for-letter build_map_data's _ARR_SPANS so a pooled median
+// interpolates identically at both ends. The open first band reads
+// null like ageMed's 85+: interpolation there would fabricate a year
+const ARR_BAND_SPAN = {
+  bef41: [null, 1940], "41_50": [1941, 1950], "51_60": [1951, 1960],
+  "61_70": [1961, 1970], "71_80": [1971, 1980], "81_90": [1981, 1990],
+  "91_00": [1991, 2000], "01_05": [2001, 2005], "01_10": [2001, 2010],
+  "06_11": [2006, 2011], "11_15": [2011, 2015], "16_21": [2016, 2021],
+  bef46: [null, 1945], "46_55": [1946, 1955], "56_65": [1956, 1965],
+  "66_75": [1966, 1975], "76_85": [1976, 1985], "86_95": [1986, 1995],
+  "96_05": [1996, 2005], "06_10": [2006, 2010], "11_16": [2011, 2016],
+  bef51: [null, 1950], bef91: [null, 1990], "91_95": [1991, 1995],
+  "96_00": [1996, 2000], "01_06": [2001, 2006],
+  bef81: [null, 1980], "81_85": [1981, 1985], "86_90": [1986, 1990],
+  "91_96": [1991, 1996] };
+// the median year of arrival of a band-share dict — build_map_data's
+// arr_median's recipe: linear inside the median band, null out of the
+// open first one. Pooled areas compute theirs from pooled bands
+function arrMedian(shares, keys) {
+  if (!shares) return null;
+  let tot = 0;
+  for (const k of keys) tot += shares[k] || 0;
+  if (tot <= 0) return null;
+  let acc = 0;
+  const half = tot / 2;
+  for (const k of keys) {
+    const sp = ARR_BAND_SPAN[k];
+    if (!sp) return null;
+    const m = shares[k] || 0;
+    if (acc + m >= half) {
+      if (sp[0] === null || m <= 0) return null;
+      return sp[0] + (sp[1] + 1 - sp[0]) * (half - acc) / m;
+    }
+    acc += m;
+  }
+  return null;
+}
+// the median-arrival lane's colour domain per year: the year's own
+// division medians snapped outward to 2-year pairs (ageMed's own
+// recipe, the $100 snap's yearly sibling)
+const arrMedRange = (m) => {
+  if (m && m._arrMedRange) return m._arrMedRange;
+  let lo = Infinity, hi = -Infinity;
+  for (const d of (m && m.divs) || []) {
+    const v = d.demo && d.demo.arrMed;
+    if (v == null) continue;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const r = isFinite(lo) ? [Math.floor(lo / 2) * 2, Math.ceil(hi / 2) * 2] : [1970, 2025];
+  if (m) m._arrMedRange = r;
+  return r;
+};
+// the arrival-family reads' caps: the last-decade share and the
+// weak-English share, each rounded past its division maximum —
+// the median year's own domain steps in through arrMedRange
+const ARR_RANGE = { arr10: [0, 45], engpoor: [0, 60] };
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInd() ? IND_RANGE[S.ind] : isMar() ? MAR_RANGE[S.mar] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : isFam() ? DM_RANGE[S.famMode] : isImm() ? (arrMed() ? arrMedRange(M()) : ARR_RANGE[S.immMode] || DM_RANGE[S.immMode]) : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInd() ? "ind" : isMar() ? "mar" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : isFam() ? S.famMode : isImm() ? (arrMed() ? "agemed" : S.immMode) : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc/occ/ind/mar)
 const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) : isInd() ? (m.indPos || {}) : isMar() ? (m.marPos || {}) : (m.cobPos || {}));
@@ -1001,7 +1081,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"bde0594e","core-1993.json":"7ddafe04","core-1996.json":"9c708f73","core-1998.json":"c0aa0c51","core-2001.json":"2b9ef3b2","core-2004.json":"57578bc0","core-2007.json":"558be90c","core-2010.json":"864a1efb","core-2013.json":"72faa27c","core-2016.json":"16ac6dbd","core-2019.json":"7c464b40","core-2022.json":"ca28345f","core-2025.json":"30fc28af","core-nsw15.json":"ef675a20","core-nsw19.json":"0a413370","core-nsw23.json":"28007acc","core-qld17.json":"90883dd3","core-qld20.json":"afa13d52","core-qld24.json":"097d4868","core-sa22.json":"c12f25c5","core-sa26.json":"a1adcae3","core-vic14.json":"1a25367d","core-vic18.json":"81193083","core-vic22.json":"36eb937c","core-wa17.json":"b7ff67f5","core-wa21.json":"eb80aa84","core-wa25.json":"dd4a29e6","data-1993.json":"dddd6c6b","data-1996.json":"d3a46fe9","data-1998.json":"43251e20","data-2001.json":"c8396d3c","data-2004.json":"92b64caa","data-2007.json":"b0151c07","data-2010.json":"19be3309","data-2013.json":"20b87661","data-2016.json":"c394f1a4","data-2019.json":"6800b212","data-2022.json":"363e7d56","data-2025.json":"413f9021","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"fde0f488","data-nsw15.json":"15805e03","data-nsw19.json":"3e8ba736","data-nsw23.json":"45cad84e","data-qld17.json":"ba2697bd","data-qld20.json":"5cd4d880","data-qld24.json":"24b89e7a","data-sa22.json":"8ab536fc","data-sa26.json":"7035d3ea","data-vic14.json":"304baad2","data-vic18.json":"b4bbe512","data-vic22.json":"01fec53f","data-wa17.json":"90f80af9","data-wa21.json":"efec9ede","data-wa25.json":"d74f96e5","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"fdceb8bb","res-1996.json":"dde8300c","res-1998.json":"533cb6ce","res-2001.json":"ee1034f8","res-2004.json":"fec96b74","res-2007.json":"7966949e","res-2010.json":"7fdc39ae","res-2013.json":"98197af7","res-2016.json":"ffe08c79","res-2019.json":"610304b1","res-2022.json":"f24aac4a","res-2025.json":"1cfd1a3e","res-nsw15.json":"ef675a20","res-nsw19.json":"0a413370","res-nsw23.json":"755aa871","res-qld17.json":"5bb429b9","res-qld20.json":"6b2ce3bb","res-qld24.json":"2328dc47","res-sa22.json":"0110ee26","res-sa26.json":"44a5434b","res-vic14.json":"1a25367d","res-vic18.json":"81193083","res-vic22.json":"5375e71f","res-wa17.json":"b7ff67f5","res-wa21.json":"eb80aa84","res-wa25.json":"dd4a29e6","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"bde0594e","core-1993.json":"7ddafe04","core-1996.json":"9c708f73","core-1998.json":"c0aa0c51","core-2001.json":"2b9ef3b2","core-2004.json":"93891c71","core-2007.json":"1e8ba475","core-2010.json":"b8f62308","core-2013.json":"2cebfaaa","core-2016.json":"631cefb9","core-2019.json":"4bb713fa","core-2022.json":"dbd9640e","core-2025.json":"88d9e262","core-nsw15.json":"ef675a20","core-nsw19.json":"0a413370","core-nsw23.json":"28007acc","core-qld17.json":"90883dd3","core-qld20.json":"afa13d52","core-qld24.json":"097d4868","core-sa22.json":"c12f25c5","core-sa26.json":"a1adcae3","core-vic14.json":"1a25367d","core-vic18.json":"81193083","core-vic22.json":"36eb937c","core-wa17.json":"b7ff67f5","core-wa21.json":"eb80aa84","core-wa25.json":"dd4a29e6","data-1993.json":"dddd6c6b","data-1996.json":"558a2e60","data-1998.json":"43251e20","data-2001.json":"e35166d8","data-2004.json":"7d962fe4","data-2007.json":"fe58e66c","data-2010.json":"b11ff0bf","data-2013.json":"66eef730","data-2016.json":"e6c301f2","data-2019.json":"7c919351","data-2022.json":"b8be56c7","data-2025.json":"becb600c","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"b13c005a","data-nsw15.json":"15805e03","data-nsw19.json":"3e8ba736","data-nsw23.json":"45cad84e","data-qld17.json":"ba2697bd","data-qld20.json":"5cd4d880","data-qld24.json":"24b89e7a","data-sa22.json":"8ab536fc","data-sa26.json":"7035d3ea","data-vic14.json":"304baad2","data-vic18.json":"b4bbe512","data-vic22.json":"01fec53f","data-wa17.json":"90f80af9","data-wa21.json":"efec9ede","data-wa25.json":"d74f96e5","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"fdceb8bb","res-1996.json":"dde8300c","res-1998.json":"533cb6ce","res-2001.json":"ee1034f8","res-2004.json":"75a7af53","res-2007.json":"5010d86b","res-2010.json":"ddf098f4","res-2013.json":"36b5d805","res-2016.json":"9df719f5","res-2019.json":"e0315a5b","res-2022.json":"a3e2bfca","res-2025.json":"89ac2bb1","res-nsw15.json":"ef675a20","res-nsw19.json":"0a413370","res-nsw23.json":"755aa871","res-qld17.json":"5bb429b9","res-qld20.json":"6b2ce3bb","res-qld24.json":"2328dc47","res-sa22.json":"0110ee26","res-sa26.json":"44a5434b","res-vic14.json":"1a25367d","res-vic18.json":"81193083","res-vic22.json":"5375e71f","res-wa17.json":"b7ff67f5","res-wa21.json":"eb80aa84","res-wa25.json":"dd4a29e6","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -1166,6 +1246,19 @@ function demoOf(m, idx) {
     if (m.marKeys && m.marKeys.length) {
       demo.mar = {};
       for (const k of m.marKeys) { const xs = ds.filter((x) => x.mar && x.mar[k] != null); demo.mar[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.mar[k]))) / sum(xs.map((x) => x.p)) : null; }
+    }
+    // the arrival lanes pool their bands the same way — and the pooled
+    // median interpolates OFF the pooled bands, never an average of
+    // the seats' medians (the income/age-median property the lens
+    // itself owns)
+    if (m.arrKeys && m.arrKeys.length) {
+      demo.arrv = {};
+      for (const k of m.arrKeys) { const xs = ds.filter((x) => x.arrv && x.arrv[k] != null); demo.arrv[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.arrv[k]))) / sum(xs.map((x) => x.p)) : null; }
+      demo.arrMed = arrMedian(demo.arrv, m.arrKeys);
+      const a10 = ds.filter((x) => x.arr10 != null);
+      demo.arr10 = a10.length ? (100 * sum(a10.map((x) => x.p * x.arr10))) / sum(a10.map((x) => x.p)) : null;
+      const eP = ds.filter((x) => x.engpoor != null);
+      demo.engpoor = eP.length ? (100 * sum(eP.map((x) => x.p * x.engpoor))) / sum(eP.map((x) => x.p)) : null;
     }
   }
   return demo;
@@ -1573,6 +1666,13 @@ async function loadYear(year, bg) {
     // entry reads whichever list the frame packs (era-gap keys stay off)
     m.indKeys = res.indKeys || null;
     m.indPos = m.indKeys ? Object.fromEntries(m.indKeys.map((k, i) => [k, i])) : null;
+    // the Immigration arc's arrival-band and proficiency keys (2026-11-12):
+    // the frame print's own grid — the menu's modes vanish when the era
+    // never printed the lanes (the '91-side frames; states till their
+    // own arc lands)
+    m.arrKeys = res.arrKeys || null;
+    m.arrPos = m.arrKeys ? Object.fromEntries(m.arrKeys.map((k, i) => [k, i])) : null;
+    m.profKeys = res.profKeys || null;
     // the Marital status menu + per-option positional map (2026-11-11)
     m.marKeys = res.marKeys || null;
     m.marPos = m.marKeys ? Object.fromEntries(m.marKeys.map((k, i) => [k, i])) : null;
@@ -1594,6 +1694,11 @@ async function loadYear(year, bg) {
       m.hasLane[LENS_EDU] = m.hasLane.uni;
       m.hasLane[LENS_FAM] = m.hasLane.u15;
       m.hasLane[LENS_IMM] = m.hasLane.lang;
+      // the immigration arrival+proficiency modes gate on the frame's
+      // arrKeys/profKeys records (never implied from another lane)
+      m.hasLane.arrmed = !!(m.arrKeys && m.arrKeys.length) && divs.some((d) => d.demo && d.demo.arrMed != null);
+      m.hasLane.arr10 = !!(m.arrKeys && m.arrKeys.length) && divs.some((d) => d.demo && d.demo.arr10 != null);
+      m.hasLane.engpoor = divs.some((d) => d.demo && d.demo.engpoor != null);
       // the Advantage indexes joined with their era print only: IRSAD
       // debuts at the 2001-census SEIFA issue (its name, the four-index
       // suite); the '90s frames carry IRSD/IER/IEO alone, so their menu
@@ -1724,6 +1829,8 @@ function divValue(m, i) {
       if (incMed()) { const v = d.demo && d.demo.medIncWeekly; return v == null ? null : v; }
       // the median age prices divisions in years on the same doctrine
       if (ageMed()) { const v = d.demo && d.demo.ageMed; return v == null ? null : v; }
+      // the median arrival year prices divisions in years beside them
+      if (arrMed()) { const v = d.demo && d.demo.arrMed; return v == null ? null : v; }
       const v = demoShare(d); return v == null ? null : 100 * v;
     }
   }
@@ -1762,6 +1869,8 @@ function boothValue(m, j) {
       if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null; return v == null ? null : v; }
       // the median age reads its own year-lane, likewise never a share
       if (ageMed()) { const v = b.raw.ageMed ? b.raw.ageMed[j] : null; return v == null ? null : v; }
+      // the immigration arrival arc is division-level today — no booth lanes
+      if (arrMed() || S.immMode === "arr10" || S.immMode === "engpoor") return null;
       if (isDemo()) { const v = demoBoothShare(b.raw, j, selPos(m)); return v == null ? null : 100 * v; }
       const arr = seifaBasis(m) === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
     }
@@ -6988,6 +7097,7 @@ function chCensusNat(m) {
     // the ageCuts record keeps its shares as fractions
     if (["a1824", "a3554", "a75"].includes(S.ageMode)) { const v = m.ageCuts && m.ageCuts[S.ageMode]; return v == null ? null : v <= 1 ? 100 * v : v; }
   }
+  if (arrMed()) return nn(demoAreaShare(aus.demo) );
   if (incMed()) return nn(m.incomeCuts && m.incomeCuts.medWeekly);
   return nn(demoAreaShare(aus.demo));
 }
@@ -7016,6 +7126,7 @@ function chCensusX(m) {
     };
   }
   if (ageMed()) return { get: (d) => divValue(m, d.i), axis: "Median age, years", short: "Median age", fmt: (v) => String(Math.round(v)), per: (s) => `per ${s}-year difference in median age`, unit: (s) => `${s} years`, noun: "median age", jitter: 0.32 };
+  if (arrMed()) return { get: (d) => divValue(m, d.i), axis: "Median year of arrival in Australia, year", short: "Median arrival year", fmt: (v) => String(Math.round(v)), per: (s) => `per ${s}-year difference in median arrival year`, unit: (s) => `${s} years`, noun: "median year of arrival", jitter: 0.32 };
   if (incMed()) return { get: (d) => divValue(m, d.i), axis: "Median weekly household income", short: "Median income", fmt: mny, per: (s) => `per ${mny(s)}-a-week difference in median household income`, unit: (s) => `${mny(s)} a week`, noun: "median household income" };
   const w = censusWho(m);
   return { get: (d) => divValue(m, d.i), axis: `${lensShort()}, % of ${w.pop}`, short: lensShort(), fmt: (v) => (v < 10 ? f1(v) : f0(v)), per: (s) => `per ${s}-point difference in the share of ${w.phrase}`, unit: (s) => `${s} points`, noun: `the share of ${w.phrase}` };
@@ -10932,7 +11043,7 @@ function areaHedDek(m, st) {
 }
 
 // the census people measures, area level: who holds the fifth of seats at each end
-const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats where the most people aged 15+ hold a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12: ["seats where the most residents aged 15+ finished Year 12 as their highest level of schooling", "with the fewest"], y10less: ["seats where the most residents aged 15+ finished school at Year 10 or earlier", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
+const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats where the most people aged 15+ hold a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12: ["seats where the most residents aged 15+ finished Year 12 as their highest level of schooling", "with the fewest"], y10less: ["seats where the most residents aged 15+ finished school at Year 10 or earlier", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], arrmed: ["seats with the newest median year of arrival in Australia", "with the oldest median arrival year"], arr10: ["seats where the most arrivals came in the census's final ten years", "with the fewest"], engpoor: ["seats with the weakest spoken English", "with the strongest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
   pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"], unemp: ["seats with the most people out of work", "with the fewest"] };
 // Ancestry option phrases, generated per option of the select menu
 const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.entries(ANC_NAME) : []).map(([k, n]) => [k, [`seats where the most residents named ${n} ancestry`, "with the fewest"]]));
@@ -11023,16 +11134,22 @@ function areaDemo(m, st, idx, where, isNowM) {
   if (!A.demo) return DEMO_EARLY;
   const med = incMed() ? m.incomeCuts && m.incomeCuts.medWeekly : null;
   const medAge = ageMed() ? m.ageCuts && m.ageCuts.medAge : null;
+  // the arrival-year median lane: the pooled median interpolates the
+  // pooled bands, null's the era-open cohorts gone to print lumps
+  const medArr = arrMed() ? (A.demo && A.demo.arrMed) : null;
   // the median view's headline is the national line: medians never pool,
   // so a state area carries no figure of its own to print
   if (incMed() && med == null) return { hed: "Income figures start at the 2001 election", dek: "" };
   if (ageMed() && medAge == null) return { hed: "Median-age figures arrive with the census age bands", dek: "" };
+  if (arrMed() && medArr == null) return { hed: "The median year of arrival doesn't read on this print — its first arrival band is an open lump", dek: "" };
   const scored = idx.filter((i) => demoShare(m.divs[i]) != null).sort((a, b) => demoShare(m.divs[b]) - demoShare(m.divs[a]));
   const share = incMed()
     ? `${st === "AUS" ? "the median weekly household income" : "the national median weekly household income"} is ${mny(med)}${incEpoch(m)}`
     : ageMed()
       ? `${st === "AUS" ? "the median age" : "the national median age"} is ${medAge}`
-      : `${f1(demoAreaShare(A.demo))}% of ${censusWho(m, k).pop}${where} ${censusWho(m, k).pred}`;
+      : arrMed()
+        ? `${st === "AUS" ? "the median year of arrival in Australia" : `the median arrival year in ${stNameCap(m.year)}`} is ${Math.round(medArr)}`
+        : `${f1(demoAreaShare(A.demo))}% of ${censusWho(m, k).pop}${where} ${censusWho(m, k).pred}`;
   const note = demoCopy(m).seats;
   if (scored.length < 10) return { hed: cap(share), dek: note };
   const q = Math.round(scored.length / 5), high = scored.slice(0, q), low = scored.slice(-q);
@@ -11565,6 +11682,12 @@ function seatHedDek(m, d) {
         if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats; across Australia, households earn ${mny(m.incomeCuts && m.incomeCuts.medWeekly)} a week${incEpoch(m)}. ${demoCopy(m).seats}` };
         // the median-age view tells it in years on the same doctrine
         if (ageMed()) return { hed: `The median age in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the oldest median", "the youngest median")} of the ${xs.length} seats; Australia’s median age is ${m.ageCuts && m.ageCuts.medAge}. ${demoCopy(m).seats}` };
+        // the median arrival year, the lens's own year idiom alongside
+        if (arrMed()) {
+          if (demoShare(d) == null) return { hed: `${ds(d.n)} rides the print's open arrival bump — the median arrival year doesn't read here`, dek: "" };
+          const aus2 = m.areas.AUS.demo && m.areas.AUS.demo.arrMed;
+          return { hed: `The median year of arrival in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the newest median", "the oldest median")} of the ${xs.length} seats; Australia’s median arrival year is ${aus2 == null ? "off this print" : Math.round(aus2)}. ${demoCopy(m).seats}` };
+        }
         return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${censusWho(m, k).pop} ${censusWho(m, k).pred}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
@@ -11722,6 +11845,11 @@ function storyBooth(m, j) {
         hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure")
           : `The median age near here is ${Math.round(v)}`;
         dek = v == null ? "" : `In ${ds(D.n)} as a whole, it's ${dv != null ? Math.round(dv) : "–"}. ${demoBoothCopy(m).note}`;
+      } else if (arrMed() || S.immMode === "arr10" || S.immMode === "engpoor") {
+        // division-level reads today — no booth lanes for the arrival
+        // and proficiency arcs (2026-11-12); the seat's card says so
+        hed = "The arrival and proficiency reads are district-level — no per-place figures";
+        dek = `Read it on ${ds(D.n)}'s card.`;
       } else {
         const v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v;
         hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${(isInc() ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who).replace(/^of (the adults|residents)/, `of ${censusWho(m, k).pop}`)} ${censusWho(m, k).pred}`;
@@ -11890,8 +12018,9 @@ function lensColumn(get, colOf) {
   const dec = S.lens === "seifa" && !isDemo();
   // the income lens's median view prices column cells in weekly dollars
   const dol = S.lens === "seifa" && incMed();
-  // the age lens's median view prices column cells in years
-  const yr = S.lens === "seifa" && ageMed();
+  // the age lens's median view prices column cells in years, and the
+  // immigration median arrival year rides the same idiom
+  const yr = S.lens === "seifa" && (ageMed() || arrMed());
   // a signed lens (a primary's change, the Senate's gap on the House) reads as a change: diverging, no bar
   const signed = (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap());
   const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" || S.lens === "senpref" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;
@@ -12275,7 +12404,7 @@ function valueText(v, kind, ctx) {
     case "senpref": return `${f0(v)}% ranked ${spA()} ahead of ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
-    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : `${f1(v)}% ${censusWho(M()).pop === "residents" ? censusWho(M()).pred : `of ${censusWho(M()).pop} ${censusWho(M()).pred}`}`) : `Decile ${v} of 10`;
+    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : arrMed() ? `year ${Math.round(v)}, the median year of arrival in Australia` : `${f1(v)}% ${censusWho(M()).pop === "residents" ? censusWho(M()).pred : `of ${censusWho(M()).pop} ${censusWho(M()).pred}`}`) : `Decile ${v} of 10`;
   }
   return "";
 }
@@ -12717,7 +12846,7 @@ function legendHTML(m) {
           : (aus.demo && demoAreaShare(aus.demo));
         // the median lanes price their axes in dollars and years; every
         // other people lane reads percentages
-        const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : ageMed() ? (v) => `${Math.round(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
+        const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : (ageMed() || arrMed()) ? (v) => `${Math.round(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
         // the income lanes' note names their own cut in the census
         // year's dollars — the median spectrum reads the national
         // household line straight — then the same census-basis tail
@@ -12748,6 +12877,11 @@ function legendHTML(m) {
           noncit: "Share of residents not listed as Australian citizens (the census doesn't break out a not-stated share separately here: they're inside the complement)",
           bigfam: "Share of women aged 15+ who have had more than two children",
           hl: "Share of residents counted homeless in the ABS's census estimate, measured per SA2 statistical area (coarser than the other census measures)",
+          // the Immigration arc's three reads (2026-11-12): each names
+          // its own stated-arrival or other-language basis
+          arr10: "Share of overseas-born residents who stated a year of arrival who arrived in the census's own final ten years",
+          engpoor: "Share of residents who speak a language other than English who answer that they speak English not well or not at all (proficiency-not-stated sits beside neither reading)",
+          arrmed: "Median year of arrival in Australia of overseas-born residents who stated one, interpolated from the census print's own arrival bands (an era whose first band sits open, like the '06 prints, never reads one down to the year)",
         };
         const ptNote = m.demoInterp && m.demoInterp.c0 === 1991 ? PT_SINGLE : NOTE_ARC.pt;
         const headNote = isInc() ? incNote

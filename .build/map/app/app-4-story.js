@@ -1099,7 +1099,7 @@ function areaHedDek(m, st) {
 }
 
 // the census people measures, area level: who holds the fifth of seats at each end
-const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats where the most people aged 15+ hold a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12: ["seats where the most residents aged 15+ finished Year 12 as their highest level of schooling", "with the fewest"], y10less: ["seats where the most residents aged 15+ finished school at Year 10 or earlier", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
+const DM_TOP = { lang: ["seats with the most residents speaking another language at home", "most English-speaking"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], fborn: ["seats with the most residents born overseas", "the most Australia-born"], uni: ["seats where the most people aged 15+ hold a university qualification", "with the fewest"], blue: ["seats with the most blue-collar workers", "with the fewest"], y12: ["seats where the most residents aged 15+ finished Year 12 as their highest level of schooling", "with the fewest"], y10less: ["seats where the most residents aged 15+ finished school at Year 10 or earlier", "with the fewest"], atsci: ["seats with the most Indigenous Australians", "with the fewest"], arrmed: ["seats with the newest median year of arrival in Australia", "with the oldest median arrival year"], arr10: ["seats where the most arrivals came in the census's final ten years", "with the fewest"], engpoor: ["seats with the weakest spoken English", "with the strongest"], u15: ["seats with the most children under 15", "with the fewest"], onepar: ["seats with the most one-parent families", "with the fewest"],
   pt: ["seats where the most employed people travel to work by public transport", "with the fewest"], noncit: ["seats where the most residents were not counted as Australian citizens", "with the fewest"], bigfam: ["seats where the most women have had more than two children", "with the fewest"], hl: ["seats with the most homeless residents", "with the fewest"], unemp: ["seats with the most people out of work", "with the fewest"] };
 // Ancestry option phrases, generated per option of the select menu
 const ANC_TOP = Object.fromEntries((typeof ANC_NAME !== "undefined" ? Object.entries(ANC_NAME) : []).map(([k, n]) => [k, [`seats where the most residents named ${n} ancestry`, "with the fewest"]]));
@@ -1190,16 +1190,22 @@ function areaDemo(m, st, idx, where, isNowM) {
   if (!A.demo) return DEMO_EARLY;
   const med = incMed() ? m.incomeCuts && m.incomeCuts.medWeekly : null;
   const medAge = ageMed() ? m.ageCuts && m.ageCuts.medAge : null;
+  // the arrival-year median lane: the pooled median interpolates the
+  // pooled bands, null's the era-open cohorts gone to print lumps
+  const medArr = arrMed() ? (A.demo && A.demo.arrMed) : null;
   // the median view's headline is the national line: medians never pool,
   // so a state area carries no figure of its own to print
   if (incMed() && med == null) return { hed: "Income figures start at the 2001 election", dek: "" };
   if (ageMed() && medAge == null) return { hed: "Median-age figures arrive with the census age bands", dek: "" };
+  if (arrMed() && medArr == null) return { hed: "The median year of arrival doesn't read on this print — its first arrival band is an open lump", dek: "" };
   const scored = idx.filter((i) => demoShare(m.divs[i]) != null).sort((a, b) => demoShare(m.divs[b]) - demoShare(m.divs[a]));
   const share = incMed()
     ? `${st === "AUS" ? "the median weekly household income" : "the national median weekly household income"} is ${mny(med)}${incEpoch(m)}`
     : ageMed()
       ? `${st === "AUS" ? "the median age" : "the national median age"} is ${medAge}`
-      : `${f1(demoAreaShare(A.demo))}% of ${censusWho(m, k).pop}${where} ${censusWho(m, k).pred}`;
+      : arrMed()
+        ? `${st === "AUS" ? "the median year of arrival in Australia" : `the median arrival year in ${stNameCap(m.year)}`} is ${Math.round(medArr)}`
+        : `${f1(demoAreaShare(A.demo))}% of ${censusWho(m, k).pop}${where} ${censusWho(m, k).pred}`;
   const note = demoCopy(m).seats;
   if (scored.length < 10) return { hed: cap(share), dek: note };
   const q = Math.round(scored.length / 5), high = scored.slice(0, q), low = scored.slice(-q);
@@ -1732,6 +1738,12 @@ function seatHedDek(m, d) {
         if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats; across Australia, households earn ${mny(m.incomeCuts && m.incomeCuts.medWeekly)} a week${incEpoch(m)}. ${demoCopy(m).seats}` };
         // the median-age view tells it in years on the same doctrine
         if (ageMed()) return { hed: `The median age in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the oldest median", "the youngest median")} of the ${xs.length} seats; Australia’s median age is ${m.ageCuts && m.ageCuts.medAge}. ${demoCopy(m).seats}` };
+        // the median arrival year, the lens's own year idiom alongside
+        if (arrMed()) {
+          if (demoShare(d) == null) return { hed: `${ds(d.n)} rides the print's open arrival bump — the median arrival year doesn't read here`, dek: "" };
+          const aus2 = m.areas.AUS.demo && m.areas.AUS.demo.arrMed;
+          return { hed: `The median year of arrival in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the newest median", "the oldest median")} of the ${xs.length} seats; Australia’s median arrival year is ${aus2 == null ? "off this print" : Math.round(aus2)}. ${demoCopy(m).seats}` };
+        }
         return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${censusWho(m, k).pop} ${censusWho(m, k).pred}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
       const c = d.seifa[S.index];
@@ -1889,6 +1901,11 @@ function storyBooth(m, j) {
         hed = v == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure")
           : `The median age near here is ${Math.round(v)}`;
         dek = v == null ? "" : `In ${ds(D.n)} as a whole, it's ${dv != null ? Math.round(dv) : "–"}. ${demoBoothCopy(m).note}`;
+      } else if (arrMed() || S.immMode === "arr10" || S.immMode === "engpoor") {
+        // division-level reads today — no booth lanes for the arrival
+        // and proficiency arcs (2026-11-12); the seat's card says so
+        hed = "The arrival and proficiency reads are district-level — no per-place figures";
+        dek = `Read it on ${ds(D.n)}'s card.`;
       } else {
         const v = demoBoothShare(raw, j, selPos(m)), pct = v == null ? null : 100 * v;
         hed = pct == null ? (m.year !== "now" && m.year < DEMO_FROM ? DEMO_EARLY.hed : "This place has no census figure") : `${f0(pct)}% ${(isInc() ? demoBoothCopy(m).whoAdults : demoBoothCopy(m).who).replace(/^of (the adults|residents)/, `of ${censusWho(m, k).pop}`)} ${censusWho(m, k).pred}`;

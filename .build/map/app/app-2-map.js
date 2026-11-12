@@ -18,6 +18,8 @@ function divValue(m, i) {
       if (incMed()) { const v = d.demo && d.demo.medIncWeekly; return v == null ? null : v; }
       // the median age prices divisions in years on the same doctrine
       if (ageMed()) { const v = d.demo && d.demo.ageMed; return v == null ? null : v; }
+      // the median arrival year prices divisions in years beside them
+      if (arrMed()) { const v = d.demo && d.demo.arrMed; return v == null ? null : v; }
       const v = demoShare(d); return v == null ? null : 100 * v;
     }
   }
@@ -56,6 +58,8 @@ function boothValue(m, j) {
       if (incMed()) { const v = b.raw.medinc ? b.raw.medinc[j] : null; return v == null ? null : v; }
       // the median age reads its own year-lane, likewise never a share
       if (ageMed()) { const v = b.raw.ageMed ? b.raw.ageMed[j] : null; return v == null ? null : v; }
+      // the immigration arrival arc is division-level today — no booth lanes
+      if (arrMed() || S.immMode === "arr10" || S.immMode === "engpoor") return null;
       if (isDemo()) { const v = demoBoothShare(b.raw, j, selPos(m)); return v == null ? null : 100 * v; }
       const arr = seifaBasis(m) === "voters" ? b.raw.vdec[j] : b.raw.dec[j]; return arr ? nn(arr[IX.indexOf(S.index)]) : null;
     }

@@ -282,6 +282,30 @@ B43C_COLS = ["P_Ag_For_Fshg_Tot", "P_Mining_Tot", "P_Manufact_Tot",
              "P_Public_admin_sfty_Tot", "P_Educ_trng_Tot",
              "P_HlthCare_SocAs_Tot", "P_Art_recn_Tot"]
 B43D_COLS = ["P_Oth_scs_Tot", "P_ID_NS_Tot", "P_Tot_Tot"]
+# the Immigration lens's arrival-year and English-proficiency lanes
+# (2026-11-12): YARP's Tot family rides B10C (the 2011 print's own
+# decade grid), ENGLP the persons totals of B11A's speaks-other-
+# language classes (good = very well or well, limited = not well or
+# not at all, over that pair — proficiency-not-stated and English-
+# only speakers outside it), B11B's grand total as the universe
+# guard. Key order letter-for-letter gcp_newlanes.ARR_KEYS_ERA
+# ["2011"], whose load_arr_eng is this read's state-frame twin
+ARR_KEYS_2011 = ["bef41", "41_50", "51_60", "61_70", "71_80", "81_90",
+                 "91_00", "01_05", "06_11"]
+BCP_B10C = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B10C_AUST_SA1_short.csv")
+BCP_B11A = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B11A_AUST_SA1_short.csv")
+BCP_B11B = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+            "2011Census_B11B_AUST_SA1_short.csv")
+ARR_TOT_COLS = ["Tot_Before_1941", "Tot_1941_1950", "Tot_1951_1960",
+                "Tot_1961_1970", "Tot_1971_1980", "Tot_1981_1990",
+                "Tot_1991_2000", "Tot_2001_2005",
+                "Tot_2006", "Tot_2007", "Tot_2008", "Tot_2009",
+                "Tot_2010", "Tot_2011", "Tot_Yr_arrival_NS",
+                "Tot_Tot"]
+_ARR_TAIL = slice(8, 14)   # 2011-2015+ single years fold into "06_11"
+PROF_COLS = ["P_SOL_SE_VW_W_Y_a_Total", "P_SOL_SE_NW_NA_Total"]
 RENAME = {"Mcewen": "McEwen", "Mcmillan": "McMillan",
           "Mcpherson": "McPherson"}
 STATE_ORDER = {s: i for i, s in
@@ -365,6 +389,31 @@ def load_bcp():
     b43c = bcp_table(z, BCP_B43C, "region_id", B43C_COLS, 54800, 54805)
     b43d = bcp_table(z, BCP_B43D, "region_id", B43D_COLS, 54800, 54805)
     b05 = bcp_table(z, BCP_B05, "region_id", B05_COLS, 54800, 54805)
+    b10 = bcp_table(z, BCP_B10C, "region_id", ARR_TOT_COLS,
+                    54800, 54805)
+    b11a = bcp_table(z, BCP_B11A, "region_id", PROF_COLS,
+                     54800, 54805)
+    b11b = bcp_table(z, BCP_B11B, "region_id",
+                     ["P_SOL_SE_Tot_Total"], 54800, 54805)
+    if not (set(b10) == set(b11a) == set(b11b)):
+        fail("BCP B10/B11 SA1 universes diverge")
+    sb = sn = st = sg = sp = 0
+    for code, row10 in b10.items():
+        bands = list(row10[:8])
+        bands.append(sum(row10[_ARR_TAIL]))
+        ns, tot = row10[14], row10[15]
+        sb += sum(bands)
+        sn += ns
+        st += tot
+    for code, row11 in b11a.items():
+        if row11[0] + row11[1] > b11b[code][0]:
+            fail(f"BCP B11 pair exceeds SOL total at {code}")
+        sg += row11[0]
+        sp += row11[1]
+    if st and abs(sb + sn - st) / st > 0.004:
+        fail(f"BCP B10 national band drift {(sb + sn - st) / st:+.2%}")
+    if st and sg + sp > st * 1.02:
+        fail(f"BCP proficiency pair exceeds the overseas-born base")
     out = {}
     for code, g in g01.items():
         row09 = b09.get(code)
@@ -387,6 +436,17 @@ def load_bcp():
         row43c = b43c.get(code)
         row43d = b43d.get(code)
         row05 = b05.get(code)
+        row10 = b10.get(code)
+        arrv = None
+        arrns = None
+        profg = profp = None
+        if row10 is not None:
+            arrv = list(row10[:8])
+            arrv.append(sum(row10[_ARR_TAIL]))
+            arrns = row10[14]
+        row11 = b11a.get(code)
+        if row11 is not None:
+            profg, profp = row11
         mtw = None
         if row46 is not None:
             tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b, ttot, tns = row46
@@ -433,6 +493,13 @@ def load_bcp():
             "indns": None if row43d is None else row43d[1],
             "indt": None if row43d is None else row43d[2],
             "marvec": None if row05 is None else row05,
+            # the arrival lanes (B10C's own nine-band grid, stated
+            # arrivals only) and the proficiency pair — both
+            # overseas-born bases
+            "arrv": arrv,
+            "arrNS": arrns,
+            "profG": profg,
+            "profP": profp,
         }
     n05 = sum(1 for c in out.values() if c["aus"] is None)
     n40 = sum(1 for c in out.values() if c["uni"] is None)
@@ -792,6 +859,17 @@ def shares(rec):
         mard = sum(rec["marvec"])
         out["mar"] = {k: bounded(rec["marvec"][i], mard)
                       for i, k in enumerate(MAR_KEYS)}
+    # the arrival lanes (2026-11-12): each stated-arrival band's share
+    # of the stated total; the proficiency pair over itself
+    if rec.get("arrv") is not None:
+        arrd = sum(rec["arrv"])
+        if arrd > 0:
+            out["arrv"] = {k: bounded(rec["arrv"][i], arrd)
+                           for i, k in enumerate(ARR_KEYS_2011)}
+    if rec.get("profG") is not None and rec["profG"] + rec["profP"] > 0:
+        profd = rec["profG"] + rec["profP"]
+        out["prof"] = {"good": bounded(rec["profG"], profd),
+                       "limited": bounded(rec["profP"], profd)}
     return out
 
 
@@ -833,7 +911,9 @@ def main():
              or sa1.get(k, {}).get("labU") is None
              or sa1.get(k, {}).get("labLF") is None
              or sa1.get(k, {}).get("indn") is None
-             or sa1.get(k, {}).get("marvec") is None}
+             or sa1.get(k, {}).get("marvec") is None
+             or sa1.get(k, {}).get("arrv") is None
+             or sa1.get(k, {}).get("profG") is None}
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
@@ -860,7 +940,9 @@ def main():
                                   "hle": 0.0,
                                   "labU": 0, "labLF": 0,
                                   "indn": [0] * len(IND_KEYS),
-                                  "marvec": [0] * len(MAR_KEYS)})
+                                  "marvec": [0] * len(MAR_KEYS),
+                                  "arrv": [0] * 9, "arrNS": 0,
+                                  "profG": 0, "profP": 0})
     for key, dv in ced.items():
         r = sa1[key]
         ir = inc[key]
@@ -907,6 +989,11 @@ def main():
             acc["indn"][i] += r["indn"][i]
         for i in range(len(MAR_KEYS)):
             acc["marvec"][i] += r["marvec"][i]
+        for i in range(9):
+            acc["arrv"][i] += r["arrv"][i]
+        acc["arrNS"] += r["arrNS"]
+        acc["profG"] += r["profG"]
+        acc["profP"] += r["profP"]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -1000,6 +1087,12 @@ def main():
         for i in range(len(MAR_KEYS)):
             nat.setdefault("marvec", [0] * len(MAR_KEYS))
             nat["marvec"][i] += dv["marvec"][i]
+        for i in range(9):
+            nat.setdefault("arrv", [0] * 9)
+            nat["arrv"][i] += dv["arrv"][i]
+        nat["arrNS"] = nat.get("arrNS", 0) + dv["arrNS"]
+        nat["profG"] = nat.get("profG", 0) + dv["profG"]
+        nat["profP"] = nat.get("profP", 0) + dv["profP"]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -1068,6 +1161,15 @@ def main():
                     if sum(nat["indn"]) else None),
             "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
                     for i, k in enumerate(MAR_KEYS)},
+            "arrv": ({k: round(nat["arrv"][i] / sum(nat["arrv"]), 4)
+                      for i, k in enumerate(ARR_KEYS_2011)}
+                     if sum(nat["arrv"]) else None),
+            "prof": ({"good": round(nat["profG"]
+                                    / (nat["profG"] + nat["profP"]), 4),
+                      "limited": round(nat["profP"]
+                                       / (nat["profG"] + nat["profP"]),
+                                       4)}
+                     if nat["profG"] + nat["profP"] else None),
         },
     }
     out = {
@@ -1191,6 +1293,10 @@ def main():
         # shared print family's own order; B43C/D's persons block)
         "indKeys": list(IND_KEYS),
         "marKeys": list(MAR_KEYS),
+        # the Immigration lens's arrival lanes (2026-11-12): the 2011
+        # print's own band keys beside the proficiency pair's two keys
+        "arrKeys": list(ARR_KEYS_2011),
+        "profKeys": ["good", "limited"],
         "deliveryBasis": ("venue-proxy per booth (SA1 of the premises); "
                           "exact CED-2011 census sum per division"),
         "incomeCuts": {

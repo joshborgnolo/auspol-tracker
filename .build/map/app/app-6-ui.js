@@ -52,7 +52,7 @@ function valueText(v, kind, ctx) {
     case "senpref": return `${f0(v)}% ranked ${spA()} ahead of ${spB()}`;
     case "informal": return infModeOf(M()) === "exhaust" ? `${f1(v)}% exhausted` : `${f1(v)}% informal`;
     case "cls": return CLS_SHORT[v] || v;
-    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : `${f1(v)}% ${censusWho(M()).pop === "residents" ? censusWho(M()).pred : `of ${censusWho(M()).pop} ${censusWho(M()).pred}`}`) : `Decile ${v} of 10`;
+    case "seifa": return isDemo() ? (incMed() ? `${mny(v)} a week, the median household income` : ageMed() ? `age ${Math.round(v)}, the median age` : arrMed() ? `year ${Math.round(v)}, the median year of arrival in Australia` : `${f1(v)}% ${censusWho(M()).pop === "residents" ? censusWho(M()).pred : `of ${censusWho(M()).pop} ${censusWho(M()).pred}`}`) : `Decile ${v} of 10`;
   }
   return "";
 }
@@ -494,7 +494,7 @@ function legendHTML(m) {
           : (aus.demo && demoAreaShare(aus.demo));
         // the median lanes price their axes in dollars and years; every
         // other people lane reads percentages
-        const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : ageMed() ? (v) => `${Math.round(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
+        const demoTick = incMed() ? (v) => `${mny(v)}${v === hi ? "+" : ""}` : (ageMed() || arrMed()) ? (v) => `${Math.round(v)}${v === hi ? "+" : ""}` : (v) => `${v}%${v === hi ? "+" : ""}`;
         // the income lanes' note names their own cut in the census
         // year's dollars — the median spectrum reads the national
         // household line straight — then the same census-basis tail
@@ -525,6 +525,11 @@ function legendHTML(m) {
           noncit: "Share of residents not listed as Australian citizens (the census doesn't break out a not-stated share separately here: they're inside the complement)",
           bigfam: "Share of women aged 15+ who have had more than two children",
           hl: "Share of residents counted homeless in the ABS's census estimate, measured per SA2 statistical area (coarser than the other census measures)",
+          // the Immigration arc's three reads (2026-11-12): each names
+          // its own stated-arrival or other-language basis
+          arr10: "Share of overseas-born residents who stated a year of arrival who arrived in the census's own final ten years",
+          engpoor: "Share of residents who speak a language other than English who answer that they speak English not well or not at all (proficiency-not-stated sits beside neither reading)",
+          arrmed: "Median year of arrival in Australia of overseas-born residents who stated one, interpolated from the census print's own arrival bands (an era whose first band sits open, like the '06 prints, never reads one down to the year)",
         };
         const ptNote = m.demoInterp && m.demoInterp.c0 === 1991 ? PT_SINGLE : NOTE_ARC.pt;
         const headNote = isInc() ? incNote

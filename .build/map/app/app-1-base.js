@@ -429,10 +429,21 @@ const isFam = () => S.index === LENS_FAM;
 // view. Each share keeps its DM id for the dicts, ranges, ramps and
 // top-of lists, and Ancestry keeps its select lens's — IMM_* names only
 // the lens's own menu, chip and note texts
-const IMM_MODES = ["lang", "fborn", "noncit", "anc"];
-const IMM_NAME = { lang: "Language other than English at home", fborn: "Born overseas", noncit: "Non-citizens", anc: "Ancestry" };
-const IMM_SHORT = { lang: "Other language", fborn: "Born overseas", noncit: "Non-citizens", anc: "Ancestry" };
+const IMM_MODES = ["lang", "fborn", "arrmed", "arr10", "engpoor", "noncit", "anc"];
+const IMM_NAME = { lang: "Language other than English at home", fborn: "Born overseas", arrmed: "Median year of arrival", arr10: "Arrived in the last decade", engpoor: "English spoken not well or not at all", noncit: "Non-citizens", anc: "Ancestry" };
+const IMM_SHORT = { lang: "Other language", fborn: "Born overseas", arrmed: "Median arrival", arr10: "Newer arrivals", engpoor: "Weak English", noncit: "Non-citizens", anc: "Ancestry" };
 const isImm = () => S.index === LENS_IMM;
+// the Immigration lens's arrival and English-proficiency arcs (2026-11-12):
+// two share reads beside the year-median idiom — the first census lane to
+// read a YEAR at all. The three reads carry their own demo-dict scalars
+// emitted by build_map_data (arrMed/arr10/engpoor); the era grids are each
+// frame print's own — the open first band reads null like ageMed (its pile
+// frames: the '06-print editions), division-level only today (no booth
+// lanes yet), and the menu omits a frame the lanes never printed (the
+// '91-side frames by construction, plus every state-frame lens before its
+// own era lands)
+const arrMed = () => isImm() && S.immMode === "arrmed";
+const ARR_IMM_DEMOKEY = { arrmed: "arrMed", arr10: "arr10", engpoor: "engpoor" };
 const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TENESMS[S.ten] : k === LENS_ANC ? ANCISMS[S.anc] : k === LENS_OCC ? OCCISMS[S.occ] : k === LENS_IND ? INDISMS[S.ind] : k === LENS_MAR ? MARISMS[S.mar] : k === "fborn" && S.cob != null ? COB_VERB[S.cob] : k === LENS_INC ? (INC_VERB[S.incMode] ? INC_VERB[S.incMode](m) : "") : k === LENS_AGE ? (AGE_VERB[S.ageMode] || "") : k === LENS_EDU ? DM_VERB[S.eduMode] : k === LENS_FAM ? DM_VERB[S.famMode] : k === LENS_IMM ? (S.immMode === "anc" ? ANCISMS[S.anc] : S.immMode === "fborn" && S.cob != null ? COB_VERB[S.cob] : DM_VERB[S.immMode]) : DM_VERB[k]);
 // whose share a census measure is, and what it says of them: the bases the builders divide by
 // (build_areas_sa1.py's SHARES and the state demo builders), so copy never sets a measure over
@@ -440,8 +451,8 @@ const dmVerb = (m, k) => (k === LENS_REL ? RELISMS[S.rel] : k === LENS_TEN ? TEN
 // aged 15+, occupation and the journey to work of employed people, one-parent families of
 // families, children ever born of women aged 15+, tenure of dwellings, and the income shares of
 // adults (households, in the era prints that count households)
-const DM_POP = { uni: "people aged 15+", y12: "people aged 15+", y10less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+", unemp: "people in the labour force" };
-const DM_PRED = { y10less: "finished school at Year 10 or earlier", onepar: "are one-parent families", pt: "travelled to work by public transport", bigfam: "have had more than two children" };
+const DM_POP = { uni: "people aged 15+", y12: "people aged 15+", y10less: "people aged 15+", blue: "employed people", pt: "employed people", onepar: "families", bigfam: "women aged 15+", unemp: "people in the labour force", arr10: "overseas-born residents who stated their arrival year", engpoor: "residents who speak a language other than English" };
+const DM_PRED = { y10less: "finished school at Year 10 or earlier", onepar: "are one-parent families", pt: "travelled to work by public transport", bigfam: "have had more than two children", arr10: "arrived in the census's own final ten years", engpoor: "speak English not well or not at all" };
 function censusWho(m, k = S.index) {
   let pop = "residents", pred;
   if (k === LENS_TEN) { pop = "dwellings"; pred = TENESMS[S.ten]; }
@@ -515,7 +526,10 @@ const demoShare = (d) => {
   if (isFam()) return d.demo ? d.demo[S.famMode] : null;
   // immigration: the three shares ride their own demo keys too (ancestry
   // and the birthplace views joined the cob/anc select chains above)
-  if (isImm()) return d.demo ? d.demo[S.immMode] : null;
+  if (isImm()) {
+    if (ARR_IMM_DEMOKEY[S.immMode]) return d.demo ? d.demo[ARR_IMM_DEMOKEY[S.immMode]] : null;
+    return d.demo ? d.demo[S.immMode] : null;
+  }
   return d.demo ? d.demo[S.index] : null;
 };
 // ...and of the year model's AUS/area pool (demo dicts built in deriveAreas)
@@ -531,7 +545,10 @@ const demoAreaShare = (demo) => {
   if (isAge()) return demo ? demo[AGE_KEY[S.ageMode]] : null;
   if (isEdu()) return demo ? demo[S.eduMode] : null;
   if (isFam()) return demo ? demo[S.famMode] : null;
-  if (isImm()) return demo ? demo[S.immMode] : null;
+  if (isImm()) {
+    if (ARR_IMM_DEMOKEY[S.immMode]) return demo ? demo[ARR_IMM_DEMOKEY[S.immMode]] : null;
+    return demo ? demo[S.immMode] : null;
+  }
   return demo ? demo[S.index] : null;
 };
 // ...and of one booth row (fraction): the select lanes ride their
@@ -557,8 +574,13 @@ const demoBoothShare = (raw, j, pos) => {
   if (isEdu()) { const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.eduMode)] : null; }
   // family composition: u15 11, onepar 12, bigfam 15, the same positional way
   if (isFam()) { const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.famMode)] : null; }
-  // immigration: the positional tuple again (lang 0, fborn 3, noncit 14)
-  if (isImm()) { const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.immMode)] : null; }
+  // immigration: the positional tuple again (lang 0, fborn 3, noncit 14);
+  // the arrival/proficiency arc rides division-level demo scalars —
+  // its sentinels return null at booth level today
+  if (isImm()) {
+    if (ARR_IMM_DEMOKEY[S.immMode]) return null;
+    const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.immMode)] : null;
+  }
   const r = raw.demo && raw.demo[j]; return r ? r[DM.indexOf(S.index)] : null;
 };
 // the median-age lane's colour domain per year: the year's own division
@@ -592,8 +614,66 @@ const incMedRange = (m) => {
   if (m) m._incMedRange = r;
   return r;
 };
-const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInd() ? IND_RANGE[S.ind] : isMar() ? MAR_RANGE[S.mar] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : isFam() ? DM_RANGE[S.famMode] : isImm() ? DM_RANGE[S.immMode] : DM_RANGE[S.index]);
-const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInd() ? "ind" : isMar() ? "mar" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : isFam() ? S.famMode : isImm() ? S.immMode : S.index];
+// the Immigration arrival lanes' band spans, era grid by era grid —
+// letter-for-letter build_map_data's _ARR_SPANS so a pooled median
+// interpolates identically at both ends. The open first band reads
+// null like ageMed's 85+: interpolation there would fabricate a year
+const ARR_BAND_SPAN = {
+  bef41: [null, 1940], "41_50": [1941, 1950], "51_60": [1951, 1960],
+  "61_70": [1961, 1970], "71_80": [1971, 1980], "81_90": [1981, 1990],
+  "91_00": [1991, 2000], "01_05": [2001, 2005], "01_10": [2001, 2010],
+  "06_11": [2006, 2011], "11_15": [2011, 2015], "16_21": [2016, 2021],
+  bef46: [null, 1945], "46_55": [1946, 1955], "56_65": [1956, 1965],
+  "66_75": [1966, 1975], "76_85": [1976, 1985], "86_95": [1986, 1995],
+  "96_05": [1996, 2005], "06_10": [2006, 2010], "11_16": [2011, 2016],
+  bef51: [null, 1950], bef91: [null, 1990], "91_95": [1991, 1995],
+  "96_00": [1996, 2000], "01_06": [2001, 2006],
+  bef81: [null, 1980], "81_85": [1981, 1985], "86_90": [1986, 1990],
+  "91_96": [1991, 1996] };
+// the median year of arrival of a band-share dict — build_map_data's
+// arr_median's recipe: linear inside the median band, null out of the
+// open first one. Pooled areas compute theirs from pooled bands
+function arrMedian(shares, keys) {
+  if (!shares) return null;
+  let tot = 0;
+  for (const k of keys) tot += shares[k] || 0;
+  if (tot <= 0) return null;
+  let acc = 0;
+  const half = tot / 2;
+  for (const k of keys) {
+    const sp = ARR_BAND_SPAN[k];
+    if (!sp) return null;
+    const m = shares[k] || 0;
+    if (acc + m >= half) {
+      if (sp[0] === null || m <= 0) return null;
+      return sp[0] + (sp[1] + 1 - sp[0]) * (half - acc) / m;
+    }
+    acc += m;
+  }
+  return null;
+}
+// the median-arrival lane's colour domain per year: the year's own
+// division medians snapped outward to 2-year pairs (ageMed's own
+// recipe, the $100 snap's yearly sibling)
+const arrMedRange = (m) => {
+  if (m && m._arrMedRange) return m._arrMedRange;
+  let lo = Infinity, hi = -Infinity;
+  for (const d of (m && m.divs) || []) {
+    const v = d.demo && d.demo.arrMed;
+    if (v == null) continue;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const r = isFinite(lo) ? [Math.floor(lo / 2) * 2, Math.ceil(hi / 2) * 2] : [1970, 2025];
+  if (m) m._arrMedRange = r;
+  return r;
+};
+// the arrival-family reads' caps: the last-decade share and the
+// weak-English share, each rounded past its division maximum —
+// the median year's own domain steps in through arrMedRange
+const ARR_RANGE = { arr10: [0, 45], engpoor: [0, 60] };
+const demoRange = () => (isCob() ? COB_RANGE[S.cob] : isRel() ? REL_RANGE[S.rel] : isTen() ? TEN_RANGE[S.ten] : isAnc() ? ANC_RANGE[S.anc] : isOcc() ? OCC_RANGE[S.occ] : isInd() ? IND_RANGE[S.ind] : isMar() ? MAR_RANGE[S.mar] : isInc() ? (S.incMode === "med" ? incMedRange(M()) : INC_RANGE[S.incMode]) : isAge() ? (S.ageMode === "med" ? ageMedRange(M()) : AGE_RANGE[S.ageMode]) : isEdu() ? DM_RANGE[S.eduMode] : isFam() ? DM_RANGE[S.famMode] : isImm() ? (arrMed() ? arrMedRange(M()) : ARR_RANGE[S.immMode] || DM_RANGE[S.immMode]) : DM_RANGE[S.index]);
+const demoRamp = () => RAMP.demo[isCob() ? "fborn" : isRel() ? "rel" : isTen() ? "ten" : isAnc() ? "anc" : isOcc() ? "occ" : isInd() ? "ind" : isMar() ? "mar" : isInc() ? (S.incMode === "med" ? "incmed" : S.incMode === "lo" ? "loinc" : "hiqinc") : isAge() ? (S.ageMode === "med" ? "agemed" : S.ageMode) : isEdu() ? S.eduMode : isFam() ? S.famMode : isImm() ? (arrMed() ? "agemed" : S.immMode) : S.index];
 const cobFor = (m) => (m.cobKeys || []).map((k) => [k, COB_NAME[k]]);
 // the model's positional map for the active select lane (cob/rel/ten/anc/occ/ind/mar)
 const selPos = (m) => (isCob() ? (m.cobPos || {}) : isRel() ? (m.relPos || {}) : isTen() ? (m.tenPos || {}) : isAnc() ? (m.ancPos || {}) : isOcc() ? (m.occPos || {}) : isInd() ? (m.indPos || {}) : isMar() ? (m.marPos || {}) : (m.cobPos || {}));
@@ -1165,6 +1245,19 @@ function demoOf(m, idx) {
       demo.mar = {};
       for (const k of m.marKeys) { const xs = ds.filter((x) => x.mar && x.mar[k] != null); demo.mar[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.mar[k]))) / sum(xs.map((x) => x.p)) : null; }
     }
+    // the arrival lanes pool their bands the same way — and the pooled
+    // median interpolates OFF the pooled bands, never an average of
+    // the seats' medians (the income/age-median property the lens
+    // itself owns)
+    if (m.arrKeys && m.arrKeys.length) {
+      demo.arrv = {};
+      for (const k of m.arrKeys) { const xs = ds.filter((x) => x.arrv && x.arrv[k] != null); demo.arrv[k] = xs.length ? (100 * sum(xs.map((x) => x.p * x.arrv[k]))) / sum(xs.map((x) => x.p)) : null; }
+      demo.arrMed = arrMedian(demo.arrv, m.arrKeys);
+      const a10 = ds.filter((x) => x.arr10 != null);
+      demo.arr10 = a10.length ? (100 * sum(a10.map((x) => x.p * x.arr10))) / sum(a10.map((x) => x.p)) : null;
+      const eP = ds.filter((x) => x.engpoor != null);
+      demo.engpoor = eP.length ? (100 * sum(eP.map((x) => x.p * x.engpoor))) / sum(eP.map((x) => x.p)) : null;
+    }
   }
   return demo;
 }
@@ -1571,6 +1664,13 @@ async function loadYear(year, bg) {
     // entry reads whichever list the frame packs (era-gap keys stay off)
     m.indKeys = res.indKeys || null;
     m.indPos = m.indKeys ? Object.fromEntries(m.indKeys.map((k, i) => [k, i])) : null;
+    // the Immigration arc's arrival-band and proficiency keys (2026-11-12):
+    // the frame print's own grid — the menu's modes vanish when the era
+    // never printed the lanes (the '91-side frames; states till their
+    // own arc lands)
+    m.arrKeys = res.arrKeys || null;
+    m.arrPos = m.arrKeys ? Object.fromEntries(m.arrKeys.map((k, i) => [k, i])) : null;
+    m.profKeys = res.profKeys || null;
     // the Marital status menu + per-option positional map (2026-11-11)
     m.marKeys = res.marKeys || null;
     m.marPos = m.marKeys ? Object.fromEntries(m.marKeys.map((k, i) => [k, i])) : null;
@@ -1592,6 +1692,11 @@ async function loadYear(year, bg) {
       m.hasLane[LENS_EDU] = m.hasLane.uni;
       m.hasLane[LENS_FAM] = m.hasLane.u15;
       m.hasLane[LENS_IMM] = m.hasLane.lang;
+      // the immigration arrival+proficiency modes gate on the frame's
+      // arrKeys/profKeys records (never implied from another lane)
+      m.hasLane.arrmed = !!(m.arrKeys && m.arrKeys.length) && divs.some((d) => d.demo && d.demo.arrMed != null);
+      m.hasLane.arr10 = !!(m.arrKeys && m.arrKeys.length) && divs.some((d) => d.demo && d.demo.arr10 != null);
+      m.hasLane.engpoor = divs.some((d) => d.demo && d.demo.engpoor != null);
       // the Advantage indexes joined with their era print only: IRSAD
       // debuts at the 2001-census SEIFA issue (its name, the four-index
       // suite); the '90s frames carry IRSD/IER/IEO alone, so their menu

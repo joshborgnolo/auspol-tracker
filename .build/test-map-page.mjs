@@ -659,8 +659,9 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     const div = r.divs.find((d) => d.demo);
     // demo rows: 0..1 shares or null per lane, and the birthplace dict's
     // own country shares the same inside it (the interp contract joined
-    // its object-valued cob key 2026-10-28)
-    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "ind", "mar"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
+    // its object-valued cob key 2026-10-28, the Immigration arrival arc's
+    // arrv/prof dicts its 2026-11-12)
+    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "ind", "mar", "arrv", "prof"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
   // every interp year rides the income cuts of the nearest census
   // side (hi edges differ across the 2001/2006/2011 grids, so the hi
@@ -1143,12 +1144,12 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
 // the Ancestry read appears only where the frame prints its ancestry table
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), story = part("app-4-story.js");
-  assert.ok(base.includes('const LENS_IMM = "imm";') && base.includes('const IMM_MODES = ["lang", "fborn", "noncit", "anc"];'), "the Immigration lane id and its four reads, the language share first");
+  assert.ok(base.includes('const LENS_IMM = "imm";') && base.includes('const IMM_MODES = ["lang", "fborn", "arrmed", "arr10", "engpoor", "noncit", "anc"];'), "the Immigration lane id and its reads, the language share first (the arrival family broadcasts after it, 2026-11-12)");
   assert.ok(base.includes('if (k === "lang") { ks.push(LENS_IMM); continue; }') && base.includes('k !== "fborn" && k !== "noncit"'), "the People menu folds the four reads into the one Immigration entry where lang sat (DM stays positional against the demo tuple)");
   assert.ok(base.includes('imm: "Immigration"'), "the menu entry labels itself in the name tables");
   assert.ok(base.includes('immMode: "lang"'), "the language share is the landing read");
-  assert.ok(base.includes('if (isImm()) return d.demo ? d.demo[S.immMode] : null;') && base.includes('DM.indexOf(S.immMode)'), "the read rides its own demo-dict key and demo-tuple cell");
-  assert.ok(base.includes('DM_RANGE[S.immMode]') && base.includes('isImm() ? S.immMode :'), "range and ramp follow the picked read");
+  assert.ok(base.includes('return d.demo ? d.demo[S.immMode] : null;') && base.includes('DM.indexOf(S.immMode)') && base.includes('ARR_IMM_DEMOKEY'), "the read rides its own demo-dict key and demo-tuple cell; the arrival/proficiency reads route their emitted scalars (2026-11-12)");
+  assert.ok(base.includes('DM_RANGE[S.immMode]') && base.includes('isImm() ? (arrMed() ? arrMedRange(M()) : ARR_RANGE[S.immMode]'), "range and ramp follow the picked read, the median's own snapped domain beside it");
   assert.ok(base.includes('S.index === LENS_IMM && S.immMode === "fborn"') && base.includes('S.index === LENS_IMM && S.immMode === "anc"'), "the birthplace-country and ancestry sub-lenses ride their folded reads in the share chains");
   assert.ok(base.includes("m.hasLane[LENS_IMM] = m.hasLane.lang;"), "the menu gate rides the language share");
   assert.ok(!ui.includes('[LENS_ANC, "Ancestry"]'), "the standalone Ancestry menu entry folded away into Immigration");

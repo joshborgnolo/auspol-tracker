@@ -143,6 +143,7 @@ function chCensusNat(m) {
     // the ageCuts record keeps its shares as fractions
     if (["a1824", "a3554", "a75"].includes(S.ageMode)) { const v = m.ageCuts && m.ageCuts[S.ageMode]; return v == null ? null : v <= 1 ? 100 * v : v; }
   }
+  if (arrMed()) return nn(demoAreaShare(aus.demo) );
   if (incMed()) return nn(m.incomeCuts && m.incomeCuts.medWeekly);
   return nn(demoAreaShare(aus.demo));
 }
@@ -171,6 +172,7 @@ function chCensusX(m) {
     };
   }
   if (ageMed()) return { get: (d) => divValue(m, d.i), axis: "Median age, years", short: "Median age", fmt: (v) => String(Math.round(v)), per: (s) => `per ${s}-year difference in median age`, unit: (s) => `${s} years`, noun: "median age", jitter: 0.32 };
+  if (arrMed()) return { get: (d) => divValue(m, d.i), axis: "Median year of arrival in Australia, year", short: "Median arrival year", fmt: (v) => String(Math.round(v)), per: (s) => `per ${s}-year difference in median arrival year`, unit: (s) => `${s} years`, noun: "median year of arrival", jitter: 0.32 };
   if (incMed()) return { get: (d) => divValue(m, d.i), axis: "Median weekly household income", short: "Median income", fmt: mny, per: (s) => `per ${mny(s)}-a-week difference in median household income`, unit: (s) => `${mny(s)} a week`, noun: "median household income" };
   const w = censusWho(m);
   return { get: (d) => divValue(m, d.i), axis: `${lensShort()}, % of ${w.pop}`, short: lensShort(), fmt: (v) => (v < 10 ? f1(v) : f0(v)), per: (s) => `per ${s}-point difference in the share of ${w.phrase}`, unit: (s) => `${s} points`, noun: `the share of ${w.phrase}` };

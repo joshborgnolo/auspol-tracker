@@ -36,8 +36,9 @@ function lensColumn(get, colOf) {
   const dec = S.lens === "seifa" && !isDemo();
   // the income lens's median view prices column cells in weekly dollars
   const dol = S.lens === "seifa" && incMed();
-  // the age lens's median view prices column cells in years
-  const yr = S.lens === "seifa" && ageMed();
+  // the age lens's median view prices column cells in years, and the
+  // immigration median arrival year rides the same idiom
+  const yr = S.lens === "seifa" && (ageMed() || arrMed());
   // a signed lens (a primary's change, the Senate's gap on the House) reads as a change: diverging, no bar
   const signed = (S.lens === "fp" && S.fpMode === "change") || (S.lens === "senate" && senGap());
   const scale = S.lens === "fp" || S.lens === "senate" ? (signed ? null : FPMAX[S.party]) : S.lens === "flow" || S.lens === "senpref" ? 100 : S.lens === "seifa" ? (dec ? 10 : demoRange()[1]) : null;

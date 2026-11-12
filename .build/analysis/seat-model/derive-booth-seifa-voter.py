@@ -339,6 +339,51 @@ G07_BANDS = ["A_0_4_y", "A_5_9_y", "A_10_14_y", "A_15_19_y", "A_20_24_y",
              "A_25_29_y", "A_30_34_y", "A_35_39_y", "A_40_44_y",
              "A_45_49_y", "A_50_54_y", "A_55_59_y", "A_60_64_y",
              "A_65_y_ov"]
+# ---- the Immigration lens's arrival-year and English-proficiency
+# lanes (2026-11-12): YARP rides each print's birthplace-by-arrival
+# table's Tot family (2021/2016 G10C) — bands are the print's own
+# era grid (never re-resolved onto a common one: the 2016 print's
+# 1946-1955 bucket does NOT equal the 2021 print's 1951-1960), and
+# the keys below ride the store's arrKeys verbatim. ENGLP rides the
+# proficiency-by-arrival table's speaks-other-language class blocks
+# (2021 G11A-D stem UOLSE, 2016 SOLSE): "very well or well" and "not
+# well or not at all" persons, over the same pair — the print's
+# grand-total T_* blocks repeat the suffix and its boundary cohorts
+# recur across split parts (A25_34 ships in G11A AND G11B at 2021),
+# so cohort reads anchor on A\d prefixes claimed by their first part.
+# Both counts measure overseas-born residents. Constants letter-for-
+# letter gcp_newlanes.ARR_KEYS_ERA/_ARR_ERA, whose load_arr_eng the
+# state-frame builders read instead.
+ARR_KEYS_GCP = {
+    "2021": ["bef51", "51_60", "61_70", "71_80", "81_90", "91_00",
+             "01_10", "11_15", "16_21"],
+    "2016": ["bef46", "46_55", "56_65", "66_75", "76_85", "86_95",
+             "96_05", "06_10", "11_16"],
+}
+_ARR_MEMBER_GCP = {
+    "2021": "2021Census_G10C_AUST_SA1.csv",
+    "2016": "2016Census_G10C_AUS_SA1.csv",
+}
+_ARR_GROUPS_GCP = {
+    "2021": (["Tot_Before_1951"], ["Tot_1951_1960"], ["Tot_1961_1970"],
+             ["Tot_1971_1980"], ["Tot_1981_1990"], ["Tot_1991_2000"],
+             ["Tot_2001_2010"], ["Tot_2011_2015"],
+             ["Tot_2016", "Tot_2017", "Tot_2018", "Tot_2019",
+              "Tot_2020", "Tot_2021"]),
+    "2016": (["Tot_Before_1946"], ["Tot_1946_1955"], ["Tot_1956_1965"],
+             ["Tot_1966_1975"], ["Tot_1976_1985"], ["Tot_1986_1995"],
+             ["Tot_1996_2005"], ["Tot_2006_2010"],
+             ["Tot_2011", "Tot_2012", "Tot_2013", "Tot_2014",
+              "Tot_2015", "Tot_2016"]),
+}
+_ARR_NS_TOT = ("Tot_Yr_arrival_NS", "Tot_Tot")
+_ARR_PROF_MEMBERS = {
+    "2021": ("2021Census_G11A_AUST_SA1.csv", "2021Census_G11B_AUST_SA1.csv",
+             "2021Census_G11C_AUST_SA1.csv", "2021Census_G11D_AUST_SA1.csv"),
+    "2016": ("2016Census_G11A_AUS_SA1.csv", "2016Census_G11B_AUS_SA1.csv",
+             "2016Census_G11C_AUS_SA1.csv", "2016Census_G11D_AUS_SA1.csv"),
+}
+_ARR_PROF_STEM = {"2021": "UOLSE", "2016": "SOLSE"}
 # G14 religion columns per REL_KEYS slot (GCP era: No-religion is the
 # so-described NR part of SB_OSB_NRA; the orth lane sums Eastern +
 # Oriental orthodox — the 2001 print's own two orthodox rows)
@@ -876,6 +921,62 @@ def new_lane_tables(z, idcol="SA1_CODE_2021", era="2021"):
     # sum, never it
     tbl["mar"] = read_p_cols(z, zpf(mmar), idcol,
                              mar_cols, rows_pin, "mar")
+    # the arrival-year histogram (the print's own Tot columns, each
+    # band slot summing its group) + the English-proficiency pair,
+    # both measuring overseas-born residents (the YARP universe);
+    # ABS perturbs the cell prints independently, so the arrival
+    # band sum drifts ±2% of its printed total nationally — guard
+    # wide enough to name that without chasing noise
+    groups = _ARR_GROUPS_GCP[era]
+    want = [c for blk in groups for c in blk] + list(_ARR_NS_TOT)
+    ar = read_p_cols(z, zpf(_ARR_MEMBER_GCP[era]), idcol, want,
+                     rows_pin, "arr")
+    tbl["arr"] = {}
+    sb = sn = st = 0
+    for code, r in ar.items():
+        vec, pos = [], 0
+        for blk in groups:
+            vec.append(sum(r[pos: pos + len(blk)]))
+            pos += len(blk)
+        tbl["arr"][code] = (tuple(vec), r[-2], r[-1])
+        sb += sum(vec)
+        sn += r[-2]
+        st += r[-1]
+    if abs(sb + sn - st) / st > 0.04:
+        fail(f"GCP arrival G10C national band drift "
+             f"{(sb + sn - st) / st:+.2%}")
+    pg, pp = {}, {}
+    seen = set()
+    for m in _ARR_PROF_MEMBERS[era]:
+        name = zpf(m)
+        if name not in z.namelist():
+            fail(f"GCP zip lacks {name}")
+        with io.TextIOWrapper(z.open(name), encoding="utf-8-sig") as fh:
+            head = next(csv.reader(fh))
+        stem = _ARR_PROF_STEM[era]
+        ages = [c[:c.index("_" + stem + "_VWW_T")]
+                for c in head
+                if c.endswith("_" + stem + "_VWW_T")
+                and c[:1] == "A" and c[1].isdigit()]
+        if not ages:
+            fail(f"GCP {m.split('/')[-1]} header drift, no cohorts")
+        ages = [a for a in ages if a not in seen]
+        seen.update(ages)
+        cols = [f"{a}_{stem}_VWW_T" for a in ages] + \
+               [f"{a}_{stem}_NWNAA_T" for a in ages]
+        d = read_p_cols(z, name, idcol, cols, rows_pin, "prof")
+        for code, r in d.items():
+            n = len(ages)
+            g0, p0 = pg.get(code, 0), pp.get(code, 0)
+            pg[code] = g0 + sum(r[:n])
+            pp[code] = p0 + sum(r[n:])
+    if set(pg) != set(tbl["arr"]):
+        fail("GCP arrival/proficiency universes diverge")
+    sg, sp = sum(pg.values()), sum(pp.values())
+    if sg + sp > st * 1.02:
+        fail(f"GCP proficiency pair exceeds the overseas-born base "
+             f"nationally ({(sg + sp) / st:.1%})")
+    tbl["arr"] = {c: v + ((pg[c], pp[c]),) for c, v in tbl["arr"].items()}
     return tbl
 
 
@@ -971,6 +1072,8 @@ def load_gcp21():
             fail(f"GCP G54 SA1 set mismatch at {code}")
         if code not in nlt["mar"]:
             fail(f"GCP G05 SA1 set mismatch at {code}")
+        if code not in nlt["arr"]:
+            fail(f"GCP G10C/G11 SA1 set mismatch at {code}")
         # the ten-country cob tuple, in COB_KEYS order, indexed on the
         # GCP_G09{F,G,H}_COLS orders above
         cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
@@ -997,7 +1100,8 @@ def load_gcp21():
                ir[5]) \
             + (nlt["lab"][code],) \
             + (nlt["ind"][code],) \
-            + (nlt["mar"][code],)
+            + (nlt["mar"][code],) \
+            + (nlt["arr"][code],)
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -1121,15 +1225,18 @@ def acc_new():
             "ueN": 0.0, "lfD": 0.0,
             "indN": [0.0] * len(IND_KEYS),
             "indNS": 0.0, "indT": 0.0,
-            "marN": [0.0] * len(MAR_KEYS)}
+            "marN": [0.0] * len(MAR_KEYS),
+            "arrN": [0.0] * 9, "arrNsW": 0.0,
+            "profG": 0.0, "profP": 0.0}
 
 
 def acc_row(acc, r, w):
-    """Weight-add row r's new-lane tail (r[17..31]) into acc; any
+    """Weight-add row r's new-lane tail (r[17..32]) into acc; any
     reader of the GCP/BCP universes emits the same tail layout (slot
     29 slot — the labour counts — appended 2026-11-10; slot 30 the
     industry triple appended 2026-11-11; incq stays 28; slot 31 —
-    the marital five — appended 2026-11-11)."""
+    the marital five — slot 32 the immigration arrival family —
+    appended 2026-11-11/12)."""
     acc["pers"] += w * r[0]
     acc["y12n"] += w * r[17][0]
     acc["y12cn"] += w * r[17][1]
@@ -1173,6 +1280,16 @@ def acc_row(acc, r, w):
     if len(r) > 31:
         for i in range(len(MAR_KEYS)):
             acc["marN"][i] += w * r[31][i]
+    # slot 32 the Immigration arc's arrival histogram and proficiency
+    # pair (2026-11-12): r[32] = (arrv9 bands, arrNsW, arrTot,
+    # (profGood, profPoor)) — counted the same way, GCP-2021-era rows
+    if len(r) > 32:
+        av, ans_, _at, pr = r[32]
+        for i in range(9):
+            acc["arrN"][i] += w * av[i]
+        acc["arrNsW"] += w * ans_
+        acc["profG"] += w * pr[0]
+        acc["profP"] += w * pr[1]
 
 
 def acc_merge(dst, src):
@@ -1180,7 +1297,8 @@ def acc_merge(dst, src):
               "relNS", "relTot",
               "famN", "famD", "citz", "ptN", "ptT", "ptNS",
               "cebN", "cebNS", "cebT", "ancP", "ancNS", "hlE",
-              "ueN", "lfD", "indNS", "indT"):
+              "ueN", "lfD", "indNS", "indT",
+              "arrNsW", "profG", "profP"):
         dst[k] += src[k]
     for i in range(len(REL_KEYS)):
         dst["relN"][i] += src["relN"][i]
@@ -1192,14 +1310,18 @@ def acc_merge(dst, src):
         dst["indN"][i] += src["indN"][i]
     for i in range(len(MAR_KEYS)):
         dst["marN"][i] += src["marN"][i]
+    for i in range(9):
+        dst["arrN"][i] += src["arrN"][i]
 
 
-def emit_new(acc):
+def emit_new(acc, era="2021"):
     """One share-block's new-lane section. Shares come from the
     weighted COUNTS (never averaged row shares), and an empty basis
     emits null on the per-lane pcti convention — nothing is ever
     clamped or completed. rel rides the ex-not-stated persons basis,
-    ten the ex-tenure-not-stated dwellings basis."""
+    ten the ex-tenure-not-stated dwellings basis. The arrival lanes
+    (2026-11-12) ride the era's own print grid in arrKeys_era — the
+    2016-cohort callers pass era=2016."""
     yd, ad = acc["y12d"], acc["atD"]
     relD = acc["relTot"] - acc["relNS"]
     tn = acc["tenN"]
@@ -1209,6 +1331,8 @@ def emit_new(acc):
     ancD = acc["ancP"] - acc["ancNS"]
     indden = sum(acc["indN"])
     marD = sum(acc["marN"])
+    arrD = sum(acc["arrN"])
+    profD = acc["profG"] + acc["profP"]
     return {
         "y12less": round(acc["y12n"] / yd, 4) if yd > 0 else None,
         "y12": round(acc["y12cn"] / yd, 4) if yd > 0 else None,
@@ -1244,6 +1368,15 @@ def emit_new(acc):
         "mar": {k: (round(acc["marN"][i] / marD, 4)
                     if marD > 0 else None)
                 for i, k in enumerate(MAR_KEYS)},
+        # the arrival lanes (2026-11-12): each arrival band's share of
+        # the stated-arrival overseas-born, on the era's own print
+        # grid; the proficiency pair's two reads over themselves
+        "arrv": ({k: round(acc["arrN"][i] / arrD, 4)
+                  for i, k in enumerate(ARR_KEYS_GCP[era])}
+                 if arrD > 0 else None),
+        "prof": ({"good": round(acc["profG"] / profD, 4),
+                  "limited": round(acc["profP"] / profD, 4)}
+                 if profD > 0 else None),
     }
 
 
@@ -2435,6 +2568,12 @@ def build(year):
         # tables, 2021 G54/2016 G51 persons blocks)
         "indKeys": list(IND_KEYS),
         "marKeys": list(MAR_KEYS),
+        # the Immigration lens's arrival-year family (2026-11-12): the
+        # THIS store's basis census's own print grid (2021 GCP here);
+        # the spoken-English proficiency pair rides the speaks-other-
+        # language basis (keys [good, limited] of the pair)
+        "arrKeys": list(ARR_KEYS_GCP["2021"]),
+        "profKeys": ["good", "limited"],
         "incomeCuts": {
             "loQuantile": gcp_meta["loQuantile"],
             "loCutWeekly": gcp_meta["loCutWeekly"],

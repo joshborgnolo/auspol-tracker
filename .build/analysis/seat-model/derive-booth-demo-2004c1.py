@@ -106,7 +106,9 @@ def main():
                                   "ancns": 0, "ancP": 0,
                                   "labU": 0, "labLF": 0,
                                   "indn": [0] * len(d06.IND_KEYS),
-                                  "marvec": [0] * len(d06.MAR_KEYS)})
+                                  "marvec": [0] * len(d06.MAR_KEYS),
+                                  "arrv": [0] * 4, "arrNS": 0,
+                                  "profG": 0, "profP": 0})
     for code, dv in alloc.items():
         r = people[code]
         acc = divsum[dv]
@@ -148,6 +150,11 @@ def main():
             acc["indn"][i] += r["indn"][i]
         for i in range(len(d06.MAR_KEYS)):
             acc["marvec"][i] += r["marvec"][i]
+        for i in range(4):
+            acc["arrv"][i] += r["arrv"][i]
+        acc["arrNS"] += r["arrNS"]
+        acc["profG"] += r["profG"]
+        acc["profP"] += r["profP"]
 
     nat = defaultdict(int)
     for dv in divsum.values():
@@ -186,6 +193,12 @@ def main():
         nat.setdefault("marvec", [0] * len(d06.MAR_KEYS))
         for i in range(len(d06.MAR_KEYS)):
             nat["marvec"][i] += dv["marvec"][i]
+        for i in range(4):
+            nat.setdefault("arrv", [0] * 4)
+            nat["arrv"][i] += dv["arrv"][i]
+        nat["arrNS"] = nat.get("arrNS", 0) + dv["arrNS"]
+        nat["profG"] = nat.get("profG", 0) + dv["profG"]
+        nat["profP"] = nat.get("profP", 0) + dv["profP"]
     nat_eo = nat["eng"] + nat["oth"]
     nat_fb = nat["totc"] - nat["cobns"]
     nat_p15 = nat["pers"] - nat["bands"][0] - nat["bands"][1]
@@ -232,6 +245,14 @@ def main():
                 if sum(nat["indn"]) else None),
         "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
                 for i, k in enumerate(d06.MAR_KEYS)},
+        "arrv": ({k: round(nat["arrv"][i] / sum(nat["arrv"]), 4)
+                  for i, k in enumerate(d06.ARR_KEYS_2006)}
+                 if sum(nat["arrv"]) else None),
+        "prof": ({"good": round(nat["profG"]
+                                / (nat["profG"] + nat["profP"]), 4),
+                  "limited": round(nat["profP"]
+                                   / (nat["profG"] + nat["profP"]), 4)}
+                 if nat["profG"] + nat["profP"] else None),
     }
     # 2006-census usual residents: published census count 19,855,288
     pub = 19855288
@@ -353,6 +374,11 @@ def main():
             "(cd-2006-ced-2003ed)"),
         "relKeys": list(d06.REL_KEYS),
         "tenKeys": list(d06.TEN_KEYS),
+        # the Immigration lens's arrival lanes (2026-11-12): the 2006
+        # print's own four-slot grid beside the proficiency pair
+        "arrKeys": list(d06.ARR_KEYS_2006),
+        "profKeys": ["good", "limited"],
+        "marKeys": list(d06.MAR_KEYS),
         "incomeCuts": {
             "loQuantile": d06.ilanes.INC_LO_Q,
             "loCutWeekly": inc_cut,

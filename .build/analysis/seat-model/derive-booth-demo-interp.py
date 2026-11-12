@@ -185,6 +185,15 @@ def blend_demo(c0blk, c1blk, f, nearest_blk, hi_mixed):
                       if d0 is not None or d1 is not None else None)
     near = nearest_blk if nearest_blk is not None else {}
     out["incMed"] = near.get("incMed")
+    # the arrival lanes (2026-11-12) never blend: their band grids
+    # ride the census print's own era — each frame takes the nearest
+    # cohort's read whole, like incMed below the share lanes; the
+    # lanes join the block only where they exist (an era hole leaves
+    # the key off, never a null)
+    if near.get("arrv") is not None:
+        out["arrv"] = near["arrv"]
+    if near.get("prof") is not None:
+        out["prof"] = near["prof"]
     return out
 
 
@@ -312,7 +321,28 @@ def main():
                 if d0 is not None or d1 is not None else None)
         if ispan is None:
             ni["incMed"] = (fn if near == y["c1"] else mn).get("incMed")
+        # the arrival lanes pin the nearest cohort's figure whole —
+        # their band grids never re-resolve across editions (2026-11-12);
+        # an era hole leaves the keys out like the lane never was
+        _na = (fn if near == y["c1"] else mn)
+        if _na.get("arrv") is not None:
+            ni["arrv"] = _na["arrv"]
+        if _na.get("prof") is not None:
+            ni["prof"] = _na["prof"]
         meas["counts"]["demoI"] = {"rows": rows, "national": ni}
+
+        # the frame-level keys ride the nearest side's print edition
+        # (NEVER a read of the popped head keys after popping — on
+        # the c0 frames near_store IS meas, so snapshot first)
+        near_ak, near_pk = (far.get("arrKeys"), far.get("profKeys")) \
+            if near == y["c1"] else (meas.get("arrKeys"),
+                                     meas.get("profKeys"))
+        meas.pop("arrKeys", None)
+        meas.pop("profKeys", None)
+        if near_ak is not None:
+            meas["arrKeys"] = near_ak
+        if near_pk is not None:
+            meas["profKeys"] = near_pk
 
         meas["demoInterp"] = {
             "f": f, "c0": y["c0"], "c1": y["c1"], "nearestSide": near,

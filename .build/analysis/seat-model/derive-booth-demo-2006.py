@@ -212,6 +212,19 @@ IND_KEYS = ["ag", "mining", "manuf", "utils", "constr", "whole",
             "retail", "accom", "transport", "media", "rental", "fin",
             "prof", "admin", "pubadm", "educ", "health", "arts",
             "othersvc"]
+# the Immigration lens's arrival-year and English-proficiency lanes
+# (2026-11-12): YARP rides B10's Total family (B10_B's opaque cells,
+# descriptor-verified: Total_Before_1991 B1746, 1991-1995 B1747,
+# 1996-2000 B1748, the 2001..2006 single years B1749-1754 — folded
+# into the "01_06" slot — not-stated B1755, grand total B1756);
+# ENGLP rides B11_A's persons totals (good = P_S_o_l_a_sp_E_v_w_r_w
+# Tot B1932, limited = P_S_o_l_a_s_E_n_w_n_a_a Tot B1943, B1965 the
+# speaks-other-language grand total as universe guard).
+ARR_KEYS_2006 = ["bef91", "91_95", "96_00", "01_06"]
+_ARR10_B_CELLS = ["B1746", "B1747", "B1748", "B1749", "B1750", "B1751",
+                  "B1752", "B1753", "B1754", "B1755", "B1756"]
+_ARR11_A_CELLS = ["B1932", "B1943"]
+_ARR11_B_UNIV = "B1965"
 B42C_IND_CELLS = ["B6452", "B6462", "B6472", "B6482", "B6492",
                   "B6502", "B6512", "B6522", "B6532", "B6542",
                   "B6552", "B6562", "B6572", "B6582", "B6592",
@@ -268,7 +281,8 @@ def load_bcp():
     """Per CD: persons, ages(11), eng, oth, aus, totc, cobns, uni, eduns,
     occupancy of the eight stated major groups, pop15."""
     for st in STATES:
-        for t in ("B01", "B05", "B07", "B08_A", "B08_B", "B09", "B12",
+        for t in ("B01", "B05", "B07", "B08_A", "B08_B", "B09", "B10_B",
+                  "B11_A", "B11_B", "B12",
                   "B13", "B15_B", "B23", "B24", "B32", "B39_B", "B41_B",
                   "B44_B", "B45"):
             if not (CD06 / f"CD_{st}_{t}.csv").exists():
@@ -297,6 +311,31 @@ def load_bcp():
     # B05's five registered-marital Total cells, MAR_KEYS order
     # (2026-11-11)
     b05 = bcp_table("B05", B05_MAR)
+    # the Immigration arc's YARP and ENGLP cells (B10_B's Total family
+    # and the B11 proficiency pair; universe guard via B11_B's grand
+    # total)
+    b10 = bcp_table("B10_B", _ARR10_B_CELLS)
+    b11a = bcp_table("B11_A", _ARR11_A_CELLS)
+    b11b = bcp_table("B11_B", [_ARR11_B_UNIV])
+    if set(b10) != set(b11a) or set(b10) != set(b11b):
+        fail("BCP B10/B11 CD universes diverge")
+    sb = sn = st = sg = sp = 0
+    for code, row10 in b10.items():
+        bands = (row10[0], row10[1], row10[2],
+                 sum(row10[3:9]))
+        ns, tot = row10[9], row10[10]
+        sb += sum(bands)
+        sn += ns
+        st += tot
+    for code, row11 in b11a.items():
+        if row11[0] + row11[1] > b11b[code][0]:
+            fail(f"BCP B11 pair exceeds SOL total at {code}")
+        sg += row11[0]
+        sp += row11[1]
+    if st and abs(sb + sn - st) / st > 0.004:
+        fail(f"BCP B10 national band drift {(sb + sn - st) / st:+.2%}")
+    if st and sg + sp > st * 1.02:
+        fail("BCP proficiency pair exceeds the overseas-born base")
     b07 = bcp_table("B07", [B07_NS_TOTAL])
     rel_cells = [c for k in REL_KEYS for c in B13_REL[k]]
     b13 = bcp_table("B13", rel_cells + [B13_NS, B13_TOT])
@@ -330,6 +369,8 @@ def load_bcp():
             i += span
         tr1, bu1, fe1, tm1, tr2, bu2, tb2, t3t, t3b, ttot, tns = b45[code]
         cw = b23[code]
+        row10 = b10[code]
+        arrv = [row10[0], row10[1], row10[2], sum(row10[3:9])]
         out[code] = {
             "pers": g[0],
             "ages": g[2:13],
@@ -367,6 +408,13 @@ def load_bcp():
                       if b42d.get(code) else None),
             "indt": (int(b42d[code][2]) if b42d.get(code) else None),
             "marvec": tuple(int(x) for x in b05[code]),
+            # the arrival lanes (2026-11-12): the B10 native cells'
+            # four-slot fold and the proficiency pair — both
+            # overseas-born bases
+            "arrv": arrv,
+            "arrNS": row10[9],
+            "profG": b11a[code][0],
+            "profP": b11a[code][1],
         }
     print(f"BCP 2006: {len(out)} CDs")
     return out
@@ -522,6 +570,17 @@ def shares(rec):
         mard = sum(rec["marvec"])
         out["mar"] = {k: bounded(rec["marvec"][i], mard)
                       for i, k in enumerate(MAR_KEYS)}
+    # the arrival lanes (2026-11-12): stated-arrival band shares and
+    # the proficiency pair over itself
+    if rec.get("arrv") is not None:
+        arrd = sum(rec["arrv"])
+        if arrd > 0:
+            out["arrv"] = {k: bounded(rec["arrv"][i], arrd)
+                           for i, k in enumerate(ARR_KEYS_2006)}
+    if rec.get("profG") is not None and rec["profG"] + rec["profP"] > 0:
+        profd = rec["profG"] + rec["profP"]
+        out["prof"] = {"good": bounded(rec["profG"], profd),
+                       "limited": bounded(rec["profP"], profd)}
     return out
 
 
@@ -571,7 +630,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                                   "ancns": 0, "ancP": 0,
                                   "labU": 0, "labLF": 0,
                                   "indn": [0] * len(IND_KEYS),
-                                  "marvec": [0] * len(MAR_KEYS)})
+                                  "marvec": [0] * len(MAR_KEYS),
+                                  "arrv": [0] * 4, "arrNS": 0,
+                                  "profG": 0, "profP": 0})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -617,6 +678,11 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             acc["indn"][i] += r["indn"][i]
         for i in range(len(MAR_KEYS)):
             acc["marvec"][i] += r["marvec"][i]
+        for i in range(4):
+            acc["arrv"][i] += r["arrv"][i]
+        acc["arrNS"] += r["arrNS"]
+        acc["profG"] += r["profG"]
+        acc["profP"] += r["profP"]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -706,6 +772,12 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         for i in range(len(MAR_KEYS)):
             nat.setdefault("marvec", [0] * len(MAR_KEYS))
             nat["marvec"][i] += dv["marvec"][i]
+        for i in range(4):
+            nat.setdefault("arrv", [0] * 4)
+            nat["arrv"][i] += dv["arrv"][i]
+        nat["arrNS"] = nat.get("arrNS", 0) + dv["arrNS"]
+        nat["profG"] = nat.get("profG", 0) + dv["profG"]
+        nat["profP"] = nat.get("profP", 0) + dv["profP"]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -769,6 +841,15 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                     if sum(nat["indn"]) else None),
             "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
                     for i, k in enumerate(MAR_KEYS)},
+            "arrv": ({k: round(nat["arrv"][i] / sum(nat["arrv"]), 4)
+                      for i, k in enumerate(ARR_KEYS_2006)}
+                     if sum(nat["arrv"]) else None),
+            "prof": ({"good": round(nat["profG"]
+                                    / (nat["profG"] + nat["profP"]), 4),
+                      "limited": round(nat["profP"]
+                                       / (nat["profG"] + nat["profP"]),
+                                       4)}
+                     if nat["profG"] + nat["profP"] else None),
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -876,6 +957,11 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         "election": year,
         "censusEdition": 2006,
         "cobKeys": COB_KEYS8,
+        # the Immigration lens's arrival lanes (2026-11-12): this
+        # store carries the 2006 print's own four-slot grid beside the
+        # proficiency pair
+        "arrKeys": list(ARR_KEYS_2006),
+        "profKeys": ["good", "limited"],
         "relKeys": list(REL_KEYS),
         "tenKeys": list(TEN_KEYS),
         "ancKeys": list(ANC_KEYS),

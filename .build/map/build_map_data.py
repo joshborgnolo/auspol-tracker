@@ -357,6 +357,69 @@ def age_shares(age):
     return (round(a1824, 4), round(a3554, 4), round(a75, 4))
 
 
+# the Immigration lens's arrived-in-the-last-decade read (2026-11-12):
+# the era print grids' arrival-band spans, the open first band marked
+# None like ageMed's 85+ (interpolation there would fabricate a year).
+# Keyed by grid shape — the labels describe themselves
+_ARR_SPANS = {
+    "bef41": (None, 1940), "41_50": (1941, 1950), "51_60": (1951, 1960),
+    "61_70": (1961, 1970), "71_80": (1971, 1980), "81_90": (1981, 1990),
+    "91_00": (1991, 2000), "01_10": (2001, 2010), "01_05": (2001, 2005), "06_11": (2006, 2011),
+    "11_15": (2011, 2015), "16_21": (2016, 2021),
+    "bef46": (None, 1945), "46_55": (1946, 1955), "56_65": (1956, 1965),
+    "66_75": (1966, 1975), "76_85": (1976, 1985), "86_95": (1986, 1995),
+    "96_05": (1996, 2005), "06_10": (2006, 2010), "11_16": (2011, 2016),
+    "bef51": (None, 1950),
+    "bef91": (None, 1990), "91_95": (1991, 1995),
+    "96_00": (1996, 2000), "01_06": (2001, 2006), "01": (2001, 2001),
+    "bef81": (None, 1980), "81_85": (1981, 1985),
+    "86_90": (1986, 1990), "91_96": (1991, 1996),
+}
+
+
+def arr_decade(arrv, keys):
+    """Share of the stated-arrival overseas-born who arrived in the
+    census's own final ten years: the band keys whose whole span sits
+    inside (censusYear-10, censusYear] summed over the band dict —
+    the window rides each print's own edition, no hand year."""
+    if not arrv:
+        return None
+    spans = [_ARR_SPANS.get(k) for k in keys]
+    if any(s is None for s in spans):
+        return None
+    end = max(s[1] for s in spans)
+    cut = end - 10
+    r = sum((arrv.get(k) or 0.0) for k in keys
+            if _ARR_SPANS[k][0] is not None and _ARR_SPANS[k][0] >= cut)
+    tot = sum((arrv.get(k) or 0.0) for k in keys)
+    return round(r / tot, 4) if tot > 0 else None
+
+
+def arr_median(shares, keys):
+    """Median year of arrival of a band-share dict: linear inside the
+    median band like age_median's; None when the basis is empty or the
+    median lands in the open first band (an open tail's year would be
+    fabricated, never a read — the ageMed doctrine). The app computes
+    pooled medians the same way through its arrMedian helper."""
+    if not shares:
+        return None
+    spans = [_ARR_SPANS.get(k) for k in keys]
+    if any(s is None for s in spans):
+        return None
+    tot = sum((shares.get(k) or 0.0) for k in keys)
+    if tot <= 0:
+        return None
+    half, acc = tot / 2.0, 0.0
+    for k, (lo, hi) in zip(keys, spans):
+        m = shares.get(k) or 0.0
+        if acc + m >= half:
+            if lo is None or m <= 0:
+                return None
+            return lo + (hi + 1 - lo) * (half - acc) / m
+        acc += m
+    return None
+
+
 def seifa_cells(sf):
     S = {}
     for ix in ("irsad", "irsd", "ier", "ieo"):
@@ -379,7 +442,7 @@ def demo_interp_of(dm, di):
     if not dm:
         return None
     if not di:
-        return dm
+        return dict(dm)
     m = dict(dm)
     for k, v in di.items():
         if k in ("persons", "cov"):
@@ -564,6 +627,10 @@ def build_year(year, hist, base2001):
     # the Marital status select menu's five options (2026-11-11;
     # None-when-absent like the other era-gated lanes)
     markeys = (vstore.get("marKeys") or None) if vstore else None
+    # the Immigration arrival lanes' own grid keys (2026-11-12 arc) —
+    # empty where the frame's print family never carried the lanes
+    # (the '91-side frames; the GCP-era arcs carry them throughout)
+    arrkeys = vstore.get("arrKeys", []) if vstore else []
     # the previous election's ordinary first preferences at each polling
     # place, summed to the family's shares — the same-place read every booth's
     # primary-change number (and the booth card's change column) reads off
@@ -660,6 +727,19 @@ def build_year(year, hist, base2001):
             dd = next((x for x in vstore.get("divisions", []) if x.get("div") == name), None)
             dm = demo_interp_of(dd, (dd or {}).get("demoI"))
             dc = demo_cells(dm)
+            if dm:
+                # the Immigration arrival reads (2026-11-12): the
+                # share-of-last-decade and the median-year read are
+                # computed from the packed band dicts like the
+                # income/age lanes before them; the open first band
+                # holds the '06-print-grid frames' medians away (the
+                # read reports null there, never a fabricated year)
+                arrv = dm.get("arrv")
+                if isinstance(arrv, dict) and arrkeys:
+                    dm["arr10"] = arr_decade(arrv, arrkeys)
+                    dm["arrMed"] = arr_median(arrv, arrkeys)
+                if isinstance(dm.get("prof"), dict) and dm["prof"].get("limited") is not None:
+                    dm["engpoor"] = dm["prof"]["limited"]
             if dc:
                 # p: the store's pool weight — vote-weighted pseudo-population
                 # on the voter store, real census headcount on the venue proxy.
@@ -676,7 +756,12 @@ def build_year(year, hist, base2001):
                                "rel": (dm or {}).get("rel"), "ten": (dm or {}).get("ten"),
                                "anc": (dm or {}).get("anc"),
                                "ind": (dm or {}).get("ind"),
-                               "mar": (dm or {}).get("mar")}
+                               "mar": (dm or {}).get("mar"),
+                               "arrv": (dm or {}).get("arrv"),
+                               "arr10": (dm or {}).get("arr10"),
+                               "arrMed": (dm or {}).get("arrMed"),
+                               "engpoor": (dm or {}).get("engpoor"),
+                               "prof": (dm or {}).get("prof")}
                 if dm.get("age") and dm.get("persons"):
                     age_bands_w[0] += dm["persons"]
                     for i, k in enumerate(AGE_BAND_KEYS):
@@ -888,7 +973,15 @@ def build_year(year, hist, base2001):
            "indKeys": indkeys if vstore else None,
            # the Marital status select menu's five options, B["mar"] rows
            # and rec.demo.mar dicts follow (2026-11-11)
-           "marKeys": markeys if vstore else None}
+           "marKeys": markeys if vstore else None,
+           # the Immigration lens's arrival lanes (2026-11-12): the
+           # frame's OWN census print grid (this store's era's arrv
+           # band keys) beside the proficiency pair — never carried to
+           # a res file whose stores never print them (the '91-hole
+           # frames and any forecast-era frame)
+           "arrKeys": (vstore.get("arrKeys") if vstore else None),
+           "profKeys": (vstore.get("profKeys")
+                        if vstore else None)}
     if vstore and vstore.get("demoInterp"):
         # the people-interp blend record (f, c0/c1, nearestSide,
         # nullRule) on interpolated years; the app's demo copy reads

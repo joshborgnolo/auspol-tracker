@@ -139,7 +139,9 @@ def sum_divisions(alloc, sa1, inc):
                                   "hle": 0.0,
                                   "labU": 0, "labLF": 0,
                                   "indn": [0] * len(d13.IND_KEYS),
-                                  "marvec": [0] * len(d13.MAR_KEYS)})
+                                  "marvec": [0] * len(d13.MAR_KEYS),
+                                  "arrv": [0] * 9, "arrNS": 0,
+                                  "profG": 0, "profP": 0})
     for key, dv in alloc.items():
         r = sa1.get(key)
         ir = inc.get(key)
@@ -189,6 +191,11 @@ def sum_divisions(alloc, sa1, inc):
             acc["indn"][i] += r["indn"][i]
         for i in range(len(d13.MAR_KEYS)):
             acc["marvec"][i] += r["marvec"][i]
+        for i in range(9):
+            acc["arrv"][i] += r["arrv"][i]
+        acc["arrNS"] += r["arrNS"]
+        acc["profG"] += r["profG"]
+        acc["profP"] += r["profP"]
     return divsum
 
 
@@ -235,6 +242,12 @@ def national_of(divsum):
         for i in range(len(d13.MAR_KEYS)):
             nat.setdefault("marvec", [0] * len(d13.MAR_KEYS))
             nat["marvec"][i] += dv["marvec"][i]
+        for i in range(9):
+            nat.setdefault("arrv", [0] * 9)
+            nat["arrv"][i] += dv["arrv"][i]
+        nat["arrNS"] = nat.get("arrNS", 0) + dv["arrNS"]
+        nat["profG"] = nat.get("profG", 0) + dv["profG"]
+        nat["profP"] = nat.get("profP", 0) + dv["profP"]
     nat_b = sum(nat[b] for b in d13.BANDS)
     nat_eo = nat["eng"] + nat["oth"]
     nat_fbd = nat["totc"] - nat["cobns"]
@@ -288,6 +301,14 @@ def national_of(divsum):
                 if sum(nat["indn"]) else None),
         "mar": {k: round(nat["marvec"][i] / sum(nat["marvec"]), 4)
                 for i, k in enumerate(d13.MAR_KEYS)},
+        "arrv": ({k: round(nat["arrv"][i] / sum(nat["arrv"]), 4)
+                  for i, k in enumerate(d13.ARR_KEYS_2011)}
+                 if sum(nat["arrv"]) else None),
+        "prof": ({"good": round(nat["profG"]
+                                / (nat["profG"] + nat["profP"]), 4),
+                  "limited": round(nat["profP"]
+                                   / (nat["profG"] + nat["profP"]), 4)}
+                 if nat["profG"] + nat["profP"] else None),
     }
 
 
@@ -504,6 +525,11 @@ def main():
             "relKeys": list(d13.REL_KEYS),
             "tenKeys": list(d13.TEN_KEYS),
             "ancKeys": list(d13.ANC_KEYS),
+            # the Immigration lens's arrival lanes (2026-11-12): this
+            # 2011-print store's own band keys beside the proficiency
+            # pair's two keys
+            "arrKeys": list(d13.ARR_KEYS_2011),
+            "profKeys": ["good", "limited"],
             # the Industry picker's nineteen ANZSIC-2006 divisions —
             # the 2013 store's own key list (same census universe)
             "indKeys": list(d13.IND_KEYS),
