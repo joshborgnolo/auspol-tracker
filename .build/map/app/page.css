@@ -93,7 +93,7 @@ button { cursor: pointer; background: none; border: 0; }
   min-height: 560px; max-height: 1000px; display: flex; flex-direction: column; grid-column: 2; grid-row: 1;
 }
 .mp-story { grid-column: 1; grid-row: 1; min-width: 0; padding-bottom: 24px; }
-.mp-stage { position: relative; flex: 1 1 auto; min-height: 0; border-radius: 3px; }
+.mp-stage { position: relative; flex: 1 1 auto; min-height: 0; border: 1px solid var(--ink-faint); border-radius: 3px; }
 .mp-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
 .mp-stage canvas.grab { cursor: grab; }
 .mp-stage canvas.grabbing { cursor: grabbing; }
@@ -319,6 +319,8 @@ button { cursor: pointer; background: none; border: 0; }
 .st-up svg { flex: none; }
 .st-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .st-head h2 { font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; }
+/* the today heads ("The House/Senate/Assembly today") wear the page title's Crimson */
+.st-head.st-today h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; }
 .st-hed { margin-top: 14px; font-family: var(--serif); font-weight: 700; font-size: 32px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
 /* the Winner lens's head: result, swing, seats, each seat count's change beneath it */
 .st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 8px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; position: relative; }

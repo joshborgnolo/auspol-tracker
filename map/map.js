@@ -9227,7 +9227,7 @@ function senUpLink() {
   return `<button type="button" class="st-up" data-sgo="${go}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.6 2.2 3.8 6l3.8 3.8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(label)}</button>`;
 }
 function senHead(title, meta, hed, dek) {
-  return `${senUpLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div><h3 class="st-hed">${hed}</h3>${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
+  return `${senUpLink()}<div class="st-head${/^The (House|Senate|Assembly) today$/.test(title) ? " st-today" : ""}"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div><h3 class="st-hed">${hed}</h3>${dek ? `<p class="st-dek">${dek}</p>` : ""}`;
 }
 /* the balance of power, in rules: how many votes the government is short of the 39, which crossbench
    groups could supply them alone, and what it would take without them */
@@ -10019,7 +10019,7 @@ function upLink() {
    close with one, so their finding draws it itself */
 function head(title, meta, hed, dek, stat) {
   const find = findingHTML(hed, dek, !stat);
-  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
+  return `${upLink()}<div class="st-head${/^The (House|Senate|Assembly) today$/.test(title) ? " st-today" : ""}"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
 }
 // the lens's finding under the figures: its headline as a bold lead sentence, the dek after it
 function findingHTML(hed, dek, lead) {

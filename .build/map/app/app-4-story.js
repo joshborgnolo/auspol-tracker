@@ -75,7 +75,7 @@ function upLink() {
    close with one, so their finding draws it itself */
 function head(title, meta, hed, dek, stat) {
   const find = findingHTML(hed, dek, !stat);
-  return `${upLink()}<div class="st-head"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
+  return `${upLink()}<div class="st-head${/^The (House|Senate|Assembly) today$/.test(title) ? " st-today" : ""}"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
 }
 // the lens's finding under the figures: its headline as a bold lead sentence, the dek after it
 function findingHTML(hed, dek, lead) {
