@@ -2423,6 +2423,29 @@
       "pmName": "Carroll",
       "han": 9,
       "detail": null
+    },
+    {
+      "date": "2026-11-10",
+      "firm": "RedBridge/Accent",
+      "alb": -28,
+      "opp": 7,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": -8,
+      "detail": {
+        "alb": {
+          "app": 19,
+          "dis": 47
+        },
+        "opp": {
+          "app": 35,
+          "dis": 28
+        },
+        "han": {
+          "app": 17,
+          "dis": 25
+        }
+      }
     }
   ],
   "ppmHeadToHead": [],

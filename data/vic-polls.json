@@ -4001,6 +4001,60 @@
       ]
     },
     {
+      "series": "approval",
+      "dateLabel": "3–10 Nov 2026",
+      "date": "2026-11-10",
+      "fwStart": "2026-11-03",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "leader": "carroll",
+      "pos": 19,
+      "neg": 47,
+      "dk": 34,
+      "net": -28,
+      "sourceUrl": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "3–10 Nov 2026",
+      "date": "2026-11-10",
+      "fwStart": "2026-11-03",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "leader": "wilson",
+      "pos": 35,
+      "neg": 28,
+      "dk": 37,
+      "net": 7,
+      "sourceUrl": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "3–10 Nov 2026",
+      "date": "2026-11-10",
+      "fwStart": "2026-11-03",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1008,
+      "leader": "pickering",
+      "pos": 17,
+      "neg": 25,
+      "dk": null,
+      "net": -8,
+      "sourceUrl": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
       "series": "preferredPremier",
       "dateLabel": "30 Oct–5 Nov 2026",
       "date": "2026-11-05",
