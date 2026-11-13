@@ -308,7 +308,7 @@ def select_cells(dm, lane, keys):
 
 
 # the Age family (the merged Household-age lens, the same idiom as the
-# income lane's): medians and three new share views from the packed
+# income lane's): medians and the band-share views from the packed
 # demo.age band dicts at every record, plus the national-age marker
 AGE_BANDS = [("0_4", 0, 4), ("5_14", 5, 14), ("15_19", 15, 19), ("20_24", 20, 24),
              ("25_34", 25, 34), ("35_44", 35, 44), ("45_54", 45, 54), ("55_64", 55, 64),
@@ -317,6 +317,10 @@ AGE_BAND_KEYS = [k for k, _, _ in AGE_BANDS]
 # the 18-19 share of the 15-19 band: two years of five split linearly —
 # the census grid's own constant, the label admits it
 AGE_1824_OF_1519 = 2 / 5
+# the 15-18 share of the same band for the 0-18 read: four years of five,
+# split the same linear way (the printed ranges count 18s on both ends —
+# the menu's age bands overlap by design)
+AGE_0018_OF_1519 = 4 / 5
 
 
 def age_median(age):
@@ -343,18 +347,33 @@ def age_median(age):
     return None
 
 
+# the Age lens's band-share views, in menu order: median age and the demo
+# tuple's a65/a2034 ride beside them (a2034 is now a defunct view — its
+# tuple cell 2 stays put, every DM slot is positional)
+AGE_SHARE_KEYS = ("a0018", "a1824", "a1834", "a3554", "a55", "a75", "a85")
+
+
 def age_shares(age):
-    """The median-lane family's new share views (a1824, a3554, a75) from
-    the packed band dict; a2034/a65 already ride the demo tuple."""
+    """The Age lens's band-share views from the packed band dict, as a
+    {view id: fraction} dict ({} on an empty basis); a65/a2034 already
+    ride the demo tuple. The new views of 2026-11-13: a0018 (18 and
+    under), a1834 (18 to 34, 20-34's replacement), a55, a85 — every one a
+    linear re-sum of the same eleven bands, the 15-19 band split into
+    single years where a printed range cuts inside it."""
     if not age:
-        return (None, None, None)
-    tot = sum((age.get(k) or 0.0) for k in AGE_BAND_KEYS)
+        return {}
+    def b(k):
+        return age.get(k) or 0.0
+    tot = sum(b(k) for k in AGE_BAND_KEYS)
     if tot <= 0:
-        return (None, None, None)
-    a1824 = (AGE_1824_OF_1519 * (age.get("15_19") or 0.0) + (age.get("20_24") or 0.0)) / tot
-    a3554 = ((age.get("35_44") or 0.0) + (age.get("45_54") or 0.0)) / tot
-    a75 = ((age.get("75_84") or 0.0) + (age.get("85ov") or 0.0)) / tot
-    return (round(a1824, 4), round(a3554, 4), round(a75, 4))
+        return {}
+    return {"a0018": round((b("0_4") + b("5_14") + AGE_0018_OF_1519 * b("15_19")) / tot, 4),
+            "a1824": round((AGE_1824_OF_1519 * b("15_19") + b("20_24")) / tot, 4),
+            "a1834": round((AGE_1824_OF_1519 * b("15_19") + b("20_24") + b("25_34")) / tot, 4),
+            "a3554": round((b("35_44") + b("45_54")) / tot, 4),
+            "a55": round((b("55_64") + b("65_74") + b("75_84") + b("85ov")) / tot, 4),
+            "a75": round((b("75_84") + b("85ov")) / tot, 4),
+            "a85": round(b("85ov") / tot, 4)}
 
 
 # the Immigration lens's arrived-in-the-last-decade read (2026-11-12):
@@ -746,10 +765,9 @@ def build_year(year, hist, base2001):
                 # The income shares are per-adult (they ride as cells 6/7);
                 # medIncWeekly is the household-basis band-interpolated median
                 # — medians don't pool, so it never joins a state aggregate
-                a18, a35, a75x = age_shares(dm.get("age"))
                 rec["demo"] = {"lang": dc[0], "a65": dc[1], "a2034": dc[2], "fborn": dc[3], "uni": dc[4], "blue": dc[5], "p": dd["persons"],
                                "loinc": dc[6], "hiinc": dc[7], "hiqinc": dc[17], "medIncWeekly": dm.get("incMed"), "ageMed": age_median(dm.get("age")),
-                               "a1824": a18, "a3554": a35, "a75": a75x, "cob": dd.get("cob"),
+                               **age_shares(dm.get("age")), "cob": dd.get("cob"),
                                "y12": dc[8], "y10less": dc[9], "atsci": dc[10], "u15": dc[11], "onepar": dc[12],
                                "pt": dc[13], "noncit": dc[14], "bigfam": dc[15], "hl": dc[16],
                                "unemp": dc[18],
@@ -848,12 +866,11 @@ def build_year(year, hist, base2001):
         B["medinc"].append(dirow.get("incMed") if dcrow else None)
         # the Age family rides the same doctrine in parallel lanes off
         # the packed age dicts: median in years (never a share) and the
-        # three new share views as fractions, like the second menu rows
-        a18, a35, a75x = age_shares(dirow.get("age")) if dcrow else (None, None, None)
+        # seven share views as fractions, like the second menu rows
+        agev = age_shares(dirow.get("age")) if dcrow else {}
         B["ageMed"].append(age_median(dirow.get("age")) if dcrow else None)
-        B["a1824"].append(a18)
-        B["a3554"].append(a35)
-        B["a75"].append(a75x)
+        for ak in AGE_SHARE_KEYS:
+            B[ak].append(agev.get(ak))
 
     if not any(B["demo"]):
         del B["demo"]  # the year's store didn't exist (pre-2004, absent
@@ -872,7 +889,7 @@ def build_year(year, hist, base2001):
         del B["mar"]
     if not any(B["medinc"]):
         del B["medinc"]
-    for k in ("ageMed", "a1824", "a3554", "a75"):
+    for k in ("ageMed",) + AGE_SHARE_KEYS:
         if not any(B[k]):
             del B[k]
 
@@ -933,8 +950,7 @@ def build_year(year, hist, base2001):
     agecuts = None
     if age_bands_w[0] > 0:
         nat_age = {k: age_bands_w[1][i] / age_bands_w[0] for i, k in enumerate(AGE_BAND_KEYS)}
-        na18, na35, na75 = age_shares(nat_age)
-        agecuts = {"medAge": age_median(nat_age), "a1824": na18, "a3554": na35, "a75": na75,
+        agecuts = {"medAge": age_median(nat_age), **age_shares(nat_age),
                    "basis": "pool-weighted share of the packed census age bands over every seat"}
     out = {"year": year, "event": EVENT.get(year) or None, "date": DATE[year], "prev": prev, "speaker": SPEAKER[year],
            "agg": A, "divs": D, "booths": B, "seifaCuts": cuts,

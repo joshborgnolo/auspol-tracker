@@ -804,7 +804,7 @@ function areasLane() {
   return S.index;
 }
 // the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
-const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a0018", "a1824", "a1834", "a3554", "a55", "a75", "a85",
   "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
   "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",

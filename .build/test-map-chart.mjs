@@ -134,6 +134,9 @@ assert.ok(page.includes("Chart sets the map aside") && page.includes("permutatio
   set({ index: "occ", occ: "farmer" }); assert.equal(who("occ"), "workers who are farmers or farm managers");
   set({ index: "mar", mar: "div" }); assert.equal(who("mar"), "people aged 15+ who are divorced");
   set({ index: "age", ageMode: "a65" }); assert.equal(who("age"), "residents who are aged 65 or over");
+  set({ index: "age", ageMode: "a0018" }); assert.equal(who("age"), "residents who are aged 18 or under");
+  set({ index: "age", ageMode: "a1834" }); assert.equal(who("age"), "residents who are aged 18 to 34");
+  set({ index: "age", ageMode: "a85" }); assert.equal(who("age"), "residents who are aged 85 or over");
   set({ index: "inc", incMode: "lo" }); assert.equal(who("inc"), "adults who live in households earning under $X");
   // and the story and the key use it, never "residents" over a share of families
   assert.ok(!story.includes(`isInc() ? "of the adults" : "of residents"`) && story.includes("censusWho(m, k).pop"), "the story names the base");

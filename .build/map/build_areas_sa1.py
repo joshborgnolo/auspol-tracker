@@ -88,6 +88,7 @@ AGE_BANDS = [("0_4", 0, 4), ("5_14", 5, 14), ("15_19", 15, 19), ("20_24", 20, 24
              ("25_34", 25, 34), ("35_44", 35, 44), ("45_54", 45, 54), ("55_64", 55, 64),
              ("65_74", 65, 74), ("75_84", 75, 84), ("85ov", 85, None)]
 AGE_1824_OF_1519 = 2 / 5  # the census-grid constant the map's own age lane uses
+AGE_0018_OF_1519 = 4 / 5  # and its sibling for the 0-18 read (build_map_data's pair)
 
 
 def fail(msg):
@@ -343,9 +344,13 @@ SHARES = {
     "unemp": (lambda r: r["labU"], lambda r: r["labLF"]),
     "a65": (lambda r: r["bands"][8] + r["bands"][9] + r["bands"][10], _bands_sum),
     "a2034": (lambda r: r["bands"][3] + r["bands"][4], _bands_sum),
+    "a0018": (lambda r: r["bands"][0] + r["bands"][1] + r["bands"][2] * AGE_0018_OF_1519, _bands_sum),
     "a1824": (lambda r: r["bands"][2] * AGE_1824_OF_1519 + r["bands"][3], _bands_sum),
+    "a1834": (lambda r: r["bands"][2] * AGE_1824_OF_1519 + r["bands"][3] + r["bands"][4], _bands_sum),
     "a3554": (lambda r: r["bands"][5] + r["bands"][6], _bands_sum),
+    "a55": (lambda r: r["bands"][7] + r["bands"][8] + r["bands"][9] + r["bands"][10], _bands_sum),
     "a75": (lambda r: r["bands"][9] + r["bands"][10], _bands_sum),
+    "a85": (lambda r: r["bands"][10], _bands_sum),
 }
 for _i, _k in enumerate(gcp_newlanes.REL_KEYS):
     SHARES[f"rel.{_k}"] = ((lambda i: (lambda r: r["relvec"][i]))(_i),
@@ -401,7 +406,7 @@ def inc_masses(band, cutlo, cuthi):
 
 LANE_ORDER = (["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar",
                "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc",
-               "a65", "a2034", "a1824", "a3554", "a75"]
+               "a65", "a2034", "a0018", "a1824", "a1834", "a3554", "a55", "a75", "a85"]
               + [f"rel.{k}" for k in gcp_newlanes.REL_KEYS]
               + [f"ten.{k}" for k in ["mort", "rent", "own", "rentPub"]]
               + [f"cob.{k}" for k in COB_KEYS]

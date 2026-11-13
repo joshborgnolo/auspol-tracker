@@ -493,6 +493,51 @@ Canonical sources to re-fetch when they go missing:
   no `name`) in `.build/map/src/vic22/n-vic22.geojson` — normalised to its
   committed `vic22_geo.EXPECTED_NAMES` casing on re-derivation.
 
+# The Age lens's 2026-11-13 band set (a0018/a1834/a55/a85)
+
+The Age picker's share views are now the user-listed set **0-18, 18-24,
+18-34, 35-54, 55+, 65+, 75+, 85+** beside the median-age spectrum: 20-34
+retired as a view (18-34 replaces it; the demo tuple's `a2034` cell 2 is
+positional and rides along untouched — legacy `i=a2034` and `av=a2034`
+hashes land on 18-34 the way y12less landed on Year 10 or less). A 95+
+view was asked for and is **unsourced**: every census input's printed
+age grid tops out at the one open-ended `85ov` band (GCP G01's
+`Age_85ov_P`, every BCP/AURIN edition alike), so nothing finer than 85+
+exists to read anywhere in the pipeline.
+
+Machine work, all three:
+
+- `build_map_data.py`'s `age_shares` now returns the band-share views as
+  a dict keyed by the new view ids (`AGE_SHARE_KEYS`), emitted into every
+  division demo record, the parallel booth lanes and the national
+  `ageCuts`; `build_stats_history.py` rides the same function for the
+  stats-era files. 0-18 splits the 15-19 band's 15-18 share (4/5 of the
+  band, the printed ranges' through-endpoint convention the 18-24 view
+  already set with its 2/5), 18-34 is the 18-24 mass plus 25-34, 55+ and
+  85+ are plain band sums.
+- `build_areas_sa1.py` carries the four lanes (`LANE_ORDER` beside the
+  existing five); `core-split.mjs`'s `PPL_LANES` and the page's
+  `AREAS_LANES`/`AGE_CUT_VIEWS` gained them; the app tables AGE_MODES/
+  NAME/SHORT/VERB/TOP/KEY list nine views, and a shared `AGE_CUT_VIEWS`
+  set drives the legend Australia's-line and chart national marker for
+  every band-share view (demo-tuple a65 the one exception as ever).
+- Range caps are measured, not guessed: seat-level maxima are 0-18
+  36.7%, 18-34 48.6%, 55 46.2%, 85+ a hair under 4% — AGE_RANGE prices
+  each view just above the division maximum the way the existing caps do
+  (a85's `[0, 8]` deliberately tight: the shares sit at 1-2% nationally,
+  a wide cap would monotonise the map).
+
+The res-file emission was surgical for this landing: every federal data
+intermediate re-derives clean (audited: diffs are the four age keys only,
+all existing figures byte-identical), and the res files carry exactly the
+four keys' additions on top of HEAD (`res = data + lp/vt*/boundary...`
+proven pairwise for the GCP-era publics first; the stats-era publics got
+an additive overlay only — their stores were mid-flux under the sibling
+marital arc at the time and nothing but the four age keys clouds the
+lift). test-map-page's AGE_Y pins the whole family's national reads per
+year (0-18 falling 28.1%→23.2%, 55+ rising 20.0%→30.0%, 85+ doubling to
+2.11%, 1993→2025).
+
 ## Upper-house preference data (NSWLC senpref files, November 2026)
 
 `map/data/senate-prefs-nsw{15,19,23}.json` derives from the NSW Electoral

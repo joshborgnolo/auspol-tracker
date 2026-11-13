@@ -168,7 +168,7 @@ function buildRamps() {
     // the census people measures, a hue each so a change of measure reads as one
     demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
       loinc: seq(20, 0.13), hiqinc: seq(275, 0.12), incmed: seq(48, 0.14),
-      agemed: seq(86, 0.14), a1824: seq(185, 0.13), a3554: seq(128, 0.14), a75: seq(26, 0.14),
+      agemed: seq(86, 0.14), a0018: seq(287, 0.13), a1824: seq(185, 0.13), a1834: seq(150, 0.13), a3554: seq(128, 0.14), a55: seq(349, 0.13), a75: seq(26, 0.14), a85: seq(76, 0.13),
       y12: seq(115, 0.12), y10less: seq(245, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       unemp: seq(8, 0.13),
@@ -378,20 +378,30 @@ const INC_VERB = {
   hiq: (m) => `live in households earning ${incHiQFrag(m)}${incEpoch(m)}`,
 };
 // the Age lens: S.index === "age" and S.ageMode the picked measure — the
-// median-age spectrum lands; the two aged-band reads that were their own
-// menu lanes (a65/a2034) and three new shares (18-24, 35-54, 75+) sit
-// beside it in the same legend picker, riding the income lane's idiom
-const AGE_MODES = ["med", "a1824", "a2034", "a3554", "a65", "a75"];
-const AGE_NAME = { med: "Median age", a1824: "Aged 18 to 24", a2034: "Aged 20 to 34", a3554: "Aged 35 to 54", a65: "Aged 65 and over", a75: "Aged 75 and over" };
-const AGE_SHORT = { med: "Median age", a1824: "18–24", a2034: "20–34", a3554: "35–54", a65: "65+", a75: "75+" };
-const AGE_VERB = { a1824: "are aged 18 to 24", a2034: "are aged 20 to 34", a3554: "are aged 35 to 54", a65: "are aged 65 or over", a75: "are aged 75 or over" };
-const AGE_RANGE = { a1824: [0, 28], a2034: [10, 40], a3554: [18, 45], a65: [5, 35], a75: [0, 35] };
-const AGE_TOP = { med: ["seats with the oldest residents", "with the youngest"], a1824: ["seats where the most residents are aged 18 to 24", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], a3554: ["seats with the most residents aged 35 to 54", "with the fewest"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a75: ["seats with the most residents aged 75 and over", "with the fewest"] };
-const AGE_KEY = { med: "ageMed", a1824: "a1824", a2034: "a2034", a3554: "a3554", a65: "a65", a75: "a75" };
+// median-age spectrum lands; the aged-band shares sit beside it in the
+// same legend picker, riding the income lane's idiom. User-listed set
+// 2026-11-13: 0-18, 18-24, 18-34 (replacing 20-34 — a2034 retired as a
+// view but its positional demo-tuple cell rides along untouched), 35-54,
+// 55+, 65+, 75+, 85+. The 15-19 band is split into single years where a
+// printed range cuts inside it, so the age bands overlap by design
+const AGE_MODES = ["med", "a0018", "a1824", "a1834", "a3554", "a55", "a65", "a75", "a85"];
+const AGE_NAME = { med: "Median age", a0018: "Aged 18 and under", a1824: "Aged 18 to 24", a1834: "Aged 18 to 34", a3554: "Aged 35 to 54", a55: "Aged 55 and over", a65: "Aged 65 and over", a75: "Aged 75 and over", a85: "Aged 85 and over" };
+const AGE_SHORT = { med: "Median age", a0018: "0–18", a1824: "18–24", a1834: "18–34", a3554: "35–54", a55: "55+", a65: "65+", a75: "75+", a85: "85+" };
+const AGE_VERB = { a0018: "are aged 18 or under", a1824: "are aged 18 to 24", a1834: "are aged 18 to 34", a3554: "are aged 35 to 54", a55: "are aged 55 or over", a65: "are aged 65 or over", a75: "are aged 75 or over", a85: "are aged 85 or over" };
+// range caps priced just above every frame's division maximum (booth
+// tails saturate past them by the fborn lane's doctrine): 0-18 36.7%,
+// 18-34 48.6%, 55+ 46.2%, 85+ a hair under 4% at the seat level
+const AGE_RANGE = { a0018: [10, 40], a1824: [0, 28], a1834: [10, 55], a3554: [18, 45], a55: [10, 55], a65: [5, 35], a75: [0, 35], a85: [0, 8] };
+const AGE_TOP = { med: ["seats with the oldest residents", "with the youngest"], a0018: ["seats with the most children aged 18 or under", "with the fewest"], a1824: ["seats where the most residents are aged 18 to 24", "with the fewest"], a1834: ["seats with the most residents aged 18 to 34", "with the fewest"], a3554: ["seats with the most residents aged 35 to 54", "with the fewest"], a55: ["seats with the most residents aged 55 and over", "with the fewest"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a75: ["seats with the most residents aged 75 and over", "with the fewest"], a85: ["seats with the most residents aged 85 and over", "with the fewest"] };
+const AGE_KEY = { med: "ageMed", a0018: "a0018", a1824: "a1824", a1834: "a1834", a3554: "a3554", a55: "a55", a65: "a65", a75: "a75", a85: "a85" };
+// the ageCut-recorded views: every mode except the median and the
+// demo-tuple's a65 — the legend's Australia line and the chart's
+// national marker read the pool-aged marker off the year's ageCuts for these
+const AGE_CUT_VIEWS = new Set(AGE_MODES.filter((k) => k !== "med" && k !== "a65"));
 const isAge = () => S.index === LENS_AGE;
 const ageMed = () => isAge() && S.ageMode === "med";
-// the national age marker per year rides ageCuts (median + the three new
-// shares pool-computed by the build from the packed band dicts); frames
+// the national age marker per year rides ageCuts (median + the seven
+// band shares pool-computed by the build from the packed band dicts); frames
 // without band dicts (the state frames' GCP lanes today) carry none
 const hasAgeCuts = (m) => !!(m && m.ageCuts);
 const dmVerbAge = (m) => (AGE_VERB[S.ageMode] || "");
@@ -564,10 +574,10 @@ const demoBoothShare = (raw, j, pos) => {
   // income: the share views ride the demo tuple's cells 6/17; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
   if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[{ lo: 6, hiq: 17 }[S.incMode]] : null; }
-  // age: a65/a2034 stay at the demo tuple's cells 1/2 like every GCP lane
+  // age: a65 stays at the demo tuple's cell 1 like every GCP lane
   if (isAge()) {
     if (S.ageMode === "med") return null; // median is years: boothValue reads raw.ageMed
-    if (S.ageMode === "a65" || S.ageMode === "a2034") { const r = raw.demo && raw.demo[j]; return r ? r[S.ageMode === "a65" ? 1 : 2] : null; }
+    if (S.ageMode === "a65") { const r = raw.demo && raw.demo[j]; return r ? r[1] : null; }
     const lane = raw[AGE_KEY[S.ageMode]]; return lane ? lane[j] : null;
   }
   // education: each read rides its own demo-tuple cell (uni 4, y12 8, y10less 9)

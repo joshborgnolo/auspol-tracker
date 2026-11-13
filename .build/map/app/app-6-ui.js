@@ -335,9 +335,10 @@ function censusSelects(m, cls = "") {
     // spectrum lands; the two share views sit beside it (loinc/hiinc as
     // standalone menu lanes until 2026-10-31)
     if (S.index === LENS_INC && hasInc(m)) out.push(lgMenu("incv", INC_MODES.map((k) => [k, INC_NAME[k]]), S.incMode, "Income measure"));
-    // on Age the same picker reads the six views: the median-age spectrum
-    // lands, the aged shares beside it (a65/a2034 as menu lanes until
-    // 2026-10-31, three new brackets same day)
+    // on Age the same picker reads the nine views: the median-age spectrum
+    // lands, the aged band shares beside it (a65/a2034 as menu lanes
+    // until their fold 2026-10-31, the 2026-11-13 band set replacing
+    // 20-34 with 18-34 and adding 0-18, 55+ and 85+)
     if (S.index === LENS_AGE) out.push(lgMenu("agev", AGE_MODES.map((k) => [k, AGE_NAME[k]]), S.ageMode, "Age view"));
     // on Education the same picker now reads the three schooling views:
     // the university share lands, the two highest-school-year reads
@@ -487,10 +488,10 @@ function legendHTML(m) {
         const noInc = isInc() && !hasInc(m);
 
         // the Australia's-line marker: pooled shares as ever; the Age
-        // family's median and three new views ride the ageCuts record
-        // (medians and pool-computed national reads, never pooled here)
+        // family's band-share views ride the ageCuts record (medians and
+        // pool-computed national reads, never pooled here)
         const ausShare = isAge()
-          ? (S.ageMode === "med" ? (m.ageCuts && m.ageCuts.medAge) : (["a1824", "a3554", "a75"].includes(S.ageMode) ? (m.ageCuts && m.ageCuts[S.ageMode]) : (aus.demo && demoAreaShare(aus.demo))))
+          ? (S.ageMode === "med" ? (m.ageCuts && m.ageCuts.medAge) : (AGE_CUT_VIEWS.has(S.ageMode) ? (m.ageCuts && m.ageCuts[S.ageMode]) : (aus.demo && demoAreaShare(aus.demo))))
           : (aus.demo && demoAreaShare(aus.demo));
         // the median lanes price their axes in dollars and years; every
         // other people lane reads percentages
@@ -511,10 +512,11 @@ function legendHTML(m) {
           ? `Median weekly household income${incEpochBrk}${incMedNote}`
           : `${incHouse ? "Share of households" : "Share of adults in households"} earning ${S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m)}${incEpochBrk}`;
         // the Age family's per-view notes: the median names its band
-        // interpolation, the 18–24 view admits its 15–19 estimate, and a
-        // frame without the band dicts says why the new views are empty
-        const AGE_NOTE = { med: "Median resident age, interpolated from census age bands", a1824: "Share of residents aged 18 to 24 (the 18–19 share of the 15–19 band)", a2034: "Share of residents aged 20 to 34", a3554: "Share of residents aged 35 to 54", a65: "Share of residents aged 65 and over", a75: "Share of residents aged 75 and over" };
-        const ageMedNote = m.ageCuts == null && !(S.ageMode === "a65" || S.ageMode === "a2034") ? "; this frame doesn't carry the census age bands this view needs" : "";
+        // interpolation, the views cutting the 15–19 band admit their
+        // single-year estimate, and a frame without the band dicts says
+        // why the band views are empty
+        const AGE_NOTE = { med: "Median resident age, interpolated from census age bands", a0018: "Share of residents aged 18 or under (the 15–18 share of the 15–19 band)", a1824: "Share of residents aged 18 to 24 (the 18–19 share of the 15–19 band)", a1834: "Share of residents aged 18 to 34 (the 18–19 share of the 15–19 band)", a3554: "Share of residents aged 35 to 54", a55: "Share of residents aged 55 and over", a65: "Share of residents aged 65 and over", a75: "Share of residents aged 75 and over", a85: "Share of residents aged 85 and over" };
+        const ageMedNote = m.ageCuts == null && S.ageMode !== "a65" ? "; this frame doesn't carry the census age bands this view needs" : "";
         const ageNote = AGE_NOTE[S.ageMode] + (ageMedNote || "");
         // the 2026-10-31 lane notes: each carries its basis the way the
         // older lanes do (the older lanes' honest phrasing is part of
@@ -1526,7 +1528,9 @@ function readURL() {
   // naming one lands on the lens with its share view picked (hiq where
   // hi once sat)
   if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hiq"; }
-  else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i; }
+  // the retired 20-34 view id follows the same rule: its nearest living
+  // read is the 18-34 bracket that replaced it
+  else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i === "a2034" ? "a1834" : i; }
   // schooling-read hashes: the legacy y12less id lands on its nearest
   // living read ("Year 10 or less", its left-early half)
   else if (EDU_MODES.includes(i) || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y10less" : i; }
@@ -1538,7 +1542,7 @@ function readURL() {
   else if (IMM_MODES.includes(i) || i === LENS_ANC) { S.index = LENS_IMM; S.immMode = i === LENS_ANC ? "anc" : i; }
   else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_FAM || i === LENS_IMM || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_IND || i === LENS_MAR)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
-  const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
+  const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : av === "a2034" ? "a1834" : (i === "a65" ? "a65" : i === "a2034" ? "a1834" : "med");
   const ev = p.get("ev"); S.eduMode = EDU_MODES.includes(ev) ? ev : ev === "y12less" ? "y10less" : EDU_MODES.includes(i) ? i : i === "y12less" ? "y10less" : "uni";
   const fv = p.get("fv"); S.famMode = FAMC_MODES.includes(fv) ? fv : FAMC_MODES.includes(i) ? i : "u15";
   const mv = p.get("mv"); S.immMode = IMM_MODES.includes(mv) ? mv : IMM_MODES.includes(i) ? i : i === LENS_ANC ? "anc" : "lang";

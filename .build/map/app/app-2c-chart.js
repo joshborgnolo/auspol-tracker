@@ -140,8 +140,8 @@ function chCensusNat(m) {
   if (!aus || !aus.demo || (m.year !== "now" && m.year < DEMO_FROM) || !isDemo()) return null;
   if (isAge()) {
     if (S.ageMode === "med") return nn(m.ageCuts && m.ageCuts.medAge);
-    // the ageCuts record keeps its shares as fractions
-    if (["a1824", "a3554", "a75"].includes(S.ageMode)) { const v = m.ageCuts && m.ageCuts[S.ageMode]; return v == null ? null : v <= 1 ? 100 * v : v; }
+    // the ageCuts record keeps its band-share views as fractions
+    if (AGE_CUT_VIEWS.has(S.ageMode)) { const v = m.ageCuts && m.ageCuts[S.ageMode]; return v == null ? null : v <= 1 ? 100 * v : v; }
   }
   if (arrMed()) return nn(demoAreaShare(aus.demo) );
   if (incMed()) return nn(m.incomeCuts && m.incomeCuts.medWeekly);

@@ -170,7 +170,7 @@ function buildRamps() {
     // the census people measures, a hue each so a change of measure reads as one
     demo: { lang: seq(235, 0.12), a65: seq(62, 0.13), a2034: seq(150, 0.12), fborn: seq(195, 0.12), uni: seq(100, 0.12), blue: seq(36, 0.13),
       loinc: seq(20, 0.13), hiqinc: seq(275, 0.12), incmed: seq(48, 0.14),
-      agemed: seq(86, 0.14), a1824: seq(185, 0.13), a3554: seq(128, 0.14), a75: seq(26, 0.14),
+      agemed: seq(86, 0.14), a0018: seq(287, 0.13), a1824: seq(185, 0.13), a1834: seq(150, 0.13), a3554: seq(128, 0.14), a55: seq(349, 0.13), a75: seq(26, 0.14), a85: seq(76, 0.13),
       y12: seq(115, 0.12), y10less: seq(245, 0.12), atsci: seq(322, 0.12), u15: seq(175, 0.12), onepar: seq(220, 0.12),
       pt: seq(330, 0.13), noncit: seq(300, 0.13), bigfam: seq(142, 0.12), hl: seq(310, 0.08),
       unemp: seq(8, 0.13),
@@ -380,20 +380,30 @@ const INC_VERB = {
   hiq: (m) => `live in households earning ${incHiQFrag(m)}${incEpoch(m)}`,
 };
 // the Age lens: S.index === "age" and S.ageMode the picked measure — the
-// median-age spectrum lands; the two aged-band reads that were their own
-// menu lanes (a65/a2034) and three new shares (18-24, 35-54, 75+) sit
-// beside it in the same legend picker, riding the income lane's idiom
-const AGE_MODES = ["med", "a1824", "a2034", "a3554", "a65", "a75"];
-const AGE_NAME = { med: "Median age", a1824: "Aged 18 to 24", a2034: "Aged 20 to 34", a3554: "Aged 35 to 54", a65: "Aged 65 and over", a75: "Aged 75 and over" };
-const AGE_SHORT = { med: "Median age", a1824: "18–24", a2034: "20–34", a3554: "35–54", a65: "65+", a75: "75+" };
-const AGE_VERB = { a1824: "are aged 18 to 24", a2034: "are aged 20 to 34", a3554: "are aged 35 to 54", a65: "are aged 65 or over", a75: "are aged 75 or over" };
-const AGE_RANGE = { a1824: [0, 28], a2034: [10, 40], a3554: [18, 45], a65: [5, 35], a75: [0, 35] };
-const AGE_TOP = { med: ["seats with the oldest residents", "with the youngest"], a1824: ["seats where the most residents are aged 18 to 24", "with the fewest"], a2034: ["seats with the most residents aged 20 to 34", "with the fewest"], a3554: ["seats with the most residents aged 35 to 54", "with the fewest"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a75: ["seats with the most residents aged 75 and over", "with the fewest"] };
-const AGE_KEY = { med: "ageMed", a1824: "a1824", a2034: "a2034", a3554: "a3554", a65: "a65", a75: "a75" };
+// median-age spectrum lands; the aged-band shares sit beside it in the
+// same legend picker, riding the income lane's idiom. User-listed set
+// 2026-11-13: 0-18, 18-24, 18-34 (replacing 20-34 — a2034 retired as a
+// view but its positional demo-tuple cell rides along untouched), 35-54,
+// 55+, 65+, 75+, 85+. The 15-19 band is split into single years where a
+// printed range cuts inside it, so the age bands overlap by design
+const AGE_MODES = ["med", "a0018", "a1824", "a1834", "a3554", "a55", "a65", "a75", "a85"];
+const AGE_NAME = { med: "Median age", a0018: "Aged 18 and under", a1824: "Aged 18 to 24", a1834: "Aged 18 to 34", a3554: "Aged 35 to 54", a55: "Aged 55 and over", a65: "Aged 65 and over", a75: "Aged 75 and over", a85: "Aged 85 and over" };
+const AGE_SHORT = { med: "Median age", a0018: "0–18", a1824: "18–24", a1834: "18–34", a3554: "35–54", a55: "55+", a65: "65+", a75: "75+", a85: "85+" };
+const AGE_VERB = { a0018: "are aged 18 or under", a1824: "are aged 18 to 24", a1834: "are aged 18 to 34", a3554: "are aged 35 to 54", a55: "are aged 55 or over", a65: "are aged 65 or over", a75: "are aged 75 or over", a85: "are aged 85 or over" };
+// range caps priced just above every frame's division maximum (booth
+// tails saturate past them by the fborn lane's doctrine): 0-18 36.7%,
+// 18-34 48.6%, 55+ 46.2%, 85+ a hair under 4% at the seat level
+const AGE_RANGE = { a0018: [10, 40], a1824: [0, 28], a1834: [10, 55], a3554: [18, 45], a55: [10, 55], a65: [5, 35], a75: [0, 35], a85: [0, 8] };
+const AGE_TOP = { med: ["seats with the oldest residents", "with the youngest"], a0018: ["seats with the most children aged 18 or under", "with the fewest"], a1824: ["seats where the most residents are aged 18 to 24", "with the fewest"], a1834: ["seats with the most residents aged 18 to 34", "with the fewest"], a3554: ["seats with the most residents aged 35 to 54", "with the fewest"], a55: ["seats with the most residents aged 55 and over", "with the fewest"], a65: ["seats with the most residents aged 65 and over", "with the fewest"], a75: ["seats with the most residents aged 75 and over", "with the fewest"], a85: ["seats with the most residents aged 85 and over", "with the fewest"] };
+const AGE_KEY = { med: "ageMed", a0018: "a0018", a1824: "a1824", a1834: "a1834", a3554: "a3554", a55: "a55", a65: "a65", a75: "a75", a85: "a85" };
+// the ageCut-recorded views: every mode except the median and the
+// demo-tuple's a65 — the legend's Australia line and the chart's
+// national marker read the pool-aged marker off the year's ageCuts for these
+const AGE_CUT_VIEWS = new Set(AGE_MODES.filter((k) => k !== "med" && k !== "a65"));
 const isAge = () => S.index === LENS_AGE;
 const ageMed = () => isAge() && S.ageMode === "med";
-// the national age marker per year rides ageCuts (median + the three new
-// shares pool-computed by the build from the packed band dicts); frames
+// the national age marker per year rides ageCuts (median + the seven
+// band shares pool-computed by the build from the packed band dicts); frames
 // without band dicts (the state frames' GCP lanes today) carry none
 const hasAgeCuts = (m) => !!(m && m.ageCuts);
 const dmVerbAge = (m) => (AGE_VERB[S.ageMode] || "");
@@ -566,10 +576,10 @@ const demoBoothShare = (raw, j, pos) => {
   // income: the share views ride the demo tuple's cells 6/17; the median
   // is dollars, dollars never a share — boothValue reads raw.medinc
   if (isInc()) { const r = raw.demo && raw.demo[j]; return r && S.incMode !== "med" ? r[{ lo: 6, hiq: 17 }[S.incMode]] : null; }
-  // age: a65/a2034 stay at the demo tuple's cells 1/2 like every GCP lane
+  // age: a65 stays at the demo tuple's cell 1 like every GCP lane
   if (isAge()) {
     if (S.ageMode === "med") return null; // median is years: boothValue reads raw.ageMed
-    if (S.ageMode === "a65" || S.ageMode === "a2034") { const r = raw.demo && raw.demo[j]; return r ? r[S.ageMode === "a65" ? 1 : 2] : null; }
+    if (S.ageMode === "a65") { const r = raw.demo && raw.demo[j]; return r ? r[1] : null; }
     const lane = raw[AGE_KEY[S.ageMode]]; return lane ? lane[j] : null;
   }
   // education: each read rides its own demo-tuple cell (uni 4, y12 8, y10less 9)
@@ -1081,7 +1091,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"bde0594e","core-1993.json":"7ddafe04","core-1996.json":"9c708f73","core-1998.json":"c0aa0c51","core-2001.json":"2b9ef3b2","core-2004.json":"93891c71","core-2007.json":"1e8ba475","core-2010.json":"b8f62308","core-2013.json":"2cebfaaa","core-2016.json":"631cefb9","core-2019.json":"4bb713fa","core-2022.json":"dbd9640e","core-2025.json":"88d9e262","core-nsw15.json":"ef675a20","core-nsw19.json":"0a413370","core-nsw23.json":"28007acc","core-qld17.json":"90883dd3","core-qld20.json":"afa13d52","core-qld24.json":"097d4868","core-sa22.json":"c12f25c5","core-sa26.json":"a1adcae3","core-vic14.json":"1a25367d","core-vic18.json":"81193083","core-vic22.json":"36eb937c","core-wa17.json":"b7ff67f5","core-wa21.json":"eb80aa84","core-wa25.json":"dd4a29e6","data-1993.json":"dddd6c6b","data-1996.json":"558a2e60","data-1998.json":"43251e20","data-2001.json":"e35166d8","data-2004.json":"7d962fe4","data-2007.json":"fe58e66c","data-2010.json":"b11ff0bf","data-2013.json":"66eef730","data-2016.json":"e6c301f2","data-2019.json":"7c919351","data-2022.json":"b8be56c7","data-2025.json":"becb600c","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"b13c005a","data-nsw15.json":"15805e03","data-nsw19.json":"3e8ba736","data-nsw23.json":"45cad84e","data-qld17.json":"ba2697bd","data-qld20.json":"5cd4d880","data-qld24.json":"24b89e7a","data-sa22.json":"8ab536fc","data-sa26.json":"7035d3ea","data-vic14.json":"304baad2","data-vic18.json":"b4bbe512","data-vic22.json":"01fec53f","data-wa17.json":"90f80af9","data-wa21.json":"efec9ede","data-wa25.json":"d74f96e5","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"fdceb8bb","res-1996.json":"dde8300c","res-1998.json":"533cb6ce","res-2001.json":"ee1034f8","res-2004.json":"75a7af53","res-2007.json":"5010d86b","res-2010.json":"ddf098f4","res-2013.json":"36b5d805","res-2016.json":"9df719f5","res-2019.json":"e0315a5b","res-2022.json":"a3e2bfca","res-2025.json":"89ac2bb1","res-nsw15.json":"ef675a20","res-nsw19.json":"0a413370","res-nsw23.json":"755aa871","res-qld17.json":"5bb429b9","res-qld20.json":"6b2ce3bb","res-qld24.json":"2328dc47","res-sa22.json":"0110ee26","res-sa26.json":"44a5434b","res-vic14.json":"1a25367d","res-vic18.json":"81193083","res-vic22.json":"5375e71f","res-wa17.json":"b7ff67f5","res-wa21.json":"eb80aa84","res-wa25.json":"dd4a29e6","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"003cca8e","core-1993.json":"327e8466","core-1996.json":"840860c7","core-1998.json":"74437062","core-2001.json":"4687095f","core-2004.json":"53df3f45","core-2007.json":"fc4da867","core-2010.json":"f8674c56","core-2013.json":"da51f1e2","core-2016.json":"b332503d","core-2019.json":"8669aeaa","core-2022.json":"95ce7b05","core-2025.json":"90d1df90","core-nsw15.json":"ef675a20","core-nsw19.json":"0a413370","core-nsw23.json":"28007acc","core-qld17.json":"90883dd3","core-qld20.json":"afa13d52","core-qld24.json":"097d4868","core-sa22.json":"c12f25c5","core-sa26.json":"a1adcae3","core-vic14.json":"1a25367d","core-vic18.json":"81193083","core-vic22.json":"36eb937c","core-wa17.json":"b7ff67f5","core-wa21.json":"eb80aa84","core-wa25.json":"dd4a29e6","data-1993.json":"dddd6c6b","data-1996.json":"7e1e675a","data-1998.json":"43251e20","data-2001.json":"820b4b78","data-2004.json":"8b5d2197","data-2007.json":"8d6ab355","data-2010.json":"cb213b6e","data-2013.json":"411c7caa","data-2016.json":"cbc5b571","data-2019.json":"824c3ab0","data-2022.json":"48cec582","data-2025.json":"26d1f258","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"c44b27c1","data-nsw15.json":"15805e03","data-nsw19.json":"3e8ba736","data-nsw23.json":"45cad84e","data-qld17.json":"ba2697bd","data-qld20.json":"5cd4d880","data-qld24.json":"24b89e7a","data-sa22.json":"8ab536fc","data-sa26.json":"7035d3ea","data-vic14.json":"304baad2","data-vic18.json":"b4bbe512","data-vic22.json":"01fec53f","data-wa17.json":"90f80af9","data-wa21.json":"efec9ede","data-wa25.json":"d74f96e5","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"0fab6e31","res-1996.json":"3f2817f7","res-1998.json":"b6c2d81e","res-2001.json":"dfb38833","res-2004.json":"02335fc3","res-2007.json":"c4023b4c","res-2010.json":"c3ad053a","res-2013.json":"402cb92b","res-2016.json":"e109b8a3","res-2019.json":"110ecb7b","res-2022.json":"efe5a83b","res-2025.json":"35266010","res-nsw15.json":"ef675a20","res-nsw19.json":"0a413370","res-nsw23.json":"755aa871","res-qld17.json":"5bb429b9","res-qld20.json":"6b2ce3bb","res-qld24.json":"2328dc47","res-sa22.json":"0110ee26","res-sa26.json":"44a5434b","res-vic14.json":"1a25367d","res-vic18.json":"81193083","res-vic22.json":"5375e71f","res-wa17.json":"b7ff67f5","res-wa21.json":"eb80aa84","res-wa25.json":"dd4a29e6","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -6183,7 +6193,7 @@ function areasLane() {
   return S.index;
 }
 // the 2021 pack's lanes (AREA_LANES pinned in test-map-areas.mjs against the pack)
-const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a1824", "a3554", "a75",
+const AREAS_LANES = new Set(["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "unemp", "loinc", "hiqinc", "a65", "a2034", "a0018", "a1824", "a1834", "a3554", "a55", "a75", "a85",
   "rel.norel", "rel.cath", "rel.angl", "rel.unch", "rel.pres", "rel.orth", "rel.budd", "rel.isl", "rel.hind", "rel.jew",
   "ten.mort", "ten.rent", "ten.own", "ten.rentPub",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
@@ -7094,8 +7104,8 @@ function chCensusNat(m) {
   if (!aus || !aus.demo || (m.year !== "now" && m.year < DEMO_FROM) || !isDemo()) return null;
   if (isAge()) {
     if (S.ageMode === "med") return nn(m.ageCuts && m.ageCuts.medAge);
-    // the ageCuts record keeps its shares as fractions
-    if (["a1824", "a3554", "a75"].includes(S.ageMode)) { const v = m.ageCuts && m.ageCuts[S.ageMode]; return v == null ? null : v <= 1 ? 100 * v : v; }
+    // the ageCuts record keeps its band-share views as fractions
+    if (AGE_CUT_VIEWS.has(S.ageMode)) { const v = m.ageCuts && m.ageCuts[S.ageMode]; return v == null ? null : v <= 1 ? 100 * v : v; }
   }
   if (arrMed()) return nn(demoAreaShare(aus.demo) );
   if (incMed()) return nn(m.incomeCuts && m.incomeCuts.medWeekly);
@@ -12687,9 +12697,10 @@ function censusSelects(m, cls = "") {
     // spectrum lands; the two share views sit beside it (loinc/hiinc as
     // standalone menu lanes until 2026-10-31)
     if (S.index === LENS_INC && hasInc(m)) out.push(lgMenu("incv", INC_MODES.map((k) => [k, INC_NAME[k]]), S.incMode, "Income measure"));
-    // on Age the same picker reads the six views: the median-age spectrum
-    // lands, the aged shares beside it (a65/a2034 as menu lanes until
-    // 2026-10-31, three new brackets same day)
+    // on Age the same picker reads the nine views: the median-age spectrum
+    // lands, the aged band shares beside it (a65/a2034 as menu lanes
+    // until their fold 2026-10-31, the 2026-11-13 band set replacing
+    // 20-34 with 18-34 and adding 0-18, 55+ and 85+)
     if (S.index === LENS_AGE) out.push(lgMenu("agev", AGE_MODES.map((k) => [k, AGE_NAME[k]]), S.ageMode, "Age view"));
     // on Education the same picker now reads the three schooling views:
     // the university share lands, the two highest-school-year reads
@@ -12839,10 +12850,10 @@ function legendHTML(m) {
         const noInc = isInc() && !hasInc(m);
 
         // the Australia's-line marker: pooled shares as ever; the Age
-        // family's median and three new views ride the ageCuts record
-        // (medians and pool-computed national reads, never pooled here)
+        // family's band-share views ride the ageCuts record (medians and
+        // pool-computed national reads, never pooled here)
         const ausShare = isAge()
-          ? (S.ageMode === "med" ? (m.ageCuts && m.ageCuts.medAge) : (["a1824", "a3554", "a75"].includes(S.ageMode) ? (m.ageCuts && m.ageCuts[S.ageMode]) : (aus.demo && demoAreaShare(aus.demo))))
+          ? (S.ageMode === "med" ? (m.ageCuts && m.ageCuts.medAge) : (AGE_CUT_VIEWS.has(S.ageMode) ? (m.ageCuts && m.ageCuts[S.ageMode]) : (aus.demo && demoAreaShare(aus.demo))))
           : (aus.demo && demoAreaShare(aus.demo));
         // the median lanes price their axes in dollars and years; every
         // other people lane reads percentages
@@ -12863,10 +12874,11 @@ function legendHTML(m) {
           ? `Median weekly household income${incEpochBrk}${incMedNote}`
           : `${incHouse ? "Share of households" : "Share of adults in households"} earning ${S.incMode === "lo" ? incLoFrag(m) : incHiQFrag(m)}${incEpochBrk}`;
         // the Age family's per-view notes: the median names its band
-        // interpolation, the 18–24 view admits its 15–19 estimate, and a
-        // frame without the band dicts says why the new views are empty
-        const AGE_NOTE = { med: "Median resident age, interpolated from census age bands", a1824: "Share of residents aged 18 to 24 (the 18–19 share of the 15–19 band)", a2034: "Share of residents aged 20 to 34", a3554: "Share of residents aged 35 to 54", a65: "Share of residents aged 65 and over", a75: "Share of residents aged 75 and over" };
-        const ageMedNote = m.ageCuts == null && !(S.ageMode === "a65" || S.ageMode === "a2034") ? "; this frame doesn't carry the census age bands this view needs" : "";
+        // interpolation, the views cutting the 15–19 band admit their
+        // single-year estimate, and a frame without the band dicts says
+        // why the band views are empty
+        const AGE_NOTE = { med: "Median resident age, interpolated from census age bands", a0018: "Share of residents aged 18 or under (the 15–18 share of the 15–19 band)", a1824: "Share of residents aged 18 to 24 (the 18–19 share of the 15–19 band)", a1834: "Share of residents aged 18 to 34 (the 18–19 share of the 15–19 band)", a3554: "Share of residents aged 35 to 54", a55: "Share of residents aged 55 and over", a65: "Share of residents aged 65 and over", a75: "Share of residents aged 75 and over", a85: "Share of residents aged 85 and over" };
+        const ageMedNote = m.ageCuts == null && S.ageMode !== "a65" ? "; this frame doesn't carry the census age bands this view needs" : "";
         const ageNote = AGE_NOTE[S.ageMode] + (ageMedNote || "");
         // the 2026-10-31 lane notes: each carries its basis the way the
         // older lanes do (the older lanes' honest phrasing is part of
@@ -13878,7 +13890,9 @@ function readURL() {
   // naming one lands on the lens with its share view picked (hiq where
   // hi once sat)
   if (i === "loinc" || i === "hiinc") { S.index = LENS_INC; S.incMode = i === "loinc" ? "lo" : "hiq"; }
-  else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i; }
+  // the retired 20-34 view id follows the same rule: its nearest living
+  // read is the 18-34 bracket that replaced it
+  else if (i === "a65" || i === "a2034") { S.index = LENS_AGE; S.ageMode = i === "a2034" ? "a1834" : i; }
   // schooling-read hashes: the legacy y12less id lands on its nearest
   // living read ("Year 10 or less", its left-early half)
   else if (EDU_MODES.includes(i) || i === "y12less") { S.index = LENS_EDU; S.eduMode = i === "y12less" ? "y10less" : i; }
@@ -13890,7 +13904,7 @@ function readURL() {
   else if (IMM_MODES.includes(i) || i === LENS_ANC) { S.index = LENS_IMM; S.immMode = i === LENS_ANC ? "anc" : i; }
   else if (i && (IX.includes(i) || DM.includes(i) || i === LENS_INC || i === LENS_AGE || i === LENS_EDU || i === LENS_FAM || i === LENS_IMM || i === LENS_REL || i === LENS_TEN || i === LENS_ANC || i === LENS_OCC || i === LENS_IND || i === LENS_MAR)) S.index = i;
   const iv = p.get("iv"); S.incMode = iv === "lo" ? "lo" : iv === "hi" || iv === "hiq" ? "hiq" : (i === "loinc" ? "lo" : i === "hiinc" ? "hiq" : "med");
-  const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : (i === "a65" || i === "a2034" ? i : "med");
+  const av = p.get("av"); S.ageMode = AGE_MODES.includes(av) ? av : av === "a2034" ? "a1834" : (i === "a65" ? "a65" : i === "a2034" ? "a1834" : "med");
   const ev = p.get("ev"); S.eduMode = EDU_MODES.includes(ev) ? ev : ev === "y12less" ? "y10less" : EDU_MODES.includes(i) ? i : i === "y12less" ? "y10less" : "uni";
   const fv = p.get("fv"); S.famMode = FAMC_MODES.includes(fv) ? fv : FAMC_MODES.includes(i) ? i : "u15";
   const mv = p.get("mv"); S.immMode = IMM_MODES.includes(mv) ? mv : IMM_MODES.includes(i) ? i : i === LENS_ANC ? "anc" : "lang";

@@ -19,7 +19,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export const PPL_LANES = ["demo", "cob", "rel", "ten", "anc", "ind", "medinc", "ageMed", "a1824", "a3554", "a75", "mar"];
+export const PPL_LANES = ["demo", "cob", "rel", "ten", "anc", "ind", "medinc", "ageMed", "a0018", "a1824", "a1834", "a3554", "a55", "a75", "a85", "mar"];
 
 // the core file's text for a results file's text
 export function coreText(resText) {
