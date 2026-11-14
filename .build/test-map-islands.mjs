@@ -4,8 +4,13 @@
      remembered foot (the cities strip and the zoom hint) must NOT be read as
      the boxes' clearance floor — it once shoved the western pair 220px down
      onto the WA coast, Christmas Island sitting on Durack (2026-11-08).
-   - the page itself: the floor stands — the hint and the cities show over the
-     map's top there, so the pair still keeps out from under them.
+   - the page itself: the floor stands — where the hint and the cities show
+     over the map's top, the pair still keeps out from under them.
+   - only what stands ON the stage counts: the strip's rows end above it, and
+     since 2026-11-13 the hint reads under it. Measured as an obstacle there,
+     the hint's foot pushed every box off the stage's foot (the four far
+     islands lost their boxes on a laptop until the measure asked where the
+     element stands).
    The slice runs in a bare vm with stub chrome; the numbers below track a
    1512×980 stage at the full-screen fit (HOME k 0.895 over a 1000×830 box).
    Run: node .build/test-map-islands.mjs */
@@ -24,9 +29,10 @@ const slice = app.slice(i, j);
 const prelude = `
 let Wpx = 1512, Hpx = 980;
 const FS = { on: false, ins: { t: 60, r: 14, b: 78, l: 406 } };
-const hint = { textContent: "zoom", offsetHeight: 17, getBoundingClientRect: () => ({ bottom: 341 }) };
-const cities = { hidden: false, offsetHeight: 95, getBoundingClientRect: () => ({ bottom: 287 }) };
-const $ = (s) => (s === "#hint" ? hint : s === "#cities" ? cities : { getBoundingClientRect: () => ({ top: 0 }) });
+let hintAt = [324, 341], citiesAt = [192, 287];
+const hint = { textContent: "zoom", offsetHeight: 17, getBoundingClientRect: () => ({ top: hintAt[0], bottom: hintAt[1] }) };
+const cities = { hidden: false, offsetHeight: 95, getBoundingClientRect: () => ({ top: citiesAt[0], bottom: citiesAt[1] }) };
+const $ = (s) => (s === "#hint" ? hint : s === "#cities" ? cities : { getBoundingClientRect: () => ({ top: 0, bottom: 980 }) });
 const isPhone = () => false;
 const HOME = { k: 0.895, x: 485, y: 96 };
 const ISL_PAIRS = [["christmas", "cocos"], ["norfolk", "lordhowe"]];
@@ -50,6 +56,11 @@ const tail = `
   const yPage = y();
   if (yPage < 350) throw new Error("the page's chrome foot no longer clears the sea spots (got y=" + yPage + ")");
   if (!(seaTop.w === Wpx && Math.abs(seaTop.top - 355) < 1)) throw new Error("the page chrome's foot is not remembered (got " + JSON.stringify(seaTop) + ")");
+  // the laptop's page since 2026-11-13: the cities in the strip above the stage, the hint under it — neither is on the sea
+  citiesAt = [-96, -68]; hintAt = [986, 1015]; seaMemo = null;
+  const yClear = y();
+  if (!(seaTop.w === Wpx && seaTop.top === 4)) throw new Error("a hint under the stage, or a strip above it, was read as an obstacle on it (got " + JSON.stringify(seaTop) + ")");
+  if (yClear > 200) throw new Error("the boxes left their sea spots for chrome that isn't on the stage (got y=" + yClear + ")");
 })();`;
 
 vm.runInContext(prelude + slice + tail, vm.createContext({}));

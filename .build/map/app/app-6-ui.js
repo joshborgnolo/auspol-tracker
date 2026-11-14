@@ -130,6 +130,7 @@ function renderLegend() {
   const searching = search && search.contains(document.activeElement);
   const basing = el.querySelector(".lg-bmenu")?.contains(document.activeElement);
   if (search && el.contains(search)) search.remove();
+  { const slot = $("#mapfoot"); if (slot) slot.replaceChildren(); }
   el.innerHTML = senOn() ? senateLegendHTML(SENM) : legendHTML(m);
   const basis = el.querySelector(".lg-basis");
   if (basis) {
@@ -147,10 +148,13 @@ function renderLegend() {
   // (the hint line is born empty: fill it now, or the strip shrinks a line and grows back, moving the map)
   updateHint();
 }
-/* where the search field sits: on a laptop it shares the control panel's Base
-   row; on a phone it stands atop the map, above the stage; in full screen, on
-   any screen, it rides the top bar's plate by the way out — never boxed in
-   among the panel's menus (2026-11-08, user calls). */
+/* where the search field sits: on a laptop's map it leads the strip (its first
+   child: the strip's own CSS stands it beside Jump to where the strip is wide,
+   at the Show row's end where it isn't — 2026-11-13, finding a seat comes
+   first); in the chamber and the list it shares the Show row; on a phone it
+   stands atop the map, above the stage; in full screen, on any screen, it
+   rides the top bar's plate by the way out — never boxed in among the
+   panel's menus (2026-11-08, user calls). */
 const phoneMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 860px)") : { matches: false };
 // (held here: the strip's rebuild lifts the field out of the page for a moment)
 const SEARCH_EL = $(".mp-search");
@@ -158,6 +162,7 @@ function placeSearch() {
   const sx = SEARCH_EL, stage = $("#stage"), el = $("#legend");
   if (!sx || !stage || !el) return;
   // full screen keeps it atop the map: in the top bar's plate, by the way out (a laptop's and a phone's alike)
+  placeFoot();
   if (FS.on && FS.sbox) {
     sx.classList.remove("mp-search-top");
     if (sx.parentElement !== FS.sbox) FS.sbox.append(sx);
@@ -169,11 +174,24 @@ function placeSearch() {
     return;
   }
   sx.classList.remove("mp-search-top");
-  // on the map it ends the hint's line, under the rule (user call 2026-11-10);
-  // the chamber and the list, with no hint, keep it on the Base row, and so does the retro view
-  const tb = (!rtIsOn() && el.querySelector(".lg-foot")) || el.querySelector(".lg-toolbar");
+  // on a laptop's map it leads the strip; the chamber and the list keep it on
+  // the Show row, and so does the retro view
+  const tb = S.view === "map" && !rtIsOn() ? null : el.querySelector(".lg-toolbar");
   if (tb) { if (sx.parentElement !== tb) tb.append(sx); }
-  else if (sx.parentElement !== el) el.prepend(sx);
+  else if (el.firstElementChild !== sx) el.prepend(sx);
+}
+/* the strip's foot line — the zoom hint, or the polling places' key in its
+   slot — reads under the map on a laptop (2026-11-13: a caption beneath the
+   picture, and the strip a row shorter above it); in full screen, the retro
+   view and on a phone it stays the strip's last line, as it was written */
+const footOut = () => S.view === "map" && !FS.on && !rtIsOn() && !phoneMQ.matches;
+function placeFoot() {
+  const slot = $("#mapfoot"), el = $("#legend");
+  if (!slot || !el) return;
+  const mine = el.querySelector(":scope > .lg-foot"), out = slot.querySelector(":scope > .lg-foot");
+  if (footOut()) { if (mine) slot.replaceChildren(mine); }
+  else if (out) { if (mine) out.remove(); else el.append(out); }
+  slot.hidden = !slot.firstElementChild;
 }
 if (phoneMQ.addEventListener) phoneMQ.addEventListener("change", () => { placeSearch(); fitSearchPlaceholder(); });
 /* the key holds the height of the CURRENT lens at its tallest election, so stepping
@@ -225,6 +243,7 @@ function legendHeightOf(m, y, w, probe) {
         for (const bo of S.view === "map" && !(S.draw === "chart" && chartFits(my)) ? [false, true] : [false]) for (const dw of [S.draw]) {
           boothsAs = bo; S.draw = dw;
           probe.innerHTML = legendHTML(my);
+          legendProbeDress(probe);
           hMax = Math.max(hMax, probe.getBoundingClientRect().height);
         }
       }
@@ -232,6 +251,13 @@ function legendHeightOf(m, y, w, probe) {
     legendHeights.set(key, Math.ceil(hMax));
   }
   return legendHeights.get(key);
+}
+// the measure wears what the live strip wears: the search field where it leads the strip (its
+// rows pair up around it), and no foot line where that reads under the map
+function legendProbeDress(probe) {
+  const sx = SEARCH_EL;
+  if (sx && sx.parentElement === $("#legend")) probe.insertAdjacentHTML("afterbegin", `<div class="mp-search"><label></label></div>`);
+  if (footOut()) probe.querySelector(":scope > .lg-foot")?.remove();
 }
 function holdLegendHeight(m) {
   const el = $("#legend"), w = el.clientWidth;
@@ -393,7 +419,7 @@ function basisHTML() {
   const cur = sen ? S.senLens : S.lens === "senpref" ? "flow" : S.lens;
   const label = (l) => l.id === "informal" ? "Informality" : l.label;
   const current = list.find((l) => l.id === cur) || list[0];
-  return `<div class="lg-t lg-basis lg-row"><span class="lg-label" id="base-label">Base</span><span class="lg-bmenu"><button type="button" class="st-sclab" data-basis-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="base-menu" aria-label="Base: ${label(current)}">${label(current)} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" id="base-menu" hidden role="menu" aria-labelledby="base-label">${list.map((l) => `<button type="button" data-base="${l.id}" data-base-house="${sen ? "senate" : "house"}" role="menuitemradio" aria-checked="${cur === l.id}" tabindex="-1">${label(l)}</button>`).join("")}</span></span></div>`;
+  return `<div class="lg-t lg-basis lg-row"><span class="lg-label" id="base-label">Show</span><span class="lg-bmenu"><button type="button" class="st-sclab" data-basis-trigger aria-haspopup="menu" aria-expanded="false" aria-controls="base-menu" aria-label="Show: ${label(current)}">${label(current)} <svg width="8" height="6" viewBox="0 0 8 6" aria-hidden="true"><path d="M1 1l3 3.2L7 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><span class="st-scm" id="base-menu" hidden role="menu" aria-labelledby="base-label">${list.map((l) => `<button type="button" data-base="${l.id}" data-base-house="${sen ? "senate" : "house"}" role="menuitemradio" aria-checked="${cur === l.id}" tabindex="-1">${label(l)}</button>`).join("")}</span></span></div>`;
 }
 function legendHTML(m) {
   const prev = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev);
@@ -578,7 +604,8 @@ function legendHTML(m) {
     if (!tight) h += jumpHTML() + drawRow;
     // the note on the picture follows the row that picks the picture (user
     // call 2026-11-08: no note floats above Draw); the hint the strip's close
-    h += drawNoteHTML(m);
+    // (each of the draw's notes is marked lg-dn: the wide strip stands them in Draw's column)
+    h += drawNoteHTML(m).replace(/<div class="lg-(note|bal|undrawn)\b/g, '<div class="lg-dn lg-$1');
     // the flow lens's "final two weren't…" key is a bottom-of-panel line too (user call)
     if (S.lens === "flow") h += `<div class="lg-note"><span class="lg-hatch"></span>Final two weren’t Labor and ${vsW()}</div>`;
     // the zoom hint rides the strip too, off the stage's top-left overlay with

@@ -40,19 +40,17 @@ html.mp-retro .st-stat { margin-top: 6px; color: #000; }
 html.mp-retro .st-sep { display: none; }
 html.mp-retro .st-lab { align-self: stretch; margin: 10px 0 6px !important; padding: 4px 7px; background: var(--rt-face); box-shadow: var(--rt-raised); font-size: 12px; font-weight: 700; color: #000; line-height: 1.2; }
 html.mp-retro .st-stat > .st-lab:first-child, html.mp-retro .st-stat > .st-sep:first-child + .st-lab { margin-top: 2px !important; }
-html.mp-retro .st-tpp, html.mp-retro .st-seats, html.mp-retro .st-fps, html.mp-retro .st-grid b { font-family: Tahoma, Verdana, sans-serif; font-weight: 700; letter-spacing: -0.03em; }
+html.mp-retro .st-tpp, html.mp-retro .st-seats, html.mp-retro .st-grid b { font-family: Tahoma, Verdana, sans-serif; font-weight: 700; letter-spacing: -0.03em; }
 html.mp-retro .st-tpp, html.mp-retro .st-seats { font-size: 44px; }
 html.mp-retro .st-seats.st-n4, html.mp-retro .st-seats.st-n5 { font-size: 36px; }
-html.mp-retro .st-fps { font-size: 25px; }
-html.mp-retro .st-fps.st-n5, html.mp-retro .st-fps.st-n6 { font-size: 20px; }
 html.mp-retro .st-stat i { font-family: Tahoma, Verdana, sans-serif; color: #000; font-weight: 400; }
 html.mp-retro .st-grid small, html.mp-retro .st-swing, html.mp-retro .st-nm { font-family: Tahoma, Verdana, sans-serif; font-weight: 700; }
 html.mp-retro .st-grid small { font-size: 14px; }
-html.mp-retro .st-swing { color: #000; font-size: 18px; }
+html.mp-retro .st-swing { color: #000; font-size: 13px; }
+html.mp-retro .st-swing b { font-size: 15px; }
 html.mp-retro .st-fg > b { background: #404040; color: #fff; border-radius: 0; box-shadow: var(--rt-thin-up); font-family: var(--rt-font); }
 html.mp-retro .st-makeup { border-radius: 0; height: 14px; box-shadow: var(--rt-sunken); padding: 2px; background: #fff; box-sizing: border-box; }
 html.mp-retro .st-seat-majority { background: #000; box-shadow: 0 0 0 1px #fff; }
-html.mp-retro .st-xb-brace { border-color: #000; }
 html.mp-retro .st-seat-legend, html.mp-retro .st-seat-note, html.mp-retro .st-find, html.mp-retro .st-note, html.mp-retro .st-foot, html.mp-retro .st-dek { font-size: 12px; color: #000; }
 html.mp-retro .st-seat-key::before { border-radius: 0; width: 9px; height: 9px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .55); }
 html.mp-retro .st-find > b { color: #000; font-weight: 700; }

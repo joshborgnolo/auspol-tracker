@@ -1,6 +1,8 @@
 // Probe: /map/'s State and Seat type filters (one pair for every view and lens),
 // the head (seats first, crossbench-only key), the steady city-names toggle, one
-// full-screen button, the Retro switch and the phone's search atop the map
+// full-screen button, the Retro switch, the phone's search atop the map, and
+// the laptop's strip (2026-11-13: the search leads it, its rows pair up, the
+// hint reads under the map)
 // usage: node .matilda/probe/map-filters.mjs <baseUrl>  (serve the repo root first)
 import puppeteer from "puppeteer-core";
 const base = process.argv[2], pre = "";
@@ -61,7 +63,7 @@ for (const [label, w] of [["desktop", 1440], ["tablet", 700]]) {
   // every lens keeps the filter and the same figures block
   for (const l of ["tpp", "fp", "informal", "seifa", "winner"]) {
     await page.evaluate((l) => window.__map.setLens(l), l); await sleep(900);
-    const h = await page.evaluate(() => ({ title: document.querySelector("#story .st-head h2").textContent, labs: [...document.querySelectorAll("#story .st-stat > .st-lab")].map((e) => e.textContent.split(" (")[0]), find: !!document.querySelector("#story .st-find") }));
+    const h = await page.evaluate(() => ({ title: document.querySelector("#story .st-head h2").textContent, labs: [...document.querySelectorAll("#story .st-stat > .st-lab > b")].map((e) => e.textContent), find: !!document.querySelector("#story .st-find") }));
     check(`lens ${l}: same head (Seats, Two-party, Primaries) under the filter`, /^Rural/.test(h.title) && h.labs[0] === "Seats" && h.labs.includes("Two-party preferred") && h.labs.some((x) => /^Primaries/.test(x)), h);
   }
   // the chamber and the list read the same pair
@@ -96,9 +98,22 @@ for (const [label, w] of [["desktop", 1440], ["tablet", 700]]) {
 // 3. seats first, crossbench-only key
 {
   const page = await open("");
-  const h = await page.evaluate(() => ({ labs: [...document.querySelectorAll("#story .st-stat > .st-lab")].map((e) => e.textContent), key: [...document.querySelectorAll("#story .st-seat-legend > *")].map((e) => e.textContent.trim()), brace: !!document.querySelector("#story .st-xb-brace") }));
+  const h = await page.evaluate(() => ({ labs: [...document.querySelectorAll("#story .st-stat > .st-lab")].map((e) => e.textContent), key: [...document.querySelectorAll("#story .st-seat-legend > .st-seat-key")].map((e) => [e.querySelector("span").textContent, +e.querySelector("b").textContent]), lab: (document.querySelector("#story .st-xb-lab") || {}).textContent, cells: document.querySelectorAll("#story .st-xb-cells > i").length, stretch: document.querySelectorAll("#story .st-makeup > span").length, grey: !!document.querySelector("#story .st-makeup > .st-makeup-xb"), names: [...document.querySelectorAll("#story .st-seats > .st-cn")].map((e) => e.textContent), maj: (document.querySelector("#story .st-seat-majlab") || {}).textContent }));
   check("Seats lead the head", /^Seats/.test(h.labs[0]), h.labs);
-  check("the seat key is the crossbench only, labelled so", /^Crossbench\s*15/.test(h.key[0]) && !h.key.some((k) => /^Labor|^Coalition/.test(k)) && h.brace, h.key);
+  check("each seat figure stands over its party's name; the majority line is named", h.names.join("|") === "Labor|Coalition|Crossbench" && h.maj === "76 for a majority", { names: h.names, maj: h.maj });
+  // (2026-11-13: the bar gives the crossbench one grey stretch; beneath it a cell a member, then the key, largest first)
+  check("the seat key is the crossbench only, labelled so: one grey stretch on the bar, a cell a member, the key largest first", h.lab === "Crossbench" && h.cells === 15 && h.stretch === 3 && h.grey && h.key.reduce((a, k) => a + k[1], 0) === 15 && !h.key.some((k) => /^Labor|^Coalition/.test(k[0])) && h.key.every((k, i) => !i || k[1] <= h.key[i - 1][1]), { lab: h.lab, cells: h.cells, stretch: h.stretch, key: h.key });
+  // the primaries are rows, and their Others row opens in place
+  const fp = await page.evaluate(async () => {
+    const rows = () => [...document.querySelectorAll("#story .st-fprs > .st-fpr")].map((e) => [e.querySelector(".nm").textContent, e.querySelector("b").textContent, getComputedStyle(e.querySelector(".bar > i")).width]);
+    const shut = rows(), b = document.querySelector("#story .st-fprs > .st-othb");
+    b.click(); await new Promise((r) => setTimeout(r, 400));
+    const b2 = document.querySelector("#story .st-fprs > .st-othb"), inside = [...document.querySelectorAll("#story .st-othx > .st-fpr-sub")].map((e) => [e.querySelector(".nm").textContent, +e.querySelector("b").textContent]);
+    const open = b2.getAttribute("aria-expanded"), total = +b2.querySelector("b").textContent;
+    b2.click(); await new Promise((r) => setTimeout(r, 400));
+    return { shut, open, inside, total, shutAgain: !document.querySelector("#story .st-othx") };
+  });
+  check("the primaries are rows (name, bar, share); Others opens in place and folds back", fp.shut.map((r) => r[0]).join("|") === "Labor|Coalition|Greens|Others" && fp.shut.every((r) => parseFloat(r[2]) > 0) && fp.open === "true" && fp.inside.length >= 2 && Math.abs(fp.inside.reduce((a, r) => a + r[1], 0) - fp.total) < 0.21 && fp.shutAgain, fp);
   // a seat: its figures lead, the finding follows
   await page.evaluate(() => { const m = window.__map.M(); window.__map.goDiv(m.byName.get("Bradfield")); }); await sleep(1500);
   const sv = await page.evaluate(() => { const el = document.querySelector("#story"); const kids = [...el.children].map((c) => c.className || c.tagName); return { kids: kids.slice(0, 6), find: (el.querySelector(".st-find") || {}).textContent }; });
@@ -133,11 +148,41 @@ for (const [label, w] of [["desktop", 1440], ["tablet", 700]]) {
   const p = await page.evaluate(() => { const s = document.querySelector(".mp-search"), st = document.querySelector("#stage"); return { above: s.getBoundingClientRect().bottom <= st.getBoundingClientRect().top + 1, inLegend: !!s.closest("#legend") }; });
   check("phone: search atop the map, out of the strip", p.above && !p.inLegend, p);
   await page.close();
-  const d = await open("", 1440);
-  // (on the map it ends the hint's line, right-aligned, under the rule — user call 2026-11-10)
-  const q = await d.evaluate(() => { const s = document.querySelector(".mp-search"), h = document.querySelector("#hint"); const sr = s.getBoundingClientRect(), hr = h.getBoundingClientRect(), lr = document.querySelector("#legend").getBoundingClientRect(); return { inFoot: !!s.closest("#legend .lg-foot"), rightAligned: Math.abs(sr.right - lr.right) < 1, besideHint: sr.left > hr.right - 1 }; });
-  check("desktop: search ends the hint's line, right-aligned", q.inFoot && q.rightAligned && q.besideHint, q);
-  await d.close();
+  // (2026-11-13: on a laptop's map the field leads the strip — beside Jump to where the strip is wide, at the
+  // Show row's end where it isn't — the rows pair up, and the hint reads under the map; it ended the hint's
+  // line, under the strip's rule, from 2026-11-10 until then)
+  const strip = (page) => page.evaluate(() => {
+    const $ = (q) => document.querySelector(q), r = (q) => { const e = $(q); if (!e || e.hidden) return null; const b = e.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.right), Math.round(b.bottom)]; };
+    const s = $(".mp-search"), lg = $("#legend");
+    return { first: lg.firstElementChild === s, lg: r("#legend"), search: r(".mp-search"), cities: r("#cities"), state: r("#state-filters"), type: r("#type-filters"), show: r("#legend .lg-toolbar"), draw: r("#legend .lg-draw"), stage: r("#stage"), hint: r("#hint"), hintIn: !!$("#mapfoot #hint"), footInStrip: !!$("#legend .lg-foot"), label: ($("#base-label") || {}).textContent,
+      wraps: ["#state-filters", "#type-filters", "#cities", "#legend .lg-draw"].map((q) => { const e = $(q); if (!e) return null; const tops = [...e.children].filter((c) => c.getBoundingClientRect().width > 0).map((c) => Math.round(c.getBoundingClientRect().top + c.getBoundingClientRect().height / 2)); return Math.max(...tops) - Math.min(...tops); }) };
+  });
+  const sameRow = (a, b) => a && b && Math.abs((a[1] + a[3]) / 2 - (b[1] + b[3]) / 2) < 8;
+  const below = (a, b) => a && b && a[1] >= b[3] - 1;
+  {
+    const d = await open("", 1440), q = await strip(d);
+    check("laptop, wide strip: the search leads it beside Jump to; State | Seat type; Show | Draw — three lines, none wrapped", q.first && q.label === "Show" && Math.abs(q.search[0] - q.lg[0]) < 1 && sameRow(q.search, q.cities) && q.cities[0] > q.search[2] && sameRow(q.state, q.type) && below(q.state, q.search) && sameRow(q.show, q.draw) && below(q.show, q.state) && Math.abs(q.cities[0] - q.type[0]) < 1 && Math.abs(q.type[0] - q.draw[0]) < 1 && q.wraps.every((w) => w != null && w < 8), q);
+    check("laptop: the hint reads under the map, out of the strip", q.hintIn && !q.footInStrip && below(q.hint, q.stage), { hintIn: q.hintIn, footInStrip: q.footInStrip, hint: q.hint, stage: q.stage });
+    // a seat chosen: the cities leave, nothing falls into their place, and the polling places' key takes the hint's slot
+    await d.evaluate(() => { const m = window.__map.M(); window.__map.goDiv(m.byName.get("Bradfield")); }); await sleep(1800);
+    const q2 = await strip(d), key = await d.evaluate(() => { const k = document.querySelector("#mapfoot .lg-shapes"); return !!k && k.getBoundingClientRect().top >= document.querySelector("#stage").getBoundingClientRect().bottom - 1; });
+    check("laptop, a seat chosen: Jump to leaves, the pairs hold their lines, the polling places' key reads under the map", !q2.cities && sameRow(q2.state, q2.type) && sameRow(q2.show, q2.draw) && below(q2.state, q2.search) && key, { q2, key });
+    check("laptop: no page errors", d.errs.length === 0, d.errs);
+    await d.close();
+  }
+  {
+    // a 1280px window's strip is 772px: only the filters pair, the field ends the Show row
+    const d = await open("", 1280), q = await strip(d);
+    check("laptop, middling strip: Show … search on one line, State | Seat type on the next, then Jump to, then Draw", q.first && sameRow(q.show, q.search) && Math.abs(q.search[2] - q.lg[2]) < 1 && sameRow(q.state, q.type) && below(q.state, q.show) && below(q.cities, q.state) && below(q.draw, q.cities) && q.wraps[0] < 8 && q.wraps[1] < 8, q);
+    await d.close();
+  }
+  {
+    // the chamber and the list keep the field on the Show row, and pair their filters
+    const d = await open("v=chamber", 1440);
+    const q = await d.evaluate(() => { const s = document.querySelector(".mp-search"), tb = document.querySelector("#legend .lg-toolbar"), a = document.querySelector("#state-filters").getBoundingClientRect(), b = document.querySelector("#type-filters").getBoundingClientRect(); return { inToolbar: s.parentElement === tb, paired: Math.abs(a.top - b.top) < 2 && b.left > a.right - 1, foot: !!document.querySelector("#mapfoot > *") }; });
+    check("chamber: the search shares the Show row, the filters pair, no foot line", q.inToolbar && q.paired && !q.foot, q);
+    await d.close();
+  }
 }
 console.log(fails.length ? `\n${fails.length} FAILED` : "\nall ok");
 await browser.close();

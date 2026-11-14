@@ -111,19 +111,26 @@ close(rows25.reduce((n,r)=>n+r[1],0),oth25,"the Others breakdown reproduces the 
 assert.deepEqual(JSON.parse(JSON.stringify(rows25.map((r)=>r[3]))),["Independents","One Nation","All other parties"]);
 assert.ok(!rows25.some((r)=>r[4]==="grn"),"the Greens' own column stays out of the breakdown");
 let g=api.statPrimaryGrid(current,current.areas.AUS,"",true);
-assert.match(g,/class="st-othb"/,"the figure carries its opener when shut");
+// (2026-11-13: the primaries are rows — name, bar, share, change — and the Others ROW is the opener)
+assert.match(g,/class="st-fpr st-othb"/,"the Others row carries its opener when shut");
+assert.match(g,/class="st-fprs st-n4 /,"the block typesets as rows");
+for(const c of cols25) assert.ok(g.includes(`<span class="nm">${c[3]}</span>`),`every row names its party: ${c[3]}`);
+assert.equal((g.match(/<span class="bar"/g)||[]).length,cols25.length,"a bar a row");
+assert.ok(g.includes(`width:${(100*cols25[0][1]/50).toFixed(1)}%`),"the bars share a scale that ends at 50%");
 assert.match(g,/aria-expanded="false"/);
 assert.ok(g.includes(`<b>${oth25.toFixed(1)}</b>`),"the shut figure shows the Others total");
 assert.ok(!g.includes("st-othx"),"nothing lists while shut");
 api.statFold.open=true;
 g=api.statPrimaryGrid(current,current.areas.AUS,"",true);
-assert.ok(!g.includes("st-othb"),"the figure button is gone once open");
-assert.match(g,/repeat\(5,auto\)/,"the remaining figures recentre on one fewer column");
+assert.match(g,/class="st-fpr st-othb" data-othx aria-expanded="true"/,"the Others row stays as the way back once open");
+assert.ok(g.includes(`<b>${oth25.toFixed(1)}</b>`),"the open row still shows the Others total");
 assert.match(g,/class="st-othx"/);
+const inside=g.slice(g.indexOf('class="st-othx"'));
 for(const r of rows25) {
-  assert.ok(g.includes(`${r[3]} <b>${r[1].toFixed(1)}</b>`),`open line shows ${r[3]}`);
-  assert.ok(g.includes(`<small>${(r[2]>=0?"+":"−")+Math.abs(r[2]).toFixed(1)}</small>`),`open line shows ${r[3]}'s change`);
+  assert.ok(inside.includes(`<span class="nm">${r[3]}</span>`)&&inside.includes(`<b>${r[1].toFixed(1)}</b>`),`open list shows ${r[3]}`);
+  assert.ok(inside.includes(`>${(r[2]>=0?"+":"−")+Math.abs(r[2]).toFixed(1)}</small>`),`open list shows ${r[3]}'s change`);
 }
+assert.equal((inside.match(/class="st-fpr st-fpr-sub"/g)||[]).length,rows25.length,"one indented row for each party inside Others");
 assert.ok(!api.statPrimaryGrid(current,current.areas.AUS).includes("st-othb"),"the breakdown cycle view's grid keeps a plain figure");
 api.statFold.open=false;
 api.statFold.open=true;
@@ -152,8 +159,9 @@ assert.equal(rowsSa16.find((r)=>r[4]==="oth")[2],null,"a lump beside a breakout 
   assert.ok(!p.includes("+3.3"), "the ghost column's closed-sum change is gone");
   assert.ok(p.includes(">10.7<"), "the 10.7% pool");
   assert.ok(p.includes("+6.3"), "the residual's change closes the shown swings");
-  assert.equal((p.match(/<small style="grid-column/g) || []).length, 5, "five change smalls for five columns");
-  assert.match(p, /st-n5 /, "the row typesets at five columns");
+  assert.equal((p.match(/<small title="Change since/g) || []).length, 5, "five changes for five rows");
+  assert.match(p, /st-n5 /, "the block typesets five rows");
+  assert.ok(p.includes('<b>Primaries</b> <small class="st-lab-r">change since 2022</small>'), "the label's end names what the changes are on, a space apart for a reader of the text");
 }
 // the preferences lens's chart beside a whole view of seats: every bloc's
 // piles pooled over the seats whose count matches the matchup, split to Labor

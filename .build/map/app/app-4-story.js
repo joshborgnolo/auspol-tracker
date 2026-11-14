@@ -73,9 +73,9 @@ function upLink() {
    figures close with their own rule; the .st-stat + .st-sec suppression
    keeps the count at one there) — the seat and place heads' sections never
    close with one, so their finding draws it itself */
-function head(title, meta, hed, dek, stat) {
+function head(title, meta, hed, dek, stat, sub = "") {
   const find = findingHTML(hed, dek, !stat);
-  return `${upLink()}<div class="st-head${/^The (House|Senate|Assembly) today$/.test(title) ? " st-today" : ""}"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
+  return `${upLink()}<div class="st-head${/^The (House|Senate|Assembly) today$/.test(title) ? " st-today" : ""}"><h2>${ds(title)}</h2><span class="rd-meta">${meta}</span></div>${sub ? `<p class="st-headdek">${sub}</p>` : ""}${stat || ""}${stat && find ? `<div class="st-sec st-findsec">${find}</div>` : find}`;
 }
 // the lens's finding under the figures: its headline as a bold lead sentence, the dek after it
 function findingHTML(hed, dek, lead) {
@@ -119,8 +119,21 @@ function swingFigure(s, side = null) {
   if (s == null) return "";
   if (Math.abs(s) < 0.05) return `<span class="st-swing">No swing</span>`;
   const f = side || (s > 0 ? "alp" : "lnp");
-  return `<span class="st-swing"><b ${tone(f)}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
+  // the words name who it went to (a figure dressed in a given side's colour keeps the bare word)
+  if (side) return `<span class="st-swing"><b ${tone(f)}>+${Math.abs(s).toFixed(1)}</b> swing</span>`;
+  return `<span class="st-swing">Swing to ${f === "alp" ? "Labor" : coalW()} <b ${tone(f)}>+${Math.abs(s).toFixed(1)}</b></span>`;
 }
+/* a figures label reads like the story's section heads: its title bold, and
+   whatever its parentheses held as a lighter note after it ("Seats · Labor has
+   62.7% of 150"); `right` closes the line with a note over the last column */
+const labHTML = (s, right = "", cls = "") => {
+  const x = /^(.*?) \((.*)\)$/.exec(s);
+  return `<span class="st-lab${cls ? ` ${cls}` : ""}"><b>${x ? x[1] : s}</b>${x ? ` <small>${x[2]}</small>` : ""}${right ? ` <small class="st-lab-r">${right}</small>` : ""}</span>`;
+};
+// the rule that stands between two figures (a dash did, until 2026-11-13)
+const VR = `<i class="st-vr" aria-hidden="true"></i>`;
+// the pair's split on one bar, the half-way line marked: how far past it is the margin
+const tppBar = (aPct, aFam, bFam) => (Number.isFinite(aPct) ? `<span class="st-tppbar" aria-hidden="true"><i style="width:${Math.max(0, Math.min(100, aPct)).toFixed(2)}%;background:${css(TH.party[aFam])}"></i><i style="background:${css(TH.party[bFam])}"></i><u></u></span>` : "");
 /* margin figures widen decimals until the figure shows: a hairline margin
    (Bradfield '25, 26 votes) vanishes at one decimal — show two, or three if
    two would still print zeros (the f1 check keeps null/NaN "–" safe) */
@@ -133,10 +146,13 @@ const tightFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(
    figures in the parties' own colours, and "parties" re-adds the national
    block's party names under the figures */
 const twoPartyFigures = (label, aPct, aFam, aName, bPct, bFam, bName, tag = "", namesUp = false, parties = null) => {
-  const under = parties ? `<span class="st-pnm st-pnm-l" ${tone(aFam)} title="${esc(parties[0])}">${parties[0]}</span><span class="st-pnm st-pnm-r" ${tone(bFam)} title="${esc(parties[1])}">${parties[1]}</span>` : "";
+  // the chip (govt, formed govt, retain…) rides beside the party's name on its own side, the pair centred under the figure
+  const left = /st-fg-(alp|l)\b/.test(tag), tl = tag && left ? tag : "", tr = tag && !left ? tag : "";
+  const under = parties ? `<span class="st-pnm st-pnm-l" ${tone(aFam)} title="${esc(parties[0])}"><span>${parties[0]}</span>${tl}</span><span class="st-pnm st-pnm-r" ${tone(bFam)} title="${esc(parties[1])}"><span>${parties[1]}</span>${tr}</span>` : "";
+  const bar = tppBar(aPct, aFam, bFam);
   return namesUp
-    ? `<span class="st-lab">${label}</span><span class="st-tpp st-nmup"><span class="st-nm st-nm-l" title="${aName}">${aName}</span><span class="st-nm st-nm-r" title="${bName}">${bName}</span><b class="fig-l" ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b class="fig-r" ${tone(bFam)}>${f1(bPct)}</b>${under}${tag}</span>`
-    : `<span class="st-lab">${label}</span><span class="st-tpp"><b ${tone(aFam)}>${f1(aPct)}</b><i>–</i><b ${tone(bFam)}>${f1(bPct)}</b><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}">${aName}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}">${bName}</span>${tag}</span>`;
+    ? `${labHTML(label)}<span class="st-tpp st-nmup"><span class="st-nm st-nm-l" title="${aName}">${aName}</span><span class="st-nm st-nm-r" title="${bName}">${bName}</span><b class="fig-l" ${tone(aFam)}>${f1(aPct)}</b>${VR}<b class="fig-r" ${tone(bFam)}>${f1(bPct)}</b>${under}${bar}</span>`
+    : `${labHTML(label)}<span class="st-tpp"><b ${tone(aFam)}>${f1(aPct)}</b>${VR}<b ${tone(bFam)}>${f1(bPct)}</b><span class="st-nm st-nm-l" ${tone(aFam)} title="${aName}"><span>${aName}</span>${tl}</span><span class="st-nm st-nm-r" ${tone(bFam)} title="${bName}"><span>${bName}</span>${tr}</span>${bar}</span>`;
 };
 
 /* a seat's stat payload: win family × run family (charged on the final two),
@@ -214,18 +230,12 @@ function seatPrimariesStat(m, d) {
   // the head's "Others" opener, on the same open state: the lump unfurls
   // into the families under the column line and the minor-parties lump
   const othrows = statOthersRows(p, cols);
-  const open = othrows.length > 0 && !!statScopeOf(m).open;
-  const shown = open ? cols.slice(0, -1) : cols;
-  const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${!open && othrows.length && c[4] === "oth"
-    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" ${tone(c[0])} title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
-    : `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`}`;
   // the eyebrow reads "Primaries" plain (user call 2026-11-08): who is in and
-  // share of what is told by the columns themselves, not a parenthetical
-  const grid = `<span class="st-grid st-fps st-n${cols.length} st-seatfps" style="grid-template-columns:repeat(${2 * shown.length - 1},auto)" role="group" aria-label="${esc(shown.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${shown.map(cell).join("")}${bigness != null ? shown.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since ${p.py}${d.by ? " (the by-election is judged against the general election's count)" : ""}">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
-  const sec = `<div class="st-sec"><div class="st-stat st-secstat"><span class="st-lab">Primaries</span>${grid}`;
-  if (!open) return `${sec}</div></div>`;
-  const bits = othrows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${bigness != null && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
-  return `${sec}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(othrows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button></div></div>`;
+  // share of what is told by the rows themselves, not a parenthetical; the
+  // line's end names what the changes are on
+  const since = bigness != null && p.py != null ? `change since ${p.py}` : "";
+  const grid = fpRowsHTML(cols, { rows: othrows, open: !!statScopeOf(m).open, showChange: bigness != null, cls: "st-seatfps", since: `Change since ${p.py}${d.by ? " (the by-election is judged against the general election's count)" : ""}` });
+  return `<div class="st-sec"><div class="st-stat st-secstat">${labHTML("Primaries", since)}${grid}</div></div>`;
 }
 
 function candRows(cands, formal, cmp, limit, swingOf, partyOf) {
@@ -524,23 +534,31 @@ function statOthersRows(A, cols) {
   if (lump >= 0.05) named.push(["oth", lump, breakouts ? null : A.fpSw.oth != null ? A.fpSw.oth : null, "All other parties", "oth"]);
   return named;
 }
-/* the primary row, the head's "Others" cell optionally an opener: clicked, the
-   remainder column drops out (the rest recentre) and its contents list in a
-   smaller line under the row; clicked again they fold back into the figure */
+/* the primaries as rows (2026-11-13: a row of bare figures named no party and
+   leaned on colour alone): each party's name, a bar on a scale the block
+   shares (to 50%, or the next ten past its largest share), the share, then
+   its change. Cells are statPrimaryCols' [tone, share, change, label, key].
+   The "Others" row can be an opener: opened, what it holds lists beneath it,
+   indented, on the same scale; clicked again it folds shut */
+function fpRowsHTML(cols, o = {}) {
+  const rows = o.rows || [], open = !!o.open && rows.length > 0, showChange = !!o.showChange;
+  const top = Math.max(50, 10 * Math.ceil(Math.max(0, ...cols.map((c) => c[1] || 0)) / 10));
+  const w = (v) => `${Math.max(0, Math.min(100, (100 * (v || 0)) / top)).toFixed(1)}%`;
+  const chg = (c) => (showChange ? `<small title="${esc(o.since || "Change since the previous election")}">${c[2] == null ? " " : sgn(c[2])}</small>` : "");
+  const line = (c) => `<span class="nm">${esc(c[3])}</span><span class="bar" aria-hidden="true"><i style="width:${w(c[1])};background:${css(TH.party[c[0]])}"></i></span><b>${f1(c[1])}</b>${chg(c)}`;
+  const body = cols.map((c) => {
+    if (!(rows.length && c[4] === "oth")) return `<span class="st-fpr" title="${esc(c[3])}">${line(c)}</span>`;
+    const inside = open ? `<span class="st-othx" role="group" aria-label="Inside ${esc(c[3])}">${rows.map((r) => `<span class="st-fpr st-fpr-sub">${line(r)}</span>`).join("")}</span>` : "";
+    return `<button type="button" class="st-fpr st-othb" data-othx aria-expanded="${open}" title="${esc(c[3])}. ${open ? "Fold the smaller parties back into this figure" : "Show which parties make up this figure"}" aria-label="${esc(`${c[3]} ${f1(c[1])}%. ${open ? `Inside: ${rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", ")}. Fold back` : "Show which parties make up this figure"}`)}">${line(c)}</button>${inside}`;
+  }).join("");
+  return `<span class="st-fprs st-n${cols.length} ${o.cls || ""}${showChange ? "" : " st-nochg"}" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${body}</span>`;
+}
 function statPrimaryGrid(m, A, cls = "", othx = false) {
-  // the change smalls ride every frame's primaries — an as-it-stands frame's
+  // the changes ride every frame's primaries — an as-it-stands frame's
   // are the base election's (user call: the now views carry swings too)
   const all = statPrimaryCols(m, A), showChange = A.fpSw.alp != null;
   const rows = othx ? statOthersRows(A, all) : [];
-  const open = othx && !!statScopeOf(m).open && rows.length > 0;
-  const cols = open ? all.slice(0, -1) : all;
-  const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${othx && !open && rows.length && c[4] === "oth"
-    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" ${tone(c[0])} title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
-    : `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`}`;
-  const grid = `<span class="st-grid st-fps st-n${all.length} ${cls}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map(cell).join("")}${showChange ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : ""}</span>`;
-  if (!open) return grid;
-  const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
-  return `${grid}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button>`;
+  return fpRowsHTML(all, { rows, open: othx && !!statScopeOf(m).open, showChange, cls });
 }
 /* the "Others" open is part of the frame's figure view, like the scope choice */
 function statOthersToggle() {
@@ -582,16 +600,7 @@ function senFpStat(m, idx) {
   const shown = new Set(all.map((c) => c[4]));
   const rows = ["grn", "onp", "ind"].filter((f) => !shown.has(f) && fp[f] >= 0.05).sort((a, b) => fp[b] - fp[a]).map((f) => [f, fp[f], fpSw[f], famLeg(f), f]);
   if (fp.oth >= 0.05) rows.push(["oth", fp.oth, fpSw.oth, "All other parties", "oth"]);
-  const open = rows.length > 0 && !!statScopeOf(m).open;
-  const cols = open ? all.slice(0, -1) : all;
-  const cell = (c, i) => `${i ? `<i aria-hidden="true">–</i>` : ""}${!open && rows.length && c[4] === "oth"
-    ? `<button type="button" class="st-othb" data-othx aria-expanded="false" ${tone(c[0])} title="${esc(c[3])}. Show which parties make up this figure" aria-label="${esc(`${c[3]} ${f1(c[1])}%. Show which parties make up this figure`)}"><b>${f1(c[1])}</b></button>`
-    : `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`}`;
-  const smalls = (cs) => (showChange ? cs.map((c, i) => `<small style="grid-column:${2 * i + 1}" title="Change since the previous election">${c[2] == null ? " " : sgn(c[2])}</small>`).join("") : "");
-  const grid = `<span class="st-grid st-fps st-n${all.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)" role="group" aria-label="${esc(cols.map((c) => `${c[3]} ${f1(c[1])}%`).join(", "))}">${cols.map(cell).join("")}${smalls(cols)}</span>`;
-  if (!open) return { alp: fp.alp, lnp: fp.lnp, grid };
-  const bits = rows.map((r) => `<span class="st-othx-r"><i aria-hidden="true" style="background:${css(TH.party[r[0]])}"></i>${esc(r[3])} <b>${f1(r[1])}</b>${showChange && r[2] != null ? `<small>${sgn(r[2])}</small>` : ""}</span>`).join("");
-  return { alp: fp.alp, lnp: fp.lnp, grid: `${grid}<button type="button" class="st-othx" data-othx aria-expanded="true" title="Fold the smaller parties back into Others" aria-label="Inside Others: ${esc(rows.map((r) => `${r[3]} ${f1(r[1])}%`).join(", "))}. Fold back into Others">${bits}</button>` };
+  return { alp: fp.alp, lnp: fp.lnp, showChange, grid: fpRowsHTML(all, { rows, open: !!statScopeOf(m).open, showChange }) };
 }
 /* the Senate lens's two-party row: not a count anyone publishes (the Senate
    elects proportionally) but the whole ballot's own order pooled — the share
@@ -748,27 +757,27 @@ function statSeatMakeup(m, idx, blocNames = []) {
   const order = ["alp", "lnp", "grn", "ind", "csa", "onp", "oth"];
   const rows = [...groups.values()].sort((a, b) => order.indexOf(a.f) - order.indexOf(b.f) || b.n - a.n || a.name.localeCompare(b.name));
   const colour = (r) => css(TH.party[FP_TONE[r.name] || r.f]);
-  const bars = rows.map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${r.n} ${r.n === 1 ? "seat" : "seats"} (${f1(100 * r.n / idx.length)}%)"></span>`).join("");
-  /* the key under the bar names the crossbench alone: Labor's and the
-     Coalition's counts are the big figures above it, so the key is the third
-     figure opened out ("Crossbench 15: Independents 8 …"), bracketed under
-     its own stretch of the bar. A crossbench party big enough to stand among
-     the big figures leaves the rest as "Others". */
+  /* the bar is the big figures' own: Labor's stretch, the Coalition's, any
+     crossbench party big enough to stand among them, then the rest of the
+     crossbench as ONE grey stretch — the figure above it is grey too. That
+     stretch is opened out beneath: a cell a member in each party's colour,
+     and a key in two columns, the counts in line (2026-11-13; the slivers
+     of a 15-seat crossbench could not be read on the bar itself, and the
+     key that wrapped under a bracket could not be scanned). */
   const xb = rows.filter((r) => r.f !== "alp" && r.f !== "lnp" && !blocNames.includes(r.name));
   const xbN = xb.reduce((a, r) => a + r.n, 0), xbWord = blocNames.length ? "Others" : "Crossbench";
-  let at = 0, lo = null, hi = null, gap = false;
-  for (const r of rows) {
-    const inX = xb.includes(r);
-    if (inX) { if (lo == null) lo = at; else if (hi !== at) gap = true; hi = at + r.n; }
-    at += r.n;
-  }
-  const brace = xbN && !gap ? `<i class="st-xb-brace" aria-hidden="true" style="left:${100 * lo / idx.length}%;width:${100 * (hi - lo) / idx.length}%"></i>` : "";
-  const legend = xbN ? `<span class="st-seat-legend" role="group" aria-label="${xbWord}: ${xbN} ${xbN === 1 ? "seat" : "seats"}"><span class="st-xb-lab">${xbWord} <b>${xbN}</b></span>${xb.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("")}</span>` : "";
+  const seatsW = (n) => `${n} ${n === 1 ? "seat" : "seats"} (${f1(100 * n / idx.length)}%)`;
+  const bars = rows.filter((r) => !xb.includes(r)).map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${seatsW(r.n)}"></span>`).join("")
+    + (xbN ? `<span class="st-makeup-xb" style="width:${100 * xbN / idx.length}%" title="${xbWord}: ${seatsW(xbN)}"></span>` : "");
+  // the key reads largest first (the family order settles ties), down its first column then its second
+  const keyed = xb.slice().sort((a, b) => b.n - a.n);
+  const cells = keyed.map((r) => `<i style="background:${colour(r)}" title="${esc(r.name)}: ${r.n}"></i>`.repeat(r.n)).join("");
+  const legend = xbN ? `<span class="st-xb" role="group" aria-label="${xbWord}: ${xbN} ${xbN === 1 ? "seat" : "seats"}"><span class="st-xb-head"><span class="st-xb-lab">${xbWord}</span><span class="st-xb-cells" aria-hidden="true" style="--n:${xbN}">${cells}</span></span><span class="st-seat-legend" style="--rows:${Math.ceil(keyed.length / 2)}">${keyed.map((r) => `<span class="st-seat-key" style="--seat-colour:${colour(r)}"><span>${esc(r.name)}</span><b>${r.n}</b></span>`).join("")}</span></span>` : "";
   const total = m.seatsN || m.divs.length, majority = Math.floor(total / 2) + 1;
   // A chamber majority is meaningful on the complete House, rather than a
-  // state or seat-type subset picked by the filters.
-  const marker = idx.length === total ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i>` : "";
-  return `<span class="st-seat-mix${brace ? " st-has-brace" : ""}"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}${brace}</span>${legend}</span>`;
+  // state or seat-type subset picked by the filters; its line is named on the bar.
+  const marker = idx.length === total ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i><span class="st-seat-majlab" aria-hidden="true" style="left:${100 * majority / total}%">${majority} for a majority</span>` : "";
+  return `<span class="st-seat-mix${marker ? " st-has-maj" : ""}"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}</span>${legend}</span>`;
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
 function seatStat(m, st, label, noteDef = null) {
@@ -792,7 +801,6 @@ function seatStat(m, st, label, noteDef = null) {
   // 2025 election's chamber, exactly as the lower house's seats do (never
   // against the election before that, as m.res.prev would price it)
   const deckP = deck ? SENY[isNowY(m.year) ? frameBaseY(m.year) : prevYearOf(m.year)] || null : null;
-  const senNote = deck && isNowY(m.year) && m.senChanges ? senChangeNote(m, frameBaseY(m.year), st) : "";
   const tallyOf = (dd, sel) => { const c = {}; for (const d of dd.divs) { if (sel && d.st !== sel) continue; c[d.hold.fam] = (c[d.hold.fam] || 0) + 1; } return c; };
   /* the base deck's day is the senators' seating day ("the election's senators"
      handed over 1 July 2025), so moves between election day and that snapshot —
@@ -806,7 +814,12 @@ function seatStat(m, st, label, noteDef = null) {
   };
   // the moved-seats note shows only while every seat it names stays inside the
   // filtered pool (the One Nation pair keeps it under Rural and NSW figures)
-  const seatsNote = !deck && noteDef && ((st === "AUS" && !cls) || noteDef.seats.every((n) => idx.some((i) => m.divs[i].n === n))) ? `<span class="st-seat-note">${noteDef.t.trim()}</span>` : "";
+  /* (the moved-seats word-note that sat under the seats' key — the curated
+     noteDef.t on the House, senChangeNote's on the Senate lanes — is no longer
+     printed: storyArea's line under the title counts the changes since the
+     election and their list follows the figures block, beside the changes it
+     explains, 2026-11-13. noteDef still names the seats the spoken label's
+     sentence is about) */
   // the change line's base: the whole frame's official series, a state's own
   // series on an election frame, else the pool's seat-by-seat reversion — and
   // the previous chamber's tally where the deck reads
@@ -845,8 +858,9 @@ function seatStat(m, st, label, noteDef = null) {
     // election frame's (user call: the now views carry swings too)
     const twoSw = swingFigure(A.tppSw);
     // the pair's names close the figures grid, each anchored to its figure's inside edge;
-    // the govt tag rides the names row with them (anchorGovtTag then hugs the head's content edge)
-    two = twoPartyFigures(`Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})`, A.tpp, "alp", "Labor", 100 - A.tpp, "lnp", coalW(1).replace(/^The /, ""), fg) + twoSw;
+    // the govt tag rides the names row with them, beside its party's name
+    // an as-it-stands frame says whose count this is; an election's own frame keeps the margin
+    two = twoPartyFigures(isNowY(m.year) ? `Two-party preferred (at the ${frameBaseY(m.year)} election)` : `Two-party preferred (margin of ${f1(Math.abs(A.tpp - 50))})`, A.tpp, "alp", "Labor", 100 - A.tpp, "lnp", coalW(1).replace(/^The /, ""), fg) + twoSw;
   }
   const change = (f, n) => {
     if (!base) return "";
@@ -856,18 +870,22 @@ function seatStat(m, st, label, noteDef = null) {
     return sgn(n - was, 0);
   };
   // a row of figures with a line of changes under them, its size set by how many columns it has
-  const row = (cls, cols, under) => `<span class="st-grid ${cls} st-n${cols.length}" style="grid-template-columns:repeat(${2 * cols.length - 1},auto)">${cols.map(([f, t], i) => `${i ? `<i>–</i>` : ""}<b ${tone(f)}>${t}</b>`).join("")}${under ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${under(c)}</small>`).join("") : ""}</span>`;
+  // each figure stands over its party's name, a rule between the columns (the names and rules: 2026-11-13)
+  const seatName = (f, i) => (f === "alp" ? "Labor" : f === "lnp" ? coalW(1).replace(/^The /, "") : blocE[i - 2] ? blocE[i - 2][0] : blocE.length ? "Others" : "Crossbench");
+  const row = (cls, cols, under) => `<span class="st-grid ${cls} st-n${cols.length}" style="grid-template-columns:repeat(${cols.length - 1},minmax(0,1fr) 1px) minmax(0,1fr)">${cols.map(([f, t], i) => `${i ? VR : ""}<b ${tone(f)}>${t}</b>`).join("")}${cols.map(([f], i) => `<span class="st-cn" style="grid-column:${2 * i + 1}${f === "oth" ? "" : `;color:${css(TH.party[f])}`}">${esc(seatName(f, i))}</span>`).join("")}${under ? cols.map((c, i) => `<small style="grid-column:${2 * i + 1}">${under(c)}</small>`).join("") : ""}</span>`;
   // the primary vote: a party on 10% or more stands apart from "others". Greens and One Nation are
   // their own family; the rest share "oth", so a party there (Xenophon's in SA, 2016) is read from the candidates.
   // (Under the Senate lens the row reads the pool's SENATE first preferences, labelled as such;
   // every other lens takes the House primaries. A state election has no Senate deck — house row stands.)
   const fpA = A.fp.alp, fpL = A.fp.lnp;
+  // the election the changes are on, as the reader would name it
+  const pv = isNowY(m.year) ? m.res.prev : prevYearOf(m.year) ?? (m.res && m.res.prev), pvL = pv == null ? "" : frameBaseY(pv);
   let fpRow = "";
   if (senLanes && svYear(m.year) != null) {
     const sf = senFpStat(m, idx);
-    if (sf) fpRow = `<span class="st-lab">Senate primaries (Labor and ${coalW()} share ${f1(sf.alp + sf.lnp)}%)</span>${sf.grid}`;
+    if (sf) fpRow = `${labHTML("Senate primaries", sf.showChange && pvL ? `change since ${pvL}` : "")}${sf.grid}<span class="st-fpnote">Labor and ${coalW()} share ${f1(sf.alp + sf.lnp)}%.</span>`;
   } else if (fpA != null && fpL != null) {
-    fpRow = `<span class="st-lab">Primaries (Labor and ${coalW()} share ${f1(fpA + fpL)}%)</span>${statPrimaryGrid(m, A, "", true)}`;
+    fpRow = `${labHTML("Primaries", A.fpSw.alp != null && pvL ? `change since ${pvL}` : "")}${statPrimaryGrid(m, A, "", true)}<span class="st-fpnote">Labor and ${coalW()} share ${f1(fpA + fpL)}%.</span>`;
   }
   // on the Seats label itself: the governing family's share of the chamber, in its wording —
   // "won" what an election delivered, "has" what an as-it-stands frame holds
@@ -880,8 +898,7 @@ function seatStat(m, st, label, noteDef = null) {
   // the seats lead (who holds the House is the map's first reading), then the
   // votes that won them: the two-party count, then the primaries
   const sections = [];
-  // the word-note about seats that moved since the election sits under the count's legend
-  sections.push(`<span class="st-lab">Seats${shareTxt}</span>${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}${seatsNote || (senNote ? `<span class="st-seat-note">${senNote.trim()}</span>` : "")}`);
+  sections.push(`${labHTML(`Seats${shareTxt}`)}${row("st-seats", seats, base ? ([f, n]) => change(f, n) : null)}${mk}`);
   if (two) sections.push(two);
   if (fpRow) sections.push(fpRow);
   return `<h3 class="st-stat" aria-label="${esc(label)}">${sep}${sections.join(sep)}${sep}</h3>`;
@@ -968,7 +985,10 @@ function areaHedDek(m, st) {
         // England, Wentworth and Warringah, all sit in it), a seat-type or
         // another state drops it (user call 2026-11-10)
         const noteDef = m.year === "now" && NOW_AUS_DEK[m.year]?.seats?.every((n) => idx.some((i) => m.divs[i].n === n)) ? NOW_AUS_DEK[m.year] : null;
-        return { hed, dek: noteDef ? "" : note, stat: seatStat(m, st, `${hed}. ${dek}`, noteDef) };
+        // (2026-11-13: on the federal frame neither note is printed any more — the line under
+        // the title counts the changes and their list follows the figures; the sentence stays
+        // the figures' spoken label. The state frames' curated notes keep the dek's place)
+        return { hed, dek: noteDef || m.year === "now" ? "" : note, stat: seatStat(m, st, `${hed}. ${dek}`, noteDef) };
       }
       const maj = Math.floor(N / 2) + 1;
       // a state frame's prev lives under its jurisdiction when the federal GOV
@@ -1535,11 +1555,35 @@ function storyArea(m, st) {
      the two-party lens's figure is its finding; every other lens adds its
      finding in a line of prose under them */
   const figs = stat || seatStat(m, st, `${hed}.`, aus && m.year === "now" ? NOW_AUS_DEK.now : null);
-  let h = head(title, meta, winnerish || quiet ? "" : hed, quiet ? "" : dek, figs);
+  // (a seat-type filter keeps the changes in its own seats)
+  const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
+  // the pool's own changed seats, at every scope; under the Senate lanes the
+  // chamber's own change list stands in place of the House's (user report
+  // 2026-11-10), state-scoped the same way, each row linking to the senator it names
+  const list = senDeck && m.senChanges ? m.senChanges.filter((c) => st === "AUS" || c.st === st) : chList;
+  const chWord = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"][list.length] || String(list.length);
+  /* an as-it-stands frame says so under its title: how many changes stand
+     between these figures and the election's, which the seats' change line
+     then counts party by party and the list under the figures names
+     (2026-11-13: this line and that list replace the word-note that sat
+     under the seats' key and pointed "see below" past the chamber) */
+  const todayDek = isNowY(m.year) ? `${chWord} ${list.length === 1 ? "change" : "changes"} since the ${frameBaseY(m.year)} election.` : "";
+  let h = head(title, meta, winnerish || quiet ? "" : hed, quiet ? "" : dek, figs, todayDek);
   if (note) h += `<p class="st-note">${note}</p>`;
   // a state election's two-party row counts only the classic pairs: say so under the figures
   if (isState() && A.tpp != null) { const classicN = idx.filter((i) => m.divs[i].tpp != null).length; h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`; }
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
+  // the changes since the election, listed straight under the figures they explain
+  if (isNowY(m.year) && list.length) {
+    const ch = list.slice().reverse();
+    const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
+    const senRow = (c) => {
+      const i = senDeck.byName.get(c.who);
+      const inner = `<span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(STATE_SHORT[c.st])}.</b> ${ds(c.text)}.</span>`;
+      return i == null ? `<span>${inner}</span>` : `<button type="button" data-sgo="sen:${i}">${inner}</button>`;
+    };
+    h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${senDeck ? ch.map(senRow).join("") : ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
+  }
   // the preferences lens's own chart at every scope, not only beside a picked
   // seat: the flows pooled over this view's seats (user call 2026-11-10)
   if (S.lens === "flow") { const af = areaFlowRows(m, idx); if (af) h += `<div class="st-sec"><h3>Where preferences went <small>to Labor and ${vsW()}</small></h3>${af}</div>`; }
@@ -1557,24 +1601,7 @@ function storyArea(m, st) {
     const chamberMark = cls ? `${CLS_SHORT[cls].replace(" ", "-")} seats lit${aus ? "" : ` in ${STATE_NAME[st]}`}` : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
     h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${(S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? "The Senate, each member a chair" : `${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair`}"></canvas></div></div>`;
   }
-  // (a seat-type filter keeps the changes in its own seats)
-  const chPool = new Set(idx), chList = (m.changes || []).filter((c) => chPool.has(m.byName.get(c.div)));
-  // the pool's own changed seats list at every scope: the curated note's
-  // "(see below)" points at it, so it renders wherever that note can (user
-  // call 2026-11-10 — New South Wales keeps the note and its referent); under
-  // the Senate lanes the chamber's own change list stands in place of the
-  // House's (user report 2026-11-10), state-scoped the same way, each row
-  // linking to the senator it names
-  const list = senDeck && m.senChanges ? m.senChanges.filter((c) => st === "AUS" || c.st === st) : chList;
   if (isNowY(m.year) && list.length) {
-    const ch = list.slice().reverse();
-    const chN = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][ch.length] || ch.length;
-    const senRow = (c) => {
-      const i = senDeck.byName.get(c.who);
-      const inner = `<span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(STATE_SHORT[c.st])}.</b> ${ds(c.text)}.</span>`;
-      return i == null ? `<span>${inner}</span>` : `<button type="button" data-sgo="sen:${i}">${inner}</button>`;
-    };
-    h += `<div class="st-sec"><h3>Since the election <small>${chN === "one" ? "one change" : `${chN} changes`}</small></h3><div class="changes">${senDeck ? ch.map(senRow).join("") : ch.map((c) => `<button type="button" data-go="divname:${esc(c.div)}"><span class="dt">${shortDate(c.date).replace(/ 20(\d\d)$/, " ’$1")}</span><span class="tx"><b>${ds(c.div)}.</b> ${ds(c.text)}.</span></button>`).join("")}</div></div>`;
     // the federal Now's figures-basis qualifier leads its seats note in the
     // head instead ("The figures here are the 2025 election's, adjusted for
     // seat changes…", user call) — the state Now frames keep it here
@@ -2009,34 +2036,8 @@ function renderStory(force) {
   // a state (the State filter, which is the map's state selection) is the
   // area every lens's head pools, narrowed by the Seat type filter
   el.innerHTML = s.level === "aus" ? storyArea(m, "AUS") : s.level === "state" ? storyArea(m, s.st) : s.level === "div" ? storyDiv(m, s.div) : storyBooth(m, s.booth);
-  anchorGovtTag(el);
-  // a second pass after the frame settles: chip width can grow a few px once
-  // Commissioner lands, which is what makes the first-read clamp stale
-  requestAnimationFrame(() => anchorGovtTag(el));
   // the charts fill in now, not a frame on: a block that grows after the
   // story paints moves everything below it, and a walk's hold with it
   paintMiniChamber(); hydrateDists();
   if (FS.on) fsStory(was !== key);
 }
-/* the govt tag rides the figures' names row, tucked INSIDE the whole head's
-   content frame: its inner-section face flush with the head's content edge on
-   its family's side — the first cut hung the tag outside the line with its
-   FAR face against it ("…flush to the section's edge"), which read exactly
-   wrong ("Labor … govt": the stamp stops AT the edge, inside it). Computed
-   per render because an absolute child of the centred figures grid can only
-   sample its own box's x, and the content edge anchors at the panel's line;
-   rerun on resize and every story render (rAF + fonts-ready too — chip width
-   grows a px or two as Commissioner lands). */
-function anchorGovtTag(el) {
-  const stat = el && el.querySelector(".st-stat"), fg = el && el.querySelector(".st-stat .st-fg");
-  if (!stat || !fg) return;
-  // left-hung classes: the head's Government-family side (alp), and the seat
-  // head's winner side (its finalist always sits on the left figure)
-  const left = fg.classList.contains("st-fg-alp") || fg.classList.contains("st-fg-l");
-  const sb = stat.getBoundingClientRect(), tb = fg.parentElement.getBoundingClientRect();
-  // an inline right is MINUS the gap between the figures' edge and the section's
-  fg.style[left ? "right" : "left"] = "auto";
-  fg.style[left ? "left" : "right"] = left ? `${sb.left - tb.left}px` : `${tb.right - sb.right}px`;
-}
-if (typeof addEventListener === "function") addEventListener("resize", () => anchorGovtTag($("#story")));
-if (typeof document !== "undefined" && document.fonts && document.fonts.ready) document.fonts.ready.then(() => anchorGovtTag($("#story")));

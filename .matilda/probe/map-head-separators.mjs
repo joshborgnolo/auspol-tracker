@@ -34,10 +34,12 @@ const geom = await page.evaluate(() => {
   const head = document.querySelector(".st-stat");
   return [...head.querySelectorAll(".st-sep")].map((s) => {
     const cs = getComputedStyle(s), r = s.getBoundingClientRect(), hr = head.getBoundingClientRect();
-    return { top: cs.borderTopWidth, bot: cs.borderBottomWidth, h: r.height, w: r.width, hw: hr.width };
+    return { top: cs.borderTopWidth, bot: cs.borderBottomWidth, style: cs.borderTopStyle, h: r.height, w: r.width, hw: hr.width };
   });
 });
-ok("every separator is two 1px lines", geom.every((g) => g.top === "1px" && g.bot === "1px"), JSON.stringify(geom.map((g) => [g.top, g.bot])));
+// (since f2464749 the twin rule is ONE declaration, 4px double: two 1px ink lines on a 2px gap — this check still read the
+// earlier top-and-bottom 1px borders and had failed from that commit on; corrected 2026-11-15)
+ok("every separator is the one 4px double rule (two 1px lines on a 2px gap)", geom.every((g) => g.top === "4px" && g.style === "double" && g.bot === "0px"), JSON.stringify(geom.map((g) => [g.top, g.style, g.bot])));
 ok("the two lines are tightly spaced (4px tall, 2px apart)", geom.every((g) => g.h === 4), JSON.stringify(geom.map((g) => g.h)));
 ok("each separator spans the head's width", geom.every((g) => Math.abs(g.w - g.hw) < 1), JSON.stringify(geom.map((g) => `${g.w}/${g.hw}`)));
 

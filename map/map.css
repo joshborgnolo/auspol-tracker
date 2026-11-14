@@ -322,16 +322,24 @@ button { cursor: pointer; background: none; border: 0; }
 /* the today heads ("The House/Senate/Assembly today") wear the page title's Crimson */
 .st-head.st-today h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; }
 .st-hed { margin-top: 14px; font-family: var(--serif); font-weight: 700; font-size: 32px; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
-/* the Winner lens's head: result, swing, seats, each seat count's change beneath it */
+/* the head's figures (redrawn 2026-11-13): every block is a label, its big
+   figures in equal columns over their parties' names with a rule between
+   them, then a bar that measures them — the seats against the majority line,
+   the two-party count against half. The primaries are rows: name, bar, share,
+   change. */
 .st-stat { display: flex; flex-direction: column; align-items: center; margin-top: 8px; font-family: "Commissioner", var(--sans); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1; position: relative; }
 .st-stat b { font-weight: 700; }
-/* the narrow dash between figures only: the seat bar's brace and majority
-   tick and the swatches are <i> too, and scaleX squeezed the brace short of
-   the crossbench's stretch of the bar (user call 2026-11-09) */
+/* the narrow dash between figures (the breakdown cycle's pair keeps one) */
 .st-stat i:not([class], [style]) { font-style: normal; font-family: var(--sans); font-weight: 300; color: var(--ink-2); padding: 0 0.1em; display: inline-block; transform: scaleX(0.72); }
-.st-lab { align-self: flex-start; font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--ink); }
-.st-lab + .st-tpp, .st-lab + .st-grid { margin-top: 6px; }
-.st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fps + .st-lab, .st-othx + .st-lab { margin-top: 22px; }
+/* a label reads as the story's section heads do: a bold title, a lighter note
+   after it, and where the block has a column of changes, what they are on at
+   the line's end */
+.st-lab { align-self: stretch; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 13px; line-height: 1.2; color: var(--ink); }
+.st-lab > b { flex: none; font-weight: 600; }
+.st-lab > small { min-width: 0; font-size: 12px; font-weight: 400; color: var(--ink-3); }
+.st-lab > .st-lab-r { flex: none; margin-left: auto; }
+.st-lab + .st-tpp, .st-lab + .st-grid, .st-lab + .st-fprs { margin-top: 10px; }
+.st-swing + .st-lab, .st-tpp + .st-lab, .st-seats + .st-lab, .st-fprs + .st-lab, .st-fpnote + .st-lab { margin-top: 22px; }
 /* the twin rules print ink-black (user call 2026-11-09: not grey) */
 #story { --twin: var(--ink); }
 /* every separator in the story column is the ONE rule — the head's figure
@@ -340,72 +348,107 @@ button { cursor: pointer; background: none; border: 0; }
 .st-sep { align-self: stretch; height: 4px; margin-top: 10px; border-top: 4px double var(--twin); }
 .st-sep + .st-lab { margin-top: 10px; }
 .st-tpp, .st-seats { font-size: 50px; letter-spacing: -0.015em; }
-/* the figures grid: the pair's numbers across row one, each side's name under its figure's inside edge */
-.st-tpp { display: inline-grid; grid-template-columns: auto auto auto; align-items: baseline; position: relative; }
-.st-tpp > b, .st-tpp > i { grid-row: 1; }
-.st-nm { grid-row: 2; margin-top: 2px; font-size: 13px; font-weight: 600; line-height: 1.15; letter-spacing: 0.01em; }
-.st-nm-l { grid-column: 1; justify-self: end; }
-.st-nm-r { grid-column: 3; justify-self: start; }
-.st-swing { margin-top: 8px; font-size: 20px; font-weight: 500; color: var(--ink); }
-/* the govt tag rides the figures' names row, flush with the whole head's
-   outside content edge (ink/bg invert with the theme); absolute, and placed
-   exactly per render by anchorGovtTag: where the run would leave the viewport
-   it tucks inside enough to stop there */
-.st-fg { position: absolute; bottom: 1px; font-size: 11px; }
-.st-fg.st-fg-alp { right: 100%; }
-.st-fg.st-fg-lnp { left: 100%; }
+/* the rule between two figures' columns, the figures' own height and their names' */
+.st-vr { align-self: stretch; justify-self: center; width: 1px; background: var(--line); }
+/* the pair: two equal columns, each figure centred over its party's name, the bar under both */
+.st-tpp { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); justify-items: center; align-items: baseline; width: 100%; position: relative; }
+.st-tpp > b { grid-row: 1; }
+.st-tpp > .st-vr { grid-area: 1 / 2 / 3 / 3; }
+.st-nm { grid-row: 2; display: inline-flex; align-items: center; gap: 6px; max-width: calc(100% - 12px); margin-top: 4px; font-size: 13px; font-weight: 600; line-height: 1.15; letter-spacing: 0.01em; white-space: nowrap; }
+.st-nm-l { grid-column: 1; }
+.st-nm-r { grid-column: 3; }
+.st-tppbar { grid-column: 1 / -1; grid-row: 3; justify-self: stretch; position: relative; display: flex; height: 8px; margin-top: 13px; }
+.st-tppbar > i { display: block; flex: none; height: 100%; border-radius: 2px 0 0 2px; }
+.st-tppbar > i + i { flex: 1 1 0; border-radius: 0 2px 2px 0; }
+.st-tppbar > u { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; transform: translateX(-50%); background: var(--ink); box-shadow: 0 0 0 1px var(--bg); }
+.st-swing { margin-top: 13px; font-size: 14px; font-weight: 400; color: var(--ink-2); }
+.st-swing b { font-size: 16px; }
+/* the govt tag rides beside its party's name, the two centred under the
+   figure as one (ink/bg invert with the theme). It hung off the head's edge by
+   measurement until the figures took the column's full width (2026-11-13) */
+.st-fg { display: inline-flex; flex: none; font-size: 11px; }
 .st-fg > b { padding: 2px 4px 3px; background: var(--ink); color: var(--bg); font-size: 11px; font-weight: 600; line-height: 1.3; letter-spacing: 0.04em; border-radius: 2px; white-space: nowrap; }
 .st-grid { display: inline-grid; justify-items: center; align-items: baseline; }
 .st-grid small { grid-row: 2; margin-top: 7px; font-size: 16px; font-weight: 500; letter-spacing: 0; min-height: 1em; color: var(--ink); }
+/* the seats: each figure over its party's name, then its change since the election */
+.st-seats { display: grid; width: 100%; }
+.st-seats > b { grid-row: 1; }
+.st-seats > .st-vr { grid-row: 1 / span 3; }
+.st-cn { grid-row: 2; max-width: calc(100% - 8px); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; line-height: 1.15; letter-spacing: 0.01em; color: var(--ink-2); }
+.st-seats small { grid-row: 3; margin-top: 6px; font-size: 14px; color: var(--ink-2); }
 .st-seats.st-n4, .st-seats.st-n5 { font-size: 42px; }
-.st-fps { font-size: 32px; letter-spacing: -0.01em; }
-.st-fps.st-n5, .st-fps.st-n6 { font-size: 26px; }
-.st-fps small { margin-top: 6px; font-size: 15px; }
-/* the head's "Others" figure opens: underlined to say so, its contents below */
-.st-othb { padding: 0; text-decoration: underline; text-underline-offset: 5px; }
-.st-othb:hover { text-decoration-thickness: 2px; }
-.st-othb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.st-othx { display: flex; flex-wrap: wrap; justify-content: center; row-gap: 4px; column-gap: 11px; margin-top: 9px; padding: 0; font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.st-othx-r { display: inline-flex; align-items: baseline; gap: 4px; white-space: nowrap; }
-.st-othx-r i { flex: none; align-self: center; width: 7px; height: 7px; border-radius: 1px; }
-.st-othx-r b { color: var(--ink); }
-.st-othx-r small { font-size: 11px; color: var(--ink-3); }
-.st-seat-mix { display: flex; flex-direction: column; width: 100%; margin: 12px 0 18px; gap: 10px; }
+/* the primaries, a row a party: its name, a bar on the block's one scale, its
+   share, its change. The bars stand on one hairline (each row draws its own
+   length of it, reaching into the gap). */
+.st-fprs { align-self: stretch; display: grid; grid-template-columns: fit-content(46%) minmax(0, 1fr) max-content max-content; column-gap: 10px; row-gap: 8px; align-items: center; font-size: 13.5px; font-weight: 400; letter-spacing: 0; line-height: 1.2; }
+.st-fprs.st-nochg { grid-template-columns: fit-content(46%) minmax(0, 1fr) max-content; }
+.st-fpr, .st-othx { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: center; }
+.st-fpr { padding: 0; font: inherit; letter-spacing: inherit; color: inherit; text-align: left; }
+.st-fpr .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.st-fpr .bar { position: relative; display: block; height: 11px; }
+.st-fpr .bar::before { content: ""; position: absolute; left: -1px; top: -4px; bottom: -4px; width: 1px; background: var(--ink-3); }
+.st-fpr .bar > i { display: block; height: 100%; }
+.st-fpr > b { justify-self: end; font-size: 15px; font-weight: 600; color: var(--ink); }
+.st-fpr > small { justify-self: end; min-width: 2.7em; text-align: right; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+/* the "Others" row opens: a chevron says so, and what it holds lists beneath it, indented */
+.st-othb { cursor: pointer; }
+.st-othb .nm::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 7px; border-right: 1.4px solid var(--ink-2); border-bottom: 1.4px solid var(--ink-2); transform: translateY(-2px) rotate(-45deg); transition: transform .15s; }
+.st-othb[aria-expanded="true"] .nm::after { transform: translateY(-3px) rotate(45deg); }
+.st-othb:hover .nm { text-decoration: underline; text-decoration-color: var(--ink-faint); text-underline-offset: 3px; }
+.st-othb:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.st-othx { row-gap: 6px; }
+.st-fpr-sub .nm { padding-left: 12px; font-size: 12.5px; color: var(--ink-2); }
+.st-fpr-sub .bar { height: 7px; }
+.st-fpr-sub .bar > i { opacity: .8; }
+.st-fpr-sub > b { font-size: 13px; }
+.st-fpr-sub > small { font-size: 12px; color: var(--ink-3); }
+.st-fpnote { align-self: flex-start; margin-top: 11px; font-size: 12.5px; font-weight: 400; line-height: 1.3; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { .st-othb .nm::after { transition: none; } }
+/* the seats' bar: Labor's stretch, the Coalition's, then the crossbench as
+   one grey stretch, the majority line named under it */
+.st-seat-mix { display: flex; flex-direction: column; width: 100%; margin: 14px 0 4px; gap: 13px; }
 .st-seat-track { position: relative; display: block; width: 100%; }
+.st-has-maj > .st-seat-track { margin-bottom: 17px; }
 .st-seat-majority { position: absolute; top: -3px; bottom: -3px; width: 2px; transform: translateX(-50%); background: var(--ink); box-shadow: 0 0 0 1px var(--bg); }
-.st-makeup { display: flex; height: 10px; width: 100%; overflow: hidden; border-radius: 2px; }
+.st-seat-majlab { position: absolute; top: calc(100% + 7px); transform: translateX(-50%); font-size: 12px; font-weight: 400; line-height: 1; color: var(--ink-3); white-space: nowrap; }
+.st-makeup { display: flex; height: 12px; width: 100%; overflow: hidden; border-radius: 2px; }
 .st-makeup > span { display: block; flex: none; height: 100%; }
-/* the key under the bar opens out the third figure alone — the crossbench —
-   bracketed under its own stretch of the bar, its name and count leading */
-.st-seat-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--ink-2); }
-.st-has-brace { gap: 14px; }
-.st-xb-brace { position: absolute; top: calc(100% + 3px); height: 5px; border: 1px solid var(--ink-3); border-top: 0; border-radius: 0 0 2px 2px; box-sizing: border-box; }
-.st-xb-lab { display: inline-flex; align-items: baseline; gap: 5px; color: var(--ink); font-weight: 500; }
-.st-xb-lab b { font-weight: 700; }
-.st-seat-key { display: inline-flex; align-items: baseline; gap: 5px; }
-.st-seat-key::before { content: ""; flex: none; width: 7px; height: 7px; align-self: center; border-radius: 1px; background: var(--seat-colour); }
-.st-seat-key b { color: var(--ink); }
-/* the federal Now head's word-note under the count's legend — the Stat block's Commissioner, one rung down */
+.st-makeup-xb { background: var(--m-oth); }
+/* the crossbench opened out: a cell a member in the party's colour, then the
+   key in two columns, largest first, the counts in line */
+.st-xb { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+.st-xb-head { display: flex; align-items: center; gap: 14px; }
+.st-xb-lab { flex: none; font-size: 13px; font-weight: 600; line-height: 1.2; color: var(--ink); }
+.st-xb-cells { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(var(--n), minmax(2px, 13px)); gap: 2px; justify-content: end; }
+.st-xb-cells > i { display: block; aspect-ratio: 1; border-radius: 1.5px; }
+.st-seat-legend { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows, 1), auto); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 32px; font-size: 13px; font-weight: 400; line-height: 1.3; color: var(--ink-2); }
+.st-seat-key { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.st-seat-key::before { content: ""; flex: none; width: 9px; height: 9px; align-self: center; border-radius: 1px; background: var(--seat-colour); }
+.st-seat-key > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-seat-key b { flex: none; font-weight: 600; color: var(--ink); }
+/* a word-note under the count's legend — the Stat block's Commissioner, one rung down */
 .st-seat-note { align-self: flex-start; width: 100%; margin-top: 0; font-size: 12.5px; font-weight: 400; line-height: 1.45; text-align: left; text-wrap: pretty; color: var(--ink-2); }
+/* the line under an as-it-stands head's title: how many changes stand between it and the election */
+.st-headdek { margin-top: 5px; font-family: "Commissioner", var(--sans); font-size: 13px; line-height: 1.4; color: var(--ink-2); }
 /* the seat story's own head blocks (Final count / Primaries): the winner-
    head figure idiom reused inside a plain st-sec. The Final count's names-
-   above variant puts the candidate surnames over black figures, their font
-   the swing line's and their colour the party's (user call 2026-11-09) */
-.st-tpp.st-nmup .st-nm { font-size: 20px; font-weight: 500; color: var(--ink); max-width: 6.2em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.st-tpp.st-nmup .st-nm-l { grid-area: 1 / 1; justify-self: end; }
-.st-tpp.st-nmup .st-nm-r { grid-area: 1 / 3; justify-self: start; }
-.st-tpp.st-nmup > i { grid-area: 2 / 2; }
-.st-tpp.st-nmup > .fig-l { grid-area: 2 / 1; justify-self: end; }
-.st-tpp.st-nmup > .fig-r { grid-area: 2 / 3; justify-self: start; }
+   above variant puts the candidate surnames over the figures, their font
+   the swing line's and their colour ink (user call 2026-11-09) */
+.st-tpp.st-nmup .st-nm { display: block; max-width: calc(100% - 12px); margin-top: 0; font-size: 20px; font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+.st-tpp.st-nmup .st-nm-l { grid-area: 1 / 1; }
+.st-tpp.st-nmup .st-nm-r { grid-area: 1 / 3; }
+.st-tpp.st-nmup > .st-vr { grid-area: 1 / 2 / 4 / 3; }
+.st-tpp.st-nmup > .fig-l { grid-area: 2 / 1; }
+.st-tpp.st-nmup > .fig-r { grid-area: 2 / 3; }
 /* the party names the national block carries under its figures, re-added to
    the seat's names-above variant as its third row (user call 2026-11-09) —
-   long enough for "Country Liberal" to wear unclipped */
-.st-pnm { font-weight: 600; font-size: 12px; letter-spacing: 0.02em; max-width: 10em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.st-tpp.st-nmup .st-pnm-l { grid-area: 3 / 1; justify-self: end; }
-.st-tpp.st-nmup .st-pnm-r { grid-area: 3 / 3; justify-self: start; }
-/* the seat's tag hangs off the winner's figure, which always sits left — the
-   head's family-side classes describe majors; the seat's side is positional */
-.st-fg.st-fg-l { right: 100%; }
+   long enough for "Country Liberal" to wear unclipped; the seat's tag
+   (retain, gain, win) rides beside the winner's party */
+.st-pnm { display: inline-flex; align-items: center; gap: 6px; max-width: calc(100% - 12px); margin-top: 2px; font-weight: 600; font-size: 12px; letter-spacing: 0.02em; white-space: nowrap; }
+.st-pnm > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.st-tpp.st-nmup .st-pnm-l { grid-area: 3 / 1; }
+.st-tpp.st-nmup .st-pnm-r { grid-area: 3 / 3; }
+.st-tpp.st-nmup > .st-tppbar { grid-row: 4; }
 /* the head meta's figures scope menu */
 .st-scwrap { position: relative; display: inline-block; }
 .st-sclab { display: inline-flex; align-items: baseline; gap: 3px; padding: 0; font: inherit; color: inherit; }
@@ -429,9 +472,6 @@ button { cursor: pointer; background: none; border: 0; }
 .st-pv-row b { font-family: "Commissioner", var(--sans); font-weight: 500; }
 .st-pv-columns { font-size: 10px; color: var(--ink-3); overflow-wrap: anywhere; }
 .st-pv-full { margin: 8px 0 20px 8px; container-type: inline-size; }
-.st-pv-full .st-fps { font-size: clamp(20px, 9cqw, 28px); }
-.st-pv-full .st-fps.st-n5 { font-size: clamp(17px, 7cqw, 23px); }
-.st-pv-full .st-fps.st-n6 { font-size: clamp(15px, 6cqw, 23px); }
 .st-pv-full .st-lab { font-weight: 400; }
 .st-pv-full .st-pv-tpp-label { margin-top: 18px; }
 .st-pv-tpp { margin-top: 6px; font-size: 28px; letter-spacing: -0.01em; }
@@ -788,7 +828,7 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-time { height: 48px; }
   .st-hed { font-size: 27px; }
   .st-tpp, .st-seats { font-size: 44px; }
-  /* the hanging govt chip shrinks; its viewport-safe tuck is runtime-computed */
+  /* the govt chip shrinks beside its party's name */
   .st-fg > b { font-size: 10px; letter-spacing: 0.02em; padding: 2px 3px; }
   .hero-num { font-size: 44px; }
   .mp-legend .lg-s, .mp-legend .lg-note { display: none; }
@@ -1339,15 +1379,15 @@ html.mp-fs .mp-tip { z-index: 260; }
 @media (max-width: 560px) { .mp-legend .lg-sub { margin-left: 8px; padding-left: 9px; } .mp-legend .lg-sub .lg-note { display: block; } }
 
 /* ------- the control rows on one label column (design A, user call 2026-11-10) -------
-   Every labelled row (Base, State, Seat type, Jump to, Draw: legendHTML's .lg-row)
+   Every labelled row (Show — "Base" until 2026-11-13 — State, Seat type, Jump to, Draw: legendHTML's .lg-row)
    hangs its choices from one column: the tags all one width, so the choices of
    every row start on one line, and a row that wraps carries on under its first
    choice, never under its tag (the tag takes a negative margin into the row's
    padding). Each choice is a 28px band to hit; the chosen one keeps its
    underline, drawn as text decoration so the band can grow. The lens's own block
-   under Base and the notes under Draw sit in the choices' column too, and the
-   hint closes the strip under a rule, as status rather than another row. The
-   phone's menu grid (≤560px) and the retro view keep their own layouts. */
+   under Show and the notes under Draw sit in the choices' column too. The
+   phone's menu grid (≤560px) and the retro view keep their own layouts; how the
+   rows share lines on a laptop is the two-column block at this file's end. */
 @media (min-width: 561px) {
   html:not(.mp-retro) .mp-legend { --lg-col: 64px; --lg-gap: 12px; gap: 2px; container: lgstrip / inline-size; }
   html:not(.mp-retro) .mp-legend .lg-row {
@@ -1386,9 +1426,11 @@ html.mp-fs .mp-tip { z-index: 260; }
   .lg-sw::after { content: ""; position: absolute; top: 1.5px; left: 1.5px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); transition: transform .15s, background-color .15s; }
   [aria-checked="true"] > .lg-sw { background: var(--ink); border-color: var(--ink); }
   [aria-checked="true"] > .lg-sw::after { background: var(--bg); transform: translateX(10px); }
-  /* the hint: status under a rule, an info mark before it, and on a laptop the
-     search field at the line's right end (the hint fades alone while it has
-     nothing to say; the rule and the field stay) */
+  /* the hint: status under a rule, an info mark before it — where the foot line
+     stays the strip's own last line (full screen's sidebar, and the tablet's
+     strip under the map). On a laptop's map it reads under the stage instead
+     (.mp-foot, below), and the search field leads the strip: placeSearch,
+     placeFoot (2026-11-13) */
   html:not(.mp-retro) .mp-legend > .lg-foot {
     display: flex; align-items: center; gap: 8px 16px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line);
   }
@@ -1396,8 +1438,6 @@ html.mp-fs .mp-tip { z-index: 260; }
     flex: 1 1 auto; min-width: 0; margin: 0; display: flex; align-items: center; gap: 7px;
     min-height: 29px; box-sizing: border-box; white-space: normal; line-height: 1.2;
   }
-  html:not(.mp-retro) .mp-legend .lg-foot > .mp-search { flex: none; width: 260px; max-width: 50%; margin: 0 0 0 auto; } /* fixed: the hint's words change as the map zooms, and the field mustn't breathe with them */
-  html:not(.mp-retro) .mp-legend .lg-foot > .mp-search label { height: 28px; }
   /* the polling-places key is the hint's own slot, exactly — same line,
      same left edge, same height, the search field's line unchanged
      (user call 2026-11-10); its generic block styles never apply in here */
@@ -1411,7 +1451,7 @@ html.mp-fs .mp-tip { z-index: 260; }
 /* a phone's hint is off (its search stands atop the map): no foot line — but
    the polling-places key, which moved into that line, keeps standing alone */
 @media (max-width: 560px) {
-  html:not(.mp-retro) .mp-legend > .lg-foot > .lg-hint, html:not(.mp-retro) .mp-legend > .lg-foot > .mp-search { display: none; }
+  html:not(.mp-retro) .mp-legend > .lg-foot > .lg-hint { display: none; }
   html:not(.mp-retro) .mp-legend > .lg-foot { border-top: 0; margin-top: 6px; padding-top: 0; }
   html:not(.mp-retro) .mp-legend > .lg-foot > .lg-shapes { min-height: 0; }
   .mp-retro .mp-legend > .lg-foot { display: none; }
@@ -1430,6 +1470,86 @@ html.mp-fs .mp-tip { z-index: 260; }
   html:not(.mp-retro) #cities.lg-row > b { grid-column: 1; margin: 0; align-self: center; }
   html:not(.mp-retro) #cities.lg-row > button { justify-content: flex-start; }
   html:not(.mp-retro) #cities.lg-row > button:nth-of-type(4n + 1) { grid-column: 2; }
+}
+
+/* ------- the strip in two columns, the foot under the map, the wider page (2026-11-13) -------
+   A laptop's strip pairs its rows instead of stacking them, so the map starts
+   higher and stands taller: the left column finds and narrows (the search
+   field, State, Show and the lens's own block), the right column moves and
+   draws (Jump to, Seat type, Draw and its notes). The strip is one grid of two
+   columns in which every child spans both unless a rule below seats it:
+     wide (the strip 940px or more)   search | Jump to · State | Seat type · Show | Draw
+     middling (768px or more)         Show … search · State | Seat type · Jump to · Draw
+     narrow                           Show … search, then a row each, as before
+   (the left column never falls under the State row's own width, 364px with a
+   little to spare, while the strip can spare it, so the pair holds a line each
+   from 768px up — a 1280px window's strip is 772px)
+   The seats are told by what the strip holds, not by script: the search field
+   is the strip's own first child only on a laptop's map (placeSearch), so the
+   chamber and the list — the field on their Show row — pair only their two
+   filters. The phone's menu grid (≤560px), the tablet's strip under the map
+   (≤860px), full screen's sidebar (narrow, by its own width) and the retro
+   view keep the layouts they had. */
+@media (min-width: 861px) {
+  html:not(.mp-retro) .mp-legend { display: grid; grid-template-columns: minmax(min(364px, 55%), 2fr) minmax(0, 3fr); column-gap: 24px; row-gap: 2px; align-items: start; min-height: 0; margin-bottom: 10px; padding-bottom: 0; border-bottom: 0; }
+  html:not(.mp-retro) .mp-legend > * { grid-column: 1 / -1; }
+  /* narrow and middling: the field ends the Show row */
+  html:not(.mp-retro) .mp-legend > .mp-search { grid-area: 1 / 2; justify-self: end; align-self: center; width: 260px; max-width: 100%; margin: 0; }
+  html:not(.mp-retro) .mp-legend > .mp-search label { height: 28px; }
+  html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-toolbar { grid-area: 1 / 1; }
+  @container lgstrip (min-width: 768px) {
+    html:not(.mp-retro) .mp-legend > #state-filters { grid-column: 1; }
+    html:not(.mp-retro) .mp-legend > #type-filters { grid-column: 2; }
+  }
+  @container lgstrip (min-width: 940px) {
+    /* the field leads, as wide as its column; each pair shares a line */
+    html:not(.mp-retro) .mp-legend > .mp-search { grid-area: 1 / 1; justify-self: stretch; width: auto; }
+    html:not(.mp-retro) .mp-legend > .mp-search label { height: 32px; border-radius: 3px; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ #cities { grid-area: 1 / 2; align-self: center; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ #state-filters { grid-area: 2 / 1; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ #type-filters { grid-area: 2 / 2; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-toolbar { grid-area: 3 / 1; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-draw { grid-area: 3 / 2; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-sub { grid-area: 4 / 1 / span 2 / auto; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-dn { grid-area: 4 / 2; }
+    html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-dn ~ .lg-dn { grid-area: 5 / 2; }
+    /* a frame with no filters (a state's election) closes the gap they'd leave */
+    html:not(.mp-retro) .mp-legend:not(:has(> #state-filters)) > .mp-search ~ .lg-toolbar { grid-area: 2 / 1; }
+    html:not(.mp-retro) .mp-legend:not(:has(> #state-filters)) > .mp-search ~ .lg-draw { grid-area: 2 / 2; }
+    html:not(.mp-retro) .mp-legend:not(:has(> #state-filters)) > .mp-search ~ .lg-sub { grid-area: 3 / 1 / span 2 / auto; }
+    html:not(.mp-retro) .mp-legend:not(:has(> #state-filters)) > .mp-search ~ .lg-dn { grid-area: 3 / 2; }
+    html:not(.mp-retro) .mp-legend:not(:has(> #state-filters)) > .mp-search ~ .lg-dn ~ .lg-dn { grid-area: 4 / 2; }
+    /* the draw's notes sit under Draw's choices, as the lens's block sits under Show's */
+    html:not(.mp-retro) .mp-legend > .mp-search ~ .lg-dn { margin-top: 0; }
+  }
+}
+/* the foot line under the map: the zoom hint, or the polling places' key in its slot */
+.mp-foot { flex: none; margin-top: 4px; }
+.mp-foot[hidden] { display: none; }
+.mp-foot > .lg-foot { display: flex; align-items: center; gap: 8px 16px; }
+.mp-foot .lg-foot > .lg-hint { flex: 1 1 auto; min-width: 0; margin: 0; display: flex; align-items: center; gap: 7px; min-height: 29px; box-sizing: border-box; line-height: 1.2; }
+.mp-foot .lg-foot > .lg-shapes { flex: 1 1 auto; min-width: 0; margin: 0; padding: 0; border: 0; gap: 12px; display: flex; align-items: center; min-height: 29px; box-sizing: border-box; }
+.mp-foot .lg-foot > .lg-hint::before {
+  content: ""; flex: none; width: 14px; height: 14px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='7' r='5.8' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M7 6.2V10' stroke='%23000' stroke-width='1.3'/%3E%3Ccircle cx='7' cy='4.2' r='.8'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='7' r='5.8' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3Cpath d='M7 6.2V10' stroke='%23000' stroke-width='1.3'/%3E%3Ccircle cx='7' cy='4.2' r='.8'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.mp-foot + .mp-legend + .mp-frames, .mp-foot:not([hidden]) ~ .mp-frames { margin-top: 2px; }
+/* the zoom control is one small plate on the map, not bare glyphs on the sea */
+html:not(.mp-retro) .mp-view:not(.fs) .mp-zoom { right: 10px; top: 10px; gap: 0; background: var(--bg); border: 1px solid var(--ink-faint); border-radius: 4px; overflow: hidden; }
+html:not(.mp-retro) .mp-view:not(.fs) .mp-zoom button { text-shadow: none; color: var(--ink); }
+html:not(.mp-retro) .mp-view:not(.fs) .mp-zoom button + button { border-top: 1px solid var(--line); }
+html:not(.mp-retro) .mp-view:not(.fs) .mp-zoom button[hidden] { display: none; }
+html:not(.mp-retro) .mp-view:not(.fs) .mp-zoom button:hover { background: color-mix(in oklch, var(--ink) 6%, var(--bg)); }
+html:not(.mp-retro) .mp-view:not(.fs) .mp-zoom svg path[stroke="white"] { display: none; }
+/* the page is a map: past the shell's column it takes the window's width, the
+   gutters easing from the shell's 64px to 32px as it widens, so nothing jumps
+   where the widening starts. The masthead and the tab row widen with it and
+   keep one left edge with the map. */
+@media (min-width: 1281px) {
+  html:root:not(.mp-retro) { --sh-maxw: 1560px; --sh-gutter: clamp(32px, calc(64px - (100vw - 1280px) * 0.125), 64px); }
+  /* (the notes under the map keep the shell's measure for reading) */
+  html:not(.mp-retro) .mp-notes > * { max-width: 1152px; }
 }
 
 /* =============================== the retro pages' chrome ===============================
@@ -1634,19 +1754,17 @@ html.mp-retro .st-stat { margin-top: 6px; color: #000; }
 html.mp-retro .st-sep { display: none; }
 html.mp-retro .st-lab { align-self: stretch; margin: 10px 0 6px !important; padding: 4px 7px; background: var(--rt-face); box-shadow: var(--rt-raised); font-size: 12px; font-weight: 700; color: #000; line-height: 1.2; }
 html.mp-retro .st-stat > .st-lab:first-child, html.mp-retro .st-stat > .st-sep:first-child + .st-lab { margin-top: 2px !important; }
-html.mp-retro .st-tpp, html.mp-retro .st-seats, html.mp-retro .st-fps, html.mp-retro .st-grid b { font-family: Tahoma, Verdana, sans-serif; font-weight: 700; letter-spacing: -0.03em; }
+html.mp-retro .st-tpp, html.mp-retro .st-seats, html.mp-retro .st-grid b { font-family: Tahoma, Verdana, sans-serif; font-weight: 700; letter-spacing: -0.03em; }
 html.mp-retro .st-tpp, html.mp-retro .st-seats { font-size: 44px; }
 html.mp-retro .st-seats.st-n4, html.mp-retro .st-seats.st-n5 { font-size: 36px; }
-html.mp-retro .st-fps { font-size: 25px; }
-html.mp-retro .st-fps.st-n5, html.mp-retro .st-fps.st-n6 { font-size: 20px; }
 html.mp-retro .st-stat i { font-family: Tahoma, Verdana, sans-serif; color: #000; font-weight: 400; }
 html.mp-retro .st-grid small, html.mp-retro .st-swing, html.mp-retro .st-nm { font-family: Tahoma, Verdana, sans-serif; font-weight: 700; }
 html.mp-retro .st-grid small { font-size: 14px; }
-html.mp-retro .st-swing { color: #000; font-size: 18px; }
+html.mp-retro .st-swing { color: #000; font-size: 13px; }
+html.mp-retro .st-swing b { font-size: 15px; }
 html.mp-retro .st-fg > b { background: #404040; color: #fff; border-radius: 0; box-shadow: var(--rt-thin-up); font-family: var(--rt-font); }
 html.mp-retro .st-makeup { border-radius: 0; height: 14px; box-shadow: var(--rt-sunken); padding: 2px; background: #fff; box-sizing: border-box; }
 html.mp-retro .st-seat-majority { background: #000; box-shadow: 0 0 0 1px #fff; }
-html.mp-retro .st-xb-brace { border-color: #000; }
 html.mp-retro .st-seat-legend, html.mp-retro .st-seat-note, html.mp-retro .st-find, html.mp-retro .st-note, html.mp-retro .st-foot, html.mp-retro .st-dek { font-size: 12px; color: #000; }
 html.mp-retro .st-seat-key::before { border-radius: 0; width: 9px; height: 9px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .55); }
 html.mp-retro .st-find > b { color: #000; font-weight: 700; }
