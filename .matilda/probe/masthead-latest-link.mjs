@@ -94,7 +94,7 @@ const probeView = async (width, height, sel, label) => {
   return ret;
 };
 
-/* phone home: the rd-head-compact sentence under the tagline */
+/* phone home: the rd-head-compact sentence under the lockup row */
 const phone = await probeView(390, 844, ".rd-head-compact", "phone");
 /* laptop home: the Latest-poll meta-item in .rd-head-meta */
 const desk = await probeView(1280, 900, ".rd-head-meta .meta-v", "laptop");

@@ -57,7 +57,6 @@ const lockupFn = () => {
     trackInk3: getComputedStyle(track).color,
     nameInk: Math.round(ink(name) * 10) / 10,
     trackInk: Math.round(ink(track) * 10) / 10,
-    taglineSize: getComputedStyle(document.querySelector(".tagline, .sh-tagline")).fontSize,
     imgs: document.querySelectorAll(".wordmark img, .lockup img, .sh-lockup img, .wm-glyph img").length,
     dialSvgs: document.querySelectorAll("svg.wm-dial").length,
     dialW: dial ? Math.round(dial.getBoundingClientRect().width) : 0,
@@ -213,16 +212,14 @@ ok(satLock.metaSubs.length === 3 &&
    /^\d+ pollsters$/.test(satLock.metaSubs[1]) && /^\d+ months at most$/.test(satLock.metaSubs[2]),
    `satellite status block notes match the design (${satLock.metaSubs.join(" · ")})`);
 
-/* type parity: face, weights and SIZES – the rd redesign's 34px wordmark
-   and 16px tagline, worn identically on both */
+/* type parity: face, weights and SIZES – the rd redesign's 34px wordmark,
+   worn identically on both */
 ok(arch.nameFont === main.nameFont &&
    arch.nameWeight === main.nameWeight && arch.trackWeight === main.trackWeight,
    `wordmark type: same face and weights (${main.nameFont}, ${main.nameWeight}/${main.trackWeight})`);
 ok(arch.nameSize === "34px" && arch.nameSize === main.nameSize,
    `wordmark size parity (main ${main.nameSize}, sat ${arch.nameSize})`);
 ok(arch.trackInk3 === main.trackInk3, `wordmark track ink identical (${main.trackInk3})`);
-ok(arch.taglineSize === "16px" && arch.taglineSize === main.taglineSize,
-   `tagline size parity (main ${main.taglineSize}, sat ${arch.taglineSize})`);
 ok(arch.alp === main.alp, `--alp resolves identically (${main.alp})`);
 ok(arch.arcStroke === main.arcStroke, `arc colour identical (${main.arcStroke})`);
 ok(JSON.stringify(arch.barStrokes) === JSON.stringify(main.barStrokes), "graduation colours identical");
@@ -335,7 +332,6 @@ const scrapeChrome = (S) => {
   return {
     skip: txt(S.skip),
     wmName: txt(".wm-name"), wmTrack: txt(".wm-track"), wmSr: txt(".wm-sr"),
-    tagline: txt(S.tagline),
     metaK: [...document.querySelectorAll(S.metaK)].map((el) => el.textContent.replace(/\s+/g, " ").trim()),
     theme: [...document.querySelectorAll(S.themeBtn)].map((b) => ({ l: b.getAttribute("aria-label"), s: sigOf(b) })),
     score: txt(S.score),
@@ -343,10 +339,10 @@ const scrapeChrome = (S) => {
     compactB: txt(S.compactB),
   };
 };
-const MAIN_CH = { skip: "a.skip-link", tagline: ".tagline", metaK: ".rd-head-meta .meta-k",
+const MAIN_CH = { skip: "a.skip-link", metaK: ".rd-head-meta .meta-k",
                   themeBtn: '.theme-seg [aria-label$=" mode"]', score: ".ts-eyebrow",
                   dial: "button.wm-glyph", compactB: ".rd-head-compact b" };
-const SAT_CH = { skip: "a.sh-skip", tagline: ".sh-tagline", metaK: ".sh-meta .sh-meta-k",
+const SAT_CH = { skip: "a.sh-skip", metaK: ".sh-meta .sh-meta-k",
                  themeBtn: '.sh-theme [aria-label$=" mode"]', score: ".sh-score .sh-eyebrow",
                  dial: "a.wm-glyph", compactB: ".sh-head-compact b" };
 const mainW = await page.evaluate(scrapeChrome, MAIN_CH);
@@ -369,10 +365,6 @@ ok(satW.theme[0].l === chrome.theme.light.label && satW.theme[1].l === chrome.th
 ok(satW.score === chrome.score.eyebrow, `the score eyebrow is the lift ("${chrome.score.eyebrow}")`);
 ok(satW.dialTitle === chrome.dial.title && satW.dialAction === chrome.dial.action, "the dial titles are the lift");
 ok(satW.compactB === chrome.compact.b, `the compact head is the lift ("${chrome.compact.b}")`);
-ok(mainW.tagline.startsWith(chrome.tagline.a.trim()) && mainW.tagline.endsWith(chrome.tagline.b),
-   `the main tagline frames its past word with the lift (${mainW.tagline})`);
-ok(satW.tagline.startsWith(chrome.tagline.a.trim()) && satW.tagline.endsWith(chrome.tagline.b),
-   `the satellite tagline frames it likewise (${satW.tagline})`);
 
 const sp = await browser.newPage();
 await sp.setViewport({ width: 1280, height: 900 });
@@ -386,9 +378,7 @@ ok(story.hash === "", "the #story hash is eaten once opened");
 
 /* the BAKED fallback: with page scripts off, auspol-now.json's copy block
    can't reach the DOM, so everything the satellite wears must come from
-   what shellHeader baked at apply time – assert the whole contract is
-   there, down to the tagline's "twenty" placeholder (only the bake says
-   it; the runtime overlay would have replaced it by now) */
+   what shellHeader baked at apply time – the whole contract baked in */
 const nojs = await browser.newPage();
 await nojs.setJavaScriptEnabled(false);
 await nojs.setViewport({ width: 1280, height: 900 });
@@ -398,8 +388,6 @@ console.log("baked    ", JSON.stringify(baked));
 ok(baked.wmName === chrome.wm.name && baked.wmTrack === chrome.wm.track && baked.wmSr === chrome.wm.sr,
    "no-JS: the wordmark's words are baked in");
 ok(baked.skip === chrome.skip, "no-JS: the skip link is baked in");
-ok(baked.tagline.startsWith(chrome.tagline.a.trim()) && baked.tagline.includes("twenty") &&
-   baked.tagline.endsWith(chrome.tagline.b), `no-JS: the tagline is baked in, placeholder intact (${baked.tagline})`);
 ok(JSON.stringify(baked.metaK) === JSON.stringify([chrome.meta.k1, chrome.meta.k2, chrome.meta.k3]),
    "no-JS: the status-block labels are baked in");
 ok(JSON.stringify(baked.theme) === JSON.stringify(satW.theme), "no-JS: the theme switch is baked in, artwork inline");

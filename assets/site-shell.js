@@ -1043,7 +1043,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     if (next && window.ResizeObserver) new ResizeObserver(function () { fitNext(); }).observe(next.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitNext(); });
   };
-  /* the masthead's status block, tagline year and compact line, as the
+  /* the masthead's status block and compact line, as the
      main page's Header fills them (rd-head-meta / rd-head-compact); the
      freshness reading is its freshness() (73de0c58…js): whole Sydney
      calendar days, fresh to a week, aging to three */
@@ -1109,11 +1109,6 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       if (wsr) wsr.textContent = cp.wm.sr;
       alignWm();
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignWm);
-    }
-    var tag = document.querySelector(".sh-tagline");
-    if (tag && cp.tagline) {
-      var past0 = tag.querySelector(".sh-past"), pastNow = past0 ? past0.textContent : "1943";
-      tag.innerHTML = esc(cp.tagline.a) + '<span class="sh-past">' + esc(pastNow) + "</span>" + esc(cp.tagline.b);
     }
     var skip = document.querySelector(".sh-skip");
     if (skip && cp.skip) skip.textContent = cp.skip;
@@ -1206,7 +1201,6 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
   var fillHead = function (n) {
     var W = (n.copy && n.copy.meta) || {};
     var wPolls = W.polls || "polls", wPollsters = W.pollsters || "pollsters", wMonths = W.monthsAtMost || "months at most";
-    if (n.past) setText(".sh-past", n.past);
     var L = n.latest;
     if (!L) return;
     var days = Math.max(0, Math.round((easternNow().day - Date.parse(L.publishedISO)) / 86400000));

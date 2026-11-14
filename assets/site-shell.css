@@ -157,11 +157,6 @@
    way home), the dial alone beside it */
 .sh-lockup { display: flex; align-items: center; gap: 12px; }
 a.wordmark { text-decoration: none; }
-.sh-tagline {
-  margin: 10px 0 0; max-width: 440px;
-  font-family: "Crimson Text", var(--serif); font-weight: 400;
-  font-size: 16px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
-}
 .sh-head-compact { display: none; }
 .sh-head a.mh-latest { color: inherit; text-decoration: none; }
 .sh-head a.mh-latest:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -192,7 +187,6 @@ a.wordmark { text-decoration: none; }
   }
   .sh-head-compact b { font-weight: 600; color: var(--ink); }
   .sh-head-compact .sh-fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; width: 6px; height: 6px; }
-  .sh-tagline { margin-top: 12px; }
 }
 @media (max-width: 560px) {
   /* the switch pins to the header corner as the main page's does, and the

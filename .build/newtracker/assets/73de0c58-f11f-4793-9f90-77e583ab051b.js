@@ -352,12 +352,6 @@ function Header({ isDark, onToggleTheme, rd }) {
       if (ss) ss.inert = true;
     };
   }, [staticView]);
-  /* The tagline dates its back-history from the EARLIEST past term in the
-     cycle data (the Now term excluded), so a Past-cycles extension further
-     back re-dates the sentence on its own. pastTerms stays the guard for a
-     jurisdiction with no past terms at all: the clause then stays off. */
-  const pastTerms = D.cycles.filter((c) => !c.current).length;
-  const pastFirst = pastTerms ? Math.min(...D.cycles.filter((c) => !c.current).map((c) => c.year)) : null;
   /* /vic/'s words (window.JUR): "vicpol", "Victorian state". Each line the
      satellites' shell lifts from this source (site-shell.mjs parseChrome)
      keeps its federal redesign JSX verbatim; the jurisdiction's variant AND
@@ -449,11 +443,6 @@ function Header({ isDark, onToggleTheme, rd }) {
           </button>
           <span id="wm-action" hidden>Replays the term on the masthead dial</span>
         </div>
-        {/* plain text: the design flip this sentence used to carry moved
-            off the page 2026-10-03; the old design is viewable at
-            ?design=old while its code ships (see the design flag below). */}
-        {!J ? <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, and for all since {pastFirst}.</p>
-            : <p className={"tagline"}>Aggregated opinion polling for the next {J.electionWords.split(" ")[0]} <br className="tagline-br"></br>{J.electionWords.split(" ").slice(1).join(" ")} election{pastTerms ? ", and for all since " + pastFirst : ""}.</p>}
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
                 onClick={() => setStaticView(true)}></span>{" "}
@@ -461,7 +450,7 @@ function Header({ isDark, onToggleTheme, rd }) {
         </div>
       </div>
       {rd && (
-        /* the phone's status, under the tagline: one line, as the old
+        /* the phone's status, under the lockup row: one line, as the old
            design's was - the latest poll and how many this term. The
            election date is the laptop block's; a second line for it cost
            the phone 20px above the headline figure. */

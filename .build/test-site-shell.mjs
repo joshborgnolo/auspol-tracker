@@ -109,7 +109,7 @@ assert.equal(mainChrome(), mainChrome(), "mainChrome is memoised");
 const chrome = mainChrome();
 assert.equal(chrome.tabs[0].id, "now", "the parse carries the main page's tabs");
 for (const [what, v] of [["wordmark name", chrome.wm.name], ["wordmark track", chrome.wm.track],
-                         ["wordmark sr suffix", chrome.wm.sr], ["tagline tail", chrome.tagline.b],
+                         ["wordmark sr suffix", chrome.wm.sr],
                          ["status label 1", chrome.meta.k1], ["status label 2", chrome.meta.k2],
                          ["status label 3", chrome.meta.k3], ["published prefix", chrome.meta.published],
                          ["polls word", chrome.meta.polls], ["pollsters word", chrome.meta.pollsters],
@@ -117,7 +117,6 @@ for (const [what, v] of [["wordmark name", chrome.wm.name], ["wordmark track", c
                          ["dial title", chrome.dial.title], ["dial action", chrome.dial.action],
                          ["skip link", chrome.skip]])
   assert.ok(typeof v === "string" && v.length > 0, `chrome lift: ${what} came through`);
-assert.ok(chrome.tagline.a.endsWith(" "), "the tagline head keeps its trailing space for the date word");
 assert.ok(chrome.meta.monthsAtMost.endsWith("at most"), "the months-at-most phrase lifted whole");
 for (const t of ["light", "dark"]) {
   assert.ok(chrome.theme[t].svg.startsWith("<svg"), `the ${t}-theme artwork lifted`);
@@ -125,7 +124,7 @@ for (const t of ["light", "dark"]) {
 }
 // the baked header carries the lifted words (the interpolation itself is pinned, not just the parse)
 const head = shellHeader({});
-for (const [what, v] of [["wordmark name", chrome.wm.name], ["tagline tail", chrome.tagline.b],
+for (const [what, v] of [["wordmark name", chrome.wm.name],
                          ["status label", chrome.meta.k1], ["skip link", chrome.skip],
                          ["light artwork", chrome.theme.light.svg], ["score eyebrow", chrome.score.eyebrow],
                          ["dial title", chrome.dial.title]])
@@ -167,7 +166,7 @@ const assetDir = path.join(ROOT, ".build", "newtracker", "assets");
 let headSrc = null, scoreSrc = null;
 for (const f of fs.readdirSync(assetDir).filter((f) => /\.jsx?$/.test(f)).sort()) {
   const s = fs.readFileSync(path.join(assetDir, f), "utf8");
-  if (!headSrc && /className="wm-name"/.test(s) && /className="tagline"/.test(s)) headSrc = s;
+  if (!headSrc && /className="wm-name"/.test(s) && /className="rd-head-compact"/.test(s)) headSrc = s;
   if (!scoreSrc && /ts-eyebrow/.test(s)) scoreSrc = s;
 }
 assert.ok(headSrc && scoreSrc, "the masthead and score assets resolve (mainChrome's own anchor check)");
@@ -175,8 +174,8 @@ assert.deepEqual(parseChrome(headSrc, scoreSrc, chrome.tabs).wm, chrome.wm, "a d
 assert.throws(() => parseChrome(headSrc.replace('className="wm-name"', 'className="wm-gone"'), scoreSrc, chrome.tabs),
   /wordmark name/, "a moved wordmark anchor throws");
 assert.throws(() => parseChrome(headSrc, "", chrome.tabs), /score eyebrow/, "a missing score asset throws");
-const noTag = headSrc.replace(/className="tagline">([\s\S]*?)<\/p>/, "x");
-assert.throws(() => parseChrome(noTag, scoreSrc, chrome.tabs), /tagline/, "a refactored tagline throws");
+const noMeta = headSrc.replace("head-meta rd-head-meta", "head-meta rd-head-gone");
+assert.throws(() => parseChrome(noMeta, scoreSrc, chrome.tabs), /status block/, "a moved status-block anchor throws");
 const noLede = headSrc.replace('className="colo-lede"', 'className="colo-gone"');
 assert.throws(() => parseChrome(noLede, scoreSrc, chrome.tabs), /colophon lede/, "a moved colophon anchor throws");
 

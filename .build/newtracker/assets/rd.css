@@ -534,24 +534,18 @@ body.rd .rd-link-arch { color: var(--ink-3); font-weight: 400; }
 body.rd .rd-link-arch .rd-link-t { text-decoration-style: dotted; }
 
 /* ---------- masthead ------------------------------------------------------
-   Identity left - the lockup a size up, the tagline in the serif - and on
-   the right a status block of three facts with their notes under them, then
-   the rocker. No rule under it: the tab row carries the page's first rule. */
+   Identity left - the lockup a size up - and on the right a status block of
+   three facts with their notes under them, then the rocker. No rule under
+   it: the tab row carries the page's first rule. */
 /* Tightened from the board's masthead (38px wordmark, 18px tagline over two
    lines, 40px to the tabs), which put the tab bar 55px lower than the old
    design's and the headline figure 62px lower, most of it an empty band
    under the tagline. The content is the board's; the air is taken out. The
-   tagline keeps its two lines: on one, it pushes the status block to a row
-   of its own. */
+   tagline itself went Nov 2026 - one descriptor line less above every page. */
 body.rd .site-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 16px; align-items: flex-start; }
 body.rd .wordmark, body.rd .wm-name, body.rd .wordmark.stacked .wm-track { font-size: 34px; }
 body.rd .wordmark.stacked .wm-track { color: var(--ink-2); }
 body.rd .wm-dial { width: 57px; height: 39.7px; }
-body.rd .tagline {
-  margin: 10px 0 0; max-width: 440px;
-  font-size: 16px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
-}
-body.rd .tagline-br { display: none; }
 body.rd .head-right { align-items: flex-start; gap: 28px; padding-top: 4px; }
 body.rd .rd-head-meta { align-items: stretch; gap: 24px; }
 body.rd .rd-head-meta .meta-item { gap: 3px; }
@@ -610,7 +604,6 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .site-head { margin-bottom: 20px; }
   body.rd .wordmark, body.rd .wm-name, body.rd .wordmark.stacked .wm-track { font-size: 32px; }
   body.rd .wm-dial { width: 54px; height: 37.6px; }
-  body.rd .tagline { margin-top: 12px; font-size: 16px; }
   body.rd .rd-head-compact {
     display: flex; align-items: baseline; gap: 8px; margin-top: 10px;
     font-size: 13px; line-height: 1.5; color: var(--ink-3); font-variant-numeric: tabular-nums;

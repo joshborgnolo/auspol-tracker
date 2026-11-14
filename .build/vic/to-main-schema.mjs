@@ -112,7 +112,7 @@ const eraByKey = (slot, key) => (VIC_ERAS[slot] || []).find((e) => e.key === key
 export const VIC_JURISDICTION = {
   id: "vic",
   name: "Victoria",
-  // the wordmark's first word and the tagline's election (user call
+  // the wordmark's first word and the pages' election wording (user call
   // 2026-10-05: "just replace aus with vic" – vicpol tracker; "Victorian
   // state" for "Australian federal")
   brand: "vicpol",

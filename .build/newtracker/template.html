@@ -942,14 +942,6 @@ body.dark {
 .wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
 @media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 /* /shell-copy */
-.tagline {
-  /* negative bottom margin drops the serif's last line ~1.5px so the tagline
-     text baseline-to-bottom edge optically matches the head-meta values */
-  margin: 7px 0 -1.5px;
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 15px; color: var(--ink-3); text-wrap: balance;
-}
 /* compact freshness line – only surfaced on small screens, where the full
    meta block is hidden (see the 560px breakpoint) */
 .head-meta-compact { display: none; }
@@ -3498,9 +3490,9 @@ button.acc-spread[aria-pressed="true"] {
 .colo-about { padding-right: 40px; border-right: 1px solid var(--line); min-width: 0; }
 .colo-ways { padding-left: 40px; min-width: 0; }
 
-/* The site's sentence about itself, in the masthead tagline's serif: the page
-   opens on one serif line saying what it shows and closes on another saying
-   what it is. Balanced rather than ragged - at this measure it sets in one
+/* The site's sentence about itself, in the masthead's serif: the page
+   opens on one serif headline and closes on another saying what it is.
+   Balanced rather than ragged - at this measure it sets in one
    line or two, and the two-line break should not leave a single word. */
 .colo-lede {
   margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.45;
@@ -3600,12 +3592,9 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
    overflow the document's right edge. The rest of the phone design still
    flips at 560. */
 @media (max-width: 640.98px) {
-  /* tagline now carries the election context, so drop the whole meta block
-     (incl. the Next election anchor) on small screens */
+  /* the meta block (incl. the Next election anchor) costs a phone too much
+     beside the lockup, so the compact line stands in for it */
   .head-meta { display: none; }
-  /* the tagline keeps its forced break on phone: with the meta gone it wraps
-     right after "next", and the desktop break after "Australian" is the
-     nicer clause split */
   /* …and surface a single compact freshness line in its place */
   .head-meta-compact {
     display: flex; align-items: center; gap: 8px;
@@ -3617,7 +3606,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
      wraps down beside the meta on narrow screens */
   .site-head { flex-direction: column; align-items: flex-start; gap: 13px; }
   /* reserve toggle space on the lockup row only – not the brand wrapper –
-     so the tagline below the (top-pinned) toggle can use the full width */
+     so the compact line below the (top-pinned) toggle can use the full width */
   .brand { padding-right: 0; }
   .lockup { padding-right: 92px; }
   /* head-right's own box leaves the flow (meta is hidden, the toggle is

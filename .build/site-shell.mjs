@@ -169,7 +169,7 @@ const NOW_LABEL = TABS.find((t) => t.id === "now").label;
    main page moved on from (the 2026-10-03 Snapshot → Now rename sat in a
    hand copy here for a day; the colophon then lurked as literals in
    shellFooter until the same lift covered it). parseChrome picks the words
-   out of the compiled newtracker asset — wordmark, tagline, status-block
+   out of the compiled newtracker asset — wordmark, status-block
    labels, phone compact, theme switch (svg artwork included), score
    eyebrow, dial and skip-link titles, and MethodNote's colophon sentences —
    and mainChrome() feeds them to THREE consumers of one contract:
@@ -197,10 +197,6 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
     .replace(/<[^>]+>/g, "").replace(/\s+/g, "");
   const track = one(/className="wm-track"[^>]*>([^<]+)</, "wordmark track");
   const sr = one(/className="wm-sr">([^<]+)</, "wordmark screen-reader suffix");
-  const tagM = headSrc.match(/className="tagline">([\s\S]*?)\{pastFirst\}([\s\S]*?)<\/p>/);
-  if (!tagM) miss("tagline", "the header asset");
-  const tagA = unesc(tagM[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").replace(/\s*$/, "") + " ";
-  const tagB = unesc(tagM[2].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
   const compI = headSrc.indexOf('rd-head-compact');
   if (compI < 0) miss("phone compact", "the header asset");
   const comp = headSrc.slice(compI, compI + 1600);
@@ -243,7 +239,6 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
     tabs: tabs.map(({ id, label, pinHide, menu }) => ({ id, label, ...(pinHide ? { pinHide: true } : {}), ...(menu ? { menu: true } : {}) })),
     skip: one(/className="skip-link"[\s\S]*?>\s*([^{}<>]+?)\s*<\/a>/, "skip link"),
     wm: { name: word, track, sr },
-    tagline: { a: tagA, b: tagB },
     meta: { k1: ks[0], k2: ks[1], k3: ks[2],
             published: cM(/className="meta-s">(\w+) \{fresh/, "published prefix"),
             polls: cM(/pollsTracked\} (\w+)</, "polls word"),
@@ -275,7 +270,7 @@ export const mainChrome = (() => {
     let head = null, score = null;
     for (const f of fs.readdirSync(dir).filter((f) => /\.jsx?$/.test(f)).sort()) {
       const s = fs.readFileSync(path.join(dir, f), "utf8");
-      if (!head && /className="wm-name"/.test(s) && /className="tagline"/.test(s)) head = { f, s };
+      if (!head && /className="wm-name"/.test(s) && /className="rd-head-compact"/.test(s)) head = { f, s };
       if (!score && /ts-eyebrow/.test(s)) score = { f, s };
     }
     if (!head) throw new Error("site-shell: no asset in .build/newtracker/assets carries the main page's masthead");
@@ -371,8 +366,8 @@ export function shellHeader({ tab, menu, page, file } = {}) {
      compact names the newest poll rather than just the day it landed – all
      filled off auspol-now.json. Every WORD here is CHROME's (mainChrome()),
      the main page's own text lifted at apply time, so this markup only ever
-     decides shape; the .sh-past year is the one placeholder, filled live.
-     ("The interactive tracker" wordmark link title stays the shell's own –
+     decides shape. ("The interactive tracker" wordmark link title stays
+     the shell's own –
      the main page's wordmark is a heading, not a link, and has none.) */
   return `<a class="sh-skip" href="#sh-content">${C.skip}</a>
 <div class="sh-frame sh-top">
@@ -392,7 +387,6 @@ export function shellHeader({ tab, menu, page, file } = {}) {
       </a>
       <span id="wm-action" hidden>${C.dial.action}</span>
     </div>
-    <p class="sh-tagline">${C.tagline.a}<span class="sh-past">1943</span>${C.tagline.b}</p>
     <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>${C.compact.b}</b> <span class="sh-latest"></span>${C.compact.sep}<span class="sh-rel"></span>${C.compact.sep}<span class="sh-npolls"></span> ${C.meta.polls}</span></p>
     </div>
     <div class="sh-right">
@@ -659,11 +653,6 @@ ${ss3 ? `@font-face {
    way home), the dial alone beside it */
 .sh-lockup { display: flex; align-items: center; gap: 12px; }
 a.wordmark { text-decoration: none; }
-.sh-tagline {
-  margin: 10px 0 0; max-width: 440px;
-  font-family: "Crimson Text", var(--serif); font-weight: 400;
-  font-size: 16px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
-}
 .sh-head-compact { display: none; }
 .sh-head a.mh-latest { color: inherit; text-decoration: none; }
 .sh-head a.mh-latest:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -694,7 +683,6 @@ a.wordmark { text-decoration: none; }
   }
   .sh-head-compact b { font-weight: 600; color: var(--ink); }
   .sh-head-compact .sh-fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; width: 6px; height: 6px; }
-  .sh-tagline { margin-top: 12px; }
 }
 @media (max-width: 560px) {
   /* the switch pins to the header corner as the main page's does, and the
@@ -1531,7 +1519,7 @@ ${npProjectSrc()}
     if (next && window.ResizeObserver) new ResizeObserver(function () { fitNext(); }).observe(next.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitNext(); });
   };
-  /* the masthead's status block, tagline year and compact line, as the
+  /* the masthead's status block and compact line, as the
      main page's Header fills them (rd-head-meta / rd-head-compact); the
      freshness reading is its freshness() (73de0c58…js): whole Sydney
      calendar days, fresh to a week, aging to three */
@@ -1597,11 +1585,6 @@ ${npProjectSrc()}
       if (wsr) wsr.textContent = cp.wm.sr;
       alignWm();
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignWm);
-    }
-    var tag = document.querySelector(".sh-tagline");
-    if (tag && cp.tagline) {
-      var past0 = tag.querySelector(".sh-past"), pastNow = past0 ? past0.textContent : "1943";
-      tag.innerHTML = esc(cp.tagline.a) + '<span class="sh-past">' + esc(pastNow) + "</span>" + esc(cp.tagline.b);
     }
     var skip = document.querySelector(".sh-skip");
     if (skip && cp.skip) skip.textContent = cp.skip;
@@ -1694,7 +1677,6 @@ ${npProjectSrc()}
   var fillHead = function (n) {
     var W = (n.copy && n.copy.meta) || {};
     var wPolls = W.polls || "polls", wPollsters = W.pollsters || "pollsters", wMonths = W.monthsAtMost || "months at most";
-    if (n.past) setText(".sh-past", n.past);
     var L = n.latest;
     if (!L) return;
     var days = Math.max(0, Math.round((easternNow().day - Date.parse(L.publishedISO)) / 86400000));

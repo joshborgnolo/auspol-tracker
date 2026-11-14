@@ -332,9 +332,8 @@ const FONTS = [
      static cuts only (there is no variable cut), so the serif range is
      carried by one file per weight per style. */
   { file: "crimsontext-400-latin.woff2",        family: "Crimson Text", style: "normal", weight: "400" },
-  /* What the first screen sets in 400 - the tagline (and the colophon's
-     line, the classic design's one heading) - is a fixed handful of
-     letters: they ship as a 5.4KB subset (pyftsubset, layout kept) that is
+  /* The colophon's lede line in 400 (and the classic design's one
+     heading) is a fixed handful of letters: they ship as a 5.4KB subset (pyftsubset, layout kept) that is
      preloaded in place of the 16.7KB face. Same family, declared after the
      full face: where two faces of a family cover a character the later one
      answers, so these letters come from the subset and anything else falls
@@ -653,8 +652,9 @@ const raceLine = (v) => {
 const basisClause = (v) => v.basis === "imp" ? " on implied preference flows" : "";
 
 /* "The last N elections" in the meta description is the count of PAST
-   federal terms the tracker has cycles for; the tagline's "since YYYY" is
-   the same rows' EARLIEST year. Both are derived from the cycle-source rows
+   federal terms the tracker has cycles for; the static summary's "since
+   YYYY" is the same rows' EARLIEST year. Both are derived from the
+   cycle-source rows
    (one key per past term; the Now term is never among them) so a new
    Past-cycles term renumbers or re-dates the copy on its own. Spelled out
    to thirty-one – the 1943-58 batch extension already sits the count
@@ -664,7 +664,7 @@ const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven
                            "eighteen","nineteen","twenty","twenty-one","twenty-two","twenty-three",
                            "twenty-four","twenty-five","twenty-six","twenty-seven","twenty-eight",
                            "twenty-nine","thirty","thirty-one"];
-/* Called from the tagline, the meta description and the summary table –
+/* Called from the meta description and the static summary –
    ~240KB of JSON parsed once, not per call. cycle-source.json is gen-data's
    last word for the whole build, so neither can move mid-run. */
 let pastCycleKeys = null;
@@ -708,8 +708,8 @@ writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
 /* …and what the satellites' masthead and tab bar show beside it, off the same
    dataset the main page's do: the status block's three facts and the phone
    compact (the newest poll by its pollster and fieldwork, linked to its
-   release – the main page's rdLatest), the tagline's count of past terms,
-   and the houses' release rhythm the bar's next-poll countdown projects
+   release – the main page's rdLatest), and the houses' release rhythm the
+   bar's next-poll countdown projects
    from at view time (np-project.js, run by site-shell.js), so the countdown
    stays right as a page ages between builds. */
 const shellNow = (() => {
@@ -730,7 +730,7 @@ const shellNow = (() => {
                      factUrl: newest ? newest.url : null,
                      // a TBC links where the fieldwork dates will appear, as on the main page
                      ...(newest && newest.fieldPending ? { factHouse: newest.pollster, factTbcUrl: newest.fieldUrl || null } : {}) },
-           past: String(pastCycleFirst()), pollCadence: grab("pollCadence") };
+           pollCadence: grab("pollCadence") };
 })();
 /* The masthead's words and artwork as the main page renders them, lifted by
    site-shell.mjs's mainChrome() into the `copy` block: site-shell.js swaps
