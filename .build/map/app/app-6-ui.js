@@ -1045,6 +1045,7 @@ function setView(v, quiet) {
   holdEyebrow();
   const list = v === "list";
   $("#list").hidden = !list;
+  $("#view").classList.toggle("v-list", list);
   $("#view").classList.toggle("v-chamber", v === "chamber");
   for (const id of ["#state-filters", "#cities", "#hint"]) { const e = $(id); if (e) e.hidden = v !== "map"; }
   // the zoom plate stays up in the chamber, for its full-screen button alone
@@ -1974,6 +1975,7 @@ const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New Sout
   const view = S.view; S.view = "map"; if (view !== "map") setView(view, true);
   renderLenses();
   morph = null; // landing mid-state is not a transition between views
+  $("#view").classList.toggle("v-list", S.view === "list");
   $("#view").classList.toggle("v-chamber", S.view === "chamber");
   if (!applySelFromURL(selFromURL)) goAus({ fly: false });
   { const at = new URLSearchParams(location.hash.slice(1)).get("at"); if (at && islOf(M(), at)) S.sel = { ...S.sel, isl: at }; }

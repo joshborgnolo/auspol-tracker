@@ -94,6 +94,9 @@ button { cursor: pointer; background: none; border: 0; }
 }
 .mp-story { grid-column: 1; grid-row: 1; min-width: 0; padding-bottom: 24px; }
 .mp-stage { position: relative; flex: 1 1 auto; min-height: 0; border: 1px solid var(--ink-faint); border-radius: 3px; }
+/* the ink frame belongs to the map view alone; the transparent border keeps
+   the stage's metrics identical in the list and chamber views */
+.mp-view.v-list .mp-stage, .mp-view.v-chamber .mp-stage { border-color: transparent; }
 .mp-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
 .mp-stage canvas.grab { cursor: grab; }
 .mp-stage canvas.grabbing { cursor: grabbing; }
