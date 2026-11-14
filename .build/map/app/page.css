@@ -795,6 +795,9 @@ button { cursor: pointer; background: none; border: 0; }
   .mp-legend .lg-left .lg-draw ~ .lg-note { display: block; }
   .mp-legend .lg-cats { gap: 3px 10px; font-size: 12px; }
   .ls-csv span { display: none; }
+  /* phone: the table's cells get their own inset from the stage edges */
+  .ls-head { padding-left: 8px; padding-right: 8px; }
+  .ls-row { left: 8px; right: 8px; }
   .ls-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
   .ls-bar::-webkit-scrollbar { display: none; }
   .ls-count { margin-left: 6px; }

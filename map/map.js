@@ -10844,6 +10844,10 @@ function seatStat(m, st, label, noteDef = null) {
    How-votes-were-cast section instead of closing the winner head (user call
    2026-11-07), keeping the head's filters — a state or seat type pools its
    own rate (scopeArea), exactly as the head's figures do */
+/* the figure names the scope, not a jurisdiction: nationwide comparisons on
+   the federal frames, statewide on the state frames (territory-wide would
+   ride here if a territory frame ever lands) */
+const cmpWord = (m) => (STATE_YEARS.has(m.year) ? "statewide" : "nationwide");
 function informalHTML(m, st) {
   // the informal lens's own finding carries the rate, so this line repeated
   // it (user call 2026-11-09); the NSW exhaust view's finding reads
@@ -10862,13 +10866,13 @@ function informalHTML(m, st) {
     let f = 0, i = 0, ff = 0, ii = 0;
     for (const d of m.divs) { const r = si.divs[d.n]; if (!r) continue; ff += r[0]; ii += r[1]; if (st === "AUS" || d.st === st) { f += r[0]; i += r[1]; } }
     if (!(f + i) || !(ff + ii)) return "";
-    const cmp = st !== "AUS" ? ` (vs national average ${f1((100 * ii) / (ff + ii))}%)` : "";
+    const cmp = st !== "AUS" ? ` (vs ${f1((100 * ii) / (ff + ii))}% ${cmpWord(m)})` : "";
     return `<div class="st-inf"><b>Informal votes:</b> ${f1((100 * i) / (f + i))}%${cmp}</div>`;
   }
   if (A.infPct == null) return "";
   /* a filtered view contrasts itself with the frame's average, the same
      comparison word the seat view's informal line carries (user call) */
-  const cmp = (st !== "AUS" || clsFilter(m)) && !STATE_YEARS.has(m.year) && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs national average ${f1(m.areas.AUS.infPct)}%)` : "";
+  const cmp = (st !== "AUS" || clsFilter(m)) && m.areas.AUS && m.areas.AUS.infPct != null ? ` (vs ${f1(m.areas.AUS.infPct)}% ${cmpWord(m)})` : "";
   return `<div class="st-inf"><b>Informal votes:</b> ${f1(A.infPct)}%${cmp}</div>`;
 }
 // the seats an "as it stands" frame holds that the election itself never
@@ -11626,7 +11630,7 @@ function seatHedDek(m, d) {
       }
       if (!v) return { hed: `${name === "Independents" ? "No independent" : name} didn’t stand in ${ds(d.n)}`.replace("No independent didn’t", "No independent stood"), dek: "" };
       const aus = m.areas.AUS.fp[P];
-      return { hed: `${name} won ${f1(v)}% of first preferences in ${ds(d.n)}`, dek: `Across Australia ${name === "Independents" ? "independents" : name} won ${f1(aus)}%.` };
+      return { hed: `${name} won ${f1(v)}% of first preferences in ${ds(d.n)}`, dek: `Across ${ausW()} ${name === "Independents" ? "independents" : name} won ${f1(aus)}%.` };
     }
     case "senate": {
       const P = S.party, name = legW(P), pr = senPron(P);
@@ -11649,9 +11653,9 @@ function seatHedDek(m, d) {
       const c = spCells(s.divs[d.n]), v = spDivValue(m, d), aus = spArea(m, m.areas.AUS.idx);
       if (v == null) return { hed: `Too few ${spWho()} Senate ${gvt ? "tickets" : "ballots"} in ${ds(d.n)} to read`, dek: c ? `${int(c.x + c.y)} numbered either party.` : "" };
       if (gvt) return { hed: `${f1(v)}% of ${spWho()} Senate tickets in ${ds(d.n)} put ${spA()} ahead of ${spB()}`,
-        dek: `${int(c.x + c.y)} ticket-bound ballots named a party of the pair.${aus ? ` Across Australia, ${f1(aus.share)}%.` : ""}` };
+        dek: `${int(c.x + c.y)} ticket-bound ballots named a party of the pair.${aus ? ` Across ${ausW()}, ${f1(aus.share)}%.` : ""}` };
       return { hed: `${f1(v)}% of ${spWho()} Senate voters in ${ds(d.n)} ranked ${spA()} ahead of ${spB()}`,
-        dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across Australia, ${f1(aus.share)}%.` : ""}` };
+        dek: `${int(c.x + c.y)} of their ballots numbered either party, ${int(c.nei)} neither.${aus ? ` Across ${ausW()}, ${f1(aus.share)}%.` : ""}` };
     }
     case "flow": {
       const F = S.from, nm = possW(F), rival = vsW();
@@ -11678,7 +11682,7 @@ function seatHedDek(m, d) {
         return { hed: `${f1(d.exhPct)}% of ${ds(d.n)}’s ballots exhausted before the final two`, dek: `New South Wales votes optional-preferential, so a ballot leaves the count when its numbered candidates are gone. That’s ${rankWords(r, xs.length)} rate of the ${xs.length} seats${byNote(d)}; across the state it was ${f1(m.areas.NSW.exhPct)}%.` };
       }
       const r = [...m.divs].filter((x) => x.infPct != null).sort((a, b) => b.infPct - a.infPct).findIndex((x) => x.i === d.i) + 1;
-      return { hed: `${f1(d.infPct)}% of ${ds(d.n)}’s ballots were informal`, dek: `That’s ${rankWords(r, m.divs.length)} rate of the ${m.divs.length} seats${byNote(d)}; across Australia it was ${f1(m.areas.AUS.infPct)}%.` };
+      return { hed: `${f1(d.infPct)}% of ${ds(d.n)}’s ballots were informal`, dek: `That’s ${rankWords(r, m.divs.length)} rate of the ${m.divs.length} seats${byNote(d)}; across ${ausW()} it was ${f1(m.areas.AUS.infPct)}%.` };
     }
     case "cls": return { hed: d.cls ? `${ds(d.n)} is ${/^[aeiou]/i.test(CLS_LOWER[d.cls]) ? "an" : "a"} ${CLS_LOWER[d.cls]} seat` : `${ds(d.n)} has no AEC type on record`, dek: d.cls ? `${CLS_DEF[d.cls]}, in the AEC’s words.` : "" };
     case "seifa": {
@@ -11689,14 +11693,14 @@ function seatHedDek(m, d) {
         const aus = m.areas.AUS.demo;
         // the median view prices the seat's figure in dollars against
         // the national household line, never a share of anything
-        if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats; across Australia, households earn ${mny(m.incomeCuts && m.incomeCuts.medWeekly)} a week${incEpoch(m)}. ${demoCopy(m).seats}` };
+        if (incMed()) return { hed: `The median household in ${ds(d.n)} earns ${mny(demoShare(d))} a week`, dek: `That’s ${rankWords(r, xs.length, "the highest median", "the lowest median")} of the ${xs.length} seats${m.incomeCuts && m.incomeCuts.medWeekly != null ? `; across ${isState() ? stNameCap(m.year) : "Australia"}, households earn ${mny(m.incomeCuts.medWeekly)} a week${incEpoch(m)}` : ""}. ${demoCopy(m).seats}` };
         // the median-age view tells it in years on the same doctrine
-        if (ageMed()) return { hed: `The median age in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the oldest median", "the youngest median")} of the ${xs.length} seats; Australia’s median age is ${m.ageCuts && m.ageCuts.medAge}. ${demoCopy(m).seats}` };
+        if (ageMed()) return { hed: `The median age in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the oldest median", "the youngest median")} of the ${xs.length} seats${m.ageCuts && m.ageCuts.medAge != null ? `; ${isState() ? `${stNameCap(m.year)}’s` : "Australia’s"} median age is ${m.ageCuts.medAge}` : ""}. ${demoCopy(m).seats}` };
         // the median arrival year, the lens's own year idiom alongside
         if (arrMed()) {
           if (demoShare(d) == null) return { hed: `${ds(d.n)} rides the print's open arrival bump — the median arrival year doesn't read here`, dek: "" };
           const aus2 = m.areas.AUS.demo && m.areas.AUS.demo.arrMed;
-          return { hed: `The median year of arrival in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the newest median", "the oldest median")} of the ${xs.length} seats; Australia’s median arrival year is ${aus2 == null ? "off this print" : Math.round(aus2)}. ${demoCopy(m).seats}` };
+          return { hed: `The median year of arrival in ${ds(d.n)} is ${Math.round(demoShare(d))}`, dek: `That’s ${rankWords(r, xs.length, "the newest median", "the oldest median")} of the ${xs.length} seats; ${isState() ? `${stNameCap(m.year)}’s` : "Australia’s"} median arrival year is ${aus2 == null ? "off this print" : Math.round(aus2)}. ${demoCopy(m).seats}` };
         }
         return { hed: `${f0(100 * demoShare(d))}% of ${ds(d.n)}’s ${censusWho(m, k).pop} ${censusWho(m, k).pred}`, dek: `That’s ${rankWords(r, xs.length)} share of the ${xs.length} seats; across ${m.demoBasis === "sa1" ? stNameCap(m.year) : "Australia"}, ${f1(demoAreaShare(aus))}%. ${demoCopy(m).seats}` };
       }
@@ -11744,16 +11748,17 @@ function storyDiv(m, i) {
   else { const fl = flowRows(d.flows, d.A, d.B); if (fl) h += `<div class="st-sec"><h3>Where preferences went <small>to the final two</small></h3>${fl}</div>`; }
   if (S.lens === "senate" || S.lens === "senpref") { if (!d.by && d.vts && vtBandsFor(M().year, true)) h += vtBlock([d], undefined, undefined, true); }
   else if (d.vt) h += vtBlock([d]);
-  const infCmpKey = m.areas.AUS ? "AUS" : stOfYear(m.year), infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
+  const stateF = STATE_YEARS.has(m.year);
+  const infCmpKey = stateF ? stOfYear(m.year) : "AUS", infCmp = m.areas[infCmpKey] && m.areas[infCmpKey].infPct;
   const byTurnout = d.by ? `<p class="st-note">Turnout was ${f1((100 * d.by.turnout) / d.by.enrolment)}% of ${int(d.by.enrolment)} enrolled.</p>` : "";
   /* the national view's plain line, with the seat's comparison inside it
      (user call 2026-11-08 — the big-figure head block lasted the day). The
      informal lens's own head already carries it, dropping the line (user
      call 2026-11-09); the NSW exhaust view's head reads another figure, so
      the line stays */
-  const infWhere = m.areas.AUS ? "national average" : `${ausW()} average`;
+  const infScope = cmpWord(m);
   const infHide = S.lens === "informal" && infModeOf(m) !== "exhaust";
-  h += infHide ? byTurnout : d.infPct == null && d.by ? `<div class="st-inf"><b>Informal votes:</b> no count filed for the by-election yet</div>${byTurnout}` : `<div class="st-inf"><b>Informal votes:</b> ${f1(d.infPct)}%${infCmp != null ? ` (vs ${infWhere} ${f1(infCmp)}%)` : ""}</div>${byTurnout}`;
+  h += infHide ? byTurnout : d.infPct == null && d.by ? `<div class="st-inf"><b>Informal votes:</b> no count filed for the by-election yet</div>${byTurnout}` : `<div class="st-inf"><b>Informal votes:</b> ${f1(d.infPct)}%${infCmp != null ? ` (vs ${f1(infCmp)}% ${infScope})` : ""}</div>${byTurnout}`;
   const incRow = d.demo ? incFact(m, d.demo) : "";
   const origV = isCob() && d.demo && d.demo.cob ? d.demo.cob[S.cob] : null;
   const demoFacts = d.demo ? `<dt>Language</dt><dd>${f0(100 * d.demo.lang)}% of residents speak a language other than English at home</dd><dt>Origin</dt><dd>${origV != null ? `${f0(100 * origV)}% ${COB_VERB[S.cob]}` : `${f0(100 * d.demo.fborn)}% ${DM_VERB.fborn}`}</dd><dt>Education</dt><dd>${f0(100 * d.demo.uni)}% ${DM_VERB.uni}</dd><dt>Work</dt><dd>${f0(100 * d.demo.blue)}% ${DM_VERB.blue}${d.demo.pt != null ? `, ${f0(100 * d.demo.pt)}% ${DM_VERB.pt}` : ""}</dd><dt>Age</dt><dd>${f0(100 * d.demo.a65)}% are 65 or older, ${f0(100 * d.demo.a2034)}% are 20 to 34</dd>${incRow ? `<dt>Income</dt><dd>${incRow}</dd>` : ""}${d.demo.noncit != null ? `<dt>Citizenship</dt><dd>${f0(100 * d.demo.noncit)}% ${DM_VERB.noncit}</dd>` : ""}${d.demo.bigfam != null ? `<dt>Children</dt><dd>${f0(100 * d.demo.bigfam)}% ${DM_VERB.bigfam}</dd>` : ""}${d.demo.hl != null ? `<dt>Home</dt><dd>${f0(100 * d.demo.hl)}% ${DM_VERB.hl}</dd>` : ""}` : "";
@@ -12176,12 +12181,13 @@ function distSVG(D, W, H, opts) {
   const ticks = B.decile ? [1, 5, 10] : B.qt ? [0, 5, 10] : d3.ticks(B.lo, B.hi, opts.compact ? 4 : 7).filter((t) => t >= B.lo && t <= B.hi);
   const fmt = c.fmt || f1;
   ticks.forEach((t, k) => { const tx0 = B.qt ? x(B.cuts[t]) : x(t); const anchor = tx0 < 14 ? "start" : tx0 > W - 14 ? "end" : "middle"; s += `<line x1="${tx0}" x2="${tx0}" y1="${H - padB}" y2="${H - padB + 4}" stroke="var(--ink-faint)"/><text x="${tx0}" y="${H - padB + 15}" text-anchor="${anchor}" font-size="11" fill="var(--ink-3)">${B.decile ? t : B.qt ? fmt(B.cuts[t]) : t === 0 && c.zero ? "0" : fmt(t).replace(/\.0$/, "")}${B.qt ? (t === B.n && c.qtPct ? "%" : "") : !B.decile && k === ticks.length - 1 && /tpp|inf|final|lens|lead/.test(c.key) && !c.diverge && c.key !== "votes" ? "%" : ""}</text>`; });
-  // the country's figure
+  // the country's figure (the frame's own on a state frame)
+  const refWord = S.sel.level === "aus" || !S.sel.st ? (STATE_YEARS.has(M().year) ? STATE_SHORT[stOfYear(M().year)] : "Australia") : STATE_SHORT[S.sel.st];
   const ref = c.ref ? c.ref(M().areas[S.sel.level === "aus" || !S.sel.st ? "AUS" : S.sel.st]) : c.key === "lens" ? lensRef() : null;
   if (ref != null && ref >= B.lo && ref <= B.hi) {
     const rx = x(ref);
     s += `<line x1="${rx}" x2="${rx}" y1="${padT - (opts.compact ? 4 : 8)}" y2="${H - padB}" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="3 3"/>`;
-    if (!opts.compact) s += `<text x="${rx + (rx > W - 120 ? -5 : 5)}" y="${padT - 2}" text-anchor="${rx > W - 120 ? "end" : "start"}" font-size="11.5" font-weight="600" fill="var(--ink-2)">${S.sel.level === "aus" || !S.sel.st ? "Australia" : STATE_SHORT[S.sel.st]} ${fmt(ref)}</text>`;
+    if (!opts.compact) s += `<text x="${rx + (rx > W - 120 ? -5 : 5)}" y="${padT - 2}" text-anchor="${rx > W - 120 ? "end" : "start"}" font-size="11.5" font-weight="600" fill="var(--ink-2)">${refWord} ${fmt(ref)}</text>`;
   }
   // the chosen seat or place
   const selId = D.unit === "seats" ? selDiv() : S.sel.level === "booth" ? S.sel.booth : null;

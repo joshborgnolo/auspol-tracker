@@ -184,12 +184,13 @@ function distSVG(D, W, H, opts) {
   const ticks = B.decile ? [1, 5, 10] : B.qt ? [0, 5, 10] : d3.ticks(B.lo, B.hi, opts.compact ? 4 : 7).filter((t) => t >= B.lo && t <= B.hi);
   const fmt = c.fmt || f1;
   ticks.forEach((t, k) => { const tx0 = B.qt ? x(B.cuts[t]) : x(t); const anchor = tx0 < 14 ? "start" : tx0 > W - 14 ? "end" : "middle"; s += `<line x1="${tx0}" x2="${tx0}" y1="${H - padB}" y2="${H - padB + 4}" stroke="var(--ink-faint)"/><text x="${tx0}" y="${H - padB + 15}" text-anchor="${anchor}" font-size="11" fill="var(--ink-3)">${B.decile ? t : B.qt ? fmt(B.cuts[t]) : t === 0 && c.zero ? "0" : fmt(t).replace(/\.0$/, "")}${B.qt ? (t === B.n && c.qtPct ? "%" : "") : !B.decile && k === ticks.length - 1 && /tpp|inf|final|lens|lead/.test(c.key) && !c.diverge && c.key !== "votes" ? "%" : ""}</text>`; });
-  // the country's figure
+  // the country's figure (the frame's own on a state frame)
+  const refWord = S.sel.level === "aus" || !S.sel.st ? (STATE_YEARS.has(M().year) ? STATE_SHORT[stOfYear(M().year)] : "Australia") : STATE_SHORT[S.sel.st];
   const ref = c.ref ? c.ref(M().areas[S.sel.level === "aus" || !S.sel.st ? "AUS" : S.sel.st]) : c.key === "lens" ? lensRef() : null;
   if (ref != null && ref >= B.lo && ref <= B.hi) {
     const rx = x(ref);
     s += `<line x1="${rx}" x2="${rx}" y1="${padT - (opts.compact ? 4 : 8)}" y2="${H - padB}" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="3 3"/>`;
-    if (!opts.compact) s += `<text x="${rx + (rx > W - 120 ? -5 : 5)}" y="${padT - 2}" text-anchor="${rx > W - 120 ? "end" : "start"}" font-size="11.5" font-weight="600" fill="var(--ink-2)">${S.sel.level === "aus" || !S.sel.st ? "Australia" : STATE_SHORT[S.sel.st]} ${fmt(ref)}</text>`;
+    if (!opts.compact) s += `<text x="${rx + (rx > W - 120 ? -5 : 5)}" y="${padT - 2}" text-anchor="${rx > W - 120 ? "end" : "start"}" font-size="11.5" font-weight="600" fill="var(--ink-2)">${refWord} ${fmt(ref)}</text>`;
   }
   // the chosen seat or place
   const selId = D.unit === "seats" ? selDiv() : S.sel.level === "booth" ? S.sel.booth : null;
