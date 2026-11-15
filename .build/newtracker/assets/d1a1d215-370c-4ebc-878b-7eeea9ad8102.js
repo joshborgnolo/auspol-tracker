@@ -8716,8 +8716,8 @@ function infoTerms(D) {
         person (the whole country's income, export prices and income paid abroad counted) and
         real household disposable income per person (what households have after tax and interest:
         the ABS's household figure over its consumption price deflator and population, worked out
-        here since the ABS prints no real per-person figure), beside the OECD's total GDP growth,
-        since it publishes no per-person average. Unemployment: the ABS's monthly
+        here since the ABS prints no real per-person figure), beside real GDP per person across
+        the OECD (its household dashboard index, so the grey line begins in 2008). Unemployment: the ABS's monthly
         seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed,
         adjusted or estimated — the prints refresh daily from the ABS and OECD data APIs.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s

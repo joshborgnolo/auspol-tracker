@@ -365,17 +365,15 @@ const oecdCpiMerged = (oecdVals) => {
   MED_MONTHS.forEach((t) => MED26.forEach((c, ci) => lines.push(oecdRow(c, t, (2.0 + ci * 0.2).toFixed(2)))));
   return lines.join("\n") + "\n";
 };
-const oecdGdpCsv = (rows) => [
-  "DATAFLOW,REF_AREA,FREQ,MEASURE,UNIT_MEASURE,ACTIVITY,ADJUSTMENT,TRANSFORMATION,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,DECIMALS,BASE_PER",
-  ...rows.map((v, i) => {
-    const y = 1980 + Math.floor(i / 4), q = (i % 4) + 1;
-    return `OECD.SDD.STES:DSD_KEI@DF_KEI(4.0),OECD,Q,B1GQ_Q,GR,_T,Y,GY,${qIso(y, q)},${v},,0,1,`;
-  }),
+/* the OECD per-capita GDP index, the dashboard download's own shape:
+   77 quarters 2007-Q1 → 2026-Q1 at 100·1.004^i (2dp, as printed) */
+const oecdGdppcCsv = (n) => [
+  "DATAFLOW,FREQ,REF_AREA,MEASURE,UNIT_MEASURE,TIME_PERIOD,OBS_VALUE,ADJUSTMENT,SECTOR,ACCOUNTING_ENTRY,TRANSACTION,INSTR_ASSET,PRICE_BASE,TRANSFORMATION,REF_YEAR_PRICE,BASE_PER,CONF_STATUS,DECIMALS,OBS_STATUS,UNIT_MULT",
+  ...Array.from({ length: n }, (_, i) => `OECD.SDD.NAD:DSD_HHDASH@DF_HHDASH_INDIC(1.1),Q,OECD,B1GQ_R_POP,IX,${qIso(2007 + Math.floor(i / 4), (i % 4) + 1)},${(100 * Math.pow(1.004, i)).toFixed(2)},Y,S1,B,B1GQ_POP,_Z,LR,IX,2020,2007-Q1,F,2,A,0`),
 ].join("\n") + "\n";
 
 const CPI_MONTHLY = [4.3, 4.4, 4.5, 4.5, 4.6, 4.6, 4.6, 4.5, 4.6];  // drift 0–0.1 vs the 4.5 quarterly line
 const OECD_CPI = Array.from({ length: 68 }, (_, i) => Math.round((1.5 + i * 0.05) * 10) / 10);
-const OECD_GDP = Array.from({ length: 186 }, (_, i) => Math.round((2.0 + 1.5 * Math.sin(i / 8)) * 10) / 10);
 
 const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {}) => {
   fs.writeFileSync(path.join(dir, "abs-cpi-index.csv"), absIdxCsv);
@@ -387,7 +385,7 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-hh-gdi.csv"), absHhGdiCsv);
   fs.writeFileSync(path.join(dir, "abs-unemp.csv"), absUnempCsv);
   fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi));
-  fs.writeFileSync(path.join(dir, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
+  fs.writeFileSync(path.join(dir, "oecd-gdppc.csv"), oecdGdppcCsv(77));
 };
 writeFixtures(FIX);
 
@@ -410,7 +408,9 @@ assert.equal(st.rows.unemp, 584, "the labour-force series 1978-02→2026-09");
 assert.equal(st.rows.oecdCpi, 68);
 assert.equal(st.rows.oecdCpiMed, 840, "846 grid months minus the 2026 months the splice hands to the store era");
 assert.equal(st.rows.oecdCpiGap, 316, "the gap lane runs 1999-09→2025-12 (15 with-both members at its start)");
-assert.equal(st.rows.oecdGdp, 186);
+assert.equal(st.rows.oecdGdppc, 77 - 4);
+assert.equal(st.newest.oecdGdppc, "2026-03-31");
+assert.deepEqual(JSON.parse(fs.readFileSync(path.join(tmp, "data", "macro.json"), "utf8")).oecdGdppc.rows[0], { date: "2008-03-31", v: 1.6 }, "1.004^4 index growth is y/y 1.6");
 assert.equal(st.newest.cpi, "2026-09-30");
 assert.equal(st.newest.cpiMonthly, "2026-09-30");
 assert.equal(st.newest.gdppc, "2026-06-30");
@@ -534,7 +534,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp", "hhdi", "hhdiLevel"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -561,7 +561,8 @@ assert.ok(live.oecdCpi.rows[0].date <= "1975-01-01", "OECD CPI reaches the 70s")
 assert.ok(live.oecdCpiMed.rows[0].date <= "1975-01-01", "OECD member median reaches the 70s");
 assert.ok(live.oecdCpiGap.rows[0].date <= "1999-03-31", "the target-deviation lane opens 1999");
 assert.equal(live.g20Cpi, undefined, "the G20 lane is gone from the file");
-assert.ok(live.oecdGdp.rows[0].date <= "1970-01-01", "OECD GDP reaches the 60s");
+assert.ok(live.oecdGdppc.rows[0].date <= "2008-03-31", "OECD GDP per person opens with its index's first year-on-year, 2008");
+assert.equal(live.oecdGdp, undefined, "the total-GDP lane gave way to per person (2026-11-16)");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");
 assert.ok(live.ausGap.rows[0].date <= "1996-12-31", "Australia's deviation lane opens at the band's 1996 adoption");
 /* the handoff the extractor certified really is tight on disk */

@@ -1,5 +1,5 @@
 {
- "_about": "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). gdppcLevel / rnndiLevel: the ABS's printed SA chain-volume per-capita levels behind gdppc and rnndi, dollars per person per quarter (whole dollars as printed). hhdi / hhdiLevel: real household disposable income per capita Australia — computed here, as the ABS prints no real per-capita household series: household gross disposable income (5206.0 Table 20, series A2302939L, current prices, SA) divided by the household consumption deflator (HFCE current prices over chain volume, SA) and by the ABS's population (GDP chain volume over GDP per capita chain volume); hhdiLevel in whole dollars per person per quarter at the deflator's 2023–24 reference prices, hhdi its annual change (same derivation as gdppc). Cross-checked 2026-11-16 against the OECD's own print of the same measure for Australia (household dashboard, B6GS1M_R_POP, 2008→): annual changes agree to 0.02pt on average, 0.2pt at most. Rows: {date: ISO period end, v: percent, or dollars on the two level lanes}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au, Table 20 of 5206.0 from the release's spreadsheet; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+ "_about": "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdppc: OECD total real GDP per capita, annual change, quarterly 2008→ — derived from the OECD's printed per-capita index (household dashboard DF_HHDASH_INDIC, B1GQ_R_POP, 2007-Q1 = 100; the same y/y derivation, rounded to 1dp). gdppcLevel / rnndiLevel: the ABS's printed SA chain-volume per-capita levels behind gdppc and rnndi, dollars per person per quarter (whole dollars as printed). hhdi / hhdiLevel: real household disposable income per capita Australia — computed here, as the ABS prints no real per-capita household series: household gross disposable income (5206.0 Table 20, series A2302939L, current prices, SA) divided by the household consumption deflator (HFCE current prices over chain volume, SA) and by the ABS's population (GDP chain volume over GDP per capita chain volume); hhdiLevel in whole dollars per person per quarter at the deflator's 2023–24 reference prices, hhdi its annual change (same derivation as gdppc). Cross-checked 2026-11-16 against the OECD's own print of the same measure for Australia (household dashboard, B6GS1M_R_POP, 2008→): annual changes agree to 0.02pt on average, 0.2pt at most. Rows: {date: ISO period end, v: percent, or dollars on the two level lanes}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au, Table 20 of 5206.0 from the release's spreadsheet; OECD DF_PRICES_ALL and DF_HHDASH_INDIC via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
  "cpi": {
   "label": "Inflation (headline CPI)",
   "basis": "derived from ABS index numbers",
@@ -12574,1025 +12574,301 @@
    }
   ]
  },
- "oecdGdp": {
-  "label": "OECD average GDP growth",
-  "basis": "OECD printed measure",
+ "oecdGdppc": {
+  "label": "OECD real GDP per capita (annual change)",
+  "basis": "derived from the OECD's printed per-capita index (household dashboard)",
   "rows": [
    {
-    "date": "1963-03-31",
-    "v": 3.62293775459767
-   },
-   {
-    "date": "1963-06-30",
-    "v": 4.94675980519947
-   },
-   {
-    "date": "1963-09-30",
-    "v": 5.82073873828464
-   },
-   {
-    "date": "1963-12-31",
-    "v": 6.4344967250124
-   },
-   {
-    "date": "1964-03-31",
-    "v": 7.95949897063229
-   },
-   {
-    "date": "1964-06-30",
-    "v": 6.77265613383999
-   },
-   {
-    "date": "1964-09-30",
-    "v": 5.71324322934898
-   },
-   {
-    "date": "1964-12-31",
-    "v": 5.19851454648866
-   },
-   {
-    "date": "1965-03-31",
-    "v": 4.98151860544867
-   },
-   {
-    "date": "1965-06-30",
-    "v": 4.91002035941044
-   },
-   {
-    "date": "1965-09-30",
-    "v": 5.28505553024297
-   },
-   {
-    "date": "1965-12-31",
-    "v": 6.22261641238833
-   },
-   {
-    "date": "1966-03-31",
-    "v": 6.27167215250121
-   },
-   {
-    "date": "1966-06-30",
-    "v": 6.3833357319587
-   },
-   {
-    "date": "1966-09-30",
-    "v": 5.81273117693785
-   },
-   {
-    "date": "1966-12-31",
-    "v": 4.69142273400665
-   },
-   {
-    "date": "1967-03-31",
-    "v": 4.11020179775505
-   },
-   {
-    "date": "1967-06-30",
-    "v": 3.58191404034825
-   },
-   {
-    "date": "1967-09-30",
-    "v": 3.88023187211598
-   },
-   {
-    "date": "1967-12-31",
-    "v": 4.305025716345
-   },
-   {
-    "date": "1968-03-31",
-    "v": 5.11328778005356
-   },
-   {
-    "date": "1968-06-30",
-    "v": 5.53357060208457
-   },
-   {
-    "date": "1968-09-30",
-    "v": 6.2274151918181
-   },
-   {
-    "date": "1968-12-31",
-    "v": 6.77807402652858
-   },
-   {
-    "date": "1969-03-31",
-    "v": 6.17974662732986
-   },
-   {
-    "date": "1969-06-30",
-    "v": 6.18443685805266
-   },
-   {
-    "date": "1969-09-30",
-    "v": 5.47706426198669
-   },
-   {
-    "date": "1969-12-31",
-    "v": 4.57870236396555
-   },
-   {
-    "date": "1970-03-31",
-    "v": 4.09100317430074
-   },
-   {
-    "date": "1970-06-30",
-    "v": 4.1206014883705
-   },
-   {
-    "date": "1970-09-30",
-    "v": 4.17063372708564
-   },
-   {
-    "date": "1970-12-31",
-    "v": 3.51589170915867
-   },
-   {
-    "date": "1971-03-31",
-    "v": 3.5762850882979
-   },
-   {
-    "date": "1971-06-30",
-    "v": 3.593114464256
-   },
-   {
-    "date": "1971-09-30",
-    "v": 3.56456617665
-   },
-   {
-    "date": "1971-12-31",
-    "v": 4.04113161988274
-   },
-   {
-    "date": "1972-03-31",
-    "v": 4.70838524355969
-   },
-   {
-    "date": "1972-06-30",
-    "v": 5.30916150513988
-   },
-   {
-    "date": "1972-09-30",
-    "v": 5.26011311245426
-   },
-   {
-    "date": "1972-12-31",
-    "v": 6.54110891589516
-   },
-   {
-    "date": "1973-03-31",
-    "v": 7.36171723648652
-   },
-   {
-    "date": "1973-06-30",
-    "v": 6.62644596712615
-   },
-   {
-    "date": "1973-09-30",
-    "v": 5.66356406867151
-   },
-   {
-    "date": "1973-12-31",
-    "v": 5.0242747378177
-   },
-   {
-    "date": "1974-03-31",
-    "v": 2.19235422366771
-   },
-   {
-    "date": "1974-06-30",
-    "v": 1.54500977342374
-   },
-   {
-    "date": "1974-09-30",
-    "v": 1.19563011759224
-   },
-   {
-    "date": "1974-12-31",
-    "v": -0.554903625027258
-   },
-   {
-    "date": "1975-03-31",
-    "v": -0.638771288105274
-   },
-   {
-    "date": "1975-06-30",
-    "v": -0.566991353686829
-   },
-   {
-    "date": "1975-09-30",
-    "v": 0.505268530371602
-   },
-   {
-    "date": "1975-12-31",
-    "v": 2.50856367101898
-   },
-   {
-    "date": "1976-03-31",
-    "v": 4.72824141915194
-   },
-   {
-    "date": "1976-06-30",
-    "v": 5.23221898043499
-   },
-   {
-    "date": "1976-09-30",
-    "v": 5.00846409630618
-   },
-   {
-    "date": "1976-12-31",
-    "v": 4.56830412694031
-   },
-   {
-    "date": "1977-03-31",
-    "v": 3.82586741459921
-   },
-   {
-    "date": "1977-06-30",
-    "v": 3.67519622615753
-   },
-   {
-    "date": "1977-09-30",
-    "v": 3.71069282435156
-   },
-   {
-    "date": "1977-12-31",
-    "v": 3.57939828475367
-   },
-   {
-    "date": "1978-03-31",
-    "v": 3.46716314086524
-   },
-   {
-    "date": "1978-06-30",
-    "v": 4.56716498650842
-   },
-   {
-    "date": "1978-09-30",
-    "v": 4.60159608023057
-   },
-   {
-    "date": "1978-12-31",
-    "v": 5.13563096519656
-   },
-   {
-    "date": "1979-03-31",
-    "v": 4.89399197943613
-   },
-   {
-    "date": "1979-06-30",
-    "v": 4.16456420851065
-   },
-   {
-    "date": "1979-09-30",
-    "v": 3.6432428685872
-   },
-   {
-    "date": "1979-12-31",
-    "v": 2.97719050259296
-   },
-   {
-    "date": "1980-03-31",
-    "v": 2.98890354626138
-   },
-   {
-    "date": "1980-06-30",
-    "v": 0.649390933839567
-   },
-   {
-    "date": "1980-09-30",
-    "v": 0.513077316259645
-   },
-   {
-    "date": "1980-12-31",
-    "v": 1.00450832788648
-   },
-   {
-    "date": "1981-03-31",
-    "v": 1.47006779409963
-   },
-   {
-    "date": "1981-06-30",
-    "v": 2.8008259295114
-   },
-   {
-    "date": "1981-09-30",
-    "v": 3.13823566765717
-   },
-   {
-    "date": "1981-12-31",
-    "v": 1.89266404107621
-   },
-   {
-    "date": "1982-03-31",
-    "v": 0.527537767967092
-   },
-   {
-    "date": "1982-06-30",
-    "v": 0.54469462344814
-   },
-   {
-    "date": "1982-09-30",
-    "v": -0.258070697903678
-   },
-   {
-    "date": "1982-12-31",
-    "v": -0.007586254572702
-   },
-   {
-    "date": "1983-03-31",
-    "v": 1.09541920834781
-   },
-   {
-    "date": "1983-06-30",
-    "v": 1.94211053385873
-   },
-   {
-    "date": "1983-09-30",
-    "v": 3.46111760113576
-   },
-   {
-    "date": "1983-12-31",
-    "v": 4.7368502279717
-   },
-   {
-    "date": "1984-03-31",
-    "v": 5.4119236424203
-   },
-   {
-    "date": "1984-06-30",
-    "v": 4.96841040730223
-   },
-   {
-    "date": "1984-09-30",
-    "v": 4.87244521100983
-   },
-   {
-    "date": "1984-12-31",
-    "v": 4.01328733412957
-   },
-   {
-    "date": "1985-03-31",
-    "v": 3.54929078472846
-   },
-   {
-    "date": "1985-06-30",
-    "v": 3.97649144960222
-   },
-   {
-    "date": "1985-09-30",
-    "v": 3.87857231987408
-   },
-   {
-    "date": "1985-12-31",
-    "v": 4.09753374996221
-   },
-   {
-    "date": "1986-03-31",
-    "v": 3.51146011556577
-   },
-   {
-    "date": "1986-06-30",
-    "v": 3.07287397033577
-   },
-   {
-    "date": "1986-09-30",
-    "v": 2.61921634206133
-   },
-   {
-    "date": "1986-12-31",
-    "v": 2.40151595152958
-   },
-   {
-    "date": "1987-03-31",
-    "v": 2.27160721343175
-   },
-   {
-    "date": "1987-06-30",
-    "v": 3.3011857531634
-   },
-   {
-    "date": "1987-09-30",
-    "v": 3.72871592212765
-   },
-   {
-    "date": "1987-12-31",
-    "v": 4.96524017827024
-   },
-   {
-    "date": "1988-03-31",
-    "v": 5.51883500733116
-   },
-   {
-    "date": "1988-06-30",
-    "v": 4.5385808770762
-   },
-   {
-    "date": "1988-09-30",
-    "v": 4.47416265335454
-   },
-   {
-    "date": "1988-12-31",
-    "v": 3.80532390360993
-   },
-   {
-    "date": "1989-03-31",
-    "v": 4.22530318190227
-   },
-   {
-    "date": "1989-06-30",
-    "v": 3.89896231297386
-   },
-   {
-    "date": "1989-09-30",
-    "v": 3.85628436215693
-   },
-   {
-    "date": "1989-12-31",
-    "v": 3.64175259546415
-   },
-   {
-    "date": "1990-03-31",
-    "v": 3.33352971897657
-   },
-   {
-    "date": "1990-06-30",
-    "v": 3.88553601606361
-   },
-   {
-    "date": "1990-09-30",
-    "v": 3.25930428224253
-   },
-   {
-    "date": "1990-12-31",
-    "v": 2.51251777323125
-   },
-   {
-    "date": "1991-03-31",
-    "v": 1.63068532574471
-   },
-   {
-    "date": "1991-06-30",
-    "v": 1.34686760472992
-   },
-   {
-    "date": "1991-09-30",
-    "v": 1.29035539126978
-   },
-   {
-    "date": "1991-12-31",
-    "v": 1.69935555465596
-   },
-   {
-    "date": "1992-03-31",
-    "v": 2.49585429710586
-   },
-   {
-    "date": "1992-06-30",
-    "v": 2.13636891285302
-   },
-   {
-    "date": "1992-09-30",
-    "v": 2.26645548573064
-   },
-   {
-    "date": "1992-12-31",
-    "v": 1.94792322612344
-   },
-   {
-    "date": "1993-03-31",
-    "v": 1.31447488366423
-   },
-   {
-    "date": "1993-06-30",
-    "v": 1.41992119301732
-   },
-   {
-    "date": "1993-09-30",
-    "v": 1.33452640158865
-   },
-   {
-    "date": "1993-12-31",
-    "v": 1.87800719573919
-   },
-   {
-    "date": "1994-03-31",
-    "v": 2.64103413788637
-   },
-   {
-    "date": "1994-06-30",
-    "v": 2.78594200559213
-   },
-   {
-    "date": "1994-09-30",
-    "v": 3.28127589704675
-   },
-   {
-    "date": "1994-12-31",
-    "v": 3.41335442294747
-   },
-   {
-    "date": "1995-03-31",
-    "v": 2.8443259470148
-   },
-   {
-    "date": "1995-06-30",
-    "v": 2.59832845950336
-   },
-   {
-    "date": "1995-09-30",
-    "v": 2.61015653888035
-   },
-   {
-    "date": "1995-12-31",
-    "v": 2.22482537297766
-   },
-   {
-    "date": "1996-03-31",
-    "v": 2.53810973818431
-   },
-   {
-    "date": "1996-06-30",
-    "v": 3.37049659627698
-   },
-   {
-    "date": "1996-09-30",
-    "v": 3.20063069233012
-   },
-   {
-    "date": "1996-12-31",
-    "v": 3.61823200654921
-   },
-   {
-    "date": "1997-03-31",
-    "v": 3.5385892164431
-   },
-   {
-    "date": "1997-06-30",
-    "v": 3.73240411804569
-   },
-   {
-    "date": "1997-09-30",
-    "v": 3.92936454963012
-   },
-   {
-    "date": "1997-12-31",
-    "v": 3.86141672959575
-   },
-   {
-    "date": "1998-03-31",
-    "v": 3.594150958188
-   },
-   {
-    "date": "1998-06-30",
-    "v": 2.66521337630517
-   },
-   {
-    "date": "1998-09-30",
-    "v": 2.4616388904567
-   },
-   {
-    "date": "1998-12-31",
-    "v": 2.34473720920156
-   },
-   {
-    "date": "1999-03-31",
-    "v": 2.63386950146924
-   },
-   {
-    "date": "1999-06-30",
-    "v": 2.96398086245391
-   },
-   {
-    "date": "1999-09-30",
-    "v": 3.51575131806228
-   },
-   {
-    "date": "1999-12-31",
-    "v": 3.98118662730784
-   },
-   {
-    "date": "2000-03-31",
-    "v": 4.39028211146937
-   },
-   {
-    "date": "2000-06-30",
-    "v": 4.96063400782167
-   },
-   {
-    "date": "2000-09-30",
-    "v": 4.19859712485551
-   },
-   {
-    "date": "2000-12-31",
-    "v": 3.4490365657158
-   },
-   {
-    "date": "2001-03-31",
-    "v": 2.681074001021
-   },
-   {
-    "date": "2001-06-30",
-    "v": 1.47491980330283
-   },
-   {
-    "date": "2001-09-30",
-    "v": 0.856398462068663
-   },
-   {
-    "date": "2001-12-31",
-    "v": 0.454516279280444
-   },
-   {
-    "date": "2002-03-31",
-    "v": 0.785488412028252
-   },
-   {
-    "date": "2002-06-30",
-    "v": 1.43981312829354
-   },
-   {
-    "date": "2002-09-30",
-    "v": 2.03967413766465
-   },
-   {
-    "date": "2002-12-31",
-    "v": 2.21260075167425
-   },
-   {
-    "date": "2003-03-31",
-    "v": 1.77733742614467
-   },
-   {
-    "date": "2003-06-30",
-    "v": 1.55385209858655
-   },
-   {
-    "date": "2003-09-30",
-    "v": 2.13125835083795
-   },
-   {
-    "date": "2003-12-31",
-    "v": 2.86725968186437
-   },
-   {
-    "date": "2004-03-31",
-    "v": 3.42549391633098
-   },
-   {
-    "date": "2004-06-30",
-    "v": 3.61660207920319
-   },
-   {
-    "date": "2004-09-30",
-    "v": 3.14210731802496
-   },
-   {
-    "date": "2004-12-31",
-    "v": 2.77742778534602
-   },
-   {
-    "date": "2005-03-31",
-    "v": 2.7744444278046
-   },
-   {
-    "date": "2005-06-30",
-    "v": 2.76661473363821
-   },
-   {
-    "date": "2005-09-30",
-    "v": 3.09587475661653
-   },
-   {
-    "date": "2005-12-31",
-    "v": 3.203940346293
-   },
-   {
-    "date": "2006-03-31",
-    "v": 3.46291617633801
-   },
-   {
-    "date": "2006-06-30",
-    "v": 3.47523839740901
-   },
-   {
-    "date": "2006-09-30",
-    "v": 2.91444592746133
-   },
-   {
-    "date": "2006-12-31",
-    "v": 3.1169750225738
-   },
-   {
-    "date": "2007-03-31",
-    "v": 2.80700077640768
-   },
-   {
-    "date": "2007-06-30",
-    "v": 2.749203715159
-   },
-   {
-    "date": "2007-09-30",
-    "v": 2.87032055309747
-   },
-   {
-    "date": "2007-12-31",
-    "v": 2.64129235347418
-   },
-   {
     "date": "2008-03-31",
-    "v": 2.11194666645991
+    "v": 1.3
    },
    {
     "date": "2008-06-30",
-    "v": 1.42616322310309
+    "v": 0.6
    },
    {
     "date": "2008-09-30",
-    "v": 0.428949235942209
+    "v": -0.3
    },
    {
     "date": "2008-12-31",
-    "v": -2.25954959335353
+    "v": -3
    },
    {
     "date": "2009-03-31",
-    "v": -4.7288460356903
+    "v": -5.4
    },
    {
     "date": "2009-06-30",
-    "v": -4.58955843873312
+    "v": -5.3
    },
    {
     "date": "2009-09-30",
-    "v": -3.60503213607096
+    "v": -4.3
    },
    {
     "date": "2009-12-31",
-    "v": -0.781819101043424
+    "v": -1.4
    },
    {
     "date": "2010-03-31",
-    "v": 2.27124737412085
+    "v": 1.6
    },
    {
     "date": "2010-06-30",
-    "v": 3.28074086416046
+    "v": 2.6
    },
    {
     "date": "2010-09-30",
-    "v": 3.60319040951679
+    "v": 2.5
    },
    {
     "date": "2010-12-31",
-    "v": 3.21320053667173
+    "v": 2.1
    },
    {
     "date": "2011-03-31",
-    "v": 2.82009038649583
+    "v": 1.8
    },
    {
     "date": "2011-06-30",
-    "v": 2.06158927078205
+    "v": 1
    },
    {
     "date": "2011-09-30",
-    "v": 1.7720580461611
+    "v": 1.1
    },
    {
     "date": "2011-12-31",
-    "v": 1.70422924616522
+    "v": 1.1
    },
    {
     "date": "2012-03-31",
-    "v": 1.98372550671178
+    "v": 1.3
    },
    {
     "date": "2012-06-30",
-    "v": 1.69370878390471
+    "v": 1.1
    },
    {
     "date": "2012-09-30",
-    "v": 1.26416050250819
+    "v": 0.7
    },
    {
     "date": "2012-12-31",
-    "v": 0.845895893643294
+    "v": 0.3
    },
    {
     "date": "2013-03-31",
-    "v": 0.898507009730658
+    "v": 0.3
    },
    {
     "date": "2013-06-30",
-    "v": 1.4597539521155
+    "v": 0.9
    },
    {
     "date": "2013-09-30",
-    "v": 2.0312161289458
+    "v": 1.4
    },
    {
     "date": "2013-12-31",
-    "v": 2.51894872908764
+    "v": 1.9
    },
    {
     "date": "2014-03-31",
-    "v": 2.29072936695655
+    "v": 1.6
    },
    {
     "date": "2014-06-30",
-    "v": 2.20902372895062
+    "v": 1.5
    },
    {
     "date": "2014-09-30",
-    "v": 2.27930152308301
+    "v": 1.6
    },
    {
     "date": "2014-12-31",
-    "v": 2.29169058853061
+    "v": 1.6
    },
    {
     "date": "2015-03-31",
-    "v": 2.77463527161494
+    "v": 2.1
    },
    {
     "date": "2015-06-30",
-    "v": 2.7838084029781
+    "v": 2.1
    },
    {
     "date": "2015-09-30",
-    "v": 2.52223562373535
+    "v": 1.8
    },
    {
     "date": "2015-12-31",
-    "v": 2.30542910803845
+    "v": 1.6
    },
    {
     "date": "2016-03-31",
-    "v": 1.94132805785389
+    "v": 1.2
    },
    {
     "date": "2016-06-30",
-    "v": 1.74138512929548
+    "v": 1
    },
    {
     "date": "2016-09-30",
-    "v": 1.66762700560448
+    "v": 1
    },
    {
     "date": "2016-12-31",
-    "v": 2.16215579683132
+    "v": 1.5
    },
    {
     "date": "2017-03-31",
-    "v": 2.34337832514169
+    "v": 1.7
    },
    {
     "date": "2017-06-30",
-    "v": 2.69879919670073
+    "v": 2
    },
    {
     "date": "2017-09-30",
-    "v": 3.1078169802028
+    "v": 2.5
    },
    {
     "date": "2017-12-31",
-    "v": 3.13266887864951
+    "v": 2.5
    },
    {
     "date": "2018-03-31",
-    "v": 3.04023945651585
+    "v": 2.4
    },
    {
     "date": "2018-06-30",
-    "v": 2.83459023656486
+    "v": 2.2
    },
    {
     "date": "2018-09-30",
-    "v": 2.30477441216424
+    "v": 1.6
    },
    {
     "date": "2018-12-31",
-    "v": 1.61132698651455
+    "v": 0.9
    },
    {
     "date": "2019-03-31",
-    "v": 1.64305653661397
+    "v": 1
    },
    {
     "date": "2019-06-30",
-    "v": 1.7715989706972
+    "v": 1.1
    },
    {
     "date": "2019-09-30",
-    "v": 2.03509533635527
+    "v": 1.5
    },
    {
     "date": "2019-12-31",
-    "v": 1.92824507097905
+    "v": 1.3
    },
    {
     "date": "2020-03-31",
-    "v": -0.384106908135803
+    "v": -0.9
    },
    {
     "date": "2020-06-30",
-    "v": -10.8558247286915
+    "v": -11.2
    },
    {
     "date": "2020-09-30",
-    "v": -3.19583888510746
+    "v": -3.6
    },
    {
     "date": "2020-12-31",
-    "v": -2.05404079594332
+    "v": -2.3
    },
    {
     "date": "2021-03-31",
-    "v": 0.846273851432604
+    "v": 0.5
    },
    {
     "date": "2021-06-30",
-    "v": 14.03719953383
+    "v": 13.7
    },
    {
     "date": "2021-09-30",
-    "v": 5.64422174302759
+    "v": 5.3
    },
    {
     "date": "2021-12-31",
-    "v": 5.86692967805018
+    "v": 5.5
    },
    {
     "date": "2022-03-31",
-    "v": 4.85139423642011
+    "v": 4.4
    },
    {
     "date": "2022-06-30",
-    "v": 3.63877507163873
+    "v": 3.1
    },
    {
     "date": "2022-09-30",
-    "v": 2.93869991148837
+    "v": 2.3
    },
    {
     "date": "2022-12-31",
-    "v": 1.76426667886385
+    "v": 1
    },
    {
     "date": "2023-03-31",
-    "v": 1.90647310080071
+    "v": 1.2
    },
    {
     "date": "2023-06-30",
-    "v": 1.7154058776205
+    "v": 1.1
    },
    {
     "date": "2023-09-30",
-    "v": 1.70102170437775
+    "v": 1
    },
    {
     "date": "2023-12-31",
-    "v": 1.79752175456797
+    "v": 1.1
    },
    {
     "date": "2024-03-31",
-    "v": 1.88275363501656
+    "v": 1.2
    },
    {
     "date": "2024-06-30",
-    "v": 1.84996073090202
+    "v": 1.1
    },
    {
     "date": "2024-09-30",
-    "v": 1.97957784886624
+    "v": 1.3
    },
    {
     "date": "2024-12-31",
-    "v": 2.06995871562
+    "v": 1.4
    },
    {
     "date": "2025-03-31",
-    "v": 1.9128284687976
+    "v": 1.4
    },
    {
     "date": "2025-06-30",
-    "v": 1.9581974570504
+    "v": 1.5
    },
    {
     "date": "2025-09-30",
-    "v": 1.95015313142761
+    "v": 1.5
    },
    {
     "date": "2025-12-31",
-    "v": 1.66178274802591
+    "v": 1.4
    },
    {
     "date": "2026-03-31",
-    "v": 1.71887152684021
-   },
-   {
-    "date": "2026-06-30",
-    "v": 1.90672244230687
+    "v": 1.5
    }
   ]
  },

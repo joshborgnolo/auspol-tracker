@@ -6736,8 +6736,9 @@ function RdConfStrip({ lines, lo, hi, win, terms, onWin, narrow, label }) {
                                  distance off its own central bank's target
      Growth per person         – real GDP per person and real net national
                                  disposable income per person (annual
-                                 change), beside OECD total GDP growth (the
-                                 OECD publishes no per-person average)
+                                 change) and real household disposable income
+                                 per person, beside the OECD's real GDP per
+                                 person (its household dashboard index, 2008→)
      Unemployment              – the ABS's monthly seasonally adjusted rate,
                                  a level rather than an annual change
    Nine lanes on one plot had them knotted together; four small plots of
@@ -6776,7 +6777,7 @@ function macroData(D) {
     gdppc: lane("gdppc", M.gdppc.rows, { name: "GDP per person", color: "var(--macro-gdppc)", au: true, q: true }),
     rnndi: M.rnndi && lane("rnndi", M.rnndi.rows, { name: "National income per person", color: "var(--macro-rnndi)", au: true, q: true }),
     hhdi: M.hhdi && lane("hhdi", M.hhdi.rows, { name: "Household income per person", color: "var(--macro-hhdi)", au: true, q: true }),
-    oecdGdp: M.oecdGdp && lane("oecdGdp", M.oecdGdp.rows, { name: "OECD (total GDP)", color: "var(--ink-3)", q: true }),
+    oecdGdppc: M.oecdGdppc && lane("oecdGdppc", M.oecdGdppc.rows, { name: "OECD GDP per person", color: "var(--ink-3)", q: true }),
     gdppcLevel: M.gdppcLevel && lvl("gdppcLevel", M.gdppcLevel.rows, { name: "GDP per person", color: "var(--macro-gdppc)", au: true, q: true }),
     rnndiLevel: M.rnndiLevel && lvl("rnndiLevel", M.rnndiLevel.rows, { name: "National income per person", color: "var(--macro-rnndi)", au: true, q: true }),
     hhdiLevel: M.hhdiLevel && lvl("hhdiLevel", M.hhdiLevel.rows, { name: "Household income per person", color: "var(--macro-hhdi)", au: true, q: true }),
@@ -6788,10 +6789,10 @@ function macroData(D) {
     { id: "gap", title: "Inflation against target", sub: "Points above (+) or below (−) the central bank’s target",
       copyTitle: "Inflation against target: Australia and the median OECD country", lanes: [L.ausGap, L.oecdCpiGap], zero: "On target" },
     { id: "grow", title: "Growth per person", sub: "Real, % change on a year earlier",
-      copyTitle: "Real growth per person in Australia, and the OECD’s", lanes: [L.gdppc, L.rnndi, L.hhdi, L.oecdGdp], zero: true,
-      /* the same two series as dollars rather than their annual change
-         (the panel's Increase / Actual switch); the OECD has no
-         per-person level to set beside them */
+      copyTitle: "Real growth per person in Australia, and the OECD’s", lanes: [L.gdppc, L.rnndi, L.hhdi, L.oecdGdppc], zero: true,
+      /* the three Australian series as dollars rather than their annual
+         change (the panel's Increase / Actual switch); the OECD's
+         per-person figure is an index, not dollars, so it sits this out */
       level: L.gdppcLevel ? { sub: "Real dollars a year, in thousands, seasonally adjusted", money: true, zero: false,
         copyTitle: "Real output and income per person in Australia", lanes: [L.gdppcLevel, L.rnndiLevel, L.hhdiLevel].filter(Boolean) } : null },
     { id: "unemp", title: "Unemployment", sub: "% of the labour force, seasonally adjusted",
@@ -6907,7 +6908,7 @@ function RdMacroPanel({ p: p0, win, dragging, narrow, union, evs, evMode, top, c
         copy={{
           title: p.copyTitle, span: years,
           sub: p.sub + ". " + span + ". Latest Australian print: " + (auLatest ? latestTxt(auLatest) + ", " + when : "") + ".",
-          caption: "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? (money ? " Chain-volume dollars at the ABS’s reference-year prices, each quarter’s seasonally adjusted figure at its annual rate (four times the quarter)." : " The OECD line is total GDP growth; the OECD publishes no per-person average.") + (p.lanes.some((l) => l.k === "hhdi" || l.k === "hhdiLevel") ? " Household income is the ABS’s household disposable income over its household consumption price deflator and population, worked out here (the ABS prints no real per-person figure)." : "") : ""),
+          caption: "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? (money ? " Chain-volume dollars at the ABS’s reference-year prices, each quarter’s seasonally adjusted figure at its annual rate (four times the quarter)." : " The OECD line is real GDP per person across the OECD, from its household dashboard index, which begins in 2007.") + (p.lanes.some((l) => l.k === "hhdi" || l.k === "hhdiLevel") ? " Household income is the ABS’s household disposable income over its household consumption price deflator and population, worked out here (the ABS prints no real per-person figure)." : "") : ""),
           legend: p.lanes.map((l) => ({ label: l.name + " (latest " + latestTxt(l) + ")", color: l.color, kind: l.dash ? "dashed" : "line" })),
         }} />
     </div>
@@ -6942,7 +6943,7 @@ function RdMacro({ win, dragging, terms, nowX, hi, strip }) {
   const years = confWinYears(win, terms, hi);
   const exportCsv = () => {
     const rr = [["kind", "series", "date", "value"]];
-    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", ausGap: "Australia over its target", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", hhdi: "Real household disposable income per capita (computed)", unemp: "Unemployment rate", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdp: "OECD average GDP growth", gdppcLevel: "Real GDP per capita (dollars a quarter)", rnndiLevel: "Real net national disposable income per capita (dollars a quarter)", hhdiLevel: "Real household disposable income per capita (dollars a quarter, 2023–24 prices, computed)" };
+    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", ausGap: "Australia over its target", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", hhdi: "Real household disposable income per capita (computed)", unemp: "Unemployment rate", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdppc: "OECD real GDP per capita", gdppcLevel: "Real GDP per capita (dollars a quarter)", rnndiLevel: "Real net national disposable income per capita (dollars a quarter)", hhdiLevel: "Real household disposable income per capita (dollars a quarter, 2023–24 prices, computed)" };
     for (const k of Object.keys(SHEET)) {
       const ln = D.macro[k];
       if (!ln) continue;
@@ -7005,11 +7006,11 @@ function macroStory(D) {
   const om = M.oecdCpiMed && M.oecdCpiMed.rows.length ? M.oecdCpiMed.rows.at(-1) : null;
   const gp = M.oecdCpiGap && M.oecdCpiGap.rows.length ? M.oecdCpiGap.rows.at(-1) : null;
   const ag = M.ausGap && M.ausGap.rows.length ? M.ausGap.rows.at(-1) : null;
-  const og = M.oecdGdp && M.oecdGdp.rows.length ? M.oecdGdp.rows.at(-1) : null;
+  const og = M.oecdGdppc && M.oecdGdppc.rows.length ? M.oecdGdppc.rows.at(-1) : null;
   const un = M.unemp && M.unemp.rows.length ? M.unemp.rows.at(-1) : null;
   const f = (v) => (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const qName = (iso) => ({ "03": "March", "06": "June", "09": "September", "12": "December" })[iso.slice(5, 7)] + " quarter";
-  const head = "Inflation runs at " + f(c.v) + "% a year; real income per person " + (g.v >= 0 ? "grows " : "shrinks ") + f(g.v) + "% a year.";
+  const head = "Inflation runs at " + f(c.v) + "% a year; real GDP per person " + (g.v >= 0 ? "grows " : "shrinks ") + f(g.v) + "% a year.";
   const dek = "Headline inflation reads " + f(c.v) + "% for " + monthLabelFull(c.date.slice(0, 7))
     + " (the ABS's monthly CPI, annual change"
     + (ag ? (ag.v >= 0 ? ", " + f(ag.v) + " points above the RBA band's midpoint" : ", " + f(ag.v) + " points below the RBA band's midpoint") : "")
@@ -7018,7 +7019,7 @@ function macroStory(D) {
     + (oc ? " OECD-wide, inflation stands at " + f(oc.v) + "%" : "")
     + (om ? " (the median OECD country's at " + f(om.v) + "%" : "")
     + (gp ? (gp.v >= 0 ? ", running " + f(gp.v) + " points above its bank's target)" : ", running " + f(gp.v) + " points below its bank's target)") : "")
-    + (og ? " and OECD-wide average GDP growth at " + f(og.v) + "%" : "")
+    + (og ? " and OECD-wide real GDP per person " + (og.v >= 0 ? "growing " : "shrinking ") + f(og.v) + "% a year" : "")
     + (oc || om || og ? "." : "")
     + (un ? " Unemployment rounds out the panel at " + f(un.v) + "% for " + monthLabelFull(un.date.slice(0, 7)) + ", as printed." : "");
   return { head, dek };
@@ -7642,7 +7643,7 @@ function RdConfidence({ rangeId }) {
         <>The bar over the chart sets the window, and the window holds as you switch tabs. It opens on this term; ‹ and › step back and forward a term at a time, and Term, 10 yrs, 25 yrs and All widen it (‹ › then page back and forward by that length). The strip under each chart is the whole record in miniature with the governments beneath it: drag the window along it, drag its edges to resize it, drag across the strip to draw a new one, or tap a spot to jump there. A term reads off its election — Election, 1 yr, 2 yrs — so every term shares one ruler; a longer window counts calendar years and marks each federal election with a faint rule. Dots show in a window of about a term; longer windows draw the lines alone.</>,
         <>Behind a term the band pools the view’s main gauge over the other terms, each lined up on its own election month: the middle half in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. This term’s band is every past term; a past term’s is every term but itself. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. Before each house’s live release file begins, its line is the house’s own monthly history, drawn a little thinner — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010, NAB’s printed net balance to March 1997. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals.</>,
         <>ANZ–Roy Morgan’s and Westpac–MI’s are indices where 100 is neutral; DemosAU’s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
-        <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as four small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted), and real household disposable income per person, beside the OECD’s total GDP growth — the OECD publishes no per-person average. National income is the whole country’s: it counts what exports buy and income paid abroad, and includes companies’ and governments’ income. Household income is what households have after tax and interest — the ABS’s household gross disposable income over its household consumption price deflator and its population, worked out here because the ABS prints no real per-person figure (it matches the OECD’s own calculation for Australia to within 0.2 points). Its Actual switch shows the three Australian series as dollars instead (each seasonally adjusted quarter at its annual rate, in 2023–24 prices). Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia’s from the ABS’s own figures, the OECD median from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
+        <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as four small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted), and real household disposable income per person, beside real GDP per person across the OECD (the OECD’s household dashboard index, so the grey line begins in 2008). National income is the whole country’s: it counts what exports buy and income paid abroad, and includes companies’ and governments’ income. Household income is what households have after tax and interest — the ABS’s household gross disposable income over its household consumption price deflator and its population, worked out here because the ABS prints no real per-person figure (it matches the OECD’s own calculation for Australia to within 0.2 points). Its Actual switch shows the three Australian series as dollars instead (each seasonally adjusted quarter at its annual rate, in 2023–24 prices). Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia’s from the ABS’s own figures, the OECD median from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
       {/* placement is deliberate: under the how-to, not beside the chart
