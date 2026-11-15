@@ -18,7 +18,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MACRO = path.join(ROOT, ".build", "macro.mjs");
 
 process.env.MACRO_LIB = "1";
-const { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane,
+const { xlsxSeriesRows, hhIncomeLevels, parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane,
         parseReleaseTable1, spliceMedianLane, monthAdd, absFiltered, ausGapLane,
         OECD_MEMBERS, MEMBER_NAMES, MED_MIN, targetOf, medianGapFor, spliceGapLane, DEV_MIN,
         MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
@@ -226,6 +226,37 @@ assert.equal(parseReleaseTable1("no table anywhere"), null, "no Table 1 → null
   const bad = spliceMedianLane(sdmx, { releases: { "2026-01": { median: 9.9, figures: figs(4.3) } } });
   assert.deepEqual(bad.corrupt, ["2026-01"], "a committed median ≠ its own figures is corrupt");
 }
+/* the household income account workbook: the series is found by its
+   named range, never by column position; column A's Excel serials are the
+   quarters (46174 = 2026-06-01, the ABS's quarter stamp); rows outside the
+   range and string cells are skipped; a non-quarter month refuses */
+{
+  const workbook = `<workbook><sheets><sheet name="Index" sheetId="3" r:id="rId1"/><sheet name="Data1" sheetId="1" r:id="rId2"/></sheets>` +
+    `<definedNames><definedName name="A2302939L">Data1!$C$1:$C$10,Data1!$C$11:$C$12</definedName>` +
+    `<definedName name="A2302939L_Data">Data1!$C$11:$C$12</definedName></definedNames></workbook>`;
+  const rels = `<Relationships><Relationship Id="rId2" Type="x/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId1" Type="x/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`;
+  const sheet = (aSerial2) => `<sheetData><row r="10"><c r="A10" t="s"><v>3</v></c><c r="C10" t="s"><v>4</v></c></row>` +
+    `<row r="11" spans="1:3"><c r="A11" s="9"><v>46082</v></c><c r="B11"><v>1</v></c><c r="C11" s="8"><v>390000</v></c></row>` +
+    `<row r="12"><c r="A12" s="9"><v>${aSerial2}</v></c><c r="B12"><v>2</v></c><c r="C12" s="8"><v>395500</v></c></row>` +
+    `<row r="13"><c r="A13"><v>46266</v></c><c r="C13"><v>1</v></c></row></sheetData>`;
+  const rows = xlsxSeriesRows({ workbook, rels, sheets: { "worksheets/sheet2.xml": sheet(46174), "worksheets/sheet1.xml": "" } }, "A2302939L");
+  assert.deepEqual(rows, [{ TIME_PERIOD: "2026-Q1", OBS_VALUE: "390000" }, { TIME_PERIOD: "2026-Q2", OBS_VALUE: "395500" }]);
+  assert.throws(() => xlsxSeriesRows({ workbook, rels, sheets: { "worksheets/sheet2.xml": sheet(46143) } }, "A2302939L"), /not a quarter's last month/);
+  assert.throws(() => xlsxSeriesRows({ workbook, rels, sheets: {} }, "A9999999X"), /names no A9999999X_Data/);
+}
+/* real household income per person = GDI ÷ (HFCE current ÷ volume) ÷
+   (GDP ÷ GDP per capita): $2,000m over a deflator of 1.25 over a
+   population of 1m (GDP $50,000m ÷ $50,000 a head) is $1,600 a head; a
+   quarter missing any input drops out */
+{
+  const r = (t, v, m) => ({ TIME_PERIOD: t, OBS_VALUE: String(v), ...(m ? { MEASURE: m } : {}) });
+  const lv = hhIncomeLevels([r("2026-Q1", 2000), r("2026-Q2", 2100)],
+    [r("2026-Q1", 1250, "C"), r("2026-Q1", 1000, "VCH"), r("2026-Q2", 1300, "C")],
+    [r("2026-Q1", 50000), r("2026-Q2", 50000)], [r("2026-Q1", 50000), r("2026-Q2", 50000)]);
+  assert.equal(lv.length, 1, "2026-Q2 has no chain-volume consumption and drops");
+  assert.equal(lv[0].TIME_PERIOD, "2026-Q1");
+  assert.ok(Math.abs(+lv[0].OBS_VALUE - 1600) < 1e-9);
+}
 console.log("1. pure helpers: OK");
 
 /* ------------------------------------------------------- 2. full pipeline */
@@ -282,6 +313,19 @@ const absGdpCsv = (() => {
   }
   return rows.join("\n") + "\n";
 })();
+/* the household income lane's inputs, 1974-Q1 → 210 quarters: GDP
+   300,000·1.007^i over the GDP-per-capita fixture's 20,000·1.005^i is the
+   population; consumption volume 100,000·1.006^i at a deflator of
+   0.5·1.01^i; disposable income 60,000·1.015^i. Real income a head is then
+   8,000·HH_R^i, HH_R = 1.015·1.005/(1.01·1.007). */
+const HH_R = (1.015 * 1.005) / (1.01 * 1.007);
+const qRows = (n, f) => { const out = []; let y = 1974, q = 1; for (let i = 0; i < n; i++) { out.push(f(qIso(y, q), i)); if (++q === 5) { q = 1; y++; } } return out; };
+const absGdpTotCsv = ["DATAFLOW,MEASURE,DATA_ITEM,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT",
+  ...qRows(210, (t, i) => `ABS:ANA_AGG(1.0.0),M1,GPM,20,AUS,Q,${t},${300000 * Math.pow(1.007, i)},AUD,6,,`)].join("\n") + "\n";
+const absHfceCsv = ["DATAFLOW,MEASURE,DATA_ITEM,SECTOR,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT",
+  ...qRows(210, (t, i) => `ABS:ANA_EXP(1.0.0),VCH,FCE,PHS,20,AUS,Q,${t},${100000 * Math.pow(1.006, i)},AUD,6,,`),
+  ...qRows(210, (t, i) => `ABS:ANA_EXP(1.0.0),C,FCE,PHS,20,AUS,Q,${t},${100000 * Math.pow(1.006, i) * 0.5 * Math.pow(1.01, i)},AUD,6,,`)].join("\n") + "\n";
+const absHhGdiCsv = ["TIME_PERIOD,OBS_VALUE", ...qRows(210, (t, i) => `${t},${60000 * Math.pow(1.015, i)}`)].join("\n") + "\n";
 const absRnndiCsv = (() => {
   const rows = ["DATAFLOW,MEASURE,DATA_ITEM,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT"];
   let y = 1974, q = 1;
@@ -338,6 +382,9 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-cpi-yoy.csv"), absMonthlyCpiCsv(cpiMonthly));
   fs.writeFileSync(path.join(dir, "abs-gdppc.csv"), absGdpCsv);
   fs.writeFileSync(path.join(dir, "abs-rnndi.csv"), absRnndiCsv);
+  fs.writeFileSync(path.join(dir, "abs-gdp.csv"), absGdpTotCsv);
+  fs.writeFileSync(path.join(dir, "abs-hfce.csv"), absHfceCsv);
+  fs.writeFileSync(path.join(dir, "abs-hh-gdi.csv"), absHhGdiCsv);
   fs.writeFileSync(path.join(dir, "abs-unemp.csv"), absUnempCsv);
   fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi));
   fs.writeFileSync(path.join(dir, "oecd-gdp.csv"), oecdGdpCsv(OECD_GDP));
@@ -356,6 +403,9 @@ assert.equal(st.rows.cpiMonthly, 9);
 assert.equal(st.rows.ausGap, 127, "118 target-era quarters + the 9 printed months");
 assert.equal(st.rows.gdppc, 210 - 4);
 assert.equal(st.rows.rnndi, 210 - 4);
+assert.equal(st.rows.hhdi, 210 - 4);
+assert.equal(st.rows.hhdiLevel, 210);
+assert.equal(st.newest.hhdi, "2026-06-30");
 assert.equal(st.rows.unemp, 584, "the labour-force series 1978-02→2026-09");
 assert.equal(st.rows.oecdCpi, 68);
 assert.equal(st.rows.oecdCpiMed, 840, "846 grid months minus the 2026 months the splice hands to the store era");
@@ -374,6 +424,8 @@ assert.equal(doc.cpi.rows[0].v, 4.5, "index-derived y/y rounds the fixture's kno
 assert.equal(doc.cpi.rows[0].date, "1962-03-31", "first y/y is the fifth quarter on file");
 assert.deepEqual(doc.gdppc.rows[0], { date: "1975-03-31", v: 2.0 });
 assert.deepEqual(doc.rnndi.rows[0], { date: "1975-03-31", v: 2.4 }, "1.006^4 levels growth is RNNDI y/y 2.4");
+assert.deepEqual(doc.hhdiLevel.rows[0], { date: "1974-03-31", v: 8000 }, "$60,000m ÷ 0.5 ÷ 15m people");
+assert.deepEqual(doc.hhdi.rows[0], { date: "1975-03-31", v: Math.round((HH_R ** 4 - 1) * 1000) / 10 }, "household income y/y off the composed growth rate");
 assert.deepEqual(doc.unemp.rows[0], { date: "1978-02-28", v: 4.4 }, "8-decimal source reads round to the published 4.4");
 assert.deepEqual(doc.unemp.rows.at(-1), { date: "2026-09-30", v: 4.4 });
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
@@ -482,7 +534,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp", "hhdi", "hhdiLevel"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -501,6 +553,8 @@ for (const k of KEYS) {
 assert.ok(live.cpi.rows[0].date <= "1955-01-01", "quarterly CPI reaches the mid-50s");
 assert.ok(live.gdppc.rows[0].date <= "1980-01-01", "GDP pc reaches the 70s");
 assert.ok(live.rnndi.rows[0].date <= "1980-01-01", "RNNDI reaches the 70s");
+assert.ok(live.hhdi.rows[0].date <= "1975-01-01", "household income reaches the 70s");
+assert.equal(live.hhdi.rows.at(-1).date, live.gdppc.rows.at(-1).date, "household income keeps pace with the national accounts");
 assert.ok(live.unemp.rows[0].date <= "1978-03-31", "the unemployment rate reaches its 1978 start");
 assert.equal(live.unemp.rows[0].v.toFixed(1), String(live.unemp.rows[0].v), "the unemp lane files the published 1dp");
 assert.ok(live.oecdCpi.rows[0].date <= "1975-01-01", "OECD CPI reaches the 70s");

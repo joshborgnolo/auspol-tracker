@@ -8712,9 +8712,12 @@ function infoTerms(D) {
         member's distance from its own central bank's target (computed here from the members'
         OECD-published prints and, since 2026, from the OECD's monthly release table; most
         members' targets are 2%, taken over the countries carrying both a print and a formal
-        target that month). Growth per person: real GDP per person and real net national
-        disposable income per person (chain volume, seasonally adjusted), beside the OECD's total
-        GDP growth, since it publishes no per-person average. Unemployment: the ABS's monthly
+        target that month). Growth per person: real GDP per person, real national income per
+        person (the whole country's income, export prices and income paid abroad counted) and
+        real household disposable income per person (what households have after tax and interest:
+        the ABS's household figure over its consumption price deflator and population, worked out
+        here since the ABS prints no real per-person figure), beside the OECD's total GDP growth,
+        since it publishes no per-person average. Unemployment: the ABS's monthly
         seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed,
         adjusted or estimated — the prints refresh daily from the ABS and OECD data APIs.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s

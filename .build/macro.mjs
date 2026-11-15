@@ -1,9 +1,9 @@
 /* macro.mjs – builds data/macro.json, the ABS/OECD price, labour and output
    series behind the "Inflation & growth" view of the Snapshot's Economic
    sentiment panel (rd-panels.jsx RdConfidence's third tab), and its Info
-   glossary entry. Ten display lanes, seven data-API pulls plus the OECD's
-   monthly inflation release PDFs — all OFFICIAL publications, fetched from
-   the ABS and OECD public data APIs, never hand-entered:
+   glossary entry. Eleven display lanes, nine data-API pulls plus one ABS
+   spreadsheet and the OECD's monthly inflation release PDFs — all OFFICIAL
+   publications, fetched from the ABS and OECD, never hand-entered:
 
      cpi        – all-groups CPI, Australia, annual change, quarterly 1949→.
                   ABS CPI dataflow: MEASURE 3 (percentage change to
@@ -33,6 +33,17 @@
                   annual change, quarterly. Same ANA_AGG derivation as
                   gdppc from the ABS's chain-volume levels
                   (M1.NNDI_PCA.20.AUS.Q), 1974→.
+     hhdi       – real household disposable income per capita, Australia,
+                  annual change, quarterly, 1974→ — COMPUTED, as the ABS
+                  prints no real per-capita household series: household
+                  gross disposable income (5206.0 Table 20, a spreadsheet
+                  only — HH_GDI) over the household consumption deflator
+                  (ANA_EXP HFCE current ÷ chain volume) and the ABS's own
+                  population (ANA_AGG GDP ÷ GDP per capita), the RBA's
+                  construction; hhdiLevel keeps the dollar level. Matches
+                  the OECD's print of the same measure for Australia to
+                  0.02pt on average (2026-11-16). Unlike national income
+                  (rnndi) it leaves out company and government income.
      unemp      – unemployment rate, Australia, monthly, seasonally
                   adjusted, persons aged 15+. The ABS's PRINTED labour-
                   force measure (LF dataflow: M13 = "Unemployment rate",
@@ -98,7 +109,8 @@
    - --check computes everything, prints MACRO_STATUS, never writes
    - --fixture-dir <dir> reads source CSVs from a fixture directory instead
      of the live APIs: abs-cpi-index.csv, abs-cpi-yoy.csv, abs-gdppc.csv,
-     abs-rnndi.csv, abs-unemp.csv, oecd-cpi.csv, oecd-gdp.csv (test seam;
+     abs-rnndi.csv, abs-gdp.csv, abs-hfce.csv, abs-hh-gdi.csv
+     (TIME_PERIOD,OBS_VALUE), abs-unemp.csv, oecd-cpi.csv, oecd-gdp.csv (test seam;
      every file must be present, the run never falls back to live fetches
      in fixture mode; in fixture mode the release-PDF probe is skipped and
      the median lane's release era reads the committed store only) */
@@ -143,6 +155,25 @@ const SOURCES = {
     accept: "application/vnd.sdmx.data+csv",
     cite: "ABS Australian National Accounts (cat 5204.0/06), real net national disposable income per capita, chain volume measures, seasonally adjusted — data API ABS,ANA_AGG measure M1, item NNDI_PCA",
   },
+  /* the household income lane's two data-API inputs (its third, the
+     household income account itself, is not on the API — see HH_GDI):
+     GDP's chain-volume level, which over the GDP-per-capita level gives
+     the ABS's own population basis, and household consumption at current
+     prices and chain volume, whose ratio is the consumption deflator at
+     full precision (the API's printed deflator, DCH, carries one decimal
+     — ~1% steps on the 1970s' index of 9-10) */
+  gdpLvl: {
+    fixture: "abs-gdp.csv",
+    url: `${ABS_BF}/ABS,ANA_AGG,1.0.0/M1.GPM.20.AUS.Q`,
+    accept: "application/vnd.sdmx.data+csv",
+    cite: "ABS Australian National Accounts (cat 5206.0), GDP, chain volume measures, seasonally adjusted — data API ABS,ANA_AGG measure M1, item GPM",
+  },
+  hfce: {
+    fixture: "abs-hfce.csv",
+    url: `${ABS_BF}/ABS,ANA_EXP,1.0.0/C+VCH.FCE.PHS.20.AUS.Q`,
+    accept: "application/vnd.sdmx.data+csv",
+    cite: "ABS Australian National Accounts (cat 5206.0), household final consumption expenditure, current prices and chain volume measures, seasonally adjusted — data API ABS,ANA_EXP measures C and VCH, item FCE, sector PHS",
+  },
   unemp: {
     fixture: "abs-unemp.csv",
     url: `${ABS_BF}/ABS,LF,1.0.0/M13.3.1599.20.AUS.M`,
@@ -165,6 +196,115 @@ const SOURCES = {
     cite: "OECD Key short-term economic indicators (DF_KEI): OECD total, GDP volume, growth on the same quarter of the previous year — some latest rows carry the OECD's provisional flag",
   },
 };
+
+/* Household gross disposable income: the ABS publishes the household
+   income account (5206.0 Table 20) as a spreadsheet only — the data API
+   carries no sector income accounts. The release's own page links the
+   current workbook (its path names the reference quarter, so it is found
+   there rather than guessed); the series is read by its ABS series ID
+   through the workbook's named range (`<id>_Data`), which survives the ABS
+   reordering columns. Fixture mode reads a two-column CSV
+   (TIME_PERIOD,OBS_VALUE) instead. */
+const HH_GDI = {
+  fixture: "abs-hh-gdi.csv",
+  page: "https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-national-income-expenditure-and-product/latest-release",
+  file: "5206020_Household_Income.xlsx",
+  series: "A2302939L",   // GROSS DISPOSABLE INCOME, $ millions, current prices, seasonally adjusted
+  cite: "ABS Australian National Accounts (cat 5206.0) Table 20, Household Income Account: gross disposable income, current prices, seasonally adjusted — series A2302939L",
+};
+const xmlText = (s) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+const colNum = (letters) => [...letters].reduce((n, c) => n * 26 + c.charCodeAt(0) - 64, 0);
+/* Read one series out of an ABS time-series workbook's XML parts: the
+   named range `<series>_Data` gives sheet, column and row span; each row's
+   date is column A's Excel serial (the ABS stamps the quarter's last
+   month, first day). Returns [{TIME_PERIOD: "YYYY-Qn", OBS_VALUE}] — the
+   SDMX row shape the lane helpers take. Pure: the tests feed it strings. */
+function xlsxSeriesRows({ workbook, rels, sheets }, series) {
+  const dn = new RegExp(`<definedName name="${series}_Data">([^<]+)</definedName>`).exec(workbook);
+  if (!dn) throw new Error(`workbook names no ${series}_Data range`);
+  const ref = /^'?([^'!]+)'?!\$([A-Z]+)\$(\d+):\$([A-Z]+)\$(\d+)$/.exec(xmlText(dn[1]));
+  if (!ref || ref[2] !== ref[4]) throw new Error(`${series}_Data is not one column: ${dn[1]}`);
+  const [, sheetName, col, r0, , r1] = ref;
+  const sh = new RegExp(`<sheet [^>]*name="${sheetName}"[^>]*r:id="([^"]+)"`).exec(workbook);
+  if (!sh) throw new Error(`workbook has no sheet ${sheetName}`);
+  const tg = new RegExp(`Id="${sh[1]}"[^>]*Target="([^"]+)"|Target="([^"]+)"[^>]*Id="${sh[1]}"`).exec(rels);
+  const target = tg && (tg[1] || tg[2]).replace(/^\/?(xl\/)?/, "");
+  const xml = target && sheets[target];
+  if (!xml) throw new Error(`sheet ${sheetName} (${target}) missing from the workbook`);
+  const want = colNum(col), out = [];
+  for (const m of xml.matchAll(/<row r="(\d+)"[^>]*>(.*?)<\/row>/gs)) {
+    const r = +m[1];
+    if (r < +r0 || r > +r1) continue;
+    let serial = null, v = null;
+    for (const c of m[2].matchAll(/<c r="([A-Z]+)\d+"([^>]*?)(?:\/>|>(.*?)<\/c>)/gs)) {
+      if (/t="s"/.test(c[2])) continue;  // shared strings never hold the figures
+      const val = c[3] && /<v>([^<]*)<\/v>/.exec(c[3]);
+      if (!val) continue;
+      const n = colNum(c[1]);
+      if (n === 1) serial = +val[1];
+      else if (n === want) v = +val[1];
+    }
+    if (!Number.isFinite(serial) || !Number.isFinite(v)) continue;
+    const d = new Date(Date.UTC(1899, 11, 30) + serial * 864e5);
+    const mo = d.getUTCMonth() + 1;
+    if (mo % 3) throw new Error(`${series} row ${r}: ${d.toISOString().slice(0, 10)} is not a quarter's last month`);
+    out.push({ TIME_PERIOD: `${d.getUTCFullYear()}-Q${mo / 3}`, OBS_VALUE: String(v) });
+  }
+  return out;
+}
+function unzipParts(buf, names) {
+  const p = `${tmpdir()}/macro-abs-${process.pid}.xlsx`;
+  writeFileSync(p, buf);
+  try {
+    const list = execFileSync("unzip", ["-Z1", p], { encoding: "utf8" }).split("\n").filter(Boolean);
+    const out = {};
+    for (const n of list.filter(names)) out[n] = execFileSync("unzip", ["-p", p, n], { encoding: "utf8", maxBuffer: 64 << 20 });
+    return out;
+  } finally {
+    try { unlinkSync(p); } catch { /* temp cleanup best-effort */ }
+  }
+}
+async function readHhGdi() {
+  if (FIXTURE_DIR) {
+    const p = `${FIXTURE_DIR}/${HH_GDI.fixture}`;
+    if (!existsSync(p)) throw new Error(`fixture missing: ${p}`);
+    return parseSdmxCsv(readFileSync(p, "utf8"));
+  }
+  const page = await httpGetBin(HH_GDI.page);
+  if (page.status !== 200) throw new Error(`ABS national accounts page → HTTP ${page.status}`);
+  const href = new RegExp(`href="([^"]*/${HH_GDI.file})"`).exec(page.body.toString("utf8"));
+  if (!href) throw new Error(`ABS national accounts page links no ${HH_GDI.file}`);
+  const url = new URL(href[1], HH_GDI.page).href;
+  const wb = await httpGetBin(url);
+  if (wb.status !== 200 || !wb.body.subarray(0, 2).equals(Buffer.from("PK"))) throw new Error(`${url} → HTTP ${wb.status}, not a workbook`);
+  const parts = unzipParts(wb.body, (n) => /^xl\/(workbook\.xml|_rels\/workbook\.xml\.rels|worksheets\/sheet\d+\.xml)$/.test(n));
+  const sheets = {};
+  for (const [n, x] of Object.entries(parts)) if (n.startsWith("xl/worksheets/")) sheets[n.slice(3)] = x;
+  return xlsxSeriesRows({ workbook: parts["xl/workbook.xml"], rels: parts["xl/_rels/workbook.xml.rels"], sheets }, HH_GDI.series);
+}
+/* Real household disposable income per person, dollars a quarter in the
+   consumption deflator's reference-year prices — the RBA's construction
+   (household gross disposable income deflated by the household
+   consumption deflator, per head). Per quarter t:
+     deflator_t = HFCE current / HFCE chain volume
+     population_t = GDP chain volume / GDP per capita chain volume
+     v_t = GDI_t / deflator_t / population_t
+   all three seasonally adjusted. The population is the ABS's own (the
+   one its per-capita aggregates divide by), so this line and GDP per
+   person share a denominator. Returns level rows in the SDMX shape. */
+function hhIncomeLevels(gdiRows, hfceRows, gdpRows, gdppcRows) {
+  const by = (rows, pick) => new Map(rows.filter(pick).map((r) => [r.TIME_PERIOD, parseFloat(r.OBS_VALUE)]));
+  const gdi = by(gdiRows, () => true);
+  const cur = by(hfceRows, (r) => r.MEASURE === "C"), vol = by(hfceRows, (r) => r.MEASURE === "VCH");
+  const gdp = by(gdpRows, () => true), pc = by(gdppcRows, () => true);
+  const out = [];
+  for (const [t, g] of gdi) {
+    const c = cur.get(t), k = vol.get(t), y = gdp.get(t), p = pc.get(t);
+    if (![g, c, k, y, p].every((x) => Number.isFinite(x) && x > 0)) continue;
+    out.push({ TIME_PERIOD: t, OBS_VALUE: String((g / (c / k)) / (y / p)) });
+  }
+  return out.sort((a, b) => periodOrd(a.TIME_PERIOD) - periodOrd(b.TIME_PERIOD));
+}
 
 /* OECD member countries (the 38 of the 2020s) — the membership the median
    lane medians over. Membership is constant by construction (a country's
@@ -308,15 +448,18 @@ const MED_DAM = (ry, rm) =>
 // OECD histories are tamer but padded on the same logic. The gap lane is
 // MEASURED on its computation (2026-11-09): −2.2 (2015's oil crash) to
 // +7.9 (mid-2022's energy spike) — the band pads both tails.
+// The household income band is measured on its live derivation
+// (2026-11-16): −6.2 (March 2023) to +7.5 (June 2004) a year; the level,
+// $7,548 to $16,174 a quarter in 2023–24 prices — both bands pad the tails.
 // The unemployment band is measured on its live series too (2026-11-10):
 // 3.4 (Oct 2022) to 11.2 (Dec 1992) — the band pads both tails.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, ausGap: 125, gdppc: 200, rnndi: 200, unemp: 550, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdp: 40, gdppcLevel: 200, rnndiLevel: 200 };
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000], hhdi: [-12, 15], hhdiLevel: [3000, 40000] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, ausGap: 125, gdppc: 200, rnndi: 200, unemp: 550, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdp: 40, gdppcLevel: 200, rnndiLevel: 200, hhdi: 200, hhdiLevel: 200 };
 /* the median/gap lanes' newest reference month trails the others by the
    release lag (~2 months) plus the daily run's day: ~75d steady state,
    ~90d across a slow December/January stretch — 110d trips only when the
    monthly release feed has truly died. */
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210, gdppcLevel: 210, rnndiLevel: 210 };
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210, gdppcLevel: 210, rnndiLevel: 210, hhdi: 210, hhdiLevel: 210 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -811,7 +954,7 @@ function guard(msg) {
 }
 
 // ------------------------------------------------------------------- main
-export { parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane, ausGapLane, AUS_TARGET_MID, AUS_TARGET_FROM, parseReleaseTable1, spliceMedianLane, readMedianStore, monthAdd, absFiltered, OECD_MEMBERS, MEMBER_NAMES, MED_MIN, CB_TARGETS, targetOf, medianGapFor, devGapLane, spliceGapLane, DEV_MIN, MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
+export { xlsxSeriesRows, hhIncomeLevels, parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane, ausGapLane, AUS_TARGET_MID, AUS_TARGET_FROM, parseReleaseTable1, spliceMedianLane, readMedianStore, monthAdd, absFiltered, OECD_MEMBERS, MEMBER_NAMES, MED_MIN, CB_TARGETS, targetOf, medianGapFor, devGapLane, spliceGapLane, DEV_MIN, MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS };
 
 if (!process.env.MACRO_LIB) {
   // Serial, with a breath between hosts: the OECD's NSI gates parallel
@@ -821,6 +964,17 @@ if (!process.env.MACRO_LIB) {
   for (const [k, spec] of Object.entries(SOURCES)) {
     texts[k] = await readSource(spec);
     await sleep(400);
+  }
+  /* the workbook rides the ABS website, not the data API: a failed read
+     leaves the household lanes on their last filed rows (logged as
+     pending, which the daily wrapper surfaces; the stale mark catches a
+     failure that lasts) rather than holding back every other lane */
+  let hhGdiRows = null, hhPending = null;
+  try { hhGdiRows = await readHhGdi(); }
+  catch (e) {
+    if (FIXTURE_DIR) throw e;
+    hhPending = e.message;
+    console.log(`pending hhdi: household income workbook unread (${e.message}); keeping the filed rows`);
   }
   const absCpiIdx = texts.cpiIndex, absCpiYoy = texts.cpiYoy, absGdp = texts.gdppcLvl, absRnndi = texts.rnndipcLvl, absUnemp = texts.unemp;
   const oecdCpiRows = texts.oecdCpi, oecdGdpRows = texts.oecdGdp;
@@ -855,6 +1009,24 @@ if (!process.env.MACRO_LIB) {
   const gdppcLevel = printedRows(gdpLevels).map((x) => ({ date: x.date, v: Math.round(x.v) }));
   const rnndiLevel = printedRows(rnndiLevels).map((x) => ({ date: x.date, v: Math.round(x.v) }));
 
+  // hhdi / hhdiLevel — real household disposable income per person: the
+  // household income account's gross disposable income over the
+  // consumption deflator and the ABS's population (hhIncomeLevels), as
+  // whole dollars a quarter and as its annual change.
+  const hfceRows = absFiltered(parseSdmxCsv(texts.hfce), { DATA_ITEM: "FCE", SECTOR: "PHS", TSEST: 20, REGION: "AUS" });
+  const gdpTotRows = absFiltered(parseSdmxCsv(texts.gdpLvl), { MEASURE: "M1", DATA_ITEM: "GPM", TSEST: 20, REGION: "AUS" });
+  let hhdi, hhdiLevel;
+  if (hhGdiRows) {
+    const hhLevels = hhIncomeLevels(hhGdiRows, hfceRows, gdpTotRows, gdpLevels);
+    if (hhLevels.length < 200) throw guard(`hhdi levels: ${hhLevels.length} rows — a household income input changed basis or span upstream?`);
+    hhdi = yoyFromLevels(hhLevels, 4);
+    hhdiLevel = printedRows(hhLevels).map((x) => ({ date: x.date, v: Math.round(x.v) }));
+  } else {
+    const filed = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : {};
+    hhdi = (filed.hhdi || {}).rows || [];
+    hhdiLevel = (filed.hhdiLevel || {}).rows || [];
+  }
+
   // unemp — the ABS's printed monthly unemployment rate, seasonally
   // adjusted. The API's OBS_VALUE carries full precision; the ABS prints
   // the rate at 1dp (its download's DECIMALS=1), so the lane rounds to
@@ -885,7 +1057,7 @@ if (!process.env.MACRO_LIB) {
     writeAtomic(MED_STORE, medStoreNext);
   }
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, ausGap, gdppc, rnndi, unemp, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdp, gdppcLevel, rnndiLevel })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, ausGap, gdppc, rnndi, unemp, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdp, gdppcLevel, rnndiLevel, hhdi, hhdiLevel })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -901,7 +1073,7 @@ if (!process.env.MACRO_LIB) {
 
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const doc = {
-    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). gdppcLevel / rnndiLevel: the ABS's printed SA chain-volume per-capita levels behind gdppc and rnndi, dollars per person per quarter (whole dollars as printed). Rows: {date: ISO period end, v: percent, or dollars on the two level lanes}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+    _about: "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdp: OECD total real GDP y/y, OECD's printed quarterly measure (no per-capita OECD aggregate is published — labelled 'OECD average GDP growth'). gdppcLevel / rnndiLevel: the ABS's printed SA chain-volume per-capita levels behind gdppc and rnndi, dollars per person per quarter (whole dollars as printed). hhdi / hhdiLevel: real household disposable income per capita Australia — computed here, as the ABS prints no real per-capita household series: household gross disposable income (5206.0 Table 20, series A2302939L, current prices, SA) divided by the household consumption deflator (HFCE current prices over chain volume, SA) and by the ABS's population (GDP chain volume over GDP per capita chain volume); hhdiLevel in whole dollars per person per quarter at the deflator's 2023–24 reference prices, hhdi its annual change (same derivation as gdppc). Cross-checked 2026-11-16 against the OECD's own print of the same measure for Australia (household dashboard, B6GS1M_R_POP, 2008→): annual changes agree to 0.02pt on average, 0.2pt at most. Rows: {date: ISO period end, v: percent, or dollars on the two level lanes}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au, Table 20 of 5206.0 from the release's spreadsheet; OECD DF_PRICES_ALL and DF_KEI via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
     cpi: { label: "Inflation (headline CPI)", basis: "derived from ABS index numbers", rows: cpi },
     cpiMonthly: { label: "Inflation (monthly CPI)", basis: "ABS printed measure", rows: cpiMonthly },
     ausGap: { label: "Australia over its target", basis: "headline CPI minus the RBA's 2–3% band midpoint (computed)", rows: ausGap },
@@ -914,10 +1086,12 @@ if (!process.env.MACRO_LIB) {
     oecdGdp: { label: "OECD average GDP growth", basis: "OECD printed measure", rows: oecdGdp },
     gdppcLevel: { label: "GDP per capita (dollars a quarter)", basis: "ABS printed level (chain volume, seasonally adjusted)", rows: gdppcLevel },
     rnndiLevel: { label: "Real net national disposable income per capita (dollars a quarter)", basis: "ABS printed level (chain volume, seasonally adjusted)", rows: rnndiLevel },
+    hhdi: { label: "Real household disposable income per capita (annual change)", basis: "household gross disposable income over the household consumption deflator and the ABS's population (computed from ABS figures, seasonally adjusted)", rows: hhdi },
+    hhdiLevel: { label: "Real household disposable income per capita (dollars a quarter, 2023–24 prices)", basis: "household gross disposable income over the household consumption deflator and the ABS's population (computed from ABS figures, seasonally adjusted)", rows: hhdiLevel },
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp", "gdppcLevel", "rnndiLevel"];
+  const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);
@@ -936,5 +1110,6 @@ if (!process.env.MACRO_LIB) {
     medParsed,
     medHandoffDrift: medSplice.handoff,
     devGapHandoffDrift: gapSplice.handoff,
+    hhPending,
   }));
 }
