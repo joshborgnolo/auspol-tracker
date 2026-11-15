@@ -1449,8 +1449,8 @@ export function validateMacro() {
   let M = null;
   try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
   catch { fail("macro.json", "macro-shape", "missing or unparseable"); return errors; }
-  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15] };
-  const STALE = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210 };
+  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdp: [-12, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000] };
+  const STALE = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdp: 210, gdppcLevel: 210, rnndiLevel: 210 };
   const days = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
   const lanes = {};
   for (const k of Object.keys(BAND)) {

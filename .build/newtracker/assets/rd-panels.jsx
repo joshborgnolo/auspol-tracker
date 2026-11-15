@@ -6763,6 +6763,10 @@ function macroData(D) {
   const cut = mo.length ? confIsoX(mo[0].date) : Infinity;
   const cpiRows = M.cpi.rows.filter((r) => confIsoX(r.date) < cut).concat(mo);
   const lane = (k, rows, o) => (rows && rows.length ? { k, ...o, latest: rows[rows.length - 1], pts: mk(rows, o.q) } : null);
+  /* the per-person levels: the ABS prints dollars a quarter; drawn at the
+     annual rate (x4, the usual reading of a seasonally adjusted quarter)
+     in thousands, so the y ruler keeps the percent charts' tick steps */
+  const lvl = (k, rows, o) => lane(k, rows && rows.map((r) => ({ date: r.date, v: r.v * 4 / 1000 })), o);
   const L = {
     cpi: lane("cpi", cpiRows, { name: "Australia", color: "var(--macro-cpi)", au: true, q: (r) => confIsoX(r.date) < cut }),
     oecdCpi: M.oecdCpi && lane("oecdCpi", M.oecdCpi.rows, { name: "OECD average", color: "var(--ink-3)", q: false }),
@@ -6772,6 +6776,8 @@ function macroData(D) {
     gdppc: lane("gdppc", M.gdppc.rows, { name: "GDP per person", color: "var(--macro-gdppc)", au: true, q: true }),
     rnndi: M.rnndi && lane("rnndi", M.rnndi.rows, { name: "National income per person", color: "var(--macro-rnndi)", au: true, q: true }),
     oecdGdp: M.oecdGdp && lane("oecdGdp", M.oecdGdp.rows, { name: "OECD (total GDP)", color: "var(--ink-3)", q: true }),
+    gdppcLevel: M.gdppcLevel && lvl("gdppcLevel", M.gdppcLevel.rows, { name: "GDP per person", color: "var(--macro-gdppc)", au: true, q: true }),
+    rnndiLevel: M.rnndiLevel && lvl("rnndiLevel", M.rnndiLevel.rows, { name: "National income per person", color: "var(--macro-rnndi)", au: true, q: true }),
     unemp: M.unemp && lane("unemp", M.unemp.rows, { name: "Australia", color: "var(--macro-unemp)", au: true, q: false }),
   };
   const P = [
@@ -6780,7 +6786,12 @@ function macroData(D) {
     { id: "gap", title: "Inflation against target", sub: "Points above (+) or below (−) the central bank’s target",
       copyTitle: "Inflation against target: Australia and the median OECD country", lanes: [L.ausGap, L.oecdCpiGap], zero: "On target" },
     { id: "grow", title: "Growth per person", sub: "Real, % change on a year earlier",
-      copyTitle: "Real growth per person in Australia, and the OECD’s", lanes: [L.gdppc, L.rnndi, L.oecdGdp], zero: true },
+      copyTitle: "Real growth per person in Australia, and the OECD’s", lanes: [L.gdppc, L.rnndi, L.oecdGdp], zero: true,
+      /* the same two series as dollars rather than their annual change
+         (the panel's Increase / Actual switch); the OECD has no
+         per-person level to set beside them */
+      level: L.gdppcLevel ? { sub: "Real dollars a year, in thousands, seasonally adjusted", money: true, zero: false,
+        copyTitle: "Real output and income per person in Australia", lanes: [L.gdppcLevel, L.rnndiLevel].filter(Boolean) } : null },
     { id: "unemp", title: "Unemployment", sub: "% of the labour force, seasonally adjusted",
       copyTitle: "Australia’s unemployment rate", lanes: [L.unemp], zero: false },
   ].map((p) => ({ ...p, lanes: p.lanes.filter(Boolean) })).filter((p) => p.lanes.length);
@@ -6800,7 +6811,12 @@ const macroStripLines = (D) => { const md = macroData(D); return md ? [{ points:
    window's elections, on every chart). A first-row chart keeps the badge
    row's height in every window (`top`), so a step never shifts the grid.
    `ctl` hands one chart the list's open event; the others keep their own. */
-function RdMacroPanel({ p, win, dragging, narrow, union, evs, evMode, top, ctl, evtOpen, setEvtOpen, xTicks, span, years, nowX }) {
+function RdMacroPanel({ p: p0, win, dragging, narrow, union, evs, evMode, top, ctl, evtOpen, setEvtOpen, xTicks, span, years, nowX }) {
+  /* Increase / Actual: a panel carrying a `level` twin swaps its lanes,
+     measure line and copy for the twin's, keeping its title and place */
+  const [actual, setActual] = useState(false);
+  const p = actual && p0.level ? { ...p0, ...p0.level } : p0;
+  const money = !!p.money;
   const inW = (q) => q.x >= win.a && q.x <= win.b;
   const dotsOn = win.b - win.a <= 4.6;
   const vals = [];
@@ -6810,6 +6826,8 @@ function RdMacroPanel({ p, win, dragging, narrow, union, evs, evMode, top, ctl, 
   const ny = confNiceY(vals.length ? vals : [0, 1], 2);
   const yd = useConfChase([ny.lo, ny.hi], dragging);
   const PCT = (v) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  /* money lanes ride in thousands of dollars a year */
+  const USD = (v) => "$" + Math.round(v * 1000).toLocaleString("en-AU");
   const series = p.lanes.map((l) => ({
     id: p.id + "-" + l.k, label: l.name, color: l.color, rdWidth: l.au ? 2.1 : 1.5, dash: l.dash,
     smooth: false, endCap: false, interpHover: true, points: l.pts,
@@ -6832,27 +6850,50 @@ function RdMacroPanel({ p, win, dragging, narrow, union, evs, evMode, top, ctl, 
   const named = evMode === "badge";
   const hPx = (narrow ? 196 : 212) + (top ? 22 : 0);
   const pad = { l: narrow ? 32 : 34, r: 14, t: top ? 34 : narrow ? 12 : 14, b: 28 };
-  const latestTxt = (l) => PCT(l.latest.v) + "%";
+  const latestTxtOf = (q) => (l) => (q.money ? USD(l.latest.v) : PCT(l.latest.v) + "%");
+  const latestTxt = latestTxtOf(p);
+  const subKey = (q) => (
+    <>
+      <p className="rd-mp-s">{q.sub}</p>
+      <ul className="rd-mp-key">
+        {q.lanes.map((l) => (
+          <li key={l.k} className={l.au ? "au" : ""}>
+            <RdSwatch kind={l.dash ? "dash" : "line"} color={l.color} />
+            <span className="rd-mp-kn" style={l.au ? { color: "color-mix(in oklch, " + l.color + " 62%, var(--ink))" } : null}>{l.name}</span>
+            <span className="rd-mp-kv">{latestTxtOf(q)(l)}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
   const auLatest = p.lanes.find((l) => l.au);
   const when = auLatest ? auLatest.pts[auLatest.pts.length - 1].when : "";
   return (
     <div className={"rd-mp rd-mp-" + p.id}>
       <div className="rd-mp-h">
-        <h4 className="rd-mp-t">{p.title}</h4>
-        <p className="rd-mp-s">{p.sub}</p>
-        <ul className="rd-mp-key">
-          {p.lanes.map((l) => (
-            <li key={l.k} className={l.au ? "au" : ""}>
-              <RdSwatch kind={l.dash ? "dash" : "line"} color={l.color} />
-              <span className="rd-mp-kn" style={l.au ? { color: "color-mix(in oklch, " + l.color + " 62%, var(--ink))" } : null}>{l.name}</span>
-              <span className="rd-mp-kv">{latestTxt(l)}</span>
-            </li>
-          ))}
-        </ul>
+        {p0.level
+          ? <div className="rd-mp-tr">
+              <h4 className="rd-mp-t">{p.title}</h4>
+              <span className="rd-chips rd-mp-mode" role="group" aria-label={p.title + ": show"}>
+                <button type="button" className="rd-chip" aria-pressed={!actual} onClick={() => setActual(false)}>Increase</button>
+                <button type="button" className="rd-chip" aria-pressed={actual} onClick={() => setActual(true)}>Actual</button>
+              </span>
+            </div>
+          : <h4 className="rd-mp-t">{p.title}</h4>}
+        {p0.level
+          /* both modes' measure line and key laid over each other, the
+             idle one hidden, so the switch never changes the header's
+             height (three keys wrap where two don't) */
+          ? <div className="rd-mp-twin">
+              {[p0, { ...p0, ...p0.level }].map((q, i) => (
+                <div key={i} className={(i === 1) === actual ? "on" : "off"} aria-hidden={(i === 1) !== actual}>{subKey(q)}</div>
+              ))}
+            </div>
+          : subKey(p)}
       </div>
       <TrendChart heightPx={hPx} padPx={pad}
         xDomain={[win.a, win.b]} yDomain={yd} yTicks={confTicksIn(yd, ny.step)}
-        yTickFmt={(v) => (v < 0 ? "−" : "") + Math.abs(v)}
+        yTickFmt={money ? (v) => String(v) : (v) => (v < 0 ? "−" : "") + Math.abs(v)}
         xTicks={xTicks} baseline driven={dragging}
         refLines={refLines} areas={areas} notes={notes} series={series} spine={spine}
         events={named ? evs : []}
@@ -6860,11 +6901,11 @@ function RdMacroPanel({ p, win, dragging, narrow, union, evs, evMode, top, ctl, 
         vlines={evMode === "rule" ? evs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
         scatter={scatter}
         tooltipTitle={(i) => (spine[i] ? spine[i].when : "")}
-        fmt={(v) => PCT(v) + (p.id === "gap" ? " pts" : "%")}
+        fmt={money ? USD : (v) => PCT(v) + (p.id === "gap" ? " pts" : "%")}
         copy={{
           title: p.copyTitle, span: years,
           sub: p.sub + ". " + span + ". Latest Australian print: " + (auLatest ? latestTxt(auLatest) + ", " + when : "") + ".",
-          caption: "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? " The OECD line is total GDP growth; the OECD publishes no per-person average." : ""),
+          caption: "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? (money ? " Chain-volume dollars at the ABS’s reference-year prices, each quarter’s seasonally adjusted figure at its annual rate (four times the quarter)." : " The OECD line is total GDP growth; the OECD publishes no per-person average.") : ""),
           legend: p.lanes.map((l) => ({ label: l.name + " (latest " + latestTxt(l) + ")", color: l.color, kind: l.dash ? "dashed" : "line" })),
         }} />
     </div>
@@ -6898,8 +6939,8 @@ function RdMacro({ win, dragging, terms, nowX, hi, strip }) {
   const span = confWinSpan(win, terms, hi);
   const years = confWinYears(win, terms, hi);
   const exportCsv = () => {
-    const rr = [["kind", "series", "date", "pct"]];
-    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", ausGap: "Australia over its target", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", unemp: "Unemployment rate", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdp: "OECD average GDP growth" };
+    const rr = [["kind", "series", "date", "value"]];
+    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", ausGap: "Australia over its target", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", unemp: "Unemployment rate", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdp: "OECD average GDP growth", gdppcLevel: "Real GDP per capita (dollars a quarter)", rnndiLevel: "Real net national disposable income per capita (dollars a quarter)" };
     for (const k of Object.keys(SHEET)) {
       const ln = D.macro[k];
       if (!ln) continue;
@@ -7599,7 +7640,7 @@ function RdConfidence({ rangeId }) {
         <>The bar over the chart sets the window, and the window holds as you switch tabs. It opens on this term; ‹ and › step back and forward a term at a time, and Term, 10 yrs, 25 yrs and All widen it (‹ › then page back and forward by that length). The strip under each chart is the whole record in miniature with the governments beneath it: drag the window along it, drag its edges to resize it, drag across the strip to draw a new one, or tap a spot to jump there. A term reads off its election — Election, 1 yr, 2 yrs — so every term shares one ruler; a longer window counts calendar years and marks each federal election with a faint rule. Dots show in a window of about a term; longer windows draw the lines alone.</>,
         <>Behind a term the band pools the view’s main gauge over the other terms, each lined up on its own election month: the middle half in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. This term’s band is every past term; a past term’s is every term but itself. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. Before each house’s live release file begins, its line is the house’s own monthly history, drawn a little thinner — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010, NAB’s printed net balance to March 1997. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals.</>,
         <>ANZ–Roy Morgan’s and Westpac–MI’s are indices where 100 is neutral; DemosAU’s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
-        <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as four small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted) beside the OECD’s total GDP growth — the OECD publishes no per-person average. Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia’s from the ABS’s own figures, the OECD median from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
+        <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as four small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted) beside the OECD’s total GDP growth — the OECD publishes no per-person average; its Actual switch shows the two Australian series as dollars instead (the ABS’s chain-volume level per person, each seasonally adjusted quarter at its annual rate). Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia’s from the ABS’s own figures, the OECD median from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
       {/* placement is deliberate: under the how-to, not beside the chart

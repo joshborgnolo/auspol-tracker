@@ -7406,8 +7406,9 @@ const confDeep = (() => {
    APIs) passes through as-is: cpi/cpiMonthly inflation, the ausGap
    deviation-from-target derivation, gdppc real GDP per capita and rnndi
    real net national disposable income per capita, the unemp unemployment
-   rate (the only lane drawn as a level, not an annual change), and the
-   OECD comparators
+   rate (the only lane drawn as a level, not an annual change), the
+   gdppcLevel/rnndiLevel printed per-person dollar levels (the growth
+   chart's "Actual" switch), and the OECD comparators
    (oecdCpi printed aggregates; oecdCpiMed and oecdCpiGap the extractor's
    member-country medians). The view reads the raw {date, v} rows and
    splices the quarterly CPI history onto the printed monthly era
@@ -7415,7 +7416,7 @@ const confDeep = (() => {
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp"]) {
+  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdp", "gdppcLevel", "rnndiLevel"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };
