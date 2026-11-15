@@ -32,7 +32,7 @@ await page.goto(base + "/", { waitUntil: "load" });
 await new Promise((r) => setTimeout(r, 1500));
 await page.evaluate(() => document.getElementById("confidence").scrollIntoView());
 await page.evaluate(() => {
-  const btn = [...document.querySelectorAll("button")].find((el) => /Show complete history/i.test(el.textContent));
+  const btn = [...document.querySelectorAll("#confidence .rd-cwin-span")].find((el) => el.textContent.trim() === "All");
   if (btn) btn.click();
 });
 await new Promise((r) => setTimeout(r, 900));

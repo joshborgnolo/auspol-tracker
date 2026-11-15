@@ -8675,13 +8675,18 @@ function infoTerms(D) {
         2026; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
         Business Survey. The consumer lanes and the business pair sit in two views, switched by
         the tabs over the chart — the consumer lanes open first. The chart opens at the May
-        2025 election; the figures on file run
-        further back — 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.
+        2025 election, on this term. The bar over it steps back a term at a time, or widens to
+        10 or 25 years or the whole record, and the strip under the chart moves the window
+        anywhere along it; the window holds as you switch tabs. Each house’s live releases
+        run back to 2019 (the Roy Morgan series), 2022 (Westpac–MI) and April 2025 (NAB), and
+        its own monthly history runs on behind them: ANZ–Roy Morgan’s consumer index to 1973,
+        Westpac–MI’s to 1974, NAB’s printed net balance to 1997 and Roy Morgan’s business index
+        to 2010.
         <span className="info-p"><b>100 is neutral.</b> The 100-neutral series are built from the
         balance of optimists and pessimists on each house’s questions, so a reading above 100
         means optimists outnumber pessimists and one below 100 the reverse.</span>
         <span className="info-p"><b>NAB is drawn 100 points up.</b> NAB reports a net balance —
-        optimistic firms minus pessimistic ones — where 0 is neutral, so its dashed line is
+        optimistic firms minus pessimistic ones — where 0 is neutral, so its line is
         drawn 100 points up to share the neutral line with the others. The figure shown beside
         it and in its tooltips is NAB’s own printed number; the row also carries the survey’s
         conditions reading, which is not charted.</span>
@@ -8697,22 +8702,21 @@ function infoTerms(D) {
         {" "}{xref("house-effect", "mood", "house-effect")} adjustment applies — a record, not an
         estimate. The change shown beside each series is the one the house printed with it, kept
         only where it agrees with the previous printed reading.</span>
-        <span className="info-p"><b>Inflation &amp; growth is a third tab.</b> It charts the ABS
-        and OECD's official series as published: Australia's headline inflation (the monthly CPI
+        <span className="info-p"><b>Inflation &amp; growth is a third tab.</b> It sets the ABS
+        and OECD's official series out as four small charts that share the window, Australia in
+        colour and the OECD in grey. Inflation: Australia's headline inflation (the monthly CPI
         era's printed annual change, spliced onto the earlier quarterly series derived from the
-        ABS's own published index numbers), its own deviation from the Reserve Bank's 2–3%
-        band at its midpoint, real GDP per person and real net national disposable
-        income per person (chain volume, seasonally
-        adjusted) and the unemployment rate (the ABS's monthly seasonally adjusted print —
-        a level, not an annual change), with the OECD-wide average, the OECD countries' own median and the
-        median deviation from each member's own central-bank target (the two median lines are
-        computed here — from the members' OECD-published prints and, since 2026, from the
-        OECD's monthly release table; the deviation is each country's print minus its own bank's
-        target midpoint — Australia's 2.5%, most others' 2% — taken over the countries
-        carrying both a print and a formal target that month) as dashed
-        context, and the Reserve Bank's 2–3% inflation target as a shaded band. Nothing is
-        smoothed, adjusted or estimated — the prints refresh daily from the ABS and OECD data
-        APIs.</span>
+        ABS's own published index numbers) beside the OECD-wide average and the median member,
+        with the Reserve Bank's 2–3% target shaded from its adoption in August 1996. Inflation
+        against target: Australia's figure minus the band's 2.5% midpoint, beside the median
+        member's distance from its own central bank's target (computed here from the members'
+        OECD-published prints and, since 2026, from the OECD's monthly release table; most
+        members' targets are 2%, taken over the countries carrying both a print and a formal
+        target that month). Growth per person: real GDP per person and real net national
+        disposable income per person (chain volume, seasonally adjusted), beside the OECD's total
+        GDP growth, since it publishes no per-person average. Unemployment: the ABS's monthly
+        seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed,
+        adjusted or estimated — the prints refresh daily from the ABS and OECD data APIs.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
         polls because confidence in the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },

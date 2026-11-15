@@ -341,6 +341,20 @@ export function sectionBlocks(sec, ctx = {}) {
       out.push({ k: "how", summary: W(find(t, (x) => x.tag === "summary")), paras: findAll(t, (x) => x.tag === "p").map(W).filter(Boolean) });
       return;
     }
+    /* Economic sentiment's Inflation & growth card is four small charts in
+       a grid (RdMacro): each panel its own chart, titled by its name with
+       its measure beside it (the copy legend carries the latest prints),
+       and the sitting term's numbered events listed after the first row */
+    if (hasCls(t, "rd-macro-card")) { walk(t.kids); return; }
+    if (hasCls(t, "rd-mp")) {
+      const chart = find(t, (x) => x.tag === "$chart");
+      if (chart) {
+        const spec = chartSpec(chart.props);
+        out.push({ k: "chart", title: W(q(t, ".rd-mp-t")) || spec.title || "", meta: W(q(t, ".rd-mp-s")), fig: null, hed: null, csub: null, reads: [], spec, key: [], small: false });
+      }
+      return;
+    }
+    if (hasCls(t, "rd-mp-evrow")) { const l = q(t, ".rd-evlist"); if (l) out.push(eventList(l)); return; }
     if (hasCls(t, "rd-card") || hasCls(t, "rd-un-panel")) { if (chartCard(t, out, ctx)) { walkRest(t); return; } }
     if (hasCls(t, "rd-evlist") || hasCls(t, "rd-event-list") || hasCls(t, "rd-cyc-events")) { out.push(eventList(t)); return; }
     if (hasCls(t, "rd-foot")) { out.push({ k: "foot", t: W(q(t, ".rd-foot-text") || t) }); return; }

@@ -305,10 +305,24 @@ export function chartSpec(P, extra = {}) {
   const call = (f, v) => { try { return String(f(v)); } catch { return String(v); } };
   const [d0, d1] = Array.isArray(P.xDomain) && P.xDomain.length === 2 ? P.xDomain : [0, 1];
   const xi = (x) => Math.round(((x - d0) / (d1 - d0 || 1)) * 1000);
+  /* a run of points held to the window, plus the one either side of it so
+     a line still reaches the plot's edge (the drawer clips there): a chart
+     whose lanes carry their whole history and window it by the domain
+     (Economic sentiment, 2026-11) would otherwise ship every year it
+     isn't showing */
+  const clip = (pts) => {
+    let lo = -1, hi = -1;
+    for (let i = 0; i < pts.length; i++) if (pts[i].x >= d0 && pts[i].x <= d1) { if (lo < 0) lo = i; hi = i; }
+    if (lo < 0) {
+      const j = pts.findIndex((q) => q.x > d1);
+      return j > 0 && pts[j - 1].x < d0 ? [pts[j - 1], pts[j]] : [];
+    }
+    return pts.slice(Math.max(0, lo - 1), hi + 2);
+  };
   const keepS = (P.series || []).filter((s) => s && s.points && s.points.length && s.opacity !== 0);
   const dots = new Map();
   for (const d of P.scatter || []) {
-    if (!fin(d.x) || !fin(d.y)) continue;
+    if (!fin(d.x) || !fin(d.y) || d.x < d0 || d.x > d1) continue;
     const k = (d.color || "var(--ink-faint)") + "|" + (d.hollow || (d.meta && d.meta.hollow) ? 1 : 0);
     if (!dots.has(k)) dots.set(k, []);
     dots.get(k).push(xi(d.x), r1(d.y));
@@ -322,11 +336,11 @@ export function chartSpec(P, extra = {}) {
     series: keepS.map((s) => ({
       l: s.label || null, end: s.endLabel || null, c: s.color || "var(--ink)", w: s.rdWidth || s.width || 2,
       d: s.dashed || s.dash ? 1 : 0, o: s.opacity != null && s.opacity < 1 ? r2(s.opacity) : 1,
-      p: s.points.filter((p) => fin(p.x) && fin(p.y)).flatMap((p) => [xi(p.x), r1(p.y)]),
+      p: clip(s.points.filter((p) => fin(p.x) && fin(p.y))).flatMap((p) => [xi(p.x), r1(p.y)]),
     })).filter((s) => s.p.length),
     areas: (P.areas || []).filter((a) => a && a.points && a.points.length && a.opacity !== 0).map((a) => ({
       c: a.color || "var(--ink-faint)", o: a.opacity != null ? r2(a.opacity) : null, cls: a.className || "",
-      p: a.points.filter((p) => fin(p.x) && fin(p.y0) && fin(p.y1)).flatMap((p) => [xi(p.x), r1(p.y0), r1(p.y1)]),
+      p: clip(a.points.filter((p) => fin(p.x) && fin(p.y0) && fin(p.y1))).flatMap((p) => [xi(p.x), r1(p.y0), r1(p.y1)]),
     })).filter((a) => a.p.length),
     dots: [...dots].map(([k, xy]) => { const [c, h] = k.split("|"); return [c, +h, xy]; }),
     marks: (P.marks || []).filter((m) => fin(m.x) && fin(m.y)).map((m) => [xi(m.x), r2(m.y), m.color || "var(--ink)", m.label || ""]),

@@ -7384,9 +7384,9 @@ const confHistory = (() => {
 /* --- §5l. confidence history as a CALENDAR series ----------------------
    The past-terms payload above re-bases every term on its own election
    month; this is the same history file as-calendar, one {ym, v} point per
-   survey month, so the confidence panel's "Show complete history" toggle
-   can widen the window to each house's full published run and extend the
-   live lines backwards. Only the lanes whose printed basis the live chart
+   survey month, so the confidence panel's time window (its ‹ › term
+   stepper, span chips and strip) can reach each house's full published run
+   and extend the live lines backwards. Only the lanes whose printed basis the live chart
    already draws travel: NAB's deep net-balance series (nabConfidence in
    the history file) now rides too, renamed to the payload's nabBusiness;
    the conditions DEVIATION lane (nabConditions — H3 CSV, never the printed

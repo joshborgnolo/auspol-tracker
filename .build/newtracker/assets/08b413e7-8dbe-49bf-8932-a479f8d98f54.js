@@ -402,8 +402,18 @@ function TrendChart(props) {
      there. */
   const visEnd = (s) => {
     const pts = s.points, last = pts[pts.length - 1];
-    if (!last || !s.clipX || last.x <= s.clipX[1]) return last;
-    const x = s.clipX[1];
+    if (!last) return last;
+    /* `endAtWin`: a line running on past the window's right edge (a past
+       window over a series that runs on to now - Economic sentiment's
+       term and year windows) visibly ends AT the edge, so its name parks
+       there; one lying wholly outside the window has no visible end */
+    let cut = s.clipX ? s.clipX[1] : Infinity;
+    if (s.endAtWin) {
+      if (pts[0].x > win[1] || last.x < win[0]) return null;
+      cut = Math.min(cut, win[1]);
+    }
+    if (last.x <= cut) return last;
+    const x = cut;
     for (let i = pts.length - 1; i > 0; i--) {
       if (pts[i - 1].x <= x) {
         const a = pts[i - 1], b = pts[i], f = b.x - a.x ? (x - a.x) / (b.x - a.x) : 0;
@@ -1909,7 +1919,7 @@ function TrendChart(props) {
             that finish at similar values are nudged apart */}
         {(() => {
           const labs = series
-            .filter((s) => s.endLabel && s.points.length && s.opacity !== 0)
+            .filter((s) => s.endLabel && s.points.length && s.opacity !== 0 && visEnd(s))
             .map((s) => {
               const last = visEnd(s);
               /* inkOf, not the series colour: the label is a GLYPH, and the

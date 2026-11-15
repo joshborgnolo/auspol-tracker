@@ -31,10 +31,10 @@ page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
 await page.goto(base + "/", { waitUntil: "load" });
 await new Promise((r) => setTimeout(r, 1500));
 
-/* consumer view is the default; switch history on */
+/* consumer view is the default; widen the window to every year on record (the window bar's All chip) */
 await page.evaluate(() => document.getElementById("confidence").scrollIntoView());
 await page.evaluate(() => {
-  const btn = [...document.querySelectorAll("button")].find((el) => /Show complete history/i.test(el.textContent));
+  const btn = [...document.querySelectorAll("#confidence .rd-cwin-span")].find((el) => el.textContent.trim() === "All");
   if (btn) btn.click();
 });
 await new Promise((r) => setTimeout(r, 900));

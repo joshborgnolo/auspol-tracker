@@ -95,7 +95,7 @@ ok((await pills()) === null, "no drawn pills after the clear");
 /* ---- B: history-view deep-region row completeness (interpHover) ---- */
 await page.evaluate(() => {
   const sec = document.getElementById("confidence");
-  const b = [...sec.querySelectorAll("button")].find((el) => /Show complete history/i.test(el.textContent));
+  const b = [...document.querySelectorAll("#confidence .rd-cwin-span")].find((el) => el.textContent.trim() === "All");
   if (b) b.click();
 });
 await new Promise((r) => setTimeout(r, 900));

@@ -142,12 +142,12 @@ if (conf) {
   const tipC = await tipRows("svgANY", "confidence");
   assertField("confidence term view", tipC);
   const histOn = await page.evaluate(() => {
-    const b = document.querySelector("#confidence .rd-confidence-hist");
+    const b = [...document.querySelectorAll("#confidence .rd-cwin-span")].find((el) => el.textContent.trim() === "All");
     if (!b) return false;
     b.click();
     return true;
   });
-  check("complete-history toggle found", histOn);
+  check("window bar's All chip found", histOn);
   if (histOn) {
     await new Promise((r) => setTimeout(r, 700)); // intentional-sleep: history view mount
     const sec = await page.evaluate(() => !!document.querySelector("#confidence svg"));

@@ -6420,9 +6420,8 @@ function RdIssues({
   const [selId, setSelId] = useState(null);
   const selNow = selId || (I && I.list && I.list[0] ? I.list[0].id : null);
   const [issMorph, setSel] = window.AP.useMorph(selNow, v => setSelId(v), (a, b) => a !== b);
-  const [gsetId, setGset] = useState("vote");
-  const [whomK, setWhomK] = useState(null);
-  const whomList = useNarrow("(max-width: 1000px)");
+  const [matView, setMatView] = useState("all");
+  const matNarrow = useNarrow("(max-width: 560px)");
   const stripRef = React.useRef(null);
   const rowsRef = React.useRef(null);
   const isHover = React.useRef(false);
@@ -6477,11 +6476,11 @@ function RdIssues({
       if (iwHover.current && view === "whom" && G && G.tabs) {
         const iw = iwCard.current;
         if (!iw || !iw.isConnected || !iw.getClientRects().length) return;
-        const list = G.tabs.map(x => x.id);
-        const i = list.indexOf(gsetId);
+        const list = ["all"].concat(G.tabs.map(x => x.id));
+        const i = list.indexOf(matViewEff);
         if (i < 0 || list.length < 2) return;
         e.preventDefault();
-        pickGset(list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length]);
+        pickMat(list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length]);
       } else if (isHover.current) {
         const vs = ["trust", "whom"];
         const i = vs.indexOf(view);
@@ -6498,7 +6497,7 @@ function RdIssues({
       });
       document.removeEventListener("keydown", key, true);
     };
-  }, [view, gsetId, I]);
+  }, [view, matView, I]);
   const stripW = useRdWidth(stripRef, 150);
   if (!I || !I.list || !I.list.length) return null;
   const P = I.parties;
@@ -6857,8 +6856,58 @@ function RdIssues({
     }, "No clear lead"));
   };
   const G = I.groups;
-  const gtab = G && (G.tabs.find(x => x.id === gsetId) || G.tabs[0]);
+  const matTabsAll = (G && G.tabs && G.tabs.length ? [{
+    id: "all"
+  }].concat(G.tabs.map(x => ({
+    id: x.id,
+    label: x.label
+  }))) : [{
+    id: "all"
+  }]).map(t => t.id === "all" ? {
+    id: "all",
+    label: matNarrow ? "All" : "All voters"
+  } : t);
+  const matViewEff = matTabsAll.some(t => t.id === matView) ? matView : "all";
+  const gtab = matViewEff !== "all" && G && G.tabs ? G.tabs.find(x => x.id === matViewEff) || null : null;
   const allOf = k => G && G.all && G.all[k] || null;
+  const matIssue = !gtab ? selNow : gtab.issues.includes(selNow) ? selNow : gtab.issues[0];
+  const matX = list.find(x => x.id === matIssue) || null;
+  const salFitOf = x => x && x.salDots && x.salDots.length >= 4 ? withinHouseSlope(x.salDots.map(d => ({
+    h: d[1],
+    t: d[0],
+    w: d[4],
+    y: d[3]
+  }))) : null;
+  const salTrends = list.map(x => ({
+    k: x.id,
+    fit: salFitOf(x)
+  })).filter(f => f.fit);
+  const salMovers = [];
+  for (const [i, f] of [...salTrends].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (salTrends.length - i)) break;
+    salMovers.push(f);
+  }
+  const matSince = x => {
+    const s = x && x.salDots && x.salDots[0] ? x.salDots[0][2] : null;
+    return s ? D.monthNameFull(+s.slice(5, 7)) + " " + s.slice(0, 4) : "";
+  };
+  const mattersHead = (() => {
+    const ph = ISS_PHRASE[top.id] || top.label.toLowerCase();
+    const moved = salMovers.filter(f => f.k !== top.id);
+    const up = moved.filter(f => f.fit.b > 0)[0],
+      dn = moved.filter(f => f.fit.b < 0)[0];
+    const cl = [up && (ISS_PHRASE[up.k] || up.k) + " is climbing", dn && (ISS_PHRASE[dn.k] || dn.k) + " is fading"].filter(Boolean);
+    return rdCap(ph) + " tops what matters to voters" + (cl.length ? ", as " + cl.join(" and ") : "") + ".";
+  })();
+  const mattersDek = (() => {
+    const sents = [];
+    const three = list.filter(x => x.imp && x.imp.v != null).slice(0, 3);
+    if (three.length) sents.push("In voters’ top three now: " + three.map(x => (ISS_PHRASE[x.id] || x.label.toLowerCase()) + " (" + Math.round(x.imp.v) + "%)").join(", ") + ".");
+    for (const x of list.filter(x => x.imp && x.imp.changeSig && x.imp.chg != null && Math.abs(x.imp.chg) >= 0.1).slice(0, 2)) {
+      sents.push(rdCap(ISS_PHRASE[x.id] || x.label.toLowerCase()) + " is " + (x.imp.chg > 0 ? "up " : "down ") + Math.abs(x.imp.chg).toFixed(1) + (Math.abs(x.imp.chg) > 1.05 ? " points" : " point") + " on a month ago.");
+    }
+    return sents.join(" ");
+  })();
   const gVerdicts = gtab ? gtab.issues.map(k => issGroupVerdict(gtab, k)).filter(Boolean).sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
   const whomHead = (() => {
     if (!gtab) return null;
@@ -6877,73 +6926,9 @@ function RdIssues({
     if (!behind) return rdCap(first) + " comes first, or level first, for everyone.";
     return rdCap(first) + " comes first for most voters, but not all.";
   })();
-  const newestPoll = G && G.newest ? D.individualPolls.find(q => /^RedBridge/.test(q.pollster) && q.released === G.newest) : null;
-  const monFull = lab => lab.replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\b/g, m => D.monthNameFull(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(m.slice(0, 3)) + 1));
-  const gSource = G ? G.house + ", " + (newestPoll ? monFull(newestPoll.dateLabel) + " " + G.newest.slice(0, 4) : rdDate(G.newest, true)) : "";
-  const whomCell = (g, k) => {
-    const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
-    if (!c) return React.createElement("span", {
-      className: "rd-iw-na"
-    }, "\u2013");
-    const a = allOf(k);
-    const diff = g && a ? c.v - a.v : 0;
-    const sig = g && a && Math.abs(diff) > c.ci;
-    return React.createElement("span", {
-      className: "rd-iw-cell" + (g ? "" : " all") + (sig ? " sig" : ""),
-      title: "± " + c.ci.toFixed(1) + " is the 95% margin"
-    }, React.createElement("span", {
-      className: "rd-iw-bar"
-    }, React.createElement("span", {
-      style: {
-        width: c.v + "%"
-      }
-    }), g && a && React.createElement("i", {
-      style: {
-        left: a.v + "%"
-      }
-    })), React.createElement("b", null, React.createElement(RollNum, {
-      value: String(Math.round(c.v))
-    }), sig ? React.createElement("em", null, diff > 0 ? "▲" : "▼") : null));
-  };
-  const groupLong = g => rdCap(issWho(g).replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
   const groupShort = g => g.replace(/^Nationals, LNP and CLP$/, "Nationals, LNP, CLP");
-  const whomIssue = !gtab ? null : whomK && gtab.issues.includes(whomK) ? whomK : (gtab.issues.map(k => ({
-    k,
-    v: issGroupVerdict(gtab, k)
-  })).filter(x => x.v).sort((a, b) => b.v.gap - a.v.gap)[0] || {}).k || gtab.issues[0];
-  const whomRow = (g, k, i) => {
-    const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
-    if (!c) return null;
-    const a = allOf(k);
-    const diff = g && a ? c.v - a.v : 0;
-    const sig = g && a && Math.abs(diff) > c.ci;
-    return React.createElement("div", {
-      key: g ? "r" + i : "all",
-      className: "rd-iw-lrow" + (g ? "" : " all") + (sig ? " sig" : ""),
-      role: "row",
-      title: "± " + c.ci.toFixed(1) + " is the 95% margin"
-    }, React.createElement("span", {
-      role: "rowheader"
-    }, g ? groupShort(g) : "All voters"), React.createElement("span", {
-      className: "rd-iw-lbar",
-      "aria-hidden": "true"
-    }, React.createElement("span", {
-      style: {
-        width: c.v + "%"
-      }
-    }), g && a && React.createElement("i", {
-      style: {
-        left: a.v + "%"
-      }
-    })), React.createElement("span", {
-      role: "cell",
-      className: "rd-iw-lv"
-    }, React.createElement(RollNum, {
-      value: String(Math.round(c.v))
-    }), sig ? " " + (diff > 0 ? "▲" : "▼") : ""));
-  };
   const whomTsig = !gtab || !gtab.tr ? null : gtab.issues.map(k => {
-    const rows = [["all", "All voters", (gtab.tr.all || {})[k]]].concat(gtab.groups.map(g => [g, groupShort(g), gtab.tr.g[g] ? gtab.tr.g[g][k] : null])).filter(x => x[2] && x[2].length).map(([id, name, s]) => ({
+    const rows = [["all", "All voters", (gtab.tr.all || {})[k]]].concat(gtab.groups.map(g => [g, groupShort(g), gtab.tr.g[g] && gtab.tr.g[g][k] ? gtab.tr.g[g][k] : null])).filter(x => x[2] && x[2].length).map(([id, name, s]) => ({
       id,
       name,
       first: s[0][1],
@@ -6968,21 +6953,278 @@ function RdIssues({
         key: r.id,
         name: r.name,
         sig: sigIds.includes(r.id),
+        dir: r.fit ? Math.sign(r.fit.b) : 0,
         cells: [rdTsSgn(r.first) + " → " + rdTsSgn(r.last), r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? sigIds.includes(r.id) ? "Yes" : "No" : "–"]
       }))
     };
   });
+  const salTsig = (() => {
+    if (gtab || !matX || !matX.salDots || !matX.salDots.length) return null;
+    const rows = [...new Set(matX.salDots.map(d => d[1]))].map(h => {
+      const s = matX.salDots.filter(d => d[1] === h);
+      return {
+        key: h,
+        name: h,
+        first: s[0][3],
+        last: s[s.length - 1][3],
+        fit: withinHouseSlope(s.map(d => ({
+          h,
+          t: d[0],
+          w: d[4],
+          y: d[3]
+        })))
+      };
+    });
+    const tested = rows.filter(r => r.fit);
+    const sigIds = [];
+    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (r.fit.p >= 0.05 / (tested.length - i)) break;
+      sigIds.push(r.key);
+    }
+    return [{
+      key: "main",
+      rows: rows.map(r => ({
+        key: r.key,
+        name: r.name,
+        sig: sigIds.includes(r.key),
+        dir: r.fit ? Math.sign(r.fit.b) : 0,
+        cells: [rdTsSgn(r.first) + " → " + rdTsSgn(r.last), r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.fit ? sigIds.includes(r.key) ? "Yes" : "No" : "–"]
+      }))
+    }];
+  })();
+  const MAT_LADDER = [90, 128, 165, 185, 205, 225, 268, 290, 312];
+  const matColor = g => {
+    if (gtab && gtab.id === "vote") {
+      if (g === "Undecided") return "var(--ink-3)";
+      if (g === "Nationals, LNP and CLP") return "oklch(0.72 0.075 255)";
+      if (g === "Coalition") return "oklch(0.58 0.10 252)";
+      return pColor({
+        Labor: "alp",
+        Liberal: "lnp",
+        "One Nation": "onp",
+        Greens: "grn",
+        Others: "oth"
+      }[g] || "oth");
+    }
+    return "oklch(0.63 0.145 " + MAT_LADDER[gtab.groups.indexOf(g) % MAT_LADDER.length] + ")";
+  };
+  const matChartFor = x => {
+    if (!x) return null;
+    if (!gtab) {
+      const mPts = (x.salMonthly || []).map(m => ({
+        ym: m[0],
+        x: D.mx(m[0]),
+        v: m[1],
+        ci: m[2]
+      }));
+      if (!mPts.length) return null;
+      const xDomain = [Math.max(rangeLo, mPts[0].x - 0.06), rangeHi];
+      const pts = filterPts(mPts, xDomain[0]);
+      if (!pts.length) return null;
+      const byRow = new Map([...D.individualPolls, ...(D.issuesOnlyPolls || [])].map(q => [q.pollster + "|" + q.released, q]));
+      const dots = (x.salDots || []).filter(d => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map(d => {
+        const meta = byRow.get(d[1] + "|" + d[2]) || {
+          pollster: d[1],
+          released: d[2],
+          sample: d[4]
+        };
+        return {
+          x: d[0],
+          pollster: d[1],
+          date: d[2],
+          y: d[3],
+          meta
+        };
+      });
+      const scatter = dots.map(d => ({
+        x: d.x,
+        y: d.y,
+        color: "var(--ink-3)",
+        label: d.pollster,
+        meta: d.meta
+      }));
+      const areas = pts.length >= 2 ? [{
+        id: "ci-v",
+        color: "var(--ink)",
+        className: "ci-band",
+        edge: false,
+        points: pts.map(d => ({
+          x: d.x,
+          y0: d.v - d.ci,
+          y1: d.v + d.ci
+        }))
+      }] : [];
+      const vals = pts.flatMap(d => [d.v - d.ci, d.v + d.ci]).concat(dots.map(d => d.y));
+      const d0 = Math.max(0, Math.floor((Math.min(...vals) + 0.6) / 10) * 10),
+        d1 = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
+      return {
+        xDomain,
+        pts,
+        scatter,
+        areas,
+        keys: ["v", "ci"],
+        domain: [d0, d1],
+        group: false
+      };
+    }
+    if (!gtab.tr || !gtab.issues.includes(x.id)) return null;
+    const allW = (gtab.tr.all || {})[x.id] || [];
+    if (!allW.length) return null;
+    const pts = allW.map(w => {
+      const row = {
+        x: w[0],
+        all: w[1],
+        _d: w[3] || null
+      };
+      for (const g of gtab.groups) {
+        const s = gtab.tr.g[g] && gtab.tr.g[g][x.id];
+        const p = s && s.find(q => q[0] === w[0]);
+        if (p) row[g] = p[1];
+      }
+      return row;
+    }).sort((a, b) => a.x - b.x);
+    const xDomain = [Math.max(rangeLo, pts[0].x - 0.06), rangeHi];
+    const rows = pts.filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]);
+    const keys = gtab.groups.concat(["all"]);
+    const vals = rows.flatMap(d => keys.map(kk => d[kk]).filter(v => v != null));
+    if (!vals.length) return null;
+    const d0 = Math.max(0, Math.floor((Math.min(...vals) + 0.6) / 10) * 10),
+      d1 = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
+    return {
+      xDomain,
+      pts: rows,
+      keys,
+      domain: [d0, d1],
+      group: true
+    };
+  };
+  const matCh = matChartFor(matX);
+  const matDraw = (() => {
+    if (!matCh) return null;
+    const base = {
+      xDomain: matCh.xDomain,
+      domain: matCh.domain,
+      pts: matCh.pts,
+      areas: matCh.areas || [],
+      scatter: matCh.scatter || [],
+      scatterOut: [],
+      scatterMove: [],
+      fade: 1,
+      clip: null
+    };
+    const m = issMorph;
+    const A = m && m.from && m.from !== matIssue ? list.find(x => x.id === m.from) : null;
+    const a = A && matChartFor(A);
+    if (!a || a.group !== matCh.group) return base;
+    const t = m.t;
+    const bl = window.AP.blendRows(a.pts, matCh.pts, t, matCh.keys);
+    if (!bl) return base;
+    const draw = {
+      xDomain: window.AP.blendDomain(a.xDomain, matCh.xDomain, t),
+      domain: window.AP.blendDomain(a.domain, matCh.domain, t),
+      pts: bl.rows,
+      clip: bl.clip,
+      fade: t
+    };
+    if (!matCh.group) {
+      draw.areas = bl.rows.length >= 2 ? [{
+        id: "ci-v",
+        color: "var(--ink)",
+        className: "ci-band",
+        edge: false,
+        clipX: bl.clip,
+        points: bl.rows.filter(d => d.v != null && d.ci != null).map(d => ({
+          x: d.x,
+          y0: d.v - d.ci,
+          y1: d.v + d.ci
+        }))
+      }] : [];
+      const cross = window.AP.crossClouds(a.scatter || [], base.scatter, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.label);
+      draw.scatter = cross.scatter;
+      draw.scatterOut = cross.scatterOut;
+      draw.scatterMove = cross.scatterMove;
+    } else {
+      draw.areas = [];
+      draw.scatter = [];
+      draw.scatterOut = [];
+      draw.scatterMove = [];
+    }
+    return draw;
+  })();
+  const matSeries = matDraw ? !gtab ? [{
+    id: "v",
+    label: "All voters",
+    color: "var(--ink)",
+    rdWidth: 2.2,
+    endCap: false,
+    clipX: matDraw.clip,
+    points: matDraw.pts.filter(d => d.v != null).map(d => ({
+      x: d.x,
+      y: d.v
+    }))
+  }] : (() => {
+    const endXOf = g => {
+      let x = -Infinity;
+      for (const d of matDraw.pts) if (d[g] != null && d.x > x) x = d.x;
+      return x;
+    };
+    const lastWave = Math.max(...matCh.keys.map(endXOf));
+    return matCh.keys.map(g => {
+      const s = {
+        id: g,
+        label: g === "all" ? "All voters" : groupShort(g),
+        color: g === "all" ? "var(--ink-3)" : matColor(g),
+        rdWidth: g === "all" ? 2.8 : 2,
+        endCap: false,
+        clipX: matDraw.clip,
+        points: matDraw.pts.filter(d => d[g] != null).map(d => ({
+          x: d.x,
+          y: d[g]
+        }))
+      };
+      if (s.points.length && endXOf(g) >= lastWave - 0.02) s.endLabel = g === "all" ? "All voters" : groupShort(g);
+      return s;
+    });
+  })() : null;
+  const matTsigSet = gtab && whomTsig ? whomTsig.find(s => s.key === matIssue) || null : null;
+  const matTrendHead = (() => {
+    if (!matX) return null;
+    if (!gtab) {
+      const fit = salFitOf(matX),
+        since = matSince(matX);
+      if (!since) return null;
+      if (fit && fit.p < 0.05) return (ISS_SHORT[matIssue] || matX.label) + " has " + (fit.b > 0 ? "climbed" : "fallen") + " significantly since " + since;
+      return "No significant shift since " + since;
+    }
+    const set = matTsigSet;
+    if (!set) return null;
+    const up = set.rows.filter(r => r.sig && r.dir > 0).map(r => r.name);
+    const dn = set.rows.filter(r => r.sig && r.dir < 0).map(r => r.name);
+    if (!up.length && !dn.length) return "No group has shifted significantly on it";
+    const nm = g => g === "All voters" ? "all voters" : g;
+    return [up.length ? "Up among " + rdList(up.map(nm)) : null, dn.length ? "Down among " + rdList(dn.map(nm)) : null].filter(Boolean).join("; ");
+  })();
+  const matSetWords = {
+    vote: "vote intention",
+    generation: "age",
+    gender: "gender",
+    education: "education",
+    location: "where they live",
+    housing: "home ownership"
+  };
+  const matTitle = (matX ? I.labels[matIssue] || matX.label : "") + " in voters’ top three" + (gtab ? " by " + (matSetWords[gtab.id] || "group") : "") + ", %";
+  const matSource = (gtab ? G && G.house || "RedBridge" : "RedBridge and Ipsos") + ", monthly" + (matSince(matX) ? " since " + matSince(matX) : "");
   const pinWhom = () => {
     const sec = document.getElementById("issues");
     rdPinScroll(sec && [sec.querySelector(".rd-iw-tabs"), sec.querySelector(".rd-iw-chips"), sec.querySelector(".rd-iw-ctl")]);
   };
-  const pickGset = id => {
+  const pickMat = id => {
     pinWhom();
-    setGset(id);
+    setMatView(id);
   };
   const pickWhom = k => {
     pinWhom();
-    setWhomK(k);
+    setSel(k);
   };
   const tabs = React.createElement(RdTabs, {
     swipe: true,
@@ -6995,7 +7237,7 @@ function RdIssues({
       label: "Who’s trusted"
     }, {
       id: "whom",
-      label: "What matters to whom"
+      label: "What matters"
     }]
   });
   return React.createElement(RdSec, {
@@ -7184,107 +7426,114 @@ function RdIssues({
       from: "The issues"
     }
   }, "One square per issue, pooled as the Snapshot\u2019s figures are. A square takes the colour of the party ahead on it by more than the figures\u2019 own 95% margin; two colours share a square the polls can\u2019t split, the left-behind party clearly third; grey means nothing separates the three.")))) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
-    head: whomHead,
-    dek: gVerdicts.length ? gVerdicts.map(v => v.text).join(" ") : "No two groups differ significantly on any of these issues."
-  }), gtab ? React.createElement("div", {
+    head: gtab ? whomHead : mattersHead,
+    dek: gtab ? gVerdicts.length ? gVerdicts.map(v => v.text).join(" ") : "No two groups differ significantly on any of these issues." : mattersDek
+  }), React.createElement("div", {
     className: "card rd-card rd-iw",
     ref: iwCard
-  }, whomList ? React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-iw-k"
-  }, "Group voters by"), React.createElement(RdTabs, {
+  }, React.createElement("div", {
+    className: "rd-iw-ctl"
+  }, React.createElement("span", {
+    className: "rd-iw-by"
+  }, "Voters"), React.createElement(RdTabs, {
     swipe: true,
-    value: gtab.id,
-    onChange: pickGset,
-    options: G.tabs.map(x => ({
-      id: x.id,
-      label: x.label
-    })),
-    ariaLabel: "Group voters by",
+    value: matViewEff,
+    onChange: pickMat,
+    options: matTabsAll,
+    ariaLabel: "Voters",
     className: "rd-tabs-sm rd-iw-tabs"
-  }), React.createElement("div", {
+  })), React.createElement("div", {
     className: "rd-iw-chips",
     role: "group",
     "aria-label": "Issue"
-  }, gtab.issues.map(k => React.createElement("button", {
+  }, (gtab ? gtab.issues : list.map(x => x.id)).map(k => React.createElement("button", {
     key: k,
     type: "button",
     className: "rd-iw-chip",
-    "aria-pressed": whomIssue === k,
+    "aria-pressed": matIssue === k,
     onClick: () => pickWhom(k)
   }, React.createElement(RdTabW, {
     t: ISS_SHORT[k] || I.labels[k] || k
   })))), React.createElement("p", {
-    className: "rd-iw-ltitle"
-  }, React.createElement("b", null, I.labels[whomIssue] || whomIssue, " in their top three, %"), React.createElement("br", null), gSource), React.createElement("div", {
-    className: "rd-iw-list",
-    role: "table",
-    "aria-label": "Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"
-  }, whomRow(null, whomIssue), gtab.groups.map((g, i) => whomRow(g, whomIssue, i)))) : React.createElement(React.Fragment, null, React.createElement("div", {
-    className: "rd-iw-ctl"
-  }, React.createElement("span", {
-    className: "rd-iw-by"
-  }, "Group voters by"), React.createElement(RdTabs, {
-    value: gtab.id,
-    onChange: pickGset,
-    options: G.tabs.map(x => ({
-      id: x.id,
-      label: x.label
-    })),
-    ariaLabel: "Group voters by",
-    className: "rd-tabs-sm rd-iw-tabs"
-  })), React.createElement("p", {
     className: "rd-iw-src"
-  }, React.createElement("b", null, "Share of each group putting each issue in its top three, %"), ", ", gSource), React.createElement("div", {
-    className: "rd-iw-wrap"
-  }, React.createElement("table", {
-    className: "rd-iw-table"
-  }, React.createElement("colgroup", null, React.createElement("col", {
-    className: "rd-iw-labcol"
-  }), gtab.issues.map(k => React.createElement("col", {
-    key: k
-  }))), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
-    scope: "col"
-  }, React.createElement("span", {
-    className: "sr-only"
-  }, "Group")), gtab.issues.map(k => React.createElement("th", {
-    scope: "col",
-    key: k
-  }, I.labels[k] || k)))), React.createElement("tbody", null, React.createElement("tr", {
-    className: "all"
-  }, React.createElement("th", {
-    scope: "row"
-  }, "All voters"), gtab.issues.map(k => React.createElement("td", {
-    key: k
-  }, whomCell(null, k)))), gtab.groups.map((g, i) => React.createElement("tr", {
-    key: "r" + i
-  }, React.createElement("th", {
-    scope: "row"
-  }, groupLong(g)), gtab.issues.map(k => React.createElement("td", {
-    key: k
-  }, whomCell(g, k))))))))), React.createElement("div", {
-    className: "rd-key rd-iw-key"
-  }, React.createElement("span", {
-    className: "rd-key-item"
-  }, React.createElement("span", {
-    className: "rd-iw-keybar",
-    "aria-hidden": "true"
-  }, React.createElement("i", null)), "Group\u2019s share, with all voters marked"), React.createElement("span", {
-    className: "rd-key-item"
-  }, React.createElement("b", {
-    "aria-hidden": "true"
-  }, "\u25B2\u25BC"), "Differs from all voters by more than the group\u2019s own 95% margin")), whomTsig && React.createElement(RdTsig, {
-    summary: "Trend-significance table",
-    heads: ["Group", "Share, first → last", "Slope, pts/yr", "t", "Significant"],
-    sets: whomTsig,
-    note: "Each row fits one straight line to " + G.house + "’s own monthly waves since the May 2025 election, each wave weighted by its share of the sample, t-tested, Holm’s correction applied across each issue’s rows — Yes means the group’s share has drifted over the term, not that it sits off the electorate’s today. First and last are the endpoint waves’ published figures, unsmoothed. The card’s ▲▼ marks ask a different question: today’s gap to all voters against the group’s own 95% margin."
+  }, React.createElement("b", null, matTitle), React.createElement("br", null), matSource), matDraw ? React.createElement(React.Fragment, null, matTrendHead && React.createElement("h4", {
+    className: "rd-is-chead"
+  }, matTrendHead), React.createElement(TrendChart, {
+    key: gtab ? "rd-im-g" : "rd-im",
+    heightPx: narrow ? 240 : 260,
+    padPx: {
+      l: 36,
+      r: 10,
+      t: 12,
+      b: 28
+    },
+    xDomain: matDraw.xDomain,
+    yDomain: matDraw.domain,
+    yTicks: rdYTicks(matDraw.domain[0], matDraw.domain[1], 10),
+    yTickFmt: v => v === matDraw.domain[1] ? v + "%" : String(v),
+    xTicks: rdXTicks(matDraw.xDomain[0], matDraw.xDomain[1], true),
+    baseline: true,
+    series: matSeries,
+    areas: matDraw.areas,
+    spine: series(matDraw.pts, gtab ? "all" : "v"),
+    scatter: matDraw.scatter,
+    scatterOut: matDraw.scatterOut,
+    scatterMove: matDraw.scatterMove,
+    fade: matDraw.fade,
+    driven: !!issMorph,
+    pollFacet: !gtab ? "issues" : undefined,
+    tooltipTitle: !gtab ? i => matCh.pts[i] ? monthLabelFull(matCh.pts[i].ym) : "" : i => {
+      const d = matCh.pts[i] && matCh.pts[i]._d;
+      return d ? rdDate(d, true) : "";
+    },
+    fmt: v => Math.round(v) + "",
+    copy: gtab ? {
+      title: "What matters: " + (ISS_SHORT[matIssue] || matIssue) + ", by " + (matSetWords[gtab.id] || "group"),
+      sub: "Share putting " + (ISS_PHRASE[matIssue] || matIssue) + " in their top three issues, " + (G ? G.house : "RedBridge") + "’s monthly polls",
+      caption: "Each line is one group of voters across " + (G ? G.house : "RedBridge") + "’s monthly polls; the grey line is all voters in the same polls."
+    } : {
+      title: "What matters to voters: " + (ISS_SHORT[matIssue] || matIssue),
+      sub: "Share putting " + (ISS_PHRASE[matIssue] || matIssue) + " in their top three issues, month by month",
+      caption: "Each dot is one poll; the line is the monthly average of the two pollsters’ adjusted figures, the band its 95% interval."
+    }
   })) : React.createElement("p", {
     className: "rd-note"
-  }, "No poll in the last ", I.window, " published these figures by group."), React.createElement(RdFoot, {
+  }, "No poll has published these figures for ", ISS_SHORT[matIssue] || matIssue, "."), !gtab && React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: [{
+      kind: "dot",
+      color: "var(--ink-3)",
+      label: "One poll"
+    }, {
+      kind: "lineband",
+      color: "var(--ink)",
+      label: "Monthly average and 95% interval"
+    }]
+  }), gtab && React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: gtab.groups.concat(["all"]).map(g => ({
+      color: g === "all" ? "var(--ink-3)" : matColor(g),
+      label: g === "all" ? "All voters" : groupShort(g)
+    }))
+  }), React.createElement(HowTo, {
+    label: "How to read these figures",
+    paras: gtab ? [React.createElement(React.Fragment, null, "Only ", G ? G.house : "RedBridge", " publishes what matters by group, and only for ", gtab ? rdNumWord(gtab.issues.length) : "these", " issues. Each line joins its monthly polls; the grey line is all voters in the same polls, so the gaps between a group and the grey line are the ones to read. The further right a line ends, the more that group cares than voters generally.")] : [React.createElement(React.Fragment, null, "RedBridge and Ipsos both ask every month, in different words \u2013 a ranked top three of fourteen against any three of nineteen \u2013 and their figures sit a steady distance apart. Each poll is moved half that distance toward the other before the two are pooled."), React.createElement(React.Fragment, null, "The dots are the polls as published; the line is the monthly average of the adjusted polls, the band its 95% interval.")]
+  }), !gtab && salTsig && React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Pollster", "Share, first → last, %", "Slope, pts/yr", "t", "Significant"],
+    sets: salTsig,
+    note: "Each pollster’s share naming " + (ISS_PHRASE[matIssue] || matIssue) + " as a top-three issue is fitted with one straight line across its monthly waves, weighted by sample, Holm’s correction across the two pollsters – Yes means the drift clears 95%. First and last are the published waves, unsmoothed."
+  }), gtab && matTsigSet && React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Group", "Share, first → last, %", "Slope, pts/yr", "t", "Significant"],
+    sets: [matTsigSet],
+    note: "Each row fits one straight line to " + (G ? G.house : "RedBridge") + "’s own monthly waves since the May 2025 election, each wave weighted by its share of the sample, t-tested, Holm’s correction applied across the set’s rows – Yes means the group’s share has drifted over the term. First and last are the endpoint waves’ published figures, unsmoothed."
+  })), React.createElement(RdFoot, {
     how: {
       term: "issues",
       from: "The issues"
     }
-  }, "Only ", G ? G.house : "RedBridge", " publishes what matters by group, and only for these ", gtab ? rdNumWord(gtab.issues.length) : "", " issues, so its all-voters row can differ from the pooled figures in Who\u2019s trusted. A group\u2019s margin depends on its share of the sample."))));
+  }, gtab ? React.createElement(React.Fragment, null, "Only ", G ? G.house : "RedBridge", " publishes what matters by group, and only for these ", rdNumWord(gtab.issues.length), " issues, so a group view leaves the other pollster behind and its all-voters line can sit off the pooled one in All voters.") : React.createElement(React.Fragment, null, "RedBridge and Ipsos both ask every month, in different words; after each poll is moved half the steady gap between the two, the line is their monthly average and the band its interval. Pooling is over the last ", I.window, " for the figures in Who\u2019s trusted; the trend here is the whole term so far.")))));
 }
 const RD_ONE_IN = [3, 4, 5, 10, 20, 50, 100];
 const RD_BIG_WORDS = {
@@ -8131,242 +8380,1011 @@ const MACRO_VIEW = {
   id: "macro",
   label: "Inflation & growth"
 };
-function RdMacro() {
-  const {
-    D,
-    monthLabelFull
-  } = window.AP;
-  const narrow = useNarrow(MQ_PHONE);
+const CONF_MON3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const confIsoX = iso => {
+  const [y, m, d] = iso.split("-").map(Number);
+  const doy = (Date.UTC(y, m - 1, d || 1) - Date.UTC(y, 0, 1)) / 86400000;
+  const yrLen = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0) ? 366 : 365;
+  return y + doy / yrLen;
+};
+const confXMonth = x => {
+  const y = Math.floor(x + 1e-9);
+  return CONF_MON3[Math.max(0, Math.min(11, Math.floor((x - y) * 12 + 1e-6)))] + " " + y;
+};
+const confIsoMonth = iso => CONF_MON3[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+function confTermsOf(D) {
+  const cyc = (D.cycles || []).filter(c => c.eDate).slice().sort((p, q) => p.eDate < q.eDate ? -1 : 1);
+  return cyc.map((c, i) => ({
+    year: c.year,
+    gov: c.gov,
+    pm: c.pm || "",
+    current: !!c.current,
+    eDate: c.eDate,
+    nDate: cyc[i + 1] ? cyc[i + 1].eDate : null,
+    a: confIsoX(c.eDate),
+    b: cyc[i + 1] ? confIsoX(cyc[i + 1].eDate) : null
+  }));
+}
+function confTermWin(t, nowX) {
+  return {
+    kind: "term",
+    year: t.year,
+    a: t.a,
+    b: t.b != null ? t.b : t.a + (Math.max(36, Math.ceil((nowX - t.a) * 12)) + 0.6) / 12
+  };
+}
+const confViewTerms = (terms, lo, hi) => terms.filter(t => Math.min(t.b != null ? t.b : hi, hi) - Math.max(t.a, lo) >= 0.5);
+const CONF_ANCHOR = 1 / 24;
+function confClampWin(w, terms, lo, hi, nowX) {
+  if (!terms.length) return {
+    kind: "all",
+    a: lo,
+    b: hi
+  };
+  if (w.kind === "term") {
+    let t = terms.find(x => x.year === w.year);
+    if (!t) t = w.a <= terms[0].a ? terms[0] : w.a >= terms[terms.length - 1].a ? terms[terms.length - 1] : terms.reduce((m, x) => Math.abs(x.a - w.a) < Math.abs(m.a - w.a) ? x : m, terms[0]);
+    return confTermWin(t, nowX);
+  }
+  if (w.kind === "all") return {
+    kind: "all",
+    a: lo,
+    b: hi
+  };
+  const wid = Math.min(w.b - w.a, hi - lo);
+  const a = Math.max(lo, Math.min(w.a, hi - wid));
+  return {
+    ...w,
+    a,
+    b: a + wid
+  };
+}
+function confStepWin(w, dir, terms, lo, hi, nowX) {
+  if (w.kind === "term") {
+    const i = terms.findIndex(t => t.year === w.year),
+      j = i + dir;
+    return i < 0 || j < 0 || j >= terms.length ? null : confTermWin(terms[j], nowX);
+  }
+  if (w.kind === "all") return null;
+  const wid = w.b - w.a;
+  const a = Math.max(lo, Math.min(hi - wid, w.a + dir * wid));
+  return Math.abs(a - w.a) < 1e-6 ? null : {
+    ...w,
+    a,
+    b: a + wid
+  };
+}
+function confZoomWin(w, id, terms, lo, hi, nowX) {
+  if (id === "all") return {
+    kind: "all",
+    a: lo,
+    b: hi
+  };
+  const cur = terms[terms.length - 1];
+  const atNow = w.kind === "term" ? !!(cur && cur.year === w.year && cur.current) : w.b >= hi - CONF_ANCHOR;
+  if (id === "term") {
+    if (w.kind === "term") return w;
+    const c = Math.min((w.a + w.b) / 2, hi);
+    const t = atNow ? cur : terms.find(x => c >= x.a && c < (x.b != null ? x.b : Infinity)) || cur;
+    return confTermWin(t, nowX);
+  }
+  const wid = Math.min(+id, hi - lo);
+  let a = atNow ? hi - wid : (w.a + Math.min(w.b, hi)) / 2 - wid / 2;
+  a = Math.max(lo, Math.min(hi - wid, a));
+  return {
+    kind: "span",
+    years: +id,
+    a,
+    b: a + wid
+  };
+}
+function confPms(terms, a, b) {
+  const out = [];
+  terms.forEach(t => {
+    if ((t.b != null ? t.b : Infinity) <= a + 0.02 || t.a >= b - 0.02) return;
+    t.pm.split("→").map(s => s.trim()).filter(Boolean).forEach(p => {
+      if (out[out.length - 1] !== p) out.push(p);
+    });
+  });
+  return out;
+}
+function confWinWords(w, terms, hi) {
+  if (w.kind === "term" || w.kind === "term-carry") {
+    const t = terms.find(x => x.year === w.year);
+    if (!t) return {
+      head: "",
+      sub: ""
+    };
+    return t.current ? {
+      head: "This term",
+      sub: t.pm + " · since " + confIsoMonth(t.eDate)
+    } : {
+      head: "The " + t.year + " term",
+      sub: t.pm + " · " + confIsoMonth(t.eDate) + " – " + confIsoMonth(t.nDate)
+    };
+  }
+  const pl = confPms(terms, w.a, w.b);
+  const pms = pl.length > 3 ? pl[0] + " to " + pl[pl.length - 1] : pl.join(" → ");
+  if (w.kind === "all") return {
+    head: "Every year on record",
+    sub: confXMonth(w.a) + " – now"
+  };
+  if (w.kind === "span" && w.b >= hi - CONF_ANCHOR) return {
+    head: "The last " + w.years + " years",
+    sub: confXMonth(w.a) + " – now"
+  };
+  return {
+    head: confXMonth(w.a) + " – " + (w.b >= hi - CONF_ANCHOR ? "now" : confXMonth(w.b)),
+    sub: pms
+  };
+}
+function confWinSpan(w, terms, hi) {
+  const ws = confWinWords(w, terms, hi);
+  return w.kind === "term" ? ws.head + " (" + ws.sub.replace(/^.*? · /, "") + ")" : ws.head + (w.kind === "custom" ? "" : " (" + ws.sub + ")");
+}
+function confWinYears(w, terms, hi) {
+  const ab = (a, b) => typeof b === "number" && String(a).slice(0, 2) === String(b).slice(0, 2) ? a + "–" + String(b).slice(2) : a + "–" + b;
+  const yr = x => Math.floor(x + 1e-9);
+  if (w.kind === "term" || w.kind === "term-carry") {
+    const t = terms.find(x => x.year === w.year);
+    if (t) return t.current ? ab(yr(t.a), "present") : ab(yr(t.a), yr(t.b));
+  }
+  return ab(yr(w.a), w.b >= hi - CONF_ANCHOR ? "present" : yr(w.b));
+}
+function confWinTicks(w, terms, nowX) {
+  if (w.kind === "term") {
+    const t = terms.find(x => x.year === w.year);
+    const out = [{
+      x: w.a,
+      label: "Election",
+      strong: true,
+      short: "E"
+    }];
+    for (let k = 1; k <= 3; k++) {
+      const x = w.a + k;
+      if (t && t.current ? x <= w.b + 1e-6 : x < w.b - 0.3) out.push({
+        x,
+        label: k === 1 ? "1 yr" : k + " yrs"
+      });
+    }
+    if (t && t.current && (nowX < w.b - 1.4 / 12 || Math.abs(w.b - nowX) < 0.1)) out.push({
+      x: Math.min(nowX, w.b),
+      label: "Now"
+    });
+    if (t && !t.current && t.b != null) out.push({
+      x: t.b,
+      label: "Election",
+      strong: true,
+      short: "E"
+    });
+    return out.sort((p, q) => p.x - q.x);
+  }
+  const span = w.b - w.a;
+  const step = span <= 6 ? 1 : span <= 14 ? 2 : span <= 32 ? 5 : 10;
+  const out = [];
+  for (let y = Math.ceil(w.a / step - 1e-9) * step; y <= w.b + 1e-9; y += step) out.push({
+    x: y,
+    label: String(y)
+  });
+  return out;
+}
+function confElectionEvents(w, terms) {
+  if (w.kind === "term") return [];
+  return terms.filter(t => t.a > w.a + 0.04 && t.a < w.b - 0.04).map(t => ({
+    date: t.eDate,
+    x: t.a,
+    short: t.year + " election",
+    label: t.year + " federal election",
+    desc: "Won by " + (t.gov === "alp" ? "Labor" : "the Coalition") + ", led by " + t.pm.split("→")[0].trim() + ".",
+    major: true,
+    elec: true
+  }));
+}
+function confNiceY(vals, minSpan) {
+  let lo = Math.min(...vals),
+    hi = Math.max(...vals);
+  if (!isFinite(lo) || !isFinite(hi)) {
+    lo = 0;
+    hi = 1;
+  }
+  if (hi - lo < (minSpan || 2)) {
+    const c = (hi + lo) / 2;
+    lo = c - (minSpan || 2) / 2;
+    hi = c + (minSpan || 2) / 2;
+  }
+  const pad = (hi - lo) * 0.06;
+  const step = [0.5, 1, 2, 5, 10, 20, 50].find(s => (hi - lo + 2 * pad) / s <= 6) || 100;
+  return {
+    lo: Math.floor((lo - pad) / step) * step,
+    hi: Math.ceil((hi + pad) / step) * step,
+    step
+  };
+}
+function confTicksIn(d, step) {
+  const out = [];
+  for (let v = Math.ceil(d[0] / step - 1e-9) * step; v <= d[1] + 1e-9; v += step) out.push(+v.toFixed(6));
+  return out;
+}
+function useConfChase(target, on) {
+  const [, force] = React.useReducer(n => n + 1, 0);
+  const cur = React.useRef(target);
+  const tgt = React.useRef(target);
+  const raf = React.useRef(0);
+  tgt.current = target;
+  React.useEffect(() => {
+    if (!on) {
+      cancelAnimationFrame(raf.current);
+      raf.current = 0;
+      return undefined;
+    }
+    let last = performance.now();
+    const step = t => {
+      const dt = Math.min(48, Math.max(0, t - last));
+      last = t;
+      const c = cur.current,
+        g = tgt.current;
+      if (c[0] !== g[0] || c[1] !== g[1]) {
+        const k = 1 - Math.exp(-dt / 70);
+        const n = [c[0] + (g[0] - c[0]) * k, c[1] + (g[1] - c[1]) * k];
+        cur.current = Math.abs(n[0] - g[0]) + Math.abs(n[1] - g[1]) < 1e-3 * (Math.abs(g[1] - g[0]) || 1) ? g : n;
+        force();
+      }
+      raf.current = requestAnimationFrame(step);
+    };
+    raf.current = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(raf.current);
+      raf.current = 0;
+    };
+  }, [on]);
+  if (!on) {
+    cur.current = target;
+    return target;
+  }
+  return cur.current;
+}
+const CONF_SPANS = [{
+  id: "term",
+  label: "Term"
+}, {
+  id: "10",
+  label: "10 yrs"
+}, {
+  id: "25",
+  label: "25 yrs"
+}, {
+  id: "all",
+  label: "All"
+}];
+function RdConfWinBar({
+  win: shown,
+  terms,
+  lo,
+  hi,
+  nowX,
+  onWin,
+  children
+}) {
+  const win = shown.kind === "term-carry" ? confClampWin({
+    kind: "term",
+    year: shown.year
+  }, terms, lo, hi, nowX) : shown;
+  const words = confWinWords(shown, terms, hi);
+  const prev = confStepWin(win, -1, terms, lo, hi, nowX);
+  const next = confStepWin(win, 1, terms, lo, hi, nowX);
+  const unit = win.kind === "term" ? "term" : win.kind === "all" ? "" : win.b - win.a >= 1.5 ? Math.round(win.b - win.a) + " years" : "stretch";
+  const active = win.kind === "term" ? "term" : win.kind === "all" ? "all" : win.kind === "span" ? String(win.years) : null;
+  const avail = CONF_SPANS.filter(s => s.id === "term" || s.id === "all" || +s.id < hi - lo - 0.5);
+  const chev = d => React.createElement("svg", {
+    viewBox: "0 0 16 16",
+    width: "16",
+    height: "16",
+    "aria-hidden": "true"
+  }, React.createElement("path", {
+    d: d,
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }));
+  return React.createElement("div", {
+    className: "rd-cwin",
+    role: "group",
+    "aria-label": "Time window"
+  }, React.createElement("div", {
+    className: "rd-cwin-nav"
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-chip rd-cwin-step",
+    disabled: !prev,
+    onClick: () => prev && onWin(prev, "step"),
+    "aria-label": win.kind === "term" ? "Previous term" : "Earlier " + unit,
+    title: win.kind === "term" ? "Previous term" : "Earlier " + unit
+  }, chev("M10 3.5L5.5 8L10 12.5")), React.createElement("button", {
+    type: "button",
+    className: "rd-chip rd-cwin-step",
+    disabled: !next,
+    onClick: () => next && onWin(next, "step"),
+    "aria-label": win.kind === "term" ? "Next term" : "Later " + unit,
+    title: win.kind === "term" ? "Next term" : "Later " + unit
+  }, chev("M6 3.5L10.5 8L6 12.5")), React.createElement("div", {
+    className: "rd-cwin-name",
+    "aria-live": "polite"
+  }, React.createElement("b", null, words.head), words.sub ? React.createElement("span", null, words.sub) : null)), React.createElement("div", {
+    className: "rd-cwin-tools"
+  }, children, React.createElement("div", {
+    className: "rd-cwin-spans",
+    role: "group",
+    "aria-label": "Window length"
+  }, avail.map(s => React.createElement("button", {
+    key: s.id,
+    type: "button",
+    className: "rd-chip rd-cwin-span",
+    "aria-pressed": active === s.id,
+    onClick: () => onWin(confZoomWin(win, s.id, terms, lo, hi, nowX), "step")
+  }, React.createElement(RdTabW, {
+    t: s.label
+  }))))));
+}
+function RdConfStrip({
+  lines,
+  lo,
+  hi,
+  win,
+  terms,
+  onWin,
+  narrow,
+  label
+}) {
+  const box = React.useRef(null);
+  const svgRef = React.useRef(null);
+  const W = useRdWidth(box, 1000);
+  const [hov, setHov] = React.useState(null);
+  const drag = React.useRef(null);
+  const raf = React.useRef(0);
+  const pend = React.useRef(null);
+  React.useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const SPARK_T = 3,
+    SPARK_H = narrow ? 24 : 28;
+  const BAND_Y = SPARK_T + SPARK_H + 4,
+    BAND_H = narrow ? 13 : 14;
+  const H = BAND_Y + BAND_H + (narrow ? 16 : 17);
+  const IN = 1;
+  const sx = x => IN + (x - lo) / (hi - lo || 1) * (W - 2 * IN);
+  const xOf = px => lo + (px - IN) / (W - 2 * IN || 1) * (hi - lo);
+  const all = lines.flatMap(l => l.points);
+  const yLo = all.length ? Math.min(...all.map(p => p.y)) : 0,
+    yHi = all.length ? Math.max(...all.map(p => p.y)) : 1;
+  const sy = y => SPARK_T + SPARK_H - (y - yLo) / (yHi - yLo || 1) * SPARK_H;
+  const path = pts => pts.filter(p => p.x >= lo - 0.5).map((p, i) => (i ? "L" : "M") + sx(p.x).toFixed(1) + " " + sy(p.y).toFixed(1)).join("");
+  const wa = Math.max(lo, win.a),
+    wb = Math.min(hi, win.b);
+  const xa = sx(wa),
+    xb = sx(wb);
+  const blocks = [];
+  terms.forEach(t => {
+    const a = Math.max(t.a, lo),
+      b = Math.min(t.b != null ? t.b : hi, hi);
+    if (b <= a) return;
+    const pms = t.pm.split("→").map(s => s.trim()).filter(Boolean);
+    const last = blocks[blocks.length - 1];
+    if (last && last.gov === t.gov && Math.abs(last.b - a) < 0.02) {
+      last.b = b;
+      pms.forEach(p => {
+        if (last.pms[last.pms.length - 1] !== p) last.pms.push(p);
+      });
+    } else blocks.push({
+      gov: t.gov,
+      a,
+      b,
+      pms: pms.slice()
+    });
+  });
+  const blockName = bk => {
+    const w = sx(bk.b) - sx(bk.a) - 8;
+    const fits = s => textWidth(s, 10.5, 500) <= w;
+    const pm = bk.pms,
+      ends = pm.length > 2 && pm[0] !== pm[pm.length - 1] ? pm[0] + "–" + pm[pm.length - 1] : null;
+    const cands = [pm.length <= 3 ? pm.join("–") : null, ends, bk.gov === "alp" ? "Labor" : "Coalition"].filter(Boolean);
+    return cands.find(fits) || "";
+  };
+  const step = (hi - lo) / Math.max(1, W / (narrow ? 64 : 72)) > 10 ? 20 : hi - lo > 24 ? 10 : 5;
+  const years = [];
+  for (let y = Math.ceil(lo / step) * step; y <= hi; y += step) years.push(y);
+  const MIN_W = 1;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const pxAt = (e, rect) => (e.clientX - rect.left) * (W / (rect.width || W));
+  const modeAt = (px, touch) => {
+    const HANDLE = touch ? 16 : 8;
+    if (xb - xa < 2 * HANDLE + 8 && px > xa && px < xb) return "move";
+    const dl = Math.abs(px - xa),
+      dr = Math.abs(px - xb);
+    if (dl <= HANDLE && dl <= dr) return "l";
+    if (dr <= HANDLE) return "r";
+    if (px > xa && px < xb) return "move";
+    return "new";
+  };
+  const send = (w, phase) => {
+    if (phase === "drag") {
+      pend.current = w;
+      if (!raf.current) raf.current = requestAnimationFrame(() => {
+        raf.current = 0;
+        const p = pend.current;
+        pend.current = null;
+        if (p) onWin(p, "drag");
+      });
+      return;
+    }
+    cancelAnimationFrame(raf.current);
+    raf.current = 0;
+    pend.current = null;
+    onWin(w, phase);
+  };
+  const termAt = x => terms.find(t => x >= t.a && x < (t.b != null ? t.b : Infinity)) || (x < terms[0].a ? terms[0] : terms[terms.length - 1]);
+  const onDown = e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const px = pxAt(e, rect);
+    const touch = e.pointerType !== "mouse";
+    drag.current = {
+      mode: modeAt(px, touch),
+      px0: px,
+      cx0: e.clientX,
+      cy0: e.clientY,
+      x0: xOf(px),
+      a0: wa,
+      b0: wb,
+      ta: win.a,
+      tb: win.b,
+      moved: false,
+      touch,
+      decided: !touch,
+      rect,
+      kind: win.kind,
+      id: e.pointerId
+    };
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (_) {}
+    if (!touch) e.preventDefault();
+  };
+  const onMove = e => {
+    const d = drag.current;
+    if (!d) {
+      if (e.pointerType === "mouse" && svgRef.current) {
+        const m = modeAt(pxAt(e, svgRef.current.getBoundingClientRect()), false);
+        if (m !== hov) setHov(m);
+      }
+      return;
+    }
+    if (!d.decided) {
+      const dx = Math.abs(e.clientX - d.cx0),
+        dy = Math.abs(e.clientY - d.cy0);
+      if (dy > dx && dy > 8) {
+        drag.current = null;
+        return;
+      }
+      if (dx < 6) return;
+      d.decided = true;
+    }
+    const px = pxAt(e, d.rect);
+    if (!d.moved && Math.abs(px - d.px0) < 3) return;
+    d.moved = true;
+    const x = xOf(px),
+      dv = x - d.x0;
+    let a, b;
+    if (d.mode === "move") {
+      const w = d.tb - d.ta;
+      a = clamp(d.ta + dv, lo, Math.max(d.ta, hi - w));
+      b = a + w;
+    } else if (d.mode === "l") {
+      a = clamp(x, lo, d.b0 - MIN_W);
+      b = d.b0;
+    } else if (d.mode === "r") {
+      b = clamp(x, d.a0 + MIN_W, hi);
+      a = d.a0;
+    } else {
+      a = clamp(Math.min(d.x0, x), lo, hi);
+      b = clamp(Math.max(d.x0, x), lo, hi);
+      if (b - a < MIN_W) {
+        if (x < d.x0) a = Math.max(lo, b - MIN_W);else b = Math.min(hi, a + MIN_W);
+      }
+    }
+    const carryTerm = d.mode === "move" && d.kind === "term";
+    send(carryTerm ? {
+      kind: "term-carry",
+      year: termAt((a + b) / 2).year,
+      a,
+      b
+    } : {
+      kind: "custom",
+      a,
+      b
+    }, "drag");
+  };
+  const onUp = e => {
+    const d = drag.current;
+    drag.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch (_) {}
+    if (!d) return;
+    const px = pxAt(e, d.rect),
+      x = clamp(xOf(px), lo, hi);
+    if (!d.moved) {
+      if (d.mode !== "new") return;
+      if (win.kind === "term") {
+        send({
+          kind: "term",
+          year: termAt(x).year,
+          a: 0,
+          b: 0
+        }, "jump");
+        return;
+      }
+      const w = wb - wa,
+        a = clamp(x - w / 2, lo, hi - w);
+      send({
+        ...win,
+        kind: win.kind === "all" ? "custom" : win.kind,
+        a,
+        b: a + w
+      }, "jump");
+      return;
+    }
+    if (d.mode === "move" && d.kind === "term") {
+      const p = pend.current || win;
+      send({
+        kind: "term",
+        year: termAt((p.a + Math.min(p.b, hi)) / 2).year,
+        a: 0,
+        b: 0
+      }, "end");
+      return;
+    }
+    send(pend.current || {
+      ...win,
+      kind: "custom"
+    }, "end");
+  };
+  const onCancel = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (d && d.moved) send(pend.current || win, "end");
+  };
+  const cursor = drag.current ? drag.current.mode === "move" ? "grabbing" : drag.current.mode === "new" ? "col-resize" : "ew-resize" : hov === "move" ? "grab" : hov === "l" || hov === "r" ? "ew-resize" : "pointer";
+  const clipId = "cstrip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  return React.createElement("div", {
+    className: "rd-cstrip",
+    ref: box
+  }, React.createElement("svg", {
+    ref: svgRef,
+    width: W,
+    height: H,
+    viewBox: `0 0 ${W} ${H}`,
+    className: "rd-cstrip-svg",
+    style: {
+      cursor
+    },
+    role: "img",
+    "aria-label": label + ": the whole record, " + Math.floor(lo) + " to now, with the window marked; drag the window to move it, its edges to resize it",
+    onPointerDown: onDown,
+    onPointerMove: onMove,
+    onPointerUp: onUp,
+    onPointerCancel: onCancel,
+    onPointerLeave: () => {
+      if (!drag.current) setHov(null);
+    }
+  }, React.createElement("defs", null, React.createElement("clipPath", {
+    id: clipId
+  }, React.createElement("rect", {
+    x: xa,
+    y: 0,
+    width: Math.max(0, xb - xa),
+    height: H
+  }))), years.map(y => React.createElement("line", {
+    key: "g" + y,
+    x1: sx(y),
+    x2: sx(y),
+    y1: SPARK_T,
+    y2: BAND_Y + BAND_H,
+    className: "rd-cstrip-grid"
+  })), lines.map((l, i) => React.createElement("path", {
+    key: "l" + i,
+    d: path(l.points),
+    className: "rd-cstrip-line"
+  })), React.createElement("g", {
+    clipPath: `url(#${clipId})`
+  }, lines.map((l, i) => React.createElement("path", {
+    key: "w" + i,
+    d: path(l.points),
+    className: "rd-cstrip-line on",
+    style: l.color ? {
+      stroke: l.color
+    } : null
+  }))), blocks.map((bk, i) => {
+    const x0 = sx(bk.a),
+      x1 = sx(bk.b),
+      nm = blockName(bk);
+    return React.createElement("g", {
+      key: "b" + i,
+      className: "rd-cstrip-gov " + bk.gov
+    }, React.createElement("rect", {
+      x: x0 + (i ? 0.5 : 0),
+      y: BAND_Y,
+      width: Math.max(0, x1 - x0 - (i ? 1 : 0)),
+      height: BAND_H
+    }), nm && React.createElement("text", {
+      x: (x0 + x1) / 2,
+      y: BAND_Y + BAND_H / 2 + 0.5,
+      dominantBaseline: "middle",
+      textAnchor: "middle"
+    }, nm));
+  }), years.map(y => React.createElement("text", {
+    key: "y" + y,
+    x: sx(y),
+    y: H - 3,
+    textAnchor: sx(y) < 16 ? "start" : sx(y) > W - 16 ? "end" : "middle",
+    className: "rd-cstrip-yr"
+  }, y)), React.createElement("rect", {
+    x: 0,
+    y: 0,
+    width: Math.max(0, xa),
+    height: BAND_Y + BAND_H,
+    className: "rd-cstrip-veil"
+  }), React.createElement("rect", {
+    x: xb,
+    y: 0,
+    width: Math.max(0, W - xb),
+    height: BAND_Y + BAND_H,
+    className: "rd-cstrip-veil"
+  }), React.createElement("rect", {
+    x: xa,
+    y: 0.75,
+    width: Math.max(2, xb - xa),
+    height: BAND_Y + BAND_H - 1.5,
+    rx: 3,
+    className: "rd-cstrip-win"
+  }), xb - xa > 14 && React.createElement(React.Fragment, null, React.createElement("rect", {
+    x: xa - 3,
+    y: (BAND_Y + BAND_H) / 2 - 8,
+    width: 6,
+    height: 16,
+    rx: 3,
+    className: "rd-cstrip-grip"
+  }), React.createElement("rect", {
+    x: xb - 3,
+    y: (BAND_Y + BAND_H) / 2 - 8,
+    width: 6,
+    height: 16,
+    rx: 3,
+    className: "rd-cstrip-grip"
+  }))));
+}
+const MACRO_RBA_FROM = 1996 + 7 / 12;
+let MACRO_CACHE = null;
+function macroData(D) {
   const M = D.macro;
   if (!M || !M.cpi || !M.cpiMonthly || !M.gdppc) return null;
-  const dx = iso => {
-    const [y, m, d] = iso.split("-").map(Number);
-    const doy = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000;
-    const yrLen = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0) ? 366 : 365;
-    return y + doy / yrLen;
-  };
+  if (MACRO_CACHE && MACRO_CACHE.M === M) return MACRO_CACHE;
   const qName = iso => ({
     "03": "March",
     "06": "June",
     "09": "September",
     "12": "December"
-  })[iso.slice(5, 7)] + " quarter";
-  const moName = iso => monthLabelFull(iso.slice(0, 7));
-  const laneNice = (l, iso) => l.q ? qName(iso) : moName(iso);
-  const PCT = v => v.toFixed(1);
-  const LANES = [{
-    k: "cpi",
-    by: "Headline inflation",
-    house: "ABS",
-    color: "var(--macro-cpi)",
-    solid: true,
-    q: false,
-    rows: M.cpiMonthly.rows,
-    history: M.cpi.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "Across the years of goods and services Australians buy — the ABS's all-items CPI, annual change. Before the monthly CPI era the ABS's quarterly index drove this lane."
-  }, {
-    k: "gdppc",
-    by: "GDP per person",
-    house: "ABS",
-    color: "var(--macro-gdppc)",
-    solid: true,
-    q: true,
-    rows: M.gdppc.rows,
-    history: M.gdppc.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "Real (price-adjusted) GDP divided across every Australian — the annual change, seasonally adjusted. Growth is everyone's slice getting bigger, on average."
-  }].concat(M.rnndi && M.rnndi.rows.length ? [{
-    k: "rnndi",
-    by: "Real net national disposable income per person",
-    house: "ABS",
-    color: "var(--macro-rnndi)",
-    solid: true,
-    q: true,
-    rows: M.rnndi.rows,
-    history: M.rnndi.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "The ABS's broader living-standards measure (RNNDI): real income per Australian once overseas income flows and the wearing-out of assets are in — GDP's cousin, annual change, seasonally adjusted."
-  }] : []).concat(M.unemp && M.unemp.rows.length ? [{
-    k: "unemp",
-    by: "Unemployment rate",
-    house: "ABS",
-    color: "var(--macro-unemp)",
-    solid: true,
-    q: false,
-    rows: M.unemp.rows,
-    history: M.unemp.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "Australians without work who were available and looking, as a share of everyone in or seeking work — the ABS's monthly seasonally adjusted print. A level, not an annual change: every figure here is the rate as published."
-  }] : []).concat(M.ausGap && M.ausGap.rows.length ? [{
-    k: "ausGap",
-    by: "Australia over its target",
-    house: "ABS·RBA",
-    color: "var(--macro-cbigap)",
-    solid: true,
-    q: false,
-    rows: M.ausGap.rows,
-    history: M.ausGap.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "The headline figure minus the RBA's 2–3% band at its midpoint — the country's own deviation line beside the OECD median one."
-  }] : []).concat(M.oecdCpi && M.oecdCpi.rows.length ? [{
-    k: "oecdCpi",
-    by: "OECD average inflation",
-    house: "OECD",
-    color: "var(--ink-2)",
-    solid: false,
-    q: false,
-    rows: M.oecdCpi.rows,
-    history: M.oecdCpi.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "Inflation across the OECD countries as a whole — the comparator, not the Australian story."
-  }] : []).concat(M.oecdCpiMed && M.oecdCpiMed.rows.length ? [{
-    k: "oecdCpiMed",
-    by: "OECD median inflation",
-    house: "OECD",
-    color: "var(--ink-2)",
-    solid: false,
-    q: false,
-    dash: "2 3",
-    rows: M.oecdCpiMed.rows,
-    history: M.oecdCpiMed.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "The median of the OECD countries' own monthly CPI prints — the middle of the member pack, beside the OECD's all-members average."
-  }] : []).concat(M.oecdCpiGap && M.oecdCpiGap.rows.length ? [{
-    k: "oecdCpiGap",
-    by: "Median deviation from inflation target",
-    house: "OECD",
-    color: "var(--ink-2)",
-    solid: false,
-    q: false,
-    dash: "1 3",
-    rows: M.oecdCpiGap.rows,
-    history: M.oecdCpiGap.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "Each OECD country's CPI minus its own central bank's target (bands at their midpoint), then the median across the countries with both — how far off their own targets the member pack's middle is running."
-  }] : []).concat(M.oecdGdp && M.oecdGdp.rows.length ? [{
-    k: "oecdGdp",
-    by: "OECD average growth",
-    house: "OECD",
-    color: "var(--ink-2)",
-    solid: false,
-    q: true,
-    rows: M.oecdGdp.rows,
-    history: M.oecdGdp.rows,
-    vfmt: v => PCT(v) + "%",
-    short: "Annual change in the OECD's total real GDP — its all-members headline; the OECD publishes no per-person average."
-  }] : []).filter(l => l.rows && l.rows.length);
-  if (!LANES.length) return null;
-  const x0 = 2025 + 122 / 365;
-  const x1 = D.domain.x1;
-  const toM = x => (x - x0) * 12;
-  const nowM = toM(x1);
-  const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
-  const cpiSplice = (() => {
-    const mo = M.cpiMonthly.rows;
-    const cut = mo.length ? dx(mo[0].date) : Infinity;
-    return M.cpi.rows.filter(r => dx(r.date) < cut).concat(mo);
-  })();
-  const deepRows = l => l.k === "cpi" ? cpiSplice : l.history;
-  const [hist, setHist] = useState(false);
-  const [evtOpen, setEvtOpen] = useState(null);
-  const histDeep = new Map(LANES.map(l => [l.k, deepRows(l).map(r => ({
-    x: dx(r.date),
+  })[iso.slice(5, 7)] + " quarter " + iso.slice(0, 4);
+  const moName = iso => window.AP.monthLabelFull(iso.slice(0, 7));
+  const mk = (rows, quarterly) => rows.map(r => ({
+    x: confIsoX(r.date),
     y: r.v,
     ym: r.date.slice(0, 7),
-    dateIso: r.date
-  }))]));
-  const histOn = hist && LANES.some(l => histDeep.get(l.k).length > 1);
-  const histX0 = histOn ? Math.floor(Math.min(...LANES.flatMap(l => histDeep.get(l.k).map(p => p.x)))) : 0;
-  const lanePoints = l => histOn ? histDeep.get(l.k) : l.rows.filter(r => dx(r.date) >= x0).map(r => ({
-    x: toM(dx(r.date)),
-    y: r.v,
-    ym: r.date.slice(0, 7),
-    dateIso: r.date
+    dateIso: r.date,
+    when: (typeof quarterly === "function" ? quarterly(r) : quarterly) ? qName(r.date) : moName(r.date)
   }));
-  const MACRO_ECONDS_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
-  const evs = rdChartEvents(D.events, x0, x1).filter(e => !MACRO_ECONDS_OFF.includes(e.date)).map(e => ({
-    ...e,
-    x: toM(e.x)
-  }));
-  const badges = !histOn && narrow ? rdEventBadges("macro", evs, 0, xMax) : null;
-  const pickEv = e => {
-    setEvtOpen(cur => cur && cur.e === e ? cur : {
-      e
-    });
-    rdEventReveal("evt-a-" + e.badgeKey);
+  const mo = M.cpiMonthly.rows;
+  const cut = mo.length ? confIsoX(mo[0].date) : Infinity;
+  const cpiRows = M.cpi.rows.filter(r => confIsoX(r.date) < cut).concat(mo);
+  const lane = (k, rows, o) => rows && rows.length ? {
+    k,
+    ...o,
+    latest: rows[rows.length - 1],
+    pts: mk(rows, o.q)
+  } : null;
+  const L = {
+    cpi: lane("cpi", cpiRows, {
+      name: "Australia",
+      color: "var(--macro-cpi)",
+      au: true,
+      q: r => confIsoX(r.date) < cut
+    }),
+    oecdCpi: M.oecdCpi && lane("oecdCpi", M.oecdCpi.rows, {
+      name: "OECD average",
+      color: "var(--ink-3)",
+      q: false
+    }),
+    oecdCpiMed: M.oecdCpiMed && lane("oecdCpiMed", M.oecdCpiMed.rows, {
+      name: "Median OECD country",
+      color: "var(--ink-3)",
+      dash: "1.5 3.2",
+      q: false
+    }),
+    ausGap: M.ausGap && lane("ausGap", M.ausGap.rows, {
+      name: "Australia",
+      color: "var(--macro-cpi)",
+      au: true,
+      q: r => confIsoX(r.date) < cut
+    }),
+    oecdCpiGap: M.oecdCpiGap && lane("oecdCpiGap", M.oecdCpiGap.rows, {
+      name: "Median OECD country",
+      color: "var(--ink-3)",
+      dash: "1.5 3.2",
+      q: false
+    }),
+    gdppc: lane("gdppc", M.gdppc.rows, {
+      name: "GDP per person",
+      color: "var(--macro-gdppc)",
+      au: true,
+      q: true
+    }),
+    rnndi: M.rnndi && lane("rnndi", M.rnndi.rows, {
+      name: "National income per person",
+      color: "var(--macro-rnndi)",
+      au: true,
+      q: true
+    }),
+    oecdGdp: M.oecdGdp && lane("oecdGdp", M.oecdGdp.rows, {
+      name: "OECD (total GDP)",
+      color: "var(--ink-3)",
+      q: true
+    }),
+    unemp: M.unemp && lane("unemp", M.unemp.rows, {
+      name: "Australia",
+      color: "var(--macro-unemp)",
+      au: true,
+      q: false
+    })
   };
-  const drawnVals = LANES.flatMap(l => lanePoints(l).map(p => p.y)).concat([0, 2, 3]);
-  const yLo = Math.floor(Math.min(...drawnVals) - 1);
-  const yHi = Math.ceil(Math.max(...drawnVals) + 1);
-  const yStep = yHi - yLo > 14 ? 2 : 1;
-  const rbaAreas = [{
-    id: "rba-target",
+  const P = [{
+    id: "infl",
+    title: "Inflation",
+    sub: "Consumer prices, % change on a year earlier",
+    copyTitle: "Inflation in Australia and across the OECD",
+    lanes: [L.cpi, L.oecdCpi, L.oecdCpiMed],
+    rba: true,
+    zero: true
+  }, {
+    id: "gap",
+    title: "Inflation against target",
+    sub: "Points above (+) or below (−) the central bank’s target",
+    copyTitle: "Inflation against target: Australia and the median OECD country",
+    lanes: [L.ausGap, L.oecdCpiGap],
+    zero: "On target"
+  }, {
+    id: "grow",
+    title: "Growth per person",
+    sub: "Real, % change on a year earlier",
+    copyTitle: "Real growth per person in Australia, and the OECD’s",
+    lanes: [L.gdppc, L.rnndi, L.oecdGdp],
+    zero: true
+  }, {
+    id: "unemp",
+    title: "Unemployment",
+    sub: "% of the labour force, seasonally adjusted",
+    copyTitle: "Australia’s unemployment rate",
+    lanes: [L.unemp],
+    zero: false
+  }].map(p => ({
+    ...p,
+    lanes: p.lanes.filter(Boolean)
+  })).filter(p => p.lanes.length);
+  const lo = L.cpi.pts[0].x;
+  MACRO_CACHE = {
+    M,
+    L,
+    P,
+    lo,
+    cut
+  };
+  return MACRO_CACHE;
+}
+const macroStripLines = D => {
+  const md = macroData(D);
+  return md ? [{
+    points: md.L.cpi.pts
+  }] : [];
+};
+function RdMacroPanel({
+  p,
+  win,
+  dragging,
+  narrow,
+  union,
+  evs,
+  evMode,
+  top,
+  ctl,
+  evtOpen,
+  setEvtOpen,
+  xTicks,
+  span,
+  years,
+  nowX
+}) {
+  const inW = q => q.x >= win.a && q.x <= win.b;
+  const dotsOn = win.b - win.a <= 4.6;
+  const vals = [];
+  p.lanes.forEach(l => l.pts.forEach(q => {
+    if (inW(q)) vals.push(q.y);
+  }));
+  if (p.rba && win.b > MACRO_RBA_FROM) vals.push(2, 3);
+  if (p.zero) vals.push(0);
+  const ny = confNiceY(vals.length ? vals : [0, 1], 2);
+  const yd = useConfChase([ny.lo, ny.hi], dragging);
+  const PCT = v => (v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const series = p.lanes.map(l => ({
+    id: p.id + "-" + l.k,
+    label: l.name,
+    color: l.color,
+    rdWidth: l.au ? 2.1 : 1.5,
+    dash: l.dash,
+    smooth: false,
+    endCap: false,
+    interpHover: true,
+    points: l.pts
+  }));
+  const scatter = dotsOn ? p.lanes.filter(l => l.au).flatMap(l => l.pts.filter(q => q.x >= union[0] && q.x <= union[1]).map(q => ({
+    x: q.x,
+    y: q.y,
+    color: l.color,
+    label: l.name,
+    meta: {
+      pollster: "ABS",
+      dateLabel: q.when
+    }
+  }))) : [];
+  const spine = p.lanes[0].pts.filter(q => q.x >= win.a - 0.3 && q.x <= win.b + 0.3);
+  const areas = p.rba ? [{
+    id: "rba-" + p.id,
     className: "rba-band",
     color: "var(--macro-cpi)",
     opacity: 0.08,
     edge: false,
+    smooth: false,
     points: [{
-      x: histOn ? histX0 : 0,
+      x: MACRO_RBA_FROM,
       y0: 2,
       y1: 3
     }, {
-      x: histOn ? x1 : xMax,
+      x: nowX + 4,
       y0: 2,
       y1: 3
     }]
-  }];
-  const xTicks = [{
-    x: 0,
-    label: "Election"
-  }, {
-    x: 12,
-    label: "1 yr"
-  }, {
-    x: 24,
-    label: "2 yrs"
-  }, {
-    x: 36,
-    label: "3 yrs"
-  }];
-  if (!histOn && nowM < xMax - 1.4) xTicks.push({
-    x: +nowM.toFixed(1),
-    label: "Now"
-  });
-  xTicks.sort((a, b) => a.x - b.x);
-  const histTicks = histOn ? (() => {
-    const step = narrow ? 10 : 5,
-      t = [];
-    for (let y = Math.ceil(histX0 / step) * step; y < x1 - 0.9; y += step) t.push({
-      x: y,
-      label: String(y)
-    });
-    return t;
-  })() : null;
-  const laneSeries = LANES.map(l => ({
-    id: l.k,
-    label: l.by,
-    color: l.color,
-    rdWidth: l.solid ? 2.2 : 1.5,
-    dash: l.solid ? undefined : l.dash || "3 3",
-    smooth: false,
-    endCap: false,
-    endLabel: narrow ? null : l.by,
-    interpHover: true,
-    points: lanePoints(l)
-  }));
-  const scatter = LANES.filter(l => l.solid).flatMap(l => lanePoints(l).map(p => ({
-    x: p.x,
-    y: p.y,
-    color: l.color,
-    label: l.by,
-    meta: {
-      pollster: l.house,
-      dateLabel: laneNice(l, p.dateIso)
+  }] : [];
+  const refLines = p.zero && yd[0] < 0 && yd[1] > 0 ? [{
+    y: 0,
+    label: typeof p.zero === "string" ? p.zero : undefined,
+    align: "left",
+    color: "var(--ink-3)"
+  }] : [];
+  const notes = p.rba && win.b > MACRO_RBA_FROM + 0.4 && ny.hi - ny.lo <= 12 ? [{
+    x: Math.max(win.a, MACRO_RBA_FROM),
+    dx: 6,
+    y: 2.5,
+    baseline: "middle",
+    text: "RBA target",
+    anchor: "start",
+    color: "var(--ink-3)",
+    weight: 500,
+    size: 11.5
+  }] : [];
+  const named = evMode === "badge";
+  const hPx = (narrow ? 196 : 212) + (top ? 22 : 0);
+  const pad = {
+    l: narrow ? 32 : 34,
+    r: 14,
+    t: top ? 34 : narrow ? 12 : 14,
+    b: 28
+  };
+  const latestTxt = l => PCT(l.latest.v) + "%";
+  const auLatest = p.lanes.find(l => l.au);
+  const when = auLatest ? auLatest.pts[auLatest.pts.length - 1].when : "";
+  return React.createElement("div", {
+    className: "rd-mp rd-mp-" + p.id
+  }, React.createElement("div", {
+    className: "rd-mp-h"
+  }, React.createElement("h4", {
+    className: "rd-mp-t"
+  }, p.title), React.createElement("p", {
+    className: "rd-mp-s"
+  }, p.sub), React.createElement("ul", {
+    className: "rd-mp-key"
+  }, p.lanes.map(l => React.createElement("li", {
+    key: l.k,
+    className: l.au ? "au" : ""
+  }, React.createElement(RdSwatch, {
+    kind: l.dash ? "dash" : "line",
+    color: l.color
+  }), React.createElement("span", {
+    className: "rd-mp-kn",
+    style: l.au ? {
+      color: "color-mix(in oklch, " + l.color + " 62%, var(--ink))"
+    } : null
+  }, l.name), React.createElement("span", {
+    className: "rd-mp-kv"
+  }, latestTxt(l)))))), React.createElement(TrendChart, {
+    heightPx: hPx,
+    padPx: pad,
+    xDomain: [win.a, win.b],
+    yDomain: yd,
+    yTicks: confTicksIn(yd, ny.step),
+    yTickFmt: v => (v < 0 ? "−" : "") + Math.abs(v),
+    xTicks: xTicks,
+    baseline: true,
+    driven: dragging,
+    refLines: refLines,
+    areas: areas,
+    notes: notes,
+    series: series,
+    spine: spine,
+    events: named ? evs : [],
+    evt: named && ctl ? evtOpen : undefined,
+    onEvt: named && ctl ? setEvtOpen : undefined,
+    vlines: evMode === "rule" ? evs.map(e => ({
+      x: e.x,
+      cls: "rd-conf-evrule"
+    })) : [],
+    scatter: scatter,
+    tooltipTitle: i => spine[i] ? spine[i].when : "",
+    fmt: v => PCT(v) + (p.id === "gap" ? " pts" : "%"),
+    copy: {
+      title: p.copyTitle,
+      span: years,
+      sub: p.sub + ". " + span + ". Latest Australian print: " + (auLatest ? latestTxt(auLatest) + ", " + when : "") + ".",
+      caption: "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? " The OECD line is total GDP growth; the OECD publishes no per-person average." : ""),
+      legend: p.lanes.map(l => ({
+        label: l.name + " (latest " + latestTxt(l) + ")",
+        color: l.color,
+        kind: l.dash ? "dashed" : "line"
+      }))
     }
-  })));
-  const spineLane = LANES.find(l => l.k === "cpi") || LANES[0];
-  const spine = lanePoints(spineLane);
+  }));
+}
+function RdMacro({
+  win,
+  dragging,
+  terms,
+  nowX,
+  hi,
+  strip
+}) {
+  const {
+    D
+  } = window.AP;
+  const narrow = useNarrow(MQ_PHONE);
+  const md = macroData(D);
+  const [evtOpen, setEvtOpen] = useState(null);
+  const prevWin = React.useRef(win);
+  React.useEffect(() => {
+    prevWin.current = win;
+  });
+  if (!md) return null;
+  const union = [Math.min(prevWin.current.a, win.a) - 0.1, Math.max(prevWin.current.b, win.b) + 0.1];
+  const cur = terms.find(t => t.current);
+  const isCur = win.kind === "term" && cur && win.year === cur.year;
+  const MACRO_ECONDS_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = isCur ? rdChartEvents(D.events, win.a, nowX).filter(e => !MACRO_ECONDS_OFF.includes(e.date)) : confElectionEvents(win, terms);
+  const badges = isCur && evs.length ? rdEventBadges("macro", evs, win.a, win.b) : null;
+  const topN = narrow ? 1 : 2;
+  const pickEv = e => {
+    setEvtOpen(c => c && c.e === e ? c : {
+      e
+    });
+    rdEventReveal("evt-a-" + e.badgeKey);
+  };
+  const xTicks = confWinTicks(win, terms, nowX);
+  const span = confWinSpan(win, terms, hi);
+  const years = confWinYears(win, terms, hi);
   const exportCsv = () => {
     const rr = [["kind", "series", "date", "pct"]];
     const SHEET = {
@@ -8382,124 +9400,72 @@ function RdMacro() {
       oecdGdp: "OECD average GDP growth"
     };
     for (const k of Object.keys(SHEET)) {
-      const lane = M[k];
-      if (!lane) continue;
-      for (const r of lane.rows) rr.push(["series", SHEET[k], r.date, r.v]);
+      const ln = D.macro[k];
+      if (!ln) continue;
+      for (const r of ln.rows) rr.push(["series", SHEET[k], r.date, r.v]);
     }
     confDownloadCsv(`auspol-tracker-macro-${D.latest.updatedISO}.csv`, rr);
   };
-  return React.createElement(React.Fragment, null, React.createElement("div", {
-    className: "rd-cc rd-confidence-cc"
+  return React.createElement("div", {
+    className: "card rd-card rd-confidence-chart rd-macro-card"
   }, React.createElement("div", {
-    className: "rd-confidence-draw"
-  }, React.createElement("button", {
-    type: "button",
-    className: "rd-chip rd-confidence-hist",
-    "aria-pressed": histOn,
-    onClick: () => {
-      setHist(h => !h);
-      setEvtOpen(null);
-    }
-  }, histOn ? "Back to this term" : "＋ " + (narrow ? "Full history" : "Show complete history")))), React.createElement("div", {
-    className: "card rd-card rd-confidence-chart"
-  }, React.createElement("div", {
-    className: "rd-un-ptitle"
-  }, React.createElement("b", null, "Inflation & growth"), React.createElement("span", null, "per cent")), LANES.map(l => {
-    const lat = l.rows[l.rows.length - 1];
-    return React.createElement("div", {
-      key: l.k,
-      className: "rd-un-read"
-    }, React.createElement(RdSwatch, {
-      kind: l.solid ? "line" : "dash",
-      color: l.color
-    }), React.createElement("div", null, React.createElement("div", {
-      className: "rd-un-rtop"
-    }, React.createElement("b", null, l.by), React.createElement("span", {
-      className: "rd-un-rhouse"
-    }, l.house), React.createElement("span", {
-      className: "rd-un-rfig"
-    }, React.createElement("span", {
-      className: "rd-un-rv"
-    }, l.vfmt(lat.v)))), React.createElement("p", null, l.short, " ", l.rows.length > 1 ? "Latest: " + laneNice(l, lat.date) + ", " + l.vfmt(lat.v) + "." : "")));
-  }), React.createElement(TrendChart, {
-    key: "rd-macro" + (histOn ? "-hist" : ""),
-    heightPx: narrow ? 260 : 340,
-    padPx: narrow ? {
-      l: 34,
-      r: 8,
-      t: 34,
-      b: 28
-    } : {
-      l: 40,
-      r: 16,
-      t: 44,
-      b: 30
-    },
-    xDomain: histOn ? [histX0, x1] : [0, xMax],
-    yDomain: [yLo, yHi],
-    yTicks: rdYTicks(yLo, yHi, yStep),
-    yTickFmt: v => String(v),
-    xTicks: histOn ? histTicks : xTicks,
-    baseline: true,
-    refLines: [{
-      y: 0,
-      label: "0",
-      align: "left",
-      color: "var(--ink-3)"
-    }],
-    areas: rbaAreas,
-    series: laneSeries,
-    spine: spine,
-    events: histOn ? [] : badges ? badges.events : evs,
-    evt: histOn ? null : evtOpen,
-    onEvt: setEvtOpen,
-    scatter: scatter,
-    tooltipTitle: i => {
-      const p = spine[i];
-      return p ? moName(p.ym + "-01") : "";
-    },
-    fmt: v => PCT(v) + "%",
-    copy: {
-      title: "Inflation & growth",
-      sub: "Official ABS and OECD series, as published. " + (histOn ? "Full published history, " + histX0 + " to now." : "This parliamentary term."),
-      caption: "The Australian Bureau of Statistics' headline inflation (all-items CPI, annual change; quarterly before the monthly CPI era, derived from the ABS's own published index numbers, spliced where the printed monthly measure begins), its deviation from the RBA band's 2.5% midpoint, real GDP per person and real net national disposable income per person (annual change, chain volume, seasonally adjusted) and the unemployment rate (its published monthly print, seasonally adjusted — a level, not an annual change), beside the OECD-wide average, the OECD countries' median and the median distance off their own central-bank targets, drawn as dashed context. The shaded band is the RBA's 2–3% inflation target. Nothing smoothed, adjusted or estimated — official prints, joined as-is.",
-      legend: LANES.map(l => ({
-        label: l.by + " (latest " + l.vfmt(l.rows[l.rows.length - 1].v) + ")",
-        color: l.color,
-        kind: l.solid ? "line" : "dashed"
-      }))
-    }
-  }), badges && badges.list.length === 1 && React.createElement(RdEventList, {
-    list: badges.list,
-    onPick: pickEv,
-    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
-  }), badges && badges.list.length > 1 && React.createElement("details", {
-    className: "rd-evdrop"
-  }, React.createElement("summary", null, "The marked events"), React.createElement(RdEventList, {
-    list: badges.list,
-    onPick: pickEv,
-    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
-  })), React.createElement(RdKey, {
+    className: "rd-mp-grid"
+  }, md.P.map((p, i) => {
+    const top = i < topN;
+    const evMode = top && badges ? "badge" : "rule";
+    return React.createElement(React.Fragment, {
+      key: p.id
+    }, React.createElement(RdMacroPanel, {
+      p: p,
+      win: win,
+      dragging: dragging,
+      narrow: narrow,
+      union: union,
+      evs: evMode === "badge" ? badges.events : evs,
+      evMode: evMode,
+      top: top,
+      ctl: i === 0,
+      evtOpen: evtOpen,
+      setEvtOpen: setEvtOpen,
+      xTicks: xTicks,
+      span: span,
+      years: years,
+      nowX: nowX
+    }), i === topN - 1 && badges && badges.list.length > 0 && React.createElement("div", {
+      className: "rd-mp-evrow"
+    }, badges.list.length === 1 ? React.createElement(RdEventList, {
+      list: badges.list,
+      onPick: pickEv,
+      openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+    }) : React.createElement("details", {
+      className: "rd-evdrop rd-mp-evdrop"
+    }, React.createElement("summary", null, "The marked events"), React.createElement(RdEventList, {
+      list: badges.list,
+      onPick: pickEv,
+      openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+    }))));
+  })), strip, React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
-      kind: "dot",
-      color: "var(--ink-3)",
-      label: "One official print (Australia)"
-    }, {
       kind: "line",
       color: "var(--ink-3)",
-      label: "Joined prints — no smoothing"
-    }, {
-      kind: "dash",
-      color: "var(--ink-2)",
-      label: "OECD / G20 comparisons"
-    }]
+      label: "Joined official prints, nothing smoothed"
+    }, win.b - win.a <= 4.6 ? {
+      kind: "dot",
+      color: "var(--ink-3)",
+      label: "One Australian print"
+    } : null]
   }, React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-cs-keyband rba",
     "aria-hidden": "true"
-  }, React.createElement("i", null)), "The RBA's 2\u20133% inflation target")), React.createElement("div", {
+  }, React.createElement("i", null)), "The RBA\u2019s 2\u20133% inflation target (from Aug 1996)"), win.kind !== "term" && evs.length > 0 && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-cs-keyelec",
+    "aria-hidden": "true"
+  }), "A federal election")), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
     className: "rd-foot-text"
@@ -8521,7 +9487,7 @@ function RdMacro() {
     "aria-hidden": "true"
   }, React.createElement("path", {
     d: "M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"
-  })), " Source data, CSV"))));
+  })), " Source data, CSV")));
 }
 function macroStory(D) {
   const M = D.macro;
@@ -8799,17 +9765,15 @@ function RdConfidence({
     return true;
   }, [view]);
   const viewLanes = lanes.filter(l => l.view === view);
-  const [hist, setHist] = useState(false);
-  const deepPoints = new Map((D.confDeep ? viewLanes.filter(l => (D.confDeep[l.k] || []).length > 1) : []).map(l => {
-    const live0 = l.s.polls[0].x;
-    return [l.k, D.confDeep[l.k].map(r => ({
-      ym: r.ym,
-      x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12,
-      y: plotOf(l, r.v)
-    })).filter(p => p.x < live0)];
-  }));
-  const deepDrawn = [...deepPoints.keys()].filter(k => deepPoints.get(k).length > 1);
-  const histOn = hist && deepDrawn.length > 0;
+  const nowX = D.domain.x1;
+  const TERMS = React.useMemo(() => confTermsOf(D), [D]);
+  const curTerm = TERMS.find(t => t.current) || TERMS[TERMS.length - 1];
+  const [winS, setWinS] = useState(() => confTermWin(curTerm, nowX));
+  const [dragging, setDragging] = useState(false);
+  const onWin = React.useCallback((w, phase) => {
+    setWinS(w);
+    setDragging(phase === "drag");
+  }, []);
   const smooth = (polls, halfLifeDays) => {
     const decay = Math.LN2 / (halfLifeDays / 365.25);
     return polls.map(p => {
@@ -8827,6 +9791,92 @@ function RdConfidence({
       };
     });
   };
+  const laneData = React.useMemo(() => new Map(lanes.map(l => {
+    const rawTag = v => l.shift || l.scale ? {
+      raw: v
+    } : {};
+    const raw = l.s.polls.map(p => ({
+      x: p.x,
+      y: plotOf(l, p.v),
+      ym: p.ym,
+      released: p.released,
+      dateLabel: p.dateLabel || "",
+      ...rawTag(p.v)
+    }));
+    const live0 = l.s.polls[0].x;
+    const rows = D.confDeep && D.confDeep[l.k];
+    const hist = rows && rows.length > 1 ? rows.map(r => ({
+      ym: r.ym,
+      x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12,
+      v: r.v
+    })).filter(p => p.x < live0) : [];
+    const n0 = hist.length > 1 ? hist.length : 0;
+    const se = smooth((n0 ? hist : []).concat(l.s.polls), l.hl).slice(n0).map((p, i) => ({
+      x: p.x,
+      y: plotOf(l, p.y),
+      ym: l.s.polls[i].ym,
+      ...rawTag(l.s.polls[i].v)
+    }));
+    const deep = n0 ? hist.map(p => ({
+      ym: p.ym,
+      x: p.x,
+      y: plotOf(l, p.v),
+      ...rawTag(p.v)
+    })) : [];
+    if (deep.length && se.length) deep.push({
+      x: se[0].x,
+      y: se[0].y,
+      joint: true,
+      ...(se[0].raw != null ? {
+        raw: se[0].raw
+      } : {})
+    });
+    return [l.k, {
+      raw,
+      se,
+      deep,
+      live0
+    }];
+  })), [M]);
+  const extOf = v => {
+    if (v === "macro") {
+      const md = macroData(D);
+      return {
+        lo: md ? md.lo : nowX - 1,
+        hi: nowX
+      };
+    }
+    const ls = lanes.filter(l => l.view === v);
+    return {
+      lo: Math.min(...ls.map(l => {
+        const d = laneData.get(l.k);
+        return d.deep.length ? d.deep[0].x : d.live0;
+      })),
+      hi: nowX
+    };
+  };
+  const ext = extOf(view);
+  const vTerms = confViewTerms(TERMS, ext.lo, ext.hi);
+  const win = winS.kind === "term-carry" ? {
+    kind: "custom",
+    a: Math.max(ext.lo, winS.a),
+    b: winS.b
+  } : confClampWin(winS, vTerms, ext.lo, ext.hi, nowX);
+  const winShown = winS.kind === "term-carry" ? {
+    ...win,
+    kind: "term-carry",
+    year: winS.year
+  } : win;
+  const isTerm = win.kind === "term";
+  const winTerm = isTerm ? vTerms.find(t => t.year === win.year) : null;
+  const isCur = !!(winTerm && winTerm.current);
+  const dotsOn = win.b - win.a <= 4.6;
+  const prevWin = React.useRef(win);
+  React.useEffect(() => {
+    prevWin.current = win;
+  });
+  const union = [Math.min(prevWin.current.a, win.a) - 0.1, Math.max(prevWin.current.b, win.b) + 0.1];
+  const inW = p => p.x >= win.a && p.x <= win.b;
   const neut = l => (100 - l.shift) / (l.scale || 1);
   const water = (l, v) => v < neut(l) ? "Pessimists lead" : "Optimists lead";
   const nab = lanes.find(l => l.k === "nabBusiness");
@@ -8847,6 +9897,8 @@ function RdConfidence({
       hi
     };
   };
+  const x0 = curTerm.a;
+  const rows = new Map(lanes.map(l => [l.k, l.s.polls.filter(p => p.x >= x0)]));
   const sent = l => {
     let t = l.dekName + " at " + l.vfmt(l.lat.v) + (l.lat.chg == null ? "" : Math.abs(l.lat.chg) < 0.05 ? ", holding steady" : ", " + (l.lat.chg < 0 ? "down " : "up ") + NICE(Math.abs(l.lat.chg)) + " on the " + l.period);
     const {
@@ -8857,17 +9909,13 @@ function RdConfidence({
     if (l.k === "nabBusiness" && l.lat.cond != null) t += " (conditions " + NICE(l.lat.cond) + ")";
     return t + ".";
   };
-  const x0 = 2025 + 122 / 365;
-  const x1 = D.domain.x1;
-  const toM = x => (x - x0) * 12;
-  const nowM = toM(x1);
-  const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
+  const dek = lanes.map(sent).join(" ");
+  const mStory = isMacro ? macroStory(D) : null;
   const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
-  const evs = rdChartEvents(D.events, x0, x1).filter(e => !CONF_OFF.includes(e.date)).map(e => ({
-    ...e,
-    x: toM(e.x)
-  }));
-  const badges = !histOn && narrow ? rdEventBadges("confidence", evs, 0, xMax) : null;
+  const elecEvs = isCur ? [] : confElectionEvents(win, vTerms);
+  const elecRules = elecEvs.length > 6;
+  const evs = isCur ? rdChartEvents(D.events, win.a, nowX).filter(e => !CONF_OFF.includes(e.date)) : elecRules ? [] : elecEvs;
+  const badges = isCur && narrow ? rdEventBadges("confidence", evs, win.a, win.b) : null;
   const [evtOpen, setEvtOpen] = useState(null);
   const pickEv = e => {
     setEvtOpen(cur => cur && cur.e === e ? cur : {
@@ -8875,74 +9923,12 @@ function RdConfidence({
     });
     rdEventReveal("evt-a-" + e.badgeKey);
   };
-  const rows = new Map(lanes.map(l => [l.k, l.s.polls.filter(p => p.x >= x0)]));
-  const dek = lanes.map(sent).join(" ");
-  const mStory = isMacro ? macroStory(D) : null;
-  const rawPoints = new Map(viewLanes.map(l => [l.k, rows.get(l.k).map(p => ({
-    x: toM(p.x),
-    y: plotOf(l, p.v),
-    ym: p.ym,
-    released: p.released,
-    dateLabel: p.dateLabel || "",
-    ...(l.shift || l.scale ? {
-      raw: p.v
-    } : {})
-  }))]));
-  const sePoints = new Map(viewLanes.map(l => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({
-    x: toM(p.x),
-    y: plotOf(l, p.y),
-    ym: rows.get(l.k)[i].ym,
-    ...(l.shift || l.scale ? {
-      raw: rows.get(l.k)[i].v
-    } : {})
-  }))]));
-  const wideRaw = histOn ? new Map(viewLanes.map(l => [l.k, l.s.polls.map(p => ({
-    x: p.x,
-    y: plotOf(l, p.v),
-    ym: p.ym,
-    released: p.released,
-    dateLabel: p.dateLabel || "",
-    ...(l.shift || l.scale ? {
-      raw: p.v
-    } : {})
-  }))])) : null;
-  const wideSe = histOn ? new Map(viewLanes.map(l => [l.k, smooth(l.s.polls, l.hl).map((p, i) => ({
-    x: p.x,
-    y: plotOf(l, p.y),
-    ym: l.s.polls[i].ym,
-    ...(l.shift || l.scale ? {
-      raw: l.s.polls[i].v
-    } : {})
-  }))])) : null;
-  const deepSeries = histOn ? deepDrawn.map(k => {
-    const l = viewLanes.find(v => v.k === k);
-    return {
-      id: "deep-" + k,
-      label: l.by + " (monthly history)",
-      color: l.color,
-      rdWidth: 1.3,
-      opacity: 0.5,
-      dash: l.dash || undefined,
-      smooth: false,
-      endCap: false,
-      interpHover: true,
-      points: deepPoints.get(k)
-    };
-  }) : [];
-  const histX0 = histOn ? Math.floor(Math.min(...deepDrawn.map(k => deepPoints.get(k)[0].x))) : 0;
-  const histTicks = histOn ? (() => {
-    const step = narrow ? 10 : 5,
-      t = [];
-    for (let y = Math.ceil(histX0 / step) * step; y < D.domain.x1 - 0.9; y += step) t.push({
-      x: y,
-      label: String(y)
-    });
-    return t;
-  })() : null;
   const HIST = D.confHistory || null;
   const histLane = view === "consumer" ? "consumer" : "business";
-  const hband = HIST && HIST[histLane] && HIST[histLane].band.length ? HIST[histLane] : null;
-  const histTerms = hband ? hband.terms : [];
+  const hset = HIST && HIST[histLane] && Array.isArray(HIST[histLane].terms) && HIST[histLane].terms.length ? HIST[histLane] : null;
+  const histTerms = hset ? hset.terms : [];
+  const bandPool = !isTerm || !hset ? [] : isCur ? histTerms : histTerms.filter(t => t.year !== win.year);
+  const bandRows = !isTerm || !hset ? null : isCur ? hset.band && hset.band.length ? hset.band : null : confBand(bandPool);
   const altTerms = (() => {
     const h = view === "consumer" && HIST ? HIST.westpacConsumer : null;
     return h && Array.isArray(h.terms) && h.terms.length ? h.terms : null;
@@ -8960,16 +9946,17 @@ function RdConfidence({
       [histLane]: n
     };
   });
+  const mX = m => win.a + m / 12;
   let bandAreas = null;
-  if (hband) {
-    const floor = Math.max(3, Math.ceil(histTerms.length * 0.75));
+  if (bandRows) {
+    const floor = Math.max(3, Math.ceil(bandPool.length * 0.75));
     const segs = [];
-    hband.band.forEach((r, i) => {
+    bandRows.forEach((r, i) => {
       const thin = r.n < floor;
       const last = segs[segs.length - 1];
       if (!last || last.thin !== thin) segs.push({
         thin,
-        pts: i ? [hband.band[i - 1], r] : [r]
+        pts: i ? [bandRows[i - 1], r] : [r]
       });else last.pts.push(r);
     });
     bandAreas = segs.filter(s => s.pts.length > 1).flatMap((s, i) => [{
@@ -8979,7 +9966,7 @@ function RdConfidence({
       opacity: 0.07,
       edge: false,
       points: s.pts.map(r => ({
-        x: r.m,
+        x: mX(r.m),
         y0: r.p10,
         y1: r.p90
       }))
@@ -8990,15 +9977,15 @@ function RdConfidence({
       opacity: 0.13,
       edge: false,
       points: s.pts.map(r => ({
-        x: r.m,
+        x: mX(r.m),
         y0: r.q1,
         y1: r.q3
       }))
     }]);
   }
-  const meanSeries = hband ? {
+  const meanSeries = bandRows ? {
     id: "conf-band-mean",
-    label: "Mean of past terms",
+    label: isCur ? "Mean of past terms" : "Mean of the other terms",
     color: "var(--ink-2)",
     rdWidth: 1.9,
     opacity: 0.85,
@@ -9006,13 +9993,15 @@ function RdConfidence({
     smooth: false,
     endCap: false,
     interpHover: true,
-    points: hband.band.map(r => ({
-      x: r.m,
+    points: bandRows.map(r => ({
+      x: mX(r.m),
       y: r.mean
     }))
   } : null;
   const TERM_HL = 60;
-  const drawnSeries = histTerms.filter(t => lifted.has(t.year)).flatMap(t => {
+  const termSpan = (win.b - win.a) * 12;
+  const drawable = histTerms.filter(t => !(isTerm && t.year === win.year));
+  const drawnSeries = !isTerm ? [] : drawable.filter(t => lifted.has(t.year)).flatMap(t => {
     const pts = term => {
       const raw = [];
       term.v.forEach((v, m) => {
@@ -9022,9 +10011,9 @@ function RdConfidence({
         });
       });
       return smooth(raw, TERM_HL).map(p => ({
-        x: p.x * 12,
+        x: win.a + p.x,
         y: p.y
-      })).filter(p => p.x <= xMax);
+      })).filter(p => (p.x - win.a) * 12 <= termSpan + 0.01);
     };
     const twin = altTerms && altTerms.find(a => a.year === t.year);
     return [{
@@ -9066,106 +10055,121 @@ function RdConfidence({
     }
     confDownloadCsv(`auspol-tracker-confidence-${D.latest.updatedISO}.csv`, rr);
   };
-  const vals = viewLanes.flatMap(l => rawPoints.get(l.k).map(p => p.y)).concat([100]);
-  if (hband) hband.band.forEach(r => {
-    if (r.m <= xMax) vals.push(r.p10, r.p90, r.mean);
+  const chartSeries = [];
+  viewLanes.forEach(l => {
+    const d = laneData.get(l.k);
+    const histEnd = win.b < d.live0;
+    if (d.deep.length) chartSeries.push({
+      id: "deep-" + l.k,
+      label: l.by,
+      color: l.color,
+      rdWidth: 1.6,
+      opacity: 0.8,
+      smooth: false,
+      endCap: false,
+      endAtWin: true,
+      interpHover: true,
+      endLabel: !narrow && histEnd ? l.by : null,
+      points: d.deep
+    });
+    chartSeries.push({
+      id: l.k,
+      label: l.by,
+      color: l.color,
+      rdWidth: l.dash ? 1.6 : 2.2,
+      dash: l.dash || undefined,
+      interpHover: true,
+      endCap: false,
+      endAtWin: true,
+      endLabel: narrow || histEnd ? null : l.by,
+      points: d.se
+    });
+  });
+  if (meanSeries) chartSeries.push(meanSeries);
+  chartSeries.push(...drawnSeries);
+  const chartDots = dotsOn ? viewLanes.flatMap(l => laneData.get(l.k).raw.filter(q => q.x >= union[0] && q.x <= union[1]).map(q => ({
+    x: q.x,
+    y: q.y,
+    color: l.color,
+    label: l.by,
+    ...(q.raw != null ? {
+      raw: q.raw
+    } : {}),
+    meta: {
+      pollster: l.by,
+      released: q.released,
+      dateLabel: q.dateLabel
+    }
+  }))) : [];
+  const vals = [100];
+  viewLanes.forEach(l => {
+    const d = laneData.get(l.k);
+    d.se.forEach(p => {
+      if (inW(p)) vals.push(p.y);
+    });
+    d.deep.forEach(p => {
+      if (inW(p)) vals.push(p.y);
+    });
+    if (dotsOn) d.raw.forEach(p => {
+      if (inW(p)) vals.push(p.y);
+    });
+  });
+  if (bandRows) bandRows.forEach(r => {
+    if (mX(r.m) <= win.b) vals.push(r.p10, r.p90, r.mean);
   });
   drawnSeries.forEach(s => s.points.forEach(p => vals.push(p.y)));
-  if (histOn) {
-    viewLanes.forEach(l => wideRaw.get(l.k).forEach(p => vals.push(p.y)));
-    deepDrawn.forEach(k => deepPoints.get(k).forEach(p => vals.push(p.y)));
-  }
-  const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10,
-    hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
-  const histSpine = histOn ? [...new Map(deepDrawn.flatMap(k => deepPoints.get(k)).concat(wideRaw.get(viewLanes[0].k)).map(p => [p.x, p])).values()].sort((a, b) => a.x - b.x) : null;
-  const spine = histOn ? histSpine : viewLanes[0] ? rawPoints.get(viewLanes[0].k) : undefined;
-  const liveSeries = ptsMap => viewLanes.map(l => ({
-    id: l.k,
-    label: l.by,
-    color: l.color,
-    rdWidth: l.dash ? 1.6 : 2.2,
-    dash: l.dash || undefined,
-    interpHover: true,
-    endCap: false,
-    endLabel: narrow ? null : l.by,
-    points: ptsMap.get(l.k)
-  }));
-  const chartSeries = histOn ? deepSeries.concat(liveSeries(wideSe)) : liveSeries(sePoints).concat(meanSeries ? [meanSeries] : [], drawnSeries);
-  const chartRaw = histOn ? wideRaw : rawPoints;
+  const yStep = Math.max(...vals) - Math.min(...vals) > 76 ? 20 : 10;
+  const lo = Math.floor((Math.min(...vals) - 2) / yStep) * yStep,
+    hi = Math.ceil((Math.max(...vals) + 2) / yStep) * yStep;
+  const yd = useConfChase([lo, hi], dragging && !isMacro);
+  const spine = isMacro ? [] : [...new Map(viewLanes.flatMap(l => laneData.get(l.k).deep.filter(p => !p.joint)).concat(viewLanes[0] ? laneData.get(viewLanes[0].k).raw : []).filter(p => p.x >= win.a - 0.1 && p.x <= win.b + 0.1).map(p => [p.x, p])).values()].sort((a, b) => a.x - b.x);
+  const histInWin = viewLanes.some(l => laneData.get(l.k).deep.some(inW));
   const copyLegend = viewLanes.map(l => ({
     label: l.by + " (latest " + l.vfmt(l.lat.v) + ")",
     color: l.color,
     kind: l.dash ? "dashed" : "line"
   }));
   const fmt = (v, p) => p && p.raw != null ? NICE(p.raw) : v.toFixed(1);
+  const span = confWinSpan(win, vTerms, ext.hi);
   const vc = view === "consumer" ? {
     title: "Consumer confidence",
     note: "100 = neutral; DemosAU’s 50-neutral index is drawn doubled",
     altKey: "Westpac–MI’s monthly read; DemosAU’s national index, drawn doubled",
     copyTitle: "Consumer confidence (three gauges)",
     copySub: head + " Three published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index, Westpac–MI’s monthly consumer sentiment, and DemosAU’s national consumer-sentiment index, drawn doubled.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). DemosAU prints to a 50-neutral scale, so its lane is drawn doubled to share the neutral line while read rows, tooltips and this caption carry each house’s own figures. The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and drawn dotted in its house’s colour — ANZ–Roy Morgan plum, Westpac–MI gold where its series reaches back that far. No combining, no adjustment.",
-    copyHist: "Consumer confidence as far back as the series go, on one 100-neutral scale. The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series); the lighter lines underneath are the houses’ own monthly history files — ANZ–Roy Morgan consumer confidence from 1973, Westpac–MI consumer sentiment from 1974. No combining, no adjustment."
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). Before the live release files begin, the lines are the houses’ own monthly history files — ANZ–Roy Morgan from 1973, Westpac–MI from 1974. DemosAU prints to a 50-neutral scale, so its lane is drawn doubled to share the neutral line while read rows, tooltips and this caption carry each house’s own figures. In a term the band pools the ANZ–Roy Morgan index over the other terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; a drawn term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and dotted in its house’s colour. No combining, no adjustment."
   } : {
     title: "Business confidence",
     note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
     altKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is Roy Morgan’s line alone — smoothed like the live monthly gauge, dotted in its plum. No combining, no adjustment.",
-    copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter lines underneath are the houses’ own monthly history — Roy Morgan’s index from 2010, NAB’s printed net balance from March 1997 (two public calendar republications of NAB’s figure, merged at wire-verified seams; the pre-2009 head is sole-witness — one mirror’s record, not two-source verified). No combining, no adjustment."
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). Before the live release files begin, the lines are the houses’ own monthly history — Roy Morgan’s index from 2010, NAB’s printed net balance from March 1997 (two public calendar republications of NAB’s figure, merged at wire-verified seams; the pre-2009 head is sole-witness). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. In a term the band pools the Roy Morgan index over the other terms, each lined up on its own election month — the middle half and the middle 80%, their average the dashed line. No combining, no adjustment."
   };
-  const xTicks = [{
-    x: 0,
-    label: "Election"
-  }, {
-    x: 12,
-    label: "1 yr"
-  }, {
-    x: 24,
-    label: "2 yrs"
-  }, {
-    x: 36,
-    label: "3 yrs"
-  }];
-  if (nowM < xMax - 1.4) xTicks.push({
-    x: +nowM.toFixed(1),
-    label: "Now"
+  const xTicks = confWinTicks(win, vTerms, nowX);
+  const stripLines = isMacro ? macroStripLines(D).map(l => ({
+    ...l,
+    color: "var(--macro-cpi)"
+  })) : viewLanes.filter(l => l.k !== "demosauConsumer").map(l => {
+    const d = laneData.get(l.k);
+    return {
+      points: d.deep.concat(d.raw),
+      color: l.color
+    };
   });
-  xTicks.sort((a, b) => a.x - b.x);
-  return React.createElement(RdSec, {
-    id: "confidence",
-    cls: "rd-confidence",
-    title: "Economic sentiment",
-    meta: isMacro ? "ABS and OECD series, annual change" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", five published series")
-  }, React.createElement(RdHed, {
-    head: isMacro && mStory ? mStory.head : head,
-    dek: isMacro && mStory ? mStory.dek : dek
-  }), React.createElement(RdTabs, {
-    swipe: true,
-    pin: true,
-    value: view,
-    onChange: setView,
-    options: views,
-    ariaLabel: "View of the economy",
-    className: "rd-confidence-tabs"
-  }), React.createElement(RdCrossfade, {
-    k: view
-  }, !isMacro && React.createElement(React.Fragment, null, (hband || deepDrawn.length > 0) && React.createElement("div", {
-    className: "rd-cc rd-confidence-cc"
-  }, React.createElement("div", {
-    className: "rd-confidence-draw"
-  }, deepDrawn.length > 0 && React.createElement("button", {
-    type: "button",
-    className: "rd-chip rd-confidence-hist",
-    "aria-pressed": histOn,
-    onClick: () => {
-      setHist(h => !h);
-      setEvtOpen(null);
-    }
-  }, histOn ? "Back to this term" : "＋ " + (narrow ? "Full history" : "Show complete history")), hband && !histOn && React.createElement("select", {
+  const strip = React.createElement(RdConfStrip, {
+    lines: stripLines,
+    lo: ext.lo,
+    hi: ext.hi,
+    win: win,
+    terms: vTerms,
+    onWin: onWin,
+    narrow: narrow,
+    label: isMacro ? "Headline inflation" : vc.title
+  });
+  const drawMenu = !isMacro && hset && isTerm ? React.createElement("select", {
     className: "rd-confidence-sel",
-    "aria-label": "Draw a past term",
+    "aria-label": isCur ? "Draw a past term" : "Draw another term",
     value: "",
     onChange: e => {
       const v = e.target.value;
@@ -9177,31 +10181,39 @@ function RdConfidence({
   }, React.createElement("option", {
     value: "",
     disabled: true
-  }, "Draw a past term"), histTerms.map(t => React.createElement("option", {
+  }, isCur ? "Draw a past term" : "Draw another term"), drawable.map(t => React.createElement("option", {
     key: t.year,
     value: t.year
   }, lifted.has(t.year) ? "✓ " + t.year : t.year)), lifted.size > 0 && React.createElement("hr", null), lifted.size > 0 && React.createElement("option", {
     value: "clear"
-  }, "\u2715 Clear lines")), !histOn && lifted.size > 0 && React.createElement("span", {
-    className: "rd-cc-drawn"
-  }, React.createElement("span", {
-    className: "rd-cc-l"
-  }, "Drawn over the band"), [...lifted].sort((a, b) => a - b).map(y => React.createElement("span", {
-    key: y,
-    className: "rd-cc-pill",
-    style: {
-      borderColor: "var(--confidence-main)"
-    }
-  }, React.createElement("span", {
-    className: "rd-cc-rule",
-    style: {
-      background: "var(--confidence-main)"
-    }
-  }), y, React.createElement("button", {
-    type: "button",
-    "aria-label": "Return " + y + " to the band",
-    onClick: () => lift(y)
-  }, "\xD7")))))), React.createElement("div", {
+  }, "\u2715 Clear lines")) : null;
+  const drawnShown = [...lifted].filter(y => isTerm && drawable.some(t => t.year === y)).sort((a, b) => a - b);
+  return React.createElement(RdSec, {
+    id: "confidence",
+    cls: "rd-confidence",
+    title: "Economic sentiment",
+    meta: isMacro ? "ABS and OECD series" : "Confidence indices, 100 = neutral" + (narrow ? "" : ", five published series")
+  }, React.createElement(RdHed, {
+    head: isMacro && mStory ? mStory.head : head,
+    dek: isMacro && mStory ? mStory.dek : dek
+  }), React.createElement(RdTabs, {
+    swipe: true,
+    pin: true,
+    value: view,
+    onChange: setView,
+    options: views,
+    ariaLabel: "View of the economy",
+    className: "rd-confidence-tabs"
+  }), React.createElement(RdConfWinBar, {
+    win: winShown,
+    terms: vTerms,
+    lo: ext.lo,
+    hi: ext.hi,
+    nowX: nowX,
+    onWin: onWin
+  }, drawMenu), React.createElement(RdCrossfade, {
+    k: view
+  }, !isMacro && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "card rd-card rd-confidence-chart"
   }, React.createElement("div", {
     className: "rd-un-ptitle"
@@ -9220,7 +10232,7 @@ function RdConfidence({
   }, l.vfmt(l.lat.v)), l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && React.createElement("span", {
     className: "rd-un-rci"
   }, rdArrow(l.lat.chg), " ", NICE(Math.abs(l.lat.chg)), " on the ", l.period))), React.createElement("p", null, l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + "."))))), React.createElement(TrendChart, {
-    key: "rd-confidence-" + view + (histOn ? "-hist" : ""),
+    key: "rd-confidence-" + view,
     heightPx: narrow ? 260 : 340,
     padPx: narrow ? {
       l: 34,
@@ -9233,38 +10245,30 @@ function RdConfidence({
       t: 44,
       b: 30
     },
-    xDomain: histOn ? [histX0, D.domain.x1] : [0, xMax],
-    yDomain: [lo, hi],
-    yTicks: rdYTicks(lo, hi, 10),
+    xDomain: [win.a, win.b],
+    yDomain: yd,
+    yTicks: confTicksIn(yd, yStep),
     yTickFmt: v => String(v),
-    xTicks: histOn ? histTicks : xTicks,
+    xTicks: xTicks,
     baseline: true,
+    driven: dragging,
     refLines: [{
       y: 100,
       label: "100 = neutral",
       align: "left",
       color: "var(--ink-3)"
     }],
-    areas: histOn ? undefined : bandAreas || undefined,
+    areas: bandAreas || undefined,
     series: chartSeries,
     spine: spine,
-    events: histOn ? [] : badges ? badges.events : evs,
-    evt: histOn ? null : evtOpen,
+    events: badges ? badges.events : evs,
+    evt: evtOpen,
     onEvt: setEvtOpen,
-    scatter: viewLanes.flatMap(l => chartRaw.get(l.k).map(q => ({
-      x: q.x,
-      y: q.y,
-      color: l.color,
-      label: l.by,
-      ...(q.raw != null ? {
-        raw: q.raw
-      } : {}),
-      meta: {
-        pollster: l.by,
-        released: q.released,
-        dateLabel: q.dateLabel
-      }
-    }))),
+    vlines: elecRules ? elecEvs.map(e => ({
+      x: e.x,
+      cls: "rd-conf-evrule"
+    })) : [],
+    scatter: chartDots,
     pollFacet: "confidence",
     tooltipTitle: i => {
       const p = spine[i];
@@ -9273,8 +10277,9 @@ function RdConfidence({
     fmt: fmt,
     copy: {
       title: vc.copyTitle,
-      sub: vc.copySub,
-      caption: histOn ? vc.copyHist : vc.copyCaption,
+      span: confWinYears(win, vTerms, ext.hi),
+      sub: vc.copySub + " " + span + ".",
+      caption: vc.copyCaption,
       legend: copyLegend
     }
   }), badges && badges.list.length === 1 && React.createElement(RdEventList, {
@@ -9287,13 +10292,13 @@ function RdConfidence({
     list: badges.list,
     onPick: pickEv,
     openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
-  })), React.createElement(RdKey, {
+  })), strip, React.createElement(RdKey, {
     className: "rd-ckey",
-    items: [{
+    items: [dotsOn ? {
       kind: "dot",
       color: "var(--ink-3)",
       label: "One release, as printed"
-    }, {
+    } : null, {
       kind: "line",
       color: "var(--ink-3)",
       label: "Smoothed trend of the releases"
@@ -9302,12 +10307,12 @@ function RdConfidence({
       color: "var(--confidence-alt)",
       label: vc.altKey
     }]
-  }, hband && !histOn && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, bandRows && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-cs-keyband",
     "aria-hidden": "true"
-  }, React.createElement("i", null)), "Middle half and middle 80% of past terms"), React.createElement("span", {
+  }, React.createElement("i", null)), isCur ? "Middle half and middle 80% of past terms" : "Middle half and middle 80% of the other terms"), React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement(RdSwatch, {
     kind: "dash",
@@ -9317,13 +10322,45 @@ function RdConfidence({
   }, React.createElement("span", {
     className: "rd-cs-keythin",
     "aria-hidden": "true"
-  }), "Paler: fewer terms ran this long")), histOn && React.createElement(React.Fragment, null, React.createElement("span", {
+  }), "Paler: fewer terms ran this long")), histInWin && React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
-    className: "rd-cs-keythin",
+    className: "rd-cs-keyhist",
     "aria-hidden": "true"
-  }), "Monthly history back to ", histX0, ", as the house published it"))))), isMacro && React.createElement(RdMacro, null)), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Five published gauges of economic confidence, split into two views \u2014 the consumer lanes and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment and DemosAU\u2019s national consumer-sentiment index, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "ANZ\u2013Roy Morgan\u2019s and Westpac\u2013MI\u2019s are indices where 100 is neutral; DemosAU\u2019s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "The Inflation & growth tab charts the ABS\u2019s and OECD\u2019s official figures exactly as published: Australia\u2019s headline inflation (the ABS\u2019s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS\u2019s own published index numbers, spliced where the printed monthly measure begins), its own deviation from the Reserve Bank\u2019s 2\u20133% band at its midpoint, real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted) and the unemployment rate (the ABS\u2019s monthly seasonally adjusted print \u2014 a level, not an annual change), beside the OECD-wide average and, drawn as dashed context lines, the OECD countries\u2019 own median and the median deviation from each member\u2019s own central-bank target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand\u2019s 1990 band). The shaded band marks the Reserve Bank\u2019s 2\u20133% inflation target. Nothing is smoothed, adjusted, combined or estimated \u2014 official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia\u2019s from the ABS\u2019s own figures, the OECD median from the member countries\u2019 OECD-published prints and, since 2026, from the OECD\u2019s monthly inflation release table \u2014 one decimal)."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+  }), "Thinner: the house\u2019s monthly history, as published"), !isTerm && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-cs-keyelec",
+    "aria-hidden": "true"
+  }), "A federal election"), drawnShown.length > 0 && React.createElement("span", {
+    className: "rd-cc-drawn"
+  }, drawnShown.map(y => React.createElement("span", {
+    key: y,
+    className: "rd-cc-pill",
+    style: {
+      borderColor: "var(--confidence-main)"
+    }
+  }, React.createElement("span", {
+    className: "rd-cc-rule",
+    style: {
+      background: "var(--confidence-main)"
+    }
+  }), "The ", y, " term", React.createElement("button", {
+    type: "button",
+    "aria-label": "Return " + y + " to the band",
+    onClick: () => lift(y)
+  }, "\xD7"))))))), isMacro && React.createElement(RdMacro, {
+    win: isCur ? {
+      ...win,
+      b: Math.min(win.b, nowX + 0.6 / 12)
+    } : win,
+    dragging: dragging,
+    terms: vTerms,
+    nowX: nowX,
+    hi: ext.hi,
+    strip: strip
+  })), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Five published gauges of economic confidence, split into two views \u2014 the consumer lanes and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment and DemosAU\u2019s national consumer-sentiment index, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "The bar over the chart sets the window, and the window holds as you switch tabs. It opens on this term; \u2039 and \u203A step back and forward a term at a time, and Term, 10 yrs, 25 yrs and All widen it (\u2039 \u203A then page back and forward by that length). The strip under each chart is the whole record in miniature with the governments beneath it: drag the window along it, drag its edges to resize it, drag across the strip to draw a new one, or tap a spot to jump there. A term reads off its election \u2014 Election, 1 yr, 2 yrs \u2014 so every term shares one ruler; a longer window counts calendar years and marks each federal election with a faint rule. Dots show in a window of about a term; longer windows draw the lines alone."), React.createElement(React.Fragment, null, "Behind a term the band pools the view\u2019s main gauge over the other terms, each lined up on its own election month: the middle half in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. This term\u2019s band is every past term; a past term\u2019s is every term but itself. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. Before each house\u2019s live release file begins, its line is the house\u2019s own monthly history, drawn a little thinner \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010, NAB\u2019s printed net balance to March 1997. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals."), React.createElement(React.Fragment, null, "ANZ\u2013Roy Morgan\u2019s and Westpac\u2013MI\u2019s are indices where 100 is neutral; DemosAU\u2019s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "The Inflation & growth tab sets the ABS\u2019s and OECD\u2019s official figures out as four small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia\u2019s headline inflation (the ABS\u2019s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS\u2019s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank\u2019s 2\u20133% target shaded from August 1996, when it was adopted. Inflation against target: Australia\u2019s figure minus the band\u2019s 2.5% midpoint, beside the median member\u2019s distance from its own central bank\u2019s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand\u2019s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted) beside the OECD\u2019s total GDP growth \u2014 the OECD publishes no per-person average. Unemployment: the ABS\u2019s monthly seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed, adjusted, combined or estimated \u2014 official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia\u2019s from the ABS\u2019s own figures, the OECD median from the member countries\u2019 OECD-published prints and, since 2026, from the OECD\u2019s monthly inflation release table \u2014 one decimal)."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
   }), React.createElement(RdConfCal, null), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
@@ -9350,6 +10387,30 @@ function RdConfidence({
     term: "confidence",
     from: "Economic sentiment"
   })));
+}
+function confBand(terms) {
+  if (!terms || terms.length < 3) return null;
+  const out = [];
+  for (let m = 0; m <= 36; m++) {
+    const nums = terms.map(t => t.v[m]).filter(v => v != null).sort((a, b) => a - b);
+    if (nums.length < 3) continue;
+    const pct = p => {
+      const i = (nums.length - 1) * p,
+        lo = Math.floor(i),
+        hi = Math.ceil(i);
+      return nums[lo] + (nums[hi] - nums[lo]) * (i - lo);
+    };
+    out.push({
+      m,
+      n: nums.length,
+      mean: +(nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2),
+      q1: +pct(0.25).toFixed(2),
+      q3: +pct(0.75).toFixed(2),
+      p10: +pct(0.1).toFixed(2),
+      p90: +pct(0.9).toFixed(2)
+    });
+  }
+  return out.length ? out : null;
 }
 Object.assign(window, {
   RdPrimary,

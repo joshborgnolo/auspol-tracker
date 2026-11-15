@@ -8,17 +8,19 @@
    half-life kernel, 14d on the weekly index, 60d on the monthly ones)
    and prices its own y-domain; NAB is a net balance drawn 100 points up,
    and the payload D.confidence stays the published readings.
-   The plot's x is MONTHS SINCE the 3 May 2025 election: the panel
-   anchors x0 = 2025 + 122/365 (gen-data's dx counting) and converts
-   every year-fraction x with toM = (x - x0) * 12, so the term window
-   is [0, xMax] with xMax = max(36, ceil(nowM)) + 0.6 and the ruler
-   reads Election / 1 yr / 2 yrs / 3 yrs plus a Now tick where the
-   sitting term stands. The payload keeps the full on-file history,
-   off-screen, so the payload pins below still run to the 2019-08-13
-   coverage clip while the render expectations window at x0.
-   "Show complete history" remounts the chart on the calendar ruler
-   (its own probe, conf-history.mjs, pins that window); EVERY check
-   here is the term window, years converted with the panel's own toM.
+   The plot's x is the CALENDAR (year-fraction, gen-data's dx counting)
+   since the window bar (Nov 2026): the panel opens on the sitting term's
+   window, from its 3 May 2025 election (x0 = 2025 + 122/365) to three
+   years or the term's age plus 0.6 months, and the ruler reads Election
+   / 1 yr / 2 yrs / 3 yrs plus a Now tick where the sitting term stands.
+   Every lane carries its whole release file (and its monthly history
+   before it, off-screen here); the smooth runs over history + releases
+   so the first releases are read with the months before them, and the
+   dots are the releases inside the window. The payload pins below still
+   run to the 2019-08-13 coverage clip.
+   The window bar's other windows (‹ › terms, 10/25 yrs, All, the
+   strip) have their own probe, conf-window.mjs; EVERY check here is the
+   sitting term's window.
 
    Asserts headlessly against BASE (repo root or a worktree):
      SOURCES (node-side):
@@ -118,13 +120,13 @@ check(panels.includes('"Roy Morgan", hl: 60'), "business lane carries hl: 60 (mo
 check(panels.includes('"DemosAU", hl: 60'), "DemosAU lane carries hl: 60");
 check(panels.includes('"Westpac–MI", hl: 60'), "Westpac–MI lane carries hl: 60");
 check(panels.includes('"NAB", hl: 60'), "NAB lane carries hl: 60");
-check(panels.includes("smooth(rows.get(l.k), l.hl)"), "series points are the smoothed readings");
-check(panels.includes("const spine = histOn ? histSpine : (viewLanes[0] ? rawPoints.get(viewLanes[0].k) : undefined)"), "the term window's hover spine stays the view's raw prints (the history window rides its own histSpine; the macro view is spine-guarded)");
-check(panels.includes("const chartRaw = histOn ? wideRaw : rawPoints"), "the term window's dots stay the raw prints (the history window re-dots the whole release file)");
-check(panels.includes("scatter={viewLanes.flatMap((l) => chartRaw.get(l.k)"), "the scatter dots come from the chart's raw map");
+check(panels.includes("smooth((n0 ? hist : []).concat(l.s.polls), l.hl).slice(n0)"), "series points are the smoothed readings (run with the house's monthly history as context)");
+check(panels.includes(".concat(viewLanes[0] ? laneData.get(viewLanes[0].k).raw : [])"), "the hover spine rides the view's raw prints (with the history's months before the release file)");
+check(panels.includes("const chartDots = dotsOn ? viewLanes.flatMap((l) => laneData.get(l.k).raw"), "the dots are the raw prints, in a term-length window");
+check(panels.includes("scatter={chartDots}"), "the scatter dots come from the chart's raw map");
 check(panels.includes('useState("consumer")'), "the view tabs open on the consumer pair by default");
 check(panels.includes('className="rd-confidence-tabs"'), "the consumer/business views ride the shared RdTabs row");
-check(panels.includes('key={"rd-confidence-" + view + (histOn ? "-hist" : "")}'), "the chart remounts per view, and again into the history window (its own ruler)");
+check(panels.includes('key={"rd-confidence-" + view}'), "the chart remounts per view and holds its mount across windows (the x window travels)");
 const glossFile = fs.readdirSync(path.join(BASE, ".build/newtracker/assets")).find((f) => f.startsWith("d1a1d215-") && f.endsWith(".js"));
 const gloss = glossFile ? fs.readFileSync(path.join(BASE, ".build/newtracker/assets", glossFile), "utf8") : "";
 const glossFlat = gloss.replace(/\s+/g, " "); /* the JSX source wraps its prose across lines */
@@ -134,20 +136,18 @@ check(glossFlat.includes("NAB is drawn 100 points up."), "glossary discloses the
 check(glossFlat.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
 check(glossFlat.includes("sit in two views, switched by the tabs over the chart — the consumer lanes open first"),
   "glossary names the two tab-switched views and the consumer default");
-check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel anchors its x at the 2025 election (x0 = 2025 + 122/365)");
-check(panels.includes("const toM = (x) => (x - x0) * 12"), "every year-fraction x is converted to MONTHS since the election (toM)");
-check(panels.includes("const xMax = Math.max(36, Math.ceil(nowM)) + 0.6"), "the term window runs [0, xMax] - 36 months or the sitting term's age, plus margin");
-check(panels.includes('{ x: 0, label: "Election" }') && panels.includes('{ x: 36, label: "3 yrs" }') && panels.includes('label: "Now"'),
-  "the x axis is the months ruler (Election / 1 yr / 2 yrs / 3 yrs + Now), not rdElectionTicks");
-check(panels.includes("xTicks={histOn ? histTicks : xTicks}"), "the term window takes the months ruler; the history window takes histTicks' calendar years");
-check(panels.includes("const evs = rdChartEvents(D.events, x0, x1).filter((e) => !CONF_OFF.includes(e.date))"), "the panel marks the window's major events (rdChartEvents over x0..x1, less CONF_OFF)");
-check(panels.includes(".map((e) => ({ ...e, x: toM(e.x) }))"), "the marked events convert to the months ruler with toM");
+check(panels.includes("const [winS, setWinS] = useState(() => confTermWin(curTerm, nowX))"), "the panel opens on the sitting term's window");
+check(panels.includes("b: t.b != null ? t.b : t.a + (Math.max(36, Math.ceil((nowX - t.a) * 12)) + 0.6) / 12"), "the sitting term's window runs three years or the term's age, plus 0.6 months");
+check(panels.includes('{ x: w.a, label: "Election", strong: true, short: "E" }') && panels.includes('label: k === 1 ? "1 yr" : k + " yrs"') && panels.includes('label: "Now"'),
+  "a term window's x axis is the election ruler (Election / 1 yr / 2 yrs / 3 yrs + Now)");
+check(panels.includes("const xTicks = confWinTicks(win, vTerms, nowX)"), "the chart takes the window's ruler (calendar years off a term)");
+check(panels.includes("const evs = isCur ? rdChartEvents(D.events, win.a, nowX).filter((e) => !CONF_OFF.includes(e.date))"), "the sitting term's window marks its major events (rdChartEvents, less CONF_OFF)");
 /* the party-politics events kept off this chart, mirroring rd-panels.jsx */
 const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
 check(panels.includes('const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"]'), "CONF_OFF names both Coalition splits, Joyce to ONP and Taylor's leadership");
-check(panels.includes('rdEventBadges("confidence", evs, 0, xMax)'), "a phone's events ride as numbered badges on the months ruler (0..xMax) under the \"confidence\" key");
-check(panels.includes("events={histOn ? [] : (badges ? badges.events : evs)}"), "the term window's chart takes the events; the history window draws none");
-check(panels.includes("evt={histOn ? null : evtOpen} onEvt={setEvtOpen}"), "the term window rides the controlled evt/onEvt pair");
+check(panels.includes('rdEventBadges("confidence", evs, win.a, win.b)'), "a phone's events ride as numbered badges over the window under the \"confidence\" key");
+check(panels.includes("events={badges ? badges.events : evs}"), "the chart takes the window's events");
+check(panels.includes("evt={evtOpen} onEvt={setEvtOpen}"), "the chart rides the controlled evt/onEvt pair");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
 check(genData.includes("draws a recency-weighted smoothed trend on top"), "gen-data §5j comment still promises the raw payload with the render-side smooth");
 
@@ -206,7 +206,7 @@ await open(1366);
 const P = await page.evaluate(() => {
   const D = window.AP.D;
   const pick = (s) => ({ polls: s.polls.map((p) => ({ x: p.x, v: p.v, ym: p.ym, released: p.released })), latest: s.latest });
-  const out = { x1: D.domain.x1 };
+  const out = { x1: D.domain.x1, deep: D.confDeep || {} };
   for (const k of ["consumer", "westpacConsumer", "demosauConsumer", "business", "nabBusiness"]) if (D.confidence[k]) out[k] = pick(D.confidence[k]);
   return out;
 });
@@ -230,22 +230,27 @@ for (const lane of LANES) {
 }
 
 /* ---- expectations recomputed from the payload ----
-   x0 is the panel's election anchor constant (source-pinned above) and
-   every x the chart draws is MONTHS since it (the panel's own toM,
-   mirrored here on the same constant); the kernel always runs on
-   year-fraction x, so fil stays years and exp converts. The term window
-   is [0, xMax]; the payload pins stay on the full on-file history. */
+   x0 is the sitting term's election (source-pinned above); the window
+   runs on the calendar to xEnd = x0 + (max(36, ceil(nowM)) + 0.6)/12.
+   The kernel runs over the house's monthly history (D.confDeep, months
+   before its first release) and then its WHOLE release file, exactly as
+   the panel does; `all` is every release (the line's vertices), `fil`
+   the releases inside the window (its dots and sampled knots). */
 const x0 = 2025 + 122 / 365;
 const x1 = P.x1;
-const toM = (x) => (x - x0) * 12;
-const nowM = toM(x1);
-const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
-const fil = {}, exp = {};
+const nowM = (x1 - x0) * 12;
+const xEnd = x0 + (Math.max(36, Math.ceil(nowM)) + 0.6) / 12;
+const fil = {}, exp = {}, all = {};
 for (const l of live) {
-  fil[l.k] = P[l.k].polls.filter((p) => p.x >= x0);
-  exp[l.k] = smooth(fil[l.k], l.hl).map((p) => ({ x: toM(p.x), y: lanePlotOf(l, p.y) }));
+  all[l.k] = P[l.k].polls;
+  const live0 = all[l.k][0].x;
+  const hist = (P.deep[l.k] || []).map((r) => ({ x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12, v: r.v })).filter((p) => p.x < live0);
+  const n0 = hist.length > 1 ? hist.length : 0;
+  exp[l.k] = smooth((n0 ? hist : []).concat(all[l.k]), l.hl).slice(n0).map((p) => ({ x: p.x, y: lanePlotOf(l, p.y) }));
+  fil[l.k] = all[l.k].filter((p) => p.x >= x0 - 0.1 && p.x <= xEnd + 0.1);
 }
-console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.hl}d${l.shift ? ", +" + l.shift : ""})`).join(", ") + `; window months 0..${xMax.toFixed(1)} (Now at ${nowM.toFixed(1)})`);
+const inWin = (k) => exp[k].map((e, i) => i).filter((i) => all[k][i].x >= x0 && all[k][i].x <= xEnd);
+console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.hl}d${l.shift ? ", +" + l.shift : ""})`).join(", ") + `; window ${x0.toFixed(3)}..${xEnd.toFixed(3)} (Now at month ${nowM.toFixed(1)})`);
 
 /* the window's marked events: the page's own rdChartEvents and
    rdEventBadges (the same machinery the panel rides) - selected on the
@@ -255,17 +260,15 @@ const expEvs = await page.evaluate(([ex, ex1, off]) =>
   rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, CONF_OFF]);
 const offEvs = await page.evaluate(([ex, ex1, off]) =>
   rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, CONF_OFF]);
-const expList = await page.evaluate(([ex, ex1, off, mx]) => {
-  const toM = (x) => (x - ex) * 12;
-  const evs = rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date))
-    .map((e) => ({ ...e, x: toM(e.x) }));
-  const b = rdEventBadges("confidence", evs, 0, mx);
+const expList = await page.evaluate(([ex, ex1, off, xe]) => {
+  const evs = rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date));
+  const b = rdEventBadges("confidence", evs, ex, xe);
   return b.list.map((l) => ({ n: l.n, t: l.labels.join(", ") }));
-}, [x0, x1, CONF_OFF, xMax]);
+}, [x0, x1, CONF_OFF, xEnd]);
 console.log("events: " + expEvs.map((e) => e.date).join(", ") + " (" + expEvs.length + ")");
 
 for (const l of live) {
-  const devs = exp[l.k].map((s, i) => Math.abs((s.y - (l.shift || 0)) / (l.scale || 1) - fil[l.k][i].v));
+  const devs = inWin(l.k).map((i) => Math.abs((exp[l.k][i].y - (l.shift || 0)) / (l.scale || 1) - all[l.k][i].v));
   const frac = devs.filter((d) => d > l.gate).length / devs.length;
   const mean = devs.reduce((a, b) => a + b, 0) / devs.length;
   if (l.live)
@@ -366,20 +369,20 @@ async function checkChart(rung, viewKey) {
      sit between the milestones; every drawn mark must sit exactly on a
      ruler position, every label on one, the election tick is pinned by
      its name, and Now rides only where the ruler's own rule keeps it) */
-  const sx = (m) => padL + m * ((fit.vbW - padR - padL) / xMax);
-  const expTicks = [{ x: 0, label: "Election" }, { x: 12, label: "1 yr" }, { x: 24, label: "2 yrs" }, { x: 36, label: "3 yrs" }];
-  if (nowM < xMax - 1.4) expTicks.push({ x: +nowM.toFixed(1), label: "Now" });
+  const sx = (x) => padL + (x - x0) * ((fit.vbW - padR - padL) / (xEnd - x0));
+  const expTicks = [{ x: x0, label: "Election" }, { x: x0 + 1, label: "1 yr" }, { x: x0 + 2, label: "2 yrs" }, { x: x0 + 3, label: "3 yrs" }];
+  if (x1 < xEnd - 1.4 / 12) expTicks.push({ x: x1, label: "Now" });
   const expXs = expTicks.map((t) => sx(t.x)).sort((a, b) => a - b);
   const ticks = [...fit.ticks].sort((a, b) => a - b);
   check(ticks.length === expXs.length && ticks.every((t, i) => Math.abs(t - expXs[i]) < 0.01),
-    `${ticks.length} axis tick marks sit exactly on the months ruler (${expTicks.map((t) => t.label).join(", ")})`);
+    `${ticks.length} axis tick marks sit exactly on the election ruler (${expTicks.map((t) => t.label).join(", ")})`);
   const expLab = (x) => { const m = expTicks.find((t) => Math.abs(sx(t.x) - x) < 0.05); return m ? m.label : null; };
   check(fit.labels.every((t) => expLab(t.x) != null), `every axis label sits on a ruler milestone (${fit.labels.length} labels)`);
-  const electX = sx(0);
+  const electX = sx(x0);
   const firstLab = fit.labels.find((t) => Math.abs(t.x - electX) < 0.05);
   check(!!firstLab && firstLab.t === "Election",
     `the ${rung}px axis pins the Election tick at month 0, 3 May 2025 (got ${firstLab ? '"' + firstLab.t + '"' : "none"})`);
-  const nowX = nowM < xMax - 1.4 ? sx(+nowM.toFixed(1)) : null;
+  const nowX = x1 < xEnd - 1.4 / 12 ? sx(x1) : null;
   const nowLab = nowX == null ? null : fit.labels.find((t) => Math.abs(t.x - nowX) < 0.05);
   check(nowX == null || (!!nowLab && nowLab.t === "Now"),
     `the sitting term's age rides as the Now tick at month ${nowM.toFixed(1)}${nowLab ? "" : " (label dropped at this width)"}`);
@@ -408,11 +411,12 @@ async function checkChart(rung, viewKey) {
     check(!!d, `${k} series line drawn`);
     if (!d) continue;
     const verts = 1 + (d.match(/ C /g) || []).length + (d.match(/ L /g) || []).length;
-    check(verts === exp[k].length, `${k}: ${verts} path vertices, one per reading (${exp[k].length}) - not a sparse resample`);
+    check(verts === exp[k].length, `${k}: ${verts} path vertices, one per release on file (${exp[k].length}) - not a sparse resample`);
+    const win = inWin(k);
     const idx = [];
-    const n = exp[k].length, stride = Math.max(1, Math.floor(n / 26));
-    for (let i = 0; i < n; i += stride) idx.push(i);
-    if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
+    const n = win.length, stride = Math.max(1, Math.floor(n / 26));
+    for (let i = 0; i < n; i += stride) idx.push(win[i]);
+    if (n && idx[idx.length - 1] !== win[n - 1]) idx.push(win[n - 1]);
     const xs = idx.map((i) => sx(exp[k][i].x));
     const ys = await knotYs(sel, xs);
     let worst = 0, wi = -1;
@@ -425,9 +429,9 @@ async function checkChart(rung, viewKey) {
        path, worst on the near-vertical COVID cliff */
     const worstPx = worst * (fit.cw / 1000);
     check(ys && worstPx <= 0.06,
-      `${k}: line passes through the recomputed kernel smooth${l.shift ? " +" + l.shift : ""} at ${idx.length} sampled dates (worst ${worst.toFixed(4)}u = ${worstPx.toFixed(4)}px${wi >= 0 ? " at " + fil[k][wi].released : ""})`);
-    const rawGap = ys ? Math.max(...idx.map((pIdx, j) => Math.abs(ys[j] - sy(lanePlotOf(l, fil[k][pIdx].v))))) : 0;
-    check(rawGap > 1 || fil[k].length < 2, `${k}: the line is NOT the raw join-the-dots (departs from a raw print by up to ${rawGap.toFixed(2)}u${fil[k].length < 2 ? " — single-reading lane, the smooth IS its one print" : ""})`);
+      `${k}: line passes through the recomputed kernel smooth${l.shift ? " +" + l.shift : ""} at ${idx.length} sampled dates (worst ${worst.toFixed(4)}u = ${worstPx.toFixed(4)}px${wi >= 0 ? " at " + all[k][wi].released : ""})`);
+    const rawGap = ys ? Math.max(...idx.map((pIdx, j) => Math.abs(ys[j] - sy(lanePlotOf(l, all[k][pIdx].v))))) : 0;
+    check(rawGap > 1 || win.length < 2, `${k}: the line is NOT the raw join-the-dots (departs from a raw print by up to ${rawGap.toFixed(2)}u${win.length < 2 ? " — single-reading lane, the smooth IS its one print" : ""})`);
   }
 
   /* dots: the two hues split main gauge from twin within the view
@@ -448,11 +452,11 @@ async function checkChart(rung, viewKey) {
     if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
     let miss = -1;
     for (const i of idx) {
-      const p = fil[k][i], tx = sx(toM(p.x)), ty = sy(lanePlotOf(l, p.v));
+      const p = fil[k][i], tx = sx(p.x), ty = sy(lanePlotOf(l, p.v));
       if (!dots.some((d) => Math.abs(d.cx - tx) < 0.05 && Math.abs(d.cy - ty) < 0.05)) { miss = i; break; }
     }
     check(miss < 0, `${k}: every sampled raw print has a dot at its plotted spot${miss >= 0 ? " (missing " + fil[k][miss].released + ")" : ""}`);
-    const last = fil[k][fil[k].length - 1], tx = sx(toM(last.x)), ty = sy(lanePlotOf(l, last.v));
+    const last = fil[k][fil[k].length - 1], tx = sx(last.x), ty = sy(lanePlotOf(l, last.v));
     const hit = dots.find((d) => Math.abs(d.cx - tx) < 0.02 && Math.abs(d.cy - ty) < 0.02);
     check(!!hit, `${k}: the last print's dot sits exactly on it (${last.released}, ${last.v}${l.shift ? " plotted " + (last.v + l.shift) : ""})`);
   }
@@ -548,7 +552,7 @@ async function checkCopy(viewKey) {
   check(how.includes("half-life 14 days") && how.includes("60 days on the monthly"), "HowTo names the half-lives");
   check(how.includes("recency-weighted kernel") && how.includes("raw prints"), "HowTo says kernel-smoothed lines, raw-print figures");
   check(how.includes("100 points up") && how.includes("net balance"), "HowTo discloses NAB's net balance and the +100 draw");
-  check(how.includes("from the 2025 election on"), "HowTo dates the chart window to the 2025 election");
+  check(how.includes("It opens on this term"), "HowTo says the window opens on this term");
   const foot = (await texts("#confidence .rd-foot")).join(" ");
   check(foot.includes("Source data, CSV") && how.includes("net balance"), "foot carries the CSV export (every release, all five lanes) and the context phrases");
 }
