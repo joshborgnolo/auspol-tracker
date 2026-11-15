@@ -6647,7 +6647,20 @@ const issues = (() => {
       snap = { lead: ord[0], runner: ord[1], third: ord[2], leadSig: leadSig0,
                ...(L3 ? { pairSig: L3.v > 1.96 * L3.se } : {}) };
     }
+    /* the What-matters trend chart's line and dots: salience pooled month by
+       month with the pair's half-gap lean, exactly as the trust rows' `monthly`
+       – plus the raw waves themselves ([x, house, wave-date, share, n]), the
+       chart's dots and the client-side trend tests' input. The house is the
+       poll name verbatim (never houseName()'s short form): the client joins
+       each dot to its archive row by pollster|released, as the trust
+       chart's dots do */
+    const salM = (salRows[k] || []).length ? MONTHS.map((ym) => {
+      const m = monthWithSe(salRows[k], salLean[k], ym);
+      return m ? [ym, r1(m.v), r1(1.96 * m.se)] : null;
+    }).filter(Boolean) : [];
+    const salD = (salRows[k] || []).map((r) => [r2(dx(r.date)), r.firm, r.date, r1(r.x), Math.round(r.n)]);
     return { id: k, label: F.issues[k], imp: salNow(k), own: ownNow, monthly,
+             ...(salM.length ? { salMonthly: salM } : {}), ...(salD.length ? { salDots: salD } : {}),
              ...(snap ? { snap } : {}),
              dots: (dots[k] || []).sort((a, b) => a[0] - b[0]), ...(grnTop[k] ? { grnTop: grnTop[k] } : {}) };
   }).filter((it) => it.own || it.imp);

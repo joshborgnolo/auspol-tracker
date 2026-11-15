@@ -91,6 +91,31 @@ for (const c of A.cycles) {
     }
     walkNumber(it.own.gap, `issue ${it.id} lead gap`);
     assert.ok(["alp", "lnp", "onp"].includes(it.own.lead), `issue ${it.id}: a named owner leads`);
+    // the What-matters trend view's line and dots ride the same row
+    if (it.imp != null) {
+      assert.ok(Array.isArray(it.salMonthly) && it.salMonthly.length >= 2,
+        `issue ${it.id}: a current salience estimate has its monthly line`);
+      assert.ok(Array.isArray(it.salDots) && it.salDots.length >= 2,
+        `issue ${it.id}: a current salience estimate has its poll dots`);
+    }
+    if (it.salMonthly != null) {
+      const yms = it.salMonthly.map((m) => m[0]);
+      assert.deepEqual(yms, [...yms].sort(), `issue ${it.id} salMonthly months run in order`);
+      for (const [ym, v, ci] of it.salMonthly) {
+        assert.ok(/^\d{4}-\d{2}$/.test(ym), `issue ${it.id} salMonthly month key ${ym}`);
+        walkNumber(v, `issue ${it.id} salMonthly v`);
+        walkNumber(ci, `issue ${it.id} salMonthly ci`);
+        assert.ok(v >= 0 && v <= 100 && ci > 0, `issue ${it.id} salMonthly share and interval are sane`);
+      }
+      for (const [x, house, date, v, n] of it.salDots) {
+        /* the verbatim poll name, so the client can join the dot to its
+           archive row by pollster|released */
+        assert.ok(typeof house === "string" && house.length > 2 && !/^\(/.test(house), `issue ${it.id} salDot names its pollster`);
+        assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(date), `issue ${it.id} salDot wave date`);
+        walkNumber(v, `issue ${it.id} salDot share`);
+        assert.ok(v >= 0 && v <= 100 && n > 0, `issue ${it.id} salDot share and n are sane`);
+      }
+    }
   }
   assert.ok(Array.isArray(A.direction) && A.direction.length >= 10,
     "the direction series is populated");

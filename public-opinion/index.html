@@ -44,7 +44,7 @@
   <link rel="preload" href="../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../assets/js/react-dom.35f4f974.js" as="script">
   <link rel="preload" href="../assets/js/data.8c62332b.js" as="script">
-  <link rel="preload" href="../assets/js/data-late.81a90a81.js" as="script">
+  <link rel="preload" href="../assets/js/data-late.ec456ea4.js" as="script">
   <link rel="preload" href="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js" as="script">
   <link rel="preload" href="../assets/js/np-project.64658a20.js" as="script">
   <link rel="preload" href="../assets/js/pv-agg.3917be66.js" as="script">
@@ -55,11 +55,11 @@
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
   <link rel="preload" href="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js" as="script">
   <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js" as="script">
-  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.baef39a2.js" as="script">
+  <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.6abc3754.js" as="script">
   <link rel="preload" href="../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../assets/js/rd.c32013aa.js" as="script">
   <link rel="preload" href="../assets/js/rd-hero.948c4053.js" as="script">
-  <link rel="preload" href="../assets/js/rd-panels.9bb68e22.js" as="script">
+  <link rel="preload" href="../assets/js/rd-panels.cddbef66.js" as="script">
   <link rel="preload" href="../assets/js/rd-polls.1d68d9a6.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.2a0d7aec.js" as="script">
@@ -5096,38 +5096,20 @@ body.rd .rd-iw-by { font-size: 13px; font-weight: 600; color: var(--ink); white-
 body.rd .rd-iw-tabs { border-bottom: 0; flex-grow: 1; }
 body.rd .rd-iw-src { margin: 14px 0 6px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-iw-src b { font-weight: 600; color: var(--ink); }
-body.rd .rd-iw-wrap { overflow-x: auto; }
-body.rd .rd-iw-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-body.rd .rd-iw-table col.rd-iw-labcol { width: 200px; }
-body.rd .rd-iw-table th, body.rd .rd-iw-table td { padding: 10px 12px 10px 0; text-align: left; border-bottom: 1px solid var(--line); }
-body.rd .rd-iw-table thead th { font-size: 13px; font-weight: 600; line-height: 1.3; vertical-align: bottom; color: var(--ink); border-bottom: 1.5px solid var(--ink-2); }
-body.rd .rd-iw-table tbody th { font-size: 15px; font-weight: 400; line-height: 1.3; color: var(--ink); }
-body.rd .rd-iw-table tr.all th { font-weight: 600; }
-body.rd .rd-iw-table tr.all td, body.rd .rd-iw-table tr.all th { border-bottom: 1.5px solid var(--ink-3); }
-body.rd .rd-iw-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
-body.rd .rd-iw-bar { position: relative; flex: 1 1 96px; max-width: 96px; min-width: 0; height: 10px; border-radius: 2px; background: var(--line-2); }
-body.rd .rd-iw-bar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--ink-faint); }
-body.rd .rd-iw-cell.all .rd-iw-bar > span { background: var(--ink); }
-body.rd .rd-iw-cell.sig .rd-iw-bar > span { background: var(--ink-2); }
-body.rd .rd-iw-bar > i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); transform: translateX(-1px); }
-body.rd .rd-iw-cell b { flex: 0 0 42px; font-size: 14px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
-body.rd .rd-iw-cell.all b, body.rd .rd-iw-cell.sig b { font-weight: 600; color: var(--ink); }
-body.rd .rd-iw-cell b em { font-style: normal; margin-left: 3px; font-size: 12px; }
-@media (max-width: 1100px) {
-  body.rd .rd-iw-table col.rd-iw-labcol { width: 170px; }
-}
-body.rd .rd-iw-k { display: block; margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
-body.rd .rd-iw-k:first-child { margin-top: 0; }
 @media (max-width: 1000px) {
-  body.rd .rd-iw-tabs { border-bottom: 1px solid var(--line); margin-top: 4px; }
   body.rd .rd-iw-tabs > [role="group"] { flex: 1 1 auto; }
   body.rd .rd-iw-tabs .rd-tab { flex: 1 1 0; justify-content: center; padding: 0 6px; }
 }
+@media (max-width: 560px) {
+  body.rd .rd-iw-by { display: none; }
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
+}
 @media (max-width: 400px) and (min-width: 341px) {
-  body.rd .rd-iw-tabs .rd-tab { padding: 0 4px; }
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 12px; }
 }
 @media (max-width: 340.98px) {
-  body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
+  body.rd .rd-iw-tabs > [role="group"] { gap: 2px; }
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 1px; font-size: 11px; }
 }
 body.rd .rd-iw-chips {
   margin: 16px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
@@ -5143,33 +5125,6 @@ body.rd .rd-iw-chip {
 body.rd .rd-iw-chip:hover { border-color: var(--ink-faint); color: var(--ink); }
 body.rd .rd-iw-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
 body.rd .rd-iw-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-body.rd .rd-iw-ltitle { margin: 18px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); }
-body.rd .rd-iw-ltitle b { font-weight: 600; color: var(--ink); }
-body.rd .rd-iw-list { margin-top: 8px; font-variant-numeric: tabular-nums; }
-body.rd .rd-iw-lrow { display: grid; grid-template-columns: 200px minmax(0, 1fr) 56px; column-gap: 12px; align-items: center; min-height: 36px; }
-body.rd .rd-iw-lrow.all { border-bottom: 1px solid var(--ink-faint); margin-bottom: 4px; }
-body.rd .rd-iw-lrow > span:first-child { font-size: 14px; color: var(--ink); }
-body.rd .rd-iw-lrow.all > span:first-child { font-weight: 600; }
-body.rd .rd-iw-lbar { position: relative; height: 12px; border-radius: 2px; background: var(--line-2); }
-body.rd .rd-iw-lbar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--ink-faint); }
-body.rd .rd-iw-lrow.sig .rd-iw-lbar > span { background: var(--ink-2); }
-body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
-body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
-body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s var(--morph-ease), background-color .32s ease; }
-body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s var(--morph-ease); }
-@media (prefers-reduced-motion: reduce) {
-  body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span, body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: none; }
-}
-body.rd .rd-iw-lv { text-align: right; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
-body.rd .rd-iw-lrow.sig .rd-iw-lv, body.rd .rd-iw-lrow.all .rd-iw-lv { font-weight: 600; color: var(--ink); }
-@media (max-width: 640px) {
-  body.rd .rd-iw-lrow { grid-template-columns: 128px minmax(0, 1fr) 46px; column-gap: 8px; }
-}
-body.rd .rd-iw-na { color: var(--ink-3); }
-body.rd .rd-iw-key { margin-top: 14px; }
-body.rd .rd-iw-key b { font-size: 12px; letter-spacing: 1px; }
-body.rd .rd-iw-keybar { display: inline-block; position: relative; width: 20px; height: 10px; background: var(--ink-faint); }
-body.rd .rd-iw-keybar i { position: absolute; right: -3px; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
 @media (max-width: 1100px) {
   body.rd .rd-is-grid { grid-template-columns: minmax(0, 1fr); row-gap: 36px; }
 }
@@ -7050,7 +7005,7 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script src="../assets/js/react.d949f1c3.js"></script>
   <script src="../assets/js/react-dom.35f4f974.js"></script>
   <script src="../assets/js/data.8c62332b.js"></script>
-  <script src="../assets/js/data-late.81a90a81.js"></script>
+  <script src="../assets/js/data-late.ec456ea4.js"></script>
   <script src="../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js"></script>
   <script src="../assets/js/np-project.64658a20.js"></script>
   <script src="../assets/js/pv-agg.3917be66.js"></script>
@@ -7061,11 +7016,11 @@ body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-vis
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
   <script src="../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.b9d08d86.js"></script>
   <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js"></script>
-  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.baef39a2.js"></script>
+  <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.6abc3754.js"></script>
   <script src="../assets/js/wm-story.63f19861.js"></script>
   <script src="../assets/js/rd.c32013aa.js"></script>
   <script src="../assets/js/rd-hero.948c4053.js"></script>
-  <script src="../assets/js/rd-panels.9bb68e22.js"></script>
+  <script src="../assets/js/rd-panels.cddbef66.js"></script>
   <script src="../assets/js/rd-polls.1d68d9a6.js"></script>
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../assets/js/rd-allpolls.2a0d7aec.js"></script>

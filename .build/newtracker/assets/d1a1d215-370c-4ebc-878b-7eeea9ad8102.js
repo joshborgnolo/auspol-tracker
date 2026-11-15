@@ -7976,8 +7976,6 @@ function infoTerms(D) {
         where every line on that chart begins.</li>
         <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
         pollster’s own previous poll.</li>
-        <li><strong>In the issues table by group:</strong> a group that differs from all voters by
-        more than its own 95% margin.</li>
       </ul>
       Most say what they are measured against beside them, or when you point at them.
       {!RD ? <> A green ▲ is a rise and a red ▼ a fall: a direction, not a verdict on anyone. The
@@ -8540,7 +8538,9 @@ function infoTerms(D) {
         for {issPhrase(gapDown.id)} {Math.round(-gapDown.v)} points below.</> : null} Nothing shows
         which is right, so each poll is moved half the pollsters’ average gap toward the other
         before the two are pooled over six weeks. The grey bars sit midway between the two, and
-        don’t jump when one pollster’s poll leaves the window. Ipsos publishes about three weeks
+        don’t jump when one pollster’s poll leaves the window. The What matters view draws the
+        same two adjusted series as a monthly line across the whole term, so a move can be read
+        against the months before it. Ipsos publishes about three weeks
         after its fieldwork, so its latest poll is in the window for only part of each month.
         DemosAU, Spectre and SEC Newgate ask versions that can’t be pooled, but DemosAU and Spectre
         side with Ipsos on health: in 2026 Spectre had it at 18 to 20%, and 1 to 3% named it the
@@ -8574,11 +8574,11 @@ function infoTerms(D) {
         <span className="info-p"><b>By group.</b> RedBridge’s tables give each group’s share
         putting an issue in its top three, by vote, generation, gender, where people live, home
         ownership, and education. A group’s margin comes from its share of the poll, so One Nation
-        voters, about a quarter of RedBridge’s sample, carry margins of about 6 points. ▲ and ▼ mark
-        a group that differs from all voters by more than its margin. A group’s change over the
-        term is a line through RedBridge’s monthly polls, with the bar raised for the number of
-        groups tested. The all-voters row is RedBridge’s own, so it can differ from the grey bars,
-        which pool RedBridge with Ipsos.</span>
+        voters, about a quarter of RedBridge’s sample, carry margins of about 6 points. The group
+        views join those tables into one line per group across RedBridge’s monthly polls, against
+        RedBridge’s own all-voters line — which can sit off the pooled line in All voters, as that
+        line pools RedBridge with Ipsos. A group’s change over the term is a line through its
+        monthly figures, with the bar raised for the number of groups tested.</span>
         <span className="info-p"><b>Limits.</b> Unfortunately, the two pollsters that ask what
         matters every month ask different questions, and nothing shows which is closer to how
         people will vote. The grey bars simply sit midway between them. And the three-party shares
