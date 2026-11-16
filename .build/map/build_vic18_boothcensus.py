@@ -21,13 +21,17 @@ voter-footprint lane (`vdec`, another wave's write) stays null.
          decile verified the column beside it — build_vic18_seifa.py's
          exact reader discipline; a decile is null where the cube
          publishes no score for the index)
-  demo — the SA1's own people cells [lang, a65, a2034, fborn, uni,
-         blue, null, null], computed from the 2016 Census GCP SA1
-         tables at the exact bases of the district people lanes
-         (build_vic18_demo.py), so a booth row is commensurate with
-         its district's row. A cell is null where its denominator is
+  demo — the SA1's own 19-cell people row in the app's DM tuple order
+         ([lang, a65, a2034, fborn, uni, blue, loinc, hiinc, y12,
+         y10less, atsci, u15, onepar, pt, noncit, bigfam, hl, hiqinc,
+         unemp] — build_nsw23_boothcensus.py's fill, at the district
+         people lanes' exact bases (build_vic18_demo.py)), with the
+         cob/rel/ten/anc/ind/mar rows beside it, each in its top-level
+         key record's site order (cobKeys/relKeys/tenKeys/ancKeys/
+         indKeys/marKeys). A cell is null where its denominator is
          zero or census perturbation takes the arithmetic outside
-         [0,1] (emit no number rather than clamp one).
+         [0,1] (emit no number rather than clamp one). The frame's top
+         level also gains its incomeCuts record.
 
 Inputs (all caches already ride this repo's other pipelines):
   .build/analysis/seat-model/cache/gcp-sa1-2016.zip      (GCP 2016 SA1 datapack)
@@ -75,6 +79,16 @@ INDEX_TITLES = {
     "ier": ("INDEX OF ECONOMIC RESOURCES",),
     "ieo": ("INDEX OF EDUCATION AND OCCUPATION", "INDEX OF EMPLOYMENT AND OCCUPATION"),
 }
+# the G09 top-country columns surfaced on /map/ as birthplace sub-views
+# (the federal stores' COB_KEYS — site-key order; 2016's G09 vocab is
+# 2021's — build_vic18_demo.py's own column set)
+COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+            "lka", "sct"]
+GCP_G09F_COLS = ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]
+GCP_G09G_COLS = ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]
+GCP_G09H_COLS = ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
+                 "P_Vietnam_Tot", "P_South_Africa_Tot", "P_Scotland_Tot",
+                 "P_Sri_Lanka_Tot"]
 
 
 def fail(msg):
@@ -190,16 +204,52 @@ def seifa_deciles():
 
 @functools.lru_cache(maxsize=None)
 def demo_cells():
-    """SA1 code -> demo row [lang, a65, a2034, fborn, uni, blue, None,
-    None] on the district people lanes' exact bases
-    (build_vic18_demo.py's shares(), via gcp_newlanes.demo_base's raw
-    counts)."""
+    """SA1 code -> (demo row [lang, a65, a2034, fborn, uni, blue, loinc,
+    hiinc, y12, y10less, atsci, u15, onepar, pt, noncit, bigfam, hl,
+    hiqinc, unemp], cob row in COB_KEYS order, rel row in REL_KEYS
+    order, ten row in TEN_KEYS order, anc row in ANC_KEYS order, ind row
+    in IND_KEYS order, mar row in MAR_KEYS order) with the district
+    people lanes' exact bases (build_vic18_demo.py, whose shared helpers
+    all read the 2016 GCP the same way)."""
+    import csv
+    import io
+    import zipfile
     if not os.path.exists(GCP_ZIP):
         fail(f"missing GCP input {GCP_ZIP}")
     base = gcp_newlanes.demo_base(GCP_ZIP, prefix="2", era=ERA)
+    newl = gcp_newlanes.load(GCP_ZIP, prefix="2", era=ERA)
+    arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="2", era=ERA)
     lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="2", era=ERA)
+    ind = gcp_newlanes.load_ind(GCP_ZIP, prefix="2", era=ERA)
+    mar = gcp_newlanes.load_mar(GCP_ZIP, prefix="2", era=ERA)
+    inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2016", "2")
+    HL = gcp_newlanes.hl_alloc_of(YEAR, "c7")
     if len(base) != GCP_VIC_ROWS:
         fail(f"GCP Vic rows {len(base)} != pin {GCP_VIC_ROWS}")
+    # the G09 birthplace read (Australia/total/not-stated ride demo_base;
+    # this fetch carries the country rows in the GCP_G09*_COLS order)
+    z = zipfile.ZipFile(GCP_ZIP)
+    extra = {}
+    for tag, cols in (("G09F", GCP_G09F_COLS), ("G09G", GCP_G09G_COLS),
+                      ("G09H", GCP_G09H_COLS)):
+        member = V["member"].format(table=tag)
+        if member not in z.namelist():
+            fail(f"GCP zip lacks {member}")
+        d, m = {}, 0
+        with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+            rdr = csv.DictReader(fh)
+            miss = [c for c in ["SA1_7DIGITCODE_2016", *cols]
+                    if c not in (rdr.fieldnames or [])]
+            if miss:
+                fail(f"GCP {tag} header drift, missing {miss}")
+            for row in rdr:
+                m += 1
+                code = row["SA1_7DIGITCODE_2016"]
+                if code.startswith("2"):
+                    d[code] = tuple(int(row[c]) for c in cols)
+        if m != GCP_ROWS or len(d) != GCP_VIC_ROWS:
+            fail(f"GCP {tag} rows {m} (pin {GCP_ROWS}), Vic {len(d)} (pin {GCP_VIC_ROWS})")
+        extra[tag] = d
     out = {}
     for code, r in base.items():
         p, eng, oth, bands = r[0], r[1], r[2], r[3]
@@ -219,15 +269,49 @@ def demo_cells():
                 return None
             v = _num / _den
             return round(v, 4) if 0 <= v <= 1 else None
+        sch6, indt, (relvec, relns, reltot), ten6, fam = newl[code]
+        rel = [safe(v, reltot - relns) for v in relvec]
+        own, mort, rent, rentpub, othtype, tenns = ten6
+        tend = own + mort + rent + othtype
+        ten = [safe(mort, tend), safe(rent, tend),
+               safe(own, tend), safe(rentpub, tend)]
+        citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
+            (ancv, ancp, ancns) = arc[code]
+        hle = HL.get(code, {}).get("e", 0.0)
         uel, lfd = lab[code]
-        out[code] = [safe(oth, eng + oth),
+        iv, _ivns, _ivt = ind[code]
+        ivd = sum(iv)
+        indsh = [safe(v, ivd) for v in iv]
+        aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
+        anc = [safe(v, ancp - ancns) for v in ancv]
+        marv = mar[code]
+        marsh = [safe(v, sum(marv)) for v in marv]
+        f09 = extra["G09F"][code]
+        g09 = extra["G09G"][code]
+        h09 = extra["G09H"][code]
+        den09 = h09[0] - h09[1]
+        cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
+               g09[2], h09[6], h09[5])
+        out[code] = ([safe(oth, eng + oth),
                      safe(bands[8] + bands[9] + bands[10], bsum),
                      safe(bands[3] + bands[4], bsum),
                      safe(tot - cobns - aust, tot - cobns),
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
-                     None, None] \
-            + [None] * 10 + [safe(uel, lfd)]
+                     safe(lom, aud), safe(him, aud),
+                     gcp_newlanes.y12_cell(sch6, safe),
+                     gcp_newlanes.y10less_cell(sch6, safe),
+                     safe(indt[0], indt[1]),
+                     gcp_newlanes.u15_cell(bands, safe),
+                     safe(fam[0], fam[1]),
+                     safe(ptn, ptt - ptns),
+                     safe(p - citz, p),
+                     safe(ceb3, cebt - cebns),
+                     safe(hle, p),
+                     safe(hiqm, aud),
+                     safe(uel, lfd)],
+                     [safe(c, den09) for c in cob], rel, ten, anc,
+                     indsh, marsh)
     if len(out) != GCP_VIC_ROWS:
         fail(f"demo cells {len(out)} != pin {GCP_VIC_ROWS}")
     print(f"GCP {YEAR} demo cells: {len(out)} SA1s")
@@ -282,7 +366,8 @@ def main():
         fail(f"{FRAME}: a booth carries only one of lat/lon")
     out_sa1, suppressions = set(), 0
     counts = {"pip": 0, "noscore": 0, "mobile": 0, "unlocated": 0}
-    dec_col, demo_col = [], []
+    dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, ind_col, mar_col = \
+        [], [], [], [], [], [], [], []
     for k in range(n):
         lat, lon, ty = B["lat"][k], B["lon"][k], B["ty"][k]
         if ty == 4:
@@ -290,11 +375,23 @@ def main():
             counts["mobile"] += 1
             dec_col.append(None)
             demo_col.append(None)
+            cob_col.append(None)
+            rel_col.append(None)
+            ten_col.append(None)
+            anc_col.append(None)
+            ind_col.append(None)
+            mar_col.append(None)
             continue
         if lat is None:
             counts["unlocated"] += 1
             dec_col.append(None)
             demo_col.append(None)
+            cob_col.append(None)
+            rel_col.append(None)
+            ten_col.append(None)
+            anc_col.append(None)
+            ind_col.append(None)
+            mar_col.append(None)
             continue
         code = pip(lon, lat)
         if code is None:
@@ -315,9 +412,29 @@ def main():
         dm = demos.get(code)
         if dm is None:
             fail(f"{FRAME} booth {B['n'][k]!r}: SA1 {code} has no GCP row (the GCP and SA1 packs must cover the same codes)")
-        demo_col.append(list(dm))
+        demo_col.append(list(dm[0]))
+        cob_col.append(list(dm[1]))
+        rel_col.append(list(dm[2]))
+        ten_col.append(list(dm[3]))
+        anc_col.append(list(dm[4]))
+        ind_col.append(list(dm[5]))
+        mar_col.append(list(dm[6]))
     B["dec"] = dec_col
+    B["vdec"] = [None] * n  # the VEC releases no votes-by-SA1 product; the
+    # voter-footprint lane is a federal AEC read and stays empty by design
     B["demo"] = demo_col
+    B["cob"] = cob_col
+    B["rel"] = rel_col
+    B["ten"] = ten_col
+    B["anc"] = anc_col
+    B["ind"] = ind_col
+    B["mar"] = mar_col
+    data["cobKeys"] = COB_KEYS
+    data["relKeys"] = list(gcp_newlanes.REL_KEYS)
+    data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
+    data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
+    data["indKeys"] = list(gcp_newlanes.IND_KEYS)
+    data["marKeys"] = list(gcp_newlanes.MAR_KEYS)
     # the frame's own income-cuts record (the shared engine post its
     # 2026-11-04 family-block fix; Vic 2016's measure is 888.43/2587.98)
     _unused_inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2016", "2")

@@ -1,8 +1,8 @@
 // The Marital status select lens on /map/, headless-browser probes:
 //
-//   - the People menu of the census lens gains "Marital status" on every
-//     frame whose res/store carries marKeys, and hides where they sit out
-//     the era (nsw15's flat frame packs no select lanes);
+//   - the People menu of the census lens has offered "Marital status" on
+//     every frame since the 2026-11-16 state-frame lane repair (every census
+//     edition's print carries it — the once-flat nsw15 carries the keys too);
 //   - landing on an option strings through the URL state
 //     (i=mar&ma=<option>) and writes it back untouched;
 //   - the legend note names people aged 15+ and the census's registered
@@ -95,11 +95,13 @@ try {
   }));
   await page.close();
 
-  // 5. an era-null frame never offers a dead option (its siblings sit out too)
+  // 5. nsw15, once the era-null exemplar (its flat frame packed no select
+  // lanes), carries them all: every census edition prints marital status,
+  // so the 2026-11-16 state-frame lane repair flagged no principled gap here
   page = await scenario("y=nsw15&l=seifa");
-  check("nsw15 has no select keys at the model (all select lanes stay out)",
-    await page.evaluate(() => !__map.M().marKeys && !__map.M().ancKeys && !__map.M().relKeys));
-  check("nsw15's menu shows no Marital status entry", await page.evaluate(() => !document.body.textContent.includes("Marital status")));
+  check("nsw15 now carries the select keys at the model (era coverage is complete — marital exists in every census's print)",
+    await page.evaluate(() => !!__map.M().marKeys && !!__map.M().ancKeys && !!__map.M().relKeys));
+  check("nsw15's menu offers Marital status", await page.evaluate(() => document.body.textContent.includes("Marital status")));
   await page.close();
 
   // 6. the Chart view invalidates on an option swap (it used to memoise the

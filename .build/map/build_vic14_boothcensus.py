@@ -22,13 +22,20 @@ voter-footprint lane (`vdec`, another wave's write) stays null.
          decile verified the column beside it — build_vic14_seifa.py's
          exact reader discipline; a decile is null where the cube
          publishes no score for the index)
-  demo — the SA1's own people cells [lang, a65, a2034, fborn, uni,
-         blue, null, null], computed from the 2011 Census BCP SA1
-         tables at the exact bases of the district people lanes
-         (build_vic14_demo.py), so a booth row is commensurate with
-         its district's row. A cell is null where its denominator is
-         zero or census perturbation takes the arithmetic outside
-         [0,1] (emit no number rather than clamp one).
+  demo — the SA1's own 19-cell people row in the app's DM tuple order
+         ([lang, a65, a2034, fborn, uni, blue, loinc, hiinc, y12,
+         y10less, atsci, u15, onepar, pt, noncit, bigfam, hl, hiqinc,
+         unemp] — build_nsw23_boothcensus.py's fill, at the district
+         people lanes' exact bases (build_vic14_demo.py)), with the
+         cob/rel/ten/anc/ind/mar rows beside it, each in its top-level
+         key record's site order (cobKeys/relKeys/tenKeys/ancKeys/
+         indKeys/marKeys; the 2011 BCP's B09 merges England+Scotland,
+         so cobKeys is the eight-country set the federal 2011-era
+         stores carry in the same situation). A cell is null where its
+         denominator is zero or census perturbation takes the
+         arithmetic outside [0,1] (emit no number rather than clamp).
+         The frame's top level also gains its 2011-dollars incomeCuts
+         record.
 
 Inputs (all caches already ride this repo's other pipelines):
   .build/analysis/seat-model/cache/bcp-sa1-2011.zip      (2011 BCP SA1 datapack)
@@ -76,6 +83,14 @@ INDEX_TITLES = {
     "ier": ("INDEX OF ECONOMIC RESOURCES",),
     "ieo": ("INDEX OF EDUCATION AND OCCUPATION", "INDEX OF EMPLOYMENT AND OCCUPATION"),
 }
+# the 2011 BCP's B09 merges the whole UK into one row, so the GCP-era
+# ten-country birthplace set can't print — the federal 2011-era stores'
+# COB_KEYS8 in the same site-key order (build_vic14_demo.py's own read)
+COB_KEYS = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"]
+BCP_B09_COLS = ["Australia_P", "Country_birth_not_stated_P", "Tot_P",
+                "India_P", "China_excl_SARs_Taiwan_P", "New_Zealand_P",
+                "Philippines_P", "Vietnam_P", "South_Africa_P",
+                "Italy_P", "Sri_Lanka_P"]
 
 
 def fail(msg):
@@ -191,16 +206,47 @@ def seifa_deciles():
 
 @functools.lru_cache(maxsize=None)
 def demo_cells():
-    """SA1 code -> demo row [lang, a65, a2034, fborn, uni, blue, None,
-    None] on the district people lanes' exact bases
-    (build_vic14_demo.py's shares(), via gcp_newlanes.demo_base's raw
-    counts)."""
+    """SA1 code -> (demo row [lang, a65, a2034, fborn, uni, blue, loinc,
+    hiinc, y12, y10less, atsci, u15, onepar, pt, noncit, bigfam, hl,
+    hiqinc, unemp], cob row in COB_KEYS order, rel row in REL_KEYS
+    order, ten row in TEN_KEYS order, anc row in ANC_KEYS order, ind row
+    in IND_KEYS order, mar row in MAR_KEYS order) with the district
+    people lanes' exact bases (build_vic14_demo.py, whose shared helpers
+    all read the 2011 BCP the same way)."""
+    import csv
+    import io
+    import zipfile
     if not os.path.exists(BCP_ZIP):
         fail(f"missing BCP input {BCP_ZIP}")
     base = gcp_newlanes.demo_base(BCP_ZIP, prefix="2", era=ERA)
+    newl = gcp_newlanes.load(BCP_ZIP, prefix="2", era=ERA)
+    arc = gcp_newlanes.load_arc31(BCP_ZIP, prefix="2", era=ERA)
     lab = gcp_newlanes.load_lab(BCP_ZIP, prefix="2", era=ERA)
+    ind = gcp_newlanes.load_ind(BCP_ZIP, prefix="2", era=ERA)
+    mar = gcp_newlanes.load_mar(BCP_ZIP, prefix="2", era=ERA)
+    inc, _inc_cutrec = gcp_newlanes.state_income_bcp(BCP_ZIP, "2")
+    HL = gcp_newlanes.hl_alloc_of(YEAR, "c7")
     if len(base) != BCP_VIC_ROWS:
         fail(f"BCP Vic rows {len(base)} != pin {BCP_VIC_ROWS}")
+    # the B09 birthplace read (Australia/total/not-stated ride demo_base;
+    # this fetch carries the eight country rows in COB_KEYS order)
+    z = zipfile.ZipFile(BCP_ZIP)
+    member = V["member"].format(table="B09")
+    cob_raw = {}
+    n9 = 0
+    with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+        rdr = csv.DictReader(fh)
+        miss = [c for c in [V["gcp_key"], *BCP_B09_COLS]
+                if c not in (rdr.fieldnames or [])]
+        if miss:
+            fail(f"BCP B09 header drift, missing {miss}")
+        for row in rdr:
+            n9 += 1
+            code = row[V["gcp_key"]].strip()
+            if code.startswith("2"):
+                cob_raw[code] = tuple(int(row[c]) for c in BCP_B09_COLS)
+    if n9 != V["gcp_rows"] or len(cob_raw) != BCP_VIC_ROWS:
+        fail(f"BCP B09 rows {n9} (pin {V['gcp_rows']}), Vic {len(cob_raw)} (pin {BCP_VIC_ROWS})")
     out = {}
     for code, r in base.items():
         p, eng, oth, bands = r[0], r[1], r[2], r[3]
@@ -220,15 +266,44 @@ def demo_cells():
                 return None
             v = _num / _den
             return round(v, 4) if 0 <= v <= 1 else None
+        sch6, indt, (relvec, relns, reltot), ten6, fam = newl[code]
+        rel = [safe(v, reltot - relns) for v in relvec]
+        own, mort, rent, rentpub, othtype, tenns = ten6
+        tend = own + mort + rent + othtype
+        ten = [safe(mort, tend), safe(rent, tend),
+               safe(own, tend), safe(rentpub, tend)]
+        citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
+            (ancv, ancp, ancns) = arc[code]
+        hle = HL.get(code, {}).get("e", 0.0)
         uel, lfd = lab[code]
-        out[code] = [safe(oth, eng + oth),
+        iv, _ivns, _ivt = ind[code]
+        ivd = sum(iv)
+        indsh = [safe(v, ivd) for v in iv]
+        aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
+        anc = [safe(v, ancp - ancns) for v in ancv]
+        marv = mar[code]
+        marsh = [safe(v, sum(marv)) for v in marv]
+        b9 = cob_raw[code]
+        den09 = b9[2] - b9[1]
+        cob = [safe(c, den09) for c in b9[3:]]
+        out[code] = ([safe(oth, eng + oth),
                      safe(bands[8] + bands[9] + bands[10], bsum),
                      safe(bands[3] + bands[4], bsum),
                      safe(tot - cobns - aust, tot - cobns),
                      safe(uni, pop15 - eduns),
                      safe(blue, occd),
-                     None, None] \
-            + [None] * 10 + [safe(uel, lfd)]
+                     safe(lom, aud), safe(him, aud),
+                     gcp_newlanes.y12_cell(sch6, safe),
+                     gcp_newlanes.y10less_cell(sch6, safe),
+                     safe(indt[0], indt[1]),
+                     gcp_newlanes.u15_cell(bands, safe),
+                     safe(fam[0], fam[1]),
+                     safe(ptn, ptt - ptns),
+                     safe(p - citz, p),
+                     safe(ceb3, cebt - cebns),
+                     safe(hle, p),
+                     safe(hiqm, aud),
+                     safe(uel, lfd)], cob, rel, ten, anc, indsh, marsh)
     if len(out) != BCP_VIC_ROWS:
         fail(f"demo cells {len(out)} != pin {BCP_VIC_ROWS}")
     print(f"BCP {YEAR} demo cells: {len(out)} SA1s")
@@ -283,7 +358,8 @@ def main():
         fail(f"{FRAME}: a booth carries only one of lat/lon")
     out_sa1, suppressions = set(), 0
     counts = {"pip": 0, "noscore": 0, "mobile": 0, "unlocated": 0}
-    dec_col, demo_col = [], []
+    dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, ind_col, mar_col = \
+        [], [], [], [], [], [], [], []
     for k in range(n):
         lat, lon, ty = B["lat"][k], B["lon"][k], B["ty"][k]
         if ty == 4:
@@ -291,11 +367,23 @@ def main():
             counts["mobile"] += 1
             dec_col.append(None)
             demo_col.append(None)
+            cob_col.append(None)
+            rel_col.append(None)
+            ten_col.append(None)
+            anc_col.append(None)
+            ind_col.append(None)
+            mar_col.append(None)
             continue
         if lat is None:
             counts["unlocated"] += 1
             dec_col.append(None)
             demo_col.append(None)
+            cob_col.append(None)
+            rel_col.append(None)
+            ten_col.append(None)
+            anc_col.append(None)
+            ind_col.append(None)
+            mar_col.append(None)
             continue
         code = pip(lon, lat)
         if code is None:
@@ -316,9 +404,29 @@ def main():
         dm = demos.get(code)
         if dm is None:
             fail(f"{FRAME} booth {B['n'][k]!r}: SA1 {code} has no BCP row (the BCP and SA1 packs must cover the same codes)")
-        demo_col.append(list(dm))
+        demo_col.append(list(dm[0]))
+        cob_col.append(list(dm[1]))
+        rel_col.append(list(dm[2]))
+        ten_col.append(list(dm[3]))
+        anc_col.append(list(dm[4]))
+        ind_col.append(list(dm[5]))
+        mar_col.append(list(dm[6]))
     B["dec"] = dec_col
+    B["vdec"] = [None] * n  # the VEC releases no votes-by-SA1 product; the
+    # voter-footprint lane is a federal AEC read and stays empty by design
     B["demo"] = demo_col
+    B["cob"] = cob_col
+    B["rel"] = rel_col
+    B["ten"] = ten_col
+    B["anc"] = anc_col
+    B["ind"] = ind_col
+    B["mar"] = mar_col
+    data["cobKeys"] = COB_KEYS
+    data["relKeys"] = list(gcp_newlanes.REL_KEYS)
+    data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
+    data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
+    data["indKeys"] = list(gcp_newlanes.IND_KEYS)
+    data["marKeys"] = list(gcp_newlanes.MAR_KEYS)
     # the frame's own 2011-dollars income-cuts record (2011 is BCP-era;
     # the GCP-era offset drift never touched this engine)
     _unused_inc, inc_cutrec = gcp_newlanes.state_income_bcp(BCP_ZIP, "2")

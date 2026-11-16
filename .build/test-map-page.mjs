@@ -2095,6 +2095,39 @@ for (const y of ["sa22", "sa26"]) {
   }
 }
 
+// ── every state frame carries the GCP-era census-people contract
+// (2026-11-16, user call "where there's no principled reason for an omission
+// in state vs in federal, fix it"): the vic14/vic18 and nsw15/nsw19 joints
+// gained the vic22-class fill (the 2011 BCP and 2016 GCP print the same
+// lanes' tables), and build_wa_boothcensus.py landed the WA family's never-
+// built joint. So vic14/vic18/nsw15/nsw19/wa17/wa21/wa25 all carry the six
+// top-level key records, their income-cuts record, the 19-cell demo tuple
+// and the cob/rel/ten/anc/ind/mar booth rows — the cob menu riding its own
+// era's country set (2011 BCP merges England+Scotland, so eight).
+{
+  for (const [tag, cobW] of Object.entries({
+    vic14: 8, vic18: 10, nsw15: 8, nsw19: 10, wa17: 10, wa21: 10, wa25: 10,
+  })) {
+    const res = JSON.parse(R(`map/data/res-${tag}.json`));
+    assert.equal((res.cobKeys || []).length, cobW, `${tag}: birthplace menu rides its own era's country set`);
+    assert.deepEqual(res.relKeys, ["norel", "cath", "angl", "unch", "pres", "orth", "budd", "isl", "hind", "jew"], `${tag}: ten religions, norel first`);
+    assert.deepEqual(res.tenKeys, ["mort", "rent", "own", "rentPub"], `${tag}: tenure menu's four options`);
+    assert.equal((res.ancKeys || []).length, 12, `${tag}: twelve ancestry options`);
+    assert.equal((res.indKeys || []).length, 19, `${tag}: nineteen industry options`);
+    assert.deepEqual(res.marKeys, ["marr", "never", "sep", "div", "wid"], `${tag}: five marital options`);
+    assert.ok(res.incomeCuts && res.incomeCuts.loQuantile > 0, `${tag}: its income-cuts record`);
+    const B = res.booths;
+    for (const lane of ["demo", "cob", "rel", "ten", "anc", "ind", "mar", "vdec"]) assert.ok(Array.isArray(B[lane]) && B[lane].length === B.id.length, `${tag}: the ${lane} lane rides the full registry`);
+    const filled = new Set();
+    for (const row of B.demo) if (row) row.forEach((v, i) => { if (v != null) filled.add(i); });
+    for (let i = 0; i < 19; i++) assert.ok(filled.has(i), `${tag}: demo slot ${i} has reads somewhere on the frame`);
+    assert.equal(B.vdec.filter((x) => x !== null).length, 0, `${tag}: no votes-by-SA1 product, vdec stays empty`);
+    const w = B.ten.filter(Boolean)[0], wl = { cob: res.cobKeys, rel: res.relKeys, ten: res.tenKeys, anc: res.ancKeys, ind: res.indKeys, mar: res.marKeys };
+    assert.ok(w && w.length === 4, `${tag}: tenure rows four-wide of mort/rent/own/rentPub`);
+    for (const k of ["cob", "rel", "ten", "anc", "ind", "mar"]) assert.ok(B[k].every((r) => r === null || (Array.isArray(r) && r.length === wl[k].length && r.every((x) => x === null || (typeof x === "number" && x >= 0 && x <= 1)))), `${tag}: every landed ${k} row is menu-width of 0-1 shares or whole-row null`);
+  }
+}
+
 // ── the 2013-era Legislative Councils (2026-11-04): staggered 21-up NSW
 // cohorts for nsw15/nsw19 (2011's and 2015's elected waves with their mid-
 // term fills; the wave runs on .build/state-flow-src/nsw/<year>/lc-*.html.gz
