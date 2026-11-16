@@ -828,6 +828,8 @@ _INC_CUT_GUARDS_BY_ERA = {
     ("2021", "2"): (1000, 1170),
     ("2021", "3"): (960, 1130),
     ("2016", "2"): (810, 970),
+    ("2016", "4"): (700, 840),   # SA's own measured 777.92 (the base map only
+                                # named NSW's) — set beside the wa-era rows 2026-11-17
 }
 _INC_SITES = {}
 

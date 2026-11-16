@@ -2783,6 +2783,52 @@ for (const y of ["sa22", "sa26"]) {
   }
 }
 
+// ── the sa18 frame on the 2016 determination's 47 districts (prev ← 2014
+// through the adjudication record at .build/map/src/sa18/past-adjudication.md:
+// Ashford→Badcoe, Goyder→Narungga, Little Para→Elizabeth; Bright, Mitchell,
+// Fisher, Napier abolished; Black, Gibson, Hurtle Vale, King created — Frome
+// carries no 2014 winner; three ECSA static breadcrumbs pinned in
+// build_sa18_past.py carry table contents of the alphabetical successor).
+// Winners' and candidates' names ride the 2014-era surname-caps print through
+// the shared flat-name machinery with the surname-leads McKay-style fallback;
+// the era's ECSA keeps no venue register so the frame draws no booth dots
+{
+  const res = JSON.parse(R("map/data/res-sa18.json"));
+  assert.equal(res.year, "sa18", "sa18: year id");
+  assert.equal(res.prev, 2014, "sa18 stands on the 2014 election");
+  assert.equal(res.demoYear, 2016, "sa18 cites the 2016 census beside ASGS2017 boundaries");
+  assert.equal(res.jurisdiction, "SA", "sa18 sits in South Australia");
+  assert.deepEqual(Object.keys(res.agg), ["AUS", "SA"], "sa18 aggregates only the two areas it spans");
+  assert.equal(res.divs.length, 47, "the 47 House of Assembly districts of the 2016 determination");
+  assert.deepEqual(res.agg.SA.seats, { LIB: 25, ALP: 19, IND: 3 }, "Marshall's 25-vote LNP majority beside Weatherill's 19 and three independents");
+  assert.deepEqual(res.agg.AUS.seats, res.agg.SA.seats, "sa18's AUS mirror carries the same seats");
+  assert.equal(res.agg.SA.formal, 1048713, "2018 South Australia formal vote");
+  assert.equal(res.agg.SA.pformal, 1017856, "2014 South Australia formal vote (pformal on the 2014 election)");
+  assert.deepEqual(res.agg.SA.pprim, { alp: 364420, lnp: 455797, grn: 88600, onp: 0, ind: 37955, oth: 71084 }, "2014 national-party primary ledger (45.8% LNP on the first preference)");
+  const bucketTotal = (x) => (x && Object.values(x) || []).reduce((a, b) => a + b, 0);
+  assert.equal(bucketTotal(res.agg.SA.pprim), res.agg.SA.pformal, "sa18's previous primary ledger accounts for the previous formal vote");
+  assert.equal(bucketTotal(res.divs.map((d) => d.h.length)), 43, "history rows = 47 districts minus Frome (a 2016 determination creation) minus the three renamed");
+  let nSw = 0;
+  for (const d of res.divs) for (const c of d.c) { assert.ok(Number.isFinite(c[5]), `sa18 ${d.n}: c[5] finite for ${c[0]}`); if (c[5] !== 0) nSw++; }
+  assert.equal(nSw, 242, "sa18: 242 candidates moved on the 2014 election");
+  assert.equal(res.divs.filter((d) => d.tpp && Number.isFinite(d.tpp[2])).length, 31, "sa18: 31 classic-pair 2PP swings where both elections finished Labor v Liberal");
+  assert.ok(res.cobKeys && res.cobKeys.length === 10, "sa18 lists its ten curated birthplace countries");
+  assert.equal(res.agg.SA.tpp && res.agg.SA.tpp[2], null, "sa18's agg keeps no two-party swing figure");
+  for (const d of res.divs) {
+    for (const h of d.h) {
+      assert.ok(h.length === 4 && h[0] === 2014 && typeof h[1] === "number" && typeof h[3] === "string", `sa18 ${d.n}: its 2014 history row`);
+    }
+    assert.ok(d.demo && typeof d.demo.p === "number", `sa18 ${d.n}: demo row's population field`);
+    assert.ok(d.seifa && typeof d.seifa.irsad.v === "number", `sa18 ${d.n}: seifa row's IRSAD score`);
+  }
+  assert.deepEqual(res.divs.find((d) => d.n === "Adelaide").h, [[2014, 52.37, "LIB", "Rachel Sanderson"]], "Adelaide's 2014 name row formats through the br-aware surname-caps split (Rachel Sanderson, off 'SANDERSON<br/>Rachel')");
+  for (const k of ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"]) {
+    assert.ok(Array.isArray(res.booths[k]) && res.booths[k].length === 0, `sa18 booths.${k}: empty (the 2016-determination era's ECSA keeps no venue register)`);
+  }
+  const dc = new Set(res.divs.map((d) => d.seifa.irsad.dec));
+  assert.ok(dc.size >= 7, "sa18 IRSAD deciles spread across the range (a monotone join bug collapses them)");
+}
+
 // ── the qld chamber floor: Queensland's Legislative Assembly on the shared arc
 // idiom (the @qld-cells QLDB ledger in app-3-chamber.js — 92 desks for the
 // chamber's 92 elected seats beside the furniture chair, the Macquarie
@@ -2820,11 +2866,11 @@ for (const y of ["sa22", "sa26"]) {
 // SyntaxError — and the page never booted, 2026-10-27)
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);') && base.includes('const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);') && base.includes('const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);'), "NSW/VIC/QLD/WA/NT year sets name the state frames (the wa family joined 2026-11-05; the Territory family 2026-11-16)");
-  assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt" };'), "YEAR_JUR maps a frame year to its jurisdiction");
+  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);') && base.includes('const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);') && base.includes('const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);') && base.includes('const SA_YEARS = new Set(["sa18", "sa22", "sa26"]);'), "NSW/VIC/QLD/WA/NT/SA year sets name the state frames (the wa family joined 2026-11-05; the Territory family and SA's third stop 2026-11-16)");
+  assert.ok(base.includes('const YEAR_JUR = { sa18: "sa", sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt" };'), "YEAR_JUR maps a frame year to its jurisdiction");
   assert.ok(base.includes('const STATE_YEARS = new Set(Object.keys(YEAR_JUR));'), "STATE_YEARS derives from YEAR_JUR");
-  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: 2015, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };"), "the state frames' past joins (qld17 stands on 2015's 89-district map through the determination renames; the wa stops prev-chain 2013→2017→2021→2025, the Territory's 2012→2016→2020→2024)");
-  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
+  assert.ok(base.includes("const PREV_YEAR = { sa18: 2014, sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: 2015, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };"), "the state frames' past joins (qld17 stands on 2015's 89-district map through the determination renames; the wa stops prev-chain 2013→2017→2021→2025, the Territory's 2012→2016→2020→2024, SA's 2014→2018 in the same way)");
+  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, sa18: 2018, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");

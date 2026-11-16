@@ -473,4 +473,5 @@ def main():
           f" 2018 stored (HA {ha['formal']} formal, LC {lc['pformal']} formal)")
 
 
-main()
+if __name__ == "__main__":
+    main()
