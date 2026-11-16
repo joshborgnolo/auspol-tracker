@@ -6465,6 +6465,29 @@
         "Nat": 3
       },
       "url": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026"
+    },
+    {
+      "date": "2026-11-15",
+      "published": "2026-11-16T16:41",
+      "dateStart": "2026-11-09",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 1595,
+      "undecided": 7.5,
+      "alp": 24.5,
+      "lnp": 25.5,
+      "grn": 14.5,
+      "onp": 23.5,
+      "ind": 12,
+      "oth": null,
+      "tpp_alp": 48,
+      "tpp_lnp": 52,
+      "tpp_flows": 50,
+      "lnpSplit": {
+        "Lib": 22.5,
+        "Nat": 3
+      },
+      "url": "https://www.roymorgan.com/findings/10387-federal-voting-intention-november-16-2026"
     }
   ],
   "ppm": [

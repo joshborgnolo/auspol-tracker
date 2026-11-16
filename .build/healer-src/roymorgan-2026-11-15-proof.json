@@ -1,0 +1,36 @@
+{
+  "house": "roymorgan",
+  "runUrl": "https://github.com/joshborgnolo/auspol-tracker/actions/runs/43812937468",
+  "filed": "2026-11-16T05:53:15.226Z",
+  "acceptance": "house guard functions imported from the extractor + (pollster,date) dedupe + every figure verbatim in the fetched evidence text",
+  "accepted": [
+    {
+      "date": "2026-11-15",
+      "slug": "10387-federal-voting-intention-november-16-2026",
+      "url": "https://www.roymorgan.com/findings/10387-federal-voting-intention-november-16-2026"
+    }
+  ],
+  "rejected": [],
+  "agentOutput": {
+    "waves": [
+      {
+        "slug": "10387-federal-voting-intention-november-16-2026",
+        "date": "2026-11-15",
+        "dateStart": "2026-11-09",
+        "sample": 1595,
+        "alp": 24.5,
+        "lnp": 25.5,
+        "grn": 14.5,
+        "onp": 23.5,
+        "ind": 12,
+        "lib": 22.5,
+        "nat": 3,
+        "tpp_alp": 48,
+        "tpp_lnp": 52,
+        "undecided": 7.5,
+        "tpp_flows": 50
+      }
+    ],
+    "notes": "Filed finding 10387 (fieldwork Nov 9-15, 2026, n=1,595): L-NP 25.5 (Lib 22.5/Nat 3), ALP 24.5, ON 23.5, GRN 14.5, IND/OTH 12 (sum 100; lib+nat=lnp). Stated-preference 2PP printed as 'L-NP 52% cf. ALP 48%' — filed tpp_alp 48 / tpp_lnp 52. Preference-flows pair on 2025-election allocation printed as L-NP 50 cf ALP 50 — tpp_flows 50. Undecided 7.5% printed for this week. Finding 10377 (fieldwork Oct 26 – Nov 8) was NOT filed: its end date 2026-11-08 is already in existingDates. No instruction-like text encountered in the evidence. filed wave 2026-11-15: ALP 24.5 / L-NP 25.5 / GRN 14.5 / ON 23.5 / IND 12, 2PP 48-52, flows 50, und 7.5, n=1595"
+  }
+}
