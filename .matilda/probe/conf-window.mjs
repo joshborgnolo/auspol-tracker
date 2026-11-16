@@ -11,12 +11,11 @@
        jumps to the term tapped;
      - the guide readout carries rows in a past term (consumer chart) and
        on every macro panel;
-     - the macro view draws six panels, numbered events only in the
+     - the macro view draws seven panels, numbered events only in the
        sitting term, and its "This term" ends at now;
-     - the six panels name their lanes (productivity and the OECD
-       medians on growth, earnings on the earnings panel, the OECD
-       median on unemployment, the median country on gini), with their
-       latest figures read off the page's own macro rows;
+     - the seven panels name their lanes (productivity, earnings and the
+       OECD medians beside them), with their latest figures read off the
+       page's own macro rows;
      - the step glide moves the lines mid-flight (the x window travels);
      - no page errors.
    --shots dir saves a frame strip of the glide. */
@@ -84,8 +83,8 @@ s = await state();
 ok("‹ steps to the 2022 term", s.head === "The 2022 term" && /May 2022 – May 2025/.test(s.sub) && s.nextOff === false, JSON.stringify(s));
 await tab("Inflation & growth");
 s = await state();
-ok("window holds across a tab switch", s.head === "The 2022 term" && s.panels === 6 && s.badges === 0, JSON.stringify(s));
-/* the six panels, their added lanes by name, and the lanes' latest
+ok("window holds across a tab switch", s.head === "The 2022 term" && s.panels === 7 && s.badges === 0, JSON.stringify(s));
+/* the seven panels, their added lanes by name, and the lanes' latest
    figures straight off the page's own data */
 const macroAudit = await page.evaluate(() => {
   const cards = [...document.querySelectorAll("#confidence .rd-xf-now .rd-mp")];
@@ -96,19 +95,22 @@ const macroAudit = await page.evaluate(() => {
   const lat = (k) => M[k].rows[M[k].rows.length - 1];
   return { titles, keys, vals, prod: lat("prod"), awe: lat("aweReal"), med: lat("oecdUnempMed"), giniMed: lat("oecdGiniMed") };
 });
-ok("panels: infl/gap/growth/earn/unemp/gini", JSON.stringify(macroAudit.titles) === JSON.stringify(["Inflation", "Inflation against target", "Growth per person", "Earnings", "Unemployment", "Income inequality"]), JSON.stringify(macroAudit.titles));
-ok("growth panel carries productivity and the OECD medians", macroAudit.keys[2].includes("GDP per hour worked") && macroAudit.keys[2].includes("OECD median GDP per person") && macroAudit.keys[2].includes("OECD median per worker"), JSON.stringify(macroAudit.keys[2]));
-ok("earnings panel pairs AWE with the OECD median wage", macroAudit.keys[3].includes("Full-time adult weekly earnings") && macroAudit.keys[3].includes("OECD median wage"), JSON.stringify(macroAudit.keys[3]));
-ok("unemployment panel carries the OECD median", macroAudit.keys[4].includes("OECD median"), JSON.stringify(macroAudit.keys[4]));
-ok("gini panel carries the OECD median country", macroAudit.keys[5].includes("OECD median country"), JSON.stringify(macroAudit.keys[5]));
+ok("panels: infl/gap/growth/prod/earn/unemp/gini", JSON.stringify(macroAudit.titles) === JSON.stringify(["Inflation", "Inflation against target", "Growth per person", "Productivity", "Earnings", "Unemployment", "Income inequality"]), JSON.stringify(macroAudit.titles));
+ok("growth panel keeps its per-person family", macroAudit.keys[2].includes("GDP per person") && macroAudit.keys[2].includes("National income per person") && macroAudit.keys[2].includes("Household income per person") && macroAudit.keys[2].includes("OECD median GDP per person"), JSON.stringify(macroAudit.keys[2]));
+ok("productivity panel pairs GDP per hour with the OECD median per worker", macroAudit.keys[3].includes("GDP per hour worked") && macroAudit.keys[3].includes("OECD median per worker"), JSON.stringify(macroAudit.keys[3]));
+ok("earnings panel pairs AWE with the OECD median wage", macroAudit.keys[4].includes("Full-time adult weekly earnings") && macroAudit.keys[4].includes("OECD median wage"), JSON.stringify(macroAudit.keys[4]));
+ok("unemployment panel carries the OECD median", macroAudit.keys[5].includes("OECD median"), JSON.stringify(macroAudit.keys[5]));
+ok("gini panel carries the OECD median country", macroAudit.keys[6].includes("OECD median country"), JSON.stringify(macroAudit.keys[6]));
 const N = (s) => (s || "").replace(/\u2212/g, "-");   /* the page prints a typographic minus */
 {
-  const w = macroAudit.keys[3].indexOf("Full-time adult weekly earnings");
-  ok("earn panel's latest figure is the file's newest real-earnings print", N(macroAudit.vals[3][w]) === macroAudit.awe.v.toFixed(1) + "%", N(macroAudit.vals[3][w]) + " vs file " + macroAudit.awe.v);
-  const u = macroAudit.keys[4].indexOf("OECD median");
-  ok("unemp panel's median figure is the file's newest median", N(macroAudit.vals[4][u]) === macroAudit.med.v.toFixed(1) + "%", N(macroAudit.vals[4][u]) + " vs file " + macroAudit.med.v);
-  const gi = macroAudit.keys[5].indexOf("OECD median country");
-  ok("gini panel's median figure reads the coefficient and its year", N(macroAudit.vals[5][gi]) === macroAudit.giniMed.v.toFixed(3) + " (" + macroAudit.giniMed.date.slice(0, 4) + ")", N(macroAudit.vals[5][gi]) + " vs file " + JSON.stringify(macroAudit.giniMed));
+  const pr = macroAudit.keys[3].indexOf("GDP per hour worked");
+  ok("productivity panel's latest figure is the file's newest print", N(macroAudit.vals[3][pr]) === macroAudit.prod.v.toFixed(1) + "%", N(macroAudit.vals[3][pr]) + " vs file " + macroAudit.prod.v);
+  const w = macroAudit.keys[4].indexOf("Full-time adult weekly earnings");
+  ok("earn panel's latest figure is the file's newest real-earnings print", N(macroAudit.vals[4][w]) === macroAudit.awe.v.toFixed(1) + "%", N(macroAudit.vals[4][w]) + " vs file " + macroAudit.awe.v);
+  const u = macroAudit.keys[5].indexOf("OECD median");
+  ok("unemp panel's median figure is the file's newest median", N(macroAudit.vals[5][u]) === macroAudit.med.v.toFixed(1) + "%", N(macroAudit.vals[5][u]) + " vs file " + macroAudit.med.v);
+  const gi = macroAudit.keys[6].indexOf("OECD median country");
+  ok("gini panel's median figure reads the coefficient and its year", N(macroAudit.vals[6][gi]) === macroAudit.giniMed.v.toFixed(3) + " (" + macroAudit.giniMed.date.slice(0, 4) + ")", N(macroAudit.vals[6][gi]) + " vs file " + JSON.stringify(macroAudit.giniMed));
 }
 await step(1);
 s = await state();

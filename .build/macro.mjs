@@ -1,7 +1,7 @@
 /* macro.mjs – builds data/macro.json, the ABS/OECD price, labour and output
    series behind the "Inflation & growth" view of the Snapshot's Economic
    sentiment panel (rd-panels.jsx RdConfidence's third tab), and its Info
-   glossary entry. Twenty-three data lanes, seventeen data-API pulls plus
+   glossary entry. Twenty-four data lanes, seventeen data-API pulls plus
    one ABS spreadsheet and the OECD's monthly inflation release PDFs —
    all OFFICIAL publications, fetched from the ABS and OECD, never
    hand-entered:
@@ -104,6 +104,10 @@
                   quarterly. ANA_AGG GPM_PHW index (chain volume, seasonally
                   adjusted) → the same v_t = lvl_t / lvl_{t−4} − 1 as the
                   other output lanes (added 2026-11-16).
+     prodLevel  – the ABS's printed GDP-per-hour-worked index itself,
+                  quarterly — the level twin the panel's Actual switch draws,
+                  so the flat post-2016 decade reads as a level, not a wiggle
+                  (2026-11-16, user: the rate line hid the stagnation).
      aweReal    – real full-time adult ordinary-time weekly earnings,
                   Australia, annual change, semi-annual. The ABS's nominal
                   seasonally adjusted AWE (May/November since 2012) deflated
@@ -655,13 +659,13 @@ const MED_DAM = (ry, rm) =>
 // (2026-11-16); its ±15 band pads both.
 // The unemployment band is measured on its live series too (2026-11-10):
 // 3.4 (Oct 2022) to 11.2 (Dec 1992) — the band pads both tails.
-const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdppc: [-15, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000], hhdi: [-12, 15], hhdiLevel: [3000, 40000], giniHilda: [0.2, 0.45], giniSih: [0.2, 0.45], prod: [-12, 15], aweReal: [-10, 12], oecdGdpMed: [-20, 20], oecdUnempMed: [0, 20], oecdProdMed: [-20, 25], oecdWageMed: [-10, 12], oecdGiniMed: [0.2, 0.45] };
-const MIN_ROWS = { cpi: 250, cpiMonthly: 6, ausGap: 125, gdppc: 200, rnndi: 200, unemp: 550, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdppc: 60, gdppcLevel: 200, rnndiLevel: 200, hhdi: 200, hhdiLevel: 200, giniHilda: 20, giniSih: 16, prod: 170, aweReal: 20, oecdGdpMed: 110, oecdUnempMed: 330, oecdProdMed: 110, oecdWageMed: 30, oecdGiniMed: 12 };
+const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdppc: [-15, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000], hhdi: [-12, 15], hhdiLevel: [3000, 40000], giniHilda: [0.2, 0.45], giniSih: [0.2, 0.45], prod: [-12, 15], prodLevel: [40, 150], aweReal: [-10, 12], oecdGdpMed: [-20, 20], oecdUnempMed: [0, 20], oecdProdMed: [-20, 25], oecdWageMed: [-10, 12], oecdGiniMed: [0.2, 0.45] };
+const MIN_ROWS = { cpi: 250, cpiMonthly: 6, ausGap: 125, gdppc: 200, rnndi: 200, unemp: 550, oecdCpi: 60, oecdCpiMed: 600, oecdCpiGap: 310, oecdGdppc: 60, gdppcLevel: 200, rnndiLevel: 200, hhdi: 200, hhdiLevel: 200, giniHilda: 20, giniSih: 16, prod: 170, prodLevel: 180, aweReal: 20, oecdGdpMed: 110, oecdUnempMed: 330, oecdProdMed: 110, oecdWageMed: 30, oecdGiniMed: 12 };
 /* the median/gap lanes' newest reference month trails the others by the
    release lag (~2 months) plus the daily run's day: ~75d steady state,
    ~90d across a slow December/January stretch — 110d trips only when the
    monthly release feed has truly died. */
-const STALE_DAYS = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdppc: 300, gdppcLevel: 210, rnndiLevel: 210, hhdi: 210, hhdiLevel: 210, giniHilda: 1460, giniSih: 4000, prod: 210, aweReal: 270, oecdGdpMed: 430, oecdUnempMed: 110, oecdProdMed: 210, oecdWageMed: 450, oecdGiniMed: 1300 };
+const STALE_DAYS = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdppc: 300, gdppcLevel: 210, rnndiLevel: 210, hhdi: 210, hhdiLevel: 210, giniHilda: 1460, giniSih: 4000, prod: 210, prodLevel: 210, aweReal: 270, oecdGdpMed: 430, oecdUnempMed: 110, oecdProdMed: 210, oecdWageMed: 450, oecdGiniMed: 1300 };
 // The quarterly derived CPI lane and the monthly printed one measure the
 // same series on different bases; overlap quarter-ends must sit within this
 // drift or the ABS has restated a basis we shouldn't silently splice.
@@ -1389,10 +1393,13 @@ if (!process.env.MACRO_LIB) {
   const oecdGdppc = yoyFromLevels(oecdPcLevels, 4);
 
   // prod — quarterly, derived from the ABS's SA GDP-per-hour-worked
-  // index (M5, the index-number measure of labour productivity).
+  // index (M5, the index-number measure of labour productivity); the
+  // printed index itself also files so the panel's Actual switch can show
+  // the decade that went nowhere as a level, not a wiggle.
   const prodLevels = absFiltered(parseSdmxCsv(texts.absProd), { MEASURE: "M5", DATA_ITEM: "GPM_PHW", TSEST: 20, REGION: "AUS" });
   if (prodLevels.length < 150) throw guard(`prod levels: ${prodLevels.length} rows — key/basis changed upstream?`);
   const prod = yoyFromLevels(prodLevels, 4);
+  const prodLevel = printedRows(prodLevels);
 
   // aweReal — real full-time adult ordinary-time weekly earnings: the
   // ABS's nominal seasonally adjusted semi-annual prints (May/November
@@ -1427,7 +1434,7 @@ if (!process.env.MACRO_LIB) {
     writeAtomic(MED_STORE, medStoreNext);
   }
 
-  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, ausGap, gdppc, rnndi, unemp, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdppc, gdppcLevel, rnndiLevel, hhdi, hhdiLevel, giniHilda, giniSih, prod, aweReal, oecdGdpMed, oecdUnempMed, oecdProdMed, oecdWageMed, oecdGiniMed })) laneGuards(k, rows);
+  for (const [k, rows] of Object.entries({ cpi, cpiMonthly, ausGap, gdppc, rnndi, unemp, oecdCpi, oecdCpiMed, oecdCpiGap, oecdGdppc, gdppcLevel, rnndiLevel, hhdi, hhdiLevel, giniHilda, giniSih, prod, prodLevel, aweReal, oecdGdpMed, oecdUnempMed, oecdProdMed, oecdWageMed, oecdGiniMed })) laneGuards(k, rows);
 
   // Handoff cross-check: where the printed monthly series covers a quarter
   // end (Mar/Jun/Sep/Dec rows), it must sit near the quarterly derived row.
@@ -1461,6 +1468,7 @@ if (!process.env.MACRO_LIB) {
     giniHilda: { label: "Gini coefficient of equivalised disposable household income (HILDA survey)", basis: "as printed by the ABS (Measuring What Matters, HILDA custom analysis), annual, financial years", rows: giniHilda },
     giniSih: { label: "Gini coefficient of equivalised disposable household income (ABS Survey of Income and Housing)", basis: "ABS printed measure, survey years, financial years", rows: giniSih },
     prod: { label: "GDP per hour worked (annual change)", basis: "derived from ABS levels (chain volume, seasonally adjusted)", rows: prod },
+    prodLevel: { label: "GDP per hour worked (index)", basis: "ABS printed chain-volume index numbers (seasonally adjusted)", rows: prodLevel },
     aweReal: { label: "Real full-time adult ordinary-time weekly earnings (annual change)", basis: "nominal ABS prints deflated by the CPI index (computed; seasonally adjusted, semi-annual May/November)", rows: aweReal },
     oecdGdpMed: { label: "OECD median GDP per capita (annual change)", basis: "median of the 38 member countries' GDP growth over population growth, per quarter (computed — not an OECD-published aggregate)", rows: oecdGdpMed },
     oecdUnempMed: { label: "OECD median unemployment rate", basis: "median of the member countries' harmonised monthly rates (computed)", rows: oecdUnempMed },
@@ -1470,7 +1478,7 @@ if (!process.env.MACRO_LIB) {
   };
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
-  const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"];
+  const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "prodLevel", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"];
   const prevByKey = new Map(KEYS.flatMap((k) => (((prev || {})[k] || {}).rows || []).map((x) => [k + "|" + x.date, true])));
   const added = {};
   for (const k of KEYS) added[k] = doc[k].rows.filter((x) => !prevByKey.has(k + "|" + x.date)).map((x) => x.date);

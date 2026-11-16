@@ -7426,7 +7426,7 @@ const confDeep = (() => {
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"]) {
+  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "prodLevel", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };

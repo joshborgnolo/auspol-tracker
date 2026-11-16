@@ -8703,7 +8703,7 @@ function infoTerms(D) {
         estimate. The change shown beside each series is the one the house printed with it, kept
         only where it agrees with the previous printed reading.</span>
         <span className="info-p"><b>Inflation &amp; growth is a third tab.</b> It sets the ABS
-        and OECD's official series out as six small charts that share the window, Australia in
+        and OECD's official series out as seven small charts that share the window, Australia in
         colour and the OECD in grey. Inflation: Australia's headline inflation (the monthly CPI
         era's printed annual change, spliced onto the earlier quarterly series derived from the
         ABS's own published index numbers) beside the OECD-wide average and the median member,
@@ -8713,23 +8713,25 @@ function infoTerms(D) {
         OECD-published prints and, since 2026, from the OECD's monthly release table; most
         members' targets are 2%, taken over the countries carrying both a print and a formal
         target that month). Growth per person: real GDP per person, real national income per
-        person (the whole country's income, export prices and income paid abroad counted),
+        person (the whole country's income, export prices and income paid abroad counted) and
         real household disposable income per person (what households have after tax and interest:
         the ABS's household figure over its consumption price deflator and population, worked out
-        here since the ABS prints no real per-person figure) and GDP per hour worked, beside
-        real GDP per person across the OECD (its household dashboard index, so the grey line
-        begins in 2008) and two member medians computed here — GDP-per-person growth and output
-        per worker. Earnings: the real change in full-time adult ordinary-time weekly earnings
-        (the ABS's nominal print deflated here by its own CPI), beside the median of the OECD
-        countries' real-wage year changes. Unemployment: the ABS's monthly seasonally adjusted
-        rate, a level rather than an annual change, beside the members' median harmonised rate.
-        Income inequality: the Gini coefficient of household income after tax, adjusted for
-        household size (0 would be everyone on the same income, 1 one household holding it all),
-        from the HILDA survey every year since 2002–03 and from the ABS's own income survey, the
-        official measure, about every second year from 1994–95 to 2019–20 (no next release is
-        scheduled), beside the OECD members' median coefficient. Their levels differ, so
-        they stay two lines, and both run years behind the other charts. Nothing is smoothed,
-        adjusted or estimated — the prints refresh daily from the ABS and OECD.</span>
+        here since the ABS prints no real per-person figure), beside real GDP per person across
+        the OECD (its household dashboard index, so the grey line begins in 2008) and the
+        member median computed here. Productivity: GDP per hour worked — the ABS's index as a
+        yearly rate beside the OECD members' median output-per-worker growth; its switch swaps
+        the rate for the index itself. Earnings: the real change in full-time adult
+        ordinary-time weekly earnings (the ABS's nominal print deflated here by its own CPI),
+        beside the median of the OECD countries' real-wage year changes. Unemployment: the ABS's
+        monthly seasonally adjusted rate, a level rather than an annual change, beside the members'
+        median harmonised rate. Income inequality: the Gini coefficient of household income
+        after tax, adjusted for household size (0 would be everyone on the same income, 1 one
+        household holding it all), from the HILDA survey every year since 2002–03 and from the
+        ABS's own income survey, the official measure, about every second year from 1994–95 to
+        2019–20 (no next release is scheduled), beside the OECD members' median coefficient.
+        Their levels differ, so they stay two lines, and both run years behind the other charts.
+        Nothing is smoothed, adjusted or estimated — the prints refresh daily from the ABS and
+        OECD.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
         polls because confidence in the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },

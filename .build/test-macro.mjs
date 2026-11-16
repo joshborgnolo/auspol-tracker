@@ -399,12 +399,13 @@ const giniPage = (cap, heads, y0, n, ...cols) => {
   return `<html><body><div class="chart-data-wrapper" style="display:none;"><pre class="chart-caption">${cap}</pre><pre class="chart-headers">${q(heads)}</pre><pre class="chart-data">${q(data)}</pre></div></body></html>`;
 };
 /* ABS productivity: ANA_AGG M5 GDP-per-hour-worked index, 190 quarters
-   1980-Q1 → 2027-Q2, 200·1.0045^q → y/y ≈ 1.8 every quarter */
+   1980-Q1 → 2027-Q2, 55·1.0035^q → stays inside the [40, 150] level band,
+   y/y ≈ 1.4 every quarter */
 const absProdCsv = (() => {
   const rows = ["DATAFLOW,MEASURE,DATA_ITEM,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT"];
   let y = 1980, q = 1;
   for (let i = 0; i < 190; i++) {
-    rows.push(`ABS:ANA_AGG(1.0.0),M5,GPM_PHW,20,AUS,Q,${qIso(y, q)},${(200 * Math.pow(1.0045, i)).toFixed(3)},,,,`);
+    rows.push(`ABS:ANA_AGG(1.0.0),M5,GPM_PHW,20,AUS,Q,${qIso(y, q)},${(55 * Math.pow(1.0035, i)).toFixed(3)},,,,`);
     if (++q === 5) { q = 1; y++; }
   }
   return rows.join("\n") + "\n";
@@ -578,8 +579,12 @@ assert.equal(st.rows.oecdUnempMed, 360);
 assert.equal(st.rows.oecdProdMed, 120);
 assert.equal(st.rows.oecdWageMed, 35, "years 1991→2025 with a predecessor each");
 assert.equal(st.rows.oecdGiniMed, 13);
-assert.deepEqual(doc.prod.rows[0], { date: "1981-03-31", v: 1.8 }, "1.0045^4 index growth is y/y 1.8");
+assert.deepEqual(doc.prod.rows[0], { date: "1981-03-31", v: 1.4 }, "1.0035^4 index growth is y/y 1.4");
 assert.deepEqual(doc.aweReal.rows[0], { date: "2011-05-31", v: 3.5 }, "nominal 8.16%/y ÷ CPI 4.49%/y is real 3.5%/y");
+assert.equal(st.rows.prodLevel, 190, "the printed index files alongside the derived rate lane");
+assert.deepEqual(doc.prodLevel.rows[0], { date: "1980-03-31", v: 55 }, "the ABS's printed index, untouched");
+assert.deepEqual(doc.prodLevel.rows.at(-1).date, "2027-06-30");
+assert.ok(Math.abs(doc.prodLevel.rows.at(-1).v - 55 * 1.0035 ** 189) < 0.001, "the printed index passed through");
 assert.deepEqual(doc.aweReal.rows.at(-1), { date: "2022-11-30", v: 3.5 });
 assert.deepEqual(doc.oecdGdpMed.rows[0], { date: "1961-03-31", v: 2.3 }, "median member 3.0 − population 0.7");
 assert.deepEqual(doc.oecdGdpMed.rows.at(-1), { date: "2025-12-31", v: 2.3 });
@@ -680,7 +685,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "prodLevel", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
