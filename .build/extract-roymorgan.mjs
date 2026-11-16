@@ -299,9 +299,23 @@ function parseRelease(post) {
        WEEKLY splits — with the change parentheticals stripped first. The
        flows pair below keeps its own anchor; it may not proxy for the
        canonical pair. */
-    const fm = normaliseLead(t).match(/for the full fortnight\s+the ALP\s+(?:on\s+)?([\d.]+)\s*%\s*(?:leading|leads?|in front of)\s+(?:the\s+)?L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%\s*on a two[- ]party preferred basis/i);
-    if (!fm) missing.push("2pp anchor");
-    else { tpp_alp = parseFloat(fm[1]); tpp_lnp = parseFloat(fm[2]); }
+    const norm = normaliseLead(t);
+    const fm = norm.match(/for the full fortnight\s+the ALP\s+(?:on\s+)?([\d.]+)\s*%\s*(?:leading|leads?|in front of)\s+(?:the\s+)?L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%\s*on a two[- ]party preferred basis/i);
+    /* From release 10387 (2026-11-16) the Coalition leads the respondent
+       pair for the first time since the election and the sentence prints
+       the leading party first after a colon — "The L-NP Coalition now
+       leads on a two-party preferred basis for the first time since the
+       Federal Election: L-NP 52% (up 3% in a week) cf. ALP 48% (down 3%)."
+       Read the colon pair in whichever order the leading party takes.
+       Reached only when the anchor parenthetical and the fortnight phrase
+       are both absent, so fortnightly prose's trailing weekly-split
+       sentences can never land here. */
+    const lm = norm.match(/on a two[- ]party preferred basis[^%]{0,120}?:\s*L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%\s*cf\.?\s+(?:the\s+)?ALP\s+(?:on\s+)?([\d.]+)\s*%/i);
+    const am = lm ? null : norm.match(/on a two[- ]party preferred basis[^%]{0,120}?:\s*ALP\s+(?:on\s+)?([\d.]+)\s*%\s*cf\.?\s+(?:the\s+)?L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%/i);
+    if (fm) { tpp_alp = parseFloat(fm[1]); tpp_lnp = parseFloat(fm[2]); }
+    else if (lm) { tpp_lnp = parseFloat(lm[1]); tpp_alp = parseFloat(lm[2]); }
+    else if (am) { tpp_alp = parseFloat(am[1]); tpp_lnp = parseFloat(am[2]); }
+    else missing.push("2pp anchor");
   }
 
   let tpp_flows = null, tpp_flows_lnp = null, flowsPairMissing = false, flowsMonthly = false;
@@ -313,8 +327,18 @@ function parseRelease(post) {
     // "…survey for the month of December are allocated…": a monthly figure
     // on a weekly release belongs to no single row
     flowsMonthly = /for the month of/i.test(t.slice(Math.max(0, fi - 120), fi));
-    if (!pa || !pl) flowsPairMissing = true;
-    else if (!flowsMonthly) { tpp_flows = parseFloat(pa[1]); tpp_flows_lnp = parseFloat(pl[1]); }
+    if (pa && pl) {
+      if (!flowsMonthly) { tpp_flows = parseFloat(pa[1]); tpp_flows_lnp = parseFloat(pl[1]); }
+    } else {
+      /* 10387 (2026-11-16): with the Coalition ahead the flows pair prints
+         leader-first too — "…the gap is closer, L-NP 50% (up 2.5%) cf. ALP
+         50% (down 2.5%)" — which the ALP-first scan above cannot see (it
+         finds only the trailing ALP figure). The half-point-grid guard
+         behind this keeps policing for the election-result echo. */
+      const fm2 = normaliseLead(w).match(/L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%\s*cf\.?\s+(?:the\s+)?ALP\s+(?:on\s+)?([\d.]+)\s*%/i);
+      if (!fm2) flowsPairMissing = true;
+      else if (!flowsMonthly) { tpp_flows_lnp = parseFloat(fm2[1]); tpp_flows = parseFloat(fm2[2]); }
+    }
   }
 
   // ALP v One Nation 2PP — weekly since wave date 2026-05-17, anchored on
