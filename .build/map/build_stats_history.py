@@ -47,6 +47,257 @@ def write(name, obj):
     (OUT / name).write_text(json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '\n')
 
 
+# ------------------------------------------------------------- 1990 prev layer
+# The 1993 frame's prev is the 1990 election. The flow lane's own mirror
+# (.build/aec-flow-src/psephos/1990/, Adam Carr's transcription of the
+# AEC's printed statistics) parses the divisions, the names and summaries
+# walk beside it — same mirror, never a second source. The rename record
+# is the 1991 determination's ("Watson" renames "St George",
+# "Riverina" renames "Riverina-Darling"; "Dundas"/"Hawker"/"Phillip"
+# abolished; "Dickson"/"Paterson" new — the documented determination,
+# ending 148→147, cross-computed against both mirrors' full rosters):
+PREV90_RENAMES = {"Watson": "St George", "Riverina": "Riverina-Darling"}
+PREV90_NEW = {"Dickson", "Paterson"}
+PREV90_ABOLISHED = {"Dundas", "Hawker", "Phillip"}
+#: their seat tallies, pinned so a parse drift can't masquerade as a result
+PREV90_SEATS = {"ALP": 78, "LP": 55, "NP": 14, "IND": 1}
+#: the psephos 1990 party-token vocabulary, observed end-to-end across
+#: the mirror files (an era print uses different codes by state):
+PREV90_AB = {"Lib": "LP", "ALP": "ALP", "NPA": "NP",
+             "Ind": "IND", "IND": "IND",
+             "": "IND",  # independents carry no party token in the print
+             "Grn": "GRN", "DemGrn": "GRN", "AD": "OTH", "CTA": "OTH",
+             "DLP": "OTH", "NDP": "OTH", "CLP": "CLP"}
+
+
+FED90_ST = {"vic": "VIC", "act": "ACT", "nsw": "NSW", "nt": "NT", "qld": "QLD",
+            "sa": "SA", "tas": "TAS", "wa": "WA"}
+
+
+def _prev90_layer():
+    from importlib.machinery import SourceFileLoader
+    pf = SourceFileLoader("pf_hist", str(ROOT / '.build/parse-fed-history.py')).load_module()
+    blocks = {}
+    d = ROOT / '.build/aec-flow-src/psephos/1990'
+    for fn in sorted(d.iterdir()):
+        st = None
+        for label, code in FED90_ST.items():
+            if fn.name.endswith(f"reps{label}.txt"):
+                st = code
+                break
+        if st is None:
+            raise SystemExit(f"1990 layer: file {fn.name} maps to no state")
+        text = fn.read_text(encoding='latin-1').replace('\r', '').replace('\xb9', "'")
+        lines = text.split('\n')
+        tabs = [i for i, ln in enumerate(lines) if ln.startswith('Candidate') and 'Party' in ln]
+        titles = []
+        for t in tabs:
+            h = next(i for i in range(t - 1, 0, -1) if lines[i].strip() and lines[i + 1].strip().startswith('===='))
+            titles.append(h)
+        for k, h in enumerate(titles):
+            end = titles[k + 1] if k + 1 < len(titles) else len(lines)
+            title = lines[h].strip()
+            div = title.rsplit(',', 1)[0].strip().title()
+            blocks[div] = (st, lines[h:end])
+    if len(blocks) != 148:
+        raise SystemExit(f"1990 layer: {len(blocks)} division blocks parsed, expected 148")
+
+    cand_re = re.compile(r"^(?P<name>.*?\S)\s{2,}(?:(?P<party>[A-Za-z][\w/&.'-]*)\s+)?(?P<votes>\d{1,3}(?:[, ]\d{3})*)\s+\d+\.\d")
+    def nums(label, text):
+        m = re.search(rf"^{re.escape(label)}\s+([\d,]+)", text, re.M)
+        return int(m.group(1).replace(',', '')) if m else None
+
+    detail = {}
+    for div, (st, blk) in blocks.items():
+        # candidate rows sit between the Candidates head and the Total rule;
+        # the vote-count tallies come from their intro section's headings
+        names = {}
+        formal = informal = enrolled = None
+        for ln in blk:
+            key, _, v = ln.partition(':')
+            v = v.strip()
+            if ln.startswith('Enrolled voters:'):
+                enrolled = int(re.match(r'([\d,]+)', v).group(1).replace(',', ''))
+            elif ln.startswith('Informal votes:'):
+                informal = int(re.match(r'([\d,]+)', v).group(1).replace(',', ''))
+            elif ln.startswith('Formal votes:'):
+                formal = int(re.match(r'([\d,]+)', v).group(1).replace(',', ''))
+        ci = next(i for i, ln in enumerate(blk) if ln.startswith('Candidate') and 'Party' in ln)
+        cast = None
+        for ln in blk:
+            if ln.startswith('Votes cast:'):
+                cast = int(re.match(r'\s*([\d,]+)', ln.partition(':')[2].strip()).group(1).replace(',', ''))
+        if cast is None or cast != formal + informal:
+            raise SystemExit(f"1990 {div}: votes cast {cast} != formal {formal} + informal {informal}")
+        i = ci + 1
+        while i < len(blk) and not blk[i].startswith('Total'):
+            ln = blk[i]
+            m = cand_re.match(ln)
+            if m and not re.match(r'^\d{4} ', ln):
+                nm = m.group('name').strip()
+                nm_clean = re.sub(r'\s*[+*]\s*$', '', nm)
+                party = (m.group('party') or '').strip()
+                names[nm_clean] = (party, int(m.group('votes').replace(',', '').replace(' ', '')))
+            i += 1
+        if formal is None or informal is None:
+            raise SystemExit(f"1990 {div}: summary lacks formal/informal tallies")
+        detail[div] = {"st": st, "names": names, "formal": formal, "informal": informal,
+                       "enrolled": enrolled or 0}
+
+    parsed = pf.psephos_divisions(1990)
+
+    def final_pair(div, ent, blk1, prob0=None):
+        """(winner_name, pct) for a division from its own count print —
+        the last count block's cumulative column (or the candidate table
+        itself on a 2-candidate file, where no preference blocks ran).
+        The candidate rows print the surname alone here (shout-form where
+        the register prints given-first); join by surname token."""
+        count_heads = [i for i, ln in enumerate(blk1)
+                       if re.match(r'^\d+(?:st|nd|rd|th) count:', ln)]
+        surs = {nm: nm.split()[-1].lower() for nm in ent['names']}
+
+        def sur_join(tok):
+            tok_l = tok.lower()
+            toks = tok_l.split()
+            if len(toks) >= 2 and len(toks[0]) == 1:
+                # two survivors share the surname: the era print gives the
+                # given-name initial beside it ("W SMITH" for "Warwick Smith")
+                given_initial, sur = toks[0], " ".join(toks[1:])
+                hits = [nm for nm in surs
+                        if surs[nm] == sur
+                        and (nm.split()[0] or " ")[0].lower() == given_initial]
+                if hits:
+                    return hits
+            plain = [nm for nm, sur in surs.items()
+                     if sur == tok_l or tok_l.endswith(" " + sur) or tok_l == nm.lower()]
+            if len(plain) > 1 and len(toks) >= 1 and len(toks[0]) == 1:
+                # a bare single-letter can't settle a surname collision
+                return []
+            return plain
+
+        if count_heads:
+            last_head = count_heads[-1]
+            cums = {}
+            row_re = re.compile(r'^(\S.*?)\s+([\d, ]+)\s+\d+\.\d\s+([\d, ]+)\s+\d+\.\d')
+            for ln in blk1[last_head:]:
+                m = row_re.match(ln)
+                if not m:
+                    continue
+                tok = re.sub(r'\s*[+*]\s*$', '', m.group(1)).strip()
+                hit = sur_join(tok)
+                if len(hit) == 1:
+                    cums[hit[0]] = int(m.group(3).replace(',', '').replace(' ', ''))
+            live = {nm: cums[nm] for nm in ent['names'] if nm in cums}
+            if len(live) != 2:
+                raise SystemExit(f"1990 {div}: last-count read found {sorted(live)}"
+                                 f" (expected the final pair{'; flow note ' + prob0 if prob0 else ''})")
+            top2 = sorted(live.items(), key=lambda kv: -kv[1], reverse=False)
+        else:
+            best = sorted(ent['names'].items(), key=lambda nm_par: -nm_par[1][1])
+            if len(best) != 2:
+                raise SystemExit(f"1990 {div}: no count blocks and {len(best)} candidates (expected 2)")
+            top2 = best
+        if count_heads:
+            w_name, w_v = top2[0][0], top2[0][1]
+            l_name, l_v = top2[1][0], top2[1][1]
+        else:
+            w_name, (w_party, w_v) = top2[0][0], top2[0][1]
+            l_name, (l_party, l_v) = top2[1][0], top2[1][1]
+        pct = round(100 * w_v / (w_v + l_v) + 1e-9, 2)
+        return w_name, pct
+
+    for div, block, problem in parsed:
+        ent = detail[div]
+        if block is not None:
+            if len(ent['names']) != len(block['cands']):
+                raise SystemExit(f"1990 {div}: name registry {len(ent['names'])} != flow parse {len(block['cands'])} (walkers drifted)")
+            fp_sum = sum(v for _p, v in block['cands'].values())
+            if fp_sum != ent['formal']:
+                raise SystemExit(f"1990 {div}: candidates {fp_sum} != formal {ent['formal']}")
+            by_name = sum(v for p, v in ent['names'].values())
+            if by_name != fp_sum:
+                raise SystemExit(f"1990 {div}: registry votes {by_name} != flow {fp_sum}")
+        else:
+            print(f'1990 {div}: winner read off the printed count rows (pf note {problem[:70]!r})')
+        w_name, w_pct = final_pair(div, ent, blocks[div][1], problem)
+        ent['winner_name'] = w_name
+        ent['winner_party'] = ent['names'][w_name][0]
+        ent['winner_pct'] = w_pct
+        ent['winner_ab'] = PREV90_AB.get(ent['winner_party'], 'OTH')
+    seats = {}
+    for ent in detail.values():
+        ab = PREV90_AB.get(ent['winner_party'], 'OTH')
+        seats[ab] = seats.get(ab, 0) + 1
+    if seats != PREV90_SEATS:
+        raise SystemExit(f"1990 layer: seat tally {seats} != the pinned record {PREV90_SEATS}")
+    return detail
+
+
+def prev_1990_doc(doc):
+    """Prepend 1990 history rows and fill the frames' prev primitives from
+    the psephos 1990 layer (see _prev90_layer's contract). Mutates doc.
+    The era print styles division names its own way ("McMILLAN" vs the
+    stats pack's "McMillan") — the join keys lowercase-alnum."""
+    detail = _prev90_layer()
+    by_norm = {re.sub(r'[^a-z0-9]+', '', n.lower()): (n, ent) for n, ent in detail.items()}
+    def lookup(nm):
+        key = re.sub(r'[^a-z0-9]+', '', nm.lower())
+        return by_norm.get(key), key
+    matched = set()
+    for d in doc['divs']:
+        n = d['n']
+        if n in PREV90_NEW:
+            continue
+        prev_n = PREV90_RENAMES.get(n, n)
+        hit, _key = lookup(prev_n)
+        if hit is None:
+            raise SystemExit(f"1993 div {n} (prev {prev_n}) matches no 1990 division"
+                             " (extend the 1991-determination renames table deliberately)")
+        raw_n, ent = hit
+        matched.add(raw_n)
+        d['h'] = [[1990, ent['winner_pct'], ent['winner_ab'], ent['winner_name']]] + d['h']
+    missing = sorted(set(detail) - matched - PREV90_ABOLISHED)
+    if missing:
+        raise SystemExit(f"1990 divisions unconsumed, unadjudicated: {missing}")
+    leftover = [prev for prev in detail if prev in PREV90_ABOLISHED and prev in matched]
+    if leftover:
+        raise SystemExit(f"abolished 1990 divisions joined into the frame: {leftover}")
+
+    # prev primitives per agg scope, over the same FAMS vocabulary the
+    # current primitives ride (LP/NP/CLP → lnp etc., every minor oth)
+    per_st = {}
+    for div, ent in detail.items():
+        p = per_st.setdefault(ent['st'], {"pprim": {k: 0 for k in FAMS}, "pformal": 0})
+        for name, (party, votes) in ent['names'].items():
+            ab = PREV90_AB.get(party, 'OTH')
+            if ab in ('LP', 'NP', 'CLP'):
+                p['pprim']['lnp'] += votes
+            elif ab == 'ALP':
+                p['pprim']['alp'] += votes
+            elif ab == 'GRN':
+                p['pprim']['grn'] += votes
+            elif ab == 'IND':
+                p['pprim']['ind'] += votes
+            else:
+                p['pprim']['oth'] += votes
+        p['pformal'] += ent['formal']
+    national = {"pprim": {k: 0 for k in FAMS}, "pformal": 0}
+    for st, p in per_st.items():
+        for k in FAMS:
+            national['pprim'][k] += p['pprim'][k]
+        national['pformal'] += p['pformal']
+    for st_key, agg in doc['agg'].items():
+        src = national if st_key == 'AUS' else per_st.get(st_key)
+        if src is None:
+            continue
+        if agg.get('pprim') is not None or agg.get('pformal') is not None:
+            raise SystemExit(f"agg.{st_key}: prev primitives already filled (the wipe doctrine broke)")
+        agg['pprim'] = dict(src['pprim'])
+        agg['pformal'] = src['pformal']
+    print(f'1990 prev layer: {len(detail)} divisions, seats {PREV90_SEATS},'
+          f' national formal {national["pformal"]}, {len(matched)} history rows')
+
+
 def build(year):
     raw = rows(f'divs-{year}.txt')
     assert len(raw) == {1993: 147, 1998: 148}[year]
@@ -238,6 +489,8 @@ def build(year):
                          'firstPreferenceDifferences': discrepancies, 'countDiscrepancies':count_discrepancies,
                          'informalDifferences': informal_differences,
                          'note':'Polling-place names and votes are from the AEC statistics pack. Historical venue coordinates are unavailable in this source; these polling places are not plotted. Census figures are unavailable.'})
+    if year == 1993:
+        prev_1990_doc(doc)
     apply_locations(doc)
     with_demo(doc, year)
     with_seifa(doc, year)
