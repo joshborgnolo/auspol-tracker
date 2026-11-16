@@ -1,0 +1,1594 @@
+LEGISLATIVE ASSEMBLY ELECTIONS 25 August 2012
+
+Vote Summary
+
+Table 1: Elector participation by ballot papers counted
+                          Formal Ballot Papers   Informal Ballot papers     Electors voting
+   Division
+               On Roll                                                                 % on
+    Name                    No.          %         No.           %          No.
+                                                                                        Roll
+Arafura            5477       3032       95.3%        148            4.7%     3180       58.1%
+Araluen            4817       3620       96.4%        137            3.6%     3757       78.0%
+Arnhem             4902       2468       97.0%            76         3.0%     2544       51.9%
+Barkly             5137       3210       96.3%        122            3.7%     3332       64.9%
+Blain              4980       3999       96.6%        142            3.4%     4141       83.2%
+Braitling          4687       3510       97.6%            88         2.4%     3598       76.8%
+Brennan            5061       4176       97.7%            99         2.3%     4275       84.5%
+Casuarina          5031       4236       97.9%            89         2.1%     4325       86.0%
+Daly               5329       3701       94.5%        214            5.5%     3915       73.5%
+Drysdale           5178       4135       96.8%        137            3.2%     4272       82.5%
+Fannie Bay         4879       3987       97.3%        109            2.7%     4096       84.0%
+Fong Lim           4883       3761       97.0%        116            3.0%     3877       79.4%
+Goyder             5323       4391       96.9%        142            3.1%     4533       85.2%
+Greatorex          4606       3514       97.3%            99         2.7%     3613       78.4%
+Johnston           4879       3998       96.2%        160            3.8%     4158       85.2%
+Karama             4713       3935       96.4%        145            3.6%     4080       86.6%
+Katherine          5174       4130       98.2%            77         1.8%     4207       81.3%
+Namatjira          5127       2924       95.3%        143            4.7%     3067       59.8%
+Nelson             4715       3679       98.1%            72         1.9%     3751       79.6%
+Nhulunbuy          4719       2824       95.4%        136            4.6%     2960       62.7%
+Nightcliff!        4797       3894       96.7%        131            3.3%     4025       83.9%
+Port Darwin        4730       3646       97.4%            96         2.6%     3742       79.1%
+Sanderson          5100       4352       97.1%        132            2.9%     4484       87.9%
+Stuart             4706       2782       94.1%        176            5.9%     2958       62.9%
+Wanguri            4855       4239       98.0%            86         2.0%     4325       89.1%
+Total           123805      92143       96.8%       3072          3.2%      95215      76.9%
+Table 2a: Elector participation by ordinary vote type
+                                          Ordinary Votes
+                                                       Ordinary Votes
+                          Ordinary Votes (Static)
+ Division Name                                            (Mobiles)           TOTAL
+                            No.            %          No.           %
+Arafura                        1766        65.1%         946       34.9%            2712
+Araluen                        2256        97.6%          55        2.4%            2311
+Arnhem                          827        38.2%        1339       61.8%            2166
+Barkly                         1293        57.0%         974       43.0%            2267
+Blain                          2952       100.0%           0        0.0%            2952
+Braitling                      2184        98.0%          44        2.0%            2228
+Brennan                        3091       100.0%           0        0.0%            3091
+Casuarina                      2923        99.3%          20        0.7%            2943
+Daly                           1985        68.2%         926       31.8%            2911
+Drysdale                       2855       100.0%           0        0.0%            2855
+Fannie Bay                     2949        99.4%          18        0.6%            2967
+Fong Lim                       2328        99.8%           4        0.2%            2332
+Goyder                         3358       100.0%           0        0.0%            3358
+Greatorex                      2172        99.6%           9        0.4%            2181
+Johnston                       3017       100.0%           0        0.0%            3017
+Karama                         3144       100.0%           0        0.0%            3144
+Katherine                      2225        95.7%         100        4.3%            2325
+Namatjira                       496        22.3%        1729       77.7%            2225
+Nelson                         2438        93.2%         177        6.8%            2615
+Nhulunbuy                      1909        82.5%         406       17.5%            2315
+Nightcliff                     2992        99.9%           2        0.1%            2994
+Port Darwin                    2366        99.4%          14        0.6%            2380
+Sanderson                      3278       100.0%           0        0.0%            3278
+Stuart                          498        23.9%        1583       76.1%            2081
+Wanguri                        3306       100.0%           0        0.0%            3306
+            Total Votes       58608        87.5%        8346       12.5%           66954
+Note: Totals shown are before amalgamation of ballot papers for distribution of preferences and recounts
+Table 2b: Participation by declaration vote type
+                                                Declaration Votes
+  Division      Absent Votes         Early Votes         Declaration Votes     Postal Votes       TOTAL
+   Name         No.        %         No.         %        No.        %       No.         %
+Arafura           281      60.0%       137      29.3%           16    3.4%         34     7.3%         468
+Araluen           348      24.1%       966      66.8%           8     0.6%      124       8.6%        1446
+Arnhem            271      71.7%           73   19.3%           12    3.2%         22     5.8%         378
+Barkly            290      27.2%       658      61.8%           11    1.0%      106      10.0%        1065
+Blain             557      46.8%       475      39.9%           7     0.6%      150      12.6%        1189
+Braitling         462      33.7%       810      59.1%           3     0.2%         95     6.9%        1370
+Brennan           528      44.6%       470      39.7%           6     0.5%      180      15.2%        1184
+Casuarina         600      43.4%       584      42.3%           6     0.4%      192      13.9%        1382
+Daly              554      55.2%       256      25.5%           6     0.6%      188      18.7%        1004
+Drysdale          755      53.3%       482      34.0%           4     0.3%      176      12.4%        1417
+Fannie Bay        384      34.0%       512      45.3%           12    1.1%      221      19.6%        1129
+Fong Lim          920      59.5%       434      28.1%           2     0.1%      189      12.2%        1545
+Goyder            494      42.0%       440      37.4%           9     0.8%      232      19.7%        1175
+Greatorex         329      23.0%      1017      71.0%           0     0.0%         86     6.0%        1432
+Johnston          520      45.6%       450      39.4%           10    0.9%      161      14.1%        1141
+Karama            354      37.8%       416      44.4%           10    1.1%      156      16.7%         936
+Katherine         211      11.2%      1483      78.8%           20    1.1%      168       8.9%        1882
+Namatjira         250      29.7%       458      54.4%           12    1.4%      122      14.5%         842
+Nelson            524      46.1%       428      37.7%           6     0.5%      178      15.7%        1136
+Nhulunbuy         159      24.7%       372      57.7%           19    2.9%         95    14.7%         645
+Nightcliff        422      40.9%       402      39.0%           4     0.4%      203      19.7%        1031
+Port Darwin       570      41.9%       561      41.2%           6     0.4%      225      16.5%        1362
+Sanderson         529      43.9%       503      41.7%           7     0.6%      167      13.8%        1206
+Stuart            393      44.8%       339      38.7%           19    2.2%      126      14.4%         877
+Wanguri           290      28.5%       542      53.2%           6     0.6%      181      17.8%        1019
+Total Votes     10995     38.9%      13268      46.9%       221       0.8%    3777       13.4%       28261
+Note: Totals shown are before amalgamation of ballot papers for distribution of preferences and recounts
+Table 3: First preference votes by affiliation
+
+Division Name            No Aff     ALP     ASX        CLP    FNPP   GRN    IND    TOTAL
+
+Arafura                       0     1104         0     1308    194    426      0    3032
+Araluen                       0      848         0     2487    285      0      0    3620
+Arnhem                        0     1102         0     1366      0      0      0    2468
+Barkly                        0     1450         0     1162    467      0    131    3210
+Blain                         0     1343         0     2462    194      0      0    3999
+Braitling                     0      613         0     2372      0    321    204    3510
+Brennan                       0     1493         0     2683      0      0      0    4176
+Casuarina                     0     2512         0     1724      0      0      0    4236
+Daly                         68     1445         0     1892    109    187      0    3701
+Drysdale                      0     1142         0     2336      0      0    657    4135
+Fannie Bay                    0     1945         0     1639      0    403      0    3987
+Fong Lim                      0     1348     113       2050      0    250      0    3761
+Goyder                      369     1291         0     2731      0      0      0    4391
+Greatorex                     0      673         0     1991      0    338    512    3514
+Johnston                     89     1799     169       1552      0    389      0    3998
+Karama                        0     2072         0     1634      0    229      0    3935
+Katherine                     0      864         0     2729      0      0    537    4130
+Namatjira                     0      824         0     1847    253      0      0    2924
+Nelson                        0      255         0     1436      0      0   1988    3679
+Nhulunbuy                     0     1554         0      641      0      0    629    2824
+Nightcliff                    0     1389         74    1260      0    263    908    3894
+Port Darwin                   0     1205     185       2023      0    233      0    3646
+Sanderson                     0     1872     176       2214     90      0      0    4352
+Stuart                        0     1035         0     1291    456      0      0    2782
+Wanguri                       0     2416         0     1823      0      0      0    4239
+Totals                     526     33594    717       46653   2048   3039   5566   92143
+                          0.6%    36.5%    0.8%       50.6%   2.2%   3.3%   6.0%
+Table 4: Seats won by affiliation
+Affiliation                         Candidate
+Australian Labor Party NT (ALP)
+Barkly                              MCCARTHY, Gerry
+Casuarina                           VATSKALIS, Kon
+Fannie Bay                          GUNNER, Michael
+Johnston                            VOWLES, Ken
+Karama                              LAWRIE, Delia
+Nhulunbuy                           WALKER, Lynne
+Nightcliff                          FYLES, Natasha
+Wanguri                             ENDERSON, Paul
+Country Liberals
+Arafura                             XAVIER, Francis
+Araluen                             LAMBLEY, Robyn
+Arnhem                              LEE, Larisa
+Blain                               MILLS, Terry
+Braitling                           GILES, Adam
+Brennan                             CHANDLER, Peter
+Daly                                HIGGINS, Gary
+Drysdale                            FINOCCHIARO, Lia
+Fong Lim                            TOLLNER, David
+Goyder                              PURICK, Kezia
+Greatorex                           CONLAN, Matt
+Katherine                           WESTRA VAN HOLTHE, Willem
+Namatjira                           ANDERSON, Alison
+Port Darwin                         ELFERINK, John
+Sanderson                           STYLES, Peter
+Stuart                              PRICE, Bess
+Independent
+Nelson                              WOOD, Gerry
+
+
+
+
+Seats Won                                2005        2008   2012
+ALP                                         19         13      8
+CLP                                          4         11     16
+Ind                                          2          1      1
+Table 5: Two candidate result following distribution of preferences
+  Division                                    Final Vote                                             Final vote                      % Swing
+                      Candidate                                          Candidate                                     Result
+   Name                                      No        %                                             No        %                     to Lose
+Arafura*       RIOLI, Dean                   1485     49.0%    XAVIER, Francis                        1547    51.0%      CLP            1.1%
+Araluen        FINDLAY, Adam                 1008     27.8%    LAMBLEY, Robyn**                       2612    72.2%      CLP           22.3%
+Arnhem         MCCARTHY, Malarndirri**       1102     44.7%    LEE, Larisa                            1366    55.3%      CLP            5.4%
+Barkly         MCCARTHY, Gerry**             1849     57.6%    HEALY, Rebecca                         1361    42.4%      ALP            7.7%
+Blain          BAHNERT, Geoff                1470     36.8%    MILLS, Terry**                         2529    63.2%      CLP           13.3%
+Braitling*     ROCK,Deborah                    925    26.4%    GILES, Adam**                          2585    73.6%      CLP           23.7%
+Brennan        JEFFREY, Russell              1493     35.8%    CHANDLER, Peter**                      2683    64.2%      CLP           14.3%
+Casuarina      VATSKALIS, Kon**              2512     59.3%    JOHNSON, Jane                          1724    40.7%      ALP            9.4%
+Daly*          KNIGHT, Rob**                 1676     45.3%    HIGGINS, Gary                          2025    54.7%      CLP            4.8%
+Drysdale*      BURKE, James                  1436     34.7%    FINOCCHIARO, Lia                       2699    65.3%      CLP           15.4%
+Fannie Bay     GUNNER, Michael**             2263     56.8%    CLEMENTSON, Tony                       1724    43.2%      ALP            6.9%
+Fong Lim       MARSH, Ashley                 1607     42.7%    TOLLNER, David**                       2154    57.3%      CLP            7.4%
+Goyder         SMITH, Damien                 1462     33.3%    PURICK, Kezia**                        2929    66.7%      CLP           16.8%
+Greatorex      FOLEY, Rowan                  1236     35.2%    CONLAN, Matt**                         2278    64.8%      CLP           14.9%
+Johnston*      VOWLES, Ken                   2225     55.7%    SANGSTER, Jo                           1773    44.3%      ALP            5.8%
+Karama         LAWRIE, Delia**               2219     56.4%    KELLY, Rohan                           1716    43.6%      ALP            6.5%
+Katherine      KING, Cerise                  1146     27.7%    WESTRA VAN HOLTHE, Willem**            2984    72.3%      CLP           22.4%
+Namatjira      ROGERS, Des                     918    31.4%    ANDERSON, Alison#                      2006    68.6%      CLP           18.7%
+Nelson*        WOOD, Gerry**                 2177     59.2%    COLE, Judy                             1502    40.8%      IND            9.3%
+Nhulunbuy      WALKER, Lynne**               1948     69.0%    FANNING, Allen                          876    31.0%      ALP           19.1%
+Nightcliff*    FYLES, Natasha                2304     59.2%    LOVEDAY, Kim                           1590    40.8%      ALP            9.3%
+Port Darwin*   JAMES, Alan                   1473     40.4%    ELFERINK, John**                       2173    59.6%      CLP            9.7%
+Sanderson*     GREEN, Jodie                  2040     46.9%    STYLES, Peter**                        2312    53.1%      CLP            3.2%
+Stuart*        HAMPTON, Karl**               1293     46.5%    PRICE, Bess                            1489    53.5%      CLP            3.6%
+Wanguri        HENDERSON, Paul**             2416     57.0%    HARKER, Rhianna                        1823    43.0%      ALP            7.1%
+
+* Minor difference between two candidate result following distribution of preferences and notional two candidate preferred result.
+** Sitting Member this division previous Parliament
+# Sitting Member for other division previous Parliament (Redistribution 2011 replaced Macdonnell with Namatjira)
+Table 6: Notional two party preferred vote
+                                   ALP                            CLP
+Division Name
+                     No. Votes              %    No. Votes                    %
+Arafura*                    1488         49.0%             1548           51.0%
+Araluen                     1008         27.8%             2612           72.2%
+Arnhem                      1102         44.7%             1366           55.3%
+Barkly                      1849         57.6%             1361           42.4%
+Blain                       1470         36.8%             2529           63.2%
+Braitling*                   918         26.2%             2592           73.8%
+Brennan                     1493         35.8%             2683           64.2%
+Casuarina                   2512         59.3%             1724           40.7%
+Daly*                       1679         45.4%             2022           54.6%
+Drysdale*                   1431         34.6%             2704           65.4%
+Fannie Bay                  2263         56.8%             1724           43.2%
+Fong Lim                    1607         42.7%             2154           57.3%
+Goyder                      1462         33.3%             2929           66.7%
+Greatorex                   1236         35.2%             2278           64.8%
+Johnston*                   2224         55.6%             1774           44.4%
+Karama                      2219         56.4%             1716           43.6%
+Katherine                   1146         27.7%             2984           72.3%
+Namatjira                    918         31.4%             2006           68.6%
+Nelson                      1203         32.7%             2477           67.3%
+Nhulunbuy                   1948         69.0%              876           31.0%
+Nightcliff*                 2301         59.1%             1592           40.9%
+Port Darwin*                1471         40.3%             2175           59.7%
+Sanderson*                  2041         46.9%             2311           53.1%
+Stuart*                     1297         46.6%             1484           53.4%
+Wanguri                     2416         57.0%             1823           43.0%
+* Minor difference between two candidate result following distribution of preferences and notional two party preferred result.
+Table 7: Informal rate by vote type
+
+              Ordinary Votes
+  Division                       Absent      Declaration   Early    Postal    All Vote
+   Name       Static   Mobiles   Votes         Votes       Votes    Votes      Types
+
+Arafura         4.4%      4.0%        7.5%        11.5%     11.8%      4.2%       4.7%
+Araluen         3.5%      5.5%        5.2%         0.0%      3.9%      0.9%       3.6%
+Arnhem          2.5%      3.1%        4.1%         0.0%      6.7%      0.0%       3.0%
+Barkly          3.9%      3.3%        5.5%         3.4%      4.7%      1.7%       3.7%
+Blain           3.2%                  4.8%         0.0%      3.8%      2.2%       3.4%
+Braitling       2.2%      6.8%        2.4%         0.0%      3.3%      0.0%       2.4%
+Brennan         2.4%                  2.7%         8.3%      5.5%      1.9%       2.3%
+Casuarina       2.2%      0.0%        2.5%         0.0%      4.7%      1.8%       2.1%
+Daly            6.1%      5.6%        6.0%         8.7%      4.2%      1.2%       5.5%
+Drysdale        2.9%                  5.0%         4.5%      6.6%      0.6%       3.2%
+Fannie Bay      2.8%     11.1%        1.6%         9.7%      3.0%      1.0%       2.7%
+Fong Lim        3.3%      0.0%        3.0%         4.5%      2.5%      0.0%       3.0%
+Goyder          3.5%                  2.8%         0.0%      9.6%      1.0%       3.1%
+Greatorex       2.4%     11.1%        2.7%         0.0%      6.3%      0.0%       2.7%
+Johnston        3.9%                  5.0%         6.1%      1.6%      5.8%       3.8%
+Karama          3.9%                  2.8%         4.5%      2.3%      1.4%       3.6%
+Katherine       2.2%      3.0%        2.4%         0.0%      1.0%      3.3%       1.8%
+Namatjira       7.3%      4.0%        5.2%         3.4%      4.7%      1.9%       4.7%
+Nelson          1.9%      1.7%        1.3%         4.8%      7.0%      3.7%       1.9%
+Nhulunbuy       4.0%     10.1%        6.9%         8.8%      4.4%      0.0%       4.6%
+Nightcliff      3.4%      0.0%        4.5%         0.0%      1.8%      1.1%       3.3%
+Port Darwin     3.2%      0.0%        4.2%         0.0%      1.7%      2.9%       2.6%
+Sanderson       2.9%                  5.1%         0.0%      1.8%      1.3%       2.9%
+Stuart          7.2%      6.2%        4.8%         9.0%     18.4%      1.3%       5.9%
+Wanguri         1.6%                  3.1%         0.0%     12.2%      1.9%       2.0%
+                                                                                                                   NT General Election 2012
+                                                                                                                   DIVISION OF ARAFURA
+No. enrolled                                          5477
+
+Formal votes                                          3032             (95.3% of total ballot papers)
+Informal ballot papers                                 148             (4.7% of total ballot papers)
+Total ballot papers                                   3180
+
+Turnout - 2012 Final                              58.1%                (Turnout - 2008 Final: 60.8%)
+
+
+                                                       First Preference Votes for each Candidate                                 Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                            Francis             George                Dean               Jeannie                                                                                               Francis              Dean
+
+                                           XAVIER               PASCOE                RIOLI             GADAMBUA                                                                                              XAVIER               RIOLI
+
+                                            CLP                 GRN                   ALP                FNPP              Formal           Informal      Total                                                CLP                 ALP             Total
+Polling Place / Declaration Type            No.           %     No.          %       No.          %       No.    %         No.          %    No.      %    No.    Polling Place / Declaration Type           No.             %   No.           %     No.
+Gunbalanya                                  111       26.1%      92      21.6%       209      49.1%        14 3.3%         426      91.4%     40   8.6%    466    Gunbalanya                                 146         34.3%   280       65.7%     426
+Jabiru                                       87       39.5%      15       6.8%       111      50.5%         7 3.2%         220      94.8%     12   5.2%    232    Jabiru                                      93         42.3%   127       57.7%     220
+Maningrida                                   28        7.1%     177      44.7%        68      17.2%       123 31.1%        396      97.8%      9   2.2%    405    Maningrida                                 146         36.9%   250       63.1%     396
+Nguiu                                       520       80.0%       8       1.4%       114      17.9%         5 0.8%         647      97.6%     16   2.4%    663    Nguiu                                      524         80.7%   125       19.3%     649
+Static Polling Place Sub Total              746       44.1%     292      17.3%       502      29.8%       149 8.8%        1689      95.6%     77   4.4%   1766    Static Polling Place Sub Total             909         53.8%   782       46.2%    1691
+
+
+Mobile Polling Team 01.0                     12       24.5%       4       8.2%        28      57.1%         5 10.2%         49      92.5%      4 7.5%       53    Mobile Polling Team 01.0                    14         28.6%    35       71.4%      49
+Mobile Polling Team 02.0                     31       20.9%      41      27.7%        73      49.3%         3 2.0%         148      89.2%     18 10.8%     166    Mobile Polling Team 02.0                    54         36.5%    94       63.5%     148
+Mobile Polling Team 03.0                    354       49.8%      19       2.7%       328      46.1%        10 1.4%         711      97.8%     16 2.2%      727    Mobile Polling Team 03.0                   369         51.9%   342       48.1%     711
+Mobile Polling Team Sub Total               397       43.7%      64       7.0%       429      47.2%        18 2.0%         908      96.0%     38 4.0%      946    Mobile Polling Team Sub Total              437         48.1%   471       51.9%     908
+
+
+Casuarina EVC                                 0                   0                    0                    0                0                 0             0    Casuarina EVC                                 0                   0                  0
+Darwin Airport EVC                            0                   0                    0                    0                0                 0             0    Darwin Airport EVC                            0                   0                  0
+Darwin EVC                                    0                   0                    0                    0                0                 0             0    Darwin EVC                                    0                   0                  0
+Jabiru EVC                                   31       31.6%      12      12.2%        54      55.1%         1      1.0%     98      94.2%      6   5.8%    104    Jabiru EVC                                   35        35.7%     63      64.3%      98
+Palmerston EVC                                0                   0                    0                    0                0                 0             0    Palmerston EVC                                0                   0                  0
+Early Voting Centre Sub Total                31       31.6%      12      12.2%        54      55.1%         1      1.0%     98      94.2%      6   5.8%    104    Early Voting Centre Sub Total                35        35.7%     63      64.3%      98
+
+Absent Votes                                 96       36.9%      44      16.9%       101      38.8%        19      7.3%    260      92.5%     21   7.5%    281    Absent Votes                                120        46.2%    140      53.8%     260
+
+
+Declaration Votes (incl 10 Postal ballot                                                                                                                          Declaration Votes (incl 10 Postal ballot
+                                              6       26.1%       7      30.4%         6      26.1%         4 17.4%         23      88.5%      3 11.5%      26                                                 10        43.5%     13      56.5%      23
+papers)                                                                                                                                                           papers)
+
+
+Early Votes (Other regions) (incl 16                                                                                                                              Early Votes (Other regions) (incl 16
+                                             22       71.0%       0      0.0%          7      22.6%         2      6.5%     31      93.9%      2   6.1%     33                                                 23        74.2%      8      25.8%      31
+Early Voting Centre ballot papers)                                                                                                                                Early Voting Centre ballot papers)
+
+Postal Votes                                 10       43.5%       7      30.4%         5      21.7%         1      4.3%     23      95.8%      1   4.2%     24    Postal Votes                                 12        52.2%     11      47.8%      23
+
+Division Total                             1308       43.1%     426      14.1%      1104      36.5%       194      6.4%   3032      95.3%    148   4.7%   3180    Division Total                             1546        51.0%   1488      49.0%    3034
+
+Distribution of Preferences
+First Preference Votes                     1308       43.1%      426     14.1%      1104      36.4%       194      6.4%   3032
+GADAMBUA excluded.                           30                  130                  34                 -194                0
+Progressive Total                          1338       44.1%      556     18.3%      1138      37.5%         0      0.0%   3032
+PASCOE excluded.                            209                 -556                 347                    0                0
+Total                                      1547       51.0%        0     0.0%       1485      49.0%         0      0.0%   3032
+
+                                           ELECTED
+                                                                                                 NT General Election 2012
+                                                                                                 DIVISION OF ARALUEN
+No. enrolled                                          4817
+
+Formal votes                                          3620           (96.4% of total ballot papers)
+Informal ballot papers                                 137           (3.6% of total ballot papers)
+Total ballot papers                                   3757
+
+Turnout - 2012 Final                                78.0%            (Turnout - 2008 Final: 74.6%)
+
+
+                                           First Preference Votes for each Candidate                        Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                              Edan             Robyn              Adam                                                                                                     Robyn            Adam
+
+                                             BAXTER           LAMBLEY            FINDLAY                                                                                                  LAMBLEY          FINDLAY
+
+                                             FNPP              CLP                ALP                 Formal            Informal      Total                                                CLP              ALP            Total
+Polling Place / Declaration Type             No.         %     No.         %      No.        %      No.            %     No.     %     No.    Polling Place / Declaration Type             No.        %     No.       %      No.
+Gillen                                       133      7.1%    1286     68.9%      447    24.0%     1866        96.5%      67   3.5%   1933    Gillen                                      1339     71.8%    527    28.2%    1866
+Pioneer Park (Araluen)                        18      5.8%     226     72.7%       67    21.5%      311        96.3%      12   3.7%    323    Pioneer Park (Araluen)                       234     75.2%     77    24.8%     311
+Static Polling Place Sub Total               151      6.9%    1512     69.5%      514    23.6%     2177        96.5%      79   3.5%   2256    Static Polling Place Sub Total              1573     72.3%    604    27.7%    2177
+
+Mobile Polling Team 04.0                      14      48.3%      9     31.0%        6    20.7%         29      93.5%       2   6.5%     31    Mobile Polling Team 04.0                      17     58.6%     12    41.4%      29
+Mobile Polling Team 22.0                       1       4.3%     14     60.9%        8    34.8%         23      95.8%       1   4.2%     24    Mobile Polling Team 22.0                      15     65.2%      8    34.8%      23
+Mobile Polling Team Sub Total                 15      28.8%     23     44.2%       14    26.9%         52      94.5%       3   5.5%     55    Mobile Polling Team Sub Total                 32     61.5%     20    38.5%      52
+
+Alice Springs Airport EVC                      1      8.3%       9     75.0%        2    16.7%         12      100.0%      0   0.0%     12    Alice Springs Airport EVC                      9     75.0%      3    25.0%      12
+Alice Springs EVC                             67      7.6%     620     70.0%      199    22.5%        886       96.1%     36   3.9%    922    Alice Springs EVC                            649     73.3%    237    26.7%     886
+Early Voting Centre Sub Total                 68      7.6%     629     70.0%      201    22.4%        898       96.1%     36   3.9%    934    Early Voting Centre Sub Total                658     73.3%    240    26.7%     898
+
+Absent Votes                                  40      12.1%    200     60.6%       90    27.3%        330      94.8%      18   5.2%    348    Absent Votes                                 218     66.1%    112    33.9%     330
+
+
+Declaration Votes (incl 16 Postal ballot                                                                                                      Declaration Votes (incl 16 Postal ballot
+                                               4      16.7%     17     70.8%        3    12.5%         24      100.0%      0   0.0%     24                                                  21     87.5%      3    12.5%      24
+papers)                                                                                                                                       papers)
+
+Early Votes (Other regions)                    1      3.1%      21     65.6%       10    31.3%         32      100.0%      0   0.0%     32    Early Votes (Other regions)                   22     68.8%     10    31.3%      32
+
+Postal Votes                                   6      5.6%      85     79.4%       16    15.0%        107      99.1%       1   0.9%    108    Postal Votes                                  88     82.2%     19    17.8%     107
+
+Division Total                               285      7.9%    2487     68.7%      848    23.4%     3620        96.4%     137   3.6%   3757    Division Total                              2612     72.2%   1008    27.8%    3620
+
+Distribution of Preferences
+First Preference Votes                        285     7.9%    2487     68.7%      848    23.4%     3620
+BAXTER excluded.                             -285              125                160                 0
+Total                                           0     0.0%    2612     72.2%     1008    27.8%     3620
+
+                                                              ELECTED
+                                              NT General Election 2012
+                                                DIVISION OF ARNHEM
+No. enrolled                                           4902
+
+Formal votes                                           2468             (97.0% of total ballot papers)
+Informal ballot papers                                   76             (3.0% of total ballot papers)
+Total ballot papers                                    2544
+
+Turnout - 2012 Final                                  51.9%             (Turnout - 2008 Final: N/A)
+
+
+                                          First Preference Votes for each
+                                                                                           Ballot Papers Counted
+                                                     Candidate
+
+                                              Malarndirri        Larisa
+
+                                             MCCARTHY             LEE
+
+                                                ALP              CLP                 Formal              Informal      Total
+Polling Place / Declaration Type               No.          %    No.          %      No.          %       No.      %    No.
+Alyangula                                      121      46.5%    139      53.5%      260      97.0%         8   3.0%    268
+Ngukurr                                        225      70.3%     95      29.7%      320      97.9%         7   2.1%    327
+Ramingining                                     81      35.8%    145      64.2%      226      97.4%         6   2.6%    232
+Static Polling Place Sub Total                 427      53.0%    379      47.0%      806      97.5%        21   2.5%    827
+
+Mobile Polling Team 05.0                       200      33.2%    402      66.8%      602      97.9%        13   2.1%    615
+Mobile Polling Team 06.0                       255      43.7%    329      56.3%      584      95.6%        27   4.4%    611
+Mobile Polling Team 07.0                        66      59.5%     45      40.5%      111      98.2%         2   1.8%    113
+Mobile Polling Team Sub Total                  521      40.2%    776      59.8%     1297      96.9%        42   3.1%   1339
+
+Katherine EVC                                    29     56.9%     22 43.1%            51      98.1%         1   1.9%     52
+Early Voting Centre Sub Total                    29     56.9%     22 43.1%            51      98.1%         1   1.9%     52
+
+Absent Votes                                   100      38.5%    160 61.5%           260      95.9%        11   4.1%    271
+
+Declaration Votes (incl 3 Postal ballot
+                                                  4     26.7%     11 73.3%            15      100.0%        0   0.0%     15
+papers)
+
+Early Votes (Other regions)                      12     60.0%      8 40.0%            20      95.2%         1   4.8%     21
+
+Postal Votes                                      9     47.4%     10 52.6%            19      100.0%        0   0.0%     19
+
+Division Total                                1102      44.7%   1366 55.3%          2468      97.0%        76   3.0%   2544
+
+                                                                ELECTED
+                                                                                                          NT General Election 2012
+                                                                                                                DIVISION OF BARKLY
+No. enrolled                                          5137
+
+Formal votes                                          3210             (96.3% of total ballot papers)
+Informal ballot papers                                 122             (3.7% of total ballot papers)
+Total ballot papers                                   3332
+
+Turnout - 2012 Final                               64.9%               (Turnout - 2008 Final: 65.1%)
+
+
+                                                      First Preference Votes for each Candidate                                Ballot Papers Counted                                                       Notional Two Candidate Preferred
+
+                                            Stewart              Valda              Gerry           Rebecca                                                                                                  Gerry           Rebecca
+
+                                            WILLEY             SHANNON            MCCARTHY              HEALY                                                                                              MCCARTHY          HEALY
+
+                                             IND                FNPP                ALP                 CLP             Formal           Informal      Total                                                 ALP             CLP             Total
+Polling Place / Declaration Type            No.          %       No.     %          No.         %       No.         %    No.        %     No.      %    No.    Polling Place / Declaration Type              No.         %   No.         %     No.
+Ali Curung                                    6       5.2%        24 20.7%           62     53.4%        24     20.7%    116    96.7%       4   3.3%    120    Ali Curung                                     83     71.6%    33     28.4%     116
+Borroloola                                    2       0.9%         2 0.9%           162     76.1%        47     22.1%    213    94.7%      12   5.3%    225    Borroloola                                    166     77.9%    47     22.1%     213
+Elliott                                       9       6.4%        10 7.1%            57     40.4%        65     46.1%    141    97.2%       4   2.8%    145    Elliott                                        69     48.9%    72     51.1%     141
+Tennant Creek                                33       4.3%       154 19.9%          328     42.4%       258     33.4%    773    96.3%      30   3.7%    803    Tennant Creek                                 439     56.8%   334     43.2%     773
+Static Polling Place Sub Total               50       4.0%       190 15.3%          609     49.0%       394     31.7%   1243    96.1%      50   3.9%   1293    Static Polling Place Sub Total                757     60.9%   486     39.1%    1243
+
+Mobile Polling Team 08.2                     19       3.7%       16 3.1%            340     66.9%       133     26.2%    508    97.7%      12   2.3%    520    Mobile Polling Team 08.2                      368     72.4%   140     27.6%     508
+Mobile Polling Team 19.2                      8       2.4%       58 17.7%            78     23.8%       184     56.1%    328    95.3%      16   4.7%    344    Mobile Polling Team 19.2                      127     38.7%   201     61.3%     328
+Mobile Polling Team 20.2                      8       7.5%       21 19.8%            33     31.1%        44     41.5%    106    96.4%       4   3.6%    110    Mobile Polling Team 20.2                       52     49.1%    54     50.9%     106
+Mobile Polling Team Sub Total                35       3.7%       95 10.1%           451     47.9%       361     38.3%    942    96.7%      32   3.3%    974    Mobile Polling Team Sub Total                 547     58.1%   395     41.9%     942
+
+Alice Springs Airport EVC                     0                   0                   0                   0                0                0             0    Alice Springs Airport EVC                       0               0                 0
+Alice Springs EVC                             2       10.0%       1 5.0%             10 50.0%             7 35.0%         20 95.2%          1   4.8%     21    Alice Springs EVC                              13 65.0%         7 35.0%          20
+Tennant Creek EVC                            21        3.9%      88 16.4%           228 42.6%           198 37.0%        535 96.6%         19   3.4%    554    Tennant Creek EVC                             298 55.7%       237 44.3%         535
+Early Voting Centre Sub Total                23        4.1%      89 16.0%           238 42.9%           205 36.9%        555 96.5%         20   3.5%    575    Early Voting Centre Sub Total                 311 56.0%       244 44.0%         555
+
+Absent Votes                                 17       6.2%       77 28.1%            97 35.4%            83 30.3%        274 94.5%         16   5.5%    290    Absent Votes                                  164 59.9%       110 40.1%         274
+
+
+Declaration Votes (incl 48 Postal ballot                                                                                                                       Declaration Votes (incl 48 Postal ballot
+                                              2       3.5%         3     5.3%        15 26.3%            37 64.9%         57 96.6%          2   3.4%     59                                                   19 33.3%         38 66.7%         57
+papers)                                                                                                                                                        papers)
+
+
+Early Votes (Other regions) (incl 3 Early                                                                                                                      Early Votes (Other regions) (incl 3 Early
+                                              3       3.7%       10 12.2%            35 42.7%            34 41.5%         82 98.8%          1   1.2%     83                                                   44 53.7%         38 46.3%         82
+Voting Centre ballot papers)                                                                                                                                   Voting Centre ballot papers)
+
+Postal Votes                                  1       1.8%         3     5.3%         5     8.8%         48 84.2%         57 98.3%          1   1.7%     58    Postal Votes                                    7 12.3%         50 87.7%         57
+
+Division Total                              131       4.1%       467 14.5%         1450 45.2%       1162 36.2%          3210 96.3%        122   3.7%   3332    Division Total                               1849 57.6%       1361 42.4%       3210
+
+Distribution of Preferences
+First Preference Votes                       131      4.1%       467 14.5%         1450 45.2%       1162 36.2%          3210
+WILLEY excluded.                            -131                  76                 37               18                   0
+Progressive Total                              0      0.0%       543 16.9%         1487 46.3%       1180 36.8%          3210
+SHANNON excluded.                              0                -543                362              181                   0
+Total                                          0      0.0%         0 0.0%          1849 57.6%       1361 42.4%          3210
+
+                                                                                  ELECTED
+                                                                                                  NT General Election 2012
+                                                                                                    DIVISION OF BLAIN
+No. enrolled                                          4980
+
+Formal votes                                          3999           (96.6% of total ballot papers)
+Informal ballot papers                                 142           (3.4% of total ballot papers)
+Total ballot papers                                   4141
+
+Turnout - 2012 Final                                83.2%            (Turnout - 2008 Final: 80.1%)
+
+
+                                           First Preference Votes for each Candidate                        Ballot Papers Counted                                                           Notional Two Candidate Preferred
+
+                                             Daniel            Geoff              Terry                                                                                                       Geoff            Terry
+
+                                              FEJO            BAHNERT             MILLS                                                                                                      BAHNERT          MILLS
+
+                                             FNPP              ALP                CLP                 Formal           Informal          Total                                                ALP             CLP              Total
+Polling Place / Declaration Type             No.         %     No.         %      No.         %      No.           %    No.          %    No.    Polling Place / Declaration Type             No.         %    No.         %     No.
+Moulden Park                                  47      5.7%     314     38.2%      462     56.1%      823       96.6%     29       3.4%    852    Moulden Park                                 344     41.8%    479     58.2%     823
+Rosebery (Blain)                              27      3.8%     246     34.2%      447     62.1%      720       97.3%     20       2.7%    740    Rosebery (Blain)                             261     36.3%    459     63.8%     720
+Woodroffe                                     77      5.9%     411     31.3%      827     62.9%     1315       96.7%     45       3.3%   1360    Woodroffe                                    465     35.4%    850     64.6%    1315
+Static Polling Place Sub Total               151      5.3%     971     34.0%     1736     60.7%     2858       96.8%     94       3.2%   2952    Static Polling Place Sub Total              1070     37.4%   1788     62.6%    2858
+
+Casuarina EVC                                  3      13.6%      6     27.3%       13     59.1%        22    100.0%       0    0.0%        22    Casuarina EVC                                  8     36.4%    14      63.6%      22
+Darwin Airport EVC                             0                 6     66.7%        3     33.3%         9     90.0%       1   10.0%        10    Darwin Airport EVC                             6     66.7%     3      33.3%       9
+Darwin EVC                                     2      3.6%      24     42.9%       30     53.6%        56    100.0%       0    0.0%        56    Darwin EVC                                    25     44.6%    31      55.4%      56
+Palmerston EVC                                10      2.8%     118     32.5%      235     64.7%       363     95.5%      17    4.5%       380    Palmerston EVC                               126     34.7%   237      65.3%     363
+Early Voting Centre Sub Total                 15      3.3%     154     34.2%      281     62.4%       450     96.2%      18    3.8%       468    Early Voting Centre Sub Total                165     36.7%   285      63.3%     450
+
+Absent Votes                                  26      4.9%     160     30.2%      344     64.9%       530      95.2%     27       4.8%    557    Absent Votes                                 175     33.0%    355     67.0%     530
+
+
+Declaration Votes (incl 15 Postal ballot                                                                                                         Declaration Votes (incl 15 Postal ballot
+                                               0      0.0%      11     50.0%       11     50.0%        22    100.0%       0       0.0%      22                                                 11     50.0%    11      50.0%      22
+papers)                                                                                                                                          papers)
+
+Early Votes (Other regions)                    1      14.3%      3     42.9%        3     42.9%        7     100.0%       0       0.0%       7   Early Votes (Other regions)                    4     57.1%      3     42.9%       7
+
+Postal Votes                                   1      0.8%      44     33.3%       87     65.9%       132      97.8%      3       2.2%    135    Postal Votes                                  45     34.1%    87      65.9%     132
+
+Division Total                               194      4.9%    1343     33.6%     2462     61.6%     3999       96.6%    142       3.4%   4141    Division Total                              1470     36.8%   2529     63.2%    3999
+
+Distribution of Preferences
+First Preference Votes                        194     4.9%    1343     33.6%     2462     61.6%     3999
+FEJO excluded.                               -194              127                 67                  0
+Total                                           0     0.0%    1470     36.8%     2529     63.2%     3999
+
+                                                                                ELECTED
+                                                                                                           NT General Election 2012
+                                                                                                           DIVISION OF BRAITLING
+No. enrolled                                         4687
+
+Formal votes                                         3510           (97.6% of total ballot papers)
+Informal ballot papers                                 88           (2.4% of total ballot papers)
+Total ballot papers                                  3598
+
+Turnout - 2012 Final                               76.8%            (Turnout - 2008 Final: 73.4%)
+
+
+                                                     First Preference Votes for each Candidate                               Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                             Colin             Deborah           Adam                Barbara                                                                                               Deborah         Adam
+
+                                            FURPHY             ROCK              GILES               SHAW                                                                                                   ROCK           GILES
+
+                                             IND               ALP               CLP                 GRN              Formal            Informal      Total                                                 ALP            CLP         Total
+Polling Place / Declaration Type            No.         %      No.     %         No.     %           No.          %    No.         %     No.      %    No.    Polling Place / Declaration Type              No.     %      No.     %     No.
+Braitling                                    62      5.0%      248 20.2%         829 67.5%            89       7.2%   1228     98.2%      23   1.8%   1251    Braitling                                     352 28.7%      876 71.3%    1228
+Larapinta                                    48      5.3%      138 15.2%         654 72.1%            67       7.4%    907     97.2%      26   2.8%    933    Larapinta                                     203 22.4%      704 77.6%     907
+Static Polling Place Sub Total              110      5.2%      386 18.1%        1483 69.5%           156       7.3%   2135     97.8%      49   2.2%   2184    Static Polling Place Sub Total                555 26.0%     1580 74.0%    2135
+
+Mobile Polling Team 18.1                      0                   2 18.2%          3 27.3%             6 54.5%          11   100.0%        0   0.0%     11    Mobile Polling Team 18.1                        6 54.5%        5 45.5%         11
+Mobile Polling Team 21.0                      1      3.3%         1 3.3%           1 3.3%             27 90.0%          30    90.9%        3   9.1%     33    Mobile Polling Team 21.0                       18 60.0%       12 40.0%         30
+Mobile Polling Team Sub Total                 1      2.4%         3 7.3%           4 9.8%             33 80.5%          41    93.2%        3   6.8%     44    Mobile Polling Team Sub Total                  24 58.5%       17 41.5%         41
+
+Alice Springs Airport EVC                     0                  0                 0                   0                 0                 0             0    Alice Springs Airport EVC                       0              0             0
+Alice Springs EVC                            47      6.3%      126 16.9%         525 70.6%            46       6.2%    744     96.7%      25   3.3%    769    Alice Springs EVC                             172 23.1%      572 76.9%     744
+Early Voting Centre Sub Total                47      6.3%      126 16.9%         525 70.6%            46       6.2%    744     96.7%      25   3.3%    769    Early Voting Centre Sub Total                 172 23.1%      572 76.9%     744
+
+Absent Votes                                 41      9.1%        76 16.9%        266 59.0%            68 15.1%        451      97.6%      11   2.4%    462    Absent Votes                                  133 29.5%      318 70.5%     451
+
+Declaration Votes (incl 22 Postal ballot                                                                                                                      Declaration Votes (incl 22 Postal ballot
+                                              0      0.0%         3 12.0%         19 76.0%              3 12.0%         25   100.0%        0   0.0%     25                                                    6 24.0%       19 76.0%         25
+papers)                                                                                                                                                       papers)
+
+
+Early Votes (Other regions) (incl 9 Early                                                                                                                     Early Votes (Other regions) (incl 9 Early
+                                              1      2.4%         6 14.6%         27 65.9%              7 17.1%        41    100.0%        0   0.0%     41                                                   10 24.4%       31 75.6%         41
+Voting Centre ballot papers)                                                                                                                                  Voting Centre ballot papers)
+
+Postal Votes                                  4      5.5%        13 17.8%         48 65.8%              8 11.0%         73   100.0%        0   0.0%     73    Postal Votes                                   18 24.7%       55 75.3%         73
+
+Division Total                              204      5.8%      613 17.5%        2372 67.6%           321       9.1%   3510     97.6%      88   2.4%   3598    Division Total                                918 26.2%     2592 73.8%    3510
+
+Distribution of Preferences
+First Preference Votes                       204     5.8%      613 17.5%        2372 67.6%            321 9.1%        3510
+FURPHY excluded.                            -204                80                77                   47                0
+Progressive Total                              0     0.0%      693 19.7%        2449 69.8%            368 10.5%       3510
+SHAW excluded.                                 0               232               136                 -368                0
+Total                                          0     0.0%      925 26.4%        2585 73.6%              0 0.0%        3510
+
+                                                                               ELECTED
+                                               NT General Election 2012
+                                                DIVISION OF BRENNAN
+No. enrolled                                              5061
+
+Formal votes                                              4176            (97.7% of total ballot papers)
+Informal ballot papers                                      99            (2.3% of total ballot papers)
+Total ballot papers                                       4275
+
+Turnout - 2012 Final                                   84.5%              (Turnout - 2008 Final: 80.3%)
+
+
+                                            First Preference Votes for each                  Ballot Papers Counted
+                                                       Candidate
+
+                                                  Peter            Russell
+
+                                               CHANDLER           JEFFREY
+
+                                                 CLP               ALP                 Formal              Informal      Total
+Polling Place / Declaration Type                 No.          %    No.           %     No.          %       No.      %    No.
+Bakewell                                        1332      62.8%    790       37.2%    2122      97.6%        53   2.4%   2175
+Farrar                                           289      61.9%    178       38.1%     467      98.1%         9   1.9%    476
+Rosebery (Brennan)                               281      65.5%    148       34.5%     429      97.5%        11   2.5%    440
+Static Polling Place Sub Total                  1902      63.0%   1116       37.0%    3018      97.6%        73   2.4%   3091
+
+Mobile Polling Team 23.1                           0                  0                  0                    0              0
+Mobile Polling Team Sub Total                      0                  0                  0                    0              0
+
+Casuarina EVC                                     24      70.6%     10       29.4%      34    100.0%          0   0.0%     34
+Darwin Airport EVC                                 0                 0                   0                    0             0
+Darwin EVC                                        58      66.7%     29       33.3%      87    100.0%          0   0.0%     87
+Palmerston EVC                                   227      71.2%     92       28.8%     319     98.2%          6   1.8%    325
+Early Voting Centre Sub Total                    309      70.2%    131       29.8%     440     98.7%          6   1.3%    446
+
+Absent Votes                                     330      64.2%    184       35.8%     514      97.3%        14   2.7%    528
+
+
+Declaration Votes (incl 18 Postal ballot
+                                                  12      54.5%     10       45.5%      22      91.7%         2   8.3%     24
+papers)
+
+
+Early Votes (Other regions) (incl 7 Early
+                                                  10      43.5%     13       56.5%      23      95.8%         1   4.2%     24
+Voting Centre ballot papers)
+
+Postal Votes                                     120      75.5%     39       24.5%     159      98.1%         3   1.9%    162
+
+Division Total                                  2683      64.2%   1493       35.8%    4176      97.7%        99   2.3%   4275
+
+                                                ELECTED
+                                               NT General Election 2012
+                                               DIVISION OF CASUARINA
+No. enrolled                                             5031
+
+Formal votes                                             4236           (97.9% of total ballot papers)
+Informal ballot papers                                     89           (2.1% of total ballot papers)
+Total ballot papers                                      4325
+
+Turnout - 2012 Final                                    86.0%           (Turnout - 2008 Final: 84.1%)
+
+
+                                            First Preference Votes for each
+                                                                                           Ballot Papers Counted
+                                                       Candidate
+
+                                                  Kon              Jane
+
+                                               VATSKALIS         JOHNSON
+
+                                                 ALP              CLP                Formal              Informal      Total
+Polling Place / Declaration Type                 No.         %    No.     %          No.          %       No.      %    No.
+Nakara                                          1261     63.0%    741 37.0%         2002      98.0%        41   2.0%   2043
+Tiwi                                             502     58.6%    355 41.4%          857      97.4%        23   2.6%    880
+Static Polling Place Sub Total                  1763     61.7%   1096 38.3%         2859      97.8%        64   2.2%   2923
+
+Mobile Polling Team 23.2                           9     45.0%     11     55.0%       20    100.0%          0   0.0%     20
+Mobile Polling Team Sub Total                      9     45.0%     11     55.0%       20    100.0%          0   0.0%     20
+
+Casuarina EVC                                    231     54.0%    197 46.0%          428      99.1%         4   0.9%    432
+Darwin Airport EVC                                 0                0                  0                    0             0
+Darwin EVC                                        59     54.1%     50 45.9%          109     98.2%          2   1.8%    111
+Palmerston EVC                                     5     38.5%      8 61.5%           13    100.0%          0   0.0%     13
+Early Voting Centre Sub Total                    295     53.6%    255 46.4%          550     98.9%          6   1.1%    556
+
+Absent Votes                                     316     54.0%    269     46.0%      585      97.5%        15   2.5%    600
+
+
+Declaration Votes (incl 21 Postal ballot
+                                                  18     66.7%      9     33.3%       27    100.0%          0   0.0%     27
+papers)
+
+
+Early Votes (Other regions) (incl 4 Early
+                                                  15     55.6%     12     44.4%       27      96.4%         1   3.6%     28
+Voting Centre ballot papers)
+
+Postal Votes                                      96     57.1%     72     42.9%      168      98.2%         3   1.8%    171
+
+Division Total                                  2512     59.3%   1724     40.7%     4236      97.9%        89   2.1%   4325
+
+                                                ELECTED
+                                                                                                                      DIVISION OF DALY
+No. enrolled                                         5329
+
+Formal votes                                         3701             (94.5% of total ballot papers)
+Informal ballot papers                                214             (5.5% of total ballot papers)
+Total ballot papers                                  3915
+
+Turnout - 2012 Final                               73.5%              (Turnout - 2008 Final: 73.9%)
+
+
+                                                             First Preference Votes for each Candidate                                       Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                              Gary              David              Trevor               Rob             Bill                                                                                                 Gary            Rob
+
+                                            HIGGINS           POLLOCK             JENKINS              KNIGHT          RISK                                                                                                HIGGINS          KNIGHT
+
+                                             CLP                GRN                                    ALP            FNPP             Formal           Informal      Total                                                 CLP             ALP            Total
+Polling Place / Declaration Type             No.         %      No.     %          No.         %       No.        %   No.         %    No.          %    No.     %     No.    Polling Place / Declaration Type              No.         %   No.        %     No.
+Adelaide River                                86     57.7%        9 6.0%             4      2.7%        47    31.5%     3      2.0%    149      94.9%      8 5.1%      157    Adelaide River                                 91     61.1%    58    38.9%     149
+Batchelor                                     88     38.8%       36 15.9%            4      1.8%        94    41.4%     5      2.2%    227      95.8%     10 4.2%      237    Batchelor                                      99     43.6%   128    56.4%     227
+Berry Springs                                463     53.0%       57 6.5%            13      1.5%       321    36.7%    20      2.3%    874      96.4%     33 3.6%      907    Berry Springs                                 493     56.4%   381    43.6%     874
+Wadeye                                       342     55.8%        4 0.7%             3      0.5%       246    40.1%    18      2.9%    613      89.6%     71 10.4%     684    Wadeye                                        354     57.7%   259    42.3%     613
+Static Polling Place Sub Total               979     52.5%      106 5.7%            24      1.3%       708    38.0%    46      2.5%   1863      93.9%    122 6.1%     1985    Static Polling Place Sub Total               1037     55.7%   826    44.3%    1863
+
+Mobile Polling Team 09.0                     362     56.5%       11     1.7%         6      0.9%       246 38.4%       16      2.5%   641       94.4%     38   5.6%    679    Mobile Polling Team 09.0                      380 59.3%       261 40.7%        641
+Mobile Polling Team 10.0                      78     33.5%       12     5.2%         8      3.4%       119 51.1%       16      6.9%   233       94.3%     14   5.7%    247    Mobile Polling Team 10.0                       92 39.5%       141 60.5%        233
+Mobile Polling Team Sub Total                440     50.3%       23     2.6%        14      1.6%       365 41.8%       32      3.7%   874       94.4%     52   5.6%    926    Mobile Polling Team Sub Total                 472 54.0%       402 46.0%        874
+
+
+Casuarina EVC                                 17     56.7%        2     6.7%         0                  11    36.7%      0             30     100.0%       0   0.0%     30    Casuarina EVC                                  18     60.0%    12    40.0%      30
+Darwin Airport EVC                             0                  0                  0                   0               0              0                  0             0    Darwin Airport EVC                              0               0                0
+Darwin EVC                                    26     39.4%        3     4.5%         1      1.5%        33    50.0%      3     4.5%    66     100.0%       0   0.0%     66    Darwin EVC                                     27     40.9%    39    59.1%      66
+Palmerston EVC                                80     62.5%        2     1.6%         1      0.8%        42    32.8%      3     2.3%   128      98.5%       2   1.5%    130    Palmerston EVC                                 81     63.3%    47    36.7%     128
+Early Voting Centre Sub Total                123     54.9%        7     3.1%         2      0.9%        86    38.4%      6     2.7%   224      99.1%       2   0.9%    226    Early Voting Centre Sub Total                 126     56.3%    98    43.8%     224
+
+Absent Votes                                 230     44.1%       42     8.1%        22      4.2%       206 39.5%       21      4.0%    521      94.0%     33   6.0%    554    Absent Votes                                  262 50.3%       259 49.7%        521
+
+
+Declaration Votes (incl 17 Postal ballot                                                                                                                                      Declaration Votes (incl 17 Postal ballot
+                                               7     33.3%        4 19.0%            2      9.5%         8 38.1%         0     0.0%     21      91.3%      2   8.7%     23                                                    7 33.3%        14 66.7%         21
+papers)                                                                                                                                                                       papers)
+
+
+Early Votes (Other regions) (incl 5 Early                                                                                                                                     Early Votes (Other regions) (incl 5 Early
+                                              13     44.8%        2     6.9%         0      0.0%        10 34.5%         4 13.8%        29      96.7%      1   3.3%     30                                                   16 55.2%        13 44.8%         29
+Voting Centre ballot papers)                                                                                                                                                  Voting Centre ballot papers)
+
+Postal Votes                                 100     59.2%        3     1.8%         4      2.4%        62 36.7%         0     0.0%    169      98.8%      2   1.2%    171    Postal Votes                                  102 60.4%        67 39.6%        169
+
+Division Total                              1892     51.1%      187     5.1%        68      1.8%   1445 39.0%         109      2.9%   3701      94.5%    214   5.5%   3915    Division Total                               2022 54.6%       1679 45.4%      3701
+
+Distribution of Preferences
+First Preference Votes                      1892     51.1%      187     5.1%        68      1.8%   1445       39.0%    109     2.9%   3701
+JENKINS excluded.                             12                 18                -68               13                 25               0
+Progressive Total                           1904     51.4%      205     5.5%         0      0.0%   1458       39.4%    134     3.6%   3701
+RISK excluded.                                45                 42                  0               47               -134               0
+Progressive Total                           1949     52.7%      247     6.7%         0      0.0%   1505       40.7%      0     0.0%   3701
+POLLOCK excluded.                             76               -247                  0              171                  0               0
+Total                                       2025     54.7%        0     0.0%         0      0.0%   1676       45.3%      0     0.0%   3701
+
+                                            ELECTED
+                                                                                                 NT General Election 2012
+                                                                                                 DIVISION OF DRYSDALE
+No. enrolled                                          5178
+
+Formal votes                                          4135           (96.8% of total ballot papers)
+Informal ballot papers                                 137           (3.2% of total ballot papers)
+Total ballot papers                                   4272
+
+Turnout - 2012 Final                                82.5%            (Turnout - 2008 Final: 79.9%)
+
+
+                                            First Preference Votes for each Candidate                       Ballot Papers Counted                                                       Notional Two Candidate Preferred
+
+                                              James            Ross                Lia                                                                                                    James               Lia
+
+                                              BURKE           BOHLIN           FINOCCHIARO                                                                                                BURKE           FINOCCHIARO
+
+                                              ALP              IND                CLP               Formal            Informal      Total                                                 ALP                CLP            Total
+Polling Place / Declaration Type              No.         %   No.         %       No.        %       No.         %     No.      %    No.    Polling Place / Declaration Type              No.         %      No.        %     No.
+Driver                                        156     25.2%   142     23.0%       320    51.8%       618     97.3%      17   2.7%    635    Driver                                        221     35.8%      397    64.2%     618
+Durack                                        321     23.6%   205     15.1%       833    61.3%      1359     96.9%      43   3.1%   1402    Durack                                        393     28.9%      966    71.1%    1359
+Gray                                          261     32.9%   107     13.5%       426    53.7%       794     97.1%      24   2.9%    818    Gray                                          318     40.1%      476    59.9%     794
+Static Polling Place Sub Total                738     26.6%   454     16.4%      1579    57.0%      2771     97.1%      84   2.9%   2855    Static Polling Place Sub Total                932     33.6%     1839    66.4%    2771
+
+Casuarina EVC                                  12     52.2%     4     17.4%         7    30.4%         23    92.0%       2   8.0%     25    Casuarina EVC                                  15     65.2%        8    34.8%      23
+Darwin Airport EVC                              0               0                   0                   0                0             0    Darwin Airport EVC                              0                  0                0
+Darwin EVC                                     15     25.4%     7     11.9%        37    62.7%         59    96.7%       2   3.3%     61    Darwin EVC                                     17     28.8%       42    71.2%      59
+Palmerston EVC                                102     28.1%    59     16.3%       202    55.6%        363    97.8%       8   2.2%    371    Palmerston EVC                                127     35.0%      236    65.0%     363
+Early Voting Centre Sub Total                 129     29.0%    70     15.7%       246    55.3%        445    97.4%      12   2.6%    457    Early Voting Centre Sub Total                 159     35.7%      286    64.3%     445
+
+Absent Votes                                  214     29.8%   107     14.9%       396    55.2%        717    95.0%      38   5.0%    755    Absent Votes                                  270     37.7%      447    62.3%     717
+
+
+Declaration Votes (incl 18 Postal ballot                                                                                                    Declaration Votes (incl 18 Postal ballot
+                                                8     38.1%     3     14.3%        10    47.6%         21    95.5%       1   4.5%     22                                                    9     42.9%       12    57.1%      21
+papers)                                                                                                                                     papers)
+
+
+Early Votes (Other regions) (incl 3 Early                                                                                                   Early Votes (Other regions) (incl 3 Early
+                                                7     29.2%     1      4.2%        16    66.7%         24    96.0%       1   4.0%     25                                                    8     33.3%       16    66.7%      24
+Voting Centre ballot papers)                                                                                                                Voting Centre ballot papers)
+
+Postal Votes                                   46     29.3%    22     14.0%        89    56.7%        157    99.4%       1   0.6%    158    Postal Votes                                   53     33.8%      104    66.2%     157
+
+Division Total                               1142     27.6%   657     15.9%      2336    56.5%      4135     96.8%     137   3.2%   4272    Division Total                               1431     34.6%     2704    65.4%    4135
+
+Distribution of Preferences
+First Preference Votes                       1142     27.6%    657    15.9%      2336    56.5%      4135
+BOHLIN excluded.                              294             -657                363                  0
+Total                                        1436     34.7%      0     0.0%      2699    65.3%      4135
+
+                                                                                ELECTED
+                                                                                                   NT General Election 2012
+                                                                                                   DIVISION OF FANNIE BAY
+No. enrolled                                            4879
+
+Formal votes                                            3987           (97.3% of total ballot papers)
+Informal ballot papers                                   109           (2.7% of total ballot papers)
+Total ballot papers                                     4096
+
+Turnout - 2012 Final                                84.0%              (Turnout - 2008 Final: 78.5%)
+
+
+                                            First Preference Votes for each Candidate                         Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                              Michael            Ken                Tony                                                                                                     Michael          Tony
+
+                                             GUNNER             BIRD            CLEMENTSON                                                                                                  GUNNER         CLEMENTSON
+
+                                              ALP               GRN                 CLP                 Formal           Informal      Total                                                 ALP              CLP            Total
+Polling Place / Declaration Type              No.          %    No.    %            No.    %          No.           %     No.     %     No.    Polling Place / Declaration Type              No.    %         No.    %         No.
+Parap                                         920       51.1%   168 9.3%            714 39.6%        1802        97.5%     47   2.5%   1849    Parap                                        1058 58.7%        744 41.3%       1802
+Stuart Park                                   520       48.8%   120 11.3%           425 39.9%        1065        96.8%     35   3.2%   1100    Stuart Park                                   612 57.5%        453 42.5%       1065
+Static Polling Place Sub Total               1440       50.2%   288 10.0%          1139 39.7%        2867        97.2%     82   2.8%   2949    Static Polling Place Sub Total               1670 58.2%       1197 41.8%       2867
+
+Mobile polling Team 23.6                        7       43.8%     1      6.3%         8 50.0%           16       88.9%      2 11.1%      18    Mobile polling Team 23.6                         8 50.0%        8 50.0%          16
+Mobile Polling Team Sub Total                   7       43.8%     1      6.3%         8 50.0%           16       88.9%      2 11.1%      18    Mobile Polling Team Sub Total                    8 50.0%        8 50.0%          16
+
+Casuarina EVC                                  36       47.4%    12 15.8%            28    36.8%         76    100.0%       0   0.0%     76    Casuarina EVC                                  45   59.2%       31    40.8%      76
+Darwin Airport EVC                              4       36.4%     2 18.2%             5    45.5%         11     91.7%       1   8.3%     12    Darwin Airport EVC                              5   45.5%        6    54.5%      11
+Darwin EVC                                    152       40.8%    28 7.5%            193    51.7%        373     96.6%      13   3.4%    386    Darwin EVC                                    173   46.4%      200    53.6%     373
+Palmerston EVC                                  0                 0                   0                   0                 0             0    Palmerston EVC                                  0                0                0
+Early Voting Centre Sub Total                 192       41.7%    42 9.1%            226    49.1%        460      97.0%     14   3.0%    474    Early Voting Centre Sub Total                 223   48.5%      237    51.5%     460
+
+Absent Votes                                  186       49.2%    46 12.2%           146 38.6%           378      98.4%      6   1.6%    384    Absent Votes                                  221 58.5%        157 41.5%        378
+
+
+Declaration Votes (incl 19 Postal ballot                                                                                                       Declaration Votes (incl 19 Postal ballot
+                                               16       57.1%     2      7.1%        10 35.7%            28      90.3%      3   9.7%     31                                                   18 64.3%         10 35.7%         28
+papers)                                                                                                                                        papers)
+
+
+Early Votes (Other regions) (incl 7 Early                                                                                                      Early Votes (Other regions) (incl 7 Early
+                                               13       34.2%     6 15.8%            19 50.0%            38    100.0%       0   0.0%     38                                                   19 50.0%         19 50.0%         38
+Voting Centre ballot papers)                                                                                                                   Voting Centre ballot papers)
+
+Postal Votes                                   91       45.5%    18      9.0%        91 45.5%           200      99.0%      2   1.0%    202    Postal Votes                                  104 52.0%         96 48.0%        200
+
+Division Total                               1945       48.8%   403 10.1%          1639 41.1%        3987        97.3%    109   2.7%   4096    Division Total                               2263 56.8%       1724 43.2%       3987
+
+Distribution of Preferences
+First Preference Votes                       1945       48.8%    403 10.1%         1639 41.1%        3987
+BIRD excluded.                                318               -403                 85                 0
+Total                                        2263       56.8%      0 0.0%          1724 43.2%        3987
+
+                                             ELECTED
+                                                                                                              NT General Election 2012
+                                                                                                               DIVISION OF FONG LIM
+No. enrolled                                          4883
+
+Formal votes                                          3761             (97.0% of total ballot papers)
+Informal ballot papers                                 116             (3.0% of total ballot papers)
+Total ballot papers                                   3877
+
+Turnout - 2012 Final                               79.4%               (Turnout - 2008 Final: 75.9%)
+
+
+                                                      First Preference Votes for each Candidate                              Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                             Ashley              Peter              David               Matt                                                                                                Ashley            David
+
+                                            MARSH              BURNHEIM           TOLLNER           HAUBRICK                                                                                                MARSH            TOLLNER
+
+                                             ALP                 ASX                CLP              GRN              Formal            Informal      Total                                                 ALP               CLP             Total
+Polling Place / Declaration Type            No.          %       No.       %        No.        %        No.      %     No.        %      No.     %      No.   Polling Place / Declaration Type              No.         %     No.        %      No.
+Bayview                                     164       32.2%        6     1.2%       310     60.8%        30    5.9%    510     97.7%      12   2.3%     522   Bayview                                       191      37.5%    319     62.5%     510
+Berrimah (Fong Lim)                          52       18.7%       14     5.0%       206     74.1%         6    2.2%    278     96.9%       9   3.1%     287   Berrimah (Fong Lim)                            63      22.7%    215     77.3%     278
+Ludmilla                                    559       46.2%       41     3.4%       527     43.6%        82    6.8%   1209     96.5%      44   3.5%    1253   Ludmilla                                      652      53.9%    557     46.1%    1209
+Marlow Lagoon                                46       18.1%        3     1.2%       186     73.2%        19    7.5%    254     95.5%      12   4.5%     266   Marlow Lagoon                                  60      23.6%    194     76.4%     254
+Static Polling Place Sub Total              821       36.5%       64     2.8%      1229     54.6%       137    6.1%   2251     96.7%      77   3.3%    2328   Static Polling Place Sub Total                966      42.9%   1285     57.1%    2251
+
+Mobile Polling Team 23.3                       3      75.0%        0                  0                  1 25.0%        4     100.0%       0   0.0%       4   Mobile Polling Team 23.3                        3 75.0%           1 25.0%           4
+Mobile Polling Team Sub Total                  3      75.0%        0                  0                  1 25.0%        4     100.0%       0   0.0%       4   Mobile Polling Team Sub Total                   3 75.0%           1 25.0%           4
+
+Casuarina EVC                                38       46.3%       2      2.4%        40     48.8%        2     2.4%    82      98.8%       1   1.2%      83   Casuarina EVC                                  41      50.0%     41     50.0%      82
+Darwin Airport EVC                            0                   0                   0                  0              0                  0              0   Darwin Airport EVC                              0                 0                 0
+Darwin EVC                                   79       32.6%       7      2.9%       139     57.4%       17     7.0%   242      98.0%       5   2.0%     247   Darwin EVC                                     95      39.3%    147     60.7%     242
+Palmerston EVC                               20       27.8%       2      2.8%        44     61.1%        6     8.3%    72      94.7%       4   5.3%      76   Palmerston EVC                                 26      36.1%     46     63.9%      72
+Early Voting Centre Sub Total               137       34.6%      11      2.8%       223     56.3%       25     6.3%   396      97.5%      10   2.5%     406   Early Voting Centre Sub Total                 162      40.9%    234     59.1%     396
+
+Absent Votes                                 329      36.9%      32      3.6%       463 51.9%            68    7.6%    892     97.0%      28   3.0%     920   Absent Votes                                  399 44.7%         493 55.3%         892
+
+
+Declaration Votes (incl 20 Postal ballot                                                                                                                      Declaration Votes (incl 20 Postal ballot
+                                               3      14.3%        2     9.5%        15 71.4%             1    4.8%     21     95.5%       1   4.5%      22                                                   5 23.8%          16 76.2%          21
+papers)                                                                                                                                                       papers)
+
+
+Early Votes (Other regions) (incl 6 Early                                                                                                                     Early Votes (Other regions) (incl 6 Early
+                                              12      42.9%        1     3.6%        11 39.3%             4 14.3%       28    100.0%       0   0.0%      28                                                  16 57.1%          12 42.9%          28
+Voting Centre ballot papers)                                                                                                                                  Voting Centre ballot papers)
+
+Postal Votes                                  43      25.4%        3     1.8%       109 64.5%            14    8.3%    169    100.0%       0   0.0%     169   Postal Votes                                   56 33.1%         113 66.9%         169
+
+Division Total                              1348      35.8%      113     3.0%      2050 54.5%           250    6.6%   3761     97.0%     116   3.0%    3877   Division Total                                1607 42.7%       2154 57.3%        3761
+
+Distribution of Preferences
+First Preference Votes                      1348      35.8%      113     3.0%      2050 54.5%         250      6.6%   3761
+BURNHEIM excluded.                            31                -113                 40                42                0
+Progressive Total                           1379      36.7%        0     0.0%      2090 55.6%         292      7.8%   3761
+HAUBRICK excluded.                           228                   0                 64              -292                0
+Total                                       1607      42.7%        0     0.0%      2154 57.3%           0      0.0%   3761
+
+                                                                                  ELECTED
+                                                                                                    NT General Election 2012
+                                                                                                     DIVISION OF GOYDER
+No. enrolled                                           5323
+
+Formal votes                                           4391            (96.9% of total ballot papers)
+Informal ballot papers                                  142            (3.1% of total ballot papers)
+Total ballot papers                                    4533
+
+Turnout - 2012 Final                                85.2%              (Turnout - 2008 Final: 83.2%)
+
+
+                                            First Preference Votes for each Candidate                         Ballot Papers Counted                                                            Notional Two Candidate Preferred
+
+                                               Kezia             John              Damien                                                                                                        Kezia           Damien
+
+                                              PURICK           KEARNEY              SMITH                                                                                                       PURICK           SMITH
+
+                                              CLP                                   ALP                 Formal           Informal          Total                                                 CLP             ALP              Total
+Polling Place / Declaration Type              No.          %    No.         %       No.         %      No.           %    No.          %    No.    Polling Place / Declaration Type              No.         %    No.         %     No.
+Bees Creek                                    818      68.5%     47      3.9%       329     27.6%     1194       97.1%     36       2.9%   1230    Bees Creek                                    841     70.4%    353     29.6%    1194
+Humpty Doo                                   1175      57.4%    243     11.9%       630     30.8%     2048       96.2%     80       3.8%   2128    Humpty Doo                                   1301     63.5%    747     36.5%    2048
+Static Polling Place Sub Total               1993      61.5%    290      8.9%       959     29.6%     3242       96.5%    116       3.5%   3358    Static Polling Place Sub Total               2142     66.1%   1100     33.9%    3242
+
+Casuarina EVC                                  29      60.4%      6     12.5%        13     27.1%        48    100.0%       0       0.0%     48    Casuarina EVC                                  32     66.7%    16      33.3%      48
+Darwin Airport EVC                              0                 0                   0                   0                 0                 0    Darwin Airport EVC                              0               0                  0
+Darwin EVC                                     50      61.7%      7      8.6%        24     29.6%        81      97.6%      2       2.4%     83    Darwin EVC                                     54     66.7%    27      33.3%      81
+Palmerston EVC                                196      70.8%     16      5.8%        65     23.5%       277      97.9%      6       2.1%    283    Palmerston EVC                                209     75.5%    68      24.5%     277
+Early Voting Centre Sub Total                 275      67.7%     29      7.1%       102     25.1%       406      98.1%      8       1.9%    414    Early Voting Centre Sub Total                 295     72.7%   111      27.3%     406
+
+Absent Votes                                  284      59.2%     40      8.3%       156     32.5%       480      97.2%     14       2.8%    494    Absent Votes                                  308     64.2%   172      35.8%     480
+
+
+Declaration Votes (incl 22 Postal ballot                                                                                                           Declaration Votes (incl 22 Postal ballot
+                                               22      71.0%      1      3.2%         8     25.8%        31    100.0%       0       0.0%      31                                                  23     74.2%     8      25.8%      31
+papers)                                                                                                                                            papers)
+
+
+Early Votes (Other regions) (incl 9 Early                                                                                                          Early Votes (Other regions) (incl 9 Early
+                                               13      54.2%      3     12.5%         8     33.3%        24      92.3%      2       7.7%      26                                                  14     58.3%    10      41.7%      24
+Voting Centre ballot papers)                                                                                                                       Voting Centre ballot papers)
+
+Postal Votes                                  144      69.2%      6      2.9%        58     27.9%       208      99.0%      2       1.0%    210    Postal Votes                                  147     70.7%    61      29.3%     208
+
+Division Total                               2731      62.2%    369      8.4%      1291     29.4%     4391       96.9%    142       3.1%   4533    Division Total                               2929     66.7%   1462     33.3%    4391
+
+Distribution of Preferences
+First Preference Votes                       2731      62.2%     369     8.4%      1291     29.4%     4391
+KEARNEY excluded.                             198               -369                171                  0
+Total                                        2929      66.7%       0     0.0%      1462     33.3%     4391
+
+                                             ELECTED
+                                                                                                            NT General Election 2012
+                                                                                                        DIVISION OF GREATOREX
+No. enrolled                                        4606
+
+Formal votes                                        3514             (97.3% of total ballot papers)
+Informal ballot papers                                99             (2.7% of total ballot papers)
+Total ballot papers                                 3613
+
+Turnout - 2012 Final                              78.4%              (Turnout - 2008 Final: 76.6%)
+
+
+                                                    First Preference Votes for each Candidate                               Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                            Rowan             Evelyne              Phil               Matt                                                                                                 Rowan            Matt
+
+                                           FOLEY             ROULLET            WALCOTT           CONLAN                                                                                                   FOLEY           CONLAN
+
+                                            ALP               GRN                 IND                 CLP             Formal           Informal       Total                                                ALP              CLP            Total
+Polling Place / Declaration Type           No.         %       No.       %        No.        %     No.          %     No.         %     No.     %      No.    Polling Place / Declaration Type             No.        %     No.       %      No.
+Pioneer Park (Greatorex)                    23      12.6%       12     6.6%        17      9.3%    131       71.6%    183      98.4%      3   1.6%     186    Pioneer Park (Greatorex)                      37     20.2%    146    79.8%     183
+Sadadeen                                   374      19.3%      228    11.8%       315     16.3%   1020       52.7%   1937      97.5%     49   2.5%    1986    Sadadeen                                     768     39.6%   1169    60.4%    1937
+Static Polling Place Sub Total             397      18.7%      240    11.3%       332     15.7%   1151       54.3%   2120      97.6%     52   2.4%    2172    Static Polling Place Sub Total               805     38.0%   1315    62.0%    2120
+
+Mobile Polling Team 18.2                     6      75.0%        0                  0                  2     25.0%      8      88.9%      1   11.1%      9    Mobile Polling Team 18.2                       6     75.0%      2    25.0%       8
+Mobile Polling Team Sub Total                6      75.0%        0                  0                  2     25.0%      8      88.9%      1   11.1%      9    Mobile Polling Team Sub Total                  6     75.0%      2    25.0%       8
+
+Alice Springs Airport EVC                    5      20.0%        4    16.0%         3     12.0%        13    52.0%     25      96.2%      1   3.8%      26    Alice Springs Airport EVC                     10     40.0%     15    60.0%      25
+Alice Springs EVC                          166      18.1%       59     6.4%       116     12.6%       577    62.9%    918      96.3%     35   3.7%     953    Alice Springs EVC                            261     28.4%    657    71.6%     918
+Early Voting Centre Sub Total              171      18.1%       63     6.7%       119     12.6%       590    62.6%    943      96.3%     36   3.7%     979    Early Voting Centre Sub Total                271     28.7%    672    71.3%     943
+
+Absent Votes                                73      22.8%       26      8.1%       50     15.6%       171    53.4%    320      97.3%      9   2.7%     329    Absent Votes                                 115     35.9%    205    64.1%     320
+
+
+Declaration Votes (incl 26 Postal ballot                                                                                                                      Declaration Votes (incl 26 Postal ballot
+                                              9     34.6%        2      7.7%        3     11.5%        12    46.2%     26    100.0%       0   0.0%      26                                                  13     50.0%     13    50.0%      26
+papers)                                                                                                                                                       papers)
+
+
+Early Votes (Other regions)                  8      21.6%        5    13.5%         2     5.4%        22     59.5%     37      97.4%      1   2.6%      38    Early Votes (Other regions)                   13     35.1%     24    64.9%      37
+
+Postal Votes                                 9      15.0%        2      3.3%        6     10.0%       43     71.7%     60    100.0%       0   0.0%      60    Postal Votes                                  13     21.7%     47    78.3%      60
+
+Division Total                             673      19.2%      338      9.6%      512     14.6%   1991       56.7%   3514      97.3%     99   2.7%    3613    Division Total                              1236     35.2%   2278    64.8%    3514
+
+Distribution of Preferences
+First Preference Votes                      673     19.2%      338      9.6%      512     14.6%   1991       56.7%   3514
+ROULLET excluded.                           183               -338                125               30                  0
+Progressive Total                           856     24.4%        0      0.0%      637     18.1%   2021       57.5%   3514
+WALCOTT excluded.                           380                  0               -637              257                  0
+Total                                      1236     35.2%        0      0.0%        0     0.0%    2278       64.8%   3514
+
+                                                                                                  ELECTED
+                                                                                                                   NT General Election 2012
+                                                                                                                   DIVISION OF JOHNSTON
+No. enrolled                                       4879
+
+Formal votes                                       3998             (96.2% of total ballot papers)
+Informal ballot papers                              160             (3.8% of total ballot papers)
+Total ballot papers                                4158
+
+Turnout - 2012 Final                             85.2%              (Turnout - 2008 Final: 82.5%)
+
+
+                                                          First Preference Votes for each Candidate                                        Ballot Papers Counted                                                       Notional Two Candidate Preferred
+
+                                           Peter             Krystal              Alana               Jo              Ken                                                                                                 Jo            Ken
+
+                                           BUSSA           METCALF            PARROTT-JOLLY      SANGSTER            VOWLES                                                                                            SANGSTER        VOWLES
+
+                                                             ASX                  GRN                CLP              ALP            Formal           Informal      Total                                                CLP            ALP           Total
+Polling Place / Declaration Type           No.        %      No.          %       No.        %     No.     %          No.     %      No.          %    No.      %    No.    Polling Place / Declaration Type             No.    %       No.    %        No.
+Millner                                     30     2.0%       54       3.6%       146     9.7%     570 37.8%          706 46.9%     1506      96.0%     62   4.0%   1568    Millner                                      648 43.0%      858 57.0%      1506
+Moil                                        27     1.9%       53       3.8%       137     9.8%     543 39.0%          634 45.5%     1394      96.2%     55   3.8%   1449    Moil                                         602 43.2%      792 56.8%      1394
+Static Polling Place Sub Total              57     2.0%      107       3.7%       283     9.8%    1113 38.4%         1340 46.2%     2900      96.1%    117   3.9%   3017    Static Polling Place Sub Total              1250 43.1%     1650 56.9%      2900
+
+Casuarina EVC                                4     1.7%        8       3.4%        13 5.5%           118   49.8%       94   39.7%   237      98.3%       4   1.7%    241    Casuarina EVC                                133   56.1%    104   43.9%     237
+Darwin Airport EVC                           0                 0                    2 15.4%            8   61.5%        3   23.1%    13     100.0%       0   0.0%     13    Darwin Airport EVC                            10   76.9%      3   23.1%      13
+Darwin EVC                                   3     1.9%        6       3.7%        19 11.7%           63   38.9%       71   43.8%   162      98.2%       3   1.8%    165    Darwin EVC                                    70   43.2%     92   56.8%     162
+Palmerston EVC                               1     6.7%        0                    1 6.7%             8   53.3%        5   33.3%    15     100.0%       0   0.0%     15    Palmerston EVC                                 9   60.0%      6   40.0%      15
+Early Voting Centre Sub Total                8     1.9%       14       3.3%        35 8.2%           197   46.1%      173   40.5%   427      98.4%       7   1.6%    434    Early Voting Centre Sub Total                222   52.0%    205   48.0%     427
+
+Absent Votes                                21     4.3%       39       7.9%        55 11.1%          158 32.0%        221 44.7%      494      95.0%     26   5.0%    520    Absent Votes                                 208 42.1%      286 57.9%       494
+
+
+Declaration Votes (incl 23 Postal ballot                                                                                                                                    Declaration Votes (incl 23 Postal ballot
+                                             1     3.2%         0      0.0%         3     9.7%        11 35.5%         16 51.6%       31      93.9%      2   6.1%      33                                                 12 38.7%       19 61.3%         31
+papers)                                                                                                                                                                     papers)
+
+Early Votes (Other regions)                  0     0.0%         1      6.3%         2 12.5%            6 37.5%          7 43.8%       16    100.0%       0   0.0%      16   Early Votes (Other regions)                    7 43.8%        9 56.3%         16
+
+Postal Votes                                 2     1.5%         8      6.2%        11     8.5%       67 51.5%          42 32.3%      130      94.2%      8   5.8%    138    Postal Votes                                  75 57.7%       55 42.3%       130
+
+Division Total                              89     2.2%      169       4.2%       389     9.7%    1552 38.8%         1799 45.0%     3998      96.2%    160   3.8%   4158    Division Total                              1774 44.4%     2224 55.6%      3998
+
+Distribution of Preferences
+First Preference Votes                      89     2.2%      169       4.2%       389 9.7%        1552     38.8%     1799   45.0%   3998
+BUSSA excluded.                            -89                35                   17               20                 17              0
+Progressive Total                            0     0.0%      204       5.1%       406 10.2%       1572     39.3%     1816   45.4%   3998
+METCALF excluded.                            0              -204                  106               46                 52              0
+Progressive Total                            0     0.0%        0       0.0%       512 12.8%       1618     40.5%     1868   46.7%   3998
+PARROTT-JOLLY excluded.                      0                 0                 -512              155                357              0
+Total                                        0     0.0%        0       0.0%         0 0.0%        1773     44.3%     2225   55.7%   3998
+
+                                                                                                                    ELECTED
+                                                                                                   NT General Election 2012
+                                                                                                    DIVISION OF KARAMA
+No. enrolled                                           4713
+
+Formal votes                                           3935           (96.4% of total ballot papers)
+Informal ballot papers                                  145           (3.6% of total ballot papers)
+Total ballot papers                                    4080
+
+Turnout - 2012 Final                                86.6%             (Turnout - 2008 Final: 84.0%)
+
+
+                                            First Preference Votes for each Candidate                        Ballot Papers Counted                                                             Notional Two Candidate Preferred
+
+                                               Delia           Rohan              Frances                                                                                                         Delia           Rohan
+
+                                              LAWRIE           KELLY             ELCOATE                                                                                                        LAWRIE            KELLY
+
+                                              ALP              CLP                 GRN                 Formal            Informal          Total                                                 ALP              CLP             Total
+Polling Place / Declaration Type              No.          %    No.        %       No.         %      No.           %     No.          %    No.    Polling Place / Declaration Type              No.          %    No.        %     No.
+Karama                                       1169      52.9%    924    41.8%       116      5.3%     2209       96.5%      80       3.5%   2289    Karama                                       1251      56.6%    958    43.4%    2209
+Manunda Terrace                               470      57.9%    292    36.0%        50      6.2%      812       95.0%      43       5.0%    855    Manunda Terrace                               501      61.7%    311    38.3%     812
+Static Polling Place Sub Total               1639      54.3%   1216    40.3%       166      5.5%     3021       96.1%     123       3.9%   3144    Static Polling Place Sub Total               1752      58.0%   1269    42.0%    3021
+
+Casuarina EVC                                 124      46.4%   132     49.4%        11      4.1%       267      98.2%       5       1.8%    272    Casuarina EVC                                 133      49.8%   134     50.2%     267
+Darwin Airport EVC                              0                0                   0                   0                  0                 0    Darwin Airport EVC                              0                0                 0
+Darwin EVC                                     39      37.5%    60     57.7%         5    4.8%         104       96.3%      4       3.7%    108    Darwin EVC                                     41      39.4%    63     60.6%     104
+Palmerston EVC                                  5      41.7%     5     41.7%         2   16.7%          12      100.0%      0       0.0%     12    Palmerston EVC                                  6      50.0%     6     50.0%      12
+Early Voting Centre Sub Total                 168      43.9%   197     51.4%        18    4.7%         383       97.7%      9       2.3%    392    Early Voting Centre Sub Total                 180      47.0%   203     53.0%     383
+
+Absent Votes                                  191      55.5%   126     36.6%        27      7.8%       344      97.2%      10       2.8%    354    Absent Votes                                  205      59.6%   139     40.4%     344
+
+
+Declaration Votes (incl 12 Postal ballot                                                                                                           Declaration Votes (incl 12 Postal ballot
+                                                8      38.1%    10     47.6%         3   14.3%         21       95.5%       1       4.5%      22                                                  10      47.6%    11     52.4%      21
+papers)                                                                                                                                            papers)
+
+
+Early Votes (Other regions) (incl 8 Early                                                                                                          Early Votes (Other regions) (incl 8 Early
+                                               10      41.7%    10     41.7%         4   16.7%         24       100.0%      0       0.0%      24                                                  12      50.0%    12     50.0%      24
+Voting Centre ballot papers)                                                                                                                       Voting Centre ballot papers)
+
+Postal Votes                                   56      39.4%    75     52.8%        11      7.7%       142      98.6%       2       1.4%    144    Postal Votes                                   60      42.3%    82     57.7%     142
+
+Division Total                               2072      52.7%   1634    41.5%       229      5.8%     3935       96.4%     145       3.6%   4080    Division Total                               2219      56.4%   1716    43.6%    3935
+
+Distribution of Preferences
+First Preference Votes                       2072      52.7%   1634    41.5%       229      5.8%     3935
+ELCOATE excluded.                             147                82               -229                  0
+Total                                        2219      56.4%   1716    43.6%         0      0.0%     3935
+
+                                             ELECTED
+                                                                                                     NT General Election 2012
+                                                                                                     DIVISION OF KATHERINE
+No. enrolled                                          5174
+
+Formal votes                                          4130             (98.2% of total ballot papers)
+Informal ballot papers                                  77             (1.8% of total ballot papers)
+Total ballot papers                                   4207
+
+Turnout - 2012 Final                               81.3%               (Turnout - 2008 Final: 75.8%)
+
+
+                                           First Preference Votes for each Candidate                          Ballot Papers Counted                                                           Notional Two Candidate Preferred
+
+                                             Cerise             Willem              Teresa                                                                                                      Cerise             Willem
+                                                              WESTRA VAN                                                                                                                                         WESTRA VAN
+                                              KING                                CUMMINGS                                                                                                      KING
+                                                                HOLTHE                                                                                                                                             HOLTHE
+                                             ALP                CLP                 IND                 Formal           Informal          Total                                                ALP                CLP              Total
+Polling Place / Declaration Type             No.          %      No.         %      No.          %      No.          %    No.          %    No.    Polling Place / Declaration Type             No.          %      No.         %     No.
+Katherine                                    226      19.6%      770     66.7%      158      13.7%     1154      97.9%     25       2.1%   1179    Katherine                                    317      27.5%      837     72.5%    1154
+Katherine East                               176      23.1%      497     65.2%       89      11.7%      762      98.8%      9       1.2%    771    Katherine East                               214      28.1%      548     71.9%     762
+Tindal                                        19       7.3%      207     79.6%       34      13.1%      260      94.5%     15       5.5%    275    Tindal                                        34      13.1%      226     86.9%     260
+Static Polling Place Sub Total               421      19.3%     1474     67.7%      281      12.9%     2176      97.8%     49       2.2%   2225    Static Polling Place Sub Total               565      26.0%     1611     74.0%    2176
+
+Mobile Polling Team 08.1                      29      29.9%      31      32.0%       37      38.1%      97       97.0%      3       3.0%    100    Mobile Polling Team 08.1                      59      60.8%      38      39.2%      97
+Mobile Polling Team Sub Total                 29      29.9%      31      32.0%       37      38.1%      97       97.0%      3       3.0%    100    Mobile Polling Team Sub Total                 59      60.8%      38      39.2%      97
+
+Katherine EVC                                295      20.5%      964     67.1%      177      12.3%     1436      99.0%     15       1.0%   1451    Katherine EVC                                379      26.4%     1057     73.6%    1436
+Early Voting Centre Sub Total                295      20.5%      964     67.1%      177      12.3%     1436      99.0%     15       1.0%   1451    Early Voting Centre Sub Total                379      26.4%     1057     73.6%    1436
+
+Absent Votes                                  84      40.8%      100     48.5%       22      10.7%      206      97.6%      5       2.4%    211    Absent Votes                                 101      49.0%      105     51.0%     206
+
+
+Declaration Votes (incl 15 Postal ballot                                                                                                           Declaration Votes (incl 15 Postal ballot
+                                               5      14.3%       28     80.0%        2      5.7%        35    100.0%       0       0.0%      35                                                  6      17.1%       29     82.9%      35
+papers)                                                                                                                                            papers)
+
+Early Votes (Other regions)                   10      31.3%       20     62.5%        2      6.3%        32    100.0%       0       0.0%      32   Early Votes (Other regions)                   11      34.4%       21     65.6%      32
+
+Postal Votes                                  20      13.5%      112     75.7%       16      10.8%      148      96.7%      5       3.3%    153    Postal Votes                                  25      16.9%      123     83.1%     148
+
+Division Total                               864      20.9%     2729     66.1%      537      13.0%     4130      98.2%     77       1.8%   4207    Division Total                              1146      27.7%     2984     72.3%    4130
+
+Distribution of Preferences
+First Preference Votes                       864      20.9%     2729     66.1%      537      13.0%     4130
+CUMMINGS excluded.                           282                 255               -537                   0
+Total                                       1146      27.7%     2984     72.3%        0      0.0%      4130
+
+                                                               ELECTED
+                                                                                                    NT General Election 2012
+                                                                                                    DIVISION OF NAMATJIRA
+No. enrolled                                          5127
+
+Formal votes                                          2924             (95.3% of total ballot papers)
+Informal ballot papers                                 143             (4.7% of total ballot papers)
+Total ballot papers                                   3067
+
+Turnout - 2012 Final                                 59.8%             (Turnout - 2008 Final: N/A)
+
+
+                                            First Preference Votes for each Candidate                          Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                               Des               Alison             Warren                                                                                                     Des             Alison
+
+                                             ROGERS            ANDERSON           WILLIAMS                                                                                                   ROGERS          ANDERSON
+
+                                               ALP               CLP               FNPP                  Formal           Informal      Total                                                 ALP              CLP              Total
+Polling Place / Declaration Type              No.       %        No.         %      No.    %            No.          %     No.    %      No.    Polling Place / Declaration Type              No.        %     No.         %      No.
+Hermannsburg                                   27    17.6%        82      53.6%      44 28.8%           153       98.1%      3 1.9%      156    Hermannsburg                                   39    25.5%     114      74.5%     153
+Papunya                                        22    18.5%        95      79.8%       2 1.7%            119       93.7%      8 6.3%      127    Papunya                                        22    18.5%      97      81.5%     119
+Yulara                                        104    55.3%        71      37.8%      13 6.9%            188       88.3%     25 11.7%     213    Yulara                                        112    59.6%      76      40.4%     188
+Static Polling Place Sub Total                153    33.3%       248      53.9%      59 12.8%           460       92.7%     36 7.3%      496    Static Polling Place Sub Total                173    37.6%     287      62.4%     460
+
+Mobile Polling Team 11.0                      160    38.5%       233      56.0%      23      5.5%        416      96.7%     14   3.3%    430    Mobile Polling Team 11.0                      164    39.4%     252      60.6%     416
+Mobile Polling Team 12.0                      189    21.3%       652      73.6%      45      5.1%        886      95.6%     41   4.4%    927    Mobile Polling Team 12.0                      207    23.4%     679      76.6%     886
+Mobile Polling Team 19.1                       57    25.2%       153      67.7%      16      7.1%        226      96.6%      8   3.4%    234    Mobile Polling Team 19.1                       61    27.0%     165      73.0%     226
+Mobile Polling Team 20.1                       36    27.5%        90      68.7%       5      3.8%        131      94.9%      7   5.1%    138    Mobile Polling Team 20.1                       37    28.2%      94      71.8%     131
+Mobile Polling Team Sub Total                 442    26.6%      1128      68.0%      89      5.4%       1659      96.0%     70   4.0%   1729    Mobile Polling Team Sub Total                 469    28.3%    1190      71.7%    1659
+
+Alice Springs Airport EVC                       0                  0                  0                    0                 0             0    Alice Springs Airport EVC                       0                0                  0
+Alice Springs EVC                             131    30.8%       259 60.8%           36      8.5%        426      95.3%     21   4.7%    447    Alice Springs EVC                             149 35.0%        277 65.0%          426
+Early Voting Centre Sub Total                 131    30.8%       259 60.8%           36      8.5%        426      95.3%     21   4.7%    447    Early Voting Centre Sub Total                 149 35.0%        277 65.0%          426
+
+Absent Votes                                   78    32.9%       105 44.3%           54 22.8%            237      94.8%     13   5.2%    250    Absent Votes                                  102 43.0%        135 57.0%          237
+
+Declaration Votes (incl 17 Postal ballot                                                                                                        Declaration Votes (incl 17 Postal ballot
+                                                5    17.9%        18 64.3%            5 17.9%            28       96.6%      1   3.4%     29                                                    5 17.9%         23 82.1%           28
+papers)                                                                                                                                         papers)
+
+
+Early Votes (Other regions) (incl 3 Early                                                                                                       Early Votes (Other regions) (incl 3 Early
+                                                4    36.4%         3 27.3%            4 36.4%            11     100.0%       0   0.0%     11                                                    6 54.5%          5 45.5%           11
+Voting Centre ballot papers)                                                                                                                    Voting Centre ballot papers)
+
+Postal Votes                                   11    10.7%        86 83.5%            6      5.8%       103       98.1%      2   1.9%    105    Postal Votes                                   14 13.6%         89 86.4%          103
+
+Division Total                                824    28.2%      1847 63.2%          253      8.7%       2924      95.3%    143   4.7%   3067    Division Total                                918 31.4%       2006 68.6%         2924
+
+Distribution of Preferences
+First Preference Votes                        824    28.2%      1847 63.2%           253     8.7%       2924
+WILLIAMS excluded.                             94                159                -253                   0
+Total                                         918    31.4%      2006 68.6%             0     0.0%       2924
+
+                                                             ELECTED
+                                                                                                                           NT General Election 2012
+                                                                                                                               DIVISION OF NELSON
+No. enrolled                                           4715
+
+Formal votes                                           3679           (98.1% of total ballot papers)
+Informal ballot papers                                   72           (1.9% of total ballot papers)
+Total ballot papers                                    3751
+
+Turnout - 2012 Final                                 79.6%            (Turnout - 2008 Final: 74.6%)
+
+
+                                            First Preference Votes for each Candidate                        Ballot Papers Counted                                                        Notional Two Candidate Preferred             Notional Two Party Preferred
+
+                                              Sharon            Gerry               Judy                                                                                                    Gerry            Judy                     Sharon              Judy
+
+                                             MCALEAR            WOOD               COLE                                                                                                     WOOD            COLE                     McALEAR             COLE
+
+                                               ALP              IND                CLP                 Formal           Informal      Total                                                 IND             CLP             Total     ALP                CLP             Total
+Polling Place / Declaration Type              No.         %     No.         %      No.         %    No.             %    No.      %    No.    Polling Place / Declaration Type              No.         %   No.         %     No.    No.           %    No.          %     No.
+Berrimah (Nelson)                              20      9.1%      78     35.6%      121     55.3%    219         97.3%      6   2.7%    225    Berrimah (Nelson)                              89     40.6%   130     59.4%     219     58       26.5%    161      73.5%     219
+Girraween                                      21      4.2%     309     61.9%      169     33.9%    499         99.2%      4   0.8%    503    Girraween                                     326     65.3%   173     34.7%     499    166       33.3%    333      66.7%     499
+Howard Springs                                111      6.7%    1041     62.1%      522     31.2%   1674         97.9%     36   2.1%   1710    Howard Springs                               1128     67.3%   547     32.7%    1675    622       37.1%   1053      62.9%    1675
+Static Polling Place Sub Total                152      6.4%    1428     59.7%      812     33.9%   2392         98.1%     46   1.9%   2438    Static Polling Place Sub Total               1543     64.5%   850     35.5%    2393    846       35.4%   1547      64.6%    2393
+
+Mobile Polling Team 24.0                       10      5.7%      37 21.3%          127 73.0%           174      98.3%      3   1.7%    177    Mobile Polling Team 24.0                       44 25.3%       130 74.7%         174     21       12.1%    153      87.9%     174
+Mobile Polling Team Sub Total                  10      5.7%      37 21.3%          127 73.0%           174      98.3%      3   1.7%    177    Mobile Polling Team Sub Total                  44 25.3%       130 74.7%         174     21       12.1%    153      87.9%     174
+
+Casuarina EVC                                  10      26.3%     16     42.1%       12     31.6%        38    100.0%       0   0.0%     38    Casuarina EVC                                  22     57.9%    16     42.1%      38     19       50.0%     19      50.0%      38
+Darwin Airport EVC                              0                 0                  0                   0                 0             0    Darwin Airport EVC                              0               0                 0      0                  0                  0
+Darwin EVC                                      1      1.1%      47     50.5%       45     48.4%        93      98.9%      1   1.1%     94    Darwin EVC                                     48     51.6%    45     48.4%      93     22       23.7%     71      76.3%      93
+Palmerston EVC                                 14      5.2%     150     55.8%      105     39.0%       269      97.5%      7   2.5%    276    Palmerston EVC                                161     59.9%   108     40.1%     269     91       33.8%    178      66.2%     269
+Early Voting Centre Sub Total                  25      6.3%     213     53.3%      162     40.5%       400      98.0%      8   2.0%    408    Early Voting Centre Sub Total                 231     57.8%   169     42.3%     400    132       33.0%    268      67.0%     400
+
+Absent Votes                                   59      11.4%    204 39.5%          254 49.1%           517      98.7%      7   1.3%    524    Absent Votes                                  247 47.8%       270 52.2%         517    152       29.4%    365      70.6%     517
+
+
+Declaration Votes (incl 15 Postal ballot                                                                                                      Declaration Votes (incl 15 Postal ballot
+                                                2      10.0%     10 50.0%            8 40.0%            20      95.2%      1   4.8%     21                                                   12 60.0%         8 40.0%          20      8       40.0%     12      60.0%      20
+papers)                                                                                                                                       papers)
+
+
+Early Votes (Other regions) (incl 3 Early                                                                                                     Early Votes (Other regions) (incl 3 Early
+                                                2      10.5%     12 63.2%            5 26.3%            19      95.0%      1   5.0%     20                                                   13 68.4%         6 31.6%          19      5       26.3%     14      73.7%      19
+Voting Centre ballot papers)                                                                                                                  Voting Centre ballot papers)
+
+Postal Votes                                    5      3.2%      84 53.5%           68 43.3%           157      96.3%      6   3.7%    163    Postal Votes                                   87 55.4%        70 44.6%         157     39       24.8%    118      75.2%     157
+
+Division Total                                255      7.0%    1988 54.0%         1436 39.0%       3679         98.1%     72   1.9%   3751    Division Total                               2177 59.2%       1503 40.8%       3680   1203       32.7%   2477      67.3%    3680
+
+Distribution of Preferences
+First Preference Votes                         255     6.9%    1988 54.0%         1436 39.0%       3679
+McALEAR excluded.                             -255              189                 66                0
+Total                                            0     0.0%    2177 59.2%         1502 40.8%       3679
+
+                                                               ELECTED
+                                                                                                   NT General Election 2012
+                                                                                                   DIVISION OF NHULUNBUY
+No. enrolled                                          4719
+
+Formal votes                                          2824            (95.4% of total ballot papers)
+Informal ballot papers                                 136            (4.6% of total ballot papers)
+Total ballot papers                                   2960
+
+Turnout - 2012 Final                               62.7%              (Turnout - 2008 Final: 59.8%)
+
+
+                                           First Preference Votes for each Candidate                         Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                              Allen            Kendall             Lynne                                                                                                     Allen            Lynne
+
+                                            FANNING           TRUDGEN             WALKER                                                                                                   FANNING           WALKER
+
+                                             CLP               IND                 ALP                 Formal           Informal       Total                                                CLP               ALP             Total
+Polling Place / Declaration Type             No.         %     No.          %      No.        %       No.          %     No.     %      No.    Polling Place / Declaration Type             No.         %     No.        %      No.
+Galiwinku                                     20       4.7%    250       58.3%     159     37.1%      429       92.7%     34   7.3%     463    Galiwinku                                     92      21.4%    337     78.6%     429
+Nhulunbuy                                    304      28.2%    108       10.0%     667     61.8%     1079       97.8%     24   2.2%    1103    Nhulunbuy                                    352      32.6%    727     67.4%    1079
+Yirrkala                                      77      23.7%     85       26.2%     163     50.2%      325       94.8%     18   5.2%     343    Yirrkala                                     124      38.2%    201     61.8%     325
+Static Polling Place Sub Total               401      21.9%    443       24.2%     989     54.0%     1833       96.0%     76   4.0%    1909    Static Polling Place Sub Total               568      31.0%   1265     69.0%    1833
+
+Mobile Polling Team 13.0                      57      17.0%     79       23.5%     200     59.5%       336      89.4%     40   10.6%    376    Mobile Polling Team 13.0                      83      24.7%    253     75.3%     336
+Mobile Polling Team 14.0                       1       3.4%     27       93.1%       1      3.4%        29      96.7%      1    3.3%     30    Mobile Polling Team 14.0                      10      34.5%     19     65.5%      29
+Mobile Polling Team Sub Total                 58      15.9%    106       29.0%     201     55.1%       365      89.9%     41   10.1%    406    Mobile Polling Team Sub Total                 93      25.5%    272     74.5%     365
+
+Nhulunbuy EVC                                107      31.8%     19       5.6%      211     62.6%       337      98.8%      4   1.2%     341    Nhulunbuy EVC                                114      33.8%    223     66.2%     337
+Early Voting Centre Sub Total                107      31.8%     19       5.6%      211     62.6%       337      98.8%      4   1.2%     341    Early Voting Centre Sub Total                114      33.8%    223     66.2%     337
+
+Absent Votes                                  34      23.0%     32       21.6%      82     55.4%       148      93.1%     11   6.9%     159    Absent Votes                                  46      31.1%    102     68.9%     148
+
+
+Declaration Votes (incl 15 Postal ballot                                                                                                       Declaration Votes (incl 15 Postal ballot
+                                               9      29.0%     10       32.3%      12     38.7%        31      91.2%      3   8.8%      34                                                  15      48.4%     16     51.6%      31
+papers)                                                                                                                                        papers)
+
+
+Early Votes (Other regions)                    8      26.7%       4      13.3%      18     60.0%        30      96.8%      1   3.2%      31    Early Votes (Other regions)                     8     26.7%     22     73.3%      30
+
+Postal Votes                                  24      30.0%     15       18.8%      41     51.3%        80    100.0%       0   0.0%      80    Postal Votes                                  32      40.0%     48     60.0%      80
+
+Division Total                               641      22.7%    629       22.3%    1554     55.0%     2824       95.4%    136   4.6%    2960    Division Total                               876      31.0%   1948     69.0%    2824
+
+Total After Amalgamation                     641      22.7%    629       22.3%    1554     55.0%     2824       95.4%    136   4.6%    2960
+
+Distribution of Preferences
+First Preference Votes                       641      22.7%     629      22.3%    1554     55.0%     2824
+TRUDGEN excluded.                            235               -629                394                  0
+Total                                        876      31.0%       0      0.0%     1948     69.0%     2824
+
+                                                                                 ELECTED
+                                                                                                                                         NT General Election 2012
+                                                                                                                                         DIVISION OF NIGHTCLIFF
+No. enrolled                                          4797
+
+Formal votes                                          3894           (96.7% of total ballot papers)
+Informal ballot papers                                 131           (3.3% of total ballot papers)
+Total ballot papers                                   4025
+
+Turnout - 2012 Final                                83.9%            (Turnout - 2008 Final: 78.8%)
+
+
+                                                                                  First Preference Votes for each Candidate                                                          Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                            Natasha             Owen                 Stuart           Andrew           Felicity             Peter              Kim                                                                                                 Natasha              Kim
+
+                                            FYLES              GALE                 BLANCH            ARTHUR          WARDLE               RUDGE            LOVEDAY                                                                                                 FYLES            LOVEDAY
+
+                                             ALP               GRN                   IND               IND             ASX                  IND               CLP              Formal            Informal      Total                                                ALP                CLP             Total
+Polling Place / Declaration Type            No.           %   No.           %       No.           %    No.        %    No.           %    No.          %    No.           %    No.          %     No.      %    No.    Polling Place / Declaration Type            No.           %    No.          %     No.
+Nightcliff                                 1029       35.6%   188        6.5%       573       19.8%     12     0.4%     57        2.0%    128       4.4%    902       31.2%   2889      96.6%     103   3.4%   2992    Nightcliff                                 1733       60.0%   1155      40.0%    2888
+Static Polling Place Sub Total             1029       35.6%   188        6.5%       573       19.8%     12     0.4%     57        2.0%    128       4.4%    902       31.2%   2889      96.6%     103   3.4%   2992    Static Polling Place Sub Total             1733       60.0%   1155      40.0%    2888
+
+Mobile Polling Team 23.4                     0                  1       50.0%         0                 0                 0                 1       50.0%      0                 2      100.0%      0   0.0%      2    Mobile Polling Team 23.4                     0        0.0%      2      100.0%       2
+Mobile Polling Team Sub Total                0                  1       50.0%         0                 0                 0                 1       50.0%      0                 2      100.0%      0   0.0%      2    Mobile Polling Team Sub Total                0        0.0%      2      100.0%       2
+
+Casuarina EVC                                69       38.1%    10        5.5%        29       16.0%     0                 3       1.7%     11       6.1%      59      32.6%    181       97.3%      5   2.7%    186    Casuarina EVC                               105       58.0%     76      42.0%     181
+Darwin Airport EVC                            6       37.5%     2       12.5%         2       12.5%     0                 1       6.3%      0                  5      31.3%     16      100.0%      0   0.0%     16    Darwin Airport EVC                           11       68.8%      5      31.3%      16
+Darwin EVC                                   57       35.0%     9        5.5%        27       16.6%     1      0.6%       1       0.6%      4       2.5%      64      39.3%    163       98.8%      2   1.2%    165    Darwin EVC                                   93       57.1%     70      42.9%     163
+Palmerston EVC                                6       50.0%     0                     2       16.7%     0                 0                 0                  4      33.3%     12      100.0%      0   0.0%     12    Palmerston EVC                                8       66.7%      4      33.3%      12
+Early Voting Centre Sub Total               138       37.1%    21        5.6%        60       16.1%     1      0.3%       5       1.3%     15       4.0%     132      35.5%    372       98.2%      7   1.8%    379    Early Voting Centre Sub Total               217       58.3%    155      41.7%     372
+
+Absent Votes                                143       35.5%    41       10.2%        51       12.7%     2      0.5%     10        2.5%     16       4.0%     140      34.7%    403      95.5%      19   4.5%    422    Absent Votes                                230       57.1%    173      42.9%     403
+
+
+Declaration Votes (incl 13 Postal ballot                                                                                                                                                                               Declaration Votes (incl 13 Postal ballot
+                                              8       47.1%     3       17.6%         0       0.0%      0      0.0%       0       0.0%      0       0.0%       6      35.3%     17      100.0%      0   0.0%     17                                                 11       64.7%      6      35.3%      17
+papers)                                                                                                                                                                                                                papers)
+
+Early Votes (Other regions)                  10       43.5%     0        0.0%         0       0.0%      0      0.0%       0       0.0%      4       17.4%      9      39.1%     23      100.0%      0   0.0%     23    Early Votes (Other regions)                  14       60.9%      9      39.1%      23
+
+Postal Votes                                 61       32.4%     9        4.8%        38       20.2%     1      0.5%       2       1.1%      6       3.2%      71      37.8%    188      98.9%       2   1.1%    190    Postal Votes                                 96       51.1%     92      48.9%     188
+
+Division Total                             1389       35.7%   263        6.8%       722       18.5%    16      0.4%     74        1.9%    170       4.3%    1260      32.4%   3894      96.7%     131   3.3%   4025    Division Total                             2301       59.1%   1592      40.9%    3893
+
+Distribution of Preferences
+First Preference Votes                     1389       35.7%    263       6.8%       722       18.5%     16     0.4%     74        1.9%     170      4.4%    1260      32.4%   3894
+ARTHUR excluded.                              2                  7                    1                -16               2                   4                 0                 0
+Progressive Total                          1391       35.7%    270       6.9%       723       18.6%      0     0.0%     76        2.0%     174      4.5%    1260      32.4%   3894
+WARDLE excluded.                             10                 14                   26                  0             -76                  12                14                 0
+Progressive Total                          1401       36.0%    284       7.3%       749       19.2%      0     0.0%      0        0.0%     186      4.8%    1274      32.7%   3894
+RUDGE excluded.                              34                 35                   78                  0               0                -186                39                 0
+Progressive Total                          1435       36.9%    319       8.2%       827       21.2%      0     0.0%      0        0.0%       0      0.0%    1313      33.7%   3894
+GALE excluded.                              131               -319                  169                  0               0                   0                19                 0
+Progressive Total                          1566       40.2%      0       0.0%       996       25.6%      0     0.0%      0        0.0%       0      0.0%    1332      34.2%   3894
+BLANCH excluded.                            738                  0                 -996                  0               0                   0               258                 0
+Total                                      2304       59.2%      0       0.0%         0       0.0%       0     0.0%      0        0.0%       0      0.0%    1590      40.8%   3894
+
+                                           ELECTED
+                                                                                                                NT General Election 2012
+                                                                                                             DIVISION OF PORT DARWIN
+No. enrolled                                        4730
+
+Formal votes                                        3646             (97.4% of total ballot papers)
+Informal ballot papers                                96             (2.6% of total ballot papers)
+Total ballot papers                                 3742
+
+Turnout - 2012 Final                              79.1%              (Turnout - 2008 Final: 72.4%)
+
+
+                                                      First Preference Votes for each Candidate                                Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                           Rowena               John                David                Alan                                                                                                  John               Alan
+
+                                           LEUNIG             ELFERINK            ANDREWS              JAMES                                                                                                ELFERINK            JAMES
+
+                                            ASX                 CLP                 GRN                 ALP              Formal           Informal       Total                                                CLP                ALP             Total
+Polling Place / Declaration Type           No.         %       No.         %        No.        %       No.          %    No.          %     No.      %    No.    Polling Place / Declaration Type            No.           %    No.          %     No.
+Darwin City                                 69      5.6%       623     50.7%         93     7.6%       444      36.1%   1229      97.9%      26   2.1%   1255    Darwin City                                 674       54.8%    555      45.2%    1229
+Larrakeyah                                  46      4.3%       622     57.8%         59     5.5%       349      32.4%   1076      96.8%      35   3.2%   1111    Larrakeyah                                  663       61.6%    413      38.4%    1076
+Static Polling Place Sub Total             115      5.0%      1245     54.0%        152     6.6%       793      34.4%   2305      97.4%      61   2.6%   2366    Static Polling Place Sub Total             1337       58.0%    968      42.0%    2305
+
+Mobile Polling Team 23.5                     2      14.3%        2     14.3%          3 21.4%            7      50.0%     14    100.0%       0    0.0%     14    Mobile Polling Team 23.5                      6       42.9%      8      57.1%      14
+Mobile Polling Team Sub Total                2      14.3%        2     14.3%          3 21.4%            7      50.0%     14    100.0%       0    0.0%     14    Mobile Polling Team Sub Total                 6       42.9%      8      57.1%      14
+
+Casuarina EVC                                0                  16     61.5%          0                 10      38.5%     26     96.3%       1    3.7%     27    Casuarina EVC                                16       61.5%     10      38.5%      26
+Darwin Airport EVC                           0                  11     61.1%          1     5.6%         6      33.3%     18    100.0%       0    0.0%     18    Darwin Airport EVC                           12       66.7%      6      33.3%      18
+Darwin EVC                                  14      3.0%       296     63.0%         20     4.3%       140      29.8%    470     99.2%       4    0.8%    474    Darwin EVC                                  306       65.1%    164      34.9%     470
+Palmerston EVC                               1      6.7%        11     73.3%          0                  3      20.0%     15    100.0%       0    0.0%     15    Palmerston EVC                               12       80.0%      3      20.0%      15
+Early Voting Centre Sub Total               15      2.8%       334     63.1%         21     4.0%       159      30.1%    529     99.1%       5    0.9%    534    Early Voting Centre Sub Total               346       65.4%    183      34.6%     529
+
+Absent Votes                                37      6.8%       289     52.9%         37     6.8%       183      33.5%    546      95.8%     24    4.2%    570    Absent Votes                                319       58.4%    227      41.6%     546
+
+Declaration Votes (incl 20 Postal ballot                                                                                                                         Declaration Votes (incl 20 Postal ballot
+                                             1      3.8%        14     53.8%          3 11.5%            8      30.8%     26    100.0%       0    0.0%     26                                                 16       61.5%     10      38.5%      26
+papers)                                                                                                                                                          papers)
+
+Early Votes (Other regions)                  0      0.0%        21     77.8%          1     3.7%         5      18.5%     27    100.0%       0    0.0%     27    Early Votes (Other regions)                  21       77.8%      6      22.2%      27
+
+Postal Votes                                15      7.5%       118     59.3%         16     8.0%        50      25.1%    199      97.1%      6    2.9%    205    Postal Votes                                130       65.3%     69      34.7%     199
+
+Division Total                             185      5.1%      2023     55.5%        233     6.4%      1205      33.0%   3646      97.4%     96    2.6%   3742    Division Total                             2175       59.7%   1471      40.3%    3646
+
+Distribution of Preferences
+First Preference Votes                      185     5.1%      2023     55.5%        233     6.4%      1205      33.0%   3646
+LEUNIG excluded.                           -185                 74                   68                 43                 0
+Progressive Total                             0     0.0%      2097     57.5%        301     8.3%      1248      34.2%   3646
+ANDREWS excluded.                             0                 76                 -301                225                 0
+Total                                         0     0.0%      2173     59.6%          0     0.0%      1473      40.4%   3646
+
+                                                              ELECTED
+                                                                                                                    NT General Election 2012
+                                                                                                                DIVISION OF SANDERSON
+No. enrolled                                         5100
+
+Formal votes                                         4352             (97.1% of total ballot papers)
+Informal ballot papers                                132             (2.9% of total ballot papers)
+Total ballot papers                                  4484
+
+Turnout - 2012 Final                                 87.9%            (Turnout - 2008 Final: 86.6%)
+
+
+                                                      First Preference Votes for each Candidate                                   Ballot Papers Counted                                                        Notional Two Candidate Preferred
+
+                                             Jodie                Peter              Dimitrious           Jillian                                                                                                 Jodie             Peter
+
+                                            GREEN               STYLES              MAGRIPLIS            BRIGGS                                                                                                  GREEN             STYLES
+
+                                             ALP                 CLP                 FNPP                ASX                Formal            Informal      Total                                                ALP                CLP             Total
+Polling Place / Declaration Type            No.         %       No.          %        No.           %    No.          %     No.         %      No.     %     No.    Polling Place / Declaration Type            No.          %     No.         %      No.
+Anula                                       673      45.3%      746       50.2%        20         1.3%    46        3.1%   1485      97.4%      39   2.6%   1524    Anula                                       719       48.4%    766      51.6%    1485
+Wagaman                                     294      44.6%      304       46.1%        30         4.6%    31        4.7%    659      96.1%      27   3.9%    686    Wagaman                                     333       50.5%    326      49.5%     659
+Wulagi                                      439      42.2%      548       52.7%        13         1.3%    40        3.8%   1040      97.4%      28   2.6%   1068    Wulagi                                      476       45.8%    564      54.2%    1040
+Static Polling Place Sub Total             1406      44.2%     1598       50.2%        63         2.0%   117        3.7%   3184      97.1%      94   2.9%   3278    Static Polling Place Sub Total             1528       48.0%   1656      52.0%    3184
+
+Casuarina EVC                               153      45.1%      174       51.3%          4 1.2%             8       2.4%    339       97.7%      8   2.3%    347    Casuarina EVC                               159       46.9%    180      53.1%     339
+Darwin Airport EVC                            4      40.0%        5       50.0%          1 10.0%            0                10      100.0%      0   0.0%     10    Darwin Airport EVC                            5       50.0%      5      50.0%      10
+Darwin EVC                                   33      28.9%       72       63.2%          2 1.8%             7       6.1%    114       99.1%      1   0.9%    115    Darwin EVC                                   41       36.0%     73      64.0%     114
+Palmerston EVC                                6      31.6%       12       63.2%          0                  1       5.3%     19      100.0%      0   0.0%     19    Palmerston EVC                                7       36.8%     12      63.2%      19
+Early Voting Centre Sub Total               196      40.7%      263       54.6%          7 1.5%            16       3.3%    482       98.2%      9   1.8%    491    Early Voting Centre Sub Total               212       44.0%    270      56.0%     482
+
+Absent Votes                                202      40.2%      245       48.8%         19        3.8%     36       7.2%    502      94.9%      27   5.1%    529    Absent Votes                               226        45.0%    276      55.0%     502
+
+
+Declaration Votes (incl 14 Postal ballot                                                                                                                            Declaration Votes (incl 14 Postal ballot
+                                             6       28.6%       11       52.4%          0        0.0%      4 19.0%         21       100.0%      0   0.0%     21                                                10        47.6%    11       52.4%      21
+papers)                                                                                                                                                             papers)
+
+Early Votes (Other regions)                   3      25.0%        9       75.0%          0        0.0%      0       0.0%     12      100.0%      0   0.0%     12    Early Votes (Other regions)                   3       25.0%      9      75.0%      12
+
+Postal Votes                                 59      39.1%       88       58.3%          1        0.7%      3       2.0%    151      98.7%       2   1.3%    153    Postal Votes                                 62       41.1%     89      58.9%     151
+
+Division Total                             1872      43.0%     2214       50.9%         90        2.1%   176        4.0%   4352      97.1%     132   2.9%   4484    Division Total                             2041       46.9%   2311      53.1%    4352
+
+Distribution of Preferences
+First Preference Votes                     1872      43.0%     2214       50.9%         90        2.1%    176       4.0%   4352
+MAGRIPLIS excluded.                          44                  21                    -90                 25                 0
+Progressive Total                          1916      44.0%     2235       51.4%          0        0.0%    201       4.6%   4352
+BRIGGS excluded.                            124                  77                      0               -201                 0
+Total                                      2040      46.9%     2312       53.1%          0        0.0%      0       0.0%   4352
+
+                                                               ELECTED
+                                                                                                      NT General Election 2012
+                                                                                                       DIVISION OF STUART
+No. enrolled                                         4706
+
+Formal votes                                         2782          (94.1% of total ballot papers)
+Informal ballot papers                                176          (5.9% of total ballot papers)
+Total ballot papers                                  2958
+
+Turnout - 2012 Final                                62.9%          (Turnout - 2008 Final: 52.8%)
+
+
+                                            First Preference Votes for each Candidate                           Ballot Papers Counted                                                Notional Two Candidate Preferred
+
+                                             Bess              Karl                  Maurie                                                                                             Bess              Karl
+
+                                            PRICE           HAMPTON                  RYAN                                                                                              PRICE           HAMPTON
+
+                                            CLP               ALP                   FNPP                 Formal            Informal       Total                                        CLP               ALP             Total
+Polling Place / Declaration Type           No.          %   No.           %        No.           %        No.        %       No.    %      No.    Polling Place / Declaration Type   No.           %   No.          %      No.
+Lajamanu                                    38      23.9%    35       22.0%         86        54.1%       159     88.3%       21 11.7%     180    Lajamanu                            75       47.2%    84       52.8%     159
+Pine Creek                                  60      64.5%    22       23.7%         11        11.8%        93     96.9%        3 3.1%       96    Pine Creek                          66       71.0%    27       29.0%      93
+Yuendumu                                    55      25.4%   101       47.9%         58        26.8%       214     94.7%        8 5.3%      222    Yuendumu                            67       31.5%   146       68.5%     213
+Static Polling Place Sub Total             153      32.7%   158       34.2%        155        33.1%       466     92.8%       32 7.2%      498    Static Polling Place Sub Total     208       44.7%   257       55.3%     465
+
+Mobile Polling Team 15.0                   219      39.4%   263       47.3%         74        13.3%       556     93.1%      41    6.9%    597    Mobile Polling Team 15.0           244       43.9%   312       56.1%     556
+Mobile Polling Team 16.0                   109      30.3%   120       33.3%        131        36.4%       360     93.5%      25    6.5%    385    Mobile Polling Team 16.0           177       49.2%   183       50.8%     360
+Mobile Polling Team 17.0                   351      61.7%   209       36.7%          9         1.6%       569     94.7%      32    5.3%    601    Mobile Polling Team 17.0           354       62.2%   215       37.8%     569
+Mobile Polling Team Sub Total              679      45.7%   592       39.9%        214        14.4%      1485     93.8%      98    6.2%   1583    Mobile Polling Team Sub Total      775       52.2%   710       47.8%    1485
+
+Alice Springs Airport EVC                    0                0                      0                      0                 0              0    Alice Springs Airport EVC            0                 0                   0
+Alice Springs EVC                           38      34.2%    65       58.6%          8        7.2%        111     96.5%       4    3.5%    115    Alice Springs EVC                   40       36.0%    71       64.0%     111
+Katherine EVC                               98      52.1%    74       39.4%         16        8.5%        188     93.5%      13    6.5%    201    Katherine EVC                      105       55.9%    83       44.1%     188
+Early Voting Centre Sub Total              136      45.5%   139       46.5%         24        8.0%        299     94.6%      17    5.4%    316    Early Voting Centre Sub Total      145       48.5%   154       51.5%     299
+
+Absent Votes                               201      53.7%   121       32.4%         52        13.9%       374     95.2%      19    4.8%    393    Absent Votes                       225       60.2%   149       39.8%     374
+
+Declaration Votes (incl 48 Postal ballot
+                                            45      73.8%    11       18.0%          5        8.2%        61      91.0%       6    9.0%     67    Declaration Votes                   48       78.7%    13       21.3%      61
+papers)
+
+Early Votes (Other regions)                  7      35.0%     7       35.0%          6        30.0%       20      87.0%       3 13.0%       23    Early Votes (Other regions)         13       65.0%     7       35.0%      20
+
+Postal Votes (incl 2 Early Voting Centre
+                                            70      90.9%     7        9.1%          0        0.0%        77      98.7%       1    1.3%     78    Postal Votes                        70       90.9%     7       9.1%       77
+ballot papers)
+
+Division Total                             1291     46.4%   1035      37.3%        456        16.4%      2782     94.1%      176   5.9%   2958    Division Total                     1484      53.4%   1297      46.6%    2781
+
+Distribution of Preferences
+First Preference Votes                     1291     46.4%   1035      37.2%        456        16.4%      2782
+RYAN excluded.                              198              258                  -456                      0
+Total                                      1489     53.5%   1293      46.5%          0        0.0%       2782
+
+                                           ELECTED
+                                               NT General Election 2012
+                                                DIVISION OF WANGURI
+No. enrolled                                             4855
+
+Formal votes                                             4239           (98.0% of total ballot papers)
+Informal ballot papers                                     86           (2.0% of total ballot papers)
+Total ballot papers                                      4325
+
+Turnout - 2012 Final                                     89.1%          (Turnout - 2008 Final: 83.9%)
+
+
+                                            First Preference Votes for each
+                                                                                           Ballot Papers Counted
+                                                       Candidate
+
+                                                  Paul           Rhianna
+
+                                              HENDERSON          HARKER
+
+                                                 ALP              CLP                Formal              Informal      Total
+Polling Place / Declaration Type                 No.         %    No.     %          No.          %       No.      %    No.
+Leanyer                                         1057     57.4%    783 42.6%         1840      98.2%        33   1.8%   1873
+Wanguri                                          841     59.6%    571 40.4%         1412      98.5%        21   1.5%   1433
+Static Polling Place Sub Total                  1898     58.4%   1354 41.6%         3252      98.4%        54   1.6%   3306
+
+Casuarina EVC                                    191     49.9%    192    50.1%       383      96.5%        14   3.5%    397
+Darwin Airport EVC                                 0                0                  0                    0             0
+Darwin EVC                                        59     57.8%     43    42.2%       102     96.2%          4   3.8%    106
+Palmerston EVC                                     6     37.5%     10    62.5%        16    100.0%          0   0.0%     16
+Early Voting Centre Sub Total                    256     51.1%    245    48.9%       501     96.5%         18   3.5%    519
+
+Absent Votes                                     153     54.4%    128 45.6%          281      96.9%         9   3.1%    290
+
+
+Declaration Votes (incl 22 Postal ballot
+                                                  20     71.4%      8 28.6%           28    100.0%          0   0.0%     28
+papers)
+
+
+Early Votes (Other regions) (incl 3 Early
+                                                  13     61.9%      8 38.1%           21      91.3%         2   8.7%     23
+Voting Centre ballot papers)
+
+Postal Votes                                      76     48.7%     80 51.3%          156      98.1%         3   1.9%    159
+
+Division Total                                  2416     57.0%   1823 43.0%         4239      98.0%        86   2.0%   4325
+
+                                                ELECTED
+

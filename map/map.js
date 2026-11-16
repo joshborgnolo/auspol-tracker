@@ -713,7 +713,7 @@ const FP_DEEP = {
   light: { alp: [0.32, 0.12, 25], lnp: [0.25, 0.13, 265], grn: [0.31, 0.09, 155], onp: [0.44, 0.155, 42], ind: [0.29, 0.12, 310], oth: [0.26, 0, 0] },
   dark: { alp: [0.91, 0.06, 30], lnp: [0.90, 0.05, 255], grn: [0.93, 0.11, 150], onp: [0.93, 0.11, 85], ind: [0.91, 0.06, 310], oth: [0.93, 0, 0] },
 };
-const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "wa17", "qld17", "vic18", 2019, "nsw19", "qld20", "wa21", "nsw23", "sa22", 2022, "vic22", "qld24", "wa25", 2025, "sa26", "nswnow", "qldnow", "wanow", "now"];
+const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "nt16", "wa17", "qld17", "vic18", 2019, "nsw19", "nt20", "qld20", "wa21", "nsw23", "sa22", 2022, "vic22", "nt24", "qld24", "wa25", 2025, "sa26", "nswnow", "qldnow", "wanow", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw15/nsw19/nsw23/
 // sa22/sa26/vic14/vic18/vic22 — non-federal stops, drawn on their own
@@ -722,13 +722,17 @@ const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15",
 // stops ran their own rows in from 2026-11-04.) wa17/wa21/wa25 (11 March
 // 2017, 13 March 2021, 8 March 2025): Western Australia's Legislative
 // Assembly stops on the same shape, one per redistribution era — the state
-// redraws its boundaries before every election.
+// redraws its boundaries before every election. nt16/nt20/nt24 (27 August
+// 2016, 22 August 2020, 24 August 2024): the Northern Territory's
+// Legislative Assembly on the same shape again (25 divisions; the
+// Territory unicameral, so no upper-house lane rides with them).
 const SA_YEARS = new Set(["sa22", "sa26"]);
 const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);
 const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);
 const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);
-const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa" };
+const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);
+const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
 // the "as it stands" overlays: a now-key rides one election frame (nswnow is
 // the 2023 Assembly plus its four by-elections, qldnow the 2024 parliament
@@ -756,40 +760,44 @@ const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 const YEARS_QLD = YEARS.filter((y) => QLD_YEARS.has(y));
 const YEARS_WA = YEARS.filter((y) => WA_YEARS.has(y));
+const YEARS_NT = YEARS.filter((y) => NT_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, nswnow: 2026.78, qldnow: 2026.79, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, wa17: 2017.192, wa21: 2021.194, wa25: 2025.183, wanow: 2026.84, now: 2026.8 };
+const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, nswnow: 2026.78, qldnow: 2026.79, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, wa17: 2017.192, wa21: 2021.194, wa25: 2025.183, wanow: 2026.84, now: 2026.8, nt16: 2016.655, nt20: 2020.641, nt24: 2024.647 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
-const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026 };
+const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024 };
 // a state frame's history spot: the previous election's date on its line;
 // Queensland's 2015 (31 January) precedes the row's three stops
-const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901, qld: 2015.086, wa: 2013.185 };
+const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901, qld: 2015.086, wa: 2013.185, nt: 2012.649 };
 const SA_PREV_X = { 2018: STATE_PREV_X.sa };
 const NSW_PREV_X = { 2011: 2011.233, 2019: STATE_PREV_X.nsw };
 const VIC_PREV_X = { 2010: 2010.907, 2018: STATE_PREV_X.vic };
 const QLD_PREV_X = { 2015: STATE_PREV_X.qld };
 const WA_PREV_X = { 2008: 2008.679, 2013: STATE_PREV_X.wa };
+const NT_PREV_X = { 2012: STATE_PREV_X.nt };
 // the election each state frame names as its "previous election" (its date rides
 // STATE_PREV_X on the timelines): South Australia's 2018, New South Wales' 2019,
 // Victoria's 2018 — and Queensland's stops prev-chain 2017→2020→2024, the 2017
 // frame naming nothing (the 2015 election was fought on the 89-district map);
 // the 2013-era stops chain too (nsw15←2011→nsw19←2015→nsw23; vic14←2010→vic18
-// ←2014→vic22), nsw15 and vic14 the row's first stops
-const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021 };
-const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia" };
+// ←2014→vic22), nsw15 and vic14 the row's first stops; the Territory stops
+// chain 2016→2020→2024 and the 2016 frame names the 2012 election (riding
+// the official 2012 statistical report beside the psephos mirror)
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };
+const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", NT: "Northern Territory" };
 const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
 // a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
 const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()} ${String(p).slice(2)}`; };
 const prevXLabOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()}’${String(p).slice(2)}`; };
-const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", nswnow: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", qldnow: "lnp", wa17: "alp", wa21: "alp", wa25: "alp", wanow: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", nswnow: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", qldnow: "lnp", wa17: "alp", wa21: "alp", wa25: "alp", wanow: "alp", now: "alp", nt16: "alp", nt20: "alp", nt24: "lnp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
 // collide with nothing, but its PREV consecutive-year keys (2017/2020) are
 // likewise carried here, not in GOV's federal-year corridor
-const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" }, wa: { 2008: "alp", 2013: "lnp", 2017: "alp", 2021: "alp" } };
-const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", qldnow: "David Crisafulli", wa17: "Mark McGowan", wa21: "Mark McGowan", wa25: "Roger Cook", wanow: "Roger Cook", now: "Anthony Albanese" };
+const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" }, wa: { 2008: "alp", 2013: "lnp", 2017: "alp", 2021: "alp" }, nt: { 2012: "lnp", 2016: "alp", 2020: "alp" } };
+const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", qldnow: "David Crisafulli", wa17: "Mark McGowan", wa21: "Mark McGowan", wa25: "Roger Cook", wanow: "Roger Cook", now: "Anthony Albanese", nt16: "Michael Gunner", nt20: "Michael Gunner", nt24: "Lia Finocchiaro" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -816,12 +824,12 @@ const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.ha
 // are keyboard only — a phone scrolls the lens row itself, and its vertical
 // drags belong to the page. On the phone a walk keeps the view fixed
 // (walkHold below), and has no scroll side effects of its own
-const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : QLD_YEARS.has(y) ? YEARS_QLD : WA_YEARS.has(y) ? YEARS_WA : YEARS_FED);
+const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : QLD_YEARS.has(y) ? YEARS_QLD : WA_YEARS.has(y) ? YEARS_WA : NT_YEARS.has(y) ? YEARS_NT : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 // the up/down-arrows walk: the "View elections" strip's order (federal, then
 // the states as they are listed there), walking round the ends; a lane holds
 // the stop it was left on (setYear keeps the memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];
+const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA, YEARS_NT];
 const laneMem = new Map();
 function walkLane(dir) {
   const cur = yearLane(S.year);
@@ -1091,7 +1099,7 @@ const xOfYear = (y) => YEAR_X[y] ?? y;
 // each data file's content hash, stamped in by assemble.mjs (data-stamp.mjs): the files keep their
 // names and Pages caches them for ten minutes, so a release asks for its own data by hash and never
 // pairs with a cached older copy
-const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"003cca8e","core-1993.json":"327e8466","core-1996.json":"840860c7","core-1998.json":"74437062","core-2001.json":"4687095f","core-2004.json":"53df3f45","core-2007.json":"fc4da867","core-2010.json":"f8674c56","core-2013.json":"da51f1e2","core-2016.json":"b332503d","core-2019.json":"8669aeaa","core-2022.json":"95ce7b05","core-2025.json":"90d1df90","core-nsw15.json":"7a45c01b","core-nsw19.json":"915e864e","core-nsw23.json":"28007acc","core-qld17.json":"90883dd3","core-qld20.json":"afa13d52","core-qld24.json":"097d4868","core-sa22.json":"c12f25c5","core-sa26.json":"a1adcae3","core-vic14.json":"a8a5e079","core-vic18.json":"803b8787","core-vic22.json":"36eb937c","core-wa17.json":"f4f03387","core-wa21.json":"6c37daf3","core-wa25.json":"31a6cadd","data-1993.json":"dddd6c6b","data-1996.json":"7e1e675a","data-1998.json":"43251e20","data-2001.json":"820b4b78","data-2004.json":"8b5d2197","data-2007.json":"8d6ab355","data-2010.json":"cb213b6e","data-2013.json":"411c7caa","data-2016.json":"cbc5b571","data-2019.json":"824c3ab0","data-2022.json":"48cec582","data-2025.json":"26d1f258","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"c44b27c1","data-nsw15.json":"1b31e9cb","data-nsw19.json":"d33f85db","data-nsw23.json":"45cad84e","data-qld17.json":"ba2697bd","data-qld20.json":"5cd4d880","data-qld24.json":"24b89e7a","data-sa22.json":"8ab536fc","data-sa26.json":"7035d3ea","data-vic14.json":"dea54777","data-vic18.json":"c630f943","data-vic22.json":"01fec53f","data-wa17.json":"bcf42c71","data-wa21.json":"eb673b3b","data-wa25.json":"2d224b45","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"0fab6e31","res-1996.json":"3f2817f7","res-1998.json":"b6c2d81e","res-2001.json":"dfb38833","res-2004.json":"02335fc3","res-2007.json":"c4023b4c","res-2010.json":"c3ad053a","res-2013.json":"402cb92b","res-2016.json":"e109b8a3","res-2019.json":"110ecb7b","res-2022.json":"efe5a83b","res-2025.json":"35266010","res-nsw15.json":"176ae5f9","res-nsw19.json":"0404c031","res-nsw23.json":"755aa871","res-qld17.json":"5bb429b9","res-qld20.json":"6b2ce3bb","res-qld24.json":"2328dc47","res-sa22.json":"0110ee26","res-sa26.json":"44a5434b","res-vic14.json":"0e9cd8d5","res-vic18.json":"26bb1237","res-vic22.json":"5375e71f","res-wa17.json":"df31c85e","res-wa21.json":"b7abde31","res-wa25.json":"2ef36c0c","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"759b70b2","water-bne.json":"d06d17f5","water-cbr.json":"4186fe21","water-drw.json":"1c58b9f2","water-hob.json":"663647c3","water-mel.json":"9f1ca003","water-per.json":"3ed90a2f","water-syd.json":"797a07ab","water.json":"9de0e29d"};
+const DATA_V = /*@data-stamps*/{"areas-sa1-2021.json":"003cca8e","core-1993.json":"327e8466","core-1996.json":"840860c7","core-1998.json":"74437062","core-2001.json":"4687095f","core-2004.json":"53df3f45","core-2007.json":"fc4da867","core-2010.json":"f8674c56","core-2013.json":"da51f1e2","core-2016.json":"b332503d","core-2019.json":"8669aeaa","core-2022.json":"95ce7b05","core-2025.json":"90d1df90","core-nsw15.json":"7a45c01b","core-nsw19.json":"915e864e","core-nsw23.json":"28007acc","core-nt16.json":"0186ade8","core-nt20.json":"cf89260e","core-nt24.json":"c08b42fa","core-qld17.json":"90883dd3","core-qld20.json":"afa13d52","core-qld24.json":"097d4868","core-sa22.json":"c12f25c5","core-sa26.json":"a1adcae3","core-vic14.json":"a8a5e079","core-vic18.json":"803b8787","core-vic22.json":"36eb937c","core-wa17.json":"f4f03387","core-wa21.json":"6c37daf3","core-wa25.json":"31a6cadd","data-1993.json":"dddd6c6b","data-1996.json":"7e1e675a","data-1998.json":"43251e20","data-2001.json":"820b4b78","data-2004.json":"8b5d2197","data-2007.json":"8d6ab355","data-2010.json":"cb213b6e","data-2013.json":"411c7caa","data-2016.json":"cbc5b571","data-2019.json":"824c3ab0","data-2022.json":"48cec582","data-2025.json":"26d1f258","data-now-nsw.json":"c190e4d7","data-now-qld.json":"2d214dc9","data-now-wa.json":"a096ff92","data-now.json":"c44b27c1","data-nsw15.json":"1b31e9cb","data-nsw19.json":"d33f85db","data-nsw23.json":"45cad84e","data-nt16.json":"f98653e0","data-nt20.json":"ba2c4786","data-nt24.json":"33cd446e","data-qld17.json":"ba2697bd","data-qld20.json":"5cd4d880","data-qld24.json":"24b89e7a","data-sa22.json":"8ab536fc","data-sa26.json":"7035d3ea","data-vic14.json":"dea54777","data-vic18.json":"c630f943","data-vic22.json":"01fec53f","data-wa17.json":"bcf42c71","data-wa21.json":"eb673b3b","data-wa25.json":"2d224b45","geo-1993-hi.json":"d5b83add","geo-1993-lo.json":"d5b83add","geo-1996-hi.json":"b3def3ba","geo-1996-lo.json":"b3def3ba","geo-1998-hi.json":"e2c51765","geo-1998-lo.json":"e2c51765","geo-2001-hi.json":"a6606c1d","geo-2001-lo.json":"a6606c1d","geo-2004-hi.json":"c25c25f4","geo-2004-lo.json":"9b0b7073","geo-2007-hi.json":"4db87a0d","geo-2007-lo.json":"84db9ed0","geo-2010-hi.json":"7bd2abe4","geo-2010-lo.json":"9c64b19a","geo-2013-hi.json":"3c101b06","geo-2013-lo.json":"e9d33398","geo-2016-hi.json":"1b30418b","geo-2016-lo.json":"22cd3463","geo-2019-hi.json":"ee819df9","geo-2019-lo.json":"227cc556","geo-2022-hi.json":"07694c27","geo-2022-lo.json":"db82df02","geo-2025-hi.json":"7048e1d1","geo-2025-lo.json":"f0de0b6d","geo-nsw15-hi.json":"7785d043","geo-nsw15-lo.json":"32849430","geo-nsw19-hi.json":"7785d043","geo-nsw19-lo.json":"32849430","geo-nsw23-hi.json":"889ef285","geo-nsw23-lo.json":"633fccdd","geo-nt16-hi.json":"c6b2d1ce","geo-nt16-lo.json":"4e83a640","geo-nt20-hi.json":"bfac734f","geo-nt20-lo.json":"cc6f6a64","geo-nt24-hi.json":"8ef242d5","geo-nt24-lo.json":"e8008629","geo-qld17-hi.json":"d5757766","geo-qld17-lo.json":"dbf00cd5","geo-qld20-hi.json":"d5757766","geo-qld20-lo.json":"dbf00cd5","geo-qld24-hi.json":"d5757766","geo-qld24-lo.json":"dbf00cd5","geo-sa22-hi.json":"63032f17","geo-sa22-lo.json":"78e53145","geo-sa26-hi.json":"4bd534f2","geo-sa26-lo.json":"7fa33203","geo-vic14-hi.json":"d20876fb","geo-vic14-lo.json":"86545419","geo-vic18-hi.json":"d20876fb","geo-vic18-lo.json":"86545419","geo-vic22-hi.json":"9b2e98b4","geo-vic22-lo.json":"0247cc7d","geo-wa17-hi.json":"295633fa","geo-wa17-lo.json":"e664a15c","geo-wa21-hi.json":"4b9ab7b3","geo-wa21-lo.json":"fdad724e","geo-wa25-hi.json":"a64d0fda","geo-wa25-lo.json":"3fe21d00","historical-boundary-sources.json":"1b2c8b30","house-seating-plan-2012-02-27.json":"2d05efc8","house-seating-plan-2013-05-14.json":"67fd5a2e","house-seating-plan-2013-11-12.json":"08f00bdb","house-seating-plan-2016-08-31.json":"d18d9c56","house-seating-plan-2021-03.json":"680131d1","house-seating-plan-2022-07-29.json":"9ed4a9d3","house-seating-plan-2025-10-27.json":"8e418a65","house-seating-plan-2026-08-13.json":"953b9336","house-seating-plan-sa-2024-12-28.json":"b96a0486","islands.json":"10fe4949","la-seating-plan-vic-2026-08-11.json":"b2887f7e","land-hi.json":"81c828c2","land.json":"f2934e85","lc-seating-plan-vic-2026-10-27.json":"8551a18b","places.json":"8dc11f3e","res-1993.json":"0fab6e31","res-1996.json":"3f2817f7","res-1998.json":"b6c2d81e","res-2001.json":"dfb38833","res-2004.json":"02335fc3","res-2007.json":"c4023b4c","res-2010.json":"c3ad053a","res-2013.json":"402cb92b","res-2016.json":"e109b8a3","res-2019.json":"110ecb7b","res-2022.json":"efe5a83b","res-2025.json":"35266010","res-nsw15.json":"176ae5f9","res-nsw19.json":"0404c031","res-nsw23.json":"755aa871","res-nt16.json":"0186ade8","res-nt20.json":"cf89260e","res-nt24.json":"c08b42fa","res-qld17.json":"5bb429b9","res-qld20.json":"6b2ce3bb","res-qld24.json":"2328dc47","res-sa22.json":"0110ee26","res-sa26.json":"44a5434b","res-vic14.json":"0e9cd8d5","res-vic18.json":"26bb1237","res-vic22.json":"5375e71f","res-wa17.json":"df31c85e","res-wa21.json":"b7abde31","res-wa25.json":"2ef36c0c","seats-2010.json":"d2c9075c","seats-2013.json":"c5b04d17","seats-2016.json":"e3a9c6f3","seats-2019.json":"a76a2944","seats-2022.json":"025f55bc","seats-2025.json":"803eb9f7","seats-now.json":"f5bfe9c9","seats-sa22.json":"9b636130","seats-sa26-lc.json":"f8e6c8a1","seats-sa26.json":"9c8e2ae0","seats-vic22-lc.json":"483ec750","seats-vic22.json":"5603a5a3","senate-1993.json":"647abc02","senate-1996.json":"29a7ef33","senate-1998.json":"d6e51918","senate-2001.json":"3de71925","senate-2004.json":"d88d0847","senate-2007.json":"5891ef1c","senate-2010.json":"f7d91697","senate-2013.json":"8a0f3d28","senate-2016.json":"e64f1cdf","senate-2019.json":"2814136b","senate-2022.json":"5df6af1e","senate-2025.json":"0ecad23e","senate-floor-2026-10-09.json":"8520afee","senate-informal-2007.json":"d667ee90","senate-informal-2010.json":"d06f5fa3","senate-informal-2013.json":"56c404c9","senate-informal-2016.json":"9d7479ca","senate-informal-2019.json":"8ab0dadb","senate-informal-2022.json":"dd4688f7","senate-informal-2025.json":"491d6153","senate-now.json":"e4b50c01","senate-nsw15.json":"08fdf9b8","senate-nsw19.json":"0c3e649f","senate-nsw23.json":"05315cda","senate-prefs-2004.json":"8ffbde9f","senate-prefs-2007.json":"b6b0cd8f","senate-prefs-2010.json":"c0583b9e","senate-prefs-2013.json":"d90e3934","senate-prefs-2016.json":"deb8c58d","senate-prefs-2019.json":"3c8940ae","senate-prefs-2022.json":"f23bf44d","senate-prefs-2025.json":"6e628cd4","senate-prefs-nsw15.json":"e65cf0d9","senate-prefs-nsw19.json":"1e4beaf7","senate-prefs-nsw23.json":"854772ce","senate-sa22.json":"f044aa86","senate-sa26.json":"78a4be99","senate-vic14.json":"d23209de","senate-vic18.json":"4e679e75","senate-vic22.json":"2958ce36","senate-vote-1993.json":"5a5c4f94","senate-vote-1996.json":"773c7410","senate-vote-1998.json":"13ad5e9f","senate-vote-2001.json":"59d2f93d","senate-vote-2004.json":"cfe0b9ca","senate-vote-2007.json":"eb9cf448","senate-vote-2010.json":"f15aac03","senate-vote-2013.json":"106747c9","senate-vote-2016.json":"c462bdb4","senate-vote-2019.json":"efb23f42","senate-vote-2022.json":"e4ffe849","senate-vote-2025.json":"1e5111cd","summary.json":"afb90330","urban.json":"f4339a42","water-adl.json":"de92b2ff","water-bne.json":"21ea27ab","water-cbr.json":"9f57892c","water-drw.json":"f4a0f607","water-hob.json":"3e8febac","water-mel.json":"ac3659e2","water-per.json":"7f3f24d6","water-syd.json":"4e200a80","water.json":"8cb44c80"};
 // the page's inline warmup (map/index.html, ahead of map.js) starts the landing year's fetches
 // while the script downloads and parses; getJSON drinks from it once, then it's gone
 // (bg: a background preload's, fetched at low priority so it yields to the reader's own)
@@ -1623,7 +1631,7 @@ const SEATED_LC = new Set(["sa26", "vic22"]);
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023;
 // Shelley Hancock, 2 May 2011; Jonathan O'Dea, 27 May 2019; Christine Fyffe, 24 December 2014;
 // Colin Brooks, 27 March 2017)
-const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", nswnow: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine", qldnow: "Condamine", wa17: "Albany", wa21: "Midland", wa25: "Forrestfield", wanow: "Forrestfield" };
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", nswnow: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine", qldnow: "Condamine", wa17: "Albany", wa21: "Midland", wa25: "Forrestfield", wanow: "Forrestfield", nt16: "Goyder", nt20: "Karama", nt24: "Araluen" };
 async function loadYear(year, bg) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent
@@ -8956,7 +8964,7 @@ const SEN_SEATS = 76;
 // election was the first on a single statewide 37-member electorate, and before that shape is
 // modelled the wa frames carry the Assembly only (2017/2021's six six-member regions model
 // cleanly, but splitting the frames by Council system helps nobody).
-const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !WA_YEARS.has(y) && !isNowY(y)));
+const SEN_YEARS = YEARS.filter((y) => typeof y === "number" || y === "now" || (STATE_YEARS.has(y) && !QLD_YEARS.has(y) && !WA_YEARS.has(y) && !NT_YEARS.has(y) && !isNowY(y)));
 const senYearFor = (y) => (SEN_YEARS.includes(y) ? y : [...SEN_YEARS].filter((v) => typeof v === "number" && YEARS.indexOf(v) < YEARS.indexOf(y)).pop());
 function senateModel(raw, year) {
   const divs = raw.senators.map((x, i) => ({ i, n: x.n, st: x.st, sen: x, hold: { n: x.n, ab: x.ab, pn: partyName(x.ab, x.pn), fam: FAM(x.ab) } }));
@@ -9977,21 +9985,24 @@ const isNSW = () => NSW_YEARS.has(S.year);
 const isVic = () => VIC_YEARS.has(S.year);
 const isQld = () => QLD_YEARS.has(S.year);
 const isWA = () => WA_YEARS.has(S.year);
+const isNT = () => NT_YEARS.has(S.year);
 // a state frame's elections commission, short form (state frames only)
-const commX = () => (isSA() ? "ECSA" : isVic() ? "VEC" : isQld() ? "ECQ" : isWA() ? "WAEC" : "NSWEC");
-const coalW = (cap) => (isSA() || isVic() || isWA() ? (cap ? "The Liberals" : "the Liberals") : isQld() ? (cap ? "The LNP" : "the LNP") : cap ? "The Coalition" : "the Coalition");
+const commX = () => (isSA() ? "ECSA" : isVic() ? "VEC" : isQld() ? "ECQ" : isWA() ? "WAEC" : isNT() ? "NTEC" : "NSWEC");
+const coalW = (cap) => (isSA() || isVic() || isWA() ? (cap ? "The Liberals" : "the Liberals") : isQld() ? (cap ? "The LNP" : "the LNP") : isNT() ? (cap ? "The Country Liberals" : "the Country Liberals") : cap ? "The Coalition" : "the Coalition");
 // (WA says Liberals like SA and Victoria by word choice, never Coalition or LNP;
 // the Nationals WA ride the lnp family here, as Victoria's do — a display
 // compromise in every sense, worth its own note: there is no Coalition in
-// WA at state level, and WAEC's tallies never publish one)
-// the rival's bare name where the hero and margin bars want one ("Liberal"/"LNP"/"Coalition")
-const oppNameW = () => (isSA() || isVic() || isWA() ? "Liberal" : isQld() ? "LNP" : "Coalition");
-const leaderT = () => (isState() ? "premier" : "prime minister");
-const ausW = () => (isSA() ? "South Australia" : isNSW() ? "New South Wales" : isVic() ? "Victoria" : isQld() ? "Queensland" : isWA() ? "Western Australia" : "Australia");
+// WA at state level, and WAEC's tallies never publish one. The Territory
+// says the Country Liberals — the merged NT Coalition partner whose CLP
+// banner is the whole of the lnp family there)
+// the rival's bare name where the hero and margin bars want one ("Liberal"/"LNP"/"CLP"/"Coalition")
+const oppNameW = () => (isSA() || isVic() || isWA() ? "Liberal" : isQld() ? "LNP" : isNT() ? "CLP" : "Coalition");
+const leaderT = () => (isNT() ? "chief minister" : isState() ? "premier" : "prime minister");
+const ausW = () => (isSA() ? "South Australia" : isNSW() ? "New South Wales" : isVic() ? "Victoria" : isQld() ? "Queensland" : isWA() ? "Western Australia" : isNT() ? "the Northern Territory" : "Australia");
 const legW = (b) => famLeg(b);
 // a family's preferences, possessive: the Liberals' on an SA or Victorian frame,
 // the LNP's on a Queensland frame, the Coalition's elsewhere
-const possW = (b) => (b === "lnp" && isQld() ? "the LNP’s" : b === "lnp" && (isSA() || isVic() || isWA()) ? "the Liberals’" : POSS[b]);
+const possW = (b) => (b === "lnp" && isQld() ? "the LNP’s" : b === "lnp" && isNT() ? "the Country Liberals’" : b === "lnp" && (isSA() || isVic() || isWA()) ? "the Liberals’" : POSS[b]);
 // an "as it stands" view: today’s holder won the last count under another
 // banner — the winner’s row in the count stays historical but earns a note
 const movedTo = (m, d) => (isNowY(m.year) && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
@@ -10363,7 +10374,7 @@ function crossSentence(m, idx, verb) {
    stamped into the script, which only count the whole state */
 function seatBase(m, st) {
   const y = m.year;
-  const row = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA].find((r) => r.includes(y));
+  const row = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA, YEARS_NT].find((r) => r.includes(y));
   const stops = row.filter((v) => !isNowY(v)), pv = isNowY(y) ? NOW_OF[y] : stops[stops.indexOf(y) - 1];
   if (pv == null) return null;
   if (!STATE_YEARS.has(pv)) return { y: pv, c: SUM && SUM.seats[pv] ? SUM.seats[pv][st] || {} : null };
@@ -11499,7 +11510,7 @@ function storyArea(m, st) {
   // the Senate lanes' head reads the chamber (the same gate as the figures')
   const senLanes = S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null);
   const senDeck = senLanes && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
-  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? (senDeck ? "The Senate today" : "The House today") : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : "South Australian election") : `${yearLabel(m.year)} election`);
+  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? (senDeck ? "The Senate today" : "The House today") : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : isNT() ? "Northern Territory election" : "South Australian election") : `${yearLabel(m.year)} election`);
   // never the date — the eyebrow line above the map already carries it; on
   // the today head the member count is the chamber's senators under the
   // Senate lanes (an election frame's divisions stand either way)
@@ -11555,7 +11566,7 @@ function storyArea(m, st) {
     // members, or the seat type whose kind stays lit
     // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
     const chamberMark = cls ? `${CLS_SHORT[cls].replace(" ", "-")} seats lit${aus ? "" : ` in ${STATE_NAME[st]}`}` : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
-    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${(S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? "The Senate, each member a chair" : `${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair`}"></canvas></div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${(S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? "The Senate, each member a chair" : `${isSA() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() || isNT() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair`}"></canvas></div></div>`;
   }
   if (isNowY(m.year) && list.length) {
     // the federal Now's figures-basis qualifier leads its seats note in the
@@ -11962,8 +11973,8 @@ function foot(m) {
   const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH"
     : m.year === "nswnow" ? "NSWEC results for the 2023 state election, the 19 October 2024 Epping, Hornsby and Pittwater by-elections and the 13 September 2025 Kiama by-election; members’ moves from the Speaker’s writ notices"
     : m.year === "qldnow" ? "ECQ results for the 2024 state general election, the 2025 Hinchinbrook and 2026 Stafford state by-elections; leaders and members’ moves from Queensland Labor and the Parliament"
-    : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : WA_YEARS.has(m.year) ? `WAEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
-  return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : WA_YEARS.has(m.year) ? "WAEC boundaries; ABS census" : "AEC boundaries and seat types; ABS census and SEIFA"}.</p>`;
+    : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : WA_YEARS.has(m.year) ? `WAEC results for the ${yearLabel(m.year)} state election` : NT_YEARS.has(m.year) ? `NTEC results for the ${yearLabel(m.year)} territory election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : WA_YEARS.has(m.year) ? "WAEC boundaries; ABS census" : NT_YEARS.has(m.year) ? "NTEC boundaries; ABS census" : "AEC boundaries and seat types; ABS census and SEIFA"}.</p>`;
 }
 let storyKey = "";
 function renderStory(force) {
@@ -13012,7 +13023,7 @@ function renderTimeline() {
   const NX = (nx) => 22 + ((nx - FED0) / (YEAR_X.now - FED0)) * (W - 44);
   // a state row's cursor: its own previous elections (2018/2019 before the frames
   // open, 2022 on the SA row is sa22, not the federal 2022), then the frames' spots
-  const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X, wa: WA_PREV_X };
+  const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X, wa: WA_PREV_X, nt: NT_PREV_X };
   const stGx = (st) => (ry) => NX(STATE_ROW_PREV_X[st][ry] ?? YEAR_X[st + String(ry).slice(2)] ?? ry);
   const short = W < 560, cur = S.year;
   /* only the selected jurisdiction's rung draws at a time, so the rows all
@@ -13026,8 +13037,9 @@ function renderTimeline() {
     { ys: YEARS_SA, base: BASE, top: TOP, gx: stGx("sa") },
     { ys: YEARS_QLD, base: BASE, top: TOP, gx: stGx("qld") },
     { ys: YEARS_WA, base: BASE, top: TOP, gx: stGx("wa") },
+    { ys: YEARS_NT, base: BASE, top: TOP, gx: stGx("nt") },
   ];
-  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : 0);
+  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : NT_YEARS.has(y) ? 6 : 0);
   // a rung belongs to the selected election alone — the rest of the timeline steps aside
   const activeIx = rowIx(m ? m.year : cur);
   const sd = m ? selDiv() : null;
@@ -13081,6 +13093,7 @@ function renderTimeline() {
     { i: 3, items: tlStops(YEARS_SA) },
     { i: 4, items: tlStops(YEARS_QLD) },
     { i: 5, items: tlStops(YEARS_WA) },
+    { i: 6, items: tlStops(YEARS_NT) },
   ];
   for (const R of rowsOf) {
     if (R.i !== activeIx) continue; // only the selected jurisdiction's rung shows
@@ -13109,7 +13122,7 @@ function renderTimeline() {
       g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${hitLeft}" y="${hitTop}" width="${hitRight - hitLeft}" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
   }
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland and Western Australian state elections; choose one">${g}</svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland, Western Australian and Northern Territory state elections; choose one">${g}</svg>`;
   // the strips follow the frame and the selection
   renderJumpSel();
   if (FS.on) fsRail();
@@ -13674,7 +13687,7 @@ const stampEl = (() => {
   return el;
 })();
 let stampShown = "", stampOff = 0;
-const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : WA_YEARS.has(y) ? "Western Australian" : "South Australian");
+const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : WA_YEARS.has(y) ? "Western Australian" : NT_YEARS.has(y) ? "Northern Territory" : "South Australian");
 function stampParts(y) {
   if (y === "now") return ["The House today", "Now"];
   if (isNowY(y)) return ["The Assembly today", "Now"];
@@ -13731,7 +13744,7 @@ function metaLine(m = M(), sen = senOn() ? SENM : null) {
    hold — with a family walk moving the head once. Every unloaded year's line is measured from the
    facts assemble.mjs stamps in (data-stamp.mjs); only the chamber view walks into a Senate (and
    back to the House at SA 2026), so only it floors on its family's Senate lines too */
-const META_FACTS = /*@meta-facts*/{"house":{"1993":["1993-03-13",147,8431],"1996":["1996-03-02",148,8463],"1998":["1998-10-03",148,8311],"2001":["2001-11-10",150,8213],"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"nsw15":["2015-03-28",93,3324],"nsw19":["2019-03-23",93,2946],"nsw23":["2023-03-25",93,3117],"qld17":["2017-11-25",93,1701],"qld20":["2020-10-31",93,1810],"qld24":["2024-10-26",93,1668],"sa22":["2022-03-19",47,695],"sa26":["2026-03-21",47,753],"vic14":["2014-11-29",88,1786],"vic18":["2018-11-24",88,1794],"vic22":["2022-11-26",88,1755],"wa17":["2017-03-11",59,752],"wa21":["2021-03-13",59,736],"wa25":["2025-03-08",59,743],"now":["2026-10-25",150,8940],"nswnow":["2026-11-04",93,3117],"qldnow":["2026-11-04",93,1668],"wanow":["2026-11-05",59,743]},"senate":{"1993":["1993-07-01",76],"1996":["1996-07-01",76],"1998":["1999-07-01",75],"2001":["2002-07-01",76],"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76],"nsw15":["2015-03-28",42],"nsw19":["2019-03-23",42],"nsw23":["2023-03-25",42],"sa22":["2022-03-19",22],"sa26":["2026-03-21",22],"vic14":["2014-11-29",40],"vic18":["2018-11-24",40],"vic22":["2026-10-27",40]},"mix":{"nsw15":{"lnp":54,"alp":34,"grn":3,"ind":2},"nsw19":{"lnp":48,"alp":36,"grn":3,"oth":3,"ind":3},"nsw23":{"lnp":36,"alp":45,"grn":3,"ind":9},"qld17":{"alp":48,"lnp":39,"oth":3,"grn":1,"onp":1,"ind":1},"qld20":{"alp":52,"lnp":34,"oth":3,"grn":2,"onp":1,"ind":1},"qld24":{"alp":36,"lnp":52,"oth":3,"grn":1,"ind":1},"sa22":{"alp":27,"lnp":16,"ind":4},"sa26":{"alp":34,"lnp":5,"ind":4,"onp":4},"vic14":{"alp":47,"lnp":38,"grn":2,"ind":1},"vic18":{"alp":55,"lnp":27,"grn":3,"ind":3},"vic22":{"alp":56,"lnp":28,"grn":4},"wa17":{"alp":41,"lnp":18},"wa21":{"alp":53,"lnp":6},"wa25":{"lnp":13,"alp":46}}};
+const META_FACTS = /*@meta-facts*/{"house":{"1993":["1993-03-13",147,8431],"1996":["1996-03-02",148,8463],"1998":["1998-10-03",148,8311],"2001":["2001-11-10",150,8213],"2004":["2004-10-09",150,8234],"2007":["2007-11-24",150,8235],"2010":["2010-08-21",150,8951],"2013":["2013-09-07",150,9146],"2016":["2016-07-02",150,8328],"2019":["2019-05-18",151,8875],"2022":["2022-05-21",151,8479],"2025":["2025-05-03",150,8940],"nsw15":["2015-03-28",93,3324],"nsw19":["2019-03-23",93,2946],"nsw23":["2023-03-25",93,3117],"nt16":["2016-08-27",25,88],"nt20":["2020-08-22",25,116],"nt24":["2024-08-24",25,134],"qld17":["2017-11-25",93,1701],"qld20":["2020-10-31",93,1810],"qld24":["2024-10-26",93,1668],"sa22":["2022-03-19",47,695],"sa26":["2026-03-21",47,753],"vic14":["2014-11-29",88,1786],"vic18":["2018-11-24",88,1794],"vic22":["2022-11-26",88,1755],"wa17":["2017-03-11",59,752],"wa21":["2021-03-13",59,736],"wa25":["2025-03-08",59,743],"now":["2026-10-25",150,8940],"nswnow":["2026-11-04",93,3117],"qldnow":["2026-11-04",93,1668],"wanow":["2026-11-05",59,743]},"senate":{"1993":["1993-07-01",76],"1996":["1996-07-01",76],"1998":["1999-07-01",75],"2001":["2002-07-01",76],"2004":["2005-07-01",76],"2007":["2008-07-01",76],"2010":["2011-07-01",76],"2013":["2014-07-01",75],"2016":["2016-07-02",76],"2019":["2019-07-01",76],"2022":["2022-07-01",76],"2025":["2025-07-01",76],"now":["2026-10-09",76],"nsw15":["2015-03-28",42],"nsw19":["2019-03-23",42],"nsw23":["2023-03-25",42],"sa22":["2022-03-19",22],"sa26":["2026-03-21",22],"vic14":["2014-11-29",40],"vic18":["2018-11-24",40],"vic22":["2026-10-27",40]},"mix":{"nsw15":{"lnp":54,"alp":34,"grn":3,"ind":2},"nsw19":{"lnp":48,"alp":36,"grn":3,"oth":3,"ind":3},"nsw23":{"lnp":36,"alp":45,"grn":3,"ind":9},"nt16":{"alp":18,"ind":5,"lnp":2},"nt20":{"alp":14,"oth":1,"lnp":8,"ind":2},"nt24":{"alp":4,"ind":3,"lnp":17,"grn":1},"qld17":{"alp":48,"lnp":39,"oth":3,"grn":1,"onp":1,"ind":1},"qld20":{"alp":52,"lnp":34,"oth":3,"grn":2,"onp":1,"ind":1},"qld24":{"alp":36,"lnp":52,"oth":3,"grn":1,"ind":1},"sa22":{"alp":27,"lnp":16,"ind":4},"sa26":{"alp":34,"lnp":5,"ind":4,"onp":4},"vic14":{"alp":47,"lnp":38,"grn":2,"ind":1},"vic18":{"alp":55,"lnp":27,"grn":3,"ind":3},"vic22":{"alp":56,"lnp":28,"grn":4},"wa17":{"alp":41,"lnp":18},"wa21":{"alp":53,"lnp":6},"wa25":{"lnp":13,"alp":46}}};
 const ebHeights = new Map();
 function holdEyebrow() {
   const eb = $(".mp-sec > .rd-eyebrow"), meta = $("#mp-meta"), w = eb.clientWidth;
@@ -14295,7 +14308,7 @@ function renderFrames() {
   el.dataset.k = String(cur);
   el.innerHTML = `<b>View elections</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}"${k === cur ? ' class="on"' : ""}>${n}</button>`).join("")}<span class="mp-fj-menu">${lgMenu("fjump", FRAME_JUMPS.map(([n], k) => [String(k), n]), String(cur), "View elections")}</span>`;
 }
-const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA]];
+const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA], ["Northern Territory", YEARS_NT]];
 
 /* =============================== boot =============================== */
 (async () => {
@@ -14395,10 +14408,10 @@ const FS_ICON = {
   next: `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5.2 2.8 9.4 7l-4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   side: `<svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.45" aria-hidden="true"><rect x="2" y="3" width="14" height="12" rx="2.2"/><path d="M7 3v12"/><path d="M3.9 6.2h1.3M3.9 8.4h1.3M3.9 10.6h1.3" stroke-linecap="round"/></svg>`,
 };
-const FS_LANES = ["Federal", "Victoria", "New South Wales", "South Australia", "Queensland", "Western Australia"];
+const FS_LANES = ["Federal", "Victoria", "New South Wales", "Queensland", "South Australia", "Western Australia", "Northern Territory"];
 /* the phone rung caps the jurisdiction picker at 98px — a name that can't
    stand there goes to its short form ("South Australia" → "SA") */
-const FS_LANE_ABBR = { Victoria: "Vic", "New South Wales": "NSW", "South Australia": "SA", Queensland: "Qld", "Western Australia": "WA" };
+const FS_LANE_ABBR = { Victoria: "Vic", "New South Wales": "NSW", "South Australia": "SA", Queensland: "Qld", "Western Australia": "WA", "Northern Territory": "NT" };
 const FS_HOLD = 2300; // ms the play-through rests on each election once the map has turned to it
 const FS_EASE = "cubic-bezier(.22,.8,.24,1)";
 const fsNativeEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;

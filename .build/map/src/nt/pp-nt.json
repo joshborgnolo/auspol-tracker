@@ -1,0 +1,1692 @@
+{
+"nt16|Arafura|Wurrumiyanga": [
+-11.75785,
+130.62451,
+1
+],
+"nt16|Araluen|Alice Springs": [
+-23.69832,
+133.88114,
+1
+],
+"nt16|Araluen|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt16|Araluen|Gillen": [
+-23.70915,
+133.86596,
+1
+],
+"nt16|Araluen|Sadadeen": [
+-23.70399,
+133.90043,
+1
+],
+"nt16|Arnhem|Alyangula": [
+-13.85082,
+136.42008,
+1
+],
+"nt16|Arnhem|Jabiru": [
+-12.66937,
+132.837,
+1
+],
+"nt16|Arnhem|Jabiru EVC": [
+-12.6707,
+132.8343,
+5
+],
+"nt16|Barkly|Borroloola": [
+-16.07034,
+136.30866,
+1
+],
+"nt16|Barkly|Tennant Creek": [
+-19.6548,
+134.18707,
+1
+],
+"nt16|Barkly|Tennant Creek EVC": [
+-19.6493,
+134.1913,
+5
+],
+"nt16|Blain|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt16|Blain|Rosebery": [
+-12.50706,
+130.99112,
+1
+],
+"nt16|Blain|Woodroffe": [
+-12.50173,
+130.98016,
+1
+],
+"nt16|Braitling|Alice Springs": [
+-23.69832,
+133.88114,
+1
+],
+"nt16|Braitling|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt16|Braitling|Braitling": [
+-23.67617,
+133.86344,
+1
+],
+"nt16|Braitling|Larapinta": [
+-23.68026,
+133.83112,
+1
+],
+"nt16|Braitling|Sadadeen": [
+-23.70399,
+133.90043,
+1
+],
+"nt16|Brennan|Bakewell": [
+-12.49685,
+130.99344,
+1
+],
+"nt16|Brennan|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt16|Brennan|Rosebery": [
+-12.50706,
+130.99112,
+1
+],
+"nt16|Casuarina|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Casuarina|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Casuarina|Nakara": [
+-12.37054,
+130.87728,
+1
+],
+"nt16|Casuarina|Tiwi": [
+-12.35876,
+130.878,
+1
+],
+"nt16|Daly|Berry Springs": [
+-12.71884,
+131.00696,
+1
+],
+"nt16|Daly|Wadeye": [
+-14.24411,
+129.51633,
+1
+],
+"nt16|Drysdale|Driver": [
+-12.48602,
+130.97539,
+1
+],
+"nt16|Drysdale|Gray": [
+-12.49037,
+130.98228,
+1
+],
+"nt16|Drysdale|Moulden Park": [
+-12.50559,
+130.97313,
+1
+],
+"nt16|Drysdale|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt16|Drysdale|Woodroffe": [
+-12.50173,
+130.98016,
+1
+],
+"nt16|Fannie Bay|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Fannie Bay|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Fannie Bay|Nightcliff": [
+-12.38359,
+130.84857,
+1
+],
+"nt16|Fannie Bay|Parap": [
+-12.43263,
+130.84498,
+1
+],
+"nt16|Fong Lim|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Fong Lim|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Fong Lim|Ludmilla": [
+-12.41469,
+130.84954,
+1
+],
+"nt16|Fong Lim|Stuart Park": [
+-12.44679,
+130.84524,
+1
+],
+"nt16|Goyder|Bees Creek": [
+-12.57948,
+131.0593,
+1
+],
+"nt16|Goyder|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt16|Goyder|Humpty Doo": [
+-12.58487,
+131.12726,
+1
+],
+"nt16|Johnston|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Johnston|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Johnston|Millner": [
+-12.39186,
+130.86252,
+1
+],
+"nt16|Johnston|Moil": [
+-12.3885,
+130.88088,
+1
+],
+"nt16|Karama|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Karama|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Karama|Karama": [
+-12.40009,
+130.91621,
+1
+],
+"nt16|Karama|Manunda Terrace": [
+-12.4031,
+130.9193,
+1
+],
+"nt16|Katherine|Katherine": [
+-14.45178,
+132.27029,
+1
+],
+"nt16|Katherine|Katherine EVC": [
+-14.4645,
+132.2636,
+5
+],
+"nt16|Katherine|Katherine East": [
+-14.46392,
+132.28893,
+1
+],
+"nt16|Katherine|Tindal": [
+-14.53123,
+132.37927,
+1
+],
+"nt16|Namatjira|Alice Springs": [
+-23.69832,
+133.88114,
+1
+],
+"nt16|Namatjira|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt16|Namatjira|Yirara": [
+-23.7626,
+133.8696,
+1
+],
+"nt16|Nelson|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt16|Nelson|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt16|Nelson|Girraween": [
+-12.52528,
+131.09566,
+1
+],
+"nt16|Nelson|Howard Springs": [
+-12.47157,
+131.06194,
+1
+],
+"nt16|Nelson|Howard Springs EVC": [
+-12.4945,
+131.0745,
+5
+],
+"nt16|Nhulunbuy|Galiwin'ku": [
+-11.93247,
+135.74302,
+1
+],
+"nt16|Nhulunbuy|Nhulunbuy": [
+-12.19996,
+136.76801,
+1
+],
+"nt16|Nhulunbuy|Nhulunbuy EVC": [
+-12.1825,
+136.7768,
+5
+],
+"nt16|Nightcliff|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Nightcliff|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Nightcliff|Nightcliff": [
+-12.38359,
+130.84857,
+1
+],
+"nt16|Port Darwin|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Port Darwin|Darwin City": [
+-12.46187,
+130.84373,
+1
+],
+"nt16|Port Darwin|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Port Darwin|Larrakeyah": [
+-12.45521,
+130.82566,
+1
+],
+"nt16|Sanderson|Anula": [
+-12.39125,
+130.89047,
+1
+],
+"nt16|Sanderson|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Sanderson|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Sanderson|Wagaman": [
+-12.38074,
+130.88538,
+1
+],
+"nt16|Spillett|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt16|Spillett|Durack": [
+-12.47291,
+130.97139,
+1
+],
+"nt16|Spillett|Johnston": [
+-12.49303,
+131.00624,
+1
+],
+"nt16|Spillett|Ludmilla": [
+-12.41469,
+130.84954,
+1
+],
+"nt16|Spillett|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt16|Stuart|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt16|Wanguri|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt16|Wanguri|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt16|Wanguri|Leanyer": [
+-12.37396,
+130.89922,
+1
+],
+"nt16|Wanguri|Wanguri": [
+-12.37129,
+130.88814,
+1
+],
+"nt20|Araluen|Alice Springs": [
+-23.69846,
+133.88096,
+1
+],
+"nt20|Araluen|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt20|Araluen|Gillen": [
+-23.70915,
+133.86596,
+1
+],
+"nt20|Arnhem|Katherine EVC": [
+-14.4645,
+132.2636,
+5
+],
+"nt20|Arnhem|Tindal": [
+-14.53123,
+132.37927,
+1
+],
+"nt20|Barkly|Tennant Creek EVC": [
+-19.6493,
+134.1913,
+5
+],
+"nt20|Blain|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Blain|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Blain|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Blain|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Blain|Rosebery": [
+-12.50706,
+130.99112,
+1
+],
+"nt20|Blain|Woodroffe": [
+-12.50173,
+130.98016,
+1
+],
+"nt20|Blain|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Braitling|Alice Springs": [
+-23.69846,
+133.88096,
+1
+],
+"nt20|Braitling|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt20|Braitling|Braitling": [
+-23.67617,
+133.86344,
+1
+],
+"nt20|Braitling|Sadadeen": [
+-23.70399,
+133.90043,
+1
+],
+"nt20|Brennan|Bakewell": [
+-12.49685,
+130.99344,
+1
+],
+"nt20|Brennan|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Brennan|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Brennan|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Brennan|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Brennan|Rosebery": [
+-12.50706,
+130.99112,
+1
+],
+"nt20|Brennan|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Casuarina|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Casuarina|Casuarina City": [
+-12.37401,
+130.88224,
+1
+],
+"nt20|Casuarina|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Casuarina|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Casuarina|Tiwi": [
+-12.35876,
+130.878,
+1
+],
+"nt20|Daly|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Daly|Berry Springs": [
+-12.71884,
+131.00696,
+1
+],
+"nt20|Daly|Berry Springs EVC": [
+-12.7145,
+131.013,
+5
+],
+"nt20|Daly|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Daly|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt20|Daly|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Daly|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Daly|Wagait Beach": [
+-12.43526,
+130.74613,
+1
+],
+"nt20|Daly|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Drysdale|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Drysdale|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Drysdale|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Drysdale|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Drysdale|Woodroffe": [
+-12.50173,
+130.98016,
+1
+],
+"nt20|Drysdale|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Fannie Bay|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Fannie Bay|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Fannie Bay|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Fannie Bay|Ludmilla": [
+-12.41469,
+130.84954,
+1
+],
+"nt20|Fannie Bay|Parap": [
+-12.43263,
+130.84498,
+1
+],
+"nt20|Fong Lim|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt20|Fong Lim|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Fong Lim|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Fong Lim|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Fong Lim|Ludmilla": [
+-12.41469,
+130.84954,
+1
+],
+"nt20|Fong Lim|Stuart Park": [
+-12.44685,
+130.8453,
+1
+],
+"nt20|Goyder|Bees Creek": [
+-12.57948,
+131.0593,
+1
+],
+"nt20|Goyder|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Goyder|Berry Springs EVC": [
+-12.7145,
+131.013,
+5
+],
+"nt20|Goyder|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Goyder|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt20|Goyder|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Goyder|Humpty Doo": [
+-12.58487,
+131.12726,
+1
+],
+"nt20|Goyder|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Goyder|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Gwoja|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt20|Gwoja|Katherine EVC": [
+-14.4645,
+132.2636,
+5
+],
+"nt20|Johnston|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Johnston|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Johnston|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Johnston|Millner": [
+-12.39186,
+130.86252,
+1
+],
+"nt20|Johnston|Moil": [
+-12.3885,
+130.88088,
+1
+],
+"nt20|Karama|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Karama|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Karama|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Karama|Karama": [
+-12.40009,
+130.91621,
+1
+],
+"nt20|Katherine|Katherine": [
+-14.45178,
+132.27029,
+1
+],
+"nt20|Katherine|Katherine EVC": [
+-14.4645,
+132.2636,
+5
+],
+"nt20|Katherine|Katherine East": [
+-14.46392,
+132.28893,
+1
+],
+"nt20|Mulka|Nhulunbuy EVC": [
+-12.1825,
+136.7768,
+5
+],
+"nt20|Namatjira|Alice Springs": [
+-23.69846,
+133.88096,
+1
+],
+"nt20|Namatjira|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt20|Namatjira|Kilgariff": [
+-23.76564,
+133.88735,
+1
+],
+"nt20|Namatjira|Larapinta": [
+-23.68026,
+133.83112,
+1
+],
+"nt20|Nelson|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt20|Nelson|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Nelson|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Nelson|Coolalinga": [
+-12.52,
+131.04017,
+1
+],
+"nt20|Nelson|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt20|Nelson|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Nelson|Howard Springs": [
+-12.47157,
+131.06194,
+1
+],
+"nt20|Nelson|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Nelson|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Nightcliff|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Nightcliff|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Nightcliff|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Nightcliff|Nightcliff": [
+-12.38359,
+130.84857,
+1
+],
+"nt20|Port Darwin|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Port Darwin|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Port Darwin|Darwin City": [
+-12.46187,
+130.84373,
+1
+],
+"nt20|Port Darwin|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Sanderson|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Sanderson|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Sanderson|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Sanderson|Sanderson": [
+-12.3889,
+130.8986,
+1
+],
+"nt20|Spillett|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt20|Spillett|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Spillett|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Spillett|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Spillett|Durack": [
+-12.47291,
+130.97139,
+1
+],
+"nt20|Spillett|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt20|Spillett|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt20|Spillett|Zuccoli": [
+-12.51167,
+131.00671,
+1
+],
+"nt20|Wanguri|Berrimah EVC": [
+-12.4423,
+130.9235,
+5
+],
+"nt20|Wanguri|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt20|Wanguri|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt20|Wanguri|Leanyer": [
+-12.37396,
+130.89922,
+1
+],
+"nt24|Araluen|Alice Springs": [
+-23.69846,
+133.88096,
+1
+],
+"nt24|Araluen|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt24|Araluen|Gillen": [
+-23.70915,
+133.86596,
+1
+],
+"nt24|Araluen|Larapinta": [
+-23.68026,
+133.83112,
+1
+],
+"nt24|Arnhem|Katherine Central EVC": [
+-14.45178,
+132.27029,
+5
+],
+"nt24|Arnhem|Tindal": [
+-14.53123,
+132.37927,
+1
+],
+"nt24|Barkly|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt24|Barkly|Tennant Creek": [
+-19.6548,
+134.18707,
+1
+],
+"nt24|Barkly|Tennant Creek EVC": [
+-19.6493,
+134.1913,
+5
+],
+"nt24|Blain|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Blain|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Blain|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Blain|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Blain|Rosebery": [
+-12.50706,
+130.99112,
+1
+],
+"nt24|Blain|Woodroffe": [
+-12.50173,
+130.98016,
+1
+],
+"nt24|Blain|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Braitling|Alice Springs": [
+-23.69846,
+133.88096,
+1
+],
+"nt24|Braitling|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt24|Braitling|Braitling": [
+-23.67617,
+133.86344,
+1
+],
+"nt24|Braitling|Sadadeen": [
+-23.70399,
+133.90043,
+1
+],
+"nt24|Brennan|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Brennan|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Brennan|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Brennan|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Brennan|Rosebery": [
+-12.50706,
+130.99112,
+1
+],
+"nt24|Brennan|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Brennan|Zuccoli": [
+-12.51167,
+131.00671,
+1
+],
+"nt24|Casuarina|Casuarina": [
+-12.37401,
+130.88224,
+1
+],
+"nt24|Casuarina|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Casuarina|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Casuarina|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Daly|Berry Springs": [
+-12.71884,
+131.00696,
+1
+],
+"nt24|Daly|Berry Springs EVC": [
+-12.7145,
+131.013,
+5
+],
+"nt24|Daly|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Daly|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt24|Daly|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Daly|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Daly|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Daly|Wagait Beach": [
+-12.43526,
+130.74613,
+1
+],
+"nt24|Daly|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Drysdale|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Drysdale|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Drysdale|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Drysdale|Palmerston City": [
+-12.47856,
+130.98456,
+1
+],
+"nt24|Drysdale|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Drysdale|Woodroffe": [
+-12.50173,
+130.98016,
+1
+],
+"nt24|Drysdale|Yarrawonga": [
+-12.47251,
+130.98834,
+1
+],
+"nt24|Drysdale|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Fannie Bay|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Fannie Bay|Darwin City": [
+-12.46187,
+130.84373,
+1
+],
+"nt24|Fannie Bay|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Fannie Bay|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Fannie Bay|Ludmilla": [
+-12.41469,
+130.84954,
+1
+],
+"nt24|Fannie Bay|Parap": [
+-12.43263,
+130.84498,
+1
+],
+"nt24|Fannie Bay|Parap EVC": [
+-12.43263,
+130.84498,
+5
+],
+"nt24|Fong Lim|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt24|Fong Lim|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Fong Lim|Darwin City": [
+-12.46187,
+130.84373,
+1
+],
+"nt24|Fong Lim|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Fong Lim|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Fong Lim|Ludmilla": [
+-12.41469,
+130.84954,
+1
+],
+"nt24|Fong Lim|Parap": [
+-12.43263,
+130.84498,
+1
+],
+"nt24|Fong Lim|Parap EVC": [
+-12.43263,
+130.84498,
+5
+],
+"nt24|Goyder|Berry Springs EVC": [
+-12.7145,
+131.013,
+5
+],
+"nt24|Goyder|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Goyder|Coolalinga": [
+-12.52,
+131.04017,
+1
+],
+"nt24|Goyder|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt24|Goyder|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Goyder|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Goyder|Humpty Doo": [
+-12.58487,
+131.12726,
+1
+],
+"nt24|Goyder|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Goyder|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Gwoja|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt24|Gwoja|Katherine Central EVC": [
+-14.45178,
+132.27029,
+5
+],
+"nt24|Johnston|Casuarina": [
+-12.37401,
+130.88224,
+1
+],
+"nt24|Johnston|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Johnston|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Johnston|Eaton": [
+-12.4124,
+130.8807,
+1
+],
+"nt24|Johnston|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Johnston|Moil": [
+-12.3885,
+130.88088,
+1
+],
+"nt24|Johnston|Nightcliff": [
+-12.38359,
+130.84857,
+1
+],
+"nt24|Karama|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt24|Karama|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Karama|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Karama|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Karama|Karama": [
+-12.40009,
+130.91621,
+1
+],
+"nt24|Karama|Malak": [
+-12.39288,
+130.90395,
+1
+],
+"nt24|Katherine|Katherine Central": [
+-14.45178,
+132.27029,
+1
+],
+"nt24|Katherine|Katherine Central EVC": [
+-14.45178,
+132.27029,
+5
+],
+"nt24|Mulka|Nhulunbuy": [
+-12.19996,
+136.76801,
+1
+],
+"nt24|Mulka|Nhulunbuy EVC": [
+-12.1825,
+136.7768,
+5
+],
+"nt24|Namatjira|Alice Springs": [
+-23.69846,
+133.88096,
+1
+],
+"nt24|Namatjira|Alice Springs EVC": [
+-23.698,
+133.8807,
+5
+],
+"nt24|Namatjira|Gillen": [
+-23.70915,
+133.86596,
+1
+],
+"nt24|Namatjira|Ilparpa": [
+-23.74247,
+133.82237,
+1
+],
+"nt24|Namatjira|Larapinta": [
+-23.68026,
+133.83112,
+1
+],
+"nt24|Nelson|Berry Springs EVC": [
+-12.7145,
+131.013,
+5
+],
+"nt24|Nelson|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Nelson|Coolalinga": [
+-12.52,
+131.04017,
+1
+],
+"nt24|Nelson|Coolalinga EVC": [
+-12.5223,
+131.0453,
+5
+],
+"nt24|Nelson|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Nelson|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Nelson|Howard Springs": [
+-12.47157,
+131.06194,
+1
+],
+"nt24|Nelson|Humpty Doo": [
+-12.58487,
+131.12726,
+1
+],
+"nt24|Nelson|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Nelson|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Nightcliff|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Nightcliff|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Nightcliff|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Nightcliff|Nightcliff": [
+-12.38359,
+130.84857,
+1
+],
+"nt24|Port Darwin|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Port Darwin|Darwin City": [
+-12.46187,
+130.84373,
+1
+],
+"nt24|Port Darwin|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Port Darwin|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Sanderson|Berrimah": [
+-12.43507,
+130.92605,
+1
+],
+"nt24|Sanderson|Casuarina": [
+-12.37401,
+130.88224,
+1
+],
+"nt24|Sanderson|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Sanderson|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Sanderson|Eaton": [
+-12.4124,
+130.8807,
+1
+],
+"nt24|Sanderson|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Sanderson|Malak": [
+-12.39288,
+130.90395,
+1
+],
+"nt24|Sanderson|Moil": [
+-12.3885,
+130.88088,
+1
+],
+"nt24|Spillett|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Spillett|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Spillett|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Spillett|Palmerston EVC": [
+-12.481,
+130.9828,
+5
+],
+"nt24|Spillett|Yarrawonga": [
+-12.47251,
+130.98834,
+1
+],
+"nt24|Spillett|Yarrawonga EVC": [
+-12.47251,
+130.98834,
+5
+],
+"nt24|Spillett|Zuccoli": [
+-12.51167,
+131.00671,
+1
+],
+"nt24|Wanguri|Casuarina": [
+-12.37401,
+130.88224,
+1
+],
+"nt24|Wanguri|Casuarina EVC": [
+-12.3773,
+130.8821,
+5
+],
+"nt24|Wanguri|Darwin EVC": [
+-12.3755,
+130.8811,
+5
+],
+"nt24|Wanguri|Eaton EVC": [
+-12.4124,
+130.8807,
+5
+],
+"nt24|Wanguri|Leanyer": [
+-12.37396,
+130.89922,
+1
+]
+}

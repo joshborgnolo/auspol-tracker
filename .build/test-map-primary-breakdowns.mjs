@@ -16,7 +16,7 @@ const vmS = { year: 2025, f: { st: null, cls: null } };
 const ctx = vm.createContext({
   FAMS, CLS, STATES, STATE_TITLE: names, STATE_NAME: names, CLS_SHORT: Object.fromEntries(CLS.map((c) => [c, c.replace(" Metropolitan", " metro")])),
   STATE_YEARS: new Set(["nsw23"]), S: vmS, TH: { party: Object.fromEntries([...FAMS,"nxt","dem"].map((f) => [f,f])) },
-  SA_YEARS: new Set(), VIC_YEARS: new Set(), WA_YEARS: new Set(), QLD_YEARS: new Set(),
+  SA_YEARS: new Set(), VIC_YEARS: new Set(), WA_YEARS: new Set(), QLD_YEARS: new Set(), NT_YEARS: new Set(),
   css: (c) => c, esc: (s) => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"), f1: (n) => n.toFixed(1), sgn: (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1),
   famLeg: (f) => labels[f], partyShort: (ab,pn) => pn || ab,
   prevYearOf: (y) => (y === 2025 ? 2022 : null), flowSeat: (d) => !!d.flowOk, ds: (s) => String(s), int: (v) => Math.round(v).toLocaleString("en-AU"), f0: (v) => Math.round(v).toString(),

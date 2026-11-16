@@ -711,7 +711,7 @@ const FP_DEEP = {
   light: { alp: [0.32, 0.12, 25], lnp: [0.25, 0.13, 265], grn: [0.31, 0.09, 155], onp: [0.44, 0.155, 42], ind: [0.29, 0.12, 310], oth: [0.26, 0, 0] },
   dark: { alp: [0.91, 0.06, 30], lnp: [0.90, 0.05, 255], grn: [0.93, 0.11, 150], onp: [0.93, 0.11, 85], ind: [0.91, 0.06, 310], oth: [0.93, 0, 0] },
 };
-const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "wa17", "qld17", "vic18", 2019, "nsw19", "qld20", "wa21", "nsw23", "sa22", 2022, "vic22", "qld24", "wa25", 2025, "sa26", "nswnow", "qldnow", "wanow", "now"];
+const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15", 2016, "nt16", "wa17", "qld17", "vic18", 2019, "nsw19", "nt20", "qld20", "wa21", "nsw23", "sa22", 2022, "vic22", "nt24", "qld24", "wa25", 2025, "sa26", "nswnow", "qldnow", "wanow", "now"];
 // qld17/qld20/qld24: the 2017 (25 November), 2020 (31 October) and 2024
 // (26 October) Queensland state elections alongside nsw15/nsw19/nsw23/
 // sa22/sa26/vic14/vic18/vic22 — non-federal stops, drawn on their own
@@ -720,13 +720,17 @@ const YEARS = [1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, "vic14", "nsw15",
 // stops ran their own rows in from 2026-11-04.) wa17/wa21/wa25 (11 March
 // 2017, 13 March 2021, 8 March 2025): Western Australia's Legislative
 // Assembly stops on the same shape, one per redistribution era — the state
-// redraws its boundaries before every election.
+// redraws its boundaries before every election. nt16/nt20/nt24 (27 August
+// 2016, 22 August 2020, 24 August 2024): the Northern Territory's
+// Legislative Assembly on the same shape again (25 divisions; the
+// Territory unicameral, so no upper-house lane rides with them).
 const SA_YEARS = new Set(["sa22", "sa26"]);
 const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);
 const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);
 const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);
 const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);
-const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa" };
+const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);
+const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt" };
 const STATE_YEARS = new Set(Object.keys(YEAR_JUR));
 // the "as it stands" overlays: a now-key rides one election frame (nswnow is
 // the 2023 Assembly plus its four by-elections, qldnow the 2024 parliament
@@ -754,40 +758,44 @@ const YEARS_NSW = YEARS.filter((y) => NSW_YEARS.has(y));
 const YEARS_VIC = YEARS.filter((y) => VIC_YEARS.has(y));
 const YEARS_QLD = YEARS.filter((y) => QLD_YEARS.has(y));
 const YEARS_WA = YEARS.filter((y) => WA_YEARS.has(y));
+const YEARS_NT = YEARS.filter((y) => NT_YEARS.has(y));
 // each stop's spot on the timeline's date line (year + day-of-year/365)
-const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, nswnow: 2026.78, qldnow: 2026.79, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, wa17: 2017.192, wa21: 2021.194, wa25: 2025.183, wanow: 2026.84, now: 2026.8 };
+const YEAR_X = { 1993: 1993.195, 1998: 1998.753, 1996: 1996.169, 2001: 2001.861, 2004: 2004.772, 2007: 2007.896, 2010: 2010.638, 2013: 2013.68, 2016: 2016.499, 2019: 2019.377, 2022: 2022.386, 2025: 2025.378, sa22: 2022.213, sa26: 2026.216, nsw15: 2015.238, nsw19: 2019.225, nsw23: 2023.23, nswnow: 2026.78, qldnow: 2026.79, vic14: 2014.912, vic18: 2018.899, vic22: 2022.901, qld17: 2017.901, qld20: 2020.833, qld24: 2024.82, wa17: 2017.192, wa21: 2021.194, wa25: 2025.183, wanow: 2026.84, now: 2026.8, nt16: 2016.655, nt20: 2020.641, nt24: 2024.647 };
 // the calendar year a non-year word's results belong to ("sa22" elects in 2022)
-const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026 };
+const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024 };
 // a state frame's history spot: the previous election's date on its line;
 // Queensland's 2015 (31 January) precedes the row's three stops
-const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901, qld: 2015.086, wa: 2013.185 };
+const STATE_PREV_X = { sa: 2018.205, nsw: 2019.222, vic: 2018.901, qld: 2015.086, wa: 2013.185, nt: 2012.649 };
 const SA_PREV_X = { 2018: STATE_PREV_X.sa };
 const NSW_PREV_X = { 2011: 2011.233, 2019: STATE_PREV_X.nsw };
 const VIC_PREV_X = { 2010: 2010.907, 2018: STATE_PREV_X.vic };
 const QLD_PREV_X = { 2015: STATE_PREV_X.qld };
 const WA_PREV_X = { 2008: 2008.679, 2013: STATE_PREV_X.wa };
+const NT_PREV_X = { 2012: STATE_PREV_X.nt };
 // the election each state frame names as its "previous election" (its date rides
 // STATE_PREV_X on the timelines): South Australia's 2018, New South Wales' 2019,
 // Victoria's 2018 — and Queensland's stops prev-chain 2017→2020→2024, the 2017
 // frame naming nothing (the 2015 election was fought on the 89-district map);
 // the 2013-era stops chain too (nsw15←2011→nsw19←2015→nsw23; vic14←2010→vic18
-// ←2014→vic22), nsw15 and vic14 the row's first stops
-const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021 };
-const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia" };
+// ←2014→vic22), nsw15 and vic14 the row's first stops; the Territory stops
+// chain 2016→2020→2024 and the 2016 frame names the 2012 election (riding
+// the official 2012 statistical report beside the psephos mirror)
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };
+const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", NT: "Northern Territory" };
 const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
 // a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
 const stNameCap = (y) => Y2_ST_CAP[stOfYear(y)] || "";
 const prevXOf = (y) => STATE_PREV_X[YEAR_JUR[y]] ?? y - 1;
 const prevNameOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()} ${String(p).slice(2)}`; };
 const prevXLabOf = (y) => { const p = PREV_YEAR[y]; return p == null ? stOfYear(y).toUpperCase() : `${stOfYear(y).toUpperCase()}’${String(p).slice(2)}`; };
-const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", nswnow: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", qldnow: "lnp", wa17: "alp", wa21: "alp", wa25: "alp", wanow: "alp", now: "alp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
+const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp", 2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp", 2018: "lnp", sa22: "alp", sa26: "alp", nsw15: "lnp", nsw19: "lnp", nsw23: "alp", nswnow: "alp", vic14: "alp", vic18: "alp", vic22: "alp", qld17: "alp", qld20: "alp", qld24: "lnp", qldnow: "lnp", wa17: "alp", wa21: "alp", wa25: "alp", wanow: "alp", now: "alp", nt16: "alp", nt20: "alp", nt24: "lnp" }; // 2018 is SA's (Marshall's Liberals), the sa22 frame's prev
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
 // collide with nothing, but its PREV consecutive-year keys (2017/2020) are
 // likewise carried here, not in GOV's federal-year corridor
-const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" }, wa: { 2008: "alp", 2013: "lnp", 2017: "alp", 2021: "alp" } };
-const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", qldnow: "David Crisafulli", wa17: "Mark McGowan", wa21: "Mark McGowan", wa25: "Roger Cook", wanow: "Roger Cook", now: "Anthony Albanese" };
+const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" }, wa: { 2008: "alp", 2013: "lnp", 2017: "alp", 2021: "alp" }, nt: { 2012: "lnp", 2016: "alp", 2020: "alp" } };
+const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", qldnow: "David Crisafulli", wa17: "Mark McGowan", wa21: "Mark McGowan", wa25: "Roger Cook", wanow: "Roger Cook", now: "Anthony Albanese", nt16: "Michael Gunner", nt20: "Michael Gunner", nt24: "Lia Finocchiaro" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
 const CITIES = [["Sydney", "NSW", [[150.62, -34.12], [151.34, -33.56]]], ["Melbourne", "VIC", [[144.6, -38.12], [145.42, -37.58]]], ["Brisbane", "QLD", [[152.78, -27.72], [153.22, -27.25]]], ["Perth", "WA", [[115.68, -32.32], [116.08, -31.7]]], ["Adelaide", "SA", [[138.46, -35.14], [138.76, -34.72]]], ["Hobart", "TAS", [[147.18, -42.98], [147.48, -42.74]]], ["Canberra", "ACT", [[148.98, -35.48], [149.24, -35.16]]], ["Darwin", "NT", [[130.82, -12.5], [131.08, -12.32]]]];
@@ -814,12 +822,12 @@ const yearLenses = (y) => STATE_YEARS.has(y) ? LENSES.filter((l) => !FED_LENS.ha
 // are keyboard only — a phone scrolls the lens row itself, and its vertical
 // drags belong to the page. On the phone a walk keeps the view fixed
 // (walkHold below), and has no scroll side effects of its own
-const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : QLD_YEARS.has(y) ? YEARS_QLD : WA_YEARS.has(y) ? YEARS_WA : YEARS_FED);
+const yearLane = (y) => (SA_YEARS.has(y) ? YEARS_SA : VIC_YEARS.has(y) ? YEARS_VIC : NSW_YEARS.has(y) ? YEARS_NSW : QLD_YEARS.has(y) ? YEARS_QLD : WA_YEARS.has(y) ? YEARS_WA : NT_YEARS.has(y) ? YEARS_NT : YEARS_FED);
 function walkYear(dir, wrap) { const lane = yearLane(S.year); const k = lane.indexOf(S.year) + dir, y = lane[wrap ? (k + lane.length) % lane.length : k]; if (y != null) setYear(y); }
 // the up/down-arrows walk: the "View elections" strip's order (federal, then
 // the states as they are listed there), walking round the ends; a lane holds
 // the stop it was left on (setYear keeps the memory), its newest stop until then
-const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA];
+const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_SA, YEARS_WA, YEARS_NT];
 const laneMem = new Map();
 function walkLane(dir) {
   const cur = yearLane(S.year);
@@ -1621,7 +1629,7 @@ const SEATED_LC = new Set(["sa26", "vic22"]);
 // Parliament first sat (Dan Cregan, 3 May 2022; Nat Cook, 5 May 2026; Greg Piper, 2 May 2023;
 // Shelley Hancock, 2 May 2011; Jonathan O'Dea, 27 May 2019; Christine Fyffe, 24 December 2014;
 // Colin Brooks, 27 March 2017)
-const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", nswnow: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine", qldnow: "Condamine", wa17: "Albany", wa21: "Midland", wa25: "Forrestfield", wanow: "Forrestfield" };
+const SPEAKER_DIV = { sa22: "Kavel", sa26: "Hurtle Vale", nsw15: "South Coast", nsw19: "Davidson", nsw23: "Lake Macquarie", nswnow: "Lake Macquarie", vic14: "Evelyn", vic18: "Bundoora", vic22: "Bendigo West", qld17: "Mulgrave", qld20: "Mulgrave", qld24: "Condamine", qldnow: "Condamine", wa17: "Albany", wa21: "Midland", wa25: "Forrestfield", wanow: "Forrestfield", nt16: "Goyder", nt20: "Karama", nt24: "Araluen" };
 async function loadYear(year, bg) {
   // switching back to an already-loaded year restores that year's projection:
   // sa26's frame fits South Australia, the federal years' the continent

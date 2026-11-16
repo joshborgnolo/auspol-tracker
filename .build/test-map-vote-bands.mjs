@@ -8,7 +8,7 @@ const read = (p) => fs.readFileSync(new URL(p, new URL("../", import.meta.url)),
 const states = { NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", SA: "South Australia", TAS: "Tasmania", ACT: "Australian Capital Territory", NT: "Northern Territory" };
 const short = { NSW: "NSW", VIC: "Vic", QLD: "Qld", WA: "WA", SA: "SA", TAS: "Tas", ACT: "ACT", NT: "NT" };
 // the app gates a state scope pick on STATE_YEARS (statScopeOk, app-1-base.js)
-const STATE_YEARS = new Set(Object.keys({ sa22: 1, sa26: 1, nsw15: 1, nsw19: 1, nsw23: 1, nswnow: 1, vic14: 1, vic18: 1, vic22: 1, qld17: 1, qld20: 1, qld24: 1, qldnow: 1, wa17: 1, wa21: 1, wa25: 1, wanow: 1 }));
+const STATE_YEARS = new Set(Object.keys({ sa22: 1, sa26: 1, nsw15: 1, nsw19: 1, nsw23: 1, nswnow: 1, vic14: 1, vic18: 1, vic22: 1, qld17: 1, qld20: 1, qld24: 1, qldnow: 1, wa17: 1, wa21: 1, wa25: 1, wanow: 1, nt16: 1, nt20: 1, nt24: 1 }));
 const STATES = ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"];
 const CLS = ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"];
 const CLS_SHORT = { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro", Provincial: "Provincial", Rural: "Rural" };

@@ -103,11 +103,23 @@ def fail(msg):
 def read_sa1_polygons(year):
     """SA1 code -> classified polygons, WA rows of that vintage's pack."""
     V = VINTAGES[year]
-    if not os.path.exists(V["shp"]):
-        fail(f"missing SA1 polygons {V['shp']} (see refetch manifests in build_qld_demo_common)")
-    with zipfile.ZipFile(V["shp"]) as z:
-        dbf = z.read(V["shp_members"][1])
-        shp = z.read(V["shp_members"][0])
+    return read_sa1_polygons_param(
+        V["gcp"], V["shp"], V["shp_members"], V["shp_key"],
+        prefix="5", expect_rows=(6352 if year == 2021 else 5984),
+        sentinels=WA_SENTINELS[year], vintage_label=f"WA {year}")
+
+
+def read_sa1_polygons_param(gcp, shp_path, shp_members, shp_key,
+                            prefix, expect_rows, sentinels, vintage_label):
+    """Parameterised twin of read_sa1_polygons — qld/wa call it through
+    their VINTAGES entries; nt_geo.py calls it directly with the NT row
+    count + sentinel pins (the vintage packs are national, so the same
+    zips serve every jurisdiction filtered on its SA1 prefix)."""
+    if not os.path.exists(shp_path):
+        fail(f"missing SA1 polygons {shp_path} (see refetch manifests in build_qld_demo_common)")
+    with zipfile.ZipFile(shp_path) as z:
+        dbf = z.read(shp_members[1])
+        shp = z.read(shp_members[0])
     nrec, hlen, rlen = struct.unpack_from("<IHH", dbf, 4)
     fields = []
     off = 32
@@ -118,19 +130,18 @@ def read_sa1_polygons(year):
         fields.append((name, pos, flen))
         pos += flen
         off += 32
-    if V["shp_key"] not in [f[0] for f in fields]:
-        fail(f"DBF lacks {V['shp_key']}")
+    if shp_key not in [f[0] for f in fields]:
+        fail(f"DBF lacks {shp_key}")
     codes = []
     for i in range(nrec):
         rec = dbf[hlen + i * rlen: hlen + (i + 1) * rlen]
         for name, rel, flen in fields:
-            if name == V["shp_key"]:
+            if name == shp_key:
                 codes.append(rec[rel:rel + flen].decode("ascii").strip())
                 break
-    wa_n = sum(1 for c in codes if c.startswith("5"))
-    expect_n = 6352 if year == 2021 else 5984
-    if wa_n != expect_n:
-        fail(f"DBF WA rows {wa_n} != pin {expect_n}")
+    wa_n = sum(1 for c in codes if c.startswith(prefix))
+    if wa_n != expect_rows:
+        fail(f"DBF {prefix}-rows {wa_n} != pin {expect_rows}")
 
     if struct.unpack_from(">i", shp, 0)[0] != 9994 or \
        struct.unpack_from("<i", shp, 28)[0] != 1000 or \
@@ -152,12 +163,12 @@ def read_sa1_polygons(year):
         recno += 1
         rtype = struct.unpack_from("<i", content, 0)[0]
         if rtype == 0:
-            if code.startswith("5"):
+            if code.startswith(prefix):
                 nulls.append(code)
             continue
         if rtype != 5:
             fail("SHP non-polygon record")
-        if not code.startswith("5"):
+        if not code.startswith(prefix):
             continue
         nparts, npts = struct.unpack_from("<2i", content, 36)
         parts = struct.unpack_from(f"<{nparts}i", content, 44)
@@ -171,11 +182,10 @@ def read_sa1_polygons(year):
     if recno != nrec:
         fail(f"SHP records {recno} != DBF {nrec}")
     nullset = set(nulls)
-    expect = WA_SENTINELS[year]
-    if nullset != expect:
-        fail(f"WA {year} sentinel SA1 set drift: got {sorted(nullset)},"
-             f" pinned {sorted(expect)}")
-    print(f"SA1 {year} polygons: {len(out)} WA shapes, {len(nulls)} WA sentinels (no geometry)")
+    if nullset != set(sentinels):
+        fail(f"{vintage_label} sentinel SA1 set drift: got {sorted(nullset)},"
+             f" pinned {sorted(sentinels)}")
+    print(f"SA1 {vintage_label} polygons: {len(out)} shapes, {len(nulls)} sentinels (no geometry)")
     return out
 
 
@@ -392,7 +402,7 @@ def assign_sa1(sa1, districts):
         assign[code] = hit_name
     for code, d in rescued:
         print(f"  edge-eps rescue: SA1 {code} -> {assign[code]} ({d:.0f} m off the boundary)")
-    print(f"assign: {len(assign)} SA1s -> 59 districts (centroid method, {len(rescued)} edge rescues)")
+    print(f"assign: {len(assign)} SA1s -> {len(districts)} districts (centroid method, {len(rescued)} edge rescues)")
     return assign
 
 
