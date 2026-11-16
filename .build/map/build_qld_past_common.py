@@ -1,11 +1,14 @@
-"""The Queensland frames' past-election joins (build_qld20_past.py and
-build_qld24_past.py), the sa26-past discipline on the ECQ's own record.
+"""The Queensland frames' past-election joins (build_qld17_past.py
+through build_qld24_past.py), the sa26-past discipline on the ECQ's own
+record.
 
-qld20 stands on qld17, qld24 on qld20 — all three were fought on the SAME
-93-district boundary set (the 2017 determination), so the join is name-for-
-name and swings are honest reads of the same seats. A rename is a breach of
-that contract (none since 2017): the build fails on any unmatched name
-rather than take a rename table.
+qld20 stands on qld17, qld24 on qld20 — both fought on the unchanged
+93-district map (the 2017 determination), so the join rides its identity
+contract: a drifted name fails the build. qld17 stands on 2015 —
+Queensland's LAST election on the 89-district map — and joins through
+the 2017 determination renames per .build/map/src/qld/past-adjudication.md
+(9 renames, 3 abolished, 7 new; centroid-adjudicated against both ABS SED
+editions).
 
 The build reads the previous election through qld_ecq's load() — the same
 committed mirrors its sister data builder just turned into data-qld<prev>.
@@ -37,12 +40,33 @@ import qld_ecq
 REPO = qld_ecq.REPO
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
-#: previous-election lookup per frame. qld17 has none: the 2015 election
-#: was fought on the 89-district map, so the "previous election" lanes
-#: would lie by implication — its frame files prev:null outright and no
-#: past builder exists for it (documented in build_qld_common.py).
-PREV_OF = {"qld24": "qld20", "qld20": "qld17"}
-PREV_YEAR = {"qld20": 2017, "qld24": 2020, "qld17": None}
+#: previous-election lookup per frame. qld17 now names 2015: the
+#: 89-district election joins the 93-district frame through the
+#: documented 2017 determination renames, adjudicated by ABS SED
+#: polygon-centroid maps in .build/map/src/qld/past-adjudication.md
+PREV_OF = {"qld24": "qld20", "qld20": "qld17", "qld17": "qld15"}
+PREV_YEAR = {"qld20": 2017, "qld24": 2020, "qld17": 2015}
+
+#: the join contract per frame — adjudication lives in
+#: .build/map/src/qld/past-adjudication.md. NEW districts keep no history
+#: rows and carry no swings (their story is "new seat"); ABOLISHED ride
+#: the aggregates only. qld20/qld24 chain name-for-name on the unchanged
+#: map (the existing contract): their PREV_ADJ records stay {}, and a
+#: drift still fails loudly.
+PREV_ADJ = {
+    "qld17": {
+        "renames": {
+            "Theodore": "Albert", "Cooper": "Ashgrove", "Scenic Rim": "Beaudesert",
+            "McConnel": "Brisbane Central", "Oodgeroo": "Cleveland",
+            "Maiwar": "Indooroopilly", "Kurwongbah": "Kallangur",
+            "Traeger": "Mount Isa", "Miller": "Yeerongpilly",
+        },
+        "new": {"Bancroft", "Bonney", "Hill", "Jordan", "Macalister", "Ninderry", "Toohey"},
+        "abolished": {"Dalrymple", "Mount Coot-tha", "Sunnybank"},
+    },
+    "qld20": {"renames": {}, "new": set(), "abolished": set()},
+    "qld24": {"renames": {}, "new": set(), "abolished": set()},
+}
 
 
 def fail(frame):
@@ -59,13 +83,14 @@ def past_main(frame):
     ffail = fail(frame)
     prev_frame = PREV_OF.get(frame)
     if not prev_frame:
-        ffail(f"{frame} has no past join by definition (qld17's election was the "
-              "first on the 93-district map)")
+        ffail(f"{frame} has no past join by definition")
     past_year = PREV_YEAR[frame]
+    adj = PREV_ADJ[frame]
     past = qld_ecq.load(prev_frame)
     past_d = {x["name"]: x for x in past["districts"]}
-    if len(past_d) != 93:
-        ffail(f"previous election parsed {len(past_d)} districts, expected 93")
+    expect_divs = {"qld15": 89, "qld17": 93, "qld20": 93}[prev_frame]
+    if len(past_d) != expect_divs:
+        ffail(f"previous election parsed {len(past_d)} districts, expected {expect_divs}")
 
     data_path = os.path.join(OUT, f"data-{frame}.json")
     if not os.path.exists(data_path):
@@ -97,12 +122,15 @@ def past_main(frame):
     matched = set()
     for div in data["divs"]:
         name = div["n"]
-        past_x = past_d.get(name)
+        if name in adj["new"]:
+            continue   # a new seat keeps no history rows and no swings
+        past_name = adj["renames"].get(name, name)
+        past_x = past_d.get(past_name)
         if past_x is None:
             ffail(f"{frame} district {name} matches no {past_year} district —"
-                  " the boundary-set contract is broken (extend a RENAMES map"
-                  " deliberately, never silently)")
-        matched.add(name)
+                  " extend the PREV_ADJ renames map deliberately (see"
+                  " .build/map/src/qld/past-adjudication.md), never silently")
+        matched.add(past_name)
         w_key = past_x["elected"]
         w_pct = r2(100 * past_x["tcp"]["v"][0] / sum(past_x["tcp"]["v"]))
         w_ab = next(c["ab"] for c in past_x["cands"] if c["key"] == w_key)
@@ -133,10 +161,14 @@ def past_main(frame):
                 old2 = (100 * past_alp_v) / (past_alp_v + past_lnp_v)
                 div["tpp"][2] = r2(cur - old2)
                 n_tpp += 1
-    leftover = set(past_d) - matched
+    leftover = set(past_d) - matched - adj["abolished"]
     if leftover:
-        ffail(f"{past_year} districts never matched: {sorted(leftover)[:5]} —"
-              " the name contract broke somewhere")
+        ffail(f"{past_year} districts never matched nor adjudicated: {sorted(leftover)[:5]}"
+              " — the adjudication record is stale")
+    handled = matched | adj["new"] | set(adj["renames"])
+    unhandled = [x["n"] for x in data["divs"] if x["n"] not in handled]
+    if unhandled:
+        ffail(f"{frame} districts neither matched nor adjudicated new: {unhandled[:5]}")
 
     with open(data_path, "w") as f:
         json.dump(data, f, separators=(",", ":"), ensure_ascii=False)

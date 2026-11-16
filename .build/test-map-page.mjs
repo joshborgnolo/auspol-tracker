@@ -2109,6 +2109,7 @@ for (const y of ["sa22", "sa26"]) {
 {
   for (const [tag, cobW] of Object.entries({
     vic14: 8, vic18: 10, nsw15: 8, nsw19: 10, wa17: 10, wa21: 10, wa25: 10,
+    nt16: 10, nt20: 10, nt24: 10,
   })) {
     const res = JSON.parse(R(`map/data/res-${tag}.json`));
     assert.equal((res.cobKeys || []).length, cobW, `${tag}: birthplace menu rides its own era's country set`);
@@ -2587,9 +2588,9 @@ for (const y of ["sa22", "sa26"]) {
     qld20: { date: "2020-10-31", prev: 2017, seats: { ALP: 52, LNP: 34, KAP: 3, GRN: 2, ONP: 1, IND: 1 }, formal: 2868324, enr: 3377476,
              booths: 1810, ty: [1, 4, 5], mobile: 93, geo: 1717, tcp: 1810, dec: 1668, demo: 1717,
              fl: 87, tppsw: 64, swings: 597, hist: 93, demoYear: null },
-    qld17: { date: "2017-11-25", prev: null, seats: { ALP: 48, LNP: 39, KAP: 3, GRN: 1, ONP: 1, IND: 1 }, formal: 2703941, enr: 3229536,
+    qld17: { date: "2017-11-25", prev: 2015, fpformal: 2623443, seats: { ALP: 48, LNP: 39, KAP: 3, GRN: 1, ONP: 1, IND: 1 }, formal: 2703941, enr: 3229536,
              booths: 1701, ty: [1, 4, 5], mobile: 3, geo: 1110, tcp: 0, dec: 1092, demo: 1110,
-             fl: 78, tppsw: 0, swings: 0, hist: 0, demoYear: 2016 },
+             fl: 78, tppsw: 59, swings: 413, hist: 86, demoYear: 2016 },
   };
   for (const [frame, ora] of Object.entries(FR)) {
     const res = JSON.parse(R(`map/data/res-${frame}.json`));
@@ -2617,7 +2618,9 @@ for (const y of ["sa22", "sa26"]) {
       assert.equal(bucketTotal(res.agg.QLD.pprim), res.agg.QLD.pformal, `${frame}: previous party primary sums account for the previous formal vote`);
       assert.equal(bucketTotal(res.divs.map((d) => d.h.length)), ora.hist, `${frame}: one history row per district ([prev-year, TCP%, party, member])`);
       for (const d of res.divs) {
-        assert.ok(d.h.length === 1 && d.h[0][0] === ora.prev && typeof d.h[0][1] === "number" && typeof d.h[0][3] === "string", `${frame} ${d.n}: its ${ora.prev} history row`);
+        // a frame with new seats leaves those without history rows (qld17's
+        // seven determination-era seats); every row named is the frame's prev
+        for (const h of d.h) assert.ok(h.length === 4 && h[0] === ora.prev && typeof h[1] === "number" && typeof h[3] === "string", `${frame} ${d.n}: its ${ora.prev} history row`);
       }
       let nSw = 0;
       for (const d of res.divs) for (const c of d.c) { assert.ok(Number.isFinite(c[5]), `${frame} ${d.n}: c[5] finite for ${c[0]}`); if (c[5] !== 0) nSw++; }
@@ -2685,6 +2688,101 @@ for (const y of ["sa22", "sa26"]) {
   }
 }
 
+// ── the nt frames: the Northern Territory's 27 August 2016, 22 August 2020
+// and 24 August 2024 Legislative Assembly elections — 25 divisions per
+// frame on era boundaries (2015-/2019-/2023-determination; nt16 riding the
+// 2016, nt20/nt24 the 2021 census vintage, nt16 carrying demoYear 2016).
+// Sources: the state-flows NTEC results-page mirror (candidate/TCP
+// summary, FP AND TCP by voting centre, tallies; nt16's past lane the
+// 2012 election from the official 2012 statistical report beside Adam
+// Carr's transcription). Past chains adjudicated in
+// .build/map/src/nt/past-adjudication.md: 2012→2016 Greatorex→-Spillett;
+// 2016→2020 Stuart→Gwoja, Nhulunbuy→Mulka; 2020→2024 quiet. Every venue
+// geolocated by pp-nt.json (338 located, zero unmatched) — remote NT's
+// mobile-team lane folds into district tallies and draws no dots. No
+// mobile ty==4 rows ride the lanes. SEIFA deciles and people cells join
+// per-booth at SA1 via build_nt_boothcensus.py
+{
+  const bucketTotal = (x) => (x && Object.values(x) || []).reduce((a, b) => a + b, 0);
+  const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
+  const NW = {
+    nt16: { date: "2016-08-27", prev: 2012, fpformal: 92143, seats: { ALP: 18, Ind: 5, CLP: 2 }, formal: 98299, enr: 135506,
+            booths: 88, geo: 88, tcp: 88, hist: 24, swings: 109, tppsw: 17, demoYear: 2016 },
+    nt20: { date: "2020-08-22", prev: 2016, fpformal: 98299, seats: { ALP: 14, CLP: 8, TA: 1, Ind: 2 }, formal: 102172, enr: 141225,
+            booths: 116, geo: 116, tcp: 115, hist: 25, swings: 111, tppsw: 17, demoYear: null },
+    nt24: { date: "2024-08-24", prev: 2020, fpformal: 102172, seats: { CLP: 17, ALP: 4, Ind: 3, GRN: 1 }, formal: 101741, enr: 153249,
+            booths: 134, geo: 134, tcp: 84, hist: 25, swings: 80, tppsw: 14, demoYear: null },
+  };
+  for (const [frame, ora] of Object.entries(NW)) {
+    const res = JSON.parse(R(`map/data/res-${frame}.json`));
+    assert.equal(res.year, frame, `${frame}: year id`);
+    assert.equal(res.date, ora.date, `${frame}: polling day`);
+    assert.equal(res.prev, ora.prev, `${frame}: prev ${ora.prev}`);
+    assert.equal(res.demoBasis, "sa1", `${frame} records the SA1 census basis`);
+    assert.equal(ora.demoYear ?? null, res.demoYear ?? null, `${frame}: the census edition it quotes${ora.demoYear ? " (nt16 reads the 2016 census)" : ""}`);
+    assert.equal(res.jurisdiction, "NT", `${frame}: jurisdiction`);
+    assert.deepEqual(Object.keys(res.agg), ["AUS", "NT"], `${frame} carries only the Territory frame's areas`);
+    assert.equal(res.divs.length, 25, `${frame}: 25 Legislative Assembly divisions`);
+    for (const f of [`geo-${frame}-lo.json`, `geo-${frame}-hi.json`]) assert.ok(fs.existsSync(path.join(ROOT, "map", "data", f)), "map/data/" + f);
+    assert.deepEqual(res.agg.NT.seats, ora.seats, `${frame}: the NTEC's declared seat count`);
+    assert.deepEqual(res.agg.AUS.seats, ora.seats, `${frame}: the AUS mirror carries the same seats`);
+    assert.equal(res.agg.NT.formal, ora.formal, `${frame}: formal vote`);
+    assert.equal(res.agg.NT.inf > 0 && res.agg.NT.inf < res.agg.NT.formal, true, `${frame}: the agg's informal tally is sane`);
+    assert.equal(bucketTotal(res.agg.NT.prim), ora.formal, `${frame}: party primary sums account for every formal vote`);
+    assert.equal(bucketTotal(res.divs.map((d) => d.enrolled)), ora.enr, `${frame}: enrolment sums to its page-sum`);
+    assert.equal(res.agg.NT.pformal, ora.fpformal, `${frame}: previous election's formal vote`);
+    assert.equal(bucketTotal(res.agg.NT.pprim), res.agg.NT.pformal, `${frame}: previous party primary sums account for the previous formal vote`);
+    assert.equal(bucketTotal(res.divs.map((d) => d.h.length)), ora.hist, `${frame}: history rows = divisions minus new seats`);
+    for (const d of res.divs) {
+      for (const h of d.h) assert.ok(h.length === 4 && h[0] === ora.prev && typeof h[1] === "number" && typeof h[3] === "string", `${frame} ${d.n}: its ${ora.prev} history row`);
+      assert.ok(d.demo && DMK.every((k2) => typeof d.demo[k2] === "number") && typeof d.demo.p === "number", `${frame} ${d.n}: demo row`);
+      assert.ok(d.demo.cob && Object.keys(d.demo.cob).length === GCP_COB_KEYS.length, `${frame} ${d.n}: ten-country cob`);
+      for (const ix of ["irsad", "irsd", "ier", "ieo"]) assert.ok(d.seifa && typeof d.seifa[ix].v === "number" && Number.isInteger(d.seifa[ix].dec), `${frame} ${d.n}: ${ix} cell`);
+    }
+    let nSw = 0;
+    for (const d of res.divs) for (const c of d.c) { assert.ok(Number.isFinite(c[5]), `${frame} ${d.n}: c[5] finite for ${c[0]}`); if (c[5] !== 0) nSw++; }
+    assert.equal(nSw, ora.swings, `${frame}: ${ora.swings} candidates moved on the previous election`);
+    assert.equal(res.divs.filter((d) => d.tpp && Number.isFinite(d.tpp[2])).length, ora.tppsw, `${frame}: ${ora.tppsw} classic-pair 2PP swings where both elections finished Labor v CLP`);
+    const B = res.booths;
+    const LANES16 = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
+    for (const k of LANES16) assert.ok(Array.isArray(B[k]) && B[k].length === ora.booths, `${frame} booths.${k}: ${ora.booths} rows`);
+    assert.equal(new Set(B.id).size, ora.booths, `${frame} booth ids are unique`);
+    assert.deepEqual([...new Set(B.ty)].sort((a, b) => a - b), [1, 5], `${frame}: venue-type vocabulary [1 day, 5 EVC] (mobile teams fold into districts)`);
+    let geo = 0, tcp = 0;
+    for (let k = 0; k < B.n.length; k++) {
+      if (B.lat[k] != null) {
+        geo++;
+        assert.ok(B.lat[k] > -26 && B.lat[k] < -10 && B.lon[k] > 128 && B.lon[k] < 139, `${frame} ${B.n[k]}: venue inside the Territory`);
+      }
+      if (B.tcp[k] != null) {
+        tcp++;
+        const f0 = B.tcp[k];
+        assert.ok(Array.isArray(f0) && f0.length === 2 && f0.every((x) => Number.isInteger(x) && x >= 0), `${frame} ${B.n[k]}: booth TCP pair at the division's final pair`);
+      }
+    }
+    assert.equal(geo, ora.geo, `${frame}: every booth geocoded (pp-nt.json's locality-anchored register)`);
+    assert.equal(tcp, ora.tcp, `${frame}: ${ora.tcp} booths carry the official two-candidate count`);
+    assert.ok(B.prem.every((x) => x === null), `${frame}: no NTEC address book — premises/locals/postcodes stay empty (the pp register carries coordinates only)`);
+    assert.ok(B.tpp.every((x) => x === null), `${frame} booths carry no tpp lane`);
+    assert.ok(B.fl.every((x) => x === null), `${frame} booths carry no per-booth flow lane`);
+    assert.ok(B.vdec.every((x) => x === null), `${frame}: no voter-footprint deciles (no NT-era votes-by-SA1 product)`);
+    assert.deepEqual(res.cobKeys, GCP_COB_KEYS, `${frame}: the ten curated birthplace countries in site order`);
+    assert.deepEqual(res.relKeys, ["norel", "cath", "angl", "unch", "pres", "orth", "budd", "isl", "hind", "jew"], `${frame}: ten religions, norel first`);
+    assert.deepEqual(res.tenKeys, ["mort", "rent", "own", "rentPub"], `${frame}: tenure menu's four options`);
+    assert.equal((res.ancKeys || []).length, 12, `${frame}: twelve ancestry options`);
+    assert.equal((res.indKeys || []).length, 19, `${frame}: nineteen industry options`);
+    assert.deepEqual(res.marKeys, ["marr", "never", "sep", "div", "wid"], `${frame}: five marital options`);
+    assert.ok(res.incomeCuts && res.incomeCuts.loQuantile > 0, `${frame}: its income-cuts record`);
+    for (const lane of ["dec", "demo", "cob", "rel", "ten", "anc", "ind", "mar"]) {
+      assert.ok(Array.isArray(B[lane]) && B[lane].length === ora.booths, `${frame}: the ${lane} booth census lane rides the full registry`);
+    }
+    assert.ok(B.dec.filter((x) => x !== null).length >= ora.tcp - 20, `${frame}: national SEIFA deciles join broadly across the located lanes`);
+    assert.ok(B.demo.filter((x) => x !== null).length >= ora.tcp - 20, `${frame}: people cells join broadly across the located lanes`);
+    const dc = new Set(res.divs.map((d) => d.seifa.irsad.dec));
+    assert.ok(dc.size >= 7, `${frame} IRSAD deciles spread across the range (a monotone join bug collapses them)`);
+  }
+}
+
 // ── the qld chamber floor: Queensland's Legislative Assembly on the shared arc
 // idiom (the @qld-cells QLDB ledger in app-3-chamber.js — 92 desks for the
 // chamber's 92 elected seats beside the furniture chair, the Macquarie
@@ -2725,7 +2823,7 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);') && base.includes('const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);') && base.includes('const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);'), "NSW/VIC/QLD/WA/NT year sets name the state frames (the wa family joined 2026-11-05; the Territory family 2026-11-16)");
   assert.ok(base.includes('const YEAR_JUR = { sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt" };'), "YEAR_JUR maps a frame year to its jurisdiction");
   assert.ok(base.includes('const STATE_YEARS = new Set(Object.keys(YEAR_JUR));'), "STATE_YEARS derives from YEAR_JUR");
-  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };"), "the state frames' past joins (qld17 names none — the 2015 election rode the 89-district map; the wa stops prev-chain 2013→2017→2021→2025, the Territory's 2012→2016→2020→2024)");
+  assert.ok(base.includes("const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: 2015, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };"), "the state frames' past joins (qld17 stands on 2015's 89-district map through the determination renames; the wa stops prev-chain 2013→2017→2021→2025, the Territory's 2012→2016→2020→2024)");
   assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");

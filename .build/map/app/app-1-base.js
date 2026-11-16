@@ -774,13 +774,14 @@ const WA_PREV_X = { 2008: 2008.679, 2013: STATE_PREV_X.wa };
 const NT_PREV_X = { 2012: STATE_PREV_X.nt };
 // the election each state frame names as its "previous election" (its date rides
 // STATE_PREV_X on the timelines): South Australia's 2018, New South Wales' 2019,
-// Victoria's 2018 — and Queensland's stops prev-chain 2017→2020→2024, the 2017
-// frame naming nothing (the 2015 election was fought on the 89-district map);
+// Victoria's 2018 — and Queensland's stops prev-chain 2015→2017→2020→2024, the
+// 2017 frame standing on 2015's 89-district map through the determination
+// renames (past-adjudication.md);
 // the 2013-era stops chain too (nsw15←2011→nsw19←2015→nsw23; vic14←2010→vic18
 // ←2014→vic22), nsw15 and vic14 the row's first stops; the Territory stops
 // chain 2016→2020→2024 and the 2016 frame names the 2012 election (riding
 // the official 2012 statistical report beside the psephos mirror)
-const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: null, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };
+const PREV_YEAR = { sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: 2015, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020 };
 const Y2_ST_CAP = { SA: "South Australia", NSW: "New South Wales", VIC: "Victoria", QLD: "Queensland", WA: "Western Australia", NT: "Northern Territory" };
 const stOfYear = (y) => (YEAR_JUR[y] || "").toUpperCase();
 // a state frame's state in sentence words ("New South Wales" wherever "SA" would do)
@@ -792,9 +793,9 @@ const GOV = { 1993: "alp", 1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2
 // another state's 2018 prev-government collides with SA's key above: Victoria
 // 2018 was Labor (Andrews won it), so the winner a vic22 frame is gauged
 // against comes from this corridor, not GOV[2018]. Queensland's stop years
-// collide with nothing, but its PREV consecutive-year keys (2017/2020) are
-// likewise carried here, not in GOV's federal-year corridor
-const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" }, wa: { 2008: "alp", 2013: "lnp", 2017: "alp", 2021: "alp" }, nt: { 2012: "lnp", 2016: "alp", 2020: "alp" } };
+// collide with nothing, but its PREV consecutive-year keys (2015/2017/2020)
+// are likewise carried here, not in GOV's federal-year corridor
+const PREV_GOV_BY_JUR = { vic: { 2010: "lnp", 2014: "alp", 2018: "alp" }, qld: { 2015: "alp", 2017: "alp", 2020: "alp" }, nsw: { 2011: "lnp", 2015: "lnp", 2019: "lnp" }, wa: { 2008: "alp", 2013: "lnp", 2017: "alp", 2021: "alp" }, nt: { 2012: "lnp", 2016: "alp", 2020: "alp" } };
 const PM = { 1993: "Paul Keating", 1998: "John Howard", 2001: "John Howard", 1996: "John Howard", 2004: "John Howard", 2007: "Kevin Rudd", 2010: "Julia Gillard", 2013: "Tony Abbott", 2016: "Malcolm Turnbull", 2019: "Scott Morrison", 2022: "Anthony Albanese", 2025: "Anthony Albanese", sa22: "Peter Malinauskas", sa26: "Peter Malinauskas", nsw15: "Mike Baird", nsw19: "Gladys Berejiklian", nsw23: "Chris Minns", nswnow: "Chris Minns", vic14: "Daniel Andrews", vic18: "Daniel Andrews", vic22: "Daniel Andrews", qld17: "Annastacia Palaszczuk", qld20: "Annastacia Palaszczuk", qld24: "David Crisafulli", qldnow: "David Crisafulli", wa17: "Mark McGowan", wa21: "Mark McGowan", wa25: "Roger Cook", wanow: "Roger Cook", now: "Anthony Albanese", nt16: "Michael Gunner", nt20: "Michael Gunner", nt24: "Lia Finocchiaro" };
 const SANS = '"IBM Plex Sans", system-ui, sans-serif';
 const K_HI = 2.6, K_ALL = 26, K_BLAB = 90;
