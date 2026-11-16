@@ -2,9 +2,10 @@
 # Daily crosstabs catch-up: vote-switching.mjs + demographics.mjs + issues.mjs
 # + confidence.mjs (ANZ–Roy Morgan consumer confidence + Roy Morgan business
 # confidence, for the Snapshot's "Economic sentiment" panel)
-# + macro.mjs (ABS CPI + GDP-per-capita + the unemployment rate, and the
-# OECD aggregates/member median via their data APIs and the OECD's monthly
-# inflation release PDFs, for that panel's "Inflation & growth" view)
+# + macro.mjs (ABS CPI + GDP-per-capita + GDP-per-hour + the unemployment
+# rate + real weekly earnings, and the OECD aggregates and member medians
+# via their data APIs and the OECD's monthly inflation release PDFs, for
+# that panel's "Inflation & growth" view)
 # -> if any file changed -> validate -> render-card -> build -> commit -> push.
 # Run in CI by crosstabs-update.yml.
 #

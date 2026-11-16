@@ -29,10 +29,16 @@ assert.equal(periodEnd("2026-Q1"), "2026-03-31");
 assert.equal(periodEnd("2026-Q4"), "2026-12-31");
 assert.equal(periodEnd("2026-02"), "2026-02-28");
 assert.equal(periodEnd("2024-02"), "2024-02-29", "leap February counts");
+assert.equal(periodEnd("2026-S1"), "2026-05-31", "the AWE semi-annual S1 is May");
+assert.equal(periodEnd("2026-S2"), "2026-11-30", "and S2 November");
+assert.equal(periodEnd("2026"), "2026-12-31", "a lone year ends at December");
 assert.equal(periodEnd("junk"), null);
 assert.equal(periodOrd("2026-Q3"), 2026 * 4 + 2);
 assert.equal(periodOrd("2026-09"), 2026 * 12 + 8);
-assert.ok(Number.isNaN(periodOrd("2026")));
+assert.equal(periodOrd("2026-S1"), 2026 * 12 + 4);
+assert.equal(periodOrd("2026-S2"), 2026 * 12 + 10);
+assert.equal(periodOrd("2026"), 2026 * 12 + 11);
+assert.ok(Number.isNaN(periodOrd("junk")));
 
 /* y/y of a steadily 1%-per-quarter index is 1.01^4−1 = 4.0604 → 4.1; the
    first four quarters carry no base and never emit */
@@ -392,6 +398,88 @@ const giniPage = (cap, heads, y0, n, ...cols) => {
   const q = (x) => JSON.stringify(x).replace(/"/g, "&quot;");
   return `<html><body><div class="chart-data-wrapper" style="display:none;"><pre class="chart-caption">${cap}</pre><pre class="chart-headers">${q(heads)}</pre><pre class="chart-data">${q(data)}</pre></div></body></html>`;
 };
+/* ABS productivity: ANA_AGG M5 GDP-per-hour-worked index, 190 quarters
+   1980-Q1 → 2027-Q2, 200·1.0045^q → y/y ≈ 1.8 every quarter */
+const absProdCsv = (() => {
+  const rows = ["DATAFLOW,MEASURE,DATA_ITEM,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT"];
+  let y = 1980, q = 1;
+  for (let i = 0; i < 190; i++) {
+    rows.push(`ABS:ANA_AGG(1.0.0),M5,GPM_PHW,20,AUS,Q,${qIso(y, q)},${(200 * Math.pow(1.0045, i)).toFixed(3)},,,,`);
+    if (++q === 5) { q = 1; y++; }
+  }
+  return rows.join("\n") + "\n";
+})();
+/* ABS AWE (cat 6302), semi-annual 2010-S1 → 2022-S2 (26 halves), nominal
+   1000·1.04^half: against the CPI index's ~4.49%/y climb the real year
+   change pins at 3.5 every row */
+const absAweCsv = (() => {
+  const rows = ["DATAFLOW,MEASURE,ESTIMATE_TYPE,SEX,SECTOR,INDUSTRY,TSEST,REGION,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,OBS_STATUS,OBS_COMMENT,UNIT_MULT"];
+  let i = 0;
+  for (let y = 2010; y <= 2022; y++) for (const s of ["S1", "S2"]) {
+    rows.push(`ABS:AWE(1.0.0),3,1,3,7,TOT,20,AUS,S,${y}-${s},${(1000 * Math.pow(1.04, i)).toFixed(1)},AUD,,,0`);
+    i++;
+  }
+  return rows.join("\n") + "\n";
+})();
+/* OECD member GDP growth: 26 members × 260 quarters 1961-Q1 → 2025-Q4;
+   member i prints 2.0+0.08i every quarter — with the pop fixture's steady
+   0.7%/y, the per-capita median pins at 2.3 every quarter */
+const oecdGdpGrowthCsv = (() => {
+  const rows = ["DATAFLOW,REF_AREA,FREQ,MEASURE,UNIT_MEASURE,PRICE_BASE,TRANSFORMATION,ADJUSTMENT,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,BASE_PER,DECIMALS"];
+  for (let qi = 0; qi < 260; qi++) {
+    const t = `${1961 + Math.floor(qi / 4)}-Q${(qi % 4) + 1}`;
+    MED26.forEach((c, i) => rows.push(`OECD.SDD.STES:DSD_KEI@DF_KEI(4.0),${c},Q,B1GQ_Q,GR,_T,Y,GY,${t},${(2.0 + 0.08 * i).toFixed(2)},A,0,1961-Q1,2`));
+  }
+  return rows.join("\n") + "\n";
+})();
+/* OECD population, annual: 26 members × years 1960→2025; member i's
+   level (i+1)·10000·1.007^(y−1960) → every member's population y/y is 0.7 */
+const oecdPopCsv = (() => {
+  const rows = ["DATAFLOW,REF_AREA,MEASURE,UNIT_MEASURE,SEX,AGE,TIME_HORIZ,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,DECIMALS"];
+  MED26.forEach((c, i) => {
+    for (let y = 1960; y <= 2025; y++) rows.push(`OECD.ELS.SAE:DSD_POPULATION@DF_POP_HIST(1.0),${c},POP,PS,_T,_T,H,${y},${((i + 1) * 10000 * Math.pow(1.007, y - 1960)).toFixed(0)},A,0,0`);
+  });
+  return rows.join("\n") + "\n";
+})();
+/* OECD monthly harmonised unemployment: 26 members × 360 months
+   1996-01 → 2025-12, member i prints 4.0 + 0.05i → monthly median 4.6 */
+const oecdUnempCsv = (() => {
+  const rows = ["DATAFLOW,REF_AREA,MEASURE,UNIT_MEASURE,TRANSFORMATION,ADJUSTMENT,SEX,AGE,ACTIVITY,FREQ,TIME_PERIOD,OBS_VALUE,BASE_PER,OBS_STATUS,UNIT_MULT,DECIMALS"];
+  for (let m = 0; m < 360; m++) {
+    const t = `${1996 + Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, "0")}`;
+    MED26.forEach((c, i) => rows.push(`OECD.SDD.TPS:DSD_LFS@DF_IALFS_UNE_M(1.0),${c},UNE_LF_M,PT_LF_SUB,_Z,Y,_T,Y_GE15,_Z,M,${t},${(4.0 + i * 0.05).toFixed(2)},,A,0,2`));
+  }
+  return rows.join("\n") + "\n";
+})();
+/* OECD output per worker growth: 26 members × 120 quarters 1996-Q1 →
+   2025-Q4, member i prints 1.0 + 0.1i → quarterly median 2.3 */
+const oecdProdCsv = (() => {
+  const rows = ["DATAFLOW,REF_AREA,FREQ,MEASURE,ACTIVITY,UNIT_MEASURE,PRICE_BASE,TRANSFORMATION,ADJUSTMENT,CONVERSION_TYPE,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,BASE_PER,DECIMALS"];
+  for (let qi = 0; qi < 120; qi++) {
+    const t = `${1996 + Math.floor(qi / 4)}-Q${(qi % 4) + 1}`;
+    MED26.forEach((c, i) => rows.push(`OECD.SDD.TPS:DSD_PDB@DF_PDB_ULC_Q(1.0),${c},Q,GDPEMP,_T,PA,Q,GY,S,NC,${t},${(1.0 + i * 0.1).toFixed(2)},A,0,,2`));
+  }
+  return rows.join("\n") + "\n";
+})();
+/* OECD real wages, annual: 26 members × years 1990→2025, member i's
+   level (2000+50i)·1.034^(y−1990) → every member's y/y is 3.4 → the
+   median year change is 3.4 every year */
+const oecdWageCsv = (() => {
+  const rows = ["DATAFLOW,REF_AREA,MEASURE,UNIT_MEASURE,PAY_PERIOD,PRICE_BASE,AGGREGATION_OPERATION,SEX,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,DECIMALS"];
+  MED26.forEach((c, i) => {
+    for (let y = 1990; y <= 2025; y++) rows.push(`OECD.ELS.SAE:DSD_EARNINGS@AV_AN_WAGE(1.0),${c},WG,USD_PPP,A,Q,MEAN,_Z,${y},${((2000 + 50 * i) * Math.pow(1.034, y - 1990)).toFixed(2)},A,0,1`);
+  });
+  return rows.join("\n") + "\n";
+})();
+/* OECD Gini, annual: 26 members × years 2011→2023, member i prints
+   0.28 + 0.002i → the median coefficient pins at 0.305 */
+const oecdGiniCsv = (() => {
+  const rows = ["DATAFLOW,REF_AREA,FREQ,MEASURE,STATISTICAL_OPERATION,UNIT_MEASURE,AGE,METHODOLOGY,DEFINITION,POVERTY_LINE,TIME_PERIOD,OBS_VALUE,OBS_STATUS,UNIT_MULT,DECIMALS"];
+  MED26.forEach((c, i) => {
+    for (let y = 2011; y <= 2023; y++) rows.push(`OECD.WISE.INE:DSD_WISE_IDD@DF_IDD(1.0),${c},A,INC_DISP_GINI,_Z,0_TO_1,_T,METH2012,D_CUR,_Z,${y},${(0.28 + i * 0.002).toFixed(3)},A,0,3`);
+  });
+  return rows.join("\n") + "\n";
+})();
 const CPI_MONTHLY = [4.3, 4.4, 4.5, 4.5, 4.6, 4.6, 4.6, 4.5, 4.6];  // drift 0–0.1 vs the 4.5 quarterly line
 const OECD_CPI = Array.from({ length: 68 }, (_, i) => Math.round((1.5 + i * 0.05) * 10) / 10);
 
@@ -406,6 +494,14 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-unemp.csv"), absUnempCsv);
   fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi));
   fs.writeFileSync(path.join(dir, "oecd-gdppc.csv"), oecdGdppcCsv(77));
+  fs.writeFileSync(path.join(dir, "abs-prod.csv"), absProdCsv);
+  fs.writeFileSync(path.join(dir, "abs-awe.csv"), absAweCsv);
+  fs.writeFileSync(path.join(dir, "oecd-gdp-growth.csv"), oecdGdpGrowthCsv);
+  fs.writeFileSync(path.join(dir, "oecd-pop.csv"), oecdPopCsv);
+  fs.writeFileSync(path.join(dir, "oecd-unemp.csv"), oecdUnempCsv);
+  fs.writeFileSync(path.join(dir, "oecd-prod.csv"), oecdProdCsv);
+  fs.writeFileSync(path.join(dir, "oecd-wage.csv"), oecdWageCsv);
+  fs.writeFileSync(path.join(dir, "oecd-gini.csv"), oecdGiniCsv);
   fs.writeFileSync(path.join(dir, "abs-mwm-gini.html"), giniPage("Gini coefficient for income (a)", ["", "HILDA (b)", "SIH (c)"], 2002, 21, (i) => [0.30 + i / 1000], () => [null]));
   fs.writeFileSync(path.join(dir, "abs-sih-gini.html"), giniPage("Graph 3. Gini coefficient of equivalised disposable household income, 1994–95 to 2019–20", ["", "Gini coefficient"], 1994, 16, (i) => [0.32]));
 };
@@ -473,6 +569,27 @@ assert.deepEqual(doc.oecdCpiMed.rows.at(-1), { date: "2025-12-31", v: 4.5 });
 assert.deepEqual(doc.oecdCpiGap.rows[0], { date: "1999-09-30", v: 2.2 });
 assert.deepEqual(doc.oecdCpiGap.rows.at(-1), { date: "2025-12-31", v: 2.4 });
 assert.equal(doc.g20Cpi, undefined, "the G20 lane is gone from the panel (user call 2026-11-09)");
+/* the added lanes (2026-11-16), each pinned to its fixture's own
+   arithmetic: sizes ride the grids' spans, values the grids' constants */
+assert.equal(st.rows.prod, 186, "190 quarterly index levels → 186 y/y prints");
+assert.equal(st.rows.aweReal, 24, "26 semi-annual halves → 24 season-matched y/y prints");
+assert.equal(st.rows.oecdGdpMed, 260, "26 members × quarters 1961→2025, all above the 25-member floor");
+assert.equal(st.rows.oecdUnempMed, 360);
+assert.equal(st.rows.oecdProdMed, 120);
+assert.equal(st.rows.oecdWageMed, 35, "years 1991→2025 with a predecessor each");
+assert.equal(st.rows.oecdGiniMed, 13);
+assert.deepEqual(doc.prod.rows[0], { date: "1981-03-31", v: 1.8 }, "1.0045^4 index growth is y/y 1.8");
+assert.deepEqual(doc.aweReal.rows[0], { date: "2011-05-31", v: 3.5 }, "nominal 8.16%/y ÷ CPI 4.49%/y is real 3.5%/y");
+assert.deepEqual(doc.aweReal.rows.at(-1), { date: "2022-11-30", v: 3.5 });
+assert.deepEqual(doc.oecdGdpMed.rows[0], { date: "1961-03-31", v: 2.3 }, "median member 3.0 − population 0.7");
+assert.deepEqual(doc.oecdGdpMed.rows.at(-1), { date: "2025-12-31", v: 2.3 });
+assert.deepEqual(doc.oecdUnempMed.rows[0], { date: "1996-01-31", v: 4.6 }, "the 4.6/4.65 member pair's mean at 1dp");
+assert.deepEqual(doc.oecdUnempMed.rows.at(-1), { date: "2025-12-31", v: 4.6 });
+assert.deepEqual(doc.oecdProdMed.rows[0], { date: "1996-03-31", v: 2.3 }, "the 2.2/2.3 member pair's mean at 1dp");
+assert.deepEqual(doc.oecdWageMed.rows[0], { date: "1991-12-31", v: 3.4 }, "every member's constant 3.4%/y");
+assert.deepEqual(doc.oecdWageMed.rows.at(-1), { date: "2025-12-31", v: 3.4 });
+assert.deepEqual(doc.oecdGiniMed.rows[0], { date: "2011-12-31", v: 0.305 }, "the 0.304/0.306 member pair's mean at 3dp");
+assert.deepEqual(doc.oecdGiniMed.rows.at(-1), { date: "2023-12-31", v: 0.305 });
 
 /* the committed median store extends the lane past the archive era: write
    a store by hand into the temp cwd (the fixture run's own cwd — never
@@ -563,7 +680,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel", "giniHilda", "giniSih"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -595,6 +712,13 @@ assert.ok(live.giniHilda.rows[0].date <= "2003-06-30", "HILDA's Gini opens with 
 assert.ok(live.giniSih.rows[0].date <= "1995-06-30", "the ABS income survey's Gini opens with 1994-95");
 assert.ok(live.giniSih.rows.every((r) => r.v > live.giniHilda.rows.find((h) => h.date === r.date)?.v - 0.005 || !live.giniHilda.rows.some((h) => h.date === r.date)), "the ABS survey runs at or above HILDA in shared years (why they stay two lines)");
 assert.equal(live.oecdGdp, undefined, "the total-GDP lane gave way to per person (2026-11-16)");
+assert.ok(live.prod.rows[0].date <= "1982-01-01", "GDP per hour worked reaches its 1979 first y/y");
+assert.ok(live.aweReal.rows[0].date <= "2016-01-01", "real weekly earnings reaches its semi-annual era's opening years");
+assert.ok(live.oecdGdpMed.rows[0].date <= "2000-01-01", "OECD median GDP per person reaches the 90s");
+assert.ok(live.oecdUnempMed.rows[0].date <= "2000-01-01", "OECD median unemployment reaches the 90s");
+assert.ok(live.oecdProdMed.rows[0].date <= "2000-01-01", "OECD median output per worker reaches the 90s");
+assert.ok(live.oecdWageMed.rows[0].date <= "1995-01-01", "OECD median real wage reaches the early 90s");
+assert.ok(live.oecdGiniMed.rows[0].date <= "2014-01-01", "OECD median Gini opens with its methodology era's 25-member years");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");
 assert.ok(live.ausGap.rows[0].date <= "1996-12-31", "Australia's deviation lane opens at the band's 1996 adoption");
 /* the handoff the extractor certified really is tight on disk */

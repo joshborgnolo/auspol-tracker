@@ -7415,13 +7415,18 @@ const confDeep = (() => {
    per-capita GDP index; oecdCpiMed and oecdCpiGap the extractor's
    member-country medians), and giniHilda/giniSih the income Gini
    coefficient from the HILDA survey and the ABS's income survey (read
-   off the ABS's pages). The view reads the raw {date, v} rows and
+   off the ABS's pages). prod real GDP per hour worked and aweReal
+   real full-time weekly earnings (computed by the extractor from ABS
+   figures, 2026-11-16) join the Australian lanes; oecdGdpMed,
+   oecdUnempMed, oecdProdMed, oecdWageMed and oecdGiniMed are their
+   OECD member-country medians, all computed by the extractor. The
+   view reads the raw {date, v} rows and
    splices the quarterly CPI history onto the printed monthly era
    render-side. */
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih"]) {
+  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih", "prod", "aweReal", "oecdGdpMed", "oecdUnempMed", "oecdProdMed", "oecdWageMed", "oecdGiniMed"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };

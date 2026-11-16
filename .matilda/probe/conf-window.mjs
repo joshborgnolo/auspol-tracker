@@ -11,8 +11,12 @@
        jumps to the term tapped;
      - the guide readout carries rows in a past term (consumer chart) and
        on every macro panel;
-     - the macro view draws five panels, numbered events only in the
+     - the macro view draws six panels, numbered events only in the
        sitting term, and its "This term" ends at now;
+     - the six panels name their lanes (productivity and the OECD
+       medians on growth, earnings on the earnings panel, the OECD
+       median on unemployment, the median country on gini), with their
+       latest figures read off the page's own macro rows;
      - the step glide moves the lines mid-flight (the x window travels);
      - no page errors.
    --shots dir saves a frame strip of the glide. */
@@ -80,7 +84,32 @@ s = await state();
 ok("‹ steps to the 2022 term", s.head === "The 2022 term" && /May 2022 – May 2025/.test(s.sub) && s.nextOff === false, JSON.stringify(s));
 await tab("Inflation & growth");
 s = await state();
-ok("window holds across a tab switch", s.head === "The 2022 term" && s.panels === 5 && s.badges === 0, JSON.stringify(s));
+ok("window holds across a tab switch", s.head === "The 2022 term" && s.panels === 6 && s.badges === 0, JSON.stringify(s));
+/* the six panels, their added lanes by name, and the lanes' latest
+   figures straight off the page's own data */
+const macroAudit = await page.evaluate(() => {
+  const cards = [...document.querySelectorAll("#confidence .rd-xf-now .rd-mp")];
+  const titles = cards.map((c) => c.querySelector(".rd-mp-t").textContent.trim());
+  const keys = cards.map((c) => [...c.querySelectorAll(".rd-mp-kn")].map((k) => k.textContent.trim()));
+  const vals = cards.map((c) => [...c.querySelectorAll(".rd-mp-kv")].map((k) => k.textContent.trim()));
+  const M = window.AP.D.macro;
+  const lat = (k) => M[k].rows[M[k].rows.length - 1];
+  return { titles, keys, vals, prod: lat("prod"), awe: lat("aweReal"), med: lat("oecdUnempMed"), giniMed: lat("oecdGiniMed") };
+});
+ok("panels: infl/gap/growth/earn/unemp/gini", JSON.stringify(macroAudit.titles) === JSON.stringify(["Inflation", "Inflation against target", "Growth per person", "Earnings", "Unemployment", "Income inequality"]), JSON.stringify(macroAudit.titles));
+ok("growth panel carries productivity and the OECD medians", macroAudit.keys[2].includes("GDP per hour worked") && macroAudit.keys[2].includes("OECD median GDP per person") && macroAudit.keys[2].includes("OECD median per worker"), JSON.stringify(macroAudit.keys[2]));
+ok("earnings panel pairs AWE with the OECD median wage", macroAudit.keys[3].includes("Full-time adult weekly earnings") && macroAudit.keys[3].includes("OECD median wage"), JSON.stringify(macroAudit.keys[3]));
+ok("unemployment panel carries the OECD median", macroAudit.keys[4].includes("OECD median"), JSON.stringify(macroAudit.keys[4]));
+ok("gini panel carries the OECD median country", macroAudit.keys[5].includes("OECD median country"), JSON.stringify(macroAudit.keys[5]));
+const N = (s) => (s || "").replace(/\u2212/g, "-");   /* the page prints a typographic minus */
+{
+  const w = macroAudit.keys[3].indexOf("Full-time adult weekly earnings");
+  ok("earn panel's latest figure is the file's newest real-earnings print", N(macroAudit.vals[3][w]) === macroAudit.awe.v.toFixed(1) + "%", N(macroAudit.vals[3][w]) + " vs file " + macroAudit.awe.v);
+  const u = macroAudit.keys[4].indexOf("OECD median");
+  ok("unemp panel's median figure is the file's newest median", N(macroAudit.vals[4][u]) === macroAudit.med.v.toFixed(1) + "%", N(macroAudit.vals[4][u]) + " vs file " + macroAudit.med.v);
+  const gi = macroAudit.keys[5].indexOf("OECD median country");
+  ok("gini panel's median figure reads the coefficient and its year", N(macroAudit.vals[5][gi]) === macroAudit.giniMed.v.toFixed(3) + " (" + macroAudit.giniMed.date.slice(0, 4) + ")", N(macroAudit.vals[5][gi]) + " vs file " + JSON.stringify(macroAudit.giniMed));
+}
 await step(1);
 s = await state();
 ok("› back to This term (macro: events numbered)", s.head === "This term" && s.badges > 0, JSON.stringify(s));
@@ -142,8 +171,12 @@ await wait(700);
 s = await state();
 ok("a tap on open strip jumps to the term tapped", /^The \d{4} term$/.test(s.head), JSON.stringify(s));
 
-/* ---- readouts */
+/* ---- readouts: reset to the sitting term first — the strip tap lands
+   on any past term its x maps to, and a Term re-click doesn't reset from
+   a term-active window (that's why All goes in between); hovers are then
+   exercised in a term every panel's record holds */
 await tab("Consumers");
+await chip("All");
 await chip("Term");
 await step(0);
 const hoverRows = async (sel) => {

@@ -1436,12 +1436,13 @@ export function validateBooth() {
    Economic sentiment panel's Inflation & growth view (built by
    .build/macro.mjs off the ABS and OECD data APIs; the extractor's own
    lanes guards ran at pull time). The gate is on the committed file's
-   shape and internal consistency: all ten lanes present with ascending
+   shape and internal consistency: all twenty-three lanes present with ascending
    dates inside plausible bounds, the quarterly CPI history and the
    printed monthly era reconciling at their handoff (the extractor's
    HANDOFF_DRIFT allowance), and each lane no staler than the extractor
    itself tolerates (the OECD median and target-deviation lanes trail the
-   aggregates by the monthly release's ~2-month lag, so their allowance
+   aggregates by the monthly release's ~2-month lag, and the per-capita
+   GDP median rides the annual population release, so their allowance
    is wider). */
 export function validateMacro() {
   const errors = [];
@@ -1449,8 +1450,8 @@ export function validateMacro() {
   let M = null;
   try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8")); }
   catch { fail("macro.json", "macro-shape", "missing or unparseable"); return errors; }
-  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdppc: [-15, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000], hhdi: [-12, 15], hhdiLevel: [3000, 40000], giniHilda: [0.2, 0.45], giniSih: [0.2, 0.45] };
-  const STALE = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdppc: 300, gdppcLevel: 210, rnndiLevel: 210, hhdi: 210, hhdiLevel: 210, giniHilda: 1460, giniSih: 4000 };
+  const BAND = { cpi: [-5, 30], cpiMonthly: [-5, 30], ausGap: [-5, 10], gdppc: [-12, 15], rnndi: [-12, 25], unemp: [0, 20], oecdCpi: [-5, 30], oecdCpiMed: [-5, 30], oecdCpiGap: [-5, 15], oecdGdppc: [-15, 15], gdppcLevel: [5000, 60000], rnndiLevel: [5000, 60000], hhdi: [-12, 15], hhdiLevel: [3000, 40000], giniHilda: [0.2, 0.45], giniSih: [0.2, 0.45], prod: [-12, 15], aweReal: [-10, 12], oecdGdpMed: [-20, 20], oecdUnempMed: [0, 20], oecdProdMed: [-20, 25], oecdWageMed: [-10, 12], oecdGiniMed: [0.2, 0.45] };
+  const STALE = { cpi: 210, cpiMonthly: 75, ausGap: 75, gdppc: 210, rnndi: 210, unemp: 75, oecdCpi: 95, oecdCpiMed: 110, oecdCpiGap: 110, oecdGdppc: 300, gdppcLevel: 210, rnndiLevel: 210, hhdi: 210, hhdiLevel: 210, giniHilda: 1460, giniSih: 4000, prod: 210, aweReal: 270, oecdGdpMed: 430, oecdUnempMed: 110, oecdProdMed: 210, oecdWageMed: 450, oecdGiniMed: 1300 };
   const days = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
   const lanes = {};
   for (const k of Object.keys(BAND)) {
