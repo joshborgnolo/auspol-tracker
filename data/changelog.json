@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 50.9
+      "alp": 50.6
     },
-    "imp": 50.9,
-    "pub": 48.9,
-    "on": 50.8,
+    "imp": 50.6,
+    "pub": 47.9,
+    "on": 50.5,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -216,7 +216,8 @@
       "2026-11-03|YouGov",
       "2026-11-06|RedBridge/Accent",
       "2026-11-07|Resolve",
-      "2026-11-08|Roy Morgan"
+      "2026-11-08|Roy Morgan",
+      "2026-11-15|Roy Morgan"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
@@ -331,19 +332,19 @@
       }
     },
     "prim": {
-      "alp": 26.3,
-      "grn": 13.5,
-      "lnp": 22.8,
-      "onp": 26.3,
+      "alp": 26,
+      "grn": 13.4,
+      "lnp": 23.3,
+      "onp": 26,
       "oth": 11
     },
     "leaders": {
-      "alb_fav": -22.9,
-      "alb_net": -23.5,
-      "hanson_fav": -6.2,
-      "hanson_net": -1.5,
-      "taylor_fav": -2.3,
-      "taylor_net": -4.6
+      "alb_fav": -23.3,
+      "alb_net": -24,
+      "hanson_fav": -6.6,
+      "hanson_net": -1.3,
+      "taylor_fav": -2.2,
+      "taylor_net": -4.7
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -366,14 +367,14 @@
       }
     },
     "dir": {
-      "right": 22.3,
-      "wrong": 65.2,
-      "net": -42.9
+      "right": 23.4,
+      "wrong": 64.5,
+      "net": -41.1
     },
     "issLead": {
       "climate": "alp",
       "col": "",
-      "crime": "onp",
+      "crime": "",
       "economy": "",
       "health": "alp",
       "housing": "",
@@ -390,16 +391,8 @@
       "immigration": "Immigration",
       "security": "National security"
     },
-    "sig": {
-      "dir|net": -1,
-      "iss|health|imp": -1,
-      "iss|immigration|imp": -1
-    },
-    "sigMeta": {
-      "dir|net": "the right-track-minus-wrong-track net",
-      "iss|health|imp": "the share naming health a top-three issue",
-      "iss|immigration|imp": "the share naming immigration a top-three issue"
-    },
+    "sig": {},
+    "sigMeta": {},
     "conf": {
       "business": 81.7,
       "consumer": 63.1,
@@ -762,6 +755,37 @@
       "label": "12 Nov 2026",
       "kind": "finding",
       "text": "The fall in the right-track-minus-wrong-track net over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-11-16",
+      "label": "16 Nov 2026",
+      "kind": "poll",
+      "text": "Roy Morgan (fieldwork 9–15 Nov, n=1,595) added — the two-party preferred estimate moved 50.9 → 50.6 (Labor v the Coalition, implied flows). Primary votes: Labor 26.3 → 26.0, the Coalition 22.8 → 23.3, One Nation 26.3 → 26.0, the Greens 13.5 → 13.4. Leader ratings: Albanese’s net approval −23.5 → −24.0, Albanese’s net favourability −22.9 → −23.3, Taylor’s net approval −4.6 → −4.7, Taylor’s net favourability −2.3 → −2.2, Hanson’s net approval −1.5 → −1.3, Hanson’s net favourability −6.2 → −6.6. National direction: right track 22.3 → 23.4, wrong track 65.2 → 64.5 (net −42.9 → −41.1). House effect (Labor v the Coalition, implied flows; positive leans Labor): Roy Morgan held at +0.1.",
+      "url": "https://www.roymorgan.com/findings/10387-federal-voting-intention-november-16-2026"
+    },
+    {
+      "date": "2026-11-16",
+      "label": "16 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in the right-track-minus-wrong-track net is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-16",
+      "label": "16 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in the share naming health a top-three issue is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-16",
+      "label": "16 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in the share naming immigration a top-three issue is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-16",
+      "label": "16 Nov 2026",
+      "kind": "finding",
+      "text": "No party leads significantly as the best party on crime any more (One Nation did)."
     }
   ]
 }
