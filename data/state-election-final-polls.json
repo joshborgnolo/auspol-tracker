@@ -1,0 +1,1006 @@
+{
+"_about": "build-store.py: state elections' final-month polls (fieldwork ending in the 35 days before polling day) and first-preference results, read from Wikipedia's polling tables (article sources fetched 16 November 2026). lnp = Liberal + National (LNP in Queensland, the Liberals alone in South Australia). NSW 2015 and 2019 have no table there. Used by calibrate-state-polls.mjs for the Victorian model's polling error.",
+"source": "en.wikipedia.org, the articles named per election (?action=raw)",
+"elections": [
+{
+"st": "vic",
+"date": "2010-11-27",
+"article": "2010 Victorian state election",
+"result": {
+"alp": 36.3,
+"lnp": 44.7,
+"grn": 11.2
+},
+"resultSource": "polling table election row (2014 article)",
+"polls": [
+{
+"end": "2010-11-25",
+"firm": "Newspoll",
+"alp": 33.0,
+"lnp": 45.0,
+"grn": 15.0
+},
+{
+"end": "2010-11-11",
+"firm": "Newspoll",
+"alp": 37.0,
+"lnp": 44.0,
+"grn": 14.0
+}
+]
+},
+{
+"st": "vic",
+"date": "2014-11-29",
+"article": "2014 Victorian state election",
+"result": {
+"alp": 38.1,
+"lnp": 41.99,
+"grn": 11.48
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2014-11-28",
+"firm": "Ipsos",
+"alp": 35.0,
+"lnp": 42.0,
+"grn": 15.0
+},
+{
+"end": "2014-11-27",
+"firm": "Newspoll",
+"alp": 39.0,
+"lnp": 40.0,
+"grn": 12.0
+},
+{
+"end": "2014-11-27",
+"firm": "ReachTEL",
+"alp": 38.3,
+"lnp": 39.7,
+"grn": 13.5
+},
+{
+"end": "2014-11-27",
+"firm": "Roy Morgan",
+"alp": 36.0,
+"lnp": 44.0,
+"grn": 13.5
+},
+{
+"end": "2014-11-26",
+"firm": "Galaxy",
+"alp": 39.0,
+"lnp": 40.0,
+"grn": 13.0
+},
+{
+"end": "2014-11-24",
+"firm": "Essential",
+"alp": 39.0,
+"lnp": 40.0,
+"grn": 13.0
+},
+{
+"end": "2014-11-24",
+"firm": "Roy Morgan",
+"alp": 33.5,
+"lnp": 39.5,
+"grn": 17.5
+},
+{
+"end": "2014-11-20",
+"firm": "Roy Morgan",
+"alp": 35.5,
+"lnp": 35.0,
+"grn": 19.5
+},
+{
+"end": "2014-11-19",
+"firm": "Galaxy",
+"alp": 39.0,
+"lnp": 40.0,
+"grn": 13.0
+},
+{
+"end": "2014-11-10",
+"firm": "Roy Morgan",
+"alp": 36.0,
+"lnp": 38.0,
+"grn": 18.5
+},
+{
+"end": "2014-11-09",
+"firm": "Ipsos",
+"alp": 39.0,
+"lnp": 39.0,
+"grn": 16.0
+},
+{
+"end": "2014-10-30",
+"firm": "Newspoll",
+"alp": 41.0,
+"lnp": 39.0,
+"grn": 13.0
+},
+{
+"end": "2014-10-27",
+"firm": "Roy Morgan",
+"alp": 34.0,
+"lnp": 37.5,
+"grn": 18.5
+},
+{
+"end": "2014-10-26",
+"firm": "Ipsos",
+"alp": 37.0,
+"lnp": 39.0,
+"grn": 17.0
+}
+]
+},
+{
+"st": "vic",
+"date": "2018-11-24",
+"article": "2018 Victorian state election",
+"result": {
+"alp": 42.9,
+"lnp": 35.2,
+"grn": 10.7
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2018-11-23",
+"firm": "Roy Morgan",
+"alp": 39.0,
+"lnp": 33.0,
+"grn": 13.0
+},
+{
+"end": "2018-11-23",
+"firm": "Newspoll",
+"alp": 41.0,
+"lnp": 40.0,
+"grn": 11.0
+},
+{
+"end": "2018-11-21",
+"firm": "uComms/ReachTEL",
+"alp": 38.7,
+"lnp": 35.9,
+"grn": 10.4
+},
+{
+"end": "2018-11-21",
+"firm": "YouGov",
+"alp": 40.0,
+"lnp": 40.0,
+"grn": 11.0
+},
+{
+"end": "2018-11-14",
+"firm": "ReachTEL",
+"alp": 40.4,
+"lnp": 36.8,
+"grn": 10.3
+},
+{
+"end": "2018-10-28",
+"firm": "Newspoll",
+"alp": 41.0,
+"lnp": 39.0,
+"grn": 11.0
+},
+{
+"end": "2018-10-24",
+"firm": "YouGov",
+"alp": 40.0,
+"lnp": 39.0,
+"grn": 12.0
+}
+]
+},
+{
+"st": "vic",
+"date": "2022-11-26",
+"article": "2022 Victorian state election",
+"result": null,
+"resultSource": null,
+"polls": [
+{
+"end": "2022-11-24",
+"firm": "Newspoll",
+"alp": 38.0,
+"lnp": 35.0,
+"grn": 12.0
+},
+{
+"end": "2022-11-23",
+"firm": "Roy Morgan",
+"alp": 38.0,
+"lnp": 32.5,
+"grn": 12.5
+},
+{
+"end": "2022-11-21",
+"firm": "Resolve Strategic",
+"alp": 36.2,
+"lnp": 35.8,
+"grn": 10.1
+},
+{
+"end": "2022-11-10",
+"firm": "Roy Morgan",
+"alp": 40.0,
+"lnp": 29.0,
+"grn": 11.5
+},
+{
+"end": "2022-11-06",
+"firm": "Freshwater Strategy",
+"alp": 37.0,
+"lnp": 34.0,
+"grn": 14.0
+},
+{
+"end": "2022-11-06",
+"firm": "RedBridge",
+"alp": 38.0,
+"lnp": 38.0,
+"grn": 14.0
+},
+{
+"end": "2022-11-06",
+"firm": "Lonergan Research",
+"alp": 42.0,
+"lnp": 29.0,
+"grn": 19.0
+},
+{
+"end": "2022-11-03",
+"firm": "Newspoll",
+"alp": 37.0,
+"lnp": 37.0,
+"grn": 13.0
+},
+{
+"end": "2022-10-23",
+"firm": "Resolve Strategic",
+"alp": 38.0,
+"lnp": 31.0,
+"grn": 12.0
+}
+]
+},
+{
+"st": "qld",
+"date": "2012-03-24",
+"article": "2012 Queensland state election",
+"result": {
+"alp": 26.7,
+"lnp": 49.7,
+"grn": 7.5
+},
+"resultSource": "polling table election row (2015 article)",
+"polls": [
+{
+"end": "2012-03-22",
+"firm": "Newspoll",
+"alp": 28.0,
+"lnp": 50.0,
+"grn": 6.0
+}
+]
+},
+{
+"st": "qld",
+"date": "2015-01-31",
+"article": "2015 Queensland state election",
+"result": {
+"alp": 37.5,
+"lnp": 41.3,
+"grn": 8.4
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2015-01-29",
+"firm": "Essential",
+"alp": 38.0,
+"lnp": 39.0,
+"grn": 7.0
+},
+{
+"end": "2015-01-29",
+"firm": "Newspoll",
+"alp": 37.0,
+"lnp": 41.0,
+"grn": 6.0
+},
+{
+"end": "2015-01-29",
+"firm": "Galaxy",
+"alp": 39.0,
+"lnp": 38.0,
+"grn": 10.0
+},
+{
+"end": "2015-01-20",
+"firm": "ReachTEL",
+"alp": 36.7,
+"lnp": 42.0,
+"grn": 8.4
+},
+{
+"end": "2015-01-18",
+"firm": "Roy Morgan",
+"alp": 37.0,
+"lnp": 39.5,
+"grn": 10.0
+},
+{
+"end": "2015-01-08",
+"firm": "Galaxy",
+"alp": 38.0,
+"lnp": 41.0,
+"grn": 8.0
+},
+{
+"end": "2015-01-08",
+"firm": "Newspoll",
+"alp": 37.0,
+"lnp": 42.0,
+"grn": 7.0
+},
+{
+"end": "2015-01-06",
+"firm": "ReachTEL",
+"alp": 38.1,
+"lnp": 40.3,
+"grn": 7.6
+}
+]
+},
+{
+"st": "qld",
+"date": "2017-11-25",
+"article": "2017 Queensland state election",
+"result": {
+"alp": 35.4,
+"lnp": 33.7,
+"grn": 10.0,
+"onp": 13.7
+},
+"resultSource": "polling table election row (2020 article)",
+"polls": [
+{
+"end": "2017-11-24",
+"firm": "Newspoll",
+"alp": 36.0,
+"lnp": 34.0,
+"grn": 10.0,
+"onp": 13.0
+},
+{
+"end": "2017-11-24",
+"firm": "Galaxy",
+"alp": 37.0,
+"lnp": 35.0,
+"grn": 9.0,
+"onp": 12.0
+},
+{
+"end": "2017-11-20",
+"firm": "ReachTEL",
+"alp": 34.0,
+"lnp": 30.0,
+"grn": 10.0,
+"onp": 17.0
+},
+{
+"end": "2017-11-13",
+"firm": "ReachTEL",
+"alp": 30.4,
+"lnp": 30.8,
+"grn": 8.1,
+"onp": 16.4
+},
+{
+"end": "2017-11-02",
+"firm": "Galaxy",
+"alp": 35.0,
+"lnp": 32.0,
+"grn": 9.0,
+"onp": 18.0
+}
+]
+},
+{
+"st": "qld",
+"date": "2020-10-31",
+"article": "2020 Queensland state election",
+"result": {
+"alp": 39.6,
+"lnp": 35.9,
+"grn": 9.5,
+"onp": 7.1
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2020-10-30",
+"firm": "Newspoll",
+"alp": 37.0,
+"lnp": 36.0,
+"grn": 11.0,
+"onp": 10.0
+},
+{
+"end": "2020-10-15",
+"firm": "Roy Morgan",
+"alp": 36.0,
+"lnp": 35.0,
+"grn": 10.0,
+"onp": 12.0
+},
+{
+"end": "2020-10-14",
+"firm": "Newspoll",
+"alp": 37.0,
+"lnp": 37.0,
+"grn": 11.0,
+"onp": 9.0
+},
+{
+"end": "2020-10-01",
+"firm": "YouGov",
+"alp": 37.0,
+"lnp": 37.0,
+"grn": 12.0,
+"onp": 9.0
+}
+]
+},
+{
+"st": "qld",
+"date": "2024-10-26",
+"article": "2024 Queensland state election",
+"result": {
+"alp": 32.6,
+"lnp": 41.5,
+"grn": 9.9,
+"onp": 8.0
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2024-10-24",
+"firm": "uComms",
+"alp": 33.6,
+"lnp": 39.3,
+"grn": 12.9,
+"onp": 7.8
+},
+{
+"end": "2024-10-24",
+"firm": "Newspoll",
+"alp": 33.0,
+"lnp": 42.0,
+"grn": 11.0,
+"onp": 8.0
+},
+{
+"end": "2024-10-19",
+"firm": "Resolve Strategic",
+"alp": 32.0,
+"lnp": 40.0,
+"grn": 11.0,
+"onp": 9.0
+},
+{
+"end": "2024-10-16",
+"firm": "YouGov",
+"alp": 31.0,
+"lnp": 41.0,
+"grn": 11.0,
+"onp": 11.0
+},
+{
+"end": "2024-10-15",
+"firm": "The Courier-Mail",
+"alp": 30.0,
+"lnp": 48.2,
+"grn": 8.6,
+"onp": 7.3
+},
+{
+"end": "2024-09-29",
+"firm": "Freshwater Strategy",
+"alp": 30.0,
+"lnp": 43.0,
+"grn": 12.0,
+"onp": 8.0
+}
+]
+},
+{
+"st": "nsw",
+"date": "2011-03-26",
+"article": "2011 New South Wales state election",
+"result": {
+"alp": 25.55,
+"lnp": 51.15,
+"grn": 10.29
+},
+"resultSource": "article infobox",
+"polls": [
+{
+"end": "2011-03-26",
+"firm": "Nielsen",
+"alp": 22.0,
+"lnp": 50.0,
+"grn": 13.0
+},
+{
+"end": "2011-03-24",
+"firm": "Newspoll",
+"alp": 23.0,
+"lnp": 49.0,
+"grn": 12.0
+},
+{
+"end": "2011-03-23",
+"firm": "Galaxy",
+"alp": 22.0,
+"lnp": 51.0,
+"grn": 12.0
+},
+{
+"end": "2011-03-23",
+"firm": "Essential",
+"alp": 23.0,
+"lnp": 55.0,
+"grn": 11.0
+},
+{
+"end": "2011-03-18",
+"firm": "Essential",
+"alp": 24.0,
+"lnp": 54.0,
+"grn": 12.0
+},
+{
+"end": "2011-03-11",
+"firm": "Newspoll",
+"alp": 26.0,
+"lnp": 50.0,
+"grn": 11.0
+},
+{
+"end": "2011-03-04",
+"firm": "Galaxy",
+"alp": 23.0,
+"lnp": 50.0,
+"grn": 14.0
+}
+]
+},
+{
+"st": "nsw",
+"date": "2023-03-25",
+"article": "2023 New South Wales state election",
+"result": null,
+"resultSource": null,
+"polls": [
+{
+"end": "2023-03-24",
+"firm": "Newspoll",
+"alp": 38.0,
+"lnp": 35.0,
+"grn": 11.0
+},
+{
+"end": "2023-03-22",
+"firm": "Freshwater Strategy",
+"alp": 37.0,
+"lnp": 37.0,
+"grn": 10.0
+},
+{
+"end": "2023-03-19",
+"firm": "Resolve Strategic",
+"alp": 38.0,
+"lnp": 38.0,
+"grn": 8.0
+},
+{
+"end": "2023-03-14",
+"firm": "Roy Morgan",
+"alp": 34.0,
+"lnp": 34.0,
+"grn": 13.0,
+"onp": 2.0
+},
+{
+"end": "2023-02-28",
+"firm": "Roy Morgan",
+"alp": 33.5,
+"lnp": 32.5,
+"grn": 11.0,
+"onp": 8.5
+},
+{
+"end": "2023-02-28",
+"firm": "Resolve Strategic",
+"alp": 38.0,
+"lnp": 32.0,
+"grn": 11.0
+},
+{
+"end": "2023-02-27",
+"firm": "Freshwater Strategy",
+"alp": 39.0,
+"lnp": 37.0,
+"grn": 10.0
+},
+{
+"end": "2023-02-26",
+"firm": "Newspoll",
+"alp": 36.0,
+"lnp": 37.0,
+"grn": 12.0
+},
+{
+"end": "2023-02-21",
+"firm": "Roy Morgan",
+"alp": 32.5,
+"lnp": 35.0,
+"grn": 9.5,
+"onp": 6.5
+}
+]
+},
+{
+"st": "wa",
+"date": "2013-03-09",
+"article": "2013 Western Australian state election",
+"result": {
+"alp": 33.13,
+"lnp": 53.15,
+"grn": 8.4
+},
+"resultSource": "article infobox",
+"polls": [
+{
+"end": "2013-03-07",
+"firm": "Newspoll",
+"alp": 32.0,
+"lnp": 54.0,
+"grn": 8.0
+},
+{
+"end": "2013-02-07",
+"firm": "Newspoll",
+"alp": 35.0,
+"lnp": 51.0,
+"grn": 8.0
+}
+]
+},
+{
+"st": "wa",
+"date": "2017-03-11",
+"article": "2017 Western Australian state election",
+"result": {
+"alp": 42.2,
+"lnp": 36.6,
+"grn": 8.9,
+"onp": 4.9
+},
+"resultSource": "polling table election row (2021 article)",
+"polls": [
+{
+"end": "2017-03-09",
+"firm": "ReachTEL",
+"alp": 41.8,
+"lnp": 39.9,
+"grn": 6.5
+},
+{
+"end": "2017-03-09",
+"firm": "Newspoll",
+"alp": 41.0,
+"lnp": 37.0,
+"grn": 7.0
+},
+{
+"end": "2017-03-03",
+"firm": "Galaxy",
+"alp": 40.0,
+"lnp": 36.0,
+"grn": 8.0
+},
+{
+"end": "2017-02-27",
+"firm": "ReachTEL",
+"alp": 35.2,
+"lnp": 41.4,
+"grn": 10.7
+}
+]
+},
+{
+"st": "wa",
+"date": "2021-03-13",
+"article": "2021 Western Australian state election",
+"result": {
+"alp": 59.9,
+"lnp": 25.3,
+"grn": 6.9,
+"onp": 1.3
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2021-03-11",
+"firm": "Newspoll",
+"alp": 57.0,
+"lnp": 26.0,
+"grn": 9.0,
+"onp": 2.0
+},
+{
+"end": "2021-02-18",
+"firm": "Newspoll",
+"alp": 59.0,
+"lnp": 25.0,
+"grn": 8.0,
+"onp": 3.0
+},
+{
+"end": "2021-02-16",
+"firm": "uComms",
+"alp": 46.8,
+"lnp": 32.6,
+"grn": 8.3,
+"onp": 6.9
+},
+{
+"end": "2021-02-16",
+"firm": "Online Research Unit",
+"alp": 49.0,
+"lnp": 27.0,
+"grn": 9.0,
+"onp": 3.0
+}
+]
+},
+{
+"st": "wa",
+"date": "2025-03-08",
+"article": "2025 Western Australian state election",
+"result": {
+"alp": 41.4,
+"lnp": 33.2,
+"grn": 11.1,
+"onp": 4.0
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2025-03-05",
+"firm": "Demos AU",
+"alp": 43.0,
+"lnp": 35.0,
+"grn": 11.0
+},
+{
+"end": "2025-03-05",
+"firm": "Newspoll",
+"alp": 44.0,
+"lnp": 34.0,
+"grn": 10.0,
+"onp": 3.0
+},
+{
+"end": "2025-02-04",
+"firm": "Newspoll",
+"alp": 42.0,
+"lnp": 35.0,
+"grn": 12.0,
+"onp": 4.0
+}
+]
+},
+{
+"st": "sa",
+"date": "2014-03-15",
+"article": "2014 South Australian state election",
+"result": {
+"alp": 35.8,
+"lnp": 44.8,
+"grn": 8.7
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2014-03-13",
+"firm": "Newspoll",
+"alp": 34.0,
+"lnp": 41.0,
+"grn": 9.0
+},
+{
+"end": "2014-02-27",
+"firm": "Newspoll",
+"alp": 34.0,
+"lnp": 44.0,
+"grn": 7.0
+}
+]
+},
+{
+"st": "sa",
+"date": "2018-03-17",
+"article": "2018 South Australian state election",
+"result": {
+"alp": 32.8,
+"lnp": 38.0,
+"grn": 6.7
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2018-03-15",
+"firm": "ReachTEL",
+"alp": 31.0,
+"lnp": 34.0,
+"grn": 8.0
+},
+{
+"end": "2018-03-15",
+"firm": "Newspoll",
+"alp": 31.0,
+"lnp": 34.0,
+"grn": 8.0
+},
+{
+"end": "2018-03-01",
+"firm": "Newspoll",
+"alp": 30.0,
+"lnp": 32.0,
+"grn": 7.0
+}
+]
+},
+{
+"st": "sa",
+"date": "2022-03-19",
+"article": "2022 South Australian state election",
+"result": {
+"alp": 40.0,
+"lnp": 35.7,
+"grn": 9.1
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2022-03-17",
+"firm": "Newspoll",
+"alp": 41.0,
+"lnp": 38.0,
+"grn": 9.0
+},
+{
+"end": "2022-03-13",
+"firm": "YouGov",
+"alp": 41.0,
+"lnp": 33.0,
+"grn": 11.0
+},
+{
+"end": "2022-02-24",
+"firm": "Newspoll",
+"alp": 39.0,
+"lnp": 37.0,
+"grn": 10.0
+},
+{
+"end": "2022-02-14",
+"firm": "Dynata",
+"alp": 37.0,
+"lnp": 35.0,
+"grn": 7.0
+}
+]
+},
+{
+"st": "sa",
+"date": "2026-03-21",
+"article": "Opinion polling for the 2026 South Australian state election",
+"result": {
+"alp": 37.5,
+"lnp": 18.9,
+"grn": 10.4,
+"onp": 22.9
+},
+"resultSource": "polling table election row (own article)",
+"polls": [
+{
+"end": "2026-03-18",
+"firm": "Newspoll",
+"alp": 40.0,
+"lnp": 16.0,
+"grn": 12.0,
+"onp": 22.0
+},
+{
+"end": "2026-03-18",
+"firm": "DemosAU",
+"alp": 37.0,
+"lnp": 17.0,
+"grn": 11.0,
+"onp": 23.0
+},
+{
+"end": "2026-03-17",
+"firm": "YouGov",
+"alp": 38.0,
+"lnp": 19.0,
+"grn": 12.0,
+"onp": 22.0
+},
+{
+"end": "2026-03-16",
+"firm": "Resolve",
+"alp": 32.0,
+"lnp": 18.0,
+"grn": 10.0,
+"onp": 28.0
+},
+{
+"end": "2026-03-16",
+"firm": "Fox & Hedgehog",
+"alp": 38.0,
+"lnp": 18.0,
+"grn": 11.0,
+"onp": 21.0
+},
+{
+"end": "2026-02-23",
+"firm": "Roy Morgan",
+"alp": 35.0,
+"lnp": 16.5,
+"grn": 11.0,
+"onp": 28.0
+},
+{
+"end": "2026-02-17",
+"firm": "Newspoll",
+"alp": 44.0,
+"lnp": 14.0,
+"grn": 12.0,
+"onp": 24.0
+},
+{
+"end": "2026-02-17",
+"firm": "YouGov",
+"alp": 37.0,
+"lnp": 20.0,
+"grn": 13.0,
+"onp": 22.0
+},
+{
+"end": "2026-02-16",
+"firm": "DemosAU",
+"alp": 43.0,
+"lnp": 18.0,
+"grn": 12.0,
+"onp": 19.0
+}
+]
+}
+]
+}

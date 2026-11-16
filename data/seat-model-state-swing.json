@@ -1,0 +1,260 @@
+{
+ "_about": "calibrate-state-swing.mjs: sitting-member terms and district noise of the logit swing at state elections fought on unchanged boundaries (Victoria 2018, Queensland 2020 and 2024, NSW 2019), statewide totals given. rec = the party's member stands again; ret = the party held the district and its member does not stand; both against districts the party did not hold, logit scale. se from a bootstrap over districts. pooled = both major parties fitted together (their own terms do not differ significantly: partyDifference), which is what the Victorian model uses. sigma = the districts' spread around the swing after the terms (rms and a robust SD), plain = the same on the swing alone.",
+ "pairs": [
+  {
+   "id": "vic18",
+   "prev": "vic14",
+   "label": "Victoria 2018",
+   "districts": 88
+  },
+  {
+   "id": "qld20",
+   "prev": "qld17",
+   "label": "Queensland 2020",
+   "districts": 93
+  },
+  {
+   "id": "qld24",
+   "prev": "qld20",
+   "label": "Queensland 2024",
+   "districts": 93
+  },
+  {
+   "id": "nsw19",
+   "prev": "nsw15",
+   "label": "NSW 2019",
+   "districts": 93
+  }
+ ],
+ "terms": {
+  "alp": {
+   "rec": 0.068,
+   "recSe": 0.023,
+   "ret": -0.048,
+   "retSe": 0.059,
+   "gap": 0.116,
+   "gapSe": 0.059,
+   "n": {
+    "rec": 153,
+    "ret": 28,
+    "other": 186
+   }
+  },
+  "lnp": {
+   "rec": 0.04,
+   "recSe": 0.025,
+   "ret": -0.183,
+   "retSe": 0.089,
+   "gap": 0.223,
+   "gapSe": 0.086,
+   "n": {
+    "rec": 131,
+    "ret": 34,
+    "other": 201
+   }
+  }
+ },
+ "byElection": {
+  "alp": {
+   "vic18": {
+    "rec": 0.064,
+    "ret": -0.008,
+    "n": {
+     "rec": 36,
+     "ret": 11
+    }
+   },
+   "qld20": {
+    "rec": 0.028,
+    "ret": -0.179,
+    "n": {
+     "rec": 44,
+     "ret": 4
+    }
+   },
+   "qld24": {
+    "rec": 0.01,
+    "ret": -0.268,
+    "n": {
+     "rec": 44,
+     "ret": 8
+    }
+   },
+   "nsw19": {
+    "rec": 0.159,
+    "ret": 0.294,
+    "n": {
+     "rec": 29,
+     "ret": 5
+    }
+   }
+  },
+  "lnp": {
+   "vic18": {
+    "rec": 0.083,
+    "ret": -0.038,
+    "n": {
+     "rec": 30,
+     "ret": 8
+    }
+   },
+   "qld20": {
+    "rec": 0.075,
+    "ret": -0.106,
+    "n": {
+     "rec": 34,
+     "ret": 5
+    }
+   },
+   "qld24": {
+    "rec": -0.083,
+    "ret": -0.013,
+    "n": {
+     "rec": 30,
+     "ret": 4
+    }
+   },
+   "nsw19": {
+    "rec": 0.029,
+    "ret": -0.415,
+    "n": {
+     "rec": 37,
+     "ret": 17
+    }
+   }
+  }
+ },
+ "sigma": {
+  "alp": {
+   "n": 367,
+   "rms": 0.235,
+   "robust": 0.194,
+   "byElection": {
+    "vic18": 0.25,
+    "qld20": 0.201,
+    "qld24": 0.208,
+    "nsw19": 0.274
+   }
+  },
+  "lnp": {
+   "n": 366,
+   "rms": 0.25,
+   "robust": 0.221,
+   "byElection": {
+    "vic18": 0.245,
+    "qld20": 0.267,
+    "qld24": 0.197,
+    "nsw19": 0.284
+   }
+  },
+  "grn": {
+   "n": 367,
+   "rms": 0.246,
+   "robust": 0.197,
+   "byElection": {
+    "vic18": 0.263,
+    "qld20": 0.249,
+    "qld24": 0.217,
+    "nsw19": 0.252
+   }
+  },
+  "onp": {
+   "n": 150,
+   "rms": 0.383,
+   "robust": 0.359,
+   "byElection": {
+    "qld20": 0.353,
+    "qld24": 0.403
+   }
+  }
+ },
+ "plain": {
+  "alp": {
+   "n": 367,
+   "rms": 0.238,
+   "robust": 0.186,
+   "byElection": {
+    "vic18": 0.25,
+    "qld20": 0.205,
+    "qld24": 0.213,
+    "nsw19": 0.277
+   }
+  },
+  "lnp": {
+   "n": 366,
+   "rms": 0.262,
+   "robust": 0.228,
+   "byElection": {
+    "vic18": 0.249,
+    "qld20": 0.27,
+    "qld24": 0.188,
+    "nsw19": 0.321
+   }
+  },
+  "grn": {
+   "n": 367,
+   "rms": 0.246,
+   "robust": 0.197,
+   "byElection": {
+    "vic18": 0.263,
+    "qld20": 0.249,
+    "qld24": 0.217,
+    "nsw19": 0.252
+   }
+  },
+  "onp": {
+   "n": 150,
+   "rms": 0.383,
+   "robust": 0.359,
+   "byElection": {
+    "qld20": 0.353,
+    "qld24": 0.403
+   }
+  }
+ },
+ "pooled": {
+  "rec": 0.055,
+  "recSe": 0.018,
+  "ret": -0.111,
+  "retSe": 0.046,
+  "n": {
+   "rec": 284,
+   "ret": 62,
+   "other": 387
+  },
+  "sigma": {
+   "rms": 0.244,
+   "robust": 0.207,
+   "alp": 0.235,
+   "lnp": 0.253
+  },
+  "partyDifference": {
+   "rec": 0.028,
+   "recSe": 0.035,
+   "ret": 0.135,
+   "retSe": 0.104
+  }
+ },
+ "card": {
+  "_about": "Coalition voters' preferences reaching Labor in Labor v Greens counts: 2010, the Liberal card put the Greens ahead of Labor; 2013, Labor ahead of the Greens. follow = the difference: the share of the party's voters who went where the card pointed.",
+  "rows": [
+   {
+    "division": "Melbourne",
+    "toLabor2010": 0.2,
+    "votes2010": 18760,
+    "toLabor2013": 0.663,
+    "votes2013": 19301
+   },
+   {
+    "division": "Batman",
+    "toLabor2010": 0.191,
+    "votes2010": 15412,
+    "toLabor2013": 0.674,
+    "votes2013": 20017
+   }
+  ],
+  "against": 0.196,
+  "with": 0.669,
+  "follow": 0.473
+ }
+}

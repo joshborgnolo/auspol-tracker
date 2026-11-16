@@ -8,8 +8,9 @@
        the polls); every other input is compared by hash with the official nowcast's own provenance.
        Moved -> data/seat-vote-layer.json, both official runs (nowcast + its history line, forecast),
        the page's stores (.build/model/export.mjs).
-     Victoria, 28 November 2026: the /vic/ polling average (vic-inputs.mjs vicVote) against the run's
-       own, and the run's other inputs by hash (data/vic-polls.json aside: the vote stands for it).
+     Victoria, 28 November 2026: the /vic/ polling average (vic-inputs.mjs vicVote) and the polls'
+       respondent preference allocations (vicRespondents) against the run's own, and the run's other
+       inputs by hash (data/vic-polls.json aside: the vote and the allocations stand for it).
        Moved -> vic-simulate.mjs (+ its history line), export-vic.mjs. After election day the run is
        left as it stood: the page shows it as the model's last word before the election.
    Then, if either ran: the changing-hands reasons (reasons.mjs), the page assembly, the guards below and the bundle test (the page must still
@@ -23,7 +24,7 @@ import { createHash } from "node:crypto";
 import { copyFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { VIC, vicVote } from "../analysis/seat-model/vic-inputs.mjs";
+import { VIC, vicVote, vicRespondents } from "../analysis/seat-model/vic-inputs.mjs";
 
 const FORCE = process.argv.includes("--force"), DRY = process.argv.includes("--dry");
 const VOTE = "data/seat-vote-layer.json", NOW = "data/seat-model-2028-nowcast.json", FC = "data/seat-model-2028-forecast.json", VRUN = "data/seat-model-vic-2026.json";
@@ -55,7 +56,8 @@ if (!vicDone) {
   let vv;
   try { vv = await vicVote(); } catch (e) { rmSync(tmp, { recursive: true, force: true }); console.error(`Victorian vote failed: ${e.message}`); process.exit(1); }
   const R = J(VRUN);
-  const vMoved = JSON.stringify(vv.nowcast) !== JSON.stringify(R.meta.nowcast) || vv.pollsTo !== R.meta.pollsTo;
+  // the vote, or the respondents' own preference allocations the run reads from the same polls file
+  const vMoved = JSON.stringify(vv.nowcast) !== JSON.stringify(R.meta.nowcast) || vv.pollsTo !== R.meta.pollsTo || JSON.stringify(vicRespondents()) !== JSON.stringify(R.meta.respondents);
   const vInputs = Object.entries(R._provenance.inputs).filter(([f, h]) => f !== "data/vic-polls.json" && sha16(f) !== h).map(([f]) => f);
   vic = { changed: FORCE || vMoved || vInputs.length > 0, pollsTo: vv.pollsTo, voteMoved: vMoved, inputsMoved: vInputs };
 }

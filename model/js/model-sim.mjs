@@ -12,7 +12,8 @@
         correlated, fat-tailed polling error on the logit scale (sigNat x corr, Student-t df)
      2. state shifts (poll deviation + its se + residual), seat-type and education shocks
      3. each candidate's seat terms (c.adj: sitting member, defection, reversion of the 2025 surprise),
-        seat noise per candidate (Student-t), the age/gender terms, then one shift per party solved so
+        seat noise per candidate (Student-t; a candidate may carry its own spread, c.sig - Victoria's
+        independents new to the ballot), the age/gender terms, then one shift per party solved so
         the national totals hold exactly (seat-engine.spreadShares)
      4. flow shocks: national per donor class and recipient, a shared One Nation acceptability shock,
         and seat-level flow noise
@@ -86,7 +87,7 @@ export function simulateOnce(seats, S, R, L, sigSeat) {
   const eduSlope = P5.map(() => (unc ? R.norm() * S.sigEdu : 0));
   const dev = (i, j) => {
     const s = seats[i], c = s.cands[j], k = c.p5;
-    const noise = unc ? R.t(S.df) * (c.isInd ? S.sigMember * S.seatNoiseMult : sigSeat[k]) : 0;
+    const noise = unc ? R.t(S.df) * (c.sig != null ? c.sig * S.seatNoiseMult : c.isInd ? S.sigMember * S.seatNoiseMult : sigSeat[k]) : 0;
     return (c.adj || 0) + (stateShift[s.st]?.[k] ?? 0) + toLogit(s.demoPP?.[k] ?? 0, k) + classShock[CLASS_IDX[s.cls] ?? 1][k] + eduSlope[k] * (s.z || 0) + noise;
   };
   const shares = spreadShares(seats, targets, dev, R);

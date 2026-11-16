@@ -13,6 +13,7 @@
      state                the state's poll deviation from the national swing
      demo                 the seat's age and gender mix (the vote layer's differentials)
      terms                seat terms: sitting member, defection, part of 2025's surprise going back
+                          (Victoria: a sitting member standing again, a member gone from a party's ticket)
      comp                 today's voters' preferences (switchers carry part of their 2025 party's; off since no voters are mixed)
 
    Plus the central count's preferences: each origin's net transfer between the two, when they meet in
@@ -150,8 +151,10 @@ function holderOf(s) {
   if (idx >= 0) return { idx, bucket: "member" };
   const b = bucketOf(h.group);
   idx = s.cands.findIndex((c) => c.group === h.group);
-  if (idx < 0) idx = s.cands.findIndex((c) => bucketOf(c.group) === b);
-  if (idx < 0 && s.won2022) idx = s.cands.findIndex((c) => c.label === s.won2022.name); // a Victorian defector: the 2022 count's candidate
+  if (idx < 0 && b !== "member") idx = s.cands.findIndex((c) => bucketOf(c.group) === b);
+  // a Victorian member who left their party and is not standing (Ringwood, South Barwon): the candidate of
+  // the party that won the district in 2022 stands in for the holder
+  if (idx < 0 && s.won2022) idx = s.cands.findIndex((c) => bucketOf(c.group) === bucketOf(s.won2022.group));
   return { idx, bucket: b };
 }
 

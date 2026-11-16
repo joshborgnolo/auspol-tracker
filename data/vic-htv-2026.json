@@ -1,0 +1,4189 @@
+{
+"_about": "Registered how-to-vote cards, 2026 Victorian election: for each district the Labor card, the Liberal and/or National card and One Nation's statewide card, as a preference order (candidate names as on the ballot) or open:true where the card numbers only its own candidate. One card per party per district, read from the VEC's register as listed on 16 November 2026 (cards registered 10-13 November; registration runs to 20 November). Read from each PDF's text layer; the twelve Nationals cards draw their numbers as artwork and were read by eye. No Liberal card was registered for Williamstown. Scripts in .build/vic/model-2026/htv (PDFs not kept).",
+"source": "https://www.vec.vic.gov.au/voting/2026-state-election/how-to-vote-cards",
+"listed": "2026-11-16",
+"districts": {
+"Albert Park": {
+"alp": {
+"reg": 74,
+"registered": "10 Nov 2026",
+"order": [
+"TAYLOR, Nina",
+"DRAGWIDGE, Georgie",
+"SEMMENS, Sonya",
+"BOLGER, Colleen",
+"COOK, Andrew",
+"KING, Adrian William",
+"LINDRUM, Tam"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 629,
+"registered": "12 Nov 2026",
+"order": [
+"COOK, Andrew",
+"KING, Adrian William",
+"DRAGWIDGE, Georgie",
+"LINDRUM, Tam",
+"TAYLOR, Nina",
+"SEMMENS, Sonya",
+"BOLGER, Colleen"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"LINDRUM, Tam",
+"COOK, Andrew",
+"TAYLOR, Nina",
+"DRAGWIDGE, Georgie",
+"KING, Adrian William",
+"SEMMENS, Sonya",
+"BOLGER, Colleen"
+],
+"read": "text layer"
+}
+},
+"Ashwood": {
+"alp": {
+"reg": 131,
+"registered": "10 Nov 2026",
+"order": [
+"FREGON, Matt",
+"JOSHI, Hitendra K.",
+"RANDALL, Tim",
+"VAN DER EYNDEN, Jacob",
+"ZOGRAPHOS, Theo",
+"UWIMANA, Enid",
+"MITCHELL, Steven"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 587,
+"registered": "12 Nov 2026",
+"order": [
+"ZOGRAPHOS, Theo",
+"JOSHI, Hitendra K.",
+"UWIMANA, Enid",
+"MITCHELL, Steven",
+"FREGON, Matt",
+"RANDALL, Tim",
+"VAN DER EYNDEN, Jacob"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MITCHELL, Steven",
+"UWIMANA, Enid",
+"ZOGRAPHOS, Theo",
+"FREGON, Matt",
+"JOSHI, Hitendra K.",
+"RANDALL, Tim",
+"VAN DER EYNDEN, Jacob"
+],
+"read": "text layer"
+}
+},
+"Bass": {
+"alp": {
+"reg": 31,
+"registered": "10 Nov 2026",
+"order": [
+"BUCKINGHAM, Chris",
+"THORN, Sophie",
+"JOBE, Chris",
+"HALSTEAD, Rochelle",
+"CAUNEAC, Ben",
+"SCHELLEKENS, Nikole"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 614,
+"registered": "12 Nov 2026",
+"order": [
+"HALSTEAD, Rochelle",
+"SCHELLEKENS, Nikole",
+"BUCKINGHAM, Chris",
+"CAUNEAC, Ben",
+"THORN, Sophie",
+"JOBE, Chris"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"SCHELLEKENS, Nikole",
+"CAUNEAC, Ben",
+"HALSTEAD, Rochelle",
+"BUCKINGHAM, Chris",
+"THORN, Sophie",
+"JOBE, Chris"
+],
+"read": "text layer"
+}
+},
+"Bayswater": {
+"alp": {
+"reg": 30,
+"registered": "10 Nov 2026",
+"order": [
+"BUXTON, Julie",
+"KENNEDY, Jess",
+"FERGUSON, Alec",
+"CLARKE, Mathew",
+"HUBBARD, Naomi",
+"KITCHEN, David",
+"COOMBES, Gary",
+"BLEAKNEY, Kayte"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 615,
+"registered": "12 Nov 2026",
+"order": [
+"KITCHEN, David",
+"COOMBES, Gary",
+"HUBBARD, Naomi",
+"BLEAKNEY, Kayte",
+"CLARKE, Mathew",
+"BUXTON, Julie",
+"KENNEDY, Jess",
+"FERGUSON, Alec"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BLEAKNEY, Kayte",
+"COOMBES, Gary",
+"KITCHEN, David",
+"HUBBARD, Naomi",
+"BUXTON, Julie",
+"CLARKE, Mathew",
+"KENNEDY, Jess",
+"FERGUSON, Alec"
+],
+"read": "text layer"
+}
+},
+"Bellarine": {
+"alp": {
+"reg": 119,
+"registered": "10 Nov 2026",
+"order": [
+"MARCHANT, Alison",
+"POPE, Mitch",
+"LOCKHART, Kate",
+"KEOGH, Ronan",
+"WILLIAMS, Dom",
+"WHITEHEAD, Callum",
+"MANUELL, Guy",
+"MCRAE, Ross"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 598,
+"registered": "12 Nov 2026",
+"order": [
+"WHITEHEAD, Callum",
+"MANUELL, Guy",
+"MCRAE, Ross",
+"LOCKHART, Kate",
+"MARCHANT, Alison",
+"POPE, Mitch",
+"KEOGH, Ronan",
+"WILLIAMS, Dom"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MCRAE, Ross",
+"MANUELL, Guy",
+"WHITEHEAD, Callum",
+"MARCHANT, Alison",
+"LOCKHART, Kate",
+"POPE, Mitch",
+"WILLIAMS, Dom",
+"KEOGH, Ronan"
+],
+"read": "text layer"
+}
+},
+"Benambra": {
+"alp": {
+"reg": 89,
+"registered": "10 Nov 2026",
+"order": [
+"YOUNG, Oliver",
+"FUERY, Mike",
+"PARTON, Graham",
+"VANGALEN, Alex",
+"McKEEMAN, Lachie",
+"QUILTY, Tim",
+"MARTIN, Steve",
+"PEPPER, Evette",
+"SHEPPARD, Kellie"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 591,
+"registered": "12 Nov 2026",
+"order": [
+"MARTIN, Steve",
+"SHEPPARD, Kellie",
+"PEPPER, Evette",
+"QUILTY, Tim",
+"McKEEMAN, Lachie",
+"FUERY, Mike",
+"YOUNG, Oliver",
+"PARTON, Graham",
+"VANGALEN, Alex"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"SHEPPARD, Kellie",
+"QUILTY, Tim",
+"PEPPER, Evette",
+"MARTIN, Steve",
+"YOUNG, Oliver",
+"McKEEMAN, Lachie",
+"PARTON, Graham",
+"FUERY, Mike",
+"VANGALEN, Alex"
+],
+"read": "text layer"
+}
+},
+"Bendigo East": {
+"alp": {
+"reg": 95,
+"registered": "10 Nov 2026",
+"order": [
+"RICKWOOD, Tim",
+"TOLHURST, Michael",
+"DUNN, Bonnie",
+"NORSEN, Denali",
+"WRIGHT, Liz",
+"LETHLEAN, Andrew",
+"HOSKINS, Kristie",
+"JOHN, Des",
+"HAWKEN, Cheryl"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 466,
+"registered": "11 Nov 2026",
+"order": [
+"LETHLEAN, Andrew",
+"WRIGHT, Liz",
+"JOHN, Des",
+"HAWKEN, Cheryl",
+"HOSKINS, Kristie",
+"RICKWOOD, Tim",
+"TOLHURST, Michael",
+"DUNN, Bonnie",
+"NORSEN, Denali"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HAWKEN, Cheryl",
+"JOHN, Des",
+"LETHLEAN, Andrew",
+"WRIGHT, Liz",
+"HOSKINS, Kristie",
+"RICKWOOD, Tim",
+"TOLHURST, Michael",
+"DUNN, Bonnie",
+"NORSEN, Denali"
+],
+"read": "text layer"
+}
+},
+"Bendigo West": {
+"alp": {
+"reg": 99,
+"registered": "10 Nov 2026",
+"order": [
+"BALDWIN, Brenton",
+"TRANTER, Debra",
+"SHAW, Liza",
+"SHALEVSKI, Tayne",
+"HUTCHINGS, David",
+"HARISOPOULOS, Christos",
+"MORGAN, Ellen"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 488,
+"registered": "11 Nov 2026",
+"order": [
+"HUTCHINGS, David",
+"MORGAN, Ellen",
+"HARISOPOULOS, Christos",
+"BALDWIN, Brenton",
+"SHAW, Liza",
+"SHALEVSKI, Tayne",
+"TRANTER, Debra"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MORGAN, Ellen",
+"HARISOPOULOS, Christos",
+"HUTCHINGS, David",
+"BALDWIN, Brenton",
+"SHAW, Liza",
+"TRANTER, Debra",
+"SHALEVSKI, Tayne"
+],
+"read": "text layer"
+}
+},
+"Bentleigh": {
+"alp": {
+"reg": 83,
+"registered": "10 Nov 2026",
+"order": [
+"STAIKOS, Nick",
+"PROCTOR, Claire",
+"KRUGER, Liam",
+"PUTT, Tynan",
+"VAINORAS, Tony",
+"LONSING, Herbert"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 597,
+"registered": "12 Nov 2026",
+"order": [
+"PUTT, Tynan",
+"LONSING, Herbert",
+"STAIKOS, Nick",
+"PROCTOR, Claire",
+"VAINORAS, Tony",
+"KRUGER, Liam"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"LONSING, Herbert",
+"VAINORAS, Tony",
+"PUTT, Tynan",
+"STAIKOS, Nick",
+"PROCTOR, Claire",
+"KRUGER, Liam"
+],
+"read": "text layer"
+}
+},
+"Berwick": {
+"alp": {
+"reg": 66,
+"registered": "10 Nov 2026",
+"order": [
+"KHAN, Rana",
+"DE SILVA, Roshan",
+"JOHN, David",
+"AMARASIRI GUNAWARDANA, Nalinda",
+"KING, Ethelyn",
+"BATTIN, Brad",
+"DE PAOLIS, Vincenzo",
+"DOWLING, Scott",
+"PIASTRINO, Michael"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 563,
+"registered": "12 Nov 2026",
+"order": [
+"BATTIN, Brad",
+"DE PAOLIS, Vincenzo",
+"JOHN, David",
+"PIASTRINO, Michael",
+"KING, Ethelyn",
+"KHAN, Rana",
+"DE SILVA, Roshan",
+"DOWLING, Scott",
+"AMARASIRI GUNAWARDANA, Nalinda"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PIASTRINO, Michael",
+"KING, Ethelyn",
+"DE PAOLIS, Vincenzo",
+"JOHN, David",
+"DOWLING, Scott",
+"BATTIN, Brad",
+"KHAN, Rana",
+"DE SILVA, Roshan",
+"AMARASIRI GUNAWARDANA, Nalinda"
+],
+"read": "text layer"
+}
+},
+"Box Hill": {
+"alp": {
+"reg": 79,
+"registered": "10 Nov 2026",
+"order": [
+"HAMER, Paul",
+"CHEUNG, Heena",
+"QIN, Aaron",
+"AFAJ, Saravina",
+"McGRATH, Sue-Ellen",
+"HOUGUET, Sally",
+"FAGG, Peter",
+"BAKER, Jamie"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 631,
+"registered": "12 Nov 2026",
+"order": [
+"HOUGUET, Sally",
+"McGRATH, Sue-Ellen",
+"FAGG, Peter",
+"CHEUNG, Heena",
+"BAKER, Jamie",
+"HAMER, Paul",
+"QIN, Aaron",
+"AFAJ, Saravina"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BAKER, Jamie",
+"FAGG, Peter",
+"HOUGUET, Sally",
+"McGRATH, Sue-Ellen",
+"HAMER, Paul",
+"CHEUNG, Heena",
+"QIN, Aaron",
+"AFAJ, Saravina"
+],
+"read": "text layer"
+}
+},
+"Brighton": {
+"alp": {
+"reg": 78,
+"registered": "10 Nov 2026",
+"order": [
+"MULLAHY, Bridget",
+"BAIN, Ebony",
+"SMITH, Jessica",
+"HAIN, Anthony",
+"NEWBURY, James",
+"VINCENT, Barry",
+"CASLEY, John",
+"FAGAN, Alexander"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 602,
+"registered": "12 Nov 2026",
+"order": [
+"NEWBURY, James",
+"VINCENT, Barry",
+"FAGAN, Alexander",
+"HAIN, Anthony",
+"MULLAHY, Bridget",
+"BAIN, Ebony",
+"SMITH, Jessica",
+"CASLEY, John"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"FAGAN, Alexander",
+"VINCENT, Barry",
+"HAIN, Anthony",
+"NEWBURY, James",
+"MULLAHY, Bridget",
+"CASLEY, John",
+"BAIN, Ebony",
+"SMITH, Jessica"
+],
+"read": "text layer"
+}
+},
+"Broadmeadows": {
+"alp": {
+"reg": 128,
+"registered": "10 Nov 2026",
+"order": [
+"MATTHEWS-WARD, Kathleen",
+"UNICOMB, Rachel",
+"EL YOUSSEF, Mohamad",
+"NASIM, Maryam",
+"ELMUSTAPHA, Mohamad",
+"YOLBULAN, Mutullah Can",
+"BOLTON, Sue",
+"DUZOVA, Baris",
+"WILSON, Russell",
+"KEIRS, Ethan"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 624,
+"registered": "12 Nov 2026",
+"order": [
+"DUZOVA, Baris",
+"WILSON, Russell",
+"KEIRS, Ethan",
+"UNICOMB, Rachel",
+"ELMUSTAPHA, Mohamad",
+"EL YOUSSEF, Mohamad",
+"MATTHEWS-WARD, Kathleen",
+"NASIM, Maryam",
+"YOLBULAN, Mutullah Can",
+"BOLTON, Sue"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"KEIRS, Ethan",
+"WILSON, Russell",
+"DUZOVA, Baris",
+"MATTHEWS-WARD, Kathleen",
+"ELMUSTAPHA, Mohamad",
+"EL YOUSSEF, Mohamad",
+"NASIM, Maryam",
+"UNICOMB, Rachel",
+"BOLTON, Sue",
+"YOLBULAN, Mutullah Can"
+],
+"read": "text layer"
+}
+},
+"Brunswick": {
+"alp": {
+"reg": 51,
+"registered": "10 Nov 2026",
+"order": [
+"STEGER, Gabe",
+"FARMER, Naomi",
+"PULFORD, Adam",
+"ROSE, India",
+"YUAN, Melissa",
+"AMANATIDIS, Jack",
+"MARGELIS, John",
+"HELMAN, Adam"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 827,
+"registered": "12 Nov 2026",
+"open": true,
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HELMAN, Adam",
+"MARGELIS, John",
+"STEGER, Gabe",
+"AMANATIDIS, Jack",
+"YUAN, Melissa",
+"PULFORD, Adam",
+"ROSE, India",
+"FARMER, Naomi"
+],
+"read": "text layer"
+}
+},
+"Bulleen": {
+"alp": {
+"reg": 32,
+"registered": "10 Nov 2026",
+"order": [
+"DALE, Tim",
+"LIGHTBODY, Tomas",
+"RUBLEE, Greg",
+"TAFIDIS, Dimitrios",
+"PALIOURAS, Amanda",
+"GUY, Matthew",
+"HARVEY, Bradley",
+"ATHARI, Mahdi"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 613,
+"registered": "12 Nov 2026",
+"order": [
+"GUY, Matthew",
+"HARVEY, Bradley",
+"ATHARI, Mahdi",
+"RUBLEE, Greg",
+"PALIOURAS, Amanda",
+"DALE, Tim",
+"LIGHTBODY, Tomas",
+"TAFIDIS, Dimitrios"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"ATHARI, Mahdi",
+"HARVEY, Bradley",
+"GUY, Matthew",
+"PALIOURAS, Amanda",
+"DALE, Tim",
+"RUBLEE, Greg",
+"LIGHTBODY, Tomas",
+"TAFIDIS, Dimitrios"
+],
+"read": "text layer"
+}
+},
+"Bundoora": {
+"alp": {
+"reg": 52,
+"registered": "10 Nov 2026",
+"order": [
+"BROOKS, Colin",
+"NICOLOSI, Chloe",
+"MURPHY-WEBSTER, Melissa",
+"LAITALA, Nina",
+"SANYAL, Sagar",
+"PARR, Chris",
+"WHALLEY, Bruce",
+"RANCIE, Rae"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 622,
+"registered": "12 Nov 2026",
+"order": [
+"PARR, Chris",
+"MURPHY-WEBSTER, Melissa",
+"WHALLEY, Bruce",
+"RANCIE, Rae",
+"NICOLOSI, Chloe",
+"BROOKS, Colin",
+"LAITALA, Nina",
+"SANYAL, Sagar"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"WHALLEY, Bruce",
+"RANCIE, Rae",
+"PARR, Chris",
+"MURPHY-WEBSTER, Melissa",
+"BROOKS, Colin",
+"LAITALA, Nina",
+"NICOLOSI, Chloe",
+"SANYAL, Sagar"
+],
+"read": "text layer"
+}
+},
+"Carrum": {
+"alp": {
+"reg": 82,
+"registered": "10 Nov 2026",
+"order": [
+"KILKENNY, Sonya",
+"PEGRUM, Zoe",
+"ABABNEH, Reema",
+"MOORE, Carolyn",
+"MACKENZIE, Harley",
+"SMITH, Trevor",
+"SHELLEY, Jeff",
+"MATHEWS, Joshua"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 619,
+"registered": "12 Nov 2026",
+"order": [
+"SHELLEY, Jeff",
+"SMITH, Trevor",
+"MATHEWS, Joshua",
+"MOORE, Carolyn",
+"MACKENZIE, Harley",
+"KILKENNY, Sonya",
+"PEGRUM, Zoe",
+"ABABNEH, Reema"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MATHEWS, Joshua",
+"SMITH, Trevor",
+"SHELLEY, Jeff",
+"KILKENNY, Sonya",
+"PEGRUM, Zoe",
+"MACKENZIE, Harley",
+"MOORE, Carolyn",
+"ABABNEH, Reema"
+],
+"read": "text layer"
+}
+},
+"Caulfield": {
+"alp": {
+"reg": 87,
+"registered": "10 Nov 2026",
+"open": true,
+"read": "text layer"
+},
+"lib": {
+"reg": 675,
+"registered": "12 Nov 2026",
+"order": [
+"SOUTHWICK, David",
+"GILBERT, Geneviève",
+"SHROOT, Yaakov Ziv",
+"ABELMAN, Michael",
+"STAFRACE, Mikaela",
+"DOLEJŠÍ, Angel",
+"ABABNEH, Malak"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"ABELMAN, Michael",
+"GILBERT, Geneviève",
+"SOUTHWICK, David",
+"SHROOT, Yaakov Ziv",
+"STAFRACE, Mikaela",
+"DOLEJŠÍ, Angel",
+"ABABNEH, Malak"
+],
+"read": "text layer"
+}
+},
+"Clarinda": {
+"alp": {
+"reg": 86,
+"registered": "10 Nov 2026",
+"order": [
+"TAK, Meng Heang",
+"BOYD-EEDLE, Conor",
+"MESSAGE, Kit",
+"ROCHE, Liam",
+"PAGANIS, John",
+"WHITE, Caroline",
+"BAIN, Gavin"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 590,
+"registered": "12 Nov 2026",
+"order": [
+"PAGANIS, John",
+"WHITE, Caroline",
+"ROCHE, Liam",
+"BAIN, Gavin",
+"TAK, Meng Heang",
+"BOYD-EEDLE, Conor",
+"MESSAGE, Kit"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BAIN, Gavin",
+"WHITE, Caroline",
+"ROCHE, Liam",
+"PAGANIS, John",
+"TAK, Meng Heang",
+"BOYD-EEDLE, Conor",
+"MESSAGE, Kit"
+],
+"read": "text layer"
+}
+},
+"Cranbourne": {
+"alp": {
+"reg": 93,
+"registered": "10 Nov 2026",
+"order": [
+"RICHARDS, Pauline",
+"URQUIOLA, Liam",
+"MERCER, Annalise",
+"YUNIS, Reem",
+"BAIRD, Craig",
+"TRIPODI, Gino",
+"FOREMAN, Shane",
+"HIRST, Andrew"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 616,
+"registered": "12 Nov 2026",
+"order": [
+"TRIPODI, Gino",
+"BAIRD, Craig",
+"FOREMAN, Shane",
+"HIRST, Andrew",
+"URQUIOLA, Liam",
+"RICHARDS, Pauline",
+"MERCER, Annalise",
+"YUNIS, Reem"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HIRST, Andrew",
+"FOREMAN, Shane",
+"BAIRD, Craig",
+"TRIPODI, Gino",
+"RICHARDS, Pauline",
+"MERCER, Annalise",
+"URQUIOLA, Liam",
+"YUNIS, Reem"
+],
+"read": "text layer"
+}
+},
+"Croydon": {
+"alp": {
+"reg": 49,
+"registered": "10 Nov 2026",
+"order": [
+"FARR, Richard",
+"FERNANDO, Lini",
+"GRIMSHAW, Beth",
+"VANDERWOLF, David",
+"SCHWAB, Nathan",
+"WOOLDRIDGE, Toby",
+"THOMAS, Nofoao",
+"BRINDLEY, Glenn"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 593,
+"registered": "12 Nov 2026",
+"order": [
+"WOOLDRIDGE, Toby",
+"THOMAS, Nofoao",
+"SCHWAB, Nathan",
+"BRINDLEY, Glenn",
+"VANDERWOLF, David",
+"FARR, Richard",
+"FERNANDO, Lini",
+"GRIMSHAW, Beth"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BRINDLEY, Glenn",
+"THOMAS, Nofoao",
+"SCHWAB, Nathan",
+"WOOLDRIDGE, Toby",
+"FARR, Richard",
+"VANDERWOLF, David",
+"FERNANDO, Lini",
+"GRIMSHAW, Beth"
+],
+"read": "text layer"
+}
+},
+"Dandenong": {
+"alp": {
+"reg": 64,
+"registered": "10 Nov 2026",
+"order": [
+"WILLIAMS, Gabrielle",
+"D'ARCY, Catherine",
+"KHAN, Arshad Ali",
+"McMAHON, Jack",
+"FORTE, Jordan",
+"BILLINGS, William",
+"HARVEY, Jacqueline",
+"WRIGHT, Glenda"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 564,
+"registered": "12 Nov 2026",
+"order": [
+"BILLINGS, William",
+"HARVEY, Jacqueline",
+"KHAN, Arshad Ali",
+"WRIGHT, Glenda",
+"FORTE, Jordan",
+"WILLIAMS, Gabrielle",
+"D'ARCY, Catherine",
+"McMAHON, Jack"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"WRIGHT, Glenda",
+"HARVEY, Jacqueline",
+"FORTE, Jordan",
+"BILLINGS, William",
+"WILLIAMS, Gabrielle",
+"KHAN, Arshad Ali",
+"D'ARCY, Catherine",
+"McMAHON, Jack"
+],
+"read": "text layer"
+}
+},
+"Eildon": {
+"alp": {
+"reg": 106,
+"registered": "10 Nov 2026",
+"order": [
+"GIBSON, Kevin",
+"BOND, Chloe",
+"GULPILIL, Talia",
+"LITTLE, Dylan",
+"WARD, Tom",
+"MCLEISH, Cindy",
+"MOSELY, Joshua",
+"BARBER, Tim"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 686,
+"registered": "12 Nov 2026",
+"order": [
+"MCLEISH, Cindy",
+"MOSELY, Joshua",
+"BARBER, Tim",
+"WARD, Tom",
+"BOND, Chloe",
+"GIBSON, Kevin",
+"GULPILIL, Talia",
+"LITTLE, Dylan"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BARBER, Tim",
+"MOSELY, Joshua",
+"MCLEISH, Cindy",
+"WARD, Tom",
+"GIBSON, Kevin",
+"GULPILIL, Talia",
+"BOND, Chloe",
+"LITTLE, Dylan"
+],
+"read": "text layer"
+}
+},
+"Eltham": {
+"alp": {
+"reg": 50,
+"registered": "10 Nov 2026",
+"order": [
+"WARD, Vicki",
+"BUSBRIDGE, Rachel",
+"BROOKSBY, Louise",
+"RICHES, Maeve",
+"MARASEA, Steven",
+"BYRNES, Paul",
+"WEATHERLEY, Jessie"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 565,
+"registered": "12 Nov 2026",
+"order": [
+"BYRNES, Paul",
+"MARASEA, Steven",
+"WEATHERLEY, Jessie",
+"BROOKSBY, Louise",
+"WARD, Vicki",
+"BUSBRIDGE, Rachel",
+"RICHES, Maeve"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"WEATHERLEY, Jessie",
+"MARASEA, Steven",
+"BYRNES, Paul",
+"WARD, Vicki",
+"BUSBRIDGE, Rachel",
+"BROOKSBY, Louise",
+"RICHES, Maeve"
+],
+"read": "text layer"
+}
+},
+"Essendon": {
+"alp": {
+"reg": 125,
+"registered": "10 Nov 2026",
+"order": [
+"THEODOSIS, Kat",
+"ADAMS, Ava",
+"MOHAMUD, Anab",
+"WILLIAMS, James",
+"KEDEM, Michal",
+"LE DEUX, Tommy",
+"YILDIZ, Oscar",
+"BARNES, John"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 595,
+"registered": "12 Nov 2026",
+"order": [
+"LE DEUX, Tommy",
+"YILDIZ, Oscar",
+"BARNES, John",
+"ADAMS, Ava",
+"THEODOSIS, Kat",
+"WILLIAMS, James",
+"KEDEM, Michal",
+"MOHAMUD, Anab"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BARNES, John",
+"LE DEUX, Tommy",
+"ADAMS, Ava",
+"YILDIZ, Oscar",
+"THEODOSIS, Kat",
+"MOHAMUD, Anab",
+"WILLIAMS, James",
+"KEDEM, Michal"
+],
+"read": "text layer"
+}
+},
+"Eureka": {
+"alp": {
+"reg": 118,
+"registered": "10 Nov 2026",
+"order": [
+"SETTLE, Michaela",
+"MORRISON, Wendy",
+"McCOLL, Sam",
+"RAVEN, Andy",
+"VENDITTI-TAYLOR, Steven",
+"MUIR, Emma",
+"ZIVKOVIC, Belinda",
+"HARKNESS, Ian Maxwell",
+"BALLINGER, Paul"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 556,
+"registered": "12 Nov 2026",
+"order": [
+"MUIR, Emma",
+"VENDITTI-TAYLOR, Steven",
+"HARKNESS, Ian Maxwell",
+"BALLINGER, Paul",
+"ZIVKOVIC, Belinda",
+"MORRISON, Wendy",
+"SETTLE, Michaela",
+"McCOLL, Sam",
+"RAVEN, Andy"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BALLINGER, Paul",
+"HARKNESS, Ian Maxwell",
+"MUIR, Emma",
+"VENDITTI-TAYLOR, Steven",
+"SETTLE, Michaela",
+"ZIVKOVIC, Belinda",
+"McCOLL, Sam",
+"MORRISON, Wendy",
+"RAVEN, Andy"
+],
+"read": "text layer"
+}
+},
+"Euroa": {
+"alp": {
+"reg": 110,
+"registered": "10 Nov 2026",
+"order": [
+"KELLY, Julian",
+"REGAN, Alysia",
+"KELLY, Karina",
+"LYLE, Zoe",
+"CLEELAND, Annabelle",
+"TAOUK, Moussa",
+"CAMPBELL, Steve"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 481,
+"registered": "11 Nov 2026",
+"order": [
+"CLEELAND, Annabelle",
+"TAOUK, Moussa",
+"CAMPBELL, Steve",
+"KELLY, Julian",
+"REGAN, Alysia",
+"KELLY, Karina",
+"LYLE, Zoe"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"CAMPBELL, Steve",
+"TAOUK, Moussa",
+"CLEELAND, Annabelle",
+"KELLY, Julian",
+"REGAN, Alysia",
+"KELLY, Karina",
+"LYLE, Zoe"
+],
+"read": "text layer"
+}
+},
+"Evelyn": {
+"alp": {
+"reg": 27,
+"registered": "10 Nov 2026",
+"order": [
+"SHERLOCK, Analise",
+"HEALD, Jan",
+"HENLEY, Andrew",
+"SCANLON, James",
+"VALLENCE, Bridget",
+"O'BRIEN, Michelle",
+"KILLEY, Daniel"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 559,
+"registered": "12 Nov 2026",
+"order": [
+"VALLENCE, Bridget",
+"O'BRIEN, Michelle",
+"KILLEY, Daniel",
+"HEALD, Jan",
+"SHERLOCK, Analise",
+"HENLEY, Andrew",
+"SCANLON, James"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"KILLEY, Daniel",
+"O'BRIEN, Michelle",
+"VALLENCE, Bridget",
+"SHERLOCK, Analise",
+"HENLEY, Andrew",
+"HEALD, Jan",
+"SCANLON, James"
+],
+"read": "text layer"
+}
+},
+"Footscray": {
+"alp": {
+"reg": 108,
+"registered": "10 Nov 2026",
+"order": [
+"HALL, Katie",
+"PEREYRA, Elena",
+"NGUYEN, Minh Quan",
+"MARSH, Jess",
+"DUFF, Jasmine",
+"CHANG, Tim",
+"DINH, Hai",
+"IBRAHIM, Marcus",
+"FLORES, Ana",
+"CUMMING, Catherine",
+"FELATE, Andualem",
+"HESS, Kristina",
+"CALDER, Daryle",
+"LEWIS, Daniel",
+"LOPEZ, Alexander"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 829,
+"registered": "13 Nov 2026",
+"open": true,
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"LOPEZ, Alexander",
+"FLORES, Ana",
+"CUMMING, Catherine",
+"CHANG, Tim",
+"NGUYEN, Minh Quan",
+"FELATE, Andualem",
+"HALL, Katie",
+"DINH, Hai",
+"IBRAHIM, Marcus",
+"MARSH, Jess",
+"HESS, Kristina",
+"CALDER, Daryle",
+"LEWIS, Daniel",
+"PEREYRA, Elena",
+"DUFF, Jasmine"
+],
+"read": "text layer"
+}
+},
+"Frankston": {
+"alp": {
+"reg": 70,
+"registered": "10 Nov 2026",
+"order": [
+"EDBROOKE, Paul",
+"KNIPE, Jeff",
+"KELSALL, Henry",
+"HARMAN, Julie",
+"GOULAS, Katie",
+"CHEESEMAN, Andrew",
+"AMBRY, Bree",
+"BARRY, Nicola",
+"NICHOLES, Peter",
+"ABRAHAM, Chrysten",
+"STAFFORD, Paul"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 558,
+"registered": "12 Nov 2026",
+"order": [
+"AMBRY, Bree",
+"NICHOLES, Peter",
+"ABRAHAM, Chrysten",
+"STAFFORD, Paul",
+"BARRY, Nicola",
+"KELSALL, Henry",
+"HARMAN, Julie",
+"KNIPE, Jeff",
+"EDBROOKE, Paul",
+"GOULAS, Katie",
+"CHEESEMAN, Andrew"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"STAFFORD, Paul",
+"NICHOLES, Peter",
+"ABRAHAM, Chrysten",
+"AMBRY, Bree",
+"EDBROOKE, Paul",
+"BARRY, Nicola",
+"KELSALL, Henry",
+"GOULAS, Katie",
+"KNIPE, Jeff",
+"HARMAN, Julie",
+"CHEESEMAN, Andrew"
+],
+"read": "text layer"
+}
+},
+"Geelong": {
+"alp": {
+"reg": 115,
+"registered": "10 Nov 2026",
+"order": [
+"COUZENS, Christine",
+"FLYNN, Emilie",
+"MACPHERSON, Pippa",
+"GRULL, Brenden",
+"VANDERPOL, Bree",
+"POBJOY, Andy",
+"BENGTSSON, Maria",
+"DE LORENZO, John"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 540,
+"registered": "12 Nov 2026",
+"order": [
+"POBJOY, Andy",
+"BENGTSSON, Maria",
+"DE LORENZO, John",
+"MACPHERSON, Pippa",
+"COUZENS, Christine",
+"FLYNN, Emilie",
+"VANDERPOL, Bree",
+"GRULL, Brenden"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"DE LORENZO, John",
+"BENGTSSON, Maria",
+"POBJOY, Andy",
+"COUZENS, Christine",
+"FLYNN, Emilie",
+"MACPHERSON, Pippa",
+"GRULL, Brenden",
+"VANDERPOL, Bree"
+],
+"read": "text layer"
+}
+},
+"Gippsland East": {
+"alp": {
+"reg": 26,
+"registered": "10 Nov 2026",
+"order": [
+"STEPHENS, Sonny",
+"MUNRO, Ash",
+"MUIR, Ricky",
+"ESPESETH, Amy",
+"RENDELL, Gemma",
+"WATERS, Alison",
+"GOODMAN, Steve"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 471,
+"registered": "11 Nov 2026",
+"order": [
+"RENDELL, Gemma",
+"MUIR, Ricky",
+"GOODMAN, Steve",
+"WATERS, Alison",
+"STEPHENS, Sonny",
+"MUNRO, Ash",
+"ESPESETH, Amy"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"GOODMAN, Steve",
+"WATERS, Alison",
+"MUIR, Ricky",
+"RENDELL, Gemma",
+"STEPHENS, Sonny",
+"MUNRO, Ash",
+"ESPESETH, Amy"
+],
+"read": "text layer"
+}
+},
+"Gippsland South": {
+"alp": {
+"reg": 24,
+"registered": "10 Nov 2026",
+"order": [
+"BARRY-MACAULAY, Amy",
+"McAULIFFE, Jessica",
+"EVANS, Zave",
+"McGENNISKEN, Lachie",
+"SCHUHMANN, Phillip",
+"O'BRIEN, Danny",
+"WILKIE, Bianca"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 480,
+"registered": "11 Nov 2026",
+"order": [
+"O'BRIEN, Danny",
+"WILKIE, Bianca",
+"BARRY-MACAULAY, Amy",
+"McAULIFFE, Jessica",
+"EVANS, Zave",
+"McGENNISKEN, Lachie",
+"SCHUHMANN, Phillip"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"WILKIE, Bianca",
+"SCHUHMANN, Phillip",
+"O'BRIEN, Danny",
+"BARRY-MACAULAY, Amy",
+"EVANS, Zave",
+"McAULIFFE, Jessica",
+"McGENNISKEN, Lachie"
+],
+"read": "text layer"
+}
+},
+"Glen Waverley": {
+"alp": {
+"reg": 134,
+"registered": "10 Nov 2026",
+"order": [
+"MULLAHY, John",
+"WHITE, Toyo",
+"SIOW, Nicholas",
+"NADARAJAH, Segar",
+"SUN, Jacky",
+"DOBIE, Anna",
+"COX, Brad"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 542,
+"registered": "12 Nov 2026",
+"order": [
+"SUN, Jacky",
+"NADARAJAH, Segar",
+"DOBIE, Anna",
+"COX, Brad",
+"MULLAHY, John",
+"WHITE, Toyo",
+"SIOW, Nicholas"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"COX, Brad",
+"DOBIE, Anna",
+"SUN, Jacky",
+"NADARAJAH, Segar",
+"MULLAHY, John",
+"WHITE, Toyo",
+"SIOW, Nicholas"
+],
+"read": "text layer"
+}
+},
+"Greenvale": {
+"alp": {
+"reg": 48,
+"registered": "10 Nov 2026",
+"order": [
+"WALTERS, Iwan",
+"FURINA, Rosanna",
+"MCGINNESS, Declan",
+"SMELOV, Kirill",
+"SAID, Hassan",
+"ZOUGHAIB, Yehya",
+"YOHANNA, Mazen",
+"TITHERIDGE, Michael",
+"OVEREND, Jim",
+"MOORE, Chris"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 835,
+"registered": "12 Nov 2026",
+"order": [
+"OVEREND, Jim",
+"ZOUGHAIB, Yehya",
+"TITHERIDGE, Michael",
+"FURINA, Rosanna",
+"WALTERS, Iwan",
+"SAID, Hassan",
+"YOHANNA, Mazen",
+"MCGINNESS, Declan",
+"SMELOV, Kirill",
+"MOORE, Chris"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MOORE, Chris",
+"TITHERIDGE, Michael",
+"YOHANNA, Mazen",
+"OVEREND, Jim",
+"WALTERS, Iwan",
+"MCGINNESS, Declan",
+"SAID, Hassan",
+"ZOUGHAIB, Yehya",
+"FURINA, Rosanna",
+"SMELOV, Kirill"
+],
+"read": "text layer"
+}
+},
+"Hastings": {
+"alp": {
+"reg": 25,
+"registered": "10 Nov 2026",
+"order": [
+"MERCURIO, Paul",
+"WILLOUGHBY, Isaac",
+"DENMAN, Michael",
+"COULSON, Chloe",
+"SCHIEFLER, Frank",
+"ANGELICO, Peter",
+"SMART, Jason"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 531,
+"registered": "12 Nov 2026",
+"order": [
+"SCHIEFLER, Frank",
+"ANGELICO, Peter",
+"COULSON, Chloe",
+"MERCURIO, Paul",
+"WILLOUGHBY, Isaac",
+"DENMAN, Michael",
+"SMART, Jason"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"ANGELICO, Peter",
+"SCHIEFLER, Frank",
+"SMART, Jason",
+"MERCURIO, Paul",
+"WILLOUGHBY, Isaac",
+"COULSON, Chloe",
+"DENMAN, Michael"
+],
+"read": "text layer"
+}
+},
+"Hawthorn": {
+"alp": {
+"reg": 90,
+"registered": "10 Nov 2026",
+"order": [
+"CROSBY, Clive",
+"ROCHA, Kylie",
+"IBUKI, Shima",
+"McENEARNEY, Tess",
+"PESUTTO, John",
+"NICOLL, Adam",
+"PRIBILOVICS, Paul"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 534,
+"registered": "12 Nov 2026",
+"order": [
+"PESUTTO, John",
+"NICOLL, Adam",
+"PRIBILOVICS, Paul",
+"IBUKI, Shima",
+"CROSBY, Clive",
+"ROCHA, Kylie",
+"McENEARNEY, Tess"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PRIBILOVICS, Paul",
+"NICOLL, Adam",
+"PESUTTO, John",
+"CROSBY, Clive",
+"IBUKI, Shima",
+"ROCHA, Kylie",
+"McENEARNEY, Tess"
+],
+"read": "text layer"
+}
+},
+"Ivanhoe": {
+"alp": {
+"reg": 47,
+"registered": "10 Nov 2026",
+"order": [
+"CARBINES, Anthony",
+"CRAWLEY, Nina",
+"MILNE, Ben",
+"KENNEDY, Michelle",
+"BERGMAN, Dora",
+"LOPEZ RIOS, Oscar",
+"HUTCHINSON, Wayne",
+"CASONATO, Ren"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 596,
+"registered": "12 Nov 2026",
+"order": [
+"LOPEZ RIOS, Oscar",
+"CASONATO, Ren",
+"HUTCHINSON, Wayne",
+"KENNEDY, Michelle",
+"BERGMAN, Dora",
+"CARBINES, Anthony",
+"CRAWLEY, Nina",
+"MILNE, Ben"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HUTCHINSON, Wayne",
+"CASONATO, Ren",
+"LOPEZ RIOS, Oscar",
+"CARBINES, Anthony",
+"KENNEDY, Michelle",
+"BERGMAN, Dora",
+"CRAWLEY, Nina",
+"MILNE, Ben"
+],
+"read": "text layer"
+}
+},
+"Kalkallo": {
+"alp": {
+"reg": 72,
+"registered": "10 Nov 2026",
+"order": [
+"SPENCE, Ros",
+"LYNCH, Matthew",
+"TIWARI, Payal",
+"ISLAM, Rebeca",
+"MILLETT, Courtney",
+"DADISHO, Eddie",
+"DOBSON, Jeanette",
+"STEANS, Troy"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 599,
+"registered": "12 Nov 2026",
+"order": [
+"DADISHO, Eddie",
+"DOBSON, Jeanette",
+"STEANS, Troy",
+"LYNCH, Matthew",
+"SPENCE, Ros",
+"TIWARI, Payal",
+"ISLAM, Rebeca",
+"MILLETT, Courtney"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"STEANS, Troy",
+"DOBSON, Jeanette",
+"DADISHO, Eddie",
+"SPENCE, Ros",
+"ISLAM, Rebeca",
+"TIWARI, Payal",
+"LYNCH, Matthew",
+"MILLETT, Courtney"
+],
+"read": "text layer"
+}
+},
+"Kew": {
+"alp": {
+"reg": 71,
+"registered": "10 Nov 2026",
+"order": [
+"SUN, David",
+"TORNEY, Sophie",
+"LIANG, Man",
+"HALES, Juliet",
+"CARTER, Jackie",
+"LINCOLNE, Samantha",
+"DAVIS, Finlay",
+"WILSON, Jess",
+"SEELEY, Ann",
+"LAIRD, David"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 600,
+"registered": "12 Nov 2026",
+"order": [
+"WILSON, Jess",
+"SEELEY, Ann",
+"DAVIS, Finlay",
+"LAIRD, David",
+"HALES, Juliet",
+"LIANG, Man",
+"TORNEY, Sophie",
+"SUN, David",
+"CARTER, Jackie",
+"LINCOLNE, Samantha"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"LAIRD, David",
+"SEELEY, Ann",
+"WILSON, Jess",
+"SUN, David",
+"DAVIS, Finlay",
+"LIANG, Man",
+"TORNEY, Sophie",
+"CARTER, Jackie",
+"HALES, Juliet",
+"LINCOLNE, Samantha"
+],
+"read": "text layer"
+}
+},
+"Kororoit": {
+"alp": {
+"reg": 222,
+"registered": "10 Nov 2026",
+"order": [
+"GRIGOROVITCH, Luba",
+"SOUTHERN, Donna",
+"MCDONALD, Joyce",
+"PIDI, Divya",
+"HASSAN, Rayan",
+"KANDPAL, Vasundhara",
+"CHAKOMA, Jack",
+"PATTERSON, Nick",
+"MELNIKOV, Seva"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 603,
+"registered": "12 Nov 2026",
+"order": [
+"CHAKOMA, Jack",
+"SOUTHERN, Donna",
+"MELNIKOV, Seva",
+"PIDI, Divya",
+"KANDPAL, Vasundhara",
+"GRIGOROVITCH, Luba",
+"MCDONALD, Joyce",
+"HASSAN, Rayan",
+"PATTERSON, Nick"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MELNIKOV, Seva",
+"PATTERSON, Nick",
+"CHAKOMA, Jack",
+"SOUTHERN, Donna",
+"PIDI, Divya",
+"GRIGOROVITCH, Luba",
+"MCDONALD, Joyce",
+"KANDPAL, Vasundhara",
+"HASSAN, Rayan"
+],
+"read": "text layer"
+}
+},
+"Lara": {
+"alp": {
+"reg": 112,
+"registered": "10 Nov 2026",
+"order": [
+"GEORGE, Ella",
+"LONG, Samantha",
+"SLATER, Theresa",
+"HATHWAY, Sarah",
+"RANDALL, Oliver",
+"BEDDOE, Tim",
+"UWIZEYIMANA, Tina",
+"SPYROS, Steven"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 576,
+"registered": "12 Nov 2026",
+"order": [
+"BEDDOE, Tim",
+"UWIZEYIMANA, Tina",
+"SPYROS, Steven",
+"LONG, Samantha",
+"GEORGE, Ella",
+"SLATER, Theresa",
+"RANDALL, Oliver",
+"HATHWAY, Sarah"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"SPYROS, Steven",
+"UWIZEYIMANA, Tina",
+"BEDDOE, Tim",
+"GEORGE, Ella",
+"SLATER, Theresa",
+"LONG, Samantha",
+"HATHWAY, Sarah",
+"RANDALL, Oliver"
+],
+"read": "text layer"
+}
+},
+"Laverton": {
+"alp": {
+"reg": 84,
+"registered": "10 Nov 2026",
+"order": [
+"CONNOLLY, Sarah",
+"MANSOURI JAJAEE, Shohre",
+"CHITTEDI, Suchithra",
+"RUDD, Van Thanh",
+"NGUYEN, Lucy",
+"MENDELSOHN, Emma",
+"NOUNE, Ghada",
+"GARCIA, Jo",
+"PAREDES, Rufo"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 573,
+"registered": "12 Nov 2026",
+"order": [
+"NOUNE, Ghada",
+"GARCIA, Jo",
+"MENDELSOHN, Emma",
+"PAREDES, Rufo",
+"MANSOURI JAJAEE, Shohre",
+"CHITTEDI, Suchithra",
+"CONNOLLY, Sarah",
+"NGUYEN, Lucy",
+"RUDD, Van Thanh"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PAREDES, Rufo",
+"GARCIA, Jo",
+"NOUNE, Ghada",
+"MENDELSOHN, Emma",
+"CHITTEDI, Suchithra",
+"CONNOLLY, Sarah",
+"NGUYEN, Lucy",
+"MANSOURI JAJAEE, Shohre",
+"RUDD, Van Thanh"
+],
+"read": "text layer"
+}
+},
+"Lowan": {
+"alp": {
+"reg": 126,
+"registered": "10 Nov 2026",
+"order": [
+"PAVLOVICH, Sue",
+"MORAN, Jeff",
+"DOWNEY, Jos",
+"HYSLOP, Karen",
+"BUTLER, Kieran",
+"KEALY, Emma",
+"ELMES, Lee-Ann",
+"PARTRIDGE, Andrew"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 487,
+"registered": "11 Nov 2026",
+"order": [
+"KEALY, Emma",
+"ELMES, Lee-Ann",
+"HYSLOP, Karen",
+"PARTRIDGE, Andrew",
+"BUTLER, Kieran",
+"PAVLOVICH, Sue",
+"MORAN, Jeff",
+"DOWNEY, Jos"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PARTRIDGE, Andrew",
+"ELMES, Lee-Ann",
+"KEALY, Emma",
+"BUTLER, Kieran",
+"HYSLOP, Karen",
+"PAVLOVICH, Sue",
+"MORAN, Jeff",
+"DOWNEY, Jos"
+],
+"read": "text layer"
+}
+},
+"Macedon": {
+"alp": {
+"reg": 117,
+"registered": "10 Nov 2026",
+"order": [
+"DEATH, Annette",
+"KORINFSKY, Natalie",
+"WILSON, Catherine",
+"MCRAE MCLEOD, Marley",
+"SETON, Michael",
+"BONANNO, Dom",
+"KENDALL, Kate",
+"MAYNE, Bernadette",
+"PAROLIN, Damien"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 571,
+"registered": "12 Nov 2026",
+"order": [
+"KENDALL, Kate",
+"MAYNE, Bernadette",
+"SETON, Michael",
+"BONANNO, Dom",
+"PAROLIN, Damien",
+"KORINFSKY, Natalie",
+"DEATH, Annette",
+"MCRAE MCLEOD, Marley",
+"WILSON, Catherine"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PAROLIN, Damien",
+"MAYNE, Bernadette",
+"SETON, Michael",
+"BONANNO, Dom",
+"KENDALL, Kate",
+"DEATH, Annette",
+"MCRAE MCLEOD, Marley",
+"KORINFSKY, Natalie",
+"WILSON, Catherine"
+],
+"read": "text layer"
+}
+},
+"Malvern": {
+"alp": {
+"reg": 77,
+"registered": "10 Nov 2026",
+"order": [
+"MARTIN, Peter",
+"ZIGOURAS, Christina",
+"KATSIKIS, Georgia",
+"LEONARD, Gavin",
+"SEGAL, David",
+"HAMER, Amelia",
+"BODE, Edward"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 639,
+"registered": "12 Nov 2026",
+"order": [
+"HAMER, Amelia",
+"SEGAL, David",
+"BODE, Edward",
+"ZIGOURAS, Christina",
+"MARTIN, Peter",
+"KATSIKIS, Georgia",
+"LEONARD, Gavin"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BODE, Edward",
+"SEGAL, David",
+"HAMER, Amelia",
+"MARTIN, Peter",
+"ZIGOURAS, Christina",
+"KATSIKIS, Georgia",
+"LEONARD, Gavin"
+],
+"read": "text layer"
+}
+},
+"Melbourne": {
+"alp": {
+"reg": 75,
+"registered": "10 Nov 2026",
+"order": [
+"GRIFFITHS, Davydd",
+"YUSUF, Mohamed",
+"JONES, Naomi",
+"TUCKFIELD, Rowan",
+"SANDELL, Ellen",
+"VAN DEN LAMB, Jordan",
+"MCCATHIE, Rob",
+"CAMILLO, Rafael",
+"COURTIS, Phillip"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 569,
+"registered": "12 Nov 2026",
+"order": [
+"CAMILLO, Rafael",
+"TUCKFIELD, Rowan",
+"MCCATHIE, Rob",
+"COURTIS, Phillip",
+"JONES, Naomi",
+"YUSUF, Mohamed",
+"GRIFFITHS, Davydd",
+"SANDELL, Ellen",
+"VAN DEN LAMB, Jordan"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"COURTIS, Phillip",
+"MCCATHIE, Rob",
+"CAMILLO, Rafael",
+"TUCKFIELD, Rowan",
+"GRIFFITHS, Davydd",
+"YUSUF, Mohamed",
+"SANDELL, Ellen",
+"JONES, Naomi",
+"VAN DEN LAMB, Jordan"
+],
+"read": "text layer"
+}
+},
+"Melton": {
+"alp": {
+"reg": 122,
+"registered": "10 Nov 2026",
+"order": [
+"BORG, Broden",
+"ADIN-JAMES, Fiona",
+"LEVCHENKOVA, Veronika",
+"KELLY, Daire",
+"LEGRO, Hayden",
+"FARUQ, M.D. Omor",
+"PERERA, Jason Spencer",
+"BINGHAM, Jarrod",
+"WEST, Marlene",
+"FRASER, Jason",
+"KATSELIS, Matthew"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 570,
+"registered": "12 Nov 2026",
+"order": [
+"BINGHAM, Jarrod",
+"WEST, Marlene",
+"LEGRO, Hayden",
+"KATSELIS, Matthew",
+"FRASER, Jason",
+"PERERA, Jason Spencer",
+"FARUQ, M.D. Omor",
+"ADIN-JAMES, Fiona",
+"BORG, Broden",
+"LEVCHENKOVA, Veronika",
+"KELLY, Daire"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"KATSELIS, Matthew",
+"WEST, Marlene",
+"LEGRO, Hayden",
+"BINGHAM, Jarrod",
+"BORG, Broden",
+"PERERA, Jason Spencer",
+"FARUQ, M.D. Omor",
+"FRASER, Jason",
+"LEVCHENKOVA, Veronika",
+"ADIN-JAMES, Fiona",
+"KELLY, Daire"
+],
+"read": "text layer"
+}
+},
+"Mildura": {
+"alp": {
+"reg": 100,
+"registered": "10 Nov 2026",
+"order": [
+"ZIGOURAS, Stella",
+"CLEMENTS, Katie",
+"FRIES, Vanessa",
+"NAYEF, Renee",
+"BENHAM, Jade",
+"NTAHOMVUKIYE, Joselyne",
+"COOPER, Guy"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 469,
+"registered": "11 Nov 2026",
+"order": [
+"BENHAM, Jade",
+"NTAHOMVUKIYE, Joselyne",
+"COOPER, Guy",
+"ZIGOURAS, Stella",
+"CLEMENTS, Katie",
+"NAYEF, Renee",
+"FRIES, Vanessa"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"COOPER, Guy",
+"NTAHOMVUKIYE, Joselyne",
+"BENHAM, Jade",
+"ZIGOURAS, Stella",
+"CLEMENTS, Katie",
+"FRIES, Vanessa",
+"NAYEF, Renee"
+],
+"read": "text layer"
+}
+},
+"Mill Park": {
+"alp": {
+"reg": 53,
+"registered": "10 Nov 2026",
+"order": [
+"NEALY, Elizabeth",
+"LEVENS, Eve",
+"ZACHARIAS, Binoy",
+"LAMBOURN, Jesse",
+"DRYSDALE, Joel",
+"VAN DER END, Kath",
+"McLINDON, Aidan",
+"TSOUTSOULIS, Arthur"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 601,
+"registered": "12 Nov 2026",
+"order": [
+"DRYSDALE, Joel",
+"VAN DER END, Kath",
+"TSOUTSOULIS, Arthur",
+"McLINDON, Aidan",
+"LEVENS, Eve",
+"NEALY, Elizabeth",
+"ZACHARIAS, Binoy",
+"LAMBOURN, Jesse"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"TSOUTSOULIS, Arthur",
+"VAN DER END, Kath",
+"McLINDON, Aidan",
+"DRYSDALE, Joel",
+"NEALY, Elizabeth",
+"ZACHARIAS, Binoy",
+"LEVENS, Eve",
+"LAMBOURN, Jesse"
+],
+"read": "text layer"
+}
+},
+"Monbulk": {
+"alp": {
+"reg": 34,
+"registered": "10 Nov 2026",
+"order": [
+"DE MARTINO, Daniela",
+"BLAIR, Merran",
+"WORMALD, Alyssa",
+"BRIGGS, Noah",
+"FITZMAURICE, Clare",
+"MANNERS, Craig",
+"DOWELL, Adrian"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 589,
+"registered": "12 Nov 2026",
+"order": [
+"FITZMAURICE, Clare",
+"DOWELL, Adrian",
+"WORMALD, Alyssa",
+"DE MARTINO, Daniela",
+"MANNERS, Craig",
+"BLAIR, Merran",
+"BRIGGS, Noah"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"DOWELL, Adrian",
+"MANNERS, Craig",
+"FITZMAURICE, Clare",
+"DE MARTINO, Daniela",
+"BLAIR, Merran",
+"WORMALD, Alyssa",
+"BRIGGS, Noah"
+],
+"read": "text layer"
+}
+},
+"Mordialloc": {
+"alp": {
+"reg": 132,
+"registered": "10 Nov 2026",
+"order": [
+"RICHARDSON, Tim",
+"THOMPSON, Renee",
+"BRESKIN, Alex",
+"HOSSAIN, Mahee",
+"O'HALLORAN, Paul",
+"POTUCEK, Lily",
+"VERSTEEGEN, Rachel",
+"TICEHURST, Nadia"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 585,
+"registered": "12 Nov 2026",
+"order": [
+"O'HALLORAN, Paul",
+"POTUCEK, Lily",
+"VERSTEEGEN, Rachel",
+"TICEHURST, Nadia",
+"THOMPSON, Renee",
+"RICHARDSON, Tim",
+"BRESKIN, Alex",
+"HOSSAIN, Mahee"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"TICEHURST, Nadia",
+"POTUCEK, Lily",
+"VERSTEEGEN, Rachel",
+"O'HALLORAN, Paul",
+"RICHARDSON, Tim",
+"BRESKIN, Alex",
+"THOMPSON, Renee",
+"HOSSAIN, Mahee"
+],
+"read": "text layer"
+}
+},
+"Mornington": {
+"alp": {
+"reg": 29,
+"registered": "10 Nov 2026",
+"order": [
+"MACDONALD, Kerry",
+"GOFFIN, Melissa",
+"TITCHER, Kai",
+"BROWNLIE, Gene",
+"MAHER, Adrian",
+"CREWTHER, Chris",
+"BEARDS, Ashli"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 584,
+"registered": "12 Nov 2026",
+"order": [
+"CREWTHER, Chris",
+"MAHER, Adrian",
+"BEARDS, Ashli",
+"GOFFIN, Melissa",
+"MACDONALD, Kerry",
+"TITCHER, Kai",
+"BROWNLIE, Gene"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BEARDS, Ashli",
+"CREWTHER, Chris",
+"MAHER, Adrian",
+"MACDONALD, Kerry",
+"TITCHER, Kai",
+"GOFFIN, Melissa",
+"BROWNLIE, Gene"
+],
+"read": "text layer"
+}
+},
+"Morwell": {
+"alp": {
+"reg": 114,
+"registered": "10 Nov 2026",
+"order": [
+"LUND, Tracie",
+"HINE, Rochelle",
+"ACREMAN, Natalie",
+"McPHEE, Ross",
+"CAMERON, Martin",
+"CLARKE, Brendan",
+"MURPHY, Casey"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 477,
+"registered": "11 Nov 2026",
+"order": [
+"CAMERON, Martin",
+"CLARKE, Brendan",
+"MURPHY, Casey",
+"McPHEE, Ross",
+"LUND, Tracie",
+"HINE, Rochelle",
+"ACREMAN, Natalie"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MURPHY, Casey",
+"CLARKE, Brendan",
+"CAMERON, Martin",
+"McPHEE, Ross",
+"LUND, Tracie",
+"HINE, Rochelle",
+"ACREMAN, Natalie"
+],
+"read": "text layer"
+}
+},
+"Mulgrave": {
+"alp": {
+"reg": 85,
+"registered": "10 Nov 2026",
+"order": [
+"FOSTER, Eden",
+"SCHOFIELD, Paul J",
+"BUCHANAN, Connor",
+"TRAN, Charles",
+"DOBRZYNSKI, Stewart",
+"COOK, Ian",
+"THEODOSSOPOULOU, Fotini",
+"REBBECHI, Cody"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 618,
+"registered": "12 Nov 2026",
+"order": [
+"TRAN, Charles",
+"THEODOSSOPOULOU, Fotini",
+"DOBRZYNSKI, Stewart",
+"COOK, Ian",
+"REBBECHI, Cody",
+"FOSTER, Eden",
+"SCHOFIELD, Paul J",
+"BUCHANAN, Connor"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"REBBECHI, Cody",
+"DOBRZYNSKI, Stewart",
+"THEODOSSOPOULOU, Fotini",
+"COOK, Ian",
+"TRAN, Charles",
+"FOSTER, Eden",
+"SCHOFIELD, Paul J",
+"BUCHANAN, Connor"
+],
+"read": "text layer"
+}
+},
+"Murray Plains": {
+"alp": {
+"reg": 104,
+"registered": "10 Nov 2026",
+"order": [
+"GRUNDY, Christine",
+"COLLARD, Peita",
+"COOK, Zoe",
+"SANIF, Asyiqin",
+"HOSKING, Brett",
+"MCDONALD, Ewan",
+"SMITH, Garner"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 459,
+"registered": "11 Nov 2026",
+"order": [
+"HOSKING, Brett",
+"MCDONALD, Ewan",
+"SMITH, Garner",
+"GRUNDY, Christine",
+"SANIF, Asyiqin",
+"COOK, Zoe",
+"COLLARD, Peita"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"SMITH, Garner",
+"MCDONALD, Ewan",
+"HOSKING, Brett",
+"GRUNDY, Christine",
+"COOK, Zoe",
+"COLLARD, Peita",
+"SANIF, Asyiqin"
+],
+"read": "text layer"
+}
+},
+"Narracan": {
+"alp": {
+"reg": 28,
+"registered": "10 Nov 2026",
+"order": [
+"LANGLEY, Jannette",
+"WEAVER, Alyssa",
+"PAGE, Moss",
+"FARNHAM, Wayne",
+"DETHLEFS, Geoff",
+"LUCAS, Ben"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 581,
+"registered": "12 Nov 2026",
+"order": [
+"FARNHAM, Wayne",
+"DETHLEFS, Geoff",
+"LUCAS, Ben",
+"LANGLEY, Jannette",
+"WEAVER, Alyssa",
+"PAGE, Moss"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"LUCAS, Ben",
+"DETHLEFS, Geoff",
+"FARNHAM, Wayne",
+"LANGLEY, Jannette",
+"WEAVER, Alyssa",
+"PAGE, Moss"
+],
+"read": "text layer"
+}
+},
+"Narre Warren North": {
+"alp": {
+"reg": 62,
+"registered": "10 Nov 2026",
+"order": [
+"WILSON, Belinda",
+"LEAHY, Martin",
+"PERRY, Hayley",
+"McCRACKEN, Lachlan",
+"UTOYO, Joshua",
+"NATHANIELSZ, Shemane",
+"EMMANUEL, Cristina",
+"CRUTCHFIELD, Sebastian"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 582,
+"registered": "12 Nov 2026",
+"order": [
+"NATHANIELSZ, Shemane",
+"UTOYO, Joshua",
+"EMMANUEL, Cristina",
+"CRUTCHFIELD, Sebastian",
+"LEAHY, Martin",
+"WILSON, Belinda",
+"PERRY, Hayley",
+"McCRACKEN, Lachlan"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"CRUTCHFIELD, Sebastian",
+"UTOYO, Joshua",
+"EMMANUEL, Cristina",
+"NATHANIELSZ, Shemane",
+"WILSON, Belinda",
+"PERRY, Hayley",
+"LEAHY, Martin",
+"McCRACKEN, Lachlan"
+],
+"read": "text layer"
+}
+},
+"Narre Warren South": {
+"alp": {
+"reg": 91,
+"registered": "10 Nov 2026",
+"order": [
+"KOOMEN, Stefan",
+"NAMBU, Jill",
+"WATSON, Scott",
+"McCRACKEN, Bailey",
+"DENKER, Lydia",
+"PETERSON, Norliah",
+"CURRIE, Alan",
+"HAMMOND, Trevor"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 580,
+"registered": "12 Nov 2026",
+"order": [
+"PETERSON, Norliah",
+"WATSON, Scott",
+"DENKER, Lydia",
+"CURRIE, Alan",
+"HAMMOND, Trevor",
+"KOOMEN, Stefan",
+"NAMBU, Jill",
+"McCRACKEN, Bailey"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HAMMOND, Trevor",
+"CURRIE, Alan",
+"DENKER, Lydia",
+"PETERSON, Norliah",
+"WATSON, Scott",
+"KOOMEN, Stefan",
+"NAMBU, Jill",
+"McCRACKEN, Bailey"
+],
+"read": "text layer"
+}
+},
+"Nepean": {
+"alp": {
+"reg": 33,
+"registered": "10 Nov 2026",
+"order": [
+"SNOWBALL, Surbhi",
+"HEALY, Sianan",
+"CHAMPION, Tamara",
+"ROBBINS, Kim",
+"WILLCOCKS, Seth",
+"MARSH, Anthony",
+"BROWN, Mike",
+"TOSCANO, Joseph",
+"HERCUS, Darren"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 608,
+"registered": "12 Nov 2026",
+"order": [
+"MARSH, Anthony",
+"BROWN, Mike",
+"HERCUS, Darren",
+"ROBBINS, Kim",
+"TOSCANO, Joseph",
+"CHAMPION, Tamara",
+"SNOWBALL, Surbhi",
+"HEALY, Sianan",
+"WILLCOCKS, Seth"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HERCUS, Darren",
+"BROWN, Mike",
+"MARSH, Anthony",
+"ROBBINS, Kim",
+"TOSCANO, Joseph",
+"SNOWBALL, Surbhi",
+"HEALY, Sianan",
+"CHAMPION, Tamara",
+"WILLCOCKS, Seth"
+],
+"read": "text layer"
+}
+},
+"Niddrie": {
+"alp": {
+"reg": 103,
+"registered": "10 Nov 2026",
+"order": [
+"CARROLL, Ben",
+"HASELGROVE, Salomae",
+"NGUYEN, Lana",
+"CHITTEDI, Karthik Reddy",
+"PATRIKEOS, Brett",
+"LAWS, Brendan",
+"SFAMENI, Sam",
+"METE, Domenic",
+"BYRNE, Samantha",
+"THEODOROU, George",
+"TAVERNA, Jason"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 577,
+"registered": "12 Nov 2026",
+"order": [
+"BYRNE, Samantha",
+"METE, Domenic",
+"THEODOROU, George",
+"PATRIKEOS, Brett",
+"TAVERNA, Jason",
+"SFAMENI, Sam",
+"CHITTEDI, Karthik Reddy",
+"HASELGROVE, Salomae",
+"CARROLL, Ben",
+"NGUYEN, Lana",
+"LAWS, Brendan"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"TAVERNA, Jason",
+"THEODOROU, George",
+"BYRNE, Samantha",
+"PATRIKEOS, Brett",
+"CHITTEDI, Karthik Reddy",
+"SFAMENI, Sam",
+"METE, Domenic",
+"CARROLL, Ben",
+"NGUYEN, Lana",
+"HASELGROVE, Salomae",
+"LAWS, Brendan"
+],
+"read": "text layer"
+}
+},
+"Northcote": {
+"alp": {
+"reg": 80,
+"registered": "10 Nov 2026",
+"order": [
+"THEOPHANOUS, Kat",
+"GOME, Campbell",
+"LARKIN, Kath",
+"HILLMAN, Ian",
+"PENMAN, Jim",
+"AWAD, Lynda",
+"PILLEY, Clive",
+"KAFEL, Hannah",
+"CIMBARO, Richard",
+"BRADBURY, Christopher"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 578,
+"registered": "12 Nov 2026",
+"order": [
+"AWAD, Lynda",
+"PENMAN, Jim",
+"CIMBARO, Richard",
+"BRADBURY, Christopher",
+"HILLMAN, Ian",
+"PILLEY, Clive",
+"THEOPHANOUS, Kat",
+"KAFEL, Hannah",
+"GOME, Campbell",
+"LARKIN, Kath"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BRADBURY, Christopher",
+"CIMBARO, Richard",
+"PENMAN, Jim",
+"AWAD, Lynda",
+"THEOPHANOUS, Kat",
+"HILLMAN, Ian",
+"PILLEY, Clive",
+"KAFEL, Hannah",
+"GOME, Campbell",
+"LARKIN, Kath"
+],
+"read": "text layer"
+}
+},
+"Oakleigh": {
+"alp": {
+"reg": 81,
+"registered": "10 Nov 2026",
+"order": [
+"DIMOPOULOS, Steve",
+"HSIEH, Hsiang-Han",
+"BUGTER, Rowdy",
+"JUNG, Martin",
+"GRINTER, Matthew",
+"CARTER, Brooke"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 643,
+"registered": "12 Nov 2026",
+"order": [
+"JUNG, Martin",
+"GRINTER, Matthew",
+"CARTER, Brooke",
+"DIMOPOULOS, Steve",
+"HSIEH, Hsiang-Han",
+"BUGTER, Rowdy"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"CARTER, Brooke",
+"GRINTER, Matthew",
+"JUNG, Martin",
+"DIMOPOULOS, Steve",
+"HSIEH, Hsiang-Han",
+"BUGTER, Rowdy"
+],
+"read": "text layer"
+}
+},
+"Ovens Valley": {
+"alp": {
+"reg": 111,
+"registered": "10 Nov 2026",
+"order": [
+"SMITH, Jennifer",
+"LITCHFIELD, Sue",
+"GILBERT, Benjamin",
+"MURPHY, Bronwyn",
+"MANNING, Steve",
+"FIDGE, Julian",
+"McCURDY, Tim",
+"NORTON-SMITH, Carol",
+"ROUEL, James"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 482,
+"registered": "11 Nov 2026",
+"order": [
+"McCURDY, Tim",
+"ROUEL, James",
+"MANNING, Steve",
+"NORTON-SMITH, Carol",
+"FIDGE, Julian",
+"SMITH, Jennifer",
+"GILBERT, Benjamin",
+"LITCHFIELD, Sue",
+"MURPHY, Bronwyn"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"ROUEL, James",
+"FIDGE, Julian",
+"NORTON-SMITH, Carol",
+"McCURDY, Tim",
+"SMITH, Jennifer",
+"MANNING, Steve",
+"GILBERT, Benjamin",
+"LITCHFIELD, Sue",
+"MURPHY, Bronwyn"
+],
+"read": "text layer"
+}
+},
+"Pakenham": {
+"alp": {
+"reg": 113,
+"registered": "10 Nov 2026",
+"order": [
+"SOLIVEN, Alessandra",
+"YAWARI, Nasser",
+"GRIGG, Stephanie",
+"HAMALAINEN, Jesse",
+"HANDS, Kate",
+"OGDEN, Lucas",
+"FRENCH, Raymond",
+"DAVIES, Stephanie",
+"DYSON, Radmila",
+"PICKERING, Warren"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 604,
+"registered": "12 Nov 2026",
+"order": [
+"DYSON, Radmila",
+"HANDS, Kate",
+"HAMALAINEN, Jesse",
+"DAVIES, Stephanie",
+"FRENCH, Raymond",
+"OGDEN, Lucas",
+"PICKERING, Warren",
+"SOLIVEN, Alessandra",
+"YAWARI, Nasser",
+"GRIGG, Stephanie"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PICKERING, Warren",
+"HANDS, Kate",
+"DAVIES, Stephanie",
+"FRENCH, Raymond",
+"DYSON, Radmila",
+"HAMALAINEN, Jesse",
+"SOLIVEN, Alessandra",
+"YAWARI, Nasser",
+"OGDEN, Lucas",
+"GRIGG, Stephanie"
+],
+"read": "text layer"
+}
+},
+"Pascoe Vale": {
+"alp": {
+"reg": 63,
+"registered": "10 Nov 2026",
+"order": [
+"CIANFLONE, Anthony",
+"PANOPOULOS, Angelica",
+"SHAMSILI, Yasemin",
+"ANDREWARTHA, Jacob",
+"TAGGAR, Rohit",
+"HAUPT, Kerry",
+"LAWRENCE, Stuart",
+"HICKEY, Amanda",
+"ASHTON, Kathrine",
+"GANCI, Rosemarie Pauline"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 606,
+"registered": "12 Nov 2026",
+"order": [
+"TAGGAR, Rohit",
+"ASHTON, Kathrine",
+"GANCI, Rosemarie Pauline",
+"HAUPT, Kerry",
+"CIANFLONE, Anthony",
+"LAWRENCE, Stuart",
+"HICKEY, Amanda",
+"PANOPOULOS, Angelica",
+"SHAMSILI, Yasemin",
+"ANDREWARTHA, Jacob"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"GANCI, Rosemarie Pauline",
+"ASHTON, Kathrine",
+"TAGGAR, Rohit",
+"CIANFLONE, Anthony",
+"HAUPT, Kerry",
+"LAWRENCE, Stuart",
+"HICKEY, Amanda",
+"PANOPOULOS, Angelica",
+"ANDREWARTHA, Jacob",
+"SHAMSILI, Yasemin"
+],
+"read": "text layer"
+}
+},
+"Point Cook": {
+"alp": {
+"reg": 96,
+"registered": "10 Nov 2026",
+"order": [
+"HILAKARI, Mathew",
+"ALLE, Kirti",
+"KRISHNA PANDI, Ponraj",
+"LAINE, Taylor",
+"GRECH, Mark",
+"KELLY, Paul",
+"MEURE, Keith",
+"REDDY, Raja",
+"REID, Cameron"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 586,
+"registered": "12 Nov 2026",
+"order": [
+"REDDY, Raja",
+"MEURE, Keith",
+"KELLY, Paul",
+"GRECH, Mark",
+"REID, Cameron",
+"ALLE, Kirti",
+"HILAKARI, Mathew",
+"KRISHNA PANDI, Ponraj",
+"LAINE, Taylor"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"REID, Cameron",
+"MEURE, Keith",
+"REDDY, Raja",
+"GRECH, Mark",
+"ALLE, Kirti",
+"KELLY, Paul",
+"HILAKARI, Mathew",
+"KRISHNA PANDI, Ponraj",
+"LAINE, Taylor"
+],
+"read": "text layer"
+}
+},
+"Polwarth": {
+"alp": {
+"reg": 107,
+"registered": "10 Nov 2026",
+"order": [
+"HUSSEIN, Hutch",
+"HOLDEN, Jesse",
+"TOLLEY, Lula",
+"RIORDAN, Richard",
+"CARBINS, Brenton",
+"COLLA, Vince",
+"MALCOLM, Anna"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 646,
+"registered": "12 Nov 2026",
+"order": [
+"RIORDAN, Richard",
+"COLLA, Vince",
+"MALCOLM, Anna",
+"HUSSEIN, Hutch",
+"HOLDEN, Jesse",
+"CARBINS, Brenton",
+"TOLLEY, Lula"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"MALCOLM, Anna",
+"COLLA, Vince",
+"CARBINS, Brenton",
+"RIORDAN, Richard",
+"HUSSEIN, Hutch",
+"HOLDEN, Jesse",
+"TOLLEY, Lula"
+],
+"read": "text layer"
+}
+},
+"Prahran": {
+"alp": {
+"reg": 88,
+"registered": "10 Nov 2026",
+"open": true,
+"read": "text layer"
+},
+"lib": {
+"reg": 612,
+"registered": "12 Nov 2026",
+"order": [
+"WESTAWAY, Rachel",
+"MENADUE, Alan",
+"LEETON WATTS, George",
+"FINNIGAN, Tosh-Jake",
+"VIRSU, Shaun",
+"O'NEILL, G. Daniel",
+"HOPPER, Meghan",
+"WONG, Nicholas",
+"JONES, Daniel",
+"DICKS, Max",
+"JONAS, Morgan",
+"DI CAMILLO, Angelica",
+"DOUEIHI, Clayton"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"VIRSU, Shaun",
+"JONAS, Morgan",
+"WESTAWAY, Rachel",
+"HOPPER, Meghan",
+"LEETON WATTS, George",
+"FINNIGAN, Tosh-Jake",
+"DICKS, Max",
+"WONG, Nicholas",
+"JONES, Daniel",
+"MENADUE, Alan",
+"DI CAMILLO, Angelica",
+"O'NEILL, G. Daniel",
+"DOUEIHI, Clayton"
+],
+"read": "text layer"
+}
+},
+"Preston": {
+"alp": {
+"reg": 224,
+"registered": "11 Nov 2026",
+"order": [
+"LAMBERT, Nathan",
+"SANGARYA, Loki",
+"ASHMORE, Serena",
+"CHIN, Zheng",
+"AL KATRANJI, Hamza",
+"VALENCIA, Julio",
+"FOWLES, William",
+"BRYANT, Mark",
+"DOWER, Simon",
+"DATE, Tim",
+"GUARDIANI, Franco"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 611,
+"registered": "12 Nov 2026",
+"order": [
+"AL KATRANJI, Hamza",
+"VALENCIA, Julio",
+"CHIN, Zheng",
+"DATE, Tim",
+"LAMBERT, Nathan",
+"DOWER, Simon",
+"BRYANT, Mark",
+"SANGARYA, Loki",
+"ASHMORE, Serena",
+"FOWLES, William",
+"GUARDIANI, Franco"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"GUARDIANI, Franco",
+"VALENCIA, Julio",
+"AL KATRANJI, Hamza",
+"LAMBERT, Nathan",
+"CHIN, Zheng",
+"FOWLES, William",
+"DATE, Tim",
+"DOWER, Simon",
+"BRYANT, Mark",
+"SANGARYA, Loki",
+"ASHMORE, Serena"
+],
+"read": "text layer"
+}
+},
+"Richmond": {
+"alp": {
+"reg": 121,
+"registered": "10 Nov 2026",
+"order": [
+"MCKENZIE, Sarah",
+"DITE, Chris",
+"de VIETRI, Gabrielle",
+"PEAD-PHILIPSON, Jack",
+"MEYER, David",
+"GRAY, Bernadette",
+"APONSO, Charles",
+"MAYNARD, Christine",
+"RINDFLEISH, Harrison"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 544,
+"registered": "12 Nov 2026",
+"order": [
+"APONSO, Charles",
+"GRAY, Bernadette",
+"MAYNARD, Christine",
+"MEYER, David",
+"RINDFLEISH, Harrison",
+"PEAD-PHILIPSON, Jack",
+"MCKENZIE, Sarah",
+"de VIETRI, Gabrielle",
+"DITE, Chris"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"RINDFLEISH, Harrison",
+"GRAY, Bernadette",
+"APONSO, Charles",
+"MAYNARD, Christine",
+"MEYER, David",
+"MCKENZIE, Sarah",
+"PEAD-PHILIPSON, Jack",
+"de VIETRI, Gabrielle",
+"DITE, Chris"
+],
+"read": "text layer"
+}
+},
+"Ringwood": {
+"alp": {
+"reg": 54,
+"registered": "10 Nov 2026",
+"order": [
+"HALSE, Rachel",
+"MILLS, Amy",
+"WALKER, Lyndon",
+"GARDNER, Jack",
+"CUTTS, Prue",
+"McGOWAN, Nick",
+"NORTON, Christopher William",
+"HUANG, Elaine",
+"O'CONNOR, John"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 594,
+"registered": "12 Nov 2026",
+"order": [
+"McGOWAN, Nick",
+"NORTON, Christopher William",
+"HUANG, Elaine",
+"CUTTS, Prue",
+"O'CONNOR, John",
+"WALKER, Lyndon",
+"HALSE, Rachel",
+"MILLS, Amy",
+"GARDNER, Jack"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"O'CONNOR, John",
+"HUANG, Elaine",
+"McGOWAN, Nick",
+"NORTON, Christopher William",
+"HALSE, Rachel",
+"CUTTS, Prue",
+"MILLS, Amy",
+"WALKER, Lyndon",
+"GARDNER, Jack"
+],
+"read": "text layer"
+}
+},
+"Ripon": {
+"alp": {
+"reg": 109,
+"registered": "10 Nov 2026",
+"order": [
+"HAYLETT, Martha",
+"WOJTKOWSKI, Krzysztof",
+"QUINCE, Bernard",
+"DRYLIE, Tim",
+"BRENNAN-JONES, Taylah",
+"SKRUZNY, Ronald",
+"BARRY, Jeff",
+"READ, Megan",
+"ARMSTRONG, Jo",
+"MCGRATH, Mark",
+"ANDREI, Trevor Scott",
+"BUXTON, Donna"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 583,
+"registered": "12 Nov 2026",
+"order": [
+"READ, Megan",
+"ARMSTRONG, Jo",
+"BARRY, Jeff",
+"SKRUZNY, Ronald",
+"MCGRATH, Mark",
+"WOJTKOWSKI, Krzysztof",
+"BUXTON, Donna",
+"ANDREI, Trevor Scott",
+"QUINCE, Bernard",
+"HAYLETT, Martha",
+"DRYLIE, Tim",
+"BRENNAN-JONES, Taylah"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 484,
+"registered": "11 Nov 2026",
+"order": [
+"ARMSTRONG, Jo",
+"READ, Megan",
+"BARRY, Jeff",
+"SKRUZNY, Ronald",
+"MCGRATH, Mark",
+"BUXTON, Donna",
+"WOJTKOWSKI, Krzysztof",
+"QUINCE, Bernard",
+"HAYLETT, Martha",
+"DRYLIE, Tim",
+"ANDREI, Trevor Scott",
+"BRENNAN-JONES, Taylah"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BUXTON, Donna",
+"MCGRATH, Mark",
+"BARRY, Jeff",
+"WOJTKOWSKI, Krzysztof",
+"ARMSTRONG, Jo",
+"READ, Megan",
+"ANDREI, Trevor Scott",
+"QUINCE, Bernard",
+"SKRUZNY, Ronald",
+"HAYLETT, Martha",
+"DRYLIE, Tim",
+"BRENNAN-JONES, Taylah"
+],
+"read": "text layer"
+}
+},
+"Rowville": {
+"alp": {
+"reg": 67,
+"registered": "10 Nov 2026",
+"order": [
+"SHAHBAZ, Muhammad",
+"MASSEY, David",
+"HIEMSTRA, Lars",
+"ROBSON, Scott",
+"WILLIAMS, Max",
+"DOBRZYNSKI, Fiona",
+"WATT, Bradley"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 579,
+"registered": "12 Nov 2026",
+"order": [
+"WILLIAMS, Max",
+"DOBRZYNSKI, Fiona",
+"ROBSON, Scott",
+"WATT, Bradley",
+"SHAHBAZ, Muhammad",
+"MASSEY, David",
+"HIEMSTRA, Lars"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"WATT, Bradley",
+"DOBRZYNSKI, Fiona",
+"ROBSON, Scott",
+"WILLIAMS, Max",
+"SHAHBAZ, Muhammad",
+"MASSEY, David",
+"HIEMSTRA, Lars"
+],
+"read": "text layer"
+}
+},
+"Sandringham": {
+"alp": {
+"reg": 94,
+"registered": "10 Nov 2026",
+"order": [
+"SAGRIS-DESMOND, Anastasia",
+"FOTAKIS, Timon",
+"STEVENSON, Lauren",
+"ROWSWELL, Brad",
+"BLIGHT, Anthony"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 552,
+"registered": "12 Nov 2026",
+"order": [
+"ROWSWELL, Brad",
+"BLIGHT, Anthony",
+"SAGRIS-DESMOND, Anastasia",
+"FOTAKIS, Timon",
+"STEVENSON, Lauren"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BLIGHT, Anthony",
+"ROWSWELL, Brad",
+"SAGRIS-DESMOND, Anastasia",
+"FOTAKIS, Timon",
+"STEVENSON, Lauren"
+],
+"read": "text layer"
+}
+},
+"Shepparton": {
+"alp": {
+"reg": 116,
+"registered": "10 Nov 2026",
+"order": [
+"FIN, Cayla",
+"MURPHY-GINGER, Faith",
+"VERNEY, Grace",
+"HOCKING, Karen",
+"COSTA, Lou",
+"VARKEY, Johnson",
+"SALI, Shane",
+"WHITE, Alison",
+"BRYANT, Phillip"
+],
+"read": "text layer"
+},
+"nat": {
+"reg": 475,
+"registered": "11 Nov 2026",
+"order": [
+"SALI, Shane",
+"WHITE, Alison",
+"BRYANT, Phillip",
+"VARKEY, Johnson",
+"COSTA, Lou",
+"FIN, Cayla",
+"VERNEY, Grace",
+"HOCKING, Karen",
+"MURPHY-GINGER, Faith"
+],
+"read": "by eye (numbers drawn as artwork)"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BRYANT, Phillip",
+"WHITE, Alison",
+"SALI, Shane",
+"COSTA, Lou",
+"VARKEY, Johnson",
+"FIN, Cayla",
+"VERNEY, Grace",
+"MURPHY-GINGER, Faith",
+"HOCKING, Karen"
+],
+"read": "text layer"
+}
+},
+"South Barwon": {
+"alp": {
+"reg": 127,
+"registered": "10 Nov 2026",
+"order": [
+"THISTLETON, Rebecca",
+"SCHERRER, Izzy",
+"HEDLEY, Freya",
+"GORMAN, Madilyn",
+"NELSON, Ron",
+"PETTIT, Libby",
+"BARRON, Alan",
+"GEARD, Josh"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 554,
+"registered": "11 Nov 2026",
+"order": [
+"PETTIT, Libby",
+"BARRON, Alan",
+"GEARD, Josh",
+"NELSON, Ron",
+"THISTLETON, Rebecca",
+"SCHERRER, Izzy",
+"GORMAN, Madilyn",
+"HEDLEY, Freya"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"GEARD, Josh",
+"BARRON, Alan",
+"NELSON, Ron",
+"PETTIT, Libby",
+"THISTLETON, Rebecca",
+"SCHERRER, Izzy",
+"HEDLEY, Freya",
+"GORMAN, Madilyn"
+],
+"read": "text layer"
+}
+},
+"South-West Coast": {
+"alp": {
+"reg": 123,
+"registered": "10 Nov 2026",
+"order": [
+"GOVANSTONE, Andrew",
+"WATTS, Silver Rose",
+"SHEPPARD, Hera",
+"BRITNELL, Roma",
+"BUCHAN, Tamhas",
+"HUGHES, Richard"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 832,
+"registered": "12 Nov 2026",
+"order": [
+"BRITNELL, Roma",
+"BUCHAN, Tamhas",
+"HUGHES, Richard",
+"GOVANSTONE, Andrew",
+"WATTS, Silver Rose",
+"SHEPPARD, Hera"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"HUGHES, Richard",
+"BUCHAN, Tamhas",
+"BRITNELL, Roma",
+"GOVANSTONE, Andrew",
+"WATTS, Silver Rose",
+"SHEPPARD, Hera"
+],
+"read": "text layer"
+}
+},
+"St Albans": {
+"alp": {
+"reg": 101,
+"registered": "10 Nov 2026",
+"order": [
+"SULEYMAN, Natalie",
+"DAVINDER KAUR",
+"WALKER, Luân",
+"HUYNH, Thuc Bao",
+"NGUYEN, Leanna",
+"DUNSTAN, Rob",
+"JANTEN, Kerry",
+"HAKIZIMANA, Alex",
+"COWELL, John"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 539,
+"registered": "12 Nov 2026",
+"order": [
+"DUNSTAN, Rob",
+"HAKIZIMANA, Alex",
+"WALKER, Luân",
+"JANTEN, Kerry",
+"COWELL, John",
+"DAVINDER KAUR",
+"SULEYMAN, Natalie",
+"HUYNH, Thuc Bao",
+"NGUYEN, Leanna"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"COWELL, John",
+"HAKIZIMANA, Alex",
+"DUNSTAN, Rob",
+"WALKER, Luân",
+"DAVINDER KAUR",
+"SULEYMAN, Natalie",
+"JANTEN, Kerry",
+"HUYNH, Thuc Bao",
+"NGUYEN, Leanna"
+],
+"read": "text layer"
+}
+},
+"Sunbury": {
+"alp": {
+"reg": 105,
+"registered": "10 Nov 2026",
+"order": [
+"BULL, Josh",
+"MOHR, Rohanna",
+"BETHI, Bhasker Reddy",
+"BREMNER, Adam",
+"VINE, Geoff",
+"GRANGER-BROWN, Lauren",
+"BATRES, Elmer",
+"MEDCRAFT, Steve Jack",
+"STAFFORD, John",
+"COTTOM, Simmone",
+"DABROWSKI, Elita"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 548,
+"registered": "12 Nov 2026",
+"order": [
+"COTTOM, Simmone",
+"STAFFORD, John",
+"BATRES, Elmer",
+"VINE, Geoff",
+"DABROWSKI, Elita",
+"MEDCRAFT, Steve Jack",
+"BETHI, Bhasker Reddy",
+"MOHR, Rohanna",
+"BULL, Josh",
+"GRANGER-BROWN, Lauren",
+"BREMNER, Adam"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"DABROWSKI, Elita",
+"BATRES, Elmer",
+"COTTOM, Simmone",
+"VINE, Geoff",
+"BETHI, Bhasker Reddy",
+"STAFFORD, John",
+"MEDCRAFT, Steve Jack",
+"BULL, Josh",
+"GRANGER-BROWN, Lauren",
+"MOHR, Rohanna",
+"BREMNER, Adam"
+],
+"read": "text layer"
+}
+},
+"Sydenham": {
+"alp": {
+"reg": 102,
+"registered": "10 Nov 2026",
+"order": [
+"RASIC, Uros",
+"JANE, Maggie",
+"KHAN, Shania",
+"POON, Bruce",
+"SINCLAIR, Brandon",
+"MOUSSI, Nathalie",
+"KERR, Maria",
+"LANCASHIRE, Bruce",
+"LANKALA KENDERLA, Laxmi",
+"CROES, Nancy G",
+"VANDENBERG, Ashleigh",
+"BAUCH, Joh"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 607,
+"registered": "12 Nov 2026",
+"order": [
+"MOUSSI, Nathalie",
+"SINCLAIR, Brandon",
+"CROES, Nancy G",
+"LANCASHIRE, Bruce",
+"KERR, Maria",
+"BAUCH, Joh",
+"LANKALA KENDERLA, Laxmi",
+"POON, Bruce",
+"RASIC, Uros",
+"JANE, Maggie",
+"VANDENBERG, Ashleigh",
+"KHAN, Shania"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BAUCH, Joh",
+"CROES, Nancy G",
+"KERR, Maria",
+"MOUSSI, Nathalie",
+"LANCASHIRE, Bruce",
+"LANKALA KENDERLA, Laxmi",
+"SINCLAIR, Brandon",
+"RASIC, Uros",
+"VANDENBERG, Ashleigh",
+"JANE, Maggie",
+"POON, Bruce",
+"KHAN, Shania"
+],
+"read": "text layer"
+}
+},
+"Tarneit": {
+"alp": {
+"reg": 130,
+"registered": "10 Nov 2026",
+"order": [
+"WIGHT, Dylan",
+"MOINUDDIN, Aijaz",
+"RAHN, Maurita",
+"RIFAI, A. Raheem",
+"ISLAM, SM Zaberul",
+"VAN KEULEN, Leah",
+"AHMED, Rahima Ibrahim",
+"ELSBURY, Andrew",
+"SUDHAGANI, Sindhu",
+"UPPARLAPALLE, Venkat Ram",
+"NIYONGABIRE, Horizana",
+"VILLAGONZALO, Walter"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 549,
+"registered": "12 Nov 2026",
+"order": [
+"UPPARLAPALLE, Venkat Ram",
+"NIYONGABIRE, Horizana",
+"MOINUDDIN, Aijaz",
+"ELSBURY, Andrew",
+"ISLAM, SM Zaberul",
+"AHMED, Rahima Ibrahim",
+"VILLAGONZALO, Walter",
+"SUDHAGANI, Sindhu",
+"RAHN, Maurita",
+"WIGHT, Dylan",
+"RIFAI, A. Raheem",
+"VAN KEULEN, Leah"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"VILLAGONZALO, Walter",
+"NIYONGABIRE, Horizana",
+"UPPARLAPALLE, Venkat Ram",
+"ELSBURY, Andrew",
+"SUDHAGANI, Sindhu",
+"WIGHT, Dylan",
+"MOINUDDIN, Aijaz",
+"ISLAM, SM Zaberul",
+"AHMED, Rahima Ibrahim",
+"RIFAI, A. Raheem",
+"RAHN, Maurita",
+"VAN KEULEN, Leah"
+],
+"read": "text layer"
+}
+},
+"Thomastown": {
+"alp": {
+"reg": 68,
+"registered": "10 Nov 2026",
+"order": [
+"HALFPENNY, Bronwyn",
+"TREWELLA, Gavin",
+"REDDY, Priya",
+"STOJCEVSKI, Belinda",
+"RANCIE, Rob",
+"ANTHONY, Nadia"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 632,
+"registered": "12 Nov 2026",
+"order": [
+"STOJCEVSKI, Belinda",
+"RANCIE, Rob",
+"ANTHONY, Nadia",
+"HALFPENNY, Bronwyn",
+"TREWELLA, Gavin",
+"REDDY, Priya"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"ANTHONY, Nadia",
+"RANCIE, Rob",
+"STOJCEVSKI, Belinda",
+"HALFPENNY, Bronwyn",
+"TREWELLA, Gavin",
+"REDDY, Priya"
+],
+"read": "text layer"
+}
+},
+"Warrandyte": {
+"alp": {
+"reg": 55,
+"registered": "10 Nov 2026",
+"order": [
+"PATERSON, Rebecca",
+"MURADIAN, Vanessa",
+"STANLEY, John",
+"SCHWAB, Caleb",
+"WERNER, Nicole",
+"BURNSIDE, Mark"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 679,
+"registered": "12 Nov 2026",
+"order": [
+"WERNER, Nicole",
+"SCHWAB, Caleb",
+"BURNSIDE, Mark",
+"PATERSON, Rebecca",
+"MURADIAN, Vanessa",
+"STANLEY, John"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"BURNSIDE, Mark",
+"SCHWAB, Caleb",
+"WERNER, Nicole",
+"PATERSON, Rebecca",
+"MURADIAN, Vanessa",
+"STANLEY, John"
+],
+"read": "text layer"
+}
+},
+"Wendouree": {
+"alp": {
+"reg": 120,
+"registered": "10 Nov 2026",
+"order": [
+"ADDISON, Juliana",
+"BURNS, Ellen",
+"COLLINS, Melissa",
+"MEAGHER, Chris",
+"RONAN, Gav",
+"BYRNE, Ruth",
+"ROBINSON, Stuart"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 626,
+"registered": "12 Nov 2026",
+"order": [
+"RONAN, Gav",
+"BYRNE, Ruth",
+"ROBINSON, Stuart",
+"COLLINS, Melissa",
+"ADDISON, Juliana",
+"BURNS, Ellen",
+"MEAGHER, Chris"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"ROBINSON, Stuart",
+"BYRNE, Ruth",
+"RONAN, Gav",
+"ADDISON, Juliana",
+"BURNS, Ellen",
+"COLLINS, Melissa",
+"MEAGHER, Chris"
+],
+"read": "text layer"
+}
+},
+"Werribee": {
+"alp": {
+"reg": 97,
+"registered": "10 Nov 2026",
+"order": [
+"LISTER, John",
+"KUMAR, Tushar",
+"MUNRO, Sue",
+"HOPPER, Paul",
+"ORCHARD, Jeremy",
+"KAYAGURLA, Sandhya",
+"RAIZADA, Monica Sharma",
+"CLARK, Reece",
+"EMERSON, Matt",
+"PATERAS, Paul"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 592,
+"registered": "12 Nov 2026",
+"order": [
+"CLARK, Reece",
+"ORCHARD, Jeremy",
+"EMERSON, Matt",
+"HOPPER, Paul",
+"PATERAS, Paul",
+"RAIZADA, Monica Sharma",
+"KAYAGURLA, Sandhya",
+"LISTER, John",
+"KUMAR, Tushar",
+"MUNRO, Sue"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"PATERAS, Paul",
+"EMERSON, Matt",
+"CLARK, Reece",
+"HOPPER, Paul",
+"KAYAGURLA, Sandhya",
+"ORCHARD, Jeremy",
+"LISTER, John",
+"RAIZADA, Monica Sharma",
+"KUMAR, Tushar",
+"MUNRO, Sue"
+],
+"read": "text layer"
+}
+},
+"Williamstown": {
+"alp": {
+"reg": 98,
+"registered": "10 Nov 2026",
+"order": [
+"HORNE, Melissa",
+"HOCKING, Ben",
+"MARTIN, Oskar",
+"YARRA, Sagar Reddy",
+"BRIFFA, Tony",
+"GANNON, Gill",
+"O'REGAN, Bruce",
+"LINDEMANN, Paul",
+"LOUGHNAN, Catherine"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"LOUGHNAN, Catherine",
+"O'REGAN, Bruce",
+"LINDEMANN, Paul",
+"GANNON, Gill",
+"YARRA, Sagar Reddy",
+"HORNE, Melissa",
+"BRIFFA, Tony",
+"HOCKING, Ben",
+"MARTIN, Oskar"
+],
+"read": "text layer"
+}
+},
+"Yan Yean": {
+"alp": {
+"reg": 133,
+"registered": "10 Nov 2026",
+"order": [
+"KATHAGE, Lauren",
+"OKATAN, Sinan",
+"MOHAMMED, Gufran",
+"BELL, Andrew",
+"CHEERS, Troy",
+"DOW, Amanda",
+"HALL, James",
+"JOHNSON, Jeremy"
+],
+"read": "text layer"
+},
+"lib": {
+"reg": 588,
+"registered": "12 Nov 2026",
+"order": [
+"DOW, Amanda",
+"HALL, James",
+"CHEERS, Troy",
+"JOHNSON, Jeremy",
+"OKATAN, Sinan",
+"KATHAGE, Lauren",
+"MOHAMMED, Gufran",
+"BELL, Andrew"
+],
+"read": "text layer"
+},
+"on": {
+"reg": 921,
+"registered": "13 Nov 2026",
+"order": [
+"JOHNSON, Jeremy",
+"CHEERS, Troy",
+"HALL, James",
+"DOW, Amanda",
+"KATHAGE, Lauren",
+"MOHAMMED, Gufran",
+"OKATAN, Sinan",
+"BELL, Andrew"
+],
+"read": "text layer"
+}
+}
+}
+}

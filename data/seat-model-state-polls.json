@@ -1,0 +1,592 @@
+{
+ "_about": "calibrate-state-polls.mjs: the mean of the final month's polls v the result at state elections 2010-2026 (Victoria, Queensland, NSW, WA, SA; data/state-election-final-polls.json), logit scale. sigma = RMS over elections, bias = mean (result - polls). all = every election; multi = elections polled by two or more firms in the month; recent = since 2017. onpLarge = One Nation where its poll mean was 5% or more. federal = the federal final-month values (data/seat-model-calibration.json).",
+ "all": {
+  "sigma": {
+   "alp": 0.096,
+   "lnp": 0.08,
+   "grn": 0.161,
+   "onp": 0.484,
+   "oth": 0.193
+  },
+  "bias": {
+   "alp": 0.048,
+   "lnp": 0.014,
+   "grn": -0.067,
+   "onp": -0.259,
+   "oth": -0.004
+  },
+  "n": {
+   "alp": 19,
+   "lnp": 19,
+   "grn": 19,
+   "onp": 6,
+   "oth": 19
+  }
+ },
+ "multi": {
+  "sigma": {
+   "alp": 0.104,
+   "lnp": 0.086,
+   "grn": 0.149,
+   "onp": 0.484,
+   "oth": 0.17
+  },
+  "bias": {
+   "alp": 0.057,
+   "lnp": 0.01,
+   "grn": -0.091,
+   "onp": -0.259,
+   "oth": 0.012
+  },
+  "n": {
+   "alp": 15,
+   "lnp": 15,
+   "grn": 15,
+   "onp": 6,
+   "oth": 15
+  }
+ },
+ "recent": {
+  "sigma": {
+   "alp": 0.11,
+   "lnp": 0.091,
+   "grn": 0.126,
+   "onp": 0.484,
+   "oth": 0.187
+  },
+  "bias": {
+   "alp": 0.059,
+   "lnp": 0.001,
+   "grn": -0.076,
+   "onp": -0.259,
+   "oth": 0.022
+  },
+  "n": {
+   "alp": 12,
+   "lnp": 12,
+   "grn": 12,
+   "onp": 6,
+   "oth": 12
+  }
+ },
+ "onpLarge": {
+  "sigma": 0.199,
+  "bias": -0.146,
+  "n": 4
+ },
+ "federal": {
+  "sigma": {
+   "alp": 0.098,
+   "lnp": 0.094,
+   "grn": 0.183,
+   "onp": 0.285,
+   "oth": 0.709
+  },
+  "n": {
+   "alp": 17,
+   "lnp": 17,
+   "grn": 11,
+   "onp": 5,
+   "oth": 17
+  }
+ },
+ "elections": [
+  {
+   "st": "vic",
+   "date": "2010-11-27",
+   "polls": 2,
+   "firms": 1,
+   "poll": {
+    "alp": 35,
+    "lnp": 44.5,
+    "grn": 14.5,
+    "oth": 6
+   },
+   "result": {
+    "alp": 36.3,
+    "lnp": 44.7,
+    "grn": 11.2,
+    "oth": 7.8
+   },
+   "resultSource": "polling table election row (2014 article)",
+   "err": {
+    "alp": 0.057,
+    "lnp": 0.008,
+    "grn": -0.296,
+    "oth": 0.282
+   }
+  },
+  {
+   "st": "vic",
+   "date": "2014-11-29",
+   "polls": 14,
+   "firms": 6,
+   "poll": {
+    "alp": 37.24,
+    "lnp": 39.48,
+    "grn": 15.21,
+    "oth": 8.07
+   },
+   "result": {
+    "alp": 38.1,
+    "lnp": 42,
+    "grn": 11.48,
+    "oth": 8.42
+   },
+   "resultSource": "map/data/res-vic14.json",
+   "err": {
+    "alp": 0.037,
+    "lnp": 0.104,
+    "grn": -0.325,
+    "oth": 0.046
+   }
+  },
+  {
+   "st": "vic",
+   "date": "2018-11-24",
+   "polls": 7,
+   "firms": 5,
+   "poll": {
+    "alp": 40.01,
+    "lnp": 37.67,
+    "grn": 11.24,
+    "oth": 11.07
+   },
+   "result": {
+    "alp": 42.86,
+    "lnp": 35.19,
+    "grn": 10.71,
+    "oth": 11.24
+   },
+   "resultSource": "map/data/res-vic18.json",
+   "err": {
+    "alp": 0.117,
+    "lnp": -0.107,
+    "grn": -0.055,
+    "oth": 0.017
+   }
+  },
+  {
+   "st": "vic",
+   "date": "2022-11-26",
+   "polls": 9,
+   "firms": 6,
+   "poll": {
+    "alp": 38.24,
+    "lnp": 33.48,
+    "grn": 13.12,
+    "oth": 15.16
+   },
+   "result": {
+    "alp": 36.66,
+    "lnp": 34.44,
+    "grn": 11.48,
+    "onp": 0.28,
+    "oth": 17.42
+   },
+   "resultSource": "map/data/res-vic22.json",
+   "err": {
+    "alp": -0.068,
+    "lnp": 0.043,
+    "grn": -0.152,
+    "oth": 0.166
+   }
+  },
+  {
+   "st": "qld",
+   "date": "2012-03-24",
+   "polls": 1,
+   "firms": 1,
+   "poll": {
+    "alp": 28,
+    "lnp": 50,
+    "grn": 6,
+    "oth": 16
+   },
+   "result": {
+    "alp": 26.7,
+    "lnp": 49.7,
+    "grn": 7.5,
+    "oth": 16.1
+   },
+   "resultSource": "polling table election row (2015 article)",
+   "err": {
+    "alp": -0.065,
+    "lnp": -0.012,
+    "grn": 0.239,
+    "oth": 0.007
+   }
+  },
+  {
+   "st": "qld",
+   "date": "2015-01-31",
+   "polls": 8,
+   "firms": 5,
+   "poll": {
+    "alp": 37.6,
+    "lnp": 40.35,
+    "grn": 8,
+    "oth": 14.05
+   },
+   "result": {
+    "alp": 37.5,
+    "lnp": 41.3,
+    "grn": 8.4,
+    "oth": 12.8
+   },
+   "resultSource": "polling table election row (own article)",
+   "err": {
+    "alp": -0.004,
+    "lnp": 0.039,
+    "grn": 0.053,
+    "oth": -0.108
+   }
+  },
+  {
+   "st": "qld",
+   "date": "2017-11-25",
+   "polls": 5,
+   "firms": 3,
+   "poll": {
+    "alp": 34.48,
+    "lnp": 32.36,
+    "grn": 9.22,
+    "onp": 15.28,
+    "oth": 8.66
+   },
+   "result": {
+    "alp": 35.43,
+    "lnp": 33.69,
+    "grn": 10,
+    "onp": 13.73,
+    "oth": 7.15
+   },
+   "resultSource": "map/data/res-qld17.json",
+   "err": {
+    "alp": 0.042,
+    "lnp": 0.06,
+    "grn": 0.09,
+    "onp": -0.125,
+    "oth": -0.208
+   }
+  },
+  {
+   "st": "qld",
+   "date": "2020-10-31",
+   "polls": 4,
+   "firms": 3,
+   "poll": {
+    "alp": 36.75,
+    "lnp": 36.25,
+    "grn": 11,
+    "onp": 10,
+    "oth": 6
+   },
+   "result": {
+    "alp": 39.57,
+    "lnp": 35.89,
+    "grn": 9.47,
+    "onp": 7.12,
+    "oth": 7.95
+   },
+   "resultSource": "map/data/res-qld20.json",
+   "err": {
+    "alp": 0.12,
+    "lnp": -0.016,
+    "grn": -0.167,
+    "onp": -0.371,
+    "oth": 0.302
+   }
+  },
+  {
+   "st": "qld",
+   "date": "2024-10-26",
+   "polls": 6,
+   "firms": 6,
+   "poll": {
+    "alp": 31.6,
+    "lnp": 42.25,
+    "grn": 11.08,
+    "onp": 8.52,
+    "oth": 6.55
+   },
+   "result": {
+    "alp": 32.56,
+    "lnp": 41.52,
+    "grn": 9.89,
+    "onp": 8,
+    "oth": 8.03
+   },
+   "resultSource": "map/data/res-qld24.json",
+   "err": {
+    "alp": 0.044,
+    "lnp": -0.03,
+    "grn": -0.127,
+    "onp": -0.068,
+    "oth": 0.22
+   }
+  },
+  {
+   "st": "nsw",
+   "date": "2011-03-26",
+   "polls": 7,
+   "firms": 4,
+   "poll": {
+    "alp": 23.29,
+    "lnp": 51.29,
+    "grn": 12.14,
+    "oth": 13.29
+   },
+   "result": {
+    "alp": 25.55,
+    "lnp": 51.15,
+    "grn": 10.29,
+    "oth": 13.01
+   },
+   "resultSource": "article infobox",
+   "err": {
+    "alp": 0.123,
+    "lnp": -0.005,
+    "grn": -0.186,
+    "oth": -0.024
+   }
+  },
+  {
+   "st": "nsw",
+   "date": "2023-03-25",
+   "polls": 9,
+   "firms": 4,
+   "poll": {
+    "alp": 36.22,
+    "lnp": 35.28,
+    "grn": 10.61,
+    "oth": 17.89
+   },
+   "result": {
+    "alp": 36.97,
+    "lnp": 35.37,
+    "grn": 9.7,
+    "onp": 1.8,
+    "oth": 17.96
+   },
+   "resultSource": "map/data/res-nsw23.json",
+   "err": {
+    "alp": 0.032,
+    "lnp": 0.004,
+    "grn": -0.1,
+    "oth": 0.005
+   }
+  },
+  {
+   "st": "wa",
+   "date": "2013-03-09",
+   "polls": 2,
+   "firms": 1,
+   "poll": {
+    "alp": 33.5,
+    "lnp": 52.5,
+    "grn": 8,
+    "oth": 6
+   },
+   "result": {
+    "alp": 33.13,
+    "lnp": 53.15,
+    "grn": 8.4,
+    "oth": 5.32
+   },
+   "resultSource": "article infobox",
+   "err": {
+    "alp": -0.017,
+    "lnp": 0.026,
+    "grn": 0.053,
+    "oth": -0.127
+   }
+  },
+  {
+   "st": "wa",
+   "date": "2017-03-11",
+   "polls": 4,
+   "firms": 3,
+   "poll": {
+    "alp": 39.5,
+    "lnp": 38.58,
+    "grn": 8.05,
+    "oth": 13.88
+   },
+   "result": {
+    "alp": 42.2,
+    "lnp": 36.62,
+    "grn": 8.91,
+    "onp": 4.93,
+    "oth": 12.27
+   },
+   "resultSource": "map/data/res-wa17.json",
+   "err": {
+    "alp": 0.112,
+    "lnp": -0.083,
+    "grn": 0.111,
+    "oth": -0.141
+   }
+  },
+  {
+   "st": "wa",
+   "date": "2021-03-13",
+   "polls": 4,
+   "firms": 3,
+   "poll": {
+    "alp": 52.95,
+    "lnp": 27.65,
+    "grn": 8.57,
+    "onp": 3.73,
+    "oth": 7.1
+   },
+   "result": {
+    "alp": 59.92,
+    "lnp": 25.3,
+    "grn": 6.92,
+    "onp": 1.26,
+    "oth": 6.6
+   },
+   "resultSource": "map/data/res-wa21.json",
+   "err": {
+    "alp": 0.284,
+    "lnp": -0.121,
+    "grn": -0.232,
+    "onp": -1.109,
+    "oth": -0.078
+   }
+  },
+  {
+   "st": "wa",
+   "date": "2025-03-08",
+   "polls": 3,
+   "firms": 2,
+   "poll": {
+    "alp": 43,
+    "lnp": 34.67,
+    "grn": 11,
+    "onp": 3.5,
+    "oth": 8
+   },
+   "result": {
+    "alp": 41.43,
+    "lnp": 33.17,
+    "grn": 11.06,
+    "onp": 4,
+    "oth": 10.34
+   },
+   "resultSource": "map/data/res-wa25.json",
+   "err": {
+    "alp": -0.064,
+    "lnp": -0.067,
+    "grn": 0.006,
+    "onp": 0.139,
+    "oth": 0.282
+   }
+  },
+  {
+   "st": "sa",
+   "date": "2014-03-15",
+   "polls": 2,
+   "firms": 1,
+   "poll": {
+    "alp": 34,
+    "lnp": 42.5,
+    "grn": 8,
+    "oth": 15.5
+   },
+   "result": {
+    "alp": 35.8,
+    "lnp": 44.8,
+    "grn": 8.7,
+    "oth": 10.7
+   },
+   "resultSource": "polling table election row (own article)",
+   "err": {
+    "alp": 0.079,
+    "lnp": 0.094,
+    "grn": 0.092,
+    "oth": -0.426
+   }
+  },
+  {
+   "st": "sa",
+   "date": "2018-03-17",
+   "polls": 3,
+   "firms": 2,
+   "poll": {
+    "alp": 30.67,
+    "lnp": 33.33,
+    "grn": 7.67,
+    "oth": 28.33
+   },
+   "result": {
+    "alp": 32.8,
+    "lnp": 38,
+    "grn": 6.7,
+    "oth": 22.5
+   },
+   "resultSource": "polling table election row (own article)",
+   "err": {
+    "alp": 0.099,
+    "lnp": 0.204,
+    "grn": -0.145,
+    "oth": -0.309
+   }
+  },
+  {
+   "st": "sa",
+   "date": "2022-03-19",
+   "polls": 4,
+   "firms": 3,
+   "poll": {
+    "alp": 39.5,
+    "lnp": 35.75,
+    "grn": 9.25,
+    "oth": 15.5
+   },
+   "result": {
+    "alp": 39.97,
+    "lnp": 36.15,
+    "grn": 9.12,
+    "onp": 2.63,
+    "oth": 14.76
+   },
+   "resultSource": "map/data/res-sa22.json",
+   "err": {
+    "alp": 0.02,
+    "lnp": 0.017,
+    "grn": -0.016,
+    "oth": -0.058
+   }
+  },
+  {
+   "st": "sa",
+   "date": "2026-03-21",
+   "polls": 9,
+   "firms": 6,
+   "poll": {
+    "alp": 38.22,
+    "lnp": 17.39,
+    "grn": 11.56,
+    "onp": 23.22,
+    "oth": 9.61
+   },
+   "result": {
+    "alp": 37.48,
+    "lnp": 19.05,
+    "grn": 10.37,
+    "onp": 22.88,
+    "oth": 10.22
+   },
+   "resultSource": "map/data/res-sa26.json",
+   "err": {
+    "alp": -0.032,
+    "lnp": 0.112,
+    "grn": -0.122,
+    "onp": -0.019,
+    "oth": 0.068
+   }
+  }
+ ]
+}

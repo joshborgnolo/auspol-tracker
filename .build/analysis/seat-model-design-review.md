@@ -524,6 +524,59 @@ National House splits between Labor and the Coalition, 1993–2025, and their lo
 - **Means over seats** (national totals still solved exactly): Labor +0.03, Coalition −0.01, Greens 0.
 - **Victoria** has no sitting-member record in its stores, so it keeps the plain-swing noise (`modelSettings({plainNoise: true})`).
 
+## 15. Victoria v2.3: the real field, state-fitted errors, respondents and cards (2026-11-16)
+
+The Victorian run (28 November 2026) until now assumed 2022's candidates stood again, borrowed every error from federal elections and took One Nation's preferences from federal counts. Twelve days out, the things it assumed are on the record. What changed, and what each test found:
+
+### The field (`vic-field.mjs`, `data/vic-candidates-2026.json`)
+- **Nominations closed 9 November: 734 candidates.** Labor, the Greens, One Nation and the Victorian Socialists stand in all 88; the Liberals in 77 (the Nationals alone in their nine seats and both Bendigos; Ripon is the only three-cornered contest); 91 independents in 56 districts, 12 of whom stood in the same district in 2022.
+- **2022's strongest independents are gone** (Cupper, Sheed, Hawkins, Lardner, Lowe). The old run stood them again and gave independents 1.25 seats on their 2022 votes.
+- **Starting shares:** 2022 Assembly share where the party or person stood (430); One Nation from the federal 2025 footprint in all 88 (one scale; its five 2022 districts were on another); the party's 2022 Council share where it stood only for the Council (90; `data/vic-lc-2022-by-district.json`, scaled by its Assembly/Council ratio where it stood for both: Victorian Socialists 1.36, Family First 1.52, Animal Justice 1.66); a median for the 126 with no record (2.5% minor party, 1.6% independent).
+- **New independents carry their own spread** (`c.sig`, the one engine change in `model-sim.mjs`): the logit SD of 2022's 123 independents, 1.24. Independents average 0.9 seats; the last four elections elected 0, 1, 3 and 0.
+- **Districts whose 2022 independent is gone** have shares summing under 1 (Mildura 0.68); the swing is applied first and the gap spread in proportion to post-swing shares, so One Nation takes more of an orphaned vote than a 2022-level split would give it.
+
+### Sitting members (`calibrate-state-swing.mjs`, `data/seat-model-state-swing.json`)
+- **Four state elections on unchanged boundaries** (Victoria 2018, Queensland 2020 and 2024, NSW 2019; 367 district pairs), statewide totals given, Huber fit, bootstrap SEs.
+- **Member stands again +0.055 (se 0.018, n 284); member gone −0.111 (se 0.046, n 62)**, both against districts the party did not hold. By party: Labor +0.068 / −0.048, Coalition +0.040 / −0.183; the differences are not significant (z 0.8 and 1.3), so one pair serves both, and the Greens.
+- **State personal votes are not larger than federal ones** on this evidence (federal: +0.10 / −0.075 to −0.125). The SA 2026 gap of 0.44 was one collapse; across ten elections including redistributed ones the gap is 0.18–0.25, and in the four collapses in the stores it is 0.21.
+- **2026:** 67 of 88 sitting members stand again; 21 do not (11 Labor, 7 Coalition, 1 Green, 2 who left Labor). A by-election successor of the same party carries both terms.
+- **District noise** at state elections: 0.235 (Labor) and 0.253 (Coalition) after the terms, 0.246 (Greens, plain), against about 0.21 federally.
+
+### Polling error (`state-polls/`, `calibrate-state-polls.mjs`, `data/seat-model-state-polls.json`)
+- **19 state elections 2010–2026** with a polling table on Wikipedia (NSW 2015 and 2019 have none there): the mean of the final month's polls against the result, logit scale.
+- **RMS: Labor 0.096, Coalition 0.080, Greens 0.161, the rest 0.193**; federal final month 0.098, 0.094, 0.183. The page had said state polls were "if anything" less accurate. They are not.
+- **Labor is under-polled at state elections**: mean +0.048, above its polls in 13 of 19, t = 2.5. Federally the lean runs the other way (−0.059), so the run adds neither.
+- **One Nation at 5%+**: four elections, RMS 0.199, over-polled in all four (mean −0.146). It keeps the federal floor (0.25).
+
+### Preferences
+- **Published two-party figures were below the old run's** (43–46 against 46.5 implied). The gap was One Nation's level.
+- **No count has ever sent less than 25.5% of One Nation's preferences to Labor** (federal 2025; Queensland 2024, with Labor losing office, 26.9; Queensland 2017 and 2020, 33). Victorian respondents (RedBridge/Accent) said 25% in February 2026, matching the 2025 count in Victoria (25.0%), then 9–13% from August. The same house's Coalition-to-Labor-over-One-Nation reading is 37–38% against the Senate tables' 28%.
+- **Rule:** where Victoria has its own count (Greens 86.0%, minor parties 49.1%, 2022) the count sets the level. Every level involving One Nation starts from the federal reading and moves halfway, on the logit scale, to the respondents of the six weeks to the newest poll. One Nation to Labor 17%; Coalition to Labor over One Nation 32%.
+- **Halfway is a judgement** (`RESPONDENT_WEIGHT`). Federal readings alone: Coalition 42.8 seats, One Nation 10.8, Coalition majority 39%. Respondents alone: 46.5, 7.5, 62%. Official: 44.8, 9.1, 52%. The count on 28 November is the first test of a reading that moved.
+- **Implied two-party vote** now 44.5 for Labor against the Coalition (seven polls: 43–46) and 53.0 against One Nation (four polls: 54–55).
+
+### How-to-vote cards (`.build/vic/model-2026/htv/`, `data/vic-htv-2026.json`)
+- **The VEC's register read for all 88 districts** (264 cards: text layers, except the Nationals' twelve, whose numbers are artwork, read by eye).
+- **The cards follow the federal pattern**: Labor has Greens, Coalition, One Nation in 86 (open in Caulfield and Prahran); the Liberals and Nationals have One Nation, Labor, Greens in 83 (Labor ahead of One Nation in Greenvale and Preston, open in Brunswick and Footscray, none registered in Williamstown); One Nation has the Coalition ahead of Labor in all 88.
+- **What a card is worth**, from the stores: the Liberal card's reversal between 2010 and 2013 moved Coalition voters' share to Labor over the Greens from 19.6% to 66.9% in Melbourne and Batman (2.11 logit). A reversed card moves its voters that far, an open card half as far, the pairs fitted together. Measured on Liberal voters only; Labor's open cards borrow it.
+
+### Result (polls to 13 November: Labor 22.1, Coalition 31.2, One Nation 21.9, Greens 13.8, others 11.0)
+| | Before | v2.3 |
+|---|---|---|
+| Coalition | 43.2 | **44.8** (32–57) |
+| Labor | 25.4 | **26.3** (15–38) |
+| One Nation | 11.7 | **9.1** (1–22) |
+| Greens | 6.4 | **6.8** (4–10) |
+| Independents | 1.25 | **0.9** (0–3) |
+| Coalition majority | 43% | **52%** |
+
+### Still open
+- By-elections change who sits, not the starting vote. Prahran is the case that matters: the Liberals won it in 2025 with Labor absent, and the run makes the Greens 4-in-5 favourites on the 2022 count.
+- Candidates disendorsed after nominations closed (One Nation in Preston, the Liberals in Williamstown) are counted as their party's.
+- The cards were read from the register as listed on 16 November; registration ran to 20 November.
+- The federal explorer's card button still assumes a third of voters follow a card (35 points); the stores now measure 47.
+- After 28 November: score the run, and the two ends of the respondents' judgement, against the count.
+
 ## Scripts (`seat-model/design-review/`)
 
 | Script | Question |
