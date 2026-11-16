@@ -123,7 +123,9 @@ for (const [name, pages, tool] of [["Now", now, []], ["Past cycles", cyc, cyc.da
       RR.resetIds();
       const html = RR.blocks(v.blocks, { idp: p.id + "-" });
       assert.ok(html.length > 200, `${name} · ${p.id} · ${k}: draws`);
-      for (const b of v.blocks.filter((x) => x.k === "chart")) assert.ok(b.spec && b.spec.series.length + b.spec.areas.length > 0, `${name} · ${p.id} · ${k}: the chart "${b.title}" carries its lines`);
+      /* a chart whose window holds no figure (the Gini surveys run years
+         behind the sitting term) carries the note saying so instead */
+      for (const b of v.blocks.filter((x) => x.k === "chart")) assert.ok(b.spec && (b.spec.series.length + b.spec.areas.length > 0 || b.spec.notes.some((n) => /^No survey year in this window/.test(n[3]))), `${name} · ${p.id} · ${k}: the chart "${b.title}" carries its lines`);
     }
   }
 }

@@ -6721,7 +6721,7 @@ function RdConfStrip({ lines, lo, hi, win, terms, onWin, narrow, label }) {
 
 /* ======== the "Inflation & growth" view of Economic sentiment =========
    D.macro (gen-data §5m ← .build/macro.mjs ← the ABS and OECD data APIs),
-   set out as four small charts that share the window, each asking one
+   set out as five small charts that share the window, each asking one
    question with Australia in colour and the OECD in grey:
      Inflation                 – ABS headline CPI, annual change (the
                                  quarterly index-derived series before the
@@ -6741,6 +6741,12 @@ function RdConfStrip({ lines, lo, hi, win, terms, onWin, narrow, label }) {
                                  person (its household dashboard index, 2008→)
      Unemployment              – the ABS's monthly seasonally adjusted rate,
                                  a level rather than an annual change
+     Income inequality         – the Gini coefficient of equivalised
+                                 disposable household income: HILDA's
+                                 annual series and the ABS income survey's
+                                 (to 2019-20), two lines never joined; no
+                                 OECD line (the OECD prints no OECD-wide
+                                 Gini)
    Nine lanes on one plot had them knotted together; four small plots of
    one to three lines each read at a glance, and their shared x window
    lines a month up down each column. Australian prints are dots in a
@@ -6768,6 +6774,15 @@ function macroData(D) {
      annual rate (x4, the usual reading of a seasonally adjusted quarter)
      in thousands, so the y ruler keeps the percent charts' tick steps */
   const lvl = (k, rows, o) => lane(k, rows && rows.map((r) => ({ date: r.date, v: r.v * 4 / 1000 })), o);
+  /* the Gini lanes: survey (financial) years, filed at 30 June and named
+     "2022–23"; drawn ×100 so the y engine's tick steps (0.5, 1, 2…) land
+     on hundredths of the coefficient */
+  const fyName = (iso) => (+iso.slice(0, 4) - 1) + "–" + iso.slice(2, 4);
+  const gini = (k, rows, o) => {
+    const l = lane(k, rows && rows.map((r) => ({ date: r.date, v: r.v * 100 })), o);
+    if (l) l.pts.forEach((q) => { q.when = fyName(q.dateIso); });
+    return l;
+  };
   const L = {
     cpi: lane("cpi", cpiRows, { name: "Australia", color: "var(--macro-cpi)", au: true, q: (r) => confIsoX(r.date) < cut }),
     oecdCpi: M.oecdCpi && lane("oecdCpi", M.oecdCpi.rows, { name: "OECD average", color: "var(--ink-3)", q: false }),
@@ -6782,6 +6797,8 @@ function macroData(D) {
     rnndiLevel: M.rnndiLevel && lvl("rnndiLevel", M.rnndiLevel.rows, { name: "National income per person", color: "var(--macro-rnndi)", au: true, q: true }),
     hhdiLevel: M.hhdiLevel && lvl("hhdiLevel", M.hhdiLevel.rows, { name: "Household income per person", color: "var(--macro-hhdi)", au: true, q: true }),
     unemp: M.unemp && lane("unemp", M.unemp.rows, { name: "Australia", color: "var(--macro-unemp)", au: true, q: false }),
+    giniHilda: M.giniHilda && gini("giniHilda", M.giniHilda.rows, { name: "HILDA survey", src: "HILDA survey", color: "var(--macro-gini)", au: true, q: false }),
+    giniSih: M.giniSih && gini("giniSih", M.giniSih.rows, { name: "ABS income survey", src: "ABS Survey of Income and Housing", color: "var(--macro-gini)", dash: "4 3", au: true, q: false }),
   };
   const P = [
     { id: "infl", title: "Inflation", sub: "Consumer prices, % change on a year earlier",
@@ -6797,6 +6814,13 @@ function macroData(D) {
         copyTitle: "Real output and income per person in Australia", lanes: [L.gdppcLevel, L.rnndiLevel, L.hhdiLevel].filter(Boolean) } : null },
     { id: "unemp", title: "Unemployment", sub: "% of the labour force, seasonally adjusted",
       copyTitle: "Australia’s unemployment rate", lanes: [L.unemp], zero: false },
+    /* income inequality: two surveys' Gini coefficients, kept as two lines
+       (the ABS's own runs about 0.02 above HILDA's, so splicing them would
+       invent a jump); annual and two-yearly, years behind the other
+       panels, so every survey year is a dot and a window holding none
+       says where the latest stands */
+    { id: "gini", title: "Income inequality", sub: "Gini coefficient of household income after tax, adjusted for household size",
+      copyTitle: "Income inequality in Australia: the Gini coefficient", lanes: [L.giniHilda, L.giniSih], zero: false, gini: true },
   ].map((p) => ({ ...p, lanes: p.lanes.filter(Boolean) })).filter((p) => p.lanes.length);
   const lo = L.cpi.pts[0].x;
   MACRO_CACHE = { M, L, P, lo, cut };
@@ -6821,39 +6845,58 @@ function RdMacroPanel({ p: p0, win, dragging, narrow, union, evs, evMode, top, c
   const p = actual && p0.level ? { ...p0, ...p0.level } : p0;
   const money = !!p.money;
   const inW = (q) => q.x >= win.a && q.x <= win.b;
-  const dotsOn = win.b - win.a <= 4.6;
+  const gin = !!p.gini;
+  const dotsOn = win.b - win.a <= 4.6 || gin;
   const vals = [];
   p.lanes.forEach((l) => l.pts.forEach((q) => { if (inW(q)) vals.push(q.y); }));
+  /* a Gini window holding no survey year (the surveys run years behind)
+     keeps the scale of the latest years on file and says so on the plot */
+  const giniEmpty = gin && !vals.length;
+  if (giniEmpty) p.lanes.forEach((l) => l.pts.slice(-4).forEach((q) => vals.push(q.y)));
   if (p.rba && win.b > MACRO_RBA_FROM) vals.push(2, 3);
   if (p.zero) vals.push(0);
-  const ny = confNiceY(vals.length ? vals : [0, 1], 2);
+  const ny = confNiceY(vals.length ? vals : [0, 1], gin ? 4 : 2);
   const yd = useConfChase([ny.lo, ny.hi], dragging);
   const PCT = (v) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   /* money lanes ride in thousands of dollars a year */
   const USD = (v) => "$" + Math.round(v * 1000).toLocaleString("en-AU");
+  /* Gini lanes ride ×100; printed back at the ABS's three decimals */
+  const GINI = (v) => (v / 100).toFixed(3);
   const series = p.lanes.map((l) => ({
     id: p.id + "-" + l.k, label: l.name, color: l.color, rdWidth: l.au ? 2.1 : 1.5, dash: l.dash,
-    smooth: false, endCap: false, interpHover: true, points: l.pts,
+    /* a survey line holds no figure between its survey years, so the
+       Gini lanes answer the hover only at a survey year */
+    smooth: false, endCap: false, interpHover: !gin, points: l.pts,
   }));
   /* every Australian print is a dot in a term-length window, gathered
      over the window being left as well as the one arriving so a step's
      glide carries its dots in and out with the lines */
   const scatter = dotsOn ? p.lanes.filter((l) => l.au).flatMap((l) => l.pts
     .filter((q) => q.x >= union[0] && q.x <= union[1])
-    .map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.name, meta: { pollster: "ABS", dateLabel: q.when } }))) : [];
-  const spine = p.lanes[0].pts.filter((q) => q.x >= win.a - 0.3 && q.x <= win.b + 0.3);
+    .map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.name, meta: { pollster: l.src || "ABS", dateLabel: q.when } }))) : [];
+  /* the hover spine: the first lane's prints; the Gini panel's two
+     surveys start years apart, so it takes every survey year of both */
+  const spineAll = gin
+    ? [...new Map(p.lanes.flatMap((l) => l.pts).sort((a, b) => a.x - b.x).map((q) => [q.x, q])).values()]
+    : p.lanes[0].pts;
+  const spine = spineAll.filter((q) => q.x >= win.a - 0.3 && q.x <= win.b + 0.3);
   const areas = p.rba ? [{ id: "rba-" + p.id, className: "rba-band", color: "var(--macro-cpi)", opacity: 0.08, edge: false, smooth: false,
     points: [{ x: MACRO_RBA_FROM, y0: 2, y1: 3 }, { x: nowX + 4, y0: 2, y1: 3 }] }] : [];
   const refLines = p.zero && yd[0] < 0 && yd[1] > 0
     ? [{ y: 0, label: typeof p.zero === "string" ? p.zero : undefined, align: "left", color: "var(--ink-3)" }] : [];
   /* the band's own name, inside it at its left end, where the band is
      tall enough to hold a line of type */
+  const lastGini = gin ? p.lanes.map((l) => l.pts[l.pts.length - 1]).sort((a, b) => b.x - a.x)[0] : null;
   const notes = p.rba && win.b > MACRO_RBA_FROM + 0.4 && ny.hi - ny.lo <= 12
-    ? [{ x: Math.max(win.a, MACRO_RBA_FROM), dx: 6, y: 2.5, baseline: "middle", text: "RBA target", anchor: "start", color: "var(--ink-3)", weight: 500, size: 11.5 }] : [];
+    ? [{ x: Math.max(win.a, MACRO_RBA_FROM), dx: 6, y: 2.5, baseline: "middle", text: "RBA target", anchor: "start", color: "var(--ink-3)", weight: 500, size: 11.5 }]
+    : giniEmpty && lastGini
+      ? [{ x: (win.a + win.b) / 2, y: (ny.lo + ny.hi) / 2, baseline: "middle", anchor: "middle", color: "var(--ink-3)", weight: 500, size: 12.5,
+          text: "No survey year in this window: the latest is " + lastGini.when }]
+      : [];
   const named = evMode === "badge";
   const hPx = (narrow ? 196 : 212) + (top ? 22 : 0);
   const pad = { l: narrow ? 32 : 34, r: 14, t: top ? 34 : narrow ? 12 : 14, b: 28 };
-  const latestTxtOf = (q) => (l) => (q.money ? USD(l.latest.v) : PCT(l.latest.v) + "%");
+  const latestTxtOf = (q) => (l) => (q.money ? USD(l.latest.v) : q.gini ? GINI(l.latest.v) + " (" + l.pts[l.pts.length - 1].when + ")" : PCT(l.latest.v) + "%");
   const latestTxt = latestTxtOf(p);
   const subKey = (q) => (
     <>
@@ -6870,6 +6913,7 @@ function RdMacroPanel({ p: p0, win, dragging, narrow, union, evs, evMode, top, c
     </>
   );
   const auLatest = p.lanes.find((l) => l.au);
+  const L0 = (q, k) => { const l = q.lanes.find((x) => x.k === k); return l ? latestTxtOf(q)(l) : null; };
   const when = auLatest ? auLatest.pts[auLatest.pts.length - 1].when : "";
   return (
     <div className={"rd-mp rd-mp-" + p.id}>
@@ -6896,7 +6940,7 @@ function RdMacroPanel({ p: p0, win, dragging, narrow, union, evs, evMode, top, c
       </div>
       <TrendChart heightPx={hPx} padPx={pad}
         xDomain={[win.a, win.b]} yDomain={yd} yTicks={confTicksIn(yd, ny.step)}
-        yTickFmt={money ? (v) => String(v) : (v) => (v < 0 ? "−" : "") + Math.abs(v)}
+        yTickFmt={money ? (v) => String(v) : gin ? (v) => (v / 100).toFixed(Number.isInteger(+v.toFixed(6)) ? 2 : 3) : (v) => (v < 0 ? "−" : "") + Math.abs(v)}
         xTicks={xTicks} baseline driven={dragging}
         refLines={refLines} areas={areas} notes={notes} series={series} spine={spine}
         events={named ? evs : []}
@@ -6904,11 +6948,11 @@ function RdMacroPanel({ p: p0, win, dragging, narrow, union, evs, evMode, top, c
         vlines={evMode === "rule" ? evs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
         scatter={scatter}
         tooltipTitle={(i) => (spine[i] ? spine[i].when : "")}
-        fmt={money ? USD : (v) => PCT(v) + (p.id === "gap" ? " pts" : "%")}
+        fmt={money ? USD : gin ? GINI : (v) => PCT(v) + (p.id === "gap" ? " pts" : "%")}
         copy={{
           title: p.copyTitle, span: years,
-          sub: p.sub + ". " + span + ". Latest Australian print: " + (auLatest ? latestTxt(auLatest) + ", " + when : "") + ".",
-          caption: "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? (money ? " Chain-volume dollars at the ABS’s reference-year prices, each quarter’s seasonally adjusted figure at its annual rate (four times the quarter)." : " The OECD line is real GDP per person across the OECD, from its household dashboard index, which begins in 2007.") + (p.lanes.some((l) => l.k === "hhdi" || l.k === "hhdiLevel") ? " Household income is the ABS’s household disposable income over its household consumption price deflator and population, worked out here (the ABS prints no real per-person figure)." : "") : ""),
+          sub: p.sub + ". " + span + ". " + (gin ? "Latest: HILDA " + (L0(p, "giniHilda") || "—") + "; ABS " + (L0(p, "giniSih") || "—") : "Latest Australian print: " + (auLatest ? latestTxt(auLatest) + ", " + when : "")) + ".",
+          caption: gin ? "The Gini coefficient of equivalised disposable household income — 0 if every household had the same income, 1 if one household had it all — as the ABS prints it. HILDA: the HILDA survey, every year from 2002–03 (the Melbourne Institute’s analysis for the ABS’s Measuring What Matters). ABS income survey: the Survey of Income and Housing, the official measure, run about every second year to 2019–20, with no next release scheduled; its income standards changed in 2007–08. The two surveys differ in level, so they are never joined. The OECD publishes no OECD-wide Gini." : "Official ABS and OECD series, as published and joined print to print — nothing smoothed, adjusted or estimated." + (p.rba ? " The shaded band is the Reserve Bank’s 2–3% inflation target, adopted in August 1996." : "") + (p.id === "grow" ? (money ? " Chain-volume dollars at the ABS’s reference-year prices, each quarter’s seasonally adjusted figure at its annual rate (four times the quarter)." : " The OECD line is real GDP per person across the OECD, from its household dashboard index, which begins in 2007.") + (p.lanes.some((l) => l.k === "hhdi" || l.k === "hhdiLevel") ? " Household income is the ABS’s household disposable income over its household consumption price deflator and population, worked out here (the ABS prints no real per-person figure)." : "") : ""),
           legend: p.lanes.map((l) => ({ label: l.name + " (latest " + latestTxt(l) + ")", color: l.color, kind: l.dash ? "dashed" : "line" })),
         }} />
     </div>
@@ -6943,7 +6987,7 @@ function RdMacro({ win, dragging, terms, nowX, hi, strip }) {
   const years = confWinYears(win, terms, hi);
   const exportCsv = () => {
     const rr = [["kind", "series", "date", "value"]];
-    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", ausGap: "Australia over its target", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", hhdi: "Real household disposable income per capita (computed)", unemp: "Unemployment rate", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdppc: "OECD real GDP per capita", gdppcLevel: "Real GDP per capita (dollars a quarter)", rnndiLevel: "Real net national disposable income per capita (dollars a quarter)", hhdiLevel: "Real household disposable income per capita (dollars a quarter, 2023–24 prices, computed)" };
+    const SHEET = { cpi: "Headline inflation", cpiMonthly: "Headline inflation (monthly CPI)", ausGap: "Australia over its target", gdppc: "Real GDP per capita", rnndi: "Real net national disposable income per capita", hhdi: "Real household disposable income per capita (computed)", unemp: "Unemployment rate", oecdCpi: "OECD average inflation", oecdCpiMed: "OECD median inflation", oecdCpiGap: "Median deviation from inflation target", oecdGdppc: "OECD real GDP per capita", gdppcLevel: "Real GDP per capita (dollars a quarter)", rnndiLevel: "Real net national disposable income per capita (dollars a quarter)", hhdiLevel: "Real household disposable income per capita (dollars a quarter, 2023–24 prices, computed)", giniHilda: "Gini coefficient, equivalised disposable household income (HILDA survey)", giniSih: "Gini coefficient, equivalised disposable household income (ABS Survey of Income and Housing)" };
     for (const k of Object.keys(SHEET)) {
       const ln = D.macro[k];
       if (!ln) continue;
@@ -7008,6 +7052,7 @@ function macroStory(D) {
   const ag = M.ausGap && M.ausGap.rows.length ? M.ausGap.rows.at(-1) : null;
   const og = M.oecdGdppc && M.oecdGdppc.rows.length ? M.oecdGdppc.rows.at(-1) : null;
   const un = M.unemp && M.unemp.rows.length ? M.unemp.rows.at(-1) : null;
+  const gh = M.giniHilda && M.giniHilda.rows.length ? M.giniHilda.rows.at(-1) : null;
   const f = (v) => (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const qName = (iso) => ({ "03": "March", "06": "June", "09": "September", "12": "December" })[iso.slice(5, 7)] + " quarter";
   const head = "Inflation runs at " + f(c.v) + "% a year; real GDP per person " + (g.v >= 0 ? "grows " : "shrinks ") + f(g.v) + "% a year.";
@@ -7021,7 +7066,8 @@ function macroStory(D) {
     + (gp ? (gp.v >= 0 ? ", running " + f(gp.v) + " points above its bank's target)" : ", running " + f(gp.v) + " points below its bank's target)") : "")
     + (og ? " and OECD-wide real GDP per person " + (og.v >= 0 ? "growing " : "shrinking ") + f(og.v) + "% a year" : "")
     + (oc || om || og ? "." : "")
-    + (un ? " Unemployment rounds out the panel at " + f(un.v) + "% for " + monthLabelFull(un.date.slice(0, 7)) + ", as printed." : "");
+    + (un ? " Unemployment stands at " + f(un.v) + "% for " + monthLabelFull(un.date.slice(0, 7)) + ", as printed." : "")
+    + (gh ? " Income inequality, by the Gini coefficient, was " + gh.v.toFixed(3) + " in " + (+gh.date.slice(0, 4) - 1) + "–" + gh.date.slice(2, 4) + ", the latest HILDA survey year." : "");
   return { head, dek };
 }
 
@@ -7635,7 +7681,7 @@ function RdConfidence({ rangeId }) {
       </>}
       {/* the Inflation & growth view has no band to run on into the
           sitting term's future, so its "This term" ends at now and its
-          four small charts are filled edge to edge */}
+          small charts are filled edge to edge */}
       {isMacro && <RdMacro win={isCur ? { ...win, b: Math.min(win.b, nowX + 0.6 / 12) } : win} dragging={dragging} terms={vTerms} nowX={nowX} hi={ext.hi} strip={strip} />}
       </RdCrossfade>
       <HowTo paras={[
@@ -7643,7 +7689,7 @@ function RdConfidence({ rangeId }) {
         <>The bar over the chart sets the window, and the window holds as you switch tabs. It opens on this term; ‹ and › step back and forward a term at a time, and Term, 10 yrs, 25 yrs and All widen it (‹ › then page back and forward by that length). The strip under each chart is the whole record in miniature with the governments beneath it: drag the window along it, drag its edges to resize it, drag across the strip to draw a new one, or tap a spot to jump there. A term reads off its election — Election, 1 yr, 2 yrs — so every term shares one ruler; a longer window counts calendar years and marks each federal election with a faint rule. Dots show in a window of about a term; longer windows draw the lines alone.</>,
         <>Behind a term the band pools the view’s main gauge over the other terms, each lined up on its own election month: the middle half in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. This term’s band is every past term; a past term’s is every term but itself. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. Before each house’s live release file begins, its line is the house’s own monthly history, drawn a little thinner — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010, NAB’s printed net balance to March 1997. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals.</>,
         <>ANZ–Roy Morgan’s and Westpac–MI’s are indices where 100 is neutral; DemosAU’s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
-        <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as four small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted), and real household disposable income per person, beside real GDP per person across the OECD (the OECD’s household dashboard index, so the grey line begins in 2008). National income is the whole country’s: it counts what exports buy and income paid abroad, and includes companies’ and governments’ income. Household income is what households have after tax and interest — the ABS’s household gross disposable income over its household consumption price deflator and its population, worked out here because the ABS prints no real per-person figure (it matches the OECD’s own calculation for Australia to within 0.2 points). Its Actual switch shows the three Australian series as dollars instead (each seasonally adjusted quarter at its annual rate, in 2023–24 prices). Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia’s from the ABS’s own figures, the OECD median from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
+        <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as five small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person and real net national disposable income per person (annual change in chain-volume levels, seasonally adjusted), and real household disposable income per person, beside real GDP per person across the OECD (the OECD’s household dashboard index, so the grey line begins in 2008). National income is the whole country’s: it counts what exports buy and income paid abroad, and includes companies’ and governments’ income. Household income is what households have after tax and interest — the ABS’s household gross disposable income over its household consumption price deflator and its population, worked out here because the ABS prints no real per-person figure (it matches the OECD’s own calculation for Australia to within 0.2 points). Its Actual switch shows the three Australian series as dollars instead (each seasonally adjusted quarter at its annual rate, in 2023–24 prices). Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change. Income inequality: the Gini coefficient of household income after tax, adjusted for household size (0 would be everyone on the same income, 1 one household holding it all), from two surveys kept as separate lines because their levels differ — the HILDA survey every year from 2002–03, and the ABS’s own Survey of Income and Housing, the official measure, about every second year from 1994–95 to 2019–20 (the ABS has scheduled no next release). Both run years behind the other charts, so a recent window can hold no survey year at all; the chart then names the latest. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines are computed here: Australia’s from the ABS’s own figures, the OECD median from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal).</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
       {/* placement is deliberate: under the how-to, not beside the chart

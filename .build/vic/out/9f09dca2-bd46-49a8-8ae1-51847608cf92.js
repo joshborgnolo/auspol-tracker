@@ -355,7 +355,7 @@ window.AUSPOL = (function () {
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = null;
   /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
-  const seatModel = {"headline":"The Coalition is favoured to win the most seats, with a majority about as likely as not","pollsTo":"2026-11-10","draws":20000,"expectedSeats":{"alp":26.09,"lnp":42.83,"on":11.35,"grn":6.41,"oth":0,"member":1.31},"mostSeats":{"alp":0.1028,"lnp":0.8743,"on":0.0228,"grn":0.0001,"oth":0,"member":0},"majority":{"alp":0.0112,"coalition":0.4092,"on":0.0059,"noMajority":0.5738}};
+  const seatModel = {"headline":"The Coalition is favoured to win the most seats, with a majority about as likely as not","pollsTo":"2026-11-13","draws":20000,"expectedSeats":{"alp":25.41,"lnp":43.23,"on":11.73,"grn":6.38,"oth":0,"member":1.25},"mostSeats":{"alp":0.0885,"lnp":0.8871,"on":0.0243,"grn":0.0001,"oth":0,"member":0},"majority":{"alp":0.0101,"coalition":0.4313,"on":0.007,"noMajority":0.5517}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */

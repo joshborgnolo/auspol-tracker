@@ -8703,7 +8703,7 @@ function infoTerms(D) {
         estimate. The change shown beside each series is the one the house printed with it, kept
         only where it agrees with the previous printed reading.</span>
         <span className="info-p"><b>Inflation &amp; growth is a third tab.</b> It sets the ABS
-        and OECD's official series out as four small charts that share the window, Australia in
+        and OECD's official series out as five small charts that share the window, Australia in
         colour and the OECD in grey. Inflation: Australia's headline inflation (the monthly CPI
         era's printed annual change, spliced onto the earlier quarterly series derived from the
         ABS's own published index numbers) beside the OECD-wide average and the median member,
@@ -8718,8 +8718,13 @@ function infoTerms(D) {
         the ABS's household figure over its consumption price deflator and population, worked out
         here since the ABS prints no real per-person figure), beside real GDP per person across
         the OECD (its household dashboard index, so the grey line begins in 2008). Unemployment: the ABS's monthly
-        seasonally adjusted rate, a level rather than an annual change. Nothing is smoothed,
-        adjusted or estimated — the prints refresh daily from the ABS and OECD data APIs.</span>
+        seasonally adjusted rate, a level rather than an annual change. Income inequality: the
+        Gini coefficient of household income after tax, adjusted for household size (0 would be
+        everyone on the same income, 1 one household holding it all), from the HILDA survey every
+        year since 2002–03 and from the ABS's own income survey, the official measure, about every
+        second year from 1994–95 to 2019–20 (no next release is scheduled). Their levels differ, so
+        they stay two lines, and both run years behind the other charts. Nothing is smoothed,
+        adjusted or estimated — the prints refresh daily from the ABS and OECD.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
         polls because confidence in the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },

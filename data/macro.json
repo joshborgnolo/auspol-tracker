@@ -1,5 +1,5 @@
 {
- "_about": "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdppc: OECD total real GDP per capita, annual change, quarterly 2008→ — derived from the OECD's printed per-capita index (household dashboard DF_HHDASH_INDIC, B1GQ_R_POP, 2007-Q1 = 100; the same y/y derivation, rounded to 1dp). gdppcLevel / rnndiLevel: the ABS's printed SA chain-volume per-capita levels behind gdppc and rnndi, dollars per person per quarter (whole dollars as printed). hhdi / hhdiLevel: real household disposable income per capita Australia — computed here, as the ABS prints no real per-capita household series: household gross disposable income (5206.0 Table 20, series A2302939L, current prices, SA) divided by the household consumption deflator (HFCE current prices over chain volume, SA) and by the ABS's population (GDP chain volume over GDP per capita chain volume); hhdiLevel in whole dollars per person per quarter at the deflator's 2023–24 reference prices, hhdi its annual change (same derivation as gdppc). Cross-checked 2026-11-16 against the OECD's own print of the same measure for Australia (household dashboard, B6GS1M_R_POP, 2008→): annual changes agree to 0.02pt on average, 0.2pt at most. Rows: {date: ISO period end, v: percent, or dollars on the two level lanes}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au, Table 20 of 5206.0 from the release's spreadsheet; OECD DF_PRICES_ALL and DF_HHDASH_INDIC via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
+ "_about": "Official price and output series behind the Economic sentiment panel's 'Inflation & growth' view. cpi: all-groups CPI Australia, annual change, quarterly — derived here from the ABS's published quarterly index numbers (1949→; v = idx_t/idx_{t−4}−1, rounded to 1dp). cpiMonthly: the ABS's printed monthly all-items y/y measure, complete monthly CPI era (1dp as printed). ausGap: Australia's own deviation from the inflation target — the headline figure minus the RBA's 2–3% band at its midpoint (2.5), computed here from the same rows, from the band's adoption quarter (Q3 1996, the August 1996 Statement on the Conduct of Monetary Policy) and riding the monthly series from the complete-monthly CPI era. gdppc: real GDP per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (v = lvl_t/lvl_{t−4}−1, rounded to 1dp). rnndi: real net national disposable income per capita Australia, annual change, quarterly — derived from the ABS's SA chain-volume per-capita levels (NNDI_PCA), the same derivation. unemp: unemployment rate Australia, monthly, seasonally adjusted, persons aged 15+ — the ABS's printed labour-force measure (LF dataflow measure M13), rounded to the publication's 1dp; the only lane drawn as a level rather than an annual change. oecdCpi: OECD total all-items CPI y/y, OECD's printed monthly measure (values carry the OECD's own decimals; the page rounds to 1dp). oecdCpiMed: the median of the OECD member countries' all-items CPI y/y prints, computed here (rounded to 1dp; not an OECD-published aggregate — a month files only when ≥25 members report; ≤ Dec 2025 from the OECD's DF_PRICES_ALL member series, Jan 2026→ from the member panel of the OECD's monthly 'Consumer Prices, OECD' release PDF, committed per reference month in .build/macro-src/oecd-member-inflation.json). oecdCpiGap: the MEDIAN DEVIATION FROM INFLATION TARGET across the OECD, computed here — per month, the median of (member CPI print minus that member's own central-bank target midpoint), over members carrying both that month (the hand-entered CB_TARGETS table in .build/macro.mjs records each bank's target history; band targets at midpoint, a member absent before its first formal target; from 1999-01; rounded to 1dp; the same era splice as oecdCpiMed). oecdGdppc: OECD total real GDP per capita, annual change, quarterly 2008→ — derived from the OECD's printed per-capita index (household dashboard DF_HHDASH_INDIC, B1GQ_R_POP, 2007-Q1 = 100; the same y/y derivation, rounded to 1dp). gdppcLevel / rnndiLevel: the ABS's printed SA chain-volume per-capita levels behind gdppc and rnndi, dollars per person per quarter (whole dollars as printed). hhdi / hhdiLevel: real household disposable income per capita Australia — computed here, as the ABS prints no real per-capita household series: household gross disposable income (5206.0 Table 20, series A2302939L, current prices, SA) divided by the household consumption deflator (HFCE current prices over chain volume, SA) and by the ABS's population (GDP chain volume over GDP per capita chain volume); hhdiLevel in whole dollars per person per quarter at the deflator's 2023–24 reference prices, hhdi its annual change (same derivation as gdppc). Cross-checked 2026-11-16 against the OECD's own print of the same measure for Australia (household dashboard, B6GS1M_R_POP, 2008→): annual changes agree to 0.02pt on average, 0.2pt at most. giniHilda / giniSih: the Gini coefficient of equivalised disposable household income (0 = every household the same income, 1 = one household holds it all), as the ABS prints it, read off the charts on its own pages — giniHilda the HILDA survey's annual series (2002–03 →, the Melbourne Institute's custom analysis for the ABS's Measuring What Matters indicator), giniSih the ABS Survey of Income and Housing's (1994–95 → 2019–20, roughly every second year; the 2007–08 cycle changed the income standards); two surveys, never spliced (the ABS's runs about 0.02 above HILDA's); dated at each financial year's end, 3dp as printed. Rows: {date: ISO period end, v: percent, dollars on the two level lanes, or the 0–1 coefficient on the Gini lanes}. Sources in .build/macro.mjs (ABS Cat. 6401.0 CPI and 5204.0/06 National Accounts via data.api.abs.gov.au, Table 20 of 5206.0 from the release's spreadsheet; OECD DF_PRICES_ALL and DF_HHDASH_INDIC via sdmx.oecd.org). Built by .build/macro.mjs — never hand-edit.",
  "cpi": {
   "label": "Inflation (headline CPI)",
   "basis": "derived from ABS index numbers",
@@ -16269,6 +16269,166 @@
    {
     "date": "2026-06-30",
     "v": 15319
+   }
+  ]
+ },
+ "giniHilda": {
+  "label": "Gini coefficient of equivalised disposable household income (HILDA survey)",
+  "basis": "as printed by the ABS (Measuring What Matters, HILDA custom analysis), annual, financial years",
+  "rows": [
+   {
+    "date": "2003-06-30",
+    "v": 0.299
+   },
+   {
+    "date": "2004-06-30",
+    "v": 0.29
+   },
+   {
+    "date": "2005-06-30",
+    "v": 0.293
+   },
+   {
+    "date": "2006-06-30",
+    "v": 0.297
+   },
+   {
+    "date": "2007-06-30",
+    "v": 0.309
+   },
+   {
+    "date": "2008-06-30",
+    "v": 0.305
+   },
+   {
+    "date": "2009-06-30",
+    "v": 0.295
+   },
+   {
+    "date": "2010-06-30",
+    "v": 0.303
+   },
+   {
+    "date": "2011-06-30",
+    "v": 0.31
+   },
+   {
+    "date": "2012-06-30",
+    "v": 0.299
+   },
+   {
+    "date": "2013-06-30",
+    "v": 0.302
+   },
+   {
+    "date": "2014-06-30",
+    "v": 0.301
+   },
+   {
+    "date": "2015-06-30",
+    "v": 0.298
+   },
+   {
+    "date": "2016-06-30",
+    "v": 0.298
+   },
+   {
+    "date": "2017-06-30",
+    "v": 0.305
+   },
+   {
+    "date": "2018-06-30",
+    "v": 0.301
+   },
+   {
+    "date": "2019-06-30",
+    "v": 0.304
+   },
+   {
+    "date": "2020-06-30",
+    "v": 0.291
+   },
+   {
+    "date": "2021-06-30",
+    "v": 0.298
+   },
+   {
+    "date": "2022-06-30",
+    "v": 0.323
+   },
+   {
+    "date": "2023-06-30",
+    "v": 0.307
+   }
+  ]
+ },
+ "giniSih": {
+  "label": "Gini coefficient of equivalised disposable household income (ABS Survey of Income and Housing)",
+  "basis": "ABS printed measure, survey years, financial years",
+  "rows": [
+   {
+    "date": "1995-06-30",
+    "v": 0.302
+   },
+   {
+    "date": "1996-06-30",
+    "v": 0.296
+   },
+   {
+    "date": "1997-06-30",
+    "v": 0.292
+   },
+   {
+    "date": "1998-06-30",
+    "v": 0.303
+   },
+   {
+    "date": "2000-06-30",
+    "v": 0.31
+   },
+   {
+    "date": "2001-06-30",
+    "v": 0.311
+   },
+   {
+    "date": "2003-06-30",
+    "v": 0.309
+   },
+   {
+    "date": "2004-06-30",
+    "v": 0.306
+   },
+   {
+    "date": "2006-06-30",
+    "v": 0.314
+   },
+   {
+    "date": "2008-06-30",
+    "v": 0.336
+   },
+   {
+    "date": "2010-06-30",
+    "v": 0.329
+   },
+   {
+    "date": "2012-06-30",
+    "v": 0.32
+   },
+   {
+    "date": "2014-06-30",
+    "v": 0.333
+   },
+   {
+    "date": "2016-06-30",
+    "v": 0.323
+   },
+   {
+    "date": "2018-06-30",
+    "v": 0.328
+   },
+   {
+    "date": "2020-06-30",
+    "v": 0.324
    }
   ]
  }

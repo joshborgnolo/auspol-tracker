@@ -11,7 +11,7 @@
        jumps to the term tapped;
      - the guide readout carries rows in a past term (consumer chart) and
        on every macro panel;
-     - the macro view draws four panels, numbered events only in the
+     - the macro view draws five panels, numbered events only in the
        sitting term, and its "This term" ends at now;
      - the step glide moves the lines mid-flight (the x window travels);
      - no page errors.
@@ -80,7 +80,7 @@ s = await state();
 ok("‹ steps to the 2022 term", s.head === "The 2022 term" && /May 2022 – May 2025/.test(s.sub) && s.nextOff === false, JSON.stringify(s));
 await tab("Inflation & growth");
 s = await state();
-ok("window holds across a tab switch", s.head === "The 2022 term" && s.panels === 4 && s.badges === 0, JSON.stringify(s));
+ok("window holds across a tab switch", s.head === "The 2022 term" && s.panels === 5 && s.badges === 0, JSON.stringify(s));
 await step(1);
 s = await state();
 ok("› back to This term (macro: events numbered)", s.head === "This term" && s.badges > 0, JSON.stringify(s));

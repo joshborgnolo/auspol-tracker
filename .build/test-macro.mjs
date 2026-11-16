@@ -18,7 +18,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MACRO = path.join(ROOT, ".build", "macro.mjs");
 
 process.env.MACRO_LIB = "1";
-const { xlsxSeriesRows, hhIncomeLevels, parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane,
+const { xlsxSeriesRows, hhIncomeLevels, absPageChart, GINI, parseSdmxCsv, periodEnd, periodOrd, yoyFromLevels, printedRows, medianOf, medianCpiLane,
         parseReleaseTable1, spliceMedianLane, monthAdd, absFiltered, ausGapLane,
         OECD_MEMBERS, MEMBER_NAMES, MED_MIN, targetOf, medianGapFor, spliceGapLane, DEV_MIN,
         MED_HANDOFF, MED_AGG_DRIFT, HANDOFF_DRIFT, MIN_ROWS, BAND, STALE_DAYS } = await import("./macro.mjs");
@@ -257,6 +257,18 @@ assert.equal(parseReleaseTable1("no table anywhere"), null, "no Table 1 → null
   assert.equal(lv[0].TIME_PERIOD, "2026-Q1");
   assert.ok(Math.abs(+lv[0].OBS_VALUE - 1600) < 1e-9);
 }
+/* absPageChart: the ABS page's hidden chart data, found by caption and
+   column header, financial years filed at 30 June, 3dp as printed */
+{
+  const block = (cap, heads, data) => `<div class="chart-data-wrapper"><pre class="chart-caption">${cap}</pre><pre class="chart-headers">${JSON.stringify(heads).replace(/"/g, "&quot;")}</pre><pre class="chart-data">${JSON.stringify(data).replace(/"/g, "&quot;")}</pre></div>`;
+  const html = block("Gini coefficient for wealth (a)", ["", "HILDA (b)", "SIH (c)"], [["2002-03"], [[0.6289]], [[null]]])
+    + block("Gini coefficient for income (a)", ["", "HILDA (b)", "SIH (c)"], [["2002-03", "2003-04", "1999-00"], [[0.2992], [0.2896], [null]], [[null], [0.306], [0.31]]]);
+  assert.deepEqual(absPageChart(html, GINI.hilda.caption, GINI.hilda.column), [{ date: "2003-06-30", v: 0.299 }, { date: "2004-06-30", v: 0.29 }], "the income chart, not the wealth one; HILDA's 4dp at the printed 3dp");
+  assert.deepEqual(absPageChart(html, /^Gini coefficient for income\b/, /^SIH\b/), [{ date: "2004-06-30", v: 0.306 }, { date: "2000-06-30", v: 0.31 }], "nulls skipped; 1999-00 ends in 2000");
+  assert.throws(() => absPageChart(html, /^Graph \d+\. Gini/, /^Gini coefficient$/), /no chart captioned/);
+  assert.throws(() => absPageChart(html, GINI.hilda.caption, /^Nope$/), /no column/);
+  assert.throws(() => absPageChart(block("Gini coefficient for income", ["", "HILDA"], [["2002"], [[0.3]]]), GINI.hilda.caption, GINI.hilda.column), /not a financial year/);
+}
 console.log("1. pure helpers: OK");
 
 /* ------------------------------------------------------- 2. full pipeline */
@@ -372,6 +384,14 @@ const oecdGdppcCsv = (n) => [
   ...Array.from({ length: n }, (_, i) => `OECD.SDD.NAD:DSD_HHDASH@DF_HHDASH_INDIC(1.1),Q,OECD,B1GQ_R_POP,IX,${qIso(2007 + Math.floor(i / 4), (i % 4) + 1)},${(100 * Math.pow(1.004, i)).toFixed(2)},Y,S1,B,B1GQ_POP,_Z,LR,IX,2020,2007-Q1,F,2,A,0`),
 ].join("\n") + "\n";
 
+/* the ABS pages' hidden chart block: n financial years from y0–(y0+1),
+   one column of values per extra header */
+const giniPage = (cap, heads, y0, n, ...cols) => {
+  const cats = Array.from({ length: n }, (_, i) => `${y0 + i}-${String((y0 + i + 1) % 100).padStart(2, "0")}`);
+  const data = [cats, ...cols.map((f) => cats.map((_, i) => f(i)))];
+  const q = (x) => JSON.stringify(x).replace(/"/g, "&quot;");
+  return `<html><body><div class="chart-data-wrapper" style="display:none;"><pre class="chart-caption">${cap}</pre><pre class="chart-headers">${q(heads)}</pre><pre class="chart-data">${q(data)}</pre></div></body></html>`;
+};
 const CPI_MONTHLY = [4.3, 4.4, 4.5, 4.5, 4.6, 4.6, 4.6, 4.5, 4.6];  // drift 0–0.1 vs the 4.5 quarterly line
 const OECD_CPI = Array.from({ length: 68 }, (_, i) => Math.round((1.5 + i * 0.05) * 10) / 10);
 
@@ -386,6 +406,8 @@ const writeFixtures = (dir, { cpiMonthly = CPI_MONTHLY, oecdCpi = OECD_CPI } = {
   fs.writeFileSync(path.join(dir, "abs-unemp.csv"), absUnempCsv);
   fs.writeFileSync(path.join(dir, "oecd-cpi.csv"), oecdCpiMerged(oecdCpi));
   fs.writeFileSync(path.join(dir, "oecd-gdppc.csv"), oecdGdppcCsv(77));
+  fs.writeFileSync(path.join(dir, "abs-mwm-gini.html"), giniPage("Gini coefficient for income (a)", ["", "HILDA (b)", "SIH (c)"], 2002, 21, (i) => [0.30 + i / 1000], () => [null]));
+  fs.writeFileSync(path.join(dir, "abs-sih-gini.html"), giniPage("Graph 3. Gini coefficient of equivalised disposable household income, 1994–95 to 2019–20", ["", "Gini coefficient"], 1994, 16, (i) => [0.32]));
 };
 writeFixtures(FIX);
 
@@ -409,6 +431,10 @@ assert.equal(st.rows.oecdCpi, 68);
 assert.equal(st.rows.oecdCpiMed, 840, "846 grid months minus the 2026 months the splice hands to the store era");
 assert.equal(st.rows.oecdCpiGap, 316, "the gap lane runs 1999-09→2025-12 (15 with-both members at its start)");
 assert.equal(st.rows.oecdGdppc, 77 - 4);
+assert.equal(st.rows.giniHilda, 21);
+assert.equal(st.newest.giniHilda, "2023-06-30", "2022-23 files at its year's end");
+assert.equal(st.rows.giniSih, 16);
+assert.equal(st.giniPending, null);
 assert.equal(st.newest.oecdGdppc, "2026-03-31");
 assert.deepEqual(JSON.parse(fs.readFileSync(path.join(tmp, "data", "macro.json"), "utf8")).oecdGdppc.rows[0], { date: "2008-03-31", v: 1.6 }, "1.004^4 index growth is y/y 1.6");
 assert.equal(st.newest.cpi, "2026-09-30");
@@ -426,6 +452,9 @@ assert.deepEqual(doc.gdppc.rows[0], { date: "1975-03-31", v: 2.0 });
 assert.deepEqual(doc.rnndi.rows[0], { date: "1975-03-31", v: 2.4 }, "1.006^4 levels growth is RNNDI y/y 2.4");
 assert.deepEqual(doc.hhdiLevel.rows[0], { date: "1974-03-31", v: 8000 }, "$60,000m ÷ 0.5 ÷ 15m people");
 assert.deepEqual(doc.hhdi.rows[0], { date: "1975-03-31", v: Math.round((HH_R ** 4 - 1) * 1000) / 10 }, "household income y/y off the composed growth rate");
+assert.deepEqual(doc.giniHilda.rows[0], { date: "2003-06-30", v: 0.3 });
+assert.deepEqual(doc.giniHilda.rows.at(-1), { date: "2023-06-30", v: 0.32 });
+assert.deepEqual(doc.giniSih.rows[0], { date: "1995-06-30", v: 0.32 });
 assert.deepEqual(doc.unemp.rows[0], { date: "1978-02-28", v: 4.4 }, "8-decimal source reads round to the published 4.4");
 assert.deepEqual(doc.unemp.rows.at(-1), { date: "2026-09-30", v: 4.4 });
 assert.equal(doc.cpiMonthly.rows.at(-1).v, 4.6);
@@ -534,7 +563,7 @@ console.log("2. full pipeline: OK");
 
 /* --------------------------------------- 3. the committed data/macro.json */
 const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "macro.json"), "utf8"));
-const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel"];
+const KEYS = ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "hhdi", "hhdiLevel", "giniHilda", "giniSih"];
 for (const k of KEYS) {
   assert.ok(live[k], `${k} lane present`);
   const rows = live[k].rows;
@@ -562,6 +591,9 @@ assert.ok(live.oecdCpiMed.rows[0].date <= "1975-01-01", "OECD member median reac
 assert.ok(live.oecdCpiGap.rows[0].date <= "1999-03-31", "the target-deviation lane opens 1999");
 assert.equal(live.g20Cpi, undefined, "the G20 lane is gone from the file");
 assert.ok(live.oecdGdppc.rows[0].date <= "2008-03-31", "OECD GDP per person opens with its index's first year-on-year, 2008");
+assert.ok(live.giniHilda.rows[0].date <= "2003-06-30", "HILDA's Gini opens with 2002-03");
+assert.ok(live.giniSih.rows[0].date <= "1995-06-30", "the ABS income survey's Gini opens with 1994-95");
+assert.ok(live.giniSih.rows.every((r) => r.v > live.giniHilda.rows.find((h) => h.date === r.date)?.v - 0.005 || !live.giniHilda.rows.some((h) => h.date === r.date)), "the ABS survey runs at or above HILDA in shared years (why they stay two lines)");
 assert.equal(live.oecdGdp, undefined, "the total-GDP lane gave way to per person (2026-11-16)");
 assert.ok(live.cpiMonthly.rows[0].date >= "2024-01-01", "the printed monthly CPI lane is the complete-monthly era");
 assert.ok(live.ausGap.rows[0].date <= "1996-12-31", "Australia's deviation lane opens at the band's 1996 adoption");

@@ -7413,13 +7413,15 @@ const confDeep = (() => {
    chart's "Actual" switch), and the OECD comparators
    (oecdCpi printed aggregate; oecdGdppc off the OECD's printed
    per-capita GDP index; oecdCpiMed and oecdCpiGap the extractor's
-   member-country medians). The view reads the raw {date, v} rows and
+   member-country medians), and giniHilda/giniSih the income Gini
+   coefficient from the HILDA survey and the ABS's income survey (read
+   off the ABS's pages). The view reads the raw {date, v} rows and
    splices the quarterly CPI history onto the printed monthly era
    render-side. */
 const macro = (() => {
   if (!MACRO_FILE) return null;
   const out = {};
-  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel"]) {
+  for (const k of ["cpi", "cpiMonthly", "ausGap", "gdppc", "rnndi", "unemp", "oecdCpi", "oecdCpiMed", "oecdCpiGap", "oecdGdppc", "gdppcLevel", "rnndiLevel", "hhdi", "hhdiLevel", "giniHilda", "giniSih"]) {
     const lane = MACRO_FILE[k];
     if (lane && Array.isArray(lane.rows) && lane.rows.length)
       out[k] = { label: lane.label, basis: lane.basis, rows: lane.rows.map((r) => ({ date: r.date, v: r.v })) };
