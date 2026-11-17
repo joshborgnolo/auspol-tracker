@@ -1980,6 +1980,81 @@
     "ind": 5,
     "oth": 5
    }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-11-17",
+   "dateStart": "2026-11-10",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13",
+   "onp": 26,
+   "source": "https://e.infogram.com/_/IxLtdVUD1MQnMnZN8PTr",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 62,
+     "lnp": 10,
+     "onp": 11,
+     "grn": 8,
+     "community-strong-australia": 1,
+     "ind": 5,
+     "oth": 3
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 56,
+     "onp": 35,
+     "grn": 2,
+     "community-strong-australia": 0,
+     "ind": 1,
+     "oth": 1
+    },
+    "grn": {
+     "alp": 6,
+     "lnp": 3,
+     "onp": 2,
+     "grn": 82,
+     "community-strong-australia": 3,
+     "ind": 2,
+     "oth": 2
+    },
+    "onp": {
+     "alp": 1,
+     "lnp": 2,
+     "onp": 92,
+     "grn": 0,
+     "community-strong-australia": 0,
+     "ind": 2,
+     "oth": 3
+    },
+    "ind": {
+     "alp": 11,
+     "lnp": 9,
+     "onp": 9,
+     "grn": 11,
+     "community-strong-australia": 3,
+     "ind": 53,
+     "oth": 4
+    },
+    "oth": {
+     "alp": 6,
+     "lnp": 1,
+     "onp": 41,
+     "grn": 0,
+     "community-strong-australia": 1,
+     "ind": 3,
+     "oth": 48
+    }
+   },
+   "total": {
+    "alp": 24,
+    "lnp": 22,
+    "onp": 26,
+    "grn": 15,
+    "community-strong-australia": 1,
+    "ind": 6,
+    "oth": 6
+   }
   }
  ],
  "skipped": [
