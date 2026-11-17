@@ -4,7 +4,9 @@
    sized on observed drift, the Coalition's Labor-v-One Nation offset set from its own counts); v2.2
    the same night (seat terms fitted on every election 1996-2025 - sitting members, defections, reversion
    of each seat's 2025 surprise - and the seat noise and its multiplier tested on 2001-2025, swing-fit.mjs,
-   calibrate-swing.mjs, backtest-long.mjs).
+   calibrate-swing.mjs, backtest-long.mjs); v2.3, 2026-11-16 (who sits now, from the candidate set's record of
+   by-elections, defections and retirements; independents drawn from the record, independents.mjs; what an
+   independent takes of preferences by who else is left, seat-inputs.mjs certifiedShares).
    Design and evidence: .build/analysis/seat-model-design-review.md, sections 12-14.
 
    The model itself lives in pure modules the /model/ page runs too (one implementation):
@@ -31,7 +33,7 @@ import { headline } from "../../model/views.mjs";
 
 const MODE = process.env.AUSPOL_SIM_MODE || (process.env.AUSPOL_SIM_NULL === "1" ? "replay" : "nowcast");
 const DRAWS = +(process.env.AUSPOL_SIM_DRAWS || 20000);
-const SEED = 20261101;
+const SEED = 20261101, ENGINE = "v2.3";
 const OUT_PATH = process.env.AUSPOL_SIM_OUT || (MODE === "replay" ? join(tmpdir(), "auspol-sim-replay.json") : MODE === "forecast" ? "data/seat-model-2028-forecast.json" : "data/seat-model-2028-nowcast.json");
 const HISTORY_PATH = "data/seat-model-2028-history.jsonl";
 const J = (f) => JSON.parse(readFileSync(f, "utf8"));
@@ -70,21 +72,28 @@ if (MODE === "replay") {
   process.exit(0);
 }
 
-const S = modelSettings({ VOTE, CAL, FCAL, DRIFT, mode: MODE });
+const S = modelSettings({ VOTE, CAL, FCAL, DRIFT, mode: MODE, IND: inputs.ind });
 const res = runMany(seats, S, { draws: DRAWS, seed: SEED });
 const central = projectOnce(seats, S);
 const INPUTS = ["data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json", "data/census-2021-divisions-2025.json", "data/senate-rankings-2025.json",
   "data/seat-model-flow-calibration.json", "data/seat-model-calibration.json", "data/seat-model-backtest-states.json", "data/vote-switching.json", "map/data/res-2025.json",
-  "data/house-incumbency.json", "map/data/res-2022.json",
+  "data/house-incumbency.json", "map/data/res-2022.json", "data/seat-model-independents.json",
+  ".build/analysis/seat-model/independents.mjs",
   ".build/analysis/seat-model/seat-engine.mjs", ".build/analysis/seat-model/senate-flows.mjs", ".build/analysis/seat-model/seat-build.mjs", ".build/analysis/seat-model/model-sim.mjs", ".build/analysis/seat-model/seat-inputs.mjs",
   ".build/analysis/seat-model/swing-fit.mjs", ".build/newtracker/flows.mjs"];
 const out = {
-  _about: `2028 seat model v2.2 (.build/analysis/seat-model/swing-simulate.mjs), mode ${MODE}: ${DRAWS.toLocaleString()} simulated elections. Logit swing from 2025 with seat terms fitted on 1996-2025 (sitting members, defections, reversion of each seat's 2025 surprise); preferences replayed on each division's 2025 Senate rankings (House-calibrated; the Coalition's Labor-v-One Nation and One Nation's Labor-v-Coalition levels set to the site's flow tables); fitted polling, state, seat-type, education, seat and flow errors. ${MODE === "forecast" ? "Election-day forecast ~17 months out: 13-20-month polling error and a minor-party fade of 0-60% of the logit surge since 2025." : "Nowcast: an election held now, final-month polling error, no fade."} HARD LIMITS: the 2025 candidate field is assumed (W6); independents' votes carry over with noise; how-to-vote decisions are not modelled beyond the 2025 Senate-to-House offsets (a Coalition card putting Labor above One Nation would move many seats); intervals are floor, not ceiling.`,
-  _provenance: { generated: new Date().toISOString().slice(0, 10), engine: "v2.2", inputs: Object.fromEntries(INPUTS.map((f) => [f, sha16(f)])) },
+  _about: `2028 seat model ${ENGINE} (.build/analysis/seat-model/swing-simulate.mjs), mode ${MODE}: ${DRAWS.toLocaleString()} simulated elections. Logit swing from 2025 with seat terms fitted on 1996-2025 (sitting members - who sits now, by-elections, defections and retirements since 2025 included - and reversion of each seat's 2025 surprise); independents drawn from the record (a sitting independent on sitting independents' own drift and spread; one challenge in every seat a party holds, its share drawn from what happened next in seats whose independent had polled about the same at the last three elections); preferences replayed on each division's 2025 Senate rankings (House-calibrated; the Coalition's Labor-v-One Nation and One Nation's Labor-v-Coalition levels set to the site's flow tables), an independent's take of them by who else is left in the count; fitted polling, state, seat-type, education, seat and flow errors. ${MODE === "forecast" ? "Election-day forecast ~17 months out: 13-20-month polling error and a minor-party fade of 0-60% of the logit surge since 2025." : "Nowcast: an election held now, final-month polling error, no fade."} HARD LIMITS: no one is nominated - the parties' 2025 field is assumed and no independent challenger is a named person; the 2025 boundaries are used (Tasmania, South Australia and the ACT have since been redrawn); how-to-vote decisions are not modelled beyond the 2025 Senate-to-House offsets (a Coalition card putting Labor above One Nation would move many seats); intervals are floor, not ceiling.`,
+  _provenance: { generated: new Date().toISOString().slice(0, 10), engine: ENGINE, inputs: Object.fromEntries(INPUTS.map((f) => [f, sha16(f)])) },
   meta: { mode: MODE, draws: DRAWS, seed: SEED, nowcast: VOTE.national.nowcast, window: VOTE.diagnostics.recentWindow, band: S.band,
     sigmaNational: Object.fromEntries(P5.map((p, k) => [p, r4(S.sigNat[k])])), corr: S.corr, tDf: S.df,
     sigmaSeat: res.sigmaSeat, sigmaSeatMultiplier: S.sigMult, kFall: S.kFall, sigmaMember: S.sigMember, sigmaStateResid: S.sigStateResid, sigmaClass: S.sigClass, sigmaEdu: S.sigEdu,
-    flowShock: { national: S.flowNat, onAcceptability: S.flowOn, seat: S.flowSeat }, fade: S.fade, composition: inputs.comp, runtimeMs: Date.now() - t0 },
+    flowShock: { national: S.flowNat, onAcceptability: S.flowOn, seat: S.flowSeat }, fade: S.fade, composition: inputs.comp,
+    // independents: the record's window, and how the run's seats divide (sitting independents; challenges standing in for a 2025 independent of 5%+; challenges added)
+    // the count of an independent against One Nation the preference table reads (map/data/data-now.json's by-elections),
+    // recorded here rather than hashed: that file also carries the map's census lanes, which must not re-run the model;
+    // a by-election that changes hands needs the candidate overlay too (test-fed-model.mjs), which is hashed
+    independents: inputs.ind ? { vsOneNation: inputs.vsOn, window: inputs.ind.years, sitting: seats.filter((s) => s.cands.some((c) => c.free && c.slot == null)).length, standing: seats.filter((s) => s.cands.some((c) => c.slot != null && c.slot !== "_new" && c.base > 0.001)).length, challenges: seats.filter((s) => s.cands.some((c) => c.slot != null)).length } : null,
+    runtimeMs: Date.now() - t0 },
   national: { expectedSeats: res.expectedSeats, seatDistribution: res.seatDistribution, histogram: res.histogram, majority: res.majority, mostSeats: res.mostSeats,
     finalPairs: res.finalPairs, twoPartyClassic: res.twoPartyClassic, nationalVote: res.nationalVote, central: central.seats },
   seats: res.seats.map((s, i) => ({ ...s, central: { w: central.perSeat[i].w, pair: central.perSeat[i].pair, share: central.perSeat[i].share } })),
@@ -93,7 +102,7 @@ const out = {
 out.national.headline = headline(out, MODE);
 writeFileSync(OUT_PATH, JSON.stringify(out) + "\n");
 if (MODE === "nowcast" && !process.env.AUSPOL_SIM_OUT) {
-  const rec = { date: VOTE.diagnostics.recentWindow.to, engine: "v2.2", expectedSeats: res.expectedSeats, majority: res.majority,
+  const rec = { date: VOTE.diagnostics.recentWindow.to, engine: ENGINE, expectedSeats: res.expectedSeats, majority: res.majority,
     seats: Object.fromEntries(res.seats.map((s) => { const top = Object.entries(s.win)[0]; return [s.name, [top[0], top[1]]]; })) };
   const existing = existsSync(HISTORY_PATH) ? readFileSync(HISTORY_PATH, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
   const same = existing.findIndex((r) => r.date === rec.date);
@@ -101,7 +110,7 @@ if (MODE === "nowcast" && !process.env.AUSPOL_SIM_OUT) {
   else appendFileSync(HISTORY_PATH, JSON.stringify(rec) + "\n");
 }
 const e = res.expectedSeats, d = res.seatDistribution, m = res.majority;
-console.log(`seat model v2.2, ${MODE} — ${DRAWS.toLocaleString()} draws (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
+console.log(`seat model ${ENGINE}, ${MODE} — ${DRAWS.toLocaleString()} draws (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
 console.log("expected seats: " + KEYS.map((k) => `${k} ${e[k]} [${d[k].p05}-${d[k].p95}]`).join("  "));
 console.log(`majority: ALP ${(100 * m.alp).toFixed(1)}% · Coalition ${(100 * m.coalition).toFixed(1)}% · ON ${(100 * m.on).toFixed(1)}% · none ${(100 * m.noMajority).toFixed(1)}%`);
 console.log("most seats: " + KEYS.map((k) => `${k} ${(100 * res.mostSeats[k]).toFixed(1)}%`).join(" · "));

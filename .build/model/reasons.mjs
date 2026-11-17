@@ -14,6 +14,8 @@
      demo                 the seat's age and gender mix (the vote layer's differentials)
      terms                seat terms: sitting member, defection, part of 2025's surprise going back
                           (Victoria: a sitting member standing again, a member gone from a party's ticket)
+     ind                  independents' own record (federal): a sitting independent's drift since 2025, and the
+                          central level of the seat's independent challenge against its 2025 independent's vote
      comp                 today's voters' preferences (switchers carry part of their 2025 party's; off since no voters are mixed)
 
    Plus the central count's preferences: each origin's net transfer between the two, when they meet in
@@ -28,8 +30,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { rankingsFrom } from "../analysis/seat-model/senate-flows.mjs";
 import { buildSeatsFrom } from "../analysis/seat-model/seat-build.mjs";
-import { projectOnce, bucketOf } from "../analysis/seat-model/model-sim.mjs";
-import { spreadShares, count, rng, P5 } from "../analysis/seat-model/seat-engine.mjs";
+import { projectOnce, bucketOf, freeDev } from "../analysis/seat-model/model-sim.mjs";
+import { spreadShares, count, rng, P5, OWN_SIDE } from "../analysis/seat-model/seat-engine.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 process.chdir(path.resolve(HERE, "..", ".."));
@@ -59,7 +61,10 @@ function countTrace(seat, shares) {
       let a = hold[x * n + o]; if (a <= 0) continue;
       hold[x * n + o] = 0;
       if (inds.length) {
-        const io = seat.iota[cands[o].cls] ?? seat.iota._ ?? 0;
+        const cl = cands[o].cls, X = seat.iotaX;
+        let io;
+        if (X) { const m = OWN_SIDE[cl]; io = (sibStanding ? X.sib : (m ? (S & m) !== 0 : (S & (S - 1)) !== 0) ? X.own[cl] : X.cross[cl]) ?? seat.iota[cl] ?? seat.iota._ ?? 0; }
+        else io = seat.iota[cl] ?? seat.iota._ ?? 0;
         if (io > 0) { const give = a * io; let tt = 0; for (const c of inds) tt += tally[c] || 1e-9; for (const c of inds) hold[c * n + o] += give * (tally[c] || 1e-9) / tt; a -= give; }
       }
       let Sx = S;
@@ -86,15 +91,22 @@ function reasonsFor(inputs, S, run, label) {
   const withComp = buildSeatsFrom(raw, { composition: true }), noComp = inputs.build.comp ? buildSeatsFrom(raw, { composition: false }) : withComp;
   const central = projectOnce(withComp, S);
   const now = central.targets, was = S.nat25;
-  const FACT = ["alp", "lnp", "on", "grn", "oth", "state", "demo", "terms", ...(inputs.build.comp ? ["comp"] : [])];
-  const NF = FACT.length, SHARE_F = 8; // the first eight move the shares; comp moves only the count
+  // independents drawn from the record (federal): their own factor, off = each at its 2025 vote (a challenge
+  // added to the field: not standing)
+  const hasFree = withComp.some((s) => s.cands.some((c) => c.free));
+  const FACT = ["alp", "lnp", "on", "grn", "oth", "state", "demo", "terms", ...(hasFree ? ["ind"] : []), ...(inputs.build.comp ? ["comp"] : [])];
+  const NF = FACT.length, SHARE_F = hasFree ? 9 : 8, IND_BIT = hasFree ? 8 : -1; // the first eight (nine) move the shares; comp moves only the count
   const sharesCache = new Map();
   const sharesFor = (mask) => {
-    const m = mask & 0xff; if (sharesCache.has(m)) return sharesCache.get(m);
+    const m = mask & ((1 << SHARE_F) - 1); if (sharesCache.has(m)) return sharesCache.get(m);
     const t = P5.map((p, k) => ((m >> k) & 1 ? now[k] : was[k])), tt = t.reduce((a, b) => a + b, 0), targets = t.map((x) => x / tt);
     const toLogit = (pp, k) => pp / (100 * targets[k] * (1 - targets[k]));
     const st = {}; for (const [s, d] of Object.entries(S.states)) st[s] = P5.map((p, k) => toLogit(d.dev[k], k));
-    const dev = (i, j) => { const s = withComp[i], c = s.cands[j], k = c.p5; return ((m >> 7) & 1 ? c.adj || 0 : 0) + ((m >> 5) & 1 ? st[s.st]?.[k] ?? 0 : 0) + ((m >> 6) & 1 ? toLogit(s.demoPP?.[k] ?? 0, k) : 0); };
+    const dev = (i, j) => {
+      const s = withComp[i], c = s.cands[j], k = c.p5;
+      if (c.free) return (m >> IND_BIT) & 1 ? freeDev(c, S, null, -1) : c.base > 0.001 ? 0 : -Infinity;
+      return ((m >> 7) & 1 ? c.adj || 0 : 0) + ((m >> 5) & 1 ? st[s.st]?.[k] ?? 0 : 0) + ((m >> 6) & 1 ? toLogit(s.demoPP?.[k] ?? 0, k) : 0);
+    };
     const sh = spreadShares(withComp, targets, dev, rng(1));
     sharesCache.set(m, sh); return sh;
   };
@@ -159,10 +171,11 @@ function holderOf(s) {
 }
 
 const fed = J("model/data/inputs.json"), vic = J("model/data/inputs-vic.json");
+const withInd = (S) => (fed.build.ind ? { ...S, ind: fed.build.ind } : S);   // the independents' tables ride once in build.ind
 const out = {
   _about: "Why each changing-hands seat changes hands (.build/model/reasons.mjs): Shapley split of the central projection's winner-v-holder margin (points) over the inputs, from the 2025 (Victoria: 2022) count to now.",
-  nowcast: reasonsFor(fed, fed.settings.nowcast, J("data/seat-model-2028-nowcast.json"), "nowcast"),
-  forecast: reasonsFor(fed, { ...fed.settings.forecast, fade: fed.settings.forecast.fade }, J("data/seat-model-2028-forecast.json"), "forecast"),
+  nowcast: reasonsFor(fed, withInd(fed.settings.nowcast), J("data/seat-model-2028-nowcast.json"), "nowcast"),
+  forecast: reasonsFor(fed, withInd({ ...fed.settings.forecast, fade: fed.settings.forecast.fade }), J("data/seat-model-2028-forecast.json"), "forecast"),
   vic: reasonsFor(vic, { ...vic.settings.vic, fade: null }, J("data/seat-model-vic-2026.json"), "vic"),
 };
 fs.writeFileSync("model/data/reasons.json", JSON.stringify(out));

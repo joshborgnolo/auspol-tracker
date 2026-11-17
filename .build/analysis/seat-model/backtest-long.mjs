@@ -17,13 +17,28 @@
                 "senate" (2019-2025 only): P's Senate ballots, as backtest-chain.mjs and the 2028 run
    Variants (pass AUSPOL_BL_VARIANTS=a,b,...): v21 = the model before this review (no seat terms, noise from
    the plain residuals x1.3); terms = with the seat terms; terms-m<k> = noise multiplier k; terms-t<df>.
-   Writes data/seat-model-backtest-long.json (AUSPOL_BL_NOWRITE=1 to skip). */
+   Independents (the variants above are told E's whole field, independents included, which no forecast has):
+     terms-ind28   independents as the 2028 run stood before independents.mjs: sitting independents ride the
+                   national "others" swing, P's losing independents stand again as minor candidates, no one new
+     terms-indrec  independents drawn from the record as it stood before E (independents.mjs): sitting
+                   independents on their own drift and spread, one challenge per party-held seat drawn from the
+                   window's elections. -w<n> = window of n elections (-wall: every election before E);
+                   -h<x> = kernel width; -d0 = no drift for sitting independents; -flat = the independent's
+                   take of preferences as one share per class (as terms-ind28 and every earlier variant count)
+   For both, the national vote given is each party's actual share of the votes not cast for the independents
+   the variant cannot see (E's independents who were not sitting members), so nothing is inflated to hold them.
+   Writes data/seat-model-backtest-long.json (AUSPOL_BL_NOWRITE=1 to skip; AUSPOL_BL_MERGE=1 re-runs the variants
+   named and keeps the stored others). AUSPOL_BL_DUMP=1 prints a line per seat: election, variant, seat, actual
+   winner, its probability, the seat's Brier score, whether a sitting independent stood, the chance given to an
+   independent. */
 import { readFileSync, writeFileSync } from "node:fs";
 import { rng, spreadShares, count, FLOW_CLASSES } from "./seat-engine.mjs";
 import { cohortTable, stateTable, pairShare, tiltPair, routing, cohortKeyFor, FAM_OF_GROUP, FAM } from "./senate-flows.mjs";
 import { loadRankings } from "./senate-io.mjs";
-import { calibratedTable, houseHistory, flowClassOf, P5_OF, settings } from "./seat-inputs.mjs";
+import { calibratedTable, houseHistory, flowClassOf, P5_OF, settings, certifiedShares, vsOneNation } from "./seat-inputs.mjs";
 import { loadHistory, historyRows, fitTerms, stage1Residuals, termsFor, rmsOf, LONG_YEARS, PREV_OF } from "./swing-fit.mjs";
+import { freeDev } from "./model-sim.mjs";
+import { IND_K, sittingFit, slotTables, windowYears } from "./independents.mjs";
 
 const DRAWS = +(process.env.AUSPOL_BL_DRAWS || 2000);
 const TESTS = (process.env.AUSPOL_BL_TESTS || "2001,2004,2007,2010,2013,2016,2019,2022,2025").split(",").map(Number);
@@ -37,6 +52,10 @@ const sum = (a) => a.reduce((s, x) => s + x, 0);
 const CAL = J("data/seat-model-calibration.json");
 const H = loadHistory(), RES = H.RES, INC = H.INC;
 const ROWS = historyRows(H);
+const INDREC = J("data/seat-model-independents.json");
+// what an independent takes of a pile by who else is left (seat-inputs.mjs certifiedShares: the 2025 count and
+// the one count of an independent against One Nation) - the terms-indrec variants count with it, as the 2028 run does
+const CAPX = (() => { const x = certifiedShares(J("data/aec-2025-seat-flows.json"), vsOneNation(J("map/data/data-now.json"))).capX; return { own: x.own, cross: x.cross, sib: x.sib }; })();
 const SEN16 = loadRankings(2016);
 const SENY = {}; const sen = (y) => (SENY[y] = SENY[y] || loadRankings(y));
 
@@ -114,8 +133,19 @@ function senateSettings(E) {
   return settings(FCAL); // full-sample settings: the senate-mode tests here are for comparison only (backtest-chain.mjs fits them out of sample)
 }
 
+/* ---- independents as known before E (terms-ind28, terms-indrec) ---- */
+function indSetup(E, variant) {
+  if (!/-ind(28|rec)/.test(variant)) return null;
+  const rec = /-indrec/.test(variant);
+  const wm = variant.match(/-w(\d+|all)/), hm = variant.match(/-h([\d.]+)/);
+  const K = { ...IND_K, ...(hm ? { h: +hm[1] } : {}) };
+  const years = windowYears(INDREC.elections, E, wm ? (wm[1] === "all" ? 99 : +wm[1]) : IND_K.window);
+  const fit = sittingFit(INDREC.sitting.filter((r) => r.E < E).map((r) => r.d));
+  return { rec, K, years, flat: /-flat/.test(variant), trans: INDREC.transitions.filter((r) => r.E < E), sitting: { drift: /-d0/.test(variant) || fit.n < 3 ? 0 : fit.drift, sig: fit.n < 3 ? 0.3 : fit.sig } };
+}
+
 /* ---- seats at E ---- */
-function seatsFor(E, mode, terms, s1P) {
+function seatsFor(E, mode, terms, s1P, IND = null) {
   const P = PREV_OF[E];
   let Rs, ST, hist;
   if (mode === "senate") { Rs = sen(P); ST = senateSettings(E); hist = houseHistory(RES[P], Rs); }
@@ -135,14 +165,35 @@ function seatsFor(E, mode, terms, s1P) {
       const prevE = dp ? s1P.get(P + "|" + dv.n + "|" + rb) ?? 0 : 0;
       adjOf[b] = t.incE * tt.incE + t.incP * tt.incP + t.defect * tt.defect + t.rho * prevE;
     }
-    const cands = dv.c.map((c) => {
+    const sitE = INC[E][dv.n]?.sit || [];
+    let cands = dv.c.map((c, ci) => {
       const g = GROUP(c), b = BUCKET(g), sh = c[4] / tot;
       let base = byB[b].base > 0.002 ? byB[b].base * sh / byB[b].share : 0;
       if (base <= 0.002 && b === "on") { const sd = mode === "senate" ? Rs.div[dv.n] : null; base = sd?.t.ON ? kON * sum(sd.t.ON) / sd.n : 0.02; }
       if (base <= 0.002) base = b === "ind" ? 0.01 : 0.004;
       const key = keyOf(c), cls = flowClassOf(key);
-      return { label: c[0], group: g, p5: P5_OF(g.startsWith("member") ? "oth" : g), fam: FAM_OF_GROUP[g] ?? -1, isInd: g.startsWith("member"), base, adj: adjOf[b] || 0, key, cls, clsIdx: FLOW_CLASSES.indexOf(cls) };
+      return { label: c[0], group: g, p5: P5_OF(g.startsWith("member") ? "oth" : g), fam: FAM_OF_GROUP[g] ?? -1, isInd: g.startsWith("member"), base, adj: adjOf[b] || 0, key, cls, clsIdx: FLOW_CLASSES.indexOf(cls), sitInd: b === "ind" && sitE[ci] === 1, ci };
     });
+    if (IND) {
+      /* what a forecast made before E knows of the independents: who sits, and how P's independents polled */
+      const totP = dp ? sum(dp.c.map((c) => c[4])) : 0, indP = dp ? dp.c.filter((c) => c[3] === "ind" && c[6] !== 1).map((c) => ({ name: c[0], sh: c[4] / totP })).sort((a, b) => b.sh - a.sh) : [];
+      const minor = (o) => ({ label: o.name, group: "oth", p5: 4, fam: -1, isInd: false, base: Math.max(o.sh, 0.004), adj: 0, key: "OTH-M", cls: "OTH-M", clsIdx: FLOW_CLASSES.indexOf("OTH-M") });
+      const sitting = cands.filter((c) => c.sitInd);
+      for (const c of sitting) {   // a sitting independent's own previous share
+        const src = dv.c[c.ci], own = src[5] != null ? src[4] / tot - src[5] / 100 : null;
+        const was = dp ? dp.c.find((x) => x[3] === "ind" && x[0] === src[0]) : null;
+        c.base = own != null && own > 0.005 ? own : was ? was[4] / totP : c.base;
+        if (IND.rec) c.free = { drift: IND.sitting.drift, sig: IND.sitting.sig };
+      }
+      cands = cands.filter((c) => !c.isInd || c.sitInd);
+      const carried = indP.filter((o) => !sitting.some((c) => c.label === o.name));
+      if (!IND.rec) cands.push(...carried.map(minor));
+      else if (!sitting.length) {
+        const tp = carried.length ? carried[0].sh : 0;
+        cands.push(...carried.slice(tp >= IND.K.replace ? 1 : 0).map(minor));
+        cands.push({ label: "independent challenge", group: "member:challenge", p5: 4, fam: -1, isInd: true, free: true, slotTp: tp, base: Math.max(tp, 1e-4), adj: 0, key: "OTH-M", cls: "OTH-M", clsIdx: FLOW_CLASSES.indexOf("OTH-M") });
+      } else cands.push(...carried.map(minor));
+    }
     const tables = {};
     for (const c of cands) { const p = (tables[c.key] = tables[c.key] || calibratedTable(Rs, ST, { st: dv.st }, dv.n, c.key, hist)); c.route = routing(Rs, p); }
     const w = dv.c.find((c) => c[6] === 1);
@@ -150,10 +201,17 @@ function seatsFor(E, mode, terms, s1P) {
     const ws = dv.tcp ? dv.tcp.find((t) => dv.c[t[0]] === w) : null;
     seats.push({ name: dv.n, st: dv.st, cls: dv.cls || "Outer Metropolitan", w: tot, uni: dv.demo?.uni ?? null, cands,
       iota: { ALP: 0.73, COAL: 0.73, GRN: 0.49, ON: 0.28, "OTH-R": 0.23, "OTH-M": 0.23, "OTH-L": 0.23, _: 0.23 }, sib: 0.72,
+      ...(IND?.rec && !IND.flat ? { iotaX: CAPX } : {}),
       actual: { w: BUCKET(GROUP(w)), pair: pairB, share: ws ? ws[1] / (dv.tcp[0][1] + dv.tcp[1][1]) : null } });
   }
   const us = seats.map((s) => s.uni).filter((v) => v != null), mu = us.length ? sum(us) / us.length : 0, sd = us.length ? Math.sqrt(sum(us.map((u) => (u - mu) ** 2)) / us.length) : 1;
   for (const s of seats) s.z = s.uni == null ? 0 : (s.uni - mu) / sd;
+  if (IND?.rec) {
+    const slots = seats.flatMap((s) => s.cands.filter((c) => c.slotTp != null).map((c) => ({ name: s.name, tp: c.slotTp, c })));
+    const T = slotTables(IND.trans, IND.years, slots, IND.K);
+    for (const x of slots) x.c.slot = T.idOf[x.name];
+    seats.ind = { years: T.years, tables: T.tables };
+  }
   return seats;
 }
 
@@ -186,12 +244,18 @@ function run(E, mode, variant, stateOracle) {
   const tdf = /-t(\d+)/.test(variant) ? +variant.match(/-t(\d+)/)[1] : 5;
   // inc = sitting-member terms only; rho = reversion only; terms = both
   const T = useTerms ? Object.fromEntries(Object.entries(K.terms).map(([b, t]) => [b, variant.startsWith("inc") ? { ...t, rho: 0 } : variant.startsWith("rho") ? { incE: 0, incP: 0, defect: 0, rho: t.rho } : t])) : null;
-  const seats = seatsFor(E, mode, T, K.s1);
+  const IND = indSetup(E, variant);
+  const seats = seatsFor(E, mode, T, K.s1, IND);
+  const SI = { ind: seats.ind || null, df: tdf, seatNoiseMult: 1 };
   if (!useTerms) for (const s of seats) for (const c of s.cands) c.adj = 0;
   const SIG = useTerms ? K.sigTerms : K.sigPlain;
   const D = RES[E];
   const shareP5 = (divs) => { const v = [0, 0, 0, 0, 0]; let t = 0; for (const dv of divs) for (const c of dv.c) { const g = GROUP(c); v[P5_OF(g.startsWith("member") ? "oth" : g)] += c[4]; t += c[4]; } return v.map((x) => x / t); };
   const natT = shareP5(D.divs);
+  // the actual vote split for the fair oracle: the four parties, minor parties, sitting independents, other independents
+  const WT = sum(seats.map((s) => s.w));
+  const ACT = (() => { const p = [0, 0, 0, 0], o = { minor: 0, indSit: 0, indNew: 0 }; let t = 0; for (const dv of D.divs) { const sit = INC[E][dv.n]?.sit || []; dv.c.forEach((c, i) => { t += c[4]; const g = GROUP(c); if (g.startsWith("member")) o[sit[i] === 1 ? "indSit" : "indNew"] += c[4]; else { const k = P5_OF(g); if (k < 4) p[k] += c[4]; else o.minor += c[4]; } }); } return { p: p.map((x) => x / t), minor: o.minor / t, indSit: o.indSit / t, indNew: o.indNew / t }; })();
+  if (IND && stateOracle) throw new Error("the independents variants run on the national oracle only");
   const groups = stateOracle ? [...new Set(seats.map((s) => s.st))].map((st) => ({ idx: seats.map((s, i) => (s.st === st ? i : -1)).filter((i) => i >= 0), targets: shareP5(D.divs.filter((d) => d.st === st)) })) : null;
   const stateSD = CAL.swing.stateDev;
   const classSD = [0.04, 0.05, 0.07, 0.045, 0.06];
@@ -202,8 +266,18 @@ function run(E, mode, variant, stateOracle) {
     const stShift = {}; for (const st of new Set(seats.map((s) => s.st))) stShift[st] = det || stateOracle ? [0, 0, 0, 0, 0] : [stateSD.alp, stateSD.lnp, stateSD.onp, stateSD.grn, 0.15].map((s) => R.norm() * s);
     const cl = {}; for (const c of ["Inner Metropolitan", "Outer Metropolitan", "Provincial", "Rural"]) cl[c] = [0, 1, 2, 3, 4].map((k) => (det ? 0 : R.norm() * classSD[k]));
     const edu = [0, 1, 2, 3, 4].map(() => (det ? 0 : R.norm() * 0.04));
-    const dev = (i, j) => { const s = seats[i], c = s.cands[j], k = c.p5; const a = c.adj || 0; if (det) return a; return a + stShift[s.st][k] + (cl[s.cls]?.[k] ?? 0) + edu[k] * s.z + R.t(tdf) * (c.isInd ? 0.3 : SIG[k]) * mult; };
-    const sh = spreadShares(seats, natT, dev, R, groups);
+    const era = SI.ind && !det ? Math.min(SI.ind.years.length - 1, Math.floor(R.u01() * SI.ind.years.length)) : -1;
+    /* the independents' own draws first: the parties' targets are their actual shares of what the modelled
+       independents leave (the fair oracle: E's unseen independents are in nobody's target) */
+    let targets = natT, fd = null;
+    if (IND) {
+      let F = 0; fd = seats.map(() => null);
+      seats.forEach((s, i) => s.cands.forEach((c, j) => { if (!c.free) return; const v = ((fd[i] = fd[i] || [])[j] = freeDev(c, SI, det ? null : R, era)); const p = ilogit(logit(Math.max(c.base, 1e-4)) + v); if (p > 0) F += s.w * p / WT; }));
+      const X = IND.rec ? F : ACT.indSit, t5 = [ACT.p[0], ACT.p[1], ACT.p[2], ACT.p[3], ACT.minor + X], tt = sum(t5);
+      targets = t5.map((x) => x / tt);
+    }
+    const dev = (i, j) => { const s = seats[i], c = s.cands[j], k = c.p5; if (c.free) return fd[i][j]; const a = c.adj || 0; if (det) return a; return a + stShift[s.st][k] + (cl[s.cls]?.[k] ?? 0) + edu[k] * s.z + R.t(tdf) * (c.isInd ? 0.3 : SIG[k]) * mult; };
+    const sh = spreadShares(seats, targets, dev, R, groups);
     let shock = null;
     if (!det) { shock = new Float64Array(FLOW_CLASSES.length * 4); FLOW_CLASSES.forEach((k, ci) => { for (let y = 0; y < 4; y++) shock[ci * 4 + y] = R.norm() * (k === "ON" ? 0.25 : 0.15) / Math.SQRT2; }); }
     const t = Object.fromEntries(BKS.map((b) => [b, 0]));
@@ -225,7 +299,7 @@ function run(E, mode, variant, stateOracle) {
     const p = Object.fromEntries(BKS.map((b) => [b, (win[i][b] || 0) / DRAWS]));
     brier += sum(BKS.map((b) => (p[b] - (b === a ? 1 : 0)) ** 2));
     logs += Math.log(Math.max(p[a], 0.5 / DRAWS));
-    if (process.env.AUSPOL_BL_DUMP) console.log(`SEAT ${E} ${variant} ${s.name} ${a} ${p[a].toFixed(4)}`);
+    if (process.env.AUSPOL_BL_DUMP) console.log(`SEAT\t${E}\t${variant}\t${s.name}\t${a}\t${p[a].toFixed(4)}\t${sum(BKS.map((b) => (p[b] - (b === a ? 1 : 0)) ** 2)).toFixed(5)}\t${s.cands.some((c) => c.sitInd) ? "sit" : "-"}\t${(p.ind || 0).toFixed(4)}`);
     if (p[a] < 0.1) upsets.push({ seat: s.name, winner: a, p: +p[a].toFixed(4) });
     if (Object.entries(p).sort((x, y) => y[1] - x[1])[0][0] === a) modal++;
     if (s.det.w === a) detOk++;

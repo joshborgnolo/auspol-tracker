@@ -1,5 +1,5 @@
 {
-  "_about": "W6 of .build/analysis/seat-model-plan.md — the 2028 candidate set the simulation layer draws around. Per seat: incumbent (+recontests), the 2028 contest set (groups booleans, coalition party mix, named independent entrants), and basis2025 — the measured 2025 contest set from the DoP — so every 2028 assumption sits next to its fact. contest.on true-but-basis2025.on false marks the ON-everywhere extension (2025: ON skipped only the three ACT seats). Produced by build-candidate-set.mjs from the HAND overlay candidate-overlay-2028.json; test-candidate-set.mjs pins the merge against the W2/W3 data.",
+  "_about": "W6 of .build/analysis/seat-model-plan.md — the 2028 candidate set the simulation layer draws around. Per seat: incumbent (who sits now, +recontests: true, false, or null where a member who changed party has not said), member2025 (who the 2025 election returned), the 2028 contest set (groups booleans, coalition party mix, named independent entrants), and basis2025 — the measured 2025 contest set from the DoP — so every 2028 assumption sits next to its fact. contest.on true-but-basis2025.on false marks the ON-everywhere extension (2025: ON skipped only the three ACT seats). Produced by build-candidate-set.mjs from the HAND overlay candidate-overlay-2028.json; test-candidate-set.mjs pins the merge against the W2/W3 data.",
   "_provenance": {
     "flows": {
       "file": "data/aec-2025-seat-flows.json",
@@ -11,9 +11,9 @@
     },
     "overlay": {
       "file": ".build/analysis/seat-model/candidate-overlay-2028.json",
-      "sha256": "cda0f0bba56b8221"
+      "sha256": "fd70f1e471c0ab7b"
     },
-    "builtAt": "2026-10-08"
+    "builtAt": "2026-11-17"
   },
   "assumptions": {
     "incumbentRecontests": true,
@@ -35,6 +35,10 @@
         "group": "alp",
         "name": "Zhi Soon",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Zhi Soon"
       },
       "contest": {
         "alp": true,
@@ -63,6 +67,10 @@
         "name": "Ash Ambihaipahar",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Ash Ambihaipahar"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -89,6 +97,10 @@
         "group": "alp",
         "name": "Jerome Laxale",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Jerome Laxale"
       },
       "contest": {
         "alp": true,
@@ -117,6 +129,10 @@
         "name": "Julian Leeser",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Julian Leeser"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -144,6 +160,10 @@
         "name": "Jason Clare",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Jason Clare"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -170,6 +190,10 @@
         "group": "member:boele",
         "name": "Nicolette Boele",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:boele",
+        "name": "Nicolette Boele"
       },
       "contest": {
         "alp": true,
@@ -204,6 +228,10 @@
         "name": "Andrew Gee",
         "recontests": true
       },
+      "member2025": {
+        "group": "member:gee",
+        "name": "Andrew Gee"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -237,6 +265,10 @@
         "name": "Ed Husic",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Ed Husic"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -263,6 +295,10 @@
         "group": "lp",
         "name": "Simon Kennedy",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Simon Kennedy"
       },
       "contest": {
         "alp": true,
@@ -291,6 +327,10 @@
         "name": "Pat Conaghan",
         "recontests": true
       },
+      "member2025": {
+        "group": "np",
+        "name": "Pat Conaghan"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -317,6 +357,10 @@
         "group": "alp",
         "name": "Alison Byrnes",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Alison Byrnes"
       },
       "contest": {
         "alp": true,
@@ -345,6 +389,10 @@
         "name": "Emma Mcbride",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Emma Mcbride"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -372,6 +420,10 @@
         "name": "Kristy Mcbain",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Kristy Mcbain"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -395,9 +447,17 @@
       "name": "Farrer",
       "state": "NSW",
       "incumbent": {
+        "group": "on",
+        "name": "David Farley",
+        "party": "One Nation",
+        "recontests": true,
+        "since": "2026-05-09",
+        "how": "by-election",
+        "note": "Sussan Ley resigned from Parliament on 27 February 2026; David Farley won the by-election of 9 May 2026 for One Nation (map/data/data-now.json holds the count)."
+      },
+      "member2025": {
         "group": "lp",
-        "name": "Sussan Ley",
-        "recontests": true
+        "name": "Sussan Ley"
       },
       "contest": {
         "alp": true,
@@ -425,6 +485,10 @@
         "group": "member:le",
         "name": "Dai Le",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:le",
+        "name": "Dai Le"
       },
       "contest": {
         "alp": true,
@@ -459,6 +523,10 @@
         "name": "Fiona Phillips",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Fiona Phillips"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -485,6 +553,10 @@
         "group": "alp",
         "name": "Anthony Albanese",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Anthony Albanese"
       },
       "contest": {
         "alp": true,
@@ -513,6 +585,10 @@
         "name": "Michelle Rowland",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Michelle Rowland"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -539,6 +615,10 @@
         "group": "alp",
         "name": "David Moncrieff",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "David Moncrieff"
       },
       "contest": {
         "alp": true,
@@ -567,6 +647,10 @@
         "name": "Angus Taylor",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Angus Taylor"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -593,6 +677,10 @@
         "group": "alp",
         "name": "Dan Repacholi",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Dan Repacholi"
       },
       "contest": {
         "alp": true,
@@ -621,6 +709,10 @@
         "name": "Matt Thistlethwaite",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Matt Thistlethwaite"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -647,6 +739,10 @@
         "group": "lp",
         "name": "Melissa Mcintosh",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Melissa Mcintosh"
       },
       "contest": {
         "alp": true,
@@ -675,6 +771,10 @@
         "name": "Alison Penfold",
         "recontests": true
       },
+      "member2025": {
+        "group": "np",
+        "name": "Alison Penfold"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -702,6 +802,10 @@
         "name": "Mike Freelander",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Mike Freelander"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -728,6 +832,10 @@
         "group": "member:scamps",
         "name": "Sophie Scamps",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:scamps",
+        "name": "Sophie Scamps"
       },
       "contest": {
         "alp": true,
@@ -762,6 +870,10 @@
         "name": "Susan Templeman",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Susan Templeman"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -788,6 +900,10 @@
         "group": "alp",
         "name": "Chris Bowen",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Chris Bowen"
       },
       "contest": {
         "alp": true,
@@ -816,6 +932,10 @@
         "name": "Alex Hawke",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Alex Hawke"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -839,9 +959,17 @@
       "name": "New England",
       "state": "NSW",
       "incumbent": {
-        "group": "np",
+        "group": "on",
         "name": "Barnaby Joyce",
-        "recontests": true
+        "party": "One Nation",
+        "recontests": null,
+        "since": "2025-12-08",
+        "how": "defection",
+        "note": "left the Nationals on 27 November 2025 and joined One Nation on 8 December 2025 (map/data/data-now.json). Joyce said in October 2025 that New England would not be recontested, and has since left that open (ABC News, 20 February 2026); recontests stays null until Joyce or One Nation says: the Nationals lose their sitting member either way, and no One Nation member is assumed on the ballot."
+      },
+      "member2025": {
+        "group": "np",
+        "name": "Barnaby Joyce"
       },
       "contest": {
         "alp": true,
@@ -870,6 +998,10 @@
         "name": "Sharon Claydon",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Sharon Claydon"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -896,6 +1028,10 @@
         "group": "np",
         "name": "Kevin Hogan",
         "recontests": true
+      },
+      "member2025": {
+        "group": "np",
+        "name": "Kevin Hogan"
       },
       "contest": {
         "alp": true,
@@ -924,6 +1060,10 @@
         "name": "Jamie Chaffey",
         "recontests": true
       },
+      "member2025": {
+        "group": "np",
+        "name": "Jamie Chaffey"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -950,6 +1090,10 @@
         "group": "alp",
         "name": "Andrew Charlton",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Andrew Charlton"
       },
       "contest": {
         "alp": true,
@@ -978,6 +1122,10 @@
         "name": "Meryl Swanson",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Meryl Swanson"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1004,6 +1152,10 @@
         "group": "alp",
         "name": "Sally Sitou",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Sally Sitou"
       },
       "contest": {
         "alp": true,
@@ -1032,6 +1184,10 @@
         "name": "Justine Elliot",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Justine Elliot"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1058,6 +1214,10 @@
         "group": "np",
         "name": "Michael Mccormack",
         "recontests": true
+      },
+      "member2025": {
+        "group": "np",
+        "name": "Michael Mccormack"
       },
       "contest": {
         "alp": true,
@@ -1086,6 +1246,10 @@
         "name": "Gordon Reid",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Gordon Reid"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1112,6 +1276,10 @@
         "group": "alp",
         "name": "Pat Conroy",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Pat Conroy"
       },
       "contest": {
         "alp": true,
@@ -1140,6 +1308,10 @@
         "name": "Tanya Plibersek",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Tanya Plibersek"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1166,6 +1338,10 @@
         "group": "member:steggall",
         "name": "Zali Steggall",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:steggall",
+        "name": "Zali Steggall"
       },
       "contest": {
         "alp": true,
@@ -1200,6 +1376,10 @@
         "name": "Tony Burke",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Tony Burke"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1226,6 +1406,10 @@
         "group": "member:spender",
         "name": "Allegra Spender",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:spender",
+        "name": "Allegra Spender"
       },
       "contest": {
         "alp": true,
@@ -1260,6 +1444,10 @@
         "name": "Anne Maree Stanley",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Anne Maree Stanley"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1286,6 +1474,10 @@
         "group": "alp",
         "name": "Carol Berry",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Carol Berry"
       },
       "contest": {
         "alp": true,
@@ -1314,6 +1506,10 @@
         "name": "Mary Doyle",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Mary Doyle"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1341,6 +1537,10 @@
         "name": "Catherine King",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Catherine King"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1367,6 +1567,10 @@
         "group": "alp",
         "name": "Lisa Chesters",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Lisa Chesters"
       },
       "contest": {
         "alp": true,
@@ -1397,6 +1601,10 @@
         "name": "Julian Hill",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Julian Hill"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1423,6 +1631,10 @@
         "group": "alp",
         "name": "Basem Abdo",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Basem Abdo"
       },
       "contest": {
         "alp": true,
@@ -1451,6 +1663,10 @@
         "name": "Aaron Violi",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Aaron Violi"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1477,6 +1693,10 @@
         "group": "alp",
         "name": "Carina Garland",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Carina Garland"
       },
       "contest": {
         "alp": true,
@@ -1505,6 +1725,10 @@
         "name": "Ged Kearney",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Ged Kearney"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1531,6 +1755,10 @@
         "group": "alp",
         "name": "Libby Coker",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Libby Coker"
       },
       "contest": {
         "alp": true,
@@ -1559,6 +1787,10 @@
         "name": "Richard Marles",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Richard Marles"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1585,6 +1817,10 @@
         "group": "alp",
         "name": "Matt Gregg",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Matt Gregg"
       },
       "contest": {
         "alp": true,
@@ -1613,6 +1849,10 @@
         "name": "Jodie Belyea",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Jodie Belyea"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1639,6 +1879,10 @@
         "group": "lp",
         "name": "Zoe Mckenzie",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Zoe Mckenzie"
       },
       "contest": {
         "alp": true,
@@ -1667,6 +1911,10 @@
         "name": "Daniel Mulino",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Daniel Mulino"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1693,6 +1941,10 @@
         "group": "alp",
         "name": "Tim Watts",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Tim Watts"
       },
       "contest": {
         "alp": true,
@@ -1721,6 +1973,10 @@
         "name": "Darren Chester",
         "recontests": true
       },
+      "member2025": {
+        "group": "np",
+        "name": "Darren Chester"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1747,6 +2003,10 @@
         "group": "lp",
         "name": "Tim Wilson",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Tim Wilson"
       },
       "contest": {
         "alp": true,
@@ -1775,6 +2035,10 @@
         "name": "Alice Jordan-baird",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Alice Jordan-baird"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1801,6 +2065,10 @@
         "group": "alp",
         "name": "Sam Rae",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Sam Rae"
       },
       "contest": {
         "alp": true,
@@ -1829,6 +2097,10 @@
         "name": "Cassandra Fernando",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Cassandra Fernando"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1856,6 +2128,10 @@
         "name": "Clare O'neil",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Clare O'neil"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1882,6 +2158,10 @@
         "group": "member:haines",
         "name": "Helen Haines",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:haines",
+        "name": "Helen Haines"
       },
       "contest": {
         "alp": true,
@@ -1916,6 +2196,10 @@
         "name": "Mark Dreyfus",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Mark Dreyfus"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1943,6 +2227,10 @@
         "name": "Kate Thwaites",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Kate Thwaites"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -1969,6 +2257,10 @@
         "group": "member:ryan",
         "name": "Monique Ryan",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:ryan",
+        "name": "Monique Ryan"
       },
       "contest": {
         "alp": true,
@@ -2003,6 +2295,10 @@
         "name": "Jason Wood",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Jason Wood"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2029,6 +2325,10 @@
         "group": "alp",
         "name": "Joanne Ryan",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Joanne Ryan"
       },
       "contest": {
         "alp": true,
@@ -2057,6 +2357,10 @@
         "name": "Josh Burns",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Josh Burns"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2083,6 +2387,10 @@
         "group": "np",
         "name": "Anne Webster",
         "recontests": true
+      },
+      "member2025": {
+        "group": "np",
+        "name": "Anne Webster"
       },
       "contest": {
         "alp": true,
@@ -2111,6 +2419,10 @@
         "name": "Jo Briskey",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Jo Briskey"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2137,6 +2449,10 @@
         "group": "alp",
         "name": "Rob Mitchell",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Rob Mitchell"
       },
       "contest": {
         "alp": true,
@@ -2165,6 +2481,10 @@
         "name": "Sarah Witty",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Sarah Witty"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2191,6 +2511,10 @@
         "group": "alp",
         "name": "Gabriel Ng",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Gabriel Ng"
       },
       "contest": {
         "alp": true,
@@ -2219,6 +2543,10 @@
         "name": "Mary Aldred",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Mary Aldred"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2245,6 +2573,10 @@
         "group": "np",
         "name": "Sam Birrell",
         "recontests": true
+      },
+      "member2025": {
+        "group": "np",
+        "name": "Sam Birrell"
       },
       "contest": {
         "alp": true,
@@ -2273,6 +2605,10 @@
         "name": "Andrew Giles",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Andrew Giles"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2299,6 +2635,10 @@
         "group": "lp",
         "name": "Dan Tehan",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Dan Tehan"
       },
       "contest": {
         "alp": true,
@@ -2327,6 +2667,10 @@
         "name": "Peter Khalil",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Peter Khalil"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2353,6 +2697,10 @@
         "group": "alp",
         "name": "Shayne Neumann",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Shayne Neumann"
       },
       "contest": {
         "alp": true,
@@ -2381,6 +2729,10 @@
         "name": "Kara Cook",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Kara Cook"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2407,6 +2759,10 @@
         "group": "lnp",
         "name": "Henry Pike",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Henry Pike"
       },
       "contest": {
         "alp": true,
@@ -2435,6 +2791,10 @@
         "name": "Madonna Jarrett",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Madonna Jarrett"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2460,7 +2820,12 @@
       "incumbent": {
         "group": "lnp",
         "name": "Michelle Landry",
-        "recontests": true
+        "recontests": false,
+        "retirementNote": "2026-10-23 — will not contest the next election (announced 23 October 2026: ABC News, abc.net.au/news/2026-10-23/michelle-landry-capricornia-retirement/107300492). The Nationals' leader, Senator Matt Canavan, has since announced a run for the seat; no candidate is assumed."
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Michelle Landry"
       },
       "contest": {
         "alp": true,
@@ -2489,6 +2854,10 @@
         "name": "Andrew Willcox",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Andrew Willcox"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2515,6 +2884,10 @@
         "group": "alp",
         "name": "Ali France",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Ali France"
       },
       "contest": {
         "alp": true,
@@ -2543,6 +2916,10 @@
         "name": "Cameron Caldwell",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Cameron Caldwell"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2569,6 +2946,10 @@
         "group": "lnp",
         "name": "Ted O'brien",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Ted O'brien"
       },
       "contest": {
         "alp": true,
@@ -2597,6 +2978,10 @@
         "name": "Andrew Wallace",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Andrew Wallace"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2623,6 +3008,10 @@
         "group": "lnp",
         "name": "Colin Boyce",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Colin Boyce"
       },
       "contest": {
         "alp": true,
@@ -2651,6 +3040,10 @@
         "name": "Rowan Holzberger",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Rowan Holzberger"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2677,6 +3070,10 @@
         "group": "alp",
         "name": "Renee Coffey",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Renee Coffey"
       },
       "contest": {
         "alp": true,
@@ -2705,6 +3102,10 @@
         "name": "Garth Hamilton",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Garth Hamilton"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2731,6 +3132,10 @@
         "group": "lnp",
         "name": "Phillip Thompson",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Phillip Thompson"
       },
       "contest": {
         "alp": true,
@@ -2759,6 +3164,10 @@
         "name": "David Batt",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "David Batt"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2785,6 +3194,10 @@
         "group": "member:katter",
         "name": "Bob Katter",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:katter",
+        "name": "Bob Katter"
       },
       "contest": {
         "alp": true,
@@ -2819,6 +3232,10 @@
         "name": "Matt Smith",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Matt Smith"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2845,6 +3262,10 @@
         "group": "alp",
         "name": "Anika Wells",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Anika Wells"
       },
       "contest": {
         "alp": true,
@@ -2873,6 +3294,10 @@
         "name": "Terry Young",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Terry Young"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2899,6 +3324,10 @@
         "group": "lnp",
         "name": "David Littleproud",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "David Littleproud"
       },
       "contest": {
         "alp": true,
@@ -2927,6 +3356,10 @@
         "name": "Leon Rebello",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Leon Rebello"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -2953,6 +3386,10 @@
         "group": "lnp",
         "name": "Angie Bell",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Angie Bell"
       },
       "contest": {
         "alp": true,
@@ -2981,6 +3418,10 @@
         "name": "Julie-Ann Campbell",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Julie-Ann Campbell"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3007,6 +3448,10 @@
         "group": "alp",
         "name": "Milton Dick",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Milton Dick"
       },
       "contest": {
         "alp": true,
@@ -3035,6 +3480,10 @@
         "name": "Emma Comer",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Emma Comer"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3061,6 +3510,10 @@
         "group": "alp",
         "name": "Jim Chalmers",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Jim Chalmers"
       },
       "contest": {
         "alp": true,
@@ -3089,6 +3542,10 @@
         "name": "Elizabeth Watson-brown",
         "recontests": true
       },
+      "member2025": {
+        "group": "grn",
+        "name": "Elizabeth Watson-brown"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3115,6 +3572,10 @@
         "group": "lnp",
         "name": "Llew O'brien",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lnp",
+        "name": "Llew O'brien"
       },
       "contest": {
         "alp": true,
@@ -3143,6 +3604,10 @@
         "name": "Scott Buchholz",
         "recontests": true
       },
+      "member2025": {
+        "group": "lnp",
+        "name": "Scott Buchholz"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3170,6 +3635,10 @@
         "name": "Steve Georganas",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Steve Georganas"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3196,6 +3665,10 @@
         "group": "lp",
         "name": "Tony Pasin",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Tony Pasin"
       },
       "contest": {
         "alp": true,
@@ -3226,6 +3699,10 @@
         "name": "Louise Miller-frost",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Louise Miller-frost"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3252,6 +3729,10 @@
         "group": "lp",
         "name": "Tom Venning",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Tom Venning"
       },
       "contest": {
         "alp": true,
@@ -3282,6 +3763,10 @@
         "name": "Mark Butler",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Mark Butler"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3308,6 +3793,10 @@
         "group": "alp",
         "name": "Amanda Rishworth",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Amanda Rishworth"
       },
       "contest": {
         "alp": true,
@@ -3336,6 +3825,10 @@
         "name": "Tony Zappia",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Tony Zappia"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3362,6 +3855,10 @@
         "group": "member:sharkie",
         "name": "Rebekha Sharkie",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:sharkie",
+        "name": "Rebekha Sharkie"
       },
       "contest": {
         "alp": true,
@@ -3396,6 +3893,10 @@
         "name": "Matt Burnell",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Matt Burnell"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3422,6 +3923,10 @@
         "group": "alp",
         "name": "Claire Clutterham",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Claire Clutterham"
       },
       "contest": {
         "alp": true,
@@ -3450,6 +3955,10 @@
         "name": "Madeleine King",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Madeleine King"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3476,6 +3985,10 @@
         "group": "alp",
         "name": "Trish Cook",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Trish Cook"
       },
       "contest": {
         "alp": true,
@@ -3506,6 +4019,10 @@
         "name": "Matt Keogh",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Matt Keogh"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3532,6 +4049,10 @@
         "group": "lp",
         "name": "Andrew Hastie",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Andrew Hastie"
       },
       "contest": {
         "alp": true,
@@ -3560,6 +4081,10 @@
         "name": "Anne Aly",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Anne Aly"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3586,6 +4111,10 @@
         "group": "member:chaney",
         "name": "Kate Chaney",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:chaney",
+        "name": "Kate Chaney"
       },
       "contest": {
         "alp": true,
@@ -3620,6 +4149,10 @@
         "name": "Melissa Price",
         "recontests": true
       },
+      "member2025": {
+        "group": "lp",
+        "name": "Melissa Price"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3648,6 +4181,10 @@
         "group": "lp",
         "name": "Ben Small",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Ben Small"
       },
       "contest": {
         "alp": true,
@@ -3678,6 +4215,10 @@
         "name": "Josh Wilson",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Josh Wilson"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3704,6 +4245,10 @@
         "group": "alp",
         "name": "Tania Lawrence",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Tania Lawrence"
       },
       "contest": {
         "alp": true,
@@ -3732,6 +4277,10 @@
         "name": "Tom French",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Tom French"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3758,6 +4307,10 @@
         "group": "lp",
         "name": "Rick Wilson",
         "recontests": true
+      },
+      "member2025": {
+        "group": "lp",
+        "name": "Rick Wilson"
       },
       "contest": {
         "alp": true,
@@ -3788,6 +4341,10 @@
         "name": "Tracey Roberts",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Tracey Roberts"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3814,6 +4371,10 @@
         "group": "alp",
         "name": "Patrick Gorman",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Patrick Gorman"
       },
       "contest": {
         "alp": true,
@@ -3842,6 +4403,10 @@
         "name": "Zaneta Mascarenhas",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Zaneta Mascarenhas"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3868,6 +4433,10 @@
         "group": "alp",
         "name": "Sam Lim",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Sam Lim"
       },
       "contest": {
         "alp": true,
@@ -3896,6 +4465,10 @@
         "name": "Jess Teesdale",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Jess Teesdale"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3923,6 +4496,10 @@
         "name": "Anne Urquhart",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Anne Urquhart"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -3949,6 +4526,10 @@
         "group": "member:wilkie",
         "name": "Andrew Wilkie",
         "recontests": true
+      },
+      "member2025": {
+        "group": "member:wilkie",
+        "name": "Andrew Wilkie"
       },
       "contest": {
         "alp": true,
@@ -3983,6 +4564,10 @@
         "name": "Julie Collins",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Julie Collins"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -4009,6 +4594,10 @@
         "group": "alp",
         "name": "Rebecca White",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Rebecca White"
       },
       "contest": {
         "alp": true,
@@ -4037,6 +4626,10 @@
         "name": "Marion Scrymgour",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Marion Scrymgour"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -4063,6 +4656,10 @@
         "group": "alp",
         "name": "Luke John Gosling",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Luke John Gosling"
       },
       "contest": {
         "alp": true,
@@ -4091,6 +4688,10 @@
         "name": "David Smith",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "David Smith"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -4118,6 +4719,10 @@
         "name": "Alicia Payne",
         "recontests": true
       },
+      "member2025": {
+        "group": "alp",
+        "name": "Alicia Payne"
+      },
       "contest": {
         "alp": true,
         "coalition": [
@@ -4144,6 +4749,10 @@
         "group": "alp",
         "name": "Andrew Leigh",
         "recontests": true
+      },
+      "member2025": {
+        "group": "alp",
+        "name": "Andrew Leigh"
       },
       "contest": {
         "alp": true,

@@ -9892,6 +9892,1806 @@
      "n": 97
     }
    ]
+  },
+  {
+   "E": 2001,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.1018,
+   "logScore": -0.26,
+   "modalRight": 141,
+   "deterministicRight": 141,
+   "pairsRight": 144,
+   "seats": 150,
+   "tcpMaePts": 2.17,
+   "expected": {
+    "alp": 64.6,
+    "lnp": 84.4,
+    "on": 0,
+    "grn": 0,
+    "ind": 1,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 65,
+    "lnp": 82,
+    "on": 0,
+    "grn": 0,
+    "ind": 3,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     59,
+     70
+    ],
+    "lnp": [
+     79,
+     90
+    ]
+   },
+   "pit": {
+    "alp": 0.55,
+    "lnp": 0.241
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 1.668,
+     "o": 2,
+     "n": 123
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.291,
+     "o": 1,
+     "n": 39
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 8.532,
+     "o": 6,
+     "n": 21
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 12.464,
+     "o": 14,
+     "n": 21
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 31.695,
+     "o": 38,
+     "n": 39
+    },
+    {
+     "bin": "0.9-1",
+     "p": 88.349,
+     "o": 89,
+     "n": 90
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "New England",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2001,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1057,
+   "logScore": -0.2519,
+   "modalRight": 141,
+   "deterministicRight": 141,
+   "pairsRight": 144,
+   "seats": 150,
+   "tcpMaePts": 2.2,
+   "expected": {
+    "alp": 64.9,
+    "lnp": 84.1,
+    "on": 0,
+    "grn": 0,
+    "ind": 0.9,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 65,
+    "lnp": 82,
+    "on": 0,
+    "grn": 0,
+    "ind": 3,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     59,
+     71
+    ],
+    "lnp": [
+     78,
+     90
+    ]
+   },
+   "pit": {
+    "alp": 0.508,
+    "lnp": 0.275
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 1.93,
+     "o": 2,
+     "n": 211
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.749,
+     "o": 1,
+     "n": 40
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 8.521,
+     "o": 6,
+     "n": 21
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 11.745,
+     "o": 13,
+     "n": 20
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 32.888,
+     "o": 40,
+     "n": 41
+    },
+    {
+     "bin": "0.9-1",
+     "p": 87.166,
+     "o": 88,
+     "n": 89
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "New England",
+     "winner": "ind",
+     "p": 0.0025
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2004,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.111,
+   "logScore": -0.183,
+   "modalRight": 138,
+   "deterministicRight": 138,
+   "pairsRight": 147,
+   "seats": 150,
+   "tcpMaePts": 2.56,
+   "expected": {
+    "alp": 57.6,
+    "lnp": 89.5,
+    "on": 0,
+    "grn": 0,
+    "ind": 2.9,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 60,
+    "lnp": 87,
+    "on": 0,
+    "grn": 0,
+    "ind": 3,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     53,
+     63
+    ],
+    "lnp": [
+     85,
+     95
+    ]
+   },
+   "pit": {
+    "alp": 0.777,
+    "lnp": 0.217
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.066,
+     "o": 0,
+     "n": 133
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 6.574,
+     "o": 4,
+     "n": 36
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 7.704,
+     "o": 8,
+     "n": 18
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 10.289,
+     "o": 10,
+     "n": 18
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 29.417,
+     "o": 32,
+     "n": 36
+    },
+    {
+     "bin": "0.9-1",
+     "p": 93.949,
+     "o": 96,
+     "n": 96
+    }
+   ],
+   "upsets": []
+  },
+  {
+   "E": 2004,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1114,
+   "logScore": -0.1883,
+   "modalRight": 139,
+   "deterministicRight": 138,
+   "pairsRight": 148,
+   "seats": 150,
+   "tcpMaePts": 2.64,
+   "expected": {
+    "alp": 57.4,
+    "lnp": 89.1,
+    "on": 0,
+    "grn": 0,
+    "ind": 3.5,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 60,
+    "lnp": 87,
+    "on": 0,
+    "grn": 0,
+    "ind": 3,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     52,
+     63
+    ],
+    "lnp": [
+     84,
+     94
+    ]
+   },
+   "pit": {
+    "alp": 0.798,
+    "lnp": 0.255
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.87,
+     "o": 0,
+     "n": 262
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 6.821,
+     "o": 5,
+     "n": 37
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 7.229,
+     "o": 6,
+     "n": 17
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 9.721,
+     "o": 11,
+     "n": 17
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 30.835,
+     "o": 33,
+     "n": 38
+    },
+    {
+     "bin": "0.9-1",
+     "p": 92.524,
+     "o": 95,
+     "n": 95
+    }
+   ],
+   "upsets": []
+  },
+  {
+   "E": 2007,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.137,
+   "logScore": -0.2229,
+   "modalRight": 137,
+   "deterministicRight": 136,
+   "pairsRight": 149,
+   "seats": 150,
+   "tcpMaePts": 2.16,
+   "expected": {
+    "alp": 84.9,
+    "lnp": 63.2,
+    "on": 0,
+    "grn": 0,
+    "ind": 1.9,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 83,
+    "lnp": 65,
+    "on": 0,
+    "grn": 0,
+    "ind": 2,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     79,
+     91
+    ],
+    "lnp": [
+     57,
+     69
+    ]
+   },
+   "pit": {
+    "alp": 0.294,
+    "lnp": 0.697
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.368,
+     "o": 0,
+     "n": 122
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 5.521,
+     "o": 3,
+     "n": 31
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 12.019,
+     "o": 10,
+     "n": 30
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 17.972,
+     "o": 20,
+     "n": 30
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 24.545,
+     "o": 27,
+     "n": 30
+    },
+    {
+     "bin": "0.9-1",
+     "p": 87.575,
+     "o": 90,
+     "n": 90
+    }
+   ],
+   "upsets": []
+  },
+  {
+   "E": 2007,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1391,
+   "logScore": -0.2279,
+   "modalRight": 137,
+   "deterministicRight": 136,
+   "pairsRight": 149,
+   "seats": 150,
+   "tcpMaePts": 2.2,
+   "expected": {
+    "alp": 84.9,
+    "lnp": 62.7,
+    "on": 0,
+    "grn": 0,
+    "ind": 2.3,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 83,
+    "lnp": 65,
+    "on": 0,
+    "grn": 0,
+    "ind": 2,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     79,
+     91
+    ],
+    "lnp": [
+     57,
+     68
+    ]
+   },
+   "pit": {
+    "alp": 0.298,
+    "lnp": 0.74
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.714,
+     "o": 0,
+     "n": 235
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 6.294,
+     "o": 4,
+     "n": 34
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 10.918,
+     "o": 9,
+     "n": 27
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 16.652,
+     "o": 18,
+     "n": 28
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 26.009,
+     "o": 29,
+     "n": 32
+    },
+    {
+     "bin": "0.9-1",
+     "p": 87.413,
+     "o": 90,
+     "n": 90
+    }
+   ],
+   "upsets": []
+  },
+  {
+   "E": 2010,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.1399,
+   "logScore": -0.3239,
+   "modalRight": 139,
+   "deterministicRight": 138,
+   "pairsRight": 146,
+   "seats": 150,
+   "tcpMaePts": 3.41,
+   "expected": {
+    "alp": 74,
+    "lnp": 72.2,
+    "on": 0,
+    "grn": 2,
+    "ind": 1.9,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 72,
+    "lnp": 73,
+    "on": 0,
+    "grn": 1,
+    "ind": 4,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     68,
+     80
+    ],
+    "lnp": [
+     66,
+     78
+    ]
+   },
+   "pit": {
+    "alp": 0.302,
+    "lnp": 0.587
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.599,
+     "o": 3,
+     "n": 170
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.866,
+     "o": 2,
+     "n": 41
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 9.872,
+     "o": 6,
+     "n": 24
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 14.772,
+     "o": 19,
+     "n": 25
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 32.28,
+     "o": 37,
+     "n": 40
+    },
+    {
+     "bin": "0.9-1",
+     "p": 82.61,
+     "o": 83,
+     "n": 85
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Lyne",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Ryan",
+     "winner": "lnp",
+     "p": 0.0225
+    },
+    {
+     "seat": "Denison",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2010,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1421,
+   "logScore": -0.3101,
+   "modalRight": 139,
+   "deterministicRight": 136,
+   "pairsRight": 146,
+   "seats": 150,
+   "tcpMaePts": 3.41,
+   "expected": {
+    "alp": 73.6,
+    "lnp": 72,
+    "on": 0,
+    "grn": 2,
+    "ind": 2.4,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 72,
+    "lnp": 73,
+    "on": 0,
+    "grn": 1,
+    "ind": 4,
+    "oth": 0
+   },
+   "range90": {
+    "alp": [
+     67,
+     80
+    ],
+    "lnp": [
+     66,
+     78
+    ]
+   },
+   "pit": {
+    "alp": 0.339,
+    "lnp": 0.605
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 3.099,
+     "o": 3,
+     "n": 303
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.76,
+     "o": 2,
+     "n": 41
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 10.326,
+     "o": 7,
+     "n": 25
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 13.556,
+     "o": 17,
+     "n": 23
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 34.766,
+     "o": 40,
+     "n": 43
+    },
+    {
+     "bin": "0.9-1",
+     "p": 80.492,
+     "o": 81,
+     "n": 83
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Lyne",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Ryan",
+     "winner": "lnp",
+     "p": 0.024
+    },
+    {
+     "seat": "Denison",
+     "winner": "ind",
+     "p": 0.004
+    }
+   ]
+  },
+  {
+   "E": 2013,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.1568,
+   "logScore": -0.3184,
+   "modalRight": 133,
+   "deterministicRight": 133,
+   "pairsRight": 144,
+   "seats": 150,
+   "tcpMaePts": 2.77,
+   "expected": {
+    "alp": 56.3,
+    "lnp": 91.9,
+    "on": 0,
+    "grn": 0.8,
+    "ind": 0.9,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 55,
+    "lnp": 90,
+    "on": 0,
+    "grn": 1,
+    "ind": 2,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     51,
+     61
+    ],
+    "lnp": [
+     87,
+     97
+    ]
+   },
+   "pit": {
+    "alp": 0.333,
+    "lnp": 0.267
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 1.944,
+     "o": 4,
+     "n": 140
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 4.739,
+     "o": 4,
+     "n": 25
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 7.656,
+     "o": 9,
+     "n": 20
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 12.338,
+     "o": 11,
+     "n": 20
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 21.078,
+     "o": 21,
+     "n": 26
+    },
+    {
+     "bin": "0.9-1",
+     "p": 102.245,
+     "o": 101,
+     "n": 104
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Fairfax",
+     "winner": "oth",
+     "p": 0
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.073
+    },
+    {
+     "seat": "Lyons",
+     "winner": "lnp",
+     "p": 0.049
+    },
+    {
+     "seat": "Indi",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2013,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1605,
+   "logScore": -0.3241,
+   "modalRight": 132,
+   "deterministicRight": 133,
+   "pairsRight": 143,
+   "seats": 150,
+   "tcpMaePts": 2.77,
+   "expected": {
+    "alp": 57.1,
+    "lnp": 91.5,
+    "on": 0,
+    "grn": 0.8,
+    "ind": 0.5,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 55,
+    "lnp": 90,
+    "on": 0,
+    "grn": 1,
+    "ind": 2,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     52,
+     62
+    ],
+    "lnp": [
+     86,
+     97
+    ]
+   },
+   "pit": {
+    "alp": 0.262,
+    "lnp": 0.312
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.019,
+     "o": 4,
+     "n": 159
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 4.675,
+     "o": 4,
+     "n": 25
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 8.142,
+     "o": 10,
+     "n": 21
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 12.809,
+     "o": 11,
+     "n": 21
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 20.23,
+     "o": 20,
+     "n": 25
+    },
+    {
+     "bin": "0.9-1",
+     "p": 102.126,
+     "o": 101,
+     "n": 104
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Fairfax",
+     "winner": "oth",
+     "p": 0
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.066
+    },
+    {
+     "seat": "Lyons",
+     "winner": "lnp",
+     "p": 0.0545
+    },
+    {
+     "seat": "Indi",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2016,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.2013,
+   "logScore": -0.3581,
+   "modalRight": 124,
+   "deterministicRight": 124,
+   "pairsRight": 125,
+   "seats": 150,
+   "tcpMaePts": 3.48,
+   "expected": {
+    "alp": 61.2,
+    "lnp": 77.6,
+    "on": 8.1,
+    "grn": 1.1,
+    "ind": 2,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 69,
+    "lnp": 76,
+    "on": 0,
+    "grn": 1,
+    "ind": 2,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     55,
+     68
+    ],
+    "lnp": [
+     69,
+     87
+    ]
+   },
+   "pit": {
+    "alp": 0.969,
+    "lnp": 0.452
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.549,
+     "o": 4,
+     "n": 161
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 6.987,
+     "o": 7,
+     "n": 36
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 11.403,
+     "o": 15,
+     "n": 28
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 16.603,
+     "o": 11,
+     "n": 29
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 27.412,
+     "o": 28,
+     "n": 34
+    },
+    {
+     "bin": "0.9-1",
+     "p": 85.046,
+     "o": 85,
+     "n": 87
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Herbert",
+     "winner": "alp",
+     "p": 0.0895
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.0365
+    },
+    {
+     "seat": "Longman",
+     "winner": "alp",
+     "p": 0.0695
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2016,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.2089,
+   "logScore": -0.3691,
+   "modalRight": 124,
+   "deterministicRight": 124,
+   "pairsRight": 125,
+   "seats": 150,
+   "tcpMaePts": 3.42,
+   "expected": {
+    "alp": 61,
+    "lnp": 77.2,
+    "on": 8.7,
+    "grn": 1.1,
+    "ind": 2,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 69,
+    "lnp": 76,
+    "on": 0,
+    "grn": 1,
+    "ind": 2,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     55,
+     68
+    ],
+    "lnp": [
+     69,
+     87
+    ]
+   },
+   "pit": {
+    "alp": 0.968,
+    "lnp": 0.49
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.795,
+     "o": 4,
+     "n": 182
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.069,
+     "o": 7,
+     "n": 37
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 11.048,
+     "o": 15,
+     "n": 28
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 17.004,
+     "o": 11,
+     "n": 29
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 29.113,
+     "o": 30,
+     "n": 36
+    },
+    {
+     "bin": "0.9-1",
+     "p": 82.971,
+     "o": 83,
+     "n": 85
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Herbert",
+     "winner": "alp",
+     "p": 0.085
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.038
+    },
+    {
+     "seat": "Longman",
+     "winner": "alp",
+     "p": 0.0675
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2019,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.1296,
+   "logScore": -0.3138,
+   "modalRight": 139,
+   "deterministicRight": 140,
+   "pairsRight": 136,
+   "seats": 151,
+   "tcpMaePts": 3.51,
+   "expected": {
+    "alp": 70.8,
+    "lnp": 76.8,
+    "on": 0.4,
+    "grn": 1.9,
+    "ind": 1,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 68,
+    "lnp": 77,
+    "on": 0,
+    "grn": 1,
+    "ind": 3,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     65,
+     76
+    ],
+    "lnp": [
+     72,
+     82
+    ]
+   },
+   "pit": {
+    "alp": 0.194,
+    "lnp": 0.523
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.702,
+     "o": 4,
+     "n": 189
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 6.402,
+     "o": 3,
+     "n": 33
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 5.509,
+     "o": 5,
+     "n": 15
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 10.53,
+     "o": 11,
+     "n": 17
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 24.273,
+     "o": 27,
+     "n": 30
+    },
+    {
+     "bin": "0.9-1",
+     "p": 101.584,
+     "o": 101,
+     "n": 104
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Warringah",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.016
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0.0145
+    },
+    {
+     "seat": "Indi",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2019,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1315,
+   "logScore": -0.2815,
+   "modalRight": 139,
+   "deterministicRight": 141,
+   "pairsRight": 137,
+   "seats": 151,
+   "tcpMaePts": 3.72,
+   "expected": {
+    "alp": 71.3,
+    "lnp": 75.4,
+    "on": 0.5,
+    "grn": 1.8,
+    "ind": 2,
+    "oth": 0
+   },
+   "actual": {
+    "alp": 68,
+    "lnp": 77,
+    "on": 0,
+    "grn": 1,
+    "ind": 3,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     66,
+     77
+    ],
+    "lnp": [
+     70,
+     81
+    ]
+   },
+   "pit": {
+    "alp": 0.163,
+    "lnp": 0.673
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 3.797,
+     "o": 4,
+     "n": 317
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 5.667,
+     "o": 3,
+     "n": 30
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 6.644,
+     "o": 5,
+     "n": 18
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 11.279,
+     "o": 13,
+     "n": 18
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 21.877,
+     "o": 24,
+     "n": 27
+    },
+    {
+     "bin": "0.9-1",
+     "p": 101.737,
+     "o": 102,
+     "n": 105
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Warringah",
+     "winner": "ind",
+     "p": 0.079
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.021
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0.0215
+    },
+    {
+     "seat": "Indi",
+     "winner": "ind",
+     "p": 0
+    }
+   ]
+  },
+  {
+   "E": 2022,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.227,
+   "logScore": -0.6337,
+   "modalRight": 130,
+   "deterministicRight": 130,
+   "pairsRight": 133,
+   "seats": 151,
+   "tcpMaePts": 3.85,
+   "expected": {
+    "alp": 76.7,
+    "lnp": 68.4,
+    "on": 0.1,
+    "grn": 3,
+    "ind": 2.7,
+    "oth": 0.2
+   },
+   "actual": {
+    "alp": 77,
+    "lnp": 58,
+    "on": 0,
+    "grn": 4,
+    "ind": 10,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     71,
+     82
+    ],
+    "lnp": [
+     63,
+     74
+    ]
+   },
+   "pit": {
+    "alp": 0.547,
+    "lnp": 0.001
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.784,
+     "o": 10,
+     "n": 213
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.404,
+     "o": 8,
+     "n": 40
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 5.123,
+     "o": 3,
+     "n": 13
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 12.382,
+     "o": 11,
+     "n": 20
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 25.402,
+     "o": 26,
+     "n": 31
+    },
+    {
+     "bin": "0.9-1",
+     "p": 97.904,
+     "o": 93,
+     "n": 100
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Fowler",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Mackellar",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "North Sydney",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Wentworth",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Ryan",
+     "winner": "grn",
+     "p": 0.089
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0.005
+    },
+    {
+     "seat": "Goldstein",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Kooyong",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Curtin",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Tangney",
+     "winner": "alp",
+     "p": 0.076
+    }
+   ]
+  },
+  {
+   "E": 2022,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.2178,
+   "logScore": -0.4364,
+   "modalRight": 129,
+   "deterministicRight": 129,
+   "pairsRight": 134,
+   "seats": 151,
+   "tcpMaePts": 3.87,
+   "expected": {
+    "alp": 75.5,
+    "lnp": 67.5,
+    "on": 0.1,
+    "grn": 2.8,
+    "ind": 4.8,
+    "oth": 0.4
+   },
+   "actual": {
+    "alp": 77,
+    "lnp": 58,
+    "on": 0,
+    "grn": 4,
+    "ind": 10,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     70,
+     81
+    ],
+    "lnp": [
+     62,
+     73
+    ]
+   },
+   "pit": {
+    "alp": 0.684,
+    "lnp": 0.003
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 4.137,
+     "o": 9,
+     "n": 341
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 7.349,
+     "o": 7,
+     "n": 43
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 5.767,
+     "o": 6,
+     "n": 15
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 10.425,
+     "o": 9,
+     "n": 17
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 27.428,
+     "o": 28,
+     "n": 34
+    },
+    {
+     "bin": "0.9-1",
+     "p": 95.893,
+     "o": 92,
+     "n": 99
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Fowler",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "North Sydney",
+     "winner": "ind",
+     "p": 0.0225
+    },
+    {
+     "seat": "Wentworth",
+     "winner": "ind",
+     "p": 0.0945
+    },
+    {
+     "seat": "Ryan",
+     "winner": "grn",
+     "p": 0.099
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0.008
+    },
+    {
+     "seat": "Goldstein",
+     "winner": "ind",
+     "p": 0.0025
+    },
+    {
+     "seat": "Kooyong",
+     "winner": "ind",
+     "p": 0.0855
+    },
+    {
+     "seat": "Curtin",
+     "winner": "ind",
+     "p": 0.0635
+    },
+    {
+     "seat": "Tangney",
+     "winner": "alp",
+     "p": 0.065
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "mode": "house",
+   "variant": "terms-ind28",
+   "stateOracle": false,
+   "brier": 0.1718,
+   "logScore": -0.3492,
+   "modalRight": 133,
+   "deterministicRight": 130,
+   "pairsRight": 129,
+   "seats": 150,
+   "tcpMaePts": 3.81,
+   "expected": {
+    "alp": 94.1,
+    "lnp": 44,
+    "on": 0.1,
+    "grn": 3.3,
+    "ind": 8.3,
+    "oth": 0.2
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     88,
+     101
+    ],
+    "lnp": [
+     38,
+     50
+    ]
+   },
+   "pit": {
+    "alp": 0.508,
+    "lnp": 0.382
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 2.929,
+     "o": 6,
+     "n": 250
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 4.921,
+     "o": 4,
+     "n": 27
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 11.255,
+     "o": 8,
+     "n": 28
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 16.822,
+     "o": 18,
+     "n": 28
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 19.387,
+     "o": 19,
+     "n": 24
+    },
+    {
+     "bin": "0.9-1",
+     "p": 94.685,
+     "o": 95,
+     "n": 97
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Bradfield",
+     "winner": "ind",
+     "p": 0
+    },
+    {
+     "seat": "Calare",
+     "winner": "ind",
+     "p": 0.022
+    },
+    {
+     "seat": "Kennedy",
+     "winner": "oth",
+     "p": 0.089
+    },
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0.0095
+    },
+    {
+     "seat": "Goldstein",
+     "winner": "lnp",
+     "p": 0.045
+    },
+    {
+     "seat": "Monash",
+     "winner": "lnp",
+     "p": 0.086
+    }
+   ]
+  },
+  {
+   "E": 2025,
+   "mode": "house",
+   "variant": "terms-indrec",
+   "stateOracle": false,
+   "brier": 0.1692,
+   "logScore": -0.3099,
+   "modalRight": 135,
+   "deterministicRight": 131,
+   "pairsRight": 130,
+   "seats": 150,
+   "tcpMaePts": 3.65,
+   "expected": {
+    "alp": 91.3,
+    "lnp": 41.7,
+    "on": 0.1,
+    "grn": 3.3,
+    "ind": 13.4,
+    "oth": 0.1
+   },
+   "actual": {
+    "alp": 94,
+    "lnp": 43,
+    "on": 0,
+    "grn": 1,
+    "ind": 10,
+    "oth": 2
+   },
+   "range90": {
+    "alp": [
+     85,
+     98
+    ],
+    "lnp": [
+     35,
+     49
+    ]
+   },
+   "pit": {
+    "alp": 0.751,
+    "lnp": 0.637
+   },
+   "calibration": [
+    {
+     "bin": "0-0.1",
+     "p": 4.989,
+     "o": 3,
+     "n": 381
+    },
+    {
+     "bin": "0.1-0.3",
+     "p": 6.463,
+     "o": 4,
+     "n": 37
+    },
+    {
+     "bin": "0.3-0.5",
+     "p": 14.428,
+     "o": 12,
+     "n": 36
+    },
+    {
+     "bin": "0.5-0.7",
+     "p": 17.168,
+     "o": 21,
+     "n": 29
+    },
+    {
+     "bin": "0.7-0.9",
+     "p": 24.609,
+     "o": 27,
+     "n": 30
+    },
+    {
+     "bin": "0.9-1",
+     "p": 82.344,
+     "o": 83,
+     "n": 85
+    }
+   ],
+   "upsets": [
+    {
+     "seat": "Mayo",
+     "winner": "oth",
+     "p": 0.0205
+    },
+    {
+     "seat": "Goldstein",
+     "winner": "lnp",
+     "p": 0.055
+    },
+    {
+     "seat": "Monash",
+     "winner": "lnp",
+     "p": 0.0635
+    }
+   ]
   }
  ],
  "pooled": {
@@ -10512,6 +12312,80 @@
      0.85,
      0,
      0.563
+    ]
+   }
+  },
+  "house|nation|terms-ind28": {
+   "elections": 9,
+   "seats": 1352,
+   "brier": 0.1529,
+   "logScore": -0.3294,
+   "modalRight": 1214,
+   "deterministicRight": 1210,
+   "pairsRight": 1253,
+   "inside90": {
+    "alp": 8,
+    "lnp": 8
+   },
+   "pit": {
+    "alp": [
+     0.55,
+     0.777,
+     0.294,
+     0.302,
+     0.333,
+     0.969,
+     0.194,
+     0.547,
+     0.508
+    ],
+    "lnp": [
+     0.241,
+     0.217,
+     0.697,
+     0.587,
+     0.267,
+     0.452,
+     0.523,
+     0.001,
+     0.382
+    ]
+   }
+  },
+  "house|nation|terms-indrec": {
+   "elections": 9,
+   "seats": 1352,
+   "brier": 0.1541,
+   "logScore": -0.3,
+   "modalRight": 1215,
+   "deterministicRight": 1209,
+   "pairsRight": 1256,
+   "inside90": {
+    "alp": 8,
+    "lnp": 8
+   },
+   "pit": {
+    "alp": [
+     0.508,
+     0.798,
+     0.298,
+     0.339,
+     0.262,
+     0.968,
+     0.163,
+     0.684,
+     0.751
+    ],
+    "lnp": [
+     0.275,
+     0.255,
+     0.74,
+     0.605,
+     0.312,
+     0.49,
+     0.673,
+     0.003,
+     0.637
     ]
    }
   }

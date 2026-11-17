@@ -1,7 +1,7 @@
 /* the Election model – assembled from .build/model by .build/model/assemble.mjs; edit the parts, not this file */
 (() => {
 "use strict";
-const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=d080bb51","forecast":"/data/seat-model-2028-forecast.json?v=1469b6e7","inputs":"/model/data/inputs.json?v=8fbe65ad","evidence":"/model/data/evidence.json?v=480d95b2","senate":"/data/senate-rankings-2025.json?v=edeb9db9","vic":"/data/seat-model-vic-2026.json?v=9df089f2","inputsVic":"/model/data/inputs-vic.json?v=f261a665","reasons":"/model/data/reasons.json?v=337c66ee","worker":"/model/js/worker.mjs?v=4e0cd601"};
+const URLS = {"nowcast":"/data/seat-model-2028-nowcast.json?v=25330490","forecast":"/data/seat-model-2028-forecast.json?v=cb57a7aa","inputs":"/model/data/inputs.json?v=fd1728ad","evidence":"/model/data/evidence.json?v=9aaa7e19","senate":"/data/senate-rankings-2025.json?v=edeb9db9","vic":"/data/seat-model-vic-2026.json?v=9df089f2","inputsVic":"/model/data/inputs-vic.json?v=f261a665","reasons":"/model/data/reasons.json?v=cc011d75","worker":"/model/js/worker.mjs?v=4f9d7b92"};
 /* views.mjs: the /model/ page's written lines and head figures, by rule - one implementation.
    assemble.mjs imports it to write the page's static head (what a reader sees before the script runs,
    and what a crawler reads) and inlines the same source into model.js, which redraws the head with it
@@ -61,10 +61,12 @@ function headline(res, mode) {
 
 /* "In 20,000 simulated elections held on the polls to 27 October, Labor wins 71 seats on average (51 to 90
    in nine of ten), One Nation 36 (13 to 63) and the Coalition 31 (15 to 48). Labor reaches the 76 seats
-   needed to govern alone in 38% of them." - parties in order of expected seats */
+   needed to govern alone in 38% of them." - the three parties in order of expected seats; independents and
+   the Greens are named with them when they average ten seats or more */
 function dek(res, mode, asOf) {
   const nat = res.national, d = nat.seatDistribution, e = nat.expectedSeats;
-  const [a, b, c] = ["alp", "on", "lnp"].sort((x, y) => e[y] - e[x]);
+  const [a, ...two] = ["alp", "on", "lnp"].sort((x, y) => e[y] - e[x]);
+  const others = [...two, ...["member", "grn"].filter((k) => (e[k] || 0) >= 10)].sort((x, y) => e[y] - e[x]);
   const sims = res.meta.draws.toLocaleString("en-AU");
   const lead = mode === "forecast"
     ? `Projected to election day, ${sims} simulated elections from the polls to ${shortDate(asOf)} give ${PARTY[a].lower}`
@@ -73,7 +75,8 @@ function dek(res, mode, asOf) {
       : `In ${sims} simulated elections held on the polls to ${shortDate(asOf)}, ${PARTY[a].lower} wins`;
   const rest = (k) => `${PARTY[k].lower} ${Math.round(e[k])} (${d[k].p05} to ${d[k].p95})`;
   const pMaj = nat.majority[MAJ_KEY[a]];
-  return `${lead} ${Math.round(e[a])} seats on average (${d[a].p05} to ${d[a].p95} in nine of ten), ${rest(b)} and ${rest(c)}. `
+  const list = others.map(rest);
+  return `${lead} ${Math.round(e[a])} seats on average (${d[a].p05} to ${d[a].p95} in nine of ten), ${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}. `
     + `${PARTY[a].name} reaches the ${majOf(res)} seats needed to govern alone in ${pct(pMaj)} of them.`;
 }
 
@@ -354,9 +357,9 @@ function renderSeats() {
   const L = seatList(), shown = L.slice(0, SEATS.shown), r = run();
   const flips = seatsJoined().filter((s) => s.lead.b !== s.heldB).length, toss = seatsJoined().filter((s) => s.lead.p < 0.6).length, vic = STATE.jur === "vic";
   $("#seat-states").hidden = vic;
-  $("#seats-meta").textContent = `${toss} ${vic ? "districts" : "seats"} where no party wins more than six simulations in ten; ${flips} where the likeliest winner is not the party that ${vic ? "holds it now" : "won in 2025"}`;
+  $("#seats-meta").textContent = `${toss} ${vic ? "districts" : "seats"} where no party wins more than six simulations in ten; ${flips} where the likeliest winner is not the party that holds it now`;
   const sortBtn = (k, label) => { const cur = SEATS.sort; const on = cur && cur.k === k; return `<button type="button" data-sort="${k}"${on ? ` aria-sort="${cur.dir > 0 ? "ascending" : "descending"}"` : ""}>${label}</button>`; };
-  const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">${vic ? "Held now" : "Won in 2025"}</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
+  const head = `<thead><tr><th scope="col">${sortBtn("name", "Seat")}</th><th scope="col" class="c-held">Held now</th><th scope="col">${sortBtn("lead", "Chance of winning")}</th><th scope="col" class="c-ct">${sortBtn("contest", "Likeliest contest")}</th><th scope="col" class="c-tcp">Average two-candidate</th></tr></thead>`;
   const rows = shown.map((s) => {
     const open = SEATS.open.has(s.name);
     const flip = s.lead.b !== s.heldB ? `<span class="flip">from ${esc(PARTY[s.heldB].short)}</span>` : "";
@@ -394,10 +397,25 @@ function seatCard(s) {
   const thin = vic ? `Thin bar: where each candidate starts. The 2022 count here where the party or the candidate stood; One Nation from its federal 2025 vote at the nearest polling places${nSrc("council") ? `; ${plural(nSrc("council"), "candidate")} from their party’s 2022 upper-house vote here` : ""}${nSrc("median") ? `; ${plural(nSrc("median"), "candidate")} new to the ballot from the 2022 median` : ""}`
     : `Thin bar: ${Y}${added ? " (One Nation, which did not stand here in 2022: its federal 2025 vote at the nearest polling places)" : ""}`;
   const notes = vic && k.notes && k.notes.length ? ` ${k.notes.map(esc).join(" ")}` : "";
-  // a Victorian district whose holder changed since 2022 (a by-election, a defection) says so: the base is the 2022 count
-  const changed = vic && k.won2022 && BUCKET(k.won2022.group) !== BUCKET(k.held.group) ? ` Won by ${esc(k.won2022.name)} (${esc(k.won2022.party)}) in 2022; held now by ${esc(k.held.member)} (${k.held.party === "L/N" ? "Liberal" : k.held.party === "IND" ? "independent" : esc(k.held.party)}). ` : "";
+  // a seat whose holder changed since the count it starts from says so: Victoria's by-elections and defections
+  // since 2022; federally a by-election, a member who changed party (and whether they stand again), a retirement
+  const h = k.held || {}, surname = (n) => esc(String(n || "").split(" ").pop());
+  const changed = vic ? (k.won2022 && BUCKET(k.won2022.group) !== BUCKET(h.group) ? ` Won by ${esc(k.won2022.name)} (${esc(k.won2022.party)}) in 2022; held now by ${esc(h.member)} (${h.party === "L/N" ? "Liberal" : h.party === "IND" ? "independent" : esc(h.party)}). ` : "")
+    : h.how === "by-election" && k.won2025 ? ` Won by ${esc(k.won2025.name)} (${esc(k.won2025.party)}) in 2025; held by ${esc(h.member)} (${esc(h.party)}) since the by-election of ${longDate(h.since)}.`
+    : h.how === "defection" && k.won2025 ? ` ${esc(h.member)} won it for ${esc(String(k.won2025.party).replace(/^The /, "the "))} in 2025 and has sat for ${esc(h.party)} since ${longDate(h.since)}${h.recontests === true ? ", and stands here again" : h.recontests === false ? ", and is not standing here again" : `. Whether ${surname(h.member)} stands here again is not settled, and the model assumes neither`}.`
+    : h.recontests === false ? ` ${esc(h.member)} is not standing again.` : "";
+  // the seat's independent (federal): a sitting member on sitting independents' record, or the challenge drawn from
+  // the record, said with its own table's chances (model-sim draws one of the window's elections at a time)
+  const T = !vic && INP().build.ind, chal = T && k.cands.find((c) => c.slot != null), sitter = !vic && k.cands.find((c) => c.free && c.slot == null);
+  const chance = (t, lo) => { let p = 0; t.lv.forEach((lv, y) => lv.forEach((l, i) => { if (l >= lo) p += t.cum[y][i] - (i ? t.cum[y][i - 1] : 0); })); return p / t.lv.length; };
+  let indNote = "";
+  if (chal) {
+    const t = T.tables[chal.slot], yrs = T.years, w = chal.was;
+    indNote = chal.base > 0.001 && w ? ` Independent: nobody is nominated. ${esc(w.name)} polled ${(100 * w.share).toFixed(1)}% here in 2025, and the seat’s independent is drawn from what happened next in seats where one had polled about the same at the ${yrs[0]}–${yrs[yrs.length - 1]} elections: 20% or more in ${pctShort(chance(t, 0.2))} of simulated elections, nobody standing in ${pctShort(1 - chance(t, 0.0001))}.`
+      : ` Independent: nobody is nominated${w ? ` (${esc(w.name)} polled ${(100 * w.share).toFixed(1)}% here in 2025)` : ""}. A challenger of 10% or more appears in ${pctShort(chance(t, 0.1))} of simulated elections, as often as one appeared in seats like this at the ${yrs[0]}–${yrs[yrs.length - 1]} elections.`;
+  } else if (sitter) indNote = ` ${esc(sitter.label)} moves by sitting independents’ own record and not by the vote for others.`;
   return `<div class="md-card">${whyHTML(s)}
-    <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">${thin}. Thick bar and figure: the simulations’ average${vic ? " on 28 November" : STATE.mode === "forecast" ? " on election day" : " now"}.</p></div>
+    <div><h4>First preferences</h4><div class="md-prim">${prim}</div><p class="md-fine" style="margin-top:8px">${thin}. Thick bar and figure: the simulations’ average${vic ? " on 28 November" : STATE.mode === "forecast" ? " on election day" : " now"}.${indNote}</p></div>
     <div><h4>How often each wins</h4><div class="md-kv">${wins}</div><h4 style="margin-top:14px">The contest it comes down to</h4><div class="md-kv">${pairs}</div></div>
     <div><h4>Preferences here</h4><div class="md-kv">${fl}</div><p class="md-fine" style="margin-top:8px">${vic ? "From the 2025 Senate ballots cast at the federal polling places nearest this district’s own" : "From this seat’s 2025 Senate ballots"}, adjusted to how ${vic ? "lower-house voters differ, then set to Victoria’s levels and this district’s how-to-vote cards" : "House voters differ, with the national levels of the Coalition’s and One Nation’s choices set to the site’s flow tables"}. The ${Y} count: ${res25}.${changed}${notes}</p></div>
   </div>`;
@@ -411,12 +429,12 @@ const PKEY = (g) => (BUCKET(g) === "member" ? g : BUCKET(g));
 const pts = (x) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x).toFixed(1)}`;
 const P5_THE = { alp: "Labor", lnp: "the Coalition", on: "One Nation", grn: "the Greens", oth: "others" };
 const listPP = (vals) => vals.map((v, i) => [P5[i], v]).filter(([, v]) => Math.abs(v) >= 0.3).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 2).map(([p, v]) => `${P5_THE[p]} ${pts(v)}`).join(", ");
-const votersOf = (k, seat) => (String(k).startsWith("member") ? `${groupName(k, seat)}’s voters` : { alp: "Labor voters", lnp: "Coalition voters", on: "One Nation voters", grn: "Greens voters", oth: "Minor-party voters" }[k] || "Other voters");
+const votersOf = (k, seat) => (k === "member:challenge" ? "the independent’s voters" : String(k).startsWith("member") ? `${groupName(k, seat)}’s voters` : { alp: "Labor voters", lnp: "Coalition voters", on: "One Nation voters", grn: "Greens voters", oth: "Minor-party voters" }[k] || "Other voters");
 const cap1 = (t) => t.replace(/^./, (c) => c.toUpperCase());
 const poss = (n) => (/s$/.test(n) ? `${n}’` : `${n}’s`);
 /* a candidate in running prose: the party (the Liberal, Labor) or the independent's name */
 const WHO = { alp: "Labor", lp: "the Liberal", np: "the National", lnp: "the LNP", clp: "the CLP", on: "One Nation", grn: "the Green", oth: "another candidate" };
-const whoOf = (g, seat) => esc(WHO[g] || groupName(g, seat));
+const whoOf = (g, seat) => (g === "member:challenge" ? "an independent" : esc(WHO[g] || groupName(g, seat)));
 function whyHTML(s) {
   if (s.lead.b === s.heldB) return "";
   const R = STATE.reasons && STATE.reasons[STATE.jur === "vic" ? "vic" : STATE.mode];
@@ -427,14 +445,21 @@ function whyHTML(s) {
   const W = whoOf(d.w, k), H = whoOf(d.h, k);
   const nat = (i, name) => {
     const a = R.nat25[i], b = R.now[i], key = P5[i];
-    const local = key === "oth" ? k.cands.filter((c) => String(c.group).startsWith("member")).map((c) => c.group) : [key];
-    const loc = local.filter((g) => d.prim25[g] != null && d.primNow[g] != null).map((g) => `${key === "oth" ? esc(groupName(g, k)) + " " : ""}${d.prim25[g].toFixed(1)} to ${d.primNow[g].toFixed(1)}`).join("; ");
+    const local = key === "oth" ? (free ? ["oth"] : k.cands.filter((c) => String(c.group).startsWith("member")).map((c) => c.group)) : [key];
+    const loc = local.filter((g) => d.prim25[g] != null && d.primNow[g] != null).map((g) => `${key === "oth" ? (g === "oth" ? "minor candidates " : esc(groupName(g, k)) + " ") : ""}${d.prim25[g].toFixed(1)} to ${d.primNow[g].toFixed(1)}`).join("; ");
     return `${name.replace("%", vic ? "statewide" : "national")} ${b < a ? "falls" : "rises"} from ${a.toFixed(1)}% in ${Y} to ${b.toFixed(1)}% ${when}${loc ? ` (here ${loc})` : ""}`;
   };
+  // the independents' own factor (federal): a sitting independent's record, or the challenge's central level
+  const free = k.cands.some((c) => c.free), fInd = k.cands.filter((c) => c.free && d.prim25[c.group] != null && d.primNow[c.group] != null);
+  const indTxt = () => { const c = fInd.find((x) => x.slot == null) || fInd[0]; if (!c) return "Independents’ own record";
+    const a = d.prim25[c.group], b = d.primNow[c.group];
+    return c.slot == null ? `${esc(c.label)}’s own vote, moved by sitting independents’ record and not by a national swing (${a.toFixed(1)} to ${b.toFixed(1)})`
+      : `The seat’s independent challenge, drawn from the record: ${c.was && c.base > 0.001 ? `${esc(c.was.name)} polled ${a.toFixed(1)} in ${Y}, and the central projection has an independent on ${b.toFixed(1)}` : `the central projection has ${b >= 0.05 ? `an independent on ${b.toFixed(1)}` : "nobody standing"}`}`; };
   const adjC = k.cands.filter((c) => Math.abs(c.adj || 0) >= 0.005).sort((a, b) => Math.abs(b.adj) - Math.abs(a.adj)).slice(0, 2);
   const TXT = {
     alp: () => nat(0, "Labor’s % vote"), lnp: () => nat(1, "The Coalition’s % vote"), on: () => nat(2, "One Nation’s % vote"), grn: () => nat(3, "The Greens’ % vote"),
-    oth: () => nat(4, k.cands.some((c) => c.isInd) ? "The % vote for other candidates, independents included," : "Other candidates’ % vote"),
+    oth: () => nat(4, free ? "The % vote for minor parties and independents" : k.cands.some((c) => c.isInd) ? "The % vote for other candidates, independents included," : "Other candidates’ % vote"),
+    ind: indTxt,
     state: () => { const v = S.states && S.states[k.st]; const l = v ? listPP(v.dev) : ""; return `${poss(ST_NAME[k.st] || k.st)} polls against the ${vic ? "statewide" : "national"} swing${l ? `: ${l} points` : ""}`; },
     demo: () => { const l = k.demoPP ? listPP(k.demoPP) : ""; return `The seat’s age and gender mix${l ? `: ${l} points against the average seat` : ""}`; },
     terms: () => `${vic ? "Sitting members: a member standing again, and a member gone from a party’s ticket" : `Seat terms: the sitting member’s personal vote, defections and part of ${Y}’s surprise going back`}${adjC.length ? ` (${adjC.map((c) => `${esc(groupName(c.group, k))} ${c.adj > 0 ? "up" : "down"}`).join(", ")})` : ""}`,
@@ -458,7 +483,7 @@ function whyHTML(s) {
     const O = d.other ? esc(groupName(d.other, k)) : "the other finalist";
     cnt = `In the central projection ${H} (${phh.toFixed(1)} on first preferences) drops out of the count before the end${d.centralW === d.w ? `, and ${W} (${pw.toFixed(1)}) beats ${O}` : `; ${whoOf(d.centralW, k)} wins it there, ${W} in more of the simulated elections`}.`;
   }
-  const turn = d.m25 < 0 ? `from ${H} ${Math.abs(d.m25).toFixed(1)} points ahead at ${Y}’s vote` : `from ${W} already ${d.m25.toFixed(1)} ahead at ${Y}’s vote (the model’s count of ${Y}’s vote with this election’s candidates, though ${H} ${vic ? "holds the seat now" : `won the seat in ${Y}`})`;
+  const turn = d.m25 < 0 ? `from ${H} ${Math.abs(d.m25).toFixed(1)} points ahead at ${Y}’s vote` : `from ${W} already ${d.m25.toFixed(1)} ahead at ${Y}’s vote (the model’s count of ${Y}’s vote with this election’s candidates, though ${H} ${vic || k.won2025 ? "holds the seat now" : `won the seat in ${Y}`})`;
   const end = d.mNow >= 0 ? `${W} ${d.mNow.toFixed(1)} ahead` : `${H} ${Math.abs(d.mNow).toFixed(1)} ahead`;
   return `<div class="md-why"><h4>Why it changes hands</h4>
     <ol>${pro.map((x) => row(x)).join("")}${con ? row(con, "con") : ""}</ol>
@@ -477,7 +502,8 @@ const EX = (() => {
   const DRAWS = 1000;
   // what switching a how-to-vote card's order is worth, in points: the federal view's stated assumption (a third
   // of voters follow the card); the Victorian view's measured reversal (inputs-vic.json evidence.cards)
-  const cardPts = () => (STATE.jur === "vic" && STATE.vicInputs && STATE.vicInputs.evidence.cards ? Math.round(100 * (STATE.vicInputs.evidence.cards.with - STATE.vicInputs.evidence.cards.against)) : 35);
+  const cardEv = () => (STATE.jur === "vic" ? STATE.vicInputs && STATE.vicInputs.evidence.cards : STATE.evidence && STATE.evidence.card);
+  const cardPts = () => (cardEv() ? Math.round(100 * (cardEv().with - cardEv().against)) : 35);
   const LEV = [
     ["COAL|AO", "Coalition voters, between Labor and One Nation", "to Labor"],
     ["ALP|CO", "Labor voters, between the Coalition and One Nation", "to the Coalition"],
@@ -517,10 +543,10 @@ const EX = (() => {
     </div>`;
     const vote = $("#ex-vote");
     P5.forEach((k, i) => vote.insertAdjacentHTML("beforeend", `<div class="md-sl t-${P5_TONE[k]}"><label for="v-${k}"><span class="dot"></span>${P5_NAME[k]}</label><output id="vo-${k}"></output><input type="range" id="v-${k}" min="0" max="50" step="0.1" data-v="${i}"></div>`));
-    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls’ figures are ${STATE.jur === "vic" ? "the /vic/ page’s polling average" : "this site’s aggregate"} to ${shortDate(INP().asOf.pollsTo)}.</p>`);
+    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls’ figures are ${STATE.jur === "vic" ? "the /vic/ page’s polling average" : "this site’s aggregate"} to ${shortDate(INP().asOf.pollsTo)}.${STATE.jur !== "vic" && INP().build.ind ? " Sitting independents and each seat’s independent challenge keep to their own record, so moving others moves minor parties." : ""}</p>`);
     const lev = $("#ex-lev");
     for (const [k, l, unit] of LEV) lev.insertAdjacentHTML("beforeend", `<div class="md-sl"><label for="l-${lid(k)}">${l}</label><output id="lo-${lid(k)}"></output><input type="range" id="l-${lid(k)}" min="-30" max="40" step="1" value="0" data-l="${k}" data-unit="${unit}"></div>`);
-    lev.insertAdjacentHTML("beforeend", `<p class="note">Each lever shifts that voter group’s choice in every seat by the same amount (on the logit scale), keeping each seat’s own leaning. ${STATE.jur === "vic" ? `The card button moves Coalition voters by what the Liberal card’s reversal between the 2010 and 2013 federal elections was worth, ${cardPts()} points.` : "The card button assumes about a third of Coalition voters follow their party’s how-to-vote card; switching the card’s order moves them, about 35 points."}</p>`);
+    lev.insertAdjacentHTML("beforeend", `<p class="note">Each lever shifts that voter group’s choice in every seat by the same amount (on the logit scale), keeping each seat’s own leaning. ${cardEv() ? `The card button moves Coalition voters by what the Liberal card’s reversal between the 2010 and 2013 federal elections was worth, ${cardPts()} points.` : "The card button assumes about a third of Coalition voters follow their party’s how-to-vote card; switching the card’s order moves them, about 35 points."}</p>`);
     const unc = $("#ex-unc");
     for (const [k, l] of [["pol", "Polling error"], ["seat", "Seat-to-seat noise"], ["flow", "Preference drift"]]) unc.insertAdjacentHTML("beforeend", `<div class="md-sl"><label for="u-${k}">${l}</label><output id="uo-${k}"></output><input type="range" id="u-${k}" min="0" max="2" step="0.25" value="1" data-u="${k}"></div>`);
     unc.insertAdjacentHTML("beforeend", `<p class="note">1 is the size fitted on past elections; 0 removes that source of error.</p>`);
@@ -788,14 +814,65 @@ function renderEvidence() {
   const LF = E.federalLong?.rows?.[0]?.E ?? 2001, LL = E.federalLong?.rows?.slice(-1)[0]?.E ?? 2025, RF = SM?.recentFrom ?? 2016;
   const fm = (m) => (Number.isInteger(m) ? m.toFixed(1) : String(m));
   const multTxt = SM ? `Drawn at ${fm(SM.value)} times the size the last three elections left, with fat tails, it scored best when the elections from ${RF} to ${LL} were predicted afresh${SM.bestAll < SM.value ? `. Over every election since ${LF} a smaller multiple, ${fm(SM.bestAll)}, would have scored better, because seats strayed less in the 2000s; the recent elections are the better guide to today’s` : SM.bestAll > SM.value ? `. Over every election since ${LF} a larger multiple, ${fm(SM.bestAll)}, would have scored better` : ""}.` : "Noise 1.3 times the calm-year size, with fat tails, scored best when past elections were predicted afresh.";
+  // who sits has changed since the election (the candidate overlay, evidence.json `changes`): by-elections,
+  // members who changed party, retirements - each said with what the model does about it. A member who has
+  // changed party and not said whether they stand again (recontests null) is assumed neither way.
+  const CH = E.changes, PTY = { alp: "Labor", lp: "the Liberals", np: "the Nationals", lnp: "the LNP", clp: "the CLP", grn: "the Greens", on: "One Nation" };
+  const many = (g) => /s$/.test(PTY[g] || ""), seatOf = (nm) => I.seats.find((x) => x.name === nm);
+  const chItems = CH ? [
+    ...CH.byElections.map((e) => { const w = e.winner.group, was = seatOf(e.seat)?.won2025?.group; return `${esc(e.seat)} went to ${poss(PTY[w] || esc(e.winner.party))} ${esc(e.winner.name)} at the by-election of ${longDate(e.date)}: ${PTY[w] || esc(e.winner.party)} now ${many(w) ? "have" : "has"} the sitting member there${PTY[was] ? `, and ${PTY[was]} no longer ${many(was) ? "have" : "has"} ${poss(esc(e.vacatedBy))} personal vote` : ""}`; }),
+    ...CH.defections.map((e) => { const a = PTY[e.from], b = PTY[e.to] || esc(e.party), lose = many(e.from) ? "lose" : "loses", their = many(e.from) ? "their" : "its";
+      return `${esc(e.member)}, elected for ${a} in ${esc(e.seat)}, has sat for ${b} since ${longDate(e.date)}${e.recontests === true ? ` and stands there again: ${a} ${lose} more than a retirement would cost, and ${b} ${many(e.to) ? "have" : "has"} a sitting member`
+        : e.recontests === false ? ` and is not standing there again: ${a} ${lose} ${their} member’s personal vote`
+        : `. Whether ${esc(e.member.split(" ").pop())} stands there again is not settled, so the model assumes neither: ${a} ${lose} ${their} member’s personal vote, and ${b} ${many(e.to) ? "get" : "gets"} no sitting member`}`; }),
+    ...CH.retirements.map((e) => { const g = seatOf(e.seat)?.held?.group; return `${esc(e.member)} is not standing again in ${esc(e.seat)}, which costs ${PTY[g] || "the party"} a sitting member’s personal vote`; }),
+  ] : [];
+  const changesTxt = chItems.length ? `
+     <p>Who sits has changed in ${word(chItems.length)} seat${chItems.length === 1 ? "" : "s"} since the election, and the terms follow. ${chItems.map((t) => cap1(t) + ".").join(" ")}</p>` : "";
   html.push(step(2, "Spread the vote across the seats",
     `<p>Each party’s 2025 vote in each seat moves by the same amount on the logit scale, with one shift per party solved so the national totals come out exactly. On the logit scale a party gains least in points where it is very weak or very strong, which is how a surge spreads: the rule predicted One Nation’s SA 2026 vote, district by district, from its federal 2025 vote with a typical miss of 2.1 points, against 4.5 for adding the same points everywhere.</p>
      <p>Each state shifts by what this term’s state polling says, within its sampling error, and each seat by the age and gender of its voters, as measured in the Resolve polls against election eve.</p>
-     ${termsTxt}
+     ${termsTxt}${changesTxt}
      <p>What the terms cannot foresee is noise, fitted on the same elections. It has grown as voters have loosened their ties, and it grows for a party in steep decline, as the SA Liberals’ did in 2026, so a party’s seat noise grows with its fall since 2025. ${multTxt}</p>
      <p>Education gets no term of its own. Within each pollster, the gap between graduates and everyone else has moved by ${E.education.estimate.onp.gapChange.toFixed(2)} on the logit scale for One Nation and ${E.education.estimate.grn.gapChange.toFixed(2)} for the Greens: their surges spread by education just as the logit rule implies. Labor’s and the Coalition’s gaps moved by about 0.2, worth at most ${fx1(Math.max(E.education.estimate.alp.seatEffect.mostPositive[0][1], E.education.estimate.lnp.seatEffect.mostPositive[0][1]))} points in the most extreme seats, and the model’s shared education shock already spans that.</p>
      <p class="src"><a href="${GH}.build/analysis/seat-model/swing-fit.mjs">swing-fit.mjs</a>, <a href="${GH}.build/analysis/seat-model/calibrate-swing.mjs">calibrate-swing.mjs</a>, <a href="${GH}.build/analysis/seat-model/extract-incumbency.mjs">extract-incumbency.mjs</a>, <a href="${GH}.build/analysis/seat-model/calibrate-education.mjs">calibrate-education.mjs</a>, <a href="${GH}.build/analysis/seat-model/vote-layer.mjs">vote-layer.mjs</a>.</p>`,
     `<div class="cap">How far seats stray from the logit rule, in points at each party’s typical vote</div><div id="fig-noise"></div><div class="sub">Root mean square of each seat’s miss with the state totals known${TM ? " and the seat terms applied" : ""}, at each party’s 2025 national vote. The SA Liberals’ 2026 collapse ran at about ${fx1(ptsAt(E.swing.sa26.lnp.rmsLogit, 0.19))} points.</div>`));
+  // independents drawn from the record (evidence.json `independents`): every figure read off the stores. The
+  // wave sentence names the window's election with the most winners among challengers new to their seats.
+  const IN = E.independents, pc0 = (v) => Math.round(100 * v), andList0 = (xs) => (xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1]);
+  if (IN) {
+    const exa = (tp) => IN.examples.find((x) => Math.abs(x.tp - tp) < 1e-9), yrs = IN.window, B = IN.byElection, r25 = I.vote.result2025;
+    const num = (n) => (n <= 12 ? word(n) : String(n));
+    const waveY = [...yrs].sort((x, y) => B[y].freshWon - B[x].freshWon || B[y].freshSerious - B[x].freshSerious)[0];
+    // one sentence, one style: numerals throughout once any count passes twelve
+    const big = yrs.some((y) => B[y].freshSerious > 12 || B[y].freshWon > 12), n2 = (n) => (big ? String(n) : num(n));
+    const waveTxt = yrs.map((y) => `${n2(B[y].freshSerious)} passed 10% in ${y} and ${B[y].freshWon === 0 ? "none" : n2(B[y].freshWon)} won`).join("; ");
+    const e0 = exa(0), e20 = exa(0.2), e30 = exa(0.3);
+    // what the draw gives on today's polls: the seats independents win that they do not hold now, against the
+    // window's elections ("more than at any" only when above the largest by half a seat), and the conversion
+    // record that says why (check.conversion: independents on 15% to 30% who won, the split-field election apart)
+    const gains = R.seats.reduce((t, s) => { const k = I.seats.find((x) => x.name === s.name); return !k || k.cands.some((c) => c.free && c.slot == null) ? t : t + Object.entries(s.win).filter(([g]) => BUCKET(g) === "member").reduce((a2, [, p]) => a2 + p, 0); }, 0);
+    const wonBy = yrs.map((y) => [y, B[y].standingWon + B[y].freshWon]), mx = wonBy.slice().sort((x, y) => y[1] - x[1])[0];
+    const CV = IN.check.conversion || [], split = CV.find((e) => e.id === "sa26"), calm = CV.filter((e) => e.id !== "sa26");
+    const mid = (e) => [e.bands["15-20"].won + e.bands["20-30"].won, e.bands["15-20"].n + e.bands["20-30"].n];
+    const calmW = calm.reduce((t, e) => t + mid(e)[0], 0), calmN = calm.reduce((t, e) => t + mid(e)[1], 0);
+    // the other elections in running prose: "the 2022 and 2025 federal elections and SA 2022"
+    const fedY = calm.filter((e) => /^Federal /.test(e.label)).map((e) => e.label.slice(8)), stL = calm.filter((e) => !/^Federal /.test(e.label)).map((e) => e.label);
+    const calmL = [...(fedY.length ? [`the ${andList0(fedY)} federal election${fedY.length > 1 ? "s" : ""}`] : []), ...stL];
+    const ofN = (a, b) => (b > 12 ? `${a} of ${b}` : `${num(a)} of ${num(b)}`);
+    const todayTxt = `<p><b>Today.</b> On these polls independents win about ${fx1(gains)} seats they do not hold now, ${gains > mx[1] + 0.5 ? `more than at any of those elections (${num(mx[1])} in ${mx[0]})` : `against ${wonBy.map(([y, n]) => `${n === 0 ? "none" : num(n)} in ${y}`).join(", ")}`}. The draw gives them no more votes than the record does. The count does the rest: a challenger needs fewer votes to win when the major parties’ first preferences are this low.${split && calmN ? ` In ${split.label}, the one election in the stores with a field this split, ${num(mid(split)[0])} of the ${num(mid(split)[1])} independents on 15% to 30% won; in ${andList0(calmL)} together, ${ofN(calmW, calmN)}.` : ""}</p>`;
+    const exRows = IN.examples.map((x) => `<tr><td>${x.tp === 0 ? "No independent to speak of" : pc0(x.tp) + "%"}</td><td>${pc0(x.none)}%</td><td>${pc0(x.p10)}%</td><td>${pc0(x.p20)}%</td><td>${pc0(x.p30)}%</td></tr>`).join("");
+    html.push(step(3, "Draw the independents from the record",
+      `<p>Independents are candidates and not a party. A seat’s independent vote does not follow a national swing, and nobody is nominated yet, so the model reads both off the record.</p>
+       <p><b>Sitting independents.</b> Since ${IN.sitting.first}, ${IN.sitting.n} sitting independents have faced the voters again and ${IN.sitting.held} held their seats. Their own vote rose on average, by ${IN.sitting.mean.toFixed(2)} on the logit scale (standard error ${IN.sitting.se.toFixed(2)}; about ${fx1(ptsAt(IN.sitting.mean, 0.35))} points for a member on 35%), and it varied by ${IN.sitting.sig.toFixed(2)} from one to the next. Each of the ${word(IN.seats.sitting)} sitting now moves by that record. Until this version they moved with the polls’ figure for others, which counts minor parties too and stands at ${fx1(now.oth)}% against ${fx1(r25.oth)}% at the election.</p>
+       <p><b>Every other seat.</b> Each of the ${IN.seats.challenges} seats a party holds gets one independent challenge. Its share of the vote is drawn from what happened next in seats whose strongest independent had polled about the same, at the last ${word(yrs.length)} elections (${andList0(yrs.map(String))}). Where no independent to speak of had stood, a challenger reached 10% in ${pc0(e0.p10)}% of seats. Where one had polled 20%, an independent reached 20% again in ${pc0(e20.p20)}%; where one had polled 30%, in ${pc0(e30.p20)}%, and none stood in ${pc0(e30.none)}%. In ${IN.seats.standing.length} seats an independent polled ${pc0(IN.settings.replace)}% or more in 2025, and the draw stands in for that candidate. Elsewhere a challenger of ${pc0(IN.settings.serious)}% or more is added to the field when one is drawn.</p>
+       <p><b>Waves.</b> Independents rise together. In seats where no independent had polled 10% the time before, ${waveTxt}. Each simulated election takes every seat’s draw from the same one of those elections, so a year like ${waveY} arrives whole or not at all.</p>
+       ${todayTxt}
+       <p>Unfortunately, the record cannot say who will stand, or where. A seat’s chance for an independent is the chance the record gives a seat like it, and it will sharpen only when candidates are known.</p>
+       <p class="src"><a href="${GH}.build/analysis/seat-model/independents.mjs">independents.mjs</a>, <a href="${GH}.build/analysis/seat-model/calibrate-independents.mjs">calibrate-independents.mjs</a>.</p>`,
+      `<table class="md-tbl"><caption>A seat’s independent challenge, by how its strongest independent polled last time</caption><thead><tr><th>Last time</th><th>None stands</th><th>10% or more</th><th>20% or more</th><th>30% or more</th></tr></thead><tbody>${exRows}</tbody></table>
+       <div class="sub">How often each happened next in comparable seats at the ${andList0(yrs.map(String))} elections, seats nearer the row’s share counting for more. A seat with no independent to speak of counts as one only when a challenger reaches ${pc0(IN.settings.serious)}%.</div>`));
+  }
   const ex = E.examples.map((x) => `<tr><td>${esc(x.seat)}</td><td>${Math.round(100 * x.coalitionLaborOverOn)}%</td><td>${Math.round(100 * x.laborCoalitionOverOn)}%</td><td>${Math.round(100 * x.onLaborOverCoalition)}%</td><td>${Math.round(100 * x.greensLaborOverCoalition)}%</td></tr>`).join("");
   const comp = (row, label) => { const parts = [["onp", "on", "One Nation"], ["lnp", "lnp", "Coalition"], ["alp", "alp", "Labor"], ["grn", "grn", "Greens"], ["ind", "member", "independents"], ["oth", "oth", "others"]]; return `<div class="md-fine" style="margin-top:12px">${label}</div><div class="md-mix">${parts.map(([k, t]) => `<span class="t-${t}" style="flex-grow:${(1000 * (row[k] || 0)).toFixed(0)}" title="${Math.round(100 * (row[k] || 0))}% voted ${k === "ind" ? "independent" : k === "oth" ? "for another party" : PARTY[t].name} in 2025"></span>`).join("")}</div><div class="md-fine">${parts.filter(([k]) => (row[k] || 0) >= 0.03).map(([k, , n]) => `${Math.round(100 * row[k])}% ${n}`).join(" · ")}</div>`; };
   // the House record’s check on the national preference shocks: each class’s drift between elections against
@@ -809,20 +886,36 @@ function renderEvidence() {
   const mixTxt = CA && OA && !CU.mixed.length ? `
      <p>Voters have moved since 2025. By the last six weeks of vote-switching polls, today’s One Nation voters are ${pc(E.composition.on.onp)}% its 2025 voters, ${pc(E.composition.on.lnp)}% former Coalition voters and ${pc(E.composition.on.alp)}% former Labor voters, and ${pc(E.composition.lnp.alp)}% of today’s Coalition voters say they voted Labor. The model doesn’t carry those switchers’ old orders over. Given their old party’s order with the new party moved first, they would send ${pc(OA.ifMixed)}% of One Nation preferences to Labor ahead of the Coalition and ${pc(CA.ifMixed)}% of Coalition preferences to Labor ahead of One Nation, both above the latest counts of those choices. Recalled votes lean towards the party that won.</p>
      <p>Two choices decide more seats than any others: whether Coalition voters put Labor or One Nation next, and whether One Nation voters put Labor or the Coalition next. The model sets both national levels to the site’s own tables and keeps each seat’s Senate pattern around them: ${pc(CA.used)}% of Coalition preferences to Labor ahead of One Nation, from the <a href="/flows-explained/#one-nation">Labor v One Nation table</a> (${pc(CA.senate)}% on the 2025 Senate ballots, outside the ACT, where One Nation ran no Senate ticket), and ${Number((100 * OA.used).toFixed(1))}% of One Nation preferences to Labor ahead of the Coalition, as counted in 2025.</p>` : "";
-  html.push(step(3, "Order every voter’s preferences",
+  // what poll respondents now say of those two levels (evidence.json `respondents`: the polls publishing their
+  // respondents' own allocation in the six weeks to the newest poll), and the nowcast's averages halfway to
+  // them and on them alone beside the official run's; absent when no such poll is in the window
+  const RS = E.respondents, sN = (o, k) => Math.round(o.expectedSeats[k]);
+  const respTxt = RS ? `
+     <p>Poll respondents now say something different. In the six weeks to ${shortDate(RS.to)}, ${RS.polls.length === 1 ? "the one poll" : `the ${word(RS.polls.length)} polls`} publishing respondents’ own choices had ${pc(RS.said.on)}% of One Nation voters putting Labor ahead of the Coalition and ${pc(RS.said.coal)}% of Coalition voters putting Labor ahead of One Nation. The model keeps the counted levels: each has a federal count behind it, and no count has yet tested a reading that has moved. Halfway to the respondents, One Nation would average ${sN(RS.halfway, "on")} seats and Labor ${sN(RS.halfway, "alp")}; on the respondents alone, ${sN(RS.respondents, "on")} and ${sN(RS.respondents, "alp")}. The official run has ${sN(RS.official, "on")} and ${sN(RS.official, "alp")}.</p>` : "";
+  html.push(step(IN ? 4 : 3, "Order every voter’s preferences",
     `<p>Who wins a seat often depends on the order in which voters number the parties they did not vote for, and in a three-way race that order decides a great deal: whether Coalition voters put Labor or One Nation next. The House count shows only the contests that happened. The Senate shows every voter’s order: the AEC publishes every formal Senate ballot, and for each party’s voters in each seat this model counts the order in which they ranked Labor, the Coalition, the Greens and One Nation, across about 15 million ballots at each of the last four elections.</p>
      <p>House voters differ from Senate voters in ways fitted on ${E.flows.rows.same.toLocaleString("en-AU")} House flows counted from 2016 to 2025, the elections since every Senate ballot has been published (before 2016 nearly every Senate vote was a single vote for a party’s ticket, which shows the party’s order, not its voters’): Greens voters’ preferences reach Labor a little less often in the House, One Nation’s a little more. Where the 2025 House count saw a seat’s own flow, that counts too.</p>${driftTxt}
-     ${mixTxt}
+     ${mixTxt}${respTxt}
      <p class="src"><a href="${GH}.build/analysis/seat-model/extract-senate-rankings.py">extract-senate-rankings.py</a>, <a href="${GH}.build/analysis/seat-model/senate-flows.mjs">senate-flows.mjs</a>, <a href="${GH}.build/analysis/seat-model/calibrate-flows.mjs">calibrate-flows.mjs</a>, <a href="${GH}.build/analysis/seat-model/seat-build.mjs">seat-build.mjs</a>.</p>`,
     `<table class="md-tbl"><caption>Three seats’ 2025 Senate ballots</caption><thead><tr><th>Seat</th><th>Coalition voters: Labor ahead of One Nation</th><th>Labor voters: Coalition ahead of One Nation</th><th>One Nation voters: Labor ahead of the Coalition</th><th>Greens voters: Labor ahead of the Coalition</th></tr></thead><tbody>${ex}</tbody></table>
      <div class="sub">Shares of each party’s Senate voters who numbered either of the two, before the House adjustments.</div>
      ${comp(E.composition.on, "Today’s One Nation voters, by their 2025 vote")}${comp(E.composition.lnp, "Today’s Coalition voters, by their 2025 vote")}`));
+  // what an independent takes of a pile, by who else is left (evidence.json independents.take), and its check on
+  // the SA 2026 districts it was not measured on: "closer" only when the mean error is smaller
+  const TK = IN?.take, CK = IN?.check?.sa26;
+  const takeTxt = TK ? (() => {
+    const vs = TK.vsOneNation, counts = vs ? andList0(vs.counts.map((c) => `the ${esc(c.seat)} by-election of ${longDate(c.date)}`)) : "";
+    const n = CK ? CK.rows.length : 0, a = CK?.meanAbsError.byWhoIsLeft, b = CK?.meanAbsError.flat, out = CK ? CK.rows.filter((q) => q.byWhoIsLeft == null).length : 0;
+    const chk = CK && a != null && b != null ? ` Counted this way from their actual first preferences, the ${word(n)} SA 2026 districts where an independent reached the final two come out ${fx1(100 * a)} points from the count on average, ${a < b ? `against ${fx1(100 * b)} when one share served for every case` : `no closer than the ${fx1(100 * b)} a single share gave`}${out ? ` (in ${word(out)} the model’s count left the independent out of the final two)` : ""}.` : "";
+    return `<p>An independent takes a share of every pile of ballots on the move, and the share depends on who else is left. Leaving aside ballots that went to other minor candidates, in the 2025 counts an independent took ${pc0(TK.own.GRN)}% of a Greens pile while Labor was still standing and ${pc0(TK.own.ON)}% of a One Nation pile while the Coalition was. Once only the other side of politics was left, an independent took ${pc0(TK.cross.ALP)}% of a Labor pile and ${pc0(TK.cross.COAL)}% of a Coalition pile.${vs && vs.COAL ? ` Coalition voters choosing between an independent and One Nation have been counted ${vs.counts.length === 1 ? "once" : word(vs.counts.length) + " times"}, at ${counts}: ${pc0(vs.COAL.share)}% chose the independent.` : ""}${chk}</p>
+     <p>A Liberal or National knocked out of a three-cornered contest passes most of their votes to their partner, at the rate their 2025 counts show.</p>`;
+  })() : `<p>Sitting independents take the share of moving ballots they took in their 2025 counts. A Liberal or National knocked out of a three-cornered contest passes most of their votes to their partner, at the rate their 2025 counts show.</p>`;
   const { p25, p28, pk, html: pairFig } = pairsFigure(I.seats, (k) => k.tcp2025, R, 2025, "If held today, on average");
   const PNM = PAIR_NM;
   const cl25 = p25["alp v lnp"] || 0, cl28 = p28["alp v lnp"] || 0, top28 = pk.find((q) => q !== "alp v lnp" && (p28[q] || 0) >= 1);
-  html.push(step(4, "Count every seat",
+  html.push(step(IN ? 5 : 4, "Count every seat",
     `<p>Every seat is counted as the AEC counts it: the candidate with the fewest votes is excluded, and each ballot moves to the next candidate it ranks who is still standing, until two remain. Because each group of voters’ whole order is known, the count works for any final pair (Labor v One Nation, the Coalition v One Nation, a three-way race) without a table of flows, and a ballot that passed through one party moves on as its own voter would move it. Building three-way splits from pairwise flows instead misplaces the right-wing minor parties’ votes by about 11 points.</p>
-     <p>Sitting independents take the share of moving ballots they took in their 2025 counts. A Liberal or National knocked out of a three-cornered contest passes most of their votes to their partner, at the rate their 2025 counts show.</p>
+     ${takeTxt}
      <p>In 2025, ${cl25} of the 150 counts ended with Labor against the Coalition. If the election were held today, about ${Math.round(cl28)} would${top28 ? `, and about ${Math.round(p28[top28])} would end ${top28.split(" v ").map((x) => (x === "lnp" ? "the Coalition" : x === "grn" ? "the Greens" : x === "member" ? "an independent" : x === "oth" ? "another candidate" : PNM[x])).join(" against ")}` : ""}.</p>
      <p>Counted on the actual 2025 first preferences, this reproduces <b>${E.replay2025.winners} of the 150 winners</b> and ${E.replay2025.pairs} of the final pairs, with a typical two-candidate error of ${fx1(E.replay2025.tcpMaePts)} points. The misses are ${E.replay2025.misses.join(", ")}, the closest contests of the election.</p>
      <p class="src"><a href="${GH}.build/analysis/seat-model/seat-engine.mjs">seat-engine.mjs</a>.</p>`, pairFig));
@@ -832,10 +925,11 @@ function renderEvidence() {
     ["Each state", "Its polling deviation within its sampling error, plus 0.10 logit", "This term’s state polling"],
     ["Seat types and education", `${Math.min(...S.sigClass).toFixed(2)}–${Math.max(...S.sigClass).toFixed(2)} logit by type; ${S.sigEdu.toFixed(2)} per standard deviation of degree share`, `Set above the seat-type swings measured ${SY}`],
     ["Each seat", `Labor ${R.meta.sigmaSeat.alp.toFixed(2)}, Coalition ${R.meta.sigmaSeat.lnp.toFixed(2)}, One Nation ${R.meta.sigmaSeat.on.toFixed(2)}, Greens ${R.meta.sigmaSeat.grn.toFixed(2)} logit, fat-tailed, larger for a party that has fallen since 2025`, `Federal ${SY} and SA 2026`],
+    ...(IN ? [["Independents", `A sitting independent ±${IN.sitting.sig.toFixed(2)} logit around a rise of ${IN.sitting.mean.toFixed(2)}, fat-tailed; every other seat’s challenge a draw from the record, all seats from the same election`, `${IN.sitting.n} sitting independents ${IN.sitting.first}–${IN.sitting.last}; seats at the ${IN.window[0]}–${IN.window[IN.window.length - 1]} elections`]] : []),
     ["Preferences, nationally", `${Object.entries(S.flowNat).filter(([k]) => ["COAL", "ON", "GRN", "OTH-R"].includes(k)).map(([k, v]) => `${{ COAL: "Coalition", ON: "One Nation", GRN: "Greens", "OTH-R": "right-wing minors" }[k]} ${v.toFixed(2)}`).join(", ")} logit, plus a shared One Nation shift of ${S.flowOn}`, "Drift from a Senate election to the next House count, federal 2019–2025 and six state elections"],
     ["Preferences, each seat", `${Math.min(...Object.values(S.flowSeat)).toFixed(2)}–${Math.max(...Object.values(S.flowSeat)).toFixed(2)} logit`, "What the Senate and the seat’s history leave unexplained"],
   ];
-  html.push(step(5, `Simulate ${R.meta.draws.toLocaleString("en-AU")} elections`,
+  html.push(step(IN ? 6 : 5, `Simulate ${R.meta.draws.toLocaleString("en-AU")} elections`,
     `<p>Every simulated election draws each of these afresh, then counts all 150 seats. A party’s seat total, its chance of a majority and each seat’s chances are simply how often things happened across the simulations. The central projection is one more election, with every error set to zero: it can differ from the averages because close seats tip one way at the centre and both ways once the errors are drawn.</p>
      <p class="src"><a href="${GH}.build/analysis/seat-model/model-sim.mjs">model-sim.mjs</a>, <a href="${GH}.build/analysis/seat-model/swing-simulate.mjs">swing-simulate.mjs</a>.</p>`,
     `<table class="md-tbl md-terms"><caption>What varies in each simulated election</caption><thead><tr><th>What</th><th>Size</th><th>Fitted on</th></tr></thead><tbody>${terms.map(([w, s2, f]) => `<tr><td>${w}</td><td style="white-space:normal;text-align:left">${s2}</td><td style="white-space:normal;text-align:left;color:var(--ink-3)">${f}</td></tr>`).join("")}</tbody></table>`));
@@ -892,7 +986,7 @@ function renderEvidence() {
     const sen = fed.length ? `On the Senate ballots, as the model reads them for 2028, the ${andList(fed.map((r) => String(r.E)))} runs picked ${andList(fed.map((r) => String(r.modalRight)))} winners.` : "";
     const longRows = rows.map((r) => `<tr><td>${r.E}</td><td>${r.modalRight}/${r.seats}<div class="md-fine">${r.modalPlain} without terms</div></td><td>${r.pairsRight}/${r.seats}</td><td>${fx1(r.tcpMaePts)}</td><td>${Math.round(r.expected.alp)} v ${r.actual.alp}</td><td>${Math.round(r.expected.lnp)} v ${r.actual.lnp}</td></tr>`).join("");
     T2.push(step("", `${cap(word(n))} federal elections, each from the one before`,
-      `<p>The whole chain run for every federal election from ${first} to ${last} with only what was known at the one before: its seats and results, its House preference flows, the seat terms and noise fitted on earlier elections only, and each election’s actual national vote given, so that what is tested is the step from votes to seats. Before 2016 the Senate ballots show no voter’s own order, so these runs take each party’s preferences from the previous House count, set on the shape of the 2016 Senate ballots.</p>
+      `<p>The whole chain run for every federal election from ${first} to ${last} with only what was known at the one before: its seats and results, its House preference flows, the seat terms and noise fitted on earlier elections only, and each election’s actual national vote and candidates given, so that what is tested is the step from votes to seats. Before 2016 the Senate ballots show no voter’s own order, so these runs take each party’s preferences from the previous House count, set on the shape of the 2016 Senate ballots.</p>
        <p>With the seat terms the chain picked ${W.toLocaleString("en-AU")} of ${seatsAll2.toLocaleString("en-AU")} winners, against ${Wp.toLocaleString("en-AU")} without them, and the chances it gave scored better in ${word(kBetter)} of the ${word(n)} elections. ${eraTxt}</p>
        <p>Labor’s seat total landed inside the model’s 90% range in ${word(rows.filter((r) => inside(r, "alp")).length)} of the ${word(n)} elections${mA.length ? ` (not in ${mA.join("; ")})` : ""}, and the Coalition’s in ${word(rows.filter((r) => inside(r, "lnp")).length)}${mL.length ? ` (not in ${mL.join("; ")})` : ""}. ${sen} When nearly every final pair is Labor against the Coalition, preferences barely move seats, so these runs test the swing and the noise more than the preferences.</p>
        <p class="src"><a href="${GH}.build/analysis/seat-model/backtest-long.mjs">backtest-long.mjs</a>, <a href="${GH}.build/analysis/seat-model/backtest-chain.mjs">backtest-chain.mjs</a>.</p>`,
@@ -903,6 +997,31 @@ function renderEvidence() {
        <p>When nearly every final pair is Labor against the Coalition, preferences barely move seats, so these runs test the swing and the noise more than the preferences.</p>
        <p class="src"><a href="${GH}.build/analysis/seat-model/backtest-chain.mjs">backtest-chain.mjs</a>.</p>`,
       `<table class="md-tbl"><caption>National vote given, ${E.federal.draws.toLocaleString("en-AU")} simulations each</caption><thead><tr><th>Election</th><th>Winners right</th><th>Final pairs right</th><th>Two-candidate error</th><th>Labor seats, model v actual</th><th>Coalition</th><th>Independents</th></tr></thead><tbody>${fedRows}</tbody></table>`));
+  }
+  /* independents: every election run twice, as the model treated them until v2.3 and drawn from the record as it
+     then stood (evidence.json independents.backtest, from backtest-long.mjs terms-ind28 / terms-indrec). Rules:
+     a score is "better" or "worse" only past a margin (0.002 on the log score, 0.0005 on the Brier score: about
+     the run-to-run noise of 2,000 simulations), else "the same"; the log score is nearer zero when better, the
+     Brier score lower. */
+  const BT = IN?.backtest;
+  if (BT && BT.rows.length) {
+    const A = BT.all, Rr = BT.recent, Ee = BT.early, nE = BT.rows.length, y0 = BT.rows[0].E, y1 = BT.rows[nE - 1].E;
+    const cmp = (after, before, tol) => (after < before - tol ? "better" : after > before + tol ? "worse" : "same");
+    const logV = cmp(-A.after.logScore, -A.before.logScore, 0.002), brR = Rr.before ? cmp(Rr.after.brier, Rr.before.brier, 0.0005) : null, brE = Ee.before ? cmp(Ee.after.brier, Ee.before.brier, 0.0005) : null;
+    const f3 = (x) => x.toFixed(3).replace("-", "−"), f4 = (x) => x.toFixed(4);
+    const logTxt = `On the log score, which punishes most a forecast that calls something impossible and then sees it happen, the record scores ${logV === "better" ? "better" : logV === "worse" ? "worse" : "the same"}: ${f3(A.after.logScore)} against ${f3(A.before.logScore)}, where nearer zero is better.`;
+    const eraWord = (v) => (v === "better" ? "better" : v === "worse" ? "a little worse" : "the same");
+    const brTxt = brR && brE ? `On the Brier score, which rewards being roughly right in every seat, it scores ${eraWord(brR)} over the elections from ${BT.recentFrom} (${f4(Rr.after.brier)} against ${f4(Rr.before.brier)}; lower is better) and ${brE === brR ? "the same before them" : eraWord(brE) + " before them"} (${f4(Ee.after.brier)} against ${f4(Ee.before.brier)})${brE === "worse" ? ", when independents were rare and the record still gave every seat a small chance that mostly never came" : ""}.` : "";
+    const cautious = A.after.expectedInd < A.after.actualInd - 0.5 ? " The record is still cautious: independents won more seats than it expected." : A.after.expectedInd > A.after.actualInd + 0.5 ? " The record expected more than independents won." : "";
+    const two = (a, b) => `${a}<div class="md-fine">${b}</div>`;
+    const btRows = BT.rows.map((r) => `<tr><td>${r.E}</td><td>${r.actualInd}</td><td>${two(fx1(r.after.expectedInd), fx1(r.before.expectedInd))}</td><td>${two(f4(r.after.brier), f4(r.before.brier))}</td><td>${two(f3(r.after.logScore), f3(r.before.logScore))}</td></tr>`).join("");
+    T2.push(step("", "Independents: the record against the old treatment",
+      `<p>Each election from ${y0} to ${y1} was run twice from what was known at the one before: with independents as the model treated them until this version (sitting members moving with the vote for others, last time’s losing independents standing again as minor candidates, nobody new), and drawn from the record as it then stood. Neither run was told who the independents would be.</p>
+       <p>Independents won ${A.after.actualInd} seats over those ${word(nE)} elections, sitting members included. The old treatment expected ${fx1(A.before.expectedInd)} and the record ${fx1(A.after.expectedInd)}.${cautious}</p>
+       <p>${logTxt} ${brTxt}</p>
+       <p class="src"><a href="${GH}.build/analysis/seat-model/backtest-long.mjs">backtest-long.mjs</a> (terms-ind28, terms-indrec).</p>`,
+      `<table class="md-tbl"><caption>Independents elected, and what the record expected; beneath each figure, the old treatment’s</caption><thead><tr><th>Election</th><th>Elected</th><th>Expected</th><th>Brier score</th><th>Log score</th></tr></thead><tbody>${btRows}</tbody></table>
+       <div class="sub">National vote given, ${(FL ? FL.draws : 2000).toLocaleString("en-AU")} simulations each. Scores are over every seat: a lower Brier score is better, and a log score nearer zero.</div>`));
   }
   // calibration: the long run’s pooled bins when present. Rules: the middle bins line up when no gap tops 5
   // points; each edge bin is "too sure" / "too cautious" when the observed rate is off the predicted by more
@@ -944,9 +1063,9 @@ function renderEvidence() {
 
   $("#limits-body").innerHTML = [
     ["How-to-vote cards", "The model assumes parties recommend preferences much as they did in 2025, when the Coalition put One Nation ahead of Labor almost everywhere. If the Coalition’s card put Labor first instead, the many Labor-v-One Nation seats would swing to Labor; the explorer has a button for it."],
-    ["Who stands", `It assumes 2025’s candidates and parties stand again, with One Nation and the Greens everywhere and sitting independents recontesting. Every sitting member is assumed to stand again${TM ? `, so a retirement would cost the party that member’s personal vote, about ${pts2(TM.alp.incE, "alp")} points` : ""}. New independents, the kind who won six seats in 2022, are invisible until they nominate.`],
-    ["Independents", "A sitting independent’s vote carries over, moved by the national swing to others and with extra noise. Their personal votes and campaigns are not modelled."],
-    ["Boundaries", "Seats are 2025’s. A redistribution before 2028 would change the starting point of the seats it touches."],
+    ["Who stands", `Nobody is nominated yet. The model assumes the parties’ 2025 candidates, with One Nation and the Greens everywhere, and every sitting member standing again unless they have said otherwise${TM ? `: a retirement costs the party that member’s personal vote, about ${pts2(TM.alp.incE, "alp")} points` : ""}.`],
+    ["Independents", IN ? "Unfortunately, no independent challenger is a named person yet. Each seat’s challenge is a draw from the record of seats like it, so the model can say how often independents win seats of that kind and cannot say which campaigns will be the strong ones. Sitting independents are assumed to stand again." : "A sitting independent’s vote carries over, moved by the national swing to others and with extra noise. Their personal votes and campaigns are not modelled."],
+    ["Boundaries", "Seats are 2025’s. Tasmania, South Australia and the ACT were redrawn in July 2026, and Queensland’s redistribution is due to finish in September 2027. The model does not yet move the 2025 vote onto the new boundaries."],
     ["The campaign", "Nothing here knows about events between now and the election. The election-day mode widens the errors for that, as history says it should, but cannot say which way they will go."],
     ["The polls", "The national vote is the polls’ average. If every pollster is wrong in the same direction, as in 2019, the model inherits it; the polling error it draws is the size such misses have been."],
   ].map(([h, p]) => `<div><h3>${h}</h3><p>${p}</p></div>`).join("");

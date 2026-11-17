@@ -42,6 +42,7 @@ self.onmessage = async (ev) => {
       const seats = seatsFor(m.levers);
       const base = INPUTS.settings[m.mode === "forecast" ? "forecast" : m.mode === "vic" ? "vic" : "nowcast"];
       const S = { ...base,
+        ...(INPUTS.build.ind ? { ind: INPUTS.build.ind } : {}),   // the independents' tables (shared by both modes)
         now5: m.now5 || base.now5,
         uncertainty: m.uncertainty !== false,
         polErrMult: m.polErrMult ?? 1, seatNoiseMult: m.seatNoiseMult ?? 1, flowNoiseMult: m.flowNoiseMult ?? 1,

@@ -15,6 +15,10 @@
         seat noise per candidate (Student-t; a candidate may carry its own spread, c.sig - Victoria's
         independents new to the ballot), the age/gender terms, then one shift per party solved so
         the national totals hold exactly (seat-engine.spreadShares)
+        Independents drawn from the record (S.ind, independents.mjs) stand outside that: a sitting
+        independent moves by sitting independents' own drift and spread, every other seat's independent
+        challenge takes a level drawn from what happened next in seats like it, all seats from the same one
+        of the last elections, and the parties share what the independents leave
      4. flow shocks: national per donor class and recipient, a shared One Nation acceptability shock,
         and seat-level flow noise
      5. the count in every seat (seat-engine.count) */
@@ -28,7 +32,7 @@ export const KEYS = ["alp", "lnp", "on", "grn", "oth", "member"];
 const CLASS_IDX = { "Inner Metropolitan": 0, "Outer Metropolitan": 1, "Provincial": 2, "Rural": 3 };
 
 /* ---- settings from the calibration files (node builds this; the page reads it) ---- */
-export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast", plainNoise = false }) {
+export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast", plainNoise = false, IND = null }) {
   const nat25 = P5.map((p) => VOTE.national.result2025[p] / 100);
   const v = P5.map((p) => VOTE.national.nowcast[p] / 100), t = v.reduce((a, b) => a + b, 0);
   const now5 = v.map((x) => x / t);
@@ -61,12 +65,29 @@ export function modelSettings({ VOTE, CAL, FCAL, DRIFT, mode = "nowcast", plainN
     flowNat, flowOn: 0.15, flowSeat, states,
     fade: mode === "forecast" ? { lo: 0, hi: 0.6 } : null,
     polErrMult: 1, seatNoiseMult: 1, flowNoiseMult: 1, uncertainty: true,
+    // independents drawn from the record: the window's elections and each challenge's table (seat-inputs.mjs)
+    ...(IND ? { ind: IND } : {}),
   };
 }
 /* the seat-noise SD per party: fitted calm-year level x sigMult, plus a term that grows with the party's
    fall since 2025 (SA 2026's collapsing Liberals); recomputed from the vote the run starts from */
 export function seatSigmas(S, base5) {
   return P5.map((p, k) => { const d = logit(base5[k]) - logit(S.nat25[k]); return S.seatNoiseMult * Math.sqrt((S.sigMult * S.sig0[k]) ** 2 + (d < 0 ? (S.kFall * d) ** 2 : 0)); });
+}
+
+/* an independent's own move from its base, on the logit scale (never a party's swing): a challenge
+   (c.slot) takes a level from its seat's table - the election `era` of the record's window, or the
+   table's central level when nothing is drawn - and is not standing where that level is zero (the
+   parties then share its last vote in proportion, as they share any vote a candidate leaves); a sitting
+   independent (c.free.drift, c.free.sig) moves by sitting independents' record */
+export function freeDev(c, S, R, era) {
+  if (c.slot != null) {
+    const t = S.ind.tables[c.slot];
+    let lv = t.central;
+    if (R && era >= 0) { const u = R.u01(), cum = t.cum[era]; let i = 0; while (i < cum.length - 1 && u > cum[i]) i++; lv = t.lv[era][i]; }
+    return lv > 0 ? logit(Math.min(lv, 0.9)) - logit(Math.max(c.base, 1e-4)) : -Infinity;
+  }
+  return (c.free.drift || 0) + (R ? R.t(S.df) * c.free.sig * S.seatNoiseMult : 0);
 }
 
 /* ---- one election ---- */
@@ -79,6 +100,8 @@ export function simulateOnce(seats, S, R, L, sigSeat) {
     const room = 1 - base[2] - base[3] - base[4], maj = S.now5[0] + S.now5[1];
     base[0] = room * S.now5[0] / maj; base[1] = room * S.now5[1] / maj;
   }
+  // which election of the record's window this one takes its independent challenges from
+  const era = S.ind && unc && S.seatNoiseMult > 0 ? Math.min(S.ind.years.length - 1, Math.floor(R.u01() * S.ind.years.length)) : -1;
   const targets = unc && S.polErrMult > 0 ? drawNational(base, S.sigNat.map((x) => x * S.polErrMult), L, R, S.df) : base;
   const toLogit = (pp, k) => pp / (100 * targets[k] * (1 - targets[k]));
   const stateShift = {};
@@ -87,6 +110,7 @@ export function simulateOnce(seats, S, R, L, sigSeat) {
   const eduSlope = P5.map(() => (unc ? R.norm() * S.sigEdu : 0));
   const dev = (i, j) => {
     const s = seats[i], c = s.cands[j], k = c.p5;
+    if (c.free) return freeDev(c, S, unc ? R : null, era);
     const noise = unc ? R.t(S.df) * (c.sig != null ? c.sig * S.seatNoiseMult : c.isInd ? S.sigMember * S.seatNoiseMult : sigSeat[k]) : 0;
     return (c.adj || 0) + (stateShift[s.st]?.[k] ?? 0) + toLogit(s.demoPP?.[k] ?? 0, k) + classShock[CLASS_IDX[s.cls] ?? 1][k] + eduSlope[k] * (s.z || 0) + noise;
   };

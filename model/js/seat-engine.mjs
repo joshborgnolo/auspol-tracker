@@ -3,15 +3,21 @@
 
      { name, st, cls, w (formal votes), z (education z-score), cands: [
          { label, group, p5 (0 alp, 1 lnp, 2 on, 3 grn, 4 oth), fam (0 A, 1 C, 2 G, 3 O, -1 none),
-           isInd, base (2025-style share, 0-1), route ({F, G} from senate-flows.routing), cls (flow class) } ],
+           isInd, base (2025-style share, 0-1), route ({F, G} from senate-flows.routing), cls (flow class),
+           free (optional: an independent whose share is its own record's, not a party's swing) } ],
        iota: { flowClass: share of a transferring pile an independent standing in the seat takes },
+       iotaX (optional, read before iota): { own: { flowClass: that share while a party of the voters' own side
+         of politics is still standing }, cross: { flowClass: the share once only the other side is }, sib: the
+         share of a Coalition candidate's pile when its partner is still standing },
        sib: share of an excluded Coalition partner's own vote its standing partner takes }
 
    One simulated election:
      1. national targets per p5 key (the caller draws them: nowcast + polling error, or oracle)
      2. seat shares by a LOGIT swing: every candidate's logit(base) + state, demographic, class,
         education-slope and seat terms, then one shift per p5 key solved so the vote-weighted national
-        total hits the target exactly (iterated with per-seat normalisation)
+        total hits the target exactly (iterated with per-seat normalisation); a `free` candidate's share is
+        ilogit(logit(base) + its own deviation) as it stands, the seat's other candidates share the rest, and
+        its key's national target is met by that key's other candidates
      3. the count: per candidate, the votes it holds are tracked by ORIGIN candidate; at each exclusion
         a held bundle goes (a) partly to a standing independent (iota), (b) to a standing Coalition
         partner (sib), (c) otherwise over the big four by the origin's Senate-ranking routing - G
@@ -21,6 +27,10 @@
 export const P5 = ["alp", "lnp", "on", "grn", "oth"];
 export const FAMS = ["A", "C", "G", "O"];
 export const FLOW_CLASSES = ["ALP", "COAL", "GRN", "ON", "OTH-R", "OTH-M", "OTH-L"];
+/* the big-four families on each donor class's own side of politics, as a mask over A C G O (Labor and the
+   Greens: 5; the Coalition and One Nation: 10). A centre minor party's voters have no side: their "own"
+   case is any count with more than one of the big four still standing. */
+export const OWN_SIDE = { ALP: 5, GRN: 5, "OTH-L": 5, COAL: 10, ON: 10, "OTH-R": 10 };
 
 /* ---- seeded random numbers ---- */
 export function rng(seed) {
@@ -47,27 +57,44 @@ export function spreadShares(seats, targets, dev, R, groups) {
   const X = seats.map((s, i) => s.cands.map((c, j) => logit(Math.max(c.base, 1e-4)) + dev(i, j)));
   const c5 = new Float64Array(5);
   const W = seats.reduce((a, s) => a + s.w, 0);
+  // free candidates: their shares as drawn (a seat's free candidates together capped at 90%), and what they
+  // take of each key's national vote
+  const fixed = new Float64Array(seats.length), freeNat = new Float64Array(5);
+  let freeShare = null;
+  for (let i = 0; i < seats.length; i++) {
+    const s = seats[i];
+    for (let j = 0; j < s.cands.length; j++) {
+      const c = s.cands[j]; if (!c.free || !(c.base > 0)) continue;
+      const p = ilogit(X[i][j]); if (!(p > 0)) continue;
+      (freeShare = freeShare || seats.map((q) => new Float64Array(q.cands.length)))[i][j] = p; fixed[i] += p;
+    }
+    if (fixed[i] > 0.9) { const f = 0.9 / fixed[i]; for (let j = 0; j < s.cands.length; j++) freeShare[i][j] *= f; fixed[i] = 0.9; }
+    if (fixed[i] > 0) for (let j = 0; j < s.cands.length; j++) if (freeShare[i][j] > 0) freeNat[s.cands[j].p5] += s.w * freeShare[i][j];
+  }
   let sh = null;
   for (let round = 0; round < 4; round++) {
     for (let k = 0; k < 5; k++) {
       if (targets[k] <= 0) continue;
+      // the key's other candidates meet what the free ones leave of its target (never under a twentieth of it)
+      const target = freeNat[k] > 0 ? Math.max(targets[k] - freeNat[k] / W, 0.05 * targets[k]) : targets[k];
       let c = c5[k];
       for (let it = 0; it < 30; it++) {
         let f = 0, d = 0;
         for (let i = 0; i < seats.length; i++) {
-          const s = seats[i], norm = round === 0 ? 1 : sh[i].norm;
-          for (let j = 0; j < s.cands.length; j++) if (s.cands[j].p5 === k && s.cands[j].base > 0) { const p = ilogit(X[i][j] + c) * norm; f += s.w * p; d += s.w * p * (1 - p); }
+          const s = seats[i], norm = round === 0 ? (fixed[i] > 0 ? 1 - fixed[i] : 1) : sh[i].norm;
+          for (let j = 0; j < s.cands.length; j++) if (s.cands[j].p5 === k && s.cands[j].base > 0 && !s.cands[j].free) { const p = ilogit(X[i][j] + c) * norm; f += s.w * p; d += s.w * p * (1 - p); }
         }
-        const g = f / W - targets[k];
+        const g = f / W - target;
         if (Math.abs(g) < 1e-9 || d === 0) break;
         c -= g / (d / W);
       }
       c5[k] = c;
     }
     sh = seats.map((s, i) => {
-      const v = s.cands.map((c, j) => (c.base > 0 ? ilogit(X[i][j] + c5[c.p5]) : 0));
+      const v = s.cands.map((c, j) => (c.base > 0 && !c.free ? ilogit(X[i][j] + c5[c.p5]) : 0));
       const t = v.reduce((a, b) => a + b, 0) || 1;
-      const out = v.map((x) => x / t); out.norm = 1 / t; return out;
+      if (!(fixed[i] > 0)) { const out = v.map((x) => x / t); out.norm = 1 / t; return out; }
+      const room = 1 - fixed[i], out = v.map((x, j) => (freeShare[i][j] > 0 ? freeShare[i][j] : x / t * room)); out.norm = room / t; return out;
     });
   }
   return sh;
@@ -95,7 +122,13 @@ export function count(seat, shares, shock, seatShock) {
       hold[x * n + o] = 0;
       // (a) a standing independent takes its share of anything moving that is not its own
       if (inds.length) {
-        const io = seat.iota[cands[o].cls] ?? seat.iota._ ?? 0;
+        // what the independent takes depends on who else is left (seat.iotaX, where given): `own` while a
+        // party of the voters' own side of politics is still standing, `cross` once only the other side is,
+        // `sib` from a Coalition candidate excluded with its partner standing; else the one share per class
+        const cl = cands[o].cls, X = seat.iotaX;
+        let io;
+        if (X) { const m = OWN_SIDE[cl]; io = (sibStanding ? X.sib : (m ? (S & m) !== 0 : (S & (S - 1)) !== 0) ? X.own[cl] : X.cross[cl]) ?? seat.iota[cl] ?? seat.iota._ ?? 0; }
+        else io = seat.iota[cl] ?? seat.iota._ ?? 0;
         if (io > 0) {
           const give = a * io; let tt = 0; for (const c of inds) tt += tally[c] || 1e-9;
           for (const c of inds) hold[c * n + o] += give * (tally[c] || 1e-9) / tt;

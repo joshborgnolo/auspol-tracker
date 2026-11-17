@@ -6,8 +6,9 @@
    (.build/model/assemble.mjs copies it into model/js/). seat-inputs.mjs builds the skeleton in node
    from the committed stores; the page fetches it as model/data/inputs.json.
 
-   Skeleton seat: { name, st, cls, w, uni, z, iota, sib, demoPP, cands: [{ label, group, party,
-   partyName, base, p5, fam, isInd, key, cls, clsIdx }] }. */
+   Skeleton seat: { name, st, cls, w, uni, z, iota, iotaX (where the seat has its own count), sib, demoPP,
+   cands: [{ label, group, party, partyName, base, p5, fam, isInd, key, cls, clsIdx, free and slot (an
+   independent drawn from the record) }] }. */
 import { cohortTable, stateTable, pairShare, tiltPair, moveFirst, mix, routing, SUB_CLASS } from "./senate-flows.mjs";
 import { FLOW_CLASSES } from "./seat-engine.mjs";
 
@@ -135,6 +136,8 @@ export function buildSeatsFrom(inputs, { composition = true, levers = null, mixF
   const { hist, comp, ST, SEN } = inputs;
   return inputs.seats.map((sk) => {
     const s = { ...sk, cands: sk.cands.map((c) => ({ ...c })) };
+    // what an independent takes of a pile, by who else is left: the seat's own 2025 count, else the national table
+    if (!s.iotaX && ST.iotaX) s.iotaX = ST.iotaX;
     const tables = {};
     // inputs.pre: each seat's tables already read and calibrated per donor class (a state election's
     // districts, state-tables.mjs), in place of the federal division tables

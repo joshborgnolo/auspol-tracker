@@ -577,6 +577,86 @@ The Victorian run (28 November 2026) until now assumed 2022's candidates stood a
 - The federal explorer's card button still assumes a third of voters follow a card (35 points); the stores now measure 47.
 - After 28 November: score the run, and the two ends of the respondents' judgement, against the count.
 
+## 16. Federal v2.3: who sits now, independents from the record, preferences by who is left (2026-11-17)
+
+The question was whether Victoria's v2.3 changes (section 15) carry over to the federal model. Each was checked against the federal stores. Three carry over and are built; two are already the federal model's rule; one cannot be had until nominations.
+
+| Victoria v2.3 | Federal counterpart | Verdict |
+|---|---|---|
+| The real field (nominations) | No one is nominated until 2028. What is on the record: by-elections, changes of party, retirements | **Built**: the candidate overlay was empty |
+| New independents as a draw from the record | The federal model gave no independent outside Parliament any chance | **Built**, and extended to sitting independents |
+| Sitting-member terms | Already fitted on federal elections (v2.2) | Extended to a by-election winner and a member who changed party |
+| Polling error and district noise fitted on state elections | Already fitted on federal cycles | No change; One Nation's floor checked against the state record |
+| Levels with no count moved halfway to respondents | Each federal level has a federal count | No change (that is the Victorian rule's own principle); the two ends are now printed |
+| Registered how-to-vote cards | None registered until 2028 | The explorer's card button now uses the measured reversal |
+
+### Who sits now (`candidate-overlay-2028.json`, `build-candidate-set.mjs`, `seat-inputs.mjs` adjFor)
+- **The overlay held nothing**, so the model still stood Sussan Ley as Farrer's sitting Liberal and Barnaby Joyce as New England's sitting National. The /map/ page's own record (`map/data/data-now.json`) had both changes.
+- **Farrer**: One Nation's David Farley won the by-election of 9 May 2026. The Liberals give back Ley's personal vote; One Nation's member takes the two major parties' average sitting-member term (0.0985 logit), as the Greens' do. The starting vote stays the 2025 count, as in Victoria ("by-elections change who sits, not the starting vote").
+- **New England**: Joyce has sat for One Nation since 8 December 2025 and has not settled whether to stand there again (`recontests: null`). The Nationals lose their member's personal vote; no One Nation member and no defection term is assumed. Set to `true`, the Nationals' term goes from −0.15 to −0.36 and One Nation gains 0.0985.
+- **Capricornia**: Michelle Landry's retirement was announced on 23 October 2026.
+- `test-fed-model.mjs` fails when the overlay and the /map/ record of the House disagree.
+
+### Independents from the record (`independents.mjs`, `calibrate-independents.mjs`, `data/seat-model-independents.json`)
+- **What the model did**: sitting independents moved with the polls' "others" (down 0.36 logit since 2025, so Kooyong read Liberal 69%, Bradfield 73%, Fowler Labor 56%); 2025's losing independents stood again as minor candidates who take no preferences (Goldstein's final pair read Liberal 75–25); nobody new could appear. Independents averaged 7.3 of the 12 seats they hold.
+- **Sitting independents' own record**: 27 have recontested since 1996 and 23 held. Their vote rose by 0.16 logit on average (se 0.06, spread 0.31). Regressed on the national change in "others" the slope is 0.52 (se 0.27): moving with others at slope 1 misses by 0.34 RMS, their own mean by 0.31. When others fell 0.33 in 2004 the three sitting independents averaged +0.10.
+- **Polls understate "others" between elections**: at 13–20 months the poll mean sat below the result in each of the last five cycles (by 0.07 to 0.73 logit, mean 0.28), and in the final month in eight of nine since 2001 (mean 0.12). Not applied: the nowcast quotes the site's aggregate as it stands. It is a second reason not to tie a member's vote to that figure.
+- **Everyone else**: 1,570 seat-elections 1996–2025 where a party held the seat. What the strongest independent polled next depends on what one polled before, and on the era. Before 2019, of 22 seats with an independent on 10% or more, one stayed strong. In 2019–2025, 13 of 23 kept at least half and four won.
+- **The draw**: one challenge per party-held seat; its share is a level drawn from the window's seat-elections, weighted by a normal kernel on the logit of the previous share (width 0.5, floor 1%). From 5% up the draw stands in for the 2025 candidate (36 seats); below, only a drawn challenger of 10% or more is added.
+- **Waves**: each simulated election takes every seat's draw from one of the window's elections. New challengers passing 10% in seats with none before: 5, 15 and 19 in 2019, 2022 and 2025; winners 0, 5 and 0.
+- **Independents are outside the national swing**: their shares stand as drawn, the seat's parties share the rest, and the "others" target is met by minor parties (`seat-engine.mjs` spreadShares, `free`). National party totals still hit the polls exactly.
+- **Tested and dropped**: sending a lapsed challenger's voters where their preferences went scored worse than sharing them in proportion (Brier 0.1576 v 0.1552). Hughes 2025 fits the preference rule; Wentworth 2007, Dickson 2001 and Nicholls 2025 do not.
+
+### What an independent takes of preferences (`seat-inputs.mjs` certifiedShares, `seat-engine.mjs` count)
+- **One share per donor class was wrong whenever the alternatives changed.** It sent 72% of One Nation preferences to Labor over an independent, and 65–73% of Coalition preferences to an independent over One Nation.
+- **Two cases, measured on the 2025 count** (pile by pile, leaving aside ballots to other minor candidates): while a party of the voters' own side still stands, an independent took 46% of a Greens pile and 35% of a One Nation pile; once only the other side is left, 75% of a Labor pile and 70% of a Coalition pile. A Coalition candidate's pile with its partner standing: 12%.
+- **Two cases 2025 never counted come from Farrer 2026**, the one count of an independent against One Nation: Coalition voters 37% to the independent (22,473 votes), Greens voters 92%.
+- **Checked on counts it was not measured on**: the four SA 2026 districts where an independent reached the final two. Mean absolute error of the independent's two-candidate share 6.4 → 3.3 points (Stuart +6.4 → +1.5, Kavel −6.7 → −2.1, Finniss −9.2 → −5.0, Mount Gambier −3.5 → −4.7).
+- **2025 replay**: winners 147 → 148 of 150, final pairs 140 → 147, two-candidate error 1.48 → 0.91 points. The 11 challengers' finals are within 0.8 on average.
+
+### The backtest (`backtest-long.mjs` terms-ind28, terms-indrec; national vote given, 2,000 draws)
+Both variants know only what a forecast would: who sits, and how independents polled last time. The reference variant (`terms`) is told the whole field.
+
+| | Brier | Log | Independents expected v 39 elected |
+|---|---|---|---|
+| Old treatment, 2001–2025 | 0.1529 | −0.329 | 22.6 |
+| The record, 2001–2025 | 0.1541 | −0.300 | 31.8 |
+| Old, 2019–2025 | 0.1761 | −0.432 | 12.0 v 23 |
+| Record, 2019–2025 | 0.1728 | −0.343 | 20.2 v 23 |
+| Old, 2001–2016 | 0.1413 | −0.278 | 10.6 v 16 |
+| Record, 2001–2016 | 0.1446 | −0.279 | 11.6 v 16 |
+
+- **Candid verdict**: better on the log score and where independents matter (2019–2025); a little worse on Brier before 2019, when independents were rare and every seat still carried a small chance. About a third of that early cost is 2016's One Nation seats, which sit at 50–50 in every variant and flip on any small change.
+- **Calibration** in party-held seats 2019–2025: the record expected 8.2 independent wins and 10 happened; by chance given, 0–0.5%: 0.4 v 3, 6–15%: 2.2 v 5, 15–40%: 2.1 v 0. Still cautious overall.
+- **The baseline's sitting independents looked safe by artefact.** Handed the true "others" total, it inflated them (Dai Le 43% modelled, 33.5% polled; Monique Ryan 44% v 33.9%). The comparison above gives neither variant the votes of independents it cannot see.
+- **Robustness** (pooled Brier / log): window of 2 elections 0.1548 / −0.305, 5: 0.1551 / −0.302, all: 0.1548 / −0.301; kernel 0.35: 0.1557 / −0.306, 0.8: 0.1548 / −0.302; no drift for sitting members 0.1559 / −0.305. All within run-to-run noise. Three elections tracks the rising count of winners best (expected 8.7 of 13 new winners, against 6.7 and 5.5 for longer windows).
+
+### Checked, no change
+- **One Nation's polling error**: federal record 0.285 logit (five cycles), state elections at 5% or more 0.199 (four). Pooled over nine: 0.25, the floor the model already draws.
+- **Respondents**: the one federal poll in the six-week window publishing its respondents' allocation has One Nation voters 17% to Labor (count: 25.5%) and Coalition voters 41% to Labor over One Nation (table: 27%). Halfway: One Nation 34 seats, Labor 62. Respondents alone: 31 and 64. Official: 36 and 60. The page prints all three.
+
+### Result (polls to 8 November)
+| | Nowcast before | v2.3 | Election day before | v2.3 |
+|---|---|---|---|---|
+| Labor | 64.3 | **60.1** (40–79) | 77.2 | **73.0** (42–97) |
+| One Nation | 39.7 | **36.3** (14–63) | 17.4 | **15.5** (1–48) |
+| Coalition | 34.3 | **29.4** (14–47) | 43.8 | **38.1** (16–64) |
+| Independents | 7.3 | **20.1** (14–27) | 7.5 | **19.7** (14–27) |
+| Greens | 4.5 | 4.2 | 4.1 | 3.7 |
+| Labor majority | 17% | **9%** | 59% | **48%** |
+
+Independents: 10.7 of the 12 sitting hold on average, and challenges win 9.4 of the other 138.
+
+### Still open
+- **The 9.4 is above any election on record** (seven in 2022). By 2025 share: seven seats on 20% or more give 2.2, 17 on 10–20% give 3.8, 12 on 5–10% give 1.2, and the other 102 give 2.2. The record's own win rates for those bands (25%, 13%, 6.5%, 0.8% in 2019–2025) would give 5.6; the rest comes from the count, where major-party primaries of 26 and 23 let a smaller independent vote win.
+- **One election in the stores has a field that split**: SA 2026 (One Nation 22.9%, Liberals 19.0%). Four of its five independents on 15% or more won, one from fourth place on 18.1% (Finniss). At federal 2022, federal 2025 and SA 2022 together, independents on 15–30% won 5 of 30. Small numbers; they point the same way as the model.
+- The record cannot say whether 2025's challengers stand again; treat single seats as rates, not forecasts.
+- **Boundaries**: Tasmania, South Australia and the ACT were redrawn in July 2026 (Bean gained the Woden Valley); Queensland's redistribution is due in September 2027. The base is still the 2025 count on 2025 boundaries.
+- **Farrer** reads Liberal 37%, One Nation 36%, independent 27% from the 2025 count, where One Nation won the by-election 58–42. Whether a by-election count should move the starting vote needs the record of federal by-elections against the next general election, which is not in the stores.
+- **Victoria** still counts with one share per class and moves independents with "others". Its 79 new independents and its independent-v-One Nation finals would be affected.
+- First-term independents rose more (0.28 v 0.16 logit, not significant). Only Bradfield and Calare are first-term now.
+- The page was checked by rendering its copy in node (`test-model-page.mjs`), not in a browser: layout at each width is unverified.
+
 ## Scripts (`seat-model/design-review/`)
 
 | Script | Question |
@@ -604,3 +684,4 @@ v2's own scripts sit one level up in `seat-model/`:
 - `seat-engine.mjs`, `seat-inputs.mjs`, `swing-simulate.mjs`
 - `backtest-chain.mjs`, `backtest-states.mjs`
 - v2.2: `extract-incumbency.mjs`, `swing-fit.mjs`, `backtest-long.mjs`, `flow-drift.mjs`
+- v2.3: `independents.mjs`, `calibrate-independents.mjs`, `test-fed-model.mjs`; Victoria's `vic-field.mjs`, `calibrate-state-polls.mjs`, `calibrate-state-swing.mjs`, `test-vic-model.mjs`

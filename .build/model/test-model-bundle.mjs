@@ -25,7 +25,9 @@ const SEN = F.rankingsFrom(JSON.parse(fs.readFileSync("data/senate-rankings-2025
 const browserSeats = B.buildSeatsFrom({ seats: inputs.seats, hist: inputs.build.hist, comp: inputs.build.comp, ST: inputs.build.ST, SEN }, { composition: true });
 const nodeInp = N.prepInputs({ composition: true });
 const nodeSeats = N.buildSeatsFrom(nodeInp, { composition: true });
-const S = inputs.settings.nowcast;
+// the independents' tables ride once in build.ind (both modes share them); the worker puts them back as S.ind
+const S = { ...inputs.settings.nowcast, ...(inputs.build.ind ? { ind: inputs.build.ind } : {}) };
+assert.deepEqual(inputs.build.ind, JSON.parse(JSON.stringify({ years: nodeInp.ind.years, tables: Object.fromEntries(Object.entries(nodeInp.ind.tables).map(([k, t]) => [k, { lv: t.lv, cum: t.cum, central: t.central }])) })), "bundle independents' tables = the node pipeline's");
 const a = M.runMany(browserSeats, S, { draws: 300, seed: 7 });
 const b = NM.runMany(nodeSeats, S, { draws: 300, seed: 7 });
 assert.deepEqual(a.expectedSeats, b.expectedSeats, "same expected seats");

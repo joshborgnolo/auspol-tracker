@@ -25,6 +25,8 @@ check("every candidate-set seat is a baseline seat", SET.seats.every((s) => base
 check("every baseline seat is in the candidate set", BASE.seats.every((s) => SET.seats.find((x) => x.name === s.name)));
 
 const RETIRED = new Set((OVERLAY.retirements ?? []).map((e) => e.seat));
+const BYELECTION = new Map((OVERLAY.byElections ?? []).map((e) => [e.seat, e]));
+const DEFECTED = new Map((OVERLAY.defections ?? []).map((e) => [e.seat, e]));
 const CHALLENGES = new Map();
 for (const c of OVERLAY.independents?.challenges ?? [])
   CHALLENGES.set(c.seat, [...(CHALLENGES.get(c.seat) ?? []), c.name]);
@@ -36,11 +38,23 @@ for (const s of SET.seats) {
   const b = baseBy.get(s.name), f = flowsBy.get(s.name);
   if (!b || !f) continue;
 
-  // Incumbent is the baseline member; recontests flips only via the overlay.
-  check(`incumbent matches baseline member (${at})`, s.incumbent.name === b.member.name,
-    `${s.incumbent.name} vs ${b.member.name}`);
-  check(`incumbent group matches baseline (${at})`, s.incumbent.group === b.member.group);
-  check(`recontests matches overlay retirements (${at})`, s.incumbent.recontests === !RETIRED.has(s.name));
+  // The 2025 member is the baseline's; the incumbent is that member unless the overlay records a
+  // by-election or a change of party; recontests flips only via the overlay.
+  check(`member2025 matches baseline member (${at})`, s.member2025.name === b.member.name && s.member2025.group === b.member.group,
+    `${s.member2025.name} vs ${b.member.name}`);
+  const by = BYELECTION.get(s.name), def = DEFECTED.get(s.name);
+  if (by) {
+    check(`incumbent is the by-election winner (${at})`, s.incumbent.name === by.winner.name && s.incumbent.group === by.winner.group && s.incumbent.how === "by-election");
+    check(`by-election winner recontests (${at})`, s.incumbent.recontests === true);
+  } else if (def) {
+    check(`incumbent sits for the party joined (${at})`, s.incumbent.name === b.member.name && s.incumbent.group === def.to && s.incumbent.how === "defection");
+    check(`defector's recontests is the overlay's (${at})`, s.incumbent.recontests === def.recontests);
+  } else {
+    check(`incumbent matches baseline member (${at})`, s.incumbent.name === b.member.name,
+      `${s.incumbent.name} vs ${b.member.name}`);
+    check(`incumbent group matches baseline (${at})`, s.incumbent.group === b.member.group);
+    check(`recontests matches overlay retirements (${at})`, s.incumbent.recontests === !RETIRED.has(s.name));
+  }
 
   // Contest set: 2028 values default to 2025 facts under the assumptions.
   const groups2025 = new Set(f.candidates.map((c) => c.group));
@@ -91,4 +105,4 @@ check("seven LP+NP three-cornered contests preserved",
   JSON.stringify(twoCoal) === JSON.stringify([...THREE_CORNERED].sort()), JSON.stringify(twoCoal));
 
 if (failures) { console.error(`${failures} failures`); process.exit(1); }
-console.log(`candidate set OK: ${SET.seats.length} seats, ${indHeld} IND holders recontesting, ${RETIRED.size} retirements, ON assumption adds ${onMod} seats`);
+console.log(`candidate set OK: ${SET.seats.length} seats, ${indHeld} IND holders recontesting, ${RETIRED.size} retirements, ${BYELECTION.size} by-elections, ${DEFECTED.size} defections, ON assumption adds ${onMod} seats`);

@@ -17,9 +17,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { prepInputs, buildSeatsFrom, LEVERS, leverLevels } from "../analysis/seat-model/seat-inputs.mjs";
+import { prepInputs, buildSeatsFrom, LEVERS, leverLevels, respondentLevels } from "../analysis/seat-model/seat-inputs.mjs";
 import { MIX_FAMS } from "../analysis/seat-model/seat-build.mjs";
-import { modelSettings } from "../analysis/seat-model/model-sim.mjs";
+import { modelSettings, runMany } from "../analysis/seat-model/model-sim.mjs";
 import { count } from "../analysis/seat-model/seat-engine.mjs";
 import { pairShare, cohortTable } from "../analysis/seat-model/senate-flows.mjs";
 
@@ -49,7 +49,11 @@ const seats = inp.seats.map((s, i) => {
   const flows = { coalLaborOverOn: share("COAL", 0, 3), laborCoalitionOverOn: share("ALP", 1, 3), onLaborOverCoalition: share("ON", 0, 1), greensLaborOverCoalition: share("GRN", 0, 1) };
   return { ...s, tcp2025: tcp, flows };
 });
+// the settings travel without the independents' tables, which both modes share: they ride once in build.ind
+// and the worker puts them back (model-sim reads S.ind)
 const settings = { nowcast: modelSettings({ VOTE, CAL, FCAL, DRIFT: STATES.drift, mode: "nowcast" }), forecast: modelSettings({ VOTE, CAL, FCAL, DRIFT: STATES.drift, mode: "forecast" }) };
+const IREC = fs.existsSync("data/seat-model-independents.json") ? J("data/seat-model-independents.json") : null;
+const OVERLAY = J(".build/analysis/seat-model/candidate-overlay-2028.json"), SWST = fs.existsSync("data/seat-model-state-swing.json") ? J("data/seat-model-state-swing.json") : null;
 
 /* hist trimmed to the seats and cohorts the skeleton uses */
 const used = new Set(seats.flatMap((s) => s.cands.map((c) => s.name + "|" + c.key)));
@@ -62,7 +66,7 @@ const inputs = {
   asOf: { pollsTo: VOTE.diagnostics.recentWindow.to, windowFrom: VOTE.diagnostics.recentWindow.from, waves: VOTE.diagnostics.recentWindow.waves, modelRun: NOW._provenance.generated },
   vote: { nowcast: VOTE.national.nowcast, result2025: VOTE.national.result2025 },
   settings,
-  build: { ST: inp.ST, comp: MIX_FAMS.length ? inp.comp : null, hist: { bySeat: histBySeat, mean: inp.hist.mean } },
+  build: { ST: inp.ST, comp: MIX_FAMS.length ? inp.comp : null, hist: { bySeat: histBySeat, mean: inp.hist.mean }, ind: inp.ind ? { years: inp.ind.years, tables: Object.fromEntries(Object.entries(inp.ind.tables).map(([k, t]) => [k, { lv: t.lv, cum: t.cum, central: t.central }])) } : null },
   levers: Object.fromEntries(Object.entries(LEVERS).map(([k, L]) => [k, { label: L.label, cls: L.cls, x: L.x, y: L.y, also: L.also || null }])),
   leverLevels: Object.fromEntries(Object.entries(leverLevels(inp.SEN, built)).map(([k, v]) => [k, r4(v)])),
   seats,
@@ -125,6 +129,42 @@ const evidence = round({
       coalLaborOverOn: { ...one("COAL|AO", 1), senate: lv(buildSeatsFrom({ ...inp, ST: { ...inp.ST, delta: { ...inp.ST.delta, "COAL|AO": 0 } } }, { composition: true }), "COAL|AO") },
       onLaborOverCoalition: one("ON|AC", 3) };
   })(),
+  /* independents: the record they are drawn from, how the 2028 seats divide, what an independent takes of
+     preferences (by who else is left) and its check on SA 2026, and the two treatments scored on 2001-2025 */
+  independents: IREC && inp.ind ? (() => {
+    const slot = (s) => s.cands.find((c) => c.slot != null), sit = (s) => s.cands.find((c) => c.free && c.slot == null);
+    const standing = inp.seats.filter((s) => slot(s)?.was && slot(s).base > 0.001).map((s) => ({ seat: s.name, name: slot(s).was.name, share: slot(s).was.share, ...(({ central, mean, n }) => ({ central, mean, cases: n }))(inp.ind.tables[slot(s).slot]) })).sort((a, b) => b.share - a.share);
+    const L = LONG ? (() => {
+      const pick = (v) => LONG.results.filter((r) => r.mode === "house" && !r.stateOracle && r.variant === v).sort((a, b) => a.E - b.E);
+      const A = pick("terms-ind28"), B = pick("terms-indrec"); if (!A.length || A.length !== B.length) return null;
+      const pool = (rs, f) => { const q = rs.filter(f), n = q.reduce((t, r) => t + r.seats, 0); return n ? { elections: q.length, seats: n, brier: q.reduce((t, r) => t + r.brier * r.seats, 0) / n, logScore: q.reduce((t, r) => t + r.logScore * r.seats, 0) / n, modalRight: q.reduce((t, r) => t + r.modalRight, 0), expectedInd: q.reduce((t, r) => t + r.expected.ind, 0), actualInd: q.reduce((t, r) => t + r.actual.ind, 0) } : null; };
+      const from = IREC.now.window[0];
+      return { recentFrom: from, rows: A.map((a, i) => ({ E: a.E, before: { brier: a.brier, logScore: a.logScore, modalRight: a.modalRight, expectedInd: a.expected.ind }, after: { brier: B[i].brier, logScore: B[i].logScore, modalRight: B[i].modalRight, expectedInd: B[i].expected.ind }, actualInd: a.actual.ind, seats: a.seats })),
+        all: { before: pool(A, () => true), after: pool(B, () => true) }, recent: { before: pool(A, (r) => r.E >= from), after: pool(B, (r) => r.E >= from) }, early: { before: pool(A, (r) => r.E < from), after: pool(B, (r) => r.E < from) } };
+    })() : null;
+    return { settings: IREC.settings, window: IREC.now.window, sitting: { ...IREC.now.sitting, se: IREC.now.se, held: IREC.sitting.filter((r) => r.held).length, first: IREC.sitting[0]?.E, last: IREC.sitting[IREC.sitting.length - 1]?.E },
+      byElection: Object.fromEntries(IREC.now.window.map((y) => [y, IREC.byElection[y]])), examples: IREC.now.examples,
+      seats: { sitting: inp.seats.filter(sit).length, challenges: inp.seats.filter(slot).length, standing },
+      take: { own: inp.capX.own, cross: inp.capX.cross, sib: inp.capX.sib, piles: inp.capX.piles, source: inp.capX.source, vsOneNation: inp.vsOn },
+      check: IREC.check, backtest: L };
+  })() : null,
+  /* the two levels set to the site's tables, against what poll respondents now say of them: the nowcast re-run
+     with both levels halfway (on the logit scale) to the respondents' and on the respondents' alone, beside
+     the official run (4,000 simulations each, the official run's seed). Absent when no wave in the six weeks
+     to the newest poll publishes its respondents' allocation. */
+  respondents: (() => {
+    const R = respondentLevels(J("data/polls.json")); if (!R) return null;
+    const T = inp.ST.targets, lg = (p) => Math.log(p / (1 - p)), il = (x) => 1 / (1 + Math.exp(-x));
+    const half = { "COAL|AO": il((lg(T["COAL|AO"]) + lg(R.coal.share)) / 2), "ON|AC": il((lg(T["ON|AC"]) + lg(R.on.share)) / 2) }, all = { "COAL|AO": R.coal.share, "ON|AC": R.on.share };
+    const S0 = { ...settings.nowcast, ind: inp.ind };
+    const run = (targets) => { const alt = prepInputs({ composition: true, targets }); const r = runMany(buildSeatsFrom(alt, { composition: true }), S0, { draws: 4000, seed: NOW.meta.seed }); return { targets: { coal: r4(targets["COAL|AO"]), on: r4(targets["ON|AC"]) }, expectedSeats: r.expectedSeats, majority: r.majority }; };
+    return { from: R.from, to: R.to, polls: R.on.polls.map((q) => `${q.firm} ${q.end}`), counted: { coal: T["COAL|AO"], on: T["ON|AC"] }, said: { coal: r4(R.coal.share), on: r4(R.on.share) },
+      official: { expectedSeats: NOW.national.expectedSeats, majority: NOW.national.majority }, halfway: run(half), respondents: run(all), draws: 4000 };
+  })(),
+  /* what has changed in the House since the 2025 election, as the model holds it (the candidate overlay) */
+  changes: { retirements: (OVERLAY.retirements || []).map((e) => ({ seat: e.seat, member: e.member, date: e.date })), byElections: (OVERLAY.byElections || []).map((e) => ({ seat: e.seat, date: e.date, vacatedBy: e.vacatedBy, winner: e.winner })), defections: (OVERLAY.defections || []).map((e) => ({ seat: e.seat, member: e.member, from: e.from, to: e.to, party: e.party, date: e.date, recontests: e.recontests })) },
+  /* what a how-to-vote card's reversal moved, as counted (calibrate-state-swing.mjs `card`): the explorer's card button */
+  card: SWST?.card ? { with: SWST.card.with, against: SWST.card.against, follow: SWST.card.follow, rows: SWST.card.rows } : null,
   replay2025: { winners: ok, pairs: pairOk, tcpMaePts: Math.round(10000 * tcpE.reduce((a, b) => a + b, 0) / tcpE.length) / 100, misses },
   states: Object.fromEntries(Object.entries(STATES.results).map(([k, v]) => [k, { label: v.label, senate: v.senate, seats: v.seats, actualSeats: v.actualSeats, replay: v.replay, chain: v.chain }])),
   federal: { draws: FED.draws, sigmaMultiplier: FED.sigmaMultiplier, results: FED.results.map((r) => ({ E: r.E, variant: r.variant, stateOracle: r.stateOracle, brier: r.brier, logScore: r.logScore, modalRight: r.modalRight, pairsRight: r.pairsRight, tcpMaePts: r.tcpMaePts, expected: r.expected, actual: r.actual })), calibration: FED.calibrationPooled },

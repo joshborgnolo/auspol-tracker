@@ -57,10 +57,12 @@ export function headline(res, mode) {
 
 /* "In 20,000 simulated elections held on the polls to 27 October, Labor wins 71 seats on average (51 to 90
    in nine of ten), One Nation 36 (13 to 63) and the Coalition 31 (15 to 48). Labor reaches the 76 seats
-   needed to govern alone in 38% of them." - parties in order of expected seats */
+   needed to govern alone in 38% of them." - the three parties in order of expected seats; independents and
+   the Greens are named with them when they average ten seats or more */
 export function dek(res, mode, asOf) {
   const nat = res.national, d = nat.seatDistribution, e = nat.expectedSeats;
-  const [a, b, c] = ["alp", "on", "lnp"].sort((x, y) => e[y] - e[x]);
+  const [a, ...two] = ["alp", "on", "lnp"].sort((x, y) => e[y] - e[x]);
+  const others = [...two, ...["member", "grn"].filter((k) => (e[k] || 0) >= 10)].sort((x, y) => e[y] - e[x]);
   const sims = res.meta.draws.toLocaleString("en-AU");
   const lead = mode === "forecast"
     ? `Projected to election day, ${sims} simulated elections from the polls to ${shortDate(asOf)} give ${PARTY[a].lower}`
@@ -69,7 +71,8 @@ export function dek(res, mode, asOf) {
       : `In ${sims} simulated elections held on the polls to ${shortDate(asOf)}, ${PARTY[a].lower} wins`;
   const rest = (k) => `${PARTY[k].lower} ${Math.round(e[k])} (${d[k].p05} to ${d[k].p95})`;
   const pMaj = nat.majority[MAJ_KEY[a]];
-  return `${lead} ${Math.round(e[a])} seats on average (${d[a].p05} to ${d[a].p95} in nine of ten), ${rest(b)} and ${rest(c)}. `
+  const list = others.map(rest);
+  return `${lead} ${Math.round(e[a])} seats on average (${d[a].p05} to ${d[a].p95} in nine of ten), ${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}. `
     + `${PARTY[a].name} reaches the ${majOf(res)} seats needed to govern alone in ${pct(pMaj)} of them.`;
 }
 

@@ -35,15 +35,29 @@ const sha = (f) => createHash("sha256").update(readFileSync(f)).digest("hex").sl
 // --- Validate overlay entries against the baseline before merging. ---------
 const seatNames = new Set(base.seats.map((s) => s.name));
 const baseBy = new Map(base.seats.map((s) => [s.name, s]));
-for (const list of ["retirements", "byElections"])
+const GROUPS = new Set(["alp", "lp", "np", "lnp", "clp", "grn", "on"]);
+for (const list of ["retirements", "byElections", "defections"])
   for (const e of overlay[list] ?? []) {
     if (!seatNames.has(e.seat)) throw new Error(`overlay ${list}: unknown seat "${e.seat}"`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date || "")) throw new Error(`overlay ${list}: ${e.seat} needs a date`);
   }
-for (const e of overlay.retirements ?? []) {
+// each entry names the member the 2025 election returned: a stale or mistyped row fails here
+const was = (list, e, name) => {
   const member = baseBy.get(e.seat).member.name;
-  if (e.member && e.member.toLowerCase() !== member.toLowerCase())
-    throw new Error(`overlay retirements: ${e.seat} member ${member} != overlay ${e.member}`);
+  if (!name || name.toLowerCase() !== member.toLowerCase()) throw new Error(`overlay ${list}: ${e.seat} member ${member} != overlay ${name}`);
+};
+for (const e of overlay.retirements ?? []) was("retirements", e, e.member);
+for (const e of overlay.byElections ?? []) {
+  was("byElections", e, e.vacatedBy);
+  if (!e.winner?.name || !GROUPS.has(e.winner.group)) throw new Error(`overlay byElections: ${e.seat} needs a winner with a party group`);
 }
+for (const e of overlay.defections ?? []) {
+  was("defections", e, e.member);
+  if (e.from !== baseBy.get(e.seat).member.group) throw new Error(`overlay defections: ${e.seat} member sat for ${baseBy.get(e.seat).member.group}, overlay says ${e.from}`);
+  if (!GROUPS.has(e.to) || e.to === e.from) throw new Error(`overlay defections: ${e.seat} needs the party joined`);
+  if (![true, false, null].includes(e.recontests)) throw new Error(`overlay defections: ${e.seat} recontests is true, false or null`);
+}
+{ const seen = new Set(); for (const list of ["retirements", "byElections", "defections"]) for (const e of overlay[list] ?? []) { if (seen.has(e.seat)) throw new Error(`overlay: ${e.seat} appears twice (one change of member per seat)`); seen.add(e.seat); } }
 for (const c of overlay.independents?.challenges ?? []) {
   if (!seatNames.has(c.seat)) throw new Error(`overlay independents: unknown seat "${c.seat}"`);
   if (!c.name || !c.name.trim()) throw new Error(`overlay independents: challenge in ${c.seat} has no name`);
@@ -51,6 +65,7 @@ for (const c of overlay.independents?.challenges ?? []) {
 
 const retired = new Map((overlay.retirements ?? []).map((e) => [e.seat, e]));
 const byElection = new Map((overlay.byElections ?? []).map((e) => [e.seat, e]));
+const defected = new Map((overlay.defections ?? []).map((e) => [e.seat, e]));
 const challenges = new Map(); // seat -> challenge entries
 for (const c of overlay.independents?.challenges ?? [])
   challenges.set(c.seat, [...(challenges.get(c.seat) ?? []), c]);
@@ -66,7 +81,7 @@ for (const b of base.seats) {
   if (!coal2025.length) throw new Error(`${b.name}: no coalition candidate in 2025 count 0`);
 
   const memberKey = Object.keys(b.primaries).find((k) => k.startsWith("member:"));
-  const ret = retired.get(b.name);
+  const ret = retired.get(b.name), by = byElection.get(b.name), def = defected.get(b.name);
   const ind = [];
   if (memberKey && A.indHeldRecontest !== false && !ret)
     ind.push({ key: memberKey, label: b.member.name, kind: "held" });
@@ -76,12 +91,17 @@ for (const b of base.seats) {
 
   seats.push({
     name: b.name, state: b.state,
-    incumbent: {
-      group: b.member.group, name: b.member.name,
-      recontests: ret ? false : A.incumbentRecontests !== false,
-      ...(ret && { retirementNote: `${ret.date}${ret.note ? ` — ${ret.note}` : ""}` }),
-      ...(byElection.has(b.name) && { byElection: byElection.get(b.name).note ?? "see overlay" }),
-    },
+    // who sits for the seat now, and whether they stand for it in 2028: the member the 2025 election
+    // returned unless a by-election replaced them or they have changed party since
+    incumbent: by
+      ? { group: by.winner.group, name: by.winner.name, party: by.winner.party ?? null, recontests: A.incumbentRecontests !== false, since: by.date, how: "by-election", note: by.note ?? null }
+      : def
+        ? { group: def.to, name: def.member, party: def.party ?? null, recontests: def.recontests, since: def.date, how: "defection", note: def.note ?? null }
+        : { group: b.member.group, name: b.member.name,
+          recontests: ret ? false : A.incumbentRecontests !== false,
+          ...(ret && { retirementNote: `${ret.date}${ret.note ? ` — ${ret.note}` : ""}` }) },
+    // the member the 2025 election returned (the incumbent above, in all but the seats the overlay lists)
+    member2025: { group: b.member.group, name: b.member.name },
     contest: {
       alp: true,
       coalition: coal2025,
@@ -102,7 +122,7 @@ if (seats.length !== 150) throw new Error(`expected 150 seats, got ${seats.lengt
 
 const onAdded = seats.filter((s) => s.contest.on && !s.basis2025.on).map((s) => s.name);
 const out = {
-  _about: "W6 of .build/analysis/seat-model-plan.md — the 2028 candidate set the simulation layer draws around. Per seat: incumbent (+recontests), the 2028 contest set (groups booleans, coalition party mix, named independent entrants), and basis2025 — the measured 2025 contest set from the DoP — so every 2028 assumption sits next to its fact. contest.on true-but-basis2025.on false marks the ON-everywhere extension (2025: ON skipped only the three ACT seats). Produced by build-candidate-set.mjs from the HAND overlay candidate-overlay-2028.json; test-candidate-set.mjs pins the merge against the W2/W3 data.",
+  _about: "W6 of .build/analysis/seat-model-plan.md — the 2028 candidate set the simulation layer draws around. Per seat: incumbent (who sits now, +recontests: true, false, or null where a member who changed party has not said), member2025 (who the 2025 election returned), the 2028 contest set (groups booleans, coalition party mix, named independent entrants), and basis2025 — the measured 2025 contest set from the DoP — so every 2028 assumption sits next to its fact. contest.on true-but-basis2025.on false marks the ON-everywhere extension (2025: ON skipped only the three ACT seats). Produced by build-candidate-set.mjs from the HAND overlay candidate-overlay-2028.json; test-candidate-set.mjs pins the merge against the W2/W3 data.",
   _provenance: {
     flows: { file: FLOWS, sha256: sha(FLOWS) },
     baseline: { file: BASE, sha256: sha(BASE) },
@@ -114,5 +134,5 @@ const out = {
 };
 writeFileSync(OUT, JSON.stringify(out, null, 2) + "\n");
 const indHeld = seats.filter((s) => s.contest.ind.some((i) => i.kind === "held")).length;
-const retiring = seats.filter((s) => !s.incumbent.recontests).length;
-console.log(`wrote ${OUT}: ${seats.length} seats — ${indHeld} IND holders recontesting, ${retiring} retirements, ON added in: ${onAdded.join(", ") || "none"}`);
+const retiring = seats.filter((s) => s.incumbent.recontests === false).length;
+console.log(`wrote ${OUT}: ${seats.length} seats — ${indHeld} IND holders recontesting, ${retiring} retirements, ${byElection.size} by-elections, ${defected.size} defections, ON added in: ${onAdded.join(", ") || "none"}`);

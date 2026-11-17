@@ -8,7 +8,8 @@ const EX = (() => {
   const DRAWS = 1000;
   // what switching a how-to-vote card's order is worth, in points: the federal view's stated assumption (a third
   // of voters follow the card); the Victorian view's measured reversal (inputs-vic.json evidence.cards)
-  const cardPts = () => (STATE.jur === "vic" && STATE.vicInputs && STATE.vicInputs.evidence.cards ? Math.round(100 * (STATE.vicInputs.evidence.cards.with - STATE.vicInputs.evidence.cards.against)) : 35);
+  const cardEv = () => (STATE.jur === "vic" ? STATE.vicInputs && STATE.vicInputs.evidence.cards : STATE.evidence && STATE.evidence.card);
+  const cardPts = () => (cardEv() ? Math.round(100 * (cardEv().with - cardEv().against)) : 35);
   const LEV = [
     ["COAL|AO", "Coalition voters, between Labor and One Nation", "to Labor"],
     ["ALP|CO", "Labor voters, between the Coalition and One Nation", "to the Coalition"],
@@ -48,10 +49,10 @@ const EX = (() => {
     </div>`;
     const vote = $("#ex-vote");
     P5.forEach((k, i) => vote.insertAdjacentHTML("beforeend", `<div class="md-sl t-${P5_TONE[k]}"><label for="v-${k}"><span class="dot"></span>${P5_NAME[k]}</label><output id="vo-${k}"></output><input type="range" id="v-${k}" min="0" max="50" step="0.1" data-v="${i}"></div>`));
-    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls’ figures are ${STATE.jur === "vic" ? "the /vic/ page’s polling average" : "this site’s aggregate"} to ${shortDate(INP().asOf.pollsTo)}.</p>`);
+    vote.insertAdjacentHTML("beforeend", `<p class="note">Move one party and the others make room in proportion. The polls’ figures are ${STATE.jur === "vic" ? "the /vic/ page’s polling average" : "this site’s aggregate"} to ${shortDate(INP().asOf.pollsTo)}.${STATE.jur !== "vic" && INP().build.ind ? " Sitting independents and each seat’s independent challenge keep to their own record, so moving others moves minor parties." : ""}</p>`);
     const lev = $("#ex-lev");
     for (const [k, l, unit] of LEV) lev.insertAdjacentHTML("beforeend", `<div class="md-sl"><label for="l-${lid(k)}">${l}</label><output id="lo-${lid(k)}"></output><input type="range" id="l-${lid(k)}" min="-30" max="40" step="1" value="0" data-l="${k}" data-unit="${unit}"></div>`);
-    lev.insertAdjacentHTML("beforeend", `<p class="note">Each lever shifts that voter group’s choice in every seat by the same amount (on the logit scale), keeping each seat’s own leaning. ${STATE.jur === "vic" ? `The card button moves Coalition voters by what the Liberal card’s reversal between the 2010 and 2013 federal elections was worth, ${cardPts()} points.` : "The card button assumes about a third of Coalition voters follow their party’s how-to-vote card; switching the card’s order moves them, about 35 points."}</p>`);
+    lev.insertAdjacentHTML("beforeend", `<p class="note">Each lever shifts that voter group’s choice in every seat by the same amount (on the logit scale), keeping each seat’s own leaning. ${cardEv() ? `The card button moves Coalition voters by what the Liberal card’s reversal between the 2010 and 2013 federal elections was worth, ${cardPts()} points.` : "The card button assumes about a third of Coalition voters follow their party’s how-to-vote card; switching the card’s order moves them, about 35 points."}</p>`);
     const unc = $("#ex-unc");
     for (const [k, l] of [["pol", "Polling error"], ["seat", "Seat-to-seat noise"], ["flow", "Preference drift"]]) unc.insertAdjacentHTML("beforeend", `<div class="md-sl"><label for="u-${k}">${l}</label><output id="uo-${k}"></output><input type="range" id="u-${k}" min="0" max="2" step="0.25" value="1" data-u="${k}"></div>`);
     unc.insertAdjacentHTML("beforeend", `<p class="note">1 is the size fitted on past elections; 0 removes that source of error.</p>`);
