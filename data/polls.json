@@ -1525,6 +1525,16 @@
       "unsure": 14
     },
     {
+      "date": "2026-11-09",
+      "dateStart": "2026-11-06",
+      "pollster": "JWS Research",
+      "right": 11,
+      "wrong": 59,
+      "unsure": 31,
+      "sample": 1000,
+      "url": "https://www.jwsresearch.com/wp-content/uploads/True_Issues_43_131126.pdf"
+    },
+    {
       "date": "2026-11-15",
       "dateStart": "2026-11-09",
       "pollster": "Roy Morgan",
