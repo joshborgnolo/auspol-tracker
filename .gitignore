@@ -54,3 +54,8 @@ __pycache__/
 # .build/essential-oneoffs-adjudicated.json instead)
 .build/essential-src/oneoffs-cases.json
 .build/essential-src/oneoffs-verdict.json
+
+# raw ABS SED-asgs* polygon caches under .build/map/src/act/ (117–123 MB
+# apiece; regenerable via .build/map/harvest-act-src.py). Never committed —
+# only the derived n-act<yy>.geojson era matches carry.
+sed-cache-asgs*.geojson

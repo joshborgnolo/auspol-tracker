@@ -1,0 +1,57 @@
+{
+ "frame": "act20",
+ "day": "2020-10-17",
+ "files": {
+  "hub.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2020-election",
+   "bytes": 177487,
+   "sha256": "8efd2831311e570212b295ba405becd3026d93c9396e3fe1e208bb1bf4f6db60"
+  },
+  "stats.xlsx": {
+   "url": "https://www.elections.act.gov.au/__data/assets/excel_doc/0008/2472470/Election-Statistics-2020-election.xlsx",
+   "bytes": 775368,
+   "sha256": "5fd272224e0c00d208acf86e754b7daf46c73bda11eaf57d492c97d112aac588"
+  },
+  "elected.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2020-election/2020-list-of-elected-candidates",
+   "bytes": 176566,
+   "sha256": "90c903c4ab773f6b71294d1190b6ea7c489b685c945b477114ed9906020bc600"
+  },
+  "dop-hub.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2020-election/distribution-of-preferences-2020",
+   "bytes": 179804,
+   "sha256": "af307b1dea56e9232b40b156969fa63fa81c773bf8e05b8477083a6f0cc95926"
+  },
+  "results-overview.html": {
+   "url": "https://www.elections.act.gov.au/elections_and_voting/past_act_legislative_assembly_elections/2020-election/2020-election-results/results-overview",
+   "bytes": 100463,
+   "sha256": "cf012627b0c6341b2d4375b4e9ea7d66de0557b61addbe145b61c35a37ed38da"
+  },
+  "dop-brindabella.xlsx": {
+   "url": null,
+   "bytes": 21015,
+   "sha256": "05de397ff8b11a31cffbdde3322958c8a2b0de6a2898b5830ef68c80360e16f5"
+  },
+  "dop-ginninderra.xlsx": {
+   "url": null,
+   "bytes": 26096,
+   "sha256": "e384041adb40098cb1b8a64364d9ed270cc9be543c007939f0966d4c435f4d06"
+  },
+  "dop-kurrajong.xlsx": {
+   "url": null,
+   "bytes": 28914,
+   "sha256": "7d40a04fd9a6c2622a61e19c3a019f0a22b470abed44706114d541d5b860a728"
+  },
+  "dop-murrumbidgee.xlsx": {
+   "url": null,
+   "bytes": 22453,
+   "sha256": "568cbc1094594127bc1bd2111493cb76cc9884ebcf02207881e6806c8f3914f6"
+  },
+  "dop-yerrabi.xlsx": {
+   "url": null,
+   "bytes": 23835,
+   "sha256": "8745af8ca59b49d2a503327bc575dc6dc05361d697df03c89f7c2a612c79a2e9"
+  }
+ },
+ "fetchedAt": "2026-11-17T09:56:08Z"
+}

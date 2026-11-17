@@ -1,0 +1,445 @@
+#!/usr/bin/env python3
+"""data/act<yy>-demo.json — per-district census-people figures for the
+the ACT /map/ frames, in the wa discipline on this state's own
+products.
+
+Same estimand as the federal seats' census lanes (booth-demo-*) pooled one
+level up, applied to the TEC frames' districts: each district's people
+figures are pooled directly from the ABS census GCP SA1 tables — the 2016
+census for  ,     , the 2021 census for tas21 and tas24 (a measured-only read)
+— at the same ex-not-stated bases as the seat-model derivation (member and
+column choices identical per vintage, so a federal figure and a tas figure
+are commensurate).
+
+Method: every Tas SA1 counts to the district its polygon centroid lies in,
+whole (boundary-straddling SA1s land on the side their centre sits; the
+State total never moves). The geometry lives in act_geo.py (wa_geo.py's
+protocol) and the join is committed per FRAME at
+.build/map/act<YY>/assign-sa1.json — tas21 and tas24 share the census vintage
+but NOT the boundaries, so they hold separate joins.
+
+Inputs (machine caches shared with the wa pipeline; refetch manifest in
+act_geo.VINTAGES):
+  .build/analysis/seat-model/cache/gcp-sa1-2021.zip        (GCP 2021 SA1 datapack)
+  .build/analysis/seat-model/cache/gcp-sa1-2016.zip        (GCP 2016 SA1 datapack)
+  .build/analysis/seat-model/cache/SA1_2021_AUST_SHP_GDA2020.zip
+  .matilda/seifa-irsad-abs/dl/1270055001_sa1_2016_aust_shape.zip
+  .build/map/src/act/n-act<YY>.geojson                       (five HoA divisions; harvest-tas-src.py)
+
+Deps: python3 stdlib only. Guards fail loud.
+usage: python3 -I .build/map/build_act<yy>_demo.py
+"""
+import csv
+import hashlib
+import io
+import json
+import os
+import sys
+import zipfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from act_geo import (FRAMES, VINTAGES, ACT_SENTINELS, assign_sa1, load_divisions,
+                    read_sa1_polygons, write_assign_map, assign_path, load_assign_map)  # noqa: E402
+import act_geo  # noqa: E402
+import gcp_newlanes  # noqa: E402
+
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+
+DEMO_BANDS = ["0_4", "5_14", "15_19", "20_24", "25_34", "35_44", "45_54",
+              "55_64", "65_74", "75_84", "85ov"]
+OCC_COLS = ["P_Tot_Managers", "P_Tot_Professionals",
+            "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
+            "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
+            "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
+COB_KEYS = ["eng", "ind", "chn", "nzl", "phl", "vnm", "zaf", "ita",
+            "lka", "sct"]
+UNI_COLS = ["P_PGrad_Deg_Total", "P_GradDip_and_GradCert_Total",
+            "P_BachDeg_Total", "P_Lev_Edu_NS_Total"]
+
+#: GCP-pack TAS persons per vintage, computed from G01 on first derivation
+#: 2026-11-16 and pinned exactly; a drift is a guard trip
+GCP_ACT_PERSONS = {2016: 397421, 2021: 454346}
+#: sentinel-SA1 persons per vintage (migratory/offshore/no-usual-address
+#: SA1s — outside the join by construction), same derivation through
+#: the state's mixed off-shore cluster — the ACT keeps five sentinel
+#: rows per vintage where mainland states keep four
+ACT_SENTINEL_PERSONS = {2016: 538, 2021: 605}
+
+DATES = {"act16": "2016-10-15", "act20": "2020-10-17", "act24": "2024-10-19"}
+
+
+def fail(msg):
+    raise SystemExit(f"act-demo: {msg}")
+
+
+def hash16(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:16]
+
+
+def _gcp_member(z, year, table):
+    name = VINTAGES[year]["member"].format(table=table)
+    if name not in z.namelist():
+        fail(f"GCP {year} zip lacks {name}")
+    return name
+
+
+def load_gcp_tas(year):
+    """One pass over that vintage's GCP SA1 pack, TAS rows (code prefix 6),
+    same table/column map as the wa/federal choices per vintage."""
+    V = VINTAGES[year]
+    gcp_zip = V["gcp"]
+    if not os.path.exists(gcp_zip):
+        fail(f"missing GCP input {gcp_zip}")
+    z = zipfile.ZipFile(gcp_zip)
+    agecols = [f"Age_{b}_yr_P" for b in DEMO_BANDS[:-1]] + ["Age_85ov_P"]
+    lang_cols = V["lang"]
+    want = [V["gcp_key"], "Tot_P_P", *lang_cols, *agecols]
+    base = {}
+    n = 0
+    member = _gcp_member(z, year, "G01")
+    with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+        rdr = csv.DictReader(fh)
+        miss = [c for c in want if c not in (rdr.fieldnames or [])]
+        if miss:
+            fail(f"GCP {year} G01 header drift, missing {miss}")
+        for row in rdr:
+            n += 1
+            code = row[V["gcp_key"]]
+            if not code.startswith("8"):
+                continue
+            if code in base:
+                fail(f"GCP G01 dup TAS code {code}")
+            base[code] = (int(row["Tot_P_P"]), int(row[lang_cols[0]]),
+                          int(row[lang_cols[1]]),
+                          tuple(int(row[c]) for c in agecols))
+    if n != V["gcp_rows"]:
+        fail(f"GCP {year} G01 rows {n} != pin {V['gcp_rows']}")
+    persons = sum(r[0] for r in base.values())
+    if persons != GCP_ACT_PERSONS[year]:
+        fail(f"GCP {year} TAS persons {persons} != pin {GCP_ACT_PERSONS[year]}")
+    print(f"GCP {year} G01 TAS: {len(base)} SA1s, {persons} persons")
+
+    table_specs = (
+        ("G09F", ["P_Australia_Tot", "P_England_Tot", "P_China_Tot"]),
+        ("G09G", ["P_India_Tot", "P_New_Zealand_Tot", "P_Italy_Tot"]),
+        ("G09H", ["P_Tot_Tot", "P_COB_NS_Tot", "P_Philippines_Tot",
+                  "P_Vietnam_Tot", "P_South_Africa_Tot", "P_Scotland_Tot",
+                  "P_Sri_Lanka_Tot"]),
+        (V["uni_member"], UNI_COLS),
+        (V["occ_member"], OCC_COLS),
+    )
+    extra = {}
+    for tag, cols in table_specs:
+        member = _gcp_member(z, year, tag)
+        d = {}
+        m = 0
+        with io.TextIOWrapper(z.open(member), encoding="utf-8-sig") as fh:
+            rdr = csv.DictReader(fh)
+            miss = [c for c in [V["gcp_key"], *cols] if c not in (rdr.fieldnames or [])]
+            if miss:
+                fail(f"GCP {year} {tag} header drift, missing {miss}")
+            for row in rdr:
+                m += 1
+                code = row[V["gcp_key"]]
+                if not code.startswith("8"):
+                    continue
+                if code in d:
+                    fail(f"GCP {tag} dup TAS code {code}")
+                d[code] = tuple(int(row[c]) for c in cols)
+        if m != V["gcp_rows"]:
+            fail(f"GCP {year} {tag} rows {m} != pin {V['gcp_rows']}")
+        if len(d) != len(base):
+            fail(f"GCP {year} {tag}: {len(d)} TAS rows != G01's {len(base)}")
+        extra[tag] = d
+        print(f"GCP {year} {tag} TAS: {len(d)} SA1s")
+
+    out = {}
+    for code, r in base.items():
+        f09 = extra["G09F"].get(code)
+        g09 = extra["G09G"].get(code)
+        h09 = extra["G09H"].get(code)
+        uni = extra[V["uni_member"]].get(code)
+        occ = extra[V["occ_member"]].get(code)
+        if None in (f09, g09, h09, uni, occ):
+            fail(f"GCP {year} TAS set mismatch at {code}")
+        cob = (f09[1], g09[0], f09[2], g09[1], h09[2], h09[3], h09[4],
+               g09[2], h09[6], h09[5])
+        out[code] = r + (f09[0], h09[0], h09[1],
+                         uni[0] + uni[1] + uni[2], uni[3],
+                         occ[2] + occ[6] + occ[7], sum(occ)) + (cob,)
+    print(f"GCP {year} demo NT: {len(out)} rows, persons {persons}")
+    return out, persons
+
+
+# ------------------------------------------------------------------ assemble
+def demo_main(frame):
+    year = FRAMES[frame]
+    V = VINTAGES[year]
+    gcp, tas_persons = load_gcp_tas(year)
+    nlt = gcp_newlanes.load(V["gcp"], prefix="8", era=str(year))
+    arc = gcp_newlanes.load_arc31(V["gcp"], prefix="8", era=str(year))
+    lab = gcp_newlanes.load_lab(V["gcp"], prefix="8", era=str(year))
+    ind = gcp_newlanes.load_ind(V["gcp"], prefix="8", era=str(year))
+    mar = gcp_newlanes.load_mar(V["gcp"], prefix="8", era=str(year))
+    inc, _inc_cutrec = gcp_newlanes.state_income(V["gcp"], str(year), "8")
+    HL = gcp_newlanes.hl_alloc_of(2021, "m") if str(year) == "2021" else gcp_newlanes.hl_alloc_of(2016, "c7")
+    sa1 = read_sa1_polygons(year)
+    districts, order = load_divisions(frame)
+
+    missing = set(gcp) - ACT_SENTINELS[year] - set(sa1)
+    extra = set(sa1) - set(gcp)
+    if missing:
+        fail(f"GCP NT SA1s without a polygon: {sorted(missing)[:5]} ({len(missing)})")
+    if extra:
+        fail(f"SA1 {year} polygons without a GCP row: {sorted(extra)[:5]} ({len(extra)})")
+
+    assign = assign_sa1(sa1, districts)
+    write_assign_map(frame, assign)
+
+    sentinel_persons = sum(gcp[c][0] for c in ACT_SENTINELS[year])
+    if sentinel_persons != ACT_SENTINEL_PERSONS[year]:
+        fail(f"{year} sentinel SA1 persons {sentinel_persons} != pin {ACT_SENTINEL_PERSONS[year]}")
+
+    acc = {}
+    for code, dist in assign.items():
+        a = acc.setdefault(dist, {"p": 0, "eng": 0, "oth": 0, "aust": 0,
+                                  "tot": 0, "cobns": 0, "uni": 0, "eduns": 0,
+                                  "pop15": 0, "blue": 0, "occd": 0,
+                                  "cobN": [0] * len(COB_KEYS),
+                                  "bands": [0] * len(DEMO_BANDS), "n": 0,
+                                  "ylN": 0, "ylD": 0, "y12n": 0, "y10n": 0, "atN": 0, "atD": 0,
+                                  "relN": [0] * len(gcp_newlanes.REL_KEYS),
+                                  "relNS": 0, "relTot": 0,
+                                  "tenN": [0] * 6, "famN": 0, "famD": 0,
+                                  "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
+                                  "ceb3": 0, "cebns": 0, "cebt": 0,
+                                  "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+                                  "marN": [0] * len(gcp_newlanes.MAR_KEYS),
+                                  "ancP": 0, "ancNS": 0,
+                                  "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0, "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+                                  "ueN": 0.0, "lfD": 0.0,
+                                  "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
+                                  "hlE": 0.0})
+        r = gcp[code]
+        a["p"] += r[0]
+        a["eng"] += r[1]
+        a["oth"] += r[2]
+        for i in range(len(DEMO_BANDS)):
+            a["bands"][i] += r[3][i]
+        a["aust"] += r[4]
+        a["tot"] += r[5]
+        a["cobns"] += r[6]
+        a["uni"] += r[7]
+        a["eduns"] += r[8]
+        a["blue"] += r[9]
+        a["occd"] += r[10]
+        for i in range(len(COB_KEYS)):
+            a["cobN"][i] += r[11][i]
+        a["pop15"] += r[0] - r[3][0] - r[3][1]
+        a["n"] += 1
+        sch6, indt, (relvec, relns, reltot), ten6, fam = nlt[code]
+        a["ylN"] += sum(sch6[1:])
+        a["y12n"] += sch6[0]
+        a["y10n"] += sum(sch6[2:])
+        a["ylD"] += sum(sch6)
+        a["atN"] += indt[0]
+        a["atD"] += indt[1]
+        for i in range(len(gcp_newlanes.REL_KEYS)):
+            a["relN"][i] += relvec[i]
+        a["relNS"] += relns
+        a["relTot"] += reltot
+        for i in range(6):
+            a["tenN"][i] += ten6[i]
+        a["famN"] += fam[0]
+        a["famD"] += fam[1]
+        citz, (ptn, ptt, ptns), (ceb3, cebns, cebt), \
+            (ancv, ancp, ancns) = arc[code]
+        a["citz"] += citz
+        a["ptn"] += ptn
+        a["ptt"] += ptt
+        a["ptns"] += ptns
+        a["ceb3"] += ceb3
+        a["cebns"] += cebns
+        a["cebt"] += cebt
+        for i in range(len(gcp_newlanes.ANC_KEYS)):
+            a["ancN"][i] += ancv[i]
+        a["ancP"] += ancp
+        aud, lom, him, _med, bands_ad, hh, hiqm = inc[code]
+        a["incAud"] += aud
+        a["incLo"] += lom
+        a["incHi"] += him
+        a["incHiQ"] += hiqm
+        for ii in range(len(gcp_newlanes.INC_BANDS)):
+            a["incBandH"][ii] += hh[ii]
+        a["ancNS"] += ancns
+        labU, labLF = lab[code]
+        a["ueN"] += labU
+        a["lfD"] += labLF
+        iv, _ivns, _ivt = ind[code]
+        for i in range(len(gcp_newlanes.IND_KEYS)):
+            a["indN"][i] += iv[i]
+        for i in range(len(gcp_newlanes.MAR_KEYS)):
+            a["marN"][i] += mar[code][i]
+        a["hlE"] += HL.get(code, {}).get("e", 0.0)
+    for dist, _bb, _polys in districts:
+        if dist not in acc:
+            fail(f"district {dist} has no SA1 assigned")
+
+    def shares(a):
+        bsum = sum(a["bands"])
+        fb_den = a["tot"] - a["cobns"]
+        uni_den = a["pop15"] - a["eduns"]
+        for nm, v in (("bands", bsum), ("fb_den", fb_den),
+                      ("uni_den", uni_den), ("occd", a["occd"]),
+                      ("eng+oth", a["eng"] + a["oth"])):
+            if v <= 0:
+                return None, nm
+        indden = sum(a["indN"])
+        tn = a["tenN"]
+        tend = tn[0] + tn[1] + tn[2] + tn[4]
+        mard = sum(a["marN"])
+        s = {
+            "lang": round(a["oth"] / (a["eng"] + a["oth"]), 4),
+            "a65": round((a["bands"][8] + a["bands"][9] + a["bands"][10]) / bsum, 4),
+            "a2034": round((a["bands"][3] + a["bands"][4]) / bsum, 4),
+            "fborn": round((fb_den - a["aust"]) / fb_den, 4),
+            "uni": round(a["uni"] / uni_den, 4),
+            "blue": round(a["blue"] / a["occd"], 4),
+            "cob": {k: round(a["cobN"][i] / fb_den, 4)
+                    for i, k in enumerate(COB_KEYS)},
+            "u15": round((a["bands"][0] + a["bands"][1]) / bsum, 4),
+            "y12less": round(a["ylN"] / a["ylD"], 4) if a["ylD"] else None,
+            "y12": round(a["y12n"] / a["ylD"], 4) if a["ylD"] else None,
+            "y10less": round(a["y10n"] / a["ylD"], 4) if a["ylD"] else None,
+            "atsci": round(a["atN"] / a["atD"], 4) if a["atD"] else None,
+            "onepar": round(a["famN"] / a["famD"], 4) if a["famD"] else None,
+            "rel": {k: (round(a["relN"][i] / (a["relTot"] - a["relNS"]), 4)
+                        if a["relTot"] - a["relNS"] > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.REL_KEYS)},
+            "ten": {k: (round({"mort": tn[1], "rent": tn[2],
+                               "own": tn[0], "rentPub": tn[3]}[k] / tend, 4)
+                        if tend > 0 else None)
+                    for k in ["mort", "rent", "own", "rentPub"]},
+            "pt": (round(a["ptn"] / (a["ptt"] - a["ptns"]), 4)
+                   if a["ptt"] - a["ptns"] > 0 else None),
+            "noncit": round((a["p"] - a["citz"]) / a["p"], 4) if a["p"] else None,
+            "bigfam": (round(a["ceb3"] / (a["cebt"] - a["cebns"]), 4)
+                       if a["cebt"] - a["cebns"] > 0 else None),
+            "hl": round(a["hlE"] / a["p"], 4) if a["p"] else None,
+            "unemp": round(a["ueN"] / a["lfD"], 4) if a["lfD"] else None,
+            "ind": ({k: round(a["indN"][i] / indden, 4)
+                     for i, k in enumerate(gcp_newlanes.IND_KEYS)}
+                    if indden else None),
+            "anc": {k: (round(a["ancN"][i] / (a["ancP"] - a["ancNS"]), 4)
+                        if a["ancP"] - a["ancNS"] > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.ANC_KEYS)},
+            "mar": {k: (round(a["marN"][i] / mard, 4)
+                        if mard > 0 else None)
+                    for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
+        }
+        if a.get("incAud", 0) > 0:
+            s["loinc"] = round(a["incLo"] / a["incAud"], 4)
+            s["hiinc"] = round(a["incHi"] / a["incAud"], 4)
+            s["hiqinc"] = round(a["incHiQ"] / a["incAud"], 4)
+            med = gcp_newlanes.band_median(a["incBandH"], gcp_newlanes.INC_BANDS)
+            s["medIncWeekly"] = int(round(med)) if med is not None else None
+        return s, None
+
+    demo = {}
+    for dist, _bb, _polys in districts:
+        a = acc[dist]
+        s, why = shares(a)
+        if s is None:
+            fail(f"{dist}: zero denominator on {why}")
+        demo[dist] = {**s, "p": a["p"], "n": a["n"]}
+
+    st_acc = {"p": 0, "eng": 0, "oth": 0, "aust": 0, "tot": 0, "cobns": 0,
+              "uni": 0, "eduns": 0, "pop15": 0, "blue": 0, "occd": 0,
+              "cobN": [0] * len(COB_KEYS),
+              "bands": [0] * len(DEMO_BANDS), "n": 0,
+              "ylN": 0, "ylD": 0, "y12n": 0, "y10n": 0, "atN": 0, "atD": 0,
+              "relN": [0] * len(gcp_newlanes.REL_KEYS),
+              "relNS": 0, "relTot": 0, "tenN": [0] * 6,
+              "famN": 0, "famD": 0,
+              "citz": 0, "ptn": 0, "ptt": 0, "ptns": 0,
+              "ceb3": 0, "cebns": 0, "cebt": 0,
+              "ancN": [0] * len(gcp_newlanes.ANC_KEYS),
+              "marN": [0] * len(gcp_newlanes.MAR_KEYS),
+              "ancP": 0, "ancNS": 0,
+              "incAud": 0.0, "incLo": 0.0, "incHi": 0.0, "incHiQ": 0.0,
+              "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
+              "ueN": 0.0, "lfD": 0.0,
+              "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
+              "hlE": 0.0}
+    for a in acc.values():
+        for k2, v2 in a.items():
+            if k2 == "bands":
+                for i in range(len(DEMO_BANDS)):
+                    st_acc["bands"][i] += v2[i]
+            elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH",
+                        "indN", "marN"):
+                for i in range(len(v2)):
+                    st_acc[k2][i] += v2[i]
+            else:
+                st_acc[k2] += v2
+    st_shares, why = shares(st_acc)
+    if st_shares is None:
+        fail(f"state: zero denominator on {why}")
+    persons = st_acc["p"]
+    if persons + sentinel_persons != tas_persons:
+        fail(f"partition drift: districts {persons} + sentinels {sentinel_persons}"
+             f" != GCP NT {tas_persons}")
+    st_acc.pop("pop15")
+    st_acc.pop("bands")
+    st_acc.pop("cobN")
+    print("state:", {**st_shares, "persons": persons, "sa1": st_acc["n"]})
+
+    out = {
+        "year": frame,
+        "jurisdiction": "NT",
+        "date": DATES[frame],
+        "demoBasis": "sa1",
+        "cobKeys": COB_KEYS,
+        "relKeys": list(gcp_newlanes.REL_KEYS),
+        "tenKeys": ["mort", "rent", "own", "rentPub"],
+        "ancKeys": list(gcp_newlanes.ANC_KEYS),
+        "indKeys": list(gcp_newlanes.IND_KEYS),
+        "marKeys": list(gcp_newlanes.MAR_KEYS),
+        "demo": {nm: demo[nm] for nm in order},
+        "state": {**st_shares, "persons": persons, "sa1": st_acc["n"],
+                  "sentinelSa1": len(ACT_SENTINELS[year]), "sentinelPersons": sentinel_persons},
+        "src": {
+            "districtGeojson": {"path": os.path.relpath(act_geo.dist_geojson(frame), REPO),
+                                "sha16": hash16(act_geo.dist_geojson(frame))},
+            "gcp": {"path": os.path.relpath(V["gcp"], REPO), "sha16": hash16(V["gcp"]),
+                    "members": ["G01", "G07", "G09F", "G09G", "G09H", "G14",
+                                V["fam_member"], V["ten_member"],
+                                V["uni_member"], V["occ_member"]]},
+            "sa1Shp": {"path": os.path.relpath(V["shp"], REPO), "sha16": hash16(V["shp"])},
+            "gcpRows": V["gcp_rows"],
+        },
+        "about": (f"{year} Census GCP G01/G07/G09F/G09G/G09H/G14/{V['fam_member']}/{V['ten_member']}/{V['uni_member']}/{V['occ_member']} SA1 tables, "
+                  "pooled to the the ACT's 25 Legislative Assembly"
+                  " electoral divisions for the frame's election date. Each "
+                  "SA1 counts whole to the division its polygon centroid lies "
+                  "in (boundary SA1s are not split; the State total is "
+                  "never moved). Bases match the federal and other-state "
+                  "stores (ex-not-stated; see the qld frame stores for the "
+                  "full per-lane specification). The industry picker (ind, "
+                  "key order in indKeys) reads the edition's "
+                  "industry-of-employment nineteen ANZSIC-2006 divisions, "
+                  "each shared over the divisions' own summed counts. p is "
+                  "census persons; n the SA1 count. The four NT sentinel "
+                  "SA1s (migratory/offshore/no-usual-address) carry no "
+                  "polygon and sit outside the join, holding "
+                  f"{sentinel_persons} persons territory-wide."),
+    }
+    out_path = os.path.join(REPO, "data", f"{frame}-demo.json")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
+    print(f"-> {out_path} ({os.path.getsize(out_path)} bytes)")

@@ -818,6 +818,10 @@ _INC_CUT_GUARDS = {
 # 2016 vs the mainland states' 5-25%): gate-off only for its measured range.
 _INC_HISHARE_GUARDS = {
     ("2016", "6"): (0.03, 0.06),
+    ("2016", "8"): (0.15, 0.40),  # ACT's top-band share sits far past the
+                                  # default 0.25 cap both eras — unlocked and
+                                  # measured beside ("2021", "8") below, 2026-11-17
+    ("2021", "8"): (0.15, 0.40),  # ACT 2021 measured 0.2713
 }
 
 _INC_HIQ_GUARDS = {
@@ -842,6 +846,18 @@ _INC_CUT_GUARDS_BY_ERA = {
     ("2021", "6"): (800, 1900),  # tas-era guard for the 2021 GCP pack's two-
                                 # member income blocks (no measurement yet)
 }
+_INC_OPEN_BAND_FRAMES = {
+    # The ACT's household-income tail is so heavy that the 75% cut lands
+    # INSIDE the GCP's open-top band for both census eras here (2016: the
+    # open band is "$3,000 seat along band", measured top share 0.2567;
+    # 2021-OPEN up form annual same direction at 0.3435). Its modelling
+    # of the cut keeps the cut parked on _INC_HIGH_EDGE as its surrogate:
+    # every lane downstream of hiQCut uses the surrogate identically.
+    ("2016", "8"),
+    ("2021", "8"),
+}
+
+
 _INC_SITES = {}
 
 
@@ -981,8 +997,12 @@ def state_income(gcp_zip, era, prefix):
             prev = cum - nat_adults[i] / nat_tot
             f = (_INC_HI_Q - prev) / (nat_adults[i] / nat_tot)
             if hi is None:
-                _fail(f"state {prefix}: income 75% cut lands the open band")
-            cut75 = lo + f * (hi - lo + 1)
+                if (str(era), prefix) in _INC_OPEN_BAND_FRAMES:
+                    cut75 = _INC_HIGH_EDGE  # open-band-era surrogate in-park
+                else:
+                    _fail(f"state {prefix}: income 75% cut lands the open band")
+            else:
+                cut75 = lo + f * (hi - lo + 1)
             break
     guq = _INC_HIQ_GUARDS.get(str(era), {}).get(prefix)
     if cut75 is None or (guq is not None

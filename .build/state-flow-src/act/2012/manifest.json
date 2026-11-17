@@ -1,0 +1,42 @@
+{
+ "frame": "act12",
+ "day": "2012-10-20",
+ "files": {
+  "hub.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2012-election",
+   "bytes": 178761,
+   "sha256": "532c1488aafb59962c51f25ee5917df4cae3f52bd963cd9b899a645c5a657233"
+  },
+  "stats.xlsx": {
+   "url": "https://www.elections.act.gov.au/__data/assets/excel_doc/0008/2466116/2012_Statistics_book.xlsx",
+   "bytes": 242289,
+   "sha256": "ba4b586b91ffb333ebe690e945982edf11f679915c7fc0c6a81eb715f7262882"
+  },
+  "elected.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2012-election/2012-list-of-elected-candidates",
+   "bytes": 175166,
+   "sha256": "7fdacd2ad0c528d395c20898c072ad79c1841198c43e34e8d67310370fe2035e"
+  },
+  "dop-hub.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2012-election/2012-distribution-of-preferences",
+   "bytes": 178271,
+   "sha256": "fd03ab0833e6006ce4b51d646194050ee6672a04a865ce38f7e3a13980011b28"
+  },
+  "dop-brindabella.xlsx": {
+   "url": null,
+   "bytes": 41958,
+   "sha256": "8cef89b52e9fa2a386e80d4979d884465960d40af6e666610130f9693048ed3a"
+  },
+  "dop-ginninderra.xlsx": {
+   "url": null,
+   "bytes": 30404,
+   "sha256": "6f3a588db60a9b83a0786a56ba9582082e790bdb867220034e7cd9ee9961ab22"
+  },
+  "dop-molonglo.xlsx": {
+   "url": null,
+   "bytes": 32747,
+   "sha256": "3eaa869806743c847de5bbd56f7cc59d37cb301df27a1d9bbe250d267c214e96"
+  }
+ },
+ "fetchedAt": "2026-11-17T09:56:08Z"
+}

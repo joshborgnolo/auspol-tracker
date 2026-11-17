@@ -23,9 +23,10 @@ const isQld = () => QLD_YEARS.has(S.year);
 const isWA = () => WA_YEARS.has(S.year);
 const isNT = () => NT_YEARS.has(S.year);
 const isTas = () => TAS_YEARS.has(S.year);
+const isAct = () => ACT_YEARS.has(S.year);
 // a state frame's elections commission, short form (state frames only)
-const commX = () => (isSA() ? "ECSA" : isVic() ? "VEC" : isQld() ? "ECQ" : isWA() ? "WAEC" : isNT() ? "NTEC" : isTas() ? "the Tasmanian Electoral Commission" : "NSWEC");
-const coalW = (cap) => (isSA() || isVic() || isWA() || isTas() ? (cap ? "The Liberals" : "the Liberals") : isQld() ? (cap ? "The LNP" : "the LNP") : isNT() ? (cap ? "The Country Liberals" : "the Country Liberals") : cap ? "The Coalition" : "the Coalition");
+const commX = () => (isSA() ? "ECSA" : isVic() ? "VEC" : isQld() ? "ECQ" : isWA() ? "WAEC" : isNT() ? "NTEC" : isTas() ? "the Tasmanian Electoral Commission" : isAct() ? "Elections ACT" : "NSWEC");
+const coalW = (cap) => (isSA() || isVic() || isWA() || isTas() || isAct() ? (cap ? "The Liberals" : "the Liberals") : isQld() ? (cap ? "The LNP" : "the LNP") : isNT() ? (cap ? "The Country Liberals" : "the Country Liberals") : cap ? "The Coalition" : "the Coalition");
 // (WA says Liberals like SA and Victoria by word choice, never Coalition or LNP;
 // the Nationals WA ride the lnp family here, as Victoria's do — a display
 // compromise in every sense, worth its own note: there is no Coalition in
@@ -33,13 +34,13 @@ const coalW = (cap) => (isSA() || isVic() || isWA() || isTas() ? (cap ? "The Lib
 // says the Country Liberals — the merged NT Coalition partner whose CLP
 // banner is the whole of the lnp family there)
 // the rival's bare name where the hero and margin bars want one ("Liberal"/"LNP"/"CLP"/"Coalition")
-const oppNameW = () => (isSA() || isVic() || isWA() || isTas() ? "Liberal" : isQld() ? "LNP" : isNT() ? "CLP" : "Coalition");
+const oppNameW = () => (isSA() || isVic() || isWA() || isTas() || isAct() ? "Liberal" : isQld() ? "LNP" : isNT() ? "CLP" : "Coalition");
 const leaderT = () => (isNT() ? "chief minister" : isState() ? "premier" : "prime minister");
-const ausW = () => (isSA() ? "South Australia" : isNSW() ? "New South Wales" : isVic() ? "Victoria" : isQld() ? "Queensland" : isWA() ? "Western Australia" : isNT() ? "the Northern Territory" : isTas() ? "Tasmania" : "Australia");
+const ausW = () => (isSA() ? "South Australia" : isNSW() ? "New South Wales" : isVic() ? "Victoria" : isQld() ? "Queensland" : isWA() ? "Western Australia" : isNT() ? "the Northern Territory" : isTas() ? "Tasmania" : isAct() ? "the Australian Capital Territory" : "Australia");
 const legW = (b) => famLeg(b);
 // a family's preferences, possessive: the Liberals' on an SA or Victorian frame,
 // the LNP's on a Queensland frame, the Coalition's elsewhere
-const possW = (b) => (b === "lnp" && isQld() ? "the LNP’s" : b === "lnp" && isNT() ? "the Country Liberals’" : b === "lnp" && (isSA() || isVic() || isWA() || isTas()) ? "the Liberals’" : POSS[b]);
+const possW = (b) => (b === "lnp" && isQld() ? "the LNP’s" : b === "lnp" && isNT() ? "the Country Liberals’" : b === "lnp" && (isSA() || isVic() || isWA() || isTas() || isAct()) ? "the Liberals’" : POSS[b]);
 // an "as it stands" view: today’s holder won the last count under another
 // banner — the winner’s row in the count stays historical but earns a note
 const movedTo = (m, d) => (isNowY(m.year) && d.hold && d.hold.n === d.win.n && d.hold.ab !== d.win.ab ? leaderName(d.hold) : null);
@@ -1547,7 +1548,7 @@ function storyArea(m, st) {
   // the Senate lanes' head reads the chamber (the same gate as the figures')
   const senLanes = S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null);
   const senDeck = senLanes && !cls ? SENY[isNowY(m.year) ? "now" : m.year] || null : null;
-  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? (senDeck ? "The Senate today" : "The House today") : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : isNT() ? "Northern Territory election" : isTas() ? "Tasmanian election" : "South Australian election") : `${yearLabel(m.year)} election`);
+  const title = filt ? `${filt}${isNowY(m.year) ? "" : ` · ${m.year}`}` : (m.year === "now" ? (senDeck ? "The Senate today" : "The House today") : isNowY(m.year) ? "The Assembly today" : STATE_YEARS.has(m.year) ? (isNSW() ? "New South Wales election" : isVic() ? "Victorian election" : isQld() ? "Queensland election" : WA_YEARS.has(m.year) ? "Western Australian election" : isNT() ? "Northern Territory election" : isTas() ? "Tasmanian election" : isAct() ? "ACT election" : "South Australian election") : `${yearLabel(m.year)} election`);
   // never the date — the eyebrow line above the map already carries it; on
   // the today head the member count is the chamber's senators under the
   // Senate lanes (an election frame's divisions stand either way)
@@ -1603,7 +1604,7 @@ function storyArea(m, st) {
     // members, or the seat type whose kind stays lit
     // a seat type compounds with a hyphen as the mark ("Outer-metro seats lit")
     const chamberMark = cls ? `${CLS_SHORT[cls].replace(" ", "-")} seats lit${aus ? "" : ` in ${STATE_NAME[st]}`}` : aus ? "with every member in their seat" : `${STATE_POSS[st]} members lit`;
-    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${(S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? "The Senate, each member a chair" : `${isSA() || isTas() ? "The House of Assembly" : isNSW() || isVic() || isQld() || isWA() || isNT() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair`}"></canvas></div></div>`;
+    h += `<div class="st-sec"><h3>${isNowY(m.year) ? "The chamber today" : "The new chamber"} <small>${chamberMark}</small></h3><div class="st-chamber"><canvas id="minich" aria-label="${(S.lens === "senate" || (S.lens === "senpref" && svYear(m.year) != null)) && !STATE_YEARS.has(m.year) ? "The Senate, each member a chair" : `${isSA() || isTas() ? "The House of Assembly" : isAct() ? "The Legislative Assembly" : isNSW() || isVic() || isQld() || isWA() || isNT() ? "The Legislative Assembly" : "The House of Representatives"}, each member a chair`}"></canvas></div></div>`;
   }
   if (isNowY(m.year) && list.length) {
     // the federal Now's figures-basis qualifier leads its seats note in the
@@ -2010,8 +2011,8 @@ function foot(m) {
   const src = m.year === "now" ? "AEC results for the 2025 election (event 31496) and the 2026 Farrer by-election (event 31633); members’ changes of party from the parties and the APH"
     : m.year === "nswnow" ? "NSWEC results for the 2023 state election, the 19 October 2024 Epping, Hornsby and Pittwater by-elections and the 13 September 2025 Kiama by-election; members’ moves from the Speaker’s writ notices"
     : m.year === "qldnow" ? "ECQ results for the 2024 state general election, the 2025 Hinchinbrook and 2026 Stafford state by-elections; leaders and members’ moves from Queensland Labor and the Parliament"
-    : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : WA_YEARS.has(m.year) ? `WAEC results for the ${yearLabel(m.year)} state election` : NT_YEARS.has(m.year) ? `NTEC results for the ${yearLabel(m.year)} territory election` : TAS_YEARS.has(m.year) ? `TEC results for the ${yearLabel(m.year)} state election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
-  return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : WA_YEARS.has(m.year) ? "WAEC boundaries; ABS census" : NT_YEARS.has(m.year) ? "NTEC boundaries; ABS census" : TAS_YEARS.has(m.year) ? "the era’s federal divisions set by state law; ABS census" : "AEC boundaries and seat types; ABS census and SEIFA"}.</p>`;
+    : QLD_YEARS.has(m.year) ? `ECQ results for the ${yearLabel(m.year)} state election` : SA_YEARS.has(m.year) ? `ECSA results for the ${yearLabel(m.year)} state election` : NSW_YEARS.has(m.year) ? `NSWEC results for the ${yearLabel(m.year)} state election` : VIC_YEARS.has(m.year) ? `VEC results for the ${yearLabel(m.year)} state election` : WA_YEARS.has(m.year) ? `WAEC results for the ${yearLabel(m.year)} state election` : NT_YEARS.has(m.year) ? `NTEC results for the ${yearLabel(m.year)} territory election` : TAS_YEARS.has(m.year) ? `TEC results for the ${yearLabel(m.year)} state election` : ACT_YEARS.has(m.year) ? `Elections ACT results for the ${yearLabel(m.year)} territory election` : `AEC results for the ${m.year} election (event ${m.res.event})`;
+  return `<p class="st-foot">${src}. ${QLD_YEARS.has(m.year) ? "ECQ boundaries; ABS census" : SA_YEARS.has(m.year) ? "ECSA boundaries; ABS census" : NSW_YEARS.has(m.year) ? "NSWEC boundaries; ABS census" : VIC_YEARS.has(m.year) ? "VEC boundaries; ABS census" : WA_YEARS.has(m.year) ? "WAEC boundaries; ABS census" : NT_YEARS.has(m.year) ? "NTEC boundaries; ABS census" : TAS_YEARS.has(m.year) ? "the era’s federal divisions set by state law; ABS census" : ACT_YEARS.has(m.year) ? "the era’s state electoral divisions (ABS SED); ABS census" : "AEC boundaries and seat types; ABS census and SEIFA"}.</p>`;
 }
 let storyKey = "";
 function renderStory(force) {

@@ -641,7 +641,7 @@ function renderTimeline() {
   const NX = (nx) => 22 + ((nx - FED0) / (YEAR_X.now - FED0)) * (W - 44);
   // a state row's cursor: its own previous elections (2018/2019 before the frames
   // open, 2022 on the SA row is sa22, not the federal 2022), then the frames' spots
-  const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X, wa: WA_PREV_X, nt: NT_PREV_X, tas: TAS_PREV_X };
+  const STATE_ROW_PREV_X = { sa: SA_PREV_X, nsw: NSW_PREV_X, vic: VIC_PREV_X, qld: QLD_PREV_X, wa: WA_PREV_X, nt: NT_PREV_X, tas: TAS_PREV_X, act: ACT_PREV_X };
   const stGx = (st) => (ry) => NX(STATE_ROW_PREV_X[st][ry] ?? YEAR_X[st + String(ry).slice(2)] ?? ry);
   const short = W < 560, cur = S.year;
   /* only the selected jurisdiction's rung draws at a time, so the rows all
@@ -657,8 +657,9 @@ function renderTimeline() {
     { ys: YEARS_WA, base: BASE, top: TOP, gx: stGx("wa") },
     { ys: YEARS_NT, base: BASE, top: TOP, gx: stGx("nt") },
     { ys: YEARS_TAS, base: BASE, top: TOP, gx: stGx("tas") },
+    { ys: YEARS_ACT, base: BASE, top: TOP, gx: stGx("act") },
   ];
-  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : NT_YEARS.has(y) ? 6 : TAS_YEARS.has(y) ? 7 : 0);
+  const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : NT_YEARS.has(y) ? 6 : TAS_YEARS.has(y) ? 7 : ACT_YEARS.has(y) ? 8 : 0);
   // a rung belongs to the selected election alone — the rest of the timeline steps aside
   const activeIx = rowIx(m ? m.year : cur);
   const sd = m ? selDiv() : null;
@@ -714,6 +715,7 @@ function renderTimeline() {
     { i: 5, items: tlStops(YEARS_WA) },
     { i: 6, items: tlStops(YEARS_NT) },
     { i: 7, items: tlStops(YEARS_TAS) },
+    { i: 8, items: tlStops(YEARS_ACT) },
   ];
   for (const R of rowsOf) {
     if (R.i !== activeIx) continue; // only the selected jurisdiction's rung shows
@@ -742,7 +744,7 @@ function renderTimeline() {
       g += `<g class="stop" data-year="${t.y}" style="cursor:pointer"><rect class="hit" x="${hitLeft}" y="${hitTop}" width="${hitRight - hitLeft}" height="${hitBot - hitTop}"/><line x1="${t.x}" x2="${t.x}" y1="${r.base - 3}" y2="${r.base + 3}" stroke="${t.on ? "var(--ink)" : "var(--ink-faint)"}"/><text class="yr${t.on ? " on" : ""}" x="${lx}" y="${labY}" text-anchor="middle">${esc(t.lab)}</text>${uline}</g>`;
     }
   }
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland, Western Australian and Northern Territory state elections; choose one">${g}</svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland, Western Australian, Tasmanian, ACT and Northern Territory state elections; choose one">${g}</svg>`;
   // the strips follow the frame and the selection
   renderJumpSel();
   if (FS.on) fsRail();
@@ -1307,7 +1309,7 @@ const stampEl = (() => {
   return el;
 })();
 let stampShown = "", stampOff = 0;
-const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : WA_YEARS.has(y) ? "Western Australian" : NT_YEARS.has(y) ? "Northern Territory" : TAS_YEARS.has(y) ? "Tasmanian" : "South Australian");
+const stateAdj = (y) => (NSW_YEARS.has(y) ? "New South Wales" : VIC_YEARS.has(y) ? "Victorian" : QLD_YEARS.has(y) ? "Queensland" : WA_YEARS.has(y) ? "Western Australian" : NT_YEARS.has(y) ? "Northern Territory" : TAS_YEARS.has(y) ? "Tasmanian" : ACT_YEARS.has(y) ? "Canberran" : "South Australian");
 function stampParts(y) {
   if (y === "now") return ["The House today", "Now"];
   if (isNowY(y)) return ["The Assembly today", "Now"];

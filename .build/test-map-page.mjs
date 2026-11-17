@@ -2829,6 +2829,133 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(dc.size >= 7, "sa18 IRSAD deciles spread across the range (a monotone join bug collapses them)");
 }
 
+// ── the Tasmania frames (the state's Hare-Clark multi-member House of
+// Assembly; five divisions and five members each until the 2024 election
+// restored seven). Its prev chains stand by the state's follow-at-next-
+// election law (its divisions by law ARE the era's federal divisions):
+// tas18 rides the same pre-2017 determination's polygons as tas14 even
+// after the federal Denison→Clark rename — the TEC pages from 2018 still
+// print "Denison"; the Sep-2017 federal determination then actually
+// in force at tas21-rather than tas14-timepoints, adjucation on records at
+// .build/map/src/tas/past-adjudication.md. Elected rosters per division dedu
+// ride each era's own commissioned roster lanes; tas14's per-division
+// 2010-era roster matches TEC's own summary matrices print
+{
+  for (const frame of ["tas14", "tas18", "tas21", "tas24", "tas25"]) {
+    const res = JSON.parse(R(`map/data/res-${frame}.json`));
+    assert.equal(res.divs.length, 5, `${frame}: five HoA divisions`);
+    assert.ok(res.divs.every((d) => d.seifa && typeof d.seifa.irsad.v === "number"), `${frame}: seifa rows`);
+    assert.ok(res.divs.every((d) => d.demo && typeof d.demo.p === "number"), `${frame}: demo rows`);
+    const elected = res.divs.reduce((a, d) => a + d.c.filter((c) => c[6] === 1).length, 0);
+    const expect = frame === "tas14" || frame === "tas18" || frame === "tas21" ? 25 : 35;
+    assert.equal(elected, expect, `${frame}: its Hare-Clark member roster cards`);
+    const hCnt = res.divs.reduce((a, d) => a + d.h.length, 0);
+    const expectH = { tas14: 25, tas18: 25, tas24: 25, tas25: 35, tas21: 25 }[frame] ?? expect;
+    assert.equal(hCnt, expectH, `${frame}: its parent-elected history rows`);
+  }
+}
+{
+  const res = JSON.parse(R("map/data/res-tas14.json"));
+  assert.equal(res.prev, 2010, "tas14 stands on 2010");
+  assert.equal(res.demoYear, 2016, "tas14 cites the 2016 census beside pre-2017 divisions");
+  assert.deepEqual(res.agg.TAS.seats, { LIB: 15, ALP: 7, GRN: 3 }, "Hodgman's 15 of 25");
+  assert.equal(res.agg.TAS.formal, 326163, "2014 Tasmania's statewide formal vote");
+  assert.equal(res.agg.TAS.inf, 16432, "2014 Tasmania's statewide informal vote");
+  assert.equal(res.agg.TAS.pformal, 320429, "2010 Tasmania's statewide formal vote");
+  assert.deepEqual(Object.keys(res.agg), ["AUS", "TAS"], "tas14's agg books Tas alone");
+  assert.equal(res.agg.AUS.formal, res.agg.TAS.formal, "tas14's AUS mirror");
+}
+{
+  const res = JSON.parse(R("map/data/res-tas18.json"));
+  assert.equal(res.prev, 2014, "tas18 stands on 2014");
+  assert.equal(res.demoYear, 2016, "tas18 cites the 2016 census beside pre-2017 divisions");
+  assert.deepEqual(res.agg.TAS.seats, { LIB: 13, ALP: 10, GRN: 2 }, "Hodgman again: 13 of 25");
+  assert.equal(res.agg.TAS.formal, 334871, "2018 Tasmania's formal vote");
+  assert.equal(res.agg.TAS.inf, 17309, "2018 Tasmania's informal vote");
+  assert.equal(res.agg.TAS.enrolled, 381183, "2018 Tasmania enrolled voters");
+  assert.equal(res.agg.TAS.pformal, 326163);
+}
+{
+  const res = JSON.parse(R("map/data/res-tas21.json"));
+  assert.equal(res.prev, 2018, "tas21 stands on 2018");
+  assert.equal(res.demoYear ?? 2021, 2021, "tas21 is the 2021-census era frame");
+  assert.deepEqual(res.agg.TAS.seats, { LIB: 13, ALP: 9, GRN: 2, IND: 1 },
+    "Gutwein's Liberals 13, Labor 9, Greens 2, Johnston in Clark");
+  assert.equal(res.agg.TAS.formal, 341350, "2021 Tasmania's formal vote");
+}
+{
+  const res = JSON.parse(R("map/data/res-tas24.json"));
+  assert.equal(res.prev, 2021, "tas24 stands on 2021");
+  assert.deepEqual(res.agg.TAS.seats, { LIB: 14, ALP: 10, GRN: 5, JLN: 3, IND: 3 },
+    "the 35-member restoration's own ledger (minority-LNP marks where the era's parliament landed despite it)");
+  assert.equal(res.agg.TAS.formal, 348612, "2024 Tasmania's formal vote");
+  assert.equal(res.agg.TAS.inf, 23465, "2024 Tasmania's informal vote");
+}
+{
+  const res = JSON.parse(R("map/data/res-tas25.json"));
+  assert.equal(res.prev, 2024, "tas25 stands on 2024");
+  assert.deepEqual(res.agg.TAS.seats, { LIB: 14, ALP: 10, GRN: 5, IND: 5, SFF: 1 },
+    "the snap's minority-LNP solution as officially posted (Lambie's roll off here)");
+  assert.equal(res.agg.TAS.formal, 350121, "2025 Tasmania's formal vote");
+  const div0 = res.divs[0];
+  assert.ok(div0.h.length === 7, "tas25's parent-era frame carries all seven parent-era h rows");
+}
+
+// ── the Hare-Clark ACT frames' oracle bank (the assembly-class era series
+// aside Tasmania's own): five five-member electorates since Elections ACT's
+// 2014 redistribution (the chamber's own 17→25 members' era opening), its
+// own ASGS State-Electoral-Division boundaries per census era, Elections
+// ACT's own statistics workbooks as its per-candidate oracle lane + the era
+// pages' elected-registers cross-checked against them. Rendered with the
+// same five-row e[6]-flag idiom Tasmania's land sets (no tcp/tpp/fl lanes
+// anywhere — Hare-Clark never ships two-party). Parent-lane act16←act12
+// adjudicated at .build/map/src/act/past-adjudication.md.
+{
+  for (const frame of ["act16", "act20", "act24"]) {
+    const res = JSON.parse(R(`map/data/res-${frame}.json`));
+    assert.equal(res.divs.length, 5, `${frame}: five ACT house divisions`);
+    assert.ok(res.divs.every((d) => d.seifa && typeof d.seifa.irsad.v === "number"), `${frame}: seifa rows`);
+    assert.ok(res.divs.every((d) => d.demo && typeof d.demo.p === "number"), `${frame}: demo rows`);
+    const elected = res.divs.reduce((a, d) => a + d.c.filter((c) => c[6] === 1).length, 0);
+    assert.equal(elected, 25, `${frame}: the five-member-era Hare-Clark roster carries`);
+    assert.equal(res.agg.ACT.formal, res.agg.AUS.formal, `${frame}'s AUS mirror carries the ACT agg per its own era's lane`);
+    const hCnt = res.divs.reduce((a, d) => a + d.h.length, 0);
+    assert.equal(hCnt, frame === "act16" ? 10 : 0, `${frame}'s parent-era register rows`);
+  }
+}
+{
+  const res = JSON.parse(R("map/data/res-act16.json"));
+  assert.equal(res.prev, 2012, "act16 stands on 2012");
+  assert.equal(res.demoYear, 2016, "act16's census era is 2016 directly");
+  assert.deepEqual(res.agg.ACT.seats, { LIB: 11, ALP: 12, GRN: 2 }, "the 25-member 2016 Assembly's ledger (Labor governs again as its fifth term)");
+  assert.equal(res.agg.ACT.formal, 244128, "2016 ACT electorate formal vote");
+  assert.equal(res.agg.ACT.inf, 6332, "2016 ACT electorate informal vote");
+  assert.equal(res.agg.ACT.enrolled, 283162, "2016 ACT electorate enrolled voters");
+  assert.equal(res.agg.ACT.pformal, 221172, "2012 ACT electorate formal vote (act12's parent lane)");
+  assert.deepEqual(Object.keys(res.agg), ["AUS", "ACT"], "act16's agg books the territory alone");
+}
+{
+  const res = JSON.parse(R("map/data/res-act20.json"));
+  assert.equal(res.prev, 2016, "act20 stands on 2016");
+  assert.equal(res.demoYear ?? 2021, 2021, "act20's census era is 2021 directly");
+  assert.deepEqual(res.agg.ACT.seats, { ALP: 10, GRN: 6, LIB: 9 },
+    "the 25-member 2020 Assembly's ledger — Barr's sixth term as it landed");
+  assert.equal(res.agg.ACT.formal, 269251, "2020 ACT electorate formal vote");
+  assert.equal(res.agg.ACT.inf, 3892, "2020 ACT electorate informal vote");
+  assert.equal(res.agg.ACT.enrolled, 306000, "2020 ACT electorate enrolled voters");
+}
+{
+  const res = JSON.parse(R("map/data/res-act24.json"));
+  assert.equal(res.prev, 2020, "act24 stands on 2020");
+  assert.equal(res.demoYear ?? 2021, 2021, "act24's census era is 2021 directly (its next census lands after it)");
+  assert.deepEqual(res.agg.ACT.seats, { LIB: 9, ALP: 10, GRN: 4, UNGRP: 2 },
+    "the 25-member 2024 Assembly's ledger (independents take two off the era)");
+  assert.equal(res.agg.ACT.formal, 274023, "2024 ACT electorate formal vote");
+  assert.equal(res.agg.ACT.inf, 5347, "2024 ACT electorate informal vote");
+  assert.equal(res.agg.ACT.enrolled, 321721, "2024 ACT electorate enrolled voters");
+}
+
+
 // ── the qld chamber floor: Queensland's Legislative Assembly on the shared arc
 // idiom (the @qld-cells QLDB ledger in app-3-chamber.js — 92 desks for the
 // chamber's 92 elected seats beside the furniture chair, the Macquarie
@@ -2866,17 +2993,17 @@ for (const y of ["sa22", "sa26"]) {
 // SyntaxError — and the page never booted, 2026-10-27)
 {
   const base = part("app-1-base.js"), ui = part("app-6-ui.js"), css = part("page.css");
-  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);') && base.includes('const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);') && base.includes('const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);') && base.includes('const SA_YEARS = new Set(["sa18", "sa22", "sa26"]);') && base.includes('const TAS_YEARS = new Set(["tas14", "tas18", "tas21", "tas24", "tas25"]);'), "NSW/VIC/QLD/WA/NT/SA/TAS year sets name the state frames (the wa family joined 2026-11-05; the Territory family and SA's third stop 2026-11-16; the Tasmanian Hare-Clark MHA frames join 2026-11-18)");
-  assert.ok(base.includes('const YEAR_JUR = { sa18: "sa", sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt", tas14: "tas", tas18: "tas", tas21: "tas", tas24: "tas", tas25: "tas" };'), "YEAR_JUR maps a frame year to its jurisdiction");
+  assert.ok(base.includes('const NSW_YEARS = new Set(["nsw15", "nsw19", "nsw23", "nswnow"]);') && base.includes('const VIC_YEARS = new Set(["vic14", "vic18", "vic22"]);') && base.includes('const QLD_YEARS = new Set(["qld17", "qld20", "qld24", "qldnow"]);') && base.includes('const WA_YEARS = new Set(["wa17", "wa21", "wa25", "wanow"]);') && base.includes('const NT_YEARS = new Set(["nt16", "nt20", "nt24"]);') && base.includes('const SA_YEARS = new Set(["sa18", "sa22", "sa26"]);') && base.includes('const TAS_YEARS = new Set(["tas14", "tas18", "tas21", "tas24", "tas25"]);') && base.includes('const ACT_YEARS = new Set(["act16", "act20", "act24"]);'), "NSW/VIC/QLD/WA/NT/SA/TAS/ACT year sets name the state frames (the wa family joined 2026-11-05; the Territory family and SA's third stop 2026-11-16; the Tasmanian Hare-Clark MHA frames join 2026-11-18)");
+  assert.ok(base.includes('const YEAR_JUR = { sa18: "sa", sa22: "sa", sa26: "sa", nsw15: "nsw", nsw19: "nsw", nsw23: "nsw", nswnow: "nsw", vic14: "vic", vic18: "vic", vic22: "vic", qld17: "qld", qld20: "qld", qld24: "qld", qldnow: "qld", wa17: "wa", wa21: "wa", wa25: "wa", wanow: "wa", nt16: "nt", nt20: "nt", nt24: "nt", tas14: "tas", tas18: "tas", tas21: "tas", tas24: "tas", tas25: "tas", act16: "act", act20: "act", act24: "act" };'), "YEAR_JUR maps a frame year to its jurisdiction");
   assert.ok(base.includes('const STATE_YEARS = new Set(Object.keys(YEAR_JUR));'), "STATE_YEARS derives from YEAR_JUR");
-  assert.ok(base.includes("const PREV_YEAR = { sa18: 2014, sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: 2015, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020, tas14: 2010, tas18: 2014, tas21: 2018, tas24: 2021, tas25: 2024 };"), "the state frames' past joins (qld17 stands on 2015's 89-district map through the determination renames; the wa stops prev-chain 2013→2017→2021→2025, the Territory's 2012→2016→2020→2024, SA's 2014→2018 and Tasmania saving its prevailings own rungs' follow-at-next-election cycle 2014→2018→2021→2024→2025)");
-  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, sa18: 2018, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024, tas14: 2014, tas18: 2018, tas21: 2021, tas24: 2024, tas25: 2025 };'), "the frames' calendar years (qld24's is 2024)");
+  assert.ok(base.includes("const PREV_YEAR = { sa18: 2014, sa22: 2018, sa26: 2022, nsw15: 2011, nsw19: 2015, nsw23: 2019, nswnow: 2019, vic14: 2010, vic18: 2014, vic22: 2018, qld24: 2020, qldnow: 2020, qld20: 2017, qld17: 2015, wa17: 2013, wa21: 2017, wa25: 2021, wanow: 2021, nt16: 2012, nt20: 2016, nt24: 2020, tas14: 2010, tas18: 2014, tas21: 2018, tas24: 2021, tas25: 2024, act16: 2012, act20: 2016, act24: 2020 };"), "the state frames' past joins (qld17 stands on 2015's 89-district map through the determination renames; the wa stops prev-chain 2013→2017→2021→2025, the Territory's 2012→2016→2020→2024, SA's 2014→2018 and Tasmania saving its prevailings own rungs' follow-at-next-election cycle 2014→2018→2021→2024→2025)");
+  assert.ok(base.includes('const FRAME_YEAR = { now: 2026, nswnow: 2026, qldnow: 2026, sa22: 2022, sa26: 2026, sa18: 2018, nsw15: 2015, nsw19: 2019, nsw23: 2023, vic14: 2014, vic18: 2018, vic22: 2022, qld17: 2017, qld20: 2020, qld24: 2024, wa17: 2017, wa21: 2021, wa25: 2025, wanow: 2026, nt16: 2016, nt20: 2020, nt24: 2024, tas14: 2014, tas18: 2018, tas21: 2021, tas24: 2024, tas25: 2025, act16: 2016, act20: 2020, act24: 2024 };'), "the frames' calendar years (qld24's is 2024)");
   assert.ok(/GOV = \{[^}]*nsw23: "alp"/.test(base) && /GOV = \{[^}]*vic22: "alp"/.test(base) && /GOV = \{[^}]*qld24: "lnp"/.test(base), "the state frames' winning sides (2024's Queensland went LNP, the map's first non-Labor state frame)");
   assert.ok(/PM = \{[^}]*nsw23: "Chris Minns"/.test(base) && /PM = \{[^}]*vic22: "Daniel Andrews"/.test(base) && /PM = \{[^}]*qld24: "David Crisafulli"/.test(base), "the Premiers are named (nsw23's Chris Minns, qld24's David Crisafulli, vic22's Daniel Andrews)");
   assert.equal((js.match(/const STATE_NAME = /g) || []).length, 1, "one top-level STATE_NAME across the app parts (frame years map through YEAR_JUR)");
   assert.ok(/\.mp-time \{ flex: none; position: relative; height: 54px;/.test(css) && /\.mp-time \{ height: 48px; \}/.test(css), "the timeline bar holds one jurisdiction rung — the top rail's old band (54px; 48px on the phone rung)");
   assert.ok(ui.includes('<text class="yr row"'), "the rows carry captions");
-  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland, Western Australian and Northern Territory state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
+  assert.ok(ui.includes("Federal elections ${YEARS[0]} to now, and Victorian, New South Wales, South Australian, Queensland, Western Australian, Tasmanian, ACT and Northern Territory state elections; choose one"), "the timeline names its jurisdiction rows to a screen reader (resolved from the years list's head – 2001 today)");
   // the rung order itself, in the spots that encode it: the rows declare
   // federal, Victoria, New South Wales, South Australia, Queensland, Western
   // Australia (2026-11-05: appended at the bottom) — and SINCE 2026-11-06 they
@@ -2884,9 +3011,9 @@ for (const y of ["sa22", "sa26"]) {
   // selected jurisdiction's rung drawing at a time; labels and the glyph's row
   // lookup follow the same order. The up/down-arrow walk runs in the
   // "View elections" strip's own order instead (Queensland before South Australia)
-  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_TAS, YEARS_SA, YEARS_WA, YEARS_NT];"), "the up/down walk follows the View elections strip's order (Qld, Tasmania, SA, WA, NT, in their own rowIx order)");
-  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : NT_YEARS.has(y) ? 6 : TAS_YEARS.has(y) ? 7 : 0);"), "the rung index per jurisdiction (vic22 → 1, a wa stop → 5, nt → 6, tas → 7)");
-  assert.ok(ui.includes("const TOP = 2, BASE = H - 23;") && (ui.match(/\{ ys: YEARS_\w+, base: BASE, top: TOP(?:, gx: [^}]+)? \}/g) || []).length === 8, "all eight jurisdiction rows collapse onto the one band in the top rail's spot (BASE = H - 23; Tasmania's joined them 2026-11-18)");
+  assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_TAS, YEARS_ACT, YEARS_SA, YEARS_WA, YEARS_NT];"), "the up/down walk follows the View elections strip's order (Qld, Tasmania, ACT, SA, WA, NT, in their own rowIx order)");
+  assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : NT_YEARS.has(y) ? 6 : TAS_YEARS.has(y) ? 7 : ACT_YEARS.has(y) ? 8 : 0);"), "the rung index per jurisdiction (vic22 → 1, a wa stop → 5, nt → 6, tas → 7, act → 8)");
+  assert.ok(ui.includes("const TOP = 2, BASE = H - 23;") && (ui.match(/\{ ys: YEARS_\w+, base: BASE, top: TOP(?:, gx: [^}]+)? \}/g) || []).length === 9, "all nine jurisdiction rows collapse onto the one band in the top rail's spot (BASE = H - 23; Tasmania and the ACT joined them 2026-11-18)");
   assert.ok(ui.includes("const hitTop = 0, hitBot = H;"), "the one visible rung takes the whole strip's height for its stops' touch windows");
   // one rung at a time (2026-11-06): the rail line, the stop labels AND the
   // seat-count make-up bars all draw for the selected election's row alone —
@@ -2895,11 +3022,11 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok((ui.match(/rows\.filter\(\(_, i\) => i === activeIx\)/g) || []).length >= 2, "the timeline's rail and its seat-count bars draw on the selected jurisdiction's rung alone (rows filtered to activeIx in both tiers)");
   assert.ok(ui.includes("if (R.i !== activeIx) continue;"), "the stop-label tier keeps its activeIx gate too");
   const rowsSlice = ui.slice(ui.indexOf("const rows = ["), ui.indexOf("const rowIx"));
-  const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA", "YEARS_NT"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
-  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs declare federal, Victoria, New South Wales, South Australia, Queensland, Western Australia, Northern Territory in order");
+  const rungIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA", "YEARS_NT", "YEARS_TAS", "YEARS_ACT"].map((k) => rowsSlice.indexOf(`{ ys: ${k},`));
+  assert.ok(rungIx.every((x, j) => x >= 0 && (j === 0 || x > rungIx[j - 1])), "the timeline rungs declare federal, Victoria, New South Wales, South Australia, Queensland, Western Australia, Northern Territory, Tasmania, the ACT in order");
   const labelsSlice = ui.slice(ui.indexOf("const rowsOf = ["));
-  const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA", "YEARS_NT"].map((k) => labelsSlice.indexOf(`tlStops(${k})`));
-  assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order");
+  const labIx = ["YEARS_FED", "YEARS_VIC", "YEARS_NSW", "YEARS_SA", "YEARS_QLD", "YEARS_WA", "YEARS_NT", "YEARS_TAS", "YEARS_ACT"].map((k) => labelsSlice.indexOf(`tlStops(${k})`));
+  assert.ok(labIx.every((x, j) => x >= 0 && (j === 0 || x > labIx[j - 1])), "the label layers follow the same rung order (as Tasmania and the ACT, joined 2026-11-18)");
   // a state frame's label: the five-char key "nsw23" ends in its two-digit
   // year — slice(2) read it as "NSW w23" (the same derivation on the
   // federal four-char keys was why it was written that way)

@@ -1,0 +1,62 @@
+{
+ "frame": "act16",
+ "day": "2016-10-15",
+ "files": {
+  "hub.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2016-election",
+   "bytes": 177538,
+   "sha256": "f0cda9649741b5c70749f3aa9019cd7c4ba4d0ec92f4b44ff1a9cb598def0d67"
+  },
+  "stats.xlsx": {
+   "url": "https://www.elections.act.gov.au/__data/assets/excel_doc/0006/2462046/Election-Statistics-2016.xlsx",
+   "bytes": 701192,
+   "sha256": "8aa09baad858009c4d3481dfc1425d764e4a7ad93b8120b98176dbf75db944b5"
+  },
+  "stats.pdf": {
+   "url": "https://www.elections.act.gov.au/__data/assets/pdf_file/0020/2462042/Election-Statistics-2016.pdf",
+   "bytes": 26038655,
+   "sha256": "b5484abb125747e96f95d615d28b96247b1e1603f0ad9eb641fd86657f37913e"
+  },
+  "elected.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2016-election/2016-list-of-elected-candidates",
+   "bytes": 175559,
+   "sha256": "e65af77e734d7647ddb28425414c1619d8d5b694be8c28cf24cd946e4ec6c40d"
+  },
+  "dop-hub.html": {
+   "url": "https://www.elections.act.gov.au/elections/previous-assembly-elections/2016-election/2016-distribution-of-preferences",
+   "bytes": 178942,
+   "sha256": "30ab3b5f2b0c469d180bd1e8aa68a43abb6b5e5682ef2ba458bd56d3a17faf89"
+  },
+  "results-overview.html": {
+   "url": "https://www.elections.act.gov.au/elections_and_voting/past_act_legislative_assembly_elections/2016-election/2016-election-results/results-overview",
+   "bytes": 86649,
+   "sha256": "458659910b43e8d36e73c370edffe297b55ecc04e7fe7e64d2da9ebf45846e6c"
+  },
+  "dop-brindabella.xlsx": {
+   "url": null,
+   "bytes": 28795,
+   "sha256": "e10512d039a99074476b6a55b8c481735490e938dc97d8362de8a63fbe02ab98"
+  },
+  "dop-ginninderra.xlsx": {
+   "url": null,
+   "bytes": 34033,
+   "sha256": "43000040667a75b54834e9ee504da0b54fe31912726f8888809880f91ee0a9da"
+  },
+  "dop-kurrajong.xlsx": {
+   "url": null,
+   "bytes": 34910,
+   "sha256": "458938d44e97ac2f474614efd25c6d9f0a9efb91c1933bf4e1e116d122549d05"
+  },
+  "dop-murrumbidgee.xlsx": {
+   "url": null,
+   "bytes": 36132,
+   "sha256": "ea6fbfd9fac91bdb0586d2a2423c2dfd0619998f091059acf85d733b307c24ff"
+  },
+  "dop-yerrabi.xlsx": {
+   "url": null,
+   "bytes": 31364,
+   "sha256": "219b8d39373fe3d15fca1c06ca01c6fa81e7b43aabb3c16f51d197643f061761"
+  }
+ },
+ "fetchedAt": "2026-11-17T09:56:08Z"
+}
