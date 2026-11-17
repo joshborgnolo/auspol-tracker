@@ -1,0 +1,25 @@
+{
+  "source": "wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13",
+  "published": null,
+  "fieldwork": {
+    "date": "2026-11-17",
+    "dateStart": "2026-11-10",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 24,
+    "lnp": 22,
+    "grn": 15,
+    "onp": 26,
+    "ind": 6,
+    "oth": 7,
+    "tpp_alp": 51,
+    "tpp_lnp": 49
+  },
+  "satisfaction": null,
+  "ppm": null,
+  "altTpp": null,
+  "infogram": null
+}
