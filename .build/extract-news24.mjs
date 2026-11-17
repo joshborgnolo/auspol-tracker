@@ -579,8 +579,9 @@ function parseNews24Article(html, url) {
   // "News24[.com.au] Pulse / YouGov poll" methodology sentence, the
   // Sept 2026 style "News24.com.au/YouGov poll" (Pulse unstated; the Pulse
   // branding survives in the News24 Pulse Infogram embeds downstream),
-  // and the Nov 2026 style "News24 Pulse/YouGov results" (3 Nov 2026 wave).
-  const gate = t.match(/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+(?:poll|results)/i);
+  // the Nov 2026 style "News24 Pulse/YouGov results" (3 Nov 2026 wave),
+  // and the mid-Nov style "News24 Pulse/YouGov survey" (17 Nov 2026 wave).
+  const gate = t.match(/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+(?:poll|results|survey)/i);
   if (!gate) return null;
 
   const block = t.slice(gate.index, gate.index + 2200);
@@ -598,6 +599,12 @@ function parseNews24Article(html, url) {
 
   const ppmS = S.find((s) => /preferred prime minister/i.test(s) && /\balbanese\b/i.test(s));
   const ppmPair = ppmS?.match(new RegExp(`(?:moving to|leading(?:\\s+(?:mr\\s+)?${era.surname})?\\s+)?${N24_PCT}\\s*%\\s*(?:compared with|to)\\s+${N24_PCT}\\s*%`, "i"));
+  // Subject decides the figure order: Albanese-subject styles put the PM's
+  // figure first, but an OL-subject style ("with Mr Taylor leading 41% to
+  // 40%", the 17 Nov 2026 wave — written that way because the OL leads)
+  // puts the OL's first.
+  const ppmSwap = ppmS != null
+    && new RegExp(`\\b(?:mr\\s+)?${era.surname}\\s+leading\\s+${N24_PCT}\\s*%`, "i").test(ppmS);
   const ppmH = t.match(new RegExp(`led\\s+(?:One Nation leader\\s+)?Pauline Hanson\\s+${N24_PAIR}`, "i"))
     ?? t.match(new RegExp(`Pauline Hanson[^.]{0,180}?led\\s+${N24_PCT}\\s*%\\s+to\\s+${N24_PCT}\\s*%`, "i"));
 
@@ -618,8 +625,8 @@ function parseNews24Article(html, url) {
       pmApp: pm?.app ?? null, pmDis: pm?.dis ?? null, pmNet: pm?.net ?? null, pmStated: pm?.stated ?? null,
       oppApp: opp?.app ?? null, oppDis: opp?.dis ?? null, oppNet: opp?.net ?? null, oppStated: opp?.stated ?? null,
     } : null,
-    ppmA: ppmPair ? parseFloat(ppmPair[1]) : null,
-    ppmO: ppmPair ? parseFloat(ppmPair[2]) : null,
+    ppmA: ppmPair ? parseFloat(ppmPair[ppmSwap ? 2 : 1]) : null,
+    ppmO: ppmPair ? parseFloat(ppmPair[ppmSwap ? 1 : 2]) : null,
     ppmHan: ppmH ? parseFloat(ppmH[1]) : null,
     ppmHanOpp: ppmH ? parseFloat(ppmH[2]) : null,
     altAlp: alt ? parseFloat(alt[1]) : null,

@@ -5113,6 +5113,97 @@
     "title": "Views towards One Nation's cartoons N24P03112026"
    },
    "note": "Companion story. The chart caption reads \"October 27-November 3, 2026\" — the wave's filed window (2026-10-27 to 2026-11-03), so the polls.json row supplies the window here."
+  },
+  {
+   "id": "most-important-issue",
+   "waveDate": "2026-11-17",
+   "fieldwork": {
+    "start": "2026-11-10",
+    "end": "2026-11-17"
+   },
+   "sample": 1500,
+   "published": "2026-11-17T21:00",
+   "question": "Thinking about issues facing Australia which do you think is the most important?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": null,
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13",
+   "embed": {
+    "id": "_/VHoqjUPIeliEG5zjRG2W",
+    "title": "Copy: Voter issues SNP 02062026"
+   },
+   "note": "Second read of the recurring most-important-issue battery (first read filed at the 2026-02-24 wave); the embed title’s 02062026 date is stale copy-over, its source line carries the 10-17 Nov 2026 fieldwork window.",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Row %",
+       "Ranked first"
+      ],
+      "rows": [
+       [
+        "Cost of living",
+        "47"
+       ],
+       [
+        "Economy/Gov debt",
+        "9"
+       ],
+       [
+        "Immigration",
+        "9"
+       ],
+       [
+        "Climate change",
+        "7"
+       ],
+       [
+        "Health care",
+        "6"
+       ],
+       [
+        "Housing affordability",
+        "6"
+       ],
+       [
+        "Rich and Poor gap",
+        "5"
+       ],
+       [
+        "Pensions/caring for elderly",
+        "4"
+       ],
+       [
+        "Security and defence",
+        "3"
+       ],
+       [
+        "Education/childcare",
+        "1"
+       ],
+       [
+        "Paying/secure jobs",
+        "2"
+       ],
+       [
+        "International affairs",
+        "0"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "The results come as the cost of living remains the dominant issue for voters, with 78 per cent identifying it among their three biggest concerns.",
+     "Almost half of Australians -&nbsp;47 per cent -&nbsp;ranked it as their number one issue, well ahead of managing the economy and government debt, which was the first choice for nine per cent.",
+     "Housing affordability was also identified among the top three concerns by 38 per cent of respondents, followed by managing the economy and government debt on 35 per cent.",
+     "The cost of living is even more prominent among that group, with 51 per cent identifying it as the most important issue facing Australia."
+    ],
+    "embedTextLeaves": [
+     "Most important issues facing Australians",
+     "Question: Thinking about issues facing Australia which do you think is the most important?",
+     "Cost of living is by far the number one issue for voters.",
+     "Source: News24 Pulse / YouGov (Nov 10 - Nov 17, 2026)"
+    ]
+   }
   }
  ],
  "not_filed": [

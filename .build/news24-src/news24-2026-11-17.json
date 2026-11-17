@@ -1,0 +1,104 @@
+{
+  "source": "news24+wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13",
+  "published": "2026-11-17T21:00",
+  "fieldwork": {
+    "date": "2026-11-17",
+    "dateStart": "2026-11-10",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 24,
+    "lnp": 22,
+    "grn": 15,
+    "onp": 26,
+    "ind": 6,
+    "oth": 7,
+    "tpp_alp": 51,
+    "tpp_lnp": 49
+  },
+  "satisfaction": {
+    "pmApp": 33,
+    "pmDis": 63,
+    "pmNet": -30,
+    "oppApp": 40,
+    "oppDis": 45,
+    "oppNet": -5
+  },
+  "ppm": {
+    "alb": 40,
+    "opp": 41,
+    "albVsHanson": 52,
+    "hanson": 38
+  },
+  "altTpp": {
+    "alpVsOnp_alp": null,
+    "alpVsOnp_onp": null
+  },
+  "infogram": {
+    "via": "anon",
+    "ids": [
+      "_/SydDdbDkf72jHnnc9FqO",
+      "_/IxLtdVUD1MQnMnZN8PTr",
+      "_/VHoqjUPIeliEG5zjRG2W",
+      "_/L2BPEE2XrjmIaWKAof9P",
+      "_/CVOGbO55cZLLRXRjtTm7",
+      "_/eNqI0vWobg8vgnYUpClq"
+    ],
+    "kinds": [
+      "horserace",
+      "crosstab",
+      "issues",
+      "ppm",
+      "approvals",
+      "tpp"
+    ],
+    "window": {
+      "start": "2026-11-10",
+      "end": "2026-11-17"
+    },
+    "vi": {
+      "alp": 24,
+      "lnp": 22,
+      "onp": 26,
+      "grn": 15,
+      "ind": 6,
+      "oth": 7
+    },
+    "tpp": {
+      "tpp_alp": 51,
+      "tpp_lnp": 49
+    },
+    "altTpp": null,
+    "approval": {
+      "alb": {
+        "app": 33,
+        "dis": 63,
+        "unc": 5
+      },
+      "opp": {
+        "app": 40,
+        "dis": 45,
+        "unc": 16
+      },
+      "oppName": "taylor"
+    },
+    "ppm": [
+      {
+        "alb": 52,
+        "dk": 10,
+        "opp": 38,
+        "oppRaw": "Pauline Hanson",
+        "table": "ppm"
+      },
+      {
+        "alb": 40,
+        "dk": 19,
+        "opp": 41,
+        "oppRaw": "Angus Taylor",
+        "table": "ppm"
+      }
+    ]
+  }
+}

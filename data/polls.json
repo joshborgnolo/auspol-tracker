@@ -6511,7 +6511,8 @@
       "oth": 7,
       "tpp_alp": 51,
       "tpp_lnp": 49,
-      "url": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13"
+      "url": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13",
+      "published": "2026-11-17T21:00"
     }
   ],
   "ppm": [
@@ -7395,6 +7396,15 @@
       "han": 24,
       "extra": null,
       "assimilated": true
+    },
+    {
+      "date": "2026-11-17",
+      "firm": "YouGov",
+      "alb": 40,
+      "opp": 41,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
     }
   ],
   "approval": [
@@ -9421,6 +9431,24 @@
         }
       },
       "assimilated": true
+    },
+    {
+      "date": "2026-11-17",
+      "firm": "YouGov",
+      "alb": -30,
+      "opp": -5,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 33,
+          "dis": 63
+        },
+        "opp": {
+          "app": 40,
+          "dis": 45
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -9555,6 +9583,12 @@
       "firm": "YouGov",
       "alb": 51,
       "han": 39
+    },
+    {
+      "date": "2026-11-17",
+      "firm": "YouGov",
+      "alb": 52,
+      "han": 38
     }
   ],
   "altTpp": [
