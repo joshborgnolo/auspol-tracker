@@ -115,7 +115,7 @@ FRAMES = {
             + [("results-index.html", "house-of-assembly/StateElection2018/Results/Results.html")]
             + [(f"results-{d.lower()}.html", f"house-of-assembly/StateElection2018/Results/{d}/index.html") for d in ["Bass", "Braddon", "Denison", "Franklin", "Lyons"]]
             + [("candidates.html", "house-of-assembly/StateElection2018/Candidates.html")]
-            + [(f"candidates-{d.lower()}.html", f"house-of-assembly/StateElection2018/Candidates-{d}.html") for d in ["Bass", "Braddon", "Denison", "Franklin", "Lyons"]
+            + [(f"candidates-{d.lower()}.html", f"house-of-assembly/StateElection2018/Candidates-{d}.html") for d in ["Bass", "Braddon", "Denison", "Franklin", "Lyons"]]
             # machine layer beside the HTML era print: the per-venue FP
             # workbooks PPs/ live inside Results/, discovered live off the
             # division pages at build-design time (2018-<Div>-first-prefs…)
