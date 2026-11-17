@@ -1,0 +1,117 @@
+{
+ "frame": "tas10",
+ "day": "2010-03-20",
+ "files": {
+  "hub-electionsummary.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010ElectionSummary.html",
+   "bytes": 7228,
+   "sha256": "e6e17e2f97eeea1f439f9184f06e671f52b8f7c6affbabc6be21b762cbc94953"
+  },
+  "hub-mainpage.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010MainPage.html",
+   "bytes": 8327,
+   "sha256": "a97e9039e4c3075fd8623fb35c8b08605c4cd13a78330b792c513b10a6aa45f9"
+  },
+  "results-bass-first.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Bass/BassFirst.html",
+   "bytes": 2419,
+   "sha256": "95e5db3b6f8fcbfe72bf1c88a99f34d6106b074a34f40a10a2bf0d755d6c0cc3"
+  },
+  "results-bass-dist.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Bass/BassDist.html",
+   "bytes": 2306,
+   "sha256": "19bdf5f305f4d1a70159f4a9ac46270f2ace3968515e76bfd614c36f64112583"
+  },
+  "pollinglist-bass.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/PollingPlaces/2010HoABassPolling.html",
+   "bytes": 28445,
+   "sha256": "97c09ec385abbc01ca3b6354d036343bee0a3042151e09fcdc5991b5fcca6fd1"
+  },
+  "pollingfigures-bass.pdf": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010_PDF/Bass%20Polling%20Place%20Figures.pdf",
+   "bytes": 361766,
+   "sha256": "4a1521829bb721ae72dd09e11c42723b2d9b8676f3e3dc2cf2df12ce65aea7b0"
+  },
+  "results-braddon-first.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Braddon/BraddonFirst.html",
+   "bytes": 2493,
+   "sha256": "bca10fbe5cc7d02ee6164f7290fc5f26c64671c2420c3d60cc73a67f955f9ec8"
+  },
+  "results-braddon-dist.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Braddon/BraddonDist.html",
+   "bytes": 2377,
+   "sha256": "d510711e070d10b6c7ad180243b6610b5d8b3a3efe41b7c21e8d8fb58a93d6c8"
+  },
+  "pollinglist-braddon.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/PollingPlaces/2010HoABraddonPolling.html",
+   "bytes": 38005,
+   "sha256": "dba56baa7705091d827f9a27abd61c4109bdf0543775fe158887ffec42893a07"
+  },
+  "pollingfigures-braddon.pdf": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010_PDF/Braddon%20Polling%20Place%20Figures.pdf",
+   "bytes": 415387,
+   "sha256": "ebed100551cb6b0035ae9ca7317ea5127006386b85e7dc5e909263b78478ef93"
+  },
+  "results-denison-first.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Denison/DenisonFirst.html",
+   "bytes": 2493,
+   "sha256": "81e713c3cc4825dac1ed4ab83675535758fc151baff7d6037b92e2ae915bbf4d"
+  },
+  "results-denison-dist.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Denison/DenisonDist.html",
+   "bytes": 2366,
+   "sha256": "49754a2ab86272cc9a65cf59a2f0916d22c6e4795a82991658eb9fa9b28f05cb"
+  },
+  "pollinglist-denison.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/PollingPlaces/2010HoADenisonPolling.html",
+   "bytes": 25735,
+   "sha256": "86654fc8ec02596763dff833f5566fde26a3ee35b557f72042cf15cc7d7c9d4b"
+  },
+  "pollingfigures-denison.pdf": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010_PDF/Denison%20Polling%20Place%20Figures.pdf",
+   "bytes": 346975,
+   "sha256": "8f251e6166cd6ddc35f91ed22d174f3a06fefd8643b682335f8f136f6945fb39"
+  },
+  "results-franklin-first.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Franklin/FranklinFirst.html",
+   "bytes": 2493,
+   "sha256": "0664ae82049ce18e438a1d76d1d3dd480aae293eb1456000f2ffbc65a01768b1"
+  },
+  "results-franklin-dist.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Franklin/FranklinDist.html",
+   "bytes": 2343,
+   "sha256": "1ad54e5b8e7966d9ad3f8b9a750b8feeb34807b0ad204621df47abd5d9d78ece"
+  },
+  "pollinglist-franklin.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/PollingPlaces/2010HoAFranklinPolling.html",
+   "bytes": 27107,
+   "sha256": "8a5a74363d8ce70bb1d7f38e540ef548e509690755bc243c86aa99457822f4b3"
+  },
+  "pollingfigures-franklin.pdf": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010_PDF/Franklin%20Polling%20Place%20Figures.pdf",
+   "bytes": 344086,
+   "sha256": "f5a4d0b6b540cec8c4d6f5458b7f4c1c87b35ed94dd04492562cb28a25c15efd"
+  },
+  "results-lyons-first.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Lyons/LyonsFirst.html",
+   "bytes": 2419,
+   "sha256": "adea5de502136276d489d36fd30ebb536cecdea1f49d550957ab2824bebe61f0"
+  },
+  "results-lyons-dist.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/Results/Lyons/LyonsDist.html",
+   "bytes": 2309,
+   "sha256": "340c00214655ee9c6a10d509d4d11477127de2451eb5edea354c0b3a8e5d7f81"
+  },
+  "pollinglist-lyons.html": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/PollingPlaces/2010HoALyonsPolling.html",
+   "bytes": 47398,
+   "sha256": "c3ae0068bf345860e581d1f890c2b8188bcc9de439914e390f1c1a921a39e32b"
+  },
+  "pollingfigures-lyons.pdf": {
+   "url": "http://www.electoral.tas.gov.au/pages/HouseOfAssembly/HoA2010/HoA2010_PDF/Lyons%20Polling%20Place%20Figures.pdf",
+   "bytes": 428480,
+   "sha256": "5e02ecda923cf18e53f5acefc0719d52696fc3e2c0954563974b07f4ead66324"
+  }
+ },
+ "fetchedAt": "2026-11-17T06:55:52Z"
+}

@@ -1,0 +1,152 @@
+{
+ "frame": "tas14",
+ "day": "2014-03-15",
+ "files": {
+  "hub.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/index.html",
+   "bytes": 12158,
+   "sha256": "445dfb48a64c637022b82794c778e89706274e5399c9c49d2fc37af50a15c0c3"
+  },
+  "results-index.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Results.html",
+   "bytes": 15731,
+   "sha256": "c755eb22692fdae14efdbbb1517bdcaa276608c09eb6c2df32290b82fa0af310"
+  },
+  "results-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Results_Bass.html",
+   "bytes": 12286,
+   "sha256": "8bdb2c8aaa12cc8c2a7b01dbcfe7a7347a91b4183afebbf8925da582f5e027cf"
+  },
+  "results-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Results_Braddon.html",
+   "bytes": 12436,
+   "sha256": "7b250cb509209b8164d06cdf5ad493262b692bf0ad950e38569d6272ad1c5378"
+  },
+  "results-denison.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Results_Denison.html",
+   "bytes": 12418,
+   "sha256": "79e71d00740aaa11fcec7080a62d1d91587b5c413f6c41473005b1b27affc022"
+  },
+  "results-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Results_Franklin.html",
+   "bytes": 12476,
+   "sha256": "4e39fcd4e5748e8558036bf5d6bc6831cd00a0c8b965510f2fba4a289f4c0ca3"
+  },
+  "results-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Results_Lyons.html",
+   "bytes": 12397,
+   "sha256": "c1ebf519fd27032f92135627a1300cb68a99dd43c806b8dbb70612ecdbf80941"
+  },
+  "candidates.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Candidates.html",
+   "bytes": 11244,
+   "sha256": "597fee61591f22ef861e10a6bddc88359cce482dd2e34915cd26c6483b5763cb"
+  },
+  "candidates-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Bass_Candidates.html",
+   "bytes": 21754,
+   "sha256": "ec8b5bd5f13980987e0770439fa46b00e3b1aa42a87e21b2db5699946e20dfcc"
+  },
+  "candidates-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Braddon_Candidates.html",
+   "bytes": 23787,
+   "sha256": "997e088860dbeb11806bd91c84945be956cc75abb70bb44f6a1f353d5be69d18"
+  },
+  "candidates-denison.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Denison_Candidates.html",
+   "bytes": 25858,
+   "sha256": "86491ad95b3cff07a639482846455500c9d9e637d7dc45c8735f7aadeba98092"
+  },
+  "candidates-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Franklin_Candidates.html",
+   "bytes": 22779,
+   "sha256": "e4aee5db74e672492b5035402db9bb5499c3e34d9f2e83024cc89a48b32ede42"
+  },
+  "candidates-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Lyons_Candidates.html",
+   "bytes": 22528,
+   "sha256": "c9c7dce11b2da7d22f512f22ead7c820a53836b4a290212814d6502a2c64a31a"
+  },
+  "ppfp-bass.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Bass/2014%20Bass%20first%20preferences%20by%20polling%20place.pdf",
+   "bytes": 98514,
+   "sha256": "da682aa9a939933c66df1e3fcf346b0cf4343dae398681065e012c481ed85360"
+  },
+  "ppfp-braddon.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Braddon/2014%20Braddon%20first%20preferences%20by%20polling%20place.pdf",
+   "bytes": 113134,
+   "sha256": "f3e3ae1ac8d9e34cd233573c3cb23229e1373d09c4d55da04dddd9eb1450ff83"
+  },
+  "ppfp-denison.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Denison/2014%20Denison%20first%20preferences%20by%20polling%20place.pdf",
+   "bytes": 102408,
+   "sha256": "14dd2493cde9e41952b385d4b8db6f49d8cd1b839e4e06467738f618ddfe97a6"
+  },
+  "ppfp-franklin.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Franklin/2014%20Franklin%20first%20preferences%20by%20polling%20place.pdf",
+   "bytes": 99618,
+   "sha256": "1c673191ff5fc34c7231dce0d3512b846ac11d99a14391353134cc0405e0c44d"
+  },
+  "ppfp-lyons.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Lyons/2014%20Lyons%20first%20preferences%20by%20polling%20place.pdf",
+   "bytes": 119459,
+   "sha256": "7d1ea39b66f63fde42cbed7883e163e536cbe6350cfb4be0625fa9e40e9bb049"
+  },
+  "scrutiny-bass.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Bass/2014%20Bass%20scrutiny%20event%20sheet.pdf",
+   "bytes": 73028,
+   "sha256": "84e14ded2731913a6c50c7a23729d4681458fb0c31d466c02a100ee60db96683"
+  },
+  "scrutiny-braddon.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Braddon/2014%20Braddon%20scrutiny%20event%20sheet.pdf",
+   "bytes": 79281,
+   "sha256": "5c3ee4ce167f106211036bfda3f78d4ce632d70d41b464ce6910b31de8db3954"
+  },
+  "scrutiny-denison.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Denison/2014%20Denison%20scrutiny%20event%20sheet.pdf",
+   "bytes": 86945,
+   "sha256": "5d989ef70fa70cbb874f6d6e247e403814891d9f51c14b15b3582ad3730f7172"
+  },
+  "scrutiny-franklin.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Franklin/2014%20Franklin%20scrutiny%20event%20sheet.pdf",
+   "bytes": 74430,
+   "sha256": "496642ca747e5075e20354c8e3cff4129d1e782a0bce589d5b5d87a7833bf9bd"
+  },
+  "scrutiny-lyons.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/Results/Lyons/2014%20Lyons%20scrutiny%20event%20sheet.pdf",
+   "bytes": 75510,
+   "sha256": "a61879564a5792f98f9580f8aa3e692cc83cc55891c8e7ef3946c51d696ec632"
+  },
+  "pollingplaces-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/PollingplaceListBASS.html",
+   "bytes": 34598,
+   "sha256": "ee1fccf6e0459a6e96aa0ca3871f2983d37485fed6e6472775662b47a14cf7df",
+   "tape": null
+  },
+  "pollingplaces-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/PollingplaceListBRADDON.html",
+   "bytes": 45175,
+   "sha256": "3da18f4029c4caf8eaa90f334033d2a782ef74cf5cc92b1b9a7bdd65fb827173",
+   "tape": null
+  },
+  "pollingplaces-denison.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/PollingplaceListDENISON.html",
+   "bytes": 31801,
+   "sha256": "91b2a785fa779f98274b050644a3a9b005ab6118b6c0a07af5265013dfbc26f8",
+   "tape": null
+  },
+  "pollingplaces-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/PollingplaceListFRANKLIN.html",
+   "bytes": 33747,
+   "sha256": "1b165a05e8cfe12d40db5a7061d36d8dd1ae7f33339d0e1f429a41b0ba103241",
+   "tape": null
+  },
+  "pollingplaces-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2014/PollingplaceListLYONS.html",
+   "bytes": 53290,
+   "sha256": "49b26c7a92ce130c11830c6453689452bfeb4e11fc31bf3e85eb353539ddd183",
+   "tape": null
+  }
+ },
+ "fetchedAt": "2026-11-17T07:20:24Z"
+}

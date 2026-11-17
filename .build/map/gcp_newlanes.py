@@ -813,6 +813,13 @@ _INC_CUT_GUARDS = {
 # plausible windows for each universe's 75th-percentile (top-quartile)
 # cut, era-keyed like _INC_CUT_GUARDS above (re-measured with the same
 # fix: 2021's NSW/Vic outs were previously understated by ~5–8%)
+# per-state high-band-membership shares — Tasmania's top-band occupancy is a
+# MEASURED feature of a low-income state (about 3.8% at the 4k+/week edge in
+# 2016 vs the mainland states' 5-25%): gate-off only for its measured range.
+_INC_HISHARE_GUARDS = {
+    ("2016", "6"): (0.03, 0.06),
+}
+
 _INC_HIQ_GUARDS = {
     "2021": {"1": (3300, 3510), "2": (3120, 3300),
              "3": (2960, 3120), "4": (2700, 2890)},
@@ -830,6 +837,10 @@ _INC_CUT_GUARDS_BY_ERA = {
     ("2016", "2"): (810, 970),
     ("2016", "4"): (700, 840),   # SA's own measured 777.92 (the base map only
                                 # named NSW's) — set beside the wa-era rows 2026-11-17
+    ("2016", "6"): (700, 800),   # Tasmania's own measured 734.49 at the 25% cut
+                                # — tas14/tas18 frames joined 2026-11-17
+    ("2021", "6"): (800, 1900),  # tas-era guard for the 2021 GCP pack's two-
+                                # member income blocks (no measurement yet)
 }
 _INC_SITES = {}
 
@@ -979,9 +990,10 @@ def state_income(gcp_zip, era, prefix):
         _fail(f"state {prefix}: income 75% cut {cut75} outside guard "
               f"{guq}")
     hi_share = nat_adults[-1] / nat_tot
-    if not 0.05 <= hi_share <= 0.25:
+    hs_guard = _INC_HISHARE_GUARDS.get((str(era), prefix)) or (0.05, 0.25)
+    if not (hs_guard[0] <= hi_share <= hs_guard[1]):
         _fail(f"state {prefix}: income top-band share {hi_share:.4f} "
-              "outside 5-25%")
+              f"outside guard {hs_guard}")
 
     out = {}
     for code, (hh, fi, mix) in rows.items():

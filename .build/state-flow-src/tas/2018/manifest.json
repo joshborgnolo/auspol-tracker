@@ -1,0 +1,53 @@
+{
+ "frame": "tas18",
+ "day": "2018-03-03",
+ "files": {
+  "hub.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/index.html",
+   "bytes": 32058,
+   "sha256": "3f67c2acc01ce5b568b97452c08203de4dcb8f9fb8502d43afb0a2d5155deb9a"
+  },
+  "results-index.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Results/Results.html",
+   "bytes": 16484,
+   "sha256": "dd97e8e2935e98281bbdafaeacdda0c8a2e81169ea52db55cee205eb6354a5d5"
+  },
+  "results-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Results/Bass/index.html",
+   "bytes": 28338,
+   "sha256": "db162d45c18ee7d1b3f3e08958a538e5f30dbbadbfa6703906b3be9f05146232"
+  },
+  "results-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Results/Braddon/index.html",
+   "bytes": 33824,
+   "sha256": "6e9128bf870e8ae27c1399b68bdd7a568f1dd5219795b8565bec1d7f59a66809"
+  },
+  "results-denison.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Results/Denison/index.html",
+   "bytes": 28301,
+   "sha256": "11a65e6dc7ae8d7ef66101658644b7ebfcb0d7034a0e9a46f7e8583ff54d7fcc"
+  },
+  "results-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Results/Franklin/index.html",
+   "bytes": 26077,
+   "sha256": "498872cf2da9af334ae61d328faa7a19a60c8478784109c6e2bbcf16e03d4b16"
+  },
+  "results-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Results/Lyons/index.html",
+   "bytes": 31719,
+   "sha256": "aa1a36626533cea17ad36859581e320fd4ee435a5baf204fadf7594af4af27ea"
+  },
+  "candidates.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/Candidates.html",
+   "bytes": 11209,
+   "sha256": "ea91e9857c455987ca134bec5cd2f499fc033110eb6ef031a360ba444af13e8c"
+  },
+  "pollinglists.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2018/PollingPlaceLists.html",
+   "bytes": 129999,
+   "sha256": "be8df38f84a9a78eb527d3830a8ce36344e3d0d6a90717df949c4cdf1698e0ef",
+   "capturedAt": "20250324202125"
+  }
+ },
+ "fetchedAt": "2026-11-17T06:54:44Z"
+}

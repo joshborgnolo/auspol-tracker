@@ -1,0 +1,97 @@
+{
+ "frame": "tas21",
+ "day": "2021-05-01",
+ "files": {
+  "hub.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/index.html",
+   "bytes": 38428,
+   "sha256": "2017b40a8eba3d2dbfaf91be0f082f9ed52cb5c1c096864844c7b7e460d9dbb0"
+  },
+  "results-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/bass/index.html",
+   "bytes": 14123,
+   "sha256": "13387b3cc2047de672e91dd9776d168a0cf20c866bb12d5e551e7cbeec4cf12c"
+  },
+  "results-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/braddon/index.html",
+   "bytes": 13296,
+   "sha256": "89aad80d7a0170d2bbc3aa2f260788c869e84fed1ee0a945899ed7142b1e81dd"
+  },
+  "results-clark.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/clark/index.html",
+   "bytes": 13270,
+   "sha256": "39a59be957a2ffbec552bf10dadd8833cdb898b648208a88c038af28931b319a"
+  },
+  "results-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/franklin/index.html",
+   "bytes": 13266,
+   "sha256": "508ffc51af398d3edce894ee52ba8b8b90d3fdac86574b542b992c85d0e96712"
+  },
+  "results-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/lyons/index.html",
+   "bytes": 13443,
+   "sha256": "431ab668d03f8280f267c5edb90b3a0bb0d9e016f8822364eb73322666564d35"
+  },
+  "fp-by-polling-places.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/assets/2021-State-election-first-preferences-by-polling-places.xlsx",
+   "bytes": 268272,
+   "sha256": "48f0a7369ccc82a4ad844e24608be2dc3e2d973520b91a769f54b50dc73fc48e"
+  },
+  "candidates-elected.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/HAElection21CandidatesElected.html",
+   "bytes": 23014,
+   "sha256": "d9021be528acf06b2991b33779a9577362904801aa0973e751843c355bc6ec9e"
+  },
+  "candidates-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/HAElection21Candidates-Bass.html",
+   "bytes": 20793,
+   "sha256": "79094f9b9530972ff44e4957d48fcb78cb448f363b54398f43f59dc748084623"
+  },
+  "candidates-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/HAElection21Candidates-Braddon.html",
+   "bytes": 21238,
+   "sha256": "f79f398f5625fd0d61b07b7d2dd817b331904016ac80471b804347e0390e1666"
+  },
+  "candidates-clark.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/HAElection21Candidates-Clark.html",
+   "bytes": 23109,
+   "sha256": "ba718309d7ab8aab7dcb40834c0054ca5687398a9348062715684cd4770fbb40"
+  },
+  "candidates-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/HAElection21Candidates-Franklin.html",
+   "bytes": 21830,
+   "sha256": "a9827c45028b73411dd67dc9352527a4bd08cf331437c3488b270a8470525b3f"
+  },
+  "candidates-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/HAElection21Candidates-Lyons.html",
+   "bytes": 20786,
+   "sha256": "39c723f93ecdb44cd1718c429ee1395bacc23707503fe547b73cd33d04f554d9"
+  },
+  "dop-bass.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/bass/pdf/2021-HoA-Bass-Export-Count-52.pdf",
+   "bytes": 62693,
+   "sha256": "44e28775aff833c3dfcc79a731626cbddf69c56413d223199f1c79dd3f99415e"
+  },
+  "dop-braddon.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/braddon/pdf/2021-HoA-Braddon-Export-Count-34.pdf",
+   "bytes": 48088,
+   "sha256": "b9235ee73110c137fd8f61956209f4949e3a80aea2a35379d8280060c208e13f"
+  },
+  "dop-clark.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/clark/pdf/2021-HoA-Clark-Export-Count-33.pdf",
+   "bytes": 66744,
+   "sha256": "92679d503a253e0ac2ce8e2f87ce901efa5b1fa37cf00a57c23a85773999ed1e"
+  },
+  "dop-franklin.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/franklin/pdf/2021-HoA-Franklin-Export-Count40.pdf",
+   "bytes": 64078,
+   "sha256": "845ba7046e8b41167b46a3cf926c29881a141880a289c24ff17f5897ea980efd"
+  },
+  "dop-lyons.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/StateElection2021/results/lyons/pdf/2021-HoA-Lyons-Export-Count-44.pdf",
+   "bytes": 61630,
+   "sha256": "31be01e627c381c8c2a2c70dcb86996e7b9dd283bfd228fe3f6aa1c432cfd9ca"
+  }
+ },
+ "fetchedAt": "2026-11-17T06:54:56Z"
+}

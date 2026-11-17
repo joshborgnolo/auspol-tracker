@@ -1,0 +1,97 @@
+{
+ "frame": "tas24",
+ "day": "2024-03-23",
+ "files": {
+  "hub.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/index.html",
+   "bytes": 40353,
+   "sha256": "07ced34b737577dc23994a5a1b33e5875d7c91ff3c5a99f711dff0070131d0e7"
+  },
+  "results-bass.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/bass/index.html",
+   "bytes": 15184,
+   "sha256": "0c9d44cebc50dd0b865a8133174086646dad35d53c431d30c14f8a121bf3186a"
+  },
+  "results-braddon.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/braddon/index.html",
+   "bytes": 14577,
+   "sha256": "3bdf629a1045b1f783b06a22809a27c941183c853a972b03131b00d4b5c4db2f"
+  },
+  "results-clark.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/clark/index.html",
+   "bytes": 15073,
+   "sha256": "1f0aba264457e9c7c187a72906c7c668da973e0fc5ba94b0804e43b899d00dc9"
+  },
+  "results-franklin.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/franklin/index.html",
+   "bytes": 14715,
+   "sha256": "771197fe298c0ca96418f3e0ee14def2552732490a3e44aab6b08bac9c14aacb"
+  },
+  "results-lyons.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/lyons/index.html",
+   "bytes": 15033,
+   "sha256": "11b360ff6177ca2da5d364f5a84053247d8d0557dae0739f6039a62ddab5eb97"
+  },
+  "fp-by-polling-places.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/pdf/2024-state-election-first-preferences-by-polling-places.xlsx",
+   "bytes": 91681,
+   "sha256": "04375bb18ea45c157222c3cb6f9186a50653b84c5ef4e6bd57c9a41d43ea29b1"
+  },
+  "candidates-elected.html": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/candidates-elected.html",
+   "bytes": 23732,
+   "sha256": "534f45cf180e6bb3ac3bf8b4ba89c482eaca84fdac1b5c09ab807d23ecab378f"
+  },
+  "dop-bass.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/bass/pdf/2024%20House%20of%20Assembly%20-%20Division%20of%20Bass%20-%20Export%2080.xlsx",
+   "bytes": 198283,
+   "sha256": "e87d62c67bcd00560963fc5af4daa060b15238e81cb12f1a2dc894938ee446e2"
+  },
+  "dop-braddon.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/braddon/pdf/2024%20House%20of%20Assembly%20-%20Division%20of%20Braddon%20-%20Export%2085.xlsx",
+   "bytes": 194234,
+   "sha256": "5fba8b0529307f8d8b1e567fb91c825ece15e11e995f891f1aa10922cfe4fa45"
+  },
+  "dop-clark.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/clark/pdf/2024%20House%20of%20Assembly%20-%20Division%20of%20Clark%20-%20Export%2045.xlsx",
+   "bytes": 153716,
+   "sha256": "42d573c8814793afc92fa501ed1bf3f14ae4b5e7af6ef4589a60266b32ddc1e8"
+  },
+  "dop-franklin.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/franklin/pdf/2024%20House%20of%20Assembly%20-%20Division%20of%20Franklin%20-%20Export%2058.xlsx",
+   "bytes": 156373,
+   "sha256": "6d6151dbf5c670b8caa12fff546a526e95f3ebcbcf3a8801700a8f82cb053ecb"
+  },
+  "dop-lyons.xlsx": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/lyons/pdf/2024%20House%20of%20Assembly%20-%20Division%20of%20Lyons%20-%20Export%2072.xlsx",
+   "bytes": 193520,
+   "sha256": "da862afe3937a24a34edc214fa86af824d1c3754b47ca9efc6828e93f33371c6"
+  },
+  "dop-bass.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/bass/pdf/2024-ha-bass-export-count-80.pdf",
+   "bytes": 72141,
+   "sha256": "54504a148a7895b0c16a34c820660fbf1abe01d957122e3b646ff61f1781498e"
+  },
+  "dop-braddon.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/braddon/pdf/2024-ha-braddon-export-count-85.pdf",
+   "bytes": 63036,
+   "sha256": "8ad475c41699c6c3d777a70c23b00861229adf9d40f52b475d341db680374558"
+  },
+  "dop-clark.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/clark/pdf/2024-ha-clark-export-count-45.pdf",
+   "bytes": 64512,
+   "sha256": "1781672a7547eeb0543ad8f141c35f5e4b655f0dc33f6f8f4eb2dd3bbe504e36"
+  },
+  "dop-franklin.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/franklin/pdf/2024-ha-franklin-export-count-58.pdf",
+   "bytes": 61408,
+   "sha256": "94dc3de78082901a392f5e97464a9b71422ad7183fc8ad3f2b8908bcb8175bc9"
+  },
+  "dop-lyons.pdf": {
+   "url": "https://www.tec.tas.gov.au/house-of-assembly/elections-2024/results/lyons/pdf/2024-ha-lyons-export-count-72.pdf",
+   "bytes": 67725,
+   "sha256": "c6433677537b86a5e1bc73f0d7ea91664dd4033bb123a32857516e6eb460dfc1"
+  }
+ },
+ "fetchedAt": "2026-11-17T06:55:15Z"
+}
