@@ -215,6 +215,8 @@ def load_cells(dbf):
     arc = gcp_newlanes.load_arc31(GCP_ZIP, era="2021")
     lab = gcp_newlanes.load_lab(GCP_ZIP, era="2021")
     ind = gcp_newlanes.load_ind(GCP_ZIP, era="2021")
+    # the Occupation classes (2026-11-19): SA2 export spread onto SA1s
+    occ = gcp_newlanes.load_occ(GCP_ZIP, era="2021")
     mar = gcp_newlanes.load_mar(GCP_ZIP, era="2021")
     inc, cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "")
     z = zipfile.ZipFile(GCP_ZIP)
@@ -258,6 +260,8 @@ def load_cells(dbf):
             "ageMed": ageM02, "incMed": incM02,
             "labU": lab[code][0], "labLF": lab[code][1],
             "indv": ind[code][0],
+            "occv": occ[code][0] if occ.get(code) else None,
+            "occD": occ[code][1] if occ.get(code) else 0,
             "marvec": mar[code],
             "jur": dbf[code]["jur"],
         }
@@ -367,6 +371,11 @@ for _i, _k in enumerate(gcp_newlanes.ANC_KEYS):
 # each lane's share over the divisions' own summed counts — the same
 # ex-not-stated denominators the federal stores use, recomputed per SA1
 _INDDEN = lambda r: sum(r["indv"])  # noqa: E731
+# the Occupation classes (2026-11-19): each class over the SA1's stated-
+# occupation workers (the parent SA2's mix on G60B's footing); no partition
+for _i, _k in enumerate(gcp_newlanes.OCC_KEYS):
+    SHARES[f"occ.{_k}"] = ((lambda i: (lambda r: r["occv"][i] if r["occv"] else None))(_i),
+                           (lambda r: r["occD"]))
 for _i, _k in enumerate(gcp_newlanes.IND_KEYS):
     SHARES[f"ind.{_k}"] = ((lambda i: (lambda r: r["indv"][i]))(_i), _INDDEN)
 _MARDEN = lambda r: sum(r["marvec"])  # noqa: E731
@@ -412,6 +421,7 @@ LANE_ORDER = (["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15",
               + [f"cob.{k}" for k in COB_KEYS]
               + [f"anc.{k}" for k in gcp_newlanes.ANC_KEYS]
               + [f"ind.{k}" for k in gcp_newlanes.IND_KEYS]
+              + [f"occ.{k}" for k in gcp_newlanes.OCC_KEYS]
               + [f"mar.{k}" for k in gcp_newlanes.MAR_KEYS]
               + ["ageMed", "incMed"]
               + [f"sf.{ix}" for ix in IX])
@@ -620,7 +630,7 @@ def cross_check_sa26(rec, universe_cuts):
             a["hiqinc"][0] += hi_m
             a["hiqinc"][1] += r["incAd"]
     GROUP_OF = {"cob": None, "rel": None, "ten": None, "anc": None,
-                "ind": None,
+                "ind": None, "occ": None,
                 "mar": None}
     checks = []
     for k in list(SHARES) + ["loinc", "hiqinc"]:

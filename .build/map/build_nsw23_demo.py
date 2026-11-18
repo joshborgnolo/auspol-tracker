@@ -192,6 +192,8 @@ def main():
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="1", era="2021")
     lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="1", era="2021")
     ind = gcp_newlanes.load_ind(GCP_ZIP, prefix="1", era="2021")
+    # the Occupation classes (2026-11-19; None off the 2021 census)
+    occ = gcp_newlanes.load_occ(GCP_ZIP, prefix="1", era="2021")
     mar = gcp_newlanes.load_mar(GCP_ZIP, prefix="1", era="2021")
     inc, _inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "1")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
@@ -234,6 +236,7 @@ def main():
                                   "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
                                   "ueN": 0.0, "lfD": 0.0,
                                   "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
+                                  "occN": [0.0] * len(gcp_newlanes.OCC_KEYS), "occD": 0.0,
                                   "marN": [0] * len(gcp_newlanes.MAR_KEYS),
                                   "hlE": 0.0})
         r = gcp[code]
@@ -294,6 +297,11 @@ def main():
         iv, _ivns, _ivt = ind[code]
         for i in range(len(gcp_newlanes.IND_KEYS)):
             a["indN"][i] += iv[i]
+        ov = occ.get(code) if occ else None
+        if ov is not None:
+            for i in range(len(gcp_newlanes.OCC_KEYS)):
+                a["occN"][i] += ov[0][i]
+            a["occD"] += ov[1]
         for i in range(len(gcp_newlanes.MAR_KEYS)):
             a["marN"][i] += mar[code][i]
         a["hlE"] += HL.get(code, {}).get("e", 0.0)
@@ -351,6 +359,11 @@ def main():
             "ind": ({k: round(a["indN"][i] / indden, 4)
                      for i, k in enumerate(gcp_newlanes.IND_KEYS)}
                     if indden else None),
+            # the Occupation classes (2026-11-19): each class over the stated-
+            # occupation workers; never a partition (19 sub-majors unclassed)
+            **({"occ": ({k: round(a["occN"][i] / a["occD"], 4)
+                         for i, k in enumerate(gcp_newlanes.OCC_KEYS)}
+                        if a["occD"] else None)} if occ else {}),
             "mar": {k: (round(a["marN"][i] / mard, 4)
                         if mard > 0 else None)
                     for i, k in enumerate(gcp_newlanes.MAR_KEYS)},
@@ -389,6 +402,7 @@ def main():
               "incBandH": [0] * len(gcp_newlanes.INC_BANDS),
               "ueN": 0.0, "lfD": 0.0,
               "indN": [0.0] * len(gcp_newlanes.IND_KEYS),
+              "occN": [0.0] * len(gcp_newlanes.OCC_KEYS), "occD": 0.0,
               "marN": [0] * len(gcp_newlanes.MAR_KEYS),
               "hlE": 0.0}
     for a in acc.values():
@@ -397,7 +411,7 @@ def main():
                 for i in range(len(DEMO_BANDS)):
                     st_acc["bands"][i] += v2[i]
             elif k2 in ("cobN", "relN", "tenN", "ancN", "incBandH",
-                        "indN", "marN"):
+                        "indN", "occN", "marN"):
                 for i in range(len(v2)):
                     st_acc[k2][i] += v2[i]
             else:
@@ -420,6 +434,7 @@ def main():
         "ancKeys": list(gcp_newlanes.ANC_KEYS),
         # the Industry picker's nineteen ANZSIC-2006 divisions
         "indKeys": list(gcp_newlanes.IND_KEYS),
+        **({"occKeys": list(gcp_newlanes.OCC_KEYS)} if occ else {}),
         "marKeys": list(gcp_newlanes.MAR_KEYS),
         "demo": {n: demo[n] for n in order},
         "state": {**st_shares, "persons": state["p"], "sa1": state["n"],

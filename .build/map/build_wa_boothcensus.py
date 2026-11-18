@@ -245,6 +245,8 @@ def demo_cells(year):
     arc = gcp_newlanes.load_arc31(V["gcp"], prefix="5", era=era)
     lab = gcp_newlanes.load_lab(V["gcp"], prefix="5", era=era)
     ind = gcp_newlanes.load_ind(V["gcp"], prefix="5", era=era)
+    # the Occupation classes (2026-11-19; None off the 2021 census)
+    occ = gcp_newlanes.load_occ(V["gcp"], prefix="5", era=era)
     mar = gcp_newlanes.load_mar(V["gcp"], prefix="5", era=era)
     inc, _inc_cutrec = gcp_newlanes.state_income(V["gcp"], era, "5")
     HL = gcp_newlanes.hl_alloc_of(year, HL_FORM[year])
@@ -307,6 +309,8 @@ def demo_cells(year):
         iv, _ivns, _ivt = ind[code]
         ivd = sum(iv)
         indsh = [safe(v, ivd) for v in iv]
+        ov = occ.get(code) if occ else None
+        occsh = [safe(x, ov[1]) for x in ov[0]] if ov else None
         aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         marv = mar[code]
@@ -336,7 +340,7 @@ def demo_cells(year):
                      safe(hiqm, aud),
                      safe(uel, lfd)],
                      [safe(c, den09) for c in cob], rel, ten, anc,
-                     indsh, marsh)
+                     indsh, marsh, occsh)
     if len(out) != GCP_WA_ROWS[year]:
         fail(f"demo cells {len(out)} != pin {GCP_WA_ROWS[year]}")
     print(f"GCP {year} demo cells: {len(out)} SA1s")
@@ -400,6 +404,7 @@ def run_frame(frame):
         fail(f"{frame}: a booth carries only one of lat/lon")
     out_sa1, suppressions = set(), 0
     counts = {"pip": 0, "noscore": 0, "mobile": 0, "unlocated": 0}
+    occ_col = []
     dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, ind_col, mar_col = \
         [], [], [], [], [], [], [], []
     for k in range(n):
@@ -414,6 +419,7 @@ def run_frame(frame):
             ten_col.append(None)
             anc_col.append(None)
             ind_col.append(None)
+            occ_col.append(None)
             mar_col.append(None)
             continue
         if lat is None:
@@ -425,6 +431,7 @@ def run_frame(frame):
             ten_col.append(None)
             anc_col.append(None)
             ind_col.append(None)
+            occ_col.append(None)
             mar_col.append(None)
             continue
         code = pip(year, lon, lat)
@@ -452,6 +459,7 @@ def run_frame(frame):
         ten_col.append(list(dm[3]))
         anc_col.append(list(dm[4]))
         ind_col.append(list(dm[5]))
+        occ_col.append(list(dm[7]) if dm[7] is not None else None)
         mar_col.append(list(dm[6]))
     if counts["mobile"] != MOBILE[frame]:
         fail(f"{frame}: {counts['mobile']} mobile-team rows != pinned "
@@ -465,12 +473,17 @@ def run_frame(frame):
     B["ten"] = ten_col
     B["anc"] = anc_col
     B["ind"] = ind_col
+    # the Occupation classes (2026-11-19): 2021-census frames only
+    if any(v is not None for v in occ_col):
+        B["occ"] = occ_col
     B["mar"] = mar_col
     data["cobKeys"] = COB_KEYS
     data["relKeys"] = list(gcp_newlanes.REL_KEYS)
     data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
     data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
     data["indKeys"] = list(gcp_newlanes.IND_KEYS)
+    if "occ" in B:
+        data["occKeys"] = list(gcp_newlanes.OCC_KEYS)
     data["marKeys"] = list(gcp_newlanes.MAR_KEYS)
     # the frame's own income-cuts record (the shared engine's prefix
     # universe — WA 2016 measured 985.03/2860.01, WA 2021 1120.41/3312.52)

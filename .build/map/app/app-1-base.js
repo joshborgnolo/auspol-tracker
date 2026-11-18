@@ -293,19 +293,21 @@ const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scot
 // LENS_OCC and S.occ the picked class. Seven politically-charged classes
 // keyed from ANZSCO sub-major (2-digit) groups — the GCP packs top out at
 // 1-digit, so the lane rides the manual 2021 TableBuilder export folded by
-// .build/map/occ_lanes.py; only 2021-census-era frames publish occKeys.
+// .build/map/occ_lanes.py; only 2021-census-era frames publish occKeys
+// (federal 2016-2025, whose voter stores all read the 2021 census, and
+// the 2021-census state frames carrying the Industry menu).
 // The classes are deliberately NOT a partition: the remaining 19
 // sub-majors (technicians, community/personal services, clerical, sales)
 // carry no class, so the options never sum to 100
 const LENS_OCC = "occ";
 const OCC_NAME = { socprof: "Sociocultural professionals", biztech: "Business & technical professionals and managers", farmer: "Farmers", farmwrk: "Farm workers", hospmgr: "Hospitality, retail & service managers", trades: "Tradespeople", routine: "Routine manual workers" };
 const OCCISMS = { socprof: "work in education, health, welfare, the arts or media", biztech: "are business or technical professionals or corporate managers", farmer: "are farmers or farm managers", farmwrk: "do farm, forestry or garden work", hospmgr: "manage hospitality, retail or service businesses", trades: "work as tradespeople", routine: "do routine manual work" };
-// PROVISIONAL PLACEHOLDER caps: the store-landing pass (occ_lanes OCC_RANGE
-// job) measures each class's division maximum across the occ frames and
-// writes the real caps, per the ANC_RANGE way; Phase A is era-null, so
-// nothing reads these until then (the map suite fails a placeholder that
-// survives landing)
-const OCC_RANGE = { socprof: [0, 40], biztech: [0, 40], farmer: [0, 20], farmwrk: [0, 12], hospmgr: [0, 20], trades: [0, 30], routine: [0, 40] };
+// measured caps (2026-11-19 store landing): each class priced just above
+// its seat maximum across every occ frame — socprof 24.4 (Nedlands, wa21),
+// biztech 47.6 (North Shore, nsw23), farmer 18.7 (Roe, wa25), farmwrk 9.2
+// (Barkly, nt20), hospmgr 6.0 (Noosa, qld20), trades 17.4 (Pilbara, wa21),
+// routine 34.0 (Woodridge, qld20)
+const OCC_RANGE = { socprof: [0, 25], biztech: [0, 50], farmer: [0, 20], farmwrk: [0, 10], hospmgr: [0, 7], trades: [0, 20], routine: [0, 35] };
 // the Industry select lens (the 2026-11-11 industry-picker arc): S.index
 // === LENS_IND and S.ind the picked division. Nineteen ANZSIC-2006
 // divisions as shares of employed people with a stated industry

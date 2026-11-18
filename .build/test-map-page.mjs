@@ -661,7 +661,7 @@ for (const y of [1996, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
     // own country shares the same inside it (the interp contract joined
     // its object-valued cob key 2026-10-28, the Immigration arrival arc's
     // arrv/prof dicts its 2026-11-12)
-    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "ind", "mar", "arrv", "prof"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
+    assert.ok(div && Object.entries(div.demo).every(([k, v]) => v == null || (typeof v === "number" && v >= 0) || (["cob", "rel", "ten", "anc", "ind", "occ", "mar", "arrv", "prof"].includes(k) && v && Object.values(v).every((x) => x == null || (typeof x === "number" && x >= 0 && x <= 1)))), `${y} demo rows well-formed`);
   }
   // every interp year rides the income cuts of the nearest census
   // side (hi edges differ across the 2001/2006/2011 grids, so the hi
@@ -1220,10 +1220,11 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   // classes from ANZSCO sub-major groups on one select-lens row, and only
   // 2021-census-era frames publish it (Phase A ships it era-null)
   assert.ok(base.includes('const LENS_OCC = "occ"'), "the Occupation lens id");
+  const OCC_CAP = Object.fromEntries(Object.entries(JSON.parse(base.match(/const OCC_RANGE = (\{[^;]*\});/)[1].replace(/(\w+):/g, '"$1":'))).map(([k, v]) => [k, v[1]]));
   assert.ok(base.includes('const OCC_NAME = { socprof: "Sociocultural professionals"'), "the classes lead with sociocultural professionals");
   assert.ok(base.includes('trades: "Tradespeople"') && base.includes('routine: "Routine manual workers"'), "the manual halves of the Oesch split");
   assert.ok(base.includes('const OCCISMS = {') && base.includes('farmwrk: "do farm, forestry or garden work"'), "the per-class story verbs (farm labourers kept apart from routine manual)");
-  assert.ok(base.includes('const OCC_RANGE = {') && base.includes('farmer: [0, 20]'), "provisional range caps until the stores land (Phase B replaces them)");
+  assert.ok(base.includes('const OCC_RANGE = { socprof: [0, 25], biztech: [0, 50], farmer: [0, 20], farmwrk: [0, 10], hospmgr: [0, 7], trades: [0, 20], routine: [0, 35] };') && !base.includes("PROVISIONAL PLACEHOLDER"), "the measured range caps replaced the Phase A placeholder");
   assert.ok(base.includes('const isOcc = () => S.index === LENS_OCC && S.occ != null;'), "the select-view guard");
   assert.ok(base.includes("m.occKeys = res.occKeys || null;") && base.includes("m.occPos"), "loadYear records the occ key order and its positional spots");
   assert.ok(base.includes("demo.occ = {};"), "the Occupation pools sum shares of workers the ancestry way");
@@ -1237,7 +1238,21 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('k === "occ"'), "the picker's change handler is wired");
   assert.ok(/if \(!b\.occKeys && S\.index === LENS_OCC\) S\.index = "irsad";/.test(ui) && /if \(!\(b\.occKeys \|\| \[\]\)\.includes\(S\.occ\)\) S\.occ =/.test(ui), "year swaps clamp the lens and the picked class");
   assert.ok(story.includes("const OCC_TOP = {") && story.includes('farmer: ["seats where the most workers are farmers or farm managers"'), "area stories phrase the classes against their worker base");
-  assert.ok(!("occKeys" in JSON.parse(R("map/data/res-2016.json"))), "2016-census frames stay era-null");
+  // the store landing (2026-11-19): the federal 2016-2025 frames (voter
+  // stores all read the 2021 census) and the 2021-census state frames
+  // carrying Industry publish the classes; older-census frames stay null
+  for (const f of ["2013", "nsw19", "vic18", "qld17", "wa17", "sa18"]) assert.ok(!("occKeys" in JSON.parse(R(`map/data/res-${f}.json`))), `${f}: pre-2021-census frames stay era-null`);
+  for (const f of ["2016", "2019", "2022", "2025", "nsw23", "vic22", "qld20", "qld24", "sa22", "sa26", "wa21", "wa25", "nt20", "nt24"]) {
+    const r = JSON.parse(R(`map/data/res-${f}.json`));
+    assert.deepEqual(r.occKeys, ["socprof", "biztech", "farmer", "farmwrk", "hospmgr", "trades", "routine"], `${f}: occKeys in menu order`);
+    const dv = r.divs.filter((d) => d.demo && d.demo.occ);
+    assert.ok(dv.length >= r.divs.length - 2, `${f}: every seat carries its class shares (${dv.length}/${r.divs.length})`);
+    for (const d of dv) for (const [k, v] of Object.entries(d.demo.occ)) assert.ok(v === null || (v >= 0 && v <= OCC_CAP[k] / 100), `${f} ${d.n} ${k} ${v} inside its cap`);
+    const rows = r.booths.occ.filter(Boolean);
+    assert.ok(rows.length > 0.85 * r.booths.occ.length, `${f}: polling places carry occ rows (${rows.length}/${r.booths.occ.length})`);
+  }
+  // the class shares never sum to a whole: 19 sub-majors stay unclassed
+  { const d = JSON.parse(R("map/data/res-2025.json")).divs.find((x) => x.n === "Bennelong").demo.occ; const t = Object.values(d).reduce((a, b) => a + b, 0); assert.ok(t > 0.5 && t < 0.85, `Bennelong 2025's seven classes cover ${t} of stated workers`); }
   // the data files' structure at every fed stop: relKeys (norel first),
   // tenKeys (mort first), 12-wide demo rows, division rel/ten dicts
   for (const y of [2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025]) {
@@ -1901,7 +1916,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `nsw23 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "ind", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "ind", "occ", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `nsw23 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `nsw23 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `nsw23 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {
@@ -2468,7 +2483,7 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   for (const d of res.divs) {
     assert.ok(d.demo && DMK.every((k) => typeof d.demo[k] === "number") && typeof d.demo.p === "number" && typeof d.demo.n === "number", `vic22 ${d.n}: demo row`);
-    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "ind", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
+    assert.deepEqual(Object.keys(d.demo).sort(), [...DMK, "anc", "cob", "ind", "occ", "mar", "rel", "ten", "n", "p", "loinc", "hiinc", "hiqinc", "medIncWeekly", "y12less"].sort(), `vic22 ${d.n}: GCP-era lanes ride the ten keys plus income plus the kept year-12-or-less store key, the birthplace, ancestry and marital dicts`);
     assert.deepEqual(Object.keys(d.demo.anc).sort(), [...ANC_GCP].sort(), `vic22 ${d.n}: the twelve Ancestry options`);
     assert.deepEqual(Object.keys(d.demo.cob).sort(), [...GCP_COB_KEYS].sort(), `vic22 ${d.n}: the ten-country cob`);
     for (const ix of IXS) {

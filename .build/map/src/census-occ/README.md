@@ -39,3 +39,18 @@ hard no-silent-degradation rule.
 
 `testdata/toy.csv` is a hand-authored miniature of this layout used by
 `.build/map/occ_lanes.py`'s self-test; it is not census data.
+
+## Landed 2026-11-19
+
+`sa2-2021.csv` and `ced-2021.csv` came from TableBuilder's *2021 Census -
+employment, income and education* dataset: SA2 (UR) / CED (UR) rows ×
+"2-digit level OCCP Occupation" (54 items: the 43 sub-majors, the nine
+major-level "nfd" cells, `&&` not stated, `@@` not applicable), counting
+Person Records, codes on. Not-applicable rows (people not employed) fall
+outside the 43-code basis, so the counting universe makes no difference.
+The class basis is Σ(43 sub-majors); the nfd cells are excluded from it
+and only re-enter for the drift gate, which compares Σ(43 + nfd) per CED
+with GCP G60B's eight majors — worst 1.45% across 155 rows at landing.
+`gcp_newlanes.load_occ` spreads each SA2's class mix onto its SA1s by
+G60B stated workers; the federal voter stores (2016–2025, all on the 2021
+census), the 2021-census state frames and the SA1 areas pack read it.

@@ -669,6 +669,41 @@ def load_arr_eng(gcp_zip, prefix="", era="2021", rows_pin=None,
     return out
 
 
+# ---- the Occupation classes (2026-11-19) ----------------------------
+# seven Oesch-style classes off the 2021 TableBuilder SA2 export
+# (occ_lanes.py owns the lattice, the reader, the CED drift gate and
+# the SA2->SA1 spread); 2021-census frames only — any other era returns
+# None and its callers print no occ lane and no occKeys
+import importlib.util as _ilu
+_occ_spec = _ilu.spec_from_file_location(
+    "occ_lanes", os.path.join(os.path.dirname(os.path.abspath(__file__)), "occ_lanes.py"))
+occ_lanes = _ilu.module_from_spec(_occ_spec)
+_occ_spec.loader.exec_module(occ_lanes)
+OCC_KEYS = list(occ_lanes.OCC_KEYS)
+_OCC_GATED = []
+
+
+def load_occ(gcp_zip, prefix="", era="2021", rows_pin=None,
+             key_col=None):
+    """{sa1: (classvec in OCC_KEYS order, stated) | None} for the
+    prefix's SA1s — each SA1's G60B stated-occupation workers carrying
+    its SA2's class mix — or None off the 2021 census. The drift gate
+    (CED export v G60B within ±3%) runs once per process."""
+    if str(era) != "2021":
+        return None
+    if not _OCC_GATED:
+        occ_lanes.drift_guard(os.path.join(os.path.dirname(gcp_zip), "gcp-ced.zip"))
+        _OCC_GATED.append(True)
+    v = VINTAGES["2021"]
+    z = zipfile.ZipFile(gcp_zip)
+    o60 = _table(z, v["member"].format(table="G60B"), key_col or v["key"],
+                 BASE_OCC_COLS, rows_pin or v["rows"], prefix)
+    out = occ_lanes.sa1_occ({c: sum(r) for c, r in o60.items()})
+    print(f"occupation classes: {sum(1 for x in out.values() if x)} of "
+          f"{len(out)} SA1s carry a class mix (prefix {prefix or 'AU'})")
+    return out
+
+
 # ---- the six canonical venue-demo cells' raw counts -----------------
 # the [lang, a65, a2034, fborn, uni, blue] reads every frame's booth-
 # level census join shares, keyed one row plainly so each caller folds/

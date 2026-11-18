@@ -238,6 +238,8 @@ def demo_cells():
     arc = gcp_newlanes.load_arc31(GCP_ZIP, prefix="4", era="2021")
     lab = gcp_newlanes.load_lab(GCP_ZIP, prefix="4", era="2021")
     ind = gcp_newlanes.load_ind(GCP_ZIP, prefix="4", era="2021")
+    # the Occupation classes (2026-11-19; None off the 2021 census)
+    occ = gcp_newlanes.load_occ(GCP_ZIP, prefix="4", era="2021")
     mar = gcp_newlanes.load_mar(GCP_ZIP, prefix="4", era="2021")
     inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "4")
     HL = gcp_newlanes.hl_alloc_of(2021, "m")
@@ -299,6 +301,8 @@ def demo_cells():
         iv, _ivns, _ivt = ind[code]
         ivd = sum(iv)
         indsh = [safe(v, ivd) for v in iv]
+        ov = occ.get(code) if occ else None
+        occsh = [safe(x, ov[1]) for x in ov[0]] if ov else None
         aud, lom, him, _med, _bands_ad, _hh, hiqm = inc[code]
         anc = [safe(v, ancp - ancns) for v in ancv]
         marv = mar[code]
@@ -322,7 +326,7 @@ def demo_cells():
                       safe(hiqm, aud),
                       safe(uel, lfd)],
                      [safe(c, den09) for c in cob],
-                     rel, ten, anc, indsh, marsh)
+                     rel, ten, anc, indsh, marsh, occsh)
     print(f"GCP demo cells: {len(out)} SA1s")
     return out
 
@@ -348,6 +352,7 @@ def main():
             fail(f"{year}: cobKeys already set — the lane is not this script's on a stale data build (rerun build_{year}_data.py first)")
         out_sa1, suppressions = set(), 0
         counts = {"pip": 0, "noscore": 0, "demo": 0, "mobile": 0}
+        occ_col = []
         dec_col, demo_col, cob_col, rel_col, ten_col, anc_col, \
             ind_col, mar_col = [], [], [], [], [], [], [], []
         for k in range(n):
@@ -361,6 +366,7 @@ def main():
                 ten_col.append(None)
                 anc_col.append(None)
                 ind_col.append(None)
+                occ_col.append(None)
                 mar_col.append(None)
                 continue
             if lat is None:
@@ -389,6 +395,7 @@ def main():
             ten_col.append(list(dm[3]))
             anc_col.append(list(dm[4]))
             ind_col.append(list(dm[5]))
+            occ_col.append(list(dm[7]) if dm[7] is not None else None)
             mar_col.append(list(dm[6]))
         B["dec"] = dec_col
         B["vdec"] = [None] * n  # ECSA releases no votes-by-SA1 product; the
@@ -399,12 +406,17 @@ def main():
         B["ten"] = ten_col
         B["anc"] = anc_col
         B["ind"] = ind_col
+        # the Occupation classes (2026-11-19): 2021-census frames only
+        if any(v is not None for v in occ_col):
+            B["occ"] = occ_col
         B["mar"] = mar_col
         data["cobKeys"] = COB_KEYS
         data["relKeys"] = list(gcp_newlanes.REL_KEYS)
         data["tenKeys"] = ["mort", "rent", "own", "rentPub"]
         data["ancKeys"] = list(gcp_newlanes.ANC_KEYS)
         data["indKeys"] = list(gcp_newlanes.IND_KEYS)
+        if "occ" in B:
+            data["occKeys"] = list(gcp_newlanes.OCC_KEYS)
         data["marKeys"] = list(gcp_newlanes.MAR_KEYS)
         unused_inc, inc_cutrec = gcp_newlanes.state_income(GCP_ZIP, "2021", "4")
         data["incomeCuts"] = inc_cutrec

@@ -283,6 +283,16 @@ IND_KEYS = ["ag", "mining", "manuf", "utils", "constr", "whole",
             "retail", "accom", "transport", "media", "rental", "fin",
             "prof", "admin", "pubadm", "educ", "health", "arts",
             "othersvc"]
+# the Occupation classes (2026-11-19 landing of the 2026-11-11 arc):
+# seven Oesch-style classes from ANZSCO sub-major groups, read off the
+# 2021 TableBuilder SA2 export and spread onto SA1s by G60B's stated
+# workers (.build/map/occ_lanes.py owns the lattice + spread); NOT a
+# partition — 19 sub-majors stay unclassed by the user's call
+_OCC_SPEC = importlib.util.spec_from_file_location(
+    "occ_lanes", str(Path(__file__).resolve().parents[2] / "map" / "occ_lanes.py"))
+occ_lanes = importlib.util.module_from_spec(_OCC_SPEC)
+_OCC_SPEC.loader.exec_module(occ_lanes)
+OCC_KEYS = list(occ_lanes.OCC_KEYS)
 IND18_COLS = ["P_Ag_For_Fshg_Tot", "P_Mining_Tot", "P_Manufact_Tot",
               "P_El_Gas_Wt_Waste_Tot", "P_Constru_Tot",
               "P_WhlesaleTde_Tot", "P_RetTde_Tot", "P_Accom_food_Tot",
@@ -1048,6 +1058,8 @@ def load_gcp21():
     ad4, nonfam, inc_path = income_factors()
     inc, inc_cut, inc_hishare, inc_hiqcut = income_gcp(z, ad4, nonfam)
     nlt = new_lane_tables(z, era="2021")
+    occ_lanes.drift_guard(str(CACHE / "gcp-ced.zip"))
+    occ = occ_lanes.sa1_occ({c: sum(v) for c, v in extra["G60B"].items()})
     out = {}
     for code, r in base.items():
         f09 = extra["G09F"].get(code)
@@ -1101,7 +1113,8 @@ def load_gcp21():
             + (nlt["lab"][code],) \
             + (nlt["ind"][code],) \
             + (nlt["mar"][code],) \
-            + (nlt["arr"][code],)
+            + (nlt["arr"][code],) \
+            + (occ.get(code),)
     print(f"GCP demo: G01 SA1, {n} rows")
     _GCP = (out, {"loCutWeekly": inc_cut, "hiEdgeWeekly": INC_BANDS[-1][0],
                   "hiNationalShare": inc_hishare,
@@ -1227,7 +1240,8 @@ def acc_new():
             "indNS": 0.0, "indT": 0.0,
             "marN": [0.0] * len(MAR_KEYS),
             "arrN": [0.0] * 9, "arrNsW": 0.0,
-            "profG": 0.0, "profP": 0.0}
+            "profG": 0.0, "profP": 0.0,
+            "occN": [0.0] * len(OCC_KEYS), "occD": 0.0}
 
 
 def acc_row(acc, r, w):
@@ -1290,6 +1304,14 @@ def acc_row(acc, r, w):
         acc["arrNsW"] += w * ans_
         acc["profG"] += w * pr[0]
         acc["profP"] += w * pr[1]
+    # slot 33 the Occupation classes (2026-11-19): r[33] = (classvec7,
+    # stated) on the 2021-GCP rows alone (None where the TableBuilder
+    # export prints no workers for the SA1's SA2)
+    if len(r) > 33 and r[33] is not None:
+        ov, od = r[33]
+        for i in range(len(OCC_KEYS)):
+            acc["occN"][i] += w * ov[i]
+        acc["occD"] += w * od
 
 
 def acc_merge(dst, src):
@@ -1298,8 +1320,10 @@ def acc_merge(dst, src):
               "famN", "famD", "citz", "ptN", "ptT", "ptNS",
               "cebN", "cebNS", "cebT", "ancP", "ancNS", "hlE",
               "ueN", "lfD", "indNS", "indT",
-              "arrNsW", "profG", "profP"):
+              "arrNsW", "profG", "profP", "occD"):
         dst[k] += src[k]
+    for i in range(len(OCC_KEYS)):
+        dst["occN"][i] += src["occN"][i]
     for i in range(len(REL_KEYS)):
         dst["relN"][i] += src["relN"][i]
     for i in range(6):
@@ -1377,6 +1401,11 @@ def emit_new(acc, era="2021"):
         "prof": ({"good": round(acc["profG"] / profD, 4),
                   "limited": round(acc["profP"] / profD, 4)}
                  if profD > 0 else None),
+        # the Occupation classes (2026-11-19): each class's share of the
+        # weighted stated-occupation workers; never sums to 1 by design
+        "occ": ({k: round(acc["occN"][i] / acc["occD"], 4)
+                 for i, k in enumerate(OCC_KEYS)}
+                if acc["occD"] > 0 else None),
     }
 
 
@@ -2567,6 +2596,7 @@ def build(year):
         # shared print family's own order; the GCP editions' industry
         # tables, 2021 G54/2016 G51 persons blocks)
         "indKeys": list(IND_KEYS),
+        "occKeys": list(OCC_KEYS),
         "marKeys": list(MAR_KEYS),
         # the Immigration lens's arrival-year family (2026-11-12): the
         # THIS store's basis census's own print grid (2021 GCP here);

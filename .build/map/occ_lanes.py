@@ -323,6 +323,77 @@ def spread_to_sa1(sa2_counts, sa1_stated):
     return out
 
 
+def _nfd_sums(path):
+    """{geo: Σ of the export's 'nfd' columns (codes 10/20/…/80, plus 09
+    'inadequately described' excluded)} — the major-group detail the
+    43-sub-major basis leaves out, read only so the drift guard can put
+    the export on G60B's own footing (G60B's majors carry their nfd)."""
+    with open(path, newline="", encoding="utf-8-sig") as f:
+        rows = [r for r in csv.reader(f) if any(str(c).strip() for c in r)]
+    hdr_i = next(i for i, r in enumerate(rows[:40])
+                 if sum(1 for c in r if _fold_lax(c) is not None) >= 20)
+    nfd_cols = [j for j, c in enumerate(rows[hdr_i])
+                if re.fullmatch(r"\s*[1-8]0\s*", str(c))]
+    out = {}
+    for row in rows[hdr_i + 1:]:
+        geo = _geo_of(row[:5])
+        if geo is None:
+            continue
+        out[geo] = sum(int(float(row[j] or 0)) for j in nfd_cols
+                       if j < len(row) and str(row[j]).strip())
+    return out
+
+
+def drift_guard(gcp_ced_zip, tol=0.03):
+    """The publication gate: every real CED's Σ(43 sub-majors + the nine
+    major-level nfd cells) must sit within ±tol of GCP G60B's stated
+    occupation total (Σ of its eight majors). A hard fail otherwise —
+    the export is from the wrong universe or shifted."""
+    import zipfile
+    import io
+    ced, _ = load_occ("ced-2021")
+    nfd = _nfd_sums(os.path.join(SRC, "ced-2021.csv"))
+    z = zipfile.ZipFile(gcp_ced_zip)
+    m = [n for n in z.namelist() if n.endswith("G60B_AUST_CED.csv")][0]
+    majors = ["P_Tot_Managers", "P_Tot_Professionals",
+              "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
+              "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
+              "P_Tot_Mach_oper_drivers", "P_Tot_Labourers"]
+    worst, n = 0.0, 0
+    for row in csv.DictReader(io.TextIOWrapper(z.open(m), encoding="utf-8-sig")):
+        code = row["CED_CODE_2021"]
+        g = sum(int(row[c]) for c in majors)
+        if g < 1000:
+            continue            # no-usual-address / migratory pseudo-CEDs
+        if code not in ced:
+            _fail(f"drift guard: {code} missing from ced-2021.csv")
+        t = ced[code]["stated"] + nfd.get(code, 0)
+        d = abs(t - g) / g
+        worst = max(worst, d)
+        n += 1
+        if d > tol:
+            _fail(f"drift guard: {code} export {t} v G60B {g} ({d:.1%})")
+    print(f"occ drift guard ok: {n} CEDs, worst {worst:.2%} (tol {tol:.0%})")
+    return worst
+
+
+def sa1_occ(sa1_stated, name="sa2-2021"):
+    """{sa1: (classvec in OCC_KEYS order, stated)} — each SA1's G60B
+    stated-occupation workers (`sa1_stated`) carrying its parent SA2's
+    class mix from the export (the documented within-SA2 homogeneity
+    limit). Counts land on G60B's footing, so every caller can weight-
+    add them like any other GCP count and share over Σstated. SA1s
+    whose SA2 the export doesn't print (or prints empty) get None."""
+    sa2, _ = load_occ(name)
+    sh = shares(sa2)
+    out = {}
+    for sa1, w in sa1_stated.items():
+        s = sh.get(str(sa1)[:9])
+        out[sa1] = (None if s is None or w <= 0 else
+                    (tuple(s[k] * w for k in OCC_KEYS), float(w)))
+    return out
+
+
 def shares(counts):
     """{geo: {class: share}} — class counts over the stated-occupation
     total; NOT a partition by design (19 residual sub-majors unclassed).

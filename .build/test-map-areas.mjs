@@ -48,6 +48,7 @@ const EXPECT_LANES = ["lang", "fborn", "uni", "blue", "y12", "y10less", "atsci",
   "cob.eng", "cob.ind", "cob.chn", "cob.nzl", "cob.phl", "cob.vnm", "cob.zaf", "cob.ita", "cob.lka", "cob.sct",
   "anc.english", "anc.australian", "anc.irish", "anc.scottish", "anc.chinese", "anc.italian", "anc.german", "anc.indian", "anc.filipino", "anc.dutch", "anc.vietnamese", "anc.lebanese",
   "ind.ag", "ind.mining", "ind.manuf", "ind.utils", "ind.constr", "ind.whole", "ind.retail", "ind.accom", "ind.transport", "ind.media", "ind.rental", "ind.fin", "ind.prof", "ind.admin", "ind.pubadm", "ind.educ", "ind.health", "ind.arts", "ind.othersvc",
+  "occ.socprof", "occ.biztech", "occ.farmer", "occ.farmwrk", "occ.hospmgr", "occ.trades", "occ.routine",
   "mar.marr", "mar.never", "mar.sep", "mar.div", "mar.wid",
   "ageMed", "incMed",
   "sf.irsad", "sf.irsd", "sf.ier", "sf.ieo"];
