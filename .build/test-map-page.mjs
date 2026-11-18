@@ -2707,11 +2707,23 @@ for (const y of ["sa22", "sa26"]) {
   const DMK = ["lang", "a65", "a2034", "fborn", "uni", "blue", "y12", "y10less", "atsci", "u15", "onepar", "pt", "noncit", "bigfam", "hl", "unemp"], IXS = ["irsad", "irsd", "ier", "ieo"];
   const NW = {
     nt16: { date: "2016-08-27", prev: 2012, fpformal: 92143, seats: { ALP: 18, Ind: 5, CLP: 2 }, formal: 98299, enr: 135506,
-            booths: 88, geo: 88, tcp: 88, hist: 24, swings: 109, tppsw: 17, demoYear: 2016 },
+            booths: 88, geo: 88, tcp: 88, hist: 24, swings: 109, tppsw: 17, demoYear: 2016,
+            tppshown: 25, tppn: 7, tppe: 0 },
     nt20: { date: "2020-08-22", prev: 2016, fpformal: 98299, seats: { ALP: 14, CLP: 8, TA: 1, Ind: 2 }, formal: 102172, enr: 141225,
-            booths: 116, geo: 116, tcp: 115, hist: 25, swings: 111, tppsw: 17, demoYear: null },
+            booths: 116, geo: 116, tcp: 115, hist: 25, swings: 111, tppsw: 17, demoYear: null,
+            tppshown: 24, tppn: 4, tppe: 4 },
     nt24: { date: "2024-08-24", prev: 2020, fpformal: 102172, seats: { CLP: 17, ALP: 4, Ind: 3, GRN: 1 }, formal: 101741, enr: 153249,
-            booths: 134, geo: 134, tcp: 84, hist: 25, swings: 80, tppsw: 14, demoYear: null },
+            booths: 134, geo: 134, tcp: 84, hist: 25, swings: 80, tppsw: 14, demoYear: null,
+            tppshown: 24, tppn: 9, tppe: 9 },
+  };
+  // the notional lane's exemplar rows (notional-adjudication.md): nt16's are
+  // NTEC-run alternative counts; nt20/24's are Antony Green's published
+  // estimates. Nelson nt24 also pins the tcp upgrade off the DOP table
+  const NOTIONAL_PINS = {
+    nt16: { "Nelson": { tpp: [1360, 1803, null], tppn: 1 } },
+    nt24: { "Fannie Bay": { tpp: [2442, 2219, null], tppn: 1, tppe: 1 },
+            "Nelson": { tcpVotes: [3949, 1155], tpp: [1047, 4057, null], tppn: 1, tppe: 1 },
+            "Mulka": { bareTpp: true } },
   };
   for (const [frame, ora] of Object.entries(NW)) {
     const res = JSON.parse(R(`map/data/res-${frame}.json`));
@@ -2743,6 +2755,23 @@ for (const y of ["sa22", "sa26"]) {
     for (const d of res.divs) for (const c of d.c) { assert.ok(Number.isFinite(c[5]), `${frame} ${d.n}: c[5] finite for ${c[0]}`); if (c[5] !== 0) nSw++; }
     assert.equal(nSw, ora.swings, `${frame}: ${ora.swings} candidates moved on the previous election`);
     assert.equal(res.divs.filter((d) => d.tpp && Number.isFinite(d.tpp[2])).length, ora.tppsw, `${frame}: ${ora.tppsw} classic-pair 2PP swings where both elections finished Labor v CLP`);
+    // the notional lane: majors-pair figures where the final count wasn't the
+    // majors (notional-2pp.json's adjudicated set), with tpp[2] swings never
+    // hung off them (the tppn/tppe markers gate the past-chain stamper)
+    assert.equal(res.divs.filter((d) => d.tpp != null).length, ora.tppshown, `${frame}: ${ora.tppshown} districts carry a two-party figure`);
+    assert.equal(res.divs.filter((d) => d.tppn).length, ora.tppn, `${frame}: ${ora.tppn} districts carry a notional (non-classic) majors figure`);
+    assert.equal(res.divs.filter((d) => d.tppe).length, ora.tppe, `${frame}: ${ora.tppe} of those are estimates`);
+    assert.ok(res.divs.every((d) => d.tpp == null || Number.isFinite(d.tpp[0]) && Number.isFinite(d.tpp[1])), `${frame}: every tpp row is a vote pair`);
+    assert.ok(res.divs.every((d) => !(d.tppn || d.tppe) || d.tpp != null && !Number.isFinite(d.tpp[2])), `${frame}: notional/estimated rows never carry a swing`);
+    for (const [seat, pin] of Object.entries(NOTIONAL_PINS[frame] || {})) {
+      const dd = res.divs.find((x) => x.n === seat);
+      assert.ok(dd, `${frame}: ${seat} on the roster`);
+      if (pin.bareTpp) assert.ok(!("tpp" in dd) && !("tppe" in dd) && !("tppn" in dd), `${frame} ${seat}: stays tpp-less (a major never stood)`);
+      if (pin.tpp) assert.deepEqual(dd.tpp, pin.tpp, `${frame} ${seat}: adjudicated notional figure (notional-adjudication.md)`);
+      if (pin.tppn) assert.equal(dd.tppn, 1, `${frame} ${seat}: notional marker`);
+      if (pin.tppe) assert.equal(dd.tppe, 1, `${frame} ${seat}: estimate marker`);
+      if (pin.tcpVotes) assert.deepEqual([dd.tcp[0][1], dd.tcp[1][1]], pin.tcpVotes, `${frame} ${seat}: canonical final count rides the division's own DOP table (the summary lane never printed one)`);
+    }
     const B = res.booths;
     const LANES16 = ["d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon", "v", "inf", "tpp", "tcp", "fl", "dec", "vdec"];
     for (const k of LANES16) assert.ok(Array.isArray(B[k]) && B[k].length === ora.booths, `${frame} booths.${k}: ${ora.booths} rows`);

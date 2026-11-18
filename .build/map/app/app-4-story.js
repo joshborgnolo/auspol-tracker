@@ -721,7 +721,8 @@ function statBreakdown(m, st, kind, rows) {
     const sw = swingFigure(A.tppSw);
     // metro types set as compound modifiers over the figures: "Inner-metro primaries"
     const nm = kind === "classes" ? r.short.replace(" ", "-") : r.short;
-    body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(nm)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(nm)} 2PP${Number.isFinite(A.tpp) ? ` (margin of ${f1(Math.abs(A.tpp - 50))})` : ""}</span>${pair}${sw}${A.nTpp != null && A.nTpp < A.idx.length ? `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats with a counted Labor–Coalition result.</span>` : ""}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
+    const tppCoverNote = A.nTpp != null && A.nTpp < A.idx.length ? (() => { const ne = A.idx.filter((ii) => m.res.divs[ii].tppe).length; return `<span class="st-note">2PP covers ${A.nTpp} of ${A.idx.length} seats${ne ? `; ${ne} are estimated` : ""}.</span>`; })() : "";
+    body = `<div class="st-stat st-pv-full" aria-live="polite" aria-atomic="true"><span class="st-lab">${esc(nm)} primaries</span>${statPrimaryGrid(m, A)}<span class="st-lab st-pv-tpp-label">${esc(nm)} 2PP${Number.isFinite(A.tpp) ? ` (margin of ${f1(Math.abs(A.tpp - 50))})` : ""}</span>${pair}${sw}${tppCoverNote}${isNowY(m.year) ? `<span class="st-note">${frameBaseY(m.year)} election results</span>` : ""}</div>`;
   }
   return `<section class="st-pv" data-pv-kind="${kind}" data-pv-area="${esc(st)}" aria-label="${esc(title)}"><div class="st-pv-head"><h4>${esc(title)}</h4><button type="button" class="st-pv-control" data-pv-action="cycle" title="Cycle through ${title.toLowerCase()}" aria-label="Show ${esc(next.label)} primaries and 2PP" aria-controls="${id}">${cycleIcon}</button><button type="button" class="st-pv-control" data-pv-action="list" title="${view.mode === 'list' ? 'Collapse list' : 'Show all results'}" aria-label="${view.mode === 'list' ? 'Collapse' : 'Show all'} ${title.toLowerCase()}" aria-expanded="${view.mode === 'list'}" aria-controls="${id}">${listIcon}</button></div><div id="${id}"${view.mode === "closed" ? " hidden" : ""}>${body}</div></section>`;
 }
@@ -1574,7 +1575,26 @@ function storyArea(m, st) {
   let h = head(title, meta, winnerish || quiet ? "" : hed, quiet ? "" : dek, figs, todayDek);
   if (note) h += `<p class="st-note">${note}</p>`;
   // a state election's two-party row counts only the classic pairs: say so under the figures
-  if (isState() && A.tpp != null) { const classicN = idx.filter((i) => m.divs[i].tpp != null).length; h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`; }
+  if (isState() && A.tpp != null) {
+    const estN = idx.filter((i) => m.divs[i].tppEst).length, notiN = idx.filter((i) => m.divs[i].tppNotional && !m.divs[i].tppEst).length;
+    if (isNT() && (estN || notiN)) {
+      // the Territory's composition note: the NTEC ran an official alternative
+      // count for nt16's non-classic finals; nt20/24's rows are Antony Green's
+      // published estimates (notional-adjudication.md), and a majors-absence
+      // (Mulka) is always called out by name
+      const miss = idx.filter((i) => m.divs[i].tpp == null);
+      const missTxt = miss.length
+        ? ` ${miss.length === 1 ? "Mulka" : miss.map((k) => ds(m.divs[k].n)).join(" and ")} can carry no such figure — ${(() => { const d = m.divs[miss[0]]; return d.c.some((c) => c.b === "alp") ? `the ${coalW(0)}` : "Labor"; })()} didn't stand there in ${FRAME_YEAR[m.year]}.`
+        : "";
+      const compTxt = estN
+        ? `The ${estN + notiN} districts whose count didn't finish Labor against ${coalW(0)} carry an estimated two-party figure, as computed and published by Antony Green.`
+        : `The ${notiN} districts whose count didn't finish Labor against ${coalW(0)} carry the ${commX()}’s own alternative two-party count.`;
+      h += `<p class="st-note">${compTxt}${missTxt}</p>`;
+    } else {
+      const classicN = idx.filter((i) => m.divs[i].tpp != null).length;
+      h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`;
+    }
+  }
   if (m.res.coverage) h += `<p class="st-note">${esc(m.res.coverage.note)}</p>`;
   // the changes since the election, listed straight under the figures they explain
   if (isNowY(m.year) && list.length) {
@@ -1684,7 +1704,13 @@ function seatHedDek(m, d) {
     }
     case "tpp": {
       if (axisNow(m) !== "AC") return axisSeatHedDek(m, d);
-      if (d.tpp == null) return { hed: `There was no Labor v ${oppNameW()} count in ${ds(d.n)}`, dek: isState() ? `The ${commX()} publishes a two-party count only where the final pair is Labor against ${coalW(0)}.` : d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
+      if (d.tpp == null) {
+        // on NT frames a bare tpp means a major never stood (Mulka 2020/2024)
+        // — say that, not the generic "the commission doesn't publish one"
+        const standAlp = d.c.some((c) => c.b === "alp"), standLnp = d.c.some((c) => c.b === "lnp");
+        if (isNT() && (!standAlp || !standLnp)) return { hed: `There was no Labor v ${oppNameW()} count in ${ds(d.n)}`, dek: `${standAlp ? `The ${coalW(0)}` : "Labor"} never stood in ${ds(d.n)} at the ${yearLabel(m.year)} election, so no Labor v ${coalW(0)} count can exist.` };
+        return { hed: `There was no Labor v ${oppNameW()} count in ${ds(d.n)}`, dek: isState() ? `The ${commX()} publishes a two-party count only where the final pair is Labor against ${coalW(0)}.` : d.by ? "Labor didn’t stand at the by-election, so the AEC counted the final two only: One Nation against the independent." : "" };
+      }
       if (S.tppMode === "swing") {
         const s = d.tppSw;
         const hed = s == null ? `${ds(d.n)} has no recorded swing` : Math.abs(s) < 0.05 ? `There was no two-party swing in ${ds(d.n)}` : `${ds(d.n)} swung ${pts(s)} to ${s > 0 ? "Labor" : coalW()}`;
@@ -1694,7 +1720,10 @@ function seatHedDek(m, d) {
       const lead = d.tpp >= 50;
       const hed = `${lead ? "Labor" : coalW(1)} won ${f1(lead ? d.tpp : 100 - d.tpp)}% of the two-party vote in ${ds(d.n)}`;
       const sp = swingPhrase(d.tppSw, prev);
-      const dek = d.classic ? `The final count was Labor against ${coalW()}${sp ? `, ${sp}` : ""}.` : `The final two here were ${ds(rn)} and ${ds(wn)}, so this is the ${isState() ? commX() + "’s" : "AEC’s"} notional count of Labor against ${coalW()}${sp ? `, ${sp}` : ""}.`;
+      const dek = d.classic ? `The final count was Labor against ${coalW()}${sp ? `, ${sp}` : ""}.`
+        : d.tppEst ? `The final two here were ${ds(rn)} and ${ds(wn)}, so this is an estimated Labor-against-${coalW(0)} figure — computed and published by Antony Green, not the ${commX()}.${sp ? ` ${sp}.` : ""}`
+        : d.tppNotional ? `The final two here were ${ds(rn)} and ${ds(wn)}, and the ${commX()} ran an alternative count of the ballots against the majors' pair afterward — that's the count above.${sp ? ` ${sp}.` : ""}`
+        : `The final two here were ${ds(rn)} and ${ds(wn)}, so this is the ${isState() ? commX() + "’s" : "AEC’s"} notional count of Labor against ${coalW()}${sp ? `, ${sp}` : ""}.`;
       return { hed, dek };
     }
     case "fp": {
@@ -1804,7 +1833,10 @@ function storyDiv(m, i) {
      minority coalition partner comes through coalW on state frames) */
   if (d.tpp != null && !d.classic) {
     const coal = coalW(1).replace(/^The /, "");
-    const two = twoPartyFigures(`Two-party preferred (notional, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coal, "", true, ["Labor", coal]);
+    // nt20/24 rows are Antony Green's published estimates (tppe) — said so
+    // in the label rather than passing them off as a commission's count
+    const basis = d.tppEst ? "estimated" : "notional";
+    const two = twoPartyFigures(`Two-party preferred (${basis}, margin of ${tightFmt(Math.abs(d.tpp - 50))})`, d.tpp, "alp", "Labor", 100 - d.tpp, "lnp", coal, "", true, ["Labor", coal]);
     figs += `<div class="st-sec"><div class="st-stat st-secstat">${two}${swingFigure(d.tppSw)}</div></div>`;
   }
   const seatFind = S.lens === "winner" && (hed || dek);

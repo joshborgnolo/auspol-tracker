@@ -1,0 +1,47 @@
+{
+  "_doc": "Notional Labor-v-CLP two-party figures for NT Legislative Assembly divisions whose final count was NOT Labor v Country Liberal. Rows are [alp_votes, clp_votes]; Mulka 2020 (no CLP stood) and Mulka 2024 (no ALP stood) can carry nothing. Provenance and verification trail: .build/map/src/nt/notional-adjudication.md. Do not edit by hand without re-running the check in build_nt_common (the frame's non-classic-with-both-majors set must equal this file's division set exactly).",
+  "nt16": {
+    "provenance": "official-alternative",
+    "credit": "Alternative two-party preferred counts undertaken post-election by the NT Electoral Commission (published in Antony Green's NT2016 summary of results, abc.net.au · ABC 'Prepared by Antony Green' pdf)",
+    "sourceUrl": "https://www.abc.net.au/dat/news/elections/nt/2020/guide/NT2016_Results.pdf",
+    "fetched": "2026-11-19",
+    "divisions": {
+      "Araluen": [1868, 2308],
+      "Barkly": [1864, 1132],
+      "Blain": [2056, 1693],
+      "Goyder": [1679, 1551],
+      "Karama": [2037, 1196],
+      "Nelson": [1360, 1803],
+      "Nhulunbuy": [2026, 1049]
+    }
+  },
+  "nt20": {
+    "provenance": "estimated-green",
+    "credit": "Estimated two-party count by Antony Green, published on his election analysis blog and carried in each seat's result table (Wikipedia's per-seat boxes cite the same source)",
+    "sourceUrl": "https://antonygreen.com.au/northern-territory-election-analysis-of-results/",
+    "fetched": "2026-11-19",
+    "divisions": {
+      "Araluen": [1632, 2732],
+      "Arnhem": [1977, 947],
+      "Goyder": [1671, 3024],
+      "Nelson": [1241, 3320]
+    }
+  },
+  "nt24": {
+    "provenance": "estimated-green",
+    "credit": "Alternative two-party preferred counts per Antony Green's post-election summary (abc.net.au '2024 Northern Territory Election – Summary of Results', prepared by Antony Green, December 2024)",
+    "sourceUrl": "https://www.abc.net.au/dat/news/elections/nt/2024/guide/NT2024-ResultSummary.pdf",
+    "fetched": "2026-11-19",
+    "divisions": {
+      "Araluen": [1540, 2481],
+      "Blain": [1137, 2938],
+      "Braitling": [1753, 2445],
+      "Fannie Bay": [2442, 2219],
+      "Goyder": [1245, 3819],
+      "Johnston": [2224, 1983],
+      "Katherine": [1157, 2673],
+      "Nelson": [1047, 4057],
+      "Nightcliff": [2908, 1559]
+    }
+  }
+}

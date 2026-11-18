@@ -37,8 +37,17 @@ corrected at parse time, per PSEPHOS_2012_ROLL_OVERRIDES.)
 Two-party semantics: district TCP pairs emit as-is; the classic line
 (district tpp) covers ALP-v-CLP pairs — the Country Liberal Party rides
 the lnp fam everywhere on /map/ (FAM(CLP)="lnp") which is also how the
-app's `classic` predicate meets it. Party long-names come off each page's
-Parties register, the flow machinery's LONG_NAMES map as fallback.
+app's `classic` predicate meets it. Divisions whose final pair ISN'T the
+majors still carry a tpp — filed from .build/map/src/nt/notional-2pp.json
+and marked `tppn` (nt16's seven are NTEC's own alternative counts; nt20/24's
+also carry `tppe`, Antony Green's published estimates). NTEC publishes no
+notional counts of its own since 2016, so these were ADJUDICATED, never
+computed here — the why and the whole sourcing trail live in
+.build/map/src/nt/notional-adjudication.md. Mulka 2020 (no CLP stood) and
+2024 (no ALP stood) can carry nothing and stay tpp-less. Notional and
+estimated rows never get tpp[2] swings (an estimate squared; past_common
+skips both markers). Party long-names come off each page's Parties
+register, the flow machinery's LONG_NAMES map as fallback.
 
 usage: python3 -I .build/map/build_nt<yy>_data.py map/data
 then:  MAPSHAPER="$PWD/node_modules/.bin/mapshaper" \\
@@ -50,6 +59,48 @@ import nt_parse
 
 REPO = nt_parse.REPO
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
+
+#: notional Labor-v-CLP figures for divisions whose final pair wasn't the
+#: majors — provenance per frame and the "don't compute our own" call live
+#: in .build/map/src/nt/notional-adjudication.md
+NOTIONAL = json.load(open(os.path.join(nt_parse.SRCN, "notional-2pp.json")))
+
+
+def notional_for_frame(frame, src, ffail):
+    """The frame's {division: (alp, clp), est: bool} union, verified against
+    the adjudicated file: the file's division set must equal exactly the
+    parsed set of non-classic finals where BOTH majors stood (Mulka 2020's
+    missing CLP / 2024's missing ALP are the tested counterexamples)."""
+    spec = NOTIONAL[frame]
+    divs, klass = spec["divisions"], []
+    expect = {}
+    for x in src["districts"]:
+        bs = {c["b"] for c in x["cands"] if c["key"] in {t["key"] for t in x["tcp"]}}
+        if bs == {"alp", "lnp"}:
+            klass.append(x["name"])
+            continue
+        alive = {c["b"] for c in x["cands"]}
+        if {"alp", "lnp"} <= alive:
+            expect[x["name"]] = spec["provenance"]
+    if set(expect) != set(divs):
+        ffail(f"notional 2PP set drift: parsed non-classic-with-majors"
+              f" {sorted(expect)} vs notional-2pp.json {sorted(divs)}"
+              f" — review the adjudication doc, never silently patch the json")
+    out = {}
+    for name, row in divs.items():
+        if not (isinstance(row, list) and len(row) == 2 and all(isinstance(v, int) and v >= 0 for v in row)):
+            ffail(f"notional-2pp.json {frame}/{name}: row shape drifted {row!r}")
+        out[name] = (row[0], row[1], spec["provenance"] == "estimated-green")
+    return out, len(klass)
+
+
+#: the territory two-party totals Antony Green's summaries publish, where
+#: his editions carry one (nt20's edition lists region rows only) — the
+#: build's mixed classic+notional+estimate sum prints beside them as a
+#: whole-frame cross-check (his classic rows ride NTEC's DOP lane, so
+#: ±~30 vote deltas against our summary-canonical totals are expected)
+PUBLISHED_2PP_TOTAL = {"nt16": (51533, 38123), "nt24": (41102, 57583)}
+
 
 FRAMES = {
     "nt16": {"year": "nt16", "date": "2016-08-27", "jurisdiction": "NT",
@@ -107,6 +158,7 @@ def data_main(frame):
     C = FRAMES[frame]
     src = nt_parse.load(frame)
     demo, seifa, cob_keys = load_census(frame, ffail)
+    notional, n_classic = notional_for_frame(frame, src, ffail)
 
     D = []
     seats = collections.Counter()
@@ -146,6 +198,7 @@ def data_main(frame):
         tcp = [[pair_rows[0], pair_votes[0]], [pair_rows[1], pair_votes[1]]]
         pair_buckets = {rows[pair_rows[0]]["b"], rows[pair_rows[1]]["b"]}
         tpp = None
+        tpp_est = False
         if pair_buckets == {"alp", "lnp"}:
             ia = pair_rows[0] if rows[pair_rows[0]]["b"] == "alp" else pair_rows[1]
             ib = pair_rows[1] if ia == pair_rows[0] else pair_rows[0]
@@ -154,6 +207,13 @@ def data_main(frame):
             tpp = [va, vb, None]
             tpp_tot[0] += va
             tpp_tot[1] += vb
+        else:
+            nrec = notional.get(name)
+            if nrec:
+                va, vb, tpp_est = nrec
+                tpp = [va, vb, None]
+                tpp_tot[0] += va
+                tpp_tot[1] += vb
 
         for bk, b in enumerate(x["booths"]):
             types_seen[b["ty"]] += 1
@@ -199,6 +259,13 @@ def data_main(frame):
         }
         if tpp:
             rec["tpp"] = tpp
+        if tpp and pair_buckets != {"alp", "lnp"}:
+            # the figure comes from the adjudicated notional file (nt16's is
+            # NTEC's own alternative count; nt20/24's is an AG estimate) —
+            # tppn tells past_common it's not a classic pair's row
+            rec["tppn"] = 1
+        if tpp_est:
+            rec["tppe"] = 1
         D.append(rec)
         tot_formal += x["formal"]
         tot_inf += x["informal"]
@@ -223,11 +290,23 @@ def data_main(frame):
     del cob_keys
     os.makedirs(OUT, exist_ok=True)
     p = os.path.join(OUT, f"data-{frame}.json")
+    # ledger for the print line: classic = n_classic; estimated/notional
+    # split of the adjudicated notional rows by tppe
+    n_est = sum(1 for d in D if d.get("tppe"))
+    n_notional = len(notional) - n_est
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
     tp = 100 * tpp_tot[0] / (tpp_tot[0] + tpp_tot[1]) if tpp_tot[0] or tpp_tot[1] else None
+    mix = n_classic + n_notional + n_est
+    pub = PUBLISHED_2PP_TOTAL.get(frame)
+    if pub:
+        pa = 100 * pub[0] / (pub[0] + pub[1])
+        print(f"  {frame} published-2PP cross-check: ours ALP {round(tp, 2)}%"
+              f" ({tpp_tot[0]}/{tpp_tot[1]}) vs ABC-published {round(pa, 2)}%"
+              f" ({pub[0]}/{pub[1]}) — DOP-vs-summary lane deltas, see adjudication")
     print(f"{frame} divisions {len(D)} | seats {dict(seats)}"
-          f" | classic-2PP ALP {round(tp, 2) if tp else '-'}%"
+          f" | 2PP: ALP {round(tp, 2) if tp else '-'}% over {mix} of 25"
+          f" ({n_classic} classic + {n_notional} notional + {n_est} estimated)"
           f" | informal {round(100 * tot_inf / (tot_inf + tot_formal), 2)}%"
           f" | enrolled {tot_enrolled} | booths {len(B['id'])} {dict(sorted(types_seen.items()))}"
           f" | geocoded {geocoded} | booth-tcp {tcp_booths}"

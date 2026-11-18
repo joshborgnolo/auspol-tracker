@@ -93,6 +93,38 @@ BUCKETS = {"ALP": "alp", "CLP": "lnp", "GRN": "grn", "Greens": "grn",
 #: roll figure drifts. A drift outside this pinned list fails loudly.)
 PSEPHOS_2012_ROLL_OVERRIDES = {"Sanderson": 5100}
 
+#: adjudicated NTEC self-contradictions between a division's Electorate
+#: summary TCP row and its Distribution-of-preferences final progressive —
+#: the DOP prints the count as it stood mid-static while the summary lane
+#: (the one the pipeline's per-centre identities prove against) got a late
+#: recount bump. (year, slug) -> per-candidate vote delta, summary minus
+#: DOP-final. The summary stays canonical; an UNPINNED drift fails loudly.
+DOP_SUMMARY_DIVERGENCES = {
+    # 2016 era — the era's DOP is a mid-static snapshot; the summary and the
+    # per-centre TCP table agree (Σ centre rows proves summary) so the
+    # summary lane stays canonical
+    (2016, "barkly"): {0: -3},           # McADAM 1260 → 1257 (exhaust 219→222)
+    (2016, "daly"): {1: -5, 6: 9},       # VENES 1622→1617, HIGGINS 1763→1772 (exh 345→341)
+    (2016, "drysdale"): {4: 7},          # CLP 1964 → 1971
+    (2016, "namatjira"): {1: -1},        # ALP 1236 → 1235
+    # 2020 era — same disease; gwoja's ±31 is a declared-recheck reallocation
+    (2020, "arnhem"): {0: 4, 3: -4},
+    (2020, "barkly"): {0: 1, 3: -1},
+    (2020, "braitling"): {0: -2, 2: 2},
+    (2020, "casuarina"): {2: -2, 3: 2},
+    (2020, "drysdale"): {1: -2, 4: 2},
+    (2020, "fannie-bay"): {2: 1, 4: -1},
+    (2020, "gwoja"): {0: 31, 1: -31},
+    (2020, "johnston"): {1: -1, 2: 1},
+    (2020, "katherine"): {1: 8, 3: -8},
+    (2020, "nelson"): {0: -1, 1: 1},
+    (2020, "port-darwin"): {0: -8, 3: 8},
+    # 2024 era — mostly clean; three ±1..±6 leftovers
+    (2024, "drysdale"): {0: 1, 2: -1},
+    (2024, "karama"): {1: -5, 3: -6},
+    (2024, "port-darwin"): {4: 1},
+}
+
 #: long party names for eras whose pages carry no Parties table (2012) and
 #: as the fallback for short codes their modern pages don't give
 LONG_NAMES = {"ALP": "Australian Labor Party", "CLP": "Country Liberal Party",
@@ -172,6 +204,166 @@ def rows_of(tbl):
         cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", r, re.S)
         out.append([clean_txt(c) for c in cells])
     return out
+
+
+def _cand_col_match(cands, title, where):
+    """A results-table column heading "Given SURNAME (AB)" -> candidate index
+    (the surname-token discipline of the summary's own parser)."""
+    mm = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", title.strip())
+    if not mm:
+        fail(f"{where}: column head {title!r} isn't a 'Name (Party)' cell")
+    hdr_sur = mm.group(1).split()[-1].upper()
+    hit = [i for i, c in enumerate(cands) if norm_key(c["sur"]) == norm_key(hdr_sur)
+           and c["ab"] == mm.group(2).strip()]
+    if not hit:
+        hit = [i for i, c in enumerate(cands) if norm_key(c["sur"]) == norm_key(hdr_sur)]
+    if not hit:
+        fail(f"{where}: column {title!r} off the summary roster")
+    return hit[0]
+
+
+def parse_html_dop(year, slug, h, cands, formal, no2cp):
+    """The division's "Distribution of preferences" table -> per-round rows
+    {excluded (cand idx or None on first-prefs), d (per-candidate transfers),
+    exh (that round's exhaust transfer, 0 when the era prints no Exhausted
+    column)}. Asserted fail-loud against itself: printed progressives are
+    replayed from first preferences and must equal prev+deltas column by
+    column; the excluded candidate's own cell negates their standing pile;
+    the LIVE rows always sum with exhaust to the division formal. Two-
+    candidate seats (no table) and quota-on-primaries seats fall to None."""
+    def where(what):
+        return f"{year}/{slug}: DOP {what}"
+    tbl = find_table_after(h, "Distribution of preferences")
+    if tbl is None:
+        return None
+    rows = rows_of(tbl)
+    if not rows or rows[0][:2] != ["Count", "Comments"]:
+        fail(where("header drifted"))
+    head = [c.strip() for c in rows[0]]
+    cand_cols = []      # (col idx, kind, payload) kind in {"cand","exh","meta"}
+    has_exh = False
+    for ci in range(2, len(head)):
+        t = head[ci].rstrip(".")
+        if t.lower() in ("total", "quota"):
+            cand_cols.append((ci, "meta", None))
+        elif t.lower() == "exhausted":
+            cand_cols.append((ci, "exh", None))
+            has_exh = True
+        else:
+            cand_cols.append((ci, "cand", _cand_col_match(cands, t, where("header"))))
+    if len([c for c in cand_cols if c[1] == "cand"]) != len(cands):
+        fail(where("candidate columns don't cover the summary roster"))
+
+    def num(cell):
+        s = cell.strip().replace(",", "").replace("(", "-").replace(")", "")
+        if s in ("", "–", "-"):
+            return 0
+        return int(s)
+
+    rounds = []
+    piles = {ci: 0 for ci in range(len(cands))}
+    exh_pile = 0
+    cur = None
+    first = True
+    for r in rows[1:]:
+        if len(r) < len(head):
+            # rows can print ragged on the 2016-era tables; pad, never mask
+            r = r + [""] * (len(head) - r)
+        comment = re.sub(r"\s+", " ", r[1]).strip().rstrip(".")
+        if comment.lower() == "progressive":
+            if cur is None:
+                fail(where("Progressive row without a transfer row"))
+            got = {}
+            exh_got = exh_pile
+            for ci, kind, pay in cand_cols:
+                if kind == "cand":
+                    got[pay] = num(r[ci])
+                elif kind == "exh":
+                    exh_got = num(r[ci])
+            quirks = []
+            for ci in range(len(cands)):
+                if piles[ci] != got.get(ci):
+                    # 2016-era print quirk: the just-excluded candidate's own
+                    # progressive cell re-prints their negated pile on their
+                    # exclusion round (Katherine '16); 0 everywhere later.
+                    ex_now = cur.get("excluded")
+                    pre = cur.get("pre", {})
+                    if ex_now is not None and ci == ex_now and got.get(ci) == -pre.get(ci, 0):
+                        quirks.append(cands[ci]["name"])
+                    else:
+                        fail(where(f"round {len(rounds)} progressive {got.get(ci)} !="
+                                   f" replayed {piles[ci]} (cand {cands[ci]['name']!r})"))
+            if quirks:
+                print(f"  nt-parse {year}/{slug}: DOP print quirk (excluded column"
+                      f" re-prints its negated pile): {', '.join(quirks)}")
+            if exh_pile != exh_got:
+                fail(where(f"round {len(rounds)} exhaust {exh_got} != replayed {exh_pile}"))
+            live = sum(piles.values()) + (exh_got if has_exh else 0)
+            if live != formal:
+                fail(where(f"round {len(rounds)} live {live} != formal {formal}"))
+            rounds.append(cur)
+            cur = None
+            continue
+        if cur is not None:
+            fail(where(f"transfer row {comment!r} lacks its Progressive row"))
+        nums = {}
+        cur_exh = 0
+        for ci, kind, pay in cand_cols:
+            if kind == "cand":
+                nums[pay] = num(r[ci])
+            elif kind == "exh":
+                cur_exh = num(r[ci])
+        if first:
+            if "first preferences" not in comment.lower():
+                fail(where(f"first transfer row is {comment!r}, want First preferences"))
+            d = {ci: nums.get(ci, 0) for ci in range(len(cands))}
+            if any(v < 0 for v in d.values()) or sum(d.values()) != formal or cur_exh != 0:
+                fail(where(f"first preferences don't sum to formal "
+                           f"({sum(d.values())} of {formal}, exh {cur_exh})"))
+            excluded = None
+        else:
+            m = re.match(r"(.*?)\s+excluded\s*\.?$", comment, re.I)
+            if not m:
+                fail(where(f"transfer comment unparsable {comment!r}"))
+            token = m.group(1).strip()
+            mm = re.match(r"^(.*?)\s*\(([^)]+)\)\s*$", token)
+            if mm:
+                ex = _cand_col_match(cands, f"{mm.group(1)} ({mm.group(2)})", where("excluded name"))
+            else:
+                sur = token.split()[-1].upper()
+                hit = [i for i, c in enumerate(cands) if norm_key(c["sur"]) == norm_key(sur)]
+                if len(hit) != 1:
+                    fail(where(f"excluded {token!r} matches {len(hit)} candidates"))
+                ex = hit[0]
+            # exactly the excluded candidate's cell goes negative, of their pile
+            d = {ci: nums.get(ci, 0) for ci in range(len(cands))}
+            if -d.get(ex, 0) != piles[ex]:
+                fail(where(f"excluded {cands[ex]['name']!r} cell {d.get(ex, 0)}"
+                           f" doesn't negate their pile {piles[ex]}"))
+            others_neg = [cands[ci]["name"] for ci in d if ci != ex and d[ci] < 0]
+            if others_neg or cur_exh < 0:
+                fail(where(f"unexpected negatives {others_neg} exh {cur_exh}"))
+            d[ex] = -piles[ex]
+            excluded = ex
+        pre = dict(piles)
+        for ci, dv in d.items():
+            piles[ci] += dv
+        exh_pile += cur_exh
+        cur = {"d": d, "excluded": excluded, "exh": cur_exh, "pre": pre}
+        first = False
+    if cur is not None:
+        fail(where("table ends on a transfer row (missing Progressive)"))
+    if not rounds:
+        return None
+    live = [(ci, p) for ci, p in piles.items() if p > 0]
+    if len(live) == 1 and no2cp:
+        # quota cleared on primaries — the printed count just stops
+        return None
+    if len(live) != 2:
+        fail(where(f"final round leaves {len(live)} candidates, want 2"))
+    tcp = [(ci, p) for ci, p in live]
+    return {"rounds": rounds, "tcp": tcp, "has_exh": has_exh,
+            "exhausted": exh_pile if has_exh else 0}
 
 
 def parse_html_division(year, slug):
@@ -335,6 +527,7 @@ def parse_html_division(year, slug):
 
     # --- division tcp pair from the summary (or FP on two-candidate seats)
     tcp = []
+    fabricated = False
     if len(cands) == 2:
         tcp = [(0, cands[0]["prim"]), (1, cands[1]["prim"])]
         tcp_pair_names = [0, 1] if not tcp_pair_names else tcp_pair_names
@@ -342,18 +535,53 @@ def parse_html_division(year, slug):
         tcp_rows = [c for c in cands if c["tcpv"] is not None]
         if len(tcp_rows) != 2:
             if no2cp and tcp_pair_names == []:
-                # the winner cleared quota on primaries — NTEC prints no
-                # preference count; the final pair is the primary top-two
+                # NTEC prints no TCP lane for the division: fall back below
+                # to the DOP table's own final pair (the full preferential
+                # count IS on the page — e.g. Nelson 2024), and only when
+                # nothing was counted at all does the primary top-two stand.
                 top2 = sorted(range(len(cands)), key=lambda i: -cands[i]["prim"])[:2]
                 tcp = [(i, cands[i]["prim"]) for i in top2]
+                fabricated = True
             else:
                 fail(f"{year}/{slug}: {len(tcp_rows)} tcp rows on a >2-candidate seat")
         else:
             tcp = [(cands.index(c), c["tcpv"]) for c in tcp_rows]
+
+    # --- Distribution of preferences (independently asserted against the
+    # summary's own tcp pair — the two tables must agree to the vote, bar
+    # adjudicated late-recount drifts pinned above)
+    dop = parse_html_dop(year, slug, h, cands, formal, no2cp) if len(cands) > 2 else None
+    if fabricated and dop is not None:
+        print(f"  nt-parse {year}/{slug}: summary prints no TCP — the final"
+              f" pair comes from the DOP table itself {dict(dop['tcp'])}")
+        tcp = list(dop["tcp"])
+        no2cp = False
+        fabricated = False
+    if fabricated:
+        print(f"  nt-parse {year}/{slug}: no TCP or DOP — final pair"
+              f" fabricated from primaries")
+    if dop is not None and not fabricated:
+        d_tcp = dict(dop["tcp"])
+        s_tcp = dict(tcp)
+        if set(d_tcp) != set(s_tcp):
+            fail(f"{year}/{slug}: DOP final pair {sorted(d_tcp)} != summary tcp pair {sorted(s_tcp)}")
+        drift = {ci: s_tcp[ci] - d_tcp[ci] for ci in s_tcp if s_tcp[ci] != d_tcp[ci]}
+        pinned = DOP_SUMMARY_DIVERGENCES.get((year, slug))
+        if drift:
+            if pinned is None:
+                fail(f"{year}/{slug}: DOP final {sorted(d_tcp.items())} !="
+                     f" summary tcp {sorted(s_tcp.items())} — adjudicate against"
+                     f" NTEC's own pages and pin in DOP_SUMMARY_DIVERGENCES deliberately")
+            if drift != pinned:
+                fail(f"{year}/{slug}: DOP-summary drift {drift} !="
+                     f" pinned {pinned} — the adjudication aged out; re-check the page")
+            print(f"  nt-parse {year}/{slug}: DOP-summary divergence {drift}"
+                  f" rides its pin (summary canonical)")
+
     return {"display": display, "cands": cands, "formal": formal,
             "informal": informal, "enrolled": enrolled,
             "venues": venue_rows, "booth_tcp": booth_tcp,
-            "tcp": tcp, "pn_of": pn_of, "no2cp": no2cp}
+            "tcp": tcp, "pn_of": pn_of, "no2cp": no2cp, "dop": dop}
 
 
 # ------------------------------------------------------------- 2012 era
@@ -558,6 +786,7 @@ def load_frame_year(year):
                           "tcp": tcp, "elected": elected,
                           "formal": x["formal"], "informal": x["informal"],
                           "enrolled": x["enrolled"],
+                          "dop": x.get("dop"),
                           "zero_rows": 0})
     out = {"year": year, "districts": districts}
     CACHED[year] = out
