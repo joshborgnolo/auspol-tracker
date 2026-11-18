@@ -5204,6 +5204,135 @@
      "Source: News24 Pulse / YouGov (Nov 10 - Nov 17, 2026)"
     ]
    }
+  },
+  {
+   "id": "essential-spending-cut-back",
+   "waveDate": "2026-11-17",
+   "fieldwork": {
+    "start": "2026-11-10",
+    "end": "2026-11-17"
+   },
+   "sample": 1500,
+   "published": "2026-11-18T05:00",
+   "question": "Have you cut back in your essential spending in the past 12 months?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Yes",
+    "No"
+   ],
+   "articleUrl": "https://www.news24.com.au/business/finance/treasurer-jim-chalmers-economic-failures-exposed-as-almost-one-in-two-australians-cut-back-on-food-spending/news-story/eb0b9d87db119fff1819952d71976e15",
+   "embed": {
+    "id": "_/LuEgOQIOjTtwCAudyRy5",
+    "title": "Copy: Voters on Jim Chalmers' Middle East excuse N24P 06102026"
+   },
+   "note": "Companion story. The embed title ('… Middle East excuse N24P 06102026') is stale copy-over from a duplicated 6-Oct chart: the chart's own caption carries this wave's question and its Source line the 10-17 Nov 2026 window.",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "All voters",
+       "Yes",
+       "No"
+      ],
+      "rows": [
+       [
+        "",
+        "70",
+        "30"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "At least 70 per cent of respondents to the nationwide survey of 1,500 voters said they were cutting back on essential spending.",
+     "About 86 per cent of working-class Australians have cut back on spending."
+    ],
+    "embedTextLeaves": [
+     "Have you cut back in your essential spending in the past 12 months?",
+     "Question: Have you cut back in your essential spending in the past 12 months?",
+     "Source: News24 Pulse / YouGov (November10- November 17, 2026)"
+    ]
+   }
+  },
+  {
+   "id": "essential-spending-cut-back-items",
+   "waveDate": "2026-11-17",
+   "fieldwork": {
+    "start": "2026-11-10",
+    "end": "2026-11-17"
+   },
+   "sample": 1500,
+   "published": "2026-11-18T05:00",
+   "question": "Which of these areas have you cut back on in the last 12 months?",
+   "questionWordingSource": "infogram-question-caption",
+   "responseOptions": [
+    "Health",
+    "Food",
+    "Clothing",
+    "Insurance",
+    "Transport",
+    "Rent",
+    "None of the above"
+   ],
+   "articleUrl": "https://www.news24.com.au/business/finance/treasurer-jim-chalmers-economic-failures-exposed-as-almost-one-in-two-australians-cut-back-on-food-spending/news-story/eb0b9d87db119fff1819952d71976e15",
+   "embed": {
+    "id": "_/Wx3R3E9rfz066sN1AgVS",
+    "title": "Copy: Immigration middle term forecasts Octobe2026"
+   },
+   "note": "Companion story. Multi-select among the 70% who said they had cut back essential spending (essential-spending-cut-back); the story's '48% of all voters' on food is the gate share applied to the 68% food row. The embed title ('Immigration middle term forecasts …') is stale copy-over: the chart's own caption carries the question and its Source line the 10-17 Nov 2026 window.",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Column %",
+       "Total"
+      ],
+      "rows": [
+       [
+        "Health",
+        "40"
+       ],
+       [
+        "Food",
+        "68"
+       ],
+       [
+        "Clothing",
+        "85"
+       ],
+       [
+        "Insurance",
+        "31"
+       ],
+       [
+        "Transport",
+        "44"
+       ],
+       [
+        "Rent",
+        "6"
+       ],
+       [
+        "None of the above",
+        "3"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Voters were asked what essential spending items they had cut back on in the last 12 months, and were asked to select as many as applicable from six options.",
+     "Of those who reported limiting their spending, 68 per cent said they were limiting food purchases and another 40 per cent said they had cut back on health spending.",
+     "In a damning assessment of Labor's Australia, 48 per cent of all voters - or almost one in two - have cut back on food.",
+     "Among respondents who had cut essential spending, 85 per cent said they had reduced spending on clothes, while 44 per cent had cut back on transport costs.",
+     "Only six per cent chose rent, while 31 per cent identified insurance as a cost-cutting area.",
+     "Of those people, 74 per cent said they had reduced spending on food and 87 per cent said they had cut back clothing."
+    ],
+    "embedTextLeaves": [
+     "Question: Which of these areas have you cut back on in the last 12 months?",
+     "Which of these areas have you cut back on in the last 12 months?",
+     "Source: News24 Pulse / YouGov (November10- November 17, 2026)"
+    ]
+   }
   }
  ],
  "not_filed": [

@@ -278,6 +278,8 @@ export const THEME_OF = {
   "unemployment-expectations": "cost-of-living",
   "card-surcharge-ban": "cost-of-living",
   "card-surcharge-ban-price-tradeoff": "cost-of-living",
+  "essential-spending-cut-back": "cost-of-living",
+  "essential-spending-cut-back-items": "cost-of-living",
   // newspoll
   "inflation-response-priorities": "cost-of-living",
   // redbridge
