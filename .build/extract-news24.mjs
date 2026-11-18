@@ -580,8 +580,10 @@ function parseNews24Article(html, url) {
   // Sept 2026 style "News24.com.au/YouGov poll" (Pulse unstated; the Pulse
   // branding survives in the News24 Pulse Infogram embeds downstream),
   // the Nov 2026 style "News24 Pulse/YouGov results" (3 Nov 2026 wave),
-  // and the mid-Nov style "News24 Pulse/YouGov survey" (17 Nov 2026 wave).
-  const gate = t.match(/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+(?:poll|results|survey)/i);
+  // the mid-Nov style "News24 Pulse/YouGov survey" (17 Nov 2026 wave), and
+  // the early-2026 co-branding "The Sky News Pulse / YouGov poll" (the
+  // 10 Feb and 24 Mar 2026 waves — the series went by Sky News Pulse then).
+  const gate = t.match(/(?:news24(?:\.com\.au)?|sky news)(?:\s+Pulse)?\s*\/\s*YouGov\s+(?:poll|results|survey)/i);
   if (!gate) return null;
 
   const block = t.slice(gate.index, gate.index + 2200);
@@ -1415,11 +1417,21 @@ try {
     // Unfinished upgrades, walk-back (2026-10-07): this gate once upgraded
     // the LATEST wave alone, so a wave whose enrichment leg failed two
     // fortnights running could never catch up. Any existing News24-client
-    // wave from Feb 2026 on — every News24 wave since carries ppm, approval
+    // wave from Apr 2026 on — every News24 wave since carries ppm, approval
     // and ALP-v-ONP 2PP derived rows alongside the publication stamp — that
     // is missing the stamp or one of those rows queues here, newest first,
     // capped per run so a backlog drains over a few runs.
-    const TRIO_ERA = "2026-02-01";
+    // The era starts in April: the co-branded "Sky News Pulse" fortnights
+    // of 10 Feb and 24 Mar 2026 cannot ever drain. Their news24.com.au
+    // articles are working-class spin-offs, not the releases of record —
+    // 24 Mar's carries no satisfaction/PPM figures at all, and 10 Feb's
+    // prose states the topline primaries only inside its class-breakdown
+    // sentences, which parse to crosstab figures that (rightly) trip the
+    // merge guard. Both waves retried and warned on every run from the
+    // moment Wikipedia's table linked them (first red 2026-11-18); their
+    // missing rows were never published on the site, so there is nothing
+    // for the walk-back to catch up.
+    const TRIO_ERA = "2026-04-01";
     const MAX_UPGRADES = 3;
     const upgradeSet = new Set(waves
       .filter((w) => {
