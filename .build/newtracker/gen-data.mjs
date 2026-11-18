@@ -3998,6 +3998,11 @@ const individualPolls = POLLS.map((p) => {
     // series, monthly point and house effect above was built WITHOUT it -
     // the detail view's "How it counts" rail says why (see NO_AGG_HOUSES)
     ...(noAggPoll(p) ? { noAgg: true, noAggWhy: noAggNoteFor(p) } : {}),
+    /* the house-level exclusion apart from noAgg's row-level one: apprAgg
+       and the 3PP aggregates skip NO_AGG_HOUSES only, so row-level out rows
+       (a combined wave, an MRP) DO count there - the leadership charts draw
+       their dots at that altitude */
+    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAggHouse: true } : {}),
     /* When the wave was PUBLISHED, where the cited release says so. The
        archive's row detail has always had a line labelled "Published" and has
        always filled it with `released`, which is the last day of FIELDWORK -

@@ -388,6 +388,12 @@ function RdPrimary({ rangeId, setRangeId }) {
     .filter((q) => inDom(q.x) || (G && q.grp && q.grp.sp))
     .flatMap((q) => {
       if (!G) {
+        /* the lines and headline count no no-aggregate wave (a months-long
+           pooled release, a combined reissue, an MRP, a Tasmania-only
+           reading), so none draws a dot beside a line it never fed - the
+           row stays in the All-polls archive with its noAgg note, as the
+           two-party hero's cloud has skipped them all along */
+        if (q.noAgg) return [];
         /* a ticked pollster subset hides the unticked houses' dots too -
            a wave from a house that doesn't count mustn't hang off the
            recomputed lines as if it fed them */
@@ -1351,8 +1357,11 @@ function RdLeadership({ rangeId }) {
   })());
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
   /* each poll's three-way shares, one dot per leader in his or her colour -
-     the spread the key tells readers to expect, shown rather than asserted */
-  const threeDots = kept("threeDots", () => D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+     the spread the key tells readers to expect, shown rather than asserted.
+     House-level skip as cloudFor's (the 3PP aggregates are NO_AGG_HOUSES
+     level too): Roy Morgan's SMS waves print three-way shares nationally,
+     but none of its readings enters a line here */
+  const threeDots = kept("threeDots", () => D.individualPolls.filter((q) => !q.noAggHouse && q.x >= xDomain[0] && q.x <= xDomain[1])
     .flatMap((q) => {
       const c = ppmMatch(q, "3");
       if (!c) return [];
@@ -1475,7 +1484,11 @@ function RdLeadership({ rangeId }) {
   };
   const cloudFor = (mt) => {
     const wantFav = mt === "fav";
-    return D.individualPolls.filter((q) => q.appr && q.x >= xDomain[0] && q.x <= xDomain[1])
+    /* the lines read appraisals at NO_AGG_HOUSES level (gen-data's apprAgg),
+       so the dots draw at exactly its altitude: a combined wave's ratings
+       count (q.noAgg but not noAggHouse) and stay; a whole excluded series
+       (Roy Morgan's SMS waves) draws nothing */
+    return D.individualPolls.filter((q) => q.appr && !q.noAggHouse && q.x >= xDomain[0] && q.x <= xDomain[1])
       .flatMap((q) => leaders.flatMap((Ld) => {
         const a = q.appr, out = [];
         const isFav = ((a.metricBy || {})[Ld.id] === "fav");
