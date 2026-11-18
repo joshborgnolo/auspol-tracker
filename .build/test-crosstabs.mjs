@@ -84,6 +84,7 @@ const HEADERS = {
   "Housing: Renter": ["housing", "Renting"],                                                              // Apr–May
   "Own home outright": ["housing", "Own outright"], "Mortgaging home": ["housing", "Mortgage"],
   "Renting home": ["housing", "Renting"],                                                                 // Jun on
+  "Own home": ["housing", "Own outright"], "Mortgage home": ["housing", "Mortgage"],                      // 17 Nov on
   "Only English spoken at home": ["language", "English only"], "Other language spoken at home": ["language", "Other language"],
   // household income: the four-bracket scheme, and the two-bracket scheme it
   // replaced mid-2026 – the brackets ride in the label so the facet's pair
@@ -92,6 +93,7 @@ const HEADERS = {
   "Household income 100-149k": ["income", "$100–149k"], "Household income 150k+": ["income", "$150k+"],
   "Income: <100k": ["income", "Under $100k"], "Income less than $100k": ["income", "Under $100k"],
   "Income more than $100k": ["income", "$100k or more"],
+  "<100k": ["income", "Under $100k"], ">100k": ["income", "$100k or more"],                               // 17 Nov on, prefix dropped
   // children at home (24 Mar 2026 on; the long negative from 7 Apr), working
   // status (2 Jun 2026 on) and self-assessed class (10 Feb 2026 on) —
   // facet-only dims, each spawning a family of spellings

@@ -6540,142 +6540,141 @@
    "dateEnd": "2026-04-14",
    "sample": 1439,
    "article": "https://www.capitalbrief.com/article/one-nation-draws-level-with-labor-as-voters-blame-immigration-for-housing-crisis-706653c7-d05f-4c10-9a62-5dde8f2a69cc/",
-   "source": "https://demosau.com/wp-content/uploads/2026/04/DemosAU-Fed-Poll-April-2026.pdf",
-   "read": "measured from the charts",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
    "dims": {
     "gender": {
      "Men": {
       "alp": 28,
-      "onp": 24,
-      "lnp": 23,
       "grn": 11,
+      "lnp": 23,
+      "onp": 24,
       "oth": 14
      },
      "Women": {
       "alp": 25,
-      "onp": 28,
-      "lnp": 22,
       "grn": 15,
+      "lnp": 22,
+      "onp": 28,
       "oth": 10
      }
     },
     "age": {
      "18–34": {
       "alp": 24,
-      "onp": 20,
-      "lnp": 18,
       "grn": 28,
+      "lnp": 18,
+      "onp": 20,
       "oth": 10
      },
      "35–54": {
       "alp": 26,
-      "onp": 26,
-      "lnp": 20,
       "grn": 13,
+      "lnp": 20,
+      "onp": 26,
       "oth": 15
      },
      "55+": {
       "alp": 28,
-      "onp": 29,
-      "lnp": 27,
       "grn": 5,
+      "lnp": 27,
+      "onp": 29,
       "oth": 11
      }
     },
     "education": {
      "School": {
       "alp": 26,
-      "onp": 31,
-      "lnp": 22,
       "grn": 10,
+      "lnp": 22,
+      "onp": 31,
       "oth": 11
      },
      "TAFE": {
       "alp": 24,
-      "onp": 28,
-      "lnp": 23,
       "grn": 13,
+      "lnp": 23,
+      "onp": 28,
       "oth": 12
      },
      "University": {
       "alp": 29,
-      "onp": 18,
-      "lnp": 24,
       "grn": 17,
+      "lnp": 24,
+      "onp": 18,
       "oth": 12
      }
     },
     "income": {
      "Under $45k": {
       "alp": 25,
-      "onp": 28,
-      "lnp": 21,
       "grn": 12,
+      "lnp": 21,
+      "onp": 28,
       "oth": 14
      },
      "$45–125k": {
       "alp": 27,
-      "onp": 24,
-      "lnp": 25,
       "grn": 15,
+      "lnp": 25,
+      "onp": 24,
       "oth": 9
      },
      "$125k+": {
       "alp": 31,
-      "onp": 26,
-      "lnp": 23,
       "grn": 10,
+      "lnp": 23,
+      "onp": 26,
       "oth": 10
      }
     },
     "location": {
      "Inner metro": {
       "alp": 33,
-      "onp": 14,
-      "lnp": 25,
       "grn": 16,
+      "lnp": 25,
+      "onp": 14,
       "oth": 12
      },
      "Outer metro": {
       "alp": 25,
-      "onp": 26,
-      "lnp": 25,
       "grn": 11,
+      "lnp": 25,
+      "onp": 26,
       "oth": 13
      },
      "Regional or rural": {
       "alp": 21,
-      "onp": 40,
-      "lnp": 17,
       "grn": 12,
+      "lnp": 17,
+      "onp": 40,
       "oth": 10
      }
     },
     "housing": {
      "Renting": {
       "alp": 27,
-      "onp": 29,
-      "lnp": 16,
       "grn": 17,
+      "lnp": 16,
+      "onp": 29,
       "oth": 11
      },
      "Mortgage": {
       "alp": 26,
-      "onp": 25,
-      "lnp": 23,
       "grn": 12,
+      "lnp": 23,
+      "onp": 25,
       "oth": 14
      },
      "Own outright": {
       "alp": 26,
-      "onp": 25,
-      "lnp": 29,
       "grn": 9,
+      "lnp": 29,
+      "onp": 25,
       "oth": 11
      }
     }
-   },
-   "fit": 0.04
+   }
   },
   {
    "pollster": "Resolve",
@@ -7819,158 +7818,157 @@
    "dateEnd": "2026-05-20",
    "sample": 1502,
    "article": "https://www.capitalbrief.com/article/labors-budget-backlash-begins-as-one-nation-continues-its-rise-f730690e-86cf-4231-8d1f-f6bf23d1d8a0/",
-   "source": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
-   "read": "measured from the charts",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
    "dims": {
     "gender": {
      "Men": {
       "alp": 28,
-      "onp": 28,
-      "lnp": 22,
       "grn": 11,
+      "lnp": 22,
+      "onp": 28,
       "oth": 11
      },
      "Women": {
       "alp": 24,
-      "onp": 30,
-      "lnp": 24,
       "grn": 14,
+      "lnp": 24,
+      "onp": 30,
       "oth": 8
      }
     },
     "age": {
      "18–34": {
       "alp": 30,
-      "onp": 16,
-      "lnp": 13,
       "grn": 33,
+      "lnp": 13,
+      "onp": 16,
       "oth": 8
      },
      "35–54": {
       "alp": 23,
-      "onp": 30,
-      "lnp": 22,
       "grn": 10,
+      "lnp": 22,
+      "onp": 30,
       "oth": 15
      },
      "55+": {
       "alp": 26,
-      "onp": 34,
-      "lnp": 29,
       "grn": 4,
+      "lnp": 29,
+      "onp": 34,
       "oth": 7
      }
     },
     "education": {
      "School": {
       "alp": 25,
-      "onp": 29,
-      "lnp": 22,
       "grn": 13,
+      "lnp": 22,
+      "onp": 29,
       "oth": 11
      },
      "TAFE": {
       "alp": 23,
-      "onp": 35,
-      "lnp": 19,
       "grn": 12,
+      "lnp": 19,
+      "onp": 35,
       "oth": 11
      },
      "University": {
       "alp": 31,
-      "onp": 21,
-      "lnp": 27,
       "grn": 13,
+      "lnp": 27,
+      "onp": 21,
       "oth": 8
      }
     },
     "income": {
      "Under $45k": {
       "alp": 24,
-      "onp": 29,
-      "lnp": 19,
       "grn": 15,
+      "lnp": 19,
+      "onp": 29,
       "oth": 13
      },
      "$45–125k": {
       "alp": 28,
-      "onp": 30,
-      "lnp": 25,
       "grn": 10,
+      "lnp": 25,
+      "onp": 30,
       "oth": 7
      },
      "$125k+": {
       "alp": 28,
-      "onp": 21,
-      "lnp": 32,
       "grn": 13,
+      "lnp": 32,
+      "onp": 21,
       "oth": 6
      }
     },
     "location": {
      "Inner metro": {
       "alp": 31,
-      "onp": 18,
-      "lnp": 24,
       "grn": 18,
+      "lnp": 24,
+      "onp": 18,
       "oth": 9
      },
      "Outer metro": {
       "alp": 27,
-      "onp": 29,
-      "lnp": 22,
       "grn": 13,
+      "lnp": 22,
+      "onp": 29,
       "oth": 9
      },
      "Regional or rural": {
       "alp": 17,
-      "onp": 38,
-      "lnp": 23,
       "grn": 9,
+      "lnp": 23,
+      "onp": 38,
       "oth": 13
      }
     },
     "housing": {
      "Renting": {
       "alp": 29,
-      "onp": 26,
-      "lnp": 15,
       "grn": 17,
+      "lnp": 15,
+      "onp": 26,
       "oth": 13
      },
      "Mortgage": {
       "alp": 28,
-      "onp": 27,
-      "lnp": 24,
       "grn": 14,
+      "lnp": 24,
+      "onp": 27,
       "oth": 7
      },
      "Own outright": {
       "alp": 21,
-      "onp": 33,
-      "lnp": 29,
       "grn": 7,
+      "lnp": 29,
+      "onp": 33,
       "oth": 10
      }
     },
     "language": {
      "English only": {
       "alp": 23,
-      "onp": 31,
-      "lnp": 23,
       "grn": 12,
+      "lnp": 23,
+      "onp": 31,
       "oth": 11
      },
      "Other language": {
       "alp": 39,
-      "onp": 18,
-      "lnp": 24,
       "grn": 14,
+      "lnp": 24,
+      "onp": 18,
       "oth": 5
      }
     }
-   },
-   "fit": 0.32
+   }
   },
   {
    "pollster": "Essential",
@@ -8719,158 +8717,157 @@
    "dateEnd": "2026-06-18",
    "sample": 1497,
    "article": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
-   "source": "https://demosau.com/wp-content/uploads/2026/06/Capital-BriefDemosAU-Federal-Poll-June-2026-FINAL.pdf",
-   "read": "measured from the charts",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
    "dims": {
     "gender": {
      "Men": {
-      "onp": 29,
       "alp": 32,
-      "lnp": 18,
       "grn": 11,
+      "lnp": 18,
+      "onp": 29,
       "oth": 10
      },
      "Women": {
-      "onp": 32,
       "alp": 21,
-      "lnp": 19,
       "grn": 14,
+      "lnp": 19,
+      "onp": 32,
       "oth": 14
      }
     },
     "age": {
      "18–34": {
-      "onp": 22,
       "alp": 29,
-      "lnp": 12,
       "grn": 29,
+      "lnp": 12,
+      "onp": 22,
       "oth": 8
      },
      "35–54": {
-      "onp": 31,
       "alp": 28,
-      "lnp": 18,
       "grn": 11,
+      "lnp": 18,
+      "onp": 31,
       "oth": 12
      },
      "55+": {
-      "onp": 35,
       "alp": 24,
-      "lnp": 22,
       "grn": 5,
+      "lnp": 22,
+      "onp": 35,
       "oth": 14
      }
     },
     "education": {
      "School": {
-      "onp": 33,
       "alp": 25,
-      "lnp": 18,
       "grn": 13,
+      "lnp": 18,
+      "onp": 33,
       "oth": 11
      },
      "TAFE": {
-      "onp": 33,
       "alp": 24,
-      "lnp": 15,
       "grn": 11,
+      "lnp": 15,
+      "onp": 33,
       "oth": 17
      },
      "University": {
-      "onp": 24,
       "alp": 31,
-      "lnp": 23,
       "grn": 14,
+      "lnp": 23,
+      "onp": 24,
       "oth": 8
      }
     },
     "income": {
      "Under $45k": {
-      "onp": 31,
       "alp": 24,
-      "lnp": 15,
       "grn": 14,
+      "lnp": 15,
+      "onp": 31,
       "oth": 16
      },
      "$45–125k": {
-      "onp": 29,
       "alp": 31,
-      "lnp": 19,
       "grn": 13,
+      "lnp": 19,
+      "onp": 29,
       "oth": 8
      },
      "$125k+": {
-      "onp": 30,
       "alp": 23,
-      "lnp": 31,
       "grn": 8,
+      "lnp": 31,
+      "onp": 30,
       "oth": 8
      }
     },
     "location": {
      "Inner metro": {
-      "onp": 19,
       "alp": 34,
-      "lnp": 19,
       "grn": 17,
+      "lnp": 19,
+      "onp": 19,
       "oth": 11
      },
      "Outer metro": {
-      "onp": 32,
       "alp": 25,
-      "lnp": 19,
       "grn": 13,
+      "lnp": 19,
+      "onp": 32,
       "oth": 11
      },
      "Regional or rural": {
-      "onp": 42,
       "alp": 20,
-      "lnp": 15,
       "grn": 8,
+      "lnp": 15,
+      "onp": 42,
       "oth": 15
      }
     },
     "housing": {
      "Renting": {
-      "onp": 29,
       "alp": 29,
-      "lnp": 12,
       "grn": 18,
+      "lnp": 12,
+      "onp": 29,
       "oth": 12
      },
      "Mortgage": {
-      "onp": 33,
       "alp": 26,
-      "lnp": 17,
       "grn": 13,
+      "lnp": 17,
+      "onp": 33,
       "oth": 11
      },
      "Own outright": {
-      "onp": 29,
       "alp": 25,
-      "lnp": 25,
       "grn": 8,
+      "lnp": 25,
+      "onp": 29,
       "oth": 13
      }
     },
     "language": {
      "English only": {
-      "onp": 33,
       "alp": 25,
-      "lnp": 18,
       "grn": 11,
+      "lnp": 18,
+      "onp": 33,
       "oth": 13
      },
      "Other language": {
-      "onp": 21,
       "alp": 35,
-      "lnp": 16,
       "grn": 21,
+      "lnp": 16,
+      "onp": 21,
       "oth": 7
      }
     }
-   },
-   "fit": 0.47
+   }
   },
   {
    "pollster": "Newspoll (pooled)",
@@ -9664,158 +9661,157 @@
    "dateEnd": "2026-07-08",
    "sample": 2694,
    "article": "https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/",
-   "source": "https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf",
-   "read": "measured from the charts",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
    "dims": {
     "gender": {
      "Men": {
       "alp": 27,
-      "onp": 30,
-      "lnp": 21,
       "grn": 11,
+      "lnp": 21,
+      "onp": 30,
       "oth": 11
      },
      "Women": {
       "alp": 24,
-      "onp": 28,
-      "lnp": 22,
       "grn": 16,
+      "lnp": 22,
+      "onp": 28,
       "oth": 10
      }
     },
     "age": {
      "18–34": {
       "alp": 28,
-      "onp": 21,
-      "lnp": 13,
       "grn": 29,
+      "lnp": 13,
+      "onp": 21,
       "oth": 9
      },
      "35–54": {
       "alp": 26,
-      "onp": 32,
-      "lnp": 18,
       "grn": 14,
+      "lnp": 18,
+      "onp": 32,
       "oth": 10
      },
      "55+": {
       "alp": 25,
-      "onp": 31,
-      "lnp": 28,
       "grn": 5,
+      "lnp": 28,
+      "onp": 31,
       "oth": 11
      }
     },
     "education": {
      "School": {
       "alp": 25,
-      "onp": 30,
-      "lnp": 24,
       "grn": 10,
+      "lnp": 24,
+      "onp": 30,
       "oth": 11
      },
      "TAFE": {
       "alp": 22,
-      "onp": 35,
-      "lnp": 19,
       "grn": 14,
+      "lnp": 19,
+      "onp": 35,
       "oth": 10
      },
      "University": {
       "alp": 31,
-      "onp": 21,
-      "lnp": 19,
       "grn": 19,
+      "lnp": 19,
+      "onp": 21,
       "oth": 10
      }
     },
     "income": {
      "Under $45k": {
       "alp": 23,
-      "onp": 30,
-      "lnp": 21,
       "grn": 15,
+      "lnp": 21,
+      "onp": 30,
       "oth": 11
      },
      "$45–125k": {
       "alp": 29,
-      "onp": 28,
-      "lnp": 21,
       "grn": 13,
+      "lnp": 21,
+      "onp": 28,
       "oth": 9
      },
      "$125k+": {
       "alp": 26,
-      "onp": 27,
-      "lnp": 25,
       "grn": 11,
+      "lnp": 25,
+      "onp": 27,
       "oth": 11
      }
     },
     "location": {
      "Inner metro": {
       "alp": 31,
-      "onp": 21,
-      "lnp": 24,
       "grn": 16,
+      "lnp": 24,
+      "onp": 21,
       "oth": 8
      },
      "Outer metro": {
       "alp": 27,
-      "onp": 28,
-      "lnp": 21,
       "grn": 15,
+      "lnp": 21,
+      "onp": 28,
       "oth": 9
      },
      "Regional or rural": {
       "alp": 18,
-      "onp": 39,
-      "lnp": 19,
       "grn": 10,
+      "lnp": 19,
+      "onp": 39,
       "oth": 14
      }
     },
     "housing": {
      "Renting": {
       "alp": 28,
-      "onp": 30,
-      "lnp": 14,
       "grn": 17,
+      "lnp": 14,
+      "onp": 30,
       "oth": 11
      },
      "Mortgage": {
       "alp": 26,
-      "onp": 29,
-      "lnp": 19,
       "grn": 16,
+      "lnp": 19,
+      "onp": 29,
       "oth": 10
      },
      "Own outright": {
       "alp": 24,
-      "onp": 28,
-      "lnp": 31,
       "grn": 7,
+      "lnp": 31,
+      "onp": 28,
       "oth": 10
      }
     },
     "language": {
      "English only": {
       "alp": 24,
-      "onp": 31,
-      "lnp": 22,
       "grn": 12,
+      "lnp": 22,
+      "onp": 31,
       "oth": 11
      },
      "Other language": {
       "alp": 37,
-      "onp": 19,
-      "lnp": 19,
       "grn": 19,
+      "lnp": 19,
+      "onp": 19,
       "oth": 6
      }
     }
-   },
-   "fit": 0.29
+   }
   },
   {
    "pollster": "DemosAU (MRP)",
@@ -11468,158 +11464,157 @@
    "dateEnd": "2026-08-20",
    "sample": 1562,
    "article": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/",
-   "source": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf",
-   "read": "measured from the charts",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
    "dims": {
     "gender": {
      "Men": {
       "alp": 26,
       "grn": 9,
-      "oth": 13,
+      "lnp": 26,
       "onp": 26,
-      "lnp": 26
+      "oth": 13
      },
      "Women": {
       "alp": 27,
       "grn": 15,
-      "oth": 12,
+      "lnp": 24,
       "onp": 22,
-      "lnp": 24
+      "oth": 12
      }
     },
     "age": {
      "18–34": {
       "alp": 30,
       "grn": 26,
-      "oth": 8,
+      "lnp": 17,
       "onp": 19,
-      "lnp": 17
+      "oth": 8
      },
      "35–54": {
       "alp": 27,
       "grn": 13,
-      "oth": 14,
+      "lnp": 22,
       "onp": 24,
-      "lnp": 22
+      "oth": 14
      },
      "55+": {
       "alp": 24,
       "grn": 2,
-      "oth": 15,
+      "lnp": 32,
       "onp": 27,
-      "lnp": 32
+      "oth": 15
      }
     },
     "education": {
      "School": {
       "alp": 26,
       "grn": 11,
-      "oth": 13,
+      "lnp": 25,
       "onp": 25,
-      "lnp": 25
+      "oth": 13
      },
      "TAFE": {
       "alp": 24,
       "grn": 11,
-      "oth": 15,
+      "lnp": 19,
       "onp": 31,
-      "lnp": 19
+      "oth": 15
      },
      "University": {
       "alp": 29,
       "grn": 14,
-      "oth": 11,
+      "lnp": 31,
       "onp": 15,
-      "lnp": 31
+      "oth": 11
      }
     },
     "income": {
      "Under $45k": {
       "alp": 25,
       "grn": 13,
-      "oth": 17,
+      "lnp": 21,
       "onp": 24,
-      "lnp": 21
+      "oth": 17
      },
      "$45–125k": {
       "alp": 26,
       "grn": 12,
-      "oth": 8,
+      "lnp": 28,
       "onp": 26,
-      "lnp": 28
+      "oth": 8
      },
      "$125k+": {
       "alp": 34,
       "grn": 10,
-      "oth": 14,
+      "lnp": 28,
       "onp": 14,
-      "lnp": 28
+      "oth": 14
      }
     },
     "location": {
      "Inner metro": {
       "alp": 31,
       "grn": 13,
-      "oth": 9,
+      "lnp": 27,
       "onp": 20,
-      "lnp": 27
+      "oth": 9
      },
      "Outer metro": {
       "alp": 27,
       "grn": 12,
-      "oth": 15,
+      "lnp": 25,
       "onp": 21,
-      "lnp": 25
+      "oth": 15
      },
      "Regional or rural": {
       "alp": 20,
       "grn": 10,
-      "oth": 15,
+      "lnp": 21,
       "onp": 34,
-      "lnp": 21
+      "oth": 15
      }
     },
     "housing": {
      "Renting": {
       "alp": 27,
       "grn": 18,
-      "oth": 13,
+      "lnp": 15,
       "onp": 27,
-      "lnp": 15
+      "oth": 13
      },
      "Mortgage": {
       "alp": 29,
       "grn": 12,
-      "oth": 12,
+      "lnp": 28,
       "onp": 19,
-      "lnp": 28
+      "oth": 12
      },
      "Own outright": {
       "alp": 23,
       "grn": 6,
-      "oth": 14,
+      "lnp": 30,
       "onp": 27,
-      "lnp": 30
+      "oth": 14
      }
     },
     "language": {
      "English only": {
       "alp": 24,
       "grn": 11,
-      "oth": 15,
+      "lnp": 25,
       "onp": 25,
-      "lnp": 25
+      "oth": 15
      },
      "Other language": {
       "alp": 36,
       "grn": 15,
-      "oth": 6,
+      "lnp": 25,
       "onp": 18,
-      "lnp": 25
+      "oth": 6
      }
     }
-   },
-   "fit": 0.26
+   }
   },
   {
    "pollster": "YouGov",
@@ -12566,158 +12561,157 @@
    "dateEnd": "2026-09-14",
    "sample": 1583,
    "article": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/",
-   "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
-   "read": "measured from the charts",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/capital-brief-poll-trends-2026.html",
+   "read": "published table",
    "dims": {
     "gender": {
      "Men": {
       "alp": 28,
       "grn": 12,
-      "oth": 13,
       "lnp": 21,
-      "onp": 26
+      "onp": 26,
+      "oth": 13
      },
      "Women": {
       "alp": 27,
       "grn": 14,
-      "oth": 14,
       "lnp": 20,
-      "onp": 25
+      "onp": 25,
+      "oth": 14
      }
     },
     "age": {
      "18–34": {
       "alp": 38,
       "grn": 22,
-      "oth": 9,
       "lnp": 15,
-      "onp": 16
+      "onp": 16,
+      "oth": 9
      },
      "35–54": {
       "alp": 26,
       "grn": 13,
-      "oth": 13,
       "lnp": 21,
-      "onp": 27
+      "onp": 27,
+      "oth": 13
      },
      "55+": {
       "alp": 23,
       "grn": 7,
-      "oth": 16,
       "lnp": 23,
-      "onp": 31
+      "onp": 31,
+      "oth": 16
      }
     },
     "education": {
      "School": {
       "alp": 29,
       "grn": 13,
-      "oth": 16,
       "lnp": 17,
-      "onp": 25
+      "onp": 25,
+      "oth": 16
      },
      "TAFE": {
       "alp": 24,
       "grn": 11,
-      "oth": 11,
       "lnp": 20,
-      "onp": 34
+      "onp": 34,
+      "oth": 11
      },
      "University": {
       "alp": 30,
       "grn": 15,
-      "oth": 13,
       "lnp": 25,
-      "onp": 17
+      "onp": 17,
+      "oth": 13
      }
     },
     "income": {
      "Under $45k": {
       "alp": 26,
       "grn": 12,
-      "oth": 17,
       "lnp": 18,
-      "onp": 27
+      "onp": 27,
+      "oth": 17
      },
      "$45–125k": {
       "alp": 30,
       "grn": 14,
-      "oth": 10,
       "lnp": 21,
-      "onp": 25
+      "onp": 25,
+      "oth": 10
      },
      "$125k+": {
       "alp": 27,
       "grn": 11,
-      "oth": 8,
       "lnp": 31,
-      "onp": 23
+      "onp": 23,
+      "oth": 8
      }
     },
     "location": {
      "Inner metro": {
       "alp": 32,
       "grn": 13,
-      "oth": 9,
       "lnp": 28,
-      "onp": 18
+      "onp": 18,
+      "oth": 9
      },
      "Outer metro": {
       "alp": 28,
       "grn": 15,
-      "oth": 13,
       "lnp": 17,
-      "onp": 27
+      "onp": 27,
+      "oth": 13
      },
      "Regional or rural": {
       "alp": 23,
       "grn": 8,
-      "oth": 19,
       "lnp": 16,
-      "onp": 34
+      "onp": 34,
+      "oth": 19
      }
     },
     "housing": {
      "Renting": {
       "alp": 31,
       "grn": 16,
-      "oth": 14,
       "lnp": 13,
-      "onp": 26
+      "onp": 26,
+      "oth": 14
      },
      "Mortgage": {
       "alp": 28,
       "grn": 13,
-      "oth": 10,
       "lnp": 23,
-      "onp": 26
+      "onp": 26,
+      "oth": 10
      },
      "Own outright": {
       "alp": 24,
       "grn": 10,
-      "oth": 16,
       "lnp": 25,
-      "onp": 25
+      "onp": 25,
+      "oth": 16
      }
     },
     "language": {
      "English only": {
       "alp": 25,
       "grn": 13,
-      "oth": 14,
       "lnp": 21,
-      "onp": 27
+      "onp": 27,
+      "oth": 14
      },
      "Other language": {
       "alp": 38,
       "grn": 14,
-      "oth": 12,
       "lnp": 18,
-      "onp": 18
+      "onp": 18,
+      "oth": 12
      }
     }
-   },
-   "fit": 0.06
+   }
   },
   {
    "pollster": "Newspoll (pooled)",
@@ -14734,8 +14728,8 @@
    "date": "2026-10-27",
    "dateStart": "2026-10-22",
    "dateEnd": "2026-10-27",
-   "sample": null,
-   "article": null,
+   "sample": 1003,
+   "article": "https://www.theguardian.com/australia-news/2026/oct/28/guardian-essential-poll-labor-albanese-one-nation-hanson-coalition-ntwnfb",
    "source": "https://essentialreport.com.au/reports/28-october-2026",
    "read": "published table",
    "dims": {
@@ -15629,6 +15623,22 @@
       "oth": 12
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 23,
+      "lnp": 21,
+      "onp": 28,
+      "grn": 16,
+      "oth": 12
+     },
+     "$100k or more": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 23,
+      "grn": 14,
+      "oth": 13
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 23,
@@ -15662,6 +15672,20 @@
      }
     },
     "housing": {
+     "Own outright": {
+      "alp": 22,
+      "lnp": 32,
+      "onp": 28,
+      "grn": 6,
+      "oth": 12
+     },
+     "Mortgage": {
+      "alp": 26,
+      "lnp": 24,
+      "onp": 27,
+      "grn": 11,
+      "oth": 11
+     },
      "Renting": {
       "alp": 27,
       "lnp": 10,

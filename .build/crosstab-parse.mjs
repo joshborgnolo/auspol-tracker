@@ -75,9 +75,12 @@ export function ygGroup(h) {
   // "National" is the whole poll restated, not a group (27 Jan 2026, before
   // the switching columns appeared); it stays unmapped on purpose
   if (/^national$/i.test(s)) return null;
-  // housing: "Own outright" (24 Mar), "Housing: Own outright" (Apr–May), "Own home outright" (Jun on)
-  if (/^(?:housing:\s*)?own(?: home)? outright$/i.test(s)) return ["housing", "Own outright"];
-  if (/^(?:housing:\s*)?(?:mortgage(?:-holder)?|mortgaging home)$/i.test(s)) return ["housing", "Mortgage"];
+  // housing: "Own outright" (24 Mar 2026), "Housing: Own outright" (Apr–May),
+  // "Own home outright" (Jun–3 Nov), "Own home" (17 Nov on) – mortgage likewise:
+  // "Mortgage"/"Mortgage-holder" (Mar–May), "Mortgaging home" (Jun–3 Nov),
+  // "Mortgage home" (17 Nov on)
+  if (/^(?:housing:\s*)?own(?: home)?(?: outright)?$/i.test(s)) return ["housing", "Own outright"];
+  if (/^(?:housing:\s*)?(?:mortgage(?:-holder| home)?|mortgaging home)$/i.test(s)) return ["housing", "Mortgage"];
   if (/^(?:housing:\s*)?(?:rent|renter|renting home)$/i.test(s)) return ["housing", "Renting"];
   // language spoken at home (Jun on)
   if (/^only english spoken at home$/i.test(s)) return ["language", "English only"];
@@ -91,6 +94,9 @@ export function ygGroup(h) {
   if ((m = s.match(/^(?:household\s+)?income:?\s*(?:>|over|more than)\s*\$?(\d+)\s*k\s*\+?$/i))) return ["income", `$${m[1]}k or more`];
   if ((m = s.match(/^(?:household\s+)?income:?\s*\$?(\d+)\s*k?\s*-\s*\$?(\d+)\s*k$/i))) return ["income", `$${m[1]}–${m[2]}k`];
   if ((m = s.match(/^(?:household\s+)?income:?\s*\$?(\d+)\s*k\s*\+$/i))) return ["income", `$${m[1]}k+`];
+  // News24's 17 Nov 2026 PV table drops the prefix entirely: a bare "<100k"/">100k" pair
+  if ((m = s.match(/^<\s*\$?(\d+)\s*k$/i))) return ["income", `Under $${m[1]}k`];
+  if ((m = s.match(/^>\s*\$?(\d+)\s*k\s*\+?$/i))) return ["income", `$${m[1]}k or more`];
   // children at home (24 Mar 2026 on): "No children" on 24 Mar, the long
   // "No, I am neither a parent or guardian" from 7 Apr; a "Parental Status: "
   // prefix dresses the 7 Apr–19 May set
