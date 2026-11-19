@@ -5867,7 +5867,7 @@ function RdUndecided({ rangeId }) {
   const F = D.firmness, A = U.softAge;
   const byId = {};
   U.series.forEach((s) => { byId[s.id] = s; });
-  const first = byId.first, tpp = byId.tpp, soft = byId.soft;
+  const first = byId.first, tpp = byId.tpp, leaner = byId.leaner, soft = byId.soft;
   const nowOf = (s) => (s ? (s.now ? s.now.v : s.latest.v) : null);
   const xDomain = rangeDomain(rangeId);
   /* the axis opens on the election tick, as the 2PP, primary, mood and
@@ -5915,7 +5915,7 @@ function RdUndecided({ rangeId }) {
        lighter grey (dashed), not firm between. Their polls wear the same
        tones, and after preferences' as open rings - six Essential readings
        carry that line, so they stay on show, but told apart */
-    const COL = (s) => (s.id === "soft" ? "var(--ink-2)" : s.id === "tpp" ? "var(--ink-3)" : "var(--ink)");
+    const COL = (s) => (s.id === "soft" || s.id === "leaner" ? "var(--ink-2)" : s.id === "tpp" ? "var(--ink-3)" : "var(--ink)");
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find((d) => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
     return (
       <div className="card rd-card rd-un-panel" key={key}>
@@ -5925,7 +5925,7 @@ function RdUndecided({ rangeId }) {
             <RdSwatch kind={s.dashed ? "dash" : "line"} color={COL(s)} />
             <div>
               <div className="rd-un-rtop"><b>{s.id === "soft" ? "Might still change" : s.label}</b><span className="rd-un-rv">{nowOf(s).toFixed(1)}%</span>{s.now && <span className="rd-un-rci">±{s.now.ci95.toFixed(1)}</span>}</div>
-              <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
+              <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "leaner" ? "Still undecided after the leaner, excluded from the published voting figures. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
             </div>
           </div>
         ))}
@@ -5951,9 +5951,9 @@ function RdUndecided({ rangeId }) {
     );
   };
   const changeFoot = (() => {
-    const bits = [first, tpp, soft].filter(Boolean).map((s) => {
+    const bits = [first, tpp, leaner, soft].filter(Boolean).map((s) => {
       const c = s.now ? s.now.chg : null;
-      const nm = s.id === "first" ? "first preference" : s.id === "tpp" ? "after preferences" : "not firm";
+      const nm = s.id === "first" ? "first preference" : s.id === "leaner" ? "after leaner" : s.id === "tpp" ? "after preferences" : "not firm";
       return { nm, c, sig: s.now && s.now.changeSig };
     });
     const anySig = bits.some((b) => b.sig);
@@ -6094,7 +6094,7 @@ function RdUndecided({ rangeId }) {
           <RdSub head={(() => { const m = [slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
                  dek="Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
           <div className="rd-un-panels">
-            {panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
+            {panel([first, tpp, leaner].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
             {soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")}
           </div>
           <RdTsig summary="Trend-significance table"

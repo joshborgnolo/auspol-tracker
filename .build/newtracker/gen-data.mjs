@@ -3005,12 +3005,17 @@ const UNDECIDED_BASES = [
     note: "can’t say who they would vote for – set aside before the shares are reported" },
   { id: "tpp", label: "After preferences", dashed: true,
     note: "won’t nominate a side – still inside the published two-party pair, which is why it sums to under 100" },
+  { id: "leaner", label: "After leaner", dashed: true,
+    note: "undecided after the leaner – excluded from published voting-intention figures" },
   // dash-dot, not dotted: a "1 3" dot line with round caps read as a string
   // of beads - noise rather than a third line
   { id: "soft", label: "Not firm", dash: "9 3 2 3",
     note: "named a party but might still move – the soft share of the decided, Resolve’s “how firm are you”" },
 ];
-const undecidedRows = POLLS.map((p) => ({ p, u: undecidedOf(p) })).filter((r) => r.u && !noAggPoll(r.p));
+const undecidedRows = POLLS.flatMap((p) => [
+  ...(undecidedOf(p) ? [{ p, u: undecidedOf(p) }] : []),
+  ...(p.undecidedLeaner != null ? [{ p, u: { v: p.undecidedLeaner, basis: "leaner" } }] : []),
+]).filter((r) => !noAggPoll(r.p));
 const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const rs = undecidedRows.filter((r) => r.u.basis === b.id);
   if (!rs.length) return null;
