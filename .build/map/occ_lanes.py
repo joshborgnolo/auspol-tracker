@@ -20,21 +20,51 @@ NO class — the user decision of 2026-11-11: class shares are NOT a
 partition, they never sum to 100, and no junk residual lane is shown.
 
 SOURCE DATA. The GCP/BCP packs top out at 1-digit occupation (B45B 2011,
-G57B 2016, G60B 2021), so the 2-digit counts arrive as a manual ABS
-TableBuilder export committed unedited at `.build/map/src/census-occ/`
-(provenance JSON beside): 2021 census, employed usual residents aged 15+,
-OCCP at 2-digit level × SA2 (rolls into SA1 exactly: SA2 codes are the
-leading 9 digits of their SA1 codes) and × CED (federal frames + the G60B
-drift anchor). TableBuilder's random cell perturbation is left in the file
-and NEVER re-normalised against GCP; class shares are computed inside the
-export's own stated-occupation basis (the sum of the 43 sub-major groups —
-the same basis GCP G60B's blue lane carries), and a per-division guard at
-the publication gate compares Σ(43 sub-majors) with G60B's stated total
-within ±3% (perturbation slack), a HARD fail before assemble. ABS pseudo-
-codes and supplementary ("not further defined") output rows never enter
-the basis. The SA2→SA1 spread assumes within-SA2 class homogeneity,
-weights proportional to each SA1's G60B stated-occupation workers; that is
-a documented modelling limit, unverified below the SA2 grain.
+G57B 2016, G60B 2021), so the 2-digit counts arrive as manual ABS
+TableBuilder exports committed unedited at `.build/map/src/census-occ/`
+(provenance JSON beside). One pair per census edition, employed usual
+residents aged 15+, occupation at 2-digit level (OCCP 2011–2021, OCC06P
+2006 — all three print ANZSCO sub-majors on the canonical 43-code grid) ×
+the edition's small areas and × CED (federal frames + the drift anchor):
+sa2-2021/ced-2021 (SA2 codes roll into SA1 exactly: the SA2 is the leading
+9 digits of its 11-digit SA1 codes), sa2-2016/ced-2016, sa2-2011/ced-2011
+and cd-2006/ced-2006 (the 2006 edition reports on collection districts,
+the map's own 7-digit unit — no spread needed). TableBuilder's random cell
+perturbation is left in the file and NEVER re-normalised against GCP;
+class shares are computed inside the export's own stated-occupation basis
+(the sum of the 43 sub-major groups — the same basis GCP G60B's blue lane
+carries), and a per-edition publication guard compares Σ(43 sub-majors)
+plus the major-level nfd cells against the edition's own GCP/BCP stated
+total within ±3% (perturbation slack), a HARD fail before assemble. ABS
+pseudo-codes and supplementary ("not further defined") output rows never
+enter the basis. The small-area→SA1 spread assumes within-area class
+homogeneity, weights proportional to each SA1's own GCP/BCP stated-
+occupation workers; that is a documented modelling limit, unverified below
+the source-area grain.
+
+Small-area to SA1 code joins are edition-native and code-only (the
+geography is always a strict subset of the SA1 string, so no join file):
+  2021  SA2 = SA1_CODE_2021[:9] (11-digit SA1 codes)
+  2016/2011  the 7-digit SA1 code carries the 9-digit SA2's state digit
+        plus its trailing 4-digit ordinal — SA1[:5] == SA2[0]+SA2[-4:]
+        (SA1 1100701 belongs to SA2 101021007; the SA1 codes are
+        nationally unique, so the (state + ordinal) key identifies one
+        SA2 — a collision is a hard fail). Verified against every
+        committed SA2 row 2026-11-19.
+  2006  collection district rows ARE the map's own 7-digit unit
+        (identity).
+
+The publication guards are edition-native too — the export is checked
+against the edition's own published profile, never a neighbouring
+census's:
+  2021  ced-2021 v GCP gcp-ced.zip G60B per CED (155 real divisions)
+  2016  ced-2016 v GCP gcp-ced-2016.zip G57B per CED
+  2011  ced-2011 v BCP bcp-sa1-2011.zip B45B summed SA1→CED through ABS's
+        own CED↔SA1 allocation (1270055003_ced_2011_aust_csv.zip; no 2011
+        CED-g profile survives on the datapacks endpoint)
+  2006  ced-2006 v the committed 2006-BCP CD extracts' B44 majors summed
+        to STATES (no CED datapack and no CED-code↔name register survives
+        for the edition)
 
 usage: python3 .build/map/occ_lanes.py     # self-test on the testdata fixture
 """
@@ -132,7 +162,19 @@ if len(SUBMAJORS) != 43:
 # unrecognised code hard-fails instead — a shifted spreadsheet needs eyes.
 _CODE_RE = re.compile(r"^\s*[\"']?(\d{2,6})")
 _CED_RE = re.compile(r"(?i)\bCED\s*(\d{3})\b")
+_CED07_RE = re.compile(r"(?i)\bCED07(\d{3})\b")
 _SA2_RE = re.compile(r"(?<!\d)(\d{9})(?!\d)")
+_CD_RE = re.compile(r"(?<!\d)(\d{7})(?!\d)")
+
+# the committed exports' census era by file stem (testdata/toy.csv and any
+# caller-supplied path default to the 2021 code scheme, which the toy
+# fixture's 11-digit SA1s and CED101 rows also read)
+EXPORT_ERA = {
+    "sa2-2021": "2021", "ced-2021": "2021",
+    "sa2-2016": "2016", "ced-2016": "2016",
+    "sa2-2011": "2011", "ced-2011": "2011",
+    "cd-2006": "2006", "ced-2006": "2006",
+}
 
 
 def _fail(msg):
@@ -174,13 +216,23 @@ def _fold_lax(raw):
 
 
 def _geo_of(rowcells):
-    """Pick the row's geography id out of its first few cells."""
+    """Pick the row's geography id out of its first few cells. The
+    2006-edition codes fold onto the shared shapes: CED07### (Commonwealth
+    Electoral Division 2007) normalises to the same CED### key the newer
+    editions print, and bare 7-digit collection-district codes ride the
+    CD_RE arm (no edition mixes shapes inside one file)."""
     for cell in rowcells:
         t = str(cell).strip()
+        m = _CED07_RE.search(t)
+        if m:
+            return "CED" + m.group(1)
         m = _CED_RE.search(t)
         if m:
             return "CED" + m.group(1)
         m = _SA2_RE.search(t)
+        if m:
+            return m.group(1)
+        m = _CD_RE.search(t)
         if m:
             return m.group(1)
     return None
@@ -377,21 +429,187 @@ def drift_guard(gcp_ced_zip, tol=0.03):
     return worst
 
 
-def sa1_occ(sa1_stated, name="sa2-2021"):
-    """{sa1: (classvec in OCC_KEYS order, stated)} — each SA1's G60B
-    stated-occupation workers (`sa1_stated`) carrying its parent SA2's
-    class mix from the export (the documented within-SA2 homogeneity
-    limit). Counts land on G60B's footing, so every caller can weight-
-    add them like any other GCP count and share over Σstated. SA1s
-    whose SA2 the export doesn't print (or prints empty) get None."""
-    sa2, _ = load_occ(name)
-    sh = shares(sa2)
+# the eight 1-digit major groups' GCP/BCP column names — every GCP
+# edition's occupation block prints this exact family (G60B 2021, G57B
+# 2016, B45B 2011); local to the guards the way drift_guard's majors are
+_MAJ_COLS = ("P_Tot_Managers", "P_Tot_Professionals",
+             "P_Tot_TechnicTrades_W", "P_Tot_CommunPersnlSvc_W",
+             "P_Tot_ClericalAdminis_W", "P_Tot_Sales_W",
+             "P_Tot_Mach_oper_drivers", "P_Tot_Labourers")
+
+
+def drift_guard_2016(gcp_ced_zip, tol=0.03):
+    """drift_guard's 2016 twin: ced-2016's Σ(43 sub-majors + nfd) per
+    division v GCP G57B's eight majors (gcp-ced-2016.zip, the 2016 GCP
+    CED profile — the 2016 election-era divisions the vintages' state
+    frames run beside)."""
+    import zipfile
+    import io
+    ced, _ = load_occ("ced-2016")
+    nfd = _nfd_sums(os.path.join(SRC, "ced-2016.csv"))
+    z = zipfile.ZipFile(gcp_ced_zip)
+    m = [n for n in z.namelist() if n.endswith("G57B_AUS_CED.csv")][0]
+    worst, n = 0.0, 0
+    for row in csv.DictReader(io.TextIOWrapper(z.open(m), encoding="utf-8-sig")):
+        code = row["CED_CODE_2016"]
+        g = sum(int(row[c]) for c in _MAJ_COLS)
+        if g < 1000:
+            continue
+        if code not in ced:
+            _fail(f"drift guard 2016: {code} missing from ced-2016.csv")
+        t = ced[code]["stated"] + nfd.get(code, 0)
+        d = abs(t - g) / g
+        worst = max(worst, d)
+        n += 1
+        if d > tol:
+            _fail(f"drift guard 2016: {code} export {t} v G57B {g} ({d:.1%})")
+    print(f"occ drift guard 2016 ok: {n} CEDs, worst {worst:.2%} "
+          f"(tol {tol:.0%})")
+    return worst
+
+
+def drift_guard_2011(bcp_zip, alloc_zip, tol=0.03):
+    """ced-2011's Σ(43 sub-majors + nfd) per division v the 2011 BCP's
+    B45B majors summed SA1→CED through ABS's own CED↔SA1 allocation
+    (1270055003_ced_2011_aust_csv.zip). The SA1_MAINCODE→region_id decode
+    is the voter pipeline's maincode[0]+maincode[5:]."""
+    import zipfile
+    import io
+    ced, _ = load_occ("ced-2011")
+    nfd = _nfd_sums(os.path.join(SRC, "ced-2011.csv"))
+    member = ("2011 Census BCP Statistical Areas Level 1 for AUST/AUST/"
+              "2011Census_B45B_AUST_SA1_short.csv")
+    z = zipfile.ZipFile(bcp_zip)
+    stated = {}
+    for row in csv.DictReader(io.TextIOWrapper(z.open(member), encoding="utf-8-sig")):
+        stated[row["region_id"]] = sum(int(row[c]) for c in _MAJ_COLS)
+    truth = {}
+    za = zipfile.ZipFile(alloc_zip)
+    a_member = [n for n in za.namelist() if n.endswith(".csv")][0]
+    for row in csv.DictReader(io.TextIOWrapper(za.open(a_member), encoding="utf-8-sig")):
+        mc = row["SA1_MAINCODE_2011"]
+        rid = mc[0] + mc[5:]
+        w = stated.get(rid, 0)
+        if w:
+            truth["CED" + row["CED_CODE_2011"]] = \
+                truth.get("CED" + row["CED_CODE_2011"], 0) + w
+    worst, n = 0.0, 0
+    for code, g in truth.items():
+        if g < 1000:
+            continue
+        if code not in ced:
+            _fail(f"drift guard 2011: {code} missing from ced-2011.csv")
+        t = ced[code]["stated"] + nfd.get(code, 0)
+        d = abs(t - g) / g
+        worst = max(worst, d)
+        n += 1
+        if d > tol:
+            _fail(f"drift guard 2011: {code} export {t} v B45B-sum {g} "
+                  f"({d:.1%})")
+    print(f"occ drift guard 2011 ok: {n} CEDs, worst {worst:.2%} "
+          f"(tol {tol:.0%})")
+    return worst
+
+
+# the 2006 BCP's B44_B occupation majors cells, persons block (the
+# committed .matilda CD extracts' column names; the voter pipeline's
+# B44_COLS read verbatim)
+_B44_MAJORS = tuple(f"B{i}" for i in range(7153, 7161))
+_B44_STATE = {"NSW": "1", "VIC": "2", "QLD": "3", "SA": "4", "WA": "5",
+              "TAS": "6", "NT": "7", "ACT": "8"}
+
+
+def drift_guard_2006(cd06_extract_dir, tol=0.03):
+    """ced-2006's Σ(43 sub-majors + nfd) v the 2006 BCP's B44 majors,
+    both folded to STATES (the division-code↔name register and a CED-g
+    datapack don't survive for 2006; the state grain still fails loud on
+    a shifted sheet — measured slack is hundredths of a point)."""
+    ced, _ = load_occ("ced-2006")
+    nfd = _nfd_sums(os.path.join(SRC, "ced-2006.csv"))
+    exp = {}
+    for code, c in ced.items():
+        st = code[-3]
+        tot = c["stated"] + nfd.get(code, 0)
+        exp[st] = exp.get(st, 0) + tot
+    truth = {}
+    for st, digit in _B44_STATE.items():
+        p = os.path.join(cd06_extract_dir, f"CD_{st}_B44_B.csv")
+        if not os.path.exists(p):
+            _fail(f"drift guard 2006: missing {p} (extract census06bcp.zip "
+                  f"per derive-booth-demo-2006.py's header)")
+        s = 0
+        with open(p, newline="", encoding="utf-8-sig") as f:
+            for row in csv.DictReader(f):
+                s += sum(int(row[c]) for c in _B44_MAJORS)
+        truth[digit] = s
+    worst, n = 0.0, 0
+    for digit, g in truth.items():
+        t = exp.get(digit, 0)
+        d = abs(t - g) / g
+        worst = max(worst, d)
+        n += 1
+        if d > tol:
+            _fail(f"drift guard 2006: state {digit} export {t} v B44 {g} "
+                  f"({d:.1%})")
+    print(f"occ drift guard 2006 ok: {n} states, worst {worst:.2%} "
+          f"(tol {tol:.0%})")
+    return worst
+
+
+def _sa2_parent_index(sa2_keys):
+    """The 2016/2011-era parent lookup: a 7-digit SA1 code's first five
+    digits equal its SA2's state digit plus the SA2's trailing 4-digit
+    ordinal ({state+ordinal: 9-digit SA2}). ABS SA1 codes are nationally
+    unique per edition, so the key identifies exactly one SA2 — a
+    collision means the lattice assumption broke and is a hard fail."""
+    idx = {}
+    for k in sa2_keys:
+        key5 = k[0] + k[-4:]
+        if key5 in idx and idx[key5] != k:
+            _fail(f"SA2 codes {idx[key5]} and {k} collide on the "
+                  f"state+ordinal key {key5}")
+        idx[key5] = k
+    return idx
+
+
+def _sa1_occ_era(sa1_stated, area_counts, era):
+    """The era-dispatched engine of sa1_occ (self-test's entry point):
+    `area_counts` the parsed export at its native small-area grain,
+    `sa1_stated` {sa1: stated workers} the GCP/BCP footing those SA1s'
+    class mixes average over. The parent map is edition-native:
+    2021 prefix, 2016/2011 state+ordinal, 2006 identity."""
+    sh = shares(area_counts)
+    era = str(era)
+    if era == "2021":
+        parent = lambda c: str(c)[:9]
+    elif era in ("2016", "2011"):
+        idx = _sa2_parent_index(area_counts)
+        parent = lambda c: idx.get(str(c)[:5])
+    elif era == "2006":
+        parent = lambda c: str(c)
+    else:
+        _fail(f"sa1_occ: no SA1 code join for era {era!r}")
     out = {}
     for sa1, w in sa1_stated.items():
-        s = sh.get(str(sa1)[:9])
+        s = sh.get(parent(sa1))
         out[sa1] = (None if s is None or w <= 0 else
                     (tuple(s[k] * w for k in OCC_KEYS), float(w)))
     return out
+
+
+def sa1_occ(sa1_stated, name="sa2-2021"):
+    """{sa1: (classvec in OCC_KEYS order, stated)} — each SA1's GCP/BCP
+    stated-occupation workers (`sa1_stated`) carrying its parent's class
+    mix from the export `name` (the documented within-area homogeneity
+    limit; the parent join is the era's own code scheme — see the module
+    docstring). Counts land on the GCP/BCP footing, so every caller can
+    weight-add them like any other GCP count and share over Σstated.
+    SA1s whose parent the export doesn't print (or prints empty) get
+    None."""
+    counts, _ = load_occ(name)
+    era = EXPORT_ERA.get(os.path.splitext(os.path.basename(name))[0],
+                         "2021")
+    return _sa1_occ_era(sa1_stated, counts, era)
 
 
 def shares(counts):
@@ -433,8 +651,31 @@ def self_test():
     for k in OCC_KEYS:
         tot = sum(sp[s][k] for s in ("10101100101", "10101100102"))
         assert abs(tot - b[k]) < 1e-9, f"SA2 {k} mass not conserved"
+    # the era-dispatched engine carries each SA1's own stated weight
+    e21 = _sa1_occ_era(sa1s, counts, "2021")
+    sh21 = shares(counts)["101011001"]
+    assert e21["10101100101"] is not None and e21["10101100103"] is None
+    for i, k in enumerate(OCC_KEYS):
+        assert abs(e21["10101100101"][0][i] - sh21[k] * 400) < 1e-9, \
+            "2021-era sa1_occ: shares × own stated drifted"
+    # 2016/2011: the state+ordinal key joins 7-digit SA1s to the export
+    e11 = _sa1_occ_era({"1100101": 400, "1100102": 600, "1100103": 0,
+                        "9999999": 50}, counts, "2011")
+    assert e11["1100101"] is not None and e11["9999999"] is None, \
+        "2011-era parent join"
+    g11 = e11["1100101"][0]
+    for i, k in enumerate(OCC_KEYS):
+        assert abs(g11[i] - shares(counts)["101011001"][k] * 400) < 1e-9
+    # 2006: the CD export is already at unit grain (identity join)
+    d = dict(next(iter(counts.items()))[1])
+    e06 = _sa1_occ_era({"CED101": 100.0}, counts, "2006")
+    assert e06["CED101"][1] == 100.0
+    # the 2006-era geography folds are read off rows
+    assert _geo_of(['"CED07101"']) == "CED101"
+    assert _geo_of(['"1091601"']) == "1091601"
+    assert _geo_of(['"101021007"']) == "101021007"
     print("occ_lanes self-test ok: 43 sub-majors, 7 classes, residual 19, "
-          "reader + spread + shares green")
+          "reader + spread + era joins + shares green")
     return True
 
 

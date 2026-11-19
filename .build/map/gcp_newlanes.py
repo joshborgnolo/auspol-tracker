@@ -670,37 +670,56 @@ def load_arr_eng(gcp_zip, prefix="", era="2021", rows_pin=None,
 
 
 # ---- the Occupation classes (2026-11-19) ----------------------------
-# seven Oesch-style classes off the 2021 TableBuilder SA2 export
-# (occ_lanes.py owns the lattice, the reader, the CED drift gate and
-# the SA2->SA1 spread); 2021-census frames only — any other era returns
-# None and its callers print no occ lane and no occKeys
+# seven Oesch-style classes off the edition's TableBuilder small-area
+# export (occ_lanes.py owns the lattice, the reader, the per-era CED
+# drift gates and the small-area->SA1 spread); the 2011/2016/2021 census
+# editions carry it — any other era returns None and its callers print
+# no occ lane and no occKeys (lanes arc widened per edition 2026-11-19)
 import importlib.util as _ilu
 _occ_spec = _ilu.spec_from_file_location(
     "occ_lanes", os.path.join(os.path.dirname(os.path.abspath(__file__)), "occ_lanes.py"))
 occ_lanes = _ilu.module_from_spec(_occ_spec)
 _occ_spec.loader.exec_module(occ_lanes)
 OCC_KEYS = list(occ_lanes.OCC_KEYS)
-_OCC_GATED = []
+_OCC_GATED = set()
+# the edition's 1-digit occupation block in its own GCP/BCP SA1 pack
+_OCC_TAB = {"2021": "G60B", "2016": "G57B", "2011": "B45B"}
+# the 2011-era guard's ABS CED<->SA1 allocation (a 2011 CED BCP is no
+# longer served from the datapacks endpoint)
+_OCC_ALLOC11 = os.path.join(_REPO, ".matilda", "seifa-irsad-abs", "dl",
+                            "1270055003_ced_2011_aust_csv.zip")
 
 
 def load_occ(gcp_zip, prefix="", era="2021", rows_pin=None,
              key_col=None):
     """{sa1: (classvec in OCC_KEYS order, stated) | None} for the
-    prefix's SA1s — each SA1's G60B stated-occupation workers carrying
-    its SA2's class mix — or None off the 2021 census. The drift gate
-    (CED export v G60B within ±3%) runs once per process."""
-    if str(era) != "2021":
+    prefix's SA1s — each SA1's stated-occupation workers carrying its
+    parent's class mix — or None off the covered census editions. The
+    era's drift gate (the edition's own CED profile within ±3%, occ_lanes
+    owns the shapes) runs once per process per era."""
+    era = str(era)
+    tab = _OCC_TAB.get(era)
+    if tab is None:
         return None
-    if not _OCC_GATED:
-        occ_lanes.drift_guard(os.path.join(os.path.dirname(gcp_zip), "gcp-ced.zip"))
-        _OCC_GATED.append(True)
-    v = VINTAGES["2021"]
+    if era not in _OCC_GATED:
+        zdir = os.path.dirname(gcp_zip)
+        if era == "2021":
+            occ_lanes.drift_guard(os.path.join(zdir, "gcp-ced.zip"))
+        elif era == "2016":
+            occ_lanes.drift_guard_2016(
+                os.path.join(zdir, "gcp-ced-2016.zip"))
+        else:
+            occ_lanes.drift_guard_2011(gcp_zip, _OCC_ALLOC11)
+        _OCC_GATED.add(era)
+    v = VINTAGES[era]
     z = zipfile.ZipFile(gcp_zip)
-    o60 = _table(z, v["member"].format(table="G60B"), key_col or v["key"],
-                 BASE_OCC_COLS, rows_pin or v["rows"], prefix)
-    out = occ_lanes.sa1_occ({c: sum(r) for c, r in o60.items()})
+    base = _table(z, v["member"].format(table=tab), key_col or v["key"],
+                  BASE_OCC_COLS, rows_pin or v["rows"], prefix)
+    out = occ_lanes.sa1_occ({c: sum(r) for c, r in base.items()},
+                            name=f"sa2-{era}")
     print(f"occupation classes: {sum(1 for x in out.values() if x)} of "
-          f"{len(out)} SA1s carry a class mix (prefix {prefix or 'AU'})")
+          f"{len(out)} SA1s carry a class mix (prefix {prefix or 'AU'}, "
+          f"era {era})")
     return out
 
 

@@ -178,6 +178,12 @@ eq(d.counts.national, {
      folds in ~3% not-stated, which the share basis excludes) */
   mar: { marr: 0.4878, never: 0.343, sep: 0.0304, div: 0.084,
          wid: 0.0548 },
+  // the Occupation select lane (the OCCP-2digit SA2 TableBuilder export
+  // spread onto SA1 over B45B's stated workers -- the 2026-11-19 arc's
+  // 2011-edition file; never a partition)
+  occ: { socprof: 0.1149, biztech: 0.1736, farmer: 0.0161,
+         farmwrk: 0.009, hospmgr: 0.0419, trades: 0.0816,
+         routine: 0.1523 },
 }, "counts.national");
 
 // 4. division anchors (measured blocks; the demoI interp block has its
@@ -191,6 +197,8 @@ const COB_KEYS8 = ["ind", "chn", "nzl", "phl", "vnm", "zaf", "ita", "lka"];
 eq(d.cobKeys, COB_KEYS8, "cobKeys contract");
 eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
   "marKeys contract");
+eq([...d.occKeys], ["socprof", "biztech", "farmer", "farmwrk", "hospmgr",
+  "trades", "routine"], "occKeys contract");
 
 // 4. division anchors
 {
@@ -222,6 +230,9 @@ eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
       health: 0.0837, arts: 0.0303, othersvc: 0.0274 },
     mar: { marr: 0.2901, never: 0.5823, sep: 0.0234, div: 0.0793,
       wid: 0.025 },
+    occ: { socprof: 0.1625, biztech: 0.3554, farmer: 0.0003,
+      farmwrk: 0.0013, hospmgr: 0.0499, trades: 0.0199,
+      routine: 0.0534 },
   }, "Sydney row");
   const M = divs.get("Melbourne");
   eq([M.persons, M.langOther, M.fborn, M.uni, M.blue,
@@ -260,6 +271,9 @@ eq([...d.marKeys], ["marr", "never", "sep", "div", "wid"],
       health: 0.1048, arts: 0.0247, othersvc: 0.0656 },
     mar: { marr: 0.4521, never: 0.4054, sep: 0.0344, div: 0.0726,
       wid: 0.0356 },
+    occ: { socprof: 0.1315, biztech: 0.1279, farmer: 0.0147,
+      farmwrk: 0.0373, hospmgr: 0.041, trades: 0.0942,
+      routine: 0.1571 },
   }, "Lingiari row (printed)");
   console.log("Lingiari:", JSON.stringify(L));
   const a65 = (x) => x.age["65_74"] + x.age["75_84"] + x.age["85ov"];

@@ -77,6 +77,15 @@ hla = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(hla)
 fail = m25.fail
 hash16 = m25.hash16
+# the Occupation select lens's class machinery (2026-11-19 arc per
+# edition): the 2011-era sibling of the voter stores' slot 33 — seven
+# Oesch-style classes out of ABS TableBuilder's OCCP-2digit SA2 export
+# (sa2-2011.csv), spread onto SA1s over B45B's stated-occupation workers
+_occ_spec = importlib.util.spec_from_file_location(
+    "occ_lanes", ROOT / ".build/map/occ_lanes.py")
+occ_lanes = importlib.util.module_from_spec(_occ_spec)
+_occ_spec.loader.exec_module(occ_lanes)
+OCC_KEYS = list(occ_lanes.OCC_KEYS)
 # the homeless lane's est-allocation table (its own guard fails loud
 # when the cache is missing); the lane reads the 2011 edition here
 HL_ALLOC = hla.alloc_of(2011, "c7") if hla is not None else None
@@ -870,6 +879,13 @@ def shares(rec):
         profd = rec["profG"] + rec["profP"]
         out["prof"] = {"good": bounded(rec["profG"], profd),
                        "limited": bounded(rec["profP"], profd)}
+    # the Occupation select lens's classes (2026-11-19 arc): the OCCP-2
+    # SA2 export spread over B45B stated-occupation workers (within-SA2
+    # class homogeneity, the module docstring's documented limit), each
+    # class over the stated workers — never a partition
+    if rec.get("occvec") is not None and rec.get("occw"):
+        out["occ"] = {k: bounded(rec["occvec"][i], rec["occw"])
+                      for i, k in enumerate(OCC_KEYS)}
     return out
 
 
@@ -917,6 +933,22 @@ def main():
     if short:
         fail(f"CED-2011 SA1s short a BCP table: {sorted(short)[:8]}")
 
+    # the Occupation classes (2026-11-19 arc): the OCCP-2 SA2 export's
+    # class mix spread onto SA1s over B45B's own stated workers (no
+    # multiplication past the export's own perturbation); the CED sheet
+    # is drift-guarded against the BCP majors summed SA1->CED through
+    # ABS's own allocation before anything files
+    occ = occ_lanes.sa1_occ(
+        {code: rec["occd"] for code, rec in sa1.items() if rec["occd"]},
+        name="sa2-2011")
+    occ_lanes.drift_guard_2011(str(BCP_ZIP), str(CED_ZIP))
+    print(f"occupation classes: {sum(1 for v in occ.values() if v)} of "
+          f"{len(occ)} SA1s carry a class mix")
+    for code, rec in sa1.items():
+        ov = occ.get(code)
+        if ov is not None:
+            rec["occvec"], rec["occw"] = list(ov[0]), ov[1]
+
     divstate = {b["div"]: b["state"] for b in booths}
     divsum = defaultdict(lambda: {"pers": 0, "bands": [0] * len(BANDS),
                                   "eng": 0, "oth": 0, "aus": 0, "totc": 0,
@@ -942,7 +974,9 @@ def main():
                                   "indn": [0] * len(IND_KEYS),
                                   "marvec": [0] * len(MAR_KEYS),
                                   "arrv": [0] * 9, "arrNS": 0,
-                                  "profG": 0, "profP": 0})
+                                  "profG": 0, "profP": 0,
+                                  "occvec": [0.0] * len(OCC_KEYS),
+                                  "occw": 0.0})
     for key, dv in ced.items():
         r = sa1[key]
         ir = inc[key]
@@ -994,6 +1028,10 @@ def main():
         acc["arrNS"] += r["arrNS"]
         acc["profG"] += r["profG"]
         acc["profP"] += r["profP"]
+        if r.get("occvec") is not None:
+            for i in range(len(OCC_KEYS)):
+                acc["occvec"][i] += r["occvec"][i]
+            acc["occw"] += r["occw"]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -1043,7 +1081,9 @@ def main():
                 "indn": (list(row["indn"]) if row["indn"] is not None
                          else None),
                 "marvec": (list(row["marvec"]) if row["marvec"] is not None
-                           else None)})
+                           else None),
+                **({"occvec": row["occvec"], "occw": row["occw"]}
+                   if row.get("occvec") is not None else {})})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the CED-2011 universe), not
@@ -1093,6 +1133,10 @@ def main():
         nat["arrNS"] = nat.get("arrNS", 0) + dv["arrNS"]
         nat["profG"] = nat.get("profG", 0) + dv["profG"]
         nat["profP"] = nat.get("profP", 0) + dv["profP"]
+        for i in range(len(OCC_KEYS)):
+            nat.setdefault("occvec", [0.0] * len(OCC_KEYS))
+            nat["occvec"][i] += dv["occvec"][i]
+        nat["occw"] = nat.get("occw", 0.0) + dv["occw"]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -1170,6 +1214,9 @@ def main():
                                        / (nat["profG"] + nat["profP"]),
                                        4)}
                      if nat["profG"] + nat["profP"] else None),
+            "occ": ({k: round(nat["occvec"][i] / nat["occw"], 4)
+                     for i, k in enumerate(OCC_KEYS)}
+                    if nat["occw"] else None),
         },
     }
     out = {
@@ -1236,7 +1283,15 @@ def main():
             "trades + machinery operators/drivers + labourers of B45B "
             "the ANZSCO occupation major groups) over the eight stated "
             "occupation groups, inadequately-described and not-stated "
-            "occupations out of the frame. Income lanes mirror the "
+            "occupations out of the frame; and the Occupation select "
+            "lens's seven Oesch-style classes (occ, key order in "
+            "occKeys) off ABS TableBuilder's OCCP-2digit SA2-of-2011 "
+            "export (.build/map/src/census-occ/sa2-2011.csv, the "
+            "2026-11-19 lane arc's 2011-edition file), each class mix "
+            "spread onto SA1s proportional to B45B's stated-occupation "
+            "workers — within-SA2 class homogeneity, the documented "
+            "modelling limit; TableBuilder's cell perturbation rides "
+            "along unre-normalised. Income lanes mirror the "
             "voter stores on the BCP's own tables: B28 households by "
             "the 14-band weekly household-income grid are re-weighted "
             "to ADULTS at the data/income-dist.json factors (each "
@@ -1274,6 +1329,9 @@ def main():
                        "B42B/B45B), abs.gov.au census datapacks",
                 "ced": "ABS ASGS Vol 3 July 2011, CED to SA1 allocation "
                        "(1270055003_ced_2011_aust_csv.zip)",
+                "occ": ("ABS TableBuilder OCCP-2digit x SA2 2011 export, "
+                       ".build/map/src/census-occ/sa2-2011.csv "
+                       "(provenance JSON beside)"),
                 "venue": "data/booth-seifa-2013.json",
             },
             "files": {
@@ -1293,6 +1351,10 @@ def main():
         # shared print family's own order; B43C/D's persons block)
         "indKeys": list(IND_KEYS),
         "marKeys": list(MAR_KEYS),
+        # the Occupation select lens's seven Oesch-style classes (the
+        # OCCP-2 SA2 export's sub-major lattice; 2026-11-19 arc) — keys
+        # ride the shared OCC_KEYS order
+        "occKeys": list(OCC_KEYS),
         # the Immigration lens's arrival lanes (2026-11-12): the 2011
         # print's own band keys beside the proficiency pair's two keys
         "arrKeys": list(ARR_KEYS_2011),

@@ -1224,7 +1224,7 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(base.includes('const OCC_NAME = { socprof: "Sociocultural professionals"'), "the classes lead with sociocultural professionals");
   assert.ok(base.includes('trades: "Tradespeople"') && base.includes('routine: "Routine manual workers"'), "the manual halves of the Oesch split");
   assert.ok(base.includes('const OCCISMS = {') && base.includes('farmwrk: "do farm, forestry or garden work"'), "the per-class story verbs (farm labourers kept apart from routine manual)");
-  assert.ok(base.includes('const OCC_RANGE = { socprof: [0, 25], biztech: [0, 50], farmer: [0, 20], farmwrk: [0, 10], hospmgr: [0, 7], trades: [0, 20], routine: [0, 35] };') && !base.includes("PROVISIONAL PLACEHOLDER"), "the measured range caps replaced the Phase A placeholder");
+  assert.ok(base.includes('const OCC_RANGE = { socprof: [0, 26], biztech: [0, 50], farmer: [0, 20], farmwrk: [0, 10], hospmgr: [0, 7], trades: [0, 21], routine: [0, 35] };') && !base.includes("PROVISIONAL PLACEHOLDER"), "the measured range caps replaced the Phase A placeholder (socprof/trades widened to the 2016-census-era maxima in the editions arc)");
   assert.ok(base.includes('const isOcc = () => S.index === LENS_OCC && S.occ != null;'), "the select-view guard");
   assert.ok(base.includes("m.occKeys = res.occKeys || null;") && base.includes("m.occPos"), "loadYear records the occ key order and its positional spots");
   assert.ok(base.includes("demo.occ = {};"), "the Occupation pools sum shares of workers the ancestry way");
@@ -1238,18 +1238,27 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.ok(ui.includes('k === "occ"'), "the picker's change handler is wired");
   assert.ok(/if \(!b\.occKeys && S\.index === LENS_OCC\) S\.index = "irsad";/.test(ui) && /if \(!\(b\.occKeys \|\| \[\]\)\.includes\(S\.occ\)\) S\.occ =/.test(ui), "year swaps clamp the lens and the picked class");
   assert.ok(story.includes("const OCC_TOP = {") && story.includes('farmer: ["seats where the most workers are farmers or farm managers"'), "area stories phrase the classes against their worker base");
-  // the store landing (2026-11-19): the federal 2016-2025 frames (voter
-  // stores all read the 2021 census) and the 2021-census state frames
-  // carrying Industry publish the classes; older-census frames stay null
-  for (const f of ["2013", "nsw19", "vic18", "qld17", "wa17", "sa18"]) assert.ok(!("occKeys" in JSON.parse(R(`map/data/res-${f}.json`))), `${f}: pre-2021-census frames stay era-null`);
-  for (const f of ["2016", "2019", "2022", "2025", "nsw23", "vic22", "qld20", "qld24", "sa22", "sa26", "wa21", "wa25", "nt20", "nt24"]) {
+  // the store landings: the 2021-census frames first, then the editions
+  // arc (2026-11-19, second land the same day) — the 2016 and 2011
+  // censuses wire nsw15/nsw19, vic14/vic18, qld17, wa17, nt16, and the
+  // federal frames go to 2013 on the 2011 census and to 2007/2010 on
+  // the 2006 print. Pre-2006 federal eras, sa18 (no Industry menu) and
+  // the tas/act frames (no People select lenses page-side at all — the
+  // occ lane lands only in their demo *stores*) stay era-null
+  for (const f of ["1993", "1996", "1998", "2001", "2004", "sa18", "tas14", "tas18", "act16"]) assert.ok(!("occKeys" in JSON.parse(R(`map/data/res-${f}.json`))), `${f}: era-null frames (pre-2006 federal, Industry-less tas/act families, sa18)`);
+  for (const f of ["2007", "2010", "2013", "2016", "2019", "2022", "2025", "nsw15", "nsw19", "nsw23", "vic14", "vic18", "vic22", "qld17", "qld20", "qld24", "sa22", "sa26", "wa17", "wa21", "wa25", "nt16", "nt20", "nt24"]) {
     const r = JSON.parse(R(`map/data/res-${f}.json`));
     assert.deepEqual(r.occKeys, ["socprof", "biztech", "farmer", "farmwrk", "hospmgr", "trades", "routine"], `${f}: occKeys in menu order`);
     const dv = r.divs.filter((d) => d.demo && d.demo.occ);
     assert.ok(dv.length >= r.divs.length - 2, `${f}: every seat carries its class shares (${dv.length}/${r.divs.length})`);
     for (const d of dv) for (const [k, v] of Object.entries(d.demo.occ)) assert.ok(v === null || (v >= 0 && v <= OCC_CAP[k] / 100), `${f} ${d.n} ${k} ${v} inside its cap`);
     const rows = r.booths.occ.filter(Boolean);
-    assert.ok(rows.length > 0.85 * r.booths.occ.length, `${f}: polling places carry occ rows (${rows.length}/${r.booths.occ.length})`);
+    // measured coverage floors per frame (2026-11-19, editions arc):
+    // qld17's PPVC pile lacks coordinates for a slice of its venues (0.645),
+    // nsw15's pre-2019 fixed-booth coords likewise (0.763); the rest run
+    // ≥0.85 (wa17 0.955 is the tightest head-room)
+    const OCC_COVER_FLOOR = { qld17: 0.6, nsw15: 0.7 };
+    assert.ok(rows.length > (OCC_COVER_FLOOR[f] ?? 0.85) * r.booths.occ.length, `${f}: polling places carry occ rows (${rows.length}/${r.booths.occ.length})`);
   }
   // the class shares never sum to a whole: 19 sub-majors stay unclassed
   { const d = JSON.parse(R("map/data/res-2025.json")).divs.find((x) => x.n === "Bennelong").demo.occ; const t = Object.values(d).reduce((a, b) => a + b, 0); assert.ok(t > 0.5 && t < 0.85, `Bennelong 2025's seven classes cover ${t} of stated workers`); }

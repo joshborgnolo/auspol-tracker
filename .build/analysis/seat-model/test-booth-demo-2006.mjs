@@ -96,6 +96,12 @@ const NATIONAL = {
   // marital over the 15+ stated-status share (the 2006 BCP's B05)
   mar: { marr: 0.4968, never: 0.3313, sep: 0.031, div: 0.082,
          wid: 0.0589 },
+  // the Occupation select lane (the OCC06P CD TableBuilder export read
+  // at the edition's own unit, no spread -- the 2026-11-19 arc's
+  // 2006-edition file; never a partition)
+  occ: { socprof: 0.1078, biztech: 0.1647, farmer: 0.0211,
+         farmwrk: 0.0104, hospmgr: 0.0435, trades: 0.0841,
+         routine: 0.1602 },
 };
 // 2006 edition's incomeCuts record (the $3,000+ top-band edition)
 const INC_CUTS = {
@@ -223,6 +229,8 @@ for (const year of [2007, 2010]) {
   eq(d.counts.national, NATIONAL, `${year} counts.national`);
   eq(d.incomeCuts, INC_CUTS, `${year} incomeCuts record`);
   eq(d.cobKeys, COB_KEYS8, `${year} cobKeys contract`);
+  eq([...d.occKeys], ["socprof", "biztech", "farmer", "farmwrk", "hospmgr",
+    "trades", "routine"], `${year} occKeys contract`);
   // 3a. income arm well-formedness: shares in range, median sane
   {
     let badShare = 0, badMed = 0, incNull = 0;

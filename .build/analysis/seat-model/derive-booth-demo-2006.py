@@ -89,6 +89,17 @@ income_band_median = lambda masses: ilanes.band_median(  # noqa: E731
     masses, ilanes.INC_BANDS_06)
 INC_BANDS06 = ilanes.INC_BANDS_06
 
+# the Occupation select lens's class machinery (2026-11-19 arc per
+# edition): seven Oesch-style classes out of ABS TableBuilder's OCC06P
+# CD-class export (cd-2006.csv — the 2006 edition prints ANZSCO on the
+# canonical 43-sub-major lattice, and the CD is the map's own unit, so no
+# spread beneath it is ever modelled)
+_occ_spec = importlib.util.spec_from_file_location(
+    "occ_lanes", ROOT / ".build/map/occ_lanes.py")
+occ_lanes = importlib.util.module_from_spec(_occ_spec)
+_occ_spec.loader.exec_module(occ_lanes)
+OCC_KEYS = list(occ_lanes.OCC_KEYS)
+
 ABS = ROOT / ".matilda/seifa-irsad-abs"
 BCP_ZIP = ABS / "dl/census06bcp.zip"
 CD06 = ABS / "dl/cd06"
@@ -581,10 +592,18 @@ def shares(rec):
         profd = rec["profG"] + rec["profP"]
         out["prof"] = {"good": bounded(rec["profG"], profd),
                        "limited": bounded(rec["profP"], profd)}
+    # the Occupation classes (2026-11-19): seven Oesch-style classes off
+    # the CD-class OCC06P TableBuilder export, each class's share of the
+    # stated-occupation workers — never a partition (the print's
+    # not-further-defined sub-majors carry no class)
+    if rec.get("occvec") is not None and rec.get("occw"):
+        out["occ"] = {k: bounded(rec["occvec"][i], rec["occw"])
+                      for i, k in enumerate(OCC_KEYS)}
     return out
 
 
-def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
+def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut,
+               occ_map):
     """One election's store off the shared BCP table."""
     venue_path = VENUE[year]
     alloc_path = ALLOC[year]
@@ -632,7 +651,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                                   "indn": [0] * len(IND_KEYS),
                                   "marvec": [0] * len(MAR_KEYS),
                                   "arrv": [0] * 4, "arrNS": 0,
-                                  "profG": 0, "profP": 0})
+                                  "profG": 0, "profP": 0,
+                                  "occvec": [0.0] * len(OCC_KEYS),
+                                  "occw": 0.0})
     for key, dv in ced.items():
         r = sa1[key]
         acc = divsum[dv]
@@ -683,6 +704,11 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         acc["arrNS"] += r["arrNS"]
         acc["profG"] += r["profG"]
         acc["profP"] += r["profP"]
+        ov = occ_map.get(key)
+        if ov is not None:
+            for i in range(len(OCC_KEYS)):
+                acc["occvec"][i] += ov[0][i]
+            acc["occw"] += ov[1]
 
     out_booths = []
     geo_missing = geo_empty = 0
@@ -702,6 +728,7 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             rec["demo"] = None
         else:
             inc = inc_map.get(vb.get("geo"))
+            ov_cd = occ_map.get(vb.get("geo"))
             rec["demo"] = shares({
                 "pers": row["pers"], "bands": list(row["ages"]),
                 "eng": row["eng"], "oth": row["oth"],
@@ -729,7 +756,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                 "indn": (list(row["indn"]) if row["indn"] is not None
                          else None),
                 "marvec": (list(row["marvec"]) if row["marvec"]
-                           is not None else None)})
+                           is not None else None),
+                **({"occvec": list(ov_cd[0]), "occw": ov_cd[1]}
+                   if ov_cd else {})})
         out_booths.append(rec)
 
     # the national row pools DIVISION sums (the era-division universe),
@@ -778,6 +807,10 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         nat["arrNS"] = nat.get("arrNS", 0) + dv["arrNS"]
         nat["profG"] = nat.get("profG", 0) + dv["profG"]
         nat["profP"] = nat.get("profP", 0) + dv["profP"]
+        for i in range(len(OCC_KEYS)):
+            nat.setdefault("occvec", [0.0] * len(OCC_KEYS))
+            nat["occvec"][i] += dv["occvec"][i]
+        nat["occw"] = nat.get("occw", 0.0) + dv["occw"]
 
     divisions = []
     for name in sorted(divsum, key=lambda n: (STATE_ORDER[divstate[n]], n)):
@@ -850,6 +883,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                                        / (nat["profG"] + nat["profP"]),
                                        4)}
                      if nat["profG"] + nat["profP"] else None),
+            "occ": ({k: round(nat["occvec"][i] / nat["occw"], 4)
+                     for i, k in enumerate(OCC_KEYS)}
+                    if nat["occw"] else None),
         },
     }
     era = ("the January 2007 national division set (the boundaries the "
@@ -927,7 +963,16 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
             "employment nineteen ANZSIC-2006 divisions (ind, key order "
             "in indKeys) each shared over the divisions' stated sum, "
             "the print's inadequately-described/not-stated cells "
-            "beside the lane. The national row pools the "
+            "beside the lane; and the Occupation select lens's seven "
+            "Oesch-style classes (occ, key order in occKeys) off ABS "
+            "TableBuilder's OCC06P-2digit collection-district export "
+            "(.build/map/src/census-occ/cd-2006.csv, the 2026-11-19 "
+            "lane arc's 2006-edition file — the BCP itself tops out "
+            "at 1-digit occupation, so the sub-major lattice rides "
+            "TableBuilder's own perturbation, never re-normalised), "
+            "each class over the CD's stated-occupation workers (per "
+            "CD, the venue's own unit — no spread beneath it). The "
+            "national row pools the "
             "division sums. A booth whose venue CD records no "
             "residents (commercial/industrial blocks; "
             "counts.boothsGeoEmpty) carries demo:null, as does one "
@@ -945,6 +990,9 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
                        "B15_B/B24/B26/B28/B32/B39_B/B41_B/B44_B), "
                        "abs.gov.au archive census06bcp.zip",
                 "alloc": f"{alloc_path.name} (derive-ced-era-alloc.py)",
+                "occ": ("ABS TableBuilder OCC06P-2digit x CD 2006 export, "
+                       ".build/map/src/census-occ/cd-2006.csv "
+                       "(provenance JSON beside)"),
                 "venue": f"data/booth-seifa-{year}.json",
             },
             "files": {
@@ -968,6 +1016,10 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
         # the Industry picker's nineteen ANZSIC-2006 divisions (B42's
         # Persons totals across B42_C/B42_D)
         "indKeys": list(IND_KEYS),
+        # the Occupation select lens's seven Oesch-style classes (the
+        # OCC06P CD export's sub-major lattice; 2026-11-19 arc) — keys
+        # ride the shared OCC_KEYS order
+        "occKeys": list(OCC_KEYS),
         "marKeys": list(MAR_KEYS),
         "deliveryBasis": ("venue-proxy per booth (collection district of "
                           "the premises); exact era-division census sum "
@@ -992,10 +1044,20 @@ def build_year(year, sa1, inc_map, inc_cut, inc_hishare, inc_hiqcut):
 
 def main():
     sa1 = load_bcp()
+    # the Occupation classes (2026-11-19 arc): the CD-class OCC06P export
+    # read against the BCP's own B44 majors — no spread (CDs ARE this
+    # universe's unit); the publication guard checks the CED-level sheet
+    # against the BCP stated total at state grain before anything files
+    occ_map = occ_lanes.sa1_occ(
+        {code: rec["occd"] for code, rec in sa1.items() if rec["occd"]},
+        name="cd-2006")
+    occ_lanes.drift_guard_2006(str(CD06))
+    print(f"occupation classes: {sum(1 for v in occ_map.values() if v)} of "
+          f"{len(occ_map)} CDs carry a class mix")
     inc_map, inc_cut, inc_hishare, inc_hiqcut = income06()
     for year in (2007, 2010):
         out = build_year(year, sa1, inc_map, inc_cut, inc_hishare,
-                         inc_hiqcut)
+                         inc_hiqcut, occ_map)
         c = out["counts"]
         op = ROOT / f"data/booth-demo-{year}.json"
         op.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n",

@@ -302,12 +302,12 @@ const ANC_RANGE = { english: [0, 80], australian: [10, 75], irish: [0, 25], scot
 const LENS_OCC = "occ";
 const OCC_NAME = { socprof: "Sociocultural professionals", biztech: "Business & technical professionals and managers", farmer: "Farmers", farmwrk: "Farm workers", hospmgr: "Hospitality, retail & service managers", trades: "Tradespeople", routine: "Routine manual workers" };
 const OCCISMS = { socprof: "work in education, health, welfare, the arts or media", biztech: "are business or technical professionals or corporate managers", farmer: "are farmers or farm managers", farmwrk: "do farm, forestry or garden work", hospmgr: "manage hospitality, retail or service businesses", trades: "work as tradespeople", routine: "do routine manual work" };
-// measured caps (2026-11-19 store landing): each class priced just above
-// its seat maximum across every occ frame — socprof 24.4 (Nedlands, wa21),
-// biztech 47.6 (North Shore, nsw23), farmer 18.7 (Roe, wa25), farmwrk 9.2
-// (Barkly, nt20), hospmgr 6.0 (Noosa, qld20), trades 17.4 (Pilbara, wa21),
-// routine 34.0 (Woodridge, qld20)
-const OCC_RANGE = { socprof: [0, 25], biztech: [0, 50], farmer: [0, 20], farmwrk: [0, 10], hospmgr: [0, 7], trades: [0, 20], routine: [0, 35] };
+// measured caps (2026-11-19 store landing + editions arc): each class
+// priced just above its seat maximum across every occ frame — socprof
+// 25.6 (Nedlands, wa17), biztech 47.6 (North Shore, nsw23), farmer 18.8
+// (Roe, wa17), farmwrk 9.2 (Barkly, nt20), hospmgr 6.8 (Surfers Paradise,
+// qld17), trades 20.5 (Nelson, nt16), routine 34.0 (Woodridge, qld20)
+const OCC_RANGE = { socprof: [0, 26], biztech: [0, 50], farmer: [0, 20], farmwrk: [0, 10], hospmgr: [0, 7], trades: [0, 21], routine: [0, 35] };
 // the Industry select lens (the 2026-11-11 industry-picker arc): S.index
 // === LENS_IND and S.ind the picked division. Nineteen ANZSIC-2006
 // divisions as shares of employed people with a stated industry
