@@ -67,11 +67,10 @@ by .build/harvest-vic-state-flows.py; this script never refetches):
     sums and to REF_2PP_SUMS (ALP 1,745,194 v Coalition 1,611,715 —
     the officials' 51.99%). Reconciliation rule page-for-page with the
     2018 script: certified classic final -> equals the final; else the
-    tcp page's classic totals; else the pinned notional class
-    PP_NOTIONAL (computed per the rule, included districts whose
-    certified final or tcp pair is non-classic: Melbourne/Richmond/
-    Northcote/Brunswick (ALP-v-GRN), Shepparton (LIB-v-IND), Mildura
-    (the Cupper-era stop-state)).
+    tcp page's classic totals; else the notional rows SHIP as the
+    districts' majors figures (EXPECTED_NOTIONAL, tpp + tppn: the VEC's
+    official alternative count — the user's 2026-11-19 "notional where
+    the final count wasn't the majors" call).
   2ppvote2018-final.xlsx "MP turnover" + "No of candidates" sheets —
     the STALE-APPENDIX finding from the 2018 workbooks: both appendix
     sheets document the 2014 election (member cells are the
@@ -338,8 +337,16 @@ PRAHRAN_VENUES = frozenset({
 # non-classic districts (ALP-v-GRN inner seats + Shepparton LIB-v-IND;
 # Mildura's Cupper-era stop-state pairs NAT-v-LAB-IND; prahran itself
 # reconciles against its indicative tcp page totals).
-PP_NOTIONAL = frozenset({"Brunswick", "Melbourne", "Mildura", "Northcote",
-                         "Richmond", "Shepparton"})
+#
+# EXPECTED_NOTIONAL: the districts whose OFFICIAL workbook 2PP row is a
+# notional majors count — shipped as this frame's tpp with the tppn
+# marker since 2026-11-19 (vic18-style; adjudication trail in
+# .build/map/src/vic/notional-adjudication.md). Prahran joins the class
+# from its page-classic override case (its row verifies against the
+# page totals in the recon; all seven = this frame's bare set).
+EXPECTED_NOTIONAL = frozenset({"Brunswick", "Melbourne", "Mildura",
+                               "Northcote", "Prahran", "Richmond",
+                               "Shepparton"})
 
 COALITION = {"LP", "LNP", "NP", "CLP", "NAT", "LNQ", "LIB"}
 BUCKETS = ["alp", "lnp", "grn", "onp", "ind", "oth"]
@@ -1271,10 +1278,21 @@ def main():
         pagepp_of[name] = (page_buckets, page_map)
 
         tpp = None
+        tpp_notional = False
         if lane_map is not None:
             tpp = [lane_map[0], lane_map[1], None]
             tpp_tot[0] += lane_map[0]
             tpp_tot[1] += lane_map[1]
+        elif name in pp:
+            # the official workbook's notional rows (EXPECTED_NOTIONAL):
+            # a majors pair count VEC itself published — shipped 2026-11-19
+            # with the tppn marker (official alternative count; adjudication
+            # in .build/map/src/vic/notional-adjudication.md)
+            va, vb = pp[name]
+            tpp = [va, vb, None]
+            tpp_tot[0] += va
+            tpp_tot[1] += vb
+            tpp_notional = True
 
         # ---------------- booths: the join + lanes (vic22's shape)
         rn = RENAMES.get(name, name)
@@ -1328,6 +1346,8 @@ def main():
                "enrolled": sm["enrolled"]}
         if tpp:
             rec["tpp"] = tpp
+        if tpp_notional:
+            rec["tppn"] = 1
         D.append(rec)
         tot_formal += sm["formal"]
         tot_inf += sm["informal"]
@@ -1361,14 +1381,22 @@ def main():
         fail(f"appendix candidate counts drift at {diff[:6]}")
 
     # 2ppvote reconciliation (the source-block rule):
-    # 1. certified classic final present -> row == that final;
-    # 2. else the tcp page's pair is classic -> row == the page's totals;
-    # 3. else -> pinned notional class
-    skipped = []
+    # - the tcp lane's own majors pair (classic) verifies its workbook
+    #   row against its certified final or the page totals;
+    # - a non-classic lane joins the notional cohort whose workbook row
+    #   ships as the district's majors figure (EXPECTED_NOTIONAL,
+    #   asserted exactly; page-classic override cases — Prahran —
+    #   still verify the row equals the page totals)
+    notional_filed = []
     for name in sorted(lane_of):
         want = pp.get(name)
         if want is None:
             fail(f"{name}: missing from the official 2pp workbook")
+        if lane_of[name]["alp_lnp"] is None:
+            if pagepp_of[name][1] is not None and pagepp_of[name][1] != want:
+                fail(f"{name}: tcp page totals {pagepp_of[name][1]} != official 2pp row {want}")
+            notional_filed.append(name)
+            continue
         finals = finals_of[name]
         fbuckets = None
         if finals is not None:
@@ -1384,9 +1412,9 @@ def main():
             if pagepp_of[name][1] != want:
                 fail(f"{name}: tcp page totals {pagepp_of[name][1]} != official 2pp row {want}")
         else:
-            skipped.append(name)
-    if set(skipped) != PP_NOTIONAL:
-        fail(f"2ppvote notional-class set {sorted(skipped)} != pinned {sorted(PP_NOTIONAL)}")
+            fail(f"{name}: classic tcp lane but no certified and no page totals to reconcile against")
+    if set(notional_filed) != EXPECTED_NOTIONAL:
+        fail(f"2ppvote notional-filed set {sorted(notional_filed)} != pinned {sorted(EXPECTED_NOTIONAL)}")
 
     # geo pins
     if geo_counts != {"div": GEO_PINS["div"], "global": GEO_PINS["global"], "miss": GEO_PINS["miss"]}:

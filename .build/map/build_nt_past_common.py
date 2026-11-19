@@ -146,10 +146,11 @@ def past_main(frame):
             r[5] = r2(share - prev_share)
             n_sw += 1
 
-        if div.get("tpp") and not (div.get("tppn") or div.get("tppe")):
-            # classic pair both elections only — a notional or estimated
-            # majors count never hangs a swing off the previous election's
-            # (possibly official) row
+        if div.get("tpp") and not div.get("tppe"):
+            # official majors figures swing freely (a classic lane, or a
+            # commission-run alternative count in tppn); a swing hangs never
+            # on tppe — an ESTIMATE against the previous election's (also
+            # estimated) row would be an estimate squared
             past_bs = [next(c for c in past_x["cands"] if c["key"] == t["key"])["b"]
                        for t in past_x["tcp"]]
             if set(past_bs) == {"alp", "lnp"}:

@@ -1577,18 +1577,22 @@ function storyArea(m, st) {
   // a state election's two-party row counts only the classic pairs: say so under the figures
   if (isState() && A.tpp != null) {
     const estN = idx.filter((i) => m.divs[i].tppEst).length, notiN = idx.filter((i) => m.divs[i].tppNotional && !m.divs[i].tppEst).length;
-    if (isNT() && (estN || notiN)) {
-      // the Territory's composition note: the NTEC ran an official alternative
-      // count for nt16's non-classic finals; nt20/24's rows are Antony Green's
-      // published estimates (notional-adjudication.md), and a majors-absence
-      // (Mulka) is always called out by name
-      const miss = idx.filter((i) => m.divs[i].tpp == null);
-      const missTxt = miss.length
-        ? ` ${miss.length === 1 ? "Mulka" : miss.map((k) => ds(m.divs[k].n)).join(" and ")} can carry no such figure — ${(() => { const d = m.divs[miss[0]]; return d.c.some((c) => c.b === "alp") ? `the ${coalW(0)}` : "Labor"; })()} didn't stand there in ${FRAME_YEAR[m.year]}.`
+    if (estN || notiN) {
+      // any frame shipping non-classic majors rows explains the mix:
+      // estimates name their author (nt20/24: Antony Green); nt16's official
+      // alternative counts and the VEC workbook rows are "official" majors
+      // counts by the commission itself. NT's majors-absence (Mulka) always
+      // gets named beside.
+      const missTxt = isNT() && idx.some((i) => m.divs[i].tpp == null)
+        ? ` Mulka can carry no such figure — ${(() => { const d = m.divs[idx.find((i) => m.divs[i].tpp == null)]; return d.c.some((c) => c.b === "alp") ? `the ${coalW(0)}` : "Labor"; })()} didn't stand there in ${FRAME_YEAR[m.year]}.`
         : "";
-      const compTxt = estN
-        ? `The ${estN + notiN} districts whose count didn't finish Labor against ${coalW(0)} carry an estimated two-party figure, as computed and published by Antony Green.`
-        : `The ${notiN} districts whose count didn't finish Labor against ${coalW(0)} carry the ${commX()}’s own alternative two-party count.`;
+      const compTxt = estN && notiN
+        ? `The ${estN + notiN} districts whose count didn't finish Labor against ${coalW(0)} carry figures outside the final pair's own count: official alternative counts and estimates alike.`
+        : estN
+          ? `The ${estN} districts whose count didn't finish Labor against ${coalW(0)} carry an estimated two-party figure, as computed and published by Antony Green.`
+          : isNT()
+            ? `The ${notiN} districts whose count didn't finish Labor against ${coalW(0)} carry the ${commX()}’s own alternative two-party count.`
+            : `The ${notiN} districts whose count didn't finish Labor against ${coalW(0)} carry the commission's official two-party figures for the majors pair.`;
       h += `<p class="st-note">${compTxt}${missTxt}</p>`;
     } else {
       const classicN = idx.filter((i) => m.divs[i].tpp != null).length;

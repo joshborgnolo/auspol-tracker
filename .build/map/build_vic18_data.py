@@ -89,14 +89,19 @@ cache gap or drift fails the build loudly):
     pinned exception — Albert Park's LNP cell prints 14,696 against its
     own certified final of 14,697 (an off-by-one inside the official
     product: the row's own formula sum 39,857 ≠ formal 39,858 exposes
-    it). The pinned notional class PP_NOTIONAL (Brunswick, Geelong,
-    Melbourne, Mildura, Morwell, Northcote, Pascoe Vale, Prahran,
-    Preston, Shepparton) carries no check: eight districts whose
-    certified final and tcp page are both non-classic, Geelong's
-    stop-state page with its own notional ALP-v-IND (Lyons) tcp pair,
-    and Preston, whose tcp page alone is non-classic — none of those
-    rows can be reproduced from this frame's certified pages. THE STALE
-    APPENDIX:
+    it). The pinned notional class EXPECTED_NOTIONAL (Benambra,
+    Brunswick, Geelong, Melbourne, Mildura, Morwell, Northcote,
+    Pascoe Vale, Prahran, Preston, Shepparton) carries no check: eight
+    districts whose certified final and tcp page are both non-classic,
+    Geelong's stop-state page with its own notional ALP-v-IND (Lyons)
+    tcp pair, and Preston, whose tcp page alone is non-classic — none
+    of those rows can be reproduced from this frame's certified pages.
+    Since 2026-11-19 those workbook rows SHIP as the districts' majors
+    two-party figures (tpp + tppn): the official alternative count by
+    the VEC itself, per the user's "a notional 2pp where the count
+    wasn't the majors" call (the adjudication trail —
+    .build/map/src/{nt,vic}/notional-adjudication.md). Richmond alone
+    stays tpp-less: the product omits its row. THE STALE APPENDIX:
     the workbooks' "MP turnover" and "No of candidates" sheets document
     the 2014 election (member cells read the 2014-elected members,
     candidate counts are 2014's 545+351) — the VEC recycled 2014's
@@ -202,9 +207,16 @@ PP_TYPOS = {"Albert Park": (25161, 14696)}
 # this frame's certified products: certified-non-classic-AND-page-non-
 # classic districts (9) plus Geelong, whose tcp page itself carries the
 # notional ALP-v-IND (Lyons) pair (the 2018 workbook's own class hole).
-PP_NOTIONAL = frozenset({"Brunswick", "Geelong", "Melbourne", "Mildura",
-                         "Morwell", "Northcote", "Pascoe Vale", "Prahran",
-                         "Preston", "Shepparton"})
+#
+# EXPECTED_NOTIONAL: the districts whose OFFICIAL workbook 2PP row is a
+# notional majors count (their tcp lane itself is non-classic — shipped
+# as this frame's tpp with the tppn marker since 2026-11-19, see
+# .build/map/src/vic/notional-adjudication.md). Richmond carries NOTHING:
+# the official product omits its row outright (PP_MISSING).
+EXPECTED_NOTIONAL = frozenset({"Benambra", "Brunswick", "Geelong",
+                               "Melbourne", "Mildura", "Morwell",
+                               "Northcote", "Pascoe Vale", "Prahran",
+                               "Preston", "Shepparton"})
 
 # the certified distribution final for districts whose tcp page runs a
 # notional pair that is NOT the seat's actual final pair (THE
@@ -1229,10 +1241,21 @@ def main():
         pagepp_of[name] = (page_buckets, page_map)
 
         tpp = None
+        tpp_notional = False
         if lane_map is not None:
             tpp = [lane_map[0], lane_map[1], None]
             tpp_tot[0] += lane_map[0]
             tpp_tot[1] += lane_map[1]
+        elif name in pp:
+            # the official workbook's notional rows (EXPECTED_NOTIONAL):
+            # a majors pair count VEC itself published — shipped 2026-11-19
+            # with the tppn marker (official alternative count; adjudication
+            # in .build/map/src/vic/notional-adjudication.md)
+            va, vb = pp[name]
+            tpp = [va, vb, None]
+            tpp_tot[0] += va
+            tpp_tot[1] += vb
+            tpp_notional = True
 
         # ---------------- booths: the join + lanes (vic22's shape)
         rn = RENAMES.get(name, name)
@@ -1286,6 +1309,8 @@ def main():
                "enrolled": sm["enrolled"]}
         if tpp:
             rec["tpp"] = tpp
+        if tpp_notional:
+            rec["tppn"] = 1
         D.append(rec)
         tot_formal += sm["formal"]
         tot_inf += sm["informal"]
@@ -1312,16 +1337,24 @@ def main():
         fail(f"statewide primaries {prim} != REF_PRIM {REF_PRIM}")
 
     # 2ppvote reconciliation (the source-block rule):
-    # 1. certified classic final present -> row == that final;
-    # 2. else the tcp page's pair is classic -> row == the page's totals;
-    # 3. else -> pinned notional-skip class
-    skipped = []
+    # - the tcp lane's own majors pair (classic) verifies against its
+    #   certified final or the page totals;
+    # - a non-classic lane joins the notional cohort whose workbook row
+    #   ships as the district's majors figure (EXPECTED_NOTIONAL,
+    #   asserted exactly); a row missing from the product means no
+    #   filing (Richmond, PP_MISSING)
+    notional_filed = []
     for name in sorted(lane_of):
         if name in PP_MISSING:
             continue
         want = pp.get(name)
         if want is None:
             fail(f"{name}: missing from the official 2pp workbook")
+        if lane_of[name]["alp_lnp"] is None:
+            if pagepp_of[name][1] is not None and pagepp_of[name][1] != want:
+                fail(f"{name}: tcp page totals {pagepp_of[name][1]} != official 2pp row {want}")
+            notional_filed.append(name)
+            continue
         finals = finals_of[name]
         fbuckets = None
         if finals is not None:
@@ -1342,9 +1375,9 @@ def main():
             if pagepp_of[name][1] != want:
                 fail(f"{name}: tcp page totals {pagepp_of[name][1]} != official 2pp row {want}")
         else:
-            skipped.append(name)
-    if set(skipped) != PP_NOTIONAL:
-        fail(f"2ppvote notional-class set {sorted(skipped)} != pinned {sorted(PP_NOTIONAL)}")
+            fail(f"{name}: classic tcp lane but no certified and no page totals to reconcile against")
+    if set(notional_filed) != EXPECTED_NOTIONAL:
+        fail(f"2ppvote notional-filed set {sorted(notional_filed)} != pinned {sorted(EXPECTED_NOTIONAL)}")
 
     # geo pins
     if geo_counts != {"div": GEO_PINS["div"], "global": GEO_PINS["global"], "miss": GEO_PINS["miss"]}:

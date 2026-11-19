@@ -115,9 +115,12 @@ jurisdiction, demoBasis, agg{AUS,VIC{...}}, divs[], booths{}}; candidate
 rows [n, ab, pn, bucket, votes, swing, elected, x]; booth lanes d,id,n,ty,
 prem,sub,pc,lat,lon,v,inf,tpp,tcp,fl,dec,vdec with every fixed centre
 ty=1 — the VEC XLS prints only election-day venues (Early Vote is one
-aggregated declaration pile, so there are no EVC lanes); tpp only on
-classic ALP-v-LNP final pairs, sums written; fl empty — no flow source is
-wired for Vic 2022).
+aggregated declaration pile, so there are no EVC lanes); tpp on classic
+ALP-v-LNP final pairs from the lanes, and since 2026-11-19 on the
+non-classic finals too — the VEC's own alternative two-party figures
+from 2ppvote2022.xlsx (2ppvote method family pinned PP_METHODS_SHIP)
++ tppn marker; Narracan, which the official product omits, stays bare;
+fl empty — no flow source is wired for Vic 2022).
 
 The census people lane rides data/vic22-demo.json and the SEIFA lane
 data/vic22-seifa.json (.build/map/build_vic22_demo.py /
@@ -151,6 +154,13 @@ SRC = os.path.join(REPO, ".build", "map", "src", "vic22")
 XLS_DIR = os.path.join(SRC, "xls")
 ANNEX_DIR = os.path.join(SRC, "2cp")
 CERT_DIR = os.path.join(SRC, "certified")
+# the VEC's official per-district Two-party-preferred workbook (fetched
+# from the live results hub's "Two-party-preferred results - all
+# districts (Excel)" link, 2026-11-19). Method taxonomy, provenance and
+# the estimated-vs-notional call that filed non-classic districts:
+# .build/map/src/vic/notional-adjudication.md. Names "(ALP v Nat)"-suffixed
+# rows carry the Coalition=The Nationals pair marker, stripped at load.
+PP_FILE = os.path.join(SRC, "2ppvote2022.xlsx")
 DS_STORE = os.path.join(SRC, "demsausage", "vic-2022.json")
 DEMO_STORE = os.path.join(REPO, "data", "vic22-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "vic22-seifa.json")
@@ -719,6 +729,61 @@ def load_store(path, key, want_basis):
 
 
 # ------------------------------------------------------------------ the frame
+# the districts whose official workbook row is a notional majors count
+# (shipped as tpp + tppn since 2026-11-19) — the frame's 15 non-classic
+# finals minus Narracan, whose row the official product omits entirely
+PP_NOTIONAL = frozenset({"Benambra", "Brunswick", "Footscray", "Hawthorn",
+                         "Kew", "Melbourne", "Mildura", "Mornington",
+                         "Northcote", "Pascoe Vale", "Prahran", "Preston",
+                         "Richmond", "Shepparton"})
+PP_GAP = frozenset({"Narracan"})
+# workbook methods allowed to ship (a formal distribution or the VEC's
+# own alternative 2PP count); "2CP" rows are the indicative election-night
+# class — never filed anywhere
+PP_METHODS_SHIP = frozenset({"Preference distribution", "2PP"})
+
+
+# ---------------------------------------------------------------- 2ppvote2022
+def load_2ppvote22():
+    """The per-district majors figure the VEC itself publishes, by method:
+    (name) -> (method, alp, lnp). Asserted product invariants: the 88
+    district names exactly; a TOTAL row equal to the columns' sums; ints
+    everywhere they're votes; two sheets with the majors-candidate pair
+    sheet agreeing with Sheet1's rows."""
+    import openpyxl
+    wb = openpyxl.load_workbook(PP_FILE, read_only=True)
+    if wb.sheetnames != ["Sheet1", "2PP candidates"]:
+        fail(f"2ppvote2022 sheet drift {wb.sheetnames}")
+    rows = [tuple(r) for r in wb["Sheet1"].iter_rows(values_only=True)]
+    wb.close()
+    if rows[0] != ("District", "Method", "ALP votes", "ALP %", "Coalition votes", "Coalition %", "Total formal votes"):
+        fail(f"2ppvote2022 header drift {rows[0]!r}")
+    out = {}
+    total = None
+    for r in rows[1:]:
+        if r[0] == "TOTAL":
+            total = r
+            continue
+        if r[0] is None:
+            continue
+        name = re.sub(r" \(ALP v (?:Nat|Flo)\)$", "", r[0])
+        meth, a, _ap, c, _cp, formal = r[1], r[2], r[3], r[4], r[5], r[6]
+        if not (isinstance(a, int) and isinstance(c, int) and isinstance(formal, int)):
+            fail(f"2ppvote2022: {name} votes not ints {r!r}")
+        if name in out:
+            fail(f"2ppvote2022: duplicate district row {name!r}")
+        out[name] = (meth, a, c)
+        if meth in PP_METHODS_SHIP and a + c != formal:
+            fail(f"2ppvote2022: {name} {meth} sum {a + c} != formal {formal}")
+    if set(out) - set(EXPECTED_NAMES):
+        fail(f"2ppvote2022 names off the roster: {sorted(set(out) - set(EXPECTED_NAMES))}")
+    if set(EXPECTED_NAMES) - set(out) != set(PP_GAP):
+        fail(f"2ppvote2022 omits {sorted(set(EXPECTED_NAMES) - set(out))} — want exactly {sorted(PP_GAP)}")
+    if total is None or total[2] != sum(v[1] for v in out.values()) or total[4] != sum(v[2] for v in out.values()):
+        fail("2ppvote2022 TOTAL row != column sums")
+    return out
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     roster = load_roster()
@@ -736,6 +801,7 @@ def main():
     if cert_files != set(CERTIFIED_FINAL):
         fail(f"certified pages {sorted(cert_files)} != pinned "
              f"CERTIFIED_FINAL {sorted(CERTIFIED_FINAL)}")
+    notional22 = load_2ppvote22()
 
     D = []
     seats = collections.Counter()
@@ -801,6 +867,7 @@ def main():
                  f"!= declared member {win!r}")
 
         tpp = None
+        tpp_notional = False
         if pair_buckets == {"alp", "lnp"}:
             alp = next(r for r in rows if r["n"] in pair_names and bucket(r["ab"]) == "alp")
             lnp = next(r for r in rows if r["n"] in pair_names and bucket(r["ab"]) == "lnp")
@@ -809,6 +876,15 @@ def main():
             tpp = [va, vb, None]
             tpp_tot[0] += va
             tpp_tot[1] += vb
+        elif name in notional22:
+            # the VEC's own alternative two-party figures (2ppvote2022,
+            # Preference-distribution or 2PP method) — shipped as this
+            # frame's tpp with the tppn marker since 2026-11-19
+            meth, va, vb = notional22[name]
+            tpp = [va, vb, None]
+            tpp_tot[0] += va
+            tpp_tot[1] += vb
+            tpp_notional = True
 
         # booths: XLS venue rows geocoded on the demsausage roll
         places = roll[name]
@@ -868,6 +944,8 @@ def main():
         }
         if tpp:
             rec["tpp"] = tpp
+        if tpp_notional:
+            rec["tppn"] = 1
         D.append(rec)
         tot_formal += xls["formal"]
         tot_inf += xls["informal"]
@@ -882,6 +960,31 @@ def main():
     if got_seats != EXPECTED_SEATS:
         fail(f"seat counts {got_seats} != expected {EXPECTED_SEATS}")
 
+    # 2ppvote2022 recon: the notional cohort is exactly the pin (its rows
+    # ship as tpp + tppn); the file gap (Narracan, PP_GAP) is asserted at
+    # load. Classic-lane finals can differ from the workbook's
+    # 'Preference distribution' print: that print is VEC's post-recheck
+    # vintage while the frame's lanes ride the certified stage — drift is
+    # printed for the record (like the nt DOP_SUMMARY_DIVERGENCES), never
+    # reconciled by editing the frame's canonical counts
+    notional_filed = [d["n"] for d in D if d.get("tppn")]
+    if set(notional_filed) != PP_NOTIONAL:
+        fail(f"notional-filed set {sorted(notional_filed)} != pinned {sorted(PP_NOTIONAL)}")
+    if any(d["n"] in PP_GAP and d.get("tpp") for d in D):
+        fail("Narracan carries a tpp — the official product omits it; adjudicate")
+    drift = []
+    for d in D:
+        if d.get("tppn") or d.get("tpp") is None:
+            continue
+        meth, a, c = notional22[d["n"]]
+        if meth == "Preference distribution" and d["tpp"] != [a, c, None]:
+            drift.append((d["n"], d["tpp"][:2], [a, c]))
+    if drift:
+        print(f"  vic22 certified-vs-workbook vintage drift over {len(drift)} districts;"
+              f" territory aggregates will differ (information only):")
+        for n, (oa, oc), (wa, wc) in drift:
+            print(f"    {n:<16} certified {oa}/{oc}  vs  workbook {wa}/{wc}")
+
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": got_seats}
     out = {"year": "vic22", "date": ELECTION, "prev": None, "jurisdiction": JUR,
@@ -891,8 +994,10 @@ def main():
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
     tp = 100 * tpp_tot[0] / (tpp_tot[0] + tpp_tot[1]) if sum(tpp_tot) else 0
+    n_classic = len(D) - sum(1 for d in D if d.get("tppn")) - sum(1 for d in D if d.get("tpp") is None)
     print("vic22 districts", len(D), "| seats", got_seats,
-          "| est. 2PP (classic finals, sums) ALP", round(tp, 2),
+          f"| 2PP ALP {round(tp, 2)} over {n_classic + len(notional_filed)} of {len(D)}"
+          f" ({n_classic} classic + {len(notional_filed)} notional)",
           "| informal", round(100 * tot_inf / (tot_inf + tot_formal), 2),
           "| enrolled", tot_enrolled, "| booths", len(B["id"]),
           f"(tcp on {n_booths_tcp})",

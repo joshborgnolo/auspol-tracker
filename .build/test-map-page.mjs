@@ -2057,10 +2057,12 @@ for (const y of ["sa22", "sa26"]) {
 {
   for (const [tag, want] of Object.entries({
     vic14: { date: "2014-11-29", prev: 2010, seats: { ALP: 47, LIB: 30, NAT: 8, GRN: 2, IND: 1 },
-             formal: 3355707, booths: 1786, geocoded: 1713, c5: 545, demoYear: 2011 },
+             formal: 3355707, booths: 1786, geocoded: 1713, c5: 545, demoYear: 2011,
+             tppShown: 88, tppn: 7, tppGap: [] },
     vic18: { date: "2018-11-24", prev: 2014, seats: { ALP: 55, LIB: 21, NAT: 6, GRN: 3, IND: 3 },
              formal: 3514474, booths: 1794, geocoded: 1726, c5: 507, c5nz: 507,
-             h: 88, tpp2: 76, pformal: 3355707, demoYear: 2016 },
+             h: 88, tpp2: 81, pformal: 3355707, demoYear: 2016,
+             tppShown: 87, tppn: 11, tppGap: ["Richmond"] },
   })) {
     const res = JSON.parse(R(`map/data/res-${tag}.json`));
     assert.equal(res.year, tag, `${tag}: year id`);
@@ -2091,6 +2093,23 @@ for (const y of ["sa22", "sa26"]) {
     assert.equal(c5, want.c5, `${tag}: candidate count`);
     assert.equal(c5nz, want.c5nz || 0, `${tag}: joined swings`);
     assert.equal(tpp2, want.tpp2 || 0, `${tag}: classic-pair swings`);
+    // the official workbook notionals (adjudicated 2026-11-19): tppn rows
+    // are official, tppe nowhere — the bare set is the product's own hole
+    assert.equal(res.divs.filter((d) => d.tpp != null).length, want.tppShown, `${tag}: districts with a two-party figure`);
+    assert.equal(res.divs.filter((d) => d.tppn).length, want.tppn, `${tag}: official notional majors rows`);
+    assert.ok(res.divs.every((d) => !d.tppe), `${tag}: official lanes only — no estimates`);
+    assert.deepEqual(res.divs.filter((d) => d.tpp == null).map((d) => d.n).sort(), want.tppGap, `${tag}: official gap districts`);
+    // exemplar workbook rows, pinned (VEC product, exact votes)
+    if (tag === "vic14") {
+      const r = res.divs.find((d) => d.n === "Richmond");
+      assert.deepEqual(r.tpp, [29303, 10799, null], "vic14 Richmond's official notional figure");
+      assert.equal(r.tppn, 1, "vic14 Richmond: official notional marker");
+    }
+    if (tag === "vic18") {
+      const rg = res.divs.find((d) => d.n === "Melbourne");
+      assert.deepEqual(rg.tpp, [30521, 10036, null], "vic18 Melbourne's official notional figure");
+      assert.equal(rg.tppn, 1, "vic18 Melbourne: official notional marker");
+    }
     if (want.pformal) assert.equal(res.agg.VIC.pformal, want.pformal, `${tag}: previous Assembly formal`);
     assert.equal(res.booths.n.length, want.booths, `${tag}: ${want.booths} venue rows`);
     assert.equal(res.booths.lat.filter((x) => x !== null).length, want.geocoded, `${tag}: ${want.geocoded} geocoded venues`);
@@ -2449,10 +2468,23 @@ for (const y of ["sa22", "sa26"]) {
   assert.deepEqual(byName.Pakenham.tcp, [[0, 19587], [1, 19280]], "vic22: Pakenham's certified 2CP (Emma Vulin 19,587 v David Farrelly 19,280)");
   assert.deepEqual(byName.Shepparton.tcp, [[0, 23455], [1, 17846]], "vic22: Shepparton's certified 2CP (Kim O'Keeffe 23,455 v Suzanna Sheed 17,846)");
   assert.equal(nH, 85, "vic22: 85 history rows");
+  // the official workbook notionals (2ppvote2022.xlsx, fetched 2026-11-19):
+  // 14 districts file official notional majors rows (Hawthorn/Kew via their
+  // Preference-distribution majors continuations), Narracan is the VEC's own
+  // gap, estimates nowhere. Exemplar rows pinned by exact vote counts.
+  assert.equal(res.divs.filter((d) => d.tpp != null).length, 87, "vic22: 87 of 88 carry a two-party figure");
+  assert.equal(res.divs.filter((d) => d.tppn).length, 14, "vic22: 14 official notional majors rows");
+  assert.ok(res.divs.every((d) => !d.tppe), "vic22: official lanes only — no estimates");
+  assert.deepEqual(res.divs.filter((d) => d.tpp == null).map((d) => d.n), ["Narracan"], "vic22: Narracan is the official product's only gap");
+  assert.deepEqual(byName.Richmond.tpp.slice(0, 2), [29451, 10280], "vic22 Richmond's official notional figure");
+  assert.deepEqual(byName.Hawthorn.tpp.slice(0, 2), [21383, 22927], "vic22 Hawthorn's official majors continuation");
+  assert.deepEqual(byName.Melbourne.tpp.slice(0, 2), [31895, 10624], "vic22 Melbourne's official notional figure");
+  assert.equal(byName.Richmond.tppn, 1, "vic22 Richmond: official notional marker");
+  assert.equal(byName.Benambra.tppn, 1, "vic22 Benambra: official notional marker");
   assert.deepEqual(res.divs.filter((d) => !d.h || !d.h.length).map((d) => d.n), ["Berwick", "Greenvale", "Laverton"], "vic22: Berwick, Greenvale and Laverton are new in 2022 — no 2018 row");
   assert.equal(nC5, 742, "vic22: 742 candidates file a swing");
   assert.equal(nSw, 718, "vic22: 718 swings moved on 2018 (24 rest at exactly 0)");
-  assert.equal(nTpp, 68, "vic22: 68 districts carry a classic-pair 2PP swing into 2018");
+  assert.equal(nTpp, 73, "vic22: 73 districts carry a classic-or-official 2PP swing into 2018 (the official notional rows swing too — estimates never do)");
   assert.equal(res.agg.VIC.formal, 3665035, "vic22: 2022 Legislative Assembly formal vote");
   assert.equal(res.agg.AUS.formal, 3665035, "vic22: the AUS agg mirrors the frame's formal");
   assert.equal(res.agg.VIC.pformal, 3514474, "vic22: 2018 Assembly formal vote");

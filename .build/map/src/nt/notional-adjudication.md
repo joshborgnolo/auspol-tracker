@@ -75,17 +75,18 @@ if anything, the map shows for a Labor-v-Coaliton two-party figure.
   NTEC's DOP print; the summary lane canonical here says 2537/1599), so
   headquarters totals differ from his published totals by ~±30 votes,
   territory-wide shares by ≤0.1pt. Build prints both as a cross-check.
-- **No 2PP swings on notional rows**: `tpp[2]` stays null everywhere a
-  row rides `tppe` (swing-vs-estimate is an estimate squared), exactly as
-  `build_nt_past_common.py` already gates on the pair being classic in
-  both elections. (NTEC's 2016 alternative counts could define 2016→2020
-  swings for those seven seats — deliberately NOT made now.)
+- **Official rows swing normally; estimates never swing**: major-pair
+  figures the commission itself published (classic lanes, NTEC's
+  alternative counts in `tppn`) carry swings where the previous
+  election's figure is computable; estimated rows (`tppe`, nt20/24)
+  never do (an estimate against a previous estimate is squared noise).
+  The gates in the past-chain stampers skip `tppe` only.
 
 ## Filing semantics on the map
 
-- nt16 rows file as plain `tpp` (official alternative counts) — the seat
-  head shows them under the existing “(notional, …)” label.
-- nt20/nt24 rows file as `tpp` + `tppe: 1` — the seat head shows
-  “(estimated, …)”, and the territory head figure pools classic counts
-  with the estimates into the ex-Mulka 24-division 2PP (Antony Green's
-  practice for the territory figure is the same).
+- nt16 rows file as `tpp` + `tppn: 1` (official alternative counts) —
+  the seat head shows them under the existing “(notional, …)” label.
+- nt20/nt24 rows file as `tpp` + `tppn: 1` + `tppe: 1` — the seat head
+  shows “(estimated, …)”, and the territory head figure pools classic
+  counts with the estimates into the ex-Mulka 24-division 2PP (Antony
+  Green's practice for the territory figure is the same).
