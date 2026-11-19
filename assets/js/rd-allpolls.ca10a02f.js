@@ -2138,13 +2138,33 @@ const rdLgPanelGo = (id, p) => {
     if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h, bo.w && bo.w[0]);
   }
 };
+function rdLgNoSignificantChanges(p, keys) {
+  const changes = p.chg && p.chg.d || {},
+    refs = p.chg && p.chg.r || {};
+  const nOf = q => q.sampleEff != null ? q.sampleEff : q.sample ? q.sample / rdApDeff() : null;
+  const n = nOf(p);
+  if (!(n > 0)) return null;
+  const deltas = keys.map(k => changes[k]).filter(v => v != null);
+  if (!deltas.length) return null;
+  const allPolls = window.AUSPOL.individualPolls;
+  for (const k of keys) {
+    const d = changes[k];
+    if (d == null) continue;
+    const prev = allPolls.find(q => q.pollster === p.pollster && q.released === refs[k]);
+    const np = prev && nOf(prev);
+    if (!(np > 0)) return null;
+    if (Math.abs(d) > 196 * Math.sqrt(0.25 * (1 / n + 1 / np))) return false;
+  }
+  return true;
+}
 function rdLgChgNote(p, keys) {
   const r = p.chg && p.chg.r || {};
   const refs = [...new Set(keys.map(k => r[k]).filter(Boolean))];
   if (!refs.length) return null;
-  if (refs.length > 1) return "▲▼ Changes are on each figure’s previous " + p.pollster + " poll.";
+  const none = rdLgNoSignificantChanges(p, keys) === true ? " (none significant)" : "";
+  if (refs.length > 1) return "▲▼ Changes are on each figure’s previous " + p.pollster + " poll" + none + ".";
   const prev = window.AUSPOL.individualPolls.find(x => x.pollster === p.pollster && x.released === refs[0]);
-  return prev ? "▲▼ Changes are on " + p.pollster + "’s " + prev.field + " poll." : null;
+  return prev ? "▲▼ Changes are on " + p.pollster + "’s " + prev.field + " poll" + none + "." : null;
 }
 function rdLgMoe(p) {
   const ms = [p.alpOnImp != null ? rdPollMargin(p, "onp", false) : null, p.alpImp != null ? rdPollMargin(p, "lnp", false) : null].filter(m => m != null);
@@ -2267,13 +2287,13 @@ function RdLgTpp({
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
   if (f && f.length === 2) return {
-    h: p.undecided != null ? p.undecided + "% undecided, excluded (primary-vote shares are decideds)" : f[1] + "% not firm",
+    h: p.undecided != null ? "Primary vote shares are decideds’. " + p.undecided + "% undecided, excluded" : f[1] + "% not firm",
     w: "",
     d: null,
     s: f[0] + "% firm, " + f[1] + "% soft"
   };
   if (p.undecidedLeaner != null) return {
-    h: p.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
+    h: "Primary vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "% undecided after leaner, excluded",
     w: "",
     d: null,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null
@@ -2281,16 +2301,16 @@ function rdLgDecided(p) {
   if (p.undecided != null) {
     const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
     if (b === "soft") return {
-      h: "Undecided disallowed",
+      h: "Primary-vote shares are everyones’. ‘Undecided’ not an option (a forced choice)",
       w: "",
       d: null,
       s: 100 - p.undecided + "% firm, " + p.undecided + "% soft"
     };
     return {
-      h: p.undecided + "%",
+      h: (b === "leaner" || b === "tpp" ? "Primary vote shares are decideds’ and leaners’ combined. " : "Primary vote shares are decideds’. ") + p.undecided + "%",
       w: b === "leaner" ? "undecided after leaner" : "undecided",
       d: p.chg && p.chg.d && p.chg.d.und || null,
-      s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "excluded (primary-vote shares are decideds')" : b === "leaner" ? "excluded (primary-vote shares are decideds' and leaners' combined)" : b === "first" ? "excluded (primary-vote shares are decideds)" : "excluded",
+      s: b === "soft" ? "named a party, but might yet change their mind" : "excluded",
       sep: b === "soft" || b === "tpp" ? " – " : ", "
     };
   }
@@ -2301,7 +2321,7 @@ function rdLgDecided(p) {
     s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table"
   };
   if (p.pollster === "YouGov" || p.pollster === "YouGov (MRP)") return {
-    h: "% undecided not published, excluded (primary-vote shares are decideds)",
+    h: "Primary vote shares are decideds’. % undecided not published, excluded",
     w: "",
     d: null,
     s: null
@@ -6609,7 +6629,7 @@ function RdHouseLean({
       term: "house-lean",
       from: "How each pollster leans"
     }
-  }, "A pollster\u2019s lean is its average gap to the other pollsters polling within four weeks of it", view === "tpp" && !pub ? ", all read through the same preference flows" : "", ", with recent polls counting most. One with few polls is pulled towards zero until its record builds.", view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : "", split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null));
+  }, "A pollster\u2019s lean is its average gap to the other pollsters polling within four weeks of it", view === "tpp" && !pub ? ", all read through the same preference flows" : "", ", with recent polls counting most. One with few polls is pulled towards zero until its record builds. Because each lean is measured against the other pollsters, a miss they all share, as at the 2019 election, leaves every lean at zero.", view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : "", split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null));
 }
 function RdFlowChart({
   fd,
