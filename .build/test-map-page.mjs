@@ -1449,6 +1449,26 @@ assert.ok(!/(?:href=|href:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|
   assert.equal(nC5, 388, "sa26: every candidate carries a swing figure");
   assert.equal(nSw, 387, "sa26: candidate swings on 2022 (only a same-share repeat may rest at 0)");
   assert.equal(nTpp, 13, "sa26: 13 districts carry a classic-pair 2PP swing into 2022");
+  // the ecsa-notional/orchestration (notional-adjudication.md): 8 AG-estimated
+  // labor-liberal rows file with tppe (never swings); 26 districts stay bare
+  // by published absence — ECSA ran its alternatives but never published a
+  // completed count, and AG's est blocks land only on the eight
+  assert.equal(res.divs.filter((d) => d.tpp != null).length, 21, "sa26: 21 of 47 carry a two-party figure");
+  assert.equal(res.divs.filter((d) => d.tppe).length, 8, "sa26: eight estimated majors rows");
+  assert.equal(res.divs.filter((d) => d.tppn).length, 8, "sa26: notional markers ride the same eight");
+  assert.deepEqual(res.divs.filter((d) => d.tpp == null).map((d) => d.n).sort(),
+    ["Badcoe", "Black", "Cheltenham", "Croydon", "Davenport", "Elizabeth", "Enfield", "Florey",
+     "Giles", "Hammond", "Hurtle Vale", "Kaurna", "King", "Lee", "Light", "Mawson", "Newland",
+     "Ngadjuri", "Playford", "Port Adelaide", "Ramsay", "Reynell", "Taylor", "Torrens",
+     "West Torrens", "Wright"], "sa26: the published-absence cohort exactly");
+  {
+    const kav = res.divs.find((d) => d.n === "Kavel");
+    assert.deepEqual(kav.tpp.slice(0, 2), [12339, 12725], "sa26 Kavel's AG-estimated labor-liberal 2PP");
+    assert.equal(kav.tppn, 1, "sa26 Kavel: notional marker");
+    assert.equal(kav.tppe, 1, "sa26 Kavel: estimate marker");
+    const cha = res.divs.find((d) => d.n === "Chaffey");
+    assert.deepEqual(cha.tpp.slice(0, 2), [6959, 15182], "sa26 Chaffey's AG-estimated 2PP");
+  }
   assert.equal(res.agg.SA.pformal, 1091173, "sa26: 2022 House of Assembly formal vote");
   assert.equal(res.agg.AUS.pformal, 1091173, "sa26: the AUS agg mirrors the state frame's 2022 formal");
   for (const st of ["SA", "AUS"]) {

@@ -1586,6 +1586,10 @@ function storyArea(m, st) {
       const missTxt = isNT() && idx.some((i) => m.divs[i].tpp == null)
         ? ` Mulka can carry no such figure — ${(() => { const d = m.divs[idx.find((i) => m.divs[i].tpp == null)]; return d.c.some((c) => c.b === "alp") ? `the ${coalW(0)}` : "Labor"; })()} didn't stand there in ${FRAME_YEAR[m.year]}.`
         : "";
+      const bareN = idx.filter((i) => m.divs[i].tpp == null).length;
+      const bareTxt = bareN && !isNT() && m.year === "sa26"
+        ? ` The other ${bareN} districts carry no figure: the commission publishes no alternative count for them, and Antony Green doesn't publish one either.`
+        : "";
       const compTxt = estN && notiN
         ? `The ${estN + notiN} districts whose count didn't finish Labor against ${coalW(0)} carry figures outside the final pair's own count: official alternative counts and estimates alike.`
         : estN
@@ -1593,7 +1597,7 @@ function storyArea(m, st) {
           : isNT()
             ? `The ${notiN} districts whose count didn't finish Labor against ${coalW(0)} carry the ${commX()}’s own alternative two-party count.`
             : `The ${notiN} districts whose count didn't finish Labor against ${coalW(0)} carry the commission's official two-party figures for the majors pair.`;
-      h += `<p class="st-note">${compTxt}${missTxt}</p>`;
+      h += `<p class="st-note">${compTxt}${missTxt}${bareTxt}</p>`;
     } else {
       const classicN = idx.filter((i) => m.divs[i].tpp != null).length;
       h += `<p class="st-note">Only the ${classicN} districts whose count finished Labor against ${coalW(0)} carry the two-party figure; the ${commX()} publishes no notional two-party count for the rest.</p>`;

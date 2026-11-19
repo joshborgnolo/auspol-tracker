@@ -1,0 +1,29 @@
+{
+  "_doc": "Notional Labor-v-Liberal two-party figures for South Australian House of Assembly districts whose final count wasn't ALP v LIB. Rows are [alp_votes, lib_votes]. Provenance and verification trail: .build/map/src/sa/notional-adjudication.md. Estimates only — ECSA undertakes alternative counts but publishes only a partial declaration-stage lane for them. Do not add rows by hand without the set assertions in build_sa26_data.py passing.",
+  "sa26": {
+    "provenance": "estimated-green",
+    "credit": "The '2-Party Preferred (est)' blocks on Antony Green's district cards and matching 'SUMMARY OF TWO-PARTY RESULTS' '(est)' rows in his SA2026 Draft Analysis (April 2026)",
+    "sourceUrl": "https://www.antonygreen.com.au/docs/sa/SA2026_DraftResults.pdf",
+    "fetched": "2026-11-19",
+    "divisions": {
+      "Chaffey": [6959, 15182],
+      "Finniss": [10972, 14579],
+      "Flinders": [5548, 15868],
+      "Kavel": [12339, 12725],
+      "MacKillop": [7666, 15901],
+      "Mount Gambier": [9818, 12290],
+      "Narungga": [8529, 15550],
+      "Stuart": [8376, 12873]
+    },
+    "publishedAbsent": {
+      "_doc": "Bare by published absence: ECSA undertook alternative Labor-Liberal counts (2026: the seven districts where Labor was excluded during the distribution) but publishes no completed figure for them (its results API carries only a declaration-stage partial machine lane, ~89% of formal), and Antony Green publishes labor-liberal estimates only for the 'divisions' rows above. Croydon's est is a Labor-v-One Nation figure, never a labor-liberal one. These districts stay tpp-less honestly.",
+      "districts": [
+        "Badcoe", "Black", "Cheltenham", "Croydon", "Davenport", "Elizabeth",
+        "Enfield", "Florey", "Giles", "Hammond", "Hurtle Vale", "Kaurna",
+        "King", "Lee", "Light", "Mawson", "Newland", "Ngadjuri", "Playford",
+        "Port Adelaide", "Ramsay", "Reynell", "Taylor", "Torrens",
+        "West Torrens", "Wright"
+      ]
+    }
+  }
+}

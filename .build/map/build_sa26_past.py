@@ -358,7 +358,10 @@ def main():
             prev_share = (100 * prev_by_ab[r[1]]) / past["formal"] if r[1] in prev_by_ab else 0.0
             r[5] = r2(share - prev_share)
             n_sw += 1
-        if div.get("tpp") and past["tpp"]:
+        # official majors figures swing (classic lanes or a commission's
+        # alternative count); an ESTIMATE never swings — the tppe marker
+        # carries adjudicated-external estimates (nt20/24/qld24 class)
+        if div.get("tpp") and not div.get("tppe") and past["tpp"]:
             cur = (100 * div["tpp"][0]) / (div["tpp"][0] + div["tpp"][1])
             old2 = (100 * past["tpp"][0]) / sum(past["tpp"])
             div["tpp"][2] = r2(cur - old2)

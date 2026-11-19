@@ -87,6 +87,25 @@ from sa_flow_lane import load_store, flow_rows
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 SRC = os.path.join(REPO, ".build", "map", "src", "sa26")
+
+#: notional Labor-v-Liberal figures for the districts whose final pair
+#: wasn't the majors — provenance and the ECSA-alternative-counts
+#: deliberation live in .build/map/src/sa/notional-adjudication.md. Rows
+#: are adjudicated-EXTERNAL estimates (nt20/24 class: tppn + tppe).
+NOTIONAL = json.load(open(os.path.join(REPO, ".build", "map", "src", "sa", "notional-2pp.json")))
+
+
+def notional_rows():
+    spec = NOTIONAL["sa26"]
+    divs = spec["divisions"]
+    out = {}
+    for name, row in divs.items():
+        if not (isinstance(row, list) and len(row) == 2 and all(isinstance(v, int) and v >= 0 for v in row)):
+            fail(f"notional-2pp.json sa26/{name}: row shape drifted {row!r}")
+        out[name] = (row[0], row[1], spec["provenance"] == "estimated-green")
+    return out
+
+
 DEMO_STORE = os.path.join(REPO, "data", "sa26-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "sa26-seifa.json")
 FLOWS_STORE = os.path.join(REPO, "data", "sa26-flows.json")
@@ -282,6 +301,8 @@ def main():
         fail(f"district-name sets differ: static-only {sorted(set(ha_d) - set(hc_d))}, change-only {sorted(set(hc_d) - set(ha_d))}")
     if len(names) != 47:
         fail(f"{len(names)} districts, expected 47")
+    notion = notional_rows()
+    published_absent = set(NOTIONAL["sa26"]["publishedAbsent"]["districts"])
     demo = load_demo()
     seifa = load_seifa()
     flows, contests, flow_err = load_flows()
@@ -292,6 +313,7 @@ def main():
     tot_prim = collections.Counter()
     tot_formal = tot_inf = tot_enrolled = 0
     tpp_tot = [0, 0]
+    est_filed, est_bare = set(), set()
     B = {k: [] for k in ("d", "id", "n", "ty", "prem", "sub", "pc", "lat", "lon",
                          "v", "inf", "tpp", "tcp", "fl", "dec", "vdec")}
     types_seen = collections.Counter()
@@ -422,12 +444,28 @@ def main():
 
         pair_buckets = {bucket(s_cands[l]["partyId"]) for l in live}
         tpp = None
+        tpp_est = False
         if pair_buckets == {"alp", "lnp"}:
             alp_l = next(l for l in live if bucket(s_cands[l]["partyId"]) == "alp")
             lnp_l = next(l for l in live if l != alp_l)
             tpp = [last[alp_l]["progressiveTotal"], last[lnp_l]["progressiveTotal"], None]
             tpp_tot[0] += tpp[0]
             tpp_tot[1] += tpp[1]
+        else:
+            # majors-pair counts that never finished on the majors: the
+            # est rows ride the AG-published estimates; Croydon + the
+            # ALP-v-ON twenty-five stay bare under publishedAbsence
+            majors_here = {"alp", "lnp"} <= {r["b"] for r in rows}
+            if majors_here:
+                nrec = notion.get(name)
+                if nrec:
+                    va, vb, tpp_est = nrec
+                    tpp = [va, vb, None]
+                    tpp_tot[0] += va
+                    tpp_tot[1] += vb
+                    est_filed.add(name)
+                else:
+                    est_bare.add(name)
 
         cid2row = {r["cid"]: k for k, r in enumerate(rows)}
         tcp = [[cid2row[live[0]], last[live[0]]["progressiveTotal"]],
@@ -508,6 +546,8 @@ def main():
         }
         if tpp:
             rec["tpp"] = tpp
+        if tpp and tpp_est:
+            rec["tppn"], rec["tppe"] = 1, 1
         D.append(rec)
         tot_formal += sum(formal.values())
         tot_inf += informal
@@ -517,6 +557,15 @@ def main():
 
     if dict(seats) != EXPECTED_SEATS:
         fail(f"seat counts {dict(seats)} != expected {EXPECTED_SEATS}")
+    # notional set checks: every json row filed, and the exact composition
+    # of the un-figured cohort (nothing bare that isn't adjudicated bare)
+    if est_filed != set(NOTIONAL["sa26"]["divisions"]):
+        fail(f"filed notional set {sorted(est_filed)} != json divisions"
+             f" {sorted(NOTIONAL['sa26']['divisions'])} — never bridge a figure silently")
+    if est_bare != published_absent:
+        fail(f"published-absent drift: bare lanes {sorted(est_bare)} !="
+             f" adjudicated absence set {sorted(published_absent)}"
+             f" — new official publication? update notional-2pp.json deliberately")
 
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
@@ -526,8 +575,11 @@ def main():
     p = os.path.join(OUT, "data-sa26.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
+    n_est = len(est_filed)
     tp = 100 * tpp_tot[0] / (tpp_tot[0] + tpp_tot[1])
-    print("sa26 districts", len(D), "| seats", dict(seats), "| 2PP-classic ALP", round(tp, 2),
+    print("sa26 districts", len(D), "| seats", dict(seats),
+          f"| 2PP ALP {round(tp, 2)} over {len(D) - len(est_bare)} of {len(D)}"
+          f" ({len(D) - len(est_bare) - n_est} classic + {n_est} estimated)",
           "| informal", round(100 * tot_inf / (tot_inf + tot_formal), 2), "| enrolled", tot_enrolled,
           "| booths", len(B["id"]), dict(sorted(types_seen.items())), "| geocoded", geocoded,
           f"(tcp {tcp_booths}, zero-vote {zero_booths}, notional-2CP {notional})",
