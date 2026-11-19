@@ -7649,6 +7649,65 @@ const accuracy = accuracyCycles.length ? (() => {
   };
 })() : null;
 
+/* ---- each pollster's historical lean on the election result ------------
+   The primary-vote leans panel's second reading (user call 2026-11-20):
+   besides each pollster's gap to the others polling beside it, its record
+   against the count. The final-polls rule, applied to each party's primary:
+   every house's LAST poll within ACC_WINDOW_DAYS of polling day, one poll
+   per house, ACC_CANON renames, ACC_EXCLUDED and exit polls out, an
+   approximate (month-only) date out. Its primaries are scaled to sum to 100
+   first, so a house that prints undecided voters (Essential 2022, 93) is
+   scored on decided voters as the count is. A party is scored only where
+   both poll and count name it; "others" is everyone else, so where the
+   count folds One Nation into the others (2004-2016) the poll's One Nation
+   joins its others too, and a poll without One Nation beside a count with
+   it scores neither. Elections since 1987, the start of the primaries
+   backtest, before which the houses' methods share nothing with today's.
+   Per party, per house: one row per election, {year, poll, result, err}. */
+const ELECTION_LEAN_FROM = 1987;
+const electionLean = (() => {
+  const parties = ["alp", "lnp", "grn", "onp", "oth"];
+  const out = Object.fromEntries(parties.map((k) => [k, {}]));
+  const years = [];
+  for (const c of CYC_META.filter((c) => !c.current && c.src && Number(c.src) >= ELECTION_LEAN_FROM)) {
+    const e = ELECTIONS["e" + c.src];
+    if (!e) continue;
+    const eMs = new Date(e.date).getTime();
+    const byHouse = new Map();
+    for (const p of [...(cyclePolls[c.src] || [])].sort((a, b) => a.date.localeCompare(b.date))) {
+      if (p.firm === "Election" || /exit/i.test(p.firm) || p.dateApprox || p.alp == null || p.lnp == null) continue;
+      const d = ddays(eMs, new Date(p.date).getTime());
+      if (d < 0 || d > ACC_WINDOW_DAYS) continue;
+      byHouse.set(accCanon(p.firm), p);
+    }
+    let any = false;
+    for (const [firm, p] of byHouse) {
+      if (ACC_EXCLUDED.has(firm)) continue;
+      const restOf = (o) => Object.entries(o).filter(([k, v]) => !["date", "firm", "alp", "lnp", "grn", "onp"].includes(k)
+        && !/^tpp/.test(k) && typeof v === "number").reduce((t, [, v]) => t + v, 0);
+      const tot = ["alp", "lnp", "grn", "onp"].reduce((t, k) => t + (p[k] || 0), 0) + restOf(p);
+      if (!(tot > 50)) continue;
+      const sc = (v) => (v * 100) / tot;
+      const foldOn = e.onp == null;
+      const cell = {
+        alp: [sc(p.alp), e.alp], lnp: [sc(p.lnp), e.lnp],
+        grn: p.grn != null && e.grn != null ? [sc(p.grn), e.grn] : null,
+        onp: p.onp != null && e.onp != null ? [sc(p.onp), e.onp] : null,
+        oth: e.oth == null ? null
+          : foldOn ? [sc(restOf(p) + (p.onp || 0)), e.oth]
+          : p.onp != null ? [sc(restOf(p)), e.oth] : null,
+      };
+      for (const k of parties) {
+        if (!cell[k] || cell[k][1] == null) continue;
+        any = true;
+        (out[k][firm] ||= []).push({ year: c.src, poll: r1(cell[k][0]), result: r1(cell[k][1]), err: r2(cell[k][0] - cell[k][1]) });
+      }
+    }
+    if (any) years.push(c.src);
+  }
+  return years.length ? { from: ELECTION_LEAN_FROM, windowDays: ACC_WINDOW_DAYS, years, canon: ACC_CANON, parties: out } : null;
+})();
+
 /* ---- the past terms' 2PP, on the implied basis ----------------------------
    Every term's line reads its polls the way the sitting term's implied 2PP
    does: primaries through ONE flow table, the one counted at the election
@@ -9314,6 +9373,8 @@ window.AUSPOL = (function () {
   // the common groups, in the order a poll row's grp.v follows (the export's columns)
   const demoGroups = ${JSON.stringify(DEMO_GROUPS)};
   const accuracy = ${JSON.stringify(accuracy)};
+  // each pollster's final polls against the count, per party (§ electionLean)
+  const electionLean = ${JSON.stringify(electionLean)};
   /* The external aggregates the hero can overlay (§6b): BludgerTrack's
      machine trend, and Kevin Bonham's line as a RECONSTRUCTION of his
      published method with his as-published sidebar stamps beside it –
@@ -9452,7 +9513,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

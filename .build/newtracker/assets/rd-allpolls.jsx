@@ -4514,6 +4514,10 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const onM = measure !== "lnp";
   const [view, setView] = useState("tpp");
   const [hover, setHover] = useState(null);
+  /* the party tabs' second reading (user call 2026-11-20): each pollster's
+     lean against the others polling beside it ("pack"), or its record
+     against the count at past elections ("election", D.electionLean) */
+  const [base, setBase] = useState("pack");
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
   /* the measure row, shared by the RdTabs render and the arrow-key walk so
@@ -4603,11 +4607,77 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     if (he && he.n) return he.n;
     return D.individualPolls.filter((p) => p.pollster === h && valOf(p) != null).length;
   };
-  const rows = window.AP.leanRows(key).map((r) => ({ ...r, n: nOf(r.h) })).sort((a, b) => b.v - a.v || b.n - a.n);
+  const packRows = window.AP.leanRows(key).map((r) => ({ ...r, n: nOf(r.h) })).sort((a, b) => b.v - a.v || b.n - a.n);
+  /* Against the election: the same pollsters (those the pack reading lists
+     on this party) with their final polls scored on the count, one row per
+     election since EL.from (gen-data electionLean). The lean is the plain
+     mean of those misses, every election one attempt; a pollster with no
+     final poll on record sits at the foot with a dash. Is a lean more than
+     chance? A one-sample t on its misses (three elections at least), Holm's
+     correction across the pollsters tested - the gate every sentence below
+     rides. */
+  const EL = D.electionLean;
+  const isParty = view in HL_LABELS;
+  const elect = isParty && base === "election" && !!EL;
+  const elRows = elect ? packRows.map((r) => {
+    /* the record files under the final-polls panel's names (ACC_CANON):
+       the pack's "RedBridge/Accent" is the record's "RedBridge" */
+    const cyc = (EL.parties[view] && EL.parties[view][(EL.canon && EL.canon[r.h]) || r.h]) || [];
+    const n = cyc.length;
+    const mean = n ? cyc.reduce((t, c) => t + c.err, 0) / n : 0;
+    let t = null, p = null;
+    if (n >= 3) {
+      const sd = Math.sqrt(cyc.reduce((a, c) => a + (c.err - mean) ** 2, 0) / (n - 1));
+      t = sd > 0 ? mean / (sd / Math.sqrt(n)) : 0;
+      p = sd > 0 ? tTail(t, n - 1) : 1;
+    }
+    return { h: r.h, cyc, n, v: Math.round(mean * 10) / 10, t, p, s: cyc.map((c) => ({ v: c.err })) };
+  }).sort((a, b) => (b.n > 0) - (a.n > 0) || b.v - a.v || b.n - a.n) : [];
+  if (elect) {
+    const tested = elRows.filter((r) => r.p != null);
+    const sig = [];
+    for (const [i, r] of [...tested].sort((a, b) => a.p - b.p).entries()) {
+      if (r.p >= 0.05 / (tested.length - i)) break;
+      sig.push(r);
+    }
+    elRows.forEach((r) => { r.sig = sig.includes(r); });
+  }
+  const rows = elect ? elRows.filter((r) => r.n) : packRows;
+  const noRecord = elect ? elRows.filter((r) => !r.n) : [];
   /* one finding per measure tab, worded in the open measure's own terms:
      who leans furthest on it, by how much, and who comes next - written in
-     menu-lines.js, which the More menu quotes for the two-party tab */
-  const { head, dek } = window.AP.leanStory(view, onM, pub);
+     menu-lines.js, which the More menu quotes for the two-party tab. The
+     election reading writes its own, on the t-test above. */
+  const elStory = () => {
+    const whose = { alp: "Labor’s", lnp: "the Coalition’s", onp: "One Nation’s", grn: "the Greens’", oth: "the others’" }[view];
+    const pts = (v) => `${Math.abs(v).toFixed(1)} point${Math.abs(v).toFixed(1) === "1.0" ? "" : "s"}`;
+    const els = (n) => `${n} election${n === 1 ? "" : "s"}`;
+    const way = (v) => (v > 0 ? "above" : "below");
+    const few = elRows.filter((r) => r.n < 3).length;
+    const fewTail = !few ? "" : few === elRows.length ? " None of the pollsters here has three elections on record for it, the fewest a lean can be tested on."
+      : ` ${few} of the ${elRows.length} pollsters here ${few === 1 ? "has" : "have"} fewer than three elections on record for it, too few to test.`;
+    if (!rows.length) return { head: "No pollster here has a final poll on record for " + whose + " vote", dek: "" };
+    const sigR = elRows.filter((r) => r.sig).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
+    if (sigR.length) {
+      const a = sigR[0];
+      const rest = sigR.slice(1);
+      return {
+        head: `${a.h} has put ${whose} vote ${way(a.v)} the result, by ${pts(a.v)} on average across ${els(a.n)}`,
+        dek: (rest.length ? (rest.length === 1 ? "The only other lean clear of chance is " : "The other leans clear of chance: ") + rest.map((r) => `${r.h}’s, ${pts(r.v)} ${way(r.v)} across ${els(r.n)}`).join("; ") + "."
+          : "No other pollster’s record on it is clear of chance.") + fewTail,
+      };
+    }
+    /* the furthest-off of the pollsters with a testable record, else of all */
+    const pool = rows.filter((r) => r.p != null);
+    const top = [...(pool.length ? pool : rows)].sort((a, b) => Math.abs(b.v) - Math.abs(a.v))[0];
+    return {
+      head: `No pollster’s record shows a lean on ${whose} vote beyond chance`,
+      dek: (pool.length
+        ? `Of those with three elections or more, ${top.h} has been furthest off on average, ${pts(top.v)} ${way(top.v)} the result across ${els(top.n)}, within what its election-to-election misses allow.`
+        : `${top.h} has been furthest off on average, ${pts(top.v)} ${way(top.v)} the result across ${els(top.n)}.`) + fewTail,
+    };
+  };
+  const { head, dek } = elect ? elStory() : window.AP.leanStory(view, onM, pub);
   /* the bar's scale: 1.2 points either way, wider only if a lean needs it */
   const maxAbs = Math.max(0, ...rows.map((r) => Math.abs(r.v)));
   const BM = maxAbs <= 1.1 ? 1.2 : Math.ceil((maxAbs + 0.1) * 2) / 2;
@@ -4646,6 +4716,11 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
         f.fit ? rdTsSgn(f.fit.b, true) : "–", f.fit ? rdTsSgn(f.fit.t) : "–",
         f.fit ? (hlSig.includes(f) ? "Yes" : "No") : "–"] })),
   };
+  const elTsig = elect ? {
+    key: "el-" + view,
+    rows: elRows.map((r) => ({ key: r.h, name: r.h, sig: !!r.sig,
+      cells: [String(r.n), r.n ? rdTsSgn(r.v, true) : "–", r.t != null ? rdTsSgn(r.t) : "–", r.p != null ? (r.sig ? "Yes" : "No") : "–"] })),
+  } : null;
   /* the two-ended measures: a lean is towards one side or the other */
   const split = view === "split";
   const two = view === "tpp" || split;
@@ -4664,7 +4739,52 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   /* a month tick every four months, as drawn, and further apart where a
      narrow column would run their labels together (about 56px each) */
   const tStep = Math.max(4, Math.ceil((56 * (ms.length - 1)) / Math.max(1, SW - 14)));
+  /* election by election: x runs by year from the first scored election to
+     the last, each final poll's miss a dot on the line */
+  const eY = elect ? EL.years.map(Number) : [];
+  const ex = (y) => 6 + ((y - eY[0]) / Math.max(1, eY[eY.length - 1] - eY[0])) * (SW - 14);
+  /* the first and last elections, and each decade's turn between them
+     where it clears both ends by about 40px */
+  const elTicks = !eY.length ? [] : [{ y: eY[0], a: "start" },
+    ...Array.from({ length: 10 }, (_, i) => Math.ceil((eY[0] + 1) / 10) * 10 + i * 10)
+      .filter((y) => y < eY[eY.length - 1] && ex(y) - ex(eY[0]) > 40 && ex(eY[eY.length - 1]) - ex(y) > 40)
+      .map((y) => ({ y, a: "middle" })),
+    ...(eY.length > 1 ? [{ y: eY[eY.length - 1], a: "end" }] : [])];
+  const elSpark = (r) => {
+    const pts = r.cyc;
+    /* the miss at each election, a stem and dot on its year */
+    const hv = hover && hover.h === r.h ? pts.find((c) => c.year === hover.ym) : null;
+    const onMove = (ev) => {
+      const rc = ev.currentTarget.getBoundingClientRect();
+      const x = ev.clientX - rc.left;
+      let best = null;
+      pts.forEach((c) => { const dx = Math.abs(ex(+c.year) - x); if (!best || dx < best.dx) best = { dx, ym: c.year }; });
+      setHover(best ? { h: r.h, ym: best.ym } : null);
+    };
+    return (
+      <span className="rd-hl-spark">
+        <svg width={SW} height={SH} viewBox={`0 0 ${SW} ${SH}`} role="img" onMouseMove={onMove} onMouseLeave={() => setHover(null)}
+             aria-label={"Miss at each election: " + pts.map((c) => c.year + " " + rdApSigned(c.err)).join(", ")}>
+          <path d={`M6 ${SH / 2}H${SW - 8}`} className="rd-hl-zero"></path>
+          {/* a stem from the result to each miss, never a line between
+              elections: years apart, nothing was measured in between */}
+          {pts.map((c) => <path key={"s" + c.year} d={`M${ex(+c.year).toFixed(1)} ${SH / 2}V${sy(c.err).toFixed(1)}`} className="rd-hl-line"></path>)}
+          {pts.map((c) => <circle key={c.year} cx={ex(+c.year)} cy={sy(c.err)} r="3" className="rd-hl-end" style={{ fill: Math.abs(c.err) < 0.05 ? "var(--ink-3)" : pos }}></circle>)}
+          {hv && <><path d={`M${ex(+hv.year)} 0V${SH}`} className="rd-dis-guide"></path><circle cx={ex(+hv.year)} cy={sy(hv.err)} r="4" className="rd-hl-hv"></circle></>}
+        </svg>
+        {hv && (
+          <span className="tip rd-hl-tip" style={{ left: Math.min(SW - 100, Math.max(100, ex(+hv.year))) }}>
+            <span className="tip-title">{r.h}, {hv.year} election</span>
+            <span className="tip-row"><span className="tip-label">Final poll</span><span className="tip-val">{hv.poll.toFixed(1)}</span></span>
+            <span className="tip-row"><span className="tip-label">Result</span><span className="tip-val">{hv.result.toFixed(1)}</span></span>
+            <span className="tip-row"><span className="tip-label">Miss</span><span className="tip-val">{Math.abs(hv.err) < 0.05 ? "level" : rdSigned(hv.err, 1)}</span></span>
+          </span>
+        )}
+      </span>
+    );
+  };
   const spark = (r) => {
+    if (elect) return elSpark(r);
     const pts = r.s.filter((d) => ms.includes(d.ym));
     if (!pts.length) return null;
     const line = monotoneXY(pts.map((d) => [sx(d.ym), sy(d.v)]), "");
@@ -4707,14 +4827,14 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
         <b className="rd-ap-scl" style={{ color: negInk }}>{lText}</b><b className="rd-ap-scr" style={{ color: posInk }}>{rText}</b>
         {(narrowBar ? [-edge, 0, edge].filter((v) => v != null && !Number.isNaN(v)) : bTicks.map((v) => -v).concat([0]).concat(bTicks)).map((v) => (
           <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: bx(v) + "%" }}>
-            {v === 0 ? (phone ? "Others" : "The others") : Math.abs(v) === edge ? Math.abs(v) + " pt" + (Math.abs(v) === 1 ? "" : "s") : String(Math.abs(v))}
+            {v === 0 ? (elect ? "Result" : phone ? "Others" : "The others") : Math.abs(v) === edge ? Math.abs(v) + " pt" + (Math.abs(v) === 1 ? "" : "s") : String(Math.abs(v))}
           </span>
         ))}
       </span>
     </span>
   );
   const bar = (v) => (
-    <span className="rd-hl-bar" role="img" aria-label={Math.abs(v) < 0.05 ? "Level with the other pollsters" : Math.abs(v).toFixed(1) + " points " + (two ? "towards " + (v > 0 ? posName : negName) : v > 0 ? "higher than the others" : "lower than the others")}>
+    <span className="rd-hl-bar" role="img" aria-label={Math.abs(v) < 0.05 ? (elect ? "Level with the result on average" : "Level with the other pollsters") : Math.abs(v).toFixed(1) + " points " + (two ? "towards " + (v > 0 ? posName : negName) : elect ? (v > 0 ? "above the result on average" : "below the result on average") : v > 0 ? "higher than the others" : "lower than the others")}>
       <span className="rd-ap-in">
         {bTicks.concat(bTicks.map((x) => -x)).map((x) => <i key={x} className="rd-ap-gl" style={{ left: bx(x) + "%" }}></i>)}
         {Math.abs(v) >= 0.05 && <i className="rd-hl-fill" style={{ left: Math.min(bx(0), bx(v)) + "%", width: Math.abs(bx(v) - bx(0)) + "%", background: v > 0 ? pos : neg }}></i>}
@@ -4722,7 +4842,8 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
       </span>
     </span>
   );
-  const title = split ? "Each pollster’s lean on One Nation’s primary vote against the Coalition’s, points"
+  const title = elect ? "Each pollster’s historical lean on the election result"
+    : split ? "Each pollster’s lean on One Nation’s primary vote against the Coalition’s, points"
     : two ? `Each pollster’s lean on Labor v ${onM ? "One Nation" : "Coalition"}${pub ? " as published" : ""}, points`
     : `Each pollster’s lean on ${partyName}${partyName.endsWith("s") ? "’" : "’s"} primary vote, points`;
   /* the size half of the finding, in words: added together, a pollster's two
@@ -4779,54 +4900,77 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
             onClick={flipPick}><span className="rd-pl-flip-t">Labor v {onM ? "One Nation" : "Coalition"}</span> <span aria-hidden="true">⇄</span></button>
   );
+  /* the party tabs' reading switch, built as the two-party flip is: the
+     button names the reading on show, a press swaps it */
+  const basePick = () => {
+    const sec = document.getElementById("house-lean");
+    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean));
+    setBase(base === "election" ? "pack" : "election");
+    setHover(null);
+  };
+  const baseFlip = isParty && EL && (
+    <button type="button" className="rd-pl-flip" aria-label={"Lean against " + (elect ? "election results" : "the other pollsters") + "; switch to " + (elect ? "the other pollsters" : "election results")}
+            title={"Switch to each pollster’s lean against " + (elect ? "the other pollsters" : "election results")}
+            onClick={basePick}><span className="rd-pl-flip-t">{elect ? "Election results" : "Other pollsters"}</span> <span aria-hidden="true">⇄</span></button>
+  );
   return (
     <section className="rd-sec rd-hl" id="house-lean" aria-labelledby="rd-hl-t">
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-hl-t">How each pollster leans</h2>
-        <span className="rd-meta">Each pollster’s usual gap to the others polling at the same time{phone ? "" : ", which the averages take out"}</span>
+        <span className="rd-meta">{elect ? "Each pollster’s final polls against the count at past elections" : <>Each pollster’s usual gap to the others polling at the same time{phone ? "" : ", which the averages take out"}</>}</span>
       </div>
       {head && <RdHed head={head} dek={dek} />}
       <RdTabs swipe value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-hl-tabs"
               options={hlViews}>
         {view === "tpp" && !narrowBar && <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Two-party:</span>{flip}</span>}
+        {baseFlip && !narrowBar && <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Against:</span>{baseFlip}</span>}
       </RdTabs>
       {/* under 1001px the five tab labels fill the row already, so the
           switch drops to its own strip, as the table's does on a phone */}
       {view === "tpp" && narrowBar && <div className="rd-ap-pctl">{flip}</div>}
-      <h4 className="rd-ap-ct rd-hl-ct">{phone ? title.replace(", points", ", points; the line beneath each is its lean month by month since the election") : title}</h4>
+      {baseFlip && narrowBar && <div className="rd-ap-pctl"><span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Against:</span>{baseFlip}</span></div>}
+      <h4 className="rd-ap-ct rd-hl-ct">{elect ? (phone ? title + ", points; the line beneath each is its miss at each election" : title) : phone ? title.replace(", points", ", points; the line beneath each is its lean month by month since the election") : title}</h4>
       <div className="rd-hl-table" role="table" aria-label="Each pollster’s lean against the others, now and month by month since the election">
         <div className="rd-hl-hrow" role="row">
           <span className="rd-ap-th" role="columnheader">Pollster</span>
           <span role="columnheader" className="rd-hl-hbar">{barHead}</span>
-          <span className="rd-ap-th r" role="columnheader">Now</span>
+          <span className="rd-ap-th r" role="columnheader">{elect ? "Average" : "Now"}</span>
           {!phone && <span></span>}
           {!phone && (
             <span className="rd-hl-shead" role="columnheader" ref={boxRef}>
-              <span className="rd-ap-cap">Since the election<em><span className="rd-hl-sep">, </span>each row’s height is {SMAX === 1 ? "a point" : SMAX + " points"} either way</em></span>
-              {rdApMonthTicks(ms, tStep).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
+              <span className="rd-ap-cap">{elect ? "Election by election" : "Since the election"}<em><span className="rd-hl-sep">, </span>each row’s height is {SMAX === 1 ? "a point" : SMAX + " points"} either way</em></span>
+              {elect ? elTicks.map((t) => <span key={t.y} className={"rd-ap-tk " + t.a} style={{ left: ex(t.y) }}>{t.y}</span>)
+                : rdApMonthTicks(ms, tStep).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
             </span>
           )}
         </div>
         {phone && <span ref={boxRef} className="rd-hl-measure" aria-hidden="true"></span>}
         {rows.map((r) => (
           <div key={r.h} className="rd-hl-row" role="row">
-            <span role="rowheader" className="rd-hl-who"><b>{r.h}</b><span className="rd-ap-sub">{r.n} poll{r.n === 1 ? "" : "s"}</span></span>
+            <span role="rowheader" className="rd-hl-who"><b>{r.h}</b><span className="rd-ap-sub">{r.n} {elect ? "election" : "poll"}{r.n === 1 ? "" : "s"}</span></span>
             <span role="cell" className="rd-hl-bc">{bar(r.v)}</span>
             <span role="cell" className="rd-hl-now" style={{ color: Math.abs(r.v) < 0.05 ? "var(--ink-3)" : r.v > 0 ? posInk : negInk }}>{rdApSigned(r.v)}</span>
             {!phone && <span></span>}
             <span role="cell" className="rd-hl-sc">{spark(r)}</span>
           </div>
         ))}
+        {noRecord.length > 0 && <p className="rd-hl-none">No final poll on record: {noRecord.map((r) => r.h).join(", ")}.</p>}
       </div>
-      <RdTsig summary="Trend-significance table"
+      {elect ? <RdTsig summary="Significance table"
+        heads={["Pollster", "Elections", "Mean miss, pts", "t", "Significant"]}
+        sets={[elTsig]}
+        note={"Each row tests the pollster’s misses at past elections against zero (a one-sample t-test, three elections at least); Holm’s correction is applied across the pollsters tested, so Yes means a lean on the result that chance alone is unlikely to give."}
+      /> : <RdTsig summary="Trend-significance table"
         heads={["Pollster", "Lean, first → last", "Slope, pts/yr", "t", "Significant"]}
         sets={[hlTsig]}
         note={"Each row’s slope is a straight line through that pollster’s own monthly leans since the election, as the sparklines above draw them, t-tested against zero; Holm’s correction is applied across the " + (hlTested.length === 1 ? "pollster" : hlTested.length + " pollsters") + " on show, so Yes means a lean is drifting, not just sitting off-centre."}
-      />
-      <RdFoot how={{ term: "house-lean", from: "How each pollster leans" }}>
+      />}
+      {elect ? <RdFoot how={{ term: "house-lean", from: "How each pollster leans" }}>
+        A pollster’s lean on the result is its final poll’s miss at each federal election since {EL.from}, averaged with every election counting once: its last poll in the {EL.windowDays} days before polling day, primary votes scaled to leave out undecided voters, against the count. Where the count does not report One Nation separately (2004 to 2016), the poll’s One Nation vote is counted among its others. Methods change, so an old miss says less about a pollster today than a recent one; the averages correct only for the lean against the other pollsters, never for this one.
+      </RdFoot> : <RdFoot how={{ term: "house-lean", from: "How each pollster leans" }}>
         A pollster’s lean is its average gap to the other pollsters polling within four weeks of it{view === "tpp" && !pub ? ", all read through the same preference flows" : ""}, with recent polls counting most. One with few polls is pulled towards zero until its record builds. Because each lean is measured against the other pollsters, a miss they all share, as at the 2019 election, leaves every lean at zero.{view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : ""}
         {split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null}
-      </RdFoot>
+      </RdFoot>}
     </section>
   );
 }

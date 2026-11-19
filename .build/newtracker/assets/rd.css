@@ -4350,3 +4350,5 @@ body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outlin
    added 2026-10-28, keeps its own classic-sheet kill in the template), and
    outlining the inset input too rings a second rectangle inside the pill */
 body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-visible { outline: none; }
+/* the election reading's pollsters with no final poll on record, under the rows */
+body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3); }
