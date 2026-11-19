@@ -388,7 +388,9 @@ def main():
             prev_share = (100 * prev_by_ab[r[1]]) / past["formal"] if r[1] in prev_by_ab else 0.0
             r[5] = r2(share - prev_share)
             n_sw += 1
-        if div.get("tpp") and past["tpp"]:
+        # official majors figures swing (classic or commission-derived);
+        # estimates (tppe) never do — uniform rule across the state lanes
+        if div.get("tpp") and not div.get("tppe") and past["tpp"]:
             cur = (100 * div["tpp"][0]) / (div["tpp"][0] + div["tpp"][1])
             oldv = (100 * past["tpp"][0]) / sum(past["tpp"])
             div["tpp"][2] = r2(cur - oldv)

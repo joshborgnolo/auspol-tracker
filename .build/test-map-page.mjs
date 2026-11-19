@@ -1832,7 +1832,19 @@ for (const y of ["sa22", "sa26"]) {
   assert.deepEqual(res.divs.filter((d) => !d.h || !d.h.length).map((d) => d.n), ["Leppington"], "nsw23: Leppington is new in 2023 — the one division with no 2019 row");
   assert.equal(nC5, 562, "nsw23: 562 candidates file a swing");
   assert.equal(nSw, 556, "nsw23: 556 swings moved on 2019 (six rest at exactly 0)");
-  assert.equal(nTpp, 66, "nsw23: 66 districts carry a classic-pair 2PP swing into 2019");
+  assert.equal(nTpp, 73, "nsw23: 73 districts carry a classic-or-tool-derived 2PP swing into 2019 (the NSWEC tool's official notional rows swing too — estimates never do)");
+  // the NSWEC-tool notional lane (notional-adjudication.md): every one of
+  // the 22 non-classic districts files the distribution tool's own output
+  assert.equal(res.divs.filter((d) => d.tpp != null).length, 93, "nsw23: all 93 districts carry a two-party figure");
+  assert.equal(res.divs.filter((d) => d.tppn).length, 22, "nsw23: the tool-derived notional cohort");
+  assert.ok(res.divs.every((d) => !d.tppe), "nsw23: no estimates anywhere");
+  {
+    const nm = res.divs.find((d) => d.n === "Newtown");
+    assert.deepEqual(nm.tpp.slice(0, 2), [35145, 7553], "nsw23 Newtown's tool-derived 2PP");
+    assert.equal(nm.tppn, 1, "nsw23 Newtown: tool-derived marker");
+    const sh = res.divs.find((d) => d.n === "Summer Hill");
+    assert.deepEqual(sh.tpp.slice(0, 2), [37057, 9373], "nsw23 Summer Hill's tool-derived 2PP");
+  }
   assert.equal(res.agg.NSW.formal, 4701930, "nsw23: 2023 Legislative Assembly formal vote");
   assert.equal(res.agg.AUS.formal, 4701930, "nsw23: the AUS agg mirrors the frame's formal");
   assert.equal(res.agg.NSW.pformal, 4551886, "nsw23: 2019 Assembly formal vote");

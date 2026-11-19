@@ -1,0 +1,33 @@
+{
+  "_doc": "Notional Labor-v-Coalition two-party figures for NSW Legislative Assembly districts whose final count wasn't Labor v Coalition. Rows are [alp_votes, coalition_votes]. Provenance and verification trail: .build/map/src/nsw/notional-adjudication.md. NSWEC publishes no 2CP beyond the finals — but since 2015 it has data-entered every ballot and ships an on-demand preference-distribution TOOL; the per-district Labor-Coalition pairs below are that tool's own output, published in Antony Green's 2023 election research paper (NSW Parliamentary Library's Research Paper 7/2025). Do not edit by hand without the set checks in build_nsw23_data.py passing.",
+  "nsw23": {
+    "provenance": "official-tool",
+    "credit": "The per-district two-party-preferred rows of Antony Green's 2023 NSW election analysis (Research Paper 7/2025 update of 11/2023; his table note: totals 'derived from the [NSW Electoral] Commission's on-line [preference-distribution] tool')",
+    "sourceUrl": "https://www.antonygreen.com.au/docs/nsw/2023-NSW-election-results-v2.pdf",
+    "fetched": "2026-11-19",
+    "divisions": {
+      "Ballina": [22445, 17492],
+      "Balmain": [32752, 11208],
+      "Barwon": [10316, 15971],
+      "Cessnock": [30154, 9103],
+      "Kiama": [24564, 10665],
+      "Lake Macquarie": [16981, 10069],
+      "Manly": [16592, 27679],
+      "Murray": [6570, 17003],
+      "Newtown": [35145, 7553],
+      "North Shore": [17371, 24208],
+      "Orange": [10165, 17138],
+      "Pittwater": [15567, 26796],
+      "Port Macquarie": [14003, 28044],
+      "Shellharbour": [31406, 9298],
+      "Summer Hill": [37057, 9373],
+      "Sydney": [22054, 13936],
+      "Tamworth": [11292, 32433],
+      "Vaucluse": [13960, 26574],
+      "Wagga Wagga": [12719, 16287],
+      "Wakehurst": [16054, 23685],
+      "Willoughby": [20665, 26152],
+      "Wollondilly": [18212, 22300]
+    }
+  }
+}

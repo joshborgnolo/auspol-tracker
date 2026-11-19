@@ -74,6 +74,22 @@ import collections, csv, gzip, html as H, json, os, re, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 FLOW = os.path.join(REPO, ".build", "state-flow-src", "nsw")
 NSW23 = os.path.join(REPO, ".build", "map", "src", "nsw23")
+
+#: notional Labor-v-Coalition figures for the 22 districts whose final
+#: pair wasn't the majors — the NSWEC distribution-tool's own output as
+#: published in Antony Green's 2023 paper (tppn; provenance:
+#: .build/map/src/nsw/notional-adjudication.md)
+NOTIONAL = json.load(open(os.path.join(REPO, ".build", "map", "src", "nsw", "notional-2pp.json")))
+
+
+def notional_rows():
+    spec = NOTIONAL["nsw23"]
+    out = {}
+    for name, row in spec["divisions"].items():
+        if not (isinstance(row, list) and len(row) == 2 and all(isinstance(v, int) and v >= 0 for v in row)):
+            fail(f"notional-2pp.json nsw23/{name}: row shape drifted {row!r}")
+        out[name] = (row[0], row[1], spec["provenance"] == "estimated-green")
+    return out
 VENUES = os.path.join(NSW23, "venues")
 DEMO_STORE = os.path.join(REPO, "data", "nsw23-demo.json")
 SEIFA_STORE = os.path.join(REPO, "data", "nsw23-seifa.json")
@@ -649,6 +665,8 @@ def main():
     demo = load_demo()
     seifa = load_seifa()
     venues = load_venues()
+    notion = notional_rows()
+    notion_filed = set()
     flows = load_flow_counts(set(DIST_SLUGS))
     disp_of = {slug_for(2023, n): n for n in names}
     if set(disp_of) != set(DIST_SLUGS):
@@ -701,6 +719,7 @@ def main():
         tcp_pair = [[ia, ta[1]], [ib, tb[1]]]
         pair_buckets = {rows[ia]["b"], rows[ib]["b"]}
         tpp = None
+        tpp_notional = False
         if pair_buckets == {"alp", "lnp"}:
             alp_i = ia if rows[ia]["b"] == "alp" else ib
             lnp_i = ib if alp_i == ia else ia
@@ -709,6 +728,15 @@ def main():
             tpp = [va, vb, None]
             tpp_tot[0] += va
             tpp_tot[1] += vb
+        else:
+            nrec = notion.get(name)
+            if nrec:
+                va, vb, _est_flag = nrec
+                tpp = [va, vb, None]
+                tpp_tot[0] += va
+                tpp_tot[1] += vb
+                tpp_notional = True
+                notion_filed.add(name)
 
         # counted preference re-count: one [k, toA, toB, exhausted] quadruple
         # per non-finalist, oriented on the tcp pair's own order. The finalists'
@@ -799,6 +827,8 @@ def main():
         }
         if tpp:
             recd["tpp"] = tpp
+        if tpp_notional:
+            recd["tppn"] = 1
         D.append(recd)
         tot_formal += fp["formal"]
         tot_inf += fp["inf"]
@@ -808,6 +838,9 @@ def main():
 
     if dict(seats) != EXPECTED_SEATS:
         fail(f"seat counts {dict(seats)} != expected {EXPECTED_SEATS}")
+    if notion_filed != set(NOTIONAL["nsw23"]["divisions"]):
+        fail(f"filed notional set {sorted(notion_filed)} != the adjudicated 22"
+             f" {sorted(NOTIONAL['nsw23']['divisions'])} — never bridge a figure silently")
 
     agg = {"prim": {k: tot_prim[k] for k in BUCKETS}, "formal": tot_formal, "inf": tot_inf,
            "tpp": [tpp_tot[0], tpp_tot[1], None], "seats": dict(seats)}
