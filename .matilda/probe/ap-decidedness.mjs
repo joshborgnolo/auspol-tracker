@@ -3,13 +3,13 @@
    redesign). The wave's movable share, on its own basis, reads in full under
    the primaries where the Primary tab leads, and as a short unit on the
    Primary line ("Also in this poll") on every other tab:
-     RedBridge/Accent : undecidedLeaner + triple → "6% undecided after leaner, excluded – 51% solid…"
-     Newspoll         : undecidedLeaner → "5% undecided after leaner, excluded"
+     RedBridge/Accent : undecidedLeaner + triple → "6% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined) – 51% solid…"
+     Newspoll         : undecidedLeaner → "5% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)"
      DemosAU          : existing first-series row, labelled from its leaner methodology
      Roy Morgan       : `undecided` (first) → "undecided", "excluded"
      Resolve          : `undecided` (soft)  → "Undecided disallowed – 74% firm, 26% soft"
-     Essential        : `undecided` (tpp)   → "undecided", "unallocated…"
-     YouGov           : neither field → "% undecided not published, excluded"
+     Essential        : `undecided` (tpp)   → "undecided – excluded (primary-vote shares are decideds')"
+     YouGov           : neither field → "% undecided not published, excluded (primary-vote shares are decideds)"
      Confidence facet : a gauge release → no Primary line, nothing
    Truth comes from the same 9f09dca2 data asset the page reads (new
    Function fixture, ap-prim-detail-order pattern) - the probe pins the
@@ -64,31 +64,31 @@ ok("DemosAU stays in its existing first-preference undecided series",
 const W = p => p.field || p.released;
 const CASES = [
   pick("RedBridge/Accent", (p) => p.undecidedLeaner != null && Array.isArray(p.firmAll) && p.firmAll.length === 3, (p) => ({
-    head: p.undecidedLeaner + "% undecided after leaner, excluded", word: "",
+    head: p.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)", word: "",
     sub: `${p.firmAll[0]}% solid, ${p.firmAll[1]}% soft, ${p.firmAll[2]}% very soft`,
   }), "RedBridge"),
   pick("Roy Morgan", (p) => p.undecided != null, (p) => ({
-    head: p.undecided + "%", word: "undecided", sub: "excluded",
+    head: p.undecided + "%", word: "undecided", sub: "excluded (primary-vote shares are decideds)",
   }), "Roy Morgan"),
   pick("Resolve", (p) => p.undecided != null && p.undecidedBasis === "soft", (p) => ({
     head: "Undecided disallowed", word: "", sub: (100 - p.undecided) + "% firm, " + p.undecided + "% soft",
   }), "Resolve"),
   pick("Essential", (p) => p.undecided != null && p.undecidedBasis === "tpp", (p) => ({
-    head: p.undecided + "%", word: "undecided", sub: "unallocated inside the printed two-party pair",
+    head: p.undecided + "%", word: "undecided", sub: "excluded (primary-vote shares are decideds')",
   }), "Essential"),
   pick("Spectre Strategy", (p) => p.undecided != null && Array.isArray(p.firmAll) && p.firmAll.length === 2, (p) => ({
-    head: p.undecided + "% undecided, excluded", word: "",
+    head: p.undecided + "% undecided, excluded (primary-vote shares are decideds)", word: "",
     sub: p.firmAll[0] + "% firm, " + p.firmAll[1] + "% soft",
   }), "Spectre"),
   pick("Newspoll", (p) => p.undecidedLeaner != null, (p) => ({
-    head: p.undecidedLeaner + "% undecided after leaner, excluded", word: "",
-    sub: p.undecidedLeaner + "% undecided after leaner, excluded",
+    head: p.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)", word: "",
+    sub: p.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
   }), "Newspoll"),
   pick("DemosAU", (p) => p.undecided != null, (p) => ({
-    head: p.undecided + "%", word: "undecided after leaner", sub: "excluded",
+    head: p.undecided + "%", word: "undecided after leaner", sub: "excluded (primary-vote shares are decideds' and leaners' combined)",
   }), "DemosAU"),
   pick("YouGov", () => true, () => ({
-    head: "% undecided not published, excluded", word: "", sub: "% undecided not published, excluded",
+    head: "% undecided not published, excluded (primary-vote shares are decideds)", word: "", sub: "% undecided not published, excluded (primary-vote shares are decideds)",
   }), "YouGov"),
 ].filter(Boolean);
 
@@ -146,7 +146,8 @@ const readDetail = () => page.evaluate(() => {
   const sentenceNode = lead ? [...lead.querySelectorAll(".rd-ldg-foot1")].find((n) => /% (not firm|undecided)|Undecided disallowed/.test(norm(n.textContent))) || null : null;
   const sentence = sentenceNode ? norm(sentenceNode.textContent) : null;
   const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
-  return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "",
+  return { marginNote: lead ? [...lead.querySelectorAll(".rd-ldg-foot1")].map((n) => norm(n.textContent)).find((t) => t.startsWith("Margin of error")) || null : null,
+    sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "",
     deltaWeights: sentenceNode ? [...sentenceNode.querySelectorAll("b .rd-ldg-chg")].map((n) => +getComputedStyle(n).fontWeight) : [], line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null, lines: [...lg.querySelectorAll(".rd-ldg-lab")].map((n) => norm(n.textContent)) };
 });
 
@@ -188,6 +189,7 @@ for (const cs of CASES) {
     ok(`2PP tab: the Primary line carries "${x.head} ${x.word}" (${tag})`, d2 && d2.line && d2.line.includes((x.head + " " + x.word).trim()),
        d2 ? String(d2.line) : "no detail");
   }
+  if (cs.house === "Essential") ok("2PP tab: undecideds are left out of the margin note, with its change reference", d2 && /Margin of error .*Undecideds are left out, unallocated\. ▲▼ Changes are on /.test(d2.marginNote || ""), d2 ? d2.marginNote : "no detail");
   await clickRow(cs.idx);
 }
 
@@ -259,7 +261,7 @@ const LATEST = [
   ["RedBridge", (() => {
     const w = byHouse("RedBridge/Accent")[0];
     return w && w.undecidedLeaner != null && Array.isArray(w.firmAll) ? {
-      dd: w.undecidedLeaner + "% undecided after leaner, excluded",
+      dd: w.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
       sub: `${w.firmAll[0]}% solid, ${w.firmAll[1]}% soft, ${w.firmAll[2]}% very soft`,
     } : undefined;
   })()],
@@ -271,18 +273,18 @@ const LATEST = [
   })()],
   ["Roy Morgan", (() => {
     const w = byHouse("Roy Morgan")[0];
-    return w && w.undecided != null ? { dd: w.undecided + "% undecided", sub: "excluded" } : undefined;
+    return w && w.undecided != null ? { dd: w.undecided + "% undecided", sub: "excluded (primary-vote shares are decideds)" } : undefined;
   })()],
   ["DemosAU", (() => {
     const w = byHouse("DemosAU")[0];
-    return w && w.undecided != null ? { dd: w.undecided + "% undecided after leaner", sub: "excluded" } : undefined;
+    return w && w.undecided != null ? { dd: w.undecided + "% undecided after leaner", sub: "excluded (primary-vote shares are decideds' and leaners' combined)" } : undefined;
   })()],
-  ["YouGov", { dd: "% undecided not published, excluded", sub: "not published" }],
+  ["YouGov", { dd: "% undecided not published, excluded (primary-vote shares are decideds)", sub: "not published" }],
   ["Newspoll", (() => {
     const w = byHouse("Newspoll")[0];
     return w && w.undecidedLeaner != null ? {
-      dd: w.undecidedLeaner + "% undecided after leaner, excluded",
-      sub: w.undecidedLeaner + "% undecided after leaner, excluded",
+      dd: w.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
+      sub: w.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
     } : undefined;
   })()],
 ];

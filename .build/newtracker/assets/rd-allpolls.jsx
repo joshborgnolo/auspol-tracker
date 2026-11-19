@@ -1657,7 +1657,7 @@ function RdLgTpp({ p, onM, moe, note }) {
           {p.tpp3 && <tr><th scope="row">Three-cornered</th><td colSpan={2}><b className="rd-ldg-tri"><span style={{ color: "var(--alp-text)" }}>ALP {rdApNum(p.tpp3.alp)}</span> <span style={{ color: "var(--lnp-text)" }}>L/NP {rdApNum(p.tpp3.lnp)}</span> <span style={{ color: "var(--onp-text)" }}>ON {rdApNum(p.tpp3.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
         </tbody>
       </table>
-      {(noPub || moe || note) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{note ? " " + note : ""}</p>}
+      {(noPub || moe || note || p.undecidedBasis === "tpp") && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{p.undecidedBasis === "tpp" ? " Undecideds are left out, unallocated." : ""}{note ? " " + note : ""}</p>}
     </>
   );
 }
@@ -1670,11 +1670,11 @@ function RdLgTpp({ p, onM, moe, note }) {
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
   if (f && f.length === 2) return {
-    h: p.undecided != null ? p.undecided + "% undecided, excluded" : f[1] + "% not firm",
+    h: p.undecided != null ? p.undecided + "% undecided, excluded (primary-vote shares are decideds)" : f[1] + "% not firm",
     w: "", d: null, s: f[0] + "% firm, " + f[1] + "% soft",
   };
   if (p.undecidedLeaner != null) return {
-    h: p.undecidedLeaner + "% undecided after leaner, excluded",
+    h: p.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
     w: "", d: null,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null,
   };
@@ -1684,12 +1684,12 @@ function rdLgDecided(p) {
       s: (100 - p.undecided) + "% firm, " + p.undecided + "% soft" };
     return { h: p.undecided + "%", w: b === "leaner" ? "undecided after leaner" : "undecided",
              d: (p.chg && p.chg.d && p.chg.d.und) || null,
-             s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "excluded",
+             s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "excluded (primary-vote shares are decideds')" : b === "leaner" ? "excluded (primary-vote shares are decideds' and leaners' combined)" : b === "first" ? "excluded (primary-vote shares are decideds)" : "excluded",
              sep: b === "soft" || b === "tpp" ? " – " : ", " };
   }
   if (f) return { h: f[1] + f[2] + "%", w: "not firm", d: null, s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table" };
   if (p.pollster === "YouGov" || p.pollster === "YouGov (MRP)")
-    return { h: "% undecided not published, excluded", w: "", d: null, s: null };
+    return { h: "% undecided not published, excluded (primary-vote shares are decideds)", w: "", d: null, s: null };
   return null;
 }
 const RD_LG_CK = { alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" };
