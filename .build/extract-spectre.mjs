@@ -20,14 +20,16 @@
 //      window), the FIRST PREFERENCE VOTE chart (label presents, share is
 //      the first "NN% ±NN" after the label inside the primaries slice),
 //      the TWO PARTY PREFERRED prose pair + Labor-v-One-Nation pair, the
-//      APPROVAL RATINGS table (six % cells per figure; canon nets are
-//      DERIVED app-dis, not the PDF's printed NET column), and — only when
-//      the wave has a PPM page — the preferred-PM and Albanese-v-Hanson
+//      country-direction chart, the FIRM/SOFT VOTE chart, the APPROVAL
+//      RATINGS table (six % cells per figure; canon nets are DERIVED
+//      app-dis, not the PDF's printed NET column), and — only when the
+//      wave has a PPM page — the preferred-PM and Albanese-v-Hanson
 //      head-to-head prose pairs
 //   5. matched waves (canon date within 3d): verify every mechanical
-//      figure against polls/ppm/ppmHeadToHead/approval/altTpp canon; RSS
-//      pubDate-vs-hand-entered `published` stays a note, never a rewrite
-//   6. new waves: guard checks, then append rows to those five arrays.
+//      figure against polls/direction/ppm/ppmHeadToHead/approval/altTpp
+//      canon; RSS pubDate-vs-hand-entered `published` stays a note, never
+//      a rewrite
+//   6. new waves: guard checks, then append rows to those six arrays.
 //      Spectre is a live house with no pollsterRules entry — nothing to
 //      un-stop
 //
@@ -35,10 +37,13 @@
 //   polls:          {date, published(rss→AEST), dateStart,
 //                    pollster:"Spectre Strategy", client:"—", sample,
 //                    undecided, alp,lnp,grn,onp,ind, oth:null,
-//                    tpp_alp, tpp_lnp, url(article page)}
+//                    tpp_alp, tpp_lnp, firmness, url(article page)}
 //                    (undecided is parsed for new waves; the four canon
 //                    rows predate the field and stay as the house entered
-//                    them)
+//                    them. firmness is the chart's [firm, soft] pair for
+//                    all voters plus Labor/Coalition/One Nation/Greens;
+//                    national soft explicitly includes undecided voters)
+//   direction:      {date, dateStart, pollster, right, wrong, unsure}
 //   ppm:            {date, firm, alb, opp, oppName, han, extra:null}
 //                    (han carries Hanson's share when the question is the
 //                    three-way squeeze — Nov 2026 on; null on a two-way)
@@ -56,7 +61,8 @@
 // (pdftotext caches, demosau-src convention). Test hooks: SPECTRE_OUT /
 // SPECTRE_SRC_DIR redirect outputs; --check = no writes; --force =
 // re-download PDFs ignoring caches; --url <rss-item-link> = parse one
-// release, print to stdout, touch nothing.
+// release, print to stdout, touch nothing. test-spectre.mjs imports the
+// parser directly without running the fetch/write main.
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
@@ -205,6 +211,24 @@ function parseReport(txt, slug, D) {
   const und = txt.match(/(\d+)%\s+of voters were undecided before\s+apportionment/i);
   if (und) w.undecided = toNum(und[1]);
 
+  const dir = SECTION(txt, "Right direction", "Q: In your view, is Australia heading") ?? "";
+  const dr = dir.match(/Right direction\s+(\d+(?:\.\d+)?)%/);
+  const dw = dir.match(/Wrong direction\s+(\d+(?:\.\d+)?)%/);
+  const du = dir.match(/Unsure\s+(\d+(?:\.\d+)?)%/);
+  if (dr && dw && du) w.direction = {
+    right: asPct(toNum(dr[1])), wrong: asPct(toNum(dw[1])), unsure: asPct(toNum(du[1])),
+  };
+
+  const firmSec = SECTION(txt, "FIRM VOTE", "Q: …and how sure") ?? "";
+  const firmShares = [...firmSec.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => asPct(toNum(m[1])));
+  if (firmShares.length === 6) {
+    // Party names are graphics in this chart, not text. Its fixed reading
+    // order is national firm, Labor, One Nation, national soft, L-NP, Greens.
+    const [allFirm, alpSoft, onpSoft, allSoft, lnpSoft, grnSoft] = firmShares;
+    const pair = (soft) => [asPct(100 - soft), soft];
+    w.firmness = { all: [allFirm, allSoft], alp: pair(alpSoft), lnp: pair(lnpSoft), onp: pair(onpSoft), grn: pair(grnSoft) };
+  }
+
   // primary vote chart: label line, then the first "NN% ±change" token that
   // follows it inside the slice (multi-column chart renders sparse; the
   // share is always paired with a signed change-since-election figure)
@@ -317,6 +341,17 @@ function guardNewWave(w, published) {
   const need = (k, what) => { if (w[k] == null) errs.push(`missing ${what} (${k})`); };
   need("date", "fieldwork end"); need("dateStart", "fieldwork start");
   need("sample", "sample size"); need("undecided", "undecided share");
+  if (!w.direction) errs.push("missing country direction chart");
+  else {
+    const { right, wrong, unsure } = w.direction;
+    if (Math.abs(right + wrong + unsure - 100) > 1) errs.push(`direction shares sum ${right + wrong + unsure}`);
+  }
+  if (!w.firmness) errs.push("missing/torn firm-vote chart");
+  else for (const k of ["all", "alp", "lnp", "onp", "grn"]) {
+    const pair = w.firmness[k];
+    if (!Array.isArray(pair) || pair.length !== 2 || pair.some((v) => !(v >= 0 && v <= 100)) || pair[0] + pair[1] !== 100)
+      errs.push(`firmness.${k} is not a 100% firm/soft pair: ${JSON.stringify(pair)}`);
+  }
   if (errs.length) return errs;
   const span = daysBetween(w.dateStart, w.date);
   if (!(span >= 1 && span <= 21)) errs.push(`implausible fieldwork span ${span}d`);
@@ -364,7 +399,15 @@ function figureDiffs(date, w, D) {
     for (const k of ["alp", "lnp", "grn", "onp", "ind"]) chk(`polls.${k}`, poll[k], w[k]);
     chk("polls.tpp_alp", poll.tpp_alp, w.tpp_alp);
     chk("polls.tpp_lnp", poll.tpp_lnp, w.tpp_lnp);
+    if (poll.firmness) {
+      for (const k of ["all", "alp", "lnp", "onp", "grn"])
+        chk(`polls.firmness.${k}`, poll.firmness[k], w.firmness?.[k]);
+    } else if (w.firmness) diffs.push({ key: "polls.firmness", canon: "absent", got: JSON.stringify(w.firmness), known: true });
   }
+  const direction = D.direction.find((p) => p.pollster === POLLSTER && p.date === date);
+  if (direction) {
+    for (const k of ["right", "wrong", "unsure"]) chk(`direction.${k}`, direction[k], w.direction?.[k]);
+  } else if (w.direction) diffs.push({ key: "direction", canon: "absent", got: JSON.stringify(w.direction), known: true });
   const ppm = D.ppm.find((p) => p.firm === POLLSTER && p.date === date);
   if (ppm) {
     chk("ppm.alb", ppm.alb, w.ppmAlb);
@@ -393,7 +436,7 @@ function figureDiffs(date, w, D) {
 
 // ------------------------------------------------------------------ rows
 function pollRows(w, item) {
-  const rows = { polls: null, ppm: null, ppmHeadToHead: null, approval: null, altTpp: null };
+  const rows = { polls: null, direction: null, ppm: null, ppmHeadToHead: null, approval: null, altTpp: null };
   rows.polls = {
     date: w.date,
     published: w.published,
@@ -404,9 +447,11 @@ function pollRows(w, item) {
     ...(w.undecided != null ? { undecided: w.undecided } : {}),
     alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: null,
     tpp_alp: w.tpp_alp, tpp_lnp: w.tpp_lnp,
+    ...(w.firmness ? { firmness: w.firmness } : {}),
     url: item.link,
   };
   if (!rows.polls.published) delete rows.polls.published;
+  if (w.direction) rows.direction = { date: w.date, dateStart: w.dateStart, pollster: POLLSTER, ...w.direction };
   if (w.ppmAlb != null) rows.ppm = { date: w.date, firm: POLLSTER, alb: w.ppmAlb, opp: w.ppmOpp,
     oppName: w.oppName, han: w.ppmHan ?? null, extra: null };
   if (w.h2hAlb != null) rows.ppmHeadToHead = { date: w.date, firm: POLLSTER, alb: w.h2hAlb, han: w.h2hHan };
@@ -422,9 +467,11 @@ function pollRows(w, item) {
 }
 
 // -------------------------------------------------------------------- main
+// SPECTRE_LIB=1 lets the offline oracle import the parser without starting
+// the fetch/write pass (same convention as the RedBridge reader).
 const status = { changed: false, check: CHECK, added: [], verified: [], mismatches: [],
   notes: [], skipped_items: [], item_errors: [] };
-try {
+if (process.env.SPECTRE_LIB !== "1") try {
   const orig = readFileSync(OUT, "utf8");
   const D = JSON.parse(orig);
   const existing = D.polls.filter((p) => p.pollster === POLLSTER);
@@ -441,7 +488,7 @@ try {
   status.candidates = items.map((i) => i.title);
 
   const guardFails = [];
-  const newRows = { polls: [], ppm: [], ppmHeadToHead: [], approval: [], altTpp: [] };
+  const newRows = { polls: [], direction: [], ppm: [], ppmHeadToHead: [], approval: [], altTpp: [] };
   for (const item of items) {
     const slug = item.link.split("/").filter(Boolean).pop();
     try {
@@ -540,3 +587,5 @@ try {
   console.log("SPECTRE_STATUS " + JSON.stringify(status));
   process.exit(1);
 }
+
+export { parseReport, pollRows, guardNewWave, figureDiffs };

@@ -1665,15 +1665,19 @@ function RdLgTpp({ p, onM, moe, note }) {
 /* ---- the primary vote: the poll's five figures, their changes, and how
    decided the vote is on the house's own question - can't-say (first
    basis), the not-firm share of the decided (soft), the residue inside a
-   printed two-party pair (tpp), or RedBridge's vote-softness triple
-   (gen-data's firmAll) */
+   printed two-party pair (tpp), RedBridge's vote-softness triple or
+   Spectre's firm/soft pair (gen-data's firmAll) */
 function rdLgDecided(p) {
+  const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
+  if (f && f.length === 2) {
+    const und = p.undecided != null ? `, including the ${p.undecided}% undecided` : ", including undecided voters";
+    return { h: f[1] + "%", w: "not firm", d: null, s: `firm ${f[0]}, soft ${f[1]} on its vote-firmness chart${und}` };
+  }
   if (p.undecided != null) {
     const b = p.undecidedBasis || "first";
     return { h: p.undecided + "%", w: b === "soft" ? "not firm" : "undecided", d: (p.chg && p.chg.d && p.chg.d.und) || null,
              s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "couldn’t name a party when first asked" };
   }
-  const f = Array.isArray(p.firmAll) && p.firmAll.length === 3 ? p.firmAll : null;
   if (f) return { h: f[1] + f[2] + "%", w: "not firm", d: null, s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table" };
   return null;
 }

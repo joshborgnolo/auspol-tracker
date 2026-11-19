@@ -3104,10 +3104,13 @@ const undecided = undecidedSeries.length ? {
    wave's effective sample times the party's primary), because one wave's
    One Nation or Greens cell rests on a hundred to three hundred people. The
    95% margin is binomial on that pooled base. The "Other" group is the row's
-   independents and minor parties (RedBridge files them all under `ind`). */
+   independents and minor parties (RedBridge files them all under `ind`).
+   Spectre's [firm, soft] pairs emit for its own poll detail, but stay out of
+   this pool: its national soft share explicitly adds undecided voters and
+   its chart has neither RedBridge's three categories nor an Other cohort. */
 const FIRM_POOL = 3;
 const FIRM_PARTIES = ["alp", "lnp", "onp", "grn", "oth"];
-const firmRows = POLLS.filter((p) => p.firmness).sort((a, b) => (a.date < b.date ? -1 : 1));
+const firmRows = POLLS.filter((p) => p.pollster === "RedBridge/Accent" && p.firmness).sort((a, b) => (a.date < b.date ? -1 : 1));
 const firmShare = (p, k) => (k === "oth" ? (p.ind ?? 0) + (p.oth ?? 0) : p[k]);
 const firmWaves = firmRows.map((p) => {
   const eff = rowN(p) / HL_DEFF;
@@ -4011,11 +4014,9 @@ const individualPolls = POLLS.map((p) => {
        fall back honestly where no release recorded one. */
     ...(p.published ? { published: p.published } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
-    /* RedBridge/Accent's decidedness reading on a fourth basis: the
-       vote-softness table's all-voters [solid, soft, verySoft] triple.
-       Beside undecidedOf's three bases, never through it – the Undecided
-       series counts only the "can't say" share, which this isn't. The
-       expanded poll shows it where other houses show their basis. */
+    /* A separate per-poll display basis from undecidedOf: RedBridge's
+       all-voters [solid, soft, verySoft] triple, or Spectre's two-way
+       [firm, soft] pair. Never route these through the can't-say series. */
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
@@ -4297,7 +4298,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     sample: p.sample ?? null,
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
-    // RedBridge/Accent's vote-softness triple, same as the archive emitter
+    // vote-firmness pair/triple, same as the archive emitter
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     // voting consideration, same as the archive emitter above
