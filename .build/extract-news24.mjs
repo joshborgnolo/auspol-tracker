@@ -590,7 +590,13 @@ function parseNews24Article(html, url) {
   const fw = news24Window(t, pubIso);
   const sample = t.match(/(?:poll|survey)\s+of\s+([\d,]+)\s+voters\b/i)?.[1];
   const tpp = t.match(new RegExp(`Labor[^%.]{0,140}?Coalition\\s+${N24_PAIR}`, "i"));
-  const alt = t.match(new RegExp(`(?:and|beat)\\s+One Nation(?:,?\\s+with a result of)?\\s+${N24_PAIR}`, "i"));
+  // subject order fixes the pair order: "…and/beat One Nation X-Y" is
+  // ALP-first by the lead clause it follows; "the government's advantage
+  // over One Nation has also widened to X-Y" (17 Nov 2026 style) is itself
+  // an ALP-subject phrase. A One Nation-subject paraphrase ("One Nation's
+  // advantage over Labor") would flip the order — match neither form then.
+  const alt = t.match(new RegExp(`(?:and|beat)\\s+One Nation(?:,?\\s+with a result of)?\\s+${N24_PAIR}`, "i"))
+    ?? t.match(new RegExp(`government['\u2018\u2019]?s\\s+advantage\\s+over\\s+One\\s+Nation\\b[^.]{0,60}?${N24_PAIR}`, "i"));
   const S = t.split(/(?<=[.!?])\s+/);
 
   const era = olFor(fw.date ?? pubIso ?? today()) ?? LEADERS.ols[LEADERS.ols.length - 1];
