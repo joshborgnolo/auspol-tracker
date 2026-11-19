@@ -1703,6 +1703,12 @@ async function loadYear(year, bg) {
     const fit = lo.handbook ? null : topojson.feature(lo, lo.objects.divs);
     if (!lo.handbook) m.proj = d3.geoConicEqualArea().parallels([-18, -36]).rotate([-132, 0]).fitSize([1000, 880], fit);
     m.res = res;
+    // Hare-Clark frames' member total: five-to-five electorates elect
+    // five-to-seven members each (tas14/18/21 → 25; tas24/25 + act16/20/24 → 35/25),
+    // so chambers and majority lines scale to elected members, not the divisions count
+    m.seatsN = res.divs && res.divs.some((d) => Array.isArray(d.c) && d.c.some((c) => c && c[6]))
+      ? res.divs.reduce((a, d) => a + d.c.filter((c) => c && c[6]).length, 0)
+      : null;
     m.pplLanes = res.pplLanes || null;
     m.ppl = !m.pplLanes; // the census lanes are here (a full file, or a frame with none)
     m.demoBasis = res.demoBasis || null;

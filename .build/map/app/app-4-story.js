@@ -369,8 +369,24 @@ function historyChart(d) {
 }
 
 /* ----- the national and state stories ----- */
+// the Hare-Clark frames: five electorates of five-to-seven members. Their
+// whole-frame seat tally is ELECTED MEMBERS (m.seatsN), never "divisions
+// led", and majority scales 18 of 35 / 13 of 25 — its per-family counts
+// come from the elected candidates' own buckets, exactly as the
+// commission's returns file lists them
+const isHareClark = (m) => (TAS_YEARS.has(m.year) || ACT_YEARS.has(m.year)) && !svYear(m.year);
+function electedCnt(m) {
+  const cnt = {};
+  if (!m.res || !m.res.divs) return cnt;
+  for (const d of m.res.divs) for (const c of d.c) if (c[6]) cnt[c[3]] = (cnt[c[3]] || 0) + 1;
+  return cnt;
+}
+function hareClarkArea(m, A, idx) {
+  return { A, idx, N: m.seatsN || idx.length, cnt: electedCnt(m) };
+}
 function areaStats(m, st) {
   const A = m.areas[st], idx = A.idx, N = idx.length;
+  if (isHareClark(m) && st === "AUS") return hareClarkArea(m, A, idx);
   const cnt = {}; for (const i of idx) { const f = holdFam(m.divs[i].hold); cnt[f] = (cnt[f] || 0) + 1; }
   return { A, idx, N, cnt };
 }
@@ -485,6 +501,12 @@ const statScopeOf = (m) => {
 function scopeArea(m, st) {
   const cls = clsFilter(m);
   if (!cls) return areaStats(m, st);
+  if (isHareClark(m)) {
+    const idx = m.areas[st].idx.filter((i) => m.divs[i].cls === cls);
+    const A = statClassArea(m, idx);
+    A.demo = demoOf(m, idx);
+    return hareClarkArea(m, A, idx);
+  }
   const idx = m.areas[st].idx.filter((i) => m.divs[i].cls === cls);
   const cnt = {};
   for (const i of idx) cnt[holdFam(m.divs[i].hold)] = (cnt[holdFam(m.divs[i].hold)] || 0) + 1;
@@ -773,9 +795,12 @@ function statSeatMakeup(m, idx, blocNames = []) {
      key that wrapped under a bracket could not be scanned). */
   const xb = rows.filter((r) => r.f !== "alp" && r.f !== "lnp" && !blocNames.includes(r.name));
   const xbN = xb.reduce((a, r) => a + r.n, 0), xbWord = blocNames.length ? "Others" : "Crossbench";
-  const seatsW = (n) => `${n} ${n === 1 ? "seat" : "seats"} (${f1(100 * n / idx.length)}%)`;
-  const bars = rows.filter((r) => !xb.includes(r)).map((r) => `<span style="width:${100 * r.n / idx.length}%;background:${colour(r)}" title="${esc(r.name)}: ${seatsW(r.n)}"></span>`).join("")
-    + (xbN ? `<span class="st-makeup-xb" style="width:${100 * xbN / idx.length}%" title="${xbWord}: ${seatsW(xbN)}"></span>` : "");
+  // the share basis of a Hare-Clark chamber bar is its members (35/25), not
+  // the electorates' count — meaningful everywhere a frame lists member sums
+  const seatBasis = isHareClark(m) ? (m.seatsN || idx.length) : idx.length;
+  const seatsW = (n) => `${n} ${n === 1 ? "seat" : "seats"} (${f1(100 * n / seatBasis)}%)`;
+  const bars = rows.filter((r) => !xb.includes(r)).map((r) => `<span style="width:${100 * r.n / seatBasis}%;background:${colour(r)}" title="${esc(r.name)}: ${seatsW(r.n)}"></span>`).join("")
+    + (xbN ? `<span class="st-makeup-xb" style="width:${100 * xbN / seatBasis}%" title="${xbWord}: ${seatsW(xbN)}"></span>` : "");
   // the key reads largest first (the family order settles ties), down its first column then its second
   const keyed = xb.slice().sort((a, b) => b.n - a.n);
   const cells = keyed.map((r) => `<i style="background:${colour(r)}" title="${esc(r.name)}: ${r.n}"></i>`.repeat(r.n)).join("");
@@ -783,7 +808,9 @@ function statSeatMakeup(m, idx, blocNames = []) {
   const total = m.seatsN || m.divs.length, majority = Math.floor(total / 2) + 1;
   // A chamber majority is meaningful on the complete House, rather than a
   // state or seat-type subset picked by the filters; its line is named on the bar.
-  const marker = idx.length === total ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i><span class="st-seat-majlab" aria-hidden="true" style="left:${100 * majority / total}%">${majority} for a majority</span>` : "";
+  // For Hare-Clark frames the bar's whole-election scope is m.seatsN members —
+  // majority at floor(N/2)+1 — while its idx remains division count
+  const marker = (idx.length === total || isHareClark(m)) ? `<i class="st-seat-majority" style="left:${100 * majority / total}%" role="img" aria-label="${majority} seats for a majority" title="${majority} seats for a majority"></i><span class="st-seat-majlab" aria-hidden="true" style="left:${100 * majority / total}%">${majority} for a majority</span>` : "";
   return `<span class="st-seat-mix${marker ? " st-has-maj" : ""}"><span class="st-seat-track"><span class="st-makeup" aria-hidden="true">${bars}</span>${marker}</span>${legend}</span>`;
 }
 // the Winner lens's head: the two-party result, its swing, then the seats with each side's change
@@ -1555,7 +1582,8 @@ function storyArea(m, st) {
   // the today head the member count is the chamber's senators under the
   // Senate lanes (an election frame's divisions stand either way)
   const senSt = senDeck && !aus ? st : null, senN = senDeck && isNowY(m.year) ? senDeck.divs.filter((d) => !senSt || d.st === senSt).length : N;
-  const meta = `${cls && !aus ? `${esc(STATE_TITLE[st])} · ` : ""}${senN} ${isNowY(m.year) ? (senN === 1 ? "member" : "members") : seatNoun()}`;
+  const hcHead = TAS_YEARS.has(m.year) || ACT_YEARS.has(m.year);
+  const meta = hcHead ? `${m.divs.length} electorates · ${senN} elected` : `${cls && !aus ? `${esc(STATE_TITLE[st])} · ` : ""}${senN} ${isNowY(m.year) ? (senN === 1 ? "member" : "members") : seatNoun()}`;
   /* the figures block is every lens's: the seats, the two-party count and the
      primaries for the filtered pool. The Winner and Seat type lenses say no
      more than their figures (a dek only where words carry what figures can't);
@@ -1628,11 +1656,14 @@ function storyArea(m, st) {
   // two, or three if two would still print zeros (the f1 check keeps null/NaN "–" safe)
   const closeFmt = (v) => (f1(v) === "0.0" ? (v.toFixed(2) === "0.00" ? v.toFixed(3) : v.toFixed(2)) : f1(v));
   const closeRow = (v, d) => `${closeFmt(v)} <small>(${int(d.votesMargin)} vote${d.votesMargin === 1 ? "" : "s"})</small>`;
-  // up arrow lit on Safest, down arrow lit on Most marginal — the arrows ride
-  // the right edge of the head, inline with its words
-  const closeNext = closeSafe ? "Show most marginal seats" : "Show safest seats";
-  const closeArrows = `<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 17V3.5M3.2 7.2 6.5 3.7l3.3 3.5" stroke="var(--ink${closeSafe ? "" : "-3"})"/><path d="M13.5 3v13.5M10.2 12.8l3.3 3.5 3.3-3.5" stroke="var(--ink${closeSafe ? "-3" : ""})"/></svg>`;
-  h += `<div class="st-sec"><h3>${closeSafe ? "Safest" : "Most marginal"} seats <small>winning margin, points</small><button type="button" class="st-pv-control st-cls-swap" data-close-toggle title="${closeNext}" aria-label="${closeNext}">${closeArrows}</button></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
+  // Hare-Clark frames have no per-seat winning pair margin at all (each
+  // electorate elects five-to-seven at surplus) — the list hides for them
+  // rather than print seven rows of blanks
+  if (!isHareClark(m)) {
+    const closeNext = closeSafe ? "Show most marginal seats" : "Show safest seats";
+    const closeArrows = `<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 17V3.5M3.2 7.2 6.5 3.7l3.3 3.5" stroke="var(--ink${closeSafe ? "" : "-3"})"/><path d="M13.5 3v13.5M10.2 12.8l3.3 3.5 3.3-3.5" stroke="var(--ink${closeSafe ? "-3" : ""})"/></svg>`;
+    h += `<div class="st-sec"><h3>${closeSafe ? "Safest" : "Most marginal"} seats <small>winning margin, points</small><button type="button" class="st-pv-control st-cls-swap" data-close-toggle title="${closeNext}" aria-label="${closeNext}">${closeArrows}</button></h3>${linkRows(m, close, closeRow, (i) => colCss(m.divCol[i]))}</div>`;
+  }
   // the informal line rides under the margin list at the foot (user call
   // 2026-11-08; it followed How-votes-were-cast before, 2026-11-07)
   h += informalHTML(m, st);
