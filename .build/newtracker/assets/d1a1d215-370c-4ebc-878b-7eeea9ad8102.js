@@ -7890,7 +7890,9 @@ function infoTerms(D) {
       four keeps {shrinkKeep(4)}%, and one with ten keeps {shrinkKeep(10)}%. That setting best
       predicts each new poll from the polls before it. Each figure gets its own lean, since a
       pollster that leans to Labor on the two-party figure need not on a primary vote. The
-      aggregate subtracts the lean as it stood at the time of each figure.
+      aggregate subtracts the lean as it stood at the time of each figure. Because each lean is
+      measured against the other pollsters, it can’t show a miss they all share, as at the 2019
+      election: if every pollster is out by the same amount, every lean still reads zero.
       {" "}The Pollster leans page, in the More menu, shows each pollster’s {xref("house-lean", "house effect", "house lean")}.
       {working(<span className="info-p">A pollster’s lean is Σvⱼgⱼ ÷ (Σvⱼ + {shrinkK}) over its
         polls, where gⱼ is a poll’s gap to the sample-weighted average of other pollsters’ polls
@@ -9017,7 +9019,8 @@ function infoTerms(D) {
       { id: "house-effect", term: "House effect", body: (
         <>A pollster’s consistent lean relative to the others. The trend estimates each pollster’s
         lean alongside the line, from all its polls, and takes it out; the leans average zero
-        across the polls. A lean measured from few polls is shrunk toward zero. Each line gets its
+        across the polls, so a miss every pollster shares leaves every lean at zero. A lean
+        measured from few polls is shrunk toward zero. Each line gets its
         own leans, since a pollster that leans to Labor on the two-party figure need not on a
         primary vote. The Pollster leans page, in the More menu, traces each
         pollster’s lean month by month, measured the federal page’s way.</>) },

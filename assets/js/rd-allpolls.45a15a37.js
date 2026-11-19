@@ -2260,20 +2260,20 @@ function RdLgTpp({
     }
   }, "ON ", rdApNum(p.tpp3.onp))), React.createElement("span", {
     className: "rd-ldg-tail"
-  }, ", as published"))))), (noPub || moe || note) && React.createElement("p", {
+  }, ", as published"))))), (noPub || moe || note || p.undecidedBasis === "tpp") && React.createElement("p", {
     className: "rd-ldg-foot1"
-  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", note ? " " + note : ""));
+  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", p.undecidedBasis === "tpp" ? " Undecideds are left out, unallocated." : "", note ? " " + note : ""));
 }
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
   if (f && f.length === 2) return {
-    h: p.undecided != null ? p.undecided + "% undecided, excluded" : f[1] + "% not firm",
+    h: p.undecided != null ? p.undecided + "% undecided, excluded (primary-vote shares are decideds)" : f[1] + "% not firm",
     w: "",
     d: null,
     s: f[0] + "% firm, " + f[1] + "% soft"
   };
   if (p.undecidedLeaner != null) return {
-    h: p.undecidedLeaner + "% undecided after leaner, excluded",
+    h: p.undecidedLeaner + "% undecided after leaner, excluded (primary-vote shares are decideds' and leaners' combined)",
     w: "",
     d: null,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null
@@ -2290,7 +2290,7 @@ function rdLgDecided(p) {
       h: p.undecided + "%",
       w: b === "leaner" ? "undecided after leaner" : "undecided",
       d: p.chg && p.chg.d && p.chg.d.und || null,
-      s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "excluded",
+      s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "excluded (primary-vote shares are decideds')" : b === "leaner" ? "excluded (primary-vote shares are decideds' and leaners' combined)" : b === "first" ? "excluded (primary-vote shares are decideds)" : "excluded",
       sep: b === "soft" || b === "tpp" ? " – " : ", "
     };
   }
@@ -2301,7 +2301,7 @@ function rdLgDecided(p) {
     s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table"
   };
   if (p.pollster === "YouGov" || p.pollster === "YouGov (MRP)") return {
-    h: "% undecided not published, excluded",
+    h: "% undecided not published, excluded (primary-vote shares are decideds)",
     w: "",
     d: null,
     s: null
@@ -6609,7 +6609,7 @@ function RdHouseLean({
       term: "house-lean",
       from: "How each pollster leans"
     }
-  }, "A pollster\u2019s lean is its average gap to the other pollsters polling within four weeks of it", view === "tpp" && !pub ? ", all read through the same preference flows" : "", ", with recent polls counting most. One with few polls is pulled towards zero until its record builds.", view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : "", split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null));
+  }, "A pollster\u2019s lean is its average gap to the other pollsters polling within four weeks of it", view === "tpp" && !pub ? ", all read through the same preference flows" : "", ", with recent polls counting most. One with few polls is pulled towards zero until its record builds. Because each lean is measured against the other pollsters, a miss they all share, as at the 2019 election, leaves every lean at zero.", view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : "", split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null));
 }
 function RdFlowChart({
   fd,
