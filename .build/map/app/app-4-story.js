@@ -412,7 +412,9 @@ function crossSentence(m, idx, verb) {
    stamped into the script, which only count the whole state */
 function seatBase(m, st) {
   const y = m.year;
-  const row = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_SA, YEARS_QLD, YEARS_WA, YEARS_NT].find((r) => r.includes(y));
+  // the families' lanes in LANES order (Tasmania and the ACT joined 2026-11-19:
+  // missed here, the strip row worked but the frame's own base row died silently)
+  const row = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_TAS, YEARS_ACT, YEARS_SA, YEARS_WA, YEARS_NT].find((r) => r.includes(y));
   const stops = row.filter((v) => !isNowY(v)), pv = isNowY(y) ? NOW_OF[y] : stops[stops.indexOf(y) - 1];
   if (pv == null) return null;
   if (!STATE_YEARS.has(pv)) return { y: pv, c: SUM && SUM.seats[pv] ? SUM.seats[pv][st] || {} : null };

@@ -1169,16 +1169,34 @@ function deriveDiv(d, i, year) {
   const c = d.c.map(([n, ab, pn, b, v, sw, el], k) => ({ k, n, ab, pn, b, v, sw, el: !!el, fam: FAM(ab) }));
   const formal = sum(c.map((x) => x.v));
   const fp = {}; for (const b of FAMS) fp[b] = 0; for (const x of c) fp[x.b] += x.v; for (const b of FAMS) fp[b] = (100 * fp[b]) / formal;
-  const [[ia, va], [ib, vb]] = d.tcp;
-  const A = c[ia], B = c[ib], tt = va + vb;
+  // the Hare-Clark frames' divisions carry no final-pair tcp lane at all (a
+  // five-of-five-seat count ends with the last surplus, never a two-of-two
+  // pair). The map's tpl-less derivations for them: win/run stay the
+  // leading-primary pair so dots shade sensibly; every pair-scaled measure
+  // (margin, classic, 2PP lanes) is null and stays out of view
+  const tcp = d.tcp || null;
+  let A, B, va, vb;
+  if (tcp) {
+    A = c[tcp[0][0]];
+    B = c[tcp[1][0]];
+    va = tcp[0][1];
+    vb = tcp[1][1];
+  } else {
+    // tas/act never print one — sort leading-by-votes for the display-only pair
+    const ranked = c.slice().sort((x, y) => (y.v || 0) - (x.v || 0));
+    A = ranked[0];
+    B = ranked[1];
+    va = vb = 0;
+  }
+  const tt = va + vb;
   const win = va >= vb ? A : B, run = va >= vb ? B : A;
-  const winPct = (100 * Math.max(va, vb)) / tt;
-  const classic = [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("lnp");
+  const winPct = tcp ? (100 * Math.max(va, vb)) / tt : null;
+  const classic = tcp ? [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("lnp") : false;
   // whom Labor's final rival was, where the preferences lens can read a split: the Coalition (a classic
   // seat), or One Nation
-  const vs = classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null;
+  const vs = tcp ? (classic ? "lnp" : [A.fam, B.fam].includes("alp") && [A.fam, B.fam].includes("onp") ? "onp" : null) : null;
   const alpSide = vs ? (A.fam === "alp" ? 0 : 1) : -1;
-  const flows = d.fl.map(([ci, ta, tb, exh]) => (exh == null ? { cand: c[ci], ta, tb } : { cand: c[ci], ta, tb, exh }));
+  const flows = (d.fl || []).map(([ci, ta, tb, exh]) => (exh == null ? { cand: c[ci], ta, tb } : { cand: c[ci], ta, tb, exh }));
   const flowAlp = {};
   for (const b of FAMS) {
     flowAlp[b] = null;
@@ -1191,9 +1209,10 @@ function deriveDiv(d, i, year) {
   const yNum = FRAME_YEAR[year] != null ? FRAME_YEAR[year] : year;
   const prev = d.h.filter((h) => h[0] < yNum && !h[4]).pop() || null;
   let change;
-  // 2004's h is empty by construction (the archive's first federal year); an
-  // empty h anywhere else means "new seat", not "unknown"
-  if (!prev) change = { kind: yNum <= 1993 || yNum === 2004 ? "unknown" : "new" };
+  // the tpl-less frames seat no held/gained classification of one pair —
+  // "unknown" is the house's admitted-uncertainty row for them
+  if (!tcp) change = { kind: "unknown" };
+  else if (!prev) change = { kind: yNum <= 1993 || yNum === 2004 ? "unknown" : "new" };
   else if (prev[3] === win.n) change = { kind: "re", since: firstYearOf(d.h.filter((h) => !h[4]), win.n, yNum) };
   else if (FAM(prev[2]) === win.fam && !(win.fam === "ind")) change = { kind: "held", prev };
   else change = { kind: "gain", prev };
@@ -1205,7 +1224,7 @@ function deriveDiv(d, i, year) {
   return {
     i, id: d.id, n: d.n, st: d.st, cls: d.cls, c, formal, inf, infPct: inf != null ? (100 * inf) / (formal + inf) : null, fp,
     exhPct: flows.some((f) => f.exh != null) ? (100 * exhTot) / formal : null,
-    A, B, va, vb, win, run, winPct, margin: winPct - 50, votesMargin: Math.abs(va - vb), classic, vs, alpSide, flows, flowAlp,
+    A, B, va, vb, win, run, winPct, margin: tcp ? winPct - 50 : null, votesMargin: tcp ? Math.abs(va - vb) : null, classic, vs, alpSide, flows, flowAlp,
     tpp, tppSw: d.tpp ? d.tpp[2] : null, seifa: d.seifa || {}, vt: d.vt || null, vt2: d.vt2 || null, vt3: d.vt3 || null, vts: d.vts || null, h: d.h, demo: d.demo, lp: d.lp, lpx: 0, lpy: 0, change,
     hold: { n: win.n, ab: win.ab, pn: win.pn, fam: win.fam },
   };

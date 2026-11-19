@@ -3036,6 +3036,10 @@ for (const y of ["sa22", "sa26"]) {
   // lookup follow the same order. The up/down-arrow walk runs in the
   // "View elections" strip's own order instead (Queensland before South Australia)
   assert.ok(base.includes("const LANES = [YEARS_FED, YEARS_VIC, YEARS_NSW, YEARS_QLD, YEARS_TAS, YEARS_ACT, YEARS_SA, YEARS_WA, YEARS_NT];"), "the up/down walk follows the View elections strip's order (Qld, Tasmania, ACT, SA, WA, NT, in their own rowIx order)");
+  // the strip itself carries every lane as a row (2026-11-19 hotfix: the
+  // landed Tasmanian/ACT frames updated LANES and the timeline rungs but
+  // FRAME_JUMPS stayed seven rows, so the strip never offered them)
+  assert.ok(ui.includes('const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["Tasmania", YEARS_TAS], ["the ACT", YEARS_ACT], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA], ["Northern Territory", YEARS_NT]];'), "the 'View elections' strip offers Tasmania and the ACT alongside the LANES it mirrors");
   assert.ok(ui.includes("const rowIx = (y) => (VIC_YEARS.has(y) ? 1 : NSW_YEARS.has(y) ? 2 : SA_YEARS.has(y) ? 3 : QLD_YEARS.has(y) ? 4 : WA_YEARS.has(y) ? 5 : NT_YEARS.has(y) ? 6 : TAS_YEARS.has(y) ? 7 : ACT_YEARS.has(y) ? 8 : 0);"), "the rung index per jurisdiction (vic22 → 1, a wa stop → 5, nt → 6, tas → 7, act → 8)");
   assert.ok(ui.includes("const TOP = 2, BASE = H - 23;") && (ui.match(/\{ ys: YEARS_\w+, base: BASE, top: TOP(?:, gx: [^}]+)? \}/g) || []).length === 9, "all nine jurisdiction rows collapse onto the one band in the top rail's spot (BASE = H - 23; Tasmania and the ACT joined them 2026-11-18)");
   assert.ok(ui.includes("const hitTop = 0, hitBot = H;"), "the one visible rung takes the whole strip's height for its stops' touch windows");

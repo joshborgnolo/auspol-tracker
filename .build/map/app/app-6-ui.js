@@ -1930,7 +1930,10 @@ function renderFrames() {
   el.dataset.k = String(cur);
   el.innerHTML = `<b>View elections</b>${FRAME_JUMPS.map(([n], k) => `<button type="button" data-fjump="${k}"${k === cur ? ' class="on"' : ""}>${n}</button>`).join("")}<span class="mp-fj-menu">${lgMenu("fjump", FRAME_JUMPS.map(([n], k) => [String(k), n]), String(cur), "View elections")}</span>`;
 }
-const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA], ["Northern Territory", YEARS_NT]];
+// the strip mirrors the year-walk's lane order (LANES in app-1-base), one row
+// per jurisdiction the map carries frames for — since the TAS/ACT frames
+// joined, it offers Tasmania and the ACT too
+const FRAME_JUMPS = [["Federal", YEARS_FED], ["Victoria", YEARS_VIC], ["New South Wales", YEARS_NSW], ["Queensland", YEARS_QLD], ["Tasmania", YEARS_TAS], ["the ACT", YEARS_ACT], ["South Australia", YEARS_SA], ["Western Australia", YEARS_WA], ["Northern Territory", YEARS_NT]];
 
 /* =============================== boot =============================== */
 (async () => {
