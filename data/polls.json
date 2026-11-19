@@ -1715,6 +1715,7 @@
       "oth": null,
       "tpp_alp": 57,
       "tpp_lnp": 43,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-vote-collapses-as-labor-snags-a-second-honeymoon/news-story/f511fc58eac90093dddcf9f7939231a4",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-21-7-2025"
     },
@@ -1819,6 +1820,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "undecidedLeaner": 5,
       "url": "https://www.thenewdaily.com.au/news/politics/2025/08/18/albanese-newspoll",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-18-8-2025"
     },
@@ -1931,6 +1933,7 @@
       "oth": null,
       "tpp_alp": 58,
       "tpp_lnp": 42,
+      "undecidedLeaner": 5,
       "url": "https://thenightly.com.au/politics/australia/newspoll-coalition-slumps-to-worst-ever-primary-vote-in-days-after-jacinta-price-dumped-from-frontbench-c-20017489",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-15-9-2025"
     },
@@ -2050,6 +2053,7 @@
       "oth": null,
       "tpp_alp": 57,
       "tpp_lnp": 43,
+      "undecidedLeaner": 6,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-as-sussan-leys-net-approval-rating-plunges/news-story/bd1e89d2319827a5bb01ce6eb0888453",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-6-10-2025"
     },
@@ -2219,6 +2223,7 @@
       "oth": null,
       "tpp_alp": 57,
       "tpp_lnp": 43,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-hits-historic-low-of-24pc-amid-sussan-leys-struggles/news-story/739877883ee405aeab0fc34c2d7b5218",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-3-11-2025"
     },
@@ -2353,6 +2358,7 @@
           13
         ]
       },
+      "undecidedLeaner": 9,
       "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2025-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
@@ -2434,6 +2440,7 @@
       "oth": null,
       "tpp_alp": 58,
       "tpp_lnp": 42,
+      "undecidedLeaner": 5,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-andrew-hastie-firms-as-liberal-alternative-to-sussan-ley/news-story/ae7d5d377e1f1d49da95f681615eb7db",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-24-11-2025"
     },
@@ -2604,6 +2611,7 @@
           16
         ]
       },
+      "undecidedLeaner": 7,
       "url": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_4df02b5e2ec545b3b4faf83f1d87c7eb.pdf"
@@ -2748,6 +2756,7 @@
       "oth": null,
       "tpp_alp": 55,
       "tpp_lnp": 45,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-ahead-of-the-coalition-on-primary-votes-for-the-first-time/news-story/4e41476c9a605ada111c0c1f7064db1d",
       "methodUrl": "https://pyxispolling.com/methodology-statement/newspoll-19-01-2026"
     },
@@ -2950,6 +2959,7 @@
           16
         ]
       },
+      "undecidedLeaner": 6,
       "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_a04c3282929c4378a2f96d0134bfd344.pdf"
@@ -2997,6 +3007,7 @@
         "Lib": 15,
         "Nat": 3
       },
+      "undecidedLeaner": 6,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-sussan-leys-liberals-hit-historic-low-and-hand-angus-taylor-a-challenge-trigger/news-story/bbd4bf5615319c1d872a735e4d1646f9",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/23197042/NewspollMethodologyStatement9February2026byPyxis-jgvq-njfgtPanNctOUTnLw.pdf"
     },
@@ -3276,6 +3287,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 5,
       "url": "https://www.pollbludger.net/2026/03/01/newspoll-labor-32-one-nation-27-coalition-20-greens-11-open-thread/",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/23739820/NewspollMethodologyStatement2March2026byPyxis-9A40zTlIA5TflJOBgYdh9g.pdf"
     },
@@ -3342,6 +3354,7 @@
           18
         ]
       },
+      "undecidedLeaner": 9,
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf"
@@ -3691,6 +3704,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/24607993/NewspollMethodologyStatement30March2026byPyxis-AvvyTlYpA6zeoV2P_V_Yhg.pdf"
     },
@@ -3920,6 +3934,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-support-falls-as-voters-resist-new-revenue-measures/news-story/ba583310b812fd590a07d4c5e6812838",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/25699945/NewspollMethodologyStatement20April2026byPyxis-PzbvqKXbZDh2br-RrjMCjw.pdf"
     },
@@ -4115,6 +4130,7 @@
         "grn": 32,
         "onp": 30
       },
+      "undecidedLeaner": 9,
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf"
@@ -4384,6 +4400,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/25699942/NewspollMethodologyStatement18May2026byPyxis-MVoGot9Vf0GzsNoVDOrvsQ.pdf"
     },
@@ -4569,6 +4586,7 @@
           20
         ]
       },
+      "undecidedLeaner": 9,
       "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf"
@@ -4634,6 +4652,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 5,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/26125276/NewspollMethodologyStatement8June2026byPyxis-65K2gj5PC1afG43d89wtLQ.pdf"
     },
@@ -4790,6 +4809,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/26605651/NewspollMethodologyStatement29June2026byPyxis-szOLdVanOJFNG1BOiiD1Hw.pdf"
     },
@@ -4852,6 +4872,7 @@
           16
         ]
       },
+      "undecidedLeaner": 7,
       "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_0fe4f080e2cd4654906be0f94268f9b2.pdf"
@@ -5183,6 +5204,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 5,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/26999641/NewspollMethodologyStatement20July2026byPyxis-UIky81cqYqHOd-HsdsjkDg.pdf"
     },
@@ -5348,6 +5370,7 @@
           22
         ]
       },
+      "undecidedLeaner": 7,
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf"
@@ -5408,6 +5431,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 5,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/27378346/NewspollMethodologyStatement10August2026byPyxis-003bk-owSLhtvzyATwtUuA.pdf"
     },
@@ -5623,6 +5647,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 6,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/27740193/NewspollMethodologyStatement31August2026byPyxis-A4iDRDxXIuKMFjSr8KuKuw.pdf"
     },
@@ -5685,6 +5710,7 @@
           19
         ]
       },
+      "undecidedLeaner": 8,
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf"
@@ -5859,6 +5885,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 5,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/28195281/NewspollMethodologyStatement21September2026byPyxis-bToKYVD66G-g0e4tmAkQNA.pdf"
     },
@@ -6118,6 +6145,7 @@
           14
         ]
       },
+      "undecidedLeaner": 8,
       "url": "https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_db6216a1a7594e93b08dbc9ca3c9e51b.pdf"
@@ -6157,6 +6185,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 4,
       "url": "https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/28591766/NewspollMethodologyStatement12October2026byPyxis-9kKHvHQTEmIDHaVKW51xJA.pdf"
     },
@@ -6334,6 +6363,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "undecidedLeaner": 5,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9",
       "methodUrl": "https://pyxispolling.com/api.php/images/document/29057920/NewspollMethodologyStatement2November2026byPyxis-q9y5IgIL6HJD5Ixfy18XkA.pdf"
     },
@@ -6453,6 +6483,7 @@
           11
         ]
       },
+      "undecidedLeaner": 6,
       "url": "https://www.afr.com/politics/federal/blow-for-pm-as-coalition-closes-in-on-labor-20261108-p61cbv",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-november-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf"

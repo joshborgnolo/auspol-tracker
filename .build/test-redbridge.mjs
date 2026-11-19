@@ -35,6 +35,7 @@ console.log(JSON.stringify(w, null, 2));
 assert.equal(w.date, "2026-07-30", "fieldwork end");
 assert.equal(w.dateStart, "2026-07-27", "fieldwork start");
 assert.equal(w.sample, 1001, "sample");
+assert.equal(w.undecidedLeaner, 7, "leaner-excluded share");
 
 // Table 2 wave row (values committed to data/polls.json)
 assert.equal(w.label, "Jul 2026", "wave label");

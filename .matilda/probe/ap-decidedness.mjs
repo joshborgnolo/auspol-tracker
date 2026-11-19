@@ -3,11 +3,13 @@
    redesign). The wave's movable share, on its own basis, reads in full under
    the primaries where the Primary tab leads, and as a short unit on the
    Primary line ("Also in this poll") on every other tab:
-     RedBridge/Accent : `firmAll` triple → "54% not firm", solid/soft/very-soft
-     Roy Morgan       : `undecided` (first) → "undecided", "couldn’t name…"
+     RedBridge/Accent : undecidedLeaner + triple → "6% undecided after leaner, excluded – 51% solid…"
+     Newspoll         : undecidedLeaner → "5% undecided after leaner, excluded"
+     DemosAU          : existing first-series row, labelled from its leaner methodology
+     Roy Morgan       : `undecided` (first) → "undecided", "excluded"
      Resolve          : `undecided` (soft)  → "not firm", "named a party…"
      Essential        : `undecided` (tpp)   → "undecided", "unallocated…"
-     YouGov           : neither field → nothing (negative control)
+     YouGov           : neither field → "% undecided not published, excluded"
      Confidence facet : a gauge release → no Primary line, nothing
    Truth comes from the same 9f09dca2 data asset the page reads (new
    Function fixture, ap-prim-detail-order pattern) - the probe pins the
@@ -57,14 +59,16 @@ const pick = (house, pred, expect, query) => {
   if (at < 0) { console.log(`  --  no candidate row for ${house}: skipped`); return null; }
   return { house, q: rows[at], idx: at, expect, query };
 };
+ok("DemosAU stays in its existing first-preference undecided series",
+  D.undecided.series.some((s) => s.id === "first" && s.polls.some((p) => p.pollster === "DemosAU")));
 const W = p => p.field || p.released;
 const CASES = [
-  pick("RedBridge/Accent", (p) => Array.isArray(p.firmAll), (p) => ({
-    head: p.firmAll[1] + p.firmAll[2] + "%", word: "not firm",
-    sub: `solid ${p.firmAll[0]}, soft ${p.firmAll[1]}, very soft ${p.firmAll[2]} on its vote-softness table`,
+  pick("RedBridge/Accent", (p) => p.undecidedLeaner != null && Array.isArray(p.firmAll) && p.firmAll.length === 3, (p) => ({
+    head: p.undecidedLeaner + "% undecided after leaner, excluded", word: "",
+    sub: `${p.firmAll[0]}% solid, ${p.firmAll[1]}% soft, ${p.firmAll[2]}% very soft`,
   }), "RedBridge"),
   pick("Roy Morgan", (p) => p.undecided != null, (p) => ({
-    head: p.undecided + "%", word: "undecided", sub: "couldn’t name a party when first asked",
+    head: p.undecided + "%", word: "undecided", sub: "excluded",
   }), "Roy Morgan"),
   pick("Resolve", (p) => p.undecided != null && p.undecidedBasis === "soft", (p) => ({
     head: p.undecided + "%", word: "not firm", sub: "named a party, but might yet change their mind",
@@ -72,7 +76,20 @@ const CASES = [
   pick("Essential", (p) => p.undecided != null && p.undecidedBasis === "tpp", (p) => ({
     head: p.undecided + "%", word: "undecided", sub: "unallocated inside the printed two-party pair",
   }), "Essential"),
-  pick("YouGov", null, null, "YouGov"),
+  pick("Spectre Strategy", (p) => p.undecided != null && Array.isArray(p.firmAll) && p.firmAll.length === 2, (p) => ({
+    head: p.undecided + "% undecided, excluded", word: "",
+    sub: p.firmAll[0] + "% firm, " + p.firmAll[1] + "% soft",
+  }), "Spectre"),
+  pick("Newspoll", (p) => p.undecidedLeaner != null, (p) => ({
+    head: p.undecidedLeaner + "% undecided after leaner, excluded", word: "",
+    sub: p.undecidedLeaner + "% undecided after leaner, excluded",
+  }), "Newspoll"),
+  pick("DemosAU", (p) => p.undecided != null, (p) => ({
+    head: p.undecided + "%", word: "undecided after leaner", sub: "excluded",
+  }), "DemosAU"),
+  pick("YouGov", () => true, () => ({
+    head: "% undecided not published, excluded", word: "", sub: "% undecided not published, excluded",
+  }), "YouGov"),
 ].filter(Boolean);
 
 const browser = await puppeteer.launch({
@@ -143,7 +160,7 @@ for (const cs of CASES) {
   } else {
     const x = cs.expect(cs.q);
     ok(`Primary tab: decidedness under the primaries (${tag}: "${x.head} ${x.word}")`,
-       d && d.sentence && d.sentence.includes(x.head + " " + x.word), d ? String(d.sentence) : "no detail");
+       d && d.sentence && d.sentence.includes((x.head + " " + x.word).trim()), d ? String(d.sentence) : "no detail");
     ok(`Primary tab: its basis in words (${tag})`, d && d.sentence && d.sentence.includes(x.sub.slice(0, 60)), d ? String(d.sentence) : "no detail");
   }
   await clickRow(cs.idx); /* collapse */
@@ -157,7 +174,7 @@ for (const cs of CASES) {
        d2 ? String(d2.line) : "no detail");
   } else {
     const x = cs.expect(cs.q);
-    ok(`2PP tab: the Primary line carries "${x.head} ${x.word}" (${tag})`, d2 && d2.line && d2.line.includes(x.head + " " + x.word),
+    ok(`2PP tab: the Primary line carries "${x.head} ${x.word}" (${tag})`, d2 && d2.line && d2.line.includes((x.head + " " + x.word).trim()),
        d2 ? String(d2.line) : "no detail");
   }
   await clickRow(cs.idx);
@@ -192,7 +209,7 @@ if (nConf > 0) {
 /* the Latest table opens a poll with the same ledger: on its Primary tab the
    sentence leads, on its 2PP tab the Primary line carries the short form.
    RedBridge's newest wave carries firmAll, Resolve's the soft basis,
-   YouGov neither (negative) */
+   YouGov its not-published note */
 await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "networkidle0", timeout: 60000 });
 await page.waitForSelector(".rd-pl-row", { timeout: 30000 });
 const latestTab = async (lab) => {
@@ -228,14 +245,27 @@ const closeLatest = async (q) => {
 const LATEST = [
   ["RedBridge", (() => {
     const w = byHouse("RedBridge/Accent")[0];
-    return w && Array.isArray(w.firmAll) ? { dd: w.firmAll[1] + w.firmAll[2] + "% not firm",
-                 sub: "solid " + w.firmAll[0] + ", soft " + w.firmAll[1] + ", very soft " + w.firmAll[2] } : undefined;
+    return w && w.undecidedLeaner != null && Array.isArray(w.firmAll) ? {
+      dd: w.undecidedLeaner + "% undecided after leaner, excluded",
+      sub: `${w.firmAll[0]}% solid, ${w.firmAll[1]}% soft, ${w.firmAll[2]}% very soft`,
+    } : undefined;
   })()],
   ["Resolve", (() => {
     const w = byHouse("Resolve")[0];
     return w && w.undecided != null && w.undecidedBasis === "soft" ? { dd: w.undecided + "% not firm", sub: "named a party" } : undefined;
   })()],
-  ["YouGov", null],
+  ["DemosAU", (() => {
+    const w = byHouse("DemosAU")[0];
+    return w && w.undecidedBasis === "leaner" ? { dd: w.undecided + "% undecided after leaner", sub: "excluded" } : undefined;
+  })()],
+  ["YouGov", { dd: "% undecided not published, excluded", sub: "not published" }],
+  ["Newspoll", (() => {
+    const w = byHouse("Newspoll")[0];
+    return w && w.undecidedLeaner != null ? {
+      dd: w.undecidedLeaner + "% undecided after leaner, excluded",
+      sub: w.undecidedLeaner + "% undecided after leaner, excluded",
+    } : undefined;
+  })()],
 ];
 for (const [house, exp] of LATEST) {
   if (exp === undefined) { console.log(`  --  no ${house} candidate wave in bundle: latest-expansion check skipped`); continue; }

@@ -91,6 +91,14 @@ export function validate(D) {
       fail("undecided-range", `undecided = ${p.undecided} (bounds 0–30)`);
     if (p.soft != null && !(p.soft >= 0 && p.soft <= 60))
       fail("soft-range", `soft = ${p.soft} (bounds 0–60)`);
+    // 0ca. after-leaner exclusions live beside firmness, never inside the
+    //      undecided aggregate whose question basis differs by house
+    if (p.undecidedLeaner != null) {
+      if (!["Newspoll", "RedBridge/Accent"].includes(p.pollster))
+        fail("undleaner-pollster", `undecidedLeaner on ${p.pollster}`);
+      if (!(p.undecidedLeaner >= 0 && p.undecidedLeaner <= 50))
+        fail("undleaner-range", `undecidedLeaner = ${p.undecidedLeaner}`);
+    }
 
     // 1. full primary sets total ~100 (majors-only polls are partial by design)
     if (CORE.every((k) => p[k] != null)) {

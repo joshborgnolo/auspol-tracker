@@ -25,5 +25,6 @@
     "grn": 89,
     "oth": 68
   },
-  "firmnessError": "vote-softness table is not the wide six-group layout"
+  "firmnessError": "vote-softness table is not the wide six-group layout",
+  "undecidedLeaner": 9
 }

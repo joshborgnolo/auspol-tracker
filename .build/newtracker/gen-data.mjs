@@ -4018,6 +4018,7 @@ const individualPolls = POLLS.map((p) => {
        all-voters [solid, soft, verySoft] triple, or Spectre's two-way
        [firm, soft] pair. Never route these through the can't-say series. */
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
+    ...(p.undecidedLeaner != null ? { undecidedLeaner: p.undecidedLeaner } : {}),
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
@@ -4300,6 +4301,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     // vote-firmness pair/triple, same as the archive emitter
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
+    ...(p.undecidedLeaner != null ? { undecidedLeaner: p.undecidedLeaner } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     // voting consideration, same as the archive emitter above
     ...(p.consideration ? { cons: p.consideration, consBasis: p.consBasis,

@@ -55,4 +55,12 @@ assert.deepEqual(july.firmness, {
   grn: [59, 41],
 });
 
-console.log("PASS: Spectre direction, two-way firmness and three-way PPM parse and reconcile");
+const ledger = readFileSync(".build/newtracker/assets/rd-allpolls.jsx", "utf8");
+const decidedStart = ledger.indexOf("function rdLgDecided(p) {");
+assert.ok(decidedStart >= 0, "ledger decidedness renderer exists");
+const decided = new Function(`return (${ledger.slice(decidedStart, ledger.indexOf("\nconst RD_LG_CK", decidedStart))});`)();
+assert.deepEqual(decided({ firmAll: [57, 43], undecided: 6 }), {
+  h: "6% undecided, excluded", w: "", d: null, s: "57% firm, 43% soft",
+});
+
+console.log("PASS: Spectre figures reconcile and the firmness ledger uses undecided-excluded wording");

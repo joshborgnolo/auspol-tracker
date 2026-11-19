@@ -137,7 +137,7 @@ import { fetchBuffer as fetchDauBuffer, passSgCaptcha } from "./demosau-fetch.mj
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
-const OUT = join(ROOT, "data", "polls.json");
+const OUT = process.env.SAMPLEEFF_OUT || join(ROOT, "data", "polls.json");
 const SRC_DIR = join(HERE, "sampleeff-src");
 mkdirSync(SRC_DIR, { recursive: true });
 const D = JSON.parse(readFileSync(OUT, "utf8"));
@@ -243,11 +243,13 @@ function parseApcStatement(txt) {
       end = mkIso(+last[5], last[2] || last[3], day);
     }
   }
+  const undecidedLeanerMatch = t.match(/How were undecided voters handled\? Undecided respondents who answered [“"]don[’']?t know[”"]? were asked a leaner question which also included a [“"]don[’']?t know[”"]? option\. Those who answered don[’']?t know were excluded from published voting intention figures but not from the survey\. (\d+(?:\.\d+)?)% were thus excluded from published voting intention figures\./i);
+  const undecidedLeaner = undecidedLeanerMatch ? +undecidedLeanerMatch[1] : null;
   /* n/a ("n/a for MRP") statements carry no eff, but their sample and
      fieldwork end are still parsed – DemosAU MRP waves link the statement
      as methodUrl even though they never take a sampleEff. */
-  if (eff == null) return naEff ? { na: true, sample, end } : null;
-  return { eff, sample, end };
+  if (eff == null) return naEff ? { na: true, sample, end, undecidedLeaner } : null;
+  return { eff, sample, end, undecidedLeaner };
 }
 
 /* ---- leg: YouGov APC listing (News24 / Sky Pulse / Public Data) -------- */
@@ -356,7 +358,10 @@ async function legNewspoll(needs) {
       console.log("  warn: " + s.href + ": " + e.message);
       continue;
     }
-    if (!rec || !rec.end) { console.log("  warn: parse hole in " + s.href); continue; }
+    if (!rec || !rec.end || rec.undecidedLeaner == null || !(rec.undecidedLeaner >= 0 && rec.undecidedLeaner <= 50)) {
+      console.log("  warn: fieldwork or leaner-excluded parse hole in " + s.href);
+      continue;
+    }
     out.push({ pollster: "Newspoll", series: "newspoll", ...rec, src: "pyxispolling.com statement " + s.when });
   }
   return out;
@@ -639,8 +644,9 @@ const legs = [
     .filter((p) => p.pollster.startsWith("DemosAU") && (p.sampleEff == null || p.methodUrl == null)))],
   ["accent", () => legAccentEff()],
 ];
-if (unstamped.some((p) => p.pollster === "Newspoll"))
-  legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);
+const npStatementsNeeded = D.polls.filter((p) => p.pollster === "Newspoll" && (p.sampleEff == null || p.undecidedLeaner == null));
+if (npStatementsNeeded.length)
+  legs.push(["newspoll", () => legNewspoll(npStatementsNeeded.map((p) => (p.published || p.date).slice(0, 10)))]);
 if (secNeeds.length) legs.push(["secnewgate", () => legSecNewgate(secNeeds)]);
 
 for (const [name, fn] of LEG_ONLY ? legs.filter(([n]) => n === LEG_ONLY) : legs) {
@@ -690,10 +696,14 @@ for (const p of unstamped) {
     if (k === "sample") rebuilt.sampleEff = pick.eff;
   }
   if (!("sample" in rebuilt)) rebuilt.sampleEff = pick.eff;
+  if (p.pollster === "Newspoll" && p.undecidedLeaner == null && pick.undecidedLeaner != null)
+    rebuilt.undecidedLeaner = pick.undecidedLeaner;
   for (const k of Object.keys(p)) delete p[k];
   Object.assign(p, rebuilt);
   stamped.push(`${p.date} ${p.pollster}: ${pick.eff} (${pick.src})`);
 }
+
+const leanerFilled = [];
 
 /* ---- pass: (pooled) waves' effective sample -------------------------------
    A "<House> (pooled)" row pools the house's own waves across [dateStart, date]:
@@ -830,7 +840,7 @@ for (const p of D.polls) {
 const sampleFromCache = (file) => {
   const rec = parseApcStatement(readFileSync(join(SRC_DIR, file), "utf8"));
   return rec && Number.isInteger(rec.sample) && rec.end
-    ? { end: rec.end, sample: rec.sample, src: "cache " + file }
+    ? { end: rec.end, sample: rec.sample, undecidedLeaner: rec.undecidedLeaner, src: "cache " + file }
     : null;
 };
 const cacheTxts = readdirSync(SRC_DIR).filter((f) => f.endsWith(".txt"));
@@ -841,6 +851,28 @@ for (const f of cacheTxts) {
     : null; // yougov-* resolve url-exactly below; Essential handled next
   const rec = pool && sampleFromCache(f);
   if (rec) pool.push(rec);
+}
+/* Leaner exclusions are display-only data, independently of sampleEff.
+   Fresh statement records plus every committed cache reach all NP rows in
+   one idempotent pass; a future source change reconciles rather than edits. */
+const npLeanerRecords = [...records.filter((r) => r.pollster === "Newspoll"), ...samplePools.Newspoll];
+for (const p of D.polls) {
+  if (p.pollster !== "Newspoll") continue;
+  const cands = npLeanerRecords.filter((r) => r.undecidedLeaner != null && r.end && Math.abs(ddays(r.end, p.date)) <= 1);
+  const wants = [...new Set(cands.map((r) => r.undecidedLeaner))];
+  if (!wants.length) continue;
+  if (wants.length > 1) { errors.push(`leaner exclusion: ${p.date} Newspoll has conflicting statements ${wants.join(" vs ")}`); continue; }
+  const want = wants[0];
+  if (!(want >= 0 && want <= 50)) { errors.push(`leaner exclusion: ${p.date} Newspoll ${want} out of range`); continue; }
+  if (p.undecidedLeaner != null) {
+    if (p.undecidedLeaner !== want) errors.push(`leaner exclusion: ${p.date} Newspoll statement=${want} vs file=${p.undecidedLeaner}`);
+    continue;
+  }
+  const es = Object.entries(p), at = Object.keys(p).indexOf("url");
+  es.splice(at < 0 ? es.length : at, 0, ["undecidedLeaner", want]);
+  for (const k of Object.keys(p)) delete p[k];
+  Object.assign(p, Object.fromEntries(es));
+  leanerFilled.push(p.date);
 }
 const essSamplePool = records
   .filter((r) => r.pollster === "Essential" && Number.isInteger(r.sample) && r.end)
@@ -906,17 +938,18 @@ for (const p of tailOff ? [] : D.polls) {
   delete p.samplePending;
 }
 
-const out = { changed: stamped.length > 0 || pooled.length > 0 || methods.length > 0 || samples.length > 0, stamped: stamped.length, pooled: pooled.length, methods: methods.length, samples: samples.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
+const out = { changed: stamped.length > 0 || pooled.length > 0 || methods.length > 0 || samples.length > 0 || leanerFilled.length > 0, stamped: stamped.length, pooled: pooled.length, methods: methods.length, samples: samples.length, leaner: leanerFilled.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
 for (const s of stamped) console.log("  stamp " + s);
 for (const s of pooled) console.log("  pooled " + s);
 for (const s of methods) console.log("  method " + s);
 for (const s of samples) console.log("  sample " + s);
+for (const date of leanerFilled) console.log("  leaner " + date);
 for (const a of ambiguous) console.log("  AMBIGUOUS " + a);
 if (errors.length) {
   for (const e of errors) console.log("  ERROR " + e);
   statusAndExit(out, 2);
 }
-if (stamped.length || pooled.length || methods.length || samples.length) {
+if (stamped.length || pooled.length || methods.length || samples.length || leanerFilled.length) {
   const txt = readFileSync(OUT, "utf8");
   const trailingNl = txt.endsWith("\n") ? "\n" : "";
   const next = JSON.stringify(D, null, 2) + trailingNl;

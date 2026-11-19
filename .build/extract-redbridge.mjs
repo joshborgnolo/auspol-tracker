@@ -632,6 +632,15 @@ function parseFirmness(txt) {
   return { rows };
 }
 
+function parseUndecidedLeaner(txt) {
+  const m = txt.replace(/\s+/g, " ").match(/Undecided respondents were asked a leaner question\. Those who refused to or were unable to provide a vote intention in both the initial question and leaner made up ([a-z-]+|\d+(?:\.\d+)?) per cent of the sample, and were excluded from published vote intention figures\./i);
+  if (!m) return { error: "leaner-excluded share not found in methodology" };
+  const words = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  const value = /^\d/.test(m[1]) ? +m[1] : words[m[1].toLowerCase()];
+  if (!(value >= 0 && value <= 50)) return { error: `implausible leaner-excluded share ${m[1]}` };
+  return { value };
+}
+
 // ---------------------------------------------------------------- pdf → wave
 function parsePdf(txt, slug, notes) {
   const out = { slug };
@@ -641,6 +650,10 @@ function parsePdf(txt, slug, notes) {
   const sm = txt.match(/sample of N = ([\d,]+)/i) || txt.match(/\bN = ([\d,]+)\b/);
   if (sm) out.sample = +sm[1].replace(/,/g, "");
   else out.fwError = (out.fwError ? out.fwError + "; " : "") + "sample N not parsed";
+
+  const leaner = parseUndecidedLeaner(txt);
+  if (leaner.error) out.undecidedLeanerError = leaner.error;
+  else out.undecidedLeaner = leaner.value;
 
   const t2 = parseTable2(txt);
   if (t2.error) out.table2Error = t2.error;
@@ -737,6 +750,7 @@ function guardNewWave(w, pubIso) {
   if (w.ppmError) errs.push(`ppm: ${w.ppmError}`);
   if (w.favError) errs.push(`favourability: ${w.favError}`);
   if (w.fwError) errs.push(`methodology: ${w.fwError}`);
+  need("leaner-excluded share", w.undecidedLeaner);
   for (const k of ["alp", "lnp", "grn", "onp", "ind"]) need(k, w[k]);
   need("tppResp", w.tppResp);
   if (!w.oppName) errs.push("opposition leader name missing");
@@ -854,6 +868,7 @@ if (process.env.RB_LIB !== "1") try {
   const filledSplit = [];
   const filledSplitOn = [];
   const filledFirm = [];
+  const filledLeaner = [];
   const filledFirstSight = [];
 
   for (const c of candidates) {
@@ -878,6 +893,11 @@ if (process.env.RB_LIB !== "1") try {
         const fm = parseFirmness(readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8"));
         const own = fm.rows && fm.rows.find((r) => r.label === w.label);
         if (own) w.firmness = own.firmness; else w.firmnessError = fm.error || `no vote-softness row for the wave (${w.label})`;
+        writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
+      }
+      if (w.undecidedLeaner == null && w.undecidedLeanerError == null && existsSync(`${SRC_DIR}/${c.slug}.txt`)) {
+        const leaner = parseUndecidedLeaner(readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8"));
+        if (leaner.error) w.undecidedLeanerError = leaner.error; else w.undecidedLeaner = leaner.value;
         writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
       }
     } else {
@@ -998,6 +1018,14 @@ if (process.env.RB_LIB !== "1") try {
         }
       }
 
+      // and for the methodology's leaner-excluded share, independent of the
+      // soft/very-soft voting triple (those respondents sit after the leaner)
+      if (matchPoll.undecidedLeaner != null) cmp("undecidedLeaner", w.undecidedLeaner, matchPoll.undecidedLeaner);
+      if (matchPoll.undecidedLeaner == null && w.undecidedLeaner != null) {
+        if (CHECK) diffs.push(`undecidedLeaner: file lacks the methodology's ${w.undecidedLeaner}% exclusion`);
+        else { fillPoll("undecidedLeaner", w.undecidedLeaner); filledLeaner.push(matchPoll.date); }
+      }
+
       // and for the wave's own vote-softness row
       if (matchPoll.firmness && w.firmness && JSON.stringify(matchPoll.firmness) !== JSON.stringify(w.firmness))
         diffs.push(`firmness: pdf=${JSON.stringify(w.firmness)} vs file=${JSON.stringify(matchPoll.firmness)}`);
@@ -1047,6 +1075,7 @@ if (process.env.RB_LIB !== "1") try {
         ...(w.tppHist != null ? { tpp_flows: w.tppHist } : {}),
         ...(w.tppSplit != null ? { tpp_split: w.tppSplit } : {}),
         ...(w.tppSplitOn != null ? { tpp_split_on: w.tppSplitOn } : {}),
+        ...(w.undecidedLeaner != null ? { undecidedLeaner: w.undecidedLeaner } : {}),
         ...(w.firmness != null ? { firmness: w.firmness } : {}),
         url: w.afrUrl || w.pdfUrl,
         releaseUrl: c.url,
@@ -1077,8 +1106,9 @@ if (process.env.RB_LIB !== "1") try {
   if (filledSplit.length) status.splitFilled = filledSplit;
   if (filledSplitOn.length) status.splitOnFilled = filledSplitOn;
   if (filledFirm.length) status.firmnessFilled = filledFirm;
+  if (filledLeaner.length) status.undecidedLeanerFilled = filledLeaner;
   if (filledFirstSight.length) status.firstSightFilled = filledFirstSight;
-  if (hasNew || filledFirstSight.length || filledRelease.length || filledSplit.length || filledSplitOn.length || filledFirm.length) {
+  if (hasNew || filledFirstSight.length || filledRelease.length || filledSplit.length || filledSplitOn.length || filledFirm.length || filledLeaner.length) {
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     // hand-entered rows keep tpp3 on one line; stringify must not expand them
     const next =
@@ -1102,4 +1132,4 @@ if (process.env.RB_LIB !== "1") try {
 
 // parser exports for .build/test-redbridge.mjs (RB_LIB=1 import skips the
 // main block above)
-export { parsePdf, parseAfrTopic, parseFirmness, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };
+export { parsePdf, parseUndecidedLeaner, parseAfrTopic, parseFirmness, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };
