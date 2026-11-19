@@ -2616,13 +2616,16 @@ for (const y of ["sa22", "sa26"]) {
   const FR = {
     qld24: { date: "2024-10-26", prev: 2020, seats: { ALP: 36, LNP: 52, KAP: 3, GRN: 1, IND: 1 }, formal: 3105945, enr: 3683368,
              booths: 1668, ty: [1, 4, 5], mobile: 93, geo: 1575, tcp: 1668, dec: 1529, demo: 1575,
-             fl: 85, tppsw: 84, swings: 525, hist: 93, demoYear: null },
+             fl: 85, tppsw: 84, swings: 525, hist: 93, demoYear: null,
+             tppShown: 93, tppn: 8, tppe: 8 },
     qld20: { date: "2020-10-31", prev: 2017, seats: { ALP: 52, LNP: 34, KAP: 3, GRN: 2, ONP: 1, IND: 1 }, formal: 2868324, enr: 3377476,
              booths: 1810, ty: [1, 4, 5], mobile: 93, geo: 1717, tcp: 1810, dec: 1668, demo: 1717,
-             fl: 87, tppsw: 64, swings: 597, hist: 93, demoYear: null },
+             fl: 87, tppsw: 64, swings: 597, hist: 93, demoYear: null,
+             tppShown: 85, tppn: 0, tppe: 0 },
     qld17: { date: "2017-11-25", prev: 2015, fpformal: 2623443, seats: { ALP: 48, LNP: 39, KAP: 3, GRN: 1, ONP: 1, IND: 1 }, formal: 2703941, enr: 3229536,
              booths: 1701, ty: [1, 4, 5], mobile: 3, geo: 1110, tcp: 0, dec: 1092, demo: 1110,
-             fl: 78, tppsw: 59, swings: 413, hist: 86, demoYear: 2016 },
+             fl: 78, tppsw: 59, swings: 413, hist: 86, demoYear: 2016,
+             tppShown: 65, tppn: 0, tppe: 0 },
   };
   for (const [frame, ora] of Object.entries(FR)) {
     const res = JSON.parse(R(`map/data/res-${frame}.json`));
@@ -2658,6 +2661,20 @@ for (const y of ["sa22", "sa26"]) {
       for (const d of res.divs) for (const c of d.c) { assert.ok(Number.isFinite(c[5]), `${frame} ${d.n}: c[5] finite for ${c[0]}`); if (c[5] !== 0) nSw++; }
       assert.equal(nSw, ora.swings, `${frame}: ${ora.swings} candidates moved on the previous election`);
       assert.equal(res.divs.filter((d) => d.tpp && Number.isFinite(d.tpp[2])).length, ora.tppsw, `${frame}: ${ora.tppsw} classic-pair 2PP swings where both elections finished Labor v LNP`);
+      // qld24 ships the eight AG-estimate notionals (notional-2pp.json); the
+      // estimate marker never carries a swing
+      assert.equal(res.divs.filter((d) => d.tpp != null).length, ora.tppShown, `${frame}: districts with a two-party figure`);
+      assert.equal(res.divs.filter((d) => d.tppn).length, ora.tppn, `${frame}: notional-marker rows`);
+      assert.equal(res.divs.filter((d) => d.tppe).length, ora.tppe, `${frame}: estimate-marker rows`);
+      assert.ok(res.divs.every((d) => !d.tppe || !Number.isFinite(d.tpp[2])), `${frame}: estimates never swing`);
+      if (frame === "qld24") {
+        const mw = res.divs.find((d) => d.n === "Maiwar");
+        assert.deepEqual(mw.tpp.slice(0, 2), [20318, 15956], "qld24 Maiwar's AG-estimated 2PP");
+        assert.equal(mw.tppn, 1, "qld24 Maiwar: notional marker");
+        assert.equal(mw.tppe, 1, "qld24 Maiwar: estimate marker");
+        const sb = res.divs.find((d) => d.n === "South Brisbane");
+        assert.deepEqual(sb.tpp.slice(0, 2), [22210, 12779], "qld24 South Brisbane's AG-estimated 2PP");
+      }
     }
     assert.equal(res.divs.filter((d) => d.fl.length > 0).length, ora.fl, `${frame}: flow rows on the ${ora.fl} districts whose final had Labor against LNP or One Nation`);
     const B = res.booths;

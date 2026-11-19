@@ -149,8 +149,10 @@ def past_main(frame):
             r[5] = r2(share - prev_share)
             n_sw += 1
 
-        # Labor-point 2PP swing where both elections finished Labor v LNP
-        if div.get("tpp"):
+        # Labor-point swing on official majors figures only (classic lanes
+        # or a commission's alternative count); estimates never swing —
+        # the tppe marker carries the adjudicated-external estimates
+        if div.get("tpp") and not div.get("tppe"):
             past_pair_bs = [qld_ecq.bucket(next(c["ab"] for c in past_x["cands"] if c["key"] == k))
                             for k in past_x["tcp"]["k"]]
             if set(past_pair_bs) == {"alp", "lnp"}:

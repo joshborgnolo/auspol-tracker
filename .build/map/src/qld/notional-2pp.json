@@ -1,0 +1,20 @@
+{
+  "_doc": "Notional Labor-v-Coalition two-party figures for Queensland Legislative Assembly districts whose final count wasn't LNP v Labor. Rows are [alp_votes, lnp_votes]. Provenance and verification trail: .build/map/src/qld/notional-adjudication.md. ECQ publishes no notional/two-party count; these are Antony Green's published estimates. Do not add rows by hand without the set-equality check in build_qld_common passing.",
+  "qld24": {
+    "provenance": "estimated-green",
+    "credit": "The per-district two-party rows superscripted '1/2 — Two-party preferred estimate for 2024 election' in Antony Green's 2024 Queensland Election – Summary of Results (ABC's guide, November 2024)",
+    "sourceUrl": "https://www.abc.net.au/dat/news/elections/qld/2024/guide/QLD2024_ResultSummary.pdf",
+    "fetched": "2026-11-19",
+    "territoryPublishedTotal": null,
+    "divisions": {
+      "Hill": [13785, 20780],
+      "Hinchinbrook": [10824, 22245],
+      "Maiwar": [20318, 15956],
+      "Mirani": [10915, 21131],
+      "Noosa": [14785, 18153],
+      "South Brisbane": [22210, 12779],
+      "Southern Downs": [8809, 24379],
+      "Traeger": [7662, 12270]
+    }
+  }
+}

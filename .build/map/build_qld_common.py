@@ -59,6 +59,45 @@ from qld_flow_lane import load_store, flow_rows
 REPO = qld_ecq.REPO
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "map", "data")
 
+#: notional Labor-v-LNP figures for districts whose final pair wasn't the
+#: majors (qld24 since 2026-11-19; provenance per frame and the sourcing
+#: trail live in .build/map/src/qld/notional-2pp.json + notional-adjudication.md)
+NOTIONAL = json.load(open(os.path.join(REPO, ".build", "map", "src", "qld", "notional-2pp.json")))
+
+
+def notional_for_frame(frame, src, ffail):
+    """{district: (alp, lnp, est: bool)}, verified the way the NT lane is:
+    the json's division set must equal exactly the parsed non-classic
+    finals where BOTH majors stood (Queensland has no majors-absent
+    district in its rows). A frame ABSENT from the file is an unfinished
+    research frame — its bare districts stay bare, noted loudly at build
+    time (never silently "fixed" by whatever improved later)."""
+    spec = NOTIONAL.get(frame)
+    if spec is None:
+        print(f"  {frame}: no notional-2pp.json entry — research frame,"
+              f" its non-classic-with-majors districts stay bare")
+        return {}
+    divs = spec["divisions"]
+    expect = {}
+    for x in src["districts"]:
+        keys = {t for t in x["tcp"]["k"]}
+        bs = {next(c["ab"] for c in x["cands"] if c["key"] == k) for k in keys}
+        bs = {bucket(ab) for ab in bs}
+        if bs == {"alp", "lnp"}:
+            continue
+        if {"alp", "lnp"} <= {bucket(c["ab"]) for c in x["cands"]}:
+            expect[x["name"]] = True
+    if set(expect) != set(divs):
+        ffail(f"notional 2PP set drift: parsed non-classic-with-majors"
+              f" {sorted(expect)} vs notional-2pp.json {sorted(divs)}"
+              f" — review qld/notional-adjudication.md, never silently patch the json")
+    out = {}
+    for name, row in divs.items():
+        if not (isinstance(row, list) and len(row) == 2 and all(isinstance(v, int) and v >= 0 for v in row)):
+            ffail(f"notional-2pp.json {frame}/{name}: row shape drifted {row!r}")
+        out[name] = (row[0], row[1], spec["provenance"] == "estimated-green")
+    return out
+
 FRAMES = {
     "qld24": {
         "year": "qld24", "date": "2024-10-26", "jurisdiction": "QLD",
@@ -148,6 +187,7 @@ def data_main(frame):
     src = qld_ecq.load(frame)
     demo, seifa, cob_keys = load_census(frame, ffail)
     flows, contests, flow_err = load_store(os.path.join(REPO, "data", f"{frame}-flows.json"), ffail)
+    notional = notional_for_frame(frame, src, ffail)
 
     D = []
     seats = collections.Counter()
@@ -190,6 +230,7 @@ def data_main(frame):
         tcp = [[pair_rows[0], pair_votes[0]], [pair_rows[1], pair_votes[1]]]
         pair_buckets = {rows[pair_rows[0]]["b"], rows[pair_rows[1]]["b"]}
         tpp = None
+        tpp_est = False
         if pair_buckets == {"alp", "lnp"}:
             ia = pair_rows[0] if rows[pair_rows[0]]["b"] == "alp" else pair_rows[1]
             ib = pair_rows[1] if ia == pair_rows[0] else pair_rows[0]
@@ -198,6 +239,13 @@ def data_main(frame):
             tpp = [va, vb, None]
             tpp_tot[0] += va
             tpp_tot[1] += vb
+        else:
+            nrec = notional.get(name)
+            if nrec:
+                va, vb, tpp_est = nrec
+                tpp = [va, vb, None]
+                tpp_tot[0] += va
+                tpp_tot[1] += vb
 
         fl = flow_rows(name, rows, pair_buckets, rows[pair_rows[0]]["b"],
                        {r["cid"]: k for k, r in enumerate(rows)}, flows, contests, ffail)
@@ -261,6 +309,12 @@ def data_main(frame):
         }
         if tpp:
             rec["tpp"] = tpp
+        if tpp and pair_buckets != {"alp", "lnp"}:
+            # the figure is the adjudicated notional row — tppe marks it an
+            # estimate (never a swing against last election)
+            rec["tppn"] = 1
+        if tpp_est:
+            rec["tppe"] = 1
         D.append(rec)
         tot_formal += x["formal"]
         tot_inf += x["informal"]
@@ -288,9 +342,13 @@ def data_main(frame):
     p = os.path.join(OUT, f"data-{frame}.json")
     with open(p, "w") as f:
         json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
+    n_est = sum(1 for d in D if d.get("tppe"))
+    n_notional = len(notional) - n_est
+    n_covered = sum(1 for d in D if d.get("tpp") is not None)
     tp = 100 * tpp_tot[0] / (tpp_tot[0] + tpp_tot[1]) if tpp_tot[0] or tpp_tot[1] else None
     print(f"{frame} districts {len(D)} | seats {dict(seats)}"
-          f" | classic-2PP ALP {round(tp, 2) if tp else '-'}%"
+          f" | 2PP: ALP {round(tp, 2) if tp else '-'}% over {n_covered} of {len(D)}"
+          f" ({n_covered - len(notional)} classic + {n_notional} notional + {n_est} estimated)"
           f" | informal {round(100 * tot_inf / (tot_inf + tot_formal), 2)}%"
           f" | enrolled {tot_enrolled} | booths {len(B['id'])} {dict(sorted(types_seen.items()))}"
           f" | geocoded {geocoded} (tcp {tcp_booths}, zero-vote {zero_booths})"
