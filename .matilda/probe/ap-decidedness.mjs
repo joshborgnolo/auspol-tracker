@@ -7,7 +7,7 @@
      Newspoll         : undecidedLeaner → "5% undecided after leaner, excluded"
      DemosAU          : existing first-series row, labelled from its leaner methodology
      Roy Morgan       : `undecided` (first) → "undecided", "excluded"
-     Resolve          : `undecided` (soft)  → "not firm", "named a party…"
+     Resolve          : `undecided` (soft)  → "Undecided disallowed – 74% firm, 26% soft"
      Essential        : `undecided` (tpp)   → "undecided", "unallocated…"
      YouGov           : neither field → "% undecided not published, excluded"
      Confidence facet : a gauge release → no Primary line, nothing
@@ -71,7 +71,7 @@ const CASES = [
     head: p.undecided + "%", word: "undecided", sub: "excluded",
   }), "Roy Morgan"),
   pick("Resolve", (p) => p.undecided != null && p.undecidedBasis === "soft", (p) => ({
-    head: p.undecided + "%", word: "not firm", sub: "named a party, but might yet change their mind",
+    head: "Undecided disallowed", word: "", sub: (100 - p.undecided) + "% firm, " + p.undecided + "% soft",
   }), "Resolve"),
   pick("Essential", (p) => p.undecided != null && p.undecidedBasis === "tpp", (p) => ({
     head: p.undecided + "%", word: "undecided", sub: "unallocated inside the printed two-party pair",
@@ -143,10 +143,18 @@ const readDetail = () => page.evaluate(() => {
   if (!lg) return null;
   const norm = (s) => (s || "").replace(/\s+/g, " ").trim();
   const lead = lg.querySelector(".rd-ldg-lead");
-  const sentence = lead ? [...lead.querySelectorAll(".rd-ldg-foot1")].map((n) => norm(n.textContent)).find((t) => /% (not firm|undecided)/.test(t)) || null : null;
+  const sentenceNode = lead ? [...lead.querySelectorAll(".rd-ldg-foot1")].find((n) => /% (not firm|undecided)|Undecided disallowed/.test(norm(n.textContent))) || null : null;
+  const sentence = sentenceNode ? norm(sentenceNode.textContent) : null;
   const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
-  return { sentence, line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null, lines: [...lg.querySelectorAll(".rd-ldg-lab")].map((n) => norm(n.textContent)) };
+  return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "", line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null, lines: [...lg.querySelectorAll(".rd-ldg-lab")].map((n) => norm(n.textContent)) };
 });
+
+const assertBoldRule = (d, tag) => {
+  const sentence = d && (d.sentence || "").replace(/\.$/, "");
+  const [before, ...tail] = (sentence || "").split(" – ");
+  ok(`${tag}: everything before the en dash is bold`, d && d.boldText.replace(/\.$/, "") === before, d ? d.boldText : "no detail");
+  if (tail.length) ok(`${tag}: the after-dash tail stays plain`, !d.boldText.includes(tail.join(" – ")), d ? d.boldText : "no detail");
+};
 
 for (const cs of CASES) {
   const tag = `${cs.house} ${W(cs.q)}`;
@@ -162,6 +170,7 @@ for (const cs of CASES) {
     ok(`Primary tab: decidedness under the primaries (${tag}: "${x.head} ${x.word}")`,
        d && d.sentence && d.sentence.includes((x.head + " " + x.word).trim()), d ? String(d.sentence) : "no detail");
     ok(`Primary tab: its basis in words (${tag})`, d && d.sentence && d.sentence.includes(x.sub.slice(0, 60)), d ? String(d.sentence) : "no detail");
+    assertBoldRule(d, `Primary tab (${tag})`);
   }
   await clickRow(cs.idx); /* collapse */
   /* the 2PP tab: the short form on the Primary line */
@@ -170,7 +179,7 @@ for (const cs of CASES) {
   await clickRow(cs.idx);
   const d2 = await readDetail();
   if (cs.expect === null) {
-    ok(`negative control: the Primary line carries no decidedness (${tag})`, d2 && d2.line != null && !/% (not firm|undecided)/.test(d2.line),
+    ok(`negative control: the Primary line carries no decidedness (${tag})`, d2 && d2.line != null && !/% (not firm|undecided)|Undecided disallowed/.test(d2.line),
        d2 ? String(d2.line) : "no detail");
   } else {
     const x = cs.expect(cs.q);
@@ -230,9 +239,10 @@ const latestDetail = async (q) => {
     const lg = item && item.querySelector(".rd-ldg");
     if (!lg) return null;
     const norm = (s) => (s || "").replace(/\s+/g, " ").trim();
-    const sentence = [...lg.querySelectorAll(".rd-ldg-lead .rd-ldg-foot1")].map((n) => norm(n.textContent)).find((t) => /% (not firm|undecided)/.test(t)) || null;
+    const sentenceNode = [...lg.querySelectorAll(".rd-ldg-lead .rd-ldg-foot1")].find((n) => /% (not firm|undecided)|Undecided disallowed/.test(norm(n.textContent))) || null;
+    const sentence = sentenceNode ? norm(sentenceNode.textContent) : null;
     const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
-    return { sentence, line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null };
+    return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "", line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null };
   }, q);
 };
 const closeLatest = async (q) => {
@@ -252,11 +262,13 @@ const LATEST = [
   })()],
   ["Resolve", (() => {
     const w = byHouse("Resolve")[0];
-    return w && w.undecided != null && w.undecidedBasis === "soft" ? { dd: w.undecided + "% not firm", sub: "named a party" } : undefined;
+    return w && w.undecided != null && w.undecidedBasis === "soft" ? {
+      dd: "Undecided disallowed", sub: (100 - w.undecided) + "% firm, " + w.undecided + "% soft",
+    } : undefined;
   })()],
   ["DemosAU", (() => {
     const w = byHouse("DemosAU")[0];
-    return w && w.undecidedBasis === "leaner" ? { dd: w.undecided + "% undecided after leaner", sub: "excluded" } : undefined;
+    return w && w.undecided != null ? { dd: w.undecided + "% undecided after leaner", sub: "excluded" } : undefined;
   })()],
   ["YouGov", { dd: "% undecided not published, excluded", sub: "not published" }],
   ["Newspoll", (() => {
@@ -276,12 +288,13 @@ for (const [house, exp] of LATEST) {
   } else {
     ok(`latest, Primary tab: "${exp.dd}" under the primaries (${house})`, d && d.sentence && d.sentence.includes(exp.dd), d ? String(d.sentence) : "no detail");
     ok(`latest, Primary tab: its basis in words (${house})`, d && d.sentence && d.sentence.toLowerCase().includes(exp.sub), d ? String(d.sentence) : "no detail");
+    assertBoldRule(d, `latest (${house})`);
   }
   await closeLatest(house);
   await latestTab("2PP");
   const d2 = await latestDetail(house);
   if (exp === null) {
-    ok(`latest, 2PP tab: the Primary line carries no decidedness (${house})`, d2 && d2.line != null && !/% (not firm|undecided)/.test(d2.line), d2 ? String(d2.line) : "no detail");
+    ok(`latest, 2PP tab: the Primary line carries no decidedness (${house})`, d2 && d2.line != null && !/% (not firm|undecided)|Undecided disallowed/.test(d2.line), d2 ? String(d2.line) : "no detail");
   } else {
     ok(`latest, 2PP tab: the Primary line carries "${exp.dd}" (${house})`, d2 && d2.line && d2.line.includes(exp.dd), d2 ? String(d2.line) : "no detail");
   }

@@ -1680,7 +1680,9 @@ function rdLgDecided(p) {
   };
   if (p.undecided != null) {
     const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
-    return { h: p.undecided + "%", w: b === "soft" ? "not firm" : b === "leaner" ? "undecided after leaner" : "undecided",
+    if (b === "soft") return { h: "Undecided disallowed", w: "", d: null,
+      s: (100 - p.undecided) + "% firm, " + p.undecided + "% soft" };
+    return { h: p.undecided + "%", w: b === "leaner" ? "undecided after leaner" : "undecided",
              d: (p.chg && p.chg.d && p.chg.d.und) || null,
              s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "excluded",
              sep: b === "soft" || b === "tpp" ? " – " : ", " };
@@ -1708,7 +1710,11 @@ function RdLgVote({ p, note }) {
           </span>
         ))}
       </div>
-      {dec && <p className="rd-ldg-foot1"><b>{dec.h}</b>{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} />{dec.s ? (dec.sep || " – ") + dec.s : ""}.</p>}
+      {dec && (dec.sep === ", " ? (
+        <p className="rd-ldg-foot1"><b>{dec.h}{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} />{dec.s ? dec.sep + dec.s : ""}.</b></p>
+      ) : (
+        <p className="rd-ldg-foot1"><b>{dec.h}{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} /></b>{dec.s ? (dec.sep || " – ") + dec.s : ""}.</p>
+      ))}
       {note && <p className="rd-ldg-note">{note}</p>}
     </>
   );

@@ -2266,22 +2266,32 @@ function RdLgTpp({
 }
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
-  if (f && f.length === 2) {
-    const und = p.undecided != null ? `, including the ${p.undecided}% undecided` : ", including undecided voters";
-    return {
-      h: f[1] + "%",
-      w: "not firm",
-      d: null,
-      s: `firm ${f[0]}, soft ${f[1]} on its vote-firmness chart${und}`
-    };
-  }
+  if (f && f.length === 2) return {
+    h: p.undecided != null ? p.undecided + "% undecided, excluded" : f[1] + "% not firm",
+    w: "",
+    d: null,
+    s: f[0] + "% firm, " + f[1] + "% soft"
+  };
+  if (p.undecidedLeaner != null) return {
+    h: p.undecidedLeaner + "% undecided after leaner, excluded",
+    w: "",
+    d: null,
+    s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null
+  };
   if (p.undecided != null) {
-    const b = p.undecidedBasis || "first";
+    const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
+    if (b === "soft") return {
+      h: "Undecided disallowed",
+      w: "",
+      d: null,
+      s: 100 - p.undecided + "% firm, " + p.undecided + "% soft"
+    };
     return {
       h: p.undecided + "%",
-      w: b === "soft" ? "not firm" : "undecided",
+      w: b === "leaner" ? "undecided after leaner" : "undecided",
       d: p.chg && p.chg.d && p.chg.d.und || null,
-      s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "couldn’t name a party when first asked"
+      s: b === "soft" ? "named a party, but might yet change their mind" : b === "tpp" ? "unallocated inside the printed two-party pair" : "excluded",
+      sep: b === "soft" || b === "tpp" ? " – " : ", "
     };
   }
   if (f) return {
@@ -2289,6 +2299,12 @@ function rdLgDecided(p) {
     w: "not firm",
     d: null,
     s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table"
+  };
+  if (p.pollster === "YouGov" || p.pollster === "YouGov (MRP)") return {
+    h: "% undecided not published, excluded",
+    w: "",
+    d: null,
+    s: null
   };
   return null;
 }
@@ -2323,12 +2339,17 @@ function RdLgVote({
     }
   }, rdApNum(q[k.id])), React.createElement("span", {
     className: "rd-ldg-chg"
-  }, rdLgChg(c[RD_LG_CK[k.id]], 0) || " ")))), dec && React.createElement("p", {
+  }, rdLgChg(c[RD_LG_CK[k.id]], 0) || " ")))), dec && (dec.sep === ", " ? React.createElement("p", {
     className: "rd-ldg-foot1"
-  }, React.createElement("b", null, dec.h), " ", dec.w, React.createElement(RdLgChg, {
+  }, React.createElement("b", null, dec.h, dec.w ? " " + dec.w : "", React.createElement(RdLgChg, {
     d: dec.d,
     dec: 1
-  }), " \u2013 ", dec.s, "."), note && React.createElement("p", {
+  }), dec.s ? dec.sep + dec.s : "", ".")) : React.createElement("p", {
+    className: "rd-ldg-foot1"
+  }, React.createElement("b", null, dec.h, dec.w ? " " + dec.w : "", React.createElement(RdLgChg, {
+    d: dec.d,
+    dec: 1
+  })), dec.s ? (dec.sep || " – ") + dec.s : "", ".")), note && React.createElement("p", {
     className: "rd-ldg-note"
   }, note));
 }
