@@ -146,7 +146,8 @@ const readDetail = () => page.evaluate(() => {
   const sentenceNode = lead ? [...lead.querySelectorAll(".rd-ldg-foot1")].find((n) => /% (not firm|undecided)|Undecided disallowed/.test(norm(n.textContent))) || null : null;
   const sentence = sentenceNode ? norm(sentenceNode.textContent) : null;
   const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
-  return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "", line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null, lines: [...lg.querySelectorAll(".rd-ldg-lab")].map((n) => norm(n.textContent)) };
+  return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "",
+    deltaWeights: sentenceNode ? [...sentenceNode.querySelectorAll("b .rd-ldg-chg")].map((n) => +getComputedStyle(n).fontWeight) : [], line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null, lines: [...lg.querySelectorAll(".rd-ldg-lab")].map((n) => norm(n.textContent)) };
 });
 
 const assertBoldRule = (d, tag) => {
@@ -154,6 +155,7 @@ const assertBoldRule = (d, tag) => {
   const [before, ...tail] = (sentence || "").split(" – ");
   ok(`${tag}: everything before the en dash is bold`, d && d.boldText.replace(/\.$/, "") === before, d ? d.boldText : "no detail");
   if (tail.length) ok(`${tag}: the after-dash tail stays plain`, !d.boldText.includes(tail.join(" – ")), d ? d.boldText : "no detail");
+  if (d && d.deltaWeights.length) ok(`${tag}: the delta figure is bold too`, d.deltaWeights.every((w) => w >= 600), d.deltaWeights.join(", "));
 };
 
 for (const cs of CASES) {
@@ -242,7 +244,8 @@ const latestDetail = async (q) => {
     const sentenceNode = [...lg.querySelectorAll(".rd-ldg-lead .rd-ldg-foot1")].find((n) => /% (not firm|undecided)|Undecided disallowed/.test(norm(n.textContent))) || null;
     const sentence = sentenceNode ? norm(sentenceNode.textContent) : null;
     const line = [...lg.querySelectorAll(".rd-ldg-line")].find((l) => norm((l.querySelector(".rd-ldg-lab") || {}).textContent) === "Primary");
-    return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "", line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null };
+    return { sentence, boldText: sentenceNode ? [...sentenceNode.querySelectorAll("b")].map((n) => norm(n.textContent)).join(" ") : "",
+    deltaWeights: sentenceNode ? [...sentenceNode.querySelectorAll("b .rd-ldg-chg")].map((n) => +getComputedStyle(n).fontWeight) : [], line: line ? norm(line.querySelector(".rd-ldg-lbody").textContent) : null };
   }, q);
 };
 const closeLatest = async (q) => {
@@ -265,6 +268,10 @@ const LATEST = [
     return w && w.undecided != null && w.undecidedBasis === "soft" ? {
       dd: "Undecided disallowed", sub: (100 - w.undecided) + "% firm, " + w.undecided + "% soft",
     } : undefined;
+  })()],
+  ["Roy Morgan", (() => {
+    const w = byHouse("Roy Morgan")[0];
+    return w && w.undecided != null ? { dd: w.undecided + "% undecided", sub: "excluded" } : undefined;
   })()],
   ["DemosAU", (() => {
     const w = byHouse("DemosAU")[0];
