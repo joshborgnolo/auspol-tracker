@@ -2291,39 +2291,10 @@ function rdApFacetStory(facet, upd, demSplit, confBw) {
   const below = (what) => "Below is every " + RD_AP_POLLS + " poll" + (what ? " " + what : "") + " since the " + rdElecYear + " election, newest first, each linked to its source.";
   const range = (vals) => [Math.min(...vals), Math.max(...vals)];
 
-  if (facet === "primary") {
-    const now = D.latest.primary || {};
-    const ids = Object.keys(now).filter((k) => now[k] != null).sort((a, b) => now[b] - now[a]);
-    if (ids.length < 2) return null;
-    const [t1, t2] = ids;
-    const days = (D.latest.method && D.latest.method.windowDays) || 21;
-    const ps = polls.filter((p) => inWin(p, days) && p.p && p.p[t1] != null);
-    if (!ps.length) return null;
-    const n = ps.length, [lo, hi] = range(ps.map((p) => p.p[t1]));
-    const f = rdApNum;
-    const head = RD_AP_KAL
-      ? poss(t1) + " " + now[t1].toFixed(1) + " primary vote is the trend through every poll; "
-        + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all read " + f(lo) : " range from " + f(lo) + " to " + f(hi)))
-      : poss(t1) + " " + now[t1].toFixed(1) + " primary vote" + fromPolls(n, lo, hi, f);
-    /* the leader's margin as RdPrimary rules it: level when the gap is
-       inside the two figures' 95% margins combined */
-    const lastM = (D.aggPrimary || [])[(D.aggPrimary || []).length - 1] || {};
-    const ci = (id) => (lastM.ci && lastM.ci[id]) || 0;
-    const gap = now[t1] - now[t2];
-    const level = gap < Math.sqrt(ci(t1) ** 2 + ci(t2) ** 2);
-    const both = ps.filter((p) => p.p[t2] != null);
-    const ahead = both.filter((p) => p.p[t1] > p.p[t2]).length;
-    const m = both.length;
-    const tl = !m ? "" : m === 1 ? (ahead ? "It has " : "It doesn’t have ")
-      : ahead === m ? (m === 2 ? "Both have " : "All " + rdNumWord(m) + " have ")
-      : ahead === 0 ? "None of the " + rdNumWord(m) + " has "
-      : rdCap(rdNumWord(ahead)) + " of the " + rdNumWord(m) + " " + (ahead === 1 ? "has " : "have ");
-    const dek = (m ? tl + rdPartyIn(t1) + " ahead of " + rdPartyIn(t2) + ". " : "")
-      + rdPartyStart(t2) + (rdPlural(t2) ? " are " : " is ") + gap.toFixed(1) + " points behind on " + now[t2].toFixed(1)
-      + (level ? ", too close to separate. " : ". ")
-      + below("");
-    return { head, dek };
-  }
+  /* the Primary facet has no head or dek of its own (user call
+     2026-11-21): the leader's figure, the polls' range and the margin
+     restated what the hero and the table beside it already show */
+  if (facet === "primary") return null;
 
   if (facet === "leadership") {
     const N = D.leaderNow || {};

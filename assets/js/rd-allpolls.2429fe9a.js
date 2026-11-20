@@ -2282,9 +2282,9 @@ function RdLgTpp({
     }
   }, "ON ", rdApNum(p.tpp3.onp))), React.createElement("span", {
     className: "rd-ldg-tail"
-  }, ", as published"))))), (noPub || moe || note || p.undecidedBasis === "tpp") && React.createElement("p", {
+  }, ", as published"))))), (noPub || moe || note || p.undecidedBasis === "tpp" || p.tppUndecided) && React.createElement("p", {
     className: "rd-ldg-foot1"
-  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", p.undecidedBasis === "tpp" ? " Undecideds are left out, unallocated." : "", note ? " " + note : ""));
+  }, noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : "", moe || "", p.undecidedBasis === "tpp" ? " Undecided " + p.undecided + "% stays inside the published pair, unallocated." : "", p.tppUndecided ? " Undecided before preference apportionment: " + p.tppUndecided.lnponp + "% Labor v Coalition, " + p.tppUndecided.alponp + "% Labor v One Nation." : "", note ? " " + note : ""));
 }
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
@@ -2292,7 +2292,7 @@ function rdLgDecided(p) {
     h: p.undecided != null ? "Primary-vote shares are decideds’. " + p.undecided + "% undecided, excluded" : f[1] + "% not firm",
     w: "",
     d: null,
-    s: f[0] + "% firm, " + f[1] + "% soft"
+    s: f[0] + "% firm, " + f[1] + "% soft" + (p.pollster === "Spectre Strategy" ? " (soft includes undecided respondents)" : "")
   };
   if (p.undecidedLeaner != null) return {
     h: "Primary-vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "% undecided after leaner, excluded",
@@ -2308,7 +2308,7 @@ function rdLgDecided(p) {
     sep: ", "
   };
   if (p.undecided != null) {
-    const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
+    const b = p.undecidedBasis || "first";
     if (b === "soft") return {
       h: "Primary-vote shares are everyones’. ‘Undecided’ not an option (a forced choice)",
       w: "",
@@ -3186,32 +3186,7 @@ function rdApFacetStory(facet, upd, demSplit, confBw) {
   const tally = (k, n, has) => n === 1 ? k ? "It " + has : "It doesn’t " + (has === "has" ? "have" : has.replace(/s$/, "")) : k === n ? (n === 2 ? "Both " : "All " + rdNumWord(n) + " ") + (has === "has" ? "have" : has.replace(/s$/, "")) : k === 0 ? "None of them " + has : rdCap(rdNumWord(k)) + " of them " + (k === 1 ? has : has === "has" ? "have" : has.replace(/s$/, ""));
   const below = what => "Below is every " + RD_AP_POLLS + " poll" + (what ? " " + what : "") + " since the " + rdElecYear + " election, newest first, each linked to its source.";
   const range = vals => [Math.min(...vals), Math.max(...vals)];
-  if (facet === "primary") {
-    const now = D.latest.primary || {};
-    const ids = Object.keys(now).filter(k => now[k] != null).sort((a, b) => now[b] - now[a]);
-    if (ids.length < 2) return null;
-    const [t1, t2] = ids;
-    const days = D.latest.method && D.latest.method.windowDays || 21;
-    const ps = polls.filter(p => inWin(p, days) && p.p && p.p[t1] != null);
-    if (!ps.length) return null;
-    const n = ps.length,
-      [lo, hi] = range(ps.map(p => p.p[t1]));
-    const f = rdApNum;
-    const head = RD_AP_KAL ? poss(t1) + " " + now[t1].toFixed(1) + " primary vote is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all read " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : poss(t1) + " " + now[t1].toFixed(1) + " primary vote" + fromPolls(n, lo, hi, f);
-    const lastM = (D.aggPrimary || [])[(D.aggPrimary || []).length - 1] || {};
-    const ci = id => lastM.ci && lastM.ci[id] || 0;
-    const gap = now[t1] - now[t2];
-    const level = gap < Math.sqrt(ci(t1) ** 2 + ci(t2) ** 2);
-    const both = ps.filter(p => p.p[t2] != null);
-    const ahead = both.filter(p => p.p[t1] > p.p[t2]).length;
-    const m = both.length;
-    const tl = !m ? "" : m === 1 ? ahead ? "It has " : "It doesn’t have " : ahead === m ? m === 2 ? "Both have " : "All " + rdNumWord(m) + " have " : ahead === 0 ? "None of the " + rdNumWord(m) + " has " : rdCap(rdNumWord(ahead)) + " of the " + rdNumWord(m) + " " + (ahead === 1 ? "has " : "have ");
-    const dek = (m ? tl + rdPartyIn(t1) + " ahead of " + rdPartyIn(t2) + ". " : "") + rdPartyStart(t2) + (rdPlural(t2) ? " are " : " is ") + gap.toFixed(1) + " points behind on " + now[t2].toFixed(1) + (level ? ", too close to separate. " : ". ") + below("");
-    return {
-      head,
-      dek
-    };
-  }
+  if (facet === "primary") return null;
   if (facet === "leadership") {
     const N = D.leaderNow || {};
     const L = {};

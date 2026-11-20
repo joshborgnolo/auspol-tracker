@@ -66,12 +66,13 @@ for (const id of IDS) {
   await sleep(500);
   const h = await hed();
   seen[id] = h;
-  check(h.facet === id && h.head && h.dek, `${id}: head + dek (${JSON.stringify((h.head || "").slice(0, 70))})`);
+  check(h.facet === id && (id === "primary" || (h.head && h.dek)), `${id}: head + dek (${JSON.stringify((h.head || "").slice(0, 70))})`);
 }
 check(seen.twopp.head.startsWith("Labor’s") && seen.twopp.dek.includes("Below is every"), "2PP head keeps its shape");
-check(new Set(IDS.map((id) => seen[id].head)).size === IDS.length, "seven distinct heads");
-check(new Set(IDS.map((id) => seen[id].dek)).size === IDS.length, "seven distinct deks");
-check(/primary vote comes from|primary vote is the trend/.test(seen.primary.head), "Primary head quotes the primary vote");
+const STORY = IDS.filter((id) => id !== "primary");
+check(new Set(STORY.map((id) => seen[id].head)).size === STORY.length, "distinct heads");
+check(new Set(STORY.map((id) => seen[id].dek)).size === STORY.length, "distinct deks");
+check(!seen.primary.head && !seen.primary.dek, "Primary carries no head or dek (user call 2026-11-21)");
 check(/net (approval|favourability) of/.test(seen.leadership.head), "Leadership head quotes the net rating");
 check(/^The net mood of/.test(seen.direction.head), "Direction head quotes the net mood");
 check(/issues/.test(seen.issues.head), "Issues head counts the issues");
