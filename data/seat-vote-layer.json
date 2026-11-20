@@ -1,9 +1,9 @@
 {
  "_about": "W4 of .build/analysis/seat-model-plan.md — vote layer: national nowcast ΔV (gen-data §7e primaryNow vs certified 2025), per-state swing deviations (self-centred per house, DL-pooled, shrunk toward 0), and differential-swing β for age/gender (Resolve difference-in-differences vs its 2025-05-03 baseline wave, self-centred so Σ w_g β_g = 0). lnp = combined Coalition. Deviations/β are pp. NOT ESTIMABLE: education/income/location/housing/generation — no May-2025 baseline wave carries them (the polling-day Resolve wave carries age/gender/state only). Tas/NT/ACT are composition-only. Marginals, not joints; no interaction terms exist for layer 3. Structural uncertainty exceeds everything these SEs express — intervals are floor, not ceiling.",
  "_provenance": {
-  "generated": "2026-11-19",
+  "generated": "2026-11-20",
   "inputs": {
-   "data/polls.json": "fabfc487a09d33c7",
+   "data/polls.json": "67ae8397a64d7ed0",
    "data/demographics.json": "3757ec01f53aeb34",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0",
@@ -11,16 +11,16 @@
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
-   "captured": "primaryNow: alp 25.8 lnp 23.2 grn 13.8 onp 25.8 oth 11.2 | n=8"
+   "captured": "primaryNow: alp 25.9 lnp 23.3 grn 13.8 onp 25.9 oth 11 | n=8"
   }
  },
  "national": {
   "nowcast": {
-   "alp": 25.8,
-   "lnp": 23.2,
+   "alp": 25.9,
+   "lnp": 23.3,
    "grn": 13.8,
-   "on": 25.8,
-   "oth": 11.2
+   "on": 25.9,
+   "oth": 11
   },
   "nPolls": 8,
   "result2025": {
@@ -31,11 +31,11 @@
    "oth": 15.01
   },
   "delta": {
-   "alp": -8.76,
-   "lnp": -8.62,
-   "on": 19.4,
+   "alp": -8.66,
+   "lnp": -8.52,
+   "on": 19.5,
    "grn": 1.6,
-   "oth": -3.81
+   "oth": -4.01
   },
   "note": "Δ = nowcast − certified 2025, pp, 5-key (lnp combined Coalition). Uncertainty deliberately not printed at this layer: W5 takes the estimator's own within gen-data."
  },
