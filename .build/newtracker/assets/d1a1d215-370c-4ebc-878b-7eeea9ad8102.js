@@ -3130,7 +3130,25 @@ function cycleSourceRows(cycles, D) {
     // the figure the 2PP chart draws: primaries at the opening election's
     // flows, against the contest named (the sitting term follows its rival)
     "implied_tpp_alp", "implied_tpp_contest",
+    /* what each voting-intention row's shares are of (2026-11-20), at the end
+       so a reader parsing by position keeps every older column where it was:
+       the DLP's and Democrats' own lanes (1955–87 Morgan printed them apart,
+       so without them those rows read short of 100); the undecided share
+       left unprinted in the base, where the data declares one – with it the
+       row adds to 100; and a note wherever the shares are of all respondents
+       or don't add to 100, saying why. A blank note on a row that adds up
+       means the shares are of those who named a party. */
+    "primary_dlp", "primary_dem", "primary_undecided", "primary_note",
   ]];
+  const pastNote = (p, src) => {
+    if (p.firm === "Election") return null;
+    const declared = src.notes && src.notes[p.firm];
+    if (p.und != null) return declared || "Undecided respondents are in the base but not printed; primary_undecided is the rest of 100.";
+    if (p.sum != null) return declared || `The shares add to ${p.sum} in the source, which doesn't say why.`;
+    return null;
+  };
+  const curNote = (p) => p.sumNote
+    || (p.undIn === "oth" ? "primary_oth includes the undecided share, so these shares are of all respondents, not just those who named a party." : null);
   /* Preferred PM is its own series rather than two more columns on the
      leader-rating row: it is a different question, asked of the same wave,
      and one row per question is what lets a reader filter the file by
@@ -3152,6 +3170,7 @@ function cycleSourceRows(cycles, D) {
       year, "voting_intention", p.date, p.dateApprox ?? null, p.m, p.firm,
       p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null,
       null, null, p.imp_alp ?? null, p.imp_alp != null ? "ALP v L/NP" : null,
+      p.dlp ?? null, p.dem ?? null, p.und ?? null, pastNote(p, src),
     ]));
     src.approval.forEach((a) => {
       if (a.pmNet != null || a.oppNet != null) rows.push([
@@ -3177,7 +3196,8 @@ function cycleSourceRows(cycles, D) {
       const imp = onRival ? p.alpOnImp : p.alpImp;
       rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster,
         p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null,
-        null, null, imp ?? null, imp != null ? (onRival ? "ALP v ON" : "ALP v L/NP") : null]);
+        null, null, imp ?? null, imp != null ? (onRival ? "ALP v ON" : "ALP v L/NP") : null,
+        null, null, null, curNote(p)]);
       /* The MAIN contest only. A wave may also publish a two-way where the
          headline is three-way, and those are separate measures that would be
          nonsense stacked in one column - they stay in the payload for the

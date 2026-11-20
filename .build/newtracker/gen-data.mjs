@@ -2876,6 +2876,16 @@ const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
    these bases at once. */
 const TPP_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
   .filter(([, r]) => r && r.tppIncludesUndecided).map(([firm]) => firm));
+/* A house whose stored ind folds its undecided share in, so its printed
+   primaries are shares of all respondents, not of those who named a party:
+   Essential, every curated wave carrying Independent + Undecided as one
+   figure (assimilate-essential-vi.mjs). Declared as pollsterRules.<firm>
+   .indIncludesUndecided; a wave that prints the two apart says so in its
+   sumNote and is not marked. Read by the source-polls download only – the
+   estimator treats the folded share as part of the house's others, which
+   its lean on others absorbs (2026-11-20). */
+const IND_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
+  .filter(([, r]) => r && r.indIncludesUndecided).map(([firm]) => firm));
 /* the rolling collection page a pollster's dated release also lives at
    (Essential's Federal Political Insights hub, which carries the current
    tables alongside each numbered report). Declared once as a pollster rule
@@ -4071,6 +4081,12 @@ const individualPolls = POLLS.map((p) => {
     // alpOnImp is the same re-read under the ALP-v-ON frozen table (flows.mjs FP_ON)
     ...impFields(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
+    /* what the printed primaries are of, for the source-polls download:
+       undIn "oth" = the undecided share sits inside others (p.oth carries
+       ind + oth); sumNote = the wave's own documented reason its shares
+       don't add to 100 */
+    ...(IND_UNDECIDED.has(p.pollster) && !p.sumNote ? { undIn: "oth" } : {}),
+    ...(p.sumNote ? { sumNote: p.sumNote } : {}),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(JUR ? { who: whoAt(p.date) } : {}),
     // link back to the published release/report this row came from (the
@@ -8770,15 +8786,49 @@ const troveByTerm = (() => {
     return out;
   } catch { return null; }
 })();
+/* Each row says what its shares are of (2026-11-20). The download used to
+   carry five party columns, so a 1958–87 row whose DLP or Democrats rode
+   their own lane read as short of 100 – as if undecideds were mixed in –
+   when it was a decided-basis poll missing a column. Now each row carries:
+     dlp, dem   the era's own minor-party lanes, where printed;
+     und        the undecided share left unprinted in the base, on a row
+                short of 100 beyond rounding (under 98, validate.mjs §8c's
+                tolerance) in a firm×term cyclePollBases declares
+                {undecided: true} – Essential and Ipsos 2019–25 and three
+                single polls. A basis can cover a house's whole term but be
+                declared for one poll (Resolve's 97), so a row that adds to
+                98–102 is rounding, never 1–2% undecided. With und the row
+                adds to 100;
+     sum        the row's total, when it misses 100 by more than rounding
+                with no undecided basis – the source's own shortfall or
+                excess, never read as undecided.
+   A term's `notes` give the declared reason per house for its flagged rows;
+   the pre-1987 era notes are provenance for the implied 2PP, not reasons for
+   a total, so an era row's `sum` goes out bare. A row with only the majors
+   (no remainder to total) carries nothing, as validate.mjs §8c skips it. */
+const CYC_BASES = D.cyclePollBases || {};
+const CYC_LANES = ["alp", "lnp", "grn", "onp", "oth", "dem", "dlp"];
+const cycRowBase = (p, c) => {
+  if (p.firm === "Election" || p.alp == null || p.lnp == null) return {};
+  if (p.tppEra == null && p.oth == null && (p.grn == null || p.onp == null)) return {};
+  const sum = CYC_LANES.reduce((s, k) => s + (p[k] ?? 0), 0);
+  const b = CYC_BASES[c.src + "|" + p.firm];
+  if (Math.abs(sum - 100) <= 2) return {};            // rounding, as §8c reads it
+  return b && b.undecided && sum < 100 ? { und: r1(100 - sum) } : { sum: r1(sum) };
+};
 for (const c of CYC_META) {
   if (c.current) continue;
   const mo = (d) => Math.round(monthsSince(d, c.eDate) * 10) / 10;
-  cycleSource[c.year] = {
-    ...(troveByTerm && troveByTerm[c.year] ? { trove: troveByTerm[c.year] } : {}),
-    polls: (cyclePolls[c.src] || []).map((p) => ({
+  const notes = {};
+  const polls = (cyclePolls[c.src] || []).map((p) => {
+    const base = cycRowBase(p, c);
+    const b = CYC_BASES[c.src + "|" + p.firm];
+    if (b && p.tppEra == null && (base.und != null || base.sum != null)) notes[p.firm] = typeof b === "string" ? b : b.note;
+    return {
       date: p.date, ...(p.dateApprox ? { dateApprox: p.dateApprox } : {}), firm: p.firm, m: mo(p.date),
       alp: p.alp ?? null, lnp: p.lnp ?? null, grn: p.grn ?? null,
       onp: p.onp ?? null, oth: p.oth ?? null,
+      ...(p.dlp != null ? { dlp: p.dlp } : {}), ...(p.dem != null ? { dem: p.dem } : {}), ...base,
       tpp_alp: p.tpp_alp ?? null, tpp_lnp: p.tpp_lnp ?? null,
       // the figure the term's line is built from (cycleTppImp): each wave's
       // primaries at the opening election's flows; the house's own published
@@ -8788,7 +8838,12 @@ for (const c of CYC_META) {
         const alp = cycleTppImp(p, { ...c, gov: "alp" });
         return alp == null ? {} : { imp_alp: r1(alp) };        // Coalition side is 100 − this
       })(),
-    })),
+    };
+  });
+  cycleSource[c.year] = {
+    ...(troveByTerm && troveByTerm[c.year] ? { trove: troveByTerm[c.year] } : {}),
+    polls,
+    ...(Object.keys(notes).length ? { notes } : {}),
     approval: (cycleAppr[c.appr] || []).map((r) => ({
       date: r.date, firm: r.firm, m: mo(r.date),
       pmNet: r.pmNet ?? null, oppNet: r.oppNet ?? null,

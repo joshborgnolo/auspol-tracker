@@ -184,4 +184,43 @@ for (const c of A.cycles) {
     "the projection hands out sliced copies");
 }
 
-console.log(`PASS: invariants – ${A.cycles.length} cycles inside their caps, finite-figure sweep, feed vocabulary, changelog tags, np-project purity`);
+// ---- T9: every past poll row says what its shares are of ---------------------------------
+/* The source-polls download carried five party columns, so a 1958–87 row whose
+   DLP or Democrats rode their own lane read short of 100 – as if undecideds
+   were mixed in – and the validator skipped any row with no Greens or One
+   Nation figure, which hid three typos and 13 short Morgan rows (2026-11-20).
+   Pinned: in gen-data's cycle-source rows, a row with a remainder to total
+   adds to 100 within rounding once its dlp/dem/und lanes count, or carries
+   `sum`; an `und` row is beyond rounding and its term names the house's
+   declared reason; and the download's columns carry those lanes. */
+{
+  const src = JSON.parse(read(path.join(".build", "newtracker", "assets", "cycle-source.json")));
+  const LANES = ["alp", "lnp", "grn", "onp", "oth", "dlp", "dem"];
+  let rows = 0, und = 0, dem = 0, dlp = 0;
+  for (const [year, term] of Object.entries(src)) {
+    for (const p of term.polls) {
+      if (p.firm === "Election" || p.alp == null || p.lnp == null) continue;
+      if (p.oth == null && p.dlp == null && p.dem == null && (p.grn == null || p.onp == null)) continue;
+      rows++;
+      if (p.dem != null) dem++;
+      if (p.dlp != null) dlp++;
+      const sum = LANES.reduce((s, k) => s + (p[k] ?? 0), 0);
+      const where = `cycle-source ${year} ${p.date} ${p.firm}`;
+      if (p.und != null) {
+        und++;
+        assert.ok(p.und > 2 && Math.abs(sum + p.und - 100) < 0.05, `${where}: und ${p.und} completes a row short of 100 beyond rounding (Σ ${sum})`);
+        assert.ok(term.notes && term.notes[p.firm], `${where}: an undecided row's term names the house's declared basis`);
+      } else if (p.sum != null) {
+        assert.ok(Math.abs(p.sum - sum) < 0.05 && Math.abs(sum - 100) > 2, `${where}: sum ${p.sum} is the row's own total, off 100 beyond rounding`);
+      } else {
+        assert.ok(Math.abs(sum - 100) <= 2, `${where}: shares add to ${sum} with no und or sum to say why`);
+      }
+    }
+  }
+  assert.ok(rows > 3000 && und > 50 && dem > 50 && dlp > 50, `the past rows carry their lanes (${rows} rows, ${und} undecided, ${dem} Democrats, ${dlp} DLP)`);
+  const tabs = read(path.join(".build", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"));
+  assert.ok(tabs.includes('"primary_dlp", "primary_dem", "primary_undecided", "primary_note",'), "the source-polls header ends with the four base columns");
+  assert.ok(tabs.includes("p.dlp ?? null, p.dem ?? null, p.und ?? null, pastNote(p, src),"), "each past voting-intention row fills them");
+}
+
+console.log(`PASS: invariants – ${A.cycles.length} cycles inside their caps, finite-figure sweep, feed vocabulary, changelog tags, np-project purity, past rows' bases`);

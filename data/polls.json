@@ -26,7 +26,8 @@
   "pollsterRules": {
     "Essential": {
       "tppIncludesUndecided": true,
-      "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption.",
+      "indIncludesUndecided": true,
+      "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption. Its primaries are undecided-inclusive too: ind is Independent + Undecided, the combined figure every curated wave carries (assimilate-essential-vi.mjs), so the shares are of all respondents; a wave that prints them apart says so in its sumNote.",
       "site": "https://www.theguardian.com/australia-news/essential-poll",
       "releaseHub": "https://essentialreport.com.au/reports/federal-political-insights",
       "skippedSlots": [
@@ -32487,7 +32488,7 @@
         "alp": 26,
         "grn": 11,
         "onp": null,
-        "oth": 15,
+        "oth": 13,
         "tpp_lnp": 61,
         "tpp_alp": 39
       },
@@ -33211,9 +33212,9 @@
         "firm": "Morgan",
         "lnp": 41.5,
         "alp": 39.5,
-        "grn": 9.5,
+        "grn": 10,
         "onp": null,
-        "oth": 6.5,
+        "oth": 9,
         "tpp_lnp": 49,
         "tpp_alp": 51
       },
@@ -36845,7 +36846,7 @@
         "alp": 38,
         "grn": 12,
         "onp": null,
-        "oth": 5.5,
+        "oth": 13.5,
         "tpp_lnp": 45.5,
         "tpp_alp": 54.5
       },
@@ -62594,12 +62595,30 @@
     "1998|Morgan": "Morgan era table lists each minor party in its own column alongside an OTH column – extracted majors+OTH sums run past 100. Faithful to the printed table (mirrored verbatim in data/roymorgan).",
     "2001|Morgan": "Morgan era table lists each minor party in its own column alongside an OTH column – extracted majors+OTH sums run past 100. Faithful to the printed table (mirrored verbatim in data/roymorgan).",
     "2004|Morgan": "Morgan era table lists each minor party in its own column alongside an OTH column – extracted majors+OTH sums run past 100. Faithful to the printed table (mirrored verbatim in data/roymorgan).",
-    "2022|Essential": "Primaries exclude undecided with no rebase to 100 (sums 90–95).",
-    "2025|Essential": "Primaries exclude undecided with no rebase to 100 (sums 92–97).",
-    "2022|Ipsos": "Primaries exclude undecided with no rebase to 100 (sums 90–93).",
-    "2025|Ipsos": "Primaries exclude undecided with no rebase to 100 (this row sums 95).",
-    "2025|Dynata": "Primaries exclude undecided with no rebase to 100 (this row sums 92).",
-    "2025|Resolve Strategic": "Primaries exclude undecided with no rebase to 100 (this row sums 97).",
+    "2022|Essential": {
+      "undecided": true,
+      "note": "Undecided respondents stay in the base but are not printed, so the party shares add to 90–95; the rest of 100 is the undecided share."
+    },
+    "2025|Essential": {
+      "undecided": true,
+      "note": "Undecided respondents stay in the base but are not printed, so the party shares add to 92–97; the rest of 100 is the undecided share."
+    },
+    "2022|Ipsos": {
+      "undecided": true,
+      "note": "Undecided respondents stay in the base but are not printed, so the party shares add to 90–93; the rest of 100 is the undecided share."
+    },
+    "2025|Ipsos": {
+      "undecided": true,
+      "note": "Undecided respondents stay in the base but are not printed, so the party shares add to 95 (one poll); the rest of 100 is the undecided share."
+    },
+    "2025|Dynata": {
+      "undecided": true,
+      "note": "Undecided respondents stay in the base but are not printed, so the party shares add to 92 (one poll); the rest of 100 is the undecided share."
+    },
+    "2025|Resolve Strategic": {
+      "undecided": true,
+      "note": "Undecided respondents stay in the base but are not printed, so the party shares add to 97 (one poll); the rest of 100 is the undecided share."
+    },
     "2025|Roy Morgan": "Modern Roy Morgan multi-mode weekly shares are published unrounded and not forced to 100; occasional weeks run past 102 (one week reaches Σ 105). Verbatim from the aeforecasts federal CSV mirror.",
     "1974|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1972 election's calibrated constants (FLOW_ERAS[1972] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.04…−0.35 vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections).  Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
     "1975|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1974 election's calibrated constants (FLOW_ERAS[1974] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.04…−0.35 vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections).  Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
@@ -62618,6 +62637,9 @@
     "1954|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1951 election's calibrated constants (FLOW_ERAS[1951] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +1.31 vs official, larger than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\". The weekend-before wave of 1954-05-23 is contested seats only (114 of them; 5 uncommitted, so its primaries sum 95, not ~100), from the Trove corpus (Trove article 230779504); a real publication week, so no dateApprox.",
     "1955|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1954 election's calibrated constants (FLOW_ERAS[1954] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest −0.48 vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
     "1958|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1955 election's calibrated constants (FLOW_ERAS[1955] in flows.mjs, anchored to that election's official 2PP, except the new Anti-Communist Labor/DLP flow, which carries the pooled DLP-era 0.27 – solved against 1955 alone it is 0.002, which puts the 1957–58 waves 2–3 points too low for Labor – the Kevin Bonham Wonk Central method; right-edge backtest 0.00 vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used. Most waves are dated to the 15th of their month by the mirror; those rows carry dateApprox \"month\".",
-    "1961|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1958 election's calibrated constants (FLOW_ERAS[1958] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.33 vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used."
+    "1961|Morgan": "F2F Morgan Gallup waves from the aeforecasts mirror (no live-poll metadata upstream). Morgan published no national 2PP this far back, so tpp is IMPLIED last-election-flows: primaries read through the 1958 election's calibrated constants (FLOW_ERAS[1958] in flows.mjs, anchored to that election's official 2PP – the Kevin Bonham Wonk Central method; right-edge backtest +0.33 vs official, smaller than the 0.6-point average miss Bonham reports for last-election flows at the 1955–80 elections). Democrats/DLP primaries are itemised in dem/dlp row fields (the era's changeable minor-party print conventions make folding them into oth unreliable); the tppEra row tag names the era set used.",
+    "1996|Morgan": "Morgan's face-to-face waves from May 1993 to mid-1994 (aeforecasts mirror) print no Greens column and fold the Democrats into others, so 13 of them add to only 91–97. The rest of 100 is not in the source: the mirror doesn't say whether it is the Greens and independents or undecideds left in the base.",
+    "1990|Quadrant": "Quadrant's 5 November 1988 poll, as the aeforecasts mirror holds it: Labor 38, Coalition 36, Democrats 5 and nothing else, so its shares add to 79. The source doesn't say what the other 21 points are; undecideds left in the base is the likeliest reading, but it is unconfirmed.",
+    "2019|YouGov-Galaxy Exit": "The 2019 election-day exit poll as filed: Labor 38, Coalition 39, Greens 10 and others 10, adding to 97, with no One Nation figure."
   }
 }

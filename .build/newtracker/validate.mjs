@@ -694,21 +694,42 @@ export function validate(D) {
          minor party into its own column AND carries an OTH column, so the
          extracted majors+OTH Σ runs 102.5–106.5. Faithful to
          data/roymorgan/roymorgan-primary-*.csv verbatim cells.
-       – 2022/2025 Essential, 2022/2025 Ipsos, 2025 Dynata: primaries exclude
-         undecided without a rebase, Σ runs 90–97.
-     An undeclared firm×era off 100±2 is a transcription bug, so it fails. */
+       – 2022/2025 Essential, 2022/2025 Ipsos, 2025 Dynata, 2025 Resolve:
+         undecided respondents stay in the base but are not printed, Σ runs
+         90–97. These are the structured bases, {undecided: true, note}: the
+         rest of 100 IS the undecided share, so gen-data exports it (`und`)
+         on each row short of 100 beyond this check's rounding, and the
+         source-polls download carries it.
+       – 1996 Morgan (May 1993 – mid-1994), 1990 Quadrant (one 1988 poll),
+         2019 YouGov-Galaxy exit poll: shortfalls that are in the source,
+         cause unstated – never read as undecided.
+     A basis is a note string, or {undecided: true, note} for the bases above.
+     An undeclared firm×era off 100±2 is a transcription bug, so it fails.
+     The check reaches every row with both majors and a remainder to total:
+     a row with no Greens or One Nation figure is still totalled when it
+     carries others (absent lanes count zero, as the import scripts read a
+     blank cell). It used to skip any row missing either, and 16 rows that
+     didn't add up went unseen until 2026-11-20 – three of them typos (2011
+     Nielsen, 2012 and 2014 Morgan, fixed from the houses' own tables). */
   const bases = D.cyclePollBases || {};
+  const basisNote = (b) => (typeof b === "string" ? b : b && b.note);
+  for (const [k, b] of Object.entries(bases))
+    if (typeof b !== "string" && !(b && typeof b.note === "string" && b.undecided === true))
+      errors.push({ type: "cycle-basis", poll: `cyclePollBases.${k}`, detail: "a basis is a note string or {undecided: true, note}" });
   for (const [cycle, rows] of Object.entries(D.cyclePolls || {})) {
     rows.forEach((r, i) => {
       // era rows: Σ over the lanes the era actually published
       const lanes = r.tppEra != null ? ["alp", "lnp", "dem", "dlp", "oth"] : ALL;
-      const core = r.tppEra != null ? ["alp", "lnp"] : CORE;
-      if (!core.every((k) => r[k] != null)) return;
+      if (r.alp == null || r.lnp == null) return;
+      if (r.tppEra == null && r.oth == null && !CORE.every((k) => r[k] != null)) return;
       const sum = lanes.reduce((s, k) => s + n0(r[k]), 0);
       if (Math.abs(sum - 100) <= 2) return;
       const basis = bases[cycle + "|" + r.firm];
       const where = `cyclePolls.${cycle} #${i} ${r.date} · ${r.firm}`;
-      if (basis) exempted.push({ type: "primary-sum", poll: where, detail: `Σ shares = ${sum.toFixed(1)} (basis: ${basis})` });
+      // an undecided remainder can only fall short of 100
+      if (basis && basis.undecided && sum > 100)
+        errors.push({ type: "primary-sum", poll: where, detail: `Σ shares = ${sum.toFixed(1)}: over 100 in an undecided-in-base basis` });
+      else if (basis) exempted.push({ type: "primary-sum", poll: where, detail: `Σ shares = ${sum.toFixed(1)} (basis: ${basisNote(basis)})` });
       else errors.push({ type: "primary-sum", poll: where, detail: `Σ shares = ${sum.toFixed(1)} (expected ~100; no declared basis for ${cycle} ${r.firm})` });
     });
   }

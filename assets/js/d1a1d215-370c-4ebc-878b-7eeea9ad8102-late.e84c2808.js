@@ -1701,7 +1701,15 @@ function apprMetricLabel(a) {
   return parts.map(([who, m]) => who + ": " + name(m)).join("; ");
 }
 function cycleSourceRows(cycles, D) {
-  const rows = [["cycle", "series", "date", "date_approx", "months_since_election", "pollster", "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth", "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "hanson_net", "leader_metric", "pm_preferred", "opp_leader_preferred", "implied_tpp_alp", "implied_tpp_contest"]];
+  const rows = [["cycle", "series", "date", "date_approx", "months_since_election", "pollster", "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth", "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "hanson_net", "leader_metric", "pm_preferred", "opp_leader_preferred", "implied_tpp_alp", "implied_tpp_contest", "primary_dlp", "primary_dem", "primary_undecided", "primary_note"]];
+  const pastNote = (p, src) => {
+    if (p.firm === "Election") return null;
+    const declared = src.notes && src.notes[p.firm];
+    if (p.und != null) return declared || "Undecided respondents are in the base but not printed; primary_undecided is the rest of 100.";
+    if (p.sum != null) return declared || `The shares add to ${p.sum} in the source, which doesn't say why.`;
+    return null;
+  };
+  const curNote = p => p.sumNote || (p.undIn === "oth" ? "primary_oth includes the undecided share, so these shares are of all respondents, not just those who named a party." : null);
   const ppmOpp = s => {
     const k = Object.keys(s).find(x => x !== "alb" && x !== "hanson" && x !== "unc");
     return k ? s[k] : null;
@@ -1711,7 +1719,7 @@ function cycleSourceRows(cycles, D) {
   Object.entries(D.cycleSource || {}).forEach(([year, src]) => {
     const c = byYear.get(Number(year));
     if (!c) return;
-    src.polls.forEach(p => rows.push([year, "voting_intention", p.date, p.dateApprox ?? null, p.m, p.firm, p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null, null, null, p.imp_alp ?? null, p.imp_alp != null ? "ALP v L/NP" : null]));
+    src.polls.forEach(p => rows.push([year, "voting_intention", p.date, p.dateApprox ?? null, p.m, p.firm, p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null, null, null, p.imp_alp ?? null, p.imp_alp != null ? "ALP v L/NP" : null, p.dlp ?? null, p.dem ?? null, p.und ?? null, pastNote(p, src)]));
     src.approval.forEach(a => {
       if (a.pmNet != null || a.oppNet != null) rows.push([year, "leader_rating", a.date, null, a.m, a.firm, null, null, null, null, null, null, null, a.pmNet, a.oppNet, null, a.metric === "fav" ? "net favourability" : "net approval", null, null]);
       if (a.pmPpm != null || a.oppPpm != null) rows.push([year, "preferred_pm", a.date, null, a.m, a.firm, null, null, null, null, null, null, null, null, null, null, null, a.pmPpm ?? null, a.oppPpm ?? null]);
@@ -1724,7 +1732,7 @@ function cycleSourceRows(cycles, D) {
     D.individualPolls.forEach(p => {
       const onRival = rivalOfMonth(D, p.ym) === "alp_on";
       const imp = onRival ? p.alpOnImp : p.alpImp;
-      rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster, p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null, null, null, imp ?? null, imp != null ? onRival ? "ALP v ON" : "ALP v L/NP" : null]);
+      rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster, p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null, null, null, imp ?? null, imp != null ? onRival ? "ALP v ON" : "ALP v L/NP" : null, null, null, null, curNote(p)]);
       const mp = mainPpm(p);
       if (mp) rows.push([cur.year, "preferred_pm", p.released, null, mo(p.released), p.pollster, null, null, null, null, null, null, null, null, null, null, null, mp.alb ?? null, ppmOpp(mp)]);
       const a = p.appr;
