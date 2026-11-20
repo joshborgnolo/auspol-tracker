@@ -357,15 +357,24 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     assert.ok(bo.w.every((w) => entries.some((e) => e.house === bo.h && e.waveDate === w)), `${rk}: every anchor is a real store wave`);
   }
 }
-// ---- automatic placement: exercise the actual client grouping rules -------------------
+// ---- automatic placement and search: exercise the actual client helpers ------------------
 {
   const Babel = createRequire(import.meta.url)("./newtracker/vendor/babel-standalone.js");
   const source = fs.readFileSync(path.join(ROOT, ".build/newtracker/assets/rd-public-opinion.jsx"), "utf8");
   const ctx = vm.createContext({ window: {}, React: { memo: (f) => f, createElement: () => null } });
-  vm.runInContext(Babel.transform(source, { presets: ["react"] }).code, ctx);
+  vm.runInContext(Babel.transform(source + "\n;window.__pubopSearchTest = { pubopBlockW, pubopMoreW };", { presets: ["react"] }).code, ctx);
   const { pubopDated: dated, pubopSplitKinds: split, pubopByMonth: months, pubopByPollster: pollsters } = ctx;
+  const { pubopBlockW: blockW, pubopMoreW: moreW } = ctx.window.__pubopSearchTest;
   const entries = readStores(ROOT);
   const out = buildPublicOpinion(entries, { deff: 1.6 });
+  const housing = out.topics.find((t) => t.id === "housing-budget");
+  const blockHay = blockW(housing.blocks.find((b) => b.id === "budget-verdicts"), out.houses);
+  const moreHay = moreW(housing.more.find((q) => q.house === "wolfsmith"), out.houses);
+  for (const hay of [blockHay, moreHay]) {
+    assert.ok(hay.includes("wolf+smith"), "search includes the pollster's short name in featured cards and the catalogue");
+    assert.ok(hay.includes("amplify"), "search includes the pollster's full source name");
+    assert.ok(hay.includes("wolfsmith"), "search includes the store key as a resilient name alias");
+  }
   const all = dated(out.topics);
   const midterms = (e) => e.q?.id === "us-midterms" && e.q.house === "essential";
   const newestFirst = (es) => es.every((e, i) => !i || es[i - 1].date >= e.date);
@@ -404,4 +413,4 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   assert.ok(split(dated([tech])).items.some((e) => e.q?.id === pinned.id && e.date === future.waveDate), "new wave is automatically visible");
   assert.equal(tech.blocks.find((b) => b.id === pinned.id).src.wave, pinned.waveDate, "historical card retains its intended comparison");
 }
-console.log("PASS: public opinion – figures, findings, payload, automatic placement in all views, complete release dates, later waves of pinned questions");
+console.log("PASS: public opinion – figures, findings, payload, automatic placement in all views, pollster search, complete release dates, later waves of pinned questions");

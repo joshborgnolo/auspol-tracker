@@ -954,10 +954,15 @@ function PubOpSort({ sort, onSort }) {
    white-space token of the query must appear in a piece's haystack, and a
    typed hyphen matches an en dash. A piece's haystack is its own words -
    its question as asked, its answers' labels, its tables' headings - plus
-   the name of the topic it belongs to; never pollsters, dates, samples or
-   figures. A non-empty query swaps the findings, the order row and the
-   topics for the pieces that match; empty is the page as it was. */
+   its pollsters' names and the name of the topic it belongs to; never dates,
+   samples or figures. A non-empty query swaps the findings, the order row
+   and the topics for the pieces that match; empty is the page as it was. */
 const pubopPushW = (parts, s) => { if (s) parts.push(String(s)); };
+const pubopHouseW = (parts, houses, ids) => (ids || []).forEach((id) => {
+  pubopPushW(parts, id);
+  const h = houses && houses[id];
+  if (h) [h.short, h.full].forEach((s) => pubopPushW(parts, s));
+});
 const pubopSegsW = (segs, parts) => (segs || []).forEach((s) => pubopPushW(parts, s.label));
 const pubopRowsW = (rows, parts) => (rows || []).forEach((r) => {
   pubopPushW(parts, r.label);
@@ -980,8 +985,9 @@ const pubopFigsW = (figs, parts) => (figs || []).forEach((f) => {
 });
 /* a featured chart or question: cols are the ledger's answer-column heads
    ("Support", "Unsure", "Oppose"), not dates */
-const pubopBlockW = (b) => {
+const pubopBlockW = (b, houses) => {
   const parts = [];
+  pubopHouseW(parts, houses, pubopHousesOf(b));
   [b.title, b.summary, b.note, b.question, b.xLabel, b.base].forEach((s) => pubopPushW(parts, s));
   (b.names || []).forEach((s) => pubopPushW(parts, s));
   (b.legend || []).forEach((l) => pubopPushW(parts, l.label));
@@ -997,8 +1003,9 @@ const pubopBlockW = (b) => {
   return parts.join(" ").toLowerCase();
 };
 /* a long-tail question */
-const pubopMoreW = (m) => {
+const pubopMoreW = (m, houses) => {
   const parts = [String(m.title || "")];
+  pubopHouseW(parts, houses, [m.house]);
   (m.srcs || []).forEach((s) => pubopPushW(parts, s.question));
   pubopFigsW(m.figs, parts);
   (m.prose || []).forEach((p) => parts.push(pubopText((p.text || []).join(" "))));
@@ -1013,7 +1020,7 @@ function PubOpSearch({ q, onQ }) {
     <label className="pubop-search">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
       <input type="search" value={q} onChange={(e) => onQ(e.target.value)} autoCorrect="off" spellCheck={false}
-             placeholder="Search a question or its answers" aria-label="Search the questions" />
+             placeholder="Search a question, answer or pollster" aria-label="Search the questions" />
       {q ? <button type="button" className="pubop-x" onClick={() => onQ("")} aria-label="Clear search">×</button> : null}
     </label>
   );
@@ -1068,7 +1075,7 @@ function PubOpResults({ q, hits, houses }) {
     return () => { cancelAnimationFrame(raf); clearTimeout(t); };
   }, [q, filled, hits.length]);
   if (!total) {
-    return <p className="pubop-none">Nothing matches “{q}” — try the words of a question as asked, or of its answers.</p>;
+    return <p className="pubop-none">Nothing matches “{q}” — try a question, an answer or a pollster.</p>;
   }
   return (
     <div className="pubop-res">
@@ -1185,9 +1192,10 @@ function PublicOpinionBody() {
   const ql = dq.trim().toLowerCase();
   const inv = pubopUseMemo(() => topics.map((t) => {
     const tw = ((t.title || "") + " " + (t.short || "") + " " + (t.about || "")).toLowerCase() + " ";
+    const houses = (src && src.houses) || {};
     return { t,
-      blocks: t.blocks.map((b) => ({ b, hay: pubopHayMirror(tw + pubopBlockW(b)) })),
-      more: t.more.map((m) => ({ m, hay: pubopHayMirror(tw + pubopMoreW(m)) })) };
+      blocks: t.blocks.map((b) => ({ b, hay: pubopHayMirror(tw + pubopBlockW(b, houses)) })),
+      more: t.more.map((m) => ({ m, hay: pubopHayMirror(tw + pubopMoreW(m, houses)) })) };
   }), [topics]);
   const hits = pubopUseMemo(() => {
     if (!ql) return null;
