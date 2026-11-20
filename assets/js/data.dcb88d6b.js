@@ -6176,6 +6176,29 @@ window.AUSPOL = function () {
     changelog,
     aggSpec,
     pvHouses,
+    undecidedCellOf: p => {
+      const base = pollBaseOf(p.pollster, "primary");
+      if (base === "F") return {
+        v: 0,
+        included: null,
+        label: "not allowed"
+      };
+      const v = typeof p.undIn === "number" ? p.undIn : p.undecidedLeaner != null ? p.undecidedLeaner : p.undecidedBasis === "soft" ? null : p.undecided;
+      if (v == null) {
+        if (p.pollster === "DemosAU (MRP)" && base === "D+L") return {
+          v: null,
+          included: false,
+          label: "excluded"
+        };
+        return null;
+      }
+      const included = base === "A" || typeof p.undIn === "number";
+      return {
+        v,
+        included,
+        label: included ? "included" : "excluded"
+      };
+    },
     get cycleSource() {
       return _cycleSource || {};
     },

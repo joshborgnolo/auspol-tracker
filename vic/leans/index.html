@@ -34,7 +34,7 @@
   <link rel="preload" href="/assets/fonts/ss3mark-wordmark.78676a6f.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../../assets/js/data-vic.1d5e6898.js" as="script">
+  <link rel="preload" href="../../assets/js/data-vic.10b5cf8f.js" as="script">
   <link rel="preload" href="../../assets/js/data-vic-late.a8b8ab3d.js" as="script">
   <link rel="preload" href="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js" as="script">
   <link rel="preload" href="../../assets/js/np-project.64658a20.js" as="script">
@@ -53,7 +53,7 @@
   <link rel="preload" href="../../assets/js/rd-panels.298170c4.js" as="script">
   <link rel="preload" href="../../assets/js/rd-polls.b4758591.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.ecc621d4.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-allpolls.842c1314.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-allpolls.9d8e39d7.js" as="script">
   <link rel="preload" href="../../assets/js/rd-public-opinion.94882b87.js" as="script">
   <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3c79a15.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – Pollster leans","url":"https://auspoltracker.com/vic/leans/","description":"How each Victorian pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
@@ -5764,6 +5764,7 @@ body.rd .rd-ap-pinf {
 }
 body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 294px minmax(0, 326px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(124px, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(56px, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
@@ -5879,7 +5880,11 @@ body.rd .rd-ap-ring {
   border-radius: 50%; border: 1.75px solid;
 }
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
+body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-pnums > .rd-ap-und { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+body.rd .rd-ap-pnums > .rd-ap-und > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-undhead { text-transform: none; }
 body.rd .rd-ap-pnums .rd-ap-halfwrap, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-halfwrap { position: relative; display: inline-block; }
 body.rd .rd-ap-pnums .rd-ap-frac:not(.rd-ap-half),
 body.rd .rd-ap-card .rd-ap-cprim .rd-ap-frac:not(.rd-ap-half) { font-size: 11px; }
@@ -6010,6 +6015,7 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 170px 110px 70px 16px 294px minmax(0, 326px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(124px, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(48px, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
@@ -6021,6 +6027,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
 @media (max-width: 1000px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 48px 0 28px; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
+  body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 150px 104px 0 12px 260px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 124px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
   body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 464px) minmax(76px, 1fr) 28px; }
@@ -6035,6 +6042,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
   body.rd .rd-ap-pnums { grid-template-columns: repeat(5, 40px); }
+  body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 40px) 60px; }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
@@ -6821,7 +6829,7 @@ body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3)
   <script>window.AP_ONEOFF_SRC=null;</script>
   <script src="../../assets/js/react.d949f1c3.js"></script>
   <script src="../../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../../assets/js/data-vic.1d5e6898.js"></script>
+  <script src="../../assets/js/data-vic.10b5cf8f.js"></script>
   <script src="../../assets/js/data-vic-late.a8b8ab3d.js"></script>
   <script src="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js"></script>
   <script src="../../assets/js/np-project.64658a20.js"></script>
@@ -6840,7 +6848,7 @@ body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3)
   <script src="../../assets/js/rd-panels.298170c4.js"></script>
   <script src="../../assets/js/rd-polls.b4758591.js"></script>
   <script src="../../assets/js/rd-cycles.ecc621d4.js"></script>
-  <script src="../../assets/js/rd-allpolls.842c1314.js"></script>
+  <script src="../../assets/js/rd-allpolls.9d8e39d7.js"></script>
   <script src="../../assets/js/rd-public-opinion.94882b87.js"></script>
   <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3c79a15.js"></script>
 

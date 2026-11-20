@@ -67,6 +67,7 @@ const ctx = { window: {} };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, ".build/vic/out/9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8"), ctx);
 const D = ctx.window.AUSPOL;
+assert.equal(typeof D.undecidedCellOf, "function", "the shared All-polls UND helper ships on every jurisdiction");
 assert.equal(D.jur.id, "vic");
 assert.equal(D.jur.brand, "vicpol", "the user's wordmark: vicpol tracker");
 assert.equal(D.latest.nextElectionISO, "2026-11-28");
