@@ -94,10 +94,18 @@ export function validate(D) {
     // 0ca. after-leaner undecided shares live beside firmness, never inside
     //      the first-preference undecided aggregate
     if (p.undecidedLeaner != null) {
-      if (!["DemosAU", "Newspoll", "RedBridge/Accent"].includes(p.pollster))
+      if (!["DemosAU", "Newspoll", "RedBridge/Accent", "EMRS (Tas)"].includes(p.pollster))
         fail("undleaner-pollster", `undecidedLeaner on ${p.pollster}`);
       if (!(p.undecidedLeaner >= 0 && p.undecidedLeaner <= 50))
         fail("undleaner-range", `undecidedLeaner = ${p.undecidedLeaner}`);
+    }
+    if (p.sampleTotal != null) {
+      if (p.pollster !== "EMRS (Tas)") fail("sample-total-pollster", `sampleTotal on ${p.pollster}`);
+      if (!Number.isInteger(p.sampleTotal) || p.sampleTotal < p.sample)
+        fail("sample-total", `sampleTotal ${p.sampleTotal} below preference base ${p.sample}`);
+      const derived = Math.round(1000 * (p.sampleTotal - p.sample) / p.sampleTotal) / 10;
+      if (p.undecidedLeaner != null && p.undecidedLeaner !== derived)
+        fail("emrs-undecided", `EMRS ${p.date}: ${p.undecidedLeaner} ≠ (${p.sampleTotal}−${p.sample})/${p.sampleTotal} × 100 = ${derived}`);
     }
 
     // 1. full primary sets total ~100 (majors-only polls are partial by design)

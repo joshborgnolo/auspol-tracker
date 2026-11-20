@@ -13,6 +13,8 @@ assert.deepEqual(D.undecidedCellOf({ pollster: "Newspoll", undecidedLeaner: 5 })
   { v: 5, included: false, label: "excluded" }, "an after-leaner share is excluded from the printed party base");
 assert.deepEqual(D.undecidedCellOf({ pollster: "Roy Morgan", undecided: 6.5, undecidedBasis: "first" }),
   { v: 6.5, included: false, label: "excluded" }, "a can't-say share is excluded from the printed party base");
+assert.deepEqual(D.undecidedCellOf({ pollster: "EMRS (Tas)", undecidedLeaner: 3.2 }),
+  { v: 3.2, included: false, label: "excluded" }, "EMRS's after-leaner share is excluded from its federal primaries");
 assert.deepEqual(D.undecidedCellOf({ pollster: "Resolve", undecided: 24, undecidedBasis: "soft" }),
   { v: 0, included: null, label: "not allowed" }, "a forced-choice survey displays zero with no soft share treated as undecided");
 assert.equal(D.undecidedCellOf({ pollster: "Roy Morgan", undecided: null }), null,

@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleYmOf, listFederalReports, fieldworkOf, federalPageOf, primariesOf, tppOf, parseWave,
+import { titleYmOf, listFederalReports, fieldworkOf, federalPageOf, totalSampleOf, primariesOf, tppOf, parseWave,
          guardNewWave, canonWaveFor, publishedOf, delistedCachedYms }
   from "./extract-emrs.mjs";
 
@@ -44,21 +44,26 @@ assert.deepEqual(waves.map((w) => w.sidecar.lastModified), [
 // ---- parseWave against the cache reproduces the canon figures exactly ---------
 // (the hand-entered polls.json rows parseWave verifies every run against)
 const CANON = {
-  "2026-02": { date: "2026-02-19", dateStart: "2026-02-16", sample: 953,
+  "2026-02": { date: "2026-02-19", dateStart: "2026-02-16", sample: 953, sampleTotal: 1000, undecidedLeaner: 4.7,
                alp: 30, lnp: 19, grn: 13, onp: 24, ind: 12, oth: 1, tpp_alp: 60, tpp_lnp: 40 },
-  "2026-08": { date: "2026-08-18", dateStart: "2026-08-17", sample: 968,
+  "2026-08": { date: "2026-08-18", dateStart: "2026-08-17", sample: 968, sampleTotal: 1000, undecidedLeaner: 3.2,
                alp: 29, lnp: 17, grn: 15, onp: 26, ind: 13, oth: 1, tpp_alp: 57, tpp_lnp: 43 },
 };
 for (const w of waves) {
+  assert.equal(totalSampleOf(w.text), 1000, `${w.ym}: whole-survey methodology n`);
   const p = parseWave(w.text, w.ym);
   assert.deepEqual(p.problems, [], `${w.ym}: clean parse`);
   for (const k of Object.keys(CANON[w.ym]))
     assert.equal(p[k], CANON[w.ym][k], `${w.ym}: ${k}`);
+  assert.equal(p.undecidedLeaner, Math.round(1000 * (p.sampleTotal - p.sample) / p.sampleTotal) / 10,
+    `${w.ym}: (total−preference base)/total, one decimal`);
   const s = [p.alp, p.lnp, p.grn, p.onp, p.ind, p.oth].reduce((a, b) => a + b, 0);
   assert.ok(Math.abs(s - 100) <= 1, `${w.ym}: primaries ${s} within a point of 100 (canon prints 99 and 101)`);
   // the cache's sidecar records the same figures the guard verifies
   assert.equal(w.sidecar.date, p.date, `${w.ym}: sidecar date`);
   assert.equal(w.sidecar.sample, p.sample, `${w.ym}: sidecar sample`);
+  assert.equal(w.sidecar.sampleTotal, p.sampleTotal, `${w.ym}: sidecar overall sample`);
+  assert.equal(w.sidecar.undecidedLeaner, p.undecidedLeaner, `${w.ym}: derived after-leaner share`);
   assert.deepEqual([w.sidecar.primaries.alp, w.sidecar.primaries.lnp, w.sidecar.primaries.grn,
                     w.sidecar.primaries.onp, w.sidecar.primaries.ind, w.sidecar.primaries.oth],
                    [p.alp, p.lnp, p.grn, p.onp, p.ind, p.oth], `${w.ym}: sidecar primaries`);
@@ -309,6 +314,7 @@ const aug2pp = [
 {
   const report = [
     "\fEMRS State and Federal Voting Intentions Report",
+    "In total, a sample of n=1,000 completed the survey.",
     "The current survey was conducted from the 17th to the 18th of August 2025.",
     "•   The most recent Omnibus survey was conducted from 17-18 August 2026 utilising EMRS' in-house call centre and online, ensuring",
     "\f" + fpage("All respondents in Bass (n=182)") + "\nThe Labor Party                                            34%",
@@ -318,7 +324,7 @@ const aug2pp = [
   ].join("\n");
   const w = parseWave(report, "2026-08");
   assert.deepEqual(w.problems, [], "a healthy synthetic report parses clean");
-  assert.deepEqual([w.date, w.dateStart, w.sample], ["2026-08-18", "2026-08-17", 968]);
+  assert.deepEqual([w.date, w.dateStart, w.sample, w.sampleTotal, w.undecidedLeaner], ["2026-08-18", "2026-08-17", 968, 1000, 3.2]);
   assert.deepEqual([w.alp, w.lnp, w.grn, w.onp, w.ind, w.oth], [29, 17, 15, 26, 12, 1],
     "primaries read from the whole-state page only, the Bass page's 34% beside the point");
   assert.deepEqual([w.tpp_alp, w.tpp_lnp], [57, 43]);
@@ -327,9 +333,12 @@ const aug2pp = [
 
 // ---- guardNewWave ---------------------------------------------------------------
 {
-  const good = { date: "2026-08-18", dateStart: "2026-08-17", sample: 968,
+  const good = { date: "2026-08-18", dateStart: "2026-08-17", sample: 968, sampleTotal: 1000, undecidedLeaner: 3.2,
                  alp: 29, lnp: 17, grn: 15, onp: 26, ind: 13, oth: 1, tpp_alp: 57, tpp_lnp: 43 };
   assert.deepEqual(guardNewWave(good), [], "the canon wave passes its own guard");
+  assert.ok(guardNewWave({ ...good, sampleTotal: null })[0].includes("sampleTotal"), "a missing overall n trips");
+  assert.ok(guardNewWave({ ...good, sampleTotal: 900 })[0].includes("exceeds overall"), "a preference base larger than the whole sample trips");
+  assert.ok(guardNewWave({ ...good, undecidedLeaner: 4.8 })[0].includes("disagrees"), "the derived undecided share is not a free field");
   assert.deepEqual(guardNewWave({ ...good, oth: 0 }), [],
     "a 0% minor-party figure is real data, not a guard trip (the ±2 sum check governs)");
   assert.ok(guardNewWave({ ...good, oth: -1 })[0].includes("out of range"), "a negative figure trips");
@@ -390,11 +399,12 @@ assert.deepEqual(delistedCachedYms([], ".build/no-such-dir"), [],
     const row = rows.find((r) => r.date === w.sidecar.date);
     assert.ok(row, `${w.ym}: row dates match exactly`);
     assert.deepEqual(
-      [row.dateStart, row.sample, row.alp, row.lnp, row.grn, row.onp, row.ind, row.oth, row.tpp_alp, row.tpp_lnp],
-      [w.sidecar.dateStart, w.sidecar.sample, w.sidecar.primaries.alp, w.sidecar.primaries.lnp,
+      [row.dateStart, row.sample, row.sampleTotal, row.undecidedLeaner, row.alp, row.lnp, row.grn, row.onp, row.ind, row.oth, row.tpp_alp, row.tpp_lnp],
+      [w.sidecar.dateStart, w.sidecar.sample, w.sidecar.sampleTotal, w.sidecar.undecidedLeaner, w.sidecar.primaries.alp, w.sidecar.primaries.lnp,
        w.sidecar.primaries.grn, w.sidecar.primaries.onp, w.sidecar.primaries.ind, w.sidecar.primaries.oth,
        w.sidecar.tpp.alp, w.sidecar.tpp.lnp],
       `${w.ym}: the canon row is the sidecar's parse`);
+    assert.equal(row.sample,  w.sidecar.sample, `${w.ym}: sample remains the preference base, not replaced by n=1,000`);
     assert.equal(row.url, w.sidecar.url, `${w.ym}: the row links the report PDF`);
   }
   assert.equal(rows.find((r) => r.date === "2026-02-19").published, "2026-02-20",

@@ -21,5 +21,7 @@
     "lnp": 40
   },
   "published": "2026-02-20",
-  "publishedSource": "document-date"
+  "publishedSource": "document-date",
+  "sampleTotal": 1000,
+  "undecidedLeaner": 4.7
 }

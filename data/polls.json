@@ -3179,7 +3179,9 @@
       "oth": 1,
       "tpp_alp": 60,
       "tpp_lnp": 40,
-      "url": "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf"
+      "url": "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf",
+      "sampleTotal": 1000,
+      "undecidedLeaner": 4.7
     },
     {
       "date": "2026-02-20",
@@ -5555,7 +5557,9 @@
       "oth": 1,
       "tpp_alp": 57,
       "tpp_lnp": 43,
-      "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20State%20and%20Federal%20Voting%20Intentions%20Report%20-%20August%202026%20-%20FINAL.pdf"
+      "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20State%20and%20Federal%20Voting%20Intentions%20Report%20-%20August%202026%20-%20FINAL.pdf",
+      "sampleTotal": 1000,
+      "undecidedLeaner": 3.2
     },
     {
       "date": "2026-08-20",

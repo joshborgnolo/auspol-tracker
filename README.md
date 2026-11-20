@@ -36,6 +36,11 @@ new and worth looking at.
   Its combined "Independents/Other" goes in `ind` with `oth: null`.
 - **Newspoll** and **Resolve** often publish no headline 2PP – leave `tpp_*` null
   rather than deriving one.
+- **EMRS (Tas)** files `sample` as its federal vote-preference base (968 in August
+  2026), distinct from the methodology's overall `sampleTotal` (1,000). The
+  extractor derives `undecidedLeaner` from those printed counts and the
+  rejected remainder is excluded from the reported primaries; it never borrows
+  the 2PP section's different unsure share for that field.
 - **RedBridge/Accent** rows cite the AFR write-up in `url`; the wave's own
   release page on accent-research.com goes beside it in `releaseUrl` (the
   extractor fills it for new waves, and the expanded poll shows it as

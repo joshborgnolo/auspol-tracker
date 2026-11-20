@@ -34,8 +34,10 @@ assert.ok(leaner, "the independent after-leaner series exists");
 assert.equal(leaner.label, "After leaner");
 assert.ok(leaner.polls.every((p) => p.basis === "leaner"));
 assert.ok(leaner.polls.every((p) => ["DemosAU", "Essential", "RedBridge/Accent", "Newspoll"].includes(p.pollster)));
+assert.ok(!leaner.polls.some((p) => p.pollster === "EMRS (Tas)"),
+  "Tasmanian-only EMRS readings stay out of the national after-leaner series");
 assert.deepEqual([...leaner.houses].sort(), ["DemosAU", "Essential", "Newspoll", "RedBridge/Accent"]);
-const expected = source.filter((p) => p.undecidedLeaner != null || (p.pollster === "Essential" && p.undecidedIn != null));
+const expected = source.filter((p) => p.pollster !== "EMRS (Tas)" && (p.undecidedLeaner != null || (p.pollster === "Essential" && p.undecidedIn != null)));
 assert.equal(leaner.polls.length, expected.length);
 for (const p of expected) {
   const expectedV = p.undecidedLeaner ?? p.undecidedIn;

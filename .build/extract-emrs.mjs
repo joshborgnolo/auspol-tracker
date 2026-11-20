@@ -38,6 +38,11 @@
        L/NP is the site's lnp); without a National line lnp is the Liberal
        share alone. sample is the vote-preference base n (the gave-a-
        preference subset of the ~1,000 polled) – the canon rows' convention.
+       sampleTotal is instead the methodology's whole-sample n (1,000 in both
+       reports). undecidedLeaner = (sampleTotal − sample)/sampleTotal × 100,
+       rounded once to one decimal: the respondents who gave no preference and
+       are not in the published primaries. Never reuse the separate 2PP
+       section's unsure count for this field.
      - the "Two Party Preferred [Order] – Labor v|and Liberal" section's
        "Labor Ahead NN%" / "Liberal Ahead NN%" pair (the heading's wording
        changed between the Feb and Aug 2026 reports – both forms match).
@@ -47,8 +52,8 @@
 
    Rows are written as
      { date = fieldwork END, published, dateStart,
-       pollster: "EMRS (Tas)", client: "—", sample, alp, lnp, grn, onp,
-       ind, oth, tpp_alp, tpp_lnp, url = the report PDF }
+       pollster: "EMRS (Tas)", client: "—", sample, sampleTotal, undecidedLeaner,
+       alp, lnp, grn, onp, ind, oth, tpp_alp, tpp_lnp, url = the report PDF }
    and polls[] re-sorted by date, like every house's writer. `published`
    is the best source stamp the wave offers, in order:
      1. the listing item's OWN date – each document <article> can carry a
@@ -262,6 +267,14 @@ export function federalPageOf(text) {
   return { page: pages[i], pageNo: i + 1, pageCount, sample: +n[1].replace(/,/g, ""), problems: [] };
 }
 
+/* The methodology's whole-survey n is distinct from the federal chart's
+   preference base: both current waves poll 1,000 but base their shares on
+   953 and 968. That difference supports the after-leaner exclusion share. */
+export function totalSampleOf(text) {
+  const m = String(text).match(/sample of n\s*=\s*([\d,]+)\s+completed the survey/i);
+  return m ? +m[1].replace(/,/g, "") : null;
+}
+
 /* The chart label → figure lines. -layout glues same-baseline text into
    one physical line, so a label can TRAIL wrapped prose
    ("…for One Nation.                The Labor Party              30%"):
@@ -321,11 +334,18 @@ export function parseWave(text, ym) {
   problems.push(...fw.problems);
   const fp = federalPageOf(text);
   problems.push(...fp.problems);
+  const sampleTotal = totalSampleOf(text);
+  if (sampleTotal == null) problems.push("no 'sample of n=N completed the survey' methodology line");
+  let undecidedLeaner = null;
+  if (sampleTotal != null && fp.sample != null) {
+    if (fp.sample > sampleTotal) problems.push(`preference base ${fp.sample} exceeds overall sample ${sampleTotal}`);
+    else undecidedLeaner = Math.round(1000 * (sampleTotal - fp.sample) / sampleTotal) / 10;
+  }
   let pri = { alp: null, lnp: null, grn: null, onp: null, ind: null, oth: null, problems: ["skipped – no federal page"] };
   if (fp.page) { pri = primariesOf(fp.page); problems.push(...pri.problems); }
   const tpp = tppOf(text);
   problems.push(...tpp.problems);
-  return { date: fw.date, dateStart: fw.dateStart, sample: fp.sample,
+  return { date: fw.date, dateStart: fw.dateStart, sample: fp.sample, sampleTotal, undecidedLeaner,
            alp: pri.alp, lnp: pri.lnp, grn: pri.grn, onp: pri.onp, ind: pri.ind, oth: pri.oth,
            tpp_alp: tpp.alp, tpp_lnp: tpp.lnp, pageNo: fp.pageNo, pageCount: fp.pageCount, problems };
 }
@@ -335,8 +355,13 @@ export function guardNewWave(w) {
   const errs = [];
   const need = (k, what) => { if (w[k] == null) errs.push(`missing ${what} (${k})`); };
   need("date", "fieldwork end"); need("dateStart", "fieldwork start");
-  need("sample", "sample size");
+  need("sample", "vote-preference base");
+  need("sampleTotal", "overall survey sample");
+  need("undecidedLeaner", "after-leaner exclusion share");
   if (errs.length) return errs;
+  if (w.sample > w.sampleTotal) errs.push(`preference base ${w.sample} exceeds overall sample ${w.sampleTotal}`);
+  else if (w.undecidedLeaner !== Math.round(1000 * (w.sampleTotal - w.sample) / w.sampleTotal) / 10)
+    errs.push(`undecided share disagrees with the printed sample counts`);
   const span = daysBetween(w.dateStart, w.date);
   if (!(span >= 1 && span <= 21)) errs.push(`implausible fieldwork span ${span}d`);
   if (w.date > todaySydney()) errs.push(`future date ${w.date}`);
@@ -360,7 +385,7 @@ export function guardNewWave(w) {
 // to the hand-entered canon rows. `published` is checked as note-only:
 // hand-entered dates never move, whatever stamp the ladder computes.
 const KNOWN_DIVERGENCE = {};
-const VERIFY_FIELDS = ["date", "dateStart", "sample", "alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp"];
+const VERIFY_FIELDS = ["date", "dateStart", "sample", "sampleTotal", "undecidedLeaner", "alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp"];
 
 /* Which canon row a parsed wave IS, if any. Identity is the fieldwork-END
    MONTH first: waves run ~6 months apart, so a re-issued report that
@@ -399,7 +424,7 @@ export function delistedCachedYms(cands, srcDir) {
 }
 
 async function main() {
-  const status = { changed: false, added: [], mismatches: [], pending: [], stale: [], warnings: [], notes: [] };
+  const status = { changed: false, added: [], backfilled: [], mismatches: [], pending: [], stale: [], warnings: [], notes: [] };
   const D = JSON.parse(fs.readFileSync(POLLS, "utf8"));
   const canon = D.polls.filter((p) => p.pollster === POLLSTER);
 
@@ -457,6 +482,7 @@ async function main() {
       url: cand.url, title: cand.title, ym,
       fetched: meta.fetched || todaySydney(),
       date: w.date, dateStart: w.dateStart, sample: w.sample,
+      sampleTotal: w.sampleTotal, undecidedLeaner: w.undecidedLeaner,
       primaries: { alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: w.oth },
       tpp: { alp: w.tpp_alp, lnp: w.tpp_lnp },
     });
@@ -476,6 +502,11 @@ async function main() {
     if (prior) {
       for (const k of VERIFY_FIELDS) {
         if (KNOWN_DIVERGENCE[`${ym}|${k}`]) continue;
+        if (["sampleTotal", "undecidedLeaner"].includes(k) && prior[k] == null && w[k] != null) {
+          prior[k] = w[k];
+          status.backfilled.push(`${ym} ${k} ${w[k]}`);
+          continue;
+        }
         if (prior[k] !== w[k]) status.mismatches.push(`${ym} ${k}: canon ${prior[k]} vs parsed ${w[k]} – verify, never rewrite`);
       }
       if (prior.published !== meta.published && meta.fetched === todaySydney())
@@ -486,7 +517,7 @@ async function main() {
     if (errs.length) { guardFails.push(`${ym}: ${errs.join("; ")}`); continue; }
     newRows.push({
       date: w.date, published: meta.published, dateStart: w.dateStart,
-      pollster: POLLSTER, client: "—", sample: w.sample,
+      pollster: POLLSTER, client: "—", sample: w.sample, sampleTotal: w.sampleTotal, undecidedLeaner: w.undecidedLeaner,
       alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: w.oth,
       tpp_alp: w.tpp_alp, tpp_lnp: w.tpp_lnp, url: cand.url,
     });
@@ -502,7 +533,7 @@ async function main() {
 
   if (status.mismatches.length || guardFails.length)
     console.error("EMRS_GUARD " + [...status.mismatches, ...guardFails].join(" | "));
-  else if (newRows.length) {
+  else if (newRows.length || status.backfilled.length) {
     const orig = fs.readFileSync(POLLS, "utf8");
     const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
     D.polls = [...D.polls, ...newRows].sort(byDate);
@@ -510,7 +541,7 @@ async function main() {
     status.changed = out !== orig;
     if (status.changed) {
       writeAtomic(POLLS, out);
-      console.log(`wrote ${POLLS}: +${newRows.length} EMRS (Tas) wave(s)`);
+      console.log(`wrote ${POLLS}: +${newRows.length} wave(s), ${status.backfilled.length} sample-derived field backfill(s)`);
     }
   }
   status.guard = status.mismatches.length || guardFails.length ? true : undefined;
