@@ -134,14 +134,14 @@
     for (const q of all) {
       if (q.noAgg) continue;
       if (keep && !keep.has(q.pollster)) continue;
-      if (!q.p) continue;
+      if (!(q.pp || q.p)) continue;
       const mid = q.mid != null ? q.mid : isoMs(q.released);
       rows.push({
         ym: q.ym,
         mid,
         firm: q.pollster,
         n: q.sampleEff != null ? q.sampleEff * spec.deff : Math.min(q.sample || 1200, spec.sampleCap),
-        x: q.p
+        x: q.pp || q.p
       });
     }
     return {
@@ -252,7 +252,7 @@
     const rowsC = [],
       rowsO = [];
     for (const q of D.individualPolls) {
-      const p = q.p;
+      const p = q.pp || q.p;
       if (q.noAgg || q.impOut || !p || p.alp == null || p.lnp == null || p.grn == null) continue;
       if (p.onp == null && !(onpOptional && p.oth != null)) continue;
       const base = {
@@ -622,7 +622,7 @@
       synthOn: snapOf(heO, HE.synthOn)
     };
     const pollImp = q => {
-      const p = q.p;
+      const p = q.pp || q.p;
       if (!p || q.alpImp == null) return null;
       const s = PK.reduce((t, k) => t + n0(p[k]), 0);
       const f = Math.abs(s - 100) <= 2 ? 1 : 100 / s;

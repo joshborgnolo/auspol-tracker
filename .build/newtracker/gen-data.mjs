@@ -117,7 +117,24 @@ const mergedPolls = (() => {
   // stable date order, as validate.mjs demands of D.polls itself
   return [...D.polls, ...live].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 })();
-const POLLS = mergedPolls.filter((p) => !p.isElection);
+/* A house that keeps its undecided IN the base (Essential: party shares of
+   all respondents, plus a printed Undecided, together 100 - `undecidedIn`)
+   is pooled on the same footing as everyone else: its parties are rescaled
+   to 100 here, at the one door, so every aggregate, implied 2PP, lean and
+   yardstick reads shares of those who named a party. What it PRINTED rides
+   along as pubPrim, and the tables show that (primaryOf, the change
+   markers), with the sample's base letter saying what it is of. Until
+   2026-11-21 the undecided was folded into Essential's ind instead, so its
+   "others" carried 4-7 points of undecided into the pool. */
+const PRIM_KEYS = ["alp", "lnp", "grn", "onp", "ind", "oth"];
+const poolPrim = (p) => {
+  const u = p.undecidedIn;
+  if (!(u > 0 && u < 100)) return p;
+  const r = { ...p, pubPrim: Object.fromEntries(PRIM_KEYS.map((k) => [k, p[k] ?? null])) };
+  PRIM_KEYS.forEach((k) => { if (p[k] != null) r[k] = Math.round(p[k] * 100 / (100 - u) * 100) / 100; });
+  return r;
+};
+const POLLS = mergedPolls.filter((p) => !p.isElection).map(poolPrim);
 /* Houses whose waves stay in the archive but are kept out of EVERY aggregate.
    Roy Morgan's SMS wave was an opt-in SMS blast to a non-probability sample -
    a selection-biased mode a house-effect cannot repair, so the wave never
@@ -400,7 +417,7 @@ const onpOk = (p) => p.onp != null || !!(JUR && JUR.onpOptional && (p.ind != nul
 const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && onpOk(p) && !p.sumNote;
 /* Per-poll DISPLAY eligibility, wider than impOk (user calls 2026-10-03):
    a wave whose primaries miss 100 ONLY through a documented anomaly
-   (sumNote – Essential's undecided-exclusive ind wave; YouGov's
+   (sumNote – YouGov's
    undecided-inclusive OTH wave) still shows an implied 2PP in the tables:
    the anomaly is a publish-out artefact, not missing data. An UNDOCUMENTED
    sum failure still suppresses the figure – any other row whose primaries
@@ -2853,6 +2870,8 @@ function build3cp(p) {
   return { tppKind: "3cp", tpp3: { alp: r1(p.tpp3.alp), lnp: r1(p.tpp3.lnp), onp: r1(p.tpp3.onp) } };
 }
 function primaryOf(p) {
+  // the shares as printed - a rescaled (undecidedIn) wave shows its own table
+  if (p.pubPrim) p = p.pubPrim;
   return { alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, oth: (p.ind == null && p.oth == null) ? null : r1((p.ind ?? 0) + (p.oth ?? 0)) };
 }
 // normalised ALP 2PP share (pairs that don't sum to 100 – e.g. an
@@ -2876,16 +2895,6 @@ const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
    these bases at once. */
 const TPP_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
   .filter(([, r]) => r && r.tppIncludesUndecided).map(([firm]) => firm));
-/* A house whose stored ind folds its undecided share in, so its printed
-   primaries are shares of all respondents, not of those who named a party:
-   Essential, every curated wave carrying Independent + Undecided as one
-   figure (assimilate-essential-vi.mjs). Declared as pollsterRules.<firm>
-   .indIncludesUndecided; a wave that prints the two apart says so in its
-   sumNote and is not marked. Read by the source-polls download only – the
-   estimator treats the folded share as part of the house's others, which
-   its lean on others absorbs (2026-11-20). */
-const IND_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
-  .filter(([, r]) => r && r.indIncludesUndecided).map(([firm]) => firm));
 /* the rolling collection page a pollster's dated release also lives at
    (Essential's Federal Political Insights hub, which carries the current
    tables alongside each numbered report). Declared once as a pollster rule
@@ -2945,14 +2954,15 @@ const undecidedOf = (p) => {
    December" reads). Keyed date|pollster → { d:{measure:Δ}, r:{measure:refISO} }. */
 const CHG_MEASURES = {
   alp2pp:    (p, a, pm) => p.tpp_alp ?? null,
-  pAlp:      (p, a, pm) => p.alp ?? null,
-  pLnp:      (p, a, pm) => p.lnp ?? null,
-  pGrn:      (p, a, pm) => p.grn ?? null,
-  pOnp:      (p, a, pm) => p.onp ?? null,
+  // as printed, like the figures beside them (primaryOf)
+  pAlp:      (p, a, pm) => (p.pubPrim || p).alp ?? null,
+  pLnp:      (p, a, pm) => (p.pubPrim || p).lnp ?? null,
+  pGrn:      (p, a, pm) => (p.pubPrim || p).grn ?? null,
+  pOnp:      (p, a, pm) => (p.pubPrim || p).onp ?? null,
   /* "Other" on screen is IND+OTH combined (primaryVal's oth branch), so the
      delta must compare the combined series – a wave filing ind-only shows a
      Other cell but would look missing to a p.oth-only delta. */
-  pOth:      (p, a, pm) => primaryVal(p, "oth"),
+  pOth:      (p, a, pm) => primaryVal(p.pubPrim || p, "oth"),
   // the movable share – "can't say" beside the primaries (Roy Morgan), the
   // shortfall inside the two-party pair (Essential), and the not-firm share
   // of the decided (Resolve). Each is that house's own series, so a delta
@@ -4115,11 +4125,14 @@ const individualPolls = POLLS.map((p) => {
     // alpOnImp is the same re-read under the ALP-v-ON frozen table (flows.mjs FP_ON)
     ...impFields(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
-    /* what the printed primaries are of, for the source-polls download:
-       undIn "oth" = the undecided share sits inside others (p.oth carries
-       ind + oth); sumNote = the wave's own documented reason its shares
-       don't add to 100 */
-    ...(IND_UNDECIDED.has(p.pollster) && !p.sumNote ? { undIn: "oth" } : {}),
+    // the pooled shares, where they differ from the printed ones (poolPrim):
+    // pv-agg's in-browser recompute must read exactly what the server pooled
+    ...(p.pubPrim ? { pp: { alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, oth: (p.ind == null && p.oth == null) ? null : (p.ind ?? 0) + (p.oth ?? 0) } } : {}),
+    /* what the printed primaries are of, for the source-polls download and
+       the poll detail: undIn = the printed undecided share a house keeps in
+       its base (the shares shown add to 100 with it); sumNote = the wave's
+       own documented reason its shares don't add to 100 */
+    ...(p.undecidedIn != null ? { undIn: p.undecidedIn } : {}),
     ...(p.sumNote ? { sumNote: p.sumNote } : {}),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(JUR ? { who: whoAt(p.date) } : {}),
@@ -4385,6 +4398,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(noAggPoll(p) ? { noAgg: true, noAggWhy: noAggNoteFor(p) } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
+    // the pooled shares, where they differ from the printed ones (poolPrim):
+    // pv-agg's in-browser recompute must read exactly what the server pooled
+    ...(p.pubPrim ? { pp: { alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, oth: (p.ind == null && p.oth == null) ? null : (p.ind ?? 0) + (p.oth ?? 0) } } : {}),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(JUR ? { who: whoAt(p.date) } : {}),
     ...(p.url ? { url: p.url } : {}),

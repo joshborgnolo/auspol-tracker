@@ -3148,7 +3148,7 @@ function cycleSourceRows(cycles, D) {
     return null;
   };
   const curNote = (p) => p.sumNote
-    || (p.undIn === "oth" ? "primary_oth includes the undecided share, so these shares are of all respondents, not just those who named a party." : null);
+    || (p.undIn != null ? "Undecided respondents are in the base: these shares are of all respondents, and primary_undecided is the printed undecided share (the row adds to 100 with it)." : null);
   /* Preferred PM is its own series rather than two more columns on the
      leader-rating row: it is a different question, asked of the same wave,
      and one row per question is what lets a reader filter the file by
@@ -3197,7 +3197,7 @@ function cycleSourceRows(cycles, D) {
       rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster,
         p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null,
         null, null, imp ?? null, imp != null ? (onRival ? "ALP v ON" : "ALP v L/NP") : null,
-        null, null, null, curNote(p)]);
+        null, null, p.undIn ?? null, curNote(p)]);
       /* The MAIN contest only. A wave may also publish a two-way where the
          headline is three-way, and those are separate measures that would be
          nonsense stacked in one column - they stay in the payload for the

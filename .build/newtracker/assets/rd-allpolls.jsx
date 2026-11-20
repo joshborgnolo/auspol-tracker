@@ -1700,6 +1700,13 @@ function rdLgDecided(p) {
     w: "", d: null,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null,
   };
+  /* a house that keeps its undecided IN the base (Essential, undIn): the
+     shares shown are everyone's and add to 100 with it; the averages rescale
+     them to leave it out */
+  if (p.undIn != null) return {
+    h: "Primary vote shares are everyone’s, undecided included. " + p.undIn + "%", w: "undecided after leaner",
+    d: null, s: "kept in, so the shares add to 100 with it (the averages rescale them to leave it out)", sep: ", ",
+  };
   if (p.undecided != null) {
     const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
     if (b === "soft") return { h: "Primary-vote shares are everyones’. ‘Undecided’ not an option (a forced choice)", w: "", d: null,
@@ -2170,7 +2177,10 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
    printed, then what the wave does to today's primaries (§7eb's peff) */
 function RdApPrimRail({ p }) {
   const D = window.AUSPOL;
-  const q = p.p || {}, y = p.pyd || {};
+  /* a house that keeps its undecided in the base (undIn) is set against the
+     polls around it on the averages' footing - its parties rescaled to 100
+     (pp) - or every lean would carry the undecided share */
+  const q = p.pp || p.p || {}, y = p.pyd || {};
   const ks = rdLgPrims().filter((k) => q[k.id] != null && y[k.id]);
   if (!ks.length) return null;
   const n = p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0);
@@ -2216,7 +2226,7 @@ function RdApPrimRail({ p }) {
       <table className="rd-ldg-t rd-ldg-rk rd-ldg-rkp">
         <thead><tr><th></th>{rows.map((r) => <th key={r.id} className="num" style={{ color: r.ink }}>{r.lab}</th>)}</tr></thead>
         <tbody>
-          <tr><th scope="row">This poll</th>{rows.map((r) => <td key={r.id} className="num"><b>{rdApNum(r.x)}</b></td>)}</tr>
+          <tr><th scope="row">{p.pp ? "This poll, undecided left out" : "This poll"}</th>{rows.map((r) => <td key={r.id} className="num"><b>{rdApNum(r.x)}</b></td>)}</tr>
           <tr><th scope="row">{around}</th>{rows.map((r) => <td key={r.id} className="num">{r.v.toFixed(1)}</td>)}</tr>
           <tr><th scope="row">Lean</th>{rows.map((r) => <td key={r.id} className={"num" + (r.out && r.less == null ? " out" : "")}>{sg(r.lean)}</td>)}</tr>
           <tr><th scope="row">House lean</th>{rows.map((r) => <td key={r.id} className="num">{sg(r.he)}</td>)}</tr>
@@ -2225,7 +2235,7 @@ function RdApPrimRail({ p }) {
         </tbody>
       </table>
       <p className="rd-ldg-foot1">
-        Lean is this poll minus {RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)"}, so + means higher; house lean is taken out before averaging.
+        Lean is this poll minus {RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)"}, so + means higher; house lean is taken out before averaging.{p.pp && p.undIn != null ? " " + p.pollster + "’s own shares include its " + p.undIn + "% undecided; here they are rescaled to leave it out, as the averages do." : ""}
         {anyOut ? " Bold: outside the poll’s margin on that party." : ""}{mTxt ? " Margins " + mTxt + ", " + rdMarginBasis(p) + "." : ""}
         {moves && e.w && now ? " Today’s figures: " + rows.filter((r) => now[r.id] != null).map((r) => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : ""}
         {moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""}

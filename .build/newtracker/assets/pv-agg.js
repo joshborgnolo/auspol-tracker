@@ -34,7 +34,9 @@
    the truncated fmid date: odd-length windows land on half-days and the
    lean-neighbour windows read the half-day), n -> sampleEff*deff where
    published else min(sample, cap) with the server's 1200 fallback,
-   x -> row.p[k] (p.oth is ALREADY ind+oth combined).
+   x -> row.pp[k] where the row carries one (a house that keeps its
+   undecided in the base, rescaled to 100 server-side - row.p is then the
+   printed table), else row.p[k] (p.oth is ALREADY ind+oth combined).
 
    Wrapped in an IIFE so nothing lands in the shared top-level lexical
    scope (the plain-layer hazard np-project.js's banner calls out).
@@ -152,12 +154,12 @@
     for (const q of all) {
       if (q.noAgg) continue;
       if (keep && !keep.has(q.pollster)) continue;
-      if (!q.p) continue;
+      if (!(q.pp || q.p)) continue;
       const mid = q.mid != null ? q.mid : isoMs(q.released);
       rows.push({
         ym: q.ym, mid, firm: q.pollster,
         n: q.sampleEff != null ? q.sampleEff * spec.deff : Math.min(q.sample || 1200, spec.sampleCap),
-        x: q.p,
+        x: q.pp || q.p,
       });
     }
     return { rows, refNow };
@@ -272,7 +274,7 @@
     for (const q of D.individualPolls) { const t = isoMs(q.released); if (t > refNow) refNow = t; }
     const rowsC = [], rowsO = [];
     for (const q of D.individualPolls) {
-      const p = q.p;
+      const p = q.pp || q.p;
       if (q.noAgg || q.impOut || !p || p.alp == null || p.lnp == null || p.grn == null) continue;
       if (p.onp == null && !(onpOptional && p.oth != null)) continue;
       const base = { q, ym: q.ym, mid: q.mid != null ? q.mid : isoMs(q.released), firm: q.pollster, p,
@@ -494,7 +496,7 @@
     /* each poll's own figures (impFields: a set off 100 by more than two
        points - a documented anomaly - is read on the 100-point base) */
     const pollImp = (q) => {
-      const p = q.p;
+      const p = q.pp || q.p;
       if (!p || q.alpImp == null) return null;
       const s = PK.reduce((t, k) => t + n0(p[k]), 0);
       const f = Math.abs(s - 100) <= 2 ? 1 : 100 / s;

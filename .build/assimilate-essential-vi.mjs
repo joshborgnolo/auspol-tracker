@@ -15,9 +15,10 @@
 //     tolerance — csv 2026-01-28 is the row curated at 2026-01-23 — while
 //     two real distinct waves rarely share all figures). Together those
 //     rules mean re-runs are no-ops and curated rows are never duplicated.
-// Poll row shape matches the curated rows: ind = Independent + Undecided
-// (the combined figure carried by all curated waves except 2026-07-27,
-// whose sumNote documents its undecided-exclusive deviation), oth null,
+// Poll row shape matches the curated rows: ind = Independent or Other
+// Party as printed, undecidedIn = the printed Undecided share (Essential
+// keeps its undecided in the base, so the six add to 100; the build rescales
+// the parties to 100 for pooling - gen-data's poolPrim), oth null,
 // tpp as published undecided-inclusive (pollsterRules.Essential
 // .tppIncludesUndecided reads the shortfall as undecided-after-
 // preferences). The CSV carries no sample/url/fieldwork window, but the
@@ -191,7 +192,7 @@ const releaseFor = (waveDate) => {
 
 const close = (a, b) => (a == null && b == null) || (a != null && b != null && Math.abs(a - b) <= 0.5);
 const sameFigures = (p, r) =>
-  ["alp", "lnp", "grn", "onp", "ind", "tpp_alp", "tpp_lnp"].every((k) => close(p[k], r[k]));
+  ["alp", "lnp", "grn", "onp", "ind", "undecidedIn", "tpp_alp", "tpp_lnp"].every((k) => close(p[k], r[k]));
 const daysApart = (a, b) => Math.abs(Date.parse(a) - Date.parse(b)) / DAY;
 const publishedFor = (csvWave) => iso(Date.parse(csvWave) + DAY) + "T01:00";
 // the validator refuses `published` stamps in the future (its TOMORROW is
@@ -272,7 +273,7 @@ const guardianArticleFor = async (csvWave) => {
 
 // canonical curated poll-row key order, used to rebuild retro-filled rows
 const POLL_KEY_ORDER = ["date", "published", "dateStart", "pollster", "client", "sample",
-  "alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp",
+  "alp", "lnp", "grn", "onp", "ind", "undecidedIn", "oth", "tpp_alp", "tpp_lnp",
   "url", "sumNote", "releaseUrl", "assimilated"];
 const reorderPollRow = (p) => {
   const out = {};
@@ -362,7 +363,8 @@ for (const waveDate of [...vi.keys()].sort()) {
     lnp: a["TOTAL: Coalition"] ?? null,
     grn: a["Greens"] ?? null,
     onp: a["One Nation"] ?? null,
-    ind: indep == null && und == null ? null : (indep ?? 0) + (und ?? 0),
+    ind: indep ?? null,
+    undecidedIn: und ?? null,
     oth: null,
     tpp_alp: t?.["Labor"] ?? null,
     tpp_lnp: t?.["TOTAL: Coalition"] ?? null,

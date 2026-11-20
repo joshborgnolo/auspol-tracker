@@ -102,7 +102,8 @@ export function validate(D) {
 
     // 1. full primary sets total ~100 (majors-only polls are partial by design)
     if (CORE.every((k) => p[k] != null)) {
-      const sum = ALL.reduce((s, k) => s + n0(p[k]), 0);
+      // a house that keeps its undecided in the base adds to 100 with it
+      const sum = ALL.reduce((s, k) => s + n0(p[k]), 0) + n0(p.undecidedIn);
       if (Math.abs(sum - 100) > 2) {
         if (p.sumNote) excuse("primary-sum", `Σ shares = ${sum.toFixed(1)} (expected ~100)`, p.sumNote);
         else fail("primary-sum", `Σ shares = ${sum.toFixed(1)} (expected ~100)`);

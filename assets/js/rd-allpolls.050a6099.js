@@ -2300,6 +2300,13 @@ function rdLgDecided(p) {
     d: null,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null
   };
+  if (p.undIn != null) return {
+    h: "Primary vote shares are everyone’s, undecided included. " + p.undIn + "%",
+    w: "undecided after leaner",
+    d: null,
+    s: "kept in, so the shares add to 100 with it (the averages rescale them to leave it out)",
+    sep: ", "
+  };
   if (p.undecided != null) {
     const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
     if (b === "soft") return {
@@ -3005,7 +3012,7 @@ function RdApPrimRail({
   p
 }) {
   const D = window.AUSPOL;
-  const q = p.p || {},
+  const q = p.pp || p.p || {},
     y = p.pyd || {};
   const ks = rdLgPrims().filter(k => q[k.id] != null && y[k.id]);
   if (!ks.length) return null;
@@ -3096,7 +3103,7 @@ function RdApPrimRail({
     }
   }, r.lab)))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("th", {
     scope: "row"
-  }, "This poll"), rows.map(r => React.createElement("td", {
+  }, p.pp ? "This poll, undecided left out" : "This poll"), rows.map(r => React.createElement("td", {
     key: r.id,
     className: "num"
   }, React.createElement("b", null, rdApNum(r.x))))), React.createElement("tr", null, React.createElement("th", {
@@ -3129,7 +3136,7 @@ function RdApPrimRail({
     }, pr ? sg(rdApR1(pr[1] - pr[0])) : "—");
   })))), React.createElement("p", {
     className: "rd-ldg-foot1"
-  }, "Lean is this poll minus ", RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)", ", so + means higher; house lean is taken out before averaging.", anyOut ? " Bold: outside the poll’s margin on that party." : "", mTxt ? " Margins " + mTxt + ", " + rdMarginBasis(p) + "." : "", moves && e.w && now ? " Today’s figures: " + rows.filter(r => now[r.id] != null).map(r => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : "", moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""));
+  }, "Lean is this poll minus ", RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)", ", so + means higher; house lean is taken out before averaging.", p.pp && p.undIn != null ? " " + p.pollster + "’s own shares include its " + p.undIn + "% undecided; here they are rescaled to leave it out, as the averages do." : "", anyOut ? " Bold: outside the poll’s margin on that party." : "", mTxt ? " Margins " + mTxt + ", " + rdMarginBasis(p) + "." : "", moves && e.w && now ? " Today’s figures: " + rows.filter(r => now[r.id] != null).map(r => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : "", moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""));
 }
 const RD_AP_DEM_NOUN = {
   "18–34": "18–34-year-olds",

@@ -1709,7 +1709,7 @@ function cycleSourceRows(cycles, D) {
     if (p.sum != null) return declared || `The shares add to ${p.sum} in the source, which doesn't say why.`;
     return null;
   };
-  const curNote = p => p.sumNote || (p.undIn === "oth" ? "primary_oth includes the undecided share, so these shares are of all respondents, not just those who named a party." : null);
+  const curNote = p => p.sumNote || (p.undIn != null ? "Undecided respondents are in the base: these shares are of all respondents, and primary_undecided is the printed undecided share (the row adds to 100 with it)." : null);
   const ppmOpp = s => {
     const k = Object.keys(s).find(x => x !== "alb" && x !== "hanson" && x !== "unc");
     return k ? s[k] : null;
@@ -1732,7 +1732,7 @@ function cycleSourceRows(cycles, D) {
     D.individualPolls.forEach(p => {
       const onRival = rivalOfMonth(D, p.ym) === "alp_on";
       const imp = onRival ? p.alpOnImp : p.alpImp;
-      rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster, p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null, null, null, imp ?? null, imp != null ? onRival ? "ALP v ON" : "ALP v L/NP" : null, null, null, null, curNote(p)]);
+      rows.push([cur.year, "voting_intention", p.released, null, mo(p.released), p.pollster, p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null, null, null, imp ?? null, imp != null ? onRival ? "ALP v ON" : "ALP v L/NP" : null, null, null, p.undIn ?? null, curNote(p)]);
       const mp = mainPpm(p);
       if (mp) rows.push([cur.year, "preferred_pm", p.released, null, mo(p.released), p.pollster, null, null, null, null, null, null, null, null, null, null, null, mp.alb ?? null, ppmOpp(mp)]);
       const a = p.appr;
@@ -4694,6 +4694,13 @@ function rdEffMissing(p) {
   const A = window.AUSPOL;
   return (A.individualPolls || []).concat(A.issuesOnlyPolls || []).some(q => q.pollster === p.pollster && q.sampleEff != null && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
 }
+const RD_APPROX_EFF_HOUSES = new Set(["Roy Morgan", "Spectre Strategy", "Resolve"]);
+function rdEffEstimate(p) {
+  if (p.conf || p.sampleEff != null || !p.sample || !RD_APPROX_EFF_HOUSES.has(p.pollster)) return null;
+  const L = window.AUSPOL.latest;
+  const deff = L && L.method && L.method.deff || 1.6;
+  return Math.round(p.sample / deff / 10) * 10;
+}
 function AllPollsView({
   focus,
   onBack,
@@ -5130,7 +5137,7 @@ function AllPollsView({
         hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
         if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
       }
-      if (p.sampleEff != null) hayParts.push("eff effective sample", String(p.sampleEff));else if (rdEffMissing(p)) hayParts.push("eff effective sample missing no statement");else if (rdEffTbc(p)) hayParts.push("eff effective sample tbc pending");
+      if (p.sampleEff != null) hayParts.push("eff effective sample", String(p.sampleEff));else if (rdEffMissing(p)) hayParts.push("eff effective sample missing no statement");else if (rdEffTbc(p)) hayParts.push("eff effective sample tbc pending");else if (rdEffEstimate(p) != null) hayParts.push("eff effective sample approximate estimated", String(rdEffEstimate(p)));
       hayParts.push(...tags);
       const hay = hayParts.join(" ").toLowerCase();
       return {
@@ -6616,7 +6623,7 @@ function infoTerms(D) {
     q: "What are the ▲ and ▼ figures measured against?",
     a: React.createElement(React.Fragment, null, "It depends on where they sit.", React.createElement("ul", {
       className: "info-list"
-    }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the change on a month ago, from the same estimate built from the polls of 30 days earlier. It counts as a change only when it is larger than its own margin, which combines both readings\u2019 intervals; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary vote figures:"), " the change since the 2025 election, where every line on that chart begins."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.", !RD ? React.createElement(React.Fragment, null, " A green \u25B2 is a rise and a red \u25BC a fall: a direction, not a verdict on anyone. The undecided share reverses the colours, since more undecided voters is the less settled reading, and where One Nation\u2019s voters came from stays grey either way.") : null)
+    }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the change on a month ago, from the same estimate built from the polls of 30 days earlier. It counts as a change only when it is larger than its own margin, which combines both readings\u2019 intervals; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary-vote figures:"), " the change since the 2025 election, where every line on that chart begins."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.", !RD ? React.createElement(React.Fragment, null, " A green \u25B2 is a rise and a red \u25BC a fall: a direction, not a verdict on anyone. The undecided share reverses the colours, since more undecided voters is the less settled reading, and where One Nation\u2019s voters came from stays grey either way.") : null)
   }];
   const sections = [{
     id: "s-2pp",
@@ -7105,7 +7112,7 @@ function infoTerms(D) {
       q: "What are the ▲ and ▼ figures measured against?",
       a: React.createElement(React.Fragment, null, "It depends on where they sit.", React.createElement("ul", {
         className: "info-list"
-      }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the trend\u2019s move over the past month. It counts as a change only when it is larger than its own margin, the 95% interval of that move; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary vote figures:"), " the change since the ", eY, " election, where the lines on that chart begin."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.")
+      }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the trend\u2019s move over the past month. It counts as a change only when it is larger than its own margin, the 95% interval of that move; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary-vote figures:"), " the change since the ", eY, " election, where the lines on that chart begin."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.")
     }].filter(Boolean) : [{
       id: "weighted-aggregate",
       term: "Weighted aggregate",
@@ -7135,7 +7142,7 @@ function infoTerms(D) {
       q: "What are the ▲ and ▼ figures measured against?",
       a: React.createElement(React.Fragment, null, "It depends on where they sit.", React.createElement("ul", {
         className: "info-list"
-      }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the change on a month ago, from the same estimate built from the polls of 30 days earlier. It counts as a change only when it is larger than its own margin, which combines both readings\u2019 intervals; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary vote figures:"), " the change since the ", eY, " election, where the lines on that chart begin."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.")
+      }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the change on a month ago, from the same estimate built from the polls of 30 days earlier. It counts as a change only when it is larger than its own margin, which combines both readings\u2019 intervals; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary-vote figures:"), " the change since the ", eY, " election, where the lines on that chart begin."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.")
     }];
     const vSections = [{
       id: "s-2pp",
