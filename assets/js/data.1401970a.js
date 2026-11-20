@@ -5346,7 +5346,7 @@ window.AUSPOL = function () {
     "Spectre Strategy": "D",
     "DemosAU": "D+L",
     "Newspoll": "D+L",
-    "Resolve": "A",
+    "Resolve": "F",
     "YouGov (MRP)": "D",
     "Newspoll (pooled)": "D+L",
     "Essential": {

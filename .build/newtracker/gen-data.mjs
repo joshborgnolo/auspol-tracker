@@ -2906,10 +2906,12 @@ const RELEASE_HUB = new Map(Object.entries(D.pollsterRules || {})
 /* What each house's primary-vote shares are OF, printed beside every sample
    ("1,500 D"): D = decided voters, undecideds set aside with no leaner
    question; D+L = decided plus leaners (undecideds asked which way they
-   lean, the rest set aside); A = all voters, undecideds kept in the base
-   (Resolve offers no undecided option; Essential asks a leaner but keeps
+   lean, the rest set aside); A = all voters, undecideds kept in the base,
+   so the parties add to less than 100 (Essential asks a leaner but keeps
    those still unsure in - a leaner moves people between rows, never out of
-   the base, so it is still A). A house whose two-party figure has another base than its
+   the base, so it is still A); F = forced choice, no undecided option, so
+   everyone is allocated and the parties add to 100 (Resolve; user call
+   2026-11-21 - not A, which would say undecideds sit in its shares). A house whose two-party figure has another base than its
    primaries carries a per-facet pair: Essential's published 2PP+ pair keeps
    its unsure in, but the site rescales it to 100 (share2pp), so the 2PP the
    2PP views show is of those who named a party and a preference - D+L.
@@ -2928,7 +2930,7 @@ const POLL_BASES = {
   "YouGov": "D",              // news24-src: "Primary vote, excluding undecided voters"
   "Roy Morgan": "D",          // "x% can't say who they would vote for", set aside; no leaner stated
   "Spectre Strategy": "D",    // spectre-src: "undecided before apportionment"
-  "Resolve": "A",             // no undecided option (a forced choice)
+  "Resolve": "F",             // no undecided option (a forced choice)
   // methodology page: "Participants answering 'Unsure' are NOT excluded from
   // published results"; questionnaire Q23 "Well which party are you currently
   // leaning towards?" asked of Q21 don't-knows

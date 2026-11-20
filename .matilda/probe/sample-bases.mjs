@@ -1,7 +1,7 @@
 /* Probe: every printed sample carries its house's base letters ("1,500 D"),
    set in small caps (.rd-smc), in the Latest polls table and the All polls
    ledger; Essential reads A on primaries and D+L on the 2PP facet (the site
-   rescales its published 2PP+ pair to 100).
+   rescales its published 2PP+ pair to 100); Resolve reads F (forced choice).
    Run after a build: node .matilda/probe/sample-bases.mjs */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
@@ -37,14 +37,14 @@ await page.goto(base + "/allpolls/", { waitUntil: "load" }); await wait(2500);
 const ledger = () => page.$$eval(".rd-ap-n > span:first-child", (els) => els.map((e) => [e.closest("[role=row]")?.textContent.match(/^\s*([A-Za-z&/ ]+?)↗/)?.[1] || "", e.textContent]));
 let ns = await ledger();
 console.log("  ledger 2PP:", ns.slice(0, 8).map((r) => r[1]).join(" | "));
-ok(ns.length && ns.filter((r) => r[1] !== "—").every((r) => /^[\d,]+( (D|D\+L|A))?$/.test(r[1])), "ledger samples read n + base");
+ok(ns.length && ns.filter((r) => r[1] !== "—").every((r) => /^[\d,]+( (D|D\+L|A|F))?$/.test(r[1])), "ledger samples read n + base");
 const ess = (rows) => (rows.find((r) => /\d/.test(r[1]) && r[0].startsWith("Essential")) || [])[1];
 ok(/ D\+L$/.test(ess(ns) || ""), "Essential reads D+L on the 2PP facet (" + ess(ns) + ")");
 await page.evaluate(() => { const b = [...document.querySelectorAll("[role=tab], button")].find((e) => e.textContent.trim() === "Primary"); b && b.click(); });
 await wait(1500);
 ns = await ledger();
 ok(/ A$/.test(ess(ns) || ""), "Essential reads A on the Primary facet (" + ess(ns) + ")");
-ok(ns.some((r) => r[0].startsWith("Resolve") && / A$/.test(r[1])), "Resolve reads A");
+ok(ns.some((r) => r[0].startsWith("Resolve") && / F$/.test(r[1])), "Resolve reads F");
 ok(errors.length === 0, "no page errors " + errors.slice(0, 3).join("; "));
 await browser.close(); server.close();
 process.exit(fails ? 1 : 0);

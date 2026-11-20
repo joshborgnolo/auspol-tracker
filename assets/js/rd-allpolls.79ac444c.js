@@ -5709,7 +5709,9 @@ function RdAllPolls(P) {
       className: "rd-smc"
     }, "D+L"), " decided voters plus leaners (undecideds asked which way they lean, the rest set aside), ", React.createElement("b", {
       className: "rd-smc"
-    }, "A"), " all voters (undecideds kept in). ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    }, "A"), " all voters (undecideds kept in), ", React.createElement("b", {
+      className: "rd-smc"
+    }, "F"), " a forced choice (no undecided option, so everyone is allocated to a party). ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
