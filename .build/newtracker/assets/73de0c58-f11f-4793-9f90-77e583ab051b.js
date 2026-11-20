@@ -72,7 +72,7 @@ function GlyphDial({ className, svgRef, width, height }) {
   glyph.forEach((p) => {
     p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H);
   });
-  const glyphTitle = "Primary vote aggregate, " +
+  const glyphTitle = "Primary-vote aggregate, " +
     glyph.map((p) => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
 
   // pendulum = the LIVE implied head-to-head against Labor's STRONGEST
@@ -2361,7 +2361,7 @@ const KBD_ROWS = [
   { keys: ["1–9"], what: "Pick a numbered party or term on a chips row" },
   { keys: ["1–9"], what: "Jump to the More menu's numbered page — the menu open, or the pointer or focus on the bar" },
   ...(window.JUR ? [] : [{ keys: ["1–7"], what: "In the all-polls demographics view, pick the Split by group" }]),
-  { keys: ["Space"], what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu; flip the Share side in the preference-flows explainer" },
+  { keys: ["Space"], what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; walk the Primary-vote panel's group menu; walk the Who votes for whom panel's party chips; cycle the One Nation voter-switching views; step the all-polls demographics split and the preference-flows region menu; step the Past-cycles summary's other menu; flip the Share side in the preference-flows explainer" },
   { keys: ["P"], what: "In the all-polls two-party table, published figures only" },
   { keys: ["?"], what: "This sheet" },
 ];

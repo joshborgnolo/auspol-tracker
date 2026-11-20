@@ -10759,7 +10759,7 @@ function statBreakdown(m, st, kind, rows) {
     const keys = [...new Set(rows.flatMap((r) => statPrimaryCols(m, r.A).map((c) => c[4])))].filter((k) => k !== "alp" && k !== "lnp" && k !== "oth");
     const cols = statPrimaryCols(m, rows[0].A, keys);
     const names = cols.map((c) => c[4] === "alp" ? "ALP" : c[4] === "lnp" ? "L/NP" : c[4] === "grn" ? "GRN" : c[4] === "onp" ? "ON" : c[4] === "oth" ? "Other" : c[3]);
-    body = `<div class="st-pv-list" style="--pv-cols:${cols.length}" role="group" aria-label="${esc(title)} primary vote percentages"><div class="st-pv-columns" aria-hidden="true"><span></span>${names.map((name) => `<span>${esc(name)}</span>`).join("")}</div>${rows.map((r, i) => {
+    body = `<div class="st-pv-list" style="--pv-cols:${cols.length}" role="group" aria-label="${esc(title)} primary-vote percentages"><div class="st-pv-columns" aria-hidden="true"><span></span>${names.map((name) => `<span>${esc(name)}</span>`).join("")}</div>${rows.map((r, i) => {
       const cells = statPrimaryCols(m, r.A, keys);
       return `<button type="button" class="st-pv-row" data-pv-action="pick" data-pv-index="${i}" aria-label="${esc(r.label + ' primaries: ' + cells.map((c) => c[3] + ' ' + f1(c[1]) + '%').join(', ') + '. Show full result')}"><span>${esc(r.short)}</span>${cells.map((c) => `<b ${tone(c[0])} title="${esc(c[3])}">${f1(c[1])}</b>`).join("")}</button>`;
     }).join("")}</div>`;

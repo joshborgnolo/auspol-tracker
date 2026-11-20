@@ -207,7 +207,7 @@ function renderPage(sections, fetchedIso) {
      the way roymorgan.com stores them. Chrome is the site's shared shell
      (.build/site-shell.mjs): the sh-page article anatomy, the lifted
      .ex-body article family, and the shell-emitted archives switcher. -->
-<meta name="description" content="Roy Morgan's two-party preferred and primary vote tables, including the long-term trends back to 1901, copied cell for cell from roymorgan.com.">
+<meta name="description" content="Roy Morgan's two-party preferred and primary-vote tables, including the long-term trends back to 1901, copied cell for cell from roymorgan.com.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
