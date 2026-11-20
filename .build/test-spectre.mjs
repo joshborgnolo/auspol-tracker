@@ -46,6 +46,8 @@ assert.deepEqual(figureDiffs("2026-11-03", nov, D), []);
 
 const july = readWave("australian-federal-political-update-april-2026-lrxjw");
 assert.equal(july.date, "2026-07-23");
+assert.equal(july.undecided, 7, "July 2026 reads its 7% across the interleaved One Nation label");
+assert.equal(nov.undecided, 6, "November 2026 keeps its 6% before-apportionment figure");
 assert.deepEqual(july.direction, { right: 29, wrong: 57, unsure: 14 });
 assert.deepEqual(july.firmness, {
   all: [60, 40],
@@ -54,6 +56,19 @@ assert.deepEqual(july.firmness, {
   onp: [69, 31],
   grn: [59, 41],
 });
+const april = readWave("australian-federal-political-update-april-2026");
+assert.equal(april.date, "2026-04-08");
+assert.equal(april.undecided, 7, "April 2026 uses the primary chart's 7%, never the TPP page's 11%");
+for (const w of [july, april]) {
+  assert.ok(!figureDiffs(w.date, w, D).some((d) => d.key === "polls.undecided"),
+    `${w.date}: the parsed and canonical undecided figures agree after backfill`);
+}
+for (const [date, value] of [["2025-07-01", 7], ["2026-04-08", 7], ["2026-07-23", 7], ["2026-11-03", 6]]) {
+  const row = D.polls.find((p) => p.pollster === "Spectre Strategy" && p.date === date);
+  assert.equal(row?.undecided, value, `${date}: canonical Spectre undecided share`);
+}
+const nov2025 = D.polls.find((p) => p.pollster === "Spectre Strategy" && p.date === "2025-11-17");
+assert.ok(nov2025 && nov2025.undecided == null, "November 2025 is not published, not zero");
 
 const ledger = readFileSync(".build/newtracker/assets/rd-allpolls.jsx", "utf8");
 const decidedStart = ledger.indexOf("function rdLgDecided(p) {");

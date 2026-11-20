@@ -38,11 +38,14 @@
 //                    pollster:"Spectre Strategy", client:"—", sample,
 //                    undecided, alp,lnp,grn,onp,ind, oth:null,
 //                    tpp_alp, tpp_lnp, firmness, url(article page)}
-//                    (undecided is parsed for new waves; the four canon
-//                    rows predate the field and stay as the house entered
-//                    them. firmness is the chart's [firm, soft] pair for
-//                    all voters plus Labor/Coalition/One Nation/Greens;
-//                    national soft explicitly includes undecided voters)
+//                    (parse undecided from the primary chart whenever the
+//                    PDF prints it. Missing-to-published metadata is filled
+//                    once, then verified each pass. Legacy waves stay with
+//                    their canon values: Jul 2025 7% (user-confirmed hand
+//                    entry), Nov 2025 no published share, never zero;
+//                    firmness is the chart's [firm, soft] pair for all voters
+//                    plus Labor/Coalition/One Nation/Greens; national soft
+//                    explicitly includes undecided voters)
 //   direction:      {date, dateStart, pollster, right, wrong, unsure}
 //   ppm:            {date, firm, alb, opp, oppName, han, extra:null}
 //                    (han carries Hanson's share when the question is the
@@ -206,9 +209,11 @@ function parseReport(txt, slug, D) {
   if (p) ({ dateStart: w.dateStart, date: w.date } = p);
   const smp = txt.match(/Sample size is n=\s*([\d,]+)/i);
   if (smp) w.sample = toNum(smp[1]);
-  // the undecided line can wrap mid-phrase ("…undecided before\n
-  // apportionment.")
-  const und = txt.match(/(\d+)%\s+of voters were undecided before\s+apportionment/i);
+  const primaryText = SECTION(txt, "The Liberal National Coalition", "Q: If a Federal Election") ?? "";
+  // "before" can be followed by the left-column One Nation label before the
+  // right-column continuation "apportionment"; stay inside this one chart so
+  // the separate TPP page's pair of undecided shares can never leak in.
+  const und = primaryText.match(/(\d+)%\s+of voters were undecided before(?:\s+One Nation)?\s+apportionment/i);
   if (und) w.undecided = toNum(und[1]);
 
   const dir = SECTION(txt, "Right direction", "Q: In your view, is Australia heading") ?? "";
@@ -232,7 +237,7 @@ function parseReport(txt, slug, D) {
   // primary vote chart: label line, then the first "NN% ±change" token that
   // follows it inside the slice (multi-column chart renders sparse; the
   // share is always paired with a signed change-since-election figure)
-  const pri = SECTION(txt, "The Liberal National Coalition", "Q: If a Federal Election") ?? "";
+  const pri = primaryText;
   for (const [k, label] of [["lnp", "The Liberal National Coalition"], ["alp", "The Labor Party"],
     ["grn", "The Greens"], ["onp", "One Nation"], ["ind", "Other"]]) {
     // pick the chart's label line, not a commentary-column line that merely
@@ -395,7 +400,7 @@ function figureDiffs(date, w, D) {
     chk("polls.dateStart", poll.dateStart, w.dateStart);
     chk("polls.sample", poll.sample, w.sample);
     if (poll.published != null) chk("polls.published", poll.published, w.published, true);
-    if (poll.undecided != null) chk("polls.undecided", poll.undecided, w.undecided, true);
+    if (!(poll.undecided == null && w.undecided != null)) chk("polls.undecided", poll.undecided, w.undecided, true);
     for (const k of ["alp", "lnp", "grn", "onp", "ind"]) chk(`polls.${k}`, poll[k], w[k]);
     chk("polls.tpp_alp", poll.tpp_alp, w.tpp_alp);
     chk("polls.tpp_lnp", poll.tpp_lnp, w.tpp_lnp);
@@ -469,7 +474,7 @@ function pollRows(w, item) {
 // -------------------------------------------------------------------- main
 // SPECTRE_LIB=1 lets the offline oracle import the parser without starting
 // the fetch/write pass (same convention as the RedBridge reader).
-const status = { changed: false, check: CHECK, added: [], verified: [], mismatches: [],
+const status = { changed: false, check: CHECK, added: [], backfilled: [], verified: [], mismatches: [],
   notes: [], skipped_items: [], item_errors: [] };
 if (process.env.SPECTRE_LIB !== "1") try {
   const orig = readFileSync(OUT, "utf8");
@@ -531,12 +536,14 @@ if (process.env.SPECTRE_LIB !== "1") try {
       const matched = existing.find((e) => w.date && Math.abs(daysBetween(e.date, w.date)) <= 3);
       status.verified.push({ slug, date: w.date, matched: !!matched });
       if (matched) {
+        if (w.undecided != null && matched.undecided == null) {
+          status.backfilled.push({ date: matched.date, key: "undecided", value: w.undecided });
+          if (!CHECK && !ONE_URL) matched.undecided = w.undecided;
+        }
         for (const d of figureDiffs(matched.date, w, D)) {
           if (d.known || d.parse === "absent") status.notes.push(`${matched.date} ${d.key}: canon ${d.canon} vs parse ${d.got}`);
           else status.mismatches.push({ date: matched.date, slug, ...d });
         }
-        if (w.undecided != null && existing.find((e) => e.date === matched.date)?.undecided == null)
-          status.notes.push(`${matched.date}: undecided ${w.undecided}% parsed (canon row predates the field)`);
         continue;
       }
       if (w.date && w.date < CYCLE_START) continue;
@@ -568,7 +575,7 @@ if (process.env.SPECTRE_LIB !== "1") try {
     process.exit(2);
   }
 
-  if (newRows.polls.length) {
+  if (newRows.polls.length || status.backfilled.length) {
     const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
     for (const sec of Object.keys(newRows)) D[sec] = [...D[sec], ...newRows[sec]].sort(byDate);
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
@@ -576,7 +583,7 @@ if (process.env.SPECTRE_LIB !== "1") try {
     if (status.changed && !CHECK && !ONE_URL) {
       writeFileSync(OUT + ".tmp", JSON.stringify(D, null, 2) + trailingNl);
       renameSync(OUT + ".tmp", OUT);
-      console.log(`wrote ${OUT}: +${newRows.polls.length} Spectre Strategy wave(s)`);
+      console.log(`wrote ${OUT}: +${newRows.polls.length} wave(s), ${status.backfilled.length} undecided backfill(s)`);
     }
   }
   if (ONE_URL && newRows.polls.length) console.log(JSON.stringify(newRows.polls[0], null, 2));

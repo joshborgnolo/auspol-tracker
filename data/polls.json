@@ -1670,6 +1670,7 @@
       "pollster": "Spectre Strategy",
       "client": "—",
       "sample": 1001,
+      "undecided": 7,
       "alp": 35.9,
       "lnp": 31,
       "grn": 12.8,
@@ -3885,7 +3886,8 @@
       "oth": null,
       "tpp_alp": 51,
       "tpp_lnp": 49,
-      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026"
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026",
+      "undecided": 7
     },
     {
       "date": "2026-04-12",
@@ -5265,7 +5267,8 @@
       "oth": null,
       "tpp_alp": 51,
       "tpp_lnp": 49,
-      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw"
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw",
+      "undecided": 7
     },
     {
       "date": "2026-07-26",
