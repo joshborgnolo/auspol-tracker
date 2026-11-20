@@ -2898,7 +2898,12 @@ const RELEASE_HUB = new Map(Object.entries(D.pollsterRules || {})
    ("1,500 D"): D = decided voters, undecideds set aside with no leaner
    question; D+L = decided plus leaners (undecideds asked which way they
    lean, the rest set aside); A = all voters, undecideds kept in the base
-   (Essential prints them as a share; Resolve offers no undecided option).
+   (Resolve offers no undecided option; Essential asks a leaner but keeps
+   those still unsure in - a leaner moves people between rows, never out of
+   the base, so it is still A). A house whose two-party figure has another base than its
+   primaries carries a per-facet pair: Essential's published 2PP+ pair keeps
+   its unsure in, but the site rescales it to 100 (share2pp), so the 2PP the
+   2PP views show is of those who named a party and a preference - D+L.
    Each is the house's own methodology statement (in the repo's -src caches
    where noted). A sub-series - "Newspoll (pooled)", "DemosAU (MRP)",
    "Roy Morgan (SMS)" - reads its parent's. A house with no statement found
@@ -2915,7 +2920,10 @@ const POLL_BASES = {
   "Roy Morgan": "D",          // "x% can't say who they would vote for", set aside; no leaner stated
   "Spectre Strategy": "D",    // spectre-src: "undecided before apportionment"
   "Resolve": "A",             // no undecided option (a forced choice)
-  "Essential": "A",           // undecided kept in, inside Independent/Other
+  // methodology page: "Participants answering 'Unsure' are NOT excluded from
+  // published results"; questionnaire Q23 "Well which party are you currently
+  // leaning towards?" asked of Q21 don't-knows
+  "Essential": { primary: "A", twopp: "D+L" },
 };
 const pollBases = Object.fromEntries([...new Set(POLLS.map((p) => p.pollster))]
   .map((h) => [h, POLL_BASES[h] || POLL_BASES[h.replace(/\s*\([^)]*\)$/, "")] || null])
@@ -9467,12 +9475,27 @@ window.AUSPOL = (function () {
   /* a sample as the tables print it: "1,500 D" - the count, then what the
      house's primary shares are of (pollBases); a house with no declared
      base prints the count alone. n overrides the count (an eff. sample). */
-  const pollBaseOf = (house) => (house && pollBases[house]) || null;
-  const sampleTxt = (p, n) => {
-    const v = n != null ? n : p && p.sample;
+  const pollBaseOf = (house, facet) => {
+    const b = house && pollBases[house];
+    if (!b) return null;
+    return typeof b === "string" ? b : (b[facet] || b.primary);
+  };
+  // the plain-text form, for labels and titles
+  const sampleTxt = (p, facet) => {
+    const v = p && p.sample;
     if (v == null) return null;
-    const b = pollBaseOf(p && p.pollster);
+    const b = pollBaseOf(p.pollster, facet);
     return (+v).toLocaleString() + (b ? "\u00a0" + b : "");
+  };
+  /* the rendered form: the letters set in small caps (.rd-smc, user call
+     2026-11-20). facet "twopp" picks a house's two-party base where it has
+     its own (Essential); anything else reads the primaries' base. */
+  const sampleEl = (p, facet) => {
+    const v = p && p.sample;
+    if (v == null) return null;
+    const b = pollBaseOf(p.pollster, facet), R = window.React;
+    const n = (+v).toLocaleString();
+    return b ? R.createElement(R.Fragment, null, n + "\u00a0", R.createElement("span", { className: "rd-smc" }, b)) : n;
   };
   const pollsterTable = ${JSON.stringify(pollsterTable)};
   // where each eff-filing house posts its APC statements (the "eff. TBC"
@@ -9608,7 +9631,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
-    individualPolls, pollBases, pollBaseOf, sampleTxt, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
+    individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },

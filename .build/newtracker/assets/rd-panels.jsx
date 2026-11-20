@@ -380,7 +380,7 @@ function RdPrimary({ rangeId, setRangeId }) {
       y = M[p.id] + (sv - q.p[p.id]);
     }
     return { x: q.x, y: +y.toFixed(2), gv: sv, color: p.color, label: p.name, meta: q, party: p.id, hollow: true,
-             sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + window.AUSPOL.sampleTxt(q) : "") };
+             sub: [RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " : ""), q.sample ? window.AUSPOL.sampleEl(q) : null] };
   }).filter(Boolean)) : []);
   const inDom = (x) => x >= xDomain[0] && x <= xDomain[1];
   const scatter = React.useMemo(() => D.individualPolls
@@ -3181,7 +3181,7 @@ function DpRug({ items, color, dxp, fmt }) {
               <span className="tip-title">{q.pollster}</span>
               <span className="tip-row"><span className="tip-swatch" style={{ background: color }}></span><span className="tip-label">{it.label}</span><span className="tip-val">{fmt(it.y)}</span></span>
               <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{q.fieldPending ? "TBC" : q.field}</span></span>
-              {q.sample != null && <div className="tip-sub">{"n ≈ " + window.AUSPOL.sampleTxt(q)}</div>}
+              {q.sample != null && <div className="tip-sub">{"n ≈ "}{window.AUSPOL.sampleEl(q)}</div>}
               {tip.src !== "touch" && <div className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + q.released}</div>}
             </span>}
           </b>
@@ -3788,7 +3788,7 @@ function RdDemographics({ rangeId = "all" }) {
                so its ring sits at the raw share; a cut inside a national
                wave lifts off that wave's own print, exactly as a dot does */
             const tip = { x: q.x, gv: sv, label: RD_SOLO_NAME[e.terr] + " only", meta: q, hollow: true,
-                          sub: "not pooled" + (q.sample ? ", n = " + window.AUSPOL.sampleTxt(q) : "") };
+                          sub: ["not pooled" + (q.sample ? ", n = " : ""), q.sample ? window.AUSPOL.sampleEl(q) : null] };
             if (e.whole) return [{ ...tip, y: +v.toFixed(1) }];
             const base = allAt.get(q.ym);
             const t = q.grp && q.grp.t ? q.grp.t[gpi] : null;

@@ -1130,7 +1130,7 @@ function TrendChart(props) {
         { label: dot.label || "2PP", value: fmt(dot.y, dot) + unit, color: dot.color },
         { label: dm.dateLabel ? "Field" : "", value: dm.dateLabel || "" },
       ].filter((r) => r.label),
-      sub: dot.sub || (dm.sample ? `n = ${window.AUSPOL.sampleTxt(dm)}` : ""),
+      sub: dot.sub || (dm.sample ? <>n = {window.AUSPOL.sampleEl(dm, !dot.label || /2PP/.test(dot.label) ? "twopp" : "primary")}</> : ""),
       hint: openable ? "Click to open this poll in All polls" : "",
     };
   } else if (hover && hoverX != null) {
@@ -1225,11 +1225,15 @@ function TrendChart(props) {
 
   /* What the live region says as the guide moves. Mirrors the visual tooltip,
      because the tooltip is positioned graphics a screen reader cannot follow. */
+  /* tip.sub may be markup (a sample's small-caps base letters), so the
+     live region reads its text */
+  const plainOf = (n) => n == null || n === false ? "" : typeof n === "string" || typeof n === "number" ? String(n)
+    : Array.isArray(n) ? n.map(plainOf).join("") : n.props ? plainOf(n.props.children) : "";
   const liveText = !tip ? "" : [
     tip.title,
     tip.date || "",
     ...(tip.rows || []).map((r) => `${r.label} ${r.value}`),
-    tip.sub || "",
+    plainOf(tip.sub),
   ].filter(Boolean).join(", ");
 
   /* Dot clouds, memoised: identity is what lets React skip them entirely on a

@@ -281,7 +281,7 @@ function RdPrimary({
       meta: q,
       party: p.id,
       hollow: true,
-      sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + window.AUSPOL.sampleTxt(q) : "")
+      sub: [RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " : ""), q.sample ? window.AUSPOL.sampleEl(q) : null]
     };
   }).filter(Boolean)) : [];
   const inDom = x => x >= xDomain[0] && x <= xDomain[1];
@@ -3913,7 +3913,7 @@ function DpRug({
       className: "tip-val"
     }, q.fieldPending ? "TBC" : q.field)), q.sample != null && React.createElement("div", {
       className: "tip-sub"
-    }, "n ≈ " + window.AUSPOL.sampleTxt(q)), tip.src !== "touch" && React.createElement("div", {
+    }, "n ≈ ", window.AUSPOL.sampleEl(q)), tip.src !== "touch" && React.createElement("div", {
       className: "tip-hint"
     }, rk ? tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls" : "Released " + q.released)));
   }));
@@ -4549,7 +4549,7 @@ function RdDemographics({
           label: RD_SOLO_NAME[e.terr] + " only",
           meta: q,
           hollow: true,
-          sub: "not pooled" + (q.sample ? ", n = " + window.AUSPOL.sampleTxt(q) : "")
+          sub: ["not pooled" + (q.sample ? ", n = " : ""), q.sample ? window.AUSPOL.sampleEl(q) : null]
         };
         if (e.whole) return [{
           ...tip,

@@ -869,7 +869,7 @@ function TrendChart(props) {
         label: dm.dateLabel ? "Field" : "",
         value: dm.dateLabel || ""
       }].filter(r => r.label),
-      sub: dot.sub || (dm.sample ? `n = ${window.AUSPOL.sampleTxt(dm)}` : ""),
+      sub: dot.sub || (dm.sample ? React.createElement(React.Fragment, null, "n = ", window.AUSPOL.sampleEl(dm, !dot.label || /2PP/.test(dot.label) ? "twopp" : "primary")) : ""),
       hint: openable ? "Click to open this poll in All polls" : ""
     };
   } else if (hover && hoverX != null) {
@@ -921,7 +921,8 @@ function TrendChart(props) {
   const spanFrom = tooltipTitle && spinePts.length ? tooltipTitle(0) : "";
   const spanTo = tooltipTitle && spinePts.length ? tooltipTitle(spinePts.length - 1) : "";
   const a11yLabel = ariaLabel || [namedSeries.length ? namedSeries.join(", ") : "Polling trend", spanFrom && spanTo ? `${spanFrom} to ${spanTo}` : "", scatter.length ? `${scatter.length} individual polls plotted` : "", spinePts.length > 1 ? "Use arrow keys to read each point" : ""].filter(Boolean).map(s => s.replace(/\.$/, "")).join(". ") + ".";
-  const liveText = !tip ? "" : [tip.title, tip.date || "", ...(tip.rows || []).map(r => `${r.label} ${r.value}`), tip.sub || ""].filter(Boolean).join(", ");
+  const plainOf = n => n == null || n === false ? "" : typeof n === "string" || typeof n === "number" ? String(n) : Array.isArray(n) ? n.map(plainOf).join("") : n.props ? plainOf(n.props.children) : "";
+  const liveText = !tip ? "" : [tip.title, tip.date || "", ...(tip.rows || []).map(r => `${r.label} ${r.value}`), plainOf(tip.sub)].filter(Boolean).join(", ");
   const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDom[0], yDom[1]].join("|");
   const dotPath = (shape, cx, cy, r) => {
     if (shape === "triangle") {

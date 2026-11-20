@@ -3918,7 +3918,7 @@ function ApprLine({ id, appr, chg }) {
 function sampleValue(x) {
   return (
     <React.Fragment>
-      {x.sample != null ? "n = " + window.AUSPOL.sampleTxt(x)
+      {x.sample != null ? <>n = {window.AUSPOL.sampleEl(x)}</>
                         : (x.sampleEff == null ? "—" : null)}
       {x.sampleEff != null && (
         <span title="Effective sample as published by the pollster (APC methodology statement)">
@@ -4989,7 +4989,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                       </span>
                     </td>
                     <td className="ta-l muted">{r.fieldPending ? rdFieldTbc(r) : r.field}</td>
-                    <td className="num muted hide-md">{r.sample != null ? window.AUSPOL.sampleTxt(r) : "—"}</td>
+                    <td className="num muted hide-md">{r.sample != null ? window.AUSPOL.sampleEl(r, facet) : "—"}</td>
 
                     {facet === "twopp" && (<>
                       <td className="ta-l apub-col hide-md"><ArchTpp p={r} basis={tppBasis} measure={measure} /></td>

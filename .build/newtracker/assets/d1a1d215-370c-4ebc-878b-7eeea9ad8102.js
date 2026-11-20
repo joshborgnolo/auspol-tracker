@@ -7083,7 +7083,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                     )}
                   </td>
                   <td className="ta-l muted">{p.fieldPending ? rdFieldTbc(p) : p.fieldLabel}</td>
-                  <td className="num muted hide-md">{p.sample != null ? window.AUSPOL.sampleTxt(p) : "—"}</td>
+                  <td className="num muted hide-md">{p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"}</td>
                   {/* only ever a house-filed figure - a dash means the pollster
                       published no effective sample, not that there is no n */}
                   <td className="num hide-md">

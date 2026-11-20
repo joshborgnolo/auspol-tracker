@@ -389,7 +389,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         <div className="tip-title">{q.pollster}</div>
         <div className="rd-tl-tipdate">{pr.fieldPending ? "TBC" : "Fieldwork " + pr.field}, published {pr.publishedLabel}</div>
         {figCell({ poll: pr })}
-        {q.sample ? <div className="tip-sub">n = {window.AUSPOL.sampleTxt(q)}</div> : null}
+        {q.sample ? <div className="tip-sub">n = {window.AUSPOL.sampleEl(q)}</div> : null}
         {t.src !== "touch" && <div className="tip-hint">{t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
       </div>
     );
@@ -843,7 +843,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                 </span>
                 <span role="cell" className="rd-pl-c-latest">
                   <span className="rd-pl-main">{latestLab(e)}</span>
-                  <span className="rd-pl-sub">{r.fieldPending ? <>fieldwork {rdFieldTbc(r)}</> : r.field}{r.sample ? ", " + window.AUSPOL.sampleTxt(r) : ""}</span>
+                  <span className="rd-pl-sub">{r.fieldPending ? <>fieldwork {rdFieldTbc(r)}</> : r.field}{r.sample ? <>, {window.AUSPOL.sampleEl(r, facet)}</> : ""}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
                 <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>

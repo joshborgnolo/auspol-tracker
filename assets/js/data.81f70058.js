@@ -5349,7 +5349,10 @@ window.AUSPOL = function () {
     "Resolve": "A",
     "YouGov (MRP)": "D",
     "Newspoll (pooled)": "D+L",
-    "Essential": "A",
+    "Essential": {
+      "primary": "A",
+      "twopp": "D+L"
+    },
     "YouGov": "D",
     "Freshwater": "D+L",
     "DemosAU (MRP)": "D+L",
@@ -5359,12 +5362,26 @@ window.AUSPOL = function () {
     "Roy Morgan (SMS)": "D",
     "Roy Morgan (pooled)": "D"
   };
-  const pollBaseOf = house => house && pollBases[house] || null;
-  const sampleTxt = (p, n) => {
-    const v = n != null ? n : p && p.sample;
+  const pollBaseOf = (house, facet) => {
+    const b = house && pollBases[house];
+    if (!b) return null;
+    return typeof b === "string" ? b : b[facet] || b.primary;
+  };
+  const sampleTxt = (p, facet) => {
+    const v = p && p.sample;
     if (v == null) return null;
-    const b = pollBaseOf(p && p.pollster);
+    const b = pollBaseOf(p.pollster, facet);
     return (+v).toLocaleString() + (b ? " " + b : "");
+  };
+  const sampleEl = (p, facet) => {
+    const v = p && p.sample;
+    if (v == null) return null;
+    const b = pollBaseOf(p.pollster, facet),
+      R = window.React;
+    const n = (+v).toLocaleString();
+    return b ? R.createElement(R.Fragment, null, n + " ", R.createElement("span", {
+      className: "rd-smc"
+    }, b)) : n;
   };
   const pollsterTable = [];
   const effTbcUrls = {
@@ -6149,6 +6166,7 @@ window.AUSPOL = function () {
     pollBases,
     pollBaseOf,
     sampleTxt,
+    sampleEl,
     pollsterTable,
     effTbcUrls,
     latest,

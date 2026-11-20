@@ -4133,7 +4133,7 @@ function ApprLine({
   })));
 }
 function sampleValue(x) {
-  return React.createElement(React.Fragment, null, x.sample != null ? "n = " + window.AUSPOL.sampleTxt(x) : x.sampleEff == null ? "—" : null, x.sampleEff != null && React.createElement("span", {
+  return React.createElement(React.Fragment, null, x.sample != null ? React.createElement(React.Fragment, null, "n = ", window.AUSPOL.sampleEl(x)) : x.sampleEff == null ? "—" : null, x.sampleEff != null && React.createElement("span", {
     title: "Effective sample as published by the pollster (APC methodology statement)"
   }, x.sample != null && ", ", "n", React.createElement("sub", null, "eff"), " = ", x.sampleEff.toLocaleString()));
 }
@@ -4959,7 +4959,7 @@ function PollsterTable({
       className: "ta-l muted"
     }, r.fieldPending ? rdFieldTbc(r) : r.field), React.createElement("td", {
       className: "num muted hide-md"
-    }, r.sample != null ? window.AUSPOL.sampleTxt(r) : "—"), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("td", {
+    }, r.sample != null ? window.AUSPOL.sampleEl(r, facet) : "—"), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("td", {
       className: "ta-l apub-col hide-md"
     }, React.createElement(ArchTpp, {
       p: r,

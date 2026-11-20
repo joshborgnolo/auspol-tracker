@@ -435,6 +435,8 @@ html.boot .static-summary :is(h1, h2), body.js:not(.ss-view) .static-summary :is
 }
 .boot-noscript strong { color: var(--ink); }
 .legend-val, .tip-val { font-variant-numeric: tabular-nums; }
+/* a sample's base letters ("1,500 D+L"): small caps, the user's one exception to sentence case (2026-11-20) */
+.rd-smc { font-variant-caps: all-small-caps; letter-spacing: .03em; }
 
 /* Insets, not guesses. viewport-fit=cover means the page now owns the notch
    strip and the home-indicator strip, so the padding has to give them back -

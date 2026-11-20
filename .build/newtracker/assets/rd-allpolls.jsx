@@ -506,7 +506,7 @@ function RdApMini({ p, onM, pub }) {
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: d.cx + "px" }} aria-hidden="true">
           <div className="tip-title">{d.q.fieldPending ? "TBC" : "Fieldwork " + (rdFieldTxt(d.q) || d.q.released)}</div>
           <div className="tip-sub">Labor {d.a.toFixed(1)} – {(100 - d.a).toFixed(1)} {rival}{pub ? ", as published" : ""}</div>
-          {d.q.sample != null && <div className="tip-sub">n = {window.AUSPOL.sampleTxt(d.q)}{d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""}</div>}
+          {d.q.sample != null && <div className="tip-sub">n = {window.AUSPOL.sampleEl(d.q, "twopp")}{d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""}</div>}
           {tip.src !== "touch" && (d.key
             ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll"}</div>
             : <div className="tip-hint">Released {outLabel(d.q)}</div>)}
@@ -618,7 +618,7 @@ function RdApDirMini({ p }) {
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
           <div className="tip-title">{dotTip.q.fieldPending ? "TBC" : "Fieldwork " + (rdFieldTxt(dotTip.q) || dotTip.q.released)}</div>
           <div className="tip-sub">Right direction {rdApNum(dotTip.q.right)}, wrong track {rdApNum(dotTip.q.wrong)}: net {rdApSigned(dotTip.a)}</div>
-          {dotTip.q.sample != null && <div className="tip-sub">n = {window.AUSPOL.sampleTxt(dotTip.q)}</div>}
+          {dotTip.q.sample != null && <div className="tip-sub">n = {window.AUSPOL.sampleEl(dotTip.q)}</div>}
           {tip.src !== "touch" && (dotTip.key
             ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading"}</div>
             : null)}
@@ -949,7 +949,7 @@ function RdApLdMini({ p, met }) {
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
           <div className="tip-title">{dotTip.q.fieldPending ? "TBC" : "Fieldwork " + (rdFieldTxt(dotTip.q) || dotTip.q.released)}</div>
           <div className="tip-sub">{rdApPm(dotTip.q.appr)}{" "}{rdApSigned(dotTip.q.appr.albNet)}, {dotTip.pr.name} {rdApSigned(dotTip.pr.net)} – {Math.abs(dotTip.pr.gap).toFixed(1)} points {rdApLdWay(dotTip.pr.gap, dotTip.pr.name, rdApPm(dotTip.q.appr))} ({rdApLdMetWord(dotTip.pr.met)})</div>
-          {dotTip.q.sample != null && <div className="tip-sub">n = {window.AUSPOL.sampleTxt(dotTip.q)}</div>}
+          {dotTip.q.sample != null && <div className="tip-sub">n = {window.AUSPOL.sampleEl(dotTip.q)}</div>}
           {tip.src !== "touch" && (dotTip.key
             ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll"}</div>
             : null)}
@@ -3321,7 +3321,7 @@ function RdAllPolls(P) {
     <span role="cell" className="rd-ap-when"><b>{p.fieldPending ? rdFieldTbc(p) : fieldTxt(p)}</b>{p.published && <span className="rd-ap-sub">released {rdDate(p.published.slice(0, 10))}</span>}</span>
   );
   const sampleCell = (p) => (
-    <span role="cell" className="rd-ap-n"><span>{p.sample != null ? window.AUSPOL.sampleTxt(p) : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
+    <span role="cell" className="rd-ap-n"><span>{p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
       : rdEffTbc(p) || rdEffMissing(p) ? <span className="rd-ap-sub">{rdEffNote(p)}</span>
       /* an MRP files no effective sample (its APC statement prints "n/a for
          MRP"), so say so rather than leave the sub-line empty */
@@ -3655,7 +3655,7 @@ function RdAllPolls(P) {
       </div>
     );
     if (phone) {
-      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleTxt(p) : null].filter(Boolean).join(", ");
+      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleEl(p, facet) : null].filter(Boolean).flatMap((x, i) => (i ? [", ", x] : [x]));
       /* the two head rows as ONE renderer so a facet whose feature line
          sits at the head's right edge can hand the slot to a stateful
          component (the consideration range cycler: its basis label rides
@@ -4229,7 +4229,7 @@ function RdAllPolls(P) {
           {" "}A pollster’s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance.</>,
         facet === "issues" && <>Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; "Level" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn’t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them.</>,
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
-        <><b>Sample</b> is the number of people polled, and the letters say what its primary-vote shares are of: <b>D</b> decided voters (undecideds set aside), <b>D+L</b> decided voters plus leaners (undecideds asked which way they lean, the rest set aside), <b>A</b> all voters (undecideds kept in). <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,
+        <><b>Sample</b> is the number of people polled, and the letters say what its primary-vote shares are of: <b className="rd-smc">D</b> decided voters (undecideds set aside), <b className="rd-smc">D+L</b> decided voters plus leaners (undecideds asked which way they lean, the rest set aside), <b className="rd-smc">A</b> all voters (undecideds kept in). <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,
       ]} />
       <div className="rd-foot">
         <span className="rd-foot-text">{facet === "twopp"
@@ -5235,7 +5235,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
             <span className="tip-row"><span className="tip-label">Published minus implied</span><span className="tip-val">{s1(d.v)}</span></span>
             {d.fl != null && <span className="tip-row"><span className="tip-label">Respondent flow to Labor</span><span className="tip-val">{d.fl.toFixed(1)}%</span></span>}
             <span className="tip-row"><span className="tip-label">Fieldwork</span><span className="tip-val">{d.dateLabel}</span></span>
-            {d.sample != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {window.AUSPOL.sampleTxt(d)}</span></span>}
+            {d.sample != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {window.AUSPOL.sampleEl(d)}</span></span>}
             {/* standard tip-hint chrome (accent colour, div not span —
                 .tip-sub sits later in the cascade and would grey it) and
                 only for an input that can actually open the poll: a touch
