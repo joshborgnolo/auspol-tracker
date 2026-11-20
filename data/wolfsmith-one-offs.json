@@ -1,0 +1,293 @@
+{
+ "_about": "One-off and topical questions from WOLF+SMITH's national polling for AMPLIFY, hand-entered from AMPLIFY's published research releases and their chart images. Voting intention is not part of this store.",
+ "generated": "2026-11-20",
+ "_readme": "Verification: the 13 May 2026 wave was transcribed from the five charts and text in AMPLIFY's 18 May research release, 'Broken promise' hits trust as Australians doubt Budget's housing reforms (https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms), with the linked 15 May AFR article as each wave's publication URL. The release identifies an independently conducted, nationally representative WOLF+SMITH survey of 1,002 Australians on 13 May, the night after the 2026-27 Budget. Figures are preserved as printed; rows that round to 99 or 101 are not adjusted and no complements are inferred. The CGT chart prints 26% opposed in its combined all-voters bar but its five-option dial sums to 27% opposed, so both printed forms remain in their respective tables. Results reported only verbally ('half', 'nearly 7 in 10') are filed as prose, never converted into numeric shares. The five source images are the release's 53f839f0 (beneficiaries), 413c1621 (CGT), 001f9364 (negative gearing), 5431a2c4 (considerations) and 1a8f592a (tax-revenue priority) PNGs.",
+ "entries": [
+  {
+   "id": "budget-group-impact",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "Taking the Budget as a whole, do you think it is good or bad for the following groups?",
+   "notes": "All-voters and subgroup values are transcribed from the release's 'Beneficiaries of Change' and 'Breakdowns for Country as a Whole' chart. Values retain the source's printed rounding.",
+   "tables": [
+    {
+     "title": "For the country as a whole",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "rows": [
+      ["Good", 27],
+      ["Neutral / Unsure", 33],
+      ["Bad", 40]
+     ]
+    },
+    {
+     "title": "Beneficiaries of Change",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Group", "Good", "Neutral / Unsure", "Bad"],
+     "rows": [
+      ["For those who own their own home outright", 37, 43, 20],
+      ["For those looking to buy a home", 34, 28, 38],
+      ["For young people", 34, 29, 37],
+      ["For the country as a whole", 27, 33, 40],
+      ["For those with an investment property", 21, 33, 47],
+      ["For those who are renting", 16, 39, 45],
+      ["For those who are paying a mortgage", 16, 41, 43]
+     ]
+    },
+    {
+     "title": "Breakdowns for Country as a Whole",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Voter group", "Good", "Neutral / Unsure", "Bad"],
+     "rows": [
+      ["Total", 27, 33, 40],
+      ["Labor Voters", 40, 36, 24],
+      ["Coalition Voters", 17, 35, 48],
+      ["Other Voters", 24, 31, 45],
+      ["Uncommitted voters", 31, 36, 33],
+      ["Marginal seats", 30, 31, 39],
+      ["Own Outright", 27, 31, 43],
+      ["Paying Mortgage", 30, 32, 38],
+      ["Renting", 25, 36, 39],
+      ["Investors", 37, 26, 37],
+      ["Lower Income", 24, 30, 46],
+      ["Medium Income", 30, 30, 40],
+      ["Higher Income", 28, 37, 35],
+      ["18-34 Years", 31, 36, 34],
+      ["35-54 Years", 28, 35, 36],
+      ["55+ Years", 24, 29, 47]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cgt-discount-removal",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "The Federal Government announced in the budget that it would be replacing the Capital Gains Tax discount with indexation, including for investment properties, from 1st July 2027. Do you support or oppose this change to the Capital Gains Tax for investment properties?",
+   "notes": "The combined all-voters bar prints 38% support, 35% neutral/unsure and 26% oppose. The five-option dial prints 10/28/35/16/11, whose oppose pair sums to 27%. Both forms are preserved as printed rather than reconciled.",
+   "tables": [
+    {
+     "title": "All voters, five-response breakdown",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "rows": [
+      ["Strongly support", 10],
+      ["Support", 28],
+      ["Unsure / Neutral", 35],
+      ["Oppose", 16],
+      ["Strongly oppose", 11]
+     ]
+    },
+    {
+     "title": "Combined support, neutral and opposition, by voter group",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Voter group", "Support", "Neutral / Unsure", "Oppose"],
+     "rows": [
+      ["Total", 38, 35, 26],
+      ["Labor Voters", 53, 31, 16],
+      ["Coalition Voters", 31, 28, 41],
+      ["Other Voters", 33, 40, 27],
+      ["Uncommitted voters", 43, 30, 27],
+      ["Marginal seats", 37, 33, 30],
+      ["Own Outright", 35, 28, 37],
+      ["Paying Mortgage", 43, 31, 25],
+      ["Renting", 37, 45, 18],
+      ["Investors", 38, 15, 47],
+      ["Lower Income", 35, 38, 27],
+      ["Medium Income", 43, 32, 25],
+      ["Higher Income", 42, 33, 24],
+      ["18-34 Years", 44, 36, 20],
+      ["35-54 Years", 41, 34, 25],
+      ["55+ Years", 32, 35, 33]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "negative-gearing-restriction",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "The Federal Government announced in the budget that it would be abolishing Negative Gearing on the purchase of existing properties from 1st July 2027. After this date, newly built homes can still be negatively geared, and any property purchased before the Budget will be exempt from the changes. Do you support or oppose the ending of Negative Gearing for existing properties in this way?",
+   "notes": "The question exempts newly built homes and properties purchased before the Budget. Values retain the source's printed rounding.",
+   "tables": [
+    {
+     "title": "All voters, five-response breakdown",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "rows": [
+      ["Strongly support", 12],
+      ["Support", 29],
+      ["Unsure / Neutral", 32],
+      ["Oppose", 16],
+      ["Strongly oppose", 11]
+     ]
+    },
+    {
+     "title": "Combined support, neutral and opposition, by voter group",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Voter group", "Support", "Neutral / Unsure", "Oppose"],
+     "rows": [
+      ["Total", 41, 32, 27],
+      ["Labor Voters", 51, 34, 14],
+      ["Coalition Voters", 28, 30, 42],
+      ["Other Voters", 40, 30, 30],
+      ["Uncommitted voters", 43, 30, 27],
+      ["Marginal seats", 40, 29, 31],
+      ["Own Outright", 41, 27, 31],
+      ["Paying Mortgage", 41, 29, 30],
+      ["Renting", 40, 39, 21],
+      ["Investors", 48, 16, 36],
+      ["Lower Income", 36, 42, 22],
+      ["Medium Income", 48, 28, 25],
+      ["Higher Income", 44, 26, 30],
+      ["18-34 Years", 47, 32, 21],
+      ["35-54 Years", 41, 32, 28],
+      ["55+ Years", 36, 32, 31]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-reform-considerations",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "Thinking about your support or opposition to the proposed changes to capital gains tax and negative gearing, how important are each of the following considerations to your view?",
+   "notes": "The tenure columns print the share calling each consideration important. Values retain the source's printed rounding.",
+   "tables": [
+    {
+     "title": "Importance of each consideration",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Consideration", "Important", "Unsure", "Unimportant"],
+     "rows": [
+      ["Whether the changes will make it easier for people to buy their first home", 80, 8, 12],
+      ["Whether the changes will increase rents", 76, 9, 14],
+      ["Whether the changes will increase the number of homes built", 73, 11, 16],
+      ["Whether the changes would increase the tax burden on investors", 57, 11, 32]
+     ]
+    },
+    {
+     "title": "Share calling each consideration important, by housing tenure",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Consideration", "Own Outright", "Paying Mortgage", "Renting & Sharing", "Investment Property"],
+     "rows": [
+      ["Whether the changes will make it easier for people to buy their first home", 76, 82, 81, 76],
+      ["Whether the changes will increase rents", 69, 81, 79, 70],
+      ["Whether the changes will increase the number of homes built", 72, 75, 72, 71],
+      ["Whether the changes would increase the tax burden on investors", 61, 56, 56, 66]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "housing-tax-revenue-priority",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "The government estimates that billions of dollars will be raised in tax revenue due to the changes to Capital Gains Tax and Negative Gearing. Where do you think this money should be spent as a priority?",
+   "notes": "The five all-voters choices sum to 101% as printed. The subgroup chart prints only the share choosing building more housing.",
+   "tables": [
+    {
+     "title": "Preferred Use of Tax Income",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "rows": [
+      ["Building more housing", 34],
+      ["Paying down the national debt", 24],
+      ["Lowering taxes", 21],
+      ["Spending on government services", 18],
+      ["Other", 4]
+     ]
+    },
+    {
+     "title": "Breakdowns for More House Building",
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "headers": ["Voter group", "Building more housing"],
+     "rows": [
+      ["Total", 34],
+      ["Labor Voters", 36],
+      ["Coalition Voters", 33],
+      ["Other Voters", 35],
+      ["Uncommitted voters", 33],
+      ["Marginal seats", 37],
+      ["Own Outright", 30],
+      ["Paying Mortgage", 29],
+      ["Renting", 42],
+      ["Investors", 21],
+      ["Lower Income", 34],
+      ["Medium Income", 37],
+      ["Higher Income", 32],
+      ["18-34 Years", 33],
+      ["35-54 Years", 34],
+      ["55+ Years", 36]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "government-housing-effort",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "Does the Federal Government have more to do on housing, or is it doing enough?",
+   "notes": "Question wording as reported in AMPLIFY's release; the exact questionnaire wording and any other response share were not published.",
+   "tables": [
+    {
+     "title": null,
+     "source": "https://www.amplifyaus.org/post/broken-promise-hits-trust-as-australians-doubt-budgets-housing-reforms",
+     "rows": [
+      ["More to do", 78],
+      ["Doing enough", 11]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "budget-2026-trust",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "Did the Budget change your level of trust in the Federal Government?",
+   "notes": "The release does not publish a full numeric breakdown. Its verbal 'half' finding is retained as prose rather than converted into an estimated percentage.",
+   "tables": [],
+   "prose": [
+    "Half of Australians say the Budget has led to a decline in their level of trust in the Federal Government, while only a small minority report increased trust."
+   ]
+  },
+  {
+   "id": "broken-promise-housing-importance",
+   "waveDate": "2026-05-13",
+   "dateStart": "2026-05-13",
+   "dateEnd": "2026-05-13",
+   "published": "2026-05-15T15:15",
+   "sample": 1002,
+   "url": "https://www.afr.com/politics/federal/labor-s-housing-revamp-fails-to-convince-voters-20260515-p5zxaa",
+   "question": "How important is it to your judgement of the housing tax policies that negative gearing and capital gains tax changes were ruled out before the election?",
+   "notes": "Question wording as reported in AMPLIFY's release. The release gives no numeric breakdown, so its verbal finding remains prose.",
+   "tables": [],
+   "prose": [
+    "Nearly 7 in 10 Australians say the fact that changes to negative gearing and the capital gains tax discount were ruled out before the election is important to how they judge the policies."
+   ]
+  }
+ ]
+}

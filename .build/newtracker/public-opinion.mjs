@@ -38,7 +38,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { THEMES, themeOf } from "./adhoc-themes.mjs";
 
-/* ---- the ten stores, read into one shape -----------------------------------
+/* ---- the eleven stores, read into one shape --------------------------------
    The stores are hand-curated research products, each on its own pipeline
    and commit; this reshapes them to one entry shape and drops what the page
    never reads (RedBridge's verification haystacks, News24's embed ids). No
@@ -79,14 +79,15 @@ export function readStores(root) {
     }
   }
   /* Essential, Resolve, Freshwater, Australia Institute (via YouGov),
-     Scanlon Institute: .entries, tables already [label, ...values] */
-  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"], ["scanlon", "scanlon-one-offs.json"]]) {
+     Scanlon Institute, WOLF+SMITH (for AMPLIFY): .entries, tables already
+     [label, ...values], with optional prose for verbal-only results */
+  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"], ["scanlon", "scanlon-one-offs.json"], ["wolfsmith", "wolfsmith-one-offs.json"]]) {
     for (const e of read(file, (j) => j.entries || [])) {
       entries.push({ house, id: e.id, waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
         sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
         question: e.question, note: e.notes || null, url: e.url || null,
         tables: (e.tables || []).map((t) => ({ title: t.title || null, headers: t.headers || null, rows: t.rows || [] })),
-        prose: [] });
+        prose: e.prose || [] });
     }
   }
   /* every id must be filed (themeOf throws), before anything is drawn */
@@ -105,6 +106,7 @@ export const HOUSES = {
   demosau: { short: "DemosAU", full: "DemosAU" },
   ausinst: { short: "Australia Inst", full: "YouGov for The Australia Institute" },
   scanlon: { short: "Scanlon", full: "Scanlon Institute" },
+  wolfsmith: { short: "Wolf+Smith", full: "WOLF+SMITH for AMPLIFY" },
 };
 
 const MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -754,6 +756,7 @@ export const FEATURES = {
         { ref: R("budget-good-for-household", "resolve"), wording: "Good or bad for your household?" },
         { ref: R("budget-approval-2026", "essential"), wording: "Approve or disapprove of the budget?" },
         { ref: R("budget-2026-impact", "secnewgate", "2026-05-18"), table: 1, wideRow: 1, wording: "Its impact on you and your family" },
+        { ref: R("budget-group-impact", "wolfsmith"), wording: "Good or bad for the country?" },
       ],
       note: "Newspoll and YouGov printed only the two sides, so their bars leave the rest blank." },
     { kind: "stack", mode: "compare", key: "cgt", title: "Do voters back cutting the capital gains tax discount?", names: ["support", "oppose"],
@@ -767,6 +770,7 @@ export const FEATURES = {
         { ref: R("budget-2026-tax-measures", "demosau"), wideRow: 1, wording: "Scrapping the 50% discount for indexation" },
         { ref: R("cgt-discount-removal", "resolve", "2026-05-16"), wording: "Removing the 50% discount" },
         { ref: R("budget-measures-2026", "essential"), wideRow: 2, wording: "Winding it back for shares and investments" },
+        { ref: R("cgt-discount-removal", "wolfsmith"), table: 1, wideRow: 0, wording: "Replacing the discount with indexation" },
       ] },
     { kind: "stack", mode: "compare", key: "negative-gearing", title: "Do voters back limiting negative gearing?", names: ["support", "oppose"],
       tally: ["support leads", "opposition leads"],
@@ -778,6 +782,7 @@ export const FEATURES = {
         { ref: R("budget-2026-tax-measures", "demosau"), wideRow: 0, wording: "Ending it for existing homes bought from 12 May" },
         { ref: R("negative-gearing-restriction", "resolve", "2026-05-16"), wording: "Restricting it" },
         { ref: R("budget-measures-2026", "essential"), wideRow: 1, wording: "Winding back negative gearing and the CGT discount for property" },
+        { ref: R("negative-gearing-restriction", "wolfsmith"), table: 1, wideRow: 0, wording: "Ending it for existing homes, with exemptions" },
       ] },
     { kind: "split", title: "Do the budget’s broken promises make people less likely to vote Labor?", ref: R("budget-broken-promises-labor-vote", "resolve"),
       sides: { a: ["More likely"], b: ["Less likely"], m: ["No impact or unsure"] }, names: ["more likely", "less likely"] },
@@ -785,6 +790,12 @@ export const FEATURES = {
       sides: { a: /increase rents/i, b: /reduce rents/i }, names: ["push rents up", "bring rents down"] },
     { kind: "split", title: "What is more to blame for the housing shortage: immigration or investor tax breaks?", ref: R("housing-shortage-blame", "demosau"),
       sides: { a: /immigration/i, b: /negative gearing/i }, names: ["immigration", "investor tax breaks"] },
+    { kind: "rank", title: "What matters when judging the housing tax changes?", ref: R("housing-reform-considerations", "wolfsmith"),
+      base: "% calling each consideration important to their view" },
+    { kind: "rank", title: "Where should the extra housing tax revenue go?", ref: R("housing-tax-revenue-priority", "wolfsmith"),
+      base: "% choosing each as the priority" },
+    { kind: "split", title: "Does the government have more to do on housing?", ref: R("government-housing-effort", "wolfsmith"),
+      sides: { a: ["More to do"], b: ["Doing enough"] }, names: ["more to do", "doing enough"] },
     { kind: "stack", mode: "compare", key: "house-prices", title: "Should house prices fall?", names: ["lower prices", "steady or higher prices"],
       tally: null,
       items: [
@@ -1799,7 +1810,14 @@ const TITLES = {
   "investment-income-tax-preference": "Should investment income be taxed at a lower rate than work?",
   "budget-2026-tax-statements": "Views on the budget’s tax changes",
   "cgt-negative-gearing-housing-verdict": "Will the housing tax changes make homes more affordable?",
+  "cgt-discount-removal|wolfsmith": "Do voters back replacing the CGT discount with indexation?",
+  "negative-gearing-restriction|wolfsmith": "Do voters back ending negative gearing on existing homes?",
   "post-budget-housing-verdict": "Are Labor’s housing measures a step in the right direction?",
+  "budget-group-impact": "Who does the budget help or hurt?",
+  "housing-reform-considerations": "What matters in judging housing tax changes?",
+  "housing-tax-revenue-priority": "Where should the housing tax revenue go?",
+  "government-housing-effort": "Does the government have more to do on housing?",
+  "broken-promise-housing-importance": "How much do the budget’s broken promises matter?",
   "budget-revenue-options": "Ten ways to raise revenue: which do people back?",
   "deficit-response-preferences": "How should the deficit be cut: tax the rich, or cut spending?",
   "deficit-seriousness": "How serious is the budget deficit?",

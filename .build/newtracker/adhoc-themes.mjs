@@ -246,6 +246,12 @@ export const THEME_OF = {
   "housing-market-timing": "housing-budget",
   "tax-reforms": "housing-budget",
   "government-financial-assistance": "housing-budget",
+  // wolfsmith
+  "budget-group-impact": "housing-budget",
+  "housing-reform-considerations": "housing-budget",
+  "housing-tax-revenue-priority": "housing-budget",
+  "government-housing-effort": "housing-budget",
+  "broken-promise-housing-importance": "housing-budget",
 
   /* cost-of-living */
   // essential

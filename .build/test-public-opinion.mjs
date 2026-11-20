@@ -309,6 +309,20 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   const fall = entries.find((e) => e.id === "housing-values-fall" && e.waveDate === "2026-09-14").tables[0].rows;
   assert.deepEqual(fall, [["For Australia — good thing (Sep '26)", 57], ["For Australia — bad thing (Sep '26)", 21],
     ["For you personally — good thing (Sep '26)", 38], ["For you personally — bad thing (Sep '26)", 29]], "SEC Newgate's September totals as page 22 prints them");
+  /* WOLF+SMITH/AMPLIFY's charts keep their printed figures, including the
+     CGT dial/combined-bar discrepancy; verbal-only findings stay prose. */
+  const wolf = entries.filter((e) => e.house === "wolfsmith");
+  assert.equal(wolf.length, 8, "all eight AMPLIFY questions ride the store");
+  assert.ok(wolf.every((e) => e.waveDate === "2026-05-13" && e.sample === 1002), "the wave keeps its printed fieldwork date and sample");
+  assert.deepEqual(wolf.find((e) => e.id === "budget-group-impact").tables[2].rows.find((r) => r[0] === "Renting"), ["Renting", 25, 36, 39]);
+  assert.deepEqual(wolf.find((e) => e.id === "cgt-discount-removal").tables[0].rows.map((r) => r[1]), [10, 28, 35, 16, 11]);
+  assert.deepEqual(wolf.find((e) => e.id === "cgt-discount-removal").tables[1].rows[0], ["Total", 38, 35, 26]);
+  assert.deepEqual(wolf.find((e) => e.id === "negative-gearing-restriction").tables[1].rows[0], ["Total", 41, 32, 27]);
+  assert.deepEqual(wolf.find((e) => e.id === "government-housing-effort").tables[0].rows, [["More to do", 78], ["Doing enough", 11]]);
+  for (const id of ["budget-2026-trust", "broken-promise-housing-importance"]) {
+    const q = out.topics.find((t) => t.id === "housing-budget").more.find((q) => q.id === id && q.house === "wolfsmith");
+    assert.equal(q.prose.length, 1, `${id}: its verbal-only release finding remains readable prose`);
+  }
   for (const t of out.topics) for (const q of t.more) {
     assert.ok(q.title && q.srcs.length, `${q.id} lists with its waves`);
     assert.ok(q.figs.length || q.prose.length, `${q.id} (${q.house}) opens to figures or the article's words`);
