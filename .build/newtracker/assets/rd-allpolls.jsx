@@ -179,7 +179,9 @@ function rdFieldTbc(p, tabIndex) {
    pollster's effective sample beside it where it prints one - and "eff. TBC"
    where it normally does but this wave's hasn't appeared yet (the house's
    previous poll carried one, and this came out in the last three weeks;
-   older gaps are left unsaid, since some waves never get one). A wave filed
+   older gaps are left unsaid, since some waves never get one). Roy Morgan,
+   Spectre Strategy and Resolve instead get a rounded approximate n, marked
+   with a tilde and derived on their row margins' basis. A wave filed
    under a client is "published by the AFR" (mastheads take the article,
    brands like News24 go bare; the non-masthead clients take "commissioned"
    instead - RD_AP_COMMISSIONED below); a self-published poll is published
@@ -194,11 +196,12 @@ const rdApThe = (name) => (/^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? nam
 const RD_AP_COMMISSIONED = { "Blueprint Institute": 1, "Climate Council": 1, "Australia Inst.": 1, Amplify: 1 };
 function rdPollHead(p) {
   const effTag = rdEffTbc(p) || rdEffMissing(p);
+  const effEst = rdEffEstimate(p);
   // the figure cluster stays glued so it never splits mid-figure; the
   // "a sample of" lead-in wraps freely or the whole run would jump to the
   // next line as one block and strand a wide gap after "from"
   const n = p.sample != null
-    ? <>a sample of <span className="rd-nocaps">{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : effTag ? <> ({rdEffNote(p)})</> : ""}</span></>
+    ? <>a sample of <span className="rd-nocaps" title={effEst != null && !effTag ? "Estimated from the raw sample and the site’s design effect; the house publishes no effective sample" : undefined}>{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : effTag ? <> ({rdEffNote(p)})</> : effEst != null ? " (eff. ~" + effEst.toLocaleString() + ")" : ""}</span></>
     : "an unpublished sample";
   const out = rdApOut(p.published);
   // a filed-under-client wave credits its client; a self-published poll is
@@ -1689,11 +1692,11 @@ function RdLgTpp({ p, onM, moe, note }) {
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
   if (f && f.length === 2) return {
-    h: p.undecided != null ? "Primary vote shares are decideds’. " + p.undecided + "% undecided, excluded" : f[1] + "% not firm",
+    h: p.undecided != null ? "Primary-vote shares are decideds’. " + p.undecided + "% undecided, excluded" : f[1] + "% not firm",
     w: "", d: null, s: f[0] + "% firm, " + f[1] + "% soft",
   };
   if (p.undecidedLeaner != null) return {
-    h: "Primary vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "% undecided after leaner, excluded",
+    h: "Primary-vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "% undecided after leaner, excluded",
     w: "", d: null,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null,
   };
@@ -1701,14 +1704,14 @@ function rdLgDecided(p) {
     const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
     if (b === "soft") return { h: "Primary-vote shares are everyones’. ‘Undecided’ not an option (a forced choice)", w: "", d: null,
       s: (100 - p.undecided) + "% firm, " + p.undecided + "% soft" };
-    return { h: (b === "leaner" || b === "tpp" ? "Primary vote shares are decideds’ and leaners’ combined. " : "Primary vote shares are decideds’. ") + p.undecided + "%", w: b === "leaner" ? "undecided after leaner" : "undecided",
+    return { h: (b === "leaner" || b === "tpp" ? "Primary-vote shares are decideds’ and leaners’ combined. " : "Primary-vote shares are decideds’. ") + p.undecided + "%", w: b === "leaner" ? "undecided after leaner" : "undecided",
              d: (p.chg && p.chg.d && p.chg.d.und) || null,
              s: b === "soft" ? "named a party, but might yet change their mind" : "excluded",
              sep: b === "soft" || b === "tpp" ? " – " : ", " };
   }
   if (f) return { h: f[1] + f[2] + "%", w: "not firm", d: null, s: "solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + " on its vote-softness table" };
   if (p.pollster === "YouGov" || p.pollster === "YouGov (MRP)")
-    return { h: "Primary vote shares are decideds’. % undecided not published, excluded", w: "", d: null, s: null };
+    return { h: "Primary-vote shares are decideds’. % undecided not published, excluded", w: "", d: null, s: null };
   return null;
 }
 const RD_LG_CK = { alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" };
@@ -3320,13 +3323,17 @@ function RdAllPolls(P) {
   const fieldCell = (p) => (
     <span role="cell" className="rd-ap-when"><b>{p.fieldPending ? rdFieldTbc(p) : fieldTxt(p)}</b>{p.published && <span className="rd-ap-sub">released {rdDate(p.published.slice(0, 10))}</span>}</span>
   );
-  const sampleCell = (p) => (
-    <span role="cell" className="rd-ap-n"><span>{p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
-      : rdEffTbc(p) || rdEffMissing(p) ? <span className="rd-ap-sub">{rdEffNote(p)}</span>
-      /* an MRP files no effective sample (its APC statement prints "n/a for
-         MRP"), so say so rather than leave the sub-line empty */
-      : / \(MRP\)$/.test(p.pollster || "") ? <span className="rd-ap-sub">eff. n/a</span> : null}</span>
-  );
+  const sampleCell = (p) => {
+    const effEst = rdEffEstimate(p);
+    return (
+      <span role="cell" className="rd-ap-n"><span>{p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
+        : rdEffTbc(p) || rdEffMissing(p) ? <span className="rd-ap-sub">{rdEffNote(p)}</span>
+        /* an MRP files no effective sample (its APC statement prints "n/a for
+           MRP"), so say so rather than leave the sub-line empty */
+        : / \(MRP\)$/.test(p.pollster || "") ? <span className="rd-ap-sub">eff. n/a</span>
+        : effEst != null ? <span className="rd-ap-sub" title="Estimated from the raw sample and the site’s design effect; the house publishes no effective sample">eff. ~{effEst.toLocaleString()}</span> : null}</span>
+    );
+  };
   const tipCard = (p, f, m) => {
     const lean = p.lean;
     const he = rdApHe(p, onM, pub);

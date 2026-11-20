@@ -5917,7 +5917,7 @@ function AllPollsView({
       className: "ta-l muted"
     }, p.fieldPending ? rdFieldTbc(p) : p.fieldLabel), React.createElement("td", {
       className: "num muted hide-md"
-    }, p.sample != null ? window.AUSPOL.sampleTxt(p) : "—"), React.createElement("td", {
+    }, p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"), React.createElement("td", {
       className: "num hide-md"
     }, p.sampleEff == null ? React.createElement("span", {
       className: "muted"

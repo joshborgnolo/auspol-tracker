@@ -661,7 +661,7 @@ function RdApMini({
       className: "tip-sub"
     }, "Labor ", d.a.toFixed(1), " \u2013 ", (100 - d.a).toFixed(1), " ", rival, pub ? ", as published" : ""), d.q.sample != null && React.createElement("div", {
       className: "tip-sub"
-    }, "n = ", window.AUSPOL.sampleTxt(d.q), d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""), tip.src !== "touch" && (d.key ? React.createElement("div", {
+    }, "n = ", window.AUSPOL.sampleEl(d.q, "twopp"), d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""), tip.src !== "touch" && (d.key ? React.createElement("div", {
       className: "tip-hint"
     }, tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll") : React.createElement("div", {
       className: "tip-hint"
@@ -861,7 +861,7 @@ function RdApDirMini({
     className: "tip-sub"
   }, "Right direction ", rdApNum(dotTip.q.right), ", wrong track ", rdApNum(dotTip.q.wrong), ": net ", rdApSigned(dotTip.a)), dotTip.q.sample != null && React.createElement("div", {
     className: "tip-sub"
-  }, "n = ", window.AUSPOL.sampleTxt(dotTip.q)), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
+  }, "n = ", window.AUSPOL.sampleEl(dotTip.q)), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
     className: "tip-hint"
   }, tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading") : null)));
 }
@@ -1404,7 +1404,7 @@ function RdApLdMini({
     className: "tip-sub"
   }, rdApPm(dotTip.q.appr), " ", rdApSigned(dotTip.q.appr.albNet), ", ", dotTip.pr.name, " ", rdApSigned(dotTip.pr.net), " \u2013 ", Math.abs(dotTip.pr.gap).toFixed(1), " points ", rdApLdWay(dotTip.pr.gap, dotTip.pr.name, rdApPm(dotTip.q.appr)), " (", rdApLdMetWord(dotTip.pr.met), ")"), dotTip.q.sample != null && React.createElement("div", {
     className: "tip-sub"
-  }, "n = ", window.AUSPOL.sampleTxt(dotTip.q)), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
+  }, "n = ", window.AUSPOL.sampleEl(dotTip.q)), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
     className: "tip-hint"
   }, tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll") : null)));
 }
@@ -4243,7 +4243,7 @@ function RdAllPolls(P) {
     return React.createElement("span", {
       role: "cell",
       className: "rd-ap-n"
-    }, React.createElement("span", null, p.sample != null ? window.AUSPOL.sampleTxt(p) : "—"), p.sampleEff != null ? React.createElement("span", {
+    }, React.createElement("span", null, p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"), p.sampleEff != null ? React.createElement("span", {
       className: "rd-ap-sub"
     }, "eff. ", p.sampleEff.toLocaleString()) : rdEffTbc(p) || rdEffMissing(p) ? React.createElement("span", {
       className: "rd-ap-sub"
@@ -4869,7 +4869,7 @@ function RdAllPolls(P) {
       onFacet: onFacet
     }));
     if (phone) {
-      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleTxt(p) : null].filter(Boolean).join(", ");
+      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleEl(p, facet) : null].filter(Boolean).flatMap((x, i) => i ? [", ", x] : [x]);
       const cardHead = edge => React.createElement(React.Fragment, null, React.createElement("div", {
         className: "rd-ap-c1"
       }, React.createElement("span", {
@@ -5696,7 +5696,13 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Published/Fieldwork heading sorts the table two ways \u2013 by the day each poll came out (the default) or, on its Fieldwork half, by fieldwork dates, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled, and the letters say what its primary-vote shares are of: ", React.createElement("b", null, "D"), " decided voters (undecideds set aside), ", React.createElement("b", null, "D+L"), " decided voters plus leaners (undecideds asked which way they lean, the rest set aside), ", React.createElement("b", null, "A"), " all voters (undecideds kept in). ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. The Published/Fieldwork heading sorts the table two ways \u2013 by the day each poll came out (the default) or, on its Fieldwork half, by fieldwork dates, with the month dividers filing by that too. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled, and the letters say what its primary-vote shares are of: ", React.createElement("b", {
+      className: "rd-smc"
+    }, "D"), " decided voters (undecideds set aside), ", React.createElement("b", {
+      className: "rd-smc"
+    }, "D+L"), " decided voters plus leaners (undecideds asked which way they lean, the rest set aside), ", React.createElement("b", {
+      className: "rd-smc"
+    }, "A"), " all voters (undecideds kept in). ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
@@ -7291,7 +7297,7 @@ function RdFlowChart({
       className: "tip-label"
     }, "Sample"), React.createElement("span", {
       className: "tip-val"
-    }, "n = ", window.AUSPOL.sampleTxt(d))), k && tip.src !== "touch" && React.createElement("div", {
+    }, "n = ", window.AUSPOL.sampleEl(d))), k && tip.src !== "touch" && React.createElement("div", {
       className: "tip-hint"
     }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"));
   })());

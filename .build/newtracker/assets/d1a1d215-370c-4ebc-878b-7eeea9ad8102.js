@@ -5943,6 +5943,18 @@ function rdEffMissing(p) {
     && Math.abs(Date.parse(q.released) - rel) < 120 * 86400000);
 }
 
+/* These houses publish no effective sample. Show the same derived n their
+   row margins use, rounded to ten and marked approximate; sampleEff remains
+   reserved for a house-published figure. Confidence releases are out even
+   when their byline shares Roy Morgan's name. */
+const RD_APPROX_EFF_HOUSES = new Set(["Roy Morgan", "Spectre Strategy", "Resolve"]);
+function rdEffEstimate(p) {
+  if (p.conf || p.sampleEff != null || !p.sample || !RD_APPROX_EFF_HOUSES.has(p.pollster)) return null;
+  const L = window.AUSPOL.latest;
+  const deff = (L && L.method && L.method.deff) || 1.6;
+  return Math.round(p.sample / deff / 10) * 10;
+}
+
 function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
@@ -6459,6 +6471,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       if (p.sampleEff != null) hayParts.push("eff effective sample", String(p.sampleEff));
       else if (rdEffMissing(p)) hayParts.push("eff effective sample missing no statement");
       else if (rdEffTbc(p)) hayParts.push("eff effective sample tbc pending");
+      else if (rdEffEstimate(p) != null) hayParts.push("eff effective sample approximate estimated", String(rdEffEstimate(p)));
       hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
       const hay = hayParts.join(" ").toLowerCase();
       return {
@@ -7994,7 +8007,7 @@ function infoTerms(D) {
         estimate built from the polls of 30 days earlier. It counts as a change only when it is
         larger than its own margin, which combines both readings’ intervals; otherwise the figure
         says “within the margin”.</li>
-        <li><strong>On the primary vote figures:</strong> the change since the 2025 election,
+        <li><strong>On the primary-vote figures:</strong> the change since the 2025 election,
         where every line on that chart begins.</li>
         <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
         pollster’s own previous poll.</li>
@@ -9065,7 +9078,7 @@ function infoTerms(D) {
           <li><strong>Beside a current figure:</strong> the trend’s move over the past month. It
           counts as a change only when it is larger than its own margin, the 95% interval of that
           move; otherwise the figure says “within the margin”.</li>
-          <li><strong>On the primary vote figures:</strong> the change since the {eY} election,
+          <li><strong>On the primary-vote figures:</strong> the change since the {eY} election,
           where the lines on that chart begin.</li>
           <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
           pollster’s own previous poll.</li>
@@ -9124,7 +9137,7 @@ function infoTerms(D) {
           estimate built from the polls of 30 days earlier. It counts as a change only when it is
           larger than its own margin, which combines both readings’ intervals; otherwise the figure
           says “within the margin”.</li>
-          <li><strong>On the primary vote figures:</strong> the change since the {eY} election,
+          <li><strong>On the primary-vote figures:</strong> the change since the {eY} election,
           where the lines on that chart begin.</li>
           <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
           pollster’s own previous poll.</li>
