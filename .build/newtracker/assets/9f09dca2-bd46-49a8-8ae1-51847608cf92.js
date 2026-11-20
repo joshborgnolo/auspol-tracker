@@ -434,6 +434,15 @@ window.AUSPOL = (function () {
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
+    undecidedCellOf: (p) => {
+      const base = pollBaseOf(p.pollster, "primary");
+      if (base === "F") return null;
+      const v = typeof p.undIn === "number" ? p.undIn
+        : p.undecidedLeaner != null ? p.undecidedLeaner
+        : p.undecidedBasis === "soft" ? null : p.undecided;
+      if (v == null) return null;
+      return ({ v, included: base === "A" || typeof p.undIn === "number" });
+    },
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },

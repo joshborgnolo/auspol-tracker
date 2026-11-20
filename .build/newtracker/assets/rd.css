@@ -3022,6 +3022,7 @@ body.rd .rd-ap-pinf {
    cost its strip a third of its 400px */
 body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 294px minmax(0, 326px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(124px, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(56px, 1fr) 40px; }
 /* issues: the six issue cells take the row (who leads on what, 2026-10-04) */
@@ -3179,7 +3180,11 @@ body.rd .rd-ap-ring {
   border-radius: 50%; border: 1.75px solid;
 }
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
+body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-pnums > .rd-ap-und { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+body.rd .rd-ap-pnums > .rd-ap-und > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-undhead { text-transform: none; }
 /* the all-polls primary figures take the SAME half-glyph cast as the Latest
    table (rd-pl-half, :703, whose comment carries the ink-width rationale):
    the ½ is one glyph absolutely positioned beside the integer's top, OUT of
@@ -3349,6 +3354,7 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 170px 110px 70px 16px 294px minmax(0, 326px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(124px, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(48px, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
@@ -3363,6 +3369,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
 @media (max-width: 1000px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 48px 0 28px; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
+  body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 150px 104px 0 12px 260px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 124px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
   body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 464px) minmax(76px, 1fr) 28px; }
@@ -3380,6 +3387,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
   body.rd .rd-ap-pnums { grid-template-columns: repeat(5, 40px); }
+  body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 40px) 60px; }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
