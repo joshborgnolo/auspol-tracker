@@ -520,7 +520,7 @@ function RdPolls({
       poll: pr
     }), q.sample ? React.createElement("div", {
       className: "tip-sub"
-    }, "n = ", q.sample.toLocaleString()) : null, t.src !== "touch" && React.createElement("div", {
+    }, "n = ", window.AUSPOL.sampleTxt(q)) : null, t.src !== "touch" && React.createElement("div", {
       className: "tip-hint"
     }, t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"));
   };
@@ -1190,7 +1190,7 @@ function RdPolls({
       className: "rd-pl-main"
     }, latestLab(e)), React.createElement("span", {
       className: "rd-pl-sub"
-    }, r.fieldPending ? React.createElement(React.Fragment, null, "fieldwork ", rdFieldTbc(r)) : r.field, r.sample ? ", " + r.sample.toLocaleString() : "")), React.createElement("span", {
+    }, r.fieldPending ? React.createElement(React.Fragment, null, "fieldwork ", rdFieldTbc(r)) : r.field, r.sample ? ", " + window.AUSPOL.sampleTxt(r) : "")), React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-figs"
     }, React.createElement(RdSwap, {

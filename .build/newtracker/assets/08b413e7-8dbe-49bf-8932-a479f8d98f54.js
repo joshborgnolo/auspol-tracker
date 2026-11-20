@@ -1130,7 +1130,7 @@ function TrendChart(props) {
         { label: dot.label || "2PP", value: fmt(dot.y, dot) + unit, color: dot.color },
         { label: dm.dateLabel ? "Field" : "", value: dm.dateLabel || "" },
       ].filter((r) => r.label),
-      sub: dot.sub || (dm.sample ? `n = ${dm.sample.toLocaleString()}` : ""),
+      sub: dot.sub || (dm.sample ? `n = ${window.AUSPOL.sampleTxt(dm)}` : ""),
       hint: openable ? "Click to open this poll in All polls" : "",
     };
   } else if (hover && hoverX != null) {

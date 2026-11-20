@@ -2894,6 +2894,32 @@ const IND_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
    every wave. */
 const RELEASE_HUB = new Map(Object.entries(D.pollsterRules || {})
   .filter(([, r]) => r && r.releaseHub).map(([firm, r]) => [firm, r.releaseHub]));
+/* What each house's primary-vote shares are OF, printed beside every sample
+   ("1,500 D"): D = decided voters, undecideds set aside with no leaner
+   question; D+L = decided plus leaners (undecideds asked which way they
+   lean, the rest set aside); A = all voters, undecideds kept in the base
+   (Essential prints them as a share; Resolve offers no undecided option).
+   Each is the house's own methodology statement (in the repo's -src caches
+   where noted). A sub-series - "Newspoll (pooled)", "DemosAU (MRP)",
+   "Roy Morgan (SMS)" - reads its parent's. A house with no statement found
+   prints no letter rather than a guess (Wolf & Smith, Agenda C Synesis). */
+const POLL_BASES = {
+  "Newspoll": "D+L",          // APC statement: leaner question (extract-sampleeff)
+  "DemosAU": "D+L",           // demosau-src: "Initial undecided voters were asked a leaner question"
+  "RedBridge/Accent": "D+L",  // redbridge-src: "Undecided respondents were asked a leaner question"
+  "Redbridge": "D+L",
+  "Freshwater": "D+L",        // methodology statement: undecideds asked a 'squeeze' question
+  "Fox & Hedgehog": "D+L",    // foxhedgehog-src: "given a leaner question"
+  "EMRS (Tas)": "D+L",        // emrs-src: "Decided Voters Supporting or Leaning towards"
+  "YouGov": "D",              // news24-src: "Primary vote, excluding undecided voters"
+  "Roy Morgan": "D",          // "x% can't say who they would vote for", set aside; no leaner stated
+  "Spectre Strategy": "D",    // spectre-src: "undecided before apportionment"
+  "Resolve": "A",             // no undecided option (a forced choice)
+  "Essential": "A",           // undecided kept in, inside Independent/Other
+};
+const pollBases = Object.fromEntries([...new Set(POLLS.map((p) => p.pollster))]
+  .map((h) => [h, POLL_BASES[h] || POLL_BASES[h.replace(/\s*\([^)]*\)$/, "")] || null])
+  .filter(([, b]) => b));
 const undecidedOf = (p) => {
   if (p.undecided != null) return { v: p.undecided, basis: "first" };
   if (p.soft != null) return { v: p.soft, basis: "soft" };
@@ -9436,6 +9462,18 @@ window.AUSPOL = (function () {
      the One Nation shadow estimate rides AS PUBLISHED. */
   const extAgg = ${JSON.stringify(extAgg)};
   const individualPolls = ${JSON.stringify(individualPolls)};
+  // what each house's primary shares are of: D / D+L / A (POLL_BASES)
+  const pollBases = ${JSON.stringify(pollBases)};
+  /* a sample as the tables print it: "1,500 D" - the count, then what the
+     house's primary shares are of (pollBases); a house with no declared
+     base prints the count alone. n overrides the count (an eff. sample). */
+  const pollBaseOf = (house) => (house && pollBases[house]) || null;
+  const sampleTxt = (p, n) => {
+    const v = n != null ? n : p && p.sample;
+    if (v == null) return null;
+    const b = pollBaseOf(p && p.pollster);
+    return (+v).toLocaleString() + (b ? "\u00a0" + b : "");
+  };
   const pollsterTable = ${JSON.stringify(pollsterTable)};
   // where each eff-filing house posts its APC statements (the "eff. TBC"
   // link's targets; derived from PENDING_AT's method landings, gen-data-side)
@@ -9570,7 +9608,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
-    individualPolls, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
+    individualPolls, pollBases, pollBaseOf, sampleTxt, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },

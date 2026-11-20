@@ -281,7 +281,7 @@ function RdPrimary({
       meta: q,
       party: p.id,
       hollow: true,
-      sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "")
+      sub: RD_SOLO_NAME[e.terr] + " only - not pooled" + (q.sample ? ", n = " + window.AUSPOL.sampleTxt(q) : "")
     };
   }).filter(Boolean)) : [];
   const inDom = x => x >= xDomain[0] && x <= xDomain[1];
@@ -3864,7 +3864,7 @@ function DpRug({
     const key = q.pollster + "|" + q.released + (it.fav ? "|f" : "");
     const rk = keys[i];
     const open = () => openIdx(i);
-    const lab = q.pollster + ", " + (q.fieldPending ? "TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
+    const lab = q.pollster + ", " + (q.fieldPending ? "TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + window.AUSPOL.sampleTxt(q) : "");
     const on = tip && tip.i === i;
     return React.createElement("b", {
       key: key,
@@ -3913,7 +3913,7 @@ function DpRug({
       className: "tip-val"
     }, q.fieldPending ? "TBC" : q.field)), q.sample != null && React.createElement("div", {
       className: "tip-sub"
-    }, "n ≈ " + (+q.sample).toLocaleString()), tip.src !== "touch" && React.createElement("div", {
+    }, "n ≈ " + window.AUSPOL.sampleTxt(q)), tip.src !== "touch" && React.createElement("div", {
       className: "tip-hint"
     }, rk ? tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls" : "Released " + q.released)));
   }));
@@ -4549,7 +4549,7 @@ function RdDemographics({
           label: RD_SOLO_NAME[e.terr] + " only",
           meta: q,
           hollow: true,
-          sub: "not pooled" + (q.sample ? ", n = " + q.sample.toLocaleString() : "")
+          sub: "not pooled" + (q.sample ? ", n = " + window.AUSPOL.sampleTxt(q) : "")
         };
         if (e.whole) return [{
           ...tip,
