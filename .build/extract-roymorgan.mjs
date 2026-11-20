@@ -246,7 +246,7 @@ function parseRelease(post) {
   for (const [k, v] of [["alp", alp], ["onp", onp], ["lnp", lnp], ["lib", lib], ["nat", nat], ["grn", grn], ["ind", ind]])
     if (v == null) missing.push(k);
 
-  const undM = t.match(/([\d.]+)%\s*\((?:up|down|unchanged)[^)]*\)\s*[^)]{0,40}?can.?t say/i)
+  const undM = t.match(/([\d.]+)%\s*\((?:(?:up|down|unchanged)[^)]*|[+\-−][^)]*)\)\s*[^)]{0,40}?can.?t say/i)
         ?? t.match(/([\d.]+)%[^%]{0,60}?can.?t say/i);
   const undecided = undM ? parseFloat(undM[1]) : null; // optional: some eras omit the line
 

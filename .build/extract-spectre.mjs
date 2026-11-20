@@ -215,6 +215,8 @@ function parseReport(txt, slug, D) {
   // the separate TPP page's pair of undecided shares can never leak in.
   const und = primaryText.match(/(\d+)%\s+of voters were undecided before(?:\s+One Nation)?\s+apportionment/i);
   if (und) w.undecided = toNum(und[1]);
+  const prefUnd = txt.match(/(\d+)%\s+and\s+(\d+)%\s+of voters respectively were undecided before preferences were apportioned/i);
+  if (prefUnd) w.tppUndecided = { lnponp: toNum(prefUnd[1]), alponp: toNum(prefUnd[2]) };
 
   const dir = SECTION(txt, "Right direction", "Q: In your view, is Australia heading") ?? "";
   const dr = dir.match(/Right direction\s+(\d+(?:\.\d+)?)%/);
@@ -225,7 +227,10 @@ function parseReport(txt, slug, D) {
   };
 
   const firmSec = SECTION(txt, "FIRM VOTE", "Q: …and how sure") ?? "";
-  const firmShares = [...firmSec.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => asPct(toNum(m[1])));
+  // Chart cells end in the left ~60 print columns. April's right-hand prose
+  // interleaves its 42% and 36% repeats among them, so don't read that text.
+  const firmShares = firmSec.split("\n").flatMap((line) =>
+    [...line.slice(0, 72).matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => asPct(toNum(m[1]))));
   if (firmShares.length === 6) {
     // Party names are graphics in this chart, not text. Its fixed reading
     // order is national firm, Labor, One Nation, national soft, L-NP, Greens.
@@ -346,6 +351,11 @@ function guardNewWave(w, published) {
   const need = (k, what) => { if (w[k] == null) errs.push(`missing ${what} (${k})`); };
   need("date", "fieldwork end"); need("dateStart", "fieldwork start");
   need("sample", "sample size"); need("undecided", "undecided share");
+  need("tppUndecided", "pre-apportionment undecided by contest");
+  if (w.tppUndecided) for (const k of ["lnponp", "alponp"]) {
+    const v = w.tppUndecided[k];
+    if (!(v >= 0 && v <= 40)) errs.push(`implausible ${k} unallocated share ${v}`);
+  }
   if (!w.direction) errs.push("missing country direction chart");
   else {
     const { right, wrong, unsure } = w.direction;
@@ -404,6 +414,7 @@ function figureDiffs(date, w, D) {
     for (const k of ["alp", "lnp", "grn", "onp", "ind"]) chk(`polls.${k}`, poll[k], w[k]);
     chk("polls.tpp_alp", poll.tpp_alp, w.tpp_alp);
     chk("polls.tpp_lnp", poll.tpp_lnp, w.tpp_lnp);
+    chk("polls.tpp_undecided", JSON.stringify(poll.tpp_undecided ?? null), JSON.stringify(w.tppUndecided ?? null));
     if (poll.firmness) {
       for (const k of ["all", "alp", "lnp", "onp", "grn"])
         chk(`polls.firmness.${k}`, poll.firmness[k], w.firmness?.[k]);
@@ -452,6 +463,7 @@ function pollRows(w, item) {
     ...(w.undecided != null ? { undecided: w.undecided } : {}),
     alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: null,
     tpp_alp: w.tpp_alp, tpp_lnp: w.tpp_lnp,
+    ...(w.tppUndecided ? { tpp_undecided: w.tppUndecided } : {}),
     ...(w.firmness ? { firmness: w.firmness } : {}),
     url: item.link,
   };
@@ -536,13 +548,21 @@ if (process.env.SPECTRE_LIB !== "1") try {
       const matched = existing.find((e) => w.date && Math.abs(daysBetween(e.date, w.date)) <= 3);
       status.verified.push({ slug, date: w.date, matched: !!matched });
       if (matched) {
-        if (w.undecided != null && matched.undecided == null) {
-          status.backfilled.push({ date: matched.date, key: "undecided", value: w.undecided });
-          if (!CHECK && !ONE_URL) matched.undecided = w.undecided;
-        }
         for (const d of figureDiffs(matched.date, w, D)) {
           if (d.known || d.parse === "absent") status.notes.push(`${matched.date} ${d.key}: canon ${d.canon} vs parse ${d.got}`);
           else status.mismatches.push({ date: matched.date, slug, ...d });
+        }
+        // Historical rows predate the parser's decidedness fields. Fill only
+        // what this report prints; never overwrite an existing reading.
+        const idx = D.polls.findIndex((p) => p.pollster === POLLSTER && p.date === matched.date);
+        if (idx < 0) continue;
+        const fill = {};
+        if (D.polls[idx].undecided == null && w.undecided != null) fill.undecided = w.undecided;
+        if (D.polls[idx].firmness == null && w.firmness) fill.firmness = w.firmness;
+        if (D.polls[idx].tpp_undecided == null && w.tppUndecided) fill.tpp_undecided = w.tppUndecided;
+        if (Object.keys(fill).length) {
+          D.polls[idx] = { ...D.polls[idx], ...fill };
+          status.backfilled.push({ date: matched.date, fields: Object.keys(fill) });
         }
         continue;
       }
@@ -583,7 +603,8 @@ if (process.env.SPECTRE_LIB !== "1") try {
     if (status.changed && !CHECK && !ONE_URL) {
       writeFileSync(OUT + ".tmp", JSON.stringify(D, null, 2) + trailingNl);
       renameSync(OUT + ".tmp", OUT);
-      console.log(`wrote ${OUT}: +${newRows.polls.length} wave(s), ${status.backfilled.length} undecided backfill(s)`);
+      if (newRows.polls.length) console.log(`wrote ${OUT}: +${newRows.polls.length} Spectre Strategy wave(s)`);
+      if (status.backfilled.length) console.log(`wrote ${OUT}: ${status.backfilled.length} decidedness backfill(s)`);
     }
   }
   if (ONE_URL && newRows.polls.length) console.log(JSON.stringify(newRows.polls[0], null, 2));

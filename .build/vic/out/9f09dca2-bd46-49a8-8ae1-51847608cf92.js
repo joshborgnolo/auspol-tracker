@@ -273,7 +273,8 @@ window.AUSPOL = (function () {
   /* a sample as the tables print it: "1,500 D" - the count, then what the
      house's primary shares are of (pollBases); a house with no declared
      base prints the count alone. n overrides the count (an eff. sample). */
-  const pollBaseOf = (house, facet) => {
+  const pollBaseOf = (house, facet, p) => {
+    if (house === "DemosAU" && p?.undecided != null) return "D";
     const b = house && pollBases[house];
     if (!b) return null;
     return typeof b === "string" ? b : (b[facet] || b.primary);
@@ -282,7 +283,7 @@ window.AUSPOL = (function () {
   const sampleTxt = (p, facet) => {
     const v = p && p.sample;
     if (v == null) return null;
-    const b = pollBaseOf(p.pollster, facet);
+    const b = pollBaseOf(p.pollster, facet, p);
     return (+v).toLocaleString() + (b ? " " + b : "");
   };
   /* the rendered form: the letters set in small caps (.rd-smc, user call
@@ -291,7 +292,7 @@ window.AUSPOL = (function () {
   const sampleEl = (p, facet) => {
     const v = p && p.sample;
     if (v == null) return null;
-    const b = pollBaseOf(p.pollster, facet), R = window.React;
+    const b = pollBaseOf(p.pollster, facet, p), R = window.React;
     const n = (+v).toLocaleString();
     return b ? R.createElement(R.Fragment, null, n + " ", R.createElement("span", { className: "rd-smc" }, b)) : n;
   };

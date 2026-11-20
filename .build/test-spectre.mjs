@@ -19,6 +19,7 @@ assert.deepEqual(nov.firmness, {
   onp: [72, 28],
   grn: [60, 40],
 });
+assert.deepEqual(nov.tppUndecided, { lnponp: 13, alponp: 9 });
 assert.deepEqual(guardNewWave(nov, "2026-11-09T09:13"), []);
 
 const rows = pollRows(nov, { link: "https://example.test/spectre" });
@@ -56,9 +57,12 @@ assert.deepEqual(july.firmness, {
   onp: [69, 31],
   grn: [59, 41],
 });
+assert.deepEqual(july.tppUndecided, { lnponp: 11, alponp: 7 });
 const april = readWave("australian-federal-political-update-april-2026");
 assert.equal(april.date, "2026-04-08");
-assert.equal(april.undecided, 7, "April 2026 uses the primary chart's 7%, never the TPP page's 11%");
+assert.equal(april.undecided, 7, "April uses the primary chart's 7%, never the TPP page's 11%");
+assert.deepEqual(april.firmness, { all: [61, 39], alp: [64, 36], lnp: [58, 42], onp: [75, 25], grn: [71, 29] });
+assert.deepEqual(april.tppUndecided, { lnponp: 13, alponp: 10 });
 for (const w of [july, april]) {
   assert.ok(!figureDiffs(w.date, w, D).some((d) => d.key === "polls.undecided"),
     `${w.date}: the parsed and canonical undecided figures agree after backfill`);
@@ -74,8 +78,9 @@ const ledger = readFileSync(".build/newtracker/assets/rd-allpolls.jsx", "utf8");
 const decidedStart = ledger.indexOf("function rdLgDecided(p) {");
 assert.ok(decidedStart >= 0, "ledger decidedness renderer exists");
 const decided = new Function(`return (${ledger.slice(decidedStart, ledger.indexOf("\nconst RD_LG_CK", decidedStart))});`)();
-assert.deepEqual(decided({ firmAll: [57, 43], undecided: 6 }), {
-  h: "Primary-vote shares are decideds’. 6% undecided, excluded", w: "", d: null, s: "57% firm, 43% soft",
+assert.deepEqual(decided({ pollster: "Spectre Strategy", firmAll: [57, 43], undecided: 6 }), {
+  h: "Primary-vote shares are decideds’. 6% undecided, excluded", w: "", d: null,
+  s: "57% firm, 43% soft (soft includes undecided respondents)",
 });
 
 console.log("PASS: Spectre figures reconcile and the firmness ledger uses undecided-excluded wording");

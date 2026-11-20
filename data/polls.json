@@ -2876,6 +2876,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1933,
+      "undecided": 5.5,
       "alp": 30.5,
       "lnp": 22.5,
       "grn": 13,
@@ -3148,6 +3149,7 @@
       "client": "Daily Telegraph",
       "sample": 1625,
       "sampleEff": 1068,
+      "undecidedLeaner": 4,
       "alp": 30,
       "lnp": 24,
       "grn": 12,
@@ -3684,6 +3686,7 @@
       "client": "Daily Telegraph",
       "sample": 1810,
       "sampleEff": 1041,
+      "undecidedLeaner": 3,
       "alp": 30,
       "lnp": 23,
       "grn": 13,
@@ -3887,7 +3890,33 @@
       "tpp_alp": 51,
       "tpp_lnp": 49,
       "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026",
-      "undecided": 7
+      "undecided": 7,
+      "tpp_undecided": {
+        "lnponp": 13,
+        "alponp": 10
+      },
+      "firmness": {
+        "all": [
+          61,
+          39
+        ],
+        "alp": [
+          64,
+          36
+        ],
+        "lnp": [
+          58,
+          42
+        ],
+        "onp": [
+          75,
+          25
+        ],
+        "grn": [
+          71,
+          29
+        ]
+      }
     },
     {
       "date": "2026-04-12",
@@ -4528,6 +4557,7 @@
       "client": "Daily Telegraph",
       "sample": 1700,
       "sampleEff": 1011,
+      "undecidedLeaner": 4,
       "alp": 29,
       "lnp": 25,
       "grn": 10,
@@ -5268,7 +5298,33 @@
       "tpp_alp": 51,
       "tpp_lnp": 49,
       "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw",
-      "undecided": 7
+      "undecided": 7,
+      "firmness": {
+        "all": [
+          60,
+          40
+        ],
+        "alp": [
+          73,
+          27
+        ],
+        "lnp": [
+          65,
+          35
+        ],
+        "onp": [
+          69,
+          31
+        ],
+        "grn": [
+          59,
+          41
+        ]
+      },
+      "tpp_undecided": {
+        "lnponp": 11,
+        "alponp": 7
+      }
     },
     {
       "date": "2026-07-26",
@@ -6032,7 +6088,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1561,
-      "undecided": 1,
+      "undecided": 5.5,
       "alp": 25,
       "lnp": 21.5,
       "grn": 15.5,
@@ -6449,7 +6505,11 @@
           40
         ]
       },
-      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-november-2026-lrxjw-682xb"
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-november-2026-lrxjw-682xb",
+      "tpp_undecided": {
+        "lnponp": 13,
+        "alponp": 9
+      }
     },
     {
       "date": "2026-11-06",

@@ -3061,7 +3061,7 @@ const UNDECIDED_BASES = [
   { id: "first", label: "First preference", dashed: false,
     note: "can’t say who they would vote for – set aside before the shares are reported" },
   { id: "tpp", label: "After preferences", dashed: true,
-    note: "won’t nominate a side – still inside the published two-party pair, which is why it sums to under 100" },
+    note: "won’t nominate a side after higher preferences are asked – either left inside the pair or excluded before it is apportioned" },
   { id: "leaner", label: "After leaner", dashed: true,
     note: "still undecided after the leaner – treatment in the published vote figures varies by house" },
   // dash-dot, not dotted: a "1 3" dot line with round caps read as a string
@@ -3074,14 +3074,16 @@ const undecidedRows = POLLS.flatMap((p) => [
   ...(p.undecidedLeaner != null ? [{ p, u: { v: p.undecidedLeaner, basis: "leaner" } }] : []),
   ...(p.pollster === "Essential" && p.undecidedIn != null
     ? [{ p, u: { v: p.undecidedIn, basis: "leaner" } }] : []),
+  ...(p.tpp_undecided?.lnponp != null
+    ? [{ p, u: { v: p.tpp_undecided.lnponp, basis: "tpp" } }] : []),
   /* RedBridge's non-solid share of its decided-plus-leaner vote intention.
      Spectre's two-way soft share also includes unresolved undecideds, so it
      stays out; this adds to the panel series, never the per-poll ledger. */
   ...(p.pollster === "RedBridge/Accent" && p.firmness?.all?.length === 3
     ? [{ p, u: { v: p.firmness.all[1] + p.firmness.all[2], basis: "soft" } }] : []),
 ]).filter((r) => !noAggPoll(r.p));
-const undecidedSeries = UNDECIDED_BASES.map((b) => {
-  const rs = undecidedRows.filter((r) => r.u.basis === b.id);
+const makeUndecidedSeries = (b, rows) => {
+  const rs = rows || undecidedRows.filter((r) => r.u.basis === b.id);
   if (!rs.length) return null;
   const polls = rs.map(({ p, u }) => ({
     x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
@@ -3121,7 +3123,10 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
               chg: prev ? r1(last.v - prev.v) : null, refDate: prev ? prev.released : null },
     now,
   };
-}).filter(Boolean);
+};
+const undecidedSeries = UNDECIDED_BASES.map((b) => makeUndecidedSeries(b)).filter(Boolean);
+const softResolve = makeUndecidedSeries(UNDECIDED_BASES.find((b) => b.id === "soft"),
+  undecidedRows.filter((r) => r.p.pollster === "Resolve" && r.u.basis === "soft"));
 /* Resolve's "not firm" share by age band (polls.json `softAge`), for the
    Undecided panel's By age view: every wave, the pooled current figure (its
    last SOFT_AGE_POOL waves) and the same pool over the term's first waves,
@@ -3157,6 +3162,7 @@ const softAge = softAgeWaves.length >= 2 * SOFT_AGE_POOL ? (() => {
 const undecided = undecidedSeries.length ? {
   series: undecidedSeries,
   softAge,
+  softResolve,
   n: undecidedRows.length,
   houses: creditHouses(undecidedRows, (r) => r.p.pollster, (r) => Date.parse(r.p.date)),
 } : null;
@@ -4088,6 +4094,7 @@ const individualPolls = POLLS.map((p) => {
        [firm, soft] pair. Never route these through the can't-say series. */
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     ...(p.undecidedLeaner != null ? { undecidedLeaner: p.undecidedLeaner } : {}),
+    ...(p.tpp_undecided ? { tppUndecided: p.tpp_undecided } : {}),
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
@@ -4380,6 +4387,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // vote-firmness pair/triple, same as the archive emitter
     ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     ...(p.undecidedLeaner != null ? { undecidedLeaner: p.undecidedLeaner } : {}),
+    ...(p.tpp_undecided ? { tppUndecided: p.tpp_undecided } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     // voting consideration, same as the archive emitter above
     ...(p.consideration ? { cons: p.consideration, consBasis: p.consBasis,
@@ -9501,7 +9509,8 @@ window.AUSPOL = (function () {
   /* a sample as the tables print it: "1,500 D" - the count, then what the
      house's primary shares are of (pollBases); a house with no declared
      base prints the count alone. n overrides the count (an eff. sample). */
-  const pollBaseOf = (house, facet) => {
+  const pollBaseOf = (house, facet, p) => {
+    if (house === "DemosAU" && p?.undecided != null) return "D";
     const b = house && pollBases[house];
     if (!b) return null;
     return typeof b === "string" ? b : (b[facet] || b.primary);
@@ -9510,7 +9519,7 @@ window.AUSPOL = (function () {
   const sampleTxt = (p, facet) => {
     const v = p && p.sample;
     if (v == null) return null;
-    const b = pollBaseOf(p.pollster, facet);
+    const b = pollBaseOf(p.pollster, facet, p);
     return (+v).toLocaleString() + (b ? "\u00a0" + b : "");
   };
   /* the rendered form: the letters set in small caps (.rd-smc, user call
@@ -9519,7 +9528,7 @@ window.AUSPOL = (function () {
   const sampleEl = (p, facet) => {
     const v = p && p.sample;
     if (v == null) return null;
-    const b = pollBaseOf(p.pollster, facet), R = window.React;
+    const b = pollBaseOf(p.pollster, facet, p), R = window.React;
     const n = (+v).toLocaleString();
     return b ? R.createElement(R.Fragment, null, n + "\u00a0", R.createElement("span", { className: "rd-smc" }, b)) : n;
   };

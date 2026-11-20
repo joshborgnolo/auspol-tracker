@@ -91,10 +91,19 @@ export function validate(D) {
       fail("undecided-range", `undecided = ${p.undecided} (bounds 0–30)`);
     if (p.soft != null && !(p.soft >= 0 && p.soft <= 60))
       fail("soft-range", `soft = ${p.soft} (bounds 0–60)`);
+    if (p.tpp_undecided != null) {
+      if (p.pollster !== "Spectre Strategy")
+        fail("tpp-und-pollster", `tpp_undecided on ${p.pollster}`);
+      for (const key of ["lnponp", "alponp"]) {
+        const v = p.tpp_undecided[key];
+        if (!(Number.isFinite(v) && v >= 0 && v <= 40))
+          fail("tpp-und-range", `tpp_undecided.${key} = ${JSON.stringify(v)}`);
+      }
+    }
     // 0ca. after-leaner undecided shares live beside firmness, never inside
     //      the first-preference undecided aggregate
     if (p.undecidedLeaner != null) {
-      if (!["DemosAU", "Newspoll", "RedBridge/Accent", "EMRS (Tas)"].includes(p.pollster))
+      if (!["DemosAU", "Fox & Hedgehog", "Newspoll", "RedBridge/Accent", "EMRS (Tas)"].includes(p.pollster))
         fail("undleaner-pollster", `undecidedLeaner on ${p.pollster}`);
       if (!(p.undecidedLeaner >= 0 && p.undecidedLeaner <= 50))
         fail("undleaner-range", `undecidedLeaner = ${p.undecidedLeaner}`);

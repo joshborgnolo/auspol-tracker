@@ -1679,7 +1679,7 @@ function RdLgTpp({ p, onM, moe, note }) {
           {p.tpp3 && <tr><th scope="row">Three-cornered</th><td colSpan={2}><b className="rd-ldg-tri"><span style={{ color: "var(--alp-text)" }}>ALP {rdApNum(p.tpp3.alp)}</span> <span style={{ color: "var(--lnp-text)" }}>L/NP {rdApNum(p.tpp3.lnp)}</span> <span style={{ color: "var(--onp-text)" }}>ON {rdApNum(p.tpp3.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
         </tbody>
       </table>
-      {(noPub || moe || note || p.undecidedBasis === "tpp") && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{p.undecidedBasis === "tpp" ? " Undecideds are left out, unallocated." : ""}{note ? " " + note : ""}</p>}
+      {(noPub || moe || note || p.undecidedBasis === "tpp" || p.tppUndecided) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{p.undecidedBasis === "tpp" ? " Undecided " + p.undecided + "% stays inside the published pair, unallocated." : ""}{p.tppUndecided ? " Undecided before preference apportionment: " + p.tppUndecided.lnponp + "% Labor v Coalition, " + p.tppUndecided.alponp + "% Labor v One Nation." : ""}{note ? " " + note : ""}</p>}
     </>
   );
 }
@@ -1693,7 +1693,7 @@ function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
   if (f && f.length === 2) return {
     h: p.undecided != null ? "Primary-vote shares are decideds’. " + p.undecided + "% undecided, excluded" : f[1] + "% not firm",
-    w: "", d: null, s: f[0] + "% firm, " + f[1] + "% soft",
+    w: "", d: null, s: f[0] + "% firm, " + f[1] + "% soft" + (p.pollster === "Spectre Strategy" ? " (soft includes undecided respondents)" : ""),
   };
   if (p.undecidedLeaner != null) return {
     h: "Primary-vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "% undecided after leaner, excluded",
@@ -1708,7 +1708,7 @@ function rdLgDecided(p) {
     d: null, s: "kept in, so the shares add to 100 with it (the averages rescale them to leave it out)", sep: ", ",
   };
   if (p.undecided != null) {
-    const b = (p.pollster || "").startsWith("DemosAU") ? "leaner" : p.undecidedBasis || "first";
+    const b = p.undecidedBasis || "first";
     if (b === "soft") return { h: "Primary-vote shares are everyones’. ‘Undecided’ not an option (a forced choice)", w: "", d: null,
       s: (100 - p.undecided) + "% firm, " + p.undecided + "% soft" };
     return { h: (b === "leaner" || b === "tpp" ? "Primary-vote shares are decideds’ and leaners’ combined. " : "Primary-vote shares are decideds’. ") + p.undecided + "%", w: b === "leaner" ? "undecided after leaner" : "undecided",

@@ -5868,6 +5868,7 @@ function RdUndecided({ rangeId }) {
   const byId = {};
   U.series.forEach((s) => { byId[s.id] = s; });
   const first = byId.first, tpp = byId.tpp, leaner = byId.leaner, soft = byId.soft;
+  const softResolve = U.softResolve;
   const nowOf = (s) => (s ? (s.now ? s.now.v : s.latest.v) : null);
   const xDomain = rangeDomain(rangeId);
   /* the axis opens on the election tick, as the 2PP, primary, mood and
@@ -5904,7 +5905,7 @@ function RdUndecided({ rangeId }) {
   })();
 
   /* ---- all voters: of every 100 ---------------------------------------------- */
-  const u = nowOf(first), sf = nowOf(soft);
+  const u = nowOf(first), sf = nowOf(softResolve);
   const und100 = Math.round(u), soft100 = Math.round(sf * (100 - u) / 100), firm100 = 100 - und100 - soft100;
   const moved = moves100 => moves100;
   const panel = (list, lo, hi, step, key, title, meta) => {
@@ -6001,7 +6002,7 @@ function RdUndecided({ rangeId }) {
     const B = [{ id: "18-34", label: "18–34" }, { id: "35-54", label: "35–54" }, { id: "55+", label: "55+" }];
     const grey = (i) => ["color-mix(in oklab, var(--ink) 50%, var(--bg))", "color-mix(in oklab, var(--ink) 72%, var(--bg))", "var(--ink)"][i];
     const apart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
-    const allNow = soft ? nowOf(soft) : null;
+    const allNow = softResolve ? nowOf(softResolve) : null;
     const rows = B.map((b, i) => ({ id: b.id, label: b.label, color: grey(i), now: A.now[b.id].v, base: A.base[b.id].v, ci: A.now[b.id].ci95, sig: apart(A.now[b.id], A.base[b.id]) }));
     const vals = rows.flatMap((r) => [r.now, r.base]).concat(allNow != null ? [allNow] : []);
     const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10), hi = Math.ceil((Math.max(...vals) + 3) / 10) * 10;
@@ -6089,7 +6090,7 @@ function RdUndecided({ rangeId }) {
                 ))}
               </div>
             )}
-            <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(soft.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
+            <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(softResolve.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
           </div>
           <RdSub head={(() => { const m = [slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
                  dek="Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
@@ -6188,7 +6189,7 @@ function RdUndecided({ rangeId }) {
               xDomain={xDomain} yDomain={[0, 40]} yTicks={rdYTicks(0, 40, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
               xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline
               series={[{ id: "all", label: "All voters", color: "var(--ink)", dashed: true, dash: "4 3", rdWidth: 1.4, endCap: false,
-                         points: soft ? filterPts(soft.monthly, xDomain[0]).map((m) => ({ x: m.x, y: m.v })) : [], endLabel: narrow ? null : "All voters" },
+                         points: softResolve ? filterPts(softResolve.monthly, xDomain[0]).map((m) => ({ x: m.x, y: m.v })) : [], endLabel: narrow ? null : "All voters" },
                        ...ageView.B.map((b, i) => ({ id: b.id, label: b.label, color: ageView.grey(i), rdWidth: 2.2, rdCap: 3.5,
                          points: ageView.lines.map((w) => ({ x: w.x, y: w[b.id] })), endLabel: narrow ? null : b.label }))]}
               spine={ageView.lines.map((w) => ({ x: w.x, y: w["18-34"] }))}

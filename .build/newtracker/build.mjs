@@ -254,7 +254,8 @@ const splitDataset = (code) => {
     if (LATE_TABLES.includes(name)) {
       /* only the return object may read it: nothing between its
          declaration and the return statement can, while the IIFE runs */
-      const re = new RegExp(`\\b${name}\\b`);
+      // Table identifiers, not row properties such as p.undecided.
+      const re = new RegExp(`(?<![.\\w$])${name}\\b`);
       const early = lines.slice(at + 1, ret).filter((l, k) => isCode[at + 1 + k] && re.test(l)).length;
       if (ret < 0 || early) throw new Error(`dataset split: ${name} is read ${early} time(s) before the return object`);
       tables[name] = JSON.parse(rhs);
