@@ -441,7 +441,7 @@ window.AUSPOL = (function () {
         return null;
       }
       const included = base === "A" || typeof p.undIn === "number";
-      return ({ v, included, label: included ? "included" : "excluded" });
+      return ({ v: Math.round(v * 2) / 2, included, label: included ? "included" : "excluded" });
     },
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

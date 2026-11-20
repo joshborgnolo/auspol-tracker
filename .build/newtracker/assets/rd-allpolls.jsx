@@ -3280,7 +3280,7 @@ function RdAllPolls(P) {
       {facet === "primary" && <>
         <span className={"rd-ap-pnums rd-ap-hpn" + (consM ? "" : " rd-ap-hasund")}>
           {prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "p." + k.id, { color: k.ink })}</React.Fragment>)}
-          {!consM && <span role="columnheader" className="rd-ap-th rd-ap-undhead" title="Undecided share; included or excluded says whether those voters sit in the party-share base">Und</span>}
+          {!consM && <span role="columnheader" className="rd-ap-th rd-ap-undhead" title="Undecided share, rounded to the nearest half point; included or excluded says whether those voters sit in the party-share base">Und</span>}
         </span>
         <span className="rd-ap-hpic" aria-hidden="true">
           <span className="rd-ap-cap">{consM ? "Voting consideration" : "Primary vote"}</span>
@@ -4258,7 +4258,7 @@ function RdAllPolls(P) {
           {" "}A pollster’s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance.</>,
         facet === "issues" && <>Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; "Level" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn’t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them.</>,
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
-        facet === "primary" && !consM && <><b>Und</b> is the published undecided share. “Included” means those voters remain in the party-share base; “excluded” means they were set aside first. A forced choice shows 0, “not allowed”.</>,
+        facet === "primary" && !consM && <><b>Und</b> is the undecided share, rounded to the nearest half point. “Included” means those voters remain in the party-share base; “excluded” means they were set aside first. A forced choice shows 0, “not allowed”.</>,
         <><b>Sample</b> is the number of people polled, and the letters say what its primary-vote shares are of: <b className="rd-smc">D</b> decided voters (undecideds set aside), <b className="rd-smc">D+L</b> decided voters plus leaners (undecideds asked which way they lean, the rest set aside), <b className="rd-smc">A</b> all voters (undecideds kept in), <b className="rd-smc">F</b> a forced choice (no undecided option, so everyone is allocated to a party). <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,
       ]} />
       <div className="rd-foot">

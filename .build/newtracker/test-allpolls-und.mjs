@@ -14,7 +14,7 @@ assert.deepEqual(D.undecidedCellOf({ pollster: "Newspoll", undecidedLeaner: 5 })
 assert.deepEqual(D.undecidedCellOf({ pollster: "Roy Morgan", undecided: 6.5, undecidedBasis: "first" }),
   { v: 6.5, included: false, label: "excluded" }, "a can't-say share is excluded from the printed party base");
 assert.deepEqual(D.undecidedCellOf({ pollster: "EMRS (Tas)", undecidedLeaner: 3.2 }),
-  { v: 3.2, included: false, label: "excluded" }, "EMRS's after-leaner share is excluded from its federal primaries");
+  { v: 3, included: false, label: "excluded" }, "EMRS's UND display rounds to the nearest half point (3.2 → 3), excluded");
 assert.deepEqual(D.undecidedCellOf({ pollster: "Resolve", undecided: 24, undecidedBasis: "soft" }),
   { v: 0, included: null, label: "not allowed" }, "a forced-choice survey displays zero with no soft share treated as undecided");
 assert.equal(D.undecidedCellOf({ pollster: "Roy Morgan", undecided: null }), null,
@@ -56,5 +56,12 @@ assert.ok(src.includes('className="rd-ap-sub">{und.label}</span>'),
   "desktop cells read the shared inclusion or forced-choice label");
 assert.ok(src.includes('<b>{rdApPrimFig(und.v)}</b>, {und.label}'),
   "phone metadata reads the same shared label");
+for (const [released, display, source] of [["2026-08-18", 3, 3.2], ["2026-02-19", 4.5, 4.7]]) {
+  const row = cells.find(({ p }) => p.pollster === "EMRS (Tas)" && p.released === released);
+  assert.equal(row.u.v, display, `${released}: the UND table rounds to the nearest half point`);
+  assert.equal(row.p.undecidedLeaner, source, `${released}: the ledger/source keeps its original precision`);
+}
+assert.ok(src.includes('title="Undecided share, rounded to the nearest half point'),
+  "the header states the display rounding rule");
 
 console.log(`PASS: UND cells preserve included, excluded and forced-choice bases (${cells.length} archive rows)`);
