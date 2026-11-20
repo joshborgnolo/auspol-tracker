@@ -5894,7 +5894,7 @@ function RdUndecided({ rangeId }) {
     const head = rdCap(rdOneIn(u)) + " is undecided"
       + (sf != null ? ", " + rdOneInShare(sf) + " might change their mind" : "")
       + firmestTail + ".";
-    const moves = [["undecided", first], ["not firm", soft]].map(([nm, s]) => ({ nm, s, f: slopeOf(s) })).filter((m) => m.f);
+    const moves = [["undecided", first], ["soft", soft]].map(([nm, s]) => ({ nm, s, f: slopeOf(s) })).filter((m) => m.f);
     const movedSig = moves.filter((m) => m.f.p < 0.05 / moves.length);
     /* the dek is the movement verdict alone (user trim, 2026-09-28): the
        house range and latest-figure sentences it used to append were cut */
@@ -5925,7 +5925,7 @@ function RdUndecided({ rangeId }) {
             <RdSwatch kind={s.dashed ? "dash" : "line"} color={COL(s)} />
             <div>
               <div className="rd-un-rtop"><b>{s.id === "soft" ? "Might still change" : s.label}</b><span className="rd-un-rv">{nowOf(s).toFixed(1)}%</span>{s.now && <span className="rd-un-rci">±{s.now.ci95.toFixed(1)}</span>}</div>
-              <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "leaner" ? "Still undecided after the leaner, excluded from the published voting figures. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
+              <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "leaner" ? "Still undecided after the leaner. Some houses keep them in the published figures; others set them aside. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
             </div>
           </div>
         ))}
@@ -5953,7 +5953,7 @@ function RdUndecided({ rangeId }) {
   const changeFoot = (() => {
     const bits = [first, tpp, leaner, soft].filter(Boolean).map((s) => {
       const c = s.now ? s.now.chg : null;
-      const nm = s.id === "first" ? "first preference" : s.id === "leaner" ? "after leaner" : s.id === "tpp" ? "after preferences" : "not firm";
+      const nm = s.id === "first" ? "first preference" : s.id === "leaner" ? "after leaner" : s.id === "tpp" ? "after preferences" : "soft";
       return { nm, c, sig: s.now && s.now.changeSig };
     });
     const anySig = bits.some((b) => b.sig);
@@ -6071,11 +6071,11 @@ function RdUndecided({ rangeId }) {
             {!narrow && (
               <div className="rd-un-100l">
                 <span style={{ flexBasis: firm100 + "%" }}><b>Firm</b> named a party and don’t expect to change</span>
-                <span style={{ flexBasis: soft100 + "%" }}><b>Not firm</b> <span className="rd-un-long">might still change</span></span>
+                <span style={{ flexBasis: soft100 + "%" }}><b>Soft</b> <span className="rd-un-long">might still change</span></span>
                 <span style={{ flexBasis: und100 + "%" }} className="rd-un-und"><b>Undecided</b></span>
               </div>
             )}
-            <div className="rd-un-bar" role="img" aria-label={`Of every 100 voters, about ${firm100} are firm, ${soft100} not firm and ${und100} undecided`}>
+            <div className="rd-un-bar" role="img" aria-label={`Of every 100 voters, about ${firm100} are firm, ${soft100} soft and ${und100} undecided`}>
               <span className="rd-un-f" style={{ flexBasis: firm100 + "%" }}>{narrow ? "" : firm100}</span>
               <span className="rd-un-s" style={{ flexBasis: soft100 + "%" }}>{narrow ? "" : soft100}</span>
               <span className="rd-un-u" style={{ flexBasis: und100 + "%" }}>{narrow ? "" : und100}</span>
@@ -6083,7 +6083,7 @@ function RdUndecided({ rangeId }) {
             {narrow && (
               <div className="rd-un-key" aria-hidden="true">
                 {[["f", firm100, "Firm:", "named a party and don’t expect to change"],
-                  ["s", soft100, "Not firm:", "named a party but might change"],
+                  ["s", soft100, "Soft:", "named a party but might change"],
                   ["u", und100, "Undecided:", "can’t say who they’d vote for"]].map(([k, n, b, t]) => (
                   <div key={k}><span className={"rd-un-sw rd-un-" + k}></span><b className="rd-un-kn">{n}</b><span><b>{b}</b> {t}</span></div>
                 ))}
@@ -6095,12 +6095,12 @@ function RdUndecided({ rangeId }) {
                  dek="Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
           <div className="rd-un-panels">
             {panel([first, tpp, leaner].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
-            {soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")}
+            {soft && panel([soft], 0, Math.ceil((soft.hi + 1) / 10) * 10, 10, "soft", "Soft", "% of voters who named a party")}
           </div>
           <RdTsig summary="Trend-significance table"
             heads={["Series", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
             sets={[{ key: "main", rows: unSig.map((x) => ({
-              key: x.s.id, name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Not firm" : "Undecided", sig: x.sig,
+              key: x.s.id, name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Soft" : "Undecided", sig: x.sig,
               cells: [x.pts.length >= 2 ? rdTsSgn(x.pts[0].v) + " → " + rdTsSgn(x.pts[x.pts.length - 1].v) : "–",
                 x.fit ? rdTsSgn(x.fit.b, true) : "–", x.fit ? rdTsSgn(x.fit.t) : "–", x.sig ? "Yes" : "No"],
             })) }]}
@@ -6162,7 +6162,7 @@ function RdUndecided({ rangeId }) {
         <>
           <div className="card rd-card rd-un-sp">
             <RdShiftPlot rows={ageView.rows} all={ageView.allNow} lo={ageView.lo} hi={ageView.hi}
-                         title="Share not firm, by age" source="Resolve, mid-2025 → now" dp={0} />
+                         title="Soft share, by age" source="Resolve, mid-2025 → now" dp={0} />
             <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + A.base.from + " to " + A.base.to + ")" },
                                                 { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + A.now.from + " to " + A.now.to + ")" }]}>
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
@@ -6172,7 +6172,7 @@ function RdUndecided({ rangeId }) {
                 move and its z on the pooled margins; there's no all-voters
                 Resolve not-firm reading over the span, so no anchor column */}
             <RdTsig summary="Significance table"
-              heads={["Age group", "Not firm, mid-2025 → now, %", "Change, pts", "z", "Significant"]}
+              heads={["Age group", "Soft, mid-2025 → now, %", "Change, pts", "z", "Significant"]}
               sets={[{ key: "main", rows: ageView.B.map((b) => {
                 const bb = A.base[b.id], nn = A.now[b.id], chg = nn.v - bb.v;
                 const z = chg / (Math.hypot(nn.ci95, bb.ci95) / 1.96), sg = Math.abs(nn.v - bb.v) > Math.hypot(nn.ci95, bb.ci95);
@@ -6196,7 +6196,7 @@ function RdUndecided({ rangeId }) {
               tooltipTitle={(i) => (ageView.lines[i] ? ageView.lines[i].dateLabel : "")} fmt={(v) => v.toFixed(0)}
               /* a phone names none of these greys on the chart, so the copy
                  keys them, and carries the sub-head's words about the pooling */
-              copy={{ title: "Voters not firm, by age", sub: "Share of each age group who named a party but aren’t firm",
+              copy={{ title: "Soft voters, by age", sub: "Share of each age group who named a party but aren’t firm",
                       caption: "Pooled three Resolve waves at a time; dots are single waves.",
                       legend: ageView.B.map((b, i) => ({ label: b.label, color: ageView.grey(i), kind: "line" }))
                         .concat([{ label: "All voters", color: "var(--ink)", kind: "dashed" }]) }} />

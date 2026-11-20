@@ -4,7 +4,7 @@
   "date": "2026-09-14",
   "sample": 1583,
   "client": "Capital Brief",
-  "undecided": 4,
+  "undecidedLeaner": 4,
   "tppNote": "2PP calculation method N/A ",
   "tpp_alp": null,
   "tpp_lnp": null,
@@ -37,5 +37,5 @@
     }
   },
   "extractedAt": "2026-09-17T23:28:45.952Z",
-  "cacheV": 3
+  "cacheV": 4
 }

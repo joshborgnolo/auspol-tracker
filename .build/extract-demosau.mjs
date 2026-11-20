@@ -32,8 +32,9 @@
 //     VALUES (±0.7 of the known results) and each wave row's percentages are
 //     assigned to parties by nearest x-position. The current wave is the LAST
 //     wave row in the table. OTH maps to the tracker's `ind` (oth:null).
-//   - undecided: the "…N% of respondents who were undecided" footer (one
-//     release misspells it "Excludeds"; matched loosely).
+//   - undecidedLeaner: the "…N% of (respondents|voters) who were undecided"
+//     footer (after the leaner, excluded from final figures; one release
+//     misspells it "Excludeds", so the match stays loose).
 //   - 2PP: "2PP calculation method" is "N/A"/"No 2PP calculated"/"No National
 //     TPP calculated" for the regular polls → tpp null/null. A national 2PP
 //     exists only when published as prose ("On a two party preferred basis
@@ -445,8 +446,8 @@ function parsePdf(txt, slug, notes) {
   const clientRaw = cm ? cm[1].trim().replace(/\s{2,}.*$/, "").trim() : "";
   out.client = !clientRaw || /self-initiated|demosau/i.test(clientRaw) ? "—" : clientRaw;
 
-  const um = txt.match(/(\d+)%\s*of respondents who were undecided/i);
-  if (um) out.undecided = +um[1];
+  const um = txt.match(/(\d+)%\s*of (?:respondents|voters) who were undecided/i);
+  if (um) out.undecidedLeaner = +um[1];
 
   const methIdx = txt.search(/2PP calculation method/i);
   const methLine = methIdx === -1 ? "" : txt.slice(methIdx, methIdx + 200).replace(/\s+/g, " ");
@@ -641,7 +642,7 @@ function parseWave(txt, slug, isMRP) {
 // load → cache → (re)parse one wave PDF. Cached metrics carry CACHE_V; a
 // stale schema is re-derived from the cached pdftotext (committed alongside)
 // without re-downloading, fetch only when the txt is missing too.
-const CACHE_VER = 3; // 3: seats from the "Central Seat Projection" layout, others as `oth` (2026-10-12)
+const CACHE_VER = 4; // 4: the method statement's remaining undecided is after its leaner
 async function loadWave(url, slug, isMRP) {
   const cachePath = `${SRC_DIR}/${slug}.json`;
   const txtPath = `${SRC_DIR}/${slug}.txt`;
@@ -923,7 +924,7 @@ try {
       pollster: c.pollster,
       client: w.client,
       sample: w.sample,
-      ...(w.undecided != null ? { undecided: w.undecided } : {}),
+      ...(w.undecidedLeaner != null ? { undecidedLeaner: w.undecidedLeaner } : {}),
       alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: null,
       tpp_alp: w.tpp_alp, tpp_lnp: w.tpp_lnp,
       ...(w.seats ? { seats: w.seats } : {}),

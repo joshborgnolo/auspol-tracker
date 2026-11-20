@@ -3063,15 +3063,22 @@ const UNDECIDED_BASES = [
   { id: "tpp", label: "After preferences", dashed: true,
     note: "won’t nominate a side – still inside the published two-party pair, which is why it sums to under 100" },
   { id: "leaner", label: "After leaner", dashed: true,
-    note: "undecided after the leaner – excluded from published voting-intention figures" },
+    note: "still undecided after the leaner – treatment in the published vote figures varies by house" },
   // dash-dot, not dotted: a "1 3" dot line with round caps read as a string
   // of beads - noise rather than a third line
-  { id: "soft", label: "Not firm", dash: "9 3 2 3",
-    note: "named a party but might still move – the soft share of the decided, Resolve’s “how firm are you”" },
+  { id: "soft", label: "Soft", dash: "9 3 2 3",
+    note: "named a party or a lean but are not solid – Resolve’s total-soft share, RedBridge’s soft plus very soft" },
 ];
 const undecidedRows = POLLS.flatMap((p) => [
   ...(undecidedOf(p) ? [{ p, u: undecidedOf(p) }] : []),
   ...(p.undecidedLeaner != null ? [{ p, u: { v: p.undecidedLeaner, basis: "leaner" } }] : []),
+  ...(p.pollster === "Essential" && p.undecidedIn != null
+    ? [{ p, u: { v: p.undecidedIn, basis: "leaner" } }] : []),
+  /* RedBridge's non-solid share of its decided-plus-leaner vote intention.
+     Spectre's two-way soft share also includes unresolved undecideds, so it
+     stays out; this adds to the panel series, never the per-poll ledger. */
+  ...(p.pollster === "RedBridge/Accent" && p.firmness?.all?.length === 3
+    ? [{ p, u: { v: p.firmness.all[1] + p.firmness.all[2], basis: "soft" } }] : []),
 ]).filter((r) => !noAggPoll(r.p));
 const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const rs = undecidedRows.filter((r) => r.u.basis === b.id);
@@ -3098,8 +3105,8 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const prev = [...polls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
   const vals = polls.map((d) => d.v);
   /* The figure the tile quotes, built as the headline is: the six-week
-     nowcast (a sparse measure – two houses at most per question), and the
-     same a month earlier. It used to be the newest single poll, which put
+     nowcast (a sparse measure, with different houses on different bases), and
+     the same a month earlier. It used to be the newest single poll, which put
      one DemosAU wave's "1%" beside a line sitting near 4.5. No house
      adjustment: each house's undecided share is its own question's answer,
      not a lean on a shared one. Null when the window holds no poll. */

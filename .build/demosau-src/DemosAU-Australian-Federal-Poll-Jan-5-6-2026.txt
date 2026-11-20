@@ -1,0 +1,283 @@
+    Australian Federal Poll
+   Sample size: 1,027. Effective margin of error:+/- 4.0%. Dates: 05-06 January 2026.
+
+
+Voting Intention
+If a Federal Election was held today, which one of the following would you vote for?
+
+                                                                                        Change
+                                                                        Primary
+                                Party                                                  Since Last
+                                                                         vote %
+                                                                                        Election
+
+         Labor (with Anthony Albanese as Leader)                          29%            -5.6%
+
+  Liberal National Coalition (with Sussan Ley as Leader)                  23%            -8.8%
+
+                            One Nation                                    23%            16.6%
+
+                            The Greens                                     12%           -0.2%
+
+                      Any Other Candidate                                  13%           -2.0%
+
+                                   Two-Party Preferred*
+
+                               Labor                                      52%           -3.2%
+
+                   Liberal National Coalition                             48%            3.2%
+
+                                                     Excludes 5% of voters who were undecided
+
+
+
+
+       *Based on the limited available data of preference flows from the Coalition to One Nation, we
+         estimate Labor’s TPP against One Nation to be 50/50. Please see p6 for more information.
+
+
+
+
+                                                                                                 1
+Preferred Prime Minister
+Who is your preferred Prime Minister?
+
+                                                                        %
+
+                 Anthony Albanese (Labor)                               42%
+
+                    Sussan Ley (Liberal)                                29%
+
+                         Don't Know                                     29%
+
+
+
+Leader Ratings
+What is your opinion on the following people?
+
+                                        Positive   Neutral   Negative   Net Positive
+
+   Anthony Albanese (Prime
+                                         29%        30%        41%            -12%
+       Minister, Labor)
+Sussan Ley (Opposition Leader,
+                                          17%       55%        28%            -11%
+           Liberal)
+
+
+
+
+                                                                                       2
+Federal Voting Intention Tables - Demographics
+
+                                Liberal
+                Labor (with
+                              National
+                  Anthony                                                      Any Other
+                            Coalition (with   The Greens     One Nation                    Don't Know
+                Albanese as                                                    Candidate
+                            Sussan Ley as
+                  Leader)
+                               Leader)
+
+  Australia         29%            23%            12%            23%              13%         5%
+
+                                                Gender
+
+    Males           34%            24%             7%            24%              11%          3%
+
+   Females          24%            22%            17%            23%              14%         8%
+
+                                                  Age
+
+    18-34           32%            19%            26%            12%              11%         4%
+
+    35-54           27%            22%            8%             26%              17%         9%
+
+     55+            28%            26%            6%             28%              12%          3%
+
+                                              Education
+
+    School          30%            24%            10%            25%              11%          7%
+
+     TAFE           24%            20%            9%             30%              17%         6%
+
+  University        33%            26%            18%            13%              10%          2%
+
+                                          Residential tenure
+
+    Rented          30%            16%            17%            20%              17%         8%
+
+  Mortgage          29%            25%            11%            27%              8%           3%
+
+    Owned           28%            27%            8%             23%              14%         5%
+
+                                                Income
+
+    <$45K           28%            20%            10%            26%              16%          7%
+
+  $45-125K          30%            23%            14%            22%              11%         5%
+
+    $125K+          29%            36%            14%            18%              3%           1%
+Note: Undecided respondents are excluded from party vote share calculations.
+
+
+
+
+                                                                                                    3
+Federal Voting Intention Tables - Demographics
+
+                                 Liberal
+                 Labor (with
+                               National
+                   Anthony                                                     Any Other
+                             Coalition (with   The Greens    One Nation                    Don't Know
+                 Albanese as                                                   Candidate
+                             Sussan Ley as
+                   Leader)
+                                Leader)
+
+                                               Location
+
+  Inner Metro        37%           26%            15%            16%              6%          6%
+
+  Outer Metro        26%           23%            11%            24%              16%         4%
+
+Regional/Rural       25%           20%            11%            32%              12%          7%
+
+                                               Past Vote
+
+ ALP 2025 Vote       77%            5%            3%             11%              4%          4%
+
+L/NP 2025 Vote       5%            59%             1%            31%              4%           1%
+
+ Grn 2025 Vote       2%            10%            82%            4%               2%           1%
+
+ONP 2025 Vote        1%             8%            2%             88%              1%           1%
+
+ Oth 2025 Vote       4%             8%             1%            25%             62%           3%
+
+   Did Not
+Remember/ Did        29%           10%            16%            20%             25%          37%
+   Not Vote
+Note: Undecided respondents are excluded from party vote share calculations.
+
+
+
+
+                                                                                                    4
+Publication date: 8 January 2026
+Methodology Statement
+
+Research company                            DemosAU
+
+Client commissioning the research:          Self-initiated
+
+End client:                                 Self-initiated
+
+Fieldwork dates:                            5 – 6 January 2026
+
+Mode of data collection                     Internet panels
+
+Target population:                          Australians 18+ eligible to vote at elections
+
+
+Sample size:                                1027
+
+Is voting intention published?              Yes
+
+
+Effective sample size after weighting       586
+applied:
+
+Margin of error associated with effective   +/- 4.0%
+sample size:
+
+
+
+Variables used in weighting:                Age x gender, education, personal income, residential tenure,
+                                            location, 2025 Federal Vote, Left-Right Self ID.
+
+Weighting method used:                      Rim Weighting
+
+
+
+Full question text, responses categories    See Page 6
+and randomisation:
+
+
+
+Source of sample:                           Internet panels
+
+Positioning of voting intention questions   Federal VI was first substantive question after demographics.
+in questionnaire:
+
+How were undecided voters handled:          Initial undecided voters were asked a leaner question. Remaining
+                                            undecided voters were excluded from final totals.
+
+
+
+2PP calculation method                      Labor v L/NP TPP - Using relevant 2025 nation-wide federal election
+                                            preference flows. For Labor v ONP TPP, see note on Page 6.
+
+
+
+
+                                                                                                                  5
+QUESTION WORDING
+
+Q. If a Federal Election was held today, which one of the following would you vote for?
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Sussan Ley as Leader)
+The Greens
+One Nation*
+Any Other Candidate
+Don't Know
+
+*On 27 October 2025, Senator Hanson announced that the name of Pauline Hanson’s One Nation would
+change to simply, One Nation. DemosAU will use this wording in polling going forward. Source:
+https://www.onenation.org.au/one-nation
+
+If respondent chose Don’t Know they were asked:
+Q. Being undecided, which of the following would you have even a slight leaning towards?
+Answers as above
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Sussan Ley as Leader)
+The Greens
+One Nation
+Any Other Candidate
+Don't Know
+
+Q. Who is your preferred Prime Minister
+Answers randomly listed except Don’t Know kept last
+Anthony Albanese (Labor)
+Sussan Ley (Liberal)
+Don't Know
+
+Q. What is your opinion on the following people?
+People randomly listed, answer order randomly flipped
+Answers: Positive, Neutral, Negative
+People Tested
+Anthony Albanese (Prime Minister, Labor)
+Sussan Ley (Opposition Leader, Liberal)
+
+
+
+NOTE ON LABOR/ONP TWO PARTY PREFERRED ESTIMATE
+
+As One Nation is tied for second with the Coalition nationally, it is necessary to consider a nation-
+wide ALP/ONP TPP estimate. Unlike the standard Labor v Coalition TPP, full nation-wide preference
+data is not available for this estimate.
+
+The preference assumptions used for an ALP v ONP TPP are;
+   Coalition: ONP 82.9% ALP 17.1% (observed Hunter 2025 preference flow)
+   Greens: ALP 88.2% ONP 11.8% (ALP v LNP Nationwide Preference Flow, with ONP replacing LNP)
+   Others: 50%-50% (As the composition of Others is not known, a 50-50 preference split has been
+   adopted.)
+
+Give the absence of full nation-wide preference data, a Labor/ONP TPP estimate should be treated
+with caution.                                                                                    6
+7
+
