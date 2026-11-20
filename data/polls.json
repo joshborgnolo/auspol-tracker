@@ -26,7 +26,7 @@
   "pollsterRules": {
     "Essential": {
       "tppIncludesUndecided": true,
-      "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption. Its primaries are undecided-inclusive too: ind is Independent + Undecided, the combined figure every curated wave carries (assimilate-essential-vi.mjs), so the shares are of all respondents; a wave that prints them apart says so in its sumNote.",
+      "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption. Its primaries keep undecideds in the base too: each row stores the printed table (ind = Independent/Other as printed, undecidedIn = Undecided, together 100), and gen-data's poolPrim rescales the parties to 100 before anything is pooled (b982965c).",
       "site": "https://www.theguardian.com/australia-news/essential-poll",
       "releaseHub": "https://essentialreport.com.au/reports/federal-political-insights",
       "skippedSlots": [
