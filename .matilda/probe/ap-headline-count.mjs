@@ -5,10 +5,9 @@
    weight) has already left - the window that said "six" while five polls
    carried the whole weight (worked 2026-10-31, rdApWinMid in rd-allpolls.jsx).
    Asserts on the built page (desktop, default implied basis):
-     1. the 2PP facet head says "comes from <numword> polls" where <numword>
-        is the midpoint-window count recomputed from the data asset's rows
-        (mid in [updatedISO - 21d, updatedISO], fallback released), AND equals
-        synthLatest.n in-world;
+     1. the midpoint-window count recomputed from the data asset's rows
+        (mid in [updatedISO - 21d, updatedISO], fallback released) equals
+        synthLatest.n (the 2PP head that once quoted it was cut 2026-11-21);
      2. the newest in-window wave's expanded detail says "as one of <same>".
    Truth comes from the same 9f09dca2 data asset the page reads (the probe
    pins the WIRING, never the day's data).
@@ -75,12 +74,8 @@ await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "networkidle0
 await page.waitForSelector(".rd-ap-table", { timeout: 30000 });
 await new Promise((r) => setTimeout(r, 900));
 
-const headText = await page.evaluate(() => document.body.innerText);
-const m = headText.match(/\.{0,1}\s*Labor[’']s\s+([\d.]+)\s+comes from\s+([a-z-]+)\s+poll/);
-ok("2PP head names the midpoint-window count", !!m && m[2] === nWord,
-  m ? "head: Labor's " + m[1] + " comes from " + m[2] + " (want " + nWord + ")" : "head phrase not found");
-ok("head figure is the implied headline", !!m && m[1] === D.synthLatest.alp.toFixed(1),
-  m ? "figure " + m[1] + " vs synthLatest " + D.synthLatest.alp : "head phrase not found");
+/* the 2PP head that quoted this count was cut (user call 2026-11-21);
+   the count now lives in the hero and the opened wave's detail */
 ok("estimator agrees (synthLatest.n)", D.synthLatest.n === expected.length,
   "synthLatest.n=" + D.synthLatest.n + " vs window " + expected.length);
 

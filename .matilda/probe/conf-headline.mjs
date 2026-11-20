@@ -60,23 +60,20 @@ const hed = () => page.evaluate(() => ({
 /* 1. a head and dek of its own on every facet */
 console.log("== 1. per-facet headlines (1280) ==");
 await open(1280);
+/* only Issues and Demographics carry a head and dek (user calls
+   2026-11-21); the other facets open straight onto their controls */
+const STORY = ["issues", "demographics"];
 const seen = {};
 for (const id of IDS) {
   check(await pick(id), `tab for ${id} present`);
   await sleep(500);
   const h = await hed();
   seen[id] = h;
-  check(h.facet === id && (id === "primary" || (h.head && h.dek)), `${id}: head + dek (${JSON.stringify((h.head || "").slice(0, 70))})`);
+  const story = STORY.includes(id);
+  check(h.facet === id && (story ? !!(h.head && h.dek) : !h.head && !h.dek), `${id}: ${story ? "head + dek" : "no head or dek"} (${JSON.stringify((h.head || "").slice(0, 70))})`);
 }
-check(seen.twopp.head.startsWith("Labor’s") && seen.twopp.dek.includes("Below is every"), "2PP head keeps its shape");
-const STORY = IDS.filter((id) => id !== "primary");
-check(new Set(STORY.map((id) => seen[id].head)).size === STORY.length, "distinct heads");
-check(new Set(STORY.map((id) => seen[id].dek)).size === STORY.length, "distinct deks");
-check(!seen.primary.head && !seen.primary.dek, "Primary carries no head or dek (user call 2026-11-21)");
-check(/net (approval|favourability) of/.test(seen.leadership.head), "Leadership head quotes the net rating");
-check(/^The net mood of/.test(seen.direction.head), "Direction head quotes the net mood");
+check(seen.issues.head !== seen.demographics.head && seen.issues.dek !== seen.demographics.dek, "distinct heads and deks");
 check(/issues/.test(seen.issues.head), "Issues head counts the issues");
-check(/gauges sit (below|above) neutral/.test(seen.confidence.head), "Confidence head reads the gauges");
 check(seen.confidence.title === "Economic sentiment" && seen.confidence.meta === CONF_META, "Confidence chrome intact (title + trimmed meta)");
 check(seen.twopp.meta && seen.twopp.meta.includes("poll since"), "poll-facet meta unchanged");
 /* the demographics head follows the split picker */

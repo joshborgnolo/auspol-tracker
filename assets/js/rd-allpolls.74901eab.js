@@ -3173,102 +3173,11 @@ const RD_AP_DEM_NOUN = {
   "United Kingdom": "voters born in the UK"
 };
 const rdApDemNoun = g => RD_AP_DEM_NOUN[g] || "the " + g + " group";
-function rdApFacetStory(facet, upd, demSplit, confBw) {
+function rdApFacetStory(facet, upd, demSplit) {
   const D = window.AUSPOL;
-  const J = window.JUR;
   const polls = D.individualPolls || [];
-  const inWin = (p, days) => {
-    const t = rdApDays(p.released);
-    return t > upd - days * 864e5 && t <= upd;
-  };
   const poss = id => rdPartyStart(id) + (rdPlural(id) ? "’" : "’s");
-  const fromPolls = (n, lo, hi, f) => " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all read " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
-  const tally = (k, n, has) => n === 1 ? k ? "It " + has : "It doesn’t " + (has === "has" ? "have" : has.replace(/s$/, "")) : k === n ? (n === 2 ? "Both " : "All " + rdNumWord(n) + " ") + (has === "has" ? "have" : has.replace(/s$/, "")) : k === 0 ? "None of them " + has : rdCap(rdNumWord(k)) + " of them " + (k === 1 ? has : has === "has" ? "have" : has.replace(/s$/, ""));
   const below = what => "Below is every " + RD_AP_POLLS + " poll" + (what ? " " + what : "") + " since the " + rdElecYear + " election, newest first, each linked to its source.";
-  const range = vals => [Math.min(...vals), Math.max(...vals)];
-  if (facet === "primary") {
-    const now = D.latest.primary || {};
-    const ids = Object.keys(now).filter(k => now[k] != null).sort((a, b) => now[b] - now[a]);
-    if (ids.length < 2) return null;
-    const [t1, t2] = ids;
-    const days = D.latest.method && D.latest.method.windowDays || 21;
-    const ps = polls.filter(p => inWin(p, days) && p.p && p.p[t1] != null);
-    if (!ps.length) return null;
-    const n = ps.length,
-      [lo, hi] = range(ps.map(p => p.p[t1]));
-    const f = rdApNum;
-    const head = RD_AP_KAL ? poss(t1) + " " + now[t1].toFixed(1) + " primary vote is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all read " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : poss(t1) + " " + now[t1].toFixed(1) + " primary vote" + fromPolls(n, lo, hi, f);
-    const lastM = (D.aggPrimary || [])[(D.aggPrimary || []).length - 1] || {};
-    const ci = id => lastM.ci && lastM.ci[id] || 0;
-    const gap = now[t1] - now[t2];
-    const level = gap < Math.sqrt(ci(t1) ** 2 + ci(t2) ** 2);
-    const both = ps.filter(p => p.p[t2] != null);
-    const ahead = both.filter(p => p.p[t1] > p.p[t2]).length;
-    const m = both.length;
-    const tl = !m ? "" : m === 1 ? ahead ? "It has " : "It doesn’t have " : ahead === m ? m === 2 ? "Both have " : "All " + rdNumWord(m) + " have " : ahead === 0 ? "None of the " + rdNumWord(m) + " has " : rdCap(rdNumWord(ahead)) + " of the " + rdNumWord(m) + " " + (ahead === 1 ? "has " : "have ");
-    const dek = (m ? tl + rdPartyIn(t1) + " ahead of " + rdPartyIn(t2) + ". " : "") + rdPartyStart(t2) + (rdPlural(t2) ? " are " : " is ") + gap.toFixed(1) + " points behind on " + now[t2].toFixed(1) + (level ? ", too close to separate. " : ". ") + below("");
-    return {
-      head,
-      dek
-    };
-  }
-  if (facet === "leadership") {
-    const N = D.leaderNow || {};
-    const L = {};
-    (D.LEADERS || []).forEach(x => {
-      L[x.id] = x;
-    });
-    const pm = L.alb,
-      opp = L.taylor;
-    if (!pm || !opp) return null;
-    const fav = !(N.alb_net && N.alb_net.v != null) && N.alb_fav && N.alb_fav.v != null;
-    const a = N[fav ? "alb_fav" : "alb_net"];
-    if (!a || a.v == null) return null;
-    const what = fav ? "net favourability" : "net approval";
-    const days = !fav && !J ? 21 : 42;
-    const isFav = p => (p.appr.metricBy || {}).alb === "fav";
-    const ps = polls.filter(p => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
-    if (!ps.length) return null;
-    const n = ps.length,
-      [lo, hi] = range(ps.map(p => p.appr.albNet));
-    const f = v => rdSigned(v, 0);
-    const head = pm.short + "’s " + what + " of " + rdSigned(a.v, 1) + fromPolls(n, lo, hi, f);
-    const t = N[fav ? "taylor_fav" : "taylor_net"];
-    const both = ps.filter(p => p.appr.taylorNet != null);
-    const above = both.filter(p => p.appr.taylorNet > p.appr.albNet).length;
-    let dek = "";
-    if (t && t.v != null && both.length) {
-      dek += tally(above, both.length, "rates") + " " + opp.short + " above " + pm.short + ", and " + opp.short + "’s own " + what + " is " + rdSigned(t.v, 1) + ". ";
-    }
-    const office = J ? J.office.alb : "PM";
-    const pa = N.alb_pref && N.alb_pref.v,
-      po = N.taylor_pref && N.taylor_pref.v;
-    if (pa != null && po != null) {
-      const ra = Math.round(pa),
-        ro = Math.round(po);
-      dek += ra === ro ? "As preferred " + office + ", " + pm.short + " and " + opp.short + " are level at " + ra + ". " : "As preferred " + office + ", " + (ra > ro ? pm.short + " leads " + opp.short : opp.short + " leads " + pm.short) + " " + Math.max(ra, ro) + "–" + Math.min(ra, ro) + ". ";
-    }
-    return {
-      head,
-      dek: dek + below("with leadership numbers")
-    };
-  }
-  if (facet === "direction") {
-    const now = D.directionNow;
-    if (!now) return null;
-    const ps = polls.concat(D.directionOnlyPolls || []).filter(p => inWin(p, 21) && p.dir && p.dir.net != null);
-    if (!ps.length) return null;
-    const n = ps.length,
-      [lo, hi] = range(ps.map(p => p.dir.net));
-    const head = "The net mood of " + rdSigned(now.net, 1) + fromPolls(n, lo, hi, v => rdSigned(v, 0));
-    const wrongLeads = now.wrong >= now.right;
-    const k = ps.filter(p => wrongLeads ? p.dir.wrong > p.dir.right : p.dir.right > p.dir.wrong).length;
-    const dek = tally(k, n, "has") + " more voters saying Australia is " + (wrongLeads ? "on the wrong track than heading in the right direction" : "heading in the right direction than on the wrong track") + ". Taken together, " + Math.round(wrongLeads ? now.wrong : now.right) + "% say it’s " + (wrongLeads ? "on the wrong track" : "heading in the right direction") + " and " + Math.round(wrongLeads ? now.right : now.wrong) + "% that it’s " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + below("with a direction reading");
-    return {
-      head,
-      dek
-    };
-  }
   if (facet === "issues") {
     const list = (D.issues && D.issues.list || []).filter(it => it.own && it.own.lead);
     if (!list.length) return null;
@@ -3359,41 +3268,8 @@ function rdApFacetStory(facet, upd, demSplit, confBw) {
       dek
     };
   }
-  if (facet === "confidence") {
-    const M = D.confidence || {};
-    const G = (confBw ? [["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]] : [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100], ["demosauConsumer", "DemosAU’s consumer sentiment index", 50]]).filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null).map(([k, name, neut]) => ({
-      k,
-      name,
-      neut,
-      lat: M[k].latest
-    }));
-    if (!G.length) return null;
-    const fig = (g, v) => g.neut === 0 ? rdSigned(v, Number.isInteger(v) ? 0 : 1).replace(/^\+/, "") : v.toFixed(1);
-    const nG = G.length,
-      under = G.filter(g => g.lat.v < g.neut).length;
-    const laneNoun = confBw ? "business" : "consumer";
-    const all = nG === 2 ? "Both" : "All " + rdNumWord(nG);
-    const head = under === nG ? all + " " + laneNoun + " gauges sit below neutral" : under === 0 ? all + " " + laneNoun + " gauges sit above neutral" : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " " + laneNoun + " gauges sit below neutral";
-    const moved = G.filter(g => g.lat.chg != null);
-    const fell = moved.filter(g => g.lat.chg < 0).length;
-    const fellTxt = !moved.length ? "" : fell === moved.length ? (moved.length === 2 ? "Both" : "All " + rdNumWord(moved.length)) + " fell in their latest release. " : fell === 0 ? "None fell in its latest release. " : rdCap(rdNumWord(fell)) + " of the " + rdNumWord(moved.length) + " fell in their latest release. ";
-    const newest = G.reduce((m, g) => g.lat.released > m ? g.lat.released : m, "");
-    const [, mo, dd] = newest.split("-").map(Number);
-    const at = g => g.name + " at " + fig(g, g.lat.v) + (g.lat.chg == null ? "" : Math.abs(g.lat.chg) < 0.05 ? " (unchanged)" : (g.lat.chg < 0 ? " (down " : " (up ") + rdApNum(Math.abs(g.lat.chg)) + ")");
-    const latest = G.filter(g => g.lat.released === newest);
-    const dek = fellTxt + "The newest release" + (latest.length > 1 ? "s" : "") + ", on " + dd + " " + D.monthNameFull(mo) + ", put" + (latest.length > 1 ? "" : "s") + " " + rdList(latest.map(at)) + ". " + "Below is every release of the " + laneNoun + " indices since the " + rdElecYear + " election, newest first, each linked to its source.";
-    return {
-      head,
-      dek
-    };
-  }
   return null;
 }
-const rdApLeanFor = (p, onM, pub) => {
-  const y = rdApYd(p, onM, pub);
-  const x = pub ? onM ? p.tppAlt ? p.tppAlt.alp : null : p.alpN : onM ? p.alpOnImp : p.alpImp;
-  return x != null && y && y.v != null ? +(x - Math.round(y.v * 10) / 10).toFixed(1) : null;
-};
 function rdApConsStory(upd) {
   const D = window.AUSPOL;
   const waves = (D.individualPolls || []).filter(p => p.cons && rdApConsDef(p).m.onp != null && rdApDays(p.released) <= upd).sort((a, b) => rdApDays(b.released) - rdApDays(a.released));
@@ -3423,37 +3299,6 @@ function rdApConsStory(upd) {
   const parts = ["outscored", "came close to", "trailed"].map((v, i) => cnt[i] ? [v, cnt[i]] : null).filter(Boolean);
   const tallied = full.length < 2 ? "" : parts.length === 1 ? "In all " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + parts[0][0] + " Labor. " : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
   const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "") + tallied + "Below is every national poll with consideration figures since the 2025 election, newest first, each linked to its source.";
-  return {
-    head,
-    dek
-  };
-}
-function rdApTppStory(onM, pub, upd) {
-  const D = window.AUSPOL;
-  const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
-  const winDays = D.latest.method && D.latest.method.windowDays || 21;
-  const figOf = p => rdApFig(p, onM, pub);
-  const win = (D.individualPolls || []).filter(p => {
-    const t = rdApWinMid(p);
-    return t >= upd - winDays * 864e5 && t <= upd && figOf(p).a != null;
-  });
-  if (!today || !win.length) return null;
-  const rival = onM ? "One Nation" : "the Coalition";
-  const contest = onM ? "onp" : "lnp";
-  const vals = win.map(p => figOf(p).a);
-  const lo = Math.min(...vals),
-    hi = Math.max(...vals);
-  const f = v => pub ? rdApNum(v) : v.toFixed(1);
-  const n = win.length;
-  const head = RD_AP_KAL ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
-  const ahead = vals.filter(v => v > 50).length;
-  const outN = win.filter(p => rdApInside(rdApAdj({
-    ...p,
-    lean: rdApLeanFor(p, onM, pub)
-  }, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
-  const lead = n === 1 ? ahead ? "It has" : "It doesn’t have" : ahead === n ? n === 2 ? "Both have" : "All " + rdNumWord(n) + " have" : ahead === 0 ? "None of them has" : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
-  const tail = n === 1 ? outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. " : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. " : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. " : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
-  const dek = lead + " Labor ahead of " + rival + ", and " + tail + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
   return {
     head,
     dek
@@ -3723,9 +3568,9 @@ function RdAllPolls(P) {
   };
   const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
   const live = React.useMemo(() => {
-    const st = facet === "twopp" ? rdApTppStory(onM, pub, upd) : facet === "primary" && consM ? rdApConsStory(upd) : facet === "confidence" ? rdApFacetStory(facet, upd, null, confBus) : facet === "demographics" ? rdApFacetStory(facet, upd, demSplit) : rdApFacetStory(facet, upd);
+    const st = facet === "primary" && consM ? rdApConsStory(upd) : facet === "demographics" ? rdApFacetStory(facet, upd, demSplit) : facet === "issues" ? rdApFacetStory(facet, upd) : null;
     return st && st.head ? st : null;
-  }, [facet, onM, pub, consM, confBus, demSplit, upd]);
+  }, [facet, consM, demSplit, upd]);
   const head = live ? live.head : null,
     dek = live ? live.dek : null;
   const [hedHold, setHedHold] = useState(0);
