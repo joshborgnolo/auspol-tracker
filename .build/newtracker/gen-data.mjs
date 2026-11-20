@@ -2912,9 +2912,10 @@ const RELEASE_HUB = new Map(Object.entries(D.pollsterRules || {})
    the base, so it is still A); F = forced choice, no undecided option, so
    everyone is allocated and the parties add to 100 (Resolve; user call
    2026-11-21 - not A, which would say undecideds sit in its shares). A house whose two-party figure has another base than its
-   primaries carries a per-facet pair: Essential's published 2PP+ pair keeps
-   its unsure in, but the site rescales it to 100 (share2pp), so the 2PP the
-   2PP views show is of those who named a party and a preference - D+L.
+   primaries carries a per-facet pair: the 2PP views' default, the implied
+   2PP, is read off Essential's primaries rescaled to leave the undecided out
+   (poolPrim) - D+L. "As published" (facet key twoppPub, which falls back to
+   the primaries' base) prints its 2PP+ pair raw, unsure still in (44-52) - A.
    Each is the house's own methodology statement (in the repo's -src caches
    where noted). A sub-series - "Newspoll (pooled)", "DemosAU (MRP)",
    "Roy Morgan (SMS)" - reads its parent's. A house with no statement found

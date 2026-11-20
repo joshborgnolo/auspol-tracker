@@ -4989,7 +4989,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                       </span>
                     </td>
                     <td className="ta-l muted">{r.fieldPending ? rdFieldTbc(r) : r.field}</td>
-                    <td className="num muted hide-md">{r.sample != null ? window.AUSPOL.sampleEl(r, facet) : "—"}</td>
+                    <td className="num muted hide-md">{r.sample != null ? window.AUSPOL.sampleEl(r, facet === "twopp" && tppBasis === "resp" ? "twoppPub" : facet) : "—"}</td>
 
                     {facet === "twopp" && (<>
                       <td className="ta-l apub-col hide-md"><ArchTpp p={r} basis={tppBasis} measure={measure} /></td>

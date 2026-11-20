@@ -4250,7 +4250,7 @@ function RdAllPolls(P) {
     return React.createElement("span", {
       role: "cell",
       className: "rd-ap-n"
-    }, React.createElement("span", null, p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"), p.sampleEff != null ? React.createElement("span", {
+    }, React.createElement("span", null, p.sample != null ? window.AUSPOL.sampleEl(p, facet === "twopp" && pub ? "twoppPub" : facet) : "—"), p.sampleEff != null ? React.createElement("span", {
       className: "rd-ap-sub"
     }, "eff. ", p.sampleEff.toLocaleString()) : rdEffTbc(p) || rdEffMissing(p) ? React.createElement("span", {
       className: "rd-ap-sub"
@@ -4876,7 +4876,7 @@ function RdAllPolls(P) {
       onFacet: onFacet
     }));
     if (phone) {
-      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleEl(p, facet) : null].filter(Boolean).flatMap((x, i) => i ? [", ", x] : [x]);
+      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleEl(p, facet === "twopp" && pub ? "twoppPub" : facet) : null].filter(Boolean).flatMap((x, i) => i ? [", ", x] : [x]);
       const cardHead = edge => React.createElement(React.Fragment, null, React.createElement("div", {
         className: "rd-ap-c1"
       }, React.createElement("span", {

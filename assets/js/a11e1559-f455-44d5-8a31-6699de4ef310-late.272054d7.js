@@ -4959,7 +4959,7 @@ function PollsterTable({
       className: "ta-l muted"
     }, r.fieldPending ? rdFieldTbc(r) : r.field), React.createElement("td", {
       className: "num muted hide-md"
-    }, r.sample != null ? window.AUSPOL.sampleEl(r, facet) : "—"), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("td", {
+    }, r.sample != null ? window.AUSPOL.sampleEl(r, facet === "twopp" && tppBasis === "resp" ? "twoppPub" : facet) : "—"), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("td", {
       className: "ta-l apub-col hide-md"
     }, React.createElement(ArchTpp, {
       p: r,

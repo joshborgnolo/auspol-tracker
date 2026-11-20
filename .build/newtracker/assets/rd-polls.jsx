@@ -843,7 +843,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                 </span>
                 <span role="cell" className="rd-pl-c-latest">
                   <span className="rd-pl-main">{latestLab(e)}</span>
-                  <span className="rd-pl-sub">{r.fieldPending ? <>fieldwork {rdFieldTbc(r)}</> : r.field}{r.sample ? <>, {window.AUSPOL.sampleEl(r, facet)}</> : ""}</span>
+                  <span className="rd-pl-sub">{r.fieldPending ? <>fieldwork {rdFieldTbc(r)}</> : r.field}{r.sample ? <>, {window.AUSPOL.sampleEl(r, facet === "twopp" && basis === "resp" ? "twoppPub" : facet)}</> : ""}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
                 <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>

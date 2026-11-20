@@ -39,7 +39,19 @@ let ns = await ledger();
 console.log("  ledger 2PP:", ns.slice(0, 8).map((r) => r[1]).join(" | "));
 ok(ns.length && ns.filter((r) => r[1] !== "—").every((r) => /^[\d,]+( (D|D\+L|A|F))?$/.test(r[1])), "ledger samples read n + base");
 const ess = (rows) => (rows.find((r) => /\d/.test(r[1]) && r[0].startsWith("Essential")) || [])[1];
-ok(/ D\+L$/.test(ess(ns) || ""), "Essential reads D+L on the 2PP facet (" + ess(ns) + ")");
+ok(/ D\+L$/.test(ess(ns) || ""), "Essential reads D+L on the 2PP facet, implied (" + ess(ns) + ")");
+// "as published" prints Essential's raw 2PP+ pair, unsure still in: A
+const flipBasis = async () => {
+  const sw = 'button[role=switch][aria-label^="Show the pollsters"]';
+  if (!(await page.$(sw))) { await page.evaluate(() => { const q = document.querySelector("button[aria-label^=\"How the two-party figures\"]"); q && q.click(); }); await wait(500); }
+  await page.evaluate((sel) => { const b = document.querySelector(sel); b && b.click(); }, sw);
+  await wait(1200);
+  await page.keyboard.press("Escape"); await wait(300);
+};
+await flipBasis();
+ns = await ledger();
+ok(/ A$/.test(ess(ns) || ""), "Essential reads A on the 2PP facet, as published (" + ess(ns) + ")");
+await flipBasis();
 await page.evaluate(() => { const b = [...document.querySelectorAll("[role=tab], button")].find((e) => e.textContent.trim() === "Primary"); b && b.click(); });
 await wait(1500);
 ns = await ledger();

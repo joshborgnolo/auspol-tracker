@@ -3336,7 +3336,7 @@ function RdAllPolls(P) {
   const sampleCell = (p) => {
     const effEst = rdEffEstimate(p);
     return (
-      <span role="cell" className="rd-ap-n"><span>{p.sample != null ? window.AUSPOL.sampleEl(p, facet) : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
+      <span role="cell" className="rd-ap-n"><span>{p.sample != null ? window.AUSPOL.sampleEl(p, facet === "twopp" && pub ? "twoppPub" : facet) : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
         : rdEffTbc(p) || rdEffMissing(p) ? <span className="rd-ap-sub">{rdEffNote(p)}</span>
         /* an MRP files no effective sample (its APC statement prints "n/a for
            MRP"), so say so rather than leave the sub-line empty */
@@ -3672,7 +3672,7 @@ function RdAllPolls(P) {
       </div>
     );
     if (phone) {
-      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleEl(p, facet) : null].filter(Boolean).flatMap((x, i) => (i ? [", ", x] : [x]));
+      const sub = [p.client, fieldTxt(p), p.sample != null ? window.AUSPOL.sampleEl(p, facet === "twopp" && pub ? "twoppPub" : facet) : null].filter(Boolean).flatMap((x, i) => (i ? [", ", x] : [x]));
       /* the two head rows as ONE renderer so a facet whose feature line
          sits at the head's right edge can hand the slot to a stateful
          component (the consideration range cycler: its basis label rides

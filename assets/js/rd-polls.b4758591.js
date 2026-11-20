@@ -1190,7 +1190,7 @@ function RdPolls({
       className: "rd-pl-main"
     }, latestLab(e)), React.createElement("span", {
       className: "rd-pl-sub"
-    }, r.fieldPending ? React.createElement(React.Fragment, null, "fieldwork ", rdFieldTbc(r)) : r.field, r.sample ? React.createElement(React.Fragment, null, ", ", window.AUSPOL.sampleEl(r, facet)) : "")), React.createElement("span", {
+    }, r.fieldPending ? React.createElement(React.Fragment, null, "fieldwork ", rdFieldTbc(r)) : r.field, r.sample ? React.createElement(React.Fragment, null, ", ", window.AUSPOL.sampleEl(r, facet === "twopp" && basis === "resp" ? "twoppPub" : facet)) : "")), React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-figs"
     }, React.createElement(RdSwap, {
