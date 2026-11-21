@@ -1367,6 +1367,13 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => k.id !== "oth" && rows.some((r) => { const o = ownOf(r); return o && o[k.id] != null; }));
     const hasUnsure = rows.some((r) => unsure(ownOf(r)) != null);
     const hasRank = ranked.length > 0;
+    /* the margins, as one range a kind in the note (the grid has no room
+       for a ± a cell): the party shares on everyone asked, and the gap
+       between the top two parties - the row's lead - as a difference */
+    const issR = (ms) => { const v = ms.filter((m) => m != null && isFinite(m)); if (!v.length) return null; const lo = Math.min(...v).toFixed(1), hi = Math.max(...v).toFixed(1); return "±" + (lo === hi ? lo : lo + "–" + hi); };
+    const shR = issR(rows.flatMap((r) => { const o = ownOf(r); return o ? cols.map((k) => (o[k.id] != null ? rdShareMoe(p, o[k.id]) : null)) : []; }));
+    const ldR = issR(rows.map((r) => { const L = ownOf(r) ? window.issLeadOf(ownOf(r)) : null; return L && L.lead != null ? rdDiffMoe(p, L.v, L.v - L.lead) : null; }));
+    const issMoeTxt = shR ? " Margins of error at 95%: " + shR + " on a party’s share" + (ldR ? ", " + ldR + " on the gap between the top two" : "") + "." : "";
     const nNum = (hasRank ? 1 : 0) + (hasR1 ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
     // the column widths live in rd.css (--isr-*); which columns there are, here
     const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], hasR1 ? ["var(--isr-p)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
@@ -1403,7 +1410,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
         </div>
         <span className="rd-apd-sub rd-apd-note">{iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it" + (hasR1 ? "; First: the share naming it the one that matters most. " : ". ")
           : iq.conc ? "Ranked: the issue’s place among concerns named without prompting, and the share mentioning it. " : "This poll didn’t ask which issues matter most. "}
-          The party columns are each party’s share of all respondents, as printed.{iq.q ? <> The question’s wording: “{iq.q}”{/[.?…]$/.test(iq.q) ? "" : "."}</> : ""} The party in front is shaded.</span>
+          The party columns are each party’s share of all respondents, as printed.{issMoeTxt}{iq.q ? <> The question’s wording: “{iq.q}”{/[.?…]$/.test(iq.q) ? "" : "."}</> : ""} The party in front is shaded.</span>
       </div>
     );
   })();
@@ -1788,19 +1795,19 @@ function RdLgTpp({ p, onM, moe, note }) {
 function rdLgDecided(p) {
   const f = Array.isArray(p.firmAll) && (p.firmAll.length === 2 || p.firmAll.length === 3) ? p.firmAll : null;
   if (f && f.length === 2) return {
-    h: p.undecided != null ? "Primary-vote shares are decideds’. " + p.undecided + "% undecided, excluded" : f[1] + "% not firm",
-    w: "", d: null, s: f[0] + "% firm, " + f[1] + "% soft" + (p.pollster === "Spectre Strategy" ? " (soft includes undecided respondents)" : ""),
+    h: p.undecided != null ? "Primary-vote shares are decideds’. " + p.undecided + "%" : f[1] + "% not firm",
+    w: p.undecided != null ? "undecided, excluded" : "", d: null, uv: p.undecided != null ? p.undecided : null, s: f[0] + "% firm, " + f[1] + "% soft" + (p.pollster === "Spectre Strategy" ? " (soft includes undecided respondents)" : ""),
   };
   if (p.undecidedLeaner != null) return {
-    h: "Primary-vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "% undecided after leaner, excluded",
-    w: "", d: null,
+    h: "Primary-vote shares are decideds’ and leaners’ combined. " + p.undecidedLeaner + "%",
+    w: "undecided after leaner, excluded", d: null, uv: p.undecidedLeaner,
     s: f && f.length === 3 ? f[0] + "% solid, " + f[1] + "% soft, " + f[2] + "% very soft" : null,
   };
   /* a house that keeps its undecided IN the base (Essential, undIn): the
      shares shown are everyone's and add to 100 with it; the averages rescale
      them to leave it out */
   if (p.undIn != null) return {
-    h: "Primary vote shares are everyone’s, undecided included. " + p.undIn + "%", w: "undecided after leaner",
+    h: "Primary vote shares are everyone’s, undecided included. " + p.undIn + "%", w: "undecided after leaner", uv: p.undIn,
     d: null, s: "kept in, so the shares add to 100 with it (the averages rescale them to leave it out)", sep: ", ",
   };
   if (p.undecided != null) {
@@ -1808,7 +1815,7 @@ function rdLgDecided(p) {
     if (b === "soft") return { h: "Primary-vote shares are everyones’. ‘Undecided’ not an option (a forced choice)", w: "", d: null,
       s: (100 - p.undecided) + "% firm, " + p.undecided + "% soft" };
     return { h: (b === "leaner" || b === "tpp" ? "Primary-vote shares are decideds’ and leaners’ combined. " : "Primary-vote shares are decideds’. ") + p.undecided + "%", w: b === "leaner" ? "undecided after leaner" : "undecided",
-             d: (p.chg && p.chg.d && p.chg.d.und) || null,
+             d: (p.chg && p.chg.d && p.chg.d.und) || null, uv: p.undecided,
              s: b === "soft" ? "named a party, but might yet change their mind" : "excluded",
              sep: b === "soft" || b === "tpp" ? " – " : ", " };
   }
@@ -1825,6 +1832,9 @@ function RdLgVote({ p, note }) {
   if (!prim.length) return null;
   const dec = rdLgDecided(p);
   const hasMoe = prim.some((k) => rdPrimMoe(p, q[k.id]) != null);
+  /* the undecided share's ±, on everyone asked (rdPrimMoe's und) */
+  const decPmT = dec && dec.uv != null ? rdPrimMoeTxt(p, dec.uv, true) : null;
+  const decPm = decPmT ? <span className="rd-ldg-ipm"> {decPmT}</span> : null;
   return (
     <>
       <div className="rd-ldg-prim">
@@ -1840,9 +1850,9 @@ function RdLgVote({ p, note }) {
         ))}
       </div>
       {dec && (dec.sep === ", " ? (
-        <p className="rd-ldg-foot1"><b>{dec.h}{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} />{dec.s ? dec.sep + dec.s : ""}.</b></p>
+        <p className="rd-ldg-foot1"><b>{dec.h}{decPm}{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} />{dec.s ? dec.sep + dec.s : ""}.</b></p>
       ) : (
-        <p className="rd-ldg-foot1"><b>{dec.h}{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} /></b>{dec.s ? (dec.sep || " – ") + dec.s : ""}.</p>
+        <p className="rd-ldg-foot1"><b>{dec.h}{decPm}{dec.w ? " " + dec.w : ""}<RdLgChg d={dec.d} dec={1} /></b>{dec.s ? (dec.sep || " – ") + dec.s : ""}.</p>
       ))}
       {note && <p className="rd-ldg-note">{note}</p>}
     </>
@@ -1884,6 +1894,9 @@ function RdLgLeaders({ p, note }) {
   };
   if (!rows.length && !sets.length) return null;
   const sum = (s) => who.reduce((t, k) => t + (s[k] || 0), 0);
+  /* every figure's ±, as the table rows print them: shares on everyone
+     asked (rdShareMoe), a net as approve minus disapprove (rdDiffMoe) */
+  const lgPm = (m) => { const t = rdMoeTxt(m); return t ? <span className="rd-ldg-ipm"> {t}</span> : null; };
   const table = (rows, gi) => {
     const nFav = rows.filter((r) => r.fav).length;
     const allFav = rows.length > 0 && nFav === rows.length, mixed = nFav > 0 && nFav < rows.length;
@@ -1903,10 +1916,10 @@ function RdLgLeaders({ p, note }) {
               <th scope="row">{r.name}{mixed && <span className="rd-ldg-tail"> {r.fav ? "favourability" : "approval"}</span>}
                 {/* a phone folds the part columns away: the parts ride under the name */}
                 {r.L && r.L.app != null && <span className="rd-ldg-parts">{r.L.app} {r.fav ? "fav." : "approve"}, {r.L.dis} {r.fav ? "unfav." : "disapprove"}{r.L.unsure != null ? ", " + r.L.unsure + " unsure" : ""}</span>}</th>
-              <td className="num pt">{r.L && r.L.app != null ? r.L.app : "—"}</td>
-              <td className="num pt">{r.L && r.L.dis != null ? r.L.dis : "—"}</td>
-              {hasUns && <td className="num pt">{r.L && r.L.unsure != null ? r.L.unsure : "—"}</td>}
-              <td className="num"><b style={{ color: RD_LG_INK[r.id] }}>{rdLgNet(r.net)}</b></td>
+              <td className="num pt">{r.L && r.L.app != null ? <>{r.L.app}{lgPm(rdShareMoe(p, r.L.app))}</> : "—"}</td>
+              <td className="num pt">{r.L && r.L.dis != null ? <>{r.L.dis}{lgPm(rdShareMoe(p, r.L.dis))}</> : "—"}</td>
+              {hasUns && <td className="num pt">{r.L && r.L.unsure != null ? <>{r.L.unsure}{lgPm(rdShareMoe(p, r.L.unsure))}</> : "—"}</td>}
+              <td className="num"><b style={{ color: RD_LG_INK[r.id] }}>{rdLgNet(r.net)}</b>{r.L && r.L.app != null && r.L.dis != null && lgPm(rdDiffMoe(p, r.L.app, r.L.dis))}</td>
               <td className="num">{rdLgChg(c[r.ck], 0) ? <span className="rd-ldg-chg">{rdLgChg(c[r.ck], 0)}</span> : <span className="rd-ldg-none">—</span>}</td>
             </tr>
           ))}
@@ -1928,8 +1941,8 @@ function RdLgLeaders({ p, note }) {
             {sets.map((s, i) => (
               <tr key={i}>
                 <th scope="row">{setLab(s)}</th>
-                {who.map((k) => <td key={k} className="num">{s[k] != null ? <b style={{ color: RD_LG_INK[k] }}>{s[k]}</b> : <span className="rd-ldg-none">—</span>}</td>)}
-                <td className="num">{s.unc ? s.unc : sum(s) >= 99.5 ? <span className="rd-ldg-none" title="Printed without its undecided share">—</span> : "0"}</td>
+                {who.map((k) => <td key={k} className="num">{s[k] != null ? <><b style={{ color: RD_LG_INK[k] }}>{s[k]}</b>{lgPm(rdShareMoe(p, s[k]))}</> : <span className="rd-ldg-none">—</span>}</td>)}
+                <td className="num">{s.unc ? <>{s.unc}{lgPm(rdShareMoe(p, s.unc))}</> : sum(s) >= 99.5 ? <span className="rd-ldg-none" title="Printed without its undecided share">—</span> : "0"}</td>
               </tr>
             ))}
           </tbody>
@@ -1945,6 +1958,7 @@ function RdLgDir({ p }) {
   const d = p.dir;
   if (!d) return null;
   const u = d.unsure != null ? d.unsure : Math.max(0, 100 - d.right - d.wrong);
+  const dPm = (m) => { const t = rdMoeTxt(m); return t ? <span className="rd-ldg-ipm"> {t}</span> : null; };
   return (
     <div className="rd-ldg-dir">
       <div className="rd-ldg-dirbar" aria-hidden="true">
@@ -1953,10 +1967,10 @@ function RdLgDir({ p }) {
         <i style={{ width: d.wrong + "%", background: "var(--mood-neg)" }}></i>
       </div>
       <div className="rd-ldg-dirk">
-        <span>Right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b></span>
-        <span>Unsure <b>{rdApNum(u)}</b></span>
-        <span>Wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b></span>
-        <span className="rd-ldg-dirnet">Net <b>{rdApSigned(d.right - d.wrong).replace(/\.0$/, "")}</b></span>
+        <span>Right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>{dPm(rdShareMoe(p, d.right))}</span>
+        <span>Unsure <b>{rdApNum(u)}</b>{u > 0 && dPm(rdShareMoe(p, u))}</span>
+        <span>Wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{dPm(rdShareMoe(p, d.wrong))}</span>
+        <span className="rd-ldg-dirnet">Net <b>{rdApSigned(d.right - d.wrong).replace(/\.0$/, "")}</b>{dPm(rdDiffMoe(p, d.right, d.wrong))}</span>
       </div>
       {/* the breakdowns THIS wave's own release printed (gen-data's dir.bg):
           SEC Newgate's five states, Roy Morgan's gender pair and voting-
@@ -2283,7 +2297,12 @@ function RdApPrimRail({ p }) {
   const q = p.pp || p.p || {}, y = p.pyd || {};
   const ks = rdLgPrims().filter((k) => q[k.id] != null && y[k.id]);
   if (!ks.length) return null;
-  const n = p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0);
+  /* the margins stand on the same base as the table's ±s (rdPrimMoe):
+     shares of the decided only - the house's own exclusion, or here the
+     undIn rescale (pp) - take n times the decided share (2026-11-21: the
+     whole n read ±2.7 under a row printing ±2.8) */
+  const und0 = p.pp && p.undIn > 0 ? p.undIn : (() => { const u = D.undecidedCellOf ? D.undecidedCellOf(p) : null; return u && u.label === "excluded" && u.v > 0 ? u.v : 0; })();
+  const n = (p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0)) * (1 - und0 / 100);
   const rows = ks.map((k) => {
     const x = +q[k.id], v = y[k.id][0], he = y[k.id][1];
     const lean = rdApR1(x - v), less = he == null ? null : rdApR1(lean - he);
@@ -2336,7 +2355,7 @@ function RdApPrimRail({ p }) {
       </table>
       <p className="rd-ldg-foot1">
         Lean is this poll minus {RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)"}, so + means higher; house lean is taken out before averaging.{p.pp && p.undIn != null ? " " + p.pollster + "’s own shares include its " + p.undIn + "% undecided; here they are rescaled to leave it out, as the averages do." : ""}
-        {anyOut ? " Bold: outside the poll’s margin on that party." : ""}{mTxt ? " Margins " + mTxt + ", " + rdMarginBasis(p) + "." : ""}
+        {anyOut ? " Bold: outside the poll’s margin on that party." : ""}{mTxt ? " Margins " + mTxt + (und0 ? " on the decided voters" : "") + ", " + rdMarginBasis(p) + "." : ""}
         {moves && e.w && now ? " Today’s figures: " + rows.filter((r) => now[r.id] != null).map((r) => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : ""}
         {moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""}
       </p>

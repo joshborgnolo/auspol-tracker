@@ -3024,10 +3024,13 @@ body.rd .rd-ap-pinf {
 body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
 /* vote intention's figures carry a ± each (rdPrimMoe, 2026-11-21); above 1240px the
-   lattice widens 46 -> 60px a party and the strip gives the 70px back - its
+   lattice widens 46 -> 70px a party and the strip gives 70px back - its
    scale now fits the rows shown (0-30 today, was 0-45), so a point keeps
    about the width it had */
-body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 364px minmax(0, 256px) minmax(0, 1fr) 40px; }
+/* 70px a party (2026-11-21, user: "more breathing room between the
+   primary vote figures ... less on the right side"): the 1fr slack right
+   of the strip goes to the figures, the strip keeps its 256px */
+body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 414px minmax(0, 256px) minmax(0, 1fr) 40px; }
 /* the other facets' ±s (2026-11-21): Better PM's pair and Demographics'
    gaps carry theirs beside each figure, the nets theirs under each net.
    From 1280px Leadership's Even, Demographics' Even and Confidence's
@@ -3194,8 +3197,8 @@ body.rd .rd-ap-ring {
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
 body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
-body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 60px) 64px; }
-body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 60px); }
+body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 70px) 64px; }
+body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 70px); }
 /* the ± hugs its own figure, so the gap before the next party's figure is
    the wide one (a fixed ± column read "24  ±2.7 26": the ± looked like
    ON's). A half's ½ hangs out of flow past the integer, so there the ±
@@ -4226,6 +4229,7 @@ body.rd .rd-ldg-prim > span { width: 64px; display: flex; flex-direction: column
 body.rd .rd-ldg-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
 body.rd .rd-ldg-big { font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
 body.rd .rd-ldg-prim .rd-ldg-chg { margin-left: 0; }
+body.rd .rd-ldg-ipm { font-size: 0.8em; font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
 body.rd .rd-ldg-pm { font-size: 12px; font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.3; }
 /* direction: one bar, its three answers and the net */
 body.rd .rd-ldg-dirbar { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; }
