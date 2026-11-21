@@ -7502,11 +7502,16 @@
     {
       "date": "2026-10-29",
       "firm": "Newspoll",
-      "alb": 42,
-      "opp": 40,
+      "alb": 44,
+      "opp": 26,
       "oppName": "Taylor",
-      "han": null,
-      "extra": null
+      "han": 30,
+      "extra": [
+        {
+          "alb": 42,
+          "opp": 40
+        }
+      ]
     },
     {
       "date": "2026-11-03",
@@ -9397,7 +9402,7 @@
       "alb": -24,
       "opp": -11,
       "oppName": "Taylor",
-      "han": null,
+      "han": -9,
       "detail": null
     },
     {
@@ -9492,7 +9497,7 @@
       "alb": -23,
       "opp": -10,
       "oppName": "Taylor",
-      "han": null,
+      "han": -1,
       "detail": null
     },
     {
@@ -9725,6 +9730,12 @@
       "firm": "DemosAU",
       "alb": 43,
       "han": 33
+    },
+    {
+      "date": "2026-10-29",
+      "firm": "Newspoll",
+      "alb": 56,
+      "han": 44
     },
     {
       "date": "2026-11-03",
