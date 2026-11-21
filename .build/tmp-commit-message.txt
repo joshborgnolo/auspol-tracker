@@ -1,0 +1,17 @@
+map: NSW upper-house ballots as the Senate-preference lens on the state frames
+
+The nsw15/nsw19/nsw23 frames open the Senate-ballot preference lens off
+map/data/senate-prefs-nsw{15,19,23}.json (built by
+.build/map/build_nsw_lc_prefs.py from the NSWEC per-ballot LC zips in
+.build/nswec-lc-flow-src/ under the committed analyse-family mapping; the
+lane's ATL totals reconcile byte-exact against
+.build/nswec-lc-flow-src/counts.json, formal/informal counts match the
+official figures). The lens wiring rides the same guards as the federal
+Senate lens, with the state frames' exceptions pinned in test-map-page:
+FED_LENS carved for senpref on the three NSW frames, spYear resolves
+frame ids directly there, the legend note names New South Wales and the
+story gates swap svYear→spYear. Victoria stays off the lens — the VEC
+publishes no per-ballot LC product, so there is no source to read.
+
+Drops the stale main data bundle whose hash rotated with today's crosstab
+update.

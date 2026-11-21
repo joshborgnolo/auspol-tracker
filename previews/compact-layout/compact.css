@@ -1,0 +1,86 @@
+/* Compact data-page introductions; shared typography elsewhere is unchanged. */
+body.rd .rd-ap.rd-first,
+body.rd .rd-cycles .rd-first { padding-top: 20px; }
+body.rd .rd-ap .rd-title,
+body.rd .rd-cycles .rd-title { font-size: 20px; }
+body.rd .rd-ap .rd-hed,
+body.rd .rd-cycles .rd-hed { font-size: 28px; line-height: 1.18; max-width: 1100px; margin-top: 12px; }
+body.rd .rd-cycles .rd-dek { font-size: 15px; line-height: 1.5; margin-top: 6px; }
+body.rd .rd-ap .rd-ap-tabs { margin-top: 12px; }
+body.rd .rd-ap .rd-ap-bar { margin-top: 12px; }
+body.rd .rd-ap .rd-ap-table { margin-top: 8px; }
+body.rd .rd-ap .rd-ap-hrow { padding-top: 6px; min-height: 48px; }
+body.rd .rd-cycles .rd-cc { margin-top: 12px; }
+body.rd .rd-cycles .rd-cs { margin-top: 8px; }
+body.rd .rd-cycles .rd-cs-head { min-height: 30px; }
+body.rd .rd-cycles .rd-cs-group { min-height: 30px; }
+body.rd .rd-intro-note { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+body.rd .rd-intro-more { display: inline; }
+body.rd .rd-intro-more > summary { display: inline; margin-left: 8px; color: var(--ink); cursor: pointer; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+body.rd .rd-intro-more > summary::-webkit-details-marker { display: none; }
+body.rd .rd-intro-more > summary::after { content: ' +'; }
+body.rd .rd-intro-more[open] > summary::after { content: ' −'; }
+body.rd .rd-intro-more > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+body.rd .rd-intro-more > p { margin: 8px 0 0; max-width: 900px; padding-left: 12px; border-left: 2px solid var(--line); }
+@media (max-width: 640px) {
+  body.rd .rd-ap.rd-first, body.rd .rd-cycles .rd-first { padding-top: 16px; }
+  body.rd .rd-ap .rd-hed, body.rd .rd-cycles .rd-hed { font-size: 24px; }
+  body.rd .rd-intro-more > summary { display: inline-block; padding-block: 4px; }
+}
+body.rd:has(:is(#panel-allpolls, #panel-cycles):not([hidden])) .tagline { display: none; }
+body.rd:has(:is(#panel-allpolls, #panel-cycles):not([hidden])) .page { padding-top: calc(16px + env(safe-area-inset-top, 0px)); }
+body.rd:has(:is(#panel-allpolls, #panel-cycles):not([hidden])) .site-head { margin-bottom: 8px; }
+@media (min-width: 1220px) {
+  body.rd .rd-ap-headingbar { display: flex; align-items: center; gap: 24px; }
+  body.rd .rd-ap-headingbar > .rd-eyebrow { flex: 0 0 auto; }
+  body.rd .rd-ap-headingbar > .rd-eyebrow .rd-meta { display: none; }
+  body.rd .rd-ap-headingbar > .rd-ap-ebvar { display: none; }
+  body.rd .rd-ap-headingbar > .rd-ap-tabs { flex: 1; min-width: 0; margin-top: 0; border-bottom: 0; }
+  body.rd .rd-ap .rd-ap-mrow { padding-top: 12px; }
+}
+
+/* The page tabs use an underline. Group table views into a segmented control,
+   including the smaller selector that stays with the table during scrolling. */
+body.rd .rd-ap .rd-ap-tabs { border-bottom: 0; }
+body.rd .rd-ap-tabs > [role="group"],
+body.rd .rd-ap .rd-ap-pintabs {
+  box-sizing: border-box;
+  align-self: center;
+  padding: 3px;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+body.rd .rd-ap .rd-ap-pintabs { gap: 2px; }
+body.rd .rd-ap-tabs .rd-tab,
+body.rd .rd-ap .rd-ap-pint {
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 10px;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+body.rd .rd-ap .rd-ap-pint { min-height: 26px; padding-inline: 6px; font-size: 13px; }
+body.rd .rd-ap :is(.rd-tab, .rd-ap-pint):hover { background: var(--surface); }
+body.rd .rd-ap :is(.rd-tab, .rd-ap-pint)[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+body.rd .rd-ap :is(.rd-tab, .rd-ap-pint):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+@media (pointer: coarse) {
+  body.rd .rd-ap-tabs .rd-tab { min-height: 40px; }
+}
+@media (forced-colors: active) {
+  body.rd .rd-ap :is(.rd-tab, .rd-ap-pint)[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+}

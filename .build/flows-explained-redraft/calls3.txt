@@ -1,0 +1,17 @@
+exec(open('@@C3@@').read())
+c19=chart3('fig-2019', [q for q in fedpts(['2013','2016']) if not (q['p']=='onp' and q['lab'].endswith('2013'))],
+    statepts([('wa','2013'),('wa','2017'),('qld','2012'),('qld','2015'),('qld','2017')]), fedpts(['2019']),
+    2012, 2019.9, [2013,2016,2019], '2019',
+    newspoll=dict(v=40,lab='40',tip='Newspoll moved One Nation to 60% to the Coalition, which is 40% to Labor'),
+    title='Before 2019, One Nation preferences had swung hard to the Coalition at state elections',
+    sub='Share of each group&rsquo;s preferences reaching Labor against the Coalition, %',
+    notes=('Newspoll&rsquo;s setting of 60% of One Nation preferences to the Coalition is 40 on this scale. State results where the party won under 2% of the vote are left off.',),
+    source='AEC; WA Electoral Commission and Electoral Commission of Queensland, read through this site&rsquo;s estimates; The Australian')
+c25=chart3('fig-2025', fedpts(['2022']), statepts([('wa','2021'),('wa','2025'),('qld','2020'),('qld','2024')]), fedpts(['2025']),
+    2019.6, 2025.9, [2020,2022,2025], '2025',
+    newspoll=dict(v=29,lo=26,hi=32,lab='&asymp;29',tip='Newspoll never published its setting; its final poll implies about 29% to Labor, plus or minus 3 for rounding'),
+    title='Before 2025, state elections pointed to weaker flows to Labor from all three groups',
+    sub='Share of each group&rsquo;s preferences reaching Labor against the Coalition, %',
+    notes=('Newspoll did not publish its new One Nation setting; &asymp;29 is inferred from its final poll, assuming 2022 flows for Greens and others (&plusmn;3 for rounding).',),
+    source='AEC; WA Electoral Commission and Electoral Commission of Queensland, read through this site&rsquo;s estimates; The Australian')
+

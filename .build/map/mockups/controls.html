@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Map controls — mockups</title>
+<style>
+@font-face { font-family: "IBM Plex Sans"; src: url("../../../fonts/ibmplexsans-latin.056e4e24.woff2") format("woff2"); font-weight: 100 700; }
+:root { --bg: oklch(0.975 0.009 80); --ink: oklch(0.27 0.012 55); --ink-2: oklch(0.44 0.012 55); --ink-3: oklch(0.52 0.010 58); --ink-faint: oklch(0.70 0.008 65); --line: oklch(0.895 0.008 75); --sans: "IBM Plex Sans", system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 28px 32px 60px; background: var(--bg); color: var(--ink); font: 13px/1.45 var(--sans); }
+h1 { font-size: 20px; margin: 0 0 4px; }
+h2 { font-size: 15px; margin: 0 0 2px; }
+.why { color: var(--ink-2); font-size: 13px; margin: 0 0 12px; max-width: 760px; }
+.mock { margin: 0 0 44px; }
+.pair { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+.frame { border-top: 1px solid var(--line); padding-top: 12px; }
+.frame small { display: block; color: var(--ink-3); font-size: 11px; margin-bottom: 8px; }
+.w860 { width: 860px; } .w600 { width: 600px; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.map { height: 54px; margin-top: 12px; border-radius: 3px; background: linear-gradient(90deg, oklch(0.93 0.03 230), oklch(0.95 0.02 230)); position: relative; }
+.map span { position: absolute; left: 10px; top: 8px; font-size: 11px; color: var(--ink-3); }
+.search { display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 8px; border: 1px solid var(--line); border-radius: 2px; color: var(--ink-3); width: 260px; background: var(--bg); }
+.search kbd { margin-left: auto; font: 11px var(--sans); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+.menu { color: var(--ink); font-weight: 600; border-bottom: 1.5px solid var(--ink); padding: 1px 0; white-space: nowrap; }
+.menu::after { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 1px 2px 6px; border-right: 1.4px solid currentColor; border-bottom: 1.4px solid currentColor; transform: rotate(45deg); }
+.chips { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.chips button { color: var(--ink-2); padding: 1px 0; border-bottom: 1.5px solid transparent; }
+.chips button.on { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.chips button.off { color: var(--ink-faint); }
+.hint { color: var(--ink-3); font-size: 12px; }
+.lab { color: var(--ink-3); font-size: 12px; white-space: nowrap; }
+
+/* A — label column */
+.A { display: grid; grid-template-columns: 72px 1fr auto; gap: 8px 14px; align-items: baseline; }
+.A .lab { padding-top: 1px; }
+.A .rule { grid-column: 1 / -1; height: 1px; background: var(--line); margin: 2px 0; }
+.A .end { justify-self: end; }
+.A .tog { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 12px; white-space: nowrap; }
+.A .tog i { width: 26px; height: 15px; border-radius: 8px; background: var(--ink); position: relative; }
+.A .tog i::after { content: ""; position: absolute; right: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); }
+.A .goto { color: var(--ink-2); white-space: nowrap; }
+.A .span2 { grid-column: 2 / -1; }
+.w600 .A { grid-template-columns: 64px 1fr; }
+.w600 .A .end { grid-column: 2; justify-self: start; }
+
+/* B — one sentence */
+.B .sent { font-size: 15px; line-height: 1.9; color: var(--ink-2); }
+.B .sent .menu { font-size: 15px; }
+.B .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.B .sub { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
+.B .quiet { color: var(--ink-2); font-size: 12px; }
+.B .quiet b { color: var(--ink); font-weight: 600; border-bottom: 1.5px solid var(--ink); }
+
+/* C — two blocks */
+.C { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+.w600 .C { grid-template-columns: 1fr; gap: 14px; }
+.C h3 { font-size: 12px; font-weight: 600; margin: 0 0 7px; color: var(--ink); }
+.C .blk + .blk { border-left: 1px solid var(--line); padding-left: 28px; }
+.w600 .C .blk + .blk { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 12px; }
+.C .row { display: grid; grid-template-columns: 68px 1fr; gap: 6px 10px; align-items: baseline; margin-bottom: 7px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+.seg button { padding: 2px 9px; color: var(--ink-2); border-left: 1px solid var(--line); }
+.seg button:first-child { border-left: 0; }
+.seg button.on { background: var(--ink); color: var(--bg); font-weight: 600; }
+.seg button.off { color: var(--ink-faint); }
+.C .foot { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+</style></head><body>
+<h1>Map controls: three redesigns</h1>
+<p class="why">Today's panel stacks five rows with five black tags: Base, State, Seat type, Jump to, Draw. They carry the same weight, but they do three different jobs. Base and Draw choose what the map shows, State and Seat type choose which seats, and Jump to only moves the camera. Each design below sorts the controls by job and drops the black tags. Each is shown at the panel's 1440 width (860px) and its 1024 width (600px).</p>
+
+<!-- ============ A ============ -->
+<section class="mock"><h2>A · Label column</h2>
+<p class="why">Keeps every choice one click away, as today. The labels become a quiet grey column, so the choices line up in one edge instead of zig-zagging after tags of different widths. Base and Draw share the first row, and a rule separates them from the filters. Jump to becomes a "Go to" menu beside the search, since both move the camera. City names becomes a small switch at the end of the Draw row: it's a drawing setting, not a destination.</p>
+<div class="pair">
+<div class="frame w860"><small>860px</small><div class="A">
+  <span class="lab">Show</span><span><button class="menu">Winner</button><span class="lab" style="margin:0 10px 0 16px">drawn as</span><span class="chips" style="display:inline-flex"><button class="on">Seats</button><button>Balloons</button><button>Surface</button><button class="off">Areas</button><button class="off">Chart</button></span></span><span class="end"><span class="tog"><i></i>City names</span></span>
+  <div class="rule"></div>
+  <span class="lab">State</span><span class="chips"><button class="on">All</button><button>NSW</button><button>Vic</button><button>Qld</button><button>WA</button><button>SA</button><button>Tas</button><button>ACT</button><button>NT</button></span><span class="end"><span class="search">⌕ Search a seat, member or place<kbd>/</kbd></span></span>
+  <span class="lab">Seat type</span><span class="chips"><button class="on">All</button><button>Inner metro</button><button>Outer metro</button><button>Provincial</button><button>Rural</button></span><span class="end"><button class="goto menu" style="font-weight:400;color:var(--ink-2);border-color:var(--ink-faint)">Go to a city</button></span>
+  <span></span><span class="hint span2">Zoom in, or choose a seat, to see its polling places</span>
+</div><div class="map"><span>map</span></div></div>
+<div class="frame w600"><small>600px</small><div class="A">
+  <span class="lab">Show</span><span><button class="menu">Winner</button><span class="lab" style="margin:0 8px 0 12px">as</span><span class="chips" style="display:inline-flex"><button class="on">Seats</button><button>Balloons</button><button>Surface</button><button class="off">Areas</button><button class="off">Chart</button></span></span>
+  <div class="rule"></div>
+  <span class="lab">State</span><span class="chips"><button class="on">All</button><button>NSW</button><button>Vic</button><button>Qld</button><button>WA</button><button>SA</button><button>Tas</button><button>ACT</button><button>NT</button></span>
+  <span class="lab">Seat type</span><span class="chips"><button class="on">All</button><button>Inner metro</button><button>Outer metro</button><button>Provincial</button><button>Rural</button></span>
+  <div class="rule"></div>
+  <span class="lab">Find</span><span style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="search" style="width:250px">⌕ Search a seat, member or place<kbd>/</kbd></span><button class="menu" style="font-weight:400;color:var(--ink-2);border-color:var(--ink-faint)">Go to a city</button><span class="tog" style="margin-left:auto"><i></i>City names</span></span>
+  <span></span><span class="hint">Zoom in, or choose a seat, to see its polling places</span>
+</div><div class="map"><span>map</span></div></div>
+</div></section>
+
+<!-- ============ B ============ -->
+<section class="mock"><h2>B · One sentence</h2>
+<p class="why">The tightest option: the whole panel reads as a caption for the map, with every setting a menu inside the sentence. It saves about 90px of height above the map. The cost is that state and seat-type choices are hidden in menus, so they take two clicks instead of one, and a filter that's on is less obvious at a glance.</p>
+<div class="pair">
+<div class="frame w860"><small>860px</small><div class="B">
+  <div class="top"><div class="sent">Seat <button class="menu">winners</button> in <button class="menu">all states</button>, <button class="menu">all seat types</button>, drawn as <button class="menu">seats</button></div><span class="search">⌕ Search a seat, member or place<kbd>/</kbd></span></div>
+  <div class="sub"><span class="hint">Zoom in, or choose a seat, to see its polling places</span><span class="quiet">Go to <button class="menu" style="font-weight:400;color:var(--ink-2);border-color:var(--ink-faint)">a city</button> · <b>City names on</b></span></div>
+</div><div class="map"><span>map</span></div></div>
+<div class="frame w600"><small>600px</small><div class="B">
+  <div class="top"><div class="sent">Seat <button class="menu">winners</button> in <button class="menu">all states</button>, <button class="menu">all seat types</button>, drawn as <button class="menu">seats</button></div><span class="search" style="width:100%">⌕ Search a seat, member or place<kbd>/</kbd></span></div>
+  <div class="sub"><span class="hint">Zoom in, or choose a seat, to see its polling places</span><span class="quiet">Go to <button class="menu" style="font-weight:400;color:var(--ink-2);border-color:var(--ink-faint)">a city</button> · <b>City names on</b></span></div>
+</div><div class="map"><span>map</span></div></div>
+</div></section>
+
+<!-- ============ C ============ -->
+<section class="mock"><h2>C · Two blocks</h2>
+<p class="why">This design names the two jobs outright. "On the map" holds Base and Draw, and "Which seats" holds the filters, side by side at full width and stacked at 1024. Draw becomes a segmented control because it's a mode switch. The camera tools (search, Go to, City names) share a footer line. It's the clearest structure, but the boxed control is a new idiom on the site, and it's the tallest of the three at 600px.</p>
+<div class="pair">
+<div class="frame w860"><small>860px</small><div class="C">
+  <div class="blk"><h3>On the map</h3>
+    <div class="row"><span class="lab">Base</span><span><button class="menu">Winner</button></span></div>
+    <div class="row"><span class="lab">Draw</span><span class="seg"><button class="on">Seats</button><button>Balloons</button><button>Surface</button><button class="off">Areas</button><button class="off">Chart</button></span></div></div>
+  <div class="blk"><h3>Which seats</h3>
+    <div class="row"><span class="lab">State</span><span class="chips"><button class="on">All</button><button>NSW</button><button>Vic</button><button>Qld</button><button>WA</button><button>SA</button><button>Tas</button><button>ACT</button><button>NT</button></span></div>
+    <div class="row"><span class="lab">Seat type</span><span class="chips"><button class="on">All</button><button>Inner metro</button><button>Outer metro</button><button>Provincial</button><button>Rural</button></span></div></div>
+  <div class="foot"><span style="display:flex;gap:16px;align-items:center"><span class="search">⌕ Search a seat, member or place<kbd>/</kbd></span><button class="menu" style="font-weight:400;color:var(--ink-2);border-color:var(--ink-faint)">Go to a city</button><span class="A" style="display:inline"><span class="tog"><i></i>City names</span></span></span><span class="hint" style="align-self:center">Zoom in, or choose a seat, to see its polling places</span></div>
+</div><div class="map"><span>map</span></div></div>
+<div class="frame w600"><small>600px</small><div class="C">
+  <div class="blk"><h3>On the map</h3>
+    <div class="row"><span class="lab">Base</span><span><button class="menu">Winner</button></span></div>
+    <div class="row"><span class="lab">Draw</span><span class="seg"><button class="on">Seats</button><button>Balloons</button><button>Surface</button><button class="off">Areas</button><button class="off">Chart</button></span></div></div>
+  <div class="blk"><h3>Which seats</h3>
+    <div class="row"><span class="lab">State</span><span class="chips"><button class="on">All</button><button>NSW</button><button>Vic</button><button>Qld</button><button>WA</button><button>SA</button><button>Tas</button><button>ACT</button><button>NT</button></span></div>
+    <div class="row"><span class="lab">Seat type</span><span class="chips"><button class="on">All</button><button>Inner metro</button><button>Outer metro</button><button>Provincial</button><button>Rural</button></span></div></div>
+  <div class="foot"><span style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="search" style="width:250px">⌕ Search a seat, member or place<kbd>/</kbd></span><button class="menu" style="font-weight:400;color:var(--ink-2);border-color:var(--ink-faint)">Go to a city</button><span class="A" style="display:inline"><span class="tog"><i></i>City names</span></span></span><span class="hint">Zoom in, or choose a seat, to see its polling places</span></div>
+</div><div class="map"><span>map</span></div></div>
+</div></section>
+</body></html>

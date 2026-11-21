@@ -1,0 +1,12 @@
+import puppeteer from "puppeteer-core";
+import path from "node:path";
+const f = path.resolve(".build/map-mockup/map-house-today.svg");
+const out = process.argv[2] || "/private/tmp/claude-501/-Users-joshuaborgnolo--claude-spares-spare-Ayhp8Y/23636905-575c-4995-95c5-abc9376d0112/scratchpad";
+const b = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new" });
+const p = await b.newPage();
+await p.setViewport({ width: 1280, height: 1156, deviceScaleFactor: 2 });
+await p.goto("file://" + f); await new Promise(r => setTimeout(r, 500));
+await p.screenshot({ path: out + "/full.png" });
+const crops = { pane: [40, 250, 400, 880], strip: [420, 190, 820, 260], map: [420, 400, 820, 736], top: [0, 0, 1280, 260] };
+for (const [k, [x, y, w, h]] of Object.entries(crops)) await p.screenshot({ path: `${out}/${k}.png`, clip: { x, y, width: w, height: h } });
+await b.close();
