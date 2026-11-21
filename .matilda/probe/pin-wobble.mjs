@@ -103,8 +103,10 @@ const TARGETS = [
   { name: "Issues: whom issue chips", sec: "issues", btn: "#issues .rd-iw-chips button",
     watch: ["#issues .rd-iw-tabs", "#issues .rd-iw-chips"] },
   { name: "Decidedness: view tabs", sec: "undecided", btn: "#undecided .rd-un-tabs button", watch: ["#undecided .rd-un-tabs"] },
-  { name: "Primary: range tabs", sec: "primary-vote", btn: "#primary-vote [aria-label='Time range'] button", watch: ["#primary-vote [aria-label='Time range']"] },
-  { name: "2PP: range tabs", sec: "two-party", btn: "#two-party [aria-label='Time range'] button", watch: ["#two-party [aria-label='Time range']"] },
+  /* the vote charts' window bar replaced their range tabs (2026-11-22): its
+     span chips are the buttons the reader presses */
+  { name: "Primary: window chips", sec: "primary-vote", btn: "#primary-vote [aria-label='Window length'] button", watch: ["#primary-vote [aria-label='Time window']"] },
+  { name: "2PP: window chips", sec: "two-party", btn: "#two-party [aria-label='Window length'] button", watch: ["#two-party [aria-label='Time window']"] },
   /* this one holds the table rather than the tab row on purpose
      (rd-polls.jsx pinPl), so the tab row is only reported, not judged */
   { name: "Latest polls: facets", sec: "latest-polls", btn: "#latest-polls [aria-label='Poll table view'] button", watch: ["#latest-polls .rd-pl", "#latest-polls .rd-pl-tabs"] },

@@ -9121,6 +9121,142 @@ for (const c of CYC_META) {
   };
 }
 
+/* ---- 8v. the vote charts' history: past terms drawn through the counts ----
+   (user ask 2026-11-21: extend the primary vote chart back in time as the
+   National direction and Economic sentiment charts are, without drawing
+   the polls' known misses as if they were the vote.) The evidence behind
+   every choice here is .build/analysis/poll-error-timing/README.md, run on
+   the 21 elections since 1972 with this estimator:
+     - a miss does not carry into the next term: the first polls after an
+       election sit back on the count, plus the winner's honeymoon;
+     - consecutive elections' misses are unrelated (r about 0);
+     - a miss does not scale with how much a party really moved, so the
+       correction is a drift over time, never a rescaling of the moves;
+     - about 0.4 of a term's polling-day miss is already in its first
+       polls (0.17–0.56 across windows and eras, wide intervals); when the
+       rest arrived the record cannot say, so it is spread evenly - the
+       expected correction at each date if it arrived at an unknown moment.
+   So each completed term's monthly line - the site's own construction,
+   readings less the term's house leans (houseEffectsFor, as debiasTerm),
+   calendar months as the sitting term's are, sqrt(m) repeat deflation -
+   is corrected by
+       e × (VH_W0 + (1 − VH_W0) × f)
+   where e is the production estimate on polling day (21-day window,
+   recency weights, the term's leans) less the count, and f the share of
+   the term elapsed. The line opens on one count and closes exactly on the
+   next. Its band adds to the month's sampling interval the doubt about
+   the bias left once the count is known: a bias b(t) that starts the term
+   with variance VH_W0·V and drifts to V by polling day (V, the lane's mean
+   squared miss over the record) has, given e, variance V·g(1 − g) with
+   g = VH_W0 + (1 − VH_W0)·f - at mid-term (g = 0.7) about ±1.6 points for
+   Labor and ±1.7 for the Coalition, shutting to nothing on the count. A term with no dated
+   poll in its final three weeks (1954–63, the sparse Gallup years) has no
+   polling-day estimate to measure: its line is the polls alone, its band
+   the unmeasured bias's own, V·g.
+   Lanes: Labor, the Coalition, and the Greens or One Nation in a term
+   whose closing count lists the party and whose polls list it in at
+   least two of every five (the Greens' 1993–96 polls: 104 of 209); everyone else is "others", in the polls and the counts
+   alike, so a term's Others always means what its closing count means
+   (One Nation sits inside it 2001–16, the Greens before 1993). A row
+   whose base keeps undecided voters (cycRowBase's und) is put on a decided
+   basis first, as poolPrim does the sitting term's. The 2PP is Labor's
+   implied share at the opening election's flows (cycleTppImp, Past
+   cycles' measure), scored on the counted 2PP. The sitting term is left
+   exactly as it is: no count has measured it yet. */
+const VH_W0 = 0.4;
+const voteHistory = JUR ? null : (() => {
+  const SEP = ["alp", "lnp", "grn", "onp"];
+  const MS_DAY = 86400000;
+  const isoX = (ms) => dx(new Date(ms).toISOString().slice(0, 10));
+  const terms = [];
+  for (const c of CYC_META) {
+    if (c.current || !c.src) continue;
+    const eO = ELECTIONS["e" + c.year], eC = ELECTIONS["e" + c.src];
+    if (!eO || !eC) continue;
+    const tO = Date.parse(eO.date), tC = Date.parse(eC.date);
+    const xO = dx(eO.date), xC = dx(eC.date);
+    const src = (cyclePolls[c.src] || [])
+      .filter((p) => p.firm !== "Election" && !/exit/i.test(p.firm || "") && !ACC_EXCLUDED.has(p.firm))
+      .filter((p) => { const t = Date.parse(p.date); return t > tO && t <= tC; });
+    if (!src.length) continue;
+    const lanes = SEP.filter((k) => k === "alp" || k === "lnp"
+      || (eC[k] > 0 && src.filter((p) => p[k] != null).length >= 0.4 * src.length));
+    const all = lanes.concat(["oth", "tpp"]);
+    const countOf = (e, k) => {
+      if (k === "tpp") return e.tpp_alp ?? null;
+      if (k === "oth") return r2(100 - lanes.reduce((s, q) => s + (e[q] || 0), 0));
+      return k === "alp" || k === "lnp" || e[k] > 0 ? e[k] : null;
+    };
+    // each poll's lane values, on a decided basis
+    const read = src.map((p) => {
+      const und = cycRowBase(p, c).und;
+      const kk = und != null ? 100 / (100 - und) : 1;
+      const v = {};
+      for (const q of lanes) v[q] = p[q] != null ? p[q] * kk : null;
+      v.oth = lanes.every((q) => v[q] != null) ? 100 - lanes.reduce((s, q) => s + v[q], 0) : null;
+      v.tpp = cycleTppImp(p, { ...c, gov: "alp" });
+      return { p, v, mid: Date.parse(p.date), ym: ymOf(p.date) };
+    });
+    /* a and b unrounded: the charts' term windows are the same dx of the same
+       dates, and a ring a rounding outside its window is culled */
+    const out = { year: c.year, src: c.src, gov: c.gov, pm: c.pm, a: xO, b: xC, lanes: all,
+                  miss: {}, open: {}, close: {}, n: src.length, series: {} };
+    for (const k of all) {
+      const rows = read.filter((r) => r.v[k] != null)
+        .map((r) => ({ ym: r.ym, mid: r.mid, x: r.v[k], n: rowN(r.p), firm: r.p.firm, approx: !!r.p.dateApprox }));
+      out.open[k] = countOf(eO, k);
+      out.close[k] = countOf(eC, k);
+      if (!rows.length) { out.miss[k] = null; out.series[k] = []; continue; }
+      const he = houseEffectsFor(rows);
+      /* polling day as the accuracy record reads it: a month-only mirror
+         date can't be placed inside a three-week window */
+      const day = weightedWithSe(nowcastPts(rows.filter((r) => !r.approx), he, tC, HEADLINE_K));
+      out.miss[k] = day && out.close[k] != null ? r2(day.v - out.close[k]) : null;
+      if (day) out.missK = Math.max(out.missK || 0, day.n);
+      const yms = [...new Set(rows.map((r) => r.ym))].sort();
+      out.series[k] = yms.map((ym) => {
+        const m = monthWithSe(rows, he, ym);
+        const inM = rows.filter((r) => r.ym === ym);
+        let x = mx(ym);
+        /* a month's point sits mid-month unless that puts it on the far
+           side of the election the month's polls follow or precede; then
+           it sits at their mean date */
+        if (x > xC - 1 / 365 || x < xO + 1 / 365) {
+          const mean = inM.reduce((s, r) => s + r.mid, 0) / inM.length;
+          x = Math.min(xC - 0.5 / 365, Math.max(xO + 0.5 / 365, isoX(mean)));
+        }
+        return { ym, x: +x.toFixed(4), raw: m.v, se: m.se, k: inM.length };
+      });
+    }
+    terms.push(out);
+  }
+  /* V, each lane's mean squared miss over the elections whose final three
+     weeks held two dated polls or more (a measured miss, not one poll's
+     luck); the band's whole scale */
+  const V = {};
+  for (const k of ["alp", "lnp", "grn", "onp", "oth", "tpp"]) {
+    const es = terms.filter((t) => t.miss[k] != null && (t.missK || 0) >= 2).map((t) => t.miss[k]);
+    V[k] = es.length ? es.reduce((s, e) => s + e * e, 0) / es.length : null;
+  }
+  for (const t of terms) {
+    for (const k of t.lanes) {
+      const e = t.miss[k], Vk = V[k] ?? V.oth;
+      t.series[k] = t.series[k].map((m) => {
+        const f = Math.min(1, Math.max(0, (m.x - t.a) / (t.b - t.a)));
+        const g = VH_W0 + (1 - VH_W0) * f;
+        const biasVar = e != null ? Vk * g * (1 - g) : Vk * g;
+        const v = e != null ? m.raw - e * g : m.raw;
+        return [m.x, r2(v), r2(m.raw), r2(1.96 * Math.sqrt(m.se * m.se + biasVar)), m.k];
+      });
+    }
+    delete t.missK;
+  }
+  console.log("voteHistory:", terms.length, "terms;",
+    "rms miss " + Object.entries(V).map(([k, v]) => k + " " + (v == null ? "–" : Math.sqrt(v).toFixed(2))).join(", ") + ";",
+    "unmeasured", terms.filter((t) => t.miss.alp == null).map((t) => t.year + "–" + String(t.src).slice(2)).join(" ") || "none");
+  return { w0: VH_W0, rms: Object.fromEntries(Object.entries(V).map(([k, v]) => [k, v == null ? null : r2(Math.sqrt(v))])), terms };
+})();
+
 /* ---- 8d. the change log ---------------------------------------------------
    The Info tab's change log: what moved the two-party preferred estimate,
    and which statistical findings appeared or fell away. Since 2026-10-12
@@ -9642,6 +9778,10 @@ window.AUSPOL = (function () {
      aligned to its election month and the pooled middle-half / middle-80%
      band – what the "past terms" ribbon and draw-a-term lines read. */
   const confHistory = ${JSON.stringify(confHistory)};
+  /* the vote charts' history (§8v): each past term's lines drawn through its
+     two counts, with the polls' own figures beside them - null off the
+     federal page */
+  const voteHistory = ${JSON.stringify(voteHistory)};
   /* The history file as a calendar series (§5l): one {ym, v} point per
      survey month per lane, what the confidence panel's complete-history
      window draws behind the live lines. */
@@ -9868,7 +10008,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {

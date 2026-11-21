@@ -8042,7 +8042,13 @@ function infoTerms(D) {
         splits the undecided in proportion, only because a pair on its own gives no basis for
         splitting them any other way. The shortfall is kept as Essential’s own line in Decidedness.
         The primaries keep their shortfall instead: a primary share can be read on its own, but a
-        two-party pair is pooled across pollsters, so it has to be comparable.</span></>) },
+        two-party pair is pooled across pollsters, so it has to be comparable.</span>
+        <span className="info-p"><b>Past terms.</b> The arrows over the chart, and its 10 yrs and
+        All views, run Labor against the Coalition back to 1943. Before this term each poll’s
+        primary votes are run through the previous election’s preference flows, and every past
+        term is drawn through the election results at both ends, as the primary vote is (see
+        {" "}{xref("primary-vote", "two-party preferred", "Primary vote")}). One Nation’s contest
+        was first asked in this term.</span></>) },
       entries: [
         { id: "implied-2pp", term: "Implied 2PP", body: (
           <>The site’s main two-party figure, on the hero, the share card and the summary. It takes
@@ -8292,7 +8298,36 @@ function infoTerms(D) {
         is never the group share the poll printed, so a poll whose sample leans toward the group
         still lands on the one trend. The printed figures themselves sit beside each poll in All
         polls’ {xref("all-polls", "primary vote", "group breakdowns")} (the Demographics view) – and
-        a dot’s click opens them there.</span></>) },
+        a dot’s click opens them there.</span>
+        {(() => {
+          const VHi = D.voteHistory && D.voteHistory.rms && D.voteHistory.terms ? D.voteHistory : null;
+          const gap = VHi ? VHi.terms.filter((t) => t.miss.alp == null).map((t) => t.src) : [];
+          return (<>
+            <span className="info-p"><b>Past terms.</b> The arrows over the chart, and its 10 yrs
+            and All views, run the primary vote back to 1943. Each past term is built the same way,
+            month by month with each pollster’s lean taken out, and then drawn through the election
+            results at both ends. Unfortunately, the polls miss on polling day: by about
+            {" "}{VHi ? VHi.rms.alp.toFixed(1) : "1.7"} points for Labor and {VHi ? VHi.rms.lnp.toFixed(1) : "1.9"} for
+            the Coalition, as a root mean square over past elections. So each month of a past term
+            is moved toward its closing result by part of that election’s miss: two-fifths of it
+            from the first month, rising evenly to all of it on polling day.</span>
+            <span className="info-p">The site’s record of the 21 elections since 1972 sets the
+            shape. A miss is gone once the count is in: the first polls of a new term sit back on
+            the result, plus the winner’s honeymoon. Consecutive elections’ misses are unrelated, and
+            a miss doesn’t grow with how far a party really moved, so the correction drifts with
+            time rather than stretching the moves. About two-fifths of a term’s miss already shows in
+            its first polls (the estimates run from about a sixth to just over a half). When the rest arrived no record
+            can say, so it is spread evenly, and the shaded band adds that doubt to each month’s
+            sampling error: at mid-term about ±{VHi ? (1.96 * Math.sqrt(0.21) * VHi.rms.alp).toFixed(1) : "1.6"} points for Labor and
+            ±{VHi ? (1.96 * Math.sqrt(0.21) * VHi.rms.lnp).toFixed(1) : "1.7"} for the Coalition, shutting on each count. The dots are the polls as published. This term is the polls alone, because no
+            election has measured it yet.</span>
+            <span className="info-p">A past term’s Others is whatever its election counted as
+            others, so it holds the Greens before 1993 and One Nation from 2001 to 2016.
+            {gap.length ? <> No dated poll fell in the final three weeks before the {gap[0]}
+            to {gap[gap.length - 1]} elections, so those terms are the polls alone.</> : null} Over
+            a dozen years or more the chart leaves the bands off; a shorter window shows them.</span>
+          </>);
+        })()}</>) },
       entries: [] },
     { id: "s-latest", title: "Latest and next polls", nav: "Latest polls",
       lead: { id: "latest-polls", body: (

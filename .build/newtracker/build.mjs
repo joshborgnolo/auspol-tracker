@@ -227,7 +227,7 @@ const stripJs = (code, name) => babelCached("plain", code, name, {});
    Root documents load it first in the late list; tab documents load it as
    a plain script straight after the dataset. The More menu's own tables
    (houseLean, flowDrift) stay in the main half: the menu can open first. */
-const LATE_TABLES = ["onSources", "flowHistory", "primaryHistory", "confDeep", "pollsterTable", "directionGroups", "demoTrend", "confHistory",
+const LATE_TABLES = ["onSources", "flowHistory", "primaryHistory", "voteHistory", "confDeep", "pollsterTable", "directionGroups", "demoTrend", "confHistory",
   "twoPPHistory", "informalHistory", "yardLine", "ldYardLine", "confidence", "undecided", "demographics", "issues"];
 const LATE_POLL_FIELDS = ["grp", "links", "chg", "yd", "url", "ldYd", "iss", "dir", "pyd", "peff", "eff", "methodUrl"];
 const splitDataset = (code) => {

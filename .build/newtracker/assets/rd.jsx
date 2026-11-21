@@ -751,6 +751,10 @@ function RdSwatch({ kind = "line", color = "var(--ink-3)" }) {
       return <svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style={{ fill: color, opacity: 0.2 }} /><path d="M1 7H23" style={{ stroke: color, strokeWidth: 2.5, strokeLinecap: "round" }} /></svg>;
     case "dash":
       return <svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M1 7H23" style={{ stroke: color, strokeWidth: 2, strokeDasharray: "4 3" }} /></svg>;
+    case "dots":
+      /* the dotted bridge over months nobody polled (the vote charts'
+         history, the group views' lead-ins) */
+      return <svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 7H22" style={{ stroke: color, strokeWidth: 2.5, strokeDasharray: "0.5 4", strokeLinecap: "round" }} /></svg>;
     case "whisker":
       return <svg width="28" height="16" viewBox="0 0 28 16" aria-hidden="true"><path d="M2 8H26M2 4V12M26 4V12" style={{ stroke: color, strokeWidth: 2, strokeLinecap: "round", fill: "none" }} /></svg>;
     case "square":
