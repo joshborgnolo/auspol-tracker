@@ -10,8 +10,14 @@ import path from "node:path";
 import vm from "node:vm";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
+import { pollRowCoversWitness } from "./vic-watch.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const dated = { firm: "example", fwEnd: "2026-11-15", published: "2026-11-20" };
+assert.ok(pollRowCoversWitness(dated, { firm: "example", fwEnd: "2026-11-15" }), "fieldwork-end match");
+assert.ok(pollRowCoversWitness(dated, { firm: "example", fwEnd: "2026-11-20" }), "publication-date match");
+assert.ok(!pollRowCoversWitness(dated, { firm: "other", fwEnd: "2026-11-20" }), "a different house never matches");
+assert.ok(!pollRowCoversWitness({ firm: "example", fwEnd: "2026-11-13" }, { firm: "example", fwEnd: "2026-11-20" }), "nearby waves do not merge without an explicit publication date");
 const SCRATCH = fs.mkdtempSync(path.join(os.tmpdir(), "vic-build-"));
 const OUT = path.join(SCRATCH, "index.html");
 const FED = ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "assets/favicon.svg",

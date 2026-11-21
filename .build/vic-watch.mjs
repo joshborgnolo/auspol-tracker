@@ -570,6 +570,10 @@ const emitBackfill = async () => {
   console.log(JSON.stringify({ polls, threeParty, leadership }, null, 2));
 };
 
+/* A corrected fieldwork window and the witness's publication date describe the
+   same wave; only an explicit publication date may bridge the two. */
+const pollRowCoversWitness = (p, w) => p.firm === w.firm && (p.fwEnd === w.fwEnd || p.published === w.fwEnd);
+
 const crossCheck = async () => {
   const ours = JSON.parse(readFileSync(DATA_FILE, "utf8"));
   const wt = await getWiki(ARGV("wiki-file"));
@@ -589,8 +593,7 @@ const crossCheck = async () => {
     console.error(`FAIL witness parse thinned out: ${wikiPolls.length} LA polls, ${leaders.length} leadership rows`);
     process.exit(1);
   }
-  const have = new Set(ours.polls.map((p) => `${p.firm}|${p.fwEnd}`));
-  const missingPolls = wikiPolls.filter((w) => !have.has(`${w.firm}|${w.fwEnd}`)).map((w) => ({ firm: w.firm, fwEnd: w.fwEnd, pollster: w.firmRaw }));
+  const missingPolls = wikiPolls.filter((w) => !ours.polls.some((p) => pollRowCoversWitness(p, w))).map((w) => ({ firm: w.firm, fwEnd: w.fwEnd, pollster: w.firmRaw }));
   const csvMissing = csvRows.filter((c) => !ours.polls.some((p) => p.firm === c.firm && closeDate(p.fwEnd, c.fwEnd))).map((c) => ({ firm: c.firm, fwEnd: c.fwEnd }));
   const haveLead = new Set(ours.leadership.map((l) => `${l.series}|${l.firm}|${l.date}|${l.leader || l.pair}`));
   const missingLead = leaders.filter((l) => !haveLead.has(`${l.series}|${l.firm}|${l.date}|${l.leader || l.pair}`)).map((l) => ({ series: l.series, firm: l.firm, date: l.date }));
@@ -683,4 +686,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   main().catch((e) => { console.error("FAIL", e.message); process.exit(1); });
 }
 
-export { parseLaTables, parse3pp, parseLeadership, parseEtCsv, parseDateLabel, firmId, mergeRows };
+export { parseLaTables, parse3pp, parseLeadership, parseEtCsv, parseDateLabel, firmId, mergeRows, pollRowCoversWitness };

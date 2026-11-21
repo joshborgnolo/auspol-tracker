@@ -127,7 +127,7 @@
   },
   "meta": {
     "source": "data/vic-polls.json",
-    "generated": "2026-11-11"
+    "generated": "2026-11-21"
   },
   "metricRules": {
     "favFirms": [
@@ -1504,6 +1504,22 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.news.com.au/finance/work/leaders/ben-carroll-risks-losing-his-seat-at-victorian-election-as-coalition-extends-primary-vote-lead-in-new-opinion-poll/news-story/f819afaf30e91e884afecb139f65d7b3"
+    },
+    {
+      "date": "2026-11-15",
+      "dateStart": "2026-11-02",
+      "pollster": "Lighthouse",
+      "client": "Herald Sun",
+      "sample": 1221,
+      "alp": 22,
+      "lnp": 31,
+      "grn": 15,
+      "onp": 24,
+      "ind": 8,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.onenewsaustralia.com/australian-poll-tracker/"
     }
   ],
   "ppm": [

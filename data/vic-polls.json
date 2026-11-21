@@ -1,8 +1,8 @@
 {
-  "generated": "2026-11-11",
+  "generated": "2026-11-21",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-11 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-11 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-21 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-21 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -2019,6 +2019,33 @@
         "electiontracker"
       ],
       "sourceUrl": "https://www.news.com.au/finance/work/leaders/ben-carroll-risks-losing-his-seat-at-victorian-election-as-coalition-extends-primary-vote-lead-in-new-opinion-poll/news-story/f819afaf30e91e884afecb139f65d7b3"
+    },
+    {
+      "firmRaw": "Lighthouse/Growth Intelligence Centre",
+      "firm": "lighthouse-growth-intelligence-centre",
+      "client": "Herald Sun",
+      "sample": 1221,
+      "dateLabel": "2–15 Nov",
+      "fwStart": "2026-11-02",
+      "fwEnd": "2026-11-15",
+      "published": "2026-11-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 22,
+        "lnp": 31,
+        "grn": 15,
+        "onp": 24,
+        "ind": null,
+        "oth": 8
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker",
+        "onenewsaustralia"
+      ],
+      "sourceUrl": "https://www.onenewsaustralia.com/australian-poll-tracker/"
     }
   ],
   "threeParty": [
