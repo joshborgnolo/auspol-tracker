@@ -599,13 +599,14 @@ function eq(name, got, want) {
   eq("one standing slot - no further slots this far out", rows.filter((r) => r.pollster === "Spectre Strategy").length, 1);
   eq("on the bar as a hedged countdown", items.filter((i) => i.firm === "Spectre Strategy").map((i) => [i.when, i.maybe]),
     [["141 days", true]]);
-  // the bound is floor(28/cadence) - 4 slots at the weekly habit the pin
-  // was written with, 2 since Roy Morgan went fortnightly (2026-11-09:
-  // rhythmSince 2026-09-29). Derived from the shipped row so the pin rides
-  // whichever habit is measured, never one era's count.
+  /* The first slot stands even outside the horizon, so give its actual
+     countdown its own term; only the cadence-sized steps after it divide
+     the horizon that remains. This holds for the earlier weekly and
+     fortnightly habits and for the current fractional measured interval. */
+  const rm8 = rows.filter((r) => r.pollster === "Roy Morgan");
   eq("the horizon still bounds the house's further slots",
-    rows.filter((r) => r.pollster === "Roy Morgan").length,
-    Math.floor(28 / cad8.find((c) => c.pollster === "Roy Morgan").cadence));
+    rm8.length,
+    1 + Math.floor((28 - rm8[0].inDays) / cad8.find((c) => c.pollster === "Roy Morgan").cadence));
 }
 
 // S9 – Mon 14 Sep, Roy Morgan's slot day, hour by hour, with the measured

@@ -54,8 +54,8 @@ assert.ok(src.indexOf('className="rd-ap-th rd-ap-undhead"') > src.indexOf('prims
   "the UND header follows the party headers, with OTH last among them");
 assert.ok(src.includes('className="rd-ap-sub">{und.label}</span>'),
   "desktop cells read the shared inclusion or forced-choice label");
-assert.ok(src.includes('<b>{rdApPrimFig(und.v)}</b>, {und.label}'),
-  "phone metadata reads the same shared label");
+assert.match(src, /<b>\{rdApPrimFig\(und\.v\)\}<\/b>.*, \{und\.label\}/,
+  "phone metadata reads the same shared label, with its margin when available");
 for (const [released, display, source] of [["2026-08-18", 3, 3.2], ["2026-02-19", 4.5, 4.7]]) {
   const row = cells.find(({ p }) => p.pollster === "EMRS (Tas)" && p.released === released);
   assert.equal(row.u.v, display, `${released}: the UND table rounds to the nearest half point`);

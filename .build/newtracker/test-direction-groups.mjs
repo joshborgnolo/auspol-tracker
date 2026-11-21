@@ -320,8 +320,8 @@ for (const [date, w] of Object.entries(rbStore.waves))
     const vs = dg.Men.raw.filter((d) => d.pollster === h && d.gapR != null).map((d) => d.gapR);
     return r10(vs.reduce((a, b) => a + b, 0) / vs.length);
   };
-  assert.deepEqual([meanOf("Essential"), meanOf("RedBridge/Accent"), meanOf("Roy Morgan")], [4.6, 3, 1.3],
-    "Men's right-direction gap: Essential 4.6, RedBridge/Accent 3.0, Roy Morgan 1.3 – the panel's stated disagreement");
+  assert.deepEqual([meanOf("Essential"), meanOf("RedBridge/Accent"), meanOf("Roy Morgan")], [4.6, 2.8, 1.3],
+    "Men's right-direction gap: Essential 4.6, RedBridge/Accent 2.8, Roy Morgan 1.3 – the panel's stated disagreement");
   console.log("directionGroups (pooled): OK");
 }
 

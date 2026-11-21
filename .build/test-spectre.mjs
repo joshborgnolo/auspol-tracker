@@ -79,7 +79,7 @@ const decidedStart = ledger.indexOf("function rdLgDecided(p) {");
 assert.ok(decidedStart >= 0, "ledger decidedness renderer exists");
 const decided = new Function(`return (${ledger.slice(decidedStart, ledger.indexOf("\nconst RD_LG_CK", decidedStart))});`)();
 assert.deepEqual(decided({ pollster: "Spectre Strategy", firmAll: [57, 43], undecided: 6 }), {
-  h: "Primary-vote shares are decideds’. 6% undecided, excluded", w: "", d: null,
+  h: "Primary-vote shares are decideds’. 6%", w: "undecided, excluded", uv: 6, d: null,
   s: "57% firm, 43% soft (soft includes undecided respondents)",
 });
 
