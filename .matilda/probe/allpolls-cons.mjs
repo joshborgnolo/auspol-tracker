@@ -214,9 +214,9 @@ const runDesktop = async () => {
   ok(cons.nRings === 0, "month rows drop the intention rings under consM");
   ok(cons.mrowNotes.length > 0 && cons.mrowNotes.every((n) => /^\d+ polls?$/.test(n.trim())), `month notes read as bare counts (${JSON.stringify(cons.mrowNotes)})`);
   ok(!cons.pill, "no scope auto-pill leaks into the rd view (the toggle carries the state)");
-  ok(/when last asked/i.test(cons.hed) && /would/i.test(cons.hed) && /one nation/i.test(cons.hed), `facet story head asks when One Nation was last considered ("${cons.hed.slice(0, 70)}…")`);
-  ok(/39%/.test(cons.hed) && /seriously/i.test(cons.hed), `story head reads the newest wave's default-range figures ("${cons.hed.slice(0, 90)}…")`);
-  ok(/consider/i.test(cons.dek) && /polls that asked/i.test(cons.dek), "facet story dek speaks consideration across the waves");
+  /* one plain dek, the warning, no head (user call 2026-11-21) */
+  ok(!cons.hed, "the consideration view carries no head");
+  ok(/word the question differently/i.test(cons.dek) && /same pollster/i.test(cons.dek), `the dek warns against comparing across pollsters ("${cons.dek.slice(0, 90)}")`);
 
   // 3. the range cycler steps each banded row through its three ranges
   for (const [id, spec] of Object.entries(CYCS)) {
@@ -244,7 +244,7 @@ const runDesktop = async () => {
   ok(back.count === base.count && back.nRows === base.nRows, `the unscoped table returns verbatim ("${back.count}" vs "${base.count}")`);
   ok(back.firstAria.startsWith("Primary vote:"), "top row's aria announces Primary vote again");
   ok(back.nRings > 0, "the intention rings return on the month rows");
-  ok(!/one nation consideration/i.test(back.hed), "the story leaves consideration with the mode");
+  ok(!back.hed && !back.dek, "the warning leaves with the mode (Primary carries no words)");
 
   // 5. deep land on k=1 restores the mode
   await page.goto(`http://127.0.0.1:${PORT}/allpolls/?f=p&k=1`, { waitUntil: "networkidle2" });
@@ -256,7 +256,7 @@ const runDesktop = async () => {
   ok(landed.nRows === 9, "?f=p&k=1 scopes the table");
   ok(landed.rb && landed.rb.lab.startsWith("Would consider (≥4/10)"), "a fresh land opens the RedBridge row on its default loose range");
   ok(landed.essJun && landed.essJun.lab.startsWith("Would consider (definitely or open)"), "a fresh land opens the Essential June row on its default loose range");
-  ok(/consider/i.test(landed.hed + " " + landed.dek), "the story speaks consideration off a fresh land");
+  ok(/word the question differently/i.test(landed.dek), "the warning shows off a fresh land");
 
   // 6. the Essential June row's expanded ledger prints ONE Consideration
   //    line carrying the loose figures and the summed-bands note (the

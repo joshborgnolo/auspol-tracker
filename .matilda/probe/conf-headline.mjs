@@ -60,8 +60,9 @@ const hed = () => page.evaluate(() => ({
 /* 1. a head and dek of its own on every facet */
 console.log("== 1. per-facet headlines (1280) ==");
 await open(1280);
-/* only Issues and Demographics carry a head and dek (user calls
-   2026-11-21); the other facets open straight onto their controls */
+/* only Issues and Demographics carry words, one plain dek and no head
+   (user calls 2026-11-21); the other facets open straight onto their
+   controls */
 const STORY = ["issues", "demographics"];
 const seen = {};
 for (const id of IDS) {
@@ -70,10 +71,10 @@ for (const id of IDS) {
   const h = await hed();
   seen[id] = h;
   const story = STORY.includes(id);
-  check(h.facet === id && (story ? !!(h.head && h.dek) : !h.head && !h.dek), `${id}: ${story ? "head + dek" : "no head or dek"} (${JSON.stringify((h.head || "").slice(0, 70))})`);
+  check(h.facet === id && !h.head && (story ? !!h.dek : !h.dek), `${id}: ${story ? "dek only" : "no head or dek"} (${JSON.stringify((h.dek || "").slice(0, 70))})`);
 }
-check(seen.issues.head !== seen.demographics.head && seen.issues.dek !== seen.demographics.dek, "distinct heads and deks");
-check(/issues/.test(seen.issues.head), "Issues head counts the issues");
+check(seen.issues.dek !== seen.demographics.dek, "distinct deks");
+check(/ leads on |No party’s lead on any issue/.test(seen.issues.dek) && !/Below is every/.test(seen.issues.dek), "Issues dek names the clear leads, no boilerplate");
 check(seen.confidence.title === "Economic sentiment" && seen.confidence.meta === CONF_META, "Confidence chrome intact (title + trimmed meta)");
 check(seen.twopp.meta && seen.twopp.meta.includes("poll since"), "poll-facet meta unchanged");
 /* the demographics head follows the split picker */
@@ -84,9 +85,9 @@ for (const s of ["Age", "Gender", "Education", "Place", "Home", "Income", "Offcu
   const ok = await page.evaluate((s) => { const b = [...document.querySelectorAll(".rd-ap-dpick button")].find((x) => x.textContent.trim() === s); if (b) b.click(); return !!b; }, s);
   if (!ok) continue;
   await sleep(400);
-  demHeads.push((await hed()).head);
+  demHeads.push((await hed()).dek);
 }
-check(demHeads.length >= 5 && new Set(demHeads).size === demHeads.length, `demographics head changes with each split (${demHeads.length})`);
+check(demHeads.length >= 5 && new Set(demHeads).size === demHeads.length, `demographics dek changes with each split (${demHeads.length})`);
 
 /* 2. the phone menu */
 console.log("== 2. phone menu, 320-760 ==");

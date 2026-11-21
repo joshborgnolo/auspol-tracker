@@ -2277,35 +2277,28 @@ function rdApFacetStory(facet, upd, demSplit) {
   /* the polls the facets' rows hold */
   const polls = D.individualPolls || [];
   const poss = (id) => rdPartyStart(id) + (rdPlural(id) ? "’" : "’s");
-  const below = (what) => "Below is every " + RD_AP_POLLS + " poll" + (what ? " " + what : "") + " since the " + rdElecYear + " election, newest first, each linked to its source.";
-  /* 2PP, Primary, Leadership, Direction and Economic sentiment carry no
-     head or dek (user calls 2026-11-21): the figure, the polls' range and
-     the tallies restated the hero and the table beside them. Issues,
-     Demographics and the consideration view keep theirs - each says
-     something the rows don't add up for a reader */
+  /* parties in primary-vote order, the aggregate's (the user's rule for
+     these lines, 2026-11-21) */
+  const prim = (D.latest && D.latest.primary) || {};
+  const byPrim = (x, y) => (prim[y] ?? -1) - (prim[x] ?? -1);
+  /* Only Issues, Demographics and the consideration view carry words, and
+     only as one plain dek (user calls 2026-11-21): no headline, no
+     restated windows or "Below is every poll" boilerplate - just what the
+     rows don't add up for a reader. The other facets carry none */
   if (facet === "issues") {
     /* the Issues section's pooled readings: who voters rate best on each
-       issue over six weeks, and whether the lead clears its margin */
+       issue over six weeks. Only leads that clear their margin are named,
+       gathered by party in primary-vote order: "Labor leads on health and
+       climate change, One Nation on immigration, and the Coalition on ..." */
     const list = ((D.issues && D.issues.list) || []).filter((it) => it.own && it.own.lead);
     if (!list.length) return null;
-    const by = {};
-    list.forEach((it) => { (by[it.own.lead] = by[it.own.lead] || []).push(it); });
     const lab = (it) => it.label.charAt(0).toLowerCase() + it.label.slice(1);
-    const sig = (its) => its.filter((it) => it.own.leadSig);
-    const order = Object.keys(by).sort((x, y) => by[y].length - by[x].length || sig(by[y]).length - sig(by[x]).length);
-    const top = order[0], mine = by[top], clear = sig(mine).length, N = list.length;
-    let head;
-    if (order.length > 1 && by[order[1]].length === mine.length) head = "No party leads on more of the " + rdNumWord(N) + " issues than the others";
-    else head = rdPartyStart(top) + " leads on " + (mine.length === N ? "all " + rdNumWord(N) + " issues" : rdNumWord(mine.length) + " of the " + rdNumWord(N) + " issues")
-      + (clear === mine.length ? "" : clear === 0 ? ", but on none of them clearly" : ", but clearly on only " + rdNumWord(clear));
-    const rest = order.slice(head.startsWith("No party") ? 0 : 1);
-    const parts = rest.map((id) => rdPartyIn(id) + " on " + rdList(by[id].map(lab)));
-    let dek = parts.length ? rdCap(parts[0].replace(" on ", " leads on ")) + (parts.length > 1 ? ", and " + parts.slice(1).join(", and ") : "") + ". " : "";
-    const soft = mine.filter((it) => !it.own.leadSig);
-    if (!head.startsWith("No party") && soft.length && clear > 0)
-      dek += poss(top) + " edge on " + rdList(soft.map(lab)) + " is inside the margin of error. ";
-    dek += "Each figure pools the last " + (D.issues.window || "six weeks") + "’ polls. " + below("with issues figures");
-    return { head, dek };
+    const by = {};
+    list.filter((it) => it.own.leadSig).forEach((it) => { (by[it.own.lead] = by[it.own.lead] || []).push(it); });
+    const order = Object.keys(by).sort(byPrim);
+    if (!order.length) return { dek: "No party’s lead on any issue clears the margin of error." };
+    const parts = order.map((id, i) => (i ? rdPartyIn(id) + " on " : rdPartyStart(id) + " leads on ") + rdList(by[id].map(lab)));
+    return { dek: (parts.length > 1 ? parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1] : parts[0]) + "." };
   }
 
   if (facet === "demographics") {
@@ -2315,101 +2308,58 @@ function rdApFacetStory(facet, upd, demSplit) {
     const pooled = {};
     (DG.tabs || []).forEach((t) => t.sets.forEach((s) => s.groups.forEach((g) => { if (!pooled[g.label]) pooled[g.label] = g; })));
     const pair = sp.pairs.find(([x, y]) => pooled[x] && pooled[y]);
-    const close = below(sp.scope.charAt(0).toLowerCase() + sp.scope.slice(1)).replace("each linked to its source", "each split into its own pollster’s groups");
+    const pts = (g) => Math.round(Math.abs(g)) + " point" + (Math.round(Math.abs(g)) === 1 ? "" : "s");
     if (pair) {
       /* the Who-votes section's pooled six-week groups: each party's gap
          between the split's two ends, in whole points as the table prints
-         them, and whether it clears the two groups' margins combined */
+         them. Only gaps that clear the two groups' margins combined are
+         named, parties in primary-vote order: "One Nation’s vote is 18
+         points higher among over-55s than 18–34s, Labor’s 10 points
+         higher among 18–34s, and ..." */
       const [a, b] = pair, A = pooled[a], B = pooled[b];
-      const gaps = (DG.order || Object.keys(A.v)).filter((k) => A.v[k] != null && B.v[k] != null).map((k) => {
+      const gaps = (DG.order || Object.keys(A.v)).filter((k) => k !== "oth" && A.v[k] != null && B.v[k] != null).map((k) => {
         const g = A.v[k] - B.v[k];
-        return { k, g, hi: g >= 0 ? a : b, lo: g >= 0 ? b : a, sig: Math.abs(g) > Math.sqrt(((A.ci || {})[k] || 0) ** 2 + ((B.ci || {})[k] || 0) ** 2) };
-      }).sort((x, y) => Math.abs(y.g) - Math.abs(x.g));
-      if (!gaps.length) return null;
-      const pts = (g) => Math.round(Math.abs(g)) + " point" + (Math.round(Math.abs(g)) === 1 ? "" : "s");
-      const n = Math.min(A.n || 0, B.n || 0);
-      const pool = n ? " The figures pool " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + " from the last " + (DG.window || "six weeks") + ". " : " ";
-      const w = gaps[0];
-      if (!w.sig) {
-        return { head: rdCap(rdApDemNoun(a)) + " and " + rdApDemNoun(b) + " vote much alike",
-          dek: "No party’s vote differs between them by more than the margin of error; the widest gap is " + poss(w.k).replace(/^T/, "t") + ", " + pts(w.g) + "." + pool + close };
-      }
-      const head = poss(w.k) + " vote is " + pts(w.g) + " higher among " + rdApDemNoun(w.hi) + " than " + rdApDemNoun(w.lo);
-      /* the next two gaps that clear their margins, gathered by the group
-         they favour: "One Nation’s is 18 points and the Coalition’s 12
-         points higher among over-55s" */
-      const nx = gaps.slice(1).filter((x) => x.sig).slice(0, 2);
-      const sides = [...new Set(nx.map((x) => x.hi))].map((hi) => {
-        const xs = nx.filter((x) => x.hi === hi);
-        return xs.map((x, i) => poss(x.k).replace(/^The /, "the ") + (i === 0 ? " is " : " ") + pts(x.g)).join(" and ") + " higher among " + rdApDemNoun(hi);
-      });
-      const dek = (sides.length ? rdCap(sides.join(", and ")) + "." : "No other party’s gap clears the margin of error.") + pool + close;
-      return { head, dek };
+        return { k, g, hi: g >= 0 ? a : b, lo: g >= 0 ? b : a, sig: Math.round(Math.abs(g)) > 0 && Math.abs(g) > Math.sqrt(((A.ci || {})[k] || 0) ** 2 + ((B.ci || {})[k] || 0) ** 2) };
+      }).filter((x) => x.sig).sort((x, y) => byPrim(x.k, y.k));
+      if (!gaps.length) return { dek: "No party’s vote differs between " + rdApDemNoun(a) + " and " + rdApDemNoun(b) + " by more than the margin of error." };
+      const parts = gaps.map((x, i) => (i ? poss(x.k).replace(/^The /, "the ") + " " + pts(x.g) + " higher among " + rdApDemNoun(x.hi)
+        : poss(x.k) + " vote is " + pts(x.g) + " higher among " + rdApDemNoun(x.hi) + " than " + rdApDemNoun(x.lo)));
+      return { dek: (parts.length > 1 ? parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1] : parts[0]) + "." };
     }
     /* a split the section doesn't pool (income: the houses bracket
        different quantities; birth country: one special pooled release, no
-       peer) - the newest poll's own pair */
+       peer) - say so, and give the newest poll's own widest gap */
     const ps = polls.filter((p) => window.demPairOf(p, demSplit)).sort((x, y) => (x.released < y.released ? 1 : -1));
     if (!ps.length) return null;
     const p = ps[0], pr = window.demPairOf(p, demSplit);
     const gs = Object.keys(pr.gap).filter((k) => pr.gap[k] != null).sort((x, y) => Math.abs(pr.gap[y]) - Math.abs(pr.gap[x]));
     if (!gs.length) return null;
     const k = gs[0], g = pr.gap[k];
-    const head = ps.length === 1 ? "One poll breaks the vote out by " + sp.label.toLowerCase()
-      : rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
     /* the "Roy Morgan (pooled)" row is its special pooled survey, not the
        weekly series - the apposition names it as one */
     const who = p.pollster.replace(/^(.+?) \((.+?)\)$/, "$1’s $2 survey");
-    const dek = rdCap(rdNumWord(ps.length)) + " poll" + (ps.length === 1 ? " has" : "s have") + " split the vote by " + sp.label.toLowerCase()
-      + ". The newest, " + (who === p.pollster ? who + "’s" : who) + ", puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among "
-      + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ". " + close;
-    return { head, dek };
+    const whose = who === p.pollster ? who + "’s poll" : who;
+    const newest = who === p.pollster ? "from " + who : who;
+    const gap = rdPartyIn(k) + " " + pts(g) + " higher among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a);
+    return { dek: ps.length === 1
+      ? "Only " + whose + " breaks the vote out by " + sp.label.toLowerCase() + "; it puts " + gap + "."
+      : "Each pollster draws its own " + sp.label.toLowerCase() + " brackets, so these aren’t pooled. The newest, " + newest + ", puts " + gap + "." };
   }
 
   return null;
 }
 
-/* the Primary facet's consideration variant (consM). Each pollster asks its
-   own question ("would seriously consider", "would definitely vote for",
-   "would ever support"), so no figure pools across pollsters: the head
-   quotes the last poll to ask ("when last asked", never "newest": these
-   polls are months apart, and the date says how old) in its own question's words against the larger
-   major party's figure in the same poll; the dek says to compare within a
-   pollster and tallies One Nation v
-   Labor over the polls that asked about every party. "Above"/"below" only
-   past the two shares' combined 95% margin in that poll's sample. */
+/* the Primary facet's consideration variant (consM): one dek, the
+   warning. Each pollster asks its own question ("would seriously
+   consider", "would definitely vote for", "would ever support"), so no
+   figure compares across pollsters; said only when more than one
+   pollster-question pair is on the page */
 function rdApConsStory(upd) {
   const D = window.AUSPOL;
-  const waves = (D.individualPolls || []).filter((p) => p.cons && rdApConsDef(p).m.onp != null && rdApDays(p.released) <= upd)
-    .sort((a, b) => rdApDays(b.released) - rdApDays(a.released));
-  if (!waves.length) return null;
-  const newest = waves[0], nw = rdApConsDef(newest).m;
-  /* every figure rides the default "would consider" range (rdApConsDef):
-     a banded wave's loose tier, not the filed canonical figures */
+  const waves = (D.individualPolls || []).filter((p) => p.cons && rdApConsDef(p).m.onp != null && rdApDays(p.released) <= upd);
   const basis = (p) => rdApConsDef(p).lab.replace(/\s*\(.*\)\s*$/, "").toLowerCase();
-  const pct = (v) => rdApNum(v) + "%";
-  const apart = (p, a, b) => Math.abs(a - b) > 1.96 * Math.sqrt((a * (100 - a) + b * (100 - b)) / (p.sample || 1000));
-  const rel = (p, id) => { const m = rdApConsDef(p).m; return !apart(p, m.onp, m[id]) ? 0 : m.onp > m[id] ? 1 : -1; };
-  const MAJ = { alp: "Labor’s", lnp: "the Coalition’s" };
-  const day = (iso) => { const [y, m, d] = iso.split("-").map(Number);
-    return d + " " + D.monthNameFull(m) + (y !== new Date(upd).getUTCFullYear() ? " " + y : ""); };
-  const top = ["alp", "lnp"].filter((id) => nw[id] != null).sort((a, b) => nw[b] - nw[a])[0];
-  const head = "When last asked, by " + newest.pollster + " on " + day(newest.released) + ", " + pct(nw.onp) + " "
-    + basis(newest) + (/vote$/.test(basis(newest)) ? " for " : " ") + "One Nation"
-    + (top ? ", " + ["below ", "close to ", "above "][rel(newest, top) + 1] + MAJ[top] + " " + pct(nw[top]) : "");
   const askers = new Set(waves.map((p) => p.pollster + "|" + basis(p))).size;
-  /* One Nation v Labor where every party was asked */
-  const full = waves.filter((p) => rdApConsDef(p).m.alp != null);
-  const cnt = [1, 0, -1].map((r) => full.filter((p) => rel(p, "alp") === r).length);
-  const parts = ["outscored", "came close to", "trailed"].map((v, i) => (cnt[i] ? [v, cnt[i]] : null)).filter(Boolean);
-  const tallied = full.length < 2 ? ""
-    : parts.length === 1 ? "In all " + rdNumWord(full.length) + " polls that asked about every party, One Nation " + parts[0][0] + " Labor. "
-    : "Of the " + rdNumWord(full.length) + " polls that asked about every party, One Nation "
-      + rdList(parts.map(([v, k], i) => (i ? v.replace(/ to$/, "") : v + " Labor") + " in " + rdNumWord(k))) + ". ";
-  const dek = (askers > 1 ? "Pollsters word the question differently, so compare a figure only with the same pollster’s. " : "")
-    + tallied
-    + "Below is every national poll with consideration figures since the 2025 election, newest first, each linked to its source.";
-  return { head, dek };
+  return askers > 1 ? { dek: "Pollsters word the question differently, so compare a figure only with the same pollster’s." } : null;
 }
 /* ---------------------------------------------------------------- the phone's filters
    "Filters" on the pinned bar opens the pollster, time and includes lists as a
@@ -2655,7 +2605,7 @@ function RdAllPolls(P) {
       : facet === "demographics" ? rdApFacetStory(facet, upd, demSplit)
       : facet === "issues" ? rdApFacetStory(facet, upd)
       : null;
-    return st && st.head ? st : null;
+    return st && st.dek ? st : null;
   }, [facet, consM, demSplit, upd]);
   const head = live ? live.head : null, dek = live ? live.dek : null;
   const [hedHold, setHedHold] = useState(0);
