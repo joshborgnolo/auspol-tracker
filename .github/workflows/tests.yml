@@ -57,4 +57,9 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Validate, build, run every suite
+        # test-map-marital drives headless Chrome; without CHROME it falls back
+        # to the Mac app path, and from 2026-11-11 that failed every run there,
+        # so no suite after it ran. The image's Chrome, as every workflow uses.
+        env:
+          CHROME: /usr/bin/google-chrome
         run: npm test
