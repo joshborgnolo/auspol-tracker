@@ -4253,6 +4253,26 @@ body.rd .rd-ldg-conf b { font-size: 26px; font-weight: 500; color: var(--ink); }
 /* the lines: a label, then units that wrap between themselves; figures never
    break inside — prose tails may (see rd-ldg-lisoft below) */
 body.rd .rd-ldg-also .rd-ldg-h { margin-bottom: 4px; }
+/* which gaps are real (RdLgSig): a lower-triangle table under Also in this
+   poll; a significant gap in full ink, the rest quiet */
+body.rd .rd-ldg-sigw { margin-top: 22px; }
+body.rd .rd-ldg-lines + .rd-ldg-sigw { margin-top: 26px; }
+body.rd .rd-ldg-sigsay { margin: 0 0 8px; font-size: 14px; color: var(--ink); }
+body.rd .rd-ldg-sig { width: auto; }
+body.rd .rd-ldg-sig thead th { padding-left: 14px; }
+body.rd .rd-ldg-sig td { padding-left: 14px; font-variant-numeric: tabular-nums; color: var(--ink-3); }
+body.rd .rd-ldg-sig td b { font-weight: 400; }
+body.rd .rd-ldg-sig td.sig { color: var(--ink); }
+body.rd .rd-ldg-sig td.sig b { font-weight: 600; }
+body.rd .rd-ldg-sig tbody th { font-weight: 600; font-size: 12px; letter-spacing: 0.04em; }
+body.rd .rd-ldg-sigw .rd-ldg-note { margin-top: 8px; }
+/* a phone: four gap columns beside ±s ran past a 320px card; each ±
+   drops under its gap */
+@media (max-width: 760px) {
+  body.rd .rd-ldg-sig thead th, body.rd .rd-ldg-sig td { padding-left: 10px; }
+  body.rd .rd-ldg-sig td .rd-ldg-ipm { display: block; font-size: 11px; line-height: 1.2; }
+  body.rd .rd-ldg-sig td, body.rd .rd-ldg-sig tbody th { vertical-align: top; }
+}
 body.rd .rd-ldg-lines { display: flex; flex-direction: column; border-top: 1px solid var(--line-2); }
 body.rd .rd-ldg-line {
   /* 110px: the longest eyebrow label (CONSIDERATION) measures 98px wrapped;

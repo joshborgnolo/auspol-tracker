@@ -2215,6 +2215,67 @@ function rdLgLines(p, { onM, demSplit }) {
    rhythm); lead = a facet's own wide table where it has one (issues,
    groups, the gauge); onLine(id, el) = what pressing a line does; latest =
    the Latest table, whose own tabs are 2PP, Primary and Leadership */
+/* ---- which gaps are real (user idea 2026-11-21: "a pairwise significance
+   test matrix ... whether the two parties' primary vote shares differ
+   significantly at the 95% level for that particular poll"). Two shares
+   from the same respondents move against each other, so a gap's margin is
+   1.96 sqrt((a + b - (a - b)^2) / n), on the same decided-voter effective
+   sample as the figures' own ±s (rdPrimMoe) - not the overlap of two
+   whiskers, which reads too many gaps as nothing. The lower triangle only
+   (each pair once); a gap wider than its margin is significant. No table
+   for an MRP series or a poll without a sample */
+function RdLgSig({ p }) {
+  const q = p.p || {};
+  const ps = rdLgPrims().filter((k) => q[k.id] != null);
+  if (ps.length < 3 || rdIsMrp(p)) return null;
+  let n = rdNEff(p);
+  if (!n) return null;
+  const u = window.AUSPOL.undecidedCellOf ? window.AUSPOL.undecidedCellOf(p) : null;
+  if (u && u.label === "excluded" && u.v > 0) n *= 1 - u.v / 100;
+  const test = (a, b) => {
+    const x = +q[a.id] / 100, y = +q[b.id] / 100;
+    const m = 196 * Math.sqrt(Math.max(0, x + y - (x - y) * (x - y)) / n);
+    const g = rdApR1(+q[a.id] - +q[b.id]);
+    return { g, m, sig: Math.abs(g) > m };
+  };
+  const pairs = [];
+  ps.forEach((a, i) => ps.slice(0, i).forEach((b) => pairs.push({ a, b, ...test(a, b) })));
+  const ns = pairs.filter((x) => !x.sig);
+  const sgn = (g) => (g > 0 ? "+" : g < 0 ? "−" : "") + rdApNum(Math.abs(g));
+  const NM = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others" };
+  const nm = (id) => NM[id] || id;
+  const say = !ns.length ? "Every pair of parties differs significantly in this poll."
+    : ns.length === pairs.length ? "No pair of parties differs significantly in this poll."
+    : "No significant difference between " + ns.map((x) => nm(x.b.id) + " and " + nm(x.a.id)).join(", ").replace(/, ([^,]*)$/, ns.length > 2 ? ", or $1" : " or $1") + "; every other pair differs.";
+  return (
+    <div className="rd-ldg-sigw">
+      <h4 className="rd-ldg-h">Which gaps are real</h4>
+      <p className="rd-ldg-sigsay">{say}</p>
+      <table className="rd-ldg-t rd-ldg-sig">
+        <thead><tr><th><span className="sr-only">Row party minus column party</span></th>{ps.slice(0, -1).map((k) => <th key={k.id} className="num" style={{ color: k.ink }}>{k.lab}</th>)}</tr></thead>
+        <tbody>
+          {ps.slice(1).map((a, i) => (
+            <tr key={a.id}>
+              <th scope="row" style={{ color: a.ink }}>{a.lab}</th>
+              {ps.slice(0, -1).map((b, j) => {
+                if (j > i) return <td key={b.id}></td>;
+                const t = test(a, b);
+                return (
+                  <td key={b.id} className={"num" + (t.sig ? " sig" : "")}
+                      title={a.lab + " minus " + b.lab + ": " + sgn(t.g) + " ±" + t.m.toFixed(1) + (t.sig ? ", significant at 95%" : ", within the margin")}>
+                    <b>{sgn(t.g)}</b><span className="rd-ldg-ipm"> ±{t.m.toFixed(1)}</span>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="rd-ldg-note">Each cell is the row party’s share minus the column party’s, in points, with its margin of error at 95%: the two shares come from the same voters, so the gap carries its own margin, wider than either share’s. Dark gaps are wider than their margin, so significant. With {rdNumWord(pairs.length)} pairs, about one significant-looking gap in twenty can be chance alone, and whole-number shares can hide up to a point of a gap.</p>
+    </div>
+  );
+}
+
 function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demSplit, moe, latest }) {
   const lines = rdLgLines(p, { onM, demSplit });
   const NOTE = {
@@ -2249,8 +2310,9 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
         )}
       </div>
       {side && <div className="rd-ldg-side">{side}</div>}
-      {rest.length > 0 && (
+      {(rest.length > 0 || facet === "primary") && (
         <div className="rd-ldg-also">
+          {rest.length > 0 && <>
           <h4 className="rd-ldg-h">Also in this poll</h4>
           <div className="rd-ldg-lines">
             {rest.map((l) => {
@@ -2275,6 +2337,8 @@ function RdLedger({ p, facet, onM, side, lead, wide, onLine, sources, foot, demS
               );
             })}
           </div>
+          </>}
+          {facet === "primary" && <RdLgSig p={p} />}
         </div>
       )}
     </div>
