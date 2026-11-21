@@ -146,7 +146,7 @@ async function openRowContaining(page, re) {
       keys: [...detail.querySelectorAll(".rd-apd-r .rd-apd-k")].map((k) => k.textContent.trim()),
       tbl: tableOf(detail),
       rowCells: [...(document.querySelector(".rd-ap-row.open .rd-ap-imap, .rd-ap-card.open .rd-ap-imapc") || { children: [] }).children]
-        .map((c) => ((c.querySelector("b") || {}).textContent || "").replace(/\s+/g, " ").trim()),
+        .map((c) => (((b) => (b ? [...b.childNodes].filter((n) => !(n.classList && n.classList.contains("rd-ap-pm"))).map((n) => n.textContent).join("") : ""))(c.querySelector("b"))).replace(/\s+/g, " ").trim()),
     };
     // the issues facet's opened poll leads with its issue-by-issue table
     function tableOf(detail) {
@@ -260,7 +260,7 @@ const rowAnatomy = await page1.evaluate(() => {
     const cells = maps.length === 1 ? [...maps[0].querySelectorAll(":scope > .rd-ap-icell")] : [];
     if (cells.length !== 6) { bad.push(i + ": " + cells.length + " cells"); return; }
     cells.forEach((c, j) => {
-      const v = norm((c.querySelector("b") || {}).textContent || "");
+      const v = norm(((b) => (b ? [...b.childNodes].filter((n) => !(n.classList && n.classList.contains("rd-ap-pm"))).map((n) => n.textContent).join("") : ""))(c.querySelector("b")));
       const aria = c.getAttribute("aria-label") || "";
       seen.push(v);
       if (!aria.startsWith(LAB[MAP[j]] + ": ")) { bad.push(i + "/" + j + " label " + aria.slice(0, 40)); return; }
@@ -577,7 +577,7 @@ const cardAnatomy = await page3.evaluate(() => {
     const bars = cells.map((x) => x.querySelector(".rd-ap-ibar")).filter(Boolean).map((b) => b.getBoundingClientRect().top);
     if (bars.length && Math.max(...bars) - Math.min(...bars) > 0.5) off.push(i + ": bars off one line by " + (Math.max(...bars) - Math.min(...bars)).toFixed(1));
     cells.forEach((x, j) => {
-      const v = norm((x.querySelector("b") || {}).textContent || "");
+      const v = norm(((b) => (b ? [...b.childNodes].filter((n) => !(n.classList && n.classList.contains("rd-ap-pm"))).map((n) => n.textContent).join("") : ""))(x.querySelector("b")));
       if (!/^(—|Level|(ALP|L\/NP|ON|GRN) \+\d+)$/.test(v)) off.push(i + "/" + j + " " + v);
     });
   });

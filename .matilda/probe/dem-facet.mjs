@@ -111,7 +111,7 @@ console.log("== desktop 1280: tab, splits, rows ==");
       const want = D.individualPolls.filter((p) => window.demPairOf(p, id)).length;
       const rows = [...document.querySelectorAll(".rd-ap-row")];
       const first = rows[0];
-      const figs = first ? [...first.querySelectorAll(".rd-ap-dgap .rd-ap-pnums b")].map((b) => b.textContent) : [];
+      const figs = first ? [...first.querySelectorAll(".rd-ap-dgap .rd-ap-pnums b")].map((b) => ((b) => (b ? [...b.childNodes].filter((n) => !(n.classList && n.classList.contains("rd-ap-pm"))).map((n) => n.textContent).join("") : ""))(b)) : [];
       const sub = first ? (first.querySelector(".rd-ap-dgap .rd-ap-sub") || {}).textContent : "";
       const dots = first ? first.querySelectorAll(".rd-ap-pic .rd-ap-dot").length : 0;
       const even = first ? !!first.querySelector(".rd-ap-pic .rd-ap-avg") : false;
@@ -146,7 +146,7 @@ console.log("== desktop 1280: tab, splits, rows ==");
   const col = await page.evaluate(() => {
     const heads = [...document.querySelectorAll(".rd-ap-hrow .rd-ap-pnums .rd-ap-th")].map((t) => t.textContent.trim());
     const i = heads.findIndex((h) => /^ON/.test(h));
-    return [...document.querySelectorAll(".rd-ap-row")].map((r) => r.querySelectorAll(".rd-ap-dgap .rd-ap-pnums b")[i].textContent)
+    return [...document.querySelectorAll(".rd-ap-row")].map((r) => ((b) => (b ? [...b.childNodes].filter((n) => !(n.classList && n.classList.contains("rd-ap-pm"))).map((n) => n.textContent).join("") : ""))(r.querySelectorAll(".rd-ap-dgap .rd-ap-pnums b")[i]))
       .map((t) => (t === "—" ? -Infinity : +t.replace("−", "-").replace("+", "")));
   });
   check("sorting the ON column orders rows by One Nation's gap", col.length > 3 && col.every((v, j) => j === 0 || col[j - 1] >= v), col.slice(0, 6).join(" "));

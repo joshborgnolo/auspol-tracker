@@ -66,6 +66,58 @@ function rdPrimMoe(p, v, und) {
 }
 const rdPrimMoeTxt = (p, v, und) => { const m = rdPrimMoe(p, v, und); return m == null ? null : "±" + m.toFixed(1); };
 
+/* the other facets' ±s (user call 2026-11-21, "direction and issues and
+   demographics and leadership also want to have it"), on the same
+   effective sample. A share of everyone asked (preferred PM, right
+   direction, a party rated best) takes p(1 - p) on the whole n. A
+   difference of two shares from the same respondents (a net rating,
+   right minus wrong, an issue lead) takes (a + b - (a - b)^2) / n */
+const rdNEff = (p) => (p ? p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0) : 0);
+const rdIsMrp = (p) => / \(MRP\)$/.test((p && p.pollster) || "");
+const rdMoeTxt = (m) => (m == null || !isFinite(m) || m <= 0 ? null : "±" + m.toFixed(1));
+function rdShareMoe(p, v) {
+  const n = rdIsMrp(p) ? 0 : rdNEff(p);
+  if (v == null || !n) return null;
+  const s = Math.max(0, Math.min(100, +v)) / 100;
+  return 196 * Math.sqrt((s * (1 - s)) / n);
+}
+function rdDiffMoe(p, a, b) {
+  const n = rdIsMrp(p) ? 0 : rdNEff(p);
+  if (a == null || b == null || !n) return null;
+  const x = +a / 100, y = +b / 100;
+  return 196 * Math.sqrt(Math.max(0, x + y - (x - y) * (x - y)) / n);
+}
+/* a group gap's ± (Demographics) needs each group's own sample, which the
+   pollsters rarely print, so each is ESTIMATED as the poll's effective
+   sample times the group's share of Australia's adults - polls are
+   weighted to those shares - and, where the house takes its undecided out
+   of the party base, times the decided share as for the primaries. Shares
+   (2026-11-21): age from ABS ERP 2026-Q1 adults (data/age-dist.json; Gen Z
+   = 18-29, boomers = 62-80 in 2026); gender, education (persons 15+) and
+   tenure (dwellings) from the 2021 Census frame (data/census-2021-divisions-
+   2025.json); inner metro and rural from the AEC's 2025 division classes
+   weighted by Census persons; capital cities 67% (ABS, 2021 Census). No
+   share, no ±: the income brackets (each house's own household or
+   personal yardstick) and the Offcuts families */
+const RD_DEM_SHARE = {
+  "Women": 0.51, "Men": 0.49,
+  "18–34": 0.30, "55+": 0.36, "65+": 0.22, "50+": 0.44, "Gen Z": 0.21, "Boomers": 0.21,
+  "University": 0.26, "School": 0.45, "Year 12 or less": 0.45, "High School": 0.45, "No tertiary": 0.74,
+  "Inner metro": 0.30, "Rural": 0.24, "Regional or rural": 0.40, "Capital cities": 0.67, "Regional/rural areas": 0.33,
+  "Renting": 0.31, "Renting and other": 0.33, "Own outright": 0.31,
+};
+function rdDemGapMoe(p, pr, k) {
+  if (!pr || rdIsMrp(p)) return null;
+  const sa = RD_DEM_SHARE[pr.a], sb = RD_DEM_SHARE[pr.b], va = pr.A && pr.A[k], vb = pr.B && pr.B[k];
+  let n = rdNEff(p);
+  if (!sa || !sb || va == null || vb == null || !n) return null;
+  const u = window.AUSPOL.undecidedCellOf ? window.AUSPOL.undecidedCellOf(p) : null;
+  if (u && u.label === "excluded" && u.v > 0) n *= 1 - u.v / 100;
+  const x = Math.max(0, Math.min(100, +va)) / 100, y = Math.max(0, Math.min(100, +vb)) / 100;
+  return 196 * Math.sqrt((x * (1 - x)) / (n * sa) + (y * (1 - y)) / (n * sb));
+}
+const rdPm = (m) => { const t = rdMoeTxt(m); return t ? <i className="rd-ap-pm">{t}</i> : null; };
+
 /* what a poll's margin stands on, said beside it wherever it shows: the
    pollster's own effective sample (its APC statement), or, where it printed
    none for this poll, the raw sample over the design effect rdPollMargin
@@ -1772,6 +1824,7 @@ function RdLgVote({ p, note }) {
   const prim = rdLgPrims().filter((k) => q[k.id] != null);
   if (!prim.length) return null;
   const dec = rdLgDecided(p);
+  const hasMoe = prim.some((k) => rdPrimMoe(p, q[k.id]) != null);
   return (
     <>
       <div className="rd-ldg-prim">
@@ -1779,6 +1832,9 @@ function RdLgVote({ p, note }) {
           <span key={k.id}>
             <b style={{ color: k.ink }}>{k.lab}</b>
             <span className="rd-ldg-big" style={{ color: k.ink }}>{rdApNum(q[k.id])}</span>
+            {/* the figure's ±, the same rdPrimMoe the table row prints
+                (user catch 2026-11-21: the ledger had none) */}
+            {hasMoe && <span className="rd-ldg-pm">{rdPrimMoeTxt(p, q[k.id]) || " "}</span>}
             <span className="rd-ldg-chg">{rdLgChg(c[RD_LG_CK[k.id]], 0) || " "}</span>
           </span>
         ))}
@@ -3341,11 +3397,13 @@ function RdAllPolls(P) {
       const three = sets.find((s) => s.hanson != null && (s.taylor != null || s.ley != null));
       const oppV = (s) => (s.taylor != null ? s.taylor : s.ley);
       const oppN = (s) => apWho(p, "taylor", s.taylor != null ? "Taylor" : "Ley");
-      const two = (x, y, yInk) => <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{x}</span><span className="rd-ap-dash"> – </span><span style={{ color: yInk }}>{y}</span></b>;
+      /* each preferred-PM share carries its ± (rdShareMoe: of everyone
+         asked, the uncommitted included) */
+      const two = (x, y, yInk) => <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{x}{rdPm(rdShareMoe(p, x))}</span><span className="rd-ap-dash"> – </span><span style={{ color: yInk }}>{y}{rdPm(rdShareMoe(p, y))}</span></b>;
       let main, sub;
       if (opp) { main = two(opp.alb, oppV(opp), "var(--lnp-text)"); sub = han ? "v " + oppN(opp) + ", " + han.alb + "–" + han.hanson + " v " + apWho(p, "hanson", "Hanson") : apWho(p, "alb", "Albanese") + " v " + oppN(opp); }
       else if (three) {
-        main = <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{three.alb}</span><span className="rd-ap-dash"> – </span><span style={{ color: "var(--lnp-text)" }}>{oppV(three)}</span><span className="rd-ap-dash"> – </span><span style={{ color: "var(--onp-text)" }}>{three.hanson}</span></b>;
+        main = <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{three.alb}{rdPm(rdShareMoe(p, three.alb))}</span><span className="rd-ap-dash"> – </span><span style={{ color: "var(--lnp-text)" }}>{oppV(three)}{rdPm(rdShareMoe(p, oppV(three)))}</span><span className="rd-ap-dash"> – </span><span style={{ color: "var(--onp-text)" }}>{three.hanson}{rdPm(rdShareMoe(p, three.hanson))}</span></b>;
         sub = "three-way";
       } else if (han) { main = two(han.alb, han.hanson, "var(--onp-text)"); sub = apWho(p, "alb", "Albanese") + " v " + apWho(p, "hanson", "Hanson"); }
       else { main = <span className="rd-ap-none">—</span>; sub = "not asked"; }
@@ -3367,10 +3425,13 @@ function RdAllPolls(P) {
         </span>
       );
       const fav = ["alb", "taylor", "hanson"].some((k) => mb[k] === "fav" && a[k + "Net"] != null);
+      /* a net is approve minus disapprove of the same respondents
+         (rdDiffMoe); a house that printed only the net gets none */
+      const netMoe = (k) => { const r = a[k.replace(/Net$/, "")]; return r && r.app != null && r.dis != null ? rdDiffMoe(p, r.app, r.dis) : null; };
       const nets = (
         <span className="rd-ap-nets">
           {[["albNet", "var(--alp-text)", window.JUR ? "Prem" : "Alb"], ["taylorNet", "var(--lnp-text)", window.JUR ? "Opp" : "Tay"], ["hansonNet", "var(--onp-text)", window.JUR ? "ON" : "Han"]].map(([k, col, lab]) => (
-            <b key={k} style={{ color: col }}>{phone && <em>{lab}</em>}{a[k] != null ? rdSigned(a[k], 0) : "—"}</b>
+            <b key={k} style={{ color: col }}>{phone && <em>{lab}</em>}{a[k] != null ? rdSigned(a[k], 0) : "—"}{a[k] != null && rdPm(netMoe(k))}</b>
           ))}
         </span>
       );
@@ -3393,9 +3454,9 @@ function RdAllPolls(P) {
       const uChg = noU ? null : dChg(dc.unsure);
       const subRow = d && (dChg(dc.right) || dChg(dc.wrong) || uChg);
       figs = d ? <>
-        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>{dChg(dc.right) && <span className="rd-ap-sub">{dChg(dc.right)}</span>}</span>
-        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{dChg(dc.wrong) && <span className="rd-ap-sub">{dChg(dc.wrong)}</span>}</span>
-        <span role="cell" className="rd-ap-dnum"><span>{noU ? "—" : rdApNum(d.unsure)}</span>{subRow && <span className="rd-ap-sub" aria-hidden={uChg ? undefined : "true"}>{uChg || "\u00a0"}</span>}</span>
+        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}{rdPm(rdShareMoe(p, d.right))}</b>{dChg(dc.right) && <span className="rd-ap-sub">{dChg(dc.right)}</span>}</span>
+        <span role="cell" className="rd-ap-dnum"><b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}{rdPm(rdShareMoe(p, d.wrong))}</b>{dChg(dc.wrong) && <span className="rd-ap-sub">{dChg(dc.wrong)}</span>}</span>
+        <span role="cell" className="rd-ap-dnum"><span>{noU ? "—" : rdApNum(d.unsure)}{!noU && rdPm(rdShareMoe(p, d.unsure))}</span>{subRow && <span className="rd-ap-sub" aria-hidden={uChg ? undefined : "true"}>{uChg || "\u00a0"}</span>}</span>
       </> : <><span role="cell" className="rd-ap-none">—</span><span></span><span></span></>;
       pic = d ? (
         <span className="rd-ap-pic" role="img" aria-label={`Right direction ${rdApNum(d.right)}%, ${noU ? "" : `unsure ${rdApNum(d.unsure)}%, `}wrong track ${rdApNum(d.wrong)}%`}>
@@ -3409,10 +3470,12 @@ function RdAllPolls(P) {
           </span>
         </span>
       ) : <span className="rd-ap-pic"></span>;
-      val = <span role="cell" className="rd-ap-val">{d ? rdSigned(d.net, 0) : "—"}</span>;
-      right1 = d ? <b className="rd-ap-pairfig">Net {rdSigned(d.net, 0)}</b> : <span className="rd-ap-none">—</span>;
+      /* the net is right minus wrong of the same respondents (rdDiffMoe) */
+      const netPm = d ? rdPm(rdDiffMoe(p, d.right, d.wrong)) : null;
+      val = <span role="cell" className="rd-ap-val">{d ? <>{rdSigned(d.net, 0)}{netPm}</> : "—"}</span>;
+      right1 = d ? <b className="rd-ap-pairfig">Net {rdSigned(d.net, 0)}{netPm}</b> : <span className="rd-ap-none">—</span>;
       body = d ? <><div className="rd-ap-cpic">{pic}</div>
-        <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{noU ? "" : ", unsure " + rdApNum(d.unsure)}</div></> : null;
+        <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>{rdPm(rdShareMoe(p, d.right))}, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>{rdPm(rdShareMoe(p, d.wrong))}{noU ? "" : <>, unsure {rdApNum(d.unsure)}{rdPm(rdShareMoe(p, d.unsure))}</>}</div></> : null;
     } else if (facet === "issues") {
       /* who leads on what (user call 2026-10-04, design B of three mocked):
          the six most-asked issues across the row, each the party rated best
@@ -3426,6 +3489,9 @@ function RdAllPolls(P) {
       const verdict = ({ L }) => (!L ? "—" : L.level ? "Level"
         : <><span>{(window.ISS_PARTY_META[L.who] || [L.who, L.who])[1]}</span> <span>+{Math.round(L.lead)}</span></>);
       const ink = ({ L }) => (L && !L.level ? (window.ISS_PARTY_META[L.who] || [])[2] : null);
+      /* the lead's ± is the gap's: the two parties' shares come from the
+         same respondents (rdDiffMoe), so "Level" carries one too */
+      const leadPm = ({ L }) => (L && L.lead != null ? rdPm(rdDiffMoe(p, L.v, L.v - L.lead)) : null);
       const words = ({ id, own, L }) => (own
         ? IMAP_LAB[id] + ": " + (!L ? "no party figures" : L.level ? "level" : (window.ISS_PARTY_META[L.who] || [L.who])[0] + " ahead by " + Math.round(L.lead))
           + " (" + IP4.filter((k) => own[k.id] != null).map((k) => k.lab + " " + rdApNum(own[k.id])).join(", ") + ")"
@@ -3437,7 +3503,7 @@ function RdAllPolls(P) {
         <span role="cell" className="rd-ap-imap">
           {cells.map((c) => (
             <span key={c.id} className="rd-ap-icell" aria-label={words(c)}>
-              <b style={ink(c) ? { color: ink(c) } : null}>{verdict(c)}</b>{bar(c.own)}
+              <b style={ink(c) ? { color: ink(c) } : null}>{verdict(c)}{leadPm(c)}</b>{bar(c.own)}
             </span>
           ))}
         </span>
@@ -3446,7 +3512,7 @@ function RdAllPolls(P) {
          pinned head's issue names */
       body = (
         <div className="rd-ap-imapc">
-          {cells.map((c) => <span key={c.id} aria-label={words(c)}><b style={ink(c) ? { color: ink(c) } : null}>{verdict(c)}</b>{bar(c.own)}</span>)}
+          {cells.map((c) => <span key={c.id} aria-label={words(c)}><b style={ink(c) ? { color: ink(c) } : null}>{verdict(c)}{leadPm(c)}</b>{bar(c.own)}</span>)}
         </div>
       );
     } else if (facet === "demographics") {
@@ -3459,7 +3525,7 @@ function RdAllPolls(P) {
       const pr = window.demPairOf(p, demSplit, demFam);
       figs = (
         <span role="cell" className="rd-ap-fig rd-ap-dgap">
-          <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b>)}</span>
+          <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}{pr && pr.gap[k.id] != null && rdPm(rdDemGapMoe(p, pr, k.id))}</b>)}</span>
           <span className="rd-ap-sub">{pr ? pr.lab + ", in points" : "no " + spl.label.toLowerCase() + " breakdown"}</span>
         </span>
       );
@@ -3478,7 +3544,7 @@ function RdAllPolls(P) {
       );
       right1 = pr ? <span className="rd-ap-dpair">{pr.lab}</span> : null;
       body = <>
-        <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b></span>)}</div>
+        <div className="rd-ap-cprim rd-ap-cmoe">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b>{pr && pr.gap[k.id] != null && rdPm(rdDemGapMoe(p, pr, k.id))}</span>)}</div>
         <div className="rd-ap-cpic">{pic}</div>
       </>;
     } else if (facet === "confidence") {
@@ -4117,6 +4183,14 @@ function RdAllPolls(P) {
           {" "}A pollster’s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance.</>,
         facet === "issues" && <>Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; "Level" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn’t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them.</>,
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
+        /* what the ±s are (user call 2026-11-21) */
+        ["primary", "leadership", "direction", "issues", "demographics"].includes(facet) && !(facet === "primary" && consM) && <>{{
+          primary: "Each ± is the figure’s margin of error at 95%. Where the undecided were set aside, a party’s share is of the decided voters only, so its margin is a little wider.",
+          leadership: "Each ± is the figure’s margin of error at 95%. A net rating’s covers approve minus disapprove; a pollster that printed only the net has none.",
+          direction: "Each ± is the figure’s margin of error at 95%. The net’s covers right minus wrong.",
+          issues: "Each ± is the margin of error at 95% on the lead, the gap between the top two parties. A lead smaller than its ± could be no lead at all.",
+          demographics: "Each ± is the gap’s margin of error at 95%, and only an estimate: pollsters rarely publish how many people are in each group, so each group’s sample is taken as the poll’s sample times the group’s share of Australian adults. The income brackets and the Offcuts groups have no such share, so they carry none.",
+        }[facet]} It comes from the poll’s effective sample (the pollster’s own figure where it published one, otherwise its sample over a typical design effect) and counts sampling error alone.</>,
         facet === "primary" && !consM && <><b>Und</b> is the undecided share, rounded to the nearest half point. “Included” means those voters remain in the party-share base; “excluded” means they were set aside first. A forced choice shows 0, “not allowed”.</>,
         <><b>Sample</b> is the number of people polled, and the letters say what its primary-vote shares are of: <b className="rd-smc">D</b> decided voters (undecideds set aside), <b className="rd-smc">D+L</b> decided voters plus leaners (undecideds asked which way they lean, the rest set aside), <b className="rd-smc">A</b> all voters (undecideds kept in), <b className="rd-smc">F</b> a forced choice (no undecided option, so everyone is allocated to a party). <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,
       ]} />
