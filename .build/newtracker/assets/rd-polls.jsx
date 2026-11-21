@@ -6,7 +6,7 @@
    countdown runs), and the figures are the Latest table's own, so nothing
    here is a second estimate of anything. */
 
-const RD_PL_FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" }, { id: "leadership", label: "Leadership" }];
+const RD_PL_FACETS = [{ id: "primary", label: "Primary" }, { id: "twopp", label: "2PP" }, { id: "leadership", label: "Leadership" }];
 /* primary columns rank by the site aggregate like every other party
    listing (the All-polls/Latest tables read the same latest.primaryOrder
    walk) - user call 2026-10-03: a fixed Labor, Coalition, Greens, One
@@ -95,7 +95,10 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
      takes the phone's cards too */
   const narrow = useNarrow("(max-width: 900px)");
   const phone = useNarrow(MQ_PHONE);
-  const [facet, setFacet] = useState("twopp");
+  /* the primary vote leads (2026-11-21): it is what a poll measures, the
+     2PP is derived from it by flows, and with two contests the 2PP needs
+     a matchup before it means anything */
+  const [facet, setFacet] = useState("primary");
   const [sort, setSort] = useState({ key: "latest", dir: -1 });
   const [open, setOpen] = useState(null);
   /* a house's sub-rows the reader has shown or hidden with its +/− button:

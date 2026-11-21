@@ -4793,7 +4793,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
      the Coalition being the contest even in months One Nation was. */
   const measure = window.AP.measureOfMatchup(tppMatchup);
   const flipMatchup = () => setTppMatchup && setTppMatchup(tppMatchup === "alp_on" ? "alp_lnp" : "alp_on");
-  const [facet, setFacet] = useState("twopp");
+  const [facet, setFacet] = useState("primary");   // primaries lead, as in the redesign (2026-11-21)
   const [sort, setSort] = useState({ key: "pubSort", dir: -1 });
   const [open, setOpen] = useState(null);
 
@@ -4840,8 +4840,8 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const windowLabel = `${fmtWin(newest[newest.length - 1].pubSort)}\u2013${fmtWin(newest[0].pubSort)}`;
 
   const FACETS = [
-    { id: "twopp", label: "2PP" },
     { id: "primary", label: "Primary" },
+    { id: "twopp", label: "2PP" },
     { id: "leadership", label: "Leadership" },
   ];
 

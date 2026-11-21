@@ -2568,7 +2568,7 @@ function RdAllPolls(P) {
      file's releases ship (never /vic/: the JUR build files no
      confidenceOnlyPolls), and /vic/'s polls carry no direction, issues or
      group figures */
-  const FACET_IDS = ["twopp", "primary", "leadership", "direction", "issues", "demographics"]
+  const FACET_IDS = ["primary", "twopp", "leadership", "direction", "issues", "demographics"]
     .concat((D.confidenceOnlyPolls || []).length ? ["confidence"] : [])
     .filter((f) => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f));
 

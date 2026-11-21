@@ -6073,8 +6073,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const confNarrow = useNarrow("(max-width: 600px)");
   const confWide = !confNarrow || !!(window.AP && window.AP.rd);
   const FACETS = [
-    { id: "twopp", label: "2PP" },
     { id: "primary", label: "Primary" },
+    { id: "twopp", label: "2PP" },
     { id: "leadership", label: "Leadership" },
     { id: "direction", label: "Direction" },
     { id: "issues", label: "Issues" },
@@ -6118,7 +6118,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      and tag values out as comma-joined names. All spellings are still read
      here, the short key winning if a hand-edited URL carries both; only
      the short keys and mask values are ever written. */
-  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", c: "confidence", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues", confidence: "confidence",
+  /* the primary facet is the default (2026-11-21; the 2PP was until then):
+     a bare link opens Primary, f=2 the 2PP. f=p is still read, so links
+     written before the switch keep their facet; bare links written then
+     meant the 2PP and now open Primary - the one cost of the switch */
+  const FACET_BY_URL = { "2": "twopp", twopp: "twopp", p: "primary", l: "leadership", d: "direction", i: "issues", c: "confidence", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues", confidence: "confidence",
                          ...(window.AP.rd ? { g: "demographics", demographics: "demographics" } : {}) };
   // the demographics facet's split → URL letter's inverse; age, the default, rides no letter
   const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home", n: "income", b: "country" };
@@ -6134,7 +6138,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const p = new URLSearchParams(window.location.search);
     /* new short key first, then each legacy key the value once had */
     const get = (...keys) => { for (const k of keys) { const v = p.get(k); if (v != null) return v; } return null; };
-    const view = FACET_BY_URL[get("f", "view")] || "twopp";
+    const view = FACET_BY_URL[get("f", "view")] || "primary";
     const sExplicit = get("s", "scope") != null;
     /* the matchup is lifted out ahead of the literal so the scope seed can
        see it – a published-only matchup self-arms its contest scope */
@@ -6165,7 +6169,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         const mask = archUnpack(raw, POLL_TAGS.map((t) => t.id));
         return (mask ? [...mask] : raw.split(",")).filter((t) => POLL_TAGS.some((pt) => pt.id === t));
       })(),
-      lead: LEAD_BY_URL[get("l", "lead")] || "all",
+      // the ahead filter belongs to the 2PP lead column (onFacet clears it elsewhere)
+      lead: (view === "twopp" && LEAD_BY_URL[get("l", "lead")]) || "all",
       measure: meas,
       cons: consIn,
       confBus: confBusIn,
@@ -6260,10 +6265,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     setOpen(focus.key);
   }, [focus]);
   // this design's menu drops Confidence on narrow viewports (confWide); a
-  // reader sitting on the facet as the window shrinks re-seats on 2PP
+  // reader sitting on the facet as the window shrinks re-seats on Primary
   // rather than viewing a facet whose tab is no longer on offer
   React.useEffect(() => {
-    if (!confWide && facet === "confidence") onFacet("twopp");
+    if (!confWide && facet === "confidence") onFacet("primary");
   }, [confWide, facet]);
   // …and once the row is actually on the page, put it under the reader's eye.
   // The row and its open detail are centred as one block - centring the
@@ -6674,7 +6679,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      can never clobber each other. The guard against a no-op write matters:
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
-  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i", confidence: "c", demographics: "g" };  // facet → URL letter (inverse of the restore map)
+  const FACET_BY_ID = { twopp: "2", leadership: "l", direction: "d", issues: "i", confidence: "c", demographics: "g" };  // facet → URL letter (inverse of the restore map)
   const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h", income: "n", country: "b" };   // split → URL letter; age is the omitted default
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
@@ -6688,7 +6693,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     if (tagSel.size) p.set("h", archMask(POLL_TAGS.map((t) => t.id), tagSel));
     if (measure !== DEFAULT_MEASURE) p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
-    if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
+    if (facet !== "primary") p.set("f", FACET_BY_ID[facet]);
     // like the split below, the consideration mode only means something on
     // its own facet – and consM can only stand there (onFacet, urlInit)
     if (consM) p.set("k", "1");
