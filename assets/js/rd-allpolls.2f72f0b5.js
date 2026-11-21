@@ -3025,6 +3025,83 @@ function rdLgLines(p, {
   }
   return out;
 }
+function RdLgSig({
+  p
+}) {
+  const q = p.p || {};
+  const ps = rdLgPrims().filter(k => q[k.id] != null);
+  if (ps.length < 3 || rdIsMrp(p)) return null;
+  let n = rdNEff(p);
+  if (!n) return null;
+  const u = window.AUSPOL.undecidedCellOf ? window.AUSPOL.undecidedCellOf(p) : null;
+  if (u && u.label === "excluded" && u.v > 0) n *= 1 - u.v / 100;
+  const test = (a, b) => {
+    const x = +q[a.id] / 100,
+      y = +q[b.id] / 100;
+    const m = 196 * Math.sqrt(Math.max(0, x + y - (x - y) * (x - y)) / n);
+    const g = rdApR1(+q[a.id] - +q[b.id]);
+    return {
+      g,
+      m,
+      sig: Math.abs(g) > m
+    };
+  };
+  const pairs = [];
+  ps.forEach((a, i) => ps.slice(0, i).forEach(b => pairs.push({
+    a,
+    b,
+    ...test(a, b)
+  })));
+  const ns = pairs.filter(x => !x.sig);
+  const sgn = g => (g > 0 ? "+" : g < 0 ? "−" : "") + rdApNum(Math.abs(g));
+  const NM = {
+    alp: "Labor",
+    lnp: "the Coalition",
+    grn: "the Greens",
+    onp: "One Nation",
+    oth: "others"
+  };
+  const nm = id => NM[id] || id;
+  const say = !ns.length ? "Every pair of parties differs significantly in this poll." : ns.length === pairs.length ? "No pair of parties differs significantly in this poll." : "No significant difference between " + ns.map(x => nm(x.b.id) + " and " + nm(x.a.id)).join(", ").replace(/, ([^,]*)$/, ns.length > 2 ? ", or $1" : " or $1") + "; every other pair differs.";
+  return React.createElement("div", {
+    className: "rd-ldg-sigw"
+  }, React.createElement("h4", {
+    className: "rd-ldg-h"
+  }, "Which gaps are real"), React.createElement("p", {
+    className: "rd-ldg-sigsay"
+  }, say), React.createElement("table", {
+    className: "rd-ldg-t rd-ldg-sig"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, React.createElement("span", {
+    className: "sr-only"
+  }, "Row party minus column party")), ps.slice(0, -1).map(k => React.createElement("th", {
+    key: k.id,
+    className: "num",
+    style: {
+      color: k.ink
+    }
+  }, k.lab)))), React.createElement("tbody", null, ps.slice(1).map((a, i) => React.createElement("tr", {
+    key: a.id
+  }, React.createElement("th", {
+    scope: "row",
+    style: {
+      color: a.ink
+    }
+  }, a.lab), ps.slice(0, -1).map((b, j) => {
+    if (j > i) return React.createElement("td", {
+      key: b.id
+    });
+    const t = test(a, b);
+    return React.createElement("td", {
+      key: b.id,
+      className: "num" + (t.sig ? " sig" : ""),
+      title: a.lab + " minus " + b.lab + ": " + sgn(t.g) + " ±" + t.m.toFixed(1) + (t.sig ? ", significant at 95%" : ", within the margin")
+    }, React.createElement("b", null, sgn(t.g)), React.createElement("span", {
+      className: "rd-ldg-ipm"
+    }, " \xB1", t.m.toFixed(1)));
+  }))))), React.createElement("p", {
+    className: "rd-ldg-note"
+  }, "Each cell is the row party\u2019s share minus the column party\u2019s, in points, with its margin of error at 95%: the two shares come from the same voters, so the gap carries its own margin, wider than either share\u2019s. Dark gaps are wider than their margin, so significant. With ", rdNumWord(pairs.length), " pairs, about one significant-looking gap in twenty can be chance alone, and whole-number shares can hide up to a point of a gap."));
+}
 function RdLedger({
   p,
   facet,
@@ -3105,9 +3182,9 @@ function RdLedger({
     className: "rd-ldg-foot1"
   }, p.pollster, " didn\u2019t publish a ", ASKED[facet] || facet, " figure in this poll."))), side && React.createElement("div", {
     className: "rd-ldg-side"
-  }, side), rest.length > 0 && React.createElement("div", {
+  }, side), (rest.length > 0 || facet === "primary") && React.createElement("div", {
     className: "rd-ldg-also"
-  }, React.createElement("h4", {
+  }, rest.length > 0 && React.createElement(React.Fragment, null, React.createElement("h4", {
     className: "rd-ldg-h"
   }, "Also in this poll"), React.createElement("div", {
     className: "rd-ldg-lines"
@@ -3141,7 +3218,9 @@ function RdLedger({
       className: "rd-ldg-arrow",
       "aria-hidden": "true"
     }, away ? "↗" : "→"));
-  }))));
+  }))), facet === "primary" && React.createElement(RdLgSig, {
+    p: p
+  })));
 }
 function RdApPrimRail({
   p
@@ -3834,6 +3913,10 @@ function RdAllPolls(P) {
       const s = sentRef.current,
         h = headRef.current;
       if (!s || !h) return;
+      if (!s.getClientRects().length) {
+        setPinned(false);
+        return;
+      }
       const pin = parseFloat(getComputedStyle(h).top) || 0;
       setPinned(s.getBoundingClientRect().top < pin - 1);
     };
@@ -3848,11 +3931,15 @@ function RdAllPolls(P) {
       passive: true
     });
     window.addEventListener("resize", onResize);
+    const sec = headRef.current && headRef.current.closest(".rd-ap");
+    const ro = typeof ResizeObserver !== "undefined" && sec ? new ResizeObserver(onResize) : null;
+    if (ro) ro.observe(sec);
     fit();
     check();
     return () => {
       window.removeEventListener("scroll", on);
       window.removeEventListener("resize", onResize);
+      if (ro) ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
   }, [phone]);

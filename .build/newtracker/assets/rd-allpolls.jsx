@@ -2992,6 +2992,8 @@ function RdAllPolls(P) {
       raf = 0;
       const s = sentRef.current, h = headRef.current;
       if (!s || !h) return;
+      /* a hidden page has no layout: never pinned there */
+      if (!s.getClientRects().length) { setPinned(false); return; }
       const pin = parseFloat(getComputedStyle(h).top) || 0;
       setPinned(s.getBoundingClientRect().top < pin - 1);
     };
@@ -2999,9 +3001,17 @@ function RdAllPolls(P) {
     const onResize = () => { fit(); on(); };
     window.addEventListener("scroll", on, { passive: true });
     window.addEventListener("resize", onResize);
+    /* leaving All polls scrolled deep (pinned) and coming back by the site
+       tabs showed the page at the top with the bar still on - both tab rows
+       at once (user catch 2026-11-21). No scroll event fires on that return,
+       so re-read whenever the section's box changes, which it does when the
+       page is shown again */
+    const sec = headRef.current && headRef.current.closest(".rd-ap");
+    const ro = typeof ResizeObserver !== "undefined" && sec ? new ResizeObserver(onResize) : null;
+    if (ro) ro.observe(sec);
     fit();
     check();
-    return () => { window.removeEventListener("scroll", on); window.removeEventListener("resize", onResize); if (raf) cancelAnimationFrame(raf); };
+    return () => { window.removeEventListener("scroll", on); window.removeEventListener("resize", onResize); if (ro) ro.disconnect(); if (raf) cancelAnimationFrame(raf); };
   }, [phone]);
   const toSearch = () => {
     const el = searchRef.current;
