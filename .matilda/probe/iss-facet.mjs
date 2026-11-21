@@ -590,7 +590,7 @@ check("phone: every card reads the six verdicts in one line, bars level",
   cardAnatomy.n > 0 && cardAnatomy.off.length === 0, `${cardAnatomy.n} cards; ${cardAnatomy.off.slice(0, 4).join(" | ") || "clean"}`);
 check("phone: the pinned head names the six issues over the cards' columns",
   JSON.stringify(cardAnatomy.head) === JSON.stringify(cardAnatomy.want), cardAnatomy.head.join(" | "));
-check("phone: cards stand at the facets' 122px", Math.abs(cardAnatomy.hMin - 122) < 0.6 && Math.abs(cardAnatomy.hMax - 122) < 0.6,
+check("phone: cards stand at the facets' 139px", Math.abs(cardAnatomy.hMin - 139) < 0.6 && Math.abs(cardAnatomy.hMax - 139) < 0.6,
   `${cardAnatomy.hMin.toFixed(1)}–${cardAnatomy.hMax.toFixed(1)}px`);
 check("phone: the Ipsos cards are there", cardAnatomy.ipsos === exp.issOnly, `${cardAnatomy.ipsos}/${exp.issOnly}`);
 

@@ -87,8 +87,8 @@ for (const [vw, vh] of [[320, 568], [340, 640], [360, 640], [390, 844], [402, 87
 
   for (const name of FLOORED) {
     const d = out[name];
-    check(`@${vw} ${name}: every card is EXACTLY the 122px floor (single height)`,
-      d.uniq.length === 1 && Math.abs(d.uniq[0] - 122) < 0.51,
+    check(`@${vw} ${name}: every card is EXACTLY the 139px floor (single height)`,
+      d.uniq.length === 1 && Math.abs(d.uniq[0] - 139) < 0.51,
       `cards=${d.n} uniq=${JSON.stringify(d.uniq)} minH=${d.minH}`);
   }
   check(`@${vw} all four floored facets carry the same single height`,
@@ -97,8 +97,8 @@ for (const [vw, vh] of [[320, 568], [340, 640], [360, 640], [390, 844], [402, 87
     JSON.stringify(Object.fromEntries(FLOORED.map((f) => [f, out[f].uniq]))));
 
   const t = out.twopp;
-  check(`@${vw} twopp: exempt from the floor (93.94 / 121.94 lean-sub, no min-height)`,
-    t.uniq.every((h) => h <= 122.01) && t.minH === "0px",
+  check(`@${vw} twopp: exempt from the floor (93.94 / 138.94 lean-sub, no min-height)`,
+    t.uniq.every((h) => h <= 139.01) && t.minH === "0px",
     `uniq=${JSON.stringify(t.uniq)} minH=${t.minH}`);
 
   const mrows = FLOORED.concat("twopp").flatMap((f) => out[f].mrowUniq);

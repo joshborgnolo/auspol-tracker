@@ -174,11 +174,12 @@ const runDesktop = async () => {
   await page.waitForSelector(".rd-ap-row", { timeout: 20000 });
   await sleep(500);
 
-  // 1. default: intention caption, 40%-capped ladder, the flip offered
+  // 1. default: intention caption, a ladder fitted to the rows shown (30% at
+  //    least, 2026-11-21), the flip offered
   const base = await state(page);
   ok(base.nCons === 9, `data carries the nine consideration waves (saw ${base.nCons})`);
   ok(base.cap === "Primary vote", "default head caption reads Primary vote");
-  ok(base.tks[base.tks.length - 1] === "40%", "default tick ladder ends at the 40% mark");
+  ok(/^[3-9]0%$/.test(base.tks[base.tks.length - 1] || ""), `default tick ladder ends at a ten of 30% or more, fitted to the rows (${base.tks[base.tks.length - 1]})`);
   ok(base.flips.length === 1 && /Voting intention/.test(base.flips[0].text), "the flip reads its live mode, intention, on the Primary facet");
   ok(base.flips[0] && base.flips[0].pressed === "false", "flip starts unpressed");
   ok(base.firstAria.startsWith("Primary vote:"), "top row's aria announces Primary vote");
@@ -383,7 +384,7 @@ const runPhone = async () => {
   ok(on.nums.includes("41") && on.nums.includes("39"), "the top card prints the consideration figures");
   ok(on.subsAll, "every phone card names its basis at the head's right edge, none left under the figures");
   ok(on.geom, "every basis label sits in the head row's right half, above the figures");
-  ok(on.heights.every((h) => Math.abs(h - 122) < 0.51), `every cons card rides the shared 122px rung (${JSON.stringify([...new Set(on.heights)])})`);
+  ok(on.heights.every((h) => Math.abs(h - 139) < 0.51), `every cons card rides the shared 139px rung (${JSON.stringify([...new Set(on.heights)])})`);
   ok(on.nCyc === 3, `three phone cards carry the range cycler (saw ${on.nCyc})`);
   ok(on.rb && on.rb.nTiers === 1, `the phone RedBridge card shows a single figure line (saw ${on.rb && on.rb.nTiers} tiers)`);
   ok(on.rb && on.rb.lab.startsWith("Would consider (≥4/10)"), `the phone RedBridge card opens on the default loose range ("${on.rb && on.rb.lab}")`);

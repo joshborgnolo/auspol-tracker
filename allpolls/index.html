@@ -60,9 +60,9 @@
   <link rel="preload" href="../assets/js/rd.c32013aa.js" as="script">
   <link rel="preload" href="../assets/js/rd-hero.948c4053.js" as="script">
   <link rel="preload" href="../assets/js/rd-panels.ee76495f.js" as="script">
-  <link rel="preload" href="../assets/js/rd-polls.fde1a362.js" as="script">
+  <link rel="preload" href="../assets/js/rd-polls.3e55d06c.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.ecc621d4.js" as="script">
-  <link rel="preload" href="../assets/js/rd-allpolls.a2baf3d0.js" as="script">
+  <link rel="preload" href="../assets/js/rd-allpolls.d4e64825.js" as="script">
   <link rel="preload" href="../assets/js/rd-public-opinion.931ac939.js" as="script">
   <link rel="preload" href="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3c79a15.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 18 November 2026, Labor leads the Coalition 50.7–49.3 two-party preferred on implied preference flows (±1.3), from 193 polls by 13 pollsters. Primary votes, every poll, and the last thirty-one elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
@@ -4474,6 +4474,7 @@ body.rd .rd-pl-ticks > span {
 body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
+body.rd .rd-pl-prim .rd-pl-pm { display: block; line-height: 1.35; margin-top: 1px; }
 body.rd .rd-pl-prim .rd-pl-frac { font-size: 11px; }
 @media (max-width: 900.98px) { body.rd .rd-pl-prim .rd-pl-frac { font-size: 10px; } }
 body.rd .rd-pl-prim .rd-pl-halfwrap { position: relative; display: inline-block; }
@@ -5773,7 +5774,7 @@ body.rd .rd-ap-pinf {
 }
 body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 294px minmax(0, 326px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 364px minmax(0, 256px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(124px, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(56px, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
@@ -5891,6 +5892,14 @@ body.rd .rd-ap-ring {
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
 body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 60px) 64px; }
+body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 60px); }
+body.rd .rd-ap-pnums .rd-ap-pm { margin-left: 3px; }
+body.rd .rd-ap-pnums .rd-ap-pf:has(.rd-ap-half) + .rd-ap-pm { margin-left: 12px; }
+body.rd .rd-ap-pm, body.rd .rd-pl-pm {
+  font-style: normal; font-size: 11px; font-weight: 400; color: var(--ink-3);
+  font-variant-numeric: tabular-nums; white-space: nowrap; letter-spacing: 0;
+}
 body.rd .rd-ap-pnums > .rd-ap-und { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
 body.rd .rd-ap-pnums > .rd-ap-und > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-undhead { text-transform: none; }
@@ -6025,6 +6034,9 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 170px 110px 70px 16px 294px minmax(0, 326px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 46px); }
+  body.rd .rd-ap-undcol .rd-ap-pnums > b > .rd-ap-pf + .rd-ap-pm { display: block; margin-left: 0; line-height: 1.35; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(124px, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(48px, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
@@ -6052,6 +6064,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
   body.rd .rd-ap-pnums { grid-template-columns: repeat(5, 40px); }
   body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 40px) 60px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 40px) 60px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 40px); }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
@@ -6107,7 +6121,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-frow .rd-ap-chev { margin-left: auto; flex: none; align-self: center; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
-  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 122px; }
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 139px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -6125,6 +6139,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
+  body.rd .rd-ap-card .rd-ap-cprim.rd-ap-cmoe > span { display: inline-grid; grid-template-columns: auto auto; column-gap: 4px; align-items: baseline; }
+  body.rd .rd-ap-card .rd-ap-cprim.rd-ap-cmoe .rd-ap-pm { grid-column: 2; line-height: 13px; }
   body.rd .rd-ap-dpair { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
   body.rd .rd-apd-demr { grid-template-columns: minmax(0, 1fr) repeat(5, 40px); padding: 3px 2px; }
   body.rd .rd-apd-dem { --isr-rk: 58px; --isr-p: 36px; --isr-u: 52px; }
@@ -6920,9 +6936,9 @@ body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3)
   <script src="../assets/js/rd.c32013aa.js"></script>
   <script src="../assets/js/rd-hero.948c4053.js"></script>
   <script src="../assets/js/rd-panels.ee76495f.js"></script>
-  <script src="../assets/js/rd-polls.fde1a362.js"></script>
+  <script src="../assets/js/rd-polls.3e55d06c.js"></script>
   <script src="../assets/js/rd-cycles.ecc621d4.js"></script>
-  <script src="../assets/js/rd-allpolls.a2baf3d0.js"></script>
+  <script src="../assets/js/rd-allpolls.d4e64825.js"></script>
   <script src="../assets/js/rd-public-opinion.931ac939.js"></script>
   <script src="../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3c79a15.js"></script>
 

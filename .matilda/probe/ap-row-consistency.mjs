@@ -230,7 +230,7 @@ for (const W of [390, 320]) {
   });
   check(c.dupe === 0 && c.once === c.n, `@${W} confidence: each card prints its change once`, `${c.n} cards`);
   check(c.nab.length > 0 && c.nab.every(Boolean), `@${W} confidence: NAB cards carry "net balance" under the figure`);
-  check(c.heights.length === 1 && c.heights[0] === 122, `@${W} confidence: one card height, the 122px floor`, JSON.stringify(c.heights));
+  check(c.heights.length === 1 && c.heights[0] === 139, `@${W} confidence: one card height, the 139px floor`, JSON.stringify(c.heights));
   check(c.csubFlex === 0, `@${W} confidence: the summary line is a sentence, not a gapped flex row`);
   await page.goto(BASE + "?f=d", { waitUntil: "networkidle0" });
   await new Promise((r) => setTimeout(r, 400));

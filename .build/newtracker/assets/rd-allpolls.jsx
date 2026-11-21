@@ -41,6 +41,31 @@ function rdPollMargin(p, contest, pub) {
   return 196 * Math.sqrt(Math.max(0, e2 - e1 * e1) / n);
 }
 
+/* a primary figure's margin of error at 95% (user call 2026-11-21: a ±
+   beside every primary, and the undecided share, in both poll tables). A
+   share is each respondent's own answer, so p(1 - p) over the effective
+   sample rdPollMargin and rdMarginBasis use - the APC figure where the house
+   printed one, else the raw sample over the design effect. That n counts
+   everyone interviewed. Where the house prints its parties with the
+   undecided taken out (undecidedCellOf's "excluded"), each party's share is
+   of the decided only, so its base shrinks to n(1 - und); the undecided
+   share itself (und = true) is of everyone. Included and forced-choice
+   tables keep the whole n. None without a sample, and none for an MRP
+   series: its national shares are modelled from seat cells, not read off
+   a simple sample */
+function rdPrimMoe(p, v, und) {
+  if (v == null || !p || / \(MRP\)$/.test(p.pollster || "")) return null;
+  let n = p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0);
+  if (!n) return null;
+  if (!und) {
+    const u = window.AUSPOL.undecidedCellOf ? window.AUSPOL.undecidedCellOf(p) : null;
+    if (u && u.label === "excluded" && u.v > 0) n *= 1 - u.v / 100;
+  }
+  const s = Math.max(0, Math.min(100, +v)) / 100;
+  return s > 0 ? 196 * Math.sqrt((s * (1 - s)) / n) : null;
+}
+const rdPrimMoeTxt = (p, v, und) => { const m = rdPrimMoe(p, v, und); return m == null ? null : "±" + m.toFixed(1); };
+
 /* what a poll's margin stands on, said beside it wherever it shows: the
    pollster's own effective sample (its APC statement), or, where it printed
    none for this poll, the raw sample over the design effect rdPollMargin
@@ -2515,6 +2540,10 @@ function RdAllPolls(P) {
   const noun1 = facet === "confidence" ? "release" : "poll";
   const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
+  /* at or under 1240px vote intention's ±s drop under their figures and
+     the primary strip keeps its full track (rd.css); above, the strip is
+     the narrow one and its dots dodge on a wider radius */
+  const midW = useNarrow("(max-width: 1240px)");
   /* The tab row only holds the two-party control (and the demographics
      facet's split picker) while the tabs and the control fit between the
      margins: below ~810px the five-tab group plus the nowrap "Two-party"
@@ -2571,7 +2600,9 @@ function RdAllPolls(P) {
      the remaining ~=5px coming from the primary block's line/margin
      collapses. Applied as an inline height so the CSS 28px strip stays
      the lean-less default. */
-  const primStripH = 56;
+  /* 73 since 2026-11-21: the primary card grew 17px (138.69, its ± line
+     under each figure), so the lean-sub card's strip grows with it */
+  const primStripH = 73;
 
   /* a published-only matchup from an old link has no place in the redesign's
      table: the rare contests live in Includes now */
@@ -2859,9 +2890,20 @@ function RdAllPolls(P) {
   /* the primary strip's scale: consideration figures run past 60 on
      Essential's and RedBridge/Accent's looser tiers (the would-not tier
      tops 69), intention tops out near 40 */
-  const PMAX = (facet === "primary" && consM) ? 70 : 45;
+  /* Vote intention's scale fits the rows on screen (user call 2026-11-21:
+     "it goes to 40%, which is too high ... nothing's polling above 30"):
+     the highest primary shown, rounded up to 5, never under 30 (the month
+     rings average the same rows, so they never run past it). Every shown
+     row shares the one scale, and it widens only when the reader shows
+     older rows that need it. The narrower track it allows is where each
+     figure's ± sits */
+  const shownRows = groups ? groups.flatMap((g) => g.list) : flat || [];
+  const pTop = shownRows.reduce((mx, p) => Math.max(mx, ...Object.values(p.p || {}).map((v) => +v || 0)), 0);
+  const PMAX = (facet === "primary" && consM) ? 70 : Math.max(30, Math.ceil(pTop / 5) * 5);
   const PTKS = [];
-  for (let v = 0; v < PMAX; v += 10) PTKS.push(v);
+  /* consideration keeps its open end (ticks to 60 on the 70 scale);
+     intention's last tick is the scale's end where that falls on a ten */
+  for (let v = 0; (facet === "primary" && consM) ? v < PMAX : v <= PMAX; v += 10) PTKS.push(v);
   const PLAST = PTKS[PTKS.length - 1];
   const pdx = (v) => (Math.max(0, Math.min(PMAX, v)) / PMAX) * 100;
   /* dots whose figures land within the glyph's width of each other paint
@@ -2873,8 +2915,9 @@ function RdAllPolls(P) {
      (the 10px glyph plus its halo) fans out into a little tower instead:
      the 28px strip holds ±6px of centre, so a stack spans its full height
      and both neighbours keep their own ladder position in x. */
-  const rdApDodge = (xs) => {
-    const R = 3.2; /* ≈ the 13px glyph-and-halo's share of the 334-362px track */
+  const rdApDodge = (xs, R = 3.2) => {
+    /* R ≈ the 13px glyph-and-halo's share of the 334-362px track; the
+       primary strip's narrower desktop track (~200-250px) passes its own */
     const tops = new Array(xs.length).fill(0);
     const ord = xs.map((_, i) => i).sort((a, b) => xs[a] - xs[b]);
     for (let i = 0; i < ord.length;) {
@@ -3228,13 +3271,13 @@ function RdAllPolls(P) {
       const und = consM ? null : D.undecidedCellOf(p);
       const undCell = !consM && (
         <span className="rd-ap-und">
-          <b>{und ? rdApPrimFig(und.v) : "—"}</b>
+          <b>{und && und.v != null && rdPrimMoeTxt(p, und.v, true) ? <><span className="rd-ap-pf">{rdApPrimFig(und.v)}</span><i className="rd-ap-pm">{rdPrimMoeTxt(p, und.v, true)}</i></> : und ? rdApPrimFig(und.v) : "—"}</b>
           {und && <span className="rd-ap-sub">{und.label}</span>}
         </span>
       );
       const primNums = (m) => <span className={"rd-ap-pnums" + (consM ? "" : " rd-ap-hasund")}>{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>)}{undCell}</span>;
       const primStrip = (m, ariaPre) => {
-        const cols = prims.filter((k) => m[k.id] != null), tops = rdApDodge(cols.map((k) => pdx(m[k.id])));
+        const cols = prims.filter((k) => m[k.id] != null), tops = rdApDodge(cols.map((k) => pdx(m[k.id])), phone || consM || midW ? 3.2 : 6);
         return (
         <span className="rd-ap-pic" role="img" aria-label={ariaPre + cols.map((k) => k.lab + " " + rdApNum(m[k.id])).join(", ")}>
           <span className="rd-ap-in">
@@ -3246,7 +3289,16 @@ function RdAllPolls(P) {
         </span>
         );
       };
-      const primCardNums = (m) => <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b></span>)}</div>;
+      /* each vote figure's ± (rdPrimMoe) rides after it in a quiet ink: on
+         the desktop hugging the figure (rd-ap-pf marks where a ½ hangs, so
+         the ± can step clear of it); on a phone card under it.
+         Consideration tiers carry none */
+      const moeOf = (m, k) => (consM ? null : rdPrimMoeTxt(p, m[k.id]));
+      const primB = (m, k) => {
+        const mo = moeOf(m, k);
+        return <b key={k.id} style={{ color: k.ink }}>{mo ? <><span className="rd-ap-pf">{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</span><i className="rd-ap-pm">{mo}</i></> : m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>;
+      };
+      const primCardNums = (m) => <div className={"rd-ap-cprim" + (consM ? "" : " rd-ap-cmoe")}>{prims.map((k) => { const mo = moeOf(m, k); return <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{m[k.id] != null ? rdApPrimFig(m[k.id]) : "—"}</b>{mo && <i className="rd-ap-pm">{mo}</i>}</span>; })}</div>;
       if (tiers) {
         /* the cycler's fragment is BOTH cells (figures cell then strip) on
            the desktop, so it parks at the figs slot and pic stays empty;
@@ -3255,13 +3307,13 @@ function RdAllPolls(P) {
         if (phone) consEdge = (cardHead) => <RdApConsCyc tiers={tiers} phone primNums={primNums} primStrip={primStrip} primCardNums={primCardNums} cardHead={cardHead} />;
         else { figs = <RdApConsCyc tiers={tiers} primNums={primNums} primStrip={primStrip} primCardNums={primCardNums} />; pic = null; }
       } else {
-        figs = <span role="cell" className="rd-ap-pnums rd-ap-hasund">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}{undCell}</span>;
+        figs = <span role="cell" className="rd-ap-pnums rd-ap-hasund">{prims.map((k) => primB(pr, k))}{undCell}</span>;
         pic = primStrip(pr, "Primary vote: ");
         body = <>
           {primCardNums(pr)}
           <div className="rd-ap-cpic">{pic}</div>
         </>;
-        right2 = und ? <span className="rd-ap-sub"><span className="rd-ap-undhead">Und</span> <b>{rdApPrimFig(und.v)}</b>, {und.label}</span> : null;
+        right2 = und ? <span className="rd-ap-sub"><span className="rd-ap-undhead">Und</span> <b>{rdApPrimFig(und.v)}</b>{und.v != null && rdPrimMoeTxt(p, und.v, true) ? <i className="rd-ap-pm"> {rdPrimMoeTxt(p, und.v, true)}</i> : null}, {und.label}</span> : null;
       }
     } else if (facet === "leadership") {
       const sets = window.ppmContests(p);

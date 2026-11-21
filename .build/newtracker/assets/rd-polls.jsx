@@ -33,7 +33,7 @@ function rdPollRow(p) {
   const d = new Date(pub.slice(0, 10) + "T00:00:00Z");
   const lab = d.getUTCDate() + " " + window.AUSPOL.monthName(d.getUTCMonth() + 1);
   return { pollster: p.pollster, client: p.client, field: p.dateLabel || p.field, released: p.released,
-           published: p.published, publishedLabel: lab, pubSort: pub, sample: p.sample,
+           published: p.published, publishedLabel: lab, pubSort: pub, sample: p.sample, sampleEff: p.sampleEff,
            alpImp: p.alpImp, alpOnImp: p.alpOnImp, alp2pp: p.alp, lnp2pp: p.lnp, p: p.p || {},
            tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl, links: p.links,
            ...(p.noAgg ? { noAgg: true, noAggWhy: p.noAggWhy } : {}),
@@ -323,10 +323,17 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       };
       return (
         <div className="rd-pl-prim">
-          {plParties.map(([id]) => (
-            <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>
-              {primFig(r.p ? r.p[id] : null)}</span>
-          ))}
+          {plParties.map(([id]) => {
+            /* the figure's margin of error (rdPrimMoe) on a quiet line under
+               it: the figures track is one width for every facet, too narrow
+               for a ± beside a half-point figure, and the name and date
+               cells already run two lines, so the row keeps its height */
+            const mo = rdPrimMoeTxt(r, r.p ? r.p[id] : null);
+            return (
+              <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>
+                {primFig(r.p ? r.p[id] : null)}{mo && <i className="rd-pl-pm">{mo}</i>}</span>
+            );
+          })}
         </div>
       );
     }

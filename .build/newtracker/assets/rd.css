@@ -1159,6 +1159,7 @@ body.rd .rd-pl-ticks > span {
 body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
+body.rd .rd-pl-prim .rd-pl-pm { display: block; line-height: 1.35; margin-top: 1px; }
 /* half-point houses (Roy Morgan) print x.5 beside whole figures; an IN-FLOW
    suffix of any size shifts the figure inside the fixed-width lattice —
    desktop rows stutter their ink gaps and the phone's right-aligned figs
@@ -3022,7 +3023,11 @@ body.rd .rd-ap-pinf {
    cost its strip a third of its 400px */
 body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 36px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 390px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 294px minmax(0, 326px) minmax(0, 1fr) 40px; }
+/* vote intention's figures carry a ± each (rdPrimMoe, 2026-11-21); above 1240px the
+   lattice widens 46 -> 60px a party and the strip gives the 70px back - its
+   scale now fits the rows shown (0-30 today, was 0-45), so a point keeps
+   about the width it had */
+body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 200px 120px 76px 36px 364px minmax(0, 256px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(124px, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(56px, 1fr) 40px; }
 /* issues: the six issue cells take the row (who leads on what, 2026-10-04) */
@@ -3182,6 +3187,18 @@ body.rd .rd-ap-ring {
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
 body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 60px) 64px; }
+body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 60px); }
+/* the ± hugs its own figure, so the gap before the next party's figure is
+   the wide one (a fixed ± column read "24  ±2.7 26": the ± looked like
+   ON's). A half's ½ hangs out of flow past the integer, so there the ±
+   steps clear of it */
+body.rd .rd-ap-pnums .rd-ap-pm { margin-left: 3px; }
+body.rd .rd-ap-pnums .rd-ap-pf:has(.rd-ap-half) + .rd-ap-pm { margin-left: 12px; }
+body.rd .rd-ap-pm, body.rd .rd-pl-pm {
+  font-style: normal; font-size: 11px; font-weight: 400; color: var(--ink-3);
+  font-variant-numeric: tabular-nums; white-space: nowrap; letter-spacing: 0;
+}
 body.rd .rd-ap-pnums > .rd-ap-und { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
 body.rd .rd-ap-pnums > .rd-ap-und > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-undhead { text-transform: none; }
@@ -3355,6 +3372,14 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 390px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim.rd-ap-undcol { grid-template-columns: 170px 110px 70px 16px 294px minmax(0, 326px) minmax(0, 1fr) 32px; }
+  /* from here down the lattice goes back to 46px a party and each party's ±
+     drops under its figure (the Latest table's way): beside it, the strip
+     shrank until its dots collided at 1024, and a half-point row ran
+     "24½±2.8 23½" together at 860. The row already stands two lines for
+     the pollster and dates; Und keeps its ± beside it, its label below */
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 46px) 64px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 46px); }
+  body.rd .rd-ap-undcol .rd-ap-pnums > b > .rd-ap-pf + .rd-ap-pm { display: block; margin-left: 0; line-height: 1.35; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(124px, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(48px, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
@@ -3388,6 +3413,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
   body.rd .rd-ap-pnums { grid-template-columns: repeat(5, 40px); }
   body.rd .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 40px) 60px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-hasund { grid-template-columns: repeat(5, 40px) 60px; }
+  body.rd .rd-ap-undcol .rd-ap-pnums.rd-ap-mpn { grid-template-columns: repeat(5, 40px); }
   body.rd .rd-ap-bar { flex-wrap: wrap; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
@@ -3467,7 +3494,9 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
      primary and the exempt 2PP card (93.94) untouched. Width-independent
      at the 320/340/360/390/402 rungs - the sent/issph width ladders keep
      every card one sentence-line deep. Pinned by ap-phcard-heights.mjs */
-  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 122px; }
+  /* 139px since 2026-11-21: the primary card's ± line under each figure
+     (13px + the grid's line box) took its natural 121.69 to 138.69 */
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 139px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -3498,6 +3527,10 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 16px; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
+  /* the card's ± sits under its figure: five parties' labels, figures and
+     ±s need ~360-390px on one line, more than a phone card has */
+  body.rd .rd-ap-card .rd-ap-cprim.rd-ap-cmoe > span { display: inline-grid; grid-template-columns: auto auto; column-gap: 4px; align-items: baseline; }
+  body.rd .rd-ap-card .rd-ap-cprim.rd-ap-cmoe .rd-ap-pm { grid-column: 2; line-height: 13px; }
   body.rd .rd-ap-dpair { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
   body.rd .rd-apd-demr { grid-template-columns: minmax(0, 1fr) repeat(5, 40px); padding: 3px 2px; }
   body.rd .rd-apd-dem { --isr-rk: 58px; --isr-p: 36px; --isr-u: 52px; }
