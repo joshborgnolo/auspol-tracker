@@ -1,0 +1,16 @@
+[
+  {
+    "start": "2007-10-24",
+    "end": "2007-10-25",
+    "published": "2007-10-26",
+    "label": "October 24/25, 2007",
+    "right": 63.5,
+    "wrong": 28,
+    "unsure": 8.5,
+    "sample": null,
+    "method": "Phone",
+    "url": "https://web.archive.org/web/20071029045306id_/http://www.roymorgan.com/news/polls/2007/4233/index.cfm?printversion=yes",
+    "quote": "Roy Morgan Finding 4233, direction table: the October 24/25 telephone column prints Right direction 63.5, Wrong direction 28, Can't say 8.5 (a tabulated reading, the same release as the October 20/21 face-to-face wave).",
+    "table": true
+  }
+]

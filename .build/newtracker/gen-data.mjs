@@ -2134,6 +2134,63 @@ const directionOnlyPolls = DIR
   })
   .sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
+/* ---- 5dh. national direction BACK HISTORY, one house at a time ----------
+   data/direction-history.json (rebuilt by .build/backfill-direction-history.mjs)
+   carries Roy Morgan's printed waves before the live direction[] file opens:
+   its Government Confidence Rating tables, which tabulate January 2012
+   onward, plus individually sourced 2006–2011 releases. The live rows above
+   take over from there — Essential's national-mood question starts June
+   2022 — so EVERY house's run is monthly means of its own printed waves,
+   nothing pooled across houses, nothing house-effect adjusted and no
+   confidence interval (those are the pooled model's, above; this is the
+   published record, as the confidence panel's §5l deep series is). A month
+   no wave printed stays absent rather than being filled in. Where the two
+   files know the same wave, the live row is the one counted. */
+const dirHistory = (() => {
+  if (JUR) return null;            // federal history only; /vic/ has its own run
+  const file = path.join(ROOT, "data", "direction-history.json");
+  const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { waves: [] };
+  const rows = old.waves.filter((w) => (w.end || w.published) && w.right != null && w.wrong != null)
+    .map((w) => ({
+      date: w.end || w.published, pollster: w.pollster || "Roy Morgan",
+      right: w.right, wrong: w.wrong,
+      unsure: w.unsure != null ? w.unsure : Math.max(0, r1(100 - w.right - w.wrong)),
+      // a table row duplicating a live wave on figures alone still drops out
+      key: `${w.end}|${w.right}|${w.wrong}`,
+    }));
+  const liveKeys = new Set(DIR.map((d) => `${d.date}|${d.right}|${d.wrong}`));
+  const byHouse = new Map();
+  for (const w of rows) if (!liveKeys.has(w.key)) {
+    if (!byHouse.has(w.pollster)) byHouse.set(w.pollster, []);
+    byHouse.get(w.pollster).push(w);
+  }
+  for (const d of DIR) {
+    if (d.right == null || d.wrong == null) continue;
+    if (!byHouse.has(d.pollster)) byHouse.set(d.pollster, []);
+    byHouse.get(d.pollster).push({ date: d.date, right: d.right, wrong: d.wrong,
+      unsure: d.unsure != null ? d.unsure : Math.max(0, r1(100 - d.right - d.wrong)) });
+  }
+  const houses = {};
+  for (const [house, ws] of byHouse) {
+    const months = new Map();
+    for (const w of ws) {
+      const ym = ymOf(w.date);
+      if (!months.has(ym)) months.set(ym, { ym, n: 0, right: 0, wrong: 0, unsure: 0 });
+      const m = months.get(ym);
+      m.n++; m.right += w.right; m.wrong += w.wrong; m.unsure += w.unsure;
+    }
+    const pts = [...months.values()].sort((a, b) => a.ym.localeCompare(b.ym)).map((m) => ({
+      ym: m.ym, x: mx(m.ym), n: m.n,
+      right: r1(m.right / m.n), wrong: r1(m.wrong / m.n), unsure: r1(m.unsure / m.n),
+    }));
+    if (pts.length) houses[house] = pts;
+  }
+  if (!Object.keys(houses).length) return null;
+  const all = Object.values(houses).flat();
+  return { houses, from: all.reduce((a, p) => (p.ym < a ? p.ym : a), all[0].ym),
+    sources: old.sources || [] };
+})();
+
 /* ---- 5i. issues waves – per-wave what-matters / who's-best data, keyed to
    the archive row the question was asked in. Same join convention as
    direction above: each salience/ownership wave in data/issues.json carries
@@ -9415,6 +9472,12 @@ window.AUSPOL = (function () {
      none of those can fall behind a house that started or stopped */
   const apprHouses = ${JSON.stringify(apprHouses)};
   const directionPolls = ${JSON.stringify(directionPolls)};
+  /* the direction question's back history (§5dh): per house, monthly means
+     of its OWN printed waves — Roy Morgan from the GCR tables and archived
+     releases, the live direction[] rows from where each house starts. The
+     direction panel's history window and government strip read this; the
+     pooled model above never covers these years. */
+  const dirHistory = ${JSON.stringify(dirHistory)};
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
@@ -9664,7 +9727,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {

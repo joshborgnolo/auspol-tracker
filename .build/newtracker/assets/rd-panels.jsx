@@ -2160,7 +2160,45 @@ function RdDirectionView({ rangeId }) {
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   }, [grpId]);
   if (!D.direction.length) return null;
-  const xDomain = rangeDomain(rangeId);
+  /* ---- the history window (the confidence panel's machinery) ------------
+     gen-data §5dh ships every house's own monthly record (Roy Morgan's GCR
+     tables and archived releases, Essential from June 2022) as D.dirHistory.
+     With it on the page the all-voters chart takes the same window the
+     confidence charts use — term / 10 yrs / 25 yrs / All, stepping ‹ ›, and
+     the miniature strip with the governments beneath — and a window
+     reaching behind the pooled model's May 2025 start draws the houses'
+     own published runs beside it. A group cut stays on the old range:
+     those series only exist for the current term. */
+  const HIST = D.dirHistory && D.dirHistory.houses ? D.dirHistory : null;
+  const nowX = D.domain.x1;
+  const TERMS = React.useMemo(() => confTermsOf(D), [D]);
+  const curTerm = TERMS.find((t) => t.current) || TERMS[TERMS.length - 1];
+  const [winS, setWinS] = React.useState(() => confTermWin(curTerm, nowX));
+  const [dragging, setDragging] = React.useState(false);
+  const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
+  const poolStart = D.direction[0].x;
+  const histLanesAll = HIST ? Object.keys(HIST.houses).sort((a, b) => HIST.houses[a][0].x - HIST.houses[b][0].x)
+    .map((house) => ({ house, pts: HIST.houses[house] })) : [];
+  /* only houses with a record BEFORE the pooled series opens get a history
+     lane, so a house that started mid-term never doubles the recent lines */
+  const histLanes = histLanesAll.filter((l) => l.pts[0].x < poolStart);
+  const histLo = histLanes.length ? Math.min(...histLanes.map((l) => l.pts[0].x)) : poolStart;
+  const ext = { lo: histLanes.length ? histLo : poolStart, hi: nowX };
+  const vTerms = confViewTerms(TERMS, ext.lo, ext.hi);
+  const histOn = !!(histLanes.length && !grpId);
+  const win = histOn
+    ? (winS.kind === "term-carry" ? { kind: "custom", a: Math.max(ext.lo, winS.a), b: winS.b }
+      : confClampWin(winS, vTerms, ext.lo, ext.hi, nowX))
+    : null;
+  const winShown = histOn && winS.kind === "term-carry" ? { ...win, kind: "term-carry", year: winS.year } : win;
+  const isTerm = histOn && win.kind === "term";
+  const winTerm = isTerm ? vTerms.find((t) => t.year === win.year) : null;
+  const isCur = !!(winTerm && winTerm.current);
+  const housesOn = histOn && histLanes.some((l) => l.pts.some((p) =>
+    p.x >= win.a && p.x <= win.b && p.x < poolStart));
+  const dotsOn = win ? win.b - win.a <= 4.6 : true;
+  const xDomain = histOn ? [win.a, win.b] : rangeDomain(rangeId);
+  const xTicks = histOn ? confWinTicks(win, vTerms, nowX) : null;
   const pts = filterPts(D.direction, xDomain[0]);
   const now = D.directionNow || D.direction[D.direction.length - 1];
   const M = D.direction;
@@ -2190,7 +2228,7 @@ function RdDirectionView({ rangeId }) {
         : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025.") : ".");
   const signedP = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
-  const dots = (D.directionPolls || []).filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap((d) => [
+  const dots = (D.directionPolls || []).filter((d) => dotsOn && d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap((d) => [
     { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta: d },
     { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta: d },
   ]);
@@ -2199,8 +2237,25 @@ function RdDirectionView({ rangeId }) {
     { id: "ci-right", color: "var(--mood-pos)", className: "ci-band", edge: false, points: band("right", "rightCi") },
     { id: "ci-wrong", color: "var(--mood-neg)", className: "ci-band", edge: false, points: band("wrong", "wrongCi") },
   ].filter((a) => a.points.length >= 2);
-  const vals = pts.flatMap((p) => [p.right, p.wrong]).concat(dots.map((d) => d.y)).concat(areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+  const inW = (p) => p.x >= xDomain[0] && p.x <= xDomain[1];
+  const histSeries = !housesOn ? [] : histLanes.flatMap((l) => {
+    const pts = { right: [], wrong: [] };
+    for (const p of l.pts) if (inW(p) && p.x < poolStart) for (const k of ["right", "wrong"]) pts[k].push({ x: p.x, y: p[k], ym: p.ym });
+    /* Roy Morgan solid, every other house dotted — right/wrong keep the
+       mood colours everywhere, the dash carries WHICH house printed it */
+    const dash = l.house === "Roy Morgan" ? null : "0.1 3.6";
+    return ["right", "wrong"].filter((k) => pts[k].length >= 2).map((k) => ({
+      id: "hist-" + k + "-" + l.house, color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)",
+      label: l.house + ", " + (k === "right" ? "right direction" : "wrong track"),
+      points: pts[k], rdWidth: 1.5, opacity: dash ? 0.85 : 0.75, dash: dash || undefined,
+      smooth: false, endCap: false, endAtWin: true, interpHover: true,
+    }));
+  });
+  const vals = pts.flatMap((p) => [p.right, p.wrong]).concat(dots.map((d) => d.y))
+    .concat(areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])))
+    .concat(histSeries.flatMap((s) => s.points.map((p) => p.y)));
   const lo = Math.floor((Math.min(...vals) + 0.6) / 10) * 10, hi = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
+  const yd = useConfChase([lo, hi], dragging);
   /* the gap drawn where it now stands, against the month before Bondi */
   const bondi = (D.events || []).find((e) => e.date === "2025-12-14");
   const last = pts[pts.length - 1];
@@ -2208,15 +2263,31 @@ function RdDirectionView({ rangeId }) {
   const gapNow = last ? Math.abs(last.wrong - last.right) : null;
   /* the gap is named where it is drawn, on a phone too, as the canvas did:
      three short lines beside the bracket rather than a note under the chart */
-  const brackets = !last ? [] : !narrow ? [{ x: last.x, y0: last.wrong, y1: last.right, lines: [
+  const brackets = !last || (histOn && !isCur) ? [] : !narrow ? [{ x: last.x, y0: last.wrong, y1: last.right, lines: [
     gapNow.toFixed(1) + " points apart in " + D.monthNameFull(Number(last.ym.slice(5))),
     base ? "up from " + Math.abs(base.wrong - base.right).toFixed(1) + " in " + D.monthNameFull(Number(base.ym.slice(5))) + ", before Bondi" : null,
   ].filter(Boolean) }] : [{ x: last.x, y0: last.wrong, y1: last.right, dx: 4, lines: [
     gapNow.toFixed(1) + " points apart", "in " + D.monthNameFull(Number(last.ym.slice(5))) + (base ? ";" : ""),
     base ? Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : null,
   ].filter(Boolean) }];
-  const evs = bondi ? [bondi] : [];
-  const badges = narrow ? rdEventBadges("dir", evs, xDomain[0], xDomain[1]) : null;
+  const elecEvs = histOn && !isCur ? confElectionEvents(win, vTerms) : [];
+  const elecRules = elecEvs.length > 6;
+  const evs = histOn && !isCur ? (elecRules ? [] : elecEvs) : bondi ? [bondi] : [];
+  const badges = narrow && (!histOn || isCur) ? rdEventBadges("dir", evs, xDomain[0], xDomain[1]) : null;
+  /* the strip under the chart: each house's net (right minus wrong) over
+     its whole published run — the miniature is the record, not the
+     pooled estimate, with the governments from D.cycles beneath it */
+  const stripLines = histLanes.map((l) => ({
+    color: l.house === "Roy Morgan" ? "var(--mood-neg)" : "var(--ink-3)",
+    points: l.pts.map((p) => ({ x: p.x, y: p.right - p.wrong })),
+  }));
+  /* the hover guide lands on whichever house's month it is (the pooled
+     months are the same mid-month grid), so past windows still read a
+     month name rather than a bare axis position */
+  const chartMonths = histSeries.length
+    ? [...new Map(histSeries.flatMap((s) => s.points).concat(pts.map((p) => ({ x: p.x, ym: p.ym })))
+      .map((p) => [p.x, p])).values()].sort((a, b) => a.x - b.x)
+    : pts;
   /* who supplies the readings, and how many, lives in Info's National
      direction entry; the foot keeps only the note about the figures above */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
@@ -2354,6 +2425,7 @@ function RdDirectionView({ rangeId }) {
       </div>
       <p className="rd-dir-net"><b>Net {signedP(now.net)} points</b>
         {now.chg != null && <>, {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig === false ? ", within the margin" : ""}</>}</p>
+      {histOn && <RdConfWinBar win={winShown} terms={vTerms} lo={ext.lo} hi={ext.hi} nowX={nowX} onWin={onWin} />}
       <div className="card rd-card rd-dir-chart">
         <div className="rd-chead"><span className="rd-chead-t">{narrow || G
           ? "Right direction and wrong track, %"
@@ -2406,25 +2478,35 @@ function RdDirectionView({ rangeId }) {
         ) : (
           <TrendChart key="rd-dir" heightPx={narrow ? 280 : 360}
             padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
-            xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
+            xDomain={xDomain} yDomain={histOn ? yd : [lo, hi]}
+            yTicks={histOn ? confTicksIn(yd, 10) : rdYTicks(lo, hi, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
             /* the axis opens on the election tick, as the 2PP, primary and
                mood charts do - 2025 + 122/365 is 3 May 2025 on gen-data's dx
                counting (rdXTicks's month grid would open at July, May falling
-               between its quarter steps) */
-            xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
+               between its quarter steps); a history window rides the
+               confidence panel's term/year ruler instead */
+            xTicks={xTicks || rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
+            driven={dragging}
             series={[
-              { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
-              { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" },
+              ...histSeries,
+              { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Wrong track" },
+              { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Right direction" },
             ]}
-            spine={series(pts, "right")} areas={areas} scatter={dots} pollFacet="direction"
+            spine={histSeries.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet="direction"
             events={badges ? badges.events : evs} brackets={brackets}
-            tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
-            extraRows={(i) => { const d = pts[i]; return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
+            vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
+            tooltipTitle={(i) => (chartMonths[i] ? monthLabelFull(chartMonths[i].ym) : "")}
+            extraRows={(i) => { const d = pts.find((p) => p.x === (chartMonths[i] || {}).x); return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
             fmt={(v) => v.toFixed(1)}
-            copy={{ title: "Is Australia heading in the right direction?", sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
-                    caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : ""), legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
+            copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
+                    sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
+                    caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : "")
+                      + (housesOn ? " Behind the pooled line (from May 2025) the thinner lines are each house’s OWN published record, monthly means of the waves it printed, nothing adjusted: " + histLanes.map((l) => l.house).join(", ") + " — Roy Morgan’s Government Confidence Rating tables and archived releases (thin solid) and Essential’s national-mood reports (dotted). Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling." : ""),
+                    legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
           />
         )}
+        {histOn && <RdConfStrip lines={stripLines} lo={ext.lo} hi={ext.hi} win={win} terms={vTerms} onWin={onWin}
+                                narrow={narrow} label="National direction, right less wrong track" />}
         {badges && !G && <RdEventList list={badges.list} />}
         {G ? (
           <RdKey className="rd-ckey" items={[
@@ -2434,8 +2516,10 @@ function RdDirectionView({ rangeId }) {
           ]} />
         ) : (
           <RdKey className="rd-ckey" items={[
-            { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+            dotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll" } : null,
             { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
+            housesOn ? { kind: "line", color: "var(--ink-3)", label: "Thinner lines: each house’s own published monthly record, unadjusted — Roy Morgan solid, other houses dotted" } : null,
+            (histOn && !isTerm) ? { kind: "line", color: "var(--ink-3)", label: "A faint rule is a federal election; the strip beneath carries the governments" } : null,
           ]} />
         )}
       </div>
@@ -2458,6 +2542,10 @@ function RdDirectionView({ rangeId }) {
         <HowTo paras={[
           <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
           <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
+          ...(histOn ? [
+            <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole direction record in miniature with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
+            <>Before May 2025 there is no pooled estimate to draw, so a window reaching further back shows each house’s own published record instead: monthly means of the waves it printed, with no adjustment for house lean and no interval — Roy Morgan solid, Essential dotted. Roy Morgan’s record comes from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007; Essential’s national-mood question starts in June 2022. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
+          ] : []),
         ]} />
       )}
       <RdFoot how={{ term: "direction", from: "National mood" }}>{foot}</RdFoot>
