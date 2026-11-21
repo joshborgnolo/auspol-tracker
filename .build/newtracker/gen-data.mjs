@@ -2136,10 +2136,11 @@ const directionOnlyPolls = DIR
 
 /* ---- 5dh. national direction BACK HISTORY, one house at a time ----------
    data/direction-history.json (rebuilt by .build/backfill-direction-history.mjs)
-   carries Roy Morgan's printed waves before the live direction[] file opens:
-   its Government Confidence Rating tables, which tabulate January 2012
-   onward, plus individually sourced 2006–2011 releases. The live rows above
-   take over from there — Essential's national-mood question starts June
+   carries each house's printed waves before the live direction[] file opens:
+   Roy Morgan's tables and sourced releases, SEC Newgate's reprinted national
+   chart (series colours identify right/wrong even when they cross), and
+   RedBridge's image trend, independently read in two reports. The live rows
+   above take over from there — Essential's national-mood question starts June
    2022 — so EVERY house's run is monthly means of its own printed waves,
    nothing pooled across houses, nothing house-effect adjusted and no
    confidence interval (those are the pooled model's, above; this is the
@@ -2150,15 +2151,18 @@ const dirHistory = (() => {
   if (JUR) return null;            // federal history only; /vic/ has its own run
   const file = path.join(ROOT, "data", "direction-history.json");
   const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { waves: [] };
-  const rows = old.waves.filter((w) => (w.end || w.published) && w.right != null && w.wrong != null)
+  const rows = old.waves.filter((w) => (w.end || w.published || w.month) && w.right != null && w.wrong != null)
     .map((w) => ({
-      date: w.end || w.published, pollster: w.pollster || "Roy Morgan",
+      // Reprinted house series give an exact month, not fieldwork days. The
+      // mid-month date is chart geometry only; `month` stays the identity.
+      date: w.end || w.published || `${w.month}-15`, month: w.month,
+      pollster: w.pollster || "Roy Morgan",
       right: w.right, wrong: w.wrong,
       unsure: w.unsure != null ? w.unsure : Math.max(0, r1(100 - w.right - w.wrong)),
       // a table row duplicating a live wave on figures alone still drops out
-      key: `${w.end}|${w.right}|${w.wrong}`,
+      key: `${w.month || w.end}|${w.right}|${w.wrong}`,
     }));
-  const liveKeys = new Set(DIR.map((d) => `${d.date}|${d.right}|${d.wrong}`));
+  const liveKeys = new Set(DIR.map((d) => `${d.month || d.date}|${d.right}|${d.wrong}`));
   const byHouse = new Map();
   for (const w of rows) if (!liveKeys.has(w.key)) {
     if (!byHouse.has(w.pollster)) byHouse.set(w.pollster, []);
@@ -2174,7 +2178,7 @@ const dirHistory = (() => {
   for (const [house, ws] of byHouse) {
     const months = new Map();
     for (const w of ws) {
-      const ym = ymOf(w.date);
+      const ym = w.month || ymOf(w.date);
       if (!months.has(ym)) months.set(ym, { ym, n: 0, right: 0, wrong: 0, unsure: 0 });
       const m = months.get(ym);
       m.n++; m.right += w.right; m.wrong += w.wrong; m.unsure += w.unsure;
@@ -2475,50 +2479,63 @@ const directionNow = (() => {
   return out;
 })();
 
-/* ---- 5dp. national direction, the two-house stretch before this term ----
-   From June 2022 (Essential's first national-mood wave) to the month
-   before the pooled series above opens, two houses asked the question:
-   Roy Morgan (its Government Confidence Rating waves, from
-   data/direction-history.json, with any wave the live file also holds
-   counted once, from the live file) and Essential (the live direction[]
-   rows). That is the headline's own condition for pooling, so this stretch
-   is built like the monthly rows above – sample-weighted monthly means,
-   each house's repeat waves deflated to sqrt(m), interval from the spread
-   between readings floored by sampling error (monthWithSe) – with one
-   change forced by the count: with two houses, "the other houses" a lean
-   is measured against is the other house, so houseEffectsFor would charge
-   each the whole gap. pairLeanFor splits it instead, half to each side,
-   read at the month as every lean is (the §7h issue-salience pair uses the
-   same estimator). The line therefore sits at the two houses' middle;
-   the current term's consensus is six houses wide, so the join can step
-   by however far that middle sits from it. Before June 2022 Roy Morgan
-   asked alone: nothing to pool or adjust, and its own printed run (§5dh)
-   is what the panel draws there. Waves with no printed sample take the
-   standing 1200 default, as dirSample does. */
-const DIR_PRE_FROM = "2022-06";
-const DIR_PRE_HOUSES = ["Roy Morgan", "Essential"];
+/* ---- 5dp. national direction, the houses' runs before this term ----
+   SEC Newgate starts the multi-house span in March 2022, Essential joins
+   in June 2022 and RedBridge/Accent in February 2024. Every printed wave
+   joins in its own month; these are not treated as a continuously staffed
+   panel of four. The estimator is the headline's – sample-weighted
+   monthly means, repeat waves deflated to sqrt(m), intervals from the
+   spread floored by sampling error. Two-house stretches use pairLeanFor
+   (an unidentified level means no whole gap can be assigned to one house);
+   three or more houses use houseEffectsFor as the current-term series
+   does. House-reprinted series carry an exact month only, placed at its
+   midpoint in the model but labelled with their month and no fieldwork
+   days. Before March 2022 Roy Morgan's printed waves alone supply the
+   series. Waves with no printed sample take the standing 1200 default. */
+const DIR_PRE_FROM = "2022-03";
+const DIR_PRE_HOUSES = ["Roy Morgan", "SEC Newgate", "Essential", "RedBridge/Accent"];
+const dirPreLeanFor = (rows) => {
+  const firms = [...new Set(rows.map((r) => r.firm))];
+  const multiple = houseEffectsFor(rows);
+  const pairs = new Map();
+  const at = (firm, t) => {
+    // Coverage varies by month. Only the multi-house estimator can charge an
+    // individual house a whole measured lean; where just two houses overlap,
+    // use those two houses' own pair, half the unidentified gap either side.
+    const here = [...new Set(rows.filter((r) => Math.abs(ddays(r.mid, t)) <= HE_WINDOW).map((r) => r.firm))];
+    if (here.length < 3) {
+      const key = here.join("|");
+      if (!pairs.has(key)) pairs.set(key, pairLeanFor(rows.filter((r) => here.includes(r.firm))));
+      return pairs.get(key).at(firm, t);
+    }
+    return multiple.at(firm, t);
+  };
+  return { firms, estimable: multiple.estimable, evidenceN: multiple.evidenceN,
+    snapshot: multiple.snapshot, at,
+    gapAt: (t) => firms.length < 2 ? null : at(firms[0], t) - at(firms[1], t) };
+};
 const directionPre = (() => {
   if (JUR || !direction.length) return null;
   const to = direction[0].ym;                    // exclusive: the pooled series takes over here
-  const inPre = (date) => { const ym = ymOf(date); return ym >= DIR_PRE_FROM && ym < to; };
-  const live = DIR.filter((d) => d.right != null && d.wrong != null && inPre(d.date));
-  const liveKeys = new Set(DIR.map((d) => `${d.date}|${d.right}|${d.wrong}`));
+  const inPre = (ym) => ym && ym >= DIR_PRE_FROM && ym < to;
+  const live = DIR.filter((d) => d.right != null && d.wrong != null && inPre(ymOf(d.date)));
+  const liveKeys = new Set(DIR.map((d) => `${d.pollster}|${d.date}|${d.right}|${d.wrong}`));
   const file = path.join(ROOT, "data", "direction-history.json");
   const hist = (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")).waves : [])
-    .filter((w) => w.end && w.right != null && w.wrong != null && inPre(w.end)
-      && !liveKeys.has(`${w.end}|${w.right}|${w.wrong}`))
-    .map((w) => ({ date: w.end, dateStart: w.start && w.start !== w.end ? w.start : null,
-      pollster: w.pollster || "Roy Morgan", right: w.right, wrong: w.wrong, sample: w.sample,
-      dateLabel: w.label || null, url: w.url || null }));
+    .filter((w) => (w.end || w.month) && w.right != null && w.wrong != null && inPre(w.month || ymOf(w.end))
+      && !liveKeys.has(`${w.pollster || "Roy Morgan"}|${w.end}|${w.right}|${w.wrong}`))
+    .map((w) => ({ date: w.end || `${w.month}-15`, dateStart: w.start && w.start !== w.end ? w.start : null,
+      month: w.month || null, pollster: w.pollster || "Roy Morgan", right: w.right, wrong: w.wrong, sample: w.sample,
+      dateLabel: w.label || (w.month ? `${MNF[+w.month.slice(5, 7) - 1]} ${w.month.slice(0, 4)}` : null), url: w.url || null }));
   const waves = [...live.map((d) => ({ date: d.date, dateStart: d.dateStart || null, pollster: d.pollster,
       right: d.right, wrong: d.wrong, sample: dirSample(d), dateLabel: null, url: d.url || null })), ...hist]
     .filter((w) => DIR_PRE_HOUSES.includes(w.pollster))
     .sort((a, b) => a.date.localeCompare(b.date));
   if (new Set(waves.map((w) => w.pollster)).size < 2) return null;
-  const rowsOf = (k) => waves.map((w) => ({ ym: ymOf(w.date), mid: midMs(w), x: w[k],
+  const rowsOf = (k) => waves.map((w) => ({ ym: w.month || ymOf(w.date), mid: midMs(w), x: w[k],
     n: Math.min(w.sample || 1200, SAMPLE_CAP), firm: w.pollster }));
   const rR = rowsOf("right"), rW = rowsOf("wrong");
-  const he = { right: pairLeanFor(rR), wrong: pairLeanFor(rW) };
+  const he = { right: dirPreLeanFor(rR), wrong: dirPreLeanFor(rW) };
   const months = [];
   for (let y = +DIR_PRE_FROM.slice(0, 4), m = +DIR_PRE_FROM.slice(5, 7); ; m++) {
     if (m > 12) { m = 1; y++; }
@@ -2537,7 +2554,7 @@ const directionPre = (() => {
   const polls = waves.map((w) => ({ x: mx(ymOf(w.date)) + (dayOf(w.date) - 15) / 365, pollster: w.pollster,
     released: w.date, dateLabel: w.dateLabel || fwLabel(w.dateStart, w.date), right: w.right, wrong: w.wrong,
     ...(w.url ? { url: w.url } : {}) }));
-  /* Before June 2022 Roy Morgan asked alone. Its months are built the same
+  /* Before March 2022 Roy Morgan asked alone. Its months are built the same
      way (monthWithSe: sample-weighted, sqrt(m) repeat deflation, the
      interval from the spread between its waves floored by sampling error)
      with no lean to remove – one house has no consensus to lean from – so

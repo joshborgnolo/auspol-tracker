@@ -1,5 +1,5 @@
 {
- "$comment": "Roy Morgan national direction (right direction / wrong track), one published wave per row. Tables tabulate January 2012 onward; earlier rows are individually sourced releases. No interpolation, no back-calculation. Live rows (polls.json direction[]) take precedence. Rebuilt by .build/backfill-direction-history.mjs.",
+ "$comment": "Roy Morgan waves carry fieldwork dates where published; house-reprinted series carry an exact month only. Roy Morgan tables tabulate January 2012 onward; earlier rows are individually sourced releases; SEC Newgate's reprinted chart is read by series colour, and RedBridge's image table is reconciled across two reports. No interpolation or invented fieldwork days. Live rows (polls.json direction[]) take precedence. Rebuilt by .build/backfill-direction-history.mjs.",
  "generated": "2026-11-21",
  "sources": [
   {
@@ -17,6 +17,110 @@
   {
    "label": "Roy Morgan Government Confidence Rating table, 2022 Wayback capture",
    "url": "https://web.archive.org/web/20220123063359/http://www.roymorgan.com/morganpoll/federal-voting/roy-morgan-government-confidence-rating-2006-2022"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-march-2022/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-april-2022/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-may-2022/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-energy-edition/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-bush-edition/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-victoria-edition/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-october-2022/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-november-2022/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-february-2023/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-april-2023/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-june-2023/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-august-2023/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-october-2023/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-february-2024/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-april-2024-summary/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-july-2024-summary/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-september-2024-summary/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-november-2024-summary/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-february-2025-summary/"
+  },
+  {
+   "label": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-april-2025/"
+  },
+  {
+   "label": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
+  },
+  {
+   "label": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
+  },
+  {
+   "label": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
+  },
+  {
+   "label": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
+  },
+  {
+   "label": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
+  },
+  {
+   "label": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf"
   }
  ],
  "waves": [
@@ -2917,6 +3021,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2022-03",
+   "right": 50,
+   "wrong": 50,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-march-2022/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 1's purple right-direction and orange wrong-direction paths and printed values; 2022-03."
+  },
+  {
    "start": "2022-03-03",
    "end": "2022-03-13",
    "published": null,
@@ -2975,6 +3091,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2022-04",
+   "right": 47,
+   "wrong": 53,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-april-2022/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 2's purple right-direction and orange wrong-direction paths and printed values; 2022-04."
   },
   {
    "start": "2022-04-04",
@@ -3037,6 +3165,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2022-05",
+   "right": 54,
+   "wrong": 46,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-may-2022/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 3's purple right-direction and orange wrong-direction paths and printed values; 2022-05."
+  },
+  {
    "start": "2022-05-02",
    "end": "2022-05-08",
    "published": null,
@@ -3065,6 +3205,30 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2022-06",
+   "right": 52,
+   "wrong": 48,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-energy-edition/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 4's purple right-direction and orange wrong-direction paths and printed values; 2022-06."
+  },
+  {
+   "month": "2022-08",
+   "right": 52,
+   "wrong": 48,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-bush-edition/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 5's purple right-direction and orange wrong-direction paths and printed values; 2022-08."
   },
   {
    "start": "2022-08-14",
@@ -3110,6 +3274,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2022-09",
+   "right": 53,
+   "wrong": 47,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-victoria-edition/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 6's purple right-direction and orange wrong-direction paths and printed values; 2022-09."
   },
   {
    "start": "2022-09-04",
@@ -3170,6 +3346,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2022-10",
+   "right": 51,
+   "wrong": 49,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-october-2022/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 7's purple right-direction and orange wrong-direction paths and printed values; 2022-10."
   },
   {
    "start": "2022-10-02",
@@ -3245,6 +3433,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2022-11",
+   "right": 50,
+   "wrong": 50,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-november-2022/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 8's purple right-direction and orange wrong-direction paths and printed values; 2022-11."
   },
   {
    "start": "2022-11-06",
@@ -3427,6 +3627,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2023-02",
+   "right": 53,
+   "wrong": 47,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-february-2023/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 9's purple right-direction and orange wrong-direction paths and printed values; 2023-02."
+  },
+  {
    "start": "2023-02-05",
    "end": "2023-02-05",
    "published": null,
@@ -3545,6 +3757,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2023-04",
+   "right": 49,
+   "wrong": 51,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-april-2023/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 10's purple right-direction and orange wrong-direction paths and printed values; 2023-04."
   },
   {
    "start": "2023-04-02",
@@ -3697,6 +3921,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2023-06",
+   "right": 39,
+   "wrong": 61,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-june-2023/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 11's purple right-direction and orange wrong-direction paths and printed values; 2023-06."
+  },
+  {
    "start": "2023-06-04",
    "end": "2023-06-04",
    "published": null,
@@ -3832,6 +4068,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2023-08",
+   "right": 43,
+   "wrong": 57,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-august-2023/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 12's purple right-direction and orange wrong-direction paths and printed values; 2023-08."
+  },
+  {
    "start": "2023-08-06",
    "end": "2023-08-06",
    "published": null,
@@ -3950,6 +4198,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2023-10",
+   "right": 37,
+   "wrong": 63,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-october-2023/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 13's purple right-direction and orange wrong-direction paths and printed values; 2023-10."
   },
   {
    "start": "2023-10-01",
@@ -4192,6 +4452,28 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2024-02",
+   "right": 44,
+   "wrong": 56,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-february-2024/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 14's purple right-direction and orange wrong-direction paths and printed values; 2024-02."
+  },
+  {
+   "month": "2024-02",
+   "right": 32,
+   "wrong": 47,
+   "unsure": 21,
+   "pollster": "RedBridge/Accent",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf",
+   "source": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "quote": "Figure 53, November 2025: 2024-02, 32 generally right / 47 generally wrong / 21 not sure."
+  },
+  {
    "start": "2024-02-04",
    "end": "2024-02-04",
    "published": null,
@@ -4327,6 +4609,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2024-04",
+   "right": 37,
+   "wrong": 63,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-april-2024-summary/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 15's purple right-direction and orange wrong-direction paths and printed values; 2024-04."
+  },
+  {
    "start": "2024-04-07",
    "end": "2024-04-07",
    "published": null,
@@ -4385,6 +4679,16 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2024-05",
+   "right": 32,
+   "wrong": 47,
+   "unsure": 21,
+   "pollster": "RedBridge/Accent",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf",
+   "source": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "quote": "Figure 53, November 2025: 2024-05, 32 generally right / 47 generally wrong / 21 not sure."
   },
   {
    "start": "2024-05-05",
@@ -4522,6 +4826,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2024-07",
+   "right": 40,
+   "wrong": 60,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-july-2024-summary/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 16's purple right-direction and orange wrong-direction paths and printed values; 2024-07."
+  },
+  {
    "start": "2024-07-07",
    "end": "2024-07-07",
    "published": null,
@@ -4582,6 +4898,16 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2024-08",
+   "right": 32,
+   "wrong": 50,
+   "unsure": 18,
+   "pollster": "RedBridge/Accent",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf",
+   "source": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "quote": "Figure 53, November 2025: 2024-08, 32 generally right / 50 generally wrong / 18 not sure."
+  },
+  {
    "start": "2024-08-04",
    "end": "2024-08-04",
    "published": null,
@@ -4640,6 +4966,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2024-09",
+   "right": 37,
+   "wrong": 63,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-september-2024-summary/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 17's purple right-direction and orange wrong-direction paths and printed values; 2024-09."
   },
   {
    "start": "2024-09-01",
@@ -4775,6 +5113,28 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2024-11",
+   "right": 39,
+   "wrong": 61,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-november-2024-summary/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 18's purple right-direction and orange wrong-direction paths and printed values; 2024-11."
+  },
+  {
+   "month": "2024-11",
+   "right": 32,
+   "wrong": 49,
+   "unsure": 19,
+   "pollster": "RedBridge/Accent",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf",
+   "source": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "quote": "Figure 53, November 2025: 2024-11, 32 generally right / 49 generally wrong / 19 not sure."
   },
   {
    "start": "2024-11-03",
@@ -4942,6 +5302,18 @@
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
   },
   {
+   "month": "2025-02",
+   "right": 38,
+   "wrong": 62,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/mood-of-the-nation-february-2025-summary/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 19's purple right-direction and orange wrong-direction paths and printed values; 2025-02."
+  },
+  {
    "start": "2025-02-02",
    "end": "2025-02-02",
    "published": null,
@@ -5000,6 +5372,16 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2025-03",
+   "right": 30,
+   "wrong": 50,
+   "unsure": 20,
+   "pollster": "RedBridge/Accent",
+   "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_abdcc3923bde4644b76c7f976a0f0034.pdf",
+   "source": "RedBridge/Accent national-direction trend, Figure 53, November 2025",
+   "quote": "Figure 53, November 2025: 2025-03, 30 generally right / 50 generally wrong / 20 not sure."
   },
   {
    "start": "2025-03-02",
@@ -5075,6 +5457,18 @@
    "pollster": "Roy Morgan",
    "url": "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
    "source": "Roy Morgan Government Confidence Rating table (2012–2025)"
+  },
+  {
+   "month": "2025-04",
+   "right": 43,
+   "wrong": 57,
+   "unsure": 0,
+   "pollster": "SEC Newgate",
+   "method": "Online",
+   "sample": null,
+   "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-april-2025/",
+   "source": "SEC Newgate Mood of the Nation, Perceived direction of Australia (%)",
+   "quote": "SEC Newgate wave 20's purple right-direction and orange wrong-direction paths and printed values; 2025-04."
   },
   {
    "start": "2025-04-04",

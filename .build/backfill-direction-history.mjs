@@ -18,6 +18,7 @@
 //   node .build/backfill-direction-history.mjs --fetch   (re-download the tables)
 import fs from "node:fs";
 import path from "node:path";
+import { secHistoryWaves, redbridgeHistoryWaves } from "./direction-history-aux.mjs";
 
 const SRC = ".build/direction-history-src";
 const OUT = "data/direction-history.json";
@@ -188,24 +189,40 @@ async function main() {
     if (unsureBad(w)) { console.log(`HIST_BAD ${w.end} ${w.right}/${w.wrong}/${w.unsure}`); continue; }
     byKey.set(key, w);
   }
-  const wavesOut = [...byKey.values()].sort((a, b) => String(a.end || a.published).localeCompare(String(b.end || b.published)));
+  const liveDirection = JSON.parse(fs.readFileSync("data/polls.json", "utf8")).direction;
+  const additional = [
+    ...secHistoryWaves(".build/secnewgate-src"),
+    ...redbridgeHistoryWaves(SRC),
+  ];
+  for (const w of additional) {
+    if (unsureBad(w)) throw new Error(`${w.pollster} ${w.month}: bad printed triple`);
+    const liveSameMonth = liveDirection.filter((d) => d.pollster === w.pollster && d.date.startsWith(w.month));
+    if (liveSameMonth.some((d) => d.right === w.right && d.wrong === w.wrong)) continue;
+    if (liveSameMonth.length) throw new Error(`${w.pollster} ${w.month}: historical reprint disagrees with the dated row`);
+    byKey.set(`${w.pollster}|${w.month}|${w.right}|${w.wrong}`, w);
+  }
+  const monthOfWave = (w) => String(w.month || w.end || w.published);
+  const wavesOut = [...byKey.values()].sort((a, b) => monthOfWave(a).localeCompare(monthOfWave(b)));
   if (!wavesOut.length) throw new Error("no waves parsed — refusing to write an empty history");
   const json = {
-    $comment: "Roy Morgan national direction (right direction / wrong track), one published wave per row. " +
-      "Tables tabulate January 2012 onward; earlier rows are individually sourced releases. " +
-      "No interpolation, no back-calculation. Live rows (polls.json direction[]) take precedence. " +
+    $comment: "Roy Morgan waves carry fieldwork dates where published; house-reprinted series carry an exact month only. " +
+      "Roy Morgan tables tabulate January 2012 onward; earlier rows are individually sourced releases; " +
+      "SEC Newgate's reprinted chart is read by series colour, and RedBridge's image table is reconciled across two reports. " +
+      "No interpolation or invented fieldwork days. Live rows (polls.json direction[]) take precedence. " +
       "Rebuilt by .build/backfill-direction-history.mjs.",
     generated: new Date().toISOString().slice(0, 10),
-    sources: TABLES.map((t) => ({ label: t.label, url: t.url })),
+    sources: [...TABLES.map((t) => ({ label: t.label, url: t.url })),
+      ...additional.map((w) => ({ label: w.source, url: w.url }))],
     waves: wavesOut,
   };
   fs.writeFileSync(OUT, JSON.stringify(json, null, 1) + "\n");
   const years = {};
-  for (const w of wavesOut) { const y = String(w.end || w.published).slice(0, 4); years[y] = (years[y] || 0) + 1; }
+  for (const w of wavesOut) { const y = monthOfWave(w).slice(0, 4); years[y] = (years[y] || 0) + 1; }
   console.log("HIST_TABLES " + JSON.stringify(reports));
   console.log("HIST_DUPES_DROPPED " + dupes);
+  console.log("HIST_OTHER_HOUSES " + JSON.stringify(Object.fromEntries(["SEC Newgate", "RedBridge/Accent"].map((h) => [h, additional.filter((w) => w.pollster === h).length]))));
   console.log("HIST_YEARS " + JSON.stringify(years));
-  console.log(`HIST_STATUS wrote ${OUT}: ${wavesOut.length} waves, ${wavesOut[0].end || wavesOut[0].published} → ${wavesOut.at(-1).end || wavesOut.at(-1).published}`);
+  console.log(`HIST_STATUS wrote ${OUT}: ${wavesOut.length} waves, ${monthOfWave(wavesOut[0])} → ${monthOfWave(wavesOut.at(-1))}`);
 }
 const unsureBad = (w) => !(w.right >= 0 && w.wrong >= 0) ||
   (w.unsure != null && Math.abs(w.right + w.wrong + w.unsure - 100) > 1.5);

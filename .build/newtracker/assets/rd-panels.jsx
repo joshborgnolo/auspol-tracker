@@ -2161,11 +2161,12 @@ function RdDirectionView({ rangeId }) {
   }, [grpId]);
   if (!D.direction.length) return null;
   /* ---- the history window (the confidence panel's machinery) ------------
-     gen-data §5dh ships every house's own monthly record (Roy Morgan's GCR
-     tables and archived releases, Essential from June 2022) as D.dirHistory.
-     With it on the page the all-voters chart takes the same window the
-     confidence charts use — term / 10 yrs / 25 yrs / All, stepping ‹ ›, and
-     the miniature strip with the governments beneath — and a window
+     gen-data §5dh ships every house's own monthly record (Roy Morgan's GCR,
+     SEC Newgate from March 2022, Essential from June 2022 and RedBridge's
+     reprinted image trend) as D.dirHistory. With it on the page the
+     all-voters chart takes the same window the confidence charts use —
+     term / 10 yrs / 25 yrs / All, stepping ‹ ›, and the miniature strip
+     with the governments beneath — and a window
      reaching behind the pooled model's May 2025 start draws the houses'
      own published runs beside it. A group cut stays on the old range:
      those series only exist for the current term. */
@@ -2176,10 +2177,10 @@ function RdDirectionView({ rangeId }) {
   const [winS, setWinS] = React.useState(() => confTermWin(curTerm, nowX));
   const [dragging, setDragging] = React.useState(false);
   const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
-  /* gen-data §5dp: June 2022 to the term's start, when Roy Morgan and
-     Essential both asked, is pooled like the monthly rows (lean split
-     between the two); the history window draws it as the same line, and
-     the houses' own runs take over only before it */
+  /* gen-data §5dp: from March 2022, with SEC Newgate joining first,
+     Essential in June and RedBridge in its printed 2024–25 months.
+     That run pools like the current term; Roy Morgan's older solo
+     months flow into it at the join. */
   const PRE = D.directionPre && D.directionPre.series && D.directionPre.series.length ? D.directionPre : null;
   const poolStart = PRE ? PRE.series[0].x : D.direction[0].x;
   const histLanesAll = HIST ? Object.keys(HIST.houses).sort((a, b) => HIST.houses[a][0].x - HIST.houses[b][0].x)
@@ -2204,7 +2205,7 @@ function RdDirectionView({ rangeId }) {
   const dotsOn = win ? win.b - win.a <= 4.6 : true;
   const xDomain = histOn ? [win.a, win.b] : rangeDomain(rangeId);
   const xTicks = histOn ? confWinTicks(win, vTerms, nowX) : null;
-  /* Roy Morgan alone before June 2022 (gen-data §5dp's solo months): the
+  /* Roy Morgan alone before March 2022 (gen-data §5dp's solo months): the
      same monthly construction, so the same line and band. Its record has
      long silences, so the months split into runs at any gap over a quarter
      – a line never bridges years nobody polled. The run that meets the
@@ -2310,7 +2311,7 @@ function RdDirectionView({ rangeId }) {
   const evs = histOn && !isCur ? (elecRules ? [] : elecEvs) : bondi ? [bondi] : [];
   const badges = narrow && (!histOn || isCur) ? rdEventBadges("dir", evs, xDomain[0], xDomain[1]) : null;
   /* the strip under the chart: the net (right minus wrong) of the chart's
-     own line over its whole run – Roy Morgan's months alone before June
+     own line over its whole run – Roy Morgan's months alone before March
      2022, the pooled months after – one line, broken where the main line
      breaks, with the governments from D.cycles beneath it */
   const stripRuns = histOn && PRE ? soloRuns.concat([soloJoin.concat(PRE.series, D.direction)]) : [D.direction];
@@ -2539,8 +2540,8 @@ function RdDirectionView({ rangeId }) {
             copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
                     sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
                     caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : "")
-                      + (histOn && PRE && win.a < D.direction[0].x ? " From June 2022 to April 2025 two pollsters asked, Roy Morgan and Essential, so the gap between them is split evenly between the two." : "")
-                      + (soloOn ? " Before June 2022 only Roy Morgan asked, so its monthly averages carry no lean adjustment. Its printed waves are sparse before 2012 and between 2016 and 2021: the line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
+                      + (histOn && PRE && win.a < D.direction[0].x ? " From March 2022 to April 2025 each house contributes in the months it asked: SEC Newgate from March 2022, Essential from June 2022 and RedBridge/Accent from February 2024." : "")
+                      + (soloOn ? " Before March 2022 only Roy Morgan asked, so its monthly averages carry no lean adjustment. Its printed waves are sparse before 2012 and between 2016 and 2021: the line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
                     legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
           />
         )}
@@ -2557,7 +2558,7 @@ function RdDirectionView({ rangeId }) {
           <RdKey className="rd-ckey" items={[
             dotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll" } : null,
             { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
-            soloOn ? { kind: "line", color: "var(--ink-3)", label: "Before June 2022: Roy Morgan alone, unadjusted; breaks where it printed nothing for over a quarter" } : null,
+            soloOn ? { kind: "line", color: "var(--ink-3)", label: "Before March 2022: Roy Morgan alone, unadjusted; breaks where it printed nothing for over a quarter" } : null,
             (histOn && !isTerm) ? { kind: "line", color: "var(--ink-3)", label: "A faint rule is a federal election; the strip beneath carries the governments" } : null,
           ]} />
         )}
@@ -2583,8 +2584,8 @@ function RdDirectionView({ rangeId }) {
           <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
           ...(histOn ? [
             <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole line in miniature, as its net (right direction less wrong track), with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
-            <>From June 2022, when Essential first asked the question, to April 2025, two pollsters were asking: Roy Morgan and Essential. That stretch is built the same way as this term’s line: monthly averages weighted by sample size, with 95% intervals. With only two pollsters there is no wider group to measure each one’s lean against. So the gap between them is split evenly, half to each, and the line runs through the middle of the two. Unfortunately, that middle need not match where this term’s six pollsters put it, so the line can step a little where the terms meet.</>,
-            <>Before June 2022 only Roy Morgan asked, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. The waves come from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
+            <>From March 2022 to April 2025, each house contributes in the months it asked: SEC Newgate from March 2022, Essential from June 2022 and RedBridge/Accent from February 2024. The stretch is built like this term’s line: sample-weighted monthly means, 95% intervals, and house leans measured against the other houses present. Where only two houses ask, an unidentified level means their gap is split evenly, half to each. House-reprinted months are placed mid-month and say just the month, not fieldwork days.</>,
+            <>Before March 2022 only Roy Morgan asked, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. The waves come from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
           ] : []),
         ]} />
       )}

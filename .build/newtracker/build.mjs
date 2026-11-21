@@ -880,10 +880,12 @@ function ssAboutBlock(L, prim, acc) {
         margin of error. Leadership questions are asked irregularly, so those lines are monthly
         aggregates too &#8211; adjusted per house for approval and favourability, joined straight
         from published readings for preferred prime minister. On the direction chart the window bar
-        reaches back before this term. From June 2022, when Roy Morgan and Essential were both
-        asking, the line is pooled the same way, with the gap between those two split evenly;
-        before that only Roy Morgan asked, and its waves are averaged month by month the same
-        way, with intervals but no lean adjustment, back through its Government Confidence
+        reaches back before this term. From March 2022, SEC Newgate joins Roy Morgan,
+        Essential follows in June and RedBridge/Accent joins in its printed months from February 2024.
+        Their waves pool in the same way, with the two-house gap split evenly while only two are
+        asking and the wider house consensus used as more join; before that only Roy Morgan asked,
+        and its waves are averaged month by month the same way, with intervals but no lean adjustment,
+        back through its Government Confidence
         Rating tables; the line breaks where it printed nothing for more than a quarter. The miniature strip
         beneath (with each government in power marked) carries the same line&#8217;s net, right direction less wrong track. A &#8220;&#8212;&#8221; in any
         table means the pollster didn&#8217;t ask that question.</p>
