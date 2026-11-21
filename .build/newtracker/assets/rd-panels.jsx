@@ -2322,6 +2322,79 @@ function RdTrust() {
   );
 }
 
+function RdIpsosDirectionWorld({ D }) {
+  const { monthLabelFull } = window.AP;
+  const narrow = useNarrow(MQ_PHONE);
+  const ws = D.directionWorld?.waves || [];
+  if (!ws.length) return null;
+  const xDomain = [ws[0].x, ws[ws.length - 1].x];
+  const last = ws[ws.length - 1];
+  const au = ws.map((w) => ({ x: w.x, y: w.auNet }));
+  const world = ws.map((w) => ({ x: w.x, y: w.worldNet }));
+  const bands = ws.filter((w) => w.band);
+  const values = ws.flatMap((w) => [w.auNet, w.worldNet])
+    .concat(bands.flatMap((w) => [w.band.p10, w.band.p90]));
+  const lo = Math.floor(Math.min(0, ...values) / 20) * 20;
+  const hi = Math.ceil(Math.max(0, ...values) / 20) * 20;
+  const netLabel = (v, digits = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(digits);
+  const area = (key, id, opacity) => ({
+    id, color: "var(--ink-3)", opacity, edge: false,
+    points: bands.map((w) => ({ x: w.x, y0: w.band["p" + (key === "50" ? "25" : "10")], y1: w.band["p" + (key === "50" ? "75" : "90")] })),
+  });
+  return (
+    <div className="card rd-card rd-dir-chart rd-direction-world">
+      <div className="rd-chead">
+        <span className="rd-chead-t">Australia and Ipsos’ Global Average: net direction, percentage points</span>
+      </div>
+      <p className="rd-dir-grp">Right direction less wrong track in Ipsos’ What Worries the World. Australia is now {netLabel(last.auNet)} points, against {netLabel(last.worldNet)} in the publisher’s global average.</p>
+      <TrendChart key="rd-ipsos-direction-world" heightPx={narrow ? 280 : 350}
+        padPx={narrow ? { l: 42, r: 8, t: 30, b: 28 } : { l: 46, r: 20, t: 40, b: 30 }}
+        xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => netLabel(v)}
+        xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
+        series={[
+          { id: "world-au", label: "Australia", color: "var(--mood-neg)", points: au, rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Australia" },
+          { id: "world-average", label: "Ipsos’ Global Average", color: "var(--ink-2)", points: world, rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Ipsos’ Global Average" },
+        ]}
+        areas={[area("80", "countries-middle-80", 0.10), area("50", "countries-middle-half", 0.20)]}
+        spine={au}
+        tooltipTitle={(i) => {
+          const w = ws[i];
+          return w ? monthLabelFull(w.ym) + (w.fieldwork ? " · " + w.fieldwork : "") : "";
+        }}
+        extraRows={(i) => {
+          const w = ws[i];
+          if (!w) return [];
+          const bandRows = w.band ? [
+            { label: `Middle half of ${w.band.n} countries, net`, value: `${netLabel(w.band.q25, 1)} to ${netLabel(w.band.p75, 1)} points` },
+            { label: `Middle 80% of ${w.band.n} countries, net`, value: `${netLabel(w.band.p10, 1)} to ${netLabel(w.band.p90, 1)} points` },
+          ] : [];
+          return [
+            { label: "Australia", value: `${w.auRight}% right / ${w.auWrong}% wrong track` },
+            { label: "Ipsos’ Global Average", value: `${w.worldRight}% right / ${w.worldWrong}% wrong track` },
+            ...bandRows,
+            { label: "Sample", value: [w.auN ? `${w.auSampleApprox ? "≈" : ""}${w.auN.toLocaleString("en-AU")} in Australia` : null,
+              w.worldN ? `${w.worldN.toLocaleString("en-AU")} across all countries` : null].filter(Boolean).join("; ") || "not published" },
+          ];
+        }}
+        fmt={(v) => netLabel(v, 1)}
+        copy={{ title: "Australia and Ipsos’ Global Average, national direction",
+          sub: `Australia's latest net direction is ${netLabel(last.auNet)} points, against ${netLabel(last.worldNet)} in Ipsos’ global average. Net direction is right direction less wrong track, in percentage points.`,
+          caption: "Ipsos’ What Worries the World, each published wave since " + monthLabelFull(ws[0].ym) + ". Bands are the middle half and middle 80% of participating countries’ net direction; Ipsos’ own global average is not included in those country distributions.",
+          legend: [{ label: "Australia", color: "var(--mood-neg)", kind: "line" }, { label: "Ipsos’ Global Average", color: "var(--ink-2)", kind: "line" }] }}
+      />
+      <RdKey className="rd-ckey" items={[
+        { kind: "line", color: "var(--mood-neg)", label: "Australia" },
+        { kind: "line", color: "var(--ink-2)", label: "Ipsos’ Global Average" },
+        { kind: "lineband", color: "var(--ink-3)", label: "Middle half and middle 80% of countries, net direction; the global average is excluded" },
+      ]} />
+      <RdFoot how={{ term: "direction", from: "Ipsos What Worries the World" }}>
+        Each country is one observation in the distribution, not weighted by population. The publisher’s global average is preserved separately, not recomputed.
+        {last.url ? <> <a className="rd-link" href={last.url} target="_blank" rel="noopener noreferrer">{last.source}<span className="plink-mark">↗</span></a></> : null}
+      </RdFoot>
+    </div>
+  );
+}
+
 function RdDirectionView({ rangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
@@ -2367,9 +2440,9 @@ function RdDirectionView({ rangeId }) {
   const poolStart = PRE ? PRE.series[0].x : D.direction[0].x;
   const histLanesAll = HIST ? Object.keys(HIST.houses).sort((a, b) => HIST.houses[a][0].x - HIST.houses[b][0].x)
     .map((house) => ({ house, pts: HIST.houses[house] })) : [];
-  /* only houses with a record BEFORE the pooled series opens get a history
-     lane, so a house that started mid-term never doubles the recent lines */
-  const histLanes = histLanesAll.filter((l) => l.pts[0].x < poolStart);
+  /* Live houses join before the pooled model opens; McKinnon's separately
+     worded publication stays its own lane, never a pooled-model input. */
+  const histLanes = histLanesAll.filter((l) => l.pts[0].x < poolStart || HIST.wordings?.[l.house]);
   const histLo = histLanes.length ? Math.min(...histLanes.map((l) => l.pts[0].x)) : poolStart;
   const ext = { lo: histLanes.length ? histLo : poolStart, hi: nowX };
   const vTerms = confViewTerms(TERMS, ext.lo, ext.hi);
@@ -2468,8 +2541,24 @@ function RdDirectionView({ rangeId }) {
       smooth: false, endCap: false, endAtWin: true, interpHover: true,
     }));
   });
+  const wordedSeries = histLanes.filter((l) => HIST.wordings?.[l.house]).flatMap((l) => {
+    const q = HIST.wordings[l.house];
+    return [["right", q.rightLabel], ["wrong", q.wrongLabel]].map(([k, wording]) => {
+      const points = [];
+      for (const p of l.pts) if (inW(p) && p[k] != null) {
+        points.push({ x: p.x, y: p[k], ym: p.ym });
+        dots.push({ x: p.x, y: p[k], color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)",
+          label: l.house + ", " + wording,
+          meta: { pollster: l.house, dateLabel: monthLabelFull(p.ym), pre: true,
+            sample: p.samples?.length === 1 ? p.samples[0] : null } });
+      }
+      return { id: "worded-" + k + "-" + l.house, label: l.house + ", " + wording,
+        color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)", points, rdWidth: 1.5, opacity: 0.85, dash: "0.1 3.6" };
+    }).filter((s) => s.points.length >= 2);
+  });
   const vals = pts.flatMap((p) => [p.right, p.wrong]).concat(dots.map((d) => d.y))
     .concat(areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])))
+    .concat(wordedSeries.flatMap((s) => s.points.map((p) => p.y)))
     .concat(histSeries.flatMap((s) => s.points.map((p) => p.y)))
     .concat(soloPts.filter(inW).flatMap((p) => [p.right - p.rightCi, p.right + p.rightCi, p.wrong - p.wrongCi, p.wrong + p.wrongCi]));
   const lo = Math.floor((Math.min(...vals) + 0.6) / 10) * 10, hi = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
@@ -2512,7 +2601,11 @@ function RdDirectionView({ rangeId }) {
   /* who supplies the readings, and how many, lives in Info's National
      direction entry; the foot keeps only the note about the figures above */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const foot = last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  const wordingNote = histLanes.some((l) => l.house === "McKinnon" && l.pts.some((p) => inW(p)))
+    ? "McKinnon asks instead how satisfied respondents are with “the way Australia is heading”. Satisfied and Dissatisfied are plotted as right direction and wrong track; Neutral and Don’t know are separate answers, combined in Unsure. The separately worded series does not enter the headline’s pooled estimate."
+    : null;
+  const foot = [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote]
+    .filter(Boolean).join(" ");
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
 
@@ -2709,7 +2802,7 @@ function RdDirectionView({ rangeId }) {
             xTicks={xTicks || rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
             driven={dragging}
             series={[
-              ...histSeries, ...soloSeries,
+              ...histSeries, ...wordedSeries, ...soloSeries,
               { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Wrong track" },
               { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Right direction" },
             ]}
@@ -2722,8 +2815,8 @@ function RdDirectionView({ rangeId }) {
             copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
                     sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
                     caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : "")
-                      + (histOn && PRE && win.a < D.direction[0].x ? " From March 2022 to April 2025 each house contributes in the months it asked: SEC Newgate from March 2022, Essential from June 2022 and RedBridge/Accent from February 2024." : "")
-                      + (soloOn ? " Before March 2022 only Roy Morgan asked, so its monthly averages carry no lean adjustment. Its printed waves are sparse before 2012 and between 2016 and 2021: the line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
+                      + (histOn && PRE && win.a < D.direction[0].x ? " Each house contributes wherever it printed a reading: SEC Newgate from March 2022, Essential from February 2022, Freshwater from May 2023 and RedBridge/Accent from February 2024. McKinnon’s differently worded series stays separate." : "")
+                      + (soloOn ? " Before March 2022 only Roy Morgan is on record, so its monthly averages carry no lean adjustment. The line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
                     legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
           />
         )}
@@ -2766,12 +2859,13 @@ function RdDirectionView({ rangeId }) {
           <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
           ...(histOn ? [
             <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole line in miniature, as its net (right direction less wrong track), with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
-            <>From March 2022 to April 2025, each house contributes in the months it asked: SEC Newgate from March 2022, Essential from June 2022 and RedBridge/Accent from February 2024. The stretch is built like this term’s line: sample-weighted monthly means, 95% intervals, and house leans measured against the other houses present. Where only two houses ask, an unidentified level means their gap is split evenly, half to each. House-reprinted months are placed mid-month and say just the month, not fieldwork days.</>,
-            <>Before March 2022 only Roy Morgan asked, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. The waves come from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
+            <>From March 2022 to April 2025, each house contributes wherever it printed: SEC Newgate from March 2022, Essential from February 2022, Freshwater from May 2023 and RedBridge/Accent from February 2024. McKinnon’s differently worded series stays separate. The pooled stretch is built like this term’s line: sample-weighted monthly means, 95% intervals, and house leans measured against the other houses present. Where only two houses ask, an unidentified level means their gap is split evenly, half to each. House-reprinted months are placed mid-month and say just the month, not fieldwork days.</>,
+            <>Before March 2022 only Roy Morgan is on record, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. It comes from the consolidated Government Confidence Rating tables and the original release tables back to mid-2007. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. Publication hiatuses remain where the primary record prints no wave; nothing is interpolated.</>,
           ] : []),
         ]} />
       )}
       <RdFoot how={{ term: "direction", from: "National mood" }}>{foot}</RdFoot>
+      <RdIpsosDirectionWorld D={D} />
     </>
   );
 }
