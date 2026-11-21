@@ -31,7 +31,9 @@ const DAY = 86_400_000;
 // AFTER adjudicating against the release — an exception here hides a real hole
 // just as effectively as it silences a false alarm. Format:
 //   { house: "YouGov", date: "2026-06-16", missing: "ppm", why: "..." }
-const EXCEPTIONS = [];
+const EXCEPTIONS = [
+  { house: "Newspoll", date: "2026-10-08", missing: "ppmHeadToHead", why: "The 12 October APC statement has the three-leader ranking (Q12), but neither the release prose nor the surviving chart states a numeric Albanese–Hanson distribution; never derive a published pair from the ranking." },
+];
 
 const polls = JSON.parse(readFileSync(OUT, "utf8"));
 const DERIVED = [["ppm", "firm"], ["approval", "firm"], ["altTpp", "firm"], ["ppmHeadToHead", "firm"]];

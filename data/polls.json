@@ -7460,11 +7460,16 @@
     {
       "date": "2026-10-08",
       "firm": "Newspoll",
-      "alb": 44,
-      "opp": 39,
+      "alb": 45,
+      "opp": 25,
       "oppName": "Taylor",
-      "han": null,
-      "extra": null
+      "han": 30,
+      "extra": [
+        {
+          "alb": 44,
+          "opp": 39
+        }
+      ]
     },
     {
       "date": "2026-10-10",
@@ -7671,7 +7676,12 @@
       "opp": -9,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 49,
+          "dis": 46
+        }
+      }
     },
     {
       "date": "2025-08-16",
@@ -7792,7 +7802,16 @@
       "opp": -20,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 47,
+          "dis": 48
+        },
+        "opp": {
+          "app": 31,
+          "dis": 51
+        }
+      }
     },
     {
       "date": "2025-10-04",
@@ -7873,7 +7892,16 @@
       "opp": -33,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 46,
+          "dis": 51
+        },
+        "opp": {
+          "app": 25,
+          "dis": 58
+        }
+      }
     },
     {
       "date": "2025-11-08",
@@ -7949,7 +7977,16 @@
       "opp": -29,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 47,
+          "dis": 47
+        },
+        "opp": {
+          "app": 26,
+          "dis": 55
+        }
+      }
     },
     {
       "date": "2025-11-24",
@@ -8093,7 +8130,16 @@
       "opp": -28,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 42,
+          "dis": 53
+        },
+        "opp": {
+          "app": 28,
+          "dis": 56
+        }
+      }
     },
     {
       "date": "2026-01-16",
@@ -8201,7 +8247,12 @@
       "opp": -39,
       "oppName": "Ley",
       "han": null,
-      "detail": null
+      "detail": {
+        "opp": {
+          "app": 23,
+          "dis": 62
+        }
+      }
     },
     {
       "date": "2026-02-12",
@@ -8375,7 +8426,16 @@
       "opp": -7,
       "oppName": "Taylor",
       "han": null,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 39,
+          "dis": 57
+        },
+        "opp": {
+          "app": 35,
+          "dis": 42
+        }
+      }
     },
     {
       "date": "2026-03-27",
@@ -9084,6 +9144,10 @@
         "opp": {
           "app": 34,
           "dis": 46
+        },
+        "han": {
+          "app": 46,
+          "dis": 49
         }
       }
     },
@@ -9403,7 +9467,20 @@
       "opp": -11,
       "oppName": "Taylor",
       "han": -9,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 36,
+          "dis": 60
+        },
+        "opp": {
+          "app": 36,
+          "dis": 47
+        },
+        "han": {
+          "app": 43,
+          "dis": 52
+        }
+      }
     },
     {
       "date": "2026-10-10",
@@ -9498,7 +9575,12 @@
       "opp": -10,
       "oppName": "Taylor",
       "han": -1,
-      "detail": null
+      "detail": {
+        "han": {
+          "app": 47,
+          "dis": 48
+        }
+      }
     },
     {
       "date": "2026-11-03",
