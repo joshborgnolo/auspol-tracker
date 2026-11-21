@@ -298,6 +298,50 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
      Melbourne Cup each late-October Cup-eve report), and no all-voters grid
      carries a column no row fills */
   const waves = (id, house) => entries.filter((e) => e.id === id && e.house === house).map((e) => e.waveDate).sort();
+  /* AES: the full response distributions survive, with the published trend
+     bases and each question's effective sample carried through the charts. */
+  const aes = entries.filter((e) => e.house === "aes");
+  assert.equal(aes.length, 45, "45 response distributions across the four recurring AES questions");
+  for (const e of aes) {
+    const total = e.tables[0].rows.reduce((s, r) => s + r[1], 0);
+    assert.ok(Math.abs(total - 100) <= 0.2 + 1e-9, `${e.id} ${e.waveDate}: the response scale renormalises to 100 after rounding`);
+    assert.ok(e.sampleEff > 0 && e.sampleEff <= e.sample, `${e.id} ${e.waveDate}: a real Kish effective sample`);
+    assert.match(e.waveDate, /^\d{4}-\d{2}$/, "the rounded AES wave never invents a fieldwork day");
+  }
+  assert.deepEqual(waves("political-interest", "aes")[0], "1987-08");
+  assert.deepEqual(aes.find((e) => e.id === "campaign-interest" && e.waveDate === "1993-04").tables[0].rows,
+    [["A good deal", 49.7], ["Some", 34.7], ["Not much", 13.5], ["None at all", 2.1]]);
+  assert.deepEqual(aes.find((e) => e.id === "campaign-interest" && e.waveDate === "2025-06").tables[0].rows,
+    [["A good deal", 32.5], ["Some", 38.6], ["Not much", 20.9], ["None at all", 8]]);
+  assert.deepEqual(aes.find((e) => e.id === "political-interest" && e.waveDate === "1987-08").tables[0].rows,
+    [["A good deal", 35.2], ["Some", 44.9], ["Not much", 15.2], ["None at all", 4.7]]);
+  const aesBlocks = out.topics.find((t) => t.id === "trust-democracy").blocks;
+  const pol = aesBlocks.find((b) => b.id === "aes-political-interest"), camp = aesBlocks.find((b) => b.id === "aes-campaign-interest");
+  assert.equal(pol.panels[0].points.length, 14);
+  assert.equal(camp.panels[0].points.length, 12);
+  const polLast = pol.panels[0].points.at(-1);
+  assert.equal(polLast.v, 33.3);
+  assert.equal(polLast.m, 41.9);
+  assert.equal(polLast.b, 24.7);
+  assert.equal(polLast.neff, 1034.5, "AES change calls use its own effective sample, not a generic design effect");
+  assert.equal(pol.head, "Deep interest in politics has held up since 1987");
+  assert.equal(camp.head, "Deep interest in the election campaign has fallen since 1993");
+  const big = aesBlocks.find((b) => b.id === "aes-big-interests"), know = aesBlocks.find((b) => b.id === "aes-politicians-know");
+  assert.equal(waves("government-big-interests", "aes")[0], "1998-11", "the big-interests trend starts with its published 1998 reading");
+  assert.equal(waves("politicians-know-people", "aes")[0], "2001-12", "the representation trend does not backfill the incompatible 1996/1998 codes");
+  assert.equal(big.panels[0].points.length, 10);
+  assert.equal(know.panels[0].points.length, 9);
+  const bigLast = big.panels[0].points.at(-1), knowLast = know.panels[0].points.at(-1);
+  assert.deepEqual([bigLast.v, bigLast.b, bigLast.m], [50, 13.6, 36.5]);
+  assert.deepEqual([knowLast.v, knowLast.b, knowLast.m], [49, 16.4, 34.6]);
+  assert.deepEqual(aes.find((e) => e.id === "government-big-interests" && e.waveDate === "2025-06").tables[0].rows,
+    [["Entirely run for the big interests", 17.3], ["Mostly run for the big interests", 32.7], ["About half and half", 36.5],
+      ["Mostly run for the benefit of all", 12.9], ["Entirely run for the benefit of all", 0.7]]);
+  assert.deepEqual(aes.find((e) => e.id === "politicians-know-people" && e.waveDate === "2025-06").tables[0].rows,
+    [["Politicians know what ordinary people think — 1", 2.8], ["Politicians know what ordinary people think — 2", 13.6], ["Midpoint — 3", 34.6],
+      ["Politicians don't know what ordinary people think — 4", 24.4], ["Politicians don't know what ordinary people think — 5", 24.6]]);
+  assert.equal(big.head, "50% say government is run for a few big interests");
+  assert.equal(know.head, "49% say federal politicians do not know what ordinary people think");
   assert.deepEqual(waves("happiness-personal", "essential"), ["2026-09-29"], "happiness: one wave, the 30 Sep 2026 report's");
   assert.deepEqual(entries.find((e) => e.id === "happiness-personal").tables[0].rows[0], ["My life overall", 6.4], "happiness: its chart's Sep'26 point is the wave's all-voters figure");
   for (const id of ["melbourne-cup-attitudes", "melbourne-cup-betting", "melbourne-cup-interest"])

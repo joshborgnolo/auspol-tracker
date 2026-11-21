@@ -38,7 +38,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { THEMES, themeOf } from "./adhoc-themes.mjs";
 
-/* ---- the eleven stores, read into one shape --------------------------------
+/* ---- the twelve stores, read into one shape --------------------------------
    The stores are hand-curated research products, each on its own pipeline
    and commit; this reshapes them to one entry shape and drops what the page
    never reads (RedBridge's verification haystacks, News24's embed ids). No
@@ -79,9 +79,9 @@ export function readStores(root) {
     }
   }
   /* Essential, Resolve, Freshwater, Australia Institute (via YouGov),
-     Scanlon Institute, WOLF+SMITH (for AMPLIFY): .entries, tables already
-     [label, ...values], with optional prose for verbal-only results */
-  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"], ["scanlon", "scanlon-one-offs.json"], ["wolfsmith", "wolfsmith-one-offs.json"]]) {
+     Scanlon Institute, WOLF+SMITH (for AMPLIFY), Australian Election Study:
+     .entries, tables already [label, ...values], with optional prose */
+  for (const [house, file] of [["essential", "essential-one-offs.json"], ["resolve", "resolve-one-offs.json"], ["freshwater", "freshwater-one-offs.json"], ["ausinst", "ausinst-one-offs.json"], ["scanlon", "scanlon-one-offs.json"], ["wolfsmith", "wolfsmith-one-offs.json"], ["aes", "aes-one-offs.json"]]) {
     for (const e of read(file, (j) => j.entries || [])) {
       entries.push({ house, id: e.id, waveDate: e.waveDate, dateStart: e.dateStart || null, dateEnd: e.dateEnd || null,
         sample: e.sample ?? null, sampleEff: e.sampleEff ?? null, published: e.published || null,
@@ -107,13 +107,14 @@ export const HOUSES = {
   ausinst: { short: "Australia Inst", full: "YouGov for The Australia Institute" },
   scanlon: { short: "Scanlon", full: "Scanlon Institute" },
   wolfsmith: { short: "Wolf+Smith", full: "WOLF+SMITH for AMPLIFY" },
+  aes: { short: "AES", full: "Australian Election Study" },
 };
 
 const MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const monthYear = (iso) => MONF[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
 /* gen-data's dx: an exact decimal year, leap years 366 days long. A wave
-   filed at month precision (Scanlon prints only a fieldwork month) reads
-   as its month's end, matching the wave-date-is-fieldwork-end contract */
+   filed at month precision reads at its month's end: Scanlon dates fieldwork
+   by month; AES uses the month after polling day as its rounded wave marker */
 const dx = (iso) => {
   const [y, m, d] = iso.split("-").map(Number);
   const day = d || new Date(Date.UTC(y, m, 0)).getUTCDate();
@@ -484,7 +485,7 @@ function moved(panel) {
 const listJoin = (xs) => (xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1]);
 const possessive = (h) => HOUSES[h].short + "’s";
 
-/* the movement sentences both trackers share: each pollster with two or
+/* the movement sentences the trackers share: each pollster with two or
    more readings, its latest against its first, gated on the margin of the
    change. They compare two readings and say so; they never call a trend. */
 function movementSentences(panels) {
@@ -502,7 +503,37 @@ function movementSentences(panels) {
   return out.join(" ");
 }
 
+/* The interest chart plots the focused answer; its dek restores the wider
+   scale. First-to-latest change earns a direction past the sampling margin. */
+function aesInterestCopy(panels, subject) {
+  const latest = panels[0].points[panels[0].points.length - 1];
+  const change = moved(panels[0]);
+  const firstYear = change ? change.first.field.end.slice(0, 4) : null;
+  const head = !change ? Math.round(latest.v) + "% took a good deal of interest in " + subject
+    : "Deep interest in " + subject + " has " + (change.sig ? (change.d < 0 ? "fallen" : "risen") : "held up") + " since " + firstYear;
+  const dek = "In " + monthYear(latest.field.end) + ", " + Math.round(latest.a + latest.m) + "% reported at least some interest in " + subject
+    + "; " + Math.round(latest.v) + "% took a good deal. " + movementSentences(panels);
+  return { head, dek: dek.trim() };
+}
+
 const TRACKER_COPY = {
+  politicalInterest(panels) { return aesInterestCopy(panels, "politics"); },
+  campaignInterest(panels) { return aesInterestCopy(panels, "the election campaign"); },
+  bigInterests(panels) {
+    const latest = panels[0].points[panels[0].points.length - 1];
+    return {
+      head: Math.round(latest.a) + "% say government is run for a few big interests",
+      dek: Math.round(latest.b) + "% say it is run for the benefit of all the people; " + Math.round(latest.m)
+        + "% say about half and half. " + movementSentences(panels),
+    };
+  },
+  politiciansKnow(panels) {
+    const latest = panels[0].points[panels[0].points.length - 1];
+    return {
+      head: Math.round(latest.a) + "% say federal politicians do not know what ordinary people think",
+      dek: Math.round(latest.b) + "% say they do know, with " + Math.round(latest.m) + "% at the scale’s midpoint. " + movementSentences(panels),
+    };
+  },
   /* Trump: "deeply" only when every pollster's latest net sits at -30 or
      below, and any "unpopular" only when every latest net clears its own
      margin below zero */
@@ -962,6 +993,34 @@ export const FEATURES = {
         level: "Voters are divided on whether the Albanese government has lived up to their expectations, {a} to {b}",
         none: "{b} say the Albanese government has fallen short of their expectations, and {a} that it has met them",
       } },
+    { kind: "tracker", key: "aes-political-interest", copy: "politicalInterest", measure: "share",
+      title: "Interest in politics: ‘a good deal’", names: ["a good deal", "less interest"],
+      cols: ["A good deal", "Some", "Not much or none"], yDomain: [25, 45], yStep: 5,
+      note: "The line is only ‘a good deal’, not everyone with at least some interest. Post-election self-completion surveys; weighted in 1993 and from 2010, otherwise unweighted in the integrated release. Waves are dated to the month after polling day.",
+      families: ["AES interest in politics"],
+      series: [{ house: "aes", id: "political-interest", label: "A good deal of interest in politics", fam: 0,
+        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+    { kind: "tracker", key: "aes-campaign-interest", copy: "campaignInterest", measure: "share",
+      title: "Interest in the election campaign: ‘a good deal’", names: ["a good deal", "less interest"],
+      cols: ["A good deal", "Some", "Not much or none"], yDomain: [25, 55], yStep: 5,
+      note: "The line is only ‘a good deal’, not everyone with at least some interest. Post-election self-completion surveys; weighted in 1993 and from 2010, otherwise unweighted in the integrated release. Waves are dated to the month after polling day.",
+      families: ["AES interest in the election campaign"],
+      series: [{ house: "aes", id: "campaign-interest", label: "A good deal of interest in the campaign", fam: 0,
+        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+    { kind: "tracker", key: "aes-big-interests", copy: "bigInterests", measure: "share",
+      title: "Who is government run for: big interests or all the people?", names: ["big interests", "all the people"],
+      cols: ["Big interests", "All the people", "Half and half"], yDomain: [30, 65], yStep: 10,
+      note: "‘Big interests’ combines entirely and mostly run for those interests; the middle answer is about half and half. Post-election self-completion surveys, weighted from 2010 and otherwise unweighted in the integrated release. Waves are dated to the month after polling day.",
+      families: ["AES: who government is run for"],
+      series: [{ house: "aes", id: "government-big-interests", label: "Run for big interests", fam: 0,
+        sides: { a: /run for the big interests$/, m: /^About half and half$/, b: /run for the benefit of all$/ } }] },
+    { kind: "tracker", key: "aes-politicians-know", copy: "politiciansKnow", measure: "share",
+      title: "Do federal politicians know what ordinary people think?", names: ["do not know", "know"],
+      cols: ["Do not know", "Know", "Midpoint"], yDomain: [30, 60], yStep: 10,
+      note: "The chart combines positions 4 and 5 on the do-not-know side, against positions 1 and 2 on the know side. The official comparable trend starts in 2001; earlier integrated-file codes are not used. Post-election surveys, weighted from 2010.",
+      families: ["AES: politicians and ordinary people"],
+      series: [{ house: "aes", id: "politicians-know-people", label: "Politicians do not know", fam: 0,
+        sides: { a: /^Politicians don't know/, m: /^Midpoint/, b: /^Politicians know/ } }] },
     { kind: "rank", title: "How much does the political system need to change?", ref: R("state-of-politics-system", "redbridge"),
       base: "% choosing each", sort: false, relabel: {
         "The system is fine as it is and doesn't need any change": "It is fine as it is",

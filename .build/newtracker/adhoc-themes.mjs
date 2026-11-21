@@ -1,5 +1,5 @@
 /* ---- Public opinion: the topic map -----------------------------------------
-   Where every question in the ten one-off stores lands on the /public-opinion/
+   Where every question in the twelve one-off stores lands on the /public-opinion/
    page (the ☰ menu page that was /ad-hocs/ until 2026-10-18, then
    /beyond-the-vote/ until 2026-10-21). TWO reads of
    this file must never diverge: gen-data.mjs files every entry under its topic
@@ -457,6 +457,11 @@ export const THEME_OF = {
   "how-to-vote-cards": "trust-democracy",
   "more-mps": "trust-democracy",
   "voting-systems": "trust-democracy",
+  // aes
+  "political-interest": "trust-democracy",
+  "campaign-interest": "trust-democracy",
+  "government-big-interests": "trust-democracy",
+  "politicians-know-people": "trust-democracy",
   // essential
   "government-performance": "trust-democracy",
   "trust-institutions": "trust-democracy",

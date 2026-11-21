@@ -586,10 +586,12 @@ function PubOpTracker({ c, houses, topic }) {
   const x1 = Math.max(...pts.map((q) => q.x)) + 0.06;
   const [lo, hi] = c.yDomain;
   const step = c.yStep || (hi - lo > 50 ? 25 : 10);
-  /* the ticks: each January and July inside the window */
+  /* Long histories need year ticks, not two labels per year. */
+  const span = x1 - x0, yearStep = span > 24 ? 5 : span > 10 ? 2 : 1;
   const ticks = [];
   for (let y = Math.floor(x0); y <= Math.ceil(x1); y++) {
-    for (const m of [0, 6]) {
+    if (y % yearStep) continue;
+    for (const m of span > 10 ? [0] : [0, 6]) {
       const x = y + m / 12;
       if (x >= x0 && x <= x1) ticks.push({ x, label: PUBOP_MON[m] + " " + String(y).slice(2) });
     }
