@@ -885,7 +885,7 @@ function ssAboutBlock(L, prim, acc) {
         before that only Roy Morgan asked, and its waves are averaged month by month the same
         way, with intervals but no lean adjustment, back through its Government Confidence
         Rating tables; the line breaks where it printed nothing for more than a quarter. The miniature strip
-        beneath (with each government in power marked) carries each house&#8217;s own record. A &#8220;&#8212;&#8221; in any
+        beneath (with each government in power marked) carries the same line&#8217;s net, right direction less wrong track. A &#8220;&#8212;&#8221; in any
         table means the pollster didn&#8217;t ask that question.</p>
       <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
         figure into a seat count assumes a uniform swing, and with One Nation near

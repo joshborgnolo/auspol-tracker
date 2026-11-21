@@ -2309,12 +2309,14 @@ function RdDirectionView({ rangeId }) {
   const elecRules = elecEvs.length > 6;
   const evs = histOn && !isCur ? (elecRules ? [] : elecEvs) : bondi ? [bondi] : [];
   const badges = narrow && (!histOn || isCur) ? rdEventBadges("dir", evs, xDomain[0], xDomain[1]) : null;
-  /* the strip under the chart: each house's net (right minus wrong) over
-     its whole published run — the miniature is the record, not the
-     pooled estimate, with the governments from D.cycles beneath it */
-  const stripLines = histLanesAll.filter((l) => l.pts[0].x < D.direction[0].x).map((l) => ({
-    color: l.house === "Roy Morgan" ? "var(--mood-neg)" : "var(--ink-3)",
-    points: l.pts.map((p) => ({ x: p.x, y: p.right - p.wrong })),
+  /* the strip under the chart: the net (right minus wrong) of the chart's
+     own line over its whole run – Roy Morgan's months alone before June
+     2022, the pooled months after – one line, broken where the main line
+     breaks, with the governments from D.cycles beneath it */
+  const stripRuns = histOn && PRE ? soloRuns.concat([soloJoin.concat(PRE.series, D.direction)]) : [D.direction];
+  const stripLines = stripRuns.filter((r) => r.length >= 2).map((r) => ({
+    color: "var(--ink-2)",
+    points: r.map((p) => ({ x: p.x, y: p.right - p.wrong })),
   }));
   /* the hover guide lands on whichever house's month it is (the pooled
      months are the same mid-month grid), so past windows still read a
@@ -2580,7 +2582,7 @@ function RdDirectionView({ rangeId }) {
           <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
           <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
           ...(histOn ? [
-            <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole direction record in miniature with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
+            <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole line in miniature, as its net (right direction less wrong track), with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
             <>From June 2022, when Essential first asked the question, to April 2025, two pollsters were asking: Roy Morgan and Essential. That stretch is built the same way as this term’s line: monthly averages weighted by sample size, with 95% intervals. With only two pollsters there is no wider group to measure each one’s lean against. So the gap between them is split evenly, half to each, and the line runs through the middle of the two. Unfortunately, that middle need not match where this term’s six pollsters put it, so the line can step a little where the terms meet.</>,
             <>Before June 2022 only Roy Morgan asked, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. The waves come from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
           ] : []),
