@@ -1160,6 +1160,10 @@ body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
 body.rd .rd-pl-prim .rd-pl-pm { display: block; line-height: 1.35; margin-top: 1px; }
+body.rd .rd-pl-lead .rd-pl-pm { margin-left: 3px; }
+/* a phone's three-way line: the ±s step down so the pollster's name keeps
+   its room beside the right-aligned figures */
+@media (max-width: 900px) { body.rd .rd-pl-lead .rd-pl-pm { font-size: 10px; margin-left: 2px; } }
 /* half-point houses (Roy Morgan) print x.5 beside whole figures; an IN-FLOW
    suffix of any size shifts the figure inside the fixed-width lattice —
    desktop rows stutter their ink gaps and the phone's right-aligned figs

@@ -342,17 +342,26 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const a = r.appr || {};
       const opp = a.oppName || "Taylor";
       const net = (v) => (v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
-      const ppmTxt = ppm && ppm.alb != null
-        ? (() => { const os = Object.keys(ppm).filter((k) => k !== "alb" && k !== "unc");
-                   const who = (o) => { const L = (window.LEADER_META || {})[o]; return apWho(r, o, L ? L.label : rdCap(o)); };
-                   // a three-way question lists every contender; head to head keeps the pair form
-                   return os.length > 1 ? apWho(r, "alb", "Albanese") + " " + ppm.alb + ", " + os.map((o) => who(o) + " " + ppm[o]).join(", ")
-                     : apWho(r, "alb", "Albanese") + " " + ppm.alb + "–" + ppm[os[0]] + " " + who(os[0]); })()
+      /* every figure carries its ± (user call 2026-11-21, "YES" to short
+         names): a three-way line with full names already filled the
+         figures track, which keeps one width for every facet, so the names
+         shorten to three letters (Alb, Tay, Han - the All-polls nets'
+         heads) and every contest reads as one list, "Alb 40 ±3.1, Tay 41
+         ±3.1". Shares take rdShareMoe, nets rdDiffMoe (approve minus
+         disapprove); a house that printed only the net gets no ± there */
+      const sh = (name) => String(name).slice(0, 3);
+      const pm = (m) => { const t = rdMoeTxt(m); return t ? <i className="rd-pl-pm">{t}</i> : null; };
+      const leaderName = (o) => { const L = (window.LEADER_META || {})[o]; return apWho(r, o, L ? L.label : rdCap(o)); };
+      const ppmEl = ppm && ppm.alb != null
+        ? (() => { const os = ["alb"].concat(Object.keys(ppm).filter((k) => k !== "alb" && k !== "unc"));
+                   return <span>{os.map((o, i) => <React.Fragment key={o}>{i ? ", " : ""}{sh(o === "alb" ? apWho(r, "alb", "Albanese") : leaderName(o))} {ppm[o]}{pm(rdShareMoe(r, ppm[o]))}</React.Fragment>)}</span>; })()
         : null;
+      const netPm = (k) => { const L = a[k]; return L && L.app != null && L.dis != null ? pm(rdDiffMoe(r, L.app, L.dis)) : null; };
+      const nets = [["alb", apWho(r, "alb", "Albanese"), a.albNet], ["taylor", opp, a.taylorNet]].concat(a.hansonNet != null ? [["hanson", apWho(r, "hanson", "Hanson"), a.hansonNet]] : []);
       return (
         <div className="rd-pl-lead">
-          <span className="rd-pl-main">{ppmTxt || <span className="rd-pl-none">{window.JUR ? "No preferred-" + window.JUR.office.alb + " question" : "No preferred-PM question"}</span>}</span>
-          <span className="rd-pl-sub"><span className="rd-pl-netl">Net: </span>{apWho(r, "alb", "Albanese")}{" "}{net(a.albNet)}, {opp} {net(a.taylorNet)}{a.hansonNet != null ? ", " + apWho(r, "hanson", "Hanson") + " " + net(a.hansonNet) : ""}</span>
+          <span className="rd-pl-main">{ppmEl || <span className="rd-pl-none">{window.JUR ? "No preferred-" + window.JUR.office.alb + " question" : "No preferred-PM question"}</span>}</span>
+          <span className="rd-pl-sub"><span className="rd-pl-netl">Net: </span><span>{nets.map(([k, nm, v], i) => <React.Fragment key={k}>{i ? ", " : ""}{sh(nm)} {net(v)}{v != null && netPm(k)}</React.Fragment>)}</span></span>
         </div>
       );
     }
