@@ -2537,8 +2537,38 @@ const directionPre = (() => {
   const polls = waves.map((w) => ({ x: mx(ymOf(w.date)) + (dayOf(w.date) - 15) / 365, pollster: w.pollster,
     released: w.date, dateLabel: w.dateLabel || fwLabel(w.dateStart, w.date), right: w.right, wrong: w.wrong,
     ...(w.url ? { url: w.url } : {}) }));
+  /* Before June 2022 Roy Morgan asked alone. Its months are built the same
+     way (monthWithSe: sample-weighted, sqrt(m) repeat deflation, the
+     interval from the spread between its waves floored by sampling error)
+     with no lean to remove – one house has no consensus to lean from – so
+     the line and its band run on in the same form behind the pooled
+     stretch. A month no wave printed stays absent; the panel breaks the
+     line across gaps longer than a quarter. */
+  const solo = (() => {
+    const ws = (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")).waves : [])
+      .filter((w) => (w.end || w.published) && w.right != null && w.wrong != null
+        && (w.pollster || "Roy Morgan") === "Roy Morgan" && ymOf(w.end || w.published) < DIR_PRE_FROM)
+      .map((w) => ({ date: w.end || w.published, dateStart: w.start && w.start !== w.end ? w.start : null,
+        pollster: "Roy Morgan", right: w.right, wrong: w.wrong, sample: w.sample, dateLabel: w.label || null, url: w.url || null }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const rows = (k) => ws.map((w) => ({ ym: ymOf(w.date), mid: midMs(w), x: w[k], n: Math.min(w.sample || 1200, SAMPLE_CAP), firm: w.pollster }));
+    const sr = rows("right"), sw = rows("wrong");
+    const yms = [...new Set(sr.map((r) => r.ym))].sort();
+    const series = yms.map((ym) => {
+      const r = monthWithSe(sr, null, ym), w = monthWithSe(sw, null, ym);
+      if (!r || !w) return null;
+      const right = r1(r.v), wrong = r1(w.v);
+      return { ym, x: mx(ym), right, wrong, unsure: r1(Math.max(0, 100 - right - wrong)), net: r1(right - wrong),
+        n: r.n, rightCi: r1(1.96 * r.se), wrongCi: r1(1.96 * w.se) };
+    }).filter(Boolean);
+    return { series, waves: ws };
+  })();
+  for (const w of solo.waves) polls.push({ x: mx(ymOf(w.date)) + (dayOf(w.date) - 15) / 365, pollster: w.pollster,
+    released: w.date, dateLabel: w.dateLabel || fwLabel(w.dateStart, w.date), right: w.right, wrong: w.wrong,
+    ...(w.url ? { url: w.url } : {}) });
+  polls.sort((a, b) => a.x - b.x);
   const gap = (k) => { const g = he[k].gapAt(Date.parse(to + "-01T00:00:00Z")); return g == null ? null : r1(g); };
-  return { from: DIR_PRE_FROM, to, houses: he.right.firms, series, polls,
+  return { from: DIR_PRE_FROM, to, houses: he.right.firms, series, polls, solo: solo.series,
     // firms[0] minus firms[1] at the hand-over, for Info and the build log
     gapAtJoin: { right: gap("right"), wrong: gap("wrong") } };
 })();

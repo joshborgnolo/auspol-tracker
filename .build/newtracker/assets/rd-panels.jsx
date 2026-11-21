@@ -2204,7 +2204,21 @@ function RdDirectionView({ rangeId }) {
   const dotsOn = win ? win.b - win.a <= 4.6 : true;
   const xDomain = histOn ? [win.a, win.b] : rangeDomain(rangeId);
   const xTicks = histOn ? confWinTicks(win, vTerms, nowX) : null;
-  const pts = filterPts(histOn && PRE ? PRE.series.concat(D.direction) : D.direction, xDomain[0]);
+  /* Roy Morgan alone before June 2022 (gen-data §5dp's solo months): the
+     same monthly construction, so the same line and band. Its record has
+     long silences, so the months split into runs at any gap over a quarter
+     – a line never bridges years nobody polled. The run that meets the
+     pooled stretch joins it as one line; a month standing alone draws as a
+     single mark. */
+  const SOLO_GAP = 0.26;
+  const soloRuns = [];
+  if (histOn && PRE && PRE.solo) for (const r of PRE.solo) {
+    const run = soloRuns[soloRuns.length - 1];
+    if (run && r.x - run[run.length - 1].x < SOLO_GAP) run.push(r); else soloRuns.push([r]);
+  }
+  const soloJoin = soloRuns.length && PRE.series[0].x - soloRuns[soloRuns.length - 1].slice(-1)[0].x < SOLO_GAP
+    ? soloRuns.pop() : [];
+  const pts = filterPts(histOn && PRE ? soloJoin.concat(PRE.series, D.direction) : D.direction, xDomain[0]);
   const now = D.directionNow || D.direction[D.direction.length - 1];
   const M = D.direction;
   const wrongLeads = now.wrong >= now.right;
@@ -2244,7 +2258,21 @@ function RdDirectionView({ rangeId }) {
     { id: "ci-wrong", color: "var(--mood-neg)", className: "ci-band", edge: false, points: band("wrong", "wrongCi") },
   ].filter((a) => a.points.length >= 2);
   const inW = (p) => p.x >= xDomain[0] && p.x <= xDomain[1];
-  const histSeries = !housesOn ? [] : histLanes.flatMap((l) => {
+  const nearW = (r) => r.some((p) => p.x >= xDomain[0] - 0.3 && p.x <= xDomain[1] + 0.3);
+  const soloShown = soloRuns.filter(nearW);
+  const soloOn = histOn && PRE && PRE.solo && PRE.solo.length && xDomain[0] < PRE.series[0].x;
+  const soloSeries = soloShown.filter((r) => r.length >= 2).flatMap((r) => ["wrong", "right"].map((k) => ({
+    id: "solo-" + k + "-" + r[0].ym, label: k === "right" ? "Right direction" : "Wrong track",
+    color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)", points: series(r, k), rdWidth: 2.5, endCap: false, endLabel: null,
+  })));
+  soloShown.filter((r) => r.length >= 2).forEach((r) => ["right", "wrong"].forEach((k) => areas.push({
+    id: "solo-ci-" + k + "-" + r[0].ym, color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)", className: "ci-band", edge: false,
+    points: r.map((d) => ({ x: d.x, y0: d[k] - d[k + "Ci"], y1: d[k] + d[k + "Ci"] })) })));
+  soloShown.filter((r) => r.length === 1).forEach(([d]) => ["right", "wrong"].forEach((k) => dots.push({
+    x: d.x, y: d[k], color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)", label: k === "right" ? "Right direction" : "Wrong track",
+    meta: { pollster: "Roy Morgan", dateLabel: monthLabelFull(d.ym) + " average", pre: true } })));
+  const soloPts = soloShown.flat();
+  const histSeries = !housesOn || PRE && PRE.solo && PRE.solo.length ? [] : histLanes.flatMap((l) => {
     const pts = { right: [], wrong: [] };
     for (const p of l.pts) if (inW(p) && p.x < poolStart) for (const k of ["right", "wrong"]) pts[k].push({ x: p.x, y: p[k], ym: p.ym });
     /* Roy Morgan solid, every other house dotted — right/wrong keep the
@@ -2259,7 +2287,8 @@ function RdDirectionView({ rangeId }) {
   });
   const vals = pts.flatMap((p) => [p.right, p.wrong]).concat(dots.map((d) => d.y))
     .concat(areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])))
-    .concat(histSeries.flatMap((s) => s.points.map((p) => p.y)));
+    .concat(histSeries.flatMap((s) => s.points.map((p) => p.y)))
+    .concat(soloPts.filter(inW).flatMap((p) => [p.right - p.rightCi, p.right + p.rightCi, p.wrong - p.wrongCi, p.wrong + p.wrongCi]));
   const lo = Math.floor((Math.min(...vals) + 0.6) / 10) * 10, hi = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
   const yd = useConfChase([lo, hi], dragging);
   /* the gap drawn where it now stands, against the month before Bondi */
@@ -2290,10 +2319,11 @@ function RdDirectionView({ rangeId }) {
   /* the hover guide lands on whichever house's month it is (the pooled
      months are the same mid-month grid), so past windows still read a
      month name rather than a bare axis position */
-  const chartMonths = histSeries.length
-    ? [...new Map(histSeries.flatMap((s) => s.points).concat(pts.map((p) => ({ x: p.x, ym: p.ym })))
+  const chartMonths = histSeries.length || soloPts.length
+    ? [...new Map(histSeries.flatMap((s) => s.points).concat(soloPts, pts).map((p) => ({ x: p.x, ym: p.ym }))
       .map((p) => [p.x, p])).values()].sort((a, b) => a.x - b.x)
     : pts;
+  const monthAt = (x) => pts.find((p) => p.x === x) || soloPts.find((p) => p.x === x);
   /* who supplies the readings, and how many, lives in Info's National
      direction entry; the foot keeps only the note about the figures above */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
@@ -2494,21 +2524,21 @@ function RdDirectionView({ rangeId }) {
             xTicks={xTicks || rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
             driven={dragging}
             series={[
-              ...histSeries,
+              ...histSeries, ...soloSeries,
               { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Wrong track" },
               { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Right direction" },
             ]}
-            spine={histSeries.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet={(m) => (m && m.pre ? null : "direction")}
+            spine={histSeries.length || soloPts.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet={(m) => (m && m.pre ? null : "direction")}
             events={badges ? badges.events : evs} brackets={brackets}
             vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
             tooltipTitle={(i) => (chartMonths[i] ? monthLabelFull(chartMonths[i].ym) : "")}
-            extraRows={(i) => { const d = pts.find((p) => p.x === (chartMonths[i] || {}).x); return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
+            extraRows={(i) => { const d = monthAt((chartMonths[i] || {}).x); return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
             fmt={(v) => v.toFixed(1)}
             copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
                     sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
                     caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : "")
                       + (histOn && PRE && win.a < D.direction[0].x ? " From June 2022 to April 2025 two pollsters asked, Roy Morgan and Essential, so the gap between them is split evenly between the two." : "")
-                      + (housesOn ? " Before June 2022 only Roy Morgan asked: the thinner line is its own published record, monthly means of the waves it printed, nothing adjusted. Its printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling." : ""),
+                      + (soloOn ? " Before June 2022 only Roy Morgan asked, so its monthly averages carry no lean adjustment. Its printed waves are sparse before 2012 and between 2016 and 2021: the line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
                     legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
           />
         )}
@@ -2525,7 +2555,7 @@ function RdDirectionView({ rangeId }) {
           <RdKey className="rd-ckey" items={[
             dotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll" } : null,
             { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
-            housesOn ? { kind: "line", color: "var(--ink-3)", label: "Thinner lines: Roy Morgan’s own published monthly record, unadjusted, before June 2022" } : null,
+            soloOn ? { kind: "line", color: "var(--ink-3)", label: "Before June 2022: Roy Morgan alone, unadjusted; breaks where it printed nothing for over a quarter" } : null,
             (histOn && !isTerm) ? { kind: "line", color: "var(--ink-3)", label: "A faint rule is a federal election; the strip beneath carries the governments" } : null,
           ]} />
         )}
@@ -2552,7 +2582,7 @@ function RdDirectionView({ rangeId }) {
           ...(histOn ? [
             <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole direction record in miniature with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
             <>From June 2022, when Essential first asked the question, to April 2025, two pollsters were asking: Roy Morgan and Essential. That stretch is built the same way as this term’s line: monthly averages weighted by sample size, with 95% intervals. With only two pollsters there is no wider group to measure each one’s lean against. So the gap between them is split evenly, half to each, and the line runs through the middle of the two. Unfortunately, that middle need not match where this term’s six pollsters put it, so the line can step a little where the terms meet.</>,
-            <>Before June 2022 only Roy Morgan asked, so there is nothing to pool or adjust. The thinner line is its own published record: monthly averages of the waves it printed, with no interval. It comes from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
+            <>Before June 2022 only Roy Morgan asked, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. The waves come from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
           ] : []),
         ]} />
       )}
