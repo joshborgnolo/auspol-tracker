@@ -49,6 +49,8 @@ export const THEMES = [
     dek: "The under-16 social media ban, AI and data centres, gambling ads, unions, abortion and other questions of how we live and work." },
   { id: "trust-democracy", title: "Leaders, trust and democracy", short: "Trust and democracy", about: "leaders, trust and democracy",
     dek: "How voters rate the government, the leaders and the institutions, and how much they think politics needs to change." },
+  { id: "media", title: "Campaign news", short: "Campaign news", about: "campaign news and the media",
+    dek: "How much attention Australians paid to election news on television, radio, in newspapers and on the internet." },
 ];
 
 export const THEME_OF = {
@@ -460,8 +462,15 @@ export const THEME_OF = {
   // aes
   "political-interest": "trust-democracy",
   "campaign-interest": "trust-democracy",
+  "satisfaction-democracy": "trust-democracy",
   "government-big-interests": "trust-democracy",
   "politicians-know-people": "trust-democracy",
+  "household-economy-year": "cost-of-living",
+  "national-economy-year": "cost-of-living",
+  "campaign-news-tv": "media",
+  "campaign-news-radio": "media",
+  "campaign-news-newspapers": "media",
+  "campaign-news-internet": "media",
   // essential
   "government-performance": "trust-democracy",
   "trust-institutions": "trust-democracy",

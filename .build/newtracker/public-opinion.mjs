@@ -516,9 +516,43 @@ function aesInterestCopy(panels, subject) {
   return { head, dek: dek.trim() };
 }
 
+function aesEconomyCopy(panels, subject, verb = "is") {
+  const latest = panels[0].points[panels[0].points.length - 1];
+  return {
+    head: Math.round(latest.b) + "% say " + subject + " " + verb + " worse than a year ago",
+    dek: Math.round(latest.a) + "% say it is better and " + Math.round(latest.m) + "% about the same. " + movementSentences(panels),
+  };
+}
+
+function aesChannelCopy(panels, channel) {
+  const latest = panels[0].points[panels[0].points.length - 1], change = moved(panels[0]);
+  const firstYear = change ? change.first.field.end.slice(0, 4) : null;
+  const head = !change ? "Attention to " + channel + " campaign news"
+    : "Attention to " + channel + " campaign news is " + (change.sig ? (change.d < 0 ? "lower" : "higher") : "little changed") + " since " + firstYear;
+  return {
+    head,
+    dek: "In " + monthYear(latest.field.end) + ", " + Math.round(latest.a + latest.m) + "% paid at least some attention to " + channel
+      + " campaign coverage; " + Math.round(latest.a) + "% a good deal. " + movementSentences(panels),
+  };
+}
+
 const TRACKER_COPY = {
   politicalInterest(panels) { return aesInterestCopy(panels, "politics"); },
   campaignInterest(panels) { return aesInterestCopy(panels, "the election campaign"); },
+  democraticSatisfaction(panels) {
+    const latest = panels[0].points[panels[0].points.length - 1];
+    return {
+      head: Math.round(latest.a) + "% are satisfied with the way democracy works",
+      dek: "In " + monthYear(latest.field.end) + ", " + Math.round(latest.a) + "% were very or fairly satisfied; " + Math.round(latest.b)
+        + "% were not very or not at all satisfied. " + movementSentences(panels),
+    };
+  },
+  householdEconomy(panels) { return aesEconomyCopy(panels, "their household finances", "are"); },
+  nationalEconomy(panels) { return aesEconomyCopy(panels, "the national economy"); },
+  campaignTv(panels) { return aesChannelCopy(panels, "television"); },
+  campaignRadio(panels) { return aesChannelCopy(panels, "radio"); },
+  campaignNewspapers(panels) { return aesChannelCopy(panels, "newspaper"); },
+  campaignInternet(panels) { return aesChannelCopy(panels, "internet"); },
   bigInterests(panels) {
     const latest = panels[0].points[panels[0].points.length - 1];
     return {
@@ -850,6 +884,20 @@ export const FEATURES = {
       ref: R("chalmers-middle-east-rate-rise", "news24"), wideRow: 0, names: ["agree", "disagree"] },
     { kind: "stack", mode: "waves", key: "household-finances", title: "Is your household better or worse off than three months ago?",
       ref: R("financial-situation-3m", "news24"), sides: { a: ["Better"], b: ["Worse"], m: ["No change", "Unsure", "Don't know"] }, names: ["better off", "worse off"] },
+    { kind: "tracker", key: "aes-household-economy", copy: "householdEconomy", measure: "share",
+      title: "Household finances compared with a year ago: better", names: ["better", "worse"],
+      cols: ["Better", "Same", "Worse"], yDomain: [0, 50], yStep: 10,
+      note: "Combines a lot and a little better, or worse, with about the same kept separately. This is a post-election evaluation, not a consumer-confidence index. 14 waves since 1987, weighted from 2010; dated to the month after polling day.",
+      families: ["AES household finances over a year"],
+      series: [{ house: "aes", id: "household-economy-year", label: "Household finances better than a year ago", fam: 0,
+        sides: { a: /better$/, m: /^About the same$/, b: /worse$/ } }] },
+    { kind: "tracker", key: "aes-national-economy", copy: "nationalEconomy", measure: "share",
+      title: "The national economy compared with a year ago: better", names: ["better", "worse"],
+      cols: ["Better", "Same", "Worse"], yDomain: [0, 60], yStep: 10,
+      note: "Combines a lot and a little better, or worse, with about the same kept separately. This is a post-election evaluation, not a consumer-confidence index. 14 waves since 1987, weighted from 2010; dated to the month after polling day.",
+      families: ["AES national economy over a year"],
+      series: [{ house: "aes", id: "national-economy-year", label: "National economy better than a year ago", fam: 0,
+        sides: { a: /better$/, m: /^About the same$/, b: /worse$/ } }] },
     { kind: "rank", title: "How should the government respond to inflation?", ref: R("inflation-response-priorities", "newspoll"),
       base: "% naming each as one of their top two priorities", sort: false },
     { kind: "rank", title: "Skipped care because of the cost", ref: R("healthcare-cost-impact", "essential"),
@@ -1007,6 +1055,13 @@ export const FEATURES = {
       families: ["AES interest in the election campaign"],
       series: [{ house: "aes", id: "campaign-interest", label: "A good deal of interest in the campaign", fam: 0,
         sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+    { kind: "tracker", key: "aes-democratic-satisfaction", copy: "democraticSatisfaction", measure: "share",
+      title: "Satisfaction with democracy in Australia", names: ["satisfied", "dissatisfied"],
+      cols: ["Satisfied", null, "Dissatisfied"], yDomain: [45, 90], yStep: 15,
+      note: "Combines very and fairly satisfied against not very or not at all satisfied; no non-response is shown as a neutral answer. The 1996 top answer was ‘Satisfied’ rather than ‘Very satisfied’. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
+      families: ["AES satisfaction with democracy"],
+      series: [{ house: "aes", id: "satisfaction-democracy", label: "Satisfied with how democracy works", fam: 0,
+        sides: { a: /^(?:Very satisfied|Fairly satisfied)$/, b: /^Not (?:very|at all) satisfied$/ } }] },
     { kind: "tracker", key: "aes-big-interests", copy: "bigInterests", measure: "share",
       title: "Who is government run for: big interests or all the people?", names: ["big interests", "all the people"],
       cols: ["Big interests", "All the people", "Half and half"], yDomain: [30, 65], yStep: 10,
@@ -1036,6 +1091,37 @@ export const FEATURES = {
       names: ["positive", "negative"], show: 10 },
     { kind: "split", title: "Does the Greens’ change of leader change people’s vote?", ref: R("greens-leadership-vote-impact", "resolve"),
       names: ["more likely", "less likely"] },
+  ],
+
+  "media": [
+    { kind: "tracker", key: "aes-campaign-tv", copy: "campaignTv", measure: "share",
+      title: "Campaign news on television: ‘a good deal’", names: ["a good deal", "less attention"],
+      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 60], yStep: 10,
+      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. Early exclusive-channel codes count as no television use. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
+      families: ["AES campaign news on television"],
+      series: [{ house: "aes", id: "campaign-news-tv", label: "A good deal of attention to TV campaign news", fam: 0,
+        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+    { kind: "tracker", key: "aes-campaign-radio", copy: "campaignRadio", measure: "share",
+      title: "Campaign news on the radio: ‘a good deal’", names: ["a good deal", "less attention"],
+      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 40], yStep: 10,
+      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. Early exclusive-channel codes count as no radio use. The integrated release and official report contain no 2025 radio reading, so the series ends in 2022.",
+      families: ["AES campaign news on radio"],
+      series: [{ house: "aes", id: "campaign-news-radio", label: "A good deal of attention to radio campaign news", fam: 0,
+        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+    { kind: "tracker", key: "aes-campaign-newspapers", copy: "campaignNewspapers", measure: "share",
+      title: "Campaign news in newspapers: ‘a good deal’", names: ["a good deal", "less attention"],
+      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 55], yStep: 10,
+      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. Early exclusive-channel codes count as no newspaper use. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
+      families: ["AES campaign news in newspapers"],
+      series: [{ house: "aes", id: "campaign-news-newspapers", label: "A good deal of attention to newspaper campaign news", fam: 0,
+        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+    { kind: "tracker", key: "aes-campaign-internet", copy: "campaignInternet", measure: "share",
+      title: "Campaign news on the internet: ‘a good deal’", names: ["a good deal", "less attention"],
+      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 40], yStep: 10,
+      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. The series begins in 1998. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
+      families: ["AES campaign news on the internet"],
+      series: [{ house: "aes", id: "campaign-news-internet", label: "A good deal of attention to internet campaign news", fam: 0,
+        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
   ],
 };
 

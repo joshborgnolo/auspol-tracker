@@ -678,14 +678,14 @@ function PubOpTracker({ c, houses, topic }) {
           <table className="pubop-table">
             <thead><tr>
               <th className="pubop-l">Pollster</th><th className="pubop-l">Fieldwork</th><th>Sample</th>
-              <th>{c.cols[0]}</th><th>{c.cols[1]}</th><th>{c.cols[2]}</th>{net ? <th>Net</th> : null}<th />
+              <th>{c.cols[0]}</th>{c.cols[1] ? <th>{c.cols[1]}</th> : null}<th>{c.cols[2]}</th>{net ? <th>Net</th> : null}<th />
             </tr></thead>
             <tbody>
               {rows.map((q, i) => (
                 <tr key={i}>
                   <td className="pubop-l">{pubopHouse(q, houses)}</td><td className="pubop-l">{pubopSpan(q.field)}</td>
                   <td>{q.n ? q.n.toLocaleString("en-AU") : "–"}</td>
-                  <td>{pubopN(q.a)}</td><td>{q.m == null ? "–" : pubopN(q.m)}</td><td>{q.b == null ? "–" : pubopN(q.b)}</td>
+                  <td>{pubopN(q.a)}</td>{c.cols[1] ? <td>{q.m == null ? "–" : pubopN(q.m)}</td> : null}<td>{q.b == null ? "–" : pubopN(q.b)}</td>
                   {net ? <td><b>{pubopSigned(q.v)}</b></td> : null}
                   <td>{q.url ? <a href={q.url} target="_blank" rel="noopener">Source ↗</a> : null}</td>
                 </tr>

@@ -801,9 +801,12 @@ function PubOpTracker({
   const x1 = Math.max(...pts.map(q => q.x)) + 0.06;
   const [lo, hi] = c.yDomain;
   const step = c.yStep || (hi - lo > 50 ? 25 : 10);
+  const span = x1 - x0,
+    yearStep = span > 24 ? 5 : span > 10 ? 2 : 1;
   const ticks = [];
   for (let y = Math.floor(x0); y <= Math.ceil(x1); y++) {
-    for (const m of [0, 6]) {
+    if (y % yearStep) continue;
+    for (const m of span > 10 ? [0] : [0, 6]) {
       const x = y + m / 12;
       if (x >= x0 && x <= x1) ticks.push({
         x,
@@ -993,13 +996,13 @@ function PubOpTracker({
     className: "pubop-l"
   }, "Pollster"), React.createElement("th", {
     className: "pubop-l"
-  }, "Fieldwork"), React.createElement("th", null, "Sample"), React.createElement("th", null, c.cols[0]), React.createElement("th", null, c.cols[1]), React.createElement("th", null, c.cols[2]), net ? React.createElement("th", null, "Net") : null, React.createElement("th", null))), React.createElement("tbody", null, rows.map((q, i) => React.createElement("tr", {
+  }, "Fieldwork"), React.createElement("th", null, "Sample"), React.createElement("th", null, c.cols[0]), c.cols[1] ? React.createElement("th", null, c.cols[1]) : null, React.createElement("th", null, c.cols[2]), net ? React.createElement("th", null, "Net") : null, React.createElement("th", null))), React.createElement("tbody", null, rows.map((q, i) => React.createElement("tr", {
     key: i
   }, React.createElement("td", {
     className: "pubop-l"
   }, pubopHouse(q, houses)), React.createElement("td", {
     className: "pubop-l"
-  }, pubopSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, pubopN(q.a)), React.createElement("td", null, q.m == null ? "–" : pubopN(q.m)), React.createElement("td", null, q.b == null ? "–" : pubopN(q.b)), net ? React.createElement("td", null, React.createElement("b", null, pubopSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
+  }, pubopSpan(q.field)), React.createElement("td", null, q.n ? q.n.toLocaleString("en-AU") : "–"), React.createElement("td", null, pubopN(q.a)), c.cols[1] ? React.createElement("td", null, q.m == null ? "–" : pubopN(q.m)) : null, React.createElement("td", null, q.b == null ? "–" : pubopN(q.b)), net ? React.createElement("td", null, React.createElement("b", null, pubopSigned(q.v))) : null, React.createElement("td", null, q.url ? React.createElement("a", {
     href: q.url,
     target: "_blank",
     rel: "noopener"

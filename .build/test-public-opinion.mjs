@@ -301,7 +301,7 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   /* AES: the full response distributions survive, with the published trend
      bases and each question's effective sample carried through the charts. */
   const aes = entries.filter((e) => e.house === "aes");
-  assert.equal(aes.length, 45, "45 response distributions across the four recurring AES questions");
+  assert.equal(aes.length, 135, "135 response distributions across the 11 recurring AES questions");
   for (const e of aes) {
     const total = e.tables[0].rows.reduce((s, r) => s + r[1], 0);
     assert.ok(Math.abs(total - 100) <= 0.2 + 1e-9, `${e.id} ${e.waveDate}: the response scale renormalises to 100 after rounding`);
@@ -342,6 +342,34 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
       ["Politicians don't know what ordinary people think — 4", 24.4], ["Politicians don't know what ordinary people think — 5", 24.6]]);
   assert.equal(big.head, "50% say government is run for a few big interests");
   assert.equal(know.head, "49% say federal politicians do not know what ordinary people think");
+  const sat = aesBlocks.find((b) => b.id === "aes-democratic-satisfaction");
+  assert.equal(sat.panels[0].points.length, 11);
+  assert.equal(sat.cols[1], null, "democracy has no invented neutral column");
+  assert.deepEqual([sat.panels[0].points.at(-1).a, sat.panels[0].points.at(-1).b], [70, 30]);
+  assert.equal(sat.head, "70% are satisfied with the way democracy works");
+  assert.deepEqual(aes.find((e) => e.id === "satisfaction-democracy" && e.waveDate === "2025-06").tables[0].rows,
+    [["Very satisfied", 16.3], ["Fairly satisfied", 53.7], ["Not very satisfied", 18.3], ["Not at all satisfied", 11.7]]);
+  const econ = out.topics.find((t) => t.id === "cost-of-living").blocks;
+  const homeEcon = econ.find((b) => b.id === "aes-household-economy"), nationalEcon = econ.find((b) => b.id === "aes-national-economy");
+  assert.equal(waves("household-economy-year", "aes")[0], "1987-08");
+  assert.deepEqual([homeEcon.panels[0].points.at(-1).v, homeEcon.panels[0].points.at(-1).m, homeEcon.panels[0].points.at(-1).b], [16.1, 37, 46.8]);
+  assert.deepEqual([nationalEcon.panels[0].points.at(-1).v, nationalEcon.panels[0].points.at(-1).m, nationalEcon.panels[0].points.at(-1).b], [13.2, 27.4, 59.4]);
+  assert.equal(homeEcon.panels[0].points.length, 14);
+  assert.equal(nationalEcon.panels[0].points.length, 14);
+  assert.equal(homeEcon.head, "47% say their household finances are worse than a year ago");
+  assert.equal(nationalEcon.head, "59% say the national economy is worse than a year ago");
+  const news = out.topics.find((t) => t.id === "media").blocks;
+  const tv = news.find((b) => b.id === "aes-campaign-tv"), radio = news.find((b) => b.id === "aes-campaign-radio");
+  const papers = news.find((b) => b.id === "aes-campaign-newspapers"), internet = news.find((b) => b.id === "aes-campaign-internet");
+  for (const [id, count] of [["campaign-news-tv", 14], ["campaign-news-radio", 13], ["campaign-news-newspapers", 14], ["campaign-news-internet", 10]])
+    assert.equal(waves(id, "aes").length, count, `${id}: the full comparable channel series`);
+  assert.equal(waves("campaign-news-radio", "aes").at(-1), "2022-06", "no 2025 radio point is invented");
+  assert.equal(aes.find((e) => e.id === "campaign-news-tv" && e.waveDate === "1987-08").sample, 1818, "early exclusive-channel answers stay in television's base");
+  assert.deepEqual([tv.panels[0].points.at(-1).v, tv.panels[0].points.at(-1).m, tv.panels[0].points.at(-1).b], [22, 36, 42]);
+  assert.deepEqual([papers.panels[0].points.at(-1).v, papers.panels[0].points.at(-1).m, papers.panels[0].points.at(-1).b], [9.9, 19.7, 70.4]);
+  assert.deepEqual([internet.panels[0].points.at(-1).v, internet.panels[0].points.at(-1).m, internet.panels[0].points.at(-1).b], [32.2, 33.5, 34.2]);
+  assert.equal(internet.head, "Attention to internet campaign news is higher since 1998");
+  assert.equal(radio.panels[0].points.at(-1).field.end, "2022-06");
   assert.deepEqual(waves("happiness-personal", "essential"), ["2026-09-29"], "happiness: one wave, the 30 Sep 2026 report's");
   assert.deepEqual(entries.find((e) => e.id === "happiness-personal").tables[0].rows[0], ["My life overall", 6.4], "happiness: its chart's Sep'26 point is the wave's all-voters figure");
   for (const id of ["melbourne-cup-attitudes", "melbourne-cup-betting", "melbourne-cup-interest"])
