@@ -2151,14 +2151,16 @@ const dirHistory = (() => {
   if (JUR) return null;            // federal history only; /vic/ has its own run
   const file = path.join(ROOT, "data", "direction-history.json");
   const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { waves: [] };
-  const rows = old.waves.filter((w) => (w.end || w.published || w.month) && w.right != null && w.wrong != null)
+  const rows = old.waves.filter((w) => (w.end || w.published || w.month) && (w.right != null || w.wrong != null))
     .map((w) => ({
       // Reprinted house series give an exact month, not fieldwork days. The
       // mid-month date is chart geometry only; `month` stays the identity.
       date: w.end || w.published || `${w.month}-15`, month: w.month,
-      pollster: w.pollster || "Roy Morgan",
+      pollster: w.pollster || "Roy Morgan", sample: w.sample ?? null,
       right: w.right, wrong: w.wrong,
-      unsure: w.unsure != null ? w.unsure : Math.max(0, r1(100 - w.right - w.wrong)),
+      unsure: w.unsure != null ? w.unsure : w.right != null && w.wrong != null
+        ? Math.max(0, r1(100 - w.right - w.wrong)) : null,
+      ...(w.question ? { question: w.question, rightLabel: w.rightLabel, wrongLabel: w.wrongLabel } : {}),
       // a table row duplicating a live wave on figures alone still drops out
       key: `${w.month || w.end}|${w.right}|${w.wrong}`,
     }));
@@ -2174,25 +2176,75 @@ const dirHistory = (() => {
     byHouse.get(d.pollster).push({ date: d.date, right: d.right, wrong: d.wrong,
       unsure: d.unsure != null ? d.unsure : Math.max(0, r1(100 - d.right - d.wrong)) });
   }
-  const houses = {};
+  const houses = {}, wordings = {};
   for (const [house, ws] of byHouse) {
     const months = new Map();
     for (const w of ws) {
       const ym = w.month || ymOf(w.date);
-      if (!months.has(ym)) months.set(ym, { ym, n: 0, right: 0, wrong: 0, unsure: 0 });
+      if (!months.has(ym)) months.set(ym, { ym, n: 0, right: 0, wrong: 0, unsure: 0, rn: 0, wn: 0, un: 0, samples: [] });
       const m = months.get(ym);
-      m.n++; m.right += w.right; m.wrong += w.wrong; m.unsure += w.unsure;
+      m.n++;
+      if (w.right != null) { m.rn++; m.right += w.right; }
+      if (w.wrong != null) { m.wn++; m.wrong += w.wrong; }
+      if (w.unsure != null) { m.un++; m.unsure += w.unsure; }
+      if (w.sample != null) m.samples.push(w.sample);
+      if (w.question) wordings[house] = { question: w.question, rightLabel: w.rightLabel, wrongLabel: w.wrongLabel };
     }
     const pts = [...months.values()].sort((a, b) => a.ym.localeCompare(b.ym)).map((m) => ({
       ym: m.ym, x: mx(m.ym), n: m.n,
-      right: r1(m.right / m.n), wrong: r1(m.wrong / m.n), unsure: r1(m.unsure / m.n),
+      right: m.rn ? r1(m.right / m.rn) : null,
+      wrong: m.wn ? r1(m.wrong / m.wn) : null,
+      unsure: m.un ? r1(m.unsure / m.un) : null,
+      ...(m.samples.length ? { samples: m.samples } : {}),
+      ...(wordings[house] || {}),
     }));
     if (pts.length) houses[house] = pts;
   }
   if (!Object.keys(houses).length) return null;
   const all = Object.values(houses).flat();
-  return { houses, from: all.reduce((a, p) => (p.ym < a ? p.ym : a), all[0].ym),
+  return { houses, wordings, from: all.reduce((a, p) => (p.ym < a ? p.ym : a), all[0].ym),
     sources: old.sources || [] };
+})();
+
+/* ---- 5di. Ipsos Australia-and-world national direction. What Worries the
+   World publishes Australia and its own global average, not an estimate we
+   can average together again. Quantiles are over participating COUNTRIES
+   only, each country's net direction, excluding that global average. */
+const directionWorld = (() => {
+  if (JUR) return null;
+  const file = path.join(ROOT, "data", "ipsos-direction.json");
+  if (!fs.existsSync(file)) return null;
+  const doc = JSON.parse(fs.readFileSync(file, "utf8"));
+  const q = (sorted, p) => {
+    const at = (sorted.length - 1) * p, lo = Math.floor(at), hi = Math.ceil(at);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (at - lo);
+  };
+  const waves = [];
+  for (const w of doc.waves || []) {
+    const ym = w.month, au = w.australia, world = w.globalAverage;
+    if (!/^\d{4}-(?:0[1-9]|1[0-2])$/.test(ym || "")) throw new Error(`Ipsos direction: bad month ${ym}`);
+    for (const [who, r] of [["Australia", au], ["Global average", world]]) {
+      if (r == null || ![r.right, r.wrong].every((v) => Number.isFinite(v) && v >= 0 && v <= 100))
+        throw new Error(`Ipsos ${ym}: no complete printed split for ${who}`);
+      if (r.sample != null && (!Number.isInteger(r.sample) || r.sample <= 0))
+        throw new Error(`Ipsos ${ym}: invalid n for ${who}`);
+    }
+    const nets = (w.countries || []).filter((c) => Number.isFinite(c.right) && Number.isFinite(c.wrong))
+      .map((c) => c.right - c.wrong).sort((a, b) => a - b);
+    const band = nets.length >= 4 ? {
+      n: nets.length,
+      p10: q(nets, 0.1), q25: q(nets, 0.25), p50: q(nets, 0.5), p75: q(nets, 0.75), p90: q(nets, 0.9),
+    } : null;
+    waves.push({ ym, x: mx(ym),
+      auRight: au.right, auWrong: au.wrong, auNet: r1(au.right - au.wrong), auN: au.sample ?? null,
+      ...(au.sampleApprox ? { auSampleApprox: true } : {}),
+      worldRight: world.right, worldWrong: world.wrong, worldNet: r1(world.right - world.wrong), worldN: world.sample ?? null,
+      band, fieldwork: w.fieldwork || null, start: w.start ?? null, end: w.end ?? null,
+      source: w.source || doc.source || "Ipsos What Worries the World",
+      url: w.sourceUrl || w.url || null });
+  }
+  waves.sort((a, b) => a.ym.localeCompare(b.ym));
+  return { waves, source: doc.source || "Ipsos What Worries the World" };
 })();
 
 /* ---- 5i. issues waves – per-wave what-matters / who's-best data, keyed to
@@ -2493,7 +2545,7 @@ const directionNow = (() => {
    days. Before March 2022 Roy Morgan's printed waves alone supply the
    series. Waves with no printed sample take the standing 1200 default. */
 const DIR_PRE_FROM = "2022-03";
-const DIR_PRE_HOUSES = ["Roy Morgan", "SEC Newgate", "Essential", "RedBridge/Accent"];
+const DIR_PRE_HOUSES = ["Roy Morgan", "SEC Newgate", "Essential", "RedBridge/Accent", "Freshwater"];
 const dirPreLeanFor = (rows) => {
   const firms = [...new Set(rows.map((r) => r.firm))];
   const multiple = houseEffectsFor(rows);
@@ -2523,6 +2575,7 @@ const directionPre = (() => {
   const file = path.join(ROOT, "data", "direction-history.json");
   const hist = (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")).waves : [])
     .filter((w) => (w.end || w.month) && w.right != null && w.wrong != null && inPre(w.month || ymOf(w.end))
+      && w.pollster !== "McKinnon"
       && !liveKeys.has(`${w.pollster || "Roy Morgan"}|${w.end}|${w.right}|${w.wrong}`))
     .map((w) => ({ date: w.end || `${w.month}-15`, dateStart: w.start && w.start !== w.end ? w.start : null,
       month: w.month || null, pollster: w.pollster || "Roy Morgan", right: w.right, wrong: w.wrong, sample: w.sample,
@@ -2553,6 +2606,7 @@ const directionPre = (() => {
   // the waves themselves, as the panel's dots (the current term's are directionPolls)
   const polls = waves.map((w) => ({ x: mx(ymOf(w.date)) + (dayOf(w.date) - 15) / 365, pollster: w.pollster,
     released: w.date, dateLabel: w.dateLabel || fwLabel(w.dateStart, w.date), right: w.right, wrong: w.wrong,
+    sample: w.sample ?? null,
     ...(w.url ? { url: w.url } : {}) }));
   /* Before March 2022 Roy Morgan asked alone. Its months are built the same
      way (monthWithSe: sample-weighted, sqrt(m) repeat deflation, the
@@ -2582,6 +2636,7 @@ const directionPre = (() => {
   })();
   for (const w of solo.waves) polls.push({ x: mx(ymOf(w.date)) + (dayOf(w.date) - 15) / 365, pollster: w.pollster,
     released: w.date, dateLabel: w.dateLabel || fwLabel(w.dateStart, w.date), right: w.right, wrong: w.wrong,
+    sample: w.sample ?? null,
     ...(w.url ? { url: w.url } : {}) });
   polls.sort((a, b) => a.x - b.x);
   const gap = (k) => { const g = he[k].gapAt(Date.parse(to + "-01T00:00:00Z")); return g == null ? null : r1(g); };
@@ -9755,6 +9810,7 @@ window.AUSPOL = (function () {
      pooled model above never covers these years. */
   const dirHistory = ${JSON.stringify(dirHistory)};
   const directionPre = ${JSON.stringify(directionPre)};
+  const directionWorld = ${JSON.stringify(directionWorld)};
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
@@ -10008,7 +10064,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {

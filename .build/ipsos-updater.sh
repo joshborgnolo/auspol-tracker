@@ -8,8 +8,8 @@
 #
 # Ipsos publishes no voting intention, so it has no house updater and no row
 # in "Next expected polls": its monthly Issues Monitor feeds the Snapshot's
-# issues panel alone. A report goes up about three weeks after its fieldwork
-# closes, on no fixed weekday and mostly in the afternoon, and the panel
+# issues panel, and What Worries the World feeds the global-direction comparison.
+# A report goes up about three weeks after its fieldwork closes, on no fixed weekday and mostly in the afternoon, and the panel
 # counts Ipsos's newest poll for only part of each month – so it is combed
 # through the hours it uploads in. The daily crosstabs run, the only fetcher
 # before 2026-09-26, fetches Ipsos too, and stays the alarm for a month left
@@ -63,9 +63,22 @@ log "$LAST"
 # anything that did load has been pushed
 WARN="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^IPSOS_STATUS /, "")); console.log((s.warnings || [])[0] || "")' "$LAST")"
 
-if [ -z "$(git status --porcelain -- .build/ipsos-src)" ]; then
-  if [ -n "$WARN" ]; then
-    log "FAIL extract-ipsos (exit 1): $WARN"
+DOUT="$(node .build/ipsos-direction.mjs --fetch 2>&1)"
+DCODE=$?
+DLAST="$(echo "$DOUT" | tail -1)"
+case "$DLAST" in
+  IPDIR_STATUS*) ;;
+  *) log "FAIL ipsos-direction (exit $DCODE): $(node_error "$DOUT")"; exit 1 ;;
+esac
+[ $DCODE -eq 0 ] || { log "FAIL ipsos-direction (exit $DCODE): $(node_error "$DOUT")"; exit 1; }
+log "$DLAST"
+DWARN="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^IPDIR_STATUS /, "")); console.log((s.failures || [])[0]?.error || "")' "$DLAST")"
+
+# The daily full run refreshes global direction even when no Issues Monitor
+# file moved. New caches alone trigger no build; changed figures do.
+if [ -z "$(git status --porcelain -- .build/ipsos-src .build/ipsos-direction-src data/ipsos-direction.json)" ]; then
+  if [ -n "$WARN$DWARN" ]; then
+    log "FAIL extract-ipsos (exit 1): ${WARN:-$DWARN}"
     exit 1
   fi
   exit 0
@@ -93,10 +106,10 @@ IPBAD="$(node -e '
                ...(s.unknown || []).filter((u) => u.startsWith("Ipsos "))];
   console.log(bad.join("; "));' "$ILAST")"
 
-if git diff --quiet -- data/issues.json; then
+if git diff --quiet -- data/issues.json data/ipsos-direction.json; then
   # a statement or report that moves no figure (a month still waiting, or
   # dates that already matched): keep the file so it isn't fetched again
-  FILES=(.build/ipsos-src)
+  FILES=(.build/ipsos-src .build/ipsos-direction-src)
   MSG="Cache Ipsos Issues Monitor files $(date '+%Y-%m-%d')"
 else
   log "new Ipsos figures; running validate/build/commit/push"
@@ -110,7 +123,7 @@ else
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/issues.json .build/ipsos-src "${SITE_FILES[@]}")
+  FILES=(data/issues.json data/ipsos-direction.json .build/ipsos-src .build/ipsos-direction-src "${SITE_FILES[@]}")
   MSG="Update Ipsos Issues Monitor $(date '+%Y-%m-%d')"
 fi
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
@@ -125,8 +138,9 @@ log "OK committed + pushed: $MSG"
 
 # The alarms, last: the classifier reads the LAST FAIL line, and a report
 # that didn't read is the defect to name over a page that didn't load.
-if [ -n "$WARN" ] || [ -n "$IPBAD" ]; then
+if [ -n "$WARN" ] || [ -n "$DWARN" ] || [ -n "$IPBAD" ]; then
   [ -n "$WARN" ] && log "FAIL extract-ipsos (exit 1): $WARN"
+  [ -n "$DWARN" ] && log "FAIL ipsos-direction (exit 1): $DWARN"
   [ -n "$IPBAD" ] && log "FAIL issues (exit 1): new Ipsos report didn't read: $IPBAD (reasons in the issues lines above)"
   exit 1
 fi

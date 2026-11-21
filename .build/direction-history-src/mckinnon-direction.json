@@ -1,0 +1,43 @@
+{
+  "_about": "The national-direction question in the McKinnon Index. Satisfied and dissatisfied are the very/somewhat aggregates; neutral and don't know are separate answer categories. This differently worded house series is displayed separately and does not join the pooled right/wrong estimator.",
+  "question": "All things considered, how satisfied are you with the way Australia is heading? 'Satisfied' aggregates very satisfied and somewhat satisfied; 'Dissatisfied' aggregates somewhat dissatisfied and very dissatisfied; neutral and don't know are separate answer categories.",
+  "rightLabel": "Satisfied",
+  "wrongLabel": "Dissatisfied",
+  "waves": [
+    {
+      "month": "2025-07",
+      "start": "2025-07-09",
+      "end": "2025-07-31",
+      "right": 28.8,
+      "wrong": 54.8,
+      "unsure": 16.4,
+      "neutral": 15.4,
+      "dontKnow": 1,
+      "sample": 4416,
+      "method": "Online",
+      "question": "All things considered, how satisfied are you with the way Australia is heading?",
+      "rightLabel": "Satisfied",
+      "wrongLabel": "Dissatisfied",
+      "url": "https://apo.org.au/sites/default/files/resource-files/2025-11/apo-nid332763_1.pdf",
+      "quote": "Figure 11: Satisfied 28.8%; Neutral 15.4%; Dissatisfied 54.8%; Don't know 1.0% by residual. Methodology: 'The survey was conducted online with a large sample of n=4,416 Australians aged 18+ From the 9th –31st July 2025.'"
+    },
+    {
+      "month": "2026-07",
+      "start": "2026-06-19",
+      "end": "2026-07-21",
+      "right": 26.1,
+      "wrong": 59,
+      "unsure": 15,
+      "neutral": 14.1,
+      "dontKnow": 0.9,
+      "sample": 4273,
+      "method": "Online",
+      "question": "All things considered, how satisfied are you with the way Australia is heading?",
+      "rightLabel": "Satisfied",
+      "wrongLabel": "Dissatisfied",
+      "url": "https://mckinnon.co/index/dashboard",
+      "reportUrl": "https://a-ap.storyblok.com/f/3001038/x/241a2c3f06/mckinnon-index-2026-key-findings-report.pdf",
+      "quote": "Figure 03 of the key-findings report: Satisfied 26.1%, a 2.7-point fall. Dashboard: Very satisfied 3.5 + somewhat satisfied 22.6 = 26.1; Neither 14.1; Somewhat dissatisfied 26.5 + very dissatisfied 32.5 = 59.0; Don't know 0.9. The report methodology prints 4,273 Australians, online, 19 June to 21 July 2026."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "waves": [
+    { "dateStart": "2022-02-16", "end": "2022-02-21", "pollster": "Essential", "right": 40, "wrong": 40, "unsure": 20, "sample": 1089, "sampleEff": 1013, "question": "In general, would you say that Australia is heading in the right direction or is it off on the wrong track?", "url": "https://essentialreport.com.au/questions/direction-of-australia", "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2022/02/Essential-Report-Disclosure-Statement-1.pdf", "source": "Essential Direction of Australia, February 2022" },
+    { "dateStart": "2022-04-14", "end": "2022-04-19", "pollster": "Essential", "right": 46, "wrong": 37, "unsure": 16, "sample": 1052, "sampleEff": 971, "question": "In general, would you say that Australia is heading in the right direction or is it off on the wrong track?", "url": "https://essentialreport.com.au/questions/direction-of-australia-2", "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2022/04/Essential-Report-Disclosure-Statement-20_04_22-Full-Questionnaire.pdf", "source": "Essential Direction of Australia, April 2022" },
+    { "dateStart": "2022-04-27", "end": "2022-05-02", "pollster": "Essential", "right": 41, "wrong": 43, "unsure": 16, "sample": 1630, "sampleEff": 1508, "question": "In general, would you say that Australia is heading in the right direction or is it off on the wrong track?", "url": "https://essentialreport.com.au/questions/direction-of-australia-3", "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2022/05/Essential-Report-Disclosure-Statement-03_05_22-Full-Questionnaire.pdf", "source": "Essential Direction of Australia, 2 May 2022" },
+    { "dateStart": "2022-05-11", "end": "2022-05-17", "pollster": "Essential", "right": 40, "wrong": 42, "unsure": 18, "sample": 1599, "sampleEff": 1459, "question": "In general, would you say that Australia is heading in the right direction or is it off on the wrong track?", "url": "https://essentialreport.com.au/questions/direction-of-australia-4", "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2022/05/Essential-Report-Disclosure-Statement-18_05_22-Full-Questionnaire.pdf", "source": "Essential Direction of Australia, 17 May 2022" },
+    { "dateStart": "2023-05-15", "end": "2023-05-17", "pollster": "Freshwater", "right": 37, "wrong": 48, "unsure": null, "unsureDerived": true, "sample": 1005, "url": "https://www.afr.com/politics/federal/public-support-shifting-away-from-the-voice-poll-20230519-p5d9nv", "source": "Freshwater Strategy national direction, May 2023; figures reconciled against September's printed 31% right / 56% wrong and down 6 / up 8 changes" },
+    { "dateStart": "2023-09-22", "end": "2023-09-24", "pollster": "Freshwater", "right": 31, "wrong": 56, "unsure": null, "unsureDerived": true, "sample": 1003, "url": "https://www.afr.com/politics/federal/support-for-labor-albanese-voice-slides-20230924-p5e73r", "source": "Freshwater Strategy national direction, September 2023" },
+    { "dateStart": "2023-12-15", "end": "2023-12-17", "pollster": "Freshwater", "right": 32, "wrong": 54, "unsure": null, "unsureDerived": true, "sample": 1109, "url": "https://www.afr.com/politics/federal/labor-loses-lead-pm-s-ratings-slump-poll-20231217-p5es0f", "source": "Freshwater Strategy national direction, December 2023" },
+    { "dateStart": "2024-01-10", "end": "2024-01-11", "pollster": "Freshwater", "right": 31, "wrong": 51, "unsure": 18, "sample": 1007, "url": "https://freshwaterstrategy.com/2024/01/16/sunday-telegraph-freshwater-strategy-federal-poll-insights-january-2024/", "source": "Freshwater Strategy national direction, January 2024" },
+    { "dateStart": "2024-02-16", "end": "2024-02-18", "pollster": "Freshwater", "right": 32, "wrong": 54, "unsure": 15, "sample": 1049, "url": "https://freshwaterstrategy.com/2024/02/20/afr-freshwater-strategy-federal-poll-february-2024-insights/", "source": "Freshwater Strategy national direction, February 2024; published rounded shares sum to 101" },
+    { "dateStart": "2026-01-16", "end": "2026-01-18", "pollster": "Freshwater", "right": 33, "wrong": 53, "unsure": 15, "sample": 1050, "url": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Federal-Poll-18012679.xlsx", "source": "Freshwater Strategy national direction, January 2026" },
+    { "dateStart": "2026-03-27", "end": "2026-03-29", "pollster": "Freshwater", "right": 28, "wrong": 60, "unsure": 12, "sample": 1050, "url": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Federal-Poll-300326.xlsx", "source": "Freshwater Strategy national direction, March 2026" },
+    { "dateStart": "2026-04-28", "end": "2026-04-30", "pollster": "Freshwater", "right": 29, "wrong": 56, "unsure": 15, "sample": 1046, "url": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Aus-Polling-300426.xlsx", "source": "Freshwater Strategy national direction, April 2026" },
+    { "dateStart": "2026-05-13", "end": "2026-05-15", "pollster": "Freshwater", "right": 27, "wrong": 60, "unsure": 13, "sample": 1384, "url": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Aus-Polling-150526.xlsx", "source": "Freshwater Strategy national direction, May 2026" }
+  ],
+  "secNewgateSamples": [
+    { "dateStart": "2022-03-07", "end": "2022-03-11", "sample": 1204 },
+    { "dateStart": "2022-04-12", "end": "2022-04-18", "sample": 1401 },
+    { "dateStart": "2022-05-23", "end": "2022-05-27", "sample": 1403 },
+    { "dateStart": "2022-06-23", "end": "2022-06-27", "sample": 1201 },
+    { "dateStart": "2022-08-10", "end": "2022-08-15", "sample": 1804 },
+    { "dateStart": "2022-08-31", "end": "2022-09-05", "sample": 1502 },
+    { "dateStart": "2022-10-05", "end": "2022-10-10", "sample": 1207 },
+    { "dateStart": "2022-11-09", "end": "2022-11-15", "sample": 1472 },
+    { "dateStart": "2023-02-01", "end": "2023-02-06", "sample": 1478 },
+    { "dateStart": "2023-04-13", "end": "2023-04-18", "sample": 1200 },
+    { "dateStart": "2023-06-23", "end": "2023-06-28", "sample": 2207 },
+    { "dateStart": "2023-08-16", "end": "2023-08-21", "sample": 1213 },
+    { "dateStart": "2023-10-18", "end": "2023-10-23", "sample": 1610 },
+    { "dateStart": "2024-02-01", "end": "2024-02-05", "sample": 1588 },
+    { "dateStart": "2024-04-23", "end": "2024-04-26", "sample": 1208 },
+    { "dateStart": "2024-07-17", "end": "2024-07-23", "sample": 2021 },
+    { "dateStart": "2024-09-10", "end": "2024-09-14", "sample": 1611 },
+    { "dateStart": "2024-10-31", "end": "2024-11-04", "sample": 1417 },
+    { "dateStart": "2025-01-30", "end": "2025-02-03", "sample": 1865 },
+    { "dateStart": "2025-04-10", "end": "2025-04-14", "sample": 1214 }
+  ]
+}

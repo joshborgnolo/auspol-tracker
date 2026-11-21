@@ -25,7 +25,8 @@ const OUT = "data/direction-history.json";
 const FETCH = process.argv.includes("--fetch");
 const MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 /* full names OR their abbreviations — the tables write "31/ Aug 1" */
-const MONRE = "Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)";
+const MONRE = "Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?";
+const MON_ANY = new RegExp(`\\b(?:${MONRE})\\b`, "i");
 const monOf = (tok) => MON.findIndex((x) => x.slice(0, 3).toLowerCase() === String(tok).slice(0, 3).toLowerCase());
 const TABLES = [
   { id: "live", label: "Roy Morgan Government Confidence Rating table (2012–2025)",
@@ -40,6 +41,18 @@ const TABLES = [
   { id: "wb2022", label: "Roy Morgan Government Confidence Rating table, 2022 Wayback capture",
     url: "https://web.archive.org/web/20220123063359/http://www.roymorgan.com/morganpoll/federal-voting/roy-morgan-government-confidence-rating-2006-2022",
     cache: "gcr-2006-2022.html" },
+  { id: "rm2007", release: true, startYear: 2007, label: "Roy Morgan Finding 4259, 2007 release trend table",
+    url: "https://web.archive.org/web/20080102151457id_/http://www.roymorgan.com:80/news/polls/2007/4259/index.cfm?printversion=yes", cache: "gcr-release-4259.html" },
+  { id: "rm2008", release: true, startYear: 2007, label: "Roy Morgan Finding 4343, 2008 release trend table",
+    url: "https://web.archive.org/web/20081226214036id_/http://www.roymorgan.com:80/news/polls/2008/4343/index.cfm?printversion=yes", cache: "gcr-release-4343.html" },
+  { id: "rm2009", release: true, startYear: 2009, label: "Roy Morgan Finding 4452, 2009 release trend table",
+    url: "https://web.archive.org/web/20100117203521id_/http://www.roymorgan.com:80/news/polls/2009/4452/index.cfm?printversion=yes", cache: "gcr-release-4452.html" },
+  { id: "rm2010-h1", release: true, startYear: 2009, label: "Roy Morgan Finding 4519, January–June 2010 release trend table",
+    url: "https://web.archive.org/web/20100704024251id_/http://www.roymorgan.com:80/news/polls/2010/4519/index.cfm?printversion=yes", cache: "gcr-release-4519.html" },
+  { id: "rm2010-h2", release: true, startYear: 2010, label: "Roy Morgan Finding 4619, June–December 2010 release trend table",
+    url: "https://web.archive.org/web/20110306051133id_/http://www.roymorgan.com/news/polls/2010/4619/index.cfm?printversion=yes", cache: "gcr-release-4619.html" },
+  { id: "rm2011", release: true, startYear: 2011, label: "Roy Morgan Finding 4729, 2011 release trend table",
+    url: "https://web.archive.org/web/20120324162518id_/http://www.roymorgan.com/news/polls/2011/4729/index.cfm?printversion=yes", cache: "gcr-release-4729.html" },
 ];
 
 /* Tiny HTML entity decode for the handful the tables actually carry. */
@@ -75,7 +88,7 @@ function fieldDates(label0, yearHint) {
   if (explicit.length) year = explicit[explicit.length - 1];
   const dates = label.replace(/(?:19|20)\d{2}/g, " ");
   let m = null, start = null, end = null, curYear = year;
-  const re = new RegExp(`(?:(${MONRE})\\s*)?(\\d{1,2})(?:\\s*[/–-]\\s*(?:(?:${MONRE})\\s*)?(\\d{1,2}))?`, "gi");
+  const re = new RegExp(`(?:(${MONRE})\\s*)?(\\d{1,2})(?:\\s*[/–-]\\s*(?:(${MONRE})\\s*)?(\\d{1,2}))?`, "gi");
   let seenMonth = null;
   for (const t of dates.matchAll(re)) {
     const mon = t[1] ? monOf(t[1]) : null;
@@ -84,15 +97,19 @@ function fieldDates(label0, yearHint) {
       seenMonth = mon; m = mon;
     }
     if (m == null || curYear == null) continue;
-    const d1 = +t[2], d2 = t[3] != null ? +t[3] : null;
+    const d1 = +t[2], d2 = t[4] != null ? +t[4] : null;
     if (d1 > 31 || (d2 != null && d2 > 31)) continue;
     if (!start) start = iso(curYear, m, d1);
-    end = iso(curYear, m, d2 != null ? d2 : d1);
-    if (d2 != null && d2 < d1) {          // "March 31/April 1" month roll
-      const dt = new Date(Date.UTC(curYear, m, d1) + 86400000);
-      end = dt.toISOString().slice(0, 10);
-      m = dt.getUTCMonth(); curYear = dt.getUTCFullYear(); seenMonth = m;
+    if (t[3]) {
+      const nextMonth = monOf(t[3]);
+      if (nextMonth < m - 6) curYear++;
+      m = nextMonth;
+    } else if (d2 != null && d2 < d1) {
+      const dt = new Date(Date.UTC(curYear, m + 1, d2));
+      m = dt.getUTCMonth(); curYear = dt.getUTCFullYear();
     }
+    end = iso(curYear, m, d2 != null ? d2 : d1);
+    seenMonth = m;
   }
   return { start, end, year: curYear ?? year, month: m };
 }
@@ -100,19 +117,18 @@ function fieldDates(label0, yearHint) {
 /* A table row is [date cells..., numbers...]. Modes (Face/Phone/Multi) arrive
    as words, shares sometimes carry %, and the old tables print
    right wrong GCR unsure Total where the live one prints right wrong unsure GCR. */
-function parseRows(html, url, label) {
+function parseRows(html, url, label, startYear = null) {
   const waves = [];
-  let year = null, skipped = 0;
+  let year = startYear, skipped = 0;
   for (const cells of tableRows(html)) {
     let text = cells.join(" ");
     const yearOnly = text.match(/^(?:Interviewing Dates[^]*?)?\s*((?:19|20)\d{2})\s*$/);
     if (yearOnly) { year = +yearOnly[1]; continue; }
-    const hasMonth = MON.some((m) => text.toLowerCase().includes(m.toLowerCase()));
-    if (!hasMonth) continue;                     // headings, footnotes, elections
-    const di = fieldDates(cells.filter((c) => MON.some((m) => c.toLowerCase().includes(m.toLowerCase()))).join(" ")
+    if (!MON_ANY.test(text)) continue;            // headings, footnotes, elections
+    const di = fieldDates(cells.filter((c) => MON_ANY.test(c)).join(" ")
       || text.split(/\d+(?:\.\d+)?\s*%/)[0], year);
     if (di.year != null) year = di.year;
-    const dateCell = cells.find((c) => MON.some((m) => c.toLowerCase().includes(m.toLowerCase()))) || "";
+    const dateCell = cells.find((c) => MON_ANY.test(c)) || "";
     const numericCells = cells.slice(cells.indexOf(dateCell) + 1).flatMap((c) =>
       (c.match(/\d+(?:\.\d+)?/g) || []).map(Number)).filter((v) => v <= 200);
     let right = null, wrong = null, unsure = null, gcr = null;
@@ -139,6 +155,52 @@ function parseRows(html, url, label) {
   return { waves, skipped };
 }
 
+/* The 2007–11 release tables are transposed: interviewing dates are column
+   heads and right/wrong/GCR/can't-say are rows beneath them. */
+function parseReleaseRows(html, url, label, startYear) {
+  const waves = [];
+  let year = startYear, previousMonth = null, skipped = 0;
+  const number = (s) => {
+    const m = String(s ?? "").trim().match(/^-?\d+(?:\.\d+)?$/);
+    return m ? +m[0] : null;
+  };
+  const body = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+  for (const table of body.matchAll(/<table\b[\s\S]*?<\/table>/gi)) {
+    if (!/Right direction/i.test(table[0]) || !/Wrong direction/i.test(table[0])) continue;
+    const rows = tableRows(table[0]).map((r) => r.filter((c) => c !== ""));
+    const dateRow = rows.findIndex((r) => r.some((c) => MON_ANY.test(c)));
+    if (dateRow < 0) continue;
+    const dates = rows[dateRow], methods = rows[dateRow + 1];
+    const rightRow = rows.find((r) => /^Right direction$/i.test(r[0]));
+    const wrongRow = rows.find((r) => /^Wrong direction$/i.test(r[0]));
+    const unsureRow = rows.find((r) => /^Can.?t say$/i.test(r[0]));
+    const gcrRow = rows.find((r) => /^Roy Morgan GCR/.test(r[0]));
+    if (!rightRow || !wrongRow) continue;
+    for (let i = 0; i < dates.length; i++) {
+      const rawDate = dates[i], firstMonthToken = rawDate.match(MON_ANY)?.[0];
+      if (firstMonthToken && previousMonth != null && monOf(firstMonthToken) < previousMonth - 6) year++;
+      const di = fieldDates(rawDate, year), right = number(rightRow[i + 1]);
+      const wrong = number(wrongRow[i + 1]), unsure = number(unsureRow?.[i + 1]);
+      let gcr = number(gcrRow?.[i + 1]) ?? (100 + right - wrong);
+      const gcrMisprint = /Finding 4343/.test(label) && rawDate === "May 17/18" &&
+        gcr === 130 && right === 56 && wrong === 25 && unsure === 18;
+      const gcrPrinted = gcrMisprint ? gcr : null;
+      if (gcrMisprint) gcr = null;  // this cell alone says 130, against 56 − 25 ⇒ 131
+      if (!di.end || right == null || wrong == null || right > 95 || wrong > 95 ||
+        unsure == null || Math.abs(right + wrong + unsure - 100) > 1.5 ||
+        (gcr != null && Math.abs(gcr - (100 + right - wrong)) > 0.55)) { skipped++; continue; }
+      year = di.year;
+      previousMonth = di.month;
+      const printedMethod = /^(?:Face|Phone|Multi)$/i.test(methods?.[i] || "") ? methods[i] : null;
+      waves.push({ start: di.start, end: di.end, published: null, label: rawDate.replace(/\s*\^\s*$/, ""),
+        right, wrong, unsure, gcr, ...(gcrPrinted != null ? { gcrPrinted } : {}), sample: null,
+        method: printedMethod || (/\^/.test(rawDate) ? "Phone" : "Face"),
+        pollster: "Roy Morgan", url, source: label });
+    }
+  }
+  return { waves, skipped };
+}
+
 /* The live file keys a wave to its fieldwork end (a Sunday); the tables
    sometimes print the Monday the release landed instead, and occasionally
    restate the wrong-track share by half a point (Feb 2026's 57 vs the
@@ -155,7 +217,7 @@ const isLiveWave = (rows, w) => w.end && rows.some((r) =>
 async function main() {
   fs.mkdirSync(SRC, { recursive: true });
   const live = liveRows();
-  const byKey = new Map(), reports = [];
+  const byKey = new Map(), reports = [], recovered = [];
   for (const t of TABLES) {
     const file = path.join(SRC, t.cache);
     if (FETCH || !fs.existsSync(file)) {
@@ -163,7 +225,17 @@ async function main() {
       if (!res.ok) { console.log(`HIST_FETCH ${t.id} HTTP ${res.status}`); continue; }
       fs.writeFileSync(file, await res.text());
     }
-    const { waves, skipped } = parseRows(fs.readFileSync(file, "utf8"), t.url, t.label);
+    const html = fs.readFileSync(file, "utf8");
+    const { waves, skipped } = t.release
+      ? parseReleaseRows(html, t.url, t.label, t.startYear)
+      : parseRows(html, t.url, t.label);
+    if (t.release) {
+      recovered.push(...waves);
+      const samples = [...new Set([...clean(fs.readFileSync(file, "utf8"))
+        .matchAll(/cross-section of ([\d,]+)|cross-section of Australians aged \d+\+ including ([\d,]+) electors/g)]
+        .map((m) => +(m[1] || m[2]).replaceAll(",", "")))];
+      if (samples.length === 1 && waves.at(-1)) waves.at(-1).sample = samples[0];
+    }
     let added = 0;
     for (const w of waves) {
       if (isLiveWave(live, w)) continue;         // the live file owns this wave
@@ -171,8 +243,10 @@ async function main() {
       if (byKey.has(key)) continue;
       byKey.set(key, w); added++;
     }
-    reports.push({ table: t.id, rows: waves.length, added, skipped });
+    reports.push({ table: t.id, rows: waves.length, added, skipped,
+      ...(t.release ? { latestSample: waves.at(-1)?.sample, latestDate: waves.at(-1)?.end } : {}) });
   }
+  const recoveredKeys = new Set(recovered.map((w) => `${w.end}|${w.method}`));
   const oldFile = path.join(SRC, "waves-2007-2011.json");
   let older = [];
   for (const name of [oldFile, path.join(SRC, "waves-supplement.json")]) {
@@ -182,17 +256,36 @@ async function main() {
     older = older.map((w) => ({ ...w, pollster: "Roy Morgan", source: "Roy Morgan release" }));
     console.log(`HIST_RELEASES ${older.length}`);
   } else console.log("HIST_RELEASES 0 (no separate release files present)");
-  let dupes = 0;
+  let dupes = 0, superseded = 0;
   for (const w of older) {
+    if (recoveredKeys.has(`${w.end}|${w.method}`)) { superseded++; continue; }
     const key = `${w.end}|${w.right}|${w.wrong}`;
     if (isLiveWave(live, w) || byKey.has(key)) { dupes++; continue; }
     if (unsureBad(w)) { console.log(`HIST_BAD ${w.end} ${w.right}/${w.wrong}/${w.unsure}`); continue; }
     byKey.set(key, w);
   }
+  console.log(`HIST_OLDER_SUPERSEDED ${superseded} (primary release tables win same-date/method conflicts)`);
   const liveDirection = JSON.parse(fs.readFileSync("data/polls.json", "utf8")).direction;
+  const mckinnonFile = path.join(SRC, "mckinnon-direction.json");
+  const mckinnon = fs.existsSync(mckinnonFile)
+    ? JSON.parse(fs.readFileSync(mckinnonFile, "utf8")).waves
+      .map((w) => ({ ...w, pollster: "McKinnon", source: "McKinnon Index, How satisfied are you with the way Australia is heading?" }))
+    : [];
+  const otherFile = path.join(SRC, "other-houses-direction.json");
+  const other = fs.existsSync(otherFile) ? JSON.parse(fs.readFileSync(otherFile, "utf8")) : { waves: [], secNewgateSamples: [] };
+  const secRows = secHistoryWaves(".build/secnewgate-src");
+  if (other.secNewgateSamples.length !== secRows.length) throw new Error("SEC Newgate metadata must cover every historical wave");
+  for (let i = 0; i < secRows.length; i++) Object.assign(secRows[i], other.secNewgateSamples[i],
+    { start: other.secNewgateSamples[i].dateStart });
+  const otherRows = other.waves.map((w) => ({
+    ...w, start: w.dateStart, label: `${w.dateStart} to ${w.end}`,
+    source: w.source || `${w.pollster} national-direction release`,
+  }));
   const additional = [
-    ...secHistoryWaves(".build/secnewgate-src"),
+    ...secRows,
     ...redbridgeHistoryWaves(SRC),
+    ...mckinnon,
+    ...otherRows,
   ];
   for (const w of additional) {
     if (unsureBad(w)) throw new Error(`${w.pollster} ${w.month}: bad printed triple`);
@@ -201,7 +294,32 @@ async function main() {
     if (liveSameMonth.length) throw new Error(`${w.pollster} ${w.month}: historical reprint disagrees with the dated row`);
     byKey.set(`${w.pollster}|${w.month}|${w.right}|${w.wrong}`, w);
   }
-  const monthOfWave = (w) => String(w.month || w.end || w.published);
+  const recoveredSamples = ["rm-samples-2007-2013.json", "rm-samples-2014-2025.json"]
+    .flatMap((name) => JSON.parse(fs.readFileSync(path.join(SRC, name), "utf8")).waves);
+  const samplesByKey = new Map();
+  for (const s of recoveredSamples) {
+    const key = `${s.historyEnd || s.end}|${s.right ?? ""}|${s.wrong ?? ""}`;
+    if (!samplesByKey.has(key)) samplesByKey.set(key, []);
+    samplesByKey.get(key).push(s);
+  }
+  let samplesApplied = 0, ambiguousSamples = 0;
+  for (const w of byKey.values()) if (w.pollster === "Roy Morgan") {
+    const candidates = (samplesByKey.get(`${w.end}|${w.right}|${w.wrong}`) ||
+      samplesByKey.get(`${w.end}||`) || [])
+      .filter((s) => !s.method || (s.historyMethod || s.method) === w.method);
+    const ns = [...new Set(candidates.map((s) => s.sample))];
+    if (ns.length !== 1) { if (candidates.length) ambiguousSamples++; continue; }
+    const s = candidates[0];
+    if (w.sample != null && w.sample !== s.sample) throw new Error(`${w.end}: ${w.sample} conflicts with recovered n=${s.sample}`);
+    w.sample = s.sample;
+    w.sampleUrl = s.url; w.sampleQuote = s.quote;
+    if (s.releaseMethod && s.releaseMethod !== w.method) w.releaseMethod = s.releaseMethod;
+    samplesApplied++;
+  }
+  console.log(`HIST_SAMPLES ${JSON.stringify({ accepted: recoveredSamples.length, applied: samplesApplied,
+    alreadySourced: [...byKey.values()].filter((w) => w.pollster === "Roy Morgan" && w.sample != null).length,
+    ambiguous: ambiguousSamples, remainingNull: [...byKey.values()].filter((w) => w.pollster === "Roy Morgan" && w.sample == null).length })}`);
+  const monthOfWave = (w) => String(w.end || w.published || w.month);
   const wavesOut = [...byKey.values()].sort((a, b) => monthOfWave(a).localeCompare(monthOfWave(b)));
   if (!wavesOut.length) throw new Error("no waves parsed — refusing to write an empty history");
   const json = {
@@ -228,7 +346,7 @@ const unsureBad = (w) => !(w.right >= 0 && w.wrong >= 0) ||
   (w.unsure != null && Math.abs(w.right + w.wrong + w.unsure - 100) > 1.5);
 
 // importable in tests without re-running the harvest
-export { fieldDates, parseRows };
+export { fieldDates, parseRows, parseReleaseRows };
 if (process.argv[1] && process.argv[1].endsWith("backfill-direction-history.mjs")) {
   main().catch((e) => { console.error(e); process.exit(1); });
 }

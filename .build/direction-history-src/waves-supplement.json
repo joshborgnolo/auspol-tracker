@@ -12,5 +12,83 @@
     "url": "https://web.archive.org/web/20071029045306id_/http://www.roymorgan.com/news/polls/2007/4233/index.cfm?printversion=yes",
     "quote": "Roy Morgan Finding 4233, direction table: the October 24/25 telephone column prints Right direction 63.5, Wrong direction 28, Can't say 8.5 (a tabulated reading, the same release as the October 20/21 face-to-face wave).",
     "table": true
+  },
+  {
+    "start": "2018-03-24",
+    "end": "2018-04-01",
+    "published": "2018-04-06",
+    "label": "March 24/25 & March 31/ April 1, 2018",
+    "right": 42.5,
+    "wrong": 39.5,
+    "unsure": null,
+    "sample": 1477,
+    "method": "Face",
+    "url": "https://web.archive.org/web/20180406155116/http://www.roymorgan.com/findings/7559-federal-voting-intention-april-6-2018-201804060750",
+    "quote": "The Roy Morgan Government Confidence Rating is down 2.5pts to 103 this week with 42.5% (down 1%) of Australians saying Australia is ‘heading in the right direction’ and 39.5% (up 1.5%) saying Australia is ‘heading in the wrong direction’."
+  },
+  {
+    "start": "2009-12-19",
+    "end": "2010-01-03",
+    "published": "2010-01-08",
+    "label": "Dec 19/20, 2009 & Jan 2/3, 2010",
+    "right": 58.5,
+    "wrong": 26,
+    "unsure": 15.5,
+    "sample": 1555,
+    "method": "Face",
+    "url": "https://web.archive.org/web/20120410215016id_/http://www.roymorgan.com/news/polls/2010/4455/index.cfm?printversion=yes",
+    "quote": "The Roy Morgan Government Confidence Rating is now at 132.5 (down 4pts) with 58.5% (down 1%) of Australians confident that Australia is ‘heading in the right direction,’ compared to 26% (up 3%) that say Australia is ‘heading in the wrong direction.’"
+  },
+  {
+    "start": "2013-11-02",
+    "end": "2013-11-03",
+    "published": "2013-11-06",
+    "label": "November 2/3, 2013",
+    "right": 45.5,
+    "wrong": 31,
+    "unsure": 23.5,
+    "sample": null,
+    "method": "Face",
+    "url": "https://web.archive.org/web/20140221182333id_/http://www.roymorgan.com/findings/5279-morgan-poll-federal-voting-intention-201311060444",
+    "quote": "The Roy Morgan Government Confidence Rating is now at 114.5, up 0.5pts since October 19/20, 2013. Now 45.5% (up 3%) of Australians say Australia is ‘heading in the right direction’ and 31% (up 2.5%) say Australia is ‘heading in the wrong direction’."
+  },
+  {
+    "start": "2013-11-16",
+    "end": "2013-11-17",
+    "published": "2013-11-18",
+    "label": "November 16/17, 2013",
+    "right": 48.5,
+    "wrong": 32.5,
+    "unsure": 19,
+    "sample": null,
+    "method": "Face",
+    "url": "https://web.archive.org/web/20140113062137id_/http://www.roymorgan.com/findings/5306-morgan-poll-federal-voting-intention-november-18-2013-201311180454",
+    "quote": "The Roy Morgan Government Confidence Rating is now at 116, up 1.5pts since November 2/3, 2013. Now 48.5% (up 3%) of Australians say Australia is ‘heading in the right direction’ and 32.5% (up 1.5%) say Australia is ‘heading in the wrong direction’."
+  },
+  {
+    "start": "2013-11-30",
+    "end": "2013-12-01",
+    "published": "2013-12-02",
+    "label": "November 30/ December 1, 2013",
+    "right": 48,
+    "wrong": 35,
+    "unsure": 17,
+    "sample": null,
+    "method": "Face",
+    "url": "https://web.archive.org/web/20131204234812id_/http://www.roymorgan.com/findings/5329-federal-voting-intention-december-2-2013-201312020313",
+    "quote": "The Roy Morgan Government Confidence Rating is now at 113, down 3pts since November 16/17, 2013. Now 48% (down 0.5%) of Australians say Australia is ‘heading in the right direction’ and 35% (up 2.5%) say Australia is ‘heading in the wrong direction’."
+  },
+  {
+    "start": "2013-12-07",
+    "end": "2013-12-15",
+    "published": "2013-12-16",
+    "label": "December 7/8 & 14/15, 2013",
+    "right": 42,
+    "wrong": 38.5,
+    "unsure": 19.5,
+    "sample": null,
+    "method": "Face",
+    "url": "https://web.archive.org/web/20140113151658id_/http://www.roymorgan.com/findings/5353-federal-voting-intention-december-16-2013-201312160613",
+    "quote": "The Roy Morgan Government Confidence Rating has fallen to 103.5 (down 9.5pts since November 30/ December 1, 2013). Now 42% (down 6%) of Australians say Australia is ‘heading in the right direction’ and 38.5% (up 3.5%) say Australia is ‘heading in the wrong direction’."
   }
 ]

@@ -1,0 +1,1183 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-21T23:20:45.935Z",
+  "discoveryPages": [
+    "https://www.ipsos.com/en/what-worries-world",
+    "https://www.ipsos.com/en/topic/what-worries-world"
+  ],
+  "sources": [
+    {
+      "id": "What-Worries-the-World-April-2026-68271154",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-April-2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-April-2026-68271154.txt",
+      "bytes": 3741508,
+      "sha256": "84408eb1457d465f6c60aa728d11b9e52cd7fe45bb27a9af3d7e0b98875a1aa6",
+      "fetchedAt": "2026-11-21T22:41:58.059Z"
+    },
+    {
+      "id": "What-Worries-the-World-August-26-WEB-24669797",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-August-26-WEB.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-August-26-WEB-24669797.txt",
+      "bytes": 1741043,
+      "sha256": "3bcd179f8c597af50d1d4038fc57150cc1cd0fc6be213bb49312a7eee013f80b",
+      "fetchedAt": "2026-11-21T22:41:57.867Z"
+    },
+    {
+      "id": "What-Worries-the-World-February-2026-7feadde7",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-February-2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-February-2026-7feadde7.txt",
+      "bytes": 3641945,
+      "sha256": "668fc2d148186f425647e690224d1e4f981f037c51be2be677b73975e1992a7f",
+      "fetchedAt": "2026-11-21T22:41:58.669Z"
+    },
+    {
+      "id": "What-Worries-the-World-January-2026-4938e1e5",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-January-2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-January-2026-4938e1e5.txt",
+      "bytes": 3441426,
+      "sha256": "a806d520484047dca9fa50eb0b27bcd8f836a7c68a0082e255d6f5e9776f044e",
+      "fetchedAt": "2026-11-21T22:41:58.120Z"
+    },
+    {
+      "id": "What-Worries-the-World-July-2026-feb2e2ea",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-July-2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-July-2026-feb2e2ea.txt",
+      "bytes": 1574858,
+      "sha256": "4c056d3e87ea6591efd5c2396536c255d99e98d66cc6b87a4b4b2e57ac84b326",
+      "fetchedAt": "2026-11-21T22:41:59.637Z"
+    },
+    {
+      "id": "What-Worries-the-World-March-2026-c67485d9",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-March-2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-March-2026-c67485d9.txt",
+      "bytes": 4367770,
+      "sha256": "658976e7649d44cdd7d403466dce23722427021ed6d240a00ef4a2575baca83f",
+      "fetchedAt": "2026-11-21T22:41:59.855Z"
+    },
+    {
+      "id": "What-Worries-the-World-May-2026-ea4ae3a9",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-May-2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-May-2026-ea4ae3a9.txt",
+      "bytes": 2429877,
+      "sha256": "e7b716325b744c418dcb1cdc89e8c31a44bf485a3d6131a2bf7d19f34d76d16f",
+      "fetchedAt": "2026-11-21T22:41:59.200Z"
+    },
+    {
+      "id": "What-Worries-the-World-October-26-f75b5835",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-October-26.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-October-26-f75b5835.txt",
+      "bytes": 1999839,
+      "sha256": "4d8adf55220bfa6aca94c294890b2339bd9a3d0447a889d85c097bb0f9b57f6c",
+      "fetchedAt": "2026-11-21T22:41:59.557Z"
+    },
+    {
+      "id": "What-Worries-the-World-September-26-cf08e7e6",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-September-26.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-September-26-cf08e7e6.txt",
+      "bytes": 1815673,
+      "sha256": "6df2e1a3010f4d249b6e81fb001dadcd19cca0060271db5e1e5e4f4d50368ede",
+      "fetchedAt": "2026-11-21T22:42:00.147Z"
+    },
+    {
+      "id": "What_Worries_the_World_June_26-bf7fe468",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What%20Worries%20the%20World%20June%2026.pdf?version=0",
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What_Worries_the_World_June_26-bf7fe468.txt",
+      "bytes": 1375422,
+      "sha256": "6b11517b2bdf30a26fe1f07f629e147f1816f9dbc652f56325702bf2580fc171",
+      "fetchedAt": "2026-11-21T22:42:00.596Z"
+    },
+    {
+      "id": "What_Worries_the_World-Sep_2016-ea548cea",
+      "url": "https://www.ipsos.com/sites/default/files/2016-10/What_Worries_the_World-Sep_2016.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2016"
+      ],
+      "text": "What_Worries_the_World-Sep_2016-ea548cea.txt",
+      "bytes": 1956613,
+      "sha256": "33d399e1dff8698dcfb039245aebc06bceedbd83067eb4c1c9b7e8ea94b9453a",
+      "fetchedAt": "2026-11-21T22:42:03.481Z"
+    },
+    {
+      "id": "What_Worries_the_World_Oct_2016-4e795c2f",
+      "url": "https://www.ipsos.com/sites/default/files/2016-12/What_Worries_the_World_Oct_2016.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-october-2016"
+      ],
+      "text": "What_Worries_the_World_Oct_2016-4e795c2f.txt",
+      "bytes": 1543038,
+      "sha256": "e8f41dcf58fc67e9720a306ea734110bf9bc6eb1cd6bf9b30ed0a1fb4a9bc14a",
+      "fetchedAt": "2026-11-21T22:42:03.053Z"
+    },
+    {
+      "id": "What_Worries_the_World-Nov_2016-e7e5328e",
+      "url": "https://www.ipsos.com/sites/default/files/2016-12/What_Worries_the_World-Nov_2016.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-november-2016"
+      ],
+      "text": "What_Worries_the_World-Nov_2016-e7e5328e.txt",
+      "bytes": 5322161,
+      "sha256": "f7a8a72945d783ce9ae70edca0d13b88c68da933527a612269e557fb30f53724",
+      "fetchedAt": "2026-11-21T22:42:03.779Z"
+    },
+    {
+      "id": "What_Worries_the_World-Feb_2017-e17ed563",
+      "url": "https://www.ipsos.com/sites/default/files/2017-03/What_Worries_the_World-Feb_2017.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-february-2017"
+      ],
+      "text": "What_Worries_the_World-Feb_2017-e17ed563.txt",
+      "bytes": 1979418,
+      "sha256": "3148a5b935c2ef656caca85fe5d94dae6e92ebf90fdc7d6c056b50be26b0226c",
+      "fetchedAt": "2026-11-21T22:42:04.205Z"
+    },
+    {
+      "id": "What_worries_the_world-May-2017-4b3fbffe",
+      "url": "https://www.ipsos.com/sites/default/files/2017-06/What_worries_the_world-May-2017.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2017"
+      ],
+      "text": "What_worries_the_world-May-2017-4b3fbffe.txt",
+      "bytes": 3052411,
+      "sha256": "35bb6113dcf2b61be6f863eb89afceac994ef7443f1e93e66d09e7cdfd9ff301",
+      "fetchedAt": "2026-11-21T22:42:06.581Z"
+    },
+    {
+      "id": "What_worries_the_world-July-2017-4a0e2c4d",
+      "url": "https://www.ipsos.com/sites/default/files/2017-08/What_worries_the_world-July-2017.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-july-2017"
+      ],
+      "text": "What_worries_the_world-July-2017-4a0e2c4d.txt",
+      "bytes": 3042003,
+      "sha256": "a1d00ceb23640bf2c5e72a9c69e6ab21472e74ee0aee2c1c0d816d3360e85a2a",
+      "fetchedAt": "2026-11-21T22:42:04.723Z"
+    },
+    {
+      "id": "What_worries_the_world-November_2017-677f1d40",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2017-11/What_worries_the_world-November_2017.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-november-2017"
+      ],
+      "text": "What_worries_the_world-November_2017-677f1d40.txt",
+      "bytes": 2980778,
+      "sha256": "32b9689ba2a98c7788b926c80c3fd21fad7b3b9bdbd054f2e99c22fac727a728",
+      "fetchedAt": "2026-11-21T22:42:07.606Z"
+    },
+    {
+      "id": "what_worries_the_world-january_2018-0172ff9c",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2018-01/what_worries_the_world-january_2018.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2018"
+      ],
+      "text": "what_worries_the_world-january_2018-0172ff9c.txt",
+      "bytes": 2208171,
+      "sha256": "d1069e8262587148dfbe3605f183ddb64f4c761e1efdb7f185036db1dd116ec3",
+      "fetchedAt": "2026-11-21T22:42:07.995Z"
+    },
+    {
+      "id": "www-march-2018-bee685bb",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2018-04/www-march-2018.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-march-2018"
+      ],
+      "text": "www-march-2018-bee685bb.txt",
+      "bytes": 1958742,
+      "sha256": "6a4b28137d6efcb986c944397a7a61fb850c4e28542e895b982ff7389be7b0ee",
+      "fetchedAt": "2026-11-21T22:42:05.216Z"
+    },
+    {
+      "id": "www-may-2018-050dbc3e",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2018-06/www-may-2018.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2018"
+      ],
+      "text": "www-may-2018-050dbc3e.txt",
+      "bytes": 1946247,
+      "sha256": "f7fd5f2fbb9d399cdb875c66d30612b5ce3089fb78815ec5a942a097beac452f",
+      "fetchedAt": "2026-11-21T22:42:08.810Z"
+    },
+    {
+      "id": "www-july-2018-d0757548",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2018-08/www-july-2018.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-july-2018"
+      ],
+      "text": "www-july-2018-d0757548.txt",
+      "bytes": 2327398,
+      "sha256": "309666c1fb77798253353e7f1bd0e90e7657b59515940333a52624bc39ce35f6",
+      "fetchedAt": "2026-11-21T22:42:10.269Z"
+    },
+    {
+      "id": "www-september-2018-1d3b6808",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2018-10/www-september-2018.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2018"
+      ],
+      "text": "www-september-2018-1d3b6808.txt",
+      "bytes": 2090880,
+      "sha256": "7d81ce725b120d24239b45dde5624bbe6ac06727c1d9ea4a4f8156cba7a53e37",
+      "fetchedAt": "2026-11-21T22:42:11.039Z"
+    },
+    {
+      "id": "what-worries-the-world-january-2019-25269d5c",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2019-04/what-worries-the-world-january-2019.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2019"
+      ],
+      "text": "what-worries-the-world-january-2019-25269d5c.txt",
+      "bytes": 1851238,
+      "sha256": "747312f87ec0457cc6ff21e215c91e1b3b3d822516f0ae7c4a88194196e0fafe",
+      "fetchedAt": "2026-11-21T22:42:11.542Z"
+    },
+    {
+      "id": "what-worries-the-world-march-2019-85eaeb08",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2019-04/what-worries-the-world-march-2019.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-march-2019"
+      ],
+      "text": "what-worries-the-world-march-2019-85eaeb08.txt",
+      "bytes": 1934312,
+      "sha256": "80b1722827f31bd7ece87c9e50725529888a46cbe026b78550ea013f8a562a38",
+      "fetchedAt": "2026-11-21T22:42:12.502Z"
+    },
+    {
+      "id": "what-worries-the-world-may_2019-54d37a67",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2019-06/what-worries-the-world-may_2019.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2019"
+      ],
+      "text": "what-worries-the-world-may_2019-54d37a67.txt",
+      "bytes": 1957086,
+      "sha256": "e9b2c347f558c384a2908b1db3c24e32bb14a13952197c2769d28443c0f620f5",
+      "fetchedAt": "2026-11-21T22:42:13.871Z"
+    },
+    {
+      "id": "what-worries-the-world-2019-07-9ffb50c0",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2019-09/what-worries-the-world-2019-07.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-july-2019"
+      ],
+      "text": "what-worries-the-world-2019-07-9ffb50c0.txt",
+      "bytes": 1247668,
+      "sha256": "f8d6da155c600ba46ab28ac79693c1b0594a64b75ccdf8ab1c0450e90d2fe034",
+      "fetchedAt": "2026-11-21T22:42:14.393Z"
+    },
+    {
+      "id": "what-worries-the-world-september-2019-de2b6596",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2019-11/what-worries-the-world-september-2019.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2019"
+      ],
+      "text": "what-worries-the-world-september-2019-de2b6596.txt",
+      "bytes": 1131034,
+      "sha256": "3fa1383b8ed388f05e79b5c4c85551b86c0e0a3200c5ba7f2eb221fe9eb3bc44",
+      "fetchedAt": "2026-11-21T22:42:14.784Z"
+    },
+    {
+      "id": "what-worries-the-world-january-2020-2ce9ca14",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-01/what-worries-the-world-january-2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2020"
+      ],
+      "text": "what-worries-the-world-january-2020-2ce9ca14.txt",
+      "bytes": 1086958,
+      "sha256": "481cad0a2e0c6a27e5ccced09d6729aa296098d2e583e54f36b01a0a8d8c7529",
+      "fetchedAt": "2026-11-21T22:42:15.827Z"
+    },
+    {
+      "id": "what-worries-the-world-november-2019-930a401a",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-01/what-worries-the-world-november-2019.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-november-2019"
+      ],
+      "text": "what-worries-the-world-november-2019-930a401a.txt",
+      "bytes": 1203017,
+      "sha256": "852ad63c94c7379c747756f96f0e1a9f475e88b9963b34b6c81e74468f5c8d00",
+      "fetchedAt": "2026-11-21T22:42:17.112Z"
+    },
+    {
+      "id": "what-worries-the-world-june-2020-ipsos-6ee7dd66",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-06/what-worries-the-world-june-2020-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-june-2020"
+      ],
+      "text": "what-worries-the-world-june-2020-ipsos-6ee7dd66.txt",
+      "bytes": 1098072,
+      "sha256": "49065a7d6b63ea15defb073ee8c72577caadf3c6841692098d411d7afbe6b4a9",
+      "fetchedAt": "2026-11-21T22:42:17.643Z"
+    },
+    {
+      "id": "what-worries-the-world-may-2020-ipsos-f574e42c",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-06/what-worries-the-world-may-2020-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2020"
+      ],
+      "text": "what-worries-the-world-may-2020-ipsos-f574e42c.txt",
+      "bytes": 1086145,
+      "sha256": "60aeb2f2d78238c7e5d00649ddd6c78d45079d746c9f4508933051d3f01e235e",
+      "fetchedAt": "2026-11-21T22:42:17.972Z"
+    },
+    {
+      "id": "what-worries-world-summary-deck_may2020-b71e08f0",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-06/what-worries-world-summary-deck_may2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2020"
+      ],
+      "text": "what-worries-world-summary-deck_may2020-b71e08f0.txt",
+      "bytes": 1783942,
+      "sha256": "d1899544862690c644a9de25598ada1b5ce6eaef6c6d6fe7f5fc68f24073255e",
+      "fetchedAt": "2026-11-21T22:42:15.951Z"
+    },
+    {
+      "id": "www-summary-deck-june2020-66e76419",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-06/www-summary-deck-june2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-june-2020"
+      ],
+      "text": "www-summary-deck-june2020-66e76419.txt",
+      "bytes": 1579393,
+      "sha256": "c07706701e332eac8b2d32fa0744c0b626af663343e3bf43588bffe92a298217",
+      "fetchedAt": "2026-11-21T22:42:18.042Z"
+    },
+    {
+      "id": "what-worries-the-world-july-2020-ipsos-96916d90",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-07/what-worries-the-world-july-2020-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-july-2020"
+      ],
+      "text": "what-worries-the-world-july-2020-ipsos-96916d90.txt",
+      "bytes": 1000905,
+      "sha256": "af64e105a74f3bd5da26cce061c19122166e8e3436669326067e34274677af86",
+      "fetchedAt": "2026-11-21T22:42:20.153Z"
+    },
+    {
+      "id": "www-summary-deck-july-2020-87968b43",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-07/www-summary-deck-july-2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-july-2020"
+      ],
+      "text": "www-summary-deck-july-2020-87968b43.txt",
+      "bytes": 1541675,
+      "sha256": "c9288333d42ac5ac846c188c3e53e4c9f55259b74075ce952c2752344d8a205a",
+      "fetchedAt": "2026-11-21T22:42:20.500Z"
+    },
+    {
+      "id": "www-report-august-2020-ipsos-0cdcd712",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-08/www-report-august-2020-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-coronavirus-concern-rebounds"
+      ],
+      "text": "www-report-august-2020-ipsos-0cdcd712.txt",
+      "bytes": 1010210,
+      "sha256": "70fe518762d301031cd9d3d1d6677af24b0fc93b11d7d49f49c9e4523641247a",
+      "fetchedAt": "2026-11-21T22:42:21.183Z"
+    },
+    {
+      "id": "www-summary-august-2020-e422f864",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-08/www-summary-august-2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-coronavirus-concern-rebounds"
+      ],
+      "text": "www-summary-august-2020-e422f864.txt",
+      "bytes": 1594999,
+      "sha256": "95070046f08893282961ed90d2ff5c97fe0fffe5e3699de8de28767923b3676a",
+      "fetchedAt": "2026-11-21T22:42:20.819Z"
+    },
+    {
+      "id": "www-report-september-2020-ipsos-89e27b55",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-09/www-report-september-2020-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2020"
+      ],
+      "text": "www-report-september-2020-ipsos-89e27b55.txt",
+      "bytes": 994783,
+      "sha256": "fc992d5631d34470559c139da5fe39a00afe1ca846116562efdf208c21973412",
+      "fetchedAt": "2026-11-21T22:42:23.185Z"
+    },
+    {
+      "id": "www-summary-september-2020-23837c99",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-09/www-summary-september-2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2020"
+      ],
+      "text": "www-summary-september-2020-23837c99.txt",
+      "bytes": 1506417,
+      "sha256": "8c76d1187dcef0733429d4a7f3943d96997e19db5b4238b94a8754e266cc48a1",
+      "fetchedAt": "2026-11-21T23:00:37.177Z"
+    },
+    {
+      "id": "what-worries-the-world-october-2020-ipsos-59c0db89",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-10/what-worries-the-world-october-2020-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-october-2020"
+      ],
+      "text": "what-worries-the-world-october-2020-ipsos-59c0db89.txt",
+      "bytes": 1944430,
+      "sha256": "ca94ad2ec17fa41d80ff6a1a22e02b74ee13ee3b0bbf657cfbf7704f4df081d8",
+      "fetchedAt": "2026-11-21T23:00:40.903Z"
+    },
+    {
+      "id": "www-summary-november-2020-2924c3bf",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-11/www-summary-november-2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-november-2020"
+      ],
+      "text": "www-summary-november-2020-2924c3bf.txt",
+      "bytes": 2000912,
+      "sha256": "72eeaff8263b4745b83599cc4654ca4e0916caa8dab6e65318532ad21c1fce27",
+      "fetchedAt": "2026-11-21T23:00:44.131Z"
+    },
+    {
+      "id": "www-summary-december-2020-bd68bccd",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2020-12/www-summary-december-2020.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-december-2020"
+      ],
+      "text": "www-summary-december-2020-bd68bccd.txt",
+      "bytes": 2000607,
+      "sha256": "017055c4b764fcda77706bb3ab68a392f6d249f6736788ecfe8bbbe4c0ea72ec",
+      "fetchedAt": "2026-11-21T23:00:47.372Z"
+    },
+    {
+      "id": "www-summary-january-20201-ce34cefb",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-01/www-summary-january-20201.pdf",
+      "retrievedUrl": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-01/www-summary-january-20201.pdf",
+      "recovery": "original",
+      "discoveryArticles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2021"
+      ],
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2021"
+      ],
+      "text": "www-summary-january-20201-ce34cefb.txt",
+      "bytes": 1984360,
+      "sha256": "c13d25c82aedcc4299328b210acbe52dc1253fb69c49c50de5f37d054dc3a6af",
+      "fetchedAt": "2026-11-21T23:10:30.489Z"
+    },
+    {
+      "id": "global-summary_whatworriestheworld-februrary2021-d4046184",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-02/global-summary_whatworriestheworld-februrary2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-february-2021"
+      ],
+      "text": "global-summary_whatworriestheworld-februrary2021-d4046184.txt",
+      "bytes": 2107609,
+      "sha256": "6c66baa76ad54395bb3216dcfb22feea06cff05b2ae77095d9996ea2a1434655",
+      "fetchedAt": "2026-11-21T23:01:04.321Z"
+    },
+    {
+      "id": "what_worries_the_world_march_2021_0-c39c1066",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-03/what_worries_the_world_march_2021_0.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-march-2021"
+      ],
+      "text": "what_worries_the_world_march_2021_0-c39c1066.txt",
+      "bytes": 2578637,
+      "sha256": "14ee35ea290725e6d8c64fc395d107a0e815da9ea1d4032ff1c19f85089c8cbf",
+      "fetchedAt": "2026-11-21T23:01:07.923Z"
+    },
+    {
+      "id": "Global-summary_WhatWorriestheWorld-May2021-4dc4511a",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-05/Global-summary_WhatWorriestheWorld-May2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2021"
+      ],
+      "text": "Global-summary_WhatWorriestheWorld-May2021-4dc4511a.txt",
+      "bytes": 1791574,
+      "sha256": "0ec2e16b0ebf376640ccd8929cc6469dd84b43499ab04e1b6d2c7b338446764b",
+      "fetchedAt": "2026-11-21T23:01:10.579Z"
+    },
+    {
+      "id": "Global-summary_WhatWorriestheWorld-June2021-38e9fb43",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-06/Global-summary_WhatWorriestheWorld-June2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-june-2021"
+      ],
+      "text": "Global-summary_WhatWorriestheWorld-June2021-38e9fb43.txt",
+      "bytes": 1752584,
+      "sha256": "bd9d4f1d3b3e84312156e1b8dc05046a1e3399ae63366d395884941f8ba96284",
+      "fetchedAt": "2026-11-21T23:01:13.651Z"
+    },
+    {
+      "id": "What_Worries_the_World_July_2021-3e4c936d",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-07/What%20Worries%20the%20World%20July%202021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-july-2021"
+      ],
+      "text": "What_Worries_the_World_July_2021-3e4c936d.txt",
+      "bytes": 1831418,
+      "sha256": "8fdd5c5888326d44c5bc35eb18fca3e412741d562d89b27d54c3703532dad6b0",
+      "fetchedAt": "2026-11-21T23:01:26.258Z"
+    },
+    {
+      "id": "www-september-2021-9904b5bf",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-09/www-september-2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2021"
+      ],
+      "text": "www-september-2021-9904b5bf.txt",
+      "bytes": 1838958,
+      "sha256": "ea1c9fe203d75dd12b543976d0ce2c0cd7ccfad3f0714f5cc16387a456bc850a",
+      "fetchedAt": "2026-11-21T23:01:30.372Z"
+    },
+    {
+      "id": "www-october-2021-dc78639c",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-10/www-october-2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-october-2021"
+      ],
+      "text": "www-october-2021-dc78639c.txt",
+      "bytes": 6981482,
+      "sha256": "6532f77df87d30a3e9b746bbd6da6af9e078931f07272efe8aaff7e850342ba7",
+      "fetchedAt": "2026-11-21T23:01:34.062Z"
+    },
+    {
+      "id": "www-nov-2021-dcc7e196",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-11/www-nov-2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-november-2021"
+      ],
+      "text": "www-nov-2021-dcc7e196.txt",
+      "bytes": 1797618,
+      "sha256": "689927d05a8ae97655ecd14061931b04e55ed62703c4f7774d9ae7b418456c04",
+      "fetchedAt": "2026-11-21T22:43:01.492Z"
+    },
+    {
+      "id": "What-worries-the-world-December-2021-05f1ed0e",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2021-12/What-worries-the-world-December-2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-december-2021"
+      ],
+      "text": "What-worries-the-world-December-2021-05f1ed0e.txt",
+      "bytes": 1810489,
+      "sha256": "9f7b8eda40e6c5af9bd480dba57233ea45932b5b3c0f81eb73135dc2f717de23",
+      "fetchedAt": "2026-11-21T22:43:01.332Z"
+    },
+    {
+      "id": "What-worries-the-world-January-2022-c51276d7",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-01/What-worries-the-world-January-2022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2022",
+        "https://www.ipsos.com/en/what-worries-world-july-2022"
+      ],
+      "text": "What-worries-the-world-January-2022-c51276d7.txt",
+      "bytes": 2678990,
+      "sha256": "d5f62bc140c27327c0034f4209ffe1b8fca38ee4d9a9d1557b17b422024297e2",
+      "fetchedAt": "2026-11-21T22:43:02.113Z"
+    },
+    {
+      "id": "What-worries-the-world-February-2022-815a18f4",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-02/What-worries-the-world-February-2022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-february-2022"
+      ],
+      "text": "What-worries-the-world-February-2022-815a18f4.txt",
+      "bytes": 2712096,
+      "sha256": "14ea6ff51fc6e40d81e2871f358962c2908e6ebfb90a1d0d8b96ec21ad4806e9",
+      "fetchedAt": "2026-11-21T22:43:04.386Z"
+    },
+    {
+      "id": "What-worries-the-world-april-2022-488b3ff1",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-04/What-worries-the-world-april-2022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-april-2022"
+      ],
+      "text": "What-worries-the-world-april-2022-488b3ff1.txt",
+      "bytes": 5033506,
+      "sha256": "e73b2a2b117fe0126fcea626b72ab8aca2726a7d08c3bcc3f33b4fafb8dbfe4e",
+      "fetchedAt": "2026-11-21T23:01:37.507Z"
+    },
+    {
+      "id": "Global_Summary_WhatWorriestheWorld_-May_2022-dbfe5074",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-05/Global%20Summary%20WhatWorriestheWorld%20%20-May%202022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-may-2022"
+      ],
+      "text": "Global_Summary_WhatWorriestheWorld_-May_2022-dbfe5074.txt",
+      "bytes": 5019901,
+      "sha256": "56a8310667ac526c11452d5f9a8105d3a8e3fe4f33c3940a02f4f4bed056ec67",
+      "fetchedAt": "2026-11-21T23:01:41.301Z"
+    },
+    {
+      "id": "WWW_Global_Report_June_2022-28b2b706",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-06/WWW_Global%20Report_June%202022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-june-2022"
+      ],
+      "text": "WWW_Global_Report_June_2022-28b2b706.txt",
+      "bytes": 1922892,
+      "sha256": "d5acfc93c294cb7b4f0859098fb00da877fcf2a5d6b3941af2885654c68c281b",
+      "fetchedAt": "2026-11-21T23:01:44.426Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_July_22_0-f21e6444",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-07/Global%20Report%20-%20What%20Worries%20the%20World%20July%2022_0.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-august-2022",
+        "https://www.ipsos.com/en/what-worries-world-july-2022"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_July_22_0-f21e6444.txt",
+      "bytes": 4875828,
+      "sha256": "5b0b88cbdd453fcb3714a5fa2aecdb5f8bae593bc16731e19f80343b7220039a",
+      "fetchedAt": "2026-11-21T23:01:48.102Z"
+    },
+    {
+      "id": "What_Worries_the_World_-_August_-_Global-dce6d364",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-08/What%20Worries%20the%20World%20-%20August%20-%20Global.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-august-2022"
+      ],
+      "text": "What_Worries_the_World_-_August_-_Global-dce6d364.txt",
+      "bytes": 4867950,
+      "sha256": "64a3a0540675e9001a300e74f452b12c174bf2c877ce354900f513cfc3429bc2",
+      "fetchedAt": "2026-11-21T23:01:51.519Z"
+    },
+    {
+      "id": "Global-report-what-worries-the-world-ed3e6de6",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-09/Global-report-what-worries-the-world.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-september-2022"
+      ],
+      "text": "Global-report-what-worries-the-world-ed3e6de6.txt",
+      "bytes": 2581288,
+      "sha256": "85aa5fb21d142b699878d2b901eccab471c679ae273cd28e73d1d5e4bf1f14f2",
+      "fetchedAt": "2026-11-21T23:01:53.890Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Oct_2022-4d9414b0",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2022-10/Global%20Report%20-%20What%20Worries%20the%20World%20Oct%202022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-october-2022"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Oct_2022-4d9414b0.txt",
+      "bytes": 1842973,
+      "sha256": "51dd6feb19cfa40c45dbbde649a93bb2e4654b00b33905471a1ad4e0a142232e",
+      "fetchedAt": "2026-11-21T23:01:56.574Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Dec22-402605eb",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-01/Global%20Report%20-%20What%20Worries%20the%20World%20Dec22.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-december-2022"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Dec22-402605eb.txt",
+      "bytes": 1952520,
+      "sha256": "35dc80dbcfceec6e92be6deaa8404af6539785e8fcb95ec8d55a4194bd462507",
+      "fetchedAt": "2026-11-21T23:01:59.973Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Jan_23-f362c695",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-01/Global%20Report%20-%20What%20Worries%20the%20World%20Jan%2023.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-january-2023"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Jan_23-f362c695.txt",
+      "bytes": 1984594,
+      "sha256": "5c579b4ddd81393f500fac2a9aaa89b482cc4c913a2c4d8ad125797fb9d37eed",
+      "fetchedAt": "2026-11-21T23:02:03.323Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Feb_23-663f84b9",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-02/Global%20Report%20-%20What%20Worries%20the%20World%20Feb%2023.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-february-2023"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Feb_23-663f84b9.txt",
+      "bytes": 1928809,
+      "sha256": "162ceb1c5c4d30321b8780609ec2f959393133b746b52e401e9ae6d7f6d112b7",
+      "fetchedAt": "2026-11-21T23:02:06.622Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Mar_23-906ab40c",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-03/Global%20Report%20-%20What%20Worries%20the%20World%20Mar%2023.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Mar_23-906ab40c.txt",
+      "bytes": 1846399,
+      "sha256": "216d0feea522b7d1040cd8595fd735cc1bb36d04fe4b0b65eea0c8deb1361a72",
+      "fetchedAt": "2026-11-21T23:02:06.826Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Apr_23_Final-0034d3a7",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-04/Global%20Report%20-%20What%20Worries%20the%20World%20Apr%2023%20Final.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world",
+        "https://www.ipsos.com/en/what-worries-world-april-2023"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Apr_23_Final-0034d3a7.txt",
+      "bytes": 1878595,
+      "sha256": "b3bbe81da162334b45a32aabf8f020cc595f4ca1d10640ccbd8527f3603d3651",
+      "fetchedAt": "2026-11-21T23:02:10.185Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_May_23-WEB-7b666937",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-05/Global%20Report%20-%20What%20Worries%20the%20World%20May%2023-WEB.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_May_23-WEB-7b666937.txt",
+      "bytes": 1853894,
+      "sha256": "008b3f3ff18d5fa8f3a6f630a824cf70d3db99b54db39b59f5a2f8588f1f3002",
+      "fetchedAt": "2026-11-21T22:43:46.250Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_June_23-WEB-f6d1a538",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-06/Global%20Report%20-%20What%20Worries%20the%20World%20June%2023-WEB.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_June_23-WEB-f6d1a538.txt",
+      "bytes": 1853825,
+      "sha256": "f2f9edcff02c3d6d9dfc1d3ef7d181409af04623020761d903c04e255e6f9811",
+      "fetchedAt": "2026-11-21T22:43:47.217Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Jul_23-WEB-42699f78",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-07/Global%20Report%20-%20What%20Worries%20the%20World%20Jul%2023-WEB.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world",
+        "https://www.ipsos.com/en/what-worries-world-july-2023"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Jul_23-WEB-42699f78.txt",
+      "bytes": 1866307,
+      "sha256": "85b799b34140146173eea9635f21997650ef62c1e765a63a94300483ed34b9ce",
+      "fetchedAt": "2026-11-21T22:43:47.091Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_Aug_23-57274757",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-08/Global%20Report%20-%20What%20Worries%20the%20World%20Aug%2023.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world",
+        "https://www.ipsos.com/en/what-worries-world-august-2023"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_Aug_23-57274757.txt",
+      "bytes": 1878528,
+      "sha256": "0c3d7030bd1cec82a3a8f52f9118293c649732175dc40c8b5fa4b446c36c2b86",
+      "fetchedAt": "2026-11-21T23:02:13.483Z"
+    },
+    {
+      "id": "What_Worries_the_World_Sep_23_-_Global-9a667271",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-09/What%20Worries%20the%20World%20Sep%2023%20-%20Global%20.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What_Worries_the_World_Sep_23_-_Global-9a667271.txt",
+      "bytes": 1865285,
+      "sha256": "d88851f137ca25fcef97755fc5f26d5d76ce11b6e1b65ebf605382388bceb8e1",
+      "fetchedAt": "2026-11-21T23:02:16.609Z"
+    },
+    {
+      "id": "Global-report-what-worries-the-world-october-2023-e08c4882",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-10/Global-report-what-worries-the-world-october-2023.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global-report-what-worries-the-world-october-2023-e08c4882.txt",
+      "bytes": 1936615,
+      "sha256": "cb3c5a77fc4c8f53e604187a8bed1014cd076dcfdbe6165175e56a659dd19de8",
+      "fetchedAt": "2026-11-21T23:02:19.673Z"
+    },
+    {
+      "id": "Global-Report-What-Worries-the-World-Nov-2023-f5c7f3dc",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-12/Global-Report-What-Worries-the-World-Nov-2023.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global-Report-What-Worries-the-World-Nov-2023-f5c7f3dc.txt",
+      "bytes": 1913749,
+      "sha256": "a70ad52a89e526c33e52444c82e5bb2182c9fdb5c2fdd68bc34962a3928dda8e",
+      "fetchedAt": "2026-11-21T23:02:22.938Z"
+    },
+    {
+      "id": "Global_Report_-_What_Worries_the_World_November_22-c7b90cbe",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2023-12/Global%20Report%20-%20What%20Worries%20the%20World%20November%2022.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-november-2022"
+      ],
+      "text": "Global_Report_-_What_Worries_the_World_November_22-c7b90cbe.txt",
+      "bytes": 10043109,
+      "sha256": "2eb33aef8ec0bca324a1c27c906a7550dae7c5de16fd87698144fde76c461afb",
+      "fetchedAt": "2026-11-21T23:02:26.792Z"
+    },
+    {
+      "id": "Global-Report-What-Worries-the-World-December-23-5e9d84f1",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-03/Global-Report-What-Worries-the-World-December-23.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global-Report-What-Worries-the-World-December-23-5e9d84f1.txt",
+      "bytes": 1905631,
+      "sha256": "6bfb875bbafca6f02a74d376706e8daa628e79756c91d4bd44ec12411c986ae8",
+      "fetchedAt": "2026-11-21T23:02:29.864Z"
+    },
+    {
+      "id": "Global-Report-What-Worries-the-World-January-2024-a1374d4d",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-03/Global-Report-What-Worries-the-World-January-2024.pdf",
+      "retrievedUrl": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2024-01/Global-Report-What-Worries-the-World-January-2024.pdf",
+      "recovery": "regional-mirror",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world",
+        "https://www.ipsos.com/ko-kr/what-worries-world-january-2024"
+      ],
+      "text": "Global-Report-What-Worries-the-World-January-2024-a1374d4d.txt",
+      "bytes": 1889458,
+      "sha256": "3a3b252030d82a698f1dc8bc6417b9acece26c6e4240f4f36828dc05a258f0e7",
+      "fetchedAt": "2026-11-21T23:20:45.923Z"
+    },
+    {
+      "id": "Global-Report_-What-Worries-the-World-February-2024-3f0c61c1",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-04/Global-Report%20-What-Worries-the-World-February-2024.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global-Report_-What-Worries-the-World-February-2024-3f0c61c1.txt",
+      "bytes": 1826741,
+      "sha256": "78610bb0fe224397933f7aa7ed07305f3b26137e49f45e6f70f47946bfe7ef4a",
+      "fetchedAt": "2026-11-21T23:02:44.775Z"
+    },
+    {
+      "id": "Global-Report-What-Worries-the-World-March-2024-c0617bce",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-05/Global-Report-What-Worries-the-World-March-2024.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "Global-Report-What-Worries-the-World-March-2024-c0617bce.txt",
+      "bytes": 1881979,
+      "sha256": "ef543f61a5902f397b1c75979682acaf29bc898c0357059b766ac8d6819464f2",
+      "fetchedAt": "2026-11-21T23:02:47.936Z"
+    },
+    {
+      "id": "What-Worries-the-World-April2024-9aeba12f",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-05/What-Worries-the-World-April2024.pdf",
+      "retrievedUrl": "https://web.archive.org/web/20240510032544id_/https://www.ipsos.com/sites/default/files/ct/news/documents/2024-05/What-Worries-the-World-April2024.pdf",
+      "recovery": "wayback",
+      "discoveryArticles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-April2024-9aeba12f.txt",
+      "bytes": 1855256,
+      "sha256": "f58f2710026655c905ff07aac7926d133af457f9e78c4558b968a36f861f17ad",
+      "fetchedAt": "2026-11-21T23:10:59.117Z"
+    },
+    {
+      "id": "What-Worries-the-World-May24-bae8146f",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-06/What-Worries-the-World-May24.pdf",
+      "retrievedUrl": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-07/What-Worries-the-World-May24.pdf",
+      "recovery": "regional-mirror",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world",
+        "https://www.ipsos.com/en-nl/what-worries-world-may-2024"
+      ],
+      "text": "What-Worries-the-World-May24-bae8146f.txt",
+      "bytes": 1872034,
+      "sha256": "e067ca973a127e97da03f1eed47642c90225b3d9f25bbde0ad021454ceb009e9",
+      "fetchedAt": "2026-11-21T23:20:45.925Z"
+    },
+    {
+      "id": "What-Worries-the-World-June-2024-e4d8241b",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-07/What-Worries-the-World-June-2024.pdf",
+      "retrievedUrl": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-06/What-Worries-the-World-June-2024_0.pdf",
+      "recovery": "regional-mirror",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world",
+        "https://www.ipsos.com/ko-kr/what-worries-world-june-2024"
+      ],
+      "text": "What-Worries-the-World-June-2024-e4d8241b.txt",
+      "bytes": 3187275,
+      "sha256": "537e5e4defb5b46f8a4e5f840667c0a022c5e03004377f97c350d504097c65ad",
+      "fetchedAt": "2026-11-21T23:20:45.927Z"
+    },
+    {
+      "id": "What-Worries-the-World-August-2024-f9a934d6",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-08/What-Worries-the-World-August-2024.pdf",
+      "retrievedUrl": "https://web.archive.org/web/20250318082414id_/https://www.ipsos.com/sites/default/files/ct/news/documents/2024-08/What-Worries-the-World-August-2024.pdf",
+      "recovery": "wayback",
+      "discoveryArticles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-August-2024-f9a934d6.txt",
+      "bytes": 3174760,
+      "sha256": "e584f2f381d14756d9efad62766a8028c0b3c532c599f6a0e6b14ca15c53c66c",
+      "fetchedAt": "2026-11-21T23:11:46.690Z"
+    },
+    {
+      "id": "What-Worries-the-World-August-2024_2-3dae7841",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-09/What-Worries-the-World-August-2024_2.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-august-2024"
+      ],
+      "text": "What-Worries-the-World-August-2024_2-3dae7841.txt",
+      "bytes": 3174760,
+      "sha256": "e584f2f381d14756d9efad62766a8028c0b3c532c599f6a0e6b14ca15c53c66c",
+      "fetchedAt": "2026-11-21T23:03:39.690Z"
+    },
+    {
+      "id": "What-Worries-the-World-Sep-24-23a6b6e1",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-10/What-Worries-the-World-Sep-24.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-Sep-24-23a6b6e1.txt",
+      "bytes": 3087913,
+      "sha256": "b2ff7eeabf803ee655b8c9bc25c0d4894eb831bfa554045820234a0d2568e4d9",
+      "fetchedAt": "2026-11-21T23:03:42.962Z"
+    },
+    {
+      "id": "what-worries-the-world-november-2024-ipsos-45b2243b",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-11/what-worries-the-world-november-2024-ipsos.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-november-2024-ipsos-45b2243b.txt",
+      "bytes": 3129039,
+      "sha256": "893753166ca1fe8c94038dd63518633e730ddbec7053f1dd64a98ee1693e17fd",
+      "fetchedAt": "2026-11-21T23:03:46.265Z"
+    },
+    {
+      "id": "what-worries-the-world-october-2024-ipsos_1-8bb0a0b6",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2024-11/what-worries-the-world-october-2024-ipsos_1.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-october-2024-ipsos_1-8bb0a0b6.txt",
+      "bytes": 3162166,
+      "sha256": "d4ccb018b617ff46d9da68c8b8a27707472debc0976b7f54963d28e1888cab4b",
+      "fetchedAt": "2026-11-21T23:03:49.467Z"
+    },
+    {
+      "id": "what-worries-the-world-december-2024-653912c4",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-01/what-worries-the-world-december-2024.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-december-2024-653912c4.txt",
+      "bytes": 3167517,
+      "sha256": "62dfa6c2a70cbbaa027146d9294e6508b305df300101e693c29743b6a579b3a8",
+      "fetchedAt": "2026-11-21T23:03:52.954Z"
+    },
+    {
+      "id": "what-worries-the-world-january-2025-f42032b3",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-01/what-worries-the-world-january-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-january-2025-f42032b3.txt",
+      "bytes": 3213913,
+      "sha256": "b626324227045bea84f7ad90bbdf37fcea1895172e2120702bd716878e21196b",
+      "fetchedAt": "2026-11-21T23:03:55.338Z"
+    },
+    {
+      "id": "What-Worries-the-World-February-2025-cefe6ed2",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-02/What-Worries-the-World-February-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-February-2025-cefe6ed2.txt",
+      "bytes": 3235991,
+      "sha256": "d5b54cd3e1bb038c026bf6ff3193b90092793bde90cc534a0f06f03f8adab1a9",
+      "fetchedAt": "2026-11-21T23:03:58.583Z"
+    },
+    {
+      "id": "what-worries-the-world-march-2025-61b445c4",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-04/what-worries-the-world-march-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-march-2025-61b445c4.txt",
+      "bytes": 3775214,
+      "sha256": "b38c582b4da132f4a6aa54444bb97b07498bdcc90a8f2397e4f1e46da6880707",
+      "fetchedAt": "2026-11-21T23:04:01.956Z"
+    },
+    {
+      "id": "what-worries-the-world-april-2025-b0f903ec",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-05/what-worries-the-world-april-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-april-2025-b0f903ec.txt",
+      "bytes": 3771042,
+      "sha256": "9338e93be61c79315134ee1806d503bd65c170c27f33e009c4c6bef38304ec66",
+      "fetchedAt": "2026-11-21T23:04:05.343Z"
+    },
+    {
+      "id": "what-worries-the-world-may-2025-ddbeee2d",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-06/what-worries-the-world-may-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-may-2025-ddbeee2d.txt",
+      "bytes": 3996660,
+      "sha256": "161e0db5257ec0c4252f4ab20744a54021b14bd19e6a9657b04ce9bb84924881",
+      "fetchedAt": "2026-11-21T23:04:09.060Z"
+    },
+    {
+      "id": "what-worries-the-world-june-2025-61461ada",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-07/what-worries-the-world-june-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-june-2025-61461ada.txt",
+      "bytes": 4311511,
+      "sha256": "8c65756ff7863c2becca98c4a92df2946784e75abed321993bb080b963259860",
+      "fetchedAt": "2026-11-21T23:04:12.778Z"
+    },
+    {
+      "id": "what-worries-the-world-july-2025-70020b75",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-08/what-worries-the-world-july-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-july-2025-70020b75.txt",
+      "bytes": 4377703,
+      "sha256": "ad86530d6e7b46decb7c10b6f4c512641de7816ab8a969879fbc382b439b2c9c",
+      "fetchedAt": "2026-11-21T23:04:16.594Z"
+    },
+    {
+      "id": "what-worries-the-world-august-2025-8ca9e817",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-09/what-worries-the-world-august-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-august-2025-8ca9e817.txt",
+      "bytes": 4240039,
+      "sha256": "b2b3b88c5d1e56d3416f6866b80f53c25c12bf3171882611d872fd4bbc9065a9",
+      "fetchedAt": "2026-11-21T22:45:05.036Z"
+    },
+    {
+      "id": "What-Worries-the-World-September-2025-ae56b06b",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-10/What-Worries-the-World-September-2025.pdf",
+      "retrievedUrl": "https://web.archive.org/web/20251008070327id_/https://www.ipsos.com/sites/default/files/ct/news/documents/2025-10/What-Worries-the-World-September-2025.pdf",
+      "recovery": "wayback",
+      "discoveryArticles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-September-2025-ae56b06b.txt",
+      "bytes": 3981835,
+      "sha256": "30fc439e68c897f326a0427574c6f82119238deb81827de3d707e57a64ff2949",
+      "fetchedAt": "2026-11-21T23:11:59.750Z"
+    },
+    {
+      "id": "What-Worries-the-World-October-2025-3703d679",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-11/What-Worries-the-World-October-2025.pdf",
+      "retrievedUrl": "https://web.archive.org/web/20251117190806id_/https://www.ipsos.com/sites/default/files/ct/news/documents/2025-11/What-Worries-the-World-October-2025.pdf",
+      "recovery": "wayback",
+      "discoveryArticles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-October-2025-3703d679.txt",
+      "bytes": 4688845,
+      "sha256": "32a30b0acaf82f5979f7738c4d53538d5a5a08633a4f9b9cc085e9cb5ddaf243",
+      "fetchedAt": "2026-11-21T23:12:31.823Z"
+    },
+    {
+      "id": "what-worries-the-world-ipsos-november-2025-b9b00346",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2025-12/what-worries-the-world-ipsos-november-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "what-worries-the-world-ipsos-november-2025-b9b00346.txt",
+      "bytes": 2809224,
+      "sha256": "9e878c7367aece99072895ed00330140f7a3575460b5dc83f2e8376bff54b387",
+      "fetchedAt": "2026-11-21T22:45:06.107Z"
+    },
+    {
+      "id": "What-Worries-the-World-December-2025-da6b50fd",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2026-01/What-Worries-the-World-December-2025.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-December-2025-da6b50fd.txt",
+      "bytes": 3417523,
+      "sha256": "004e4f4a009cff613b17aee412caab7564bdd706f6c65b620d82949a7155ba90",
+      "fetchedAt": "2026-11-21T22:45:06.903Z"
+    },
+    {
+      "id": "What-Worries-the-World-January-2026-85bf34b5",
+      "url": "https://www.ipsos.com/sites/default/files/ct/news/documents/2026-02/What-Worries-the-World-January-2026.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-January-2026-85bf34b5.txt",
+      "bytes": 3437005,
+      "sha256": "4c478933f809e7a8c774d6bfb8547bfbca1095b84c6aa1a18a4d61e41a0e6ed7",
+      "fetchedAt": "2026-11-21T22:45:08.362Z"
+    },
+    {
+      "id": "What_worries_the_world-Autumn_2017-4a926ce8",
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2017-10/What_worries_the_world-Autumn_2017.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-autumn-2017"
+      ],
+      "text": "What_worries_the_world-Autumn_2017-4a926ce8.txt",
+      "bytes": 2978824,
+      "sha256": "712696a0e9e4b84145bfbb2da13ccdf38a537c96ebb21a540281fb65a72b9ad8",
+      "fetchedAt": "2026-11-21T22:45:08.888Z"
+    },
+    {
+      "id": "What_Worries_the_World-August_2021-b6893fa2",
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2021-08/What%20Worries%20the%20World-August_2021.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world-august-2021"
+      ],
+      "text": "What_Worries_the_World-August_2021-b6893fa2.txt",
+      "bytes": 1832543,
+      "sha256": "7d199efe20380f6463067ba01d824cd6c7758e30adb33a0a8975901caf3b2811",
+      "fetchedAt": "2026-11-21T22:45:15.553Z"
+    },
+    {
+      "id": "What-Worries-the-World-July-2024_1-28db3dea",
+      "url": "https://www.ipsos.com/sites/default/files/What-Worries-the-World-July-2024%20%281%29.pdf",
+      "articles": [
+        "https://www.ipsos.com/en/what-worries-world"
+      ],
+      "text": "What-Worries-the-World-July-2024_1-28db3dea.txt",
+      "bytes": 3176951,
+      "sha256": "6feed7c4c0a19f859b662dec851c902117608aad6ffcf54b679776d4f26a6c6e",
+      "fetchedAt": "2026-11-21T22:45:14.177Z"
+    }
+  ],
+  "failures": []
+}

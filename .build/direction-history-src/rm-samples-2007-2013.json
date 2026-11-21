@@ -1,0 +1,2223 @@
+{
+  "waves": [
+    {
+      "start": "2007-05-26",
+      "end": "2007-05-27",
+      "sample": 818,
+      "label": "May 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20070918122242id_/http://www.roymorgan.com/news/polls/2007/4173/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of May 26/27, 2007, with an Australia-wide cross-section of 818 electors"
+    },
+    {
+      "start": "2007-06-02",
+      "end": "2007-06-03",
+      "sample": 909,
+      "label": "June 2/3",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20071218114123id_/http://www.roymorgan.com/news/polls/2007/4174/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of June 2/3, 2007, with an Australia-wide cross-section of 909 electors"
+    },
+    {
+      "start": "2007-06-09",
+      "end": "2007-06-17",
+      "sample": 1723,
+      "label": "June 9/10 & 16/17",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080729183535id_/http://www.roymorgan.com/news/polls/2007/4180/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of June 9/10 & 16/17, 2007, with an Australia-wide cross-section of 1,723 electors"
+    },
+    {
+      "start": "2007-06-23",
+      "end": "2007-07-01",
+      "sample": 1690,
+      "label": "June 23/24 & June 30/July 1",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20070906202326id_/http://www.roymorgan.com/news/polls/2007/4184/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of June 23/24 & June 30/July 1, 2007, with an Australia-wide cross-section of 1,690 electors"
+    },
+    {
+      "start": "2007-07-07",
+      "end": "2007-07-15",
+      "sample": 1780,
+      "label": "July 7/8 & 14/15",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20070906201635id_/http://www.roymorgan.com/news/polls/2007/4189/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of July 7/8 and 14/15, 2007, with an Australia-wide cross-section of 1,780 electors"
+    },
+    {
+      "start": "2007-07-21",
+      "end": "2007-07-29",
+      "sample": 1772,
+      "label": "July 21/22 & 28/29",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20070904065707id_/http://www.roymorgan.com/news/polls/2007/4192/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of July 21/22 and 28/29, 2007, with an Australia-wide cross-section of 1,772 electors"
+    },
+    {
+      "start": "2007-08-04",
+      "end": "2007-08-12",
+      "sample": 1667,
+      "label": "Aug 4/5 & 11/12",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20070904065927id_/http://www.roymorgan.com/news/polls/2007/4197/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of August 4/5 & 11/12, 2007, with an Australia-wide cross-section of 1,667 electors"
+    },
+    {
+      "start": "2007-08-18",
+      "end": "2007-08-26",
+      "sample": 1271,
+      "label": "Aug 18/19 & 25/26",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20070906192805id_/http://www.roymorgan.com/news/polls/2007/4206/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of August 18/19 & 25/26, 2007, with an Australia-wide cross-section of 1,271 electors"
+    },
+    {
+      "start": "2007-09-01",
+      "end": "2007-09-02",
+      "sample": 915,
+      "label": "Sep 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20071016131513id_/http://www.roymorgan.com/news/polls/2007/4207/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of September 1/2, 2007, with an Australia-wide cross-section of 915 electors"
+    },
+    {
+      "start": "2007-09-08",
+      "end": "2007-09-09",
+      "sample": 955,
+      "label": "Sep 8/9",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730232846id_/http://www.roymorgan.com/news/polls/2007/4211/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of September 8/9, 2007, with an Australia-wide cross-section of 955 electors"
+    },
+    {
+      "start": "2007-09-15",
+      "end": "2007-09-16",
+      "sample": 844,
+      "label": "Sep 15/16",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730233018id_/http://www.roymorgan.com/news/polls/2007/4214/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of September 15/16, 2007, with an Australia-wide cross-section of 844 electors"
+    },
+    {
+      "start": "2007-09-22",
+      "end": "2007-09-23",
+      "sample": 972,
+      "label": "Sep 22/23",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20071013235001id_/http://www.roymorgan.com/news/polls/2007/4217/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of September 22/23, 2007, with an Australia-wide cross-section of 972 electors"
+    },
+    {
+      "start": "2007-09-29",
+      "end": "2007-09-30",
+      "sample": 894,
+      "label": "Sep 29/30",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730190046id_/http://www.roymorgan.com/news/polls/2007/4219/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of September 29/30, 2007, with an Australia-wide cross-section of 894 electors"
+    },
+    {
+      "start": "2007-10-06",
+      "end": "2007-10-07",
+      "sample": 1081,
+      "label": "Oct 6/7",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20071016131518id_/http://www.roymorgan.com/news/polls/2007/4222/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 6/7, 2007, with an Australia-wide cross-section of 1,081 electors"
+    },
+    {
+      "start": "2007-10-13",
+      "end": "2007-10-14",
+      "sample": 850,
+      "label": "Oct 13/14",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20071023182559id_/http://www.roymorgan.com/news/polls/2007/4229/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 13/14, 2007, with an Australia-wide cross-section of 850 electors"
+    },
+    {
+      "start": "2007-10-17",
+      "end": "2007-10-18",
+      "sample": 598,
+      "label": "Oct 17/18",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20071023182559id_/http://www.roymorgan.com/news/polls/2007/4229/index.cfm?printversion=yes",
+      "quote": "The latest Australia-wide telephone Morgan Poll on Federal voting intention was conducted on the nights of October 17/18, 2007, with an Australia-wide cross-section of 598 electors"
+    },
+    {
+      "start": "2007-10-20",
+      "end": "2007-10-21",
+      "sample": 996,
+      "label": "Oct 20/21",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20071029045306id_/http://www.roymorgan.com/news/polls/2007/4233/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 20/21, 2007, with an Australia-wide cross-section of 996 electors"
+    },
+    {
+      "start": "2007-10-24",
+      "end": "2007-10-25",
+      "sample": 520,
+      "label": "Oct 24/25",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20071029045306id_/http://www.roymorgan.com/news/polls/2007/4233/index.cfm?printversion=yes",
+      "quote": "The latest Australia-wide telephone Morgan Poll on Federal voting intention was conducted on the nights of October 24/25, 2007, with an Australia-wide cross-section of 520 electors"
+    },
+    {
+      "start": "2007-10-27",
+      "end": "2007-10-28",
+      "sample": 1086,
+      "label": "Oct 27/28",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080102151453id_/http://www.roymorgan.com/news/polls/2007/4235/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 27/28, 2007, with an Australia-wide cross-section of 1,086 electors"
+    },
+    {
+      "start": "2007-11-03",
+      "end": "2007-11-04",
+      "sample": 990,
+      "label": "Nov 3/4",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080102235307id_/http://www.roymorgan.com/news/polls/2007/4237/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of November 3/4, 2007, with an Australia-wide cross-section of 990 electors"
+    },
+    {
+      "start": "2007-11-07",
+      "end": "2007-11-08",
+      "sample": 552,
+      "label": "Nov 7/8",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080102235307id_/http://www.roymorgan.com/news/polls/2007/4237/index.cfm?printversion=yes",
+      "quote": "The latest Australia-wide telephone Morgan Poll on Federal voting intention was conducted on the nights of November 7/8, 2007, with an Australia-wide cross-section of 552 electors"
+    },
+    {
+      "start": "2007-11-10",
+      "end": "2007-11-11",
+      "sample": 890,
+      "label": "Nov 10/11",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080103125518id_/http://www.roymorgan.com/news/polls/2007/4245/index.cfm?printversion=yes",
+      "quote": "This latest face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of November 10/11, 2007, with an Australia-wide cross-section of 890 electors"
+    },
+    {
+      "start": "2007-11-15",
+      "end": "2007-11-17",
+      "sample": 1670,
+      "label": "Nov 15-17",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080103125524id_/http://www.roymorgan.com/news/polls/2007/4246/index.cfm?printversion=yes",
+      "quote": "This latest telephone Morgan Poll on Federal voting intention was conducted on November 15-17, 2007, with an Australia-wide cross-section of 1,670 electors"
+    },
+    {
+      "start": "2007-11-21",
+      "end": "2007-11-22",
+      "sample": 1648,
+      "label": "Nov 21/22",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080103100413id_/http://www.roymorgan.com/news/polls/2007/4250/index.cfm?printversion=yes",
+      "quote": "This latest telephone Morgan Poll on Federal voting intention was conducted on November 21/22, 2007, with an Australia-wide cross-section of 1,648 electors"
+    },
+    {
+      "start": "2007-11-23",
+      "end": "2007-11-23",
+      "sample": 2115,
+      "label": "Nov 23",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080103120020id_/http://www.roymorgan.com/news/polls/2007/4251/index.cfm?printversion=yes",
+      "quote": "This latest telephone Morgan Poll on Federal voting intention was conducted on November 23, 2007, with an Australia-wide cross-section of 2,115 electors"
+    },
+    {
+      "start": "2007-12-05",
+      "end": "2007-12-06",
+      "sample": 1263,
+      "label": "Dec 5/6",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080729183117id_/http://www.roymorgan.com/news/polls/2007/4255/index.cfm?printversion=yes",
+      "quote": "This latest telephone Morgan Poll on Federal voting intention was conducted on December 5/6, 2007, with an Australia-wide cross-section of 1,263 electors"
+    },
+    {
+      "start": "2008-01-23",
+      "end": "2008-01-24",
+      "sample": 1214,
+      "label": "Jan 23/24",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080730232554id_/http://www.roymorgan.com/news/polls/2008/4266/index.cfm?printversion=yes",
+      "quote": "This latest telephone Morgan Poll on Federal voting intention was conducted January 23/24, 2008, with an Australia-wide cross-section of 1,214 electors"
+    },
+    {
+      "start": "2008-01-19",
+      "end": "2008-01-27",
+      "sample": 1941,
+      "label": "Jan 19/20 & 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730150604id_/http://www.roymorgan.com/news/polls/2008/4267/index.cfm?printversion=yes",
+      "quote": "The latest Morgan Poll on Federal voting intention was conducted face-to-face on the weekends of January 19/20 and 26/27, 2008, with an Australia-wide cross-section of 1,941 electors"
+    },
+    {
+      "start": "2008-01-30",
+      "end": "2008-01-31",
+      "sample": 1204,
+      "label": "Jan 30/31",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080730150604id_/http://www.roymorgan.com/news/polls/2008/4267/index.cfm?printversion=yes",
+      "quote": "The latest telephone Morgan Poll on Federal voting intention was conducted on the nights of January 30/31, 2008, with an Australia-wide cross-section of 1,204 electors"
+    },
+    {
+      "start": "2008-02-02",
+      "end": "2008-02-10",
+      "sample": 1905,
+      "label": "Feb 2/3 & 9/10",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730172844id_/http://www.roymorgan.com/news/polls/2008/4270/index.cfm?printversion=yes",
+      "quote": "The latest Morgan Poll on Federal voting intention was conducted face-to-face on the weekends of February 2/3 and 9/10, 2008, with an Australia-wide cross-section of 1,905 electors"
+    },
+    {
+      "start": "2008-02-16",
+      "end": "2008-02-24",
+      "sample": 1864,
+      "label": "Feb 16/17 & 23/24",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080306214658id_/http://www.roymorgan.com/news/polls/2008/4275/index.cfm?printversion=yes",
+      "quote": "The latest Morgan Poll on Federal voting intention was conducted face-to-face on the weekends of February 16/17 and 23/24, 2008, with an Australia-wide cross-section of 1,864 electors"
+    },
+    {
+      "start": "2008-03-01",
+      "end": "2008-03-09",
+      "sample": 2019,
+      "label": "Mar 1/2 & 8/9",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080318213111id_/http://www.roymorgan.com/news/polls/2008/4279/index.cfm?printversion=yes",
+      "quote": "The Morgan Poll on Federal voting intention was conducted face-to-face on the weekends of March 1/2 & 8/9, 2008, with an Australia-wide cross-section of 2,019 electors"
+    },
+    {
+      "start": "2008-03-11",
+      "end": "2008-03-12",
+      "sample": 1128,
+      "label": "Mar 11/12",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080318213111id_/http://www.roymorgan.com/news/polls/2008/4279/index.cfm?printversion=yes",
+      "quote": "The latest telephone Morgan Poll on Federal voting intention was conducted March 11/12, 2008, with an Australia-wide cross-section of 1,128 electors"
+    },
+    {
+      "start": "2008-03-15",
+      "end": "2008-03-23",
+      "sample": 1651,
+      "label": "Mar 15/16 & 22/23",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080508222426id_/http://www.roymorgan.com/news/polls/2008/4281/index.cfm?printversion=yes",
+      "quote": "The Morgan Poll on Federal voting intention was conducted face-to-face on the weekends of March 15/16 & 22/23, 2008, with an Australia-wide cross-section of 1,651 electors"
+    },
+    {
+      "start": "2008-03-26",
+      "end": "2008-04-03",
+      "sample": 2231,
+      "label": "Mar 26/27 & Apr 2/3",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080409150729id_/http://www.roymorgan.com/news/polls/2008/4282/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted on the nights of March 26/27 and April 2/3, 2008, with an Australia-wide cross-section of 2,231 electors"
+    },
+    {
+      "start": "2008-04-05",
+      "end": "2008-04-06",
+      "sample": 1260,
+      "label": "Apr 5/6",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080729184756id_/http://www.roymorgan.com/news/polls/2008/4286/index.cfm?printversion=yes",
+      "quote": "This Morgan Poll on Federal voting intention was conducted face-to-face on the weekend of April 5/6, 2008, with an Australia-wide cross-section of 1,260 electors"
+    },
+    {
+      "start": "2008-04-09",
+      "end": "2008-04-10",
+      "sample": 802,
+      "label": "Apr 9/10",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080729184756id_/http://www.roymorgan.com/news/polls/2008/4286/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted on the nights of April 9/10, 2008, with an Australia-wide cross-section of 802 electors"
+    },
+    {
+      "start": "2008-04-12",
+      "end": "2008-04-13",
+      "sample": 897,
+      "label": "Apr 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080729184439id_/http://www.roymorgan.com/news/polls/2008/4287/index.cfm?printversion=yes",
+      "quote": "This Morgan Poll on Federal voting intention was conducted face-to-face on the weekend of April 12/13, 2008, with an Australia-wide cross-section of 897 electors"
+    },
+    {
+      "start": "2008-04-16",
+      "end": "2008-04-17",
+      "sample": 765,
+      "label": "Apr 16/17",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080729184439id_/http://www.roymorgan.com/news/polls/2008/4287/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted on the nights of April 16/17, 2008, with an Australia-wide cross-section of 765 electors"
+    },
+    {
+      "start": "2008-04-19",
+      "end": "2008-04-27",
+      "sample": 1891,
+      "label": "Apr 19/20 & 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080509054930id_/http://www.roymorgan.com/news/polls/2008/4289/index.cfm?printversion=yes",
+      "quote": "This Morgan Poll on Federal voting intention was conducted face-to-face on the weekends of April 19/20 & 26/27, 2008, with an Australia-wide cross-section of 1891 electors"
+    },
+    {
+      "start": "2008-05-03",
+      "end": "2008-05-04",
+      "sample": 650,
+      "label": "May 3/4",
+      "method": "Face",
+      "url": "https://web.archive.org/web/20080517123024id_/http://www.roymorgan.com/news/polls/2008/4294/index.cfm?printversion=yes",
+      "quote": "This Special Morgan Poll on Federal voting intention was conducted on the weekend of May 3-4, 2008, with an Australia-wide cross-section of 650 electors"
+    },
+    {
+      "start": "2008-05-07",
+      "end": "2008-05-11",
+      "sample": 618,
+      "label": "May 7-11",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080517123020id_/http://www.roymorgan.com/news/polls/2008/4293/index.cfm?printversion=yes",
+      "quote": "This special telephone Morgan Poll on Federal voting intention was conducted May 7-11, 2008, with an Australia-wide cross-section of 618 electors"
+    },
+    {
+      "start": "2008-05-17",
+      "end": "2008-05-18",
+      "sample": 1055,
+      "label": "May 17/18",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080604121747id_/http://www.roymorgan.com/news/polls/2008/4296/index.cfm?printversion=yes",
+      "quote": "This Morgan Poll on Federal voting intention was conducted face-to-face over the period May 17-18, 2008, with an Australia-wide cross-section of 1,055 electors"
+    },
+    {
+      "start": "2008-05-24",
+      "end": "2008-05-25",
+      "sample": 842,
+      "label": "May 24/25",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080604121807id_/http://www.roymorgan.com/news/polls/2008/4297/index.cfm?printversion=yes",
+      "quote": "This Morgan Poll on Federal voting intention was conducted face-to-face over the period May 24/25, 2008, with an Australia-wide cross-section of 842 electors"
+    },
+    {
+      "start": "2008-05-31",
+      "end": "2008-06-01",
+      "sample": 960,
+      "label": "May 31 & June 1",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730150714id_/http://www.roymorgan.com/news/polls/2008/4299/index.cfm?printversion=yes",
+      "quote": "This Morgan Poll on Federal voting intention was conducted face-to-face over the period May 31 — June 1, 2008, with an Australia-wide cross-section of 960 electors"
+    },
+    {
+      "start": "2008-06-07",
+      "end": "2008-06-08",
+      "sample": 826,
+      "label": "June 7/8",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730150849id_/http://www.roymorgan.com/news/polls/2008/4300/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekend of June 7/8, 2008, with an Australia-wide cross-section of 826 electors"
+    },
+    {
+      "start": "2008-06-04",
+      "end": "2008-06-09",
+      "sample": 1393,
+      "label": "June 4-9",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080730150849id_/http://www.roymorgan.com/news/polls/2008/4300/index.cfm?printversion=yes",
+      "quote": "The telephone Morgan Poll on Federal voting intention was conducted on the phone over the period June 4-9, 2008 with an Australia-wide cross-section of 1,393 electors"
+    },
+    {
+      "start": "2008-06-14",
+      "end": "2008-06-22",
+      "sample": 1746,
+      "label": "June 14/15 & 21/22",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080729230739id_/http://www.roymorgan.com/news/polls/2008/4304/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of June 14/15 and 21/22, 2008, with an Australia-wide cross-section of 1,746 electors"
+    },
+    {
+      "start": "2008-06-28",
+      "end": "2008-07-06",
+      "sample": 1806,
+      "label": "June 28/29 & July 5/6",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080729171654id_/http://www.roymorgan.com/news/polls/2008/4307/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of June 28/29 & July 5/6, 2008, with an Australia-wide cross-section of 1,806 electors"
+    },
+    {
+      "start": "2008-07-12",
+      "end": "2008-07-13",
+      "sample": 797,
+      "label": "July 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730171847id_/http://www.roymorgan.com/news/polls/2008/4309/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of July 12/13, 2008, with an Australia-wide cross-section of 797 electors"
+    },
+    {
+      "start": "2008-07-19",
+      "end": "2008-07-20",
+      "sample": 1067,
+      "label": "July 19/20",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080730172642id_/http://www.roymorgan.com/news/polls/2008/4310/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekend of July 19/20, 2008, with an Australia-wide cross-section of 1067 electors"
+    },
+    {
+      "start": "2008-07-26",
+      "end": "2008-08-03",
+      "sample": 1255,
+      "label": "July 26/27 & Aug 2/3",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080916230926id_/http://www.roymorgan.com:80/news/polls/2008/4313/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of July 26/27 and August 2/3, 2008, with an Australia-wide cross-section of 1,255 electors"
+    },
+    {
+      "start": "2008-08-09",
+      "end": "2008-08-17",
+      "sample": 1799,
+      "label": "Aug 9/10 & 16/17",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120410195724id_/http://www.roymorgan.com/news/polls/2008/4315/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of August 9/10 & 16/17, 2008, with an Australia-wide cross-section of 1,799 electors"
+    },
+    {
+      "start": "2008-08-23",
+      "end": "2008-08-31",
+      "sample": 1786,
+      "label": "Aug 23/24 & 30/31",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080917163600id_/http://www.roymorgan.com:80/news/polls/2008/4317/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of August 23/24 & 30/31, 2008, with an Australia-wide cross-section of 1,786 electors"
+    },
+    {
+      "start": "2008-09-06",
+      "end": "2008-09-14",
+      "sample": 1703,
+      "label": "Sep 6/7 & 13/14",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20080922073812id_/http://www.roymorgan.com:80/news/polls/2008/4320/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of September 6/7 & 13/14, 2008, with an Australia-wide cross-section of 1,703 electors"
+    },
+    {
+      "start": "2008-09-24",
+      "end": "2008-09-25",
+      "sample": 574,
+      "label": "Sep 24/25",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20080930055452id_/http://www.roymorgan.com/news/polls/2008/4322/index.cfm?printversion=yes",
+      "quote": "This special telephone Morgan Poll was conducted on the evenings of September 24/25, 2008, with an Australia-wide cross section of 574 electors"
+    },
+    {
+      "start": "2008-09-20",
+      "end": "2008-09-28",
+      "sample": 1221,
+      "label": "Sep 20/21 & 27/28",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20081008074224id_/http://www.roymorgan.com/news/polls/2008/4324/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of September 20/21 & 27/28, 2008, with an Australia-wide cross-section of 1,221 electors"
+    },
+    {
+      "start": "2008-10-04",
+      "end": "2008-10-12",
+      "sample": 1692,
+      "label": "Oct 4/5 & 11/12",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090925183234id_/http://www.roymorgan.com/news/polls/2008/4328/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of October 4/5 & 11/12, 2008, with an Australia-wide cross-section of 1,692 electors"
+    },
+    {
+      "start": "2008-10-18",
+      "end": "2008-10-26",
+      "sample": 1906,
+      "label": "Oct 18/19 & 25/26",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120411054644id_/http://www.roymorgan.com/news/polls/2008/4331/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of October 18/19 & 25/26, 2008, with an Australia-wide cross-section of 1,906 electors"
+    },
+    {
+      "start": "2008-11-01",
+      "end": "2008-11-09",
+      "sample": 1880,
+      "label": "Nov 1/2 & 8/9",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20081216023800id_/http://www.roymorgan.com:80/news/polls/2008/4336/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of November 1/2 & 8/9, 2008, with an Australia-wide cross-section of 1,880 electors"
+    },
+    {
+      "start": "2008-11-15",
+      "end": "2008-11-23",
+      "sample": 1778,
+      "label": "Nov 15/16 & 22/23",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20081204032223id_/http://www.roymorgan.com:80/news/polls/2008/4339/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of November 15/16 & 22/23, 2008, with an Australia-wide cross-section of 1,778 electors"
+    },
+    {
+      "start": "2009-02-14",
+      "end": "2009-02-15",
+      "sample": 828,
+      "label": "Feb 14/15",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090227002354id_/http://www.roymorgan.com:80/news/polls/2009/4360/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekend of February 14/15, 2009, with an Australia-wide cross-section of 828 electors"
+    },
+    {
+      "start": "2009-02-21",
+      "end": "2009-03-01",
+      "sample": 1845,
+      "label": "Feb 21/22 & 28/ Mar 1",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090311000839id_/http://www.roymorgan.com:80/news/polls/2009/4363/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of February 21/22 & February 28/ March 1, 2009, with an Australia-wide cross-section of 1,845 electors"
+    },
+    {
+      "start": "2009-03-07",
+      "end": "2009-03-08",
+      "sample": 955,
+      "label": "Mar 7/8",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090319030039id_/http://www.roymorgan.com:80/news/polls/2009/4364/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of March 7/8, 2009, with an Australia-wide cross-section of 955 electors"
+    },
+    {
+      "start": "2009-03-14",
+      "end": "2009-03-15",
+      "sample": 883,
+      "label": "Mar 14/15",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090326032459id_/http://www.roymorgan.com:80/news/polls/2009/4366/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of March 14/15, 2009, with an Australia-wide cross-section of 883 electors"
+    },
+    {
+      "start": "2009-03-21",
+      "end": "2009-03-29",
+      "sample": 1180,
+      "label": "Mar 21/22 & 28/29",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120410191422id_/http://www.roymorgan.com/news/polls/2009/4369/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of March 21/22 & 28/29, 2009, with an Australia-wide cross-section of 1,180 electors"
+    },
+    {
+      "start": "2009-04-04",
+      "end": "2009-04-12",
+      "sample": 1713,
+      "label": "Apr 4/5 & 11/12",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090430162348id_/http://www.roymorgan.com:80/news/polls/2009/4372/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of April 4/5 & 11/12, 2009, with an Australia-wide cross-section of 1,713 electors"
+    },
+    {
+      "start": "2009-04-18",
+      "end": "2009-04-26",
+      "sample": 1838,
+      "label": "Apr 18/19 & 25/26",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090508111713id_/http://www.roymorgan.com:80/news/polls/2009/4374/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of April 18/19 & 25/26, 2009, with an Australia-wide cross-section of 1,838 electors"
+    },
+    {
+      "start": "2009-05-02",
+      "end": "2009-05-10",
+      "sample": 1800,
+      "label": "May 2/3 & 9/10",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120411072357id_/http://www.roymorgan.com/news/polls/2009/4377/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of May 2/3 & 9/10, 2009, with an Australia-wide cross-section of 1,800 electors"
+    },
+    {
+      "start": "2009-05-16",
+      "end": "2009-05-17",
+      "sample": 999,
+      "label": "May 16/17",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110311055046id_/http://www.roymorgan.com/news/polls/2009/4379/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of May 16/17, 2009, with an Australia-wide cross-section of 999 electors"
+    },
+    {
+      "start": "2009-05-20",
+      "end": "2009-05-21",
+      "sample": 873,
+      "label": "May 20/21",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110311055046id_/http://www.roymorgan.com/news/polls/2009/4379/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll was conducted on the evenings of May 20/21, 2009, with an Australia-wide cross section of 873 electors"
+    },
+    {
+      "start": "2009-05-23",
+      "end": "2009-05-31",
+      "sample": 1804,
+      "label": "May 23/24 & 30/31",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090919151228id_/http://www.roymorgan.com/news/polls/2009/4386/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of May 23/24 & 30/31, 2009, with an Australia-wide cross-section of 1,804 electors"
+    },
+    {
+      "start": "2009-06-03",
+      "end": "2009-06-04",
+      "sample": 805,
+      "label": "June 3/4",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20090919151228id_/http://www.roymorgan.com/news/polls/2009/4386/index.cfm?printversion=yes",
+      "quote": "A telephone Morgan Poll conducted on the evenings of June 3/4, 2009, with an Australia-wide cross section of 805 electors"
+    },
+    {
+      "start": "2009-06-10",
+      "end": "2009-06-11",
+      "sample": 715,
+      "label": "June 10/11",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120410232327id_/http://www.roymorgan.com/news/polls/2009/4390/index.cfm?printversion=yes",
+      "quote": "The telephone Morgan Poll on Federal voting intention was conducted on June 10/11, 2009 with an Australia-wide cross section of 715 electors"
+    },
+    {
+      "start": "2009-06-06",
+      "end": "2009-06-14",
+      "sample": 1744,
+      "label": "June 6/7 & 13/14",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090921181133id_/http://www.roymorgan.com/news/polls/2009/4392/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekends of June 6/7 & 13/14, 2009, with an Australia-wide cross-section of 1,744 electors"
+    },
+    {
+      "start": "2009-06-20",
+      "end": "2009-06-21",
+      "sample": 897,
+      "label": "June 20/21",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090919151106id_/http://www.roymorgan.com/news/polls/2009/4393/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekend of June 20/21, 2009, with an Australia-wide cross-section of 897 electors"
+    },
+    {
+      "start": "2009-07-01",
+      "end": "2009-07-02",
+      "sample": 546,
+      "label": "July 1/2",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20090921181017id_/http://www.roymorgan.com/news/polls/2009/4397/index.cfm",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted on the nights of July 1/2, 2009, with an Australia-wide cross-section of 546 electors"
+    },
+    {
+      "start": "2009-06-27",
+      "end": "2009-07-05",
+      "sample": 1190,
+      "label": "June 27/28 & July 4/5",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090921123709id_/http://www.roymorgan.com/news/polls/2009/4399/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of June 27/28 & July 4/5, 2009, with an Australia-wide cross-section of 1,190 electors"
+    },
+    {
+      "start": "2009-07-11",
+      "end": "2009-07-19",
+      "sample": 1812,
+      "label": "July 11/12 & 18/19",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090731234043id_/http://www.roymorgan.com:80/news/polls/2009/4401/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of July 11/12 & 18/19, 2009, with an Australia-wide cross-section of 1,812 electors"
+    },
+    {
+      "start": "2009-07-25",
+      "end": "2009-08-02",
+      "sample": 1832,
+      "label": "July 25/26 & Aug 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090821012654id_/http://www.roymorgan.com:80/news/polls/2009/4404/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of July 25/26 & August 1/2, 2009, with an Australia-wide cross-section of 1,832 electors"
+    },
+    {
+      "start": "2009-08-05",
+      "end": "2009-08-06",
+      "sample": 574,
+      "label": "Aug 5/6",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20090821012654id_/http://www.roymorgan.com:80/news/polls/2009/4404/index.cfm?printversion=yes",
+      "quote": "The telephone Morgan Poll conducted on the nights of August 5/6, 2009 with an Australia-wide cross-section of 574 electors"
+    },
+    {
+      "start": "2009-08-22",
+      "end": "2009-08-30",
+      "sample": 1778,
+      "label": "Aug 22/23 & 29/30",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090919134656id_/http://www.roymorgan.com/news/polls/2009/4414/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of August 22/23 & 29/30, 2009, with an Australia-wide cross-section of 1,778 electors"
+    },
+    {
+      "start": "2009-09-05",
+      "end": "2009-09-13",
+      "sample": 1730,
+      "label": "Sep 5/6 & 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20090921153006id_/http://www.roymorgan.com/news/polls/2009/4418/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of September 5/6 & 12/13, 2009, with an Australia-wide cross-section of 1,730 electors"
+    },
+    {
+      "start": "2009-09-19",
+      "end": "2009-09-27",
+      "sample": 1129,
+      "label": "Sep 19/20 & 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20091006052637id_/http://www.roymorgan.com:80/news/polls/2009/4420/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of September 19/20 & 26/27, 2009, with an Australia-wide cross-section of 1,129 electors"
+    },
+    {
+      "start": "2009-10-07",
+      "end": "2009-10-08",
+      "sample": 549,
+      "label": "Oct 7/8",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20091016001137id_/http://www.roymorgan.com:80/news/polls/2009/4423/index.cfm?printversion=yes",
+      "quote": "This special telephone Morgan Poll was conducted on the evenings of October 7/8, 2009, with an Australia-wide cross section of 549 electors"
+    },
+    {
+      "start": "2009-10-03",
+      "end": "2009-10-11",
+      "sample": 1684,
+      "label": "Oct 3/4 & 10/11",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20091022170837id_/http://www.roymorgan.com:80/news/polls/2009/4427/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 3/4 & 10/11, 2009, with an Australia-wide cross-section of 1,684 electors"
+    },
+    {
+      "start": "2009-10-17",
+      "end": "2009-10-25",
+      "sample": 1790,
+      "label": "Oct 17/18 & 24/25",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20091103103143id_/http://www.roymorgan.com:80/news/polls/2009/4429/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 17/18 & 24/25, 2009, with an Australia-wide cross-section of 1,790 electors"
+    },
+    {
+      "start": "2009-10-31",
+      "end": "2009-11-01",
+      "sample": 1050,
+      "label": "Oct 31 & Nov 1",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20091115211944id_/http://www.roymorgan.com/news/polls/2009/4432/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of October 31/ November 1, 2009, with an Australia-wide cross-section of 1.050 electors"
+    },
+    {
+      "start": "2009-11-07",
+      "end": "2009-11-08",
+      "sample": 874,
+      "label": "Nov 7/8",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120411090627id_/http://www.roymorgan.com/news/polls/2009/4434/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of November 7/8, 2009, with an Australia-wide cross-section of 874 electors"
+    },
+    {
+      "start": "2009-11-11",
+      "end": "2009-11-12",
+      "sample": 573,
+      "label": "Nov 11/12",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120411090627id_/http://www.roymorgan.com/news/polls/2009/4434/index.cfm?printversion=yes",
+      "quote": "A separate telephone Morgan Poll on Federal voting intention conducted on the nights of November 11/12, 2009 with an Australia-wide cross-section of 573 electors"
+    },
+    {
+      "start": "2009-11-21",
+      "end": "2009-11-22",
+      "sample": 961,
+      "label": "Nov 21/22",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20091201021813id_/http://www.roymorgan.com:80/news/polls/2009/4441/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of November 21/22, 2009, with an Australia-wide cross-section of 961 electors"
+    },
+    {
+      "start": "2009-11-28",
+      "end": "2009-11-29",
+      "sample": 958,
+      "label": "Nov 28/29",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120410211959id_/http://www.roymorgan.com/news/polls/2009/4444/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of November 28/29, 2009, with an Australia-wide cross-section of 958 electors"
+    },
+    {
+      "start": "2009-12-02",
+      "end": "2009-12-03",
+      "sample": 597,
+      "label": "Dec 2/3",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120410211959id_/http://www.roymorgan.com/news/polls/2009/4444/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll was conducted on the evenings of December 2/3, 2009, with an Australia-wide cross section of 597 electors"
+    },
+    {
+      "start": "2009-12-04",
+      "end": "2009-12-09",
+      "sample": 493,
+      "label": "Dec 4-9",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120420023424id_/http://www.roymorgan.com/news/polls/2009/4450/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll was conducted on the evenings of December 4-9, 2009, with an Australia-wide cross section of 493 electors"
+    },
+    {
+      "start": "2010-01-13",
+      "end": "2010-01-14",
+      "sample": 541,
+      "label": "Jan 13/14",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100125225152id_/http://www.roymorgan.com:80/news/polls/2010/4456/index.cfm?printversion=yes",
+      "quote": "This special telephone Morgan Poll was conducted on the evenings of January 13/14, 2010, with an Australia-wide cross section of 541 electors"
+    },
+    {
+      "start": "2010-01-09",
+      "end": "2010-01-17",
+      "sample": 1819,
+      "label": "Jan 9/10 & 16/17",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100124090742id_/http://www.roymorgan.com:80/news/polls/2010/4463/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of January 9/10 & 16/17, 2010, with an Australia-wide cross-section of 1,819 electors"
+    },
+    {
+      "start": "2010-01-23",
+      "end": "2010-01-31",
+      "sample": 1796,
+      "label": "Jan 23/24 & 30/31",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100213055821id_/http://www.roymorgan.com:80/news/polls/2010/4466/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of January 23/24 & 30/31, 2010, with an Australia-wide cross-section of 1,796 electors"
+    },
+    {
+      "start": "2010-02-10",
+      "end": "2010-02-11",
+      "sample": 545,
+      "label": "Feb 10/11",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100217090248id_/http://www.roymorgan.com:80/news/polls/2010/4467/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted on the nights of February 10/11, 2010, with an Australia-wide cross-section of 545 electors"
+    },
+    {
+      "start": "2010-02-06",
+      "end": "2010-02-14",
+      "sample": 1811,
+      "label": "Feb 6/7 & 13/14",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100227051756id_/http://www.roymorgan.com:80/news/polls/2010/4471/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of February 6/7 & 13/14, 2010, with an Australia-wide cross-section of 1811 electors"
+    },
+    {
+      "start": "2010-02-20",
+      "end": "2010-02-21",
+      "sample": 940,
+      "label": "Feb 20/21",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110303082602id_/http://www.roymorgan.com/news/polls/2010/4472/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of February 20/21, 2010, with an Australia-wide cross-section of 940 electors"
+    },
+    {
+      "start": "2010-02-27",
+      "end": "2010-03-07",
+      "sample": 1910,
+      "label": "Feb 27/28 & Mar 6/7",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100317085919id_/http://www.roymorgan.com:80/news/polls/2010/4476/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of February 27/28 & March 6/7, 2010, with an Australia-wide cross-section of 1,910 electors"
+    },
+    {
+      "start": "2010-03-13",
+      "end": "2010-03-21",
+      "sample": 1793,
+      "label": "Mar 13/14 & 20/21",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100402051523id_/http://www.roymorgan.com:80/news/polls/2010/4480/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekends of March 13/14 & 20/21, 2010, with an Australia-wide cross-section of 1,793 electors"
+    },
+    {
+      "start": "2010-03-27",
+      "end": "2010-04-04",
+      "sample": 1030,
+      "label": "Mar 27/28 & Apr 3/4",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100416132939id_/http://www.roymorgan.com:80/news/polls/2010/4484/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of March 27/28 & April 3/4, 2010, with an Australia-wide cross-section of 1,030 electors"
+    },
+    {
+      "start": "2010-04-24",
+      "end": "2010-04-25",
+      "sample": 915,
+      "label": "Apr 24/25",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100505165225id_/http://www.roymorgan.com:80/news/polls/2010/4487/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of April 24/25, 2010, with an Australia-wide cross-section of 915 electors"
+    },
+    {
+      "start": "2010-05-01",
+      "end": "2010-05-02",
+      "sample": 931,
+      "label": "May 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100513043701id_/http://www.roymorgan.com:80/news/polls/2010/4493/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted on the weekend of May 1/2, 2010, with an Australia-wide cross-section of 931 electors"
+    },
+    {
+      "start": "2010-05-04",
+      "end": "2010-05-05",
+      "sample": 555,
+      "label": "May 4/5",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100519013851id_/http://www.roymorgan.com:80/news/polls/2010/4490/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights of May 4/5, 2010, with an Australia-wide cross-section of 555 electors"
+    },
+    {
+      "start": "2010-05-08",
+      "end": "2010-05-09",
+      "sample": 830,
+      "label": "May 8/9",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100518224720id_/http://www.roymorgan.com:80/news/polls/2010/4499/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of May 8/9, 2010, with an Australia-wide cross-section of 830 electors"
+    },
+    {
+      "start": "2010-05-12",
+      "end": "2010-05-13",
+      "sample": 571,
+      "label": "May 12/13",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100518224720id_/http://www.roymorgan.com:80/news/polls/2010/4499/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll was conducted on the evenings of May 12/13, 2010, with an Australia-wide cross section of 571 electors"
+    },
+    {
+      "start": "2010-05-15",
+      "end": "2010-05-16",
+      "sample": 850,
+      "label": "May 15/16",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100526003315id_/http://www.roymorgan.com:80/news/polls/2010/4501/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of May 15/16, 2010, with an Australia-wide cross-section of 850 electors"
+    },
+    {
+      "start": "2010-05-22",
+      "end": "2010-05-23",
+      "sample": 895,
+      "label": "May 22/23",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100531214856id_/http://www.roymorgan.com:80/news/polls/2010/4503/",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of May 22/23, 2010, with an Australia-wide cross-section of 895 electors"
+    },
+    {
+      "start": "2010-05-26",
+      "end": "2010-05-27",
+      "sample": 549,
+      "label": "May 26/27",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100531214856id_/http://www.roymorgan.com:80/news/polls/2010/4503/",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted on the nights of May 26/27, 2010, with an Australia-wide cross-section of 549 electors"
+    },
+    {
+      "start": "2010-05-29",
+      "end": "2010-05-30",
+      "sample": 797,
+      "label": "May 29/30",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120411020430id_/http://www.roymorgan.com/news/polls/2010/4506/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of May 29/30, 2010, with an Australia-wide cross-section of 797 electors"
+    },
+    {
+      "start": "2010-06-05",
+      "end": "2010-06-06",
+      "sample": 880,
+      "label": "June 5/6",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100616052932id_/http://www.roymorgan.com:80/news/polls/2010/4510/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of June 5/6, 2010, with an Australia-wide cross-section of 880 electors"
+    },
+    {
+      "start": "2010-06-12",
+      "end": "2010-06-13",
+      "sample": 770,
+      "label": "June 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110306080108id_/http://www.roymorgan.com/news/polls/2010/4514/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of June 12/13, 2010, with an Australia-wide cross-section of 770 electors"
+    },
+    {
+      "start": "2010-06-19",
+      "end": "2010-06-20",
+      "sample": 887,
+      "label": "June 19/20",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100630133932id_/http://www.roymorgan.com:80/news/polls/2010/4517/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of June 19/20, 2010, with an Australia-wide cross-section of 887 electors"
+    },
+    {
+      "start": "2010-06-26",
+      "end": "2010-07-04",
+      "sample": 1178,
+      "label": "June 26/27 & July 3/4",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100714015822id_/http://www.roymorgan.com/news/polls/2010/4532/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekends of June 26/27, 2010 (299 electors) & July 3/4, 2010 (879 electors), with an Australia-wide cross-section of 1,178 electors"
+    },
+    {
+      "start": "2010-07-10",
+      "end": "2010-07-11",
+      "sample": 824,
+      "label": "July 10/11",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120411021104id_/http://www.roymorgan.com/news/polls/2010/4533/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of July 10/11, 2010, with an Australia-wide cross-section of 824 electors"
+    },
+    {
+      "start": "2010-07-17",
+      "end": "2010-07-18",
+      "sample": 871,
+      "label": "July 17/18",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110303075521id_/http://www.roymorgan.com/news/polls/2010/4540/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of July 17/18, 2010, with an Australia-wide cross-section of 871 electors"
+    },
+    {
+      "start": "2010-07-20",
+      "end": "2010-07-21",
+      "sample": 719,
+      "label": "July 20/21",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110303075521id_/http://www.roymorgan.com/news/polls/2010/4540/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the nights of July 20/21, 2010 with an Australia-wide cross-section of 719 electors"
+    },
+    {
+      "start": "2010-07-24",
+      "end": "2010-07-25",
+      "sample": 847,
+      "label": "July 24/25",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110303074500id_/http://www.roymorgan.com/news/polls/2010/4545/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted on the weekend of July 24/25, 2010, with an Australia-wide cross-section of 847 electors"
+    },
+    {
+      "start": "2010-07-27",
+      "end": "2010-07-28",
+      "sample": 680,
+      "label": "July 27/28",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110303074500id_/http://www.roymorgan.com/news/polls/2010/4545/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the nights of July 27/28, 2010 with an Australia-wide cross-section of 680 electors"
+    },
+    {
+      "start": "2010-07-31",
+      "end": "2010-08-01",
+      "sample": 1042,
+      "label": "July 31/ Aug 1",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100820131606id_/http://www.roymorgan.com:80/news/polls/2010/4552/",
+      "quote": "This face to face Morgan Poll on Federal voting intention was conducted over the week-end of July 31/ August 1, 2010 with an Australia-wide cross-section of 1,042 electors"
+    },
+    {
+      "start": "2010-08-03",
+      "end": "2010-08-03",
+      "sample": 660,
+      "label": "Aug 3",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110311110206id_/http://www.roymorgan.com/news/polls/2010/4546/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted last night, August 3, 2010 with an Australia-wide cross-section of 660 electors"
+    },
+    {
+      "start": "2010-08-07",
+      "end": "2010-08-08",
+      "sample": 900,
+      "label": "Aug 7/8",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110311120511id_/http://www.roymorgan.com/news/polls/2010/4556/index.cfm?printversion=yes",
+      "quote": "This face to face Morgan Poll on Federal voting intention was conducted over the week-end of August 7/8, 2010 with an Australia-wide cross-section of 900 electors"
+    },
+    {
+      "start": "2010-08-14",
+      "end": "2010-08-14",
+      "sample": 966,
+      "label": "Aug 14",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100820043634id_/http://www.roymorgan.com:80/news/polls/2010/4559/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted today, August 14, 2010 with an Australia-wide cross-section of 966 electors"
+    },
+    {
+      "start": "2010-08-14",
+      "end": "2010-08-15",
+      "sample": 1049,
+      "label": "Aug 14/15",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100825043146id_/http://www.roymorgan.com:80/news/polls/2010/4566/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted last weekend, August 14/15, 2010, with an Australia-wide cross-section of 1,049 electors"
+    },
+    {
+      "start": "2010-08-18",
+      "end": "2010-08-19",
+      "sample": 1872,
+      "label": "Aug 18/19",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100824233911id_/http://www.roymorgan.com:80/news/polls/2010/4567/index.cfm?printversion=yes",
+      "quote": "This special telephone Morgan Poll on Federal voting intention was conducted over the last two nights, August 18/19, 2010, with an Australia-wide cross-section of 1,872 electors"
+    },
+    {
+      "start": "2010-08-25",
+      "end": "2010-08-26",
+      "sample": 530,
+      "label": "Aug 25/26",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100830055605id_/http://www.roymorgan.com:80/news/polls/2010/4574/",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights, August 25/26, 2010, with an Australia-wide cross-section of 530 electors"
+    },
+    {
+      "start": "2010-08-28",
+      "end": "2010-09-05",
+      "sample": 1632,
+      "label": "Aug 28/29 & Sep 4/5",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100923004011id_/http://www.roymorgan.com:80/news/polls/2010/4580/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted over the last two weekends, August 28/29 & September 4/5, 2010, with an Australia-wide cross-section of 1,632 electors"
+    },
+    {
+      "start": "2010-09-15",
+      "end": "2010-09-16",
+      "sample": 541,
+      "label": "Sep 15/16",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20100923021531id_/http://www.roymorgan.com:80/news/polls/2010/4582/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights, September 15/16, 2010, with an Australia-wide cross-section of 541 electors"
+    },
+    {
+      "start": "2010-09-18",
+      "end": "2010-09-19",
+      "sample": 1123,
+      "label": "Sep 18/19",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20100926033853id_/http://www.roymorgan.com:80/news/polls/2010/4584/",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted last weekends September 18/19, 2010, with an Australia-wide cross-section of 1,123 electors"
+    },
+    {
+      "start": "2010-10-02",
+      "end": "2010-10-03",
+      "sample": 1388,
+      "label": "Oct 2/3",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20101016123416id_/http://www.roymorgan.com:80/news/polls/2010/4587/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted last weekends October 2/3, 2010, with an Australia-wide cross-section of 1,388 electors"
+    },
+    {
+      "start": "2010-10-09",
+      "end": "2010-10-17",
+      "sample": 1661,
+      "label": "Oct 9/10 & 16/17",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20101027092633id_/http://www.roymorgan.com:80/news/polls/2010/4591/",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted last weekends October 9/10 & 16/17, 2010, with an Australia-wide cross-section of 1,661 electors"
+    },
+    {
+      "start": "2010-10-23",
+      "end": "2010-10-31",
+      "sample": 1804,
+      "label": "Oct 23/24 & 30/31",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20101110025013id_/http://www.roymorgan.com:80/news/polls/2010/4599/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted over the last two weekends October 23/24 & 30/31, 2010, with an Australia-wide cross-section of 1,804 electors"
+    },
+    {
+      "start": "2010-11-06",
+      "end": "2010-11-14",
+      "sample": 1862,
+      "label": "Nov 6/7 & 13/14",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110306052235id_/http://www.roymorgan.com/news/polls/2010/4604/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted over the last two weekends November 6/7 & 13/14, 2010, with an Australia-wide cross-section of 1,862 electors"
+    },
+    {
+      "start": "2010-11-20",
+      "end": "2010-11-28",
+      "sample": 1829,
+      "label": "Nov 20/21 & 27/28",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110306051856id_/http://www.roymorgan.com/news/polls/2010/4611/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted over the last two weekends November 20/21 & 27/28, 2010, with an Australia-wide cross-section of 1,829 electors"
+    },
+    {
+      "start": "2010-12-08",
+      "end": "2010-12-12",
+      "sample": 1078,
+      "label": "Dec 8-12",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110306051518id_/http://www.roymorgan.com/news/polls/2010/4616/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last five days December 8-12, 2010, with an Australia-wide cross-section of 1,078 electors"
+    },
+    {
+      "start": "2011-01-08",
+      "end": "2011-01-09",
+      "sample": 855,
+      "label": "Jan 8/9",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110303102538id_/http://www.roymorgan.com/news/polls/2011/4620/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted last weekend, January 8/9, 2011, with an Australia-wide cross-section of 855 electors"
+    },
+    {
+      "start": "2011-01-15",
+      "end": "2011-01-23",
+      "sample": 1824,
+      "label": "Jan 15/16 & 22/23",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110303101707id_/http://www.roymorgan.com/news/polls/2011/4624/index.cfm?printversion=yes",
+      "quote": "This Face-to-Face Morgan Poll on Federal voting intention was conducted over the last two weekends, January 15/16 & 22/23, 2011, with an Australia-wide cross-section of 1,824 electors"
+    },
+    {
+      "start": "2011-02-01",
+      "end": "2011-02-03",
+      "sample": 561,
+      "label": "Feb 1-3",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110209105151id_/http://www.roymorgan.com:80/news/polls/2011/4626/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last three nights, February 1-3, 2011, with an Australia-wide cross-section of 561 electors"
+    },
+    {
+      "start": "2011-01-29",
+      "end": "2011-02-06",
+      "sample": 1760,
+      "label": "Jan 29/30 & Feb 5/6",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110303092028id_/http://www.roymorgan.com/news/polls/2011/4630/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, January 29/30 & February 5/6, 2011, with an Australia-wide cross-section of 1,760 electors"
+    },
+    {
+      "start": "2011-02-12",
+      "end": "2011-02-20",
+      "sample": 1895,
+      "label": "Feb 12/13 & 19/20",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110306080808id_/http://www.roymorgan.com/news/polls/2011/4635/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, February 12/13 & February 19/20, 2011, with an Australia-wide cross-section of 1,895 electors"
+    },
+    {
+      "start": "2011-02-21",
+      "end": "2011-02-23",
+      "sample": 519,
+      "label": "Feb 21-23",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110306080808id_/http://www.roymorgan.com/news/polls/2011/4635/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last three nights of February 21-23, 2011 with an Australia-wide cross-section of 519 electors"
+    },
+    {
+      "start": "2011-02-26",
+      "end": "2011-03-06",
+      "sample": 1761,
+      "label": "Feb 26/27 & Mar 5/6",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120325005934id_/http://www.roymorgan.com/news/polls/2011/4642/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, February 26/27 & March 5/6, 2011, with an Australia-wide cross-section of 1,761 electors"
+    },
+    {
+      "start": "2011-03-08",
+      "end": "2011-03-10",
+      "sample": 524,
+      "label": "Mar 8-10",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120325005934id_/http://www.roymorgan.com/news/polls/2011/4642/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last three nights - March 8-10, 2011 with an Australia-wide cross-section of 524 electors"
+    },
+    {
+      "start": "2011-03-12",
+      "end": "2011-03-13",
+      "sample": 947,
+      "label": "Mar 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324162500id_/http://www.roymorgan.com/news/polls/2011/4647/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted last weekend, March 12/13, 2011 with an Australia wide cross-section of 947 electors"
+    },
+    {
+      "start": "2011-03-16",
+      "end": "2011-03-17",
+      "sample": 523,
+      "label": "Mar 16/17",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120324223606id_/http://www.roymorgan.com/news/polls/2011/4647/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights - March 16/17, 2011 with an Australia-wide cross-section of 523 electors"
+    },
+    {
+      "start": "2011-03-22",
+      "end": "2011-03-24",
+      "sample": 542,
+      "label": "Mar 22-24",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120324215447id_/http://www.roymorgan.com/news/polls/2011/4652/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last three nights - March 22-24, 2011 with an Australia-wide cross-section of 542 electors"
+    },
+    {
+      "start": "2011-03-19",
+      "end": "2011-03-27",
+      "sample": 1819,
+      "label": "Mar 19/20 & 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324154404id_/http://www.roymorgan.com/news/polls/2011/4654/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, March 19/20 & 26/27, 2011, with an Australia-wide cross-section of 1,819 electors"
+    },
+    {
+      "start": "2011-04-02",
+      "end": "2011-04-03",
+      "sample": 966,
+      "label": "Apr 2/3",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110414151320id_/http://www.roymorgan.com:80/news/polls/2011/4656/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted last weekend, April 2/3, 2011, with an Australia-wide cross-section of 966 electors"
+    },
+    {
+      "start": "2011-04-23",
+      "end": "2011-05-01",
+      "sample": 1843,
+      "label": "Apr 23/24 & 30/ May 1",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120325034331id_/http://www.roymorgan.com/news/polls/2011/4664/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, April 23/24 & 30/ May 1, 2011, with an Australia-wide cross-section of 1,843 electors"
+    },
+    {
+      "start": "2011-05-07",
+      "end": "2011-05-08",
+      "sample": 791,
+      "label": "May 7/8",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324220844id_/http://www.roymorgan.com/news/polls/2011/4667/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last weekend, May 7/8, 2011, with an Australia-wide cross-section of 791 electors"
+    },
+    {
+      "start": "2011-05-14",
+      "end": "2011-05-15",
+      "sample": 942,
+      "label": "May 14/15",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110606090728id_/http://www.roymorgan.com:80/news/polls/2011/4668/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last weekend, May 14/15, 2011, with an Australia-wide cross-section of 942 electors"
+    },
+    {
+      "start": "2011-05-31",
+      "end": "2011-06-02",
+      "sample": 742,
+      "label": "May 31 - June 2",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20110610003024id_/http://www.roymorgan.com/news/polls/2011/4672/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last three nights – May 31 – June 2, 2011 with an Australia-wide cross-section 887 Australians aged 14+ including 742 electors"
+    },
+    {
+      "start": "2011-06-11",
+      "end": "2011-06-19",
+      "sample": 1776,
+      "label": "June 11/12 & 18/19",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120502160151id_/http://www.roymorgan.com/news/polls/2011/4680/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over last weekend – June 11/12 & 18/19, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,776 electors"
+    },
+    {
+      "start": "2011-06-25",
+      "end": "2011-07-02",
+      "sample": 1095,
+      "label": "June 25/26 & July 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20110715015955id_/http://www.roymorgan.com:80/news/polls/2011/4683/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – June 25/26 & July 1/2, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,095 electors"
+    },
+    {
+      "start": "2011-07-09",
+      "end": "2011-07-10",
+      "sample": 897,
+      "label": "July 9/10",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120410081030id_/http://www.roymorgan.com/news/polls/2011/4684/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted last weekend – July 9/10, 2011 with an Australia-wide cross-section of Australians aged 14+ including 897 electors"
+    },
+    {
+      "start": "2011-07-13",
+      "end": "2011-07-14",
+      "sample": 1083,
+      "label": "July 13/14",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120410081030id_/http://www.roymorgan.com/news/polls/2011/4684/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights – July 13/14, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,083 electors"
+    },
+    {
+      "start": "2011-07-30",
+      "end": "2011-08-07",
+      "sample": 1662,
+      "label": "July 30/31 & Aug 6/7",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111003213254id_/http://www.roymorgan.com:80/news/polls/2011/4694/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – July 30/31 & August 6/7 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,662 electors"
+    },
+    {
+      "start": "2011-08-09",
+      "end": "2011-08-10",
+      "sample": 1006,
+      "label": "Aug 9/10",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20111003213254id_/http://www.roymorgan.com:80/news/polls/2011/4694/",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights, August 9/10, 2011 with an Australia-wide cross-section of 1,006 electors"
+    },
+    {
+      "start": "2011-08-13",
+      "end": "2011-08-21",
+      "sample": 1526,
+      "label": "Aug 13/14 & 20/21",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111003213316id_/http://www.roymorgan.com:80/news/polls/2011/4695/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – August 13/14 & 20/21, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,526 electors"
+    },
+    {
+      "start": "2011-08-27",
+      "end": "2011-09-04",
+      "sample": 1807,
+      "label": "Aug 27/28 & Sep 3/4",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111003211228id_/http://www.roymorgan.com:80/news/polls/2011/4699/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – August 27/28 & September 3/4, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,807 electors"
+    },
+    {
+      "start": "2011-09-10",
+      "end": "2011-09-18",
+      "sample": 1990,
+      "label": "Sep 10/11 & 17/18",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111004053432id_/http://www.roymorgan.com:80/news/polls/2011/4701/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – September 10/11 & 17/18, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,990 electors"
+    },
+    {
+      "start": "2011-09-24",
+      "end": "2011-10-02",
+      "sample": 1515,
+      "label": "Sep 24/25 & Oct 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111010023420id_/http://www.roymorgan.com:80/news/polls/2011/4704/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – September 24/25 & October 1/2, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,515 electors"
+    },
+    {
+      "start": "2011-10-08",
+      "end": "2011-10-09",
+      "sample": 930,
+      "label": "Oct 8 /9",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111019045947id_/http://www.roymorgan.com:80/news/polls/2011/4706/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over last weekend – October 8/9, 2011 with an Australia-wide cross-section of Australians aged 14+ including 930 electors"
+    },
+    {
+      "start": "2011-10-15",
+      "end": "2011-10-16",
+      "sample": 815,
+      "label": "Oct 15 /16",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111026055845id_/http://www.roymorgan.com:80/news/polls/2011/4707/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over last weekend – October 15/16, 2011 with an Australia-wide cross-section of Australians aged 14+ including 815 electors"
+    },
+    {
+      "start": "2011-10-22",
+      "end": "2011-10-23",
+      "sample": 961,
+      "label": "Oct 22 /23",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111105040943id_/http://www.roymorgan.com:80/news/polls/2011/4710/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over last weekend – October 22/23, 2011 with an Australia-wide cross-section of Australians aged 14+ including 961 electors"
+    },
+    {
+      "start": "2011-10-25",
+      "end": "2011-10-26",
+      "sample": 538,
+      "label": "Oct 25 /26",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20111105040943id_/http://www.roymorgan.com:80/news/polls/2011/4710/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights, October 25/26, 2011 with an Australia-wide cross-section of 538 electors"
+    },
+    {
+      "start": "2011-10-29",
+      "end": "2011-10-30",
+      "sample": 856,
+      "label": "Oct 29 /30",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120114185152id_/http://www.roymorgan.com:80/news/polls/2011/4713/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted last weekend – October 29/30, 2011 with an Australia-wide cross-section of Australians aged 14+ including 856 electors"
+    },
+    {
+      "start": "2011-11-02",
+      "end": "2011-11-03",
+      "sample": 525,
+      "label": "Nov 2/3",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120114185152id_/http://www.roymorgan.com:80/news/polls/2011/4713/",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last two nights, November 2/3, 2011 with an Australia-wide cross-section of 525 electors"
+    },
+    {
+      "start": "2011-11-05",
+      "end": "2011-11-13",
+      "sample": 1788,
+      "label": "Nov 5/6 & 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20111119225700id_/http://www.roymorgan.com:80/news/polls/2011/4721/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – November 5/6 & 12/13, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,788 electors"
+    },
+    {
+      "start": "2011-11-19",
+      "end": "2011-11-20",
+      "sample": 864,
+      "label": "Nov 19/20",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324033710id_/http://www.roymorgan.com/news/polls/2011/4725/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last weekend – November 19/20, 2011 with an Australia-wide cross-section of Australians aged 14+ including 864 electors"
+    },
+    {
+      "start": "2011-11-26",
+      "end": "2011-12-04",
+      "sample": 1900,
+      "label": "Nov 26/27 & Dec 3/4",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324035201id_/http://www.roymorgan.com/news/polls/2011/4728/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends – November 26/27 & December 3/4, 2011 with an Australia-wide cross-section of Australians aged 14+ including 1,900 electors"
+    },
+    {
+      "start": "2012-01-17",
+      "end": "2012-01-18",
+      "sample": 540,
+      "label": "January 17/18",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120324161111id_/http://www.roymorgan.com/news/polls/2012/4735/index.cfm",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over two nights this week, January 17/18, 2012 with an Australia-wide cross-section of Australians aged 14+ including 540 electors"
+    },
+    {
+      "start": "2012-01-14",
+      "end": "2012-01-22",
+      "sample": 1921,
+      "label": "January 14/15 & 21/22",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120205224333id_/http://www.roymorgan.com:80/news/polls/2012/4740/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two week-ends, January 14/15 & 21/22, 2012 with an Australia-wide cross-section of Australians aged 14+ including 1,921 electors"
+    },
+    {
+      "start": "2012-02-07",
+      "end": "2012-02-08",
+      "sample": 543,
+      "label": "February 7/8",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120323213115id_/http://www.roymorgan.com/news/polls/2012/4744/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over two nights this week, February 7/8, 2012 with an Australia-wide cross-section of Australians aged 14+ including 543 electors"
+    },
+    {
+      "start": "2012-02-11",
+      "end": "2012-02-19",
+      "sample": 2005,
+      "label": "February 11/12 & 18/19",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324135128id_/http://www.roymorgan.com/news/polls/2012/4748/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, February 11/12 & 18/19, 2012 with an Australia-wide cross-section of Australians aged 14+ including 2,005 electors"
+    },
+    {
+      "start": "2012-02-25",
+      "end": "2012-02-26",
+      "sample": 981,
+      "label": "February 25/26",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120324002839id_/http://www.roymorgan.com/news/polls/2012/4750/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, February 25/26, 2012 with an Australia-wide cross-section of Australians aged 14+ including 981 electors"
+    },
+    {
+      "start": "2012-04-21",
+      "end": "2012-04-22",
+      "sample": 949,
+      "label": "April 21/22",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120508063310id_/http://www.roymorgan.com:80/news/polls/2012/4766/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, April 21/22, 2012 with an Australia-wide cross-section of 949 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-05-05",
+      "end": "2012-05-06",
+      "sample": 1004,
+      "label": "May 5/6",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120516101046id_/http://www.roymorgan.com:80/news/polls/2012/4774/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, May 5/6, 2012 with an Australia-wide cross-section of 1,004 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-05-09",
+      "end": "2012-05-10",
+      "sample": 527,
+      "label": "May 9/10",
+      "method": "Face",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120516101046id_/http://www.roymorgan.com:80/news/polls/2012/4774/index.cfm?printversion=yes",
+      "quote": "The telephone Morgan Poll on Federal voting intention was conducted over the last two nights, May 9 /10, 2012 with an Australia-wide cross-section of 527 electors aged 14+"
+    },
+    {
+      "start": "2012-05-19",
+      "end": "2012-05-20",
+      "sample": 893,
+      "label": "May 19/20",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120526012142id_/http://www.roymorgan.com:80/news/polls/2012/4781/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, May 19/20, 2012 with an Australia-wide cross-section of 893 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-05-26",
+      "end": "2012-05-27",
+      "sample": 874,
+      "label": "May 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120602035553id_/http://www.roymorgan.com:80/news/polls/2012/4782/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, May 26/27, 2012 with an Australia-wide cross-section of 874 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-06-02",
+      "end": "2012-06-03",
+      "sample": 948,
+      "label": "June 2/3",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120621210920id_/http://www.roymorgan.com:80/news/polls/2012/4786/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, June 2/3, 2012 with an Australia-wide cross-section of 948 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-06-09",
+      "end": "2012-06-10",
+      "sample": 863,
+      "label": "June 9/10",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120616224106id_/http://www.roymorgan.com:80/news/polls/2012/4790/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, June 9/10, 2012 with an Australia-wide cross-section of 863 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-07-14",
+      "end": "2012-07-22",
+      "sample": 1700,
+      "label": "July 14/15 & 21/22",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120728072355id_/http://www.roymorgan.com:80/news/polls/2012/4806/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, July 14/15 & 21/22, 2012 with an Australia-wide cross-section of 1,700 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-07-28",
+      "end": "2012-08-05",
+      "sample": 1775,
+      "label": "July 28/29 & August 4/5",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120825030312id_/http://www.roymorgan.com:80/news/polls/2012/4809/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, July 28/29 & August 4/5 2012 with an Australia-wide cross-section of 1,775 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-08-11",
+      "end": "2012-08-19",
+      "sample": 1754,
+      "label": "August 11/12 & 18/19",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120825003014id_/http://www.roymorgan.com:80/news/polls/2012/4812/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, August 11/12 & 18/19, 2012 with an Australia-wide cross-section of 1,754 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-09-01",
+      "end": "2012-09-02",
+      "sample": 821,
+      "label": "September 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20120910002008id_/http://www.roymorgan.com:80/news/polls/2012/4816/",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, September 1/2, 2012 with an Australia-wide cross-section of 821 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-09-08",
+      "end": "2012-09-16",
+      "sample": 1613,
+      "label": "September 8/9 & 15/16",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20121030053741id_/http://www.roymorgan.com/news/polls/2012/4823/index.cfm?printversion=yes",
+      "quote": "The face-to-face Morgan Poll on Federal voting intention was conducted over last weekend, September 8/9 & 15/16, 2012 with an Australia-wide cross-section of 1,613 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-09-17",
+      "end": "2012-09-20",
+      "sample": 668,
+      "label": "September 17-20",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20120925082834id_/http://www.roymorgan.com:80/news/polls/2012/4826/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last four nights, September 17-20, 2012 with an Australia-wide cross-section of 668 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-09-29",
+      "end": "2012-10-07",
+      "sample": 1601,
+      "label": "September 29/30 & October 6/7",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20121014012738id_/http://www.roymorgan.com:80/news/polls/2012/4830/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, September 29/30 & October 6/7, 2012 with an Australia-wide cross-section of 1,601 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-10-13",
+      "end": "2012-10-21",
+      "sample": 1709,
+      "label": "October 13/14 & 20/21",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20121027013740id_/http://www.roymorgan.com:80/news/polls/2012/4834/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, October 13/14 & 20/21, 2012 with an Australia-wide cross-section of 1,709 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-11-10",
+      "end": "2012-11-18",
+      "sample": 1573,
+      "label": "November 10/11 & 17/18",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20121129190322id_/http://www.roymorgan.com:80/news/polls/2012/4840/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, November 10/11 & 17/18, 2012 with an Australia-wide cross-section of 1,573 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-11-27",
+      "end": "2012-11-29",
+      "sample": 523,
+      "label": "November 27-29",
+      "method": "Phone",
+      "releaseMethod": "Phone",
+      "url": "https://web.archive.org/web/20121207125740id_/http://www.roymorgan.com:80/news/polls/2012/4843/index.cfm?printversion=yes",
+      "quote": "This telephone Morgan Poll on Federal voting intention was conducted over the last three nights, November 27-29, 2012 with an Australia-wide cross-section of 523 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-11-24",
+      "end": "2012-12-02",
+      "sample": 1516,
+      "label": "November 24/25 & December 1/2",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20121212021935id_/http://www.roymorgan.com:80/news/polls/2012/4850/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, November 24/25 & December 1/2, 2012 with an Australia-wide cross-section of 1,516 Australian electors aged 18+"
+    },
+    {
+      "start": "2012-12-08",
+      "end": "2012-12-16",
+      "sample": 1714,
+      "label": "December 8/9 & 15/16",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20121223063736id_/http://www.roymorgan.com:80/news/polls/2012/4852/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, December 8/9 & 15/16, 2012 with an Australia-wide cross-section of 1,714 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-01-05",
+      "end": "2013-01-13",
+      "sample": 1638,
+      "label": "January 5/6 & 12/13",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20130121164719id_/http://www.roymorgan.com/news/polls/2013/4855/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, January 5/6 & 12/13, 2013 with an Australia-wide cross-section of 1,638 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-01-19",
+      "end": "2013-01-27",
+      "sample": 1630,
+      "label": "January 19/20 & 26/27",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20130210015856id_/http://www.roymorgan.com/news/polls/2013/4859/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends, January 19/20 & 26/27, 2013 with an Australia-wide cross-section of 1,630 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-02-02",
+      "end": "2013-02-03",
+      "sample": 903,
+      "label": "February 2/3",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20130216045543id_/http://www.roymorgan.com/news/polls/2013/4861/index.cfm?printversion=yes",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekend of February 2/3, 2013 with an Australia-wide cross-section of 903 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-02-09",
+      "end": "2013-02-10",
+      "sample": 806,
+      "label": "February 9/10",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20130216063614id_/http://www.roymorgan.com:80/news/polls/2013/4864/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the weekend of February 9/10, 2013 with an Australia-wide cross-section of 806 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-02-16",
+      "end": "2013-02-24",
+      "sample": 1642,
+      "label": "February 16/17 & 23/24",
+      "method": "Face",
+      "releaseMethod": "Face",
+      "url": "https://web.archive.org/web/20130302023431id_/http://www.roymorgan.com:80/news/polls/2013/4866/",
+      "quote": "This face-to-face Morgan Poll on Federal voting intention was conducted over the last two weekends of February 16/17 & 23/24, 2013 with an Australia-wide cross-section of 1,642 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-03-02",
+      "end": "2013-03-03",
+      "sample": 9101,
+      "label": "March 2/3",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130308094546id_/http://www.roymorgan.com:80/news/polls/2013/4869/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted late last week, February 28 – March 3, 2013 with an Australia-wide cross-section of 9,101 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-03-09",
+      "end": "2013-03-10",
+      "sample": 4627,
+      "label": "March 9/10",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130315015808id_/http://www.roymorgan.com:80/news/polls/2013/4872/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days, March 7-10, 2013 with an Australia-wide cross-section of 4,627 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-03-16",
+      "end": "2013-03-17",
+      "sample": 3982,
+      "label": "March 16/17",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130425205617id_/http://www.roymorgan.com/news/polls/2013/4875/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days, March 14-17, 2013 with an Australia-wide cross-section of 3,982 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-03-23",
+      "end": "2013-03-24",
+      "sample": 3494,
+      "label": "March 23/24",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130330012406id_/http://www.roymorgan.com/news/polls/2013/4878/index.cfm?printversion=yes",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days, March 21-24, 2013 with an Australia-wide cross-section of 3,494 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-04-06",
+      "end": "2013-04-07",
+      "sample": 3372,
+      "label": "April 6/7",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130410053422id_/http://www.roymorgan.com/news/polls/2013/4882/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days, April 4-7, 2013 with an Australia-wide cross-section of 3,372 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-04-13",
+      "end": "2013-04-14",
+      "sample": 3835,
+      "label": "April 13/14",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130506024819id_/http://www.roymorgan.com/news/polls/2013/4885/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days, April 11-14, 2013 with an Australia-wide cross-section of 3,835 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-04-20",
+      "end": "2013-04-21",
+      "sample": 3270,
+      "label": "April 20/21",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130426151613id_/http://www.roymorgan.com/news/polls/2013/4887/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days, April 18-21, 2013 with an Australia-wide cross-section of 3,270 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-04-27",
+      "end": "2013-04-28",
+      "sample": 3418,
+      "label": "April 27/28",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130503041545id_/http://www.roymorgan.com:80/news/polls/2013/4889/",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days via Face-to-Face, Internet and SMS interviewing, April 26-28, 2013 with an Australia-wide cross-section of 3,418 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-05-04",
+      "end": "2013-05-05",
+      "sample": 3376,
+      "label": "May 4/5",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140316015230id_/http://www.roymorgan.com/findings/4892-l-np-down-2-percent-6-may-2013-201305060800",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days via Face-to-Face, Internet and SMS interviewing, May 3-5, 2013 with an Australia-wide cross-section of 3,376 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-08-03",
+      "end": "2013-08-04",
+      "sample": 3326,
+      "label": "August 3/4",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130810141827id_/http://www.roymorgan.com:80/findings/5085-morgan-poll-august-5-201308050559",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days via Face-to-Face, Internet and SMS interviewing, August 2-4, 2013 with an Australia-wide cross-section of 3,326 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-08-10",
+      "end": "2013-08-11",
+      "sample": 3836,
+      "label": "August 10/11",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140314121309id_/http://www.roymorgan.com/findings/5100-federal-vote-morgan-poll-august-11-2013-201308150001",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days via Face-to-Face, Internet and SMS interviewing, August 9-11, 2013 with an Australia-wide cross-section of 3,836 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-08-24",
+      "end": "2013-08-25",
+      "sample": 3419,
+      "label": "August 24/25",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140205080620id_/http://www.roymorgan.com/findings/5130-federal-vote-august-26-2013-201308251336",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days via Face-to-Face, Internet and SMS interviewing, August 23-25, 2013 with an Australia-wide cross-section of 3,419 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-08-28",
+      "end": "2013-08-29",
+      "sample": 1599,
+      "label": "August 28/29",
+      "method": "Phone",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140302104349id_/http://www.roymorgan.com/findings/5148-morgan-poll-august-30-2013-201308300742",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few nights via Telephone and Internet, August 28-29, 2013 with an Australia-wide cross-section of 1,599 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-08-31",
+      "end": "2013-09-01",
+      "sample": 3746,
+      "label": "August 31/ September 1",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20130904144002id_/http://www.roymorgan.com:80/findings/5151-morgan-poll-september-2-2013-201309011354",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted over the last few days via SMS, Online interviewing and face-to-face interviewing, August 30 – September 1, 2013 with an Australia-wide cross-section of 3,746 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-09-21",
+      "end": "2013-09-22",
+      "sample": 2999,
+      "label": "September 21/22",
+      "method": "Multi",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140302104244id_/http://www.roymorgan.com/findings/5200-morgan-poll-september-24-2013-201309240354",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted last weekend via SMS, Online and face-to-face interviewing on September 21/22, 2013 with an Australia-wide cross-section of 2,999 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-10-05",
+      "end": "2013-10-06",
+      "sample": 3199,
+      "label": "October 5/6",
+      "method": "Multi",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140302104155id_/http://www.roymorgan.com/findings/5234-federal-vote-october-8-2013-201310080550",
+      "quote": "This multi-mode Morgan Poll on Federal voting intention was conducted last weekend via SMS, Online and face-to-face interviewing on October 5/6, 2013 with an Australia-wide cross-section of 3,199 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-11-02",
+      "end": "2013-11-03",
+      "sample": 2077,
+      "label": "November 2/3, 2013",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140221182333id_/http://www.roymorgan.com/findings/5279-morgan-poll-federal-voting-intention-201311060444",
+      "quote": "This multi-mode Morgan Poll on voting intention was conducted last weekend (November 2/3, 2013) with an Australia-wide cross-section of 2,077 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-11-16",
+      "end": "2013-11-17",
+      "sample": 2005,
+      "label": "November 16/17, 2013",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140113062137id_/http://www.roymorgan.com/findings/5306-morgan-poll-federal-voting-intention-november-18-2013-201311180454",
+      "quote": "This multi-mode Morgan Poll on voting intention was conducted last weekend (November 16/17, 2013) with an Australia-wide cross-section of 2,005 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-11-30",
+      "end": "2013-12-01",
+      "sample": 2018,
+      "label": "November 30/ December 1, 2013",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140104063431id_/http://www.roymorgan.com/findings/5329-federal-voting-intention-december-2-2013-201312020313",
+      "quote": "This multi-mode Morgan Poll on voting intention was conducted last weekend (November 30/December 1, 2013) with an Australia-wide cross-section of 2,018 Australian electors aged 18+"
+    },
+    {
+      "start": "2013-12-07",
+      "end": "2013-12-15",
+      "sample": 2879,
+      "label": "December 7/8 & 14/15, 2013",
+      "method": "Face",
+      "releaseMethod": "Multi",
+      "url": "https://web.archive.org/web/20140113151658id_/http://www.roymorgan.com/findings/5353-federal-voting-intention-december-16-2013-201312160613",
+      "quote": "This multi-mode Morgan Poll on voting intention was conducted over the last two weekends (December 7/8 & 14/15, 2013) with an Australia-wide cross-section of 2,879 Australian electors aged 18+"
+    }
+  ]
+}

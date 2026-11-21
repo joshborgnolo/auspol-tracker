@@ -3522,6 +3522,7 @@ window.AUSPOL = function () {
   const directionPolls = [];
   const dirHistory = null;
   const directionPre = null;
+  const directionWorld = null;
   const directionOnlyPolls = [];
   const issuesOnlyPolls = [];
   const confidenceOnlyPolls = [];
@@ -4181,29 +4182,29 @@ window.AUSPOL = function () {
   const house = null;
   const seatModel = {
     "headline": "The Coalition is very likely to win the most seats, with a majority about as likely as not",
-    "pollsTo": "2026-11-13",
+    "pollsTo": "2026-11-15",
     "draws": 20000,
     "expectedSeats": {
-      "alp": 26.32,
-      "lnp": 44.83,
-      "on": 9.13,
-      "grn": 6.83,
+      "alp": 26.17,
+      "lnp": 44.75,
+      "on": 9.43,
+      "grn": 6.79,
       "oth": 0,
-      "member": 0.89
+      "member": 0.86
     },
     "mostSeats": {
-      "alp": 0.0623,
-      "lnp": 0.9235,
-      "on": 0.0143,
+      "alp": 0.061,
+      "lnp": 0.9236,
+      "on": 0.0154,
       "grn": 0,
       "oth": 0,
       "member": 0
     },
     "majority": {
-      "alp": 0.0066,
-      "coalition": 0.5243,
-      "on": 0.0042,
-      "noMajority": 0.465
+      "alp": 0.0064,
+      "coalition": 0.5201,
+      "on": 0.0046,
+      "noMajority": 0.469
     }
   };
   const publicOpinionByRow = null;
@@ -4368,6 +4369,7 @@ window.AUSPOL = function () {
     directionStoppedSince,
     dirHistory,
     directionPre,
+    directionWorld,
     favHouses,
     apprHouses,
     directionPolls,
