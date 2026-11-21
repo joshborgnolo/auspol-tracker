@@ -7456,8 +7456,20 @@ function RdConfidence({ rangeId }) {
   const laneData = React.useMemo(() => new Map(lanes.map((l) => {
     const rawTag = (v) => ((l.shift || l.scale) ? { raw: v } : {});
     const raw = l.s.polls.map((p) => ({ x: p.x, y: plotOf(l, p.v), ym: p.ym, released: p.released, dateLabel: p.dateLabel || "", ...rawTag(p.v) }));
-    const live0 = l.s.polls[0].x;
+    /* where the release file takes over: the start of its STEADY run, not
+       its first row. ANZ–Roy Morgan's file holds one December 2016 release
+       and then nothing until mid-2019; taking over at the first row dropped
+       the history's 2017–19 months and bridged the silence with one
+       straight segment. Any gap over a quarter before the run settles
+       hands those months back to the monthly history (the stray releases
+       stay as dots); with no history to fall back on, every release
+       counts. */
     const rows = D.confDeep && D.confDeep[l.k];
+    const P = l.s.polls;
+    let s0 = 0;
+    if (rows && rows.length > 1) for (let i = 1; i < P.length; i++) if (P[i].x - P[i - 1].x > 0.25) s0 = i;
+    const live = P.slice(s0);
+    const live0 = live[0].x;
     const hist = rows && rows.length > 1
       ? rows.map((r) => ({ ym: r.ym, x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12, v: r.v })).filter((p) => p.x < live0)
       : [];
@@ -7466,9 +7478,9 @@ function RdConfidence({ rangeId }) {
        the same kernel as the releases, so the line means the same thing
        either side of where the release file takes over (raw tags keep the
        printed month, as the releases keep their prints) */
-    const all = smooth((n0 ? hist : []).concat(l.s.polls), l.hl);
+    const all = smooth((n0 ? hist : []).concat(live), l.hl);
     const se = all.slice(n0)
-      .map((p, i) => ({ x: p.x, y: plotOf(l, p.y), ym: l.s.polls[i].ym, ...rawTag(l.s.polls[i].v) }));
+      .map((p, i) => ({ x: p.x, y: plotOf(l, p.y), ym: live[i].ym, ...rawTag(live[i].v) }));
     const deep = n0 ? all.slice(0, n0).map((p, i) => ({ ym: hist[i].ym, x: p.x, y: plotOf(l, p.y), ...rawTag(hist[i].v) })) : [];
     /* the joint: the history's line ends on the smooth's first point (a
        drawing point only - it carries no month, so the readout and the

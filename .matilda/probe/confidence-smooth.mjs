@@ -120,7 +120,7 @@ check(panels.includes('"Roy Morgan", hl: 60'), "business lane carries hl: 60 (mo
 check(panels.includes('"DemosAU", hl: 60'), "DemosAU lane carries hl: 60");
 check(panels.includes('"Westpac–MI", hl: 60'), "Westpac–MI lane carries hl: 60");
 check(panels.includes('"NAB", hl: 60'), "NAB lane carries hl: 60");
-check(panels.includes("const all = smooth((n0 ? hist : []).concat(l.s.polls), l.hl);") && panels.includes("const se = all.slice(n0)"), "series points are the smoothed readings (run with the house's monthly history as context)");
+check(panels.includes("const all = smooth((n0 ? hist : []).concat(live), l.hl);") && panels.includes("const se = all.slice(n0)"), "series points are the smoothed readings (run with the house's monthly history as context)");
 check(panels.includes("all.slice(0, n0).map((p, i) => ({ ym: hist[i].ym, x: p.x, y: plotOf(l, p.y)"), "the history line is the same smooth's history months (one kernel over the whole run)");
 check(panels.includes(".concat(viewLanes[0] ? laneData.get(viewLanes[0].k).raw : [])"), "the hover spine rides the view's raw prints (with the history's months before the release file)");
 check(panels.includes("const chartDots = dotsOn ? viewLanes.flatMap((l) => laneData.get(l.k).raw"), "the dots are the raw prints, in a term-length window");
