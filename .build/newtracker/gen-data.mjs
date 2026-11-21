@@ -2475,6 +2475,74 @@ const directionNow = (() => {
   return out;
 })();
 
+/* ---- 5dp. national direction, the two-house stretch before this term ----
+   From June 2022 (Essential's first national-mood wave) to the month
+   before the pooled series above opens, two houses asked the question:
+   Roy Morgan (its Government Confidence Rating waves, from
+   data/direction-history.json, with any wave the live file also holds
+   counted once, from the live file) and Essential (the live direction[]
+   rows). That is the headline's own condition for pooling, so this stretch
+   is built like the monthly rows above – sample-weighted monthly means,
+   each house's repeat waves deflated to sqrt(m), interval from the spread
+   between readings floored by sampling error (monthWithSe) – with one
+   change forced by the count: with two houses, "the other houses" a lean
+   is measured against is the other house, so houseEffectsFor would charge
+   each the whole gap. pairLeanFor splits it instead, half to each side,
+   read at the month as every lean is (the §7h issue-salience pair uses the
+   same estimator). The line therefore sits at the two houses' middle;
+   the current term's consensus is six houses wide, so the join can step
+   by however far that middle sits from it. Before June 2022 Roy Morgan
+   asked alone: nothing to pool or adjust, and its own printed run (§5dh)
+   is what the panel draws there. Waves with no printed sample take the
+   standing 1200 default, as dirSample does. */
+const DIR_PRE_FROM = "2022-06";
+const DIR_PRE_HOUSES = ["Roy Morgan", "Essential"];
+const directionPre = (() => {
+  if (JUR || !direction.length) return null;
+  const to = direction[0].ym;                    // exclusive: the pooled series takes over here
+  const inPre = (date) => { const ym = ymOf(date); return ym >= DIR_PRE_FROM && ym < to; };
+  const live = DIR.filter((d) => d.right != null && d.wrong != null && inPre(d.date));
+  const liveKeys = new Set(DIR.map((d) => `${d.date}|${d.right}|${d.wrong}`));
+  const file = path.join(ROOT, "data", "direction-history.json");
+  const hist = (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")).waves : [])
+    .filter((w) => w.end && w.right != null && w.wrong != null && inPre(w.end)
+      && !liveKeys.has(`${w.end}|${w.right}|${w.wrong}`))
+    .map((w) => ({ date: w.end, dateStart: w.start && w.start !== w.end ? w.start : null,
+      pollster: w.pollster || "Roy Morgan", right: w.right, wrong: w.wrong, sample: w.sample,
+      dateLabel: w.label || null, url: w.url || null }));
+  const waves = [...live.map((d) => ({ date: d.date, dateStart: d.dateStart || null, pollster: d.pollster,
+      right: d.right, wrong: d.wrong, sample: dirSample(d), dateLabel: null, url: d.url || null })), ...hist]
+    .filter((w) => DIR_PRE_HOUSES.includes(w.pollster))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  if (new Set(waves.map((w) => w.pollster)).size < 2) return null;
+  const rowsOf = (k) => waves.map((w) => ({ ym: ymOf(w.date), mid: midMs(w), x: w[k],
+    n: Math.min(w.sample || 1200, SAMPLE_CAP), firm: w.pollster }));
+  const rR = rowsOf("right"), rW = rowsOf("wrong");
+  const he = { right: pairLeanFor(rR), wrong: pairLeanFor(rW) };
+  const months = [];
+  for (let y = +DIR_PRE_FROM.slice(0, 4), m = +DIR_PRE_FROM.slice(5, 7); ; m++) {
+    if (m > 12) { m = 1; y++; }
+    const ym = `${y}-${String(m).padStart(2, "0")}`;
+    if (ym >= to) break;
+    months.push(ym);
+  }
+  const series = months.map((ym) => {
+    const r = monthWithSe(rR, he.right, ym), w = monthWithSe(rW, he.wrong, ym);
+    if (!r || !w) return null;
+    const right = r1(r.v), wrong = r1(w.v);
+    return { ym, x: mx(ym), right, wrong, unsure: r1(Math.max(0, 100 - right - wrong)), net: r1(right - wrong),
+      n: r.n, rightCi: r1(1.96 * r.se), wrongCi: r1(1.96 * w.se) };
+  }).filter(Boolean);
+  // the waves themselves, as the panel's dots (the current term's are directionPolls)
+  const polls = waves.map((w) => ({ x: mx(ymOf(w.date)) + (dayOf(w.date) - 15) / 365, pollster: w.pollster,
+    released: w.date, dateLabel: w.dateLabel || fwLabel(w.dateStart, w.date), right: w.right, wrong: w.wrong,
+    ...(w.url ? { url: w.url } : {}) }));
+  const gap = (k) => { const g = he[k].gapAt(Date.parse(to + "-01T00:00:00Z")); return g == null ? null : r1(g); };
+  return { from: DIR_PRE_FROM, to, houses: he.right.firms, series, polls,
+    // firms[0] minus firms[1] at the hand-over, for Info and the build log
+    gapAtJoin: { right: gap("right"), wrong: gap("wrong") } };
+})();
+
 /* The panel's GROUP views (the select on the National direction chart).
    Two federal-only sources, both left as printed – never house-adjusted,
    never smoothed; the panel caption says so:
@@ -7483,6 +7551,24 @@ const CONF_HIST_MAXM = 36;
    its terms only (the renderer's dotted twin); a band of whole-point
    mirror years never pools beside the main gauges' decimals. */
 const CONF_HIST_BAND = new Set(["consumer", "business"]);
+/* rd-panels' kernel smooth (symmetric half-life, weights under 0.02
+   dropped), over a term's month grid; a month with no value stays null */
+const CONF_TERM_HL = 60;
+function confTermSmooth(v) {
+  const decay = Math.LN2 / (CONF_TERM_HL / 365.25);
+  const pts = v.map((y, m) => (y == null ? null : { x: m / 12, y })).filter(Boolean);
+  const out = v.map(() => null);
+  for (const p of pts) {
+    let ws = 0, wt = 0;
+    for (const q of pts) {
+      const w = Math.exp(-decay * Math.abs(q.x - p.x));
+      if (w < 0.02) continue;
+      ws += w; wt += w * q.y;
+    }
+    out[Math.round(p.x * 12)] = wt / ws;
+  }
+  return out;
+}
 const confHistory = (() => {
   if (!CONF_HISTORY_FILE) return null;   // the back-history file simply isn't there (JUR, fresh clone)
   const ymIdx = (ym) => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
@@ -7520,10 +7606,17 @@ const confHistory = (() => {
     }
     /* The band needs its three-term crowd, as the past-cycles ribbon
        does; below that a "band" is just the two lines' gap relabelled. */
+    /* The band pools each term as the panel draws a line: through the
+       same symmetric kernel smooth (CONF_TERM_HL, the panel's TERM_HL –
+       the monthly gauges' half-life), run inside the term, so the band
+       sits behind lines built the same way as the one in front of it.
+       The shipped term rows stay unsmoothed: the panel smooths a lifted
+       term itself, and the CSV carries the printed months. */
+    const sm = terms.map((t) => confTermSmooth(t.v));
     const band = [];
     if (terms.length >= 3 && CONF_HIST_BAND.has(k)) {
       for (let m = 0; m <= CONF_HIST_MAXM; m++) {
-        const nums = terms.map((t) => t.v[m]).filter((v) => v != null).sort((a, b) => a - b);
+        const nums = sm.map((v) => v[m]).filter((v) => v != null).sort((a, b) => a - b);
         if (nums.length < 3) continue;
         const pct = (p) => { const i = (nums.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return nums[lo] + (nums[hi] - nums[lo]) * (i - lo); };
         band.push({ m, n: nums.length,
@@ -9478,6 +9571,7 @@ window.AUSPOL = (function () {
      direction panel's history window and government strip read this; the
      pooled model above never covers these years. */
   const dirHistory = ${JSON.stringify(dirHistory)};
+  const directionPre = ${JSON.stringify(directionPre)};
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
@@ -9727,7 +9821,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {

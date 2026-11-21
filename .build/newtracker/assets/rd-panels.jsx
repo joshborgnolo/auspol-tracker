@@ -2176,7 +2176,12 @@ function RdDirectionView({ rangeId }) {
   const [winS, setWinS] = React.useState(() => confTermWin(curTerm, nowX));
   const [dragging, setDragging] = React.useState(false);
   const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
-  const poolStart = D.direction[0].x;
+  /* gen-data §5dp: June 2022 to the term's start, when Roy Morgan and
+     Essential both asked, is pooled like the monthly rows (lean split
+     between the two); the history window draws it as the same line, and
+     the houses' own runs take over only before it */
+  const PRE = D.directionPre && D.directionPre.series && D.directionPre.series.length ? D.directionPre : null;
+  const poolStart = PRE ? PRE.series[0].x : D.direction[0].x;
   const histLanesAll = HIST ? Object.keys(HIST.houses).sort((a, b) => HIST.houses[a][0].x - HIST.houses[b][0].x)
     .map((house) => ({ house, pts: HIST.houses[house] })) : [];
   /* only houses with a record BEFORE the pooled series opens get a history
@@ -2199,7 +2204,7 @@ function RdDirectionView({ rangeId }) {
   const dotsOn = win ? win.b - win.a <= 4.6 : true;
   const xDomain = histOn ? [win.a, win.b] : rangeDomain(rangeId);
   const xTicks = histOn ? confWinTicks(win, vTerms, nowX) : null;
-  const pts = filterPts(D.direction, xDomain[0]);
+  const pts = filterPts(histOn && PRE ? PRE.series.concat(D.direction) : D.direction, xDomain[0]);
   const now = D.directionNow || D.direction[D.direction.length - 1];
   const M = D.direction;
   const wrongLeads = now.wrong >= now.right;
@@ -2228,7 +2233,8 @@ function RdDirectionView({ rangeId }) {
         : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025.") : ".");
   const signedP = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
-  const dots = (D.directionPolls || []).filter((d) => dotsOn && d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap((d) => [
+  const prePolls = histOn && PRE ? PRE.polls.map((d) => ({ ...d, pre: true })) : [];
+  const dots = prePolls.concat(D.directionPolls || []).filter((d) => dotsOn && d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap((d) => [
     { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta: d },
     { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta: d },
   ]);
@@ -2277,7 +2283,7 @@ function RdDirectionView({ rangeId }) {
   /* the strip under the chart: each house's net (right minus wrong) over
      its whole published run — the miniature is the record, not the
      pooled estimate, with the governments from D.cycles beneath it */
-  const stripLines = histLanes.map((l) => ({
+  const stripLines = histLanesAll.filter((l) => l.pts[0].x < D.direction[0].x).map((l) => ({
     color: l.house === "Roy Morgan" ? "var(--mood-neg)" : "var(--ink-3)",
     points: l.pts.map((p) => ({ x: p.x, y: p.right - p.wrong })),
   }));
@@ -2492,7 +2498,7 @@ function RdDirectionView({ rangeId }) {
               { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Wrong track" },
               { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Right direction" },
             ]}
-            spine={histSeries.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet="direction"
+            spine={histSeries.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet={(m) => (m && m.pre ? null : "direction")}
             events={badges ? badges.events : evs} brackets={brackets}
             vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
             tooltipTitle={(i) => (chartMonths[i] ? monthLabelFull(chartMonths[i].ym) : "")}
@@ -2501,7 +2507,8 @@ function RdDirectionView({ rangeId }) {
             copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
                     sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
                     caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : "")
-                      + (housesOn ? " Behind the pooled line (from May 2025) the thinner lines are each house’s OWN published record, monthly means of the waves it printed, nothing adjusted: " + histLanes.map((l) => l.house).join(", ") + " — Roy Morgan’s Government Confidence Rating tables and archived releases (thin solid) and Essential’s national-mood reports (dotted). Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling." : ""),
+                      + (histOn && PRE && win.a < D.direction[0].x ? " From June 2022 to April 2025 two pollsters asked, Roy Morgan and Essential, so the gap between them is split evenly between the two." : "")
+                      + (housesOn ? " Before June 2022 only Roy Morgan asked: the thinner line is its own published record, monthly means of the waves it printed, nothing adjusted. Its printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling." : ""),
                     legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
           />
         )}
@@ -2518,7 +2525,7 @@ function RdDirectionView({ rangeId }) {
           <RdKey className="rd-ckey" items={[
             dotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll" } : null,
             { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
-            housesOn ? { kind: "line", color: "var(--ink-3)", label: "Thinner lines: each house’s own published monthly record, unadjusted — Roy Morgan solid, other houses dotted" } : null,
+            housesOn ? { kind: "line", color: "var(--ink-3)", label: "Thinner lines: Roy Morgan’s own published monthly record, unadjusted, before June 2022" } : null,
             (histOn && !isTerm) ? { kind: "line", color: "var(--ink-3)", label: "A faint rule is a federal election; the strip beneath carries the governments" } : null,
           ]} />
         )}
@@ -2544,7 +2551,8 @@ function RdDirectionView({ rangeId }) {
           <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
           ...(histOn ? [
             <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole direction record in miniature with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
-            <>Before May 2025 there is no pooled estimate to draw, so a window reaching further back shows each house’s own published record instead: monthly means of the waves it printed, with no adjustment for house lean and no interval — Roy Morgan solid, Essential dotted. Roy Morgan’s record comes from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007; Essential’s national-mood question starts in June 2022. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
+            <>From June 2022, when Essential first asked the question, to April 2025, two pollsters were asking: Roy Morgan and Essential. That stretch is built the same way as this term’s line: monthly averages weighted by sample size, with 95% intervals. With only two pollsters there is no wider group to measure each one’s lean against. So the gap between them is split evenly, half to each, and the line runs through the middle of the two. Unfortunately, that middle need not match where this term’s six pollsters put it, so the line can step a little where the terms meet.</>,
+            <>Before June 2022 only Roy Morgan asked, so there is nothing to pool or adjust. The thinner line is its own published record: monthly averages of the waves it printed, with no interval. It comes from its Government Confidence Rating tables (January 2012 onward) and individually sourced releases back to mid-2007. Roy Morgan’s printed waves are sparse before 2012 (2008–2011 especially) and again between 2016 and 2021, so those stretches show the readings on record, not continuous polling.</>,
           ] : []),
         ]} />
       )}
@@ -7421,9 +7429,14 @@ function RdConfidence({ rangeId }) {
       ? rows.map((r) => ({ ym: r.ym, x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12, v: r.v })).filter((p) => p.x < live0)
       : [];
     const n0 = hist.length > 1 ? hist.length : 0;
-    const se = smooth((n0 ? hist : []).concat(l.s.polls), l.hl).slice(n0)
+    /* one smooth over the whole run: the history months are drawn through
+       the same kernel as the releases, so the line means the same thing
+       either side of where the release file takes over (raw tags keep the
+       printed month, as the releases keep their prints) */
+    const all = smooth((n0 ? hist : []).concat(l.s.polls), l.hl);
+    const se = all.slice(n0)
       .map((p, i) => ({ x: p.x, y: plotOf(l, p.y), ym: l.s.polls[i].ym, ...rawTag(l.s.polls[i].v) }));
-    const deep = n0 ? hist.map((p) => ({ ym: p.ym, x: p.x, y: plotOf(l, p.v), ...rawTag(p.v) })) : [];
+    const deep = n0 ? all.slice(0, n0).map((p, i) => ({ ym: hist[i].ym, x: p.x, y: plotOf(l, p.y), ...rawTag(hist[i].v) })) : [];
     /* the joint: the history's line ends on the smooth's first point (a
        drawing point only - it carries no month, so the readout and the
        spine never land on it) */
@@ -7629,8 +7642,8 @@ function RdConfidence({ rangeId }) {
     confDownloadCsv(`auspol-tracker-confidence-${D.latest.updatedISO}.csv`, rr);
   };
   /* ---- the drawing -------------------------------------------------------
-     Each lane: its monthly history (the house's own file, as published)
-     where the live file hasn't begun, then the smoothed releases. The two
+     Each lane: its monthly history (the house's own file, through the
+     same smooth) where the live file hasn't begun, then the smoothed releases. The two
      share a lane's name, so the readout carries one row per house; the end
      name rides whichever form reaches the window's right edge. Dots - one
      per release - draw in a term-length window only, gathered over the
@@ -7685,14 +7698,14 @@ function RdConfidence({ rangeId }) {
     altKey: "Westpac–MI’s monthly read; DemosAU’s national index, drawn doubled",
     copyTitle: "Consumer confidence (three gauges)",
     copySub: head + " Three published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index, Westpac–MI’s monthly consumer sentiment, and DemosAU’s national consumer-sentiment index, drawn doubled.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). Before the live release files begin, the lines are the houses’ own monthly history files — ANZ–Roy Morgan from 1973, Westpac–MI from 1974. DemosAU prints to a 50-neutral scale, so its lane is drawn doubled to share the neutral line while read rows, tooltips and this caption carry each house’s own figures. In a term the band pools the ANZ–Roy Morgan index over the other terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; a drawn term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and dotted in its house’s colour. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). Before the live release files begin, the lines run on through the houses’ own monthly history files, smoothed the same way — ANZ–Roy Morgan from 1973, Westpac–MI from 1974. DemosAU prints to a 50-neutral scale, so its lane is drawn doubled to share the neutral line while read rows, tooltips and this caption carry each house’s own figures. In a term the band pools the ANZ–Roy Morgan index over the other terms, each smoothed like the lines and lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; a drawn term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and dotted in its house’s colour. No combining, no adjustment.",
   } : {
     title: "Business confidence",
     note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
     altKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). Before the live release files begin, the lines are the houses’ own monthly history — Roy Morgan’s index from 2010, NAB’s printed net balance from March 1997 (two public calendar republications of NAB’s figure, merged at wire-verified seams; the pre-2009 head is sole-witness). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. In a term the band pools the Roy Morgan index over the other terms, each lined up on its own election month — the middle half and the middle 80%, their average the dashed line. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). Before the live release files begin, the lines run on through the houses’ own monthly history, smoothed the same way — Roy Morgan’s index from 2010, NAB’s printed net balance from March 1997 (two public calendar republications of NAB’s figure, merged at wire-verified seams; the pre-2009 head is sole-witness). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. In a term the band pools the Roy Morgan index over the other terms, each smoothed like the lines and lined up on its own election month — the middle half and the middle 80%, their average the dashed line. No combining, no adjustment.",
   };
   const xTicks = confWinTicks(win, vTerms, nowX);
   /* the strip's lines: each lane's whole run, history then releases */
@@ -7802,7 +7815,7 @@ function RdConfidence({ rangeId }) {
             <span className="rd-key-item"><RdSwatch kind="dash" color="var(--ink-2)" />Their average</span>
             <span className="rd-key-item"><span className="rd-cs-keythin" aria-hidden="true"></span>Paler: fewer terms ran this long</span>
           </>}
-          {histInWin && <span className="rd-key-item"><span className="rd-cs-keyhist" aria-hidden="true"></span>Thinner: the house’s monthly history, as published</span>}
+          {histInWin && <span className="rd-key-item"><span className="rd-cs-keyhist" aria-hidden="true"></span>Thinner: the house’s monthly history, smoothed the same way</span>}
           {!isTerm && <span className="rd-key-item"><span className="rd-cs-keyelec" aria-hidden="true"></span>A federal election</span>}
           {drawnShown.length > 0 && (
             <span className="rd-cc-drawn">
@@ -7825,7 +7838,7 @@ function RdConfidence({ rangeId }) {
       <HowTo paras={[
         <>Five published gauges of economic confidence, split into two views — the consumer lanes and the business pair, switched by the tabs over the chart — and set out as each house prints them: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment and DemosAU’s national consumer-sentiment index, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>The bar over the chart sets the window, and the window holds as you switch tabs. It opens on this term; ‹ and › step back and forward a term at a time, and Term, 10 yrs, 25 yrs and All widen it (‹ › then page back and forward by that length). The strip under each chart is the whole record in miniature with the governments beneath it: drag the window along it, drag its edges to resize it, drag across the strip to draw a new one, or tap a spot to jump there. A term reads off its election — Election, 1 yr, 2 yrs — so every term shares one ruler; a longer window counts calendar years and marks each federal election with a faint rule. Dots show in a window of about a term; longer windows draw the lines alone.</>,
-        <>Behind a term the band pools the view’s main gauge over the other terms, each lined up on its own election month: the middle half in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. This term’s band is every past term; a past term’s is every term but itself. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. Before each house’s live release file begins, its line is the house’s own monthly history, drawn a little thinner — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010, NAB’s printed net balance to March 1997. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals.</>,
+        <>Behind a term the band pools the view’s main gauge over the other terms, each smoothed like the lines (60-day half-life) and lined up on its own election month: the middle half in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. This term’s band is every past term; a past term’s is every term but itself. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. Before each house’s live release file begins, its line runs on through the house’s own monthly history, smoothed the same way and drawn a little thinner — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010, NAB’s printed net balance to March 1997. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals.</>,
         <>ANZ–Roy Morgan’s and Westpac–MI’s are indices where 100 is neutral; DemosAU’s national index is 50-neutral and draws doubled to share the line. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>The Inflation &amp; growth tab sets the ABS’s and OECD’s official figures out as seven small charts that share the window, Australia in colour and the OECD in grey. Inflation: Australia’s headline inflation (the ABS’s monthly all-items CPI as an annual change; before the monthly CPI era, the quarterly series derived from the ABS’s own published index numbers, spliced where the printed monthly measure begins) beside the OECD-wide average and the median member country, with the Reserve Bank’s 2–3% target shaded from August 1996, when it was adopted. Inflation against target: Australia’s figure minus the band’s 2.5% midpoint, beside the median member’s distance from its own central bank’s target (band targets read at their midpoints; a country joins the median only once both its print and a formal target exist that month, so the line grows as inflation targeting spread after New Zealand’s 1990 band). Growth per person: real GDP per person, real net national disposable income per person and real household disposable income per person (annual change in chain-volume levels, seasonally adjusted), beside real GDP per person across the OECD (the OECD’s household dashboard index, so the grey line begins in 2008) and the median member’s own GDP-per-person growth computed here from the OECD’s growth and population files. National income is the whole country’s: it counts what exports buy and income paid abroad, and includes companies’ and governments’ income. Household income is what households have after tax and interest — the ABS’s household gross disposable income over its household consumption price deflator and its population, worked out here because the ABS prints no real per-person figure (it matches the OECD’s own calculation for Australia to within 0.2 points). Its Actual switch shows the three Australian series as dollars instead (each seasonally adjusted quarter at its annual rate, in 2023–24 prices). Productivity: GDP per hour worked — the ABS’s seasonally adjusted index as an annual rate, beside the OECD members’ median output-per-worker growth (computed here from their own file, which carries no per-hour median, so the two lines measure differently and the page names a basis openly). Its Increase/Actual switch swaps the yearly rate for the index itself — the form in which the decade since roughly 2016, nearly flat beside the two before it, reads as a level rather than a wiggle. Earnings: the real change in full-time adult ordinary-time weekly earnings — the ABS’s nominal print deflated here by its own consumer price index, since the ABS publishes no real figure — beside the median of the OECD countries’ real average-wage year changes, a different measure and cadence (annual gross wages per employee at constant 2023 purchasing-power prices). Unemployment: the ABS’s monthly seasonally adjusted rate, a level rather than an annual change, beside the OECD members’ median harmonised rate, computed here. Income inequality: the Gini coefficient of household income after tax, adjusted for household size (0 would be everyone on the same income, 1 one household holding it all), from two surveys kept as separate lines because their levels differ — the HILDA survey every year from 2002–03, and the ABS’s own Survey of Income and Housing, the official measure, about every second year from 1994–95 to 2019–20 (the ABS has scheduled no next release) — beside the OECD member countries’ median coefficient, computed here; the OECD publishes no OECD-wide Gini. Both surveys run years behind the other charts, so a recent window can hold no survey year at all; the chart then names the latest. Nothing is smoothed, adjusted, combined or estimated — official prints, joined as-is, refreshed daily from the ABS and OECD data APIs (the deviation lines, the OECD medians and Australia’s real-earnings deflation are computed here: Australia’s from the ABS’s own figures, the OECD medians from the member countries’ OECD-published prints and, since 2026, from the OECD’s monthly inflation release table — one decimal, three on the Gini lines).</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
@@ -7846,11 +7859,30 @@ function RdConfidence({ rangeId }) {
 /* the band of a set of terms, gen-data §5k's rule: at each month 0..36,
    the middle half, middle 80% and mean of the terms standing there, once
    three or more do (and three terms at the least overall) */
+/* a past term's month grid through the panel's kernel at TERM_HL (60
+   days), as gen-data's confTermSmooth does for the sitting term's band –
+   the band pools terms built like the lines drawn over it */
+function confTermSmooth(v) {
+  const decay = Math.LN2 / (60 / 365.25);
+  const pts = v.map((y, m) => (y == null ? null : { m, y })).filter(Boolean);
+  const out = v.map(() => null);
+  for (const p of pts) {
+    let ws = 0, wt = 0;
+    for (const q of pts) {
+      const w = Math.exp(-decay * Math.abs(q.m - p.m) / 12);
+      if (w < 0.02) continue;
+      ws += w; wt += w * q.y;
+    }
+    out[p.m] = wt / ws;
+  }
+  return out;
+}
 function confBand(terms) {
   if (!terms || terms.length < 3) return null;
+  const sm = terms.map((t) => confTermSmooth(t.v));
   const out = [];
   for (let m = 0; m <= 36; m++) {
-    const nums = terms.map((t) => t.v[m]).filter((v) => v != null).sort((a, b) => a - b);
+    const nums = sm.map((v) => v[m]).filter((v) => v != null).sort((a, b) => a - b);
     if (nums.length < 3) continue;
     const pct = (p) => { const i = (nums.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return nums[lo] + (nums[hi] - nums[lo]) * (i - lo); };
     out.push({ m, n: nums.length,

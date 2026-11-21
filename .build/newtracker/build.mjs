@@ -880,11 +880,11 @@ function ssAboutBlock(L, prim, acc) {
         margin of error. Leadership questions are asked irregularly, so those lines are monthly
         aggregates too &#8211; adjusted per house for approval and favourability, joined straight
         from published readings for preferred prime minister. On the direction chart the window bar
-        reaches back behind the pooled series: it and the miniature strip beneath (with each
-        government in power marked) show every house&#8217;s own published monthly record back
-        through Roy Morgan&#8217;s Government Confidence Rating tables and Essential&#8217;s
-        national-mood waves, unadjusted for house lean; the pooled, lean-adjusted estimate
-        begins in May 2025. A &#8220;&#8212;&#8221; in any
+        reaches back before this term. From June 2022, when Roy Morgan and Essential were both
+        asking, the line is pooled the same way, with the gap between those two split evenly;
+        before that only Roy Morgan asked, and the chart shows its own published monthly record,
+        unadjusted, back through its Government Confidence Rating tables. The miniature strip
+        beneath (with each government in power marked) carries each house&#8217;s own record. A &#8220;&#8212;&#8221; in any
         table means the pollster didn&#8217;t ask that question.</p>
       <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
         figure into a seat count assumes a uniform swing, and with One Nation near
