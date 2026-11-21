@@ -3223,9 +3223,17 @@ function rdApFacetStory(facet, upd, demSplit) {
       if (!gaps.length) return {
         dek: "No party’s vote differs between " + rdApDemNoun(a) + " and " + rdApDemNoun(b) + " by more than the margin of error."
       };
-      const parts = gaps.map((x, i) => i ? poss(x.k).replace(/^The /, "the ") + " " + pts(x.g) + " higher among " + rdApDemNoun(x.hi) : poss(x.k) + " vote is " + pts(x.g) + " higher among " + rdApDemNoun(x.hi) + " than " + rdApDemNoun(x.lo));
+      const groups = [...new Set(gaps.map(x => x.hi))];
+      const sents = groups.map((hi, i) => {
+        const xs = gaps.filter(x => x.hi === hi);
+        const names = rdList(xs.map((x, j) => j ? rdPartyIn(x.k) : rdPartyStart(x.k)));
+        const many = xs.length > 1 || rdPlural(xs[0].k);
+        const ns = xs.map(x => Math.round(Math.abs(x.g)));
+        const by = rdList(ns.map(String)) + (ns.length === 1 && ns[0] === 1 ? " point" : " points");
+        return names + (many ? " do" : " does") + " better among " + rdApDemNoun(hi) + (i ? "" : " than " + rdApDemNoun(xs[0].lo)) + ", by " + by + ".";
+      });
       return {
-        dek: (parts.length > 1 ? parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1] : parts[0]) + "."
+        dek: sents.join(" ")
       };
     }
     const ps = polls.filter(p => window.demPairOf(p, demSplit)).sort((x, y) => x.released < y.released ? 1 : -1);
@@ -3239,9 +3247,9 @@ function rdApFacetStory(facet, upd, demSplit) {
     const who = p.pollster.replace(/^(.+?) \((.+?)\)$/, "$1’s $2 survey");
     const whose = who === p.pollster ? who + "’s poll" : who;
     const newest = who === p.pollster ? "from " + who : who;
-    const gap = rdPartyIn(k) + " " + pts(g) + " higher among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a);
+    const gap = rdPartyIn(k) + " doing better among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ", by " + pts(g);
     return {
-      dek: ps.length === 1 ? "Only " + whose + " breaks the vote out by " + sp.label.toLowerCase() + "; it puts " + gap + "." : "Each pollster draws its own " + sp.label.toLowerCase() + " brackets, so these aren’t pooled. The newest, " + newest + ", puts " + gap + "."
+      dek: ps.length === 1 ? "Only " + whose + " breaks the vote out by " + sp.label.toLowerCase() + "; it has " + gap + "." : "Each pollster draws its own " + sp.label.toLowerCase() + " brackets, so these aren’t pooled. The newest, " + newest + ", has " + gap + "."
     };
   }
   return null;
@@ -3509,7 +3517,7 @@ function RdAllPolls(P) {
   React.useEffect(() => {
     if (measure !== "lnp" && measure !== "onp") onMeasure("onp");
   }, [measure]);
-  const FACET_IDS = ["twopp", "primary", "leadership", "direction", "issues", "demographics"].concat((D.confidenceOnlyPolls || []).length ? ["confidence"] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f));
+  const FACET_IDS = ["primary", "twopp", "leadership", "direction", "issues", "demographics"].concat((D.confidenceOnlyPolls || []).length ? ["confidence"] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f));
   const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
   const upd = rdApDays(D.latest.updatedISO);
   const winDays = D.latest.method && D.latest.method.windowDays || 21;

@@ -2322,9 +2322,22 @@ function rdApFacetStory(facet, upd, demSplit) {
         return { k, g, hi: g >= 0 ? a : b, lo: g >= 0 ? b : a, sig: Math.round(Math.abs(g)) > 0 && Math.abs(g) > Math.sqrt(((A.ci || {})[k] || 0) ** 2 + ((B.ci || {})[k] || 0) ** 2) };
       }).filter((x) => x.sig).sort((x, y) => byPrim(x.k, y.k));
       if (!gaps.length) return { dek: "No party’s vote differs between " + rdApDemNoun(a) + " and " + rdApDemNoun(b) + " by more than the margin of error." };
-      const parts = gaps.map((x, i) => (i ? poss(x.k).replace(/^The /, "the ") + " " + pts(x.g) + " higher among " + rdApDemNoun(x.hi)
-        : poss(x.k) + " vote is " + pts(x.g) + " higher among " + rdApDemNoun(x.hi) + " than " + rdApDemNoun(x.lo)));
-      return { dek: (parts.length > 1 ? parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1] : parts[0]) + "." };
+      /* one sentence per group, the parties that do better there in
+         primary-vote order; the group the biggest such party favours goes
+         first and alone names the other end (user call 2026-11-21):
+         "Labor and the Greens do better among 18–34-year-olds than
+         over-55s, by 3 and 24 points. One Nation and the Coalition do
+         better among over-55s, by 14 and 15 points." */
+      const groups = [...new Set(gaps.map((x) => x.hi))];
+      const sents = groups.map((hi, i) => {
+        const xs = gaps.filter((x) => x.hi === hi);
+        const names = rdList(xs.map((x, j) => (j ? rdPartyIn(x.k) : rdPartyStart(x.k))));
+        const many = xs.length > 1 || rdPlural(xs[0].k);
+        const ns = xs.map((x) => Math.round(Math.abs(x.g)));
+        const by = rdList(ns.map(String)) + (ns.length === 1 && ns[0] === 1 ? " point" : " points");
+        return names + (many ? " do" : " does") + " better among " + rdApDemNoun(hi) + (i ? "" : " than " + rdApDemNoun(xs[0].lo)) + ", by " + by + ".";
+      });
+      return { dek: sents.join(" ") };
     }
     /* a split the section doesn't pool (income: the houses bracket
        different quantities; birth country: one special pooled release, no
@@ -2340,10 +2353,10 @@ function rdApFacetStory(facet, upd, demSplit) {
     const who = p.pollster.replace(/^(.+?) \((.+?)\)$/, "$1’s $2 survey");
     const whose = who === p.pollster ? who + "’s poll" : who;
     const newest = who === p.pollster ? "from " + who : who;
-    const gap = rdPartyIn(k) + " " + pts(g) + " higher among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a);
+    const gap = rdPartyIn(k) + " doing better among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ", by " + pts(g);
     return { dek: ps.length === 1
-      ? "Only " + whose + " breaks the vote out by " + sp.label.toLowerCase() + "; it puts " + gap + "."
-      : "Each pollster draws its own " + sp.label.toLowerCase() + " brackets, so these aren’t pooled. The newest, " + newest + ", puts " + gap + "." };
+      ? "Only " + whose + " breaks the vote out by " + sp.label.toLowerCase() + "; it has " + gap + "."
+      : "Each pollster draws its own " + sp.label.toLowerCase() + " brackets, so these aren’t pooled. The newest, " + newest + ", has " + gap + "." };
   }
 
   return null;
