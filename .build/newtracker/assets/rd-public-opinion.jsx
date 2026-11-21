@@ -578,7 +578,10 @@ function PubOpItem({ c, houses, topic }) {
    (levels differ with the wording), its name sits at its end, and the list
    beside the chart gives each pollster's latest. A dot is one poll; the
    readout follows the dates the polls ended. */
-function PubOpTracker({ c, houses, topic }) {
+function PubOpTracker(props) {
+  return props.c.form === "longrun" ? <PubOpLongRun {...props} /> : <PubOpPollsTracker {...props} />;
+}
+function PubOpPollsTracker({ c, houses, topic }) {
   const narrow = useNarrow(MQ_PHONE);
   const net = c.measure === "net";
   const pts = c.panels.flatMap((p) => p.points.map((q) => ({ ...q, house: p.house, fam: p.fam })));
@@ -698,6 +701,134 @@ function PubOpTracker({ c, houses, topic }) {
   );
 }
 
+/* ---- the long run: one survey, every election -------------------------------
+   The Australian Election Study's series (public-opinion.mjs buildLongRun):
+   a block of one to three charts on one scale, each line one answer (its
+   side's colour, or a channel's), named at its end; a dot is the survey
+   after one election and the x axis counts elections, never months. The
+   middle answer rides the tooltip and the table. No "latest from each
+   pollster" box: there is one survey, and the head and dek quote its latest. */
+const PUBOP_LR_INK = { a: "var(--mood-pos)", b: "var(--mood-neg)", c0: "var(--pubop-w0)", c1: "var(--pubop-w1)", c2: "var(--pubop-c2)", c3: "var(--pubop-c3)" };
+function PubOpLongChart({ c, ch, multi, narrow }) {
+  const lines = ch.lines.map((i) => c.panels[i]);
+  const pts = lines.flatMap((p) => p.points);
+  const years = [...new Set(pts.map((q) => q.year))].sort((p, q) => p - q);
+  const xOf = new Map(pts.map((q) => [q.year, q.x]));
+  /* room at the left for the y labels, which sit inside the plot, so the
+     first election's dot never lands on them */
+  const xa = Math.min(...pts.map((q) => q.x)), xb = Math.max(...pts.map((q) => q.x));
+  const x0 = xa - Math.max(0.7, (xb - xa) * (multi ? 0.1 : 0.05)), x1 = xb + 0.7;
+  /* every election named where a wide chart has room; a narrow one (a phone,
+     a small multiple) marks the decades instead */
+  const sparse = narrow || multi;
+  const ticks = sparse
+    ? [1990, 2000, 2010, 2020].filter((y) => y > x0 && y < x1).map((y) => ({ x: y, label: String(y) }))
+    : years.map((y) => ({ x: xOf.get(y), label: "’" + String(y).slice(2) }));
+  const [lo, hi] = c.yDomain;
+  /* a small multiple on a phone keeps every other rung */
+  const step = multi && narrow ? c.yStep * 2 : c.yStep;
+  const yt = [];
+  for (let v = lo + step; v <= hi + 1e-9; v += step) yt.push(v);
+  const top = yt[yt.length - 1];
+  const spine = years.map((y) => ({ x: xOf.get(y), y: pts.find((q) => q.year === y).v }));
+  const at = (i) => (spine[i] ? years[i] : null);
+  const ptAt = (p, y) => p.points.find((q) => q.year === y) || null;
+  const oneQ = new Set(lines.map((p) => p.id)).size === 1;
+  const title = ch.title ? c.title.replace(/,? at each election$/, "") + ": " + ch.title : c.title;
+  return (
+    <div className="pubop-lrc">
+      {ch.title ? <p className="pubop-lrt">{ch.title}</p> : null}
+      <div className="card rd-card pubop-chart">
+        <TrendChart key={"pubop-lr-" + c.id + "-" + (ch.title || "")} heightPx={multi ? (narrow ? 180 : 230) : (narrow ? 250 : 300)}
+          padPx={{ l: 30, r: 8, t: 16, b: 22 }}
+          xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={yt} yTickFmt={() => ""} xTicks={ticks} baseline
+          notes={yt.map((v) => ({ x: "left", y: v, dy: -3, text: v + (v === top ? "%" : ""), size: 10.5, cls: "pubop-ylab" }))}
+          series={lines.map((p) => ({ id: p.key, label: p.label, color: PUBOP_LR_INK[p.tone], rdWidth: 2, smooth: false,
+            endLabel: p.label, points: p.points.map((q) => ({ x: q.x, y: q.v })) }))}
+          spine={spine}
+          scatter={lines.flatMap((p) => p.points.map((q) => ({ x: q.x, y: q.v, color: PUBOP_LR_INK[p.tone], label: p.label,
+            meta: { pollster: "Australian Election Study", dateLabel: "After the " + q.year + " election", sample: q.n } })))}
+          tooltipTitle={(i) => (at(i) ? "After the " + at(i) + " election" : "")}
+          extraRows={(i) => {
+            const y = at(i);
+            if (y == null) return [];
+            const p0 = lines.map((p) => ptAt(p, y)).find(Boolean);
+            const rows = [];
+            if (ch.mid && oneQ && p0 && p0.mid != null) rows.push({ label: ch.mid, value: pubopPct(p0.mid) });
+            if (oneQ && p0 && p0.n) rows.push({ label: "Sample", value: p0.n.toLocaleString("en-AU") });
+            return rows;
+          }}
+          fmt={(v) => pubopPct(v)}
+          copy={{ title, sub: c.head + "." + (c.note ? " " + c.note : ""),
+            span: years[0] + " – " + years[years.length - 1],
+            caption: "Australian Election Study. Each dot is the survey after one federal election.", legend: [] }}
+        />
+      </div>
+    </div>
+  );
+}
+function PubOpLongRun({ c, topic }) {
+  const narrow = useNarrow(MQ_PHONE);
+  const multi = c.charts.length > 1;
+  const first = c.elections[0], last = c.elections[c.elections.length - 1];
+  const url = (c.panels.flatMap((p) => p.points).find((q) => q.url) || {}).url;
+  const ns = c.panels.flatMap((p) => p.points.map((q) => q.n)).filter(Boolean);
+  const nLo = Math.min(...ns), nHi = Math.max(...ns);
+  const rnd = (v) => (Math.round(v / 100) * 100).toLocaleString("en-AU");
+  return (
+    <div className={"pubop-tracker pubop-lr" + (multi ? " pubop-lr-m" + c.charts.length : "")}>
+      {topic ? <p className="pubop-qt">{topic}</p> : null}
+      <p className="pubop-tlab">{c.title}</p>
+      <p className="pubop-tdek">{c.dek}</p>
+      <p className="pubop-lrsrc">
+        Australian Election Study, after each federal election {first}–{last} · {c.elections.length} elections · {rnd(nLo)} to {rnd(nHi)} voters each
+        {url ? <> · <a href={url} target="_blank" rel="noopener">Source ↗</a></> : null}
+      </p>
+      <div className="pubop-lrg">
+        {c.charts.map((ch, i) => <PubOpLongChart key={i} c={c} ch={ch} multi={multi} narrow={narrow} />)}
+      </div>
+      {c.note ? <p className="pubop-note">{c.note}</p> : null}
+      <details className="pubop-ledger">
+        <summary>All readings, election by election</summary>
+        {c.charts.map((ch, ci) => {
+          const lines = ch.lines.map((i) => c.panels[i]);
+          const years = [...new Set(lines.flatMap((p) => p.points.map((q) => q.year)))].sort((p, q) => q - p);
+          const oneQ = new Set(lines.map((p) => p.id)).size === 1;
+          const pt = (p, y) => p.points.find((q) => q.year === y);
+          return (
+            <div className="pubop-twrap" key={ci}>
+              <table className="pubop-table">
+                {ch.title ? <caption className="pubop-lrcap">{ch.title}</caption> : null}
+                <thead><tr>
+                  <th className="pubop-l">Election</th>
+                  {lines.map((p) => <th key={p.key}>{p.label}</th>)}
+                  {ch.mid && oneQ ? <th>{ch.mid}</th> : null}
+                  {oneQ ? <th>Sample</th> : null}
+                  <th />
+                </tr></thead>
+                <tbody>
+                  {years.map((y) => {
+                    const p0 = lines.map((p) => pt(p, y)).find(Boolean);
+                    return (
+                      <tr key={y}>
+                        <td className="pubop-l">{y}</td>
+                        {lines.map((p) => { const q = pt(p, y); return <td key={p.key}>{q ? pubopN(q.v) : "–"}</td>; })}
+                        {ch.mid && oneQ ? <td>{p0 && p0.mid != null ? pubopN(p0.mid) : "–"}</td> : null}
+                        {oneQ ? <td>{p0 && p0.n ? p0.n.toLocaleString("en-AU") : "–"}</td> : null}
+                        <td>{p0 && p0.url ? <a href={p0.url} target="_blank" rel="noopener">Source ↗</a> : null}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </details>
+    </div>
+  );
+}
+
 /* ---- the topic's long tail --------------------------------------------------
    One line a question, the question on the left and whose and when on the
    right; a line opens across the full width to the same row as a featured
@@ -760,6 +891,9 @@ const pubopCount = (trackers, items, more) => [
 function PubOpTopic({ t, n, houses }) {
   const g = pubopSplitKinds(pubopDated([t]));
   const count = pubopCount(g.trackers.length, g.items.length, g.more.length);
+  /* the term's charts lead; the AES long run closes the topic (before its
+     fold), so a topic's finding and its newest polls stay at the top */
+  const live = g.trackers.filter((e) => e.b.form !== "longrun"), long = g.trackers.filter((e) => e.b.form === "longrun");
   return (
     <section className="pubop-topic" id={"pubop-" + t.id} aria-labelledby={"pubop-h-" + t.id}>
       <div className="pubop-tk">
@@ -768,8 +902,19 @@ function PubOpTopic({ t, n, houses }) {
       </div>
       {t.finding ? <p className="pubop-hl">{t.finding.text}</p> : null}
       <p className="pubop-tdk">{t.dek}</p>
-      {g.trackers.map((e) => <PubOpTracker key={e.b.id} c={e.b} houses={houses} />)}
+      {live.map((e) => <PubOpTracker key={e.b.id} c={e.b} houses={houses} />)}
       <PubOpEntries entries={g.items} houses={houses} />
+      {long.length ? (
+        <div className="pubop-lrs">
+          {live.length || g.items.length ? (
+            <div className="pubop-lrhd">
+              <h4 className="pubop-lrh">The long view</h4>
+              <p className="pubop-lrp">The Australian Election Study asks the same questions after every federal election, so these go back decades, well before this term.</p>
+            </div>
+          ) : null}
+          {long.map((e) => <PubOpTracker key={e.b.id} c={e.b} houses={houses} />)}
+        </div>
+      ) : null}
       {g.more.length ? <PubOpMore label={"More questions on " + (t.about || t.title)} qs={g.more.map((e) => e.q)} houses={houses}
         meta={(q) => pubopHouse(q, houses) + " · " + pubopMonth(q.last) + (q.srcs.length > 1 ? " · " + q.srcs.length + " readings" : "")} /> : null}
     </section>
@@ -1001,6 +1146,7 @@ const pubopBlockW = (b, houses) => {
     (b.families || []).forEach((s) => parts.push(String(s)));
     (b.cols || []).forEach((s) => parts.push(String(s)));
     (b.panels || []).forEach((p) => pubopPushW(parts, p.label));
+    (b.charts || []).forEach((ch) => pubopPushW(parts, ch.title));
   }
   return parts.join(" ").toLowerCase();
 };
@@ -1253,8 +1399,9 @@ function PublicOpinionBody() {
           as a thin sliver until named apart.) */}
       <div className="pubop-tools"><PubOpSearch q={q} onQ={setQ} />{!ql && <PubOpSort sort={sort} onSort={setSort} />}</div>
       {!ql && <p className="pubop-scope">
-        {src.counts.questions} questions from {pubopWord(Object.keys(houses).length)} pollsters
-        {" "}since {pubopMonth(src.first)}. The newest questions appear automatically by issue and pollster; by recency shows every question, newest first.
+        {src.counts.questions} questions from {pubopWord(Object.keys(houses).filter((h) => !src.longRun || h !== src.longRun.house).length)} pollsters
+        {" "}since {pubopMonth(src.first)}{src.longRun ? <>, and the Australian Election Study’s long view: the same questions after every federal election since {src.longRun.first.slice(0, 4)}</> : null}.
+        {" "}The newest questions appear automatically by issue and pollster; by recency shows every question, newest first.
         {" "}Every figure names its pollster, its dates and its sample, and links to its source.
       </p>}
       {ql ? <PubOpResults q={dq.trim()} hits={hits} houses={houses} />
@@ -1269,7 +1416,7 @@ function PublicOpinionBody() {
           In the charts, each line joins one pollster’s own readings and is coloured by how that pollster asked. Pollsters word
           their questions differently, so compare a pollster with itself before comparing it with another.</p>
         <p><b>What is left out.</b> Questions about sport, holidays and personal habits, state politics, surveys run before
-          this term, and questions the main page already tracks, such as whether the country is heading in the right direction.</p>
+          this term (the Australian Election Study’s long view aside), and questions the main page already tracks, such as whether the country is heading in the right direction.</p>
       </div>
     </div>
   );

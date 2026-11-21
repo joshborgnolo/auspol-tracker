@@ -49,8 +49,8 @@ export const THEMES = [
     dek: "The under-16 social media ban, AI and data centres, gambling ads, unions, abortion and other questions of how we live and work." },
   { id: "trust-democracy", title: "Leaders, trust and democracy", short: "Trust and democracy", about: "leaders, trust and democracy",
     dek: "How voters rate the government, the leaders and the institutions, and how much they think politics needs to change." },
-  { id: "media", title: "Campaign news", short: "Campaign news", about: "campaign news and the media",
-    dek: "How much attention Australians paid to election news on television, radio, in newspapers and on the internet." },
+  { id: "following", title: "Following politics", short: "Following politics", about: "how Australians follow politics",
+    dek: "How much interest Australians take in politics and election campaigns, and where they follow the campaign: online, on television, in newspapers or on the radio. The Australian Election Study asks after every election, so these charts reach back to 1987." },
 ];
 
 export const THEME_OF = {
@@ -460,17 +460,17 @@ export const THEME_OF = {
   "more-mps": "trust-democracy",
   "voting-systems": "trust-democracy",
   // aes
-  "political-interest": "trust-democracy",
-  "campaign-interest": "trust-democracy",
+  "political-interest": "following",
+  "campaign-interest": "following",
   "satisfaction-democracy": "trust-democracy",
   "government-big-interests": "trust-democracy",
   "politicians-know-people": "trust-democracy",
   "household-economy-year": "cost-of-living",
   "national-economy-year": "cost-of-living",
-  "campaign-news-tv": "media",
-  "campaign-news-radio": "media",
-  "campaign-news-newspapers": "media",
-  "campaign-news-internet": "media",
+  "campaign-news-tv": "following",
+  "campaign-news-radio": "following",
+  "campaign-news-newspapers": "following",
+  "campaign-news-internet": "following",
   // essential
   "government-performance": "trust-democracy",
   "trust-institutions": "trust-democracy",

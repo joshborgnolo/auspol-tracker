@@ -964,6 +964,16 @@ function ssBeyondBlock(esc) {
   const by = (s) => `${house(s.house, true)}, ${month(s.field.end)}`;
   const pair = (r, names) => `${pct(r.a)} ${esc(names[0])}, ${pct(r.b)} ${esc(names[1])}${r.sig === false ? " (level)" : ""}`;
   const block = (c) => {
+    if (c.form === "longrun") {
+      const latest = c.charts.map((ch) => ch.lines.map((i) => {
+        const p = c.panels[i], q = p.points[p.points.length - 1];
+        return `<li>${ch.title ? esc(ch.title) + " " : ""}${esc(p.label)}: ${pct(q.v)} after the ${q.year} election</li>`;
+      }).join("")).join("");
+      return `
+        <h3>${esc(c.title)}</h3>
+        <p>${esc(c.dek)} <span class="pubop-ss-by">Australian Election Study, ${c.elections[0]}&#8211;${c.elections[c.elections.length - 1]}</span></p>
+        <ul class="pubop-ss-list">${latest}</ul>`;
+    }
     if (c.kind === "tracker") {
       const latest = c.panels.map((p) => {
         const q = p.points[p.points.length - 1];

@@ -34,7 +34,7 @@
   <link rel="preload" href="/assets/fonts/ss3mark-wordmark.78676a6f.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../../assets/js/data-vic.ca5c2d18.js" as="script">
+  <link rel="preload" href="../../assets/js/data-vic.04a08997.js" as="script">
   <link rel="preload" href="../../assets/js/data-vic-late.a8b8ab3d.js" as="script">
   <link rel="preload" href="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js" as="script">
   <link rel="preload" href="../../assets/js/np-project.64658a20.js" as="script">
@@ -50,11 +50,11 @@
   <link rel="preload" href="../../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../../assets/js/rd.c32013aa.js" as="script">
   <link rel="preload" href="../../assets/js/rd-hero.948c4053.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-panels.ee76495f.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-panels.7229671f.js" as="script">
   <link rel="preload" href="../../assets/js/rd-polls.3e55d06c.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.ecc621d4.js" as="script">
   <link rel="preload" href="../../assets/js/rd-allpolls.d4e64825.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-public-opinion.931ac939.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-public-opinion.8ddc4952.js" as="script">
   <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3c79a15.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – All polls","url":"https://auspoltracker.com/vic/allpolls/","description":"Every published Victorian opinion poll since the 2022 Victorian election – primary votes, two-party preferred and leadership ratings, with fieldwork dates and samples, month by month.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
   <style>
@@ -200,6 +200,8 @@
   --macro-cbigap: oklch(0.56 0.12 330);
   --pubop-w0: oklch(0.50 0.105 305);
   --pubop-w1: oklch(0.60 0.115 83);
+  --pubop-c2: oklch(0.52 0.090 150);
+  --pubop-c3: oklch(0.56 0.015 260);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -276,6 +278,8 @@ body.dark {
   --macro-cbigap: oklch(0.72 0.12 330);
   --pubop-w0: oklch(0.66 0.110 305);
   --pubop-w1: oklch(0.67 0.115 83);
+  --pubop-c2: oklch(0.68 0.090 150);
+  --pubop-c3: oklch(0.70 0.015 260);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -3446,6 +3450,20 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .pubop-ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink-3); }
 .pubop-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px dashed var(--ink-3); }
 .pubop-ledger { margin-top: 14px; }
+.pubop-lrs { margin-top: 36px; }
+.pubop-lrhd { padding-top: 16px; border-top: 1px solid var(--line); }
+.pubop-lrh { margin: 0; font-family: var(--sans); font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+.pubop-lrp { margin: 4px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.5; color: var(--ink-3); text-wrap: pretty; }
+.pubop-lrhd + .pubop-lr { margin-top: 20px; }
+.pubop-lrsrc { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.pubop-lrsrc a { color: inherit; }
+.pubop-lrg { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px 32px; margin-top: 14px; }
+.pubop-lrc { min-width: 0; }
+.pubop-lrt { margin: 0 0 2px; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink-2); }
+.pubop-lr .pubop-note { margin-top: 10px; max-width: 96ch; }
+.pubop-lrcap { caption-side: top; padding: 12px 0 4px; text-align: left; font-size: 13px; font-weight: 600; color: var(--ink); }
+@media (min-width: 640px) { .pubop-lr-m2 .pubop-lrg { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 960px) { .pubop-lr-m3 .pubop-lrg { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .pubop-items { margin-top: 30px; }
 .pubop-item { display: flex; flex-wrap: wrap; gap: 14px 48px; padding: 22px 0 24px; border-top: 1px solid var(--line); }
 .pubop-il { flex: 1 1 260px; min-width: 0; }
@@ -6906,7 +6924,7 @@ body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3)
   <script>window.AP_ONEOFF_SRC=null;</script>
   <script src="../../assets/js/react.d949f1c3.js"></script>
   <script src="../../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../../assets/js/data-vic.ca5c2d18.js"></script>
+  <script src="../../assets/js/data-vic.04a08997.js"></script>
   <script src="../../assets/js/data-vic-late.a8b8ab3d.js"></script>
   <script src="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js"></script>
   <script src="../../assets/js/np-project.64658a20.js"></script>
@@ -6922,11 +6940,11 @@ body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3)
   <script src="../../assets/js/wm-story.63f19861.js"></script>
   <script src="../../assets/js/rd.c32013aa.js"></script>
   <script src="../../assets/js/rd-hero.948c4053.js"></script>
-  <script src="../../assets/js/rd-panels.ee76495f.js"></script>
+  <script src="../../assets/js/rd-panels.7229671f.js"></script>
   <script src="../../assets/js/rd-polls.3e55d06c.js"></script>
   <script src="../../assets/js/rd-cycles.ecc621d4.js"></script>
   <script src="../../assets/js/rd-allpolls.d4e64825.js"></script>
-  <script src="../../assets/js/rd-public-opinion.931ac939.js"></script>
+  <script src="../../assets/js/rd-public-opinion.8ddc4952.js"></script>
   <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.a3c79a15.js"></script>
 
 

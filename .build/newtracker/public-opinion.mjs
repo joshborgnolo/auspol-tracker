@@ -503,71 +503,7 @@ function movementSentences(panels) {
   return out.join(" ");
 }
 
-/* The interest chart plots the focused answer; its dek restores the wider
-   scale. First-to-latest change earns a direction past the sampling margin. */
-function aesInterestCopy(panels, subject) {
-  const latest = panels[0].points[panels[0].points.length - 1];
-  const change = moved(panels[0]);
-  const firstYear = change ? change.first.field.end.slice(0, 4) : null;
-  const head = !change ? Math.round(latest.v) + "% took a good deal of interest in " + subject
-    : "Deep interest in " + subject + " has " + (change.sig ? (change.d < 0 ? "fallen" : "risen") : "held up") + " since " + firstYear;
-  const dek = "In " + monthYear(latest.field.end) + ", " + Math.round(latest.a + latest.m) + "% reported at least some interest in " + subject
-    + "; " + Math.round(latest.v) + "% took a good deal. " + movementSentences(panels);
-  return { head, dek: dek.trim() };
-}
-
-function aesEconomyCopy(panels, subject, verb = "is") {
-  const latest = panels[0].points[panels[0].points.length - 1];
-  return {
-    head: Math.round(latest.b) + "% say " + subject + " " + verb + " worse than a year ago",
-    dek: Math.round(latest.a) + "% say it is better and " + Math.round(latest.m) + "% about the same. " + movementSentences(panels),
-  };
-}
-
-function aesChannelCopy(panels, channel) {
-  const latest = panels[0].points[panels[0].points.length - 1], change = moved(panels[0]);
-  const firstYear = change ? change.first.field.end.slice(0, 4) : null;
-  const head = !change ? "Attention to " + channel + " campaign news"
-    : "Attention to " + channel + " campaign news is " + (change.sig ? (change.d < 0 ? "lower" : "higher") : "little changed") + " since " + firstYear;
-  return {
-    head,
-    dek: "In " + monthYear(latest.field.end) + ", " + Math.round(latest.a + latest.m) + "% paid at least some attention to " + channel
-      + " campaign coverage; " + Math.round(latest.a) + "% a good deal. " + movementSentences(panels),
-  };
-}
-
 const TRACKER_COPY = {
-  politicalInterest(panels) { return aesInterestCopy(panels, "politics"); },
-  campaignInterest(panels) { return aesInterestCopy(panels, "the election campaign"); },
-  democraticSatisfaction(panels) {
-    const latest = panels[0].points[panels[0].points.length - 1];
-    return {
-      head: Math.round(latest.a) + "% are satisfied with the way democracy works",
-      dek: "In " + monthYear(latest.field.end) + ", " + Math.round(latest.a) + "% were very or fairly satisfied; " + Math.round(latest.b)
-        + "% were not very or not at all satisfied. " + movementSentences(panels),
-    };
-  },
-  householdEconomy(panels) { return aesEconomyCopy(panels, "their household finances", "are"); },
-  nationalEconomy(panels) { return aesEconomyCopy(panels, "the national economy"); },
-  campaignTv(panels) { return aesChannelCopy(panels, "television"); },
-  campaignRadio(panels) { return aesChannelCopy(panels, "radio"); },
-  campaignNewspapers(panels) { return aesChannelCopy(panels, "newspaper"); },
-  campaignInternet(panels) { return aesChannelCopy(panels, "internet"); },
-  bigInterests(panels) {
-    const latest = panels[0].points[panels[0].points.length - 1];
-    return {
-      head: Math.round(latest.a) + "% say government is run for a few big interests",
-      dek: Math.round(latest.b) + "% say it is run for the benefit of all the people; " + Math.round(latest.m)
-        + "% say about half and half. " + movementSentences(panels),
-    };
-  },
-  politiciansKnow(panels) {
-    const latest = panels[0].points[panels[0].points.length - 1];
-    return {
-      head: Math.round(latest.a) + "% say federal politicians do not know what ordinary people think",
-      dek: Math.round(latest.b) + "% say they do know, with " + Math.round(latest.m) + "% at the scale’s midpoint. " + movementSentences(panels),
-    };
-  },
   /* Trump: "deeply" only when every pollster's latest net sits at -30 or
      below, and any "unpopular" only when every latest net clears its own
      margin below zero */
@@ -604,6 +540,164 @@ const TRACKER_COPY = {
     const dek = "In each pollster’s latest reading, " + rng("v") + " say immigration is too high or should be cut"
       + (wantMore ? ", and " + wantMore + " want more" : "") + ". " + movementSentences(panels);
     return { head, dek: dek.trim() };
+  },
+};
+
+/* ---- the long run: the Australian Election Study ---------------------------
+   The AES asks the same questions after every federal election, the one
+   survey on the page that reaches back before this term (to 1987). Its
+   series are not trackers of this term's polls, so they get their own form
+   (kind "tracker", form "longrun": every list, count and order that treats
+   a tracker as a chart treats these the same way):
+   - a reading belongs to an ELECTION, not to a month. The store dates each
+     wave to the month after polling day (its rounded marker); the chart
+     places it on polling day and every label names the election year, so
+     no date is printed that nobody was surveyed on;
+   - questions with two sides draw both (better and worse, satisfied and not),
+     the middle answer left to the tooltip and the table: one side alone
+     hid the side the head was about;
+   - questions that belong together share one block - the four campaign news
+     channels on one chart, household and national economy side by side on
+     one scale - so the comparison the reader wants is on screen at once;
+   - one survey, so no house colours: a line's colour is its side (green
+     the agreeing or better side, red the other, the --pubop-a2/b2 pair the
+     answer bars wear) or, where lines are parallel measures, one of the
+     channel inks.
+   Copy is rule-written: a change is called only past its 95% margin (Kish
+   effective samples as the store files them), and a range across elections
+   is stated as the point readings, never as a trend. */
+const AES_POLLING_DAY = {
+  "1987-08": "1987-07-11", "1990-04": "1990-03-24", "1993-04": "1993-03-13", "1996-04": "1996-03-02",
+  "1998-11": "1998-10-03", "2001-12": "2001-11-10", "2004-11": "2004-10-09", "2007-12": "2007-11-24",
+  "2010-09": "2010-08-21", "2013-10": "2013-09-07", "2016-08": "2016-07-02", "2019-06": "2019-05-18",
+  "2022-06": "2022-05-21", "2025-06": "2025-05-03",
+};
+const sumRows = (e, rx) => r1(mainTable(e).rows.filter((r) => rx.test(String(r[0]).trim())).reduce((t, r) => t + num(r[1]), 0));
+function buildLongRun(spec, ix, deff) {
+  const panels = [];
+  const charts = spec.charts.map((ch, ci) => ({ title: ch.title, mid: ch.mid ? ch.mid.label : null,
+    lines: ch.lines.map((ln) => {
+      const pts = ix.waves(ln.id, "aes").map((e) => {
+        const day = AES_POLLING_DAY[e.waveDate];
+        if (!day) throw new Error("public-opinion: AES wave " + e.waveDate + " names no polling day (AES_POLLING_DAY)");
+        const v = sumRows(e, ln.rx), neff = neffOf(e, deff);
+        return { house: "aes", wave: e.waveDate, field: { start: null, end: day }, year: +day.slice(0, 4),
+          x: Math.round(dx(day) * 1e4) / 1e4, v, a: v, n: e.sample ?? null, neff: e.sampleEff ?? null,
+          se: neff ? r1(seShare(v, neff)) : null, mid: ch.mid ? sumRows(e, ch.mid.rx) : null, url: e.url || null, pub: pubOf(e) };
+      }).sort((p, q) => p.x - q.x);
+      if (!pts.length) throw new Error("public-opinion: " + spec.key + " / " + ln.id + " has no AES waves");
+      panels.push({ house: "aes", id: ln.id, key: ln.key, label: ln.label, name: ln.name || ln.label.toLowerCase(), tone: ln.tone, chart: ci,
+        question: ln.question || ix.waves(ln.id, "aes")[0].question, points: pts });
+      return panels.length - 1;
+    }) }));
+  const all = panels.flatMap((p) => p.points);
+  const hi = Math.max(...all.map((q) => q.v));
+  const b = { kind: "tracker", form: "longrun", id: spec.key, title: spec.title, measure: "share",
+    names: panels.map((p) => p.label), cols: [], families: [], charts, panels,
+    yDomain: [0, spec.yMax || Math.max(20, Math.ceil((hi + 3) / 10) * 10)], yStep: spec.yStep || 10,
+    note: spec.note || null, ref: spec.ref ?? null, refLabel: spec.refLabel || null,
+    elections: [...new Set(all.map((q) => q.year))].sort((p, q) => p - q),
+    first: all.reduce((m, p) => (p.field.end < m ? p.field.end : m), "9999"),
+    last: all.reduce((m, p) => (p.field.end > m ? p.field.end : m), "0000"),
+    pub: all.reduce((m, p) => (p.pub && p.pub > m ? p.pub : m), "") || null };
+  const copy = LONG_COPY[spec.copy](b);
+  return { ...b, head: copy.head, dek: copy.dek };
+}
+
+/* the long run's sentences. `line(b, key)` finds a line; each helper reads
+   one line's readings and words only what its margins allow. */
+const lineOf = (b, key) => b.panels.find((p) => p.key === key);
+const lastOf = (p) => p.points[p.points.length - 1];
+const pctR = (v) => Math.round(v) + "%";
+/* two readings of one line differ past the margin of their difference */
+const apart = (p, q) => p.se != null && q.se != null && Math.abs(p.v - q.v) > 1.96 * Math.hypot(p.se, q.se);
+/* the latest against the election before it */
+function sincePrev(p) {
+  const pts = p.points, l = pts[pts.length - 1], q = pts[pts.length - 2];
+  if (!q) return null;
+  return apart(l, q) ? (l.v > q.v ? "up from " : "down from ") + pctR(q.v) + " in " + q.year
+    : "much the same as in " + q.year;
+}
+/* the latest against the line's first reading */
+function sinceFirst(p) {
+  const pts = p.points, l = pts[pts.length - 1], f = pts[0];
+  if (pts.length < 2) return null;
+  return { sig: apart(l, f), d: l.v - f.v, f, l,
+    text: apart(l, f) ? (l.v > f.v ? "up from " : "down from ") + pctR(f.v) + " in " + f.year : "much the same as in " + f.year };
+}
+/* the latest against the line's low or high, where it has climbed off the
+   one or fallen from the other past the margin (the earlier extreme wins a
+   tie, as the record it set) */
+function offExtreme(p) {
+  const l = lastOf(p), prior = p.points.slice(0, -1);
+  if (prior.length < 2) return null;
+  const lo = prior.reduce((m, q) => (q.v < m.v ? q : m)), hi = prior.reduce((m, q) => (q.v > m.v ? q : m));
+  if (apart(l, lo) && l.v > lo.v && lo !== prior[prior.length - 1] && lo.v <= Math.min(...prior.map((q) => q.v))) return "up from a low of " + pctR(lo.v) + " in " + lo.year;
+  if (apart(l, hi) && l.v < hi.v && hi !== prior[prior.length - 1]) return "down from a high of " + pctR(hi.v) + " in " + hi.year;
+  return null;
+}
+/* the spread of a line's point readings across the elections */
+function rangeOf(p) {
+  const lo = p.points.reduce((m, q) => (q.v < m.v ? q : m)), hi = p.points.reduce((m, q) => (q.v > m.v ? q : m));
+  return "from " + pctR(lo.v) + " in " + lo.year + " to " + pctR(hi.v) + " in " + hi.year;
+}
+/* a share past half by its own margin */
+const isMaj = (q) => q.se != null && q.v - 1.96 * q.se > 50;
+
+export const LONG_COPY = {
+  economy(b) {
+    const nW = lineOf(b, "natWorse"), nB = lineOf(b, "natBetter"), hW = lineOf(b, "hhWorse"), hB = lineOf(b, "hhBetter");
+    const lw = lastOf(nW), lb = lastOf(nB), Y = lw.year;
+    const head = isMaj(lw) ? "Most voters said the national economy had got worse in the year before the " + Y + " election"
+      : apart(lw, lb) && lw.v > lb.v ? "More voters said the national economy had got worse than better in the year before the " + Y + " election"
+      : apart(lw, lb) ? "More voters said the national economy had got better than worse in the year before the " + Y + " election"
+      : "Voters split on whether the national economy had improved in the year before the " + Y + " election";
+    const dek = "After the " + Y + " election, " + pctR(lw.v) + " said the national economy was worse than a year earlier and "
+      + pctR(lb.v) + " better; of their own household’s finances, " + pctR(lastOf(hW).v) + " said worse and " + pctR(lastOf(hB).v) + " better. "
+      + "The national ‘worse’ share is " + sincePrev(nW) + ", and has run " + rangeOf(nW) + " across " + nW.points.length + " elections; "
+      + "the household ‘worse’ share is " + sincePrev(hW) + ".";
+    return { head, dek };
+  },
+  democracy(b) {
+    const sat = lineOf(b, "satisfied"), big = lineOf(b, "bigInterests"), all = lineOf(b, "allPeople");
+    const dk = lineOf(b, "dontKnow"), kn = lineOf(b, "know");
+    const l = lastOf(sat), Y = l.year;
+    const move = offExtreme(sat) || sincePrev(sat);
+    const head = pctR(l.v) + " were satisfied with how democracy works after the " + Y + " election, " + move;
+    const bl = lastOf(big), al = lastOf(all), dl = lastOf(dk), kl = lastOf(kn);
+    const dek = pctR(bl.v) + " said government is run for a few big interests, " + pctR(al.v) + " for all the people and "
+      + pctR(bl.mid) + " half and half; the big-interests share is " + sinceFirst(big).text + ". "
+      + pctR(dl.v) + " said federal politicians do not know what ordinary people think and " + pctR(kl.v) + " that they do; "
+      + "the ‘do not know’ share has run " + rangeOf(dk) + ".";
+    return { head, dek };
+  },
+  interest(b) {
+    const pol = lineOf(b, "politics"), cam = lineOf(b, "campaign");
+    const l = lastOf(pol), Y = l.year, f = sinceFirst(pol);
+    const head = !f.sig ? "Interest in politics is where it was in " + f.f.year + ": " + pctR(l.v) + " took a good deal after the " + Y + " election"
+      : "Interest in politics has " + (f.d < 0 ? "fallen" : "risen") + " since " + f.f.year + ": " + pctR(l.v) + " took a good deal after the " + Y + " election";
+    const cf = sinceFirst(cam);
+    const dek = "After the " + Y + " election, " + pctR(l.v) + " took a good deal of interest in politics and " + pctR(l.v + l.mid)
+      + " at least some; " + pctR(lastOf(cam).v) + " took a good deal of interest in the campaign, " + cf.text
+      + ". Interest in politics has run " + rangeOf(pol) + " across " + pol.points.length + " elections.";
+    return { head, dek };
+  },
+  media(b) {
+    const Y = Math.max(...b.panels.map((p) => lastOf(p).year));
+    const now = b.panels.filter((p) => lastOf(p).year === Y).sort((p, q) => lastOf(q).v - lastOf(p).v);
+    const [t, s] = now, tl = lastOf(t), sl = lastOf(s);
+    const head = apart(tl, sl) ? capFirst(t.name) + " now draws the most close attention to campaign news: " + pctR(tl.v) + " followed it a good deal in " + Y + ", against " + pctR(sl.v) + " for " + s.name
+      : capFirst(t.name) + " and " + s.name + " drew level for close attention to campaign news in " + Y + ", at " + pctR(tl.v) + " and " + pctR(sl.v);
+    /* where the leader started behind: the first election it read higher */
+    const pass = t.points.find((q) => { const r = s.points.find((z) => z.year === q.year); return r && q.v > r.v; });
+    const behind = t.points[0] && s.points.find((z) => z.year === t.points[0].year) && s.points.find((z) => z.year === t.points[0].year).v > t.points[0].v;
+    const parts = [];
+    if (apart(tl, sl) && behind && pass) parts.push(capFirst(t.name) + " first read above " + s.name + " in " + pass.year + ".");
+    for (const p of b.panels.filter((x) => x !== t)) {
+      const l = lastOf(p), f = sinceFirst(p);
+      parts.push(capFirst(p.name) + ": " + pctR(l.v) + (l.year !== Y ? " in " + l.year + " (no " + Y + " reading)" : "") + ", " + f.text + ".");
+    }
+    return { head, dek: parts.join(" ") };
   },
 };
 
@@ -660,6 +754,7 @@ function rankFinding(b, P, deff) {
 /* whose figures the finding reads: the pollsters and readings behind a
    tracker, the polls behind a tally, else the one poll */
 function findingMeta(b) {
+  if (b.form === "longrun") return HOUSES.aes.full + ", " + b.elections.length + " elections since " + b.elections[0];
   if (b.kind === "tracker") {
     const m = b.panels.reduce((k, p) => k + p.points.length, 0);
     return capFirst(numWord(b.panels.length)) + " pollsters, " + numWord(m) + " readings since " + monthYear(b.first);
@@ -884,20 +979,6 @@ export const FEATURES = {
       ref: R("chalmers-middle-east-rate-rise", "news24"), wideRow: 0, names: ["agree", "disagree"] },
     { kind: "stack", mode: "waves", key: "household-finances", title: "Is your household better or worse off than three months ago?",
       ref: R("financial-situation-3m", "news24"), sides: { a: ["Better"], b: ["Worse"], m: ["No change", "Unsure", "Don't know"] }, names: ["better off", "worse off"] },
-    { kind: "tracker", key: "aes-household-economy", copy: "householdEconomy", measure: "share",
-      title: "Household finances compared with a year ago: better", names: ["better", "worse"],
-      cols: ["Better", "Same", "Worse"], yDomain: [0, 50], yStep: 10,
-      note: "Combines a lot and a little better, or worse, with about the same kept separately. This is a post-election evaluation, not a consumer-confidence index. 14 waves since 1987, weighted from 2010; dated to the month after polling day.",
-      families: ["AES household finances over a year"],
-      series: [{ house: "aes", id: "household-economy-year", label: "Household finances better than a year ago", fam: 0,
-        sides: { a: /better$/, m: /^About the same$/, b: /worse$/ } }] },
-    { kind: "tracker", key: "aes-national-economy", copy: "nationalEconomy", measure: "share",
-      title: "The national economy compared with a year ago: better", names: ["better", "worse"],
-      cols: ["Better", "Same", "Worse"], yDomain: [0, 60], yStep: 10,
-      note: "Combines a lot and a little better, or worse, with about the same kept separately. This is a post-election evaluation, not a consumer-confidence index. 14 waves since 1987, weighted from 2010; dated to the month after polling day.",
-      families: ["AES national economy over a year"],
-      series: [{ house: "aes", id: "national-economy-year", label: "National economy better than a year ago", fam: 0,
-        sides: { a: /better$/, m: /^About the same$/, b: /worse$/ } }] },
     { kind: "rank", title: "How should the government respond to inflation?", ref: R("inflation-response-priorities", "newspoll"),
       base: "% naming each as one of their top two priorities", sort: false },
     { kind: "rank", title: "Skipped care because of the cost", ref: R("healthcare-cost-impact", "essential"),
@@ -912,6 +993,20 @@ export const FEATURES = {
       relabel: { "The next generation will have about the same quality of life as my parents' generation": "About the same" } },
     { kind: "split", title: "Would you struggle to pay an unexpected bill of a few thousand dollars?", ref: R("unexpected-expense-struggle", "resolve"),
       names: ["would struggle", "would not"] },
+    /* the long view (AES, every election since 1987): after the term's
+       polls, never ahead of them - PubOpTopic draws a topic's long-run
+       blocks last, under their own subhead */
+    { kind: "tracker", form: "longrun", key: "aes-economy", copy: "economy",
+      title: "Better or worse off than a year before, at each election",
+      charts: [
+        { title: "Your household’s finances", mid: { label: "About the same", rx: /^About the same$/ }, lines: [
+          { id: "household-economy-year", key: "hhWorse", label: "Worse", tone: "b", rx: /worse$/ },
+          { id: "household-economy-year", key: "hhBetter", label: "Better", tone: "a", rx: /better$/ } ] },
+        { title: "The national economy", mid: { label: "About the same", rx: /^About the same$/ }, lines: [
+          { id: "national-economy-year", key: "natWorse", label: "Worse", tone: "b", rx: /worse$/ },
+          { id: "national-economy-year", key: "natBetter", label: "Better", tone: "a", rx: /better$/ } ] },
+      ],
+      note: "Better and worse each combine ‘a lot’ and ‘a little’; ‘about the same’ is in the tooltip and the table. A post-election evaluation, not a consumer-confidence index. Weighted from 2010, otherwise unweighted in the integrated release. Each reading sits on its election’s polling day; the survey is completed in the weeks after." },
   ],
 
   "war-security": [
@@ -1041,41 +1136,6 @@ export const FEATURES = {
         level: "Voters are divided on whether the Albanese government has lived up to their expectations, {a} to {b}",
         none: "{b} say the Albanese government has fallen short of their expectations, and {a} that it has met them",
       } },
-    { kind: "tracker", key: "aes-political-interest", copy: "politicalInterest", measure: "share",
-      title: "Interest in politics: ‘a good deal’", names: ["a good deal", "less interest"],
-      cols: ["A good deal", "Some", "Not much or none"], yDomain: [25, 45], yStep: 5,
-      note: "The line is only ‘a good deal’, not everyone with at least some interest. Post-election self-completion surveys; weighted in 1993 and from 2010, otherwise unweighted in the integrated release. Waves are dated to the month after polling day.",
-      families: ["AES interest in politics"],
-      series: [{ house: "aes", id: "political-interest", label: "A good deal of interest in politics", fam: 0,
-        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
-    { kind: "tracker", key: "aes-campaign-interest", copy: "campaignInterest", measure: "share",
-      title: "Interest in the election campaign: ‘a good deal’", names: ["a good deal", "less interest"],
-      cols: ["A good deal", "Some", "Not much or none"], yDomain: [25, 55], yStep: 5,
-      note: "The line is only ‘a good deal’, not everyone with at least some interest. Post-election self-completion surveys; weighted in 1993 and from 2010, otherwise unweighted in the integrated release. Waves are dated to the month after polling day.",
-      families: ["AES interest in the election campaign"],
-      series: [{ house: "aes", id: "campaign-interest", label: "A good deal of interest in the campaign", fam: 0,
-        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
-    { kind: "tracker", key: "aes-democratic-satisfaction", copy: "democraticSatisfaction", measure: "share",
-      title: "Satisfaction with democracy in Australia", names: ["satisfied", "dissatisfied"],
-      cols: ["Satisfied", null, "Dissatisfied"], yDomain: [45, 90], yStep: 15,
-      note: "Combines very and fairly satisfied against not very or not at all satisfied; no non-response is shown as a neutral answer. The 1996 top answer was ‘Satisfied’ rather than ‘Very satisfied’. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
-      families: ["AES satisfaction with democracy"],
-      series: [{ house: "aes", id: "satisfaction-democracy", label: "Satisfied with how democracy works", fam: 0,
-        sides: { a: /^(?:Very satisfied|Fairly satisfied)$/, b: /^Not (?:very|at all) satisfied$/ } }] },
-    { kind: "tracker", key: "aes-big-interests", copy: "bigInterests", measure: "share",
-      title: "Who is government run for: big interests or all the people?", names: ["big interests", "all the people"],
-      cols: ["Big interests", "All the people", "Half and half"], yDomain: [30, 65], yStep: 10,
-      note: "‘Big interests’ combines entirely and mostly run for those interests; the middle answer is about half and half. Post-election self-completion surveys, weighted from 2010 and otherwise unweighted in the integrated release. Waves are dated to the month after polling day.",
-      families: ["AES: who government is run for"],
-      series: [{ house: "aes", id: "government-big-interests", label: "Run for big interests", fam: 0,
-        sides: { a: /run for the big interests$/, m: /^About half and half$/, b: /run for the benefit of all$/ } }] },
-    { kind: "tracker", key: "aes-politicians-know", copy: "politiciansKnow", measure: "share",
-      title: "Do federal politicians know what ordinary people think?", names: ["do not know", "know"],
-      cols: ["Do not know", "Know", "Midpoint"], yDomain: [30, 60], yStep: 10,
-      note: "The chart combines positions 4 and 5 on the do-not-know side, against positions 1 and 2 on the know side. The official comparable trend starts in 2001; earlier integrated-file codes are not used. Post-election surveys, weighted from 2010.",
-      families: ["AES: politicians and ordinary people"],
-      series: [{ house: "aes", id: "politicians-know-people", label: "Politicians do not know", fam: 0,
-        sides: { a: /^Politicians don't know/, m: /^Midpoint/, b: /^Politicians know/ } }] },
     { kind: "rank", title: "How much does the political system need to change?", ref: R("state-of-politics-system", "redbridge"),
       base: "% choosing each", sort: false, relabel: {
         "The system is fine as it is and doesn't need any change": "It is fine as it is",
@@ -1091,37 +1151,42 @@ export const FEATURES = {
       names: ["positive", "negative"], show: 10 },
     { kind: "split", title: "Does the Greens’ change of leader change people’s vote?", ref: R("greens-leadership-vote-impact", "resolve"),
       names: ["more likely", "less likely"] },
+    { kind: "tracker", form: "longrun", key: "aes-democracy", copy: "democracy",
+      title: "How Australians see their democracy, at each election",
+      charts: [
+        { title: "Satisfied with how democracy works?", lines: [
+          { id: "satisfaction-democracy", key: "satisfied", label: "Satisfied", tone: "a", rx: /^(?:Very satisfied|Fairly satisfied)$/ },
+          { id: "satisfaction-democracy", key: "notSatisfied", label: "Not satisfied", tone: "b", rx: /^Not (?:very|at all) satisfied$/ } ] },
+        { title: "Who is government run for?", mid: { label: "Half and half", rx: /^About half and half$/ }, lines: [
+          { id: "government-big-interests", key: "bigInterests", label: "Big interests", tone: "b", rx: /run for the big interests$/ },
+          { id: "government-big-interests", key: "allPeople", label: "All the people", tone: "a", rx: /run for the benefit of all$/ } ] },
+        { title: "Do politicians know what people think?", mid: { label: "Midpoint", rx: /^Midpoint/ }, lines: [
+          { id: "politicians-know-people", key: "dontKnow", label: "Do not know", tone: "b", rx: /^Politicians don't know/ },
+          { id: "politicians-know-people", key: "know", label: "Know", tone: "a", rx: /^Politicians know/ } ] },
+      ],
+      note: "Satisfied combines very and fairly satisfied (the 1996 top answer was ‘Satisfied’), against not very or not at all. ‘Big interests’ combines entirely and mostly run for a few big interests. Politicians sit on a five-point scale: positions 4 and 5 against 1 and 2, the midpoint in the tooltip; its comparable trend starts in 2001. Weighted from 2010. Each reading sits on its election’s polling day; the survey is completed in the weeks after." },
   ],
 
-  "media": [
-    { kind: "tracker", key: "aes-campaign-tv", copy: "campaignTv", measure: "share",
-      title: "Campaign news on television: ‘a good deal’", names: ["a good deal", "less attention"],
-      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 60], yStep: 10,
-      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. Early exclusive-channel codes count as no television use. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
-      families: ["AES campaign news on television"],
-      series: [{ house: "aes", id: "campaign-news-tv", label: "A good deal of attention to TV campaign news", fam: 0,
-        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
-    { kind: "tracker", key: "aes-campaign-radio", copy: "campaignRadio", measure: "share",
-      title: "Campaign news on the radio: ‘a good deal’", names: ["a good deal", "less attention"],
-      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 40], yStep: 10,
-      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. Early exclusive-channel codes count as no radio use. The integrated release and official report contain no 2025 radio reading, so the series ends in 2022.",
-      families: ["AES campaign news on radio"],
-      series: [{ house: "aes", id: "campaign-news-radio", label: "A good deal of attention to radio campaign news", fam: 0,
-        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
-    { kind: "tracker", key: "aes-campaign-newspapers", copy: "campaignNewspapers", measure: "share",
-      title: "Campaign news in newspapers: ‘a good deal’", names: ["a good deal", "less attention"],
-      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 55], yStep: 10,
-      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. Early exclusive-channel codes count as no newspaper use. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
-      families: ["AES campaign news in newspapers"],
-      series: [{ house: "aes", id: "campaign-news-newspapers", label: "A good deal of attention to newspaper campaign news", fam: 0,
-        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
-    { kind: "tracker", key: "aes-campaign-internet", copy: "campaignInternet", measure: "share",
-      title: "Campaign news on the internet: ‘a good deal’", names: ["a good deal", "less attention"],
-      cols: ["A good deal", "Some", "Not much or none"], yDomain: [0, 40], yStep: 10,
-      note: "Only ‘a good deal’ is plotted, not everyone with at least some attention. The series begins in 1998. Post-election surveys, weighted from 2010. Waves are dated to the month after polling day.",
-      families: ["AES campaign news on the internet"],
-      series: [{ house: "aes", id: "campaign-news-internet", label: "A good deal of attention to internet campaign news", fam: 0,
-        sides: { a: /^A good deal$/, m: /^Some$/, b: /^(?:Not much|None at all)$/ } }] },
+
+  following: [
+    { kind: "tracker", form: "longrun", key: "aes-media", copy: "media",
+      title: "Where voters followed the campaign: ‘a good deal’ of attention",
+      charts: [
+        { title: null, mid: { label: "Some", rx: /^Some$/ }, lines: [
+          { id: "campaign-news-internet", key: "internet", label: "Internet", name: "the internet", tone: "c0", rx: /^A good deal$/ },
+          { id: "campaign-news-tv", key: "tv", label: "Television", name: "television", tone: "c1", rx: /^A good deal$/ },
+          { id: "campaign-news-newspapers", key: "papers", label: "Newspapers", name: "newspapers", tone: "c2", rx: /^A good deal$/ },
+          { id: "campaign-news-radio", key: "radio", label: "Radio", name: "radio", tone: "c3", rx: /^A good deal$/ } ] },
+      ],
+      note: "Only ‘a good deal’ is drawn; ‘some’ is in the tooltip and the table. Early answers that named one channel only count as no use of the others. The internet was first asked about in 1998; the 2025 survey carries no radio reading. Weighted from 2010. Each reading sits on its election’s polling day; the survey is completed in the weeks after." },
+    { kind: "tracker", form: "longrun", key: "aes-interest", copy: "interest",
+      title: "Interest in politics and in the campaign: ‘a good deal’",
+      charts: [
+        { title: null, mid: { label: "Some", rx: /^Some$/ }, lines: [
+          { id: "political-interest", key: "politics", label: "Politics", tone: "c0", rx: /^A good deal$/ },
+          { id: "campaign-interest", key: "campaign", label: "The campaign", tone: "c1", rx: /^A good deal$/ } ] },
+      ],
+      note: "Only ‘a good deal’ is drawn; ‘some’ is in the tooltip and the table. Interest in the campaign was first asked in 1993. Weighted in 1993 and from 2010, otherwise unweighted in the integrated release. Each reading sits on its election’s polling day; the survey is completed in the weeks after." },
   ],
 };
 
@@ -1779,12 +1844,14 @@ export function buildPublicOpinion(entries, { deff, rowKeys }) {
      Date-pinned comparisons must not swallow later imports of that same
      question: those still join the automatically displayed catalogue. */
   const used = new Map();
-  const refsOf = (spec) => (spec.kind === "tracker" ? spec.series.map((s) => ({ id: s.id, house: s.house }))
+  const refsOf = (spec) => (spec.form === "longrun" ? spec.charts.flatMap((c) => c.lines.map((l) => ({ id: l.id, house: "aes" })))
+    : spec.kind === "tracker" ? spec.series.map((s) => ({ id: s.id, house: s.house }))
     : spec.mode === "compare" ? spec.items.map((it) => it.ref) : [spec.ref]);
   const topics = THEMES.map((t) => {
     const specs = FEATURES[t.id] || [];
     const blocks = specs.map((spec) => {
-      const b = spec.kind === "tracker" ? buildTracker(spec, ix, deff, rowKeys)
+      const b = spec.form === "longrun" ? buildLongRun(spec, ix, deff)
+        : spec.kind === "tracker" ? buildTracker(spec, ix, deff, rowKeys)
         : spec.kind === "split" ? buildSplit(spec, ix, deff)
         : spec.kind === "stack" ? buildStack(spec, ix, deff)
         : spec.kind === "rank" ? buildRank(spec, ix)
@@ -1850,12 +1917,20 @@ export function buildPublicOpinion(entries, { deff, rowKeys }) {
       { h: b.h, n: b.ids.size, t: THEMES.filter((t) => b.th.has(t.id)).map((t) => t.short),
         w: [...b.ws].sort().reverse() }])),
     counts: {
-      questions: new Set(shown.map((e) => e.id + "|" + e.house)).size,
+      /* this term's questions; the AES long run's are counted apart */
+      questions: new Set(shown.filter((e) => e.house !== "aes").map((e) => e.id + "|" + e.house)).size,
+      longRun: new Set(shown.filter((e) => e.house === "aes").map((e) => e.id)).size,
       waves: shown.length,
       featured: topics.reduce((n, t) => n + t.blocks.length, 0),
       cut: new Set(entries.filter((e) => themeOf(e.id) === "cut").map((e) => e.id)).size,
     },
-    first: shown.reduce((m, e) => ((e.dateEnd || e.waveDate) < m ? (e.dateEnd || e.waveDate) : m), "9999"),
+    /* the term's span: the AES long run reaches back to 1987 and is
+       counted apart (`longRun`), so "since" still names this term's start */
+    first: shown.filter((e) => e.house !== "aes").reduce((m, e) => ((e.dateEnd || e.waveDate) < m ? (e.dateEnd || e.waveDate) : m), "9999"),
+    longRun: (() => {
+      const ds = [...new Set(shown.filter((e) => e.house === "aes").map((e) => AES_POLLING_DAY[e.waveDate]))].sort();
+      return ds.length ? { house: "aes", elections: ds.length, first: ds[0], last: ds[ds.length - 1] } : null;
+    })(),
     topics,
   };
 }
@@ -2121,5 +2196,5 @@ const TITLES = {
 };
 
 /* the rules, for .build/test-public-opinion.mjs to pin branch by branch */
-export const __test = { classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows, pairsOf,
+export const __test = { sincePrev, offExtreme, sinceFirst, rangeOf, LONG_COPY, classify, splitOf, leadOf, tallyOf, wavesSummary, TRACKER_COPY, tableRows, pairsOf,
   splitFinding, tallyFinding, rankFinding, findingMeta, tidyTitle, tidyHead, unpack, groupOf, matchKey, figuresOf };

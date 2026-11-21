@@ -280,6 +280,8 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     } else if (b.kind === "stack") {
       assert.ok(b.rows.length >= 2, `${b.title} has rows`);
       for (const r of b.rows) { r.segs.forEach(seg); assert.ok(r.a + r.b + r.m <= 101.5, `${b.title}: a row fits its track`); }
+    } else if (b.kind === "tracker" && b.form === "longrun") {
+      assert.ok(b.head && b.dek && b.charts.length >= 1, `${b.title} carries its head, dek and charts`);
     } else if (b.kind === "tracker") {
       for (const p of b.panels) for (const q of p.points)
         assert.ok(q.v >= b.yDomain[0] && q.v <= b.yDomain[1], `${b.title}: ${p.house} ${q.field.end} sits inside the chart`);
@@ -315,61 +317,87 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     [["A good deal", 32.5], ["Some", 38.6], ["Not much", 20.9], ["None at all", 8]]);
   assert.deepEqual(aes.find((e) => e.id === "political-interest" && e.waveDate === "1987-08").tables[0].rows,
     [["A good deal", 35.2], ["Some", 44.9], ["Not much", 15.2], ["None at all", 4.7]]);
-  const aesBlocks = out.topics.find((t) => t.id === "trust-democracy").blocks;
-  const pol = aesBlocks.find((b) => b.id === "aes-political-interest"), camp = aesBlocks.find((b) => b.id === "aes-campaign-interest");
-  assert.equal(pol.panels[0].points.length, 14);
-  assert.equal(camp.panels[0].points.length, 12);
-  const polLast = pol.panels[0].points.at(-1);
-  assert.equal(polLast.v, 33.3);
-  assert.equal(polLast.m, 41.9);
-  assert.equal(polLast.b, 24.7);
-  assert.equal(polLast.neff, 1034.5, "AES change calls use its own effective sample, not a generic design effect");
-  assert.equal(pol.head, "Deep interest in politics has held up since 1987");
-  assert.equal(camp.head, "Deep interest in the election campaign has fallen since 1993");
-  const big = aesBlocks.find((b) => b.id === "aes-big-interests"), know = aesBlocks.find((b) => b.id === "aes-politicians-know");
+  /* the long run (form "longrun"): four blocks, never ahead of a topic's
+     own polls, every line on election years with both sides drawn */
+  const lr = (tid) => out.topics.find((t) => t.id === tid).blocks.filter((b) => b.form === "longrun");
+  const line = (b, key) => b.panels.find((p) => p.key === key);
+  for (const tid of ["cost-of-living", "trust-democracy"]) {
+    const bs = out.topics.find((t) => t.id === tid).blocks;
+    assert.ok(bs[0].form !== "longrun", `${tid}: the topic's finding reads this term's poll, not the AES`);
+    assert.ok(bs.findIndex((b) => b.form === "longrun") === bs.length - lr(tid).length, `${tid}: the long run closes the topic's blocks`);
+  }
+  assert.deepEqual(lr("following").map((b) => b.id), ["aes-media", "aes-interest"]);
+  assert.equal(Object.values(THEME_OF).filter((t) => t === "media").length, 0, "no AES-only Campaign news topic");
+  const [econ] = lr("cost-of-living"), [demo] = lr("trust-democracy"), [media, interest] = lr("following");
+  for (const b of [econ, demo, media, interest]) {
+    assert.equal(b.kind, "tracker", `${b.id}: counts as a chart wherever the page counts charts`);
+    for (const p of b.panels) {
+      assert.equal(p.house, "aes");
+      for (const q of p.points) {
+        assert.ok(q.v >= b.yDomain[0] && q.v <= b.yDomain[1], `${b.id}/${p.key} ${q.year} sits inside the chart`);
+        assert.equal(q.field.end.slice(0, 4), String(q.year), "a reading sits on its election's polling day");
+      }
+    }
+  }
+  /* polling day, not the store's month-after marker */
+  assert.equal(line(interest, "politics").points[0].field.end, "1987-07-11");
+  assert.equal(line(econ, "natWorse").points.at(-1).field.end, "2025-05-03");
+  assert.deepEqual(interest.elections.slice(0, 2), [1987, 1990]);
+  /* both sides of a two-sided question, the middle in mid */
+  const nw = line(econ, "natWorse").points.at(-1), nb = line(econ, "natBetter").points.at(-1);
+  assert.deepEqual([nb.v, nw.mid, nw.v], [13.2, 27.4, 59.4]);
+  const hw = line(econ, "hhWorse").points.at(-1), hb = line(econ, "hhBetter").points.at(-1);
+  assert.deepEqual([hb.v, hw.mid, hw.v], [16.1, 37, 46.8]);
+  assert.equal(econ.yDomain[1], 80, "household and nation share one scale");
+  const bi = line(demo, "bigInterests").points.at(-1), ap = line(demo, "allPeople").points.at(-1);
+  assert.deepEqual([bi.v, ap.v, bi.mid], [50, 13.6, 36.5]);
+  const dk = line(demo, "dontKnow").points.at(-1), kn = line(demo, "know").points.at(-1);
+  assert.deepEqual([dk.v, kn.v, dk.mid], [49, 16.4, 34.6]);
+  assert.deepEqual([line(demo, "satisfied").points.at(-1).v, line(demo, "notSatisfied").points.at(-1).v], [70, 30]);
+  assert.equal(line(demo, "satisfied").points.length, 11);
+  assert.equal(line(demo, "bigInterests").points.length, 10);
+  assert.equal(line(demo, "dontKnow").points.length, 9);
+  assert.equal(line(interest, "politics").points.length, 14);
+  assert.equal(line(interest, "campaign").points.length, 12);
+  assert.equal(line(interest, "politics").points.at(-1).neff, 1034.5, "AES change calls use its own effective sample, not a generic design effect");
+  assert.equal(line(media, "radio").points.at(-1).year, 2022, "no 2025 radio point is invented");
+  assert.deepEqual([line(media, "internet").points.at(-1).v, line(media, "tv").points.at(-1).v, line(media, "papers").points.at(-1).v], [32.2, 22, 9.9]);
+  /* rule-written copy, gated on the margins */
+  assert.equal(econ.head, "Most voters said the national economy had got worse in the year before the 2025 election");
+  assert.match(econ.dek, /national ‘worse’ share is down from 67% in 2022/);
+  assert.match(econ.dek, /household ‘worse’ share is up from 41% in 2022/);
+  assert.equal(demo.head, "70% were satisfied with how democracy works after the 2025 election, up from a low of 59% in 2019");
+  assert.match(demo.dek, /big-interests share is much the same as in 1998/);
+  assert.equal(media.head, "The internet now draws the most close attention to campaign news: 32% followed it a good deal in 2025, against 22% for television");
+  assert.match(media.dek, /Radio: 12% in 2022 \(no 2025 reading\)/);
+  assert.equal(interest.head, "Interest in politics is where it was in 1987: 33% took a good deal after the 2025 election");
+  assert.match(interest.dek, /in the campaign, down from 50% in 1993/);
+  assert.equal(findingMeta(media), "Australian Election Study, 14 elections since 1987");
+  /* the copy helpers' gates, on made-up lines */
+  const mk = (...vs) => ({ points: vs.map(([year, v, se]) => ({ year, v, se })) });
+  assert.equal(__test.sincePrev(mk([2019, 40, 1.5], [2022, 41, 1.5])), "much the same as in 2019");
+  assert.equal(__test.sincePrev(mk([2019, 40, 1.5], [2022, 46, 1.5])), "up from 40% in 2019");
+  assert.equal(__test.offExtreme(mk([2013, 60, 1.5], [2016, 50, 1.5], [2019, 52, 1.5], [2022, 61, 1.5])), "up from a low of 50% in 2016");
+  assert.equal(__test.offExtreme(mk([2013, 60, 1.5], [2016, 59, 1.5], [2019, 60, 1.5], [2022, 61, 1.5])), null, "no extreme it has clearly left");
+  /* the payload counts this term apart from the long run */
+  assert.ok(out.first >= "2025-01-01", "the page's 'since' names this term, not 1987");
+  assert.deepEqual([out.longRun.house, out.longRun.first, out.longRun.elections], ["aes", "1987-07-11", 14]);
+  assert.equal(out.counts.longRun, 11);
   assert.equal(waves("government-big-interests", "aes")[0], "1998-11", "the big-interests trend starts with its published 1998 reading");
   assert.equal(waves("politicians-know-people", "aes")[0], "2001-12", "the representation trend does not backfill the incompatible 1996/1998 codes");
-  assert.equal(big.panels[0].points.length, 10);
-  assert.equal(know.panels[0].points.length, 9);
-  const bigLast = big.panels[0].points.at(-1), knowLast = know.panels[0].points.at(-1);
-  assert.deepEqual([bigLast.v, bigLast.b, bigLast.m], [50, 13.6, 36.5]);
-  assert.deepEqual([knowLast.v, knowLast.b, knowLast.m], [49, 16.4, 34.6]);
   assert.deepEqual(aes.find((e) => e.id === "government-big-interests" && e.waveDate === "2025-06").tables[0].rows,
     [["Entirely run for the big interests", 17.3], ["Mostly run for the big interests", 32.7], ["About half and half", 36.5],
       ["Mostly run for the benefit of all", 12.9], ["Entirely run for the benefit of all", 0.7]]);
   assert.deepEqual(aes.find((e) => e.id === "politicians-know-people" && e.waveDate === "2025-06").tables[0].rows,
     [["Politicians know what ordinary people think — 1", 2.8], ["Politicians know what ordinary people think — 2", 13.6], ["Midpoint — 3", 34.6],
       ["Politicians don't know what ordinary people think — 4", 24.4], ["Politicians don't know what ordinary people think — 5", 24.6]]);
-  assert.equal(big.head, "50% say government is run for a few big interests");
-  assert.equal(know.head, "49% say federal politicians do not know what ordinary people think");
-  const sat = aesBlocks.find((b) => b.id === "aes-democratic-satisfaction");
-  assert.equal(sat.panels[0].points.length, 11);
-  assert.equal(sat.cols[1], null, "democracy has no invented neutral column");
-  assert.deepEqual([sat.panels[0].points.at(-1).a, sat.panels[0].points.at(-1).b], [70, 30]);
-  assert.equal(sat.head, "70% are satisfied with the way democracy works");
   assert.deepEqual(aes.find((e) => e.id === "satisfaction-democracy" && e.waveDate === "2025-06").tables[0].rows,
     [["Very satisfied", 16.3], ["Fairly satisfied", 53.7], ["Not very satisfied", 18.3], ["Not at all satisfied", 11.7]]);
-  const econ = out.topics.find((t) => t.id === "cost-of-living").blocks;
-  const homeEcon = econ.find((b) => b.id === "aes-household-economy"), nationalEcon = econ.find((b) => b.id === "aes-national-economy");
   assert.equal(waves("household-economy-year", "aes")[0], "1987-08");
-  assert.deepEqual([homeEcon.panels[0].points.at(-1).v, homeEcon.panels[0].points.at(-1).m, homeEcon.panels[0].points.at(-1).b], [16.1, 37, 46.8]);
-  assert.deepEqual([nationalEcon.panels[0].points.at(-1).v, nationalEcon.panels[0].points.at(-1).m, nationalEcon.panels[0].points.at(-1).b], [13.2, 27.4, 59.4]);
-  assert.equal(homeEcon.panels[0].points.length, 14);
-  assert.equal(nationalEcon.panels[0].points.length, 14);
-  assert.equal(homeEcon.head, "47% say their household finances are worse than a year ago");
-  assert.equal(nationalEcon.head, "59% say the national economy is worse than a year ago");
-  const news = out.topics.find((t) => t.id === "media").blocks;
-  const tv = news.find((b) => b.id === "aes-campaign-tv"), radio = news.find((b) => b.id === "aes-campaign-radio");
-  const papers = news.find((b) => b.id === "aes-campaign-newspapers"), internet = news.find((b) => b.id === "aes-campaign-internet");
   for (const [id, count] of [["campaign-news-tv", 14], ["campaign-news-radio", 13], ["campaign-news-newspapers", 14], ["campaign-news-internet", 10]])
     assert.equal(waves(id, "aes").length, count, `${id}: the full comparable channel series`);
   assert.equal(waves("campaign-news-radio", "aes").at(-1), "2022-06", "no 2025 radio point is invented");
   assert.equal(aes.find((e) => e.id === "campaign-news-tv" && e.waveDate === "1987-08").sample, 1818, "early exclusive-channel answers stay in television's base");
-  assert.deepEqual([tv.panels[0].points.at(-1).v, tv.panels[0].points.at(-1).m, tv.panels[0].points.at(-1).b], [22, 36, 42]);
-  assert.deepEqual([papers.panels[0].points.at(-1).v, papers.panels[0].points.at(-1).m, papers.panels[0].points.at(-1).b], [9.9, 19.7, 70.4]);
-  assert.deepEqual([internet.panels[0].points.at(-1).v, internet.panels[0].points.at(-1).m, internet.panels[0].points.at(-1).b], [32.2, 33.5, 34.2]);
-  assert.equal(internet.head, "Attention to internet campaign news is higher since 1998");
-  assert.equal(radio.panels[0].points.at(-1).field.end, "2022-06");
   assert.deepEqual(waves("happiness-personal", "essential"), ["2026-09-29"], "happiness: one wave, the 30 Sep 2026 report's");
   assert.deepEqual(entries.find((e) => e.id === "happiness-personal").tables[0].rows[0], ["My life overall", 6.4], "happiness: its chart's Sep'26 point is the wave's all-voters figure");
   for (const id of ["melbourne-cup-attitudes", "melbourne-cup-betting", "melbourne-cup-interest"])

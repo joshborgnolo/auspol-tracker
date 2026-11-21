@@ -148,6 +148,10 @@
      copy-as-image legend resolves them outside the page's tree. */
   --pubop-w0: oklch(0.50 0.105 305);
   --pubop-w1: oklch(0.60 0.115 83);
+  /* the AES long run's two further channel inks (newspapers, radio); the
+     internet and television wear the wording pair above. No valence. */
+  --pubop-c2: oklch(0.52 0.090 150);
+  --pubop-c3: oklch(0.56 0.015 260);
 
   /* The change indicator's direction colours. The standing rule elsewhere is
      that "up" is not inherently good – which is why the NET and the mood axis
@@ -276,6 +280,8 @@ body.dark {
      check passes on the dark surface and paper (2026-10-18) */
   --pubop-w0: oklch(0.66 0.110 305);
   --pubop-w1: oklch(0.67 0.115 83);
+  --pubop-c2: oklch(0.68 0.090 150);
+  --pubop-c3: oklch(0.70 0.015 260);
   /* the change indicator, lifted the same way */
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
@@ -5717,6 +5723,22 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 .pubop-ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--ink-3); }
 .pubop-rl0 { display: inline-block; width: 18px; height: 0; border-top: 1px dashed var(--ink-3); }
 .pubop-ledger { margin-top: 14px; }
+/* the AES long run: a topic's closing section under its own subhead, one
+   to three charts a block on one scale, side by side once they fit */
+.pubop-lrs { margin-top: 36px; }
+.pubop-lrhd { padding-top: 16px; border-top: 1px solid var(--line); }
+.pubop-lrh { margin: 0; font-family: var(--sans); font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+.pubop-lrp { margin: 4px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.5; color: var(--ink-3); text-wrap: pretty; }
+.pubop-lrhd + .pubop-lr { margin-top: 20px; }
+.pubop-lrsrc { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+.pubop-lrsrc a { color: inherit; }
+.pubop-lrg { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px 32px; margin-top: 14px; }
+.pubop-lrc { min-width: 0; }
+.pubop-lrt { margin: 0 0 2px; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink-2); }
+.pubop-lr .pubop-note { margin-top: 10px; max-width: 96ch; }
+.pubop-lrcap { caption-side: top; padding: 12px 0 4px; text-align: left; font-size: 13px; font-weight: 600; color: var(--ink); }
+@media (min-width: 640px) { .pubop-lr-m2 .pubop-lrg { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 960px) { .pubop-lr-m3 .pubop-lrg { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* the questions: a row each, parted by hairlines – what was asked and by
    whom on the left, the answers on the right, the two stacked where they
