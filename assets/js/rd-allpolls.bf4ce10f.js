@@ -2155,7 +2155,7 @@ const rdLgPanelGo = (id, p) => {
     if (bo && window.AP.gotoOpinion) window.AP.gotoOpinion(bo.h, bo.w && bo.w[0]);
   }
 };
-function rdLgNoSignificantChanges(p, keys) {
+function rdLgSignificantChanges(p, keys) {
   const changes = p.chg && p.chg.d || {},
     refs = p.chg && p.chg.r || {};
   const nOf = q => q.sampleEff != null ? q.sampleEff : q.sample ? q.sample / rdApDeff() : null;
@@ -2163,25 +2163,47 @@ function rdLgNoSignificantChanges(p, keys) {
   if (!(n > 0)) return null;
   const deltas = keys.map(k => changes[k]).filter(v => v != null);
   if (!deltas.length) return null;
-  const allPolls = window.AUSPOL.individualPolls;
+  const allPolls = window.AUSPOL.individualPolls,
+    significant = [];
   for (const k of keys) {
     const d = changes[k];
     if (d == null) continue;
     const prev = allPolls.find(q => q.pollster === p.pollster && q.released === refs[k]);
     const np = prev && nOf(prev);
     if (!(np > 0)) return null;
-    if (Math.abs(d) > 196 * Math.sqrt(0.25 * (1 / n + 1 / np))) return false;
+    if (Math.abs(d) > 196 * Math.sqrt(0.25 * (1 / n + 1 / np))) significant.push(k);
   }
-  return true;
+  return significant;
+}
+function rdLgChgLabel(p, k) {
+  const fixed = {
+    pAlp: "ALP",
+    pLnp: "L/NP",
+    pGrn: "GRN",
+    pOnp: "ON",
+    pOth: "OTH",
+    und: "undecided",
+    imp: "implied Labor v Coalition",
+    impOn: "implied Labor v One Nation",
+    alp2pp: "published Labor v Coalition",
+    altAlpOn: "published Labor v One Nation"
+  }[k];
+  if (fixed) return fixed;
+  const id = k.startsWith("alb") ? "alb" : k.startsWith("taylor") ? "taylor" : "hanson";
+  const name = id === "taylor" ? (p.appr || {}).oppName || rdLgWho(p, id) : rdLgWho(p, id);
+  const fav = k.endsWith("Fav") || ((p.appr || {}).metricBy || {})[id] === "fav";
+  return name + (fav ? " net favourability" : " net approval");
 }
 function rdLgChgNote(p, keys) {
   const r = p.chg && p.chg.r || {};
   const refs = [...new Set(keys.map(k => r[k]).filter(Boolean))];
   if (!refs.length) return null;
-  const none = rdLgNoSignificantChanges(p, keys) === true ? " (none significant)" : "";
-  if (refs.length > 1) return "▲▼ Changes are on each figure’s previous " + p.pollster + " poll" + none + ".";
+  const significant = rdLgSignificantChanges(p, keys);
+  const names = significant && significant.map(k => rdLgChgLabel(p, k));
+  const verdict = !significant ? "" : significant.length ? " (only " + (names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0]) + " significant)" : " (none significant)";
+  if (refs.length > 1) return "▲▼ Changes are on each figure’s previous " + p.pollster + " poll" + verdict + ".";
   const prev = window.AUSPOL.individualPolls.find(x => x.pollster === p.pollster && x.released === refs[0]);
-  return prev ? "▲▼ Changes are on " + p.pollster + "’s " + prev.field + " poll" + none + "." : null;
+  return prev ? "▲▼ Changes are on " + p.pollster + "’s " + prev.field + " poll" + verdict + "." : null;
 }
 function rdLgMoe(p) {
   const ms = [p.alpOnImp != null ? rdPollMargin(p, "onp", false) : null, p.alpImp != null ? rdPollMargin(p, "lnp", false) : null].filter(m => m != null);
