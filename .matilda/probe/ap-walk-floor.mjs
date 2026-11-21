@@ -101,7 +101,9 @@ for (const W of widths) {
     return out;
   });
   if (stacks[".rd-ap-storyvar"] !== "ABSENT" || stacks[".rd-ap-ctlvar"] !== "ABSENT") bad(W, "a retired measurement stack is back " + JSON.stringify(stacks));
-  if (!/^hidden h0$/.test(stacks[".rd-ap-ebvar"])) bad(W, "the eyebrow stack paints or holds height " + stacks[".rd-ap-ebvar"]);
+  // the eyebrow (and its .rd-ap-ebvar measuring stack) went with the page
+  // heading on 2026-11-21 (user: "remove both")
+  if (stacks[".rd-ap-ebvar"] !== "ABSENT") bad(W, "the retired eyebrow stack is back " + stacks[".rd-ap-ebvar"]);
   /* shallow: the tab row 300px down the screen */
   await page.evaluate(() => { const t = document.querySelector(".rd-ap-tabs").getBoundingClientRect().top + scrollY; window.scrollTo(0, t - 300); });
   await sleep(500);

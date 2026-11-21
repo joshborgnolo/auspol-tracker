@@ -2813,29 +2813,6 @@ function RdAllPolls(P) {
   const [hedHold, setHedHold] = useState(0);
   const hedW0 = rdWords(head), hedW1 = rdWords(dek);
   const ctlRow = ctlNarrow && (facet === "twopp" || facet === "demographics" || facet === "primary" || facet === "confidence");
-  /* the eyebrow sits above the tab row, the pin's anchor, so it walks a
-     floor (the 6f25cf4 walk floor): Confidence's title and meta are both
-     the longer pair, and past the phone wrap widths its meta alone went
-     to a second line and lifted the whole section-head row 18px over the
-     walk (user report 2026-10-08). The two states measure
-     invisibly in .rd-ap-ebvar so only the words swap, never a height */
-  const ebVarRef = useRef(null);
-  const [ebFloor, setEbFloor] = useState(0);
-  React.useLayoutEffect(() => {
-    const box = ebVarRef.current;
-    if (!box) return undefined;
-    const measure = () => {
-      let h = 0;
-      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
-      h = Math.ceil(h - 0.01);
-      setEbFloor((f) => (f === h ? f : h));
-    };
-    measure();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const ro = new ResizeObserver(measure);
-    [...box.children].forEach((c) => ro.observe(c));
-    return () => ro.disconnect();
-  }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
 
   /* ---- paging, by whole months ---------------------------------------------- */
@@ -4099,24 +4076,12 @@ function RdAllPolls(P) {
     </RdQPop>
   );
 
-  /* the eyebrow's copy by facet pair, written once so .rd-ap-ebvar can
-     lay both states out invisibly for the eyebrow floor above. keyId
-     keeps the section's aria-labelledby id on the live copy only */
-  const eyebrowCopy = (conf, keyId) => (<>
-    <h2 className="rd-title" {...(keyId ? { id: "rd-ap-t" } : {})}>{conf ? "Economic sentiment" : "All polls"}</h2>
-    <span className="rd-meta">{conf
-      ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election"
-      : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
-  </>);
   return (
     <section className="rd-sec rd-first rd-ap" id="rd-ap-top" aria-labelledby="rd-ap-t" data-facet={facet}>
-      <div className="rd-eyebrow" style={ebFloor ? { minHeight: ebFloor + "px" } : null}>
-        {eyebrowCopy(facet === "confidence", true)}
-      </div>
-      <div className="rd-ap-ebvar" ref={ebVarRef} aria-hidden="true">
-        <div className="rd-eyebrow">{eyebrowCopy(false, false)}</div>
-        <div className="rd-eyebrow">{eyebrowCopy(true, false)}</div>
-      </div>
+      {/* no visible page heading (user call 2026-11-21, "remove both"): the
+          site tab already names the page, so it opens on the facet tabs. The
+          section keeps its name for screen readers */}
+      <h2 className="sr-only" id="rd-ap-t">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
       <RdTabs swipe value={facet} onChange={facetPick} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
         {facet === "twopp" && !ctlNarrow && (
           <span className="rd-pl-ctl">

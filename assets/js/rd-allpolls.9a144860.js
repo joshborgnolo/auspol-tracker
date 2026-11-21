@@ -3755,23 +3755,6 @@ function RdAllPolls(P) {
   const hedW0 = rdWords(head),
     hedW1 = rdWords(dek);
   const ctlRow = ctlNarrow && (facet === "twopp" || facet === "demographics" || facet === "primary" || facet === "confidence");
-  const ebVarRef = useRef(null);
-  const [ebFloor, setEbFloor] = useState(0);
-  React.useLayoutEffect(() => {
-    const box = ebVarRef.current;
-    if (!box) return undefined;
-    const measure = () => {
-      let h = 0;
-      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
-      h = Math.ceil(h - 0.01);
-      setEbFloor(f => f === h ? f : h);
-    };
-    measure();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const ro = new ResizeObserver(measure);
-    [...box.children].forEach(c => ro.observe(c));
-    return () => ro.disconnect();
-  }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
   const byDate = (sort.key === "date" || sort.key === "pub") && sort.dir < 0;
   const gym = sort.key === "pub" ? p => p.published ? p.published.slice(0, 7) : p.ym : p => p.ym;
@@ -3913,6 +3896,10 @@ function RdAllPolls(P) {
       const s = sentRef.current,
         h = headRef.current;
       if (!s || !h) return;
+      if (!s.getClientRects().length) {
+        setPinned(false);
+        return;
+      }
       const pin = parseFloat(getComputedStyle(h).top) || 0;
       setPinned(s.getBoundingClientRect().top < pin - 1);
     };
@@ -3927,11 +3914,15 @@ function RdAllPolls(P) {
       passive: true
     });
     window.addEventListener("resize", onResize);
+    const sec = headRef.current && headRef.current.closest(".rd-ap");
+    const ro = typeof ResizeObserver !== "undefined" && sec ? new ResizeObserver(onResize) : null;
+    if (ro) ro.observe(sec);
     fit();
     check();
     return () => {
       window.removeEventListener("scroll", on);
       window.removeEventListener("resize", onResize);
+      if (ro) ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
   }, [phone]);
@@ -5459,32 +5450,15 @@ function RdAllPolls(P) {
     label: "What voting consideration figures are, and which waves collected them",
     align: "left"
   }, React.createElement("p", null, "Voting consideration is the share of voters who name a party as one they ", React.createElement("i", null, "would consider"), " supporting \u2014 a looser yardstick than voting intention, the party the voter does intend. YouGov and Essential have asked it; every other wave stays on intention, and on a wave without consideration figures the intention figure stands."));
-  const eyebrowCopy = (conf, keyId) => React.createElement(React.Fragment, null, React.createElement("h2", _extends({
-    className: "rd-title"
-  }, keyId ? {
-    id: "rd-ap-t"
-  } : {}), conf ? "Economic sentiment" : "All polls"), React.createElement("span", {
-    className: "rd-meta"
-  }, conf ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"));
   return React.createElement("section", {
     className: "rd-sec rd-first rd-ap",
     id: "rd-ap-top",
     "aria-labelledby": "rd-ap-t",
     "data-facet": facet
-  }, React.createElement("div", {
-    className: "rd-eyebrow",
-    style: ebFloor ? {
-      minHeight: ebFloor + "px"
-    } : null
-  }, eyebrowCopy(facet === "confidence", true)), React.createElement("div", {
-    className: "rd-ap-ebvar",
-    ref: ebVarRef,
-    "aria-hidden": "true"
-  }, React.createElement("div", {
-    className: "rd-eyebrow"
-  }, eyebrowCopy(false, false)), React.createElement("div", {
-    className: "rd-eyebrow"
-  }, eyebrowCopy(true, false))), React.createElement(RdTabs, {
+  }, React.createElement("h2", {
+    className: "sr-only",
+    id: "rd-ap-t"
+  }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement(RdTabs, {
     swipe: true,
     value: facet,
     onChange: facetPick,

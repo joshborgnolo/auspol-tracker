@@ -32,7 +32,6 @@ const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new"
 const page = await browser.newPage();
 page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300)); fails++; });
 
-const CONF_META = "Every confidence-index release (business and consumer) since the 2025 election";
 const LAB = { twopp: "2PP", primary: "Primary", leadership: /^Leader/, direction: "Direction", issues: "Issues", demographics: "Demographics", confidence: "Confidence" };
 const IDS = Object.keys(LAB);
 const open = async (w, qs = "") => {
@@ -53,8 +52,8 @@ const hed = () => page.evaluate(() => ({
   facet: document.querySelector(".rd-ap").dataset.facet,
   head: (document.querySelector(".rd-ap h2.rd-hed") || {}).textContent || null,
   dek: (document.querySelector(".rd-ap p.rd-dek") || {}).textContent || null,
-  title: (document.querySelector(".rd-ap h2.rd-title") || {}).textContent || null,
-  meta: (document.querySelector(".rd-ap .rd-eyebrow .rd-meta") || {}).textContent || null,
+  title: (document.querySelector(".rd-ap > h2.sr-only") || {}).textContent || null,
+  eyebrow: !!document.querySelector(".rd-ap .rd-eyebrow"),
 }));
 
 /* 1. a head and dek of its own on every facet */
@@ -75,8 +74,10 @@ for (const id of IDS) {
 }
 check(seen.issues.dek !== seen.demographics.dek, "distinct deks");
 check(/ leads on |No party’s lead on any issue/.test(seen.issues.dek) && !/Below is every/.test(seen.issues.dek), "Issues dek names the clear leads, no boilerplate");
-check(seen.confidence.title === "Economic sentiment" && seen.confidence.meta === CONF_META, "Confidence chrome intact (title + trimmed meta)");
-check(seen.twopp.meta && seen.twopp.meta.includes("poll since"), "poll-facet meta unchanged");
+// no visible page heading since 2026-11-21 (user: "remove both"); the
+// section keeps its name for screen readers, Economic sentiment on Confidence
+check(seen.confidence.title === "Economic sentiment" && !seen.confidence.eyebrow, "Confidence: no visible heading, screen-reader title Economic sentiment");
+check(seen.twopp.title === "All polls" && !seen.twopp.eyebrow, "poll facets: no visible heading, screen-reader title All polls");
 /* the demographics head follows the split picker */
 await pick("demographics");
 await sleep(400);

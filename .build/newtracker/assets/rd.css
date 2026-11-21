@@ -4439,3 +4439,11 @@ body.rd [role="button"]:focus-visible { outline: 2px solid var(--accent); outlin
 body.rd .rd-ap-search input:focus-visible, body.rd .pubop-search input:focus-visible { outline: none; }
 /* the election reading's pollsters with no final poll on record, under the rows */
 body.rd .rd-hl-none { margin: 8px 0 0 12px; font-size: 13px; color: var(--ink-3); }
+
+/* All polls and Past cycles open on their tab row now that the page
+   heading is gone (2026-11-21, user: "remove both"): the row's top margin
+   was its distance from that heading, so with only the screen-reader title
+   before it the row sits at the section's own top padding - where the
+   first heading sits on Now */
+body.rd .rd-ap > h2.sr-only + .rd-ap-tabs,
+body.rd #cyc-summary > h2.sr-only + .rd-cc { margin-top: 0; }

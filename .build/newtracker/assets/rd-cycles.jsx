@@ -1417,7 +1417,6 @@ function RdPastCycles(p) {
     </RdKey>
   );
   /* the list reads as one sentence, "and" before the last and no commas */
-  const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls have done"]];
   /* The Draw-a-term chip and its drawn-over-the-band pills hang over each
      vote-and-leadership section's divider (user call 2026-10-17: the same
      door above the Primary vote and Leadership header lines as Two-party's).
@@ -1457,11 +1456,11 @@ function RdPastCycles(p) {
   return (
     <div className="view view-cycles rd-cycles">
       <section className="rd-sec rd-first" id="cyc-summary" aria-labelledby="rd-cyc-t">
-        <div className="rd-eyebrow">
-          <h2 className="rd-title" id="rd-cyc-t">Past cycles</h2>
-          <span className="rd-meta">Every term since {cycles[0].year}, lined up on its own election day</span>
-          {!narrow && <nav className="rd-eyebrow-tools rd-cyc-nav" aria-label="On this page">{navs.map(([id, lab], i) => <button key={id} type="button" onClick={() => goTo(id)}>{(i === navs.length - 1 ? "and " : "") + lab}</button>)}</nav>}
-        </div>
+        {/* no visible page heading (user call 2026-11-21, "remove both"):
+            the site tab names the page, and its on-this-page links went with
+            the heading row (phones never had them); every section is a
+            scroll away */}
+        <h2 className="sr-only" id="rd-cyc-t">Past cycles</h2>
         {controls}
         <div className="rd-cyc-storyslot" style={storyHold ? { minHeight: storyHold + "px" } : null}>
           <RdHed head={pageStory.head} dek={pageStory.dek} level={2} />
