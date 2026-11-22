@@ -671,7 +671,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         if (q.count || q.elec) return [{ label: "", value: "The election result" }];
         if (!q.cur) return [{ label: "", value: "Drawn through the election results" }];
         const d = pts.find((r) => r.x === q.x);
-        return d && d.ci ? [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }] : [];
+        return d && d.ci ? visible.map((p) => ({ label: "95% intervals", value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"), rowLabel: p.name })) : [];
       },
       bridges, unmeasured,
       ticks: rdVwTicks(vwWin, vwTerms),
@@ -951,7 +951,7 @@ function RdPrimary({ rangeId, setRangeId }) {
                   : "Australian Election Study 2025, " + evGrp.aesN.toLocaleString() + " respondents" }];
             const d = pts[elecStop ? i - 1 : i];
             if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
-            return [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }];
+            return visible.map((p) => ({ label: "95% intervals", value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"), rowLabel: p.name }));
           }}
           /* a group view's dot is drawn at a lifted y (the trend plus this
              wave's group-vs-all-voters gap) but tips the figure the wave
@@ -1473,8 +1473,10 @@ function RdLeadership({ rangeId }) {
   const ciRows = (series, i, spine) => {
     const r = spine[i];
     if (!r) return [];
-    const cs = series.map((s) => { const p = s.points.find((q) => q.ym === r.ym); return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null; }).filter(Boolean);
-    return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : [];
+    return series.map((s) => {
+      const p = s.points.find((q) => q.ym === r.ym);
+      return p && p.ci != null ? { label: "95% intervals", value: "±" + p.ci.toFixed(1), rowLabel: s.label } : null;
+    }).filter(Boolean);
   };
   const leadSeries = kept("leadSeries", () => J ? (() => {
     /* /vic/: one line per PAIRING, so a change of Premier breaks the line
@@ -1759,7 +1761,16 @@ function RdLeadership({ rangeId }) {
             legend: [], caption: keyDots + " Polls by " + apprBy(true) + "." }
         : { title: "Net approval of " + leaderNames, sub: "Approve minus disapprove of the job each leader is doing, month by month",
             legend: [], caption: keyDots + " Polls by " + apprBy(false) + "." },
-      extraRows: (i) => { const r = spine[i]; if (!r) return []; const cs = leaders.map((Ld) => { const row = pts.find((p) => p.ym === r.ym); const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci"; return row && row[k] != null ? "±" + row[k].toFixed(1) : null; }).filter(Boolean); return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : []; },
+      extraRows: (i) => {
+        const r = spine[i];
+        if (!r) return [];
+        return drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => {
+          const sid = Ld.id + (J ? "-" + d.era.who : d.era ? "-" + d.era : "");
+          const s = series.find((x) => x.id === sid);
+          const row = d.rows.find((p) => p.ym === r.ym);
+          return s && row && row.ci != null ? { label: "95% intervals", value: "±" + row.ci.toFixed(1), rowLabel: s.label } : null;
+        })).filter(Boolean);
+      },
     });
   };
 
@@ -2272,7 +2283,7 @@ function RdTrustModel() {
           series={series} spine={spine} areas={areas} scatter={dots}
           events={evs} vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
           tooltipTitle={(i) => (lineW[i] ? trustMonth(lineW[i].ym) : "")}
-          extraRows={(i) => { const m = lineW[i]; return m ? [{ label: "95% interval", value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1) }] : []; }}
+          extraRows={(i) => { const m = lineW[i]; return m ? [{ label: "95% interval", value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1), rowLabel: "trust-model" }] : []; }}
           fmt={(v) => v.toFixed(1)}
           copy={{ title: "Confidence in the federal government", span: confWinYears(win, vTerms, nowX),
                   sub: head + ". Every survey pooled, on ANUpoll’s terms: the share with a great deal or quite a lot of confidence in the Federal Government in Canberra.",
@@ -2511,7 +2522,7 @@ function RdTrustSeparate() {
               xDomain={[x0, x1]} yDomain={[tLo, tHi]} yTicks={rdYTicks(tLo, tHi, 10)} yTickFmt={(v) => (v === tHi ? v + "%" : String(v))}
               xTicks={tTicks} baseline series={tSeries} spine={R.map((r) => ({ x: r.x, y: r.v }))} areas={tAreas} scatter={tDots}
               tooltipTitle={(i) => (R[i] ? "ANUpoll, " + trustMonth(R[i].date) : "")}
-              extraRows={(i) => { const r = R[i]; return r ? [{ label: "95% interval", value: "±" + r.ci.toFixed(1) }, ...(r.panel && line.panels ? [{ label: "Panel", value: line.panels.find((p) => p.id === r.panel).label }] : [])] : []; }}
+              extraRows={(i) => { const r = R[i]; return r ? [{ label: "95% interval", value: "±" + r.ci.toFixed(1), rowLabel: line.house }, ...(r.panel && line.panels ? [{ label: "Panel", value: line.panels.find((p) => p.id === r.panel).label }] : [])] : []; }}
               fmt={(v) => v.toFixed(1)}
               copy={{ title: "Confidence in the federal government", sub: head + ". ANUpoll, % with a great deal or quite a lot of confidence in the Federal Government in Canberra.",
                       caption: "Line: ANUpoll, shaded with its 95% interval" + (breakYear ? ", broken in " + breakYear + " where it moved panels" : "") + ". Open dots: other surveys, each worded its own way (" + otherNames + ").",
@@ -3121,7 +3132,13 @@ function RdDirectionView({ rangeId }) {
             events={badges ? badges.events : evs} brackets={brackets}
             vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
             tooltipTitle={(i) => (chartMonths[i] ? monthLabelFull(chartMonths[i].ym) : "")}
-            extraRows={(i) => { const d = monthAt((chartMonths[i] || {}).x); return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
+            extraRows={(i) => {
+              const d = monthAt((chartMonths[i] || {}).x);
+              return d && d.rightCi != null ? [
+                { label: "95% intervals", value: "±" + d.rightCi.toFixed(1), rowLabel: "Right direction" },
+                { label: "95% intervals", value: "±" + d.wrongCi.toFixed(1), rowLabel: "Wrong track" },
+              ] : [];
+            }}
             fmt={(v) => v.toFixed(1)}
             copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
                     sub: head + (MODEL
@@ -4615,8 +4632,10 @@ function RdDemographics({ rangeId = "all" }) {
         : r.rows.filter((d) => d.ci != null).map((d) => ({ x: d.x, y0: Math.max(0, d.y - d.ci), y1: d.y + d.ci })) });
     const ciRows = (rs, label) => (i) => {
       const ym = c.allPts[i] && c.allPts[i].ym;
-      const cs = rs.map((r) => { const d = r.l.pts.find((q) => q.ym === ym); return d && d.ci != null ? (rs.length > 1 ? r.l.g.label + " " : "") + "±" + d.ci.toFixed(1) : null; }).filter(Boolean);
-      return cs.length ? [{ label: label, value: cs.join(", ") }] : [];
+      return rs.map((r) => {
+        const d = r.l.pts.find((q) => q.ym === ym);
+        return d && d.ci != null ? { label, value: "±" + d.ci.toFixed(1), rowLabel: r.l.g.label } : null;
+      }).filter(Boolean);
     };
     const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label + (d.part != null ? "|" + d.part : "")) : null;
     const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
@@ -5498,7 +5517,7 @@ function RdSwitching({ rangeId }) {
                 areas={band.length >= 2 ? [{ id: "ci-go-" + r.id, color: r.color, className: "ci-band", edge: false, points: band }] : []}
                 notes={rdYTicks(step, top, step).map((v) => ({ x: "left", y: v, dy: -4, text: v + "%", size: 11, cls: "rd-sm-ylab" }))}
                 tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
-                extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1) }] : [])}
+                extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1), rowLabel: r.noun }] : [])}
                 fmt={(v) => v.toFixed(1)}
                 copy={{ title: GO_COHORT_W[V] + " now backing " + r.noun,
                         sub: "Share of those who voted " + (V === "lnp" ? "for the Coalition" : "Labor") + " at the 2025 election who now say they would vote " + r.noun + ", month by month",
@@ -5678,7 +5697,7 @@ function RdSwitching({ rangeId }) {
                 areas={band.length >= 2 ? [{ id: "ci-" + c.id, color: c.color, className: "ci-band", edge: false, points: band }] : []}
                 notes={rdYTicks(25, smTop, 25).map((v) => ({ x: "left", y: v, dy: -4, text: v + "%", size: 11, cls: "rd-sm-ylab" }))}
                 tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
-                extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1) }] : [])}
+                extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1), rowLabel: LONG[c.id] }] : [])}
                 fmt={(v) => v.toFixed(1)}
                 copy={{ title: VOTERS25[c.id] + " now backing One Nation",
                         sub: "Share of those who voted " + VOTED[c.id] + " at the 2025 election who now say they would vote One Nation, month by month",

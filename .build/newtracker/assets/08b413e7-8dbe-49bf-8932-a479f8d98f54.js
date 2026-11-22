@@ -247,10 +247,38 @@ function straightPath(pts, sx, sy) {
  *           the Past cycles terms the chart has data for; `span` is the
  *           title's date range where the x ticks stop short of the data's
  *           ends (else the first and last tick labels make it)
- *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
+ *  extraRows: (i) => [{label,value,color?,rowLabel?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
- *           secondary value shown beside its own row
+ *           secondary value shown beside its own row. rowLabel attaches an interval to
+ *           the series whose label it names, inline when it fits, else in a labelled row.
  * ------------------------------------------------------------------ */
+function tipRowsWithIntervals(base, more, stacked) {
+  const parts = more.filter((r) => r.rowLabel != null && r.value != null);
+  if (!parts.length) return { rows: base.concat(more), ciKey: null };
+  const attached = !stacked && new Set(base.map((r) => r.label));
+  const regular = more.filter((r) => r.rowLabel == null || r.value == null);
+  const rows = base.map((r) => ({ ...r }));
+  const grouped = new Map(), groupedRows = [];
+  for (const part of parts) {
+    grouped.set(part.label, (grouped.get(part.label) || 0) + 1);
+    if (attached && attached.has(part.rowLabel)) {
+      const row = rows.find((r) => r.label === part.rowLabel);
+      row.interval = part;
+    } else {
+      let group = groupedRows.find((r) => r.label === part.label);
+      if (!group) { group = { label: part.label, value: [] }; groupedRows.push(group); }
+      group.value.push(part.rowLabel + " " + part.value);
+    }
+  }
+  const extras = [];
+  for (const r of groupedRows) {
+    const label = grouped.get(r.label) > 1 && r.label === "95% interval" ? "95% intervals" : r.label;
+    extras.push({ label, value: r.value.join(", ") });
+  }
+  return { rows: rows.concat(regular, extras),
+    ciKey: parts.map((r) => r.rowLabel + "=" + String(r.value)).join("|") };
+}
+
 function TrendChart(props) {
   const {
     height: heightIn = 360, xDomain, yDomain, pad: padIn = { l: 46, r: 20, t: 18, b: 34 },
@@ -653,6 +681,9 @@ function TrendChart(props) {
      readout takes the cap as its width and its notes wrap (template.html
      .tip-tight) */
   const [tipTight, setTipTight] = useState(null);
+  /* Inline candidate only until its natural width is measured; the key keeps
+     one mode while content and chart width hold, so measurement cannot oscillate. */
+  const [tipCiFit, setTipCiFit] = useState({ key: null, stacked: false });
   /* LAYOUT effect, not a plain one: it runs before the browser paints, so the
      corrected left lands in the same frame the readout appears in. Measured on
      every render and written back only when it actually moves, so a readout
@@ -675,6 +706,11 @@ function TrendChart(props) {
     setTipSpill(over && !el.classList.contains("tip-dot"));
     const rows = [...el.querySelectorAll(".tip-row")];
     const spills = el.scrollWidth > el.clientWidth + 1;
+    if (tip && tip.ciKey && !(tipCiFit.key === tip.ciKey && tipCiFit.stacked)) {
+      const stack = el.scrollWidth + 2 > tipRoom;
+      if (tipCiFit.key !== tip.ciKey || tipCiFit.stacked !== stack) setTipCiFit({ key: tip.ciKey, stacked: stack });
+      if (stack) return;
+    }
     /* content width read off the un-wrapped rows as they spill (+2 borders:
        scrollWidth is the content box, the inline width pins the border box) */
     if (spills && !(tipTight && tipTight.n === rows.length && tipTight.cw === cw)) setTipTight({ n: rows.length, cw, w: el.scrollWidth + 2 });
@@ -1136,32 +1172,28 @@ function TrendChart(props) {
   } else if (hover && hoverX != null) {
     const i = hi;
     const spx = spinePts[i] ? spinePts[i].x : null;
+    const more = extraRows ? extraRows(i).filter(Boolean) : [];
+    const rawRows = (() => {
+      const claimed = new Set();
+      return series.map((s) => {
+        if (s.opacity === 0 || spx == null) return null;
+        const p = ptAtXLine(s, spx);
+        if (!p) return null;
+        if (s.label != null) {
+          if (claimed.has(s.label)) return null;
+          claimed.add(s.label);
+        }
+        return { label: s.label, value: fmt(p.y, p) + unit, color: s.color, y: p.y, note: p.note };
+      }).filter(Boolean).sort((a, b) => b.y - a.y);
+    })();
+    const inline = tipRowsWithIntervals(rawRows, more, false);
+    const ciKey = inline.ciKey && inline.rows.map((r) => r.label + ":" + String(r.value)).join("|") + "@" + cw;
+    const chosen = ciKey && tipCiFit.key === ciKey && tipCiFit.stacked
+      ? tipRowsWithIntervals(rawRows, more, true) : inline;
     tip = {
       left: (hoverX / W) * 100, top: 6,
       ringSwatch: ringAtX != null && spx != null && Math.abs(spx - ringAtX) < 1e-6,
-      title: tooltipTitle ? tooltipTitle(i) : "",
-      // rows sorted by value, so the readout order matches the lines'
-      // top-to-bottom order at the hovered point
-      /* One LINE may arrive as several series – a cycle line is split at the
-         months it interpolates so the gap can be dashed, and the runs share
-         both their label and their boundary points. The reader is hovering
-         one line and wants one row, so the first series to answer for a
-         label answers for all of them. Series without a label (unnamed
-         helpers) are left alone. */
-      rows: (() => {
-        const claimed = new Set();
-        return series.map((s) => {
-          if (s.opacity === 0 || spx == null) return null;
-          const p = ptAtXLine(s, spx);
-          if (!p) return null;
-          if (s.label != null) {
-            if (claimed.has(s.label)) return null;
-            claimed.add(s.label);
-          }
-          return { label: s.label, value: fmt(p.y, p) + unit, color: s.color, y: p.y, note: p.note };
-        }).filter(Boolean).sort((a, b) => b.y - a.y)
-          .concat(extraRows ? extraRows(i).filter(Boolean) : []);
-      })(),
+      title: tooltipTitle ? tooltipTitle(i) : "", ciKey, rows: chosen.rows,
     };
   }
 
@@ -1232,7 +1264,7 @@ function TrendChart(props) {
   const liveText = !tip ? "" : [
     tip.title,
     tip.date || "",
-    ...(tip.rows || []).map((r) => `${r.label} ${r.value}`),
+    ...(tip.rows || []).map((r) => `${r.label} ${r.value}` + (r.interval ? `, ${r.interval.label === "95% intervals" ? "95% interval" : r.interval.label} ${r.interval.value}` : "")),
     plainOf(tip.sub),
   ].filter(Boolean).join(", ");
 
@@ -2213,7 +2245,7 @@ function TrendChart(props) {
                                   style={tip.ringSwatch ? { borderColor: r.color } : { background: r.color }}></span>}
                 <span className="tip-label">{r.label}</span>
                 {r.note && <span className="tip-note">{r.note}</span>}
-                <span className="tip-val">{r.value}</span>
+                <span className="tip-val">{r.value}{r.interval && <span className="tip-ci" title={`${r.interval.label}: ${r.label}`}>{r.interval.value}</span>}</span>
               </div>
             );
             if (!tipCols) return tip.rows.map(row);

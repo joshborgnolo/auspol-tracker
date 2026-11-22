@@ -1240,7 +1240,7 @@ function RdHero(p) {
     if (!d || !d.ci95) return [];
     // the implied ALP v ON month's ± is a margin of two parts, named
     const two = flowsBand && d.cs != null && d.cf != null ? " (polls ± " + d.cs.toFixed(1) + ", flows ± " + d.cf.toFixed(1) + ")" : "";
-    return [{ label: flowsBand ? "Margin" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + two + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
+    return [{ label: flowsBand ? "Margin" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + two + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : ""), rowLabel: labelMain }];
   };
 
   /* ---- the history scene: a window reaching behind this term ------------
@@ -1317,7 +1317,7 @@ function RdHero(p) {
         if (q.count || q.elec) return [{ label: "", value: "The election result" }];
         if (!q.cur) return [{ label: "", value: "Drawn through the election results" }];
         const d = rows.find((r) => r.x === q.x);
-        return d && d.ci95 ? [{ label: "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" }] : [];
+        return d && d.ci95 ? [{ label: "95% interval", value: "± " + d.ci95.toFixed(1) + " pts", rowLabel: lbl }] : [];
       },
     };
   })();
