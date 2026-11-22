@@ -3112,11 +3112,13 @@ const trustGov = (() => {
     days: [...months.map((m) => m.day), yearAgo, ...(elecDay ? [elecDay] : [])], nDraw: 1000 });
   const at = (day) => fit.draws.map((d) => d.v[fit.slotOfDay.get(day)]);
   const S = (a) => ({ v: r1(tmean(a)), lo: r1(tquant(a, 0.025)), hi: r1(tquant(a, 0.975)) });
-  const mRows = months.map(({ ym, day }) => { const s = S(at(day)); return { ym, x: mx(ym), ...s, on: s.hi - s.lo < 20 }; });
   /* the line is drawn from the start of the run of months, ending now, whose
-     95% band is under 20 points (user decision 2026-11-22); the month of the
-     pandemic jump itself (its band widens for a moment by design) doesn't
-     break the run */
+     95% band is under BAND_MAX points: 20 at first (user decision 2026-11-22),
+     25 since the user asked for a line from 2010 (2026-11-23), where the band
+     runs 18–23 points wide; the month of the pandemic jump itself (its band
+     widens for a moment by design) doesn't break the run */
+  const BAND_MAX = 25;
+  const mRows = months.map(({ ym, day }) => { const s = S(at(day)); return { ym, x: mx(ym), ...s, on: s.hi - s.lo < BAND_MAX }; });
   const jumpYms = new Set(["2020-03"]);
   let firstOn = mRows.length - 1;
   while (firstOn > 0 && (mRows[firstOn - 1].on || jumpYms.has(mRows[firstOn - 1].ym))) firstOn--;
@@ -3144,7 +3146,7 @@ const trustGov = (() => {
   const oecdAvgAdj = avgAdj("oecd-avg", "OECD Australia"), edelmanAvgAdj = avgAdj("edelman-avg", "Edelman");
   const brk = (a, b, day) => r1(trustTerms(50, -leanAdj(a, day)) - trustTerms(50, -leanAdj(b, day)));
   const model = {
-    ref: "ANUpoll", method: "bayes", draws: fit.n, months: mRows, firstOn: mRows[firstOn].ym,
+    ref: "ANUpoll", method: "bayes", draws: fit.n, months: mRows, firstOn: mRows[firstOn].ym, bandMax: BAND_MAX,
     now: { ym: ymOfDay(tLast), x: mx(ymOfDay(tLast)), ...S(nowA),
       year: { from: ymOfDay(yearAgo), ...diffS(nowA, at(yearAgo)) },
       ...(elecDay ? { election: { date: lastElec, ym: afterElec.date, ...diffS(nowA, at(elecDay)) } } : {}),

@@ -1,5 +1,5 @@
 {
-  "_about": "Trust and confidence in the federal government, hand-filed for the National mood section's Trust view (gen-data §5t). Every survey words the question its own way, so the series are never pooled: ANUpoll draws the line (the only one asked quarterly), the rest ride as their own dots or their own lines. Each series names its question, its measure (which answers count) and its source; a reading's `date` is the fieldwork month (YYYY-MM), `field` the printed fieldwork dates where known.",
+  "_about": "Trust and confidence in the federal government, hand-filed for the National mood section's Trust view (gen-data §5t). Every survey words the question its own way; since 2026-11-22 a model (trust-model.mjs) pools them all, each through its own lean, printed on ANUpoll's terms. Each series names its question, its measure (which answers count) and its source; a reading's `date` is the fieldwork month (YYYY-MM), `field` the printed fieldwork dates where known.",
   "series": [
     {
       "id": "anupoll",

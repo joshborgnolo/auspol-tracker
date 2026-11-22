@@ -8546,8 +8546,9 @@ function infoTerms(D) {
           beyond their samples are estimated from the readings. The line’s{" "}
           {xref("interval", "trust-government", "95% interval")} gives a 95% chance the figure lies
           inside, under the model’s assumptions; a change is significant only when its own
-          interval excludes zero. Before the line begins the interval is wider than ±10 points, so
-          earlier readings show only as dots, moved onto ANUpoll’s terms. The two global averages,
+          interval excludes zero. Before the line begins the interval is wider than ±{(D.trustGov.model.bandMax || 20) / 2}{" "}
+          points – each survey’s lean against ANUpoll is measured where they overlap, since 2020, and is
+          less sure the further back it goes – so earlier readings show only as dots, moved onto ANUpoll’s terms. The two global averages,
           the OECD’s and Edelman’s, are moved onto the same terms the way the Ipsos world figure is
           on the direction chart: each by its own survey’s lean in Australia, assuming, as any such
           comparison must, that its Australian and international samples lean alike. They answer
