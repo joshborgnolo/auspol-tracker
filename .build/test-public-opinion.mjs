@@ -402,6 +402,14 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   assert.deepEqual(entries.find((e) => e.id === "happiness-personal").tables[0].rows[0], ["My life overall", 6.4], "happiness: its chart's Sep'26 point is the wave's all-voters figure");
   for (const id of ["melbourne-cup-attitudes", "melbourne-cup-betting", "melbourne-cup-interest"])
     assert.deepEqual(waves(id, "essential"), ["2025-10-28", "2026-10-27"], `${id}: each Cup read under the Cup-eve report that asked it`);
+  const traitMatch = out.topics.find((t) => t.id === "trust-democracy").more.find((q) => q.id === "leader-traits-matchup" && q.house === "newspoll");
+  assert.equal(traitMatch.last, "2026-11-19", "the November leaders' traits join the January entry");
+  assert.deepEqual(traitMatch.srcs.map((s) => s.n), [1229, 1224], "each wave keeps its own sample and source");
+  const traitLatest = traitMatch.figs.find((f) => f.cols[0] === "Nov 2026");
+  assert.deepEqual(traitLatest.heads, ["Anthony Albanese", "Angus Taylor", "Pauline Hanson"]);
+  assert.equal(traitLatest.rows.length, 9, "the full nine-trait battery");
+  assert.deepEqual(traitLatest.rows.find((r) => r.label === "Decisive and strong").waves[0].cells, [43, 46, 62]);
+  assert.deepEqual(traitLatest.rows.find((r) => r.label === "Trustworthy").waves[0].cells, [42, null, 42], "unprinted leader/attribute cells stay absent");
   for (const e of entries) for (const t of e.tables) {
     if (!t.headers || !t.rows.length) continue;
     t.headers.forEach((h, i) => assert.ok(!i || t.rows.some((r) => r[i] != null), `${e.id} @ ${e.waveDate}: "${h}" is a column no row fills`));

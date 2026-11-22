@@ -2177,7 +2177,7 @@ const TITLES = {
   "information-trust": "Which news sources do people trust?",
   "bondi-policies": "Support for social policies, January 2026",
   "leader-traits-history": "Newspoll’s leader traits since 2008",
-  "leader-traits-matchup": "Albanese and Ley, trait by trait",
+  "leader-traits-matchup": "Newspoll leaders, trait by trait",
   "australia-vs-countries": "Is Australia a better place to live than most countries?",
   "expectations-2026": "Will 2026 be better or worse than 2025?",
   "democracy-wellbeing-statements": "Views on Australian democracy",

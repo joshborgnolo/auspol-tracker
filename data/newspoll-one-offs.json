@@ -1,7 +1,7 @@
 {
- "generated": "2026-10-25",
+ "generated": "2026-11-22",
  "series": "Newspoll / Pyxis Polling & Insights — The Australian (federal)",
- "scope": "Special and one-off questions across the 19 Newspoll VI waves of the 2025–26 term (2025-07-17 … 2026-10-08) plus the midweek one-off stories that sit outside the wave's own weekend story (two immigration specials recovered: 2026-09-17's from its midweek story on the topic page, and 2025-10-30's from syndicated coverage — The Australian's original story had left the topic page before this corpus was built). The standing battery asked every wave is excluded: primary voting intention ('If a federal election for the House of Representatives was held today, which one of the following would you vote for? …'), PM and opposition-leader satisfaction ('Are you satisfied or dissatisfied with the way … is doing his/her job?'), better PM ('Who do you think would make the better Prime Minister?'), and its 2026 extensions — Hanson's own satisfaction series ('… the way Pauline Hanson is doing her job as Leader of One Nation'), the three-way ranked preferred-PM ('Please rank the following three people … highest preference to lowest preference') and the forced Albanese-v-Hanson 'distributed between top two leaders' pairing. Those are already channelled into polls.json (polls[] primaries, approval[19], ppm[19], ppmHeadToHead[3] carries the distributed pairing for three waves). The 2026-02-08 wave's Liberals-15/Nationals-3 split is a reporting detail of the standing VI row (recorded as an 18 Coalition primary), not a separate question. Historical waves before this term are out of scope.",
+ "scope": "Special and one-off questions across the 21 Newspoll VI waves of the 2025–26 term (2025-07-17 … 2026-11-19) plus the midweek one-off stories that sit outside the wave's own weekend story (two immigration specials recovered: 2026-09-17's from its midweek story on the topic page, and 2025-10-30's from syndicated coverage — The Australian's original story had left the topic page before this corpus was built). The standing battery asked every wave is excluded: primary voting intention ('If a federal election for the House of Representatives was held today, which one of the following would you vote for? …'), PM and opposition-leader satisfaction ('Are you satisfied or dissatisfied with the way … is doing his/her job?'), better PM ('Who do you think would make the better Prime Minister?'), and its 2026 extensions — Hanson's own satisfaction series ('… the way Pauline Hanson is doing her job as Leader of One Nation'), the three-way ranked preferred-PM ('Please rank the following three people … highest preference to lowest preference') and the forced Albanese-v-Hanson 'distributed between top two leaders' pairing. Those are already channelled into polls.json (polls[] primaries, approval[21], ppm[21], ppmHeadToHead[3] carries the distributed pairing for three waves). The 2026-02-08 wave's Liberals-15/Nationals-3 split is a reporting detail of the standing VI row (recorded as an 18 Coalition primary), not a separate question. Historical waves before this term are out of scope.",
  "sources": "Every wave's story re-fetched from its canonical polls.json url through the user's logged-in Chrome (.build/chrome-article.mjs) plus every per-story Infogram embed re-downloaded; the Newspoll topic page was swept once for unmatched stories (kit: .matilda/np-questions/, per-wave cached dumps; three waves file through secondary coverage — 2025-08-14 thenewdaily.com.au, 2025-09-11 thenightly.com.au, 2026-02-26 pollbludger.net — all battery-only). Tables are the embeds' chart rows verbatim — table 2 of each entry in the traits entries is a live-updated project where noted — and prose entries quote The Australian's own paragraphs verbatim (its copy spells some numbers as words). Question wordings are article-prose paraphrase unless marked infogram-*; The Australian does not print verbatim questionnaires. The 2026-09-17 'PM popularity slides' embed (TAD-2641) is editorial context charting, not survey data, and is excluded. ONE pair of entries reads secondary coverage instead: the 2025-10-30 wave's immigration levels+impact pair quotes Daily Mail Australia's 3 Nov 2025 write-up verbatim (wordingSource 'secondary-coverage'; The Australian's original midweek story had left the topic page before this corpus was built), every headline figure independently corroborated by The Australian's own Sep-2026 retrospective, which quotes the identical 64/10/26.",
  "one_offs": [
   {
@@ -1637,6 +1637,98 @@
     "prose": []
    },
    "note": "One table per attribute (builder labels each chart from its Jan-2026 final row against the matchup totals). Source anomaly kept raw: the Decisive-and-strong series' 2–6 Dec 2024 row carries 'Ms Ley' in its third cell (an Infogram transcription error in The Australian's own chart). Albanese v Ley joins only at the final read (12–15 Jan 2026)."
+  },
+  {
+   "id": "leader-traits-matchup",
+   "waveDate": "2026-11-19",
+   "fieldwork": {
+    "start": "2026-11-16",
+    "end": "2026-11-19"
+   },
+   "sample": 1229,
+   "published": "2026-11-22T20:00",
+   "question": "Does each attribute describe Anthony Albanese, Angus Taylor and Pauline Hanson? (agree % per leader and attribute)",
+   "questionWordingSource": "article-prose",
+   "responseOptions": [
+    "Agree"
+   ],
+   "articleUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "",
+       "Anthony Albanese",
+       "Angus Taylor",
+       "Pauline Hanson"
+      ],
+      "rows": [
+       [
+        "Experienced",
+        70,
+        null,
+        null
+       ],
+       [
+        "Decisive and strong",
+        43,
+        46,
+        62
+       ],
+       [
+        "Has a vision for Australia",
+        52,
+        54,
+        66
+       ],
+       [
+        "Understands the major issues",
+        49,
+        53,
+        51
+       ],
+       [
+        "Cares for people",
+        50,
+        null,
+        50
+       ],
+       [
+        "Arrogant",
+        53,
+        41,
+        62
+       ],
+       [
+        "Likeable",
+        47,
+        null,
+        43
+       ],
+       [
+        "In touch with voters",
+        38,
+        43,
+        55
+       ],
+       [
+        "Trustworthy",
+        42,
+        null,
+        42
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Only 42 per cent of voters ­believe that Mr Albanese is trustworthy, 47 per cent say he is likeable, 53 per cent consider him arrogant, 50 per cent believe he cares for people, and 38 per cent say he is in touch with voters.",
+     "On being trustworthy (42 per cent of voters agree) and likeable (47 per cent of voters agree), Mr Albanese has fallen to the same level as Scott Morrison when the former Liberal prime minister hit his worst political period months ahead of the 2022 election. While 70 per cent of voters agreed Mr Albanese was experienced, the Labor leader has claimed the record of being the worst-­performing prime minister, or joint worst, since 2008 on being decisive and strong (43 per cent), understanding the major issues (49 per cent), having a vision for Australia (52 per cent), caring for people (50 per cent) and being trustworthy.",
+     "Mr Taylor edged Mr Albanese on being decisive and strong (46 per cent), having a vision for Australia (54 per cent), understanding the major issues (53 per cent) and being in touch with voters (43 per cent). The Opposition Leader is considered less arrogant (41 per cent) than Mr Albanese, as well as former Liberal leaders including Peter Dutton.",
+     "Almost all voters surveyed ­expressed opinions on the leadership attributes of Mr Albanese and Senator Hanson. Up to a quarter of voters did not express opinions on Mr Taylor’s leadership traits.",
+     "Senator Hanson performed strongest on being decisive and strong (62 per cent), having a ­vision for Australia (66 per cent), understanding the major issues (51 per cent), caring for people (50 per cent), and being in touch with ­voters (55 per cent). The One ­Nation leader is considered arrogant by 62 per cent of voters, likeable by 43 per cent and trustworthy by 42 per cent."
+    ]
+   },
+   "note": "Agree percentages only. A blank cell means the article did not print that leader's figure for that attribute, not zero or the complement of the agree share. Up to a quarter did not express opinions on Taylor, so absence cannot be inferred from 100. The Hanson figures printed only in prose are included in the same table. The 2PMP forced-choice result in this article is not part of this attribute battery."
   },
   {
    "id": "iran-us-military-action",
