@@ -2106,7 +2106,7 @@ const TRUST_HOUSE_NOTES = {
   },
   aes: {
     question: "In general, do you feel that the people in government are too often interested in looking after themselves, or do you feel that they can be trusted to do the right thing nearly all the time?",
-    answers: "Usually look after themselves, sometimes look after themselves, sometimes can be trusted, usually can be trusted; the last two count. Don Aitkin’s 1969 and 1979 surveys, before the AES, offered only the two ends. The report doesn’t say how non-answers are counted.",
+    answers: "Usually look after themselves, sometimes look after themselves, sometimes can be trusted, usually can be trusted; the last two count. Don Aitkin’s 1969 and 1979 surveys, before the AES, offered only the two ends. The report doesn’t say how non-answers are counted. The 1999 dot is the Constitutional Referendum Study, which asked the same question after the republic referendum (37%, from Murray Goot’s tables).",
     method: "A self-completion survey after each election, by post and, since 2019, push-to-web: 2,070 responses in 2025, weighted to the electorate. Dated to the month after polling day.",
     role: "level",
   },
@@ -2171,7 +2171,7 @@ function RdTrustModel() {
   const S = Object.fromEntries(D.trustGov.series.map((s) => [s.id, s]));
   const pts = (n) => Math.abs(n).toFixed(1);
   const color = TRUST_COLOR.anupoll;
-  const credit = (s, r) => ({ pollster: s.house, dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""), sample: r.n || null });
+  const credit = (s, r) => ({ pollster: r.survey || s.house, dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""), sample: r.n || null });
 
   /* ---- the window: the direction panel's machinery (term / 10 yrs / 25 yrs /
      All, ‹ ›, the strip with the governments beneath), over every reading on
@@ -2184,7 +2184,7 @@ function RdTrustModel() {
   const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
   const adjDotsAll = Object.entries(M.adj).flatMap(([sid, rs]) => rs.map((r, i) => {
     const s = S[sid], orig = s && s.readings[i];
-    return { x: r.x, y: r.v, color: TRUST_COLOR[sid] || "var(--ink-3)", label: (s ? s.house : sid) + ", on ANUpoll’s terms",
+    return { sid, x: r.x, y: r.v, color: TRUST_COLOR[sid] || "var(--ink-3)", label: ((orig && orig.survey) || (s ? s.house : sid)) + ", on ANUpoll’s terms",
       sub: orig ? "Printed: " + orig.v + "% (" + s.measure.split(" (")[0].toLowerCase() + ")" : undefined,
       meta: s && orig ? credit(s, orig) : { pollster: sid }, hollow: !!(orig && (orig.panel === "lia" || orig.mode === "tel")), size: 1.1 };
   }));
@@ -2283,7 +2283,7 @@ function RdTrustModel() {
                      narrow={narrow} label="Confidence in the federal government, every survey on ANUpoll’s terms" />
         <RdKey className="rd-ckey" items={[
           { kind: "lineband", color, label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval, from " + firstOnName },
-          ...Object.keys(M.adj).filter((sid) => S[sid] && dots.some((d) => d.meta && d.meta.pollster === S[sid].house))
+          ...Object.keys(M.adj).filter((sid) => S[sid] && dots.some((d) => d.sid === sid))
             .map((sid) => ({ kind: "dot", color: TRUST_COLOR[sid] || "var(--ink-3)", label: S[sid].house + (sid === "anupoll" ? " (open: its earlier panel)" : sid === "scanlon" ? " (open: its telephone years)" : "") })),
           oecd.length >= 2 ? { kind: "dash", color: TRUST_COLOR["oecd-avg"], label: "OECD average, moved onto the same terms by the OECD survey’s lean in Australia" } : null,
           edel.length >= 2 ? { kind: "dash", color: TRUST_COLOR["edelman-avg"], label: "Edelman’s global average, moved onto the same terms by Edelman’s lean in Australia" } : null,
@@ -2393,7 +2393,7 @@ function RdTrustSeparate() {
     id: "anu-ci-" + i, color: TRUST_COLOR[line.id], className: "ci-band", edge: false, smooth: false,
     points: rs.map((r) => ({ x: r.x, y0: r.v - r.ci, y1: r.v + r.ci })),
   })).filter((a) => a.points.length >= 2);
-  const credit = (s, r) => ({ pollster: s.house, dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""), sample: r.n || null });
+  const credit = (s, r) => ({ pollster: r.survey || s.house, dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""), sample: r.n || null });
   /* the long series' readings since 2020 join the trend view as dots too:
      each is a survey of the same question family, at its own level */
   const dotSeries = D.trustGov.series.filter((s) => s.role !== "line" && !/-avg$/.test(s.id));

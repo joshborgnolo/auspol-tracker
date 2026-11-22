@@ -432,7 +432,7 @@
       "measure": "Usually or sometimes can be trusted",
       "role": "long",
       "source": "https://australianelectionstudy.org/wp-content/uploads/The-2025-Australian-Federal-Election-Results-from-the-Australian-Election-Study.pdf",
-      "note": "Figure 5.1 of the 2025 report; asked after each election (the series as printed skips 1987 and 1990). Dated to the month after polling day.",
+      "note": "Figure 5.1 of the 2025 report; asked after each election (the series as printed skips 1987 and 1990). Dated to the month after polling day. One reading is not the AES's own: the 1999 Australian Constitutional Referendum Study, which asked the same question (its reading carries `survey`).",
       "readings": [
         {
           "date": "1969-11",
@@ -454,6 +454,16 @@
         {
           "date": "1998-11",
           "v": 34
+        },
+        {
+          "date": "1999-12",
+          "v": 37,
+          "n": 2311,
+          "approxDate": true,
+          "survey": "Australian Constitutional Referendum Study",
+          "field": "after the republic referendum of 6 November 1999",
+          "url": "https://www.aph.gov.au/About_Parliament/Senate/Publications_and_resources/Papers_and_research/Papers_on_Parliament_and_other_resources/Papers_on_Parliament/38/goot",
+          "note": "Not an AES wave: the Australian Constitutional Referendum Study, a post-referendum survey asking the AES question with its four answers (usually/sometimes look after themselves, sometimes/usually can be trusted). From Murray Goot's Table 5a (Papers on Parliament 38): can be trusted 37, look after themselves 62, don't know 1 (n 2,311); 37.4 with don't-knows left out, as AES figures appear to be, so 37 either way. Read through the AES's lean, as the same question."
         },
         {
           "date": "2001-12",
