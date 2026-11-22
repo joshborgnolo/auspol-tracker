@@ -586,10 +586,11 @@ function RdPrimary({
           value: "Drawn through the election results"
         }];
         const d = pts.find(r => r.x === q.x);
-        return d && d.ci ? [{
+        return d && d.ci ? visible.map(p => ({
           label: "95% intervals",
-          value: visible.map(p => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ")
-        }] : [];
+          value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"),
+          rowLabel: p.name
+        })) : [];
       },
       bridges,
       unmeasured,
@@ -881,10 +882,11 @@ function RdPrimary({
         label: "",
         value: "The election result"
       }] : [];
-      return [{
+      return visible.map(p => ({
         label: "95% intervals",
-        value: visible.map(p => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ")
-      }];
+        value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"),
+        rowLabel: p.name
+      }));
     },
     fmt: (v, pt) => (G && pt && pt.gv != null ? pt.gv : v).toFixed(1),
     copy: H ? {
@@ -1469,14 +1471,14 @@ function RdLeadership({
   const ciRows = (series, i, spine) => {
     const r = spine[i];
     if (!r) return [];
-    const cs = series.map(s => {
+    return series.map(s => {
       const p = s.points.find(q => q.ym === r.ym);
-      return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null;
+      return p && p.ci != null ? {
+        label: "95% intervals",
+        value: "±" + p.ci.toFixed(1),
+        rowLabel: s.label
+      } : null;
     }).filter(Boolean);
-    return cs.length ? [{
-      label: "95% intervals",
-      value: cs.join(", ")
-    }] : [];
   };
   const leadSeries = kept("leadSeries", () => J ? (() => {
     const runs = [...runsJ("lead_ley", r => (r.alb_who || "") + "|" + (r.ley_who || "")).map(x => ({
@@ -2006,15 +2008,19 @@ function RdLeadership({
       extraRows: i => {
         const r = spine[i];
         if (!r) return [];
-        const cs = leaders.map(Ld => {
-          const row = pts.find(p => p.ym === r.ym);
-          const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci";
-          return row && row[k] != null ? "±" + row[k].toFixed(1) : null;
-        }).filter(Boolean);
-        return cs.length ? [{
-          label: "95% intervals",
-          value: cs.join(", ")
-        }] : [];
+        return drawn.flatMap(({
+          Ld,
+          runs: rs
+        }) => rs.map(d => {
+          const sid = Ld.id + (J ? "-" + d.era.who : d.era ? "-" + d.era : "");
+          const s = series.find(x => x.id === sid);
+          const row = d.rows.find(p => p.ym === r.ym);
+          return s && row && row.ci != null ? {
+            label: "95% intervals",
+            value: "±" + row.ci.toFixed(1),
+            rowLabel: s.label
+          } : null;
+        })).filter(Boolean);
       }
     });
   };
@@ -2471,7 +2477,7 @@ const TRUST_HOUSE_NOTES = {
   },
   aes: {
     question: "In general, do you feel that the people in government are too often interested in looking after themselves, or do you feel that they can be trusted to do the right thing nearly all the time?",
-    answers: "Usually look after themselves, sometimes look after themselves, sometimes can be trusted, usually can be trusted; the last two count. Don Aitkin’s 1969 and 1979 surveys, before the AES, offered only the two ends. The report doesn’t say how non-answers are counted.",
+    answers: "Usually look after themselves, sometimes look after themselves, sometimes can be trusted, usually can be trusted; the last two count. Don Aitkin’s 1969 and 1979 surveys, before the AES, offered only the two ends. The report doesn’t say how non-answers are counted. The 1999 dot is the Constitutional Referendum Study, which asked the same question after the republic referendum (37%, from Murray Goot’s tables).",
     method: "A self-completion survey after each election, by post and, since 2019, push-to-web: 2,070 responses in 2025, weighted to the electorate. Dated to the month after polling day.",
     role: "level"
   },
@@ -2542,7 +2548,7 @@ function RdTrustModel() {
   const pts = n => Math.abs(n).toFixed(1);
   const color = TRUST_COLOR.anupoll;
   const credit = (s, r) => ({
-    pollster: s.house,
+    pollster: r.survey || s.house,
     dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""),
     sample: r.n || null
   });
@@ -2559,10 +2565,11 @@ function RdTrustModel() {
     const s = S[sid],
       orig = s && s.readings[i];
     return {
+      sid,
       x: r.x,
       y: r.v,
       color: TRUST_COLOR[sid] || "var(--ink-3)",
-      label: (s ? s.house : sid) + ", on ANUpoll’s terms",
+      label: (orig && orig.survey || (s ? s.house : sid)) + ", on ANUpoll’s terms",
       sub: orig ? "Printed: " + orig.v + "% (" + s.measure.split(" (")[0].toLowerCase() + ")" : undefined,
       meta: s && orig ? credit(s, orig) : {
         pollster: sid
@@ -2788,7 +2795,8 @@ function RdTrustModel() {
       const m = lineW[i];
       return m ? [{
         label: "95% interval",
-        value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1)
+        value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1),
+        rowLabel: "trust-model"
       }] : [];
     },
     fmt: v => v.toFixed(1),
@@ -2822,7 +2830,7 @@ function RdTrustModel() {
       kind: "lineband",
       color,
       label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval, from " + firstOnName
-    }, ...Object.keys(M.adj).filter(sid => S[sid] && dots.some(d => d.meta && d.meta.pollster === S[sid].house)).map(sid => ({
+    }, ...Object.keys(M.adj).filter(sid => S[sid] && dots.some(d => d.sid === sid)).map(sid => ({
       kind: "dot",
       color: TRUST_COLOR[sid] || "var(--ink-3)",
       label: S[sid].house + (sid === "anupoll" ? " (open: its earlier panel)" : sid === "scanlon" ? " (open: its telephone years)" : "")
@@ -2965,7 +2973,7 @@ function RdTrustSeparate() {
     }))
   })).filter(a => a.points.length >= 2);
   const credit = (s, r) => ({
-    pollster: s.house,
+    pollster: r.survey || s.house,
     dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""),
     sample: r.n || null
   });
@@ -3161,7 +3169,8 @@ function RdTrustSeparate() {
       const r = R[i];
       return r ? [{
         label: "95% interval",
-        value: "±" + r.ci.toFixed(1)
+        value: "±" + r.ci.toFixed(1),
+        rowLabel: line.house
       }, ...(r.panel && line.panels ? [{
         label: "Panel",
         value: line.panels.find(p => p.id === r.panel).label
@@ -4046,7 +4055,12 @@ function RdDirectionView({
       const d = monthAt((chartMonths[i] || {}).x);
       return d && d.rightCi != null ? [{
         label: "95% intervals",
-        value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1)
+        value: "±" + d.rightCi.toFixed(1),
+        rowLabel: "Right direction"
+      }, {
+        label: "95% intervals",
+        value: "±" + d.wrongCi.toFixed(1),
+        rowLabel: "Wrong track"
       }] : [];
     },
     fmt: v => v.toFixed(1),
@@ -5726,14 +5740,14 @@ function RdDemographics({
     });
     const ciRows = (rs, label) => i => {
       const ym = c.allPts[i] && c.allPts[i].ym;
-      const cs = rs.map(r => {
+      return rs.map(r => {
         const d = r.l.pts.find(q => q.ym === ym);
-        return d && d.ci != null ? (rs.length > 1 ? r.l.g.label + " " : "") + "±" + d.ci.toFixed(1) : null;
+        return d && d.ci != null ? {
+          label,
+          value: "±" + d.ci.toFixed(1),
+          rowLabel: r.l.g.label
+        } : null;
       }).filter(Boolean);
-      return cs.length ? [{
-        label: label,
-        value: cs.join(", ")
-      }] : [];
     };
     const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.label + (d.part != null ? "|" + d.part : "")) : null;
     const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
@@ -7015,7 +7029,8 @@ function RdSwitching({
       tooltipTitle: i => pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "",
       extraRows: i => pts[i] && pts[i].ci != null ? [{
         label: "95% interval",
-        value: "±" + pts[i].ci.toFixed(1)
+        value: "±" + pts[i].ci.toFixed(1),
+        rowLabel: r.noun
       }] : [],
       fmt: v => v.toFixed(1),
       copy: {
@@ -7373,7 +7388,8 @@ function RdSwitching({
       tooltipTitle: i => pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "",
       extraRows: i => pts[i] && pts[i].ci != null ? [{
         label: "95% interval",
-        value: "±" + pts[i].ci.toFixed(1)
+        value: "±" + pts[i].ci.toFixed(1),
+        rowLabel: LONG[c.id]
       }] : [],
       fmt: v => v.toFixed(1),
       copy: {
