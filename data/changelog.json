@@ -7,7 +7,7 @@
     },
     "imp": 50.7,
     "pub": 48.6,
-    "on": 50.8,
+    "on": 50.9,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -218,7 +218,8 @@
       "2026-11-07|Resolve",
       "2026-11-08|Roy Morgan",
       "2026-11-15|Roy Morgan",
-      "2026-11-17|YouGov"
+      "2026-11-17|YouGov",
+      "2026-11-19|Newspoll"
     ],
     "moves": {
       "alp|education|TAFE or trade": -1,
@@ -334,18 +335,18 @@
     },
     "prim": {
       "alp": 25.8,
-      "grn": 13.8,
-      "lnp": 23.2,
-      "onp": 25.8,
-      "oth": 11.2
+      "grn": 14,
+      "lnp": 23.5,
+      "onp": 25.6,
+      "oth": 10.9
     },
     "leaders": {
-      "alb_fav": -23.4,
-      "alb_net": -24.8,
-      "hanson_fav": -6.6,
-      "hanson_net": -1.3,
-      "taylor_fav": -2.1,
-      "taylor_net": -1.1
+      "alb_fav": -23.5,
+      "alb_net": -27,
+      "hanson_fav": -7.2,
+      "hanson_net": -3.2,
+      "taylor_fav": -2,
+      "taylor_net": -1.3
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -368,9 +369,9 @@
       }
     },
     "dir": {
-      "right": 23.4,
-      "wrong": 64.5,
-      "net": -41.1
+      "right": 22.9,
+      "wrong": 62.5,
+      "net": -39.7
     },
     "issLead": {
       "climate": "alp",
@@ -393,10 +394,10 @@
       "security": "National security"
     },
     "sig": {
-      "dir|net": -1
+      "lead|taylor_net": 1
     },
     "sigMeta": {
-      "dir|net": "the right-track-minus-wrong-track net"
+      "lead|taylor_net": "Taylor’s net approval"
     },
     "conf": {
       "business": 81.7,
@@ -822,6 +823,25 @@
       "label": "17 Nov 2026",
       "kind": "finding",
       "text": "ACT/NT/Tas voters (by state) no longer break significantly away from One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-22",
+      "label": "22 Nov 2026",
+      "kind": "poll",
+      "text": "Newspoll (fieldwork 16–19 Nov, n=1,229) added — the two-party preferred estimate held at 50.7 (Labor v the Coalition, implied flows). Primary votes: the Coalition 23.2 → 23.5, One Nation 25.8 → 25.6, the Greens 13.8 → 14.0, others 11.2 → 10.9. Leader ratings: Albanese’s net approval −24.8 → −27.0, Albanese’s net favourability −23.4 → −23.5, Taylor’s net approval −1.1 → −1.3, Taylor’s net favourability −2.1 → −2.0, Hanson’s net approval −1.3 → −3.2, Hanson’s net favourability −6.6 → −7.2. National direction: right track 23.4 → 22.9, wrong track 64.5 → 62.5 (net −41.1 → −39.7). House effect (Labor v the Coalition, implied flows; positive leans Labor): Newspoll held at +1.4.",
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e"
+    },
+    {
+      "date": "2026-11-22",
+      "label": "22 Nov 2026",
+      "kind": "finding",
+      "text": "The rise in Taylor’s net approval over the past month is now statistically significant."
+    },
+    {
+      "date": "2026-11-22",
+      "label": "22 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in the right-track-minus-wrong-track net is no longer statistically significant."
     }
   ]
 }
