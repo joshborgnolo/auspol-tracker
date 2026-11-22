@@ -30,10 +30,15 @@ for (const s of S) {
     assert.ok(s.readings.length >= 8, "the line has enough waves to be a line");
   }
 }
-// the OECD average is drawn only beside the OECD's own Australian figure
-if (ids.has("oecd-avg")) {
-  assert.ok(ids.has("oecd-au"), "OECD average needs the OECD Australia series");
-  const au = new Set(S.find((s) => s.id === "oecd-au").readings.map((r) => r.date));
-  for (const r of S.find((s) => s.id === "oecd-avg").readings) assert.ok(au.has(r.date), "OECD average round " + r.date + " pairs an Australian reading");
+// a global average is drawn only beside its own survey's Australian figure
+// (the lean that moves it onto ANUpoll's terms is that survey's)
+for (const [avg, own] of [["oecd-avg", "oecd-au"], ["edelman-avg", "edelman"]]) {
+  if (!ids.has(avg)) continue;
+  assert.ok(ids.has(own), avg + " needs the " + own + " series");
+  const au = new Set(S.find((s) => s.id === own).readings.map((r) => r.date));
+  for (const r of S.find((s) => s.id === avg).readings) {
+    assert.ok(au.has(r.date), avg + " round " + r.date + " pairs an Australian reading");
+    assert.ok(r.countries > 1, avg + " round " + r.date + " says how many countries it averages");
+  }
 }
 console.log("trust-government: ok (" + S.length + " series, " + S.reduce((n, s) => n + s.readings.length, 0) + " readings)");

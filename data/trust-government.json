@@ -547,6 +547,227 @@
           "approxDate": true
         }
       ]
+    },
+    {
+      "id": "edelman",
+      "house": "Edelman Trust Barometer",
+      "question": "Below is a list of institutions. For each one, please indicate how much you trust that institution to do what is right, using a nine-point scale where one means that you “do not trust them at all” and nine means that you “trust them a great deal.” [Government in general]",
+      "measure": "6 to 9 on the nine-point scale (the top four boxes)",
+      "role": "long",
+      "source": "https://www.edelman.com/sites/g/files/aatuss191/files/au/2026-03/2026%20Edelman%20Trust%20Barometer_Australia%20Report.pdf",
+      "note": "Edelman's general-population online sample in Australia (1,000 a year to the 2015 Barometer, about 1,150 since, 1,204 in 2026), read from Edelman's global reports, 2012–2026, and its 2026 Australia report. Each Barometer is fielded the October–November before the year it's named for, so the 2026 Barometer is dated November 2025; the 2012–2015 decks print no fieldwork dates and are placed at November. Every year's printed change reconciles with the year before. Changes Edelman marks as significant (a t-test at 99%): 2023 −7, 2026 +6.",
+      "readings": [
+        {
+          "date": "2011-11",
+          "v": 33,
+          "n": 1000,
+          "field": "October–November 2011 (approx.)",
+          "approxDate": true,
+          "barometer": 2012,
+          "page": "2018 report p. 41 (2012–2018 table)"
+        },
+        {
+          "date": "2012-11",
+          "v": 32,
+          "n": 1000,
+          "field": "October–November 2012 (approx.)",
+          "approxDate": true,
+          "barometer": 2013,
+          "page": "2018 report p. 41"
+        },
+        {
+          "date": "2013-11",
+          "v": 38,
+          "n": 1000,
+          "field": "October–November 2013 (approx.)",
+          "approxDate": true,
+          "barometer": 2014,
+          "page": "2018 report p. 41"
+        },
+        {
+          "date": "2014-11",
+          "v": 37,
+          "n": 1000,
+          "field": "October–November 2014 (approx.)",
+          "approxDate": true,
+          "barometer": 2015,
+          "page": "2018 report p. 41; global from the 2016 deck p. 65"
+        },
+        {
+          "date": "2015-10",
+          "v": 45,
+          "n": 1150,
+          "field": "13 October – 16 November 2015",
+          "barometer": 2016,
+          "page": "2016 deck p. 65; 2018 report p. 41"
+        },
+        {
+          "date": "2016-10",
+          "v": 37,
+          "n": 1150,
+          "field": "13 October – 16 November 2016",
+          "barometer": 2017,
+          "page": "2017 report p. 13"
+        },
+        {
+          "date": "2017-11",
+          "v": 35,
+          "n": 1150,
+          "field": "28 October – 20 November 2017",
+          "barometer": 2018,
+          "page": "2018 report p. 39"
+        },
+        {
+          "date": "2018-11",
+          "v": 42,
+          "n": 1150,
+          "field": "19 October – 16 November 2018",
+          "barometer": 2019,
+          "page": "2019 report p. 40"
+        },
+        {
+          "date": "2019-11",
+          "v": 44,
+          "n": 1150,
+          "field": "19 October – 18 November 2019",
+          "barometer": 2020,
+          "page": "2020 report p. 40"
+        },
+        {
+          "date": "2020-11",
+          "v": 61,
+          "n": 1150,
+          "field": "19 October – 18 November 2020",
+          "barometer": 2021,
+          "page": "2021 report p. 44"
+        },
+        {
+          "date": "2021-11",
+          "v": 52,
+          "n": 1150,
+          "field": "1–24 November 2021",
+          "barometer": 2022,
+          "page": "2022 report p. 42"
+        },
+        {
+          "date": "2022-11",
+          "v": 45,
+          "n": 1152,
+          "field": "1–28 November 2022",
+          "barometer": 2023,
+          "page": "2023 report p. 43",
+          "sigChange": true
+        },
+        {
+          "date": "2023-11",
+          "v": 50,
+          "n": 1150,
+          "field": "3–22 November 2023",
+          "barometer": 2024,
+          "page": "2024 report p. 42"
+        },
+        {
+          "date": "2024-11",
+          "v": 47,
+          "n": 1153,
+          "field": "25 October – 16 November 2024",
+          "barometer": 2025,
+          "page": "2025 report p. 43"
+        },
+        {
+          "date": "2025-11",
+          "v": 53,
+          "n": 1204,
+          "field": "25 October – 16 November 2025",
+          "barometer": 2026,
+          "page": "2026 report p. 43; Australia report p. 38",
+          "sigChange": true
+        }
+      ]
+    },
+    {
+      "id": "edelman-avg",
+      "house": "Edelman global average",
+      "question": "Below is a list of institutions. For each one, please indicate how much you trust that institution to do what is right, using a nine-point scale where one means that you “do not trust them at all” and nine means that you “trust them a great deal.” [Government in general]",
+      "measure": "6 to 9 on the nine-point scale, averaged across the countries surveyed",
+      "role": "long",
+      "source": "https://www.edelman.com/sites/g/files/aatuss191/files/au/2026-03/2026%20Edelman%20Trust%20Barometer_Australia%20Report.pdf",
+      "note": "The general-population average across the Barometer's countries – 26 to 28 a year, as each report prints it (Global 26, 27 or 28) – so part of its movement is who was counted. Published from the 2015 Barometer on; earlier global figures are for the informed public only.",
+      "readings": [
+        {
+          "date": "2014-11",
+          "v": 41,
+          "countries": 27,
+          "barometer": 2015,
+          "approxDate": true
+        },
+        {
+          "date": "2015-10",
+          "v": 42,
+          "countries": 27,
+          "barometer": 2016
+        },
+        {
+          "date": "2016-10",
+          "v": 41,
+          "countries": 28,
+          "barometer": 2017
+        },
+        {
+          "date": "2017-11",
+          "v": 43,
+          "countries": 28,
+          "barometer": 2018
+        },
+        {
+          "date": "2018-11",
+          "v": 47,
+          "countries": 26,
+          "barometer": 2019
+        },
+        {
+          "date": "2019-11",
+          "v": 49,
+          "countries": 26,
+          "barometer": 2020
+        },
+        {
+          "date": "2020-11",
+          "v": 53,
+          "countries": 27,
+          "barometer": 2021
+        },
+        {
+          "date": "2021-11",
+          "v": 52,
+          "countries": 27,
+          "barometer": 2022
+        },
+        {
+          "date": "2022-11",
+          "v": 50,
+          "countries": 27,
+          "barometer": 2023
+        },
+        {
+          "date": "2023-11",
+          "v": 51,
+          "countries": 28,
+          "barometer": 2024
+        },
+        {
+          "date": "2024-11",
+          "v": 52,
+          "countries": 28,
+          "barometer": 2025
+        },
+        {
+          "date": "2025-11",
+          "v": 53,
+          "countries": 28,
+          "barometer": 2026
+        }
+      ]
     }
   ]
 }

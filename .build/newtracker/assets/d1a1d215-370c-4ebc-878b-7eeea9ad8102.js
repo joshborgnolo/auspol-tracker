@@ -8456,9 +8456,10 @@ function infoTerms(D) {
           January 2020; ANU’s reports print only their latest wave, so earlier waves are read off
           their charts, to within about 0.3 of a point), Scanlon’s Mapping Social Cohesion (yearly
           since 2007), the Australian Election Study (after each election since 1969), the OECD’s
-          Trust Survey (2021, 2023, 2025; 6 or more out of 10), the McKinnon Index (6 or more out of
-          10), and Essential, on trust in the national government and, separately, in the federal
-          parliament. Each has a lean of its own, measured against the others; Essential’s
+          Trust Survey (2021, 2023, 2025; 6 or more out of 10), the Edelman Trust Barometer (each
+          October–November since 2011, online; 6 to 9 on a nine-point scale of trust in “government
+          in general” to do what is right), the McKinnon Index (6 or more out of 10), and Essential,
+          on trust in the national government and, separately, in the federal parliament. Each has a lean of its own, measured against the others; Essential’s
           parliament question never sets the level. A survey that changed how it polls counts as
           a new one: ANUpoll’s opt-in panel since 2024 against ANU’s Life in Australia panel
           before it, and Scanlon’s online panel since 2018 against its telephone years.</span>
@@ -8469,10 +8470,15 @@ function infoTerms(D) {
           beyond their samples are estimated from the readings. The line’s{" "}
           {xref("interval", "trust-government", "95% interval")} gives a 95% chance the figure lies
           inside, under the model’s assumptions; a change is significant only when its own
-          interval excludes zero. Before the long view’s line begins the interval is wider than
-          ±10 points, so earlier readings show only as dots, moved onto ANUpoll’s terms. The OECD
-          average is moved onto the same terms by the OECD survey’s lean in Australia, assuming,
-          as any such comparison must, that its Australian and international samples lean alike.
+          interval excludes zero. Before the line begins the interval is wider than ±10 points, so
+          earlier readings show only as dots, moved onto ANUpoll’s terms. The two global averages,
+          the OECD’s and Edelman’s, are moved onto the same terms the way the Ipsos world figure is
+          on the direction chart: each by its own survey’s lean in Australia, assuming, as any such
+          comparison must, that its Australian and international samples lean alike. They answer
+          different questions about the world: the OECD averages its member countries (and, in
+          2025, five accession candidates), while Edelman’s 26 to 28 countries include China, Saudi
+          Arabia, the UAE and India, where its trust readings have run from 75 to 90% in recent
+          years.
           No survey can be checked against the truth, only against the others.</span></>
           ) : (
 <>The National mood section’s second view: how far Australians trust the federal

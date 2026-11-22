@@ -1613,6 +1613,11 @@ body.rd .rd-dir-bar > span { flex-grow: 0; flex-shrink: 1; min-width: 0; positio
 body.rd .rd-dir-pos { background: var(--mood-pos); border-radius: 9px 0 0 9px; }
 body.rd .rd-dir-neg { background: var(--mood-neg); border-radius: 0 9px 9px 0; }
 body.rd .rd-dir-uns { background: var(--line); }
+/* trust's bar: solid to the low end of the 95% interval, the interval in a
+   pale tint, the rest grey; the month and the interval sit at the right */
+body.rd .rd-trust-ci { background: color-mix(in oklab, var(--mood-pos) 32%, var(--line)); }
+body.rd .rd-trust-rest { border-radius: 0 9px 9px 0; }
+body.rd .rd-dir-fig.rd-trust-meta { justify-content: flex-end; text-align: right; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
