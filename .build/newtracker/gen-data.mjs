@@ -2247,6 +2247,16 @@ const directionWorld = (() => {
   return { waves, source: doc.source || "Ipsos What Worries the World" };
 })();
 
+// Lowy asks Australian respondents about the world as a whole, rather than
+// an Australian direction or the publisher's multi-country mean. Its two
+// observations sit only alongside the Ipsos comparison, never inside a pool.
+const directionLowy = JUR ? null : (() => {
+  const file = path.join(ROOT, "data", "lowy-direction.json");
+  if (!fs.existsSync(file)) return null;
+  const doc = JSON.parse(fs.readFileSync(file, "utf8"));
+  return { ...doc, waves: doc.waves.map((w) => ({ ...w, x: dx(w.end) })) };
+})();
+
 /* ---- 5i. issues waves – per-wave what-matters / who's-best data, keyed to
    the archive row the question was asked in. Same join convention as
    direction above: each salience/ownership wave in data/issues.json carries
@@ -9811,6 +9821,7 @@ window.AUSPOL = (function () {
   const dirHistory = ${JSON.stringify(dirHistory)};
   const directionPre = ${JSON.stringify(directionPre)};
   const directionWorld = ${JSON.stringify(directionWorld)};
+  const directionLowy = ${JSON.stringify(directionLowy)};
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
@@ -10064,7 +10075,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {

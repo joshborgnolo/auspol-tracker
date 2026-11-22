@@ -1,0 +1,45 @@
+{
+  "source": "Lowy Institute Poll — satisfaction with the direction of the world",
+  "sourceUrl": "https://poll.lowyinstitute.org/charts/satisfaction-with-direction-of-world/",
+  "lastAsked": 2018,
+  "waves": [
+    {
+      "year": 2017,
+      "start": "2017-03-01",
+      "end": "2017-03-21",
+      "field": "1–21 March 2017",
+      "satisfied": 19,
+      "dissatisfied": 79,
+      "other": 2,
+      "otherLabel": "Don’t know / no view / neither",
+      "otherDerived": true,
+      "net": -60,
+      "sample": 1200,
+      "method": "Nationally representative polling by Social Research Centre, combining telephone and online responses among Australian adults aged 18+.",
+      "sampleNote": "1,200 interviews among Australian adults aged 18+.",
+      "question": "And turning to the situation in the world overall, are you satisfied or dissatisfied with the way things are going in the world today?",
+      "modeChange": false,
+      "sourceLabel": "In 2017, 79% said dissatisfied; In 2017, 19% said satisfied."
+    },
+    {
+      "year": 2018,
+      "start": "2018-03-05",
+      "end": "2018-03-25",
+      "field": "5–25 March 2018",
+      "satisfied": 17,
+      "dissatisfied": 78,
+      "other": 5,
+      "otherLabel": "Don’t know / no view / neither",
+      "otherDerived": true,
+      "net": -61,
+      "sample": 1200,
+      "method": "Mode blend: 600 online responses from Life in Australia (5–19 March) and 600 telephone respondents (7–25 March), weighted and blended.",
+      "sampleNote": "600 online respondents + 600 telephone respondents; dual-frame landline and mobile sampling, with state/territory location quotas.",
+      "modeDetail": "600 online + 600 telephone, weighted and blended",
+      "question": "And turning to the situation in the world overall, are you satisfied or dissatisfied with the way things are going in the world today?",
+      "modeChange": true,
+      "sourceLabel": "In 2018, 78% said dissatisfied; In 2018, 17% said satisfied."
+    }
+  ],
+  "$comment": "Global satisfaction by Lowy Institute, not Roy Morgan's Australia-specific direction or Ipsos' Global Average directions. Preserve distinct wordings and mode-era boundaries. Other is the derived remainder for the combined Don't know / no view / neither category, never an independently measured neutral or Unsure share. Not for pooling with other pollsters."
+}

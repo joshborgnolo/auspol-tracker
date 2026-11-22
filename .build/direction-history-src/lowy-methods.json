@@ -1,0 +1,20 @@
+{
+  "2017": {
+    "start": "2017-03-01",
+    "end": "2017-03-21",
+    "field": "1–21 March 2017",
+    "sample": 1200,
+    "method": "Nationally representative polling by Social Research Centre, using telephone and online responses",
+    "sampleNote": "1,200 interviews among Australian adults aged 18 and over",
+    "modeChange": false
+  },
+  "2018": {
+    "start": "2018-03-05",
+    "end": "2018-03-25",
+    "field": "5–25 March 2018",
+    "sample": 1200,
+    "method": "Mode blend: 600 online Life in Australia responses (5–19 March) and 600 telephone responses (7–25 March), weighted and blended",
+    "sampleNote": "600 online respondents plus 600 telephone respondents, with dual-frame landline/mobile coverage and state/territory location quotas",
+    "modeChange": true
+  }
+}
