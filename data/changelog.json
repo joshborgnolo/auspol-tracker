@@ -7,7 +7,7 @@
     },
     "imp": 50.7,
     "pub": 48.6,
-    "on": 50.9,
+    "on": 51,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -239,6 +239,7 @@
       "lnp|location|Rural": -1,
       "lnp|state|Qld": -1,
       "lnp|state|Vic": 1,
+      "oth|state|NSW": 1,
       "oth|state|Non-NSW/Vic/Qld": -1,
       "oth|working|Retired": -1
     },
@@ -323,6 +324,11 @@
         "group": "Vic",
         "setLabel": "By state"
       },
+      "oth|state|NSW": {
+        "party": "oth",
+        "group": "NSW",
+        "setLabel": "By state"
+      },
       "oth|state|Non-NSW/Vic/Qld": {
         "party": "oth",
         "group": "Non-NSW/Vic/Qld",
@@ -335,11 +341,11 @@
       }
     },
     "prim": {
-      "alp": 25.8,
-      "grn": 14,
-      "lnp": 23.5,
+      "alp": 26.8,
+      "grn": 13.4,
+      "lnp": 24.2,
       "onp": 25.6,
-      "oth": 10.9
+      "oth": 9.9
     },
     "leaders": {
       "alb_fav": -23.5,
@@ -850,6 +856,18 @@
       "kind": "poll",
       "text": "EMRS (Tas) (fieldwork 11–12 Nov, n=978) added — the two-party preferred estimate held at 50.7 (Labor v the Coalition, implied flows). Primary votes held.",
       "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20Nov%202026.pdf"
+    },
+    {
+      "date": "2026-11-23",
+      "label": "23 Nov 2026",
+      "kind": "meta",
+      "text": "The primary vote and Who votes for whom are now estimated with a model rather than three- and six-week averages (see Info). The primary figures moved with the method, not with any poll: Labor 25.8 → 26.8, the Coalition 23.5 → 24.2, the Greens 14.0 → 13.4, One Nation 25.6 held, others 10.9 → 9.9. The NSW finding logged the same day follows from the change too."
+    },
+    {
+      "date": "2026-11-23",
+      "label": "23 Nov 2026",
+      "kind": "finding",
+      "text": "NSW voters (by state) now break significantly toward others, relative to all voters."
     }
   ]
 }

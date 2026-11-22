@@ -115,6 +115,13 @@ for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json
   }
 }
 
+/* the primary model's browser copy for the pollster menu: regenerated from
+   primary-model.mjs every build (deterministic, written only on a change) */
+{
+  const { makeEngineSource } = await import("./pm-engine-src.mjs");
+  const eng = makeEngineSource(), at = A("pm-engine.js");
+  if (!fs.existsSync(at) || fs.readFileSync(at, "utf8") !== eng) fs.writeFileSync(at, eng);
+}
 /* ---- 3. source modules, in load order ---------------------------------- */
 // plain scripts first (they define the window aliases every component needs)
 const PLAIN = [
@@ -1847,7 +1854,10 @@ for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(emitJs(f.replace(/\.production\.min\.js$/, ""), fs.readFileSync(path.join(HERE, "vendor", f), "utf8")));
 for (const f of PLAIN) {
   if (f !== DATASET) {
-    parts.push(emitJs(f.replace(/\.js$/, ""), stripJs(fs.readFileSync(A(f), "utf8"), f)));
+    /* the pollster menu's module carries the primary model's browser copy
+       ahead of it (pm-engine.js, regenerated from primary-model.mjs above) */
+    const src = (f === "pv-agg.js" ? fs.readFileSync(A("pm-engine.js"), "utf8") + "\n" : "") + fs.readFileSync(A(f), "utf8");
+    parts.push(emitJs(f.replace(/\.js$/, ""), stripJs(src, f)));
     continue;
   }
   const src = fs.readFileSync(DA(f), "utf8");

@@ -7440,7 +7440,33 @@ function infoTerms(D) {
   const F = (v) => (+v).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const swP = D.showWorking && D.showWorking.primary;
   const swT = D.showWorking && D.showWorking.tpp;
-  const primWork = swP && swP.rows.length ? (
+  /* federal: the primary model has no window of weights, so its working is
+     each recent poll's printed Labor share, the house's lean then, the share
+     less the lean, the line at its fieldwork without it, and its pull – how
+     far today's figure would move without it */
+  const primWorkModel = swP && swP.model && swP.rows.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Labor</th><th>lean</th><th>less lean</th><th>line without it</th><th>pull</th></tr></thead>
+        <tbody>
+          {swP.rows.map((r) => (
+            <tr key={r.firm + r.fw}>
+              <td>{r.firm}</td><td>{r.fw}</td><td>{r.mid}</td><td>{F(r.x)}</td>
+              <td>{r.lean == null ? "–" : F(r.lean)}</td><td>{r.adj == null ? "–" : F(r.adj)}</td>
+              <td>{r.level == null ? "–" : F(r.level)}</td><td>{r.pull == null ? "–" : (r.pull > 0 ? "+" : "") + F(r.pull)}</td>
+            </tr>
+          ))}
+          <tr className="info-work-sum"><td colSpan="8">
+            Labor today: {swP.v.toFixed(1)}, with a 95% interval of {swP.lo.toFixed(1)} to {swP.hi.toFixed(1)}, from all {swP.polls} polls since the election
+            {" "}({swP.houses} pollsters; the {swP.zero} regular ones set the zero). These are the {swP.k} polls in the 21 days to {swP.ref}.
+          </td></tr>
+        </tbody>
+      </table>
+      <p className="info-work-note">A poll that sits where its pollster usually sits barely moves the figure, however recent.
+        One that surprises moves it most, and less when the pollster's polls usually scatter more than their samples imply.</p>
+    </div>
+  ) : null;
+  const primWork = swP && swP.model ? primWorkModel : swP && swP.rows.length ? (
     <div className="info-work-wrap">
       <table className="info-work">
         <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>lean</th><th>xᵢ</th><th>d</th><th>nᵢ</th><th>m</th><th>wᵢ</th></tr></thead>
@@ -7869,7 +7895,9 @@ function infoTerms(D) {
   /* The method every section shares, written once. */
   const method = [
     { id: "weighted-aggregate", term: "Weighted aggregate", body: (
-      <>How the headline and every other current figure are built. It averages the recent polls,
+      <>How the headline and every other current figure are built{D.latest && D.latest.primaryModel
+        ? <> – except the primary vote and the vote by group, which a model estimates (see
+        {" "}{xref("primary-vote", "weighted aggregate", "Primary vote")})</> : null}. It averages the recent polls,
       giving more weight to newer and larger ones, after removing each pollster’s
       {" "}{xref("house-effect", "weighted aggregate", "house effect")}.
       <span className="info-p"><b>Recency.</b> A poll’s weight halves every seven days, and it
@@ -7909,11 +7937,12 @@ function infoTerms(D) {
         effective sample is (Σwᵢ)² ÷ Σwᵢ². If the window is empty, the last monthly point
         stands in. The six-week window doubles every timescale: half-life 14 days, taper from
         day 28 to day 42.</span>
+        {D.latest && D.latest.primaryModel ? null : (<>
         <span className="info-p"><b>Worked example: the Labor primary.</b> Each party’s primary
         is estimated the same way. The five are rescaled only if their total sits more than half
         a point from the plain-average total, so a real shortfall from undecided voters is
         kept.</span>
-        {primWork}
+        {primWork}</>)}
         <span className="info-p"><b>Worked example: the published 2PP.</b> A pair published
         with undecided voters still inside it is rebased to 100 first. A pollster that
         publishes no pair adds no row.</span>
@@ -8281,7 +8310,54 @@ function infoTerms(D) {
       ] },
     { id: "s-primary", title: "Primary vote", nav: "Primary vote",
       lead: { id: "primary-vote", body: (
-        <>The share of voters who put a party first, before any preferences are distributed. Each
+        <>{D.latest && D.latest.primaryModel ? (() => {
+          const PMd = D.latest.primaryModel, mi = PMd.miss || {};
+          return (<>The share of voters who put a party first, before any preferences are distributed.
+          Like the {xref("direction", "primary vote", "national mood")}, it is estimated with a model
+          rather than an average. The five parties’ shares are treated as moving a little each day,
+          and each pollster as seeing them through a {xref("house-effect", "primary vote", "lean")} of
+          its own plus sampling error. The model works out the shares and every lean together from
+          every poll since the 2025 election. So a pollster that polls weekly doesn’t outvote the rest,
+          an older poll counts for less the more opinion has moved since, and quiet stretches carry
+          wider {xref("interval", "primary vote", "95% intervals")}. How fast each party’s vote moves,
+          whether it is trending, how far leans drift and how noisy each pollster really is are all
+          estimated from the polls. The figures beside the chart give the change since the
+          election.
+          <span className="info-p"><b>The level.</b> A lean can only be measured against the other
+          pollsters, never against the truth. The level is set by the {(PMd.zeroHouses || []).length} pollsters
+          with four or more polls this term, each counting once; the rest have leans but don’t move
+          it. The term starts from the 2025 count, moved by how far the polls’ final figures missed
+          at the seven elections from 2007 to 2025: Labor overstated by {mi.alp ? Math.abs(mi.alp[0]).toFixed(1) : "1.0"} points
+          on average, give or take {mi.alp ? mi.alp[1].toFixed(1) : "2.2"}. Unfortunately, an error every pollster shares
+          stays invisible until the next count. If the polls missed by as much as they have before,
+          Labor’s count would land between {PMd.electionBand.alp[0].toFixed(1)} and {PMd.electionBand.alp[1].toFixed(1)}.</span>
+          <span className="info-p"><b>Why they add up to 100.</b> The model reads each poll as the
+          ratios of one party’s share to another’s. A ratio is the same whether or not the pollster kept
+          {" "}{xref("decidedness", "primary vote", "undecided")} voters in its base, so the five
+          figures are shares of decided voters. Each poll’s breakdown says which base its
+          pollster used.</span>
+          <span className="info-p"><b>Changes and leads.</b> The change on a month ago compares today
+          with the model’s estimate of a month ago, using every poll since. It counts as
+          significant only when its own 95% interval excludes zero. Because the five shares come out
+          together, the chance that one party is ahead of another is read off directly. A lead is
+          called only when that chance passes 97.5%.</span>
+          {working(<>
+            <span className="info-p">Each party’s share is carried as the logarithm of its ratio to
+            others’. Every day each takes a small random step; a damped trend lets a steady rise or
+            fall carry on. A change of prime minister or opposition leader allows a larger step.
+            Each pollster’s lean drifts slowly. A poll is the average pollster’s shares moved by its
+            pollster’s lean, plus sampling error at its decided sample (its published effective
+            sample, or its raw sample capped at 3,000 and discounted by 1.6, less any undecided share
+            it set aside), scaled by how noisy that pollster has proved. A Kalman filter and smoother
+            give the answer for each set of settings, and the settings are averaged over by their
+            fit to the polls.</span>
+            <span className="info-p">Tested by predicting each of 10,160 polls before it was
+            published, from 2007 to now, the model missed by 1.16 points on average against 1.26
+            for the three-week average it replaced, and its 95% intervals held 95% of the polls
+            against 92%. This term alone the two are level (1.29 against 1.26).</span>
+            {primWork}
+          </>)}</>);
+        })() : (<>The share of voters who put a party first, before any preferences are distributed. Each
         party’s figure is built like the headline, from the last three weeks of polls with each
         pollster’s lean taken out (see {xref("weighted-aggregate", "primary vote", "Weighted aggregate")}).
         Every line starts at the 2025 election result, and the figures beside the chart give the
@@ -8291,10 +8367,10 @@ function infoTerms(D) {
         100 by exactly that {xref("decidedness", "primary vote", "undecided")} share. The aggregate
         keeps the shortfall, because it says something real about the electorate: the five parties
         are rescaled only if their total sits more than half a point from the plain average’s.
-        Each poll’s breakdown says which approach its pollster used.</span>
+        Each poll’s breakdown says which approach its pollster used.</span></>)}
         <span className="info-p"><b>The group views.</b> Pick a group from the menu over the chart
         and each dot becomes that poll’s reading of the group: the group’s share in the poll less
-        the poll’s own all-voters figure, drawn onto the pooled all-voters line for its month. It
+        the poll’s own all-voters figure, drawn onto the all-voters line for its month. It
         is never the group share the poll printed, so a poll whose sample leans toward the group
         still lands on the one trend. The printed figures themselves sit beside each poll in All
         polls’ {xref("all-polls", "primary vote", "group breakdowns")} (the Demographics view) – and
@@ -8304,8 +8380,8 @@ function infoTerms(D) {
           const gap = VHi ? VHi.terms.filter((t) => t.miss.alp == null).map((t) => t.src) : [];
           return (<>
             <span className="info-p"><b>Past terms.</b> The arrows over the chart, and its 10 yrs
-            and All views, run the primary vote back to 1943. Each past term is built the same way,
-            month by month with each pollster’s lean taken out, and then drawn through the election
+            and All views, run the primary vote back to 1943. Each past term is built month by
+            month, with each pollster’s lean taken out, and then drawn through the election
             results at both ends. Unfortunately, the polls miss on polling day: by about
             {" "}{VHi ? VHi.rms.alp.toFixed(1) : "1.7"} points for Labor and {VHi ? VHi.rms.lnp.toFixed(1) : "1.9"} for
             the Coalition, as a root mean square over past elections. So each month of a past term
@@ -8509,13 +8585,28 @@ function infoTerms(D) {
         men and women, age groups, generations, education levels, states, where people live,
         whether they own or rent, the language they speak at home, whether they work full
         time, part time or are retired, and how much they earn.
+        {D.latest && D.latest.primaryModel ? (
+        <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
+        that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Measuring
+        each poll against its own total removes its pollster’s lean on the level. A model then
+        follows each group’s gap day by day, as the {xref("primary-vote", "who votes for whom", "primary vote")}’s
+        does. The gap moves slowly, and each pollster reads it its own way (one may find young
+        voters greener than the others do), so a pollster that cuts a group every fortnight
+        doesn’t set it alone. The gap is applied to the model’s figure for all voters, so a group’s
+        95% interval carries both. The charts follow each group month by month, as a percentage
+        above or below all voters. Tested by predicting each new poll’s group figures from the
+        polls before it, the model missed by 1.7 points against 2.0 for the six-week pooling it
+        replaced. Groups pool only where pollsters cut the population the same way; the working
+        lists which count where.</span>
+        ) : (
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
         are pooled over the last six weeks of polls and added to the site’s current figure for all
         voters. Measuring each poll against its own total removes its pollster’s lean. The charts
         follow each group month by month, built the same way, as a percentage above or below all
         voters. Groups pool only where pollsters cut the population the same way; the working
-        lists which count where. Income is treated differently. Because no two pollsters draw
+        lists which count where.</span>)}
+        <span className="info-p">Income is treated differently. Because no two pollsters draw
         the same income brackets, the Income tab places each bracket where it sits in the
         electorate – an under-$50k cut is roughly the poorest quarter, from the census income
         distribution – and fits each poll a line through its brackets, each weighted by how
@@ -8550,10 +8641,14 @@ function infoTerms(D) {
         through the monthly readings, tighter months counting for more. A group needs five monthly
         readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</span>
         <span className="info-p"><b>Since the election.</b> The sentence also asks whether a group
-        has moved since the 2025 election, on the same two tests. It starts from the polls’ own
+        has moved since the 2025 election, on the same two tests. {D.latest && D.latest.primaryModel
+        ? <>It starts from the model’s figure for the group on polling day: the 2025 count moved by
+        the group’s gap then, which the pollsters’ tables before and after the election place, and
+        drawn on the charts as an open triangle.</>
+        : <>It starts from the polls’ own
         figure for the group over the six weeks before polling day: the pollsters’ published
         tables then, pooled just as today’s figures are, and drawn on the charts as an open
-        triangle. Both ends are the same polls, so a difference is movement. The Australian
+        triangle.</>} Both ends are the same polls, so a difference is movement. The Australian
         Election Study, a survey after the election of how people voted, is drawn beside it as a
         diamond. At the election it read several groups differently from the polls by more than
         both margins, among them Labor’s and the Greens’ gender gaps, so it is the starting point

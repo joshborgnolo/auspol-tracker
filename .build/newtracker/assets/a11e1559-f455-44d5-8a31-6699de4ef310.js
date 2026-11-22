@@ -2528,7 +2528,7 @@ function DemographicsPanel({ rangeId = "all" }) {
           fmt={signed}
           ariaLabel={`${name} by ${by}: how much higher or lower each group's vote is than all voters', in percent, month by month`}
           copy={{
-            sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by}, the latest figures pool the last ${T.window} of polls`,
+            sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by}, ${T.model ? "the latest figures the model’s, from every poll this term" : "the latest figures pool the last " + T.window + " of polls"}`,
             legend: [{ label: `All voters  ${all.toFixed(1)}%`, color: "var(--ink-3)", kind: "dashed" },
                      ...st.groups.map((g, i) => ({ label: `${g.label}  ${signed(rel(g.v[party], all))}%`,
                                                    color: demoRamp(color, n, i), kind: "line" })),
@@ -2549,7 +2549,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         <div>
           <h2 className="card-title">Who votes for whom</h2>
           <p className="card-sub">
-            <Houses after={`${name}’s share of each group’s first-preference vote, pooled from the last ${T.window} of polls`}>{houseList(T.houses.map(demoHouse))}</Houses>
+            <Houses after={`${name}’s share of each group’s first-preference vote, ${T.model ? "estimated from every poll this term" : "pooled from the last " + T.window + " of polls"}`}>{houseList(T.houses.map(demoHouse))}</Houses>
           </p>
         </div>
       </div>
@@ -2579,7 +2579,7 @@ function DemographicsPanel({ rangeId = "all" }) {
             )}
             {row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate", "dash")}
             {st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false,
-              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"}, ${houseList(g.houses.map(demoHouse))}, ± ${g.ci[party].toFixed(1)} is the 95% margin`,
+              T.model ? `${g.n} poll${g.n === 1 ? "" : "s"} in the last ${T.window}, ${houseList(g.houses.map(demoHouse))}; ± ${g.ci[party].toFixed(1)} is the 95% interval` : `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"}, ${houseList(g.houses.map(demoHouse))}, ± ${g.ci[party].toFixed(1)} is the 95% margin`,
               demoRamp(color, st.groups.length, i)))}
             {demoSaid(demoVerdict(st, party))}
             </div>
@@ -2596,7 +2596,7 @@ function DemographicsPanel({ rangeId = "all" }) {
       <details className="view-how hint-how">
         <summary>How to read these charts</summary>
         <p className="table-hint">
-          The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
+          {T.model ? "The figures are the model’s, from every poll this term." : <>The figures pool the last {T.window} of polls.</>} Each chart shows how much higher or lower
           the party’s vote is in each group than among all voters, month by month.{" "}
           <button type="button" className="hi-term"
                   onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "Who votes for whom")}>

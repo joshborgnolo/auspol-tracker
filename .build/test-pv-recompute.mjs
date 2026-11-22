@@ -21,6 +21,7 @@ const fresh = (mutate) => {
   vm.runInContext(fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8"), ctx);
   vm.runInContext(fs.readFileSync(A("ed2260de-5b11-4bd5-8a8d-a391156c05ee.js"), "utf8"), ctx);
   if (mutate) mutate(win.AP.D, win);
+  vm.runInContext(fs.readFileSync(A("pm-engine.js"), "utf8"), ctx);
   vm.runInContext(fs.readFileSync(A("pv-agg.js"), "utf8"), ctx);
   return win.AP;
 };
@@ -38,6 +39,35 @@ const fresh = (mutate) => {
   assert.equal(typeof AP.pvAgg, "function", "pv-agg.js installs window.AP.pvAgg");
 }
 
+/* ---- the browser's copy of the model is current with primary-model.mjs */
+{
+  const { makeEngineSource } = await import("./newtracker/pm-engine-src.mjs");
+  assert.equal(fs.readFileSync(A("pm-engine.js"), "utf8"), makeEngineSource(), "assets/pm-engine.js is regenerated from primary-model.mjs (run the build)");
+}
+
+/* ---- federal (the model): every house ticked is the build's own figures,
+   exactly; the browser's re-run on every house lands within a few tenths
+   of them (it runs the settings' mode, the build summarises draws over
+   them) */
+{
+  const AP = fresh();
+  if (AP.D.primModel) {
+    const exact = AP.pvAgg(AP.D.pvHouses), serverMonths = AP.D.aggPrimary.slice(1);
+    assert.equal(JSON.stringify(exact.months), JSON.stringify(serverMonths), "every house: the build's months");
+    for (const k of KEYS) assert.equal(exact.now[k], AP.D.latest.primary[k], "every house: the build's " + k);
+    const prev = exact.nowAt(AP.D.primModel.t1 * 86400000 - 30 * 86400000);
+    assert.deepEqual(prev, AP.D.primModel.prev, "a month ago: the build's");
+    const eng = AP.pvAgg(AP.D.pvHouses, { engine: true });
+    assert.equal(eng.months.length, serverMonths.length, "the re-run draws every month");
+    for (let i = 0; i < serverMonths.length; i++) {
+      for (const k of KEYS) assert.ok(Math.abs(eng.months[i][k] - serverMonths[i][k]) <= 0.4, `re-run ${serverMonths[i].ym} ${k}: ${eng.months[i][k]} ≈ ${serverMonths[i][k]}`);
+      for (const k of KEYS) assert.ok(Math.abs(eng.months[i].ci[k] - serverMonths[i].ci[k]) <= 0.6, `re-run ${serverMonths[i].ym} ${k} ci: ${eng.months[i].ci[k]} ≈ ${serverMonths[i].ci[k]}`);
+    }
+    for (const k of KEYS) assert.ok(Math.abs(eng.now[k] - AP.D.latest.primary[k]) <= 0.4, `re-run now ${k}`);
+    assert.ok(Math.abs(KEYS.reduce((s, k) => s + eng.now[k], 0) - 100) <= 0.3, "the model's shares add to 100");
+  }
+}
+
 /* ---- all houses ticked: the client recompute reproduces the build's own figures */
 {
   const AP = fresh();
@@ -52,7 +82,7 @@ const fresh = (mutate) => {
   }
   assert.ok(all.now, "a full-house headline exists");
   for (const k of KEYS) assert.ok(Math.abs(all.now[k] - AP.D.latest.primary[k]) <= 0.2, `now ${k}: ${all.now[k]} ≈ ${AP.D.latest.primary[k]}`);
-  assert.ok(Math.abs(KEYS.reduce((s, k) => s + all.now[k], 0) - 100) <= 1.5, "rescale re-fires: the headline still sums to 100");
+  assert.ok(Math.abs(KEYS.reduce((s, k) => s + all.now[k], 0) - 100) <= 1.5, "the headline still sums to 100");
 }
 
 /* ---- a subset only aggregates its own houses' months */

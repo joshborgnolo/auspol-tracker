@@ -19,6 +19,7 @@ import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
+import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
 
@@ -1000,6 +1001,88 @@ for (const k of PRIMARY_KEYS) {
     .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
+/* ---- 2m. the primary-vote model (federal; .build/newtracker/primary-model.mjs)
+   Every federal primary figure – the current shares, the monthly line and
+   its band, the change on a month, each house's lean, each poll's footprint
+   and yardstick – comes from one state-space model of the five shares
+   together (the module's header has the construction; the prototype,
+   backtests and review are in .build/analysis/primary-bayes/). /vic/ keeps
+   its Kalman trend (§1a); PRIMM is null there and the recipe below runs.
+   PRIM_MISS: the polls' final consensus (this model, election eve) minus the
+   count at the 2007–2025 elections, mean and spread in points (spread =
+   sd·√(1 + 1/n), the mean's own uncertainty included; One Nation from the
+   three elections it was polled apart) – the prior on the term's first day
+   is the count moved by it.
+   PRIM_JUMPS: changes of prime minister or opposition leader this term,
+   where the shares may step. */
+const PRIM_MISS = { alp: [1.03, 2.16], lnp: [-0.70, 2.19], grn: [0.56, 0.70], onp: [0.78, 1.26], oth: [-1.22, 1.25] };
+const PRIM_JUMPS = ["2025-05-13", "2026-02-12"];   // Ley, then Taylor, lead the Liberals
+/* the D-base houses (POLL_BASES, §5b: undecided set aside, no leaner) – a
+   printed undecided share there is out of the shares' base */
+const PRIM_UND_ASIDE = new Set(["Roy Morgan", "Spectre Strategy", "YouGov"]);
+const pmDay = (iso) => Math.floor(Date.parse(String(iso).slice(0, 10) + "T00:00:00Z") / 86400000);
+const PRIMM = (() => {
+  if (JUR) return null;
+  const tStart = Date.now();
+  const readings = [];
+  POLLS.forEach((p, idx) => {
+    if (noAggPoll(p)) return;
+    const y = Object.fromEntries(PRIMARY_KEYS.map((k) => [k, primaryVal(p, k)]));
+    const c = pmCategories(y);
+    if (!c) return;
+    const und = p.undecidedIn ?? (PRIM_UND_ASIDE.has(p.pollster) ? p.undecided : null) ?? 0;
+    const s = pmDay(p.dateStart || p.date), e = pmDay(p.date);
+    readings.push({ key: p.date + "|" + p.pollster, house: p.pollster, idx, start: s, end: e, day: Math.round((s + e) / 2),
+      n: (rowN(p) / HL_DEFF) * (1 - und / 100), und, cats: c.cats, vals: c.vals, full: c.full, step: pmStep(c.vals),
+      pub: p.published ? pmDay(p.published) : e });
+  });
+  readings.sort((a, b) => a.day - b.day || a.idx - b.idx);
+  const t0 = pmDay(ELECTION.date), t1 = pmDay(LATEST_ISO);
+  /* the days the panel prints: mid-month (the current month at the newest
+     poll, so the line ends on the headline), and a month ago */
+  const months = MONTHS.filter((ym) => POLLS.some((p) => ymOf(p.date) === ym))   // months with polls, as the line always had
+    .map((ym) => ({ ym, day: ym === LATEST_ISO.slice(0, 7) ? t1 : Math.min(pmDay(ym + "-15"), t1) })).filter((m) => m.day > t0);
+  const anchor = anchorFrom(ELECTION, PRIM_MISS);
+  const jumps = new Set(PRIM_JUMPS.map(pmDay));
+  const eventDays = POLLS.map((p) => Math.round((pmDay(p.dateStart || p.date) + pmDay(p.date)) / 2));
+  const fit = fitPrimary(readings, { t0, t1, anchor, jumps, days: [...months.map((m) => m.day), t1 - 30], pairs: [[t1, t1 - 30]], eventDays,
+    trend: true, nDraw: +(process.env.PRIM_NDRAW || 2000), seed: 20261123 });
+  const P = PM_PARTIES.length;
+  const colOf = (draws, q) => { const n = draws.length / P, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * draws[i * P + q]; return o; };
+  const sum = (draws) => Object.fromEntries(PM_PARTIES.map((k, q) => {
+    const c = colOf(draws, q), lo = pmQuant(c, 0.025), hi = pmQuant(c, 0.975);
+    return [k, { v: pmMean(c), lo, hi, ci: (hi - lo) / 2 }];
+  }));
+  const at = new Map([...months.map((m) => m.day), t1, t1 - 30].map((d) => [d, sum(fit.shares(d))]));
+  const now = at.get(t1), prev = at.get(t1 - 30);
+  const pd = fit.pair(t1, t1 - 30);
+  const chg = Object.fromEntries(PM_PARTIES.map((k, q) => {
+    const c = colOf(pd, q), lo = pmQuant(c, 0.025), hi = pmQuant(c, 0.975);
+    return [k, { chg: r1(pmMean(c)), lo: r1(lo), hi: r1(hi), changeCi95: r1((hi - lo) / 2), changeSig: lo > 0 || hi < 0, pUp: r2(pmMean(c.map((v) => (v > 0 ? 1 : 0)))) }];
+  }));
+  /* the chance each party is ahead of each other, today */
+  const nowD = fit.shares(t1), nD = nowD.length / P;
+  const pAhead = {};
+  for (let a = 0; a < P; a++) for (let b = 0; b < P; b++) if (a !== b) {
+    let w = 0; for (let i = 0; i < nD; i++) if (nowD[i * P + a] > nowD[i * P + b]) w++;
+    pAhead[PM_PARTIES[a] + ">" + PM_PARTIES[b]] = r2(w / nD);
+  }
+  /* each house's lean today (printed share minus the average pollster's) */
+  const leanNow = {};
+  for (const h of fit.L.houses) {
+    const d = fit.lean(h);
+    leanNow[h] = Object.fromEntries(PM_PARTIES.map((k, q) => { const c = colOf(d, q); return [k, { v: pmMean(c), lo: pmQuant(c, 0.025), hi: pmQuant(c, 0.975) }]; }));
+  }
+  /* the same month by month, at the settings' mode (the leans panel's lines) */
+  const leanMonths = Object.fromEntries(fit.L.houses.map((h) => [h, fit.leanPath(h, months.map((m) => m.day))]));
+  const s = fit.settings, th = s.comps[0];
+  console.log(`primary model: ${readings.length} polls (${fit.L.houses.length} houses in the state, ${fit.L.core.length} set the zero, ${fit.L.lone.size} one-off) in ${((Date.now() - tStart) / 1000).toFixed(1)}s`
+    + ` | now ${PM_PARTIES.map((k) => `${k} ${r1(now[k].v)} ±${r1(now[k].ci)}`).join(" ")}`
+    + ` | ESS ${fit.ctx.laplace ? fit.ctx.laplace.ess.toFixed(1) : "-"} of ${s.comps.length}`
+    + ` | κ ${JSON.stringify(Object.fromEntries([...s.kappa].filter(([h]) => !fit.L.lone.has(h))))}`);
+  return { fit, readings, t0, t1, months, at, now, prev, chg, pAhead, leanNow, leanMonths,
+    byKey: new Map(readings.map((r) => [r.key, r])) };
+})();
 const aggPrimary = MONTHS.map((ym) => {
   const rows = POLLS.filter((p) => ymOf(p.date) === ym);
   if (!rows.length) return null;
@@ -1031,6 +1114,13 @@ aggPrimary.unshift({
   alp: ELECTION.alp, lnp: ELECTION.lnp, grn: ELECTION.grn,
   onp: ELECTION.onp ?? 0, oth: r1(ELECTION.oth ?? 0),
 });
+/* the federal line: the model at each month's middle (the current month at
+   the newest poll), its 95% interval as ci – half its width */
+if (PRIMM) aggPrimary.splice(1, Infinity, ...PRIMM.months.map(({ ym, day }) => {
+  const a = PRIMM.at.get(day), o = { ym, x: mx(ym), ci: {} };
+  for (const k of PRIMARY_KEYS) { o[k] = r1(a[k].v); o.ci[k] = r1(a[k].ci); }
+  return o;
+}));
 if (KF) {   // /vic/: each party's trend (§1a); a party first reported late is null before it
   const per = KF_NOW.primary = {};
   for (const k of PRIMARY_KEYS) { const kf = kfSeries(primaryRows[k], k, ELECTION[k] ?? 0); if (kf) per[k] = kf; }
@@ -1137,6 +1227,23 @@ const houseLean = Object.fromEntries([
         .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
     ]))]),
 );
+/* federal: each house's lean on each primary from the model – the smoothed
+   lean at each month's middle (settings at their mode), from the month its
+   first poll this term falls in; the same staleness rule */
+if (PRIMM) {
+  const days = new Map();
+  for (const r of PRIMM.readings) (days.get(r.house) || days.set(r.house, []).get(r.house)).push(r.day);
+  PRIMARY_KEYS.forEach((k, q) => {
+    houseLean[k] = Object.fromEntries(PRIMM.fit.L.houses
+      .filter((h) => (days.get(h) || []).length >= 3 && PRIMM.t1 - Math.max(...days.get(h)) < LEAN_STALE_DAYS)
+      .map((h) => {
+        const first = Math.min(...days.get(h));
+        return [h, PRIMM.months.map((m, i) => ({ m, l: PRIMM.leanMonths[h][i] }))
+          .filter(({ m, l }) => l && pmDay(m.ym + "-28") >= first)
+          .map(({ m, l }) => ({ ym: m.ym, v: r1(100 * l[q]) }))];
+      }));
+  });
+}
 
 /* ---- 3b. each poll's footprint on the aggregates (leave-one-out) ---------
    The expanded tables answer "how much did THIS poll move the figure the
@@ -1420,8 +1527,34 @@ for (const [k, s] of Object.entries(yardBy)) {
    No line or patch: that rail draws one strip per party, not a chart. A
    wave the aggregate never takes (an SMS poll) still meets the polls around
    it, all of them in, as ydOf's outsiders do. */
-const primYardBy = Object.fromEntries(PRIMARY_KEYS.map((k) => [k, yardSeries(primaryRows[k], primaryHE[k], KF ? ((KF_NOW.primary || {})[k] || null) : null, true)]));
+const primYardBy = PRIMM ? {} : Object.fromEntries(PRIMARY_KEYS.map((k) => [k, yardSeries(primaryRows[k], primaryHE[k], KF ? ((KF_NOW.primary || {})[k] || null) : null, true)]));
+/* federal: the model's – the average pollster at the wave's fieldwork
+   midpoint estimated without it (leave-one-out), and the house's lean then;
+   n the other polls within four weeks either side. A wave the model never
+   takes meets the line with every poll in. */
+const pmYard = PRIMM ? (() => {
+  const out = new Map();
+  for (const r of PRIMM.readings) {
+    const inf = PRIMM.fit.influence(r.idx);
+    if (!inf) continue;
+    const n = PRIMM.readings.filter((q) => q !== r && Math.abs(q.day - r.day) <= HE_WINDOW).length;
+    out.set(r.key, { level: inf.level, he: inf.he, dNow: inf.dNow, n });
+  }
+  return out;
+})() : null;
 const pydOf = (p) => {
+  if (PRIMM) {
+    const key = p.date + "|" + p.pollster, y = pmYard.get(key), o = {};
+    if (y) {
+      PRIMARY_KEYS.forEach((k, q) => { if (primaryVal(p, k) != null) o[k] = [r1(100 * y.level[q]), y.he ? r1(100 * y.he[q]) : null]; });
+      return Object.keys(o).length ? { n: y.n, ...o } : null;
+    }
+    const day = Math.round((pmDay(p.dateStart || p.date) + pmDay(p.date)) / 2), lv = PRIMM.fit.levelAt(day);
+    if (!lv) return null;
+    const lean = PRIMM.fit.L.coef.has(p.pollster) && !PRIMM.fit.L.lone.has(p.pollster) ? PRIMM.fit.leanPath(p.pollster, [day])[0] : null;
+    PRIMARY_KEYS.forEach((k, q) => { if (primaryVal(p, k) != null) o[k] = [r1(100 * lv[q]), lean ? r1(100 * lean[q]) : null]; });
+    return Object.keys(o).length ? { n: PRIMM.readings.filter((q) => Math.abs(q.day - day) <= HE_WINDOW).length, ...o } : null;
+  }
   const key = p.date + "|" + p.pollster, o = {};
   let n = 0;
   for (const k of PRIMARY_KEYS) {
@@ -6098,6 +6231,15 @@ const twoPPHistory = (() => {
    debiased per party, plain-window total alongside, renormalised only if the
    totals disagree by more than half a point. */
 const primaryNowAt = (ref, skip = null) => {
+  /* federal: the model's posterior mean at that day (today or a month ago,
+     the days §2m drew); n is the polls in the 21 days to it */
+  if (PRIMM && skip == null) {
+    const day = pmDay(new Date(ref).toISOString()), a = PRIMM.at.get(day);
+    if (!a) throw new Error(`primaryNowAt: the model drew no shares for ${new Date(ref).toISOString().slice(0, 10)}`);
+    const out = Object.fromEntries(PRIMARY_KEYS.map((k) => [k, r1(a[k].v)]));
+    const n = PRIMM.readings.filter((r) => r.day <= day && day - r.day <= HL_WINDOW).length;
+    return { ...out, n, parties: {}, plainTotal: null, adjTotal: null, rescaled: false, model: true };
+  }
   if (KF) {   // /vic/: each party's trend at that day (§1a); null before a party's first reading
     const per = KF_NOW.primary || {}, out = {};
     for (const k of PRIMARY_KEYS) {
@@ -6133,7 +6275,10 @@ const primaryNow = primaryNowAt(refNow);
    five-party renormalisation above is a display check, not a reading. The
    change log's findings read it (§8d); null on /vic/, whose lines are the
    Kalman trend. */
-const primaryChg = KF ? null : Object.fromEntries(PRIMARY_KEYS.map((k) => {
+const primaryChg = KF ? null : PRIMM ? Object.fromEntries(PRIMARY_KEYS.map((k) => {
+  const c = PRIMM.chg[k];
+  return [k, { chg: c.chg, changeCi95: c.changeCi95, changeSig: c.changeSig, lo: c.lo, hi: c.hi, pUp: c.pUp }];
+})) : Object.fromEntries(PRIMARY_KEYS.map((k) => {
   const nw = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], refNow));
   const pv = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], refNow - 30 * 86400000));
   if (!nw || !pv) return [k, null];
@@ -6154,6 +6299,22 @@ const aggSpec = { window: HL_WINDOW, half: HL_HALF, taper: HL_TAPER, deff: HL_DE
 /* the menu's ticks: every house that feeds the term's aggregates, in
    first-appearance order (a stopped house stays - its months still count) */
 const pvHouses = [...new Set(POLLS.filter((p) => !noAggPoll(p)).map((p) => p.pollster))];
+/* federal: what the menu's browser copy of the model (pm-engine.js, generated
+   from primary-model.mjs) needs to re-run it on the ticked houses – the
+   settings at their mode, each house's noise, the election-day prior, the
+   jump days, the month days and the polls as the model reads them. With
+   every house ticked the menu shows the build's own figures (latest.primary
+   and prev, a month ago); a subset is the model at these settings. */
+const primModel = PRIMM ? (() => {
+  const S = PRIMM.fit.settings, th = pmUnpack(S.mode, PM_PARTIES.length, PRIMM.fit.ctx.prior.names);
+  const an = PRIMM.fit.ctx.anchor;
+  return { t0: PRIMM.t0, t1: PRIMM.t1, months: PRIMM.months.map((m) => [m.ym, m.day]), window: HL_WINDOW,
+    th: { w: Array.from(th.w, (v) => +v.toPrecision(6)), ...Object.fromEntries(["d", "s", "J", "nu", "tau"].map((k) => [k, +th[k].toPrecision(6)])) },
+    kappa: Object.fromEntries([...S.kappa].map(([h, k]) => [h, k])), anchor: { mean: Array.from(an.mean, (v) => +v.toPrecision(8)), cov: Array.from(an.cov, (v) => +v.toPrecision(8)) },
+    jumps: PRIM_JUMPS.map(pmDay), minCore: 4,
+    obs: PRIMM.readings.map((r) => [r.house, r.day, r2(r.n), r.step, r.cats, r.vals]),
+    prev: Object.fromEntries(PRIMARY_KEYS.map((k) => [k, r1(PRIMM.prev[k].v)])) };
+})() : null;
 
 /* ---- 7eb. each poll's footprint on the current primaries -----------------
    §3b's leave-one-out on the five-party nowcast, for the Primary tab's How it
@@ -6168,6 +6329,23 @@ const pvHouses = [...new Set(POLLS.filter((p) => !noAggPoll(p)).map((p) => p.pol
 const primEffByKey = (() => {
   const out = new Map();
   if (!primaryNow) return out;
+  /* federal: every poll is in the model, so each has a footprint (w 1): the
+     current primaries without the wave, through the smoother's
+     cross-covariance (rank-one leave-one-out, settings at their mode) */
+  if (PRIMM) {
+    for (const r of PRIMM.readings) {
+      const y = pmYard.get(r.key);
+      if (!y) continue;
+      const p = POLLS[r.idx], eff = { w: 1 };
+      PRIMARY_KEYS.forEach((k, q) => { if (primaryVal(p, k) != null) eff[k] = [r1(primaryNow[k] - 100 * y.dNow[q]), primaryNow[k]]; });
+      out.set(r.key, eff);
+    }
+    for (const [k, eff] of out) for (const [party, e] of Object.entries(eff)) {
+      if (!Array.isArray(e)) continue;
+      if (!Number.isFinite(e[0]) || Math.abs(e[1] - e[0]) > 4) throw new Error(`primary footprint out of range (${k} ${party}): ${JSON.stringify(e)}`);
+    }
+    return out;
+  }
   const KFP = KF ? (KF_NOW.primary || {}) : null;
   const hiNow = primaryNow;
   for (const p of POLLS) {
@@ -6356,6 +6534,98 @@ const DEMO_RESOLVE_BETA = (() => {
    and others null, and its printed shares, already decided voters'
    percentages, are taken as printed rather than rescaled over three
    parties. Null on /vic/ and where the file is absent. */
+/* ---- 7gm. the vote-by-group model (federal; primary-model.mjs fitSet) -------
+   Each group's gap from all voters – the group's shares against the same
+   poll's all-voters shares, as log-ratios, so the poll's lean on the level
+   cancels as it always has – is a slow random walk, and each pollster has
+   its own reading of it (a house that finds young voters greener than the
+   others do), shrunk to the average house's. The settings are shared by the
+   groups of a set and integrated over a grid. A group's figures are then
+   the national model's figures (§2m) moved by its gap, draw by draw, so the
+   group's band carries both. The polls read are exactly §7g's (harmonize,
+   pooled releases as their parts, models reusing waves left out) plus the
+   pre-election tables DEMO_ELECTION reads, which place each group's gap on
+   election day. Backtest (predicting each new poll's group figures from
+   the waves before it, this term): error 1.65 v 2.03 points for the
+   pooled-gap construction it replaces. */
+const GROUPM = (() => {
+  if (JUR || !PRIMM || !DEMOGRAPHICS || !Array.isArray(DEMOGRAPHICS.waves)) return null;
+  const tStart = Date.now();
+  const raw = [];
+  const toPM = (o) => PM_PARTIES.map((k) => (o[k] == null ? null : o[k]));
+  const dayMid = (q) => Math.round((pmDay(q.dateStart || q.date) + pmDay(q.date)) / 2);
+  const add = (src, house, rel, tot, reads, sets) => {
+    for (const [setId, groups] of sets) for (const [group, g] of groups) for (const r of reads)
+      raw.push({ src, set: setId, group, house, day: r.day, n: r.n * DEMO_SHARE[group], s: DEMO_SHARE[group], g: toPM(g), t: toPM(tot), rel });
+  };
+  const harmSets = (w) => {
+    const h = harmonize(w), out = [];
+    for (const set of DEMO_SETS) {
+      const gs = [];
+      for (const group of set.groups) { const g = h[set.id] && h[set.id][group] && demoNorm(h[set.id][group]); if (g) gs.push([group, g]); }
+      if (gs.length) out.push([set.id, gs]);
+    }
+    return out;
+  };
+  for (const w of DEMOGRAPHICS.waves) {
+    const p = demoPollOf(w), tot = demoTotalOf(w, p);
+    if (!tot || (p && reusesWaves(p))) continue;
+    const parts = isPooledRelease(w) ? pooledParts(p) : null;
+    if (isPooledRelease(w) && !parts) continue;
+    const r0 = p || w, n = rowN(p || { sample: w.sample });
+    const reads = (parts || [r0]).map((q) => ({ day: dayMid(q), n: (parts ? rowN(q) : n) / HL_DEFF }));
+    add("term", w.pollster, r0.date, tot, reads, harmSets(w));
+    const inc = incomeStandardise(w.pollster, w.dims && w.dims.income, midMs(r0));
+    if (inc) add("term", w.pollster, r0.date, tot, reads, [["income", INCOME_STD_BANDS.map((b) => [b.group, inc.shares[b.group] && demoNorm(inc.shares[b.group])]).filter(([, g]) => g)]]);
+  }
+  let src = null;
+  try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics-2025-election.json"), "utf8")); } catch { src = null; }
+  const normE = (o) => (o && DEMO_KEYS.every((k) => o[k] != null) ? demoNorm(o) : o);
+  if (src) for (const w of src.waves) {
+    const tot = normE(w.total);
+    if (!tot) continue;
+    const reads = (w.parts || [w]).map((q) => ({ day: dayMid(q), n: rowN(q) / HL_DEFF }));
+    const h = harmonize(w), sets = [];
+    for (const set of DEMO_SETS) { const gs = []; for (const group of set.groups) { const g = h[set.id] && h[set.id][group] && normE(h[set.id][group]); if (g) gs.push([group, g]); } if (gs.length) sets.push([set.id, gs]); }
+    add("election", w.pollster, w.date, tot, reads, sets);
+  }
+  const { t0, t1, months } = PRIMM, P = PM_PARTIES.length, D = P - 1;
+  const days = [...new Set([...months.map((m) => m.day), t1, t0])];
+  /* the national figures' draws on the log-ratio scale, at each day */
+  const natAt = new Map(days.filter((d) => d !== t0).map((d) => {
+    const sh = PRIMM.fit.shares(d), n = sh.length / P;
+    return [d, Array.from({ length: n }, (_, i) => pmAlr(sh.subarray(i * P, i * P + P)))];
+  }));
+  const resAlr = pmAlr(PM_PARTIES.map((k) => (ELECTION[k] ?? 0) / 100));
+  const out = new Map(), grids = {};
+  for (const setId of [...new Set(raw.map((r) => r.set))]) {
+    const fit = fitGroupSet(raw.filter((r) => r.set === setId), { t0, t1, days, pairs: [[t0, t1]], nDraw: PRIMM.fit.nDraw, seed: 20261125 });
+    grids[setId] = fit.grid[0];
+    for (const [group, g] of fit.groups) {
+      const sumAt = (d, natFn) => {
+        const gd = g.draws.get(d);
+        if (!gd) return null;
+        const n = gd.length / D, cols = PM_PARTIES.map(() => new Float64Array(n));
+        for (let i = 0; i < n; i++) {
+          const base = natFn(i), e = new Float64Array(D);
+          for (let k = 0; k < D; k++) e[k] = base[k] + gd[i * D + k];
+          const sh = pmSoftmax(e);
+          for (let q = 0; q < P; q++) cols[q][i] = 100 * sh[q];
+        }
+        return Object.fromEntries(PM_PARTIES.map((k, q) => { const lo = pmQuant(cols[q], 0.025), hi = pmQuant(cols[q], 0.975); return [k, { v: pmMean(cols[q]), ci: (hi - lo) / 2 }]; }));
+      };
+      const firstTerm = Math.min(...g.obs.filter((o) => o.src.src === "term").map((o) => o.day));
+      out.set(setId + "|" + group, {
+        now: sumAt(t1, (i) => natAt.get(t1)[i]),
+        election: sumAt(t0, () => resAlr),
+        monthly: months.filter((m) => m.day >= firstTerm - 15).map((m) => ({ ym: m.ym, s: sumAt(m.day, (i) => natAt.get(m.day)[i]) })).filter((m) => m.s),
+        houses: g.houses, beta: g.beta,
+      });
+    }
+  }
+  console.log(`group model: ${raw.length} readings, ${out.size} groups in ${((Date.now() - tStart) / 1000).toFixed(1)}s | settings ${JSON.stringify(grids)}`);
+  return out;
+})();
 const DEMO_ELECTION = (() => {
   if (JUR) return null;
   let src;
@@ -6392,17 +6662,23 @@ const DEMO_ELECTION = (() => {
     const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
     // polls, not rows: a pooled release's waves count once
     const inRows = (rows[key("alp")] || []).filter(inW);
+    /* federal: the group model's figure on election day (the count moved by
+       the group's gap then), its 95% interval as the margin */
+    const gm = GROUPM && GROUPM.get(set.id + "|" + group), ge = gm && gm.election;
     (sets[set.id] ||= { groups: {} }).groups[group] = {
       n: new Set(inRows.map((r) => r.firm + "|" + r.rel)).size,
       houses: [...new Set(inRows.map((r) => r.firm))],
+
       /* per party: [the group's figure on the result's scale (the 2025
          result plus the pooled gap: where the chart marks it), its 95%
          margin] - the gap itself is the first less elec */
       ...Object.fromEntries(DEMO_KEYS.map((k) => [k, [r1(ELEC_T * raw[k] / t), r1(1.96 * est[k].se)]])),
+      ...(ge ? Object.fromEntries(DEMO_KEYS.map((k) => [k, [r1(ELEC_T * ge[k].v / 100), r1(ge[k].ci)]])) : {}),
+      ...(ge ? { model: true } : {}),
     };
   }
   if (!Object.keys(sets).length) return null;
-  return { x: DEMO_STATE_ELECTION.x, window: SPARSE_K.label, src: src.source, elec: ELEC, sets };
+  return { x: DEMO_STATE_ELECTION.x, window: SPARSE_K.label, src: src.source, elec: ELEC, sets, ...(GROUPM ? { model: true } : {}) };
 })();
 /* How each group voted at the 2025 election: ONE estimate from the two
    election-time readings (user call 2026-11-10: "proceed as you recommend").
@@ -6591,6 +6867,22 @@ function demoBuild(rows, rowsM, setsSpec, allbyYm, ALL, ALL_T, SPARSE, SHARES) {
         const byW = new Map((rows[key(k)] || []).filter(inW).map((r) => [wId(r), r.x]));
         return [k, win.map((r) => { const x = byW.get(wId(r)); return x == null ? null : r1(ALL_T * x / t); })];
       }));
+      /* federal: the group model's figures (§7gm) – today's, on the quoted
+         total, with their 95% intervals, and its monthly line – in place
+         of the pooled window's; the window still decides which groups show
+         and feeds the credits and the rug */
+      const gm = GROUPM && GROUPM.get(set.id + "|" + group);
+      if (gm && gm.now) return {
+        label: group,
+        v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * gm.now[k].v / 100)])),
+        ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(gm.now[k].ci)])),
+        n: win.length, houses: housesIn(rows[key("alp")] || []),
+        monthly: gm.monthly.map(({ ym, s }) => {
+          const T = total(allbyYm.get(ym) || ALL);
+          return [ym, ...DEMO_KEYS.map((k) => r1(T * s[k].v / 100)), ...DEMO_KEYS.map((k) => r1(s[k].ci))];
+        }),
+        pd, px, share: DEMO_SHARE[group], model: true,
+      };
       return {
         label: group,
         v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),
@@ -6746,7 +7038,7 @@ const { demo: demographics, income: demoIncome } = (() => {
     // the monthly lines' party order, and the all-voters line they sit against
     order: DEMO_KEYS,
     allMonthly: [...allByYm.entries()].map(([ym, a]) => [ym, ...DEMO_KEYS.map((k) => r1(a[k]))]),
-    window: SPARSE_K.label, tabs,
+    window: SPARSE_K.label, tabs, ...(GROUPM ? { model: true } : {}),
     /* every house that has ever fed each group (any party's rows, so a
        One-Nation-less fold still counts), most waves first – the Info
        entry's "which pollsters count where", derived so it can't drift from
@@ -7633,6 +7925,25 @@ const latest = {
      monthly point (that stays the chart series). Shares only; the window
      count rides as primaryNow's own n where a reader needs it. */
   primary: primaryNow && Object.fromEntries(PRIMARY_KEYS.map((k) => [k, primaryNow[k]])),
+  /* federal: the model's view of the same figures – each share's 95%
+     interval, its change on a month (the posterior of the difference: sig
+     when the interval excludes zero, pUp the chance it rose), the chance
+     each party is ahead of each other, and where the count would land if
+     the polls missed as they have at past elections (each share less the
+     2007–2025 average miss, that miss's spread added) */
+  primaryModel: PRIMM ? (() => {
+    const N = PRIMM.fit.nDraw, P = PM_PARTIES.length, nowD = PRIMM.fit.shares(PRIMM.t1), rng = (() => { let x = 20261124; return () => { x = (x * 1103515245 + 12345) >>> 0; return x / 4294967296; }; })();
+    const gauss = () => { let u = 0, v = 0; while (!u) u = rng(); v = rng(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+    const elec = Object.fromEntries(PM_PARTIES.map((k, q) => {
+      const c = Array.from({ length: N }, (_, i) => 100 * nowD[i * P + q] - PRIM_MISS[k][0] + PRIM_MISS[k][1] * gauss());
+      return [k, [r1(pmQuant(c, 0.025)), r1(pmQuant(c, 0.975))]];
+    }));
+    return {
+      method: "bayes", draws: N, ...Object.fromEntries(["lo", "hi", "ci"].map((f) => [f, Object.fromEntries(PRIMARY_KEYS.map((k) => [k, r1(PRIMM.now[k][f])]))])),
+      chg: PRIMM.chg, pAhead: PRIMM.pAhead, electionBand: elec, miss: PRIM_MISS,
+      houses: PRIMM.fit.L.houses.length + PRIMM.fit.L.lone.size, zeroHouses: PRIMM.fit.L.core,
+    };
+  })() : null,
   /* The ALP–ON pairing's ONLY quoted level: the §7f implied figure (uniform
      first-principles flow set on the §7e primaries). ci95 is its margin -
      the sampling interval (cs) and the flow table's range (band) added in
@@ -7716,7 +8027,21 @@ const showWorking = KF ? {} : (() => {   // /vic/'s figures are the trend's: no 
      (ONE source for it); the Σ of THIS table's rows must reproduce it,
      which the guard below enforces. */
   let primary = null;
-  if (primaryNow) {
+  /* federal: the model has no window of weights. Its working is each recent
+     poll (fieldwork midpoint in the 21 days to the newest) with its printed
+     Labor share, the house's lean then, the share less the lean, and its
+     pull – how far today's Labor figure would move without it */
+  if (PRIMM && primaryNow) {
+    const rows = PRIMM.readings.filter((r) => r.day <= PRIMM.t1 && PRIMM.t1 - r.day <= HL_WINDOW).map((r) => {
+      const p = POLLS[r.idx], y = pmYard.get(r.key), lean = y && y.he ? 100 * y.he[0] : null;
+      return { firm: p.pollster, fw: fwText(p), mid: dayMon(midMs(p)), x: r2(p.alp), lean: lean == null ? null : r2(lean),
+               adj: lean == null ? null : r2(p.alp - lean), level: y ? r2(100 * y.level[0]) : null, pull: y ? r2(100 * y.dNow[0]) : null };
+    });
+    primary = { model: true, rows, k: rows.length, ref: dayMon(refNow), v: primaryNow.alp,
+                lo: r1(PRIMM.now.alp.lo), hi: r1(PRIMM.now.alp.hi), polls: PRIMM.readings.length,
+                houses: PRIMM.fit.L.houses.length + PRIMM.fit.L.lone.size, zero: PRIMM.fit.L.core.length };
+  }
+  else if (primaryNow) {
     const wPolls = POLLS.filter((p) => { if (p.alp == null) return false; if (noAggPoll(p)) return false; const d = ddays(refNow, midMs(p)); return d >= 0 && d <= HL_WINDOW; });
     wPolls.sort((a, b) => midMs(a) - midMs(b));
     const waves = new Map();
@@ -10049,7 +10374,10 @@ window.AUSPOL = (function () {
      must show as "—", never as 0. */
   const houseEffects = ${JSON.stringify({
     tpp: houseEffect.snapshot(Infinity),
-    primary: Object.fromEntries(Object.entries(primaryHE).map(([k, h]) => [k, h.snapshot(Infinity)])),
+    /* federal: each house's lean today from the model, n its polls this term */
+    primary: PRIMM ? Object.fromEntries(PRIMARY_KEYS.map((k) => [k, Object.fromEntries(Object.entries(PRIMM.leanNow)
+      .map(([h, l]) => [h, { v: r1(l[k].v), n: PRIMM.fit.cnt[h] }]))]))
+      : Object.fromEntries(Object.entries(primaryHE).map(([k, h]) => [k, h.snapshot(Infinity)])),
     alp_on: altAON.he.snapshot(Infinity),
     appr: Object.fromEntries(Object.entries(apprHE).map(([lk, h]) => [lk, h.snapshot(Infinity)])),
     synth: synthEffect.snapshot(Infinity),
@@ -10248,6 +10576,7 @@ window.AUSPOL = (function () {
      rule: change a constant there, it tracks here) and the canonical
      house roster the menu lists (aggregable houses, first-seen order) */
   const aggSpec = ${JSON.stringify(aggSpec)};
+  const primModel = ${JSON.stringify(primModel)};
   const pvHouses = ${JSON.stringify(pvHouses)};
   const showWorking = ${JSON.stringify(showWorking)};
   const events = ${JSON.stringify(events)};
@@ -10372,7 +10701,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
-    individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
+    individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {
       const base = pollBaseOf(p.pollster, "primary");
       if (base === "F") return { v: 0, included: null, label: "not allowed" };

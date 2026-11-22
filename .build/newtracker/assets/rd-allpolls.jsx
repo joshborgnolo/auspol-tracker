@@ -2455,19 +2455,19 @@ function RdApPrimRail({ p }) {
   const ms = rows.map((r) => r.m).filter((m) => m != null);
   const mTxt = ms.length ? "±" + (Math.min(...ms).toFixed(1) === Math.max(...ms).toFixed(1) ? Math.min(...ms).toFixed(1) : Math.min(...ms).toFixed(1) + "–" + Math.max(...ms).toFixed(1)) : null;
   const now = D.latest && D.latest.primary;
-  const around = RD_AP_KAL ? "The trend" : "Polls around it";
+  const around = RD_AP_KAL ? "The trend" : RD_AP_PM ? "The line without it" : "Polls around it";
   const anyOut = rows.some((r) => r.out);
-  const say = rows.map((r) => r.lab + " " + (Math.abs(r.lean) < 0.05 ? "level with" : Math.abs(r.lean).toFixed(1) + (r.lean > 0 ? " above" : " below")) + " " + (RD_AP_KAL ? "the trend" : "the polls around it")).join("; ");
+  const say = rows.map((r) => r.lab + " " + (Math.abs(r.lean) < 0.05 ? "level with" : Math.abs(r.lean).toFixed(1) + (r.lean > 0 ? " above" : " below")) + " " + (RD_AP_KAL ? "the trend" : RD_AP_PM ? "the line without it" : "the polls around it")).join("; ");
   return (
     <>
-      <span className="rd-apd-ct">{p.pollster}’s primaries against {RD_AP_KAL ? "the trend through the other polls" : "the polls fielded around it"}, in points</span>
+      <span className="rd-apd-ct">{p.pollster}’s primaries against {RD_AP_KAL ? "the trend through the other polls" : RD_AP_PM ? "the line at its fieldwork, estimated without it" : "the polls fielded around it"}, in points</span>
       <div className="rd-ldg-pstrips" role="img" aria-label={say}>
         <div className="rd-ldg-prow rd-ldg-phead" aria-hidden="true">
           <span></span>
           <span className="rd-ap-hpic"><span className="rd-ap-scale"><span className="rd-ap-in">
             <b className="rd-ap-scl">◀ Lower</b>
             <b className="rd-ap-scr">Higher ▶</b>
-            {[[-6, "6"], [-3, "3"], [0, RD_AP_KAL ? "Trend" : <><span className="rd-ldg-lg">Polls around it</span><span className="rd-ldg-sh">Around</span></>], [3, "3"], [6, "6 pts"]].map(([v, lab]) => (
+            {[[-6, "6"], [-3, "3"], [0, RD_AP_KAL ? "Trend" : RD_AP_PM ? "Line" : <><span className="rd-ldg-lg">Polls around it</span><span className="rd-ldg-sh">Around</span></>], [3, "3"], [6, "6 pts"]].map(([v, lab]) => (
               <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (v === -6 ? " start" : "") + (v === 6 ? " end" : "") + (Math.abs(v) === 3 ? " rd-ldg-lg" : "")} style={{ left: rdApX(v) + "%" }}>{lab}</span>
             ))}
           </span></span></span>
@@ -2493,7 +2493,7 @@ function RdApPrimRail({ p }) {
         </tbody>
       </table>
       <p className="rd-ldg-foot1">
-        Lean is this poll minus {RD_AP_KAL ? "the trend" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)"}, so + means higher; house lean is taken out before averaging.{p.pp && p.undIn != null ? " " + p.pollster + "’s own shares include its " + p.undIn + "% undecided; here they are rescaled to leave it out, as the averages do." : ""}
+        Lean is this poll minus {RD_AP_KAL ? "the trend" : RD_AP_PM ? "the model’s line at its fieldwork, estimated without it" : "the polls around it (" + (p.pyd.n === 1 ? "one other poll" : rdNumWord(p.pyd.n) + " others") + " within three weeks)"}, so + means higher; {RD_AP_PM ? "house lean is the pollster’s lean then, which the model takes out." : "house lean is taken out before averaging."}{p.pp && p.undIn != null ? " " + p.pollster + "’s own shares include its " + p.undIn + "% undecided; here they are rescaled to leave it out, as the averages do." : ""}
         {anyOut ? " Bold: outside the poll’s margin on that party." : ""}{mTxt ? " Margins " + mTxt + (und0 ? " on the decided voters" : "") + ", " + rdMarginBasis(p) + "." : ""}
         {moves && e.w && now ? " Today’s figures: " + rows.filter((r) => now[r.id] != null).map((r) => r.lab + " " + now[r.id].toFixed(1)).join(", ") + "." : ""}
         {moves && !e.w ? " It is out of today’s three-week window; the last row is what it did to the figures when it came out." : ""}
@@ -4358,6 +4358,9 @@ const RD_AP_POLLS = window.JUR ? window.JUR.adj : "national";
 /* /vic/'s figures are a smoothed trend through every poll (gen-data §1a):
    a month's figure is the trend's, and every poll this term counts */
 const RD_AP_KAL = !!(window.AUSPOL.latest.method && window.AUSPOL.latest.method.kind === "kalman");
+/* federal primaries come from the model (gen-data §2m): a poll is held against
+   the model's line at its fieldwork, estimated without it */
+const RD_AP_PM = !RD_AP_KAL && !!window.AUSPOL.latest.primaryModel;
 const RD_AP_AVG = RD_AP_KAL ? "trend" : "average";
 function rdApMonths(from) {
   const D = window.AUSPOL;

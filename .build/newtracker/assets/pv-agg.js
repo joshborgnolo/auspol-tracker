@@ -174,7 +174,68 @@
                 node-existence rule keys off all rows, noAgg included);
      } */
   window.AP = window.AP || {};
-  window.AP.pvAgg = (houses) => {
+  /* federal: the primary model (gen-data §2m) re-run on the ticked houses
+     by its browser copy (pm-engine.js, generated from primary-model.mjs) at
+     the build's settings (D.primModel) – the regular houses among them set
+     the zero, each counting once. With every aggregating house ticked it is
+     the build's own figures (the published draws' summaries), exactly; the
+     subset's band is the smoother's, carried to the shares by the delta
+     method. opts.engine forces the re-run (the parity test's check that the
+     browser copy reproduces the build). */
+  const pmAgg = (houses, opts) => {
+    const D = window.AP.D, M = D.primModel, E = window.AP.pmEngine, DAY0 = 86400000;
+    const { refNow } = rowsFor(houses);
+    const sel = houses ? new Set(houses) : null;
+    /* nothing of the set in the archive: the panel's dry state */
+    if (!(D.individualPolls || []).some((q) => (!sel || sel.has(q.pollster)) && !q.noAgg && q.p))
+      return { months: [], now: null, refNow, nowAt: () => null };
+    const everyHouse = !sel || D.pvHouses.every((h) => sel.has(h));
+    if (everyHouse && !(opts && opts.engine)) {
+      const now = D.latest.primary ? { ...D.latest.primary, n: M.obs.filter((o) => M.t1 - o[1] >= 0 && M.t1 - o[1] <= M.window).length } : null;
+      return { months: D.aggPrimary.slice(1).map((m) => ({ ...m, ci: { ...m.ci } })), now, refNow,
+               nowAt: (ref) => { const d = Math.floor(ref / DAY0); return d === M.t1 ? now : d === M.t1 - 30 ? { ...M.prev } : null; } };
+    }
+    const readings = M.obs.filter((o) => !sel || sel.has(o[0])).map((o, idx) => ({ house: o[0], day: o[1], n: o[2], step: o[3], cats: o[4], vals: o[5], idx }));
+    if (!readings.length) return { months: [], now: null, refNow, nowAt: () => null };
+    const prep = E.prepare(readings, { t0: M.t0, t1: M.t1, minCore: M.minCore, trend: true });
+    const jumps = new Set(M.jumps.filter((d) => d > M.t0 && d <= M.t1));
+    const events = [...new Set([M.t0, ...prep.obs.map((o) => o.day), ...M.months.map((m) => m[1]), M.t1, M.t1 - 30, ...jumps])].filter((d) => d >= M.t0 && d <= M.t1).sort((a, b) => a - b);
+    const th = { ...M.th, w: Float64Array.from(M.th.w) };
+    const kappa = new Map(Object.entries(M.kappa));
+    const anchor = { mean: Float64Array.from(M.anchor.mean), cov: Float64Array.from(M.anchor.cov) };
+    const f = E.runFilter(prep.obs, prep.L, events, th, { anchor, jumps, kappa, lone: prep.L.lone, store: true });
+    const sm = E.smooth(f, prep.L, th);
+    const N = prep.L.N, Dd = prep.L.D, ev = new Map(events.map((d, i) => [d, i]));
+    const sharesAt = (day) => {
+      const k = ev.get(day);
+      if (k == null) return null;
+      const eta = sm.xs.subarray(k * N, k * N + Dd), p = E.softmaxAlr(eta), o = { ci: {} };
+      PK.forEach((key, a) => {
+        let v = 0;
+        for (let i = 0; i < Dd; i++) for (let j = 0; j < Dd; j++) {
+          const ji = p[a] * ((a === i ? 1 : 0) - p[i]), jj = p[a] * ((a === j ? 1 : 0) - p[j]);
+          v += ji * sm.Ps[k * N * N + i * N + j] * jj;
+        }
+        o[key] = r1(100 * p[a]); o.ci[key] = r1(196 * Math.sqrt(v));
+      });
+      return o;
+    };
+    const live = (day) => readings.filter((r) => day - r.day >= 0 && day - r.day <= M.window).length;
+    const have = new Set();
+    for (const q of D.individualPolls || []) if (!sel || sel.has(q.pollster)) have.add(q.ym);
+    const months = M.months.filter(([ym]) => have.has(ym)).map(([ym, day]) => { const o = sharesAt(day); return { ym, x: D.mx(ym), ...o }; });
+    const nowS = live(M.t1) ? sharesAt(M.t1) : null;
+    const now = nowS ? { ...Object.fromEntries(PK.map((k) => [k, nowS[k]])), n: live(M.t1) } : null;
+    const nowAt = (ref) => {
+      const d = Math.floor(ref / DAY0);
+      if (d === M.t1) return now;
+      if (d === M.t1 - 30 && live(d)) { const o = sharesAt(d); return Object.fromEntries(PK.map((k) => [k, o[k]])); }
+      return null;
+    };
+    return { months, now, refNow, nowAt };
+  };
+  window.AP.pvAgg = (houses, opts) => {
+    if (window.AP.D.primModel && window.AP.pmEngine) return pmAgg(houses, opts);
     const D = window.AP.D, spec = D.aggSpec;
     const { rows, refNow } = rowsFor(houses);
     const rowsK = {};

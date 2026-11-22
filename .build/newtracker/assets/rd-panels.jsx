@@ -42,13 +42,18 @@ const RD_AES_NUDGE = (narrow) => (narrow ? 0.05 : 0.03);
    result's scale, and the estimate's 95% margin. `c` is the party's cell:
    [estimate, margin, the polls' figure | null, the AES's | null]. */
 const RD_VOTE_LABEL = "Estimated vote at the 2025 election";
+/* how the polls' election-day figure for a group is read: federally the
+   group model's estimate for polling day (gen-data §7gm), from the houses'
+   tables before and after it; otherwise the six weeks of tables before */
+const RD_PEL_MODEL = !!(window.AUSPOL.demoElection && window.AUSPOL.demoElection.model);
+const RD_PEL_WHEN = RD_PEL_MODEL ? "for polling day, from the tables before and after it" : "over the six weeks before polling day";
 const rdVoteSub = (grp, c) => {
   const polls = grp.polls ? grp.polls.n + " poll" + (grp.polls.n === 1 ? "" : "s") + " from " + rdList(grp.polls.houses.map(demoHouse)) : "";
   const aes = grp.aesN != null ? grp.aesN.toLocaleString() + " respondents in this group" : "";
   return c[2] != null && c[3] != null
-    ? "Polls in the six weeks before polling day " + c[2].toFixed(1) + " (" + polls + "); Australian Election Study " + c[3].toFixed(1) + " (" + aes + "); weighted together, ±" + c[1].toFixed(1)
+    ? (RD_PEL_MODEL ? "Polls, read for polling day " : "Polls in the six weeks before polling day ") + c[2].toFixed(1) + " (" + polls + "); Australian Election Study " + c[3].toFixed(1) + " (" + aes + "); weighted together, ±" + c[1].toFixed(1)
     : c[2] != null
-      ? "From the polls in the six weeks before polling day: " + polls + ", ±" + c[1].toFixed(1)
+      ? (RD_PEL_MODEL ? "From the polls, read for polling day: " : "From the polls in the six weeks before polling day: ") + polls + ", ±" + c[1].toFixed(1)
       : "From the Australian Election Study 2025, a post-election survey: " + aes + ", ±" + c[1].toFixed(1);
 };
 
@@ -195,11 +200,20 @@ function RdPrimary({ rangeId, setRangeId }) {
      wider gap starts a fresh group, so a tie BELOW the leaders is its own
      group. levelCount is the top group's size - the all-voters contrast
      behind a group's dek asks only that. */
+  /* federal all-voters figures come from the model, which gives the chance
+     each party is ahead of each other directly (latest.primaryModel.pAhead):
+     there a party joins the group above while that chance is under 97.5%
+     (a two-sided 95% test); a group view or a pollster subset keeps the
+     margins test */
+  const pAheadAll = !pvx && D.latest && D.latest.primaryModel ? D.latest.primaryModel.pAhead : null;
   const levelRuns = (ps) => {
     const rs = [];
+    const pa = pAheadAll && ps === partsAll ? pAheadAll : null;
     ps.forEach((p) => {
       const r = rs[rs.length - 1];
-      if (r && r[0].v - p.v < Math.sqrt(r[0].ci * r[0].ci + p.ci * p.ci)) r.push(p);
+      const pk = r ? r[0].id + ">" + p.id : null;
+      const tied = r && (pa && pa[pk] != null ? pa[pk] < 0.975 : r[0].v - p.v < Math.sqrt(r[0].ci * r[0].ci + p.ci * p.ci));
+      if (tied) r.push(p);
       else rs.push([p]);
     });
     return rs;
@@ -536,9 +550,12 @@ function RdPrimary({ rangeId, setRangeId }) {
   /* the polls the meta line counts: "national" here, "Victorian" on /vic/ */
   const pollsWord = window.JUR ? window.JUR.adj : "national";
   /* /vic/'s lines are a smoothed trend through every poll (gen-data §1a) */
+  /* federal: the lines are the primary model's (gen-data §2m) – its estimate at
+     each month's middle, the band its 95% interval */
+  const PMD = !window.JUR && !!(D.latest && D.latest.primaryModel);
   const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
   const meta = G
-    ? "Pooled from the last " + T.window + " of " + rdList(G.houses.map(demoHouse)) + " polls"
+    ? (T.model ? "Modelled from every poll this term; " + rdList(G.houses.map(demoHouse)) + " in the last " + T.window : "Pooled from the last " + T.window + " of " + rdList(G.houses.map(demoHouse)) + " polls")
     : pvx
       ? pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, !narrow)
       : narrow
@@ -682,7 +699,7 @@ function RdPrimary({ rangeId, setRangeId }) {
            itself: a survey's election figure, not the count */
         const w = p.was != null ? { v: p.was, since: aesGrp ? "the election (AES)" : "the election" } : (gWas && gWas[p.id] != null ? { v: gWas[p.id], since: rdMonthYear(gWas.ym) } : null);
         const wTitle = p.was == null ? undefined
-          : pelGrp ? "Measured from the polls’ figure for this group over the six weeks before the election, ±" + (p.wasCi || 0).toFixed(1) + " points"
+          : pelGrp ? "Measured from the polls’ figure for this group " + RD_PEL_WHEN + ", ±" + (p.wasCi || 0).toFixed(1) + " points"
           : aesGrp ? "Measured from the Australian Election Study 2025’s figure for this group, ±" + (p.wasCi || 0).toFixed(1) + " points" : undefined;
         return w && (
           <span className="rd-pv-chg" title={wTitle}>{rdArrow(p.v - w.v)} {Math.abs(p.v - w.v).toFixed(1)} since {w.since}</span>
@@ -930,7 +947,7 @@ function RdPrimary({ rangeId, setRangeId }) {
             if (elecStop && i === 0) return gElecStop
               ? [{ label: "", value: "The election result" }]
               : [{ label: "", value: evGrp.src === "both" ? "Estimated from the polls before the election and the Australian Election Study 2025"
-                  : evGrp.src === "polls" ? "The polls over the six weeks before polling day"
+                  : evGrp.src === "polls" ? "The polls " + RD_PEL_WHEN
                   : "Australian Election Study 2025, " + evGrp.aesN.toLocaleString() + " respondents" }];
             const d = pts[elecStop ? i - 1 : i];
             if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
@@ -950,20 +967,20 @@ function RdPrimary({ rangeId, setRangeId }) {
             sub: "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "")
               + ". Monthly averages of the polls, adjusted for each pollster’s lean.",
             caption: (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + " are monthly averages moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
-              + " with the doubt about when the miss arose." + (H.bridges ? " Dotted stretches are months no one polled." : ""),
+              + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
             legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
               .concat([{ label: "Election result", color: "var(--ink)", kind: "ring" }]),
-          } : { title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""), sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : pvx ? ". Monthly averages of " + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
+          } : { title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""), sub: story.head + (G ? (PMD ? ". The model’s estimate for " + sel.who + " at each month’s middle, latest fieldwork " : ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork ") + rdDate(D.latest.updatedISO, true) + "." : pvx ? (PMD ? ". The model re-run on " : ". Monthly averages of ") + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : PMD ? ". The model’s estimates from " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
-                    : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals."
+                    : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are " + (PMD ? "the model’s estimates at each month’s middle" : "monthly averages") + ", shaded bands their 95% intervals."
                       + (evOn ? " The diamonds at the election are estimates of how " + sel.who + " voted, from "
-                        + (evGrp.src === "both" ? "the polls before polling day and the Australian Election Study 2025 together." : evGrp.src === "polls" ? "the polls over the six weeks before polling day." : "the Australian Election Study 2025.") : "")
+                        + (evGrp.src === "both" ? "the polls before polling day and the Australian Election Study 2025 together." : evGrp.src === "polls" ? "the polls " + RD_PEL_WHEN + "." : "the Australian Election Study 2025.") : "")
                       /* the income bands' own caveat, from the payload's one
                          copy of it (the Who-votes dek's note is the same) */
                       + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "")
                       + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "")
-                    : "Each dot is one poll; lines are monthly averages" + (pvx ? " of the selected pollsters" : "") + ", shaded bands their 95% intervals.",
+                    : "Each dot is one poll; lines are " + (PMD ? "the model’s estimates at each month’s middle" + (pvx ? ", re-run on the selected pollsters" : "") : "monthly averages" + (pvx ? " of the selected pollsters" : "")) + ", shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
                     .concat(evOn ? [{ label: RD_VOTE_LABEL, color: "var(--ink-3)", kind: "diamond" }] : []) }}
         />
@@ -1009,7 +1026,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           H.bridges ? { kind: "dots", color: "var(--ink-3)", label: "No polls" } : null,
         ] : [
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-          { kind: "lineband", color: "var(--ink-3)", label: KAL ? (narrow ? "Trend, 95% interval" : "Trend and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+          { kind: "lineband", color: "var(--ink-3)", label: KAL ? (narrow ? "Trend, 95% interval" : "Trend and its 95% interval") : PMD && !G ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           base ? { kind: "ring", label: rdElecYear + " election result" } : null,
           evOn ? { kind: "diamond", color: "var(--ink-3)", label: RD_VOTE_LABEL } : null,
         ]}>
@@ -4358,7 +4375,7 @@ function RdDemographics({ rangeId = "all" }) {
         /* the pooled-figures note sits on the text cells, not the row: the
            rug dots now bring their own chart-style tip, and a row-wide
            title would pop the OS tooltip over it */
-        const rowTitle = "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading";
+        const rowTitle = (T.model ? g.n + " poll" + (g.n === 1 ? "" : "s") + " in the last " + T.window + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% interval of the model’s figure" : "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin") + ", small dots: each poll’s own reading";
         return (
           <div key={"r" + gi} className="rd-wv-row" role="row">
             <span role="cell" className="rd-wv-lab" title={rowTitle}>{g.bare || g.label}<RdGenBorn label={g.label} />{g.cuts && g.cuts.length ? <RdIncomeCut pct={g.pct} cuts={g.cuts} /> : null}</span>
@@ -4668,7 +4685,7 @@ function RdDemographics({ rangeId = "all" }) {
     const ciLead = (i) => (i === 0
       ? [{ label: "", value: leOn ? "The election result"
         : elSrc.includes("both") ? "Groups: estimated from the polls before the election and the Australian Election Study 2025; all voters: the result"
-        : elSrc[0] === "polls" ? "Groups: the polls over the six weeks before polling day; all voters: the result"
+        : elSrc[0] === "polls" ? "Groups: the polls " + RD_PEL_WHEN + "; all voters: the result"
         : "Groups: Australian Election Study 2025; all voters: the result" }]
       : ciLoc(i - 1));
     return (
@@ -4716,7 +4733,7 @@ function RdDemographics({ rangeId = "all" }) {
   };
 
   return (
-    <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
+    <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={T.model ? "Modelled from every poll this term; " + rdList(T.houses.map(demoHouse)) + " in the last " + T.window : "Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
       <RdHed head={story.head} dek={story.dek} />
       {/* the party picks itself by number key: 1 One Nation, 2 Labor,
           3 Coalition, 4 Greens, 5 Others - the chips' left-to-right order */}
@@ -4757,7 +4774,7 @@ function RdDemographics({ rangeId = "all" }) {
           { kind: "dot-solid", color: pColor, label: "Clearly above or below all voters" },
           { kind: "dot-open", color: pColor, label: "Within the margin" },
           { kind: "whisker", color: pColor, label: "95% interval" },
-          { kind: "dot", color: pColor, label: "One poll pooled" },
+          { kind: "dot", color: pColor, label: T.model ? "One poll in the last " + T.window : "One poll pooled" },
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
         {/* the house's own end brackets each tilt was read from, spelled
            out by house since no two houses' brackets agree (the dek says
@@ -4782,7 +4799,7 @@ function RdDemographics({ rangeId = "all" }) {
       <div className="rd-wv-charts rd-wv-enter" key={"wv-" + tab.id}>{charts.map(chartOf)}</div>
       <RdKey className="rd-ckey rd-sm-key" items={[
         { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-        { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+        { kind: "lineband", color: "var(--ink-3)", label: T.model ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
         { kind: "dash", color: "var(--ink)", label: "All voters" },
         { kind: "ring", label: rdElecYear + " election result" },
       ].concat(D.demoVote && tab.sets.some((st) => D.demoVote.sets[st.id] && Object.values(D.demoVote.sets[st.id].groups).some((g) => g[party] != null))
@@ -4862,7 +4879,7 @@ function RdDemographics({ rangeId = "all" }) {
                   ))}
                 </table>
               </div>
-              <p className="rd-note rd-tsig-note">The election gap is the group’s in the polls over the six weeks before polling day: the houses’ own published tables then, pooled as the current figure is, so both ends are the same instruments. The generations are the exception, because no pollster cut them before the election: their election gap is the Australian Election Study 2025’s (its share less all respondents’, from the survey’s respondent file). The gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. This compares two endpoints and is never a point in the trend fit above. The AES records the vote people cast, not an intention, and at the election it read several groups differently from the polls by more than both margins. That is why the polls’ own figure is the baseline wherever one exists; the AES’s diamonds stay on the charts. For age and gender, Resolve’s own polls give a second reading of the same change: its recent polls against its election-day poll, so its house lean cancels. Where that reading disagrees beyond both margins, the change is withheld from the summary above.{(() => {
+              <p className="rd-note rd-tsig-note">{RD_PEL_MODEL ? "The election gap is the group’s on polling day in the model, read from the houses’ own published tables before and after it, as the current figure is, so both ends are the same instruments." : "The election gap is the group’s in the polls over the six weeks before polling day: the houses’ own published tables then, pooled as the current figure is, so both ends are the same instruments."} The generations are the exception, because no pollster cut them before the election: their election gap is the Australian Election Study 2025’s (its share less all respondents’, from the survey’s respondent file). The gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. This compares two endpoints and is never a point in the trend fit above. The AES records the vote people cast, not an intention, and at the election it read several groups differently from the polls by more than both margins. That is why the polls’ own figure is the baseline wherever one exists; the AES’s diamonds stay on the charts. For age and gender, Resolve’s own polls give a second reading of the same change: its recent polls against its election-day poll, so its house lean cancels. Where that reading disagrees beyond both margins, the change is withheld from the summary above.{(() => {
                 const gs = elecSets.find((s) => s.key.endsWith("|generation"));
                 const st = gs && Tdemo.tabs.flatMap((t) => t.sets).find((s) => s.id === "generation");
                 return st ? " The generations’ comparison is across instruments: the polls’ Gen Z, Millennial, Gen X and Boomer figures come only from the generation cuts of " + rdList(st.houses.map(demoHouse)) + ", set against the AES, and the margins can’t account for that." : "";
