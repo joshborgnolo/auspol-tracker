@@ -217,6 +217,7 @@
       "2026-11-06|RedBridge/Accent",
       "2026-11-07|Resolve",
       "2026-11-08|Roy Morgan",
+      "2026-11-12|EMRS (Tas)",
       "2026-11-15|Roy Morgan",
       "2026-11-17|YouGov",
       "2026-11-19|Newspoll"
@@ -842,6 +843,13 @@
       "label": "22 Nov 2026",
       "kind": "finding",
       "text": "The month-on-month fall in the right-track-minus-wrong-track net is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-22",
+      "label": "22 Nov 2026",
+      "kind": "poll",
+      "text": "EMRS (Tas) (fieldwork 11–12 Nov, n=978) added — the two-party preferred estimate held at 50.7 (Labor v the Coalition, implied flows). Primary votes held.",
+      "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20Nov%202026.pdf"
     }
   ]
 }
