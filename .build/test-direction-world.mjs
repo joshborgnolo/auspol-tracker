@@ -1,5 +1,5 @@
-// Ipsos's world comparison. Run after the site build: the producer reads PDFs,
-// the renderer consumes only the derived monthly waves and country quantiles.
+// Ipsos's Australian and Global Average direction data. Run after the site
+// build: the producer reads PDFs; the build derives monthly waves and quantiles.
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
@@ -46,27 +46,8 @@ for (const w of payload.waves) {
 const panelMatch = html.match(/assets\/js\/rd-panels\.[a-z0-9]+\.js/);
 assert.ok(panelMatch, "the panels asset is emitted");
 const panel = fs.readFileSync(panelMatch[0], "utf8");
-assert.ok(panel.includes("Ipsos") && panel.includes("middle 80%") && panel.includes("Global Average"),
-  "Australia, global average and country bands have explicit chart labels");
+assert.ok(panel.includes("Ipsos") && panel.includes("Global Average"),
+  "the Global Average remains labelled on the main national-direction chart");
+assert.ok(!panel.includes("RdIpsosDirectionWorld"), "the redundant separate chart renderer is removed");
 
-// Render the actual component through the same VM the production retro pages
-// use. This catches context/import errors and a plausible but invalid tooltip.
-const { modernRunner } = await import("./retro/harvest.mjs");
-const runner = modernRunner({ root: process.cwd(), doc: "cycles/index.html" });
-const tree = runner.mount("RdIpsosDirectionWorld", { D: runner.D });
-const findChart = (node) => {
-  if (Array.isArray(node)) for (const child of node) { const found = findChart(child); if (found) return found; }
-  if (!node) return null;
-  if (node.tag === "$chart" || node.tag === "$c") return node;
-  return findChart(node.kids) || findChart(node.props?.children);
-};
-const chart = findChart(tree.tree);
-assert.ok(chart, "the actual world component renders a chart");
-assert.equal(chart.props.series[1].label, "Ipsos’ Global Average");
-assert.equal(JSON.stringify(chart.props.areas.map((a) => a.id)), JSON.stringify(["countries-middle-80", "countries-middle-half"]));
-const tipRows = chart.props.extraRows(chart.props.spine.length - 1);
-assert.equal(tipRows.find((r) => r.label === "Australia").value, "36% right / 64% wrong track");
-assert.equal(tipRows.find((r) => r.label === "Ipsos’ Global Average").value, "37% right / 63% wrong track");
-assert.equal(tipRows.find((r) => r.label === "Sample").value, "≈1,000 in Australia; 24,527 across all countries");
-assert.ok(!tipRows.some((r) => /undefined|NaN/.test(r.value)), "tooltip never exposes a malformed value");
 console.log(`test-direction-world: OK (${payload.waves.length} waves; October AU 36/64, world 37/63)`);

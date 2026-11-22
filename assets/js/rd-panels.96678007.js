@@ -2442,7 +2442,8 @@ const TRUST_COLOR = {
   scanlon: "var(--confidence-main)",
   aes: "var(--confidence-alt)",
   "oecd-au": "var(--macro-gdppc)",
-  "oecd-avg": "var(--macro-gdppc)"
+  "oecd-avg": "var(--macro-gdppc)",
+  "essential-parliament": "var(--ink-3)"
 };
 const TRUST_ELECTIONS = [{
   date: "2022-05-21",
@@ -2460,6 +2461,403 @@ const trustMonth = ym => {
   return window.AP.D.monthNameFull(m) + " " + y;
 };
 function RdTrust() {
+  const {
+    D
+  } = window.AP;
+  if (!D.trustGov.model) return React.createElement(RdTrustSeparate, null);
+  return React.createElement(RdTrustModel, null);
+}
+function RdTrustModel() {
+  const {
+    D
+  } = window.AP;
+  const narrow = useNarrow(MQ_PHONE);
+  const [tab, setTab] = React.useState("recent");
+  const M = D.trustGov.model,
+    now = M.now;
+  const S = Object.fromEntries(D.trustGov.series.map(s => [s.id, s]));
+  const line = D.trustGov.series.find(s => s.role === "line");
+  const R = line.readings;
+  const pts = n => Math.abs(n).toFixed(1);
+  const color = TRUST_COLOR.anupoll;
+  const credit = (s, r) => ({
+    pollster: s.house,
+    dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""),
+    sample: r.n || null
+  });
+  const firstOnName = trustMonth(M.firstOn);
+  const rank = x => !x ? "" : x.record ? ", the lowest since the line begins in " + firstOnName : ", the lowest since " + trustMonth(x.since);
+  const head = plainShare(now.v) + " Australians have confidence in the federal government" + rank(now.low2020);
+  const Y = now.year,
+    E = now.election;
+  const sYear = Y.sig ? (Y.chg < 0 ? "Down " : "Up ") + pts(Y.chg) + " points on a year ago" : "Not significantly changed on a year ago";
+  const elecLabel = E ? trustMonth(E.date.slice(0, 7)) : "";
+  const sElec = E && E.sig && E.ym !== Y.from ? (Y.sig && Math.sign(Y.chg) === Math.sign(E.chg) ? ", and " : ", but ") + (E.chg < 0 ? "down " : "up ") + pts(E.chg) + " points since just after the " + elecLabel + " election" : "";
+  const others = D.trustGov.series.filter(s => s.role === "dot");
+  const sigOther = others.map(s => {
+    const rs = s.readings,
+      a = rs[rs.length - 1],
+      b = rs[rs.length - 2];
+    return a && b && a.sigChange ? {
+      s,
+      a,
+      b
+    } : null;
+  }).filter(Boolean).sort((p, q) => q.a.x - p.a.x)[0];
+  const ref = Y.sig ? Y.chg : E && E.sig ? E.chg : 0;
+  const sameWay = sigOther && ref && Math.sign(sigOther.a.v - sigOther.b.v) === Math.sign(ref);
+  const dek = sYear + sElec + "." + (sameWay ? " " + sigOther.s.house + "’s own " + trustMonth(sigOther.a.date) + " survey reports a significant " + (sigOther.a.v < sigOther.b.v ? "fall" : "rise") + " too, " + pts(sigOther.a.v - sigOther.b.v) + " points in a year." : "");
+  const dotSeries = D.trustGov.series.filter(s => s.role !== "line" && s.id !== "oecd-avg");
+  const x0 = 2019.92,
+    x1 = Math.max(now.x, ...dotSeries.flatMap(s => s.readings.map(r => r.x))) + 0.2;
+  const lineR = M.months.filter(m => m.x >= x0 - 0.05);
+  const oecdR = (M.oecdAvgAdj || []).filter(r => r.x >= x0);
+  const tSeries = [{
+    id: "trust-model",
+    label: "All surveys, on ANUpoll’s terms",
+    color,
+    points: lineR.map(m => ({
+      x: m.x,
+      y: m.v
+    })),
+    rdWidth: 2.5,
+    endCap: false,
+    smooth: false,
+    endLabel: narrow ? null : "All surveys"
+  }, ...(oecdR.length >= 2 ? [{
+    id: "oecd-avg-adj",
+    label: "OECD average, on ANUpoll’s terms",
+    color: TRUST_COLOR["oecd-avg"],
+    points: oecdR.map(r => ({
+      x: r.x,
+      y: r.v
+    })),
+    rdWidth: 1.5,
+    dash: "4 4",
+    endCap: false,
+    smooth: false,
+    interpHover: true
+  }] : [])];
+  const tAreas = [{
+    id: "trust-ci",
+    color,
+    className: "ci-band",
+    edge: false,
+    smooth: false,
+    points: lineR.map(m => ({
+      x: m.x,
+      y0: m.lo,
+      y1: m.hi
+    }))
+  }];
+  const tDots = [...R.map(r => ({
+    x: r.x,
+    y: r.v,
+    color,
+    label: "Confidence, as printed",
+    meta: credit(line, r),
+    op: 1.6,
+    hollow: r.panel === "lia"
+  })), ...dotSeries.flatMap(s => s.readings.filter(r => r.x >= x0 && r.x <= x1).map(r => ({
+    x: r.x,
+    y: r.v,
+    color: TRUST_COLOR[s.id] || "var(--ink-3)",
+    label: s.measure.split(" (")[0] + ", as printed",
+    meta: credit(s, r),
+    hollow: true,
+    size: 1.25
+  })))];
+  const tVals = tDots.map(d => d.y).concat(tAreas[0].points.flatMap(p => [p.y0, p.y1]), oecdR.map(r => r.v));
+  const tLo = Math.floor(Math.min(...tVals) / 10) * 10,
+    tHi = Math.ceil(Math.max(...tVals) / 10) * 10;
+  const tTicks = (() => {
+    const elec = TRUST_ELECTIONS.map(e => ({
+      x: trustDx(e.date),
+      label: narrow ? "E" : "Election",
+      strong: true,
+      short: "E"
+    }));
+    const years = [];
+    for (let y = Math.ceil(x0); y <= x1; y++) {
+      if (elec.some(e => Math.abs(e.x - y) < (narrow ? 0.55 : 0.4))) continue;
+      if (narrow && y % 2) continue;
+      years.push({
+        x: y,
+        label: String(y)
+      });
+    }
+    return [...years, ...elec].sort((a, b) => a.x - b.x);
+  })();
+  const otherNames = rdList(dotSeries.filter(s => s.readings.some(r => r.x >= x0)).map(s => s.house));
+  const lineL = M.months.filter(m => m.ym >= M.firstOn);
+  const adjDots = Object.entries(M.adj).flatMap(([sid, rs]) => rs.map((r, i) => {
+    const s = S[sid],
+      orig = s && s.readings[i];
+    return {
+      x: r.x,
+      y: r.v,
+      color: TRUST_COLOR[sid] || "var(--ink-3)",
+      label: (s ? s.house : sid) + ", on ANUpoll’s terms",
+      sub: orig ? "Printed: " + orig.v + "% (" + s.measure.split(" (")[0].toLowerCase() + ")" : undefined,
+      meta: s && orig ? credit(s, orig) : {
+        pollster: sid
+      },
+      hollow: !!(orig && (orig.panel === "lia" || orig.mode === "tel")),
+      size: sid === "aes" || sid === "scanlon" ? 1.1 : 1
+    };
+  }));
+  const oecdL = M.oecdAvgAdj || [];
+  const lSeries = [{
+    id: "trust-model-long",
+    label: "All surveys, on ANUpoll’s terms",
+    color,
+    points: lineL.map(m => ({
+      x: m.x,
+      y: m.v
+    })),
+    rdWidth: 2.5,
+    endCap: false,
+    smooth: false,
+    endLabel: narrow ? null : "All surveys"
+  }, ...(oecdL.length >= 2 ? [{
+    id: "oecd-avg-adj-long",
+    label: "OECD average, on ANUpoll’s terms",
+    color: TRUST_COLOR["oecd-avg"],
+    points: oecdL.map(r => ({
+      x: r.x,
+      y: r.v
+    })),
+    rdWidth: 1.5,
+    dash: "4 4",
+    endCap: false,
+    smooth: false
+  }] : [])];
+  const lAreas = [{
+    id: "trust-ci-long",
+    color,
+    className: "ci-band",
+    edge: false,
+    smooth: false,
+    points: lineL.map(m => ({
+      x: m.x,
+      y0: m.lo,
+      y1: m.hi
+    }))
+  }];
+  const lx0 = 1968,
+    lx1 = Math.max(...adjDots.map(d => d.x), now.x) + 1.2;
+  const lVals = adjDots.map(d => d.y).concat(lAreas[0].points.flatMap(p => [p.y0, p.y1]));
+  const lLo = Math.floor(Math.min(...lVals) / 10) * 10,
+    lHi = Math.ceil(Math.max(...lVals) / 10) * 10;
+  const lTicks = [];
+  for (let y = 1970; y <= lx1; y += narrow ? 20 : 10) lTicks.push({
+    x: y,
+    label: String(y)
+  });
+  const longHead = plainShare(now.v) + " Australians have confidence in the federal government, on ANUpoll’s terms" + rank(now.lowOn);
+  const oa = S["oecd-au"],
+    ov = S["oecd-avg"];
+  const oDek = (() => {
+    if (!oa || !ov) return "";
+    const pairs = oa.readings.map(r => [r, ov.readings.find(q => q.date === r.date)]).filter(([, q]) => q);
+    if (!pairs.length) return "";
+    const [a, b] = pairs[pairs.length - 1];
+    const allAbove = pairs.every(([r, q]) => r.v > q.v),
+      allBelow = pairs.every(([r, q]) => r.v < q.v);
+    return " On the OECD’s own scale Australia sits " + (a.v > b.v ? "above" : "below") + " the OECD average" + (allAbove || allBelow ? " in every round" : " in its latest round") + ", " + a.v + "% to " + b.v + "% in " + a.date.slice(0, 4) + ".";
+  })();
+  const longDek = "Before " + firstOnName + " too few surveys asked, on questions too unlike, to pin the level within ±10 points, so the line starts there; earlier readings show as dots, each moved onto ANUpoll’s terms by its own lean." + oDek;
+  const tabs = React.createElement(RdTabs, {
+    value: tab,
+    onChange: setTab,
+    ariaLabel: "Trust view",
+    className: "rd-tabs-sm rd-trust-tabs",
+    options: [{
+      id: "recent",
+      label: "Since 2020"
+    }, {
+      id: "long",
+      label: "The long view"
+    }]
+  });
+  const spineR = lineR.map(m => ({
+      x: m.x,
+      y: m.v
+    })),
+    spineL = lineL.map(m => ({
+      x: m.x,
+      y: m.v
+    }));
+  const brk = M.breaks || {};
+  return React.createElement(React.Fragment, null, React.createElement(RdHed, {
+    head: tab === "recent" ? head : longHead,
+    dek: tab === "recent" ? dek : longDek
+  }), tabs, React.createElement(RdCrossfade, {
+    k: tab
+  }, tab === "recent" ? React.createElement("div", {
+    className: "card rd-card rd-dir-chart rd-trust-chart"
+  }, React.createElement("div", {
+    className: "rd-chead"
+  }, React.createElement("span", {
+    className: "rd-chead-t"
+  }, narrow ? "Confidence in the federal government, %" : "Confidence in the federal government, %, every survey on ANUpoll’s terms")), narrow && React.createElement(RdKey, {
+    items: [{
+      kind: "line",
+      color,
+      label: "All surveys"
+    }],
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, {
+    key: "rd-trust-m",
+    heightPx: narrow ? 280 : 360,
+    padPx: narrow ? {
+      l: 34,
+      r: 8,
+      t: 30,
+      b: 28
+    } : {
+      l: 40,
+      r: 16,
+      t: 40,
+      b: 30
+    },
+    xDomain: [x0, x1],
+    yDomain: [tLo, tHi],
+    yTicks: rdYTicks(tLo, tHi, 10),
+    yTickFmt: v => v === tHi ? v + "%" : String(v),
+    xTicks: tTicks,
+    baseline: true,
+    series: tSeries,
+    spine: spineR,
+    areas: tAreas,
+    scatter: tDots,
+    tooltipTitle: i => lineR[i] ? trustMonth(lineR[i].ym) : "",
+    extraRows: i => {
+      const m = lineR[i];
+      return m ? [{
+        label: "95% interval",
+        value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1)
+      }] : [];
+    },
+    fmt: v => v.toFixed(1),
+    copy: {
+      title: "Confidence in the federal government",
+      sub: head + ". Every survey pooled, on ANUpoll’s terms: the share with a great deal or quite a lot of confidence in the Federal Government in Canberra.",
+      caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval. Filled dots: ANUpoll as printed (open: its earlier panel). Open dots: other surveys as printed, each worded its own way (" + otherNames + ")." + (oecdR.length >= 2 ? " Dashed: the OECD average on the same terms." : ""),
+      legend: [{
+        label: "All surveys, on ANUpoll’s terms",
+        color,
+        kind: "line"
+      }, {
+        label: "Surveys as printed",
+        color: "var(--ink-3)",
+        kind: "ring"
+      }]
+    }
+  }), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: [{
+      kind: "lineband",
+      color,
+      label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval"
+    }, {
+      kind: "dot",
+      color,
+      label: "ANUpoll as printed; open dots are its earlier panel, to 2024"
+    }, ...dotSeries.filter(s => s.readings.some(r => r.x >= x0)).map(s => ({
+      kind: "dot-open",
+      color: TRUST_COLOR[s.id] || "var(--ink-3)",
+      label: s.house + ", as printed"
+    })), oecdR.length >= 2 ? {
+      kind: "dash",
+      color: TRUST_COLOR["oecd-avg"],
+      label: "OECD average, moved onto the same terms by the OECD’s lean in Australia"
+    } : null].filter(Boolean)
+  })) : React.createElement("div", {
+    className: "card rd-card rd-dir-chart rd-trust-chart"
+  }, React.createElement("div", {
+    className: "rd-chead"
+  }, React.createElement("span", {
+    className: "rd-chead-t"
+  }, narrow ? "Confidence in the federal government, %" : "Confidence in the federal government, %, every survey on ANUpoll’s terms")), narrow && React.createElement(RdKey, {
+    items: [{
+      kind: "line",
+      color,
+      label: "All surveys"
+    }],
+    className: "rd-tpp-legend"
+  }), React.createElement(TrendChart, {
+    key: "rd-trust-m-long",
+    heightPx: narrow ? 280 : 360,
+    padPx: narrow ? {
+      l: 34,
+      r: 8,
+      t: 30,
+      b: 28
+    } : {
+      l: 40,
+      r: 16,
+      t: 40,
+      b: 30
+    },
+    xDomain: [lx0, lx1],
+    yDomain: [lLo, lHi],
+    yTicks: rdYTicks(lLo, lHi, 10),
+    yTickFmt: v => v === lHi ? v + "%" : String(v),
+    xTicks: lTicks,
+    baseline: true,
+    series: lSeries,
+    areas: lAreas,
+    scatter: adjDots,
+    spine: spineL,
+    tooltipTitle: i => lineL[i] ? trustMonth(lineL[i].ym) : "",
+    extraRows: i => {
+      const m = lineL[i];
+      return m ? [{
+        label: "95% interval",
+        value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1)
+      }] : [];
+    },
+    fmt: v => v.toFixed(1),
+    copy: {
+      title: "Confidence in the federal government over the long run",
+      sub: longHead + ".",
+      caption: "Line from " + firstOnName + ": every survey pooled, on ANUpoll’s terms, shaded with its 95% interval. Dots: each survey’s readings moved onto ANUpoll’s terms by its own lean (open: ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecdL.length >= 2 ? " Dashed: the OECD average on the same terms." : ""),
+      legend: [{
+        label: "All surveys, on ANUpoll’s terms",
+        color,
+        kind: "line"
+      }, {
+        label: "Each survey’s readings, on the same terms",
+        color: "var(--ink-3)",
+        kind: "ring"
+      }]
+    }
+  }), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: [{
+      kind: "lineband",
+      color,
+      label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval, from " + firstOnName
+    }, ...Object.keys(M.adj).filter(sid => S[sid]).map(sid => ({
+      kind: "dot",
+      color: TRUST_COLOR[sid] || "var(--ink-3)",
+      label: S[sid].house + ", moved onto ANUpoll’s terms"
+    })), oecdL.length >= 2 ? {
+      kind: "dash",
+      color: TRUST_COLOR["oecd-avg"],
+      label: "OECD average, on the same terms"
+    } : null].filter(Boolean)
+  }))), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Every survey asks its own question \u2013 ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Essential about trust in the national government and in the federal parliament \u2013 so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on ANUpoll\u2019s terms: the share with a great deal or quite a lot of confidence, as ANUpoll\u2019s current panel asks it."), React.createElement(React.Fragment, null, "The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll\u2019s opt-in panel since 2024 reads about ", pts(brk.anupoll || 0), " points below its earlier panel at the same level of trust, and Scanlon\u2019s telephone years read about ", pts(brk.scanlon || 0), " points ", brk.scanlon < 0 ? "below" : "above", " its online panel. No survey responds more or less sharply than ANUpoll\u2019s once its lean is taken out."), React.createElement(React.Fragment, null, "The shading is the line\u2019s 95% interval: a 95% chance trust lies inside, under the model\u2019s assumptions. A change is called significant only when its own 95% interval excludes zero. Before ", firstOnName, " the interval is wider than \xB110 points, so the long view draws the line only from there. The OECD average is moved onto the same terms by the OECD survey\u2019s lean in Australia, and covers whichever countries took part (22 in 2021, 38 in 2025).")]
+  }), React.createElement(RdFoot, {
+    how: {
+      term: "trust-government",
+      from: "National mood"
+    }
+  }, tab === "recent" ? "Trust readings come a few times a year, not monthly: ANUpoll’s waves are quarterly, the rest yearly or less." : "The AES dates each reading to the month after polling day; Scanlon fields mid-year."));
+}
+function RdTrustSeparate() {
   const {
     D
   } = window.AP;
@@ -2846,157 +3244,6 @@ function RdTrust() {
       from: "National mood"
     }
   }, tab === "recent" ? "Trust readings come a few times a year, not monthly: ANUpoll’s waves are quarterly, the rest yearly or less." : "The AES dates each reading to the month after polling day; Scanlon fields mid-year."));
-}
-function RdIpsosDirectionWorld({
-  D
-}) {
-  const {
-    monthLabelFull
-  } = window.AP;
-  const narrow = useNarrow(MQ_PHONE);
-  const ws = D.directionWorld?.waves || [];
-  if (!ws.length) return null;
-  const xDomain = [ws[0].x, ws[ws.length - 1].x];
-  const last = ws[ws.length - 1];
-  const au = ws.map(w => ({
-    x: w.x,
-    y: w.auNet
-  }));
-  const world = ws.map(w => ({
-    x: w.x,
-    y: w.worldNet
-  }));
-  const bands = ws.filter(w => w.band);
-  const values = ws.flatMap(w => [w.auNet, w.worldNet]).concat(bands.flatMap(w => [w.band.p10, w.band.p90]));
-  const lo = Math.floor(Math.min(0, ...values) / 20) * 20;
-  const hi = Math.ceil(Math.max(0, ...values) / 20) * 20;
-  const netLabel = (v, digits = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(digits);
-  const area = (key, id, opacity) => ({
-    id,
-    color: "var(--ink-3)",
-    opacity,
-    edge: false,
-    points: bands.map(w => ({
-      x: w.x,
-      y0: key === "50" ? w.band.q25 : w.band.p10,
-      y1: key === "50" ? w.band.p75 : w.band.p90
-    }))
-  });
-  return React.createElement("div", {
-    className: "card rd-card rd-dir-chart rd-direction-world"
-  }, React.createElement("div", {
-    className: "rd-chead"
-  }, React.createElement("span", {
-    className: "rd-chead-t"
-  }, "Australia and Ipsos\u2019 Global Average: net direction, percentage points")), React.createElement("p", {
-    className: "rd-dir-grp"
-  }, "Right direction less wrong track in Ipsos\u2019 What Worries the World. Australia is now ", netLabel(last.auNet), " points, against ", netLabel(last.worldNet), " in the publisher\u2019s global average."), React.createElement(TrendChart, {
-    key: "rd-ipsos-direction-world",
-    heightPx: narrow ? 280 : 350,
-    padPx: narrow ? {
-      l: 42,
-      r: 8,
-      t: 30,
-      b: 28
-    } : {
-      l: 46,
-      r: 20,
-      t: 40,
-      b: 30
-    },
-    xDomain: xDomain,
-    yDomain: [lo, hi],
-    yTicks: rdYTicks(lo, hi, 10),
-    yTickFmt: v => netLabel(v),
-    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365),
-    baseline: true,
-    series: [{
-      id: "world-au",
-      label: "Australia",
-      color: "var(--mood-neg)",
-      points: au,
-      rdWidth: 2.5,
-      endCap: false,
-      endLabel: narrow ? null : "Australia"
-    }, {
-      id: "world-average",
-      label: "Ipsos’ Global Average",
-      color: "var(--ink-2)",
-      points: world,
-      rdWidth: 2.5,
-      endCap: false,
-      endLabel: narrow ? null : "Ipsos’ Global Average"
-    }],
-    areas: [area("80", "countries-middle-80", 0.10), area("50", "countries-middle-half", 0.20)],
-    spine: au,
-    tooltipTitle: i => {
-      const w = ws[i];
-      return w ? monthLabelFull(w.ym) + (w.fieldwork ? " · " + w.fieldwork : "") : "";
-    },
-    extraRows: i => {
-      const w = ws[i];
-      if (!w) return [];
-      const bandRows = w.band ? [{
-        label: `Middle half of ${w.band.n} countries, net`,
-        value: `${netLabel(w.band.q25, 1)} to ${netLabel(w.band.p75, 1)} points`
-      }, {
-        label: `Middle 80% of ${w.band.n} countries, net`,
-        value: `${netLabel(w.band.p10, 1)} to ${netLabel(w.band.p90, 1)} points`
-      }] : [];
-      return [{
-        label: "Australia",
-        value: `${w.auRight}% right / ${w.auWrong}% wrong track`
-      }, {
-        label: "Ipsos’ Global Average",
-        value: `${w.worldRight}% right / ${w.worldWrong}% wrong track`
-      }, ...bandRows, {
-        label: "Sample",
-        value: [w.auN ? `${w.auSampleApprox ? "≈" : ""}${w.auN.toLocaleString("en-AU")} in Australia` : null, w.worldN ? `${w.worldN.toLocaleString("en-AU")} across all countries` : null].filter(Boolean).join("; ") || "not published"
-      }];
-    },
-    fmt: v => netLabel(v, 1),
-    copy: {
-      title: "Australia and Ipsos’ Global Average, national direction",
-      sub: `Australia's latest net direction is ${netLabel(last.auNet)} points, against ${netLabel(last.worldNet)} in Ipsos’ global average. Net direction is right direction less wrong track, in percentage points.`,
-      caption: "Ipsos’ What Worries the World, each published wave since " + monthLabelFull(ws[0].ym) + ". Bands are the middle half and middle 80% of participating countries’ net direction; Ipsos’ own global average is not included in those country distributions.",
-      legend: [{
-        label: "Australia",
-        color: "var(--mood-neg)",
-        kind: "line"
-      }, {
-        label: "Ipsos’ Global Average",
-        color: "var(--ink-2)",
-        kind: "line"
-      }]
-    }
-  }), React.createElement(RdKey, {
-    className: "rd-ckey",
-    items: [{
-      kind: "line",
-      color: "var(--mood-neg)",
-      label: "Australia"
-    }, {
-      kind: "line",
-      color: "var(--ink-2)",
-      label: "Ipsos’ Global Average"
-    }, {
-      kind: "lineband",
-      color: "var(--ink-3)",
-      label: "Middle half and middle 80% of countries, net direction; the global average is excluded"
-    }]
-  }), React.createElement(RdFoot, {
-    how: {
-      term: "direction",
-      from: "Ipsos What Worries the World"
-    }
-  }, "Each country is one observation in the distribution, not weighted by population. The publisher\u2019s global average is preserved separately, not recomputed.", last.url ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
-    className: "rd-link",
-    href: last.url,
-    target: "_blank",
-    rel: "noopener noreferrer"
-  }, last.source, React.createElement("span", {
-    className: "plink-mark"
-  }, "\u2197"))) : null));
 }
 const DIRECTION_HOUSE_NOTES = {
   "Roy Morgan": {
@@ -3394,7 +3641,7 @@ function RdDirectionView({
   })).map(p => [p.x, p])).values()].sort((a, b) => a.x - b.x) : pts;
   const monthAt = x => pts.find(p => p.x === x) || soloPts.find(p => p.x === x);
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const wordingNote = !MODEL && !grpId && histLanes.some(l => ownWording(l) && l.pts.some(inW)) ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average, which stays in the world comparison." : null;
+  const wordingNote = !MODEL && !grpId && histLanes.some(l => ownWording(l) && l.pts.some(inW)) ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average." : null;
   const foot = MODEL ? "The dots sit where each pollster printed them: Ipsos and SEC Newgate force a choice and Lowy and McKinnon ask about satisfaction, so theirs sit apart from the line, which is set for the average pollster asking this question." : [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote].filter(Boolean).join(" ");
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
@@ -3886,9 +4133,7 @@ function RdDirectionView({
       term: "direction",
       from: "National mood"
     }
-  }, foot), React.createElement(RdIpsosDirectionWorld, {
-    D: D
-  }));
+  }, foot));
 }
 function rdTrendLine(items, sinceM, none, rest) {
   if (!items.length) return none + " since " + sinceM + ".";

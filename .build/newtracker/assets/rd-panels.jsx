@@ -2497,80 +2497,6 @@ function RdTrustSeparate() {
   );
 }
 
-function RdIpsosDirectionWorld({ D }) {
-  const { monthLabelFull } = window.AP;
-  const narrow = useNarrow(MQ_PHONE);
-  const ws = D.directionWorld?.waves || [];
-  if (!ws.length) return null;
-  const xDomain = [ws[0].x, ws[ws.length - 1].x];
-  const last = ws[ws.length - 1];
-  const au = ws.map((w) => ({ x: w.x, y: w.auNet }));
-  const world = ws.map((w) => ({ x: w.x, y: w.worldNet }));
-  const bands = ws.filter((w) => w.band);
-  const values = ws.flatMap((w) => [w.auNet, w.worldNet])
-    .concat(bands.flatMap((w) => [w.band.p10, w.band.p90]));
-  const lo = Math.floor(Math.min(0, ...values) / 20) * 20;
-  const hi = Math.ceil(Math.max(0, ...values) / 20) * 20;
-  const netLabel = (v, digits = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(digits);
-  const area = (key, id, opacity) => ({
-    id, color: "var(--ink-3)", opacity, edge: false,
-    // the lower quartile is stored as q25 (gen-data directionWorld); "p25" read undefined and drew nothing
-    points: bands.map((w) => ({ x: w.x, y0: key === "50" ? w.band.q25 : w.band.p10, y1: key === "50" ? w.band.p75 : w.band.p90 })),
-  });
-  return (
-    <div className="card rd-card rd-dir-chart rd-direction-world">
-      <div className="rd-chead">
-        <span className="rd-chead-t">Australia and Ipsos’ Global Average: net direction, percentage points</span>
-      </div>
-      <p className="rd-dir-grp">Right direction less wrong track in Ipsos’ What Worries the World. Australia is now {netLabel(last.auNet)} points, against {netLabel(last.worldNet)} in the publisher’s global average.</p>
-      <TrendChart key="rd-ipsos-direction-world" heightPx={narrow ? 280 : 350}
-        padPx={narrow ? { l: 42, r: 8, t: 30, b: 28 } : { l: 46, r: 20, t: 40, b: 30 }}
-        xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => netLabel(v)}
-        xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
-        series={[
-          { id: "world-au", label: "Australia", color: "var(--mood-neg)", points: au, rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Australia" },
-          { id: "world-average", label: "Ipsos’ Global Average", color: "var(--ink-2)", points: world, rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Ipsos’ Global Average" },
-        ]}
-        areas={[area("80", "countries-middle-80", 0.10), area("50", "countries-middle-half", 0.20)]}
-        spine={au}
-        tooltipTitle={(i) => {
-          const w = ws[i];
-          return w ? monthLabelFull(w.ym) + (w.fieldwork ? " · " + w.fieldwork : "") : "";
-        }}
-        extraRows={(i) => {
-          const w = ws[i];
-          if (!w) return [];
-          const bandRows = w.band ? [
-            { label: `Middle half of ${w.band.n} countries, net`, value: `${netLabel(w.band.q25, 1)} to ${netLabel(w.band.p75, 1)} points` },
-            { label: `Middle 80% of ${w.band.n} countries, net`, value: `${netLabel(w.band.p10, 1)} to ${netLabel(w.band.p90, 1)} points` },
-          ] : [];
-          return [
-            { label: "Australia", value: `${w.auRight}% right / ${w.auWrong}% wrong track` },
-            { label: "Ipsos’ Global Average", value: `${w.worldRight}% right / ${w.worldWrong}% wrong track` },
-            ...bandRows,
-            { label: "Sample", value: [w.auN ? `${w.auSampleApprox ? "≈" : ""}${w.auN.toLocaleString("en-AU")} in Australia` : null,
-              w.worldN ? `${w.worldN.toLocaleString("en-AU")} across all countries` : null].filter(Boolean).join("; ") || "not published" },
-          ];
-        }}
-        fmt={(v) => netLabel(v, 1)}
-        copy={{ title: "Australia and Ipsos’ Global Average, national direction",
-          sub: `Australia's latest net direction is ${netLabel(last.auNet)} points, against ${netLabel(last.worldNet)} in Ipsos’ global average. Net direction is right direction less wrong track, in percentage points.`,
-          caption: "Ipsos’ What Worries the World, each published wave since " + monthLabelFull(ws[0].ym) + ". Bands are the middle half and middle 80% of participating countries’ net direction; Ipsos’ own global average is not included in those country distributions.",
-          legend: [{ label: "Australia", color: "var(--mood-neg)", kind: "line" }, { label: "Ipsos’ Global Average", color: "var(--ink-2)", kind: "line" }] }}
-      />
-      <RdKey className="rd-ckey" items={[
-        { kind: "line", color: "var(--mood-neg)", label: "Australia" },
-        { kind: "line", color: "var(--ink-2)", label: "Ipsos’ Global Average" },
-        { kind: "lineband", color: "var(--ink-3)", label: "Middle half and middle 80% of countries, net direction; the global average is excluded" },
-      ]} />
-      <RdFoot how={{ term: "direction", from: "Ipsos What Worries the World" }}>
-        Each country is one observation in the distribution, not weighted by population. The publisher’s global average is preserved separately, not recomputed.
-        {last.url ? <> <a className="rd-link" href={last.url} target="_blank" rel="noopener noreferrer">{last.source}<span className="plink-mark">↗</span></a></> : null}
-      </RdFoot>
-    </div>
-  );
-}
-
 /* How each pollster asks the direction question, and what the model does
    with its answers (gen-data §5m). Checked 2026-11-22 against the sources
    linked: Roy Morgan's live table and releases, Essential's report data,
@@ -2899,7 +2825,7 @@ function RdDirectionView({ rangeId }) {
      foot distinguishes these separate observations from the pooled line. */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
   const wordingNote = !MODEL && !grpId && histLanes.some((l) => ownWording(l) && l.pts.some(inW))
-    ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average, which stays in the world comparison." : null;
+    ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average." : null;
   const foot = MODEL
     ? "The dots sit where each pollster printed them: Ipsos and SEC Newgate force a choice and Lowy and McKinnon ask about satisfaction, so theirs sit apart from the line, which is set for the average pollster asking this question."
     : [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote]
@@ -3209,8 +3135,6 @@ function RdDirectionView({ rangeId }) {
         {foot}
 
       </RdFoot>
-
-      <RdIpsosDirectionWorld D={D} />
     </>
   );
 }

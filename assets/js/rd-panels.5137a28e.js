@@ -3245,6 +3245,7 @@ function RdTrustSeparate() {
     }
   }, tab === "recent" ? "Trust readings come a few times a year, not monthly: ANUpoll’s waves are quarterly, the rest yearly or less." : "The AES dates each reading to the month after polling day; Scanlon fields mid-year."));
 }
+<<<<<<<< HEAD:assets/js/rd-panels.5137a28e.js
 function RdIpsosDirectionWorld({
   D
 }) {
@@ -3396,6 +3397,8 @@ function RdIpsosDirectionWorld({
     className: "plink-mark"
   }, "\u2197"))) : null));
 }
+========
+>>>>>>>> 1feaf4e9 (National direction: remove redundant Ipsos comparison):assets/js/rd-panels.232b841c.js
 const DIRECTION_HOUSE_NOTES = {
   "Roy Morgan": {
     question: "Generally speaking, do you feel that things in Australia are heading in the right direction or would you say things are seriously heading in the wrong direction?",
@@ -3792,7 +3795,11 @@ function RdDirectionView({
   })).map(p => [p.x, p])).values()].sort((a, b) => a.x - b.x) : pts;
   const monthAt = x => pts.find(p => p.x === x) || soloPts.find(p => p.x === x);
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
+<<<<<<<< HEAD:assets/js/rd-panels.5137a28e.js
   const wordingNote = !MODEL && !grpId && histLanes.some(l => ownWording(l) && l.pts.some(inW)) ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average, which stays in the world comparison." : null;
+========
+  const wordingNote = !MODEL && !grpId && histLanes.some(l => ownWording(l) && l.pts.some(inW)) ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average." : null;
+>>>>>>>> 1feaf4e9 (National direction: remove redundant Ipsos comparison):assets/js/rd-panels.232b841c.js
   const foot = MODEL ? "The dots sit where each pollster printed them: Ipsos and SEC Newgate force a choice and Lowy and McKinnon ask about satisfaction, so theirs sit apart from the line, which is set for the average pollster asking this question." : [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote].filter(Boolean).join(" ");
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
@@ -4284,9 +4291,13 @@ function RdDirectionView({
       term: "direction",
       from: "National mood"
     }
+<<<<<<<< HEAD:assets/js/rd-panels.5137a28e.js
   }, foot), React.createElement(RdIpsosDirectionWorld, {
     D: D
   }));
+========
+  }, foot));
+>>>>>>>> 1feaf4e9 (National direction: remove redundant Ipsos comparison):assets/js/rd-panels.232b841c.js
 }
 function rdTrendLine(items, sinceM, none, rest) {
   if (!items.length) return none + " since " + sinceM + ".";

@@ -1,5 +1,5 @@
 // Lowy and Ipsos Australia's own readings belong on the main national-direction
-// chart, separated from the pooled estimator and Ipsos' global comparison.
+// chart; Ipsos' Global Average is a reference there, not a duplicate chart.
 // Run after the normal site build.
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -136,12 +136,8 @@ assert.ok(firstIp.sub.includes("approximately 1,000"));
 assert.ok(firstIp.sub.includes("no exact achieved n"));
 assert.ok(ipDots.every((d) => d.meta.url && d.meta.url.includes("ipsos")));
 
-const worldChart = findAll(main.tree, (n) => n.tag === "$chart").find((n) =>
-  (n.props.series || []).some((s) => s.id === "world-average"));
-assert.ok(worldChart, "the separate Ipsos Australia-and-world comparison remains");
-assert.deepEqual([...worldChart.props.series.map((s) => s.id)], ["world-au", "world-average"]);
-assert.deepEqual([...worldChart.props.areas.map((a) => a.id)], ["countries-middle-80", "countries-middle-half"]);
-assert.ok(!worldChart.props.scatter?.length, "Lowy no longer sits in the global comparison");
-assert.ok(!(worldChart.props.series || []).some((s) => s.id.includes("lowy")));
+assert.ok(!findAll(main.tree, (n) => n.tag === "$chart").some((n) =>
+  (n.props.series || []).some((s) => s.id === "world-average")),
+"the Global Average appears once, on the main chart, without the redundant separate comparison");
 
-console.log("test-lowy-direction: OK (Lowy 47/48, 49/46 on main; Ipsos Australia's 90 waves on main; exact fields, approximate-AU samples; all visible question notes; global chart with both bands preserved)");
+console.log("test-lowy-direction: OK (Lowy 47/48, 49/46 on main; Ipsos Australia's 90 waves on main; exact fields, approximate-AU samples; all visible question notes; Global Average on the main chart only)");
