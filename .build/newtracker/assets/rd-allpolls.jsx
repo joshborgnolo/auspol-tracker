@@ -2215,63 +2215,130 @@ function rdLgLines(p, { onM, demSplit }) {
    rhythm); lead = a facet's own wide table where it has one (issues,
    groups, the gauge); onLine(id, el) = what pressing a line does; latest =
    the Latest table, whose own tabs are 2PP, Primary and Leadership */
-/* ---- which gaps are real (user idea 2026-11-21: "a pairwise significance
-   test matrix ... whether the two parties' primary vote shares differ
-   significantly at the 95% level for that particular poll"). Two shares
-   from the same respondents move against each other, so a gap's margin is
-   1.96 sqrt((a + b - (a - b)^2) / n), on the same decided-voter effective
-   sample as the figures' own ±s (rdPrimMoe) - not the overlap of two
-   whiskers, which reads too many gaps as nothing. The lower triangle only
-   (each pair once); a gap wider than its margin is significant. No table
-   for an MRP series or a poll without a sample */
-function RdLgSig({ p }) {
+/* ---- which gaps are real, as a triangle (user 2026-11-22, after Figure
+   7.3 of a polling text: "triangle with labor, one nation, and coalition").
+   The three shares, rescaled to their own sum, are one point on a ternary
+   plot; the poll's error is a blob around it. Covariance is the
+   multinomial's, (diag(p) - pp')/n3, on the decided-voter effective sample
+   (rdNEff, less an excluded undecided share) times the three's combined
+   share. The blob reaches 1.96 SEs in every direction - an ellipse's reach
+   across a line is its SE along that line's normal, so it crosses the
+   a = b line exactly when a - b is within its own 95% margin. That is the
+   old table's pairwise test, kept on purpose; as a joint region it is ~85%
+   (chi-square 2 df at 3.84), not the book's 95% joint ellipse. Solid
+   medians split who leads, dashed ones who runs second; the blob is
+   clipped into each party's corner and tinted by it, under the lines, so
+   a crossing reads as a second colour. The view zooms to
+   every share >= m (multiple of 5, at most 20) with the blob 3 points
+   clear. No triangle for an MRP series, a poll without a sample, or one
+   missing any of the three */
+const RD_SIG_TRI = ["alp", "lnp", "onp"]; /* top, bottom left, bottom right */
+function rdSigTri(p) {
   const q = p.p || {};
-  const ps = rdLgPrims().filter((k) => q[k.id] != null);
-  if (ps.length < 3 || rdIsMrp(p)) return null;
+  if (rdIsMrp(p) || RD_SIG_TRI.some((id) => q[id] == null || !(+q[id] > 0))) return null;
   let n = rdNEff(p);
   if (!n) return null;
   const u = window.AUSPOL.undecidedCellOf ? window.AUSPOL.undecidedCellOf(p) : null;
   if (u && u.label === "excluded" && u.v > 0) n *= 1 - u.v / 100;
-  const test = (a, b) => {
-    const x = +q[a.id] / 100, y = +q[b.id] / 100;
-    const m = 196 * Math.sqrt(Math.max(0, x + y - (x - y) * (x - y)) / n);
-    const g = rdApR1(+q[a.id] - +q[b.id]);
-    return { g, m, sig: Math.abs(g) > m };
+  const raw = RD_SIG_TRI.map((id) => +q[id]);
+  const s = raw[0] + raw[1] + raw[2];
+  const pr = raw.map((v) => v / s), n3 = n * s / 100;
+  const cov = (i, j) => ((i === j ? pr[i] : 0) - pr[i] * pr[j]) / n3;
+  const Z = 1.96;
+  const pairs = [[0, 1], [0, 2], [1, 2]].map(([i, j]) => {
+    const g = pr[i] - pr[j], m = Z * Math.sqrt(Math.max(0, pr[i] + pr[j] - g * g) / n3);
+    return { i, j, g, m, sig: Math.abs(g) > m };
+  });
+  let lo = 20;
+  while (lo > 0 && pr.some((v, i) => 100 * (v - Z * Math.sqrt(cov(i, i))) - 3 < lo)) lo -= 5;
+  /* the shares out of 100 for the three, by largest remainder */
+  const fl = pr.map((v) => Math.floor(v * 100));
+  const left = 100 - fl.reduce((t, v) => t + v, 0);
+  pr.map((v, i) => [v * 100 - fl[i], i]).sort((a, b) => b[0] - a[0]).slice(0, left).forEach(([, i]) => fl[i]++);
+  return { raw, s, pr, cov, Z, pairs, lo, of100: fl };
+}
+let rdSigSeq = 0;
+function RdLgSig({ p }) {
+  const uid = React.useMemo(() => "rdtri" + (++rdSigSeq), []);
+  const T = rdSigTri(p);
+  if (!T) return null;
+  const meta = RD_SIG_TRI.map((id) => ({ id, ...RD_AP_PRIM_META[id] }));
+  const NM = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" };
+  const NMc = { alp: "Labor", lnp: "The Coalition", onp: "One Nation" };
+  const CORNER = { alp: "Labor", lnp: "Coalition", onp: "One Nation" };
+  /* geometry: side 240 in a 320-wide box */
+  const W = 320, S = 240, H0 = 30, h = S * Math.sqrt(3) / 2;
+  const V = [[W / 2, H0], [W / 2 - S / 2, H0 + h], [W / 2 + S / 2, H0 + h]];
+  const span = 1 - 3 * T.lo / 100;
+  const at = (f) => { /* f = three shares as fractions summing to 1 */
+    const w = f.map((v) => (v - T.lo / 100) / span);
+    return [w[0] * V[0][0] + w[1] * V[1][0] + w[2] * V[2][0], w[0] * V[0][1] + w[1] * V[1][1] + w[2] * V[2][1]];
   };
-  const pairs = [];
-  ps.forEach((a, i) => ps.slice(0, i).forEach((b) => pairs.push({ a, b, ...test(a, b) })));
-  const ns = pairs.filter((x) => !x.sig);
-  const sgn = (g) => (g > 0 ? "+" : g < 0 ? "−" : "") + rdApNum(Math.abs(g));
-  const NM = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others" };
-  const nm = (id) => NM[id] || id;
-  const say = !ns.length ? "Every pair of parties differs significantly in this poll."
-    : ns.length === pairs.length ? "No pair of parties differs significantly in this poll."
-    : "No significant difference between " + ns.map((x) => nm(x.b.id) + " and " + nm(x.a.id)).join(", ").replace(/, ([^,]*)$/, ns.length > 2 ? ", or $1" : " or $1") + "; every other pair differs.";
+  const mid = (a, b) => [(V[a][0] + V[b][0]) / 2, (V[a][1] + V[b][1]) / 2];
+  const G = [W / 2, H0 + h * 2 / 3];
+  const pt = (xy) => xy[0].toFixed(1) + "," + xy[1].toFixed(1);
+  /* the blob: M (2x3, pixels per unit share) times the share covariance */
+  const M = [0, 1].map((r) => [0, 1, 2].map((k) => V[k][r] / span));
+  const C = [0, 1].map((r) => [0, 1].map((c) => {
+    let t = 0;
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) t += M[r][i] * T.cov(i, j) * M[c][j];
+    return t;
+  }));
+  const tr = C[0][0] + C[1][1], det = C[0][0] * C[1][1] - C[0][1] * C[0][1];
+  const l1 = tr / 2 + Math.sqrt(Math.max(0, tr * tr / 4 - det)), l2 = Math.max(0, tr - l1);
+  const ang = Math.atan2(l1 - C[0][0], C[0][1] || 1e-12) * 180 / Math.PI;
+  const D = at(T.pr);
+  /* grid every 5 points of the three's share (10 when unzoomed) */
+  const grid = [];
+  const step = T.lo ? 5 : 10;
+  for (let v = T.lo + step; v < 100 - 2 * T.lo - 1e-9; v += step) {
+    for (let k = 0; k < 3; k++) {
+      const a = (k + 1) % 3, b = (k + 2) % 3, rest = (1 - v / 100);
+      const e1 = [0, 0, 0], e2 = [0, 0, 0];
+      e1[k] = e2[k] = v / 100; e1[a] = rest - T.lo / 100; e1[b] = T.lo / 100; e2[b] = rest - T.lo / 100; e2[a] = T.lo / 100;
+      if (rest - T.lo / 100 < T.lo / 100 - 1e-9) continue;
+      grid.push({ k, v, p1: at(e1), p2: at(e2) });
+    }
+  }
+  const kite = (k) => [V[k], mid(k, (k + 1) % 3), G, mid(k, (k + 2) % 3)].map(pt).join(" ");
+  /* the words */
+  const lead = [0, 1, 2].sort((a, b) => T.pr[b] - T.pr[a]);
+  const pairOf = (i, j) => T.pairs.find((x) => (x.i === i && x.j === j) || (x.i === j && x.j === i));
+  const L = RD_SIG_TRI[lead[0]], tied = lead.slice(1).filter((k) => !pairOf(lead[0], k).sig);
+  const s1 = !tied.length ? NMc[L] + " is ahead of both, beyond the margin: the blob sits wholly in its corner."
+    : tied.length === 2 ? "No party is clearly ahead: the blob reaches all three corners."
+    : NMc[L] + " is ahead in this poll, but not clearly: the blob reaches into " + NM[RD_SIG_TRI[tied[0]]] + "’s corner.";
+  const p23 = pairOf(lead[1], lead[2]);
+  const s2 = tied.length === 2 ? "" : p23.sig ? " " + NMc[RD_SIG_TRI[lead[1]]] + " is clearly ahead of " + NM[RD_SIG_TRI[lead[2]]] + "."
+    : " " + NMc[RD_SIG_TRI[lead[1]]] + " and " + NM[RD_SIG_TRI[lead[2]]] + " are within the margin of each other.";
+  const shares = meta.map((k, i) => CORNER[k.id] + " " + T.of100[i]).join(", ");
+  const Hh = H0 + h + 26;
+  const blob = { cx: D[0], cy: D[1], rx: T.Z * Math.sqrt(l1), ry: T.Z * Math.sqrt(l2), transform: "rotate(" + ang.toFixed(2) + " " + D[0].toFixed(1) + " " + D[1].toFixed(1) + ")" };
   return (
     <div className="rd-ldg-sigw">
       <h4 className="rd-ldg-h">Which gaps are real</h4>
-      <p className="rd-ldg-sigsay">{say}</p>
-      <table className="rd-ldg-t rd-ldg-sig">
-        <thead><tr><th><span className="sr-only">Row party minus column party</span></th>{ps.slice(0, -1).map((k) => <th key={k.id} className="num" style={{ color: k.ink }}>{k.lab}</th>)}</tr></thead>
-        <tbody>
-          {ps.slice(1).map((a, i) => (
-            <tr key={a.id}>
-              <th scope="row" style={{ color: a.ink }}>{a.lab}</th>
-              {ps.slice(0, -1).map((b, j) => {
-                if (j > i) return <td key={b.id}></td>;
-                const t = test(a, b);
-                return (
-                  <td key={b.id} className={"num" + (t.sig ? " sig" : "")}
-                      title={a.lab + " minus " + b.lab + ": " + sgn(t.g) + " ±" + t.m.toFixed(1) + (t.sig ? ", significant at 95%" : ", within the margin")}>
-                    <b>{sgn(t.g)}</b><span className="rd-ldg-ipm"> ±{t.m.toFixed(1)}</span>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="rd-ldg-note">Each cell is the row party’s share minus the column party’s, in points, with its margin of error at 95%: the two shares come from the same voters, so the gap carries its own margin, wider than either share’s. Dark gaps are wider than their margin, so significant. With {rdNumWord(pairs.length)} pairs, about one significant-looking gap in twenty can be chance alone, and whole-number shares can hide up to a point of a gap.</p>
+      <p className="rd-ldg-sigsay">{s1 + s2}</p>
+      <div className="rd-ldg-sigrow">
+        <svg className="rd-ldg-tri" viewBox={"0 0 " + W + " " + Hh} role="img"
+             aria-label={"Triangle of the Labor, Coalition and One Nation shares: " + shares + ". " + s1 + s2}>
+          <defs>{[0, 1, 2].map((k) => <clipPath key={k} id={uid + "k" + k}><polygon points={kite(k)} /></clipPath>)}</defs>
+          {[0, 1, 2].map((k) => <polygon key={k} points={kite(k)} style={{ fill: meta[k].dot }} className="rd-tri-kite" />)}
+          {grid.map((g, i) => <line key={i} x1={g.p1[0]} y1={g.p1[1]} x2={g.p2[0]} y2={g.p2[1]} className="rd-tri-grid" />)}
+          {[0, 1, 2].map((k) => <ellipse key={"b" + k} {...blob} clipPath={"url(#" + uid + "k" + k + ")"} style={{ fill: meta[k].dot }} className="rd-tri-blob" />)}
+          <ellipse {...blob} className="rd-tri-blobline" />
+          <polygon points={V.map(pt).join(" ")} className="rd-tri-edge" />
+          {[0, 1, 2].map((k) => <line key={"d" + k} x1={G[0]} y1={G[1]} x2={V[k][0]} y2={V[k][1]} className="rd-tri-med dash" />)}
+          {[0, 1, 2].map((k) => <line key={"m" + k} x1={G[0]} y1={G[1]} x2={mid((k + 1) % 3, (k + 2) % 3)[0]} y2={mid((k + 1) % 3, (k + 2) % 3)[1]} className="rd-tri-med" />)}
+          <circle cx={D[0]} cy={D[1]} r="3.5" className="rd-tri-dot"><title>{shares + " of every 100 votes for the three"}</title></circle>
+          <text x={V[0][0]} y={V[0][1] - 9} textAnchor="middle" className="rd-tri-v" style={{ fill: meta[0].ink }}>Labor</text>
+          <text x={V[1][0] + 2} y={V[1][1] + 20} textAnchor="middle" className="rd-tri-v" style={{ fill: meta[1].ink }}>Coalition</text>
+          <text x={V[2][0] - 2} y={V[2][1] + 20} textAnchor="middle" className="rd-tri-v" style={{ fill: meta[2].ink }}>One Nation</text>
+        </svg>
+        <div className="rd-ldg-sigtxt">
+          <p className="rd-ldg-note">The white dot is this poll: Labor, the Coalition and One Nation as shares of their combined {rdApNum(T.s)}%, so {shares} of every 100. The nearer a corner, the bigger that party’s share. Each shaded corner is where that party leads; the faint lines are {step} points apart{T.lo ? ", and the triangle shows only where each party has at least " + T.lo : ""}.</p>
+          <p className="rd-ldg-note">The blob around the dot is the poll’s margin of error, 1.96 standard errors in every direction. Where it crosses a solid line, the two parties either side can’t be told apart at 95%; a dashed line does the same for second and third place. The Greens and others are left out, and whole-number shares can hide up to a point of a gap.</p>
+        </div>
+      </div>
     </div>
   );
 }

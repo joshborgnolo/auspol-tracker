@@ -186,6 +186,7 @@ window.AUSPOL = (function () {
      pooled model above never covers these years. */
   const dirHistory = null;
   const directionPre = null;
+  const directionWorld = null;
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
@@ -396,7 +397,7 @@ window.AUSPOL = (function () {
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = null;
   /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
-  const seatModel = {"headline":"The Coalition is very likely to win the most seats, with a majority about as likely as not","pollsTo":"2026-11-13","draws":20000,"expectedSeats":{"alp":26.32,"lnp":44.83,"on":9.13,"grn":6.83,"oth":0,"member":0.89},"mostSeats":{"alp":0.0623,"lnp":0.9235,"on":0.0143,"grn":0,"oth":0,"member":0},"majority":{"alp":0.0066,"coalition":0.5243,"on":0.0042,"noMajority":0.465}};
+  const seatModel = {"headline":"The Coalition is very likely to win the most seats, with a majority about as likely as not","pollsTo":"2026-11-15","draws":20000,"expectedSeats":{"alp":26.17,"lnp":44.75,"on":9.43,"grn":6.79,"oth":0,"member":0.86},"mostSeats":{"alp":0.061,"lnp":0.9236,"on":0.0154,"grn":0,"oth":0,"member":0},"majority":{"alp":0.0064,"coalition":0.5201,"on":0.0046,"noMajority":0.469}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -439,7 +440,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {
