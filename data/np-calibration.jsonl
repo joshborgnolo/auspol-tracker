@@ -43,3 +43,4 @@
 {"ts":"2026-11-09T20:16:17.119Z","syd":"2026-11-10 07:16","pollster":"Roy Morgan","kind":"dated","anchor":"2026-11-09","release":"2026-11-23","open":"2026-11-23","close":"2026-11-23","winHalf":0,"rolled":false,"ahead":0}
 {"ts":"2026-11-09T20:16:17.119Z","syd":"2026-11-10 07:16","pollster":"Spectre Strategy","kind":"dated","anchor":"2026-11-09","release":"2027-03-09","open":"2027-02-11","close":"2027-04-04","winHalf":26,"rolled":false,"ahead":0}
 {"ts":"2026-11-17T20:16:30.643Z","syd":"2026-11-18 07:16","pollster":"YouGov","kind":"dated","anchor":"2026-11-18","release":"2026-12-01","open":"2026-12-01","close":"2026-12-01","winHalf":0,"rolled":false,"ahead":0}
+{"ts":"2026-11-22T20:16:45.023Z","syd":"2026-11-23 07:16","pollster":"Newspoll","kind":"dated","anchor":"2026-11-22","release":"2026-12-13","open":"2026-12-13","close":"2026-12-13","winHalf":0,"rolled":false,"ahead":0}
