@@ -7008,7 +7008,7 @@ function confWinWords(w, terms, hi) {
     if (!t) return { head: "", sub: "" };
     return t.current
       ? { head: "This term", sub: t.pm + " · since " + confIsoMonth(t.eDate) }
-      : { head: "The " + t.year + " term", sub: t.pm + " · " + confIsoMonth(t.eDate) + " – " + confIsoMonth(t.nDate) };
+      : { head: "The " + t.year + " term", sub: t.pm + " · " + confTermDates(t.eDate, t.nDate) };
   }
   const pl = confPms(terms, w.a, w.b);
   const pms = pl.length > 3 ? pl[0] + " to " + pl[pl.length - 1] : pl.join(" → ");

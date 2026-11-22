@@ -29,6 +29,10 @@ const confXMonth = (x) => {
   return CONF_MON3[Math.max(0, Math.min(11, Math.floor((x - y) * 12 + 1e-6)))] + " " + y;
 };
 const confIsoMonth = (iso) => CONF_MON3[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
+function confTermDates(start, end) {
+  const sameMonth = start.slice(5, 7) === end.slice(5, 7);
+  return confIsoMonth(start) + "–" + (sameMonth ? end.slice(0, 4) : confIsoMonth(end));
+}
 /* the terms on file (D.cycles, election to election), oldest first */
 function confTermsOf(D) {
   const cyc = (D.cycles || []).filter((c) => c.eDate).slice().sort((p, q) => (p.eDate < q.eDate ? -1 : 1));
@@ -136,7 +140,7 @@ function rdVwWords(w, terms, hi) {
     const t = terms.find((x) => x.year === w.year);
     if (!t) return { head: "", sub: "" };
     return t.current ? { head: "This term", sub: t.pm + " · since " + confIsoMonth(t.eDate) }
-      : { head: "The " + t.year + " term", sub: t.pm + " · " + confIsoMonth(t.eDate) + " – " + confIsoMonth(t.nDate) };
+      : { head: "The " + t.year + " term", sub: t.pm + " · " + confTermDates(t.eDate, t.nDate) };
   }
   if (w.kind === "all") return { head: "Every year on record", sub: confXMonth(w.a) + " – now" };
   const pl = confPms(terms, w.a, w.b);
