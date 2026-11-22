@@ -18,7 +18,8 @@
         "ppmA": 41,
         "ppmO": 42,
         "pmNet": -31,
-        "oppNet": -9
+        "oppNet": -9,
+        "undecidedLeaner": 7
       },
       "missing": []
     },
@@ -109,6 +110,7 @@
     "ppm3A": 44,
     "ppm3H": 28,
     "ppm3O": 28,
-    "sample": 1229
+    "sample": 1229,
+    "undecidedLeaner": 7
   }
 }

@@ -125,6 +125,26 @@ const numOrNull = (s) => {
   return m ? parseFloat(m[1]) : null;
 };
 
+// The primary chart's questionnaire names the uncommitted share excluded
+// before the leaner-adjusted primaries. It is annotation text, not a feed
+// row; read it only in that exact phrase and never choose between versions.
+export function undecidedLeanerOf(data) {
+  const found = [];
+  const walk = (v) => {
+    if (Array.isArray(v)) { for (const x of v) walk(x); return; }
+    if (!v || typeof v !== "object") return;
+    for (const [k, x] of Object.entries(v)) {
+      if (k === "text" && typeof x === "string") {
+        const m = x.match(/(\d+(?:\.\d+)?)%\s+["'‘’“”]?uncommitted["'‘’“”]?\s+excluded/i);
+        if (m) found.push(+m[1]);
+      } else if (x && typeof x === "object") walk(x);
+    }
+  };
+  walk(data);
+  const distinct = new Set(found);
+  return distinct.size === 1 ? found[0] : null;
+}
+
 // ------------------------------------------------------------------- rungs
 // Orchestration takes the caller's fetchText (retry policy stays with the
 // extractor). Unavailability degrades to state "unavailable"|"note" — the
@@ -169,6 +189,7 @@ export async function infogramLive(fetchText, latestNp) {
   return {
     state: "ok", pubIso, refreshed,
     figs: { alp: primary.alp, lnp: primary.lnp, grn: primary.grn, onp: primary.onp, ind: primary.ind,
+      undecidedLeaner: undecidedLeanerOf(data),
       tpp_alp: tpp.tpp_alp, tpp_lnp: tpp.tpp_lnp,
       ppmA: betterpm.ppmA, ppmO: betterpm.ppmO,
       pmNet: waveNet?.pm ?? null, oppNetByEra: { dutton: waveNet?.dutton ?? null, ley: waveNet?.ley ?? null, taylor: waveNet?.taylor ?? null } },

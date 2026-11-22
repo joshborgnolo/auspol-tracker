@@ -35,7 +35,8 @@ const run = () => {
 const first = run();
 assert.ok(first.leaner >= 1, "cached Newspoll statements stamp their leaner-excluded share");
 const stamped = JSON.parse(readFileSync(out, "utf8"));
-const latest = stamped.polls.filter((p) => p.pollster === "Newspoll").sort((a, b) => b.date.localeCompare(a.date))[0];
+assert.equal(stamped.polls.find((p) => p.pollster === "Newspoll" && p.date === "2026-11-19").undecidedLeaner, 7, "the release's live-chart leaner exclusion survives");
+const latest = stamped.polls.filter((p) => p.pollster === "Newspoll" && p.sampleEff != null).sort((a, b) => b.date.localeCompare(a.date))[0];
 assert.equal(latest.date, "2026-10-29");
 assert.equal(latest.undecidedLeaner, 5);
 const beforeSecondRun = readFileSync(out, "utf8");

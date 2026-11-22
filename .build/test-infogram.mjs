@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { igDate, igWindow, infographicDataOf, parsePrimary, parseTpp,
   parseBetterPm, parseNetsat, parseStatic, attachTarget, infogramLive,
-  infogramStatic } from "./infogram.mjs";
+  infogramStatic, undecidedLeanerOf } from "./infogram.mjs";
 
 const DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fx = (p) => readFileSync(path.join(DIR, ".build/newspoll-src", p), "utf8");
@@ -41,6 +41,11 @@ eq("netsat pre-tenure nulls", [netsat[0].ley, netsat[0].taylor], [null, null]);
 // parseTpp on the documented N/A and a resumed shape
 eq("tpp N/A", (() => { const t = parseTpp([["DATE", "March 1"], ["ALP", "N/A"], ["Coalition", "N/A"]]); return [t.tpp_alp, t.tpp_lnp, t.resumed]; })(), [null, null, false]);
 eq("tpp resumed", (() => { const t = parseTpp([["DATE", "March 1"], ["ALP", "53"], ["Coalition", "47"]]); return [t.tpp_alp, t.tpp_lnp, t.resumed]; })(), [53, 47, true]);
+
+eq("questionnaire's leaner-excluded share", undecidedLeanerOf({ a: { text: "If 'uncommitted', which one? 7% 'uncommitted' excluded" } }), 7);
+eq("repetitions of the same exclusion agree", undecidedLeanerOf({ a: { text: "7% 'uncommitted' excluded" }, b: { text: "7% 'uncommitted' excluded" } }), 7);
+eq("conflicting exclusion annotations stay unfiled", undecidedLeanerOf({ a: { text: "7% 'uncommitted' excluded" }, b: { text: "5% 'uncommitted' excluded" } }), null);
+eq("an uncommitted share without its exclusion is not inferred", undecidedLeanerOf({ a: { text: "Uncommitted 17%" } }), null);
 
 // parseBetterPm on the documented shape
 eq("betterpm shape", (() => { const b = parseBetterPm([["Name", "Anthony Albanese", "Uncommitted", "Angus Taylor"], ["%", "44%", "21%", "35%"]]); return [b.ppmA, b.ppmO, b.ppmUnc, b.oppName]; })(), [44, 35, 21, "Angus Taylor"]);

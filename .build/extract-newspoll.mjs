@@ -586,7 +586,7 @@ async function discover() {
 // ------------------------------------------------------------- merge/guard
 const FIELDS = ["alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp",
   "pmNet", "oppNet", "pmApp", "pmDis", "oppApp", "oppDis", "ppmA", "ppmO", "ppmH",
-  "hanNet", "hanApp", "hanDis", "ppm3A", "ppm3H", "ppm3O", "sample"];
+  "hanNet", "hanApp", "hanDis", "ppm3A", "ppm3H", "ppm3O", "sample", "undecidedLeaner"];
 function mergeCluster(recs) {
   const m = { conflicts: [] };
   for (const k of ["date", "dateStart"]) {
@@ -922,7 +922,8 @@ try {
     newPolls.push({
       date, published, dateStart: m.dateStart, pollster: "Newspoll", client, sample: m.sample,
       alp: m.alp, lnp: m.lnp, grn: m.grn, onp: m.onp, ind: m.ind, oth: m.oth,
-      tpp_alp: m.tpp_alp ?? null, tpp_lnp: m.tpp_lnp ?? null, url: ausUrl ?? best.url,
+      tpp_alp: m.tpp_alp ?? null, tpp_lnp: m.tpp_lnp ?? null,
+      ...(m.undecidedLeaner != null ? { undecidedLeaner: m.undecidedLeaner } : {}), url: ausUrl ?? best.url,
     });
     // Canonical Newspoll ppm row: the three-way shares are the headline
     // fields; the PM–OL head-to-head pairs off in `extra`.
