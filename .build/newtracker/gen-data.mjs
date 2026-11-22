@@ -18,6 +18,7 @@ import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED,
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
+import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
 
@@ -2942,7 +2943,84 @@ const trustGov = (() => {
     ...s,
     readings: [...s.readings].sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ ...r, x: mx(r.date) })),
   }));
-  return series.some((s) => s.role === "line") ? { series } : null;
+  if (!series.some((s) => s.role === "line")) return null;
+  /* ---- 5t. one line from every survey (trust-model.mjs, 2026-11-22) -----
+     ANUpoll, Scanlon, the AES, the OECD survey, Essential and McKinnon,
+     each through its own lean (ANUpoll's and Scanlon's earlier panels as
+     surveys of their own), printed on ANUpoll's terms. The OECD average is
+     moved onto the same terms by the OECD survey's lean in Australia. */
+  const TRUST_N = { "ANUpoll (Life in Australia)": 3000, ANUpoll: 3500, Essential: 1000, "Essential (federal parliament)": 1000, McKinnon: 4300, "Scanlon (telephone)": 1500, Scanlon: 3500, AES: 2000, "OECD Australia": 2000 };
+  const houseOf = (s, r) => s.id === "anupoll" ? (r.panel === "lia" ? "ANUpoll (Life in Australia)" : "ANUpoll")
+    : s.id === "scanlon" ? (r.mode === "tel" ? "Scanlon (telephone)" : "Scanlon")
+    : ({ essential: "Essential", "essential-parliament": "Essential (federal parliament)", mckinnon: "McKinnon", aes: "AES", "oecd-au": "OECD Australia" })[s.id] || null;
+  const TDAY = (ym) => Math.floor(Date.parse(ym + "-15T00:00:00Z") / 86400000);
+  const readings = [];
+  for (const s of series) for (const r of s.readings) {
+    const house = houseOf(s, r);
+    if (house) readings.push({ house, day: TDAY(r.date), v: r.v, n: r.n || TRUST_N[house], sid: s.id, date: r.date });
+  }
+  const tFirst = Math.min(...readings.map((r) => r.day)), tLast = Math.max(...readings.map((r) => r.day));
+  const ymOfDay = (d) => new Date(d * 86400000).toISOString().slice(0, 7);
+  const months = [];
+  for (let y = +ymOfDay(tFirst).slice(0, 4), m = +ymOfDay(tFirst).slice(5, 7); ; m++) {
+    if (m > 12) { m = 1; y++; }
+    const ym = `${y}-${String(m).padStart(2, "0")}`, day = TDAY(ym);
+    if (day > tLast) break;
+    if (day >= tFirst) months.push({ ym, day });
+  }
+  /* "since just after the latest election": the first ANUpoll wave after it */
+  const lastElec = ["2022-05-21", "2025-05-03"].filter((d) => TDAY(d.slice(0, 7)) <= tLast).pop();
+  const anu = series.find((s) => s.id === "anupoll");
+  const afterElec = lastElec && anu.readings.find((r) => r.date > lastElec.slice(0, 7));
+  const yearAgo = tLast - 365, elecDay = afterElec ? TDAY(afterElec.date) : null;
+  const t0 = Date.now();
+  const fit = fitTrust(readings, { core: new Set(["ANUpoll", "Essential", "McKinnon", "Scanlon", "AES", "OECD Australia"]), ref: "ANUpoll",
+    days: [...months.map((m) => m.day), yearAgo, ...(elecDay ? [elecDay] : [])], nDraw: 1000 });
+  const at = (day) => fit.draws.map((d) => d.v[fit.slotOfDay.get(day)]);
+  const S = (a) => ({ v: r1(tmean(a)), lo: r1(tquant(a, 0.025)), hi: r1(tquant(a, 0.975)) });
+  const mRows = months.map(({ ym, day }) => { const s = S(at(day)); return { ym, x: mx(ym), ...s, on: s.hi - s.lo < 20 }; });
+  /* the line is drawn from the start of the run of months, ending now, whose
+     95% band is under 20 points (user decision 2026-11-22); the month of the
+     pandemic jump itself (its band widens for a moment by design) doesn't
+     break the run */
+  const jumpYms = new Set(["2020-03"]);
+  let firstOn = mRows.length - 1;
+  while (firstOn > 0 && (mRows[firstOn - 1].on || jumpYms.has(mRows[firstOn - 1].ym))) firstOn--;
+  const nowA = at(tLast), diffS = (a, b) => { const d = a.map((v, i) => v - b[i]); const s = S(d); return { chg: s.v, lo: s.lo, hi: s.hi, sig: s.lo > 0 || s.hi < 0 }; };
+  /* "the lowest since <month>": the latest earlier month whose line sits at
+     or below today's, provided today sits significantly below every month
+     between (95% of draws) – else no claim; "record" when no earlier month
+     in the span is at or below today */
+  const extreme = (fromYm, low) => {
+    const span = months.filter((m) => m.ym >= fromYm && m.day < tLast - 60);
+    const nowMean = tmean(nowA);
+    const atOrBeyond = span.filter((m) => (low ? tmean(at(m.day)) <= nowMean : tmean(at(m.day)) >= nowMean));
+    const last = atOrBeyond[atOrBeyond.length - 1];
+    const between = span.filter((m) => !last || m.day > last.day);
+    const sigBetween = between.every((m) => { const a = at(m.day); let k = 0; for (let i = 0; i < a.length; i++) if (low ? nowA[i] < a[i] : nowA[i] > a[i]) k++; return k / a.length >= 0.95; });
+    if (!sigBetween || !between.length) return null;
+    return last ? { since: last.ym } : { record: true };
+  };
+  const leanAdj = (house, day) => fit.leanAt(house, day);
+  const adj = {};
+  for (const r of readings) (adj[r.sid] ||= []).push({ date: r.date, x: mx(r.date), v: r1(trustTerms(r.v, leanAdj(r.house, r.day))) });
+  const oecdAvg = series.find((s) => s.id === "oecd-avg");
+  const oecdAvgAdj = oecdAvg ? oecdAvg.readings.map((r) => ({ date: r.date, x: mx(r.date), v: r1(trustTerms(r.v, leanAdj("OECD Australia", TDAY(r.date)))), printed: r.v })) : [];
+  const brk = (a, b, day) => r1(trustTerms(50, -leanAdj(a, day)) - trustTerms(50, -leanAdj(b, day)));
+  const model = {
+    ref: "ANUpoll", method: "bayes", draws: fit.n, months: mRows, firstOn: mRows[firstOn].ym,
+    now: { ym: ymOfDay(tLast), x: mx(ymOfDay(tLast)), ...S(nowA),
+      year: { from: ymOfDay(yearAgo), ...diffS(nowA, at(yearAgo)) },
+      ...(elecDay ? { election: { date: lastElec, ym: afterElec.date, ...diffS(nowA, at(elecDay)) } } : {}),
+      low2020: extreme("2020-01", true), high2020: extreme("2020-01", false), lowOn: extreme(mRows[firstOn].ym, true) },
+    adj, oecdAvgAdj,
+    /* how far an earlier panel read above the current one, in points near 50% */
+    breaks: { anupoll: brk("ANUpoll (Life in Australia)", "ANUpoll", TDAY("2024-01")), scanlon: brk("Scanlon (telephone)", "Scanlon", TDAY("2018-07")) },
+  };
+  console.log(`trust model: ${readings.length} readings in ${((Date.now() - t0) / 1000).toFixed(1)}s | now ${model.now.v} [${model.now.lo}, ${model.now.hi}] on ANUpoll's terms`
+    + ` | year ${model.now.year.chg} [${model.now.year.lo}, ${model.now.year.hi}] | line from ${model.firstOn} | breaks ANU ${model.breaks.anupoll} Scanlon ${model.breaks.scanlon}`
+    + ` | best ${JSON.stringify(fit.best)}${fit.edges.length ? " | GRID EDGE " + fit.edges : ""}`);
+  return { series, model };
 })();
 const directionStates = (() => {
   if (!SEC_STATES?.series) return null;

@@ -8446,8 +8446,36 @@ function infoTerms(D) {
         {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>
         )) },
       entries: [
-        { id: "trust-government", term: "Trust in government", body: (
+        { id: "trust-government", term: "Trust in government", body: (D.trustGov && D.trustGov.model ? (
           <>The National mood section’s second view: how far Australians trust the federal
+          government. No pollster asks it every month and every survey words it its own way, so
+          the line is a model of all of them at once, like direction’s, printed on ANUpoll’s terms:
+          the share with “a great deal” or “quite a lot” of confidence in the Federal Government in
+          Canberra, as ANUpoll’s current panel asks it.
+          <span className="info-p"><b>The surveys.</b> ANUpoll (about every three months since
+          January 2020; ANU’s reports print only their latest wave, so earlier waves are read off
+          their charts, to within about 0.3 of a point), Scanlon’s Mapping Social Cohesion (yearly
+          since 2007), the Australian Election Study (after each election since 1969), the OECD’s
+          Trust Survey (2021, 2023, 2025; 6 or more out of 10), the McKinnon Index (6 or more out of
+          10), and Essential, on trust in the national government and, separately, in the federal
+          parliament. Each has a lean of its own, measured against the others; Essential’s
+          parliament question never sets the level. A survey that changed how it polls counts as
+          a new one: ANUpoll’s opt-in panel since 2024 against ANU’s Life in Australia panel
+          before it, and Scanlon’s online panel since 2018 against its telephone years.</span>
+          <span className="info-p"><b>How it’s built.</b> Trust is treated as moving a little each
+          month, with room for a sudden shift at each federal election and change of prime
+          minister and at the start of the pandemic in March 2020 – the evidence for that last jump
+          is overwhelming. How fast trust moves, how far leans drift and how noisy the surveys are
+          beyond their samples are estimated from the readings. The line’s{" "}
+          {xref("interval", "trust-government", "95% interval")} gives a 95% chance the figure lies
+          inside, under the model’s assumptions; a change is significant only when its own
+          interval excludes zero. Before the long view’s line begins the interval is wider than
+          ±10 points, so earlier readings show only as dots, moved onto ANUpoll’s terms. The OECD
+          average is moved onto the same terms by the OECD survey’s lean in Australia, assuming,
+          as any such comparison must, that its Australian and international samples lean alike.
+          No survey can be checked against the truth, only against the others.</span></>
+          ) : (
+<>The National mood section’s second view: how far Australians trust the federal
           government. No pollster asks it every month, and every survey that asks words it its own
           way, so unlike direction it is never averaged and no pollster’s lean is estimated.
           <span className="info-p"><b>Since 2020.</b> The line is ANUpoll’s share with “a great deal”
@@ -8466,7 +8494,8 @@ function infoTerms(D) {
           Australia since. The OECD’s Trust Survey (2021, 2023, 2025) is the only one with an
           international average, so that average is drawn beside the OECD’s Australian figure
           and nowhere else: on the OECD’s 0–10 question Australia sits above it, while other
-          surveys’ questions put Australia’s level lower – a matter of wording, not rank.</span></>) },
+          surveys’ questions put Australia’s level lower – a matter of wording, not rank.</span></>
+          )) },
       ] },
     { id: "s-who", title: "Who votes for whom", nav: "Who votes",
       lead: { id: "vote-by-group", body: (

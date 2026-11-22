@@ -228,6 +228,53 @@
       ]
     },
     {
+      "id": "essential-parliament",
+      "house": "Essential (federal parliament)",
+      "question": "How much trust do you have in the following institutions? Federal parliament",
+      "measure": "A lot or some trust",
+      "role": "dot",
+      "source": "https://essentialreport.com.au/reports",
+      "note": "Essential’s trust-in-institutions question (E309) asks about the federal parliament, not the government; its trend prints the share with a lot or some trust (a lot + some in every wave both are printed: Jun 2022 11 + 36, Sep 2022 8 + 38, Dec 2023 4 + 30). Filed from Essential’s report data (data/essential-report.csv).",
+      "readings": [
+        {
+          "date": "2020-08",
+          "v": 55,
+          "field": "August 2020",
+          "url": "https://essentialreport.com.au/reports"
+        },
+        {
+          "date": "2021-03",
+          "v": 54,
+          "field": "March 2021",
+          "url": "https://essentialreport.com.au/reports"
+        },
+        {
+          "date": "2021-10",
+          "v": 48,
+          "field": "October 2021",
+          "url": "https://essentialreport.com.au/reports"
+        },
+        {
+          "date": "2022-06",
+          "v": 47,
+          "field": "June 2022 (report of 14 June)",
+          "url": "https://essentialreport.com.au/reports"
+        },
+        {
+          "date": "2022-09",
+          "v": 46,
+          "field": "September 2022 (report of 5 September)",
+          "url": "https://essentialreport.com.au/reports"
+        },
+        {
+          "date": "2023-12",
+          "v": 34,
+          "field": "December 2023 (report of 11 December)",
+          "url": "https://essentialreport.com.au/reports"
+        }
+      ]
+    },
+    {
       "id": "mckinnon",
       "house": "McKinnon Index",
       "question": "On a scale of 0–10, how much do you trust the Federal Government?",
