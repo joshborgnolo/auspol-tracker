@@ -1,0 +1,14 @@
+{
+  "house": "pollbludger",
+  "generated": "2026-11-22T20:49:05.650Z",
+  "cases": [
+    "pending:1843"
+  ],
+  "decisions": [
+    {
+      "case": "pending:1843",
+      "action": "never_file",
+      "reason": "The identical sample and figures indicate this is the canonical 16–19 November Newspoll under a different feed end-date basis."
+    }
+  ]
+}

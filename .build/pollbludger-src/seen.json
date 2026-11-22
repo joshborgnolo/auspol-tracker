@@ -1,1 +1,13 @@
-{}
+{
+  "1843": {
+    "firstSeen": "2026-11-22T20:48:42.940Z",
+    "pollster": "Newspoll",
+    "end": "2026-11-15"
+  },
+  "L86": {
+    "firstSeen": "2026-11-22T20:48:42.940Z",
+    "pollster": "Newspoll",
+    "end": "2026-11-15",
+    "kind": "approval"
+  }
+}
