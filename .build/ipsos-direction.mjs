@@ -392,12 +392,12 @@ export function directionTable(page, reportRoster = []) {
 }
 
 function datesOf(text) {
-  const re = new RegExp(`(${MON}\\s+\\d+(?:st|nd|rd|th)?(?:\\s+20\\d{2})?)\\s*(?:-|–|—|to|and)\\s*(${MON}\\s+\\d+(?:st|nd|rd|th)?(?:\\s+20\\d{2})?)`, "i");
+  const re = new RegExp(`(${MON}\\s+\\d+(?:st|nd|rd|th)?,?(?:\\s+20\\d{2})?),?\\s*(?:-|–|—|to|and)\\s*(${MON}\\s+\\d+(?:st|nd|rd|th)?,?(?:\\s+20\\d{2})?)`, "i");
   const m = text.match(re);
   if (!m) return { start: null, end: null, fieldwork: null };
   const fieldwork = compact(m[0]);
   const part = (s) => {
-    const p = s.match(new RegExp(`^(${MON})\\s+(\\d+)(?:st|nd|rd|th)?(?:\\s+(20\\d{2}))?$`, "i"));
+    const p = s.match(new RegExp(`^(${MON})\\s+(\\d+)(?:st|nd|rd|th)?,?(?:\\s+(20\\d{2}))?$`, "i"));
     return p ? { month: monthNo(p[1]), day: Number(p[2]), year: p[3] == null ? null : Number(p[3]) } : null;
   };
   const a = part(m[1]), b = part(m[2]);
@@ -516,6 +516,44 @@ export function reportMonth(text, source = {}) {
 }
 
 const DIRECTION_ANCHOR = /RIGHT DIRECTION\/WRONG TRACK|RIGHT DIRECTION VS\. WRONG TRACK MONITOR|(?:^|\n)\s*Right vs\.\s*(?:wrong direction|World|Global Country Average|\r?\n)|Right direction vs\.?\s*wrong track/i;
+/* The wave's fieldwork. The direction-table page's dated Base footer is the
+   first choice, but pdftotext's column layout often splits it (a country row
+   lands between its dates: 21 of 90 waves came out undated), and five
+   2019–20 reports print the end year wrong in every footer ("April 19th 2019
+   - May 3rd 2018"). The 2026-11-22 source check found every wave's dates
+   printed whole elsewhere in its report: on the clean Base lines of other
+   pages, and in the methodology paragraph ("were interviewed between …
+   and …", "conducted between …"), whose year is right every time but which
+   sits in two columns. So when the table page gives no range ending in the
+   labelled month, every range the report prints is collected – each line,
+   and each column's text rejoined (the left segment of every line, then the
+   right) – and the range ending in the labelled month that is printed most
+   often wins (a stale footer copied from an earlier wave loses on count);
+   ties go to the later end. */
+function fieldworkOf(text, textPage, month) {
+  const m0 = Date.parse(month + "-01T00:00:00Z");
+  const [y, mo] = month.split("-").map(Number);
+  const m1 = Date.UTC(y, mo, 1) - 864e5;                 // the month's last day
+  const fits = (r) => r.start && r.end && Date.parse(r.end) >= m0 && Date.parse(r.end) <= m1;
+  const first = datesOf(textPage);
+  if (fits(first)) return first;
+  const lines = text.split(/\r?\n/);
+  const columns = [0, 1].map((c) => lines.map((l) => l.trimStart().split(/[ \t]{5,}/)[c] || "").join(" "));
+  const sources = [...lines, ...columns.flatMap((t) => t.split(/(?<=\.)\s+(?=[A-Z])/))];
+  const counts = new Map();
+  for (const s of sources) {
+    const t = compact(s);
+    if (!/\d/.test(t)) continue;
+    const r = datesOf(t);
+    if (!fits(r)) continue;
+    const k = r.start + "|" + r.end;
+    const c = counts.get(k) || { r, n: 0 };
+    c.n++; counts.set(k, c);
+  }
+  const best = [...counts.values()].sort((a, b) => b.n - a.n || b.r.end.localeCompare(a.r.end))[0];
+  return best ? best.r : first;
+}
+
 export function parseReport(text, source = {}) {
   const month = reportMonth(text, source);
   const pages = text.split("\f");
@@ -542,7 +580,7 @@ export function parseReport(text, source = {}) {
   const au = countries.find((r) => r.code === "AU");
   const samples = countrySamples(text, countries);
   const sample = (r) => ({ sample: r?.sample ?? null, ...(r?.sampleApprox ? { sampleApprox: true } : {}) });
-  const startEnd = datesOf(textPage);
+  const startEnd = fieldworkOf(text, textPage, month);
   return {
     month, ...startEnd,
     source: "Ipsos What Worries the World",

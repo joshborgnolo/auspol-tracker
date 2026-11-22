@@ -72,9 +72,11 @@ assert.notEqual(latestAustralia.auRight, latestAustralia.worldRight,
   "the main chart's Australia reading is never filled by the global average");
 const dirPreEncoded = js.match(/const directionPre = JSON.parse\(("(?:\\[\s\S]|[^"\\])*")\);/);
 const dirPre = JSON.parse(JSON.parse(dirPreEncoded[1]));
-for (const house of ["McKinnon", "Lowy Institute", "Ipsos"]) {
-  assert.ok(!dirPre.houses.includes(house), `${house}: separate observations never enter the estimator roster`);
-}
+/* since 2026-11-22 every pollster is an input to the model (gen-data §5m):
+   Ipsos asked through March 2022 – April 2025, so it is in that stretch's
+   roster; Lowy (2017–18) and McKinnon (2025–26) fall outside it */
+assert.ok(dirPre.model && dirPre.houses.includes("Ipsos"), "Ipsos enters the model");
+assert.ok(!dirPre.houses.includes("Lowy Institute") && !dirPre.houses.includes("McKinnon"), "the pre-term roster is March 2022 – April 2025 only");
 
 const { modernRunner, findAll, press, words } = await import("./retro/harvest.mjs");
 const runner = modernRunner({ root: process.cwd(), doc: "cycles/index.html" });
@@ -84,43 +86,45 @@ function mainChart(handle) {
     ["right", "wrong"].every((id) => (n.props.series || []).some((s) => s.id === id)));
 }
 function topicNote(handle, house) {
-  return findAll(handle.tree, (n) => n.tag === "div" && n.props.className === "rd-direction-wording")
-    .find((n) => words(n).startsWith(house + " asks"));
+  return findAll(handle.tree, (n) => n.tag === "section" && n.props.className === "rd-dirq-house")
+    .find((n) => words(n).startsWith(house));
 }
-for (const house of ["Roy Morgan", "Essential", "SEC Newgate", "Freshwater", "RedBridge/Accent", "Spectre Strategy", "McKinnon", "Ipsos"]) {
-  assert.ok(topicNote(main, house), `${house}: exact question wording beneath the current main chart`);
+for (const house of ["Roy Morgan", "Essential", "SEC Newgate", "RedBridge/Accent", "Spectre Strategy", "McKinnon", "Ipsos"]) {
+  assert.ok(topicNote(main, house), `${house}: how it asks, beneath the current main chart`);
+  assert.ok(/Answers/.test(words(topicNote(main, house))) && /In the line/.test(words(topicNote(main, house))), `${house}: its answers and what the model does with them`);
 }
 assert.ok(words(topicNote(main, "Essential")).includes("or on the wrong track"));
 assert.ok(words(topicNote(main, "Essential")).includes("is it off on the wrong track"), "Essential's earlier wording is retained");
-assert.ok(words(topicNote(main, "Freshwater")).includes("2023–24 wording is unverified"));
 assert.ok(words(topicNote(main, "McKinnon")).includes("how satisfied"));
-assert.ok(words(main.tree).includes("Ipsos Australia is separate from its Global Average"));
+assert.ok(words(topicNote(main, "McKinnon")).includes("neutral"), "McKinnon's neutral middle answer is named");
+assert.ok(words(topicNote(main, "SEC Newgate")).includes("forced choice"));
+assert.ok(words(topicNote(main, "Ipsos")).includes("don’t know"), "Ipsos's undecided treatment is said");
 
-const currentIpsosRight = mainChart(main).props.series.find((s) => s.id === "worded-right-Ipsos");
-const currentIpsosWrong = mainChart(main).props.series.find((s) => s.id === "worded-wrong-Ipsos");
-assert.equal(currentIpsosRight.points.filter((p) => p.ym === "2026-10")[0].y, 36);
-assert.equal(currentIpsosWrong.points.filter((p) => p.ym === "2026-10")[0].y, 64);
-assert.ok(!(mainChart(main).props.series || []).some((s) => s.id === "world-average"));
+const cur = mainChart(main);
+assert.ok(!(cur.props.series || []).some((s) => /^worded-/.test(s.id)), "no pollster draws as a separate overlay: all are in the line");
+assert.ok(["world-right", "world-wrong"].every((id) => cur.props.series.some((s) => s.id === id)), "Ipsos' Global Average is the dashed reference on the main chart");
+const ipOct = cur.props.scatter.filter((d) => d.meta.pollster === "Ipsos" && d.meta.ym === "2026-10");
+assert.deepEqual(ipOct.map((d) => d.y).sort((a, b) => a - b), [36, 64], "Ipsos's October 2026 reading is a dot where it printed it");
+assert.ok(!(cur.props.series || []).some((s) => s.id === "world-average"));
 
-for (let i = 0; i < 6; i++) {
-  if ((mainChart(main).props.series || []).some((s) => s.id === "worded-right-Lowy Institute")) break;
+for (let i = 0; i < 8; i++) {
+  if (mainChart(main).props.scatter.some((d) => d.meta.pollster === "Lowy Institute")) break;
   assert.ok(press(main, (n) => n.tag === "button" && n.props["aria-label"] === "Previous term"), "walk back to Lowy's term");
 }
 const chart = mainChart(main);
-const right = chart.props.series.find((s) => s.id === "worded-right-Lowy Institute");
-const wrong = chart.props.series.find((s) => s.id === "worded-wrong-Lowy Institute");
-assert.deepEqual([...right.points.map((p) => p.y)], [47, 49], "Lowy shows satisfied and dissatisfied shares, not net-direction points");
-assert.deepEqual([...wrong.points.map((p) => p.y)], [48, 46]);
 const lowyDots = chart.props.scatter.filter((d) => d.meta.pollster === "Lowy Institute");
 assert.equal(lowyDots.length, 4);
+assert.deepEqual(lowyDots.filter((d) => d.label === "Satisfied").map((d) => d.y), [47, 49], "Lowy shows satisfied and dissatisfied shares, labelled as such");
+assert.deepEqual(lowyDots.filter((d) => d.label === "Dissatisfied").map((d) => d.y), [48, 46]);
 assert.deepEqual(new Set(lowyDots.map((d) => d.meta.sample)), new Set([1200]));
 assert.deepEqual(new Set(lowyDots.map((d) => d.meta.dateLabel)), new Set(["1–21 March 2017", "5–25 March 2018"]));
 assert.ok(lowyDots.every((d) => d.meta.url.includes("lowyinstitute.org/publications/")));
 assert.ok(lowyDots.filter((d) => d.x > 2018).every((d) => d.meta.modeChange));
 const lowyNote = topicNote(main, "Lowy Institute");
-assert.ok(lowyNote, "Lowy's question moves to the main chart's note");
+assert.ok(lowyNote, "Lowy's question is in the notes when its readings are in view");
 assert.ok(words(lowyNote).includes("Overall, are you satisfied or dissatisfied with the way things are going in Australia today?"));
 assert.ok(words(lowyNote).includes("600 online and 600 telephone"));
+assert.ok(words(lowyNote).includes("never offered"), "Lowy's volunteered-only don't know is said");
 
 const ipDots = chart.props.scatter.filter((d) => d.meta.pollster === "Ipsos");
 assert.ok(ipDots.length >= 10, "the selected historical window shows many Australian Ipsos waves");

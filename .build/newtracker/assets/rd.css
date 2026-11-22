@@ -1621,6 +1621,15 @@ body.rd .rd-dir-chart { margin-top: 40px; }
    chart card (the select sits in the chead's right slot by flex) */
 body.rd .rd-dir-chart .rd-chead .rd-pv-sel { flex-shrink: 0; }
 body.rd .rd-dir-extremes { margin: 14px 0 0; font-size: 13px; color: var(--ink-3); max-width: 66ch; }
+/* National direction: how each pollster asks (rd-panels DIRECTION_HOUSE_NOTES) */
+body.rd .rd-dirq .rd-dirq-grid { margin-top: 10px; }
+body.rd .rd-dirq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 24px; }
+body.rd .rd-dirq-house { border-top: 1px solid var(--line); padding-top: 8px; min-width: 0; }
+body.rd .rd-dirq-name { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--ink); }
+body.rd .rd-dirq-name .rd-link { font-weight: 400; font-size: 12px; margin-left: 4px; }
+body.rd .rd-dirq-q { margin: 0 0 6px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+body.rd .rd-dirq-l { margin: 3px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-3); }
+body.rd .rd-dirq-k { display: block; font-weight: 600; color: var(--ink-2); }
 /* a group view's readout, under the chart's name: the group's latest print
    beside its house's all-voters print and whether the gap clears its margin */
 body.rd .rd-dir-grp { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); max-width: 66ch; }

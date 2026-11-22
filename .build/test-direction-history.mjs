@@ -214,18 +214,23 @@ assert.ok(preMatch, "the historical pooled series is emitted");
 const pre = JSON.parse(JSON.parse(preMatch[1]));
 assert.equal(pre.polls.find((p) => p.pollster === "Roy Morgan" && p.dateLabel === "May 26/27").sample, 818,
   "the recovered historical sample reaches its chart dot's tooltip");
-assert.equal(pre.from, "2022-03", "pooling starts when SEC Newgate joins Roy Morgan");
-assert.deepEqual(pre.houses, ["Roy Morgan", "SEC Newgate", "Essential", "Freshwater", "RedBridge/Accent"],
-  "all five houses enter the estimator in first-asked order");
+assert.equal(pre.from, "2022-03", "the pre-term series opens when SEC Newgate joins Roy Morgan");
+/* since 2026-11-22 the series is the Bayesian model's (gen-data §5m): every
+   pollster that asked between March 2022 and the term is an input, Ipsos and
+   Spectre included, in first-asked order */
+assert.ok(pre.model, "the pre-term series is the model's");
+assert.deepEqual(pre.houses, ["Roy Morgan", "SEC Newgate", "Ipsos", "Essential", "Freshwater", "RedBridge/Accent", "Spectre Strategy"],
+  "every house asking March 2022 – April 2025 enters the model, in first-asked order");
 const monthPoint = (ym) => {
   const p = pre.series.find((q) => q.ym === ym);
-  assert.ok(p, `${ym} is pooled`);
+  assert.ok(p, `${ym} is modelled`);
   assert.ok(Math.abs(p.right + p.wrong + p.unsure - 100) <= 0.2, `${ym}'s sums reconcile`);
+  assert.ok(p.rightCi > 0 && p.wrongCi > 0, `${ym} carries its 95% intervals`);
   return p;
 };
-assert.equal(monthPoint("2022-04").right, 43.3, "April 2022 uses Essential's recovered wave and SEC Newgate's exact fieldwork midpoint");
-assert.equal(monthPoint("2022-09").right, 50.0, "Essential joins the September 2022 consensus with recovered fieldwork windows and samples");
-assert.equal(monthPoint("2024-02").right, 35.3, "RedBridge joins the February 2024 estimate with Freshwater and exact SEC Newgate fieldwork and samples");
+for (let y = 2022, m = 3; y < 2025 || m < 5; m++) { if (m > 12) { m = 1; y++; } if (y === 2025 && m === 5) break; monthPoint(`${y}-${String(m).padStart(2, "0")}`); }
+assert.ok(pre.solo.length > 150 && pre.solo[0].ym <= "2007-06", "the model's line runs back to mid-2007");
+assert.ok(pre.solo.every((p, i) => i === 0 || p.x > pre.solo[i - 1].x), "and has a point every month");
 for (const [pollster, dateLabel, right, wrong] of [["SEC Newgate", "September 2022", 53, 47],
   ["RedBridge/Accent", "February 2024", 32, 47]]) {
   const dot = pre.polls.find((p) => p.pollster === pollster && p.dateLabel === dateLabel);

@@ -80,11 +80,26 @@ const close = (got, want, label) => assert.ok(Math.abs(got - want) < 1e-9, `${la
   console.log("3. Historical exception lists, roster typology and split-cell alignment: OK");
 }
 
-// 4. Exact-date discipline: a source's impossible end year stays null.
+// 4. Exact-date discipline. A footer's impossible end year is never repaired
+//    by guesswork: the date comes from wherever the same report prints the
+//    range whole (2019-09's footers say "September 6th 2018"; its methodology
+//    paragraph, "were interviewed between August 23rd 2019 and September 6th
+//    2019"). Every wave carries dates whose end falls in its labelled month –
+//    the 27 waves the 2026-11-22 source check recovered or corrected included.
 {
   const sep = of("2019-09");
-  assert.equal(sep.start, "2019-08-23"); assert.equal(sep.end, null);
-  assert.match(sep.fieldwork, /September 6th 2018/);
+  assert.equal(sep.start, "2019-08-23"); assert.equal(sep.end, "2019-09-06");
+  assert.match(sep.fieldwork, /September 6th 2019/);
+  for (const [m, s0, e0] of [["2019-03", "2019-02-22", "2019-03-08"], ["2022-06", "2022-05-27", "2022-06-06"],
+                             ["2022-09", "2022-08-26", "2022-09-09"], ["2026-05", "2026-04-24", "2026-05-08"]]) {
+    const w = of(m);
+    assert.equal(w.start, s0, m + " start"); assert.equal(w.end, e0, m + " end");
+  }
+  for (const w of waves) {
+    assert.ok(w.start && w.end, w.month + " has fieldwork dates");
+    const [y, mo] = w.month.split("-").map(Number);
+    assert.ok(Date.parse(w.end) >= Date.UTC(y, mo - 1, 1) && Date.parse(w.end) < Date.UTC(y, mo, 1), w.month + " ends in its month");
+  }
   assert.ok(waves.every((w) => w.australia.sampleApprox && w.australia.sample != null),
     "every accepted wave has a printed approximate Australia n, never an invented exact n");
   assert.equal(waves.filter((w) => w.globalAverage.sample != null).length, 61, "61 exact global totals are printed");

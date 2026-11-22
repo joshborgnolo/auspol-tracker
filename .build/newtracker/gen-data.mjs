@@ -2,9 +2,9 @@
    dataset asset for index.html (window.AUSPOL).
    Methodology matches the established aggregate (see transform.mjs):
    2PP headline = sample- & recency-weighted, house-effect-adjusted nowcast;
-   every monthly estimate (2PP, primaries, synthetic, alt head-to-heads,
-   direction) = sample-weighted, house-effect-adjusted monthly mean from ONE
-   construction, with a house's repeat waves in a window or month deflated
+   every monthly estimate (2PP, primaries, synthetic, alt head-to-heads;
+   direction on /vic/) = sample-weighted, house-effect-adjusted monthly mean from ONE
+   construction (federal national direction is the Bayesian model of §5m), with a house's repeat waves in a window or month deflated
    to the square root of their number; leadership = monthly means of
    published readings, with the opposition slot spliced Ley → Taylor
    (handover 13 Feb 2026).
@@ -17,6 +17,7 @@ import { writeAtomic } from "../atomic-write.mjs";
 import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_3CNR, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp, FP_ON, FP_ON_BAND, FLOW_HISTORY, FLOW_HISTORY_SENATE, FLOW_HISTORY_SENATE_ON, FLOW_HISTORY_SENATE_CON, FLOW_HISTORY_NSW_LC, FLOW_HISTORY_NSW_LC_ON, FLOW_HISTORY_NSW_LC_CON } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
+import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
 
@@ -1874,7 +1875,11 @@ const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
 };
 
 /* ---- 5. national direction – right track / wrong track ------------------
-   Given the SAME treatment as the 2PP and the primaries: sample-weighted,
+   Federally every direction figure now comes from the model in §5m below
+   (2026-11-22); what follows is the earlier recipe, still the path for a
+   jurisdiction without the model and the source of the leans §5's other
+   consumers read. The earlier recipe gave it the SAME treatment as the 2PP
+   and the primaries: sample-weighted,
    house-effect-adjusted monthly means. The houses asking this question are
    not the ones publishing a 2PP, and they don't all poll every month, so a
    plain mean would step with WHO polled rather than with what people think.
@@ -1893,6 +1898,208 @@ const dirSample = (d) => {
   if (p) return rowN(p);
   return Math.min(d.sample || 1200, SAMPLE_CAP);
 };
+
+/* ---- 5m. national direction: the Bayesian model (federal, 2026-11-22) ----
+   Every figure the National direction panel prints – the line back to 2007,
+   today's reading and its change, each pollster's lean, the All-polls rail's
+   "against the trend" and "in today's figure" – comes from one state-space
+   model over every reading on file (./direction-model.mjs explains it; the
+   prototype, backtest and review are in .build/analysis/direction-bayes/).
+   Readings: the live direction[] rows, the houses' back history
+   (data/direction-history.json, corrected below), Ipsos's What Worries the
+   World Australia figures and the Lowy Institute's and McKinnon's
+   satisfaction questions – different questions and formats enter through
+   each pollster's lean, measured on the ratio of right to wrong, which a
+   forced choice or an unsure option leaves comparable. /vic/ asks no
+   direction question: there DIRM is null and the older recipe below runs on
+   its empty series exactly as before. */
+const DIR_DAY = (iso) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000);
+const DIR_ISO = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+/* Corrections to the back history found by the 2026-11-22 release-date
+   audit (.build/analysis/direction-bayes/morgan-release-dates.json, issues),
+   keyed end|right|wrong. The backfill (backfill-direction-history.mjs) should
+   learn them; until it does they are applied as the file is read.
+     · five Oct–Dec "2015" rows are the late-2013 waves (a table heading set
+       the year): four repeat waves already on file, the fifth moves to 2013;
+     · two-week pools of Dec 11 2022 and May 14 2023 overlap the one-week
+       readings ending the same day, so they are dropped, and every Aug 2022 –
+       Nov 2023 row (filed with start = end) gets its week back;
+     · three label typos ("23/34" 2012, "18/29" 2020, "February 20" 2025). */
+/* days opinion may move at once: federal elections and changes of prime
+   minister since the record begins */
+const DIR_JUMPS = ["2007-11-24", "2010-06-24", "2010-08-21", "2013-06-27", "2013-09-07", "2015-09-15",
+  "2016-07-02", "2018-08-24", "2019-05-18", "2022-05-21", "2025-05-03"];
+const MONTH_SET_EARLY = new Set(MONTHS);
+const DIR_HIST_DROP = new Set(["2015-11-03|45.5|31", "2015-11-17|48.5|32.5", "2015-12-01|48|35", "2015-12-15|42|38.5",
+  "2022-12-11|45.7|37.9", "2023-05-14|39.4|45.1"]);
+const DIR_HIST_REDATE = {
+  "2015-10-20|42.5|28.5": ["2013-10-19", "2013-10-20"], "2012-06-17|39|44": ["2012-06-16", "2012-06-24"],
+  "2020-07-29|49|34.5": ["2020-07-11", "2020-07-19"], "2025-02-20|34.6|49.6": ["2025-02-17", "2025-02-23"],
+};
+const DIR_HIST_TWO_WEEK = new Set(["2022-12-16|45.5|39.1", "2023-01-15|45|38.5", "2023-01-29|43.5|38.7"]);
+const DIRM = (() => {
+  if (JUR || !DIR.length) return null;
+  const tStart = Date.now();
+  const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8")); } catch { return null; } };
+  const HIST = (rd("direction-history.json") || {}).waves || [], IPS = (rd("ipsos-direction.json") || {}).waves || [], LOWY = (rd("lowy-direction.json") || {}).waves || [];
+  const fmtOf = (house, unsure) => DIR_FORMAT[house] || (unsure != null && unsure >= 2 ? "u" : "f");
+  const readings = [];
+  const add = (r) => {
+    if (!(r.R > 0 && r.W > 0) || !r.end) return;
+    const s = DIR_DAY(r.start || r.end), e = DIR_DAY(r.end);
+    const fmt = fmtOf(r.house, r.U);
+    readings.push({ ...r, start: r.start || r.end, fmt, mid: Math.round((Math.min(s, e) + e) / 2), U: fmt === "u" ? (r.U ?? Math.max(0, 100 - r.R - r.W)) : null });
+  };
+  for (const d of DIR) add({ house: d.pollster, src: "live", key: d.date + "|" + d.pollster, start: d.dateStart || d.date, end: d.date,
+    R: d.right, W: d.wrong, U: d.unsure, n: dirSample(d), sample: (POLL_BY_KEY.get(d.date + "|" + d.pollster) || {}).sample || d.sample || null, url: d.url || null });
+  const liveKeys = new Set(DIR.map((d) => `${d.pollster}|${d.date}|${d.right}|${d.wrong}`));
+  const histHouse = (w) => HOUSE_RENAMES[w.pollster || "Roy Morgan"] || w.pollster || "Roy Morgan";
+  /* a dateless reprint (only the day an outlet printed it) that repeats a
+     dated wave of the same house from the ten days before, within half a
+     point, is that wave again (Crikey, 18 Mar and 13 Jun 2008) */
+  const reprint = (w) => !w.end && w.published && HIST.some((x) => x !== w && x.end && histHouse(x) === histHouse(w)
+    && DIR_DAY(w.published) - DIR_DAY(x.end) >= 0 && DIR_DAY(w.published) - DIR_DAY(x.end) <= 10
+    && Math.abs(x.right - w.right) <= 0.5 && Math.abs(x.wrong - w.wrong) <= 0.5);
+  for (const w of HIST) {
+    if (w.right == null || w.wrong == null || reprint(w)) continue;
+    const house = histHouse(w), k = `${w.end}|${w.right}|${w.wrong}`;
+    if (DIR_HIST_DROP.has(k) || liveKeys.has(`${house}|${w.end}|${w.right}|${w.wrong}`)) continue;
+    let start, end;
+    if (DIR_HIST_REDATE[k]) [start, end] = DIR_HIST_REDATE[k];
+    else if (w.end) { start = w.start || w.dateStart || w.end; end = w.end; }
+    else if (w.month) { start = w.month + "-01"; end = DIR_ISO(DIR_DAY(w.month + "-01") + 31).slice(0, 7) + "-01"; end = DIR_ISO(DIR_DAY(end) - 1); }
+    else if (w.published) start = end = w.published;
+    else continue;
+    if (house === "Roy Morgan" && start === end && end >= "2022-08-01" && end <= "2023-11-30")
+      start = DIR_ISO(DIR_DAY(end) - (DIR_HIST_TWO_WEEK.has(k) ? 13 : 6));
+    add({ house, src: "history", start, end, R: w.right, W: w.wrong, U: w.unsure, n: Math.min(w.sample || 1200, SAMPLE_CAP),
+      sample: w.sample || null, url: w.url || null,
+      label: w.label || (w.month ? `${MNF[+w.month.slice(5, 7) - 1]} ${w.month.slice(0, 4)}` : null) });
+  }
+  for (const w of IPS) if (w.australia && w.australia.right != null && w.start && w.end)
+    add({ house: "Ipsos", src: "ipsos", start: w.start, end: w.end, R: w.australia.right, W: w.australia.wrong,
+      n: Math.min(w.australia.sample || 1000, SAMPLE_CAP), sample: w.australia.sample || null, sampleApprox: !!w.australia.sampleApprox, url: w.sourceUrl || null, ym: w.month,
+      label: w.fieldwork || null });
+  for (const w of LOWY) add({ house: "Lowy Institute", src: "lowy", start: w.start, end: w.end, R: w.satisfied, W: w.dissatisfied,
+    n: Math.min(w.sample || 1200, SAMPLE_CAP), sample: w.sample || null, url: w.url || null, label: w.field || null, modeChange: !!w.modeChange });
+  readings.sort((a, b) => a.mid - b.mid || a.house.localeCompare(b.house));
+  const t1 = DIR_DAY(LATEST_ISO), tFirst = readings[0].mid;
+  /* the days the panel prints: mid-month back to the first reading (the
+     current month at the newest poll, so the line ends on the headline), the
+     yardstick grid of the current term (every YARD_STEP days to KF_T1), each
+     Ipsos wave's middle day (the world comparison), and a month ago */
+  const months = [];
+  for (let y = Number(DIR_ISO(tFirst).slice(0, 4)), m = Number(DIR_ISO(tFirst).slice(5, 7)); ; m++) {
+    if (m > 12) { m = 1; y++; }
+    const ym = `${y}-${String(m).padStart(2, "0")}`;
+    if (DIR_DAY(ym + "-01") > t1) break;
+    const day = ym === LATEST_ISO.slice(0, 7) ? t1 : Math.min(DIR_DAY(ym + "-15"), t1);
+    if (day >= tFirst) months.push({ ym, day });
+  }
+  const curFirst = Math.min(...readings.filter((r) => MONTHS.includes(DIR_ISO(r.mid).slice(0, 7))).map((r) => r.mid));
+  const yard = [];
+  for (let d = curFirst; d < KF_T1; d += YARD_STEP) yard.push(d);
+  yard.push(KF_T1);
+  const ipsDays = readings.filter((r) => r.src === "ipsos").map((r) => r.mid);
+  const days = [...new Set([...months.map((m) => m.day), ...yard, ...ipsDays, t1, t1 - 30])];
+  const jumps = new Set(DIR_JUMPS.map(DIR_DAY));
+  const fit = fitDirection(readings, { t1, days, jumps, nDraw: +(process.env.DIR_NDRAW || 2000), track: ["Ipsos"] });
+  const S = (a) => ({ v: dmean(a), lo: dquant(a, 0.025), hi: dquant(a, 0.975) });
+  const half = (a) => r1((dquant(a, 0.975) - dquant(a, 0.025)) / 2);
+  const inMonth = (ym) => readings.filter((r) => DIR_ISO(r.mid).slice(0, 7) === ym).length;
+  const row = ({ ym, day }) => {
+    const s = fit.shares(day), right = r1(dmean(s.R)), wrong = r1(dmean(s.W));
+    return { ym, x: mx(ym), right, wrong, unsure: r1(Math.max(0, 100 - right - wrong)), net: r1(dmean(s.NET)),
+      n: inMonth(ym), rightCi: half(s.R), wrongCi: half(s.W), netCi: half(s.NET) };
+  };
+  const series = months.map(row);
+  const byYm = new Map(series.map((m) => [m.ym, m]));
+  const direction = MONTHS.map((ym) => byYm.get(ym)).filter(Boolean);
+  /* today, its change on a month ago and since the term's first month: the
+     posterior of each difference itself (the mood then estimated with every
+     poll since), significant when its 95% band excludes zero */
+  const now = fit.shares(t1), prev = fit.shares(t1 - 30);
+  const chg = now.NET.map((v, i) => v - prev.NET[i]);
+  const firstDay = months.find((m) => m.ym === MONTHS[0])?.day;
+  const since = firstDay != null ? now.NET.map((v, i) => v - fit.shares(firstDay).NET[i]) : null;
+  const cS = S(chg), sS = since ? S(since) : null;
+  const nowRight = r1(dmean(now.R)), nowWrong = r1(dmean(now.W));
+  const directionNow = {
+    right: nowRight, wrong: nowWrong, unsure: r1(Math.max(0, 100 - nowRight - nowWrong)), net: r1(dmean(now.NET)),
+    rightCi: half(now.R), wrongCi: half(now.W), netCi: half(now.NET),
+    n: readings.filter((r) => t1 - r.mid <= HL_WINDOW && r.mid <= t1).length,
+    chg: r1(cS.v), changeCi95: r1((cS.hi - cS.lo) / 2), changeLo: r1(cS.lo), changeHi: r1(cS.hi),
+    changeSig: cS.lo > 0 || cS.hi < 0, pUp: r2(dmean(chg.map((v) => (v > 0 ? 1 : 0)))),
+    ...(sS ? { sinceTerm: { from: MONTHS[0], chg: r1(sS.v), lo: r1(sS.lo), hi: r1(sS.hi), sig: sS.lo > 0 || sS.hi < 0 } } : {}),
+    method: "bayes", draws: fit.n,
+  };
+  /* each house's lean today: its printed right and wrong against the average
+     pollster's, format included (a forced choice runs high on both) */
+  const curHouses = [...new Set(readings.filter((r) => MONTHS.includes(DIR_ISO(r.mid).slice(0, 7))).map((r) => r.house))];
+  const allN = (h) => readings.filter((r) => r.house === h && dirLeanHouse(r) === h).length;
+  const houseEffects = { right: {}, wrong: {}, net: {} };
+  for (const h of curHouses) {
+    const { dR, dW } = fit.leanPts(h), n = allN(h);
+    houseEffects.right[h] = { v: r1(dmean(dR)), n }; houseEffects.wrong[h] = { v: r1(dmean(dW)), n };
+    houseEffects.net[h] = { v: r1(dmean(dR) - dmean(dW)), n };
+  }
+  /* per live reading of this term: what it does to today's net (its
+     footprint) and the trend at its fieldwork without it (its yardstick) */
+  const effByKey = new Map(), ydAt = new Map();
+  readings.forEach((r, i) => {
+    if (r.src !== "live" || !MONTH_SET_EARLY.has(DIR_ISO(r.mid).slice(0, 7))) return;
+    const inf = fit.influence(i);
+    if (!inf) return;
+    effByKey.set(r.key, { lo: r1(directionNow.net - inf.dNow), hi: directionNow.net, w: 1 });
+    const n = readings.filter((q, j) => j !== i && Math.abs(q.mid - r.mid) <= HE_WINDOW).length;
+    ydAt.set(r.key, { v: r2(inf.level), he: r2(inf.he), n });
+  });
+  const yardLine = yard.map((d) => [DIR_ISO(d), r1(dmean(fit.shares(d).NET))]);
+  /* dots: the pre-term readings, and this term's readings that have no
+     direction[] row (Ipsos, McKinnon) – no All-polls row to open */
+  const termStart = MONTHS[0], dispHouse = (h) => h;
+  const dot = (r) => ({ x: dx(r.end), ym: r.end.slice(0, 7), pollster: dispHouse(r.house), dateLabel: r.label || fwLabel(r.start !== r.end ? r.start : null, r.end),
+    released: r.end, fmid: DIR_ISO(r.mid), right: r.R, wrong: r.W, unsure: r.fmt === "u" ? r.U : null, sample: r.sample,
+    ...(r.sampleApprox ? { sampleApprox: true } : {}), ...(r.modeChange ? { modeChange: true } : {}), ...(r.url ? { url: r.url } : {}) });
+  const preDots = readings.filter((r) => r.end.slice(0, 7) < termStart).map(dot).sort((a, b) => a.x - b.x);
+  const extraDots = readings.filter((r) => r.src !== "live" && r.end.slice(0, 7) >= termStart).map((r) => ({ ...dot(r), noRow: true }));
+  const directionPre = {
+    from: "2022-03", to: termStart,
+    houses: [...new Set(readings.filter((r) => { const ym = r.end.slice(0, 7); return ym >= "2022-03" && ym < termStart; }).map((r) => r.house))],
+    series: series.filter((m) => m.ym >= "2022-03" && m.ym < termStart),
+    solo: series.filter((m) => m.ym < "2022-03"),
+    polls: preDots, gapAtJoin: null, model: true,
+  };
+  /* Ipsos' Global Average on the panel's terms: each wave's world ratio of
+     right to wrong moved by Ipsos's lean on that day – the shift the model
+     gives Ipsos Australia – and split with Australia's undecided share.
+     Ipsos's Australia-and-world gap is kept exactly; the assumption is the
+     one any Ipsos comparison of Australia with the world makes, that its
+     Australian and world samples share its lean in the same month. */
+  const sb = fit.bal, su = fit.und, LG = (p) => Math.log(p / (1 - p));
+  const worldAdj = IPS.filter((w) => w.globalAverage && w.globalAverage.right != null && w.start && w.end).map((w) => {
+    const day = Math.round((DIR_DAY(w.start) + DIR_DAY(w.end)) / 2), slb = sb.slotOfDay.get(day), slu = su.slotOfDay.get(day);
+    if (slb == null || slu == null) return null;
+    const lw = LG(w.globalAverage.right / (w.globalAverage.right + w.globalAverage.wrong));
+    const R = [], W = [];
+    for (let i = 0; i < fit.n; i++) {
+      const u = fit.logistic(su.draws[i].m[slu]), b = fit.logistic(lw - sb.draws[i].tr.Ipsos[slb]);
+      R.push(100 * (1 - u) * b); W.push(100 * (1 - u) * (1 - b));
+    }
+    return { ym: w.month, x: dx(DIR_ISO(day)), field: w.fieldwork || null, right: r1(dmean(R)), wrong: r1(dmean(W)),
+      printed: { right: w.globalAverage.right, wrong: w.globalAverage.wrong } };
+  }).filter(Boolean);
+  const kap = (f) => Object.fromEntries([...f.kappa].map(([h, k]) => [h, k]));
+  const top = (f) => f.rows[0].th;
+  console.log(`direction model: ${readings.length} readings (${[...new Set(readings.map((r) => r.house))].length} houses) in ${((Date.now() - tStart) / 1000).toFixed(1)}s`
+    + ` | now R ${directionNow.right} W ${directionNow.wrong} U ${directionNow.unsure} net ${directionNow.net} ±${directionNow.netCi}`
+    + ` | month ${directionNow.chg} [${directionNow.changeLo}, ${directionNow.changeHi}] P(up) ${directionNow.pUp}`
+    + ` | best balance ${JSON.stringify(top(sb))} undecided ${JSON.stringify(top(su))}`
+    + ((sb.edges.length || su.edges.length) ? ` | GRID EDGE balance [${sb.edges}] undecided [${su.edges}]` : "")
+    + ` | κ ${JSON.stringify(kap(sb))}`);
+  return { readings, direction, series, directionNow, houseEffects, effByKey, yard: { at: ydAt, line: yardLine },
+    directionPre, extraDots, worldAdj, extraHouses: curHouses.filter((h) => !DIR.some((d) => d.pollster === h)) };
+})();
 const dirRows = (field) => DIR.filter((d) => d[field] != null).map((d) => ({
   ym: ymOf(d.date), mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster,
 }));
@@ -1911,7 +2118,7 @@ const dirHeNet = houseEffectsFor(dirNetRows);
    difference of two SHARE nowcasts, so the footprint is the difference of
    their two leave-one-out recomputes; the at-day pair (for readings outside
    today's window) works the same way on the release day itself. */
-const dirEffByKey = (() => {
+const dirEffByKey = DIRM ? DIRM.effByKey : (() => {
   const ms = new Set(MONTHS);            // current-term months only: older
                                          // readings never surface as rows
   const keyed = (field) => DIR.filter((d) => d[field] != null).map((d) =>
@@ -1952,7 +2159,7 @@ const dirEffByKey = (() => {
    each house-adjusted on its own series), and the line the chart draws.
    yd: { v, he, n } - the other readings' net at this one's fieldwork
    midpoint, and this house's net lean then (right lean minus wrong lean). */
-const dirYard = (() => {
+const dirYard = DIRM ? DIRM.yard : (() => {
   const keyed = (field) => DIR.filter((d) => d[field] != null).map((d) =>
     ({ key: d.date + "|" + d.pollster, mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster }));
   const rowsR = keyed("right"), rowsW = keyed("wrong");
@@ -1996,15 +2203,15 @@ for (const [k, eff] of dirEffByKey) {
 // chart-span alone still credited Freshwater eleven months after its last
 // reading.
 const MONTH_SET = new Set(MONTHS);
-const directionHouses = creditHouses(
-  DIR.filter((d) => MONTH_SET.has(ymOf(d.date))),
-  (d) => d.pollster, (d) => Date.parse(d.date));
+/* federally the line is built from Ipsos's and McKinnon's readings too
+   (§5m), so they are credited beside the direction[] houses */
+const DIR_CREDIT = DIR.filter((d) => MONTH_SET.has(ymOf(d.date))).map((d) => ({ pollster: d.pollster, date: d.date }))
+  .concat(DIRM ? DIRM.extraDots.map((d) => ({ pollster: d.pollster, date: d.released })) : []);
+const directionHouses = creditHouses(DIR_CREDIT, (d) => d.pollster, (d) => Date.parse(d.date));
 // The caption's name-list takes the same houses plus any STOPPED contributors,
 // listed last as "Name (inactive)" – directionHouses stays the active count
 // for the How-to-read line ("Only N houses ask this question").
-const directionHousesAll = creditHousesWithStopped(
-  DIR.filter((d) => MONTH_SET.has(ymOf(d.date))),
-  (d) => d.pollster, (d) => Date.parse(d.date));
+const directionHousesAll = creditHousesWithStopped(DIR_CREDIT, (d) => d.pollster, (d) => Date.parse(d.date));
 // The month each STOPPED house went quiet on this question - one past its
 // last direction reading - so the caption can date "became inactive in …"
 // instead of a bare "has stopped asking". Keyed by firm, "YYYY-MM".
@@ -2063,6 +2270,7 @@ const directionPolls = DIR
     };
   })
   .sort((a, b) => a.x - b.x);
+if (DIRM) { directionPolls.push(...DIRM.extraDots); directionPolls.sort((a, b) => a.x - b.x); }
 const dirRight = monthlyAdj(dirRows("right"), dirHe.right);
 const dirWrong = monthlyAdj(dirRows("wrong"), dirHe.wrong);
 const dirWrongBy = new Map(dirWrong.map((m) => [m.ym, m]));
@@ -2506,7 +2714,7 @@ const issuesOnlyPolls = (() => {
    bands on the site – which is the honest shape of a series this thin, and
    was previously only said in the caption. */
 const dirRightRows = dirRows("right"), dirWrongRows = dirRows("wrong");
-const direction = dirRight.map((m) => {
+const directionOld = DIRM ? null : dirRight.map((m) => {
   const w = dirWrongBy.get(m.ym);
   if (!w) return null;
   const right = r1(m.v), wrong = r1(w.v);
@@ -2520,6 +2728,7 @@ const direction = dirRight.map((m) => {
            rightCi: rSe ? r1(1.96 * rSe.se) : null,
            wrongCi: wSe ? r1(1.96 * wSe.se) : null };
 }).filter(Boolean);
+const direction = DIRM ? DIRM.direction : directionOld;
 
 /* The panel's current reading: the headline construction – three-week
    window, house-adjusted – not the last calendar month, which early in a
@@ -2528,7 +2737,7 @@ const direction = dirRight.map((m) => {
    on its own series with its own house effects (never borrowed between
    measures): a net is a difference of two proportions, with the net's
    sampling variance, not a share's. */
-const directionNow = (() => {
+const directionNowOld = DIRM ? null : (() => {
   const r = currentReading(dirRightRows, dirHe.right), w = currentReading(dirWrongRows, dirHe.wrong);
   const net = currentReading(dirNetRows, dirHeNet);
   if (!r || !w) return null;
@@ -2540,6 +2749,7 @@ const directionNow = (() => {
   }
   return out;
 })();
+const directionNow = DIRM ? DIRM.directionNow : directionNowOld;
 
 /* ---- 5dp. national direction, the houses' runs before this term ----
    SEC Newgate starts the multi-house span in March 2022, Essential joins
@@ -2577,6 +2787,7 @@ const dirPreLeanFor = (rows) => {
     gapAt: (t) => firms.length < 2 ? null : at(firms[0], t) - at(firms[1], t) };
 };
 const directionPre = (() => {
+  if (DIRM) return DIRM.directionPre;
   if (JUR || !direction.length) return null;
   const to = direction[0].ym;                    // exclusive: the pooled series takes over here
   const inPre = (ym) => ym && ym >= DIR_PRE_FROM && ym < to;
@@ -9793,7 +10004,10 @@ window.AUSPOL = (function () {
   const directionStateNote = ${JSON.stringify(directionStateNote)};
   /* §5t: trust in the federal government, hand-filed, never pooled */
   const trustGov = ${JSON.stringify(trustGov)};
-  const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
+  const directionHouseEffects = ${JSON.stringify(DIRM ? DIRM.houseEffects : { right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
+  /* Ipsos' Global Average moved onto the panel's terms by Ipsos's lean on
+     each wave's day (§5m), the main chart's dashed reference; null on /vic/ */
+  const directionWorldAdj = ${JSON.stringify(DIRM ? DIRM.worldAdj : null)};
   const directionHouses = ${JSON.stringify(directionHouses)};
   /* name-list for the direction card's caption: the active houses plus any
      STOPPED contributor, listed last, labelled "(inactive)". Keep counting
@@ -10075,7 +10289,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, pvHouses,
     undecidedCellOf: (p) => {

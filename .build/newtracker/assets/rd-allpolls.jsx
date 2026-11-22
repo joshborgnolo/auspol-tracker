@@ -1138,6 +1138,9 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
      dir.eff). The margin reuses the estimator's pq for a net. */
   const isDir = facet === "direction";
   const dirNow = isDir ? D.directionNow || null : null;
+  /* the federal series is the Bayesian model's (gen-data §5m): its yardstick
+     is the trend without the reading, its footprint exact for every reading */
+  const dirBayes = !!(dirNow && dirNow.method === "bayes");
   const dEff = isDir && d ? d.eff || null : null;
   const dYd = isDir && d ? d.yd || null : null;
   const dirLean = d && dYd ? rdApR1(d.net - rdApR1(dYd.v)) : null;
@@ -1468,13 +1471,18 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const dirReckon = d && (
     <table className="rd-ldg-t rd-ldg-rk"><tbody>
       {rk("This reading", r1s(d.net), "right direction minus wrong track")}
-      {dYd ? rk("Readings around it", r1s(rdApR1(dYd.v)), (dYd.n === 1 ? "one other reading" : rdNumWord(dYd.n) + " others") + ", within three weeks")
+      {dirBayes
+        ? (dYd ? rk("Trend without it", r1s(rdApR1(dYd.v)), "the model’s line through every other reading, for the average pollster")
+               : rk("Trend without it", "—", "not available for this reading"))
+        : dYd ? rk("Readings around it", r1s(rdApR1(dYd.v)), (dYd.n === 1 ? "one other reading" : rdNumWord(dYd.n) + " others") + ", within three weeks")
            : rk("Readings around it", "—", "none taken within three weeks")}
       {dirLean != null && rk("Lean", r1s(dirLean), (Math.abs(dirLean) < 0.05 ? "level with them" : "more " + dirWay(dirLean)) + (dirHe == null && insideD ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : ""), dirLean > 0 ? "var(--mood-pos)" : dirLean < 0 ? "var(--mood-neg)" : null)}
-      {rk("House lean", dirHe != null ? r1s(dirHe) : dirHl ? r1s(rdApR1(dirHl.v)) : "—", dirHe != null || dirHl ? "taken out before averaging" : "not measured yet: too few readings")}
+      {rk("House lean", dirHe != null ? r1s(dirHe) : dirHl ? r1s(rdApR1(dirHl.v)) : "—", dirHe != null || dirHl ? (dirBayes ? "the model takes it out" : "taken out before averaging") : "not measured yet: too few readings")}
       {dirHe != null && Math.abs(dirHe) >= 0.05 && dirAdj != null && rk("Less house lean", r1s(dirAdj), insideD ? insideD[0].toUpperCase() + insideD.slice(1) + " its ±" + dirMoe.toFixed(1) + " margin" : (Math.abs(dirAdj) < 0.05 ? "level" : "more " + dirWay(dirAdj)), dirAdj > 0 ? "var(--mood-pos)" : dirAdj < 0 ? "var(--mood-neg)" : null)}
-      {dirNow && rk("In today’s " + rdApSigned(dirNow.net), dEff && dEff.w ? move(dEff) : dEff && dEff.t ? move(dEff.t) : "—",
-          dEff && dEff.w ? "how far it moves it, as one of " + rdNumWord(dirNow.n) : dEff && dEff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only")}
+      {dirNow && (dirBayes
+        ? rk("In today’s " + rdApSigned(dirNow.net), dEff ? move(dEff) : "—", dEff ? "how far it moves today’s figure; older readings count for less as opinion moves on" : "not available for this reading")
+        : rk("In today’s " + rdApSigned(dirNow.net), dEff && dEff.w ? move(dEff) : dEff && dEff.t ? move(dEff.t) : "—",
+          dEff && dEff.w ? "how far it moves it, as one of " + rdNumWord(dirNow.n) : dEff && dEff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only"))}
     </tbody></table>
   );
   const since = D.monthNameFull(Number(from.slice(5)));

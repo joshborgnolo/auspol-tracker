@@ -8409,6 +8409,31 @@ function infoTerms(D) {
       ] },
     { id: "s-direction", title: "National mood", nav: "Mood",
       lead: { id: "direction", body: (
+        D.directionNow && D.directionNow.method === "bayes" ? (
+        <>Whether voters think the country is heading in the right direction or is on the wrong
+        track. {(D.directionHouses || []).length} pollsters ask it now, with slightly different
+        wording and answers, and not every poll includes it. {dirSources}
+        <span className="info-p">Unlike the vote, it is estimated with a model rather than an
+        average. The country’s mood is treated as moving a little each day, and each pollster as
+        seeing it through a {xref("house-effect", "direction", "lean")} of its own plus sampling
+        error. The model works out the mood and every lean together from every reading since
+        2007, so a pollster that asks often doesn’t outvote the rest, older polls count for less
+        the more opinion has moved since, and thin months carry wider
+        {" "}{xref("interval", "direction", "95% intervals")}, which give a 95% chance the figure
+        lies inside, under the model’s assumptions. How fast opinion moves, how far leans drift
+        and how noisy each pollster really is are all estimated from the polls.</span>
+        <span className="info-p">Pollsters are compared on the ratio of right direction to wrong
+        track, which is the same whether or not “unsure” was offered. SEC Newgate and Ipsos force
+        a choice; the Lowy Institute (2017–18) and McKinnon ask about satisfaction instead. Each
+        is read through its own lean. The level is set by the pollsters asking this question, each
+        counting once, and the unsure share by those that print one; Roy Morgan’s face-to-face
+        (to 2020) and multi-mode (2020–22) years have leans of their own. Before Ipsos began in
+        September 2016 only Roy Morgan polled, so the level then is uncertain by several points.
+        The change on a month ago compares today with the model’s estimate of a month ago using
+        every poll since, and counts as significant only when its 95% interval excludes zero. No
+        lean can be measured against the truth, only against the other pollsters, so an error
+        they all share stays invisible.</span></>
+        ) : (
         <>Whether voters think the country is heading in the right direction or is on the wrong
         track. Only {(D.directionHouses || []).length} pollsters ask it, with slightly different
         wording, and not every poll includes it. {dirSources}
@@ -8418,7 +8443,8 @@ function infoTerms(D) {
         undecided share and sit higher on both lines, which the lean adjustment takes out. The
         figures at the top come from the last three weeks of polls. With so few pollsters asking,
         some months rest on a single poll, and their
-        {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>) },
+        {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>
+        )) },
       entries: [
         { id: "trust-government", term: "Trust in government", body: (
           <>The National mood section’s second view: how far Australians trust the federal

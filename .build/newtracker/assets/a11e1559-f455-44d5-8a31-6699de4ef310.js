@@ -1523,7 +1523,15 @@ function DirectionPanel({ rangeId }) {
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={dirFmt}
       />
-      <HowTo paras={[
+      <HowTo paras={D.directionNow && D.directionNow.method === "bayes" ? [
+        <>Each dot is one published reading, where its pollster printed it; the lines are a model’s
+        estimate for the average pollster asking this question, month by month, shaded with their
+        95% intervals.</>,
+        <>The model works out the country’s mood and each pollster’s lean together from every
+        reading since 2007, so thin months carry wider shading rather than resting on one poll.
+        Pollsters that force a choice or ask about satisfaction are read through leans of their
+        own; Info’s National mood entry explains how.</>,
+      ] : [
         <>Each dot is one published reading; the lines are monthly averages, shaded with their
         95% intervals.</>,
         <>The lines are adjusted for house effects. Only {asked ? D.directionHouses.length : 0} houses

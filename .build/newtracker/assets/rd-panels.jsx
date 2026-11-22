@@ -2339,7 +2339,8 @@ function RdIpsosDirectionWorld({ D }) {
   const netLabel = (v, digits = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(digits);
   const area = (key, id, opacity) => ({
     id, color: "var(--ink-3)", opacity, edge: false,
-    points: bands.map((w) => ({ x: w.x, y0: w.band["p" + (key === "50" ? "25" : "10")], y1: w.band["p" + (key === "50" ? "75" : "90")] })),
+    // the lower quartile is stored as q25 (gen-data directionWorld); "p25" read undefined and drew nothing
+    points: bands.map((w) => ({ x: w.x, y0: key === "50" ? w.band.q25 : w.band.p10, y1: key === "50" ? w.band.p75 : w.band.p90 })),
   });
   return (
     <div className="card rd-card rd-dir-chart rd-direction-world">
@@ -2395,53 +2396,79 @@ function RdIpsosDirectionWorld({ D }) {
   );
 }
 
-const DIRECTION_WORDING_NOTES = {
+/* How each pollster asks the direction question, and what the model does
+   with its answers (gen-data §5m). Checked 2026-11-22 against the sources
+   linked: Roy Morgan's live table and releases, Essential's report data,
+   SEC Newgate's, Spectre's and Ipsos's reports, RedBridge's questionnaire,
+   the Lowy Institute Poll's notes and McKinnon's report. `role`:
+     level – one of the pollsters asking the standard question, whose leans
+             average zero: together they set the line's level;
+     lean  – shifted by a lean of its own and never setting the level.
+   `unsure` says whether the pollster's undecided share feeds the line's. */
+const DIRECTION_HOUSE_NOTES = {
   "Roy Morgan": {
     question: "Generally speaking, do you feel that things in Australia are heading in the right direction or would you say things are seriously heading in the wrong direction?",
-    scope: "Verified in releases from 2007 and 2020–22, and the current table.",
+    answers: "Right direction and wrong direction, with a third column printed as “Can’t say / no answer”.",
+    method: "Face-to-face to March 2020, then multi-mode to May 2022; its table records no method since August 2022. Each of the three runs has its own lean, the earlier two placed on today’s scale through the pollsters that polled across each change.",
+    role: "level", unsure: true,
     url: "https://www.roymorgan.com/morgan-poll/government-confidence-rating",
   },
   Essential: {
-    question: "E563. In general, would you say that Australia is heading in the right direction or on the wrong track?",
-    scope: "Current 2025–26 wording. The February–May 2022 reports had “is it off on the wrong track?”; the exact transition wave is not established.",
+    question: "In general, would you say that Australia is heading in the right direction or on the wrong track?",
+    answers: "Right direction, wrong track and unsure, each printed. The February–May 2022 reports asked “or is it off on the wrong track?”.",
+    role: "level", unsure: true,
     url: "https://essentialreport.com.au/wp-content/uploads/2026/10/Essential-Report-Disclosure-Statement-Full-Questionnaire-.pdf",
   },
   "SEC Newgate": {
-    question: "B2. Overall, do you think Australia, (state/territory), and your local area are heading in the right direction or the wrong direction?",
-    scope: "Verified in seven reports from July 2025 to September 2026. The Australia item is plotted.",
+    question: "Overall, do you think Australia, (state/territory), and your local area are heading in the right direction or the wrong direction? (The Australia item is used.)",
+    answers: "Right direction and wrong direction only, summing to 100. Its reports print a “Don’t know” column for other questions but none for this one, so it is treated as a forced choice.",
+    role: "level", unsure: false,
     url: "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf",
   },
-  Freshwater: {
-    question: "Generally speaking, do you think that Australia is currently heading in the right direction, or the wrong direction?",
-    scope: "Verified in October 2025–May 2026 workbooks; exact 2023–24 wording is unverified.",
-    url: "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Aus-Polling-150526.xlsx",
-  },
   "RedBridge/Accent": {
-    question: "Would you say that things in Australia are… 1. Generally headed in the right direction; 2. Generally headed in the wrong direction; 3. Not sure.",
-    scope: "Single select; response order 1–2 randomly reversed. Verified in November 2025, January, May and November 2026.",
+    question: "Would you say that things in Australia are… generally headed in the right direction; generally headed in the wrong direction; not sure.",
+    answers: "Right direction, wrong direction and not sure, offered as answers (single select; the first two in random order).",
+    role: "level", unsure: true,
     url: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf",
   },
   "Spectre Strategy": {
-    question: "Q: In your view, is Australia heading in the right direction, or the wrong direction at this time?",
-    scope: "2026 wording; the exact 2025 wording is unverified.",
+    question: "In your view, is Australia heading in the right direction, or the wrong direction at this time?",
+    answers: "Right direction, wrong direction and unsure, each printed. The 2025 wording is unverified.",
+    role: "level", unsure: true,
     url: "https://www.spectrestrategy.com/s/Political-Update-November-26-Spectre-Strategy.pdf",
   },
-  McKinnon: {
-    question: "All things considered, how satisfied are you with the way Australia is heading?",
-    scope: "2025–26 wording. Satisfied and Dissatisfied aggregate the two strength categories; Neutral and Don’t know remain separate answers.",
-    url: "https://apo.org.au/sites/default/files/resource-files/2025-11/apo-nid332763_1.pdf",
-  },
-  "Lowy Institute": {
-    question: "Overall, are you satisfied or dissatisfied with the way things are going in Australia today?",
-    scope: "2017–18 wording. The 5% remainder combines Don’t know / no view / neither; it is not an independently printed Neutral share. In 2018, 600 online and 600 telephone responses were weighted and blended.",
-    url: "https://www.lowyinstitute.org/publications/2018-lowy-institute-poll",
+  Freshwater: {
+    question: "Generally speaking, do you think that Australia is currently heading in the right direction, or the wrong direction?",
+    answers: "Right direction and wrong direction; the rest (about 13%) is read as unsure. The third answer’s label is not on file, and the 2023–24 wording is unverified.",
+    role: "level", unsure: true,
+    url: "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Aus-Polling-150526.xlsx",
   },
   Ipsos: {
     question: "Generally speaking, would you say things in this country are heading in the right direction, or are they off on the wrong track?",
-    scope: "Latest report wording (October 2026). Australia’s sample is published as approximately 1,000, not an exact achieved n.",
+    answers: "Right direction and wrong track, summing to 100: Ipsos notes that its totals can leave out “don’t know” or not-stated answers, so no undecided share is printed.",
+    method: "Ipsos Online Panel, about 1,000 Australians aged 16–74 a month (16–64 from March to July 2019).",
+    role: "level", unsure: false,
     url: "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-October-26.pdf?version=0",
   },
+  "Lowy Institute": {
+    question: "Overall, are you satisfied or dissatisfied with the way things are going in Australia today?",
+    answers: "Satisfied and dissatisfied. “Don’t know” or “no view” was recorded only when volunteered, never offered, which leaves 5% in each wave.",
+    method: "Telephone in 2017; 600 online and 600 telephone responses, weighted and blended, in 2018.",
+    role: "lean", unsure: false,
+    url: "https://www.lowyinstitute.org/publications/2018-lowy-institute-poll",
+  },
+  McKinnon: {
+    question: "All things considered, how satisfied are you with the way Australia is heading?",
+    answers: "Satisfied and dissatisfied (each aggregating two strengths), a neutral middle answer (“neither satisfied nor dissatisfied”, about 15%) and a separate “don’t know” (about 1%).",
+    method: "Online, about 4,300–4,400 Australians aged 18 and over a year.",
+    role: "lean", unsure: false,
+    url: "https://apo.org.au/sites/default/files/resource-files/2025-11/apo-nid332763_1.pdf",
+  },
 };
+/* what the model does with a pollster's answers, in words */
+const directionRoleText = (n) => n.role === "level"
+  ? "Sets the line’s level with the other pollsters asking this question, each counting once" + (n.unsure ? ", and feeds its unsure share." : "; its ratio of right to wrong only, as it prints no unsure share.")
+  : "Asks about satisfaction, so it is read through a lean of its own, wide enough that a couple of readings teach the model about the question, not about Australia. It never sets the level or the unsure share.";
 
 function RdDirectionView({ rangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
@@ -2486,7 +2513,14 @@ function RdDirectionView({ rangeId }) {
      months flow into it at the join. */
   const PRE = D.directionPre && D.directionPre.series && D.directionPre.series.length ? D.directionPre : null;
   const poolStart = PRE ? PRE.series[0].x : D.direction[0].x;
-  const lowyLane = D.directionLowy?.waves?.length ? [{
+  /* Federally (gen-data §5m, PRE.model) every pollster's readings are inputs
+     to the one modelled line – Ipsos, Lowy and McKinnon included – so there
+     are no separate house lanes or dashed overlays: the window reaches back
+     to the model's first month and each reading shows as a dot. Without the
+     model (a page whose history carries only houses' own runs) the lanes
+     below draw as before. */
+  const MODEL = !!(PRE && PRE.model);
+  const lowyLane = !MODEL && D.directionLowy?.waves?.length ? [{
     house: "Lowy Institute",
     // Annual fieldwork intervals stay exact rather than becoming month buckets.
     pts: D.directionLowy.waves.map((w) => ({
@@ -2495,26 +2529,27 @@ function RdDirectionView({ rangeId }) {
       wording: { question: w.question, rightLabel: "Satisfied", wrongLabel: "Dissatisfied" },
     })),
   }] : [];
-  const ipsosLane = D.directionWorld?.waves?.length ? [{
+  const ipsosLane = !MODEL && D.directionWorld?.waves?.length ? [{
     house: "Ipsos",
     // Australia's published split is separate from the global average and country bands.
     pts: D.directionWorld.waves.map((w) => ({
       ym: w.ym, x: w.x, right: w.auRight, wrong: w.auWrong,
       samples: w.auN == null ? [] : [w.auN], sampleApprox: w.auSampleApprox,
       field: w.fieldwork, url: w.url,
-      wording: { question: DIRECTION_WORDING_NOTES.Ipsos.question, rightLabel: "Right direction", wrongLabel: "Wrong track" },
+      wording: { question: DIRECTION_HOUSE_NOTES.Ipsos.question, rightLabel: "Right direction", wrongLabel: "Wrong track" },
     })),
   }] : [];
-  const histLanesAll = (HIST ? Object.keys(HIST.houses).map((house) => ({ house, pts: HIST.houses[house] })) : [])
+  const histLanesAll = MODEL ? [] : (HIST ? Object.keys(HIST.houses).map((house) => ({ house, pts: HIST.houses[house] })) : [])
     .concat(lowyLane, ipsosLane).sort((a, b) => a.pts[0].x - b.pts[0].x);
   const ownWording = (l) => HIST?.wordings?.[l.house] || l.pts[0]?.wording;
   /* Live houses join before the pooled model opens; separately supplied
      house series stay their own lanes, never pooled-model inputs. */
   const histLanes = histLanesAll.filter((l) => l.pts[0].x < poolStart || ownWording(l));
+  const modelLo = MODEL ? Math.min(...(PRE.solo.length ? [PRE.solo[0].x] : []), PRE.series[0].x) : null;
   const histLo = histLanes.length ? Math.min(...histLanes.map((l) => l.pts[0].x)) : poolStart;
-  const ext = { lo: histLanes.length ? histLo : poolStart, hi: nowX };
+  const ext = { lo: MODEL ? modelLo : histLanes.length ? histLo : poolStart, hi: nowX };
   const vTerms = confViewTerms(TERMS, ext.lo, ext.hi);
-  const histOn = !!(histLanes.length && !grpId);
+  const histOn = !!((MODEL || histLanes.length) && !grpId);
   const win = histOn
     ? (winS.kind === "term-carry" ? { kind: "custom", a: Math.max(ext.lo, winS.a), b: winS.b }
       : confClampWin(winS, vTerms, ext.lo, ext.hi, nowX))
@@ -2551,19 +2586,21 @@ function RdDirectionView({ rangeId }) {
   const head = plainShare(big) + " say Australia is " + (wrongLeads ? "on the wrong track" : "heading in the right direction")
     + (most ? ", the most this term" : "");
   const first = M[0];
-  const sinceFirst = now.net - first.net;
   /* the move since the first month is said when it is five points or more
-     AND clears both readings' margins; a net's margin is at most its two
-     shares' margins added (one sample's shares move against each other) */
+     AND clears its margin: under the model (directionNow.sinceTerm) the 95%
+     band of the change itself; otherwise both readings' margins, a net's at
+     most its two shares' added (one sample's shares move against each other) */
+  const ST = now.sinceTerm || null;
+  const sinceFirst = ST ? ST.chg : now.net - first.net;
   const netCi = (r) => (r.rightCi || 0) + (r.wrongCi || 0);
-  const sinceSaid = Math.abs(sinceFirst) >= 5 && Math.abs(sinceFirst) > Math.hypot(netCi(now), netCi(first));
+  const sinceSaid = Math.abs(sinceFirst) >= 5 && (ST ? ST.sig : Math.abs(sinceFirst) > Math.hypot(netCi(now), netCi(first)));
   const netVerb = (n, up) => n >= 10 ? (up ? "soared" : "plummeted") : n >= 6 ? (up ? "lifted" : "soured") : (up ? "lifted slightly" : "soured slightly");
   const netWord = (d) => (d > 0 ? "improved" : "worsened");
   const upDown = (d) => (d > 0 ? "up " : "down ");
   const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say we’re " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
     + (now.chg == null ? ""
       : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
-      : "Net mood has held steady for a month")
+      : "Net mood has not changed significantly in a month")
     + (sinceSaid ? (now.chg == null
       ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025."
       : now.changeSig
@@ -2573,9 +2610,12 @@ function RdDirectionView({ rangeId }) {
 
   const prePolls = histOn && PRE ? PRE.polls.map((d) => ({ ...d, pre: true })) : [];
   const visiblePolls = prePolls.concat(D.directionPolls || []).filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]);
+  /* a satisfaction question's dots say so; Ipsos prints no exact sample */
+  const dotWords = (d) => (DIRECTION_HOUSE_NOTES[d.pollster]?.role === "lean" ? ["Satisfied", "Dissatisfied"] : ["Right direction", "Wrong track"]);
+  const dotSub = (d) => (d.sampleApprox && d.sample ? "Australian sample approximately " + d.sample.toLocaleString("en-AU") + " (Ipsos publishes no exact achieved n)" : undefined);
   const dots = visiblePolls.filter((d) => dotsOn).flatMap((d) => [
-    { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta: d },
-    { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta: d },
+    { x: d.x, y: d.right, color: "var(--mood-pos)", label: dotWords(d)[0], sub: dotSub(d), meta: d },
+    { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: dotWords(d)[1], sub: dotSub(d), meta: d },
   ]);
   const band = (k, ck) => pts.filter((d) => d[ck] != null).map((d) => ({ x: d.x, y0: d[k] - d[ck], y1: d[k] + d[ck] }));
   const areas = [
@@ -2627,7 +2667,18 @@ function RdDirectionView({ rangeId }) {
         color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)", points, rdWidth: 1.5, opacity: 0.85, dash: "0.1 3.6" };
     }).filter((s) => s.points.length >= 2);
   });
+  /* Ipsos' Global Average on Australian pollsters' terms (gen-data §5m):
+     each wave's world ratio moved by Ipsos's lean that day, split with
+     Australia's unsure share – a dashed reference, never in the line */
+  const worldPts = !grpId && D.directionWorldAdj ? D.directionWorldAdj.filter((w) => w.x >= xDomain[0] - 0.05 && w.x <= xDomain[1] + 0.05) : [];
+  const worldOn = worldPts.length >= 2;
+  const worldSeries = worldOn ? [["wrong", "wrong track"], ["right", "right direction"]].map(([k, lab]) => ({
+    id: "world-" + k, label: "Ipsos’ Global Average, " + lab + ", on Australian pollsters’ terms",
+    color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)", points: worldPts.map((w) => ({ x: w.x, y: w[k] })),
+    rdWidth: 1.5, opacity: 0.8, dash: "5 4", endCap: false, endLabel: null, smooth: false, interpHover: true,
+  })) : [];
   const vals = pts.flatMap((p) => [p.right, p.wrong]).concat(dots.map((d) => d.y))
+    .concat(worldPts.flatMap((w) => [w.right, w.wrong]))
     .concat(areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])))
     .concat(wordedSeries.flatMap((s) => s.points.map((p) => p.y)))
     .concat(histSeries.flatMap((s) => s.points.map((p) => p.y)))
@@ -2672,10 +2723,12 @@ function RdDirectionView({ rangeId }) {
   /* House counts and cadence live in Info's National direction entry; the
      foot distinguishes these separate observations from the pooled line. */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const wordingNote = !grpId && histLanes.some((l) => ownWording(l) && l.pts.some(inW))
+  const wordingNote = !MODEL && !grpId && histLanes.some((l) => ownWording(l) && l.pts.some(inW))
     ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average, which stays in the world comparison." : null;
-  const foot = [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote]
-    .filter(Boolean).join(" ");
+  const foot = MODEL
+    ? "The dots sit where each pollster printed them: Ipsos and SEC Newgate force a choice and Lowy and McKinnon ask about satisfaction, so theirs sit apart from the line, which is set for the average pollster asking this question."
+    : [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote]
+      .filter(Boolean).join(" ");
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
 
@@ -2701,9 +2754,10 @@ function RdDirectionView({ rangeId }) {
   const questionHouses = new Set(G ? gHouses : visiblePolls.map((p) => p.pollster).filter(Boolean));
   if (!G) for (const l of histLanes) if (ownWording(l) && l.pts.some(inW)) questionHouses.add(l.house);
   // These are federal wordings; a Victorian poll can share the pollster's name.
-  const questionNotes = D.directionWorld?.waves?.length ? [...questionHouses].map((house) => ({ house,
-    ...(DIRECTION_WORDING_NOTES[house] || { question: "Exact question wording has not been verified against a primary report.", unverified: true }),
-  })) : [];
+  const NOTE_ORDER = Object.keys(DIRECTION_HOUSE_NOTES);
+  const questionNotes = [...questionHouses].sort((a, b) => (NOTE_ORDER.indexOf(a) + 1 || 99) - (NOTE_ORDER.indexOf(b) + 1 || 99)).map((house) => ({ house,
+    ...(DIRECTION_HOUSE_NOTES[house] || { question: "The exact wording has not been checked against a primary report.", unverified: true }),
+  }));
   const gName = !G ? "" : G.dim === "age" ? "Aged " + grpId : grpId;
   const gSeries = G ? G.series.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
   /* two months make a line; the shading is the pooled gap's margin */
@@ -2814,7 +2868,8 @@ function RdDirectionView({ rangeId }) {
         <span className="rd-dir-neg" style={{ flexBasis: now.wrong + "%" }}></span>
       </div>
       <p className="rd-dir-net"><b>Net {signedP(now.net)} points</b>
-        {now.chg != null && <>, {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig === false ? ", within the margin" : ""}</>}</p>
+        {now.chg != null && <>, {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig === false
+          ? (now.pUp != null ? ", within the margin: a " + Math.round(100 * (now.chg < 0 ? now.pUp : 1 - now.pUp)) + "% chance it " + (now.chg < 0 ? "rose" : "fell") : ", within the margin") : ""}</>}</p>
       {histOn && <RdConfWinBar win={winShown} terms={vTerms} lo={ext.lo} hi={ext.hi} nowX={nowX} onWin={onWin} />}
       <div className="card rd-card rd-dir-chart">
         <div className="rd-chead"><span className="rd-chead-t">{narrow || G
@@ -2878,21 +2933,26 @@ function RdDirectionView({ rangeId }) {
             xTicks={xTicks || rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
             driven={dragging}
             series={[
-              ...histSeries, ...wordedSeries, ...soloSeries,
+              ...histSeries, ...wordedSeries, ...soloSeries, ...worldSeries,
               { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Wrong track" },
               { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow || (histOn && !isCur) ? null : "Right direction" },
             ]}
-            spine={histSeries.length || soloPts.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet={(m) => (m && m.pre ? null : "direction")}
+            spine={histSeries.length || soloPts.length ? chartMonths : series(pts, "right")} areas={areas} scatter={dots} pollFacet={(m) => (m && (m.pre || m.noRow) ? null : "direction")}
             events={badges ? badges.events : evs} brackets={brackets}
             vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
             tooltipTitle={(i) => (chartMonths[i] ? monthLabelFull(chartMonths[i].ym) : "")}
             extraRows={(i) => { const d = monthAt((chartMonths[i] || {}).x); return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
             fmt={(v) => v.toFixed(1)}
             copy={{ title: "Is Australia heading in the right direction?", span: histOn ? confWinYears(win, vTerms, nowX) : null,
-                    sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
-                    caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : "")
-                      + (histOn && PRE && win.a < D.direction[0].x ? " Each house contributes wherever it printed a reading: SEC Newgate from March 2022, Essential from February 2022, Freshwater from May 2023 and RedBridge/Accent from February 2024. McKinnon’s differently worded series stays separate." : "")
-                      + (soloOn ? " Before March 2022 only Roy Morgan is on record, so its monthly averages carry no lean adjustment. The line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
+                    sub: head + (MODEL
+                      ? ". A model of every poll asking whether the country is heading in the right direction, adjusted for each pollster’s lean."
+                      : ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track."),
+                    caption: (MODEL
+                      ? "Each dot is one poll as printed; the lines are the model’s estimate for the average pollster, month by month, shaded bands their 95% intervals." + (worldOn ? " Dashed: Ipsos’ Global Average on the same terms." : "")
+                      : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.") + (asked ? " Polls by " + asked + "." : "")
+                      + (!MODEL && histOn && PRE && win.a < D.direction[0].x ? " Each house contributes wherever it printed a reading: SEC Newgate from March 2022, Essential from February 2022, Freshwater from May 2023 and RedBridge/Accent from February 2024. McKinnon’s differently worded series stays separate." : "")
+                      + (MODEL && soloOn ? " Before September 2016 only Roy Morgan polled, so the level there carries the uncertainty of how its readings compared with other pollsters’ then." : "")
+                      + (!MODEL && soloOn ? " Before March 2022 only Roy Morgan is on record, so its monthly averages carry no lean adjustment. The line breaks where no wave was printed for more than a quarter, and a month standing alone is a single mark." : ""),
                     legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
           />
         )}
@@ -2908,8 +2968,10 @@ function RdDirectionView({ rangeId }) {
         ) : (
           <RdKey className="rd-ckey" items={[
             dotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll" } : null,
-            { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
-            soloOn ? { kind: "line", color: "var(--ink-3)", label: "Before March 2022: Roy Morgan alone, unadjusted; breaks where it printed nothing for over a quarter" } : null,
+            MODEL ? { kind: "lineband", color: "var(--ink-3)", label: "The model’s estimate for the average pollster, and its 95% interval" }
+              : { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
+            worldOn ? { kind: "dash", color: "var(--ink-3)", label: "Ipsos’ Global Average, moved onto the same terms by Ipsos’s lean in Australia" } : null,
+            !MODEL && soloOn ? { kind: "line", color: "var(--ink-3)", label: "Before March 2022: Roy Morgan alone, unadjusted; breaks where it printed nothing for over a quarter" } : null,
             (histOn && !isTerm) ? { kind: "line", color: "var(--ink-3)", label: "A faint rule is a federal election; the strip beneath carries the governments" } : null,
           ]} />
         )}
@@ -2930,6 +2992,19 @@ function RdDirectionView({ rangeId }) {
                 : <>Essential prints these breakdowns beside the national-mood trend in its fortnightly report, so the series has a point wherever Essential asked the question.</>,
         ]} />
       ) : (
+        MODEL ? (
+        <HowTo paras={[
+          <>Each dot is one published reading, where its pollster printed it. The lines are a model’s estimate of what the average pollster asking this question would find, day by day, read off month by month; the shading is its 95% interval. There is a 95% chance the figure lies inside it, given the polls and the model’s assumptions.</>,
+          <>The model treats the country’s mood as something that moves a little each day, faster or slower as the polls themselves show, and each pollster as seeing it through a lean of its own plus sampling error. It works out the mood and every lean together from all the polls at once, so a pollster that asks often doesn’t outvote the rest, an older poll counts for less the more opinion has moved since, and months with few polls simply carry wider shading.</>,
+          <>Pollsters are compared on the ratio of right direction to wrong track, which doesn’t depend on whether “unsure” was offered: Ipsos and SEC Newgate force a choice, so their right and wrong both run higher, and Lowy and McKinnon ask about satisfaction instead. Each is read through its own lean, measured against the others, which can drift slowly. The level is set by the pollsters asking this question, each counting once; the unsure share by those that print one. The notes below say how each asks.</>,
+          <>The change on a month ago compares today with the model’s estimate of a month ago using every poll since, and is called significant only when its 95% interval excludes zero. No pollster’s lean can be measured against the truth, only against the others, so an error every pollster shares stays invisible.</>,
+          ...(histOn ? [
+            <>The bar over the chart sets the window, as on the confidence charts. It opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the whole line in miniature, as its net (right direction less wrong track), with the governments in power beneath it — drag the window, drag its edges to resize, or tap a spot to jump. Longer windows mark each federal election with a faint rule. Dots show only in a term-length window.</>,
+            <>Roy Morgan has asked since 2007, Ipsos since September 2016, and the others since 2022 or later, so before September 2016 the line rests on Roy Morgan alone. Its readings can be placed against the others only from later years, and Roy Morgan changed how it polls in 2020 and again in 2022, so the shading there includes how far its lean could have been: the level is uncertain by several points, the month-to-month movement less so.</>,
+            <>The dashed lines are Ipsos’ Global Average on the same terms: each wave’s ratio of right to wrong moved by Ipsos’s lean in Australia that month, then split with Australia’s unsure share. That keeps exactly the gap Ipsos itself measures between Australia and the world, and assumes, as any such comparison must, that its Australian and world samples lean alike.</>,
+          ] : []),
+        ]} />
+        ) : (
         <HowTo paras={[
           <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
           <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
@@ -2939,20 +3014,27 @@ function RdDirectionView({ rangeId }) {
             <>Before March 2022 only Roy Morgan is on record, so there is nothing to pool and no lean to adjust for. The line there is built the same way from its waves alone: monthly averages weighted by sample size, with 95% intervals. It comes from the consolidated Government Confidence Rating tables and the original release tables back to mid-2007. The line breaks wherever Roy Morgan printed nothing for more than a quarter, and a month standing alone shows as a single mark. Publication hiatuses remain where the primary record prints no wave; nothing is interpolated.</>,
           ] : []),
         ]} />
+        )
       )}
+      {questionNotes.length ? <details className="view-how hint-how rd-dirq">
+        <summary>How each pollster asks</summary>
+        <div className="rd-dirq-grid">
+          {questionNotes.map((q) => (
+            <section className="rd-dirq-house" key={q.house}>
+              <h5 className="rd-dirq-name">{q.house}{q.url ? <> <a className="rd-link" href={q.url} target="_blank" rel="noopener noreferrer">source<span className="plink-mark">↗</span></a></> : null}</h5>
+              <p className="rd-dirq-q">{q.unverified ? q.question : "“" + q.question + "”"}</p>
+              {q.answers && <p className="rd-dirq-l"><span className="rd-dirq-k">Answers</span>{q.answers}</p>}
+              {q.method && <p className="rd-dirq-l"><span className="rd-dirq-k">Method</span>{q.method}</p>}
+              {q.role && MODEL && <p className="rd-dirq-l"><span className="rd-dirq-k">In the line</span>{directionRoleText(q)}</p>}
+            </section>
+          ))}
+        </div>
+      </details> : null}
       <RdFoot how={{ term: "direction", from: "National mood" }}>
         {foot}
-        {questionNotes.length ? <div className="rd-direction-wordings">
-          <strong>Question wording, by pollster</strong>
-          {questionNotes.map((q) => (
-            <div className="rd-direction-wording" key={q.house}>
-              <strong>{q.house}</strong>{q.unverified ? <> {q.question}</> : <> asks “{q.question}”</>}
-              {q.scope ? <> — {q.scope}</> : null}
-              {q.url ? <> {" "}<a className="rd-link" href={q.url} target="_blank" rel="noopener noreferrer">source<span className="plink-mark">↗</span></a></> : null}
-            </div>
-          ))}
-        </div> : null}
+
       </RdFoot>
+
       <RdIpsosDirectionWorld D={D} />
     </>
   );
