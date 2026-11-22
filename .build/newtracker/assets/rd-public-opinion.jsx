@@ -405,6 +405,44 @@ function PubOpTraits({ figs }) {
   );
 }
 
+function PubOpLeaderMatchup({ q }) {
+  const january = q.figs.filter((f) => f.kind === "split" && f.cols[0] === "Jan 2026");
+  const leaders = ["Anthony Albanese", "Sussan Ley"];
+  return <>
+    <p className="pubop-ghb">% who agree the trait describes each leader</p>
+    {q.srcs.map((src) => {
+      const date = new Date(src.wave + "T00:00:00Z");
+      const month = (width) => date.toLocaleDateString("en-AU", { month: width, year: "numeric", timeZone: "UTC" });
+      const when = month("short");
+      let table = q.figs.find((f) => f.kind === "table" && f.cols.includes(when));
+      if (table) {
+        const rows = table.rows.map((r) => ({ ...r, waves: r.waves.filter((w) => w.when === when) }));
+        table = { ...table, cols: [when], rows: rows.filter((r) => r.waves.length) };
+      } else if (src.wave === "2026-01-16" && january.length === leaders.length) {
+        const agreement = january.map((f) => new Map(f.rows.map((r) => [r.label, r.waves[0].cells[f.heads.indexOf("Agree")]])));
+        const traits = [...new Set(agreement.flatMap((values) => [...values.keys()]))];
+        table = { heads: leaders, extraHeads: [], cols: [when], rows: traits.map((label) => ({
+          label, waves: [{ cells: agreement.map((values) => values.get(label)), extra: [] }]
+        })) };
+      }
+      return table ? <section className="pubop-fig" key={src.wave}>
+        <h5 className="pubop-ght">{month("long")}</h5>
+        <PubOpFigTable f={table} />
+        {src.wave === "2026-01-16" ? <details className="pubop-cuts">
+          <summary>Full January responses</summary>
+          {january.map((f, i) => <PubOpFig key={leaders[i]} f={{ ...f, title: leaders[i] }} />)}
+        </details> : null}
+      </section> : null;
+    })}
+  </>;
+}
+
+function PubOpQuestionFigures({ q }) {
+  if (q.id === "leader-traits-matchup" && q.house === "newspoll") return <PubOpLeaderMatchup q={q} />;
+  if (q.figs.length > 1 && q.figs.every((f) => pubopTraitSeries(f))) return <PubOpTraits figs={q.figs} />;
+  return q.figs.map((f, i) => <PubOpFig key={i} f={f} solo={q.figs.length === 1} />);
+}
+
 function PubOpFig({ f, solo }) {
   const body = f.kind === "list" ? <PubOpFigList f={f} />
     : f.kind === "nets" ? <PubOpFigNets f={f} />
@@ -862,8 +900,7 @@ function PubOpMore({ label, qs, houses, meta, wv }) {
               <div className="pubop-mb">
                 <div className="pubop-il"><PubOpWaves q={q} houses={houses} /></div>
                 <div className="pubop-ir">
-                  {q.figs.length > 1 && q.figs.every((f) => pubopTraitSeries(f)) ? <PubOpTraits figs={q.figs} />
-                    : q.figs.map((f, i) => <PubOpFig key={i} f={f} solo={q.figs.length === 1} />)}
+                  <PubOpQuestionFigures q={q} />
                   {q.prose.map((p, i) => (
                     <div className="pubop-fig" key={"p" + i}>
                       {q.prose.length > 1 || q.figs.length ? <p className="pubop-ght">{p.when}</p> : null}
@@ -1186,8 +1223,7 @@ function PubOpQuestion({ m, houses, topic, wv }) {
         <PubOpWaves q={m} houses={houses} />
       </div>
       <div className="pubop-ir">
-        {m.figs.length > 1 && m.figs.every((f) => pubopTraitSeries(f)) ? <PubOpTraits figs={m.figs} />
-          : m.figs.map((f, i) => <PubOpFig key={i} f={f} solo={m.figs.length === 1} />)}
+        <PubOpQuestionFigures q={m} />
         {m.prose.map((p, i) => (
           <div className="pubop-fig" key={"p" + i}>
             {m.prose.length > 1 || m.figs.length ? <p className="pubop-ght">{p.when}</p> : null}
