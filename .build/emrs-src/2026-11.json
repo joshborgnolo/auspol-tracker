@@ -1,0 +1,27 @@
+{
+  "firstSeen": "2026-11-22",
+  "lastModified": "Sat, 21 Nov 2026 03:47:18 GMT",
+  "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20Nov%202026.pdf",
+  "title": "Federal Voting Intentions Report November2026",
+  "ym": "2026-11",
+  "fetched": "2026-11-22",
+  "date": "2026-11-12",
+  "dateStart": "2026-11-11",
+  "sample": 978,
+  "sampleTotal": 1000,
+  "undecidedLeaner": 2.2,
+  "primaries": {
+    "alp": 25,
+    "lnp": 20,
+    "grn": 15,
+    "onp": 27,
+    "ind": 14,
+    "oth": 1
+  },
+  "tpp": {
+    "alp": 53,
+    "lnp": 47
+  },
+  "published": "2026-11-21",
+  "publishedSource": "last-modified"
+}

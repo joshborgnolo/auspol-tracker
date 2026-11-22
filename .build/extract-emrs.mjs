@@ -162,10 +162,10 @@ const pdfToText = (buf, slug) => {
 /* The wave a report covers, from its anchor title's trailing month:
    "EMRS State and Federal Voting Intentions Report - August 2026" →
    "2026-08". The title may drop the dash ("… Report February 2026") and
-   wrap entities. "YYYY-MM" or null. */
+   wrap entities; November 2026's live caption concatenates both ("… Report November2026"). "YYYY-MM" or null. */
 export function titleYmOf(title) {
   const t = String(title).replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n)).replace(/&amp;/gi, "&");
-  const m = t.match(/([A-Za-z]+)\s+(\d{4})\D*$/);
+  const m = t.match(/([A-Za-z]+)\s*(\d{4})\D*$/);
   if (!m) return null;
   const mo = MONTHS[m[1].toLowerCase()];
   return mo == null ? null : `${m[2]}-${String(mo + 1).padStart(2, "0")}`;
@@ -255,16 +255,30 @@ export function fieldworkOf(text, ym) {
    diagnostics; pageCount counts EVERY matching page (a re-issue that
    reprints the whole-state chart in an appendix is noted by the caller,
    the first page still read). */
-export function federalPageOf(text) {
+export function federalPageOf(text, ym = null) {
   const pages = String(text).split("\f");
-  const hit = (pg) =>
-    /If a federal election were being held today/.test(pg)
-    && /Base:\s*All respondents who gave a vote preference\s*\(n\s*=\s*([\d,]+)\)/.test(pg);
-  const pageCount = pages.filter(hit).length;
-  const i = pages.findIndex(hit);
+  const sampleOf = (pg) => {
+    if (!/If a federal election were being held today/.test(pg)) return null;
+    const old = pg.match(/Base:\s*All respondents who gave a vote preference\s*\(n\s*=\s*([\d,]+)\)/);
+    if (old) return +old[1].replace(/,/g, "");
+    if (!ym || !/Base:\s*All respondents who gave a vote preference\s*$/.test(pg)) return null;
+    // November prints month labels on one line and their samples on the
+    // next. Match a series column by position, never a neighbouring wave's n.
+    const month = Object.entries(MONTHS).find(([name, n]) => name.length === 3 && n === +ym.slice(5, 7) - 1);
+    const lines = pg.split("\n");
+    for (let i = 0; i < lines.length - 1; i++) {
+      const labels = [...lines[i].matchAll(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s*'?\d{2,4}/gi)];
+      const ns = [...lines[i + 1].matchAll(/\(n\s*=\s*([\d,]+)\)/g)];
+      if (labels.length < 2 || labels.length !== ns.length) continue;
+      const column = labels.findIndex(([label]) => new RegExp(`^${month[0]}\\.?\\s*'?${ym.slice(2, 4)}$`, "i").test(label));
+      if (column >= 0) return +ns[column][1].replace(/,/g, "");
+    }
+    return null;
+  };
+  const pageCount = pages.map(sampleOf).filter((n) => n != null).length;
+  const i = pages.findIndex((pg) => sampleOf(pg) != null);
   if (i < 0) return { page: null, pageNo: 0, pageCount: 0, sample: null, problems: ["no federal vote-preference page with a gave-a-preference base"] };
-  const n = pages[i].match(/Base:\s*All respondents who gave a vote preference\s*\(n\s*=\s*([\d,]+)\)/);
-  return { page: pages[i], pageNo: i + 1, pageCount, sample: +n[1].replace(/,/g, ""), problems: [] };
+  return { page: pages[i], pageNo: i + 1, pageCount, sample: sampleOf(pages[i]), problems: [] };
 }
 
 /* The methodology's whole-survey n is distinct from the federal chart's
@@ -307,16 +321,39 @@ export function primariesOf(page) {
            problems, natFolded: got.nat ?? null };
 }
 
+const ELECTORATE_PRIMARY = /(?:^| {2,})Primary Vote\b[^\n]*\bOverall[ \t]*$/im;
+const ELECTORATE_TPP = /(?:^| {2,})TPP\s*[–-]\s*Labor v\.?\s*Liberal\b[^\n]*\bOverall[ \t]*$/im;
+
+/* In November the whole-state share is the Overall column of the named
+   electorate table, not a standalone label beside the trend chart. The
+   whole row must have exactly six electorate percentages; anchor its label
+   and stop at the next preference heading so Labor v One Nation can never
+   masquerade as a primary or the Labor-v-Liberal 2PP. */
+function overallValue(text, heading, label) {
+  const t = String(text), h = t.match(heading);
+  if (!h) return null;
+  const rest = t.slice(h.index + h[0].length);
+  const next = rest.search(/TPP\s*[–-]|Two Party Preferred/i);
+  const table = next < 0 ? rest : rest.slice(0, next);
+  const row = table.match(new RegExp(`(?:^| {2,})${label}[ \\t]+((?:\\d{1,2}(?:\\.\\d)?%[ \\t]+){5}\\d{1,2}(?:\\.\\d)?%)[ \\t]*$`, "im"));
+  const figures = row?.[1].match(/\d{1,2}(?:\.\d)?/g).map(Number) ?? [];
+  return figures.length === 6 ? figures[5] : null;
+}
+
 /* The Labor-v-Liberal 2PP pair. The section heading was "Two Party
    Preferred – Labor v Liberal" in Feb 2026 and "Two Party Preferred
    Order – Labor and Liberal" in Aug 2026; the Labor-v-One-Nation section
    never matches (its rival token differs), and its "Labor Ahead" figure
    stays OUT of the returned pair: the slice ends at the next Two-Party
-   heading. */
+   heading. November moves the pair to an electorate table's Overall column. */
 export function tppOf(text) {
   const t = String(text);
   const h = t.match(/Two Party Preferred(?:\s+Order)?\s*[–-]\s*Labor\s+(?:v|and)\s+Liberal/i);
-  if (!h) return { alp: null, lnp: null, problems: ["no 'Two Party Preferred … Labor v|and Liberal' section"] };
+  if (!h) {
+    const alp = overallValue(t, ELECTORATE_TPP, "Labor"), lnp = overallValue(t, ELECTORATE_TPP, "Liberal");
+    return alp != null && lnp != null ? { alp, lnp, problems: [] }
+      : { alp: null, lnp: null, problems: ["no 'Two Party Preferred … Labor v|and Liberal' section"] };
+  }
   const rest = t.slice(h.index);
   const next = rest.slice(h[0].length).search(/Two Party Preferred/i);
   const slice = next < 0 ? rest : rest.slice(0, h[0].length + next);
@@ -332,7 +369,7 @@ export function parseWave(text, ym) {
   const problems = [];
   const fw = fieldworkOf(text, ym);
   problems.push(...fw.problems);
-  const fp = federalPageOf(text);
+  const fp = federalPageOf(text, ym);
   problems.push(...fp.problems);
   const sampleTotal = totalSampleOf(text);
   if (sampleTotal == null) problems.push("no 'sample of n=N completed the survey' methodology line");
@@ -342,7 +379,17 @@ export function parseWave(text, ym) {
     else undecidedLeaner = Math.round(1000 * (sampleTotal - fp.sample) / sampleTotal) / 10;
   }
   let pri = { alp: null, lnp: null, grn: null, onp: null, ind: null, oth: null, problems: ["skipped – no federal page"] };
-  if (fp.page) { pri = primariesOf(fp.page); problems.push(...pri.problems); }
+  if (fp.page) {
+    pri = primariesOf(fp.page);
+    if (pri.problems.length) {
+      const fromTable = { alp: overallValue(text, ELECTORATE_PRIMARY, "Labor"),
+        lnp: overallValue(text, ELECTORATE_PRIMARY, "Liberals"),
+        grn: overallValue(text, ELECTORATE_PRIMARY, "Greens"), onp: overallValue(text, ELECTORATE_PRIMARY, "One Nation"),
+        ind: overallValue(text, ELECTORATE_PRIMARY, "Independent"), oth: overallValue(text, ELECTORATE_PRIMARY, "Other party") };
+      if (Object.values(fromTable).every((v) => typeof v === "number")) pri = { ...fromTable, problems: [] };
+    }
+    problems.push(...pri.problems);
+  }
   const tpp = tppOf(text);
   problems.push(...tpp.problems);
   return { date: fw.date, dateStart: fw.dateStart, sample: fp.sample, sampleTotal, undecidedLeaner,

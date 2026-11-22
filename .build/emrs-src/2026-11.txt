@@ -1,0 +1,324 @@
+Omnibus – Federal
+Voting Intentions Report
+November 2026
+METHODOLOGY
+
+•   For the Omnibus surveys done by EMRS, 1,000 Tasmanians are polled each quarter via an interviewer led questionnaire conducted
+    with Computer Assisted Telephone Interviewing (CATI) and online via Computer Assisted Web Interviewing (CAWI).
+
+•   Quotas are used to balance the age, gender and location of respondents to roughly align with the ABS Census, currently based on
+    the 2021 census data. The target population was based on 445,067 Tasmanian residents aged 18 years and over (source: ABS
+    Census, 2021). In total, a sample of n=1,000 completed the survey, yielding overall results accurate to within ±3.10 percentage
+    points at the 95% confidence level.
+
+•   Weighting is then applied to the data based on age group, gender, federal electorate, highest education achieved and past vote
+    (Tasmanian House of Assembly) to ensure that balance and provide the most accurate results possible.
+
+•   The most recent Omnibus survey was conducted from 11-12 November 2026 utilising EMRS’ in-house call centre and online panel,
+    ensuring high levels of quality control and that the target sample sizes, and their distribution regionally, were achieved or closely
+    achieved with low and statistically acceptable weightings.
+
+•   The sample is robust and reliable. Cross-tab analysis was carried out to ensure the robustness of the findings.
+
+•   Statistically significant results are in bold and highlighted in a dark shade of green for results that are significantly higher or red for
+    results that is significantly lower at the 95% confidence interval.
+
+
+
+This survey was conducted to the market and social research ISO20252:2019 standard.
+
+
+                                                                                                                                   © 2026 EMRS | 2
+                                               Federal election vote preference
+With a one point increase to 27 per cent,
+One Nation is now the most preferred
+political party in Tasmania at a Federal           Decided Voters Supporting or Leaning towards a Major or Minor
+level. Its support is highest among men                          Party or an Independent (Overall)
+(32%), 45–54 year olds (38%) and voters
+in Lyons (41%), and its voters are the most
+likely to name cost of living (46%) and             30%
+                                                                                                      29%
+immigration (27%) as their top issue.
+                                                                                                              26%                                             27%
+Support for the Labor Party in Tasmania                   24%                                                                                      25%
+has declined significantly in the last three
+months, falling by four points to 25%. This               18%                                                                                             20%
+mirrors national polling since the late-                                                                   17%
+September interest rate rise. Cost of                                                                  15%                                         15%
+living is the top federal issue (37%), yet          13%                                                       13%                                         14%
+only 19% of these voters back Labor,                         12%
+compared with 32% for One Nation.
+Labor is now weakest among 45–54 year
+olds (16%), full-time workers (21%) and
+voters in Bass and Braddon (20% each).
+                                                          1%                                               1%                                            1%
+The Liberal vote is showing green shoots,
+with a three point increase to 20 per cent.           Feb. '26                                          Aug. '26                                    Nov. '26
+The Liberals poll best among voters aged             (n = 953)                                         (n = 968)                                   (n = 978)
+70 and over (33%) and lead among those
+                                                Liberal              Labor               Greens               Independent                   One Nation               Other
+most concerned about government
+spending (41%) and budget and debt
+(37%).
+
+
+                                                          If a federal election were being held today, who would you vote for? Would it be...                       © 2026 EMRS | 3
+                                                                           Base: All respondents who gave a vote preference
+                                                               Preferred Prime Minister
+ There has been a significant change in
+ preferred Prime Minister in the past
+ quarter.
+ In November 2026, 41% (a decrease from                                                            48%
+                                                      45%
+ a high of 48% in August) of respondents
+ indicated that they would prefer Anthony                                                                                                    41%
+ Albanese as Prime Minister compared to
+ 27% (up from 21% in August, but still                   31%
+ down from 31% in February) who chose
+ Angus Taylor, and 23% (up from 19% in                                                                                                      27%
+ August) who chose Pauline Hanson.                      23%                                             21%                                 23%
+ Mr Albanese’s seven point fall is larger                                                               19%
+ than Labor’s drop in the vote, pointing to
+ the Prime Minister’s personal standing as                                                              13%
+ cost-of-living pressure and the                                                                                                             9%
+ September rate rise bite. One in eight
+ Labor voters (12%) now prefer Mr Taylor.
+ Mr Albanese is weakest in Braddon (30%)
+ and among 45–54 year olds (32%).                      Feb. '26                                      Aug. '26                              Nov. '26
+
+ Mr Taylor polls best among voters aged
+ 70 and over (37%) and a third (33%) of
+                                                     Anthony Albanese                     Angus Taylor                    Pauline Hanson           Unsure
+ independent voters, while Ms Hanson is
+ strongest among 45–54 year olds (36%)
+ and in Lyons (37%).
+
+                                                               In your opinion who do you think would make a better Prime Minister?                   © 2026 EMRS | 4
+                                                                                 Base: All respondents (n=1,000)
+*Charts may not equal 100 percent due to rounding.
+                                                               Primary and Two Party Preferred by Electorate
+                                                                    Primary Vote                          Bass             Braddon                Clark             Franklin             Lyons           Overall
+One Nation leads the primary vote in Lyons
+(41%), Braddon (29%) and Bass (29%), but is                One Nation                                     29%                 29%                  10%                22%                  41%             27%
+weakest in Clark (10%). Since February,
+Labor’s primary vote has fallen by nine to                 Labor                                          20%                 20%                 24%                 36%                 23%              25%
+eleven points in Bass, Braddon and Lyons,                  Liberals                                       25%                 27%                  18%                 15%                 13%            20%
+while the Liberals have lifted from 16% to
+27% in Braddon.                                            Greens                                          12%                 10%                24%                  15%                 15%             15%
+Overall, just over half (53%) of respondents               Independent                                     12%                 13%                24%                  12%                 7%              14%
+were more likely to preference Labor over
+Liberal (47%). The Liberals lead in Bass (57%)             Other party                                     2%                   1%                 0%                   1%                 0%              1%
+and Braddon (60%), both of which favoured
+Labor in February.
+Against One Nation, Labor leads overall (59%                 TPP – Labor v. Liberal                       Bass             Braddon                Clark             Franklin             Lyons           Overall
+to 41%), but the contest is even in Lyons
+(50%), Bass (51%) and Braddon (52%).                       Labor                                          43%                 40%                  61%                67%                 53%              53%
+One Nation voters put the Liberals ahead of
+Labor 83% to 17% (81% to 19% in August),                   Liberal                                        57%                 60%                 39%                 33%                 47%              47%
+but Liberal voters favour One Nation over
+Labor by only 57% to 43% (53% to 47% in
+August). Liberal preferences keep Labor
+ahead of One Nation: if they flowed as                    TPP – Labor v. One Nation                       Bass             Braddon                Clark             Franklin             Lyons           Overall
+strongly as One Nation’s do, Labor’s lead
+would narrow to about 54–46.                               Labor                                           51%                52%                 75%                 69%                 50%              59%
+
+*NOTE: These are the current boundaries.                   One Nation                                     49%                 48%                 25%                  31%                50%              41%
+
+
+Electorate samples (n=165 to 227) carry a margin of
+error of around ±7 points and should be treated only as
+broadly indicative.                                                                                                                                                                                    © 2026 EMRS | 5
+                                                          Under the preferential voting system, you may ultimately assign a preference to either the Liberal Party or the Labor Party. Regardless of
+                                                           WHERE you would place them on your preference list, would you put LABOR AHEAD OF LIBERAL or LIBERAL AHEAD OF LABOR?
+                                                          Base: All respondents who were NOT undecided (Primary vote n = 978; TPP Labor v. Liberal n = 926; TPP Labor v. One Nation n = 966)
+                                                                 Federal Senator Name Recognition
+                                                                     Jacqui Lambie                                                20%
+Respondents were asked to name up to four
+Tasmanian Senators. It was apparent from the                       Jonathon Duniam                       7%
+major differences between CATI and online
+responses that some online respondents had                            Andrew Wilkie                      7%
+“cheated” by searching on the internet before
+responding, so only CATI responses (n=509)                              Nick McKim                  5%
+are presented here.                                                                                                                         Senators                         Number            %
+                                                                     Rebecca White                 4%
+                                                                                                                              Jacqui Lambie                                      125         20%
+Over half (52%) of those completing the                             Richard Colbeck               4%
+survey by CATI said they could not name any                                                                                   The Hon Jonathon Duniam                            56           7%
+Tasmanian Senators.                                                    Carol Brown               3%                           Nick McKim                                         41           5%
+                                                                     Anne Urquhart             3%                             The Hon Richard Colbeck                            27           4%
+Of those individuals named, the most recalled
+unprompted name was Jacqui Lambie (20%)                                                                                       The Hon Carol Brown                                23           3%
+                                                                        Julie Collins         3%
+followed by Jonathon Duniam (7%), Nick                                                                                        Tammy Tyrrell                                      10           2%
+McKim (5%) and Richard Colbeck (4%).                                  Tammy Tyrrell           2%
+                                                                                                                              Helen Polley                                       17           2%
+                                                                       Helen Polley           2%
+A number of non-Senators were commonly                                                                                        Josh Dolega                                        5            2%
+identified as Senators including Andrew Wilkie                            Eric Abetz         2%                               Chris Gatenby                                      9            1%
+(7%), Rebecca White (4%), Anne Urquhart and
+Julie Collins (3%) each.                                                Lee Hanson           2%                               Claire Chandler                                    9            1%
+                                                                                                                              Vanessa Bleyer                                     5            1%
+Other names mentioned < 2%:                                        Rosalie Woodruff          2%
+Bridget Archer, Chris Gatenby, Josh Willie, Jess Teesdale, Meg                                                                Richard Dowling                                    5            1%
+Webb, Claire Chandler, David OByrne, Vanessa Bleyer, Peter          Jeremy Rockliff          2%
+Whish-Wilson, Richard Dowling, Shane Broad (1% each); Craig                                                                                     Percentages are weighted; numbers are unweighted counts.
+Garland, Kay Denman, Sarah Hanson-Young, Gavin Pearce,                Peter George           2%
+Felix Ellis, Jen Butler, Jason Clare, Tanya Plibersek, Cassy
+O'Connor, Tania Rattray, Jo Palmer, Brian Mitchell, Sarah              Josh Dolega          2%
+(surname unknown), Catryna Bilyk, David Shoebridge, Roger
+Jaensch, Kerry Vincent, Guy Barnett, Richard Bailey, David
+Bushby.                                                          Could not name any                                                                                                          52%
+
+*Charts do not equal 100 percent due to multiple responses          Still thinking about federal politics, can you name any of the senators that currently represent Tasmania?         © 2026 EMRS | 6
+and names with less than 2% of responses not included.                                  Base: All respondents who completed the survey by phone (n=509)
+                                                                                                     *Senators in orange, non-senators in green.
+                                                Top Federal Issues
+                                                                                                              Cost-of-Living                                                                   37%
+Cost of living remains the dominant federal                                                                       Healthcare                            10%
+issue, named by 37% of Tasmanians –                                                                         Anti-Immigration                           9%
+almost four times the next issue,
+                                                          Budget/ debt/ financial management/ Government Spending                                 7%
+healthcare (10%).
+                                                                                       Climate Change/ The Environment                            7%
+It is highest among families with children 16                                                                  The Economy                      7%
+or under (49%), workers (39–40%) and                                                                                 Housing                    6%
+voters in Lyons (44%), and lowest among                                                        Taxation/ Negative Gearing                    5%
+those aged 70 and over (27%). One Nation
+                                                                                                            Age Care/ NDIS                 4%
+attracts around a third (32%) of cost-of-
+                                                Government Accountability/ Honesty + Address government corruption                         4%
+living voters, ahead of Labor (19%), the
+                                                                                                                      Welfare          2%
+Liberals (18%) and the Greens (18%).
+                                                                                                           Put Australia first         2%
+Beyond cost of living, each party’s voters
+                                                                                                 National Defence/ AUKUS               2%
+have a distinct priority: healthcare for
+                                                                                                            AI/ data centres          2%
+Labor (19%), immigration for One Nation
+                                                                                                             Crime/ Policing          2%
+(27%), climate change for the Greens
+                                                                                                               Jobs/ Wages            2%
+(28%), and government spending and the
+                                                                                                                   Education          2%
+economy for the Liberals (10% each). One
+Nation voters account for three in four                                                               Power/ energy supply            2%
+mentions of immigration.                                                                                  Civil rights/ equity        2%
+                                                                                                         Domestic violence           2%
+Women (15%) and those aged 70 and over
+                                                                                Party preference/ change of government               2%
+(17%) were more likely to name healthcare.
+Climate change is concentrated in Hobart:                                                                               Other        1%
+42% in the Hobart Legislative Council                                                                                 Unsure          2%
+division and 16% in Clark, against 4–6% in                                                                           Nothing        1%
+the other four electorates.                                            What is the most important national issue that would influence the way you vote?
+                                                                                                                                                                                  © 2026 EMRS | 7
+                                                                                               Base: All respondents (n=1,000)
+                                                  *Chart sum does not equal 100 percent due to multiple responses and those responses of 1% or less not included in the chart .
+                                               RESEARCH SAMPLE PROFILE (1)
+                                                                      Table 1 – November 2026 - Sample size and weightings*
+
+
+      Region                            %                   Number                                                 Electorate            %     Number
+       South                           52%                      522                                                     Bass             17%    165
+       North                           24%                      238                                                   Braddon            23%    227
+    North-West                         24%                      240                                                     Clark            21%    210
+                                                                                                                      Franklin           21%    212
+                                                                                                                       Lyons             19%    186
+  Employment
+                                        %                   Number
+    Status
+Employed full-time or
+                                       41%                      374                                                  Gender              %     Number
+  self-employed
+                                                                                                                        Male             51%     511
+Employed on a part-
+                                       22%                      167                                                   Female             49%    489
+ time/ casual basis
+ Engaged in home
+                                        3%                       27
+     duties
+                                                                                                                        Age              %     Number
+   Retired or on a
+                                       26%                      407                                              18 to 34 years           6%     61
+      pension
+                                                                                                                 35 to 54 years          28%    276
+    Unemployed                          1%                       10
+                                                                                                                  55 and older           66%    663
+     A student                          6%                       10
+ Declined to answer                     0%                        5
+
+
+
+
+                                                                                                                                                        © 2026 EMRS | 8
+                     *Employment Status percentages are weighted; all other percentages are unweighted. Numbers are unweighted counts.
+                      *Percentages may not sum to 100 due to rounding.
+                                      RESEARCH SAMPLE PROFILE (2)
+                                                             Table 2 – November 2026 - Sample size and weightings*
+
+
+   Household Situation                              %                   Number                                     Education                             %     Number
+     Single, never married                        14%                        92                                 No qualifications                        1%        14
+   A couple with no children                      19%                       112                                  Apprenticeship                          4%       38
+  Family, no children over 16                      17%                      136                                Secondary school                          22%      224
+Family, children over 16 at home                  13%                       134                             Diploma or workplace
+                                                                                                                                                         32%      316
+ Married, no children at home                                                                                    qualification
+                                                  20%                       296
+           Widowed                                                                                   Undergraduate or postgraduate
+                                                   5%                        79                                                                          41%      408
+                                                                                                           university degree
+          Sole parent                              3%                        22
+                                                                                                                       Other                             0%        0
+    Separated or divorced                          9%                       117
+      Declined to answer                           1%                        12
+
+
+    Household Income                                %                   Number
+        Under $20,000                              4%                        34
+ $20,000 and under $40,000                        13%                       142
+ $40,000 and under $60,000                         9%                       122
+ $60,000 and under $80,000                        12%                       106
+$80,000 and under $100,000                        10%                       100
+$100,000 and under $120,000                        9%                        93
+      $120,000 and over                           35%                       318
+      Declined to answer                           7%                        85
+                                                                                                                                                               © 2026 EMRS | 9
+             *Household Situation and Household Income percentages are weighted; Education percentages are unweighted. Numbers are unweigh ted counts.
+              *Percentages may not sum to 100 due to rounding.
+                                                           EMRS Federal Voting Intentions Poll – Omnibus November 2026
+                                                                               REPORT VERSION: 1
+                                                                        This report has been prepared by
+                                                                  Enterprise Marketing and Research Services
+                                                                        60 Main Road, Moonah TAS 7009
+
+
+
+                                                                            All enquiries should be addressed to:
+                                                                                   Phone: (03) 6211 1222
+                                                                              E-mail: enquiries@emrs.com.au
+                                                                           Post: PO Box 402, Moonah TAS 7009
+
+
+
+                                         The current survey was conducted from the 11th to the 12th of November 2026.
+                 1,000 Tasmanian registered voters were interviewed, and responses weighted to reflect the Tasmanian adult voting population.
+                      A sample of this size provides a maximum margin of error of +/- 3.10 percentage points at the 95% confidence level.
+
+
+Enterprise Marketing and Research Services (EMRS). | ABN 29 009 546 561
+
+Confidential/ Disclaimer
+Notice: The information contained herein is confidential and has been supplied under a confidentiality agreement. If you are not authorised to view or to be in possession of this document you
+are hereby notified that any dissemination, distribution or duplication of this document is expressly prohibited. If you receive this document in error, please notify Enterprise Marketing and
+Research Services (EMRS) immediately on +61 3 6211 1222.
+
+Limitations/ Liability
+While all care and diligence has been exercised in the preparation of this report, EMRS does not warrant the accuracy of the information contained within and accepts no liability for any loss
+or damage that may be suffered as a result of reliance on this information, whether or not there has been any error, omission or negligence on the part of EMRS or its employees.
+
+The research complies with the EMRS Quality System, certified to ISO 20252:2019, the international standard for Social and Ma rket Research,                                    © 2026 EMRS | 10
+certificate number 888027.
+emrs.com.au
+

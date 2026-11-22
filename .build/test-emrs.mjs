@@ -19,16 +19,17 @@ const waves = fs.readdirSync(SRC).filter((f) => f.endsWith(".json"))
     sidecar: JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")),
   }))
   .sort((a, b) => (a.ym < b.ym ? -1 : 1));
-assert.deepEqual(waves.map((w) => w.ym), ["2026-02", "2026-08"], "the cached federal waves");
+assert.deepEqual(waves.map((w) => w.ym), ["2026-02", "2026-08", "2026-11"], "the cached federal waves");
 for (const w of waves) w.text = fs.readFileSync(path.join(SRC, w.ym + ".txt"), "utf8");
 
 assert.deepEqual(waves.map((w) => [w.ym, w.sidecar.url, w.sidecar.title]), [
   ["2026-02", "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf", "EMRS - Federal Voting Intentions Report - February 2026"],
   ["2026-08", "https://www.emrs.com.au/sites/default/files/documents/EMRS%20State%20and%20Federal%20Voting%20Intentions%20Report%20-%20August%202026%20-%20FINAL.pdf", "EMRS State and Federal Voting Intentions Report - August 2026"],
+  ["2026-11", "https://www.emrs.com.au/sites/default/files/documents/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20Nov%202026.pdf", "Federal Voting Intentions Report November2026"],
 ], "the sidecar report links and listing titles");
-for (const w of waves) {
+for (const w of waves.filter((w) => w.ym < "2026-11"))
   assert.equal(w.sidecar.firstSeen, "2026-10-10", `${w.ym}: first-seen the day the pipeline shipped`);
-}
+assert.equal(waves.find((w) => w.ym === "2026-11").sidecar.firstSeen, "2026-11-22", "the concatenated-title November report's first sighting");
 // the published-stamp ladder (document-date → Last-Modified → first-seen)
 // reproduces BOTH hand-entered canon published dates from the sources
 assert.equal(waves.find((w) => w.ym === "2026-02").sidecar.published, "2026-02-20",
@@ -37,8 +38,11 @@ assert.equal(waves.find((w) => w.ym === "2026-02").sidecar.publishedSource, "doc
 assert.equal(waves.find((w) => w.ym === "2026-08").sidecar.published, "2026-08-22",
   "2026-08: undated on the listing – the PDF's Last-Modified upload date (Sydney)");
 assert.equal(waves.find((w) => w.ym === "2026-08").sidecar.publishedSource, "last-modified");
+assert.equal(waves.find((w) => w.ym === "2026-11").sidecar.published, "2026-11-21",
+  "2026-11: the release came out Saturday evening eastern time, not after yesterday's evening sweep");
+assert.equal(waves.find((w) => w.ym === "2026-11").sidecar.publishedSource, "last-modified");
 assert.deepEqual(waves.map((w) => w.sidecar.lastModified), [
-  "Sat, 21 Feb 2026 01:18:44 GMT", "Sat, 22 Aug 2026 04:55:01 GMT",
+  "Sat, 21 Feb 2026 01:18:44 GMT", "Sat, 22 Aug 2026 04:55:01 GMT", "Sat, 21 Nov 2026 03:47:18 GMT",
 ], "the PDF upload timestamps captured at fetch time (raw GMT headers)");
 
 // ---- parseWave against the cache reproduces the canon figures exactly ---------
@@ -48,7 +52,11 @@ const CANON = {
                alp: 30, lnp: 19, grn: 13, onp: 24, ind: 12, oth: 1, tpp_alp: 60, tpp_lnp: 40 },
   "2026-08": { date: "2026-08-18", dateStart: "2026-08-17", sample: 968, sampleTotal: 1000, undecidedLeaner: 3.2,
                alp: 29, lnp: 17, grn: 15, onp: 26, ind: 13, oth: 1, tpp_alp: 57, tpp_lnp: 43 },
+  "2026-11": { date: "2026-11-12", dateStart: "2026-11-11", sample: 978, sampleTotal: 1000, undecidedLeaner: 2.2,
+               alp: 25, lnp: 20, grn: 15, onp: 27, ind: 14, oth: 1, tpp_alp: 53, tpp_lnp: 47 },
 };
+assert.equal(federalPageOf(waves.find((w) => w.ym === "2026-11").text, "2026-11").sample, 978,
+  "the current month column's n, not February 953 or August 968");
 for (const w of waves) {
   assert.equal(totalSampleOf(w.text), 1000, `${w.ym}: whole-survey methodology n`);
   const p = parseWave(w.text, w.ym);
@@ -58,7 +66,7 @@ for (const w of waves) {
   assert.equal(p.undecidedLeaner, Math.round(1000 * (p.sampleTotal - p.sample) / p.sampleTotal) / 10,
     `${w.ym}: (total−preference base)/total, one decimal`);
   const s = [p.alp, p.lnp, p.grn, p.onp, p.ind, p.oth].reduce((a, b) => a + b, 0);
-  assert.ok(Math.abs(s - 100) <= 1, `${w.ym}: primaries ${s} within a point of 100 (canon prints 99 and 101)`);
+  assert.ok(Math.abs(s - 100) <= 2, `${w.ym}: primaries ${s} allows published rounding (canon prints 99, 101 and 102)`);
   // the cache's sidecar records the same figures the guard verifies
   assert.equal(w.sidecar.date, p.date, `${w.ym}: sidecar date`);
   assert.equal(w.sidecar.sample, p.sample, `${w.ym}: sidecar sample`);
@@ -87,6 +95,10 @@ assert.equal(titleYmOf("EMRS &#8211; Federal Voting Intentions Report &#8211; Ma
   "entities decode");
 assert.equal(titleYmOf("EMRS Federal Voting Intentions Report - February 2026 FINAL"), "2026-02",
   "a FINAL suffix stays the same month");
+assert.equal(titleYmOf("Federal Voting Intentions Report November2026"), "2026-11",
+  "the exact live November caption glues the month to its year");
+assert.equal(titleYmOf("EMRS Federal Voting Intentions Report Nov2026"), "2026-11",
+  "an abbreviated month may also run straight into its year");
 assert.equal(titleYmOf("EMRS Federal Voting Intentions Report"), null, "no month, no wave");
 assert.equal(titleYmOf("EMRS Federal Voting Intentions Report - Smarch 2026"), null, "an unknown month is null");
 
@@ -98,6 +110,7 @@ const anchor = (inner, href) => `<a class="file-link" href="${href}">${inner}</a
       "https://www.emrs.com.au/sites/default/files/documents/2026-02/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20February%202026.pdf"),
     anchor("<b>Federal</b> and State <em>Voting Intentions</em> Report - August 2026",
       "/sites/default/files/documents/aug-2026.pdf"),
+    anchor("Federal Voting Intentions Report November2026", "/files/federal-nov-2026.pdf"),
     anchor("EMRS State Voting Intentions Report - March 2026", "/files/state-mar.pdf"),
     anchor("Media Release: voters say cost of living is the issue", "/files/mr.pdf"),
     anchor("Federal Voting Intentions November 2024", "/files/old.pdf"),
@@ -110,6 +123,8 @@ const anchor = (inner, href) => `<a class="file-link" href="${href}">${inner}</a
       title: "EMRS - Federal Voting Intentions Report - February 2026", docDate: null, variants: 1 },
     { ym: "2026-08", url: "https://www.emrs.com.au/sites/default/files/documents/aug-2026.pdf",
       title: "Federal and State Voting Intentions Report - August 2026", docDate: null, variants: 1 },
+    { ym: "2026-11", url: "https://www.emrs.com.au/files/federal-nov-2026.pdf",
+      title: "Federal Voting Intentions Report November2026", docDate: null, variants: 1 },
   ], "federal reports only: <b>/<em> wrapping reads, relative hrefs absolutise, " +
      "state-only / media-release / pre-first-wave / non-PDF / no-'report' links stay out");
 }
@@ -382,11 +397,11 @@ assert.deepEqual(publishedOf(null, "not a date", "2026-10-10"), { published: "20
 
 // ---- delistedCachedYms: a cached wave that leaves the listing is named -------------
 assert.deepEqual(
-  delistedCachedYms([{ ym: "2026-02" }, { ym: "2026-08" }], SRC), [],
-  "both cached waves listed → nothing delisted");
+  delistedCachedYms([{ ym: "2026-02" }, { ym: "2026-08" }, { ym: "2026-11" }], SRC), [],
+  "all three cached waves listed → nothing delisted");
 assert.deepEqual(
-  delistedCachedYms([{ ym: "2026-08" }], SRC), ["2026-02"],
-  "a wave whose report leaves the listing is named (its verification has ended)");
+  delistedCachedYms([{ ym: "2026-08" }], SRC), ["2026-02", "2026-11"],
+  "waves whose reports leave the listing are named (their verification has ended)");
 assert.deepEqual(delistedCachedYms([], ".build/no-such-dir"), [],
   "a missing cache dir is empty, not an error");
 

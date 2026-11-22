@@ -6623,6 +6623,25 @@
       "url": "https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026"
     },
     {
+      "date": "2026-11-12",
+      "published": "2026-11-21",
+      "dateStart": "2026-11-11",
+      "pollster": "EMRS (Tas)",
+      "client": "—",
+      "sample": 978,
+      "sampleTotal": 1000,
+      "undecidedLeaner": 2.2,
+      "alp": 25,
+      "lnp": 20,
+      "grn": 15,
+      "onp": 27,
+      "ind": 14,
+      "oth": 1,
+      "tpp_alp": 53,
+      "tpp_lnp": 47,
+      "url": "https://www.emrs.com.au/sites/default/files/documents/EMRS%20-%20Federal%20Voting%20Intentions%20Report%20-%20Nov%202026.pdf"
+    },
+    {
       "date": "2026-11-15",
       "published": "2026-11-16T16:41",
       "dateStart": "2026-11-09",
