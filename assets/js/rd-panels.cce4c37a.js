@@ -2867,12 +2867,7 @@ function RdIpsosDirectionWorld({
     y: w.worldNet
   }));
   const bands = ws.filter(w => w.band);
-  const lowy = D.directionLowy?.waves || [];
-  const lowyPoints = lowy.map(w => ({
-    x: w.x,
-    y: w.net
-  }));
-  const values = ws.flatMap(w => [w.auNet, w.worldNet]).concat(bands.flatMap(w => [w.band.p10, w.band.p90])).concat(lowy.map(w => w.net));
+  const values = ws.flatMap(w => [w.auNet, w.worldNet]).concat(bands.flatMap(w => [w.band.p10, w.band.p90]));
   const lo = Math.floor(Math.min(0, ...values) / 20) * 20;
   const hi = Math.ceil(Math.max(0, ...values) / 20) * 20;
   const netLabel = (v, digits = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(digits);
@@ -2887,24 +2882,6 @@ function RdIpsosDirectionWorld({
       y1: w.band["p" + (key === "50" ? "75" : "90")]
     }))
   });
-  const dots = lowy.map(w => ({
-    x: w.x,
-    y: w.net,
-    color: "var(--accent, #7b5ca7)",
-    label: "Lowy Institute: world satisfaction",
-    meta: {
-      pollster: "Lowy Institute",
-      dateLabel: w.field,
-      sample: w.sample,
-      pre: true,
-      satisfied: w.satisfied,
-      dissatisfied: w.dissatisfied,
-      other: w.other,
-      otherLabel: w.otherLabel,
-      modeChange: w.modeChange,
-      url: D.directionLowy.sourceUrl
-    }
-  }));
   return React.createElement("div", {
     className: "card rd-card rd-dir-chart rd-direction-world"
   }, React.createElement("div", {
@@ -2949,19 +2926,9 @@ function RdIpsosDirectionWorld({
       rdWidth: 2.5,
       endCap: false,
       endLabel: narrow ? null : "Ipsos’ Global Average"
-    }, {
-      id: "lowy-world",
-      label: "Lowy Institute: world satisfaction",
-      color: "var(--accent, #7b5ca7)",
-      points: lowyPoints,
-      rdWidth: 1.75,
-      dash: "3 3",
-      endCap: false,
-      endLabel: narrow ? null : "Lowy Institute"
     }],
     areas: [area("80", "countries-middle-80", 0.10), area("50", "countries-middle-half", 0.20)],
     spine: au,
-    scatter: dots,
     tooltipTitle: i => {
       const w = ws[i];
       return w ? monthLabelFull(w.ym) + (w.fieldwork ? " · " + w.fieldwork : "") : "";
@@ -2969,11 +2936,6 @@ function RdIpsosDirectionWorld({
     extraRows: i => {
       const w = ws[i];
       if (!w) return [];
-      const lowyWave = lowy.find(r => Math.abs(r.x - w.x) < 0.13);
-      const lowyRow = lowyWave ? [{
-        label: "Lowy Institute",
-        value: `${lowyWave.satisfied}% satisfied / ${lowyWave.dissatisfied}% dissatisfied · ${lowyWave.other}% ${lowyWave.otherLabel} (n=${lowyWave.sample.toLocaleString("en-AU")})`
-      }] : [];
       const bandRows = w.band ? [{
         label: `Middle half of ${w.band.n} countries, net`,
         value: `${netLabel(w.band.q25, 1)} to ${netLabel(w.band.p75, 1)} points`
@@ -2987,7 +2949,7 @@ function RdIpsosDirectionWorld({
       }, {
         label: "Ipsos’ Global Average",
         value: `${w.worldRight}% right / ${w.worldWrong}% wrong track`
-      }, ...lowyRow, ...bandRows, {
+      }, ...bandRows, {
         label: "Sample",
         value: [w.auN ? `${w.auSampleApprox ? "≈" : ""}${w.auN.toLocaleString("en-AU")} in Australia` : null, w.worldN ? `${w.worldN.toLocaleString("en-AU")} across all countries` : null].filter(Boolean).join("; ") || "not published"
       }];
@@ -3005,10 +2967,6 @@ function RdIpsosDirectionWorld({
         label: "Ipsos’ Global Average",
         color: "var(--ink-2)",
         kind: "line"
-      }, {
-        label: "Lowy Institute: world satisfaction",
-        color: "var(--accent, #7b5ca7)",
-        kind: "line"
       }]
     }
   }), React.createElement(RdKey, {
@@ -3025,10 +2983,6 @@ function RdIpsosDirectionWorld({
       kind: "lineband",
       color: "var(--ink-3)",
       label: "Middle half and middle 80% of countries, net direction; the global average is excluded"
-    }, {
-      kind: "line",
-      color: "var(--accent, #7b5ca7)",
-      label: "Lowy Institute: world satisfaction (2017–18, separate question)"
     }]
   }), React.createElement(RdFoot, {
     how: {
@@ -3042,15 +2996,55 @@ function RdIpsosDirectionWorld({
     rel: "noopener noreferrer"
   }, last.source, React.createElement("span", {
     className: "plink-mark"
-  }, "\u2197"))) : null, lowy.length ? React.createElement(React.Fragment, null, " Lowy\u2019s 2017 and 2018 points ask Australians about the direction of the world, not Australia. Its Satisfied / Dissatisfied and combined Don\u2019t know / no view / neither categories stay distinct from Ipsos\u2019 country pool, and 2018 marks Lowy\u2019s blended online-and-telephone method. ", React.createElement("a", {
-    className: "rd-link",
-    href: D.directionLowy.sourceUrl,
-    target: "_blank",
-    rel: "noopener noreferrer"
-  }, "Lowy Institute", React.createElement("span", {
-    className: "plink-mark"
   }, "\u2197"))) : null));
 }
+const DIRECTION_WORDING_NOTES = {
+  "Roy Morgan": {
+    question: "Generally speaking, do you feel that things in Australia are heading in the right direction or would you say things are seriously heading in the wrong direction?",
+    scope: "Verified in releases from 2007 and 2020–22, and the current table.",
+    url: "https://www.roymorgan.com/morgan-poll/government-confidence-rating"
+  },
+  Essential: {
+    question: "E563. In general, would you say that Australia is heading in the right direction or on the wrong track?",
+    scope: "Current 2025–26 wording. The February–May 2022 reports had “is it off on the wrong track?”; the exact transition wave is not established.",
+    url: "https://essentialreport.com.au/wp-content/uploads/2026/10/Essential-Report-Disclosure-Statement-Full-Questionnaire-.pdf"
+  },
+  "SEC Newgate": {
+    question: "B2. Overall, do you think Australia, (state/territory), and your local area are heading in the right direction or the wrong direction?",
+    scope: "Verified in seven reports from July 2025 to September 2026. The Australia item is plotted.",
+    url: "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf"
+  },
+  Freshwater: {
+    question: "Generally speaking, do you think that Australia is currently heading in the right direction, or the wrong direction?",
+    scope: "Verified in October 2025–May 2026 workbooks; exact 2023–24 wording is unverified.",
+    url: "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-News-Australia-Freshwater-Strategy-Aus-Polling-150526.xlsx"
+  },
+  "RedBridge/Accent": {
+    question: "Would you say that things in Australia are… 1. Generally headed in the right direction; 2. Generally headed in the wrong direction; 3. Not sure.",
+    scope: "Single select; response order 1–2 randomly reversed. Verified in November 2025, January, May and November 2026.",
+    url: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf"
+  },
+  "Spectre Strategy": {
+    question: "Q: In your view, is Australia heading in the right direction, or the wrong direction at this time?",
+    scope: "2026 wording; the exact 2025 wording is unverified.",
+    url: "https://www.spectrestrategy.com/s/Political-Update-November-26-Spectre-Strategy.pdf"
+  },
+  McKinnon: {
+    question: "All things considered, how satisfied are you with the way Australia is heading?",
+    scope: "2025–26 wording. Satisfied and Dissatisfied aggregate the two strength categories; Neutral and Don’t know remain separate answers.",
+    url: "https://apo.org.au/sites/default/files/resource-files/2025-11/apo-nid332763_1.pdf"
+  },
+  "Lowy Institute": {
+    question: "Overall, are you satisfied or dissatisfied with the way things are going in Australia today?",
+    scope: "2017–18 wording. The 5% remainder combines Don’t know / no view / neither; it is not an independently printed Neutral share. In 2018, 600 online and 600 telephone responses were weighted and blended.",
+    url: "https://www.lowyinstitute.org/publications/2018-lowy-institute-poll"
+  },
+  Ipsos: {
+    question: "Generally speaking, would you say things in this country are heading in the right direction, or are they off on the wrong track?",
+    scope: "Latest report wording (October 2026). Australia’s sample is published as approximately 1,000, not an exact achieved n.",
+    url: "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-October-26.pdf?version=0"
+  }
+};
 function RdDirectionView({
   rangeId
 }) {
@@ -3089,11 +3083,48 @@ function RdDirectionView({
   }, []);
   const PRE = D.directionPre && D.directionPre.series && D.directionPre.series.length ? D.directionPre : null;
   const poolStart = PRE ? PRE.series[0].x : D.direction[0].x;
-  const histLanesAll = HIST ? Object.keys(HIST.houses).sort((a, b) => HIST.houses[a][0].x - HIST.houses[b][0].x).map(house => ({
+  const lowyLane = D.directionLowy?.waves?.length ? [{
+    house: "Lowy Institute",
+    pts: D.directionLowy.waves.map(w => ({
+      ym: w.end.slice(0, 7),
+      x: w.x,
+      right: w.satisfied,
+      wrong: w.dissatisfied,
+      samples: [w.sample],
+      field: w.field,
+      modeChange: w.modeChange,
+      url: w.url,
+      wording: {
+        question: w.question,
+        rightLabel: "Satisfied",
+        wrongLabel: "Dissatisfied"
+      }
+    }))
+  }] : [];
+  const ipsosLane = D.directionWorld?.waves?.length ? [{
+    house: "Ipsos",
+    pts: D.directionWorld.waves.map(w => ({
+      ym: w.ym,
+      x: w.x,
+      right: w.auRight,
+      wrong: w.auWrong,
+      samples: w.auN == null ? [] : [w.auN],
+      sampleApprox: w.auSampleApprox,
+      field: w.fieldwork,
+      url: w.url,
+      wording: {
+        question: DIRECTION_WORDING_NOTES.Ipsos.question,
+        rightLabel: "Right direction",
+        wrongLabel: "Wrong track"
+      }
+    }))
+  }] : [];
+  const histLanesAll = (HIST ? Object.keys(HIST.houses).map(house => ({
     house,
     pts: HIST.houses[house]
-  })) : [];
-  const histLanes = histLanesAll.filter(l => l.pts[0].x < poolStart || HIST.wordings?.[l.house]);
+  })) : []).concat(lowyLane, ipsosLane).sort((a, b) => a.pts[0].x - b.pts[0].x);
+  const ownWording = l => HIST?.wordings?.[l.house] || l.pts[0]?.wording;
+  const histLanes = histLanesAll.filter(l => l.pts[0].x < poolStart || ownWording(l));
   const histLo = histLanes.length ? Math.min(...histLanes.map(l => l.pts[0].x)) : poolStart;
   const ext = {
     lo: histLanes.length ? histLo : poolStart,
@@ -3146,7 +3177,8 @@ function RdDirectionView({
     ...d,
     pre: true
   })) : [];
-  const dots = prePolls.concat(D.directionPolls || []).filter(d => dotsOn && d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap(d => [{
+  const visiblePolls = prePolls.concat(D.directionPolls || []).filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]);
+  const dots = visiblePolls.filter(d => dotsOn).flatMap(d => [{
     x: d.x,
     y: d.right,
     color: "var(--mood-pos)",
@@ -3238,8 +3270,8 @@ function RdDirectionView({
       interpHover: true
     }));
   });
-  const wordedSeries = histLanes.filter(l => HIST.wordings?.[l.house]).flatMap(l => {
-    const q = HIST.wordings[l.house];
+  const wordedSeries = histLanes.filter(l => ownWording(l)).flatMap(l => {
+    const q = ownWording(l);
     return [["right", q.rightLabel], ["wrong", q.wrongLabel]].map(([k, wording]) => {
       const points = [];
       for (const p of l.pts) if (inW(p) && p[k] != null) {
@@ -3253,11 +3285,15 @@ function RdDirectionView({
           y: p[k],
           color: k === "right" ? "var(--mood-pos)" : "var(--mood-neg)",
           label: l.house + ", " + wording,
+          sub: p.sampleApprox ? "Australian sample approximately " + p.samples[0].toLocaleString("en-AU") + " (Ipsos publishes no exact achieved n)" : undefined,
           meta: {
             pollster: l.house,
-            dateLabel: monthLabelFull(p.ym),
+            dateLabel: p.field || monthLabelFull(p.ym),
             pre: true,
-            sample: p.samples?.length === 1 ? p.samples[0] : null
+            sample: p.samples?.length === 1 ? p.samples[0] : null,
+            sampleApprox: p.sampleApprox || false,
+            modeChange: p.modeChange || false,
+            url: p.url || null
           }
         });
       }
@@ -3310,13 +3346,22 @@ function RdDirectionView({
   })).map(p => [p.x, p])).values()].sort((a, b) => a.x - b.x) : pts;
   const monthAt = x => pts.find(p => p.x === x) || soloPts.find(p => p.x === x);
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const wordingNote = histLanes.some(l => l.house === "McKinnon" && l.pts.some(p => inW(p))) ? "McKinnon asks instead how satisfied respondents are with “the way Australia is heading”. Satisfied and Dissatisfied are plotted as right direction and wrong track; Neutral and Don’t know are separate answers, combined in Unsure. The separately worded series does not enter the headline’s pooled estimate." : null;
+  const wordingNote = !grpId && histLanes.some(l => ownWording(l) && l.pts.some(inW)) ? "Dashed house-specific overlays show their own published readings and do not enter the pooled estimate. Ipsos Australia is separate from its Global Average, which stays in the world comparison." : null;
   const foot = [last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null, wordingNote].filter(Boolean).join(" ");
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   const G = grpId ? D.directionGroups?.[grpId] || null : null;
   const gHouses = G ? G.houses || [] : [];
   const gSrc = gHouses.join(" and ") || "the pollsters";
+  const questionHouses = new Set(G ? gHouses : visiblePolls.map(p => p.pollster).filter(Boolean));
+  if (!G) for (const l of histLanes) if (ownWording(l) && l.pts.some(inW)) questionHouses.add(l.house);
+  const questionNotes = D.directionWorld?.waves?.length ? [...questionHouses].map(house => ({
+    house,
+    ...(DIRECTION_WORDING_NOTES[house] || {
+      question: "Exact question wording has not been verified against a primary report.",
+      unverified: true
+    })
+  })) : [];
   const gName = !G ? "" : G.dim === "age" ? "Aged " + grpId : grpId;
   const gSeries = G ? G.series.filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]) : [];
   const gHasRight = gSeries.filter(d => d.right != null).length >= 2;
@@ -3752,7 +3797,19 @@ function RdDirectionView({
       term: "direction",
       from: "National mood"
     }
-  }, foot), React.createElement(RdIpsosDirectionWorld, {
+  }, foot, questionNotes.length ? React.createElement("div", {
+    className: "rd-direction-wordings"
+  }, React.createElement("strong", null, "Question wording, by pollster"), questionNotes.map(q => React.createElement("div", {
+    className: "rd-direction-wording",
+    key: q.house
+  }, React.createElement("strong", null, q.house), q.unverified ? React.createElement(React.Fragment, null, " ", q.question) : React.createElement(React.Fragment, null, " asks \u201C", q.question, "\u201D"), q.scope ? React.createElement(React.Fragment, null, " \u2014 ", q.scope) : null, q.url ? React.createElement(React.Fragment, null, " ", " ", React.createElement("a", {
+    className: "rd-link",
+    href: q.url,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, "source", React.createElement("span", {
+    className: "plink-mark"
+  }, "\u2197"))) : null))) : null), React.createElement(RdIpsosDirectionWorld, {
     D: D
   }));
 }

@@ -2247,9 +2247,9 @@ const directionWorld = (() => {
   return { waves, source: doc.source || "Ipsos What Worries the World" };
 })();
 
-// Lowy asks Australian respondents about the world as a whole, rather than
-// an Australian direction or the publisher's multi-country mean. Its two
-// observations sit only alongside the Ipsos comparison, never inside a pool.
+// Lowy asks about national satisfaction with a distinct question wording.
+// Its observations sit in the main chart's separate-wording lane, never the
+// pooled estimator, Ipsos' global average or its country distributions.
 const directionLowy = JUR ? null : (() => {
   const file = path.join(ROOT, "data", "lowy-direction.json");
   if (!fs.existsSync(file)) return null;
