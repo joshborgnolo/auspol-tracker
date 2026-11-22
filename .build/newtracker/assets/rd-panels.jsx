@@ -2345,7 +2345,7 @@ function RdIpsosDirectionWorld({ D }) {
     points: bands.map((w) => ({ x: w.x, y0: w.band["p" + (key === "50" ? "25" : "10")], y1: w.band["p" + (key === "50" ? "75" : "90")] })),
   });
   const dots = lowy.map((w) => ({
-    x: w.x, y: w.net, color: "var(--accent, #7b5ca7)", label: "Lowy Institute: world satisfaction",
+    x: w.x, y: w.net, color: "var(--accent, #7b5ca7)", label: "Lowy Institute: satisfaction with direction of Australia",
     meta: { pollster: "Lowy Institute", dateLabel: w.field, sample: w.sample, pre: true,
       satisfied: w.satisfied, dissatisfied: w.dissatisfied, other: w.other,
       otherLabel: w.otherLabel, modeChange: w.modeChange, url: D.directionLowy.sourceUrl },
@@ -2363,7 +2363,7 @@ function RdIpsosDirectionWorld({ D }) {
         series={[
           { id: "world-au", label: "Australia", color: "var(--mood-neg)", points: au, rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Australia" },
           { id: "world-average", label: "Ipsos’ Global Average", color: "var(--ink-2)", points: world, rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Ipsos’ Global Average" },
-          { id: "lowy-world", label: "Lowy Institute: world satisfaction", color: "var(--accent, #7b5ca7)", points: lowyPoints, rdWidth: 1.75, dash: "3 3", endCap: false, endLabel: narrow ? null : "Lowy Institute" },
+          { id: "lowy-world", label: "Lowy Institute: satisfaction with direction of Australia", color: "var(--accent, #7b5ca7)", points: lowyPoints, rdWidth: 1.75, dash: "3 3", endCap: false, endLabel: narrow ? null : "Lowy Institute" },
         ]}
         areas={[area("80", "countries-middle-80", 0.10), area("50", "countries-middle-half", 0.20)]}
         spine={au} scatter={dots}
@@ -2395,18 +2395,18 @@ function RdIpsosDirectionWorld({ D }) {
         copy={{ title: "Australia and Ipsos’ Global Average, national direction",
           sub: `Australia's latest net direction is ${netLabel(last.auNet)} points, against ${netLabel(last.worldNet)} in Ipsos’ global average. Net direction is right direction less wrong track, in percentage points.`,
           caption: "Ipsos’ What Worries the World, each published wave since " + monthLabelFull(ws[0].ym) + ". Bands are the middle half and middle 80% of participating countries’ net direction; Ipsos’ own global average is not included in those country distributions.",
-          legend: [{ label: "Australia", color: "var(--mood-neg)", kind: "line" }, { label: "Ipsos’ Global Average", color: "var(--ink-2)", kind: "line" }, { label: "Lowy Institute: world satisfaction", color: "var(--accent, #7b5ca7)", kind: "line" }] }}
+          legend: [{ label: "Australia", color: "var(--mood-neg)", kind: "line" }, { label: "Ipsos’ Global Average", color: "var(--ink-2)", kind: "line" }, { label: "Lowy Institute: satisfaction with direction of Australia", color: "var(--accent, #7b5ca7)", kind: "line" }] }}
       />
       <RdKey className="rd-ckey" items={[
         { kind: "line", color: "var(--mood-neg)", label: "Australia" },
         { kind: "line", color: "var(--ink-2)", label: "Ipsos’ Global Average" },
         { kind: "lineband", color: "var(--ink-3)", label: "Middle half and middle 80% of countries, net direction; the global average is excluded" },
-        { kind: "line", color: "var(--accent, #7b5ca7)", label: "Lowy Institute: world satisfaction (2017–18, separate question)" },
+        { kind: "line", color: "var(--accent, #7b5ca7)", label: "Lowy Institute: satisfaction with direction of Australia (2017–18, separate question)" },
       ]} />
       <RdFoot how={{ term: "direction", from: "Ipsos What Worries the World" }}>
         Each country is one observation in the distribution, not weighted by population. The publisher’s global average is preserved separately, not recomputed.
         {last.url ? <> <a className="rd-link" href={last.url} target="_blank" rel="noopener noreferrer">{last.source}<span className="plink-mark">↗</span></a></> : null}
-        {lowy.length ? <> Lowy’s 2017 and 2018 points ask Australians about the direction of the world, not Australia. Its Satisfied / Dissatisfied and combined Don’t know / no view / neither categories stay distinct from Ipsos’ country pool, and 2018 marks Lowy’s blended online-and-telephone method. <a className="rd-link" href={D.directionLowy.sourceUrl} target="_blank" rel="noopener noreferrer">Lowy Institute<span className="plink-mark">↗</span></a></> : null}
+        {lowy.length ? <> Lowy’s Australia-specific series asks “Overall, are you satisfied or dissatisfied with the way things are going in Australia today?” — adjacent to McKinnon’s national-satisfaction wording, not the same words. Its combined Don’t know / no view / neither category stays distinct, and 2018 marks the blended online-and-telephone method. <a className="rd-link" href={D.directionLowy.sourceUrl} target="_blank" rel="noopener noreferrer">Lowy Institute<span className="plink-mark">↗</span></a></> : null}
       </RdFoot>
     </div>
   );

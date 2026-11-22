@@ -1,6 +1,6 @@
 {
-  "source": "Lowy Institute Poll — satisfaction with the direction of the world",
-  "sourceUrl": "https://poll.lowyinstitute.org/charts/satisfaction-with-direction-of-world/",
+  "source": "Lowy Institute Poll — satisfaction with the direction of Australia",
+  "sourceUrl": "https://www.lowyinstitute.org/publications/2018-lowy-institute-poll",
   "lastAsked": 2018,
   "waves": [
     {
@@ -8,38 +8,40 @@
       "start": "2017-03-01",
       "end": "2017-03-21",
       "field": "1–21 March 2017",
-      "satisfied": 19,
-      "dissatisfied": 79,
-      "other": 2,
+      "satisfied": 47,
+      "dissatisfied": 48,
+      "other": 5,
       "otherLabel": "Don’t know / no view / neither",
       "otherDerived": true,
-      "net": -60,
+      "net": -1,
       "sample": 1200,
-      "method": "Nationally representative polling by Social Research Centre, combining telephone and online responses among Australian adults aged 18+.",
-      "sampleNote": "1,200 interviews among Australian adults aged 18+.",
-      "question": "And turning to the situation in the world overall, are you satisfied or dissatisfied with the way things are going in the world today?",
+      "method": "Nationally representative fixed-line and mobile telephone survey by Social Research Centre, with state/territory quotas and call-back/appointment procedures to reach people away from home.",
+      "sampleNote": "A nationally representative sample of 1,200 Australian adults aged 18 and over.",
+      "question": "Overall, are you satisfied or dissatisfied with the way things are going in Australia today?",
       "modeChange": false,
-      "sourceLabel": "In 2017, 79% said dissatisfied; In 2017, 19% said satisfied."
+      "url": "https://www.lowyinstitute.org/publications/2017-lowy-institute-poll",
+      "sourceLabel": "The 2017 Lowy Institute Poll: Overall, are you satisfied or dissatisfied with the way things are going in Australia today? Satisfied 47%; Dissatisfied 48%."
     },
     {
       "year": 2018,
       "start": "2018-03-05",
       "end": "2018-03-25",
       "field": "5–25 March 2018",
-      "satisfied": 17,
-      "dissatisfied": 78,
+      "satisfied": 49,
+      "dissatisfied": 46,
       "other": 5,
       "otherLabel": "Don’t know / no view / neither",
       "otherDerived": true,
-      "net": -61,
+      "net": 3,
       "sample": 1200,
-      "method": "Mode blend: 600 online responses from Life in Australia (5–19 March) and 600 telephone respondents (7–25 March), weighted and blended.",
-      "sampleNote": "600 online respondents + 600 telephone respondents; dual-frame landline and mobile sampling, with state/territory location quotas.",
+      "method": "Blended method: 600 online responses from Life in Australia (5–19 March) and 600 telephone responses (7–25 March), weighted and blended to preserve comparability with earlier telephone polls.",
+      "sampleNote": "600 online respondents plus 600 telephone respondents, with dual-frame landline and mobile sampling and state/territory location quotas.",
       "modeDetail": "600 online + 600 telephone, weighted and blended",
-      "question": "And turning to the situation in the world overall, are you satisfied or dissatisfied with the way things are going in the world today?",
+      "question": "Overall, are you satisfied or dissatisfied with the way things are going in Australia today?",
       "modeChange": true,
-      "sourceLabel": "In 2018, 78% said dissatisfied; In 2018, 17% said satisfied."
+      "url": "https://www.lowyinstitute.org/publications/2018-lowy-institute-poll",
+      "sourceLabel": "The 2018 Lowy Institute Poll: Overall, are you satisfied or dissatisfied with the way things are going in Australia today? Satisfied 49%; Dissatisfied 46%."
     }
   ],
-  "$comment": "Global satisfaction by Lowy Institute, not Roy Morgan's Australia-specific direction or Ipsos' Global Average directions. Preserve distinct wordings and mode-era boundaries. Other is the derived remainder for the combined Don't know / no view / neither category, never an independently measured neutral or Unsure share. Not for pooling with other pollsters."
+  "$comment": "National satisfaction by Lowy Institute, grouped with McKinnon's separately worded Satisfaction with the way Australia is heading and kept separate from Morgan's right-direction series and Ipsos' Global Average. 'Overall' and 'All things considered' are not identical wordings, so this is a separately labelled source, not a pooled observation. Other is the derived remainder for the combined Don't know / no view / neither category, never an independently measured neutral or Unsure share."
 }
