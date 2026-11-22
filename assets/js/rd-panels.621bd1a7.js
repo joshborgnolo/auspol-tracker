@@ -2454,6 +2454,61 @@ const TRUST_COLOR = {
   edelman: "var(--trust-edelman)",
   "edelman-avg": "var(--trust-edelman)"
 };
+const TRUST_NOTE_ORDER = ["anupoll", "scanlon", "aes", "oecd-au", "edelman", "mckinnon", "essential", "essential-parliament"];
+const TRUST_HOUSE_NOTES = {
+  anupoll: {
+    paraphrase: true,
+    question: "How much confidence people have in the Federal Government in Canberra, asked beside the public service and their own state or territory government.",
+    answers: "Its reports print the share with “a great deal” or “quite a lot” of confidence, the share counted here; they don’t list the other answers or say how non-answers are counted.",
+    method: "Online. The Social Research Centre’s Life in Australia panel, recruited at random, October 2019 – January 2024; since October 2024 an opt-in panel run with the Online Research Unit. About 3,500 adults a wave (3,543 from 18 June to 6 July 2026), weighted to age, sex, education and employment.",
+    role: "ref"
+  },
+  scanlon: {
+    question: "How often do you think the government in Canberra can be trusted to do the right thing for the Australian people?",
+    answers: "Almost always, most of the time, only some of the time, almost never; the first two count. The few who don’t answer (under 1%) are left out of the base.",
+    method: "Telephone surveys from 2007 to 2018; since 2018 the Life in Australia panel, recruited at random and 99% online, each June–July (2018 was run both ways). Since 2025 it adds Online Research Unit respondents so the sample matches the 2025 vote: over 10,000 adults in 2026.",
+    role: "scanlon"
+  },
+  aes: {
+    question: "In general, do you feel that the people in government are too often interested in looking after themselves, or do you feel that they can be trusted to do the right thing nearly all the time?",
+    answers: "Usually look after themselves, sometimes look after themselves, sometimes can be trusted, usually can be trusted; the last two count. Don Aitkin’s 1969 and 1979 surveys, before the AES, offered only the two ends. The report doesn’t say how non-answers are counted. The 1999 dot is the Constitutional Referendum Study, which asked the same question after the republic referendum (37%, from Murray Goot’s tables).",
+    method: "A self-completion survey after each election, by post and, since 2019, push-to-web: 2,070 responses in 2025, weighted to the electorate. Dated to the month after polling day.",
+    role: "level"
+  },
+  "oecd-au": {
+    question: "On a scale of 0 to 10, how much do you trust the national government?",
+    answers: "0 to 10; 6 to 10 count, the OECD’s “high or moderately high” trust. How it counts don’t-knows is unverified.",
+    method: "The OECD’s Trust Survey, about 2,000 Australian adults a round (2021, 2023, 2025), as the APSC reports it. The OECD average across the countries taking part is drawn dashed.",
+    role: "level"
+  },
+  edelman: {
+    question: "Below is a list of institutions. For each one, please indicate how much you trust that institution to do what is right, using a nine-point scale where one means that you “do not trust them at all” and nine means that you “trust them a great deal.” (Government in general)",
+    answers: "1 to 9; 6 to 9 count (its “top 4 box”), 5 is neutral. The reports don’t say how don’t-knows are counted.",
+    method: "Online, about 1,150 Australian adults a year (1,000 to the 2015 Barometer, 1,204 in 2026), each October–November before the year the Barometer is named for. Its average across its 26 to 28 countries is drawn dashed.",
+    role: "level"
+  },
+  mckinnon: {
+    question: "On a scale of 0-10 where 0 means not at all and 10 means completely, how much do you trust the Federal Government?",
+    answers: "0 to 10; 6 to 10 count (“high or moderately high”), 5 is neutral. “Don’t know” is a separate answer, kept in the base.",
+    method: "Roy Morgan’s online panel, recruited by probability methods, each winter: 4,416 adults from 9 to 31 July 2025, 4,273 from 19 June to 21 July 2026.",
+    role: "level"
+  },
+  essential: {
+    paraphrase: true,
+    question: "How much people trust the national government, asked beside corporations and family.",
+    answers: "A lot, quite a bit, not that much, none at all; the first two count. No unsure share is printed: the four sum to 100.",
+    method: "Essential’s online panel, about 1,000 adults (October 2024; 18–23 February 2026).",
+    role: "level"
+  },
+  "essential-parliament": {
+    paraphrase: true,
+    question: "How much people trust the federal parliament, in a list of institutions.",
+    answers: "A lot, some, little, none at all, and unsure, each printed; a lot or some counts, with the unsure (6% in December 2023) kept in the base.",
+    method: "Essential’s online panel, about 1,000 adults; six waves, August 2020 – December 2023.",
+    role: "other"
+  }
+};
+const trustRoleText = q => q.role === "ref" ? "The line is printed on the terms of its current panel, which also counts once among the surveys setting the level. Its Life in Australia waves count as a survey of their own, read through a wide lean." : q.role === "scanlon" ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways." : q.role === "other" ? "Asks about the parliament, not the government, so it is read through a wide lean of its own: it shows how trust moved, never where it stands." : "Sets the line’s level with the other surveys, each counting once.";
 const TRUST_ELECTIONS = [{
   date: "2022-05-21",
   label: "May 2022"
@@ -2487,7 +2542,7 @@ function RdTrustModel() {
   const pts = n => Math.abs(n).toFixed(1);
   const color = TRUST_COLOR.anupoll;
   const credit = (s, r) => ({
-    pollster: s.house,
+    pollster: r.survey || s.house,
     dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""),
     sample: r.n || null
   });
@@ -2504,10 +2559,11 @@ function RdTrustModel() {
     const s = S[sid],
       orig = s && s.readings[i];
     return {
+      sid,
       x: r.x,
       y: r.v,
       color: TRUST_COLOR[sid] || "var(--ink-3)",
-      label: (s ? s.house : sid) + ", on ANUpoll’s terms",
+      label: (orig && orig.survey || (s ? s.house : sid)) + ", on ANUpoll’s terms",
       sub: orig ? "Printed: " + orig.v + "% (" + s.measure.split(" (")[0].toLowerCase() + ")" : undefined,
       meta: s && orig ? credit(s, orig) : {
         pollster: sid
@@ -2608,6 +2664,7 @@ function RdTrustModel() {
     }))
   }];
   const firstOnName = trustMonth(M.firstOn);
+  const bandHalf = String((M.bandMax || 20) / 2);
   const rank = x => !x ? "" : x.record ? ", the lowest since the line begins in " + firstOnName : ", the lowest since " + trustMonth(x.since);
   const head = plainShare(now.v) + " Australians have confidence in the federal government" + rank(now.low2020);
   const Y = now.year,
@@ -2629,7 +2686,6 @@ function RdTrustModel() {
   const ref = Y.sig ? Y.chg : E && E.sig ? E.chg : 0;
   const sameWay = sigOther && ref && Math.sign(sigOther.a.v - sigOther.b.v) === Math.sign(ref);
   const dek = sYear + sElec + "." + (sameWay ? " " + sigOther.s.house + "’s own " + trustMonth(sigOther.a.date) + " survey reports a significant " + (sigOther.a.v < sigOther.b.v ? "fall" : "rise") + " too, " + pts(sigOther.a.v - sigOther.b.v) + " points in a year." : "");
-  const chance = d => Math.round(100 * (d.chg < 0 ? d.pUp : 1 - d.pUp));
   const otherNames = rdList(Object.keys(M.adj).filter(sid => S[sid] && sid !== "anupoll").map(sid => S[sid].house));
   const brk = M.breaks || {};
   const spine = lineW.map(m => ({
@@ -2678,7 +2734,7 @@ function RdTrustModel() {
     }
   })), React.createElement("p", {
     className: "rd-dir-net"
-  }, React.createElement("b", null, rdArrow(Y.chg), " ", pts(Y.chg), " on a year ago"), Y.sig ? "" : ", within the margin: a " + chance(Y) + "% chance it " + (Y.chg < 0 ? "rose" : "fell"), E && E.ym !== Y.from ? React.createElement(React.Fragment, null, "; ", rdArrow(E.chg), " ", pts(E.chg), " since just after the ", elecLabel, " election", E.sig ? "" : ", within the margin") : null), React.createElement(RdConfWinBar, {
+  }, React.createElement("b", null, rdArrow(Y.chg), " ", pts(Y.chg), " on a year ago"), rdSigClause(Y.chg, Y.pUp, Y.sig), E && E.ym !== Y.from ? React.createElement(React.Fragment, null, "; ", rdArrow(E.chg), " ", pts(E.chg), " since just after the ", elecLabel, " election", rdSigClause(E.chg, E.pUp, E.sig)) : null), React.createElement(RdConfWinBar, {
     win: winShown,
     terms: vTerms,
     lo: ext.lo,
@@ -2741,7 +2797,7 @@ function RdTrustModel() {
       title: "Confidence in the federal government",
       span: confWinYears(win, vTerms, nowX),
       sub: head + ". Every survey pooled, on ANUpoll’s terms: the share with a great deal or quite a lot of confidence in the Federal Government in Canberra.",
-      caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval; drawn from " + firstOnName + ", where that interval narrows under ±10 points. Dots: each survey’s readings on the same terms (" + otherNames + " and ANUpoll; open dots are ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecd.length >= 2 || edel.length >= 2 ? " Dashed: " + [oecd.length >= 2 ? "the OECD average" : null, edel.length >= 2 ? "Edelman’s global average" : null].filter(Boolean).join(" and ") + ", each moved onto the same terms by its own survey’s lean in Australia." : ""),
+      caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval; drawn from " + firstOnName + ", where that interval narrows under ±" + bandHalf + " points. Dots: each survey’s readings on the same terms (" + otherNames + " and ANUpoll; open dots are ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecd.length >= 2 || edel.length >= 2 ? " Dashed: " + [oecd.length >= 2 ? "the OECD average" : null, edel.length >= 2 ? "Edelman’s global average" : null].filter(Boolean).join(" and ") + ", each moved onto the same terms by its own survey’s lean in Australia." : ""),
       legend: [{
         label: "Confidence, every survey on ANUpoll’s terms",
         color,
@@ -2767,7 +2823,7 @@ function RdTrustModel() {
       kind: "lineband",
       color,
       label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval, from " + firstOnName
-    }, ...Object.keys(M.adj).filter(sid => S[sid] && dots.some(d => d.meta && d.meta.pollster === S[sid].house)).map(sid => ({
+    }, ...Object.keys(M.adj).filter(sid => S[sid] && dots.some(d => d.sid === sid)).map(sid => ({
       kind: "dot",
       color: TRUST_COLOR[sid] || "var(--ink-3)",
       label: S[sid].house + (sid === "anupoll" ? " (open: its earlier panel)" : sid === "scanlon" ? " (open: its telephone years)" : "")
@@ -2785,8 +2841,42 @@ function RdTrustModel() {
       label: "A faint rule is a federal election; the strip beneath carries the governments"
     } : null].filter(Boolean)
   })), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Every survey asks its own question \u2013 ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Edelman how far people trust \u201Cgovernment in general\u201D to do what is right on a nine-point scale, Essential about trust in the national government and in the federal parliament \u2013 so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on ANUpoll\u2019s terms: the share with a great deal or quite a lot of confidence, as ANUpoll\u2019s current panel asks it. Each dot is one survey\u2019s reading moved onto those terms by its lean; point at one for the figure as printed."), React.createElement(React.Fragment, null, "The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll\u2019s opt-in panel since 2024 reads about ", pts(brk.anupoll || 0), " points below its earlier panel at the same level of trust, and Scanlon\u2019s telephone years read about ", pts(brk.scanlon || 0), " points ", brk.scanlon < 0 ? "below" : "above", " its online panel. No survey responds more or less sharply than ANUpoll\u2019s once its lean is taken out."), React.createElement(React.Fragment, null, "The shading is the line\u2019s 95% interval: a 95% chance trust lies inside, under the model\u2019s assumptions. A change is called significant only when its own 95% interval excludes zero. Before ", firstOnName, " the interval is wider than \xB110 points, so the line starts there and earlier readings show only as dots. The two global averages are moved onto the same terms the way the Ipsos world figure is on the direction chart: each by its own survey\u2019s lean in Australia. Each covers whichever countries took part \u2013 the OECD\u2019s 22 in 2021 and 38 in 2025, Edelman\u2019s 26 to 28 a year \u2013 so part of their movement is who was counted. They also count different worlds: the OECD\u2019s are its members, while Edelman\u2019s include China, Saudi Arabia, the UAE and India, where its readings have run from 75 to 90% in recent years \u2013 which helps explain why Edelman\u2019s average usually sits above Australia\u2019s line and the OECD\u2019s below it."), React.createElement(React.Fragment, null, "The bar over the chart sets the window, as on the direction chart: it opens on this term; \u2039 and \u203A step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the line in miniature with the governments beneath it \u2013 drag the window, drag its edges to resize, or tap a spot to jump.")]
-  }), React.createElement(RdFoot, {
+    paras: [React.createElement(React.Fragment, null, "Every survey asks its own question \u2013 ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Edelman how far people trust \u201Cgovernment in general\u201D to do what is right on a nine-point scale, Essential about trust in the national government and in the federal parliament \u2013 so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on ANUpoll\u2019s terms: the share with a great deal or quite a lot of confidence, as ANUpoll\u2019s current panel asks it. Each dot is one survey\u2019s reading moved onto those terms by its lean; point at one for the figure as printed."), React.createElement(React.Fragment, null, "The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll\u2019s opt-in panel since 2024 reads about ", pts(brk.anupoll || 0), " points below its earlier panel at the same level of trust, and Scanlon\u2019s telephone years read about ", pts(brk.scanlon || 0), " points ", brk.scanlon < 0 ? "below" : "above", " its online panel. No survey responds more or less sharply than ANUpoll\u2019s once its lean is taken out."), React.createElement(React.Fragment, null, "The shading is the line\u2019s 95% interval: a 95% chance trust lies inside, under the model\u2019s assumptions. A change is called significant only when its own 95% interval excludes zero. Before ", firstOnName, " the interval is wider than \xB1", bandHalf, " points \u2013 each survey\u2019s lean against ANUpoll is measured where they overlap, since 2020, and the further back from there, the less sure it is \u2013 so the line starts there and earlier readings show only as dots. The two global averages are moved onto the same terms the way the Ipsos world figure is on the direction chart: each by its own survey\u2019s lean in Australia. Each covers whichever countries took part \u2013 the OECD\u2019s 22 in 2021 and 38 in 2025, Edelman\u2019s 26 to 28 a year \u2013 so part of their movement is who was counted. They also count different worlds: the OECD\u2019s are its members, while Edelman\u2019s include China, Saudi Arabia, the UAE and India, where its readings have run from 75 to 90% in recent years \u2013 which helps explain why Edelman\u2019s average usually sits above Australia\u2019s line and the OECD\u2019s below it."), React.createElement(React.Fragment, null, "The bar over the chart sets the window, as on the direction chart: it opens on this term; \u2039 and \u203A step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the line in miniature with the governments beneath it \u2013 drag the window, drag its edges to resize, or tap a spot to jump.")]
+  }), React.createElement("details", {
+    className: "view-how hint-how rd-dirq"
+  }, React.createElement("summary", null, "How each survey asks"), React.createElement("div", {
+    className: "rd-dirq-grid"
+  }, TRUST_NOTE_ORDER.filter(id => S[id] && TRUST_HOUSE_NOTES[id]).map(id => {
+    const q = TRUST_HOUSE_NOTES[id],
+      s = S[id];
+    return React.createElement("section", {
+      className: "rd-dirq-house",
+      key: id
+    }, React.createElement("h5", {
+      className: "rd-dirq-name"
+    }, s.house, q.url || s.source ? React.createElement(React.Fragment, null, " ", React.createElement("a", {
+      className: "rd-link",
+      href: q.url || s.source,
+      target: "_blank",
+      rel: "noopener noreferrer"
+    }, "source", React.createElement("span", {
+      className: "plink-mark"
+    }, "\u2197"))) : null), React.createElement("p", {
+      className: "rd-dirq-q"
+    }, q.paraphrase ? q.question : "“" + q.question + "”"), q.answers && React.createElement("p", {
+      className: "rd-dirq-l"
+    }, React.createElement("span", {
+      className: "rd-dirq-k"
+    }, "Answers"), q.answers), q.method && React.createElement("p", {
+      className: "rd-dirq-l"
+    }, React.createElement("span", {
+      className: "rd-dirq-k"
+    }, "Method"), q.method), React.createElement("p", {
+      className: "rd-dirq-l"
+    }, React.createElement("span", {
+      className: "rd-dirq-k"
+    }, "In the line"), trustRoleText(q)));
+  }))), React.createElement(RdFoot, {
     how: {
       term: "trust-government",
       from: "National mood"
@@ -2876,7 +2966,7 @@ function RdTrustSeparate() {
     }))
   })).filter(a => a.points.length >= 2);
   const credit = (s, r) => ({
-    pollster: s.house,
+    pollster: r.survey || s.house,
     dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""),
     sample: r.n || null
   });
@@ -3249,6 +3339,13 @@ const DIRECTION_HOUSE_NOTES = {
     unsure: false,
     url: "https://apo.org.au/sites/default/files/resource-files/2025-11/apo-nid332763_1.pdf"
   }
+};
+const rdSigClause = (chg, pUp, sig) => {
+  if (pUp == null) return sig === false ? ", within the margin" : sig ? ", a significant " + (chg < 0 ? "fall" : "rise") : "";
+  const p = chg < 0 ? pUp : 1 - pUp,
+    way = chg < 0 ? "rose" : "fell";
+  const odds = p < 0.005 ? "under a 1% chance it " + way : "a " + Math.round(100 * p) + "% chance it " + way;
+  return sig ? ", a significant " + (chg < 0 ? "fall" : "rise") + ": " + odds : ", within the margin: " + odds;
 };
 const directionRoleText = n => n.role === "level" ? "Sets the line’s level with the other pollsters asking this question, each counting once" + (n.unsure ? ", and feeds its unsure share." : "; its ratio of right to wrong only, as it prints no unsure share.") : "Asks about satisfaction, so it is read through a lean of its own, wide enough that a couple of readings teach the model about the question, not about Australia. It never sets the level or the unsure share.";
 function RdDirectionView({
@@ -3766,7 +3863,7 @@ function RdDirectionView({
     }
   })), React.createElement("p", {
     className: "rd-dir-net"
-  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, ", ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago", now.changeSig === false ? now.pUp != null ? ", within the margin: a " + Math.round(100 * (now.chg < 0 ? now.pUp : 1 - now.pUp)) + "% chance it " + (now.chg < 0 ? "rose" : "fell") : ", within the margin" : "")), histOn && React.createElement(RdConfWinBar, {
+  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, ", ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago", now.changeSig == null ? "" : rdSigClause(now.chg, now.pUp, now.changeSig))), histOn && React.createElement(RdConfWinBar, {
     win: winShown,
     terms: vTerms,
     lo: ext.lo,
