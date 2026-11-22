@@ -26,6 +26,7 @@ const paras = [
   "But after adding Senator Hanson to a three-way contest, Mr Albanese leads with 44 per cent, ahead of the One Nation leader on 32 per cent and Mr Taylor on 24 per cent.",
   "On which party is best to handle the economy, the Coalition rose to 29 per cent.",
   "Pauline Hanson's net rating was minus 15, with 44 per cent satisfied and 51 per cent dissatisfied.",
+  "The Newspoll showed Mr Albanese trailing Mr Taylor on both the traditional better prime minister measure and new two prime minister preferred (2PMP) question. Mr Taylor holds a 53 per cent to 47 per cent 2PMP lead over Mr Albanese.",
 ];
 const era = { pm: "Albanese", opp: "Taylor", third: "Hanson" };
 const prev = { alp: 29, onp: 30, grn: 13, ind: 9, lnp: 20 };
@@ -73,6 +74,11 @@ v = read({ lnp: cite(6, "the Coalition rose to 29 per cent", 29) });
 eq("an issue rating is not a primary", [v.ok.lnp, v.verdict.lnp], [undefined, "sentence is about issue ratings, not the vote"]);
 v = read({ ppmA: cite(5, "Mr Albanese leads with 44 per cent", 44) });
 eq("the head-to-head is not read from the three-way sentence", v.ok.ppmA, undefined);
+v = verifyReading({ scope: "newspoll", fields: { ppm3A: cite(1, "Mr Albanese dropped from 46 per cent to 44 per cent over the same period", 44) } },
+  ["x".repeat(40), "In the three-way contest with Mr Albanese and Mr Taylor on who voters prefer as prime minister, Senator Hanson has fallen to 28 per cent. Support for Mr Taylor has increased to 28 per cent. Mr Albanese dropped from 46 per cent to 44 per cent over the same period."], {}, era);
+eq("a three-way heading governs a later change sentence in its paragraph", v.ok.ppm3A, 44);
+v = read({ ppmA: cite(8, "a 53 per cent to 47 per cent 2PMP lead over Mr Albanese", 47), ppmO: cite(8, "Mr Taylor holds a 53 per cent to 47 per cent 2PMP lead", 53) });
+eq("the separate 2PMP contest is not filed as traditional preferred PM", [v.ok.ppmA, v.ok.ppmO], [undefined, undefined]);
 v = read({ hanNet: cite(7, "net rating was minus 15", -15), hanApp: cite(7, "44 per cent satisfied", 44), hanDis: cite(7, "51 per cent dissatisfied", 51) });
 eq("satisfied − dissatisfied ≠ net refuses the leader's figures", v.ok, {});
 v = read({ hanDis: cite(2, "62 per cent dissatisfied", 62) });

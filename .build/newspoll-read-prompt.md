@@ -29,8 +29,11 @@ leader).
   `oppNet` (the opposition leader), `hanApp`, `hanDis`, `hanNet` (the One
   Nation leader). Nets are signed: "minus 27" is -27.
 - Better / preferred prime minister:
-  - `ppmA`, `ppmO`: the TWO-WAY contest between the prime minister and the
-    opposition leader ("one-on-one", "head-to-head").
+  - `ppmA`, `ppmO`: the traditional TWO-WAY better/preferred PM contest
+    between the prime minister and the opposition leader ("one-on-one",
+    "head-to-head"), which can have an uncommitted remainder. Do NOT use
+    the separate forced-choice "two prime minister preferred" (2PMP)
+    question: that is a different measure with no uncommitted remainder.
   - `ppm3A`, `ppm3O`, `ppm3H`: the THREE-WAY contest that adds the One
     Nation leader.
 
@@ -45,12 +48,14 @@ leader).
   measures. Keep it short (under 40 words).
 - `value` is the figure as a number. Percentages are plain numbers (27, not
   "27 per cent").
-- `from`: if the quoted words also state this figure in the PREVIOUS
-  Newspoll ("fell from 29 per cent to 27 per cent", "up from 9 to 11"),
-  give that earlier number; if they say the figure was unchanged
+- `from`: if the quoted words also state this figure in the IMMEDIATELY
+  PREVIOUS Newspoll ("fell from 29 per cent to 27 per cent", "up from 9
+  to 11"), give that earlier number; if they say the figure was unchanged
   ("remained at 30 per cent", "stayed at 13 per cent", "steady on 19"),
-  give the same number as `value`. Otherwise null. Never use a comparison
-  with an election, a year ago or another poll as `from`.
+  give the same number as `value`. Otherwise null. If the comparison names
+  an earlier release or period ("since September"), leave `from` null even
+  when it gives numbers. Never use a comparison with an election, a year
+  ago or another poll as `from`.
 - A figure the article does not state is null. Do not derive a net from
   satisfied/dissatisfied or vice versa; do not derive a missing primary.
 - `scope`: "newspoll" when the article reports a federal Newspoll's

@@ -1,0 +1,112 @@
+{
+  "url": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e",
+  "textHash": "4c53315fb4dd64ce",
+  "readAt": "2026-11-22T10:42:07.197Z",
+  "reading": {
+    "scope": "newspoll",
+    "fields": {
+      "alp": {
+        "para": 3,
+        "quote": "While Labor's primary vote held at a historically low 27 per cent",
+        "value": 27,
+        "from": 27
+      },
+      "lnp": {
+        "para": 3,
+        "quote": "core support for the Coalition rose for the fourth time since August to 22 per cent",
+        "value": 22,
+        "from": null
+      },
+      "grn": {
+        "para": 3,
+        "quote": "the Greens lifted to 14 per cent",
+        "value": 14,
+        "from": null
+      },
+      "onp": {
+        "para": 3,
+        "quote": "One Nation's primary vote dropped to 27 per cent, marking the right-wing party's lowest mark since May",
+        "value": 27,
+        "from": null
+      },
+      "ind": {
+        "para": 22,
+        "quote": "Core support for others, which is made up of independents and minor parties, fell from 11 per cent to 10 per cent.",
+        "value": 10,
+        "from": 11
+      },
+      "oth": null,
+      "tpp_alp": null,
+      "pmApp": {
+        "para": 2,
+        "quote": "the Prime Minister's net approval rating has plunged to minus 31, with 64 per cent of voters dissatisfied with his performance and 33 per cent satisfied",
+        "value": 33,
+        "from": null
+      },
+      "pmDis": {
+        "para": 2,
+        "quote": "the Prime Minister's net approval rating has plunged to minus 31, with 64 per cent of voters dissatisfied with his performance and 33 per cent satisfied",
+        "value": 64,
+        "from": null
+      },
+      "pmNet": {
+        "para": 2,
+        "quote": "the Prime Minister's net approval rating has plunged to minus 31",
+        "value": -31,
+        "from": null
+      },
+      "oppApp": {
+        "para": 20,
+        "quote": "Mr Taylor's net approval rating improved to minus 9, with 37 per cent of Australians satisfied with his performance and 46 per cent dissatisfied.",
+        "value": 37,
+        "from": null
+      },
+      "oppDis": {
+        "para": 20,
+        "quote": "Mr Taylor's net approval rating improved to minus 9, with 37 per cent of Australians satisfied with his performance and 46 per cent dissatisfied.",
+        "value": 46,
+        "from": null
+      },
+      "oppNet": {
+        "para": 20,
+        "quote": "Mr Taylor's net approval rating improved to minus 9",
+        "value": -9,
+        "from": null
+      },
+      "hanApp": {
+        "para": 20,
+        "quote": "Newspoll showed that voters have marked down Senator Hanson, with 45 per cent of Australians satisfied with her performance and 49 per cent dissatisfied.",
+        "value": 45,
+        "from": null
+      },
+      "hanDis": {
+        "para": 20,
+        "quote": "Newspoll showed that voters have marked down Senator Hanson, with 45 per cent of Australians satisfied with her performance and 49 per cent dissatisfied.",
+        "value": 49,
+        "from": null
+      },
+      "hanNet": null,
+      "ppmA": null,
+      "ppmO": null,
+      "ppm3A": {
+        "para": 21,
+        "quote": "Mr Albanese dropped from 46 per cent to 44 per cent over the same period.",
+        "value": 44,
+        "from": null
+      },
+      "ppm3O": {
+        "para": 21,
+        "quote": "on who voters prefer as prime minister, Senator Hanson has fallen from 32 per cent to 28 per cent since September. Support for Mr Taylor has increased from 23 per cent to 28 per cent.",
+        "value": 28,
+        "from": null
+      },
+      "ppm3H": {
+        "para": 21,
+        "quote": "In the three-way contest with Mr Albanese and Mr Taylor on who voters prefer as prime minister, Senator Hanson has fallen from 32 per cent to 28 per cent since September.",
+        "value": 28,
+        "from": null
+      }
+    },
+    "notes": "The 53–47 figures are the excluded 2PMP measure; no traditional two-way preferred-PM figures or 2PP are stated."
+  }
+}

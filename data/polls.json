@@ -6661,6 +6661,23 @@
       "tpp_lnp": 49,
       "url": "https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13",
       "published": "2026-11-18T05:00"
+    },
+    {
+      "date": "2026-11-19",
+      "published": "2026-11-22T20:00",
+      "dateStart": "2026-11-16",
+      "pollster": "Newspoll",
+      "client": "The Australian",
+      "sample": 1229,
+      "alp": 27,
+      "lnp": 22,
+      "grn": 14,
+      "onp": 27,
+      "ind": 10,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e"
     }
   ],
   "ppm": [
@@ -7563,6 +7580,20 @@
       "oppName": "Taylor",
       "han": null,
       "extra": null
+    },
+    {
+      "date": "2026-11-19",
+      "firm": "Newspoll",
+      "alb": 44,
+      "opp": 28,
+      "oppName": "Taylor",
+      "han": 28,
+      "extra": [
+        {
+          "alb": 41,
+          "opp": 42
+        }
+      ]
     }
   ],
   "approval": [
@@ -9682,6 +9713,28 @@
         "opp": {
           "app": 40,
           "dis": 45
+        }
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "firm": "Newspoll",
+      "alb": -31,
+      "opp": -9,
+      "oppName": "Taylor",
+      "han": -4,
+      "detail": {
+        "alb": {
+          "app": 33,
+          "dis": 64
+        },
+        "opp": {
+          "app": 37,
+          "dis": 46
+        },
+        "han": {
+          "app": 45,
+          "dis": 49
         }
       }
     }

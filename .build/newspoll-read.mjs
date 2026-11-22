@@ -161,11 +161,14 @@ export function verifyReading(reading, paras, prev, era) {
     // sentence is where the leader or contest is named
     const { ctx, before } = sentenceAround(para, quote);
     // a pronoun's antecedent ("Its primary vote now stands at 29 per cent",
-    // "giving him a net approval rating of zero") sits one sentence back
-    const miss = lex(f, era).find((re) => !re.test(ctx) && !re.test(before + " " + ctx));
+    // "giving him a net approval rating of zero") sits one sentence back;
+    // a three-way heading can instead govern later short change sentences
+    const threeWayPara = f.startsWith("ppm3") && /three-way|three way|three-cornered/i.test(para);
+    const miss = lex(f, era).find((re) => !re.test(ctx) && !re.test((threeWayPara ? para : before) + " " + ctx));
     if (miss) { verdict[f] = `sentence does not name what ${f} measures (${miss})`; continue; }
     if (PRIMARY.has(f) && ISSUE_TALK.test(ctx)) { verdict[f] = "sentence is about issue ratings, not the vote"; continue; }
     if ((f === "ppmA" || f === "ppmO") && /three-way|three way|three-cornered/i.test(ctx)) { verdict[f] = "two-way PPM cited from the three-way contest"; continue; }
+    if ((f === "ppmA" || f === "ppmO") && /\b2PMP\b|two prime minister preferred/i.test(ctx)) { verdict[f] = "traditional PPM cited from the separate 2PMP contest"; continue; }
     // the earlier figure is in the quote, or follows from a change the quote
     // states ("fell a point to 29 per cent", "remains at 28"); either way it
     // must be the previous Newspoll's, else the sentence is about some other
