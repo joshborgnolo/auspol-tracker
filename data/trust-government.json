@@ -234,12 +234,14 @@
       "measure": "6 or more out of 10",
       "role": "dot",
       "source": "https://a-ap.storyblok.com/f/3001038/x/241a2c3f06/mckinnon-index-2026-key-findings-report.pdf",
-      "note": "Fieldwork by Roy Morgan, online. The 2025 figure is the 2026 report's 33.1 plus its printed 4.5-point fall; the report does not give the 2025 wave's fieldwork dates, so it is placed at July 2025 like the 2026 wave. The report underlines its statistically significant year-on-year changes; the Federal Government's 4.5-point fall is underlined (sigChange).",
+      "note": "Fieldwork by Roy Morgan, online. The 2025 figure is printed directly in Figure 2 of the 2025 detailed report. The 2026 report underlines its statistically significant year-on-year changes; the Federal Government's 4.5-point fall is underlined (sigChange).",
       "readings": [
         {
           "date": "2025-07",
           "v": 37.6,
-          "approxDate": true
+          "field": "9–31 July 2025",
+          "n": 4416,
+          "url": "https://a-ap.storyblok.com/f/3001038/x/1718148fed/mckinnon-index__detailed_findings_2025_final.pdf"
         },
         {
           "date": "2026-07",
