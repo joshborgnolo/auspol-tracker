@@ -1222,6 +1222,44 @@ const DEMOSAU_MRP_DEMO = {
         "Reg & Rur": { alp: 24, lnp: 26, grn: 9, onp: 24, oth: 17 },
       },
     },
+    /* Summary pp. 8–9: each cell is One Nation's share of the recalled-2025
+       cohort's location × age × education cell, not a vote distribution. */
+    onp2025: {
+      lnp: {
+        "Inner metro": {
+          "18–34": { "Less than year 12": 13, "Year 12": 11, TAFE: 11, Undergraduate: 6, Postgraduate: 5 },
+          "35–54": { "Less than year 12": 18, "Year 12": 15, TAFE: 15, Undergraduate: 10, Postgraduate: 9 },
+          "55+": { "Less than year 12": 23, "Year 12": 20, TAFE: 20, Undergraduate: 12, Postgraduate: 11 },
+        },
+        "Outer metro": {
+          "18–34": { "Less than year 12": 18, "Year 12": 15, TAFE: 15, Undergraduate: 9, Postgraduate: 7 },
+          "35–54": { "Less than year 12": 24, "Year 12": 21, TAFE: 21, Undergraduate: 13, Postgraduate: 11 },
+          "55+": { "Less than year 12": 30, "Year 12": 26, TAFE: 27, Undergraduate: 17, Postgraduate: 15 },
+        },
+        "Reg & Rur": {
+          "18–34": { "Less than year 12": 21, "Year 12": 18, TAFE: 18, Undergraduate: 11, Postgraduate: 9 },
+          "35–54": { "Less than year 12": 28, "Year 12": 25, TAFE: 25, Undergraduate: 16, Postgraduate: 14 },
+          "55+": { "Less than year 12": 35, "Year 12": 31, TAFE: 31, Undergraduate: 20, Postgraduate: 18 },
+        },
+      },
+      alp: {
+        "Inner metro": {
+          "18–34": { "Less than year 12": 3, "Year 12": 3, TAFE: 3, Undergraduate: 2, Postgraduate: 1 },
+          "35–54": { "Less than year 12": 5, "Year 12": 4, TAFE: 4, Undergraduate: 2, Postgraduate: 2 },
+          "55+": { "Less than year 12": 7, "Year 12": 6, TAFE: 6, Undergraduate: 3, Postgraduate: 3 },
+        },
+        "Outer metro": {
+          "18–34": { "Less than year 12": 5, "Year 12": 4, TAFE: 4, Undergraduate: 2, Postgraduate: 2 },
+          "35–54": { "Less than year 12": 7, "Year 12": 6, TAFE: 6, Undergraduate: 3, Postgraduate: 3 },
+          "55+": { "Less than year 12": 10, "Year 12": 8, TAFE: 8, Undergraduate: 5, Postgraduate: 4 },
+        },
+        "Reg & Rur": {
+          "18–34": { "Less than year 12": 6, "Year 12": 5, TAFE: 5, Undergraduate: 3, Postgraduate: 2 },
+          "35–54": { "Less than year 12": 9, "Year 12": 7, TAFE: 7, Undergraduate: 4, Postgraduate: 4 },
+          "55+": { "Less than year 12": 12, "Year 12": 10, TAFE: 10, Undergraduate: 6, Postgraduate: 5 },
+        },
+      },
+    },
   },
   "2026-03-03": {
     source: "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
@@ -1905,7 +1943,7 @@ try {
       if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
       push({ pollster: house, date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
              sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: h.read || "published table", dims: h.dims,
-             ...(h.total ? { total: h.total } : {}) });
+             ...(h.total ? { total: h.total } : {}), ...(h.onp2025 ? { onp2025: h.onp2025 } : {}) });
       console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
     }
   }
@@ -1973,7 +2011,7 @@ const reminders = watchReminders({
 });
 
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal, RedBridge weekly-household; no common brackets) – read for the All-polls demographics facet, never pooled. The working columns (YouGov from Jun 2026, Newspoll pooled's quarterly rows, RedBridge's Oct 2025 aliases) join the common Full time / Part time / Retired groups on the chart views; YouGov's self-assessed class (Feb 2026 on) and children-at-home (Mar on), the Newspoll pooled waves' religion and Other-work-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end, joined by the one-off religion, financial-stress and occupation tables RedBridge/Accent's Oct 2025 report prints (dims[religion|stress|occupation]). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal, RedBridge weekly-household; no common brackets) – read for the All-polls demographics facet, never pooled. The working columns (YouGov from Jun 2026, Newspoll pooled's quarterly rows, RedBridge's Oct 2025 aliases) join the common Full time / Part time / Retired groups on the chart views; YouGov's self-assessed class (Feb 2026 on) and children-at-home (Mar on), the Newspoll pooled waves' religion and Other-work-status dims, and EMRS's Feb 2026 Tasmanian-electorate cut, ride dims[class|children|working|religion|electorate] to the same facet-only end, joined by the one-off religion, financial-stress and occupation tables RedBridge/Accent's Oct 2025 report prints (dims[religion|stress|occupation]). DemosAU (MRP)'s Oct–Nov 2025 summary also prints One Nation switch rates by recalled 2025 vote, location, age and education: onp2025[lnp|alp][location][age][education], each a percentage of that recalled-cohort cell rather than a distribution, so kept outside dims. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };

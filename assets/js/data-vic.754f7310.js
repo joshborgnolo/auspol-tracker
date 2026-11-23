@@ -3822,6 +3822,7 @@ window.AUSPOL = function () {
   const confDeep = null;
   const macro = null;
   const firmness = null;
+  const decidednessHistory = null;
   const onSources = null;
   const switchFlows = null;
   const leaderNow = {
@@ -4964,6 +4965,7 @@ window.AUSPOL = function () {
     confDeep,
     macro,
     firmness,
+    decidednessHistory,
     onSources,
     switchFlows,
     demographics,

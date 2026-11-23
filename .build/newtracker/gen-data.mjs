@@ -3977,7 +3977,12 @@ const UNDECIDED_BASES = [
   { id: "soft", label: "Soft", dash: "9 3 2 3",
     note: "named a party or a lean but are not solid – Resolve’s total-soft share, RedBridge’s soft plus very soft" },
 ];
-const undecidedRows = POLLS.flatMap((p) => [
+const decidedHistoryPolls = JUR ? [] : Object.entries(cyclePolls).flatMap(([term, rows]) => rows.map((p) => ({
+  ...p,
+  pollster: p.firm === "Resolve Strategic" ? "Resolve" : p.firm === "RedBridge Group" ? "RedBridge/Accent" : p.firm,
+  decidedTerm: +term,
+})));
+const undecidedRowsFor = (rows) => rows.flatMap((p) => [
   ...(undecidedOf(p) ? [{ p, u: undecidedOf(p) }] : []),
   ...(p.undecidedLeaner != null ? [{ p, u: { v: p.undecidedLeaner, basis: "leaner" } }] : []),
   ...(p.pollster === "Essential" && p.undecidedIn != null
@@ -3987,9 +3992,10 @@ const undecidedRows = POLLS.flatMap((p) => [
   /* RedBridge's non-solid share of its decided-plus-leaner vote intention.
      Spectre's two-way soft share also includes unresolved undecideds, so it
      stays out; this adds to the panel series, never the per-poll ledger. */
-  ...(p.pollster === "RedBridge/Accent" && p.firmness?.all?.length === 3
+  ...(p.pollster === "RedBridge/Accent" && Number.isFinite(p.firmness?.all?.[1]) && Number.isFinite(p.firmness?.all?.[2])
     ? [{ p, u: { v: p.firmness.all[1] + p.firmness.all[2], basis: "soft" } }] : []),
 ]).filter((r) => !noAggPoll(r.p));
+const undecidedRows = undecidedRowsFor(POLLS);
 const makeUndecidedSeries = (b, rows) => {
   const rs = rows || undecidedRows.filter((r) => r.u.basis === b.id);
   if (!rs.length) return null;
@@ -4035,6 +4041,39 @@ const makeUndecidedSeries = (b, rows) => {
 const undecidedSeries = UNDECIDED_BASES.map((b) => makeUndecidedSeries(b)).filter(Boolean);
 const softResolve = makeUndecidedSeries(UNDECIDED_BASES.find((b) => b.id === "soft"),
   undecidedRows.filter((r) => r.p.pollster === "Resolve" && r.u.basis === "soft"));
+const decidedHistoryGroups = (keep, mapWave) => {
+  const groups = new Map();
+  for (const p of decidedHistoryPolls) {
+    if (!keep(p)) continue;
+    if (!groups.has(p.decidedTerm)) groups.set(p.decidedTerm, []);
+    groups.get(p.decidedTerm).push(mapWave(p));
+  }
+  return [...groups.entries()].map(([year, waves]) => ({ year, waves: waves.sort((a, b) => a.x - b.x) })).sort((a, b) => a.year - b.year);
+};
+const decidedSoftHistory = (() => {
+  const groups = new Map();
+  for (const { p, u } of undecidedRowsFor(decidedHistoryPolls).filter((r) => r.u.basis === "soft")) {
+    const point = {
+      x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
+      dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+      sample: p.sample ?? null, ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
+      v: u.v, basis: "soft",
+    };
+    if (!groups.has(p.decidedTerm)) groups.set(p.decidedTerm, []);
+    groups.get(p.decidedTerm).push(point);
+  }
+  const terms = [];
+  for (const [year, polls] of groups) {
+    polls.sort((a, b) => a.x - b.x);
+    const monthly = [...new Set(polls.map((p) => p.ym))].sort().map((ym) => {
+      const at = polls.filter((p) => p.ym === ym);
+      const sw = at.reduce((s, p) => s + rowN(p), 0);
+      return { ym, x: mx(ym), v: r1(at.reduce((s, p) => s + rowN(p) * p.v, 0) / sw), k: at.length };
+    });
+    terms.push({ year, polls, monthly, houses: [...new Set(polls.map((p) => p.pollster))] });
+  }
+  return { terms: terms.sort((a, b) => a.year - b.year) };
+})();
 /* Resolve's "not firm" share by age band (polls.json `softAge`), for the
    Undecided panel's By age view: every wave, the pooled current figure (its
    last SOFT_AGE_POOL waves) and the same pool over the term's first waves,
@@ -4044,12 +4083,14 @@ const softResolve = makeUndecidedSeries(UNDECIDED_BASES.find((b) => b.id === "so
    37.1% of those 18 and over) – the weighting Resolve's sample is drawn to.
    The 95% margin is binomial on the pooled base. */
 const SOFT_AGE_POOL = 3;
-const softAgeWaves = POLLS.filter((p) => p.softAge).sort((a, b) => (a.date < b.date ? -1 : 1)).map((p) => ({
+const softAgeWaveOf = (p) => ({
   x: dx(p.date), ym: ymOf(p.date), released: p.date, dateLabel: fwLabel(p.dateStart, p.date),
   pollster: p.pollster, sample: p.sample ?? null,
   soft: { ...p.softAge },
   n: Object.fromEntries(Object.keys(AGE_SHARE).map((k) => [k, Math.round(rowN(p) / HL_DEFF * AGE_SHARE[k])])),
-}));
+});
+const softAgeWaves = POLLS.filter((p) => p.softAge).sort((a, b) => (a.date < b.date ? -1 : 1)).map(softAgeWaveOf);
+const decidedAgeHistory = decidedHistoryGroups((p) => p.softAge, softAgeWaveOf);
 const softAgePooled = (ws) => Object.fromEntries(Object.keys(AGE_SHARE).map((k) => {
   let sn = 0, snv = 0;
   for (const w of ws) { sn += w.n[k]; snv += w.n[k] * w.soft[k]; }
@@ -4154,18 +4195,30 @@ const FIRM_POOL = 3;
 const FIRM_PARTIES = ["alp", "lnp", "onp", "grn", "oth"];
 const firmRows = POLLS.filter((p) => p.pollster === "RedBridge/Accent" && p.firmness).sort((a, b) => (a.date < b.date ? -1 : 1));
 const firmShare = (p, k) => (k === "oth" ? (p.ind ?? 0) + (p.oth ?? 0) : p[k]);
-const firmWaves = firmRows.map((p) => {
+const firmWaveOf = (p) => {
   const eff = rowN(p) / HL_DEFF;
+  const solid = {}, n = {};
+  for (const k of ["all", ...FIRM_PARTIES]) {
+    const v = p.firmness[k]?.[0];
+    const share = k === "all" ? 100 : firmShare(p, k);
+    if (!Number.isFinite(v) || !Number.isFinite(share) || share <= 0) continue;
+    solid[k] = v;
+    n[k] = Math.round(eff * share / 100);
+  }
   return {
     x: dx(p.date), ym: ymOf(p.date), released: p.date, dateLabel: fwLabel(p.dateStart, p.date),
-    pollster: p.pollster, sample: p.sample ?? null,
-    solid: Object.fromEntries(["all", ...FIRM_PARTIES].map((k) => [k, p.firmness[k][0]])),
-    n: Object.fromEntries([["all", Math.round(eff)], ...FIRM_PARTIES.map((k) => [k, Math.round(eff * firmShare(p, k) / 100)])]),
+    pollster: p.pollster, sample: p.sample ?? null, solid, n,
+    ...(p.firmnessNote ? { methodNote: p.firmnessNote } : {}),
+    ...(p.decidedTerm && (p.firmnessSource || p.releaseUrl) ? { source: p.firmnessSource || p.releaseUrl } : {}),
   };
-});
+};
+const firmWaves = firmRows.map(firmWaveOf);
 const firmPooled = (ws) => Object.fromEntries(["all", ...FIRM_PARTIES].map((k) => {
   let sn = 0, snv = 0;
-  for (const w of ws) { sn += w.n[k]; snv += w.n[k] * w.solid[k]; }
+  for (const w of ws) {
+    if (!Number.isFinite(w.solid[k]) || !(w.n[k] > 0)) continue;
+    sn += w.n[k]; snv += w.n[k] * w.solid[k];
+  }
   // a pool where no pooled wave filed the cohort's base (a wave can carry no
   // ind/oth at all, and "oth" derives from them) divides by zero - stay
   // absent (the usual null-for-no-figure contract) instead of printing NaN
@@ -4184,6 +4237,12 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
     base: { from: firmWaves[0].dateLabel, to: firmWaves[FIRM_POOL - 1].dateLabel, ...firmPooled(firmWaves.slice(0, FIRM_POOL)) },
   };
 })() : null;
+const decidedFirmHistory = decidedHistoryGroups((p) => p.pollster === "RedBridge/Accent" && p.firmness, firmWaveOf);
+const decidednessHistory = JUR ? null : {
+  soft: decidedSoftHistory,
+  softAge: { pool: SOFT_AGE_POOL, terms: decidedAgeHistory },
+  firmness: { pool: FIRM_POOL, terms: decidedFirmHistory },
+};
 
 /* ---- 5j. economic sentiment – business and consumer confidence ---------
    Four published sentiment gauges on one plot (data/confidence.json, built
@@ -4796,6 +4855,7 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   // joins no common group) still carries its raw cuts to the facet
   if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
     { r: w.read, v, d, n, ...(reuse ? { x: "reuse" } : {}), ...(ar.length ? { ar } : {}), ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => (tot[k] == null ? null : r1(tot[k]))) } : {}),
+      ...(w.onp2025 ? { onp2025: w.onp2025 } : {}),
       ...(pp ? { sp: pp.map((q) => ({ x: mx(ymOf(q.date)) + (dayOf(q.date) - 15) / 365, ym: ymOf(q.date), k: rowN(q) / rowN(p), l: fwLabel(q.dateStart, q.date) })) } : {}) });
 }
 /* Solo single-territory readings for the ACT/NT/Tas group. Displayed on the
@@ -10966,6 +11026,10 @@ window.AUSPOL = (function () {
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
      the share of each party's voters certain of their vote. */
   const firmness = ${JSON.stringify(firmness)};
+  /* The completed terms' decidedness readings: national soft share, Resolve
+     age bands and RedBridge party cohorts, kept outside the current-term
+     pools above. */
+  const decidednessHistory = ${JSON.stringify(decidednessHistory)};
   /* Where One Nation's gains came from (§5b): per wave, each 2025-vote
      group's part of what One Nation drew from outside its own 2025 vote,
      from DemosAU's and YouGov's vote-switching tables. */
@@ -11199,7 +11263,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

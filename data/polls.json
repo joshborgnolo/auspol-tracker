@@ -43138,7 +43138,13 @@
         "onp": 6,
         "oth": 11,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 21,
+        "softAge": {
+          "18-34": 26,
+          "35-54": 23,
+          "55+": 16
+        }
       },
       {
         "date": "2021-04-24",
@@ -43193,7 +43199,13 @@
         "onp": 2,
         "oth": 13,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 25,
+        "softAge": {
+          "18-34": 29,
+          "35-54": 31,
+          "55+": 17
+        }
       },
       {
         "date": "2021-05-24",
@@ -43248,7 +43260,13 @@
         "onp": 3,
         "oth": 12,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 28,
+        "softAge": {
+          "18-34": 39,
+          "35-54": 29,
+          "55+": 17
+        }
       },
       {
         "date": "2021-06-20",
@@ -43314,7 +43332,13 @@
         "onp": 4,
         "oth": 12,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 27,
+        "softAge": {
+          "18-34": 32,
+          "35-54": 35,
+          "55+": 15
+        }
       },
       {
         "date": "2021-07-18",
@@ -43402,7 +43426,13 @@
         "onp": 2,
         "oth": 14,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 27,
+        "softAge": {
+          "18-34": 36,
+          "35-54": 30,
+          "55+": 17
+        }
       },
       {
         "date": "2021-08-28",
@@ -43479,7 +43509,13 @@
         "onp": 4,
         "oth": 16,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 28,
+        "softAge": {
+          "18-34": 36,
+          "35-54": 32,
+          "55+": 18
+        }
       },
       {
         "date": "2021-09-26",
@@ -43567,7 +43603,13 @@
         "onp": 3,
         "oth": 14,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 32,
+        "softAge": {
+          "18-34": 39,
+          "35-54": 39,
+          "55+": 20
+        }
       },
       {
         "date": "2021-10-24",
@@ -43622,7 +43664,13 @@
         "onp": 3,
         "oth": 14,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 26,
+        "softAge": {
+          "18-34": 34,
+          "35-54": 30,
+          "55+": 16
+        }
       },
       {
         "date": "2021-11-21",
@@ -43710,7 +43758,13 @@
         "onp": 3,
         "oth": 17,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 27,
+        "softAge": {
+          "18-34": 35,
+          "35-54": 33,
+          "55+": 14
+        }
       },
       {
         "date": "2022-01-16",
@@ -43809,7 +43863,13 @@
         "onp": 3,
         "oth": 19,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 22,
+        "softAge": {
+          "18-34": 25,
+          "35-54": 24,
+          "55+": 17
+        }
       },
       {
         "date": "2022-02-23",
@@ -43963,7 +44023,13 @@
         "onp": 2,
         "oth": 15,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 21,
+        "softAge": {
+          "18-34": 21,
+          "35-54": 27,
+          "55+": 17
+        }
       },
       {
         "date": "2022-04-09",
@@ -43996,7 +44062,13 @@
         "onp": 4,
         "oth": 17,
         "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_alp": null,
+        "soft": 27,
+        "softAge": {
+          "18-34": 35,
+          "35-54": 33,
+          "55+": 16
+        }
       },
       {
         "date": "2022-04-17",
@@ -44073,7 +44145,13 @@
         "onp": 5,
         "oth": 13,
         "tpp_lnp": 46,
-        "tpp_alp": 54
+        "tpp_alp": 54,
+        "soft": 24,
+        "softAge": {
+          "18-34": 28,
+          "35-54": 29,
+          "55+": 17
+        }
       },
       {
         "date": "2022-04-30",
@@ -44183,7 +44261,13 @@
         "onp": 5.8,
         "oth": 14.9,
         "tpp_lnp": 48.8,
-        "tpp_alp": 51.2
+        "tpp_alp": 51.2,
+        "soft": 14,
+        "softAge": {
+          "18-34": 19,
+          "35-54": 17,
+          "55+": 8
+        }
       },
       {
         "date": "2022-05-18",
@@ -44306,7 +44390,13 @@
         "onp": 5,
         "oth": 13,
         "tpp_lnp": 39,
-        "tpp_alp": 61
+        "tpp_alp": 61,
+        "soft": 20,
+        "softAge": {
+          "18-34": 24,
+          "35-54": 22,
+          "55+": 15
+        }
       },
       {
         "date": "2022-09-01",
@@ -44339,7 +44429,13 @@
         "onp": 6,
         "oth": 13,
         "tpp_lnp": 43.5,
-        "tpp_alp": 56.5
+        "tpp_alp": 56.5,
+        "soft": 27,
+        "softAge": {
+          "18-34": 32,
+          "35-54": 31,
+          "55+": 19
+        }
       },
       {
         "date": "2022-09-22",
@@ -44372,7 +44468,13 @@
         "onp": 5,
         "oth": 14,
         "tpp_lnp": 41.5,
-        "tpp_alp": 58.5
+        "tpp_alp": 58.5,
+        "soft": 24,
+        "softAge": {
+          "18-34": 31,
+          "35-54": 27,
+          "55+": 16
+        }
       },
       {
         "date": "2022-10-13",
@@ -44405,7 +44507,13 @@
         "onp": 4,
         "oth": 12,
         "tpp_lnp": 42,
-        "tpp_alp": 58
+        "tpp_alp": 58,
+        "soft": 21,
+        "softAge": {
+          "18-34": 23,
+          "35-54": 27,
+          "55+": 14
+        }
       },
       {
         "date": "2022-10-30",
@@ -44493,7 +44601,13 @@
         "onp": 4,
         "oth": 10,
         "tpp_lnp": 40,
-        "tpp_alp": 60
+        "tpp_alp": 60,
+        "soft": 24,
+        "softAge": {
+          "18-34": 28,
+          "35-54": 29,
+          "55+": 15
+        }
       },
       {
         "date": "2022-12-11",
@@ -44548,7 +44662,13 @@
         "onp": 6,
         "oth": 13,
         "tpp_lnp": 40,
-        "tpp_alp": 60
+        "tpp_alp": 60,
+        "soft": 26,
+        "softAge": {
+          "18-34": 27,
+          "35-54": 34,
+          "55+": 19
+        }
       },
       {
         "date": "2023-01-22",
@@ -44614,7 +44734,13 @@
         "onp": 5,
         "oth": 12,
         "tpp_lnp": 42,
-        "tpp_alp": 58
+        "tpp_alp": 58,
+        "soft": 27,
+        "softAge": {
+          "18-34": 33,
+          "35-54": 32,
+          "55+": 19
+        }
       },
       {
         "date": "2023-02-19",
@@ -44680,7 +44806,13 @@
         "onp": 5,
         "oth": 12,
         "tpp_lnp": 40,
-        "tpp_alp": 60
+        "tpp_alp": 60,
+        "soft": 24,
+        "softAge": {
+          "18-34": 32,
+          "35-54": 27,
+          "55+": 16
+        }
       },
       {
         "date": "2023-03-16",
@@ -44779,7 +44911,13 @@
         "onp": 6,
         "oth": 12,
         "tpp_lnp": 38.5,
-        "tpp_alp": 61.5
+        "tpp_alp": 61.5,
+        "soft": 22,
+        "softAge": {
+          "18-34": 26,
+          "35-54": 29,
+          "55+": 14
+        }
       },
       {
         "date": "2023-04-16",
@@ -44867,7 +45005,13 @@
         "onp": 5,
         "oth": 10,
         "tpp_lnp": 39,
-        "tpp_alp": 61
+        "tpp_alp": 61,
+        "soft": 26,
+        "softAge": {
+          "18-34": 32,
+          "35-54": 30,
+          "55+": 18
+        }
       },
       {
         "date": "2023-05-14",
@@ -44944,7 +45088,13 @@
         "onp": 6,
         "oth": 12,
         "tpp_lnp": 40,
-        "tpp_alp": 60
+        "tpp_alp": 60,
+        "soft": 26,
+        "softAge": {
+          "18-34": 33,
+          "35-54": 28,
+          "55+": 19
+        }
       },
       {
         "date": "2023-06-11",
@@ -45043,7 +45193,13 @@
         "onp": 6,
         "oth": 12,
         "tpp_lnp": 41,
-        "tpp_alp": 59
+        "tpp_alp": 59,
+        "soft": 28,
+        "softAge": {
+          "18-34": 35,
+          "35-54": 35,
+          "55+": 17
+        }
       },
       {
         "date": "2023-07-20",
@@ -45098,7 +45254,13 @@
         "onp": 5,
         "oth": 14,
         "tpp_lnp": 44,
-        "tpp_alp": 56
+        "tpp_alp": 56,
+        "soft": 26,
+        "softAge": {
+          "18-34": 35,
+          "35-54": 30,
+          "55+": 17
+        }
       },
       {
         "date": "2023-08-14",
@@ -45197,7 +45359,13 @@
         "onp": 5,
         "oth": 13,
         "tpp_lnp": 44.5,
-        "tpp_alp": 55.5
+        "tpp_alp": 55.5,
+        "soft": 22,
+        "softAge": {
+          "18-34": 27,
+          "35-54": 27,
+          "55+": 14
+        }
       },
       {
         "date": "2023-09-10",
@@ -45296,7 +45464,13 @@
         "onp": 7,
         "oth": 13,
         "tpp_lnp": 43,
-        "tpp_alp": 57
+        "tpp_alp": 57,
+        "soft": 21,
+        "softAge": {
+          "18-34": 28,
+          "35-54": 24,
+          "55+": 13
+        }
       },
       {
         "date": "2023-10-06",
@@ -45417,7 +45591,13 @@
         "onp": 7,
         "oth": 15,
         "tpp_lnp": 43,
-        "tpp_alp": 57
+        "tpp_alp": 57,
+        "soft": 28,
+        "softAge": {
+          "18-34": 34,
+          "35-54": 35,
+          "55+": 17
+        }
       },
       {
         "date": "2023-11-12",
@@ -45516,7 +45696,13 @@
         "onp": 5,
         "oth": 13,
         "tpp_lnp": 45,
-        "tpp_alp": 55
+        "tpp_alp": 55,
+        "soft": 24,
+        "softAge": {
+          "18-34": 28,
+          "35-54": 30,
+          "55+": 16
+        }
       },
       {
         "date": "2023-12-05",
@@ -45780,7 +45966,13 @@
         "onp": 6,
         "oth": 12,
         "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_alp": 52,
+        "soft": 25,
+        "softAge": {
+          "18-34": 31,
+          "35-54": 32,
+          "55+": 14
+        }
       },
       {
         "date": "2024-02-25",
@@ -45912,7 +46104,13 @@
         "onp": 5,
         "oth": 13,
         "tpp_lnp": 47,
-        "tpp_alp": 53
+        "tpp_alp": 53,
+        "soft": 28,
+        "softAge": {
+          "18-34": 36,
+          "35-54": 32,
+          "55+": 19
+        }
       },
       {
         "date": "2024-03-27",
@@ -46011,7 +46209,39 @@
         "onp": 7,
         "oth": 11,
         "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_alp": 52,
+        "dateStart": "2024-04-12",
+        "sample": 1529,
+        "sampleEff": 1270,
+        "firmness": {
+          "alp": [
+            64,
+            33,
+            null
+          ],
+          "lnp": [
+            72,
+            25,
+            null
+          ],
+          "onp": [
+            63,
+            35,
+            null
+          ],
+          "grn": [
+            57,
+            39,
+            4
+          ],
+          "oth": [
+            51,
+            43,
+            null
+          ]
+        },
+        "releaseUrl": "https://redbridgegroup.com.au/wp-content/uploads/2024/04/RedBridge-political-report-Apr-2024.pdf",
+        "firmnessNote": "Figure 2: not at all / somewhat / very likely to change vote. No all-voters row; blank third-category labels stay absent."
       },
       {
         "date": "2024-04-21",
@@ -46033,7 +46263,13 @@
         "onp": 5,
         "oth": 16,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 36,
+        "softAge": {
+          "18-34": 50,
+          "35-54": 40,
+          "55+": 22
+        }
       },
       {
         "date": "2024-04-23",
@@ -46132,7 +46368,13 @@
         "onp": 7,
         "oth": 16,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 36,
+        "softAge": {
+          "18-34": 48,
+          "35-54": 40,
+          "55+": 24
+        }
       },
       {
         "date": "2024-05-19",
@@ -46231,7 +46473,13 @@
         "onp": 6,
         "oth": 16,
         "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_alp": 51,
+        "soft": 36,
+        "softAge": {
+          "18-34": 51,
+          "35-54": 38,
+          "55+": 22
+        }
       },
       {
         "date": "2024-06-16",
@@ -46330,7 +46578,13 @@
         "onp": 6,
         "oth": 14,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 36,
+        "softAge": {
+          "18-34": 49,
+          "35-54": 41,
+          "55+": 22
+        }
       },
       {
         "date": "2024-07-14",
@@ -46374,7 +46628,34 @@
         "onp": null,
         "oth": 16,
         "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_alp": 48.5,
+        "dateStart": "2024-07-10",
+        "sample": 1505,
+        "sampleEff": 1082,
+        "firmness": {
+          "alp": [
+            47,
+            39,
+            14
+          ],
+          "lnp": [
+            58,
+            31,
+            11
+          ],
+          "grn": [
+            42,
+            49,
+            null
+          ],
+          "oth": [
+            45,
+            41,
+            14
+          ]
+        },
+        "releaseUrl": "https://redbridgegroup.com.au/wp-content/uploads/2024/07/RedBridge-July-public-opinion-snapshot.pdf",
+        "firmnessNote": "Figure 3: Solid / Soft / Leaning. No all-voters or separate One Nation row; an unreadable third-category label stays absent."
       },
       {
         "date": "2024-07-19",
@@ -46473,7 +46754,13 @@
         "onp": 6,
         "oth": 15,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 36,
+        "softAge": {
+          "18-34": 49,
+          "35-54": 39,
+          "55+": 23
+        }
       },
       {
         "date": "2024-08-11",
@@ -46594,7 +46881,13 @@
         "onp": 6,
         "oth": 16,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 35,
+        "softAge": {
+          "18-34": 44,
+          "35-54": 39,
+          "55+": 25
+        }
       },
       {
         "date": "2024-09-07",
@@ -46704,7 +46997,13 @@
         "onp": 5,
         "oth": 15,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 36,
+        "softAge": {
+          "18-34": 45,
+          "35-54": 41,
+          "55+": 24
+        }
       },
       {
         "date": "2024-10-06",
@@ -46858,7 +47157,13 @@
         "onp": 5,
         "oth": 15,
         "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_alp": 49,
+        "soft": 39,
+        "softAge": {
+          "18-34": 56,
+          "35-54": 42,
+          "55+": 25
+        }
       },
       {
         "date": "2024-11-13",
@@ -46869,7 +47174,34 @@
         "onp": null,
         "oth": 16,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "dateStart": "2024-11-06",
+        "sample": 2011,
+        "sampleEff": 1538,
+        "firmness": {
+          "alp": [
+            44,
+            46,
+            10
+          ],
+          "lnp": [
+            62,
+            31,
+            7
+          ],
+          "grn": [
+            42,
+            52,
+            6
+          ],
+          "oth": [
+            43,
+            41,
+            16
+          ]
+        },
+        "releaseUrl": "https://redbridgegroup.com.au/wp-content/uploads/2024/11/RedBridge-November-public-opinion-snapshot.pdf",
+        "firmnessNote": "Figure 2: Solid / Soft / Leaning. No all-voters or separate One Nation row; One Nation is inside Other on this row's primary basis."
       },
       {
         "date": "2024-11-17",
@@ -47001,7 +47333,13 @@
         "onp": 7,
         "oth": 16,
         "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_alp": 49,
+        "soft": 38,
+        "softAge": {
+          "18-34": 52,
+          "35-54": 44,
+          "55+": 24
+        }
       },
       {
         "date": "2024-12-15",
@@ -47111,7 +47449,13 @@
         "onp": 7,
         "oth": 16,
         "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_alp": 48,
+        "soft": 34,
+        "softAge": {
+          "18-34": 41,
+          "35-54": 40,
+          "55+": 24
+        }
       },
       {
         "date": "2025-01-24",
@@ -47174,10 +47518,46 @@
         "lnp": 40,
         "alp": 31,
         "grn": 11,
-        "onp": null,
-        "oth": 18,
+        "onp": 7,
+        "oth": 11,
         "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_alp": 48.5,
+        "firmness": {
+          "all": [
+            53,
+            38,
+            9
+          ],
+          "alp": [
+            51,
+            39,
+            10
+          ],
+          "lnp": [
+            61,
+            34,
+            5
+          ],
+          "onp": [
+            45,
+            39,
+            16
+          ],
+          "grn": [
+            50,
+            39,
+            11
+          ],
+          "oth": [
+            35,
+            51,
+            14
+          ]
+        },
+        "firmnessSource": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf",
+        "firmnessNote": "RedBridge/Accent's retrospective AFR-series vote-softness table; this is the later print, not an inferred original-release figure.",
+        "dateStart": "2025-02-03",
+        "sample": 1013
       },
       {
         "date": "2025-02-09",
@@ -47265,7 +47645,13 @@
         "onp": 9,
         "oth": 13,
         "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_alp": 45,
+        "soft": 39,
+        "softAge": {
+          "18-34": 56,
+          "35-54": 43,
+          "55+": 22
+        }
       },
       {
         "date": "2025-02-23",
@@ -47361,10 +47747,46 @@
         "lnp": 37,
         "alp": 32,
         "grn": 12,
-        "onp": null,
-        "oth": 19,
+        "onp": 7,
+        "oth": 12,
         "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_alp": 51,
+        "firmness": {
+          "all": [
+            55,
+            37,
+            8
+          ],
+          "alp": [
+            51,
+            41,
+            8
+          ],
+          "lnp": [
+            65,
+            29,
+            6
+          ],
+          "onp": [
+            48,
+            40,
+            12
+          ],
+          "grn": [
+            45,
+            48,
+            7
+          ],
+          "oth": [
+            43,
+            42,
+            15
+          ]
+        },
+        "firmnessSource": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf",
+        "firmnessNote": "RedBridge/Accent's retrospective AFR-series vote-softness table; this is the later print, not an inferred original-release figure.",
+        "dateStart": "2025-03-03",
+        "sample": 2007
       },
       {
         "date": "2025-03-13",
@@ -47496,7 +47918,13 @@
         "onp": 7,
         "oth": 14,
         "tpp_lnp": 50,
-        "tpp_alp": 50
+        "tpp_alp": 50,
+        "soft": 32,
+        "softAge": {
+          "18-34": 39,
+          "35-54": 37,
+          "55+": 22
+        }
       },
       {
         "date": "2025-03-30",
@@ -47595,7 +48023,13 @@
         "onp": 6,
         "oth": 17,
         "tpp_lnp": 46.5,
-        "tpp_alp": 53.5
+        "tpp_alp": 53.5,
+        "soft": 30,
+        "softAge": {
+          "18-34": 36,
+          "35-54": 40,
+          "55+": 19
+        }
       },
       {
         "date": "2025-04-14",
@@ -47727,7 +48161,13 @@
         "onp": 7,
         "oth": 13,
         "tpp_lnp": 47,
-        "tpp_alp": 53
+        "tpp_alp": 53,
+        "soft": 19,
+        "softAge": {
+          "18-34": 26,
+          "35-54": 23,
+          "55+": 11
+        }
       },
       {
         "date": "2025-04-28",
@@ -47749,7 +48189,45 @@
         "onp": 8,
         "oth": 12,
         "tpp_lnp": 47,
-        "tpp_alp": 53
+        "tpp_alp": 53,
+        "firmness": {
+          "all": [
+            68,
+            26,
+            6
+          ],
+          "alp": [
+            69,
+            25,
+            6
+          ],
+          "lnp": [
+            74,
+            21,
+            5
+          ],
+          "onp": [
+            67,
+            29,
+            4
+          ],
+          "grn": [
+            63,
+            32,
+            5
+          ],
+          "oth": [
+            53,
+            34,
+            13
+          ]
+        },
+        "firmnessSource": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_ab6caba0abb44d15a1268fde42f282d5.pdf",
+        "firmnessNote": "RedBridge/Accent's retrospective AFR-series vote-softness table; this is the later print, not an inferred original-release figure.",
+        "dateStart": "2025-04-24",
+        "sample": 1011,
+        "sampleEff": 801,
+        "releaseUrl": "https://www.accent-research.com/projects/federal-election-campaign-final-week"
       },
       {
         "date": "2025-04-29",

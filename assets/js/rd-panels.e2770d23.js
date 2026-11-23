@@ -8963,7 +8963,8 @@ function RdUndecided({
   }, []);
   if (!U || !U.series.length) return null;
   const F = D.firmness,
-    A = U.softAge;
+    A = U.softAge,
+    DH = D.decidednessHistory;
   const byId = {};
   U.series.forEach(s => {
     byId[s.id] = s;
@@ -8975,10 +8976,11 @@ function RdUndecided({
   const softResolve = U.softResolve;
   const nowOf = s => s ? s.now ? s.now.v : s.latest.v : null;
   const H = U.history && U.history.terms && U.history.terms.length ? U.history : null;
-  const histOn = !!(H && winU && nowXU != null);
+  const histOn = !!((H || DH) && winU && nowXU != null);
   const hx = ym => D.mx(ym);
+  const historyXU = (H ? H.terms.flatMap(t => Object.values(t.series).flatMap(sr => sr.months.map(m => hx(m[0])))) : []).concat(DH ? DH.soft.terms.flatMap(t => t.monthly.map(m => m.x)) : []);
   const extU = histOn ? {
-    lo: Math.min(...H.terms.flatMap(t => Object.values(t.series).flatMap(sr => sr.months.map(m => hx(m[0]))))) - 0.3,
+    lo: Math.min(nowXU, ...historyXU) - 0.3,
     hi: nowXU
   } : null;
   const vTermsU = histOn ? confViewTerms(TERMS_U, extU.lo, extU.hi) : null;
@@ -8995,7 +8997,7 @@ function RdUndecided({
   const xDomain = histOn ? [winC.a, winC.b] : rangeDomain(rangeId);
   const atNowU = !histOn || winC.b >= nowXU - 1 / 24;
   const inWinU = x => x >= xDomain[0] - 0.02 && x <= xDomain[1] + 0.02;
-  const histLines = basis => !histOn ? [] : H.terms.map(t => {
+  const histLines = basis => !histOn || !H ? [] : H.terms.map(t => {
     const sr = t.series[basis];
     if (!sr) return null;
     const pts = sr.months.map(m => ({
@@ -9014,7 +9016,13 @@ function RdUndecided({
       zero: sr.zero
     } : null;
   }).filter(Boolean);
-  const histDots = basis => !histOn ? [] : H.polls.filter(q => q.basis === basis && inWinU(q.x));
+  const histDots = basis => !histOn || !H ? [] : H.polls.filter(q => q.basis === basis && inWinU(q.x));
+  const histSoftLines = () => !histOn || !DH ? [] : DH.soft.terms.map(t => ({
+    year: t.year,
+    houses: t.houses,
+    pts: t.monthly.filter(q => inWinU(q.x))
+  })).filter(h => h.pts.length >= 2);
+  const histSoftDots = () => !histOn || !DH ? [] : DH.soft.terms.flatMap(t => t.polls).filter(q => inWinU(q.x));
   const base = (D.aggPrimary || []).find(d => d.election) || null;
   const slopeOf = s => s ? withinHouseSlope(s.polls.map(d => ({
     h: d.pollster,
@@ -9066,10 +9074,20 @@ function RdUndecided({
     })).filter(d => d.pts.length >= 2);
     const like = basis => list.find(s => s.id === basis) || {
       id: basis,
-      label: basis === "first" ? "First preference" : "After leaner",
+      label: basis === "first" ? "First preference" : basis === "soft" ? "Soft" : "After leaner",
       dashed: basis === "leaner"
     };
-    const drawnPast = key !== "und" ? [] : ["first", "leaner"].flatMap(b => histLines(b).map(h => ({
+    const drawnPast = key === "soft" ? histSoftLines().map(h => ({
+      s: {
+        ...like("soft"),
+        id: "soft-" + h.year,
+        basisId: "soft",
+        houses: h.houses
+      },
+      pts: h.pts,
+      dots: [],
+      past: h
+    })) : key !== "und" ? [] : ["first", "leaner"].flatMap(b => histLines(b).map(h => ({
       s: {
         ...like(b),
         id: h.id,
@@ -9082,7 +9100,13 @@ function RdUndecided({
     })));
     const drawn = drawnNow.concat(drawnPast);
     if (!drawn.length) return null;
-    const pastDots = key !== "und" ? [] : ["first", "leaner"].flatMap(b => histDots(b).map(q => ({
+    const pastDots = key === "soft" ? histSoftDots().map(q => ({
+      x: q.x,
+      y: q.v,
+      color: COLb("soft"),
+      label: like("soft").label,
+      meta: q
+    })) : key !== "und" ? [] : ["first", "leaner"].flatMap(b => histDots(b).map(q => ({
       x: q.x,
       y: q.v,
       color: COLb(b),
@@ -9218,6 +9242,28 @@ function RdUndecided({
     const anySig = bits.some(b => b.sig);
     return (anySig ? "Changes on the previous period: " : "None of the " + rdNumWord(bits.length) + " has changed significantly on the previous period: ") + bits.map(b => b.nm + " " + (b.c == null ? "n/a" : Math.abs(b.c) < 0.05 ? "unchanged" : (b.c > 0 ? "+" : "−") + Math.abs(b.c).toFixed(1))).join(", ") + ". ± is the 95% margin.";
   })();
+  const poolValues = (waves, keys, pool, cell) => waves.map((w, i) => {
+    const ws = waves.slice(Math.max(0, i - pool + 1), i + 1),
+      r = {
+        x: w.x,
+        dateLabel: w.dateLabel
+      };
+    for (const k of keys) {
+      let sn = 0,
+        snv = 0;
+      for (const q of ws) {
+        const {
+          v,
+          n
+        } = cell(q, k);
+        if (!Number.isFinite(v) || !(n > 0)) continue;
+        sn += n;
+        snv += n * v;
+      }
+      if (sn) r[k] = snv / sn;
+    }
+    return r;
+  });
   const partyView = F && (() => {
     const ids = ["onp", "alp", "lnp", "grn", "oth"].filter(k => F.now[k] && F.base[k]).sort((a, b) => F.now[b].v - F.now[a].v);
     const apart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
@@ -9241,34 +9287,37 @@ function RdUndecided({
     const onpRow = rows.find(r => r.id === "onp");
     const onpTail = onpRow && onpRow.sig && biggest && biggest.id !== "onp" ? ", while One Nation voters have " + (onpRow.now < onpRow.base ? "softened" : "hardened") : "";
     const sub = biggest ? (biggest.id === "oth" ? "Minor-party voters" : biggest.label + " voters") + " " + (biggest.now < biggest.base ? "have softened" : "have firmed") + " since July 2025" + onpTail : "No party’s voters have softened significantly since July 2025";
-    const rolled = F.waves.map((w, i) => {
-      const ws = F.waves.slice(Math.max(0, i - F.pool + 1), i + 1);
-      const r = {
-        x: w.x,
-        dateLabel: w.dateLabel
-      };
-      for (const k of ids.concat(["all"])) {
-        const n = ws.reduce((a, v) => a + v.n[k], 0);
-        r[k] = ws.reduce((a, v) => a + v.n[k] * v.solid[k], 0) / n;
-      }
-      return r;
-    });
     const inX = w => w.x >= xDomain[0] && w.x <= xDomain[1];
-    const waves = F.waves.filter(inX),
-      lines = rolled.filter(inX);
-    const smVals = waves.flatMap(w => ids.map(k => w.solid[k]));
+    const roll = ws => poolValues(ws, ids.concat(["all"]), F.pool, (w, k) => ({
+      v: w.solid[k],
+      n: w.n[k]
+    }));
+    const oldTerms = DH ? DH.firmness.terms : [];
+    const oldSegments = oldTerms.map(t => ({
+      year: t.year,
+      points: roll(t.waves).filter(inX)
+    })).filter(t => t.points.length);
+    const segments = oldSegments.concat({
+      year: "current",
+      points: roll(F.waves).filter(inX)
+    }).filter(t => t.points.length);
+    const waves = oldTerms.flatMap(t => t.waves).concat(F.waves).filter(inX);
+    const lines = segments.flatMap(t => t.points);
+    const smVals = waves.flatMap(w => ids.map(k => w.solid[k])).filter(Number.isFinite);
+    if (!waves.length || !lines.length) return null;
     const sLo = Math.floor((Math.min(...smVals) - 2) / 20) * 20,
       sHi = Math.ceil((Math.max(...smVals) + 2) / 20) * 20;
-    const monthOf = lab => lab;
+    const historyNote = waves.some(w => w.methodNote) ? " Earlier reports print only the cohorts shown; no unprinted cohort or category has been reconstructed." : "";
     return {
       rows,
       lo,
       hi,
-      note,
+      note: note + historyNote,
       sub,
       ids,
       waves,
       lines,
+      segments,
       sLo,
       sHi
     };
@@ -9314,19 +9363,31 @@ function RdUndecided({
       firmest = byLoose[byLoose.length - 1];
     const leastApart = byLoose.slice(1).every(r => apart(A.now[least.id], A.now[r.id]));
     const sub = leastApart ? rdCap(AGE_WHO[least.id]) + " are the least firm" : apart(A.now[least.id], A.now[firmest.id]) ? rdCap(AGE_WHO[least.id]) + " are less firm than " + AGE_WHO[firmest.id] : "No age group is clearly less firm than the others";
-    const rolled = A.waves.map((w, i) => {
-      const ws = A.waves.slice(Math.max(0, i - A.pool + 1), i + 1);
-      const r = {
-        x: w.x,
-        dateLabel: w.dateLabel
-      };
-      for (const b of B) {
-        const n = ws.reduce((a, v) => a + v.n[b.id], 0);
-        r[b.id] = ws.reduce((a, v) => a + v.n[b.id] * v.soft[b.id], 0) / n;
-      }
-      return r;
-    });
     const inX = w => w.x >= xDomain[0] && w.x <= xDomain[1];
+    const roll = ws => poolValues(ws, B.map(b => b.id), A.pool, (w, k) => ({
+      v: w.soft[k],
+      n: w.n[k]
+    }));
+    const oldTerms = DH ? DH.softAge.terms : [];
+    const oldSegments = oldTerms.map(t => ({
+      year: t.year,
+      points: roll(t.waves).filter(inX)
+    })).filter(t => t.points.length);
+    const segments = oldSegments.concat({
+      year: "current",
+      points: roll(A.waves).filter(inX)
+    }).filter(t => t.points.length);
+    const waves = oldTerms.flatMap(t => t.waves).concat(A.waves).filter(inX);
+    const lines = segments.flatMap(t => t.points);
+    if (!waves.length || !lines.length) return null;
+    const nationalSegments = (DH ? DH.soft.terms.map(t => ({
+      year: t.year,
+      points: t.monthly.filter(inX)
+    })) : []).concat({
+      year: "current",
+      points: softResolve ? softResolve.monthly.filter(inX) : []
+    }).filter(t => t.points.length >= 2);
+    const chartHi = Math.max(40, Math.ceil((Math.max(...waves.flatMap(w => B.map(b => w.soft[b.id]))) + 3) / 10) * 10);
     return {
       B,
       grey,
@@ -9336,8 +9397,11 @@ function RdUndecided({
       note,
       sub,
       allNow,
-      waves: A.waves.filter(inX),
-      lines: rolled.filter(inX)
+      waves,
+      lines,
+      segments,
+      nationalSegments,
+      chartHi
     };
   })();
   const monthsLabel = (from, to) => from + " → " + to;
@@ -9369,6 +9433,8 @@ function RdUndecided({
     id: "age",
     label: "By age"
   }] : []);
+  const historyFromU = histOn ? [H && H.terms[0].from, DH && DH.soft.terms[0] && DH.soft.terms[0].polls[0].released].filter(Boolean).sort()[0] : null;
+  const softChartHi = soft ? Math.ceil((Math.max(soft.hi, ...(DH ? DH.soft.terms.flatMap(t => t.polls.map(p => p.v)) : [])) + 1) / 10) * 10 : 0;
   const pinUn = () => {
     const sec = document.getElementById("undecided");
     rdPinScroll(sec && sec.querySelector(".rd-un-tabs"));
@@ -9381,7 +9447,7 @@ function RdUndecided({
     id: "undecided",
     cls: "rd-un",
     title: "Decidedness",
-    meta: rdList(U.houses) + ", since the 2025 election" + (histOn ? "; undecided back to " + H.terms[0].from.slice(0, 4) : "")
+    meta: rdList(U.houses) + ", since the 2025 election" + (historyFromU ? "; history back to " + historyFromU.slice(0, 4) : "")
   }, story && React.createElement(RdHed, {
     head: story.head,
     dek: story.dek
@@ -9392,6 +9458,13 @@ function RdUndecided({
     options: views,
     ariaLabel: "Decidedness among",
     className: "rd-un-tabs"
+  }), histOn && React.createElement(RdConfWinBar, {
+    win: winShownU,
+    terms: vTermsU,
+    lo: extU.lo,
+    hi: extU.hi,
+    nowX: nowXU,
+    onWin: onWinU
   }), React.createElement(RdCrossfade, {
     k: view
   }, view === "all" && React.createElement(React.Fragment, null, React.createElement("div", {
@@ -9458,16 +9531,9 @@ function RdUndecided({
       return m.every(f => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election";
     })(),
     dek: (first && first.model ? "Each dot is one poll, open rings for after preferences. The undecided lines are a model of every poll, each pollster’s lean taken out, shaded with their 95% intervals; the others are monthly averages." : "Each dot is one poll, open rings for after preferences; lines are monthly averages.") + " Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales."
-  }), histOn && React.createElement(RdConfWinBar, {
-    win: winShownU,
-    terms: vTermsU,
-    lo: extU.lo,
-    hi: extU.hi,
-    nowX: nowXU,
-    onWin: onWinU
   }), React.createElement("div", {
     className: "rd-un-panels"
-  }, panel([first, tpp, leaner].filter(Boolean), 0, 12, 5, "und", "Undecided", "% of all voters"), soft && panel([soft], 0, Math.ceil((soft.hi + 1) / 10) * 10, 10, "soft", "Soft", "% of voters who named a party")), histOn && React.createElement(RdConfStrip, {
+  }, panel([first, tpp, leaner].filter(Boolean), 0, 12, 5, "und", "Undecided", "% of all voters"), soft && panel([soft], 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party")), histOn && H && React.createElement(RdConfStrip, {
     lines: [{
       color: "var(--ink-2)",
       points: H.terms.flatMap(t => t.series.first ? t.series.first.months.map(m => ({
@@ -9578,36 +9644,38 @@ function RdUndecided({
     yDomain: [partyView.sLo, partyView.sHi],
     yTicks: rdYTicks(partyView.sLo, partyView.sHi, 20),
     yTickFmt: v => v + "%",
-    xTicks: rdElectionTicks(xDomain[0], xDomain[1], true, base ? base.x : null),
+    xTicks: histOn ? confWinTicks(winC, vTermsU, nowXU) : rdElectionTicks(xDomain[0], xDomain[1], true, base ? base.x : null),
     baseline: true,
-    series: [{
-      id: "all",
+    driven: dragU,
+    series: partyView.segments.flatMap(t => [{
+      id: "all-" + t.year,
       label: "All voters",
       color: "var(--ink)",
       dashed: true,
       dash: "4 3",
       rdWidth: 1.2,
       endCap: false,
-      points: partyView.lines.map(w => ({
+      points: t.points.filter(w => Number.isFinite(w.all)).map(w => ({
         x: w.x,
         y: w.all
       }))
     }, {
-      id: k,
+      id: k + "-" + t.year,
       label: D.PARTIES[k].name,
       color: D.PARTIES[k].color,
       rdWidth: 2.2,
-      rdCap: 3.5,
-      points: partyView.lines.map(w => ({
+      rdCap: t.year === "current" ? 3.5 : 0,
+      endCap: t.year === "current",
+      points: t.points.filter(w => Number.isFinite(w[k])).map(w => ({
         x: w.x,
         y: w[k]
       }))
-    }],
-    spine: partyView.lines.map(w => ({
+    }].filter(s => s.points.length)),
+    spine: partyView.lines.filter(w => Number.isFinite(w[k])).map(w => ({
       x: w.x,
       y: w[k]
     })),
-    scatter: partyView.waves.map(w => ({
+    scatter: partyView.waves.filter(w => Number.isFinite(w.solid[k])).map(w => ({
       x: w.x,
       y: w.solid[k],
       color: D.PARTIES[k].color,
@@ -9704,36 +9772,38 @@ function RdUndecided({
       b: 30
     },
     xDomain: xDomain,
-    yDomain: [0, 40],
-    yTicks: rdYTicks(0, 40, 10),
+    yDomain: [0, ageView.chartHi],
+    yTicks: rdYTicks(0, ageView.chartHi, 10),
     yTickFmt: v => v === 0 ? "0" : v + "%",
-    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
+    xTicks: histOn ? confWinTicks(winC, vTermsU, nowXU) : rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
     baseline: true,
-    series: [{
-      id: "all",
+    driven: dragU,
+    series: ageView.nationalSegments.map(t => ({
+      id: "all-" + t.year,
       label: "All voters",
       color: "var(--ink)",
       dashed: true,
       dash: "4 3",
       rdWidth: 1.4,
       endCap: false,
-      points: softResolve ? filterPts(softResolve.monthly, xDomain[0]).map(m => ({
+      points: t.points.map(m => ({
         x: m.x,
         y: m.v
-      })) : [],
-      endLabel: narrow ? null : "All voters"
-    }, ...ageView.B.map((b, i) => ({
-      id: b.id,
+      })),
+      endLabel: !narrow && t.year === "current" ? "All voters" : null
+    })).concat(ageView.B.flatMap((b, i) => ageView.segments.map(t => ({
+      id: b.id + "-" + t.year,
       label: b.label,
       color: ageView.grey(i),
       rdWidth: 2.2,
-      rdCap: 3.5,
-      points: ageView.lines.map(w => ({
+      rdCap: t.year === "current" ? 3.5 : 0,
+      endCap: t.year === "current",
+      points: t.points.filter(w => Number.isFinite(w[b.id])).map(w => ({
         x: w.x,
         y: w[b.id]
       })),
-      endLabel: narrow ? null : b.label
-    }))],
+      endLabel: !narrow && t.year === "current" ? b.label : null
+    })))),
     spine: ageView.lines.map(w => ({
       x: w.x,
       y: w["18-34"]
