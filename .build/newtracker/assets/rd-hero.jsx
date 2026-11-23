@@ -277,7 +277,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
         counts.push(p);
         if (!opt.measured) pts.push(p);
       }
-      for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[opt.measured ? 2 : 1], raw: m[2], ci: opt.measured ? null : m[3], n: m[4],
+      for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[opt.measured ? 2 : 1], raw: m[2], ci: m[opt.measured ? 5 : 3], n: m[4],
         note: opt.measured ? undefined : "polls " + m[2].toFixed(1) });
       if (t.close[k] != null) {
         const p = { x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [] };
@@ -297,7 +297,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
           if (i) series.push({ id: "vh-" + t.year + "-" + k + "-g" + i, label: st.label, color: st.color,
             points: [runs[i - 1][runs[i - 1].length - 1], r[0]], rdWidth: st.width, dash: RD_VH_BRIDGE,
             endCap: false, endLabel: null, opacity: st.opacity });
-          const band = opt.long || opt.measured ? [] : r.filter((p) => p.ci != null || p.count);
+          const band = opt.long ? [] : r.filter((p) => p.ci != null || p.count);
           if (band.length >= 2) areas.push({ id: "vh-ci-" + t.year + "-" + k + "-" + i, color: st.color, className: "ci-band", edge: false,
             hidden: st.opacity === 0, points: band.map((p) => ({ x: p.x, y0: p.y - (p.ci || 0), y1: p.y + (p.ci || 0) })) });
         });

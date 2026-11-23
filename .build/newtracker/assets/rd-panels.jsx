@@ -731,12 +731,11 @@ function RdPrimary({ rangeId, setRangeId }) {
           return rows;
         }
         if (!q.cur) {
-          if (supportMeasured) return [{ label: "", value: VH.model ? "The model’s consensus before the election adjustment" : "The polls’ monthly average before the election adjustment" }];
-          /* a past month's own 95% intervals, party by party, as this term's
-             months carry theirs */
-          const ciAt = (k) => { for (const t of VHuse.terms) { const m = (t.series[k] || []).find((r) => Math.abs(r[0] - q.x) < 1e-6); if (m && m[3] != null) return m[3]; } return null; };
+          /* each basis's own interval: the calibrated past-term band, or
+             Measured support's raw polling/model band */
+          const ciAt = (k) => { for (const t of VHuse.terms) { const m = (t.series[k] || []).find((r) => Math.abs(r[0] - q.x) < 1e-6); if (m && m[supportMeasured ? 5 : 3] != null) return m[supportMeasured ? 5 : 3]; } return null; };
           const cis = visible.map((p) => ciAt(p.id));
-          return [{ label: "", value: G ? "The model’s estimate for " + sel.who + " that term" : "Drawn through the election results" }]
+          return [{ label: "", value: supportMeasured ? (VH.model ? "The model’s consensus before the election adjustment" : "The polls’ monthly average before the election adjustment") : G ? "The model’s estimate for " + sel.who + " that term" : "Drawn through the election results" }]
             .concat(cis.some((c) => c != null) ? [{ label: "95% intervals", value: cis.map((c) => (c == null ? "–" : "±" + c.toFixed(1))).join(" ") }] : []);
         }
         const d = pts.find((r) => r.x === q.x);
@@ -1053,7 +1052,7 @@ function RdPrimary({ rangeId, setRangeId }) {
               : "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "")
                 + (VH.model ? ". The model’s estimates, each pollster’s lean taken out." : ". Monthly averages of the polls, adjusted for each pollster’s lean."),
             caption: supportMeasured
-              ? (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s consensus before its election adjustment" : " are monthly averages before the election adjustment") + "; rings stay at the counted results." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : "")
+              ? (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s consensus before its election adjustment" : " are monthly averages before the election adjustment") + ", shaded bands their 95% intervals; rings stay at the counted results." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : "")
               : (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
                 + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
             legend: visible.map((p) => ({ label: p.name, color: p.color, kind: "line" }))
@@ -1099,7 +1098,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         {/* what the past terms' lines are, beside them */}
         {H && (
           G ? <p className="rd-note">Each past term is the model’s estimate for {sel.who}: that term’s national primaries, from every poll with each pollster’s lean taken out, moved by the group’s gap from all voters, from the pollsters’ group tables and the Australian Election Study at the term’s two elections. Where few pollsters published group tables, the line leans on the two Election Studies and its band widens between them. A line ends at each election; the next term starts from its own polls.</p>
-          : supportMeasured ? <p className="rd-note">Past terms keep the polls’ own figures before the election-result adjustment. Rings stay at the official results, above or below a party’s line where the polls over- or underestimated support. {vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is unchanged: no election has measured it yet. " : ""}</p>
+          : supportMeasured ? <p className="rd-note">Past terms keep the polls’ own figures before the election-result adjustment. Shaded bands retain the polling and model uncertainty without that adjustment’s extra calibration doubt. Rings stay at the official results, above or below a party’s line where the polls over- or underestimated support. {vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is unchanged: no election has measured it yet. " : ""}</p>
           : <p className="rd-note">Past terms are drawn through the election results at both ends. By polling day the polls typically miss Labor’s result by about {VH.rms.alp.toFixed(1)} points and the Coalition’s by {VH.rms.lnp.toFixed(1)}, so every month of a past term is moved by part of its closing election’s miss: two-fifths of it from the first month, rising evenly to all of it on polling day. {vhLong ? "Over a dozen years or more the bands are left off; a shorter window shows them, with the doubt about when the miss arose. " : "The shaded band includes the doubt about when the miss arose. "}{vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is the polls alone: no election has measured it yet. " : ""}{H.unmeasured.length ? "No dated poll fell in the final three weeks before the " + rdList(H.unmeasured.map((t) => String(t.src))) + " elections, so " + (H.unmeasured.length === 1 ? "that term is" : "those terms are") + " the polls alone." : ""}</p>
         )}
         {/* the lift mapping, where the dots are read - the glossary's "The
@@ -1112,7 +1111,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" },
         ] : H ? [
           vhDotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll, as published" } : null,
-          supportMeasured ? { kind: "line", color: "var(--ink-3)", label: VH.model ? (narrow ? "Before election adjustment" : "Model consensus before election adjustment") : "Monthly average before election adjustment" }
+          supportMeasured ? { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model consensus and its 95% interval") : "Monthly average and its 95% interval" }
             : vhLong ? { kind: "line", color: "var(--ink-3)", label: VH.model ? "Model estimate" : "Monthly average" }
               : { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           { kind: "ring", label: "Election result" },

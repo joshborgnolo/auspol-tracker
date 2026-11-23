@@ -61,18 +61,20 @@ const measured = rdVhLines(history, lanes, history.terms[0].a, history.terms.at(
 assert.deepEqual(measured.marks, allPartyResult.marks, "Measured support retains every official election ring unchanged");
 assert.deepEqual(measured.stops.map((p) => [p.x, p.count]), allPartyResult.stops.map((p) => [p.x, p.count]),
   "Measured support retains every stop's position and election role, with y following the selected basis");
-assert.equal(measured.areas.length, 0, "Measured support does not carry election-calibration bands");
+assert(measured.areas.length > 0, "Measured support retains its unadjusted polling/model bands");
 const measuredPoints = measured.series.flatMap((s) => s.points);
 assert(measuredPoints.length > 0, "Measured support draws monthly lines");
 assert(measuredPoints.every((p) => p.count == null), "No election count becomes a vertex in a measured line");
 assert(measuredPoints.every((p) => p.y === p.raw), "Every measured vertex uses the stored unadjusted poll figure");
+assert(measuredPoints.every((p) => Number.isFinite(p.ci) && p.ci >= 0), "Every measured vertex has its raw 95% interval");
 assert.deepEqual(rdVhLines(history, lanes, history.terms[0].a, history.terms.at(-1).b, partyStyle, {}).series,
   allPartyResult.series, "The default inferred series is unchanged");
 
 const smallHistory = { terms: [{ year: 2022, src: 2025, a: 2022, b: 2025, lanes: ["alp"], open: { alp: 40 }, close: { alp: 44 }, otherIncludes: {},
-  series: { alp: [[2022.5, 45, 46, 1, 4], [2024.5, 43, 42, 1, 4]] } }] };
+  series: { alp: [[2022.5, 45, 46, 1, 4, 0.8], [2022.75, 43, 42, 1, 4, 0.6]] } }] };
 const smallMeasured = rdVhLines(smallHistory, ["alp"], 2022, 2025, partyStyle, { measured: true });
 assert.deepEqual(smallMeasured.series[0].points.map((p) => p.y), [46, 42], "A measured example can sit above one count and below the other");
+assert.deepEqual(smallMeasured.areas[0].points, [{ x: 2022.5, y0: 45.2, y1: 46.8 }, { x: 2022.75, y0: 41.4, y1: 42.6 }], "The band is centred on the measured line, with its own raw half-width");
 assert.deepEqual(smallMeasured.marks.map((p) => [p.x, p.y]), [[2022, 40], [2025, 44]], "The two counted elections remain detached marks");
 const emptyMeasured = rdVhLines({ terms: [{ ...smallHistory.terms[0], series: { alp: [] } }] }, ["alp"], 2022, 2025, partyStyle, { measured: true });
 assert.equal(emptyMeasured.series.length, 0, "A count-only term invents no measured line");

@@ -420,7 +420,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
         x: m[0],
         y: m[opt.measured ? 2 : 1],
         raw: m[2],
-        ci: opt.measured ? null : m[3],
+        ci: m[opt.measured ? 5 : 3],
         n: m[4],
         note: opt.measured ? undefined : "polls " + m[2].toFixed(1)
       });
@@ -469,7 +469,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
             endLabel: null,
             opacity: st.opacity
           });
-          const band = opt.long || opt.measured ? [] : r.filter(p => p.ci != null || p.count);
+          const band = opt.long ? [] : r.filter(p => p.ci != null || p.count);
           if (band.length >= 2) areas.push({
             id: "vh-ci-" + t.year + "-" + k + "-" + i,
             color: st.color,

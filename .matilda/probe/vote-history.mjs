@@ -116,8 +116,8 @@ s = await state();
 check("the actual button switches to Measured support", s.support && s.support.text === "Measured support" && s.support.checked === "true", JSON.stringify(s.support));
 check("measured lines differ from inferred lines", s.paths !== inferredPaths);
 check("measured lines retain the same election rings", s.rings === inferredRings, inferredRings + " -> " + s.rings);
-check("measured lines carry no election-calibration bands", s.bands === 0, "bands " + s.bands);
-check("the note explains detached measured lines and official rings", /before the election-result adjustment/.test(s.note) && /above or below a party’s line/.test(s.note), s.note);
+check("measured lines retain their unadjusted error bands", s.bands > 0, "bands " + s.bands);
+check("the note explains measured bands, detached lines and official rings", /Shaded bands retain the polling and model uncertainty/.test(s.note) && /above or below a party’s line/.test(s.note), s.note);
 await page.evaluate(() => {
   const marks = [...document.querySelectorAll("#primary-vote .rd-pv-chart .rd-mark circle.rd-ring")];
   marks[marks.length - 1].scrollIntoView({ block: "center", behavior: "instant" });

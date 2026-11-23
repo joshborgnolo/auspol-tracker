@@ -663,21 +663,17 @@ function RdPrimary({
           return rows;
         }
         if (!q.cur) {
-          if (supportMeasured) return [{
-            label: "",
-            value: VH.model ? "The model’s consensus before the election adjustment" : "The polls’ monthly average before the election adjustment"
-          }];
           const ciAt = k => {
             for (const t of VHuse.terms) {
               const m = (t.series[k] || []).find(r => Math.abs(r[0] - q.x) < 1e-6);
-              if (m && m[3] != null) return m[3];
+              if (m && m[supportMeasured ? 5 : 3] != null) return m[supportMeasured ? 5 : 3];
             }
             return null;
           };
           const cis = visible.map(p => ciAt(p.id));
           return [{
             label: "",
-            value: G ? "The model’s estimate for " + sel.who + " that term" : "Drawn through the election results"
+            value: supportMeasured ? VH.model ? "The model’s consensus before the election adjustment" : "The polls’ monthly average before the election adjustment" : G ? "The model’s estimate for " + sel.who + " that term" : "Drawn through the election results"
           }].concat(cis.some(c => c != null) ? [{
             label: "95% intervals",
             value: cis.map(c => c == null ? "–" : "±" + c.toFixed(1)).join(" ")
@@ -1013,7 +1009,7 @@ function RdPrimary({
       title: "First-preference vote for each party",
       span: confWinYears(vwWin, vwTerms, vwHi),
       sub: supportMeasured ? "Past terms before the election adjustment, with rings at the counted results" + (curIn ? "; this term unchanged" : "") : "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "") + (VH.model ? ". The model’s estimates, each pollster’s lean taken out." : ". Monthly averages of the polls, adjusted for each pollster’s lean."),
-      caption: supportMeasured ? (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s consensus before its election adjustment" : " are monthly averages before the election adjustment") + "; rings stay at the counted results." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : "") : (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals" + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
+      caption: supportMeasured ? (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s consensus before its election adjustment" : " are monthly averages before the election adjustment") + ", shaded bands their 95% intervals; rings stay at the counted results." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : "") : (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals" + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
@@ -1062,7 +1058,7 @@ function RdPrimary({
     className: "rd-note"
   }, "Each past term is the model\u2019s estimate for ", sel.who, ": that term\u2019s national primaries, from every poll with each pollster\u2019s lean taken out, moved by the group\u2019s gap from all voters, from the pollsters\u2019 group tables and the Australian Election Study at the term\u2019s two elections. Where few pollsters published group tables, the line leans on the two Election Studies and its band widens between them. A line ends at each election; the next term starts from its own polls.") : supportMeasured ? React.createElement("p", {
     className: "rd-note"
-  }, "Past terms keep the polls\u2019 own figures before the election-result adjustment. Rings stay at the official results, above or below a party\u2019s line where the polls over- or underestimated support. ", vhDotsOn ? "The dots are the polls as published. " : "", curIn ? "This term is unchanged: no election has measured it yet. " : "") : React.createElement("p", {
+  }, "Past terms keep the polls\u2019 own figures before the election-result adjustment. Shaded bands retain the polling and model uncertainty without that adjustment\u2019s extra calibration doubt. Rings stay at the official results, above or below a party\u2019s line where the polls over- or underestimated support. ", vhDotsOn ? "The dots are the polls as published. " : "", curIn ? "This term is unchanged: no election has measured it yet. " : "") : React.createElement("p", {
     className: "rd-note"
   }, "Past terms are drawn through the election results at both ends. By polling day the polls typically miss Labor\u2019s result by about ", VH.rms.alp.toFixed(1), " points and the Coalition\u2019s by ", VH.rms.lnp.toFixed(1), ", so every month of a past term is moved by part of its closing election\u2019s miss: two-fifths of it from the first month, rising evenly to all of it on polling day. ", vhLong ? "Over a dozen years or more the bands are left off; a shorter window shows them, with the doubt about when the miss arose. " : "The shaded band includes the doubt about when the miss arose. ", vhDotsOn ? "The dots are the polls as published. " : "", curIn ? "This term is the polls alone: no election has measured it yet. " : "", H.unmeasured.length ? "No dated poll fell in the final three weeks before the " + rdList(H.unmeasured.map(t => String(t.src))) + " elections, so " + (H.unmeasured.length === 1 ? "that term is" : "those terms are") + " the polls alone." : "")), G && React.createElement("p", {
     className: "rd-note"
@@ -1077,9 +1073,9 @@ function RdPrimary({
       color: "var(--ink-3)",
       label: "One poll, as published"
     } : null, supportMeasured ? {
-      kind: "line",
+      kind: "lineband",
       color: "var(--ink-3)",
-      label: VH.model ? narrow ? "Before election adjustment" : "Model consensus before election adjustment" : "Monthly average before election adjustment"
+      label: VH.model ? narrow ? "Model, 95% interval" : "Model consensus and its 95% interval" : "Monthly average and its 95% interval"
     } : vhLong ? {
       kind: "line",
       color: "var(--ink-3)",

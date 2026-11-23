@@ -10346,7 +10346,7 @@ const voteHistory = JUR ? null : (() => {
         const g = VH_W0 + (1 - VH_W0) * f;
         const biasVar = e != null ? Vk * g * (1 - g) : Vk * g;
         const v = e != null ? m.raw - e * g : m.raw;
-        return [m.x, r2(v), r2(m.raw), r2(1.96 * Math.sqrt(m.se * m.se + biasVar)), m.k];
+        return [m.x, r2(v), r2(m.raw), r2(1.96 * Math.sqrt(m.se * m.se + biasVar)), m.k, r2(1.96 * m.se)];
       });
     }
     delete t.missK;
