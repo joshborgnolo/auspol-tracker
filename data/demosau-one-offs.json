@@ -1,7 +1,7 @@
 {
  "generated": "2026-10-17",
  "series": "DemosAU (federal)",
- "scope": "Special and one-off questions asked on DemosAU's monthly federal waves (from the house's first federal poll, fieldwork 5 July 2025, through the September 2026 wave) and in its self-generated/self-commissioned special reports (childcare-sector attitudes, Australian values, the AI gap, TrustWatch on democracy and count fairness, Palestine and the Gaza war, the YouTube under-16s ban, superannuation changes, state sport barriers, the former-prime-minister special, the cigarette-tax special, the data-centre special, the Admired Sportspeople special and the inaugural Australian Wellbeing Index). The standing battery asked on every monthly wave is excluded: primary voting intention ('If a Federal Election was held today, which one of the following would you vote for?'), the undecided leaner, preferred PM ('Who is your preferred Prime Minister'), leader satisfaction ('What is your opinion on the following people?'), the best-party-per-issue battery, demographic crosstabs of those measures and seat projections. Those channel into polls.json (polls[] primaries and the approval/ppm series). The quarterly MRP models ask only the standing VI/leaner questions and project seats (all five committed MRP reports checked — Feb-March, May-July and Aug-Sept models, the May-July and Oct-Nov reports — plus the 28 Jan - 1 Feb 2025 methodology statement and the Jan 5-6 2026 poll, all battery-only, so nothing added). Hypothetical-VI counterfactuals (a Hanson-retirement or Abbott-led Coalition) DO land here: they are extra questions on a monthly wave, not the standing series.",
+ "scope": "Special and one-off questions asked on DemosAU's monthly federal waves (from the house's first federal poll, fieldwork 5 July 2025, through the November 2026 wave) and in its self-generated/self-commissioned special reports (childcare-sector attitudes, Australian values, the AI gap, TrustWatch on democracy and count fairness, Palestine and the Gaza war, the YouTube under-16s ban, superannuation changes, state sport barriers, the former-prime-minister special, the cigarette-tax special, the data-centre special, the Admired Sportspeople special and the inaugural Australian Wellbeing Index). The standing battery asked on every monthly wave is excluded: primary voting intention ('If a Federal Election was held today, which one of the following would you vote for?'), the undecided leaner, preferred PM ('Who is your preferred Prime Minister'), leader satisfaction ('What is your opinion on the following people?'), the best-party-per-issue battery, demographic crosstabs of those measures and seat projections. Those channel into polls.json (polls[] primaries and the approval/ppm series). The quarterly MRP models ask only the standing VI/leaner questions and project seats (all five committed MRP reports checked — Feb-March, May-July and Aug-Sept models, the May-July and Oct-Nov reports — plus the 28 Jan - 1 Feb 2025 methodology statement and the Jan 5-6 2026 poll, all battery-only, so nothing added). Hypothetical-VI counterfactuals (a Hanson-retirement or Abbott-led Coalition) DO land here: they are extra questions on a monthly wave, not the standing series.",
  "sources": "Every wave's cached report-PDF text dump (.matilda/demosau-questions/txt/ for the special reports and pre-agent waves, plus the .build/demosau-src/*.txt methodology statements the poll agent keeps) and DemosAU's own news posts (posts/*.json — snapshot of demosau.com news articles as fetched). Tables are the printed chart rows verbatim; percents keep one decimal place wherever the report prints one. The PDF text layer occasionally drops a figure cell — those cells stay blank ('') and are never reconstructed from row residues; whole page blocks whose labels mis-align with their values file nothing at all unless a DemosAU news post independently states the figure (provenance recorded in the entry's note). Question wordings come from each report's own question/wording pages where printed (pdf-question-wording-page or report-question-block), else from the paired DemosAU post (post-prose). Multi-select batteries print shares that total over 100 by design and are never sum-checked.",
  "one_offs": [
   {
@@ -696,6 +696,134 @@
     "prose": []
    },
    "note": "April wave PDF pages 4-6; the report's net-positive comparison chart (yes minus no) reconciles with every figure above (Albanese -25 to +13, Taylor -8 to +13, Hanson 0 to +34). The eight traits were the full tested list."
+  },
+  {
+   "id": "leader-attributes",
+   "waveDate": "2026-11-22",
+   "fieldwork": {
+    "start": "2026-11-19",
+    "end": "2026-11-22"
+   },
+   "sample": 1464,
+   "published": "2026-11-24T05:00",
+   "question": "Whether voters think these descriptions fit Albanese, Hanson and Taylor",
+   "questionWordingSource": "subscriber-article-description",
+   "responseOptions": [
+    "Agree",
+    "Don't know",
+    "Disagree"
+   ],
+   "articleUrl": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
+   "data": {
+    "tables": [
+     {
+      "headers": [
+       "Albanese attribute",
+       "Agree %",
+       "Don't know %",
+       "Disagree %"
+      ],
+      "rows": [
+       [
+        "Arrogant",
+        "43",
+        "23",
+        "34"
+       ],
+       [
+        "Trustworthy",
+        "29",
+        "22",
+        "49"
+       ],
+       [
+        "In touch with ordinary Australians",
+        "28",
+        "20",
+        "52"
+       ],
+       [
+        "Has a vision for Australia",
+        "32",
+        "25",
+        "43"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Hanson attribute",
+       "Agree %",
+       "Don't know %",
+       "Disagree %"
+      ],
+      "rows": [
+       [
+        "Arrogant",
+        "44",
+        "21",
+        "35"
+       ],
+       [
+        "Trustworthy",
+        "34",
+        "27",
+        "39"
+       ],
+       [
+        "In touch with ordinary Australians",
+        "43",
+        "23",
+        "34"
+       ],
+       [
+        "Has a vision for Australia",
+        "49",
+        "20",
+        "31"
+       ]
+      ]
+     },
+     {
+      "headers": [
+       "Taylor attribute",
+       "Agree %",
+       "Don't know %",
+       "Disagree %"
+      ],
+      "rows": [
+       [
+        "Arrogant",
+        "25",
+        "39",
+        "36"
+       ],
+       [
+        "Trustworthy",
+        "31",
+        "43",
+        "26"
+       ],
+       [
+        "In touch with ordinary Australians",
+        "29",
+        "43",
+        "28"
+       ],
+       [
+        "Has a vision for Australia",
+        "38",
+        "41",
+        "21"
+       ]
+      ]
+     }
+    ],
+    "prose": [
+     "Nearly half (49%) of the voters surveyed in the latest Capital Brief/DemosAU poll do not view the prime minister as trustworthy, while 52% suggested he was not in touch with ordinary Australians and 43% labelled him arrogant."
+    ]
+   },
+   "note": "Full table supplied from the subscriber article. The free article lead verifies Albanese's 43% arrogant, 49% not trustworthy and 52% not in touch. Question wording is the supplied battery description; DemosAU's report was not yet posted when filed."
   },
   {
    "id": "us-reliable-military-ally",

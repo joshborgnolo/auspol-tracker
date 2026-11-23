@@ -6750,8 +6750,8 @@
       "undecidedLeaner": 7
     },
     {
-      "date": "2026-11-20",
-      "dateStart": "2026-11-16",
+      "date": "2026-11-22",
+      "dateStart": "2026-11-19",
       "published": "2026-11-24T05:00",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -6764,8 +6764,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
-      "fieldworkPending": true
+      "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/"
     }
   ],
   "ppm": [
@@ -7683,6 +7682,15 @@
           "kind": "2pmp"
         }
       ]
+    },
+    {
+      "date": "2026-11-22",
+      "firm": "DemosAU",
+      "alb": 37,
+      "opp": 38,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
     }
   ],
   "approval": [

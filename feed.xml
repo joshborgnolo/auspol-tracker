@@ -6,13 +6,13 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national polling release as it enters the tracker – voting intention, leader ratings, national direction, the issues and vote breakdowns included. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Fri, 20 Nov 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 22 Nov 2026 12:00:00 GMT</lastBuildDate>
     <item>
-      <title>DemosAU, 16–20 Nov 2026 – ALP 27, L/NP 25, GRN 12, ON 23, Ind/Oth 13</title>
+      <title>DemosAU, 19–22 Nov 2026 – ALP 27, L/NP 25, GRN 12, ON 23, Ind/Oth 13</title>
       <link>https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/</link>
-      <guid isPermaLink="false">auspol-tracker:2026-11-20|DemosAU</guid>
-      <pubDate>Fri, 20 Nov 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27, L/NP 25, GRN 12, ON 23, Ind/Oth 13. No two-party figure published. Sample 1,464. Fieldwork 16–20 Nov 2026.</description>
+      <guid isPermaLink="false">auspol-tracker:2026-11-22|DemosAU</guid>
+      <pubDate>Sun, 22 Nov 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 25, GRN 12, ON 23, Ind/Oth 13. No two-party figure published. Preferred PM: Albanese 37 – Taylor 38. Sample 1,464. Fieldwork 19–22 Nov 2026.</description>
     </item>
     <item>
       <title>Newspoll, 16–19 Nov 2026 – ALP 27, L/NP 22, GRN 14, ON 27, Ind/Oth 10</title>
