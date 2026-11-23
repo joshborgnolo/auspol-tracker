@@ -62114,7 +62114,8 @@
         "date": "2023-06-12",
         "firm": "CT Group",
         "pmNet": 6,
-        "oppNet": null
+        "oppNet": null,
+        "metric": "fav"
       },
       {
         "date": "2023-06-17",

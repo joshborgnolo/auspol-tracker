@@ -245,6 +245,11 @@ window.AUSPOL = (function () {
      preferred PM, and the national direction – nowcasts, as the headline. */
   const leaderNow = {"alb_net":{"v":-19.4,"se":1.81,"ci95":3.6,"n":5,"nEff":3.9,"prev":-11,"chg":-8.4,"changeCi95":8.4,"changeSig":true},"alb_fav":{"v":-29,"se":1.87,"ci95":3.7,"n":3,"nEff":2.1,"prev":-14,"chg":-15,"changeCi95":8.3,"changeSig":true},"taylor_net":{"v":17.4,"se":2.13,"ci95":4.2,"n":5,"nEff":3.9,"prev":23,"chg":-5.6,"changeCi95":8.5,"changeSig":false},"taylor_fav":{"v":9.7,"se":3.56,"ci95":7,"n":3,"nEff":2.1,"prev":15.1,"chg":-5.4,"changeCi95":9.1,"changeSig":false},"hanson_net":{"v":9,"se":3.98,"ci95":7.8,"n":1,"nEff":1,"prev":null},"hanson_fav":{"v":-13.3,"se":6.05,"ci95":11.8,"n":2,"nEff":2,"prev":-18,"chg":4.7,"changeCi95":14.1,"changeSig":false},"alb_pref":{"v":34,"se":1.88,"ci95":3.7,"n":1,"nEff":1,"prev":null},"taylor_pref":{"v":48,"se":1.98,"ci95":3.9,"n":1,"nEff":1,"prev":null},"alb_pref3":{"v":23.4,"se":3.18,"ci95":6.2,"n":5,"nEff":2.9,"prev":22.7,"chg":0.8,"changeCi95":8.5,"changeSig":false},"taylor_pref3":{"v":33.6,"se":2.25,"ci95":4.4,"n":5,"nEff":2.9,"prev":30.5,"chg":3.1,"changeCi95":6.6,"changeSig":false},"hanson_pref3":{"v":15.7,"se":2.49,"ci95":4.9,"n":5,"nEff":2.9,"prev":11.1,"chg":4.6,"changeCi95":6.1,"changeSig":false}};
   const leaderLead = {"taylor":{"v":-14,"ci95":7},"hanson":null};
+  /* the leadership model (§4m): every series' monthly line back to 1971 –
+     ratings per leader per office, preferred PM per pairing (the PM's lead
+     among those who chose) – with this term's preferred-PM readouts; null
+     off the federal page */
+  const leaderModel = null;
   const directionNow = null;
   /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
@@ -423,7 +428,7 @@ window.AUSPOL = (function () {
   /* the House as it stands (/map/'s data) - the menu's Election map line; null off the federal page */
   const house = null;
   /* the seat model's latest run (/model/) - the menu's Election model line; null off the federal page */
-  const seatModel = {"headline":"The Coalition is very likely to win the most seats, with a majority about as likely as not","pollsTo":"2026-11-15","draws":20000,"expectedSeats":{"alp":26.17,"lnp":44.75,"on":9.43,"grn":6.79,"oth":0,"member":0.86},"mostSeats":{"alp":0.061,"lnp":0.9236,"on":0.0154,"grn":0,"oth":0,"member":0},"majority":{"alp":0.0064,"coalition":0.5201,"on":0.0046,"noMajority":0.469}};
+  const seatModel = {"headline":"The Coalition is very likely to win the most seats, with a majority about as likely as not","pollsTo":"2026-11-15","draws":20000,"expectedSeats":{"alp":26.41,"lnp":44.73,"on":8.65,"grn":7.37,"oth":0,"member":0.84},"mostSeats":{"alp":0.0635,"lnp":0.9243,"on":0.0122,"grn":0,"oth":0,"member":0},"majority":{"alp":0.0066,"coalition":0.517,"on":0.0037,"noMajority":0.4728}};
   /* which All-polls rows a public-opinion wave pairs to (§8e): rk → { h:
      the pollster's store key, n: questions, t: topic shorts }. The poll
      ledger's "Public opinion" line reads it - null off the federal page */
@@ -466,7 +471,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

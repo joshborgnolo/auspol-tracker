@@ -2179,7 +2179,8 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
         <NextPollsMemo />
       </>}
       {tail >= 3 && <>
-        <LeadershipMemo rangeId={rangeId} />
+        {/* the leaders join the vote charts' window (rd-hero.jsx): its range and its history */}
+        <LeadershipMemo rangeId={window.AP.rd ? heroRange : rangeId} setRangeId={setRangeId} />
         <DirectionMemo rangeId={rangeId} />
       </>}
       {/* who votes for whom: age, gender, education, place, and home */}

@@ -8578,7 +8578,45 @@ function infoTerms(D) {
             today in Sydney. Houses that stop publishing are removed by hand.</span>)}</>) },
       ] },
     { id: "s-leaders", title: "Leadership", nav: "Leadership",
-      lead: { id: "leadership", body: (
+      lead: { id: "leadership", body: D.leaderModel ? (
+        <>Three questions: who would make the better
+        {" "}{xref("preferred-pm", "leadership", "prime minister")}, how each leader is doing the
+        job ({xref("approval", "leadership", "approval")}), and what voters think of each as a
+        person ({xref("favourability", "leadership", "favourability")}).
+        <span className="info-p"><b>The model.</b> Every figure is a model’s estimate of what the
+        average pollster would find, with each pollster’s lean taken out. It is the same kind of
+        model as the vote’s. Each leader in each office has a line of their own. When a leader
+        changes, the new line starts afresh, so two people’s numbers are never joined. The model
+        is fitted to every leader poll on file since 1971 at once, so it learns from fifty years
+        of polling how fast ratings move and how noisy each pollster is.</span>
+        <span className="info-p"><b>Approval and favourability</b> are different questions, but
+        they move together, so each leader has one line for both. Pollsters asking approval set
+        its level. Pollsters asking favourability (RedBridge, DemosAU, Freshwater, Spectre
+        Strategy and Resolve’s likeability question) have leans of their own, but they still move
+        the line. A pollster that leaves more people unsure prints a smaller net, so its readings
+        are scaled by the share of its respondents who gave a view. Tested on the polls
+        themselves, one shared line predicted the next favourability poll better than a separate
+        favourability line (3.7 points off, against 4.3) and the next approval poll as well (3.9
+        against 3.9). The favourability view draws the same line on the favourability pollsters’
+        scale.</span>
+        <span className="info-p"><b>Preferred prime minister</b> counts those who chose one of
+        the leaders, as the two-party preferred counts those who chose a party. Pollsters leave
+        between 15% and 50% uncommitted, and only on this basis can their figures be compared.
+        Newspoll’s two-PM preferred, first published in November 2026, asks everyone to choose,
+        so it is the same kind of number. It is read as Albanese against Taylor, with a lean of
+        its own. The three-way question is counted as shares of those who named one of the
+        three.</span>
+        <span className="info-p"><b>How well it works.</b> Each poll was predicted from the polls
+        before it, and the model came closer than this page’s earlier monthly averages. For
+        leader ratings since 1971 it was 4.2 net points off against 4.6, and this term 3.8
+        against 4.4. For preferred prime minister it was 2.2 points off against 2.5. Its 95%
+        intervals caught 94 to 96% of polls. No election tests a leader’s rating, so the average
+        pollster is the reference: if every pollster were wrong in the same direction, the model
+        would be too.</span>
+        <span className="info-p"><b>The history.</b> Morgan Gallup’s monthly ratings run from 1971
+        and Newspoll’s from 1985, both approval or satisfaction questions. Newspoll’s better prime
+        minister question runs from 1987, and regularly from 1991. Favourability was rarely asked
+        before 2022.</span></>) : (
         <>Three questions, each kept apart: who would make the better
         {" "}{xref("preferred-pm", "leadership", "prime minister")}, how each leader is doing the
         job ({xref("approval", "leadership", "approval")}), and what voters think of each as a
@@ -8616,9 +8654,11 @@ function infoTerms(D) {
           asks, “Do you have a favourable or unfavourable view of the following?” DemosAU asks,
           “What is your opinion of the following people?”, offering positive, neutral and
           negative. Freshwater and Spectre Strategy ask their own versions. A leader can be
-          approved of for the job and disliked as a person, so
-          {" "}{xref("approval", "favourability", "approval")} and favourability are never averaged
-          together.</>) },
+          approved of for the job and disliked as a person.
+          {D.leaderModel ? <>{" "}Favourability pollsters lean as a group on each leader’s one line,
+          so {xref("approval", "favourability", "approval")} and favourability move together
+          while keeping their own levels.</> : <>{" "}So {xref("approval", "favourability", "approval")} and
+          favourability are never averaged together.</>}</>) },
       ] },
     { id: "s-direction", title: "National mood", nav: "Mood",
       lead: { id: "direction", body: (

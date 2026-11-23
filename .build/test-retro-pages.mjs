@@ -63,7 +63,9 @@ const block = (p, k) => opening(p).blocks.find((b) => b.k === k);
   const NAME = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others & independents" };
   assert.deepEqual(pv.stats.map((s) => [s.name, s.v]), L.primaryOrder.map((id) => [NAME[id], L.primary[id].toFixed(1)]), "the primary votes are latest.primary, in the site's order");
   const hb = block(P(now, "leaders"), "hbars").bars[0];
-  assert.deepEqual([hb.a.v, hb.b.v], [LN.alb_pref.v.toFixed(1), LN.taylor_pref.v.toFixed(1)], "preferred PM, head to head, is leaderNow's");
+  /* the model's basis (of those who chose, alb_prefD) where the leadership model ran, else the published one */
+  const pa = LN.alb_prefD || LN.alb_pref, po = LN.taylor_prefD || LN.taylor_pref;
+  assert.deepEqual([hb.a.v, hb.b.v], [pa.v.toFixed(1), po.v.toFixed(1)], "preferred PM, head to head, is leaderNow's");
   // Leaders' two tab strips (Preferred PM, Net approval), every pairing; the three-way bar's three shares
   const ld = P(now, "leaders");
   assert.equal(ld.ctl.length, 2, "Leaders offers both of the modern section's tab strips");

@@ -20,6 +20,7 @@ import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
+import { ratingSeries as ldRatingSeries, ppmSeries as ldPpmSeries, fitSettings as ldFit, lineMoments as ldMoments, drawReads as ldDrawReads, houseCoef as ldHouseCoef } from "./leader-model.mjs";
 import { tppRead, tppNowOut, tppChgOut } from "./primary-model.mjs";
 import { fitSpan, gapReading, countReading, nestCats, nestCoords, nestShares, drawMix, makeRng as gsRng } from "./group-span.mjs";
 import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
@@ -8979,6 +8980,353 @@ for (const c of CYC_META) {
   c.eTpp = e["tpp_" + c.gov];
 }
 
+/* ---- 4m. the leadership model (leader-model.mjs, 2026-11-23) -----------
+   (user ask 2026-11-23: the primary vote's Bayesian treatment for the
+   leaders' ratings and preferred PM, and their history.) Prototype,
+   backtests and the approval-v-favourability evidence are in
+   .build/analysis/leader-bayes/ (not committed).
+
+   SERIES. A rating series is one person in one office (Hawke as prime
+   minister, Peacock's second stint leading the opposition, Hanson leading
+   One Nation); a preferred-PM series is one pairing (Keating v Hewson),
+   read as the PM's share of those who chose one of the two – the basis of
+   the two-party preferred, so a forced pair (Newspoll's two-PM preferred,
+   2PMP, from Nov 2026) is the same kind of number. Each series starts
+   fresh when its person or pairing starts, so a new leader's line is never
+   joined to the old one's. Settings are shared by all series of a family;
+   leans are each series' own.
+
+   RATINGS. Approval houses set the level: the average regular pollster
+   asking approval (or satisfaction), each counting once. Favourability
+   houses (RedBridge, DemosAU, Freshwater, Spectre, Resolve's likeability,
+   CT Group's one 2023 wave) and different scales (ReachTEL's five-point
+   performance rating, Fox & Hedgehog's "your view" question) lean but set
+   no zero, as the direction model's satisfaction houses do. A house that
+   leaves more people unsure prints a smaller net, so each house's reading
+   is scaled by (1 − its unsure share) / (1 − the regular houses'), from
+   the shares it printed. Tested against keeping the two questions apart
+   (analysis combine.mjs): one line predicts favourability polls far better
+   (3.7 v 4.3 points) and approval polls about as well (3.9 v 3.9); two
+   correlated lines did no better than one.
+
+   Backtests, predicting each poll before it was published, against this
+   page's recipe rebuilt to use only earlier polls: ratings 4.2 v 4.6 net
+   points (3,394 polls, 1971–2026), this term 3.8 v 4.4; preferred PM 2.2 v
+   2.5 (share of those who chose, 1,103 polls), since 2022 2.0 v 2.6; 95%
+   bands covering 94–96%. A damped trend and faster early-tenure movement
+   were tried and dropped (no gain in prediction). */
+const LDM = JUR ? null : (() => {
+  const T0 = Date.now();
+  const DAYn = (iso) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000);
+  const ISOd = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+  const t1 = DAYn(LATEST_ISO);
+  const ELEC_DAYS = Object.values(ELECTIONS).map((e) => e && e.date).filter(Boolean).map(DAYn);
+  const PARTY_OF = { Whitlam: "alp", Hayden: "alp", Hawke: "alp", Keating: "alp", Beazley: "alp", Crean: "alp", Latham: "alp", Rudd: "alp", Gillard: "alp", Shorten: "alp", Albanese: "alp",
+    Gorton: "lnp", McMahon: "lnp", Snedden: "lnp", Fraser: "lnp", Peacock: "lnp", Howard: "lnp", Hewson: "lnp", Downer: "lnp", Nelson: "lnp", Turnbull: "lnp", Abbott: "lnp", Morrison: "lnp", Dutton: "lnp", Ley: "lnp", Taylor: "lnp", Hanson: "onp" };
+  /* each office's holders from CYC_META's handovers: [{ person, from, to }] */
+  const stintsOf = (office) => {
+    const raw = [];
+    CYC_META.forEach((c, i) => {
+      const next = CYC_META[i + 1], end = next ? next.eDate : "2099-01-01";
+      const spl = office === "pm" ? c.pmSpl : c.oppSpl;
+      const names = spl ? spl.names : [office === "pm" ? c.lead : c.oppLead];
+      const bounds = [c.eDate, ...(spl ? spl.isos || [spl.iso] : []), end];
+      names.forEach((nm, k) => raw.push({ person: nm, from: bounds[k], to: bounds[k + 1] }));
+    });
+    /* a split dated past its term's end (Shorten → Albanese, 27 May 2019, on
+       both the 2016 and 2019 rows) leaves an empty stint: dropped, then a
+       person's consecutive stints across elections merged */
+    const ok = raw.filter((s) => s.to > s.from).sort((a, b) => (a.from < b.from ? -1 : a.from > b.from ? 1 : 0));
+    const m = [];
+    for (const s of ok) { const l = m[m.length - 1]; if (l && l.person === s.person && l.to >= s.from) { if (s.to > l.to) l.to = s.to; } else m.push({ ...s, party: PARTY_OF[s.person] || null }); }
+    for (let i = 0; i + 1 < m.length; i++) if (m[i].to > m[i + 1].from) m[i].to = m[i + 1].from;
+    return m;
+  };
+  const PM_ST = stintsOf("pm"), OPP_ST = stintsOf("opp");
+  const at = (list, iso) => list.find((s) => iso >= s.from && iso < s.to) || null;
+  const midOf = (date, firm) => { const P = POLL_BY_KEY.get(date + "|" + firm); return P && P.dateStart ? Math.round((DAYn(P.dateStart) + DAYn(date)) / 2) : DAYn(date) - 1; };
+  /* rating scales that are not the approve/disapprove question: they lean, they set no zero */
+  const SCALE_HOUSES = new Set(["ReachTEL", "Fox & Hedgehog"]);
+  const ratings = [], ppmRows = [];
+  const csvRows = (f) => {
+    const p = path.join(ROOT, "data", f);
+    if (!fs.existsSync(p)) return [];
+    const L = fs.readFileSync(p, "utf8").trim().split("\n"), h = L[0].split(",");
+    return L.slice(1).map((l) => { const v = l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map((x) => x.replace(/,$/, "").replace(/^"|"$/g, "")); return Object.fromEntries(h.map((k, i) => [k, v[i] === "" || v[i] == null ? null : v[i]])); });
+  };
+  const BULL = csvRows("bulletin-leader-approval.csv"), ACN = csvRows("acnielsen-polls.csv");
+  const near = (rows, iso, tol) => rows.filter((x) => Math.abs(DAYn(x.date) - DAYn(iso)) <= tol);
+  const stintKey = (role, S) => role + ":" + S.person + ":" + S.from;
+  /* past terms: cycleApproval, with the printed splits its sources carry */
+  for (const rows of Object.values(cycleAppr)) for (const r of rows) {
+    const iso = r.date, firm = HOUSE_RENAMES[r.firm] || r.firm;
+    if (iso >= "2025-05-03") continue;                         // this term's rows are D.approval's
+    const pmS = at(PM_ST, iso), opS = at(OPP_ST, iso);
+    const metric = r.metric || metricOf(firm, "alb");
+    for (const [k, role, S] of [["pmNet", "pm", pmS], ["oppNet", "opp", opS]]) {
+      if (r[k] == null || !S) continue;
+      let R = null, W = null, U = null;
+      if (firm === "Morgan Gallup") {
+        const m = near(BULL, iso, 3).find((x) => (role === "pm" ? x.role === "pm" : x.role === "opposition") && x.net != null && Math.abs(+x.net - r[k]) <= 1);
+        if (m && m.approve != null) { R = +m.approve; W = +m.disapprove; U = m.undecided != null ? +m.undecided : 100 - R - W; }
+      } else if (/Nielsen/.test(firm)) {
+        const m = near(ACN, iso, 3)[0], ks = role === "pm" ? ["pm_approve", "pm_disapprove", "pm_uncommitted"] : ["ol_approve", "ol_disapprove", "ol_uncommitted"];
+        if (m && m[ks[0]] != null && Math.abs(+m[ks[0]] - +m[ks[1]] - r[k]) <= 1) { R = +m[ks[0]]; W = +m[ks[1]]; U = m[ks[2]] != null ? +m[ks[2]] : 100 - R - W; }
+      }
+      ratings.push({ day: DAYn(iso) - 1, date: iso, house: firm, role, person: S.person, party: S.party, from: S.from, to: S.to, series: stintKey(role, S),
+        metric, net: r[k], R, W, U, n: firm === "Morning Consult" ? 3000 : 1200, ...(SCALE_HOUSES.has(firm) ? { format: "scale" } : {}) });
+    }
+    if (r.pmPpm != null && r.oppPpm != null && pmS && opS && r.pmPpm > 0 && r.oppPpm > 0)
+      ppmRows.push({ day: DAYn(iso) - 1, date: iso, house: firm, kind: "two", contest: "pm-opp", pm: pmS.person, opp: opS.person, pmParty: pmS.party, oppParty: opS.party,
+        series: "pm-opp:" + pmS.person + ":" + pmS.from + ":" + opS.person + ":" + opS.from, to: pmS.to < opS.to ? pmS.to : opS.to, a: r.pmPpm, b: r.oppPpm, n: 1200 });
+  }
+  /* this term: the approval rows every leadership figure reads (apprAgg) */
+  const curPm = at(PM_ST, LATEST_ISO), oppNow = (iso) => at(OPP_ST, iso);
+  for (const p of apprAgg) {
+    const day = midOf(p.date, p.firm), n = rowN(POLL_BY_KEY.get(p.date + "|" + p.firm));
+    for (const [lk, role] of [["alb", "pm"], ["opp", "opp"], ["han", "han"]]) {
+      const S = role === "pm" ? at(PM_ST, p.date) : role === "opp" ? oppNow(p.date) : { person: "Hanson", party: "onp", from: "2025-05-03", to: "2099-01-01" };
+      if (!S) continue;
+      const sp = p.splits && p.splits[lk];
+      const R = sp && sp.app != null ? sp.app : null, W = sp && sp.dis != null ? sp.dis : null;
+      const U = sp && sp.unsure != null ? sp.unsure : R != null && W != null ? Math.max(0, 100 - R - W) : null;
+      const base = { day, date: p.date, role, person: S.person, party: S.party, from: S.from, to: S.to, series: stintKey(role, S), n };
+      if (p[lk] != null) ratings.push({ ...base, house: p.firm, metric: metricOf(p.firm, lk, p.date), net: p[lk], R, W, U, ...(SCALE_HOUSES.has(p.firm) ? { format: "scale" } : {}) });
+      const fv = p.splits && p.splits.fav ? p.splits.fav[lk] : null;
+      if (fv != null && metricOf(p.firm, lk, p.date) !== "fav") ratings.push({ ...base, house: p.firm + " (likeability)", metric: "fav", net: fv, R: null, W: null, U: null });
+    }
+  }
+  for (const p of ppm) {
+    const day = midOf(p.date, p.firm), n = ppmN(p), S = oppNow(p.date), P = at(PM_ST, p.date);
+    if (!S || !P) continue;
+    const base = { day, date: p.date, contest: "pm-opp", pm: P.person, opp: S.person, pmParty: P.party, oppParty: S.party, series: "pm-opp:" + P.person + ":" + P.from + ":" + S.person + ":" + S.from, to: P.to < S.to ? P.to : S.to, n };
+    if (p.han == null && p.alb > 0 && p.opp > 0) ppmRows.push({ ...base, house: p.firm, kind: "two", a: p.alb, b: p.opp });
+    for (const e of p.extra || []) if (e.alb > 0 && e.opp > 0)
+      ppmRows.push({ ...base, house: e.kind === "2pmp" ? p.firm + " (2PMP)" : p.firm, kind: e.kind === "2pmp" ? "2pmp" : "two", a: e.alb, b: e.opp });
+  }
+  for (const r of D.ppmHeadToHead) if (r.alb > 0 && r.han > 0)
+    ppmRows.push({ day: midOf(r.date, r.firm), date: r.date, house: r.firm, kind: "two", contest: "alb-han", pm: "Albanese", opp: "Hanson", pmParty: "alp", oppParty: "onp",
+      series: "alb-han:Albanese:Hanson", to: "2099-01-01", a: r.alb, b: r.han, n: ppmN(r) });
+  /* output days: the 15th of every month a series spans (its first to its
+     last reading), the latest poll day for a series still running, and the
+     month before it (the change) */
+  const monthDays = (a, b, rs) => {
+    const out = [];
+    const d0 = new Date(a * 86400000), d1 = new Date(b * 86400000);
+    for (let y = d0.getUTCFullYear(), m = d0.getUTCMonth(); y < d1.getUTCFullYear() || (y === d1.getUTCFullYear() && m <= d1.getUTCMonth()); m === 11 ? (y++, m = 0) : m++) {
+      const d = Math.min(b, Math.max(a, Math.floor(Date.UTC(y, m, 15) / 86400000)));
+      out.push(d);
+    }
+    if (rs.some((r) => r.to > LATEST_ISO || r.contest === "alb-han")) out.push(t1, t1 - 30);
+    return [...new Set(out)].sort((x, y) => x - y);
+  };
+  /* the settings grids: each spans its posterior on the prototype's wider grid with room either side */
+  const GRID_R = { w: [0.0075, 0.01, 0.014], d: [0.0007, 0.0015, 0.003], s: [0.02, 0.05, 0.1], tau: [0, 0.01, 0.02], J: [0.05, 0.1, 0.2] };
+  const GRID_P = { w: [0.014, 0.02, 0.03], d: [0.002, 0.004, 0.008], s: [0.03, 0.1, 0.25], tau: [0, 0.03, 0.06], J: [0.15, 0.3, 0.6] };
+  const RS = ldRatingSeries(ratings, { jumpsIn: ELEC_DAYS, monthDays: (a, b, rs) => monthDays(a, Math.max(b, rs.some((r) => r.to > LATEST_ISO) ? t1 : b), rs) });
+  const PS = ldPpmSeries(ppmRows, { jumpsIn: ELEC_DAYS, monthDays: (a, b, rs) => monthDays(a, Math.max(b, rs.some((r) => r.contest === "alb-han" || (r.to || "") > LATEST_ISO) ? t1 : b), rs) });
+  /* a running series reads to the latest poll day: its last reading may be days before */
+  for (const S of [...RS, ...PS]) if (S.outDays.includes(t1) && t1 > S.t1) S.t1 = t1;
+  const stR = ldFit(RS, GRID_R), stP = ldFit(PS, GRID_P);
+  if (stR.edges.length || stP.edges.length) console.warn("leaderModel: settings on a grid edge –", [...stR.edges.map((e) => "ratings " + e), ...stP.edges.map((e) => "ppm " + e)].join(", "));
+  const T1 = Date.now();
+  /* ---- ratings: monthly lines for every series; the favourability read
+     where favourability houses polled the leader (each regular one counting
+     once: its printed figure, c·m + lean) ---- */
+  const favCoefOf = (S) => {
+    const hs = S.favHouses.filter((h) => !S.lone.has(h) && S.cnt[h] >= 3);
+    if (!hs.length) return null;
+    const v = new Float64Array(S.N);
+    for (const h of hs) { const c = ldHouseCoef(S, h, S.cOf(h)); for (let i = 0; i < S.N; i++) v[i] += c[i] / hs.length; }
+    return { v, houses: hs, from: Math.min(...S.obs.filter((o) => hs.includes(o.house)).map((o) => o.t)) };
+  };
+  const ymOfDay = (d) => ISOd(d).slice(0, 7);
+  const rSeries = RS.map((S) => {
+    const fc = favCoefOf(S);
+    const mm = ldMoments(S, stR, S.outDays, fc ? { main: null, fav: fc.v } : { main: null });
+    const months = S.outDays.map((d, j) => ({ d, v: 100 * mm.main[j].m, ci: 196 * mm.main[j].sd, ...(fc && d >= fc.from ? { fv: 100 * mm.fav[j].m, fci: 196 * mm.fav[j].sd } : {}) }));
+    return { S, fc, months };
+  });
+  const pSeries = PS.map((S) => {
+    const mm = ldMoments(S, stP, S.outDays);
+    const sh = (z) => 100 / (1 + Math.exp(-z));
+    /* the lead among those who chose, 2s − 1, with its interval read through the logistic */
+    const months = S.outDays.map((d, j) => { const m = mm.main[j].m, sd = mm.main[j].sd; return { d, v: 2 * sh(m) - 100, lo: 2 * sh(m - 1.96 * sd) - 100, hi: 2 * sh(m + 1.96 * sd) - 100 }; });
+    return { S, months };
+  });
+  const T2 = Date.now();
+  /* ---- this term: draws for the readouts (now, a month ago, the change) ---- */
+  const curR = (role, person) => rSeries.find((x) => x.S.role === role && x.S.person === person && x.S.outDays.includes(t1));
+  const sumDraws = (now, prev) => {
+    const lo = quant(now, 0.025), hi = quant(now, 0.975), v = mean(now), sd = Math.sqrt(mean(Array.from(now, (x) => (x - v) ** 2)));
+    const o = { v: r1(v), se: r2(sd), ci95: r1((hi - lo) / 2), lo: r1(lo), hi: r1(hi) };
+    if (prev) {
+      const dd = now.map((x, i) => x - prev[i]), dlo = quant(dd, 0.025), dhi = quant(dd, 0.975), pUp = mean(Array.from(dd, (x) => (x > 0 ? 1 : 0)));
+      Object.assign(o, { prev: r1(mean(prev)), chg: r1(mean(dd)), changeCi95: r1((dhi - dlo) / 2), changeSig: dlo > 0 || dhi < 0, pUp: r2(pUp) });
+    }
+    return o;
+  };
+  const quant = (a, q) => { const s = Float64Array.from(a).sort(); const i = (s.length - 1) * q, lo = Math.floor(i); return s[lo] + (s[Math.min(lo + 1, s.length - 1)] - s[lo]) * (i - lo); };
+  const mean = (a) => { let s = 0; for (const v of a) s += v; return s / a.length; };
+  const now = {};
+  const recent = (S, test) => S.obs.filter((o) => o.t > t1 - 42 && test(o)).length;
+  for (const [key, role, person] of [["alb", "pm", curPm ? curPm.person : "Albanese"], ["taylor", "opp", (oppNow(LATEST_ISO) || {}).person], ["hanson", "han", "Hanson"]]) {
+    const X = curR(role, person); if (!X) continue;
+    const coefs = X.fc ? { net: null, fav: X.fc.v } : { net: null };
+    const dr = ldDrawReads(X.S, stR, [t1, t1 - 30], coefs, { nDraw: 2000, seed: 20261123 + key.length });
+    const sc = (a) => a.map((x) => 100 * x);
+    now[key + "_net"] = { ...sumDraws(sc(dr.net[0]), sc(dr.net[1])), n: recent(X.S, (o) => o.raw.metric === "approval"), method: "bayes" };
+    if (X.fc && X.S.obs.some((o) => o.t > t1 - 183 && X.fc.houses.includes(o.house)))
+      now[key + "_fav"] = { ...sumDraws(sc(dr.fav[0]), sc(dr.fav[1])), n: recent(X.S, (o) => o.raw.metric === "fav"), method: "bayes" };
+  }
+  /* preferred PM now: each running pairing's lead among those who chose and
+     the PM's share of them; which side leads, as a probability */
+  const pnow = {};
+  for (const X of pSeries.filter((x) => x.S.outDays.includes(t1))) {
+    const dr = ldDrawReads(X.S, stP, [t1, t1 - 30], { main: null }, { nDraw: 2000, seed: 20261124 + X.S.id.length });
+    const lead = (a) => a.map((z) => 200 / (1 + Math.exp(-z)) - 100);
+    const L = sumDraws(lead(dr.main[0]), lead(dr.main[1])), s = sumDraws(dr.main[0].map((z) => 100 / (1 + Math.exp(-z))));
+    const key = X.S.contest === "alb-han" ? "hanson" : "taylor";
+    pnow[key] = { pm: X.S.pm, opp: X.S.opp, lead: { ...L, pAhead: r2(mean(Array.from(lead(dr.main[0]), (x) => (x > 0 ? 1 : 0)))) }, share: s, n: recent(X.S, () => true) };
+  }
+  /* ---- the three-way question (this term): Albanese, the opposition
+     leader and Hanson as shares of those who named one, on the primary
+     model's engine (three categories; regular houses set the level) ---- */
+  let three = null;
+  {
+    const rs = ppm.filter((p) => p.han != null && p.alb > 0 && p.opp > 0 && p.han > 0 && eraOf(p.date) === "taylor")
+      .map((p, i) => ({ day: midOf(p.date, p.firm), house: p.firm, n: ppmN(p) * (p.alb + p.opp + p.han) / 100, cats: [[0], [1], [2]], vals: [p.alb, p.opp, p.han], full: true, step: pmStep([p.alb, p.opp, p.han]), idx: i }));
+    if (rs.length >= 4) {
+      const f5 = rs.slice(0, 5).map((r) => r.vals.map((v) => v / (r.vals[0] + r.vals[1] + r.vals[2])));
+      const avg = [0, 1, 2].map((k) => f5.reduce((a, v) => a + v[k], 0) / f5.length);
+      const t0 = Math.min(...rs.map((r) => r.day)) - 1;
+      const anchor = { mean: Float64Array.from([Math.log(avg[0] / avg[2]), Math.log(avg[1] / avg[2])]), cov: Float64Array.from([0.25, 0.1, 0.1, 0.25]) };
+      const mdays = monthDays(t0 + 1, t1, [{ to: "2099-01-01" }]).filter((d) => d > t0);
+      const fit = fitPrimary(rs, { t0, t1, anchor, jumps: new Set(), parties: ["alb", "opp", "han"], days: [...new Set([...mdays, t1, t1 - 30])], pairs: [[t1, t1 - 30]], nDraw: 2000, seed: 20261125, M: 16, minCore: 4 });
+      const d = fit.shares(t1), dp = fit.shares(t1 - 30), n = d.length / 3;
+      const colK = (A, k) => Float64Array.from({ length: n }, (_, i) => 100 * A[i * 3 + k]);
+      const o = {};
+      ["alb", "opp", "han"].forEach((k, j) => { o[k] = sumDraws(colK(d, j), colK(dp, j)); });
+      const secondH = mean(Array.from({ length: n }, (_, i) => (d[i * 3 + 2] > d[i * 3 + 1] ? 1 : 0)));
+      const firstA = mean(Array.from({ length: n }, (_, i) => (d[i * 3] > Math.max(d[i * 3 + 1], d[i * 3 + 2]) ? 1 : 0)));
+      /* each month's shares (mid-month, the latest month at the newest poll): mean and 95% interval */
+      const months = mdays.map((dd) => { const A = fit.shares(dd); return { d: dd, ...Object.fromEntries(["alb", "opp", "han"].map((k, j) => { const c = colK(A, j); return [k, [mean(c), (quant(c, 0.975) - quant(c, 0.025)) / 2]]; })) }; });
+      three = { ...o, pHansonOverOpp: r2(secondH), pAlbFirst: r2(firstA), n: rs.filter((r) => r.day > t1 - 42).length, houses: [...new Set(rs.map((r) => r.house))], months };
+    }
+  }
+  /* each house's lean now, per office: its printed net less the average approval pollster's (c·m + lean − m) */
+  const leans = {};
+  for (const [lk, role] of [["alb", "pm"], ["opp", "opp"], ["han", "han"]]) {
+    const X = rSeries.find((x) => x.S.role === role && x.S.outDays.includes(t1)); if (!X) continue;
+    const o = {};
+    for (const h of X.S.houses) {
+      if (X.S.lone.has(h)) continue;
+      const c = ldHouseCoef(X.S, h, X.S.cOf(h)); c[0] -= 1;
+      const mm = ldMoments(X.S, stR, [t1], { h: c });
+      o[h.replace(" (likeability)", "")] = { v: r1(100 * mm.h[0].m), n: X.S.cnt[h], ...(/likeability/.test(h) ? { metric: "fav" } : {}) };
+    }
+    leans[lk] = o;
+  }
+  const T3 = Date.now();
+  console.log(`leaderModel: ${RS.length} rating series (${ratings.length} readings), ${PS.length} preferred-PM pairings (${ppmRows.length}); ratings ${JSON.stringify(stR.best)}, ppm ${JSON.stringify(stP.best)}; fit ${T1 - T0} ms, lines ${T2 - T1} ms, now ${T3 - T2} ms`);
+  return { t1, rSeries, pSeries, now, pnow, three, leans, stR, stP, ymOfDay, ISOd, PM_ST, OPP_ST };
+})();
+
+/* ---- 4m'. the model's figures into the panel's shapes -------------------
+   The nets (alb_net, taylor_net, ley_net, hanson_net and their _fav twins)
+   are replaced where they stand, in leaderMonths and leaderNow, so every
+   reader of them – both designs, the change log, Past cycles' sitting term
+   – quotes the model. Preferred PM is a different basis (of those who
+   chose), so it travels in its own keys (lead_* in leaderMonths, read by
+   the redesign alone, and leaderModel); the published-basis _pref keys the
+   old design reads stay as they were. */
+let leaderModel = null;
+if (LDM) {
+  const lmByYm = new Map(leaderMonths.map((r) => [r.ym, r]));
+  const mid15 = (ym) => Math.floor(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 15) / 86400000);
+  const dayFor = (ym) => Math.min(mid15(ym), LDM.t1);
+  const termA = DAYn0(ELECTIONS["e2025"] ? ELECTIONS["e2025"].date : "2025-05-03");
+  function DAYn0(iso) { return Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000); }
+  /* this term's months, every month the model reads (a month no house polled
+     the leaders gets a row of nets only) */
+  for (const ym of MONTHS) {
+    const d = dayFor(ym);
+    if (d < termA) continue;
+    let row = lmByYm.get(ym);
+    for (const X of LDM.rSeries) {
+      const j = X.S.outDays.indexOf(d); if (j < 0) continue;
+      const key = X.S.role === "pm" ? "alb" : X.S.role === "han" ? "hanson" : X.S.person === "Ley" ? "ley" : X.S.person === "Taylor" ? "taylor" : null;
+      if (!key) continue;
+      if (!row) { row = { ym, x: mx(ym) }; lmByYm.set(ym, row); leaderMonths.push(row); }
+      const m = X.months[j];
+      row[key + "_net"] = r1(m.v); row[key + "_netCi"] = r1(m.ci);
+      if (m.fv != null) { row[key + "_fav"] = r1(m.fv); row[key + "_favCi"] = r1(m.fci); } else if (row[key + "_fav"] != null) { row[key + "_fav"] = null; row[key + "_favCi"] = null; }
+    }
+    /* Ley and Taylor: a month either does not span carries no value of theirs */
+    for (const X of LDM.pSeries) {
+      const j = X.S.outDays.indexOf(d); if (j < 0) continue;
+      const key = X.S.contest === "alb-han" ? "hanson" : X.S.opp === "Ley" ? "ley" : X.S.opp === "Taylor" ? "taylor" : null;
+      if (!key || !row) continue;
+      const m = X.months[j];
+      row["lead_" + key] = r1(m.v); row["lead_" + key + "Lo"] = r1(m.lo); row["lead_" + key + "Hi"] = r1(m.hi); row["lead_" + key + "Ci"] = r1((m.hi - m.lo) / 2);
+    }
+  }
+  /* the three-way question: shares of those who named one of the three
+     (the model's monthly reads replace the published-basis means; the old
+     design never drew them) */
+  if (LDM.three) {
+    for (const row of leaderMonths) for (const k of ["alb", "ley", "taylor", "hanson"]) { row[k + "_pref3"] = null; row[k + "_pref3Ci"] = null; }
+    for (const m of LDM.three.months) {
+      const row = lmByYm.get(LDM.ymOfDay(m.d)); if (!row) continue;
+      row.alb_pref3 = r1(m.alb[0]); row.alb_pref3Ci = r1(m.alb[1]);
+      row.taylor_pref3 = r1(m.opp[0]); row.taylor_pref3Ci = r1(m.opp[1]);
+      row.hanson_pref3 = r1(m.han[0]); row.hanson_pref3Ci = r1(m.han[1]);
+    }
+  }
+  leaderMonths.sort((a, b) => (a.ym < b.ym ? -1 : 1));
+  /* a month outside a series' span keeps no model value: the recipe's figure there would be a different construction */
+  for (const row of leaderMonths) {
+    const d = dayFor(row.ym);
+    for (const key of ["alb", "ley", "taylor", "hanson"]) {
+      const X = LDM.rSeries.find((x) => (key === "alb" ? x.S.role === "pm" : key === "hanson" ? x.S.role === "han" : x.S.person === (key === "ley" ? "Ley" : "Taylor")) && x.S.outDays.includes(d));
+      if (!X && d >= termA) { row[key + "_net"] = null; row[key + "_netCi"] = null; row[key + "_fav"] = null; row[key + "_favCi"] = null; }
+    }
+    for (const key of ["ley", "taylor", "hanson"]) {
+      const X = LDM.pSeries.find((x) => (key === "hanson" ? x.S.contest === "alb-han" : x.S.opp === (key === "ley" ? "Ley" : "Taylor")) && x.S.outDays.includes(d));
+      if (!X) { row["lead_" + key] = null; row["lead_" + key + "Ci"] = null; delete row["lead_" + key + "Lo"]; delete row["lead_" + key + "Hi"]; }
+    }
+  }
+  for (const k of Object.keys(leaderNow)) if (/_(net|fav)$/.test(k)) delete leaderNow[k];
+  Object.assign(leaderNow, LDM.now);
+  /* preferred PM on the model's basis – each side's share of those who chose
+     between the two, and of those who named one of the three – in keys of
+     their own (the old design reads the published-basis alb_pref) */
+  const sh2 = (P, side) => (P ? { v: side ? r1(100 - P.share.v) : P.share.v, ci95: P.share.ci95, se: P.share.se, n: P.n, method: "bayes" } : null);
+  for (const [k, v] of [["alb_prefD", sh2(LDM.pnow.taylor, 0)], ["taylor_prefD", sh2(LDM.pnow.taylor, 1)], ["alb_prefHD", sh2(LDM.pnow.hanson, 0)], ["hanson_prefHD", sh2(LDM.pnow.hanson, 1)]]) if (v) leaderNow[k] = v;
+  if (LDM.three) for (const [k, j] of [["alb_pref3", "alb"], ["taylor_pref3", "opp"], ["hanson_pref3", "han"]]) leaderNow[k] = { ...LDM.three[j], n: LDM.three.n, method: "bayes" };
+  /* the lead test in the panel's head: the model's lead among those who chose */
+  leaderLead.taylor = LDM.pnow.taylor ? { v: LDM.pnow.taylor.lead.v, ci95: LDM.pnow.taylor.lead.ci95, basis: "decided" } : null;
+  leaderLead.hanson = LDM.pnow.hanson ? { v: LDM.pnow.hanson.lead.v, ci95: LDM.pnow.hanson.lead.ci95, basis: "decided" } : null;
+  for (const lk of Object.keys(apprHE)) if (LDM.leans[lk]) apprHE[lk] = { ...apprHE[lk], snapshot: () => LDM.leans[lk] };
+  /* the history: every series' monthly line ([x, v, ±] ratings; [x, v, lo, hi]
+     preferred PM), one decimal */
+  const xOfDay = (d) => { const iso = LDM.ISOd(d); return dx(iso); };
+  leaderModel = {
+    t1: LDM.ISOd(LDM.t1),
+    ratings: LDM.rSeries.map(({ S, months }) => ({
+      id: S.id, role: S.role, person: S.person, party: S.party, from: S.from, to: S.to < "2099" ? S.to : null,
+      houses: [...new Set(S.obs.map((o) => o.house))].length,
+      m: months.map((m) => [r2(xOfDay(m.d)), r1(m.v), r1(m.ci), ...(m.fv != null ? [r1(m.fv), r1(m.fci)] : [])]),
+    })),
+    ppm: LDM.pSeries.map(({ S, months }) => ({
+      id: S.id, contest: S.contest, pm: S.pm, opp: S.opp, pmParty: S.pmParty, oppParty: S.oppParty,
+      m: months.map((m) => [r2(xOfDay(m.d)), r1(m.v), r1(m.lo), r1(m.hi)]),
+    })),
+    now: LDM.pnow, three: LDM.three,
+    settings: { ratings: LDM.stR.best, ppm: LDM.stP.best },
+  };
+}
+
 /* ---- 5k. confidence against past terms ---------------------------------
    The confidence panel's month-since-election reframe, past-cycles style:
    this term's gauge line over the middle half and middle 80% of the past
@@ -10762,8 +11110,9 @@ const changelog = JUR ? null : (() => {
       putSig(`lead|${id}_${metric}`, `${who}’s ${what}`, r);
     }
   }
-  putSig("ppm|alb_taylor", "Albanese’s preferred-PM margin over Taylor", ppmMarginNow);
-  putSig("ppm|alb_hanson", "Albanese’s preferred-PM margin over Hanson", ppmHMarginNow);
+  /* federally the model's lead among those who chose (§4m), the test the panel reads */
+  putSig("ppm|alb_taylor", "Albanese’s preferred-PM margin over Taylor", LDM ? LDM.pnow.taylor && LDM.pnow.taylor.lead : ppmMarginNow);
+  putSig("ppm|alb_hanson", "Albanese’s preferred-PM margin over Hanson", LDM ? LDM.pnow.hanson && LDM.pnow.hanson.lead : ppmHMarginNow);
   putSig("dir|net", "the right-track-minus-wrong-track net", directionNow);
   for (const it of (issues && issues.list) || []) {
     const lab = String(it.label || it.id).toLowerCase();
@@ -11257,6 +11606,11 @@ window.AUSPOL = (function () {
      preferred PM, and the national direction – nowcasts, as the headline. */
   const leaderNow = ${JSON.stringify(leaderNow)};
   const leaderLead = ${JSON.stringify(leaderLead)};
+  /* the leadership model (§4m): every series' monthly line back to 1971 –
+     ratings per leader per office, preferred PM per pairing (the PM's lead
+     among those who chose) – with this term's preferred-PM readouts; null
+     off the federal page */
+  const leaderModel = ${JSON.stringify(leaderModel)};
   const directionNow = ${JSON.stringify(directionNow)};
   /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
@@ -11478,7 +11832,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

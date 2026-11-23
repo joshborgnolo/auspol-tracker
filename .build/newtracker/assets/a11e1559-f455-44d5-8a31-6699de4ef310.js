@@ -438,8 +438,8 @@ function PanelZoom({ expanded, onExpand, onSwap, onClose, label, otherLabel }) {
   );
 }
 
-function LeadershipSection({ rangeId }) {
-  if (window.AP.rd) return <RdLeadership rangeId={rangeId} />;
+function LeadershipSection({ rangeId, setRangeId }) {
+  if (window.AP.rd) return <RdLeadership rangeId={rangeId} setRangeId={setRangeId} />;
   const { D } = window.AP;
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width

@@ -330,12 +330,12 @@
       "oth": 10
     },
     "leaders": {
-      "alb_fav": -23.5,
-      "alb_net": -27,
-      "hanson_fav": -7.2,
-      "hanson_net": -3.2,
-      "taylor_fav": -2,
-      "taylor_net": -1.3
+      "alb_fav": -25.3,
+      "alb_net": -24.6,
+      "hanson_fav": -3.2,
+      "hanson_net": 0.4,
+      "taylor_fav": 4.4,
+      "taylor_net": -1.4
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -377,12 +377,8 @@
       "immigration": "Immigration",
       "security": "National security"
     },
-    "sig": {
-      "lead|taylor_net": 1
-    },
-    "sigMeta": {
-      "lead|taylor_net": "Taylor’s net approval"
-    },
+    "sig": {},
+    "sigMeta": {},
     "conf": {
       "business": 81.7,
       "consumer": 66.6,
@@ -1043,6 +1039,12 @@
       "label": "24 Nov 2026",
       "kind": "finding",
       "text": "Other language voters (by language at home) no longer break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "meta",
+      "text": "Leader ratings and preferred prime minister are now estimated with a model rather than three- and six-week averages (see Info), and the leadership charts run back to 1971. The ratings moved with the method, not with any poll: net approval Albanese −27.0 → −24.6, Taylor −1.3 → −1.4, Hanson −3.2 → +0.4; net favourability Albanese −23.5 → −25.3, Taylor −2.0 → +4.4, Hanson −7.2 → −3.2. On the model’s test, Taylor’s rise in net approval over the month is no longer significant. Preferred prime minister now counts those who chose one of the leaders: Albanese 49.1, Taylor 50.9; Albanese 57.0, Hanson 43.0."
     }
   ]
 }

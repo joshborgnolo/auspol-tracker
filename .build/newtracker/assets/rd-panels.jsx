@@ -1242,10 +1242,34 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
   );
 }
 
-function RdLeadership({ rangeId }) {
+function RdLeadership({ rangeId, setRangeId }) {
   const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const xDomain = rangeDomain(rangeId);
+  /* The leadership model (gen-data §4m, D.leaderModel) and the vote charts'
+     shared window (rd-hero.jsx): inside this term the panel reads the range
+     tabs as it always has; a window behind it (a past term, ten years,
+     every year on record) draws every leader's line from the model's
+     history, each person's line apart from the next. /vic/ has neither. */
+  const LMOD = !window.JUR && D.leaderModel && D.leaderModel.ratings ? D.leaderModel : null;
+  const vw = useRdVw();
+  const vwTerms = React.useMemo(() => confTermsOf(D), [D]);
+  const { VH: vwVH, lo: vwLo, hi: vwHi } = rdVwReach(D);
+  const vwOn = !!(LMOD && setRangeId);
+  const histOn = !!(vwOn && vw.hist);
+  const vwWin = rdVwWin(rangeId, histOn ? vw.hist : null, vwTerms);
+  const xDomain = histOn ? [vwWin.a, vwWin.b] : rangeDomain(rangeId);
+  const vhLong = histOn && xDomain[1] - xDomain[0] > RD_VH_LONG;
+  /* the past terms' polls ride the Past cycles tab's lazily fetched file */
+  const [srcTick, setSrcTick] = useState(0);
+  React.useEffect(() => {
+    if (!histOn || Object.keys(D.cycleSource || {}).length) return undefined;
+    let live = true;
+    D.loadCycleSource().then(() => { if (live) setSrcTick((n) => n + 1); });
+    return () => { live = false; };
+  }, [histOn]);
+  /* preferred PM on the model's basis: each side's share of those who chose
+     one of the two (the two-party preferred's basis, and Newspoll's 2PMP's) */
+  const PK = LMOD ? { a: "alb_prefD", o: "taylor_prefD", aH: "alb_prefHD", h: "hanson_prefHD" } : { a: "alb_pref", o: "taylor_pref", aH: "alb_prefH", h: "hanson_prefH" };
   /* the jurisdiction's baseline election rides the axis as in RdPrimary:
      data-driven, so /vic/ never sees the federal mark (its own gritting
      falls back to the plain month grid when the window opens past it) */
@@ -1346,11 +1370,11 @@ function RdLeadership({ rangeId }) {
     }
     return { head, dek };
   })() : (() => {
-    const a = get("alb_pref"), o = get("taylor_pref"), aH = get("alb_prefH"), h = get("hanson_prefH");
+    const a = get(PK.a), o = get(PK.o), aH = get(PK.aH), h = get(PK.h);
     const net = get("alb_net");
     const first = LM.find((r) => r.alb_net != null);
     if (a == null || o == null || net == null || !first) return null;
-    const oppSig = leadTest(LL.taylor, "alb_pref", "taylor_pref");
+    const oppSig = leadTest(LL.taylor, PK.a, PK.o);
     const leads = a > o, lead = a - o;
     /* the approval move since the first month, said when it is large (ten
        points or more) AND clears the two readings' margins */
@@ -1366,7 +1390,7 @@ function RdLeadership({ rangeId }) {
     const leyRows = LM.filter((r) => r.alb_pref != null && r.ley_pref != null);
     const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + r.alb_pref - r.ley_pref, 0) / leyRows.length : null;
     const hanLead = aH != null && h != null ? aH - h : null;
-    const hanSig = hanLead != null && leadTest(LL.hanson, "alb_prefH", "hanson_prefH");
+    const hanSig = hanLead != null && leadTest(LL.hanson, PK.aH, PK.h);
     /* "held steady since it was first measured": the running lead within its
        own margin of the contest's first monthly reading */
     const hanRows = LM.filter((r) => r.alb_prefH != null && r.hanson_prefH != null);
@@ -1394,8 +1418,8 @@ function RdLeadership({ rangeId }) {
      two side by side, never pairs a segment with one still on screen). The
      head-to-head Albanese has no three-way counterpart. */
   const seg = (Ld, k, order, mk) => ({ name: Ld.short, v: get(k), color: Ld.color, party: Ld.id === "alb" ? "alp" : Ld.id === "taylor" ? "lnp" : "onp", ci: N[k] ? N[k].ci95 : null, order, mk });
-  const twoNow = get("alb_pref") != null && get("taylor_pref") != null
-    ? { label: pm.short + " v " + opp.short, segs: [seg(pm, "alb_pref", 0, "alb"), seg(opp, "taylor_pref", 2, "taylor")] } : null;
+  const twoNow = get(PK.a) != null && get(PK.o) != null
+    ? { label: pm.short + " v " + opp.short, segs: [seg(pm, PK.a, 0, "alb"), seg(opp, PK.o, 2, "taylor")] } : null;
   /* /vic/: no head-to-head inside the window (its pollsters moved to the
      three-way question) - the bar shows the latest month the sitting pair
      was asked head to head, labelled with that month, rather than leaving
@@ -1408,8 +1432,8 @@ function RdLeadership({ rangeId }) {
              segs: [one(pm, "alb_pref", 0, "alb"), one(opp, "taylor_pref", 2, "taylor")] };
   })() : null;
   const two = twoNow || twoLast;
-  const twoH = get("alb_prefH") != null && get("hanson_prefH") != null
-    ? { label: pm.short + " v " + han.short, segs: [seg(pm, "alb_prefH", 0, "alb-h2h"), seg(han, "hanson_prefH", 2, "hanson")] } : null;
+  const twoH = get(PK.aH) != null && get(PK.h) != null
+    ? { label: pm.short + " v " + han.short, segs: [seg(pm, PK.aH, 0, "alb-h2h"), seg(han, PK.h, 2, "hanson")] } : null;
   const three = ["alb_pref3", "taylor_pref3", "hanson_pref3"].every((k) => get(k) != null)
     ? [seg(pm, "alb_pref3", null, "3:alb"), seg(opp, "taylor_pref3", null, "3:taylor"), seg(han, "hanson_pref3", null, "3:hanson")].sort((x, y) => y.v - x.v) : null;
   const leadOf = (segs) => { const w = segs[0].v >= segs[1].v ? segs[0] : segs[1]; return { who: w, m: Math.abs(segs[0].v - segs[1].v) }; };
@@ -1504,14 +1528,18 @@ function RdLeadership({ rangeId }) {
     void root.offsetWidth;          // commit every start state at once, then release them together
     release.forEach((f) => f());
   }, [ppmView]);
-  const secondIsHanson = three && three[1].name === han.short;
+  /* who runs second in the three-way: on the model, said only where it is
+     95% sure of the order; inside that, the two are too close to separate */
+  const p2 = LMOD && LMOD.three ? LMOD.three.pHansonOverOpp : null;
+  const secondIsHanson = !!three && (p2 != null ? p2 >= 0.95 : three[1].name === han.short);
+  const secondClose = !!three && p2 != null && p2 > 0.05 && p2 < 0.95;
   const ppmNote = (() => {
     if (ppmView === "two") {
       if (!three) return null;
       const lastTwo = J && !twoNow && !two ? LM.slice().reverse().find((r) => r.alb_pref != null && r.taylor_pref != null) : null;
       return (lastTwo ? "The head-to-head question was last asked in " + rdMonthYear(lastTwo.ym) + ". " : "")
         + "Asked to choose from all three: " + three.map((s) => s.name + " " + r1(s.v) + "%").join(", ") + "."
-        + (secondIsHanson ? " " + han.short + ", not " + opp.short + ", runs second." : "");
+        + (secondIsHanson ? " " + han.short + ", not " + opp.short + ", runs second." : secondClose ? " " + han.short + " and " + opp.short + " are too close to separate for second." : "");
     }
     if (ppmView === "three") {
       const rows = LM.filter((r) => r.hanson_pref3 != null && (r.taylor_pref3 != null || r.ley_pref3 != null));
@@ -1534,7 +1562,7 @@ function RdLeadership({ rangeId }) {
     }
     const beats = two && twoH && leadOf(two.segs).who.name === pm.short && leadOf(twoH.segs).who.name === pm.short;
     return (beats ? "Head to head, " + pm.short + " beats both." : "")
-      + (secondIsHanson ? " In the three-way question " + han.short + ", not " + opp.short + ", runs second." : "");
+      + (secondIsHanson ? " In the three-way question " + han.short + ", not " + opp.short + ", runs second." : secondClose ? " In the three-way question " + han.short + " and " + opp.short + " are too close to separate for second." : "");
   })();
 
   /* ---- preferred PM: the charts ----------------------------------------- */
@@ -1544,7 +1572,7 @@ function RdLeadership({ rangeId }) {
      dots is built once and kept - which also lets a switch's blend find the
      pair of views it lined up on the frame before. */
   const memo = React.useRef({ key: null, m: new Map() });
-  const memoKey = xDomain[0] + "|" + xDomain[1] + "|" + narrow;
+  const memoKey = xDomain[0] + "|" + xDomain[1] + "|" + narrow + "|" + srcTick + "|" + histOn;
   if (memo.current.key !== memoKey) memo.current = { key: memoKey, m: new Map() };
   const kept = (k, f) => { const mm = memo.current.m; if (!mm.has(k)) mm.set(k, f()); return mm.get(k); };
   const handover = (D.events || []).find((e) => e.date === "2026-02-12");
@@ -1641,7 +1669,7 @@ function RdLeadership({ rangeId }) {
       if (!c || c.alb == null) return null;
       const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
       if (!o || c[o] == null) return null;
-      return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color, who: o,
+      return { x: q.x, y: LMOD ? +(100 * (c.alb - c[o]) / (c.alb + c[o])).toFixed(2) : c.alb - c[o], color: o === "hanson" ? han.color : opp.color, who: o,
                label: J ? (holderAt("alb", q.released) || pm.short) + " over " + (holderAt(SLOT[o], q.released) || L[o === "ley" ? "taylor" : o].short)
                  : "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
     })).filter(Boolean));
@@ -1703,7 +1731,11 @@ function RdLeadership({ rangeId }) {
       return (J ? [["alb", pm.color, holderAt("alb", q.released) || pm.short], [oppK, opp.color, holderAt("opp", q.released) || opp.short], ["hanson", han.color, holderAt("han", q.released) || han.short]]
         : [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]])
         .filter(([k]) => k && c[k] != null)
-        .map(([k, color, label]) => ({ x: q.x, y: c[k], color, label, meta: q, who: k }));
+        .map(([k, color, label]) => {
+          /* on the model's basis a share of those who named one of the three */
+          const tot = LMOD ? ["alb", oppK, "hanson"].reduce((a, kk) => a + (kk && c[kk] != null ? c[kk] : 0), 0) : 100;
+          return { x: q.x, y: LMOD ? +(100 * c[k] / tot).toFixed(2) : c[k], color, label, meta: q, who: k };
+        });
     }));
   const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map((d) => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find((s) => s.id === "ley");
@@ -1723,10 +1755,11 @@ function RdLeadership({ rangeId }) {
   const lchart = (key, title, props) => (
     <div className="card rd-card rd-ld-chart" key={key}>
       <div className="rd-chead"><span className="rd-chead-t">{title}</span></div>
-      <TrendChart key={key} heightPx={narrow ? 250 : 270} padPx={chartPad} xDomain={xDomain}
-                  xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline events={evs}
+      <TrendChart key={key} heightPx={narrow ? 250 : histOn || LMOD ? 320 : 270} padPx={chartPad} xDomain={props.win ? [props.win.a, props.win.b] : xDomain}
+                  xTicks={histOn ? rdVwTicks(props.win || vwWin, vwTerms) : rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline
+                  events={histOn ? rdVwElections(props.win || vwWin, vwTerms) : evs}
                   tooltipTitle={(i) => { const s = props.spine || []; return s[i] && s[i].ym ? monthLabelFull(s[i].ym) : ""; }}
-                  fmt={(v) => v.toFixed(1)} {...props} />
+                  fmt={(v) => v.toFixed(1)} {...props} pollFacet={(mm) => (mm && mm.pre ? null : "leadership")} />
     </div>
   );
   /* The two views as data, so the one chart can be either or on its way
@@ -1739,10 +1772,122 @@ function RdLeadership({ rangeId }) {
      what the page's key says. The copy is read away from the panel, so it
      also carries the panel's name as its title; its lines are named at
      their ends, so it wants no legend. */
-  const keyDots = "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.";
-  const keyThree = "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels.";
-  const keyLead = J ? "Lead is the " + J.office.alb + "’s share minus the " + J.office.opp + "’s" : "Lead is " + pm.short + "’s share minus his opponent’s";
-  const ppmModel = (v) => v === "three" ? {
+  const keyDots = LMOD ? "Each dot is one poll; lines are the model’s estimates for the average pollster, each pollster’s lean taken out, shaded bands their 95% intervals."
+    : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.";
+  const keyThree = LMOD ? "Shares of those who named one of the three: pollsters leave very different shares undecided, so each poll is read without them."
+    : "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels.";
+  const keyLead = J ? "Lead is the " + J.office.alb + "’s share minus the " + J.office.opp + "’s"
+    : LMOD ? "Lead is " + (histOn ? "the prime minister" : pm.short) + "’s share minus the opponent’s among those who chose one of the two, as the two-party preferred is counted"
+    : "Lead is " + pm.short + "’s share minus his opponent’s";
+  /* ---- the history scene (D.leaderModel) ---------------------------------
+     Every series in the window: a rating series is a person in an office, a
+     preferred-PM series a pairing. Each is its own line, coloured by its
+     party (a pairing by the opponent's, as the sitting term's "over Taylor"
+     is), so a change of leader detaches the lines rather than joining two
+     people. Named where they end inside the window, or at the window's edge
+     while they run; a long window names the prime ministers only. */
+  const partyCol = (p) => (D.PARTIES && D.PARTIES[p] ? D.PARTIES[p].color : "var(--ink-3)");
+  const ymOfX = (x) => { const y = Math.floor(x + 1e-9); const mo = Math.min(12, Math.floor((x - y) * 12 + 1e-6) + 1); return y + "-" + String(mo).padStart(2, "0"); };
+  const ROLE_OF = { pm: "PM", opp: "opposition", han: "One Nation" };
+  const histScene = (kind, mt) => {
+    if (!histOn) return null;
+    const list = kind === "ppm" ? LMOD.ppm : LMOD.ratings;
+    /* a window reaching back before the first reading on file (leader
+       ratings from 1971, preferred PM from 1987) starts there instead */
+    const reach = Math.min(...list.flatMap((q) => q.m.filter((r) => kind === "ppm" || mt !== "fav" || r[3] != null).slice(0, 1).map((r) => r[0])));
+    const win = vwWin.kind !== "term" && vwWin.kind !== "term-carry" && Number.isFinite(reach) && xDomain[0] < reach - 0.5 && xDomain[1] > reach + 1
+      ? { kind: "custom", a: reach - 0.3, b: xDomain[1] } : null;
+    const [a, b] = win ? [win.a, win.b] : xDomain, atNow = b >= vwHi - 1 / 24;
+    /* a phone's plot is a third as wide: six years there is already long */
+    const long = b - a > (narrow ? RD_VH_LONG / 2 : RD_VH_LONG);
+    const series = [], areas = [], lone = [], notes = [], stops = new Map(), pmPeaks = new Map();
+    const lastAll = Math.max(...list.map((q) => (q.m.length ? q.m[q.m.length - 1][0] : 0)));
+    for (const s of list) {
+      const rows = s.m.filter((r) => r[0] >= a - 0.05 && r[0] <= b + 0.05 && (kind === "ppm" || mt !== "fav" || r[3] != null));
+      if (!rows.length) continue;
+      const pts = rows.map((r) => {
+        const y = kind === "ppm" ? r[1] : mt === "fav" ? r[3] : r[1];
+        const ci = kind === "ppm" ? (r[3] - r[2]) / 2 : mt === "fav" ? r[4] : r[2];
+        return { x: r[0], y, ci, lo: kind === "ppm" ? r[2] : y - ci, hi: kind === "ppm" ? r[3] : y + ci, ym: ymOfX(r[0]) };
+      });
+      const color = kind === "ppm" ? partyCol(s.oppParty) : partyCol(s.party);
+      const name = kind === "ppm" ? s.pm + " v " + s.opp : s.person;
+      const label = kind === "ppm" ? s.pm + " over " + s.opp : s.person + " (" + ROLE_OF[s.role] + ")";
+      pts.forEach((q) => stops.set(q.x.toFixed(2), { x: q.x, y: 0, ym: q.ym }));
+      if (pts.length < 2) {
+        lone.push({ x: pts[0].x, y: pts[0].y, color, label, meta: { pollster: "Model estimate", dateLabel: rdVhMonth(pts[0].x), pre: true } });
+        continue;
+      }
+      const last = pts[pts.length - 1];
+      /* a series still running reaches the model's newest day */
+      const running = (kind === "ppm" || !s.to) && s.m[s.m.length - 1][0] >= lastAll - 0.02;
+      const atEdge = atNow && running && last.x >= b - 0.08;
+      series.push({ id: "h:" + s.id, label, color, points: pts, rdWidth: long ? 1.6 : 2.5, endCap: false,
+                    endLabel: atEdge && !long ? (kind === "ppm" ? "over " + s.opp : s.person) : null });
+      if (!long) areas.push({ id: "h-ci:" + s.id, color, className: "ci-band", edge: false, points: pts.map((q) => ({ x: q.x, y0: q.lo, y1: q.hi })) });
+      if (!atEdge || long) {
+        /* a long window names each prime minister once, over the highest
+           point of their longest line: the ratings' PM lines, and on the
+           preferred-PM chart the PM's pairings together - there in plain
+           ink, since those lines wear the opponents' colours */
+        if (long && (kind !== "ppm" && s.role !== "pm")) continue;
+        const pk = pts.reduce((m, q) => (q.y > m.y ? q : m), pts[0]);
+        if (long) {
+          const nm = kind === "ppm" ? s.pm : s.person, span = last.x - pts[0].x, was = pmPeaks.get(nm);
+          if (!was || span > was.span) pmPeaks.set(nm, { span, note: { x: pk.x, y: pk.y, dy: -9, text: nm, anchor: "middle", color: kind === "ppm" ? "var(--ink-2)" : inkOf(color), weight: 600 } });
+          continue;
+        }
+        notes.push({ x: last.x, y: last.y, dy: kind === "ppm" || s.role === "pm" ? -9 : 18, text: kind === "ppm" ? name : s.person, anchor: "middle", color: inkOf(color), weight: 600 });
+      }
+    }
+    /* the past polls as published (the Past cycles file), for windows of a dozen years or less */
+    for (const v of pmPeaks.values()) notes.push(v.note);
+    const dots = [];
+    if (!long) {
+      const src = D.cycleSource || {};
+      const who = (role, iso) => LMOD.ratings.find((q) => q.role === role && iso >= q.from && (!q.to || iso < q.to));
+      for (const t of Object.values(src)) for (const r of (t && t.approval) || []) {
+        const x = confIsoX(r.date);
+        if (x < a || x > b) continue;
+        const meta = { pollster: r.firm, dateLabel: rdDate(r.date, true), pre: true };
+        if (kind === "ppm") {
+          if (r.pmPpm == null || r.oppPpm == null || !(r.pmPpm + r.oppPpm > 0)) continue;
+          const P = who("pm", r.date), O = who("opp", r.date);
+          if (!P || !O) continue;
+          dots.push({ x, y: +(100 * (r.pmPpm - r.oppPpm) / (r.pmPpm + r.oppPpm)).toFixed(2), color: partyCol(O.party), label: P.person + " over " + O.person, meta });
+        } else {
+          const fav = (r.metric || "approval") === "fav";
+          if (fav !== (mt === "fav")) continue;
+          for (const [k, role] of [["pmNet", "pm"], ["oppNet", "opp"]]) {
+            if (r[k] == null) continue;
+            const P = who(role, r.date);
+            if (P) dots.push({ x, y: r[k], color: partyCol(P.party), label: P.person, meta });
+          }
+        }
+      }
+    }
+    const spine = [...stops.values()].filter((q) => q.x >= a - 1e-6 && q.x <= b + 1e-6).sort((p, q) => p.x - q.x);
+    const ys = series.flatMap((q) => q.points.map((p) => p.y));
+    const span = ys.length ? Math.max(...ys) - Math.min(...ys) : 20;
+    return { series, areas, lone, notes: unclash(notes, Math.max(4, span * 0.1)), dots, spine, win, long };
+  };
+  const histPpm = histOn ? histScene("ppm") : null;
+  const histLead = histPpm ? (() => {
+    const vals = histPpm.series.flatMap((s) => s.points.flatMap((q) => (histPpm.long ? [q.y] : [q.lo, q.hi]))).concat(histPpm.dots.map((d) => d.y), histPpm.lone.map((d) => d.y), histPpm.long ? [] : leadDots.map((d) => d.y));
+    const fit = fitDomain(vals.length ? vals : [-20, 20], 10, 0);
+    return {
+      title: "The prime minister’s lead, month by month", series: histPpm.series, dots: histPpm.dots.concat(histPpm.lone, histPpm.long ? [] : leadDots), win: histPpm.win,
+      domain: fit.domain, yTicks: rdYTicks(fit.domain[0], fit.domain[1], 10), areas: histPpm.areas,
+      yTickFmt: (y) => (y === 0 ? "Tied" : y > 0 ? "+" + y : "−" + Math.abs(y)),
+      refLines: [{ y: 0, color: "var(--ink-3)" }], notes: histPpm.notes.length ? histPpm.notes
+        : histPpm.series.length || histPpm.lone.length ? [] : [{ span: ["left", "right"], y: fit.domain[1] * 0.4, text: "No preferred-PM polls on file for these years: the question runs from 1987, regularly from 1991", cls: "rd-note-it" }],
+      spine: histPpm.spine,
+      copy: { title: "Preferred prime minister: the prime minister’s lead", span: confWinYears(vwWin, vwTerms, vwHi),
+              sub: "Points ahead of the opposition leader among those who chose one of the two, each pairing its own line",
+              legend: [], caption: keyDots + " " + keyLead + "." },
+    };
+  })() : null;
+  const ppmModel = (v) => v !== "three" && histLead ? histLead : v === "three" ? {
     title: "Share in the three-way question, month by month", series: threeSeries, dots: threeDots,
     domain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (y) => (y === 0 ? "0" : y % 20 === 0 ? y + "%" : ""),
     refLines: [], notes: threeNotes, spine: J ? spineOf(threeSeries) : (threeSeries[0] || { points: [] }).points,
@@ -1786,10 +1931,10 @@ function RdLeadership({ rangeId }) {
     const A0 = m ? ppmModel(ppmSlot(m.from)) : null;
     return lchart(key, B.title, {
       padSeries: ppmPadSeries, yDomain: dom, yTicks: B.yTicks, yTickFmt: B.yTickFmt, refLines: B.refLines,
-      series, areas: bandsOf(series), notes: B.notes,
+      series, areas: B.areas || bandsOf(series), notes: B.notes,
       morphFrom: A0 ? { yTicks: A0.yTicks, yTickFmt: A0.yTickFmt, refLines: A0.refLines, notes: A0.notes } : null, morphT: m ? m.t : 1,
       scatter: cross ? cross.scatter : B.dots, scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],
-      fade: m ? m.t : 1, pollFacet: "leadership", spine: B.spine, copy: B.copy,
+      fade: m ? m.t : 1, spine: B.spine, copy: B.copy, ...(B.win ? { win: B.win } : {}),
       extraRows: (i) => ciRows(B.series, i, B.spine),
     });
   };
@@ -1833,7 +1978,27 @@ function RdLeadership({ rangeId }) {
         return out.map((y) => ({ x: q.x, y, color: Ld.color, label: lab, meta: q, leader: Ld.id }));
       }));
   };
+  const netHistChart = (mt, key) => {
+    const H = histScene("ratings", mt);
+    const cur = H.long ? [] : cloudFor(mt);
+    const vals = H.series.flatMap((s) => s.points.flatMap((q) => (H.long ? [q.y] : [q.lo, q.hi]))).concat(H.dots.map((d) => d.y), H.lone.map((d) => d.y), cur.map((d) => d.y));
+    const tgt = fitDomain(vals.length ? vals : [-20, 20], 20, 0);
+    const empty = !H.series.length && !H.lone.length;
+    const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
+    return lchart("rd-appr-" + (key === "b" ? "b" : "main"), title, {
+      yDomain: tgt.domain, yTicks: rdYTicks(tgt.domain[0], tgt.domain[1], 20),
+      yTickFmt: (v) => (v === 0 ? "Even" : v > 0 ? "+" + v : "−" + Math.abs(v)),
+      refLines: [{ y: 0, color: "var(--ink-faint)" }], series: H.series, areas: H.areas,
+      notes: empty ? [{ span: ["left", "right"], y: tgt.domain[1] * 0.5, text: mt === "fav" ? "Favourability was rarely asked before 2022: no pollster asked it regularly" : "No leader ratings on file for these years: Morgan Gallup’s monthly ratings begin in 1971", cls: "rd-note-it" }] : H.notes,
+      scatter: H.dots.concat(H.lone, cur), scatterOut: [], scatterMove: [], fade: 1, spine: H.spine, ...(H.win ? { win: H.win } : {}),
+      copy: { title: (mt === "fav" ? "Net favourability" : "Net approval") + " of each leader", span: confWinYears(vwWin, vwTerms, vwHi),
+              sub: (mt === "fav" ? "Favourable minus unfavourable views of each leader as a person" : "Approve minus disapprove of the job each leader is doing") + ", each leader in each office a line of their own",
+              legend: [], caption: keyDots + " Before 2007 most ratings are Newspoll’s and, before 1985, Morgan Gallup’s." },
+      extraRows: (i) => ciRows(H.series, i, H.spine),
+    });
+  };
   const netChart = (mt, key) => {
+    if (histOn) return netHistChart(mt, key);
     const m = key === "main" || key === "a" ? morph : null;
     const runs = (Ld) => erasOf(Ld).map((era) => {
       if (!m) return { era, rows: lineFor(Ld, mt, era), clip: null };
@@ -1887,7 +2052,7 @@ function RdLeadership({ rangeId }) {
       yTickFmt: (v) => (v === 0 ? "Even" : v > 0 ? "+" + v : "−" + Math.abs(v)),
       refLines: [{ y: 0, color: "var(--ink-faint)" }], series, areas, notes,
       scatter: cross ? cross.scatter : cloudFor(mt), scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],
-      fade: m ? m.t : 1, pollFacet: "leadership", spine,
+      fade: m ? m.t : 1, spine,
       /* read away from the panel: its name, its measure, and the key */
       copy: mt === "fav"
         ? { title: "Net favourability of " + leaderNames, sub: "Favourable minus unfavourable views of each leader as a person, month by month",
@@ -2030,6 +2195,13 @@ function RdLeadership({ rangeId }) {
     return s;
   })();
 
+  /* the vote charts' window bar (rd-hero.jsx), one over each chart, both on
+     the one shared window; the pin holds this panel on screen while the
+     window reshapes the charts above it */
+  const winBar = (id) => (
+    <RdVoteWinBar rangeId={rangeId} setRangeId={setRangeId} hist={histOn ? vw.hist : null} terms={vwTerms}
+                  lo={vwLo} hi={vwHi} ready={!!vwVH} pin={() => { const el = (id === "ppm" ? ppmEl : apprEl).current; if (el) rdPinScroll(el); }} />
+  );
   const panel = (id, head, dek, tabs, body) => (
     <div className={"rd-ld-panel" + (expanded && expanded !== id ? " rd-hidden" : "")}
          ref={id === "ppm" ? ppmEl : apprEl}>
@@ -2113,11 +2285,11 @@ function RdLeadership({ rangeId }) {
           keys and notes would get parked against this panel's tall chart
           rows, centre themselves in the stretched track and hang in space
           above or below their own charts. Not shared, each panel stacks. */}
-      <div className={"rd-ld-grid" + (expanded ? " one" : ppmView === "both" || metric === "both" ? " free" : "")}>
+      <div className={"rd-ld-grid" + (LMOD || expanded ? " one" : ppmView === "both" || metric === "both" ? " free" : "")}>
         {panel("ppm", J ? "Preferred " + J.office.alb : "Preferred prime minister", J ? "“Who would make the better " + J.office.alb + "?” Asked head to head, and three-way where pollsters offer it." : "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
           <RdTabs swipe value={ppmView} onChange={ppmPick} ariaLabel={J ? "Preferred " + J.office.alb + " question" : "Preferred prime minister question"}
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
-            {!narrow && expandBtn("ppm", J ? "preferred " + J.office.alb : "preferred prime minister")}
+            {!narrow && !LMOD && expandBtn("ppm", J ? "preferred " + J.office.alb : "preferred prime minister")}
           </RdTabs>,
           <>
             {/* two bars or one, a note a line longer or shorter: each glides
@@ -2133,12 +2305,13 @@ function RdLeadership({ rangeId }) {
               </div>
             </RdGlide>
             {ppmNote && <RdGlide watch={ppmNote} className={"rd-ld-note-g" + (ppmView === "three" ? " rd-ld-noteup" : "")}><p className="rd-note rd-ld-note">{ppmNote}</p></RdGlide>}
+            {vwOn && winBar("ppm")}
             {mainPpmChart}
             {ppmView === "both" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
               <span className="rd-ld-keytxt">{keyDots + " " + (ppmView === "three" ? keyThree
-                : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests."
-                : keyLead + "; three-way figures are shares of all respondents.")}</span>
+                : ppmView === "two" ? keyLead + (histOn ? "; each pairing is its own line." : ", which lets one chart carry both head-to-head contests.")
+                : keyLead + (LMOD ? "; three-way figures are shares of those who named one of the three." : "; three-way figures are shares of all respondents."))}</span>
             </RdKey>
           </>)}
         {panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval",
@@ -2147,22 +2320,24 @@ function RdLeadership({ rangeId }) {
             : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".",
           <RdTabs swipe value={metric} onChange={pickMetric} ariaLabel="Leader rating"
                   options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
-            {!narrow && expandBtn("appr", "leader ratings")}
+            {!narrow && !LMOD && expandBtn("appr", "leader ratings")}
           </RdTabs>,
           <>
             <RdGlide watch={metric} className="rd-ld-dp-g">{dotPlot(metric)}</RdGlide>
             {metric === "both" && <RdKey className="rd-dp-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "Approval: the job they’re doing" }, { kind: "dot-open", color: "var(--ink-3)", label: "Favourability: views of them as a person" }]} />}
             <RdGlide watch={apprNote} className="rd-ld-note-g"><p className="rd-note rd-ld-note">{apprNote}</p></RdGlide>
+            {vwOn && winBar("appr")}
             {apprChart}
             {metric === "both" && apprFavChart}
             <RdKey className="rd-ckey" items={[
               { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-              { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and its 95% interval" },
+              { kind: "lineband", color: "var(--ink-3)", label: LMOD ? "Model estimate and its 95% interval" : "Monthly average and its 95% interval" },
             ]} />
           </>)}
       </div>
       <RdFoot how={{ term: "leadership", from: "Leadership" }}>
         {J ? "Every figure pools the last six weeks of polls, counting only those since the leader took the job. Changes are on a month ago; ▼ in bold marks a significant change."
+          : LMOD ? "Every figure is the model’s estimate for the average pollster, each pollster’s lean taken out; preferred PM counts those who chose one of the leaders. Changes are on a month ago; ▼ in bold marks a significant change."
           : "Albanese’s and Taylor’s approval pool the last three weeks of polls; the other figures, the last six. Changes are on a month ago; ▼ in bold marks a significant change."}
       </RdFoot>
     </RdSec>
