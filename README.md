@@ -29,24 +29,22 @@ new and worth looking at.
 
 ### Demographic gaps
 
-Under **Who votes for whom**, the existing group charts are followed by
-party-by-party gap charts for each set, including generations, states,
-language, work status and the standardised income bands. The charts subtract
-the named reference group's monthly primary vote from the comparison group's
-figure; gender defaults to women's minus men's. Either group can be the reference.
-The default relative mode divides the comparison share by the reference share (1× is equal support), omitting months where the reference share is zero. Multi-category sets offer every other
-category against the same reference. Absolute scales are symmetric about zero and
-fixed across parties, comparison choices and time windows within a set.
-Tooltips give both underlying shares. Missing months break the line.
-Each party chart appears only if its selected measure changes over the
-available monthly history under an approximate 95% simultaneous test.
-The test treats published 95% margins as normal-equivalent, allows for
-rounding, and widens them for both groups and all paired months using
-Bonferroni. If the resulting monthly ratio or difference intervals share
-any common value, the chart stays hidden. This conservative screen allows
-dependence between estimates and can miss changes. The correction is per
-party and group comparison. Run `node .build/test-demographic-gaps.mjs` for the numeric
-and data-coverage checks (also included in `npm test`).
+Under **Who votes for whom**, each party and facet shows an election-to-latest
+finding only when the Bayesian model detects a change in a group’s support
+relative to the national vote for that party. The model uses paired posterior
+draws at the two dates. The 95% credible interval for the change factor must
+exclude 1, and a conflicting same-house check withholds the finding. These
+are individual intervals. The details show both vote shares and the interval.
+
+The separate group-to-group time-series section appears only for facets with
+a qualifying pair. Its approximate 95% screen widens both groups’ published
+monthly margins for rounding and multiple months (Bonferroni), then checks
+whether any constant share ratio is compatible with the full history. It is
+conservative and applies per party and group pair. Every eligible reference is
+selectable. Relative view defaults to comparison share divided by reference
+share, with zero denominators omitted. Absolute view shows the same qualifying
+parties in percentage points. Tooltips give both underlying shares.
+Run `node .build/test-demographic-gaps.mjs` for the numeric and data checks.
 
 ### Pollster conventions worth knowing
 

@@ -5,8 +5,8 @@ import vm from "node:vm";
 
 const source = fs.readFileSync(".build/newtracker/assets/rd-panels.jsx", "utf8");
 const helper = source.slice(source.indexOf("const RD_GAP_REFS ="), source.indexOf("function RdDemographicGapSet("));
-const { rdGapPoints, rdGapRuns, rdGapSet, rdGapChanged, rdGapFmt } = new Function(helper
-  + "\nreturn {rdGapPoints, rdGapRuns, rdGapSet, rdGapChanged, rdGapFmt};")();
+const { rdGapPoints, rdGapRuns, rdGapSet, rdGapChanged, rdGapReferences, rdGapFmt } = new Function(helper
+  + "\nreturn {rdGapPoints, rdGapRuns, rdGapSet, rdGapChanged, rdGapReferences, rdGapFmt};")();
 const mx = (ym) => { const [y, m] = ym.split("-").map(Number); return y + (m - 0.5) / 12; };
 const group = { monthly: [["2026-04", 0, 30], ["2026-01", 30, 10], ["2026-02", null, 0], ["2026-03", 20, null], ["2026-05", 10, 20]] };
 const reference = { monthly: [["2026-01", 25, 20], ["2026-02", 15, 0], ["2026-04", 0, 40], ["2026-05", 20, 10]] };
@@ -34,6 +34,21 @@ assert.equal(changed([20,40,20],[10,20,10],false),true, "intermediate absolute c
 assert.equal(changed([20,30],[10,20],false),false, "constant nonzero gap");
 assert.equal(changed([20,30],[10,20],true),true, "relative change");
 assert.equal(changed([20,30],[0,20],true),false, "one usable month");
+const synthetic = (label, levels) => ({label, ...history(levels)});
+const growing = synthetic("Vic", [20,40]), steadyRatio = synthetic("Qld", [10,20]);
+assert.deepEqual(rdGapReferences({id: "state", groups: [growing, steadyRatio]}, ["alp"]), [],
+  "an absolute change alone cannot make any reference eligible");
+const st = {id: "state", groups: [{label:"NSW", monthly:[]}, growing, synthetic("Qld", [10,10])]};
+assert.deepEqual(rdGapReferences(st, ["alp"]).map(r => [r.reference.label, r.comparisons[0].group.label]),
+  [["Vic","Qld"], ["Qld","Vic"]], "find eligible pairs even when the default reference has none");
+
+const predicate = source.slice(source.indexOf("function rdRelativeFinding("), source.indexOf("function rdChangeFactor("));
+const finding = new Function(predicate + "return rdRelativeFinding;")();
+const result = {model: true, ratioChange: {low: 0.91, high: 0.99}};
+assert(finding(result));
+assert(!finding({...result, model:false}), "legacy fits cannot qualify");
+assert(!finding({...result, check:{conflict:true}}), "withhold a contradicted finding");
+assert(!finding({...result, sig:true, ratioChange:{low:1, high:1.1}}), "touching parity cannot qualify");
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "utf8"), context);
 const D = context.window.AUSPOL, T = D.demographics;

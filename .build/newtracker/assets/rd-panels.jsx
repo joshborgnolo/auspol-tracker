@@ -4315,310 +4315,40 @@ function DpRug({ items, color, dxp, fmt }) {
     </span>
   );
 }
-/* the composition-trend block's wording slots (shapes are the user's, dictated
-   2026-09-29 and re-dictated 2026-09-30; the SENTENCES are generated from
-   D.demoTrend — gen-data §7gb — and re-word themselves as significances move,
-   so only these phrase pieces are curated). Titles: "… is losing voters
-   faster in …", "The composition of …'s vote is unchanged". Deks: "… shifted
-   away from X (−x points …), and towards Y (+y points)", "… voter base has
-   become more inner-metro" + "… has increased by +x points relative to the
-   overall decrease, rising even as …", "It has also shifted away from /
-   towards …" — a sole gender move as "Its relative position among men has
-   shrunk" (no "also"). */
-const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "the Greens", oth: "Others & independents" };
-const RD_TREND_NAME_DEK = { onp: "One Nation", alp: "Labor", lnp: "the Coalition", grn: "the Greens", oth: "others & independents" };
-const RD_TREND_BARE = { onp: "One Nation", alp: "Labor", lnp: "Coalition", grn: "Greens" };
-const RD_TREND_SKEW = {
-  onp: "Its older, regional skew is no stronger or weaker now than it was then.",
-  grn: "Its younger, urban skew remains.",
-};
-const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "ACT/NT/Tas": "Tasmania, the ACT and the NT", "Non-NSW/Vic/Qld": "the non-eastern-mainland states" };
-const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld"];
-const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
-const RD_TREND_LOC = {
-  "Inner metro": { adj: "inner-metro", ref: "the inner metros" },
-  "Outer metro": { adj: "outer-metro", ref: "the outer metros" },
-  Provincial: { adj: "provincial", ref: "provincial areas" },
-  Rural: { adj: "rural", ref: "rural areas" },
-};
-const RD_TREND_GROUP = {
-  "Other language": "voters who speak a language other than English at home", "English only": "English-only speakers",
-  "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s",
-  "Gen Z": "Gen Z", Millennials: "Millennials", "Gen X": "Gen X", Boomers: "Boomers",
-  Men: "men", Women: "women",
-  /* "Year 12 or less" in the trend copy: user dictate 2026-11-02 */
-  University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "high school-educated voters (or less)",
-  "Own outright": "outright homeowners", Mortgage: "mortgage holders", Renting: "renters",
-  "Full time": "full-time workers", "Part time": "part-time workers", Retired: "retirees",
-  "Lower earners (bottom 50%)": "lower earners", "Higher earners (top 15%)": "higher earners",
-};
-/* ---- the composition trend: which groups have moved out of proportion ----
-   Titled and deked from D.demoTrend (gen-data's two-stage test, §7gb), on
-   the user's dictated shapes (2026-09-29): proportionality, so "away from /
-   towards" means beyond what the party's own national trend hands a group
-   merely for its starting level. Sets rank by their strongest move's
-   |t(log-ratio)|; the dek carries the top two. Figures quoted are the
-   signed moves relative to the all-voters shift, a move on seven or fewer
-   monthly points hedges "appears to", and (user dictate 2026-09-29: "it
-   must be significantly significant to make it") a thin move never CARRIES
-   a claim — it trails a solid one, only once every solid move's set is in
-   the dek, and a party whose moves are all thin renders the unchanged pair.
-   Verbs read against the party's own national line: a group moving
-   "towards" a falling party is holding up better, not gaining. */
-function rdDemoShift(dt, T, party) {
-  if (!dt || !dt.windowYm) return null;
-  const moves = dt.moves || [];
-  const solid = moves.filter((m) => !m.thin), thin = moves.filter((m) => m.thin);
-  const nameT = RD_TREND_NAME[party], nameD = RD_TREND_NAME_DEK[party];
-  const isAre = party === "oth" ? "are" : "is";
-  const poss = (s) => s + (/s$/.test(s) ? "’" : "’s");
-  /* the vote noun phrase, mid-sentence, keeps its article lower-case ("The
-     composition of the Coalition's vote"); others & independents can't
-     carry a possessive (user dictates 2026-09-30, 2026-10-07) */
-  const voteOf = party === "oth" ? "the vote for others & independents" : poss(nameD) + " vote";
-  const allOf = party === "oth" ? "all voters for others & independents" : "all " + (RD_TREND_BARE[party] || nameD) + " voters";
-  const serial = (ls) => rdSerial(ls, "and");
-  const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
-  const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
-  /* The election test's sentence (gen-data §7gb `elec`, user rulings
-     2026-11-02 and 2026-11-03): groups whose gap from all voters has moved
-     since the election, measured from the polls' own figures at the
-     election (the generations: the Australian Election Study 2025's) with
-     both margins combined and the ratio agreeing. Its own closing sentence,
-     worded "since the election", never merged into the slope test's
-     claims; the two strongest passes (|change| / margin), a group the dek
-     already names left out (one group, one figure); men and women passing
-     together are one finding, the gender gap. `named` is filled as the
-     slope claims are chosen below. */
-  const named = new Set();
-  const elecSentence = () => {
-    /* on the model the moves above already are the change since the
-       election (gen-data §7gb), so a second sentence would repeat them */
-    if (dt.model) return null;
-    /* r.claim: significant AND not contradicted by Resolve's same-house
-       estimate where one exists (age, gender) - gen-data §7gb */
-    const pass = (dt.elec || []).filter((r) => (r.claim ?? r.sig) && !named.has(r.group))
-      .sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
-    if (!pass.length) return null;
-    const sgnE = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
-    const men = pass.find((r) => r.group === "Men"), women = pass.find((r) => r.group === "Women");
-    const claims = [];
-    if (men && women) {
-      /* the test says the gap MOVED; "reversed" also says where it now
-         sits, so it needs the men-v-women gap now to clear its own margin
-         the other way - a flip inside that margin has only "closed" */
-      const was = men.then - women.then, now = men.now - women.now;
-      const flip = Math.sign(was) !== Math.sign(now);
-      const nowSig = Math.abs(now) > Math.sqrt((men.ciNow || 0) ** 2 + (women.ciNow || 0) ** 2);
-      const how = flip ? (nowSig ? "reversed" : "closed") : Math.abs(now) < Math.abs(was) ? "narrowed" : "widened";
-      claims.push({ k: Math.max(Math.abs(men.d) / men.ci, Math.abs(women.d) / women.ci), b: men.base,
-        s: "its gender gap has " + how + " (men " + sgnE(men.d) + ", women " + sgnE(women.d) + " points relative to all voters)" });
-    }
-    for (const r of pass) {
-      if (men && women && (r === men || r === women)) continue;
-      claims.push({ k: Math.abs(r.d) / r.ci, g: r.group, b: r.base,
-        s: "it has " + (r.d > 0 ? "gained" : "lost") + " ground among " + (RD_TREND_GROUP[r.group] || r.group) + " (" + sgnE(r.d) + " points relative to all voters)" });
-    }
-    claims.sort((a, b) => b.k - a.k);
-    const chosen = claims.slice(0, 2);
-    /* a Gen Z claim compares across instruments: the polls' Gen Z figures
-       are the generation cuts of one or two houses alone, and those read
-       young voters differently from the age-band houses (user call
-       2026-11-02, after Essential's April 2025 18–34s matched the AES's
-       18–34s while the generation cuts ran well below both on the
-       Coalition) - the margins measure sampling, not that, so the sentence
-       says so */
-    const genSet = (T.tabs || []).flatMap((t) => t.sets).find((s) => s.id === "generation");
-    const genNote = chosen.some((c) => c.g === "Gen Z") && genSet
-      ? ". The Gen Z comparison is across instruments: the polls’ Gen Z figures come only from the generation cuts of " + rdList(genSet.houses.map(demoHouse))
-      : "";
-    /* the sentence names its baseline: the polls' own figures at the
-       election, or - for a generation, which no house cut then - the AES */
-    const bases = new Set(chosen.map((c) => c.b));
-    const lead = bases.has("aes") && bases.has("polls") ? "Measured from the election (the polls then; for generations, the Australian Election Study 2025), "
-      : bases.has("aes") ? "Measured from the election (Australian Election Study 2025), "
-      : "Measured from the polls at the election, ";
-    return lead + serial(chosen.map((c) => c.s)) + genNote;
-  };
-  if (!solid.length) {
-    const skew = RD_TREND_SKEW[party];
-    const es = elecSentence();
-    /* the polls' months show nothing, but the election test does: the head
-       can't call the composition unchanged, and the skew line (a claim of
-       no change) gives way */
-    if (es) return {
-      head: "The composition of " + voteOf + " has shifted since the election",
-      dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters. " + es + ".",
-    };
-    return {
-      head: "The composition of " + voteOf + " is unchanged",
-      dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : "."),
-    };
-  }
-  /* a move's points relative to the all-voters shift over the same window:
-     (g1−g0) − (a1−a0) — also a group claim's change in gap vs all voters */
-  const sgnPts = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
-  const relPts = (m) => sgnPts((m.g1 - m.g0) - (m.a1 - m.a0));
-  const bestOf = (ms) => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
-  // the party's national line over the move's window: +1 rising, −1 falling, 0 flat
-  const natDir = (m) => (m.a1 - m.a0 > 1 ? 1 : m.a1 - m.a0 < -1 ? -1 : 0);
-  const headVerb = (toward, m) => {
-    const n = natDir(m);
-    if (n < 0) return toward ? "holding up better in " : "losing voters faster in ";
-    if (n > 0) return toward ? "gaining faster in " : "gaining more slowly in ";
-    return toward ? "gaining ground in " : "losing ground in ";
-  };
-  /* the states nest - SA, WA and ACT/NT/Tas inside the non-eastern-mainland
-     bucket - so a side with no move of its own is the other side's
-     complement among the six base groups, named only when it has a name:
-     the eastern mainland, the bucket, or one or two states. A side with its
-     own move quotes its own figure (user dictate 2026-09-30); a
-     complement-named side stays bare. */
-  const BASE = ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas"], BUCKET = "Non-NSW/Vic/Qld";
-  const members = (l) => (l === BUCKET ? BASE.filter((b) => DEMO_WITHIN[b] === BUCKET) : [l]);
-  const placeName = (ls) => {
-    const s = BASE.filter((l) => ls.includes(l));
-    if (s.length === 3 && RD_TREND_EASTERN.every((l) => s.includes(l))) return "the eastern-mainland states";
-    if (s.length && s.every((l) => DEMO_WITHIN[l] === BUCKET) && s.length === members(BUCKET).length) return RD_TREND_STATE[BUCKET];
-    return s.length && s.length <= 2 ? serial(s.map((l) => RD_TREND_STATE[l])) : null;
-  };
-  const stateDek = (ms, hedged, opens) => {
-    const towardMs = ms.filter((m) => m.dir > 0), awayMs = ms.filter((m) => m.dir < 0);
-    const tw = towardMs.flatMap((m) => members(m.group)), aw = awayMs.flatMap((m) => members(m.group));
-    const clash = tw.some((l) => aw.includes(l));
-    const rest = (ls) => BASE.filter((l) => !ls.includes(l));
-    const own = (gs) => placeName(gs.flatMap((m) => members(m.group)))
-      || serial(RD_TREND_STATE_ORDER.filter((l) => gs.some((m) => m.group === l)).map((l) => RD_TREND_STATE[l] || l));
-    const awayName = awayMs.length ? own(awayMs) : clash ? null : placeName(rest(tw));
-    const towardName = towardMs.length ? own(towardMs) : clash ? null : placeName(rest(aw));
-    let first = true;
-    const fig = (gs) => {
-      if (!gs.length) return "";
-      const f = " (" + relPts(bestOf(gs)) + " points" + (first ? " relative to " + allOf : "") + ")";
-      first = false;
-      return f;
-    };
-    const halves = [];
-    if (awayName) halves.push("away from " + awayName + fig(awayMs));
-    if (towardName) halves.push("towards " + towardName + fig(towardMs));
-    return {
-      head: nameT + " " + isAre + " " + headVerb(!awayName, bestOf(ms)) + (awayName || towardName),
-      /* only the dek's opening sentence names its subject; a later one is "it" */
-      dek: (opens ? "the composition of " + voteOf + " " + (hedged ? "appears to have" : "has")
-        : "it " + (hedged ? "also appears to have" : "has also")) + " shifted " + halves.join(", and "),
-    };
-  };
-  const locDek = (m) => {
-    const loc = RD_TREND_LOC[m.group] || { adj: m.group.toLowerCase(), ref: m.group };
-    if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
-    /* the quoted figure is the RELATIVE move, not the fitted from–to
-       levels, and the direction word moves into the national clause (user
-       dictate 2026-09-30: "... has increased by +3.7 points relative to the
-       overall decrease, rising even as the national vote has remained
-       flat"); the group's own word follows its own level, and the national
-       clause the national line's */
-    const n = natDir(m), gch = m.g1 - m.g0;
-    const own = Math.abs(gch) < 0.5 ? "holding steady" : gch > 0 ? "rising" : "falling";
-    const natSpan = (n < 0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
-    const clause = n === 0 ? own + " even as the national vote has remained flat"
-      : own === "holding steady" || Math.sign(gch) !== n ? own + " while the national vote has " + natSpan
-      : own + (m.dir * n > 0 ? " faster" : " more slowly") + " than the national vote, which has " + natSpan;
-    const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
-    const rel = (m.g1 - m.g0) - (m.a1 - m.a0);
-    return [
-      poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
-      support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to "
-        + (n < 0 ? "the overall decrease" : n > 0 ? "the overall increase" : "all voters") + ", " + clause,
-    ];
-  };
-  /* non-state, non-location moves merge into ONE "It has also shifted …"
-     sentence, each group quoting its own figure (user dictate 2026-09-30);
-     a sole GENDER move names a relative position instead ("Its relative
-     position among men has shrunk" — no "also", since a gender move often
-     sits after an opposite-direction location move, per the same dictate).
-     The sentence hedges only when every move it carries is thin. Opening
-     the dek, it names its subject rather than "it". */
-  const groupSentence = (gms, opens) => {
-    const fig = (m) => (RD_TREND_GROUP[m.group] || m.group) + " (" + relPts(m) + " points)";
-    const hedged = gms.every((m) => m.thin);
-    if (gms.length === 1 && gms[0].set === "gender") {
-      const m = gms[0], gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
-      const motion = Math.abs(gap1) > Math.abs(gap0) ? "grown" : "shrunk";
-      return (opens ? poss(nameD) + " relative position" : "Its relative position") + " among " + (RD_TREND_GROUP[m.group] || m.group)
-        + (hedged ? " appears to have " : " has ") + motion + " (" + relPts(m) + " points)";
-    }
-    const away = gms.filter((m) => m.dir < 0).map(fig);
-    const toward = gms.filter((m) => m.dir > 0).map(fig);
-    const halves = [];
-    if (away.length) halves.push("away from " + serial(away));
-    if (toward.length) halves.push("towards " + serial(toward));
-    return (opens ? "the composition of " + voteOf + (hedged ? " appears to have shifted " : " has shifted ")
-      : "It " + (hedged ? "also appears to have shifted " : "has also shifted ")) + halves.join(", and ");
-  };
-  const bySet = new Map();
-  for (const m of solid) {
-    const k = m.tab + "|" + m.set;
-    if (!bySet.has(k)) bySet.set(k, []);
-    bySet.get(k).push(m);
-  }
-  const allSets = [...bySet.values()]
-    .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
-    .sort((a, b) => b.top - a.top);
-  const setsRanked = allSets.slice(0, 2);
-  let head = null;
-  const parts = [];
-  const groupMoves = [];
-  for (const { ms } of setsRanked) {
-    const m0 = ms[0];
-    if (m0.set === "state") {
-      const b = stateDek(ms, false, !parts.length);
-      if (!head) head = b.head;
-      parts.push(b.dek);
-    } else if (m0.set === "location") {
-      const m = bestOf(ms), loc = RD_TREND_LOC[m.group] || { ref: m.group };
-      if (!head) head = nameT + " " + isAre + " " + headVerb(m.dir > 0, m) + loc.ref;
-      parts.push(...locDek(m));
-    } else {
-      if (!head) head = "The composition of " + voteOf + " is shifting";
-      groupMoves.push(bestOf(ms));
-    }
-  }
-  /* thin moves trail the solid claim (the thin locDek and the hedged
-     stateDek render "appears to"; a group sentence of only thin moves
-     hedges too); a set already carried by a solid move stays out, and none
-     trails while a solid set was left out for room - a hedged move never
-     takes the place of a firmer one. Thin sentences collect apart and join
-     LAST — a hedged sentence never opens the dek */
-  const carried = new Set(setsRanked.map(({ ms }) => ms[0].tab + "|" + ms[0].set));
-  const thinSets = new Map();
-  if (allSets.length <= setsRanked.length) for (const m of thin) {
-    const k = m.tab + "|" + m.set;
-    if (carried.has(k)) continue;
-    if (!thinSets.has(k)) thinSets.set(k, []);
-    thinSets.get(k).push(m);
-  }
-  const thinParts = [], thinGroupMoves = [];
-  [...thinSets.values()]
-    .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
-    .sort((a, b) => b.top - a.top)
-    .slice(0, 2)
-    .forEach(({ ms }) => {
-      const m0 = ms[0];
-      if (m0.set === "state") thinParts.push(stateDek(ms, true, false).dek);
-      else if (m0.set === "location") thinParts.push(...locDek(bestOf(ms)));
-      else thinGroupMoves.push(bestOf(ms));
-    });
-  if (groupMoves.length) parts.push(groupSentence(groupMoves, !parts.length));
-  /* thin group moves close the dek in their own sentence (all-thin, so
-     groupSentence hedges it) — never mixed unhedged into the solid one */
-  if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves, false));
-  // the groups the slope claims name (a set's state/location claims cover groups the AES never cuts)
-  groupMoves.concat(thinGroupMoves).forEach((m) => named.add(m.group));
-  const es = elecSentence();
-  const ordered = parts.concat(thinParts, es ? [es] : []);
-  /* sentences after the first start a sentence of their own, so a
-     lower-case name ("others & independents") still opens capitalised */
-  return { head, dek: since + ordered.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
+/* Each row compares a group's share with the national share for the same
+   party. The model pairs election-day and latest draws before taking the
+   ratio of those ratios. Legacy trend fits have no such posterior. */
+function rdRelativeFinding(row) {
+  const c = row.ratioChange;
+  return row.model && c && !row.check?.conflict && (c.low > 1 || c.high < 1);
+}
+function rdChangeFactor(v) {
+  // Keep near-parity bounds distinguishable from 1×.
+  const rounded = Number(v.toFixed(2));
+  if (rounded === 1 && v !== 1) return v > 1 ? "just above 1×" : "just below 1×";
+  return rounded + "×";
+}
+function RdRelativeFindings({ rows, partyName }) {
+  const findings = rows.filter(rdRelativeFinding).sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
+  if (!findings.length) return null;
+  const first = findings[0];
+  const label = r => RD_STATE_NAME[r.group] || r.group;
+  const ratio = (g, a) => (g / a).toFixed(2) + "×";
+  const summary = findings.slice(0, 2).map(r =>
+    label(r) + " " + ratio(r.g0, r.a0) + " → " + ratio(r.g1, r.a1)
+  ).join(" · ");
+  return <>
+    <RdSub head={"Where support for " + partyName + " changed relative to its national vote"}
+      dek={"Group share divided by national share, " + rdMonthYear(first.from) + " to " + rdMonthYear(first.to) + ". " + summary + "."} />
+    <RdTsig summary="Model estimates and uncertainty"
+      heads={["Group", "Group vote, start → end", "National vote, start → end", "Change in relative support", "95% credible interval"]}
+      sets={[{ key: "findings", rows: findings.map(r => ({
+        key: r.set + "|" + r.group, name: label(r),
+        cells: [[r.g0, r.g1], [r.a0, r.a1]].map(pair => pair.map(v => v.toFixed(1) + "%").join(" → ")).concat(
+          rdChangeFactor(r.ratioChange.factor), rdChangeFactor(r.ratioChange.low) + " to " + rdChangeFactor(r.ratioChange.high))
+      })) }]}
+      note="The Bayesian model compares each group’s support relative to the national vote on election day and at the latest estimate. A change factor of 1× means the group kept pace nationally. Each group shown has a 95% credible interval entirely above or below 1×. The interval applies to that group’s comparison." />
+  </>;
 }
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
@@ -4706,7 +4436,7 @@ function rdGapSet(st, order, mx, refLabel, relative) {
   const reference = st.groups.find((g) => g.label === (refLabel || def.ref));
   if (!reference) return null;
   const comparisons = st.groups.filter((g) => g !== reference).map((g) => ({
-    group: g, parties: order.map((party) => ({ party, changed: rdGapChanged(g, reference, order, party, relative), points: rdGapPoints(g, reference, order, party, mx, relative) })),
+    group: g, parties: order.map((party) => ({ party, points: rdGapPoints(g, reference, order, party, mx, relative) })),
   })).filter((c) => c.parties.some((p) => p.points.length));
   if (!comparisons.length) return null;
   const points = comparisons.flatMap((c) => c.parties.flatMap((p) => p.points));
@@ -4715,21 +4445,34 @@ function rdGapSet(st, order, mx, refLabel, relative) {
   const limit = relative ? Math.max(2, Math.ceil(Math.max(...points.map((p) => p.y)))) : Math.max(5, Math.ceil((Math.max(...points.map((p) => Math.abs(p.y))) + 1) / 5) * 5);
   return { def, reference, comparisons, limit, firstX: Math.min(...points.map((p) => p.x)) };
 }
-function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
+function rdGapReferences(st, order) {
+  if (!RD_GAP_REFS[st.id]) return [];
+  return st.groups.map(reference => ({
+    reference,
+    comparisons: st.groups.filter(g => g !== reference).map(group => ({
+      group, parties: order.filter(party => rdGapChanged(group, reference, order, party, true))
+    })).filter(c => c.parties.length)
+  })).filter(r => r.comparisons.length);
+}
+function RdDemographicGapSet({ st, references, order, rangeId, model, relative }) {
   const { D, rangeDomain, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
   const [refLabel, setRefLabel] = useState("");
   const format = relative ? (v) => String(Number(v.toFixed(2))) : rdGapFmt;
   const measure = relative ? "Factor" : "Gap";
   const unit = relative ? "×" : " pp";
-  const data = React.useMemo(() => rdGapSet(st, order, D.mx, refLabel, relative), [st, order, D, refLabel, relative]);
+  const eligible = references.find(r => r.reference.label === refLabel)
+    || references.find(r => r.reference.label === RD_GAP_REFS[st.id].ref) || references[0];
+  const data = React.useMemo(() => rdGapSet(st, order, D.mx, eligible.reference.label, relative), [st, order, D, eligible, relative]);
   const [choice, setChoice] = useState("");
   const [gapPop, setGapPop] = useState(null);
   if (!data) return null;
-  const { def, reference, comparisons, limit, firstX } = data;
+  const { def, reference, limit, firstX } = data;
+  const comparisons = data.comparisons.filter(c => eligible.comparisons.some(e => e.group === c.group));
   const selected = comparisons.find((c) => c.group.label === choice)
     || comparisons.find((c) => c.group.label === def.compare) || comparisons[0];
   const group = selected.group;
+  const parties = eligible.comparisons.find(c => c.group === group).parties;
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
   const ticks = relative ? [...new Set([0, 1, limit / 2, limit])].sort((a, b) => a - b) : [-limit, -limit / 2, 0, limit / 2, limit];
@@ -4757,7 +4500,7 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
         </FilterPop>
         <FilterPop id="reference" label="Reference" summary={reference.label} on={false} open={gapPop} setOpen={setGapPop}>
           <div className="ap-poplist" role="radiogroup" aria-label={def.title + " reference group"}>
-            {st.groups.map((g) => <PopRow key={g.label} radio on={reference.label === g.label} label={g.label} onClick={() => {
+            {references.map(({reference: g}) => <PopRow key={g.label} radio on={reference.label === g.label} label={g.label} onClick={() => {
               setChoice(g.label === group.label ? reference.label : group.label);
               setRefLabel(g.label);
               setGapPop(null);
@@ -4768,11 +4511,10 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
       <p className="rd-wv-gap-formula">{formula}</p>
       <p className="rd-wv-gap-directions">{explanation}</p>
       {def.note && <p className="rd-wv-gap-note">{def.note}</p>}
-      {!selected.parties.some(p => p.changed) && <p className="rd-wv-gap-note">No party meets the 95% change threshold for this comparison.</p>}
       <div className="rd-wv-gap-grid">
         {DEMO_PARTIES.map((pp) => {
           const party = selected.parties.find((p) => p.party === pp.id);
-          if (!party?.changed) return null;
+          if (!parties.includes(pp.id)) return null;
           const points = (party ? party.points : []).filter((p) => p.x >= x0 && p.x <= x1);
           const last = points[points.length - 1];
           const color = D.PARTIES[pp.id].color;
@@ -4809,14 +4551,17 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
 }
 const RdDemographicGaps = React.memo(function RdDemographicGaps({ tab, order, rangeId, model }) {
   const [relative, setRelative] = useState(true);
+  const sets = React.useMemo(() => tab.sets.map(st => ({ st, references: rdGapReferences(st, order) }))
+    .filter(set => set.references.length), [tab, order]);
+  if (!sets.length) return null;
   return (
     <div className="rd-wv-gaps">
       <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups." />
       <div className="rd-chips" role="group" aria-label="Gap measure">
         {[false, true].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (×)" : "Absolute (pp)"}</button>)}
       </div>
-      <p className="rd-wv-gap-note">{relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. "}{model ? "Lines use the group model estimates." : "Lines use the monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Only parties showing a change over the available months in this measure are shown. The approximate 95% test accounts for checking the whole series.</p>
-      {tab.sets.map((st) => <RdDemographicGapSet key={st.id} st={st} order={order} rangeId={rangeId} model={model} relative={relative} />)}
+      <p className="rd-wv-gap-note">{relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. "}{model ? "Lines use the group model estimates." : "Lines use the monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Both views show only comparisons where relative support changed over the available months. The approximate 95% test accounts for checking the whole series.</p>
+      {sets.map(({ st, references }) => <RdDemographicGapSet key={st.id} st={st} references={references} order={order} rangeId={rangeId} model={model} relative={relative} />)}
     </div>
   );
 });
@@ -4977,41 +4722,7 @@ function RdDemographics({ rangeId = "all" }) {
      grouping tabs, income tab included) over the tab's dek (rdDemoDek) ------ */
   const story = { head: rdDemoHead(T, party).head, dek: rdDemoDek(T, tab, party) };
 
-  /* ---- the composition trend: which groups have moved out of proportion
-     (rdDemoShift, from gen-data §7gb's demoTrend, income bands included) --- */
-  const shift = rdDemoShift(D.demoTrend && D.demoTrend[party], Tdemo, party);
-
-  /* the full significance battery behind the dek: every tested group, pass
-     or fail, in the tabs' own order — the Trend-significance table dropdown
-     under the trend legend. A signed figure the site's way: true minus, the
-     plus only where the sign is the claim (s = always sign) */
-  // signed from the ROUNDED figure, so −0.04 prints 0.0, never "−0.0"
-  const sgn1 = (v, s) => { const r = Math.round(v * 10) / 10; return (r < 0 ? "−" : s && r > 0 ? "+" : "") + Math.abs(r).toFixed(1); };
-  const sigSets = (() => {
-    const dt = D.demoTrend && D.demoTrend[party];
-    const seen = new Map();
-    for (const r of (dt && dt.rows) || []) {
-      const k = r.tab + "|" + r.set;
-      if (!seen.has(k)) seen.set(k, { key: k, label: r.setLabel, from: r.from, to: r.to, rows: [] });
-      const s = seen.get(k);
-      s.rows.push(r);
-      if (r.from < s.from) s.from = r.from;
-      if (r.to > s.to) s.to = r.to;
-    }
-    return [...seen.values()];
-  })();
-  /* the election test's rows (gen-data §7gb `elec`), by set in the tabs'
-     order - the second table under the same dropdown */
-  const elecSets = (() => {
-    const dt = D.demoTrend && D.demoTrend[party];
-    const seen = new Map();
-    for (const r of (dt && dt.elec) || []) {
-      const k = r.tab + "|" + r.set;
-      if (!seen.has(k)) seen.set(k, { key: k, label: r.setLabel, rows: [] });
-      seen.get(k).rows.push(r);
-    }
-    return [...seen.values()];
-  })();
+  const trendRows = (D.demoTrend?.[party]?.rows || []).filter(row => row.tab === tab.id);
 
   /* ---- the dot plot, every set on one scale -------------------------------- */
   const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)].concat((g.px && g.px[party]) || []))).concat([all]);
@@ -5449,10 +5160,7 @@ function RdDemographics({ rangeId = "all" }) {
           </div>
         ) : null}
       </div>
-      {/* the composition trend IS the change-over-time line here (it came
-          down from under the headline and the per-tab gap pairs retired with
-          it - user correction, 2026-09-29) */}
-      {shift && <RdSub head={shift.head} dek={shift.dek} glide />}
+      <RdRelativeFindings rows={trendRows} partyName={pName} />
       {/* keyed on the grouping: a switch of it brings the charts in fresh,
           faded rather than cut (a party switch keeps them and morphs) */}
       <div className="rd-wv-charts rd-wv-enter" key={"wv-" + tab.id}>{charts.map(chartOf)}</div>
@@ -5464,92 +5172,6 @@ function RdDemographics({ rangeId = "all" }) {
       ].concat(D.demoVote && tab.sets.some((st) => D.demoVote.sets[st.id] && Object.values(D.demoVote.sets[st.id].groups).some((g) => g[party] != null))
         ? [{ kind: "diamond", color: "var(--ink-3)", label: RD_VOTE_LABEL }] : [])} />
       <RdDemographicGaps key={tab.id} tab={tab} order={T.order} rangeId={rangeId} model={T.model && tab.id !== "income"} />
-      {sigSets.length > 0 && (
-        <details className="rd-evdrop rd-tsig">
-          <summary>Trend-significance table</summary>
-          <div className="rd-tsig-wrap">
-            <table className="rd-tsig-table">
-              <thead>
-                <tr>
-                  <th scope="col"><span className="sr-only">Group</span></th>
-                  <th scope="col">Support, start → end, %</th>
-                  <th scope="col">All voters, start → end, %</th>
-                  <th scope="col">Change vs all voters, pts</th>
-                  <th scope="col">{sigSets.some((x) => x.rows.some((r) => r.model)) ? "z, gap" : "t, gap"}</th>
-                  <th scope="col">{sigSets.some((x) => x.rows.some((r) => r.model)) ? "z, ratio" : "t, ratio"}</th>
-                  <th scope="col">Significant</th>
-                </tr>
-              </thead>
-              {sigSets.map((s) => (
-                <tbody key={s.key}>
-                  <tr className="rd-tsig-set"><th colSpan={7}>{s.label}<span className="rd-tsig-since">since {rdMonthYear(s.from)}</span></th></tr>
-                  {s.rows.map((r) => (
-                    <tr key={r.group}>
-                      <th scope="row">{r.group}{r.thin ? " †" : ""}</th>
-                      <td>{sgn1(r.g0)} → {sgn1(r.g1)}</td>
-                      <td>{sgn1(r.a0)} → {sgn1(r.a1)}</td>
-                      <td>{sgn1(r.rel, true)}</td>
-                      <td>{r.tAbs == null ? "–" : sgn1(r.tAbs)}</td>
-                      <td>{r.tLR == null ? "–" : sgn1(r.tLR)}</td>
-                      <td className={r.sig && !(r.check && r.check.conflict) ? "rd-tsig-yes" : ""}>{!r.sig ? "No" : r.check && r.check.conflict ? "Withheld" : "Yes"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              ))}
-            </table>
-          </div>
-          {sigSets.some((x) => x.rows.some((r) => r.model))
-            ? <p className="rd-note rd-tsig-note">Support figures are the model’s, at polling day and today. A group’s change vs all voters is its change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national change, read from the model’s draws of the group’s gap on both days together. z is that change over its own standard error, on the point gap and on the ratio to all voters; a group has moved only when both 95% intervals exclude zero in the same direction, so a group that has merely kept pace with a party growing everywhere has not. Where Resolve’s own election-day and current waves measure the same change for age or gender, a move they contradict beyond both margins is withheld.</p>
-            : <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96, in the same direction. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>}
-          {elecSets.length > 0 && !(D.demoTrend && D.demoTrend[party] && D.demoTrend[party].model) && (
-            <>
-              <div className="rd-tsig-wrap">
-                <table className="rd-tsig-table">
-                  <caption className="rd-tsig-cap">{elecSets.some((s) => s.rows.some((r) => r.base === "aes"))
-                    ? "Since the election, against the polls then (for generations, the Australian Election Study 2025)"
-                    : "Since the election, against the polls then"}</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col"><span className="sr-only">Group</span></th>
-                      <th scope="col">Gap to all voters, election → now, pts</th>
-                      <th scope="col">Change, pts</th>
-                      <th scope="col">95% margin, pts</th>
-                      <th scope="col">Rate vs all voters, election → now</th>
-                      <th scope="col">Election figure from</th>
-                      <th scope="col">Resolve’s own change, pts</th>
-                      <th scope="col">Significant</th>
-                    </tr>
-                  </thead>
-                  {elecSets.map((s) => (
-                    <tbody key={s.key}>
-                      <tr className="rd-tsig-set"><th colSpan={8}>{s.label}</th></tr>
-                      {s.rows.map((r) => (
-                        <tr key={r.group}>
-                          <th scope="row">{r.group}</th>
-                          <td>{sgn1(r.then, true)} → {sgn1(r.now, true)}</td>
-                          <td>{sgn1(r.d, true)}</td>
-                          <td>±{r.ci.toFixed(1)}</td>
-                          <td>{r.rThen == null ? "–" : r.rThen.toFixed(2) + " → " + r.rNow.toFixed(2)}</td>
-                          <td>{r.base === "aes" ? "AES, " + r.n.toLocaleString() + " respondents" : r.n + " poll" + (r.n === 1 ? "" : "s")}</td>
-                          <td>{r.check ? sgn1(r.check.beta, true) + " ±" + r.check.ci.toFixed(1) + (r.check.conflict ? ", disagrees" : "") : "–"}</td>
-                          {/* significant but contradicted by the same-house
-                              check: withheld from the copy, not highlighted */}
-                          <td className={r.sig && !(r.check && r.check.conflict) ? "rd-tsig-yes" : ""}>{!r.sig ? "No" : r.check && r.check.conflict ? "Withheld" : "Yes"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  ))}
-                </table>
-              </div>
-              <p className="rd-note rd-tsig-note">{RD_PEL_MODEL ? "The election gap is the group’s on polling day in the model, read from the houses’ own published tables before and after it, as the current figure is, so both ends are the same instruments." : "The election gap is the group’s in the polls over the six weeks before polling day: the houses’ own published tables then, pooled as the current figure is, so both ends are the same instruments."} The generations are the exception, because no pollster cut them before the election: their election gap is the Australian Election Study 2025’s (its share less all respondents’, from the survey’s respondent file). The gap now is the group’s current pooled figure less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} current primary. The margin combines both figures’ sampling error. A change counts only when it clears that margin and the group’s rate relative to all voters has moved the same way beyond its own margin, so a party growing everywhere doesn’t read as a shift. This compares two endpoints and is never a point in the trend fit above. The AES records the vote people cast, not an intention, and at the election it read several groups differently from the polls by more than both margins. That is why the polls’ own figure is the baseline wherever one exists; the AES’s diamonds stay on the charts. For age and gender, Resolve’s own polls give a second reading of the same change: its recent polls against its election-day poll, so its house lean cancels. Where that reading disagrees beyond both margins, the change is withheld from the summary above.{(() => {
-                const gs = elecSets.find((s) => s.key.endsWith("|generation"));
-                const st = gs && Tdemo.tabs.flatMap((t) => t.sets).find((s) => s.id === "generation");
-                return st ? " The generations’ comparison is across instruments: the polls’ Gen Z, Millennial, Gen X and Boomer figures come only from the generation cuts of " + rdList(st.houses.map(demoHouse)) + ", set against the AES, and the margins can’t account for that." : "";
-              })()}</p>
-            </>
-          )}
-        </details>
-      )}
       <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>
         {charts.length > 1 ? (even ? "Every panel shares one scale." : "Both panels share one scale, so each is only as wide as its data.") : null}
       </RdFoot>

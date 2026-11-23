@@ -7897,6 +7897,7 @@ const demoTrend = (() => {
             const row = { tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label, from: fromYm, to: toYm,
               dir: sv.lr.v >= 0 ? 1 : -1, tAbs: rr(sv.gap.z), tLR: rr(sv.lr.z), thin: false, months: (g.monthly || []).length,
               g0: rr(sv.g0), g1: rr(sv.g1), a0: rr(sv.a0), a1: rr(sv.a1), rel: rr(sv.gap.v), sig, model: true,
+              ratioChange: { factor: Math.exp(sv.lr.v), low: Math.exp(sv.lr.lo), high: Math.exp(sv.lr.hi) },
               gapLo: rr(sv.gap.lo), gapHi: rr(sv.gap.hi), lrLo: rr(sv.lr.lo), lrHi: rr(sv.lr.hi) };
             rows.push(row);
             if (sig) moves.push({ ...row, r0: rr(sv.g0 / sv.a0), r1: rr(sv.g1 / sv.a1) });
