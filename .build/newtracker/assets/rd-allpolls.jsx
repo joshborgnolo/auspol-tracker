@@ -325,8 +325,9 @@ function rdPollHead(p) {
   // the figure cluster stays glued so it never splits mid-figure; the
   // "a sample of" lead-in wraps freely or the whole run would jump to the
   // next line as one block and strand a wide gap after "from"
+  const tas = p.pollster === "EMRS (Tas)";
   const n = p.sample != null
-    ? <>a sample of <span className="rd-nocaps" title={effEst != null && !effTag ? "Estimated from the raw sample and the site’s design effect; the house publishes no effective sample" : undefined}>{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : effTag ? <> ({rdEffNote(p)})</> : effEst != null ? " (eff. ~" + effEst.toLocaleString() + ")" : ""}</span></>
+    ? <>{tas ? "a Tasmanian sample of" : "a sample of"} <span className="rd-nocaps" title={effEst != null && !effTag ? "Estimated from the raw sample and the site’s design effect; the house publishes no effective sample" : undefined}>{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : effTag ? <> ({rdEffNote(p)})</> : effEst != null ? " (eff. ~" + effEst.toLocaleString() + ")" : ""}</span></>
     : "an unpublished sample";
   const out = rdApOut(p.published);
   // a filed-under-client wave credits its client; a self-published poll is
@@ -336,7 +337,7 @@ function rdPollHead(p) {
   // on the client's kind - mastheads publish, non-mastheads commission.
   const selfBy = p.conf || !(p.client && !/^self/i.test(p.client));
   const commissioned = !selfBy && RD_AP_COMMISSIONED[p.client];
-  const by = (commissioned ? "commissioned by " : "published by ") + (selfBy ? p.pollster : rdApThe(p.client));
+  const by = (commissioned ? "commissioned by " : "published by ") + (selfBy ? (tas ? "EMRS" : p.pollster) : rdApThe(p.client));
   const field = p.field || p.dateLabel;
   // pending dates read "Conducted on dates TBC" - the sentence shape the
   // probes pin (starts "Conducted on") and the copy card's anchors survive
