@@ -599,7 +599,7 @@ function TrendChart(props) {
     cancelHoverLeave();
     if (dotSrc.current === "touch") setDotFrom(null, null);
     const p = toVB(e);
-    const markX = snapToMarks && e.target.closest?.(".rd-ring[data-spine-x]")?.getAttribute("data-spine-x");
+    const markX = snapToMarks ? e.target.closest?.("[data-spine-x]")?.getAttribute("data-spine-x") : null;
     if (markX != null) {
       showSpine(nearestSpine(sx(Number(markX))));
       return;
@@ -633,6 +633,10 @@ function TrendChart(props) {
   };
   const handleMouseLeave = event => {
     if (event?.relatedTarget instanceof Node && ref.current?.contains(event.relatedTarget)) return;
+    if (event && ref.current && Number.isFinite(event.clientX) && Number.isFinite(event.clientY) && ref.current.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+      cancelHoverLeave();
+      return;
+    }
     cancelHoverLeave();
     hoverLeaveTimer.current = setTimeout(() => {
       hoverLeaveTimer.current = null;
@@ -1242,7 +1246,8 @@ function TrendChart(props) {
     return out.sort((a, b) => a.ex - b.ex);
   }, [events, eventsFrom, eventMix, copying, geom, rd]);
   if (ctl && evt) {
-    const q = evPlaced.find(p => p.e === evt.e && !p.leaving);
+    const evtKey = evKey(evt.e);
+    const q = evPlaced.find(p => evKey(p.e) === evtKey && !p.leaving);
     if (!q) {
       const cur = evt;
       setTimeout(() => {
@@ -1485,6 +1490,7 @@ function TrendChart(props) {
       x: sx(t.x),
       y: rd ? H - pad.b + PX(20) : H - 10,
       className: "axis-label x" + (t.strong ? " strong" : ""),
+      "data-spine-x": snapToMarks && t.strong ? t.x : undefined,
       style: op != null && op < 1 ? {
         fontSize: axisUnits,
         opacity: op
@@ -1687,7 +1693,8 @@ function TrendChart(props) {
     x2: sx(v.x),
     y1: pad.t,
     y2: H - pad.b,
-    className: "rd-vline" + (v.cls ? " " + v.cls : "")
+    className: "rd-vline" + (v.cls ? " " + v.cls : ""),
+    "data-spine-x": snapToMarks ? v.x : undefined
   })), spinePts.length > 0 && React.createElement("line", {
     x1: 0,
     x2: 0,
