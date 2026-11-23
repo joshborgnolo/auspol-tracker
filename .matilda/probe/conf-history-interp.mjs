@@ -1,10 +1,7 @@
 /* Pins two confidence-panel contracts:
-   A. The "Draw a past term" menu is a native select styled with the
-      primary-vote subpopulation menu's rules (shipped 2026-10-09,
-      replacing the chip + board): a DISABLED "Draw a past term" title
-      row plus one year per term on file; a pick draws the line (drawn
-      years carry a ✓, pills row names them, and a rule-separated
-      "✕ Clear lines" entry joins to return them all).
+   A. The restored shared popover: year checkboxes, a selected-term count on
+      the button, the matching drawn pills, and Clear lines to return every
+      past term to the band.
    B. interpHover - the history-view guide tooltip carries EVERY in-range lane
       row continuously (deep quarterly lane and monthly lane interpolated
       between their own prints) instead of dropping rows on months a lane does
@@ -43,52 +40,67 @@ await page.evaluate(() => document.getElementById("confidence").scrollIntoView()
 let fails = 0;
 const ok = (cond, label) => { console.log(`${cond ? "  ok" : "FAIL"} ${label}`); if (!cond) fails++; };
 
-/* ---- A: the draw-a-term menu is a native select (the subpopulation
-   menu's control and style): a disabled title row + one year option per
-   term on file (drawn ones ✓-marked); picking a year draws its line, and
-   a rule-separated "✕ Clear lines" empties the pills ---- */
-const menu = () => page.evaluate(() => {
-  const sec = document.getElementById("confidence");
-  const sel = sec && [...sec.querySelectorAll("select.rd-confidence-sel")]
-    .find((el) => !el.closest(".rd-crossfade-out"));
-  if (!sel) return null;
-  return { value: sel.value,
-           hasHr: !!sel.querySelector("hr"),
-           options: [...sel.options].map((o) => ({ v: o.value, label: o.textContent.trim(), disabled: o.disabled })) };
-});
-const pick = (v) => page.evaluate((val) => {
-  const sec = document.getElementById("confidence");
-  const sel = sec && [...sec.querySelectorAll("select.rd-confidence-sel")]
-    .find((el) => !el.closest(".rd-crossfade-out"));
-  if (!sel || ![...sel.options].some((o) => o.value === val)) return false;
-  sel.value = val;
-  sel.dispatchEvent(new Event("change", { bubbles: true }));
+/* ---- A: the restored shared-rule popover: year checkboxes, a selected-term
+   count on the button, and Clear lines ---- */
+const openMenu = async () => {
+  const exists = await page.evaluate(() => {
+    const sec = document.getElementById("confidence");
+    const button = sec && [...sec.querySelectorAll(".ap-popbtn")].find((b) => b.querySelector(".ap-popbtn-lab").textContent === "Draw a past term");
+    if (!button) return false;
+    if (button.getAttribute("aria-expanded") !== "true") button.click();
+    return true;
+  });
+  if (!exists) return false;
+  await page.waitForSelector("#confidence .rd-cwin-tools .ap-panel");
   return true;
-}, v);
+};
+const menu = async () => {
+  if (!(await openMenu())) return null;
+  return page.evaluate(() => {
+    const sec = document.getElementById("confidence");
+    const button = sec.querySelector(".rd-cwin-tools .ap-popbtn");
+    const panel = sec.querySelector(".rd-cwin-tools .ap-panel");
+    return { summary: button.querySelector(".ap-popbtn-val") ? button.querySelector(".ap-popbtn-val").textContent : null,
+             hasClear: !!panel.querySelector(".ap-clear"),
+             options: [...panel.querySelectorAll(".ap-check")].map((row) => ({ label: row.querySelector(".ap-check-lab").textContent, on: row.getAttribute("aria-checked") === "true" })) };
+  });
+};
+const pick = async (v) => {
+  if (!(await openMenu())) return false;
+  return page.evaluate((val) => {
+    const sec = document.getElementById("confidence");
+    const row = [...sec.querySelectorAll(".rd-cwin-tools .ap-check")].find((b) => b.querySelector(".ap-check-lab").textContent === val);
+    if (val === "clear") {
+      const clear = sec.querySelector(".rd-cwin-tools .ap-clear");
+      if (!clear) return false;
+      clear.click();
+      return true;
+    }
+    if (!row) return false;
+    row.click();
+    return true;
+  }, v);
+};
 const pills = () => page.evaluate(() => {
   const d = document.querySelector("#confidence .rd-cc-drawn");
   return d ? d.innerText.replace(/\s+/g, " ").trim() : null;
 });
 const m0 = await menu();
-ok(m0 && m0.value === "" && m0.options[0].label === "Draw a past term",
-   "draw-a-term select shows its label");
-ok(m0 && m0.options.filter((o) => /^\d{4}$/.test(o.v)).length >= 5,
-   `one option per past term on file (${m0 ? m0.options.length - 1 : 0})`);
-ok(m0 && m0.options[0].disabled === true,
-   "the label is a disabled menu title, not a pickable option");
-ok(m0 && !m0.options.some((o) => o.v === "clear"), "no Clear-lines entry while nothing is drawn");
-ok(await pick("2019"), "picked 2019 from the menu");
+ok(m0 && m0.summary === null, "draw-a-term popover starts without additions");
+ok(m0 && m0.options.filter((o) => /^\d{4}$/.test(o.label)).length >= 5,
+   `one row per past term on file (${m0 ? m0.options.length : 0})`);
+ok(m0 && !m0.hasClear, "no Clear-lines action while nothing is drawn");
+ok(await pick("2019"), "picked 2019 from the popover");
 await new Promise((r) => setTimeout(r, 400));
 const m1 = await menu();
-ok(m1 && m1.value === "", "the menu snaps back to its label after a pick");
-ok(m1 && m1.options.some((o) => o.v === "2019" && o.label.startsWith("✓")), "the 2019 option carries its drawn ✓");
-ok(m1 && m1.hasHr && m1.options.some((o) => o.v === "clear" && /^✕/.test(o.label)),
-   "Clear lines joins separated by a rule once a line is drawn");
+ok(m1 && m1.summary === "1 term", "the button counts the drawn term");
+ok(m1 && m1.options.some((o) => o.label === "2019" && o.on), "the 2019 checkbox stays checked");
+ok(m1 && m1.hasClear, "Clear lines joins once a line is drawn");
 ok((await pills() || "").includes("2019"), "the drawn pills row names 2019");
 ok(await pick("clear"), "picked Clear lines");
 await new Promise((r) => setTimeout(r, 400));
 const m2 = await menu();
-ok(m2 && !m2.options.some((o) => o.v === "clear") && !m2.hasHr && !m2.options.some((o) => /✓/.test(o.label)),
+ok(m2 && !m2.hasClear && m2.summary === null && m2.options.every((o) => !o.on),
    "Clear lines returns every term to the band");
 ok((await pills()) === null, "no drawn pills after the clear");
 
@@ -98,20 +110,22 @@ await page.evaluate(() => {
   const b = [...document.querySelectorAll("#confidence .rd-cwin-span")].find((el) => el.textContent.trim() === "All");
   if (b) b.click();
 });
+await page.keyboard.press("Escape");
 await new Promise((r) => setTimeout(r, 900));
 const rect = await page.evaluate(() => {
   const sec = document.getElementById("confidence");
   const svgs = [...sec.querySelectorAll("svg")];
   let best = null, bw = 0;
   for (const s of svgs) { const r = s.getBoundingClientRect(); if (r.width > bw) { bw = r.width; best = s; } }
+  best.scrollIntoView({ block: "center" });
   const r = best.getBoundingClientRect();
   return { x: r.left, y: r.top, w: r.width, h: r.height };
 });
 ok(rect.w > 800, `main chart svg measured (${Math.round(rect.w)}x${Math.round(rect.h)})`);
 const readRows = () => page.evaluate(() => {
-  const tip = document.querySelector("#confidence .tip");
+  const tip = [...document.querySelectorAll("#confidence .tip.tip-guide")].find((t) => +getComputedStyle(t).opacity > 0.05);
   if (!tip) return null;
-  return { cls: tip.className.includes("tip-guide") ? "guide" : "dot",
+  return { cls: "guide",
            title: (tip.querySelector(".tip-title") || {}).textContent || "",
            rows: [...tip.querySelectorAll(".tip-label")].map((el) => el.textContent) };
 });

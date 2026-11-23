@@ -105,6 +105,7 @@ function RdPrimary({ rangeId, setRangeId }) {
      individualPolls, with the constants from D.aggSpec. */
   const pvMenuOK = !window.JUR && !!(D.aggSpec && D.pvHouses && window.AP.pvAgg);
   const [hvSel, setHvSel] = useState(() => new Set());
+  const [pvPop, setPvPop] = useState(null);
   const hvKey = [...hvSel].sort().join("|");
   const pvx = React.useMemo(
     () => (pvMenuOK && hvSel.size && !G ? window.AP.pvAgg([...hvSel]) : null),
@@ -884,38 +885,10 @@ function RdPrimary({ rangeId, setRangeId }) {
     return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
   }, []);
 
-  /* a closed <select> still sizes itself to its WIDEST option, so "Lower
-     earners (bottom 50%)"'s 180px of text framed the three-letter "Men"
-     the day income's bands joined the menu. Hold the control to the label
-     it actually shows instead: measure that label in the control's own
-     font, add back its paddings and a 14px slack (the text-to-frame gap,
-     calibrated against the max-content width before this fix - 249px for
-     the 234px padding-plus-widest-label sum). Runs before paint on every
-     selection and again once the webfont lands - a fallback-font measure
-     would otherwise freeze the early render's width. */
-  const grpSelRef = React.useRef(null);
-  const pvSelRef = React.useRef(null);
-  React.useLayoutEffect(() => {
-    [grpSelRef, pvSelRef].forEach((r0) => {
-      const el = r0.current;
-      if (!el) return;
-      const fit = () => {
-        const cs = getComputedStyle(el);
-        const cv = document.createElement("canvas").getContext("2d");
-        cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
-        el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width
-          + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
-      };
-      fit();
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-    });
-  }, [grpId, hvKey]);
-
-  /* the menu's longest options buy its width, so the two income bands
-     print their short names in the MENU text alone (user call 2026-10-19),
-     values untouched: the head's "Among lower earners (bottom 50%)", the
-     Who-votes tab, the lift note and the All-polls hand-off all keep the
-     full labelled names */
+  /* the two income bands print their short names in the MENU text alone
+     (user call 2026-10-19), values untouched: the head's "Among lower earners
+     (bottom 50%)", the Who-votes tab, the lift note and the All-polls hand-off
+     all keep the full labelled names */
   const MENUSHORT = { "Lower earners (bottom 50%)": "Lower earners", "Higher earners (top 15%)": "Higher earners" };
 
   return (
@@ -923,31 +896,36 @@ function RdPrimary({ rangeId, setRangeId }) {
       <div className="rd-pv-head">
         <RdHed head={story.head} dek={story.dek} />
         {T && (
-          <select ref={grpSelRef} className="rd-pv-sel" aria-label="The primary vote among" value={grpId}
-                  onChange={(e) => setGrpId(e.target.value)}>
-            <option value="">All voters</option>
-            {T.tabs.map((t) => t.sets.map((s) => (
-              <optgroup key={s.id} label={s.label || "By " + t.label.toLowerCase()}>
-                {s.groups.map((g) => <option key={g.label} value={g.label}>{MENUSHORT[g.label] || g.label}</option>)}
-              </optgroup>
-            )))}
-          </select>
+          <FilterPop id="group" label="Among" summary={MENUSHORT[grpId] || grpId || "All voters"}
+                     on={!!grpId} open={pvPop} setOpen={setPvPop}>
+            <div className="ap-pop-head"><span>The primary vote among</span></div>
+            <div className="ap-poplist" role="radiogroup" aria-label="The primary vote among">
+              <PopRow radio on={grpId === ""} label="All voters" onClick={() => setGrpId("")} />
+              {T.tabs.map((t) => t.sets.map((s) => (
+                <div className="rd-pv-popgroup" key={s.id}>
+                  <div className="rd-pv-popgrouphead">{s.label || "By " + t.label.toLowerCase()}</div>
+                  {s.groups.map((g) => <PopRow key={g.label} radio on={grpId === g.label} label={MENUSHORT[g.label] || g.label} onClick={() => setGrpId(g.label)} />)}
+                </div>
+              )))}
+            </div>
+          </FilterPop>
         )}
         {pvMenuOK && !G && (
           /* the ALL POLLSTERS menu (its figures live beside `hvSel` above):
-             the All-polls filter bar's tick-menu pattern - the select holds
-             no value, a pick ticks or unticks the house ("__clear" wipes the
-             set) and the label snaps back, to "N pollsters" while a subset
-             counts. Hidden in group mode: a group's figures are §7g's pooled
-             reads and a house subset can't recompose them, so no recomputed
-             view would sit behind whatever the menu said */
-          <select ref={pvSelRef} className="rd-pv-sel" aria-label="The primary vote counted from only some pollsters" value=""
-                  onChange={(e) => { const v = e.target.value; if (v === "__clear") setHvSel(new Set()); else if (v) setHvSel((s) => { const n = new Set(s); if (n.has(v)) n.delete(v); else n.add(v); return n; }); }}>
-            <option value="" disabled>{hvSel.size ? hvSel.size + (hvSel.size === 1 ? " pollster" : " pollsters") : "All pollsters"}</option>
-            {D.pvHouses.map((h) => <option key={h} value={h}>{(hvSel.has(h) ? "✓ " : "") + h}</option>)}
-            {hvSel.size > 0 && <hr />}
-            {hvSel.size > 0 && <option value="__clear">✕ Clear</option>}
-          </select>
+             hidden in group mode, whose figures are §7g's pooled reads and
+             cannot be recomposed from a house subset */
+          <FilterPop id="houses" label="Pollsters"
+                     summary={hvSel.size ? hvSel.size + (hvSel.size === 1 ? " pollster" : " pollsters") : "All"}
+                     on={hvSel.size > 0} open={pvPop} setOpen={setPvPop}>
+            <div className="ap-pop-head"><span>Count only votes from</span>
+              {hvSel.size > 0 && <button className="ap-clear" onClick={() => setHvSel(new Set())}>Clear</button>}
+            </div>
+            <div className="ap-poplist" role="group" aria-label="The primary vote counted from only some pollsters">
+              {D.pvHouses.map((h) => <PopRow key={h} on={hvSel.has(h)} label={h} onClick={() => setHvSel((s) => {
+                const n = new Set(s); if (n.has(h)) n.delete(h); else n.add(h); return n;
+              })} />)}
+            </div>
+          </FilterPop>
         )}
       </div>
       {narrow ? (
@@ -4480,6 +4458,7 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
   const unit = relative ? "×" : " pp";
   const data = React.useMemo(() => rdGapSet(st, order, D.mx, refLabel, relative), [st, order, D, refLabel, relative]);
   const [choice, setChoice] = useState("");
+  const [gapPop, setGapPop] = useState(null);
   if (!data) return null;
   const { def, reference, comparisons, limit, firstX } = data;
   const selected = comparisons.find((c) => c.group.label === choice)
@@ -4505,16 +4484,19 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
     <div className="card rd-card rd-wv-gap-set" role="group" aria-label={title}>
       <div className="rd-chead"><h5 className="rd-chead-t">{title}</h5></div>
       <div className="rd-wv-gap-choice">
-        Compare
-        <select className="rd-pv-sel" aria-label={def.title + " comparison group"} value={group.label}
-                onChange={(e) => setChoice(e.target.value)}>
-          {comparisons.map((c) => <option key={c.group.label} value={c.group.label}>{c.group.label}</option>)}
-        </select>
-        Reference
-        <select className="rd-pv-sel" aria-label={def.title + " reference group"} value={reference.label}
-                onChange={(e) => { setChoice(e.target.value === group.label ? reference.label : group.label); setRefLabel(e.target.value); }}>
-          {st.groups.map((g) => <option key={g.label} value={g.label}>{g.label}</option>)}
-        </select>
+        <FilterPop id="compare" label="Compare" summary={group.label} on={false} open={gapPop} setOpen={setGapPop}>
+          <div className="ap-poplist" role="radiogroup" aria-label={def.title + " comparison group"}>
+            {comparisons.map((c) => <PopRow key={c.group.label} radio on={group.label === c.group.label} label={c.group.label} onClick={() => setChoice(c.group.label)} />)}
+          </div>
+        </FilterPop>
+        <FilterPop id="reference" label="Reference" summary={reference.label} on={false} open={gapPop} setOpen={setGapPop}>
+          <div className="ap-poplist" role="radiogroup" aria-label={def.title + " reference group"}>
+            {st.groups.map((g) => <PopRow key={g.label} radio on={reference.label === g.label} label={g.label} onClick={() => {
+              setChoice(g.label === group.label ? reference.label : group.label);
+              setRefLabel(g.label);
+            }} />)}
+          </div>
+        </FilterPop>
       </div>
       <p className="rd-wv-gap-formula">{formula}</p>
       <p className="rd-wv-gap-directions">{explanation}</p>
@@ -8441,6 +8423,7 @@ function RdConfidence({ rangeId }) {
   const curTerm = TERMS.find((t) => t.current) || TERMS[TERMS.length - 1];
   const [winS, setWinS] = useState(() => confTermWin(curTerm, nowX));
   const [dragging, setDragging] = useState(false);
+  const [confidencePop, setConfidencePop] = useState(null);
   const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
   // Symmetric half-life kernel over the raw readings (x units are years).
   // Evaluated at each reading's date; week-to-week sampling noise on the
@@ -8778,25 +8761,18 @@ function RdConfidence({ rangeId }) {
                  label={isMacro ? "Headline inflation" : vc.title} />
   );
   /* the draw-a-term menu: any term window can lift other terms over its
-     band, lined up on its own election */
+     band, lined up on its own election; drawn lines stay on the key row */
   const drawMenu = !isMacro && hset && isTerm ? (
-    /* the past-terms menu is the page's own control over a native
-       select, styled with the primary-vote subpopulation menu's rules —
-       picking a year toggles its line and the select snaps back to its
-       label: the drawn set lives on the key row under the chart */
-    <select className="rd-confidence-sel" aria-label={isCur ? "Draw a past term" : "Draw another term"} value=""
-            onChange={(e) => {
-              const v = e.target.value;
-              if (v === "clear") setLiftedBy((s) => ({ ...s, [histLane]: new Set() }));
-              else if (v) lift(+v);
-            }}>
-      <option value="" disabled>{isCur ? "Draw a past term" : "Draw another term"}</option>
-      {drawable.map((t) => (
-        <option key={t.year} value={t.year}>{lifted.has(t.year) ? ("✓ " + t.year) : t.year}</option>
-      ))}
-      {lifted.size > 0 && <hr />}
-      {lifted.size > 0 && <option value="clear">✕ Clear lines</option>}
-    </select>
+    <FilterPop id="terms" label={isCur ? "Draw a past term" : "Draw another term"}
+               summary={lifted.size ? lifted.size + (lifted.size === 1 ? " term" : " terms") : null}
+               on={lifted.size > 0} open={confidencePop} setOpen={setConfidencePop}>
+      <div className="ap-pop-head"><span>Draw terms beside the band</span>
+        {lifted.size > 0 && <button className="ap-clear" onClick={() => setLiftedBy((s) => ({ ...s, [histLane]: new Set() }))}>Clear lines</button>}
+      </div>
+      <div className="ap-poplist" role="group" aria-label={isCur ? "Draw a past term" : "Draw another term"}>
+        {drawable.map((t) => <PopRow key={t.year} on={lifted.has(t.year)} label={t.year} onClick={() => lift(t.year)} />)}
+      </div>
+    </FilterPop>
   ) : null;
   const drawnShown = [...lifted].filter((y) => isTerm && drawable.some((t) => t.year === y)).sort((a, b) => a - b);
   return (
