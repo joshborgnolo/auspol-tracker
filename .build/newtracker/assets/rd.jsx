@@ -726,7 +726,7 @@ if (typeof window !== "undefined" && !window.__rdInputWatch) {
 /* ---------------------------------------------------------------- keys
    What each mark on a chart is, drawn the way the chart draws it. Colour is
    never the only carrier: every item is a shape and a word. */
-function RdSwatch({ kind = "line", color = "var(--ink-3)" }) {
+function RdSwatch({ kind = "line", color = "var(--ink-3)", dotColor = null }) {
   switch (kind) {
     case "dot":
       return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style={{ fill: color, opacity: 0.55 }} /></svg>;
@@ -735,7 +735,7 @@ function RdSwatch({ kind = "line", color = "var(--ink-3)" }) {
     case "dot-open":
       return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style={{ fill: "var(--bg)", stroke: color, strokeWidth: 2 }} /></svg>;
     case "ring":
-      return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style={{ fill: "var(--bg)", stroke: "var(--ink)", strokeWidth: 2 }} /></svg>;
+      return <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style={{ fill: "var(--bg)", stroke: dotColor ? color : "var(--ink)", strokeWidth: 2 }} />{dotColor ? <circle cx="7" cy="7" r="1.5" style={{ fill: dotColor }} /> : null}</svg>;
     case "diamond":
       /* the estimated-cell mark (the explainer's class views, 2026-10-23):
          a hollow diamond beside the counted bases' ring and solid dot */
@@ -768,8 +768,8 @@ function RdSwatch({ kind = "line", color = "var(--ink-3)" }) {
 
 function RdKey({ items, children, className }) {
   const item = (it, i) => it.href
-    ? <a key={i} className="rd-key-item" href={it.href} target="_blank" rel="noopener noreferrer"><RdSwatch kind={it.kind} color={it.color} />{it.label}</a>
-    : <span key={i} className="rd-key-item"><RdSwatch kind={it.kind} color={it.color} />{it.label}</span>;
+    ? <a key={i} className="rd-key-item" href={it.href} target="_blank" rel="noopener noreferrer"><RdSwatch kind={it.kind} color={it.color} dotColor={it.dotColor} />{it.label}</a>
+    : <span key={i} className="rd-key-item"><RdSwatch kind={it.kind} color={it.color} dotColor={it.dotColor} />{it.label}</span>;
   return (
     <div className={"rd-key" + (className ? " " + className : "")}>
       {items.filter(Boolean).map((it, i) => item(it, i))}

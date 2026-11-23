@@ -702,6 +702,8 @@ function RdPrimary({ rangeId, setRangeId }) {
     const curYear = (vwTerms.find((t) => t.current) || {}).year;
     const bridges = L.series.some((sr) => sr.dash === RD_VH_BRIDGE);
     const unmeasured = G ? [] : VH.terms.filter((t) => t.miss.alp == null && t.b > xDomain[0] && t.a < xDomain[1]);
+    const inclusions = ["grn", "onp"].filter((k) => vhMarks.some((m) => m.dotColor === D.PARTIES[k].color))
+      .map((k) => ({ kind: "ring", color: D.PARTIES.oth.color, dotColor: D.PARTIES[k].color, label: D.PARTIES[k].name + " included in Others" }));
     return {
       series: (curIn ? chartSeries.map((sr) => ({ ...sr, ...(vwAtNow ? {} : { endLabel: null }), ...(vhLong ? { rdWidth: sr.id === "oth" ? 1.4 : 1.6 } : {}) })) : []).concat(L.series),
       areas: (curIn && !vhLong ? areas : []).concat(L.areas),
@@ -740,7 +742,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         const d = pts.find((r) => r.x === q.x);
         return d && d.ci ? visible.map((p) => ({ label: "95% intervals", value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"), rowLabel: p.name })) : [];
       },
-      bridges, unmeasured,
+      bridges, unmeasured, inclusions,
       ticks: rdVwTicks(vwWin, vwTerms),
     };
   })();
@@ -1055,7 +1057,7 @@ function RdPrimary({ rangeId, setRangeId }) {
               : (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
                 + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
             legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
-              .concat([{ label: "Election result", color: "var(--ink)", kind: "ring" }]),
+              .concat([{ label: "Election result", color: "var(--ink)", kind: "ring" }], H.inclusions),
           } : { title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""), sub: story.head + (G ? (PMD ? ". The model’s estimate for " + sel.who + " at each month’s middle, latest fieldwork " : ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork ") + rdDate(D.latest.updatedISO, true) + "." : pvx ? (PMD ? ". The model re-run on " : ". Monthly averages of ") + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : PMD ? ". The model’s estimates from " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
@@ -1114,6 +1116,7 @@ function RdPrimary({ rangeId, setRangeId }) {
             : vhLong ? { kind: "line", color: "var(--ink-3)", label: VH.model ? "Model estimate" : "Monthly average" }
               : { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           { kind: "ring", label: "Election result" },
+          ...H.inclusions,
           H.bridges ? { kind: "dots", color: "var(--ink-3)", label: "No polls" } : null,
         ] : [
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },

@@ -766,7 +766,7 @@
          weight the chart draws it, not a line: drawn as one, "95% interval"
          read as a second series in the series' own colour */
       ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring", "diamond", "triangle"].includes(l.kind) ? l.kind : "line",
-                                 fill: paint(l.color), alpha: l.kind === "band" ? 0.4 : 1 }))
+                                 fill: paint(l.color), dotFill: l.dotColor ? paint(l.dotColor) : null, alpha: l.kind === "band" ? 0.4 : 1 }))
       : readLegend(target);
     if (!stated && !legend.length && board0) legend = boardLegend();
     if (!stated && !legend.length) legend = cycleLegend();
@@ -1025,6 +1025,10 @@
               /* an election result: a count, drawn open as the chart draws it */
               c.strokeStyle = it.fill; c.lineWidth = 2;
               c.beginPath(); c.arc(lx + 6, my, 5, 0, 7); c.stroke();
+              if (it.dotFill) {
+                c.fillStyle = it.dotFill;
+                c.beginPath(); c.arc(lx + 6, my, 1.5, 0, 7); c.fill();
+              }
             } else if (it.kind === "diamond") {
               /* a survey reading kept apart from the polls (the Who-votes
                  charts' Australian Election Study points): open, as drawn */

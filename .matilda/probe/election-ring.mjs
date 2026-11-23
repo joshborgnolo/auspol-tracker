@@ -208,6 +208,58 @@ if (prim.found && prim.rings.length) {
     tp.nRing + "/" + tp.nSwatch + " ring swatches");
 }
 
+/* the key names what a coloured centre inside an Others election ring means */
+await page.evaluate(async () => {
+  for (let y = 0; y < document.body.scrollHeight; y += 600) {
+    window.scrollTo(0, y);
+    await new Promise((r) => setTimeout(r, 40));
+  }
+  window.scrollTo(0, 0);
+  [...document.querySelectorAll("#primary-vote button")].filter((b) => b.textContent.trim() === "All").forEach((b) => b.click());
+});
+await sleep(900);
+const inclusionKeys = await page.evaluate(() => [...document.querySelectorAll("#primary-vote .rd-key .rd-key-item")].map((el) => ({
+  text: el.textContent,
+  circles: [...el.querySelectorAll("svg circle")].map((c) => ({ fill: c.style.fill, stroke: c.style.stroke })),
+})));
+for (const party of ["Greens", "One Nation"]) {
+  const item = inclusionKeys.find((k) => k.text === party + " included in Others");
+  check("primary key explains " + party + " included in Others", !!item,
+    JSON.stringify(inclusionKeys.map((k) => k.text)));
+  check("primary " + party + " inclusion key mirrors ring and centre dot",
+    !!item && item.circles.length === 2 && item.circles[0].stroke === "var(--oth)" && item.circles[1].fill === (party === "Greens" ? "var(--grn)" : "var(--onp)"),
+    JSON.stringify(item));
+}
+
+/* the copy-card composer's legend keeps the ring and its centre dot too */
+await page.evaluate(() => {
+  window.__copyKeyOps = [];
+  const p = CanvasRenderingContext2D.prototype;
+  const arc = p.arc, fillText = p.fillText, anchorClick = HTMLAnchorElement.prototype.click;
+  p.arc = function(x, y, r, ...rest) {
+    window.__copyKeyOps.push({ op: "arc", x, y, r, fill: this.fillStyle });
+    return arc.call(this, x, y, r, ...rest);
+  };
+  p.fillText = function(text, ...rest) {
+    window.__copyKeyOps.push({ op: "text", text });
+    return fillText.call(this, text, ...rest);
+  };
+  HTMLAnchorElement.prototype.click = function(...args) {
+    if (!/\.png$/.test(this.download || "")) return anchorClick.apply(this, args);
+  };
+});
+await page.click("#primary-vote .chart > .chart-copy-btn");
+await page.waitForFunction(() => ["Greens included in Others", "One Nation included in Others"]
+  .every((label) => window.__copyKeyOps.some((o) => o.text === label)), { timeout: 15000 });
+const copyKeyOps = await page.evaluate(() => window.__copyKeyOps);
+for (const party of ["Greens", "One Nation"]) {
+  const at = copyKeyOps.findIndex((o) => o.text === party + " included in Others");
+  const arcs = copyKeyOps.slice(0, at).filter((o) => o.op === "arc").slice(-2);
+  check("copy-card key keeps the " + party + " centre dot",
+    arcs.length === 2 && arcs[0].r === 5 && arcs[1].r === 1.5 && arcs[0].x === arcs[1].x && arcs[0].y === arcs[1].y && !!arcs[1].fill,
+    JSON.stringify(arcs));
+}
+
 await browser.close();
 server.close();
 console.log(fails ? "\n" + fails + " check(s) FAILED" : "\nall checks passed");
