@@ -1352,7 +1352,7 @@ function RdPastCycles(p) {
 
   /* the sitting term's events, numbered once for each pair of half-width
      charts so the list under the pair serves both */
-  const pairOf = (keys) => rdEventBadges("cy" + cur.year, (CYC_EVENTS[cur.year] || [])
+  const pairOf = (keys) => rdEventBadges("cy" + cur.year, cycleChartEvents(cur, window.AP.D)
     .filter((e) => !e.metrics || e.metrics.some((k) => keys.includes(k)))
     .map((e) => ({ ...e, x: cycEventMonth(e.date, cur.eDate) })), -2, 38);
   const PAIRS = { primary: pairOf(["primary", "oppr"]), leaders: pairOf(["ppmm", "oppnet"]) };

@@ -531,16 +531,24 @@ function RdPrimary({ rangeId, setRangeId }) {
      drawn the stop reads them, through their lead-ins */
   const evStop = evOn ? { x: D.demoVote.x, y: evOf("alp") ? evOf("alp")[0] : evPts[0].y } : null;
   const elecStop = gElecStop || evStop;
-  /* the numbered events: the same set the 2PP hero marks, over this chart's
-     window */
-  /* a history window lying wholly inside this term keeps this term's
-     events; one reaching behind it marks the elections in it instead (a
-     term window has its two as the axis's ends), as rules past six, and
-     the phone keeps no numbered list for them */
-  const curOnly = histOn && xDomain[0] >= curTermA - 1e-6;
-  const evs = !histOn || curOnly ? rdChartEvents(D.events, xDomain[0], xDomain[1]) : rdVwElections(vwWin, vwTerms);
-  const elecRules = histOn && !curOnly && evs.length > 6;
-  const badges = narrow && (!histOn || curOnly) ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
+  /* Show dated events at term scale. Wider overviews retain the election
+     landmarks. A leadership handover can be filed under adjacent terms. */
+  const elections = histOn ? rdVwElections(vwWin, vwTerms) : [];
+  const termScale = xDomain[1] - xDomain[0] <= 4;
+  const evs = React.useMemo(() => {
+    if (!histOn || xDomain[0] >= curTermA) return rdChartEvents(D.events, ...xDomain);
+    if (!termScale) return elections;
+    const byDate = new Map();
+    for (const term of vwTerms) {
+      for (const event of cycleChartEvents(term, D)) {
+        const x = confIsoX(event.date);
+        if (x >= xDomain[0] && x <= xDomain[1]) byDate.set(event.date, { ...event, x });
+      }
+    }
+    return [...byDate.values(), ...elections].sort((a, b) => a.x - b.x);
+  }, [histOn, xDomain[0], xDomain[1], vwWin.kind, curTermA, D.events, vwTerms]);
+  const elecRules = histOn && !termScale && elections.length > 6;
+  const badges = narrow && !elecRules ? rdEventBadges("p1", evs, ...xDomain) : null;
   /* the phone list under the chart opens an event's panel by tapping its
      number; a tap on another number hands the panel over, and an event that
      leaves the window is put away by the chart's own reconciliation */
@@ -7755,7 +7763,7 @@ function RdMacro({ win, dragging, terms, nowX, hi, strip }) {
      keeping the bare rules lined up under the numbers; a longer window's
      elections are bare rules on every chart (the strip under the grid
      names the governments between them) */
-  const MACRO_ECONDS_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const MACRO_ECONDS_OFF = ["2025-05-20", "2025-12-08", "2026-01-22", "2026-02-12"];
   const evs = isCur ? rdChartEvents(D.events, win.a, nowX).filter((e) => !MACRO_ECONDS_OFF.includes(e.date)) : confElectionEvents(win, terms);
   const badges = isCur && evs.length ? rdEventBadges("macro", evs, win.a, win.b) : null;
   const topN = narrow ? 1 : 2;
@@ -8171,7 +8179,7 @@ function RdConfidence({ rangeId }) {
      blockade, the 2026 budget and the RBA's September hike all moved one
      or more of these gauges. Only the sitting term's window carries them;
      a longer window hangs its elections there instead. */
-  const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const CONF_OFF = ["2025-05-20", "2025-12-08", "2026-01-22", "2026-02-12"];
   /* a window holding more than six elections keeps them as bare rules:
      names over every one of them ran end to end across the top */
   const elecEvs = isCur ? [] : confElectionEvents(win, vTerms);

@@ -1183,6 +1183,106 @@ function cycMonthOf(eDate, m) {
    whitelist pins the event to those chart measures alone. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
+  1943: [
+    {
+      date: "1945-07-13", short: "Chifley sworn in",
+      label: "Chifley becomes prime minister",
+      desc: "Ben Chifley takes office after John Curtin’s death and Frank Forde’s eight days as caretaker prime minister.",
+      major: true,
+    },
+  ],
+  1946: [
+    {
+      date: "1947-08-16", short: "Bank nationalisation",
+      label: "Chifley announces bank nationalisation",
+      desc: "Ben Chifley announces plans to bring the private banks into public ownership.",
+      major: true,
+    },
+  ],
+  1949: [
+    {
+      date: "1951-03-09", short: "Communist Party ban struck down",
+      label: "High Court overturns the Communist Party ban",
+      desc: "The High Court strikes down the Menzies government’s law dissolving the Communist Party.",
+      major: true,
+    },
+  ],
+  1951: [
+    {
+      date: "1951-09-22", short: "Communism referendum defeated",
+      label: "Voters reject new powers over communism",
+      desc: "A narrow majority votes against giving the Commonwealth express power to legislate against communism.",
+      major: true,
+    },
+    {
+      date: "1954-04-13", short: "Petrov affair",
+      label: "Menzies announces Petrov’s defection",
+      desc: "Robert Menzies tells Parliament that Soviet diplomat Vladimir Petrov has defected and announces a royal commission into espionage.",
+      major: true,
+    },
+  ],
+  1954: [
+    {
+      date: "1955-04-07", short: "Labor split",
+      label: "Victorian expulsions divide Labor",
+      desc: "Labor expels Victorian members associated with the anti-communist Movement. The breakaway party later becomes the Democratic Labor Party.",
+      major: true,
+    },
+  ],
+  1955: [
+    {
+      date: "1957-07-06", short: "Japan trade agreement",
+      label: "Australia signs a trade agreement with Japan",
+      desc: "Trade minister John McEwen signs an agreement with Japan that opens the way for closer postwar trade.",
+      major: true,
+    },
+  ],
+  1958: [
+    {
+      date: "1960-03-07", short: "Evatt → Calwell",
+      label: "Calwell becomes opposition leader",
+      desc: "Arthur Calwell succeeds H. V. Evatt as federal Labor leader.",
+      major: true,
+    },
+  ],
+  1961: [
+    {
+      date: "1962-08-03", short: "Advisers reach Vietnam",
+      label: "Australian Army advisers arrive in South Vietnam",
+      desc: "Thirty Australian Army advisers arrive in Saigon to join their commander and train South Vietnamese forces.",
+      major: true,
+    },
+  ],
+  1963: [
+    {
+      date: "1965-04-29", short: "Vietnam troop commitment",
+      label: "Menzies commits a battalion to Vietnam",
+      desc: "Robert Menzies tells Parliament that Australia will send an infantry battalion to South Vietnam.",
+      major: true,
+    },
+  ],
+  1966: [
+    {
+      date: "1967-05-27", short: "1967 referendum",
+      label: "Voters approve the Aboriginal affairs amendment",
+      desc: "Voters remove the constitutional exclusion of Aboriginal people from population counts and give the Commonwealth power to make special laws for them.",
+      major: true,
+    },
+    {
+      date: "1967-12-17", short: "Holt disappears",
+      label: "Harold Holt disappears at Cheviot Beach",
+      desc: "Prime minister Harold Holt disappears while swimming near Portsea, Victoria.",
+      major: true,
+    },
+  ],
+  1969: [
+    {
+      date: "1970-05-08", short: "Vietnam Moratorium",
+      label: "First national Vietnam Moratorium",
+      desc: "Australians march against the Vietnam War in coordinated demonstrations across the country.",
+      major: true,
+    },
+  ],
   /* Pre-1987 terms: the leadership handovers the Morgan Gallup lines splice
      on (CYC_META in gen-data), dated to the day the party room decided or
      the office changed hands. Two handovers fall in the fortnight after an
@@ -1199,7 +1299,7 @@ const CYC_EVENTS = {
       label: "Snedden replaces McMahon as opposition leader",
       desc: "Billy Snedden defeats Nigel Bowen 30–29 for the Liberal leadership after William McMahon stands down following the 1972 election defeat, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1974-04-11", short: "Double dissolution",
@@ -1214,7 +1314,7 @@ const CYC_EVENTS = {
       label: "Fraser replaces Snedden as opposition leader",
       desc: "Malcolm Fraser defeats Billy Snedden 37–27 in a Liberal leadership spill, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1975-10-16", short: "Supply blocked",
@@ -1247,7 +1347,7 @@ const CYC_EVENTS = {
       label: "Hayden replaces Whitlam as opposition leader",
       desc: "Bill Hayden defeats Lionel Bowen 36–28 for the Labor leadership after Gough Whitlam resigns following the 1977 election defeat, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
   ],
   1977: [
@@ -1256,7 +1356,7 @@ const CYC_EVENTS = {
       label: "Hayden replaces Whitlam as opposition leader",
       desc: "Bill Hayden defeats Lionel Bowen 36–28 for the Labor leadership after Gough Whitlam resigns following the 1977 election defeat, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1978-08-15", short: "Tax surcharge budget",
@@ -1283,14 +1383,14 @@ const CYC_EVENTS = {
       label: "Hawke challenges Hayden for the Labor leadership",
       desc: "Bob Hawke challenges Bill Hayden for the Labor leadership and loses the ballot 42 votes to 37.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1983-02-03", short: "Hayden → Hawke",
       label: "Hawke replaces Hayden as opposition leader",
       desc: "Bill Hayden resigns the Labor leadership and Bob Hawke is elected unopposed as his replacement on the morning Malcolm Fraser calls the March 1983 election.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
   ],
   1983: [
@@ -1299,7 +1399,19 @@ const CYC_EVENTS = {
       label: "Peacock replaces Fraser as opposition leader",
       desc: "Andrew Peacock defeats John Howard 36–20 for the Liberal leadership after Malcolm Fraser resigns following the 1983 election defeat, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
+    },
+    {
+      date: "1983-12-12", short: "Dollar floated",
+      label: "The Australian dollar floats",
+      desc: "The Hawke government lets the foreign exchange market set the value of the Australian dollar.",
+      major: true,
+    },
+    {
+      date: "1984-02-01", short: "Medicare begins",
+      label: "Medicare comes into effect",
+      desc: "The Hawke government introduces Medicare, Australia’s universal health insurance scheme.",
+      major: true,
     },
   ],
   1984: [
@@ -1308,7 +1420,7 @@ const CYC_EVENTS = {
       label: "Howard replaces Peacock as opposition leader",
       desc: "Andrew Peacock resigns the Liberal leadership after the party room refuses to remove John Howard as his deputy; Howard is elected leader 57 votes to 6, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1986-05-14", short: "Banana republic",
@@ -1335,7 +1447,7 @@ const CYC_EVENTS = {
       label: "Peacock replaces Howard as opposition leader",
       desc: "Andrew Peacock defeats John Howard in a Liberal leadership spill, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1989-08-18", short: "Pilots’ dispute",
@@ -1388,14 +1500,14 @@ const CYC_EVENTS = {
       label: "Downer replaces Hewson as opposition leader",
       desc: "Alexander Downer defeats John Hewson in a Liberal leadership spill, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "1995-01-30", short: "Downer → Howard",
       label: "Howard replaces Downer as opposition leader",
       desc: "John Howard replaces Alexander Downer as Liberal leader and opposition leader after Downer resigns.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
   ],
   1996: [
@@ -1450,7 +1562,7 @@ const CYC_EVENTS = {
       label: "Crean replaces Beazley as opposition leader",
       desc: "Kim Beazley resigns after Labor’s 2001 election defeat and Simon Crean is elected unopposed as Labor leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "2002-10-12", short: "Bali bombings",
@@ -1469,7 +1581,7 @@ const CYC_EVENTS = {
       label: "Latham replaces Crean as opposition leader",
       desc: "Mark Latham defeats Kim Beazley 47–45 in a Labor leadership ballot after Simon Crean resigns, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
   ],
   2004: [
@@ -1478,7 +1590,7 @@ const CYC_EVENTS = {
       label: "Beazley replaces Latham as opposition leader",
       desc: "Mark Latham resigns the Labor leadership and leaves parliament; Kim Beazley is elected unopposed as his replacement.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "2006-03-27", short: "WorkChoices",
@@ -1491,7 +1603,7 @@ const CYC_EVENTS = {
       label: "Rudd replaces Beazley as opposition leader",
       desc: "Kevin Rudd defeats Kim Beazley 49–39 in a Labor leadership spill, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "2007-11-07", short: "Campaign rate rise",
@@ -1518,14 +1630,14 @@ const CYC_EVENTS = {
       label: "Turnbull replaces Nelson as opposition leader",
       desc: "Malcolm Turnbull defeats Brendan Nelson 45–41 in a Liberal leadership spill, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "2009-12-01", short: "Turnbull → Abbott",
       label: "Abbott replaces Turnbull as opposition leader",
       desc: "Tony Abbott defeats Malcolm Turnbull 42–41 in a Liberal leadership spill over emissions trading, becoming opposition leader.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
     {
       date: "2010-04-27", short: "ETS shelved, mining tax",
@@ -1628,7 +1740,7 @@ const CYC_EVENTS = {
       label: "Albanese replaces Shorten as opposition leader",
       desc: "Anthony Albanese is elected unopposed as Labor leader, after Bill Shorten resigns in the wake of the 2019 federal election defeat.",
       major: true,
-      metrics: ["oppnet"],
+      metrics: ["primary", "oppr", "oppnet"],
     },
   ],
   2019: [
@@ -1671,40 +1783,12 @@ const CYC_EVENTS = {
       major: true,
     },
   ],
-  2025: [
-    {
-      date: "2025-05-28", short: "1st Coalition split",
-      label: "First Coalition dissolution",
-      desc: "The Liberal–National Coalition dissolves for the first time, weeks after the 2025 election defeat.",
-      major: true,
-    },
-    {
-      date: "2025-12-14", short: "Bondi shooting",
-      label: "Bondi Beach shooting",
-      desc: "A shooting at Bondi Beach in Sydney.",
-      major: true,
-    },
-    {
-      date: "2026-01-22", short: "2nd Coalition split",
-      label: "Coalition dissolves again",
-      desc: "the Liberal–National Coalition dissolves again.",
-      major: true,
-    },
-    {
-      date: "2026-02-12", short: "Ley → Taylor",
-      label: "Taylor replaces Ley as opposition leader",
-      desc: "Angus Taylor replaces Sussan Ley as Leader of the Liberal Party and Opposition Leader.",
-      major: true,
-      metrics: ["oppnet"],
-    },
-    {
-      date: "2026-05-12", short: "2026 Budget",
-      label: "2026 federal Budget",
-      desc: "Treasurer Jim Chalmers delivers the Albanese government’s fifth federal budget, with sweeping CGT changes.",
-      major: true,
-    },
-  ],
 };
+
+function cycleChartEvents(cycle, D) {
+  if (cycle.current) return rdChartEvents(D.events, -Infinity, Infinity);
+  return window.JUR ? [] : CYC_EVENTS[cycle.year] || [];
+}
 
 /* ---- the readings behind a cycle's line --------------------------------
    These charts are monthly averages, and an average is a claim about polls
@@ -2126,7 +2210,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       })
     : [];
   const cycleEvents = eventCycle
-    ? (CYC_EVENTS[eventCycle.year] || [])
+    ? cycleChartEvents(eventCycle, D)
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
         .concat(contestEvents)
