@@ -10,6 +10,7 @@
    (handover 13 Feb 2026).
    Run: node .build/newtracker/gen-data.mjs */
 import fs from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
@@ -6720,7 +6721,31 @@ const GROUPM = (() => {
       /* from the election month where polling day has a reading (polls at
          the election, the AES, the count), else from the group's first poll */
       const firstTerm = g.obs.some((o) => o.src.src !== "term") ? emDay : Math.min(...g.obs.filter((o) => o.src.src === "term").map((o) => o.day));
+      /* each party's move against all voters since polling day, from the
+         joint draws of the gap on both days (the pair) and today's national
+         figures: the point gap (group less all voters) and the log ratio
+         (group over all voters), each a posterior of its own */
+      const since = (() => {
+        const pd = g.pairs.get(t0 + "|" + t1);
+        if (!pd) return null;
+        const nd = natAt.get(t1), n = Math.min(nd.length, pd.length / (2 * D));
+        const cols = PM_PARTIES.map(() => ({ gap: new Float64Array(n), lr: new Float64Array(n), g0: 0, g1: 0, a1: 0 }));
+        const a0 = pmSoftmax(resAlr);
+        for (let i = 0; i < n; i++) {
+          const e0 = resAlr.map((v, k) => v + pd[i * 2 * D + k]), e1 = nd[i].map((v, k) => v + pd[i * 2 * D + D + k]);
+          const g0 = pmSoftmax(e0), g1 = pmSoftmax(e1), a1 = pmSoftmax(nd[i]);
+          for (let q = 0; q < P; q++) {
+            const c = cols[q];
+            c.gap[i] = 100 * ((g1[q] - a1[q]) - (g0[q] - a0[q]));
+            c.lr[i] = Math.log(g1[q] / a1[q]) - Math.log(g0[q] / a0[q]);
+            c.g0 += 100 * g0[q] / n; c.g1 += 100 * g1[q] / n; c.a1 += 100 * a1[q] / n;
+          }
+        }
+        const sm = (a) => { const m = pmMean(a), lo = pmQuant(a, 0.025), hi = pmQuant(a, 0.975), sd = (hi - lo) / 3.92; return { v: m, lo, hi, z: sd > 0 ? m / sd : 0 }; };
+        return Object.fromEntries(PM_PARTIES.map((k, q) => [k, { gap: sm(cols[q].gap), lr: sm(cols[q].lr), g0: cols[q].g0, g1: cols[q].g1, a0: 100 * a0[q], a1: cols[q].a1 }]));
+      })();
       out.set(setId + "|" + group, {
+        since,
         now: sumAt(t1, (i) => natAt.get(t1)[i]),
         election: sumAt(t0, () => resAlr),
         monthly: months.filter((m) => m.day >= firstTerm - 15).map((m) => ({ ym: m.ym, s: sumAt(m.day, (i) => natAt.get(m.day)[i]) })).filter((m) => m.s),
@@ -7332,6 +7357,23 @@ const demoTrend = (() => {
           const xs = [], gs = [], as = [], ws = [];
           /* the test's own months (DEMO_TEST_MONTHLY): the drawn line's,
              except that a pooled release counts once, not once per part */
+          /* federal: the group model's own move against all voters since
+             polling day (§7gm since), significant when both the point gap's
+             and the log ratio's 95% intervals exclude zero the same way */
+          const gmS = GROUPM && GROUPM.get(st.id + "|" + g.label), sv = gmS && gmS.since && gmS.since[party];
+          if (sv) {
+            const sigG = sv.gap.lo > 0 || sv.gap.hi < 0, sigR = sv.lr.lo > 0 || sv.lr.hi < 0;
+            const sig = sigG && sigR && Math.sign(sv.gap.v) === Math.sign(sv.lr.v);
+            const fromYm = ELECTION.date.slice(0, 7), toYm = demographics.allMonthly[demographics.allMonthly.length - 1][0];
+            if (!windowYm || fromYm < windowYm) windowYm = fromYm;
+            const row = { tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label, from: fromYm, to: toYm,
+              dir: sv.lr.v >= 0 ? 1 : -1, tAbs: rr(sv.gap.z), tLR: rr(sv.lr.z), thin: false, months: (g.monthly || []).length,
+              g0: rr(sv.g0), g1: rr(sv.g1), a0: rr(sv.a0), a1: rr(sv.a1), rel: rr(sv.gap.v), sig, model: true,
+              gapLo: rr(sv.gap.lo), gapHi: rr(sv.gap.hi), lrLo: rr(sv.lr.lo), lrHi: rr(sv.lr.hi) };
+            rows.push(row);
+            if (sig) moves.push({ ...row, r0: rr(sv.g0 / sv.a0), r1: rr(sv.g1 / sv.a1) });
+            continue;
+          }
           const tm = DEMO_TEST_MONTHLY.get(st.id + "|" + g.label) || g.monthly || [];
           for (const row of tm) {
             const a = anchor.get(row[0]);
@@ -7425,9 +7467,13 @@ const demoTrend = (() => {
           base = "aes"; then = a[1] - DEMO_AES.elec[party]; ciThen = a[2];
           gThen = a[0]; allThen = DEMO_AES.all[party]; nBase = ag.n;
         } else continue;
+        const gmE = GROUPM && GROUPM.get(st.id + "|" + g.label), se = gmE && gmE.since && gmE.since[party];
         const now = g.v[party] - demographics.all[party];
-        const ci = Math.sqrt((g.ci[party] || 0) ** 2 + ciThen ** 2);
-        const d = now - then;
+        /* federal: the change is the group model's own posterior (the two
+           days' gaps are drawn jointly, so the change's interval is the
+           change's, not the two margins added as if independent) */
+        const ci = se ? (se.gap.hi - se.gap.lo) / 2 : Math.sqrt((g.ci[party] || 0) ** 2 + ciThen ** 2);
+        const d = se ? se.gap.v : now - then;
         /* and the ratio half, as the slope test pairs its two: a party that
            has grown everywhere widens a low group's point gap while the
            group keeps its share of it (One Nation, ~6 to ~25 since the
@@ -7437,8 +7483,8 @@ const demoTrend = (() => {
            then has no ratio to test, so it can't pass */
         const gNow = g.v[party], allNow = demographics.all[party];
         const lrOk = gNow > 0.05 && allNow > 0.05 && gThen > 0.05 && allThen > 0.05;
-        const lr = lrOk ? Math.log(gNow / allNow) - Math.log(gThen / allThen) : null;
-        const lrCi = lrOk ? Math.sqrt(((g.ci[party] || 0) / gNow) ** 2 + (ciThen / gThen) ** 2) : null;
+        const lr = se ? se.lr.v : lrOk ? Math.log(gNow / allNow) - Math.log(gThen / allThen) : null;
+        const lrCi = se ? (se.lr.hi - se.lr.lo) / 2 : lrOk ? Math.sqrt(((g.ci[party] || 0) / gNow) ** 2 + (ciThen / gThen) ** 2) : null;
         const sigLR = lr != null && Math.abs(lr) > lrCi;
         /* the same-house check (user ruling 2026-11-02): where Resolve's own
            election-day wave gives the same quantity - the cell's movement
@@ -7463,7 +7509,19 @@ const demoTrend = (() => {
           claim: sig && !(check && check.conflict) });
       }
     }
-    out[party] = { windowYm, moves, rows, elec: elecRows };
+    /* on the model the slope test and the election test measure one thing
+       (the move since polling day), so a move the same-house check
+       contradicts is dropped from the moves as it is from the claims */
+    const modelMoves = rows.some((r) => r.model);
+    if (modelMoves) for (const r of rows) {
+      const e = elecRows.find((q) => q.set === r.set && q.group === r.group);
+      if (e && e.check) r.check = e.check;
+    }
+    if (modelMoves) for (let i = moves.length - 1; i >= 0; i--) {
+      const e = elecRows.find((q) => q.set === moves[i].set && q.group === moves[i].group);
+      if (e && e.check && e.check.conflict) { moves[i].conflict = true; moves.splice(i, 1); }
+    }
+    out[party] = { windowYm, moves, rows, elec: elecRows, ...(modelMoves ? { model: true } : {}) };
   }
   return out;
 })();
@@ -10050,10 +10108,36 @@ const voteHistory = JUR ? null : (() => {
     }
     delete t.missK;
   }
-  console.log("voteHistory:", terms.length, "terms;",
+  /* federal: the primaries' past terms on the site's model
+     (.build/build-vote-history.mjs → data/vote-history-model.json): each
+     term fitted as the sitting term is, then moved toward its closing count
+     by the rule above on the model's log-ratio scale, so no share is moved
+     below zero. The 2PP lane stays this construction. Used only while the
+     file is current with its inputs (cyclePolls, the elections, the bases);
+     a stale file leaves the monthly averages in place and says so (and
+     test-vote-history-model.mjs fails until it is rebuilt). */
+  const VHM = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-model.json"), "utf8")); } catch { return null; }
+  })();
+  const vhmInput = (() => { try { return createHash("sha1").update(JSON.stringify({ e: D.elections, c: D.cyclePolls, b: D.cyclePollBases })).digest("hex").slice(0, 12); } catch { return null; } })();
+  let vhmUsed = false;
+  if (VHM && VHM.input === vhmInput) {
+    for (const t of terms) {
+      const m = VHM.terms.find((q) => q.year === t.year && q.src === t.src);
+      if (!m) continue;
+      for (const k of m.lanes) {
+        if (!t.lanes.includes(k)) continue;
+        t.series[k] = m.series[k]; t.miss[k] = m.miss[k]; t.open[k] = m.open[k]; t.close[k] = m.close[k];
+      }
+      t.model = true;
+    }
+    for (const k of ["alp", "lnp", "grn", "onp", "oth"]) if (VHM.rms[k] != null) V[k] = VHM.rms[k] ** 2;
+    vhmUsed = true;
+  } else if (VHM) console.warn("voteHistory: data/vote-history-model.json is stale (run node .build/build-vote-history.mjs) – past terms drawn as monthly averages");
+  console.log("voteHistory:", terms.length, "terms;", vhmUsed ? "primaries on the model;" : "",
     "rms miss " + Object.entries(V).map(([k, v]) => k + " " + (v == null ? "–" : Math.sqrt(v).toFixed(2))).join(", ") + ";",
     "unmeasured", terms.filter((t) => t.miss.alp == null).map((t) => t.year + "–" + String(t.src).slice(2)).join(" ") || "none");
-  return { w0: VH_W0, rms: Object.fromEntries(Object.entries(V).map(([k, v]) => [k, v == null ? null : r2(Math.sqrt(v))])), terms };
+  return { w0: VH_W0, rms: Object.fromEntries(Object.entries(V).map(([k, v]) => [k, v == null ? null : r2(Math.sqrt(v))])), terms, ...(vhmUsed ? { model: true } : {}) };
 })();
 
 /* ---- 8d. the change log ---------------------------------------------------

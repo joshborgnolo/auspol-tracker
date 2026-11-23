@@ -8464,13 +8464,12 @@ function infoTerms(D) {
           const gap = VHi ? VHi.terms.filter((t) => t.miss.alp == null).map((t) => t.src) : [];
           return (<>
             <span className="info-p"><b>Past terms.</b> The arrows over the chart, and its 10 yrs
-            and All views, run the primary vote back to 1943. Each past term is built month by
-            month, with each pollster’s lean taken out, and then drawn through the election
+            and All views, run the primary vote back to 1943. {VHi && VHi.model ? "Each past term is estimated with the same model as this term, each pollster’s lean taken out, and then drawn through the election" : "Each past term is built month by month, with each pollster’s lean taken out, and then drawn through the election"}
             results at both ends. Unfortunately, the polls miss on polling day: by about
             {" "}{VHi ? VHi.rms.alp.toFixed(1) : "1.7"} points for Labor and {VHi ? VHi.rms.lnp.toFixed(1) : "1.9"} for
             the Coalition, as a root mean square over past elections. So each month of a past term
             is moved toward its closing result by part of that election’s miss: two-fifths of it
-            from the first month, rising evenly to all of it on polling day.</span>
+            from the first month, rising evenly to all of it on polling day.{VHi && VHi.model ? " The move is made on the shares’ ratios, so a small party is never moved below zero." : ""}</span>
             <span className="info-p">The site’s record of the 21 elections since 1972 sets the
             shape. A miss is gone once the count is in: the first polls of a new term sit back on
             the result, plus the winner’s honeymoon. Consecutive elections’ misses are unrelated, and
@@ -8722,9 +8721,13 @@ function infoTerms(D) {
         national figure sits 3 points under when the party is on 8%, and 9 under at 27%. So each
         group is tested on its gap in points and on its ratio to all voters, which holds steady for
         a group merely keeping pace, and a change counts only when both pass, in the same
-        direction. Each test is a line
+        direction. {D.latest && D.latest.primaryModel
+        ? <>Both tests read the model: the group’s gap on polling day and today, drawn together
+        from the model’s simulations, so the change has an interval of its own. A change counts
+        when its 95% interval, on the gap and on the ratio, stays clear of zero.</>
+        : <>Each test is a line
         through the monthly readings, tighter months counting for more. A group needs five monthly
-        readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</span>
+        readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</>}</span>
         <span className="info-p"><b>Since the election.</b> The sentence also asks whether a group
         has moved since the 2025 election, on the same two tests. {D.latest && D.latest.primaryModel
         ? <>It starts from the model’s figure for the group on polling day: the 2025 count moved by
@@ -8776,14 +8779,20 @@ function infoTerms(D) {
           are, so newer and larger polls count for more. A group’s 95% margin is the interval taken
           over its pooled gaps, each poll’s sample for the group being the poll’s sample times the
           group’s share of adults.</span>
-          <span className="info-p"><b>Changes over time:</b> for month m, y is the group’s share
+          {D.latest && D.latest.primaryModel ? <span className="info-p"><b>Changes over time:</b> for
+          each of the model’s simulations, y = (group − all voters) today less the same on polling
+          day, and r = ln(group ÷ all voters) today less the same on polling day; the group’s gap on
+          the two days comes from one joint draw of its random walk, all voters’ from the national
+          model’s. A move counts only when the 2.5th and 97.5th percentiles of y and of r fall on the
+          same side of zero, and in the same direction. z in the table is each change over its own
+          standard error (the 95% interval’s width ÷ 3.92).</span> : <span className="info-p"><b>Changes over time:</b> for month m, y is the group’s share
           less all voters’ share, and r = ln(group ÷ all voters); months where either share is a
           trace drop out of r. y and r each get a weighted-least-squares slope on the month index,
           the weight the precision of the month’s own 95% margin – w = (1.96 ÷ margin)², the margin
           floored at 0.5 – t-tested on months − 2 degrees of freedom against the months’ own
           scatter. A move counts only when both slopes clear |t| = 1.96 with the same sign: the
           point-gap drifting AND the ratio drifting, the same way. Fewer than five monthly readings: untested. Seven or fewer: thin, and
-          the sentence above hedges.</span>
+          the sentence above hedges.</span>}
           <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
           group must add up to 100, give or take rounding, and an all-voters column must match the
           poll’s published vote.</span>

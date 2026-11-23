@@ -1,0 +1,145 @@
+/* build-vote-history.mjs – the primary vote's past terms on the site's model.
+
+   The vote charts' history (gen-data §8v) draws every past term, 1943–2025,
+   through the counts at both ends. This fits each term's primaries with the
+   same model as the sitting term (primary-model.mjs fitPrimary: each
+   pollster's drifting lean, the term's regular pollsters averaging zero, a
+   damped trend, the term opening on the count), from the term's polls in
+   data/polls.json cyclePolls, and then moves the line toward the closing
+   count by §8v's own rule – the polls' polling-day miss e (the model's
+   consensus there less the count) applied in part, g = 0.4 + 0.6·f of it
+   at the share f of the term elapsed – but on the model's log-ratio scale,
+   so no share can be moved below zero (the monthly averages' point
+   correction pushed the 1950s' small Others under it). The band is the
+   model's own 95% interval with the doubt about the bias left once the
+   count is known added, V·g(1 − g) (V the lane's mean squared miss over
+   the record), as §8v's. A term with no dated poll in its last three weeks
+   has no measured miss: its line is the polls alone, its band
+   the unmeasured bias's own, V·g.
+   Lanes as §8v's: Labor, the Coalition, the Greens or One Nation where the
+   closing count lists the party and two in five of the term's polls do;
+   everyone else is others. Rows that kept undecided voters in the base are
+   put on a decided basis first.
+   Writes data/vote-history-model.json, stamped with a hash of its inputs.
+     node .build/build-vote-history.mjs */
+import fs from "node:fs";
+import path from "node:path";
+import { createHash } from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { fitPrimary, anchorFrom, categoriesOf, stepOf, softmaxAlr, alrOf, mean, quant, PRIM_MISS } from "./newtracker/primary-model.mjs";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const W0 = 0.4, SEP = ["alp", "lnp", "grn", "onp"], DEFF = 1.6;
+const day = (iso) => Math.floor(Date.parse(String(iso).slice(0, 10) + "T00:00:00Z") / 864e5);
+const r2 = (v) => Math.round(v * 100) / 100;
+const dx = (iso) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  const doy = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000;
+  const yrLen = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0) ? 366 : 365;
+  return y + doy / yrLen;
+};
+const mx = (ym) => { const [y, m] = ym.split("-").map(Number); return y + (m - 1 + 0.5) / 12; };
+
+export function buildVoteHistory({ log = () => {} } = {}) {
+  const src = fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8");
+  const D = JSON.parse(src);
+  const inputs = JSON.stringify({ e: D.elections, c: D.cyclePolls, b: D.cyclePollBases });
+  const E = Object.entries(D.elections).filter(([, e]) => e.date).map(([k, e]) => ({ year: +k.slice(1), ...e })).sort((a, b) => (a.date < b.date ? -1 : 1));
+  const BASES = D.cyclePollBases || {}, CYC = D.cyclePolls || {};
+  const LANES_ALL = ["alp", "lnp", "grn", "onp", "oth", "dem", "dlp"];
+  const terms = [];
+  for (let i = 1; i < E.length; i++) {
+    const O = E[i - 1], C = E[i];
+    const tO = day(O.date), tC = day(C.date);
+    const polls = (CYC[C.year] || []).filter((p) => p.firm !== "Election" && !/exit/i.test(p.firm || "") && p.firm !== "YouGov MRP" && p.alp != null && p.lnp != null)
+      .filter((p) => { const t = day(p.date); return t > tO && t <= tC; });
+    if (!polls.length) continue;
+    const lanes = SEP.filter((k) => k === "alp" || k === "lnp" || (C[k] > 0 && polls.filter((p) => p[k] != null).length >= 0.4 * polls.length));
+    const parties = lanes.concat(["oth"]), P = parties.length, Dd = P - 1;
+    const count = (e) => { const o = {}; for (const k of lanes) o[k] = e[k] > 0 || k === "alp" || k === "lnp" ? e[k] : 0; o.oth = r2(100 - lanes.reduce((s, q) => s + (e[q] || 0), 0)); return o; };
+    const open = count(O), close = count(C);
+    const readings = [];
+    polls.forEach((p, idx) => {
+      const sum = LANES_ALL.reduce((s, k) => s + (p[k] ?? 0), 0), b = BASES[C.year + "|" + p.firm];
+      const und = Math.abs(sum - 100) > 2 && b && b.undecided && sum < 100 ? 100 - sum : null;
+      const kk = und != null ? 100 / (100 - und) : 1;
+      const y = {};
+      for (const k of lanes) y[k] = p[k] != null ? p[k] * kk : null;
+      if (lanes.some((k) => y[k] == null)) return;
+      y.oth = 100 - lanes.reduce((s, k) => s + y[k], 0);
+      if (!(y.oth > 0.2)) y.oth = 0.2;
+      const c = categoriesOf(y, parties);
+      if (!c) return;
+      const e = day(p.date);
+      readings.push({ house: p.firm, idx, day: e - 2, end: e, approx: !!p.dateApprox, n: 1200 / DEFF, cats: c.cats, vals: c.vals, full: c.full, step: stepOf(c.vals), ym: p.date.slice(0, 7) });
+    });
+    if (readings.length < 2) continue;
+    readings.sort((a, b) => a.day - b.day);
+    /* the month points: one per month the term polled in, mid-month unless
+       that falls the far side of an election (then at the month's polls) */
+    const yms = [...new Set(readings.map((r) => r.ym))].sort();
+    const xO = dx(O.date), xC = dx(C.date);
+    const months = yms.map((ym) => {
+      const inM = readings.filter((r) => r.ym === ym);
+      let x = mx(ym), dd = Math.min(Math.max(day(ym + "-15"), tO + 1), tC);
+      if (x > xC - 1 / 365 || x < xO + 1 / 365) { dd = Math.round(inM.reduce((s, r) => s + r.day, 0) / inM.length); dd = Math.min(Math.max(dd, tO + 1), tC); x = Math.min(xC - 0.5 / 365, Math.max(xO + 0.5 / 365, dx(new Date(dd * 864e5).toISOString().slice(0, 10)))); }
+      return { ym, x: +x.toFixed(4), day: dd, k: inM.length };
+    });
+    const miss = Object.fromEntries(parties.map((k) => [k, PRIM_MISS[k] || PRIM_MISS.oth]));
+    const fit = fitPrimary(readings, { t0: tO, t1: tC, anchor: anchorFrom(open, miss, parties), jumps: new Set(), parties,
+      days: months.map((m) => m.day), trend: true, nDraw: 600, M: 8, seed: 20261201 + C.year, minCore: 4 });
+    const alrDraws = (d) => { const sh = fit.shares(d), n = sh.length / P; return Array.from({ length: n }, (_, j) => alrOf(sh.subarray(j * P, j * P + P))); };
+    /* the polls' polling-day miss: measured where a dated poll falls in the
+       last three weeks (§8v's rule); the band's scale V counts only terms
+       with two or more there */
+    const lateN = readings.filter((r) => !r.approx && tC - r.end <= 21).length;
+    const endD = alrDraws(tC);
+    const cAlr = alrOf(parties.map((k) => Math.max(close[k], 0.2) / 100));
+    const eAlr = lateN >= 1 ? Array.from({ length: Dd }, (_, k) => mean(endD.map((e) => e[k])) - cAlr[k]) : null;
+    const endSh = parties.map((_, q) => mean(endD.map((e) => 100 * softmaxAlr(e)[q])));
+    const out = { year: O.year, src: C.year, a: xO, b: xC, lanes: parties, open, close, miss: {}, n: polls.length, lateN, series: {} };
+    parties.forEach((k, q) => { out.miss[k] = eAlr ? r2(endSh[q] - close[k]) : null; out.series[k] = []; });
+    for (const m of months) {
+      const f = Math.min(1, Math.max(0, (m.x - xO) / (xC - xO))), g = W0 + (1 - W0) * f;
+      const dr = alrDraws(m.day), raw = parties.map(() => []), adj = parties.map(() => []);
+      for (const e of dr) {
+        const s0 = softmaxAlr(e), s1 = eAlr ? softmaxAlr(e.map((v, k) => v - eAlr[k] * g)) : s0;
+        parties.forEach((_, q) => { raw[q].push(100 * s0[q]); adj[q].push(100 * s1[q]); });
+      }
+      parties.forEach((k, q) => {
+        const lo = quant(adj[q], 0.025), hi = quant(adj[q], 0.975);
+        out.series[k].push({ x: m.x, adj: mean(adj[q]), raw: mean(raw[q]), sd: (hi - lo) / 3.92, k: m.k, g, measured: !!eAlr });
+      });
+    }
+    terms.push(out);
+    log(`  ${O.year}–${C.year}: ${readings.length} polls, lanes ${parties.join("/")}, miss ${eAlr ? parties.map((k) => k + " " + out.miss[k]).join(" ") : "unmeasured"}`);
+  }
+  /* V: each lane's mean squared miss over the measured terms (points²) */
+  const V = {};
+  for (const k of ["alp", "lnp", "grn", "onp", "oth"]) {
+    const es = terms.filter((t) => t.miss[k] != null && t.lateN >= 2).map((t) => t.miss[k]);
+    V[k] = es.length ? es.reduce((s, e) => s + e * e, 0) / es.length : null;
+  }
+  for (const t of terms) {
+    for (const k of t.lanes) {
+      const Vk = V[k] ?? V.oth;
+      t.series[k] = t.series[k].map((m) => {
+        const biasVar = m.measured ? Vk * m.g * (1 - m.g) : Vk * m.g;
+        const ci = Math.min(1.96 * Math.sqrt(m.sd * m.sd + biasVar), m.adj);   // the band stops at zero
+        return [m.x, r2(m.adj), r2(m.raw), r2(ci), m.k];
+      });
+    }
+    delete t.lateN;
+  }
+  return {
+    _about: "Generated by .build/build-vote-history.mjs from data/polls.json (cyclePolls, elections, cyclePollBases) – do not edit. Each past term's primaries on the site's model, moved toward the closing count on the log-ratio scale; series rows are [x, adjusted, the model's consensus, 95% half-width, polls that month], gen-data §8v's shape.",
+    input: createHash("sha1").update(inputs).digest("hex").slice(0, 12), w0: W0,
+    rms: Object.fromEntries(Object.entries(V).map(([k, v]) => [k, v == null ? null : r2(Math.sqrt(v))])), terms,
+  };
+}
+if (process.argv[1] && path.basename(process.argv[1]) === "build-vote-history.mjs") {
+  const t = Date.now();
+  const m = buildVoteHistory({ log: console.log });
+  fs.writeFileSync(path.join(ROOT, "data", "vote-history-model.json"), JSON.stringify(m) + "\n");
+  console.log(`vote history: ${m.terms.length} terms → data/vote-history-model.json (input ${m.input}) in ${((Date.now() - t) / 1000).toFixed(0)}s; rms ${JSON.stringify(m.rms)}`);
+}

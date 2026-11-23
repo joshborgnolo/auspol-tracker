@@ -38,7 +38,7 @@
           into others is read as the figures it printed (extended Kalman).
    For fixed settings the Kalman filter gives the posterior and its marginal
    likelihood. The settings are integrated by importance sampling around
-   their posterior mode (a Laplace proposal widened 1.5×); printed figures
+   their posterior mode (a Laplace proposal, 64 draws: about half carry weight); printed figures
    are summaries of seeded draws, so the same data prints the same figures.
 
    Backtests (predicting each poll before it was published, against the
@@ -419,7 +419,7 @@ function hessian(v, ctx, kappa, h = 0.2) {
 
 /* settings: MAP, κ, MAP again, then a Laplace mixture of M settings vectors
    drawn from N(mode, (−H)⁻¹) and importance-weighted by the exact posterior */
-export function fitSettings(ctx, { start = null, M = 32, seed = 1, quick = false, inflate = 1.5 } = {}) {
+export function fitSettings(ctx, { start = null, M = 64, seed = 1, quick = false, inflate = 1.0 } = {}) {
   const P = ctx.L.P;
   const kappa = ctx.kappa0 ? new Map(ctx.kappa0) : new Map(ctx.L.houses.map((h) => [h, 1]));
   for (const h of ctx.L.lone) kappa.set(h, 1);
@@ -489,7 +489,7 @@ export function fitPrimary(readings, opts) {
   const events = [...new Set([opts.t0, ...obs.map((o) => o.day), ...days, ...extra, ...[...opts.jumps].filter((d) => d > opts.t0 && d <= opts.t1)])].sort((a, b) => a - b);
   const ctx = { obs, L, events, anchor: opts.anchor, jumps: opts.jumps, prior: opts.prior || DEFAULT_PRIOR(P, !!opts.trend, !!opts.noise), kappa0: opts.kappa0, kappaFixed: opts.kappaFixed };
   const T0 = Date.now();
-  const S = fitSettings(ctx, { start: opts.start, M: opts.M ?? 32, seed: opts.seed ?? 1 });
+  const S = fitSettings(ctx, { start: opts.start, M: opts.M ?? 64, seed: opts.seed ?? 1 });
   const T1 = Date.now();
   const nDraw = opts.nDraw ?? 2000, rng = makeRng(opts.seed ?? 20261123);
   const evIdx = new Map(events.map((d, i) => [d, i]));

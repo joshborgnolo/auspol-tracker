@@ -692,7 +692,7 @@ function RdPrimary({ rangeId, setRangeId }) {
     /* this term's ring IS the last term's closing count: drawn once */
     const vhMarks = curIn && base ? L.marks.filter((m) => Math.abs(m.x - base.x) > 1e-6) : L.marks;
     const lone = L.lone.map((q) => ({ x: q.x, y: q.y, color: q.color, label: q.label, party: q.party, op: hideC[q.party] ? 0 : undefined,
-      meta: { pollster: "Monthly average", dateLabel: rdVhMonth(q.x), pre: true }, sub: "Drawn through the election results; the " + q.note }));
+      meta: { pollster: VH.model ? "Model estimate" : "Monthly average", dateLabel: rdVhMonth(q.x), pre: true }, sub: "Drawn through the election results; the " + (VH.model ? q.note.replace("polls ", "polls’ model ") : q.note) }));
     const curStops = curIn ? pts.filter((d) => d.x >= xDomain[0] - 1e-6).map((d) => ({ x: d.x, y: d.alp, ym: d.ym, cur: true, elec: !!d.election })) : [];
     const spine = [...new Map(L.stops.map((q) => [q.x.toFixed(4), q]).concat(curStops.map((q) => [q.x.toFixed(4), q]))).values()]
       .filter((q) => q.x >= xDomain[0] - 1e-6 && q.x <= xDomain[1] + 1e-6).sort((p, q) => p.x - q.x);
@@ -1023,8 +1023,8 @@ function RdPrimary({ rangeId, setRangeId }) {
           } : H ? {
             title: "First-preference vote for each party", span: confWinYears(vwWin, vwTerms, vwHi),
             sub: "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "")
-              + ". Monthly averages of the polls, adjusted for each pollster’s lean.",
-            caption: (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + " are monthly averages moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
+              + (VH.model ? ". The model’s estimates, each pollster’s lean taken out." : ". Monthly averages of the polls, adjusted for each pollster’s lean."),
+            caption: (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
               + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
             legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
               .concat([{ label: "Election result", color: "var(--ink)", kind: "ring" }]),
@@ -1081,8 +1081,8 @@ function RdPrimary({ rangeId, setRangeId }) {
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" },
         ] : H ? [
           vhDotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll, as published" } : null,
-          vhLong ? { kind: "line", color: "var(--ink-3)", label: "Monthly average" }
-            : { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+          vhLong ? { kind: "line", color: "var(--ink-3)", label: VH.model ? "Model estimate" : "Monthly average" }
+            : { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           { kind: "ring", label: "Election result" },
           H.bridges ? { kind: "dots", color: "var(--ink-3)", label: "No polls" } : null,
         ] : [
@@ -4106,6 +4106,9 @@ function rdDemoShift(dt, T, party) {
      slope claims are chosen below. */
   const named = new Set();
   const elecSentence = () => {
+    /* on the model the moves above already are the change since the
+       election (gen-data §7gb), so a second sentence would repeat them */
+    if (dt.model) return null;
     /* r.claim: significant AND not contradicted by Resolve's same-house
        estimate where one exists (age, gender) - gen-data §7gb */
     const pass = (dt.elec || []).filter((r) => (r.claim ?? r.sig) && !named.has(r.group))
@@ -4992,8 +4995,8 @@ function RdDemographics({ rangeId = "all" }) {
                   <th scope="col">Support, start → end, %</th>
                   <th scope="col">All voters, start → end, %</th>
                   <th scope="col">Change vs all voters, pts</th>
-                  <th scope="col">t, gap</th>
-                  <th scope="col">t, ratio</th>
+                  <th scope="col">{sigSets.some((x) => x.rows.some((r) => r.model)) ? "z, gap" : "t, gap"}</th>
+                  <th scope="col">{sigSets.some((x) => x.rows.some((r) => r.model)) ? "z, ratio" : "t, ratio"}</th>
                   <th scope="col">Significant</th>
                 </tr>
               </thead>
@@ -5008,15 +5011,17 @@ function RdDemographics({ rangeId = "all" }) {
                       <td>{sgn1(r.rel, true)}</td>
                       <td>{r.tAbs == null ? "–" : sgn1(r.tAbs)}</td>
                       <td>{r.tLR == null ? "–" : sgn1(r.tLR)}</td>
-                      <td className={r.sig ? "rd-tsig-yes" : ""}>{r.sig ? "Yes" : "No"}</td>
+                      <td className={r.sig && !(r.check && r.check.conflict) ? "rd-tsig-yes" : ""}>{!r.sig ? "No" : r.check && r.check.conflict ? "Withheld" : "Yes"}</td>
                     </tr>
                   ))}
                 </tbody>
               ))}
             </table>
           </div>
-          <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96, in the same direction. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>
-          {elecSets.length > 0 && (
+          {sigSets.some((x) => x.rows.some((r) => r.model))
+            ? <p className="rd-note rd-tsig-note">Support figures are the model’s, at polling day and today. A group’s change vs all voters is its change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national change, read from the model’s draws of the group’s gap on both days together. z is that change over its own standard error, on the point gap and on the ratio to all voters; a group has moved only when both 95% intervals exclude zero in the same direction, so a group that has merely kept pace with a party growing everywhere has not. Where Resolve’s own election-day and current waves measure the same change for age or gender, a move they contradict beyond both margins is withheld.</p>
+            : <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96, in the same direction. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>}
+          {elecSets.length > 0 && !(D.demoTrend && D.demoTrend[party] && D.demoTrend[party].model) && (
             <>
               <div className="rd-tsig-wrap">
                 <table className="rd-tsig-table">

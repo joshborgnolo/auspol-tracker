@@ -41,19 +41,59 @@ function rdPollMargin(p, contest, pub) {
   return 196 * Math.sqrt(Math.max(0, e2 - e1 * e1) / n);
 }
 
-/* a primary figure's margin of error at 95% (user call 2026-11-21: a ±
-   beside every primary, and the undecided share, in both poll tables). A
-   share is each respondent's own answer, so p(1 - p) over the effective
-   sample rdPollMargin and rdMarginBasis use - the APC figure where the house
-   printed one, else the raw sample over the design effect. That n counts
-   everyone interviewed. Where the house prints its parties with the
-   undecided taken out (undecidedCellOf's "excluded"), each party's share is
-   of the decided only, so its base shrinks to n(1 - und); the undecided
-   share itself (und = true) is of everyone. Included and forced-choice
-   tables keep the whole n. None without a sample, and none for an MRP
-   series: its national shares are modelled from seat cells, not read off
-   a simple sample */
-function rdPrimMoe(p, v, und) {
+/* a primary figure's ± at 95% (user call 2026-11-21: a ± beside every
+   primary, and the undecided share, in both poll tables; 2026-11-23: on the
+   model, not the textbook sampling margin). The ± is the half-width of a
+   95% credible interval for what the poll measured, under the model's own
+   account of a reading's noise (primary-model.mjs's observation variance):
+     var = κ · s(1 − s) / n + step² / 12
+   n the effective sample rdPollMargin and rdMarginBasis use (the APC figure
+   where the house printed one, else the raw sample over the design effect),
+   shrunk to n(1 − und) where the house prints its parties with the
+   undecided taken out (undecidedCellOf's "excluded": each party's share is
+   of the decided only; the undecided share itself, und = true, is of
+   everyone); κ the house's own noise as the model estimates it from how its
+   readings scatter about the trend (window.AUSPOL.primModel.kappa: 1 is
+   exactly its sample, Newspoll's 0.5 steadier, Fox & Hedgehog's 1.41
+   noisier; that is steadiness, never accuracy - its lean is apart); step
+   the precision the house printed to (whole points, halves, tenths), whose
+   rounding hides up to half a step. That variance is carried as a Beta
+   posterior on a Jeffreys prior, Beta(s·m + ½, (1 − s)·m + ½) with m the
+   sample it is worth, so the interval bends away from zero for a small
+   share instead of crossing it. None without a sample, and none for an MRP
+   series: its national shares are modelled from seat cells, not read off a
+   simple sample */
+const rdLgamma = (x) => {
+  const g = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  let y = x, t = x + 5.5; t -= (x + 0.5) * Math.log(t);
+  let a = 1.000000000190015; for (let k = 0; k < 6; k++) a += g[k] / ++y;
+  return -t + Math.log(2.5066282746310005 * a / x);
+};
+const rdBetacf = (a, b, x) => {
+  const TINY = 1e-30; let c = 1, d = 1 - (a + b) * x / (a + 1); if (Math.abs(d) < TINY) d = TINY; d = 1 / d; let h = d;
+  for (let m = 1; m <= 200; m++) {
+    const m2 = 2 * m; let aa = m * (b - m) * x / ((a - 1 + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < TINY) d = TINY; c = 1 + aa / c; if (Math.abs(c) < TINY) c = TINY; d = 1 / d; h *= d * c;
+    aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + 1 + m2));
+    d = 1 + aa * d; if (Math.abs(d) < TINY) d = TINY; c = 1 + aa / c; if (Math.abs(c) < TINY) c = TINY; d = 1 / d;
+    const del = d * c; h *= del; if (Math.abs(del - 1) < 3e-12) break;
+  }
+  return h;
+};
+const rdIbeta = (a, b, x) => {
+  if (x <= 0) return 0; if (x >= 1) return 1;
+  const bt = Math.exp(rdLgamma(a + b) - rdLgamma(a) - rdLgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+  return x < (a + 1) / (a + b + 2) ? bt * rdBetacf(a, b, x) / a : 1 - bt * rdBetacf(b, a, 1 - x) / b;
+};
+const rdBetaQ = (a, b, q) => { let lo = 0, hi = 1; for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (rdIbeta(a, b, m) < q) lo = m; else hi = m; } return (lo + hi) / 2; };
+const rdPrimCiMemo = new Map();
+const rdPrimStep = (p) => {
+  const vs = Object.values((p && p.p) || {}).filter((v) => typeof v === "number");
+  if (!vs.length || vs.every((v) => Math.abs(v - Math.round(v)) < 1e-6)) return 1;
+  return vs.every((v) => Math.abs(v * 2 - Math.round(v * 2)) < 1e-6) ? 0.5 : 0.1;
+};
+/* [lo, hi] in points, or null */
+function rdPrimCi(p, v, und) {
   if (v == null || !p || / \(MRP\)$/.test(p.pollster || "")) return null;
   let n = p.sampleEff || (p.sample ? p.sample / rdApDeff() : 0);
   if (!n) return null;
@@ -61,8 +101,27 @@ function rdPrimMoe(p, v, und) {
     const u = window.AUSPOL.undecidedCellOf ? window.AUSPOL.undecidedCellOf(p) : null;
     if (u && u.label === "excluded" && u.v > 0) n *= 1 - u.v / 100;
   }
+  return rdPrimCiN(p, v, n, !und);
+}
+/* the same at a given effective sample (the rail's rescaled base); kap:
+   whether the house's model noise applies (not to the undecided share) */
+function rdPrimCiN(p, v, n, kap0) {
   const s = Math.max(0, Math.min(100, +v)) / 100;
-  return s > 0 ? 196 * Math.sqrt((s * (1 - s)) / n) : null;
+  if (!(s > 0) || !(n > 0)) return null;
+  const PM = window.AUSPOL.primModel;
+  const kap = kap0 && PM && PM.kappa && PM.kappa[p.pollster] != null ? PM.kappa[p.pollster] : 1;
+  const step = rdPrimStep(p) / 100;
+  const key = s.toFixed(4) + "|" + Math.round(n) + "|" + kap + "|" + step;
+  if (rdPrimCiMemo.has(key)) return rdPrimCiMemo.get(key);
+  const vr = kap * s * (1 - s) / n + step * step / 12;
+  const m = Math.max(1, s * (1 - s) / vr);
+  const ci = [100 * rdBetaQ(s * m + 0.5, (1 - s) * m + 0.5, 0.025), 100 * rdBetaQ(s * m + 0.5, (1 - s) * m + 0.5, 0.975)];
+  rdPrimCiMemo.set(key, ci);
+  return ci;
+}
+function rdPrimMoe(p, v, und) {
+  const ci = rdPrimCi(p, v, und);
+  return ci ? (ci[1] - ci[0]) / 2 : null;
 }
 const rdPrimMoeTxt = (p, v, und) => { const m = rdPrimMoe(p, v, und); return m == null ? null : "±" + m.toFixed(1); };
 
@@ -2445,7 +2504,7 @@ function RdApPrimRail({ p }) {
   const rows = ks.map((k) => {
     const x = +q[k.id], v = y[k.id][0], he = y[k.id][1];
     const lean = rdApR1(x - v), less = he == null ? null : rdApR1(lean - he);
-    const m = n ? 196 * Math.sqrt((x / 100) * (1 - x / 100) / n) : null;
+    const ci = n ? rdPrimCiN(p, x, n, true) : null, m = ci ? (ci[1] - ci[0]) / 2 : null;
     return { ...k, x, v, he, lean, less, m, out: rdApInside(less != null ? less : lean, m) === "outside" };
   });
   const e = p.peff || null;
@@ -4318,7 +4377,7 @@ function RdAllPolls(P) {
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
         /* what the ±s are (user call 2026-11-21) */
         ["primary", "leadership", "direction", "issues", "demographics"].includes(facet) && !(facet === "primary" && consM) && <>{{
-          primary: "Each ± is the figure’s margin of error at 95%. Where the undecided were set aside, a party’s share is of the decided voters only, so its margin is a little wider.",
+          primary: window.AUSPOL.primModel ? "Each ± is half the model’s 95% interval for the figure: the poll’s sample, how much the pollster’s figures have scattered, and the rounding of what it printed. Where the undecided were set aside, a party’s share is of the decided voters only, so its interval is a little wider." : "Each ± is the figure’s margin of error at 95%. Where the undecided were set aside, a party’s share is of the decided voters only, so its margin is a little wider.",
           leadership: "Each ± is the figure’s margin of error at 95%. A net rating’s covers approve minus disapprove; a pollster that printed only the net has none.",
           direction: "Each ± is the figure’s margin of error at 95%. The net’s covers right minus wrong.",
           issues: "Each ± is the margin of error at 95% on the lead, the gap between the top two parties. A lead smaller than its ± could be no lead at all.",
