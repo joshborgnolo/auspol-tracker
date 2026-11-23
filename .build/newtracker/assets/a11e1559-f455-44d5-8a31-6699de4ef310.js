@@ -1651,10 +1651,15 @@ function UndecidedPanel({ rangeId }) {
      are told apart by the dash, the same way the preferred-PM panel tells its
      two contests apart — never by being averaged into one line. */
   const COL = "var(--ink-2)";
+  /* since 2026-11-23 each line carries its own colour token (gen-data §5c:
+     the undecided share asked once and after a follow-up, Resolve's and
+     RedBridge's soft shares) - four lines in one grey told apart by dashes
+     could not be read */
+  const colOf = (sr) => sr.color || COL;
   const drawn = U.series.map((sr) => {
     const pts = filterPts(sr.monthly, xDomain[0]);
     const dots = sr.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
-      .map((d) => ({ x: d.x, y: d.v, color: COL, label: sr.label, meta: d }));
+      .map((d) => ({ x: d.x, y: d.v, color: colOf(sr), label: sr.label, meta: d }));
     return { sr, pts, dots };
   }).filter((d) => d.pts.length >= 2);
   if (!drawn.length) return null;
@@ -1717,7 +1722,7 @@ function UndecidedPanel({ rangeId }) {
       <div className="und-reads">
         {U.series.map((sr) => (
           <div className="und-read" key={sr.id}>
-            <span className={"und-swatch" + (sr.dashed ? " dashed" : sr.dash ? " dotted" : "")} aria-hidden="true"></span>
+            <span className={"und-swatch" + (sr.dashed ? " dashed" : sr.dash ? " dotted" : "")} style={sr.color ? { borderColor: sr.color, background: sr.color } : undefined} aria-hidden="true"></span>
             <div className="und-read-body">
               <div className="und-read-top">
                 <span className="und-read-lab">{sr.label}</span>
@@ -1744,22 +1749,21 @@ function UndecidedPanel({ rangeId }) {
         // two-digit shares ("20%") at the phone's 28px axis need the room
         pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
-        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: COL,
-                                    dashed: d.sr.dashed, dash: d.sr.dash, points: series(d.pts, "v") }))}
+        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: colOf(d.sr),
+                                    dashed: d.sr.dashed, dash: d.sr.dash, endLabel: d.sr.label, points: series(d.pts, "v") }))}
         spine={series(spine, "v")}
         scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
       <HowTo paras={[
-        <>Each dot is one published reading; the lines are monthly averages, and
-        the figure beside each question pools the last six weeks of polls.</>,
-        <>Newer and larger polls count for more in the figure beside each question.</>,
-        <>The questions are never averaged together – one counts people who can’t name
-        a party, the other people who won’t pick a side once preferences are
-        applied. Only the first is left out of the shares elsewhere on this
-        page, so a rising line means the share is being read off a smaller
-        pool of decided voters, not that support has moved.</>,
+        <>Each dot is one published reading. Each line is a model of its polls,
+        and the figure beside it is the model’s reading today.</>,
+        <>The questions are never averaged together. Two count people who can’t
+        name a party: asked once, or still undecided after a follow-up asking
+        which way they lean. The other two count people who named a party but
+        might change their mind, as Resolve and RedBridge each ask it; their
+        questions differ, so compare each line with itself.</>,
       ]} />
     </section>
   );

@@ -44,16 +44,16 @@
   <link rel="preload" href="../../assets/js/copy-poll.feb389c5.js" as="script">
   <link rel="preload" href="../../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.a8c68e6d.js" as="script">
   <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
-  <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.2389411c.js" as="script">
+  <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.4688daf3.js" as="script">
   <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js" as="script">
-  <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.4a3928ab.js" as="script">
+  <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.a7eb8797.js" as="script">
   <link rel="preload" href="../../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../../assets/js/rd.1758f840.js" as="script">
   <link rel="preload" href="../../assets/js/rd-hero.ed8b9eaa.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-panels.ebcf2337.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-panels.ab04c22c.js" as="script">
   <link rel="preload" href="../../assets/js/rd-polls.cf08e27d.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.0b1f8462.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-allpolls.41ee1dd4.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-allpolls.63643008.js" as="script">
   <link rel="preload" href="../../assets/js/rd-public-opinion.246dfe2a.js" as="script">
   <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.2d87e8fd.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – Respondent-allocated preference flows","url":"https://auspoltracker.com/vic/flows/","description":"Where Victorian preferences are flowing now – what voters tell pollsters, and what the pollsters' own two-party figures imply, set against the flows of the last election.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
@@ -190,6 +190,11 @@
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
   --confidence-third: oklch(0.52 0.085 175);
+  --dec-once: oklch(0.48 0.12 310);
+  --dec-leaner: oklch(0.64 0.13 88);
+  --dec-pref: var(--ink);
+  --dec-resolve: oklch(0.58 0.12 195);
+  --dec-redbridge: var(--ink-2);
   --macro-cpi: oklch(0.56 0.115 40);
   --macro-gdppc: oklch(0.50 0.095 230);
   --macro-rnndi: oklch(0.55 0.10 155);
@@ -269,6 +274,11 @@ body.dark {
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
   --confidence-third: oklch(0.70 0.085 175);
+  --dec-once: oklch(0.64 0.14 312);
+  --dec-leaner: oklch(0.66 0.135 88);
+  --dec-pref: var(--ink);
+  --dec-resolve: oklch(0.66 0.12 195);
+  --dec-redbridge: var(--ink-2);
   --macro-cpi: oklch(0.72 0.115 40);
   --macro-gdppc: oklch(0.70 0.095 230);
   --macro-rnndi: oklch(0.71 0.10 155);
@@ -5318,6 +5328,11 @@ body.rd .rd-un-rtop b { font-size: 14px; font-weight: 600; color: var(--ink); }
 body.rd .rd-un-rv { font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 body.rd .rd-un-rci { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-read p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
+body.rd .rd-un-gaps { margin: 14px 0 0; padding-top: 8px; border-top: 1px solid var(--line); align-self: start; }
+body.rd .rd-un-softnote { margin: 14px 0 0; padding-top: 8px; border-top: 1px solid var(--line); align-self: start; }
+body.rd .rd-un-gaps > b { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 2px; }
+body.rd .rd-un-gaps .rd-note { margin: 4px 0 0; }
+body.rd .rd-un-gapk { color: var(--ink-2); font-weight: 600; }
 body.rd .rd-confidence-chart .rd-un-read > div { flex: 1 1 auto; min-width: 0; }
 body.rd .rd-confidence-chart .rd-un-rtop { display: grid; grid-template-columns: 130px 3em auto; gap: 0 10px; justify-content: start; }
 body.rd .rd-confidence-chart .rd-un-rv { text-align: right; }
@@ -5370,6 +5385,10 @@ body.rd .rd-sp-ticks > span { position: absolute; top: 4px; transform: translate
 }
 @media (max-width: 640px) {
   body.rd .rd-un-panels { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
+  body.rd .rd-un-p-und { order: 1; }
+  body.rd .rd-un-gaps { order: 2; margin-top: -14px; }
+  body.rd .rd-un-p-soft { order: 3; }
+  body.rd .rd-un-softnote { order: 4; margin-top: -14px; }
   body.rd .rd-un-bar { height: 36px; }
   body.rd .rd-un-bar > span { padding: 0 10px; font-size: 17px; }
   body.rd .rd-un-100h { align-items: flex-start; min-height: 54px; }
@@ -6959,16 +6978,16 @@ body.rd #cyc-summary > h2.sr-only + .rd-cc { margin-top: 0; }
   <script src="../../assets/js/copy-poll.feb389c5.js"></script>
   <script src="../../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.a8c68e6d.js"></script>
   <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
-  <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.2389411c.js"></script>
+  <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.4688daf3.js"></script>
   <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js"></script>
-  <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.4a3928ab.js"></script>
+  <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.a7eb8797.js"></script>
   <script src="../../assets/js/wm-story.63f19861.js"></script>
   <script src="../../assets/js/rd.1758f840.js"></script>
   <script src="../../assets/js/rd-hero.ed8b9eaa.js"></script>
-  <script src="../../assets/js/rd-panels.ebcf2337.js"></script>
+  <script src="../../assets/js/rd-panels.ab04c22c.js"></script>
   <script src="../../assets/js/rd-polls.cf08e27d.js"></script>
   <script src="../../assets/js/rd-cycles.0b1f8462.js"></script>
-  <script src="../../assets/js/rd-allpolls.41ee1dd4.js"></script>
+  <script src="../../assets/js/rd-allpolls.63643008.js"></script>
   <script src="../../assets/js/rd-public-opinion.246dfe2a.js"></script>
   <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.2d87e8fd.js"></script>
 

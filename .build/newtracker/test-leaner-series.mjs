@@ -18,29 +18,35 @@ assert.ok(first.polls.some((p) => p.pollster === "DemosAU" && p.released === "20
 assert.ok(!first.polls.some((p) => p.pollster === "DemosAU" && p.released > "2025-07-06"),
   "DemosAU’s later figures are after its leaner, not first-preference readings");
 
-const soft = series.soft;
-assert.equal(soft.label, "Soft", "the soft-support series uses the short tooltip label");
-assert.deepEqual([...soft.houses].sort(), ["RedBridge/Accent", "Resolve"]);
-for (const p of source.filter((p) => p.pollster === "RedBridge/Accent" && p.firmness?.all?.length === 3)) {
+/* the soft share is one line per pollster (2026-11-23): Resolve's "soft"
+   (about 26%) and RedBridge's soft plus very soft (about 50%) ask
+   differently, and their monthly average jumped with whoever reported */
+const soft = series.soft, softRB = series.softRB;
+assert.equal(soft.label, "Resolve");
+assert.deepEqual(soft.houses, ["Resolve"], "Resolve's soft line is Resolve's alone");
+assert.ok(soft.polls.every((p) => p.pollster === "Resolve" && p.basis === "soft"));
+assert.deepEqual(softRB.houses, ["RedBridge/Accent"], "RedBridge's soft line is RedBridge's alone");
+for (const p of source.filter((p) => p.pollster === "RedBridge/Accent" && p.firmness?.all?.length === 3 && p.noAgg == null)) {
   const expectedSoft = p.firmness.all[1] + p.firmness.all[2];
-  assert.ok(soft.polls.some((d) => d.released === p.date && d.pollster === p.pollster && d.v === expectedSoft),
+  assert.ok(softRB.polls.some((d) => d.released === p.date && d.pollster === p.pollster && d.v === expectedSoft),
     `${p.date}: RedBridge soft + very soft = ${expectedSoft}`);
 }
-assert.ok(!soft.polls.some((p) => p.pollster === "Spectre Strategy"),
-  "Spectre's undecided-inclusive soft share stays out");
-const softResolve = w.AUSPOL.undecided.softResolve;
-assert.deepEqual(softResolve.houses, ["Resolve"], "the Resolve-only companion series stays single-source");
-assert.ok(softResolve.polls.every((p) => p.pollster === "Resolve" && p.basis === "soft"));
+for (const s of [soft, softRB]) {
+  assert.ok(!s.polls.some((p) => p.pollster === "Spectre Strategy"), "Spectre's undecided-inclusive soft share stays out");
+  assert.ok(s.model && s.now.since && Number.isFinite(s.now.ci95), `${s.id}: on the model, with a change since the term's first month`);
+  assert.ok(s.monthly.every((m) => m.lo <= m.v && m.v <= m.hi), `${s.id}: every month inside its own band`);
+}
+assert.equal(w.AUSPOL.undecided.softResolve, undefined, "no pooled or companion soft series is emitted");
 
 const leaner = series.leaner;
 assert.ok(leaner, "the independent after-leaner series exists");
-assert.equal(leaner.label, "After leaner");
+assert.equal(leaner.label, "After a follow-up");
 assert.ok(leaner.polls.every((p) => p.basis === "leaner"));
 assert.ok(leaner.polls.every((p) => ["DemosAU", "Essential", "Fox & Hedgehog", "RedBridge/Accent", "Newspoll"].includes(p.pollster)));
 assert.ok(!leaner.polls.some((p) => p.pollster === "EMRS (Tas)"),
   "Tasmanian-only EMRS readings stay out of the national after-leaner series");
 assert.deepEqual([...leaner.houses].sort(), ["DemosAU", "Essential", "Fox & Hedgehog", "Newspoll", "RedBridge/Accent"]);
-const expected = source.filter((p) => p.pollster !== "EMRS (Tas)" && (p.undecidedLeaner != null || (p.pollster === "Essential" && p.undecidedIn != null)));
+const expected = source.filter((p) => p.pollster !== "EMRS (Tas)" && p.noAgg == null && (p.undecidedLeaner != null || (p.pollster === "Essential" && p.undecidedIn != null)));
 assert.equal(leaner.polls.length, expected.length);
 for (const p of expected) {
   const expectedV = p.undecidedLeaner ?? p.undecidedIn;
@@ -49,8 +55,11 @@ for (const p of expected) {
 }
 assert.ok(leaner.polls.some((p) => p.pollster === "DemosAU" && p.released === "2026-01-06" && p.v === 5),
   "the early-January DemosAU 5% is included");
-assert.equal(source.filter((p) => p.pollster === "DemosAU" && p.date <= "2026-10-26" && p.undecidedLeaner != null).length, 9,
-  "all nine published post-leaner DemosAU shares through October 2026 are filed; nothing is invented for late January");
+/* ten through October 2026: mid-January's 6 (2026-01-21) is printed on
+   DemosAU's own Capital Brief poll-trends page ("Undecided (excluded)"),
+   filed by .build/backfill-decidedness-gaps.mjs */
+assert.equal(source.filter((p) => p.pollster === "DemosAU" && p.date <= "2026-10-26" && p.undecidedLeaner != null).length, 10,
+  "all ten published post-leaner DemosAU shares through October 2026 are filed");
 const newest = [...expected].sort((a, b) => b.date.localeCompare(a.date))[0];
 assert.ok(newest, "at least one source wave has an after-leaner share");
 assert.equal(leaner.latest.released, newest.date);
@@ -60,13 +69,28 @@ assert.ok(leaner.polls.some((p) => p.pollster === "Newspoll" && p.released === "
 assert.ok(Number.isFinite(leaner.now.v) && Number.isFinite(leaner.now.ci95));
 assert.ok(leaner.now.n >= 2, "the nowcast includes more than one source reading");
 
+/* after preferences is Spectre's Labor-v-Coalition undecided alone
+   (tpp_undecided.lnponp: a legacy key name for that contest). Essential's
+   two-party shortfall is its primary undecided again and stays in its poll
+   detail; averaging the two (about 12% and 5%) made the line leap. */
 const tpp = series.tpp;
-assert.deepEqual([...tpp.houses].sort(), ["Essential", "Spectre Strategy"]);
+assert.deepEqual(tpp.houses, ["Spectre Strategy"]);
+assert.ok(!tpp.polls.some((d) => d.pollster === "Essential"), "Essential's two-party shortfall is not an after-preferences reading");
 for (const p of source.filter((p) => p.tpp_undecided)) {
   assert.ok(tpp.polls.some((d) => d.pollster === "Spectre Strategy" && d.released === p.date && d.v === p.tpp_undecided.lnponp));
   const emitted = w.AUSPOL.individualPolls.find((d) => d.pollster === p.pollster && d.released === p.date);
-  assert.deepEqual(emitted.tppUndecided, p.tpp_undecided, "both preference-contest undecided shares reach the poll detail");
+  assert.deepEqual(emitted.tppUndecided, p.tpp_undecided, "the preference-contest undecided shares reach the poll detail");
 }
+assert.ok(tpp.model && tpp.leans === undefined, "a one-pollster line reports no lean");
+assert.ok(w.AUSPOL.individualPolls.some((d) => d.pollster === "Essential" && d.undecidedBasis === "tpp"),
+  "Essential's two-party shortfall still shows in its own poll detail");
+/* the gaps the panel states, each inside its own interval */
+const gaps = Object.fromEntries((w.AUSPOL.undecided.gaps || []).map((g) => [g.a + "|" + g.b, g]));
+for (const k of ["tpp|first", "first|leaner"]) {
+  assert.ok(gaps[k] && gaps[k].lo <= gaps[k].v && gaps[k].v <= gaps[k].hi, `gap ${k} carries its interval`);
+  assert.equal(gaps[k].sig, gaps[k].lo > 0 || gaps[k].hi < 0, `gap ${k}: significant exactly when its interval excludes zero`);
+}
+for (const s of Object.values(series)) assert.ok(s.color && /^var\(--dec-/.test(s.color), `${s.id}: its own colour token`);
 assert.equal(w.AUSPOL.sampleTxt(w.AUSPOL.individualPolls.find((p) => p.pollster === "DemosAU" && p.released === "2025-07-06")), "1,199\u00a0D");
 assert.equal(w.AUSPOL.sampleTxt(w.AUSPOL.individualPolls.find((p) => p.pollster === "DemosAU" && p.released === "2026-10-26")), "1,500\u00a0D+L");
 w.React = { Fragment: "Fragment", createElement: (type, props, ...children) => ({ type, props: { ...(props || {}), children } }) };

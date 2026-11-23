@@ -2353,6 +2353,13 @@ body.rd .rd-un-rtop b { font-size: 14px; font-weight: 600; color: var(--ink); }
 body.rd .rd-un-rv { font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 body.rd .rd-un-rci { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-read p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
+/* how the undecided lines compare (each gap, its interval, its verdict):
+   under the readouts it explains, above the chart */
+body.rd .rd-un-gaps { margin: 14px 0 0; padding-top: 8px; border-top: 1px solid var(--line); align-self: start; }
+body.rd .rd-un-softnote { margin: 14px 0 0; padding-top: 8px; border-top: 1px solid var(--line); align-self: start; }
+body.rd .rd-un-gaps > b { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 2px; }
+body.rd .rd-un-gaps .rd-note { margin: 4px 0 0; }
+body.rd .rd-un-gapk { color: var(--ink-2); font-weight: 600; }
 /* the confidence panel's read rows keep their figures in one column:
    the house name sits a fixed-width track and the figure a
    right-aligned 3em track (which also fits a four-digit index
@@ -2429,6 +2436,11 @@ body.rd .rd-sp-ticks > span { position: absolute; top: 4px; transform: translate
 }
 @media (max-width: 640px) {
   body.rd .rd-un-panels { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
+  /* one column: each chart's note follows its own chart */
+  body.rd .rd-un-p-und { order: 1; }
+  body.rd .rd-un-gaps { order: 2; margin-top: -14px; }
+  body.rd .rd-un-p-soft { order: 3; }
+  body.rd .rd-un-softnote { order: 4; margin-top: -14px; }
   body.rd .rd-un-bar { height: 36px; }
   body.rd .rd-un-bar > span { padding: 0 10px; font-size: 17px; }
   /* the title on its own line, the bracket's words on one line under it,

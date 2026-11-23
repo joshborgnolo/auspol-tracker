@@ -9040,13 +9040,19 @@ function infoTerms(D) {
         breakdown says how its pollster treats it.
         {undWho("first") ? <> {undWho("first")} {undVerb("first", "sets", "set")} it aside before
         calculating party shares, so the primaries sum to 100.</> : null}
-        {undWho("tpp") ? <> {undWho("tpp")} {undVerb("tpp", "leaves", "leave")} it inside the
-        published two-party pair, which sums to less than 100; the shortfall is the
-        after-preferences line.</> : null}</span>
+        {undWho("tpp") ? <> <b>After preferences</b> is {undWho("tpp")}’s: asked which of Labor and
+        the Coalition they would put higher, the share who won’t choose. It sits above the other
+        two because it also counts voters who named a minor party but won’t rank the two majors.</> : null}
+        {" "}Essential’s two-party pair also sums to less than 100, but its shortfall is the same
+        voters as its primary undecided (within a point every month), so it shows in that poll’s
+        breakdown rather than as a line.</span>
         <span className="info-p"><b>Not firm.</b> {undWho("soft") || "Resolve"} {undVerb("soft", "asks", "ask")} those
-        who named a party, “How firm are you with your vote?” The not-firm share is everyone who
-        might still change. <b>Of every 100 voters</b> combines it with the undecided share, so it
-        is approximate.</span>
+        who named a party, “How firm are you with your vote?”, and the soft share is everyone who
+        might still change. {undWho("softRB") || "RedBridge"} asks whether a vote is solid, soft or
+        very soft, and its line is the soft and very soft together. The two questions offer
+        different answers and sit about twenty-five points apart, so each pollster keeps its own
+        line, never an average of the two. <b>Of every 100 voters</b> combines Resolve’s soft share
+        with the undecided share, so it is approximate.</span>
         <span className="info-p"><b>By party</b> shows the share of each party’s voters RedBridge
         finds solid: certain to vote that way. Each figure pools RedBridge’s last {firmPool} polls,
         weighted by how many of the party’s voters each held, against its first {firmPool} of the
@@ -9066,8 +9072,10 @@ function infoTerms(D) {
             <span className="info-p"><b>How the undecided lines are built.</b> Pollsters ask the
             question two ways. Some take “can’t say” with no follow-up ({undWho("first")});
             others first ask undecided voters which way they lean, and count only those still
-            undecided after that ({undWho("leaner") || "Newspoll, RedBridge, DemosAU and Fox & Hedgehog"}). The second
-            is a smaller share, so each way is its own line. Each line is estimated with the same
+            undecided after that ({undWho("leaner") || "Newspoll, RedBridge, DemosAU and Fox & Hedgehog"}). A follow-up
+            can only shrink a pollster’s own undecided count, so each way is its own line, and the
+            chart says whether the gap between the two today is significant; different pollsters ask
+            each way, so the gap also carries their other differences. Each line is estimated with the same
             kind of model as the {xref("primary-vote", "decidedness", "primary vote")}: the share
             moves a little each day, and each pollster reads it through a lean of its own – its
             wording – which the model works out alongside the share. So a month is no longer high
@@ -9080,10 +9088,11 @@ function infoTerms(D) {
             term’s polls, so its line ends at its election and its level is set by that term’s own
             pollsters. A pollster that changed how it polls (Newspoll from phone to online, Roy Morgan
             from face-to-face to online) is a different pollster for this purpose.</span> : null}
-            <span className="info-p"><b>The other lines.</b> After preferences and not firm are one
-            question from one or two pollsters each, so they stay monthly averages weighted by sample
-            size, tested within each pollster’s own polls with the bar raised for testing several
-            lines at once.</span>
+            <span className="info-p"><b>The one-pollster lines.</b> After preferences and the two soft
+            lines are each one pollster’s polls through the same model, with no lean to take out: each poll counts as a sample of its size, the share
+            moves a little each day, and a month with no poll is filled in from the months around it
+            rather than jumping to another pollster’s level. Past terms are fitted the same way, and a
+            change counts as significant only when its own 95% interval excludes zero.</span>
           </>);
         })()}</>) },
       entries: [] },

@@ -899,8 +899,8 @@ export function tppChgOut(r) {
    Returns monthly summaries at `months` [{ ym, day }], today and a month
    ago, each house's lean, and (pairs) the change between two days. */
 export const UND_PARTIES = ["und", "dec"];
-export function fitUndecided(readings, { t0, t1, months, pairs = [], nDraw = 2000, seed = 20261126, M = 16, minCore = 4 }) {
-  const rs = readings.filter((r) => r.und > 0 && r.und < 50 && r.day > t0 && r.day <= t1).map((r, i) => {
+export function fitUndecided(readings, { t0, t1, months, pairs = [], nDraw = 2000, seed = 20261126, M = 16, minCore = 4, max = 50 }) {
+  const rs = readings.filter((r) => r.und > 0 && r.und < max && r.day > t0 && r.day <= t1).map((r, i) => {
     const vals = [r.und, 100 - r.und];
     return { ...r, idx: r.idx ?? i, cats: [[0], [1]], vals, full: true, step: stepOf([r.und]) };
   });
@@ -914,6 +914,9 @@ export function fitUndecided(readings, { t0, t1, months, pairs = [], nDraw = 200
   const out = months.filter((m) => m.day > t0 && m.day <= t1).map((m) => ({ ym: m.ym, day: m.day, ...sum(colU(fit.shares(m.day))) }));
   const pairOut = pairs.map(([a, b]) => { const c = colU(fit.pair(a, b)); return { a, b, ...sum(c), pUp: mean(c.map((v) => (v > 0 ? 1 : 0))) }; });
   const leans = Object.fromEntries(fit.L.houses.map((h) => { const s = sum(colU(fit.lean(h))); return [h, s]; }));
-  return { months: out, now: sum(colU(fit.shares(t1))), pairs: pairOut, leans, core: fit.L.core, houses: [...new Set(rs.map((r) => r.house))],
+  /* today's draws ride along (never emitted) so a caller can difference two
+     independent fits, as gen-data's undecidedGap does */
+  const nowDraws = colU(fit.shares(t1));
+  return { months: out, now: sum(nowDraws), nowDraws, pairs: pairOut, leans, core: fit.L.core, houses: [...new Set(rs.map((r) => r.house))],
     n: rs.length, ess: fit.ctx.laplace ? fit.ctx.laplace.ess : null, kappa: Object.fromEntries(fit.settings.kappa) };
 }

@@ -1888,7 +1888,7 @@ function RdLgTpp({ p, onM, moe, note }) {
           {p.tpp3 && <tr><th scope="row">Three-cornered</th><td colSpan={2}><b className="rd-ldg-tri"><span style={{ color: "var(--alp-text)" }}>ALP {rdApNum(p.tpp3.alp)}</span> <span style={{ color: "var(--lnp-text)" }}>L/NP {rdApNum(p.tpp3.lnp)}</span> <span style={{ color: "var(--onp-text)" }}>ON {rdApNum(p.tpp3.onp)}</span></b><span className="rd-ldg-tail">, as published</span></td></tr>}
         </tbody>
       </table>
-      {(noPub || moe || note || p.undecidedBasis === "tpp" || p.tppUndecided) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{p.undecidedBasis === "tpp" ? " Undecided " + p.undecided + "% stays inside the published pair, unallocated." : ""}{p.tppUndecided ? " Undecided before preference apportionment: " + p.tppUndecided.lnponp + "% Labor v Coalition, " + p.tppUndecided.alponp + "% Labor v One Nation." : ""}{note ? " " + note : ""}</p>}
+      {(noPub || moe || note || p.undecidedBasis === "tpp" || p.tppUndecided) && <p className="rd-ldg-foot1">{noPub ? p.pollster + " published no two-party figure; the implied ones are read off its primaries. " : ""}{moe || ""}{p.undecidedBasis === "tpp" ? " Undecided " + p.undecided + "% stays inside the published pair, unallocated." : ""}{p.tppUndecided ? " Undecided before preference apportionment: " + p.tppUndecided.lnponp + "% Labor v Coalition" + (p.tppUndecided.alponp != null ? ", " + p.tppUndecided.alponp + "% Labor v One Nation" : "") + "." : ""}{note ? " " + note : ""}</p>}
     </>
   );
 }

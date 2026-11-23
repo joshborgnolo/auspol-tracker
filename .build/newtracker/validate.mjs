@@ -94,8 +94,12 @@ export function validate(D) {
     if (p.tpp_undecided != null) {
       if (p.pollster !== "Spectre Strategy")
         fail("tpp-und-pollster", `tpp_undecided on ${p.pollster}`);
+      /* lnponp is a legacy name for the FIRST contest Spectre prints,
+         Labor v Coalition (always there); alponp, Labor v One Nation, only
+         since April 2026 */
       for (const key of ["lnponp", "alponp"]) {
         const v = p.tpp_undecided[key];
+        if (key === "alponp" && v == null) continue;
         if (!(Number.isFinite(v) && v >= 0 && v <= 40))
           fail("tpp-und-range", `tpp_undecided.${key} = ${JSON.stringify(v)}`);
       }

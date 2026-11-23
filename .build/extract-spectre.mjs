@@ -216,6 +216,10 @@ function parseReport(txt, slug, D) {
   const und = primaryText.match(/(\d+)%\s+of voters were undecided before(?:\s+One Nation)?\s+apportionment/i);
   if (und) w.undecided = toNum(und[1]);
   const prefUnd = txt.match(/(\d+)%\s+and\s+(\d+)%\s+of voters respectively were undecided before preferences were apportioned/i);
+  /* `lnponp` is a legacy key name: it holds the FIRST contest in Spectre's
+     sentence, Labor v Coalition ("leads the Liberal National Coalition … and
+     One Nation …"), not Coalition v One Nation; alponp is Labor v One Nation.
+     The ledger and gen-data read it as Labor v Coalition. */
   if (prefUnd) w.tppUndecided = { lnponp: toNum(prefUnd[1]), alponp: toNum(prefUnd[2]) };
 
   const dir = SECTION(txt, "Right direction", "Q: In your view, is Australia heading") ?? "";

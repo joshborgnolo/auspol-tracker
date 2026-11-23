@@ -77,7 +77,11 @@ const asset = `.build/newtracker/assets/${readdirSync(".build/newtracker/assets"
 const w = {};
 new Function("window", readFileSync(asset, "utf8"))(w);
 const H = w.AUSPOL.decidednessHistory;
-assert.deepEqual(H.soft.terms.map((t) => [t.year, t.polls.length]), [[2022, 14], [2025, 36]]);
+/* one soft line per pollster and term since 2026-11-23 (never an average
+   of Resolve and RedBridge); RedBridge's three pre-election waves are dots */
+assert.deepEqual(H.soft.terms.map((t) => [t.year, t.id, t.polls.length]), [[2022, "soft", 14], [2025, "soft", 33], [2025, "softRB", 3]]);
+assert.ok(H.soft.terms.every((t) => t.polls.every((p) => p.basis === t.id)), "each term's polls are its pollster's own");
+assert.equal(H.soft.terms.find((t) => t.id === "softRB").monthly.length, 0, "three polls draw no line");
 assert.deepEqual(H.softAge.terms.map((t) => [t.year, t.waves.length]), [[2022, 14], [2025, 33]]);
 assert.deepEqual(H.firmness.terms.map((t) => [t.year, t.waves.length]), [[2025, 6]]);
 assert.equal(H.soft.terms[0].polls[0].v, 21);

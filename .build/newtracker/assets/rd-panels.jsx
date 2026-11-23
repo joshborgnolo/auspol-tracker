@@ -6981,9 +6981,16 @@ function RdUndecided({ rangeId }) {
   const F = D.firmness, A = U.softAge, DH = D.decidednessHistory;
   const byId = {};
   U.series.forEach((s) => { byId[s.id] = s; });
-  const first = byId.first, tpp = byId.tpp, leaner = byId.leaner, soft = byId.soft;
-  const softResolve = U.softResolve;
+  /* five lines, one question each (gen-data §5c): three undecided
+     questions, and two pollsters' soft shares - Resolve's "soft" and
+     RedBridge's "soft or very soft" ask differently and sit twenty-five
+     points apart, so each keeps its own line and colour */
+  const first = byId.first, leaner = byId.leaner, tpp = byId.tpp, soft = byId.soft, softRB = byId.softRB;
+  const softResolve = soft;
   const nowOf = (s) => (s ? (s.now ? s.now.v : s.latest.v) : null);
+  /* what each line is called in a sentence, and in the significance table */
+  const UN_NAME = { first: "undecided share asked once", leaner: "undecided share after a follow-up", tpp: "undecided share after preferences", soft: "Resolve’s soft share", softRB: "RedBridge’s soft share" };
+  const UN_ROW = { first: "Undecided, asked once", leaner: "Undecided, after a follow-up", tpp: "Undecided, after preferences", soft: "Soft (Resolve)", softRB: "Soft or very soft (RedBridge)" };
   const H = U.history && U.history.terms && U.history.terms.length ? U.history : null;
   const histOn = !!((H || DH) && winU && nowXU != null);
   const hx = (ym) => D.mx(ym);
@@ -7010,8 +7017,10 @@ function RdUndecided({ rangeId }) {
     return pts.length >= 2 ? { id: basis + "-" + t.year, basis, year: t.year, pts, houses: sr.houses, zero: sr.zero } : null;
   }).filter(Boolean));
   const histDots = (basis) => (!histOn || !H ? [] : H.polls.filter((q) => q.basis === basis && inWinU(q.x)));
+  /* the past terms' soft lines: one per pollster and term, modelled like
+     today's (gen-data decidedSoftHistory), in the pollster's colour */
   const histSoftLines = () => (!histOn || !DH ? [] : DH.soft.terms.map((t) => ({
-    year: t.year, houses: t.houses,
+    year: t.year, houses: t.houses, basis: t.id,
     pts: t.monthly.filter((q) => inWinU(q.x)),
   })).filter((h) => h.pts.length >= 2));
   const histSoftDots = () => (!histOn || !DH ? [] : DH.soft.terms.flatMap((t) => t.polls).filter((q) => inWinU(q.x)));
@@ -7036,18 +7045,23 @@ function RdUndecided({ rangeId }) {
       const np = ord[0] === "oth" ? "the minor-party" : "the " + D.PARTIES[ord[0]].name;
       return ", and " + np + " vote is firmest";
     })();
+    /* "might change their mind" quotes Resolve, the share the bar below
+       is built from (its question asks everyone; RedBridge's reads about
+       twice as high on a different scale, and the chart shows both) */
     const head = rdCap(rdOneIn(u)) + " is undecided"
       + (sf != null ? ", " + rdOneInShare(sf) + " might change their mind" : "")
       + firmestTail + ".";
-    /* a modelled line moves when its change since the term's first month
-       clears its own 95% interval (the posterior of the difference); the
-       soft share keeps its within-house slope, Bonferroni across the two */
-    const moves = [["undecided", first], ["soft", soft]].map(([nm, s]) => ({ nm, s, f: s && s.now && s.now.since ? { p: s.now.since.sig ? 0 : 1, b: s.now.since.chg } : slopeOf(s) })).filter((m) => m.f);
-    const movedSig = moves.filter((m) => m.f.p < 0.05 / moves.length);
+    /* every line is modelled: it moves when its change since the term's
+       first month clears its own 95% interval (the posterior of the
+       difference). Until 2026-11-23 the soft share was one monthly average
+       of Resolve and RedBridge whose slope test called a rise that neither
+       pollster's own line shows. */
+    const moves = [first, leaner, tpp, soft, softRB].filter((s) => s && s.now && s.now.since).map((s) => ({ s, sig: s.now.since.sig, b: s.now.since.chg }));
+    const movedSig = moves.filter((m) => m.sig);
     /* the dek is the movement verdict alone (user trim, 2026-09-28): the
        house range and latest-figure sentences it used to append were cut */
-    const dek = !movedSig.length ? (moves.length > 1 ? "Neither share has" : "The share has") + " moved significantly since the 2025 election."
-      : movedSig.map((m) => "The " + m.nm + " share has " + (m.f.b > 0 ? "risen" : "fallen") + " significantly since the 2025 election.").join(" ");
+    const dek = !movedSig.length ? (moves.length > 2 ? "None of the " + rdNumWord(moves.length) + " measures has" : moves.length === 2 ? "Neither measure has" : "The share has") + " moved significantly since the 2025 election."
+      : movedSig.map((m) => rdCap(UN_NAME[m.s.id]) + " has " + (m.b > 0 ? "risen" : "fallen") + " significantly since the 2025 election.").join(" ");
     return { head, dek };
   })();
 
@@ -7055,21 +7069,46 @@ function RdUndecided({ rangeId }) {
   const u = nowOf(first), sf = nowOf(softResolve);
   const und100 = Math.round(u), soft100 = Math.round(sf * (100 - u) / 100), firm100 = 100 - und100 - soft100;
   const moved = moves100 => moves100;
-  const COLb = (id) => (id === "soft" || id === "leaner" ? "var(--ink-2)" : id === "tpp" ? "var(--ink-3)" : "var(--ink)");
+  /* each line's own colour (gen-data's colour tokens): the undecided
+     questions plum, gold and ink, the two soft pollsters teal and dark grey.
+     Until 2026-11-23 they were three greys told apart by dashes alone. */
+  const COLb = (id) => (byId[id] && byId[id].color) || { first: "var(--dec-once)", leaner: "var(--dec-leaner)", tpp: "var(--dec-pref)", soft: "var(--dec-resolve)", softRB: "var(--dec-redbridge)" }[id] || "var(--ink)";
+  const READ_TOP = { first: "Asked once", leaner: "After a follow-up", tpp: "After preferences", soft: "Resolve: soft", softRB: "RedBridge: soft or very soft" };
+  /* how the undecided lines compare today (gen-data undecidedGaps): each
+     gap with its interval and its verdict, and what it is made of. It sits
+     on the charts' second row, under the undecided chart (a phone stacks it
+     straight after that chart), so the two charts still align. */
+  const GAPS = atNowU && U.gaps ? U.gaps.filter((g) => byId[g.a] && byId[g.b]) : [];
+  const gapWhy = {
+    "tpp|first": "It counts the voters who can name a party but won’t rank Labor against the Coalition. Spectre asks both questions of the same voters.",
+    "first|leaner": "A follow-up can only shrink a pollster’s own undecided count, but different pollsters ask each way, so this gap also carries their other differences.",
+  };
+  const gapsBlock = GAPS.length > 0 && (
+    <div className="rd-un-gaps">
+      <b>How the undecided lines compare</b>
+      {GAPS.map((g) => (
+        <p key={g.a + g.b} className="rd-note">
+          <span className="rd-un-gapk">{READ_TOP[g.a]} v {READ_TOP[g.b].toLowerCase()}:</span>{" "}
+          {(g.v >= 0 ? "higher by " : "lower by ") + Math.abs(g.v).toFixed(1) + " points, " + (g.sig ? "a significant gap" : "not a significant gap") + " (95% interval " + rdTsSgn(g.lo, true) + " to " + rdTsSgn(g.hi, true) + "). "}{gapWhy[g.a + "|" + g.b] || ""}
+        </p>
+      ))}
+    </div>
+  );
+  const softNote = byId.soft && byId.softRB && <p className="rd-note rd-un-softnote">The two pollsters ask different questions with different answers to choose from, so compare each line with itself, not with the other.</p>;
   const panel = (list, lo, hi, step, key, title, meta) => {
     const drawnNow = list.map((s) => ({ s, pts: filterPts(s.monthly, xDomain[0]).filter((q) => q.x <= xDomain[1] + 0.02), dots: s.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) }))
       .filter((d) => d.pts.length >= 2);
     /* the past terms' lines, one per term and basis, each its own segment
        (a term's line ends at its election), tones and dashes as the
        basis's own line today */
-    const like = (basis) => list.find((s) => s.id === basis) || { id: basis, label: basis === "first" ? "First preference" : basis === "soft" ? "Soft" : "After leaner", dashed: basis === "leaner" };
+    const like = (basis) => list.find((s) => s.id === basis) || byId[basis] || { id: basis, label: { first: "Asked once", leaner: "After a follow-up", tpp: "After preferences", soft: "Resolve", softRB: "RedBridge" }[basis] || basis };
     const drawnPast = key === "soft" ? histSoftLines().map((h) => ({
-      s: { ...like("soft"), id: "soft-" + h.year, basisId: "soft", houses: h.houses }, pts: h.pts, dots: [], past: h,
+      s: { ...like(h.basis), id: h.basis + "-" + h.year, basisId: h.basis, houses: h.houses }, pts: h.pts, dots: [], past: h,
     })) : key !== "und" ? [] : ["first", "leaner"].flatMap((b) => histLines(b).map((h) => ({
       s: { ...like(b), id: h.id, basisId: b, houses: h.houses }, pts: h.pts, dots: [], past: h })));
     const drawn = drawnNow.concat(drawnPast);
     if (!drawn.length) return null;
-    const pastDots = key === "soft" ? histSoftDots().map((q) => ({ x: q.x, y: q.v, color: COLb("soft"), label: like("soft").label, meta: q }))
+    const pastDots = key === "soft" ? histSoftDots().map((q) => ({ x: q.x, y: q.v, color: COLb(q.basis), label: like(q.basis).label, meta: q }))
       : key !== "und" ? [] : ["first", "leaner"].flatMap((b) => histDots(b).map((q) => ({ x: q.x, y: q.v, color: COLb(b), label: like(b).label, meta: q })));
     /* each modelled line's 95% band */
     const bands = drawn.filter((d) => d.pts[0].lo != null).map((d) => ({
@@ -7083,32 +7122,42 @@ function RdUndecided({ rangeId }) {
       const q = cand[cand.length - 1];
       return q ? { v: q.v, ci: q.lo != null ? (q.hi - q.lo) / 2 : null, when: monthLabelFull(q.ym) } : null;
     };
-    const readList = (atNowU ? list : list.concat(["first", "leaner"].filter((b) => !list.some((s) => s.id === b)).map(like))).filter((s) => readOf(s));
-    /* the board's tones: first preference in ink, after preferences a
-       lighter grey (dashed), not firm between. Their polls wear the same
-       tones, and after preferences' as open rings - six Essential readings
-       carry that line, so they stay on show, but told apart */
+    const readList = (atNowU ? list : list.concat((key === "und" ? ["first", "leaner"] : ["soft", "softRB"]).filter((b) => !list.some((s) => s.id === b)).map(like))).filter((s) => readOf(s));
+    /* each line and its polls wear the line's own colour */
     const COL = (s) => COLb(s.basisId || s.id);
+    const READ_SUB = {
+      first: "Can’t say who they’d vote for. These pollsters ask once, with no follow-up: ",
+      leaner: "Still can’t say after a follow-up question asks which party they lean to: ",
+      tpp: "Won’t choose between Labor and the Coalition when asked which they’d put higher, including some who named a minor party: ",
+      soft: "Named a party but call their vote soft, not firm. Resolve asks everyone and offers no undecided option.",
+      softRB: "Named a party or a lean but call their vote soft or very soft, not solid.",
+    };
+
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find((d) => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
     return (
-      <div className="card rd-card rd-un-panel" key={key}>
+      <div className={"card rd-card rd-un-panel rd-un-p-" + key} key={key}>
         <div className="rd-un-ptitle"><b>{title}</b><span>{meta}</span></div>
         {readList.map((s) => { const r = readOf(s); return (
           <div key={s.id} className="rd-un-read">
-            <RdSwatch kind={s.dashed ? "dash" : "line"} color={COL(s)} />
+            <RdSwatch kind="line" color={COL(s)} />
             <div>
-              <div className="rd-un-rtop"><b>{s.id === "soft" ? "Might still change" : s.label}</b><span className="rd-un-rv">{r.v.toFixed(1)}%</span>{r.ci != null && <span className="rd-un-rci">±{r.ci.toFixed(1)}</span>}{r.when && <span className="rd-un-rci">{r.when}</span>}</div>
-              <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "leaner" ? "Still undecided after the leaner. Some houses keep them in the published figures; others set them aside. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
+              <div className="rd-un-rtop"><b>{READ_TOP[s.id] || s.label}</b><span className="rd-un-rv">{r.v.toFixed(1)}%</span>{r.ci != null && <span className="rd-un-rci">±{r.ci.toFixed(1)}</span>}{r.when && <span className="rd-un-rci">{r.when}</span>}</div>
+              <p>{READ_SUB[s.id] || ""}{s.kind === "soft" ? "" : rdList(s.houses) + "."}</p>
             </div>
           </div>
         ); })}
+
         <TrendChart key={"rd-un-" + key} heightPx={narrow ? 200 : 230} padPx={{ l: 36, r: 10, t: 14, b: 28 }}
           xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, step)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
           xTicks={histOn ? confWinTicks(winC, vTermsU, nowXU) : rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline driven={dragU}
-          series={drawn.map((d) => ({ id: d.s.id, label: d.s.label + (d.past ? " (" + d.past.year + " term)" : ""), color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: d.past ? 0 : 3.5, endCap: !d.past, points: series(d.pts, "v") }))}
+          series={drawn.map((d) => ({ id: d.s.id, label: (READ_TOP[d.s.basisId || d.s.id] || d.s.label) + (d.past ? " (" + d.past.year + " term)" : ""), color: COL(d.s), rdWidth: 2, rdCap: d.past ? 0 : 3.5, endCap: !d.past,
+            /* named at its end as well as in the readouts: four lines in two
+               colours each must never rest on colour alone */
+            ...(d.past ? {} : { endLabel: { first: "Asked once", leaner: "Follow-up", tpp: "Preferences", soft: "Resolve", softRB: "RedBridge" }[d.s.id] }),
+            points: series(d.pts, "v") }))}
           areas={bands}
           spine={series(drawn[0].pts, "v")}
-          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), hollow: d.s.id === "tpp", label: d.s.label, meta: q }))).concat(pastDots)} pollFacet="twopp"
+          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), label: READ_TOP[d.s.id] || d.s.label, meta: q }))).concat(pastDots)} pollFacet="twopp"
           notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "%, " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
           tooltipTitle={(i) => { const p = drawn[0].pts[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={(v) => v.toFixed(1)}
@@ -7116,23 +7165,22 @@ function RdUndecided({ rangeId }) {
              leaves them behind, so its key says it, with the figures */
           copy={{ title: key === "und" ? "Undecided voters" : "Voters who might still change their mind",
                   ...(histOn ? { span: confWinYears(winC, vTermsU, nowXU) } : {}),
-                  sub: key === "und" ? "Share of all voters who can’t say who they’d vote for, month by month"
-                    : "Share of voters naming a party who say they could still change their mind, month by month", caption: key === "und"
-                    ? "Each dot is one poll" + (drawn.some((d) => d.s.id === "tpp") ? ", open rings for after preferences" : "") + "; the undecided lines are a model of every poll with each pollster’s lean taken out, shaded with their 95% intervals" + (drawn.some((d) => d.s.id === "tpp") ? "; after preferences is a monthly average" : "") + (drawnPast.length ? ". Each term’s lines end at its election." : ".")
-                    : "Each dot is one poll; lines are monthly averages.",
-                  legend: readList.map((s) => ({ label: (s.id === "soft" ? "Might still change" : s.label) + " " + readOf(s).v.toFixed(1) + "%",
-                                              color: COL(s), kind: s.dashed ? "dashed" : "line" })) }} />
+                  sub: key === "und" ? "Share of all voters who can’t say who they’d vote for: asked once, after a follow-up, and between Labor and the Coalition after preferences"
+                    : "Share of voters naming a party who say they could still change their mind, by pollster", caption: key === "und"
+                    ? "Each dot is one poll. Each line is a model of every poll on its question with each pollster’s lean taken out, shaded with its 95% interval" + (drawnPast.length ? ". Each term’s lines end at its election." : ".")
+                    : "Each dot is one poll. Each line is a model of that pollster’s polls, shaded with its 95% interval" + (drawnPast.length ? ". Each term’s lines end at its election." : "."),
+                  legend: readList.map((s) => ({ label: (READ_TOP[s.id] || s.label) + " " + readOf(s).v.toFixed(1) + "%",
+                                              color: COL(s), kind: "line" })) }} />
       </div>
     );
   };
   const changeFoot = (() => {
-    const bits = [first, tpp, leaner, soft].filter(Boolean).map((s) => {
+    const bits = [first, leaner, tpp, soft, softRB].filter(Boolean).map((s) => {
       const c = s.now ? s.now.chg : null;
-      const nm = s.id === "first" ? "first preference" : s.id === "leaner" ? "after leaner" : s.id === "tpp" ? "after preferences" : "soft";
-      return { nm, c, sig: s.now && s.now.changeSig };
+      return { nm: { first: "asked once", leaner: "after a follow-up", tpp: "after preferences", soft: "Resolve soft", softRB: "RedBridge soft" }[s.id] || s.label, c, sig: s.now && s.now.changeSig };
     });
     const anySig = bits.some((b) => b.sig);
-    return (anySig ? "Changes on the previous period: " : "None of the " + rdNumWord(bits.length) + " has changed significantly on the previous period: ")
+    return (anySig ? "Changes on a month ago: " : "None of the " + rdNumWord(bits.length) + " has changed significantly on a month ago: ")
       + bits.map((b) => b.nm + " " + (b.c == null ? "n/a" : Math.abs(b.c) < 0.05 ? "unchanged" : (b.c > 0 ? "+" : "−") + Math.abs(b.c).toFixed(1))).join(", ") + ". ± is the 95% margin.";
   })();
 
@@ -7217,7 +7265,7 @@ function RdUndecided({ rangeId }) {
     const waves = oldTerms.flatMap((t) => t.waves).concat(A.waves).filter(inX);
     const lines = segments.flatMap((t) => t.points);
     if (!waves.length || !lines.length) return null;
-    const nationalSegments = (DH ? DH.soft.terms.map((t) => ({ year: t.year, points: t.monthly.filter(inX) })) : [])
+    const nationalSegments = (DH ? DH.soft.terms.filter((t) => t.id === "soft").map((t) => ({ year: t.year, points: t.monthly.filter(inX) })) : [])
       .concat({ year: "current", points: softResolve ? softResolve.monthly.filter(inX) : [] }).filter((t) => t.points.length >= 2);
     const chartHi = Math.max(40, Math.ceil((Math.max(...waves.flatMap((w) => B.map((b) => w.soft[b.id]))) + 3) / 10) * 10);
     return { B, grey, rows, lo, hi, note, sub, allNow, waves, lines, segments, nationalSegments, chartHi };
@@ -7228,7 +7276,7 @@ function RdUndecided({ rangeId }) {
      series (the dek only sentences undecided and firmness), Holm across
      whatever has a fit; the fold-out lists every series, fit or not */
   const unSig = (() => {
-    const ss = [first, leaner, tpp, soft].filter(Boolean).map((s) => ({ s, pts: s.monthly || [], fit: s.now && s.now.since ? null : slopeOf(s), since: s.now && s.now.since ? s.now.since : null }));
+    const ss = [first, leaner, tpp, soft, softRB].filter(Boolean).map((s) => ({ s, pts: s.monthly || [], fit: s.now && s.now.since ? null : slopeOf(s), since: s.now && s.now.since ? s.now.since : null }));
     const ok = ss.filter((x) => x.fit), won = [];
     for (const [i, f] of [...ok].sort((a, b) => a.fit.p - b.fit.p).entries()) {
       if (f.fit.p >= 0.05 / (ok.length - i)) break;
@@ -7239,7 +7287,12 @@ function RdUndecided({ rangeId }) {
 
   const views = [{ id: "all", label: "All voters" }].concat(F ? [{ id: "party", label: "By party" }] : [], A ? [{ id: "age", label: "By age" }] : []);
   const historyFromU = histOn ? [H && H.terms[0].from, DH && DH.soft.terms[0] && DH.soft.terms[0].polls[0].released].filter(Boolean).sort()[0] : null;
-  const softChartHi = soft ? Math.ceil((Math.max(soft.hi, ...(DH ? DH.soft.terms.flatMap((t) => t.polls.map((p) => p.v)) : [])) + 1) / 10) * 10 : 0;
+  const softList = [soft, softRB].filter(Boolean);
+  const undList = [first, leaner, tpp].filter(Boolean);
+  /* the undecided chart's top: 12 unless a line (after preferences sits
+     near 12, its band and polls higher) needs more, in steps of 5 */
+  const undChartHi = Math.max(12, Math.ceil((Math.max(0, ...undList.map((s) => Math.max(s.hi, s.now && s.now.hi != null ? s.now.hi : 0))) + 1) / 5) * 5);
+  const softChartHi = softList.length ? Math.ceil((Math.max(...softList.map((s) => s.hi), ...softList.map((s) => s.now ? s.now.hi : 0), ...(DH ? DH.soft.terms.flatMap((t) => t.polls.map((p) => p.v)) : [])) + 1) / 10) * 10 : 0;
   /* The views are pages of their own, so the row walks them by arrow keys
      and, on a phone, by a sideways swipe on or just under it (without
      swipe the gesture turns the page instead). Scrolled past the head and
@@ -7287,23 +7340,25 @@ function RdUndecided({ rangeId }) {
             )}
             <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(softResolve.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
           </div>
-          <RdSub head={(() => { const m = [first && first.now && first.now.since ? { p: first.now.since.sig ? 0 : 1 } : slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
-                 dek={(first && first.model ? "Each dot is one poll, open rings for after preferences. The undecided lines are a model of every poll, each pollster’s lean taken out, shaded with their 95% intervals; the others are monthly averages." : "Each dot is one poll, open rings for after preferences; lines are monthly averages.") + " Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales."} />
+          <RdSub head={unSig.some((x) => x.sig) ? "Moving since the election" : "Steady since the election"}
+                 dek={"Each dot is one poll and each line a model of its polls, shaded with its 95% interval, so a month with few polls is filled in rather than jumping to whoever reported. Undecided voters are counted out of all voters and soft voters out of those who named a party, so the two charts have different scales."} />
           <div className="rd-un-panels">
-            {panel([first, tpp, leaner].filter(Boolean), 0, 12, 5, "und", "Undecided", "% of all voters")}
-            {soft && panel([soft], 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party")}
+            {panel(undList, 0, undChartHi, 5, "und", "Undecided", "% of all voters")}
+            {softList.length > 0 && panel(softList, 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party")}
+            {gapsBlock || (softNote ? <span /> : null)}
+            {softNote}
           </div>
           {histOn && H && <RdConfStrip lines={[{ color: "var(--ink-2)", points: H.terms.flatMap((t) => (t.series.first ? t.series.first.months.map((m) => ({ x: hx(m[0]), y: m[1] })) : [])).concat((first ? first.monthly : []).map((m) => ({ x: m.x, y: m.v }))) }]}
                                   lo={extU.lo} hi={extU.hi} win={winC} terms={vTermsU} onWin={onWinU} narrow={narrow} label="Undecided voters, can’t say who they’d vote for, every term on file" />}
           <RdTsig summary="Trend-significance table"
             heads={["Series", "Line, first month → last, %", "Change", "Test", "Significant"]}
             sets={[{ key: "main", rows: unSig.map((x) => ({
-              key: x.s.id, name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Soft" : x.s.id === "leaner" ? "Undecided, after leaner" : "Undecided", sig: x.sig,
+              key: x.s.id, name: UN_ROW[x.s.id] || x.s.label, sig: x.sig,
               cells: [x.pts.length >= 2 ? rdTsSgn(x.pts[0].v) + " → " + rdTsSgn(x.pts[x.pts.length - 1].v) : "–",
                 x.since ? rdTsSgn(x.since.chg, true) + " since " + monthLabelFull(x.since.from) : x.fit ? rdTsSgn(x.fit.b, true) + " pts/yr" : "–",
                 x.since ? "95% interval " + rdTsSgn(x.since.lo, true) + " to " + rdTsSgn(x.since.hi, true) : x.fit ? "slope t " + rdTsSgn(x.fit.t) : "–", x.sig ? "Yes" : "No"],
             })) }]}
-            note={(first && first.model ? "The two undecided lines are tested on the model’s own change since their first month: Yes when its 95% interval excludes zero. After preferences and soft keep one trend test each: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the two." : "One trend test per series: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the series. Yes means the slope clears 95% since the 2025 election.") + " The dek above reads the same tests. Undecided counts all voters, “Might still change” those who named a party, so the two panels’ figures sit on different scales."}
+            note={(first && first.model ? "Each line is tested on the model’s own change since its first month: Yes when that change’s 95% interval excludes zero." : "One trend test per series: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the series. Yes means the slope clears 95% since the 2025 election.") + " The dek above reads the same tests. Undecided counts all voters, soft those who named a party, so the two charts’ figures sit on different scales."}
           />
           <RdFoot how={{ term: "undecided", from: "Decidedness" }}>{changeFoot}</RdFoot>
         </>

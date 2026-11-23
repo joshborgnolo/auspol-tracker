@@ -3967,17 +3967,41 @@ for (const p of [...POLLS].sort((a, b) => a.date.localeCompare(b.date) || a.poll
    effect is estimable against a single publisher, so this is a plain monthly
    mean of published readings and the panel says whose. A wave that published
    no figure is absent rather than zero. */
+/* The panel's five lines, three undecided questions on one chart and two
+   pollsters' soft shares on the other. Each line is ONE question, never an
+   average of two:
+     first   "Asked once": can't say, and the pollster asks no follow-up
+             (Roy Morgan, Spectre)
+     leaner  "After a follow-up": still can't say after being asked which
+             party they lean to (Newspoll, RedBridge, DemosAU, Essential,
+             Fox & Hedgehog)
+     tpp     "After preferences": won't choose between Labor and the
+             Coalition when asked which they'd put higher (Spectre) – it also
+             counts minor-party voters who won't rank the two majors
+     soft    Resolve's soft share: named a party but not firm in it
+     softRB  RedBridge's soft plus very soft: not solid
+   Until 2026-11-23 the soft chart drew ONE monthly average of Resolve (about
+   26%) and RedBridge (about 50%): two questions twenty-five points apart, so
+   the line fell to Resolve's level in every month RedBridge skipped (July
+   and August 2025, September 2026) and climbed back when it reported – dips
+   the voters never made, and a "risen significantly" verdict built on them.
+   After preferences was the same kind of average, of Spectre (11–13%) and
+   Essential (4–7%), so it leapt to 13 in any month only Spectre reported.
+   Essential's two-party shortfall stays in its own poll's detail: it is its
+   primary undecided again (within a point every month, already on the
+   follow-up line), not an answer to a preference question. Each line
+   carries its own colour token, so no two lines are told apart by a dash. */
 const UNDECIDED_BASES = [
-  { id: "first", label: "First preference", dashed: false,
-    note: "can’t say who they would vote for – set aside before the shares are reported" },
-  { id: "tpp", label: "After preferences", dashed: true,
-    note: "won’t nominate a side after higher preferences are asked – either left inside the pair or excluded before it is apportioned" },
-  { id: "leaner", label: "After leaner", dashed: true,
-    note: "still undecided after the leaner – treatment in the published vote figures varies by house" },
-  // dash-dot, not dotted: a "1 3" dot line with round caps read as a string
-  // of beads - noise rather than a third line
-  { id: "soft", label: "Soft", dash: "9 3 2 3",
-    note: "named a party or a lean but are not solid – Resolve’s total-soft share, RedBridge’s soft plus very soft" },
+  { id: "first", kind: "und", label: "Asked once", color: "var(--dec-once)",
+    note: "can’t say who they would vote for, and the pollster asks no follow-up – set aside before the shares are reported" },
+  { id: "leaner", kind: "und", label: "After a follow-up", color: "var(--dec-leaner)",
+    note: "still can’t say after a follow-up asking which party they lean to – treatment in the published vote figures varies by house" },
+  { id: "tpp", kind: "und", house: "Spectre Strategy", label: "After preferences", color: "var(--dec-pref)",
+    note: "won’t choose between Labor and the Coalition when asked which they would put higher, including some who named a minor party" },
+  { id: "soft", kind: "soft", house: "Resolve", label: "Resolve", color: "var(--dec-resolve)",
+    note: "named a party but call their vote soft, not firm (Resolve asks everyone; no undecided option)" },
+  { id: "softRB", kind: "soft", house: "RedBridge/Accent", label: "RedBridge", color: "var(--dec-redbridge)",
+    note: "named a party or a lean but call their vote soft or very soft, not solid" },
 ];
 const decidedHistoryPolls = JUR ? [] : Object.entries(cyclePolls).flatMap(([term, rows]) => rows.map((p) => ({
   ...p,
@@ -3985,17 +4009,25 @@ const decidedHistoryPolls = JUR ? [] : Object.entries(cyclePolls).flatMap(([term
   decidedTerm: +term,
 })));
 const undecidedRowsFor = (rows) => rows.flatMap((p) => [
-  ...(undecidedOf(p) ? [{ p, u: undecidedOf(p) }] : []),
+  /* undecidedOf's "tpp" basis (Essential's two-party shortfall) stays in the
+     poll's own detail: it is the same undecided voters as its primary */
+  ...(undecidedOf(p) && undecidedOf(p).basis !== "tpp" ? [{ p, u: undecidedOf(p) }] : []),
   ...(p.undecidedLeaner != null ? [{ p, u: { v: p.undecidedLeaner, basis: "leaner" } }] : []),
   ...(p.pollster === "Essential" && p.undecidedIn != null
     ? [{ p, u: { v: p.undecidedIn, basis: "leaner" } }] : []),
+  /* Spectre's undecided on its Labor-v-Coalition preference question.
+     `lnponp` is a legacy key name: it holds the FIRST contest Spectre prints,
+     Labor v Coalition (extract-spectre.mjs; the ledger labels it so), not
+     Coalition v One Nation; alponp, its Labor-v-One Nation contest, stays in
+     the poll detail. */
   ...(p.tpp_undecided?.lnponp != null
     ? [{ p, u: { v: p.tpp_undecided.lnponp, basis: "tpp" } }] : []),
-  /* RedBridge's non-solid share of its decided-plus-leaner vote intention.
-     Spectre's two-way soft share also includes unresolved undecideds, so it
-     stays out; this adds to the panel series, never the per-poll ledger. */
+  /* RedBridge's non-solid share of its decided-plus-leaner vote intention,
+     its own line (softRB). Spectre's two-way soft share also includes
+     unresolved undecideds, so it stays out; this adds to the panel series,
+     never the per-poll ledger. */
   ...(p.pollster === "RedBridge/Accent" && Number.isFinite(p.firmness?.all?.[1]) && Number.isFinite(p.firmness?.all?.[2])
-    ? [{ p, u: { v: p.firmness.all[1] + p.firmness.all[2], basis: "soft" } }] : []),
+    ? [{ p, u: { v: p.firmness.all[1] + p.firmness.all[2], basis: "softRB" } }] : []),
 ]).filter((r) => !noAggPoll(r.p));
 const undecidedRows = undecidedRowsFor(POLLS);
 const makeUndecidedSeries = (b, rows) => {
@@ -4031,7 +4063,7 @@ const makeUndecidedSeries = (b, rows) => {
   const now = currentReading(rs.map(({ p, u }) => ({ mid: midMs(p), x: u.v, n: rowN(p), firm: p.pollster })),
                              null, SPARSE_K);
   return {
-    id: b.id, label: b.label, note: b.note, dashed: b.dashed, dash: b.dash,
+    id: b.id, kind: b.kind, label: b.label, note: b.note, color: b.color, ...(b.house ? { house: b.house } : {}),
     houses: creditHouses(polls, (d) => d.pollster, (d) => Date.parse(d.released)),
     polls, monthly, n: polls.length,
     lo: Math.min(...vals), hi: Math.max(...vals),
@@ -4041,8 +4073,6 @@ const makeUndecidedSeries = (b, rows) => {
   };
 };
 const undecidedSeries = UNDECIDED_BASES.map((b) => makeUndecidedSeries(b)).filter(Boolean);
-const softResolve = makeUndecidedSeries(UNDECIDED_BASES.find((b) => b.id === "soft"),
-  undecidedRows.filter((r) => r.p.pollster === "Resolve" && r.u.basis === "soft"));
 const decidedHistoryGroups = (keep, mapWave) => {
   const groups = new Map();
   for (const p of decidedHistoryPolls) {
@@ -4052,29 +4082,34 @@ const decidedHistoryGroups = (keep, mapWave) => {
   }
   return [...groups.entries()].map(([year, waves]) => ({ year, waves: waves.sort((a, b) => a.x - b.x) })).sort((a, b) => a.year - b.year);
 };
+/* the past terms' soft lines, one per house and term, fitted like today's
+   (fitSoftLine below; past polls do not change, so the fits are cheap and
+   stable). Each term's line runs from its house's first poll to its last. */
+const SOFT_HIST_BASES = UNDECIDED_BASES.filter((b) => b.kind === "soft");
 const decidedSoftHistory = (() => {
-  const groups = new Map();
-  for (const { p, u } of undecidedRowsFor(decidedHistoryPolls).filter((r) => r.u.basis === "soft")) {
-    const point = {
-      x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
-      dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
-      sample: p.sample ?? null, ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
-      v: u.v, basis: "soft",
-    };
-    if (!groups.has(p.decidedTerm)) groups.set(p.decidedTerm, []);
-    groups.get(p.decidedTerm).push(point);
-  }
   const terms = [];
-  for (const [year, polls] of groups) {
-    polls.sort((a, b) => a.x - b.x);
-    const monthly = [...new Set(polls.map((p) => p.ym))].sort().map((ym) => {
-      const at = polls.filter((p) => p.ym === ym);
-      const sw = at.reduce((s, p) => s + rowN(p), 0);
-      return { ym, x: mx(ym), v: r1(at.reduce((s, p) => s + rowN(p) * p.v, 0) / sw), k: at.length };
-    });
-    terms.push({ year, polls, monthly, houses: [...new Set(polls.map((p) => p.pollster))] });
+  const elections = Object.values(ELECTIONS).filter((e) => e && e.date).map((e) => e.date).sort();
+  const rows = undecidedRowsFor(decidedHistoryPolls).filter((r) => SOFT_HIST_BASES.some((b) => b.id === r.u.basis));
+  for (const year of [...new Set(rows.map((r) => r.p.decidedTerm))].sort()) {
+    const to = elections.find((d) => +d.slice(0, 4) === year), from = elections[elections.indexOf(to) - 1];
+    if (!to || !from) continue;
+    for (const b of SOFT_HIST_BASES) {
+      const rs = rows.filter((r) => r.p.decidedTerm === year && r.u.basis === b.id && r.p.date > from && r.p.date < to);
+      if (!rs.length) continue;
+      const polls = rs.map(({ p, u }) => ({
+        x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
+        dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+        sample: p.sample ?? null, ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
+        v: u.v, basis: b.id,
+      })).sort((q, r) => q.x - r.x);
+      /* fewer than four polls make no line (RedBridge's three before the
+         2025 election): they stay on the chart as dots */
+      const fit = rs.length >= 4 ? fitSoftLine(rs, { from, to, seed: 20261123 + year + (b.id === "soft" ? 0 : 1), first: true }) : null;
+      terms.push({ year, id: b.id, house: b.house, label: b.label, color: b.color, houses: [b.house], polls,
+        monthly: fit ? fit.months.map((m) => ({ ym: m.ym, x: mx(m.ym), v: r1(m.v), lo: r1(m.lo), hi: r1(m.hi) })) : [] });
+    }
   }
-  return { terms: terms.sort((a, b) => a.year - b.year) };
+  return { terms };
 })();
 /* Resolve's "not firm" share by age band (polls.json `softAge`), for the
    Undecided panel's By age view: every wave, the pooled current figure (its
@@ -4110,38 +4145,63 @@ const softAge = softAgeWaves.length >= 2 * SOFT_AGE_POOL ? (() => {
     base: { from: first[0].dateLabel, to: first[SOFT_AGE_POOL - 1].dateLabel, ...softAgePooled(first) },
   };
 })() : null;
-/* ---- 5bm. the undecided lines on the model (federal) ---------------------
-   The two undecided bases the pollsters print – can't say with no leaner
-   asked (Roy Morgan, Spectre) and still undecided after a leaner (Newspoll,
-   RedBridge, DemosAU, Fox & Hedgehog; Essential keeps its own in the base)
-   – each on the primary model with two categories (primary-model.mjs
-   fitUndecided): each pollster's lean on it (its own wording) drifts, the
-   regular pollsters average zero, each counting once, and the band is the
-   posterior's. The line replaces the monthly average, whose level jumped
-   with whichever pollsters reported that month (RedBridge reads 1.6 above
-   the average pollster after its leaner, Fox & Hedgehog 2.0 below). The
-   tile's figure, its change on a month and since the term's first month
-   come from the same draws. Past terms are fitted the same way, term by
-   term, by .build/build-undecided-history.mjs into
-   data/undecided-history-model.json (their polls do not change), read here
-   for the panel's window. After preferences and soft stay as they were:
-   other questions, one house each. */
+/* ---- 5bm. the decidedness lines on the model (federal) -------------------
+   Every line is the primary model with two categories (primary-model.mjs
+   fitUndecided). The two undecided questions pool their pollsters: each
+   pollster's lean on the question (its own wording) drifts, the regular
+   pollsters average zero, each counting once, and the band is the
+   posterior's. This replaced a monthly average whose level jumped with
+   whichever pollsters reported that month (RedBridge reads 1.6 above the
+   average pollster after its leaner, Fox & Hedgehog 2.0 below). After
+   preferences and the two soft lines are one house each, so the same model
+   there is a smoother of that
+   house's own polls with no lean: each poll is a sample (its effective
+   size, its rounding), the share drifts a little a day, and a month with no
+   poll is interpolated, never a jump. Each tile's figure, its change on a
+   month and since the term's first month come from the same draws. Past
+   terms' undecided lines are fitted the same way, term by term, by
+   .build/build-undecided-history.mjs into data/undecided-history-model.json
+   (their polls do not change), read here for the panel's window; past soft
+   lines are fitted here (decidedSoftHistory). */
+function termMonths(from, to) {
+  const t0 = pmDay(from), t1 = pmDay(to), out = [];
+  for (let d = new Date(from.slice(0, 7) + "-01T00:00:00Z"); ; d.setUTCMonth(d.getUTCMonth() + 1)) {
+    const ym = d.toISOString().slice(0, 7);
+    if (pmDay(ym + "-01") > t1) break;
+    const mid = Math.min(pmDay(ym + "-15"), t1);
+    if (mid > t0) out.push({ ym, day: mid });
+  }
+  return out;
+}
+function fitSoftLine(rows, { from, to, seed, pairs = [], first = false, nDraw = 2000 }) {
+  const readings = rows.map(({ p, u }, i) => {
+    const s0 = pmDay(p.dateStart || p.date), e = pmDay(p.date);
+    return { house: p.pollster, day: Math.round((s0 + e) / 2), n: rowN(p) / HL_DEFF, und: u.v, idx: i };
+  }).sort((a, b) => a.day - b.day);
+  if (readings.length < 4) return null;
+  let months = termMonths(from, to);
+  /* a past term's line spans its house's polls only */
+  if (first) months = months.filter((m) => m.day >= readings[0].day - 15 && m.day <= readings[readings.length - 1].day + 15);
+  return fitUndecided(readings, { t0: pmDay(from), t1: pmDay(to), months, pairs: pairs.length ? pairs : [], seed, max: 100, nDraw });
+}
 const UNDM = JUR ? null : (() => {
   const tStart = Date.now();
   const t0 = pmDay(ELECTION.date), t1 = pmDay(LATEST_ISO);
   const months = MONTHS.map((ym) => ({ ym, day: ym === LATEST_ISO.slice(0, 7) ? t1 : Math.min(pmDay(ym + "-15"), t1) })).filter((m) => m.day > t0);
   const out = {};
-  for (const id of ["first", "leaner"]) {
+  UNDECIDED_BASES.forEach((b, bi) => {
+    const id = b.id;
     const readings = undecidedRows.filter((r) => r.u.basis === id && !/^EMRS/.test(r.p.pollster)).map(({ p, u }, i) => {
       const s = pmDay(p.dateStart || p.date), e = pmDay(p.date);
       return { house: p.pollster, day: Math.round((s + e) / 2), n: rowN(p) / HL_DEFF, und: u.v, idx: i };
-    }).sort((a, b) => a.day - b.day);
-    if (readings.length < 4) continue;
+    }).sort((a, b2) => a.day - b2.day);
+    if (readings.length < 4) return;
     const firstMonth = months.find((m) => m.day >= readings[0].day) || months[0];
-    const fit = fitUndecided(readings, { t0, t1, months, pairs: [[t1, t1 - 30], [t1, firstMonth.day]], seed: id === "first" ? 20261126 : 20261127 });
+    const fit = fitUndecided(readings, { t0, t1, months, pairs: [[t1, t1 - 30], [t1, firstMonth.day]],
+      seed: 20261126 + bi, max: b.kind === "soft" ? 100 : 50 });
     if (fit) out[id] = { ...fit, firstYm: firstMonth.ym };
-  }
-  console.log(`undecided model: ${Object.entries(out).map(([id, f]) => `${id} ${r1(f.now.v)} [${r1(f.now.lo)}, ${r1(f.now.hi)}] (${f.n} polls, zero ${f.core.join("/") || "–"})`).join(" | ")} in ${((Date.now() - tStart) / 1000).toFixed(1)}s`);
+  });
+  console.log(`decidedness model: ${Object.entries(out).map(([id, f]) => `${id} ${r1(f.now.v)} [${r1(f.now.lo)}, ${r1(f.now.hi)}] (${f.n} polls, zero ${f.core.join("/") || "–"})`).join(" | ")} in ${((Date.now() - tStart) / 1000).toFixed(1)}s`);
   return out;
 })();
 for (const s of undecidedSeries) {
@@ -4154,10 +4214,33 @@ for (const s of undecidedSeries) {
     chg: r1(mo.v), changeCi95: r1(mo.ci), changeSig: mo.lo > 0 || mo.hi < 0, pUp: r2(mo.pUp),
     since: { from: f.firstYm, chg: r1(since.v), lo: r1(since.lo), hi: r1(since.hi), sig: since.lo > 0 || since.hi < 0, pUp: r2(since.pUp) },
     model: true };
-  s.leans = Object.fromEntries(Object.entries(f.leans).map(([h, l]) => [h, { v: r1(l.v), lo: r1(l.lo), hi: r1(l.hi) }]));
-  s.zero = f.core;
+  /* a one-house line has no lean to report: its pollster IS its zero */
+  if (!s.house) {
+    s.leans = Object.fromEntries(Object.entries(f.leans).map(([h, l]) => [h, { v: r1(l.v), lo: r1(l.lo), hi: r1(l.hi) }]));
+    s.zero = f.core;
+  }
   s.model = true;
 }
+/* The gaps between the undecided lines today, from the fits' draws paired
+   at random (the fits are independent), each significant when its 95%
+   interval excludes zero:
+     tpp − first     after preferences over asked once: the voters who can
+                     name a party but won't rank Labor against the Coalition
+                     (Spectre asks both of the same voters, and its lean on
+                     asked once is about zero)
+     first − leaner  asked once over after a follow-up: a follow-up can only
+                     shrink a pollster's own undecided share, but different
+                     pollsters ask each way, so this gap also carries how
+                     differently they poll – the panel says so */
+const gapOf = (a, b) => {
+  const A = UNDM && UNDM[a], B = UNDM && UNDM[b];
+  if (!A || !B || !A.nowDraws || !B.nowDraws) return null;
+  const n = Math.min(A.nowDraws.length, B.nowDraws.length), d = new Float64Array(n);
+  for (let i = 0; i < n; i++) d[i] = A.nowDraws[i] - B.nowDraws[(i * 7919) % n];
+  const lo = pmQuant(d, 0.025), hi = pmQuant(d, 0.975), v = pmMean(d);
+  return { a, b, v: r1(v), lo: r1(lo), hi: r1(hi), sig: lo > 0 || hi < 0 };
+};
+const undecidedGaps = [gapOf("tpp", "first"), gapOf("first", "leaner")].filter(Boolean);
 /* the past terms' modelled lines (build-undecided-history.mjs) and the polls
    behind them, for the panel's window; federal only */
 const undecidedHistory = JUR ? null : (() => {
@@ -4171,8 +4254,8 @@ const undecidedHistory = JUR ? null : (() => {
 const undecided = undecidedSeries.length ? {
   series: undecidedSeries,
   ...(undecidedHistory ? { history: undecidedHistory } : {}),
+  ...(undecidedGaps.length ? { gaps: undecidedGaps } : {}),
   softAge,
-  softResolve,
   n: undecidedRows.length,
   houses: creditHouses(undecidedRows, (r) => r.p.pollster, (r) => Date.parse(r.p.date)),
 } : null;

@@ -123,6 +123,21 @@
   --confidence-main: oklch(0.50 0.105 305);
   --confidence-alt: oklch(0.60 0.115 83);
   --confidence-third: oklch(0.52 0.085 175);
+  /* The Decidedness panel's five lines (gen-data §5c), one question each:
+     the undecided share asked once (plum), after a follow-up (gold) and after
+     preferences (ink) on one chart; the soft share by pollster, Resolve
+     (teal) and RedBridge (ink-2), on the other. Plum/gold/teal pass the
+     dataviz validator's lightness, chroma, all-pairs CVD and normal-vision
+     checks on --surface (2026-11-23); the two neutrals split from their
+     chart-mates by lightness, and every line is also named at its end.
+     Until then the lines were three greys told apart by dashes. Clear of
+     the party palette: gold is not One Nation orange, plum not Coalition
+     blue, teal not Greens green. */
+  --dec-once: oklch(0.48 0.12 310);
+  --dec-leaner: oklch(0.64 0.13 88);
+  --dec-pref: var(--ink);
+  --dec-resolve: oklch(0.58 0.12 195);
+  --dec-redbridge: var(--ink-2);
   /* The Economic sentiment panel's "Inflation & growth" view: ABS CPI and
      GDP-per-capita lanes (the OECD comparators draw in --ink-2 – context,
      never principals). Ochre and deep steel sit clear of the party palette
@@ -269,6 +284,12 @@ body.dark {
   --confidence-main: oklch(0.70 0.105 305);
   --confidence-alt: oklch(0.72 0.115 83);
   --confidence-third: oklch(0.70 0.085 175);
+  /* the Decidedness lines, stepped for the dark surface (validated there) */
+  --dec-once: oklch(0.64 0.14 312);
+  --dec-leaner: oklch(0.66 0.135 88);
+  --dec-pref: var(--ink);
+  --dec-resolve: oklch(0.66 0.12 195);
+  --dec-redbridge: var(--ink-2);
   /* the Inflation & growth view's CPI / GDP-per-capita lanes, lifted too */
   --macro-cpi: oklch(0.72 0.115 40);
   --macro-gdppc: oklch(0.70 0.095 230);

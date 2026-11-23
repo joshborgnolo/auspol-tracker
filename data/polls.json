@@ -1662,7 +1662,8 @@
       },
       "url": "https://www.afr.com/politics/federal/youthquake-coalition-deserted-by-younger-voters-20250701-p5mbja",
       "releaseUrl": "https://www.accent-research.com/projects/australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_59aef60e2d644fc38ed58658564239b1.pdf",
+      "undecidedLeaner": 7
     },
     {
       "date": "2025-07-01",
@@ -1680,7 +1681,10 @@
       "oth": null,
       "tpp_alp": 56.5,
       "tpp_lnp": 43.5,
-      "url": "https://www.spectrestrategy.com/blog-3-1/austalian-federal-polling-update-july-2025"
+      "url": "https://www.spectrestrategy.com/blog-3-1/austalian-federal-polling-update-july-2025",
+      "tpp_undecided": {
+        "lnponp": 10
+      }
     },
     {
       "date": "2025-07-06",
@@ -1918,7 +1922,8 @@
       },
       "url": "https://www.afr.com/politics/federal/liberal-party-risks-permanent-opposition-without-youth-vote-20250911-p5mueg",
       "releaseUrl": "https://www.accent-research.com/projects/australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_59aef60e2d644fc38ed58658564239b1.pdf",
+      "undecidedLeaner": 8
     },
     {
       "date": "2025-09-11",
@@ -2403,7 +2408,10 @@
       "oth": null,
       "tpp_alp": 53,
       "tpp_lnp": 47,
-      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-polling-update-november-2025"
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-polling-update-november-2025",
+      "tpp_undecided": {
+        "lnponp": 12.9
+      }
     },
     {
       "date": "2025-11-17",
@@ -2506,8 +2514,41 @@
       "tpp_alp": 54,
       "tpp_lnp": 46,
       "url": "https://www.afr.com/politics/federal/one-in-four-male-gen-xers-now-support-one-nation-20251201-p5njot",
-      "releaseUrl": "https://www.accent-research.com/projects/australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf"
+      "releaseUrl": "https://www.accent-research.com/projects/australian-financial-review-redbridge-group-and-accent-research-large-sample-federal-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_59aef60e2d644fc38ed58658564239b1.pdf",
+      "undecidedLeaner": 8,
+      "firmness": {
+        "all": [
+          47,
+          44,
+          9
+        ],
+        "alp": [
+          49,
+          44,
+          7
+        ],
+        "lnp": [
+          51,
+          39,
+          10
+        ],
+        "onp": [
+          50,
+          43,
+          7
+        ],
+        "grn": [
+          43,
+          48,
+          9
+        ],
+        "oth": [
+          29,
+          52,
+          19
+        ]
+      }
     },
     {
       "date": "2025-12-02",
@@ -2632,7 +2673,6 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1574,
-      "undecided": 5,
       "alp": 30.5,
       "lnp": 27.5,
       "grn": 13,
@@ -2749,7 +2789,8 @@
         "Lib": 28,
         "Nat": 2.5
       },
-      "url": "https://www.roymorgan.com/findings/federal-voting-intention-late-january-alp-increases-two-party-preferred-lead-as-one-nation-overtakes-the-liberal-party-for-the-first-time-as-coalition-splits"
+      "url": "https://www.roymorgan.com/findings/alp-two-party-lead-is-smallest-since-the-federal-election-following-the-bondi-shooting-alp-52-cf-l-np-48",
+      "undecided": 4.5
     },
     {
       "date": "2026-01-16",
@@ -2813,7 +2854,8 @@
         "Lib": 22,
         "Nat": 2
       },
-      "url": "https://www.roymorgan.com/findings/federal-voting-intention-late-january-alp-increases-two-party-preferred-lead-as-one-nation-overtakes-the-liberal-party-for-the-first-time-as-coalition-splits"
+      "url": "https://www.roymorgan.com/findings/9967-federal-voting-intention-january-18-2026",
+      "undecided": 4
     },
     {
       "date": "2026-01-18",
@@ -2850,7 +2892,8 @@
       "tpp_lnp": null,
       "url": "https://www.capitalbrief.com/article/pauline-hanson-leads-sussan-ley-as-preferred-pm-as-one-nation-extends-gains-647f3210-a525-4aea-aa0c-f97fb1d226bb/",
       "releaseUrl": "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Federal-Poll-January-2026-FINAL.pdf",
-      "methodUrl": "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Federal-Poll-January-2026-FINAL.pdf"
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Federal-Poll-January-2026-FINAL.pdf",
+      "undecidedLeaner": 6
     },
     {
       "date": "2026-01-23",
@@ -2879,7 +2922,7 @@
       "dateStart": "2026-01-19",
       "pollster": "Roy Morgan",
       "client": "—",
-      "sample": 1933,
+      "sample": 1653,
       "undecided": 5.5,
       "alp": 30.5,
       "lnp": 22.5,
@@ -3597,7 +3640,8 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
-      "methodUrl": "https://cdn.australiainstitute.org.au/2026/05/18024445/Polling-Gas-tax-LDS-March-2026.pdf"
+      "methodUrl": "https://cdn.australiainstitute.org.au/2026/05/18024445/Polling-Gas-tax-LDS-March-2026.pdf",
+      "undecided": 8
     },
     {
       "date": "2026-03-19",
@@ -3617,7 +3661,8 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.accent-research.com/projects/australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025",
-      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf"
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
+      "undecidedLeaner": 8
     },
     {
       "date": "2026-03-22",
