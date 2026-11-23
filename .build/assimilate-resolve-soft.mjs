@@ -1,10 +1,11 @@
-// Add Resolve's vote-firmness series to the current-term Resolve rows in
-// polls.json. The CSV carries TOTAL SOFT per wave, nationally and by age
-// band; the tracker row gets `soft: n` (the other number in the published
-// pair — TOTAL HARD, the "committed" share — is 100 - n) and
-// `softAge: { "18-34", "35-54", "55+" }`. New waves get both from
-// assimilate-resolve-vi.mjs; this fills rows curated before it, and any row
-// missing either. Dry-run by default; --apply writes.
+// Add Resolve's vote-firmness series to every matching Resolve row in
+// polls.json, including the completed terms in cyclePolls. The CSV carries
+// TOTAL SOFT per wave, nationally and by age band; the tracker row gets
+// `soft: n` (the other number in the published pair — TOTAL HARD, the
+// "committed" share — is 100 - n) and `softAge: { "18-34", "35-54", "55+" }`.
+// New current-term waves get both from assimilate-resolve-vi.mjs; this fills
+// rows curated before it, any row missing either, and the published archive
+// back to Resolve's first wave in April 2021. Dry-run by default; --apply writes.
 //
 // Tolerant ±2d date matching, same as the approval backfill: the tracker's
 // Resolve waves are keyed on publication date while the CSV keys the wave's
@@ -34,14 +35,19 @@ const softNear = (iso) => {
 };
 
 const D = JSON.parse(readFileSync("data/polls.json", "utf8"));
+const targets = [
+  ...D.polls.filter((p) => p.pollster === "Resolve").map((p) => ({ p, where: `polls ${p.date}` })),
+  ...Object.entries(D.cyclePolls || {}).flatMap(([cycle, rows]) => rows
+    .filter((p) => p.firm === "Resolve Strategic" || p.firm === "Resolve")
+    .map((p) => ({ p, where: `cyclePolls.${cycle} ${p.date}` }))),
+];
 let matched = 0, filled = 0;
 const misses = [];
-for (const p of D.polls) {
-  if (p.pollster !== "Resolve" || p.date < "2025-05-04") continue;
+for (const { p, where } of targets) {
   const f = softNear(p.date);
-  if (!f) { misses.push(p.date); continue; }
+  if (!f) { misses.push(where); continue; }
   matched++;
-  if (f.date !== p.date) console.log(`  ${p.date}: firmness from CSV wave ${f.date}`);
+  if (f.date !== p.date) console.log(`  ${where}: firmness from CSV wave ${f.date}`);
   const age = Object.keys(f.age).length === 3 ? f.age : null;
   if (p.soft !== f.v || (age && JSON.stringify(p.softAge) !== JSON.stringify(age))) filled++;
   p.soft = f.v;

@@ -686,6 +686,49 @@ export function validate(D) {
       });
     }
   }
+  /* 8b1. decidedness fields on completed-term rows. The early RedBridge
+     charts are deliberately partial: an unprinted cohort is absent, and an
+     unprinted third-category label is null rather than a residual dressed up
+     as a published zero. Resolve's historical house name is Resolve
+     Strategic; RedBridge's pre-AFR name is RedBridge Group. */
+  for (const [cycle, rows] of Object.entries(D.cyclePolls || {})) {
+    for (const p of rows) {
+      const where = `cyclePolls.${cycle} ${p.date} · ${p.firm}`;
+      if (p.soft != null && !(p.soft >= 0 && p.soft <= 60))
+        errors.push({ type: "soft-range", poll: where, detail: `soft = ${p.soft} (bounds 0–60)` });
+      if (p.softAge != null) {
+        if (!["Resolve", "Resolve Strategic"].includes(p.firm))
+          errors.push({ type: "softage-pollster", poll: where, detail: "softAge on a non-Resolve row" });
+        for (const k of ["18-34", "35-54", "55+"])
+          if (!(p.softAge[k] >= 0 && p.softAge[k] <= 100))
+            errors.push({ type: "softage-shape", poll: where, detail: `softAge.${k} = ${p.softAge[k]}` });
+      }
+      if (p.firmness != null) {
+        if (!["RedBridge/Accent", "RedBridge Group"].includes(p.firm)) {
+          errors.push({ type: "firm-pollster", poll: where, detail: "unsupported firmness house" });
+        } else {
+          for (const [k, t] of Object.entries(p.firmness)) {
+            if (!["all", "alp", "lnp", "onp", "grn", "oth"].includes(k) || !Array.isArray(t) || t.length !== 3) {
+              errors.push({ type: "firm-shape", poll: where, detail: `${k} = ${JSON.stringify(t)}` });
+              continue;
+            }
+            if (t.slice(0, 2).some((v) => !(v >= 0 && v <= 100)) || (t[2] != null && !(t[2] >= 0 && t[2] <= 100)))
+              errors.push({ type: "firm-shape", poll: where, detail: `${k} = ${JSON.stringify(t)}` });
+            else if (t[2] != null && Math.abs(t.reduce((a, v) => a + v, 0) - 100) > 2)
+              errors.push({ type: "firm-sum", poll: where, detail: `${k} sums to ${t.reduce((a, v) => a + v, 0)}` });
+          }
+        }
+      }
+      if (p.dateStart != null && (!validISO(p.dateStart) || p.dateStart > p.date))
+        errors.push({ type: "fieldwork-dates", poll: where, detail: `dateStart ${p.dateStart} must be a real day no later than ${p.date}` });
+      if (p.sample != null && !(Number.isInteger(p.sample) && p.sample > 0))
+        errors.push({ type: "sample-shape", poll: where, detail: `sample = ${p.sample}` });
+      if (p.sampleEff != null && (!(p.sampleEff > 0) || p.sampleEff > p.sample))
+        errors.push({ type: "sampleeff-shape", poll: where, detail: `sampleEff = ${p.sampleEff}` });
+      if (p.firmnessSource != null && !/^https:\/\/.+\..+\//.test(p.firmnessSource))
+        errors.push({ type: "firmness-source", poll: where, detail: `source = ${p.firmnessSource}` });
+    }
+  }
   if (D.cycleApproval) {
     for (const [cycle, rows] of Object.entries(D.cycleApproval)) {
       let prev = "";
