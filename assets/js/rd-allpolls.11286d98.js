@@ -1654,6 +1654,50 @@ function RdApIssMini({
     textAnchor: "middle"
   }, D.monthName(Number(ym.slice(5)))) : null)));
 }
+const RD_AP_ON25_EDUC = ["Less than year 12", "Year 12", "TAFE", "Undergraduate", "Postgraduate"];
+const RD_AP_ON25_LOCS = [["Inner metro", "Inner metro"], ["Outer metro", "Outer metro"], ["Reg & Rur", "Rural/regional"]];
+const RD_AP_ON25_AGES = ["18–34", "35–54", "55+"];
+function RdApOnp2025({
+  data
+}) {
+  if (!data) return null;
+  return React.createElement("div", {
+    className: "rd-apd-on25"
+  }, React.createElement("span", {
+    className: "rd-apd-h"
+  }, "One Nation\u2019s support within 2025 voting cohorts"), React.createElement("div", {
+    className: "rd-apd-on25-cols"
+  }, [["lnp", "Coalition"], ["alp", "Labor"]].filter(([k]) => data[k]).map(([k, party]) => React.createElement("div", {
+    key: k,
+    className: "rd-apd-on25-set"
+  }, React.createElement("span", {
+    className: "rd-apd-on25-tag"
+  }, "Modelled, MRP estimates"), React.createElement("table", {
+    className: "rd-ldg-t rd-apd-on25-t"
+  }, React.createElement("caption", null, "One Nation share of 2025 ", party, " voters"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "col"
+  }, "Age cohort"), RD_AP_ON25_EDUC.map(ed => React.createElement("th", {
+    key: ed,
+    scope: "col",
+    className: "num"
+  }, ed)))), RD_AP_ON25_LOCS.filter(([loc]) => data[k][loc]).map(([loc, label]) => React.createElement("tbody", {
+    key: loc
+  }, React.createElement("tr", {
+    className: "rd-apd-on25-loc"
+  }, React.createElement("th", {
+    scope: "rowgroup",
+    colSpan: RD_AP_ON25_EDUC.length + 1
+  }, label)), RD_AP_ON25_AGES.filter(age => data[k][loc][age]).map(age => React.createElement("tr", {
+    key: age
+  }, React.createElement("th", {
+    scope: "row"
+  }, age), RD_AP_ON25_EDUC.map(ed => React.createElement("td", {
+    key: ed,
+    className: "num"
+  }, rdApNum(data[k][loc][age][ed]))))))))))), React.createElement("span", {
+    className: "rd-apd-sub rd-apd-note"
+  }, "Each figure is the modelled One Nation share of that recalled-2025-vote group, by location, age and education, %. These are switch rates, not the primary-vote shares above."));
+}
 function RdApDetail({
   p,
   onM,
@@ -1833,7 +1877,7 @@ function RdApDetail({
         role: "cell"
       }, tv == null ? "—" : rdApNum(tv));
     }));
-    return React.createElement("div", {
+    return React.createElement(React.Fragment, null, React.createElement("div", {
       className: "rd-apd-demwrap"
     }, React.createElement("span", {
       className: "rd-apd-h"
@@ -1861,7 +1905,9 @@ function RdApDetail({
       key: k.id
     }, cell(v[K.indexOf(k.id)], k.id)))))))))), React.createElement("span", {
       className: "rd-apd-sub rd-apd-note"
-    }, "Primary vote within each group, %. Shaded: five points or more above the poll\u2019s all-voters figure; faded: five or more below.", pr ? " Marked: " + pr.a + " and " + pr.b + ", the two groups the row compares." : ""));
+    }, "Primary vote within each group, %. Shaded: five points or more above the poll\u2019s all-voters figure; faded: five or more below.", pr ? " Marked: " + pr.a + " and " + pr.b + ", the two groups the row compares." : "")), React.createElement(RdApOnp2025, {
+      data: p.grp.onp2025
+    }));
   })();
   const demFacts = (() => {
     if (!isDem || !p.grp) return null;
@@ -3043,7 +3089,9 @@ function rdLgLines(p, {
         key: k.id
       }, pty(k.id, sg(pr.gap[k.id])))), React.createElement(U, {
         soft: true
-      }, nG, " groups in ", rdNumWord(nC), " breakdown", nC === 1 ? "" : "s"))
+      }, nG, " groups in ", rdNumWord(nC), " breakdown", nC === 1 ? "" : "s"), p.grp.onp2025 && React.createElement(U, {
+        soft: true
+      }, "plus One Nation by 2025 vote, place, age and education"))
     });
   }
   const seats = p.seats && p.seats.p ? rdLgPrims().filter(k => p.seats.p[k.id]) : [];
