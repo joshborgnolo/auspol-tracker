@@ -812,7 +812,10 @@ function TrendChart(props) {
     showSpine(nearestSpine(p.x));
   };
 
-  const handleLeave = () => {
+  const handleLeave = (event) => {
+    // Safari can fire a root mouseout while moved to another drawn element
+    // in this same chart; that is not a chart exit or an outside dismissal.
+    if (event?.relatedTarget instanceof Node && ref.current?.contains(event.relatedTarget)) return;
     setHover(null); setDotFrom(null, null); setEvt(null); onHoverIndex && onHoverIndex(null);
   };
 
@@ -1939,8 +1942,12 @@ function TrendChart(props) {
                  (the explainer's state-flows chart; user 2026-10-22) */
               <circle cx={x} cy={y} r={PX(m.r != null ? m.r : 3)} style={{ fill: m.color ? m.color : "var(--ink)" }} />
             ) : (
-              <circle cx={x} cy={y} r={PX(m.r || 5)} className="rd-ring"
-                      style={m.color ? { stroke: m.color } : null} />
+              <>
+                <circle cx={x} cy={y} r={PX(m.r || 5)} className="rd-ring"
+                        style={m.color ? { stroke: m.color } : null} />
+                {m.dotColor && <circle cx={x} cy={y} r={PX(1.35)} className="rd-ring-inclusion"
+                                       style={{ fill: m.dotColor, stroke: "none" }} />}
+              </>
             )}
             {m.label && (
               <text x={x + PX(m.labelDx != null ? m.labelDx : 10)} y={y + PX(m.labelDy != null ? m.labelDy : 22)}

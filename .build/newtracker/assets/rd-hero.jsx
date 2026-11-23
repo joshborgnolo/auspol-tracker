@@ -275,9 +275,9 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
       const st = style(k, t);
       if (!st) continue;
       const pts = [];
-      if (t.open[k] != null) pts.push({ x: t.a, y: t.open[k], count: t.year });
+      if (t.open[k] != null) pts.push({ x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [] });
       for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[1], raw: m[2], ci: m[3], n: m[4], note: "polls " + m[2].toFixed(1) });
-      if (t.close[k] != null) pts.push({ x: t.b, y: t.close[k], count: t.src });
+      if (t.close[k] != null) pts.push({ x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [] });
       if (!pts.length) continue;
       const runs = [[pts[0]]];
       for (let i = 1; i < pts.length; i++) {
@@ -298,7 +298,14 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
       for (const p of pts) {
         if (p.count) {
           const key = k + "|" + p.x.toFixed(3) + "|" + p.y;
-          if (!ringSeen.has(key)) { ringSeen.add(key); marks.push({ x: p.x, y: p.y, color: st.color, r: opt.long ? 3 : 4.5, hidden: st.opacity === 0 }); }
+          // Keep both count definitions. A centre dot marks the vote of the
+          // distinct party folded into this term's Others count.
+          if (!ringSeen.has(key)) {
+            ringSeen.add(key);
+            marks.push({ x: p.x, y: p.y, color: st.color,
+              dotColor: p.otherIncludes?.length === 1 ? style(p.otherIncludes[0], t).color : null,
+              r: opt.long ? 3 : 4.5, hidden: st.opacity === 0 });
+          }
         }
         const sk = p.x.toFixed(4);
         if (!stopSeen.has(sk)) { stopSeen.add(sk); stops.push({ x: p.x, y: p.y, count: p.count || null }); }

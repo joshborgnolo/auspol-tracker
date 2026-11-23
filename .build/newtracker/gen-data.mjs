@@ -9994,9 +9994,11 @@ const voteHistory = JUR ? null : (() => {
       v.tpp = cycleTppImp(p, { ...c, gov: "alp" });
       return { p, v, mid: Date.parse(p.date), ym: ymOf(p.date) };
     });
+    const otherIncludes = (e) => SEP.filter((k) => e[k] > 0 && !lanes.includes(k));
     /* a and b unrounded: the charts' term windows are the same dx of the same
        dates, and a ring a rounding outside its window is culled */
     const out = { year: c.year, src: c.src, gov: c.gov, pm: c.pm, a: xO, b: xC, lanes: all,
+                  otherIncludes: { open: otherIncludes(eO), close: otherIncludes(eC) },
                   miss: {}, open: {}, close: {}, n: src.length, series: {} };
     for (const k of all) {
       const rows = read.filter((r) => r.v[k] != null)

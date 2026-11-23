@@ -85,7 +85,7 @@ const readHero = () => page.evaluate(() => {
   const sec = document.querySelector("section.rd-tpp");
   const inkProbe = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   inkProbe.style.stroke = "var(--ink)";
-  sec.querySelector("svg").appendChild(inkProbe);
+  sec.querySelector(".chart-svg").appendChild(inkProbe);
   const ink = getComputedStyle(inkProbe).stroke;
   inkProbe.remove();
   const rings = [...sec.querySelectorAll("circle.rd-ring")].map((c) => {
@@ -155,7 +155,7 @@ if (h1.rings.length && h1.main) {
 
 /* --- hero: hover a recent month → plain squares --- */
 const box = await page.evaluate(() => {
-  const r = document.querySelector("section.rd-tpp svg").getBoundingClientRect();
+  const r = document.querySelector("section.rd-tpp .chart-svg").getBoundingClientRect();
   return { x: r.x, y: r.y, w: r.width, h: r.height };
 });
 await hoverAt(box.x + box.w - 40, box.y + box.h / 2);
@@ -198,7 +198,7 @@ if (prim.found && prim.rings.length) {
   check("primary election hover: rings in per-party colours",
     t.borders && new Set(t.borders).size >= 4, JSON.stringify(t.borders));
   const pbox = await page.evaluate(() => {
-    const r = document.querySelector("#primary-vote svg").getBoundingClientRect();
+    const r = document.querySelector("#primary-vote .chart-svg").getBoundingClientRect();
     return { x: r.x, y: r.y, w: r.width, h: r.height };
   });
   await hoverAt(pbox.x + pbox.w - 40, pbox.y + pbox.h / 2);
