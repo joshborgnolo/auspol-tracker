@@ -273,14 +273,14 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
       if (!st) continue;
       const pts = [], counts = [];
       if (t.open[k] != null) {
-        const p = { x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [] };
+        const p = { x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [], otherIncludedVotes: t.otherIncludedVotes?.open || {} };
         counts.push(p);
         if (!opt.measured) pts.push(p);
       }
       for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[opt.measured ? 2 : 1], raw: m[2], ci: m[opt.measured ? 5 : 3], n: m[4],
         note: opt.measured ? undefined : "polls " + m[2].toFixed(1) });
       if (t.close[k] != null) {
-        const p = { x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [] };
+        const p = { x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [], otherIncludedVotes: t.otherIncludedVotes?.close || {} };
         counts.push(p);
         if (!opt.measured) pts.push(p);
       }
@@ -311,6 +311,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
             ringSeen.add(key);
             marks.push({ x: p.x, y: p.y, color: st.color,
               dotColor: k === "oth" && p.otherIncludes?.length === 1 ? style(p.otherIncludes[0], t).color : null,
+              dotVote: k === "oth" && p.otherIncludes?.length === 1 ? p.otherIncludedVotes[p.otherIncludes[0]] : null,
               r: opt.long ? 3 : 4.5, hidden: st.opacity === 0 });
           }
         }

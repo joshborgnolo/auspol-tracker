@@ -20,6 +20,7 @@ const rings = result.marks.filter((m) => Math.abs(m.x - electionX) < 1e-8);
 assert.equal(rings.length, 2, "the closing and next-opening Rings definitions both draw");
 assert.deepEqual(rings.map((m) => m.y).sort((a, b) => a - b), [9.85, 14.15], "both counted values remain");
 assert.equal(rings.filter((m) => m.dotColor === "var(--onp)").length, 1, "the One-Nation-inclusive ring gets the orange centre");
+assert.equal(rings.find((m) => m.dotColor === "var(--onp)").dotVote, 4.3, "the One-Nation-inclusive ring carries its party's election vote");
 assert.equal(rings.filter((m) => !m.dotColor).length, 1, "the ring excluding One Nation stays hollow");
 assert(rings.every((m) => m.color === "var(--oth)"), "the outer rings retain the Others colour");
 assert.equal(result.stops.filter((point) => point.x === electionX).length, 1, "the electoral spine remains unique");

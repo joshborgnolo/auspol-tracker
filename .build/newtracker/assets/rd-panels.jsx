@@ -702,8 +702,13 @@ function RdPrimary({ rangeId, setRangeId }) {
     const curYear = (vwTerms.find((t) => t.current) || {}).year;
     const bridges = L.series.some((sr) => sr.dash === RD_VH_BRIDGE);
     const unmeasured = G ? [] : VH.terms.filter((t) => t.miss.alp == null && t.b > xDomain[0] && t.a < xDomain[1]);
-    const inclusions = ["grn", "onp"].filter((k) => vhMarks.some((m) => m.dotColor === D.PARTIES[k].color))
-      .map((k) => ({ kind: "ring", color: D.PARTIES.oth.color, dotColor: D.PARTIES[k].color, label: D.PARTIES[k].name + " included in Others" }));
+    const inclusions = ["grn", "onp"].map((k) => {
+      const m = vhMarks.find((q) => q.dotColor === D.PARTIES[k].color);
+      return m ? { id: k, vote: k === "grn" ? 0 : m.dotVote } : null;
+    }).filter(Boolean).map((d, i, a) => ({
+      kind: "ring", color: D.PARTIES.oth.color, dotColor: D.PARTIES[d.id].color,
+      label: D.PARTIES[d.id].name + " included in Others" + (a.length === 1 && d.vote != null ? " (" + d.vote + "%)" : ""),
+    }));
     return {
       series: (curIn ? chartSeries.map((sr) => ({ ...sr, ...(vwAtNow ? {} : { endLabel: null }), ...(vhLong ? { rdWidth: sr.id === "oth" ? 1.4 : 1.6 } : {}) })) : []).concat(L.series),
       areas: (curIn && !vhLong ? areas : []).concat(L.areas),

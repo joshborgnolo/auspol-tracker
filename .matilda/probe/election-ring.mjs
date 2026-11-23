@@ -260,6 +260,26 @@ for (const party of ["Greens", "One Nation"]) {
     JSON.stringify(arcs));
 }
 
+/* a lone inclusion key names its vote; two keys stay unannotated (above) */
+const inclusionTitles = () => page.evaluate(() => [...document.querySelectorAll("#primary-vote .rd-key .rd-key-item")]
+  .map((el) => el.textContent).filter((s) => s.includes("included in Others")));
+await page.evaluate(() => {
+  const t = AUSPOL.voteHistory.terms.find((q) => q.year === 2001);
+  rdVwPut({ kind: "term", year: t.year, a: t.a, b: t.b }, false);
+});
+await sleep(900);
+const onKey = await inclusionTitles();
+check("2001: lone One Nation inclusion key carries its 4.3% vote",
+  onKey.length === 1 && onKey[0] === "One Nation included in Others (4.3%)", JSON.stringify(onKey));
+await page.evaluate(() => {
+  const t = AUSPOL.voteHistory.terms.find((q) => q.year === 1990);
+  rdVwPut({ kind: "term", year: t.year, a: t.a, b: t.b }, false);
+});
+await sleep(900);
+const grnKey = await inclusionTitles();
+check("1990–93: lone Greens inclusion key carries its specified zero vote",
+  grnKey.length === 1 && grnKey[0] === "Greens included in Others (0%)", JSON.stringify(grnKey));
+
 await browser.close();
 server.close();
 console.log(fails ? "\n" + fails + " check(s) FAILED" : "\nall checks passed");
