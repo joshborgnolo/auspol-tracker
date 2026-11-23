@@ -41,4 +41,19 @@ for (const [avg, own] of [["oecd-avg", "oecd-au"], ["edelman-avg", "edelman"]]) 
     assert.ok(r.countries > 1, avg + " round " + r.date + " says how many countries it averages");
   }
 }
+
+// The AES long-view headline uses a live ten-point-rounded share, framed to
+// emphasise how low trust is rather than imply an exact percentage.
+const jsx = fs.readFileSync(new URL("./newtracker/assets/rd-panels.jsx", import.meta.url), "utf8");
+const helperSource = jsx.match(/  function trustNoMoreThan\(v\) \{[\s\S]*?\n  \}/);
+assert.ok(helperSource, "AES headline rounding helper");
+const words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const trustNoMoreThan = new Function("NUM_WORDS", helperSource[0] + "; return trustNoMoreThan;")(words);
+assert.equal(trustNoMoreThan(32), "No more than three in ten");
+assert.equal(trustNoMoreThan(34.99), "No more than three in ten");
+assert.equal(trustNoMoreThan(35), "No more than four in ten");
+assert.equal(trustNoMoreThan(5), "No more than one in ten");
+assert.equal(trustNoMoreThan(95), "No more than ten in ten");
+assert.match(jsx, /trustNoMoreThan\(aesNow\.v\) \+ " Australians say people in government can be trusted"/);
+
 console.log("trust-government: ok (" + S.length + " series, " + S.reduce((n, s) => n + s.readings.length, 0) + " readings)");

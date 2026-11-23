@@ -2518,17 +2518,22 @@ function RdTrustSeparate() {
   const otherNames = rdList(dotSeries.filter((s) => s.readings.some((r) => r.x >= x0)).map((s) => s.house));
   const breakYear = lineRuns.length > 1 ? lineRuns[1][0].date.slice(0, 4) : null;
 
+  function trustNoMoreThan(v) {
+    return "No more than " + NUM_WORDS[Math.round(v / 10)] + " in ten";
+  }
+
   /* ---- the long view's words ---------------------------------------------
-     head (AES, the longest series): its latest share; "the lowest on
-     record" when it is the minimum, else "up from <year>'s record low" when
-     the low is one of the last three elections and the latest stands five
-     or more points above it (the AES's ~2,000-a-wave samples put a 95%
-     margin of about three points on a difference). */
+     head (AES, the longest series): its latest share rounded to the nearest
+     ten points and said as "No more than …" to emphasise how low trust is;
+     "the lowest on record" when it is the minimum, else "up from <year>'s
+     record low" when the low is one of the last three elections and the
+     latest stands five or more points above it (the AES's ~2,000-a-wave
+     samples put a 95% margin of about three points on a difference). */
   const aes = S.aes, sc = S.scanlon, oa = S["oecd-au"], ov = S["oecd-avg"];
   const aesNow = aes && aes.readings[aes.readings.length - 1];
   const aesMin = aes && aes.readings.reduce((m, r) => (r.v < m.v ? r : m));
   const aesRecent = aes && aes.readings.slice(-4, -1).includes(aesMin);
-  const longHead = !aes ? "" : plainShare(aesNow.v) + " say people in government can be trusted"
+  const longHead = !aes ? "" : trustNoMoreThan(aesNow.v) + " Australians say people in government can be trusted"
     + (aesNow === aesMin ? ", the lowest on record"
       : aesRecent && aesNow.v - aesMin.v >= 5 ? ", up from " + aesMin.date.slice(0, 4) + "’s record low" : "");
   /* dek: Scanlon's latest (its online panel) against that panel's own high
