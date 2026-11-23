@@ -1,0 +1,41 @@
+{
+  "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
+  "textHash": "57bb5aed59110743",
+  "readAt": "2026-11-23T21:33:50.611Z",
+  "reading": {
+    "scope": "demosau",
+    "fields": {
+      "alp": {
+        "para": 6,
+        "quote": "Labor lifted its primary vote by one percentage point since October to 27%",
+        "value": 27,
+        "from": 26
+      },
+      "lnp": {
+        "para": 6,
+        "quote": "with the Coalition also up a point to 25%",
+        "value": 25,
+        "from": 24
+      },
+      "grn": {
+        "para": 6,
+        "quote": "The Greens fell a point to 12%",
+        "value": 12,
+        "from": 13
+      },
+      "onp": {
+        "para": 6,
+        "quote": "One Nation down three points to 23% in third place",
+        "value": 23,
+        "from": 26
+      },
+      "oth": {
+        "para": 6,
+        "quote": "with others, including independents, climbing two points to 13%",
+        "value": 13,
+        "from": 11
+      }
+    },
+    "notes": "All five national primary votes and their changes are stated in paragraph 6."
+  }
+}

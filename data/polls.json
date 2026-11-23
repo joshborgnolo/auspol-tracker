@@ -6748,6 +6748,24 @@
       "tpp_lnp": null,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e",
       "undecidedLeaner": 7
+    },
+    {
+      "date": "2026-11-20",
+      "dateStart": "2026-11-16",
+      "published": "2026-11-24T05:00",
+      "pollster": "DemosAU",
+      "client": "Capital Brief",
+      "sample": 1464,
+      "alp": 27,
+      "lnp": 25,
+      "grn": 12,
+      "onp": 23,
+      "ind": 13,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
+      "fieldworkPending": true
     }
   ],
   "ppm": [

@@ -6,7 +6,14 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national polling release as it enters the tracker – voting intention, leader ratings, national direction, the issues and vote breakdowns included. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Thu, 19 Nov 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 20 Nov 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>DemosAU, 16–20 Nov 2026 – ALP 27, L/NP 25, GRN 12, ON 23, Ind/Oth 13</title>
+      <link>https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-11-20|DemosAU</guid>
+      <pubDate>Fri, 20 Nov 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 25, GRN 12, ON 23, Ind/Oth 13. No two-party figure published. Sample 1,464. Fieldwork 16–20 Nov 2026.</description>
+    </item>
     <item>
       <title>Newspoll, 16–19 Nov 2026 – ALP 27, L/NP 22, GRN 14, ON 27, Ind/Oth 10</title>
       <link>https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e</link>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-08-30|Roy Morgan</guid>
       <pubDate>Sun, 30 Aug 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 29.5, L/NP 20.5, GRN 13.5, ON 23.5, Ind/Oth 13. Two-party preferred: ALP 56 – L/NP 44. Undecided 6.5%. Other two-party contests: ALP 55.5 – ON 44.5. National direction: right direction 28% · wrong track 59% · unsure 13%. Sample 1,585. Fieldwork 24–30 Aug 2026.</description>
-    </item>
-    <item>
-      <title>Newspoll, 24–28 Aug 2026 – ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9</title>
-      <link>https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b</link>
-      <guid isPermaLink="false">auspol-tracker:2026-08-28|Newspoll</guid>
-      <pubDate>Fri, 28 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9. No two-party figure published. Preferred PM: Albanese 46 – Taylor 23 – Hanson 31. Preferred PM, Albanese v Hanson: 56 – 44. Satisfaction: Albanese -21 net (38% approve, 59% disapprove); Taylor -17 net (33% approve, 50% disapprove); Hanson -1 net (47% approve, 48% disapprove). Sample 1,243. Fieldwork 24–28 Aug 2026.</description>
     </item>
   </channel>
 </rss>
