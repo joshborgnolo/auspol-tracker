@@ -264,21 +264,19 @@ function eq(name, got, want) {
   // the roll is every house's nearest slot, unsliced - on the live bar the
   // fit pass trims this to the room it actually has; the roll itself never
   // caps (a weekly house appears once, not twice inside the same week).
-  // DemosAU's window opens on the 1st, so it already rides the bar's tail
-  // as "any day now" here (window houses are bar-visible only while open) -
-  // a dated-house ticket from Essential on down, with YouGov and Spectre's
-  // standing slots ahead of it: the horizon bounds further slots, never the
-  // first, and both houses' next slots sit past 28 days (YouGov re-anchored
-  // 2026-10-07 when its 6 Oct wave landed; Spectre's 120-day cadence is
-  // ~seventeen weeks out).
+  // DemosAU's measured minimum gap is 18 days. Its 24 Aug anchor therefore
+  // cannot open next month's window on 1 Sep: the next supported opening is
+  // 11 Sep, so it stays off the bar on 1 Sep (window houses are bar-visible
+  // only while open). YouGov and Spectre's standing slots sit past 28 days,
+  // but every house still gets its first row beyond the horizon.
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
      ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"], ["YouGov", "49 days"],
-     ["Spectre Strategy", "163 days"], ["DemosAU", "any day now"]]);
+     ["Spectre Strategy", "163 days"]]);
   {
     const da = firm(rows, "DemosAU");
-    eq("DemosAU's window opens on the measured 1st, and is open on the 1st", da && panelWhen(da), "open now");
-    eq("window open → DemosAU on the bar", items.some((i) => i.firm === "DemosAU"), true);
+    eq("minimum gap defers the next month opening", da && panelWhen(da), "opens in 10 days");
+    eq("window not open → DemosAU off the bar", items.some((i) => i.firm === "DemosAU"), false);
   }
   // the hold-the-slot rule, in force while a slot is inside its two days
   // of grace: the same seed-stripped cadHold world one day past the Wed
@@ -333,6 +331,29 @@ function eq(name, got, want) {
   // "some time in the next fortnight" is the weakest claim on the bar, so
   // the window row trails every dated slot and count
   eq("the open window sits at the tail of the roll", items[items.length - 1].firm, "DemosAU");
+}
+
+// S1d – Tue 24 Nov, the live DemosAU record. Its measured minimum elapsed
+// publication gap has to constrain a calendar-month bracket too: with the
+// last release on 24 Nov and a minimum of 18 days, the earliest supported
+// opening is 12 Dec, not the next month's bare 1st. A longer synthetic gap
+// can leave nothing in that month; the walk must go to the next valid one
+// rather than construct a negative-width window.
+{
+  const { label, t0, nowMs } = scen("Tue 24 Nov, minimum publication gap", "2026-11-24", 480);
+  const da = firm(D.pollCadence, "DemosAU");
+  const iso = (ms) => new Date(ms).toISOString().slice(0, 10);
+  const rows = project([da], t0, nowMs);
+  const next = rows[0];
+  eq("the measured minimum publication interval", next && next.minPubGap, 18);
+  eq("the live window respects the whole record", next && [iso(next.field), next.opensIn, next.closesIn],
+    ["2026-12-12", 18, 33]);
+  eq("the window is not overdue", next && next.missed, false);
+  eq("panel counts to the supported opening", next && panelWhen(next), "opens in 18 days");
+  eq("window retains its measured last day", next && iso(next.release + next.spread * DAY), "2026-12-27");
+  const later = project([{ ...da, minPubGap: 40 }], t0, nowMs)[0];
+  eq("an empty following month rolls to a positive-width window",
+    later && [iso(later.field), iso(later.release + later.spread * DAY)], ["2027-01-03", "2027-01-27"]);
 }
 
 // S2 – Wed 2 Sep, 3am: the slipped slot itself expired an hour ago but the

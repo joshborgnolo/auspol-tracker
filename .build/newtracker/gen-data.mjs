@@ -10564,11 +10564,14 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      actually filed on, measured over the same published sequence the
      intervals were. Nothing declares it - it re-measures itself every build
      as the record grows, so an early-January outlier widens it and a steady
-     run keeps it narrow. DemosAU at present: the 9th to the 27th. */
+     run keeps it narrow. A day-of-month window alone is not compatible with
+     the recency of the last release: the next window's open also has to
+     respect the shortest elapsed gap between releases in this same sequence. */
   const calDays = !calMonth ? null : (() => {
     const ds = seq.map((d) => Number(d.slice(8, 10)));
     return [Math.min(...ds), Math.max(...ds)];
   })();
+  const minPubGap = calMonth ? Math.min(...gaps) : null;
   /* A MONTH-END rhythm (RedBridge/Accent): the house's weekday nearest each
      month's last day - see npMonthEndSlot in np-project.js, run here
      through NP_MONTH_END_SLOT so the rule measured is the rule projected.
@@ -10725,8 +10728,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     ...(monthEnd ? { monthEnd: true, monthEndKept, monthEndN } : {}),
     /* The month itself is the projection, not a median ± spread: npProject's
        window is the measured day-of-month range (calDays) of the month
-       after the last wave, with the bare 1st-to-last month as its fallback. */
-    ...(calMonth ? { calMonth: true, calDays } : {}),
+       after the last wave, with the bare 1st-to-last month as its fallback.
+       minPubGap keeps that day-of-month bracket compatible with the shortest
+       elapsed interval between releases in the same sequence. */
+    ...(calMonth ? { calMonth: true, calDays, minPubGap } : {}),
     waves: dates.length,
     // the house's own release index, so a reader can go and check - a
     // tracked confidence series carries its page on the rows themselves,

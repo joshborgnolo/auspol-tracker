@@ -1122,21 +1122,36 @@ function npProjectAt(nowOverride, horizonDays, includeTracked, series) {
       const ld = new Date(Date.parse(c.last));
       let sm = (ld.getUTCMonth() + 1) % 12;
       let sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
-      /* A slot month named in `skippedMonths` was confirmed absent at the
-         publisher by the house's agent - the month-grain counterpart of the
-         dated path's `skipped` roll below, and the same off-ramp from the
-         never-rolled-forward-on-a-guess rule: the slot steps one month at a
-         time to the next UNVERIFIED month rather than holding red on a
-         window verified never filed. */
-      while ((c.skippedMonths || []).includes(`${sy}-${String(sm + 1).padStart(2, "0")}`)) {
+      let open, close;
+      for (;;) {
+        /* A slot month named in `skippedMonths` was confirmed absent at the
+           publisher by the house's agent - the month-grain counterpart of the
+           dated path's `skipped` roll below, and the same off-ramp from the
+           never-rolled-forward-on-a-guess rule: the slot steps one month at a
+           time to the next UNVERIFIED month rather than holding red on a
+           window verified never filed. */
+        if (!(c.skippedMonths || []).includes(`${sy}-${String(sm + 1).padStart(2, "0")}`)) {
+          const lastDay = Date.UTC(sy, sm + 1, 0); // the next month's day 0 = this slot's last day
+          /* Day-of-month bounds cannot re-open a window before the shortest
+             recorded interval between releases has passed. The floor follows
+             the last release, not an arbitrary minimum day of this month. */
+          const nextOpen = Math.max(Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1),
+            Date.parse(c.last) + (c.minPubGap ?? 0) * DAY_MS);
+          /* a habit reaching past the 28th is not owed a day a shorter month
+             doesn't have: clamp the close to the slot month's own last day */
+          const nextClose = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
+          if (nextOpen <= nextClose) {
+            open = nextOpen;
+            close = nextClose;
+            break;
+          }
+          /* If the interval floor falls after this month's close, roll to a
+             month that can contain a positive-width window. This is a schedule
+             constraint, not a claimed publisher-confirmed absence. */
+        }
         sm += 1;
         if (sm > 11) { sm = 0; sy += 1; }
       }
-      const lastDay = Date.UTC(sy, sm + 1, 0); // the next month's day 0 = this slot's last day
-      const open = Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1);
-      /* a habit reaching past the 28th is not owed a day a shorter month
-         doesn't have: clamp the close to the slot month's own last day */
-      const close = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
       const calSpread = (close - open) / 2 / DAY_MS;
       const release = (open + close) / 2;
       const missed = close < t0;
