@@ -4671,13 +4671,42 @@ function rdGapRuns(points) {
   }
   return runs;
 }
+/* Screen the entire displayed history of one party/comparison. Widen both
+   groups' published normal-equivalent margins simultaneously (Bonferroni).
+   Intersect the monthly feasible contrasts: an empty intersection rules out
+   every constant contrast, including constant gaps far from parity. No
+   assumption of independence across groups or months is needed. */
+function rdGapChanged(group, reference, order, party, relative) {
+  const i = order.indexOf(party) + 1;
+  const refs = new Map(reference.monthly.map(row => [row[0], row]));
+  const pairs = group.monthly.map(row => [row, refs.get(row[0])]).filter(([a, b]) =>
+    b && [a, b].every(r => Number.isFinite(r[i]) && Number.isFinite(r[i + order.length]) && r[i + order.length] >= 0)
+    && (!relative || b[i] > 0));
+  if (pairs.length < 2) return false;
+  // Upper bound on the standard normal tail (Mills' inequality).
+  const tail = 0.05 / (4 * pairs.length);
+  let z = 1.96;
+  while (Math.exp(-z*z/2) / (z*Math.sqrt(2*Math.PI)) > tail) z += 0.01;
+  const bounds = r => {
+    // Shares and margins are published to one decimal place.
+    const width = (r[i + order.length] + 0.05) * z / 1.96 + 0.05;
+    return [Math.max(0, r[i] - width), Math.min(100, r[i] + width)];
+  };
+  let lower = -Infinity, upper = Infinity;
+  for (const [a, b] of pairs) {
+    const [al, ah] = bounds(a), [bl, bh] = bounds(b);
+    lower = Math.max(lower, relative ? al / bh : al - bh);
+    upper = Math.min(upper, relative ? (bl > 0 ? ah / bl : Infinity) : ah - bl);
+  }
+  return lower > upper;
+}
 function rdGapSet(st, order, mx, refLabel, relative) {
   const def = RD_GAP_REFS[st.id];
   if (!def) return null;
   const reference = st.groups.find((g) => g.label === (refLabel || def.ref));
   if (!reference) return null;
   const comparisons = st.groups.filter((g) => g !== reference).map((g) => ({
-    group: g, parties: order.map((party) => ({ party, points: rdGapPoints(g, reference, order, party, mx, relative) })),
+    group: g, parties: order.map((party) => ({ party, changed: rdGapChanged(g, reference, order, party, relative), points: rdGapPoints(g, reference, order, party, mx, relative) })),
   })).filter((c) => c.parties.some((p) => p.points.length));
   if (!comparisons.length) return null;
   const points = comparisons.flatMap((c) => c.parties.flatMap((p) => p.points));
@@ -4739,9 +4768,11 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
       <p className="rd-wv-gap-formula">{formula}</p>
       <p className="rd-wv-gap-directions">{explanation}</p>
       {def.note && <p className="rd-wv-gap-note">{def.note}</p>}
+      {!selected.parties.some(p => p.changed) && <p className="rd-wv-gap-note">No party meets the 95% change threshold for this comparison.</p>}
       <div className="rd-wv-gap-grid">
         {DEMO_PARTIES.map((pp) => {
           const party = selected.parties.find((p) => p.party === pp.id);
+          if (!party?.changed) return null;
           const points = (party ? party.points : []).filter((p) => p.x >= x0 && p.x <= x1);
           const last = points[points.length - 1];
           const color = D.PARTIES[pp.id].color;
@@ -4777,14 +4808,14 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
   );
 }
 const RdDemographicGaps = React.memo(function RdDemographicGaps({ tab, order, rangeId, model }) {
-  const [relative, setRelative] = useState(false);
+  const [relative, setRelative] = useState(true);
   return (
     <div className="rd-wv-gaps">
       <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups." />
       <div className="rd-chips" role="group" aria-label="Gap measure">
         {[false, true].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (×)" : "Absolute (pp)"}</button>)}
       </div>
-      <p className="rd-wv-gap-note">{relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. "}{model ? "Lines use the group model estimates." : "Lines use the monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Intervals for the differences are not available.</p>
+      <p className="rd-wv-gap-note">{relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. "}{model ? "Lines use the group model estimates." : "Lines use the monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Only parties showing a change over the available months in this measure are shown. The approximate 95% test accounts for checking the whole series.</p>
       {tab.sets.map((st) => <RdDemographicGapSet key={st.id} st={st} order={order} rangeId={rangeId} model={model} relative={relative} />)}
     </div>
   );

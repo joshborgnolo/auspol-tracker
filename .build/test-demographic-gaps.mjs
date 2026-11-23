@@ -5,8 +5,8 @@ import vm from "node:vm";
 
 const source = fs.readFileSync(".build/newtracker/assets/rd-panels.jsx", "utf8");
 const helper = source.slice(source.indexOf("const RD_GAP_REFS ="), source.indexOf("function RdDemographicGapSet("));
-const { rdGapPoints, rdGapRuns, rdGapSet, rdGapFmt } = new Function(helper
-  + "\nreturn {rdGapPoints, rdGapRuns, rdGapSet, rdGapFmt};")();
+const { rdGapPoints, rdGapRuns, rdGapSet, rdGapChanged, rdGapFmt } = new Function(helper
+  + "\nreturn {rdGapPoints, rdGapRuns, rdGapSet, rdGapChanged, rdGapFmt};")();
 const mx = (ym) => { const [y, m] = ym.split("-").map(Number); return y + (m - 0.5) / 12; };
 const group = { monthly: [["2026-04", 0, 30], ["2026-01", 30, 10], ["2026-02", null, 0], ["2026-03", 20, null], ["2026-05", 10, 20]] };
 const reference = { monthly: [["2026-01", 25, 20], ["2026-02", 15, 0], ["2026-04", 0, 40], ["2026-05", 20, 10]] };
@@ -27,6 +27,13 @@ assert.deepEqual([-0.04, 0, 1.24, -5.37].map(rdGapFmt), ["0.0", "0.0", "+1.2", "
 assert.equal(rdGapSet({ id: "gender", groups: [{ label: "Women", ...group }] }, ["alp"], mx), null,
   "a missing reference cannot silently become another comparison");
 
+const history = values => ({monthly: values.map((v,i) => ["2026-0"+(i+1), v, 0.2])});
+const changed = (a,b,relative) => rdGapChanged(history(a), history(b), ["alp"], "alp", relative);
+assert.equal(changed([20,40,20],[10,20,10],true),false, "constant ratio");
+assert.equal(changed([20,40,20],[10,20,10],false),true, "intermediate absolute change");
+assert.equal(changed([20,30],[10,20],false),false, "constant nonzero gap");
+assert.equal(changed([20,30],[10,20],true),true, "relative change");
+assert.equal(changed([20,30],[0,20],true),false, "one usable month");
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "utf8"), context);
 const D = context.window.AUSPOL, T = D.demographics;
