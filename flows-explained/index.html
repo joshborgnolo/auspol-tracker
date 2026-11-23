@@ -58,8 +58,8 @@
   <link rel="preload" href="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.39461600.js" as="script">
   <link rel="preload" href="../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../assets/js/rd.3f581418.js" as="script">
-  <link rel="preload" href="../assets/js/rd-hero.16f92083.js" as="script">
-  <link rel="preload" href="../assets/js/rd-panels.30f577e7.js" as="script">
+  <link rel="preload" href="../assets/js/rd-hero.5e90f518.js" as="script">
+  <link rel="preload" href="../assets/js/rd-panels.24429545.js" as="script">
   <link rel="preload" href="../assets/js/rd-polls.cf08e27d.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.0b1f8462.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.f8155915.js" as="script">
@@ -4417,6 +4417,13 @@ body.rd .rd-pv-val { font-size: 36px; font-weight: 500; line-height: 1.1; letter
 body.rd .rd-pv-pct { font-size: 20px; color: var(--ink-3); letter-spacing: 0; }
 body.rd .rd-pv-chg { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-pv-chart { margin-top: 28px; }
+body.rd .rd-pv-support-toggle { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--ink-2); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+body.rd .rd-pv-support-track { position: relative; flex-shrink: 0; width: 26px; height: 16px; border-radius: 8px; background: var(--ink-faint); transition: background .15s ease; }
+body.rd .rd-pv-support-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 6px; background: var(--bg); transition: left .15s ease; }
+body.rd .rd-pv-support-toggle[aria-checked="true"] .rd-pv-support-track { background: var(--ink); }
+body.rd .rd-pv-support-toggle[aria-checked="true"] .rd-pv-support-track::after { left: 12px; }
+body.rd .rd-pv-support-toggle:hover { color: var(--ink); }
+body.rd .rd-pv-support-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 body.rd .rd-pv-head { display: flex; align-items: flex-end; gap: 32px; }
 body.rd .rd-pv-head > div { flex: 1 1 auto; min-width: 0; }
 body.rd .rd-pv-sel, body.rd .rd-confidence-sel, body.rd .rd-ap-sel {
@@ -7214,8 +7221,8 @@ body.rd #cyc-summary > h2.sr-only + .rd-cc { margin-top: 0; }
   <script src="../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.39461600.js"></script>
   <script src="../assets/js/wm-story.63f19861.js"></script>
   <script src="../assets/js/rd.3f581418.js"></script>
-  <script src="../assets/js/rd-hero.16f92083.js"></script>
-  <script src="../assets/js/rd-panels.30f577e7.js"></script>
+  <script src="../assets/js/rd-hero.5e90f518.js"></script>
+  <script src="../assets/js/rd-panels.24429545.js"></script>
   <script src="../assets/js/rd-polls.cf08e27d.js"></script>
   <script src="../assets/js/rd-cycles.0b1f8462.js"></script>
   <script src="../assets/js/rd-allpolls.f8155915.js"></script>

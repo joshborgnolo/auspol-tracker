@@ -1044,6 +1044,15 @@ body.rd .rd-pv-val { font-size: 36px; font-weight: 500; line-height: 1.1; letter
 body.rd .rd-pv-pct { font-size: 20px; color: var(--ink-3); letter-spacing: 0; }
 body.rd .rd-pv-chg { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-pv-chart { margin-top: 28px; }
+/* the active support basis sits in the history bar's tools, beside its own
+   switch track; the button's full height is also its touch target */
+body.rd .rd-pv-support-toggle { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--ink-2); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+body.rd .rd-pv-support-track { position: relative; flex-shrink: 0; width: 26px; height: 16px; border-radius: 8px; background: var(--ink-faint); transition: background .15s ease; }
+body.rd .rd-pv-support-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 6px; background: var(--bg); transition: left .15s ease; }
+body.rd .rd-pv-support-toggle[aria-checked="true"] .rd-pv-support-track { background: var(--ink); }
+body.rd .rd-pv-support-toggle[aria-checked="true"] .rd-pv-support-track::after { left: 12px; }
+body.rd .rd-pv-support-toggle:hover { color: var(--ink); }
+body.rd .rd-pv-support-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 /* the group picker row: head and dek carry on as they were on the left, the
    menu stands on the dek's last line at the column's right edge (the glide
    div is the only element child beside the select) */

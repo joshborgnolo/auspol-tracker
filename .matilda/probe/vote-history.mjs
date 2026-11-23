@@ -63,12 +63,15 @@ const state = () => page.evaluate(() => {
                  pressed: [...r.querySelectorAll(".rd-cwin-span")].filter((b) => b.getAttribute("aria-pressed") === "true").map((b) => b.textContent) } : null;
   };
   const pv = document.querySelector("#primary-vote .rd-pv-chart");
+  const support = pv.querySelector(".rd-pv-support-toggle");
   return {
     tpp: bar("#two-party"), pv: bar("#primary-vote"),
     strip: !!pv.querySelector(".rd-cstrip"),
     rings: pv.querySelectorAll(".rd-mark").length,
     bands: pv.querySelectorAll("path.ci-band, .ci-band").length,
     dots: pv.querySelectorAll("circle.dot, .scatter circle, circle.rd-dot").length,
+    paths: [...pv.querySelectorAll("path.series-line")].map((p) => p.getAttribute("d")).join("|"),
+    support: support ? { text: support.textContent.trim(), checked: support.getAttribute("aria-checked"), height: support.getBoundingClientRect().height } : null,
     note: (pv.querySelector(".rd-note") || {}).textContent || "",
     tabs: !!document.querySelector("#primary-vote [aria-label='Time range']"),
   };
@@ -82,6 +85,7 @@ check("six chips, Term pressed", s.pv && s.pv.chips === 6 && s.pv.pressed.join()
 check("the primary card has its strip", s.strip);
 check("no range tabs left on the federal page", !s.tabs);
 check("no history note on this term", !/Past terms are drawn/.test(s.note));
+check("no support toggle without a past-term datum", !s.support);
 
 console.log("== 2. one term back ==");
 await page.evaluate(() => document.querySelector("#primary-vote .rd-cwin-step").click());
@@ -103,6 +107,50 @@ await page.waitForFunction(() => Object.keys(window.AUSPOL.cycleSource || {}).le
 await settle(800);
 const pastDots = await page.evaluate(() => Object.keys(window.AUSPOL.cycleSource || {}).length);
 check("the past polls' sidecar loaded for the history window", pastDots > 20, pastDots + " terms");
+check("history opens with Inferred support off the measured switch", s.support && s.support.text === "Inferred support" && s.support.checked === "false", JSON.stringify(s.support));
+check("the inferred switch has its full touch height", s.support && s.support.height >= 44, s.support && s.support.height);
+const inferredPaths = s.paths, inferredRings = s.rings;
+await page.evaluate(() => document.querySelector("#primary-vote .rd-pv-support-toggle").click());
+await settle(1800);
+s = await state();
+check("the actual button switches to Measured support", s.support && s.support.text === "Measured support" && s.support.checked === "true", JSON.stringify(s.support));
+check("measured lines differ from inferred lines", s.paths !== inferredPaths);
+check("measured lines retain the same election rings", s.rings === inferredRings, inferredRings + " -> " + s.rings);
+check("measured lines carry no election-calibration bands", s.bands === 0, "bands " + s.bands);
+check("the note explains detached measured lines and official rings", /before the election-result adjustment/.test(s.note) && /above or below a party’s line/.test(s.note), s.note);
+await page.evaluate(() => {
+  const marks = [...document.querySelectorAll("#primary-vote .rd-pv-chart .rd-mark circle.rd-ring")];
+  marks[marks.length - 1].scrollIntoView({ block: "center", behavior: "instant" });
+});
+await settle(200);
+const electionMark = await page.evaluate(() => {
+  const marks = [...document.querySelectorAll("#primary-vote .rd-pv-chart .rd-mark circle.rd-ring")], r = marks[marks.length - 1].getBoundingClientRect();
+  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+});
+let electionTip = "";
+for (const [dx, dy] of [[0, -18], [0, 18], [-18, 0], [18, 0], [0, 0]]) {
+  await page.mouse.move(electionMark.x + dx, electionMark.y + dy);
+  await settle(250);
+  electionTip = await page.evaluate(() => (document.querySelector("#primary-vote .tip-guide") || {}).textContent || "");
+  if (/The 2025 election/.test(electionTip)) break;
+}
+check("a measured election-ring hover names the election", /The 2025 election/.test(electionTip), electionTip.slice(0, 180));
+check("a measured election-ring hover still reads the counted Labor share", /Labor/.test(electionTip) && /34.6/.test(electionTip), electionTip.slice(0, 300));
+await page.mouse.move(0, 0);
+await page.select("#primary-vote select.rd-pv-sel", "Men");
+await settle(1800);
+s = await state();
+check("group views do not show the support toggle", !s.support);
+check("group views keep their own history model, not Measured mode", /Each past term is the model’s estimate for men/.test(s.note), s.note.slice(0, 150));
+await page.select("#primary-vote select.rd-pv-sel", "");
+await settle(1800);
+s = await state();
+check("leaving a group view preserves the selected support basis", s.support && s.support.text === "Measured support" && s.support.checked === "true", JSON.stringify(s.support));
+await page.evaluate(() => document.querySelector("#primary-vote .rd-pv-support-toggle").click());
+await settle(1800);
+s = await state();
+check("the switch returns to Inferred support", s.support && s.support.text === "Inferred support" && s.support.checked === "false", JSON.stringify(s.support));
+check("the inferred line geometry is restored", s.paths === inferredPaths);
 
 console.log("== 3. All ==");
 await page.evaluate(() => [...document.querySelectorAll("#primary-vote .rd-cwin-span")].find((b) => b.textContent === "All").click());
@@ -129,7 +177,22 @@ await settle(2000);
 s = await state();
 check("ArrowLeft over the primary card steps back a term", s.pv && s.pv.name === "The 2022 term", s.pv && s.pv.name);
 
-console.log("== 6. /vic/ ==");
+console.log("== 6. phone switch ==");
+await page.setViewport({ width: 390, height: 844 });
+await settle(800);
+s = await state();
+check("the phone keeps the inferred switch at full touch height", s.support && s.support.checked === "false" && s.support.height >= 44, JSON.stringify(s.support));
+const phoneFit = await page.evaluate(() => ({ overflow: document.documentElement.scrollWidth - innerWidth }));
+check("the support control adds no phone overflow", phoneFit.overflow <= 0, JSON.stringify(phoneFit));
+await page.evaluate(() => document.querySelector("#primary-vote .rd-pv-support-toggle").click());
+await settle(800);
+s = await state();
+check("the phone button switches to Measured support", s.support && s.support.text === "Measured support" && s.support.checked === "true", JSON.stringify(s.support));
+await page.evaluate(() => document.querySelector("#primary-vote .rd-pv-support-toggle").click());
+await settle(400);
+await page.setViewport({ width: 1280, height: 1000 });
+
+console.log("== 7. /vic/ ==");
 if (fs.existsSync(join(ROOT, "vic", "index.html"))) {
   const v = await browser.newPage();
   await v.setViewport({ width: 1280, height: 1000 });

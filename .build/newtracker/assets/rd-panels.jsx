@@ -591,6 +591,8 @@ function RdPrimary({ rangeId, setRangeId }) {
      number; a tap on another number hands the panel over, and an event that
      leaves the window is put away by the chart's own reconciliation */
   const [evtOpen, setEvtOpen] = useState(null);
+  const [measuredSupport, setMeasuredSupport] = useState(false);
+  const supportMeasured = histOn && !G && measuredSupport;
   const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
   const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
   /* the polls the meta line counts: "national" here, "Victorian" on /vic/ */
@@ -634,7 +636,7 @@ function RdPrimary({ rangeId, setRangeId }) {
   const vhLong = histOn && vhSpan > RD_VH_LONG;
   const vhStyle = (k) => ({ label: k === "oth" ? "Others & independents" : D.PARTIES[k].name, color: D.PARTIES[k].color,
     width: vhLong ? (k === "oth" ? 1.4 : 1.6) : k === "oth" ? 2 : 2.5, dashed: k === "oth", dash: k === "oth" ? "6 4" : undefined, opacity: hideC[k] ? 0 : 1 });
-  const vhL = histOn ? rdVhLines(VHuse, ["alp", "lnp", "grn", "onp", "oth"], xDomain[0], xDomain[1], vhStyle, { long: vhLong }) : null;
+  const vhL = histOn ? rdVhLines(VHuse, ["alp", "lnp", "grn", "onp", "oth"], xDomain[0], xDomain[1], vhStyle, { long: vhLong, measured: supportMeasured }) : null;
   const vhDotsOn = histOn && !G && vhSpan <= 4.6;
   const vhHideKey = Object.keys(hideC).filter((k) => hideC[k]).sort().join("|");
   const vhScatter = React.useMemo(() => {
@@ -669,30 +671,31 @@ function RdPrimary({ rangeId, setRangeId }) {
   }, [vhDotsOn, xDomain[0], xDomain[1], srcTick, vhHideKey]);
   const yTopH = !histOn ? yTop : Math.max(40, Math.ceil(Math.max(0,
     ...vhL.series.filter((sr) => sr.opacity !== 0).flatMap((sr) => sr.points.filter((q) => q.x >= xDomain[0] - 0.1 && q.x <= xDomain[1] + 0.1).map((q) => q.y + (q.ci || 0))),
+    ...vhL.marks.filter((m) => !m.hidden && m.x >= xDomain[0] - 0.1 && m.x <= xDomain[1] + 0.1).map((m) => m.y),
     ...(curIn ? chartSeries.filter((sr) => sr.opacity !== 0).flatMap((sr) => sr.points.map((q) => q.y)) : []),
     ...vhScatter.filter((d) => d.op !== 0).map((d) => d.y)) * 1.0001 / 10) * 10);
   const yd = useConfChase([0, yTopH], !!(vw.drag && histOn));
-  /* the strip's one line: Labor and the Coalition together, every past
-     month drawn through the counts and this term's months as the polls */
+  /* the strip follows the chart's support basis through the past terms */
   const vhStripLines = React.useMemo(() => {
     if (!VH || !vwOn) return [];
-    const out = [];
+    const out = [], vi = supportMeasured ? 2 : 1;
     for (const t of VH.terms) {
-      const lnp = new Map((t.series.lnp || []).map((m) => [m[0], m[1]]));
-      if (t.open.alp != null && t.open.lnp != null) out.push({ x: t.a, y: t.open.alp + t.open.lnp });
-      for (const m of t.series.alp || []) if (lnp.has(m[0])) out.push({ x: m[0], y: m[1] + lnp.get(m[0]) });
+      const lnp = new Map((t.series.lnp || []).map((m) => [m[0], m[vi]]));
+      if (!supportMeasured && t.open.alp != null && t.open.lnp != null) out.push({ x: t.a, y: t.open.alp + t.open.lnp });
+      for (const m of t.series.alp || []) if (lnp.has(m[0])) out.push({ x: m[0], y: m[vi] + lnp.get(m[0]) });
     }
     for (const d of D.aggPrimary) if (d.alp != null && d.lnp != null) out.push({ x: d.x, y: d.alp + d.lnp });
     out.sort((p, q) => p.x - q.x);
     return [{ color: "var(--ink-2)", points: out }];
-  }, [VH, vwOn]);
+  }, [VH, vwOn, supportMeasured]);
   const H = (() => {
     if (!histOn) return null;
     const L = vhL;
     /* this term's ring IS the last term's closing count: drawn once */
     const vhMarks = curIn && base ? L.marks.filter((m) => Math.abs(m.x - base.x) > 1e-6) : L.marks;
     const lone = L.lone.map((q) => ({ x: q.x, y: q.y, color: q.color, label: q.label, party: q.party, op: hideC[q.party] ? 0 : undefined,
-      meta: { pollster: VH.model ? "Model estimate" : "Monthly average", dateLabel: rdVhMonth(q.x), pre: true }, sub: "Drawn through the election results; the " + (VH.model ? q.note.replace("polls ", "polls’ model ") : q.note) }));
+      meta: { pollster: VH.model ? "Model estimate" : "Monthly average", dateLabel: rdVhMonth(q.x), pre: true },
+      sub: supportMeasured ? "Before the election adjustment" : "Drawn through the election results; the " + (VH.model ? q.note.replace("polls ", "polls’ model ") : q.note) }));
     const curStops = curIn ? pts.filter((d) => d.x >= xDomain[0] - 1e-6).map((d) => ({ x: d.x, y: d.alp, ym: d.ym, cur: true, elec: !!d.election })) : [];
     const spine = [...new Map(L.stops.map((q) => [q.x.toFixed(4), q]).concat(curStops.map((q) => [q.x.toFixed(4), q]))).values()]
       .filter((q) => q.x >= xDomain[0] - 1e-6 && q.x <= xDomain[1] + 1e-6).sort((p, q) => p.x - q.x);
@@ -714,8 +717,19 @@ function RdPrimary({ rangeId, setRangeId }) {
       extra: (i) => {
         const q = spine[i];
         if (!q) return [];
-        if (q.count || q.elec) return [{ label: "", value: "The election result" }];
+        if (q.count || q.elec) {
+          if (!supportMeasured) return [{ label: "", value: "The election result" }];
+          const rows = [{ label: "", value: "The election result" }];
+          for (const t of VH.terms) {
+            for (const p of visible) {
+              const v = Math.abs(t.a - q.x) < 1e-6 ? t.open[p.id] : Math.abs(t.b - q.x) < 1e-6 ? t.close[p.id] : null;
+              if (v != null) rows.push({ label: p.name, value: v.toFixed(1), color: p.color });
+            }
+          }
+          return rows;
+        }
         if (!q.cur) {
+          if (supportMeasured) return [{ label: "", value: VH.model ? "The model’s consensus before the election adjustment" : "The polls’ monthly average before the election adjustment" }];
           /* a past month's own 95% intervals, party by party, as this term's
              months carry theirs */
           const ciAt = (k) => { for (const t of VHuse.terms) { const m = (t.series[k] || []).find((r) => Math.abs(r[0] - q.x) < 1e-6); if (m && m[3] != null) return m[3]; } return null; };
@@ -959,7 +973,17 @@ function RdPrimary({ rangeId, setRangeId }) {
              the pin holds this card on screen while the shared window
              reshapes the two-party card above it */
           <RdVoteWinBar rangeId={rangeId} setRangeId={setRangeId} hist={histOn ? vw.hist : null} terms={vwTerms}
-                        lo={vwLo} hi={vwHi} ready={!!VH} pin={() => { if (cardEl.current) rdPinScroll(cardEl.current); }} />
+                        lo={vwLo} hi={vwHi} ready={!!VH} pin={() => { if (cardEl.current) rdPinScroll(cardEl.current); }}>
+            {histOn && !G && (
+              <button type="button" role="switch" aria-checked={supportMeasured} aria-label="Use measured support"
+                      className="rd-pv-support-toggle"
+                      title={supportMeasured ? "Switch to inferred support: the past terms are moved toward their election results" : "Switch to measured support: leave the past terms at the polls’ own figures"}
+                      onClick={() => setMeasuredSupport((v) => !v)}>
+                <span className="rd-pv-support-track" aria-hidden="true"><span></span></span>
+                <span>{supportMeasured ? "Measured support" : "Inferred support"}</span>
+              </button>
+            )}
+          </RdVoteWinBar>
         ) : (
           <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin />
         )}
@@ -1022,10 +1046,14 @@ function RdPrimary({ rangeId, setRangeId }) {
             legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })),
           } : H ? {
             title: "First-preference vote for each party", span: confWinYears(vwWin, vwTerms, vwHi),
-            sub: "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "")
-              + (VH.model ? ". The model’s estimates, each pollster’s lean taken out." : ". Monthly averages of the polls, adjusted for each pollster’s lean."),
-            caption: (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
-              + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
+            sub: supportMeasured
+              ? "Past terms before the election adjustment, with rings at the counted results" + (curIn ? "; this term unchanged" : "")
+              : "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "")
+                + (VH.model ? ". The model’s estimates, each pollster’s lean taken out." : ". Monthly averages of the polls, adjusted for each pollster’s lean."),
+            caption: supportMeasured
+              ? (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s consensus before its election adjustment" : " are monthly averages before the election adjustment") + "; rings stay at the counted results." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : "")
+              : (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
+                + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
             legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
               .concat([{ label: "Election result", color: "var(--ink)", kind: "ring" }]),
           } : { title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""), sub: story.head + (G ? (PMD ? ". The model’s estimate for " + sel.who + " at each month’s middle, latest fieldwork " : ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork ") + rdDate(D.latest.updatedISO, true) + "." : pvx ? (PMD ? ". The model re-run on " : ". Monthly averages of ") + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : PMD ? ". The model’s estimates from " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
@@ -1069,6 +1097,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         {/* what the past terms' lines are, beside them */}
         {H && (
           G ? <p className="rd-note">Each past term is the model’s estimate for {sel.who}: that term’s national primaries, from every poll with each pollster’s lean taken out, moved by the group’s gap from all voters, from the pollsters’ group tables and the Australian Election Study at the term’s two elections. Where few pollsters published group tables, the line leans on the two Election Studies and its band widens between them. A line ends at each election; the next term starts from its own polls.</p>
+          : supportMeasured ? <p className="rd-note">Past terms keep the polls’ own figures before the election-result adjustment. Rings stay at the official results, above or below a party’s line where the polls over- or underestimated support. {vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is unchanged: no election has measured it yet. " : ""}</p>
           : <p className="rd-note">Past terms are drawn through the election results at both ends. By polling day the polls typically miss Labor’s result by about {VH.rms.alp.toFixed(1)} points and the Coalition’s by {VH.rms.lnp.toFixed(1)}, so every month of a past term is moved by part of its closing election’s miss: two-fifths of it from the first month, rising evenly to all of it on polling day. {vhLong ? "Over a dozen years or more the bands are left off; a shorter window shows them, with the doubt about when the miss arose. " : "The shaded band includes the doubt about when the miss arose. "}{vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is the polls alone: no election has measured it yet. " : ""}{H.unmeasured.length ? "No dated poll fell in the final three weeks before the " + rdList(H.unmeasured.map((t) => String(t.src))) + " elections, so " + (H.unmeasured.length === 1 ? "that term is" : "those terms are") + " the polls alone." : ""}</p>
         )}
         {/* the lift mapping, where the dots are read - the glossary's "The
@@ -1081,8 +1110,9 @@ function RdPrimary({ rangeId, setRangeId }) {
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" },
         ] : H ? [
           vhDotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll, as published" } : null,
-          vhLong ? { kind: "line", color: "var(--ink-3)", label: VH.model ? "Model estimate" : "Monthly average" }
-            : { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+          supportMeasured ? { kind: "line", color: "var(--ink-3)", label: VH.model ? (narrow ? "Before election adjustment" : "Model consensus before election adjustment") : "Monthly average before election adjustment" }
+            : vhLong ? { kind: "line", color: "var(--ink-3)", label: VH.model ? "Model estimate" : "Monthly average" }
+              : { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           { kind: "ring", label: "Election result" },
           H.bridges ? { kind: "dots", color: "var(--ink-3)", label: "No polls" } : null,
         ] : [

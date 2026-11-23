@@ -246,14 +246,11 @@ function rdVwElections(w, terms) {
     major: true, elec: true,
   }));
 }
-/* The past terms' lines inside a window, drawn through the counts. Each
-   lane of each term is one line from its opening count, through its months
-   (gen-data §8v: [x, adjusted, polls, ±, polls in month]), to its closing
-   count. A stretch of more than a quarter that nobody polled is bridged with
-   the dotted stroke the group views' lead-ins use, the band stopping either
-   side of it; a month standing alone between such stretches is a single
-   mark (`lone`). The counts are rings, and the band shuts on each. Each
-   month point carries the polls' own figure as its readout note. */
+/* The inferred past-term lines run through their opening and closing counts.
+   The optional measured view uses the unadjusted poll figure in slot 2, so
+   those counts stay as rings and tooltip stops but not vertices in its lines.
+   In either view a stretch of more than a quarter that nobody polled is
+   bridged with a dotted stroke, and a month standing alone is a single mark. */
 const RD_VH_GAP = 0.26;
 const RD_VH_BRIDGE = "0.5 4";
 /* a history month's name from its x (a month point sits inside its month) */
@@ -274,28 +271,38 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
       if (!t.lanes.includes(k)) continue;
       const st = style(k, t);
       if (!st) continue;
-      const pts = [];
-      if (t.open[k] != null) pts.push({ x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [] });
-      for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[1], raw: m[2], ci: m[3], n: m[4], note: "polls " + m[2].toFixed(1) });
-      if (t.close[k] != null) pts.push({ x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [] });
-      if (!pts.length) continue;
-      const runs = [[pts[0]]];
-      for (let i = 1; i < pts.length; i++) {
-        if (pts[i].x - pts[i - 1].x > RD_VH_GAP) runs.push([]);
-        runs[runs.length - 1].push(pts[i]);
+      const pts = [], counts = [];
+      if (t.open[k] != null) {
+        const p = { x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [] };
+        counts.push(p);
+        if (!opt.measured) pts.push(p);
       }
-      runs.forEach((r, i) => {
-        if (r.length >= 2) series.push({ id: "vh-" + t.year + "-" + k + "-" + i, label: st.label, color: st.color, points: r,
-          rdWidth: st.width, dashed: st.dashed, dash: st.dash, endCap: false, endLabel: null, opacity: st.opacity });
-        else if (!r[0].count) lone.push({ ...r[0], color: st.color, label: st.label, party: k });
-        if (i) series.push({ id: "vh-" + t.year + "-" + k + "-g" + i, label: st.label, color: st.color,
-          points: [runs[i - 1][runs[i - 1].length - 1], r[0]], rdWidth: st.width, dash: RD_VH_BRIDGE,
-          endCap: false, endLabel: null, opacity: st.opacity });
-        const band = opt.long ? [] : r.filter((p) => p.ci != null || p.count);
-        if (band.length >= 2) areas.push({ id: "vh-ci-" + t.year + "-" + k + "-" + i, color: st.color, className: "ci-band", edge: false,
-          hidden: st.opacity === 0, points: band.map((p) => ({ x: p.x, y0: p.y - (p.ci || 0), y1: p.y + (p.ci || 0) })) });
-      });
-      for (const p of pts) {
+      for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[opt.measured ? 2 : 1], raw: m[2], ci: opt.measured ? null : m[3], n: m[4],
+        note: opt.measured ? undefined : "polls " + m[2].toFixed(1) });
+      if (t.close[k] != null) {
+        const p = { x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [] };
+        counts.push(p);
+        if (!opt.measured) pts.push(p);
+      }
+      if (pts.length) {
+        const runs = [[pts[0]]];
+        for (let i = 1; i < pts.length; i++) {
+          if (pts[i].x - pts[i - 1].x > RD_VH_GAP) runs.push([]);
+          runs[runs.length - 1].push(pts[i]);
+        }
+        runs.forEach((r, i) => {
+          if (r.length >= 2) series.push({ id: "vh-" + t.year + "-" + k + "-" + i, label: st.label, color: st.color, points: r,
+            rdWidth: st.width, dashed: st.dashed, dash: st.dash, endCap: false, endLabel: null, opacity: st.opacity });
+          else if (!r[0].count) lone.push({ ...r[0], color: st.color, label: st.label, party: k });
+          if (i) series.push({ id: "vh-" + t.year + "-" + k + "-g" + i, label: st.label, color: st.color,
+            points: [runs[i - 1][runs[i - 1].length - 1], r[0]], rdWidth: st.width, dash: RD_VH_BRIDGE,
+            endCap: false, endLabel: null, opacity: st.opacity });
+          const band = opt.long || opt.measured ? [] : r.filter((p) => p.ci != null || p.count);
+          if (band.length >= 2) areas.push({ id: "vh-ci-" + t.year + "-" + k + "-" + i, color: st.color, className: "ci-band", edge: false,
+            hidden: st.opacity === 0, points: band.map((p) => ({ x: p.x, y0: p.y - (p.ci || 0), y1: p.y + (p.ci || 0) })) });
+        });
+      }
+      for (const p of opt.measured ? counts.concat(pts) : pts) {
         if (p.count) {
           const key = k + "|" + p.x.toFixed(3) + "|" + p.y;
           // Keep both count definitions. A centre dot marks the vote of the
