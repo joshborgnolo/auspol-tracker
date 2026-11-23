@@ -6799,6 +6799,10 @@ function RdUndecided({ rangeId }) {
   const histOn = !!((H || DH) && winU && nowXU != null);
   const hx = (ym) => D.mx(ym);
   const historyXU = (H ? H.terms.flatMap((t) => Object.values(t.series).flatMap((sr) => sr.months.map((m) => hx(m[0])))) : [])
+    /* Isolated published dots predate a term line (Trove's raw Gallup shares).
+       Their x still belongs in the reachable domain even when that term has
+       too few polls to fit. */
+    .concat(H ? H.polls.map((p) => p.x) : [])
     .concat(DH ? DH.soft.terms.flatMap((t) => t.monthly.map((m) => m.x)) : []);
   const extU = histOn ? { lo: Math.min(nowXU, ...historyXU) - 0.3, hi: nowXU } : null;
   const vTermsU = histOn ? confViewTerms(TERMS_U, extU.lo, extU.hi) : null;
