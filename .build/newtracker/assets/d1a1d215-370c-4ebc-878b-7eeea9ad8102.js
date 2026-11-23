@@ -6031,7 +6031,7 @@ function rdEffMissing(p) {
    row margins use, rounded to ten and marked approximate; sampleEff remains
    reserved for a house-published figure. Confidence releases are out even
    when their byline shares Roy Morgan's name. */
-const RD_APPROX_EFF_HOUSES = new Set(["Roy Morgan", "Spectre Strategy", "Resolve"]);
+const RD_APPROX_EFF_HOUSES = new Set(["Roy Morgan", "Spectre Strategy", "Resolve", "EMRS (Tas)"]);
 function rdEffEstimate(p) {
   if (p.conf || p.sampleEff != null || !p.sample || !RD_APPROX_EFF_HOUSES.has(p.pollster)) return null;
   const L = window.AUSPOL.latest;

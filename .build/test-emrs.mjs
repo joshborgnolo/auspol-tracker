@@ -426,6 +426,16 @@ assert.deepEqual(delistedCachedYms([], ".build/no-such-dir"), [],
     "the canon rows keep their hand-entered published stamps …");
   assert.equal(rows.find((r) => r.date === "2026-08-18").published, "2026-08-22",
     "… never the sidecar's first-seen date");
+
+  const source = fs.readFileSync(".build/newtracker/assets/d1a1d215-370c-4ebc-878b-7eeea9ad8102.js", "utf8");
+  const start = source.indexOf("const RD_APPROX_EFF_HOUSES");
+  const end = source.indexOf("\nfunction AllPollsView", start);
+  assert.ok(start >= 0 && end > start, "the archive's shared effective-sample estimator is present");
+  const effEstimate = new Function("window", source.slice(start, end) + "\nreturn rdEffEstimate;")({ AUSPOL: { latest: { method: { deff: 1.6 } } } });
+  assert.deepEqual(rows.map(effEstimate), [600, 610, 610],
+    "all three EMRS waves show the derived effective sample, rounded to ten as other non-filing houses do");
+  assert.equal(effEstimate({ ...rows[0], sampleEff: 700 }), null,
+    "a house-published effective sample still takes precedence over the estimate");
 }
 
 console.log("test-emrs: all OK");
