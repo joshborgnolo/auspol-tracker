@@ -4442,7 +4442,7 @@ function rdGapPoints(group, reference, order, party, mx, relative = false) {
   return (group.monthly || []).flatMap((r) => {
     const a = r[1 + i], b = base.get(r[0]);
     return Number.isFinite(a) && Number.isFinite(b) && (!relative || b > 0)
-      ? [{ ym: r[0], x: mx(r[0]), y: relative ? 100 * (a - b) / b : Math.round((a - b) * 10) / 10, groupVote: a, referenceVote: b }] : [];
+      ? [{ ym: r[0], x: mx(r[0]), y: relative ? a / b : Math.round((a - b) * 10) / 10, groupVote: a, referenceVote: b }] : [];
   }).sort((a, b) => a.x - b.x);
 }
 /* Missing months break the stroke, even when the model/average is ragged. */
@@ -4468,14 +4468,16 @@ function rdGapSet(st, order, mx, refLabel, relative) {
   const points = comparisons.flatMap((c) => c.parties.flatMap((p) => p.points));
   /* One symmetrical scale for ALL parties and choices over the full
      history. Neither switching comparison nor shortening time rescales it. */
-  const limit = Math.max(5, Math.ceil((Math.max(...points.map((p) => Math.abs(p.y))) + 1) / 5) * 5);
+  const limit = relative ? Math.max(2, Math.ceil(Math.max(...points.map((p) => p.y)))) : Math.max(5, Math.ceil((Math.max(...points.map((p) => Math.abs(p.y))) + 1) / 5) * 5);
   return { def, reference, comparisons, limit, firstX: Math.min(...points.map((p) => p.x)) };
 }
 function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
   const { D, rangeDomain, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
   const [refLabel, setRefLabel] = useState("");
-  const unit = relative ? "%" : " pp";
+  const format = relative ? (v) => String(Number(v.toFixed(2))) : rdGapFmt;
+  const measure = relative ? "Factor" : "Gap";
+  const unit = relative ? "×" : " pp";
   const data = React.useMemo(() => rdGapSet(st, order, D.mx, refLabel, relative), [st, order, D, refLabel, relative]);
   const [choice, setChoice] = useState("");
   if (!data) return null;
@@ -4485,19 +4487,19 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
   const group = selected.group;
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
-  const ticks = [-limit, -limit / 2, 0, limit / 2, limit];
+  const ticks = relative ? [...new Set([0, 1, limit / 2, limit])].sort((a, b) => a - b) : [-limit, -limit / 2, 0, limit / 2, limit];
   const who = (g) => DEMO_WHO[g.label] || RD_DEMO_SHORT[g.label] || g.label;
-  const formula = relative ? group.label + " compared with " + reference.label + " · percentage difference relative to " + reference.label
+  const formula = relative ? group.label + " ÷ " + reference.label + " · primary vote ratio"
     : st.id === "gender" && reference.label === "Men" ? "Women’s primary vote − men’s primary vote · percentage points"
     : group.label + " − " + reference.label + " · primary vote, percentage points";
   const title = def.title + " gap in primary voting intention";
-  const explanation = "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
+  const explanation = relative ? "Above 1× means higher support among " + who(group) + ". Below 1× means higher support among " + who(reference) + ". At 1× support is equal." : "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
   /* Reserve the widest end label in every panel so equal dates align,
      even when one party's signed figure is longer than another's. */
   const padSeries = selected.parties.flatMap((p) => {
     const visible = p.points.filter((pt) => pt.x >= x0 && pt.x <= x1);
     const last = visible[visible.length - 1];
-    return last ? [{ points: [last], endLabel: rdGapFmt(last.y) + unit }] : [];
+    return last ? [{ points: [last], endLabel: format(last.y) + unit }] : [];
   });
   return (
     <div className="card rd-card rd-wv-gap-set" role="group" aria-label={title}>
@@ -4529,14 +4531,14 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
                 <span className="rd-wv-gap-date">{last ? rdMonthYear(last.ym) : ""}</span></div>
               {points.length ? <TrendChart key={st.id + "|" + group.label + "|" + reference.label + "|" + unit + "|" + pp.id}
                 heightPx={narrow ? 180 : 170} padPx={{ l: 36, r: 6, t: 12, b: 26 }}
-                xDomain={[x0, x1]} yDomain={[-limit, limit]} xTicks={rdXTicks(x0, x1, true)}
-                yTicks={ticks} yTickFmt={(v) => v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, "")}
-                refLines={[{ y: 0, color: "var(--ink-3)" }]}
+                xDomain={[x0, x1]} yDomain={[relative ? 0 : -limit, limit]} xTicks={rdXTicks(x0, x1, true)}
+                yTicks={ticks} yTickFmt={(v) => relative ? v + "×" : v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, "")}
+                refLines={[{ y: relative ? 1 : 0, color: "var(--ink-3)" }]}
                 series={rdGapRuns(points).map((run, i, runs) => ({
-                  id: pp.id + "-" + i, label: "Gap", color, points: run, smooth: false, rdWidth: 2.25,
-                  endLabel: i === runs.length - 1 ? rdGapFmt(last.y) + unit : null,
+                  id: pp.id + "-" + i, label: measure, color, points: run, smooth: false, rdWidth: 2.25,
+                  endLabel: i === runs.length - 1 ? format(last.y) + unit : null,
                 }))}
-                spine={points} padSeries={padSeries} fmt={rdGapFmt} unit={unit}
+                spine={points} padSeries={padSeries} fmt={format} unit={unit}
                 tooltipTitle={(i) => points[i] ? monthLabelFull(points[i].ym) : ""}
                 extraRows={(i) => points[i] ? [
                   { label: group.label, value: points[i].groupVote.toFixed(1) + "%" },
@@ -4544,8 +4546,8 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
                 ] : []}
                 ariaLabel={pp.label + ". " + formula + ". " + explanation}
                 copy={{ title: pp.label + ": " + title.toLowerCase(), sub: formula,
-                  caption: explanation + " " + (model ? "Difference of group model estimates." : "Difference of monthly group averages."),
-                  legend: [{ label: "Gap", color, kind: "line" }, { label: "Equal support", color: "var(--ink-3)", kind: "line" }] }}
+                  caption: explanation + " " + (model ? "Based on group model estimates." : "Based on monthly group averages."),
+                  legend: [{ label: measure, color, kind: "line" }, { label: "Equal support", color: "var(--ink-3)", kind: "line" }] }}
               /> : <p className="rd-wv-gap-empty">No comparable monthly figures in this period.</p>}
             </div>
           );
@@ -4560,9 +4562,9 @@ const RdDemographicGaps = React.memo(function RdDemographicGaps({ tab, order, ra
     <div className="rd-wv-gaps">
       <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups." />
       <div className="rd-chips" role="group" aria-label="Gap measure">
-        {[false, true].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (%)" : "Absolute (pp)"}</button>)}
+        {[false, true].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (×)" : "Absolute (pp)"}</button>)}
       </div>
-      <p className="rd-wv-gap-note">{relative && "The gap is divided by the reference group’s vote share and expressed as a percentage. Months with a zero reference share are omitted. "}{model ? "Lines subtract the existing group model estimates." : "Lines subtract the existing monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Intervals for the differences are not available.</p>
+      <p className="rd-wv-gap-note">{relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. "}{model ? "Lines use the group model estimates." : "Lines use the monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Intervals for the differences are not available.</p>
       {tab.sets.map((st) => <RdDemographicGapSet key={st.id} st={st} order={order} rangeId={rangeId} model={model} relative={relative} />)}
     </div>
   );

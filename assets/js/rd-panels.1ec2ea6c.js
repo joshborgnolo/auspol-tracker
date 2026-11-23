@@ -5511,8 +5511,7 @@ const RD_GAP_REFS = {
   state: {
     ref: "NSW",
     compare: "Vic",
-    title: "State",
-    note: "NSW, the largest state, is the reference; states are not ranked."
+    title: "State"
   },
   location: {
     ref: "Inner metro",
@@ -5532,8 +5531,7 @@ const RD_GAP_REFS = {
   working: {
     ref: "Full time",
     compare: "Part time",
-    title: "Work status",
-    note: "Full-time workers are the reference; work categories are not ranked."
+    title: "Work status"
   },
   income: {
     ref: "Lower earners (bottom 50%)",
@@ -5546,17 +5544,17 @@ const rdGapFmt = v => {
   const r = Math.round(v * 10) / 10;
   return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(1);
 };
-function rdGapPoints(group, reference, order, party, mx) {
+function rdGapPoints(group, reference, order, party, mx, relative = false) {
   const i = order.indexOf(party);
   if (i < 0 || !group || !reference) return [];
   const base = new Map((reference.monthly || []).map(r => [r[0], r[1 + i]]));
   return (group.monthly || []).flatMap(r => {
     const a = r[1 + i],
       b = base.get(r[0]);
-    return Number.isFinite(a) && Number.isFinite(b) ? [{
+    return Number.isFinite(a) && Number.isFinite(b) && (!relative || b > 0) ? [{
       ym: r[0],
       x: mx(r[0]),
-      y: Math.round((a - b) * 10) / 10,
+      y: relative ? a / b : Math.round((a - b) * 10) / 10,
       groupVote: a,
       referenceVote: b
     }] : [];
@@ -5571,21 +5569,21 @@ function rdGapRuns(points) {
   }
   return runs;
 }
-function rdGapSet(st, order, mx) {
+function rdGapSet(st, order, mx, refLabel, relative) {
   const def = RD_GAP_REFS[st.id];
   if (!def) return null;
-  const reference = st.groups.find(g => g.label === def.ref);
+  const reference = st.groups.find(g => g.label === (refLabel || def.ref));
   if (!reference) return null;
   const comparisons = st.groups.filter(g => g !== reference).map(g => ({
     group: g,
     parties: order.map(party => ({
       party,
-      points: rdGapPoints(g, reference, order, party, mx)
+      points: rdGapPoints(g, reference, order, party, mx, relative)
     }))
   })).filter(c => c.parties.some(p => p.points.length));
   if (!comparisons.length) return null;
   const points = comparisons.flatMap(c => c.parties.flatMap(p => p.points));
-  const limit = Math.max(5, Math.ceil((Math.max(...points.map(p => Math.abs(p.y))) + 1) / 5) * 5);
+  const limit = relative ? Math.max(2, Math.ceil(Math.max(...points.map(p => p.y)))) : Math.max(5, Math.ceil((Math.max(...points.map(p => Math.abs(p.y))) + 1) / 5) * 5);
   return {
     def,
     reference,
@@ -5598,7 +5596,8 @@ function RdDemographicGapSet({
   st,
   order,
   rangeId,
-  model
+  model,
+  relative
 }) {
   const {
     D,
@@ -5606,7 +5605,11 @@ function RdDemographicGapSet({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const data = React.useMemo(() => rdGapSet(st, order, D.mx), [st, order, D]);
+  const [refLabel, setRefLabel] = useState("");
+  const format = relative ? v => String(Number(v.toFixed(2))) : rdGapFmt;
+  const measure = relative ? "Factor" : "Gap";
+  const unit = relative ? "×" : " pp";
+  const data = React.useMemo(() => rdGapSet(st, order, D.mx, refLabel, relative), [st, order, D, refLabel, relative]);
   const [choice, setChoice] = useState("");
   if (!data) return null;
   const {
@@ -5621,17 +5624,17 @@ function RdDemographicGapSet({
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const x0 = Math.max(rangeLo, firstX - 0.04),
     x1 = rangeHi;
-  const ticks = [-limit, -limit / 2, 0, limit / 2, limit];
+  const ticks = relative ? [...new Set([0, 1, limit / 2, limit])].sort((a, b) => a - b) : [-limit, -limit / 2, 0, limit / 2, limit];
   const who = g => DEMO_WHO[g.label] || RD_DEMO_SHORT[g.label] || g.label;
-  const formula = st.id === "gender" ? "Women’s primary vote − men’s primary vote · percentage points" : group.label + " − " + reference.label + " · primary vote, percentage points";
+  const formula = relative ? group.label + " ÷ " + reference.label + " · primary vote ratio" : st.id === "gender" && reference.label === "Men" ? "Women’s primary vote − men’s primary vote · percentage points" : group.label + " − " + reference.label + " · primary vote, percentage points";
   const title = def.title + " gap in primary voting intention";
-  const explanation = "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
+  const explanation = relative ? "Above 1× means higher support among " + who(group) + ". Below 1× means higher support among " + who(reference) + ". At 1× support is equal." : "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
   const padSeries = selected.parties.flatMap(p => {
     const visible = p.points.filter(pt => pt.x >= x0 && pt.x <= x1);
     const last = visible[visible.length - 1];
     return last ? [{
       points: [last],
-      endLabel: rdGapFmt(last.y) + " pp"
+      endLabel: format(last.y) + unit
     }] : [];
   });
   return React.createElement("div", {
@@ -5642,7 +5645,7 @@ function RdDemographicGapSet({
     className: "rd-chead"
   }, React.createElement("h5", {
     className: "rd-chead-t"
-  }, title)), comparisons.length > 1 && React.createElement("label", {
+  }, title)), React.createElement("div", {
     className: "rd-wv-gap-choice"
   }, "Compare", React.createElement("select", {
     className: "rd-pv-sel",
@@ -5652,7 +5655,18 @@ function RdDemographicGapSet({
   }, comparisons.map(c => React.createElement("option", {
     key: c.group.label,
     value: c.group.label
-  }, c.group.label))), React.createElement("span", null, "Reference: ", React.createElement("b", null, reference.label))), React.createElement("p", {
+  }, c.group.label))), "Reference", React.createElement("select", {
+    className: "rd-pv-sel",
+    "aria-label": def.title + " reference group",
+    value: reference.label,
+    onChange: e => {
+      setChoice(e.target.value === group.label ? reference.label : group.label);
+      setRefLabel(e.target.value);
+    }
+  }, st.groups.map(g => React.createElement("option", {
+    key: g.label,
+    value: g.label
+  }, g.label)))), React.createElement("p", {
     className: "rd-wv-gap-formula"
   }, formula), React.createElement("p", {
     className: "rd-wv-gap-directions"
@@ -5678,7 +5692,7 @@ function RdDemographicGapSet({
     }), pp.label), React.createElement("span", {
       className: "rd-wv-gap-date"
     }, last ? rdMonthYear(last.ym) : "")), points.length ? React.createElement(TrendChart, {
-      key: st.id + "|" + group.label + "|" + pp.id,
+      key: st.id + "|" + group.label + "|" + reference.label + "|" + unit + "|" + pp.id,
       heightPx: narrow ? 180 : 170,
       padPx: {
         l: 36,
@@ -5687,27 +5701,27 @@ function RdDemographicGapSet({
         b: 26
       },
       xDomain: [x0, x1],
-      yDomain: [-limit, limit],
+      yDomain: [relative ? 0 : -limit, limit],
       xTicks: rdXTicks(x0, x1, true),
       yTicks: ticks,
-      yTickFmt: v => v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, ""),
+      yTickFmt: v => relative ? v + "×" : v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, ""),
       refLines: [{
-        y: 0,
+        y: relative ? 1 : 0,
         color: "var(--ink-3)"
       }],
       series: rdGapRuns(points).map((run, i, runs) => ({
         id: pp.id + "-" + i,
-        label: "Gap",
+        label: measure,
         color,
         points: run,
         smooth: false,
         rdWidth: 2.25,
-        endLabel: i === runs.length - 1 ? rdGapFmt(last.y) + " pp" : null
+        endLabel: i === runs.length - 1 ? format(last.y) + unit : null
       })),
       spine: points,
       padSeries: padSeries,
-      fmt: rdGapFmt,
-      unit: " pp",
+      fmt: format,
+      unit: unit,
       tooltipTitle: i => points[i] ? monthLabelFull(points[i].ym) : "",
       extraRows: i => points[i] ? [{
         label: group.label,
@@ -5720,9 +5734,9 @@ function RdDemographicGapSet({
       copy: {
         title: pp.label + ": " + title.toLowerCase(),
         sub: formula,
-        caption: explanation + " " + (model ? "Difference of group model estimates." : "Difference of monthly group averages."),
+        caption: explanation + " " + (model ? "Based on group model estimates." : "Based on monthly group averages."),
         legend: [{
-          label: "Gap",
+          label: measure,
           color,
           kind: "line"
         }, {
@@ -5742,19 +5756,31 @@ const RdDemographicGaps = React.memo(function RdDemographicGaps({
   rangeId,
   model
 }) {
+  const [relative, setRelative] = useState(false);
   return React.createElement("div", {
     className: "rd-wv-gaps"
   }, React.createElement(RdSub, {
     head: "Demographic gaps over time",
-    dek: "How each party\u2019s primary vote differs between groups, in percentage points."
-  }), React.createElement("p", {
+    dek: "How each party\u2019s primary vote differs between groups."
+  }), React.createElement("div", {
+    className: "rd-chips",
+    role: "group",
+    "aria-label": "Gap measure"
+  }, [false, true].map(r => React.createElement("button", {
+    type: "button",
+    className: "rd-chip",
+    key: String(r),
+    "aria-pressed": relative === r,
+    onClick: () => setRelative(r)
+  }, r ? "Relative (×)" : "Absolute (pp)"))), React.createElement("p", {
     className: "rd-wv-gap-note"
-  }, model ? "Lines subtract the existing group model estimates." : "Lines subtract the existing monthly group averages.", " All parties and comparisons within each set share the same scales. Hover, tap or use the chart\u2019s arrow keys to see both groups\u2019 primary votes. Intervals for the differences are not available."), tab.sets.map(st => React.createElement(RdDemographicGapSet, {
+  }, relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. ", model ? "Lines use the group model estimates." : "Lines use the monthly group averages.", " All parties and comparisons within each set share the same scales. Hover, tap or use the chart\u2019s arrow keys to see both groups\u2019 primary votes. Intervals for the differences are not available."), tab.sets.map(st => React.createElement(RdDemographicGapSet, {
     key: st.id,
     st: st,
     order: order,
     rangeId: rangeId,
-    model: model
+    model: model,
+    relative: relative
   })));
 });
 function RdDemographics({

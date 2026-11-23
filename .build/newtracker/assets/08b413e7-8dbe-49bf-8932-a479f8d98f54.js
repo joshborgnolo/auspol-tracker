@@ -1536,7 +1536,10 @@ function TrendChart(props) {
      its event sits today, and put away when the new window drops the event);
      an uncontrolled one keeps its own spot, as it always has. */
   if (ctl && evt) {
-    const q = evPlaced.find((p) => p.e === evt.e && !p.leaving);
+    // History events are rebuilt on parent renders, so identity cannot hold the
+    // controlled hover; match the event's stable date-and-label key instead.
+    const evtKey = evKey(evt.e);
+    const q = evPlaced.find((p) => evKey(p.e) === evtKey && !p.leaving);
     if (!q) { const cur = evt; setTimeout(() => { if (evtCtl === cur) setEvt(null); }, 0); }
     else if (evt.x !== q.ex || evt.y !== q.y) {
       const cur = evt;

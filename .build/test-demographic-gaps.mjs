@@ -16,8 +16,8 @@ assert.deepEqual(a.map((p) => [p.ym, p.y, p.groupVote, p.referenceVote]), [
 ], "exact month joins, signed percentage points, missing values omitted and printed zero retained");
 const relative = rdGapPoints(reference, group, ["alp", "onp"], "alp", mx, true);
 assert.deepEqual(relative.map(p => p.ym), ["2026-01", "2026-05"]);
-assert(Math.abs(relative[0].y + 100 * 5 / 30) < 1e-9);
-assert.equal(relative[1].y, 100);
+assert(Math.abs(relative[0].y - 25 / 30) < 1e-9);
+assert.equal(relative[1].y, 2);
 assert.deepEqual(rdGapRuns(a).map((r) => r.map((p) => p.ym)), [["2026-01"], ["2026-04", "2026-05"]],
   "missing months break the line instead of implying observed continuity");
 assert.deepEqual(rdGapPoints(group, reference, ["alp", "onp"], "onp", mx).map((p) => p.y), [-10, 0, -10, 10],
