@@ -788,6 +788,14 @@ function TrendChart(props) {
 
   const showSpine = (i) => { setDotFrom(null, null); setEvt(null); setHover({ index: i }); onHoverIndex && onHoverIndex(i); };
 
+  const hoverLeaveTimer = useRef(null);
+  const cancelHoverLeave = () => {
+    if (hoverLeaveTimer.current == null) return;
+    clearTimeout(hoverLeaveTimer.current);
+    hoverLeaveTimer.current = null;
+  };
+  React.useEffect(() => () => cancelHoverLeave(), []);
+
   /* Which input selected the current dot. A touch-picked dot has to SURVIVE the
      finger lifting – that is the only way a phone can hold a poll on screen to
      read it – but on a hybrid machine that same sticky dot would otherwise sit
@@ -796,6 +804,7 @@ function TrendChart(props) {
   const setDotFrom = (src, d) => { dotSrc.current = d ? src : null; setDot(d); };
 
   const handleMove = (e) => {
+    cancelHoverLeave();
     if (dotSrc.current === "touch") setDotFrom(null, null);   // mouse takes over a stale touch pick
     const p = toVB(e);
     const near = nearestDot(p, MOUSE_PICK_PX);
@@ -813,10 +822,23 @@ function TrendChart(props) {
   };
 
   const handleLeave = (event) => {
+    cancelHoverLeave();
     // Safari can fire a root mouseout while moved to another drawn element
     // in this same chart; that is not a chart exit or an outside dismissal.
     if (event?.relatedTarget instanceof Node && ref.current?.contains(event.relatedTarget)) return;
     setHover(null); setDotFrom(null, null); setEvt(null); onHoverIndex && onHoverIndex(null);
+  };
+
+  const handleMouseLeave = (event) => {
+    if (event?.relatedTarget instanceof Node && ref.current?.contains(event.relatedTarget)) return;
+    /* Safari also reports some moves between SVG children with no
+       relatedTarget. Let the next movement disprove a real chart exit before
+       hiding the guide; a genuine exit still clears after this short delay. */
+    cancelHoverLeave();
+    hoverLeaveTimer.current = setTimeout(() => {
+      hoverLeaveTimer.current = null;
+      handleLeave();
+    }, 80);
   };
 
   /* A dot is a poll, and the whole poll is in the archive – so on a mouse, the
@@ -1516,7 +1538,7 @@ function TrendChart(props) {
            data-copy-cw={copying ? Math.round(cw) : undefined}
            onPointerMove={onPointerMove} onPointerDown={onPointerDown}
            onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
-           onMouseLeave={handleLeave} onClick={handleClick}
+           onMouseLeave={handleMouseLeave} onClick={handleClick}
            style={openable ? { cursor: "pointer" } : null}
            onKeyDown={handleKeyDown} onBlur={handleLeave}
            tabIndex={0} role="img" aria-label={a11yLabel}>
