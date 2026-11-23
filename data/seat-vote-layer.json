@@ -1,26 +1,26 @@
 {
  "_about": "W4 of .build/analysis/seat-model-plan.md — vote layer: national nowcast ΔV (gen-data §7e primaryNow vs certified 2025), per-state swing deviations (self-centred per house, DL-pooled, shrunk toward 0), and differential-swing β for age/gender (Resolve difference-in-differences vs its 2025-05-03 baseline wave, self-centred so Σ w_g β_g = 0). lnp = combined Coalition. Deviations/β are pp. NOT ESTIMABLE: education/income/location/housing/generation — no May-2025 baseline wave carries them (the polling-day Resolve wave carries age/gender/state only). Tas/NT/ACT are composition-only. Marginals, not joints; no interaction terms exist for layer 3. Structural uncertainty exceeds everything these SEs express — intervals are floor, not ceiling.",
  "_provenance": {
-  "generated": "2026-11-22",
+  "generated": "2026-11-23",
   "inputs": {
-   "data/polls.json": "48e8c30f4caffa97",
-   "data/demographics.json": "3757ec01f53aeb34",
+   "data/polls.json": "b344d4c55ec4bd2f",
+   "data/demographics.json": "92a208e66744ddc9",
    "data/census-2021-divisions.json": "0131bfe18529aefe",
    "data/seats-2025-baseline.json": "a076ea5a2877dfa0",
    "data/aes-2025-groups.json": "00823a6ddedb8345"
   },
   "genData": {
    "spawnedWith": "GEN_DATA_OUT=<tmp> node .build/newtracker/gen-data.mjs",
-   "captured": "primaryNow: alp 26.8 lnp 24.2 grn 13.4 onp 25.6 oth 9.9 | n=8"
+   "captured": "primaryNow: alp 26.6 lnp 24.3 grn 13.4 onp 25.6 oth 10 | n=8"
   }
  },
  "national": {
   "nowcast": {
-   "alp": 26.8,
-   "lnp": 24.2,
+   "alp": 26.6,
+   "lnp": 24.3,
    "grn": 13.4,
    "on": 25.6,
-   "oth": 9.9
+   "oth": 10
   },
   "nPolls": 8,
   "result2025": {
@@ -31,11 +31,11 @@
    "oth": 15.01
   },
   "delta": {
-   "alp": -7.76,
-   "lnp": -7.62,
+   "alp": -7.96,
+   "lnp": -7.52,
    "on": 19.2,
    "grn": 1.2,
-   "oth": -5.11
+   "oth": -5.01
   },
   "note": "Δ = nowcast − certified 2025, pp, 5-key (lnp combined Coalition). Uncertainty deliberately not printed at this layer: W5 takes the estimator's own within gen-data."
  },
