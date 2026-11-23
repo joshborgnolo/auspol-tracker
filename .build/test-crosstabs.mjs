@@ -464,6 +464,35 @@ assert.equal(demosLabel("income", "$125K+"), "$125k+");
     fm.income["$45–75k"] = { ...fm.income["$45–75k"], grn: 14, onp: 27 };
     assert.deepEqual(fm, sorted(hand("2026-03-03")), `the ${r.period} report's Feb–Mar rows match the hand entries but for that cell`);
   }
+  // Oct–Nov summary pp. 8–9: every recalled-2025 cohort × location × age × education cell
+  const switching = wave("DemosAU (MRP)", "2025-11-11").onp2025;
+  const switchLocs = ["Inner metro", "Outer metro", "Reg & Rur"];
+  const switchAges = ["18–34", "35–54", "55+"];
+  const switchEduc = ["Less than year 12", "Year 12", "TAFE", "Undergraduate", "Postgraduate"];
+  const switchCells = {
+    lnp: [
+      [[13, 11, 11, 6, 5], [18, 15, 15, 10, 9], [23, 20, 20, 12, 11]],
+      [[18, 15, 15, 9, 7], [24, 21, 21, 13, 11], [30, 26, 27, 17, 15]],
+      [[21, 18, 18, 11, 9], [28, 25, 25, 16, 14], [35, 31, 31, 20, 18]],
+    ],
+    alp: [
+      [[3, 3, 3, 2, 1], [5, 4, 4, 2, 2], [7, 6, 6, 3, 3]],
+      [[5, 4, 4, 2, 2], [7, 6, 6, 3, 3], [10, 8, 8, 5, 4]],
+      [[6, 5, 5, 3, 2], [9, 7, 7, 4, 4], [12, 10, 10, 6, 5]],
+    ],
+  };
+  assert.deepEqual(Object.keys(switching), ["lnp", "alp"]);
+  for (const [cohort, locRows] of Object.entries(switchCells)) {
+    assert.deepEqual(Object.keys(switching[cohort]), switchLocs);
+    locRows.forEach((ageRows, li) => {
+      assert.deepEqual(Object.keys(switching[cohort][switchLocs[li]]), switchAges);
+      ageRows.forEach((expected, ai) => {
+        const cell = switching[cohort][switchLocs[li]][switchAges[ai]];
+        assert.deepEqual(Object.keys(cell), switchEduc);
+        assert.deepEqual(switchEduc.map((ed) => cell[ed]), expected, `${cohort} ${switchLocs[li]} ${switchAges[ai]}`);
+      });
+    });
+  }
   // the filed waves are the reader's output
   assert.deepEqual(wave("DemosAU (MRP)", "2026-09-19").dims, as.dims);
   assert.deepEqual(wave("DemosAU (MRP)", "2026-07-11").dims, mj.dims);
