@@ -45,4 +45,13 @@ assert.equal(syntheticRings.length, 2, "a value-swap cannot collapse the definit
 assert.equal(syntheticRings.find((m) => m.y === 9).dotColor, "var(--grn)", "metadata, not the larger value, selects the Greens dot");
 assert.equal(syntheticRings.find((m) => m.y === 14).dotColor, null, "no component makes no centre dot");
 assert(synthetic.marks.some((m) => m.x === 1996 && m.dotColor === "var(--onp)"), "the metadata works at ordinary boundaries too");
-console.log("PASS: double count-definition rings retained; inclusion dots use the counted party membership, while the spine and all-series points stay correct");
+
+const allPartyResult = rdVhLines(history, ["alp", "lnp", "grn", "onp", "oth"], history.terms[0].a, history.terms.at(-1).b,
+  (k) => ({ label: k, color: "var(--" + k + ")", width: 1, opacity: 1 }), {});
+assert(allPartyResult.marks.every((m) => !m.dotColor || m.color === "var(--oth)"),
+  "an included party's colour cue belongs only on an Others ring, never a party's own ring");
+const green2016X = history.terms.find((t) => t.year === 2016).a;
+const green2016Rings = allPartyResult.marks.filter((m) => m.x === green2016X && m.color === "var(--grn)");
+assert(green2016Rings.length > 0, "the 2016 election has its Greens count ring");
+assert(green2016Rings.every((m) => !m.dotColor), "a Greens ring never carries One Nation's inclusion cue");
+console.log("PASS: double count-definition rings retained; inclusion dots appear only on Others rings");

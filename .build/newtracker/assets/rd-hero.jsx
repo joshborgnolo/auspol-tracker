@@ -303,7 +303,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
           if (!ringSeen.has(key)) {
             ringSeen.add(key);
             marks.push({ x: p.x, y: p.y, color: st.color,
-              dotColor: p.otherIncludes?.length === 1 ? style(p.otherIncludes[0], t).color : null,
+              dotColor: k === "oth" && p.otherIncludes?.length === 1 ? style(p.otherIncludes[0], t).color : null,
               r: opt.long ? 3 : 4.5, hidden: st.opacity === 0 });
           }
         }
