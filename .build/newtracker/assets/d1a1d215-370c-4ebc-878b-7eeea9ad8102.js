@@ -8734,14 +8734,21 @@ function infoTerms(D) {
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Measuring
         each poll against its own total removes its pollster’s lean on the level. A model then
         follows each group’s gap day by day, as the {xref("primary-vote", "who votes for whom", "primary vote")}’s
-        does. The gap moves slowly, and each pollster reads it its own way (one may find young
+        does, as one line from the group’s first reading to today: the Australian Election Study
+        from 1987, and the count from 1993 for the states and from 1996 for the AEC’s seat types.
+        So the gap has one value on each polling day, and each term’s line meets the next there.
+        The gap moves slowly, and each pollster reads it its own way (one may find young
         voters greener than the others do), so a pollster that cuts a group every fortnight
-        doesn’t set it alone. The gap is applied to the model’s figure for all voters, so a group’s
-        95% interval carries both. The charts follow each group month by month, as a percentage
-        above or below all voters. Tested by predicting each new poll’s group figures from the
-        polls before it, the model missed by 1.7 points against 2.0 for the six-week pooling it
-        replaced. Groups pool only where pollsters cut the population the same way; the working
-        lists which count where.</span>
+        doesn’t set it alone. For the states and the seat types the count measures the gap at
+        every election, so the line passes through each result. The pollsters’ shared lean
+        against the count is measured there and taken out between elections: their “rural” is
+        not the AEC’s rural seats. The gap is applied to the model’s figure for all voters (this
+        term’s model, and each past term’s line as the vote charts draw it, through the counts),
+        so a group’s 95% interval carries both. The charts follow each group month by month, as
+        a percentage above or below all voters. Tested by predicting each poll’s group figures
+        this term from the readings before it, given the poll’s own overall figure, the model
+        missed by 1.6 points on average. Groups pool only where pollsters cut the population the
+        same way; the working lists which count where.</span>
         ) : (
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
@@ -8791,8 +8798,8 @@ function infoTerms(D) {
         <span className="info-p"><b>Since the election.</b> The sentence also asks whether a group
         has moved since the 2025 election, on the same two tests. {D.latest && D.latest.primaryModel
         ? <>It starts from the model’s figure for the group on polling day: the 2025 count moved by
-        the group’s gap then, which the pollsters’ tables before and after the election place, and
-        drawn on the charts as an open triangle.</>
+        the group’s gap then, which the pollsters’ tables before and after the election place (and,
+        for the states and seat types, the count itself). The group’s line starts there.</>
         : <>It starts from the polls’ own
         figure for the group over the six weeks before polling day: the pollsters’ published
         tables then, pooled just as today’s figures are, and drawn on the charts as an open

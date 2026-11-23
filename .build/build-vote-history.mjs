@@ -34,6 +34,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { fitPrimary, anchorFrom, categoriesOf, stepOf, softmaxAlr, alrOf, mean, quant, PRIM_MISS } from "./newtracker/primary-model.mjs";
 import { FLOW_LEF, impliedLefAlp2pp } from "./newtracker/flows.mjs";
+import { nestCoords, nestJac } from "./newtracker/group-span.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const W0 = 0.4, SEP = ["alp", "lnp", "grn", "onp"], DEFF = 1.6;
@@ -105,6 +106,14 @@ export function buildVoteHistory({ log = () => {} } = {}) {
     const eAlr = lateN >= 1 ? Array.from({ length: Dd }, (_, k) => mean(endD.map((e) => e[k])) - cAlr[k]) : null;
     const endSh = parties.map((_, q) => mean(endD.map((e) => 100 * softmaxAlr(e)[q])));
     const out = { year: O.year, src: C.year, a: xO, b: xC, lanes: parties, open, close, miss: {}, n: polls.length, lateN, series: {} };
+    /* the vote-by-group model's base (gen-data §7gm): each month's adjusted
+       draws on its nested log-ratio scale (group-span.mjs), mean and
+       covariance – Labor, the Coalition, then the Greens and One Nation
+       where the term draws them apart (a term drawing One Nation but not the
+       Greens apart has no such scale) */
+    const nestOK = !(parties.includes("onp") && !parties.includes("grn"));
+    const lev = parties.length - 1;
+    if (nestOK) { out.days = [tO, tC]; out.nest = []; }
     /* the 2PP through the opening election's flows, draw by draw */
     const LEF = FLOW_LEF[O.year];
     const tppOf = (sh) => { const q = Object.fromEntries(parties.map((k, i) => [k, 100 * sh[i]])); return impliedLefAlp2pp(LEF, { alp: q.alp, lnp: q.lnp, grn: q.grn ?? null, onp: q.onp ?? null, oth: q.oth }); };
@@ -123,6 +132,13 @@ export function buildVoteHistory({ log = () => {} } = {}) {
       for (const e of dr) {
         const s0 = softmaxAlr(e), s1 = eAlr ? softmaxAlr(e.map((v, k) => v - eAlr[k] * g)) : s0;
         parties.forEach((_, q) => { raw[q].push(100 * s0[q]); adj[q].push(100 * s1[q]); });
+      }
+      if (nestOK) {
+        const cs = adj[0].map((_, j) => nestCoords(parties.map((__, q) => Math.max(adj[q][j], 1e-4) / 100)));
+        const mu = Array.from({ length: lev }, (_, a) => mean(cs.map((c) => c[a])));
+        const C = [];
+        for (let a = 0; a < lev; a++) for (let b = a; b < lev; b++) C.push(cs.reduce((s, c) => s + (c[a] - mu[a]) * (c[b] - mu[b]), 0) / (cs.length - 1));
+        out.nest.push({ day: m.day, m: mu, C, sh: parties.map((_, q) => mean(adj[q]) / 100), g, measured: !!eAlr });
       }
       parties.forEach((k, q) => {
         const lo = quant(adj[q], 0.025), hi = quant(adj[q], 0.975);
@@ -155,6 +171,20 @@ export function buildVoteHistory({ log = () => {} } = {}) {
         const ci = Math.min(1.96 * Math.sqrt(m.sd * m.sd + biasVar), m.adj);   // the band stops at zero
         const rawCi = Math.min(1.96 * m.rawSd, m.raw);
         return [m.x, r2(m.adj), r2(m.raw), r2(ci), m.k, r2(rawCi)];
+      });
+    }
+    /* the nested moments with the doubt about the bias left once the count
+       is known added in share space (each lane's V·g(1 − g), or V·g
+       unmeasured) and read through the scale's Jacobian at the month's mean
+       shares: rows [day, mean…, covariance's upper triangle…] */
+    if (t.nest) {
+      const lev = t.lanes.filter((k) => k !== "tpp").length - 1, lanes = t.lanes.filter((k) => k !== "tpp"), P = lev + 1;
+      t.nest = t.nest.map((r) => {
+        const bv = lanes.map((k) => { const Vk = V[k] ?? V.oth; return (r.measured ? Vk * r.g * (1 - r.g) : Vk * r.g) / 1e4; });
+        const J = nestJac(r.sh), C = r.C.slice();
+        let u = 0;
+        for (let a = 0; a < lev; a++) for (let b = a; b < lev; b++) { let s = 0; for (let i = 0; i < P; i++) s += J[a * P + i] * bv[i] * J[b * P + i]; C[u++] += s; }
+        return [r.day, ...r.m.map((v) => +v.toFixed(5)), ...C.map((v) => +v.toPrecision(5))];
       });
     }
     delete t.lateN;

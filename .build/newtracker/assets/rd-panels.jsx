@@ -124,13 +124,17 @@ function RdPrimary({ rangeId, setRangeId }) {
   /* nothing in the three-week window under the subset: the headline quotes
      nothing, the monthly chart still draws (story override below) */
   const pvxDry = !!(pvx && !pvx.now);
-  /* A group's past terms (data/group-history-model.json, built by
-     .build/build-group-history.mjs: each past term's national model moved by
-     the group's modelled gap, from that term's crosstabs and the AES at both
-     elections), fetched the first time a group view opens a window behind
-     this term, and shaped as the vote history is so the history scene draws
-     them exactly as it draws all voters' terms: one line per party per term,
-     its band, no count rings (no count cuts a group). */
+  /* A group's past terms (gen-data §7gm's group-history file: each past
+     term's all-voters line, drawn through the counts, moved by the group's
+     modelled gap from all voters – one gap running through every term, so
+     each term meets the next on polling day), fetched the first time a group
+     view opens a window behind this term, and shaped as the vote history is
+     so the history scene draws them exactly as it draws all voters' terms.
+     A polling day the count cut (a state's, an AEC seat type's) is a ring
+     the line passes through; any other is the model's estimate, drawn as a
+     point of the line with its band (est). A group with no past terms (the
+     income bands) gets an empty history, so a wide window still opens on
+     this term rather than doing nothing. */
   const [ghTick, setGhTick] = useState(0);
   const ghAvail = !window.JUR && !!window.AP_GROUP_HIST;
   const VHg = React.useMemo(() => {
@@ -140,14 +144,20 @@ function RdPrimary({ rangeId, setRangeId }) {
     const terms = GH.terms.map((t) => {
       const c = t.sets && t.sets[sel.setId] && t.sets[sel.setId][sel.label];
       if (!c) return null;
-      const series = {};
+      const series = {}, open = {}, close = {}, openCi = {}, closeCi = {};
       KG.forEach((k, i) => {
-        const rows = c.months.filter((m) => m[1 + i] != null).map((m) => [D.mx(m[0]), m[1 + i], m[1 + i], m[6 + i], null]);
-        if (rows.length >= 2) series[k] = rows;
+        const rows = c.months.filter((m) => m[1 + i] != null).map((m) => [m[0], m[1 + i], m[1 + i], m[6 + i], null, m[6 + i]]);
+        if (c.open && c.open[i] != null) { open[k] = c.open[i]; openCi[k] = c.open[5 + i]; }
+        if (c.close && c.close[i] != null) { close[k] = c.close[i]; closeCi[k] = c.close[5 + i]; }
+        if (rows.length + (open[k] != null ? 1 : 0) + (close[k] != null ? 1 : 0) >= 2) series[k] = rows;
       });
-      return { year: t.year, a: confIsoX(t.from), b: confIsoX(t.to), lanes: Object.keys(series), open: {}, close: {}, series, miss: {}, src: t.year, houses: c.houses };
+      const inc = c.inc || [null, null];
+      return { year: t.year, src: t.src, a: t.a, b: t.b, lanes: Object.keys(series), open, close, openCi, closeCi,
+               est: [!c.counted[0], !c.counted[1]], series, miss: {},
+               otherIncludes: { open: Object.keys(inc[0] || {}), close: Object.keys(inc[1] || {}) },
+               otherIncludedVotes: { open: inc[0] || {}, close: inc[1] || {} } };
     }).filter(Boolean);
-    return terms.length ? { terms } : null;
+    return { terms };
   }, [G, ghTick, sel && sel.setId, sel && sel.label]);
   /* The window bar stands in for the range tabs on the all-voters view and
      on a group's (whose past terms load on demand); a pollster subset exists
@@ -397,13 +407,32 @@ function RdPrimary({ rangeId, setRangeId }) {
      row ({x, ym, per-party value, ci:{…}}) so the series/areas/tooltip code
      below needs no group branches of its own. A month the group went
      unpolled is simply absent, as live() already tolerates */
+  /* The model's line starts on polling day itself (G.el: its estimate
+     there, on the count where the count cut the group), where the past
+     term's line ends, as the all-voters line starts on the count */
+  const gElX = D.demoStateElection ? D.demoStateElection.x : null;
   const gMonths = React.useMemo(() => {
     if (!G) return null;
-    return G.monthly.map((m) => {
+    const rows = G.monthly.map((m) => {
       const o = { ym: m[0], x: D.mx(m[0]), ci: {} };
       T.order.forEach((kk, i) => { o[kk] = m[1 + i]; o.ci[kk] = m[1 + T.order.length + i]; });
       return o;
     });
+    if (G.el && gElX != null && (!rows.length || rows[0].x > gElX + 1e-6)) {
+      const o = { ym: rows.length ? rows[0].ym : "", x: gElX, election: true, est: !base, ci: {} };
+      T.order.forEach((kk, i) => { o[kk] = G.el[i]; o.ci[kk] = G.el[T.order.length + i]; });
+      rows.unshift(o);
+    }
+    return rows;
+  }, [T, G]);
+  /* where the count cuts the group, the polls' shared offset from it each
+     month (G.mo, points per party): a poll's own reading is moved by it to
+     sit on the line's footing */
+  const gOff = React.useMemo(() => {
+    if (!G || !G.mo || !G.mo.length) return null;
+    const m = new Map(G.mo.map((r) => [r[0], r]));
+    const last = G.mo[G.mo.length - 1];
+    return (ym, kk) => { const r = m.get(ym) || (ym > last[0] ? last : G.mo[0]); return r[1 + T.order.indexOf(kk)] || 0; };
   }, [T, G]);
   const pts = filterPts(G && gMonths ? gMonths : aggPrim, xDomain[0]);
   const visible = (partsChart || []).filter((p) => !hideC[p.id]);
@@ -501,7 +530,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           if (gv[i] == null || tt[i] == null) return null;
           // the group's estimated subsample (gen-data's wave n × the group's
           // share of voters) overrides the tip's whole-wave n, as the rug does
-          return { x: s.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: demoPartMeta(q, s), party: p.id,
+          return { x: s.x, y: M[p.id] + (gv[i] - tt[i]) - (gOff ? gOff(s.ym, p.id) : 0), gv: gv[i], color: p.color, label: p.name, meta: demoPartMeta(q, s), party: p.id,
                    sub: demoReadSub(q, sel.label, demoPartSub(q, s, q.grp.n && q.grp.n[gi])) };
         }).filter(Boolean);
       }).concat(inDom(q.x) ? soloDotsOf(q) : []);
@@ -577,7 +606,7 @@ function RdPrimary({ rangeId, setRangeId }) {
      the first month polled. A counted base excludes the election-time
      figures by construction, so the stops never coexist; with triangles
      drawn the stop reads them, through their lead-ins */
-  const evStop = evOn ? { x: D.demoVote.x, y: evOf("alp") ? evOf("alp")[0] : evPts[0].y } : null;
+  const evStop = evOn && (!pts.length || pts[0].x > D.demoVote.x + 1e-6) ? { x: D.demoVote.x, y: evOf("alp") ? evOf("alp")[0] : evPts[0].y } : null;
   const elecStop = gElecStop || evStop;
   /* Show dated events at term scale. Wider overviews retain the election
      landmarks. A leadership handover can be filed under adjacent terms. */
@@ -735,6 +764,17 @@ function RdPrimary({ rangeId, setRangeId }) {
         const q = spine[i];
         if (!q) return [];
         if (q.count || q.elec) {
+          /* a group's polling day the count never cut: the model's estimate */
+          if (G && (q.est || (q.elec && !base))) {
+            const ciAtE = (k) => {
+              if (q.elec) { const d = pts.find((r) => r.election); return d && d.ci[k] != null ? d.ci[k] : null; }
+              for (const t of VHuse.terms) { if (Math.abs(t.a - q.x) < 1e-6 && t.openCi[k] != null) return t.openCi[k]; if (Math.abs(t.b - q.x) < 1e-6 && t.closeCi[k] != null) return t.closeCi[k]; }
+              return null;
+            };
+            const cis = visible.map((p) => ciAtE(p.id));
+            return [{ label: "", value: "The model’s estimate for " + sel.who + " on polling day" }]
+              .concat(cis.some((c) => c != null) ? [{ label: "95% intervals", value: cis.map((c) => (c == null ? "–" : "±" + c.toFixed(1))).join(" ") }] : []);
+          }
           if (!supportMeasured) return [{ label: "", value: "The election result" }];
           const rows = [{ label: "", value: "The election result" }];
           for (const t of VH.terms) {
@@ -1020,6 +1060,8 @@ function RdPrimary({ rangeId, setRangeId }) {
                   : evGrp.src === "polls" ? "The polls " + RD_PEL_WHEN
                   : "Australian Election Study 2025, " + evGrp.aesN.toLocaleString() + " respondents" }];
             const d = pts[elecStop ? i - 1 : i];
+            if (d && d.election && G) return [{ label: "", value: d.est ? "The model’s estimate for polling day" : "The election result" }]
+              .concat(d.est ? visible.map((p) => ({ label: "95% intervals", value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"), rowLabel: p.name })) : []);
             if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
             return visible.map((p) => ({ label: "95% intervals", value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"), rowLabel: p.name }));
           }}
@@ -1034,9 +1076,11 @@ function RdPrimary({ rangeId, setRangeId }) {
              Nation are level" said neither whose votes nor how many polls */
           copy={H && G ? {
             title: "First-preference vote for each party, " + sel.who, span: confWinYears(vwWin, vwTerms, vwHi),
-            sub: "Each term is the model’s estimate for " + sel.who + ": that term’s national primaries moved by the group’s gap, from the pollsters’ group tables and the Australian Election Study at each election.",
-            caption: "Lines are the model’s estimates at each month’s middle, shaded bands their 95% intervals; a term with few group tables leans on the Australian Election Study at its two elections, and its band widens between them.",
-            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: "line" })),
+            sub: "Each term is the all-voters line, drawn through the election results, moved by the model’s gap for " + sel.who + "; the gap runs through every term, so each term meets the next on polling day" + (base ? ", on the counted result." : "."),
+            caption: "Lines are the model’s estimates at each month’s middle, shaded bands their 95% intervals"
+              + (base ? "; rings are the counted results, which the lines pass through." : "; polling-day figures are the model’s estimates, from the pollsters’ group tables and the Australian Election Study."),
+            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: "line" }))
+              .concat(base ? [{ label: "Election result", color: "var(--ink)", kind: "ring" }] : []),
           } : H ? {
             title: "First-preference vote for each party", span: confWinYears(vwWin, vwTerms, vwHi),
             sub: supportMeasured
@@ -1089,7 +1133,9 @@ function RdPrimary({ rangeId, setRangeId }) {
         )}
         {/* what the past terms' lines are, beside them */}
         {H && (
-          G ? <p className="rd-note">Each past term is the model’s estimate for {sel.who}: that term’s national primaries, from every poll with each pollster’s lean taken out, moved by the group’s gap from all voters, from the pollsters’ group tables and the Australian Election Study at the term’s two elections. Where few pollsters published group tables, the line leans on the two Election Studies and its band widens between them. A line ends at each election; the next term starts from its own polls.</p>
+          G ? (base
+            ? <p className="rd-note">Each past term is the all-voters line, drawn through the election results, moved by the model’s gap for {sel.who}. The gap is one estimate running through every term, so each term meets the next on polling day. The AEC counts {sel.who} at every election, so the line passes through each counted result. Between elections it follows the pollsters’ group tables, less their shared lean against the count. Where no pollster published the cut, the line runs between the counted results and its band widens away from them.</p>
+            : <p className="rd-note">Each past term is the all-voters line, drawn through the election results, moved by the model’s gap for {sel.who}. The gap is one estimate running through every term, read from the pollsters’ group tables and the Australian Election Study at each election, so each term meets the next on polling day. No count measures {sel.who}, so each polling-day figure is the model’s estimate, with its own band. Where few pollsters published group tables, the line leans on the Election Studies and its band widens between them.</p>)
           : supportMeasured ? <p className="rd-note">Past terms keep the polls’ own figures before the election-result adjustment. Shaded bands retain the polling and model uncertainty without that adjustment’s extra calibration doubt. Rings stay at the official results, above or below a party’s line where the polls over- or underestimated support. {vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is unchanged: no election has measured it yet. " : ""}</p>
           : <p className="rd-note">Past terms are drawn through the election results at both ends. By polling day the polls typically miss Labor’s result by about {VH.rms.alp.toFixed(1)} points and the Coalition’s by {VH.rms.lnp.toFixed(1)}, so every month of a past term is moved by part of its closing election’s miss: two-fifths of it from the first month, rising evenly to all of it on polling day. {vhLong ? "Over a dozen years or more the bands are left off; a shorter window shows them, with the doubt about when the miss arose. " : "The shaded band includes the doubt about when the miss arose. "}{vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is the polls alone: no election has measured it yet. " : ""}{H.unmeasured.length ? "No dated poll fell in the final three weeks before the " + rdList(H.unmeasured.map((t) => String(t.src))) + " elections, so " + (H.unmeasured.length === 1 ? "that term is" : "those terms are") + " the polls alone." : ""}</p>
         )}
@@ -1097,10 +1143,12 @@ function RdPrimary({ rangeId, setRangeId }) {
             group views" paragraph is the deep version; a dot's tooltip
             tips the printed figure and the Demographics facet lists them */}
         {G && (
-          <p className="rd-note">Each dot is one poll’s reading of {sel.who} less that poll’s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll’s in All polls’ Demographics view.{sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : ""}</p>
+          <p className="rd-note">Each dot is one poll’s reading of {sel.who} less that poll’s own all-voters figure, drawn onto the trend{gOff ? <>, then moved by the pollsters’ shared lean against the AEC’s count for {sel.who}, which the model measures at each election</> : null}; it is never the cut the poll printed, which sits beside every other poll’s in All polls’ Demographics view.{sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : ""}</p>
         )}
         <RdKey className="rd-ckey" items={H && G ? [
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" },
+          base ? { kind: "ring", label: "Election result" } : null,
+          ...(base ? H.inclusions : []),
         ] : H ? [
           vhDotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll, as published" } : null,
           supportMeasured ? { kind: "lineband", color: "var(--ink-3)", label: VH.model ? (narrow ? "Model, 95% interval" : "Model consensus and its 95% interval") : "Monthly average and its 95% interval" }

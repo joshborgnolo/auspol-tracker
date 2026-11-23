@@ -272,15 +272,19 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
       const st = style(k, t);
       if (!st) continue;
       const pts = [], counts = [];
+      /* a group's polling day the count never cut (t.est) is the model's
+         estimate: the line passes through it with its band, and no ring */
       if (t.open[k] != null) {
-        const p = { x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [], otherIncludedVotes: t.otherIncludedVotes?.open || {} };
+        const p = { x: t.a, y: t.open[k], count: t.year, otherIncludes: t.otherIncludes?.open || [], otherIncludedVotes: t.otherIncludedVotes?.open || {},
+                    ...(t.est && t.est[0] ? { est: true, ci: t.openCi[k] } : {}) };
         counts.push(p);
         if (!opt.measured) pts.push(p);
       }
       for (const m of t.series[k] || []) pts.push({ x: m[0], y: m[opt.measured ? 2 : 1], raw: m[2], ci: m[opt.measured ? 5 : 3], n: m[4],
         note: opt.measured ? undefined : "polls " + m[2].toFixed(1) });
       if (t.close[k] != null) {
-        const p = { x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [], otherIncludedVotes: t.otherIncludedVotes?.close || {} };
+        const p = { x: t.b, y: t.close[k], count: t.src, otherIncludes: t.otherIncludes?.close || [], otherIncludedVotes: t.otherIncludedVotes?.close || {},
+                    ...(t.est && t.est[1] ? { est: true, ci: t.closeCi[k] } : {}) };
         counts.push(p);
         if (!opt.measured) pts.push(p);
       }
@@ -303,7 +307,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
         });
       }
       for (const p of opt.measured ? counts.concat(pts) : pts) {
-        if (p.count) {
+        if (p.count && !p.est) {
           const key = k + "|" + p.x.toFixed(3) + "|" + p.y;
           // Keep both count definitions. A centre dot marks the vote of the
           // distinct party folded into this term's Others count.
@@ -316,7 +320,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
           }
         }
         const sk = p.x.toFixed(4);
-        if (!stopSeen.has(sk)) { stopSeen.add(sk); stops.push({ x: p.x, y: p.y, count: p.count || null }); }
+        if (!stopSeen.has(sk)) { stopSeen.add(sk); stops.push({ x: p.x, y: p.y, count: p.count || null, ...(p.est ? { est: true } : {}) }); }
       }
     }
   }

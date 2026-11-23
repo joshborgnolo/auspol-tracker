@@ -141,7 +141,7 @@ await page.select("#primary-vote select.rd-pv-sel", "Men");
 await settle(1800);
 s = await state();
 check("group views do not show the support toggle", !s.support);
-check("group views keep their own history model, not Measured mode", /Each past term is the model’s estimate for men/.test(s.note), s.note.slice(0, 150));
+check("group views keep their own history model, not Measured mode", /Each past term is the all-voters line, drawn through the election results, moved by the model’s gap for men/.test(s.note), s.note.slice(0, 150));
 await page.select("#primary-vote select.rd-pv-sel", "");
 await settle(1800);
 s = await state();

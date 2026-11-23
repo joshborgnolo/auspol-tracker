@@ -107,7 +107,7 @@ finally { console.log = _mutelog; console.warn = _mutewarn; }
    line reads them by name, so if either is missing or empty the diagnosis
    belongs here, not in a readFileSync ENOENT two hundred lines later. */
 for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json",
-                   ...(VIC ? [] : ["oneoffs-source.json"])]) {
+                   ...(VIC ? [] : ["oneoffs-source.json", "group-history.json"])]) {
   const exists = fs.existsSync(DA(rel));
   if (!exists || fs.statSync(DA(rel)).size === 0) {
     console.error(`\n.build/newtracker/${"assets/" + rel} is ${exists ? "empty" : "missing"} after gen-data – build stopped`);
@@ -1799,12 +1799,14 @@ writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
    document, and the browser resolves the cycle-source fetch against the
    page's own URL. */
 parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
-/* The past terms' primary vote by group (data/group-history-model.json,
-   .build/build-group-history.mjs) gets the same treatment: only a reader who
-   opens a group view on a window behind this term needs it. Federal only. */
+/* The past terms' primary vote by group (gen-data §7gm's group-history.json:
+   each past term's all-voters line moved by the group's modelled gap) gets
+   the same treatment: only a reader who opens a group view on a window
+   behind this term needs it. Federal only. */
 if (!VIC) {
-  const ghPath = path.join(ROOT, "data", "group-history-model.json");
-  const ghJson = fs.existsSync(ghPath) ? fs.readFileSync(ghPath, "utf8") : null;
+  const ghPath = DA("group-history.json");
+  const ghRaw = fs.existsSync(ghPath) ? fs.readFileSync(ghPath, "utf8") : null;
+  const ghJson = ghRaw && ghRaw.trim() !== "null" ? ghRaw : null;
   const name = ghJson ? `group-history.${hash8(Buffer.from(ghJson))}.json` : null;
   for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
     if (/^group-history\..*\.json$/.test(old) && old !== name && !sweepKeep(`assets/${old}`))

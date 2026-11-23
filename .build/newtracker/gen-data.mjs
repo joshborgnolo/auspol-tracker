@@ -21,6 +21,7 @@ import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
 import { tppRead, tppNowOut, tppChgOut } from "./primary-model.mjs";
+import { fitSpan, gapReading, countReading, nestCats, nestCoords, nestShares, drawMix, makeRng as gsRng } from "./group-span.mjs";
 import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
@@ -86,6 +87,7 @@ const OUT_DIR = process.env.GEN_DATA_OUT || path.join(HERE, "assets");
 const DATA_ASSET = path.join(OUT_DIR, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
 const CYCLE_SOURCE_ASSET = path.join(OUT_DIR, "cycle-source.json");
 const ONEOFFS_ASSET = path.join(OUT_DIR, "oneoffs-source.json");
+const GROUP_HIST_ASSET = path.join(OUT_DIR, "group-history.json");
 
 /* ---- canonical dataset ------------------------------------------------
    data/polls.json is the single source of truth. It used to be scraped out of
@@ -1017,7 +1019,7 @@ for (const k of PRIMARY_KEYS) {
    is the count moved by it.
    PRIM_JUMPS: changes of prime minister or opposition leader this term,
    where the shares may step. */
-// PRIM_MISS lives in primary-model.mjs (one copy for this file and build-group-history.mjs)
+// PRIM_MISS lives in primary-model.mjs (one copy for this file and build-vote-history.mjs)
 /* the days a new leader can move the vote at once: federally Ley, then
    Taylor, lead the Liberals; a state build's each change of head of
    government or opposition leader since its election (JUR.eras) */
@@ -6913,42 +6915,67 @@ const DEMO_RESOLVE_BETA = (() => {
    and others null, and its printed shares, already decided voters'
    percentages, are taken as printed rather than rescaled over three
    parties. Null on /vic/ and where the file is absent. */
-/* ---- 7gm. the vote-by-group model (federal; primary-model.mjs fitSet) -------
+/* ---- 7gm. the vote-by-group model (federal; group-span.mjs fitSpan) --------
    Each group's gap from all voters – the group's shares against the same
-   poll's all-voters shares, as log-ratios, so the poll's lean on the level
-   cancels as it always has – is a slow random walk, and each pollster has
-   its own reading of it (a house that finds young voters greener than the
-   others do), shrunk to the average house's. The settings are shared by the
-   groups of a set and integrated over a grid. A group's figures are then
-   the national model's figures (§2m) moved by its gap, draw by draw, so the
-   group's band carries both. The polls read are exactly §7g's (harmonize,
-   pooled releases as their parts, models reusing waves left out) plus the
-   pre-election tables DEMO_ELECTION reads, which place each group's gap on
-   election day. Backtest (predicting each new poll's group figures from
-   the waves before it, this term): error 1.65 v 2.03 points for the
-   pooled-gap construction it replaces. */
-/* a pollster consensus gap's error against a counted one, a party (§7g's
-   DEMO_INSTR, defined from it below) */
+   poll's all-voters shares, on nested log-ratios, so the poll's lean on the
+   level cancels as it always has – is ONE slow random walk from the group's
+   first reading (the Australian Election Study 1987, the count 1993 for the
+   states, 1996 for the AEC seat types) to today, so it has one value on each
+   polling day, read from both sides of it. Each pollster has its own
+   reading of the gap (a house that finds young voters greener than the
+   others do), fixed while it keeps publishing the cut and shrunk to the
+   average house's; the AES is one more house. Where the count cuts the
+   group (each state's and each AEC seat type's result against the nation's)
+   the gap is the counted one on polling day, and the polls' shared offset
+   from the count is a walk of its own: measured at each election, carried
+   into the term, drifting until the next count. The settings are shared by
+   a set's groups and integrated over a grid.
+   A group's figures are the all-voters figures moved by its gap, draw by
+   draw: this term's from the national model (§2m), each past term's from
+   its line as the vote charts draw it (§8v, through the counts), so a
+   group's line meets the next term's on polling day and, where the count
+   cuts the group, passes through the count. The readings: every crosstab
+   of the past terms (data/group-history-waves.json, 2006–25, which holds
+   the tables of the six weeks before the 2025 election too), this term's
+   (§7g's: harmonize, pooled releases as their parts, models reusing waves
+   left out), the AES at every election (data/aes-groups-history.json;
+   2025 from its respondent file, data/aes-2025-groups.json) and the counts
+   (data/group-counts.json from the AEC results in map/data; 2025 as the
+   charts' own rings). */
 const GROUP_INSTR = 1.5;
-const GROUPM = (() => {
-  if (JUR || !PRIMM || !DEMOGRAPHICS || !Array.isArray(DEMOGRAPHICS.waves)) return null;
+const GROUP_HOUSE = { "Resolve Strategic": "Resolve" };
+const GROUP_SPAN = JUR || !PRIMM || !DEMOGRAPHICS || !Array.isArray(DEMOGRAPHICS.waves) ? null : (() => {
   const tStart = Date.now();
+  const rdJ = (f) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8")); } catch { return null; } };
+  const GHW = rdJ("group-history-waves.json"), AESH = rdJ("aes-groups-history.json"), AES25 = rdJ("aes-2025-groups.json"), CNT = rdJ("group-counts.json");
+  const VHM = rdJ("vote-history-model.json");
+  const vhmInput = (() => { try { return createHash("sha1").update(JSON.stringify({ e: D.elections, c: D.cyclePolls, b: D.cyclePollBases })).digest("hex").slice(0, 12); } catch { return null; } })();
+  const vhmOK = !!(VHM && VHM.input === vhmInput && VHM.terms.some((t) => t.nest));
+  if (!vhmOK) console.warn("group model: data/vote-history-model.json is stale or lacks the nested moments (run node .build/build-vote-history.mjs) – no past terms by group");
+  const t0E = pmDay(ELECTION.date);
   const raw = [];
-  const toPM = (o) => PM_PARTIES.map((k) => (o[k] == null ? null : o[k]));
   const dayMid = (q) => Math.round((pmDay(q.dateStart || q.date) + pmDay(q.date)) / 2);
-  const add = (src, house, rel, tot, reads, sets) => {
-    for (const [setId, groups] of sets) for (const [group, g] of groups) for (const r of reads)
-      raw.push({ src, set: setId, group, house, day: r.day, n: r.n * DEMO_SHARE[group], s: DEMO_SHARE[group], g: toPM(g), t: toPM(tot), rel });
-  };
-  const harmSets = (w) => {
-    const h = harmonize(w), out = [];
-    for (const set of DEMO_SETS) {
-      const gs = [];
-      for (const group of set.groups) { const g = h[set.id] && h[set.id][group] && demoNorm(h[set.id][group]); if (g) gs.push([group, g]); }
-      if (gs.length) out.push([set.id, gs]);
+  const read = (src, set, group, house, g, t, reads) => {
+    for (const r of reads) {
+      const q = gapReading({ g, t, n: r.n * DEMO_SHARE[group], s: DEMO_SHARE[group] });
+      if (q) raw.push({ src, set, group, house: GROUP_HOUSE[house] || house, day: r.day, ...q });
     }
+  };
+  const harmSets = (w, norm) => {
+    const h = harmonize(w), out = [];
+    for (const set of DEMO_SETS) for (const group of set.groups) { const g = h[set.id] && h[set.id][group] && norm(h[set.id][group]); if (g) out.push([set.id, group, g]); }
     return out;
   };
+  const normE = (o) => (o && DEMO_KEYS.every((k) => o[k] != null) ? demoNorm(o) : o && o.alp != null ? demoNorm(o) : null);
+  /* the past terms' crosstabs (to the 2025 election) */
+  if (GHW) for (const w of GHW.waves) {
+    if (!w.dims || !w.date || w.date >= ELECTION.date) continue;
+    const tot = normE(w.total);
+    if (!tot) continue;
+    const reads = (w.parts && w.parts.length ? w.parts : [w]).map((q) => ({ day: dayMid(q.dateStart ? q : { date: q.date, dateStart: w.dateStart }), n: rowN({ sample: q.sample || w.sample }) / HL_DEFF }));
+    for (const [setId, group, g] of harmSets(w, normE)) read("poll", setId, group, w.pollster, g, tot, reads);
+  }
+  /* this term's (§7g's reading) */
   for (const w of DEMOGRAPHICS.waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
     if (!tot || (p && reusesWaves(p))) continue;
@@ -6956,119 +6983,214 @@ const GROUPM = (() => {
     if (isPooledRelease(w) && !parts) continue;
     const r0 = p || w, n = rowN(p || { sample: w.sample });
     const reads = (parts || [r0]).map((q) => ({ day: dayMid(q), n: (parts ? rowN(q) : n) / HL_DEFF }));
-    add("term", w.pollster, r0.date, tot, reads, harmSets(w));
+    for (const [setId, group, g] of harmSets(w, demoNorm)) read("poll", setId, group, w.pollster, g, tot, reads);
     const inc = incomeStandardise(w.pollster, w.dims && w.dims.income, midMs(r0));
-    if (inc) add("term", w.pollster, r0.date, tot, reads, [["income", INCOME_STD_BANDS.map((b) => [b.group, inc.shares[b.group] && demoNorm(inc.shares[b.group])]).filter(([, g]) => g)]]);
+    if (inc) for (const b of INCOME_STD_BANDS) { const g = inc.shares[b.group] && demoNorm(inc.shares[b.group]); if (g) read("poll", "income", b.group, w.pollster, g, tot, reads); }
   }
-  let src = null;
-  try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics-2025-election.json"), "utf8")); } catch { src = null; }
-  const normE = (o) => (o && DEMO_KEYS.every((k) => o[k] != null) ? demoNorm(o) : o);
-  if (src) for (const w of src.waves) {
-    const tot = normE(w.total);
-    if (!tot) continue;
-    const reads = (w.parts || [w]).map((q) => ({ day: dayMid(q), n: rowN(q) / HL_DEFF }));
-    const h = harmonize(w), sets = [];
-    for (const set of DEMO_SETS) { const gs = []; for (const group of set.groups) { const g = h[set.id] && h[set.id][group] && normE(h[set.id][group]); if (g) gs.push([group, g]); } if (gs.length) sets.push([set.id, gs]); }
-    add("election", w.pollster, w.date, tot, reads, sets);
+  /* the AES at every election: each group against the AES's own total, on
+     polling day (weighted samples: design effect ~1.5, else 1.2) */
+  const aesYears = [];
+  for (const [yr, A] of Object.entries((AESH && AESH.elections) || {})) {
+    const useA = yr === "2025" && AES25 && AES25.all ? { ...AES25, weighted: true, date: ELECTION.date } : A;
+    if (!useA || !useA.all || !useA.date) continue;
+    const tot = useA.all, d = pmDay(useA.date);
+    aesYears.push(yr);
+    for (const set of DEMO_SETS) for (const group of set.groups) {
+      const c = useA.sets && useA.sets[set.id] && useA.sets[set.id][group];
+      if (!c || !(c.n >= 30)) continue;
+      read("aes", set.id, group, "AES", c, tot, [{ day: d, n: c.n / (useA.weighted ? 1.5 : 1.2) / DEMO_SHARE[group] }]);
+    }
   }
-  /* the Australian Election Study 2025: each group's vote at the election
-     against the AES's own total, read on polling day as one more house
-     with its own (shrunk) reading of each gap – the AES and the polls
-     disagree beyond sampling on several groups (gender, the Coalition's age
-     gradient), and the model weighs it as it weighs a pollster. Its group
-     samples are weighted (design effect ~1.5). */
-  const AES25 = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "aes-2025-groups.json"), "utf8")); } catch { return null; } })();
-  const t0E = pmDay(ELECTION.date);
-  if (AES25 && AES25.all) for (const set of DEMO_SETS) for (const group of set.groups) {
-    const g = AES25.sets && AES25.sets[set.id] && AES25.sets[set.id][group];
-    if (!g || !g.n || DEMO_KEYS.some((k) => g[k] == null)) continue;
-    raw.push({ src: "aes", set: set.id, group, house: "AES 2025", day: t0E, n: g.n / 1.5, s: DEMO_SHARE[group], g: toPM(g), t: toPM(AES25.all), rel: ELECTION.date });
+  /* the counts: each state's and AEC seat type's result against the
+     nation's, on polling day; 2025 as the charts' rings (DEMO_*_ELECTION) */
+  const asObj = (arr) => Object.fromEntries(DEMO_KEYS.map((k, i) => [k, arr[i]]));
+  const counted = new Map();          // "set|group" → Map(election day → the group's counted shares)
+  const addCount = (setId, group, day, g, t) => {
+    const q = countReading(g, t);
+    raw.push({ src: "count", set: setId, group, house: "Count", day, ...q });
+    const k = setId + "|" + group; (counted.get(k) || counted.set(k, new Map()).get(k)).set(day, { g, t });
+  };
+  for (const [yr, E] of Object.entries((CNT && CNT.elections) || {})) {
+    if (yr >= ELECTION.date.slice(0, 4)) continue;
+    const d = pmDay(E.date), nat = asObj(E.Nat.pct);
+    for (const setId of ["state", "location"]) for (const [group, c] of Object.entries(E[setId] || {})) addCount(setId, group, d, asObj(c.pct), nat);
   }
-  /* the count, where it was cut (each state's and each AEC region class's
-     result against the nation's): polling day's gap itself, with the error
-     a pollster's consensus gap shows against a counted one (DEMO_INSTR, 1.5
-     points a party), and no lean of its own */
-  const natE = DEMO_STATE_ELECTION.groups.Nat;
-  for (const [E, setId] of [[DEMO_STATE_ELECTION, "state"], [DEMO_LOC_ELECTION, "location"]]) for (const [group, arr] of Object.entries(E.groups)) {
+  for (const [Eg, setId] of [[DEMO_STATE_ELECTION, "state"], [DEMO_LOC_ELECTION, "location"]]) for (const [group, arr] of Object.entries(Eg.groups)) {
     if (group === "Nat" || !DEMO_SETS.some((st) => st.id === setId && st.groups.includes(group))) continue;
-    const gs = toPM(Object.fromEntries(DEMO_KEYS.map((k, i) => [k, arr[i]]))).map((v) => Math.max(v, 0.5) / 100);
-    const ns = toPM(Object.fromEntries(DEMO_KEYS.map((k, i) => [k, natE[i]]))).map((v) => Math.max(v, 0.5) / 100);
-    const sg = gs.reduce((a, b) => a + b, 0), sn = ns.reduce((a, b) => a + b, 0);
-    for (let i = 0; i < gs.length; i++) { gs[i] /= sg; ns[i] /= sn; }
-    const Dd = gs.length - 1, z = [], V = [], e2 = (GROUP_INSTR / 100) ** 2;
-    for (let k = 0; k < Dd; k++) z.push(Math.log(gs[k] / gs[Dd]) - Math.log(ns[k] / ns[Dd]));
-    for (let a = 0; a < Dd; a++) for (let b = 0; b < Dd; b++) V.push(e2 * ((a === b ? 1 / (gs[a] * gs[a]) : 0) + 1 / (gs[Dd] * gs[Dd])));
-    raw.push({ src: "count", set: setId, group, house: "Count", day: t0E, noLean: true, zV: { z, V }, rel: ELECTION.date });
+    addCount(setId, group, t0E, asObj(arr), asObj(Eg.groups.Nat));
   }
-  const { t0, t1, months: monthsP, emDay } = PRIMM, P = PM_PARTIES.length, D = P - 1;
-  /* every group's line can start in the election month (its middle, where
-     the election marks sit), as the polls at and after the election, the
-     AES and the count place each gap there */
+  /* the days asked for: this term's months (from the election month's
+     middle) and today, and every past term's months and polling days */
+  const { t1, months: monthsP, emDay } = PRIMM, P = PM_PARTIES.length;
   const emYm = ELECTION.date.slice(0, 7);
   const months = [{ ym: emYm, day: emDay }, ...monthsP.filter((m) => m.ym !== emYm)];
-  const days = [...new Set([...months.map((m) => m.day), t1, t0])];
-  /* the national figures' draws on the log-ratio scale, at each day */
-  const natAt = new Map(days.filter((d) => d !== t0).map((d) => {
+  const vhTerms = vhmOK ? VHM.terms.filter((t) => t.nest && t.days && t.days[1] <= t0E) : [];
+  const days = [...new Set([...months.map((m) => m.day), t1, t0E, ...vhTerms.flatMap((t) => [...t.days, ...t.nest.map((r) => r[0])])])].sort((a, b) => a - b);
+  /* this term's national draws on the nested scale */
+  const natNest = new Map([...months.map((m) => m.day), t1].map((d) => {
     const sh = PRIMM.fit.shares(d), n = sh.length / P;
-    return [d, Array.from({ length: n }, (_, i) => pmAlr(sh.subarray(i * P, i * P + P)))];
+    return [d, Array.from({ length: n }, (_, i) => nestCoords(Array.from(sh.subarray(i * P, i * P + P))))];
   }));
-  const resAlr = pmAlr(PM_PARTIES.map((k) => (ELECTION[k] ?? 0) / 100));
-  const out = new Map(), grids = {};
+  const resNest = nestCoords(nestCats(asObj(DEMO_STATE_ELECTION.groups.Nat), 4));
+  const resSh = nestShares(resNest, 4);
+  const lvlOf = (lanes) => 2 + (lanes.includes("grn") ? 1 : 0) + (lanes.includes("onp") ? 1 : 0);
+  const keyIdx = (lanes) => { const L = lanes.filter((k) => k !== "tpp"); return DEMO_KEYS.map((k) => L.indexOf(k)); };
+  /* a column's mean and 95% half-width, sorted once */
+  const mci = (c) => { const s = Float64Array.from(c).sort(), q = (p) => { const i = (s.length - 1) * p, lo = Math.floor(i); return s[lo] + (s[Math.min(lo + 1, s.length - 1)] - s[lo]) * (i - lo); }; return { v: pmMean(c), ci: (q(0.975) - q(0.025)) / 2 }; };
+  const sumCols = (cols) => cols.map((c) => (c ? mci(c) : null));
+  const NG = 600;
+  const cur = new Map(), hist = new Map(), settings = {}, predErr = [];
   for (const setId of [...new Set(raw.map((r) => r.set))]) {
-    const fit = fitGroupSet(raw.filter((r) => r.set === setId), { t0, t1, days, pairs: [[t0, t1]], nDraw: PRIMM.fit.nDraw, seed: 20261125 });
-    grids[setId] = fit.grid[0];
+    const useMu = setId === "state" || setId === "location";
+    const fit = fitSpan(raw.filter((r) => r.set === setId), { days, pair: [t0E, t1], useMu, predFrom: t0E });
+    settings[setId] = fit.settings[0];
     for (const [group, g] of fit.groups) {
-      const sumAt = (d, natFn) => {
-        const gd = g.draws.get(d);
-        if (!gd) return null;
-        const n = gd.length / D, cols = PM_PARTIES.map(() => new Float64Array(n));
-        for (let i = 0; i < n; i++) {
-          const base = natFn(i), e = new Float64Array(D);
-          for (let k = 0; k < D; k++) e[k] = base[k] + gd[i * D + k];
-          const sh = pmSoftmax(e);
-          for (let q = 0; q < P; q++) cols[q][i] = 100 * sh[q];
-        }
-        return Object.fromEntries(PM_PARTIES.map((k, q) => { const lo = pmQuant(cols[q], 0.025), hi = pmQuant(cols[q], 0.975); return [k, { v: pmMean(cols[q]), ci: (hi - lo) / 2 }]; }));
+      for (const e of g.pred) predErr.push(...e);
+      const rng = gsRng(20261125 + group.length * 7919 + setId.length);
+      /* one set of gap draws per day and count, all four coordinates (a term
+         drawing fewer parties apart reads the first of them), so the two
+         terms meeting on a polling day read the very same draws there */
+      const gdCache = new Map();
+      const gapDraws = (d, n) => {
+        const k = d + "|" + n;
+        if (!gdCache.has(k)) { const mix = g.at.get(d); gdCache.set(k, mix ? drawMix(mix, n, gsRng(d * 31 + group.length * 7919 + setId.length), 4) : null); }
+        return gdCache.get(k);
       };
-      /* from the election month where polling day has a reading (polls at
-         the election, the AES, the count), else from the group's first poll */
-      const firstTerm = g.obs.some((o) => o.src.src !== "term") ? emDay : Math.min(...g.obs.filter((o) => o.src.src === "term").map((o) => o.day));
-      /* each party's move against all voters since polling day, from the
-         joint draws of the gap on both days (the pair) and today's national
-         figures: the point gap (group less all voters) and the log ratio
-         (group over all voters), each a posterior of its own */
+      /* this term: the national model's draws moved by the gap's */
+      const sumAt = (d, natFn, n) => {
+        const gd = gapDraws(d, n);
+        if (!gd) return null;
+        const cols = PM_PARTIES.map(() => new Float64Array(gd.length));
+        for (let i = 0; i < gd.length; i++) { const base = natFn(i), sh = nestShares(base.map((v, k) => v + gd[i][k]), 4); for (let q = 0; q < P; q++) cols[q][i] = 100 * sh[q]; }
+        return Object.fromEntries(PM_PARTIES.map((k, q) => [k, mci(cols[q])]));
+      };
+      const firstTerm = Math.max(g.first, emDay);
+      const nN = natNest.get(t1).length;
       const since = (() => {
-        const pd = g.pairs.get(t0 + "|" + t1);
+        const pd = g.pair.length ? drawMix(g.pair, nN, rng, 8) : null;
         if (!pd) return null;
-        const nd = natAt.get(t1), n = Math.min(nd.length, pd.length / (2 * D));
+        const nd = natNest.get(t1), n = pd.length;
         const cols = PM_PARTIES.map(() => ({ gap: new Float64Array(n), lr: new Float64Array(n), g0: 0, g1: 0, a1: 0 }));
-        const a0 = pmSoftmax(resAlr);
         for (let i = 0; i < n; i++) {
-          const e0 = resAlr.map((v, k) => v + pd[i * 2 * D + k]), e1 = nd[i].map((v, k) => v + pd[i * 2 * D + D + k]);
-          const g0 = pmSoftmax(e0), g1 = pmSoftmax(e1), a1 = pmSoftmax(nd[i]);
+          const g0 = nestShares(resNest.map((v, k) => v + pd[i][k]), 4), g1 = nestShares(nd[i].map((v, k) => v + pd[i][4 + k]), 4), a1 = nestShares(nd[i], 4);
           for (let q = 0; q < P; q++) {
             const c = cols[q];
-            c.gap[i] = 100 * ((g1[q] - a1[q]) - (g0[q] - a0[q]));
-            c.lr[i] = Math.log(g1[q] / a1[q]) - Math.log(g0[q] / a0[q]);
+            c.gap[i] = 100 * ((g1[q] - a1[q]) - (g0[q] - resSh[q]));
+            c.lr[i] = Math.log(g1[q] / a1[q]) - Math.log(g0[q] / resSh[q]);
             c.g0 += 100 * g0[q] / n; c.g1 += 100 * g1[q] / n; c.a1 += 100 * a1[q] / n;
           }
         }
         const sm = (a) => { const m = pmMean(a), lo = pmQuant(a, 0.025), hi = pmQuant(a, 0.975), sd = (hi - lo) / 3.92; return { v: m, lo, hi, z: sd > 0 ? m / sd : 0 }; };
-        return Object.fromEntries(PM_PARTIES.map((k, q) => [k, { gap: sm(cols[q].gap), lr: sm(cols[q].lr), g0: cols[q].g0, g1: cols[q].g1, a0: 100 * a0[q], a1: cols[q].a1 }]));
+        return Object.fromEntries(PM_PARTIES.map((k, q) => [k, { gap: sm(cols[q].gap), lr: sm(cols[q].lr), g0: cols[q].g0, g1: cols[q].g1, a0: 100 * resSh[q], a1: cols[q].a1 }]));
       })();
-      out.set(setId + "|" + group, {
-        since,
-        now: sumAt(t1, (i) => natAt.get(t1)[i]),
-        election: sumAt(t0, () => resAlr),
-        monthly: months.filter((m) => m.day >= firstTerm - 15).map((m) => ({ ym: m.ym, s: sumAt(m.day, (i) => natAt.get(m.day)[i]) })).filter((m) => m.s),
-        sources: [...new Set(g.obs.map((o) => o.src.src))],
-        houses: g.houses, beta: g.beta,
+      /* where the count cuts the group, the polls' shared offset from it
+         (μ), month by month, in points per party: what a poll's own reading
+         of the group is moved by to sit on the line's footing (the dots) */
+      const muOff = useMu ? months.filter((m) => m.day >= firstTerm - 15).map((m) => {
+        const mix = g.at.get(m.day);
+        if (!mix || !mix[0].mu) return null;
+        const nd = natNest.get(m.day), nb = [0, 1, 2, 3].map((k) => nd.reduce((a, e) => a + e[k], 0) / nd.length);
+        const gb = [0, 1, 2, 3].map((k) => mix.reduce((a, c) => a + c.w * c.m[k], 0)), mb = [0, 1, 2, 3].map((k) => mix.reduce((a, c) => a + c.w * c.mu[k], 0));
+        const s0 = nestShares(nb.map((v, k) => v + gb[k]), 4), s1 = nestShares(nb.map((v, k) => v + gb[k] + mb[k]), 4);
+        return [m.ym, ...DEMO_KEYS.map((k) => { const q = PM_PARTIES.indexOf(k); return r2(100 * (s1[q] - s0[q])); })];
+      }).filter(Boolean) : null;
+      cur.set(setId + "|" + group, {
+        since, muOff,
+        now: sumAt(t1, (i) => natNest.get(t1)[i], nN),
+        election: g.first <= t0E ? sumAt(t0E, () => resNest, nN) : null,
+        monthly: months.filter((m) => m.day >= firstTerm - 15).map((m) => ({ ym: m.ym, s: sumAt(m.day, (i) => natNest.get(m.day)[i], nN) })).filter((m) => m.s),
+        sources: g.sources, houses: g.houses, beta: g.beta,
       });
+      /* the past terms: each month's all-voters line (§8v's, drawn through
+         the counts) moved by the gap, and both polling days on the counts */
+      const cset = counted.get(setId + "|" + group) || new Map();
+      /* a counted end whose term folds the Greens or One Nation into others
+         (as the all-voters history does where its count lists the party):
+         the folded party's own count, for the ring's centre dot */
+      const incAt = (d, yr, lanes) => {
+        const g0 = cset.has(d) ? cset.get(d).g : null, E = ELECTIONS["e" + yr];
+        if (!g0 || !E) return null;
+        const ks = ["grn", "onp"].filter((k) => !lanes.includes(k) && E[k] > 0 && g0[k] != null);
+        return ks.length ? Object.fromEntries(ks.map((k) => [k, r1(g0[k])])) : null;
+      };
+      const terms = [];
+      for (const t of vhTerms) {
+        if (g.first > t.days[1]) continue;
+        const lanes = t.lanes.filter((k) => k !== "tpp"), lev = lvlOf(lanes), ki = keyIdx(t.lanes);
+        const row = (draws) => { const s = sumCols(lanes.map((_, q) => Float64Array.from(draws.map((sh) => 100 * sh[q])))); return [...ki.map((i) => (i < 0 ? null : r1(s[i].v))), ...ki.map((i) => (i < 0 ? null : r1(s[i].ci)))]; };
+        const curEl = cur.get(setId + "|" + group).election;
+        const end = (d, cnt) => {
+          if (d < g.first) return null;
+          /* the 2025 election: this term's polling-day estimate itself, so the
+             two terms meet on one figure */
+          if (d === t0E && lev === 4 && curEl) return [...DEMO_KEYS.map((k) => r1(curEl[k].v)), ...DEMO_KEYS.map((k) => r1(curEl[k].ci))];
+          /* a counted polling day: the count itself, as the all-voters line
+             ends on its own – the vote charts' count moved by the group's
+             counted gap (like with like: the AEC's group against the AEC's
+             nation), the band shut */
+          if (cset.has(d)) {
+            const { g: gc, t: tc } = cset.get(d);
+            const fold = (o) => ({ alp: o.alp, lnp: o.lnp, grn: lanes.includes("grn") ? o.grn : null, onp: lanes.includes("onp") ? o.onp : null,
+              oth: (o.oth || 0) + (lanes.includes("onp") ? 0 : o.onp || 0) + (lanes.includes("grn") ? 0 : o.grn || 0) });
+            const nat = nestCoords(nestCats(Object.fromEntries(lanes.map((k) => [k, cnt[k]])), lev, 0.005));
+            const zg = nestCoords(nestCats(fold(gc), lev, 0.05)), zt = nestCoords(nestCats(fold(tc), lev, 0.05));
+            const sh = nestShares(nat.map((v, k) => v + zg[k] - zt[k]), lev);
+            return [...ki.map((i) => (i < 0 ? null : r1(100 * sh[i]))), ...ki.map((i) => (i < 0 ? null : 0))];
+          }
+          const nat = nestCoords(nestCats(Object.fromEntries(lanes.map((k) => [k, cnt[k]])), lev, 0.005));
+          const gd = gapDraws(d, NG);
+          return gd ? row(gd.map((e) => nestShares(nat.map((v, k) => v + e[k]), lev))) : null;
+        };
+        const ms = [];
+        t.nest.forEach((r, j) => {
+          const d = r[0];
+          if (d < g.first - 15) return;
+          const m = r.slice(1, 1 + lev), C = new Float64Array(lev * lev);
+          let u = 1 + lev;
+          for (let a = 0; a < lev; a++) for (let b = a; b < lev; b++) { C[a * lev + b] = r[u]; C[b * lev + a] = r[u]; u++; }
+          const gd = gapDraws(d, NG);
+          if (!gd) return;
+          const nd = drawMix([{ w: 1, m: Float64Array.from(m), C }], NG, rng, lev);
+          ms.push([+t.series.alp[j][0].toFixed(3), ...row(gd.map((e, i) => nestShares(nd[i].map((v, k) => v + e[k]), lev)))]);
+        });
+        const open = end(t.days[0], t.open), close = end(t.days[1], t.close);
+        if (ms.length + (open ? 1 : 0) + (close ? 1 : 0) < 2) continue;
+        const inc = [incAt(t.days[0], t.year, lanes), incAt(t.days[1], t.src, lanes)];
+        terms.push({ year: t.year, open, close, counted: [cset.has(t.days[0]), cset.has(t.days[1])], months: ms, ...(inc[0] || inc[1] ? { inc } : {}) });
+      }
+      if (terms.length) hist.set(setId + "|" + group, { terms, houses: g.houses, n: g.n });
     }
   }
-  console.log(`group model: ${raw.length} readings, ${out.size} groups in ${((Date.now() - tStart) / 1000).toFixed(1)}s | settings ${JSON.stringify(grids)}`);
-  return out;
+  /* the one-step test (Info's "How it's built"): this term's polls, each
+     predicted from the readings before it */
+  const predMae = predErr.length ? predErr.reduce((a, b) => a + b, 0) / predErr.length : null;
+  console.log(`group model one-step test: this term's polls' group figures missed by ${predMae == null ? "–" : predMae.toFixed(2)} points on average (${predErr.length} party figures)`);
+  console.log(`group model: ${raw.length} readings (${raw.filter((r) => r.src === "aes").length} AES, ${raw.filter((r) => r.src === "count").length} counts), ${cur.size} groups, past terms for ${hist.size} in ${((Date.now() - tStart) / 1000).toFixed(1)}s | settings ${JSON.stringify(settings)}`);
+  if (process.env.GS_DUMP) fs.writeFileSync(process.env.GS_DUMP, JSON.stringify({ cur: Object.fromEntries(cur), hist: Object.fromEntries(hist) }));
+  return { cur, hist, vhTerms, aesYears };
 })();
+const GROUPM = GROUP_SPAN ? GROUP_SPAN.cur : null;
+/* the past terms by group (§7gm), shipped as build.mjs's lazily fetched
+   group-history file: per term its polling days and lanes, and per group
+   each month's [x, Labor, Coalition, One Nation, Greens, others, then each
+   one's 95% half-width] (null where the term folds the party into
+   others), its two polling days the same way, and which of them the count
+   cut (the line passes through a count there; elsewhere the polling-day
+   figure is the model's estimate) */
+const GROUP_HIST = GROUP_SPAN && GROUP_SPAN.hist.size ? (() => {
+  const terms = GROUP_SPAN.vhTerms.map((t) => {
+    const sets = {};
+    for (const [key, h] of GROUP_SPAN.hist) {
+      const T = h.terms.find((q) => q.year === t.year);
+      if (!T) continue;
+      const [setId, group] = key.split("|");
+      (sets[setId] ||= {})[group] = { open: T.open, close: T.close, counted: T.counted, months: T.months, ...(T.inc ? { inc: T.inc } : {}) };
+    }
+    return { year: t.year, src: t.src, from: new Date(t.days[0] * 864e5).toISOString().slice(0, 10), to: new Date(t.days[1] * 864e5).toISOString().slice(0, 10),
+             a: t.a, b: t.b, lanes: t.lanes.filter((k) => k !== "tpp"), sets };
+  }).filter((t) => Object.keys(t.sets).length);
+  return { _about: "Generated by gen-data §7gm (group-span.mjs) – each past term's primary vote by group: the vote charts' all-voters line (§8v) moved by the group's modelled gap from all voters; rows [x, alp, lnp, onp, grn, oth, then each one's 95% half-width].", aes: GROUP_SPAN.aesYears, terms };
+})() : null;
 const DEMO_ELECTION = (() => {
   if (JUR) return null;
   let src;
@@ -7333,7 +7455,17 @@ function demoBuild(rows, rowsM, setsSpec, allbyYm, ALL, ALL_T, SPARSE, SHARES) {
           const T = total(allbyYm.get(ym) || ALL);
           return [ym, ...DEMO_KEYS.map((k) => r1(T * s[k].v / 100)), ...DEMO_KEYS.map((k) => r1(s[k].ci))];
         }),
-        pd, px, share: DEMO_SHARE[group], model: true,
+        /* polling day itself (the model's estimate; on the count where the
+           count cuts the group), where the line starts – the past term's
+           line ends on the same figure – and, where the count cuts the
+           group, the polls' shared offset from it each month (muOff) */
+        ...(gm.election ? { el: [...DEMO_KEYS.map((k) => r1(gm.election[k].v)), ...DEMO_KEYS.map((k) => r1(gm.election[k].ci))] } : {}),
+        ...(gm.muOff ? { mo: gm.muOff } : {}),
+        /* the rug's readings (each wave's gap on today's all-voters figure),
+           where the count cuts the group moved by today's offset of the
+           polls from it, so they sit about the figure they feed */
+        pd, px: gm.muOff && gm.muOff.length ? (() => { const off = gm.muOff[gm.muOff.length - 1]; return Object.fromEntries(DEMO_KEYS.map((k, j) => [k, px[k].map((x) => (x == null ? null : r1(x - off[1 + j])))])); })() : px,
+        share: DEMO_SHARE[group], model: true,
       };
       return {
         label: group,
@@ -11303,6 +11435,9 @@ writeAtomic(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
 /* The /public-opinion/ page's sidecar (§8e); federal-only – the Vic build's
    client never mounts the page, and its AP_ONEOFF_SRC is null. */
 if (!JUR) writeAtomic(ONEOFFS_ASSET, JSON.stringify(oneOffsSource));
+/* the past terms by group (§7gm GROUP_HIST): build.mjs ships it as the
+   lazily fetched group-history sidecar; "null" when the model couldn't run */
+if (!JUR) writeAtomic(GROUP_HIST_ASSET, JSON.stringify(GROUP_HIST));
 
 /* ---- sanity summary ---------------------------------------------------- */
 console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {
