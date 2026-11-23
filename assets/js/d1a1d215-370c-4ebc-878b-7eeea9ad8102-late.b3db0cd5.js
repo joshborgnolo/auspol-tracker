@@ -7218,7 +7218,48 @@ function infoTerms(D) {
       q: "Why doesn’t the newest poll match the headline?",
       a: React.createElement(React.Fragment, null, "Usually neither is wrong. A poll is one pollster\u2019s reading of one week, and chance alone can put it off by its ", xref("margin-of-error", "newest poll", "margin of error"), ", so two honest polls of an unchanged electorate will differ too. The headline is a trend through every poll after removing each pollster\u2019s", " ", xref("house-effect", "newest poll", "house effect"), ", its habit of leaning one way. One poll moves it by its weight, not its news value: its", " ", xref("aggregate-effect", "newest poll", "aggregate effect"), " shows how much.", " ", xref("poll-disagreement", "newest poll", "Poll disagreement"), " tests whether the polls differ by more than chance allows.")
     } : faqs.find(f => f.id === "newest-poll-not-headline"), faqs.find(f => f.id === "more-menu-figures")].filter(Boolean);
-    const vMethod = KAL ? [{
+    const VMOD = !!(L.method && L.method.kind === "model");
+    const vMethod = VMOD ? [{
+      id: "weighted-aggregate",
+      term: "Model estimate",
+      body: React.createElement(React.Fragment, null, "How the headline and every line on this page are built, with the same model as the federal page. Victoria publishes only a poll or two a month, so rather than average each month\u2019s polls, the model draws one line through all of them. It treats opinion as drifting from day to day, with some momentum, and each poll as a reading of it, off by its pollster\u2019s ", xref("house-effect", "model estimate", "lean"), " and by chance.", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "How much a poll counts."), " Larger samples count for more. Where a pollster publishes an ", xref("effective-sample", "model estimate", "effective sample"), ", that figure is used. Otherwise the raw sample is discounted by 1.6, roughly what weighting costs the pollsters that do publish, and capped at 3,000. A pollster whose polls scatter more than their samples imply counts for a little less."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Where it starts."), " The line opens on the ", eY, " count, moved by how far the final polls have typically missed at federal elections since 2007, so it starts where the polls would have been, not where the votes were."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Leaders."), " On a change of Premier or Opposition Leader the line may step at once."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "The line and the headline."), " The line uses every poll, earlier and later, so a month\u2019s point can shift a little as later polls come in. The headline is the model\u2019s estimate today, and the line ends on it."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Months with no poll."), " The line carries on through them, and its 95% interval widens until the next poll arrives."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Two-party figures."), " The implied figures are the model\u2019s primary votes read through the ", eY, " election\u2019s preference flows; the pollsters\u2019 published figures get a model of their own, built the same way."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "One Nation."), " Victoria\u2019s pollsters counted One Nation among others until it surged. Those polls still count: the model reads them as a figure for One Nation and others together. The One Nation line starts with the first poll that printed it on its own; before that, others includes it."), working(React.createElement("span", {
+        className: "info-p"
+      }, "The model works on each party\u2019s share relative to others, on the log scale. Opinion follows a random walk with a damped trend, its daily spread fitted party by party; each pollster\u2019s lean drifts slowly, and the regular pollsters\u2019 leans sum to zero. A poll reads the line plus its pollster\u2019s lean, with its sampling error scaled by that pollster\u2019s fitted noise, plus the rounding of what it printed. The settings are averaged over their uncertainty; the line, its 95% interval and the change on a month ago come from simulations of the fitted model.")))
+    }, {
+      id: "house-effect",
+      term: "House effect",
+      body: React.createElement(React.Fragment, null, "A pollster\u2019s consistent lean relative to the others. The model estimates each pollster\u2019s lean alongside the line, from all its polls this term, lets it drift slowly, and takes it out; the regular pollsters\u2019 leans average zero, so a miss every pollster shares leaves every lean at zero. A pollster with one poll has no lean measured: its poll counts, with the doubt about its lean added to its error. Each line gets its own leans, since a pollster that leans to Labor on the two-party figure need not on a primary vote.")
+    }, method.find(m => m.id === "monthly-average"), {
+      id: "interval",
+      term: "95% interval",
+      body: React.createElement(React.Fragment, null, "How far a figure could plausibly be off by chance. For the two-party figure against the Coalition today, that\u2019s \xB1", hl.ci.toFixed(1), " points on each party\u2019s share, and \xB1", (2 * hl.ci).toFixed(1), " on the lead. It is the model\u2019s own interval: it narrows where polls come thick and widens through months with none.", React.createElement("span", {
+        className: "info-p"
+      }, "Unfortunately, it can\u2019t see an error every poll shares. When the whole industry leans one way, the interval has no way to know."))
+    }, method.find(m => m.id === "margin-of-error"), {
+      id: "effective-sample",
+      term: "Effective sample",
+      body: React.createElement(React.Fragment, null, "What a sample is worth once weighting is counted. A pollster\u2019s", " ", xref("apc-statement", "effective sample", "APC statement"), " gives one for each poll, shown as ", eff, " beside its sample, and it sets how much the poll counts in the", " ", xref("weighted-aggregate", "effective sample", "model"), ".")
+    }, method.find(m => m.id === "significance"), {
+      id: "changes",
+      q: "What are the ▲ and ▼ figures measured against?",
+      a: React.createElement(React.Fragment, null, "It depends on where they sit.", React.createElement("ul", {
+        className: "info-list"
+      }, React.createElement("li", null, React.createElement("strong", null, "Beside a current figure:"), " the model\u2019s move over the past month. It counts as a change only when its 95% interval leaves out zero; otherwise the figure says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary-vote figures:"), " the change since the ", eY, " election, where the lines on that chart begin."), React.createElement("li", null, React.createElement("strong", null, "In a poll\u2019s breakdown and the poll tables:"), " the change on that pollster\u2019s own previous poll.")), "Most say what they are measured against beside them, or when you point at them.")
+    }].filter(Boolean) : KAL ? [{
       id: "weighted-aggregate",
       term: "Smoothed trend",
       body: React.createElement(React.Fragment, null, "How the headline and every line on this page are built. Victoria publishes only a poll or two a month, so rather than average each month\u2019s polls, the site draws a smoothed trend through all of them, with a Kalman smoother. It treats opinion as drifting from day to day, and each poll as a reading of it, off by its pollster\u2019s", " ", xref("house-effect", "smoothed trend", "lean"), " and by chance.", React.createElement("span", {

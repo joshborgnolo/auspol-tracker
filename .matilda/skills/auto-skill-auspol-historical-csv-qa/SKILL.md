@@ -47,13 +47,24 @@ they paste an external table and ask "is this consistent with what's on file".
 - `roymorgan-primary-vote.csv` — `date,election,alp,coalition,lib,nat,greens,one_nation,
   nxt,family_first,democrats,independents,other_parties,other,undecided,mode`.
   Quirks: sub-threshold values are the STRING `"< 0.5"` (never coerce blind);
-  `mode` ∈ `face|phone|(blank)` — ALWAYS filter by mode when comparing against a table
-  labelled "face to face" etc.; `election=1` rows hold actual election results
+  `mode` ∈ `face|phone|multi-mode|sms|(blank)` — ALWAYS filter by mode when comparing against a table
+  labelled "face to face" etc., and drop `sms` (Morgan's SMS and exit polls are a
+  separate series); `election=1` rows hold actual election results
   (e.g. `2010-08-21,1,38,43.6,...,6.4` + matching 2PP row `50.1,49.9`).
-  There is exactly ONE non-election POLL row with a blank mode in the 2007–10
-  era: `2010-08-21`, which sits date-for-date on a labelled `phone` wave, so
-  its provenance can't be named apart — the cycle assimilator
-  (`.build/assimilate-2007-cycle-csv.mjs`) drops it on purpose.
+  Tidied 2026-11-23 in the extractor (`.build/extract-roymorgan-archive.mjs`,
+  re-run; .build/analysis/primary-bayes/history/GAPS.md §3 found them):
+  the `(SMS)` / `(SMS - 4pm)` labels now file as `sms` (2010-08-21's
+  unlabelled row – the one `.build/assimilate-2007-cycle-csv.mjs` dropped on
+  purpose – is Morgan's 4pm election-day SMS poll; 2010-08-23 and 2010-09-09
+  are SMS polls too); Morgan's "August 18/29, 2018" label typo files as
+  2018-08-19; and 63 unlabelled reprints of the 2014–16 multi-mode waves
+  (the long-term table's copies) are gone, the labelled row kept. Dates that
+  still repeat are different polls on one day (2010-08-21 SMS + phone +
+  count, 2010-12-12 face + phone, 2013-09-07 exit poll + count, 2025-05-03).
+  Not an error: 2011-03-27 face 37.5/43.5 is Morgan's two-weekend TOTAL
+  (19/20 & 26/27 Mar pooled); Jackman and Wikipedia file the 26–27 Mar weekend
+  alone (35.5/47), which the extractor's first-record-wins rule leaves out –
+  both are Morgan's printed figures (the long-term table prints both rows).
   ALSO: polls.json's curated 2013-cycle Morgan rows can DIVERGE from these
   CSV 2PP columns (e.g. 2010-08-26: curated `tpp_alp` 49 vs CSV alp 51.5) —
   treat the CSV's alp/coalition pair as canonical (it sums to 100); nobody

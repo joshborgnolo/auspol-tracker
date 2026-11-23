@@ -826,7 +826,7 @@ const synthEffect = houseEffectsFor(tppRowsSynth);
    (JUR.kalman.series, the maximum-likelihood fit on Victoria's own polls);
    kfLog reports the current fit beside it, a refit being a hand call.
    Federally none of this runs: KF is null. */
-const KF = JUR && JUR.kalman ? JUR.kalman : null;
+const KF = JUR && JUR.kalman && !JUR.model ? JUR.kalman : null;   // /vic/ moved to the model 2026-11-23 (JUR.model)
 const kfDay = (ms) => Math.round(ms / 86400000);
 const KF_T0 = kfDay(Date.parse(ELECTION.date + "T00:00:00Z")), KF_T1 = kfDay(refNow);
 // a change of Premier or Opposition Leader may move every series at once
@@ -1018,13 +1018,17 @@ for (const k of PRIMARY_KEYS) {
    PRIM_JUMPS: changes of prime minister or opposition leader this term,
    where the shares may step. */
 // PRIM_MISS lives in primary-model.mjs (one copy for this file and build-group-history.mjs)
-const PRIM_JUMPS = ["2025-05-13", "2026-02-12"];   // Ley, then Taylor, lead the Liberals
+/* the days a new leader can move the vote at once: federally Ley, then
+   Taylor, lead the Liberals; a state build's each change of head of
+   government or opposition leader since its election (JUR.eras) */
+const PRIM_JUMPS = JUR ? ["alb", "opp"].flatMap((slot) => ((JUR.eras || {})[slot] || []).slice(1).map((e) => e.from))
+  .filter((d) => d > ELECTION.date).sort() : ["2025-05-13", "2026-02-12"];
 /* the D-base houses (POLL_BASES, §5b: undecided set aside, no leaner) – a
    printed undecided share there is out of the shares' base */
 const PRIM_UND_ASIDE = new Set(["Roy Morgan", "Spectre Strategy", "YouGov"]);
 const pmDay = (iso) => Math.floor(Date.parse(String(iso).slice(0, 10) + "T00:00:00Z") / 86400000);
 const PRIMM = (() => {
-  if (JUR) return null;
+  if (JUR && !JUR.model) return null;
   const tStart = Date.now();
   const readings = [];
   POLLS.forEach((p, idx) => {
@@ -1042,7 +1046,11 @@ const PRIMM = (() => {
   const t0 = pmDay(ELECTION.date), t1 = pmDay(LATEST_ISO);
   /* the days the panel prints: mid-month (the current month at the newest
      poll, so the line ends on the headline), and a month ago */
-  const months = MONTHS.filter((ym) => POLLS.some((p) => ymOf(p.date) === ym))   // months with polls, as the line always had
+  const pollYm = MONTHS.filter((ym) => POLLS.some((p) => ymOf(p.date) === ym));   // months with polls, as the line always had
+  /* a state build polls a month or two apart: its line carries on through a
+     month with no poll from the first month with one (as the Kalman trend it
+     replaced did), its interval widening until the next */
+  const months = (JUR ? MONTHS.filter((ym) => ym >= pollYm[0]) : pollYm)
     .map((ym) => ({ ym, day: ym === LATEST_ISO.slice(0, 7) ? t1 : Math.min(pmDay(ym + "-15"), t1) })).filter((m) => m.day > t0);
   const anchor = anchorFrom(ELECTION, PRIM_MISS);
   const jumps = new Set(PRIM_JUMPS.map(pmDay));
@@ -1078,12 +1086,18 @@ const PRIMM = (() => {
   }
   /* the same month by month, at the settings' mode (the leans panel's lines) */
   const leanMonths = Object.fromEntries(fit.L.houses.map((h) => [h, fit.leanPath(h, months.map((m) => m.day))]));
+  if (process.env.PRIM_DEBUG) for (const r of readings) { const lv = fit.levelAt(r.day); if (lv) console.log("DBG", new Date(r.day*864e5).toISOString().slice(0,10), r.house, "vals", JSON.stringify(r.vals.map((v)=>+v.toFixed(1))), "cats", JSON.stringify(r.cats), "line", PM_PARTIES.map((k,q)=>k+" "+(100*lv[q]).toFixed(1)).join(" "), "n", r.n.toFixed(0)); }
   const s = fit.settings, th = s.comps[0];
   console.log(`primary model: ${readings.length} polls (${fit.L.houses.length} houses in the state, ${fit.L.core.length} set the zero, ${fit.L.lone.size} one-off) in ${((Date.now() - tStart) / 1000).toFixed(1)}s`
     + ` | now ${PM_PARTIES.map((k) => `${k} ${r1(now[k].v)} ±${r1(now[k].ci)}`).join(" ")}`
     + ` | ESS ${fit.ctx.laplace ? fit.ctx.laplace.ess.toFixed(1) : "-"} of ${s.comps.length}`
     + ` | κ ${JSON.stringify(Object.fromEntries([...s.kappa].filter(([h]) => !fit.L.lone.has(h))))}`);
-  return { fit, readings, t0, t1, months, emDay, at, now, prev, chg, pAhead, leanNow, leanMonths,
+  /* the first day a poll printed One Nation apart (a state build's line
+     carries none before it) */
+  const qOn = PM_PARTIES.indexOf("onp");
+  const onDays = readings.filter((r) => r.cats.some((c) => c.length === 1 && c[0] === qOn)).map((r) => r.day);
+  const onFirst = onDays.length ? Math.min(...onDays) : null;
+  return { fit, readings, t0, t1, months, emDay, at, now, prev, chg, pAhead, leanNow, leanMonths, onFirst,
     byKey: new Map(readings.map((r) => [r.key, r])) };
 })();
 const aggPrimary = MONTHS.map((ym) => {
@@ -1122,6 +1136,16 @@ aggPrimary.unshift({
 if (PRIMM) aggPrimary.splice(1, Infinity, ...PRIMM.months.map(({ ym, day }) => {
   const a = PRIMM.at.get(day), o = { ym, x: mx(ym), ci: {} };
   for (const k of PRIMARY_KEYS) { o[k] = r1(a[k].v); o.ci[k] = r1(a[k].ci); }
+  /* a state build's houses folded One Nation into others until it surged:
+     before the month any poll printed it apart, the line shows no One Nation
+     and others as the polls meant them, One Nation included (the two summed
+     draw by draw), as the published figures read */
+  if (JUR && PRIMM.onFirst != null && day < PRIMM.onFirst) {
+    const dr = PRIMM.fit.shares(day), P = PM_PARTIES.length, qo = PM_PARTIES.indexOf("onp"), qx = PM_PARTIES.indexOf("oth");
+    const c = Array.from({ length: dr.length / P }, (_, i) => 100 * (dr[i * P + qo] + dr[i * P + qx]));
+    const lo = pmQuant(c, 0.025), hi = pmQuant(c, 0.975);
+    o.oth = r1(pmMean(c)); o.ci.oth = r1((hi - lo) / 2); o.onp = null; delete o.ci.onp;
+  }
   return o;
 }));
 if (KF) {   // /vic/: each party's trend (§1a); a party first reported late is null before it
@@ -1264,8 +1288,9 @@ const TPM = PRIMM ? (() => {
   const F_22 = vec({ alp: 1, grn: FLOW.grn, onp: ONP_FLOW_2022, oth: FLOW.oth });
   const F_ON = vec({ alp: 1, lnp: FP_ON.lnp, grn: FP_ON.grn, oth: FP_ON.oth });
   const BAND = vec({ lnp: FP_ON_BAND.lnp, grn: FP_ON_BAND.grn, oth: FP_ON_BAND.oth });
-  const imp = tppRead(tppLin, F_IMP, FLOW_3CNR), on = tppRead(tppLin, F_ON, 0), s22 = tppRead(tppLin, F_22, FLOW_3CNR);
-  const gap = tppRead(tppLin, F_IMP.map((v, q) => v - F_ON[q]), FLOW_3CNR);   // implied v Coalition less v One Nation
+  const CNR = JUR ? (JUR.flows.threeCorner || 0) : FLOW_3CNR;
+  const imp = tppRead(tppLin, F_IMP, CNR), on = tppRead(tppLin, F_ON, 0), s22 = tppRead(tppLin, F_22, CNR);
+  const gap = tppRead(tppLin, F_IMP.map((v, q) => v - F_ON[q]), CNR);   // implied v Coalition less v One Nation
   const prim = tppRead(tppLin, vec({ onp: 1, lnp: -1 }), 0);                 // One Nation's primary less the Coalition's
   /* the ALP-v-ON table's own range at the shares (linear, points) */
   const cf = new Map(Object.keys(tppLin.days).map((d) => [+d, imp.band(+d, BAND)]));
@@ -6598,7 +6623,12 @@ const primModel = PRIMM ? (() => {
     kappa: Object.fromEntries([...S.kappa].map(([h, k]) => [h, k])), anchor: { mean: Array.from(an.mean, (v) => +v.toPrecision(8)), cov: Array.from(an.cov, (v) => +v.toPrecision(8)) },
     jumps: PRIM_JUMPS.map(pmDay), minCore: 4,
     obs: PRIMM.readings.map((r) => [r.house, r.day, r2(r.n), r.step, r.cats, r.vals]),
-    prev: Object.fromEntries(PRIMARY_KEYS.map((k) => [k, r1(PRIMM.prev[k].v)])) };
+    prev: Object.fromEntries(PRIMARY_KEYS.map((k) => [k, r1(PRIMM.prev[k].v)])),
+    /* a state build's line has no One Nation before a poll printed it apart
+       (aggPrimary's rule); a subset's line keeps the same day */
+    onFirst: JUR && PRIMM.onFirst != null ? PRIMM.onFirst : null,
+    /* and carries its line through a month with no poll (§2m's months) */
+    carry: !!JUR };
 })() : null;
 
 /* ---- 7eb. each poll's footprint on the current primaries -----------------

@@ -313,28 +313,35 @@ function RdPrimary({
     const L = pts.filter(d => d[id] != null);
     return lateParties.includes(id) && L.length > 1 && L[0].election ? L.slice(1) : L;
   };
-  const chartSeries = (partsChart || []).slice().reverse().map(p => ({
-    id: p.id,
-    label: p.name,
+  const othSplit = lateParties.includes("onp") ? firstPolled.onp.x : null;
+  const runsOf = (id, rows) => id === "oth" && othSplit != null ? [["oth-inc", rows.filter(d => d.x < othSplit)], ["oth", rows.filter(d => d.x >= othSplit)]] : [[id, rows]];
+  const chartSeries = (partsChart || []).slice().reverse().flatMap(p => runsOf(p.id, live(p.id)).map(([sid, rows]) => ({
+    id: sid,
+    label: sid === "oth-inc" ? p.name + ", One Nation included" : p.name,
     color: p.color,
-    points: series(live(p.id), p.id),
+    points: series(rows, p.id),
     rdWidth: p.id === "oth" ? 2 : 2.5,
     opacity: hideC[p.id] ? 0 : 1,
-    endLabel: narrow ? ABBR[p.id] : SHORT[p.id],
-    rdCap: 4
-  }));
-  const areas = (partsChart || []).map(p => ({
-    id: "ci-" + p.id,
+    rdCap: 4,
+    ...(sid === "oth-inc" ? {
+      endCap: false,
+      endLabel: null
+    } : {
+      endLabel: narrow ? ABBR[p.id] : SHORT[p.id]
+    })
+  }))).filter(sr => sr.id !== "oth-inc" || sr.points.length);
+  const areas = (partsChart || []).flatMap(p => runsOf(p.id, pts.filter(d => d.ci && d.ci[p.id] != null && d[p.id] != null)).map(([sid, rows]) => ({
+    id: "ci-" + sid,
     color: p.color,
     className: "ci-band",
     edge: false,
     hidden: !!hideC[p.id],
-    points: pts.filter(d => d.ci && d.ci[p.id] != null && d[p.id] != null).map(d => ({
+    points: rows.map(d => ({
       x: d.x,
       y0: d[p.id] - d.ci[p.id],
       y1: d[p.id] + d.ci[p.id]
     }))
-  })).filter(a => a.points.length >= 2);
+  }))).filter(a => a.points.length >= 2);
   const gi = G && D.demoGroups ? D.demoGroups.indexOf(sel.label) : -1;
   const aggByYm = React.useMemo(() => !G ? null : new Map(D.aggPrimary.filter(d => !d.election).map(d => [d.ym, d])), [G]);
   const soloDotsOf = q => G && sel.label === "ACT/NT/Tas" && q.solo ? q.solo.flatMap(e => parts.map(p => {
@@ -493,7 +500,7 @@ function RdPrimary({
   };
   const eDate = (D.cycles.find(c => c.current) || {}).eDate;
   const pollsWord = window.JUR ? window.JUR.adj : "national";
-  const PMD = !window.JUR && !!(D.latest && D.latest.primaryModel);
+  const PMD = !!(D.latest && D.latest.primaryModel);
   const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
   const meta = G ? T.model ? "Modelled from every poll this term; " + rdList(G.houses.map(demoHouse)) + " in the last " + T.window : "Pooled from the last " + T.window + " of " + rdList(G.houses.map(demoHouse)) + " polls" : pvx ? pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, !narrow) : narrow ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO) : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
   const toggle = id => setHidden(h => {
@@ -612,11 +619,17 @@ function RdPrimary({
     const curYear = (vwTerms.find(t => t.current) || {}).year;
     const bridges = L.series.some(sr => sr.dash === RD_VH_BRIDGE);
     const unmeasured = G ? [] : VH.terms.filter(t => t.miss.alp == null && t.b > xDomain[0] && t.a < xDomain[1]);
-    const inclusions = ["grn", "onp"].filter(k => vhMarks.some(m => m.dotColor === D.PARTIES[k].color)).map(k => ({
+    const inclusions = ["grn", "onp"].map(k => {
+      const m = vhMarks.filter(q => q.dotColor === D.PARTIES[k].color);
+      return m.length ? {
+        id: k,
+        vote: m.length === 1 ? m[0].dotVote : null
+      } : null;
+    }).filter(Boolean).map(d => ({
       kind: "ring",
       color: D.PARTIES.oth.color,
-      dotColor: D.PARTIES[k].color,
-      label: D.PARTIES[k].name + " included in Others"
+      dotColor: D.PARTIES[d.id].color,
+      label: D.PARTIES[d.id].name + " included in Others" + (d.vote != null ? " (" + d.vote + "%)" : "")
     }));
     return {
       series: (curIn ? chartSeries.map(sr => ({
@@ -625,7 +638,7 @@ function RdPrimary({
           endLabel: null
         }),
         ...(vhLong ? {
-          rdWidth: sr.id === "oth" ? 1.4 : 1.6
+          rdWidth: sr.id === "oth" || sr.id === "oth-inc" ? 1.4 : 1.6
         } : {})
       })) : []).concat(L.series),
       areas: (curIn && !vhLong ? areas : []).concat(L.areas),

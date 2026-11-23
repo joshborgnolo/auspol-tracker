@@ -14,11 +14,11 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const A = (f) => path.join(ROOT, ".build", "newtracker", "assets", f);
 const KEYS = ["alp", "lnp", "grn", "onp", "oth"];
-const fresh = (mutate) => {
+const fresh = (mutate, data = A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js")) => {
   const win = {};
   const ctx = vm.createContext({ window: win, React: {}, console });
   win.window = win;
-  vm.runInContext(fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8"), ctx);
+  vm.runInContext(fs.readFileSync(data, "utf8"), ctx);
   vm.runInContext(fs.readFileSync(A("ed2260de-5b11-4bd5-8a8d-a391156c05ee.js"), "utf8"), ctx);
   if (mutate) mutate(win.AP.D, win);
   vm.runInContext(fs.readFileSync(A("pm-engine.js"), "utf8"), ctx);
@@ -66,6 +66,33 @@ const fresh = (mutate) => {
     for (const k of KEYS) assert.ok(Math.abs(eng.now[k] - AP.D.latest.primary[k]) <= 0.4, `re-run now ${k}`);
     assert.ok(Math.abs(KEYS.reduce((s, k) => s + eng.now[k], 0) - 100) <= 0.3, "the model's shares add to 100");
   }
+}
+
+/* ---- /vic/ (on the model since 2026-11-23): the same parity, with the
+   state build's two rules – no One Nation line before a poll printed it
+   apart (others carries it there), and a line through months with no poll */
+{
+  const AP = fresh(null, path.join(ROOT, ".build", "vic", "out", "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"));
+  const M = AP.D.primModel;
+  assert.ok(M && M.carry === true && Number.isFinite(M.onFirst), "the Victorian build ships the model, its One Nation day and the carry rule");
+  const serverMonths = AP.D.aggPrimary.slice(1);
+  assert.equal(JSON.stringify(AP.pvAgg(AP.D.pvHouses).months), JSON.stringify(serverMonths), "vic every house: the build's months");
+  const eng = AP.pvAgg(AP.D.pvHouses, { engine: true });
+  assert.equal(eng.months.length, serverMonths.length, "vic re-run draws every month, empty ones included");
+  for (let i = 0; i < serverMonths.length; i++) for (const k of KEYS) {
+    const a = eng.months[i], b = serverMonths[i];
+    if (b[k] == null) { assert.equal(a[k], null, `vic re-run ${b.ym} ${k}: no line, as the build`); continue; }
+    assert.ok(Math.abs(a[k] - b[k]) <= 0.4, `vic re-run ${b.ym} ${k}: ${a[k]} ≈ ${b[k]}`);
+    assert.ok(Math.abs(a.ci[k] - b.ci[k]) <= 0.6, `vic re-run ${b.ym} ${k} ci: ${a.ci[k]} ≈ ${b.ci[k]}`);
+  }
+  const counts = new Map();
+  for (const q of AP.D.individualPolls) if (!q.noAgg) counts.set(q.pollster, (counts.get(q.pollster) || 0) + 1);
+  const [busy] = [...counts.entries()].sort((x, y) => y[1] - x[1])[0];
+  const sub = AP.pvAgg([busy]), first = AP.D.individualPolls.filter((q) => q.pollster === busy && !q.noAgg).map((q) => q.ym).sort()[0];
+  assert.equal(sub.months[0].ym, first, "a vic subset's line starts at its first poll");
+  assert.equal(sub.months.length, serverMonths.filter((m) => m.ym >= first).length, "and carries through every month after");
+  const onYm = new Date(M.onFirst * 86400000).toISOString().slice(0, 7);
+  assert.ok(sub.months.filter((m) => m.ym < onYm).every((m) => m.onp == null && m.ci.onp == null && m.oth > 14), "no One Nation line in a subset before its first separate reading");
 }
 
 /* ---- all houses ticked: the client recompute reproduces the build's own figures */

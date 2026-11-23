@@ -222,9 +222,11 @@
       Ls = new Float64Array(16),
       Kg = new Float64Array(N * 4);
     const mu = new Float64Array(D),
+      ml = new Float64Array(D),
       pr = new Float64Array(P),
       Jm = new Float64Array(4 * D),
       V = new Float64Array(D * D);
+    const lin = opts.lin || null;
     let ll = 0,
       prev = null,
       oi = 0,
@@ -247,12 +249,20 @@
           for (const b of nzb) s += c[b] * x[b * D + k];
           mu[k] = s;
         }
+        if (lin && o.cats.length < P) {
+          const lo = ev * N;
+          for (let k = 0; k < D; k++) {
+            let s = 0;
+            for (const b of nzb) s += c[b] * lin[lo + b * D + k];
+            ml[k] = s;
+          }
+        } else ml.set(mu);
         let mx = 0;
-        for (let k = 0; k < D; k++) mx = Math.max(mx, mu[k]);
+        for (let k = 0; k < D; k++) mx = Math.max(mx, ml[k]);
         let z = Math.exp(-mx);
         pr[P - 1] = z;
         for (let k = 0; k < D; k++) {
-          pr[k] = Math.exp(mu[k] - mx);
+          pr[k] = Math.exp(ml[k] - mx);
           z += pr[k];
         }
         for (let k = 0; k < P; k++) pr[k] /= z;
@@ -270,9 +280,13 @@
         for (let ci = 0; ci < m; ci++) {
           const g = Math.log(Pc[ci] / Pref),
             yo = Math.log(o.vals[ci] / o.vals[C - 1]);
-          v[ci] = yo - g;
-          let jm = 0;
-          for (let k = 0; k < D; k++) jm += Jm[ci * D + k] * mu[k];
+          let jm = 0,
+            jd = 0;
+          for (let k = 0; k < D; k++) {
+            jm += Jm[ci * D + k] * ml[k];
+            jd += Jm[ci * D + k] * (mu[k] - ml[k]);
+          }
+          v[ci] = yo - g - jd;
           zlin[ci] = yo - g + jm;
         }
         const kap = opts.kappa?.get(o.house) ?? 1,
@@ -465,6 +479,40 @@
       N
     };
   }
+  function filterSmooth(obs, L, events, th, opts, passes = 3) {
+    let f = runFilter(obs, L, events, th, {
+        ...opts,
+        store: true
+      }),
+      sm = smooth(f, L, th);
+    if (!obs.some(o => o.cats.length < L.P)) return {
+      f,
+      sm,
+      passes: 0
+    };
+    let k = 0;
+    for (; k < passes; k++) {
+      const f2 = runFilter(obs, L, events, th, {
+          ...opts,
+          store: true,
+          lin: sm.xs
+        }),
+        sm2 = smooth(f2, L, th);
+      let dmax = 0;
+      for (let i = 0; i < sm.xs.length; i++) dmax = Math.max(dmax, Math.abs(sm2.xs[i] - sm.xs[i]));
+      f = f2;
+      sm = sm2;
+      if (dmax < 1e-3) {
+        k++;
+        break;
+      }
+    }
+    return {
+      f,
+      sm,
+      passes: k
+    };
+  }
   const softmaxAlr = eta => {
     const D = eta.length;
     let mx = 0;
@@ -627,6 +675,7 @@
     prepare,
     runFilter,
     smooth,
+    filterSmooth,
     softmaxAlr,
     alrOf,
     makeLayout,
@@ -859,14 +908,14 @@
       mean: Float64Array.from(M.anchor.mean),
       cov: Float64Array.from(M.anchor.cov)
     };
-    const f = E.runFilter(prep.obs, prep.L, events, th, {
+    const {
+      sm
+    } = E.filterSmooth(prep.obs, prep.L, events, th, {
       anchor,
       jumps,
       kappa,
-      lone: prep.L.lone,
-      store: true
+      lone: prep.L.lone
     });
-    const sm = E.smooth(f, prep.L, th);
     const N = prep.L.N,
       Dd = prep.L.D,
       ev = new Map(events.map((d, i) => [d, i]));
@@ -878,22 +927,38 @@
         o = {
           ci: {}
         };
-      PK.forEach((key, a) => {
+      const band = c => {
         let v = 0;
         for (let i = 0; i < Dd; i++) for (let j = 0; j < Dd; j++) {
-          const ji = p[a] * ((a === i ? 1 : 0) - p[i]),
-            jj = p[a] * ((a === j ? 1 : 0) - p[j]);
+          let ji = 0,
+            jj = 0;
+          for (let a = 0; a < c.length; a++) if (c[a]) {
+            ji += c[a] * p[a] * ((a === i ? 1 : 0) - p[i]);
+            jj += c[a] * p[a] * ((a === j ? 1 : 0) - p[j]);
+          }
           v += ji * sm.Ps[k * N * N + i * N + j] * jj;
         }
+        return r1(196 * Math.sqrt(v));
+      };
+      PK.forEach((key, a) => {
         o[key] = r1(100 * p[a]);
-        o.ci[key] = r1(196 * Math.sqrt(v));
+        o.ci[key] = band(PK.map((_, b) => b === a ? 1 : 0));
       });
+      if (M.onFirst != null && day < M.onFirst) {
+        const qo = PK.indexOf("onp"),
+          qx = PK.indexOf("oth");
+        o.oth = r1(100 * (p[qo] + p[qx]));
+        o.ci.oth = band(PK.map((_, b) => b === qo || b === qx ? 1 : 0));
+        o.onp = null;
+        delete o.ci.onp;
+      }
       return o;
     };
     const live = day => readings.filter(r => day - r.day >= 0 && day - r.day <= M.window).length;
     const have = new Set();
     for (const q of D.individualPolls || []) if (!sel || sel.has(q.pollster)) have.add(q.ym);
-    const months = M.months.filter(([ym]) => have.has(ym)).map(([ym, day]) => {
+    const firstYm = [...have].sort()[0];
+    const months = M.months.filter(([ym]) => M.carry ? ym >= firstYm : have.has(ym)).map(([ym, day]) => {
       const o = sharesAt(day);
       return {
         ym,
