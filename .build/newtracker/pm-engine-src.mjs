@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const NEED = ["DEFF", "WIDE_SD", "PARTIES", "helmert", "cholIn", "cholSolveVec", "categoriesOf", "stepOf", "zeroBasis",
-  "makeLayout", "predictStep", "LOG2PI", "runFilter", "smooth", "softmaxAlr", "alrOf", "prepare"];
+  "makeLayout", "predictStep", "LOG2PI", "runFilter", "smooth", "softmaxAlr", "alrOf", "prepare", "tppQuad", "tppRead", "tppNowOut", "tppChgOut"];
 export function makeEngineSource() {
   const src = fs.readFileSync(path.join(HERE, "primary-model.mjs"), "utf8").split("\n");
   /* top-level chunks: a declaration at column 0 runs to the next one */
@@ -34,7 +34,7 @@ export function makeEngineSource() {
   "use strict";
 ${body}
   window.AP = window.AP || {};
-  window.AP.pmEngine = { prepare, runFilter, smooth, softmaxAlr, alrOf, makeLayout, PARTIES, DEFF };
+  window.AP.pmEngine = { prepare, runFilter, smooth, softmaxAlr, alrOf, makeLayout, PARTIES, DEFF, tppRead, tppNowOut, tppChgOut };
 })();
 `;
 }

@@ -258,6 +258,58 @@ function prepare(readings, { t0, t1, minCore = 4, parties = PARTIES, coreOverrid
 }
 
 /* the log posterior of a settings vector (κ held) */
+function tppQuad(C, f) {
+  const P = f.length;
+  let v = 0, k = 0;
+  for (let i = 0; i < P; i++) for (let j = i; j < P; j++) { v += (i === j ? 1 : 2) * f[i] * f[j] * C[k]; k++; }
+  return Math.max(0, v);
+}
+function tppRead(lin, f, c) {
+  const val = (m, withC) => { let t = 0; for (let q = 0; q < f.length; q++) t += m[q] * f[q]; return 100 * t + (withC ? c : 0); };
+  const at = (mc, withC = true) => {
+    const v = val(mc[0], withC), sd = 100 * Math.sqrt(tppQuad(mc[1], f));
+    return { v, sd, ci: 1.96 * sd, lo: v - 1.96 * sd, hi: v + 1.96 * sd };
+  };
+  const months = lin.months.map(([ym, day]) => ({ ym, day, ...at(lin.days[day]) }));
+  const chg = at(lin.pair, false);
+  const leanM = (h) => (lin.leanM[h] || []).map((l) => (l ? val(l, false) : null));
+  const nearest = (arr, key, d) => { let b = null; for (const x of arr) if (b == null || Math.abs(key(x) - d) < Math.abs(key(b) - d)) b = x; return b; };
+  const lineV = lin.line.map(([iso, s]) => [iso, Math.round(Date.parse(iso + "T00:00:00Z") / 86400000), val(s, true)]);
+  return {
+    months, now: at(lin.days[lin.t1]), prev: at(lin.days[lin.prev]),
+    chg: { chg: chg.v, sd: chg.sd, ci: chg.ci, lo: chg.lo, hi: chg.hi, sig: chg.lo > 0 || chg.hi < 0 },
+    lean: (h) => (lin.lean[h] ? at(lin.lean[h], false) : null),
+    leanMonths: leanM,
+    leanAt: (h, day) => {
+      const lm = leanM(h), i = lin.months.indexOf(nearest(lin.months.filter((_, j) => lm[j] != null), (m) => m[1], day));
+      return i < 0 ? null : lm[i];
+    },
+    yard: (key) => { const y = lin.yard[key]; return y ? { v: val(y[0], true), he: y[1] ? val(y[1], false) : null, dNow: val(y[2], false) } : null; },
+    levelAt: (day) => { const p = nearest(lineV, (x) => x[1], day); return p ? p[2] : null; },
+    line: () => lineV.map(([iso, , v]) => [iso, Math.round(v * 10) / 10]),
+    band: (day, b) => 100 * lin.days[day][0].reduce((t, s, q) => t + s * b[q], 0),
+    houses: lin.houses, lone: new Set(lin.lone), cnt: lin.cnt, n: lin.n, keys: new Set(Object.keys(lin.yard)),
+  };
+}
+/* the payload shapes both sides emit, key for key */
+function tppNowOut(r, n) {
+  const R1 = (v) => Math.round(v * 10) / 10, R2 = (v) => Math.round(v * 100) / 100;
+  return { alp: R1(r.now.v), n, se: R2(r.now.sd), nEff: n, ci95: R1(r.now.ci), lo: R1(r.now.lo), hi: R1(r.now.hi), model: true };
+}
+function tppChgOut(r) {
+  const R1 = (v) => Math.round(v * 10) / 10;
+  return { changeSe: R1(r.chg.sd), changeCi95: R1(r.chg.ci), changeSig: r.chg.sig, changeLo: R1(r.chg.lo), changeHi: R1(r.chg.hi) };
+}
+
+/* ============================================================ undecided */
+/* The undecided share on one basis (can't say with no leaner asked, or
+   still undecided after a leaner) is the same model with two categories,
+   undecided and decided: each pollster's lean on it (its own wording) drifts,
+   the regular pollsters average zero, each counting once. There is no count
+   to start from, so the prior on the first day is wide around the first
+   readings. readings: [{ house, day, n (all respondents), und, idx }].
+   Returns monthly summaries at `months` [{ ym, day }], today and a month
+   ago, each house's lean, and (pairs) the change between two days. */
   window.AP = window.AP || {};
-  window.AP.pmEngine = { prepare, runFilter, smooth, softmaxAlr, alrOf, makeLayout, PARTIES, DEFF };
+  window.AP.pmEngine = { prepare, runFilter, smooth, softmaxAlr, alrOf, makeLayout, PARTIES, DEFF, tppRead, tppNowOut, tppChgOut };
 })();

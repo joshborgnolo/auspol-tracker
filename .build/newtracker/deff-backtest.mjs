@@ -208,7 +208,10 @@ const refNow = new Date(LATEST_ISO).getTime();
   const cur = nowcastAdj(rows, he, refNow);
   console.log(`== Parity == A0 headline nowcast at ${LATEST_ISO}: ALP ${r1(cur.v)}  (n=${cur.n})`);
   const assetName = fs.readdirSync(path.join(ROOT, ".build/newtracker/assets")).find((f) => f.startsWith("9f09dca2-") && f.endsWith(".js"));
-  const m = assetName && fs.readFileSync(path.join(ROOT, ".build/newtracker/assets", assetName), "utf8").match(/"alp2pp":([0-9.]+),"lnp2pp":[0-9.]+,"alp2ppPrev"/);
+  /* since the published 2PP moved to the model (gen-data §2t) the asset
+     carries the window recipe's own figure as method.recipeAlp2pp */
+  const assetSrc = assetName ? fs.readFileSync(path.join(ROOT, ".build/newtracker/assets", assetName), "utf8") : "";
+  const m = assetSrc.match(/"recipeAlp2pp":([0-9.]+)/) || assetSrc.match(/"alp2pp":([0-9.]+),"lnp2pp":[0-9.]+,"alp2ppPrev"/);
   const committed = m && Number(m[1]);
   console.log(`   committed asset (${assetName || "?"}): ALP ${committed}`);
   if (committed == null) die("parity: could not read alp2pp from the committed data asset");

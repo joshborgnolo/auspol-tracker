@@ -799,6 +799,67 @@ export function anchorFrom(result, miss, parties = PARTIES) {
   return { mean, cov };
 }
 
+/* ============================================================ two-party */
+/* The implied two-party figures as linear reads of the primary model.
+   Labor's share after preferences is linear in the five primary shares,
+   s·f + c (f each party's share reaching Labor under a flow table, c the
+   table's constant), so every implied figure is a read of the primary
+   model's draws: its mean the draws' mean read through f, its spread
+   √(fᵀΣf) from the draws' covariance Σ, with a 95% interval of ±1.96 of it.
+   The build summarises the draws once (tppLin, in gen-data §2t) and both it
+   and the browser's flow editor (pv-agg.js) read every implied figure
+   through this one function, so a reader's own table moves them exactly as
+   the build's moves its own.
+   lin = { n, t1, prev, months: [[ym, day]], days: { day: [m, C] },
+           pair: [m, C], lean: { house: [m, C] }, leanM: { house: [v|null…] },
+           cnt: { house: n }, houses: [...], lone: [...],
+           yard: { key: [level, he|null, dNow] }, line: [[iso, s]…] }
+   m a mean share vector, C its covariance's upper triangle (row-major),
+   leanM a house's lean vector at each month (null before it polled), level
+   and he and dNow a poll's leave-one-out vectors (gen-data §2t). */
+export function tppQuad(C, f) {
+  const P = f.length;
+  let v = 0, k = 0;
+  for (let i = 0; i < P; i++) for (let j = i; j < P; j++) { v += (i === j ? 1 : 2) * f[i] * f[j] * C[k]; k++; }
+  return Math.max(0, v);
+}
+export function tppRead(lin, f, c) {
+  const val = (m, withC) => { let t = 0; for (let q = 0; q < f.length; q++) t += m[q] * f[q]; return 100 * t + (withC ? c : 0); };
+  const at = (mc, withC = true) => {
+    const v = val(mc[0], withC), sd = 100 * Math.sqrt(tppQuad(mc[1], f));
+    return { v, sd, ci: 1.96 * sd, lo: v - 1.96 * sd, hi: v + 1.96 * sd };
+  };
+  const months = lin.months.map(([ym, day]) => ({ ym, day, ...at(lin.days[day]) }));
+  const chg = at(lin.pair, false);
+  const leanM = (h) => (lin.leanM[h] || []).map((l) => (l ? val(l, false) : null));
+  const nearest = (arr, key, d) => { let b = null; for (const x of arr) if (b == null || Math.abs(key(x) - d) < Math.abs(key(b) - d)) b = x; return b; };
+  const lineV = lin.line.map(([iso, s]) => [iso, Math.round(Date.parse(iso + "T00:00:00Z") / 86400000), val(s, true)]);
+  return {
+    months, now: at(lin.days[lin.t1]), prev: at(lin.days[lin.prev]),
+    chg: { chg: chg.v, sd: chg.sd, ci: chg.ci, lo: chg.lo, hi: chg.hi, sig: chg.lo > 0 || chg.hi < 0 },
+    lean: (h) => (lin.lean[h] ? at(lin.lean[h], false) : null),
+    leanMonths: leanM,
+    leanAt: (h, day) => {
+      const lm = leanM(h), i = lin.months.indexOf(nearest(lin.months.filter((_, j) => lm[j] != null), (m) => m[1], day));
+      return i < 0 ? null : lm[i];
+    },
+    yard: (key) => { const y = lin.yard[key]; return y ? { v: val(y[0], true), he: y[1] ? val(y[1], false) : null, dNow: val(y[2], false) } : null; },
+    levelAt: (day) => { const p = nearest(lineV, (x) => x[1], day); return p ? p[2] : null; },
+    line: () => lineV.map(([iso, , v]) => [iso, Math.round(v * 10) / 10]),
+    band: (day, b) => 100 * lin.days[day][0].reduce((t, s, q) => t + s * b[q], 0),
+    houses: lin.houses, lone: new Set(lin.lone), cnt: lin.cnt, n: lin.n, keys: new Set(Object.keys(lin.yard)),
+  };
+}
+/* the payload shapes both sides emit, key for key */
+export function tppNowOut(r, n) {
+  const R1 = (v) => Math.round(v * 10) / 10, R2 = (v) => Math.round(v * 100) / 100;
+  return { alp: R1(r.now.v), n, se: R2(r.now.sd), nEff: n, ci95: R1(r.now.ci), lo: R1(r.now.lo), hi: R1(r.now.hi), model: true };
+}
+export function tppChgOut(r) {
+  const R1 = (v) => Math.round(v * 10) / 10;
+  return { changeSe: R1(r.chg.sd), changeCi95: R1(r.chg.ci), changeSig: r.chg.sig, changeLo: R1(r.chg.lo), changeHi: R1(r.chg.hi) };
+}
+
 /* ============================================================ undecided */
 /* The undecided share on one basis (can't say with no leaner asked, or
    still undecided after a leaner) is the same model with two categories,

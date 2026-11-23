@@ -20,6 +20,12 @@
    closing count lists the party and two in five of the term's polls do;
    everyone else is others. Rows that kept undecided voters in the base are
    put on a decided basis first.
+   The 2PP (1987 on, where the opening election's flows are on file,
+   FLOW_LEF): Labor's share read through those flows from each of the
+   model's draws, exactly Past cycles' construction (impliedLefAlp2pp) on
+   the model's shares; moved toward the counted 2PP by the same rule on the
+   logit scale, its band the draws' interval plus the bias doubt. Earlier
+   terms keep gen-data's 2PP lane (their rows already carry an implied 2PP).
    Writes data/vote-history-model.json, stamped with a hash of its inputs.
      node .build/build-vote-history.mjs */
 import fs from "node:fs";
@@ -27,6 +33,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { fitPrimary, anchorFrom, categoriesOf, stepOf, softmaxAlr, alrOf, mean, quant, PRIM_MISS } from "./newtracker/primary-model.mjs";
+import { FLOW_LEF, impliedLefAlp2pp } from "./newtracker/flows.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const W0 = 0.4, SEP = ["alp", "lnp", "grn", "onp"], DEFF = 1.6;
@@ -98,6 +105,17 @@ export function buildVoteHistory({ log = () => {} } = {}) {
     const eAlr = lateN >= 1 ? Array.from({ length: Dd }, (_, k) => mean(endD.map((e) => e[k])) - cAlr[k]) : null;
     const endSh = parties.map((_, q) => mean(endD.map((e) => 100 * softmaxAlr(e)[q])));
     const out = { year: O.year, src: C.year, a: xO, b: xC, lanes: parties, open, close, miss: {}, n: polls.length, lateN, series: {} };
+    /* the 2PP through the opening election's flows, draw by draw */
+    const LEF = FLOW_LEF[O.year];
+    const tppOf = (sh) => { const q = Object.fromEntries(parties.map((k, i) => [k, 100 * sh[i]])); return impliedLefAlp2pp(LEF, { alp: q.alp, lnp: q.lnp, grn: q.grn ?? null, onp: q.onp ?? null, oth: q.oth }); };
+    const lg = (v) => Math.log(v / (100 - v));
+    let eT = null;
+    if (LEF && C.tpp_alp != null) {
+      const endT = endD.map((e) => tppOf(softmaxAlr(e)));
+      eT = lateN >= 1 ? lg(mean(endT)) - lg(C.tpp_alp) : null;
+      out.open.tpp = O.tpp_alp ?? null; out.close.tpp = C.tpp_alp; out.miss.tpp = eT == null ? null : r2(mean(endT) - C.tpp_alp);
+      out.series.tpp = [];
+    }
     parties.forEach((k, q) => { out.miss[k] = eAlr ? r2(endSh[q] - close[k]) : null; out.series[k] = []; });
     for (const m of months) {
       const f = Math.min(1, Math.max(0, (m.x - xO) / (xC - xO))), g = W0 + (1 - W0) * f;
@@ -110,13 +128,20 @@ export function buildVoteHistory({ log = () => {} } = {}) {
         const lo = quant(adj[q], 0.025), hi = quant(adj[q], 0.975);
         out.series[k].push({ x: m.x, adj: mean(adj[q]), raw: mean(raw[q]), sd: (hi - lo) / 3.92, k: m.k, g, measured: !!eAlr });
       });
+      if (out.series.tpp) {
+        const rawT = dr.map((e) => tppOf(softmaxAlr(e)));
+        const adjT = eT == null ? rawT : rawT.map((v) => { const z = lg(v) - eT * g; return 100 / (1 + Math.exp(-z)); });
+        const lo = quant(adjT, 0.025), hi = quant(adjT, 0.975);
+        out.series.tpp.push({ x: m.x, adj: mean(adjT), raw: mean(rawT), sd: (hi - lo) / 3.92, k: m.k, g, measured: eT != null });
+      }
     }
+    if (out.series.tpp) out.lanes = parties.concat(["tpp"]);
     terms.push(out);
     log(`  ${O.year}–${C.year}: ${readings.length} polls, lanes ${parties.join("/")}, miss ${eAlr ? parties.map((k) => k + " " + out.miss[k]).join(" ") : "unmeasured"}`);
   }
   /* V: each lane's mean squared miss over the measured terms (points²) */
   const V = {};
-  for (const k of ["alp", "lnp", "grn", "onp", "oth"]) {
+  for (const k of ["alp", "lnp", "grn", "onp", "oth", "tpp"]) {
     const es = terms.filter((t) => t.miss[k] != null && t.lateN >= 2).map((t) => t.miss[k]);
     V[k] = es.length ? es.reduce((s, e) => s + e * e, 0) / es.length : null;
   }

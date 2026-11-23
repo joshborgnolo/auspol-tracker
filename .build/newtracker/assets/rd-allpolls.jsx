@@ -458,7 +458,8 @@ const rdApInside = (gap, moe) => {
   return 2 * g < m ? "well inside" : g <= m ? "inside" : "outside";
 };
 /* what the table's dot is measured from, in words */
-const rdApAgainst = (pub) => (RD_AP_KAL ? "the trend through the other polls"
+const rdApAgainst = (pub, onM) => (RD_AP_KAL ? "the trend through the other polls"
+  : RD_AP_TM && !(pub && onM) ? "the model’s line at its fieldwork, estimated without it"
   : "the average of the other " + (pub ? "published figures" : "polls") + " fielded within three weeks of it");
 const rdApTickStep = (lo, hi) => (hi - lo > 24 ? (hi - lo > 48 ? 10 : 8) : 4);
 /* a house's name in the rail's narrow key column may break after its slash
@@ -1500,17 +1501,20 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   /* the single-territory readings the wave also carries (sentence built
      beside sampleValue so every band voices it the one way) */
   const solo = p.solo && window.soloNote ? <div className="rd-apd-facts"><span className="rd-apd-k">Territory readings</span><span>{window.soloNote(p)}</span></div> : null;
+  /* federal: the two-party figures are the model's (gen-data §2t), all but
+     the published Labor v One Nation head-to-heads */
+  const tpModel = RD_AP_TM && !(onM && pub);
   const tppReckon = fig.a != null && (
     <table className="rd-ldg-t rd-ldg-rk"><tbody>
       {rk("This poll", fig.a.toFixed(1), "Labor v " + (onM ? "One Nation" : "Coalition") + (pub ? ", published" : ", implied"))}
-      {yd ? rk(RD_AP_KAL ? "The trend" : "Polls around it", yd.v.toFixed(1), RD_AP_KAL ? "the other polls’ trend" : (yd.n === 1 ? "one other poll" : rdNumWord(yd.n) + " others") + ", within three weeks")
+      {yd ? rk(RD_AP_KAL ? "The trend" : tpModel ? "Line without it" : "Polls around it", yd.v.toFixed(1), RD_AP_KAL ? "the other polls’ trend" : tpModel ? "the model’s line at its fieldwork, from the other " + yd.n + " polls" : (yd.n === 1 ? "one other poll" : rdNumWord(yd.n) + " others") + ", within three weeks")
           : rk("Polls around it", "—", "none fielded within three weeks, so nothing to set it against")}
       {yd && lean != null && rk("Lean", r1s(lean), (Math.abs(lean) < 0.05 ? "level with them" : sideOf(lean) + " way") + (ydHe == null && inside ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""), rdApLeanInk(lean, onM))}
       {rk("House lean", ydHe != null ? r1s(ydHe) : hl != null ? r1s(rdApR1(hl)) : "—",
           ydHe != null || hl != null ? "taken out before averaging" : "not measured yet: too few polls", rdApLeanInk(ydHe != null ? ydHe : hl, onM))}
       {ydHe != null && lean != null && Math.abs(ydHe) >= 0.05 && rk("Less house lean", r1s(adj), inside ? inside[0].toUpperCase() + inside.slice(1) + " its ±" + moe.toFixed(1) + " margin" : (Math.abs(adj) < 0.05 ? "level" : sideOf(adj) + " way"), rdApLeanInk(adj, onM))}
       {today && !p.noAgg && rk("In today’s " + today.a.toFixed(1), eff && eff.w ? move(eff) : eff && eff.t ? move(eff.t) : "—",
-          eff && eff.w ? "how far it moves it, as one of " + rdNumWord(winN)
+          eff && eff.w ? (tpModel ? "how far it moves it: today’s figure without it is " + eff.lo.toFixed(1) : "how far it moves it, as one of " + rdNumWord(winN))
             : eff && eff.t ? "out of the window now; it moved it this far" : "out of the window: the last three weeks only")}
     </tbody></table>
   );
@@ -4179,7 +4183,7 @@ function RdAllPolls(P) {
   );
   const qpop = (
     <RdQPop label="How the two-party figures are counted, and the pollsters’ published figures" align="left">
-      <p>{pub ? "Each poll’s two-party figure as its pollster published it, against " + rdApAgainst(true) + "."
+      <p>{pub ? "Each poll’s two-party figure as its pollster published it, against " + rdApAgainst(true, onM) + "."
         : "Each poll’s primary votes read through the same preference flows, the " + rdElecYear + " election’s, so the polls compare like for like. The pollster’s own figure sits beneath."}</p>
       <div className="rd-qrow"><span>Show the pollsters’ published figures</span>
         <RdSwitch on={pub} onToggle={basisPick} label="Show the pollsters’ published figures" /></div>
@@ -4370,8 +4374,8 @@ function RdAllPolls(P) {
       <HowTo label="How to read this table" paras={[
         <>Dates are fieldwork; the day the poll came out sits beneath. The Published/Fieldwork heading sorts the table two ways – by the day each poll came out (the default) or, on its Fieldwork half, by fieldwork dates, with the month dividers filing by that too. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
         facet === "twopp" && <>{pub
-          ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it."
-          : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}
+          ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true, onM) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it."
+          : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false, onM) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}
           {" "}A pollster’s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance.</>,
         facet === "issues" && <>Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; "Level" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn’t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them.</>,
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
@@ -4388,7 +4392,7 @@ function RdAllPolls(P) {
       ]} />
       <div className="rd-foot">
         <span className="rd-foot-text">{facet === "twopp"
-          ? (pub ? "Each poll’s own published figure, against " + rdApAgainst(true) + ". A dash marks a figure the pollster didn’t publish."
+          ? (pub ? "Each poll’s own published figure, against " + rdApAgainst(true, onM) + ". A dash marks a figure the pollster didn’t publish."
             : (phone ? "Every poll is read through the " + rdElecYear + " election’s preference flows, so polls compare like for like; the pollster’s own figure sits beneath. Each interval is sampling error alone. A dash marks a figure the pollster didn’t publish."
               : "Every poll’s primary votes are read through the same preference flows, the " + rdElecYear + " election’s, so the polls compare like for like; the pollster’s own figure sits beneath where it published one. Those flows carry doubt of their own, but the same doubt for every poll, so each interval is sampling error alone. A dash marks a figure the pollster didn’t publish."))
           : "A dash marks a figure the pollster didn’t publish. Open any row for the poll in full."}</span>
@@ -4420,6 +4424,8 @@ const RD_AP_KAL = !!(window.AUSPOL.latest.method && window.AUSPOL.latest.method.
 /* federal primaries come from the model (gen-data §2m): a poll is held against
    the model's line at its fieldwork, estimated without it */
 const RD_AP_PM = !RD_AP_KAL && !!window.AUSPOL.latest.primaryModel;
+/* and the two-party figures (gen-data §2t) */
+const RD_AP_TM = !RD_AP_KAL && !!(window.AUSPOL.latest.method && window.AUSPOL.latest.method.kind === "model");
 const RD_AP_AVG = RD_AP_KAL ? "trend" : "average";
 function rdApMonths(from) {
   const D = window.AUSPOL;

@@ -1668,7 +1668,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                     onClick={() => window.AP.openTerm &&
                       window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average",
                                          "two-party preferred")}>
-              {adjusted ? "Weighted aggregate" : "Monthly average"}
+              {adjusted ? (D.latest.method && D.latest.method.kind === "model" ? "Model estimate" : "Weighted aggregate") : "Monthly average"}
             </button>
             {/* The sentence continues in a parenthetical: how much evidence
                 the figure carries and what its interval is called. The count
@@ -1679,8 +1679,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                 14 Sep" says the window and the estimate's date in one. */}
             {unc && (
               <span className="hi-count">
-                ({unc.n} poll{unc.n === 1 ? "" : "s"} in the{" "}
-                {D.latest.method.windowDays} days to {shortDate(D.latest.updatedISO)};{" "}
+                {D.latest.method && D.latest.method.kind === "model" && adjusted
+                  ? <>({unc.n} polls this term, to {shortDate(D.latest.updatedISO)};{" "}</>
+                  : <>({unc.n} poll{unc.n === 1 ? "" : "s"} in the{" "}
+                {D.latest.method.windowDays} days to {shortDate(D.latest.updatedISO)};{" "}</>}
                 {/* One more route to the margin's definition: the glossary
                     files "95% interval" as a synonym waypoint of margin of
                     error, so a click lands on the same page the ± figure and

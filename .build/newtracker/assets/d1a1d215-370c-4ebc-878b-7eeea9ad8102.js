@@ -7979,9 +7979,15 @@ function infoTerms(D) {
   /* The method every section shares, written once. */
   const method = [
     { id: "weighted-aggregate", term: "Weighted aggregate", body: (
-      <>How the headline and every other current figure are built{D.latest && D.latest.primaryModel
+      <>{L.method && L.method.kind === "model"
+        ? <>How the other current figures are built: leader ratings, preferred prime minister, the
+        direction of the country, the issues and the rest. The two-party figures, the primary vote
+        and the vote by group come from a model instead (see
+        {" "}{xref("primary-vote", "weighted aggregate", "Primary vote")} and
+        {" "}{xref("two-party-preferred", "weighted aggregate", "Two-party preferred")})</>
+        : <>How the headline and every other current figure are built{D.latest && D.latest.primaryModel
         ? <> – except the primary vote and the vote by group, which a model estimates (see
-        {" "}{xref("primary-vote", "weighted aggregate", "Primary vote")})</> : null}. It averages the recent polls,
+        {" "}{xref("primary-vote", "weighted aggregate", "Primary vote")})</> : null}</>}. It averages the recent polls,
       giving more weight to newer and larger ones, after removing each pollster’s
       {" "}{xref("house-effect", "weighted aggregate", "house effect")}.
       <span className="info-p"><b>Recency.</b> A poll’s weight halves every seven days, and it
@@ -8010,7 +8016,7 @@ function infoTerms(D) {
       cycles draws every earlier term the same way. A few measures depart from all this, and their
       sections say how.</span>
       {working(<>
-        <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
+        <span className="info-p">{L.method && L.method.kind === "model" ? "A figure" : "The headline"} is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
         where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
         <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
         × 1.6 (the design factor) where the pollster publishes one – Newspoll, YouGov, Essential,
@@ -8027,10 +8033,11 @@ function infoTerms(D) {
         a point from the plain-average total, so a real shortfall from undecided voters is
         kept.</span>
         {primWork}</>)}
+        {L.method && L.method.kind === "model" ? null : (<>
         <span className="info-p"><b>Worked example: the published 2PP.</b> A pair published
         with undecided voters still inside it is rebased to 100 first. A pollster that
         publishes no pair adds no row.</span>
-        {tppWork}
+        {tppWork}</>)}
       </>)}</>) },
     { id: "house-effect", term: "House effect", body: (
       <>A pollster’s consistent lean relative to the others. Each of its polls is compared with
@@ -8058,13 +8065,21 @@ function infoTerms(D) {
       <>How far a figure could plausibly be off by chance. For the two-party figure against the
       Coalition today, that’s ±{hl.ci.toFixed(1)} points on each party’s share, and
       ±{(2 * hl.ci).toFixed(1)} on the lead: anything that moves one share moves the gap between
-      them twice as far. The interval takes the larger of two measures: how much the polls in the
+      them twice as far. {L.method && L.method.kind === "model"
+        ? <>The model’s interval is the middle 95% of its simulations. It counts each poll’s sample,
+        how much each pollster’s polls scatter beyond their samples, how far opinion can have moved
+        since the last polls, and the doubt about each pollster’s lean. So it widens when the
+        pollsters split or go quiet, and narrows as polls agree.</>
+        : <>The interval takes the larger of two measures: how much the polls in the
       window disagree, and how much chance alone would scatter them if they all agreed. So it
-      widens when the pollsters split, and never claims more precision than their samples allow.
+      widens when the pollsters split, and never claims more precision than their samples allow.</>}
       <span className="info-p">Unfortunately, it can’t see an error every poll shares. When the
       whole industry leans one way{accShared ? <>, as all {accShared.n} houses did
       in {accShared.year}</> : null}, the interval has no way to know.</span>
-      {working(<>
+      {L.method && L.method.kind === "model" ? working(<span className="info-p">The implied figure’s 95% interval is
+        ±1.96 × √(fᵀΣf) × 100, where Σ is the covariance of the primary model’s simulated shares on
+        the day and f each party’s share reaching Labor under the flow table; the published
+        figure’s is the 2.5th to 97.5th percentile of its own model’s simulations.</span>) : working(<>
         <span className="info-p">1.96 × the larger of two standard errors, both taken on the
         weights wᵢ of the {xref("weighted-aggregate", "95% interval", "weighted aggregate")}.</span>
         <span className="info-p"><b>Spread:</b> √(Σwᵢ(xᵢ − x̄)² ÷ Σwᵢ ÷ (nEff − 1)). This is the
@@ -8087,10 +8102,13 @@ function infoTerms(D) {
     { id: "effective-sample", term: "Effective sample", body: (
       <>What a sample is worth once weighting is counted. A pollster’s
       {" "}{xref("apc-statement", "effective sample", "APC statement")} gives one for each poll,
-      shown as {eff} beside its sample. The window has one too: today the two-party window’s
+      shown as {eff} beside its sample.{L.method && L.method.kind === "model"
+        ? <> The models weigh each poll by it, after discounting it for how much that pollster’s
+        polls scatter beyond their samples.</>
+        : <> The window has one too: today the two-party window’s
       {" "}{hl.n} polls are worth {hl.nEff}, since older polls, smaller samples and repeat polls
       from one pollster count for less. The
-      {" "}{xref("interval", "effective sample", "95% interval")} is computed from it.</>) },
+      {" "}{xref("interval", "effective sample", "95% interval")} is computed from it.</>}</>) },
     { id: "significance", term: "Significant", body: (
       <>A difference or change that chance is an unlikely explanation for: if nothing had really
       differed or moved, a gap as large would turn up less than one time in twenty. Two figures
@@ -8148,7 +8166,17 @@ function infoTerms(D) {
         {" "}{xref("implied-2pp", "two-party preferred", "implied")} from each poll’s primary votes,
         with the pollsters’ own published figures a switch away. A contest no fixed table covers,
         such as the Coalition against One Nation, is shown as published.
-        <span className="info-p"><b>Published figures</b> are averaged as Labor’s share of the
+        {L.method && L.method.kind === "model" ? (
+        <span className="info-p"><b>How they are estimated.</b> The implied figures are the
+        {" "}{xref("primary-vote", "two-party preferred", "primary vote model")}’s estimates read
+        through the flow table. Labor’s share after preferences is a straight sum of the primary
+        shares, so every simulation of the primary vote gives one two-party figure, and the
+        interval, the change on a month ago and each pollster’s lean come from those. The
+        pollsters’ published figures get a model of their own, built the same way: each
+        pollster’s lean on its own figure taken out, the regular pollsters averaging zero, the
+        term opening on the counted 2PP. The figures can step at a change of leader. A change on a
+        month ago is called significant when its 95% interval leaves out zero.</span>) : null}
+        <span className="info-p"><b>Published figures</b> are {L.method && L.method.kind === "model" ? "modelled" : "averaged"} as Labor’s share of the
         two. Essential leaves {xref("decidedness", "two-party preferred", "undecided")} voters
         inside its pair, which falls short of 100 by that share; averaged as published, it would mix
         a share of everyone with a share of the decided and give Essential a false lean. Rescaling
@@ -8165,7 +8193,7 @@ function infoTerms(D) {
       entries: [
         { id: "implied-2pp", term: "Implied 2PP", body: (
           <>The site’s main two-party figure, on the hero, the share card and the summary. It takes
-          each poll’s primary votes and distributes the minor parties’ shares using one fixed
+          {L.method && L.method.kind === "model" ? " the primary vote model’s estimates" : " each poll’s primary votes"} and distributes the minor parties’ shares using one fixed
           {" "}{xref("preference-flows", "implied 2PP", "preference table")}: against the Coalition,
           the flows counted at the 2025 election. Every pollster allocates preferences its own way,
           so one table for all of them means the figure moves when voters do, not when the mix of

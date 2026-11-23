@@ -322,9 +322,153 @@
      them. test-pv-recompute.mjs runs this at the site's own table and holds
      it to the build's figures. Null where the lines are a Kalman trend
      (/vic/), which this mirror does not carry. ================== */
+  /* federal (gen-data §2t): the implied two-party figures are linear reads
+     of the primary model, D.tppLin, through a table - the reader's here -
+     by the build's own function (tppRead, primary-model.mjs, shipped in
+     pm-engine.js), so at the site's table every figure is the build's to
+     the last digit. Each poll's own implied pair is arithmetic on its
+     primaries, as before */
+  const flowAggModel = (T) => {
+    const D = window.AP.D, L = D.tppLin, E = window.AP.pmEngine, spec = D.aggSpec;
+    const r2 = (v) => Math.round(v * 100) / 100;
+    const C = T.lnp, O = T.onp, B = T.onBand, cnr = T.cnr || 0;
+    const n0 = (v) => (v == null ? 0 : v);
+    const impC = (p) => p.alp + C.grn * n0(p.grn) + C.onp * n0(p.onp) + C.oth * n0(p.oth) + cnr;
+    const impO = (p) => p.alp + p.lnp * O.lnp + p.grn * O.grn + n0(p.oth) * O.oth;
+    const onpOptional = !!(window.JUR && window.JUR.onpOptional);
+    let refNow = 0;
+    for (const q of D.individualPolls) { const t = isoMs(q.released); if (t > refNow) refNow = t; }
+    const rowsC = [], rowsO = [];
+    for (const q of D.individualPolls) {
+      const p = q.pp || q.p;
+      if (q.noAgg || q.impOut || !p || p.alp == null || p.lnp == null || p.grn == null) continue;
+      if (p.onp == null && !(onpOptional && p.oth != null)) continue;
+      const base = { q, key: q.released + "|" + q.pollster, ym: q.ym, mid: q.mid != null ? q.mid : isoMs(q.released), firm: q.pollster, p };
+      rowsC.push(base);
+      if (p.onp != null) rowsO.push(base);
+    }
+    const vec = (o) => E.PARTIES.map((k) => o[k] ?? 0);
+    const F_IMP = vec({ alp: 1, grn: C.grn, onp: C.onp, oth: C.oth }), F_ON = vec({ alp: 1, lnp: O.lnp, grn: O.grn, oth: O.oth });
+    const BAND = vec({ lnp: B.lnp, grn: B.grn, oth: B.oth });
+    const imp = E.tppRead(L, F_IMP, cnr), on = E.tppRead(L, F_ON, 0);
+    const gap = E.tppRead(L, F_IMP.map((v, q) => v - F_ON[q]), cnr);
+    const kOf = (rows, ym) => rows.filter((r) => r.ym === ym).length;
+    const El = D.aggPrimary && D.aggPrimary[0] && D.aggPrimary[0].election ? D.aggPrimary[0] : null;
+
+    /* §1b, §7b */
+    const synth2pp = imp.months.map((m) => ({ ym: m.ym, x: D.mx(m.ym), alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: kOf(rowsC, m.ym) }));
+    if (El) synth2pp.unshift({ ym: El.ym, x: El.x, alp: r1(impC(El)), lnp: r1(100 - impC(El)), ci95: 0, k: 0, election: true });
+    const sNow = E.tppNowOut(imp, L.n);
+    const synthLatest = { ...sNow, ...E.tppChgOut(imp), lnp: r1(100 - sNow.alp), prev: r1(imp.prev.v) };
+
+    /* §1c */
+    let flowSens = null;
+    if (T.onp22 != null) {
+      const s22 = E.tppRead(L, vec({ alp: 1, grn: C.grn, onp: T.onp22, oth: C.oth }), cnr);
+      flowSens = [];
+      if (El) { const a = r1(impC(El)), b = r1(impC(El) + (T.onp22 - C.onp) * n0(El.onp)); flowSens.push({ ym: El.ym, x: El.x, lo: Math.min(a, b), hi: Math.max(a, b) }); }
+      imp.months.forEach((m, i) => { const e = s22.months[i]; flowSens.push({ ym: m.ym, x: D.mx(m.ym), lo: r1(Math.min(m.v, e.v)), hi: r1(Math.max(m.v, e.v)) }); });
+    }
+
+    /* §1d */
+    const synthOn = on.months.map((m) => {
+      const cs = m.ci, cf = on.band(m.day, BAND);
+      return { ym: m.ym, x: D.mx(m.ym), a: r1(m.v), b: r1(100 - m.v), ci95: r1(Math.hypot(cs, cf)), cs: r1(cs), cf: r1(cf), k: kOf(rowsO, m.ym) };
+    });
+
+    /* §7f */
+    const P = D.latest.primary;
+    let onImp = D.latest.onImp;
+    if (P && onImp) {
+      const fp = (q) => q.alp + q.lnp * O.lnp + q.grn * O.grn + q.oth * O.oth;
+      const a = fp(P), band = P.lnp * B.lnp + P.grn * B.grn + P.oth * B.oth;
+      const prevP = window.AP.pvAgg ? window.AP.pvAgg(null).nowAt(refNow - 30 * DAY) : null;
+      const cs = E.tppNowOut(on, L.n).ci95;
+      onImp = { a: r1(a), b: r1(100 - a), band: r1(band), cs: r1(cs), ci95: r1(Math.hypot(cs, band)),
+        n: onImp.n, aPrev: prevP ? r1(fp(prevP)) : null, ...E.tppChgOut(on) };
+    }
+
+    /* §8 */
+    const rivalWalk = synth2pp.map((d) => {
+      const i = d.election ? -1 : gap.months.findIndex((m) => m.ym === d.ym);
+      const g = i < 0 ? null : gap.months[i];
+      const e = g && { gap: g.v, gapM: Math.hypot(g.ci, on.band(g.day, BAND) || 0) };
+      if (e && e.gap > e.gapM) return { ym: d.ym, who: "alp_on", why: "2pp" };
+      return { ym: d.ym, who: "alp_lnp", why: e && e.gap < -e.gapM ? "2pp" : "default" };
+    });
+
+    /* §3b, §3c */
+    const dayOf = (mid) => Math.min(L.t1, Math.max(L.t0 + 1, Math.round(mid / DAY)));
+    const yardOf = (rows, m) => {
+      const at = new Map();
+      for (const r of rows) { const y = m.yard(r.key); if (y) at.set(r.q, { v: r2(y.v), he: y.he == null ? null : r2(y.he), n: m.keys.size - 1 }); }
+      const outside = (mid, firm) => {
+        const d = dayOf(mid), v = m.levelAt(d);
+        const he = m.houses.includes(firm) && !m.lone.has(firm) ? m.leanAt(firm, d) : null;
+        return v == null ? null : { v: r2(v), he: he == null ? null : r2(he), n: m.keys.size };
+      };
+      const eff = new Map();
+      for (const r of rows) { const y = m.yard(r.key); if (y) eff.set(r.q, { lo: r1(m.now.v - y.dNow), hi: r1(m.now.v), w: 1 }); }
+      return { at, outside, eff, member: new Set(at.keys()) };
+    };
+    const yC = yardOf(rowsC, imp), yO = yardOf(rowsO, on);
+    const inC = new Set(rowsC.map((r) => r.q)), inO = new Set(rowsO.map((r) => r.q));
+    const twin = new Map(D.individualPolls.map((q) => [q.released + "|" + q.pollster, q]));
+    const pollYard = (q0) => {
+      const q = inC.has(q0) || inO.has(q0) ? q0 : twin.get(q0.released + "|" + q0.pollster) || q0;
+      const y = {}, f = {}, mid = q.mid != null ? q.mid : isoMs(q.released);
+      const im = yC.at.has(q) ? yC.at.get(q) : !yC.member.has(q) && q.alpImp != null ? yC.outside(mid, q.pollster) : null;
+      const o = yO.at.has(q) ? yO.at.get(q) : !yO.member.has(q) && q.alpOnImp != null ? yO.outside(mid, q.pollster) : null;
+      if (im) y.imp = im;
+      if (o) y.onimp = o;
+      if (yC.eff.has(q)) f.imp = yC.eff.get(q);
+      if (yO.eff.has(q)) f.onimp = yO.eff.get(q);
+      return { yd: y, eff: f };
+    };
+
+    /* §3: the leans, as gen-data §2t emits them */
+    const ordered = (keep, obj) => {
+      const out = {};
+      for (const k of Object.keys(keep || {})) if (k in obj) out[k] = obj[k];
+      for (const k of Object.keys(obj)) if (!(k in out)) out[k] = obj[k];
+      return out;
+    };
+    const leanOf = (m, rows, keep) => {
+      const by = new Map();
+      for (const r of rows) { const d = Math.round(r.mid / DAY), o = by.get(r.firm) || { n: 0, first: d, last: d }; o.n++; o.first = Math.min(o.first, d); o.last = Math.max(o.last, d); by.set(r.firm, o); }
+      const out = {};
+      for (const h of m.houses) {
+        const o = by.get(h);
+        if (m.lone.has(h) || !o || o.n < 3 || L.t1 - o.last >= spec.leanStaleDays) continue;
+        const lm = m.leanMonths(h);
+        out[h] = L.months.map(([ym], i) => ({ ym, v: lm[i] }))
+          .filter((x, i) => x.v != null && Math.floor(Date.parse(L.months[i][0] + "-28T00:00:00Z") / DAY) >= o.first).map((x) => ({ ym: x.ym, v: r1(x.v) }));
+      }
+      return ordered(keep, out);
+    };
+    const snapOf = (m, keep) => ordered(keep, Object.fromEntries(m.houses.filter((h) => !m.lone.has(h)).map((h) => { const l = m.lean(h); return [h, { v: l ? r1(l.v) : 0, n: m.cnt[h] }]; })));
+    const HL = D.houseLean || {}, HE = D.houseEffects || {};
+    const houseLean = spec.leanStaleDays != null ? { imp: leanOf(imp, rowsC, HL.imp), onimp: leanOf(on, rowsO, HL.onimp) } : null;
+    const houseEffects = { synth: snapOf(imp, HE.synth), synthOn: snapOf(on, HE.synthOn) };
+
+    const pollImp = (q) => {
+      const p = q.pp || q.p;
+      if (!p || q.alpImp == null) return null;
+      const s = PK.reduce((t, k) => t + n0(p[k]), 0);
+      const f = Math.abs(s - 100) <= 2 ? 1 : 100 / s;
+      const sc = {};
+      for (const k of PK) if (p[k] != null) sc[k] = p[k] * f;
+      return { alpImp: r1(impC(sc)), ...(q.alpOnImp != null && sc.onp != null ? { alpOnImp: r1(impO(sc)) } : {}) };
+    };
+
+    return { synth2pp, synthLatest, flowSens, synthOn, onImp, rivalWalk,
+             rivalLead: rivalWalk.length ? rivalWalk[rivalWalk.length - 1].who : "alp_lnp", pollImp, pollYard,
+             yardLine: { imp: imp.line(), onimp: on.line() }, houseLean, houseEffects };
+  };
   window.AP.flowAgg = (T) => {
     const D = window.AP.D, spec = D.aggSpec;
     if (!spec || !D.individualPolls || (D.latest.method && D.latest.method.kind === "kalman")) return null;
+    if (D.tppLin && window.AP.pmEngine && window.AP.pmEngine.tppRead) return flowAggModel(T);
     const r2 = (v) => Math.round(v * 100) / 100;
     const C = T.lnp, O = T.onp, B = T.onBand, cnr = T.cnr || 0;
     const n0 = (v) => (v == null ? 0 : v);

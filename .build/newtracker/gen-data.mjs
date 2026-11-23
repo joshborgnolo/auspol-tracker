@@ -20,6 +20,7 @@ import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
+import { tppRead, tppNowOut, tppChgOut } from "./primary-model.mjs";
 import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
@@ -1194,6 +1195,152 @@ const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
    the GRN and OTH read-offs joined 2026-10-02 for the panel's wide-screen
    tabs; lives after primaryHE exists). A firm under 3 evidence
    polls on a measure is absent from that measure's map, never drawn flat. */
+
+/* ---- 2t. the two-party figures on the model (federal) ---------------------
+   (user ask 2026-11-23: "the implied 2PP from the model's draws through the
+   flow table; the published 2PP with its own leans; replace the three-week
+   window".)
+   IMPLIED. Each of the primary model's draws read through the flow table.
+   Labor's share after preferences is linear in the five shares, so the
+   implied 2PP's draws are the primaries' draws mapped one by one: its
+   interval, its month-on-month change (the joint draws of the two days),
+   each house's lean (its leans on the primaries, mapped the same way), each
+   poll's yardstick and footprint all come out of the one model, with no
+   second fit and no window. The same for Labor v One Nation through the
+   ALP-v-ON table, whose own range (FP_ON_BAND) no poll can narrow and is
+   still added to its margin; and for the 2022 One Nation flow, the
+   sensitivity band's other edge.
+   PUBLISHED. The houses' own two-party figures measure something else:
+   each house allocates preferences its own way. They get the same model
+   with two categories, Labor and the Coalition: each pollster's drifting
+   lean on its published figure, the regular pollsters averaging zero, a
+   damped trend, the leader changes, the term opening on the counted 2PP
+   moved by the polls' average miss at the elections 2007–2025 (TPP_MISS:
+   Labor +0.8 ± 1.9 points, the vote history's implied 2PP misses).
+   Every two-party figure the page prints reads these: the headline, the
+   monthly lines, the change tests, the leans, each poll's yardstick and
+   footprint, the working table and the rival ruling. The three-week window
+   remains /vic/'s fallback and the archived recipe. */
+const TPP_MISS = [0.83, 1.86];
+/* the primary model's draws, summarised once for the linear reads (tppRead,
+   primary-model.mjs): each printed day's mean shares and their covariance,
+   the month-on-month pair's, each house's lean today, its lean at each
+   month (at the settings' mode), each poll's leave-one-out vectors, and the
+   line through every day the smoother kept. Shipped as D.tppLin, so the
+   flow editor reads a reader's own table through the same numbers */
+const R6 = (v) => Math.round(v * 1e6) / 1e6;
+const tppLin = PRIMM ? (() => {
+  const { fit, months, t0, t1 } = PRIMM, P = PM_PARTIES.length;
+  const vecR = (v) => Array.from(v, R6);
+  const mc = (draws) => {
+    const n = draws.length / P, m = new Array(P).fill(0);
+    for (let i = 0; i < n; i++) for (let q = 0; q < P; q++) m[q] += draws[i * P + q] / n;
+    const C = [];
+    for (let a = 0; a < P; a++) for (let b = a; b < P; b++) {
+      let t = 0; for (let i = 0; i < n; i++) t += (draws[i * P + a] - m[a]) * (draws[i * P + b] - m[b]);
+      C.push(+(t / (n - 1)).toPrecision(6));
+    }
+    return [m.map(R6), C];
+  };
+  const daysAll = [...new Set([...months.map((m) => m.day), t1, t1 - 30])];
+  const yard = {};
+  for (const r of PRIMM.readings) { const f = fit.influence(r.idx); if (f) yard[r.key] = [vecR(f.level), f.he ? vecR(f.he) : null, vecR(f.dNow)]; }
+  const iso = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+  return {
+    n: PRIMM.readings.length, t0, t1, prev: t1 - 30, months: months.map((m) => [m.ym, m.day]),
+    days: Object.fromEntries(daysAll.map((d) => [d, mc(fit.shares(d))])),
+    pair: mc(fit.pair(t1, t1 - 30)),
+    lean: Object.fromEntries(fit.L.houses.filter((h) => fit.lean(h)).map((h) => [h, mc(fit.lean(h))])),
+    leanM: Object.fromEntries(fit.L.houses.map((h) => [h, (PRIMM.leanMonths[h] || []).map((l) => (l ? vecR(l) : null))])),
+    cnt: fit.cnt, houses: fit.L.houses, lone: [...fit.L.lone], yard,
+    line: fit.events.filter((d) => d > t0 && d <= t1).map((d) => { const l = fit.levelAt(d); return l ? [iso(d), vecR(l)] : null; }).filter(Boolean),
+  };
+})() : null;
+const TPM = PRIMM ? (() => {
+  const T0 = Date.now();
+  const { months, t0, t1 } = PRIMM;
+  const vec = (o) => PM_PARTIES.map((k) => o[k] ?? 0);
+  const F_IMP = vec({ alp: 1, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth });
+  const F_22 = vec({ alp: 1, grn: FLOW.grn, onp: ONP_FLOW_2022, oth: FLOW.oth });
+  const F_ON = vec({ alp: 1, lnp: FP_ON.lnp, grn: FP_ON.grn, oth: FP_ON.oth });
+  const BAND = vec({ lnp: FP_ON_BAND.lnp, grn: FP_ON_BAND.grn, oth: FP_ON_BAND.oth });
+  const imp = tppRead(tppLin, F_IMP, FLOW_3CNR), on = tppRead(tppLin, F_ON, 0), s22 = tppRead(tppLin, F_22, FLOW_3CNR);
+  const gap = tppRead(tppLin, F_IMP.map((v, q) => v - F_ON[q]), FLOW_3CNR);   // implied v Coalition less v One Nation
+  const prim = tppRead(tppLin, vec({ onp: 1, lnp: -1 }), 0);                 // One Nation's primary less the Coalition's
+  /* the ALP-v-ON table's own range at the shares (linear, points) */
+  const cf = new Map(Object.keys(tppLin.days).map((d) => [+d, imp.band(+d, BAND)]));
+  const daysAll = [...new Set([...months.map((m) => m.day), t1, t1 - 30])];
+  const sm = (c) => { const lo = pmQuant(c, 0.025), hi = pmQuant(c, 0.975); return { v: pmMean(c), lo, hi, ci: (hi - lo) / 2, sd: (hi - lo) / 3.92 }; };
+  const sig = (c) => ({ chg: c.v, lo: c.lo, hi: c.hi, sd: c.sd, ci: c.ci, sig: c.lo > 0 || c.hi < 0 });
+  /* the nearest day the smoother kept (an event: a poll, a printed day) */
+  const nearEv = (evs, d) => { let lo = 0, hi = evs.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (evs[m] <= d) lo = m; else hi = m; } return Math.abs(evs[lo] - d) <= Math.abs(evs[hi] - d) ? evs[lo] : evs[hi]; };
+  /* the published classic pair: its own two-category fit */
+  const pubRs = [];
+  tppRows.forEach((r, i) => {
+    const p = POLL_BY_KEY.get(r.key);
+    if (!p || !(r.x > 0 && r.x < 100)) return;
+    const s0 = pmDay(p.dateStart || p.date), e0 = pmDay(p.date);
+    pubRs.push({ key: r.key, house: r.firm, idx: i, start: s0, end: e0, day: Math.round((s0 + e0) / 2), n: r.n / HL_DEFF,
+      cats: [[0], [1]], vals: [r.x, 100 - r.x], full: true, step: pmStep([p.tpp_alp]), pub: p.published ? pmDay(p.published) : e0 });
+  });
+  pubRs.sort((a, b) => a.day - b.day || a.idx - b.idx);
+  const a0 = (ELECTION.tpp_alp + TPP_MISS[0]) / 100, sdl = (TPP_MISS[1] / 100) * (1 / a0 + 1 / (1 - a0));
+  const pf = pubRs.length >= 2 ? fitPrimary(pubRs, { t0, t1, anchor: { mean: Float64Array.from([Math.log(a0 / (1 - a0))]), cov: Float64Array.from([sdl * sdl]) },
+    jumps: new Set(PRIM_JUMPS.map(pmDay)), parties: ["alp", "lnp"], days: daysAll, pairs: [[t1, t1 - 30]], trend: true,
+    nDraw: +(process.env.PRIM_NDRAW || 2000), seed: 20261125, minCore: 4 }) : null;
+  const pub = pf && (() => {
+    const lin2 = (draws, withC) => { const n = draws.length / 2, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * draws[i * 2]; return o; };
+    const at = new Map(daysAll.map((d) => [d, sm(lin2(pf.shares(d)))]));
+    const pinf = new Map(pubRs.map((r) => [r.key, pf.influence(r.idx)]).filter(([, f]) => f));
+    return {
+      months: months.map(({ ym, day }) => ({ ym, day, ...at.get(day) })), now: at.get(t1), prev: at.get(t1 - 30),
+      chg: sig(sm(lin2(pf.pair(t1, t1 - 30)))), fit: pf,
+      lean: (h) => { const d = pf.lean(h); return d ? sm(lin2(d)) : null; },
+      leanMonths: (h) => pf.leanPath(h, months.map((m) => m.day)).map((l) => (l ? 100 * l[0] : null)),
+      leanAt: (h, day) => { const l = pf.leanPath(h, [nearEv(pf.events, day)])[0]; return l ? 100 * l[0] : null; },
+      yard: (key) => { const f = pinf.get(key); return f ? { v: 100 * f.level[0], he: f.he ? 100 * f.he[0] : null, dNow: 100 * f.dNow[0] } : null; },
+      levelAt: (day) => { const l = pf.levelAt(nearEv(pf.events, day)); return l ? 100 * l[0] : null; },
+      line: () => pf.events.filter((d) => d > t0 && d <= t1).map((d) => { const l = pf.levelAt(d); return l ? [new Date(d * 86400000).toISOString().slice(0, 10), r1(100 * l[0])] : null; }).filter(Boolean),
+      houses: pf.L.houses, lone: pf.L.lone, cnt: pf.cnt, keys: new Set(pubRs.map((r) => r.key)), n: pubRs.length,
+      kappa: Object.fromEntries([...pf.settings.kappa].filter(([h]) => !pf.L.lone.has(h))),
+      ess: pf.ctx.laplace ? pf.ctx.laplace.ess : null, M: pf.settings.comps.length,
+    };
+  })();
+  const out = { imp, on, s22, gap, prim, cf, pub };
+  console.log(`two-party model: implied ${r1(imp.now.v)} ±${r1(imp.now.ci)} (month ${imp.chg.chg >= 0 ? "+" : ""}${r1(imp.chg.chg)}, ${imp.chg.sig ? "significant" : "within the margin"}),`
+    + ` ALP v ON ${r1(on.now.v)} ±${r1(on.now.ci)} + table ±${r1(cf.get(t1))}`
+    + (pub ? `, published ${r1(pub.now.v)} ±${r1(pub.now.ci)} from ${pub.n} polls (ESS ${pub.ess ? pub.ess.toFixed(1) : "-"} of ${pub.M}; κ ${JSON.stringify(pub.kappa)})` : ", published: too few")
+    + ` in ${((Date.now() - T0) / 1000).toFixed(1)}s`);
+  return out;
+})() : null;
+/* a model lean in the house-effect interface the two-party consumers take
+   (he.at(firm, ms), he.snapshot(), evidence maps for the leans panel) */
+const tpmHe = (m) => {
+  if (!m) return null;
+  const cache = new Map();
+  const at = (firm, t) => {
+    if (!m.houses.includes(firm) || m.lone.has(firm)) return 0;
+    const d = Math.min(PRIMM.t1, Math.max(PRIMM.t0 + 1, Math.round(t / 86400000)));
+    const k = firm + "|" + d;
+    if (!cache.has(k)) { const v = m.leanAt(firm, d); cache.set(k, v == null ? 0 : v); }
+    return cache.get(k);
+  };
+  const snapshot = () => Object.fromEntries(m.houses.filter((h) => !m.lone.has(h)).map((h) => { const l = m.lean(h); return [h, { v: l ? r1(l.v) : 0, n: m.cnt[h] }]; }));
+  return { at, snapshot, model: true };
+};
+const houseEffectM = TPM && TPM.pub ? tpmHe(TPM.pub) : houseEffect;
+const synthEffectM = TPM ? tpmHe(TPM.imp) : synthEffect;
+const synthOnEffectM = TPM ? tpmHe(TPM.on) : synthOnEffect;
+if (TPM) {
+  const kOf = (rows, ym) => rows.filter((r) => r.ym === ym).length;
+  agg2ppSynth.splice(1, Infinity, ...TPM.imp.months.map((m) => ({ ym: m.ym, x: mx(m.ym), alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: kOf(tppRowsSynth, m.ym) })));
+  if (TPM.pub) agg2pp.splice(1, Infinity, ...TPM.pub.months.map((m) => ({ ym: m.ym, x: mx(m.ym), alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: kOf(tppRows, m.ym) })));
+  agg2ppSynthOn.splice(0, Infinity, ...TPM.on.months.map((m) => ({ ym: m.ym, x: mx(m.ym), a: r1(m.v), b: r1(100 - m.v), ...onMargin(m.ci, TPM.cf.get(m.day)), k: kOf(tppRowsSynthOn, m.ym) })));
+  if (synthBand) synthBand.splice(1, Infinity, ...TPM.imp.months.map((m, i) => {
+    const e = TPM.s22.months[i];
+    return { ym: m.ym, x: mx(m.ym), lo: r1(Math.min(m.v, e.v)), hi: r1(Math.max(m.v, e.v)) };
+  }));
+}
 /* "imp" is synthEffect, and it is here because the site's DEFAULT two-party
    figure is the implied one, which subtracts synthEffect and not houseEffect.
    The panel used to draw only the published-2PP lean while telling the reader
@@ -1229,6 +1376,21 @@ const houseLean = Object.fromEntries([
         .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
     ]))]),
 );
+/* federal: the two-party leans from the model (§2t) – the implied ones the
+   primaries' leans read through each table, the published one its own fit's -
+   at each month's middle, from the month of the house's first poll on that
+   measure this term; the same staleness rule */
+if (TPM) {
+  const lastBy = (rows) => { const o = new Map(); for (const r of rows) { const d = Math.round(r.mid / 86400000); const q = o.get(r.firm) || { n: 0, first: d, last: d }; q.n++; q.first = Math.min(q.first, d); q.last = Math.max(q.last, d); o.set(r.firm, q); } return o; };
+  const put = (key, m, rows) => {
+    if (!m) return;
+    const by = lastBy(rows);
+    houseLean[key] = Object.fromEntries(m.houses.filter((h) => !m.lone.has(h) && by.has(h) && by.get(h).n >= 3 && PRIMM.t1 - by.get(h).last < LEAN_STALE_DAYS)
+      .map((h) => { const lm = m.leanMonths(h); return [h, PRIMM.months.map((mm, i) => ({ ym: mm.ym, v: lm[i] }))
+        .filter((o, i) => o.v != null && pmDay(PRIMM.months[i].ym + "-28") >= by.get(h).first).map((o) => ({ ym: o.ym, v: r1(o.v) }))]; }));
+  };
+  put("imp", TPM.imp, tppRowsSynth); put("onimp", TPM.on, tppRowsSynthOn); put("tpp", TPM.pub, tppRows);
+}
 /* federal: each house's lean on each primary from the model – the smoothed
    lean at each month's middle (settings at their mode), from the month its
    first poll this term falls in; the same staleness rule */
@@ -1278,6 +1440,26 @@ if (PRIMM) {
    than mixing bases against the monthly-fallback the headline would show. */
 const FOOTPRINT_THIN = 3, footprintThin = new Set(); // see the footprint guard below
 const effByKey = (() => {
+  /* federal (§2t): every poll is in the model (w 1); its footprint is
+     today's figure without it, through the smoother (the primary model's
+     for the implied pairs, the published fit's for the published pair) */
+  if (TPM) {
+    const out = new Map();
+    const has = { lnp: new Set(tppRows.map((r) => r.key)), imp: new Set(tppRowsSynth.map((r) => r.key)), onimp: new Set(tppRowsSynthOn.map((r) => r.key)) };
+    const series = [["lnp", TPM.pub, TPM.pub && TPM.pub.now], ["imp", TPM.imp, TPM.imp.now], ["onimp", TPM.on, TPM.on.now]].filter(([, m]) => m);
+    for (const p of POLLS) {
+      if (noAggPoll(p)) continue;
+      const key = p.date + "|" + p.pollster, eff = {};
+      for (const [k, m, now] of series) {
+        if (!has[k].has(key)) continue;
+        const y = m.yard(key);
+        if (!y) continue;
+        eff[k] = { lo: r1(now.v - y.dNow), hi: r1(now.v), w: 1 };
+      }
+      if (Object.keys(eff).length) out.set(key, eff);
+    }
+    return out;
+  }
   /* /vic/: every poll sits in the trend (w is always 1), so its footprint
      is today's trend without it, rerun through the filter */
   if (KF) {
@@ -1492,10 +1674,27 @@ function yardSeries(rows, he, kf, bare = false) {
   };
   return { at, line, member: new Set(rows.map((r) => r.key)), outside };
 }
+/* federal (§2t): the yardstick is the model's line at the wave's fieldwork
+   estimated without it (rank-one leave-one-out), he the house's lean then,
+   the line the model's own through every poll */
+function yardModel(rows, m) {
+  const at = new Map();
+  for (const r of rows) {
+    const y = m.yard(r.key);
+    if (y) at.set(r.key, { v: r2(y.v), he: y.he == null ? null : r2(y.he), n: m.keys.size - 1 });
+  }
+  const dayOf = (mid) => Math.min(PRIMM.t1, Math.max(PRIMM.t0 + 1, Math.round(mid / 86400000)));
+  return { at, line: m.line(), member: new Set(rows.filter((r) => at.has(r.key)).map((r) => r.key)),
+    outside: (mid, firm) => {
+      const d = dayOf(mid), v = m.levelAt(d) ?? (() => { const e = m.months.reduce((b, q) => (Math.abs(q.day - d) < Math.abs(b.day - d) ? q : b), m.months[0]); return e ? e.v : null; })();
+      const he = m.houses.includes(firm) && !m.lone.has(firm) ? m.leanAt(firm, d) : null;
+      return v == null ? null : { v: r2(v), he: he == null ? null : r2(he), n: m.keys.size };
+    } };
+}
 const yardBy = {
-  lnp: yardSeries(tppRows, houseEffect, KF ? KF_NOW.tpp : null),
-  imp: yardSeries(tppRowsSynth, synthEffect, KF ? KF_NOW.imp : null),
-  onimp: yardSeries(tppRowsSynthOn, synthOnEffect, KF ? KF_NOW.on : null),
+  lnp: TPM && TPM.pub ? yardModel(tppRows, TPM.pub) : yardSeries(tppRows, houseEffect, KF ? KF_NOW.tpp : null),
+  imp: TPM ? yardModel(tppRowsSynth, TPM.imp) : yardSeries(tppRowsSynth, synthEffect, KF ? KF_NOW.imp : null),
+  onimp: TPM ? yardModel(tppRowsSynthOn, TPM.on) : yardSeries(tppRowsSynthOn, synthOnEffect, KF ? KF_NOW.on : null),
   onp: yardSeries(altAON.rows, altAON.adjusted ? altAON.he : null, null),
 };
 const yardLine = Object.fromEntries(Object.entries(yardBy).map(([k, s]) => [k, s.line]));
@@ -1512,10 +1711,11 @@ const ydOf = (p) => {
   }
   return Object.keys(o).length ? o : null;
 };
-// a two-party share outside 20-80 is arithmetic gone wrong, not data
+// a two-party share outside 20-80 is arithmetic gone wrong, not data (a
+// null lean is the model's one-off house: none measured, none taken out)
 for (const [k, s] of Object.entries(yardBy)) {
   for (const [key, y] of s.at) {
-    if (!Number.isFinite(y.v) || !Number.isFinite(y.he) || y.v < 20 || y.v > 80)
+    if (!Number.isFinite(y.v) || !(Number.isFinite(y.he) || y.he === null) || y.v < 20 || y.v > 80)
       throw new Error(`poll yardstick out of range (${k} ${key}): ${JSON.stringify(y)}`);
   }
 }
@@ -5185,8 +5385,11 @@ const headlineTpp = (ref) => {
   const r = nowcastAdj(tppRows, houseEffect, ref);
   return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
 };
-const hlNow = (KF ? kfNow(KF_NOW.tpp) : headlineTpp(refNow)) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
-const hl1mo = KF ? (KF_NOW.tpp && KF_NOW.tpp.change ? { alp: r1(KF_NOW.tpp.change.prev) } : null) : headlineTpp(refNow - 30 * 86400000);
+/* federal (§2t): the model's, with its interval and its own change test */
+const tpmNow = (m, n) => m && tppNowOut(m, n);
+const tpmChg = (m) => (m ? tppChgOut(m) : {});
+const hlNow = (KF ? kfNow(KF_NOW.tpp) : TPM && TPM.pub ? tpmNow(TPM.pub, TPM.pub.n) : headlineTpp(refNow)) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
+const hl1mo = KF ? (KF_NOW.tpp && KF_NOW.tpp.change ? { alp: r1(KF_NOW.tpp.change.prev) } : null) : TPM && TPM.pub ? { alp: r1(TPM.pub.prev.v) } : headlineTpp(refNow - 30 * 86400000);
 
 /* The synthetic series' nowcast, on the identical window/half-life/house-
    effect machinery as the headline. Kept next to it in the payload so the
@@ -5198,13 +5401,13 @@ const synthHeadline = (ref) => {
   const r = nowcastAdj(tppRowsSynth, synthEffect, ref);
   return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
 };
-const synthNow = KF ? kfNow(KF_NOW.imp) : synthHeadline(refNow);
-const synth1mo = KF ? (KF_NOW.imp && KF_NOW.imp.change ? { alp: r1(KF_NOW.imp.change.prev) } : null) : synthHeadline(refNow - 30 * 86400000);
+const synthNow = KF ? kfNow(KF_NOW.imp) : TPM ? tpmNow(TPM.imp, tppLin.n) : synthHeadline(refNow);
+const synth1mo = KF ? (KF_NOW.imp && KF_NOW.imp.change ? { alp: r1(KF_NOW.imp.change.prev) } : null) : TPM ? { alp: r1(TPM.imp.prev.v) } : synthHeadline(refNow - 30 * 86400000);
 /* The implied headline's month-on-month significance, on the same RSS rule
    the published headline uses (two independent 21d windows). Emitted beside
    synthLatest so the hero's "within the margin" caveat reads the implied
    basis it displays. */
-const synthChg = KF ? kfChgOf(KF_NOW.imp) : (synthNow && synth1mo && synthNow.se != null && synth1mo.se != null)
+const synthChg = KF ? kfChgOf(KF_NOW.imp) : TPM ? tpmChg(TPM.imp) : (synthNow && synth1mo && synthNow.se != null && synth1mo.se != null)
   ? (() => {
       const seChg = Math.sqrt(synthNow.se ** 2 + synth1mo.se ** 2);
       return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(synthNow.alp - synth1mo.alp) > 1.96 * seChg };
@@ -7947,9 +8150,9 @@ const onImp = primaryNow && (() => {
      Same RSS rule as synthChg (§1b) and altNowcast (§6): three of the four
      basis x contest cells made this call already, the PUBLISHED ALP-v-ON
      among them. */
-  const nw = KF ? null : nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow);
-  const pv = KF ? null : nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow - 30 * 86400000);
-  const chg = KF ? kfChgOf(KF_NOW.on) : (nw && pv && nw.se != null && pv.se != null)
+  const nw = KF || TPM ? null : nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow);
+  const pv = KF || TPM ? null : nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow - 30 * 86400000);
+  const chg = KF ? kfChgOf(KF_NOW.on) : TPM ? tpmChg(TPM.on) : (nw && pv && nw.se != null && pv.se != null)
     ? (() => {
         const seChg = Math.sqrt(nw.se ** 2 + pv.se ** 2);
         return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg),
@@ -7958,7 +8161,7 @@ const onImp = primaryNow && (() => {
     : {};
   // the level's sampling interval: the nowcast's own (or the trend's, /vic/),
   // the interval synthLatest quotes on the classic pairing
-  const lvl = KF ? kfNow(KF_NOW.on) : nw;
+  const lvl = KF ? kfNow(KF_NOW.on) : TPM ? tpmNow(TPM.on, tppLin.n) : nw;
   const cs = lvl && lvl.ci95 != null ? lvl.ci95 : null;
   return { a: r1(a), b: r1(100 - a), band: r1(band),
            ...(cs != null ? { cs: r1(cs), ci95: r1(Math.hypot(cs, band)) } : { ci95: r1(band) }),
@@ -7999,7 +8202,15 @@ const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return 
    2PP one. Before 2026-10-11 a fixed one-point deadband decided it. Each
    month's ruling records why (why: "2pp" when the gap decided it,
    "default" otherwise). */
-const rivalEvidence = (() => {
+/* federal (§2t): the same two tests on the model's draws, month by month -
+   the gap between the two implied pairs (its 95% interval with the ALP-v-ON
+   table's range added) and One Nation's primary less the Coalition's */
+const rivalEvidence = TPM ? Object.fromEntries(MONTHS.map((ym) => {
+  const i = TPM.gap.months.findIndex((m) => m.ym === ym);
+  if (i < 0) return [ym, null];
+  const g = TPM.gap.months[i], q = TPM.prim.months[i];
+  return [ym, { gap: g.v, gapM: Math.hypot(g.ci, TPM.cf.get(g.day) || 0), prim: q.v, primM: q.ci }];
+})) : (() => {
   const onBy = new Map(tppRowsSynthOn.map((r) => [r.key, r]));
   const share = (p) => {
     const q = { alp: p.alp || 0, lnp: p.lnp || 0, grn: p.grn || 0, onp: p.onp || 0, oth: (p.ind || 0) + (p.oth || 0) };
@@ -8103,7 +8314,7 @@ const latest = {
   alp2ppSe: hlNow.se ?? null,
   alp2ppCi95: hlNow.ci95 ?? null,
   alp2ppNEff: hlNow.nEff ?? null,
-  ...(KF ? kfChgOf(KF_NOW.tpp) : hl1mo && hlNow.se != null ? (() => {
+  ...(KF ? kfChgOf(KF_NOW.tpp) : TPM && TPM.pub ? tpmChg(TPM.pub) : hl1mo && hlNow.se != null ? (() => {
     const seChg = Math.sqrt(hlNow.se ** 2 + hl1mo.se ** 2);
     const chg = hlNow.alp - hl1mo.alp;
     return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(chg) > 1.96 * seChg };
@@ -8160,7 +8371,11 @@ const latest = {
   /* deff rides in the payload so the page's discord engine reads the SAME
      constant the node estimator used (it lives in an untransformed asset and
      used to mirror 1.6 by hand, free to drift). */
-  method: { kind: KF ? "kalman" : "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, taperDays: HL_TAPER, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
+  /* recipeAlp2pp: the three-week window's published 2PP, kept beside the
+     model's (§2t) as the parity control deff-backtest.mjs holds its copy of
+     the window recipe to */
+  method: { kind: KF ? "kalman" : TPM ? "model" : "weighted house-effect-adjusted mean",
+    ...(TPM ? { recipeAlp2pp: (() => { const h = headlineTpp(refNow); return h ? r1(h.alp) : null; })() } : {}), windowDays: HL_WINDOW, halfLifeDays: HL_HALF, taperDays: HL_TAPER, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
 };
 
 /* ---- 8b. show-your-working: the rows behind the two headline estimates ---
@@ -8186,8 +8401,22 @@ const fwText = (p) => {
 };
 const showWorking = KF ? {} : (() => {   // /vic/'s figures are the trend's: no 21-day tables
   // 2PP: polls whose fieldwork mid falls inside the trailing window – the
+  /* federal (§2t): the published pair's model has no window of weights;
+     its working is each recent published figure, the house's lean then, the
+     figure less the lean, the line at its fieldwork without it, and its pull */
+  let tppModelWork = null;
+  if (TPM && TPM.pub) {
+    const rows = tppRows.filter((a) => { const d = ddays(refNow, a.mid); return d >= 0 && d <= HL_WINDOW; }).sort((a, b) => a.mid - b.mid).map((a) => {
+      const p = POLL_BY_KEY.get(a.key), y = TPM.pub.yard(a.key);
+      return { firm: a.firm, fw: fwText(p), mid: dayMon(a.mid), pair: p.tpp_lnp != null ? `${p.tpp_alp}–${p.tpp_lnp}` : `${p.tpp_alp}`,
+               x: r2(a.x), lean: y && y.he != null ? r2(y.he) : null, adj: y && y.he != null ? r2(a.x - y.he) : null,
+               level: y ? r2(y.v) : null, pull: y ? r2(y.dNow) : null };
+    });
+    tppModelWork = { model: true, rows, k: rows.length, ref: dayMon(refNow), v: hlNow.alp, lo: r1(TPM.pub.now.lo), hi: r1(TPM.pub.now.hi),
+      polls: TPM.pub.n, houses: TPM.pub.houses.length + TPM.pub.lone.size };
+  }
   // filter is nowcastAdj's own predicate, ref and constants included
-  const tppRowsIn = tppRows.filter((a) => { const d = ddays(refNow, a.mid); return d >= 0 && d <= HL_WINDOW; });
+  const tppRowsIn = TPM && TPM.pub ? [] : tppRows.filter((a) => { const d = ddays(refNow, a.mid); return d >= 0 && d <= HL_WINDOW; });
   tppRowsIn.sort((a, b) => a.mid - b.mid);
   let tpp = null;
   if (tppRowsIn.length) {
@@ -8252,7 +8481,7 @@ const showWorking = KF ? {} : (() => {   // /vic/'s figures are the trend's: no 
                 rescaled: primaryNow.rescaled,
                 v: r1(primaryNow.rescaled ? (swx / sw) * (primaryNow.plainTotal / primaryNow.adjTotal) : swx / sw) };
   }
-  return { tpp, primary };
+  return { tpp: tppModelWork || tpp, primary };
 })();
 /* The tables must say what the estimates say – drift here means an emitted
    table contradicts the hero it claims to explain. Fail the build, don't
@@ -10126,7 +10355,9 @@ const voteHistory = JUR ? null : (() => {
      (.build/build-vote-history.mjs → data/vote-history-model.json): each
      term fitted as the sitting term is, then moved toward its closing count
      by the rule above on the model's log-ratio scale, so no share is moved
-     below zero. The 2PP lane stays this construction. Used only while the
+     below zero; from 1987 the 2PP too (the model's draws read through the
+     opening election's flows, moved on the logit scale). Earlier terms'
+     2PP lane stays this construction. Used only while the
      file is current with its inputs (cyclePolls, the elections, the bases);
      a stale file leaves the monthly averages in place and says so (and
      test-vote-history-model.mjs fails until it is rebuilt). */
@@ -10145,7 +10376,7 @@ const voteHistory = JUR ? null : (() => {
       }
       t.model = true;
     }
-    for (const k of ["alp", "lnp", "grn", "onp", "oth"]) if (VHM.rms[k] != null) V[k] = VHM.rms[k] ** 2;
+    for (const k of ["alp", "lnp", "grn", "onp", "oth", "tpp"]) if (VHM.rms[k] != null) V[k] = VHM.rms[k] ** 2;
     vhmUsed = true;
   } else if (VHM) console.warn("voteHistory: data/vote-history-model.json is stale (run node .build/build-vote-history.mjs) – past terms drawn as monthly averages");
   console.log("voteHistory:", terms.length, "terms;", vhmUsed ? "primaries on the model;" : "",
@@ -10197,7 +10428,7 @@ const changelog = JUR ? null : (() => {
   const leadBasis = rivalLead === "alp_on" ? (onImp ? "imp" : "pub") : (synthNow ? "imp" : "pub");
   /* the House effect column's figure on the headline's pairing and basis
      (the all-history snapshot the All polls table prints) */
-  const leanHe = { "alp_on|imp": synthOnEffect, "alp_on|pub": altAON.he, "alp_lnp|imp": synthEffect, "alp_lnp|pub": houseEffect }[`${leadPair}|${leadBasis}`];
+  const leanHe = { "alp_on|imp": synthOnEffectM, "alp_on|pub": altAON.he, "alp_lnp|imp": synthEffectM, "alp_lnp|pub": houseEffectM }[`${leadPair}|${leadBasis}`];
   const lean = leanHe && typeof leanHe.snapshot === "function"
     ? { key: `${leadPair}|${leadBasis}`, v: Object.fromEntries(Object.entries(leanHe.snapshot(Infinity)).map(([h, o]) => [h, o.v])) }
     : null;
@@ -10588,19 +10819,19 @@ window.AUSPOL = (function () {
      A firm absent from a map has too few readings to estimate – which the UI
      must show as "—", never as 0. */
   const houseEffects = ${JSON.stringify({
-    tpp: houseEffect.snapshot(Infinity),
+    tpp: houseEffectM.snapshot(Infinity),
     /* federal: each house's lean today from the model, n its polls this term */
     primary: PRIMM ? Object.fromEntries(PRIMARY_KEYS.map((k) => [k, Object.fromEntries(Object.entries(PRIMM.leanNow)
       .map(([h, l]) => [h, { v: r1(l[k].v), n: PRIMM.fit.cnt[h] }]))]))
       : Object.fromEntries(Object.entries(primaryHE).map(([k, h]) => [k, h.snapshot(Infinity)])),
     alp_on: altAON.he.snapshot(Infinity),
     appr: Object.fromEntries(Object.entries(apprHE).map(([lk, h]) => [lk, h.snapshot(Infinity)])),
-    synth: synthEffect.snapshot(Infinity),
+    synth: synthEffectM.snapshot(Infinity),
     /* the ALP-v-ON twin of synth: a house's lean on the implied ALP–ON
        reading (the pairing's default basis), so the tables' Lean / House
        effect columns and the breakdown's rows can follow that matchup
        instead of reading the classic pair whatever the page is showing */
-    synthOn: synthOnEffect.snapshot(Infinity),
+    synthOn: synthOnEffectM.snapshot(Infinity),
   })};
   const houseLean = ${JSON.stringify(houseLean)};
   /* Flow-drift residual tracker (gen-data §7c): each poll's published 2PP
@@ -10794,6 +11025,9 @@ window.AUSPOL = (function () {
   const primModel = ${JSON.stringify(primModel)};
   const pvHouses = ${JSON.stringify(pvHouses)};
   const showWorking = ${JSON.stringify(showWorking)};
+  /* the implied two-party figures' linear summary of the primary model (§2t),
+     for the flow editor */
+  const tppLin = ${JSON.stringify(tppLin)};
   const events = ${JSON.stringify(events)};
   /* The Info tab's change log (gen-data §8d): poll additions, preference-
      flow assumption changes and significance findings, appended on each
@@ -10928,7 +11162,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {
@@ -11000,7 +11234,7 @@ console.log("  fav months:", leaderMonths.filter((r) => r.alb_fav != null || r.t
 console.log("  approval months:", leaderMonths.filter((r) => r.alb_net != null).map((r) => r.ym).join(","));
 console.log("individualPolls:", individualPolls.length, "| no 2PP:", individualPolls.filter((p) => p.alp == null).length, "| with ppm:", individualPolls.filter((p) => p.ppm || p.ppmSets).length, "| with appr:", individualPolls.filter((p) => p.appr.albNet != null).length);
 console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r) => `${r.pollster} ${r.releasedLabel}${r.alp2pp == null ? " (no 2PP)" : ""}`).join(" | "));
-console.log("houseEffects (2PP):", Object.entries(houseEffect.snapshot(Infinity)).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
+console.log("houseEffects (2PP):", Object.entries(houseEffectM.snapshot(Infinity)).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
 console.log("flowDrift:", flowDrift.meta.houses.length, "houses | now:", JSON.stringify(flowDrift.now), "| last month:", JSON.stringify(flowDrift.months[flowDrift.months.length - 1]));
 console.log("  baseFrom:", Object.entries(flowDrift.meta.baseFrom).map(([f, d]) => `${f}→${d}`).join(", "));
 if (flowDriftOn) {

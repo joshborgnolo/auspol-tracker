@@ -483,7 +483,7 @@ function rdVhLines(VH, lanes, a, b, style, opt = {}) {
               x: p.x,
               y: p.y,
               color: st.color,
-              dotColor: p.otherIncludes?.length === 1 ? style(p.otherIncludes[0], t).color : null,
+              dotColor: k === "oth" && p.otherIncludes?.length === 1 ? style(p.otherIncludes[0], t).color : null,
               r: opt.long ? 3 : 4.5,
               hidden: st.opacity === 0
             });
@@ -1176,7 +1176,8 @@ function RdHero(p) {
     monthLabelFull
   } = window.AP;
   const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
-  const lineWord = (contest, basis) => KAL && !(contest === "alp_on" && basis === "resp") ? "trend" : "monthly average";
+  const TPMH = !!(D.latest.method && D.latest.method.kind === "model");
+  const lineWord = (contest, basis) => contest === "alp_on" && basis === "resp" ? "monthly average" : KAL ? "trend" : TPMH ? "model estimate" : "monthly average";
   const M = window.AP.tppMatchups;
   const m = M[matchup];
   const narrow = useNarrow(MQ_PHONE);
@@ -1240,7 +1241,11 @@ function RdHero(p) {
     id: "weighted-aggregate",
     from: "two-party preferred",
     title: "What the smoothed trend means"
-  }, "smoothed trend"), unc && React.createElement(React.Fragment, null, " ", "of ", unc.n, " polls to ", rdDate(D.latest.updatedISO))) : React.createElement(React.Fragment, null, basisWords, ", ", React.createElement(RdTerm, {
+  }, "smoothed trend"), unc && React.createElement(React.Fragment, null, " ", "of ", unc.n, " polls to ", rdDate(D.latest.updatedISO))) : TPMH && adjusted ? React.createElement(React.Fragment, null, basisWords, ", ", React.createElement(RdTerm, {
+    id: "weighted-aggregate",
+    from: "two-party preferred",
+    title: "What the model\u2019s estimate means"
+  }, "model estimate"), unc && React.createElement(React.Fragment, null, " ", "from ", unc.n, " polls to ", rdDate(D.latest.updatedISO))) : React.createElement(React.Fragment, null, basisWords, ", ", React.createElement(RdTerm, {
     id: adjusted ? "weighted-aggregate" : "monthly-average",
     from: "two-party preferred",
     title: "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"
@@ -1252,7 +1257,7 @@ function RdHero(p) {
   const other = hasBases ? tppLatest(matchup, onImp ? "resp" : "imp") : null;
   const otherSays = other && other.a != null ? other.a >= other.b ? m.a.name + " ahead " + other.a.toFixed(1) + "–" + other.b.toFixed(1) : m.b.name + " ahead " + other.b.toFixed(1) + "–" + other.a.toFixed(1) : null;
   const yourTable = yours && D.flowTables[matchup === "alp_on" ? "onp" : "lnp"];
-  const howCounted = yours ? "Each poll’s primary votes, run through your own preference flows from the More menu instead of the site’s: " + (matchup === "alp_on" ? "Greens " + Math.round(100 * yourTable.grn) + "%, Coalition " + Math.round(100 * yourTable.lnp) + "% and others " + Math.round(100 * yourTable.oth) + "%" : "Greens " + Math.round(100 * yourTable.grn) + "%, One Nation " + Math.round(100 * yourTable.onp) + "% and others " + Math.round(100 * yourTable.oth) + "%") + " to Labor. Everything else is counted as usual: the same polls, weighted the same way and adjusted for each pollster’s lean. Reloading the page puts the site’s flows back." : !hasBases ? "The pollsters’ own head-to-head figures, averaged. Too few pollsters ask this pairing for it to be weighted or corrected for each one’s lean." : !onImp ? KAL ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, as a smoothed trend through every poll, adjusted for each pollster’s lean. The ± is its 95% interval." : "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin." : matchup === "alp_on" ? (window.JUR ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page. The ± counts both the polls’ sampling error and the doubt about those flows." + (KAL ? " The line is a smoothed trend through every poll." : "") : "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself. The ± counts both the polls’ sampling error and the doubt about those flows.") + (parts ? " On the lead today that’s ±" + (2 * unc.ci95).toFixed(1) + ": ±" + parts.cs.toFixed(1) + " from the polls and ±" + parts.cf.toFixed(1) + " from the flows, added as independent errors." : "") : window.JUR ? "Each poll’s primary votes, run through the preference flows counted at the " + rdElecYear + " election (One Nation’s, too few then to measure, from the 2025 federal count)." + (KAL ? " The line is a smoothed trend through every poll, and the ± its 95% interval." : " The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.") : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
+  const howCounted = yours ? "Each poll’s primary votes, run through your own preference flows from the More menu instead of the site’s: " + (matchup === "alp_on" ? "Greens " + Math.round(100 * yourTable.grn) + "%, Coalition " + Math.round(100 * yourTable.lnp) + "% and others " + Math.round(100 * yourTable.oth) + "%" : "Greens " + Math.round(100 * yourTable.grn) + "%, One Nation " + Math.round(100 * yourTable.onp) + "% and others " + Math.round(100 * yourTable.oth) + "%") + " to Labor. Everything else is counted as usual: the same polls, weighted the same way and adjusted for each pollster’s lean. Reloading the page puts the site’s flows back." : !hasBases ? "The pollsters’ own head-to-head figures, averaged. Too few pollsters ask this pairing for it to be weighted or corrected for each one’s lean." : !onImp ? KAL ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, as a smoothed trend through every poll, adjusted for each pollster’s lean. The ± is its 95% interval." : TPMH ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, through the same model as the primary vote: every published figure this term, each pollster’s lean taken out. The ± is its 95% interval." : "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin." : matchup === "alp_on" ? (window.JUR ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page. The ± counts both the polls’ sampling error and the doubt about those flows." + (KAL ? " The line is a smoothed trend through every poll." : "") : TPMH ? "The model’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself. The ± counts both the model’s own doubt and the doubt about those flows." : "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself. The ± counts both the polls’ sampling error and the doubt about those flows.") + (parts ? " On the lead today that’s ±" + (2 * unc.ci95).toFixed(1) + ": ±" + parts.cs.toFixed(1) + (TPMH ? " from the model" : " from the polls") + " and ±" + parts.cf.toFixed(1) + " from the flows, added as independent errors." : "") : window.JUR ? "Each poll’s primary votes, run through the preference flows counted at the " + rdElecYear + " election (One Nation’s, too few then to measure, from the 2025 federal count)." + (KAL ? " The line is a smoothed trend through every poll, and the ± its 95% interval." : " The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.") : TPMH ? "The primary vote model’s figures, run through the preference flows counted at the 2025 election. Labor’s share after preferences is a straight sum of the primary shares, so each of the model’s simulations gives one two-party figure; the ± is the 95% interval across them." : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
   const qPanel = React.createElement(RdQPop, {
     label: "How this is counted, and the pollsters\u2019 published figures",
     align: "left"
@@ -1627,7 +1632,7 @@ function RdHero(p) {
   } : null, adjusted || morph ? {
     kind: bandPts.length >= 2 ? "lineband" : "line",
     color: mainCol,
-    label: (lineWord(shown, b0) === "trend" ? "Trend" : narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? flowsBand ? narrow ? ", margin incl. flows" : " and its margin, polls and flows" : narrow ? ", 95% interval" : " and its 95% interval" : "")
+    label: (lineWord(shown, b0) === "trend" ? "Trend" : lineWord(shown, b0) === "model estimate" ? narrow ? "Model" : "Model estimate" : narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? flowsBand ? narrow ? ", margin incl. flows" : " and its margin, polls and flows" : narrow ? ", 95% interval" : " and its 95% interval" : "")
   } : null, !narrow && labelOther ? {
     kind: "line",
     color: otherCol,
@@ -1835,6 +1840,7 @@ function RdHero(p) {
       onOn: onRows.length >= 2,
       bridges: L.series.some(sr => sr.dash === RD_VH_BRIDGE),
       unmeasured: VH.terms.filter(tm => tm.miss.tpp == null && tm.b > xd[0] && tm.a < xd[1]),
+      model: !!VH.model && VH.terms.filter(tm => tm.b > xd[0] && tm.a < xd[1]).every(tm => tm.year >= 1987),
       title: i => {
         const q = spine[i];
         if (!q) return "";
@@ -2231,7 +2237,7 @@ function RdHero(p) {
     copy: HH ? {
       title: "Labor’s two-party-preferred vote against the Coalition",
       span: typeof confWinYears === "function" ? confWinYears(vwWin, vwTerms, vwHi) : null,
-      sub: "Past terms drawn through the election results at both ends" + (HH.curIn ? "; this term is the polls alone" : "") + ". Monthly averages; before this term, each poll’s primary votes run through the previous election’s preference flows.",
+      sub: "Past terms drawn through the election results at both ends" + (HH.curIn ? "; this term is the polls alone" : "") + (HH.model ? ". The model’s estimates; before this term, its primary votes run through the previous election’s preference flows." : ". Monthly averages; before this term, each poll’s primary votes run through the previous election’s preference flows."),
       caption: (HH.dotsOn ? "Each dot is one poll; lines" : "Lines") + " are monthly averages moved toward each past term’s closing result by part of the polls’ miss there" + (HH.long ? "." : ", shaded bands their 95% intervals with the doubt about when the miss arose.") + (HH.bridges ? " Dotted stretches are months no one polled." : ""),
       legend: [{
         label: vsName("alp_lnp"),
@@ -2248,7 +2254,7 @@ function RdHero(p) {
       }])
     } : {
       title: chartTitle.replace(/, %$/, ""),
-      sub: (story && M[matchup].vsLabor ? story.head + ". " : "") + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^Your flows$/, "Your preference flows").replace(/^As published$/, "Pollsters’ published figures") + (KAL ? ", smoothed trend through every poll" + (unc ? ", " + unc.n + " polls to " + rdDate(D.latest.updatedISO, true) : "") : ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "")) + ".",
+      sub: (story && M[matchup].vsLabor ? story.head + ". " : "") + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^Your flows$/, "Your preference flows").replace(/^As published$/, "Pollsters’ published figures") + (KAL ? ", smoothed trend through every poll" + (unc ? ", " + unc.n + " polls to " + rdDate(D.latest.updatedISO, true) : "") : TPMH && adjusted ? ", the model’s estimate at each month" + (unc ? ", from " + unc.n + " polls to " + rdDate(D.latest.updatedISO, true) : "") : ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "")) + ".",
       legend: copyKey.map(k => ({
         label: k.label,
         color: k.color,
@@ -2272,11 +2278,11 @@ function RdHero(p) {
     } : null, HH.long ? {
       kind: "line",
       color: M.alp_lnp.b.color,
-      label: "Monthly average"
+      label: HH.model ? "Model estimate" : "Monthly average"
     } : {
       kind: "lineband",
       color: M.alp_lnp.b.color,
-      label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval"
+      label: HH.model ? narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval"
     }, !narrow && HH.onOn ? {
       kind: "line",
       color: M.alp_on.b.color,
@@ -2290,13 +2296,13 @@ function RdHero(p) {
       label: "No polls"
     } : null] : keyItems
   })), React.createElement(RdFoot, {
-    how: KAL ? {
+    how: KAL || TPMH ? {
       term: "weighted-aggregate",
       from: "Two-party preferred"
     } : {
       href: "/flows-explained/"
     }
-  }, KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago. The chart follows the matchup chosen above." : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.", extOn && isCoal && React.createElement(React.Fragment, null, " BludgerTrack\u2019s line is its published trend. Bonham\u2019s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025."), extOn && isOn && React.createElement(React.Fragment, null, " Bonham\u2019s line is his published shadow-2PP, averaged by month like ours. He converts each poll\u2019s primary votes with his own estimates of 2025 preferences and averages the latest ten polls, at most two from each pollster. Our flows differ, so the two lines need not agree.")));
+  }, KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago. The chart follows the matchup chosen above." : TPMH ? "Figures are the model’s estimates from every poll this term, each pollster’s lean taken out, and can step at a change of leader. Changes are on a month ago, read from the model’s simulations. The chart follows the matchup chosen above." : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.", extOn && isCoal && React.createElement(React.Fragment, null, " BludgerTrack\u2019s line is its published trend. Bonham\u2019s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025."), extOn && isOn && React.createElement(React.Fragment, null, " Bonham\u2019s line is his published shadow-2PP, averaged by month like ours. He converts each poll\u2019s primary votes with his own estimates of 2025 preferences and averages the latest ten polls, at most two from each pollster. Our flows differ, so the two lines need not agree.")));
 }
 Object.assign(window, {
   RdHero,
