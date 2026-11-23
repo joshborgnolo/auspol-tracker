@@ -36528,11 +36528,11 @@
       {
         "date": "2014-01-12",
         "firm": "Essential",
-        "lnp": 44,
+        "lnp": 45,
         "alp": 38,
-        "grn": 7,
+        "grn": 8,
         "onp": null,
-        "oth": 11,
+        "oth": 10,
         "tpp_lnp": 51,
         "tpp_alp": 49
       },
@@ -37883,9 +37883,9 @@
         "firm": "Ipsos",
         "lnp": 38,
         "alp": 40,
-        "grn": null,
+        "grn": 11,
         "onp": null,
-        "oth": 22,
+        "oth": 11,
         "tpp_lnp": 46,
         "tpp_alp": 54
       },
@@ -39003,7 +39003,7 @@
       {
         "date": "2015-11-24",
         "firm": "Essential",
-        "lnp": 45,
+        "lnp": 44,
         "alp": 35,
         "grn": 10,
         "onp": null,
@@ -44278,13 +44278,13 @@
       {
         "date": "2022-08-11",
         "firm": "Roy Morgan",
-        "lnp": 38.9,
+        "lnp": 39,
         "alp": 36.5,
-        "grn": 11.3,
+        "grn": 11.5,
         "onp": 4,
-        "oth": 9.3,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2022-08-18",
@@ -44294,8 +44294,8 @@
         "grn": 11.5,
         "onp": 2.6,
         "oth": 10.3,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2022-08-21",
@@ -44311,13 +44311,13 @@
       {
         "date": "2022-09-01",
         "firm": "Roy Morgan",
-        "lnp": 36.7,
-        "alp": 35.9,
+        "lnp": 36.5,
+        "alp": 36,
         "grn": 12,
         "onp": 4.1,
-        "oth": 11.3,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 11.4,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2022-09-03",
@@ -44345,23 +44345,23 @@
         "date": "2022-09-22",
         "firm": "Roy Morgan",
         "lnp": 36.5,
-        "alp": 36.3,
-        "grn": 11.9,
+        "alp": 36.5,
+        "grn": 12,
         "onp": 3.4,
-        "oth": 11.9,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 11.6,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2022-09-29",
         "firm": "Roy Morgan",
-        "lnp": 38,
-        "alp": 36.9,
-        "grn": 11.1,
+        "lnp": 37,
+        "alp": 38,
+        "grn": 11,
         "onp": 3.6,
         "oth": 10.4,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2022-10-09",
@@ -44377,24 +44377,24 @@
       {
         "date": "2022-10-13",
         "firm": "Roy Morgan",
-        "lnp": 36.4,
-        "alp": 37.3,
-        "grn": 11.6,
+        "lnp": 36.5,
+        "alp": 37.5,
+        "grn": 11.5,
         "onp": 4.2,
-        "oth": 10.5,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 10.3,
+        "tpp_lnp": 45.2,
+        "tpp_alp": 54.8
       },
       {
         "date": "2022-10-27",
         "firm": "Roy Morgan",
-        "lnp": 37.2,
-        "alp": 38.2,
-        "grn": 11.7,
+        "lnp": 37,
+        "alp": 38,
+        "grn": 12,
         "onp": 3,
-        "oth": 9.9,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 10,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
       },
       {
         "date": "2022-10-30",
@@ -44422,34 +44422,34 @@
         "date": "2022-11-03",
         "firm": "Roy Morgan",
         "lnp": 39,
-        "alp": 36.8,
+        "alp": 37,
         "grn": 11,
         "onp": 3.9,
-        "oth": 9.3,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 9.1,
+        "tpp_lnp": 46.7,
+        "tpp_alp": 53.3
       },
       {
         "date": "2022-11-10",
         "firm": "Roy Morgan",
-        "lnp": 37.6,
-        "alp": 37.1,
-        "grn": 11.4,
+        "lnp": 37.5,
+        "alp": 37,
+        "grn": 11.5,
         "onp": 2.2,
-        "oth": 11.8,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 11.9,
+        "tpp_lnp": 46.6,
+        "tpp_alp": 53.4
       },
       {
         "date": "2022-11-17",
         "firm": "Roy Morgan",
-        "lnp": 37.7,
-        "alp": 36.6,
-        "grn": 11.1,
+        "lnp": 37.5,
+        "alp": 36.5,
+        "grn": 11,
         "onp": 3.8,
-        "oth": 10.8,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "oth": 11.2,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2022-11-27",
@@ -44470,8 +44470,8 @@
         "grn": 14,
         "onp": 2.7,
         "oth": 14.1,
-        "tpp_lnp": null,
-        "tpp_alp": null
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2022-12-03",
@@ -44496,17 +44496,6 @@
         "tpp_alp": 60
       },
       {
-        "date": "2022-12-10",
-        "firm": "Roy Morgan",
-        "lnp": 32.4,
-        "alp": 37.9,
-        "grn": 12.7,
-        "onp": 4.5,
-        "oth": 12.6,
-        "tpp_lnp": 41.5,
-        "tpp_alp": 58.5
-      },
-      {
         "date": "2022-12-11",
         "firm": "Essential",
         "lnp": 30,
@@ -44516,6 +44505,17 @@
         "oth": 11,
         "tpp_lnp": 44,
         "tpp_alp": 51
+      },
+      {
+        "date": "2022-12-15",
+        "firm": "Roy Morgan",
+        "lnp": 32.5,
+        "alp": 38,
+        "grn": 12.5,
+        "onp": 4.5,
+        "oth": 12.6,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
       },
       {
         "date": "2022-12-18",
@@ -44531,11 +44531,11 @@
       {
         "date": "2023-01-09",
         "firm": "Roy Morgan",
-        "lnp": 31.4,
+        "lnp": 31.5,
         "alp": 39.5,
-        "grn": 12.3,
+        "grn": 12.5,
         "onp": 5.2,
-        "oth": 11.7,
+        "oth": 11.4,
         "tpp_lnp": 40.5,
         "tpp_alp": 59.5
       },
@@ -44685,11 +44685,11 @@
       {
         "date": "2023-03-16",
         "firm": "Roy Morgan",
-        "lnp": 31.9,
-        "alp": 37.7,
-        "grn": 12.8,
+        "lnp": 32,
+        "alp": 37.5,
+        "grn": 13,
         "onp": 5.2,
-        "oth": 12.4,
+        "oth": 12.3,
         "tpp_lnp": 42,
         "tpp_alp": 58
       },
@@ -44707,22 +44707,22 @@
       {
         "date": "2023-03-23",
         "firm": "Roy Morgan",
-        "lnp": 31.7,
-        "alp": 35.7,
-        "grn": 13.2,
+        "lnp": 32,
+        "alp": 35.5,
+        "grn": 13,
         "onp": 6,
-        "oth": 13.4,
+        "oth": 13.5,
         "tpp_lnp": 43,
         "tpp_alp": 57
       },
       {
         "date": "2023-03-30",
         "firm": "Roy Morgan",
-        "lnp": 34.4,
+        "lnp": 34.5,
         "alp": 34.5,
-        "grn": 13.2,
+        "grn": 13,
         "onp": 4.9,
-        "oth": 13,
+        "oth": 13.1,
         "tpp_lnp": 45.5,
         "tpp_alp": 54.5
       },
@@ -44752,19 +44752,19 @@
         "date": "2023-04-06",
         "firm": "Roy Morgan",
         "lnp": 33.5,
-        "alp": 36.6,
+        "alp": 36.5,
         "grn": 12.5,
         "onp": 6.3,
-        "oth": 11.1,
+        "oth": 11.2,
         "tpp_lnp": 44,
         "tpp_alp": 56
       },
       {
         "date": "2023-04-13",
         "firm": "Roy Morgan",
-        "lnp": 32.8,
-        "alp": 37.1,
-        "grn": 12.1,
+        "lnp": 33,
+        "alp": 37,
+        "grn": 12,
         "onp": 5,
         "oth": 13,
         "tpp_lnp": 44,
@@ -44795,11 +44795,11 @@
       {
         "date": "2023-04-20",
         "firm": "Roy Morgan",
-        "lnp": 33.6,
+        "lnp": 33.5,
         "alp": 35.5,
-        "grn": 13.7,
+        "grn": 13.5,
         "onp": 4.7,
-        "oth": 12.6,
+        "oth": 12.9,
         "tpp_lnp": 43.5,
         "tpp_alp": 56.5
       },
@@ -44817,11 +44817,11 @@
       {
         "date": "2023-04-27",
         "firm": "Roy Morgan",
-        "lnp": 35.3,
-        "alp": 35.8,
+        "lnp": 35.5,
+        "alp": 36,
         "grn": 13,
         "onp": 5.8,
-        "oth": 10.1,
+        "oth": 9.7,
         "tpp_lnp": 46.5,
         "tpp_alp": 53.5
       },
@@ -44839,11 +44839,11 @@
       {
         "date": "2023-05-11",
         "firm": "Roy Morgan",
-        "lnp": 31.7,
-        "alp": 37.4,
-        "grn": 13.4,
+        "lnp": 33.5,
+        "alp": 36.5,
+        "grn": 13,
         "onp": 4.9,
-        "oth": 12.6,
+        "oth": 12.1,
         "tpp_lnp": 43,
         "tpp_alp": 57
       },
@@ -44894,22 +44894,22 @@
       {
         "date": "2023-05-18",
         "firm": "Roy Morgan",
-        "lnp": 33.7,
-        "alp": 34.8,
-        "grn": 13.1,
+        "lnp": 33.5,
+        "alp": 35,
+        "grn": 13,
         "onp": 4.8,
-        "oth": 13.6,
+        "oth": 13.7,
         "tpp_lnp": 44.5,
         "tpp_alp": 55.5
       },
       {
         "date": "2023-05-25",
         "firm": "Roy Morgan",
-        "lnp": 33.4,
+        "lnp": 33.5,
         "alp": 36,
-        "grn": 12.4,
+        "grn": 11.5,
         "onp": 4.7,
-        "oth": 13.5,
+        "oth": 14.3,
         "tpp_lnp": 44.5,
         "tpp_alp": 55.5
       },
