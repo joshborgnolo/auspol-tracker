@@ -77,4 +77,17 @@ assert.deepEqual(smallMeasured.marks.map((p) => [p.x, p.y]), [[2022, 40], [2025,
 const emptyMeasured = rdVhLines({ terms: [{ ...smallHistory.terms[0], series: { alp: [] } }] }, ["alp"], 2022, 2025, partyStyle, { measured: true });
 assert.equal(emptyMeasured.series.length, 0, "A count-only term invents no measured line");
 assert.equal(emptyMeasured.marks.length, 2, "A count-only term still draws both election marks");
-console.log("PASS: election rings, unchanged inferred output, and raw measured lines with detached counts");
+
+const primarySource = fs.readFileSync(".build/newtracker/assets/rd-panels.jsx", "utf8");
+const currentStart = primarySource.indexOf("  const chartSeries =");
+const currentStyle = primarySource.slice(currentStart, primarySource.indexOf("  /* a party toggled off", currentStart));
+assert(currentStart >= 0 && currentStyle.includes('color: p.color'), "the current-term Others line keeps its party colour");
+assert(currentStyle.includes('rdWidth: p.id === "oth" ? 2 : 2.5'), "the current-term Others line keeps its width");
+assert(!/\bdashed:|\bdash:/.test(currentStyle), "the current-term Others line is solid");
+const historyStart = primarySource.indexOf("  const vhStyle =");
+const historyStyle = primarySource.slice(historyStart, primarySource.indexOf("  const vhL =", historyStart));
+assert(historyStart >= 0 && historyStyle.includes("color: D.PARTIES[k].color"), "the history Others line keeps its party colour");
+assert(historyStyle.includes('k === "oth" ? 2 : 2.5'), "the history Others line keeps its width");
+assert(!/\bdashed:|\bdash:/.test(historyStyle), "the history Others line is solid");
+assert(!primarySource.includes('kind: p.id === "oth" ? "dashed" : "line"'), "the copy-card legends mark Others as a line, not a dash");
+console.log("PASS: election rings, unchanged inferred output, raw measured lines with detached counts, and solid Others lines");

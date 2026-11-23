@@ -319,8 +319,6 @@ function RdPrimary({
     color: p.color,
     points: series(live(p.id), p.id),
     rdWidth: p.id === "oth" ? 2 : 2.5,
-    dashed: p.id === "oth",
-    dash: p.id === "oth" ? "6 4" : undefined,
     opacity: hideC[p.id] ? 0 : 1,
     endLabel: narrow ? ABBR[p.id] : SHORT[p.id],
     rdCap: 4
@@ -512,8 +510,6 @@ function RdPrimary({
     label: k === "oth" ? "Others & independents" : D.PARTIES[k].name,
     color: D.PARTIES[k].color,
     width: vhLong ? k === "oth" ? 1.4 : 1.6 : k === "oth" ? 2 : 2.5,
-    dashed: k === "oth",
-    dash: k === "oth" ? "6 4" : undefined,
     opacity: hideC[k] ? 0 : 1
   });
   const vhL = histOn ? rdVhLines(VHuse, ["alp", "lnp", "grn", "onp", "oth"], xDomain[0], xDomain[1], vhStyle, {
@@ -1011,7 +1007,7 @@ function RdPrimary({
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
-        kind: p.id === "oth" ? "dashed" : "line"
+        kind: "line"
       }))
     } : H ? {
       title: "First-preference vote for each party",
@@ -1021,7 +1017,7 @@ function RdPrimary({
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
-        kind: p.id === "oth" ? "dashed" : "line"
+        kind: "line"
       })).concat([{
         label: "Election result",
         color: "var(--ink)",
@@ -1034,7 +1030,7 @@ function RdPrimary({
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
-        kind: p.id === "oth" ? "dashed" : "line"
+        kind: "line"
       })).concat(evOn ? [{
         label: RD_VOTE_LABEL,
         color: "var(--ink-3)",

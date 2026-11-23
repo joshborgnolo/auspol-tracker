@@ -417,7 +417,7 @@ function RdPrimary({ rangeId, setRangeId }) {
   };
   const chartSeries = (partsChart || []).slice().reverse().map((p) => ({
     id: p.id, label: p.name, color: p.color, points: series(live(p.id), p.id),
-    rdWidth: p.id === "oth" ? 2 : 2.5, dashed: p.id === "oth", dash: p.id === "oth" ? "6 4" : undefined,
+    rdWidth: p.id === "oth" ? 2 : 2.5,
     opacity: hideC[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
   }));
   /* a party toggled off keeps its band, its dots and its election ring on
@@ -635,7 +635,7 @@ function RdPrimary({ rangeId, setRangeId }) {
      1993 it holds the Greens and from 2001 to 2016 One Nation. */
   const vhLong = histOn && vhSpan > RD_VH_LONG;
   const vhStyle = (k) => ({ label: k === "oth" ? "Others & independents" : D.PARTIES[k].name, color: D.PARTIES[k].color,
-    width: vhLong ? (k === "oth" ? 1.4 : 1.6) : k === "oth" ? 2 : 2.5, dashed: k === "oth", dash: k === "oth" ? "6 4" : undefined, opacity: hideC[k] ? 0 : 1 });
+    width: vhLong ? (k === "oth" ? 1.4 : 1.6) : k === "oth" ? 2 : 2.5, opacity: hideC[k] ? 0 : 1 });
   const vhL = histOn ? rdVhLines(VHuse, ["alp", "lnp", "grn", "onp", "oth"], xDomain[0], xDomain[1], vhStyle, { long: vhLong, measured: supportMeasured }) : null;
   const vhDotsOn = histOn && !G && vhSpan <= 4.6;
   const vhHideKey = Object.keys(hideC).filter((k) => hideC[k]).sort().join("|");
@@ -1045,7 +1045,7 @@ function RdPrimary({ rangeId, setRangeId }) {
             title: "First-preference vote for each party, " + sel.who, span: confWinYears(vwWin, vwTerms, vwHi),
             sub: "Each term is the model’s estimate for " + sel.who + ": that term’s national primaries moved by the group’s gap, from the pollsters’ group tables and the Australian Election Study at each election.",
             caption: "Lines are the model’s estimates at each month’s middle, shaded bands their 95% intervals; a term with few group tables leans on the Australian Election Study at its two elections, and its band widens between them.",
-            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })),
+            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: "line" })),
           } : H ? {
             title: "First-preference vote for each party", span: confWinYears(vwWin, vwTerms, vwHi),
             sub: supportMeasured
@@ -1056,7 +1056,7 @@ function RdPrimary({ rangeId, setRangeId }) {
               ? (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s consensus before its election adjustment" : " are monthly averages before the election adjustment") + "; rings stay at the counted results." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : "")
               : (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals"
                 + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
-            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
+            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: "line" }))
               .concat([{ label: "Election result", color: "var(--ink)", kind: "ring" }], H.inclusions),
           } : { title: "First-preference vote for each party" + (G ? ", " + sel.who : pvx ? ", selected pollsters" : ""), sub: story.head + (G ? (PMD ? ". The model’s estimate for " + sel.who + " at each month’s middle, latest fieldwork " : ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork ") + rdDate(D.latest.updatedISO, true) + "." : pvx ? (PMD ? ". The model re-run on " : ". Monthly averages of ") + pvxMeta.n + " " + pollsWord + " polls from the selected pollsters, latest fieldwork " + rdDate(pvxMeta.latest, true) + "." : (KAL ? ". Smoothed trends through " : PMD ? ". The model’s estimates from " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
@@ -1069,7 +1069,7 @@ function RdPrimary({ rangeId, setRangeId }) {
                       + (sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : "")
                       + (sel.label === "ACT/NT/Tas" ? " Open rings are single-territory readings - Tasmania, the ACT or the NT alone, their own poll or crosstab - shown for comparison, never pooled into the lines." : "")
                     : "Each dot is one poll; lines are " + (PMD ? "the model’s estimates at each month’s middle" + (pvx ? ", re-run on the selected pollsters" : "") : "monthly averages" + (pvx ? " of the selected pollsters" : "")) + ", shaded bands their 95% intervals.",
-                  legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" }))
+                  legend: visible.map((p) => ({ label: p.name, color: p.color, kind: "line" }))
                     .concat(evOn ? [{ label: RD_VOTE_LABEL, color: "var(--ink-3)", kind: "diamond" }] : []) }}
         />
         {/* the 2PP card above already lists this window's events under its
