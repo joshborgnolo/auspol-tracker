@@ -900,11 +900,11 @@ function RdPrimary({ rangeId, setRangeId }) {
                      on={!!grpId} open={pvPop} setOpen={setPvPop}>
             <div className="ap-pop-head"><span>The primary vote among</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="The primary vote among">
-              <PopRow radio on={grpId === ""} label="All voters" onClick={() => setGrpId("")} />
+              <PopRow radio on={grpId === ""} label="All voters" onClick={() => { setGrpId(""); setPvPop(null); }} />
               {T.tabs.map((t) => t.sets.map((s) => (
                 <div className="rd-pv-popgroup" key={s.id}>
                   <div className="rd-pv-popgrouphead">{s.label || "By " + t.label.toLowerCase()}</div>
-                  {s.groups.map((g) => <PopRow key={g.label} radio on={grpId === g.label} label={MENUSHORT[g.label] || g.label} onClick={() => setGrpId(g.label)} />)}
+                  {s.groups.map((g) => <PopRow key={g.label} radio on={grpId === g.label} label={MENUSHORT[g.label] || g.label} onClick={() => { setGrpId(g.label); setPvPop(null); }} />)}
                 </div>
               )))}
             </div>
@@ -4486,7 +4486,7 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
       <div className="rd-wv-gap-choice">
         <FilterPop id="compare" label="Compare" summary={group.label} on={false} open={gapPop} setOpen={setGapPop}>
           <div className="ap-poplist" role="radiogroup" aria-label={def.title + " comparison group"}>
-            {comparisons.map((c) => <PopRow key={c.group.label} radio on={group.label === c.group.label} label={c.group.label} onClick={() => setChoice(c.group.label)} />)}
+            {comparisons.map((c) => <PopRow key={c.group.label} radio on={group.label === c.group.label} label={c.group.label} onClick={() => { setChoice(c.group.label); setGapPop(null); }} />)}
           </div>
         </FilterPop>
         <FilterPop id="reference" label="Reference" summary={reference.label} on={false} open={gapPop} setOpen={setGapPop}>
@@ -4494,6 +4494,7 @@ function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
             {st.groups.map((g) => <PopRow key={g.label} radio on={reference.label === g.label} label={g.label} onClick={() => {
               setChoice(g.label === group.label ? reference.label : group.label);
               setRefLabel(g.label);
+              setGapPop(null);
             }} />)}
           </div>
         </FilterPop>

@@ -74,6 +74,7 @@ function RdPrimary({
   const G = sel && sel.g;
   const pvMenuOK = !window.JUR && !!(D.aggSpec && D.pvHouses && window.AP.pvAgg);
   const [hvSel, setHvSel] = useState(() => new Set());
+  const [pvPop, setPvPop] = useState(null);
   const hvKey = [...hvSel].sort().join("|");
   const pvx = React.useMemo(() => pvMenuOK && hvSel.size && !G ? window.AP.pvAgg([...hvSel]) : null, [hvKey, !!G]);
   const pvxMeta = React.useMemo(() => {
@@ -835,22 +836,6 @@ function RdPrimary({
       document.removeEventListener("keydown", key, true);
     };
   }, []);
-  const grpSelRef = React.useRef(null);
-  const pvSelRef = React.useRef(null);
-  React.useLayoutEffect(() => {
-    [grpSelRef, pvSelRef].forEach(r0 => {
-      const el = r0.current;
-      if (!el) return;
-      const fit = () => {
-        const cs = getComputedStyle(el);
-        const cv = document.createElement("canvas").getContext("2d");
-        cv.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
-        el.style.width = Math.ceil(cv.measureText(el.options[el.selectedIndex].textContent).width + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 14) + "px";
-      };
-      fit();
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-    });
-  }, [grpId, hvKey]);
   const MENUSHORT = {
     "Lower earners (bottom 50%)": "Lower earners",
     "Higher earners (top 15%)": "Higher earners"
@@ -864,42 +849,67 @@ function RdPrimary({
   }, React.createElement(RdHed, {
     head: story.head,
     dek: story.dek
-  }), T && React.createElement("select", {
-    ref: grpSelRef,
-    className: "rd-pv-sel",
-    "aria-label": "The primary vote among",
-    value: grpId,
-    onChange: e => setGrpId(e.target.value)
-  }, React.createElement("option", {
-    value: ""
-  }, "All voters"), T.tabs.map(t => t.sets.map(s => React.createElement("optgroup", {
-    key: s.id,
-    label: s.label || "By " + t.label.toLowerCase()
-  }, s.groups.map(g => React.createElement("option", {
-    key: g.label,
-    value: g.label
-  }, MENUSHORT[g.label] || g.label)))))), pvMenuOK && !G && React.createElement("select", {
-    ref: pvSelRef,
-    className: "rd-pv-sel",
-    "aria-label": "The primary vote counted from only some pollsters",
-    value: "",
-    onChange: e => {
-      const v = e.target.value;
-      if (v === "__clear") setHvSel(new Set());else if (v) setHvSel(s => {
-        const n = new Set(s);
-        if (n.has(v)) n.delete(v);else n.add(v);
-        return n;
-      });
+  }), T && React.createElement(FilterPop, {
+    id: "group",
+    label: "Among",
+    summary: MENUSHORT[grpId] || grpId || "All voters",
+    on: !!grpId,
+    open: pvPop,
+    setOpen: setPvPop
+  }, React.createElement("div", {
+    className: "ap-pop-head"
+  }, React.createElement("span", null, "The primary vote among")), React.createElement("div", {
+    className: "ap-poplist",
+    role: "radiogroup",
+    "aria-label": "The primary vote among"
+  }, React.createElement(PopRow, {
+    radio: true,
+    on: grpId === "",
+    label: "All voters",
+    onClick: () => {
+      setGrpId("");
+      setPvPop(null);
     }
-  }, React.createElement("option", {
-    value: "",
-    disabled: true
-  }, hvSel.size ? hvSel.size + (hvSel.size === 1 ? " pollster" : " pollsters") : "All pollsters"), D.pvHouses.map(h => React.createElement("option", {
+  }), T.tabs.map(t => t.sets.map(s => React.createElement("div", {
+    className: "rd-pv-popgroup",
+    key: s.id
+  }, React.createElement("div", {
+    className: "rd-pv-popgrouphead"
+  }, s.label || "By " + t.label.toLowerCase()), s.groups.map(g => React.createElement(PopRow, {
+    key: g.label,
+    radio: true,
+    on: grpId === g.label,
+    label: MENUSHORT[g.label] || g.label,
+    onClick: () => {
+      setGrpId(g.label);
+      setPvPop(null);
+    }
+  }))))))), pvMenuOK && !G && React.createElement(FilterPop, {
+    id: "houses",
+    label: "Pollsters",
+    summary: hvSel.size ? hvSel.size + (hvSel.size === 1 ? " pollster" : " pollsters") : "All",
+    on: hvSel.size > 0,
+    open: pvPop,
+    setOpen: setPvPop
+  }, React.createElement("div", {
+    className: "ap-pop-head"
+  }, React.createElement("span", null, "Count only votes from"), hvSel.size > 0 && React.createElement("button", {
+    className: "ap-clear",
+    onClick: () => setHvSel(new Set())
+  }, "Clear")), React.createElement("div", {
+    className: "ap-poplist",
+    role: "group",
+    "aria-label": "The primary vote counted from only some pollsters"
+  }, D.pvHouses.map(h => React.createElement(PopRow, {
     key: h,
-    value: h
-  }, (hvSel.has(h) ? "✓ " : "") + h)), hvSel.size > 0 && React.createElement("hr", null), hvSel.size > 0 && React.createElement("option", {
-    value: "__clear"
-  }, "\u2715 Clear"))), narrow ? React.createElement("div", {
+    on: hvSel.has(h),
+    label: h,
+    onClick: () => setHvSel(s => {
+      const n = new Set(s);
+      if (n.has(h)) n.delete(h);else n.add(h);
+      return n;
+    })
+  }))))), narrow ? React.createElement("div", {
     className: "rd-pv-list"
   }, pvBlocks.map((b, i) => b.tied ? React.createElement("div", {
     key: "tg" + i,
@@ -5611,6 +5621,7 @@ function RdDemographicGapSet({
   const unit = relative ? "×" : " pp";
   const data = React.useMemo(() => rdGapSet(st, order, D.mx, refLabel, relative), [st, order, D, refLabel, relative]);
   const [choice, setChoice] = useState("");
+  const [gapPop, setGapPop] = useState(null);
   if (!data) return null;
   const {
     def,
@@ -5647,26 +5658,48 @@ function RdDemographicGapSet({
     className: "rd-chead-t"
   }, title)), React.createElement("div", {
     className: "rd-wv-gap-choice"
-  }, "Compare", React.createElement("select", {
-    className: "rd-pv-sel",
-    "aria-label": def.title + " comparison group",
-    value: group.label,
-    onChange: e => setChoice(e.target.value)
-  }, comparisons.map(c => React.createElement("option", {
+  }, React.createElement(FilterPop, {
+    id: "compare",
+    label: "Compare",
+    summary: group.label,
+    on: false,
+    open: gapPop,
+    setOpen: setGapPop
+  }, React.createElement("div", {
+    className: "ap-poplist",
+    role: "radiogroup",
+    "aria-label": def.title + " comparison group"
+  }, comparisons.map(c => React.createElement(PopRow, {
     key: c.group.label,
-    value: c.group.label
-  }, c.group.label))), "Reference", React.createElement("select", {
-    className: "rd-pv-sel",
-    "aria-label": def.title + " reference group",
-    value: reference.label,
-    onChange: e => {
-      setChoice(e.target.value === group.label ? reference.label : group.label);
-      setRefLabel(e.target.value);
+    radio: true,
+    on: group.label === c.group.label,
+    label: c.group.label,
+    onClick: () => {
+      setChoice(c.group.label);
+      setGapPop(null);
     }
-  }, st.groups.map(g => React.createElement("option", {
+  })))), React.createElement(FilterPop, {
+    id: "reference",
+    label: "Reference",
+    summary: reference.label,
+    on: false,
+    open: gapPop,
+    setOpen: setGapPop
+  }, React.createElement("div", {
+    className: "ap-poplist",
+    role: "radiogroup",
+    "aria-label": def.title + " reference group"
+  }, st.groups.map(g => React.createElement(PopRow, {
     key: g.label,
-    value: g.label
-  }, g.label)))), React.createElement("p", {
+    radio: true,
+    on: reference.label === g.label,
+    label: g.label,
+    onClick: () => {
+      setChoice(g.label === group.label ? reference.label : group.label);
+      setRefLabel(g.label);
+      setGapPop(null);
+    }
+  }))))), React.createElement("p", {
     className: "rd-wv-gap-formula"
   }, formula), React.createElement("p", {
     className: "rd-wv-gap-directions"
@@ -11757,6 +11790,7 @@ function RdConfidence({
   const curTerm = TERMS.find(t => t.current) || TERMS[TERMS.length - 1];
   const [winS, setWinS] = useState(() => confTermWin(curTerm, nowX));
   const [dragging, setDragging] = useState(false);
+  const [confidencePop, setConfidencePop] = useState(null);
   const onWin = React.useCallback((w, phase) => {
     setWinS(w);
     setDragging(phase === "drag");
@@ -12159,26 +12193,31 @@ function RdConfidence({
     narrow: narrow,
     label: isMacro ? "Headline inflation" : vc.title
   });
-  const drawMenu = !isMacro && hset && isTerm ? React.createElement("select", {
-    className: "rd-confidence-sel",
-    "aria-label": isCur ? "Draw a past term" : "Draw another term",
-    value: "",
-    onChange: e => {
-      const v = e.target.value;
-      if (v === "clear") setLiftedBy(s => ({
-        ...s,
-        [histLane]: new Set()
-      }));else if (v) lift(+v);
-    }
-  }, React.createElement("option", {
-    value: "",
-    disabled: true
-  }, isCur ? "Draw a past term" : "Draw another term"), drawable.map(t => React.createElement("option", {
+  const drawMenu = !isMacro && hset && isTerm ? React.createElement(FilterPop, {
+    id: "terms",
+    label: isCur ? "Draw a past term" : "Draw another term",
+    summary: lifted.size ? lifted.size + (lifted.size === 1 ? " term" : " terms") : null,
+    on: lifted.size > 0,
+    open: confidencePop,
+    setOpen: setConfidencePop
+  }, React.createElement("div", {
+    className: "ap-pop-head"
+  }, React.createElement("span", null, "Draw terms beside the band"), lifted.size > 0 && React.createElement("button", {
+    className: "ap-clear",
+    onClick: () => setLiftedBy(s => ({
+      ...s,
+      [histLane]: new Set()
+    }))
+  }, "Clear lines")), React.createElement("div", {
+    className: "ap-poplist",
+    role: "group",
+    "aria-label": isCur ? "Draw a past term" : "Draw another term"
+  }, drawable.map(t => React.createElement(PopRow, {
     key: t.year,
-    value: t.year
-  }, lifted.has(t.year) ? "✓ " + t.year : t.year)), lifted.size > 0 && React.createElement("hr", null), lifted.size > 0 && React.createElement("option", {
-    value: "clear"
-  }, "\u2715 Clear lines")) : null;
+    on: lifted.has(t.year),
+    label: t.year,
+    onClick: () => lift(t.year)
+  })))) : null;
   const drawnShown = [...lifted].filter(y => isTerm && drawable.some(t => t.year === y)).sort((a, b) => a - b);
   return React.createElement(RdSec, {
     id: "confidence",

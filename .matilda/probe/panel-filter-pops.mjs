@@ -37,13 +37,18 @@ const labels = (scope) => page.evaluate((scope) => [...document.querySelectorAll
   label: b.querySelector(".ap-popbtn-lab").textContent,
   summary: b.querySelector(".ap-popbtn-val") ? b.querySelector(".ap-popbtn-val").textContent : null,
   open: b.getAttribute("aria-expanded") === "true",
+  focused: document.activeElement === b,
 })), scope);
 const open = async (scope, label) => {
-  await page.evaluate(({ scope, label }) => {
+  const closed = await page.evaluate(({ scope, label }) => {
     const button = [...document.querySelectorAll(scope + " .ap-popbtn")].find((b) => b.querySelector(".ap-popbtn-lab").textContent === label);
     if (!button) throw new Error("No menu " + label + " under " + scope);
-    if (button.getAttribute("aria-expanded") !== "true") button.click();
+    button.scrollIntoView({ block: "center" });
+    button.setAttribute("data-filter-probe", label);
+    return button.getAttribute("aria-expanded") !== "true";
   }, { scope, label });
+  if (closed) await page.click(`${scope} [data-filter-probe="${label}"]`);
+  await page.waitForSelector(scope + " .ap-panel", { timeout: 5000 });
   await sleep(130);
 };
 const pick = async (scope, label, choice) => {
@@ -73,15 +78,20 @@ const chooseGender = async () => {
 const PV = "#primary-vote .rd-pv-head";
 ok(!(await page.evaluate(() => !!document.querySelector("#primary-vote select"))), "Primary has no native select left");
 await pick(PV, "Among", "Men");
-ok((await labels(PV)).length === 1 && (await labels(PV))[0].summary === "Men", "Primary group changes and hides pollster filtering in group mode", await labels(PV));
+const groupPicked = await labels(PV);
+ok(groupPicked.length === 1 && groupPicked[0].summary === "Men" && !groupPicked[0].open && groupPicked[0].focused,
+  "Primary group selection closes immediately and restores focus", groupPicked);
+await open(PV, "Among");
 ok(await escape(PV, "Among"), "Primary group Escape closes and returns focus");
 await pick(PV, "Among", "All voters");
 await outside();
 ok((await labels(PV)).every((x) => !x.open), "Primary group closes on outside click");
 await pick(PV, "Pollsters", "Essential");
-ok((await labels(PV))[1].summary === "1 pollster", "Primary pollster summary counts one selected house", await labels(PV));
+const pvOneHouse = await labels(PV);
+ok(pvOneHouse[1].summary === "1 pollster" && pvOneHouse[1].open, "Pollster checkbox stays open after one selection", pvOneHouse);
 await pick(PV, "Pollsters", "Resolve");
-ok((await labels(PV))[1].summary === "2 pollsters", "Primary pollster summary counts multiple selected houses", await labels(PV));
+const pvTwoHouses = await labels(PV);
+ok(pvTwoHouses[1].summary === "2 pollsters" && pvTwoHouses[1].open, "Pollster checkbox stays open for multiple selections", pvTwoHouses);
 await page.evaluate((scope) => document.querySelector(scope + " .ap-clear").click(), PV);
 await sleep(120);
 ok((await labels(PV))[1].summary === "All", "Primary pollster Clear restores all houses", await labels(PV));
@@ -94,8 +104,12 @@ const beforeGap = await labels(WV);
 ok(beforeGap.some((b) => b.label === "Compare" && b.summary === "Women") && beforeGap.some((b) => b.label === "Reference" && b.summary === "Men"), "Who-votes comparison and reference faces show their current groups", beforeGap);
 await pick(WV, "Reference", "Women");
 const swapped = await labels(WV);
-ok(swapped.some((b) => b.label === "Compare" && b.summary === "Men") && swapped.some((b) => b.label === "Reference" && b.summary === "Women"), "Who-votes reference selection swaps the comparison to preserve direction", swapped);
+ok(swapped.every((b) => !b.open) && swapped.some((b) => b.label === "Compare" && b.summary === "Men") && swapped.some((b) => b.label === "Reference" && b.summary === "Women"),
+  "Who-votes reference selection swaps groups and closes immediately", swapped);
+await open(WV, "Reference");
 ok(await escape(WV, "Reference"), "Who-votes Escape closes and returns focus");
+await pick(WV, "Compare", "Men");
+ok((await labels(WV))[0].focused && !(await labels(WV))[0].open, "Who-votes Compare also closes and restores focus", await labels(WV));
 await pick(WV, "Reference", "Men");
 ok((await labels(WV)).some((b) => b.label === "Compare" && b.summary === "Women"), "Who-votes reference can be restored");
 
@@ -108,7 +122,7 @@ const years = await page.evaluate(async () => {
 });
 for (const year of years) await pick(CF, "Draw a past term", year);
 const cfDrawn = await labels(CF);
-ok(cfDrawn.some((b) => b.summary === "2 terms"), "Economic sentiment checkboxes accumulate drawn terms", cfDrawn);
+ok(cfDrawn.some((b) => b.summary === "2 terms") && cfDrawn[0].open, "Economic term checkboxes accumulate while staying open", cfDrawn);
 await page.evaluate((scope) => document.querySelector(scope + " .ap-clear").click(), CF);
 await sleep(120);
 ok(!(await labels(CF))[0].summary, "Economic sentiment Clear lines removes the drawn terms");
