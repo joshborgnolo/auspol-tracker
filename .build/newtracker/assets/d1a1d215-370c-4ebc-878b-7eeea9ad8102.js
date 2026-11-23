@@ -8605,7 +8605,9 @@ function infoTerms(D) {
         Newspoll’s two-PM preferred, first published in November 2026, asks everyone to choose,
         so it is the same kind of number. It is read as Albanese against Taylor, with a lean of
         its own. The three-way question is counted as shares of those who named one of the
-        three.</span>
+        three. RedBridge also offers “Neither”, which far more Coalition and One Nation voters
+        choose than Labor voters, so its opposition leader’s share comes out lower than other
+        pollsters’. Its figures have a lean of their own but do not set the level.</span>
         <span className="info-p"><b>How well it works.</b> Each poll was predicted from the polls
         before it, and the model came closer than this page’s earlier monthly averages. For
         leader ratings since 1971 it was 4.2 net points off against 4.6, and this term 3.8

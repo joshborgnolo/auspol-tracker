@@ -9047,6 +9047,12 @@ const LDM = JUR ? null : (() => {
   const midOf = (date, firm) => { const P = POLL_BY_KEY.get(date + "|" + firm); return P && P.dateStart ? Math.round((DAYn(P.dateStart) + DAYn(date)) / 2) : DAYn(date) - 1; };
   /* rating scales that are not the approve/disapprove question: they lean, they set no zero */
   const SCALE_HOUSES = new Set(["ReachTEL", "Fox & Hedgehog"]);
+  /* preferred-PM questions that offer "Neither" (RedBridge: Albanese / Ley /
+     About the same / Neither / Not sure). Neither takes the opposition
+     leader's would-be backers far more than the PM's (Nov 2025: 35% of
+     Coalition voters, 69% of One Nation's, 7% of Labor's), so the decided
+     share isn't the regular question's: they lean, they set no zero */
+  const NEITHER_PPM = new Set(["RedBridge/Accent"]);
   const ratings = [], ppmRows = [];
   const csvRows = (f) => {
     const p = path.join(ROOT, "data", f);
@@ -9100,9 +9106,9 @@ const LDM = JUR ? null : (() => {
     const day = midOf(p.date, p.firm), n = ppmN(p), S = oppNow(p.date), P = at(PM_ST, p.date);
     if (!S || !P) continue;
     const base = { day, date: p.date, contest: "pm-opp", pm: P.person, opp: S.person, pmParty: P.party, oppParty: S.party, series: "pm-opp:" + P.person + ":" + P.from + ":" + S.person + ":" + S.from, to: P.to < S.to ? P.to : S.to, n };
-    if (p.han == null && p.alb > 0 && p.opp > 0) ppmRows.push({ ...base, house: p.firm, kind: "two", a: p.alb, b: p.opp });
+    if (p.han == null && p.alb > 0 && p.opp > 0) ppmRows.push({ ...base, house: p.firm, kind: NEITHER_PPM.has(p.firm) ? "neither" : "two", a: p.alb, b: p.opp });
     for (const e of p.extra || []) if (e.alb > 0 && e.opp > 0)
-      ppmRows.push({ ...base, house: e.kind === "2pmp" ? p.firm + " (2PMP)" : p.firm, kind: e.kind === "2pmp" ? "2pmp" : "two", a: e.alb, b: e.opp });
+      ppmRows.push({ ...base, house: e.kind === "2pmp" ? p.firm + " (2PMP)" : p.firm, kind: e.kind === "2pmp" ? "2pmp" : NEITHER_PPM.has(p.firm) ? "neither" : "two", a: e.alb, b: e.opp });
   }
   for (const r of D.ppmHeadToHead) if (r.alb > 0 && r.han > 0)
     ppmRows.push({ day: midOf(r.date, r.firm), date: r.date, house: r.firm, kind: "two", contest: "alb-han", pm: "Albanese", opp: "Hanson", pmParty: "alp", oppParty: "onp",
@@ -9202,7 +9208,9 @@ const LDM = JUR ? null : (() => {
       const t0 = Math.min(...rs.map((r) => r.day)) - 1;
       const anchor = { mean: Float64Array.from([Math.log(avg[0] / avg[2]), Math.log(avg[1] / avg[2])]), cov: Float64Array.from([0.25, 0.1, 0.1, 0.25]) };
       const mdays = monthDays(t0 + 1, t1, [{ to: "2099-01-01" }]).filter((d) => d > t0);
-      const fit = fitPrimary(rs, { t0, t1, anchor, jumps: new Set(), parties: ["alb", "opp", "han"], days: [...new Set([...mdays, t1, t1 - 30])], pairs: [[t1, t1 - 30]], nDraw: 2000, seed: 20261125, M: 16, minCore: 4 });
+      const cnt3 = {}; for (const r of rs) cnt3[r.house] = (cnt3[r.house] || 0) + 1;
+      const core3 = new Set(Object.keys(cnt3).filter((h) => cnt3[h] >= 4 && !NEITHER_PPM.has(h)));
+      const fit = fitPrimary(rs, { t0, t1, anchor, jumps: new Set(), parties: ["alb", "opp", "han"], days: [...new Set([...mdays, t1, t1 - 30])], pairs: [[t1, t1 - 30]], nDraw: 2000, seed: 20261125, M: 16, minCore: 4, coreOverride: core3 });
       const d = fit.shares(t1), dp = fit.shares(t1 - 30), n = d.length / 3;
       const colK = (A, k) => Float64Array.from({ length: n }, (_, i) => 100 * A[i * 3 + k]);
       const o = {};
@@ -9229,7 +9237,7 @@ const LDM = JUR ? null : (() => {
   }
   const T3 = Date.now();
   console.log(`leaderModel: ${RS.length} rating series (${ratings.length} readings), ${PS.length} preferred-PM pairings (${ppmRows.length}); ratings ${JSON.stringify(stR.best)}, ppm ${JSON.stringify(stP.best)}; fit ${T1 - T0} ms, lines ${T2 - T1} ms, now ${T3 - T2} ms`);
-  return { t1, rSeries, pSeries, now, pnow, three, leans, stR, stP, ymOfDay, ISOd, PM_ST, OPP_ST };
+  return { t1, rSeries, pSeries, now, pnow, three, leans, stR, stP, ymOfDay, ISOd, PM_ST, OPP_ST, neither: [...NEITHER_PPM] };
 })();
 
 /* ---- 4m'. the model's figures into the panel's shapes -------------------
@@ -9313,6 +9321,8 @@ if (LDM) {
   const xOfDay = (d) => { const iso = LDM.ISOd(d); return dx(iso); };
   leaderModel = {
     t1: LDM.ISOd(LDM.t1),
+    /* pollsters whose head-to-head offers "Neither": not drawn on the decided-basis lead chart */
+    neither: LDM.neither,
     ratings: LDM.rSeries.map(({ S, months }) => ({
       id: S.id, role: S.role, person: S.person, party: S.party, from: S.from, to: S.to < "2099" ? S.to : null,
       houses: [...new Set(S.obs.map((o) => o.house))].length,

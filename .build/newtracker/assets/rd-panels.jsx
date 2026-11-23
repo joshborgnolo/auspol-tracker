@@ -1662,9 +1662,15 @@ function RdLeadership({ rangeId, setRangeId }) {
     { id: "hanson", label: "over " + han.short, color: han.color, points: run("lead_hanson"), rdWidth: 2.5, endLabel: "over " + han.short },
   ].filter((s) => s.points.length));
   /* each poll's own lead in each head-to-head it asked: the opposition
-     leader ("at") and Hanson ("ah"), never the three-way */
+     leader ("at") and Hanson ("ah"), never the three-way. A head-to-head
+     that offers "Neither" (LMOD.neither, RedBridge's) isn't drawn: on the
+     decided basis it isn't the same number, since Neither takes the
+     opposition leader's backers far more than the PM's (the model reads it
+     with a lean and lets it set no level) */
+  const neitherH = new Set((LMOD && LMOD.neither) || []);
   const leadDots = kept("leadDots", () => D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
     .flatMap((q) => ["at", "ah"].map((mode) => {
+      if (neitherH.has(q.pollster)) return null;
       const c = ppmMatch(q, mode);
       if (!c || c.alb == null) return null;
       const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
@@ -1872,6 +1878,14 @@ function RdLeadership({ rangeId, setRangeId }) {
     return { series, areas, lone, notes: unclash(notes, Math.max(4, span * 0.1)), dots, spine, win, long };
   };
   const histPpm = histOn ? histScene("ppm") : null;
+  /* said under the lead chart only when such a poll falls in its window */
+  const neitherNote = (() => {
+    if (!neitherH.size || (histPpm && histPpm.long)) return "";
+    const a = histPpm && histPpm.win ? histPpm.win.a : xDomain[0], b = histPpm && histPpm.win ? histPpm.win.b : xDomain[1];
+    const hs = [...new Set(D.individualPolls.filter((q) => neitherH.has(q.pollster) && q.x >= a && q.x <= b
+      && ["at", "ah"].some((m) => { const c = ppmMatch(q, m); return c && c.alb != null; })).map((q) => q.pollster.split("/")[0]))];
+    return hs.length ? " " + rdList(hs) + "’s head-to-head polls aren’t drawn: they offered “Neither”, which took the opposition leader’s backers far more than the prime minister’s." : "";
+  })();
   const histLead = histPpm ? (() => {
     const vals = histPpm.series.flatMap((s) => s.points.flatMap((q) => (histPpm.long ? [q.y] : [q.lo, q.hi]))).concat(histPpm.dots.map((d) => d.y), histPpm.lone.map((d) => d.y), histPpm.long ? [] : leadDots.map((d) => d.y));
     const fit = fitDomain(vals.length ? vals : [-20, 20], 10, 0);
@@ -1884,7 +1898,7 @@ function RdLeadership({ rangeId, setRangeId }) {
       spine: histPpm.spine,
       copy: { title: "Preferred prime minister: the prime minister’s lead", span: confWinYears(vwWin, vwTerms, vwHi),
               sub: "Points ahead of the opposition leader among those who chose one of the two, each pairing its own line",
-              legend: [], caption: keyDots + " " + keyLead + "." },
+              legend: [], caption: keyDots + " " + keyLead + "." + neitherNote },
     };
   })() : null;
   const ppmModel = (v) => v !== "three" && histLead ? histLead : v === "three" ? {
@@ -1902,7 +1916,7 @@ function RdLeadership({ rangeId, setRangeId }) {
     spine: J ? spineOf(leadSeries) : (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
     copy: { title: J ? "The " + J.office.alb + "’s lead as preferred " + J.office.alb : pm.short + "’s lead as preferred prime minister",
             sub: "Points ahead of each rival when voters are asked to choose between the two, month by month",
-            legend: [], caption: keyDots + " " + keyLead + "." },
+            legend: [], caption: keyDots + " " + keyLead + "." + neitherNote },
   };
   /* The engine widens the right margin to the longest end label showing, so
      priced per drawn set each view would get its own plot width and the
@@ -2310,8 +2324,8 @@ function RdLeadership({ rangeId, setRangeId }) {
             {ppmView === "both" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
               <span className="rd-ld-keytxt">{keyDots + " " + (ppmView === "three" ? keyThree
-                : ppmView === "two" ? keyLead + (histOn ? "; each pairing is its own line." : ", which lets one chart carry both head-to-head contests.")
-                : keyLead + (LMOD ? "; three-way figures are shares of those who named one of the three." : "; three-way figures are shares of all respondents."))}</span>
+                : ppmView === "two" ? keyLead + (histOn ? "; each pairing is its own line." : ", which lets one chart carry both head-to-head contests.") + neitherNote
+                : keyLead + (LMOD ? "; three-way figures are shares of those who named one of the three." : "; three-way figures are shares of all respondents.") + neitherNote)}</span>
             </RdKey>
           </>)}
         {panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval",
