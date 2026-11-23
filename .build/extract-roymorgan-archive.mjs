@@ -121,12 +121,22 @@ const MONTHS = {
 const MODE_MAP = [
   [/multi-?mode/i, "multi-mode"],
   [/face\s*:\s*face/i, "face"], [/face-to-face/i, "face"], [/^\(?face\)?$/i, "face"],
-  [/exit poll/i, "sms"], [/snap sms/i, "sms"], [/^sms/i, "sms"],
+  // the label is tested with its brackets on: "(SMS)" and "(SMS - 4pm)" are SMS
+  // polls too (a bare /^sms/ missed them until 2026-11-23, filing 2010-08-21,
+  // 2010-08-23 and 2010-09-09 as unlabelled waves)
+  [/exit poll/i, "sms"], [/snap sms/i, "sms"], [/^\(?\s*sms\b/i, "sms"],
   [/phone/i, "phone"],
 ];
+/* Roy Morgan's own typos in a row label, corrected before parsing (each
+   checked against the other sources in .build/analysis/primary-bayes/history):
+   the 18–19 Aug 2018 wave is printed "August 18/29", which filed it ten
+   days late, after the 25–26 Aug wave (Jackman's file and Wikipedia end it
+   on the 19th) */
+const LABEL_FIX = { "August 18/29, 2018": "August 18/19, 2018" };
 function parseLabel(raw, cursor) {
   // returns { iso, election, mode, year } or null for non-data labels
   let label = String(raw).trim();
+  if (LABEL_FIX[label]) { note(`label corrected: "${label}" -> "${LABEL_FIX[label]}"`); label = LABEL_FIX[label]; }
   if (!label) return null;
   if (/^(19|20)\d{2}$/.test(label)) return null; // bare year-header row
   const election = /^(\d{4}\s+)?(federal\s+election|election)\b/i.test(label);
@@ -519,6 +529,27 @@ function csvRows(map, dateCol, cols) {
     rows.push([iso, elec === "1" ? "1" : "", ...cols.map((c) => r.cols[c]), r.mode]);
   }
   return rows.map((r) => r.join(",")).join("\n") + "\n";
+}
+/* One wave, two tables: the long-term table reprints the 2014–16 multi-mode
+   waves without their "(Multi-mode)" label, the 2013–2025 table with it, so
+   each came out twice (once with mode blank). The labelled row is kept – it
+   prints the minor parties the long-term table folds into others – and the
+   unlabelled twin is dropped where the two agree on Labor and the
+   Coalition; a twin that disagrees on either stays, with a warning. */
+{
+  const byDate = new Map();
+  for (const [k, r] of primary) { const [iso, el] = k.split("|"); if (el === "1") continue; (byDate.get(iso) || byDate.set(iso, []).get(iso)).push([k, r]); }
+  let dropped = 0;
+  for (const [iso, rs] of byDate) {
+    const blank = rs.filter(([, r]) => !r.mode), labelled = rs.filter(([, r]) => r.mode);
+    if (!blank.length || !labelled.length) continue;
+    for (const [k, r] of blank) {
+      const twin = labelled.find(([, q]) => q.cols.alp === r.cols.alp && q.cols.coalition === r.cols.coalition);
+      if (twin) { primary.delete(k); dropped++; }
+      else warn(`unlabelled ${iso} [${r.src}] "${r.lab}" sits beside a labelled wave with other figures (${labelled.map(([, q]) => q.mode + " " + q.cols.alp + "/" + q.cols.coalition).join(", ")}) – kept both`);
+    }
+  }
+  note(`dropped ${dropped} unlabelled reprints of labelled waves`);
 }
 fs.writeFileSync(OUT_P, csvRows(primary, "date", P_COLS));
 fs.writeFileSync(OUT_T, csvRows(tpp, "date", ["alp", "coalition", "flow_alp", "flow_coalition"]));
