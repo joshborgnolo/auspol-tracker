@@ -1,0 +1,3148 @@
+{
+  "_about": "Freshwater Strategy / AFR issue-importance and issue-management tables, read only from official Datawrapper TSV payloads and the two official December 2022 PNGs. Importance, full three-response management and the four-issue Labor-net-lead supplements are separate measures. Printed labels and source row order are retained, including source spelling/grammar changes. Tabular/chart downloads do not print exact question stems, so only the two PNG-backed December 2022 stems are filed; no stem is inferred for another wave. May 2023, September 2023 and February 2025 are explicit missing-battery markers, never zeros. Nothing here is joined to polls.json.",
+  "schemaVersion": 1,
+  "house": "Freshwater Strategy",
+  "publisher": "Australian Financial Review",
+  "generatedBy": ".build/extract-freshwater-issues.mjs",
+  "questionStemPolicy": "Do not invent question stems absent from the tabular downloads; questionStem:null means no exact stem was present in the downloaded table or chart shell",
+  "universes": {
+    "importance": "Usually 16 printed rows including Other; December 2022 has 15 because its PNG omits job security, and January 2024 has 17 because its TSV adds Indigenous affairs",
+    "management": "Three response columns over 15 issues in the tabular waves; the December 2022 PNG has those three responses over 14 printed issues because it omits job security",
+    "netLeadSupplements": "Four issues only, printed Labor-minus-Coalition leads by month; supplement, not full three-response management"
+  },
+  "importance": {
+    "measure": "share naming the issue among up to three voter priorities",
+    "waves": [
+      {
+        "measure": "issue-importance",
+        "month": "2022-12",
+        "fieldworkStart": "2022-12-16",
+        "fieldworkEnd": "2022-12-18",
+        "fieldworkText": "16-18 Dec 2022",
+        "sample": 1209,
+        "marginOfError": null,
+        "title": "Voter priorities",
+        "printedLabel": null,
+        "questionStem": "Which of the following do you think are the most important issues for the Federal government to focus on at this time? Please pick up to three",
+        "questionStemStatus": "printed-in-source-png-read-by-two-accurate-ocr-scales",
+        "sourceNotes": "Freshwater Strategy / AFR Poll; Australian voters; Sample size n=1,209; Fieldwork 16-18 Dec 2022; Figures may not sum to 100% due to rounding",
+        "source": {
+          "month": "2022-12",
+          "chartId": null,
+          "datasetUrl": null,
+          "chartUrl": null,
+          "releaseUrl": "https://freshwaterstrategy.com/2022/12/19/afr-freshwater-strategy-federal-polling/",
+          "releaseCache": "2022-12-19-release.html",
+          "imageUrl": "https://freshwaterstrategy.com/wp-content/uploads/voter-priorities.png",
+          "imageCache": "2022-12-importance.png",
+          "ocrCaches": [
+            "2022-12-importance-ocr-3x-accurate.json",
+            "2022-12-importance-ocr-4x-accurate.json"
+          ],
+          "ocrProofCache": "2022-12-ocr-proof.json",
+          "verification": "Solely mechanical: no transcription or model-read pixel figure is used. ocrTable() coordinate-matches each printed issue label and numeric cell independently in accurate-mode 3x and 4x ocr-image.swift outputs. Both scales must return the same issue, response column and share or the build fails; the two scale-specific raw boxes for every shipped cell are in 2022-12-ocr-proof.json."
+        },
+        "coverage": "complete-published-png-table-as-printed-later-universe-job-row-absent",
+        "universeException": "15 printed rows: unlike the later usual 16-row table, there is no job-security row; Other is included and no zero was inserted",
+        "missingPrintedUniverseIssues": [
+          "Job security & unemployment"
+        ],
+        "sourceHeaders": null,
+        "rows": [
+          {
+            "issue": "Cost of & standard of living",
+            "share": 71
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 40
+          },
+          {
+            "issue": "Health & social care",
+            "share": 40
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 37
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 31
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 19
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 18
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 15
+          },
+          {
+            "issue": "Defence and national security",
+            "share": 14
+          },
+          {
+            "issue": "Education & training",
+            "share": 13
+          },
+          {
+            "issue": "Family & community",
+            "share": 11
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 10
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 9
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 4
+          },
+          {
+            "issue": "Other",
+            "share": 3
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2023-12",
+        "fieldworkStart": "2023-12-15",
+        "fieldworkEnd": "2023-12-17",
+        "fieldworkText": "15-17 December 2023",
+        "sample": 1109,
+        "marginOfError": 3.3,
+        "title": "Concern about immigration rises by 2.5 times, up 8pts since September",
+        "printedLabel": "Figure 4: Voter priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1109; Fieldwork 15-17 December 2023. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2023-12",
+          "chartId": "ehv1e",
+          "datasetUrl": "https://datawrapper.dwcdn.net/ehv1e/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/ehv1e/1/",
+          "datasetCache": "ehv1e.dataset.csv",
+          "chartCache": "ehv1e.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "%",
+          "Dec-23"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 71
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 43
+          },
+          {
+            "issue": "Health & social care",
+            "share": 28
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 26
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 20
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 17
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 15
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 13
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 13
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 11
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 9
+          },
+          {
+            "issue": "Education & training",
+            "share": 6
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 5
+          },
+          {
+            "issue": "Family & community",
+            "share": 4
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 1
+          },
+          {
+            "issue": "Other",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2024-01",
+        "fieldworkStart": "2024-01-10",
+        "fieldworkEnd": "2024-01-11",
+        "fieldworkText": "10-11 January 2024",
+        "sample": 1007,
+        "marginOfError": 3.3,
+        "title": "Cost of living dominates the issue agenda, followed by housing & accommodation.",
+        "printedLabel": "Figure 2: Issue Agenda",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "The Sunday Telegraph / Freshwater Strategy Federal Poll; Australian Voters aged 18+ online; Sample size n=1,007; Fieldwork 10-11 January 2024, Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-01",
+          "chartId": "JiZHI",
+          "datasetUrl": "https://datawrapper.dwcdn.net/JiZHI/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/JiZHI/2/",
+          "datasetCache": "JiZHI.dataset.csv",
+          "chartCache": "JiZHI.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Issue ",
+          "%"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 74
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 41
+          },
+          {
+            "issue": "Health & social care",
+            "share": 30
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 30
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 21
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 16
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 15
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 10
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 10
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 9
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 9
+          },
+          {
+            "issue": "Education & training",
+            "share": 6
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 5
+          },
+          {
+            "issue": "Family & community",
+            "share": 4
+          },
+          {
+            "issue": "Indigenous affairs",
+            "share": 4
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 2
+          },
+          {
+            "issue": "Other",
+            "share": 1
+          }
+        ],
+        "universeException": "17 printed rows: Indigenous affairs is an extra source-native row in January 2024; the usual 16-row table has no such row"
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2024-02",
+        "fieldworkStart": "2024-02-16",
+        "fieldworkEnd": "2024-02-18",
+        "fieldworkText": "16 – 18 February 2024",
+        "sample": 1049,
+        "marginOfError": 3.3,
+        "title": "Concern about crime & social order has risen by 8pts since December.",
+        "printedLabel": "Figure 2: Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,049; Fieldwork 16 – 18 February 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-02",
+          "chartId": "XHdnx",
+          "datasetUrl": "https://datawrapper.dwcdn.net/XHdnx/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/XHdnx/1/",
+          "datasetCache": "XHdnx.dataset.csv",
+          "chartCache": "XHdnx.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Priority",
+          "Feb-24"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 69
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 40
+          },
+          {
+            "issue": "Health & social care",
+            "share": 29
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 27
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 25
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 23
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 17
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 14
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 11
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 11
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 10
+          },
+          {
+            "issue": "Education & training",
+            "share": 8
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 5
+          },
+          {
+            "issue": "Family & community",
+            "share": 3
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 1
+          },
+          {
+            "issue": "Other",
+            "share": 2
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2024-03",
+        "fieldworkStart": "2024-03-08",
+        "fieldworkEnd": "2024-03-10",
+        "fieldworkText": "08 – 10 March 2024",
+        "sample": 1051,
+        "marginOfError": 3.3,
+        "title": "Cost of living continues to dominate the issue agenda, followed by housing.",
+        "printedLabel": "Figure 4: Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,051; Fieldwork 08 – 10 March 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-03",
+          "chartId": "fdR4U",
+          "datasetUrl": "https://datawrapper.dwcdn.net/fdR4U/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/fdR4U/1/",
+          "datasetCache": "fdR4U.dataset.csv",
+          "chartCache": "fdR4U.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Priority",
+          "Mar-24"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 72
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 42
+          },
+          {
+            "issue": "Health & social care",
+            "share": 28
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 26
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 23
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 18
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 16
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 14
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 12
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 10
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 10
+          },
+          {
+            "issue": "Education & training",
+            "share": 8
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 4
+          },
+          {
+            "issue": "Family & community",
+            "share": 4
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 1
+          },
+          {
+            "issue": "Other",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2024-09",
+        "fieldworkStart": "2024-09-13",
+        "fieldworkEnd": "2024-09-15",
+        "fieldworkText": "13-15 September 2024",
+        "sample": 1057,
+        "marginOfError": 3.1,
+        "title": "The cost & standard of living continues to dominate the issue agenda for voters",
+        "printedLabel": "Figure 5: Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,057; Fieldwork 13-15 September 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-09",
+          "chartId": "jhkQi",
+          "datasetUrl": "https://datawrapper.dwcdn.net/jhkQi/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/jhkQi/1/",
+          "datasetCache": "jhkQi.dataset.csv",
+          "chartCache": "jhkQi.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Priority",
+          "Sep-24"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 74
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 42
+          },
+          {
+            "issue": "Health & social care",
+            "share": 27
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 27
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 24
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 18
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 16
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 13
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 11
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 10
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 10
+          },
+          {
+            "issue": "Education & training",
+            "share": 6
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 5
+          },
+          {
+            "issue": "Family & community",
+            "share": 4
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 2
+          },
+          {
+            "issue": "Other",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2024-10",
+        "fieldworkStart": "2024-10-18",
+        "fieldworkEnd": "2024-10-20",
+        "fieldworkText": "18-20 October 2024",
+        "sample": 1034,
+        "marginOfError": 3.1,
+        "title": "The cost & standard of living continues to dominate the issue agenda for voters.",
+        "printedLabel": "Figure 5: Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,034; Fieldwork 18-20 October 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-10",
+          "chartId": "QpC8O",
+          "datasetUrl": "https://datawrapper.dwcdn.net/QpC8O/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/QpC8O/1/",
+          "datasetCache": "QpC8O.dataset.csv",
+          "chartCache": "QpC8O.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Priority",
+          "Oct-24"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 72
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 44
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 28
+          },
+          {
+            "issue": "Health & social care",
+            "share": 26
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 22
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 19
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 15
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 12
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 12
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 10
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 9
+          },
+          {
+            "issue": "Education & training",
+            "share": 6
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 5
+          },
+          {
+            "issue": "Family & community",
+            "share": 5
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 2
+          },
+          {
+            "issue": "Other",
+            "share": 1
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2024-11",
+        "fieldworkStart": "2024-11-15",
+        "fieldworkEnd": "2024-11-17",
+        "fieldworkText": "15-17 November 2024",
+        "sample": 1046,
+        "marginOfError": 3.1,
+        "title": "The cost & standard of living continues to dominate the issue agenda for voters.",
+        "printedLabel": "Figure 5: Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,046; Fieldwork 15-17 November 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-11",
+          "chartId": "KUCk7",
+          "datasetUrl": "https://datawrapper.dwcdn.net/KUCk7/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/KUCk7/1/",
+          "datasetCache": "KUCk7.dataset.csv",
+          "chartCache": "KUCk7.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Priority",
+          "Nov-24"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 77
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 42
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 28
+          },
+          {
+            "issue": "Health & social care",
+            "share": 28
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 24
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 19
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 16
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 14
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 10
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 8
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 7
+          },
+          {
+            "issue": "Education & training",
+            "share": 6
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 5
+          },
+          {
+            "issue": "Family & community",
+            "share": 4
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 2
+          },
+          {
+            "issue": "Other",
+            "share": 2
+          }
+        ]
+      },
+      {
+        "measure": "issue-importance",
+        "month": "2025-01",
+        "fieldworkStart": "2025-01-17",
+        "fieldworkEnd": "2025-01-19",
+        "fieldworkText": "17-19 January 2025",
+        "sample": 1063,
+        "marginOfError": 3.1,
+        "title": "The cost & standard of living continues to dominate voter concerns.",
+        "printedLabel": "Figure 5: Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,063; Fieldwork 17-19 January 2025. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2025-01",
+          "chartId": "4VjBV",
+          "datasetUrl": "https://datawrapper.dwcdn.net/4VjBV/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/4VjBV/1/",
+          "datasetCache": "4VjBV.dataset.csv",
+          "chartCache": "4VjBV.chart.html"
+        },
+        "coverage": "complete-published-table-as-printed",
+        "sourceHeaders": [
+          "Priority",
+          "Jan-25"
+        ],
+        "rows": [
+          {
+            "issue": "The cost & standard of living",
+            "share": 73
+          },
+          {
+            "issue": "Housing & accommodation",
+            "share": 42
+          },
+          {
+            "issue": "Health & social care",
+            "share": 28
+          },
+          {
+            "issue": "Managing the economy",
+            "share": 27
+          },
+          {
+            "issue": "Crime & social order",
+            "share": 26
+          },
+          {
+            "issue": "The environment & climate change",
+            "share": 18
+          },
+          {
+            "issue": "Tax & government spending",
+            "share": 15
+          },
+          {
+            "issue": "Immigration & asylum",
+            "share": 14
+          },
+          {
+            "issue": "Job security & unemployment",
+            "share": 11
+          },
+          {
+            "issue": "Education & training",
+            "share": 8
+          },
+          {
+            "issue": "Welfare & benefits",
+            "share": 7
+          },
+          {
+            "issue": "Defence & national security",
+            "share": 7
+          },
+          {
+            "issue": "Roads & transport",
+            "share": 4
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "share": 4
+          },
+          {
+            "issue": "Family & community",
+            "share": 3
+          },
+          {
+            "issue": "Other",
+            "share": 2
+          }
+        ]
+      }
+    ],
+    "coverage": [
+      {
+        "month": "2022-12",
+        "status": "imported",
+        "chartId": null,
+        "printedRows": 15,
+        "coverage": "complete-published-png-table-as-printed-later-universe-job-row-absent",
+        "note": "15 printed rows: unlike the later usual 16-row table, there is no job-security row; Other is included and no zero was inserted"
+      },
+      {
+        "month": "2023-05",
+        "status": "missing-skipped-battery",
+        "chartId": null,
+        "printedRows": null,
+        "coverage": "missing-not-zero",
+        "note": "Importance battery wave left missing exactly as requested for 2023-05; no cell was set to zero and no net-lead supplement was promoted into a full table"
+      },
+      {
+        "month": "2023-09",
+        "status": "missing-skipped-battery",
+        "chartId": null,
+        "printedRows": null,
+        "coverage": "missing-not-zero",
+        "note": "Importance battery wave left missing exactly as requested for 2023-09; no cell was set to zero and no net-lead supplement was promoted into a full table"
+      },
+      {
+        "month": "2023-12",
+        "status": "imported",
+        "chartId": "ehv1e",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2024-01",
+        "status": "imported",
+        "chartId": "JiZHI",
+        "printedRows": 17,
+        "coverage": "complete-published-table-as-printed",
+        "note": "17 printed rows: Indigenous affairs is an extra source-native row in January 2024; the usual 16-row table has no such row"
+      },
+      {
+        "month": "2024-02",
+        "status": "imported",
+        "chartId": "XHdnx",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2024-03",
+        "status": "imported",
+        "chartId": "fdR4U",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2024-09",
+        "status": "imported",
+        "chartId": "jhkQi",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2024-10",
+        "status": "imported",
+        "chartId": "QpC8O",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2024-11",
+        "status": "imported",
+        "chartId": "KUCk7",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2025-01",
+        "status": "imported",
+        "chartId": "4VjBV",
+        "printedRows": 16,
+        "coverage": "complete-published-table-as-printed"
+      },
+      {
+        "month": "2025-02",
+        "status": "missing-skipped-battery",
+        "chartId": null,
+        "printedRows": null,
+        "coverage": "missing-not-zero",
+        "note": "Importance battery wave left missing exactly as requested for 2025-02; no cell was set to zero and no net-lead supplement was promoted into a full table"
+      }
+    ]
+  },
+  "management": {
+    "measure": "three-response government-best-to-manage shares by issue",
+    "waves": [
+      {
+        "measure": "issue-management-three-response",
+        "month": "2022-12",
+        "fieldworkStart": "2022-12-16",
+        "fieldworkEnd": "2022-12-18",
+        "fieldworkText": "16-18 Dec 2022",
+        "sample": 1209,
+        "marginOfError": null,
+        "title": "Who is best to manage each voter priority",
+        "printedLabel": null,
+        "questionStem": "Thinking about those same issues, if you had to choose, which type of government do you think would be best to respond to that specific concern?",
+        "questionStemStatus": "printed-in-source-png-read-by-two-accurate-ocr-scales",
+        "sourceNotes": "Freshwater Strategy / AFR Poll; Australian voters; Sample size n=1,209; Fieldwork 16-18 Dec 2022; Figures may not sum to 100% due to rounding",
+        "source": {
+          "month": "2022-12",
+          "chartId": null,
+          "datasetUrl": null,
+          "chartUrl": null,
+          "releaseUrl": "https://freshwaterstrategy.com/2022/12/19/afr-freshwater-strategy-federal-polling/",
+          "releaseCache": "2022-12-19-release.html",
+          "imageUrl": "https://freshwaterstrategy.com/wp-content/uploads/who-is-best-to-manage-each-voter-priority-1.png",
+          "imageCache": "2022-12-management.png",
+          "ocrCaches": [
+            "2022-12-management-ocr-3x-accurate.json",
+            "2022-12-management-ocr-4x-accurate.json"
+          ],
+          "ocrProofCache": "2022-12-ocr-proof.json",
+          "verification": "Solely mechanical: no transcription or model-read pixel figure is used. ocrTable() coordinate-matches each printed issue label and numeric cell independently in accurate-mode 3x and 4x ocr-image.swift outputs. Both scales must return the same issue, response column and share or the build fails; the two scale-specific raw boxes for every shipped cell are in 2022-12-ocr-proof.json."
+        },
+        "coverage": "full-three-responses-for-14-printed-issues-later-15th-job-row-absent",
+        "universeException": "14 printed issues: Job security & unemployment is not printed in the December 2022 PNG and remains missing, not zero",
+        "missingPrintedUniverseIssues": [
+          "Job security & unemployment"
+        ],
+        "sourceHeaders": null,
+        "responseOptions": [
+          "Albanese-led Labor government is best",
+          "Neither / Unsure",
+          "Dutton-led Liberal government is best"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              50,
+              28,
+              23
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              47,
+              30,
+              24
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              45,
+              32,
+              23
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              43,
+              34,
+              23
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              43,
+              31,
+              26
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              42,
+              38,
+              20
+            ]
+          },
+          {
+            "issue": "The cost of & standards of living",
+            "shares": [
+              41,
+              32,
+              27
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              38,
+              36,
+              26
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              38,
+              35,
+              27
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              36,
+              36,
+              29
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              34,
+              33,
+              33
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              33,
+              38,
+              29
+            ]
+          },
+          {
+            "issue": "Defence and national security",
+            "shares": [
+              32,
+              33,
+              35
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              31,
+              38,
+              31
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-03",
+        "fieldworkStart": "2024-03-08",
+        "fieldworkEnd": "2024-03-10",
+        "fieldworkText": "08 – 10 March 2024",
+        "sample": 1051,
+        "marginOfError": 3.3,
+        "title": "Albanese & Labor lifts net 3pts on ‘best to manage’ for COL and tax & spending.",
+        "printedLabel": "Figure 7: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,051; Fieldwork 08 – 10 March 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-03",
+          "chartId": "VkN0B",
+          "datasetUrl": "https://datawrapper.dwcdn.net/VkN0B/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/VkN0B/1/",
+          "datasetCache": "VkN0B.dataset.csv",
+          "chartCache": "VkN0B.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              45,
+              31,
+              24
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              39,
+              32,
+              29
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              38,
+              32,
+              30
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              35,
+              35,
+              30
+            ]
+          },
+          {
+            "issue": "Job security and unemployment",
+            "shares": [
+              35,
+              32,
+              33
+            ]
+          },
+          {
+            "issue": "The environment & climate change",
+            "shares": [
+              34,
+              46,
+              20
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              32,
+              41,
+              27
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              32,
+              33,
+              35
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              31,
+              39,
+              30
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              31,
+              38,
+              31
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              30,
+              30,
+              40
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              30,
+              35,
+              35
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              27,
+              33,
+              40
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              26,
+              37,
+              37
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              26,
+              37,
+              37
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-04",
+        "fieldworkStart": "2024-04-12",
+        "fieldworkEnd": "2024-04-13",
+        "fieldworkText": "12-13 April 2024",
+        "sample": 1055,
+        "marginOfError": 3.3,
+        "title": "Albanese & Labor slip further on ‘best to manage’ COL, immigration, and crime",
+        "printedLabel": "Figure 6: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,055; Fieldwork 12-13 April 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-04",
+          "chartId": "bn29c",
+          "datasetUrl": "https://datawrapper.dwcdn.net/bn29c/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/bn29c/1/",
+          "datasetCache": "bn29c.dataset.csv",
+          "chartCache": "bn29c.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              43,
+              32,
+              26
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              38,
+              35,
+              27
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              37,
+              35,
+              28
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              35,
+              34,
+              30
+            ]
+          },
+          {
+            "issue": "Job security and unemployment",
+            "shares": [
+              34,
+              31,
+              34
+            ]
+          },
+          {
+            "issue": "The environment & climate change",
+            "shares": [
+              34,
+              44,
+              22
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              34,
+              38,
+              27
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              31,
+              36,
+              33
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              29,
+              41,
+              31
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              29,
+              37,
+              35
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              28,
+              34,
+              38
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              27,
+              33,
+              41
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              26,
+              33,
+              41
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              34,
+              41
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              23,
+              37,
+              40
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-05",
+        "fieldworkStart": "2024-05-17",
+        "fieldworkEnd": "2024-05-19",
+        "fieldworkText": "17-19 May 2024",
+        "sample": 1056,
+        "marginOfError": 3.3,
+        "title": "Post-Budget, lifts for Labor on economic management, immigration and crime",
+        "printedLabel": "Figure 4: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,056; Fieldwork 17-19 May 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-05",
+          "chartId": "0BAz2",
+          "datasetUrl": "https://datawrapper.dwcdn.net/0BAz2/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/0BAz2/1/",
+          "datasetCache": "0BAz2.dataset.csv",
+          "chartCache": "0BAz2.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              40,
+              33,
+              26
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              38,
+              34,
+              27
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              37,
+              34,
+              29
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              34,
+              37,
+              28
+            ]
+          },
+          {
+            "issue": "The environment & climate change",
+            "shares": [
+              34,
+              46,
+              21
+            ]
+          },
+          {
+            "issue": "Job security and unemployment",
+            "shares": [
+              33,
+              36,
+              31
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              32,
+              44,
+              25
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              30,
+              38,
+              32
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              30,
+              39,
+              31
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              30,
+              37,
+              33
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              29,
+              34,
+              37
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              29,
+              33,
+              39
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              26,
+              35,
+              39
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              26,
+              39,
+              35
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              39,
+              37
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-06",
+        "fieldworkStart": "2024-06-14",
+        "fieldworkEnd": "2024-06-16",
+        "fieldworkText": "14-16 June 2024",
+        "sample": 1060,
+        "marginOfError": 3.3,
+        "title": "Post-Budget, Labor declines significantly on COL, environment and unions/strikes",
+        "printedLabel": "Figure 5: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,060; Fieldwork 14-16 June 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-06",
+          "chartId": "l5lbz",
+          "datasetUrl": "https://datawrapper.dwcdn.net/l5lbz/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/l5lbz/1/",
+          "datasetCache": "l5lbz.dataset.csv",
+          "chartCache": "l5lbz.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              38,
+              34,
+              28
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              36,
+              34,
+              30
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              34,
+              35,
+              31
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              33,
+              36,
+              31
+            ]
+          },
+          {
+            "issue": "Job security and unemployment",
+            "shares": [
+              33,
+              33,
+              34
+            ]
+          },
+          {
+            "issue": "The environment & climate change",
+            "shares": [
+              31,
+              43,
+              26
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              30,
+              41,
+              29
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              29,
+              39,
+              32
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              28,
+              39,
+              33
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              27,
+              37,
+              36
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              27,
+              35,
+              38
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              26,
+              34,
+              40
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              25,
+              34,
+              42
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              24,
+              39,
+              37
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              36,
+              40
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-07",
+        "fieldworkStart": "2024-07-19",
+        "fieldworkEnd": "2024-07-21",
+        "fieldworkText": "19-21 July 2024",
+        "sample": 1003,
+        "marginOfError": 3.1,
+        "title": "Coalition has significant leads on key issues like cost of living and the economy",
+        "printedLabel": "Figure 5: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,003; Fieldwork 19-21 July 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-07",
+          "chartId": "ATB3r",
+          "datasetUrl": "https://datawrapper.dwcdn.net/ATB3r/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/ATB3r/1/",
+          "datasetCache": "ATB3r.dataset.csv",
+          "chartCache": "ATB3r.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              40,
+              33,
+              27
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              36,
+              34,
+              31
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              36,
+              35,
+              30
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              35,
+              33,
+              32
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              32,
+              44,
+              24
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              31,
+              35,
+              34
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              29,
+              40,
+              30
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              29,
+              39,
+              31
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              29,
+              38,
+              34
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              27,
+              37,
+              37
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              27,
+              32,
+              41
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              26,
+              35,
+              39
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              25,
+              33,
+              41
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              25,
+              38,
+              37
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              23,
+              38,
+              38
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-08",
+        "fieldworkStart": "2024-08-16",
+        "fieldworkEnd": "2024-08-18",
+        "fieldworkText": "16-18 August 2024",
+        "sample": 1061,
+        "marginOfError": 3.1,
+        "title": "Coalition has increased its lead on key strengths, and Labor has gained slightly on the cost of living",
+        "printedLabel": "Figure 5: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,061; Fieldwork 16-18 August 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-08",
+          "chartId": "PWs3v",
+          "datasetUrl": "https://datawrapper.dwcdn.net/PWs3v/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/PWs3v/1/",
+          "datasetCache": "PWs3v.dataset.csv",
+          "chartCache": "PWs3v.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              40,
+              33,
+              27
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              36,
+              34,
+              30
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              35,
+              34,
+              31
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              35,
+              41,
+              24
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              34,
+              35,
+              31
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              31,
+              40,
+              29
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              30,
+              35,
+              35
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              30,
+              36,
+              34
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              29,
+              38,
+              33
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              28,
+              37,
+              35
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              26,
+              34,
+              40
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              26,
+              35,
+              39
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              24,
+              32,
+              44
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              35,
+              41
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              22,
+              40,
+              38
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-09",
+        "fieldworkStart": "2024-09-13",
+        "fieldworkEnd": "2024-09-15",
+        "fieldworkText": "13-15 September 2024",
+        "sample": 1057,
+        "marginOfError": 3.1,
+        "title": "Coalition has increased its lead on key strengths, including cost of living",
+        "printedLabel": "Figure 6: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,057; Fieldwork 13-15 September 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-09",
+          "chartId": "xaKtG",
+          "datasetUrl": "https://datawrapper.dwcdn.net/xaKtG/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/xaKtG/1/",
+          "datasetCache": "xaKtG.dataset.csv",
+          "chartCache": "xaKtG.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              39,
+              32,
+              29
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              34,
+              34,
+              32
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              34,
+              36,
+              30
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              33,
+              35,
+              32
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              31,
+              33,
+              36
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              30,
+              47,
+              23
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              28,
+              41,
+              30
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              28,
+              41,
+              31
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              26,
+              42,
+              32
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              25,
+              34,
+              41
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              25,
+              35,
+              40
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              24,
+              37,
+              39
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              24,
+              38,
+              38
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              24,
+              38,
+              38
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              23,
+              35,
+              42
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-10",
+        "fieldworkStart": "2024-10-18",
+        "fieldworkEnd": "2024-10-20",
+        "fieldworkText": "18-20 October 2024",
+        "sample": 1034,
+        "marginOfError": 3.1,
+        "title": "The Coalition has increased its lead over Labor on crime and immigration.",
+        "printedLabel": "Figure 6: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,034; Fieldwork 18-20 October 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-10",
+          "chartId": "7GwBO",
+          "datasetUrl": "https://datawrapper.dwcdn.net/7GwBO/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/7GwBO/2/",
+          "datasetCache": "7GwBO.dataset.csv",
+          "chartCache": "7GwBO.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              39,
+              32,
+              29
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              36,
+              32,
+              32
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              36,
+              32,
+              32
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              35,
+              33,
+              33
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              33,
+              40,
+              27
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              31,
+              32,
+              37
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              30,
+              34,
+              36
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              30,
+              39,
+              31
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              27,
+              38,
+              35
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              27,
+              30,
+              43
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              26,
+              34,
+              40
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              25,
+              36,
+              39
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              25,
+              30,
+              45
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              33,
+              43
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              23,
+              35,
+              42
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-11",
+        "fieldworkStart": "2024-11-15",
+        "fieldworkEnd": "2024-11-17",
+        "fieldworkText": "15-17 November 2024",
+        "sample": 1046,
+        "marginOfError": 3.1,
+        "title": "The Coalition leads Labor as best to respond on four of the top five concerns of Australian voters.",
+        "printedLabel": "Figure 6: Management of Voter Priorities.",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,046; Fieldwork 15-17 November 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-11",
+          "chartId": "vc831",
+          "datasetUrl": "https://datawrapper.dwcdn.net/vc831/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/vc831/1/",
+          "datasetCache": "vc831.dataset.csv",
+          "chartCache": "vc831.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              37,
+              33,
+              30
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              36,
+              30,
+              34
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              35,
+              31,
+              34
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              34,
+              32,
+              34
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              32,
+              33,
+              35
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              30,
+              45,
+              25
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              29,
+              35,
+              36
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              28,
+              40,
+              32
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              28,
+              36,
+              36
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              27,
+              34,
+              39
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              26,
+              31,
+              43
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              26,
+              33,
+              41
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              25,
+              32,
+              43
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              33,
+              43
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              24,
+              34,
+              42
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2024-12",
+        "fieldworkStart": "2024-12-13",
+        "fieldworkEnd": "2024-12-15",
+        "fieldworkText": "13-15 December 2024",
+        "sample": 1051,
+        "marginOfError": 3.1,
+        "title": "The Coalition leads Labor as best to respond on three of the top five concerns of Australian voters.",
+        "printedLabel": "Figure 7: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,051; Fieldwork 13-15 December 2024. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2024-12",
+          "chartId": "Ase3I",
+          "datasetUrl": "https://datawrapper.dwcdn.net/Ase3I/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/Ase3I/1/",
+          "datasetCache": "Ase3I.dataset.csv",
+          "chartCache": "Ase3I.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              40,
+              32,
+              28
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              37,
+              33,
+              30
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              37,
+              30,
+              32
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              36,
+              31,
+              32
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              32,
+              43,
+              25
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              31,
+              33,
+              36
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              30,
+              36,
+              34
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              29,
+              38,
+              33
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              28,
+              38,
+              34
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              27,
+              36,
+              37
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              27,
+              33,
+              40
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              27,
+              32,
+              41
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              26,
+              32,
+              42
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              24,
+              36,
+              40
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              24,
+              37,
+              39
+            ]
+          }
+        ]
+      },
+      {
+        "measure": "issue-management-three-response",
+        "month": "2025-01",
+        "fieldworkStart": "2025-01-17",
+        "fieldworkEnd": "2025-01-19",
+        "fieldworkText": "17-19 January 2025",
+        "sample": 1063,
+        "marginOfError": 3.1,
+        "title": "The Coalition leads Labor as best to respond on three of the top five concerns of Australian voters.",
+        "printedLabel": "Figure 7: Management of Voter Priorities",
+        "questionStem": null,
+        "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+        "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,063; Fieldwork 17-19 January 2025. Margin of Error +/- 3.1%. Figures may not sum to 100% due to rounding.",
+        "source": {
+          "month": "2025-01",
+          "chartId": "zexaY",
+          "datasetUrl": "https://datawrapper.dwcdn.net/zexaY/1/dataset.csv",
+          "chartUrl": "https://datawrapper.dwcdn.net/zexaY/2/",
+          "datasetCache": "zexaY.dataset.csv",
+          "chartCache": "zexaY.chart.html"
+        },
+        "coverage": "full-three-response-15-issue-management-table",
+        "sourceHeaders": [
+          "Row %",
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "responseOptions": [
+          "Albanese-led Labor government",
+          "Neither / Unsure",
+          "Dutton-led Coalition government"
+        ],
+        "rows": [
+          {
+            "issue": "Welfare & benefits",
+            "shares": [
+              42,
+              31,
+              27
+            ]
+          },
+          {
+            "issue": "Health & social care",
+            "shares": [
+              37,
+              33,
+              30
+            ]
+          },
+          {
+            "issue": "Family & community",
+            "shares": [
+              36,
+              33,
+              31
+            ]
+          },
+          {
+            "issue": "Education & training",
+            "shares": [
+              35,
+              33,
+              32
+            ]
+          },
+          {
+            "issue": "Job security & unemployment",
+            "shares": [
+              33,
+              33,
+              34
+            ]
+          },
+          {
+            "issue": "The environment",
+            "shares": [
+              32,
+              43,
+              25
+            ]
+          },
+          {
+            "issue": "Roads & transport",
+            "shares": [
+              30,
+              36,
+              34
+            ]
+          },
+          {
+            "issue": "Housing & accommodation",
+            "shares": [
+              30,
+              39,
+              31
+            ]
+          },
+          {
+            "issue": "Strikes & union-led industrial action",
+            "shares": [
+              29,
+              41,
+              30
+            ]
+          },
+          {
+            "issue": "The cost & standard of living",
+            "shares": [
+              26,
+              37,
+              37
+            ]
+          },
+          {
+            "issue": "Managing the economy",
+            "shares": [
+              26,
+              32,
+              42
+            ]
+          },
+          {
+            "issue": "Defence & national security",
+            "shares": [
+              26,
+              31,
+              43
+            ]
+          },
+          {
+            "issue": "Tax & government spending",
+            "shares": [
+              25,
+              35,
+              40
+            ]
+          },
+          {
+            "issue": "Immigration & asylum",
+            "shares": [
+              25,
+              35,
+              40
+            ]
+          },
+          {
+            "issue": "Crime & social order",
+            "shares": [
+              23,
+              38,
+              39
+            ]
+          }
+        ]
+      }
+    ],
+    "coverage": [
+      {
+        "month": "2022-12",
+        "status": "imported",
+        "chartId": null,
+        "printedRows": 14,
+        "coverage": "full-three-responses-for-14-printed-issues-later-15th-job-row-absent",
+        "note": "14 printed issues: Job security & unemployment is not printed in the December 2022 PNG and remains missing, not zero"
+      },
+      {
+        "month": "2023-05",
+        "status": "missing-skipped-battery",
+        "chartId": null,
+        "printedRows": null,
+        "coverage": "missing-not-zero",
+        "note": "Management battery wave left missing exactly as requested for 2023-05; no cell was set to zero and no net-lead supplement was promoted into a full table"
+      },
+      {
+        "month": "2023-09",
+        "status": "missing-skipped-battery",
+        "chartId": null,
+        "printedRows": null,
+        "coverage": "missing-not-zero",
+        "note": "Management battery wave left missing exactly as requested for 2023-09; no cell was set to zero and no net-lead supplement was promoted into a full table"
+      },
+      {
+        "month": "2024-03",
+        "status": "imported",
+        "chartId": "VkN0B",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-04",
+        "status": "imported",
+        "chartId": "bn29c",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-05",
+        "status": "imported",
+        "chartId": "0BAz2",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-06",
+        "status": "imported",
+        "chartId": "l5lbz",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-07",
+        "status": "imported",
+        "chartId": "ATB3r",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-08",
+        "status": "imported",
+        "chartId": "PWs3v",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-09",
+        "status": "imported",
+        "chartId": "xaKtG",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-10",
+        "status": "imported",
+        "chartId": "7GwBO",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-11",
+        "status": "imported",
+        "chartId": "vc831",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2024-12",
+        "status": "imported",
+        "chartId": "Ase3I",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2025-01",
+        "status": "imported",
+        "chartId": "zexaY",
+        "printedRows": 15,
+        "coverage": "full-three-response-15-issue-management-table"
+      },
+      {
+        "month": "2025-02",
+        "status": "missing-skipped-battery",
+        "chartId": null,
+        "printedRows": null,
+        "coverage": "missing-not-zero",
+        "note": "Management battery wave left missing exactly as requested for 2025-02; no cell was set to zero and no net-lead supplement was promoted into a full table"
+      }
+    ]
+  },
+  "netLeadSupplements": [
+    {
+      "measure": "labor-net-lead-supplement",
+      "month": "2024-02",
+      "fieldworkStart": "2024-02-16",
+      "fieldworkEnd": "2024-02-18",
+      "fieldworkText": "16 – 18 February 2024",
+      "sample": 1049,
+      "marginOfError": 3.3,
+      "title": "Labor has lost ground on several key areas of political management.",
+      "printedLabel": "Figure 3: Labor Lead on Management of Voter Priorities Trend",
+      "questionStem": null,
+      "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+      "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,049; Fieldwork 16 – 18 February 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+      "source": {
+        "month": "2024-02",
+        "chartId": "ePE81",
+        "datasetUrl": "https://datawrapper.dwcdn.net/ePE81/1/dataset.csv",
+        "chartUrl": "https://datawrapper.dwcdn.net/ePE81/7/",
+        "datasetCache": "ePE81.dataset.csv",
+        "chartCache": "ePE81.chart.html"
+      },
+      "coverage": "supplement-four-issue-net-lead-trend-not-full-three-response-management",
+      "supplement": true,
+      "valueMeaning": "Labor lead over the Coalition in percentage points, as printed; not a three-response share and never substituted for one",
+      "sourceHeaders": [
+        "Net",
+        "Managing the economy",
+        "Cost & standard of living",
+        "Immigration & asylum",
+        "Crime & social order"
+      ],
+      "issues": [
+        "Managing the economy",
+        "Cost & standard of living",
+        "Immigration & asylum",
+        "Crime & social order"
+      ],
+      "rows": [
+        {
+          "printedPeriod": "Feb-24",
+          "month": "2024-02",
+          "netLeads": [
+            -9,
+            -6,
+            -13,
+            -12
+          ]
+        },
+        {
+          "printedPeriod": "Dec-23",
+          "month": "2023-12",
+          "netLeads": [
+            -11,
+            -5,
+            -13,
+            -11
+          ]
+        },
+        {
+          "printedPeriod": "Sep-23",
+          "month": "2023-09",
+          "netLeads": [
+            -9,
+            -2,
+            -5,
+            -9
+          ]
+        },
+        {
+          "printedPeriod": "May-23",
+          "month": "2023-05",
+          "netLeads": [
+            -4,
+            2,
+            -6,
+            -6
+          ]
+        },
+        {
+          "printedPeriod": "Dec-22",
+          "month": "2022-12",
+          "netLeads": [
+            1,
+            13,
+            4,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "measure": "labor-net-lead-supplement",
+      "month": "2024-03",
+      "fieldworkStart": "2024-03-08",
+      "fieldworkEnd": "2024-03-10",
+      "fieldworkText": "08 – 10 March 2024",
+      "sample": 1051,
+      "marginOfError": 3.3,
+      "title": "Labor has stopped losing ground on several areas of issue management.",
+      "printedLabel": "Figure 8: Labor Leads on Management of Voter Priorities Trend",
+      "questionStem": null,
+      "questionStemStatus": "not-present-in-tabular-or-chart-download-not-inferred",
+      "sourceNotes": "AFR / Freshwater Strategy Poll; Australian Voters; Sample size n=1,051; Fieldwork 08 – 10 March 2024. Margin of Error +/- 3.3%. Figures may not sum to 100% due to rounding.",
+      "source": {
+        "month": "2024-03",
+        "chartId": "aTbi4",
+        "datasetUrl": "https://datawrapper.dwcdn.net/aTbi4/1/dataset.csv",
+        "chartUrl": "https://datawrapper.dwcdn.net/aTbi4/1/",
+        "datasetCache": "aTbi4.dataset.csv",
+        "chartCache": "aTbi4.chart.html"
+      },
+      "coverage": "supplement-four-issue-net-lead-trend-not-full-three-response-management",
+      "supplement": true,
+      "valueMeaning": "Labor lead over the Coalition in percentage points, as printed; not a three-response share and never substituted for one",
+      "sourceHeaders": [
+        "Net",
+        "Managing the economy",
+        "Cost & standard of living",
+        "Immigration & asylum",
+        "Crime & social order"
+      ],
+      "issues": [
+        "Managing the economy",
+        "Cost & standard of living",
+        "Immigration & asylum",
+        "Crime & social order"
+      ],
+      "rows": [
+        {
+          "printedPeriod": "Mar-24",
+          "month": "2024-03",
+          "netLeads": [
+            -10,
+            -3,
+            -11,
+            -11
+          ]
+        },
+        {
+          "printedPeriod": "Feb-24",
+          "month": "2024-02",
+          "netLeads": [
+            -9,
+            -6,
+            -13,
+            -12
+          ]
+        },
+        {
+          "printedPeriod": "Dec-23",
+          "month": "2023-12",
+          "netLeads": [
+            -11,
+            -5,
+            -13,
+            -11
+          ]
+        },
+        {
+          "printedPeriod": "Sep-23",
+          "month": "2023-09",
+          "netLeads": [
+            -9,
+            -2,
+            -5,
+            -9
+          ]
+        },
+        {
+          "printedPeriod": "May-23",
+          "month": "2023-05",
+          "netLeads": [
+            -4,
+            2,
+            -6,
+            -6
+          ]
+        },
+        {
+          "printedPeriod": "Dec-22",
+          "month": "2022-12",
+          "netLeads": [
+            1,
+            13,
+            4,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "importanceWaves": 9,
+    "importanceRows": 144,
+    "importanceCells": 144,
+    "managementWaves": 12,
+    "managementRows": 179,
+    "managementResponseCells": 537,
+    "netLeadSupplementCharts": 2,
+    "netLeadPeriodRows": 11,
+    "netLeadCells": 44,
+    "netLeadDistinctMonths": 6,
+    "missingBatteryMarkersPerMeasure": 3
+  }
+}

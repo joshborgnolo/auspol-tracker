@@ -1,0 +1,189 @@
+{
+  "heading": "Top 10 voter Issues of Most Importance June Quarter 2022, to September Quarter 2024 (change since the 2022 Federal Election)",
+  "population": "Australians Electors 18+",
+  "scope": "Australia",
+  "waves": [
+    {
+      "period": {
+        "label": "June Quarter 2022",
+        "id": "2022-Q2",
+        "basis": "quarter",
+        "startMonth": "2022-04",
+        "endMonth": "2022-06",
+        "sample": 14522
+      },
+      "sample": 14522,
+      "issues": [
+        {
+          "label": "Keeping day to day living costs down",
+          "share": 50
+        },
+        {
+          "label": "Improving health services and hospitals",
+          "share": 33
+        },
+        {
+          "label": "Reducing crime and maintaining law and order",
+          "share": 13
+        },
+        {
+          "label": "Global warming and climate change",
+          "share": 32
+        },
+        {
+          "label": "Managing the economy",
+          "share": 20
+        },
+        {
+          "label": "Keeping interest rates down",
+          "share": 11
+        },
+        {
+          "label": "Open and honest government",
+          "share": 25
+        },
+        {
+          "label": "Reducing the taxes you and your family pay",
+          "share": 15
+        },
+        {
+          "label": "Improving education",
+          "share": 13
+        },
+        {
+          "label": "Managing immigration and population growth",
+          "share": 6
+        }
+      ]
+    },
+    {
+      "period": {
+        "label": "September Quarter 2024",
+        "id": "2024-Q3",
+        "basis": "quarter",
+        "startMonth": "2024-07",
+        "endMonth": "2024-09",
+        "sample": 14713
+      },
+      "sample": 14713,
+      "issues": [
+        {
+          "label": "Keeping day to day living costs down",
+          "share": 57
+        },
+        {
+          "label": "Improving health services and hospitals",
+          "share": 31
+        },
+        {
+          "label": "Reducing crime and maintaining law and order",
+          "share": 23
+        },
+        {
+          "label": "Global warming and climate change",
+          "share": 23
+        },
+        {
+          "label": "Managing the economy",
+          "share": 22
+        },
+        {
+          "label": "Keeping interest rates down",
+          "share": 19
+        },
+        {
+          "label": "Open and honest government",
+          "share": 19
+        },
+        {
+          "label": "Reducing the taxes you and your family pay",
+          "share": 15
+        },
+        {
+          "label": "Improving education",
+          "share": 14
+        },
+        {
+          "label": "Managing immigration and population growth",
+          "share": 14
+        }
+      ]
+    }
+  ],
+  "changes": {
+    "from": "2022-Q2",
+    "to": "2024-Q3",
+    "issues": [
+      {
+        "label": "Keeping day to day living costs down",
+        "direction": "up",
+        "points": 7,
+        "signedPoints": 7,
+        "printed": "up 7%"
+      },
+      {
+        "label": "Improving health services and hospitals",
+        "direction": "down",
+        "points": 2,
+        "signedPoints": -2,
+        "printed": "down 2%"
+      },
+      {
+        "label": "Reducing crime and maintaining law and order",
+        "direction": "up",
+        "points": 10,
+        "signedPoints": 10,
+        "printed": "up 10%"
+      },
+      {
+        "label": "Global warming and climate change",
+        "direction": "down",
+        "points": 9,
+        "signedPoints": -9,
+        "printed": "down 9%"
+      },
+      {
+        "label": "Managing the economy",
+        "direction": "up",
+        "points": 2,
+        "signedPoints": 2,
+        "printed": "up 2%"
+      },
+      {
+        "label": "Keeping interest rates down",
+        "direction": "up",
+        "points": 8,
+        "signedPoints": 8,
+        "printed": "up 8%"
+      },
+      {
+        "label": "Open and honest government",
+        "direction": "down",
+        "points": 6,
+        "signedPoints": -6,
+        "printed": "down 6%"
+      },
+      {
+        "label": "Reducing the taxes you and your family pay",
+        "direction": "steady",
+        "points": 0,
+        "signedPoints": 0,
+        "printed": "-"
+      },
+      {
+        "label": "Improving education",
+        "direction": "up",
+        "points": 1,
+        "signedPoints": 1,
+        "printed": "up 1%"
+      },
+      {
+        "label": "Managing immigration and population growth",
+        "direction": "up",
+        "points": 8,
+        "signedPoints": 8,
+        "printed": "up 8%"
+      }
+    ]
+  }
+}

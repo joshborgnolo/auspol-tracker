@@ -1,0 +1,687 @@
+{
+  "sources": [
+    {
+      "id": "national-2013-08",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/top_issues_august13_national.pdf",
+      "text": "national-2013-08.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2013-09",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-National-Victoria-September-2013.pdf",
+      "text": "national-2013-09.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2013-12",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/top_issues_dec13_national-vic1.pdf",
+      "text": "national-2013-12.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2014-03",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/top_issues_mar14_National.pdf",
+      "text": "national-2014-03.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2014-06",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2014-National1.pdf",
+      "text": "national-2014-06.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2014-09",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-July-to-September-2014-National.pdf",
+      "text": "national-2014-09.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2014-12",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-October-to-December-2014-National.pdf",
+      "text": "national-2014-12.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2015-03",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-January-to-March-2015-National.pdf",
+      "text": "national-2015-03.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2015-06",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2015-National.pdf",
+      "text": "national-2015-06.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2015-09",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-July-to-September-2015-National.pdf",
+      "text": "national-2015-09.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2016",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202016.pdf",
+      "text": "national-2016.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2017",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202017.pdf",
+      "text": "national-2017.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2018",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202018.pdf",
+      "text": "national-2018.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2019",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202019.pdf",
+      "text": "national-2019.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2020",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202020.pdf",
+      "text": "national-2020.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2021",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202021.pdf",
+      "text": "national-2021.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2022",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202022.pdf",
+      "text": "national-2022.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2023",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202023.pdf",
+      "text": "national-2023.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-2024",
+      "kind": "national",
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-02/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202024.pdf",
+      "text": "national-2024.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "national-commentaries",
+      "kind": "commentary",
+      "url": "https://www.ipsos.com/sites/default/files/Ipsos%20Issues%20Monitor%20-%20Archived%20Commentaries_2.pdf",
+      "text": "national-commentaries.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-08c0f11c",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-05/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20April%202023_0.pdf",
+      "linkText": "20230511 Issues Monitor April 2023",
+      "text": "statement-08c0f11c.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-121656fa",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-11/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20October%202023.pdf",
+      "linkText": "20231109 Issues Monitor October 2023",
+      "text": "statement-121656fa.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-1e417356",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-08/Ipsos%20Issues%20Monitor_State%20Reports%20Q2%202021.pdf",
+      "linkText": "Ipsos Issues Monitor_State Reports Q2 2021",
+      "text": "statement-1e417356.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-1e6dac44",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-02/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20January%202023.pdf",
+      "linkText": "20230209 Issues Monitor National_January 2023",
+      "text": "statement-1e6dac44.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-1e73b4f2",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-01/20220125-%20Issues%20Monitor%20National%20January%202022.pdf",
+      "linkText": "20220125 Issues Monitor_National January 2022",
+      "text": "statement-1e73b4f2.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-1f42c683",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-09/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20August%202022.pdf",
+      "linkText": "20220831 Issues Monitor_National August 2022",
+      "text": "statement-1f42c683.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-2aa3ec0d",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-10/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q3%202022.pdf",
+      "linkText": "20221003 Issues Monitor_State Reports Q3 2022",
+      "text": "statement-2aa3ec0d.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-3a60b2c2",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-11/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20October%202021.pdf",
+      "linkText": "20211029 Issues Monitor_National October 2021",
+      "text": "statement-3a60b2c2.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-4a9ca0cb",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-10/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20September%202023.pdf",
+      "linkText": "20230905 Issues Monitor_State_Reports_Q3_2023",
+      "text": "statement-4a9ca0cb.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-5acb3b0a",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-01/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20December%202021.pdf",
+      "linkText": "20211217 Issues Monitor_National December 2021",
+      "text": "statement-5acb3b0a.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-5cd16293",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-09/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20September%202021.pdf",
+      "linkText": "20210923 Issues Monitor_National September 2021",
+      "text": "statement-5cd16293.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-6837265a",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-04/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20April%202022_0.pdf",
+      "linkText": "20220426 Issues Monitor_National April 2022",
+      "text": "statement-6837265a.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-6db7976f",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-03/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q1%202022.pdf",
+      "linkText": "20220328 Issues Monitor_National Q1 2022",
+      "text": "statement-6db7976f.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-74985e53",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-07/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q2%202022_0.pdf",
+      "linkText": "20220706 World Refugee Day GA Survey APC Methodology Disclosure Statement",
+      "text": "statement-74985e53.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-771fe466",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-09/20210928%20%20Issues%20Monitor%20Q3%202021.pdf",
+      "linkText": "Ipsos Issues Monitor_State Reports Q3 2021",
+      "text": "statement-771fe466.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-7f657049",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-05/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20May%202022.pdf",
+      "linkText": "20220517 Issues Monitor_National May 2022",
+      "text": "statement-7f657049.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-81244bdf",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-02/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20February%202022.pdf",
+      "linkText": "20220228 Issues Monitor_National February 2022",
+      "text": "statement-81244bdf.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-8c677d3b",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-08/20210611%20%20Ipsos%20Issues%20Monitor_National%20July%202021_0.pdf",
+      "linkText": "20210711 Ipsos Issues Monitor_National July 2021",
+      "text": "statement-8c677d3b.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-99bf9802",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-12/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20November%202022_0.pdf",
+      "linkText": "20221201 Issues Monitor_November Report",
+      "text": "statement-99bf9802.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-a8db5711",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-07/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q2%202023.pdf",
+      "linkText": "20230706 Issues Monitor_State Reports Q2 2023",
+      "text": "statement-a8db5711.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-ab3bd70c",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-12/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q4%202022_0.pdf",
+      "linkText": "20221220 Issues Monitor_State Reports Q4 2022",
+      "text": "statement-ab3bd70c.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-ad52d45e",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-10/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20October%202022.pdf",
+      "linkText": "20221031 Issues Monitor_National October 2022",
+      "text": "statement-ad52d45e.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-ad566b14",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-12/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20December%202022.pdf",
+      "linkText": "20221220 Issues Monitor National_December 2022",
+      "text": "statement-ad566b14.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-b578613f",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-07/20210611%20%E2%80%93%20Ipsos%20Issues%20Monitor_National%20June%202021.pdf",
+      "linkText": "20210611 - Ipsos Issues Monitor_National June 2021",
+      "text": "statement-b578613f.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-b7eb8eb1",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-12/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20November%202021%20%28002%29.pdf",
+      "linkText": "20211118 Issues Monitor_National November 2021",
+      "text": "statement-b7eb8eb1.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-bde70dd5",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2021-08/20210823%20Issues%20Monitor_National%20August%202021.pdf",
+      "linkText": "20210823 Issues Monitor_National August 2021",
+      "text": "statement-bde70dd5.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-c1d1c5e0",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-06/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20May%202023.pdf",
+      "linkText": "20230618 Issues Monitor May 2023",
+      "text": "statement-c1d1c5e0.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-c90c9215",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-04/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q1%202023.pdf",
+      "linkText": "20231417 Issues Monitor_State Reports Q1 2023",
+      "text": "statement-c90c9215.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-ca3f1214",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2024-01/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20December%202023.pdf",
+      "linkText": "20240115 Issues Monitor December 2023",
+      "text": "statement-ca3f1214.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-cb16e5d4",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-01/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q4%202021.pdf",
+      "linkText": "Ipsos Issues Monitor_State Reports Q4 2021",
+      "text": "statement-cb16e5d4.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-cfd49366",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202023.pdf",
+      "linkText": "20230829 Issues Monitor_July 2023",
+      "text": "statement-cfd49366.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-d3d88d76",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2022-07/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202022.pdf",
+      "linkText": "20220722 Issues Monitor_National July 2022",
+      "text": "statement-d3d88d76.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-e34fb04a",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-04/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20March%202023_0.pdf",
+      "linkText": "20231417 Issues Monitor March 2023",
+      "text": "statement-e34fb04a.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-ee8345d5",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-07/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20June%202023.pdf",
+      "linkText": "20230706 Issues Monitor June 2023",
+      "text": "statement-ee8345d5.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "statement-fd869ec2",
+      "kind": "statement",
+      "url": "https://www.ipsos.com/sites/default/files/2023-08/20230831%20APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20August%202023.pdf",
+      "linkText": "20230831 Issues Monitor August 2023",
+      "text": "statement-fd869ec2.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2014-q1-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-January-to-March-2014-New-South-Wales.pdf",
+      "text": "states-2014-q1-nsw.txt",
+      "sha256": "93f96949c3919c0f1afee16a816911842223ad163de29860066705a7466fbcff",
+      "storedAt": "2026-11-23T10:28:04.557Z"
+    },
+    {
+      "id": "states-2014-q1-queensland",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-January-to-March-2014-Queensland.pdf",
+      "text": "states-2014-q1-queensland.txt",
+      "sha256": "5e538bc4236ca7a247c8c745911882157aa5d8fcd6f318259fac28c998329168",
+      "storedAt": "2026-11-23T10:28:05.197Z"
+    },
+    {
+      "id": "states-2014-q1-victoria",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/top_issues_mar14_National_Vic.pdf",
+      "text": "states-2014-q1-victoria.txt",
+      "sha256": "26437159a1374f52aae3e54985a95a376e7ba2cd91621630eb8e7f749d0482c6",
+      "storedAt": "2026-11-23T10:28:04.987Z"
+    },
+    {
+      "id": "states-2014-q1-wa",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-January-to-March-2014-Western-Australia.pdf",
+      "text": "states-2014-q1-wa.txt",
+      "sha256": "0adb1085c382037f4dd59e91e07454b63d4bdc70c287b5e7df3f5837f3dd7733",
+      "storedAt": "2026-11-23T10:28:05.322Z"
+    },
+    {
+      "id": "states-2014-q2-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2014-New-South-Wales.pdf",
+      "text": "states-2014-q2-nsw.txt",
+      "sha256": "cc2f76dcc83e81de55c87b7fd9ae6f5ea5886947c120c92c8ad753e23142dd2e",
+      "storedAt": "2026-11-23T10:28:05.467Z"
+    },
+    {
+      "id": "states-2014-q2-queensland",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2014-Queensland.pdf",
+      "text": "states-2014-q2-queensland.txt",
+      "sha256": "d27c5bb0d91345d8fb540057f866328236d4a4eb01a732f1a3d63ad7c722eab6",
+      "storedAt": "2026-11-23T10:28:05.707Z"
+    },
+    {
+      "id": "states-2014-q3-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-July-to-September-2014-New-South-Wales.pdf",
+      "text": "states-2014-q3-nsw.txt",
+      "sha256": "a39455a8a92c1eeb47fa710f045221dc7c52f00af4f2ec7b61c3555163877cec",
+      "storedAt": "2026-11-23T10:28:05.850Z"
+    },
+    {
+      "id": "states-2014-q3-victoria",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-July-to-September-2014-National-Victoria.pdf",
+      "text": "states-2014-q3-victoria.txt",
+      "sha256": "c312be371f52cbada096071f789f6e6793c2d45f69563af5b64f1a641ab0832a",
+      "storedAt": "2026-11-23T10:28:06.228Z"
+    },
+    {
+      "id": "states-2014-q4-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-October-to-December-2014-New-South-Wales.pdf",
+      "text": "states-2014-q4-nsw.txt",
+      "sha256": "b19ae56240356eb96c78ff1df3097269736f34a96818ff719ea5452b82282c60",
+      "storedAt": "2026-11-23T10:28:06.410Z"
+    },
+    {
+      "id": "states-2014-q4-victoria",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-October-to-December-2014-Victoria.pdf",
+      "text": "states-2014-q4-victoria.txt",
+      "sha256": "c0ce5234bb97c989fe80211b5d4905a61f2e82d7c2c251370ed06352b5b009c6",
+      "storedAt": "2026-11-23T10:28:06.642Z"
+    },
+    {
+      "id": "states-2015-q1-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-January-to-March-2015-New-South-Wales.pdf",
+      "text": "states-2015-q1-nsw.txt",
+      "sha256": "c6ff387388eba983d026e99a114e7e152093c37c5dbdfbc5dc0b8189ead1fce9",
+      "storedAt": "2026-11-23T10:28:06.818Z"
+    },
+    {
+      "id": "states-2015-q1-victoria",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-January-to-March-2015-National-Victoria.pdf",
+      "text": "states-2015-q1-victoria.txt",
+      "sha256": "7a8f03ed665df23e549925d783bb7b13d3e1cf0031096d13d1d78e2e8edcb1af",
+      "storedAt": "2026-11-23T10:28:07.219Z"
+    },
+    {
+      "id": "states-2015-q2-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2015-New-South-Wales.pdf",
+      "text": "states-2015-q2-nsw.txt",
+      "sha256": "d428ad9b0350b58922be8277decba558b7889dead22df49d1b6df52b31fec3a8",
+      "storedAt": "2026-11-23T10:28:07.408Z"
+    },
+    {
+      "id": "states-2015-q2-queensland",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2015-Queensland.pdf",
+      "text": "states-2015-q2-queensland.txt",
+      "sha256": "a51cbc05ea0559e88b6f29b8af40794b988bfbd84f8adcabaf16acec09f4352e",
+      "storedAt": "2026-11-23T10:28:07.911Z"
+    },
+    {
+      "id": "states-2015-q2-victoria",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-April-to-June-2015-Victoria.pdf",
+      "text": "states-2015-q2-victoria.txt",
+      "sha256": "434b0f3d635026077f4408a6efe4d9b34a9e1b6a5fe034bee5042f71e76b57c7",
+      "storedAt": "2026-11-23T10:28:07.740Z"
+    },
+    {
+      "id": "states-2015-q3-nsw",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-July-to-September-2015-New-South-Wales.pdf",
+      "text": "states-2015-q3-nsw.txt",
+      "sha256": "aef9b8ca0d7849596755952fbe613d56c10810d093b5fc670f3f93a93969f737",
+      "storedAt": "2026-11-23T10:28:08.099Z"
+    },
+    {
+      "id": "states-2015-q3-victoria",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2017-07/Ipsos-Issues-Monitor-July-to-September-2015-National-Victoria.pdf",
+      "text": "states-2015-q3-victoria.txt",
+      "sha256": "dbd7fd410eb8fa55db07fe3e734c8852351a36fc262c6218ad04ddf55c7b8207",
+      "storedAt": "2026-11-23T10:28:08.451Z"
+    },
+    {
+      "id": "states-2016",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202016.pdf",
+      "text": "states-2016.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2017",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202017.pdf",
+      "text": "states-2017.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2018",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202018.pdf",
+      "text": "states-2018.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2019",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202019.pdf",
+      "text": "states-2019.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2020",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202020.pdf",
+      "text": "states-2020.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2021",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202021.pdf",
+      "text": "states-2021.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2022",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202022.pdf",
+      "text": "states-2022.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2023",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/2024-03/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202023.pdf",
+      "text": "states-2023.txt",
+      "sha256": null,
+      "storedAt": null
+    },
+    {
+      "id": "states-2024",
+      "kind": "states",
+      "url": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-02/AU%20STATES%20IPSOS%20ISSUES%20MONITOR%20-%20QUARTERLY%20REPORTS%202024.pdf",
+      "text": "states-2024.txt",
+      "sha256": null,
+      "storedAt": null
+    }
+  ]
+}

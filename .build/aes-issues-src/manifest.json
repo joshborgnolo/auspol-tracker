@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 1,
+  "report": {
+    "publisher": "Australian Election Study",
+    "authors": [
+      "Sarah Cameron",
+      "Ian McAllister",
+      "Juliet Pietsch"
+    ],
+    "title": "Trends in Australian Political Opinion: Results from the Australian Election Study, 1987–2025",
+    "published": "2025-11",
+    "reportUrl": "https://australianelectionstudy.org/wp-content/uploads/Trends-in-Australian-Political-Opinion-1987-2025.pdf",
+    "aggregateProvider": "Holy Sheet",
+    "aggregateRoute": "https://holy-sheet.visualise.today/sheet/<sheetId>",
+    "nationalRowRule": "col1 === ''",
+    "responseCategoryRule": "col0",
+    "granularity": "Published national aggregate percentages; no respondent-level microdata"
+  },
+  "nationalRowRule": "col1 === '' (an explicit all-voters aggregate label, never a falsy-value filter)",
+  "responseCategoryRule": "col0",
+  "sources": [
+    {
+      "id": "3.1",
+      "role": "current-series",
+      "sheetId": "1FZbk2a9Acy2Xhp_0qF-UIpWRmHHuMidbBMf8xb3Ju_E",
+      "url": "https://holy-sheet.visualise.today/sheet/1FZbk2a9Acy2Xhp_0qF-UIpWRmHHuMidbBMf8xb3Ju_E",
+      "cacheFile": "3.1.json",
+      "sha256": "c04798c1ea848dd5fcdd1101843db5ca58e3203d22e977f391cd0261537523bc",
+      "bytes": 16586,
+      "aggregateRows": 86,
+      "nationalRows": 6,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.2",
+      "role": "current-series",
+      "sheetId": "1kqM-G7H6m_AM-CaV8ry35iYSn9993fMBWJM7XObZ9MY",
+      "url": "https://holy-sheet.visualise.today/sheet/1kqM-G7H6m_AM-CaV8ry35iYSn9993fMBWJM7XObZ9MY",
+      "cacheFile": "3.2.json",
+      "sha256": "235848fb281e891d989d1ca3e0263b1105eebd5daed23d6995275be6060c71e0",
+      "bytes": 16248,
+      "aggregateRows": 85,
+      "nationalRows": 5,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.3",
+      "role": "current-series",
+      "sheetId": "1ciiipu6Nqjx3_gEWzkSUdG_csVnBsyPOy7NoS-OYPW8",
+      "url": "https://holy-sheet.visualise.today/sheet/1ciiipu6Nqjx3_gEWzkSUdG_csVnBsyPOy7NoS-OYPW8",
+      "cacheFile": "3.3.json",
+      "sha256": "9ec356a86771cac92df139c5bff0e0f92e7be041ffe184160e28046ecc64f440",
+      "bytes": 5846,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.4",
+      "role": "current-series",
+      "sheetId": "1JVqAZTjiq6v3QXIqm0GR1GU9r7hxVE2I6o1eOKYuFFc",
+      "url": "https://holy-sheet.visualise.today/sheet/1JVqAZTjiq6v3QXIqm0GR1GU9r7hxVE2I6o1eOKYuFFc",
+      "cacheFile": "3.4.json",
+      "sha256": "73ed7753ebbc1ff821dab9355ad0583797dd22975e8da4080d7ca40a9a6ff8f8",
+      "bytes": 10032,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.5",
+      "role": "current-series",
+      "sheetId": "1WiZZqG2Unl69FZ9tTqTk_AHlx8UwNkcjH_iSlR-TDLw",
+      "url": "https://holy-sheet.visualise.today/sheet/1WiZZqG2Unl69FZ9tTqTk_AHlx8UwNkcjH_iSlR-TDLw",
+      "cacheFile": "3.5.json",
+      "sha256": "378560b7978b324b731c6b443a4bed54a704b2aa00db198b7f19eba5cb1b3b0a",
+      "bytes": 9418,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.6",
+      "role": "current-series",
+      "sheetId": "1GLpSNLS53frSsLWXnaYCNk6Cd2-G5BFuGCMv-56x4Ig",
+      "url": "https://holy-sheet.visualise.today/sheet/1GLpSNLS53frSsLWXnaYCNk6Cd2-G5BFuGCMv-56x4Ig",
+      "cacheFile": "3.6.json",
+      "sha256": "b1d05066153a0b791d72ca95d377b306aa6acba58a12bc261932e5dc00cbae09",
+      "bytes": 10007,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.7.2022",
+      "role": "superseded-edition",
+      "currentSeries": "3.7",
+      "edition": "2022",
+      "sheetId": "1fZFDcl1SFJwZLpaLxWXzZPFjIWwPy7uJHNXhXK9BXXE",
+      "url": "https://holy-sheet.visualise.today/sheet/1fZFDcl1SFJwZLpaLxWXzZPFjIWwPy7uJHNXhXK9BXXE",
+      "cacheFile": "3.7.2022.json",
+      "sha256": "ce78d571238d44c4c4156b0aeae0b467899cb082e7dd2274e167399f1c4dcb52",
+      "bytes": 9439,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.7",
+      "role": "current-series",
+      "sheetId": "1vh9O5wUBYCXt0iEp5YJoKOlPfgmgeQr4KWbbJ8ZbMbA",
+      "url": "https://holy-sheet.visualise.today/sheet/1vh9O5wUBYCXt0iEp5YJoKOlPfgmgeQr4KWbbJ8ZbMbA",
+      "cacheFile": "3.7.json",
+      "sha256": "b0cae7f00b59a04e9e64a5d46e44f9774cd7dc960850ea7ba5c3b2801d598b2c",
+      "bytes": 10035,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.8",
+      "role": "current-series",
+      "sheetId": "18Ck-rdZBLJ9JrFj9s2mG2fM6X5NcrGv34hvTUIor7GM",
+      "url": "https://holy-sheet.visualise.today/sheet/18Ck-rdZBLJ9JrFj9s2mG2fM6X5NcrGv34hvTUIor7GM",
+      "cacheFile": "3.8.json",
+      "sha256": "3e9e2c83d9a28a24ad2ca02ac0e524b1580b5fe9fc3296f5c2e152ed00b88abc",
+      "bytes": 6436,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.9",
+      "role": "current-series",
+      "sheetId": "1XRl69hGodTsKMuHuOkcWwBiCSVMVemcUjglmKeq7wVY",
+      "url": "https://holy-sheet.visualise.today/sheet/1XRl69hGodTsKMuHuOkcWwBiCSVMVemcUjglmKeq7wVY",
+      "cacheFile": "3.9.json",
+      "sha256": "b9112fae64b44677b4a4230f80c6d563afa752f89ed2c610349dac9b3a2aab07",
+      "bytes": 8222,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.10",
+      "role": "current-series",
+      "sheetId": "1Z0wkSeB-kFPIxtEq61wg4LCX4udMrZLbqYayG8tYXLA",
+      "url": "https://holy-sheet.visualise.today/sheet/1Z0wkSeB-kFPIxtEq61wg4LCX4udMrZLbqYayG8tYXLA",
+      "cacheFile": "3.10.json",
+      "sha256": "dc28ee0ebdce08644f16223246cf4996b2bcae80b97020597cab8024d3819cd2",
+      "bytes": 6510,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.11",
+      "role": "current-series",
+      "sheetId": "1c87W8xHXB5-tOh5ZlApev0VSgsnNc_yVzU9kHf9TkS8",
+      "url": "https://holy-sheet.visualise.today/sheet/1c87W8xHXB5-tOh5ZlApev0VSgsnNc_yVzU9kHf9TkS8",
+      "cacheFile": "3.11.json",
+      "sha256": "43fc34da23b83c27665a82f2625cabd4ce2f452c4901f7c0b1aeb114b351508d",
+      "bytes": 8166,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.12",
+      "role": "current-series",
+      "sheetId": "1EAOpfBivS_B24kB6DYF8sUdb4gZnktkSwI3_ZLcZRec",
+      "url": "https://holy-sheet.visualise.today/sheet/1EAOpfBivS_B24kB6DYF8sUdb4gZnktkSwI3_ZLcZRec",
+      "cacheFile": "3.12.json",
+      "sha256": "63b213c936ff7d5b2cbd17ef0c3d4f903e14a9a82c745faac33e96dcda6d646b",
+      "bytes": 16575,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.13",
+      "role": "current-series",
+      "sheetId": "1llDx2d7myBR_pnAxuB80pqH1Ys_EGzWsFJQPlnh6qMc",
+      "url": "https://holy-sheet.visualise.today/sheet/1llDx2d7myBR_pnAxuB80pqH1Ys_EGzWsFJQPlnh6qMc",
+      "cacheFile": "3.13.json",
+      "sha256": "62fe22160bd72e9c00b736d57f7d020d583822e2267d4879be3840c0182698a9",
+      "bytes": 15582,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.14",
+      "role": "current-series",
+      "sheetId": "1MHMXhl5qY4T4cO7XTdRp8L9W-t2Z2b4yHZ_59FF-nUw",
+      "url": "https://holy-sheet.visualise.today/sheet/1MHMXhl5qY4T4cO7XTdRp8L9W-t2Z2b4yHZ_59FF-nUw",
+      "cacheFile": "3.14.json",
+      "sha256": "3da48acad941777a7ea95acac2b2ee95e42d059c4ef89136b3c22ad9baaa855b",
+      "bytes": 16073,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.15",
+      "role": "current-series",
+      "sheetId": "1yiWEKZ1wQeJnSrcIqaIsinpN_Ub1kKPvFvG4iDyrheQ",
+      "url": "https://holy-sheet.visualise.today/sheet/1yiWEKZ1wQeJnSrcIqaIsinpN_Ub1kKPvFvG4iDyrheQ",
+      "cacheFile": "3.15.json",
+      "sha256": "d7ded2e18e164cfe4ba2d300d7e0fc6baa2931d7049d443c735a64798e5f4b2b",
+      "bytes": 16550,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.16",
+      "role": "current-series",
+      "sheetId": "1JqhIF85QinFw63ZVjlDKoRFIj2DN0KCjs3iJRS5Yk6o",
+      "url": "https://holy-sheet.visualise.today/sheet/1JqhIF85QinFw63ZVjlDKoRFIj2DN0KCjs3iJRS5Yk6o",
+      "cacheFile": "3.16.json",
+      "sha256": "ae8cd5741ee7b3c82ffdb06a855884f79961590a17023d1dc17b33396ee715bc",
+      "bytes": 9202,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.17",
+      "role": "current-series",
+      "sheetId": "1WadqzTUzORL95Q2n0U_vAC5Z7vvGf3o63lqGfMgq_2w",
+      "url": "https://holy-sheet.visualise.today/sheet/1WadqzTUzORL95Q2n0U_vAC5Z7vvGf3o63lqGfMgq_2w",
+      "cacheFile": "3.17.json",
+      "sha256": "b1727050c628f08e617743e0e8b436e9d31b784d2d5485b0badd4b8a487c77b6",
+      "bytes": 13017,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    },
+    {
+      "id": "3.18",
+      "role": "current-series",
+      "sheetId": "1mowRtF2Gjd1c_hcXsfG0_lQTspCaXhgHOMIIKIcKvfo",
+      "url": "https://holy-sheet.visualise.today/sheet/1mowRtF2Gjd1c_hcXsfG0_lQTspCaXhgHOMIIKIcKvfo",
+      "cacheFile": "3.18.json",
+      "sha256": "26f8b9154eb70046d4cb8595cd93f5d582b4b29d2423f10ca099c37500268714",
+      "bytes": 10092,
+      "aggregateRows": 51,
+      "nationalRows": 3,
+      "retrievedAt": "2026-11-23T11:32:39.747Z"
+    }
+  ],
+  "previousEditionChecks": [
+    {
+      "series": "3.7",
+      "previousEdition": "3.7.2022",
+      "role": "cross-check only; superseded rows never enter output",
+      "comparedCells": 36,
+      "matchingCells": 33,
+      "revisedCells": [
+        {
+          "option": "ALP",
+          "year": 2022,
+          "previous": 51.2,
+          "current": 42.4
+        },
+        {
+          "option": "Coalition",
+          "year": 2022,
+          "previous": 19.3,
+          "current": 16
+        },
+        {
+          "option": "No difference",
+          "year": 2022,
+          "previous": 29.5,
+          "current": 24.4
+        }
+      ]
+    }
+  ]
+}

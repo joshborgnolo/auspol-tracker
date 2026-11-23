@@ -1,0 +1,918 @@
+ANU-SRC Poll: Changing views of governance:
+Results from the ANUpoll, 2008 and 2014
+Professor Ian McAllister
+
+ANU College of Arts and Social Sciences
+
+Report No. 17
+
+August 2014
+
+
+
+Contents
+Confidence in institutions                                3
+
+Satisfaction with democracy                               6
+
+Federal-state relations                                   10
+
+Future prospects                                          12
+
+Poll questions                                            14
+
+
+
+
+About the survey
+The ANU Poll is conducted for The Australian National University (ANU) by the Social Research Centre,
+an ANU Enterprise business. The survey is a national random sample of the adult population aged 18
+years and over conducted by telephone. In this survey, 1,388 people were interviewed between 23 June
+and 9 July 2014, with a response rate of 63 per cent. The results have been weighted to represent the
+national population. The survey’s margin of error is ± 2.5 per cent.
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                              1
+Vice‐Chancellor’s message
+How the public views various aspects of governance is a key indicator of the health of any democracy.
+How these views may have shifted over time can also provide crucial information about the trajectory of
+change, as well as pointing towards areas that may require political reform.
+
+This ANUpoll on governance replicates the very first ANUpoll conducted in 2008. This period was a
+tumultuous one for Australia covering, among other things, the global financial crisis. How these events
+have affected ordinary Australians’ views of governance is therefore essential for understanding their
+long-term consequences for the political system.
+
+The general conclusion is that governance has fared well over the period. There is increased public
+confidence in our major institutions, and a notable finding is that younger people differ little from their
+older counterparts in their overall confidence.
+
+The key indicators of democratic health, satisfaction with democracy and political efficacy, show a decline
+from previous periods, but remain high by international standards. And while opinions about the future are
+more pessimistic than they were in 2008, younger people display a remarkably optimistic view of future
+Australian society.
+
+These survey findings show how the public’s views of our political system have changed. They also
+provide some insights, through the attitudes of the younger respondents, into how these views may shape
+our politics in future years.
+
+ANUpoll was designed to inform public and policy debate as well as to assist in scholarly research. It
+builds on The Australian National University’s long tradition of social survey research, which began in the
+1960s. Today, it fulfils the University’s mission of addressing topics of national importance.
+
+I hope the release of this poll’s findings contributes to a greater understanding of the nation’s attitudes
+towards the changing views of governance.
+
+Professor Ian Young AO
+Vice-Chancellor and President
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                         2
+Confidence in institutions
+
+Key points
+•     There is strong public confidence in the defence forces, the police and universities. Institutions
+      associated with politics attract much less public support.
+
+•     Over the past two decades, overall confidence in Australia’s major institutions has increased, most
+      notably for the police.
+
+•     Younger people have the same overall level of confidence compared to the rest of the population,
+      but there are differences for specific institutions, most notably the police and banks.
+
+
+Effective governance rests on strong and enduring public confidence in the major institutions of society.
+This ongoing public confidence provides the resilience that enables a society to deal with any crises or
+threats to democracy that may emerge.
+
+The Australian public has traditionally exhibited high levels of confidence in major institutions. When
+asked about their level of confidence in nine institutions, the ANUpoll found that four out of every 10
+respondents expressed “a great deal” of confidence in the defences forces and almost one in three “a
+great deal” confidence in the police.
+
+At the other end of the scale, less confidence emerged among the survey respondents for the federal
+parliament and trade unions. Just six per cent had “a great deal” of confidence in the parliament and trade
+unions. The churches and banks, in the wake of the recent negative publicity surrounding their activities,
+also do not attract widespread confidence.
+
+
+             40
+
+                       31
+                                  26
+
+
+                                             14         14        14
+                                                                             11
+                                                                                         6         6
+
+
+
+
+“I am now going to read out a number of organisations. For each one, could you tell me how
+much confidence you have in them: is it a great deal of confidence, quite a lot of confidence,
+not very much confidence, or none at all?” Estimates for per cent who say “great deal” and
+exclude don’t know responses for comparability with results from previous years.
+
+Source     ANUpoll on Governance, 2014.
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                      3
+Judged over two decades, public confidence in most of the major institutions has increased. Of the eight
+institutions that were included in a 2001 survey, public confidence has increased for seven of them; the
+exception is the federal parliament where the level of confidence has remained unchanged. Indeed, for
+five of the institutions the increase since 2001 has been 10 percentage points or more. The police, for
+example, have attracted notably more confidence, as have universities.
+
+                                                                  2001                  2005                2008             2014     (Change
+                                                                                                                                       2001-14)
+Australian defence forces                                            26                     25                32                 40    (+14)
+Universities                                                         11                      -                24                 26    (+15)
+Police                                                               13                     24                22                 31    (+18)
+Churches, religious institutions                                      -                      7                13                 11
+Courts, legal system                                                  5                     11                12                 14     (+9)
+Federal parliament                                                    5                      5                10                  6     (+1)
+Unions                                                                3                      3                 7                  6     (+3)
+Public service                                                        3                      3                 7                 14    (+11)
+Banks, financial institutions                                         2                      -                 6                 14    (+12)
+Sources Australian Election Study, 2001; Australian Survey of Social Attitudes, 2005;
+        ANUpolls on Governance, 2008 and 2014.
+
+While overall public confidence in the major institutions of society has generally increased, those that
+have benefitted most from this increase are non-political institutions. Institutions which have direct or
+indirect political associations tend to show much smaller increases in confidence.
+
+A frequent observation is that young people exhibit less confidence in institutions compared to their older
+counterparts, reflecting their alleged cynicism. In contrast, the results from the ANUpoll show that, overall,
+younger people have the same level of confidence in institutions compared to the rest of the population.
+Among those aged 18 to 34, the overall per cent saying that they have a “great deal” of confidence across
+all nine institutions is 19 per cent, almost the same as the other two age groups.
+
+                                  Per cent say “great deal” confidence
+                                   ---------------------------------------------------------------------------------------
+                                   ---------------------------------------------------------------------------------------
+                                                            ------------------------------------
+                                         18-34                             35-44                               55+
+ Australian defence forces                 35*                                42                            42
+ Universities                              29*                                27                            24
+ Police                                    25**                               32                            37
+ Churches, religious institutions          10                                 12                            11
+ Courts, legal system                      19*                                13                            13
+ Federal parliament                            7                                 4                             6
+ Unions                                        7                                 6                             6
+ Public service                            19**                               13                            11
+ Banks, financial institutions             20**                              12                             10
+                                   -------------------------------------------------------------------------------------------
+                                   -------------------------------------------------------------------------------------------
+                                                                    --------------------------
+ (Average)                         (19)                              (18)                               (18)
+
+* difference between 18-34 and 55+ groups statistically significant at p<.05, ** p<.01.
+
+Source ANUpoll on Governance, 2014
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                                                             4
+While the overall level of confidence is the same across the three age groups, there are age differences
+for particular institutions. The largest differences are on the police and banks, with younger people
+showing less confidence in the police but more confidence in the banks compared to the 55 or older age
+group. Younger people are also more likely to show confidence in the public service and the courts and
+are less likely to be confident about the defence forces.
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                   5
+Attitudes to democracy
+
+Key points
+•        Satisfaction with democracy remains at a low level in comparison to the 2000s, although it is still
+         high by international standards.
+
+•        The public’s feelings that they can influence politics is also at a low level, particularly with regard to
+         feeling that whoever is in power can make a difference.
+
+•        Younger people have a stronger sense that who people vote for makes a difference, when
+         compared to the rest of the population.
+
+
+
+Popular attitudes to democracy, such as satisfaction with the democratic system and feelings of efficacy
+and trust, underpin the efficient operation of government. Australia has traditionally exhibited stronger
+democratic attitudes than are found across most of the other established democracies. This is a
+consequence of Australia’s long-term political stability, relative economic prosperity, and the absence of
+any major political crises or physical threats.
+
+Since the late 1960s, the Australian public’s level of satisfaction with democracy has experienced three
+distinct stages. First, following the 1975 constitutional crisis, satisfaction with democracy declined
+substantially, recording just 56 per cent in 1979. Second, from the mid-1990s onwards, when the question
+began to be regularly asked in surveys, satisfaction gradually increased, peaking at 86 per cent in 2007
+with the election of the Rudd Labor government, following 11 years of Liberal government.
+
+                100
+                90                                                 86
+                                                            82             81
+                       77             78
+                80                                  74                             72      73      73      72
+                                             71
+                70
+                60
+
+     Per cent
+                50             56
+
+                40
+                30
+                20
+                10
+                  0
+                      1969    1979   1996   1998   2001   2004    2007   2008    2010    2011    2013    2014
+
+                 “On the whole, are you very satisfied, fairly satisfied, not very satisfied or not at all
+                 satisfied with the way democracy works in Australia?” Estimates are for “very
+                 satisfied” and “fairly satisfied” and exclude don’t know responses for comparability
+                 with results from previous years.
+
+                 Sources     Australian National Political Attitudes Surveys, 1969, 1979; Australian
+                             Election Study, 1987-2013; ANUpoll on Governance, 2014.
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                           6
+The period since 2007 represents the third stage, with satisfaction declining to 72 per cent and remaining
+at that level through to the present time. The period up to the 2013 election represents popular
+dissatisfaction with the performance of the Rudd and Gillard Labor governments, and dissatisfaction with
+the experience of minority Labor government between the 2010 and 2013 elections. Satisfaction would
+have been expected to increase with the election of the new Liberal government in 2013, but it has
+remained at the pre-2013 level largely due to dissatisfaction with the performance of the Abbott Liberal
+Government.
+
+                     94
+
+                             78
+                                  73   72    72     71     70
+
+                                                                  57
+
+                                                                          44
+
+          Per cent
+                                                                                 36
+                                                                                        30
+                                                                                               23
+
+
+
+
+          Sources Comparative Study of Electoral Systems module 2; ANUpoll on Governance,
+                          2014.
+
+Despite these lower levels of satisfaction with the democracy since 2010, Australia remains on par with
+many comparable democracies, such as Germany, Japan and Canada. The level of satisfaction with
+democracy in Australia is exceeded significantly only by the United States and Denmark.
+
+An important element of democratic attitudes is the sense that a citizen can have an influence on political
+outcomes through their vote, and that whoever holds office can make a difference to citizens’ lives—what
+is often referred to as political efficacy. Australians have a strong sense of efficacy, and in the current
+survey more than half of those interviewed, 56 per cent, believed that whoever occupies political office
+could make a difference. Rather fewer, 43 per cent, thought that who someone votes would make a
+difference.
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                     7
+                                      Makes a difference who is in power
+                                                                                                            30
+                                      Vote makes a difference
+                                                                               26     26
+                                                                                                24
+
+                                                                      19                                             19
+                                                               16
+                                          15
+                                 13
+                                                      12
+
+
+
+
+              Per cent
+
+
+                                      1                    2               3                4                    5        Makes a
+         Does not make
+                                                                                                                          difference
+         a difference
+
+          “Do you think it makes a difference who is in power? Please give me a number from 1
+          through to 5 where a low number means it does not make a difference and a high
+          number means it does make a difference?” “Do you think the people we vote for
+          make any difference to what happens? Again, please give me a number from 1
+          through to 5 where a low number means the people we vote for do not make a
+          difference and a high number means the people we vote for do make a difference.”
+
+          Source               ANUpoll on Governance, 2014.
+
+The trends from the late 1990s suggest that public feelings of political efficacy are currently at their lowest
+levels since the questions were first asked. In 1996, 70 per cent of those interviewed believed that their
+vote made a difference, declining to 57 per cent in 2001. After a recovery between 2004 and 2013, the
+current figure, at 56 per cent, is just below the 2001 estimate. The current proportion who believe that it
+makes a difference who is in power, at 43 per cent, is at an all-time low.
+
+                          80
+                                  70                                            68
+                          70                    64                   66                64             64
+                                                           57        67         68                               56
+                          60
+                                                                                       60             60
+                          50
+
+               Per cent
+                                                               51
+                          40                                                                                     43
+                          30
+                                                      Vote makes a difference
+                          20
+                                                      Makes difference who is in power
+                          10
+                           0
+                                 1996          1998     2001        2004       2007   2010           2013   2014
+
+                          Sources          Australian Election Study, 1996-2013; ANUpoll on Governance,
+                                           2014.
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                                                  8
+General attitudes to democracy remain high in Australia by international standards. However, the longer-
+term trends suggest that public support has not recovered from the low points recorded after the 2010
+election. Indeed, measures of efficacy—a key indicator of individual political empowerment—are at their
+lowest recorded levels.
+
+Young people are not significantly different from the rest of the population on two of the three views of
+democracy. The exception is the proportion who say that who a person votes for makes a difference. In
+this case, younger people exhibit a significantly stronger sense of efficacy compared to both of the older
+age groups.
+
+                                                    18-34        35-44        55+
+Per cent satisfied with democracy                    69           74         74
+Per cent say makes difference who is in power        58           53         54
+Per cent say who vote for makes a difference         50**         41         39
+
+* difference between 18-34 and 55+ groups statistically significant at p<.05, ** p<.01.
+
+Source ANUpoll on Governance, 2014
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                   9
+Federal‐state relations
+
+Key points
+•     Public opinion on federal-state relations has shifted considerably over the past six years, and is
+      now more favourable to the states than at any time since the late 1970s.
+
+•     A plurality of respondents believe that the federal government should provide the states with more
+      money.
+
+•     Young people are more likely to favour the states rather than the federal government in terms of
+      powers.
+
+
+
+Relations between the Commonwealth Government and its state counterparts are always highly political,
+particularly with regard to the sensitive issue of funding. Each new government attempts to make a
+compact with the states, with varying degrees of success. The Hawke and Keating Governments, with
+their policy of ‘co-operative federalism’, represented one of the more successful periods of postwar
+federal-state relations. More recent governments have had varying levels of success in their relations with
+the states.
+
+In line with changing government priorities, the public has also had differing views of federalism. In 1979,
+when the question was first asked in a survey, two-thirds of the respondents thought that the federal
+government had enough power and that the federal-state balance was appropriate. By 2008 there had
+been a substantial shift in opinion in favour of the federal government, and a plurality of respondents
+believed that the states should transfer powers to the federal government. However, in the current
+ANUpoll the balance of opinion has shifted yet again back towards the states, almost returning to the
+levels recorded in 1979.
+
+                                                                          (Change
+                                         1979       2008        2014     1979-2014)
+States should give more powers to         17          40         24           (+7)
+federal government
+Federal government has enough             66          39         54          (-12)
+power already
+Depends/No opinion                        17         21          22           (+5)
+Total                                    100        100         100
+“Do you think the state governments should give some powers to the federal government, or do
+you think the federal government has enough powers already?”
+
+Sources         Australian National Political Attitudes Survey 1979, ANUpolls on Governance, 2008
+                and 2014.
+
+These are substantial changes in opinions occurring over a relatively short timespan. They undoubtedly
+reflect changes in state government party composition as well as the election of the Rudd Labor
+Government in 2007. In terms
+
+of the distribution of resources between the state and federal governments, once again the results show
+that opinions in 2014 are closest to those recorded in 1979 than in 2008. In 2014, 43 per cent of those
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                  10
+interviewed believed that the federal government should provide more money to the states, compared to
+37 per cent in 2008 and 49 per cent in 1979.
+
+                                                                             (Change
+                                          1979        2008        2014      1979-2014)
+Federal government should                    49        37          43            (-6)
+provide more money
+State governments have enough                30        38          30            (0)
+Depends/No opinion                           21        25          27           (+6)
+Total                                       100       100         100
+“Do you think the federal government should provide more money to the state governments, or
+do you think the states have enough already?”
+
+Sources    Australian National Political Attitudes survey 1979, ANUpolls on Governance, 2008
+           and 2014.
+
+Public opinion on federal-state relations has therefore fluctuated since the late 1970s, more so than is the
+case with most other views about governance. In particular, there has been a substantial change in
+opinion since 2008. In part, this reflects the political complexions of the states vis-a-vis the federal
+government, but it may also reflect a broader underlying view that successive federal governments have
+accumulated too much power at the expense of their state counterparts.
+
+There are also significant variations in how young people view federal-state relations, at least with regard
+to whether the states or the federal government should have more power. Young people are more likely
+to endorse the states against the federal government; indeed, they are almost twice as likely to do so
+compared to the oldest age group.
+
+                                                      18-34        35-44         55+
+Per cent say states should give more powers            16**         27          29
+to federal government
+Per cent say federal government should                  42          48          42
+provide more money
+
+** difference between 18-34 and 55+ groups statistically significant at p<.01.
+
+Source ANUpoll on Governance, 2014
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                      11
+Future prospects
+
+Key points
+•     Opinions about the future have become more pessimistic since 2008. Just 30 per cent believe that
+      their lives will be better in five year’s time.
+
+•     A narrow majority believe that the lives of their children will be worse than their own.
+
+•     Younger people are significantly more optimistic about the future compared to older people.
+
+
+
+When the last ANUpoll on Governance was conducted in March 2008, the global financial crisis had only
+just begun. While Australia weathered the crisis without experiencing an economic recession, the crisis
+has made a major impression on public opinion. In the 2008 survey 37 per cent of the respondents
+believed that their lives would be improved in five year’s time. Just one in four believed that their lives
+would be worse.
+
+Views were more pessimistic in the 2014 survey, with the largest group of respondents, 34 per cent,
+believing that their lives would be worse in five years. Just 30 per cent believed that their lives would be
+improved, and 32 per cent thought that their lives would be unchanged. This is a substantial change over
+a period when it might have been thought that Australia’s economic performance relative to the rest of the
+world which would produced a greater degree of optimism than was the case in 2008.
+
+                                                 38
+
+                                                      32
+                                                                                2008
+                                    27
+                                                                   25           2014
+
+                                         20                   19
+
+
+
+                       10 10                                                    9
+
+                                                                            4                4
+
+           Per cent
+                                                                                         2
+
+
+                        Much        A little   Same as        A little   Much worse Don't know
+                      improved    improved       now          worse
+
+
+             “In five years, do you think that your life in Australia will be…?”
+
+             Source     ANUpoll on Governance, 2014.
+
+Looking further ahead in time, to the lives of the respondents’ children, there are fewer changes in
+opinions, but again tending towards pessimism. In 2008, 31 per cent of the respondents thought that their
+children’s lives would be better than their own, and this declined slightly to 27 per cent in 2014. However,
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                    12
+in 2014 a majority of the respondents, 54 per cent, believed that their children’s lives would be worse than
+their own. There was also a substantial increase in the proportion saying that their children’s lives would
+be “much worse”.
+
+
+
+                                                           34
+                                                                33
+                                                                                2008
+                                                                                2014
+
+                                     22
+                                                                           21
+                                          19
+                                                 16
+                                                      15
+                                                                      14
+
+                             9
+                                 8
+                                                                                5
+                                                                                     4
+
+
+            Per cent
+                            Much     A little   Same as    A little   Much      Don't
+                            better   better       now      worse      worse     know
+
+        “Compared with your life, do you think that the lives of today’s children will be …?”
+
+        Source           ANUpoll on Governance, 2014.
+
+These opinions show an increased level of pessimism about the future, particularly with respect to the
+medium term, when compared to the same views in 2008. While such views do not directly correlate with
+political opinions, they provide a context within which the results showing declines in satisfaction with
+democracy and political efficacy need to be interpreted.
+
+Younger people show a remarkable degree of optimism about the future compared to their older
+counterparts. On both questions, those aged 18 to 34 are significantly more optimistic than older
+respondents. Indeed, in the case of their future lives, 44 per cent of younger people see an improvement
+in five years compared to those aged 55 or over. Of course, part of this effect is a lifecycle one, with
+younger people looking at increased earnings and life satisfaction. Nevertheless, the degree of optimism
+among young people is also reflected in the question about the lives of today’s children.
+
+                                                           18-34      35-44          55+
+  Per cent say in five years life improved                  44**       27           23
+  Per cent say lives of today’s children better             35**       26           25
+
+   ** difference between 18-34 and 55+ groups statistically significant at p<.01.
+
+   Source              ANUpoll on Governance, 2014
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                      13
+Poll questions
+All things considered, are you satisfied or dissatisfied with the way the country is heading?
+                                                     Frequency        Per cent
+          Very satisfied                                        131              9.4
+          Satisfied                                             585             42.1
+          Neither satisfied nor dissatisfied                    146             10.5
+          Dissatisfied                                          325             23.4
+          Very dissatisfied                                     173             12.4
+          Don't know/not sure                                    29              2.1
+          Total                                              1,388              100
+
+
+What do you think is the most important problem facing Australia today?
+                                                Frequency        Per cent
+          Economy/jobs                                   366           26.4
+          Industrial relations                             19            1.4
+          Interest rates                                    3            0.2
+          Housing affordability                            15            1.1
+          Health care                                      57            4.1
+          Education                                        61            4.4
+          Defence/national security                         2            0.1
+          Terrorism                                         3            0.2
+          Environment/global warming                     118             8.5
+          Water management                                  2            0.1
+          Immigration                                    131             9.5
+          Indigenous affairs                                1            0.1
+          Taxation                                          8            0.6
+          Better government                              176           12.7
+          Law and order/ crime/ justice                    26            1.9
+          system
+          Ageing population                                26            1.8
+          Values/ morals/ respect for                      53            3.8
+          others
+          Poverty/ Social exclusion/                       60            4.3
+          inequality
+          Carbon Tax                                        1            0.1
+          The budget                                       45            3.3
+          Other (Specify)                                  13            0.9
+          (None/ no other)                                 28               2
+          Trade balance/loss of jobs to                    10            0.7
+          overseas
+          Rural/farming issues                              4            0.3
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                           14
+          Social services (including aged              17             1.2
+          care, the disabled, etc)
+          Infrastructure/ Planning/                      6            0.4
+          Innovation
+          Alcohol and Drug use                           1            0.1
+          Young people's                                 6            0.5
+          behaviour/attitudes
+          Foreign influence/Australia's                25             1.8
+          position in world
+          Family/community/societal                      2            0.1
+          breakdown
+          Refused                                      11             0.8
+          Don't know/can't say                         94             6.7
+          Total                                     1,388             100
+
+
+And what do you think is the second most important problem facing Australia today?
+                                                Frequency         Per cent
+            Economy/jobs                                 209           15.1
+            Industrial relations                             18          1.3
+            Interest rates                                   11          0.8
+            Housing affordability                            27          1.9
+            Health care                                  102             7.4
+            Education                                        91          6.6
+            Defence/national security                        11          0.8
+            Terrorism                                        7           0.5
+            Environment/global warming                       64          4.6
+            Water management                                 10          0.7
+            Immigration                                      94          6.8
+            Indigenous affairs                               5           0.4
+            Taxation                                         19          1.4
+            Better government                                76          5.5
+            Law and order/ crime/ justice                    28              2
+            system
+            Ageing population                                36          2.6
+            Values/ morals/ respect for                      40          2.8
+            others
+            Poverty/ Social exclusion/                       93          6.7
+            inequality
+            Carbon Tax                                       4           0.3
+            The budget                                       29          2.1
+            Trade balance/loss of jobs to                    6           0.4
+            overseas
+            Rural/farming issues                             12          0.8
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                15
+             Social services (including aged                    13                1
+             care, the disabled, etc)
+             Infrastructure/ Planning/                          22              1.6
+             Innovation
+             Alcohol and Drug use                               4               0.3
+             Young people's                                     6               0.5
+             behaviour/attitudes
+             Foreign influence/Australia's                      15              1.1
+             position in world
+             Family/community/societal                          7               0.5
+             breakdown
+             Other                                              24              1.8
+             None/ no other                                     63              4.5
+             Refused                                            11              0.8
+             Don't know/can't say                               99              7.1
+             Not answered                                   133                 9.6
+            Total                                         1,388                 100
+
+
+I am going to read out a number of organisations. For each one, could you tell me how much
+confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very
+much confidence, or none at all?
+...The Australian defence forces
+                                                Frequency            Per cent
+          A great deal of confidence                      512             36.9
+          Quite a lot of confidence                       609             43.9
+          Not very much confidence                        137               9.9
+          None at all                                      33               2.4
+          Refused                                           4               0.3
+          Don't know                                       92               6.6
+          Total                                         1,388              100
+
+
+... The unions
+                                                Frequency            Per cent
+          A great deal of confidence                       73               5.3
+          Quite a lot of confidence                       310             22.3
+          Not very much confidence                        560             40.3
+          None at all                                     260             18.7
+          Refused                                           3               0.2
+          Don't know                                      182             13.1
+          Total                                         1,388              100
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                16
+... The courts and the legal system
+                                            Frequency       Per cent
+           A great deal of confidence                190         13.7
+           Quite a lot of confidence                 501         36.1
+           Not very much confidence                  501         36.1
+           None at all                               123           8.9
+           Refused                                      1          0.1
+           Don't know                                 72           5.2
+           Total                                   1,388          100
+
+
+... The federal parliament
+                                            Frequency       Per cent
+           A great deal of confidence                 73           5.3
+           Quite a lot of confidence                 283         20.4
+           Not very much confidence                  698         50.3
+           None at all                               270         19.5
+           Refused                                      1              0
+           Don't know                                 63           4.5
+           Total                                   1,388          100
+
+
+... The public service
+                                            Frequency       Per cent
+           A great deal of confidence                176         12.7
+           Quite a lot of confidence                 548         39.5
+           Not very much confidence                  493         35.5
+           None at all                                67           4.9
+           Refused                                      4          0.3
+           Don't know                                 99           7.1
+           Total                                   1,388          100
+
+
+... Banks and financial institutions
+                                            Frequency       Per cent
+
+
+
+           A great deal of confidence                182         13.1
+           Quite a lot of confidence                 510         36.8
+           Not very much confidence                  517         37.3
+           None at all                               142         10.2
+           Refused                                      1          0.1
+           Don't know                                 36           2.6
+           Total                                   1,388          100
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014      17
+... Churches and religious institutions
+                                                   Frequency         Per cent
+           A great deal of confidence                        140            10.1
+           Quite a lot of confidence                         307            22.1
+           Not very much confidence                          481            34.6
+           None at all                                       308            22.2
+           Refused                                            13             0.9
+           Don't know                                        139              10
+           Total                                            1,388           100
+
+
+... The police in your state or territory
+                                                   Frequency         Per cent
+           A great deal of confidence                        420            30.2
+           Quite a lot of confidence                         671            48.3
+           Not very much confidence                          201            14.5
+           None at all                                        52             3.7
+           Don't know                                         45             3.2
+           Total                                            1,388           100
+
+
+... Universities
+                                                   Frequency         Per cent
+           A great deal of confidence                        331            23.9
+           Quite a lot of confidence                         696            50.2
+           Not very much confidence                          189            13.6
+           None at all                                        32             2.3
+           Refused                                              3            0.2
+           Don't know                                        137             9.9
+           Total                                            1388            100
+
+
+On the whole, are you very satisfied, fairly satisfied, not very satisfied, or not at all satisfied with
+the way democracy works in Australia?
+                                            Frequency       Per cent
+           Very satisfied                           287             20.6
+           Fairly satisfied                         685             49.3
+           Not very satisfied                       302             21.7
+           Not at all satisfied                      74              5.4
+           Refused                                      2            0.1
+           Don't know                                39              2.8
+           Total                                  1,388             100
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                                      18
+Do you think it makes a difference who is in power? Please give me a number from 1 through to 5
+where a low number means it does not make a difference and a high number means it does make a
+difference.
+                               Frequency        Per cent
+          1.00                           180            13
+          2.00                           161          11.6
+          3.00                           252          18.2
+          4.00                           348          25.1
+          5.00                           401          28.9
+          Refused                          9           0.6
+          Don't know                      35           2.6
+          Total                        1,388         100.0
+
+
+Do you think the people we vote for make any difference to what happens? Again, please give me
+a number from 1 through to 5 where a low number means the people we vote for do not make a
+difference and a high number means the people we vote for do make a difference.
+                               Frequency        Per cent
+          1.00                           204          14.7
+          2.00                           211          15.2
+          3.00                           346          24.9
+          4.00                           322          23.2
+          5.00                           263          18.9
+          Refused                         14               1
+          Don't know                      29           2.1
+          Total                        1,388           100
+
+
+Some people think that in order to deal with Australia’s problems the state governments should hand
+over some of their powers to the federal government in Canberra. Others think that the federal
+government has enough power already. What is your view? Do you think the state governments
+should give some powers to the federal government, or do you think the federal government has
+enough powers already? If you have no opinion, just say so.
+                                               Frequency        Per cent
+          States should give more powers                328          23.6
+          to Federal government
+          Federal government has enough                 747          53.8
+          power already
+          It depends                                    100            7.2
+          No opinion                                    197          14.2
+          Refused                                          16          1.2
+          Total                                       1,388           100
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                             19
+Some people think the problem is really about money: the state governments could do their job
+better if the federal government provided them with more money. Others think that the state
+governments have enough money as it is. What is your view? Do you think the federal
+government should provide more money to the state governments, or do you think the states
+have enough already? If you have no opinion just say so.
+                                                    Frequency           Per cent
+           Federal government should                          598            43.1
+           provide more finance
+           State governments have enough                      407            29.4
+           It depends                                         164            11.8
+           No opinion                                         208              15
+           Refused                                              11             0.8
+           Total                                            1,388             100
+
+
+In five years, do you think that your life in Australia will be ...
+                                                    Frequency           Per cent
+           Much improved                                      141            10.2
+           A little improved                                  274            19.7
+           The same as now                                    451            32.5
+           A little worse, or                                 351            25.3
+           Much worse                                         122              8.8
+           Don't think will be living in                         7             0.5
+           Australia
+           Refused                                               3             0.2
+           Don't know                                           39             2.8
+           Total                                            1,388             100
+
+
+Compared with your life, do you think that the lives of today's children will be ...
+                                           Frequency         Per cent
+           Much better                               109               7.9
+           A little better                           270              19.4
+           The same as now                           204              14.7
+           A little worse, or                        458               33
+           Much worse                                290              20.9
+           Don't know                                 58               4.2
+           Total                                  1,388               100
+
+
+
+
+Changing views of governance: Results from the ANUpoll, 2008 and 2014                           20
+

@@ -1,0 +1,899 @@
+{
+  "props": {
+    "pageProps": {
+      "findingData": {
+        "postBy": {
+          "id": "cG9zdDo0NTk0NQ==",
+          "__typename": "Post",
+          "findingTopics": {
+            "nodes": [
+              {
+                "name": "Most Important Issues"
+              }
+            ]
+          },
+          "findings": {
+            "findingNumber": 9797,
+            "hideMarginOfError": null,
+            "listingImage": {
+              "sourceUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004638/9797-328x288-1.png",
+              "mediaDetails": {
+                "height": 288,
+                "width": 328,
+                "meta": {
+                  "title": ""
+                }
+              }
+            },
+            "pdfDownload": {
+              "mediaItemUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004646/9797-Most-Important-Issues-Facing-Australia-January-2025.pdf",
+              "slug": "9797-most-important-issues-facing-australia-january-2025"
+            },
+            "pdfDownloadCustomLabel": {
+              "useCustomLabel": true,
+              "customLabel": "Download PDF"
+            },
+            "additionalPdfs": null,
+            "summary": "Roy Morgan’s in-depth survey data covering the last few years highlights the key issues gaining importance for Australian electors as we approach this year’s Federal Election.",
+            "releaseDate": "23/01/2025",
+            "relatedFindings": null,
+            "relatedProducts": [
+              {
+                "product": {
+                  "id": "cG9zdDoyMDE2NA==",
+                  "title": "Helix Personas",
+                  "excerpt": "<p>Unlock the DNA of Australia to discover the Why and What Next of consumer behaviour. Helix Personas is a powerful psychographic consumer segmentation and data integration tool that combines sophisticated psychographic, attitudinal and behavioural data to classify the Australian population.</p>\n",
+                  "slug": "helix-personas",
+                  "featuredImage": {
+                    "node": {
+                      "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/02005349/Helix-Personas-2.png",
+                      "mediaDetails": {
+                        "height": 714,
+                        "width": 896,
+                        "meta": {
+                          "title": ""
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "product": {
+                  "id": "cG9zdDo5MQ==",
+                  "title": "Asteroid",
+                  "excerpt": "<p>ASTEROID gives researchers the speed, creativity and power to extract maximum value from their survey data. With minimal experience and training users can explore data, generate and test hypotheses, follow up ideas, search for supporting evidence, and transform simple data into usable market intelligence.</p>\n",
+                  "slug": "asteroid",
+                  "featuredImage": {
+                    "node": {
+                      "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/25012021/product-asteroid2.png",
+                      "mediaDetails": {
+                        "height": 357,
+                        "width": 448,
+                        "meta": {
+                          "title": ""
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "product": {
+                  "id": "cG9zdDoyMDIxMQ==",
+                  "title": "Single Source",
+                  "excerpt": "<p>Single Source delivers an atlas of truthful, concrete networks between and within target customers. Connect purchase behaviour to media preference. Put ad awareness in the context of lifestyle goals. Correlate specific product attitudes to credit cards, technology adoption, or ‘No Junk Mail’ stickers. Explore. Discover. Know.   </p>\n",
+                  "slug": "single-source",
+                  "featuredImage": {
+                    "node": {
+                      "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/02011129/SIngle-Source-1.png",
+                      "mediaDetails": {
+                        "height": 714,
+                        "width": 896,
+                        "meta": {
+                          "title": ""
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "excerpt": "",
+          "archiveName": "Findings",
+          "archiveUri": "/findings",
+          "content": "\n<p class=\"wp-block-paragraph\"><strong>Roy Morgan’s in-depth survey data covering the last few years highlights the key issues gaining importance for Australian electors as we approach this year’s Federal Election.</strong></p>\n\n\n\n<p class=\"wp-block-paragraph\">A representative cross-section of 14,522 electors in the June Quarter 2022, at the time of the last Australian Federal Election, and 14,713 electors in the September Quarter 2024 were asked <em>“Which three issues are the most important to you?”</em></p>\n\n\n\n<p class=\"wp-block-paragraph\">Cost-of-living increasingly dominates voter concerns with several related issues rising significantly since mid-2022. The most important issue for electors is clearly <em>‘Keeping day-to-day living costs down’</em> up 7% points to 57%. ‘<em>Keeping interest rates down’ </em>up 8% points to 19%, and <em>‘Managing immigration and population growth’</em> surging 8% points to 14%. The sharp rise in immigration-related concerns is during a period in which Australia has had record high immigration and housing affordability issues have been at the forefront for many Australians.</p>\n\n\n\n<p class=\"wp-block-paragraph\">At the same time, public anxiety about safety has escalated significantly with <em>‘Reducing crime and maintaining law and order’</em> jumping 10% points to 23% &#8211; the largest increase for any issue.</p>\n\n\n\n<p class=\"wp-block-paragraph\">In contrast, there are two issues that have fallen rapidly in importance:<em> ‘Global warming and climate change’</em> is down 9% points to 23% and <em>‘Open and honest government’ </em>is down 6% points to 19%.</p>\n\n\n\n<p class=\"wp-block-paragraph\"><em>‘Improving health services and hospitals’</em> remains a top priority, but has dipped slightly, down 2% points to 31%; <em>‘Managing the economy’</em> has increased marginally in importance, up 2% points to 22%; <em>‘Reducing the taxes you and your family pay’</em> holds steady at 15% and ‘Improving education’ has seen a modest increase, up 1% point to 14%.</p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>Top 10 voter Issues of Most Importance June Quarter 2022, to September Quarter 2024 (change since the 2022 Federal Election)</strong></p>\n\n\n\n<figure class=\"wp-block-image size-full\"><img loading=\"lazy\" decoding=\"async\" width=\"927\" height=\"605\" src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004510/9797-c1.png\" alt=\"\" class=\"wp-image-45947\" srcset=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004510/9797-c1.png 927w, https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004510/9797-c1-300x196.png 300w, https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004510/9797-c1-768x501.png 768w\" sizes=\"auto, (max-width: 927px) 100vw, 927px\" /></figure>\n\n\n\n<p class=\"wp-block-paragraph\"><em><strong>Source</strong>: Roy Morgan Single Source (Australia), June 2022 Quarter n= 14,522 &amp; September 2024 Quarter n= 14,713. <strong>Base</strong>: Australians Electors 18+</em></p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>Concerns about crime and maintaining law and order have increased by more than any other issue since the last Federal Election – and for supporters of all major parties</strong></p>\n\n\n\n<p class=\"wp-block-paragraph\">Since the last Federal Election in mid-2022, concerns about<em> ‘reducing crime and maintaining law and order’ </em>have risen sharply for supporters of all major parties and in all States and Territories.</p>\n\n\n\n<p class=\"wp-block-paragraph\">Detailed analysis shows a notable and consistent shift among voters from around the country regarding crime– which has already had an impact in last year’s Queensland Election.</p>\n\n\n\n<p class=\"wp-block-paragraph\">Nearly a third of Liberal-National Coalition supporters, 32%, now cite ‘<em>reducing crime and maintaining law and order’</em> as one of their top priorities—an increase of 15% points since mid-2022.</p>\n\n\n\n<p class=\"wp-block-paragraph\">There was also a significant increase for ALP supporters with concern nearly doubling from 11% to 20%, a 9% points jump. Supporters of the Greens recorded a more modest increase, with 13% of their voters now prioritising <em>‘reducing crime and law and order’,</em> up 5% points from mid-2022.</p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>Queensland and Victoria show significant increases in concern relating to ‘reducing crime and maintaining law and order’</strong></p>\n\n\n\n<p class=\"wp-block-paragraph\">Queensland recorded the largest increase of concern about the issue of <em>‘reducing crime and maintaining law and order’</em> doubling in importance for the electorate, up from 16% to 32%.</p>\n\n\n\n<p class=\"wp-block-paragraph\">In Victoria, concern about crime has grown significantly, with a 12% points increase from 14% to 26%. This means over one-in-four Victorian electors now see crime as one of their most important issues.</p>\n\n\n\n<p class=\"wp-block-paragraph\">In Western Melbourne, concern about crime has surged from 13% to 21% since mid-2022, with more than one in five voters highlighting it as one of their most important issues. This is especially important with a February by-election in the State seat of Werribee.</p>\n\n\n\n<p class=\"wp-block-paragraph\">Concern about the issue in New South Wales rose 9% points from 12% to 21%. There are more marginal electorates in New South Wales than anywhere else in Australia, with 15 federal electorates held by a margin of 6% or less.</p>\n\n\n\n<p class=\"wp-block-paragraph\">South Australia follows closely with a 7% points jump, moving from 14% to 21%. Western Australia recorded a 7% point increase from 15% to 22%, while Tasmania saw a rise of 9% points, climbing from 15% to 24%. Similarly, the Northern Territory experienced a sharp rise, with nearly one in three voters now prioritising crime, increasing 13% points from 20% to 33%.</p>\n\n\n\n<p class=\"wp-block-paragraph\">In contrast, the ACT registered the smallest increase, with concern about crime rising by only 3% points from 9% to 12%.</p>\n\n\n\n<p class=\"wp-block-paragraph\">The contrast between concerns about crime among Queenslanders (32%) and those in the Northern Territory (33%) compared to those voters living in the ACT (12%) is stark.</p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>Michele Levine, CEO of Roy Morgan, says understanding how electors feel about these issues is critical as we approach this year’s Federal Election:</strong></p>\n\n\nBlock Quote\n\n\n<p class=\"wp-block-paragraph\"><strong>For detailed analysis such as by states, capital cities/country areas, age, gender, occupation, and education contact Andrew Calvert-Jones on email acalvert-jones@roymorgan.com or contact Julian McCrann on (03) 9224 5365 or email julian.mccrann@roymorgan.com.</strong></p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>For further comment or more information contact:<br>Michele Levine 0411 129 093 or Gary Morgan 0411 129 094 or email </strong><a href=\"mailto:askroymorgan@roymorgan.com\">askroymorgan@roymorgan.com</a>.<strong></strong></p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>About Roy Morgan</strong></p>\n\n\n\n<p class=\"wp-block-paragraph\"><a></a>Roy Morgan is Australia’s largest independent Australian research company, with offices in each state, as well as in the U.S. and U.K. A full-service research organisation, Roy Morgan has over 80 years’ experience collecting objective, independent information on consumers.</p>\n",
+          "date": "2025-01-23T00:48:13",
+          "featuredImage": {
+            "node": {
+              "sourceUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004809/9797-670x450-1.png",
+              "mediaDetails": {
+                "height": 450,
+                "width": 670
+              }
+            }
+          },
+          "seo": {
+            "metaDesc": "Roy Morgan’s in-depth survey data covering the last few years highlights the key issues gaining importance for Australian electors as we approach this year’s Federal Election.",
+            "title": "Top 10 Issues Shaping the 2025 Federal Election: Cost of Living and Crime on the Rise, Climate Change Fades - Roy Morgan Research",
+            "opengraphAuthor": "",
+            "opengraphTitle": "Top 10 Issues Shaping the 2025 Federal Election: Cost of Living and Crime on the Rise, Climate Change Fades - Roy Morgan Research",
+            "opengraphDescription": "Roy Morgan’s in-depth survey data covering the last few years highlights the key issues gaining importance for Australian electors as we approach this year’s Federal Election.",
+            "opengraphImage": {
+              "altText": "",
+              "sourceUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004809/9797-670x450-1.png",
+              "srcSet": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004809/9797-670x450-1-300x201.png 300w, https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004809/9797-670x450-1.png 670w"
+            },
+            "opengraphUrl": "https://www.roymorgan.com/findings/9797-most-important-issues-facing-australia-january-2025/",
+            "opengraphSiteName": "Roy Morgan Research",
+            "opengraphPublishedTime": "2025-01-23T00:48:13+00:00",
+            "opengraphModifiedTime": "",
+            "twitterTitle": "",
+            "twitterDescription": "",
+            "twitterImage": null
+          },
+          "template": {
+            "templateName": "Default"
+          },
+          "title": "Top 10 Issues Shaping the 2025 Federal Election: Cost of Living and Crime on the Rise, Climate Change Fades",
+          "slug": "9797-most-important-issues-facing-australia-january-2025",
+          "blocks": [
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>Roy Morgan’s in-depth survey data covering the last few years highlights the key issues gaining importance for Australian electors as we approach this year’s Federal Election.</strong></p>",
+              "originalContent": "<p><strong>Roy Morgan’s in-depth survey data covering the last few years highlights the key issues gaining importance for Australian electors as we approach this year’s Federal Election.</strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>A representative cross-section of 14,522 electors in the June Quarter 2022, at the time of the last Australian Federal Election, and 14,713 electors in the September Quarter 2024 were asked <em>“Which three issues are the most important to you?”</em></p>",
+              "originalContent": "<p>A representative cross-section of 14,522 electors in the June Quarter 2022, at the time of the last Australian Federal Election, and 14,713 electors in the September Quarter 2024 were asked <em>“Which three issues are the most important to you?”</em></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Cost-of-living increasingly dominates voter concerns with several related issues rising significantly since mid-2022. The most important issue for electors is clearly <em>‘Keeping day-to-day living costs down’</em> up 7% points to 57%. ‘<em>Keeping interest rates down’ </em>up 8% points to 19%, and <em>‘Managing immigration and population growth’</em> surging 8% points to 14%. The sharp rise in immigration-related concerns is during a period in which Australia has had record high immigration and housing affordability issues have been at the forefront for many Australians.</p>",
+              "originalContent": "<p>Cost-of-living increasingly dominates voter concerns with several related issues rising significantly since mid-2022. The most important issue for electors is clearly <em>‘Keeping day-to-day living costs down’</em> up 7% points to 57%. ‘<em>Keeping interest rates down’ </em>up 8% points to 19%, and <em>‘Managing immigration and population growth’</em> surging 8% points to 14%. The sharp rise in immigration-related concerns is during a period in which Australia has had record high immigration and housing affordability issues have been at the forefront for many Australians.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>At the same time, public anxiety about safety has escalated significantly with <em>‘Reducing crime and maintaining law and order’</em> jumping 10% points to 23% - the largest increase for any issue.</p>",
+              "originalContent": "<p>At the same time, public anxiety about safety has escalated significantly with <em>‘Reducing crime and maintaining law and order’</em> jumping 10% points to 23% - the largest increase for any issue.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>In contrast, there are two issues that have fallen rapidly in importance:<em> ‘Global warming and climate change’</em> is down 9% points to 23% and <em>‘Open and honest government’ </em>is down 6% points to 19%.</p>",
+              "originalContent": "<p>In contrast, there are two issues that have fallen rapidly in importance:<em> ‘Global warming and climate change’</em> is down 9% points to 23% and <em>‘Open and honest government’ </em>is down 6% points to 19%.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><em>‘Improving health services and hospitals’</em> remains a top priority, but has dipped slightly, down 2% points to 31%; <em>‘Managing the economy’</em> has increased marginally in importance, up 2% points to 22%; <em>‘Reducing the taxes you and your family pay’</em> holds steady at 15% and ‘Improving education’ has seen a modest increase, up 1% point to 14%.</p>",
+              "originalContent": "<p><em>‘Improving health services and hospitals’</em> remains a top priority, but has dipped slightly, down 2% points to 31%; <em>‘Managing the economy’</em> has increased marginally in importance, up 2% points to 22%; <em>‘Reducing the taxes you and your family pay’</em> holds steady at 15% and ‘Improving education’ has seen a modest increase, up 1% point to 14%.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>Top 10 voter Issues of Most Importance June Quarter 2022, to September Quarter 2024 (change since the 2022 Federal Election)</strong></p>",
+              "originalContent": "<p><strong>Top 10 voter Issues of Most Importance June Quarter 2022, to September Quarter 2024 (change since the 2022 Federal Election)</strong></p>"
+            },
+            {
+              "name": "core/image",
+              "saveContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004510/9797-c1.png\" alt=\"\" class=\"wp-image-45947\"/></figure>",
+              "originalContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/23004510/9797-c1.png\" alt=\"\" class=\"wp-image-45947\"/></figure>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><em><strong>Source</strong>: Roy Morgan Single Source (Australia), June 2022 Quarter n= 14,522 &amp; September 2024 Quarter n= 14,713. <strong>Base</strong>: Australians Electors 18+</em></p>",
+              "originalContent": "<p><em><strong>Source</strong>: Roy Morgan Single Source (Australia), June 2022 Quarter n= 14,522 &amp; September 2024 Quarter n= 14,713. <strong>Base</strong>: Australians Electors 18+</em></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>Concerns about crime and maintaining law and order have increased by more than any other issue since the last Federal Election – and for supporters of all major parties</strong></p>",
+              "originalContent": "<p><strong>Concerns about crime and maintaining law and order have increased by more than any other issue since the last Federal Election – and for supporters of all major parties</strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Since the last Federal Election in mid-2022, concerns about<em> ‘reducing crime and maintaining law and order’ </em>have risen sharply for supporters of all major parties and in all States and Territories.</p>",
+              "originalContent": "<p>Since the last Federal Election in mid-2022, concerns about<em> ‘reducing crime and maintaining law and order’ </em>have risen sharply for supporters of all major parties and in all States and Territories.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Detailed analysis shows a notable and consistent shift among voters from around the country regarding crime– which has already had an impact in last year’s Queensland Election.</p>",
+              "originalContent": "<p>Detailed analysis shows a notable and consistent shift among voters from around the country regarding crime– which has already had an impact in last year’s Queensland Election.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Nearly a third of Liberal-National Coalition supporters, 32%, now cite ‘<em>reducing crime and maintaining law and order’</em> as one of their top priorities—an increase of 15% points since mid-2022.</p>",
+              "originalContent": "<p>Nearly a third of Liberal-National Coalition supporters, 32%, now cite ‘<em>reducing crime and maintaining law and order’</em> as one of their top priorities—an increase of 15% points since mid-2022.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>There was also a significant increase for ALP supporters with concern nearly doubling from 11% to 20%, a 9% points jump. Supporters of the Greens recorded a more modest increase, with 13% of their voters now prioritising <em>‘reducing crime and law and order’,</em> up 5% points from mid-2022.</p>",
+              "originalContent": "<p>There was also a significant increase for ALP supporters with concern nearly doubling from 11% to 20%, a 9% points jump. Supporters of the Greens recorded a more modest increase, with 13% of their voters now prioritising <em>‘reducing crime and law and order’,</em> up 5% points from mid-2022.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>Queensland and Victoria show significant increases in concern relating to ‘reducing crime and maintaining law and order’</strong></p>",
+              "originalContent": "<p><strong>Queensland and Victoria show significant increases in concern relating to ‘reducing crime and maintaining law and order’</strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Queensland recorded the largest increase of concern about the issue of <em>‘reducing crime and maintaining law and order’</em> doubling in importance for the electorate, up from 16% to 32%.</p>",
+              "originalContent": "<p>Queensland recorded the largest increase of concern about the issue of <em>‘reducing crime and maintaining law and order’</em> doubling in importance for the electorate, up from 16% to 32%.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>In Victoria, concern about crime has grown significantly, with a 12% points increase from 14% to 26%. This means over one-in-four Victorian electors now see crime as one of their most important issues.</p>",
+              "originalContent": "<p>In Victoria, concern about crime has grown significantly, with a 12% points increase from 14% to 26%. This means over one-in-four Victorian electors now see crime as one of their most important issues.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>In Western Melbourne, concern about crime has surged from 13% to 21% since mid-2022, with more than one in five voters highlighting it as one of their most important issues. This is especially important with a February by-election in the State seat of Werribee.</p>",
+              "originalContent": "<p>In Western Melbourne, concern about crime has surged from 13% to 21% since mid-2022, with more than one in five voters highlighting it as one of their most important issues. This is especially important with a February by-election in the State seat of Werribee.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Concern about the issue in New South Wales rose 9% points from 12% to 21%. There are more marginal electorates in New South Wales than anywhere else in Australia, with 15 federal electorates held by a margin of 6% or less.</p>",
+              "originalContent": "<p>Concern about the issue in New South Wales rose 9% points from 12% to 21%. There are more marginal electorates in New South Wales than anywhere else in Australia, with 15 federal electorates held by a margin of 6% or less.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>South Australia follows closely with a 7% points jump, moving from 14% to 21%. Western Australia recorded a 7% point increase from 15% to 22%, while Tasmania saw a rise of 9% points, climbing from 15% to 24%. Similarly, the Northern Territory experienced a sharp rise, with nearly one in three voters now prioritising crime, increasing 13% points from 20% to 33%.</p>",
+              "originalContent": "<p>South Australia follows closely with a 7% points jump, moving from 14% to 21%. Western Australia recorded a 7% point increase from 15% to 22%, while Tasmania saw a rise of 9% points, climbing from 15% to 24%. Similarly, the Northern Territory experienced a sharp rise, with nearly one in three voters now prioritising crime, increasing 13% points from 20% to 33%.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>In contrast, the ACT registered the smallest increase, with concern about crime rising by only 3% points from 9% to 12%.</p>",
+              "originalContent": "<p>In contrast, the ACT registered the smallest increase, with concern about crime rising by only 3% points from 9% to 12%.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>The contrast between concerns about crime among Queenslanders (32%) and those in the Northern Territory (33%) compared to those voters living in the ACT (12%) is stark.</p>",
+              "originalContent": "<p>The contrast between concerns about crime among Queenslanders (32%) and those in the Northern Territory (33%) compared to those voters living in the ACT (12%) is stark.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>Michele Levine, CEO of Roy Morgan, says understanding how electors feel about these issues is critical as we approach this year’s Federal Election:</strong></p>",
+              "originalContent": "<p><strong>Michele Levine, CEO of Roy Morgan, says understanding how electors feel about these issues is critical as we approach this year’s Federal Election:</strong></p>"
+            },
+            {
+              "name": "acf/block-quote",
+              "saveContent": "",
+              "originalContent": "",
+              "dynamicContent": "Block Quote",
+              "BlockQuote": {
+                "content": "<p><em>&#8220;Australians are shifting their focus on what are the ‘Issues of most importance’ ahead of this year&#8217;s Federal Election, with significant increases regarding ‘Keeping day-to-day living costs down’ (up 7% points to 57% since mid-2022 and by far the most important issue for Australians) and ‘Reducing crime and maintaining law and order’ (up 10% points to 23%).</em></p>\n<p><em>&#8220;The rising focus on cost-of-living pressures—spanning day-to-day expenses, interest rates, and housing affordability—reflects a growing urgency among voters to address financial strain, making it the defining issue of this election cycle.</em></p>\n<p><em>“Since the Federal Election in mid-2022, concern about &#8216;reducing crime and maintaining law and order&#8217; has surged around Australia and for supporters of all major parties. The surge has been most pronounced in Queensland, where concern about the issue has doubled from 16% to 32%, in Victoria, with a rise from 14% to 26% and in the Northern Territory, up 13% to 33%.</em></p>\n<p><em>“The rising concern among supporters of different parties underscores the growing public demand for stronger action on ‘reducing crime and maintaining law and order’ across Australia and played a large role in the LNP’s victory in last year’s Queensland Election.</em></p>\n<p><em>“Queenslanders ejected the former ALP Government from office in October last year and the LNP under David Crisafulli gained a 7% point swing to win a clear majority of seats.</em></p>\n<p><em>“In Victoria, new State Liberal Leader Brad Battin faces his first electoral test in early February in the Labor Government-held seat of Werribee. Battin is a former policeman, like Federal Coalition Leader Peter Dutton, and will be hoping his tough reputation will add momentum to the Liberal Party’s campaign to win the seat.  </em></p>\n<p><em>“Meanwhile, concern about the issues of climate change and transparency has notably declined, with &#8216;Global warming and climate change&#8217; dropping by 9% points to 23% and &#8216;Open and honest government&#8217; falling by 6% points to 19%, signalling a clear shift in voter priorities. These two issues were important factors central to the success of the ‘Teal’ Independents in the last Federal Election.</em></p>\n<p><em>&#8220;The sharp rise in concern over ‘Managing immigration and population growth’—from 6% to 14%—reflects a growing undercurrent of public interest in the issue which is closely associated with housing affordability for many Australians. While still a relatively small issue (tenth overall), its significance as a potential swing factor in such a tightly contested election cannot be underestimated.</em></p>\n<p><em>&#8220;If the Albanese government fails to realign with these changing voter concerns, they may not be re-elected. With crime now a top priority for nearly one in three Queenslanders and a growing concern in marginal electorates across New South Wales and Victoria, the Coalition’s emphasis on maintaining law and order could resonate powerfully at the ballot box.&#8221;</em></p>\n"
+              },
+              "attributes": {
+                "sidebarTitle": "",
+                "anchor": ""
+              }
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>For detailed analysis such as by states, capital cities/country areas, age, gender, occupation, and education contact Andrew Calvert-Jones on email acalvert-jones@roymorgan.com or contact Julian McCrann on (03) 9224 5365 or email julian.mccrann@roymorgan.com.</strong></p>",
+              "originalContent": "<p><strong>For detailed analysis such as by states, capital cities/country areas, age, gender, occupation, and education contact Andrew Calvert-Jones on email acalvert-jones@roymorgan.com or contact Julian McCrann on (03) 9224 5365 or email julian.mccrann@roymorgan.com.</strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>For further comment or more information contact:<br>Michele Levine 0411 129 093 or Gary Morgan 0411 129 094 or email </strong><a href=\"mailto:askroymorgan@roymorgan.com\">askroymorgan@roymorgan.com</a>.<strong></strong></p>",
+              "originalContent": "<p><strong>For further comment or more information contact:<br>Michele Levine 0411 129 093 or Gary Morgan 0411 129 094 or email </strong><a href=\"mailto:askroymorgan@roymorgan.com\">askroymorgan@roymorgan.com</a>.<strong></strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>About Roy Morgan</strong></p>",
+              "originalContent": "<p><strong>About Roy Morgan</strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><a></a>Roy Morgan is Australia’s largest independent Australian research company, with offices in each state, as well as in the U.S. and U.K. A full-service research organisation, Roy Morgan has over 80 years’ experience collecting objective, independent information on consumers.</p>",
+              "originalContent": "<p><a></a>Roy Morgan is Australia’s largest independent Australian research company, with offices in each state, as well as in the U.S. and U.K. A full-service research organisation, Roy Morgan has over 80 years’ experience collecting objective, independent information on consumers.</p>"
+            }
+          ]
+        },
+        "header": {
+          "generalSettings": {
+            "title": "Roy Morgan Research"
+          },
+          "themeSettings": {
+            "footerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135852/roy-morgan-logo-white-1.png"
+            },
+            "headerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135851/roy-morgan-logo-1.png"
+            },
+            "marginOfError": "<h3>Margin of Error</h3>\n<p>The margin of error to be allowed for in any estimate depends mainly on the number of interviews on which it is based. Margin of error gives indications of the likely range within which estimates would be 95% likely to fall, expressed as the number of percentage points above or below the actual estimate. Allowance for design effects (such as stratification and weighting) should be made as appropriate.</p>\n<table style=\"border-collapse: collapse; width: 100%;\">\n<tbody>\n<tr>\n<td style=\"width: 14.0299%; text-align: center;\"><strong>Sample Size</strong></td>\n<td style=\"width: 55.9701%; text-align: center;\"><strong>Percentage Estimate</strong></td>\n</tr>\n</tbody>\n</table>\n<table style=\"border-collapse: collapse; width: 100%; height: 192px;\">\n<tbody>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px;\"></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>40% &#8211; 60%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>25% or 75%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>10% or 90%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>5% or 95%</strong></td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">1,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±3.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±2.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">5,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.2</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.8</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">7,500</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.1</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.5</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">10,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">20,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">50,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.2</td>\n</tr>\n</tbody>\n</table>\n"
+          },
+          "menu": {
+            "name": "Header Menu",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "/products-and-tools",
+                  "label": "Products & Tools",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/products-and-tools#data-analysis",
+                        "label": "Data Analysis",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Asteroid",
+                              "path": "https://www.roymorgan.com/products-and-tools/asteroid/"
+                            },
+                            {
+                              "label": "Helix Personas Pixel™",
+                              "path": "https://www.roymorgan.com/products-and-tools/helix-personas-pixel"
+                            },
+                            {
+                              "label": "Live Mapping",
+                              "path": "https://www.roymorgan.com/products-and-tools/live-mapping"
+                            },
+                            {
+                              "label": "Reactor",
+                              "path": "https://www.roymorgan.com/products-and-tools/reactor"
+                            },
+                            {
+                              "label": "Roy Morgan WorkSpace™",
+                              "path": "https://www.roymorgan.com/products-and-tools/workspace"
+                            },
+                            {
+                              "label": "Single Source",
+                              "path": "https://www.roymorgan.com/products-and-tools/single-source/"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/products-and-tools/segmentation-analytics/",
+                        "label": "Segmentation Analytics",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Brand Equity Segmentation and Targeting – BEST",
+                              "path": "https://www.roymorgan.com/products-and-tools/brand-equity-segmentation-and-targeting-best/"
+                            },
+                            {
+                              "label": "Food Segments",
+                              "path": "https://www.roymorgan.com/products-and-tools/food-segments/"
+                            },
+                            {
+                              "label": "Helix Personas",
+                              "path": "https://www.helixpersonas.com.au/"
+                            },
+                            {
+                              "label": "Technology Adoption Segments",
+                              "path": "https://www.roymorgan.com/products-and-tools/technology-adoption-segments/"
+                            },
+                            {
+                              "label": "Values Segments",
+                              "path": "https://www.roymorgan.com/products-and-tools/values-segments/"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/products-and-tools#research",
+                        "label": "Research",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Customer Satisfaction Awards",
+                              "path": "https://www.roymorgan.com/products-and-tools/customer-satisfaction-awards/"
+                            },
+                            {
+                              "label": "Premium",
+                              "path": "https://www.roymorgan.com/products-and-tools/premium/"
+                            },
+                            {
+                              "label": "Risk",
+                              "path": "https://www.roymorgan.com/products-and-tools/risk/"
+                            },
+                            {
+                              "label": "Social Media",
+                              "path": "https://www.roymorgan.com/products-and-tools/social-media/"
+                            },
+                            {
+                              "label": "Young Australians Survey",
+                              "path": "https://www.roymorgan.com/products-and-tools/young-australians-survey/"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/products-and-tools/longitudinal-research",
+                        "label": "Longitudinal Research",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Centre for Longitudinal Research",
+                              "path": "https://www.roymorgan.com/products-and-tools/longitudinal-research"
+                            },
+                            {
+                              "label": "HILDA",
+                              "path": "/products-and-tools/hilda"
+                            },
+                            {
+                              "label": "Footprints in Time: The Longitudinal Study of Indigenous Children",
+                              "path": "https://www.roymorgan.com/products-and-tools/footprints-in-time"
+                            },
+                            {
+                              "label": "Growing Up in Australia",
+                              "path": "/products-and-tools/growing-up-in-australia"
+                            },
+                            {
+                              "label": "International Tobacco Control",
+                              "path": "https://www.roymorgan.com/products-and-tools/international-tobacco-control"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "/services",
+                  "label": "Services",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/services",
+                        "label": "What We Offer",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Advertising Research",
+                              "path": "/services/advertising-research"
+                            },
+                            {
+                              "label": "B2B Research",
+                              "path": "https://www.roymorgan.com/services/b2b-research/"
+                            },
+                            {
+                              "label": "Customised Research",
+                              "path": "/services/customised-research"
+                            },
+                            {
+                              "label": "Centre for Longitudinal Research",
+                              "path": "https://www.roymorgan.com/products-and-tools/longitudinal-research"
+                            },
+                            {
+                              "label": "International Interviewing",
+                              "path": "/services/international-interviewing"
+                            },
+                            {
+                              "label": "Online Research",
+                              "path": "/services/online-research"
+                            },
+                            {
+                              "label": "PitchPLANNER",
+                              "path": "/services/pitch-planner"
+                            },
+                            {
+                              "label": "Qualitative Research",
+                              "path": "/services/qualitative-research"
+                            },
+                            {
+                              "label": "Roy Morgan Research Community",
+                              "path": "https://www.roymorgan.com/roy-morgan-research-community"
+                            },
+                            {
+                              "label": "Telephone Interviewing",
+                              "path": "/services/telephone-interviewing"
+                            },
+                            {
+                              "label": "Web Audience Measure",
+                              "path": "/services/web-audience-measure-services"
+                            },
+                            {
+                              "label": "Who Called Me?",
+                              "path": "https://www.roymorgan.com/services/who-called-me"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/products-and-tools#major-studies",
+                        "label": "Major Studies",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Digital Universe",
+                              "path": "https://www.roymorgan.com/products-and-tools/digital-universe/"
+                            },
+                            {
+                              "label": "Government Policy",
+                              "path": "/products-and-tools/government-policy"
+                            },
+                            {
+                              "label": "State of the Nation",
+                              "path": "/products-and-tools/state-of-the-nation"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/newsletter",
+                        "label": "Subscribe",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "ABIX-Roy Morgan Daily News Summary",
+                              "path": "https://www.roymorgan.com/abix"
+                            },
+                            {
+                              "label": "Market Research Update",
+                              "path": "https://www.roymorgan.com/newsletter"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "/industries",
+                  "label": "Industries",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/industries",
+                        "label": "Fields",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Alcohol",
+                              "path": "https://www.roymorgan.com/industries/alcohol/"
+                            },
+                            {
+                              "label": "Automotive",
+                              "path": "https://www.roymorgan.com/industries/automotive/"
+                            },
+                            {
+                              "label": "Banking and Finance",
+                              "path": "https://www.roymorgan.com/industries/banking-and-finance/"
+                            },
+                            {
+                              "label": "Consumer Products",
+                              "path": "https://www.roymorgan.com/industries/consumer-products/"
+                            },
+                            {
+                              "label": "Economic, Political and Social",
+                              "path": "https://www.roymorgan.com/industries/economic-political-and-social/"
+                            },
+                            {
+                              "label": "Gambling",
+                              "path": "https://www.roymorgan.com/industries/gambling/"
+                            },
+                            {
+                              "label": "Media",
+                              "path": "https://www.roymorgan.com/industries/media/"
+                            },
+                            {
+                              "label": "Retail",
+                              "path": "https://www.roymorgan.com/industries/retail/"
+                            },
+                            {
+                              "label": "Superannuation",
+                              "path": "https://www.roymorgan.com/industries/superannuation/"
+                            },
+                            {
+                              "label": "Telecommunications and Technology",
+                              "path": "https://www.roymorgan.com/industries/telecommunications-and-technology/"
+                            },
+                            {
+                              "label": "Travel and Tourism",
+                              "path": "https://www.roymorgan.com/industries/travel-and-tourism/"
+                            },
+                            {
+                              "label": "Utilities",
+                              "path": "https://www.roymorgan.com/industries/utilities/"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "/findings",
+                  "label": "Findings",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/findings",
+                        "label": "Search Findings",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Market Research",
+                              "path": "/findings?types=%2Cmarket-research"
+                            },
+                            {
+                              "label": "Economic",
+                              "path": "/findings?types=%2Ceconomic"
+                            },
+                            {
+                              "label": "Political",
+                              "path": "/findings?types=%2Cpolitical"
+                            },
+                            {
+                              "label": "Social",
+                              "path": "/findings?types=%2Csocial"
+                            },
+                            {
+                              "label": "Media",
+                              "path": "/findings?types=%2Cmedia"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/papers",
+                        "label": "Papers",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Readership",
+                              "path": "https://www.roymorgan.com/papers/readership"
+                            },
+                            {
+                              "label": "Media",
+                              "path": "https://www.roymorgan.com/papers/media"
+                            },
+                            {
+                              "label": "Victoria Day Council",
+                              "path": "https://www.roymorgan.com/papers/women-the-media-and-people-from-other-countries-who-have-made-victoria"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/readerships",
+                        "label": "Readerships",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Magazine Readership",
+                              "path": "https://www.roymorgan.com/readerships/australian-magazine-readership"
+                            },
+                            {
+                              "label": "Magazine Cross-Platform",
+                              "path": "https://www.roymorgan.com/readerships/magazine-cross-platform-audience"
+                            },
+                            {
+                              "label": "Newspaper Cross-Platform",
+                              "path": "https://www.roymorgan.com/readerships/newspaper-cross-platform-audience"
+                            },
+                            {
+                              "label": "NZ Readership",
+                              "path": "https://www.roymorgan.com/readerships/readership-in-new-zealand"
+                            },
+                            {
+                              "label": "Readership Archive",
+                              "path": "https://www.roymorgan.com/readerships/australian-readership-archive"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/morgan-poll",
+                        "label": "Morgan Poll Data Tables",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Federal Voting",
+                              "path": "https://www.roymorgan.com/morgan-poll/primary-voting-intention/"
+                            },
+                            {
+                              "label": "Consumer Confidence",
+                              "path": "https://www.roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-summary/"
+                            },
+                            {
+                              "label": "Business Confidence",
+                              "path": "https://www.roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence/"
+                            },
+                            {
+                              "label": "Unemployment",
+                              "path": "https://www.roymorgan.com/morgan-poll/unemployment-roy-morgan-unemployment-methodology/"
+                            },
+                            {
+                              "label": "New Zealand",
+                              "path": "https://www.roymorgan.com/morgan-poll/new-zealand-government-confidence/"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "https://store.roymorgan.com/",
+                  "label": "Store",
+                  "childItems": {
+                    "nodes": []
+                  }
+                },
+                {
+                  "path": "https://www.roymorgan.com/about/",
+                  "label": "About",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "https://www.roymorgan.com/about/history",
+                        "label": "History",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/michele-levine",
+                        "label": "Leadership",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/contact-us",
+                        "label": "Global Operations",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/certification",
+                        "label": "Certification",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/careers/",
+                        "label": "Careers",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "slug": "header-menu"
+          },
+          "topmenu": {
+            "name": "Top Menu",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://store.roymorgan.com/",
+                  "label": "Shop"
+                },
+                {
+                  "path": "https://www.roymorgan.com/careers/",
+                  "label": "Careers"
+                },
+                {
+                  "path": "https://www.roymorgan.com/contact-us/",
+                  "label": "Contact Us"
+                }
+              ]
+            },
+            "slug": "top-menu"
+          }
+        },
+        "footer": {
+          "footerColOneMenu": {
+            "name": "Footer Menu Col One",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "/findings",
+                  "label": "Findings",
+                  "description": "Latest Press Releases and Morgan Poll updates"
+                },
+                {
+                  "path": "/newsletter",
+                  "label": "Newsletter",
+                  "description": "Stay informed of all the latest market research news and opinion poll results from Roy Morgan"
+                }
+              ]
+            },
+            "slug": "footer-menu-col-one"
+          },
+          "footerColTwoMenu": {
+            "name": "Footer Menu Col Two",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://www.roymorgan.com/contact-us/",
+                  "label": "Contact Us"
+                },
+                {
+                  "path": "https://store.roymorgan.com/",
+                  "label": "Store"
+                },
+                {
+                  "path": "https://www.roymorgan.com/abix/",
+                  "label": "ABIX"
+                }
+              ]
+            },
+            "slug": "footer-menu-col-two"
+          },
+          "footerColThreeMenu": {
+            "name": "Footer Menu Col Three",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://www.roymorgan.com/terms-of-use/",
+                  "label": "Terms of Use"
+                },
+                {
+                  "path": "https://www.roymorgan.com/quality-policy/",
+                  "label": "Quality Policy"
+                },
+                {
+                  "path": "/sitemap",
+                  "label": "Sitemap"
+                },
+                {
+                  "path": "https://www.roymorgan.com/privacy-policy/",
+                  "label": "Privacy Policy"
+                }
+              ]
+            },
+            "slug": "footer-menu-col-three"
+          },
+          "footerConnectMenu": {
+            "name": "Footer Menu Connect",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://www.linkedin.com/company/roymorganaus/",
+                  "label": "LinkedIn"
+                },
+                {
+                  "path": "https://twitter.com/roymorganaus",
+                  "label": "Twitter"
+                },
+                {
+                  "path": "https://www.facebook.com/RoyMorganAus/",
+                  "label": "Facebook"
+                },
+                {
+                  "path": "https://www.youtube.com/c/roymorganaus",
+                  "label": "YouTube"
+                },
+                {
+                  "path": "https://www.instagram.com/roymorganaus/",
+                  "label": "Instagram"
+                }
+              ]
+            },
+            "slug": "footer-menu-connect"
+          },
+          "themeSettings": {
+            "footerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135852/roy-morgan-logo-white-1.png"
+            },
+            "headerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135851/roy-morgan-logo-1.png"
+            },
+            "marginOfError": "<h3>Margin of Error</h3>\n<p>The margin of error to be allowed for in any estimate depends mainly on the number of interviews on which it is based. Margin of error gives indications of the likely range within which estimates would be 95% likely to fall, expressed as the number of percentage points above or below the actual estimate. Allowance for design effects (such as stratification and weighting) should be made as appropriate.</p>\n<table style=\"border-collapse: collapse; width: 100%;\">\n<tbody>\n<tr>\n<td style=\"width: 14.0299%; text-align: center;\"><strong>Sample Size</strong></td>\n<td style=\"width: 55.9701%; text-align: center;\"><strong>Percentage Estimate</strong></td>\n</tr>\n</tbody>\n</table>\n<table style=\"border-collapse: collapse; width: 100%; height: 192px;\">\n<tbody>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px;\"></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>40% &#8211; 60%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>25% or 75%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>10% or 90%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>5% or 95%</strong></td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">1,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±3.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±2.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">5,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.2</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.8</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">7,500</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.1</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.5</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">10,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">20,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">50,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.2</td>\n</tr>\n</tbody>\n</table>\n"
+          }
+        }
+      },
+      "slug": "9797-most-important-issues-facing-australia-january-2025"
+    },
+    "__N_SSP": true
+  },
+  "page": "/findings/[slug]",
+  "query": {
+    "slug": "9797-most-important-issues-facing-australia-january-2025"
+  },
+  "buildId": "R_VhJuIheJBm6ex3gCJWb",
+  "isFallback": false,
+  "isExperimentalCompile": false,
+  "gssp": true,
+  "scriptLoader": []
+}

@@ -1,0 +1,69 @@
+{
+  "observed": "2026-11-23",
+  "authority": "Australian Data Archive (ADA) Dataverse",
+  "nativeApi": {
+    "endpoint": "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:{doi}",
+    "doisAttempted": [
+      "10.26193/qfoeoe",
+      "10.26193/okry2a",
+      "10.26193/rqtj5u",
+      "10.26193/sl1rhe"
+    ],
+    "result": "HTTP 200 HTML bot challenge, not dataset JSON",
+    "challengeTitle": "Making sure you're not a bot!",
+    "datafileAttempt": {
+      "id": 1959,
+      "endpoint": "https://dataverse.ada.edu.au/api/access/datafile/1959",
+      "result": "HTTP 200 text/html bot challenge; no codebook text returned"
+    }
+  },
+  "publicDatasetPages": [
+    {
+      "doi": "10.26193/qfoeoe",
+      "pageTitle": "Australian Gallup Polls, February 1979 - Australian Gallup Poll Dataverse",
+      "readMethod": "repository chrome-article.mjs, public page, no credentials",
+      "documentationFilesSeen": [
+        { "datafileId": 1958, "name": "1 ADA.CODEBOOK.00199.pdf" },
+        { "datafileId": 1960, "name": "1 ADA.NOTE.00199.pdf" },
+        { "datafileId": 1961, "name": "1 ADA.QUESTIONNAIRE.00199.pdf" }
+      ],
+      "otherCodebookFormatsListedWithoutAConfirmedId": [
+        "1 ADA.CODEBOOK.00199.html",
+        "1 ADA.CODEBOOK.00199.txt"
+      ],
+      "codebookTextCaptured": false
+    },
+    {
+      "doi": "10.26193/okry2a",
+      "pageTitle": "Australian Gallup Polls, March 1980 - Australian Gallup Poll Dataverse",
+      "readMethod": "repository chrome-article.mjs, public page, no credentials",
+      "documentationFilesSeen": [
+        { "datafileId": 2446, "name": "1 ADA.CODEBOOK.00277.pdf" },
+        { "datafileId": 2448, "name": "1 ADA.CODINGFRAME.00277.pdf" },
+        { "datafileId": 2449, "name": "1 ADA.NOTE.00277.pdf" },
+        { "datafileId": 2450, "name": "1 ADA.QUESTIONNAIRE.00277.pdf" }
+      ],
+      "codebookTextCaptured": false
+    },
+    {
+      "doi": "10.26193/rqtj5u",
+      "pageTitle": "Australian Gallup Polls, February 1982 - Australian Gallup Poll Dataverse",
+      "readMethod": "repository chrome-article.mjs, public page, no credentials",
+      "documentationFilesSeen": [
+        { "datafileId": 2771, "name": "1 ADA.CODEBOOK.00354.pdf" },
+        { "datafileId": 2773, "name": "1 ADA.NOTE.00354.pdf" },
+        { "datafileId": 2774, "name": "1 ADA.QUESTIONNAIRE.00354.pdf" }
+      ],
+      "codebookTextCaptured": false
+    }
+  ],
+  "unresolvedPageRead": {
+    "doi": "10.26193/sl1rhe",
+    "result": "Repository Chrome helper reported that JavaScript execution through AppleScript was turned off; no file listing was captured."
+  },
+  "subsequentAccess": {
+    "repositoryChromeHelper": "CHROME_JS_ERROR: JavaScript through AppleScript was turned off while attempting public datafile 1959.",
+    "cleanCredentialFreeChrome": "ADA returned a page titled Oh noes! and datafile 1959 again returned challenge HTML. No stored cookies, account credentials or user/profile state were read, and no custom challenge-solving code was used."
+  },
+  "implication": "File names and DataCite abstracts prove deposits and topics only. They do not prove the MIP instrument's deposited response variable, category/value mapping, missing-data rules, weights or fieldwork. No coded distribution may be emitted from this cache alone."
+}

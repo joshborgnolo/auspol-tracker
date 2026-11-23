@@ -1,0 +1,2000 @@
+{
+  "_about": "Australian Election Study national issue history, 1990–2025: the 18 charts in the Election issues chapter of the official 2025 trends monograph. Categories and printed shares are preserved without renormalisation; null means an actually blank cell, not zero.",
+  "schemaVersion": 1,
+  "source": {
+    "publisher": "Australian Election Study",
+    "authors": [
+      "Sarah Cameron",
+      "Ian McAllister",
+      "Juliet Pietsch"
+    ],
+    "title": "Trends in Australian Political Opinion: Results from the Australian Election Study, 1987–2025",
+    "published": "2025-11",
+    "reportUrl": "https://australianelectionstudy.org/wp-content/uploads/Trends-in-Australian-Political-Opinion-1987-2025.pdf",
+    "aggregateProvider": "Holy Sheet",
+    "aggregateRoute": "https://holy-sheet.visualise.today/sheet/<sheetId>",
+    "nationalRowRule": "col1 === ''",
+    "responseCategoryRule": "col0",
+    "granularity": "Published national aggregate percentages; no respondent-level microdata",
+    "generator": ".build/extract-aes-issues.mjs",
+    "cacheManifest": ".build/aes-issues-src/manifest.json",
+    "supersededSources": [
+      {
+        "id": "3.7.2022",
+        "role": "superseded-edition",
+        "currentSeries": "3.7",
+        "edition": "2022",
+        "sheetId": "1fZFDcl1SFJwZLpaLxWXzZPFjIWwPy7uJHNXhXK9BXXE",
+        "url": "https://holy-sheet.visualise.today/sheet/1fZFDcl1SFJwZLpaLxWXzZPFjIWwPy7uJHNXhXK9BXXE",
+        "cacheFile": "3.7.2022.json",
+        "sha256": "ce78d571238d44c4c4156b0aeae0b467899cb082e7dd2274e167399f1c4dcb52"
+      }
+    ]
+  },
+  "batteries": {
+    "most-important-economic-election-issues": "Most important economic election issues",
+    "most-important-non-economic-election-issues": "Most important non-economic election issues",
+    "preferred-party-policy": "Preferred party policy",
+    "vote-decision-importance": "Importance in vote decision"
+  },
+  "cellSemantics": {
+    "unit": "percent",
+    "national": "All-voters rows are selected strictly by col1 === ''. Response labels are col0 verbatim.",
+    "datedRows": "Only years actually present and non-empty in the official national chart rows. No years are inferred or forward-filled.",
+    "null": "The official cell is blank or null; this is missing, not a zero reading.",
+    "zero": "A published numeric zero remains 0 and is distinct from null.",
+    "normalisation": "None. ALP, Coalition and No difference (and all vote-importance categories) are retained as printed; no ALP+Coalition renormalisation."
+  },
+  "series": [
+    {
+      "id": "3.1",
+      "title": "Most important economic election issues",
+      "battery": "most-important-economic-election-issues",
+      "reportPage": 32,
+      "options": [
+        "Education",
+        "Taxation",
+        "Management of the economy",
+        "Cost of living",
+        "Industrial relations",
+        "Unemployment"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "Education": 5.1,
+            "Taxation": 10.7,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": null,
+            "Unemployment": 10.7
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "Education": 6.5,
+            "Taxation": null,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": null,
+            "Unemployment": 27.2
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "Education": 11.2,
+            "Taxation": 18.3,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": 7,
+            "Unemployment": 13.4
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Education": 5.8,
+            "Taxation": 23.2,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": 1.2,
+            "Unemployment": 8.8
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Education": 17,
+            "Taxation": 16.3,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": 1.4,
+            "Unemployment": 3.8
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Education": 15,
+            "Taxation": 16.4,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": 2.3,
+            "Unemployment": 1.9
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Education": 10.5,
+            "Taxation": 11,
+            "Management of the economy": null,
+            "Cost of living": null,
+            "Industrial relations": 16.3,
+            "Unemployment": 2.2
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Education": 12.6,
+            "Taxation": 7.3,
+            "Management of the economy": 21.1,
+            "Cost of living": null,
+            "Industrial relations": 3.2,
+            "Unemployment": 3.3
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Education": 14.9,
+            "Taxation": 10.6,
+            "Management of the economy": 27.5,
+            "Cost of living": null,
+            "Industrial relations": 2.9,
+            "Unemployment": null
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Education": 12.1,
+            "Taxation": 10.5,
+            "Management of the economy": 20,
+            "Cost of living": null,
+            "Industrial relations": null,
+            "Unemployment": null
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Education": 8.1,
+            "Taxation": 11.8,
+            "Management of the economy": 24,
+            "Cost of living": null,
+            "Industrial relations": null,
+            "Unemployment": null
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Education": 4.3,
+            "Taxation": 8.9,
+            "Management of the economy": 15.1,
+            "Cost of living": 31.9,
+            "Industrial relations": null,
+            "Unemployment": null
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Education": 4.4,
+            "Taxation": 9.7,
+            "Management of the economy": 12.2,
+            "Cost of living": 35.7,
+            "Industrial relations": null,
+            "Unemployment": null
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1FZbk2a9Acy2Xhp_0qF-UIpWRmHHuMidbBMf8xb3Ju_E",
+        "url": "https://holy-sheet.visualise.today/sheet/1FZbk2a9Acy2Xhp_0qF-UIpWRmHHuMidbBMf8xb3Ju_E",
+        "cacheFile": "3.1.json",
+        "sha256": "c04798c1ea848dd5fcdd1101843db5ca58e3203d22e977f391cd0261537523bc"
+      },
+      "notes": [
+        "‘Taxation’ was not included in 1993."
+      ]
+    },
+    {
+      "id": "3.2",
+      "title": "Most important non-economic election issues",
+      "battery": "most-important-non-economic-election-issues",
+      "reportPage": 33,
+      "options": [
+        "Health",
+        "Environment",
+        "Climate change",
+        "Refugees and asylum seekers",
+        "Immigration"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "Health": 8.8,
+            "Environment": 11,
+            "Climate change": null,
+            "Refugees and asylum seekers": null,
+            "Immigration": null
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "Health": 6.4,
+            "Environment": 4,
+            "Climate change": null,
+            "Refugees and asylum seekers": null,
+            "Immigration": null
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "Health": 25.5,
+            "Environment": 5.1,
+            "Climate change": null,
+            "Refugees and asylum seekers": null,
+            "Immigration": 4
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Health": 9.9,
+            "Environment": 2.9,
+            "Climate change": null,
+            "Refugees and asylum seekers": null,
+            "Immigration": 2.8
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Health": 16.1,
+            "Environment": 3.7,
+            "Climate change": null,
+            "Refugees and asylum seekers": 13,
+            "Immigration": 4.5
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Health": 30.2,
+            "Environment": 5.5,
+            "Climate change": null,
+            "Refugees and asylum seekers": 2.7,
+            "Immigration": 1.8
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Health": 20.5,
+            "Environment": 7.7,
+            "Climate change": 7.4,
+            "Refugees and asylum seekers": null,
+            "Immigration": 2.9
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Health": 23,
+            "Environment": 4.6,
+            "Climate change": 7.8,
+            "Refugees and asylum seekers": 5.6,
+            "Immigration": null
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Health": 19,
+            "Environment": 5.8,
+            "Climate change": 3.5,
+            "Refugees and asylum seekers": 10.1,
+            "Immigration": 2.2
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Health": 24.1,
+            "Environment": 5.5,
+            "Climate change": 4.1,
+            "Refugees and asylum seekers": 6.1,
+            "Immigration": 4.2
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Health": 21.6,
+            "Environment": 10.9,
+            "Climate change": 10.2,
+            "Refugees and asylum seekers": 3.2,
+            "Immigration": 3
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Health": 10,
+            "Environment": 7.1,
+            "Climate change": 10.3,
+            "Refugees and asylum seekers": 1,
+            "Immigration": 2.6
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Health": 13.4,
+            "Environment": 3,
+            "Climate change": 5.1,
+            "Refugees and asylum seekers": null,
+            "Immigration": 6.3
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1kqM-G7H6m_AM-CaV8ry35iYSn9993fMBWJM7XObZ9MY",
+        "url": "https://holy-sheet.visualise.today/sheet/1kqM-G7H6m_AM-CaV8ry35iYSn9993fMBWJM7XObZ9MY",
+        "cacheFile": "3.2.json",
+        "sha256": "235848fb281e891d989d1ca3e0263b1105eebd5daed23d6995275be6060c71e0"
+      },
+      "notes": [
+        "In 1996–2025 estimates for health are for ‘Health and Medicare’. The source category label remains ‘Health’.",
+        "‘Refugees and asylum seekers’ was not included in 2007."
+      ]
+    },
+    {
+      "id": "3.3",
+      "title": "Preferred party policy on management of the economy",
+      "battery": "preferred-party-policy",
+      "topic": "Management of the economy",
+      "reportPage": 34,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 27,
+            "Coalition": 36.8,
+            "No difference": 21.5
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 22.8,
+            "Coalition": 43.7,
+            "No difference": 18.3
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 17,
+            "Coalition": 44.1,
+            "No difference": 21.7
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 20.7,
+            "Coalition": 46.7,
+            "No difference": 17.1
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 24.6,
+            "Coalition": 36.7,
+            "No difference": 20.9
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 30.7,
+            "Coalition": 22.7,
+            "No difference": 27.1
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1ciiipu6Nqjx3_gEWzkSUdG_csVnBsyPOy7NoS-OYPW8",
+        "url": "https://holy-sheet.visualise.today/sheet/1ciiipu6Nqjx3_gEWzkSUdG_csVnBsyPOy7NoS-OYPW8",
+        "cacheFile": "3.3.json",
+        "sha256": "9ec356a86771cac92df139c5bff0e0f92e7be041ffe184160e28046ecc64f440"
+      }
+    },
+    {
+      "id": "3.4",
+      "title": "Preferred party policy on education",
+      "battery": "preferred-party-policy",
+      "topic": "Education",
+      "reportPage": 35,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "ALP": 34.1,
+            "Coalition": 22.6,
+            "No difference": 23.3
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "ALP": 43.7,
+            "Coalition": 27.4,
+            "No difference": 16.6
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "ALP": 28.7,
+            "Coalition": 31.1,
+            "No difference": 23.8
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "ALP": 40.2,
+            "Coalition": 23.8,
+            "No difference": 22.1
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "ALP": 47.5,
+            "Coalition": 26.7,
+            "No difference": 16.5
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "ALP": 44.3,
+            "Coalition": 35.1,
+            "No difference": 11.9
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "ALP": 57.5,
+            "Coalition": 21,
+            "No difference": 14.8
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 41.1,
+            "Coalition": 24.1,
+            "No difference": 22
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 42.8,
+            "Coalition": 25.4,
+            "No difference": 18.7
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 42.2,
+            "Coalition": 24,
+            "No difference": 19.5
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 40.2,
+            "Coalition": 25.2,
+            "No difference": 18.9
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 37.4,
+            "Coalition": 18.4,
+            "No difference": 24.4
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 39.7,
+            "Coalition": 15.2,
+            "No difference": 26.3
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1JVqAZTjiq6v3QXIqm0GR1GU9r7hxVE2I6o1eOKYuFFc",
+        "url": "https://holy-sheet.visualise.today/sheet/1JVqAZTjiq6v3QXIqm0GR1GU9r7hxVE2I6o1eOKYuFFc",
+        "cacheFile": "3.4.json",
+        "sha256": "73ed7753ebbc1ff821dab9355ad0583797dd22975e8da4080d7ca40a9a6ff8f8"
+      }
+    },
+    {
+      "id": "3.5",
+      "title": "Preferred party policy on taxation",
+      "battery": "preferred-party-policy",
+      "topic": "Taxation",
+      "reportPage": 36,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "ALP": 27.3,
+            "Coalition": 38.9,
+            "No difference": 17
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "ALP": 21,
+            "Coalition": 42.1,
+            "No difference": 20.6
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "ALP": 35.9,
+            "Coalition": 44.8,
+            "No difference": 10.5
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "ALP": 33.3,
+            "Coalition": 39,
+            "No difference": 17.5
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "ALP": 27.4,
+            "Coalition": 41.4,
+            "No difference": 18.1
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "ALP": 29.7,
+            "Coalition": 31.9,
+            "No difference": 26.8
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 26.6,
+            "Coalition": 33,
+            "No difference": 24.3
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 25,
+            "Coalition": 34.4,
+            "No difference": 21.6
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 30.8,
+            "Coalition": 33.2,
+            "No difference": 19.4
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 28.2,
+            "Coalition": 41,
+            "No difference": 14.2
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 23.2,
+            "Coalition": 28.9,
+            "No difference": 25.7
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 30.7,
+            "Coalition": 22.7,
+            "No difference": 27.1
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1WiZZqG2Unl69FZ9tTqTk_AHlx8UwNkcjH_iSlR-TDLw",
+        "url": "https://holy-sheet.visualise.today/sheet/1WiZZqG2Unl69FZ9tTqTk_AHlx8UwNkcjH_iSlR-TDLw",
+        "cacheFile": "3.5.json",
+        "sha256": "378560b7978b324b731c6b443a4bed54a704b2aa00db198b7f19eba5cb1b3b0a"
+      }
+    },
+    {
+      "id": "3.6",
+      "title": "Preferred party policy on health",
+      "battery": "preferred-party-policy",
+      "topic": "Health",
+      "reportPage": 37,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "ALP": 45.8,
+            "Coalition": 29,
+            "No difference": 13.2
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "ALP": 52.6,
+            "Coalition": 31.9,
+            "No difference": 8.3
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "ALP": 38.7,
+            "Coalition": 38.4,
+            "No difference": 14
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "ALP": 41.4,
+            "Coalition": 26.8,
+            "No difference": 17.4
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "ALP": 40.9,
+            "Coalition": 27.9,
+            "No difference": 19.5
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "ALP": 43.5,
+            "Coalition": 37.2,
+            "No difference": 11.2
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "ALP": 48.3,
+            "Coalition": 24.6,
+            "No difference": 17.7
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 37.2,
+            "Coalition": 26.4,
+            "No difference": 22.9
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 36.5,
+            "Coalition": 26.7,
+            "No difference": 21.5
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 44.8,
+            "Coalition": 26.4,
+            "No difference": 17.1
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 43.4,
+            "Coalition": 23.7,
+            "No difference": 17.5
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 42.3,
+            "Coalition": 18.5,
+            "No difference": 21.9
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 49.5,
+            "Coalition": 14.4,
+            "No difference": 21.1
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1GLpSNLS53frSsLWXnaYCNk6Cd2-G5BFuGCMv-56x4Ig",
+        "url": "https://holy-sheet.visualise.today/sheet/1GLpSNLS53frSsLWXnaYCNk6Cd2-G5BFuGCMv-56x4Ig",
+        "cacheFile": "3.6.json",
+        "sha256": "b1d05066153a0b791d72ca95d377b306aa6acba58a12bc261932e5dc00cbae09"
+      }
+    },
+    {
+      "id": "3.7",
+      "title": "Preferred party policy on the environment",
+      "battery": "preferred-party-policy",
+      "topic": "Environment",
+      "reportPage": 38,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "ALP": 54,
+            "Coalition": 15.4,
+            "No difference": 17.1
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "ALP": 35.3,
+            "Coalition": 16.6,
+            "No difference": 30.7
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "ALP": 29.5,
+            "Coalition": 29.7,
+            "No difference": 25.8
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "ALP": 28.1,
+            "Coalition": 17.1,
+            "No difference": 34.7
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "ALP": 26.9,
+            "Coalition": 20.9,
+            "No difference": 36.2
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "ALP": 34.6,
+            "Coalition": 28.4,
+            "No difference": 23.3
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "ALP": 55.5,
+            "Coalition": 19,
+            "No difference": 17.7
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 32.7,
+            "Coalition": 19.9,
+            "No difference": 31.8
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 35.6,
+            "Coalition": 22.5,
+            "No difference": 24.8
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 31.4,
+            "Coalition": 17.7,
+            "No difference": 32.4
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 40,
+            "Coalition": 21.4,
+            "No difference": 22
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 42.4,
+            "Coalition": 16,
+            "No difference": 24.4
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 36.9,
+            "Coalition": 16.5,
+            "No difference": 27.3
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1vh9O5wUBYCXt0iEp5YJoKOlPfgmgeQr4KWbbJ8ZbMbA",
+        "url": "https://holy-sheet.visualise.today/sheet/1vh9O5wUBYCXt0iEp5YJoKOlPfgmgeQr4KWbbJ8ZbMbA",
+        "cacheFile": "3.7.json",
+        "sha256": "b0cae7f00b59a04e9e64a5d46e44f9774cd7dc960850ea7ba5c3b2801d598b2c"
+      }
+    },
+    {
+      "id": "3.8",
+      "title": "Preferred party policy on climate change",
+      "battery": "preferred-party-policy",
+      "topic": "Climate change",
+      "reportPage": 39,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 2007,
+          "values": {
+            "ALP": 55.3,
+            "Coalition": 17,
+            "No difference": 17
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 33.1,
+            "Coalition": 22.2,
+            "No difference": 29.3
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 34.5,
+            "Coalition": 22.5,
+            "No difference": 24
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 28,
+            "Coalition": 16.4,
+            "No difference": 33.5
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 39.8,
+            "Coalition": 19.8,
+            "No difference": 21.5
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 41.2,
+            "Coalition": 15.1,
+            "No difference": 25.3
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 37.5,
+            "Coalition": 14.8,
+            "No difference": 27
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "18Ck-rdZBLJ9JrFj9s2mG2fM6X5NcrGv34hvTUIor7GM",
+        "url": "https://holy-sheet.visualise.today/sheet/18Ck-rdZBLJ9JrFj9s2mG2fM6X5NcrGv34hvTUIor7GM",
+        "cacheFile": "3.8.json",
+        "sha256": "3e9e2c83d9a28a24ad2ca02ac0e524b1580b5fe9fc3296f5c2e152ed00b88abc"
+      }
+    },
+    {
+      "id": "3.9",
+      "title": "Preferred party policy on immigration",
+      "battery": "preferred-party-policy",
+      "topic": "Immigration",
+      "reportPage": 40,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 1996,
+          "values": {
+            "ALP": 19.6,
+            "Coalition": 46.2,
+            "No difference": 15.6
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "ALP": 25.8,
+            "Coalition": 23,
+            "No difference": 30.1
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "ALP": 19.9,
+            "Coalition": 47.2,
+            "No difference": 22.7
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "ALP": 22.1,
+            "Coalition": 38.8,
+            "No difference": 20.5
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "ALP": 29.5,
+            "Coalition": 28.4,
+            "No difference": 24.8
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 20.8,
+            "Coalition": 36.9,
+            "No difference": 26.3
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 22.5,
+            "Coalition": 34.8,
+            "No difference": 26.2
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 23.7,
+            "Coalition": 34.8,
+            "No difference": 21.4
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 26,
+            "Coalition": 24.6,
+            "No difference": 25.3
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "ALP": 29,
+            "Coalition": 28.4,
+            "No difference": 23
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1XRl69hGodTsKMuHuOkcWwBiCSVMVemcUjglmKeq7wVY",
+        "url": "https://holy-sheet.visualise.today/sheet/1XRl69hGodTsKMuHuOkcWwBiCSVMVemcUjglmKeq7wVY",
+        "cacheFile": "3.9.json",
+        "sha256": "b9112fae64b44677b4a4230f80c6d563afa752f89ed2c610349dac9b3a2aab07"
+      }
+    },
+    {
+      "id": "3.10",
+      "title": "Preferred party policy on refugees and asylum seekers",
+      "battery": "preferred-party-policy",
+      "topic": "Refugees and asylum seekers",
+      "reportPage": 41,
+      "options": [
+        "ALP",
+        "Coalition",
+        "No difference"
+      ],
+      "rows": [
+        {
+          "year": 2001,
+          "values": {
+            "ALP": 15.1,
+            "Coalition": 46.4,
+            "No difference": 27.4
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "ALP": 22,
+            "Coalition": 35.8,
+            "No difference": 21.6
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "ALP": 20.7,
+            "Coalition": 38,
+            "No difference": 26.6
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "ALP": 18.8,
+            "Coalition": 40.7,
+            "No difference": 27.1
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "ALP": 18.8,
+            "Coalition": 34.1,
+            "No difference": 31.2
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "ALP": 24.5,
+            "Coalition": 34.7,
+            "No difference": 21.5
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "ALP": 27.1,
+            "Coalition": 24.8,
+            "No difference": 24.5
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1Z0wkSeB-kFPIxtEq61wg4LCX4udMrZLbqYayG8tYXLA",
+        "url": "https://holy-sheet.visualise.today/sheet/1Z0wkSeB-kFPIxtEq61wg4LCX4udMrZLbqYayG8tYXLA",
+        "cacheFile": "3.10.json",
+        "sha256": "dc28ee0ebdce08644f16223246cf4996b2bcae80b97020597cab8024d3819cd2"
+      }
+    },
+    {
+      "id": "3.11",
+      "title": "Importance of management of the economy in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Management of the economy",
+      "reportPage": 42,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 69.8,
+            "Quite important": 26.9,
+            "Not very important": 3.3
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 67.6,
+            "Quite important": 26.9,
+            "Not very important": 5.5
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 56.8,
+            "Quite important": 37.7,
+            "Not very important": 5.5
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 62.6,
+            "Quite important": 33.7,
+            "Not very important": 3.7
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 62.5,
+            "Quite important": 33.9,
+            "Not very important": 3.6
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 68.7,
+            "Quite important": 27.6,
+            "Not very important": 3.8
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1c87W8xHXB5-tOh5ZlApev0VSgsnNc_yVzU9kHf9TkS8",
+        "url": "https://holy-sheet.visualise.today/sheet/1c87W8xHXB5-tOh5ZlApev0VSgsnNc_yVzU9kHf9TkS8",
+        "cacheFile": "3.11.json",
+        "sha256": "43fc34da23b83c27665a82f2625cabd4ce2f452c4901f7c0b1aeb114b351508d"
+      }
+    },
+    {
+      "id": "3.12",
+      "title": "Importance of education in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Education",
+      "reportPage": 43,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "Extremely important": 49.7,
+            "Quite important": 33,
+            "Not very important": 17.3
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "Extremely important": 49.8,
+            "Quite important": 29.7,
+            "Not very important": 20.5
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "Extremely important": 50.4,
+            "Quite important": 33.1,
+            "Not very important": 16.5
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Extremely important": 66.1,
+            "Quite important": 26.7,
+            "Not very important": 7.2
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Extremely important": 64.9,
+            "Quite important": 29.3,
+            "Not very important": 5.9
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Extremely important": 69.2,
+            "Quite important": 26,
+            "Not very important": 4.7
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Extremely important": 68.3,
+            "Quite important": 26.2,
+            "Not very important": 5.5
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 61,
+            "Quite important": 33.1,
+            "Not very important": 5.9
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 63.3,
+            "Quite important": 30,
+            "Not very important": 6.7
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 60.2,
+            "Quite important": 32.6,
+            "Not very important": 7.2
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 62.2,
+            "Quite important": 32.6,
+            "Not very important": 5.2
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 58.3,
+            "Quite important": 33.5,
+            "Not very important": 8.2
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 56.7,
+            "Quite important": 35.8,
+            "Not very important": 7.5
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1EAOpfBivS_B24kB6DYF8sUdb4gZnktkSwI3_ZLcZRec",
+        "url": "https://holy-sheet.visualise.today/sheet/1EAOpfBivS_B24kB6DYF8sUdb4gZnktkSwI3_ZLcZRec",
+        "cacheFile": "3.12.json",
+        "sha256": "63b213c936ff7d5b2cbd17ef0c3d4f903e14a9a82c745faac33e96dcda6d646b"
+      }
+    },
+    {
+      "id": "3.13",
+      "title": "Importance of taxation in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Taxation",
+      "reportPage": 44,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "Extremely important": 59.1,
+            "Quite important": 30.7,
+            "Not very important": 10.1
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "Extremely important": 44.1,
+            "Quite important": 36,
+            "Not very important": 19.9
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Extremely important": 67.7,
+            "Quite important": 26.3,
+            "Not very important": 6
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Extremely important": 44.9,
+            "Quite important": 40.6,
+            "Not very important": 14.5
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Extremely important": 44.1,
+            "Quite important": 39.7,
+            "Not very important": 16.2
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Extremely important": 39.3,
+            "Quite important": 41.1,
+            "Not very important": 19.5
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 40.4,
+            "Quite important": 49,
+            "Not very important": 10.6
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 36.5,
+            "Quite important": 44.9,
+            "Not very important": 18.5
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 37.5,
+            "Quite important": 46.7,
+            "Not very important": 15.8
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 45.1,
+            "Quite important": 45.1,
+            "Not very important": 9.8
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 39.3,
+            "Quite important": 47.9,
+            "Not very important": 12.7
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 46.2,
+            "Quite important": 41.9,
+            "Not very important": 11.9
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1llDx2d7myBR_pnAxuB80pqH1Ys_EGzWsFJQPlnh6qMc",
+        "url": "https://holy-sheet.visualise.today/sheet/1llDx2d7myBR_pnAxuB80pqH1Ys_EGzWsFJQPlnh6qMc",
+        "cacheFile": "3.13.json",
+        "sha256": "62fe22160bd72e9c00b736d57f7d020d583822e2267d4879be3840c0182698a9"
+      }
+    },
+    {
+      "id": "3.14",
+      "title": "Importance of health in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Health",
+      "reportPage": 45,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "Extremely important": 54.3,
+            "Quite important": 34.5,
+            "Not very important": 11.2
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "Extremely important": 70.4,
+            "Quite important": 24.3,
+            "Not very important": 5.3
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "Extremely important": 67.7,
+            "Quite important": 24.6,
+            "Not very important": 7.7
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Extremely important": 69.1,
+            "Quite important": 26.1,
+            "Not very important": 4.8
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Extremely important": 65.9,
+            "Quite important": 29.6,
+            "Not very important": 4.5
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Extremely important": 76.2,
+            "Quite important": 20.9,
+            "Not very important": 2.8
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Extremely important": 76.3,
+            "Quite important": 20.8,
+            "Not very important": 2.9
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 72.6,
+            "Quite important": 24.4,
+            "Not very important": 3
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 68.4,
+            "Quite important": 26.9,
+            "Not very important": 4.7
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 69.8,
+            "Quite important": 25.7,
+            "Not very important": 4.5
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 69.9,
+            "Quite important": 28,
+            "Not very important": 2.1
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 70.1,
+            "Quite important": 25.8,
+            "Not very important": 4.1
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 72.4,
+            "Quite important": 24.2,
+            "Not very important": 3.3
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1MHMXhl5qY4T4cO7XTdRp8L9W-t2Z2b4yHZ_59FF-nUw",
+        "url": "https://holy-sheet.visualise.today/sheet/1MHMXhl5qY4T4cO7XTdRp8L9W-t2Z2b4yHZ_59FF-nUw",
+        "cacheFile": "3.14.json",
+        "sha256": "3da48acad941777a7ea95acac2b2ee95e42d059c4ef89136b3c22ad9baaa855b"
+      }
+    },
+    {
+      "id": "3.15",
+      "title": "Importance of the environment in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Environment",
+      "reportPage": 46,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 1990,
+          "values": {
+            "Extremely important": 52,
+            "Quite important": 35.3,
+            "Not very important": 12.7
+          }
+        },
+        {
+          "year": 1993,
+          "values": {
+            "Extremely important": 40.7,
+            "Quite important": 41.5,
+            "Not very important": 17.8
+          }
+        },
+        {
+          "year": 1996,
+          "values": {
+            "Extremely important": 41.8,
+            "Quite important": 42,
+            "Not very important": 16.2
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Extremely important": 43.8,
+            "Quite important": 45.7,
+            "Not very important": 10.5
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Extremely important": 46.7,
+            "Quite important": 44.2,
+            "Not very important": 9.1
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Extremely important": 51.6,
+            "Quite important": 39.9,
+            "Not very important": 8.4
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Extremely important": 59.2,
+            "Quite important": 36.1,
+            "Not very important": 4.7
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 41,
+            "Quite important": 46.8,
+            "Not very important": 12.2
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 42.7,
+            "Quite important": 44.8,
+            "Not very important": 12.5
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 42.4,
+            "Quite important": 44,
+            "Not very important": 13.6
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 52.7,
+            "Quite important": 37,
+            "Not very important": 10.2
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 49.6,
+            "Quite important": 37.5,
+            "Not very important": 12.9
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 44.2,
+            "Quite important": 41.6,
+            "Not very important": 14.2
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1yiWEKZ1wQeJnSrcIqaIsinpN_Ub1kKPvFvG4iDyrheQ",
+        "url": "https://holy-sheet.visualise.today/sheet/1yiWEKZ1wQeJnSrcIqaIsinpN_Ub1kKPvFvG4iDyrheQ",
+        "cacheFile": "3.15.json",
+        "sha256": "d7ded2e18e164cfe4ba2d300d7e0fc6baa2931d7049d443c735a64798e5f4b2b"
+      }
+    },
+    {
+      "id": "3.16",
+      "title": "Importance of climate change in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Climate change",
+      "reportPage": 47,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 2007,
+          "values": {
+            "Extremely important": 51.5,
+            "Quite important": 36.8,
+            "Not very important": 11.7
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 30.2,
+            "Quite important": 43.6,
+            "Not very important": 26.2
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 33.4,
+            "Quite important": 40.4,
+            "Not very important": 26.2
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 34.4,
+            "Quite important": 41.7,
+            "Not very important": 23.9
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 46.7,
+            "Quite important": 34.6,
+            "Not very important": 18.7
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 43.2,
+            "Quite important": 33,
+            "Not very important": 23.8
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 37.7,
+            "Quite important": 33.8,
+            "Not very important": 28.4
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1JqhIF85QinFw63ZVjlDKoRFIj2DN0KCjs3iJRS5Yk6o",
+        "url": "https://holy-sheet.visualise.today/sheet/1JqhIF85QinFw63ZVjlDKoRFIj2DN0KCjs3iJRS5Yk6o",
+        "cacheFile": "3.16.json",
+        "sha256": "ae8cd5741ee7b3c82ffdb06a855884f79961590a17023d1dc17b33396ee715bc"
+      }
+    },
+    {
+      "id": "3.17",
+      "title": "Importance of immigration in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Immigration",
+      "reportPage": 48,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 1996,
+          "values": {
+            "Extremely important": 30.9,
+            "Quite important": 36.4,
+            "Not very important": 32.8
+          }
+        },
+        {
+          "year": 1998,
+          "values": {
+            "Extremely important": 30.2,
+            "Quite important": 41.3,
+            "Not very important": 28.6
+          }
+        },
+        {
+          "year": 2001,
+          "values": {
+            "Extremely important": 49.8,
+            "Quite important": 38.5,
+            "Not very important": 11.7
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Extremely important": 31.6,
+            "Quite important": 45.6,
+            "Not very important": 22.8
+          }
+        },
+        {
+          "year": 2007,
+          "values": {
+            "Extremely important": 31.7,
+            "Quite important": 44,
+            "Not very important": 24.2
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 43,
+            "Quite important": 38.5,
+            "Not very important": 18.5
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 46,
+            "Quite important": 36.3,
+            "Not very important": 17.7
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 35.3,
+            "Quite important": 44,
+            "Not very important": 20.7
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 28.9,
+            "Quite important": 49,
+            "Not very important": 22.1
+          }
+        },
+        {
+          "year": 2025,
+          "values": {
+            "Extremely important": 41.8,
+            "Quite important": 36.6,
+            "Not very important": 21.7
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1WadqzTUzORL95Q2n0U_vAC5Z7vvGf3o63lqGfMgq_2w",
+        "url": "https://holy-sheet.visualise.today/sheet/1WadqzTUzORL95Q2n0U_vAC5Z7vvGf3o63lqGfMgq_2w",
+        "cacheFile": "3.17.json",
+        "sha256": "b1727050c628f08e617743e0e8b436e9d31b784d2d5485b0badd4b8a487c77b6"
+      }
+    },
+    {
+      "id": "3.18",
+      "title": "Importance of refugees and asylum seekers in vote decision",
+      "battery": "vote-decision-importance",
+      "topic": "Refugees and asylum seekers",
+      "reportPage": 49,
+      "options": [
+        "Extremely important",
+        "Quite important",
+        "Not very important"
+      ],
+      "rows": [
+        {
+          "year": 2001,
+          "values": {
+            "Extremely important": 50.5,
+            "Quite important": 33.3,
+            "Not very important": 16.2
+          }
+        },
+        {
+          "year": 2004,
+          "values": {
+            "Extremely important": 30.1,
+            "Quite important": 40.4,
+            "Not very important": 29.6
+          }
+        },
+        {
+          "year": 2010,
+          "values": {
+            "Extremely important": 36.8,
+            "Quite important": 37.1,
+            "Not very important": 26.1
+          }
+        },
+        {
+          "year": 2013,
+          "values": {
+            "Extremely important": 45.6,
+            "Quite important": 34.5,
+            "Not very important": 19.9
+          }
+        },
+        {
+          "year": 2016,
+          "values": {
+            "Extremely important": 45.4,
+            "Quite important": 34.4,
+            "Not very important": 20.2
+          }
+        },
+        {
+          "year": 2019,
+          "values": {
+            "Extremely important": 32.9,
+            "Quite important": 42.2,
+            "Not very important": 24.9
+          }
+        },
+        {
+          "year": 2022,
+          "values": {
+            "Extremely important": 27.5,
+            "Quite important": 42.7,
+            "Not very important": 29.8
+          }
+        }
+      ],
+      "source": {
+        "sheetId": "1mowRtF2Gjd1c_hcXsfG0_lQTspCaXhgHOMIIKIcKvfo",
+        "url": "https://holy-sheet.visualise.today/sheet/1mowRtF2Gjd1c_hcXsfG0_lQTspCaXhgHOMIIKIcKvfo",
+        "cacheFile": "3.18.json",
+        "sha256": "26f8b9154eb70046d4cb8595cd93f5d582b4b29d2423f10ca099c37500268714"
+      }
+    }
+  ],
+  "coverage": {
+    "series": 18,
+    "datedRows": 188,
+    "responseOptions": 59,
+    "numericCells": 584,
+    "nullCells": 45,
+    "zeroCells": 0,
+    "firstYear": 1990,
+    "lastYear": 2025,
+    "cachedAggregateResponses": 19
+  }
+}

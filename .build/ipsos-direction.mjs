@@ -414,7 +414,7 @@ function datesOf(text) {
   return { start, end: start && end && end >= start ? end : null, fieldwork };
 }
 
-function sampleOf(text) {
+export function sampleOf(text) {
   const m = text.match(/Representative sample of\s+(?:(c\.|approximately|about|over)\s*)?([\d,]+)\s+adults/i);
   if (m) return m[1] ? null : num(m[2]);
   // 2022–2023 display-list metadata can scramble the printed base into
@@ -530,7 +530,7 @@ const DIRECTION_ANCHOR = /RIGHT DIRECTION\/WRONG TRACK|RIGHT DIRECTION VS\. WRON
    right) – and the range ending in the labelled month that is printed most
    often wins (a stale footer copied from an earlier wave loses on count);
    ties go to the later end. */
-function fieldworkOf(text, textPage, month) {
+export function fieldworkOf(text, textPage, month) {
   const m0 = Date.parse(month + "-01T00:00:00Z");
   const [y, mo] = month.split("-").map(Number);
   const m1 = Date.UTC(y, mo, 1) - 864e5;                 // the month's last day

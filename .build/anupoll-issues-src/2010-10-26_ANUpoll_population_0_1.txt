@@ -1,0 +1,1296 @@
+                         poll
+THE AUSTRALIAN NATIONAL UNIVERSITY
+
+
+
+ Public opinion towards
+  population growth in
+               Australia
+
+                               Ian McAllister
+                                Aaron Martin
+                                Juliet Pietsch
+
+       ANU College of Arts and Social Sciences
+
+
+
+
+                             October 2010
+There is perhaps no more important policy issue for Australia in the 21st century than the size
+of the population. The size of the population shapes our economic growth, the infrastructure
+we put in place to meet the needs of the population, and much of what we take for granted in
+our society. It is appropriate, therefore, that the seventh in the series, deals with this important
+policy issue.
+
+The results from the ANUpoll show that many Australians need to be convinced by the need for
+a larger population, citing a wide range of problems that population growth brings. If there is to
+be a larger population, most hope that it will come through greater levels of population fertility
+rather than by immigration. And there are widespread concerns about the social and economic
+impact of the ageing population, and the ability of government to deal with it.
+
+Like previous ANUpolls, this study sheds new light on public opinion about a major policy topic
+that will shape Australia’s future development for decades to come. The survey fulfils the
+University’s mission of addressing topics of national importance. The ANUpoll also differs from
+other opinion polls by placing public opinion in a broad policy context, and by benchmarking
+Australia against international opinion.
+
+ANUpoll was designed to inform public and policy debate, and to assist in scholarly research.
+It builds on the University’s long tradition of social survey research, which began in the 1960s.
+I hope this ANUpoll contributes to a greater understanding of the issues surrounding Australia’s
+population debate.
+
+
+
+
+Professor Ian Chubb AC
+Vice-Chancellor, The Australian National University
+
+
+
+
+©The Australian National University, 2010
+Copyright of material contained in this publication
+is held by The Australian National University.
+
+CRICOS Provider #00120C
+MO_10114
+                         poll
+THE AUSTRALIAN NATIONAL UNIVERSITY
+
+
+
+ Public opinion towards
+  population growth in
+               Australia
+
+                               Ian McAllister
+                                Aaron Martin
+                                Juliet Pietsch
+
+       ANU College of Arts and Social Sciences
+
+
+
+
+                              REPORT 7
+                             October 2010
+    Key points summary
+    Population policy
+    •   A total of 44 per cent of Australians favour population growth, while 52 per cent want the population
+        to remain at or below current levels.
+    •   Support for a population increase is based mainly on arguments that are associated with economic growth.
+    •   Opposition to a population increase is broadly based, encompassing concerns about the effect on the
+        economy as well as the effects on the natural and built environments.
+
+    Environment & infrastructure
+    •   A majority of Australians think that the world population is too large, and is causing environmental damage.
+    •   Opinions are divided on the effects of Australia’s current population size on the environment, with three
+        in 10 thinking that the current population levels are not harming the environment.
+    •   Australian and British respondents have very similar opinions about the world population, but differ
+        considerably on evaluations of the environmental effects of their own national populations.
+    •   About half of the respondents think that people should consider limiting the sizes of their families in order
+        to minimise the impact of population growth on the environment.
+
+    Immigration versus fertility
+    •   About half of Australians want to see the population increased through greater fertility, and just 16 per
+        cent want to see any increase come about through more immigration.
+    •   If the population were to increase through immigration, skilled migrants are seen as more acceptable than
+        either refugees or family migrants.
+
+    The ageing population
+    •   Around two in three respondents believe that the ageing population will cause Australia problems
+        in the future.
+    •   A majority of the public are concerned about the government’s ability to tackle the problem, and reject
+        increased taxes as an option.
+    •   Slightly more respondents want to see individuals rather than governments funding the costs of
+        retirement.
+
+    Key trends: Most important problems & political mood
+    •   The economy and jobs are viewed by the public as the most important problems facing Australia, with
+        17 per cent mentioning them, although this represents a substantial decline on previous surveys.
+    •   A large majority of Australians are satisfied with the way the country is heading, with little change since
+        we first asked the question in early 2008.
+
+
+
+
+2   ANUpoll Report 7
+Contents
+Population policy                                        4
+
+Environment and infrastructure                           6
+
+Immigration versus fertility                             9
+
+The ageing population                                    11
+
+Key trends: Most important problems and political mood   13
+
+Questions                                                15
+    Population policy
+
+    Key points
+    •       A total of 44 per cent of Australians favour population growth, while
+            52 per cent want the population to remain at or below current levels.
+    •       Support for a population increase is based mainly on arguments that
+            are associated with economic growth.
+    •       Opposition to a population increase is broadly based, encompassing
+            concerns about the effect on the economy as well as the effects on
+            the natural and built environments.
+
+
+    The size and growth of Australia’s population has been a periodic public policy concern, but
+    it has rarely been an issue for public opinion. Public debates about population policy have
+    generally taken place in the context of the immigration program. Prime Minister Kevin Rudd’s
+    statement in October 2009 that he believed in a ‘big Australia’, followed by projections that the
+    population would reach 36 million by 2050, have for the first time focused public attention on
+    population growth.
+    As a consequence of this debate, on 3 April 2010, the government appointed Tony Burke as
+    Australia’s first population minister, with responsibility for drawing up a national population
+    policy. In June 2010, following Julia Gillard’s replacement of Kevin Rudd as Prime Minister, the
+    position became retitled the Minister for Sustainable Population.
+    What, then, are the public’s views on the future size of the population? The aim of this ANUpoll
+    is, for the first time, to find out in-depth what the public thinks about population growth, and
+    to examine the reasons that underlie their opinions.
+    The survey first asked the respondents if they believed that Australia needed more people. When
+    given this choice, 44 per cent of the respondents said that Australia did need more people, and
+    52 per cent said that Australia did not need more. A relatively small number, just four per cent,
+    had no view, suggesting that the public had well-formed opinions on the question.
+
+    Does Australia need more people? (per cent)
+
+    60
+                                              52
+    50                 44
+
+    40
+
+    30
+
+    20
+
+    10                                                                4
+
+        0
+                       Yes                    No                 Can't say
+
+
+            Q Do you think Australia needs more people?
+
+4   ANUpoll Report 7
+The survey next asked the respondents what reasons they most agreed with in support of their
+opinions about population growth, with supporters and opponents of growth being asked a
+separate group of eight questions. For those who supported a population increase, the main
+justification was economic growth, with 38 per cent strongly agreeing with the proposition,
+followed by 33 per cent who supported bringing skilled migrants into the workforce and
+creating more cultural diversity.
+
+Reasons for opinions on population growth (per cent ‘strongly agree’)
+
+Reasons for increasing the population….               Reasons for not increasing the population….
+
+…We need more people for economic growth         38   …The cost of housing is too high               53
+                                                      …We should train our own skilled people, not
+…We need skilled migrants for the workforce      33   take them from other countries                 52
+…Having more people means more cultural               …Australia might not have enough water for
+diversity                                        33   more people                                    45
+…Increasing fertility or migration rates could        …Our cities are too crowded and there is too
+counteract the ageing of the population          20   much traffic                                   45
+…More population could boost the housing              …The natural environment is stressed by the
+industry and help support property prices        16   numbers we already have                        43
+ …A larger population could make it easier to         …Having more people could make
+ defend Australia                                11   unemployment worse                             35
+ …A larger population could give Australia more       …Population growth makes it harder for
+ say in world affairs                           11    Australia to cut total greenhouse gas emissions 32
+
+ …We could ease overpopulation overseas by
+ taking in more migrants                         9    …We have too much cultural diversity already   28
+
+
+The reasons for not supporting population growth all gained greater support, ranging from
+the cost of housing, which 53 per cent of the respondents strongly agreed with, to concerns
+about skills training and the pressure on cities and the natural environment that a population
+increase would cause. In general, opponents of population growth supported a more varied
+range of explanations than the supporters; opponents of population growth strongly agreed
+with an average of 3.1 of the eight statements they were presented with, while those who
+were in favour of population growth strongly agreed with only 1.7 of the statements they were
+presented with.
+Support for population growth is therefore driven in the main by economic arguments.
+Opposition to population growth is more broadly based, encompassing not just the economy,
+but concerns about the effects such a change could bring on the natural and built environment.
+
+
+
+
+                                                                                          ANUpoll Report 7   5
+    Environment & infrastructure
+
+    Key points
+    •        A majority of Australians think that the world population is too large,
+             and is causing environmental damage.
+    •        Opinions are divided on the effects of Australia’s current population
+             size on the environment, with three in 10 thinking that the current
+             population levels are not harming the environment.
+    •        Australian and British respondents have very similar opinions about
+             the world population, but differ considerably on evaluations of the
+             environmental effects of their own national populations.
+    •        About half of the respondents think that people should consider
+             limiting the sizes of their families in order to minimise the impact
+             of population growth on the environment.
+
+
+    The population policy section indicated that opinions about the size of Australia’s future
+    population are strongly rooted in beliefs about the potential environmental damage that a large
+    population might cause. To explore this further the survey asked a series of questions about
+    the potential effects of population growth on the environment, and at what population level
+    environmental damage might become a risk.
+    The respondents were first asked if they thought there could be higher population levels without
+    environmental damage. The same question was also asked in a British survey conducted in May
+    2009. Just 16 per cent of the Australian respondents thought that there could be a higher world
+    population without causing environmental damage. Two-thirds of those interviewed thought that
+    the world population was too high, and was causing environmental damage. The figures from the
+    British survey indicate that the British respondents took almost exactly the same view about the
+    effects of the world population on the environment as did their Australian counterparts.
+    The world’s population size & the environment (per cent)
+
+           Could be lot higher
+                                           4
+               without causing
+        environmental damage           2
+
+
+               Could be higher
+                                                        12                                Britain         Australia
+               without causing
+                                           4
+        environmental damage
+
+
+        About right not causing                         12
+         environmental damage                  6
+
+
+        Bit too high, is causing                                                                         36
+        environmental damage                                                                  33
+
+
+    Much too high, is causing                                                            31
+      environmental damage                                                                                      39
+
+
+                                   0       5       10        15   20      25        30              35           40
+
+
+             Q The current world human population is 6.8 billion and growing. Thinking about this…
+             Which, if any, of the following statements relating to the world population level and
+             environmental impact do you agree with?
+
+
+6   ANUpoll Report 7
+In contrast to their views about the world population, the Australian respondents had mixed
+views about the effects of the levels of Australian population on the environment. A plurality
+of the respondents thought that the current population level was about right and not causing
+environmental damage. Opinions were evenly divided about whether the population could be
+higher without causing environmental damage, or if it needed to be lower to avoid damage.
+A total of 31 per cent of respondents thought it was a bit or much too high and causing
+environmental damage. Slightly more (35 per cent) thought the population size could be higher
+without causing environmental damage.
+Not surprisingly, the same figures for Britain show much more resistance to a population
+increase. Respondents there see such a scenario as likely to lead to environmental damage.
+A total of 38 per cent of the British respondents see the population as much too high and
+causing damage, compared to just nine per cent of their Australian counterparts.
+
+Australia and Britain’s population size & the environment (per cent)
+
+
+     Could be lot higher
+                                 2
+         without causing
+                                             9
+  environmental damage
+                                                                                     Britain        Australia
+
+         Could be higher             4
+          without causing
+                                                                           26
+   environmental damage
+
+ About right not causing                          12
+  environmental damage                                                          29
+
+
+  Bit too high, is causing                                                             32
+  environmental damage                                           22
+
+
+Much too high, is causing                                                                                38
+  environmental damage                       9
+
+
+                             0           5   10        15   20        25        30             35               40
+
+
+
+
+       Q Australia’s population is just over 21 million. [The current UK human population is
+       61 million and growing] Thinking about this… Which, if any, of the following statements
+       relating to the Australian population level and environmental impact do you agree with?
+
+
+
+
+                                                                                        ANUpoll Report 7             7
+    The survey also asked about the impact of family fertility on the environment, and if people
+    should consider the environment when deciding to have more children. About half of the
+    respondents thought that either the number of children would not affect the environment, or
+    that the environment should not be a consideration in deciding family size. Among those who
+    were not in favour of increasing the population, considerations about family size loomed larger;
+    among this group, a total of 52 per cent thought that people should have smaller families in
+    order to help the environment.
+
+
+    Environmental damage & family size (per cent)
+
+
+
+                                                                                                                  Do not increase
+
+                                                                              All respondents
+                                                                                                Increase
+
+                                                                                                population size   population size
+
+     Yes, they should think about not having any children                          2                     1                 2
+     Yes, they should think about having only one child                            3                     1                 4
+     Yes, they should think about having up to two children only              24                      18                28
+     Yes, they should think about having up to three children only            18                      18                18
+     No, they shouldn’t worry about the environment and just have as
+     many children as they like                                               26                      30                23
+     The number of children people have won’t affect the environment          21                      26                18
+     Can’t say                                                                     6                     6                 7
+     Total                                                                  100                   100               100
+
+
+
+
+         Q Do you think people should take the impact on the environment into account when
+         deciding how many children to have?
+
+
+
+
+8   ANUpoll Report 7
+Immigration versus fertility
+
+Key points
+•      About half of Australians want to see the population increased through
+       greater fertility, and just 16 per cent want to see any increase come
+       about through more immigration.
+•      If the population were to increase through immigration, skilled
+       migrants are seen as more acceptable than either refugees or family
+       migrants.
+
+
+
+
+If the Australian population were to increase, growth could only come about by either higher
+levels of fertility among the existing population, or by more immigration. In recent years,
+population increases have come about largely through immigration, since the levels of fertility
+in the population have declined consistently from the 1970s through to the present.
+The survey respondents were asked if they favoured population growth coming about
+through higher levels of fertility or as a result of higher levels of immigration. Just over half
+of the respondents favoured growth through greater fertility, with just 16 per cent favouring
+immigration as the major growth mechanism. Moreover, a greater proportion of those favouring
+the fertility option held their opinions strongly compared to those favouring immigration.
+Around a quarter of the respondents said both methods were appropriate.
+
+
+Should the population grow through fertility or immigration? (per cent)
+30
+                                27
+             25
+25
+                                              23
+
+
+
+20
+
+
+
+15
+                                                                 12
+
+
+10
+
+
+
+ 5                                                                                    4
+
+
+
+ 0
+       Strongly favour    Favour people      Both        Favour encouraging    Strongly favour
+     people having more    having more                    more migrants to    encouraging more
+           children          children                            come         migrants to come
+
+
+
+
+       Q If the Australian population were to grow, would you favour growth occurring by
+       encouraging people having more children, or by encouraging more migrants coming to Australia?
+
+
+
+
+                                                                                             ANUpoll Report 7   9
+     Immigration is, then, the least popular of the two options for population growth. However,
+     if immigration did become the major means of increasing the size of the population, what sort
+     of immigrants would the public like to see come to Australia? The survey suggests that skilled
+     migrants, who could contribute directly to the economy, would be the preferred group. Just over
+     one in three of the respondents said that they would ‘strongly support’ accepting more skilled
+     migrants, compared to 21 per cent who said that they would ‘strongly support’ accepting more
+     refugees or family migrants.
+
+     Preferences for migrant groups (per cent)
+
+
+     Skilled migrants                                                                 35
+
+
+
+
+     Family migrants                                          21
+
+
+
+
+            Refugees                                          21
+
+
+
+                        0      5       10       15       20        25      30       35      40
+
+
+
+
+          Q If Australia’s population were to grow by increased immigration, please say whether you
+          support or oppose Australia accepting more of the following types of migrant: … Humanitarian
+          migrants – that is refugees … Family migrants – that’s relatives of migrants already living in
+          Australia … Skilled migrants – that’s migrants with particular skills.
+
+
+
+
+10   ANUpoll Report 7
+The ageing population
+
+Key points
+•       Around two in three respondents believe that the ageing population
+        will cause Australia problems in the future.
+•       A majority of the public are concerned about the government’s ability
+        to tackle the problem, and reject increased taxes as an option.
+•       Slightly more respondents want to see individuals rather than
+        governments funding the costs of retirement.
+
+
+
+
+Australia is predicted to have one of the largest proportions of aged citizens within the OECD
+by the middle of the century. A government report published in early 2010, Australia to
+2050: Future Challenges, examined these trends and estimated that with the decline in the
+proportion of people of working age, there will be only 2.7 people of traditional working age
+to support each retired person by 2050. This is about half the proportion at the present time.
+It is anticipated that these trends will produce significantly slower economic growth, as well
+as reducing the proportion of the population in the workforce.
+
+Will the ageing population cause problems for Australia? (per cent)
+
+40
+              35
+35                              33
+
+30
+
+25
+
+20                                                                 17
+
+15
+
+10
+                                                  4
+    5                                                                                2
+
+    0
+        Strongly agree        Agree        Neither agree        Disagree         Strongly
+                                           nor disagree                          disagree
+
+
+
+        Q Now turning to Australia’s ageing population. Do you agree or disagree that the ageing
+        population will cause Australia problems in the future?
+
+
+
+
+                                                                                     ANUpoll Report 7   11
+     Well over half of the respondents (68 per cent) believe that the ageing population will cause
+     Australia problems in the future. Just 19 per cent disagree with the statement, suggesting that
+     public discussion of the problem (in the media and by politicians) has had a significant impact
+     on the public’s understanding of the problem and its implications.
+     This conclusion is also supported by a question asking if the respondents were worried about
+     the government’s ability to fund the costs associated with the ageing population. Of those
+     interviewed in the survey, 32 per cent said they were ‘very worried’, and 36 per cent said
+     they were ‘worried’ by the issue. Only 13 per cent said that they were not worried about the
+     costs related to an ageing population. Again, the survey evidence confirms the widespread
+     understanding that exists in the population about the problem.
+     In general, the respondents take a pessimistic view of the ability of the government to manage
+     the consequences of an ageing population. Less than one in four believe that the health system
+     will be able to cope, and 59 per cent believe that government services will have to be cut in
+     order to meet the additional costs. However, a majority disagree that taxes should be increased
+     to pay for these additional costs, and opinions are divided on whether or not retirees should
+     fund their own retirement.
+
+     The consequences of the ageing population (per cent)
+
+                                                                     Neither
+                                          Strongly                 agree nor                 Strongly
+      Do you agree or disagree that…         agree        Agree     disagree    Disagree     disagree
+      …the public health care system
+      will be able to cope with the              4           18           4           33           38
+      ageing population
+      …the government will have
+      to cut programs and welfare
+      spending in the future to deal            19           40           5           21               8
+      with the costs associated with
+      an ageing population
+      …the government should
+      increase taxes in order to pay
+                                                 6           30           5           30           26
+      for the costs associated with an
+      ageing population
+      …retirees should fund their own
+                                                13           29          23           21           12
+      retirement
+
+
+     These results suggest that while the public is aware of the problem of the ageing population,
+     and of its potential consequences, there is uncertainty and divided opinion about how
+     government should tackle it. Most importantly, a majority do not wish to see taxes raised to
+     deal with it, and there is a balance of opinion in favour of individuals rather than government
+     funding retirements. A majority of the public clearly sees private solutions to the ageing
+     population as preferable to public ones.
+
+
+
+
+12   ANUpoll Report 7
+Key trends: Most important problems
+and political mood
+
+Key points
+•       The economy and jobs are viewed by the public as the most important
+        problems facing Australia, with 17 per cent mentioning them, although
+        this represents a substantial decline on previous surveys.
+•       A large majority of Australians are satisfied with the way the country
+        is heading, with little change since we first asked the question in
+        early 2008.
+
+
+
+
+Since ANUpoll started in early 2008, the two main problems mentioned as priorities for
+Australia by the survey respondents have been the economy and the environment, the latter
+also encompassing global warming. The global financial crisis and the recession resulted in the
+economy dominating the mentions as the most important problem facing the country for most
+of 2009.
+In this ANUpoll, many fewer respondents mentioned the economy and jobs as the most
+important problem; 17 per cent mentioned it, compared to 32 per cent in October 2009. The
+peak concern about the economy occurred in early 2009, when just over half of the survey
+respondents mentioned it as the most important problem facing the country.
+
+Most important problems facing Australia (per cent)
+
+                                                          Per cent                       (July-Oct
+ Rank         Issue                                     mentioned                         Change)
+    1         Economy/jobs                                     17                            (-15)
+    2         Health care                                      13                             (+6)
+    3         Immigration                                      13                             (+6)
+    4         Environment/global warming                       12                              (-2)
+    5         Law and order                                      5                            (+1)
+
+
+        Q What do you think is the most important problem facing Australia today?
+
+
+Health care was the second most frequently mentioned problem in the current survey, at 13
+per cent, followed by immigration. The environment and global warming were mentioned by
+12 per cent of the respondents, a decrease of 2 percentage points. No other issue attracted the
+attention of more than one in 20 of the respondents. It would appear that declining worries
+about the state of the economy have been partially replaced by a renewed concern about health
+and immigration.
+
+
+
+
+                                                                                    ANUpoll Report 7   13
+     Per cent mentioning the economy and the environment since April 2008 (per cent)
+
+     60
+                                                           53
+
+
+     50
+                                                                             42
+
+     40
+                                                                                         32
+
+     30                  26
+                                                                     Economy/jobs
+                                      22
+            19                                                       Environment
+     20                  23                                                                                     17
+
+            19
+                                      18
+
+     10                                                                                  14
+                                                           12                                                   12
+                                                                             10
+
+
+      0
+          Apr-08    Jun-08 Aug-08 Oct-08 Dec-08   Feb-09    Apr-09    Jun-09 Aug-09 Oct-09 Dec-09    Feb-10   Apr-10
+
+     The political mood has been remarkably positive over the two years since ANUpoll began, and
+     this poll is no exception. A remarkably high 65 per cent are satisfied with the way the country is
+     heading, compared to 70 per cent in October 2009 and 71 per cent in July 2009. Just 18 per cent
+     say that they are dissatisfied, and a further 8 per cent are ‘very dissatisfied’. The predominant
+     picture remains one of general satisfaction, with relatively little change over the seven polls in
+     two years. The economic concerns, registered most clearly in the first poll in 2009, have had little
+     effect on the predominantly positive political mood of the country.
+
+     Satisfaction with the country’s direction (per cent)
+
+
+                 Very satisfied                   14
+
+
+                     Satisfied                                                                      51
+
+     Neither satisfied nor
+                                           7
+              dissatisfied
+
+                   Dissatisfied                        18
+
+
+          Very dissatisfied                8       8
+
+                                  0        10          20               30          40        50              60
+
+
+
+       Q All things considered, are you satisfied or dissatisfied with the way the country is heading?
+
+
+
+
+14   ANUpoll Report 7
+Questions: general questions
+
+Q I’d like to start with a general question about your views on life in Australia.
+All things considered, are you satisfied or dissatisfied with the way the country is heading?
+                                                               Number          Per cent         Cumulative per cent
+Very satisfied                                                     172               14.4                     14.4
+Satisfied                                                          614               51.2                     65.6
+Neither satisfied nor dissatisfied                                   90               7.5                     73.1
+Dissatisfied                                                       216               18.0                     91.1
+Very dissatisfied                                                    91               7.6                     98.6
+(Don’t know/not sure)                                                14               1.2                     99.8
+(Refused)                                                             2                .2                    100.0
+Total                                                             1200           100.0
+
+Q What do you think is the most important problem facing Australia today?
+                                                               Number          Per cent         Cumulative per cent
+Economy/jobs                                                       200               16.7                     16.7
+Industrial relations                                                  3                .3                     16.9
+Interest rates                                                        2                .2                     17.1
+Housing affordability                                                27               2.2                     19.3
+Health care                                                        158               13.1                     32.4
+Education                                                            35               2.9                     35.3
+Defence/national security                                            10                .9                     36.2
+Terrorism                                                             5                .4                     36.6
+Iraq war                                                              1                .1                     36.7
+Environment/global warming                                         146               12.2                     48.9
+Water management                                                     51               4.2                     53.1
+Immigration                                                        153               12.8                     65.9
+Indigenous affairs                                                   19               1.6                     67.5
+Taxation                                                              9                .8                     68.2
+Social services (including aged care, etc)                            4                .4                     68.6
+Law and order/crime/justice system                                   65               5.4                     74.0
+Poverty/social exclusion/inequality                                  12               1.0                     75.0
+Infrastructure/planning/innovation                                   21               1.7                     76.8
+Alcohol and drug use                                                  8                .7                     77.5
+Better government                                                    57               4.7                     82.2
+Young people’s behaviour/attitudes                                   23               1.9                     84.1
+Foreign influence/Australia’s position in the world                  14               1.2                     85.3
+Values/morals/respect for others                                     30               2.5                     87.8
+Family/community/societal breakdown                                   4                .4                     88.1
+Increasing/ageing population                                         43               3.6                     91.8
+
+                                                                                                    ANUpoll Report 7   15
+      Q What do you think is the most important problem facing Australia today? (continued)
+                                                                 Number        Per cent       Cumulative per cent
+      Other                                                           42            3.5                     95.2
+      None                                                             7             .6                     95.8
+      (Don’t know/Can’t say)                                          47            3.9                     99.7
+      (Refused)                                                        3             .3                    100.0
+      Total                                                         1200          100.0
+
+      Q And what do you think is the second most important problem facing Australia today?
+                                                                 Number        Per cent       Cumulative per cent
+      Economy/jobs                                                   155           13.5                     13.5
+      Industrial relations                                             9             .8                     14.3
+      Interest rates                                                   4             .4                     14.7
+      Housing affordability                                           30            2.6                     17.3
+      Health care                                                    126           11.0                     28.3
+      Education                                                       80            7.0                     35.3
+      Defence/national security                                       10             .8                     36.2
+      Terrorism                                                        4             .4                     36.5
+      Iraq war                                                         2             .2                     36.7
+      Environment/global warming                                     105            9.2                     45.9
+      Water management                                                37            3.2                     49.1
+      Immigration                                                    126           11.0                     60.1
+      Indigenous affairs                                              12            1.1                      61.2
+      Taxation                                                         8             .7                      61.9
+      Social services (including aged care, etc,)                     15            1.3                     63.2
+      Law and order/crime/justice system                              36            3.2                     66.4
+      Poverty/social exclusion/inequality                             25            2.2                     68.6
+      Infrastructure/planning/innovation                              35            3.1                      71.7
+      Alcohol and drug use                                             9             .8                     72.5
+      Better government                                               40            3.5                     76.0
+      Young people’s behaviour/attitudes                               6             .5                     76.5
+      Foreign influence/Australia’s position in the world              7             .6                     77.1
+      Values/morals/respect for others                                17            1.5                     78.6
+      Family/community/societal breakdown                             15            1.3                     79.9
+      Increasing/ageing population                                    47            4.1                     84.0
+      Other                                                           54            4.7                     88.7
+      None                                                            22            1.9                     90.6
+      (Don’t know/Can’t say)                                         106            9.3                     99.9
+      (Refused)                                                        1            0.1                    100.0
+      Total                                                         1143          100.0
+      (Missing)                                                       57
+      Total                                                         1200
+
+16   ANUpoll Report 7
+Questions: population policy
+
+Q Do you think Australia needs more people?
+                                                             Number         Per cent       Cumulative per cent
+Yes                                                             305            43.9                      43.9
+No                                                              362            52.1                      96.1
+(Can’t say)                                                       27             3.9                    100.0
+Total                                                           695           100.0
+
+
+Q Various reasons have been given to increase Australia’s population. Please say whether you agree
+or disagree with each of the following statements.
+… We need more people for economic growth.
+                                                             Number         Per cent       Cumulative per cent
+Strongly agree                                                   116           37.8                      37.8
+Agree                                                            163           53.5                      91.3
+Neither agree nor disagree                                         1             0.2                     91.5
+Disagree                                                          24             7.9                     99.5
+Strongly disagree                                                  1             0.3                     99.8
+(Can’t say)                                                        1             0.2                    100.0
+Total                                                            305          100.0
+(Missing)                                                        390
+Total                                                            695
+
+
+Q… Having more people means more cultural diversity.
+                                                             Number         Per cent       Cumulative per cent
+Strongly agree                                                   100           32.6                      32.6
+Agree                                                            171           56.2                      88.8
+Neither agree nor disagree                                         3             1.1                     89.9
+Disagree                                                          23             7.7                     97.6
+Strongly disagree                                                  6             1.9                     99.4
+(Can’t say)                                                        2             0.6                    100.0
+Total                                                            305          100.0
+(Missing)                                                        390
+Total                                                            695
+
+
+
+
+                                                                                               ANUpoll Report 7   17
+      Q… We could ease over-population overseas by taking in more migrants.
+                                                                   Number      Per cent   Cumulative per cent
+      Strongly agree                                                      27       8.8                  8.8
+      Agree                                                              166      54.3                 63.0
+      Neither agree nor disagree                                          10       3.4                 66.4
+      Disagree                                                            69      22.5                 88.9
+      Strongly disagree                                                   26       8.6                 97.5
+      (Can’t say)                                                          8       2.5                100.0
+      Total                                                              305     100.0
+      (Missing)                                                          390
+      Total                                                              695
+
+
+      Q… A larger population could make it easier to defend Australia.
+                                                                   Number      Per cent   Cumulative per cent
+      Strongly agree                                                      34      11.3                  11.3
+      Agree                                                              139      45.4                 56.7
+      Neither agree nor disagree                                          12       3.9                 60.6
+      Disagree                                                            87      28.5                 89.1
+      Strongly disagree                                                   22       7.2                 96.3
+      (Can’t say)                                                          9       3.0                 99.3
+      (Refused)                                                            2       0.7                100.0
+      Total                                                              305     100.0
+      (Missing)                                                          390
+      Total                                                              695
+
+
+      Q …We need skilled migrants for the work force.
+                                                                   Number      Per cent   Cumulative per cent
+      Strongly agree                                                     102      33.4                 33.4
+      Agree                                                              154      50.3                 83.7
+      Neither agree nor disagree                                           4       1.5                 85.2
+      Disagree                                                            30       9.7                 94.9
+      Strongly disagree                                                   14       4.6                 99.5
+      (Can’t say)                                                          2       0.5                100.0
+      Total                                                              305     100.0
+      (Missing)                                                          390
+      Total                                                              695
+
+
+
+
+18   ANUpoll Report 7
+Q… Increasing fertility or migration rates could counteract the ageing of the population.
+                                                              Number         Per cent       Cumulative per cent
+Strongly agree                                                     62            20.2                    20.2
+Agree                                                             178            58.4                    78.6
+Neither agree nor disagree                                           2            0.8                    79.4
+Disagree                                                            41           13.6                    93.0
+Strongly disagree                                                    4            1.3                    94.2
+(Can’t say)                                                        18             5.8                   100.0
+Total                                                             305           100.0
+(Missing)                                                         390
+Total                                                             695
+
+
+Q… More population could boost the housing industry and help support property prices.
+                                                              Number         Per cent       Cumulative per cent
+Strongly agree                                                     48            15.7                    15.7
+Agree                                                             159            52.2                    67.8
+Neither agree nor disagree                                           7            2.3                    70.1
+Disagree                                                           69            22.7                    92.7
+Strongly disagree                                                    8            2.7                    95.5
+(Can’t say)                                                        14             4.5                   100.0
+Total                                                             305           100.0
+(Missing)                                                         390
+Total                                                             695
+
+
+Q… A larger population could give Australia more say in world affairs.
+                                                              Number         Per cent       Cumulative per cent
+Strongly agree                                                     35            11.5                     11.5
+Agree                                                             161            52.8                    64.3
+Neither agree nor disagree                                           9            3.1                    67.3
+Disagree                                                           89            29.1                    96.4
+Strongly disagree                                                    2            0.7                    97.2
+(Can’t say)                                                          7            2.3                    99.5
+(Refused)                                                            2            0.5                   100.0
+Total                                                             305           100.0
+(Missing)                                                         390
+Total                                                             695           100.0
+
+
+
+
+                                                                                               ANUpoll Report 7   19
+      Q Various reasons have been given to NOT increase Australia’s population. Please say whether you agree
+      or disagree with each of the following statements.
+      … Our cities are too crowded and there is too much traffic.
+                                                                   Number         Per cent       Cumulative per cent
+      Strongly agree                                                      162        44.7                       44.7
+      Agree                                                               127        34.9                       79.6
+      Neither agree nor disagree                                            3          0.8                      80.4
+      Disagree                                                             63        17.4                       97.8
+      Strongly disagree                                                     5          1.5                      99.3
+      (Can’t say)                                                           1          0.3                      99.5
+      (Refused)                                                             2          0.5                     100.0
+      Total                                                               362       100.0
+      (Missing)                                                           333
+      Total                                                               695       100.0
+
+
+      Q… We have too much cultural diversity already.
+                                                                   Number         Per cent       Cumulative per cent
+      Strongly agree                                                      103        28.3                       28.3
+      Agree                                                                81        22.4                       50.7
+      Neither agree nor disagree                                            9          2.5                      53.2
+      Disagree                                                            110        30.5                       83.6
+      Strongly disagree                                                    49        13.7                       97.3
+      (Can’t say)                                                           8          2.3                      99.6
+      (Refused)                                                             2          0.4                     100.0
+      Total                                                               362       100.0
+      (Missing)                                                           333
+      Total                                                               695
+
+
+      Q… We can still take refugees without increasing total migration.
+                                                                   Number         Per cent       Cumulative per cent
+      Strongly agree                                                       31          8.5                       8.5
+      Agree                                                               163        45.1                       53.6
+      Neither agree nor disagree                                           12          3.3                      56.9
+      Disagree                                                             68        18.7                       75.6
+      Strongly disagree                                                    70        19.2                       94.8
+      (Can’t say)                                                          15          4.2                      99.1
+      (Refused)                                                             3          0.9                     100.0
+      Total                                                               362       100.0
+      (Missing)                                                           333
+      Total                                                               695
+
+
+
+20   ANUpoll Report 7
+Q… Population growth makes it harder for Australia to cut total greenhouse gas emissions.
+                                                             Number         Per cent        Cumulative per cent
+Strongly agree                                                   114           31.5                      31.5
+Agree                                                            158           43.7                      75.2
+Neither agree nor disagree                                         9            2.4                      77.6
+Disagree                                                          53           14.6                      92.2
+Strongly disagree                                                 10            2.9                      95.1
+(Can’t say)                                                       15            4.1                      99.2
+(Refused)                                                          3            0.8                     100.0
+Total                                                            362          100.0
+(Missing)                                                        333
+Total                                                            695
+
+
+Q… The cost of housing is too high.
+                                                             Number         Per cent        Cumulative per cent
+Strongly agree                                                   191           52.9                      52.9
+Agree                                                            131           36.1                      88.9
+Neither agree nor disagree                                         7            1.8                      90.7
+Disagree                                                          21            5.9                      96.6
+Strongly disagree                                                  5            1.5                      98.2
+(Can’t say)                                                        5            1.5                      99.6
+(Refused)                                                          1            0.4                     100.0
+Total                                                            362          100.0
+(Missing)                                                        333
+Total                                                            695
+
+
+Q… The natural environment is stressed by the numbers we already have.
+                                                             Number         Per cent        Cumulative per cent
+Strongly agree                                                   158           43.5                      43.5
+Agree                                                            152           41.8                      85.3
+Neither agree nor disagree                                         2            0.5                      85.9
+Disagree                                                          35            9.6                      95.5
+Strongly disagree                                                 10            2.9                      98.4
+(Can’t say)                                                        5            1.4                      99.8
+(Refused)                                                          1            0.2                     100.0
+Total                                                            362          100.0
+(Missing)                                                        333
+Total                                                            695
+
+
+
+
+                                                                                               ANUpoll Report 7   21
+      Q... Having more people could make unemployment worse.
+                                                                  Number         Per cent     Cumulative per cent
+      Strongly agree                                                  126              34.9                34.9
+      Agree                                                           141              39.0                73.8
+      Neither agree nor disagree                                       10               2.8                76.6
+      Disagree                                                         60              16.5                93.1
+      Strongly disagree                                                15               4.1                97.2
+      (Can’t say)                                                      10               2.7               100.0
+      Total                                                           362          100.0
+      (Missing)                                                       333
+      Total                                                           695
+
+
+      Q… Australia might not have enough water for more people.
+                                                                  Number         Per cent     Cumulative per cent
+      Strongly agree                                                  162              44.8                44.8
+      Agree                                                           136              37.7                82.5
+      Neither agree nor disagree                                         3              1.0                83.5
+      Disagree                                                         42              11.5                95.0
+      Strongly disagree                                                13               3.5                98.5
+      (Can’t say)                                                        5              1.5               100.0
+      Total                                                           362          100.0
+      (Missing)                                                       333
+      Total                                                           695
+
+
+      Q… We should train our own skilled people, not take them from other countries.
+                                                                  Number         Per cent     Cumulative per cent
+      Strongly agree                                                  187              51.6                51.6
+      Agree                                                           122              33.7                85.2
+      Neither agree nor disagree                                         8              2.2                87.5
+      Disagree                                                         30               8.2                95.7
+      Strongly disagree                                                  8              2.1                97.8
+      (Can’t say)                                                        6              1.7                99.5
+      (Refused)                                                          2              0.5               100.0
+      Total                                                           362          100.0
+      (Missing)                                                       333
+      Total                                                           695
+
+
+
+
+22   ANUpoll Report 7
+Q The current world human population is 6.8 billion and growing. Thinking about this… Which, if any, of the
+following statements relating to the world population level and environmental impact do you agree with?
+                                                               Number         Per cent        Cumulative per cent
+It is much too high and is causing serious                         370            30.9                       30.9
+environmental problems
+It is a bit too high and is causing serious                        431            35.9                       66.8
+environmental problems
+It is about right and not causing serious                          140            11.7                       78.5
+environmental problems
+It could be a bit higher without causing                           142            11.8                       90.3
+any serious environmental problems
+It could be a lot higher without causing                            47             3.9                       94.1
+any serious environmental problems
+(Can’t say)                                                         70             5.9                     100.0
+Total                                                             1200           100.0
+
+
+Q Australia’s population is just over 21 million. Thinking about this… Which, if any, of the following statements
+relating to the Australian population level and environmental impact do you agree with?
+                                                               Number         Per cent        Cumulative per cent
+It is much too high and is causing serious                         105             8.7                        8.7
+environmental problems
+It is a bit too high and is causing serious                        265            22.1                       30.8
+environmental problems
+It is about right and not causing serious                          349            29.1                       59.8
+environmental problems
+It could be a bit higher without causing                           317            26.4                       86.3
+any serious environmental problems
+It could be a lot higher without causing                           112             9.3                       95.6
+any serious environmental problems
+(Can’t say)                                                         53             4.4                     100.0
+Total                                                             1200           100.0
+
+
+
+
+                                                                                                  ANUpoll Report 7   23
+      Q Do you think people should take the impact on the environment into account when deciding how many
+      children to have?
+                                                                  Number         Per cent      Cumulative per cent
+      Yes, they should think about not having                          22            1.8                     1.8
+      any children
+      Yes, they should think about having only                         34            2.9                     4.7
+      one child
+      Yes, they should think about having up to                       293           24.4                    29.1
+      two children only
+      Yes, they should think about having up to                       213           17.8                    46.9
+      three children only
+      No, they shouldn’t worry about the                              311           25.9                    72.8
+      environment and just have as many
+      children as they like
+      Not applicable - the number of children                         249           20.7                    93.5
+      people have won’t affect the environment
+      (Can’t say)                                                      78            6.5                   100.0
+      Total                                                          1200          100.0
+
+
+      Q Do you agree or disagree that Australia should introduce an Emissions Trading Scheme
+                                                                  Number         Per cent      Cumulative per cent
+      Strongly agree                                                  308           25.7                    25.7
+      Agree                                                           396           33.0                    58.7
+      Neither agree nor disagree                                       45            3.8                    62.4
+      Disagree                                                        127           10.6                    73.0
+      Strongly disagree                                               149           12.4                    85.4
+      (Can’t say)                                                     171           14.3                    99.7
+      (Refused)                                                         4              .3                  100.0
+      Total                                                          1200          100.0
+
+
+
+
+24   ANUpoll Report 7
+Questions: immigration versus fertility
+
+Q If the Australian population were to grow, would you favour growth occurring by encouraging people
+having more children, or by encouraging more migrants coming to Australia?
+                                                             Number          Per cent     Cumulative per cent
+Strongly favour encouraging people to                            303            25.2                    25.2
+have more children
+Favour encouraging people to have more                           319            26.6                    51.8
+children
+Both                                                             276            23.0                    74.8
+Favour encouraging more migrants to                              149            12.4                    87.2
+come
+Strongly favour encouraging more                                   51            4.2                    91.4
+migrants to come
+(Does not favour population growth)                                36            3.0                    94.4
+(Can’t say)                                                        65            5.4                    99.8
+(Refused)                                                           2              .2                  100.0
+Total                                                           1200           100.0
+
+
+Q If Australia’s population were to grow by increased immigration, please say whether you support
+or oppose Australia accepting more of the following types of migrant:
+… Humanitarian migrants, that is refugees.
+                                                             Number          Per cent     Cumulative per cent
+Strongly support accepting more                                  256            21.3                    21.3
+Support accepting more                                           477            39.7                    61.0
+Neither support nor oppose                                       103             8.6                    69.6
+Oppose accepting more                                            173            14.4                    84.0
+Strongly oppose accepting more                                   160            13.3                    97.3
+(Can’t say)                                                        28            2.3                    99.6
+(Refused)                                                           5              .4                  100.0
+Total                                                           1200           100.0
+
+
+
+
+                                                                                              ANUpoll Report 7   25
+      Q… Family migrants – that’s relatives of migrants already living in Australia
+                                                                      Number          Per cent   Cumulative per cent
+      Strongly support accepting more                                    252             21.0                     21.0
+      Support accepting more                                             592             49.4                     70.4
+      Neither support nor oppose                                           96             8.0                     78.4
+      Oppose accepting more                                              156             13.0                     91.3
+      Strongly oppose accepting more                                       72             6.0                     97.4
+      (Can’t say)                                                          30             2.5                     99.8
+      (Refused)                                                             2               .2                   100.0
+      Total                                                             1200            100.0
+
+
+      Q… Skilled migrants – that’s migrants with particular skills.
+                                                                      Number          Per cent   Cumulative per cent
+      Strongly support accepting more                                    423             35.2                     35.2
+      Support accepting more                                             526             43.9                     79.1
+      Neither support nor oppose                                           53             4.4                     83.5
+      Oppose accepting more                                               112             9.3                     92.8
+      Strongly oppose accepting more                                       69             5.7                     98.6
+      (Can’t say)                                                          16             1.3                     99.9
+      (Refused)                                                             1               .1                   100.0
+      Total                                                             1200            100.0
+
+
+      Q Now turning to Australia’s ageing population. Do you agree or disagree that the ageing population will
+      cause Australia problems in the future?
+                                                                      Number          Per cent   Cumulative per cent
+      Strongly agree                                                     424             35.3                     35.3
+      Agree                                                              393             32.7                     68.0
+      Neither agree nor disagree                                           46             3.9                     71.9
+      Disagree                                                            210            17.5                     89.4
+      Strongly disagree                                                    95             7.9                     97.3
+      (Can’t say)                                                          29             2.4                     99.7
+      (Refused)                                                             3               .3                   100.0
+      Total                                                             1200            100.0
+
+
+
+
+26   ANUpoll Report 7
+Q Now turning to the government’s role in dealing with the ageing population. How worried are you about
+the government’s ability to fund the costs associated with an ageing population?
+                                                             Number         Per cent       Cumulative per cent
+Very worried                                                     386               32.2                   32.2
+Worried                                                          432               36.0                   68.2
+Neutral                                                          208               17.4                   85.5
+Not worried                                                       104               8.7                   94.2
+Not at all worried                                                 54               4.5                   98.7
+Don’t Know                                                         12               1.0                   99.8
+(Refused)                                                           3                .2                  100.0
+Total                                                           1200           100.0
+
+
+Q Do you agree or disagree that the public health care system will be able to cope with the ageing population?
+                                                             Number         Per cent       Cumulative per cent
+Strongly agree                                                     50               4.2                    4.2
+Agree                                                             213              17.7                   21.9
+Neither agree nor disagree                                         46               3.8                   25.7
+Disagree                                                         396               33.0                   58.8
+Strongly disagree                                                462               38.5                   97.3
+(Can’t say)                                                        30               2.5                   99.7
+(Refused)                                                           3                .3                  100.0
+Total                                                           1200           100.0
+
+
+
+
+Questions: the ageing population
+
+Q Do you agree or disagree that the government will have to cut programs and welfare spending in the future
+to deal with the costs associated with an ageing population?
+                                                             Number         Per cent       Cumulative per cent
+Strongly agree                                                   233               19.4                   19.4
+Agree                                                            476               39.7                   59.1
+Neither agree nor disagree                                         56               4.7                   63.8
+Disagree                                                         252               21.0                   84.8
+Strongly disagree                                                  98               8.1                   92.9
+(Can’t say)                                                        81               6.7                   99.7
+(Refused)                                                           4                .3                  100.0
+Total                                                           1200           100.0
+
+
+
+
+                                                                                               ANUpoll Report 7   27
+      Q Do you agree or disagree that the government should increase taxes in order to pay for the costs associated
+      with an ageing population?
+                                                                   Number           Per cent     Cumulative per cent
+      Strongly agree                                                    72               6.0                     6.0
+      Agree                                                            363              30.3                    36.3
+      Neither agree nor disagree                                        62               5.2                    41.5
+      Disagree                                                         356              29.7                    71.2
+      Strongly disagree                                                308              25.6                    96.8
+      (Can’t say)                                                       37               3.1                    99.9
+      (Refused)                                                           1               .1                   100.0
+      Total                                                           1200             100.0
+
+
+      Q Do you agree or disagree that retirees should fund their own retirement?
+                                                                   Number           Per cent     Cumulative per cent
+      Strongly agree                                                   156              13.0                    13.0
+      Agree                                                            348              29.0                    42.0
+      Depends on one’s circumstances                                   273              22.7                    64.7
+      Disagree                                                         252              21.0                    85.7
+      Strongly disagree                                                140              11.6                    97.3
+      (Can’t say)                                                       30               2.5                    99.8
+      (Refused)                                                           2               .2                   100.0
+      Total                                                           1200             100.0
+
+
+      Q Which of the following statements do you most agree with?
+                                                                   Number          Per cent      Cumulative per cent
+      The less government the better                                   320            26.7                      26.7
+      There are more things the government                             809            67.4                      94.1
+      should be doing
+      (Can’t say)                                                       57             4.7                      98.9
+      (Refused)                                                         13             1.1                     100.0
+      Total                                                           1200           100.0
+
+
+
+
+28   ANUpoll Report 7
+About the survey
+The ANUpoll is conducted for The Australian National University by the Social Research Centre,
+Melbourne. The survey is a national random sample of the adult population aged 18 years and
+over conducted by telephone. In this survey, 1,200 people were interviewed between 15 March
+and 1 April, with a response rate of 45.2 per cent. For the questions relating to population size
+and the reasons for supporting or opposing population growth, these were conducted between
+8 and 24 June among the 850 respondents in the original sample who agreed to be recontacted,
+achieving 695 interviews, representing a response rate of 81.8 per cent. The results have been
+weighted to represent the national population. The survey’s margin of error is
+± 2.5 per cent for the full sample. Full details of the survey can be found at
+www.anu.edu.au/anupoll/
+www.anu.edu.au
+

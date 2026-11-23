@@ -1,0 +1,2871 @@
+     MAPPING
+     SOCIAL
+     COHESION
+20   Social connections
+     through troubled times
+25
+     James O’Donnell,
+     Alice Falkiner &
+     Katarzyna Szachna
+Foreword
+The Scanlon Foundation Research Institute is pleased to provide you with the 2025 Mapping
+Social Cohesion Report.
+
+Under the guidance of Dr James O’Donnell, the survey, conducted in July 2025 through the
+Social Research Centre, provides the most comprehensive, ongoing profile of Australia’s social
+cohesion.
+
+One of the most significant findings has been the resilience of the Australian population
+given the multiple national and international events that have resonated through our various
+media channels. This resilience is, in part, the result of our connectedness and the resulting
+social bonds that are particularly characteristics of our local neighbourhoods. This clearly
+demonstrates the effectiveness of programs and inclusive environments created by local
+councils but also the responsibilities that sit with them to maintain and strengthen these
+bonds.
+
+Financial hardship continues to be a weight on our social cohesion and will need to be a
+necessary focus for governments in the coming year particularly for the younger generations.
+Recognising the diversity of issues that are faced across the generations, Australians are
+generally happy and their trust in government has increased slightly since the 2024 survey.
+
+The Scanlon Foundation created, and has supported, the Research Institute to ensure that
+Australia has an independent, non-partisan, comprehensive understanding of social cohesion.
+This research is essential for focusing our attention on the areas where we need to add
+resources, and areas where we need to maximise our strengths to spread initiatives and
+strategies that maintain and build our diverse, cohesive society.
+
+Although we have now chosen to provide a more manageable report this year, we will be
+releasing additional data from the 2025 survey through our Social Cohesion Insights, Social
+Cohesion Compass and our segmentation project. Please ensure you have signed up to receive
+our regular communications for the year ahead.
+
+
+Anthea Hancocks
+CEO
+Scanlon Foundation Research Institute
+
+
+
+
+This report has been produced in partnership
+between the Scanlon Foundation Research
+Institute and the Australian National University
+
+Suggested citation:
+
+O’Donnell, James, Alice Falkiner and Katarzyna
+Szachna. Mapping Social Cohesion 2025.
+Scanlon Foundation Research Institute, 2025.
+https://scanloninstitute.org.au/mapping-social-
+cohesion-2025
+
+ISSN 2982-2114
+Contents
+Introduction2                                     Conclusion32
+
+
+Mapping Social Cohesion 2025                 4    Appendix: Mapping Social Cohesion 2025   33
+
+
+National pride & belonging                   6    Endnotes40
+
+
+Attitudes to migration & diversity           9    References45
+
+
+Prejudice, discrimination & racism           13   Acknowledgement47
+
+
+Trust in government & the political system   17
+
+
+Financial hardship and its social costs      21
+
+
+Personal happiness & wellbeing               25
+
+
+Local and community connections              28
+    Mapping social cohesion 2025
+
+
+
+
+    Introduction
+
+    The year 2025 has been another year of difficulties for the world. As we
+    write, the violence and horrors of the conflict in Gaza and the Middle
+    East have intensified and spread across the region and continued to
+    provoke social and political tensions in all corners of the world including
+    confronting experiences of Islamophobia and anti-Semitism.1
+
+
+    The war between Russia and Ukraine entered            This national and global environment places
+    its fourth war year in 2025 and sits alongside        pressure on Australian society and tests the
+    other conflicts in Africa and many other parts of     resilience of its social fabric and cohesion.
+    the world.2 Meanwhile, immigration continues          As we reported last year in Mapping Social
+    to be a highly divisive issue across Europe and       Cohesion 2024, social cohesion in Australia
+    the United States, adding to a host of other          has been reasonably resilient on our measures
+    emerging and long-term issues related to the          in the face of this tumult, albeit coming after
+    economy, climate change, terrorism, health and        periods of decline through the 2010s and since
+    misinformation.3                                      the COVID-19 pandemic5 and despite signs of
+                                                          the influence of external pressures and strains
+    Australia is deeply connected to these global         on intercultural harmony.6 The resilience has
+    challenges while also dealing with a range            been underpinned by the strength of our social
+    of home-grown issues. In August 2025, anti-           fabric, connections and wellbeing, including as
+    immigration protests and movements that have          measured through active participation in social,
+    been common across Europe and north America           community and civic groups, the cohesiveness of
+    in recent years arrived in Australia through          neighbourhoods, consistent levels of happiness
+    the ‘March for Australia’ rallies4 and have           and continued recognition of the contribution
+    coincided with continued difficult experiences,       and importance of our diversity. New and
+    debates and protests including over the current       continuing pressures in 2025 though, further
+    conflict in Gaza, Australia’s relationship with       test the fabric of Australian society.
+    its First peoples, the cost of living and financial
+    hardship. Peaceful division, debate and protest
+    are foundational to a vibrant democracy and
+    oftentimes demonstrate our common humanity
+    and our concern for others and the collective
+    good. Instances of violence, racism and notably
+    in the current climate, Islamophobia and anti-
+    Semitism, however, demonstrate the opposite,
+    a lack of humanity, the marginalisation of
+    communities and an erosion of common bonds.
+
+
+
+
+2
+                                                                                         Introduction
+
+
+
+
+In a year of social, economic and political tumult,   In the current climate, the relative stability
+the Mapping Social Cohesion 2025 study                of many of our measures of social cohesion
+provides a crucial barometer of how Australian        speaks to the enduring strength of the social
+society is faring. Now in its 18th year, the 2025     fabric of communities across Australia. The
+study involved a nationally representative survey     bonds we form with people in our daily lives
+of more than 8,000 Australian adults to gauge         and in neighbourhoods and local communities
+their attitudes, perceptions, experiences and         provides the foundation for our social cohesion
+behaviours related to social cohesion and other       and collective wellbeing. While not unbreakable
+topical and related issues. Measuring social          and often tested by current events, these bonds
+cohesion across five key areas of belonging,          are not so easily broken and help weather and
+worth, social justice, participation and              safeguard social cohesion through challenging
+acceptance, we find that overall social cohesion      times.
+has been steady over the last year, underpinned
+by strong bonds and active participation in our
+neighbourhoods and communities, renewed
+trust in government and resilient happiness and
+personal wellbeing.
+
+Nevertheless, current and ongoing challenges
+in Australia and around the world are putting
+pressure on social cohesion. High levels of
+support for multiculturalism and diversity
+recorded in 2022 and 2023 have continued to
+taper off, while prejudice and discrimination
+directed towards immigrant and cultural groups
+remain common. Cost-of-living pressures
+also remain common and the accumulation of
+financial hardship in recent years is associated
+with lower levels of trust, happiness and
+neighbourhood connection. Trust in government
+and Australian democracy, meanwhile, is sharply
+divided along party political lines, while the
+sense of belonging younger generations have in
+Australia has declined substantially in the last
+10-15 years.
+
+
+
+
+                                                                                                        3
+    Mapping social cohesion 2025
+
+
+
+
+    Mapping Social Cohesion 2025
+
+    The Mapping Social Cohesion study is a crucial resource and record
+    of how Australian society is faring through these tumultuous times.
+    As in every year since 2009 and after the first study in 2007, a
+    nationally representative survey was conducted to gauge the attitudes,
+    perceptions, behaviours and experiences of Australians related to social
+    cohesion.
+
+
+    In 2025, more than 8,000 adults took part in          In each of these domains, a series of questions
+    the survey as members of the Social Research          are asked of respondents to the Mapping Social
+    Centre’s Life in AustraliaTM panel. We also           Cohesion survey. This allows us to measure
+    administered a shorter survey in one of four          social cohesion in each of these domains, track
+    different languages (including English) to            their progress over time and identify differences
+    245 people who have immigrated to Australia           and potential drivers of social cohesion across
+    over the years in an effort to strengthen our         Australia. Several of the questions have been
+    representation of Australia’s migrant and             asked in every survey since 2007 and provide
+    cultural diversity. More information on this year’s   the key information for the Scanlon Index of
+    study is available in the Appendix.                   Social Cohesion, a multi-dimensional tool to
+                                                          measure and track social cohesion over time. 7
+    As every year, social cohesion in Australia is
+    measured across five key areas or domains:            Despite the continuing national and global
+    • Belonging: the sense of pride and belonging         challenges of recent years, most of our
+       people have in Australia and in Australian         indicators of social cohesion have been stable
+       life and culture, and the belonging they feel      in the last two years. This stability is reflected
+       in their neighbourhoods                            in the Scanlon Index of Social Cohesion shown
+                                                          in Figure 1, which has recorded a score of 78
+    • Worth: the degree of emotional and material
+                                                          in 2023, 2024 and 2025.8 As we will explain in
+       wellbeing
+                                                          this report, although social cohesion is more
+    • Social inclusion and justice: perceptions of        complex and multi-faceted than can be captured
+       economic fairness and trust in government          in any single number, this result reflects stability
+    • Participation: involvement in political             across a wide range of indicators in the Mapping
+       activities and participation in social,            Social Cohesion survey.
+       community, and civic groups
+    • Acceptance and rejection: attitudes to
+       immigrant diversity, support for minorities,
+       and experience of discrimination
+
+
+
+
+4
+                                                                                                                      Mapping Social Cohesion 2025
+
+
+
+
+Figure 1.                                          Scanlon Index of Social Cohesion, 2007 to 2018 (telephone surveys) and 2018
+                                                   to 2025 (Life in AustraliaTM)
+
+                                       120
+
+
+                                             100       101
+                                       100                    93   94   95              93                                92
+
+
+
+
+  Index score (2007 reference = 100)
+                                                                             89    90        89       88   90                  88
+                                                                                                                     90
+                                                                                                                84                  83
+                                                                                                                                         78   78   78
+                                       80
+                                                                                                           82
+
+
+                                       60
+
+
+
+                                       40
+
+
+
+                                       20
+
+
+
+                                        0
+                                             07 008 009 010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025
+                                        20      2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+
+                                                             Life in Australia (online & telephone)              Telephone surveys
+
+Note: the difference in social cohesion in 2018 between the Life in AustraliaTM survey and the telephone survey reflects an
+interviewer mode effect, resulting from lower reported cohesion when respondents completed the survey online and did not have to
+speak to a person over the phone. See the Appendix and O’Donnell et al. (2024) for more information.
+
+The stability of social cohesion may seem                                                      Nevertheless, we can still detect several
+surprising in the face of these tumultuous                                                     short-term and long-run pressures on social
+times but perhaps reflects the continuity of                                                   cohesion. Australians’ sense of national pride
+daily life and the resilience of social bonds                                                  and belonging has been steady since 2023,
+and connections that shape our everyday lives.                                                 though this comes after longer-term declines
+As we explain later in this report, Australians                                                since 2007 (see Figure 2). Financial pressures
+continue to be actively involved in the social                                                 have been stubbornly common since 2023 (see
+and civic life of their communities, including                                                 Figure 10) and particularly impacting renters,
+through participating in sports clubs, charities,                                              single parent families and young-to-middle
+social clubs and religious groups (see Figure                                                  aged adults (Figure 11). Meanwhile, in a world
+15), connecting with family and friends on a                                                   deeply polarised over attitudes to migration9,
+regular basis and building and maintaining                                                     recognition of the contribution of immigrants
+bonds with neighbours and local communities                                                    to Australian society and general support
+(see Figure 14). These perhaps provide                                                         for diversity and multiculturalism has been a
+important foundations for Australia’s overall                                                  source of strength in recent years (Figure 5),
+social cohesion that are not easily disturbed by                                               though now strained by current events and
+external social, economic and political upheaval.                                              the persistence of discrimination and racism
+                                                                                               (Figure 7).
+
+
+
+
+                                                                                                                                                        5
+    Mapping social cohesion 2025
+
+
+
+
+    National pride & belonging
+
+    The sense of belonging people have in their communities and nations is
+    a foundational aspect of social cohesion.
+
+
+    To have a sense of belonging and place in the                                Australian way of life and culture. Rather, we ask
+    world is an important human need and so central                              respondents to tell us how much they identify
+    to our personal wellbeing, while also providing                              with and take pride in life and culture however
+    a basis for active engagement in society.10 For                              they think of it.
+    these reasons, the sense of belonging is a key
+    domain of social cohesion in the Mapping Social                              Following a period of decline and then
+    Cohesion study.                                                              stability in the mid-2010s, Australians’ sense
+                                                                                 of belonging, pride and the importance they
+    Historically, belonging has been measured on                                 attach to maintaining the national way of life and
+    the Mapping Social Cohesion survey through                                   culture have declined over the past five years.
+    three questions that focus on people’s sense of                              However, as we show in Figure 2, the bulk of this
+    belonging in Australia and the pride and sense                               decline occurred in the years between 2020 and
+    of importance they place in maintaining ‘the                                 2023. Since 2023, feelings of national pride and
+    Australian way of life and culture’. Importantly,                            belonging have remained relatively stable.
+    we do not ask respondents to define the
+
+    Figure 2.                         Indicators of national pride and belonging, 2007 to 2018 (telephone surveys)
+                                      and 2018 to 2025 (Life in AustraliaTM)
+
+                           100
+
+
+
+                           80 77                           74
+                                           72   72    72
+                                                                           69
+                                 65                             65    65         66   66
+                                                                                           64         63
+
+
+
+
+    Weighted % of adults
+                                           58         60                                         61    61 58
+                           60                   56         55         57   55         56    57
+                                                                55
+                                                                                                                 52
+                                 58        58   56    58   56                    56        46    49 48                49    47
+                                                                      55   55         54               47                        46
+                                                                 51                                       44
+                                                                                                    48           42   40    40    42
+                           40                                                              43    45   46
+                                                                                                          42
+                                                                                                                 37
+                                                                                                                      33    34   34
+
+                           20
+
+
+
+                            0
+                                                1
+                              07 008 009 010 201    12 013 014 015 016 017 018 019   20 021 022 023 024 025
+                            20   2   2   2        20   2   2   2   2   2   2   2   20   2   2   2   2   2
+                                        % takes great pride in the Australian way of life and culture
+                                        % has a sense of belonging in Australia to a great extent
+                                        % strongly agrees that maintaining the Australian way of life and culture is important
+    Note: dashed lines indicate when the survey was run only as a telephone survey. See the Appendix and O’Donnell et al. (2024) for
+    more information.
+
+
+
+6
+                                                                             National pride & belonging
+
+
+
+
+In 2020, close to two-thirds of adults (63 per          an average of 64 per cent across the 2010,
+cent) said they felt a sense of belonging in            2011 and 2012 surveys11 to 34 per cent in 2025,
+Australia to a great extent, but by 2025 this           while the proportion declined from 77 per cent
+figure has fallen to 46 per cent. Only three            to 53 per cent among Gen X (born 1965–1980).
+percentage points of this drop occurred                 Although Gen Z (born after 1996) were too
+between 2023 and 2025 (49 per cent to 46 per            young to participate in surveys in the early
+cent respectively).                                     2010s, just 31 per cent of the Australian-born
+                                                        have a great sense of belonging in 2025.
+Indicators of pride and cultural identity show
+similar patterns. The proportion of adults who          As we have reported in recent Mapping Social
+take great pride in the Australian way of life          Cohesion reports12, there are several potential
+and culture has fallen by 14 percentage points          social, cultural, economic, ideological and
+since 2020, reaching just one-third in 2024 (34         personal reasons why younger generations
+per cent) and 2025 (34 per cent). However, from         report declining and weaker belonging than
+2023 to 2025 there was little to no change in           older generations. To the extent that differences
+the proportion who express great pride in the           are related to changing social and cultural
+Australian way of life and culture.                     preferences in how younger adults identify
+                                                        themselves in relation to the country, the shift
+Similarly, the share of adults who strongly             may not necessarily be a cause for concern.
+agree that maintaining the Australian way of life       Greater concern though is warranted where low
+and culture is important declined from nearly           and declining belonging is related to social and
+one-half (49 per cent) in 2019 to 42 per cent in        economic disadvantage and disconnection.
+2025. This proportion though has been relatively
+stable since 2022. These results indicate that          In our analysis of this year’s Mapping Social
+although identity-based dimensions of social            Cohesion survey, we find evidence that
+cohesion remain fragile, the sharp declines seen        differences in national pride and belonging
+earlier in the decade have eased, with recent           between younger and older adults are most
+years pointing to a more stable, albeit relatively      associated with political values and personal
+low, level of national pride, belonging and             social disadvantage. Using a decomposition
+cultural attachment.                                    analysis13, we find that young people’s more
+                                                        progressive, left-wing political orientations is
+Young adults, those who have immigrated                 strongly associated with their weaker sense of
+to Australia and those who are struggling               national pride and belonging, particularly where
+financially have the weakest levels of belonging.       they are concerned about economic justice and
+Among 18 to 24 year olds and 25 to 34 year              fairness.
+olds, fewer than one-in three (29 per cent) say
+they have a sense of belonging in Australia to          Millennials and Gen Zs, for example, who agree
+a great extent, compared with 72 per cent for           that the gap between high- and low-income
+those aged 65 years and over. Likewise, just            earners is too large are 40 per cent less likely
+32 per cent of overseas-born Australians from           to have a great sense of belonging in Australia
+non‑English speaking backgrounds and 33                 than Baby Boomers and older generations
+per cent of those who describe their financial          who disagree that the income gap is too large
+situation as ‘struggling to pay bills’ or ‘poor’ have   after accounting for a range of personal
+a great sense of belonging, compared with 49            characteristics and attitudes.14
+per cent of all Australian-born adults and 58 per
+cent of all adults who describe their financial
+situation as ‘prosperous’ or ‘very comfortable’.
+
+Of particular concern, generational differences
+in the sense of belonging appear to be widening.
+As we show in Figure 3, declines in the
+proportion of people who have a great sense of
+belonging in Australia since the early 2010s have
+been largest among younger adult generations.
+We estimate, for example, that the proportion
+of Australian-born Millennials (defined here as
+people born between 1981 and 1996 inclusive)
+with a great sense of belonging declined from
+
+
+                                                                                                            7
+    Mapping social cohesion 2025
+
+
+
+
+    Figure 3.         To what extent do you have a sense of belonging in Australia?’ The proportion
+                      who say ‘to a great extent’ by generation and across time, 2010-2012
+                      (telephone surveys) and 2025 (Life in AustraliaTM)
+
+      Australian-born :
+
+       Silent generation (<1946)                                                                                 85          90
+
+      Baby boomers (1946-1965)                                                                        73          77
+
+                Gen X (1965-1980)                                                   53                           77
+
+           Millennials (1981-1996)                                  34                                64
+
+                       Gen Z (>1996)                            31
+
+
+
+      Overseas-born who immigrated to Australia before 2010:
+
+       Silent generation (<1946)                                                                 66        69
+
+      Baby boomers (1946-1965)                                                              62        64
+
+                Gen X (1965-1980)                                          43             51
+
+                                                               29             37
+           Millennials (1981-1996)
+
+                       Gen Z (>1996)                      24
+
+
+                                         0                     25                    50                     75                      100
+                                                                          Weighted % of adults
+
+                                                      2010-2012 (adjusted)                             2025
+
+    Note: 2010-2012 estimates adjusted to remove the effect of the transition from telephone surveys to the mostly online Life in
+    AustraliaTM surveys.
+
+    By the same token, young adults’ greater sense                       Interestingly, factors such as education, social
+    of loneliness and weaker sense of happiness,                         media and living in regional Australia do not
+    safety and neighbourhood connection are also                         appear to help explain why younger adults
+    strongly associated with their weaker sense                          report less national pride and belonging.
+    of national pride and belonging. Millennials
+    and Gen Zs who say they feel isolated from                           Current trends and generational shifts do not
+    others some of the time or often are 52 per cent                     guarantee but are pointing towards a future
+    less likely to have a great sense of belonging                       in which smaller shares of people have a
+    in Australia than Baby Boomer and older                              strong sense of national pride and belonging
+    generations who say they never feel isolated.15                      in Australia. Opinions will vary on the extent
+                                                                         to which this is a major concern, not least for
+                                                                         the potential for social and cultural trends and
+                                                                         preferences to continue shifting and perhaps
+                                                                         reverse course. Where though a weakened sense
+                                                                         of belonging is of urgent public and community
+                                                                         concern is where it reflects social and economic
+                                                                         disadvantage, social disconnection and
+                                                                         perceived injustice and disillusionment.
+
+
+
+
+8
+                                                                   Attitudes to migration & diversity
+
+
+
+
+Attitudes to migration &
+diversity
+
+In the wake of protest and debate, immigration has become a social
+and political flashpoint across much of the developed world. While anti-
+immigration and anti-immigrant sentiment has taken some time to reach
+Australia in its current wave, signs of its arrival was witnessed in the
+‘March for Australia’ protests in August 2025.
+
+
+As we show in this section, the concerns             pandemic. Subsequent to the 2022 Mapping
+expressed by protesters around the levels            Social Cohesion survey and leading up to
+of immigration to Australia are commonly             the 2024 survey, there was a sharp spike in
+shared across the country. However, while            actual immigration levels17, prompting the
+the disturbing racist element to the protests        Federal Government and Opposition to propose
+remains ever present and of deep concern in          and enact policies and legislation to reduce
+Australia, it remains a minority view, with most     immigration levels18 19, tacitly or explicitly
+people (even those who think immigration is too      accepting that they were too high and likely
+high) expressing strong symbolic support for the     helping to lead public opinion on the issue.
+value of multiculturalism and diversity and the      Nevertheless, the proportion of adults who
+contribution of immigration to Australian society,   believe that immigration is too high is higher
+culture and the economy.                             in 2025 than has ever been recorded in the
+                                                     Mapping Social Cohesion survey (Figure 4).
+As we reported in the Mapping Social Cohesion
+2024 report, one of the sharpest shifts in
+sentiment we have recorded in recent years
+has been in the proportion of Australians who
+think that immigration is ‘too high’.16 As shown
+in Figure 4, 24 per cent of adults in 2022 said
+that ‘the number of immigrants accepted into
+Australia at present’ is ‘too high’ as opposed
+to ‘too low’ or ‘about right’. By 2024, this
+proportion jumped to 49 per cent and remains at
+a similar level in 2025 (51 per cent).
+
+The increase in support for reducing
+immigration should not be interpreted as
+reflecting a widespread and rapid escalation
+in anti-immigrant sentiment. As we explained
+last year, the rising share of the population who
+believe immigration is too high has come in a
+context in which international borders were
+re-opened to immigration after the COVID-19
+
+
+
+
+                                                                                                        9
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 4.                          ‘What do you think of the number of immigrants accepted into Australia at
+                                        present? Would you say it has been… too high, about right or too low’, 2007 to
+                                        2018 (telephone surveys) and 2018 to 2025 (Life in AustraliaTM)
+
+                              60
+
+                                                                                                               52         52    51
+                                                                                                                    50
+                              50                  47                                                                                 49        51
+                                                                                                          48
+                                            45                                                       45
+                                                                                               44
+                                   41                       41    42   41   41
+                                                       40                          40   40                                            40   40
+
+
+
+
+       Weighted % of adutls
+                                                                                                          41
+                              40                                                                    40
+                                                                                                                38
+                                                       39         38
+                                            37              38                          37                          34
+                                   36             36                        35                 35                                    33
+                                                                       34          34                                    31
+                              30
+
+
+                                                                                                                               24
+                              20                                                               17                         22
+                                                                            19     19                      14
+                                                                       17               16                          17
+                                                       14   14                                 15                               14
+                              10                                  13                                 13        13
+                                   12
+                                             10   10                                                                                  9
+                                                                                                                                           7
+                               0
+                                   07 008 009 010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025
+                              20      2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2   2
+
+                                                       Too high                  About right                   Too low
+
+     Note: dashed lines indicate when the survey was run only as a telephone survey. See the Appendix and O’Donnell et al. (2024) for
+     more information.
+
+     Concern around the number of people
+     immigrating to Australia, however, has
+     not substantially undermined support for
+     multiculturalism and diversity. A summary
+     of overall national-levels attitudes to
+     multiculturalism and diversity is shown in
+     Figure 5. According to these results, 83 per
+     cent of Australian adults agree or strongly
+     agree that ‘multiculturalism has been good for
+     Australia’, 67 per cent agree that ‘accepting
+     immigrants from many different countries
+     makes Australia stronger’ and 64 per cent
+     agree that ‘we should do more to learn about
+     the customs and heritage of different ethnic
+     and cultural groups in this country’. These
+     proportions have declined since peaking in
+     2023, perhaps reflecting the pressures of
+     recent years, though remain at least in line with
+     levels recorded through the 2010s.
+
+
+
+
+10
+                                                                                                                  Attitudes to migration & diversity
+
+
+
+
+Figure 5.                           Attitudes to multiculturalism and diversity, 2007-2018 (telephone surveys) and
+                                    2018-2025 (Life in AustraliaTM)
+                       100
+                                                                                                                                       88    89
+                                                                  84       85       86          85       85                      86                85
+                                                                                          83                                84                           83
+                                                                                                               80                            78
+                                                                                                         77                      76    78
+                       80
+                                                                                                                       71                          71
+                             67          68                                68       68    67                      67         74                          67
+                                                                                                         66
+
+
+
+
+Weighted % of adults
+                                                      64    65                                  63
+                                                 62                  62                                                                      71
+                                                                                    67                                           69    69
+                       60                                                                 66                                                       66    64
+                                                                                                   61    59
+
+                                                                                                         37             36
+                       40
+                                                                                    41
+                                                                           38             37                                     38    38    37
+                                                            36       36                                                     35                     35
+                                         33    33     34                                        34                                                       33
+                             32
+                                                                                                         30       30
+                       20
+
+
+
+
+                        0
+                        07        08   09     10      11   12    13       14    15       16    17       18    19       20    21       22    23    24    25
+                       20      20   20      20     20   20      20    20       20    20       20    20       20    20       20    20    20    20    20
+
+                             % agree that multiculturalism has been good for Australia
+
+                             % agree that accepting immigrants from many different countries makes Australia stronger
+
+                             % agree we should do more to learn about the customs and heritage of different ethnic and cultural
+                             groups in this country
+
+                             % agree that ethnic minorities should be given Australian government assistance to maintain their
+                             customs and traditions
+Note: dashed lines indicate when the survey was run only as a telephone survey. See the Appendix and O’Donnell et al. (2024) for
+more information.
+
+The steepest decline has been in the proportion                                           evenly split between those who agree (51 per
+of adults who agree that ‘accepting immigrants                                            cent) or disagree (48 per cent) that it should
+from many different countries makes Australia                                             be possible to reject immigrants coming to
+stronger’. Between 2023 and 2025, this                                                    Australia on the basis of their race, ethnicity or
+proportion declined from 78 per cent to 67                                                religion.
+per cent. The decline over this time has been
+steepest among Liberal-National Coalition                                                 Whether symbolic support for diversity and
+voters (down 15 percentage points), people who                                            multiculturalism translates to support for
+own their home outright (down 14 percentage                                               concrete action is another question. As shown in
+points) and are retired (down 12 percentage                                               Figure 5, only one-in-three adults (33 per cent)
+points) and those who are financially struggling                                          agree that ‘ethnic minorities should be given
+to pay bills or describe themselves as ‘poor’                                             Australian government assistance to maintain
+(down 11 percentage points). Weakening support                                            their customs and traditions’. This share is in line
+for the view that immigrant diversity makes                                               with its historical average since 2007. On other
+Australia stronger does not necessarily translate                                         measures though, 90 per cent of adults agree
+to support for a discriminatory migration                                                 that ‘someone born outside of Australia is just
+program though, with those who disagree that                                              as likely to be a good citizen as someone born
+diversity makes Australia stronger reasonably                                             in Australia’, 80 per cent agree that ‘immigrants
+
+
+                                                                                                                                                              11
+     Mapping social cohesion 2025
+
+
+
+
+     are generally good for Australia’s economy’ and       The way in which people conflate immigration
+     78 per cent agree that ‘immigrants improve            with housing and economic pressures
+     Australian society by bringing new ideas and          potentially in turn has flow-on effects for the
+     cultures’.                                            strength of support for multiculturalism and
+                                                           diversity. People who believe that immigrants
+     Across this broad sweep of measures therefore,        increase house prices or take jobs away are 37
+     the Mapping Social Cohesion study illustrates         per cent less likely to believe that ‘accepting
+     the importance of distinguishing between              immigrants from many different countries makes
+     attitudes people have towards the number of           Australia stronger’ in 2025. While it is difficult to
+     people immigrating to Australia at any given          say perceived threats to housing and jobs cause
+     time and their attitudes to the value of diversity,   less support for diversity, we can also say that
+     multiculturalism and immigrants themselves.           people who believed that immigrants increase
+     While there is certainly an overlap between           house prices or take jobs away in 2024 were 2.2
+     racist attitudes and belief that immigration is       times more likely to change their minds between
+     too high, most people in the Mapping Social           2024 and 2025 from agreeing that immigrant
+     Cohesion survey who say that levels are too           diversity makes Australia stronger in 2024 to
+     high still agree that multiculturalism has been       disagreeing in 2025 and after controlling for a
+     good for Australia (71 per cent), that people         range of personal characteristics.20
+     born outside of Australia are just likely to be
+     make good citizens (85 per cent), are good for        In this way, housing and economic pressures
+     Australia’s economy (66 per cent) and improve         are potentially contributing not only to concerns
+     Australian society by bring new ideas and             about levels of immigration but also the strength
+     cultures (64 per cent). Strikingly, even among        of support of multiculturalism and diversity. The
+     overseas-born Australians, 46 per cent believe        accumulated strength of support over years
+     immigration is too high.                              and decades potentially has a protective effect,
+                                                           making it difficult for anti-immigrant sentiment
+     Rather than reflecting widespread anti-               to take a stronger hold and has perhaps helped
+     immigrant sentiment, concerns about                   to prevent deeper division over immigration
+     immigration levels more commonly relate to            in Australia in recent years. Steady declines
+     concerns around the economy and housing.              in support for diversity and multiculturalism
+     Among those who think immigration is too              though should be taken as a sign that support
+     high, 58 per cent think the economy or housing        cannot be taken for granted or assumed to be
+     shortages and affordability is the most               immune from the social and economic strains
+     important problem facing Australia in 2025, with      on individuals and households, nor the political
+     only one-in-ten (9 per cent) citing immigration       influences that would seek to create deeper
+     itself as the most important problem. In the          divisions.
+     total population, 58 per cent cite economic and
+     housing issues and 5 per cent cite immigration
+     as the most important problem.
+
+     The relationship, however, between concerns
+     about housing, the economy and immigration
+     indicates that people commonly believe that
+     immigration is adding to economic and housing
+     pressures. In 2025, 58 per cent of the total
+     population and 79 per cent of the population
+     who think immigration is too high agree or
+     strongly agree that ‘immigrants increase house
+     prices’. Approximately one-half (48 per cent) of
+     people who think immigration is too high also
+     agree that ‘immigrants take jobs away’ (31 per
+     cent of all people).
+
+
+
+
+12
+                                                                    Prejudice, discrimination & racism
+
+
+
+
+Prejudice, discrimination &
+racism
+
+The strength of support for multiculturalism and diversity that has
+accumulated in Australia over years and decades is a potentially
+important resource in guarding against deeper divisions over
+immigration and greater threats to social cohesion.
+
+
+This strength though can be, by no means, used        from Anglo, European and Christian backgrounds
+to downplay the difficult experiences of racism       – a difference that may reflect ethnic and
+and discrimination experienced by First Nations       racial biases.
+Australians21, immigrants and cultural and
+religious communities across Australia. While         Australians’ views of immigrants do indeed differ
+a longstanding issue since colonisation, racism       markedly by whether or not immigrants come
+remains an issue shaping Australian society and       from Anglo-European or other backgrounds.
+its social cohesion, evidenced recently with the      Select results are shown in Figure 6. In 2025,
+targeting of Indian Australians as part of the        people arriving from the United Kingdom
+‘March for Australia’ rallies22 and the difficult     continued to be seen warmly, with 61 per cent of
+experiences faced by Muslim, Jewish and other         adults holding a positive attitude and only 4 per
+affected communities in the wake of the conflict      cent a negative one (35 per cent were neutral),
+in Gaza.23                                            unchanged from 2024. Although not shown (to
+                                                      conserve space), attitudes towards those from
+The Mapping Social Cohesion survey is not able to     Italy (60 per cent positive, 37 per cent neutral,
+provide an exhaustive or in-depth understanding       3 per cent negative) and Germany (57 per
+of racism, though it can inform us about the          cent positive, 39 per cent neutral, 3 per cent
+extent of prejudices and discrimination that may      negative) were similarly positive. Immigrants
+be related to racism. A somewhat crude but            from the United States also remain broadly
+effective way that we monitor negative prejudices     well regarded (46 per cent positive, 36 per cent
+and stereotypes on the survey is by asking            neutral, 18 negative), though sentiments cooled
+respondents whether they have positive, negative      somewhat between 2024 and 2025.
+or neutral views towards specific immigrant and
+religious groups. We ask respondents ‘would you       Opinions about immigrants from Asian and
+say your feelings are positive, negative or neutral   African backgrounds are less positive. Attitudes
+towards immigrants from’ ten select countries,        to immigrants from China and India are mixed,
+namely the United Kingdom, the United States,         with positive and negative views near equally
+Italy, Germany, China, India, Lebanon, Iraq, Sudan    divided. More people express negative attitudes
+and Ethiopia. We likewise ask respondents to          than positive attitudes towards each of the other
+say whether they have positive, negative and          groups, with for example, fewer than one-in-five
+neutral attitudes towards people of the major         adults holding positive attitudes and around
+religious faiths – Christianity, Buddhism, Islam,     two-in-five holding negative attitudes towards
+Judaism, Hinduism and Sikhism. This cross-            immigrants from Iraq and Sudan.
+section of countries and faiths allows us to assess
+whether attitudes towards diverse groups differ
+substantially from those expressed towards those
+
+
+
+
+                                                                                                          13
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 6.      Positive and negative attitudes towards immigrants from select countries and
+                    people of different faiths, Life in AustraliaTM, 2023-2025
+
+     a) Attitudes towards immigrants from select countries
+
+     United Kingdom 2024                                             4                                                     61
+                      2025                                          4                                                      61
+
+       United States 2024                                    12                                                  50
+                      2025                              18                                                  46
+
+                 China 2024                      30                                             29
+                      2025                        26                                             32
+
+                 India 2024                       26                                             33
+                      2025                       30                                             31
+
+                  Iraq 2024                35                                              22
+                      2025                38                                              20
+
+             Sudan 2024                 39                                                20
+                      2025             43                                                18
+                                60          40          20                0             20            40              60               80
+
+                                % of adults with a negative attitude          % of adults with a positive attitude
+
+
+     b) Attitudes towards people of different religious faiths
+       Buddhists 2023                                                     4                                                       50
+                    2024                                                  4                                                 44
+                    2025                                                  4                                                  46
+
+         Hindus 2023                                              10                                             33
+                    2024                                        13                                         26
+                    2025                                      14                                           26
+
+            Jews 2023                                                 9                                               38
+                    2024                                       13                                           30
+                    2025                                     15                                             29
+
+           Sikhs 2023                                            12                                             33
+                    2024                                       14                                          26
+                    2025                                     16                                            27
+
+       Christians 2023                                      16                                                             42
+                    2024                                 19                                                           37
+                    2025                                  18                                                          38
+
+        Muslims 2023                               27                                                 24
+                    2024                      34                                                 17
+                    2025                     35                                                 16
+                           60              40                20                  0              20                    40                60
+
+                                     % of adults with a negative attitude            % of adults with a positive attitude
+
+
+
+
+14
+                                                                    Prejudice, discrimination & racism
+
+
+
+
+Perceptions of immigrants from different             were made to feel different or as if they did
+religious faiths also show clear contrasts. Most     not belong in the last 12 months (Figure 7a), 26
+strikingly, in Figure 6b, 35 per cent expressed      per cent experienced verbal or physical threat
+a negative attitude towards Muslims. This            or abuse (Figure 7b) and 27 per cent were not
+proportion had been declining in recent years24,     offered a job or treated fairly at work (Figure
+but increased between 2023 and 2024.                 7c). Approximately, one-half experienced
+                                                     mistreatment in any of these areas (Figure
+Since 2023, attitudes towards people of Hindu,       7d). While this may not be related to racial
+Jewish and Sikh faiths have also become less         or ethnically motivated discrimination, these
+positive and more negative. Indeed, while            forms of mistreatment were significantly and
+attitudes towards Jewish people became               often substantially more commonly reported
+significantly more negative after the start of the   by people from Asian or African backgrounds
+current conflict in Gaza, the extent of negative     than those born in Australia, New Zealand, the
+attitudes towards Jewish people are at similar       United Kingdom, Europe, the United States of
+levels to those of other faiths. The recent          America and Canada. People born in Asia and
+experience for Jewish Australian communities         Africa were also substantially more likely to
+though is qualitatively different and likely         report experiencing discrimination in the last
+more damaging, where negative attitudes have         12 months based on their skin colour, ethnic
+translated to anti-Semitic hatred and violence.25    origin or religion (40 per cent).
+There could be a number of reasons for the           Strikingly, the Australian-born population are at
+prevalence of negative attitudes expressed           least as likely as overseas-born Australians to
+towards immigrant and religious communities.         recognise racism as a problem. In 2025, two-
+On the face of it though, disproportionately         in-three Australian-born (69 per cent) adults
+negative attitudes highlight a persistent            believe that racism is a fairly or very big problem
+hierarchy of acceptance and a concerning level       in Australia, a similar proportion to those born
+of prejudice particularly towards people of          in Asia or Africa. Even among third generation
+Islamic faith and Australians from Asian and         Australians (people whose parents were both
+African backgrounds.                                 born in Australia), two-in-three (68 per cent)
+                                                     believe this is the case. While this might, in part,
+Whether prejudice reflects and translates
+                                                     reflect perceived racism towards white Anglo
+to racist attitudes and behaviours is another
+                                                     Australians, we estimate that only around one-
+question. While the Mapping Social Cohesion
+                                                     in-ten third generation Australians who believe
+survey does not directly capture instances and
+                                                     racism is a fairly or very big problem say they
+experiences of racism, the survey does ask
+                                                     themselves experienced discrimination on the
+whether people have experienced discrimination
+                                                     basis of skin colour, ethnic origin or religion in
+in the last 12 months based on their skin colour,
+                                                     the last 12 months – and this will include at least
+ethnic origin or religion and whether they think
+                                                     some First Nations Australians.
+racism is a problem in Australia. Since 2024,
+we have also asked respondents whether they          Racism, discrimination and prejudice are
+experienced different forms of mistreatment in       longstanding and, as our results suggest,
+the previous 12 months. We do not have a large       continuing issues for Australian society.
+enough number of respondents in the survey to        Considering the White Australia Policy was
+produce estimates of discrimination, perceived       only fully dismantled and multiculturalism
+racism and mistreatment for specific groups          embraced fifty years ago, considerable albeit
+and communities. We can though combine               uneven progress has been made since. Much
+survey data with data from Australia’s Census        work though is still to be done. Harnessing the
+to come up with estimates for people based on        symbolic support Australians have for diversity
+the regions of the world they were born in.26 The    and multiculturalism to tackle some of the
+results are shown in Figure 7 and Table A1 in the    underlying sources of racial and ethnic bias and
+Appendix.                                            prejudice could be a fruitful area for public and
+                                                     community attention in this space.
+Mistreatment and discrimination are commonly
+experienced by people from African and Asian
+backgrounds. We estimate that a combined
+45 per cent of people born in Africa and Asia
+
+
+
+
+                                                                                                            15
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 7.                     Experience of mistreatment for any reason, discrimination based on skin
+                                   colour, ethnic origin or religion and perceived racism in Australia by immigrant
+                                   background, 2025
+
+        a)               % made to feel different/did not belong in the last 12 months
+
+                                           Australia                                29
+
+
+
+     Place of birth
+                        UK, Europe, USA, Canada, NZ                           23
+                                         Asia, Africa                                             45
+                                        Total adults                                   30
+                                                        0               20              40           60                80     100
+                                                                                  Weighted % of adults
+        b)               % experienced verbal or physical threats or abuse in the last 12 months
+
+                                           Australia                         21
+
+
+
+     Place of birth
+                        UK, Europe, USA, Canada, NZ                     16
+                                         Asia, Africa                             26
+                                        Total adults                         21
+                                                        0               20              40           60                80     100
+                                                                                  Weighted % of adults
+        c)               % not offered a job or treated fairly at work in the last 12 months
+
+
+
+
+     Place of birth
+                                           Australia            10
+                        UK, Europe, USA, Canada, NZ             9
+                                         Asia, Africa                             27
+                                        Total adults              12
+                                                        0              20               40           60                80     100
+                                                                                  Weighted % of adults
+
+        d)               % mistreated in the last 12 months on any of the above
+
+
+
+
+      Place of birth
+                                           Australia                                        36
+                        UK, Europe, USA, Canada, NZ                                    30
+                                         Asia, Africa                                                  50
+                                        Total adults                                        37
+                                                        0               20              40           60                80     100
+                                                                                  Weighted % of adults
+
+        e)               % experienced discrimination on the basis of skin colour, religion or ethnic origin in the last 12 months
+
+
+
+
+       Place of birth
+                                           Australia               13
+                        UK, Europe, USA, Canada, NZ               11
+                                         Asia, Africa                                        40
+                                        Total adults                    16
+                                                        0               20              40           60                80     100
+                                                                                  Weighted % of adults
+        f)               % believes racism is a fairly or very big problem in Australia
+
+                                           Australia                                                              69
+
+
+
+       Place of birth
+                        UK, Europe, USA, Canada, NZ                                                         60
+                                         Asia, Africa                                                            65
+                                        Total adults                                                              67
+                                                        0               20              40           60                80     100
+                                                                                  Weighted % of adults
+
+
+
+
+16
+                                                         Trust in government & the political system
+
+
+
+
+Trust in government & the
+political system
+
+Trust in government and the confidence people have in the political
+system and institutions is a crucial foundation for societal functioning
+and social cohesion.
+
+
+Arguably, debate and division is an even more       Australians’ confidence in the Federal
+foundational cornerstone of democracy, while a      Government has shifted markedly in recent
+degree of scepticism and the right to question      years (see Figure 8). Belief that the Government
+is valuable for guarding against the misuse and     can be trusted to do the right thing by the
+abuse of power.27 Nevertheless, widespread          Australian people rose sharply during the
+trust in government and politics is indicative of   COVID-19 pandemic, with a peak of 56 per cent
+a political leadership that is seen to be doing     of adults in 2020 saying the government could
+the right thing by the people, while that trust     be trusted ‘almost always’ or ‘most of the time’
+provides a mandate for government to pursue         (as opposed to ‘only some of the time’ or ‘almost
+and implement policies in the interest of the       never’). Since then, however, trust declined
+country.28                                          steadily, reaching just one-in-three (33 per cent)
+                                                    people in 2024.
+Trust in government and the political system
+is measured through several questions on the        Trust in government rose though from 33 to
+Mapping Social Cohesion survey. The longest         37 per cent in the last year, an increase of four
+running question, asked in every survey since       percentage points. While this remains below the
+2007, asks respondents how often they ‘think        pandemic-era high recorded in 2020, it remains
+the government in Canberra can be trusted to        notably higher than the levels recorded through
+do the right thing by the Australian people’ and    most of the 2010–2018 period when it sat in a
+sits alongside other questions that speak to the    relatively steady band between 26 and 31 per
+confidence people have in the political system      cent. Whether the 2025 result reflects a short-
+more generally. Responses to these questions        term post-election bump or indicates an easing
+always partly reflect a partisan divide where       of public disillusionment with government and
+people are more likely to trust the government      the start of a recovery from the low trust of the
+they voted for and that best aligns with their      2010s remains to be seen.
+own views. Nevertheless, a degree of trust that
+governments have the best interests of people       The increase in trust in the Federal Government
+at heart and that the political system is fair      is mostly driven by increasing trust among
+is an important aspect to our social cohesion       progressive voters following the 2025 Federal
+and democratic functioning, especially when         election. Trust increased significantly between
+the party in government is not the one we all       2024 and 2025 among Labor and Greens voters,
+voted for.                                          while remaining reasonably stable among
+                                                    Coalition voters. Among people who voted for
+                                                    Labor at the election in May, for instance, belief
+                                                    that the Government can be trusted to do the
+                                                    right thing by the Australian people all or most
+                                                    of the time increased from 44 per cent in 2024
+                                                    to 58 per cent in 2025.
+
+
+
+
+                                                                                                         17
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 8.                              ‘How often do you think the government in Canberra can be trusted to do the
+                                            right thing for the Australian people?’ Proportion of adults who say ‘almost
+                                            always’ or ‘most of the time’, 2007 to 2018 (telephone surveys) and 2018 to
+                                            2025 (Life in AustraliaTM)
+
+                             100
+
+
+
+
+                             80
+
+
+
+
+      Weighted % of adults
+                             60
+                                                                                                       54 56
+                                             48
+                                                                                                                 44
+                                                                                                                      41
+                                        39                                                                                           37
+                             40                                                                   36                       36
+                                                                                                                                33
+                                                  31   30           30 30 29 28 30 28
+                                                            26 27
+
+                             20
+
+                                        8     7                                                             6
+                                                  5         4   4   5    5   4    4    4          3    5         4
+                                                       3                                      2                       2    2    1    2
+                              0
+                                                   1                                                 1
+                                     07 009 010 201 2012 013 014 015 016 2017 018 018 019 020 020 202 022 023 024 025
+                                   20  2   2            2   2   2   2        2   2   2 L2
+                                                                                            V
+                                                                                              2        2 2   2   2
+                                                                                      JU NO
+
+                               Almost always           Most of the time (telephone surveys)       Most of the time (Life in Australia)
+
+     Note: results up to 2018 relate to when the survey was run purely as a telephone survey. See the Appendix and O’Donnell et al.
+     (2024) for more information.
+
+     The polarisation of trust in government along                                    This partisan polarisation is also reflected in
+     party lines is shown in Figure 9a (see also Table                                broader attitudes to the functioning of the
+     A2). In 2021, under the Scott Morrison-led                                       Australian democracy and the political system.
+     Coalition Government, 72 per cent of Coalition                                   Examples are shown in Figure 9b, Figure 9c
+     voters said the Government can be trusted most                                   and Figure 9d. Overall, 40 per cent of adults say
+     of the time or almost always. After the election                                 ‘the system of government we have in Australia’
+     of the Anthony Albanese-led Labor Government                                     needs ‘major changes’ or ‘should be replaced’
+     in May 2022, trust among Coalition voters                                        (59 per cent say ‘it works fine as it is’ or ‘needs
+     fell to 34 per cent in 2023 and 29 per cent in                                   minor change’), a proportion that has fluctuated
+     2025. Over the same period, trust among Labor                                    somewhat in recent years, though the trend has
+     voters increased from 31 per cent in 2021 under                                  been stable since 2021. Likewise, 29 per cent
+     the Coalition Government to 46 per cent in                                       believe that ‘government leaders in Australia
+     2023 and 58 per cent in 2025 under the Labor                                     abuse their power’ all or most of the time (71 per
+     Government.                                                                      cent say it is ‘some of the time’, ‘a little of the
+                                                                                      time’ or ‘none of the time’) and 64 per cent say
+                                                                                      that in their view, Australian elections are fair
+                                                                                      all or most of the time (36 per cent say some,
+                                                                                      a little or none of the time), both of which have
+                                                                                      been stable since 2021.
+
+
+
+
+18
+                                                                                  Trust in government & the political system
+
+
+
+
+Figure 9.         Indicators of confidence in Australia’s political system by vote for major parties
+                  and total adults, Life in AustraliaTM , 2021, 2023 and 2025
+
+ a) % believes the Federal Government can be trusted most of the time/almost always
+  2021                                      31                         44                        72
+
+ 2023                                        34             36              46
+
+ 2025                                  29                    37                      58
+
+
+         0                       20                         40                     60                   80                  100
+                                                                  Weighted % of adults
+
+ b) % believes the system of government in Australia needs major changes/should be replaced
+  2021                      20                        39               43
+
+ 2023                                            35               41
+
+ 2025                             25                   40               45
+
+
+         0                       20                         40                     60                   80                 100
+                                                                  Weighted % of adults
+
+ c) % believes that government leaders in Australia abuse their power all or most of the time
+  2021           10                   27              31
+
+ 2023                            23               30
+
+ 2025                  16              29             32
+
+
+         0                       20                         40                     60                   80                 100
+                                                                  Weighted % of adults
+
+ d) % believes Australian elections are fair all or most of the time
+
+  2021                                                                             63     63            77
+
+ 2023                                                                              63     64    71
+
+ 2025                                                                        56           64             78
+
+
+         0                       20                         40                     60                  80                  100
+                                                                  Weighted % of adults
+
+                       Labor voter                          Liberal/National voter                   Total adults
+Note: Vote is based on who respondents said they gave their first preference to in the House at Representatives at the most recent
+Federal Election. Total adults includes voters for other parties/candidates and non-voters.
+
+
+
+
+                                                                                                                                     19
+     Mapping social cohesion 2025
+
+
+
+
+     Among Labor and Coalition voters, however,
+     the trends have been sharp and diverging. The
+     proportion of Coalition voters that believe the
+     system needs at least major changes increased
+     from 20 per cent in 2021 to 45 per cent in 2025,
+     while the proportion who believe that leaders
+     abuse their powers most or all of the time
+     increased from 10 per cent to 32 per cent and
+     the proportion who believe elections are fair all
+     or most of the time dropped from 77 per cent to
+     56 per cent. As shown in Figure 9b, Figure 9c
+     and Figure 9d, these trends are reversed among
+     Labor voters.
+
+     Stable, if not increasing, levels of trust in the
+     government and the political system in this
+     year’s survey disguise striking partisan shifts
+     in sentiment before and after the 2022 change
+     of Federal Government. Attitudes have not
+     necessarily become more polarised over this
+     time. In fact, the differences between Labor and
+     Coalition voters have narrowed on three of the
+     four indicators in Figure 9 (all except whether
+     ‘elections are fair’). Even so, it is perhaps a
+     cause for continued monitoring, if not concern,
+     that attitudes not just to the government of the
+     day but to the wider political system and the
+     integrity of elections can swing so sharply and in
+     such diverging ways between different groups
+     of voters. While Australia’s political system
+     has particular protective features such as
+     mandatory voting29, our results suggest that nor
+     is Australian democracy invulnerable to the sort
+     of political polarisation impacting many parts of
+     the world today.
+
+
+
+
+20
+                                                              Financial hardship and its social costs
+
+
+
+
+Financial hardship and
+its social costs
+
+The cost-of-living has been a dominant issue in Australia and much of
+the world for the past three years. Inflation and rising interest rates has
+coincided with a rise in financial struggles.30
+
+
+Even as inflation has subsided31 and interest      Despite improving economic conditions, a
+rates have stopped increasing32, household         substantial share of Australians continue to
+incomes, at least until recently, have not kept    report financial hardship. In 2025, when asked
+pace with the cost-of-living33 and financial       to describe their financial circumstances, 40
+hardship has remained stubbornly high.34 With      per cent of adults said they were either ‘just
+economic conditions improving, we might hope       getting along’, ‘struggling to pay bills’, or ‘poor’.
+for an easing in financial hardship in coming      Specifically, 28 per cent of adults said they were
+years. The personal and social consequences,       at best ‘just getting along’ financially, 9 per cent
+however, may have lasting effects, including on    were ‘struggling to pay bills’ and a further 3
+social cohesion.                                   per cent described themselves as ‘poor’. These
+                                                   figures are near identical to those in 2023 and
+Economic and financial conditions are related to   2024 (both 41 per cent), indicating that financial
+social cohesion in important ways, both in how     stress has remained stubbornly common despite
+they shape our material and emotional worth        slowing inflation and a pause in interest rate
+and wellbeing and influence our levels of trust,   rises.
+belonging and opportunities and willingness to
+participate in our communities. Indeed, as we
+have previously reported, financial wellbeing
+is the single most important factor associated
+with social cohesion that we can identify in the
+Mapping Social Cohesion survey.35 We build
+on this evidence in this section, including by
+showing that after multiple years of heightened
+cost-of-living pressures, persistent financial
+hardship is potentially having a cumulative
+effect on our social bonds and connections.
+
+
+
+
+                                                                                                           21
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 10.                    Proportion of adults who describe their financial situation as ‘just getting
+                                   along’, ‘struggling to pay bills’ or ‘poor’, Life in AustraliaTM, 2018 to 2025
+
+                             50
+
+                                  42                                                                          41
+                                                                                                   41
+                                                                                                                        40
+                             40             39
+                                                                                        37
+
+
+
+
+      Weighted % of adults
+                                                      34
+                                                                   33
+                                                                               31
+                             30
+                                  30
+                                                                                                   30         30        28
+                                            26
+                                                                                        27
+                             20                       27           25          24
+
+
+
+                             10
+                                   10       9                                                                  9        9
+                                                                                         8          9
+                                                      6             6          6
+
+                              0
+                                  2018     2019     Jul-20       Nov-20      2021      2022       2023       2024      2025
+
+                                           Poor              Struggling to pay bills          Just getting along
+
+
+     Financial hardship has also been stubbornly                             Financial hardship is particularly common
+     common since 2023 on a broader range of                                 among young and middle-aged adults, single
+     questions we have added to the Mapping Social                           parent families, non-family households and
+     Cohesion survey. In 2025, 13 per cent of adults                         renters. The proportion of adults reporting
+     say they have often or sometimes gone without                           financial hardship by age group, household
+     meals in the last 12 months because there                               composition and housing tenure in 2025 are
+     was not enough money for food, similar to the                           shown in Figure 11 (see also Table A3). These
+     proportion in 2023 (12 per cent) and higher than                        results show, for example, that among people
+     it was when the question was first asked in 2021                        living in single parent families, 36 per cent often
+     (9 per cent). Likewise, 13 per cent said they often                     or sometimes could not pay for medicines or
+     or sometimes could not pay the rent or mortgage                         health care, 25 per cent went without meals, 21
+     on time in 2025 and 22 per cent said they often                         per cent could not pay the rent or mortgage and
+     or sometimes could not pay for medicines or                             19 per cent said they were struggling to pay bills
+     health care, near identical to the proportions                          or ‘poor’.
+     when these questions were first asked in 2023
+     (12 per cent and 22 per cent respectively).
+
+
+
+
+22
+                                                                                                 Financial hardship and its social costs
+
+
+
+
+Figure 11.    Indicators of financial stress in the past 12 months by age, household
+              composition and housing tenure, Life in AustraliaTM, 2025
+
+                    Age
+                  18-24                        10                 16              18                   24
+                 25-34                                            16                    20                        29
+                 35-44                                        15                  18                             28
+                  45-54                                 13              15                                  26
+                  55-64               8            8                         16
+                    65+       4                     8
+
+
+             Household
+   Couple (no children)           5       6                  11
+  Couple parent family                     10                      13                       21
+  Single parent family                                                       19              21        25                36
+     Group household                                              16              18         21                  28
+            Live alone                        10                             16                   23
+
+
+       Housing tenure
+          Own outright        4        5                 10
+              Mortgage                     9                      12                   19
+                 Renter                                                           22                    25              36
+
+
+                  Total                             12             13                        21
+
+                          0                         10                            20                             30           40
+
+                                                                  Weighted % of adults
+
+                                  Went without medicines/health (often/sometimes)
+
+                                  Could not pay rent/mortgage (often/sometimes)
+
+                                  Went without meals (often/sometimes)
+
+                                  Struggling to pay bills/poor
+
+
+While the levels of financial hardship in 2025                               Having tracked many of the same individuals
+are similar to those recorded in 2018 (when 42                               on Life in AustraliaTM for multiple years, we
+per cent of adults reported financial difficulties)                          can estimate the proportion of respondents
+the overall trend since 2023 has been one                                    who have experienced financial difficulties
+of consistent levels of financial strain. The                                over multiple years. In doing so, we find that a
+persistence of financial pressure highlights the                             weighted estimate of 16 per cent of adults in
+challenges households face in meeting everyday                               2025 have been just getting along at best for
+costs and underscores the continuing impact                                  three or more consecutive years, 12 per cent
+of economic conditions on social cohesion and                                have been getting along at best for one or two
+wellbeing. Indeed, the persistence of financial                              years and 15 per cent have been getting along or
+stress for individuals and households in recent                              struggling for an unknown length of time.36
+years is potentially having a compounding effect
+on personal and social wellbeing and cohesion.
+
+
+                                                                                                                                           23
+     Mapping social cohesion 2025
+
+
+
+
+     Persistent financial difficulties over multiple        While difficult to prove, these results are
+     years are in turn, strongly associated with            consistent with the view that financial hardship,
+     several indicators of social cohesion. In              and particularly persistent hardship, can have a
+     particular, people who we observe have been            cumulative and corrosive effect on the individual
+     ‘just getting along’ at best for three or more         social bonds and ties that collectively contribute
+     years are much less likely to report being happy,      to social cohesion. Given recent macroeconomic
+     to trust in the Federal Government or people           indicators, we might reasonably hope that
+     generally or to believe their neighbours help          cost-of-living pressures will ease in coming
+     and get along with each other. For example, we         years, though whether that will translate to a
+     estimate that in 2025,                                 meaningful reduction in persistent hardship
+     • 58 per cent of adults are happy if they              and an improvement in social outcomes remains
+         have been financially ‘just getting along’,        to be seen and ought to be a foremost area of
+         ‘struggling to pay bills’ or ‘poor’ for at least   public and community concern.
+         three consecutive years, compared with 78
+         per cent of those who have been just getting
+         along at best for one or two years and 91 per
+         cent of those who say they are financially
+         comfortable or prosperous.37
+     • 28 per cent of adults trust the Federal
+         Government to do the right thing by the
+         Australian people all or most of the time if
+         they have been just getting along at best for
+         three or more years, compared with 36 per
+         cent of those who have been getting along
+         at best for 1-2 years and 47 per cent of those
+         who are comfortable or prosperous.38
+     • 32 per cent of adults believe that ‘generally
+         speaking, most people can be trusted’ if
+         they have been just getting along at best for
+         three or more years, compared with 41 per
+         cent of those who have been just getting
+         along at best for 1-2 years and 55 per cent
+         of those who say they are comfortable or
+         prosperous.39
+     • 61 per cent of adults agree that their
+         neighbours are willing help each other and
+         get on well together from different national
+         or ethnic backgrounds if they have been
+         just getting along at best for three or more
+         years, compared with 70 per cent of those
+         who have been getting along at best for
+         1-2 years and 79 per cent of those who are
+         comfortable or prosperous.40
+
+
+
+
+24
+                                                                      Personal happiness & wellbeing
+
+
+
+
+Personal happiness & wellbeing
+
+One of the most important functions of social cohesion is arguably in
+supporting personal social wellbeing and happiness.
+
+
+The effect of social cohesion, particularly of       This stability is consistent with results for life
+cohesive neighbourhoods, has been a major            satisfaction recorded on the General Social
+area of academic research for several years.41       Survey and the Household, Income and Labour
+42 43 44
+         While the findings are often nuanced,       Dynamics in Australia (HILDA)45 and highlights
+it is almost always shown to be the case that        that despite rising economic pressures and
+when people have good social connections and         social divisions in other areas, most Australians
+networks and a strong sense of belonging and         continue to consistently report a positive sense
+cohesion within neighbourhoods, communities          of personal wellbeing.
+and society, they are most likely to say they are
+happy and satisfied with life. So whether social
+cohesion causes people to be happy or not,
+personal wellbeing and happiness is a useful,
+if not one of the most important, indicators of
+social cohesion.
+
+When asked to take all things into consideration,
+around four out of five Australians (79 per cent)
+reported being either happy or very happy over
+the past year on the Mapping Social Cohesion
+survey (as opposed to unhappy or very unhappy).
+Since 2018 when the survey shifted to the
+mostly online Life in AustraliaTM survey, the
+proportion of adults who said they were happy
+or very happy has remained within the range
+of 78–80 per cent, with only minor fluctuations
+(see Figure 12). After we adjust for the fact that
+people were less likely to admit being unhappy
+on the telephone surveys prior to 2018, we
+estimate that the proportion saying they are
+happy has been consistent since 2016.
+
+
+
+
+                                                                                                          25
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 12.                              ‘Taking all things into consideration, would you say that over the last year you
+                                             have been…?’ Proportion of adults who say happy or very happy, 2007 to 2018
+                                             (telephone surveys) and 2018 to 2025 (Life in AustraliaTM)
+
+                             100
+
+                                        89 89 88 89 88       89
+                                                       87 88    85 86 85
+                                                                                                 80 80 79 79
+                                                                                            78               78 79 78 79
+                             80
+
+
+
+
+      Weighted % of adults
+                             60
+
+
+
+
+                             40
+
+
+
+
+                             20
+                                        34            31
+                                              29 29         28 26    27   28   27   26 25
+                                                                                            14   13   11        12   13   13   12   12
+                                                                                                           10
+                              0
+                                                   1                                                 1
+                                     07 009 010 201 2012 013 014 015 016 2017 018 018 019 020 020 202 022 023 024 025
+                                   20  2   2            2   2   2   2        2   2   2 L2
+                                                                                            V
+                                                                                              2        2 2   2   2
+                                                                                      JU NO
+
+                                               Very happy           Happy (Telephone surveys)         Happy (Life in Australia)
+
+     Note: results up to 2018 relate to when the survey was run purely as a telephone survey. See the Appendix and O’Donnell et al.
+     (2024) for more information.
+
+     Happiness and life satisfaction are strongly                                     almost a mirror image where 65 per cent of 18-24
+     related to economic and social factors. Among                                    year old males and 61 per cent of females say
+     people who say they are financially ‘struggling                                  they feel isolated from others ‘some of the time’
+     to pay the bills’ or ‘poor’, just 41 per cent said                               or often, proportions that decline to 22 and 26 per
+     they had been happy or very happy over the last                                  cent among males and females aged 75 years
+     year, compared with 94 per cent of those who                                     and over.
+     say they are ‘prosperous’ or ‘very comfortable’
+     and 90 per cent of those who are ‘reasonably
+     comfortable’.
+
+     Like the sense of belonging, happiness is strongly
+     related to social connections and is relatively
+     less prevalent among young adults. In Figure
+     13 (and Table A4), we show levels of happiness
+     and indicators of social connection and isolation
+     for males and females by age group. For 18-24
+     year olds, 79 per cent of males and 72 per cent
+     females said they had been happy or very happy
+     in the last 12 months, similar to levels for 24-34
+     year olds, 35-44 year olds and 45-54 year olds
+     and significantly lower than for people aged 65
+     years and over. Patterns of social isolation form
+
+
+26
+                                                                                                                              Personal happiness & wellbeing
+
+
+
+
+Figure 13.                          Happiness, social connections and isolation and age group and gender, Life in
+                                    AustraliaTM, 2025
+
+a) Males                                                                              b) Females
+
+                        100    94                                                                       100    95        95                      94       94    96
+                                                                                                                                  93    92
+                                        90     90      90             89    90
+                                                              85                                                                                                96
+                                                                            91                                                                    81
+                                                                      86                                                           77       77            87
+                        80                                                                              80                   74
+                                                              81                                               72
+                               79                                                                                                                               68
+
+
+
+
+ Weighted % of adults
+                                               77
+
+
+
+
+                                                                                 Weighted % of adults
+                                                       76
+                               65       72                                  62                                68             63
+                                                                                                                                                          60
+                                         57                           57                                60                         58
+                        60                        56
+                                                                                                                   61                            53
+                                                       50                                                                                   52
+                               55                             47                                                         56
+
+                                        48             46                                                                         49
+                        40                     46                                                       40                              46       45
+
+                                                                                                                                                          38
+                                                              36
+                                                                      31
+                                                                                                        20                                                      26
+                        20
+                                                                            22
+
+
+
+                         0                                                                               0
+                              4     4         4        4    4      4        +                                  4        4         4     4        4     4        +
+                              -2    -3       -4     -5      -6     -7      75                                 -2        -3    -4       -5    -6       -7       75
+                          18       25    35       45     55      65                                       18        25       35    45       55       65
+
+                                              Age group                                                                           Age group
+
+
+                                        % happy or very happy in the last 12 months
+                                        % isolated from others some of the time or often
+                                        % daily/weekly contact with family/friends in-person
+                                        % daily/weekly contact with family/friends in-person, online, phone
+
+
+Feelings of happiness and social isolation are,                                                 over. This difference in in-person contact is
+in turn, reflective of the regularity of contact                                                then strongly associated with differences in
+people have with family and friends. While most                                                 happiness and life satisfaction between older
+people communicate with family and friends                                                      and young-to-middle aged cohorts, suggesting
+in some form – whether in person, online or by                                                  that social disconnection is weighing on the
+phone – on at least a weekly basis, younger-to-                                                 personal wellbeing and happiness of many
+middle aged adults are relatively less likely to                                                adults.
+see family and friends in person (see Figure 13).
+For 35-44 year olds, for example, 46 per cent
+of males and 49 per cent meet with family or
+friends on a daily or weekly basis, significantly
+below levels for those aged 65 years and
+
+
+
+
+                                                                                                                                                                     27
+     Mapping social cohesion 2025
+
+
+
+
+     Local and community
+     connections
+
+     The stability of our measures of social cohesion in a world of social and
+     economic tumult demonstrates the way in which social cohesion is much
+     more than a reflection of the state of the economy or the battles that
+     take place in political and online spheres.
+
+
+     Rather, social cohesion reflects the social,        than four out of five adults (82 per cent) agreed
+     emotional and practical bonds we have between       that people in their local area are willing to
+     each other that we build and maintain each day      help neighbours, a level that has remained
+     and that hold us together as communities and        consistently high over the past 15 years.
+     a society.46 The benefits of social cohesion can    Similarly, 80 per cent said that neighbours from
+     also be subtle but powerful in protecting us from   different national or ethnic backgrounds get on
+     external and home-grown sources of division.        well together, only slightly lower than the peaks
+     Oftentimes, the true value of social cohesion       recorded in 2020 and 2021. Additionally, 80 per
+     comes not in the good times but in protecting       cent of respondents also reported feeling that
+     and supporting our collective wellbeing through     they belong in their neighbourhood, though this
+     difficult and challenging periods, in supporting    has also declined modestly since 2020 and 2021.
+     people and communities through hardship
+     and guarding against widespread disparities         Other indicators of neighbourhood cohesion
+     and disadvantage in social connectedness and        are at somewhat lower levels. Around two-
+     wellbeing across society.47                         thirds (64 per cent) of adults in 2025 agreed
+                                                         their neighbourhood has a strong sense of
+     In many ways, daily interactions within our         community, while just over 57 per cent said they
+     communities are at the heart of the protective      have a say on issues that matter to them locally.
+     effect of social cohesion. They provide             Both proportions are down from earlier peaks,
+     friendships and sources of social support,          but have been steady over the last year.
+     opportunities for interacting with people
+     from diverse backgrounds and breaking
+     down prejudice, providing avenues for active
+     engagement and establishing a sense of
+     identity, belonging and trust in friends and
+     strangers alike.48
+
+     One of the sources of community strength
+     that we have been reporting on in recent years
+     has been in neighbourhood connections and
+     cohesion. Our results this year show that most
+     Australians continue to report high levels of
+     local connection and neighbourliness. Key
+     results are shown in Figure 14. In 2025, more
+
+
+
+
+28
+                                                                                                                      Local and community connections
+
+
+
+
+Figure 14.                         Indicators of neighbourhood social cohesion, 2009 to 2018 (telephone surveys)
+                                   and 2018 to 2025 (Life in AustraliaTM)
+
+                        100
+
+                                                                                                                       87 86           85
+                                           84     84     84     84     84                                        86                              83
+                                    83                                        81     83           81                                                       82        82
+                              80                                                                        81
+                        80
+
+
+
+
+ Weighted % of adults
+                                                                                                                            67         66
+                                                                                                                                                 64                  64
+                                                                                                                                                           62
+                                           70                          70
+                                                                67                            68
+                        60                               64                   64                                      65
+                                                                                     62                     61              62         62
+                                                                                              58                                                 57                  57
+                                                                                                                                                           56
+
+                        40
+
+
+
+
+                        20
+
+
+
+
+                         0
+                              09     10     11     12     13     14     15     16     17       18        19        20        21     22        23        24        25
+                         20        20     20     20     20     20     20     20     20       20        20        20        20     20        20        20        20
+
+
+                          % agrees that people in 'local area are willing to help neighbours'
+
+                          % agrees that neighbours 'from different national or ethnic backgrounds get on well together'
+
+                          % agrees that 'I am able to have a say on issues that are important to me in my local area'
+
+                          % agrees that 'I feel like I belong in my neighbourhood'
+
+                          % agrees that 'my neighbourhood has a strong sense of community'
+
+Note: dashed lines indicate when the survey was run only as a telephone survey. See the Appendix and O’Donnell et al. (2024) for
+more information.
+
+In terms of active community participation, more                                         •    Just over two-in-five (41 per cent) adults
+than half of Australians (55 per cent) reported                                               were involved in a social or religious group in
+being involved in some form of a community,                                                   2024, including sports, arts, craft, ethnic and
+social, religious, civic and/or political group in                                            multicultural clubs and groups, also similar
+2025. As shown in Figure 15, this level is similar                                            to levels recorded since 2021.
+to those recorded since 2021. Participation is                                           •    One-in-six (17 per cent) adults were involved
+made up by:                                                                                   in a civic or political group such as a trade
+• One-in-five (21 per cent) adults were involved                                              union, political party, environmental and civil
+    in a community support group in the last                                                  rights groups, consumer organisations and
+    12 months, such as St Vincent de Paul,                                                    tenants’ associations, largely the same share
+    Rotary, the RSL, Scouts and the Australian                                                since 2022.
+    Red Cross. This proportion is in line with
+    or slightly below levels recorded in every
+    survey since the question was first asked in
+    2021.
+
+
+
+
+                                                                                                                                                                          29
+     Mapping social cohesion 2025
+
+
+
+
+     Figure 15.     Involvement in community, social, religious, civic and political groups in the last
+                    12 months, Life in AustraliaTM, 2021 to 2025
+
+                                                                                               2021
+                                                                       23
+                  Community support groups                                                     2022
+                (including St Vincent de Paul,                          24
+              Rotary, the RSL, Scouts and the                         23                       2023
+                        Australian Red Cross)                          23
+                                                                                               2024
+                                                                     21
+                                                                                               2025
+                                                                                          43
+                   Social and religious groups
+                                                                                        41
+                  (including sports, arts, craft,
+                ethnic and multicultural clubs                                           42
+                                   and groups)                                            43
+                                                                                        41
+
+
+                                                              15
+                     Civic and political groups
+                                                               16
+              (including trade unions, political
+                                                               16
+        parties, environmental and community
+                                                                17
+             groups and tenants’ associations)
+                                                                17
+
+
+                                                                                                  54
+                                                                                                  54
+                  Total community, social and                                                      55
+                                civic groups                                                        56
+                                                                                                  54
+
+                                                    0    15                  30          45           60
+                                                                 Weighted % of adults
+
+
+     Neighbourhood cohesion and community                We can see some evidence of the potential
+     participation provides an important source          protective effect of neighbourhood cohesion in
+     of connection, belonging and resilience in          the Mapping Social Cohesion survey by tracking
+     local communities. These, in turn, potentially      changes over time. We find that people were
+     support social cohesion across the country.         more likely to remain or become happy between
+     In the Mapping Social Cohesion survey,              2024 and 2025 if they lived in neighbourhoods
+     people who perceive strong cohesion in their        they perceived as cohesive. We estimate that
+     neighbourhoods and those who participate in         after accounting for a range of demographic
+     social, community and civic groups are much         and socioeconomic characteristics, 54 per
+     more likely to have a great sense of belonging      cent of people who were unhappy in 2024
+     in Australia, to believe that most people can be    became happy in 2025 if they lived in cohesive
+     trusted, to be happy and to agree that accepting    neighbourhoods, compared with 37 per cent of
+     immigrants from many different countries            people in less cohesive neighbourhoods. If they
+     makes Australia stronger. We cannot say from        were happy last year, 94 per cent of those in the
+     this evidence that neighbourhood cohesion           most cohesive neighbourhoods remained happy
+     and participation cause better social cohesion      in 2025, compared with 85 per cent of those in
+     outcomes, though some research suggests             less cohesive neighbourhoods.50
+     that cause and effect between wellbeing and
+     participation goes both ways – that participation
+     supports wellbeing and wellbeing supports
+     participation.49
+
+
+
+
+30
+                                                    Local and community connections
+
+
+
+
+Similar findings are found with respect to
+belonging, trust and acceptance. Compared
+with those in less cohesive neighbourhoods,
+people living in neighbourhoods they perceive
+as cohesive were:
+• 65 per cent more likely to shift from not
+    having a great sense of belonging in 2024
+    to having a great sense in 2025 and 19 per
+    cent more likely to maintain a great sense of
+    belonging.51
+• 2.2 times more likely to shift from not
+    believing that people generally can be
+    trusted in 2024 to trusting people in 2025
+    and 20 per cent more likely to maintain
+    trust.52
+• 2.1 times more likely to shift from not
+    agreeing the multiculturalism has been good
+    for Australia in 2024 to agreeing in 2025
+    and as likely if not somewhat more likely to
+    maintain agreement.53
+
+While it is difficult to prove cause and effect,
+these results provide support for the view
+that local and community bonds can support
+overall social cohesion, helping people to attain
+and maintain the sort of personal and social
+wellbeing that in the aggregate helps to define
+and influence social cohesion across Australia
+and protect against difficult and challenging
+times.
+
+
+
+
+                                                                                      31
+     Mapping social cohesion 2025
+
+
+
+
+     Conclusion
+
+     This year’s Mapping Social Cohesion study reflects many of the
+     immediate and long-term challenges and strengths of Australian society.
+
+
+     Most of our indicators of social cohesion have      from Australia’s intercultural harmony. Finally,
+     been reasonably stable over the last one to         recent stability, if not improvement, in the trust
+     two years, which in the current national and        people have in government and the political
+     global climate perhaps reflects positively          system comes off a reasonably low base and
+     on the resilience of Australia’s social fabric.     masks strong partisan shifts in trust depending
+     Most notably, cohesion and engagement in            on which party is in government.
+     neighbourhoods and local communities looks to
+     be a source of strength not only for their local    Through these findings, this year’s Mapping
+     benefits but also for their associations with the   Social Cohesion study sends a call for thinking,
+     stability of wider measures of social cohesion      discussion and action across communities
+     including trust, belonging and acceptance           and the country. A call to think through and
+     across the country. Indeed, we find that people     address the big social challenges – generational
+     living in close knit neighbourhoods are the most    divides, social and financial wellbeing, racism
+     likely to have attained and maintained a sense      and prejudice and working collectively to solve
+     of national belonging, trust in government and      political, social, economic and environmental
+     people and acceptance of diversity through          challenges. The strength of our community
+     these tumultuous last couple of years.              bonds and cohesion stands as a valuable
+                                                         resource in meeting these challenges.
+     Nuances in this year’s findings though point to
+     long-term, emerging and looming challenges.
+     The sense of national pride and belonging has
+     been stable in recent times, though remains at
+     the lowest levels we have recorded since 2007.
+     Driven by considerable declines among younger
+     generations and associated with personal
+     and financial wellbeing, social isolation and
+     disconnection, lower levels of national belonging
+     may well point to normal social and cultural
+     change though also contains important elements
+     that should be of public and community
+     concern. Likewise, persistent financial hardship
+     is potentially having damaging cumulative
+     effects on social outcomes, while the common
+     experience of discrimination and the widely
+     held prejudices expressed towards people of
+     different religious faiths and from different
+     migrant backgrounds detracts substantially
+
+
+
+
+32
+                                                           Appendix: Mapping Social Cohesion 2025
+
+
+
+
+Appendix: Mapping Social
+Cohesion 2025
+
+The Mapping Social Cohesion study was developed in partnership
+between the Scanlon Foundation and Monash University under the
+leadership of Emeritus Professor Andrew Markus.
+
+
+Now in its 18th year, the study has interviewed      As we have done since 2023, we also
+more than 60,000 people and delivered 18             administered a shorter survey in one of four
+national reports alongside countless other           different languages (including English) to
+reports, papers and briefings.                       245 Australians who have immigrated over
+                                                     the years from Africa, the Middle East and
+The study is now led by the Scanlon Foundation       India. These respondents were identified and
+Research Institute and the Australian National       recruited through Polaron Connect. While it is
+University. The research for this year’s report      incredibly challenging to adequately capture all
+was hosted by the PopLab in the School               of Australia’s diversity, this is an important step
+of Demography at the Australian National             to ensure the Mapping Social Cohesion study
+University. The report authors, Alice Falkiner and   continues to represent and reflect the views
+Katarzyna Szachna are employed by the PopLab,        across Australia’s rich migrant, cultural and
+while James O’Donnell is employed by the School      linguistic diversity.
+of Demography and affiliated with the PopLab.
+                                                     Most people have completed the survey online
+A special committee, ‘the Brains Trust’ is           (99 per cent in 2025) since the transition
+convened to oversee the research. The Brains         of the survey to Life in AustraliaTM in 2018,
+Trust is comprised of Anthea Hancocks, CEO           though people have the option to complete the
+of the Scanlon Foundation Research Institute,        survey by phone. Prior to 2018, the survey was
+Institute staff Trish Prentice, Rouven Link,         conducted as a purely phone survey, initially to
+John van Kooy and Phoebe Johnston, Emeritus          landline telephone numbers and then to landline
+Professor Andrew Markus AO, Darren Pennay            and mobile numbers. As explained in previous
+and Bruce Smith.                                     reports, the shift to the mostly online survey
+The Mapping Social Cohesion survey was               impacted our results, leading to lower estimates
+administered and managed by the Social               of social cohesion when people completed
+Research Centre. Key staff integral to the           the survey online and did not have to interact
+production of this year’s study include Alison       with a person over the phone (and so were
+Eglentals, Cameron Mak, Natasha Vickers, Ben         more likely to admit being unhappy, financially
+Phillips, Andrew Ward and Jack Burton.               stressed, social isolated and less accepting of
+                                                     diversity among other things).54 We measure
+The 2025 study involved the largest national         and adjust for this effect though by comparing
+survey in its history of Australians’ attitudes,     results in 2018 and 2019 when the survey was
+perceptions, experiences and actions related         simultaneously run as both a telephone and
+to social cohesion. As has been the case since       online survey.
+2018, the survey was administered to the Social
+Research Centre’s Life in AustraliaTM, a panel of    The Mapping Social Cohesion 2025 study was
+                                                     approved by the Australian National University
+more than 10,000 adults. In July this year, 8,029
+                                                     Human Research Ethics Committee (Protocol
+members of Life in AustraliaTM, agreed to take
+                                                     number H/2025/0152).
+part in the Mapping Social Cohesion survey.
+
+
+                                                                                                           33
+     Mapping social cohesion 2025
+
+
+
+
+     In the wake of 2025 Federal election, the Social     The results of the Mapping Social Cohesion
+     Research Centre, the Scanlon Foundation              survey are used to make inferences about the
+     Research Institute and the Australian National       state of social cohesion across Australia. Our
+     University have also had the opportunity to          large sample of respondents gives us a great
+     gauge the extent to which Life in AustraliaTM        deal of power in doing so. However, we obviously
+     and the Mapping Social Cohesion study                do not survey each and every Australian and
+     represents the diversity of political opinion        there are various ways in which our results
+     in Australia. A common problem for survey            would differ from results if we were to survey
+     designers around the world for several years         everyone. Differences can be classified as either
+     has been in engaging and representing                random or non-random errors.
+     conservative voices and voters.55
+                                                          Non-random errors arise where survey
+     This year, we have taken steps to strengthen         respondents are not similar in characteristics
+     the political representativeness of the study.       or representative of the population. For
+     Firstly, the Social Research Centre (SRC)            example, there may not be enough respondents
+     developed an approach to select respondents          in key demographic and socioeconomic
+     from Life in AustraliaTM based on who they           groups to match the characteristics of the
+     voted for at the 2025 election and then weight       population. We use population weights to try
+     all respondents to mirror the election results.      to correct for any underrepresentation in the
+     The SRC call this approach the Voting Adjusted       Mapping Social Cohesion sample that we can
+     Sample Selection (VASS).                             observe. Population weights are calculated
+                                                          by age, gender, education, neighbourhood
+     Secondly, we administered the Mapping                socioeconomic disadvantage, place of residence,
+     Social Cohesion survey to a sample of 3,000          migrant background and language spoken at
+     conservative and minor party voters and non-         home based on Census and population data and
+     voting adults in parallel to the survey given to     applied to each respondent to give responses
+     Life in AustraliaTM. This sample was recruited       more weight where that respondent is part of a
+     from a non-probability panel run by the Online       group that is underrepresented on the survey on
+     Research Unit (ORU). The VASS approach               any of those domains.
+     ensures that we have a mix of voters that mirrors
+     the results of the 2025 election, while the survey   Random error arises from the fact that none of
+     to the ORU panel helps to investigate and verify     the variables we measure are fixed, permanent
+     whether the survey responses of conservative         characteristics of people or society and can vary
+     and minor party voters and non-voting adults on      in time and space. Like flipping a coin 100 times,
+     Life in AustraliaTM are typical and representative   there is no guarantee that it will come up heads
+     of such groups generally.                            50 times even if it is a perfectly balanced coin.
+                                                          The most notable source of random error in any
+     At the time of writing this report, we are still     sample survey comes from the fact that, outside
+     working through the data and developing and          of censuses, we do not interview everyone
+     testing long-term strategies to future-proof the     in the population and inevitable differences
+     Mapping Social Cohesion study. We will have          arise between the results from a sample of
+     more to say on this work including through a         respondents to the results we would get if we
+     forthcoming technical report and through the         interviewed everyone, even if our sample was
+     Mapping Social Cohesion 2026 report. Our             broadly representative of the population.
+     preliminary analysis though gives us great
+     confidence in the ongoing strength of the            We use statistical theory to derive estimates
+     Mapping Social Cohesion study and its ability to     of random error and express these as 95 per
+     reflect the views of all Australians.                cent confidence intervals. The 95 per cent
+                                                          confidence intervals are the ranges within
+     In this report, we have concentrated our analysis    which we are 95 per cent confident that the
+     on aspects and indicators of social cohesion in      true estimate lies within (the estimate we would
+     which we have the highest degree of confidence       get if we interviewed everyone). Because of our
+     in the results. This relates to the great majority   large sample, the national-level estimates have
+     of questions and items on the survey. For a          relatively narrow confidence intervals – usually
+     select few politically divisive items, we have not   1-2 percentage points on either side of the
+     reported findings in this report, but will have      reported estimates. For example, we report that
+     more to say in future reports.                       46 per cent of adults have a sense of belonging
+                                                          in Australia to a great extent in 2025. The 95 per
+
+34
+                                                            Appendix: Mapping Social Cohesion 2025
+
+
+
+
+cent confidence interval around this estimate is     uncertainty, we provide confidence intervals
+44 to 48 per cent, meaning we are 95 per cent        for our sub-national estimates in the notes to
+confident that if we interviewed all Australian      this report and in the following tables. Table A1
+adults, between 44 and 48 per cent would say         provides the confidence intervals related to the
+that have a great sense of belonging.                estimates reported in Figure 7 of this report.
+                                                     Table A2 gives the intervals related to Figure
+Confidence intervals are wider for any sub-          9, Table A3 relates to Figure 11 and Table A4
+national estimates that we present in this report    relates to Figure 13. Finally, Table A5 shows the
+(for example, estimates of belonging among           number of respondents to the 2025 Mapping
+Millennials). This is because we are drawing on      Social Cohesion survey in select demographic
+a smaller sample of respondents for any sub-         and socioeconomic groups.
+national analysis, creating greater potential for
+random variation. To help explain the range of
+
+Table A1.     Experience of mistreatment for any reason, discrimination based on skin
+              colour, ethnic origin or religion and perceived racism in Australia by immigrant
+              background – with confidence intervals, 2025
+
+                                                                        Weighted % of adults
+                                                                        [95% Confidence intervals]
+% made to feel different/did not belong in the last 12 months
+Australia                                                               29 [27, 30]
+UK, Europe, USA, Canada, NZ                                             23 [21, 27]
+Asia, Africa                                                            45 [38, 52]
+Total adults                                                            30 [29, 32]
+
+% experienced verbal or physical threats or abuse in the last 12 months
+Australia                                                            21 [20, 23]
+UK, Europe, USA, Canada, NZ                                          16 [14, 19]
+Asia, Africa                                                         26 [20, 32]
+Total adults                                                         21 [20, 22]
+
+% not offered a job or treated fairly at work in the last 12 months
+Australia                                                               10 [9, 12]
+UK, Europe, USA, Canada, NZ                                             9 [8, 12]
+Asia, Africa                                                            27 [20, 33]
+Total adults                                                            12 [11, 13]
+
+% mistreated in the last 12 months on any of the above
+Australia                                                               36 [34, 38]
+UK, Europe, USA, Canada, NZ                                             30 [27, 33]
+Asia, Africa                                                            50 [44, 57]
+Total adults                                                            37 [36, 39]
+
+% experienced discrimination on the basis of skin colour, religion or ethnic origin in the last
+12 months
+Australia                                                              13 [12, 14]
+UK, Europe, USA, Canada, NZ                                            11 [9, 14]
+Asia, Africa                                                           40 [33, 46]
+Total adults                                                           16 [15, 18]
+
+% believes racism is a fairly or very big problem in Australia
+Australia                                                               69 [67, 70]
+UK, Europe, USA, Canada, NZ                                             60 [57, 64]
+Asia, Africa                                                            65 [59, 71]
+Total adults                                                            67 [66, 68]
+
+
+                                                                                                         35
+     Mapping social cohesion 2025
+
+
+
+
+     Table A2.    Indicators of confidence in Australia’s political system by vote for major parties
+                  and total adults, 2021, 2023 and 2025 (Life in AustraliaTM)
+
+                                                                Liberal/ National
+                                          Labor voter           voter               Total adults
+                                          Weighted % of adults [95% confidence interval]
+     % believes the Federal Government can be trusted most of the time/almost always
+     2021                                 31 [28, 35]           72 [69, 76]         44 [42, 46]
+     2023                                 46 [44, 49]           34 [31, 37]         36 [35, 37]
+     2025                                 58 [56, 61]           29 [27, 32]         37 [36, 39]
+
+
+     % believes the system of government in Australia should be replaced or needs major changes
+     2021                                 43 [39, 47]           20 [17, 24]         39 [37, 41]
+     2023                                 35 [32, 37]           36 [33, 39]         41 [39, 42]
+     2025                                 25 [23, 27]           45 [42, 48]         41 [39, 42]
+
+
+     % believes that government leaders in Australia abuse their power all or most of the time
+     2021                                 31 [28, 35]           10 [8, 13]          27 [25, 29]
+     2023                                 23 [21, 25]           30 [27, 33]         30 [29, 32]
+     2025                                 16 [14, 18]           32 [29, 35]         30 [28, 31]
+
+
+     % believes Australian elections are fair all or most of the time
+     2021                                 63 [59, 67]           77 [74, 81]         63 [61, 66]
+     2023                                 71 [69, 74]           64 [61, 67]         63 [62, 65]
+     2025                                 78 [76, 80]           56 [53, 59]         62 [61, 64]
+
+
+
+
+36
+                                                           Appendix: Mapping Social Cohesion 2025
+
+
+
+
+Table A3.      Indicators of financial stress in the past 12 months by age, household
+               composition and housing tenure – with confidence intervals, Life in AustraliaTM,
+               2025
+
+                                                               Could not          Went without
+                                           Went without        pay rent/          medicines/
+                         Struggling to     meals (often/       mortgage (often/   health (often/
+                         pay bills/poor    sometimes)          sometimes)         sometimes)
+                         Weighted % of adults [95% confidence interval]
+Age
+18-24                    10 [8, 14]        18 [14, 22]        16 [12, 20]         24 [20, 29]
+25-34                    16 [13, 19]       20 [17, 24]        18 [15, 21]         29 [26, 33]
+35-44                    15 [13, 17]       17 [14, 19]        18 [15, 20]         28 [25, 31]
+45-54                    15 [12, 17]       13 [11, 15]        15 [12, 17]         26 [23, 29]
+55-64                    8 [6, 10]         8 [6, 10]          8 [6, 10]           16 [14, 19]
+65+                      6 [5, 8]          4 [3, 6]           4 [3, 6]            8 [7, 10]
+
+
+Household
+Couple no children       6 [5, 7]          6 [4, 7]           5 [4, 6]            11 [9, 13]
+Couple parent family     11 [10, 13]       10 [8, 12]         13 [11, 15]         21 [18, 23]
+Single parent family     19 [15, 24]       25 [20, 30]        21 [17, 26]         36 [31, 41]
+Group household          18 [13, 24]       21 [16, 28]        16 [11, 22]         28 [22, 35]
+Live alone               13 [11, 15]       16 [14, 18]        10 [9, 13]          23 [20, 25]
+
+
+Housing tenure
+Own outright             5 [4, 7]          5 [4, 7]           4 [3, 5]            10 [8, 11]
+Mortgage                 9 [8, 11]         9 [8, 11]          12 [11, 14]         19 [17, 21]
+Rent                     22 [19, 24]       25 [23, 28]        23 [20, 25]         36 [33, 39]
+
+
+Total                    12 [11, 13]       13 [12, 14]        13 [12, 14]         21 [20, 23]
+
+
+
+
+                                                                                                    37
+     Mapping social cohesion 2025
+
+
+
+
+     Table A4.   Happiness, social connections and isolation and age group and gender – with
+                 confidence intervals, Life in AustraliaTM, 2025
+
+                                                                                 Daily/weekly
+                                                                Daily/weekly     contact with
+                                              Isolated from     contact with     family/friends
+                            Happy in the last others some of    family/friends   in-person,
+                            12 months         the time or often in-person        online, phone
+                            Weighted % of adults [95% confidence interval]
+     Males
+     18-24                  79 [71, 85]       65 [56, 73]        55 [46, 64]     94 [88, 97]
+     25-34                  72 [66, 78]       57 [50, 63]        48 [42, 55]     90 [85, 93]
+     35-44                  77 [73, 81]       56 [51, 61]        46 [41, 51]     90 [87, 93]
+     45-54                  76 [71, 80]       46 [41, 51]        50 [45, 55]     90 [86, 92]
+     55-64                  81 [77, 85]       36 [32, 41]        47 [43, 52]     85 [81, 88]
+     65-74                  86 [83, 89]       31 [27, 35]        57 [52, 62]     89 [86, 92]
+     75+                    91 [87, 94]       22 [17, 27]        62 [56, 67]     90 [85, 93]
+
+
+     Females
+     18-24                  72 [64, 78]       61 [53, 68]        68 [60, 75]     95 [91, 98]
+     25-34                  74 [70, 79]       63 [59, 67]        56 [51, 60]     95 [93, 97]
+     35-44                  77 [73, 80]       58 [54, 62]        49 [45, 53]     93 [91, 95]
+     45-54                  77 [73, 80]       52 [47, 56]        46 [42, 51]     92 [89, 94]
+     55-64                  81 [77, 84]       45 [41, 49]        53 [49, 57]     94 [92, 96]
+     65-74                  87 [84, 90]       38 [34, 42]        60 [56, 64]     94 [92, 96]
+     75+                    96 [93, 97]       26 [21, 32]        68 [62, 73]     96 [92, 97]
+
+
+
+
+38
+                                                                           Appendix: Mapping Social Cohesion 2025
+
+
+
+
+Table A5.        Number of respondents to the 2025 Mapping Social Cohesion survey by select
+                 demographic and socioeconomic characteristics
+
+ Number of respondents                                                Number of respondents
+Gender                                                                Language spoken at home
+Male                                       3,426                      English only                                  5,608
+Female                                     4,762                      Other language                                2,538
+Non-binary, other, refused                 86
+                                                                      Capital city-rest of state
+Age group                                                             Capital city                                  5,608
+18-24                                      378                        Rest of state/territory                       2,538
+25-34                                      1,044
+35-44                                      1,524                      Vote at 2025 Federal Election
+45-54                                      1,354                      Labor                                         2,874
+55-64                                      1,526                      Liberal/National                              1,743
+65-74                                      1,582                      Greens                                        1,081
+75+                                        866                        Independent                                   725
+                                                                      Other                                         789
+State/territory                                                       Did not vote                                  906
+NSW                                        2,530
+Victoria                                   2,187                      Neighbourhood disadvantage
+Queensland                                 1,581                      Quintile 1 - most disadvantaged               1,109
+South Australia                            668                        Quintile 2                                    1,420
+Western Australia                          776                        Quintile 3                                    1,720
+Tasmania                                   239                        Quintile 4                                    1,861
+Northern Territory                         47                         Quintile 5 - least disadvantaged              2,034
+ACT                                        246
+                                                                      Financial situation
+Household composition                                                 Prosperous                                    149
+Live alone                                 1,790                      Struggling to pay bills                       1,380
+Couple with no children                    2,502                      Living very comfortably                       3,872
+Couple parent family                       2,161                      Living reasonably comfortably                 2,084
+Single parent family                       594                        Just getting along                            622
+Group household                            266                        Struggling to pay bills                       155
+Other household                            961                        Poor
+
+Highest education                                                     Survey mode
+University degree                          4,652                      Life in AustraliaTM                           8,029
+Certificate III/IV / Diploma               2,229                      Polaron immigrant boost                       245
+Year 12                                    768
+Less than Year 12                          625                        Total                                         8,274
+
+Place of birth
+Australia                                  5,731
+UK, Europe, North America, NZ              1,250
+Africa, Asia                               1,134
+Other                                      85
+Note: the number of respondents in each category do not always sum to 8,274 respondents due to some respondents refusing to
+answer or answering ‘don’t know’ to certain demographic and socioeconomic questions. Neighbourhood disadvantage is measured
+by the Australian Bureau of Statistics Index of Relative Socioeconomic Disadvantage, calculated from the 2021 Census for postal
+areas.
+
+
+
+
+                                                                                                                                  39
+     Mapping social cohesion 2025
+
+
+
+
+     Endnotes
+
+     1   Australian Human Rights Commission. Seen               78 per cent of its value in 2007 – or 22 percentage
+         and Heard. 2025. https://humanrights.gov.au/           points lower. As reported in previous years (e.g.
+         our-work/race-discrimination/projects/seen-and-        see O’Donnell et al. 2024, the Scanlon Index of
+         heard                                                  Social Cohesion was affected by the transition of
+                                                                the Mapping Social Cohesion survey to the Social
+     2 “Today’s Armed Conflicts,” Geneva Academy,               Research Centre’s Life in AustraliaTM panel in
+       accessed 24 September 2025. https://geneva-              2018. We estimate that this difference, the mode
+       academy.ch/galleries/today-s-armed-conflicts             effect, reduced overall social cohesion by seven
+                                                                points. After adjusting for the transition to Life
+                                                                in AustraliaTM and removing the mode effect, we
+     3 Jacob Poushter et al. “International Opinion             estimate that overall social cohesion is 15 points
+       on Global Threats” Pew Research Center, 19               lower than in 2007 and six points lower than its
+       August 2025. https://www.pewresearch.org/                average across the 2010s.
+       global/2025/08/19/international-opinion-on-
+       global-threats/
+                                                             9 See for example Murat Aktas. “The rise of populist
+                                                               radical right parties in Europe,” International
+     4 Samuel McKeith and Hollie Adams. “Thousands in          Sociology 39, no. 6 (2024): 591–605. https://doi.
+       Australia march against immigration, government         org/10.1177/02685809241297547
+       condemns rally.” Reuters, 31 August 2025.
+       https://www.reuters.com/world/asia-pacific/
+       thousands-australia-march-against-immigration-        10 O’Donnell et al. Australian Cohesion Index. Scanlon
+       government-condemns-rally-2025-08-31/                    Foundation Research Institute, 2023. https://aci.
+                                                                scanloninstitute.org.au/
+
+     5 O’Donnell et al. Mapping Social Cohesion 2024.
+       Scanlon Foundation Research Institute, 2024.          11 We calculate average proportions across the 2010,
+       https://scanloninstitute.org.au/mapping-social-          2011 and 2012 surveys for each generation and
+       cohesion-2024                                            then adjust the proportions to remove the effect of
+                                                                the survey transitioning from a telephone survey
+                                                                to a mostly online survey administered to the Life
+     6 For example, in the 2024 report, we reported             in AustraliaTM panel in 2018. The effect is estimated
+       a significant increase in the proportion of the          as the difference in proportions between the
+       adults who hold negative attitudes towards               telephone and Life in AustraliaTM surveys in 2018
+       Muslim and Jewish people, coinciding with the            and 2019 when both survey modes were run
+       current conflict in Gaza and the Middle East,            simultaneously.
+       and a sharp increase in the proportion of people
+       who believe immigration to Australia is too high
+       and a softening in support for diversity and          12 See for example O’Donnell et al. Mapping Social
+       multiculturalism (O’Donnell et al. Mapping Social        Cohesion 2024. https://scanloninstitute.org.au/
+       Cohesion 2024. https://scanloninstitute.org.au/          mapping-social-cohesion-2024
+       mapping-social-cohesion-2024).
+                                                             13 Ebrahim Rahimi and Seyed Saeed Hashemi
+     7 The Scanlon Index of Social Cohesion was                 Nazari. “A detailed explanation and graphical
+       renamed from the Scanlon-Monash Index of Social          representation of the Blinder-Oaxaca
+       Cohesion in 2024. For details on its construction,       decomposition method with its application
+       see Andrew Markus and Jessica Arnup. Mapping             in health inequalities,” Emerging Themes in
+       Social Cohesion 2009. Scanlon Foundation, 2009.          Epidemiology 18, no. 12 (2021). https://doi.
+       https://scanloninstitute.org.au/research/mapping-        org/10.1186/s12982-021-00100-9
+       social-cohesion/
+                                                             14 We calculate this with a linear regression model
+     8 Scores on the Scanlon Index of Social Cohesion           where we predict national pride and belonging
+       are ‘indexed’ to 2007, meaning that scores are           for younger and older generations by whether
+       calculated relative to scores recorded in the first      they agree or disagree that the income gap is too
+       ‘baseline’ survey conducted in 2007. An index            large. National pride and belonging is calculated
+       score of 78, for example, indicates a score that is      by adding up each individual’s responses to the
+
+
+
+40
+                                                                                                     Endnotes
+
+
+
+
+   questions in Figure 2. In the model, we control for      situation. From this model, we estimate that 16
+   gender, education, place of birth, language spoken       per cent of people who agreed that immigrants
+   at home, experience of discrimination, financial         increase house prices or take jobs in 2024
+   stress, perceived safety, loneliness, social media       changed their mind between 2024 and 2025 and
+   use, neighbourhood cohesion, participation in            now disagree that immigrant diversity makes
+   social, community or civic groups and whether            Australia stronger, compared with 7 per cent
+   or not respondents think that home ownership is          among those who did not agree that immigrants
+   important but unlikely in the next 10 years.             increase house prices or take jobs away. The
+                                                            95 per cent confidence intervals around these
+15 This is calculated with a similar linear regression      estimates (the range within which we think with 95
+   model explained in note 14. The control variables        per cent confidence that the true estimate lies for
+   are similar, except in this model, we add                the whole population) is 14-18 per cent and 6-8 per
+   perceived economic fairness, political orientation       cent respectively.
+   and attitudes to multiculturalism and remove
+   loneliness – due to its correlation with the key      21 For information on racism towards First Nations
+   explanatory variable (social isolation).                 Australians, see for example, Fiona Allison et al.
+                                                            If you don’t think racism exists come take a walk
+16 O’Donnell et al. Mapping Social Cohesion 2024.           with us’ The Call It Out Racism Register 2023-2024.
+   https://scanloninstitute.org.au/mapping-social-          Jumbunna Institute for Indigenous Education and
+   cohesion-2024                                            Research, University of Technology Sydney, 2025.
+                                                            https://callitout.com.au/resources
+
+17 ABS. “Overseas Migration.” Australian Bureau of
+   Statistics, accessed 24 September 2025. https://      22 Neelima Choahan. “Indian Australians respond
+   www.abs.gov.au/statistics/people/population/             to being targets of abuse after negative political
+   overseas-migration                                       attention.” ABC News, 12 September 2025. https://
+                                                            www.abc.net.au/news/2025-09-12/indian-
+                                                            australian-community-feel-targeted-after-anti-
+18 SBS News. “Skilled migration to be targeted as           immigration/105751878
+   part of Coalition’s cut to permanent visas.” SBS
+   News, 24 April 2025. https://www.sbs.com.au/
+   news/article/coalition-reveals-its-cuts-to-skilled-   23 Australian Human Rights Commission. Seen and
+   migration-humanitarian-intake/rg4r03dbb                  Heard. Australian Human Rights Commission,
+                                                            2025. https://humanrights.gov.au/our-work/race-
+                                                            discrimination/projects/seen-and-heard
+19 Caitlin Cassidy. “Australian government moves to
+   slow foreign student visas after failure of a cap
+   plan.” The Guardian, 19 December 2024. https://       24 O’Donnell et al. Mapping Social Cohesion 2024.
+   www.theguardian.com/australia-news/2024/                 https://scanloninstitute.org.au/mapping-social-
+   dec/19/labor-australia-foreign-student-visa-cap-         cohesion-2024
+   plan-new-policy-processing
+                                                         25 Tammy Reznik. “It can happen here: For Jewish
+20 This is estimated with a logistic regression model.      Australians, being relentlessly targeted is not
+   In this model, the odds of an individual shifting        just frightening – it is exhausting.” ABC News,
+   from agreeing to disagreeing that ‘accepting             11 July 2025. https://www.abc.net.au/religion/
+   immigrants from many different countries                 antisemitism-jewish-australians-synagogue-
+   makes Australia stronger’ between 2024 and               melbourne-miznon/105520430
+   2025 is modelled as a function of whether they
+   agreed in 2024 that immigrants ‘increase house        26 Mistreatment, discrimination and racism for
+   prices’ and/or ‘take jobs away’ and controlling          people born in Asia and Africa are estimated
+   for respondents’ age, gender, education, city of         through small domain estimation. We pool
+   residence, disability, family composition, housing       responses from overseas-born respondents on
+   tenure, whether they were born in Australia or           the Life in AustraliaTM panel and the migrant
+   overseas and whether or not English is their             boost surveys between 2023 and 2025 and run a
+   first language and their self-described financial        logistic regression model to estimate predicted
+
+
+
+                                                                                                                  41
+     Mapping social cohesion 2025
+
+
+
+
+        probabilities of mistreatment, discrimination           Product.” Australian Bureau of Statistics, accessed
+        and perceived discrimination by place of birth,         24 September 2025. https://www.abs.gov.au/
+        year of the survey, age, gender, marital status,        statistics/economy/national-accounts/australian-
+        whether or not they speak a language other than         national-accounts-national-income-expenditure-
+        English at home, highest educational attainment,        and-product/jun-2025
+        neighbourhood socioeconomic disadvantage,
+        city of residence and whether they immigrated        34 O’Donnell et al. Mapping Social Cohesion 2024.
+        to Australia more or fewer than ten years ago.          https://scanloninstitute.org.au/mapping-social-
+        We then map the probabilities onto results from         cohesion-2024
+        the 2021 Australian Census and sum over the
+        Asian and African-born population. In this way,
+        we ensure our results are representative of the      35 See for example, O’Donnell et al. Mapping Social
+        demographic and socioeconomic profile of Asian          Cohesion 2024. https://scanloninstitute.org.au/
+        and African-born populations as best as we can          mapping-social-cohesion-2024
+        measure.
+                                                             36 ‘Just getting along at best’ combines those who
+     27 Pippa Norris (editor). Critical Citizens: Global        said they were “just getting along”, “struggling to
+        Support for Democratic Government. Oxford               pay bills” and “poor”. The 95 per cent confidence
+        Academic, 1999. https://academic.oup.com/               intervals around these estimates are 15-17 per
+        book/36109                                              cent for those just getting along at best for three
+                                                                or more years, 11-13 per cent for 1-2 years and
+                                                                15-17 per cent for those getting along at best for
+     28 Evans et al. Trust in Australian Regional Public        an unknown length of time. These intervals give
+        Services. Institute for Governance and Policy           us the range in which we expect, with 95 per
+        Analysis, University of Canberra, 2019. https://        cent confidence, that the true estimate for the
+        www.apsreform.gov.au/research/trust-australian-         Australian population lies, taking into account
+        regional-public-services/understanding-and-             that we do not survey the entire population. The
+        exploring-trust-public-0                                reason we do not know the duration of time spent
+                                                                just getting along at best for 15 per cent of adults
+     29 Oprea et al. “Moving toward the Median:                 is because those respondents have not been
+        Compulsory Voting and Political Polarization,”          involved with the Mapping Social Cohesion survey
+        American Political Science Review, 118, no. 4           for a sufficient number of years.
+        (2024): 1951–1965. https://doi.org/10.1017/
+        S0003055423001399                                    37 The 95 per cent confidence intervals around
+                                                                these estimates are 54-61 per cent for those just
+     30 O’Donnell et al. Mapping Social Cohesion 2024.          getting along, struggling or poor for three or
+        https://scanloninstitute.org.au/mapping-social-         more consecutive years, 75-81 per cent for those
+        cohesion-2024                                           getting along at best for 1-2 years and 90-92 per
+                                                                cent for those who are comfortable or prosperous.
+     31 ABS. “Consumer Price Index, Australia.” Australian      We have more than 99 per cent confidence (i.e.
+        Bureau of Statistics, accessed 24 September 2025.       p < .01) that lower levels of happiness among
+        https://www.abs.gov.au/statistics/economy/price-        those who have been just getting along at best
+        indexes-and-inflation/consumer-price-index-             for three or more years are statistically significant
+        australia                                               (i.e. more than just due to random chance) before
+                                                                and after accounting for factors such as age,
+                                                                gender, education, city, disability, housing tenure,
+     32 “Cash rate target – the key monetary policy             household composition, whether people are
+        decision.” Reserve Bank of Australia, accessed 24       Australian or overseas born and whether their first
+        September 2025. https://www.rba.gov.au/cash-            language is English.
+        rate-target-overview.html
+                                                             38 The 95 per cent confidence intervals around these
+     33 See for example, trends in real net national            estimates are 25-31 per cent for those just getting
+        disposable income: ABS. “Australian National            along at best for three or more consecutive years,
+        Accounts: National Income, Expenditure and
+
+
+42
+                                                                                                      Endnotes
+
+
+
+
+   32-40 per cent for those getting along at best        45 See the ‘Overall life satisfaction’ section of ABS.
+   for 1-2 years and 45-49 per cent for those who           “Measuring What Matters.” Australian Bureau of
+   are comfortable or prosperous. The differences           Statistics, accessed 24 September 2025. https://
+   are statistically significant before and after           www.abs.gov.au/statistics/measuring-what-
+   controlling for demographic and socioeconomic            matters
+   characteristics.
+                                                         46 Joseph Chan et al. “Reconsidering Social Cohesion:
+39 The 95 per cent confidence intervals around these        Developing a Definition and Analytical Framework
+   estimates are 29-36 per cent for those just getting      for Empirical Research,” Social Indicators Research
+   along at best for three or more consecutive years,       75 (2006): 273–302. https://doi.org/10.1007/
+   37-45 per cent for those getting along at best           s11205-005-2118-1
+   for 1-2 years and 54-57 per cent for those who
+   are comfortable or prosperous. The differences        47 See for example, O’Donnell et al. “The longitudinal
+   are statistically significant before and after           effect of COVID-19 infections and lockdown
+   controlling for demographic and socioeconomic            on mental health and the protective effect of
+   characteristics.                                         neighbourhood social relations,” Social Science
+                                                            & Medicine 297, no. 114821 (2022). https://doi.
+40 The 95 per cent confidence intervals around these        org/10.1016/j.socscimed.2022.114821
+   estimates are 58-64 per cent for those just getting
+   along at best for three or more consecutive years,    48 See for example, Delia Baldassari and Maria
+   66-74 per cent for those getting along at best           Abascal. “Diversity and prosocial behavior,”
+   for 1-2 years and 77-80 per cent for those who           Science 369, no. 6508 (2020): 1183–1187. https://
+   are comfortable or prosperous. The differences           doi.org/10.1126/science.abb2432
+   are statistically significant before and after
+   controlling for demographic and socioeconomic
+   characteristics.                                      49 Ning Ding et al. “One-year reciprocal relationship
+                                                            between community participation and mental
+                                                            wellbeing in Australia: A panel analysis,” Social
+41 Sally Fowler Davis and Megan Davies.                     Science & Medicine 128 (2015): 246–254. https://
+   “Understanding the Effects of Social Cohesion on         doi.org/10.1016/j.socscimed.2015.01.022
+   Social Wellbeing: A Scoping Review,” International
+   Journal of Public Health¸ 70 (2025). https://doi.
+   org/10.3389/ijph.2025.1607414                         50 This is estimated with a logistic regression
+                                                            model. In this model, the odds of an individual
+                                                            being happy in 2025 is modelled as a function of
+42 Jan Delhey and Georgi Dragolov. “Happier                 whether they were happy in 2024 and their level
+   together. Social cohesion and subjective                 of perceived neighbourhood cohesion in 2024
+   well-being in Europe,” International Journal of          and controlling for respondents’ age, gender,
+   Psychology 51, no. 3 (2016): 163–176. https://doi.       education, city of residence, disability, family
+   org/10.1002/ijop.12149                                   composition, housing tenure, whether they were
+                                                            born in Australia or overseas and whether or not
+43 O’Brien et al. “Broken (windows) theory: A               English is their first language, their self-described
+   meta-analysis of the evidence for the pathways           financial situation, experience of discrimination
+   from neighborhood disorder to resident health            and the degree of socioeconomic disadvantage in
+   outcomes and behaviors,” Social Science &                their neighbourhood. Perceived neighbourhood
+   Medicine 228 (2019): 272–292. https://doi.               cohesion is measured by adding up respondents’
+   org/10.1016/j.socscimed.2018.11.015                      scores to questions of the extent of agreement or
+                                                            disagreement that ‘people in your local area are
+44 O’Donnell et al. “The longitudinal effect of             willing to help their neighbours’, ‘my local area
+   COVID-19 infections and lockdown on mental               is a place where people from different national
+   health and the protective effect of neighbourhood        or ethnic backgrounds get on well together’, ‘I
+   social relations,” Social Science & Medicine             feel like I belong in my neighbourhood’ and ‘my
+   297, no. 114821 (2022). https://doi.org/10.1016/j.       neighbourhood has a strong sense of community’.
+   socscimed.2022.114821                                    This scale has a high level of reliability with a
+
+
+
+                                                                                                                    43
+     Mapping social cohesion 2025
+
+
+
+
+        Cronbach’s Alpha score of 0.81. Neighbourhoods           neighbourhoods (confidence interval of 72-84 per
+        with high perceived cohesion are defined as those        cent) and 65 per cent for people in low cohesion
+        with scores in the top five per cent of responses,       neighbourhood (confidence interval of 57-74 per
+        while neighbourhoods with low cohesion are               cent).
+        defined as those with scores in the bottom five
+        per cent. From this model, we estimate that 54        53 This is estimated with a logistic regression model
+        per cent of adults who were unhappy in 2024              similar to the one described in note 50. The
+        became happy in 2025 if they lived in high               outcome variable in this model is whether or not
+        cohesion neighbourhoods, compared with 37 per            people say ‘multiculturalism has been good for
+        cent of people in low cohesion neighbourhoods.           Australia’. We estimate that 53 per cent of adults
+        The 95 per cent confidence intervals around these        who did not agree in 2024 agreed in 2025 if they
+        estimates (the range within which we think with 95       lived in high cohesion neighbourhoods (confidence
+        per cent confidence that the true estimate lies for      interval of 39-67 per cent), compared with 25 per
+        the whole population) is 29-46 per cent and 43-65        cent of people in low cohesion neighbourhoods
+        per cent respectively. The estimated probability         (confidence interval of 17-34 per cent). The
+        of remaining happy was 94 per cent for people            estimated probability of maintaining belief that
+        in high cohesion neighbourhoods (confidence              multiculturalism has been good between 2024 and
+        interval of 92-97 per cent) and 85 per cent for          2025 was 95 per cent for people in high cohesion
+        people in low cohesion neighbourhood (confidence         neighbourhoods (confidence interval of 93-97 per
+        interval of 80-90 per cent).                             cent) and 91 per cent for people in low cohesion
+                                                                 neighbourhood (confidence interval of 88-95
+     51 This is estimated with a logistic regression model       per cent). The latter difference is not statistically
+        similar to the one described in note 50. The             significant, i.e. it could be due to random chance.
+        outcome variable in this model is whether or not
+        people say they have a sense of belonging in          54 O’Donnell et al. Mapping Social Cohesion 2024.
+        Australia to a great extent. We estimate that 31         https://scanloninstitute.org.au/mapping-social-
+        per cent of adults who did not have a great sense        cohesion-2024
+        of belonging in 2024 had a great sense in 2025
+        if they lived in high cohesion neighbourhoods
+        (confidence interval of 24-38 per cent), compared     55 In 2025, 26 per cent of Life in AustraliaTM
+        with 18 per cent of people in low cohesion               respondents to the Mapping Social Cohesion
+        neighbourhoods (confidence interval of 13-24             survey said they cast a formal vote voted for
+        per cent). The estimated probability of continuing       the Liberal-National Coalition in the House of
+        to have a great sense of belonging was 80 per            Representatives at the 2025 Federal election.
+        cent for people in high cohesion neighbourhoods          According to the AEC (2025), 3.2 million people
+        (confidence interval of 74-85 per cent) and 67 per       voted for the Liberal Party as a first preference
+        cent for people in low cohesion neighbourhood            in the House of Representatives at the 2025
+        (confidence interval of 59-75 per cent).                 Federal Election, 1.1 million voted for the Liberal
+                                                                 National Party of Queensland, 588,778 voted for
+                                                                 The Nationals and 35,785 voted for the Country
+     52 This is estimated with a logistic regression             Liberal Party (NT). Combined, this represents 4.9
+        model similar to the one described in note 50.           million votes for the Liberal-National Coalition or
+        The outcome variable in this model is whether or         32 per cent of all formal votes cast.
+        not people say ‘generally speaking, most people
+        can be trusted’. We estimate that 34 per cent of
+        adults who did not have a sense of trust in 2024
+        trusted in 2025 if they lived in high cohesion
+        neighbourhoods (confidence interval of 27-41 per
+        cent), compared with 16 per cent of people in low
+        cohesion neighbourhoods (confidence interval
+        of 12-20 per cent). The estimated probability
+        of maintaining trust between 2024 and 2025
+        was 78 per cent for people in high cohesion
+
+
+
+
+44
+                                                                                            References
+
+
+
+
+References
+
+ABS. “Overseas Migration.” Australian Bureau of      and prosocial behavior,” Science 369, no. 6508
+Statistics, accessed 24 September 2025. https://     (2020): 1183–1187. https://doi.org/10.1126/
+www.abs.gov.au/statistics/people/population/         science.abb2432
+overseas-migration
+                                                     Cassidy, Caitlin. “Australian government moves
+ABS. “Consumer Price Index, Australia.”              to slow foreign student visas after failure of a
+Australian Bureau of Statistics, accessed 24         cap plan.” The Guardian, 19 December 2024.
+September 2025. https://www.abs.gov.au/              https://www.theguardian.com/australia-
+statistics/economy/price-indexes-and-inflation/      news/2024/dec/19/labor-australia-foreign-
+consumer-price-index-australia                       student-visa-cap-plan-new-policy-processing
+
+ABS. “Australian National Accounts: National         Chan, Joseph, Ho-Pong To and Elaine Chan.
+Income, Expenditure and Product.” Australian         “Reconsidering Social Cohesion: Developing
+Bureau of Statistics, accessed 24 September          a Definition and Analytical Framework for
+2025. https://www.abs.gov.au/statistics/             Empirical Research,” Social Indicators Research
+economy/national-accounts/australian-national-       75 (2006): 273–302. https://doi.org/10.1007/
+accounts-national-income-expenditure-and-            s11205-005-2118-1
+product/jun-2025
+                                                     Choahan, Neelima. “Indian Australians respond
+ABS. “Measuring What Matters.” Australian            to being targets of abuse after negative political
+Bureau of Statistics, accessed 24 September          attention.” ABC News. 12 September 2025.
+2025. https://www.abs.gov.au/statistics/             https://www.abc.net.au/news/2025-09-12/
+measuring-what-matters                               indian-australian-community-feel-targeted-
+                                                     after-anti-immigration/105751878
+AEC. “2025 Federal Election: First
+preferences by party.” Australian Electoral          Davis, Sally Fowler and Megan Davies.
+Commission, accessed 24 September 2025.              “Understanding the Effects of Social Cohesion
+https://results.aec.gov.au/31496/Website/            on Social Wellbeing: A Scoping Review,”
+HouseStateFirstPrefsByParty-31496-NAT.htm            International Journal of Public Health¸ 70 (2025).
+                                                     https://doi.org/10.3389/ijph.2025.1607414
+Aktas, Murat. “The rise of populist radical
+right parties in Europe,” International Sociology    Delhey, Jan and Georgi Dragolov. “Happier
+39, no. 6 (2024): 591–605. https://doi.              together. Social cohesion and subjective
+org/10.1177/02685809241297547                        well-being in Europe,” International Journal of
+                                                     Psychology 51, no. 3 (2016): 163–176. https://doi.
+Allison, Fiona, Chris Cunneen, Lindon Coombes        org/10.1002/ijop.12149
+and Ayse Selcuk. ‘If you don’t think racism exists
+come take a walk with us’ The Call It Out Racism     Ding, Ning, Helen L. Berry and Léan V. O’Brien.
+Register 2023-2024. Jumbunna Institute for           “One-year reciprocal relationship between
+Indigenous Education and Research, University        community participation and mental wellbeing
+of Technology Sydney, 2025. https://callitout.       in Australia: A panel analysis,” Social Science
+com.au/resources                                     & Medicine 128 (2015): 246–254. https://doi.
+                                                     org/10.1016/j.socscimed.2015.01.022
+Australian Human Rights Commission. Seen and
+Heard. Australian Human Rights Commission,           Evans, M., L. Dare, R. Tanton, Y. Vidyattama
+2025. https://humanrights.gov.au/our-work/           and J. Seaborn. Trust in Australian Regional
+race-discrimination/projects/seen-and-heard          Public Services. Institute for Governance and
+                                                     Policy Analysis, University of Canberra, 2019.
+Baldassari, Delia and Maria Abascal. “Diversity
+
+
+
+
+                                                                                                          45
+     Mapping social cohesion 2025
+
+
+
+
+     https://www.apsreform.gov.au/research/              Poushter, Jacob, Moira Fagan, Maria Smerkovich,
+     trust-australian-regional-public-services/          and Andrew Prozorovsky. “International Opinion
+     understanding-and-exploring-trust-public-0          of Global Threats”. Pew Research Center, 19
+                                                         August 2025. https://www.pewresearch.org/
+     Geneva Academy. “Today’s Armed Conflicts.”          global/2025/08/19/international-opinion-on-
+     Accessed 24 September 2025. https://geneva-         global-threats/
+     academy.ch/galleries/today-s-armed-conflicts
+                                                         Rahimi, Ebrahim and Seyed Saeed Hashemi
+     Markus, Andrew and Jessica Arnup. Mapping           Nazari. “A detailed explanation and graphical
+     Social Cohesion 2009. Scanlon Foundation,           representation of the Blinder-Oaxaca
+     2009. https://scanloninstitute.org.au/research/     decomposition method with its application
+     mapping-social-cohesion/                            in health inequalities,” Emerging Themes in
+                                                         Epidemiology 18, no. 12 (2021). https://doi.
+     McKeith, Samuel and Hollie Adams. “Thousands
+                                                         org/10.1186/s12982-021-00100-9
+     in Australia march against immigration,
+     government condemns rally.” Reuters, 31             Reserve Bank of Australia. “Cash rate target –
+     August 2025. https://www.reuters.com/world/         the key monetary policy decision.” Accessed 24
+     asia-pacific/thousands-australia-march-             September 2025. https://www.rba.gov.au/cash-
+     against-immigration-government-condemns-            rate-target-overview.html
+     rally-2025-08-31/
+                                                         Reznik, Tammy “It can happen here: For Jewish
+     Norris, Pippa (editor). Critical Citizens: Global   Australians, being relentlessly targeted is not
+     Support for Democratic Government. Oxford           just frightening – it is exhausting.” ABC News,
+     Academic, 1999. https://academic.oup.com/           11 July 2025. https://www.abc.net.au/religion/
+     book/36109                                          antisemitism-jewish-australians-synagogue-
+                                                         melbourne-miznon/105520430
+     O’Brien, Daniel T., Chelsea Farrell, and Brandon
+     C. Welsh. “Broken (windows) theory: A meta-         SBS News. “Skilled migration to be targeted
+     analysis of the evidence for the pathways           as part of Coalition’s cut to permanent visas.”
+     from neighborhood disorder to resident health       SBS News, 24 April 2025. https://www.sbs.
+     outcomes and behaviors,” Social Science &           com.au/news/article/coalition-reveals-its-
+     Medicine 228 (2019): 272–292. https://doi.          cuts-to-skilled-migration-humanitarian-intake/
+     org/10.1016/j.socscimed.2018.11.015                 rg4r03dbb
+     O’Donnell, James, Diana Cárdenas, Nima Orazani,
+     Ann Evans and Katherine J. Reynolds. “The
+     longitudinal effect of COVID-19 infections and
+     lockdown on mental health and the protective
+     effect of neighbourhood social relations,” Social
+     Science & Medicine 297, no. 114821 (2022).
+     https://doi.org/10.1016/j.socscimed.2022.114821
+
+     O’Donnell, James, Qing Guan and Trish Prentice.
+     Mapping Social Cohesion 2024. Scanlon
+     Foundation Research Institute, 2024. https://
+     scanloninstitute.org.au/mapping-social-
+     cohesion-2024
+
+     O’Donnell, James, Trish Prentice, Rouven Link,
+     Qing Guan et al. Australian Cohesion Index.
+     Scanlon Foundation Research Institute, 2023.
+     https://aci.scanloninstitute.org.au/
+
+     Oprea, Alexandra, Lucy Martin and Geoffrey
+     H. Brennan. “Moving toward the Median:
+     Compulsory Voting and Political Polarization,”
+     American Political Science Review, 118, no. 4
+     (2024): 1951–1965. https://doi.org/10.1017/
+     S0003055423001399
+
+
+46
+Acknowledgement
+
+The Mapping Social Cohesion study is made possible with the financial
+support and vision of the Scanlon Foundation. Special thanks to the
+Board and staff of the Foundation, notably Patron and Director of the
+Scanlon Foundation and Scanlon Foundation Research Institute, Peter
+Scanlon AO; and Anthea Hancocks, Chief Executive Officer of the
+Scanlon Foundation Research Institute.
+
+
+Since its inception, the Mapping Social            An expert advisory group helped to guide
+Cohesion project has been designed and led         and oversee the 2024 study. The group was
+in conjunction with the Scanlon Foundation by      comprised of Andrew Markus AO, Darren Pennay AM,
+Emeritus Professor Andrew Markus AO and            Bruce Smith, Trish Prentice, Rouven Link,
+with the support of Monash University. This        Phoebe Johnston and Anthea Hancocks. Special
+leadership and extraordinary contribution has      thanks to this group for their expertise across
+provided the critical foundations and a powerful   the project.
+legacy for the ongoing conduct of the project.
+As we transition the name of the Index from the    The Social Research Centre managed and
+Scanlon Monash Index to the Scanlon Index,         administered the Mapping Social Cohesion
+we want to give our enduring thanks to both        survey. Special thanks to Alison Eglentals,
+Monash University and to Emeritus Professor        Dr Ben Phillips, Jack Barton, Natasha Vickers, and
+Markus AO, for their unfailing commitment to       Cameron Mak from the Social Research Centre.
+the work of the Scanlon Foundation and to social
+cohesion.
+
+The research underpinning the analyses of the
+Mapping Social Cohesion survey was conducted
+by James O’Donnell, Alice Falkiner and
+Katarzyna Szachna in the School of Demography
+at the Australian National University (ANU).
+Scanlon Foundation Research Institute
+Level 31, 367 Collins Street, Melbourne, VIC
+
+www.scanloninstitute.org.au
+
+    @ScanlonFoundationResearchInstitute
+    @ScanlonInstitute
+

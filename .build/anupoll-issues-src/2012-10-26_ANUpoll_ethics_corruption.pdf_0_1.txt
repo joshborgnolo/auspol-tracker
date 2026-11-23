@@ -1,0 +1,1214 @@
+Enquiries regarding this poll:
+Professor Adam Graycar
+Director, Research School of Social Sciences
+ANU College of Arts and Social Sciences
+Director, Transnational Research Institute on Corruption
+T +61 2 6125 0135
+E adam.graycar@anu.edu.au
+
+Transnational Research Institute
+on Corruption
+Beryl Rawson Building #13
+The Australian National University
+CANBERRA ACT 0200
+T +61 2 6125 2257
+F +61 2 6125 0502
+W tric.anu.edu.au
+
+To view electronically:
+politicsir.cass.anu.edu.au/anupoll
+
+
+
+
+                                                                   P ercepti o ns o f c o rrupti o n
+                                                                       and et h ica l c o nduct
+                                                                        ANUPOLL OCTOBER 2012
+
+
+
+
+                                                           ANU College of
+                                                           Arts & Social
+                                                           Sciences
+VICE-CHANCELLOR’S
+MESSAGE
+
+
+
+
+Corruption in our world affects
+everybody. The existence of
+corruption leads to a lack of
+confidence in our institutions,
+and in turn this has the potential
+to undermine public policy.
+All countries experience corruption.
+When it is widespread, corruption
+deters investment, weakens
+economic growth and undermines
+the rule of law. It is found in rich
+countries and in poor countries.
+
+This ANUpoll confines itself to potential corruption in the
+Australian public sector. It does not attempt to cover
+corruption in the private sector, in activities such as sport,
+or in developing countries. It explores Australians’
+perceptions of corruption against a backdrop of their
+confidence in a range of public institutions. It also explores
+perceptions of ethical behaviour of our elected politicians.
+Public policy research, teaching and engagement are               Like previous ANUpolls, this study sheds new light on
+key features of the ANU Strategic Plan, ANU to 2020.              public opinion about a major topic that shapes Australia’s
+Understanding the nature and effects of corruption on             confidence and policy development. The survey fulfils
+public policy is an important, tangible contribution that the     the University’s mission of addressing topics of national
+ANU can make to our social knowledge and our practices            importance. ANUpoll was designed to inform public and
+in government.                                                    policy debate, and to assist in scholarly research. It builds
+                                                                  on the University’s long tradition of social survey research,
+The results of this ANUpoll highlight an interesting
+                                                                  which began in the 1960s. I hope this ANUpoll contributes
+contradiction. ANUpoll confirms that acts of bribery
+                                                                  to a greater understanding of ethics, confidence and
+involving public officials are very low in Australia and that,
+                                                                  corruption in Australian public life.
+internationally, we rank as a low corruption country. The poll
+also shows that people have virtually no personal or family       Professor Ian Young
+experience of corruption, however there is a public belief that   Vice-Chancellor
+corruption is increasing. This poses challenges in ensuring our
+policy framework is built on the highest ethical standards.
+ANUPOLL
+
+
+Perceptions of corruption and ethical conduct
+
+Professor Ian McAllister
+Dr Juliet Pietsch
+Professor Adam Graycar
+
+
+Research School of Social Sciences
+ANU College of Arts and Social Sciences
+
+
+Report No. 13
+October 2012
+
+
+
+
+ABOUT THE SURVEY
+
+
+The ANUpoll is conducted for The Australian National University by the Social Research Centre, Melbourne. The survey is
+a national random sample of the adult population aged 18 years and over conducted by telephone. In this survey, 2,020
+people were interviewed between 13 August and 9 September 2012, with a response rate of 43 percent. The results have
+been weighted to represent the national population. The survey’s margin of error is ± 2.0 percent. Full details of the survey
+can be found at http://www.anu.edu.au/anupoll/
+
+
+
+©The Australian National University, 2012
+
+Copyright of material contained in this publication is held by The Australian National University.
+CONTENTS
+
+
+Confidence in government and institutions                6
+
+Perceptions and experience of corruption                 10
+
+Ethical conduct in government                            14
+
+Key trends: most important problems and political mood   18
+
+ANUpoll questions                                        20
+KEY POINTS SUMMARY
+
+
+Confidence in government and institutions
+>> Satisfaction with democracy in Australia remains high by international standards, although it is lower in
+   2012 than at any time since 1998.
+>> The lower levels of satisfaction with democracy since 2010 are substantially related to concerns about
+   the quality of government.
+>> Public confidence in the armed forces and the police remains high; public confidence is lowest in the
+   media and political parties.
+>> Judged over more than decade, the largest increases in confidence have been in the public service and
+   the legal system, and the largest decreases have been in the federal government and political parties.
+
+Perceptions and experience of corruption
+>> Very few Australians have direct experience of corruption among public officials. Less than 1 percent
+   say they or a family member have often experienced corruption in the past five years.
+>> There is a widespread perception that corruption in Australia has increased, with 43 percent taking this
+   view and 41 percent seeing corruption as having remained the same.
+>> The media, trade unions and political parties are viewed as the most corrupt institutions in Australian
+   society; the armed services, the public service and the police are viewed as the least corrupt.
+>> Around half of those interviewed in the survey did not know to whom or where to report corruption.
+
+Ethical conduct in government
+>> The public sees relatively few elected representatives as being involved in corruption. Just over half
+   of the respondents see ‘almost none’ or ‘a few’ federal politicians as being corrupt.
+>> Just one in three of the respondents believe that politicians can be trusted to look after the
+   public’s interests.
+>> The level of public scepticism about politicians’ motives has been generally stable since at least the
+   1990s, with the exception of when new governments have been elected in 1996 and 2007.
+
+Key trends: most important problems and political mood
+>> The economy and employment represent the main concerns of the survey respondents, and the
+   proportion mentioning them has increased consistently since March 2010.
+>> The two other major concerns among the public are immigration and better government. Concern about
+   the environment shows a significant decline.
+>> Satisfaction with the direction in which the country is headed remains positive, and has been virtually
+   unchanged over the past year.
+    CONFIDENCE
+    IN GOVERNMENT
+    AND INSTITUTIONS
+
+           Key points
+           >> Satisfaction with democracy in Australia remains high by international
+              standards, although it is lower in 2012 than at any time since 1998
+           >> The lower levels of satisfaction with democracy since 2010 are
+              substantially related to concerns about the quality of government
+           >> Public confidence in the armed forces and the police remains high;
+              public confidence is lowest in the media and political parties
+           >> Judged over more than decade, the largest increases in confidence
+              have been in the public service and the legal system, and the largest
+              decreases have been in the federal government and political parties.
+
+
+
+
+6
+A distinctive characteristic of Australian democracy is the internationally high level of popular satisfaction
+with the system. Since the question was first asked in a survey in Australia in 1969, satisfaction with
+democracy has never fallen below seven in 10 citizens, with the exception of the period immediately
+following the dismissal of the Whitlam government in 1975, when it declined to 56 percent.
+The question was first asked in the Australian Election Study (AES) in 1996, when almost eight out
+of every 10 Australians said they were ‘very satisfied’ or ‘fairly satisfied’ with democracy. Satisfaction
+declined slightly thereafter, and peaked again just after the 2007 election, which marked the end of
+11 years of Liberal government and the election of the Labor government. Since 2010, satisfaction has
+been noticeably lower than during the 2004-2007 period, declining to 73 percent in 2010 and 71 percent
+in this ANUpoll.
+
+100                                                                                                                                    Satisfied with
+                                                                                                                                       democracy
+ 90                                                         86
+                                                82                                                                                     Not satisfied
+            78
+ 80                                 74                                  73         73                                                  with democracy
+                        71                                                                        71
+ 70
+
+ 60
+
+ 50
+
+ 40
+                        29
+                                    26                                  27         27             26
+ 30
+            22
+                                                19
+ 20                                                         14
+
+ 10
+
+  0
+            1996       1998        2001        2004        2007        2010        2011          2012
+
+‘On the whole, are you very satisfied, fairly satisfied, not very satisfied, or not at all satisfied with the
+way democracy works in Australia?’
+Sources AES 1996-2010; ANUpoll on Government Services, 2011; ANUpoll on Perceptions of
+Corruption 2012
+
+While remaining high by international standards, current levels of satisfaction with democracy in Australia
+are at their lowest point since 1998. Relating these opinions about satisfaction with democracy to the
+problems that the respondents see facing Australia (which are examined in detail in the final section of
+this report), dissatisfaction with democracy is most strongly associated with concerns about ‘better
+government’ and immigration. This suggests that these are areas in which government performance is
+viewed as having been least effective. By contrast, those most satisfied with democracy are more likely to
+see the environment and global warming as the main problems facing Australia. This suggests that they
+see government action in these areas as having been most effective.
+
+
+
+
+                                                                                        ANUpoll - Perceptions of corruption and ethical conduct         7
+    Public confidence in the major institutions of society is often viewed as a pre-requisite to an effective,
+    widely supported democracy. Without such public confidence, and the belief that citizens will be
+    treated equitably by such institutions, the roots of democracy are often shallow. The survey asked
+    the respondents about their level of confidence in 12 institutions, broadly divided between public
+    institutions (for example, the police and government) and private or non-profit institutions (for example,
+    companies and trade unions).
+    In general, public confidence is higher in public than in private institutions. Confidence is highest in the
+    armed forces and the police, two traditional public institutions, and lowest for the media and political
+    parties, two private institutions that have experienced widespread criticism in recent years. However,
+    the public/private division is not completely clear-cut: major Australian companies attract almost as
+    much confidence as the major public institutions, while the federal government, a public institution,
+    attracts some of the lowest levels of confidence among the public.
+
+                      Armed forces                                                                             85%
+                               Police                                                                       82%
+        Major Australian companies                                                       59%
+                      Public service                                                 56%
+                       Legal system                                                51%
+                  Local government                                                 51%
+     Banks and financial institutions                                        46%
+                  State government                                   36%
+                       Trade unions                            30%
+    Federal government in Canberra                       23%
+                               Media                     23%
+                     Political parties               18%
+
+    ‘I will now read out a list of organisations. For each one, could you please indicate how much
+    confidence you have in them?’ Estimates combine ‘a great deal’ and ‘quite a lot’ of confidence.
+    Source ANUpoll on Perceptions of Corruption 2012
+
+    There is a considerable literature which illustrates how these trends in public confidence in institutions
+    have fluctuated over the past quarter of a century. Much of the changes can be traced to varying
+    performance among the institutions, and their associated public image among the public. For example,
+    although not included in this survey, public confidence in the churches, once one of the most widely
+    supported institutions internationally, has declined dramatically as the clergy have been rocked by
+    scandals. While support for specific institutions tends to ebb and flow depending on events and
+    circumstances, there is no evidence that there is a secular decline in public support for institutions.
+    In order to examine the trends in confidence in public and private institutions over time, we compared
+    support for the 10 of the 12 institutions where similar evidence exists in previous surveys, going back
+    as far as 1983. The results suggest that there has indeed been significant changes in confidence, both
+    positive and negative. Confidence in the public service, the police and the legal system has increased
+    from low points in 1995 and 2001. The armed forces have attracted increasing levels of confidence,
+    peaking at 91 percent in 2010, reflecting their involvement in overseas conflicts. In particular, the
+    jump in support between 1995 and 2001 reflects the military’s positive involvement in the East Timor
+    operation in 1999.
+
+
+
+
+8
+ Rank in        Confidence in:                     2012     2010     2008     2001       1995        1983
+ 2012
+ 1              Armed forces                       85      91       88        84         68         67
+ 2              Police                             82      79       80        68         76         80
+ 3              Major Australian companies         59      54       —         46         59         79
+ 4              Public service                     56      41       51        35         38         47
+ 5              Legal system                       51      40       48        36         35         61
+ 6              Banks and financial institutions   46      44       34        —          —          —
+ 7              Trade unions                       30      29       39        26         26         24
+ 8              Federal government in Canberra 23          43       —         51         26         55
+ 9              Media                              23      20       —         23         21         —
+ 10             Political parties                  18      31       —         33         16         —
+
+Questions vary slightly between surveys. ‘Media’ in 2010 and 2001 averages responses to ‘press’
+and ‘television.’
+Sources ANUpoll on Perceptions of Corruption 2012; AES 2010, ANUpoll 2008, AES 2001, World
+Values Study 1995, 1983
+
+
+At the other end of the scale, confidence in the federal government has fluctuated considerably,
+peaking in 1983 and 2001 but registering significant lows in 1995 and 2012. Political parties were
+significantly less popular in 2012 compared to 2001 and 2010. Both the media and trade unions have
+registered consistently low levels of confidence throughout the nearly 30 year period of the surveys,
+rarely attracting the confidence of more than one in four citizens.
+These patterns reinforce the findings of international research that there has been no long term decline
+in confidence; rather, institutions that have declined in public confidence have been at least matched
+by those moving in the opposite direction. Nevertheless, the large declines in support for the federal
+government and for political parties since 2001 suggest that the current problem of public confidence
+is very much situated in political institutions.
+
+
+
+
+                                                                                ANUpoll - Perceptions of corruption and ethical conduct   9
+     PERCEPTIONS
+     AND EXPERIENCE
+     OF CORRUPTION
+
+           Key points
+           >> Very few Australians have direct experience of corruption among
+              public officials. Less than 1 percent say they or a family member
+              have often experienced corruption in the past five years
+           >> There is a widespread perception that corruption in Australia has
+              increased, with 43 percent taking this view and 41 percent seeing
+              corruption as having remained the same
+           >> The media, trade unions and political parties are viewed as the most
+              corrupt institutions in Australian society; the armed services, the
+              public service and the police are viewed as the least corrupt
+           >> Around half of those interviewed in the survey did not know to whom
+              or where to report corruption.
+
+
+
+
+10
+Corruption has a wide range of consequences for societies, ranging from weak confidence in public
+institutions to the distortion of economic markets. Corruption is not the exclusive domain of developing
+countries or failed states. In rich countries corruption certainly exists and has implications for governance,
+the delivery of services, the development of infrastructure, and general economic conditions, not least if
+there is a widespread perception that corruption is rife or increasing.
+The survey measured two separate aspects of corruption. First, the survey asked if the respondent or
+anyone in their family had experienced an act of bribery over the previous five years and, if so, who that act
+involved. Second, the survey asked a question about the public’s perceptions of whether corruption was
+increasing or decreasing.
+The results confirm international surveys that show that the proportion of Australians who report an act
+of bribery involving a public official is consistently low. Less than one percent of the Australian population
+report that they have ‘often’ experienced bribery, and a further 3 percent report that they have experienced
+it ‘occasionally’, and 4 percent said it had ‘seldom’ happened. More than nine out of every 10 respondents
+said this had not happened to them or a family member in the previous five years.
+Australia is ranked by Transparency International as one of the 10 least corrupt countries in the world, and
+Australia’s low rate of bribery experience compares with a global average of 24 percent of people who report
+in Transparency International surveys that they paid a bribe in the previous 12 months.
+
+
+    Very often    0.1%
+
+
+
+   Quite often     1%
+
+
+
+ Occasionally        3%
+
+
+
+      Seldom          4%
+
+
+
+        Never                                                                                          91%
+
+
+
+  Don’t know       1%
+
+
+
+ ‘In the last five years, how often have you or a member of your immediate family come across a
+ public official who hinted they wanted, or asked for, a bribe or a favour in return for a service in
+ Australia?’
+ Source ANUpoll on Perceptions of Corruption 2012
+
+
+
+
+                                                                                      ANUpoll - Perceptions of corruption and ethical conduct   11
+     As we would expect, the public’s personal experience of bribery is more likely to occur among those
+     who are in the labour force, employed in manual as opposed to non-manual occupations, and who
+     are younger. Nevertheless, systematic variations across the population are generally weak, reflecting
+     the relatively small numbers of people involved.
+     In contrast to the low levels of personal or family experience of corruption, the public believes that
+     corruption is increasing. Around one in five think that it has increased a lot, and a further one in four
+     think that it has increased a little; one in four think it has remained stable. Just 7 percent believe that
+     corruption has declined. There is only a weak relationship between experience of corruption and
+     perceptions that it has increased (r = 0.09, p = <.00), suggesting that perceptions of corruption are
+     rooted more in indirect sources of information, such as the mass media, rather than in
+     personal experience.
+     Women were more likely than men to believe that corruption in Australia had increased (47 percent
+     compared with 39 percent), and people over 55 years of age were more likely than those under 55
+     to believe that corruption had increased (51 percent compared with 39 percent).
+
+
+       Increased a lot                                       20%
+
+
+
+      Increased a little                                           23%
+
+
+
+     Stayed the same                                                                               41%
+
+
+     Decreased a little           5%
+
+
+      Decreased a lot        2%
+
+
+           Don’t know                    9%
+
+
+
+     ‘In the past three years, to what extent has the level of corruption in Australia changed?’
+     Source ANUpoll on Perceptions of Corruption 2012
+
+     The view among a plurality of the Australian public that corruption has increased is mirrored by the
+     international survey findings. TI’s 2011 survey found that globally, 58 percent of respondents believed
+     that corruption had increased, while just 16 percent thought it had declined. Even among the six least
+     corrupt countries, 55 percent of the respondents considered corruption to have increased. Low levels
+     of personal experiences of corruption are therefore not incompatible with a belief that it is increasing
+     across the society as a whole.
+     The final set of questions concerning corruption asked the respondents how corrupt they considered
+     were the 12 public and private institutions asked about earlier. The results show that there is a strong
+     relationship between public confidence and perceptions of corruption. The media, trade unions and
+     political parties, which registered the lowest levels of public confidence, are also seen as those that are
+     most likely to be corrupt. For example, 44 percent regard the media as corrupt, while less than half that
+     number view them as not corrupt.
+
+
+
+
+12
+ Rank                                        Corrupt     Neither      Not         Don’t          Corrupt–
+                                                                      Corrupt     know           not
+                                                                                                 corrupt
+ 1       Media                               44          34           20          2              +24
+ 2       Trade unions                        38          31           24          7              +14
+ 3       Political parties                   37          38           22          3              +15
+ 4       Federal government in Canberra 32               34           32          2              0
+ 5       Banks and financial institutions    25          30           42          3              -17
+ 6       State government                    25          36           36          3              -11
+ 7       Legal system                        23          33           41          3              -18
+ 8       Local government                    19          31           48          2              -29
+ 9       Australian companies                18          36           40          6              -22
+ 10      Police                              16          27           56          1              -40
+ 11      Public service                      13          32           51          4              -38
+ 12      Armed forces                        8           19           69          4              -61
+
+‘To what extent do you see the following institutions being affected by corruption? Please answer on a
+scale from 1 to 5, where 1 means not at all corrupt and 5 means extremely corrupt.’ ‘Corrupt’ is coded
+as 1, 2, ‘neither’ as 3, ‘not corrupt’ as 4, 5
+Source ANUpoll on Perceptions of Corruption 2012
+
+
+The three public institutions that enjoy the highest level of public confidence—the armed forces, the
+public service and the police—are regarded as the least corrupt. Of the three levels of government
+asked about in the survey—local, state and federal—local government was seen as corrupt by just
+19 percent of the respondents, followed by 25 percent who mentioned state government. The federal
+government was seen as corrupt by almost one in three of the respondents.
+There were some observable age differences in perceptions of corruption in Australia. People over 55
+were more likely than those under 35 to think the federal government in Canberra was corrupt (36 percent
+compared with 28 percent), as they also were to think trade unions were corrupt (44 percent compared
+with 29 percent). When it comes to the media however, the reverse is observable, with 53 per cent of
+those under 35 believing the media is corrupt compared with 34 percent of those aged over 55.
+A systematic assessment by Transparency International in 2012 of the integrity systems of 25 European
+countries examined the institutional contributions to anti-corruption. While not exactly the same as this
+Australian survey of perceptions of corruption, in Europe both the media and political parties ranked in
+the bottom half of institutional performers in the integrity systems of the 25 countries. In this Australian
+survey, the public service ranked as one of the least corrupt institutions in Australia, but in Europe
+public service ranked lower on the integrity scale than the media or political parties.
+A matter of policy relevance in Australia is the reporting of corruption. Three states have established
+or are establishing new anti-corruption agencies, and the Commonwealth government is working on
+a national anti-corruption plan. The survey therefore asked would people know where to report corrupt
+activity they might suspect or observe. Only one half of the respondents felt they knew where they
+would report such activity, and of those, one half nominated the police, and 15 percent nominated
+the Ombudsman. Only 5 percent of the total survey mentioned one of the existing
+anti-corruption agencies.
+
+
+
+
+                                                                                  ANUpoll - Perceptions of corruption and ethical conduct   13
+     ETHICAL CONDUCT
+     IN GOVERNMENT
+
+
+           Key points
+           >> The public sees relatively few elected representatives as being
+              involved in corruption. Just over half of the respondents see ‘almost
+              none’ or ‘a few’ federal politicians as being corrupt
+           >> Just one in three of the respondents believe that politicians can be
+              trusted to look after their interests
+           >> The level of public scepticism about politicians’ motives has been
+              generally consistent since at least the 1990s, with the exception of
+              when new governments have been elected in 1996 and 2007.
+
+
+
+
+14
+The survey results have highlighted the relatively low standing of the federal government among citizens,
+although the overtime findings show that this has fluctuated considerably. While almost one in three of
+the survey respondents view the federal government as being corrupt, to what extent do these opinions
+translate into a similar view about elected representatives? To test this, the ANUpoll asked how many
+elected representatives they believed were involved in corruption.
+The results show that a majority of the respondents believed that few, if any, elected representatives were
+involved in corruption. A further 23 percent said that ‘some’ were corrupt, and around one in eight said
+‘quite a lot’ or ‘almost all.’ These figures are similar to those found in the United States and the other
+established democracies concerning public perceptions of corruption among elected representatives.
+
+
+
+Almost none                                 15%
+
+
+
+      A few                                                                                     42%
+
+
+
+      Some                                                 23%
+
+
+  Quite a lot                     9%
+
+
+  Almost all            4%
+
+
+ Don’t know                  7%
+
+
+
+‘Thinking about corruption in government. In your opinion, about how many elected federal politicians
+in Australia are involved in corruption? Would it be…?’
+Source ANUpoll on Perceptions of Corruption 2012
+
+
+A second aspect of the public’s views of ethical conduct in government is how far they believe citizens’
+interests are looked after by elected representatives, as against the interests of the elected representatives
+themselves. In general, the public is highly sceptical about how far their interests are looked after: almost
+two in three respondents believe that elected representatives look after themselves and just one in three
+believe that they can be trusted.
+
+
+
+
+                                                                                      ANUpoll - Perceptions of corruption and ethical conduct   15
+         Usually look after themselves                                                               41%
+
+
+
+     Sometimes look after themselves                                    22%
+
+
+
+                  Sometimes trusted                        13%
+
+
+                       Usually trusted                                 21%
+
+
+                          Don’t know        3%
+
+
+
+     ‘In general, do you feel that the people in government are too often interested in looking after
+     themselves, or do you feel that they can be trusted to do the right thing nearly all the time?’
+     Source ANUpoll on Perceptions of Corruption 2012
+
+     These results are consistent with the long term trends since 1993 which, using the same question
+     wording, have demonstrated that the public generally regards politicians as looking after themselves,
+     rather than looking after the public’s interests. In 1993, when the question was first asked in a survey,
+     the figure who believed that politicians looked after themselves was 66 percent; in 2010 and the
+     current ANUpoll, the figure was almost the same, at 63 percent. There is a minor cyclical pattern to
+     the trends: in the years when a new government is elected (as in 1996 and 2007), the public is more
+     sympathetic, and as the government ages, the public becomes more pessimistic.
+
+
+
+
+16
+80
+
+                               67            68
+70       66
+                                                                                  63            63
+                                                         61
+60                                                                      57
+                    52
+50
+
+
+40
+                                    Politicians look after themselves
+30
+
+
+20
+
+
+10
+
+
+ 0
+        1993      1996        1998          2001       2004         2007         2010          2012
+
+Sources AES 1993-2010; ANUpoll on Perceptions of Corruption 2012
+
+Taken together with the survey results for public confidence in institutions, these findings confirm the
+current low standing of politics and politicians in Australia. The contradiction is that along with these
+views, Australians show one of the highest levels of satisfaction with democracy in the world. The public
+appears able to distinguish between the broad institutions of the political system as a whole (which
+they have confidence in), and the individuals who occupy elected positions within that system (in whom
+confidence is low).
+
+
+
+
+                                                                   ANUpoll - Perceptions of corruption and ethical conduct   17
+     KEY TRENDS: MOST
+     I M P O R TA N T P R O B L E M S
+     AND POLITICAL MOOD
+
+                Key points
+                >> The economy and employment represent the main concerns of
+                   the survey respondents, and the proportion mentioning them has
+                   increased consistently since March 2010
+                >> The two other major concerns among the public are immigration
+                   and better government. Concern about the environment shows a
+                   significant decline
+                >> Satisfaction with the direction in which the country is headed remains
+                   positive, and has been virtually unchanged over the past year.
+
+
+
+
+                The ANUpolls that have been conducted over the past three years have found
+                that the most frequently mentioned problems facing Australia are the economy
+                and employment. However, with the exception of the period covering the global
+                financial crisis, these concerns have rarely been mentioned by more than one in four
+                of the survey respondents. This survey continues this trend, with 26 percent of the
+                respondents mentioning the economy and jobs as their first concern. While still a
+                minority of the respondents, it is the highest figure since the beginning of 2010 and the
+                trend shows a slow but consistent increase. This reflects worries about declining jobs
+                in manufacturing and a possible slow-down in the economy.
+
+
+                                                 Sep      Oct      May      Dec       June       Mar
+                                                  12      11       11        10        10        10
+                 Economy/jobs                     26       22       18       19         17        17
+                 Better government                15       16       20       12         14        13
+                 Immigration                      14       18        9       10         10         5
+                 Environment/global               6        10       11       12         15        12
+                 warming
+
+                ‘What do you think is the most important problem facing Australia today?’
+                Source ANUpolls, March 2010-October 2011.
+
+
+
+
+18
+Immigration is the second most mentioned problem, at 15 percent, down from the peak of 20 percent who
+mentioned it in the May 2011 poll. Once again, this trend has been generally consistent since the 2010
+election. The public’s concern about ‘better government’ is the third most frequently mentioned problem. In
+the current poll, the proportion is 14 percent, which is a decline of four percentage points from the October
+2011 figure, but still nearly three times the figure we recorded in March 2010.
+The proportion mentioning the environment and global warming as their first concern has also declined
+from the most recent surveys, in this survey being mentioned by just 6 percent of the respondents. The
+remaining problems that were raised in the survey attracted relatively few mentions. The fifth and sixth
+ranked issues were, respectively, ‘values and morals’ and education.
+The political mood remains generally positive. Just under one in 10 say that they are ‘very satisfied’ with
+the direction in which the country is heading, while almost half are ‘satisfied.’ This is almost the same
+distribution of opinion as we found in the October 2011 ANUpoll, although that represented a modest
+decline from the May 2011 ANUpoll, when 12 percent were ‘very satisfied’ and 51 percent were ‘satisfied.’
+
+
+                   Very satisfied             8%
+
+                        Satisfied                                                                                 46%
+
+Neither satisfied nor dissatisfied            8%
+
+                     Dissatisfied                                      23%
+
+                Very dissatisfied                      13%
+
+                     Don’t know      2%
+
+
+‘All things considered, are you satisfied or dissatisfied with the way the country is heading?’
+Source ANUpoll on Corruption 2012
+
+
+
+
+                                                                                  ANUpoll - Perceptions of corruption and ethical conduct   19
+     ANUPOLL QUESTIONS
+
+
+     What do you                                                        Number   Per cent
+     think is the     Economy/jobs                                         518       25.6
+     most important   Industrial relations                                  16         .8
+     problem facing   Interest rates                                         1         .0
+     Australia
+                      Housing affordability                                 10         .5
+     today?
+                      Health care                                           68        3.4
+                      Education                                             80        4.0
+                      Defence/national security                              6         .3
+                      Terrorism                                              0         .0
+                      Afghan war                                             6         .3
+                      Environment/global warming                           111        5.5
+                      Water management                                       5         .2
+                      Immigration                                          308       15.3
+                      Indigenous affairs                                     9         .5
+                      Taxation                                              25        1.3
+                      Better government                                    276       13.7
+                      Law and order/ crime/ justice system                  46        2.3
+                      Ageing population                                     14         .7
+                      Values/ morals/ respect for others                    88        4.3
+                      Poverty/ Social exclusion/ inequality                 76        3.8
+                      Carbon Tax                                            36        1.8
+                      Trade balance/loss of jobs to overseas                21        1.0
+                      Rural/farming issues                                   9         .5
+                      Social services (including aged care, the             19         .9
+                      disabled, etc)
+                      Infrastructure/ Planning/ Innovation                  21        1.1
+                      Alcohol and Drug use                                  12         .6
+                      Young people's behaviour/attitudes                     4         .2
+                      Foreign influence/Australia's position in world       16         .8
+                      Family/community/societal breakdown                    6         .3
+                      Other                                                 69        3.4
+                      None/ no other                                        26        1.3
+                      Don't know/can't say                                 112        5.6
+                      Refused                                                3         .2
+                      Total                                               2020     100.0
+
+
+
+
+20
+                                                  Number                    Per cent          And what do
+Economy/jobs                                         353                          17.5        you think is
+Industrial relations                                   8                              .4      the second
+Interest rates                                         3                              .1
+                                                                                              most important
+                                                                                              problem facing
+Housing affordability                                 23                            1.1
+                                                                                              Australia
+Health care                                          106                            5.2
+                                                                                              today?
+Education                                             84                            4.2
+Defence/national security                             13                              .7
+Terrorism                                              0                              .0
+Iraq war                                               4                              .2
+Afghan war                                             5                              .3
+Environment/global warming                            84                            4.2
+Water management                                      17                              .8
+Immigration                                          272                          13.5
+Indigenous affairs                                    21                            1.0
+Taxation                                              18                              .9
+Better government                                    173                            8.6
+Law and order/ crime/ justice system                  46                            2.3
+Ageing population                                     18                              .9
+Values/ morals/ respect for others                    77                            3.8
+Poverty/ Social exclusion/ inequality                 79                            3.9
+Carbon Tax                                            30                            1.5
+Trade balance/loss of jobs to overseas                 9                              .5
+Rural/farming issues                                   7                              .3
+Social services (including aged care, the             29                            1.4
+disabled, etc)
+Infrastructure/ Planning/ Innovation                  30                            1.5
+Alcohol and Drug use                                  17                              .8
+Young people's behaviour/attitudes                     6                              .3
+Foreign influence/Australia's position in world       19                            1.0
+Family/community/societal breakdown                    3                              .1
+Other                                                 82                            4.1
+None/ no other                                        73                            3.6
+Don't know/can't say                                 165                            8.1
+Refused                                                2                              .1
+Total                                               1878                          93.0
+
+
+
+
+                                                           ANUpoll - Perceptions of corruption and ethical conduct   21
+     On the whole, are you very satisfied,                                Number   Per cent
+     fairly satisfied, not very satisfied,   Very satisfied                  311       15.4
+     or not at all satisfied with the way    Fairly satisfied               1121       55.5
+     democracy works in Australia?           Not very satisfied              365       18.1
+                                             Not at all satisfied            156        7.7
+                                             Don't know/can't say             64        3.2
+                                             Refused                           4         .2
+                                             Total                          2020     100.0
+
+     I will now read out a list of                                        Number   Per cent
+     organisations. For each one, could      A great deal of confidence      833       41.2
+     you please indicate how much            Quite a lot of confidence       887       43.9
+     confidence you have in them?... The     Not very much confidence        201        9.9
+     armed forces
+                                             None at all                      38        1.9
+                                             Don't Know/Can't Say             56        2.8
+                                             Refused                           5         .2
+                                             Total                          2020     100.0
+
+     ... The legal system                                                 Number   Per cent
+                                             A great deal of confidence      230       11.4
+                                             Quite a lot of confidence       796       39.4
+                                             Not very much confidence        771       38.2
+                                             None at all                     177        8.8
+                                             Don't Know/Can't Say             44        2.2
+                                             Refused                           2         .1
+                                             Total                          2020     100.0
+
+     ... The Federal government                                           Number   Per cent
+     in Canberra                             A great deal of confidence       94        4.7
+                                             Quite a lot of confidence       508       25.1
+                                             Not very much confidence        904       44.7
+                                             None at all                     449       22.2
+                                             Don't Know/Can't Say             54        2.7
+                                             Refused                          11         .5
+                                             Total                          2020     100.0
+
+     ... The media                                                        Number   Per cent
+                                             A great deal of confidence       78        3.8
+                                             Quite a lot of confidence       395       19.5
+                                             Not very much confidence       1121       55.5
+                                             None at all                     383       19.0
+                                             Don't Know/Can't Say             41        2.0
+                                             Refused                           2         .1
+                                             Total                          2020     100.0
+
+
+
+
+22
+                             Number   Per cent      ... The state government
+A great deal of confidence      105        5.2
+Quite a lot of confidence       629       31.2
+Not very much confidence        916       45.3
+None at all                     313       15.5
+Don't Know/Can't Say             50        2.5
+Refused                           7         .3
+Total                          2020     100.0
+
+
+                             Number   Per cent      ... Trade unions
+A great deal of confidence       99        4.9
+Quite a lot of confidence       516       25.6
+Not very much confidence        775       38.4
+None at all                     426       21.1
+Don't Know/Can't Say            198        9.8
+Refused                           5         .3
+Total                          2020     100.0
+
+
+                             Number   Per cent      ... The police
+A great deal of confidence      632       31.3
+Quite a lot of confidence      1019       50.4
+Not very much confidence        295       14.6
+None at all                      58        2.9
+Don't Know/Can't Say             16         .8
+Refused                           1         .0
+Total                          2020     100.0
+
+
+                             Number   Per cent      ... Political parties
+A great deal of confidence       53        2.6
+Quite a lot of confidence       319       15.8
+Not very much confidence       1166       57.7
+None at all                     402       19.9
+Don't Know/Can't Say             71        3.5
+Refused                          10         .5
+Total                          2020     100.0
+
+
+                             Number   Per cent      ... The public service
+A great deal of confidence      221       10.9
+Quite a lot of confidence       906       44.8
+Not very much confidence        654       32.4
+None at all                     128        6.4
+Don't Know/Can't Say            103        5.1
+Refused                           8         .4
+Total                          2020     100.0
+
+
+
+
+                                            ANUpoll - Perceptions of corruption and ethical conduct   23
+     ... Major Australian companies                                      Number   Per cent
+                                            A great deal of confidence      229       11.3
+                                            Quite a lot of confidence       971       48.1
+                                            Not very much confidence        596       29.5
+                                            None at all                      96        4.8
+                                            Don't Know/Can't Say            117        5.8
+                                            Refused                          11         .5
+                                            Total                          2020     100.0
+
+     ... Local government                                                Number   Per cent
+                                            A great deal of confidence      193        9.5
+                                            Quite a lot of confidence       843       41.7
+                                            Not very much confidence        743       36.8
+                                            None at all                     186        9.2
+                                            Don't Know/Can't Say             51        2.5
+                                            Refused                           5         .2
+                                            Total                          2020     100.0
+
+     ... Banks and financial institutions                                Number   Per cent
+                                            A great deal of confidence      215       10.7
+                                            Quite a lot of confidence       716       35.4
+                                            Not very much confidence        793       39.3
+                                            None at all                     241       11.9
+                                            Don't Know/Can't Say             51        2.5
+                                            Refused                           3         .2
+                                            Total                          2020     100.0
+
+     Generally speaking, would you say                                   Number   Per cent
+     that most people can be trusted,       Complete distrust                50        2.5
+     or that you cannot be too careful in   Some distrust                   241       11.9
+     dealing with people?                   Neither trust nor distrust      612       30.3
+                                            Some trust                      870       43.1
+                                            Complete trust                  238       11.8
+                                            Don't know/can't say              9         .5
+                                            Refused                           1         .1
+                                            Total                          2020     100.0
+
+     In the past 3 years, to what extent                                 Number   Per cent
+     has the level of corruption in         Increased a lot                 403       19.9
+     Australia changed. Has it ... ?        Increased a little              466       23.1
+                                            Stayed the same                 824       40.8
+                                            Decreased a little              114        5.6
+                                            Decreased a lot                  35        1.7
+                                            Don't know/can't say            175        8.6
+                                            Refused                           3         .2
+                                            Total                          2020     100.0
+
+
+
+
+24
+                       Number   Per cent      To what extent do you see the
+1 Not at all corrupt      667       33.0      following institutions being affected
+2                         726       35.9      by corruption? …The armed forces
+3                         392       19.4
+4                         108        5.4
+5 Extremely corrupt        44        2.2
+Don't Know/Can't Say       79        3.9
+Refused                     3         .2
+Total                    2020     100.0
+
+
+                       Number   Per cent      …The legal system
+1 Not at all corrupt      200        9.9
+2                         629       31.1
+3                         674       33.3
+4                         305       15.1
+5 Extremely corrupt       160        7.9
+Don't Know/Can't Say       47        2.4
+Refused                     5         .2
+Total                    2020     100.0
+
+
+                       Number   Per cent      …The Federal government
+1 Not at all corrupt      159        7.9      in Canberra
+2                         481       23.8
+3                         689       34.1
+4                         365       18.1
+5 Extremely corrupt       287       14.2
+Don't Know/Can't Say       35        1.7
+Refused                     5         .3
+Total                    2020     100.0
+
+
+                       Number   Per cent      … The state government
+1 Not at all corrupt      155        7.7
+2                         579       28.7
+3                         731       36.2
+4                         328       16.2
+5 Extremely corrupt       169        8.4
+Don't Know/Can't Say       52        2.6
+Refused                     6         .3
+Total                    2020     100.0
+
+
+                       Number   Per cent      … Trade unions
+1 Not at all corrupt      128        6.4
+2                         359       17.8
+3                         624       30.9
+4                         462       22.9
+5 Extremely corrupt       300       14.9
+Don't Know/Can't Say      143        7.1
+Refused                     4         .2
+Total                    2020     100.0
+
+
+
+
+                                      ANUpoll - Perceptions of corruption and ethical conduct   25
+     … The police                                          Number   Per cent
+                                    1 Not at all corrupt      315       15.6
+                                    2                         817       40.5
+                                    3                         539       26.7
+                                    4                         237       11.7
+                                    5 Extremely corrupt        84        4.1
+                                    Don't Know/Can't Say       26        1.3
+                                    Refused                     3         .1
+                                    Total                    2020     100.0
+
+     … Political parties                                   Number   Per cent
+                                    1 Not at all corrupt       76        3.8
+                                    2                         372       18.4
+                                    3                         771       38.1
+                                    4                         517       25.6
+                                    5 Extremely corrupt       217       10.7
+                                    Don't Know/Can't Say       61        3.0
+                                    Refused                     6         .3
+                                    Total                    2020     100.0
+
+     … The public service                                  Number   Per cent
+                                    1 Not at all corrupt      265       13.1
+                                    2                         765       37.9
+                                    3                         645       31.9
+                                    4                         199        9.8
+                                    5 Extremely corrupt        69        3.4
+                                    Don't Know/Can't Say       74        3.6
+                                    Refused                     3         .2
+                                    Total                    2020     100.0
+
+     … Major Australian companies                          Number   Per cent
+                                    1 Not at all corrupt      157        7.8
+                                    2                         647       32.0
+                                    3                         736       36.5
+                                    4                         280       13.9
+                                    5 Extremely corrupt        83        4.1
+                                    Don't Know/Can't Say      111        5.5
+                                    Refused                     6         .3
+                                    Total                    2020     100.0
+
+     … Local government                                    Number   Per cent
+                                    1 Not at all corrupt      225       11.1
+                                    2                         740       36.7
+                                    3                         624       30.9
+                                    4                         258       12.8
+                                    5 Extremely corrupt       126        6.2
+                                    Don't Know/Can't Say       46        2.3
+                                    Refused                     3         .1
+                                    Total                    2020     100.0
+
+
+
+
+26
+                                        Number   Per cent      … Banks and financial institutions
+1 Not at all corrupt                       221       10.9
+2                                          639       31.6
+3                                          603       29.8
+4                                          301       14.9
+5 Extremely corrupt                        198        9.8
+Don't Know/Can't Say                        52        2.6
+Refused                                      6         .3
+Total                                     2020     100.0
+
+
+                                        Number   Per cent      If you suspected or observed corrupt
+Australian Commission for Law               10        1.0      activity, would you know where to
+Enforcement Integrity (ACLEI)                                  report this corrupt activity?
+Consumer affairs/ fair trading              22        2.1
+Corruption and Crime Commission             49        4.8
+(CCC)
+Crime and Misconduct Commission             20        1.9
+(CMC)
+Independent Commission Against              41        4.0
+Corruption (ICAC)
+Local bank manager                           1        0.1
+Local councilor                              9        0.9
+Ombudsman                                  150       14.7
+Parliament / member of parliament           15        1.5
+Police                                     508       49.8
+Public servant                               3        0.3
+School principal                             1        0.1
+Australian Competition And Consumer         16        1.6
+Commission (ACCC)
+Australian Securities And Investments       11        1.1
+Commission (ASIC)
+Depends on the type of corruption/          37        3.6
+situation/ circumstances
+Media (TV/ Newspapers/ etc)                 16        1.6
+Crime stoppers                              14        1.4
+Internet                                     6        0.6
+Work superior/ boss/ senior                 11        1.1
+management
+Other                                       48        4.7
+Don't know / can't say                      30        2.9
+Refused                                      2        0.2
+Total                                     1020     100.0
+
+
+
+
+                                                       ANUpoll - Perceptions of corruption and ethical conduct   27
+     In the last five years, how often have                                              Number   Per cent
+     you or a member of your immediate          Never                                      1842       91.2
+     family come across a public official       Seldom                                       90        4.4
+     who hinted they wanted, or asked           Occasionally                                 60        3.0
+     for, a bribe or a favour in return for a
+                                                Quite often                                  14         .7
+     service in Australia?
+                                                Very often                                    1         .1
+                                                Don't know/can't say                          8         .4
+                                                Refused                                       4         .2
+                                                Total                                      2020     100.0
+
+
+     Do you remember what institution                                                    Number   Per cent
+     or organisation the public official        Local government                             14       18.4
+     worked for?                                Police                                       14       18.4
+                                                Other                                        27       35.5
+                                                Don't Know / Can't Say                       20       26.3
+                                                Refused                                       1        1.3
+                                                Total                                        76     100.0
+                                                Refused                                       4         .2
+                                                Total                                      2020     100.0
+
+
+     Thinking about corruption in                                                        Number   Per cent
+     government. In your opinion,               Almost none                                 308       15.2
+     about how many elected federal             A few                                       850       42.1
+     politicians in Australia are involved in   Some                                        468       23.1
+     corruption? Would it be…
+                                                Quite a lot                                 189        9.4
+                                                Or, almost all                               74        3.7
+                                                Don't know                                  128        6.3
+                                                Refused                                       5         .2
+                                                Total                                      2020     100.0
+
+
+     In general, do you feel that the                                                    Number   Per cent
+     people in government are too               Usually look after themselves               832       41.2
+     often interested in looking after          Sometimes look after themselves             436       21.6
+     themselves, or do you feel that they       Sometimes can be trusted to do the          256       12.7
+     can be trusted to do the right thing       right thing
+     nearly all the time?                       Usually can be trusted to do the right      433       21.4
+                                                thing
+                                                Don't know/can't say                         57        2.8
+                                                Refused                                       7         .3
+                                                Total                                      2020     100.0
+
+
+     All things considered, are you                                                      Number   Per cent
+     satisfied or dissatisfied with the way     Very satisfied                              163        8.1
+     the country is heading?                    Satisfied                                   934       46.2
+                                                Neither satisfied nor dissatisfied          165        8.2
+                                                Dissatisfied                                471       23.3
+                                                Very dissatisfied                           252       12.5
+                                                Don’t know/not sure                          34        1.7
+                                                Refused                                       1         .0
+                                                Total                                      2020     100.0
+
+
+
+
+28
+Enquiries regarding this poll:
+Professor Adam Graycar
+Director, Research School of Social Sciences
+ANU College of Arts and Social Sciences
+Director, Transnational Research Institute on Corruption
+T +61 2 6125 0135
+E adam.graycar@anu.edu.au
+
+Transnational Research Institute
+on Corruption
+Beryl Rawson Building #13
+The Australian National University
+CANBERRA ACT 0200
+T +61 2 6125 2257
+F +61 2 6125 0502
+W tric.anu.edu.au
+
+To view electronically:
+politicsir.cass.anu.edu.au/anupoll
+
+
+
+
+                                                                   P ercepti o ns o f c o rrupti o n
+                                                                       and et h ica l c o nduct
+                                                                        ANUPOLL OCTOBER 2012
+
+
+
+
+                                                           ANU College of
+                                                           Arts & Social
+                                                           Sciences
+

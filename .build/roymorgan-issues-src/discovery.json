@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "feed": "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search?sort_by=date",
+  "totalPages": 262,
+  "rowsScanned": 2619,
+  "method": "Findings-index titles/summaries were scanned first; only matched Australian issue releases were opened and classified by their producer postBy.content. No intermediate PNG chart was converted into tabular observations.",
+  "selected": [
+    {
+      "finding": 6059,
+      "availability": "html-mip-tables"
+    },
+    {
+      "finding": 7187,
+      "availability": "html-mip-tables"
+    },
+    {
+      "finding": 7264,
+      "availability": "html-economic-breakdown"
+    },
+    {
+      "finding": 7424,
+      "availability": "html-economic-breakdown"
+    },
+    {
+      "finding": 7504,
+      "availability": "png-only"
+    },
+    {
+      "finding": 8044,
+      "availability": "png-only"
+    },
+    {
+      "finding": 8184,
+      "availability": "png-only"
+    },
+    {
+      "finding": 8829,
+      "availability": "png-only-2021-report"
+    },
+    {
+      "finding": 9797,
+      "availability": "png-pick-three-plus-printed-changes"
+    }
+  ],
+  "candidates": [
+    {
+      "page": 257,
+      "finding": 6059,
+      "releaseDate": "2015-01-29",
+      "title": "Economic Issues still biggest problems facing Australia (38%) but Terrorism/ Wars/ Security Issues easily biggest problems facing the World (43%) after French atrocity – ‘Charlie Hebdo’ shootings in Paris",
+      "slug": "economic-issues-still-biggest-problems-facing-australia-38-but-terrorism-wars-security-issues-easily-biggest-problems-facing-the-world-43-after-french-atrocity-charlie-hebdo",
+      "matchedFinding": true
+    },
+    {
+      "page": 242,
+      "finding": 7128,
+      "releaseDate": "2017-02-27",
+      "title": "Most Important Problems facing New Zealand in 2017 are Housing related, but the World faces Economic and War & Terrorism problems in almost equal measure according to New Zealanders",
+      "slug": "most-important-problems-facing-new-zealand-in-2017-are-housing-related-but-the-world-faces-economic-and-war-terrorism-problems-in-almost-equal-measure-according-to-new-zealanders",
+      "matchedFinding": false
+    },
+    {
+      "page": 242,
+      "finding": 7131,
+      "releaseDate": "2017-02-27",
+      "title": "New Zealand’s ‘Housing Crisis’ dominates domestic issues as New Zealand heads towards September Election",
+      "slug": "new-zealands-housing-crisis-dominates-domestic-issues-as-new-zealand-heads-towards-september-election",
+      "matchedFinding": false
+    },
+    {
+      "page": 241,
+      "finding": 7187,
+      "releaseDate": "2017-03-31",
+      "title": "Economic Issues led by ‘Unemployment’ and ‘The Economy’ easily the most important problems facing Turnbull Government in Australia while Economic & Environmental issues most important facing the World in 2017",
+      "slug": "economic-issues-led-by-unemployment-and-the-economy-easily-the-most-important-problems-facing-turnbull-government-in-australia-while-economic-environmental-issues",
+      "matchedFinding": true
+    },
+    {
+      "page": 240,
+      "finding": 7264,
+      "releaseDate": "2017-07-14",
+      "title": "Economic issues ‘Unemployment’ and ‘The Economy’ top the list of concerns for Australians in mid-2017",
+      "slug": "economic-issues-unemployment-and-the-economy-top-the-list-of-concerns-for-australians-in-mid-2017",
+      "matchedFinding": true
+    },
+    {
+      "page": 237,
+      "finding": 7504,
+      "releaseDate": "2018-03-06",
+      "title": "Economic Issues dominate Australians’ problems in 2018",
+      "slug": "economic-issues-dominate-australians-problems-in-2018",
+      "matchedFinding": true
+    },
+    {
+      "page": 237,
+      "finding": 7534,
+      "releaseDate": "2018-03-16",
+      "title": "Economic Issues dominate New Zealand concerns early in 2018",
+      "slug": "economic-issues-dominate-new-zealand-concerns-early-in-2018",
+      "matchedFinding": false
+    },
+    {
+      "page": 236,
+      "finding": 7424,
+      "releaseDate": "2018-04-09",
+      "title": "Cost of living, unemployment & poverty big issues before Federal Budget",
+      "slug": "cost-of-living-unemployment-poverty-big-issues-before-federal-budget",
+      "matchedFinding": true
+    },
+    {
+      "page": 236,
+      "finding": 7563,
+      "releaseDate": "2018-04-13",
+      "title": "Poverty and gap between rich and poor big issues before New Zealand Budget",
+      "slug": "poverty-and-gap-between-rich-and-poor-big-issues-before-new-zealand-budget",
+      "matchedFinding": false
+    },
+    {
+      "page": 221,
+      "finding": 8044,
+      "releaseDate": "2019-07-03",
+      "title": "Australians see the Environment as the World’s biggest problem but in Australia it’s the Economy",
+      "slug": "australians-see-the-environment-as-the-worlds-biggest-problem-but-in-australia-its-the-economy",
+      "matchedFinding": true
+    },
+    {
+      "page": 209,
+      "finding": 8184,
+      "releaseDate": "2019-11-04",
+      "title": "Environmental issues seen as the biggest problem facing Australia – for the first time since February 2011",
+      "slug": "environmental-issues-seen-as-the-biggest-problem-facing-australia-for-the-first-time-since-february-2011",
+      "matchedFinding": true
+    },
+    {
+      "page": 152,
+      "finding": 8829,
+      "releaseDate": "2021-10-19",
+      "title": "COVID-19 is the most important problem facing the World and Australia – just ahead of Global Warming &amp; Climate Change",
+      "slug": "covid-19-is-the-most-important-problem-facing-the-world-and-australia-just-ahead-of-global-warming-climate-change",
+      "matchedFinding": true
+    },
+    {
+      "page": 132,
+      "finding": 9041,
+      "releaseDate": "2022-08-19",
+      "title": "New Partnership Announcement: Melbourne Institute and Roy Morgan Join Forces to Take the Pulse of the Nation",
+      "slug": "new-partnership-announcement-melbourne-institute-and-roy-morgan-join-forces-to-take-the-pulse-of-the-nation",
+      "matchedFinding": false
+    },
+    {
+      "page": 58,
+      "finding": 9797,
+      "releaseDate": "2025-01-23",
+      "title": "Top 10 Issues Shaping the 2025 Federal Election: Cost of Living and Crime on the Rise, Climate Change Fades",
+      "slug": "9797-most-important-issues-facing-australia-january-2025",
+      "matchedFinding": true
+    },
+    {
+      "page": 44,
+      "finding": 9977,
+      "releaseDate": "2025-07-15",
+      "title": "A decade later: ‘Cost‑of‑living’ overtakes ‘corruption’ as Indonesians’ most important issue in 2025",
+      "slug": "9977-indonesians-most-important-issues-2015-vs-2025",
+      "matchedFinding": false
+    },
+    {
+      "page": 32,
+      "finding": 10081,
+      "releaseDate": "2025-11-25",
+      "title": "Australian Youth Barometer 2025: Financial pressures intensify for young Australians as confidence in the future weakens",
+      "slug": "australian-youth-barometer-2025-financial-pressures-intensify-for-young-australians-as-confidence-in-the-future-weakens",
+      "matchedFinding": false
+    }
+  ]
+}

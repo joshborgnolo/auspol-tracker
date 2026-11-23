@@ -140,7 +140,19 @@ for b in vote-switching demographics issues confidence macro; do
   R="$(echo "$LAST" | sed -n 's/.*"reminders":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$R" ]; then REMIND="$REMIND $b: $R"; fi
 done
-if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src .build/emrs-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then CHANGED=true; fi
+
+HISTORY="$(node .build/ipsos-issues-history.mjs 2>&1)"
+HCODE=$?
+HISTORY_LAST="$(echo "$HISTORY" | tail -1)"
+log "$HISTORY_LAST"
+case "$HISTORY_LAST" in
+  IPHISTORYDATA_STATUS*) ;;
+  *) [ $HCODE -eq 0 ] && HCODE=1 ;;
+esac
+if [ $HCODE -ne 0 ]; then UNFINISHED="$UNFINISHED ipsos-history"; fi
+if echo "$HISTORY_LAST" | grep -q '"changed":true'; then CHANGED=true; fi
+
+if [ -n "$(git status --porcelain -- .build/ipsos-src .build/ipsos-history-src .build/secnewgate-src .build/emrs-src data/polls.json data/sec-direction-states.json data/sec-issues.json data/ipsos-issues-history.json)" ]; then CHANGED=true; fi
 
 if $CHANGED; then
   log "crosstab tables changed; running validate/build/commit/push"
@@ -154,7 +166,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/macro.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src .build/emrs-src .build/macro-src "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/confidence.json data/macro.json data/polls.json data/sec-direction-states.json data/sec-issues.json data/ipsos-issues-history.json data/ipsos-worries.json .build/ipsos-src .build/ipsos-history-src .build/secnewgate-src .build/emrs-src .build/macro-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

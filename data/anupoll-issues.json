@@ -1,0 +1,5553 @@
+{
+  "_about": "ANUpoll 2008–2015 national most important problem and second most important problem, preserved as separate printed aggregate response tables. Poll 20 (Social Class) is excluded.",
+  "schemaVersion": 1,
+  "source": {
+    "cumulativeDataset": {
+      "title": "ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015",
+      "doi": "10.26193/2S8I0I",
+      "url": "https://doi.org/10.26193/2S8I0I",
+      "cache": ".build/anupoll-issues-src/ada-cumulative-2S8I0I.json",
+      "sha256": "C94C668884E8E3ECA20F4D8A0BA5E0247E68A6744736C9246AD2ECC9C0D1A271",
+      "variableNamesAndNumericCodes": null,
+      "codebookAccess": "ADA metadata marks every deposited XLSX/SAS/SAV/TSV file restricted; API datafile downloads 4601 and 4602 returned HTTP 403 Not authorized. No variable names or response codes are inferred from DataCite metadata."
+    },
+    "depositedFiles": [
+      {
+        "id": 4601,
+        "filename": "1. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015 - Data Dictionary.xlsx",
+        "bytes": 44265,
+        "md5": "152B3EE70630FAA566F36AE04A4575F2",
+        "restricted": true
+      },
+      {
+        "id": 4602,
+        "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sas",
+        "bytes": 16641,
+        "md5": "6A2BD3ABF568620C07120CA5B4CE9981",
+        "restricted": true
+      },
+      {
+        "id": 4603,
+        "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sas7bdat",
+        "bytes": 9504256,
+        "md5": "5AFD1995BA5E1F80B96AA168A56949A0",
+        "restricted": true
+      },
+      {
+        "id": 4604,
+        "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sav",
+        "bytes": 2772667,
+        "md5": "CF6103659F02B97F8453E51B42E6C524",
+        "restricted": true
+      },
+      {
+        "id": 4605,
+        "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.tab",
+        "bytes": 3092978,
+        "md5": "6C9D44F6E207149DE30EA9DC60658C01",
+        "restricted": true
+      }
+    ],
+    "officialWaveMetadata": {
+      "cache": ".build/anupoll-issues-src/datacite-wave-metadata.json",
+      "sha256": "54E6F2C0F01F27018B03DB29EE732B10AD2FDD8C39C022E0450C4F9CF546E31A"
+    },
+    "derivation": "Poll 1–19 aggregate figures are read only from official ANU report PDF tables/coordinate-labelled charts or separately printed prose. Count and percent are verbatim. Weighted percentages are never recomputed from frequencies. No respondent TSV was downloaded or committed.",
+    "mentionCombination": "Not computed or included. First and second choices are separate; no combined first+second mention counts are derived.",
+    "poll11FoodSecurityGap": {
+      "doi": "10.26193/iheypj",
+      "fieldwork": [
+        "2011-07-12",
+        "2011-07-25"
+      ],
+      "publicTechnicalReport": {
+        "id": 4622,
+        "filename": "1. ANU POLL (FOOD SECURITY) JULY 2011 TECHNICAL REPORT.pdf",
+        "bytes": 234476,
+        "md5": "9F607CB6B4DCB7DCBD774B3074A508AE",
+        "restricted": false
+      },
+      "accessResult": "ADA API returned HTTP 400: You may not download this file without the required Guestbook response for guestbookID 2. No identity details or credentials were invented. Its respondent files are restricted and no public ANU problem-table report was found."
+    },
+    "poll20Exclusion": {
+      "doi": "10.4225/87/p5zkme",
+      "title": "ANU Poll 2015: Social Class",
+      "reason": "Official DataCite abstract says twentieth in the series; the requested cumulative deposit is Waves 1–19 ending with National Identity."
+    },
+    "reportExtraction": "pdftotext -raw for tables; pdftotext -bbox for the two early chart series. Coordinates identify the value, never the figure itself."
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "title": "ANU Poll 2008: Governance",
+      "doi": "10.4225/87/lvkb1t",
+      "fieldwork": {
+        "reportStart": "2008-03-16",
+        "reportEnd": "2008-03-30",
+        "adaCumulativeStart": "2008-03-18",
+        "adaCumulativeEnd": "2008-04-02",
+        "reportDiffersFromAda": true
+      },
+      "respondentsReport": 1000,
+      "responseRatePercentReport": null,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2008-04-16_ANUpoll_governance_report_0_2.pdf",
+        "reportNumberPrinted": 1,
+        "cache": ".build/anupoll-issues-src/2008-04-16_ANUpoll_governance_report_0_2.pdf",
+        "sha256": "E40D111133E1470FAA69FFBE08A01355A74C23A4BA703DB744F43D81AA6D7F23"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Economy",
+              "count": null,
+              "percent": 18
+            },
+            {
+              "label": "Environment",
+              "count": null,
+              "percent": 19
+            },
+            {
+              "label": "Water management",
+              "count": null,
+              "percent": 8
+            },
+            {
+              "label": "Housing affordability",
+              "count": null,
+              "percent": 7
+            },
+            {
+              "label": "Interest rates",
+              "count": null,
+              "percent": 7
+            },
+            {
+              "label": "Health care",
+              "count": null,
+              "percent": 5
+            },
+            {
+              "label": "Education",
+              "count": null,
+              "percent": 4
+            }
+          ],
+          "base": {
+            "sampleN": 1000,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Poll 3 official retrospective chart, Mar-08 series; poll 1 prose corroborates Environment 19 and Economy/jobs 18",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 7,
+            "responsePercentSum": 68,
+            "percentWithinOnePointOf100": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Environment (including global warming and sustainability)",
+              "count": null,
+              "percent": 13
+            },
+            {
+              "label": "Economy/jobs",
+              "count": null,
+              "percent": 17
+            }
+          ],
+          "base": {
+            "sampleN": 1000,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Poll 1 printed prose only; other second-choice categories not published",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 2,
+            "responsePercentSum": 30,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 2,
+      "title": "ANU Poll 2008: Higher Education",
+      "doi": "10.4225/87/fq3mjc",
+      "fieldwork": {
+        "reportStart": "2008-06-20",
+        "reportEnd": "2008-07-06",
+        "adaCumulativeStart": "2008-06-20",
+        "adaCumulativeEnd": "2008-07-06",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 34,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2008-09-11_ANUpoll_higher_education_report_0_1.pdf",
+        "reportNumberPrinted": 2,
+        "cache": ".build/anupoll-issues-src/2008-09-11_ANUpoll_higher_education_report_0_1.pdf",
+        "sha256": "632939459A0E9434BA7306E8D5D86FEA36424AED142B5CBCD070DB1E589C4485"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Environment",
+              "count": null,
+              "percent": 23
+            },
+            {
+              "label": "Economy",
+              "count": null,
+              "percent": 23
+            },
+            {
+              "label": "Housing affordability",
+              "count": null,
+              "percent": 4
+            },
+            {
+              "label": "Interest rates",
+              "count": null,
+              "percent": 4
+            },
+            {
+              "label": "Health care",
+              "count": null,
+              "percent": 5
+            },
+            {
+              "label": "Education",
+              "count": null,
+              "percent": 4
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Jul-08 values read by chart coordinates in the official poll 2 PDF",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 6,
+            "responsePercentSum": 63,
+            "percentWithinOnePointOf100": false
+          }
+        },
+        "second": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "No separate second-choice table is printed in this wave's public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 3,
+      "title": "ANU Poll 2008: Environment",
+      "doi": "10.4225/87/fgsf5v",
+      "fieldwork": {
+        "reportStart": "2008-09-05",
+        "reportEnd": "2008-09-21",
+        "adaCumulativeStart": "2008-09-05",
+        "adaCumulativeEnd": "2008-09-21",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1000,
+      "responseRatePercentReport": 30,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2008-10-29_ANUpoll_environment_report_0_1.pdf",
+        "reportNumberPrinted": 3,
+        "cache": ".build/anupoll-issues-src/2008-10-29_ANUpoll_environment_report_0_1.pdf",
+        "sha256": "9BD7A5A4413ABD9F01C2B88A4368F5D369DEB21E72EE006574866B98B17A64EF"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Economy",
+              "count": null,
+              "percent": 22
+            },
+            {
+              "label": "Environment",
+              "count": null,
+              "percent": 18
+            },
+            {
+              "label": "Water management",
+              "count": null,
+              "percent": 5
+            },
+            {
+              "label": "Housing affordability",
+              "count": null,
+              "percent": 3
+            },
+            {
+              "label": "Interest rates",
+              "count": null,
+              "percent": 2
+            },
+            {
+              "label": "Health care",
+              "count": null,
+              "percent": 7
+            },
+            {
+              "label": "Education",
+              "count": null,
+              "percent": 4
+            }
+          ],
+          "base": {
+            "sampleN": 1000,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Sep-08 values read by chart coordinates in the official poll 3 PDF",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 7,
+            "responsePercentSum": 61,
+            "percentWithinOnePointOf100": false
+          }
+        },
+        "second": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "No separate second-choice table is printed in this wave's public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 4,
+      "title": "ANU Poll 2009: Defence",
+      "doi": "10.4225/87/oa9rve",
+      "fieldwork": {
+        "reportStart": "2009-03-17",
+        "reportEnd": "2009-04-01",
+        "adaCumulativeStart": "2009-03-17",
+        "adaCumulativeEnd": "2009-04-01",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 32.5,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2009-04-29_ANUpoll_defence_report_0_1.pdf",
+        "reportNumberPrinted": 4,
+        "cache": ".build/anupoll-issues-src/2009-04-29_ANUpoll_defence_report_0_1.pdf",
+        "sha256": "0D84D54BFF5EC43D08A5B67BB3BFDC9DF97AB430E5DF36DC7BEE6DD8EC2195E5"
+      },
+      "note": "The report's prose says 53 per cent for Economy/jobs, but its ranked printed table says 52; the table is retained verbatim.",
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": null,
+              "percent": 52,
+              "printedRank": 1
+            },
+            {
+              "label": "Environment/global warming",
+              "count": null,
+              "percent": 12,
+              "printedRank": 2
+            },
+            {
+              "label": "Immigration",
+              "count": null,
+              "percent": 6,
+              "printedRank": 3
+            },
+            {
+              "label": "Better government",
+              "count": null,
+              "percent": 3,
+              "printedRank": 4
+            },
+            {
+              "label": "Health care",
+              "count": null,
+              "percent": 3,
+              "printedRank": 5
+            },
+            {
+              "label": "Other (printed aggregate)",
+              "count": null,
+              "percent": 24
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Ranked issue table in the official ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 6,
+            "responsePercentSum": 100,
+            "percentWithinOnePointOf100": true
+          }
+        },
+        "second": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "No separate second-choice table is printed in this wave's public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 5,
+      "title": "ANU Poll 2009: Economics",
+      "doi": "10.4225/87/iqkbrk",
+      "fieldwork": {
+        "reportStart": "2009-06-17",
+        "reportEnd": "2009-06-30",
+        "adaCumulativeStart": "2009-06-20",
+        "adaCumulativeEnd": "2009-07-06",
+        "reportDiffersFromAda": true
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 32,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2009-08-03_ANUpoll_economy_report_0_1.pdf",
+        "reportNumberPrinted": 5,
+        "cache": ".build/anupoll-issues-src/2009-08-03_ANUpoll_economy_report_0_1.pdf",
+        "sha256": "6D22E6B86709E84912F9DE54053DC660BC3D6379438D67E6646070EBCEDE2334"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": null,
+              "percent": 42,
+              "printedRank": 1
+            },
+            {
+              "label": "Environment/global warming",
+              "count": null,
+              "percent": 10,
+              "printedRank": 2
+            },
+            {
+              "label": "Immigration",
+              "count": null,
+              "percent": 9,
+              "printedRank": 3
+            },
+            {
+              "label": "Health care",
+              "count": null,
+              "percent": 5,
+              "printedRank": 4
+            },
+            {
+              "label": "Better government",
+              "count": null,
+              "percent": 4,
+              "printedRank": 5
+            },
+            {
+              "label": "Other (printed aggregate)",
+              "count": null,
+              "percent": 30
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Ranked issue table in the official ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 6,
+            "responsePercentSum": 100,
+            "percentWithinOnePointOf100": true
+          }
+        },
+        "second": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "No separate second-choice table is printed in this wave's public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 6,
+      "title": "ANU Poll 2009: Rural and Regional Australia",
+      "doi": "10.4225/87/kfka3e",
+      "fieldwork": {
+        "reportStart": "2009-08-31",
+        "reportEnd": "2009-09-15",
+        "adaCumulativeStart": "2009-08-31",
+        "adaCumulativeEnd": "2009-09-15",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 40.3,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2009-11-20_ANUpoll_rural_and_regional_report_0_1.pdf",
+        "reportNumberPrinted": 6,
+        "cache": ".build/anupoll-issues-src/2009-11-20_ANUpoll_rural_and_regional_report_0_1.pdf",
+        "sha256": "92457A0AFD3F8E5E9CE18F9C5E508B10C0716B26BFB01F18D08ACC5083011540"
+      },
+      "note": "The ranked table and printed Other aggregate sum to 90 per cent, not 100; the source figures are retained without completion.",
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "selected-printed-responses-not-a-complete-codebook",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": null,
+              "percent": 32,
+              "printedRank": 1
+            },
+            {
+              "label": "Environment/global warming",
+              "count": null,
+              "percent": 14,
+              "printedRank": 2
+            },
+            {
+              "label": "Immigration",
+              "count": null,
+              "percent": 7,
+              "printedRank": 3
+            },
+            {
+              "label": "Health care",
+              "count": null,
+              "percent": 7,
+              "printedRank": 4
+            },
+            {
+              "label": "Law and order",
+              "count": null,
+              "percent": 4,
+              "printedRank": 5
+            },
+            {
+              "label": "Other (printed aggregate)",
+              "count": null,
+              "percent": 26
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Ranked issue table in the official ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 6,
+            "responsePercentSum": 90,
+            "percentWithinOnePointOf100": false
+          }
+        },
+        "second": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "No separate second-choice table is printed in this wave's public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 7,
+      "title": "ANU Poll 2010: Australia's Future",
+      "doi": "10.4225/87/oqqjce",
+      "fieldwork": {
+        "reportStart": "2010-03-15",
+        "reportEnd": "2010-04-01",
+        "adaCumulativeStart": "2010-03-16",
+        "adaCumulativeEnd": "2010-04-01",
+        "reportDiffersFromAda": true
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 45.2,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2010-10-26_ANUpoll_population_0_1.pdf",
+        "reportNumberPrinted": 7,
+        "cache": ".build/anupoll-issues-src/2010-10-26_ANUpoll_population_0_1.pdf",
+        "sha256": "39284C66F093C04A4ADE8EDD746100C1274CC4F4D801C70B6DCD9AB0A999E2F9"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 200,
+              "percent": 16.7
+            },
+            {
+              "label": "Industrial relations",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Interest rates",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Housing affordability",
+              "count": 27,
+              "percent": 2.2
+            },
+            {
+              "label": "Health care",
+              "count": 158,
+              "percent": 13.1
+            },
+            {
+              "label": "Education",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "Defence/national security",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Terrorism",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Iraq war",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 146,
+              "percent": 12.2
+            },
+            {
+              "label": "Water management",
+              "count": 51,
+              "percent": 4.2
+            },
+            {
+              "label": "Immigration",
+              "count": 153,
+              "percent": 12.8
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 19,
+              "percent": 1.6
+            },
+            {
+              "label": "Taxation",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Social services (including aged care, etc)",
+              "count": 4,
+              "percent": 0.4
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 65,
+              "percent": 5.4
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 21,
+              "percent": 1.7
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Better government",
+              "count": 57,
+              "percent": 4.7
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 23,
+              "percent": 1.9
+            },
+            {
+              "label": "Foreign influence/Australia’s position in the world",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 30,
+              "percent": 2.5
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 4,
+              "percent": 0.4
+            },
+            {
+              "label": "Increasing/ageing population",
+              "count": 43,
+              "percent": 3.6
+            },
+            {
+              "label": "Other",
+              "count": 42,
+              "percent": 3.5
+            },
+            {
+              "label": "None",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "(Don’t know/Can’t say)",
+              "count": 47,
+              "percent": 3.9
+            },
+            {
+              "label": "(Refused)",
+              "count": 3,
+              "percent": 0.3
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1200,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1200,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1199,
+            "responseCountSumAvailable": 1199,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.2,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 155,
+              "percent": 13.5
+            },
+            {
+              "label": "Industrial relations",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Interest rates",
+              "count": 4,
+              "percent": 0.4
+            },
+            {
+              "label": "Housing affordability",
+              "count": 30,
+              "percent": 2.6
+            },
+            {
+              "label": "Health care",
+              "count": 126,
+              "percent": 11
+            },
+            {
+              "label": "Education",
+              "count": 80,
+              "percent": 7
+            },
+            {
+              "label": "Defence/national security",
+              "count": 10,
+              "percent": 0.8
+            },
+            {
+              "label": "Terrorism",
+              "count": 4,
+              "percent": 0.4
+            },
+            {
+              "label": "Iraq war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 105,
+              "percent": 9.2
+            },
+            {
+              "label": "Water management",
+              "count": 37,
+              "percent": 3.2
+            },
+            {
+              "label": "Immigration",
+              "count": 126,
+              "percent": 11
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 12,
+              "percent": 1.1
+            },
+            {
+              "label": "Taxation",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Social services (including aged care, etc,)",
+              "count": 15,
+              "percent": 1.3
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 36,
+              "percent": 3.2
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 25,
+              "percent": 2.2
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 35,
+              "percent": 3.1
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Better government",
+              "count": 40,
+              "percent": 3.5
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Foreign influence/Australia’s position in the world",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 17,
+              "percent": 1.5
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 15,
+              "percent": 1.3
+            },
+            {
+              "label": "Increasing/ageing population",
+              "count": 47,
+              "percent": 4.1
+            },
+            {
+              "label": "Other",
+              "count": 54,
+              "percent": 4.7
+            },
+            {
+              "label": "None",
+              "count": 22,
+              "percent": 1.9
+            },
+            {
+              "label": "(Don’t know/Can’t say)",
+              "count": 106,
+              "percent": 9.3
+            },
+            {
+              "label": "(Refused)",
+              "count": 1,
+              "percent": 0.1
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1143,
+            "validPercent": 100,
+            "skippedN": 57,
+            "skippedPercent": null,
+            "printedOverallN": 1200
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1143,
+              "percent": 100
+            },
+            {
+              "label": "Missing",
+              "count": 57,
+              "percent": null
+            },
+            {
+              "label": "Total (overall)",
+              "count": 1200,
+              "percent": null
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1143,
+            "responseCountSumAvailable": 1143,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": true
+          }
+        }
+      }
+    },
+    {
+      "wave": 8,
+      "title": "ANU Poll 2010: Science",
+      "doi": "10.4225/87/wuepaj",
+      "fieldwork": {
+        "reportStart": "2010-06-15",
+        "reportEnd": "2010-07-02",
+        "adaCumulativeStart": "2010-06-15",
+        "adaCumulativeEnd": "2010-07-02",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 43.2,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2010-12-07_ANUpoll_science_0_1.pdf",
+        "reportNumberPrinted": 8,
+        "cache": ".build/anupoll-issues-src/2010-12-07_ANUpoll_science_0_1.pdf",
+        "sha256": "02D75D6A2F8C16A38D5E55C0FDA975A780FA71200594188FA40C5E76C5C60F07"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 203,
+              "percent": 16.9
+            },
+            {
+              "label": "Industrial relations",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Interest rates",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Housing affordability",
+              "count": 19,
+              "percent": 1.6
+            },
+            {
+              "label": "Health care",
+              "count": 75,
+              "percent": 6.3
+            },
+            {
+              "label": "Education",
+              "count": 31,
+              "percent": 2.6
+            },
+            {
+              "label": "Defence/national security",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Terrorism",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Iraq war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Afghanistan war",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 184,
+              "percent": 15.3
+            },
+            {
+              "label": "Water management",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "Immigration",
+              "count": 165,
+              "percent": 13.8
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Taxation",
+              "count": 28,
+              "percent": 2.3
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc.)",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 30,
+              "percent": 2.5
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 18,
+              "percent": 1.5
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Better government",
+              "count": 123,
+              "percent": 10.3
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 22,
+              "percent": 1.8
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 33,
+              "percent": 2.8
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Increasing/ageing population",
+              "count": 31,
+              "percent": 2.6
+            },
+            {
+              "label": "Other",
+              "count": 36,
+              "percent": 3
+            },
+            {
+              "label": "None/no other",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 68,
+              "percent": 5.7
+            },
+            {
+              "label": "Refused",
+              "count": 3,
+              "percent": 0.3
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1200,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1200,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1200,
+            "responseCountSumAvailable": 1200,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.3,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": true
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "No answer given",
+              "count": 83,
+              "percent": 6.9
+            },
+            {
+              "label": "Economy/jobs",
+              "count": 148,
+              "percent": 12.3
+            },
+            {
+              "label": "Industrial relations",
+              "count": 17,
+              "percent": 1.4
+            },
+            {
+              "label": "Interest rates",
+              "count": 10,
+              "percent": 0.8
+            },
+            {
+              "label": "Housing affordability",
+              "count": 30,
+              "percent": 2.5
+            },
+            {
+              "label": "Health care",
+              "count": 95,
+              "percent": 7.9
+            },
+            {
+              "label": "Education",
+              "count": 58,
+              "percent": 4.8
+            },
+            {
+              "label": "Defence/national security",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Terrorism",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Iraq war",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Afghanistan war",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 96,
+              "percent": 8
+            },
+            {
+              "label": "Water management",
+              "count": 37,
+              "percent": 3.1
+            },
+            {
+              "label": "Immigration",
+              "count": 125,
+              "percent": 10.4
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "Taxation",
+              "count": 29,
+              "percent": 2.4
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc.)",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 20,
+              "percent": 1.7
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 26,
+              "percent": 2.2
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Better government",
+              "count": 51,
+              "percent": 4.3
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 24,
+              "percent": 2
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Increasing/ageing population",
+              "count": 44,
+              "percent": 3.7
+            },
+            {
+              "label": "Other",
+              "count": 63,
+              "percent": 5.3
+            },
+            {
+              "label": "None/no other",
+              "count": 24,
+              "percent": 2
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 126,
+              "percent": 10.5
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1200,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1200,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1200,
+            "responseCountSumAvailable": 1200,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.1,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": true
+          }
+        }
+      }
+    },
+    {
+      "wave": 9,
+      "title": "ANU Poll 2011: The Internet and Social Capital",
+      "doi": "10.4225/87/ghp82o",
+      "fieldwork": {
+        "reportStart": "2010-12-02",
+        "reportEnd": "2010-12-16",
+        "adaCumulativeStart": "2010-12-02",
+        "adaCumulativeEnd": "2010-12-16",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 37.4,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2011-04-28_ANUpoll_internet_0_1.pdf",
+        "reportNumberPrinted": 9,
+        "cache": ".build/anupoll-issues-src/2011-04-28_ANUpoll_internet_0_1.pdf",
+        "sha256": "E538AF196655E86B5375797C3450FF1C3C71E63E9751F53CF2942DF3485B5AA4"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 222,
+              "percent": 18.5
+            },
+            {
+              "label": "Industrial relations",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Interest rates",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Housing affordability",
+              "count": 19,
+              "percent": 1.5
+            },
+            {
+              "label": "Health care",
+              "count": 83,
+              "percent": 6.9
+            },
+            {
+              "label": "Education",
+              "count": 25,
+              "percent": 2.1
+            },
+            {
+              "label": "Defence/national security",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Terrorism",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Iraq war",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Afghan war",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 149,
+              "percent": 12.4
+            },
+            {
+              "label": "Water management",
+              "count": 30,
+              "percent": 2.5
+            },
+            {
+              "label": "Immigration",
+              "count": 139,
+              "percent": 11.6
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Taxation",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Better government",
+              "count": 119,
+              "percent": 9.9
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "Ageing population",
+              "count": 38,
+              "percent": 3.2
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 33,
+              "percent": 2.7
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 60,
+              "percent": 5
+            },
+            {
+              "label": "Other",
+              "count": 22,
+              "percent": 1.8
+            },
+            {
+              "label": "None/no other",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Social issues",
+              "count": 8,
+              "percent": 0.6
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Infrastructure/planning/ innovation",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 103,
+              "percent": 8.6
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1200,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1200,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1203,
+            "responseCountSumAvailable": 1203,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.9,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 162,
+              "percent": 13.5
+            },
+            {
+              "label": "Industrial relations",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Interest rates",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Housing affordability",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "Health care",
+              "count": 86,
+              "percent": 7.2
+            },
+            {
+              "label": "Education",
+              "count": 70,
+              "percent": 5.9
+            },
+            {
+              "label": "Defence/national security",
+              "count": 18,
+              "percent": 1.5
+            },
+            {
+              "label": "Terrorism",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Iraq war",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Afghan war",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 95,
+              "percent": 8
+            },
+            {
+              "label": "Water management",
+              "count": 43,
+              "percent": 3.6
+            },
+            {
+              "label": "Immigration",
+              "count": 83,
+              "percent": 6.9
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Taxation",
+              "count": 15,
+              "percent": 1.2
+            },
+            {
+              "label": "Better government",
+              "count": 48,
+              "percent": 4
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 48,
+              "percent": 4
+            },
+            {
+              "label": "Ageing population",
+              "count": 29,
+              "percent": 2.4
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 28,
+              "percent": 2.3
+            },
+            {
+              "label": "Other",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "None/no other",
+              "count": 31,
+              "percent": 2.6
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 10,
+              "percent": 0.8
+            },
+            {
+              "label": "Infrastructure/ planning/ innovation",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 4,
+              "percent": 0.4
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 141,
+              "percent": 11.8
+            },
+            {
+              "label": "Refused",
+              "count": 0,
+              "percent": 0
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1093,
+            "validPercent": 91,
+            "skippedN": 107,
+            "skippedPercent": 9,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1093,
+              "percent": 91
+            },
+            {
+              "label": "Skipped",
+              "count": 107,
+              "percent": 9
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1091,
+            "responseCountSumAvailable": 1091,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 91.1,
+            "percentWithinOnePointOf100": false,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 10,
+      "title": "ANU Poll 2011: Gambling",
+      "doi": "10.4225/87/3ii2on",
+      "fieldwork": {
+        "reportStart": "2011-04-27",
+        "reportEnd": "2011-05-10",
+        "adaCumulativeStart": "2011-04-27",
+        "adaCumulativeEnd": "2011-05-10",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1213,
+      "responseRatePercentReport": 32.8,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2011-07-28_ANUpoll_gambling_0_1.pdf",
+        "reportNumberPrinted": 10,
+        "cache": ".build/anupoll-issues-src/2011-07-28_ANUpoll_gambling_0_1.pdf",
+        "sha256": "3CC856DD0A1C2DA85175FC13B3E941D5AFA9743BC11F75A8CA88DD472C8782EF"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 220,
+              "percent": 18.2
+            },
+            {
+              "label": "Industrial relations",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Interest rates",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Housing affordability",
+              "count": 23,
+              "percent": 1.9
+            },
+            {
+              "label": "Health care",
+              "count": 51,
+              "percent": 4.2
+            },
+            {
+              "label": "Education",
+              "count": 37,
+              "percent": 3.1
+            },
+            {
+              "label": "Defence/national security",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Terrorism",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Afghan war",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 131,
+              "percent": 10.8
+            },
+            {
+              "label": "Water management",
+              "count": 8,
+              "percent": 0.6
+            },
+            {
+              "label": "Immigration",
+              "count": 244,
+              "percent": 20.1
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Taxation",
+              "count": 31,
+              "percent": 2.5
+            },
+            {
+              "label": "Better government",
+              "count": 109,
+              "percent": 9
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 17,
+              "percent": 1.4
+            },
+            {
+              "label": "Ageing population",
+              "count": 31,
+              "percent": 2.5
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 47,
+              "percent": 3.9
+            },
+            {
+              "label": "Poverty/Social exclusion/inequality",
+              "count": 23,
+              "percent": 1.9
+            },
+            {
+              "label": "None/no other",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Trade balance",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 1,
+              "percent": 0
+            },
+            {
+              "label": "Social services",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Infrastructure/Planning/Innovation",
+              "count": 21,
+              "percent": 1.7
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Foreign influence/Australia’s position in the world",
+              "count": 14,
+              "percent": 1.1
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Other Specify",
+              "count": 29,
+              "percent": 2.4
+            },
+            {
+              "label": "Don’t Know /can’t Say",
+              "count": 91,
+              "percent": 7.5
+            },
+            {
+              "label": "Refused",
+              "count": 2,
+              "percent": 0.2
+            }
+          ],
+          "base": {
+            "sampleN": 1213,
+            "validN": 1213,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1213,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1213,
+            "responseCountSumAvailable": 1213,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.8,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": true
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 194,
+              "percent": 16
+            },
+            {
+              "label": "Industrial relations",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Interest rates",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Housing affordability",
+              "count": 27,
+              "percent": 2.2
+            },
+            {
+              "label": "Health care",
+              "count": 74,
+              "percent": 6.1
+            },
+            {
+              "label": "Education",
+              "count": 49,
+              "percent": 4
+            },
+            {
+              "label": "Defence/national security",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Terrorism",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "Iraq war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Afghan war",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 86,
+              "percent": 7.1
+            },
+            {
+              "label": "Water management",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Immigration",
+              "count": 138,
+              "percent": 11.4
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Taxation",
+              "count": 26,
+              "percent": 2.1
+            },
+            {
+              "label": "Better government",
+              "count": 62,
+              "percent": 5.1
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 34,
+              "percent": 2.8
+            },
+            {
+              "label": "Ageing population",
+              "count": 39,
+              "percent": 3.2
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 34,
+              "percent": 2.8
+            },
+            {
+              "label": "Poverty/Social exclusion/inequality",
+              "count": 32,
+              "percent": 2.6
+            },
+            {
+              "label": "None/no other",
+              "count": 34,
+              "percent": 2.8
+            },
+            {
+              "label": "Trade balance",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Social services",
+              "count": 19,
+              "percent": 1.5
+            },
+            {
+              "label": "Infrastructure/Planning/Innovation",
+              "count": 19,
+              "percent": 1.6
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Foreign influence/Australia’s position in the world",
+              "count": 22,
+              "percent": 1.8
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Other Specify",
+              "count": 47,
+              "percent": 3.9
+            },
+            {
+              "label": "Don’t Know/can’t Say",
+              "count": 75,
+              "percent": 6.2
+            }
+          ],
+          "base": {
+            "sampleN": 1213,
+            "validN": 1108,
+            "validPercent": 91.3,
+            "skippedN": 105,
+            "skippedPercent": 8.7,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1108,
+              "percent": 91.3
+            },
+            {
+              "label": "Skipped",
+              "count": 105,
+              "percent": 8.7
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1108,
+            "responseCountSumAvailable": 1108,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 91.2,
+            "percentWithinOnePointOf100": false,
+            "countSumEqualsValidN": true
+          }
+        }
+      }
+    },
+    {
+      "wave": 11,
+      "title": "ANU Poll 2011: Food Security",
+      "doi": "10.26193/iheypj",
+      "fieldwork": {
+        "reportStart": "2011-07-12",
+        "reportEnd": "2011-07-25",
+        "adaCumulativeStart": "2011-07-12",
+        "adaCumulativeEnd": "2011-07-25",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": null,
+      "responseRatePercentReport": null,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": null,
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Poll 11 Food Security first-choice table is not present in a public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        },
+        "second": {
+          "prompt": null,
+          "coverage": "unavailable-public-source-gap",
+          "responses": [],
+          "base": {
+            "sampleN": null,
+            "validN": null,
+            "validPercent": null,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [],
+          "sourceLabel": "Poll 11 Food Security second-choice table is not present in a public ANU report",
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 0,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 0,
+            "percentWithinOnePointOf100": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 12,
+      "title": "ANU Poll 2011: Government Services",
+      "doi": "10.26193/5eo0o1",
+      "fieldwork": {
+        "reportStart": "2011-09-05",
+        "reportEnd": "2011-09-18",
+        "adaCumulativeStart": "2011-09-05",
+        "adaCumulativeEnd": "2011-09-18",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 2001,
+      "responseRatePercentReport": 33.1,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/ANUpoll_Report_11_Oct_2011_Attitude_to_government_services_0_0_1.pdf",
+        "reportNumberPrinted": 11,
+        "cache": ".build/anupoll-issues-src/ANUpoll_Report_11_Oct_2011_Attitude_to_government_services_0_0_1.pdf",
+        "sha256": "49F03A8E873BA5934C5FCAC9C4B42BC7A99AD94D8AC555D53BEF9D6E6CF91798"
+      },
+      "note": "ADA identifies this as poll 12; the cover prints Report No. 11. Poll 11 is Food Security.",
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy / jobs",
+              "count": 441,
+              "percent": 22.1
+            },
+            {
+              "label": "Industrial relations",
+              "count": 10,
+              "percent": 0.5
+            },
+            {
+              "label": "Interest rates",
+              "count": 1,
+              "percent": 0
+            },
+            {
+              "label": "Housing affordability",
+              "count": 20,
+              "percent": 1
+            },
+            {
+              "label": "Health care",
+              "count": 55,
+              "percent": 2.7
+            },
+            {
+              "label": "Education",
+              "count": 39,
+              "percent": 2
+            },
+            {
+              "label": "Defence / national security",
+              "count": 3,
+              "percent": 0.1
+            },
+            {
+              "label": "Terrorism",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Afghan war",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Environment / global warming",
+              "count": 196,
+              "percent": 9.8
+            },
+            {
+              "label": "Water management",
+              "count": 12,
+              "percent": 0.6
+            },
+            {
+              "label": "Immigration",
+              "count": 317,
+              "percent": 15.8
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 13,
+              "percent": 0.7
+            },
+            {
+              "label": "Taxation",
+              "count": 16,
+              "percent": 0.8
+            },
+            {
+              "label": "Better government",
+              "count": 353,
+              "percent": 17.6
+            },
+            {
+              "label": "Law and order / crime / justice system",
+              "count": 32,
+              "percent": 1.6
+            },
+            {
+              "label": "Ageing population",
+              "count": 35,
+              "percent": 1.8
+            },
+            {
+              "label": "Values / morals / respect for others",
+              "count": 72,
+              "percent": 3.6
+            },
+            {
+              "label": "Poverty / social exclusion / inequality",
+              "count": 75,
+              "percent": 3.8
+            },
+            {
+              "label": "Other",
+              "count": 85,
+              "percent": 4.3
+            },
+            {
+              "label": "None / no other",
+              "count": 11,
+              "percent": 0.5
+            },
+            {
+              "label": "Trade balance / loss of jobs to overseas",
+              "count": 9,
+              "percent": 0.5
+            },
+            {
+              "label": "Rural / farming issues",
+              "count": 1,
+              "percent": 0
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 4,
+              "percent": 0.2
+            },
+            {
+              "label": "Infrastructure / planning / innovation",
+              "count": 21,
+              "percent": 1
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 8,
+              "percent": 0.4
+            },
+            {
+              "label": "Young people’s behaviour / attitudes",
+              "count": 8,
+              "percent": 0.4
+            },
+            {
+              "label": "Foreign influence / Australia’s position in world",
+              "count": 12,
+              "percent": 0.6
+            },
+            {
+              "label": "Family / community / societal breakdown",
+              "count": 3,
+              "percent": 0.1
+            },
+            {
+              "label": "Carbon tax",
+              "count": 77,
+              "percent": 3.8
+            },
+            {
+              "label": "Don’t Know / Can’t Say",
+              "count": 72,
+              "percent": 3.6
+            }
+          ],
+          "base": {
+            "sampleN": 2001,
+            "validN": 2001,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 2001,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 2003,
+            "responseCountSumAvailable": 2003,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy / jobs",
+              "count": 294,
+              "percent": 14.7
+            },
+            {
+              "label": "Industrial relations",
+              "count": 16,
+              "percent": 0.8
+            },
+            {
+              "label": "Interest rates",
+              "count": 6,
+              "percent": 0.3
+            },
+            {
+              "label": "Housing affordability",
+              "count": 30,
+              "percent": 1.5
+            },
+            {
+              "label": "Health care",
+              "count": 94,
+              "percent": 4.7
+            },
+            {
+              "label": "Education",
+              "count": 79,
+              "percent": 3.9
+            },
+            {
+              "label": "Defence / national security",
+              "count": 10,
+              "percent": 0.5
+            },
+            {
+              "label": "Terrorism",
+              "count": 8,
+              "percent": 0.4
+            },
+            {
+              "label": "Iraq war",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Afghan war",
+              "count": 7,
+              "percent": 0.3
+            },
+            {
+              "label": "Environment / global warming",
+              "count": 181,
+              "percent": 9
+            },
+            {
+              "label": "Water management",
+              "count": 19,
+              "percent": 0.9
+            },
+            {
+              "label": "Immigration",
+              "count": 281,
+              "percent": 14
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 20,
+              "percent": 1
+            },
+            {
+              "label": "Taxation",
+              "count": 27,
+              "percent": 1.3
+            },
+            {
+              "label": "Better government",
+              "count": 163,
+              "percent": 8.1
+            },
+            {
+              "label": "Law and order / crime / justice system",
+              "count": 43,
+              "percent": 2.1
+            },
+            {
+              "label": "Ageing population",
+              "count": 27,
+              "percent": 1.3
+            },
+            {
+              "label": "Values / morals / respect for others",
+              "count": 57,
+              "percent": 2.9
+            },
+            {
+              "label": "Poverty / social exclusion / inequality",
+              "count": 94,
+              "percent": 4.7
+            },
+            {
+              "label": "Other",
+              "count": 93,
+              "percent": 4.6
+            },
+            {
+              "label": "None / no other",
+              "count": 64,
+              "percent": 3.2
+            },
+            {
+              "label": "Trade balance / loss of jobs to overseas",
+              "count": 10,
+              "percent": 0.5
+            },
+            {
+              "label": "Rural / farming issues",
+              "count": 12,
+              "percent": 0.6
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc.)",
+              "count": 10,
+              "percent": 0.5
+            },
+            {
+              "label": "Infrastructure / planning / innovation",
+              "count": 25,
+              "percent": 1.3
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Young people’s behaviour / attitudes",
+              "count": 10,
+              "percent": 0.5
+            },
+            {
+              "label": "Foreign influence / Australia’s position in world",
+              "count": 4,
+              "percent": 0.2
+            },
+            {
+              "label": "Family/community / societal breakdown",
+              "count": 3,
+              "percent": 0.1
+            },
+            {
+              "label": "Carbon tax",
+              "count": 64,
+              "percent": 3.2
+            },
+            {
+              "label": "Don’t Know / Can’t Say",
+              "count": 168,
+              "percent": 8.4
+            },
+            {
+              "label": "Refused",
+              "count": 1,
+              "percent": 0
+            }
+          ],
+          "base": {
+            "sampleN": 2001,
+            "validN": 1919,
+            "validPercent": 95.9,
+            "skippedN": 82,
+            "skippedPercent": 4.1,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1919,
+              "percent": 95.9
+            },
+            {
+              "label": "Skipped",
+              "count": 82,
+              "percent": 4.1
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1922,
+            "responseCountSumAvailable": 1922,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 95.6,
+            "percentWithinOnePointOf100": false,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 13,
+      "title": "ANU Poll 2012: Corruption",
+      "doi": "10.26193/wtcp31",
+      "fieldwork": {
+        "reportStart": "2012-08-13",
+        "reportEnd": "2012-09-09",
+        "adaCumulativeStart": "2012-08-20",
+        "adaCumulativeEnd": "2012-09-09",
+        "reportDiffersFromAda": true
+      },
+      "respondentsReport": 2020,
+      "responseRatePercentReport": 43,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/2012-10-26_ANUpoll_ethics_corruption.pdf_0_1.pdf",
+        "reportNumberPrinted": 13,
+        "cache": ".build/anupoll-issues-src/2012-10-26_ANUpoll_ethics_corruption.pdf_0_1.pdf",
+        "sha256": "B5A779D47635C950F4CEA337FDF33C04193B8705BAFAB00F8499D6C3EDD168DA"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 518,
+              "percent": 25.6
+            },
+            {
+              "label": "Industrial relations",
+              "count": 16,
+              "percent": 0.8
+            },
+            {
+              "label": "Interest rates",
+              "count": 1,
+              "percent": 0
+            },
+            {
+              "label": "Housing affordability",
+              "count": 10,
+              "percent": 0.5
+            },
+            {
+              "label": "Health care",
+              "count": 68,
+              "percent": 3.4
+            },
+            {
+              "label": "Education",
+              "count": 80,
+              "percent": 4
+            },
+            {
+              "label": "Defence/national security",
+              "count": 6,
+              "percent": 0.3
+            },
+            {
+              "label": "Terrorism",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Afghan war",
+              "count": 6,
+              "percent": 0.3
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 111,
+              "percent": 5.5
+            },
+            {
+              "label": "Water management",
+              "count": 5,
+              "percent": 0.2
+            },
+            {
+              "label": "Immigration",
+              "count": 308,
+              "percent": 15.3
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 9,
+              "percent": 0.5
+            },
+            {
+              "label": "Taxation",
+              "count": 25,
+              "percent": 1.3
+            },
+            {
+              "label": "Better government",
+              "count": 276,
+              "percent": 13.7
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 46,
+              "percent": 2.3
+            },
+            {
+              "label": "Ageing population",
+              "count": 14,
+              "percent": 0.7
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 88,
+              "percent": 4.3
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 76,
+              "percent": 3.8
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 36,
+              "percent": 1.8
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 21,
+              "percent": 1
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 9,
+              "percent": 0.5
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 19,
+              "percent": 0.9
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 21,
+              "percent": 1.1
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 12,
+              "percent": 0.6
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 4,
+              "percent": 0.2
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 16,
+              "percent": 0.8
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 6,
+              "percent": 0.3
+            },
+            {
+              "label": "Other",
+              "count": 69,
+              "percent": 3.4
+            },
+            {
+              "label": "None/ no other",
+              "count": 26,
+              "percent": 1.3
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 112,
+              "percent": 5.6
+            },
+            {
+              "label": "Refused",
+              "count": 3,
+              "percent": 0.2
+            }
+          ],
+          "base": {
+            "sampleN": 2020,
+            "validN": 2020,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 2020,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 2017,
+            "responseCountSumAvailable": 2017,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.2,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 353,
+              "percent": 17.5
+            },
+            {
+              "label": "Industrial relations",
+              "count": 8,
+              "percent": 0.4
+            },
+            {
+              "label": "Interest rates",
+              "count": 3,
+              "percent": 0.1
+            },
+            {
+              "label": "Housing affordability",
+              "count": 23,
+              "percent": 1.1
+            },
+            {
+              "label": "Health care",
+              "count": 106,
+              "percent": 5.2
+            },
+            {
+              "label": "Education",
+              "count": 84,
+              "percent": 4.2
+            },
+            {
+              "label": "Defence/national security",
+              "count": 13,
+              "percent": 0.7
+            },
+            {
+              "label": "Terrorism",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Iraq war",
+              "count": 4,
+              "percent": 0.2
+            },
+            {
+              "label": "Afghan war",
+              "count": 5,
+              "percent": 0.3
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 84,
+              "percent": 4.2
+            },
+            {
+              "label": "Water management",
+              "count": 17,
+              "percent": 0.8
+            },
+            {
+              "label": "Immigration",
+              "count": 272,
+              "percent": 13.5
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 21,
+              "percent": 1
+            },
+            {
+              "label": "Taxation",
+              "count": 18,
+              "percent": 0.9
+            },
+            {
+              "label": "Better government",
+              "count": 173,
+              "percent": 8.6
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 46,
+              "percent": 2.3
+            },
+            {
+              "label": "Ageing population",
+              "count": 18,
+              "percent": 0.9
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 77,
+              "percent": 3.8
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 79,
+              "percent": 3.9
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 30,
+              "percent": 1.5
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 9,
+              "percent": 0.5
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 7,
+              "percent": 0.3
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 29,
+              "percent": 1.4
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 30,
+              "percent": 1.5
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 17,
+              "percent": 0.8
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 6,
+              "percent": 0.3
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 19,
+              "percent": 1
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 3,
+              "percent": 0.1
+            },
+            {
+              "label": "Other",
+              "count": 82,
+              "percent": 4.1
+            },
+            {
+              "label": "None/ no other",
+              "count": 73,
+              "percent": 3.6
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 165,
+              "percent": 8.1
+            },
+            {
+              "label": "Refused",
+              "count": 2,
+              "percent": 0.1
+            }
+          ],
+          "base": {
+            "sampleN": 2020,
+            "validN": 1878,
+            "validPercent": 93,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1878,
+              "percent": 93
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1876,
+            "responseCountSumAvailable": 1876,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 92.9,
+            "percentWithinOnePointOf100": false,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 14,
+      "title": "ANU Poll 2013: Electoral Reform",
+      "doi": "10.26193/faoy9j",
+      "fieldwork": {
+        "reportStart": "2013-07-09",
+        "reportEnd": "2013-07-23",
+        "adaCumulativeStart": "2013-07-09",
+        "adaCumulativeEnd": "2013-07-23",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 48.3,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/ANUpoll-report-August-2014-attitudes-electoral-reform_0_0.pdf",
+        "reportNumberPrinted": 14,
+        "cache": ".build/anupoll-issues-src/ANUpoll-report-August-2014-attitudes-electoral-reform_0_0.pdf",
+        "sha256": "24B7F6D1F07A00786F0874722AB56BAE26D01D01E76DF476BC88D8D87BD7BEE1"
+      },
+      "note": null,
+      "questions": {
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 236,
+              "percent": 21.2
+            },
+            {
+              "label": "Industrial relations",
+              "count": 15,
+              "percent": 1.4
+            },
+            {
+              "label": "Interest rates",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Housing affordability",
+              "count": 21,
+              "percent": 1.9
+            },
+            {
+              "label": "Health care",
+              "count": 70,
+              "percent": 6.3
+            },
+            {
+              "label": "Education",
+              "count": 78,
+              "percent": 7
+            },
+            {
+              "label": "Defence/national security",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Terrorism",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 55,
+              "percent": 4.9
+            },
+            {
+              "label": "Water management",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Immigration",
+              "count": 148,
+              "percent": 13.3
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Taxation",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Better government",
+              "count": 97,
+              "percent": 8.7
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 29,
+              "percent": 2.6
+            },
+            {
+              "label": "Ageing population",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 60,
+              "percent": 5.4
+            },
+            {
+              "label": "Poverty/social exclusion/ inequality",
+              "count": 42,
+              "percent": 3.8
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 15,
+              "percent": 1.4
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 6,
+              "percent": 0.6
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc.)",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 33,
+              "percent": 3
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Other",
+              "count": 20,
+              "percent": 1.8
+            },
+            {
+              "label": "None/no other",
+              "count": 17,
+              "percent": 1.6
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 84,
+              "percent": 7.5
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1111,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1111,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1111,
+            "responseCountSumAvailable": 1111,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.9,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": true
+          }
+        },
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 363,
+              "percent": 30.3
+            },
+            {
+              "label": "Industrial relations",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Interest rates",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Housing affordability",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Health care",
+              "count": 43,
+              "percent": 3.6
+            },
+            {
+              "label": "Education",
+              "count": 50,
+              "percent": 4.2
+            },
+            {
+              "label": "Defence/national security",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Terrorism",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 67,
+              "percent": 5.6
+            },
+            {
+              "label": "Water management",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Immigration",
+              "count": 181,
+              "percent": 15.1
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Taxation",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Better government",
+              "count": 154,
+              "percent": 12.9
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 18,
+              "percent": 1.5
+            },
+            {
+              "label": "Ageing population",
+              "count": 10,
+              "percent": 0.8
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 44,
+              "percent": 3.6
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 44,
+              "percent": 3.7
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 23,
+              "percent": 1.9
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Other",
+              "count": 22,
+              "percent": 1.8
+            },
+            {
+              "label": "None/no other",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 75,
+              "percent": 6.3
+            },
+            {
+              "label": "Refused",
+              "count": 1,
+              "percent": 0.1
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1200,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1200,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1198,
+            "responseCountSumAvailable": 1198,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.1,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 15,
+      "title": "ANU Poll 2013: Priorities for Public Expenditure",
+      "doi": "10.26193/fv1pyr",
+      "fieldwork": {
+        "reportStart": "2013-11-25",
+        "reportEnd": "2013-12-16",
+        "adaCumulativeStart": "2013-12-02",
+        "adaCumulativeEnd": "2013-12-15",
+        "reportDiffersFromAda": true
+      },
+      "respondentsReport": 1142,
+      "responseRatePercentReport": 49,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/ANU_AttitudesPollExpenditureReport_0_0.pdf",
+        "reportNumberPrinted": 15,
+        "cache": ".build/anupoll-issues-src/ANU_AttitudesPollExpenditureReport_0_0.pdf",
+        "sha256": "97F1322FA979C4C7E59C6B7D019365C9E11C6BB1A2490A4E7262CEA230DAE7A0"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 374,
+              "percent": 32.8
+            },
+            {
+              "label": "Industrial relations",
+              "count": 19,
+              "percent": 1.7
+            },
+            {
+              "label": "Housing affordability",
+              "count": 11,
+              "percent": 1
+            },
+            {
+              "label": "Health care",
+              "count": 34,
+              "percent": 3
+            },
+            {
+              "label": "Education",
+              "count": 63,
+              "percent": 5.5
+            },
+            {
+              "label": "Defence/national security",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Afghan war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 79,
+              "percent": 6.9
+            },
+            {
+              "label": "Water management",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Immigration",
+              "count": 166,
+              "percent": 14.5
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Taxation",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Better government",
+              "count": 80,
+              "percent": 7
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 22,
+              "percent": 1.9
+            },
+            {
+              "label": "Ageing population",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 43,
+              "percent": 3.8
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 59,
+              "percent": 5.1
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 17,
+              "percent": 1.5
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 5,
+              "percent": 0.5
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 19,
+              "percent": 1.7
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "None/ no other",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Other",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Refused",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Don’t Know / Can’t Say",
+              "count": 50,
+              "percent": 4.4
+            }
+          ],
+          "base": {
+            "sampleN": 1142,
+            "validN": 1142,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1142,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1142,
+            "responseCountSumAvailable": 1142,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.1,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": true
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 198,
+              "percent": 18.4
+            },
+            {
+              "label": "Industrial relations",
+              "count": 17,
+              "percent": 1.6
+            },
+            {
+              "label": "Interest rates",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Housing affordability",
+              "count": 22,
+              "percent": 2.1
+            },
+            {
+              "label": "Health care",
+              "count": 66,
+              "percent": 6.1
+            },
+            {
+              "label": "Education",
+              "count": 97,
+              "percent": 9.1
+            },
+            {
+              "label": "Defence/national security",
+              "count": 15,
+              "percent": 1.4
+            },
+            {
+              "label": "Terrorism",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Iraq war",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Afghan war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 72,
+              "percent": 6.7
+            },
+            {
+              "label": "Water management",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Immigration",
+              "count": 121,
+              "percent": 11.2
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Taxation",
+              "count": 14,
+              "percent": 1.3
+            },
+            {
+              "label": "Better government",
+              "count": 41,
+              "percent": 3.8
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 32,
+              "percent": 3
+            },
+            {
+              "label": "Ageing population",
+              "count": 31,
+              "percent": 2.8
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 36,
+              "percent": 3.3
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 45,
+              "percent": 4.1
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 13,
+              "percent": 1.2
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 23,
+              "percent": 2.2
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 14,
+              "percent": 1.3
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "None/ no other",
+              "count": 74,
+              "percent": 6.9
+            },
+            {
+              "label": "Other",
+              "count": 11,
+              "percent": 1
+            },
+            {
+              "label": "Refused",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Don’t Know / Can’t Say",
+              "count": 85,
+              "percent": 7.9
+            }
+          ],
+          "base": {
+            "sampleN": 1142,
+            "validN": 1076,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1076,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1075,
+            "responseCountSumAvailable": 1075,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.7,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 16,
+      "title": "ANU Poll 16 - Foreign Policy, 2014",
+      "doi": "10.4225/87/oe09om",
+      "fieldwork": {
+        "reportStart": "2014-05-12",
+        "reportEnd": "2014-05-25",
+        "adaCumulativeStart": "2014-05-12",
+        "adaCumulativeEnd": "2014-05-25",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1204,
+      "responseRatePercentReport": 56,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/ANUpoll_Foreign_policy_0_0.pdf",
+        "reportNumberPrinted": 16,
+        "cache": ".build/anupoll-issues-src/ANUpoll_Foreign_policy_0_0.pdf",
+        "sha256": "3EE5E80DD7D959735FF2F73E1EBED66EB740DF151ADAFD4C2798F63ADDEA0B18"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 323,
+              "percent": 26.8
+            },
+            {
+              "label": "Industrial relations",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Interest rates",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Housing affordability",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Health care",
+              "count": 52,
+              "percent": 4.4
+            },
+            {
+              "label": "Education",
+              "count": 61,
+              "percent": 5.1
+            },
+            {
+              "label": "Defence/national security",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 47,
+              "percent": 3.9
+            },
+            {
+              "label": "Water management",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Immigration",
+              "count": 80,
+              "percent": 6.6
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Taxation",
+              "count": 20,
+              "percent": 1.7
+            },
+            {
+              "label": "Better government",
+              "count": 174,
+              "percent": 14.5
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 13,
+              "percent": 1.1
+            },
+            {
+              "label": "Ageing population",
+              "count": 31,
+              "percent": 2.5
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 31,
+              "percent": 2.6
+            },
+            {
+              "label": "Poverty/Social exclusion/inequality",
+              "count": 45,
+              "percent": 3.7
+            },
+            {
+              "label": "The budget",
+              "count": 81,
+              "percent": 6.8
+            },
+            {
+              "label": "Other (Specify)",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "(None/no other)",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 30,
+              "percent": 2.5
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 8,
+              "percent": 0.6
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 9,
+              "percent": 0.7
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 20,
+              "percent": 1.7
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Refused",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 101,
+              "percent": 8.4
+            }
+          ],
+          "base": {
+            "sampleN": 1204,
+            "validN": 1204,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1204,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1205,
+            "responseCountSumAvailable": 1205,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 218,
+              "percent": 20
+            },
+            {
+              "label": "Industrial relations",
+              "count": 15,
+              "percent": 1.4
+            },
+            {
+              "label": "Interest rates",
+              "count": 7,
+              "percent": 0.7
+            },
+            {
+              "label": "Housing affordability",
+              "count": 19,
+              "percent": 1.7
+            },
+            {
+              "label": "Health care",
+              "count": 91,
+              "percent": 8.3
+            },
+            {
+              "label": "Education",
+              "count": 97,
+              "percent": 8.9
+            },
+            {
+              "label": "Defence/national security",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Terrorism",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 61,
+              "percent": 5.6
+            },
+            {
+              "label": "Water management",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Immigration",
+              "count": 97,
+              "percent": 8.9
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Taxation",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Better government",
+              "count": 49,
+              "percent": 4.5
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 17,
+              "percent": 1.6
+            },
+            {
+              "label": "Ageing population",
+              "count": 23,
+              "percent": 2.1
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 32,
+              "percent": 3
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 62,
+              "percent": 5.7
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "The budget",
+              "count": 35,
+              "percent": 3.2
+            },
+            {
+              "label": "Other (Specify)",
+              "count": 13,
+              "percent": 1.2
+            },
+            {
+              "label": "(None/ no other)",
+              "count": 19,
+              "percent": 1.7
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc.)",
+              "count": 18,
+              "percent": 1.6
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 17,
+              "percent": 1.5
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 27,
+              "percent": 2.4
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 7,
+              "percent": 0.7
+            },
+            {
+              "label": "Refused",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 122,
+              "percent": 11.2
+            }
+          ],
+          "base": {
+            "sampleN": 1204,
+            "validN": 1091,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1091,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1094,
+            "responseCountSumAvailable": 1094,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.1,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 17,
+      "title": "ANU Poll 2014: Changing Views of Governance",
+      "doi": "10.26193/zgwu0k",
+      "fieldwork": {
+        "reportStart": "2014-06-23",
+        "reportEnd": "2014-07-09",
+        "adaCumulativeStart": "2014-06-23",
+        "adaCumulativeEnd": "2014-07-09",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1388,
+      "responseRatePercentReport": 63,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/ANU_SRC_Poll_Governance_1_0.pdf",
+        "reportNumberPrinted": 17,
+        "cache": ".build/anupoll-issues-src/ANU_SRC_Poll_Governance_1_0.pdf",
+        "sha256": "83B09DAA0AA6BDC82D0A83DF34B22ED75FA5F64858D0A7692A56EE270299D0CE"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 366,
+              "percent": 26.4
+            },
+            {
+              "label": "Industrial relations",
+              "count": 19,
+              "percent": 1.4
+            },
+            {
+              "label": "Interest rates",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Housing affordability",
+              "count": 15,
+              "percent": 1.1
+            },
+            {
+              "label": "Health care",
+              "count": 57,
+              "percent": 4.1
+            },
+            {
+              "label": "Education",
+              "count": 61,
+              "percent": 4.4
+            },
+            {
+              "label": "Defence/national security",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Terrorism",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 118,
+              "percent": 8.5
+            },
+            {
+              "label": "Water management",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Immigration",
+              "count": 131,
+              "percent": 9.5
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Taxation",
+              "count": 8,
+              "percent": 0.6
+            },
+            {
+              "label": "Better government",
+              "count": 176,
+              "percent": 12.7
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 26,
+              "percent": 1.9
+            },
+            {
+              "label": "Ageing population",
+              "count": 26,
+              "percent": 1.8
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 53,
+              "percent": 3.8
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 60,
+              "percent": 4.3
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "The budget",
+              "count": 45,
+              "percent": 3.3
+            },
+            {
+              "label": "Other (Specify)",
+              "count": 13,
+              "percent": 0.9
+            },
+            {
+              "label": "(None/ no other)",
+              "count": 28,
+              "percent": 2
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 10,
+              "percent": 0.7
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 17,
+              "percent": 1.2
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 6,
+              "percent": 0.4
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 25,
+              "percent": 1.8
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Refused",
+              "count": 11,
+              "percent": 0.8
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 94,
+              "percent": 6.7
+            }
+          ],
+          "base": {
+            "sampleN": 1388,
+            "validN": 1388,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1388,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1390,
+            "responseCountSumAvailable": 1390,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.1,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 209,
+              "percent": 15.1
+            },
+            {
+              "label": "Industrial relations",
+              "count": 18,
+              "percent": 1.3
+            },
+            {
+              "label": "Interest rates",
+              "count": 11,
+              "percent": 0.8
+            },
+            {
+              "label": "Housing affordability",
+              "count": 27,
+              "percent": 1.9
+            },
+            {
+              "label": "Health care",
+              "count": 102,
+              "percent": 7.4
+            },
+            {
+              "label": "Education",
+              "count": 91,
+              "percent": 6.6
+            },
+            {
+              "label": "Defence/national security",
+              "count": 11,
+              "percent": 0.8
+            },
+            {
+              "label": "Terrorism",
+              "count": 7,
+              "percent": 0.5
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 64,
+              "percent": 4.6
+            },
+            {
+              "label": "Water management",
+              "count": 10,
+              "percent": 0.7
+            },
+            {
+              "label": "Immigration",
+              "count": 94,
+              "percent": 6.8
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Taxation",
+              "count": 19,
+              "percent": 1.4
+            },
+            {
+              "label": "Better government",
+              "count": 76,
+              "percent": 5.5
+            },
+            {
+              "label": "Law and order/ crime/ justice system",
+              "count": 28,
+              "percent": 2
+            },
+            {
+              "label": "Ageing population",
+              "count": 36,
+              "percent": 2.6
+            },
+            {
+              "label": "Values/ morals/ respect for others",
+              "count": 40,
+              "percent": 2.8
+            },
+            {
+              "label": "Poverty/ Social exclusion/ inequality",
+              "count": 93,
+              "percent": 6.7
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "The budget",
+              "count": 29,
+              "percent": 2.1
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 6,
+              "percent": 0.4
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 12,
+              "percent": 0.8
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 13,
+              "percent": 1
+            },
+            {
+              "label": "Infrastructure/ Planning/ Innovation",
+              "count": 22,
+              "percent": 1.6
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 15,
+              "percent": 1.1
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 7,
+              "percent": 0.5
+            },
+            {
+              "label": "Other",
+              "count": 24,
+              "percent": 1.8
+            },
+            {
+              "label": "None/ no other",
+              "count": 63,
+              "percent": 4.5
+            },
+            {
+              "label": "Refused",
+              "count": 11,
+              "percent": 0.8
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 99,
+              "percent": 7.1
+            },
+            {
+              "label": "Not answered",
+              "count": 133,
+              "percent": 9.6
+            }
+          ],
+          "base": {
+            "sampleN": 1388,
+            "validN": 1388,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1388,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1389,
+            "responseCountSumAvailable": 1389,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 100.3,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 18,
+      "title": "ANU Poll 2014: Indigenous Affairs",
+      "doi": "10.26193/cgscua",
+      "fieldwork": {
+        "reportStart": "2014-09-22",
+        "reportEnd": "2014-10-05",
+        "adaCumulativeStart": "2014-09-22",
+        "adaCumulativeEnd": "2014-10-05",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1201,
+      "responseRatePercentReport": 25.4,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/Indigenous-Issues-ANU-Poll-2015_1.pdf",
+        "reportNumberPrinted": 17,
+        "cache": ".build/anupoll-issues-src/Indigenous-Issues-ANU-Poll-2015_1.pdf",
+        "sha256": "1BF9884DCB2B23AB40E63B8ED3DC4946B2B3CC54CCDE5ACDF78A385E12502729"
+      },
+      "note": "ADA identifies this as poll 18; the report cover prints Report No. 17, duplicating governance's printed number.",
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 250,
+              "percent": 20.8
+            },
+            {
+              "label": "Terrorism",
+              "count": 170,
+              "percent": 14.2
+            },
+            {
+              "label": "Immigration",
+              "count": 121,
+              "percent": 10
+            },
+            {
+              "label": "Better government",
+              "count": 103,
+              "percent": 8.6
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 96,
+              "percent": 8
+            },
+            {
+              "label": "Poverty/Social exclusion/Inequality",
+              "count": 74,
+              "percent": 6.2
+            },
+            {
+              "label": "None",
+              "count": 60,
+              "percent": 5
+            },
+            {
+              "label": "Defence/National security",
+              "count": 57,
+              "percent": 4.7
+            },
+            {
+              "label": "Values/Morals/respect for others",
+              "count": 49,
+              "percent": 4.1
+            },
+            {
+              "label": "Education",
+              "count": 46,
+              "percent": 3.8
+            },
+            {
+              "label": "Ageing population",
+              "count": 22,
+              "percent": 1.8
+            },
+            {
+              "label": "Health care",
+              "count": 18,
+              "percent": 1.5
+            },
+            {
+              "label": "The budget",
+              "count": 14,
+              "percent": 1.2
+            },
+            {
+              "label": "Industrial relations",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Other",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 10,
+              "percent": 0.8
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 10,
+              "percent": 0.8
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Housing affordability",
+              "count": 8,
+              "percent": 0.6
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Infrastructure/ Planning/Innovation",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Iraq war",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Taxation",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Afghan war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 2,
+              "percent": 0.1
+            },
+            {
+              "label": "Interest rates",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Water management",
+              "count": 0,
+              "percent": 0
+            },
+            {
+              "label": "Refused",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 5,
+              "percent": 0.4
+            }
+          ],
+          "base": {
+            "sampleN": 1201,
+            "validN": 1201,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1201,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1200,
+            "responseCountSumAvailable": 1200,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.8,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "And what do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 232,
+              "percent": 20.5
+            },
+            {
+              "label": "Immigration",
+              "count": 109,
+              "percent": 9.6
+            },
+            {
+              "label": "(None/no other)",
+              "count": 81,
+              "percent": 7.2
+            },
+            {
+              "label": "Better government",
+              "count": 77,
+              "percent": 6.8
+            },
+            {
+              "label": "Poverty/Social exclusion/ inequality",
+              "count": 72,
+              "percent": 6.4
+            },
+            {
+              "label": "Education",
+              "count": 64,
+              "percent": 5.6
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 63,
+              "percent": 5.5
+            },
+            {
+              "label": "Terrorism",
+              "count": 56,
+              "percent": 4.9
+            },
+            {
+              "label": "Health care",
+              "count": 47,
+              "percent": 4.2
+            },
+            {
+              "label": "Don’t know/can’t say",
+              "count": 37,
+              "percent": 3.2
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 36,
+              "percent": 3.2
+            },
+            {
+              "label": "Housing affordability",
+              "count": 34,
+              "percent": 3
+            },
+            {
+              "label": "Defence/national security",
+              "count": 29,
+              "percent": 2.6
+            },
+            {
+              "label": "Other (Specify)",
+              "count": 20,
+              "percent": 1.8
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 20,
+              "percent": 1.8
+            },
+            {
+              "label": "Industrial relations",
+              "count": 18,
+              "percent": 1.6
+            },
+            {
+              "label": "Ageing population",
+              "count": 16,
+              "percent": 1.4
+            },
+            {
+              "label": "The budget",
+              "count": 15,
+              "percent": 1.3
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 12,
+              "percent": 1.1
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 12,
+              "percent": 1.1
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 11,
+              "percent": 1
+            },
+            {
+              "label": "Alcohol and Drug use",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Family/community/societal breakdown",
+              "count": 9,
+              "percent": 0.8
+            },
+            {
+              "label": "Iraq war",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Foreign influence/Australia’s position in world",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Young people’s behaviour/attitudes",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Taxation",
+              "count": 6,
+              "percent": 0.6
+            },
+            {
+              "label": "Water management",
+              "count": 6,
+              "percent": 0.6
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Carbon Tax",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Interest rates",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Afghan war",
+              "count": null,
+              "percent": 0
+            },
+            {
+              "label": "Refused",
+              "count": 1,
+              "percent": 1
+            }
+          ],
+          "base": {
+            "sampleN": 1201,
+            "validN": 1133,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1133,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": null,
+            "responseCountSumAvailable": 1132,
+            "responseCountCellsMissing": 1,
+            "responsePercentSum": 101.1,
+            "percentWithinOnePointOf100": false,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    },
+    {
+      "wave": 19,
+      "title": "ANU Poll 2015: National Identity",
+      "doi": "10.26193/ccb9ts",
+      "fieldwork": {
+        "reportStart": "2015-03-02",
+        "reportEnd": "2015-03-15",
+        "adaCumulativeStart": "2015-03-02",
+        "adaCumulativeEnd": "2015-03-15",
+        "reportDiffersFromAda": false
+      },
+      "respondentsReport": 1200,
+      "responseRatePercentReport": 23.4,
+      "populationFrame": "National random sample of adults (18 years and over), telephone interview, as printed in ANU reports",
+      "report": {
+        "url": "https://polis.cass.anu.edu.au/files/docs/2025/6/ANUpoll-national-identity-042015_0.pdf",
+        "reportNumberPrinted": 18,
+        "cache": ".build/anupoll-issues-src/ANUpoll-national-identity-042015_0.pdf",
+        "sha256": "B45FA0AAC79FB8F26535CAA5BD7350F8B434C32A51653A64D521F1EC85BFEA33"
+      },
+      "note": null,
+      "questions": {
+        "first": {
+          "prompt": "What do you think is the most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 317,
+              "percent": 26.4
+            },
+            {
+              "label": "Better government",
+              "count": 175,
+              "percent": 14.6
+            },
+            {
+              "label": "Immigration",
+              "count": 122,
+              "percent": 10.2
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 72,
+              "percent": 6
+            },
+            {
+              "label": "Terrorism",
+              "count": 54,
+              "percent": 4.5
+            },
+            {
+              "label": "Education",
+              "count": 39,
+              "percent": 3.2
+            },
+            {
+              "label": "Poverty/social exclusion/inequality",
+              "count": 32,
+              "percent": 2.7
+            },
+            {
+              "label": "Health care",
+              "count": 31,
+              "percent": 2.6
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 30,
+              "percent": 2.5
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 29,
+              "percent": 2.5
+            },
+            {
+              "label": "Ageing population",
+              "count": 29,
+              "percent": 2.4
+            },
+            {
+              "label": "Housing affordability",
+              "count": 21,
+              "percent": 1.7
+            },
+            {
+              "label": "Industrial relations",
+              "count": 18,
+              "percent": 1.5
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 17,
+              "percent": 1.4
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 16,
+              "percent": 1.3
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 15,
+              "percent": 1.2
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 12,
+              "percent": 1
+            },
+            {
+              "label": "Defence/national security",
+              "count": 11,
+              "percent": 0.9
+            },
+            {
+              "label": "The budget",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Taxation",
+              "count": 7,
+              "percent": 0.6
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 5,
+              "percent": 0.4
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 4,
+              "percent": 0.3
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Water management",
+              "count": 1,
+              "percent": 0.1
+            },
+            {
+              "label": "Other",
+              "count": 35,
+              "percent": 2.9
+            },
+            {
+              "label": "None/no other",
+              "count": 6,
+              "percent": 0.5
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 67,
+              "percent": 5.6
+            },
+            {
+              "label": "Refused",
+              "count": 14,
+              "percent": 1.2
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1200,
+            "validPercent": 100,
+            "skippedN": null,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Total",
+              "count": 1200,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1198,
+            "responseCountSumAvailable": 1198,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.9,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        },
+        "second": {
+          "prompt": "What do you think is the second most important problem facing Australia today?",
+          "coverage": "complete-printed-response-table",
+          "responses": [
+            {
+              "label": "Economy/jobs",
+              "count": 227,
+              "percent": 20.4
+            },
+            {
+              "label": "Better government",
+              "count": 98,
+              "percent": 8.8
+            },
+            {
+              "label": "Immigration",
+              "count": 89,
+              "percent": 8
+            },
+            {
+              "label": "Education",
+              "count": 76,
+              "percent": 6.8
+            },
+            {
+              "label": "Environment/global warming",
+              "count": 73,
+              "percent": 6.6
+            },
+            {
+              "label": "Health care",
+              "count": 55,
+              "percent": 4.9
+            },
+            {
+              "label": "Poverty/social exclusion inequality",
+              "count": 52,
+              "percent": 4.7
+            },
+            {
+              "label": "Terrorism",
+              "count": 40,
+              "percent": 3.6
+            },
+            {
+              "label": "Values/morals/respect for others",
+              "count": 37,
+              "percent": 3.3
+            },
+            {
+              "label": "Ageing population",
+              "count": 36,
+              "percent": 3.2
+            },
+            {
+              "label": "Rural/farming issues",
+              "count": 33,
+              "percent": 3
+            },
+            {
+              "label": "Defence/national security",
+              "count": 23,
+              "percent": 2.1
+            },
+            {
+              "label": "Social services (including aged care, the disabled, etc)",
+              "count": 21,
+              "percent": 1.9
+            },
+            {
+              "label": "Young people's behaviour/attitudes",
+              "count": 19,
+              "percent": 1.7
+            },
+            {
+              "label": "Foreign influence/Australia's position in world",
+              "count": 16,
+              "percent": 1.4
+            },
+            {
+              "label": "Housing affordability",
+              "count": 15,
+              "percent": 1.4
+            },
+            {
+              "label": "Industrial relations",
+              "count": 13,
+              "percent": 1.2
+            },
+            {
+              "label": "The budget",
+              "count": 11,
+              "percent": 1
+            },
+            {
+              "label": "Infrastructure/planning/innovation",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Law and order/crime/justice system",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Alcohol and drug use",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Indigenous affairs",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Taxation",
+              "count": 8,
+              "percent": 0.7
+            },
+            {
+              "label": "Trade balance/loss of jobs to overseas",
+              "count": 3,
+              "percent": 0.3
+            },
+            {
+              "label": "Iraq war",
+              "count": 2,
+              "percent": 0.2
+            },
+            {
+              "label": "Water management",
+              "count": 3,
+              "percent": 0.2
+            },
+            {
+              "label": "Other",
+              "count": 19,
+              "percent": 1.7
+            },
+            {
+              "label": "None/no other",
+              "count": 10,
+              "percent": 0.9
+            },
+            {
+              "label": "Don't know/can't say",
+              "count": 89,
+              "percent": 8
+            },
+            {
+              "label": "Refused",
+              "count": 7,
+              "percent": 0.7
+            }
+          ],
+          "base": {
+            "sampleN": 1200,
+            "validN": 1113,
+            "validPercent": 100,
+            "skippedN": 87,
+            "skippedPercent": null,
+            "printedOverallN": null
+          },
+          "printedFooter": [
+            {
+              "label": "Missing",
+              "count": 87,
+              "percent": null
+            },
+            {
+              "label": "Total",
+              "count": 1113,
+              "percent": 100
+            }
+          ],
+          "checks": {
+            "responseCountSum": 1111,
+            "responseCountSumAvailable": 1111,
+            "responseCountCellsMissing": 0,
+            "responsePercentSum": 99.9,
+            "percentWithinOnePointOf100": true,
+            "countSumEqualsValidN": false
+          }
+        }
+      }
+    }
+  ]
+}

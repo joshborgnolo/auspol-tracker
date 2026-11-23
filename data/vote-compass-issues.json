@@ -1,0 +1,4150 @@
+{
+  "schemaVersion": 1,
+  "name": "Vote Compass historical issue priority",
+  "generatedBy": ".build/extract-vote-compass-issues.mjs",
+  "deterministic": true,
+  "electionYears": [
+    2013,
+    2016,
+    2019,
+    2022,
+    2025
+  ],
+  "measure": {
+    "label": "Respondents nominating an issue in response to the most-important-issue prompt",
+    "unit": "percent",
+    "valuesBasis": "Publisher-weighted chart percentages. Values keep their published precision and need not sum to 100; no row or dataset is renormalised.",
+    "nullMeaning": "Not published or blank in the source table; never zero."
+  },
+  "methodology": {
+    "design": "Self-selected online non-probability participation in Vote Compass, with publisher/applied weighting varying by release.",
+    "probabilitySample": false,
+    "populationCaveat": "Do not describe these raw-n figures as a probability survey or equate a large self-selected sample with probability-sample precision. Publisher claims of national representativeness are retained as attributed source statements, not independently verified.",
+    "uncertainty": "No confidence interval is calculated here from raw n. Publisher-modelled error estimates are retained only where the cited chart prints them.",
+    "identityProtection": "No respondent-level records are imported. The 2025 question config's optional and sensitive flags describe the instrument, not sample sizes or aggregates."
+  },
+  "publications": [
+    {
+      "id": "abc-2013-important-issues",
+      "electionYear": 2013,
+      "title": "Vote Compass: The most important issues to voters",
+      "url": "https://www.abc.net.au/news/2013-08-09/vote-compass-data-results-important-issues/4872896",
+      "publishedAt": "2013-08-09T02:04:10+00:00",
+      "modifiedAt": null,
+      "sampleStatement": "Findings are based on the results of the initial 250,000 respondents to Vote Compass between August 4 and 6. Respondents were asked: \"Which issue is most important to you personally in this election campaign?\" Data have been weighted by gender, age, education, enrolment as a student, religion, marital status and state using the latest population estimates to be a true representation of opinion at the time of the field, resulting in an effective sample size of 53,644 respondents.",
+      "questionStatement": "Respondents were asked: \"Which issue is most important to you personally in this election campaign?\"",
+      "qualitativeConclusions": [
+        "The economy is by far the most important election issue for Australian voters, according to preliminary results from the ABC's policy comparison tool, Vote Compass."
+      ],
+      "methodologyCaveats": [
+        "Vote Compass is not a poll. It is primarily and fundamentally an educational tool intended to promote electoral literacy and stimulate public engagement in the policy aspect of election campaigns.",
+        "Online surveys are inherently prone to selection bias but statisticians have long been able to correct for this (given the availability of certain variables) by drawing on population estimates such as Census micro-data."
+      ],
+      "cache": ".build/vote-compass-issues-src/2013-abc-important-issues.html"
+    },
+    {
+      "id": "abc-2016-important-issues",
+      "electionYear": 2016,
+      "title": "Vote Compass: Double dissolution trigger not a big issue for voters",
+      "url": "https://www.abc.net.au/news/2016-05-13/vote-compass-economy-important-issues/7408232",
+      "publishedAt": "2016-05-12T20:00:15+00:00",
+      "modifiedAt": "2016-05-12T21:55:09+00:00",
+      "fieldwork": {
+        "start": "2016-05-08",
+        "end": "2016-05-11",
+        "precision": "day"
+      },
+      "sample": {
+        "responses": 60310,
+        "statement": "These findings are based on 60,310 respondents who participated in Vote Compass from May 8 to May 11, 2016. The data has been weighted to ensure the sample reflects the Australian population. [ Read the Vote Compass data FAQ ]"
+      },
+      "sampleStatement": "These findings are based on 60,310 respondents who participated in Vote Compass from May 8 to May 11, 2016. The data has been weighted to ensure the sample reflects the Australian population. [ Read the Vote Compass data FAQ ]",
+      "qualitativeConclusions": [
+        "The results show Australians consider the economy the most important election issue, followed by education and health."
+      ],
+      "numericIssueFiguresInArticle": false,
+      "note": "This contemporaneous article publishes the 60,310-respondent, 8–11 May sample and a qualitative ranking only. Those sample details are not assigned to retrospective 2016 figures published in 2019 or 2022.",
+      "cache": ".build/vote-compass-issues-src/2016-abc-important-issues.html"
+    },
+    {
+      "id": "abc-2019-important-issues",
+      "electionYear": 2019,
+      "title": "Vote Compass finds voters are split on economy and environment as most important issue",
+      "url": "https://www.abc.net.au/news/2019-04-17/vote-compass-election-most-important-issues/11003192",
+      "publishedAt": "2019-04-17T05:09:01+00:00",
+      "modifiedAt": "2019-04-17T15:20:57+00:00",
+      "weightingStatement": "Vote Compass responses have been weighted by gender, age, education and place of residence to match the Australian population, creating a nationally representative sample. The sample size for this report is 119,516 respondents Find about more about the methodology in this explainer.",
+      "cache": ".build/vote-compass-issues-src/2019-abc-important-issues.html"
+    },
+    {
+      "id": "abc-2022-important-issues",
+      "electionYear": 2022,
+      "title": "Vote Compass data shows climate change, cost of living and the economy are the big election issues, but voters still split along party lines",
+      "url": "https://www.abc.net.au/news/2022-04-22/vote-compass-federal-election-issues-data-climate-change-economy/101002116",
+      "publishedAt": "2022-04-21T19:01:42+00:00",
+      "modifiedAt": "2022-04-22T02:19:09+00:00",
+      "weightingStatement": "Vote Compass responses have been weighted by gender, age, education, language, religion, place of residence and past vote to match the Australian population, creating a nationally representative sample. The sample size for this report is 97,159 respondents. Find about more about the methodology in this explainer.",
+      "cache": ".build/vote-compass-issues-src/2022-abc-important-issues.html"
+    },
+    {
+      "id": "abc-2025-important-issues",
+      "electionYear": 2025,
+      "title": "Vote Compass data shows rise in importance of cost of living ahead of 2025 federal election",
+      "url": "https://www.abc.net.au/news/2025-04-20/federal-election-2025-most-important-issue-vote-compass/105178788",
+      "publishedAt": "2025-04-19T19:04:56+00:00",
+      "modifiedAt": "2025-04-20T00:52:01+00:00",
+      "methodologyCaveats": [
+        "Vote Compass is an educational tool designed to promote electoral literacy and civic engagement. While not a conventional public opinion poll, Vote Compass responses can be analysed using statistical methods similar to those used in polling to try to adjust for sampling bias.",
+        "Responses have been weighted by gender, age, education, language, religion, place of residence and past vote to account for the selection effects of the sample, enabling us to make statistical inferences about the Australian population."
+      ],
+      "cache": ".build/vote-compass-issues-src/2025-abc-important-issues.html"
+    }
+  ],
+  "sourceAudits": {
+    "dataGovAu2013": {
+      "requestedDatasetId": "ee721ad4-8205-4263-b040-c7c5b5e6d1c8f4",
+      "resolvedDatasetId": "ee721ad4-8205-4263-b040-c7c5e6d1c8f4",
+      "canonicalOverallUrl": "https://data.gov.au/data/dataset/vote-compass-2013-overall",
+      "sourceApiUrl": "https://data.gov.au/data/api/3/action/package_search?q=Vote%20Compass%202013&rows=100",
+      "packageCount": 16,
+      "resourceCount": 493,
+      "packages": [
+        {
+          "package": "vote-compass-2013-vote-choice",
+          "canonicalUrl": "https://data.gov.au/data/dataset/2b27f3a7-c94c-438a-b956-a1c875eca8e1",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-rurality",
+          "canonicalUrl": "https://data.gov.au/data/dataset/bb70f407-b8aa-4aa5-a539-f0272950873a",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-region",
+          "canonicalUrl": "https://data.gov.au/data/dataset/8d91f365-9402-46fc-b9ce-1f5bd07791be",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-language",
+          "canonicalUrl": "https://data.gov.au/data/dataset/9a609cd6-ec8f-44b3-a4c3-0a0e8f3f1f51",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-industry",
+          "canonicalUrl": "https://data.gov.au/data/dataset/f758be9f-99e9-45c9-9236-03846e8c7578",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-gender",
+          "canonicalUrl": "https://data.gov.au/data/dataset/975445bc-c2b8-436c-9ff1-8bcf29a5d61a",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-religion",
+          "canonicalUrl": "https://data.gov.au/data/dataset/26c36224-87a1-4a68-9a98-c585d54aa28e",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-student",
+          "canonicalUrl": "https://data.gov.au/data/dataset/882f3ef0-89e8-4553-93f0-767f58dd8f74",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-education",
+          "canonicalUrl": "https://data.gov.au/data/dataset/57368f66-192f-4d19-9193-40edd85826b2",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-overall",
+          "canonicalUrl": "https://data.gov.au/data/dataset/ee721ad4-8205-4263-b040-c7c5e6d1c8f4",
+          "resourceCount": 28,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27
+          ]
+        },
+        {
+          "package": "vote-compass-2013-self-placement",
+          "canonicalUrl": "https://data.gov.au/data/dataset/a4051be1-8236-44a6-b150-2998c7d4d11f",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-political-interest",
+          "canonicalUrl": "https://data.gov.au/data/dataset/6f4c64ae-7b57-4796-9811-41460c0f73a5",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-immigration-status",
+          "canonicalUrl": "https://data.gov.au/data/dataset/a2e08f6c-ae74-4f01-8553-a7b05f55ba80",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-marital-status",
+          "canonicalUrl": "https://data.gov.au/data/dataset/45007a0e-8273-4b57-bc86-7038ac9eaae5",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-age-group",
+          "canonicalUrl": "https://data.gov.au/data/dataset/213b99e7-cce9-44fd-ac73-21517c37735e",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        },
+        {
+          "package": "vote-compass-2013-household-weekly-income",
+          "canonicalUrl": "https://data.gov.au/data/dataset/e7074952-3c63-41f3-af14-7e82198a7dd6",
+          "resourceCount": 31,
+          "policyQuestionNumbers": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ]
+        }
+      ],
+      "finding": "The 16 related packages enumerate only the 30 policy-attitude questions. None publishes a Which issue is most important resource. The overall package omits Q28–Q30 as well as issue priority; the other packages have Q1–Q30 plus the answer key. No issue-priority figure is imported from this collection.",
+      "caches": [
+        ".build/vote-compass-issues-src/2013-data-gov-overall.html",
+        ".build/vote-compass-issues-src/2013-data-gov-package-search.json",
+        ".build/vote-compass-issues-src/2013-vote-compass-questions.csv"
+      ]
+    },
+    "excludedFromNumericStore": [
+      "The 2013 final policy-attitude explorer and data.gov.au response CSVs concern Q1–Q30 policy statements, not issue priority; their final-sample counts must not be attached to the preliminary salience chart.",
+      "The 2025 Vote Compass instance config contributes wording and optional/sensitive/free-text metadata only; it is not an aggregate respondent-data source."
+    ]
+  },
+  "datasets": [
+    {
+      "id": "2013-preliminary-abc-salience-chart",
+      "electionYear": 2013,
+      "publicationIds": [
+        "abc-2013-important-issues"
+      ],
+      "timing": "contemporaneous preliminary release",
+      "fieldwork": {
+        "start": "2013-08-04",
+        "end": "2013-08-06",
+        "precision": "day"
+      },
+      "sample": {
+        "responses": 250000,
+        "weightedEffectiveResponses": 53644,
+        "statement": "Findings are based on the results of the initial 250,000 respondents to Vote Compass between August 4 and 6. Respondents were asked: \"Which issue is most important to you personally in this election campaign?\" Data have been weighted by gender, age, education, enrolment as a student, religion, marital status and state using the latest population estimates to be a true representation of opinion at the time of the field, resulting in an effective sample size of 53,644 respondents."
+      },
+      "weightingStatement": "Findings are based on the results of the initial 250,000 respondents to Vote Compass between August 4 and 6. Respondents were asked: \"Which issue is most important to you personally in this election campaign?\" Data have been weighted by gender, age, education, enrolment as a student, religion, marital status and state using the latest population estimates to be a true representation of opinion at the time of the field, resulting in an effective sample size of 53,644 respondents.",
+      "question": {
+        "text": "Which issue is most important to you personally in this election campaign?",
+        "responseMode": null,
+        "optional": null,
+        "sensitive": null,
+        "note": "Response mode is not stated in the cited article or chart source."
+      },
+      "notes": [
+        "The archived ABC CSV is the primary numeric source; data.gov.au does not contain this issue-priority matrix.",
+        "Values are chart percentages at their published precision, not renormalised shares."
+      ],
+      "sources": [
+        {
+          "id": "abc-2013-salience-chart-csv",
+          "kind": "delimited chart data",
+          "url": "http://www.abc.net.au/news/code/4867996/Salience+Chart+Data+%28CSV%29+%281%29.js",
+          "cache": ".build/vote-compass-issues-src/2013-salience-chart-data.csv.js",
+          "role": "all 2013 issue-priority figures",
+          "archivedUrl": "https://web.archive.org/web/20130810072743id_/http://www.abc.net.au/news/code/4867996/Salience+Chart+Data+%28CSV%29+%281%29.js",
+          "archiveCapture": "2013-08-10T07:27:43Z"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "Overall",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "Overall": 12.92412407
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "Overall": 6.838008434
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "Overall": 0.861179817
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "Overall": 9.280879542
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "Overall": 0.927840742
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "Overall": 27.82589913
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Overall": 9.165294505
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "Overall": 1.659452391
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "Overall": 9.793339491
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "Overall": 1.24213938
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "Overall": 0.681415626
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "Overall": 1.437129914
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "Overall": 3.053525043
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "Overall": 0.747628954
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "Overall": 5.620052798
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "Overall": 2.348198179
+              }
+            }
+          ]
+        },
+        {
+          "id": "vote-intention",
+          "label": "Vote Intention",
+          "groups": [
+            "ALP",
+            "LIB",
+            "GRN",
+            "NAT",
+            "KAP",
+            "PUP"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "ALP": 9.76230784,
+                "LIB": 11.93451816,
+                "GRN": 22.28902466,
+                "NAT": 9.134773792,
+                "KAP": 12.39821136,
+                "PUP": 9.604963434
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "ALP": 12.89286091,
+                "LIB": 1.291047954,
+                "GRN": 6.346662317,
+                "NAT": 1.660210397,
+                "KAP": 4.144337802,
+                "PUP": 5.14898037
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "ALP": 0.891272386,
+                "LIB": 0.749599079,
+                "GRN": 1.101026522,
+                "NAT": 1.203404847,
+                "KAP": 0.275402762,
+                "PUP": 0.926447155
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "ALP": 11.22951595,
+                "LIB": 1.573076711,
+                "GRN": 25.15825655,
+                "NAT": 1.334242216,
+                "KAP": 5.1398397,
+                "PUP": 3.996658492
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "ALP": 0.323150023,
+                "LIB": 1.765669599,
+                "GRN": 0.151742681,
+                "NAT": 0.897470171,
+                "KAP": 3.161400639,
+                "PUP": 2.932339909
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "ALP": 17.16466705,
+                "LIB": 49.74418442,
+                "GRN": 5.455510787,
+                "NAT": 45.02202384,
+                "KAP": 27.12625508,
+                "PUP": 23.13361652
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "ALP": 13.01623258,
+                "LIB": 4.746861133,
+                "GRN": 11.74881745,
+                "NAT": 6.384268203,
+                "KAP": 1.314625566,
+                "PUP": 6.568024691
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "ALP": 1.091146721,
+                "LIB": 1.629825169,
+                "GRN": 1.53194266,
+                "NAT": 4.991345378,
+                "KAP": 5.698845055,
+                "PUP": 4.382654069
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "ALP": 12.88198673,
+                "LIB": 7.43344676,
+                "GRN": 7.530654806,
+                "NAT": 7.163389472,
+                "KAP": 12.54754604,
+                "PUP": 12.11576278
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "ALP": 1.04873426,
+                "LIB": 1.350496865,
+                "GRN": 0.56888116,
+                "NAT": 2.634678839,
+                "KAP": 4.382098624,
+                "PUP": 2.38379799
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "ALP": 0.330240348,
+                "LIB": 0.838451426,
+                "GRN": 0.677763375,
+                "NAT": 0.726122905,
+                "KAP": 4.270549762,
+                "PUP": 1.477275088
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "ALP": 2.040008341,
+                "LIB": 0.702377161,
+                "GRN": 1.979188736,
+                "NAT": 0.600264292,
+                "KAP": 1.163090453,
+                "PUP": 1.258933151
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "ALP": 2.012152797,
+                "LIB": 4.819957269,
+                "GRN": 0.979218447,
+                "NAT": 4.758702437,
+                "KAP": 2.591661056,
+                "PUP": 8.25719464
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "ALP": 0.957564494,
+                "LIB": 0.493164899,
+                "GRN": 0.788705065,
+                "NAT": 0.075501556,
+                "KAP": 0.715046594,
+                "PUP": 0.890149448
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "ALP": 5.465025186,
+                "LIB": 6.022104412,
+                "GRN": 4.637661192,
+                "NAT": 5.12021863,
+                "KAP": 6.262203742,
+                "PUP": 4.476142542
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "ALP": 3.932070648,
+                "LIB": 1.406119158,
+                "GRN": 1.276075197,
+                "NAT": 2.475011586,
+                "KAP": 0.377151308,
+                "PUP": 0.314859161
+              }
+            }
+          ]
+        },
+        {
+          "id": "ideology",
+          "label": "Ideology",
+          "groups": [
+            "Left",
+            "Centre-left",
+            "Centre",
+            "Centre-right",
+            "Right"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "Left": 21.83915745,
+                "Centre-left": 13.78775165,
+                "Centre": 10.51464966,
+                "Centre-right": 10.27985631,
+                "Right": 16.89011047
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "Left": 8.99183709,
+                "Centre-left": 10.39004529,
+                "Centre": 7.555314678,
+                "Centre-right": 2.66343244,
+                "Right": 1.60579374
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "Left": 0.589663075,
+                "Centre-left": 0.801488022,
+                "Centre": 1.264572196,
+                "Centre-right": 0.626801015,
+                "Right": 0.228733834
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "Left": 18.95687666,
+                "Centre-left": 16.08191909,
+                "Centre": 6.611875386,
+                "Centre-right": 2.983858572,
+                "Right": 2.188713239
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "Left": 0.337022718,
+                "Centre-left": 0.153521786,
+                "Centre": 1.163274192,
+                "Centre-right": 1.61491368,
+                "Right": 1.815076555
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "Left": 7.444211378,
+                "Centre-left": 13.64489547,
+                "Centre": 25.23157099,
+                "Centre-right": 48.90854089,
+                "Right": 48.0685734
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Left": 10.25177737,
+                "Centre-left": 13.23005855,
+                "Centre": 9.202954751,
+                "Centre-right": 5.324717933,
+                "Right": 2.361899793
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "Left": 0.776995569,
+                "Centre-left": 1.292354382,
+                "Centre": 2.064657828,
+                "Centre-right": 1.825770628,
+                "Right": 1.86867756
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "Left": 9.728202794,
+                "Centre-left": 9.226628272,
+                "Centre": 13.642511,
+                "Centre-right": 7.742651067,
+                "Right": 6.241682209
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "Left": 0.356460522,
+                "Centre-left": 0.783673054,
+                "Centre": 1.730823893,
+                "Centre-right": 1.573701265,
+                "Right": 1.284892963
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "Left": 0.357847239,
+                "Centre-left": 0.399791234,
+                "Centre": 0.883202761,
+                "Centre-right": 0.624753175,
+                "Right": 1.228693461
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "Left": 1.97614988,
+                "Centre-left": 2.121695861,
+                "Centre": 1.270628766,
+                "Centre-right": 0.799861371,
+                "Right": 0.676282679
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "Left": 1.27505977,
+                "Centre-left": 1.951887504,
+                "Centre": 4.060276521,
+                "Centre-right": 3.875062474,
+                "Right": 2.875141454
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "Left": 0.790718884,
+                "Centre-left": 0.908832926,
+                "Centre": 0.836895438,
+                "Centre-right": 0.488367519,
+                "Right": 0.635671925
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "Left": 4.487700025,
+                "Centre-left": 5.457286372,
+                "Centre": 6.159988345,
+                "Centre-right": 5.376757009,
+                "Right": 6.450140845
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "Left": 3.96698262,
+                "Centre-left": 3.166342326,
+                "Centre": 2.138738594,
+                "Centre-right": 1.559447368,
+                "Right": 0.951834852
+              }
+            }
+          ]
+        },
+        {
+          "id": "gender",
+          "label": "Gender",
+          "groups": [
+            "Men",
+            "Women"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "Men": 9.282303641,
+                "Women": 16.33680066
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "Men": 10.75838892,
+                "Women": 3.164298816
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "Men": 0.264172558,
+                "Women": 1.4206233
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "Men": 7.757003667,
+                "Women": 10.70887294
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "Men": 1.437316486,
+                "Women": 0.45042128
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "Men": 33.60025617,
+                "Women": 22.4148654
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Men": 5.935605801,
+                "Women": 12.19177076
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "Men": 1.520118226,
+                "Women": 1.790019632
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "Men": 7.135158803,
+                "Women": 12.28426709
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "Men": 1.95496962,
+                "Women": 0.574160514
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "Men": 0.803518183,
+                "Women": 0.566995779
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "Men": 1.076420573,
+                "Women": 1.775143374
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "Men": 3.492194976,
+                "Women": 2.642456281
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "Men": 1.086109924,
+                "Women": 0.430445252
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "Men": 6.306415777,
+                "Women": 4.976875869
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "Men": 2.727776811,
+                "Women": 1.992502686
+              }
+            }
+          ]
+        },
+        {
+          "id": "age",
+          "label": "Age",
+          "groups": [
+            "18-34",
+            "35-54",
+            "55+"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "18-34": 14.12640192,
+                "35-54": 10.5706687,
+                "55+": 14.78892239
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "18-34": 10.30829604,
+                "35-54": 6.321442548,
+                "55+": 3.965652181
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "18-34": 1.527378661,
+                "35-54": 0.932748954,
+                "55+": 0.085213418
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "18-34": 9.60860363,
+                "35-54": 9.944952832,
+                "55+": 8.072063269
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "18-34": 1.111979706,
+                "35-54": 0.832168985,
+                "55+": 0.86520809
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "18-34": 19.12233916,
+                "35-54": 29.56617329,
+                "55+": 34.4449377
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "18-34": 12.98781677,
+                "35-54": 9.634657351,
+                "55+": 4.63572701
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "18-34": 1.325691757,
+                "35-54": 2.025330807,
+                "55+": 1.519839245
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "18-34": 7.658679113,
+                "35-54": 7.594471135,
+                "55+": 14.87009432
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "18-34": 0.598055447,
+                "35-54": 1.369850342,
+                "55+": 1.733375604
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "18-34": 0.762366895,
+                "35-54": 0.762969112,
+                "55+": 0.491303709
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "18-34": 1.458886711,
+                "35-54": 1.586850678,
+                "55+": 1.217947427
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "18-34": 2.984735474,
+                "35-54": 4.195480565,
+                "55+": 1.622012681
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "18-34": 1.190309759,
+                "35-54": 0.547631183,
+                "55+": 0.557596398
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "18-34": 4.826633244,
+                "35-54": 5.317440241,
+                "55+": 6.830098079
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "18-34": 2.161210725,
+                "35-54": 3.382328275,
+                "55+": 1.179471944
+              }
+            }
+          ]
+        },
+        {
+          "id": "income",
+          "label": "Income",
+          "groups": [
+            "< $800 pw",
+            "$800-$2000 pw",
+            "> $2000 pw"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "< $800 pw": 14.8618927,
+                "$800-$2000 pw": 13.58834707,
+                "> $2000 pw": 10.69361811
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "< $800 pw": 5.883478459,
+                "$800-$2000 pw": 7.300215253,
+                "> $2000 pw": 7.05203618
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "< $800 pw": 0.490609572,
+                "$800-$2000 pw": 0.670834753,
+                "> $2000 pw": 1.358698757
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "< $800 pw": 9.542794064,
+                "$800-$2000 pw": 9.723999725,
+                "> $2000 pw": 8.5833968
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "< $800 pw": 0.964429066,
+                "$800-$2000 pw": 0.984706408,
+                "> $2000 pw": 0.836049763
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "< $800 pw": 23.90180407,
+                "$800-$2000 pw": 26.68697325,
+                "> $2000 pw": 32.11174942
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "< $800 pw": 8.060930076,
+                "$800-$2000 pw": 9.258359781,
+                "> $2000 pw": 9.907939733
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "< $800 pw": 1.970900817,
+                "$800-$2000 pw": 1.656343088,
+                "> $2000 pw": 1.424084677
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "< $800 pw": 14.9045233,
+                "$800-$2000 pw": 9.262804753,
+                "> $2000 pw": 6.468116322
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "< $800 pw": 1.325693746,
+                "$800-$2000 pw": 1.260252121,
+                "> $2000 pw": 1.157761337
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "< $800 pw": 0.592301435,
+                "$800-$2000 pw": 0.547496389,
+                "> $2000 pw": 0.899845418
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "< $800 pw": 1.953922402,
+                "$800-$2000 pw": 1.260089572,
+                "> $2000 pw": 1.23921194
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "< $800 pw": 1.914846502,
+                "$800-$2000 pw": 2.868062785,
+                "> $2000 pw": 4.134640353
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "< $800 pw": 0.52171723,
+                "$800-$2000 pw": 0.794258033,
+                "> $2000 pw": 0.868623914
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "< $800 pw": 6.134814442,
+                "$800-$2000 pw": 6.095301941,
+                "> $2000 pw": 4.692651577
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "< $800 pw": 1.331043382,
+                "$800-$2000 pw": 2.503615691,
+                "> $2000 pw": 2.954081559
+              }
+            }
+          ]
+        },
+        {
+          "id": "region",
+          "label": "Region",
+          "groups": [
+            "ACT",
+            "NSW",
+            "NT",
+            "Qld",
+            "SA",
+            "Tas",
+            "Vic",
+            "WA"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "ACT": 12.12114902,
+                "NSW": 13.39537013,
+                "NT": 12.1981467,
+                "Qld": 12.0261059,
+                "SA": 13.1623868,
+                "Tas": 10.97109679,
+                "Vic": 13.32508307,
+                "WA": 12.61211666
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "ACT": 6.594088087,
+                "NSW": 7.433632028,
+                "NT": 3.124333456,
+                "Qld": 5.836681111,
+                "SA": 7.763216652,
+                "Tas": 6.999650105,
+                "Vic": 6.672533578,
+                "WA": 6.913817879
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "ACT": 1.339925529,
+                "NSW": 1.149036892,
+                "NT": 0,
+                "Qld": 0.605476211,
+                "SA": 0.718894453,
+                "Tas": 0.306918651,
+                "Vic": 0.858621143,
+                "WA": 0.659024305
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "ACT": 8.559219127,
+                "NSW": 9.626414218,
+                "NT": 11.15689319,
+                "Qld": 7.024858312,
+                "SA": 8.125546828,
+                "Tas": 7.391029544,
+                "Vic": 11.86884602,
+                "WA": 7.339786368
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "ACT": 1.163590886,
+                "NSW": 0.67180928,
+                "NT": 3.809582255,
+                "Qld": 1.57618603,
+                "SA": 0.913421174,
+                "Tas": 0.328639913,
+                "Vic": 0.494660763,
+                "WA": 1.441199519
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "ACT": 26.0793866,
+                "NSW": 26.00834339,
+                "NT": 19.50459142,
+                "Qld": 32.41945168,
+                "SA": 29.71173844,
+                "Tas": 29.53290563,
+                "Vic": 24.84350159,
+                "WA": 31.36789901
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "ACT": 9.931694174,
+                "NSW": 11.03065127,
+                "NT": 10.65107745,
+                "Qld": 7.478985832,
+                "SA": 6.957536779,
+                "Tas": 6.95509866,
+                "Vic": 9.677550437,
+                "WA": 7.053446039
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "ACT": 1.551198579,
+                "NSW": 1.53622579,
+                "NT": 1.300334517,
+                "Qld": 1.715134981,
+                "SA": 2.103035189,
+                "Tas": 2.400493444,
+                "Vic": 1.424963817,
+                "WA": 2.088514224
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "ACT": 13.56811329,
+                "NSW": 9.538835294,
+                "NT": 7.044694122,
+                "Qld": 10.56486757,
+                "SA": 9.54387758,
+                "Tas": 16.49200359,
+                "Vic": 9.748937177,
+                "WA": 7.478758831
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "ACT": 0.399202273,
+                "NSW": 1.053630024,
+                "NT": 0.330484072,
+                "Qld": 1.093646041,
+                "SA": 1.995584106,
+                "Tas": 2.427832615,
+                "Vic": 1.480632708,
+                "WA": 0.932311459
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "ACT": 0.367070373,
+                "NSW": 0.712583218,
+                "NT": 0.609664665,
+                "Qld": 1.046742091,
+                "SA": 0.840347012,
+                "Tas": 0.326971193,
+                "Vic": 0.154960673,
+                "WA": 1.207967233
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "ACT": 1.014085205,
+                "NSW": 1.413806133,
+                "NT": 1.070039516,
+                "Qld": 1.637213636,
+                "SA": 1.129759228,
+                "Tas": 1.803059595,
+                "Vic": 1.449319532,
+                "WA": 1.338552849
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "ACT": 2.616182446,
+                "NSW": 2.892201099,
+                "NT": 5.092285716,
+                "Qld": 3.431267068,
+                "SA": 3.379632054,
+                "Tas": 1.803632909,
+                "Vic": 2.759512537,
+                "WA": 3.517190579
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "ACT": 0.239988838,
+                "NSW": 0.861350075,
+                "NT": 1.329730824,
+                "Qld": 0.603368305,
+                "SA": 0.290411845,
+                "Tas": 0.591917301,
+                "Vic": 0.957590234,
+                "WA": 0.550558657
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "ACT": 5.185148265,
+                "NSW": 5.286854519,
+                "NT": 9.860504098,
+                "Qld": 6.12030519,
+                "SA": 3.993282505,
+                "Tas": 6.511346107,
+                "Vic": 5.647674891,
+                "WA": 6.387584064
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "ACT": 2.676700795,
+                "NSW": 2.306314485,
+                "NT": 2.757209613,
+                "Qld": 2.05410858,
+                "SA": 2.741717964,
+                "Tas": 1.433447123,
+                "Vic": 2.393103461,
+                "WA": 2.769760547
+              }
+            }
+          ]
+        },
+        {
+          "id": "political-interest",
+          "label": "Political Interest",
+          "groups": [
+            "None",
+            "Not much",
+            "Some",
+            "A good deal"
+          ],
+          "missingValueMeaning": "Not present in the source chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Asylum seekers",
+              "shares": {
+                "None": 10.159454,
+                "Not much": 10.49207024,
+                "Some": 13.50462006,
+                "A good deal": 12.90467715
+              }
+            },
+            {
+              "issue": "Broadband",
+              "shares": {
+                "None": 11.83658236,
+                "Not much": 8.893962529,
+                "Some": 7.032192007,
+                "A good deal": 6.326844708
+              }
+            },
+            {
+              "issue": "Childcare",
+              "shares": {
+                "None": 3.738033757,
+                "Not much": 1.7283017,
+                "Some": 1.179185203,
+                "A good deal": 0.467410028
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "None": 2.391741602,
+                "Not much": 9.111257517,
+                "Some": 8.787720498,
+                "A good deal": 9.805467836
+              }
+            },
+            {
+              "issue": "Defence",
+              "shares": {
+                "None": 0.40488738,
+                "Not much": 1.120657317,
+                "Some": 0.976525988,
+                "A good deal": 0.884012022
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "None": 8.487553022,
+                "Not much": 15.13146339,
+                "Some": 23.73453866,
+                "A good deal": 32.64448485
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "None": 15.12861045,
+                "Not much": 13.82154619,
+                "Some": 10.56337631,
+                "A good deal": 7.495072159
+              }
+            },
+            {
+              "issue": "Food security",
+              "shares": {
+                "None": 1.754663245,
+                "Not much": 2.031632097,
+                "Some": 1.783356748,
+                "A good deal": 1.52723867
+              }
+            },
+            {
+              "issue": "Health and hospitals",
+              "shares": {
+                "None": 15.88833322,
+                "Not much": 14.07022136,
+                "Some": 10.50506557,
+                "A good deal": 8.629551609
+              }
+            },
+            {
+              "issue": "Manufacturing",
+              "shares": {
+                "None": 0.973658668,
+                "Not much": 1.185720631,
+                "Some": 1.229315107,
+                "A good deal": 1.26447967
+              }
+            },
+            {
+              "issue": "Mining",
+              "shares": {
+                "None": 2.284324771,
+                "Not much": 0.737870247,
+                "Some": 0.780358663,
+                "A good deal": 0.567888694
+              }
+            },
+            {
+              "issue": "NDIS (DisabilityCare)",
+              "shares": {
+                "None": 0.750267079,
+                "Not much": 1.738263847,
+                "Some": 1.304922014,
+                "A good deal": 1.505760558
+              }
+            },
+            {
+              "issue": "Taxes",
+              "shares": {
+                "None": 7.49600889,
+                "Not much": 4.472105978,
+                "Some": 3.476166896,
+                "A good deal": 2.481652586
+              }
+            },
+            {
+              "issue": "Transport",
+              "shares": {
+                "None": 0.248618671,
+                "Not much": 1.184464949,
+                "Some": 0.870679845,
+                "A good deal": 0.622700846
+              }
+            },
+            {
+              "issue": "Trust",
+              "shares": {
+                "None": 4.741789462,
+                "Not much": 4.625516347,
+                "Some": 5.939763524,
+                "A good deal": 5.550360501
+              }
+            },
+            {
+              "issue": "Workplace relations",
+              "shares": {
+                "None": 2.574306987,
+                "Not much": 2.381361415,
+                "Some": 2.052740386,
+                "A good deal": 2.537519
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2016-retrospective-in-2019-abc-chart",
+      "electionYear": 2016,
+      "publicationIds": [
+        "abc-2019-important-issues"
+      ],
+      "timing": "2016 distribution republished in a 2019 comparison chart",
+      "fieldwork": null,
+      "sample": {
+        "responses": null,
+        "statement": "The 2016 sample count and fieldwork window are not stated in this retrospective chart."
+      },
+      "weightingStatement": null,
+      "question": {
+        "text": "What issue is most important to you in this election?",
+        "responseMode": null,
+        "optional": null,
+        "sensitive": null,
+        "note": "The chart presents the 2016 and 2019 columns together under this question label; response mode is not stated."
+      },
+      "notes": [
+        "Do not apply the 2019 chart's 119,516-respondent sample or April 2019 fieldwork window to these 2016 figures."
+      ],
+      "sources": [
+        {
+          "id": "abc-2019-overall-comparison-chart",
+          "kind": "Datawrapper HTML with embedded TSV",
+          "url": "https://datawrapper.dwcdn.net/EgrRi/2/",
+          "cache": ".build/vote-compass-issues-src/2019-datawrapper-EgrRi-v2.html",
+          "role": "2019 national figures and a separate 2016 retrospective distribution"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Environment",
+              "shares": {
+                "Overall": 9
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "Overall": 25
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "Overall": 16
+              }
+            },
+            {
+              "issue": "Superannuation and pensions",
+              "shares": {
+                "Overall": 12
+              }
+            },
+            {
+              "issue": "Employment",
+              "shares": {
+                "Overall": 7
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "shares": {
+                "Overall": 9
+              }
+            },
+            {
+              "issue": "Government accountability",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Overall": 12
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Housing and cost of living",
+              "shares": {
+                "Overall": 3
+              }
+            },
+            {
+              "issue": "LGBTQ rights",
+              "shares": {
+                "Overall": 8
+              }
+            },
+            {
+              "issue": "Energy",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Security",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "shares": {
+                "Overall": 3
+              }
+            },
+            {
+              "issue": "Freedom of speech/religion",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Indigenous",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Industrial relations",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Social justice",
+              "shares": {
+                "Overall": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2019-contemporaneous-abc-release",
+      "electionYear": 2019,
+      "publicationIds": [
+        "abc-2019-important-issues"
+      ],
+      "timing": "contemporaneous release",
+      "fieldwork": {
+        "start": "2019-04-10",
+        "end": "2019-04-14",
+        "precision": "day"
+      },
+      "sample": {
+        "responses": 119516,
+        "statement": "Based on 119,516 respondents to Vote Compass between April 10 and April 14, 2019"
+      },
+      "weightingStatement": "Vote Compass responses have been weighted by gender, age, education and place of residence to match the Australian population, creating a nationally representative sample. The sample size for this report is 119,516 respondents Find about more about the methodology in this explainer.",
+      "question": {
+        "text": "What issue is most important to you in this election?",
+        "responseMode": null,
+        "optional": null,
+        "sensitive": null,
+        "note": "Response mode is not stated in the cited chart."
+      },
+      "notes": [
+        "Age and state dimensions contain only the rows printed in their charts; null cells are not zero.",
+        "Percent signs are parsed as percentages, not proportions; rounded published values are not renormalised."
+      ],
+      "sources": [
+        {
+          "id": "abc-2019-overall-comparison-chart",
+          "kind": "Datawrapper HTML with embedded TSV",
+          "url": "https://datawrapper.dwcdn.net/EgrRi/2/",
+          "cache": ".build/vote-compass-issues-src/2019-datawrapper-EgrRi-v2.html",
+          "role": "2019 national figures and a separate 2016 retrospective distribution"
+        },
+        {
+          "id": "abc-2019-party-chart",
+          "kind": "Datawrapper HTML with embedded TSV",
+          "url": "https://datawrapper.dwcdn.net/ts7yd/3/",
+          "cache": ".build/vote-compass-issues-src/2019-datawrapper-ts7yd-v3.html",
+          "role": "2019 vote-intention figures"
+        },
+        {
+          "id": "abc-2019-age-chart",
+          "kind": "Datawrapper HTML with embedded TSV",
+          "url": "https://datawrapper.dwcdn.net/Ykpia/2/",
+          "cache": ".build/vote-compass-issues-src/2019-datawrapper-Ykpia-v2.html",
+          "role": "2019 selected age-row figures"
+        },
+        {
+          "id": "abc-2019-state-chart",
+          "kind": "Datawrapper HTML with embedded TSV",
+          "url": "https://datawrapper.dwcdn.net/Em7x3/1/",
+          "cache": ".build/vote-compass-issues-src/2019-datawrapper-Em7x3-v1.html",
+          "role": "2019 selected state-row figures"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Environment",
+              "shares": {
+                "Overall": 29
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "Overall": 23
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "Overall": 8
+              }
+            },
+            {
+              "issue": "Superannuation and pensions",
+              "shares": {
+                "Overall": 8
+              }
+            },
+            {
+              "issue": "Employment",
+              "shares": {
+                "Overall": 6
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "shares": {
+                "Overall": 6
+              }
+            },
+            {
+              "issue": "Government accountability",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Housing and cost of living",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "LGBTQ rights",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Energy",
+              "shares": {
+                "Overall": 3
+              }
+            },
+            {
+              "issue": "Security",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "Freedom of speech/religion",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Indigenous",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Industrial relations",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Social justice",
+              "shares": {
+                "Overall": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": "vote-intention",
+          "label": "Vote intention",
+          "groups": [
+            "Australian Greens",
+            "Australian Labor Party (ALP)",
+            "Liberal-National Coalition",
+            "Pauline Hanson's One Nation"
+          ],
+          "missingValueMeaning": "Not published in this chart or blank in its source table; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Government accountability",
+              "shares": {
+                "Australian Greens": 2,
+                "Australian Labor Party (ALP)": 6,
+                "Liberal-National Coalition": 6,
+                "Pauline Hanson's One Nation": 4
+              }
+            },
+            {
+              "issue": "Housing and cost of living",
+              "shares": {
+                "Australian Greens": 2,
+                "Australian Labor Party (ALP)": 5,
+                "Liberal-National Coalition": 4,
+                "Pauline Hanson's One Nation": 6
+              }
+            },
+            {
+              "issue": "Security",
+              "shares": {
+                "Australian Greens": 1,
+                "Australian Labor Party (ALP)": 1,
+                "Liberal-National Coalition": 3,
+                "Pauline Hanson's One Nation": 7
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "Australian Greens": 5,
+                "Australian Labor Party (ALP)": 11,
+                "Liberal-National Coalition": 44,
+                "Pauline Hanson's One Nation": 16
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Australian Greens": 4,
+                "Australian Labor Party (ALP)": 6,
+                "Liberal-National Coalition": 3,
+                "Pauline Hanson's One Nation": 2
+              }
+            },
+            {
+              "issue": "Employment",
+              "shares": {
+                "Australian Greens": 4,
+                "Australian Labor Party (ALP)": 8,
+                "Liberal-National Coalition": 5,
+                "Pauline Hanson's One Nation": 6
+              }
+            },
+            {
+              "issue": "Energy",
+              "shares": {
+                "Australian Greens": 5,
+                "Australian Labor Party (ALP)": 4,
+                "Liberal-National Coalition": 3,
+                "Pauline Hanson's One Nation": 3
+              }
+            },
+            {
+              "issue": "Environment",
+              "shares": {
+                "Australian Greens": 63,
+                "Australian Labor Party (ALP)": 40,
+                "Liberal-National Coalition": 10,
+                "Pauline Hanson's One Nation": 4
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "shares": {
+                "Australian Greens": 0,
+                "Australian Labor Party (ALP)": 0,
+                "Liberal-National Coalition": 0,
+                "Pauline Hanson's One Nation": 3
+              }
+            },
+            {
+              "issue": "Freedom of speech/religion",
+              "shares": {
+                "Australian Greens": 0,
+                "Australian Labor Party (ALP)": 0,
+                "Liberal-National Coalition": 1,
+                "Pauline Hanson's One Nation": 2
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "shares": {
+                "Australian Greens": 1,
+                "Australian Labor Party (ALP)": 1,
+                "Liberal-National Coalition": 1,
+                "Pauline Hanson's One Nation": 1
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "Australian Greens": 5,
+                "Australian Labor Party (ALP)": 11,
+                "Liberal-National Coalition": 7,
+                "Pauline Hanson's One Nation": 5
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "shares": {
+                "Australian Greens": 7,
+                "Australian Labor Party (ALP)": 3,
+                "Liberal-National Coalition": 5,
+                "Pauline Hanson's One Nation": 32
+              }
+            },
+            {
+              "issue": "Indigenous",
+              "shares": {
+                "Australian Greens": 2,
+                "Australian Labor Party (ALP)": 1,
+                "Liberal-National Coalition": 0,
+                "Pauline Hanson's One Nation": 0
+              }
+            },
+            {
+              "issue": "Industrial relations",
+              "shares": {
+                "Australian Greens": 0,
+                "Australian Labor Party (ALP)": 1,
+                "Liberal-National Coalition": 0,
+                "Pauline Hanson's One Nation": 1
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "shares": {
+                "Australian Greens": 1,
+                "Australian Labor Party (ALP)": 2,
+                "Liberal-National Coalition": 2,
+                "Pauline Hanson's One Nation": 2
+              }
+            },
+            {
+              "issue": "LGBTQ rights",
+              "shares": {
+                "Australian Greens": 4,
+                "Australian Labor Party (ALP)": 4,
+                "Liberal-National Coalition": 5,
+                "Pauline Hanson's One Nation": 4
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "shares": {
+                "Australian Greens": 6,
+                "Australian Labor Party (ALP)": 8,
+                "Liberal-National Coalition": 2,
+                "Pauline Hanson's One Nation": 3
+              }
+            },
+            {
+              "issue": "Superannuation and pensions",
+              "shares": {
+                "Australian Greens": 3,
+                "Australian Labor Party (ALP)": 9,
+                "Liberal-National Coalition": 10,
+                "Pauline Hanson's One Nation": 10
+              }
+            },
+            {
+              "issue": "Social justice",
+              "shares": {
+                "Australian Greens": 1,
+                "Australian Labor Party (ALP)": 1,
+                "Liberal-National Coalition": 0,
+                "Pauline Hanson's One Nation": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": "age",
+          "label": "Age",
+          "groups": [
+            "18-34",
+            "35-54",
+            "55+"
+          ],
+          "missingValueMeaning": "Not published in this chart or blank in its source table; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Environment",
+              "shares": {
+                "18-34": 39,
+                "35-54": 26,
+                "55+": 25
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "18-34": 18,
+                "35-54": 27,
+                "55+": 24
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "shares": {
+                "18-34": 7,
+                "35-54": null,
+                "55+": null
+              }
+            },
+            {
+              "issue": "Employment",
+              "shares": {
+                "18-34": 6,
+                "35-54": 7,
+                "55+": null
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "18-34": null,
+                "35-54": 7,
+                "55+": 10
+              }
+            },
+            {
+              "issue": "Superannuation and pensions",
+              "shares": {
+                "18-34": null,
+                "35-54": null,
+                "55+": 12
+              }
+            }
+          ]
+        },
+        {
+          "id": "state",
+          "label": "State of residence",
+          "groups": [
+            "ACT",
+            "NSW",
+            "NT",
+            "Qld",
+            "SA",
+            "Tas",
+            "Vic",
+            "WA"
+          ],
+          "missingValueMeaning": "Not published in this chart or blank in its source table; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Environment",
+              "shares": {
+                "ACT": 36,
+                "NSW": 31,
+                "NT": 22,
+                "Qld": 24,
+                "SA": 29,
+                "Tas": 28,
+                "Vic": 33,
+                "WA": 24
+              }
+            },
+            {
+              "issue": "Economy",
+              "shares": {
+                "ACT": 20,
+                "NSW": 22,
+                "NT": 27,
+                "Qld": 27,
+                "SA": 22,
+                "Tas": 20,
+                "Vic": 21,
+                "WA": 27
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "ACT": 7,
+                "NSW": 8,
+                "NT": null,
+                "Qld": null,
+                "SA": 9,
+                "Tas": 16,
+                "Vic": null,
+                "WA": null
+              }
+            },
+            {
+              "issue": "Superannuation and pensions",
+              "shares": {
+                "ACT": null,
+                "NSW": null,
+                "NT": 8,
+                "Qld": 8,
+                "SA": null,
+                "Tas": null,
+                "Vic": 8,
+                "WA": 9
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2016-retrospective-in-2022-abc-chart",
+      "electionYear": 2016,
+      "publicationIds": [
+        "abc-2022-important-issues"
+      ],
+      "timing": "2016 distribution republished in a 2022 comparison chart",
+      "fieldwork": null,
+      "sample": {
+        "responses": null,
+        "statement": "The retrospective chart does not restate this year's sample count, fieldwork window or weighting statement. Its question label and taxonomy belong to the 2022 publication and are not merged with the 2019 chart's categories."
+      },
+      "weightingStatement": null,
+      "question": {
+        "text": "What issue is most important to you in this election?",
+        "responseMode": "open text (as described by the 2022 chart)",
+        "optional": null,
+        "sensitive": null,
+        "note": "Optional/sensitive status is not stated."
+      },
+      "notes": [
+        "This 24-row taxonomy is distinct from the 2019 publication's 20-row 2016 distribution."
+      ],
+      "sources": [
+        {
+          "id": "abc-2022-three-election-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/PDdz8/3/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2022-datawrapper-PDdz8-v3.csv",
+          "role": "2022 national 24-row matrix plus separate 2019 and 2016 retrospective distributions"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Climate change",
+              "descriptor": "(global heating/warming, emissions, etc.)",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Cost of living and affordability",
+              "descriptor": "(housing prices, rents, expenses, inflation etc.",
+              "shares": {
+                "Overall": 3
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "descriptor": "(financial regulation, government spending, taxation, etc.)",
+              "shares": {
+                "Overall": 25
+              }
+            },
+            {
+              "issue": "Government accountability and operations",
+              "descriptor": "(transparency, leadership, regional governance, etc.)",
+              "shares": {
+                "Overall": 6
+              }
+            },
+            {
+              "issue": "Environment",
+              "descriptor": "(environment, recycling, etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "descriptor": "(medical and dental care, mental health support, etc.)",
+              "shares": {
+                "Overall": 16
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "descriptor": "(pensions, aged care, family support, disability support etc.)",
+              "shares": {
+                "Overall": 7
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "descriptor": "(Ukraine, war, military, terrorism, etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Education",
+              "descriptor": "(child care, schools, universities, tuition, etc.)",
+              "shares": {
+                "Overall": 11
+              }
+            },
+            {
+              "issue": "Employment",
+              "descriptor": "(jobs, wages, Newstart payments, etc.)",
+              "shares": {
+                "Overall": 6
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "descriptor": "(redistribution, poverty, homelessness, etc.)",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "descriptor": "(women's right, feminism, equal pay, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "descriptor": "(asylum seekers, boats, migration, etc.)",
+              "shares": {
+                "Overall": 9
+              }
+            },
+            {
+              "issue": "COVID-19",
+              "descriptor": "(infection rates, testing, vaccines, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Energy",
+              "descriptor": "(coal, renewable sources, nuclear, energy policy, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "descriptor": "(China, diplomacy, trade, etc.)",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "Freedom and civil liberties",
+              "descriptor": "(freedom of expression, drug policy, gun control etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Indigenous issues",
+              "descriptor": "(Aboriginal & Torres Straight Isl. repr., Uluru statement etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "descriptor": "(roads, broadband, internet, fibre optics, etc.)",
+              "shares": {
+                "Overall": 3
+              }
+            },
+            {
+              "issue": "Agriculture and animal welfare",
+              "descriptor": "(farms, animal rights and exports, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Arts and culture",
+              "descriptor": "(arts, music, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "LGBTQI+ rights",
+              "descriptor": "(same-sex, non-binary, trans rights etc.)",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "Social justice",
+              "descriptor": "(equal rights, social justice, racism, extremism, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Water",
+              "descriptor": "(floods, droughts, water issues)",
+              "shares": {
+                "Overall": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2019-retrospective-in-2022-abc-chart",
+      "electionYear": 2019,
+      "publicationIds": [
+        "abc-2022-important-issues"
+      ],
+      "timing": "2019 distribution republished in a 2022 comparison chart",
+      "fieldwork": null,
+      "sample": {
+        "responses": null,
+        "statement": "The retrospective chart does not restate this year's sample count, fieldwork window or weighting statement. Its question label and taxonomy belong to the 2022 publication and are not merged with the 2019 chart's categories."
+      },
+      "weightingStatement": null,
+      "question": {
+        "text": "What issue is most important to you in this election?",
+        "responseMode": "open text (as described by the 2022 chart)",
+        "optional": null,
+        "sensitive": null,
+        "note": "Optional/sensitive status is not stated."
+      },
+      "notes": [
+        "Do not combine this retrospective taxonomy with the contemporaneous 2019 release."
+      ],
+      "sources": [
+        {
+          "id": "abc-2022-three-election-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/PDdz8/3/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2022-datawrapper-PDdz8-v3.csv",
+          "role": "2022 national 24-row matrix plus separate 2019 and 2016 retrospective distributions"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Climate change",
+              "descriptor": "(global heating/warming, emissions, etc.)",
+              "shares": {
+                "Overall": 27
+              }
+            },
+            {
+              "issue": "Cost of living and affordability",
+              "descriptor": "(housing prices, rents, expenses, inflation etc.",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "descriptor": "(financial regulation, government spending, taxation, etc.)",
+              "shares": {
+                "Overall": 21
+              }
+            },
+            {
+              "issue": "Government accountability and operations",
+              "descriptor": "(transparency, leadership, regional governance, etc.)",
+              "shares": {
+                "Overall": 6
+              }
+            },
+            {
+              "issue": "Environment",
+              "descriptor": "(environment, recycling, etc.)",
+              "shares": {
+                "Overall": 9
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "descriptor": "(medical and dental care, mental health support, etc.)",
+              "shares": {
+                "Overall": 8
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "descriptor": "(pensions, aged care, family support, disability support etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "descriptor": "(Ukraine, war, military, terrorism, etc.)",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "Education",
+              "descriptor": "(child care, schools, universities, tuition, etc.)",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Employment",
+              "descriptor": "(jobs, wages, Newstart payments, etc.)",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "descriptor": "(redistribution, poverty, homelessness, etc.)",
+              "shares": {
+                "Overall": 6
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "descriptor": "(women's right, feminism, equal pay, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "descriptor": "(asylum seekers, boats, migration, etc.)",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "COVID-19",
+              "descriptor": "(infection rates, testing, vaccines, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Energy",
+              "descriptor": "(coal, renewable sources, nuclear, energy policy, etc.)",
+              "shares": {
+                "Overall": 3
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "descriptor": "(China, diplomacy, trade, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Freedom and civil liberties",
+              "descriptor": "(freedom of expression, drug policy, gun control etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Indigenous issues",
+              "descriptor": "(Aboriginal & Torres Straight Isl. repr., Uluru statement etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "descriptor": "(roads, broadband, internet, fibre optics, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Agriculture and animal welfare",
+              "descriptor": "(farms, animal rights and exports, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Arts and culture",
+              "descriptor": "(arts, music, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "LGBTQI+ rights",
+              "descriptor": "(same-sex, non-binary, trans rights etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Social justice",
+              "descriptor": "(equal rights, social justice, racism, extremism, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Water",
+              "descriptor": "(floods, droughts, water issues)",
+              "shares": {
+                "Overall": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2022-contemporaneous-abc-release",
+      "electionYear": 2022,
+      "publicationIds": [
+        "abc-2022-important-issues"
+      ],
+      "timing": "contemporaneous early-campaign release",
+      "fieldwork": {
+        "start": "2022-04-11",
+        "end": "2022-04-17",
+        "precision": "day"
+      },
+      "sample": {
+        "responses": 97159,
+        "statement": "The findings are based on 97,159 respondents who participated in Vote Compass from April 11, 2022 to April 17, 2022"
+      },
+      "weightingStatement": "Vote Compass responses have been weighted by gender, age, education, language, religion, place of residence and past vote to match the Australian population, creating a nationally representative sample. The sample size for this report is 97,159 respondents. Find about more about the methodology in this explainer.",
+      "question": {
+        "text": "What issue is most important to you in this election?",
+        "responseMode": "open text",
+        "optional": null,
+        "sensitive": null,
+        "note": "Optional/sensitive status is not stated."
+      },
+      "notes": [
+        "The separate three-election comparison supplies five additional zero-valued national rows beyond the 19-row main chart; their common 19 rows are identical and cross-checked.",
+        "Source values are proportions in the CSV and are multiplied by 100 exactly once."
+      ],
+      "sources": [
+        {
+          "id": "abc-2022-national-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/2wPjA/2/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2022-datawrapper-2wPjA-v2.csv",
+          "role": "19-row projection of the 2022 national matrix, used as a cross-check"
+        },
+        {
+          "id": "abc-2022-party-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/Ce6p9/3/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2022-datawrapper-Ce6p9-v3.csv",
+          "role": "2022 vote-intention figures"
+        },
+        {
+          "id": "abc-2022-three-election-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/PDdz8/3/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2022-datawrapper-PDdz8-v3.csv",
+          "role": "2022 national 24-row matrix plus separate 2019 and 2016 retrospective distributions"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Climate change",
+              "descriptor": "(global heating/warming, emissions, etc.)",
+              "shares": {
+                "Overall": 29
+              }
+            },
+            {
+              "issue": "Cost of living and affordability",
+              "descriptor": "(housing prices, rents, expenses, inflation etc.",
+              "shares": {
+                "Overall": 13
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "descriptor": "(financial regulation, government spending, taxation, etc.)",
+              "shares": {
+                "Overall": 13
+              }
+            },
+            {
+              "issue": "Government accountability and operations",
+              "descriptor": "(transparency, leadership, regional governance, etc.)",
+              "shares": {
+                "Overall": 12
+              }
+            },
+            {
+              "issue": "Environment",
+              "descriptor": "(environment, recycling, etc.)",
+              "shares": {
+                "Overall": 8
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "descriptor": "(medical and dental care, mental health support, etc.)",
+              "shares": {
+                "Overall": 8
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "descriptor": "(pensions, aged care, family support, disability support etc.)",
+              "shares": {
+                "Overall": 5
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "descriptor": "(Ukraine, war, military, terrorism, etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Education",
+              "descriptor": "(child care, schools, universities, tuition, etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Employment",
+              "descriptor": "(jobs, wages, Newstart payments, etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "descriptor": "(redistribution, poverty, homelessness, etc.)",
+              "shares": {
+                "Overall": 4
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "descriptor": "(women's right, feminism, equal pay, etc.)",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "descriptor": "(asylum seekers, boats, migration, etc.)",
+              "shares": {
+                "Overall": 2
+              }
+            },
+            {
+              "issue": "COVID-19",
+              "descriptor": "(infection rates, testing, vaccines, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Energy",
+              "descriptor": "(coal, renewable sources, nuclear, energy policy, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "descriptor": "(China, diplomacy, trade, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Freedom and civil liberties",
+              "descriptor": "(freedom of expression, drug policy, gun control etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Indigenous issues",
+              "descriptor": "(Aboriginal & Torres Straight Isl. repr., Uluru statement etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "descriptor": "(roads, broadband, internet, fibre optics, etc.)",
+              "shares": {
+                "Overall": 1
+              }
+            },
+            {
+              "issue": "Agriculture and animal welfare",
+              "descriptor": "(farms, animal rights and exports, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Arts and culture",
+              "descriptor": "(arts, music, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "LGBTQI+ rights",
+              "descriptor": "(same-sex, non-binary, trans rights etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Social justice",
+              "descriptor": "(equal rights, social justice, racism, extremism, etc.)",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Water",
+              "descriptor": "(floods, droughts, water issues)",
+              "shares": {
+                "Overall": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": "vote-intention",
+          "label": "Vote intention",
+          "groups": [
+            "Liberal-National Coalition",
+            "Australian Labor Party",
+            "Australian Greens",
+            "Other"
+          ],
+          "missingValueMeaning": "Not published in this chart or blank in its source table; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Climate change",
+              "descriptor": "(global heating/warming, emissions, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 8,
+                "Australian Labor Party": 30,
+                "Australian Greens": 50,
+                "Other": 24
+              }
+            },
+            {
+              "issue": "Cost of living and affordability",
+              "descriptor": "(housing prices, rents, expenses, inflation etc.",
+              "shares": {
+                "Liberal-National Coalition": 13,
+                "Australian Labor Party": 14,
+                "Australian Greens": 10,
+                "Other": 12
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "descriptor": "(financial regulation, government spending, taxation, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 34,
+                "Australian Labor Party": 7,
+                "Australian Greens": 4,
+                "Other": 11
+              }
+            },
+            {
+              "issue": "Government accountability and operations",
+              "descriptor": "(transparency, leadership, regional governance, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 7,
+                "Australian Labor Party": 17,
+                "Australian Greens": 7,
+                "Other": 15
+              }
+            },
+            {
+              "issue": "Environment",
+              "descriptor": "(environment, recycling, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 3,
+                "Australian Labor Party": 7,
+                "Australian Greens": 14,
+                "Other": 6
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "descriptor": "(medical and dental care, mental health support, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 7,
+                "Australian Labor Party": 10,
+                "Australian Greens": 6,
+                "Other": 7
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "descriptor": "(pensions, aged care, family support, disability support etc.)",
+              "shares": {
+                "Liberal-National Coalition": 6,
+                "Australian Labor Party": 6,
+                "Australian Greens": 3,
+                "Other": 5
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "descriptor": "(Ukraine, war, military, terrorism, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 12,
+                "Australian Labor Party": 2,
+                "Australian Greens": 1,
+                "Other": 4
+              }
+            },
+            {
+              "issue": "Education",
+              "descriptor": "(child care, schools, universities, tuition, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 3,
+                "Australian Labor Party": 5,
+                "Australian Greens": 4,
+                "Other": 3
+              }
+            },
+            {
+              "issue": "Employment",
+              "descriptor": "(jobs, wages, Newstart payments, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 4,
+                "Australian Labor Party": 5,
+                "Australian Greens": 3,
+                "Other": 4
+              }
+            },
+            {
+              "issue": "Poverty and inequality",
+              "descriptor": "(redistribution, poverty, homelessness, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 2,
+                "Australian Labor Party": 4,
+                "Australian Greens": 5,
+                "Other": 3
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "descriptor": "(women's right, feminism, equal pay, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 1,
+                "Australian Labor Party": 2,
+                "Australian Greens": 2,
+                "Other": 2
+              }
+            },
+            {
+              "issue": "Immigration and refugees",
+              "descriptor": "(asylum seekers, boats, migration, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 1,
+                "Australian Labor Party": 1,
+                "Australian Greens": 2,
+                "Other": 2
+              }
+            },
+            {
+              "issue": "COVID-19",
+              "descriptor": "(infection rates, testing, vaccines, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 1,
+                "Australian Labor Party": 1,
+                "Australian Greens": 0,
+                "Other": 5
+              }
+            },
+            {
+              "issue": "Energy",
+              "descriptor": "(coal, renewable sources, nuclear, energy policy, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 1,
+                "Australian Labor Party": 1,
+                "Australian Greens": 1,
+                "Other": 1
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "descriptor": "(China, diplomacy, trade, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 2,
+                "Australian Labor Party": 1,
+                "Australian Greens": 0,
+                "Other": 1
+              }
+            },
+            {
+              "issue": "Freedom and civil liberties",
+              "descriptor": "(freedom of expression, drug policy, gun control etc.)",
+              "shares": {
+                "Liberal-National Coalition": 1,
+                "Australian Labor Party": 0,
+                "Australian Greens": 1,
+                "Other": 4
+              }
+            },
+            {
+              "issue": "Indigenous issues",
+              "descriptor": "(Aboriginal & Torres Straight Isl. repr., Uluru statement etc.)",
+              "shares": {
+                "Liberal-National Coalition": 0,
+                "Australian Labor Party": 1,
+                "Australian Greens": 2,
+                "Other": 1
+              }
+            },
+            {
+              "issue": "Infrastructure",
+              "descriptor": "(roads, broadband, internet, fibre optics, etc.)",
+              "shares": {
+                "Liberal-National Coalition": 1,
+                "Australian Labor Party": 1,
+                "Australian Greens": 0,
+                "Other": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2022-retrospective-in-2025-abc-chart",
+      "electionYear": 2022,
+      "publicationIds": [
+        "abc-2025-important-issues"
+      ],
+      "timing": "2022 full-campaign distribution republished in a 2025 comparison chart",
+      "fieldwork": null,
+      "sample": {
+        "responses": 471491,
+        "statement": "The 2022 data is based on 471,491 responses to Vote Compass and the 2025 data based on 254,376 responses. There is a modelled error estimate of +/-0.5%. Totals may not sum to 100 due to rounding.",
+        "publishedModelledErrorEstimate": "There is a modelled error estimate of +/-0.5%."
+      },
+      "weightingStatement": null,
+      "question": {
+        "text": null,
+        "responseMode": null,
+        "optional": null,
+        "sensitive": null,
+        "note": "The 2025 comparison chart does not restate the 2022 question wording; see the 2022 contemporaneous dataset rather than assigning the 2025 config to it."
+      },
+      "notes": [
+        "The chart states 471,491 responses but no exact 2022 fieldwork dates. It is not merged with the 97,159-respondent April 2022 release."
+      ],
+      "sources": [
+        {
+          "id": "abc-2025-2022-comparison-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/HVHU4/1/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2025-datawrapper-HVHU4-v1.csv",
+          "role": "2025 national cross-check and separate 2022 full-campaign comparison"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Cost of living/Affordability",
+              "shares": {
+                "Overall": 9.088214015
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "shares": {
+                "Overall": 14.09319345
+              }
+            },
+            {
+              "issue": "Government operations",
+              "shares": {
+                "Overall": 11.31570223
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "Overall": 23.46164573
+              }
+            },
+            {
+              "issue": "Housing",
+              "shares": {
+                "Overall": 4.459930334
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "Overall": 6.179969062
+              }
+            },
+            {
+              "issue": "Immigration",
+              "shares": {
+                "Overall": 1.302683774
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "shares": {
+                "Overall": 4.94037263
+              }
+            },
+            {
+              "issue": "Energy",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Environment",
+              "shares": {
+                "Overall": 5.405896275
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Overall": 2.678725384
+              }
+            },
+            {
+              "issue": "Wealth inequality",
+              "shares": {
+                "Overall": 2.196167789
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "shares": {
+                "Overall": 1.471997699
+              }
+            },
+            {
+              "issue": "US relations",
+              "shares": {
+                "Overall": 0
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "shares": {
+                "Overall": 1.18278331
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "shares": {
+                "Overall": 3.968511027
+              }
+            },
+            {
+              "issue": "Civil rights",
+              "shares": {
+                "Overall": 1.677180216
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2025-contemporaneous-abc-release",
+      "electionYear": 2025,
+      "publicationIds": [
+        "abc-2025-important-issues"
+      ],
+      "timing": "contemporaneous release",
+      "fieldwork": {
+        "period": "2025-04",
+        "precision": "month",
+        "note": "Only April 2025 is stated; exact response dates are not published."
+      },
+      "sample": {
+        "responses": 254376,
+        "statement": "Based on 254,376 respondents to Vote Compass in April 2025. The modelled error estimate is ± 0.5%. Totals may not sum to 100 due to rounding.",
+        "publishedModelledErrorEstimate": "The modelled error estimate is ± 0.5%."
+      },
+      "weightingStatement": "Responses have been weighted by gender, age, education, language, religion, place of residence and past vote to account for the selection effects of the sample, enabling us to make statistical inferences about the Australian population.",
+      "question": {
+        "text": "What issue is most important to you in this election?",
+        "responseMode": "free text",
+        "optional": true,
+        "sensitive": true,
+        "note": "The instance config supplies wording and answer metadata only, not respondent aggregates. This imported config is pinned by its instance id 7e90bdf8d43503a2764c6224fb3cdc."
+      },
+      "questionConfig": {
+        "answerType": "text",
+        "displayType": "text",
+        "type": "profile",
+        "source": {
+          "id": "vote-compass-2025-instance-config",
+          "kind": "JSON instrument config",
+          "url": "https://r2.votecompass.com/instances/7e90bdf8d43503a2764c6224fb3cdc.json",
+          "cache": ".build/vote-compass-issues-src/2025-vote-compass-instance.json",
+          "role": "question wording and metadata only"
+        }
+      },
+      "notes": [
+        "The publisher's modelled error statement is retained verbatim. No confidence interval is calculated from the raw count.",
+        "All 17 national rows agree exactly with the 2025 column in the 2022/2025 comparison chart, so they are stored once with both sources."
+      ],
+      "sources": [
+        {
+          "id": "abc-2025-national-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/uN3JC/1/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2025-datawrapper-uN3JC-v1.csv",
+          "role": "2025 national figures"
+        },
+        {
+          "id": "abc-2025-age-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/OQjYm/2/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2025-datawrapper-OQjYm-v2.csv",
+          "role": "2025 age figures with blank cells preserved"
+        },
+        {
+          "id": "abc-2025-2022-comparison-chart",
+          "kind": "delimited chart data",
+          "url": "https://datawrapper.dwcdn.net/HVHU4/1/dataset.csv",
+          "cache": ".build/vote-compass-issues-src/2025-datawrapper-HVHU4-v1.csv",
+          "role": "2025 national cross-check and separate 2022 full-campaign comparison"
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "overall",
+          "label": "All respondents",
+          "groups": [
+            "Overall"
+          ],
+          "missingValueMeaning": "Not published in this chart; never interpreted as zero.",
+          "values": [
+            {
+              "issue": "Cost of living/Affordability",
+              "shares": {
+                "Overall": 25.72597618
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "shares": {
+                "Overall": 11.55036815
+              }
+            },
+            {
+              "issue": "Government operations",
+              "shares": {
+                "Overall": 8.593444719
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "Overall": 7.872976122
+              }
+            },
+            {
+              "issue": "Housing",
+              "shares": {
+                "Overall": 7.314929614
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "Overall": 5.20147739
+              }
+            },
+            {
+              "issue": "Immigration",
+              "shares": {
+                "Overall": 4.898039288
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "shares": {
+                "Overall": 4.077591037
+              }
+            },
+            {
+              "issue": "Energy",
+              "shares": {
+                "Overall": 4.010706405
+              }
+            },
+            {
+              "issue": "Environment",
+              "shares": {
+                "Overall": 3.479827798
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "Overall": 2.943936589
+              }
+            },
+            {
+              "issue": "Wealth inequality",
+              "shares": {
+                "Overall": 2.709761896
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "shares": {
+                "Overall": 2.570308231
+              }
+            },
+            {
+              "issue": "US relations",
+              "shares": {
+                "Overall": 1.82347899
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "shares": {
+                "Overall": 1.719557144
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "shares": {
+                "Overall": 1.171422504
+              }
+            },
+            {
+              "issue": "Civil rights",
+              "shares": {
+                "Overall": 1.008149949
+              }
+            }
+          ]
+        },
+        {
+          "id": "age",
+          "label": "Age",
+          "groups": [
+            "18-29",
+            "30-39",
+            "40-49",
+            "50-64",
+            "65+"
+          ],
+          "missingValueMeaning": "Blank source cell; not zero and not back-filled from another group or the national total.",
+          "values": [
+            {
+              "issue": "Cost of living/Affordability",
+              "shares": {
+                "18-29": 28.41167198,
+                "30-39": 30.77598479,
+                "40-49": 28.34516435,
+                "50-64": 24.15752777,
+                "65+": 18.85778765
+              }
+            },
+            {
+              "issue": "Economy and finance",
+              "shares": {
+                "18-29": 9.817216846,
+                "30-39": 11.92169262,
+                "40-49": 12.93030045,
+                "50-64": 13.93599185,
+                "65+": 9.232764186
+              }
+            },
+            {
+              "issue": "Government operations",
+              "shares": {
+                "18-29": 4.702268948,
+                "30-39": 5.975662789,
+                "40-49": 7.414687131,
+                "50-64": 9.768699104,
+                "65+": 13.95455833
+              }
+            },
+            {
+              "issue": "Climate change",
+              "shares": {
+                "18-29": 6.961131094,
+                "30-39": 5.891217948,
+                "40-49": 6.429901275,
+                "50-64": 6.975258714,
+                "65+": 12.67151612
+              }
+            },
+            {
+              "issue": "Housing",
+              "shares": {
+                "18-29": 10.22925838,
+                "30-39": 8.573431609,
+                "40-49": 6.060226359,
+                "50-64": 6.046534396,
+                "65+": 5.62450649
+              }
+            },
+            {
+              "issue": "Healthcare",
+              "shares": {
+                "18-29": 4.070589052,
+                "30-39": 4.91829815,
+                "40-49": 4.835110412,
+                "50-64": 5.456244042,
+                "65+": 6.484869419
+              }
+            },
+            {
+              "issue": "Immigration",
+              "shares": {
+                "18-29": 6.702397342,
+                "30-39": 5.699919004,
+                "40-49": 5.010540821,
+                "50-64": 4.358604714,
+                "65+": 3.067494164
+              }
+            },
+            {
+              "issue": "Defence and public security",
+              "shares": {
+                "18-29": 2.665876844,
+                "30-39": 3.059318422,
+                "40-49": 3.885300294,
+                "50-64": 4.801274591,
+                "65+": 5.57761073
+              }
+            },
+            {
+              "issue": "Energy",
+              "shares": {
+                "18-29": 2.484823114,
+                "30-39": 2.696034885,
+                "40-49": 3.969656852,
+                "50-64": 5.271532954,
+                "65+": 5.159792737
+              }
+            },
+            {
+              "issue": "Environment",
+              "shares": {
+                "18-29": 2.524443568,
+                "30-39": 2.382638108,
+                "40-49": 3.538272265,
+                "50-64": 4.189840274,
+                "65+": 4.444007342
+              }
+            },
+            {
+              "issue": "Education",
+              "shares": {
+                "18-29": 4.196599053,
+                "30-39": 3.94026384,
+                "40-49": 2.836581188,
+                "50-64": 2.10915805,
+                "65+": 1.956781167
+              }
+            },
+            {
+              "issue": "Wealth inequality",
+              "shares": {
+                "18-29": 1.978435653,
+                "30-39": 2.160725818,
+                "40-49": 2.748442869,
+                "50-64": 2.774034462,
+                "65+": 3.73718361
+              }
+            },
+            {
+              "issue": "Foreign affairs",
+              "shares": {
+                "18-29": 3.611879158,
+                "30-39": 2.753131458,
+                "40-49": 2.866847256,
+                "50-64": 2.005807649,
+                "65+": 1.840514996
+              }
+            },
+            {
+              "issue": "US relations",
+              "shares": {
+                "18-29": 1.691594686,
+                "30-39": 1.67403972,
+                "40-49": 1.985182511,
+                "50-64": 1.914996358,
+                "65+": 1.846015724
+              }
+            },
+            {
+              "issue": "Gender equality",
+              "shares": {
+                "18-29": 4.107279103,
+                "30-39": 1.997760723,
+                "40-49": 1.476181778,
+                "50-64": null,
+                "65+": null
+              }
+            },
+            {
+              "issue": "Retirement benefits and social services",
+              "shares": {
+                "18-29": null,
+                "30-39": null,
+                "40-49": null,
+                "50-64": 1.13326339,
+                "65+": 2.400847468
+              }
+            },
+            {
+              "issue": "Civil rights",
+              "shares": {
+                "18-29": 1.139931602,
+                "30-39": 1.131132919,
+                "40-49": 1.321659118,
+                "50-64": null,
+                "65+": null
+              }
+            },
+            {
+              "issue": "Gay rights",
+              "shares": {
+                "18-29": 1.350533755,
+                "30-39": null,
+                "40-49": null,
+                "50-64": null,
+                "65+": null
+              }
+            },
+            {
+              "issue": "Employment",
+              "shares": {
+                "18-29": null,
+                "30-39": 1.05135938,
+                "40-49": 1.011399982,
+                "50-64": 1.032351304,
+                "65+": null
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "coverage": [
+    {
+      "electionYear": 2013,
+      "numericDatasetIds": [
+        "2013-preliminary-abc-salience-chart"
+      ],
+      "numericObservations": 512,
+      "explicitlyUnreportedCells": 0,
+      "limitations": [
+        "Only the preliminary 4–6 August issue-priority release is available here; the later final data.gov.au collection covers the 30 policy-attitude questions, not this question.",
+        "The source's 16 published rows per group are retained without renormalisation, although their percentages do not total 100."
+      ]
+    },
+    {
+      "electionYear": 2016,
+      "numericDatasetIds": [
+        "2016-retrospective-in-2019-abc-chart",
+        "2016-retrospective-in-2022-abc-chart"
+      ],
+      "numericObservations": 44,
+      "explicitlyUnreportedCells": 0,
+      "limitations": [
+        "The contemporaneous May article reports a ranking but no numeric issue shares. Its 60,310-respondent, 8–11 May sample is therefore not imputed onto either later chart.",
+        "Two later ABC charts republish different national taxonomies; both are retained separately and neither supplies the 2016 sample count or fieldwork window."
+      ]
+    },
+    {
+      "electionYear": 2019,
+      "numericDatasetIds": [
+        "2019-contemporaneous-abc-release",
+        "2019-retrospective-in-2022-abc-chart"
+      ],
+      "numericObservations": 160,
+      "explicitlyUnreportedCells": 14,
+      "limitations": [
+        "Age and state charts publish selected rows only; absent issue/group cells remain null, not zero.",
+        "The 2022 retrospective chart uses a different 24-row taxonomy and does not restate the 2019 sample or fieldwork window, so it is a separate dataset."
+      ]
+    },
+    {
+      "electionYear": 2022,
+      "numericDatasetIds": [
+        "2022-contemporaneous-abc-release",
+        "2022-retrospective-in-2025-abc-chart"
+      ],
+      "numericObservations": 117,
+      "explicitlyUnreportedCells": 0,
+      "limitations": [
+        "The 11–17 April release (97,159 respondents) and the later full-campaign comparison (471,491 responses) are distinct datasets, not a single time series or pooled estimate.",
+        "Published sums need not be 100; rows and precision are retained exactly as published."
+      ]
+    },
+    {
+      "electionYear": 2025,
+      "numericDatasetIds": [
+        "2025-contemporaneous-abc-release"
+      ],
+      "numericObservations": 99,
+      "explicitlyUnreportedCells": 13,
+      "limitations": [
+        "The national chart has 17 rows. The age table has 19 rows, contains blank cells, and is not completed from national totals or treated as zero-filled.",
+        "No other subgroup matrix was present in the cited 20 April publication."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3909 @@
+{
+  "schemaVersion": 1,
+  "series": "scanlon-mapping-social-cohesion-first-most-important-problem",
+  "about": "Source-preserving aggregate archive of the Scanlon Mapping Social Cohesion open-ended most-important-problem question. Categories, printed subtotals, response valence, survey modes and bases remain wave-specific. This is not data/scanlon-one-offs.json and does not convert MIP responses into broader immigration or trust sentiment.",
+  "generatedBy": ".build/extract-scanlon-issues.mjs from cached official report text; no network access and no respondent-level rows",
+  "unit": "percent",
+  "categoryContract": {
+    "idsDerivedFromPrintedLabels": true,
+    "sourceLabelsPreserved": true,
+    "noPollKeyNormalisation": true,
+    "printedSubtotalsRemainSeparate": true,
+    "supportiveAndNegativeMentionsNeverCombined": true,
+    "missingCellsRemainMissing": true,
+    "note": "Subtotal rows are included only where the report prints them. A printed combined category is not decomposed, and zeroes are retained."
+  },
+  "rawDataAccess": {
+    "host": "https://dataverse.ada.edu.au",
+    "status": "anubis-blocked",
+    "checkedApiUrls": [
+      "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:10.26193/PUIVYD",
+      "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:10.4225/87/VVSQGR",
+      "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:10.26193/AOFDPA"
+    ],
+    "challengeCapture": "ada-10.26193-PUIVYD-response.html",
+    "note": "The Dataverse API returned Anubis proof-of-work HTML instead of dataset metadata. No respondent-level files or codebooks were retrieved, and no column bindings were inferred.",
+    "suppliedDepositDois": [
+      "10.26193/PUIVYD",
+      "10.4225/87/VVSQGR",
+      "10.4225/87/0A2AYD",
+      "10.4225/87/1WAQES",
+      "10.4225/87/5K8KD7",
+      "10.4225/87/FYRCUZ",
+      "10.26193/PPZHMC",
+      "10.26193/GBRINL",
+      "10.26193/IMUXSD",
+      "10.26193/QTQOK6",
+      "10.26193/232RSY",
+      "10.26193/TZXG2J",
+      "10.26193/AOFDPA"
+    ],
+    "respondentRowsInArchive": 0,
+    "effect": "Aggregate figures come only from public report tables, figures and cited prose. No unverified codebook or wave/column binding is used."
+  },
+  "sources": [
+    {
+      "id": "scanlon-2011",
+      "reportYear": 2011,
+      "title": "Mapping Social Cohesion 2011",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-summary-report-2011.pdf",
+      "doi": "10.26193/PUIVYD",
+      "capture": ".build/scanlon-issues-src/mapping-social-cohesion-summary-report-2011.txt",
+      "pdfSha256": "c9facff529c0be986dba50c1e4f4dba0d1bbf32bb20fd048cb48cece6b06e16f",
+      "textSha256": "9c1af7e2dd902b16dfec2cc20360a4a0b8f05948ac72b33b602a58660df01e3a"
+    },
+    {
+      "id": "scanlon-2012",
+      "reportYear": 2012,
+      "title": "Mapping Social Cohesion 2012: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-national-report-2012.pdf",
+      "doi": "10.4225/87/VVSQGR",
+      "capture": ".build/scanlon-issues-src/mapping-social-cohesion-national-report-2012.txt",
+      "pdfSha256": "ac5b84103b081e30a3a3d29eb743f5b487dbd12c4285e95bf82720eaa2ec192b",
+      "textSha256": "8b932d861bcfe4b50d43a6e158a0da4b766427bb3ca555838b44b02f19e1ad23"
+    },
+    {
+      "id": "scanlon-2013",
+      "reportYear": 2013,
+      "title": "Mapping Social Cohesion 2013: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-national-report-2013.pdf",
+      "doi": "10.4225/87/0A2AYD",
+      "capture": ".build/scanlon-issues-src/mapping-social-cohesion-national-report-2013.txt",
+      "pdfSha256": "15d15c452316ee13c2c9b5494ff1875622fd9b3db011b689dcc7dbf4ac7b417d",
+      "textSha256": "0cadb638bf8b8a45e09e1db26b364878ceb238cac0cb3621e43b813095b21617"
+    },
+    {
+      "id": "scanlon-2014",
+      "reportYear": 2014,
+      "title": "Mapping Social Cohesion 2014: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2014-Mapping-Social-Cohesion-Report.pdf",
+      "doi": "10.4225/87/1WAQES",
+      "capture": ".build/scanlon-issues-src/2014-Mapping-Social-Cohesion-Report.txt",
+      "pdfSha256": "f8b53d25fc123d588b0ede9a92a30934923b72567fa4b7296f254d18ff94e5a0",
+      "textSha256": "c20c16bd8866c48933a3b4b7529e5d51a6789b4334cd7e3919e6dc7c4ba4b183"
+    },
+    {
+      "id": "scanlon-2015",
+      "reportYear": 2015,
+      "title": "Mapping Social Cohesion 2015: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2015-Mapping-Social-Cohesion-Report.pdf",
+      "doi": "10.4225/87/5K8KD7",
+      "capture": ".build/scanlon-issues-src/2015-Mapping-Social-Cohesion-Report.txt",
+      "pdfSha256": "b6b75be225d1c1f3d203f8cda06be27444d10442158f8fdbb52ed9e2b23f04fd",
+      "textSha256": "71f0e8ddbcdf8c5708dcb2dca8018e7d478a6be082b6326046db80e62e231a40"
+    },
+    {
+      "id": "scanlon-2016",
+      "reportYear": 2016,
+      "title": "Mapping Social Cohesion 2016: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2016-Mapping-Social-Cohesion-Report-FINAL-with-covers.pdf",
+      "doi": "10.4225/87/FYRCUZ",
+      "capture": ".build/scanlon-issues-src/2016-Mapping-Social-Cohesion-Report-FINAL-with-covers.txt",
+      "pdfSha256": "a30c4277f8e974bce5c45a9576c104a6fb7b02402f1473462c59abf7a543f1ef",
+      "textSha256": "68273bcedc0a2d4e2a2a91c7282a2498fe809580b899ed7738b1077cc044ddb9"
+    },
+    {
+      "id": "scanlon-2017",
+      "reportYear": 2017,
+      "title": "Mapping Social Cohesion 2017: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/ScanlonFoundation_MappingSocialCohesion_2017-1.pdf",
+      "doi": "10.26193/PPZHMC",
+      "capture": ".build/scanlon-issues-src/ScanlonFoundation_MappingSocialCohesion_2017-1.txt",
+      "pdfSha256": "4217e5813b0600dc861525996d58f4e2f790aa4d9d33c98ae225665e7663d412",
+      "textSha256": "aaf4514faffe6a01439fe747f9bce9a942465d9195ddde83edac589400b281c5"
+    },
+    {
+      "id": "scanlon-2018",
+      "reportYear": 2018,
+      "title": "Mapping Social Cohesion 2018: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Social-Cohesion-2018-report-26-Nov.pdf",
+      "doi": "10.26193/GBRINL",
+      "capture": ".build/scanlon-issues-src/Social-Cohesion-2018-report-26-Nov.txt",
+      "pdfSha256": "eb4599220246fd2cf655ea1e631b3b570f35d327c91c1436432f3d4241343115",
+      "textSha256": "ccab5163846d316946faf3eb5c4de473859dde753119d59688911795f3fc4ae7"
+    },
+    {
+      "id": "scanlon-2019",
+      "reportYear": 2019,
+      "title": "Mapping Social Cohesion 2019",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2019-FINAL.pdf",
+      "doi": "10.26193/IMUXSD",
+      "capture": ".build/scanlon-issues-src/Mapping-Social-Cohesion-2019-FINAL.txt",
+      "pdfSha256": "355a2be2d52f93cc4e426214a9d1c7d639533cc564d24bfe3fa34aaeebdb2f45",
+      "textSha256": "6dcf6a36f0b13e2141660515e29db5830c1a7ac811014dcc7695c3f7696decb7"
+    },
+    {
+      "id": "scanlon-2020",
+      "reportYear": 2020,
+      "title": "Mapping Social Cohesion 2020",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/SC2020-Report-Final.pdf",
+      "doi": "10.26193/QTQOK6",
+      "capture": ".build/scanlon-issues-src/SC2020-Report-Final.txt",
+      "pdfSha256": "50c4fff3ebbd7d6cbaddbbb88743291b99ffecd86f0413ff06d2554ebc46a1a7",
+      "textSha256": "794dd3c23b64aca6b6256850bf23dddbdeccf61d8570482ffd71d29108affb0e"
+    },
+    {
+      "id": "scanlon-2021",
+      "reportYear": 2021,
+      "title": "Mapping Social Cohesion 2021",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping_Social_Cohesion_2021_Report_0.pdf",
+      "doi": "10.26193/232RSY",
+      "capture": ".build/scanlon-issues-src/Mapping_Social_Cohesion_2021_Report_0.txt",
+      "pdfSha256": "b266301201ab870dfbe64de5a39eb34563dea0edf462c74a5cddfae812ffa3c4",
+      "textSha256": "59feda6044ee17f8d1a26bdd4f64f2370551d2b482e2834a016c336a28d04867"
+    },
+    {
+      "id": "scanlon-2022",
+      "reportYear": 2022,
+      "title": "Mapping Social Cohesion 2022",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/MSC-2022_Report.pdf",
+      "doi": "10.26193/TZXG2J",
+      "capture": ".build/scanlon-issues-src/MSC-2022_Report.txt",
+      "pdfSha256": "4d70f564a026743ecfd2a00e64dd57d877e6e95608014b16a058bba089e5afa7",
+      "textSha256": "938ff0a7b224a1ca3694c43d67935bb3bb9912e44178776117bcf914119c282b"
+    },
+    {
+      "id": "scanlon-2023",
+      "reportYear": 2023,
+      "title": "Mapping Social Cohesion 2023",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2023-Mapping-Social-Cohesion-Report-1.pdf",
+      "doi": "10.26193/AOFDPA",
+      "capture": ".build/scanlon-issues-src/2023-Mapping-Social-Cohesion-Report-1.txt",
+      "pdfSha256": "c8cb26a3500d9a521760e81e6da9f75e9912d86c64e50036dcd7edf6f1d4d3e0",
+      "textSha256": "afe8434887aad15fc153c32005002736b4398debcbedfee3bb0bbf257aeaabea"
+    },
+    {
+      "id": "scanlon-2024",
+      "reportYear": 2024,
+      "title": "Mapping Social Cohesion 2024",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2024-Report.pdf",
+      "doi": null,
+      "capture": ".build/scanlon-issues-src/Mapping-Social-Cohesion-2024-Report.txt",
+      "pdfSha256": "4eef4d664d7d86192cba90a19f1f171d39af744e78553cac87a6ff4edab60eb3",
+      "textSha256": "60c185aa8c675d9679c5b26033fe0baec274b979c83f7af48f14065cf84269c9"
+    },
+    {
+      "id": "scanlon-2025",
+      "reportYear": 2025,
+      "title": "Mapping Social Cohesion 2025",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/SI0001_MappingSocialCohesion_2025_v6.pdf",
+      "doi": null,
+      "capture": ".build/scanlon-issues-src/SI0001_MappingSocialCohesion_2025_v6.txt",
+      "pdfSha256": "568c66983934bc0b6de24f594bbf75220ae65e9176cff3005f5a49581afbe26d",
+      "textSha256": "7fe5985e1e4d04f7063017be3d17c431f93e0382bc2514dd53c0e93a48d9a3e3"
+    },
+    {
+      "id": "scanlon-2026",
+      "reportYear": 2026,
+      "title": "Mapping Social Cohesion 2026",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+      "doi": null,
+      "capture": ".build/scanlon-issues-src/SI_Mapping-Social-Cohesion_Report_2026.txt",
+      "pdfSha256": "372e2a0d39da2b7e05c417178462064909e6f40fb07e958f151e73eed1c875e3",
+      "textSha256": "a87e41ac8ec66d28f0e8bd63168299d31087fbe5c909420e1fba9c9bf090db8d"
+    },
+    {
+      "id": "scanlon-technical-2026",
+      "reportYear": 2026,
+      "title": "Mapping Social Cohesion 2026 Technical Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2026-technical-report.pdf",
+      "doi": null,
+      "capture": ".build/scanlon-issues-src/Mapping-Social-Cohesion-2026-technical-report.txt",
+      "pdfSha256": "d175b9454e2449fc0dd72c3fd0a987a02144d6ddb0fbbf39f8e99f8d34c97715",
+      "textSha256": "6db6400562387fdd386f666feac27d9b187eee16a5f388746115b2506be47ff2"
+    }
+  ],
+  "waves": [
+    {
+      "id": "2011",
+      "reportYear": 2011,
+      "wave": "2011",
+      "question": "What do you think are the most important problems facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate up to two issues; the table reports the issue mentioned first.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {
+          "start": "2011-06-15",
+          "end": "2011-07-18"
+        }
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 2001,
+        "evidence": "N (unweighted) 2,021 2,001 2,000",
+        "source": {
+          "reportId": "scanlon-2012",
+          "anchor": "Table 11, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2011",
+        "anchor": "Table 6",
+        "caption": "Table 6: ‘What do you think are the most important problems facing Australia today?’",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-summary-report-2011.pdf",
+        "doi": "10.26193/PUIVYD",
+        "textSha256": "9c1af7e2dd902b16dfec2cc20360a4a0b8f05948ac72b33b602a58660df01e3a"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 25.5,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 22.2% 25.5%"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 11.4,
+          "unit": "percent",
+          "evidence": "Environment – climate change/ water shortages (concern) 11.4%"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 17.7,
+          "unit": "percent",
+          "evidence": "2 15.1% 17.7%"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 6.3,
+          "unit": "percent",
+          "evidence": "6.3%"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 12.7,
+          "unit": "percent",
+          "evidence": "3 Quality of government/ politicians 11.2% 12.7%"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 5.2,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5.2%"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 6.9,
+          "unit": "percent",
+          "evidence": "4 6.8% 6.9%"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 1.7,
+          "unit": "percent",
+          "evidence": "1.7%"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "4.0%"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 6.6,
+          "unit": "percent",
+          "evidence": "6.4% 6.6%"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 2.6,
+          "unit": "percent",
+          "evidence": "2.6%"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "6 6.4% 6.0%"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 4.2,
+          "unit": "percent",
+          "evidence": "7 Health/ medical/ hospitals 5.6% 4.2%"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 3.1,
+          "unit": "percent",
+          "evidence": "8 Housing shortage/ affordability/ interest rates 2.1% 3.1%"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 1.7,
+          "unit": "percent",
+          "evidence": "9 Crime/ law and order 3.8% 1.7%"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1.6,
+          "unit": "percent",
+          "evidence": "10 Racism 1.1% 1.6%"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 1.4,
+          "unit": "percent",
+          "evidence": "10 Education/ schools 2.2% 1.4%"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.8,
+          "unit": "percent",
+          "evidence": "12 Indigenous issues 0.1% 0.8%"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.6,
+          "unit": "percent",
+          "evidence": "13 Industrial relations/ trade unions na 0.6%"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 0.5,
+          "unit": "percent",
+          "evidence": "14 Defence/ national security/ terrorism na 0.5%"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 10.8,
+          "unit": "percent",
+          "evidence": "15 Other/ nothing/ don’t know 16.1% 10.8%"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100.1
+      }
+    },
+    {
+      "id": "2012",
+      "reportYear": 2012,
+      "wave": "2012",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate one issue.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 2000,
+        "evidence": "N (unweighted) 2,021 2,001 2,000",
+        "source": {
+          "reportId": "scanlon-2012",
+          "anchor": "Table 11, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2012",
+        "anchor": "Table 11",
+        "caption": "Table 11: ‘What do you think is the most important problem facing Australia today?’, 2010-2012",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-national-report-2012.pdf",
+        "doi": "10.4225/87/VVSQGR",
+        "textSha256": "8b932d861bcfe4b50d43a6e158a0da4b766427bb3ca555838b44b02f19e1ad23"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 35.9,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 22.2% 25.5% 35.9%"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 6.8,
+          "unit": "percent",
+          "evidence": "11.4% 6.8%"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 10.8,
+          "unit": "percent",
+          "evidence": "2 15.1% 17.7% 10.8%"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "6.3% 4.0%"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 13.1,
+          "unit": "percent",
+          "evidence": "3 Quality of government/ politicians 11.2% 12.7% 13.1%"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 3.6,
+          "unit": "percent",
+          "evidence": "5.2% 3.6%"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 4.1,
+          "unit": "percent",
+          "evidence": "4 6.8% 6.9% 4.1%"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0.5,
+          "unit": "percent",
+          "evidence": "1.7% 0.5%"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 8.1,
+          "unit": "percent",
+          "evidence": "boat people/ illegal immigrants 4.0% 8.1%"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 12.1,
+          "unit": "percent",
+          "evidence": "5 (negative comment) 6.4% 6.6% 12.1%"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "sympathy towards refugees/ boat 2.6% 4.0%"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 4.6,
+          "unit": "percent",
+          "evidence": "6 use, family breakdown, lack of 6.4% 6.0% 4.6%"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 3.2,
+          "unit": "percent",
+          "evidence": "7 Health/ medical/ hospitals 5.6% 4.2% 3.2%"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 1.7,
+          "unit": "percent",
+          "evidence": "8 2.1% 3.1% 1.7%"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 1.3,
+          "unit": "percent",
+          "evidence": "9 Crime/ law and order 3.8% 1.7% 1.3%"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1.4,
+          "unit": "percent",
+          "evidence": "10 Racism 1.1% 1.6% 1.4%"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 2.4,
+          "unit": "percent",
+          "evidence": "11 Education/ schools 2.2% 1.4% 2.4%"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.4,
+          "unit": "percent",
+          "evidence": "12 Indigenous issues 0.1% 0.8% 0.4%"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.2,
+          "unit": "percent",
+          "evidence": "13 Industrial relations/ trade unions n.a. 0.6% 0.2%"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 0.6,
+          "unit": "percent",
+          "evidence": "14 Defence/ national security/ terrorism n.a. 0.5% 0.6%"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 8.2,
+          "unit": "percent",
+          "evidence": "15 Other/ nothing/ don’t know 16.1% 10.8% 8.2%"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2013",
+      "reportYear": 2013,
+      "wave": "2013",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate one issue.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 1200,
+        "evidence": "N (unweighted) 2,021 2,001 2,000 1,200",
+        "source": {
+          "reportId": "scanlon-2013",
+          "anchor": "Table 8, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2013",
+        "anchor": "Table 8",
+        "caption": "Table 8: ‘What do you think is the most important problem facing Australia today?’, 2010-2013 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-national-report-2013.pdf",
+        "doi": "10.4225/87/0A2AYD",
+        "textSha256": "0cadb638bf8b8a45e09e1db26b364878ceb238cac0cb3621e43b813095b21617"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 33.3,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 22.2 25.5 35.9 33.3"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 12.5,
+          "unit": "percent",
+          "evidence": "2 Quality of government/ politicians 11.2 12.7 13.1 12.5"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 9.8,
+          "unit": "percent",
+          "evidence": "boat people/ illegal immigrants 4.0 8.1 9.8"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 12.4,
+          "unit": "percent",
+          "evidence": "3 6.4 6.6 12.1 12.4"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 2.6,
+          "unit": "percent",
+          "evidence": "sympathy towards refugees/ boat people/ 2.6 4.0 2.6"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 6.6,
+          "unit": "percent",
+          "evidence": "4 use, family breakdown, lack of personal 6.4 6.0 4.6 6.6"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 4.9,
+          "unit": "percent",
+          "evidence": "11.4 6.8 4.9"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 5.3,
+          "unit": "percent",
+          "evidence": "5 15.1 17.7 10.8 5.3"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0.4,
+          "unit": "percent",
+          "evidence": "6.3 4.0 0.4**"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 3.4,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5.2 3.6 3.4"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 4.3,
+          "unit": "percent",
+          "evidence": "6 6.8 6.9 4.1 4.3"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0.9,
+          "unit": "percent",
+          "evidence": "1.7 0.5 0.9"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 4.3,
+          "unit": "percent",
+          "evidence": "7 Health/ medical/ hospitals 5.6 4.2 3.2 4.3"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "8 Education/ schools 2.2 1.4 2.4 3.0"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 2.1,
+          "unit": "percent",
+          "evidence": "9 Crime/ law and order 3.8 1.7 1.3 2.1"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 1.9,
+          "unit": "percent",
+          "evidence": "10 2.1 3.1 1.7 1.9"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1.1,
+          "unit": "percent",
+          "evidence": "11 Racism 1.1 1.6 1.4 1.1"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 0.4,
+          "unit": "percent",
+          "evidence": "12 Defence/ national security/ terrorism n.a. 0.5 0.6 0.4"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.3,
+          "unit": "percent",
+          "evidence": "13 Industrial relations/ trade unions n.a. 0.6 0.2 0.3"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.2,
+          "unit": "percent",
+          "evidence": "14 Indigenous issues 0.1 0.8 0.4 0.2"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 12.3,
+          "unit": "percent",
+          "evidence": "15 Other/ nothing/ don’t know 16.1 10.8 8.2 12.3**"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2014",
+      "reportYear": 2014,
+      "wave": "2014",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate one issue.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 1526,
+        "evidence": "N (unweighted) 2,021 2,001 2,000 1,200 1,526",
+        "source": {
+          "reportId": "scanlon-2014",
+          "anchor": "Table 9, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2014",
+        "anchor": "Table 9",
+        "caption": "Table 9: ‘What do you think is the most important problem facing Australia today?’, 2010-2014 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/2014-Mapping-Social-Cohesion-Report.pdf",
+        "doi": "10.4225/87/1WAQES",
+        "textSha256": "c20c16bd8866c48933a3b4b7529e5d51a6789b4334cd7e3919e6dc7c4ba4b183"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 33.9,
+          "unit": "percent",
+          "evidence": "1 22.2 25.5 35.9 33.2 33.9"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 14.9,
+          "unit": "percent",
+          "evidence": "2 11.2 12.7 13.1 12.5 14.9"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 7.7,
+          "unit": "percent",
+          "evidence": "3 6.4 6.0 4.6 6.6 7.7"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 5.9,
+          "unit": "percent",
+          "evidence": "11.4 6.8 4.9 5.9"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 6.3,
+          "unit": "percent",
+          "evidence": "4 15.1 17.7 10.8 5.3 6.3"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0.4,
+          "unit": "percent",
+          "evidence": "climate change/ carbon tax 6.3 4.0 0.4 0.4"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 4.9,
+          "unit": "percent",
+          "evidence": "5 Health/ medical/ hospitals 5.6 4.2 3.2 4.3 4.9"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 2.2,
+          "unit": "percent",
+          "evidence": "refugees/ boat people/ illegal 4.0 8.1 9.8 2.2"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 3.5,
+          "unit": "percent",
+          "evidence": "6 Asylum seekers – poor 6.4 6.6 12.1 12.4 3.5**"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 1.3,
+          "unit": "percent",
+          "evidence": "2.6 4.0 2.6 1.3"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "5.2 3.6 3.4 3.0"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 3.2,
+          "unit": "percent",
+          "evidence": "7 6.8 6.9 4.1 4.3 3.2"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0.2,
+          "unit": "percent",
+          "evidence": "low/ need more people 1.7 0.5 0.9 0.2"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 3.6,
+          "unit": "percent",
+          "evidence": "8 Education/ schools 2.2 1.4 2.4 3.0 3.6"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "9 2.1 3.1 1.7 1.9 2.0"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 1.8,
+          "unit": "percent",
+          "evidence": "10 Crime/ law and order 3.8 1.7 1.3 2.1 1.8"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 0.7,
+          "unit": "percent",
+          "evidence": "=11 Racism 1.1 1.6 1.4 1.1 0.7"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 0.7,
+          "unit": "percent",
+          "evidence": "=11 n.a. 0.5 0.6 0.4 0.7"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.6,
+          "unit": "percent",
+          "evidence": "12 Indigenous issues 0.1 0.8 0.4 0.2 0.6"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.1,
+          "unit": "percent",
+          "evidence": "13 Industrial relations/ trade unions n.a. 0.6 0.2 0.3 0.1"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 16,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know 16.1 10.8 8.2 12.4 16%"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 99.9
+      }
+    },
+    {
+      "id": "2015",
+      "reportYear": 2015,
+      "wave": "2015",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate one issue.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 1501,
+        "evidence": "N (unweighted) 2,021 2,001 2,000 1,200 1,526 1,501",
+        "source": {
+          "reportId": "scanlon-2015",
+          "anchor": "Table 10, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2015",
+        "anchor": "Table 10",
+        "caption": "Table 10: ‘What do you think is the most important problem facing Australia today?’, 2010-2015 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/2015-Mapping-Social-Cohesion-Report.pdf",
+        "doi": "10.4225/87/5K8KD7",
+        "textSha256": "71f0e8ddbcdf8c5708dcb2dca8018e7d478a6be082b6326046db80e62e231a40"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 33.2,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 22.2 25.5 35.9 33.2 33.9 33.2"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 10.6,
+          "unit": "percent",
+          "evidence": "2 use, family breakdown, lack of personal 6.4 6.0 4.6 6.6 7.7 10.6*"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 9.9,
+          "unit": "percent",
+          "evidence": "3 Defence/ national security/ terrorism n.a. 0.5 0.6 0.4 0.7 9.9*"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 8.7,
+          "unit": "percent",
+          "evidence": "4 Quality of government/ politicians 11.2 12.7 13.1 12.5 14.9 8.7*"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 6.9,
+          "unit": "percent",
+          "evidence": "11.4 6.8 4.9 5.9 6.9"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 7.4,
+          "unit": "percent",
+          "evidence": "5 15.1 7.4"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0.5,
+          "unit": "percent",
+          "evidence": "6.3 4.0 0.4 0.4 0.5"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 2.5,
+          "unit": "percent",
+          "evidence": "boat people/ illegal immigrants (negative 4.0 8.1 9.8 2.2 2.5"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 4.5,
+          "unit": "percent",
+          "evidence": "6 6.4 4.5"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "sympathy towards refugees/ boat people/ 2.6 4.0 2.6 1.3 2.0"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 3.7,
+          "unit": "percent",
+          "evidence": "7 2.1 3.1 1.7 1.9 2.0 3.7*"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5.2 3.6 3.4 3.0 3.0"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 3.4,
+          "unit": "percent",
+          "evidence": "8 6.8 3.4"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0.4,
+          "unit": "percent",
+          "evidence": "1.7 0.5 0.9 0.2 0.4"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 2.2,
+          "unit": "percent",
+          "evidence": "9 Education/ schools 2.2 1.4 2.4 3.0 3.6 2.2"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 1.9,
+          "unit": "percent",
+          "evidence": "10 Health/ medical/ hospitals 5.6 4.2 3.2 4.3 4.9 1.9*"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 1.7,
+          "unit": "percent",
+          "evidence": "11 Crime/ law and order 3.8 1.7 1.3 2.1 1.8 1.7"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1.5,
+          "unit": "percent",
+          "evidence": "12 Racism 1.1 1.6 1.4 1.1 0.7 1.5"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.6,
+          "unit": "percent",
+          "evidence": "13 Indigenous issues 0.1 0.8 0.4 0.2 0.6 0.6"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.2,
+          "unit": "percent",
+          "evidence": "14 Industrial relations/ trade unions n.a. 0.6 0.2 0.3 0.1 0.2"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 10.5,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know 16.1 10.8 8.2 12.4 16 10.5"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2016",
+      "reportYear": 2016,
+      "wave": "2016",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate one issue.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 1500,
+        "evidence": "N (unweighted) 2,000 1,200 1,526 1,501 1,500",
+        "source": {
+          "reportId": "scanlon-2016",
+          "anchor": "Table 9, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2016",
+        "anchor": "Table 9",
+        "caption": "Table 9: ‘What do you think is the most important problem facing Australia today?’, 2012-2016 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/2016-Mapping-Social-Cohesion-Report-FINAL-with-covers.pdf",
+        "doi": "10.4225/87/FYRCUZ",
+        "textSha256": "68273bcedc0a2d4e2a2a91c7282a2498fe809580b899ed7738b1077cc044ddb9"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 28.4,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 35.9 33.2 33.9 33.2 28.4*"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 10.7,
+          "unit": "percent",
+          "evidence": "2 Quality of government/ politicians 13.1 12.5 14.9 8.7 10.7"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 8.6,
+          "unit": "percent",
+          "evidence": "3 Defence/ national security/ terrorism 0.6 0.4 0.7 9.9 8.6"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 5.2,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 3.6 3.4 3.0 3.0 5.2*"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 6.3,
+          "unit": "percent",
+          "evidence": "4 6.3"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 1.1,
+          "unit": "percent",
+          "evidence": "0.5 0.9 0.2 0.4 1.1"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 6.1,
+          "unit": "percent",
+          "evidence": "4.6 6.6 7.7 10.6 6.1*"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 5.2,
+          "unit": "percent",
+          "evidence": "6.8 4.9 5.9 6.9 5.2"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 5.3,
+          "unit": "percent",
+          "evidence": "6 5.3"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0.1,
+          "unit": "percent",
+          "evidence": "4.0 0.4 0.4 0.5 0.1"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 4.9,
+          "unit": "percent",
+          "evidence": "7 Health/ medical/ hospitals 3.2 4.3 4.9 1.9 4.9*"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 2.1,
+          "unit": "percent",
+          "evidence": "8.1 9.8 2.2 2.5 2.1"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 4.2,
+          "unit": "percent",
+          "evidence": "8 4.2"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 2.1,
+          "unit": "percent",
+          "evidence": "towards refugees/ boat people/ illegal 4.0 2.6 1.3 2.0 2.1"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 4.1,
+          "unit": "percent",
+          "evidence": "9 Racism 1.4 1.1 0.7 1.5 4.1*"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 3.9,
+          "unit": "percent",
+          "evidence": "10 Education/ schools 2.4 3.0 3.6 2.2 3.9*"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 2.6,
+          "unit": "percent",
+          "evidence": "11 Crime/ law and order 1.3 2.1 1.8 1.7 2.6"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 2.1,
+          "unit": "percent",
+          "evidence": "12 Housing shortage/ affordability/ interest rates 1.7 1.9 2 3.7 2.1*"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.6,
+          "unit": "percent",
+          "evidence": "13 Indigenous issues 0.4 0.2 0.6 0.7 0.6"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0.2,
+          "unit": "percent",
+          "evidence": "14 0 0.2 0.2 0.5 0.2"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.1,
+          "unit": "percent",
+          "evidence": "15 Industrial relations/ trade unions 0.2 0.3 0.1 0.2 0.1"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 11.9,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know 8.3 12.2 15.7 9.8 11.9"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2017",
+      "reportYear": 2017,
+      "wave": "2017",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Respondents could nominate one issue.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 2236,
+        "evidence": "N (unweighted) 2,000 1,200 1,526 1,501 1,500 2,236",
+        "source": {
+          "reportId": "scanlon-2017",
+          "anchor": "Table 16, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2017",
+        "anchor": "Table 16",
+        "caption": "Table 16: ‘What do you think is the most important problem facing Australia today?’, 2012–2017 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/ScanlonFoundation_MappingSocialCohesion_2017-1.pdf",
+        "doi": "10.26193/PPZHMC",
+        "textSha256": "aaf4514faffe6a01439fe747f9bce9a942465d9195ddde83edac589400b281c5"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 26.2,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 35.9 33.2 33.9 33.2* 28.4 26.2"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 9.6,
+          "unit": "percent",
+          "evidence": "2 Quality of government/ politicians 13.1 12.5 14.9 8.7 10.7 9.6"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 6.3,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 3.6 3.4 3.0 3.0* 5.2 6.3"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 7.6,
+          "unit": "percent",
+          "evidence": "3 7.6"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 1.3,
+          "unit": "percent",
+          "evidence": "0.5 0.9 0.2 0.4* 1.1 1.3"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 7.4,
+          "unit": "percent",
+          "evidence": "4 4.6 6.6 7.7 10.6* 6.1 7.4"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 7.3,
+          "unit": "percent",
+          "evidence": "5 Defence/ national security/ terrorism 0.6 0.4 0.7 9.9* 8.6 7.3"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 6.4,
+          "unit": "percent",
+          "evidence": "6.8 4.9 5.9 6.9 5.2 6.4"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 6.6,
+          "unit": "percent",
+          "evidence": "6 6.6"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0.2,
+          "unit": "percent",
+          "evidence": "4.0 0.4 0.4 0.5 0.1 0.2"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 5.7,
+          "unit": "percent",
+          "evidence": "7 Housing shortage/ affordability/ interest rates 1.7 1.9 2 3.7* 2.1 5.7**"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "8 Crime/ law and order 1.3 2.1 1.8 1.7* 2.6 4.0"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 3.8,
+          "unit": "percent",
+          "evidence": "9 Education/ schools 2.4 3.0 3.6 2.2* 3.9 3.8"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 3.2,
+          "unit": "percent",
+          "evidence": "10 Health/ medical/ hospitals 3.2 4.3 4.9 1.9 4.9 3.2"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 1.1,
+          "unit": "percent",
+          "evidence": "8.1 9.8 2.2 2.5* 2.1 1.1"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 2,
+          "unit": "percent",
+          "evidence": "11 2.0"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 0.9,
+          "unit": "percent",
+          "evidence": "towards refugees/ boat people/ illegal 4.0 2.6 1.3 2.0* 2.1 0.9**"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1.8,
+          "unit": "percent",
+          "evidence": "12 Racism 1.4 1.1 0.7 1.5 4.1 1.8**"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0.6,
+          "unit": "percent",
+          "evidence": "13 Indigenous issues 0.4 0.2 0.6 0.7 0.6 0.6"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0.3,
+          "unit": "percent",
+          "evidence": "14 Industrial relations/ trade unions 0.2 0.3 0.1 0.2 0.1 0.3"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0.1,
+          "unit": "percent",
+          "evidence": "15 0 0.2 0.2 0.5 0.2 0.1"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 13.7,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know 8.3 12.2 15.7 9.8 11.9 13.7"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 99.9
+      }
+    },
+    {
+      "id": "2018-rdd",
+      "reportYear": 2018,
+      "wave": "2018-rdd",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem; separate parallel-mode estimate.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "tableModeColumn": "RDD",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 1500,
+        "evidence": "N (unweighted) 1,200 1,526 1,501 1,500 2,236 1,500 2,260",
+        "source": {
+          "reportId": "scanlon-2018",
+          "anchor": "Table 12, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2018",
+        "anchor": "Table 12",
+        "caption": "Table 12: ‘What do you think is the most important problem facing Australia today?’, 2013-2018 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/Social-Cohesion-2018-report-26-Nov.pdf",
+        "doi": "10.26193/GBRINL",
+        "textSha256": "ccab5163846d316946faf3eb5c4de473859dde753119d59688911795f3fc4ae7"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 27,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 33 34 33 28 26 27 29"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 10,
+          "unit": "percent",
+          "evidence": "5 6 7 5 6 10 5"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 10,
+          "unit": "percent",
+          "evidence": "2 10 (5)"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "0 0 1 0 0 0 0"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 10,
+          "unit": "percent",
+          "evidence": "3 Quality of government/ politicians 13 15 9 11 10 10 9"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 8,
+          "unit": "percent",
+          "evidence": "4 7 8 11 6 7 8 9"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 7,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 3 3 3 5 6 7 7"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 8,
+          "unit": "percent",
+          "evidence": "5 8 (7)"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "1 0 0 1 1 1 0"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "6 2 2 4 2 6 4 5"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "7 Health/ medical/ hospitals 4 5 2 5 3 4 3"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "8 Crime/ law and order 2 2 2 3 4 3 4"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "boat people/ illegal immigrants (negative 10 2 3 2 1 1 1"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 2,
+          "unit": "percent",
+          "evidence": "9 2 (2)"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "sympathy towards refugees/ boat people/ 3 1 2 2 1 1 1"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "10 Education/ schools 3 4 2 4 4 2 1"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "11 Racism 1 1 2 4 2 1 2"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "12 Defence/ national security/ terrorism 0 1 10 9 7 1* 1"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "13 Indigenous issues 0 1 1 1 1 0 1"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "14 Industrial relations/ trade unions 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "15 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 18,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know 12 16 10 12 14 18* 24"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 98
+      }
+    },
+    {
+      "id": "2018-lina",
+      "reportYear": 2018,
+      "wave": "2018-lina",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem; separate parallel-mode estimate.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "tableModeColumn": "LinA",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 2260,
+        "evidence": "N (unweighted) 1,200 1,526 1,501 1,500 2,236 1,500 2,260",
+        "source": {
+          "reportId": "scanlon-2018",
+          "anchor": "Table 12, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2018",
+        "anchor": "Table 12",
+        "caption": "Table 12: ‘What do you think is the most important problem facing Australia today?’, 2013-2018 (percentage)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/Social-Cohesion-2018-report-26-Nov.pdf",
+        "doi": "10.26193/GBRINL",
+        "textSha256": "ccab5163846d316946faf3eb5c4de473859dde753119d59688911795f3fc4ae7"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 29,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 33 34 33 28 26 27 29"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "5 6 7 5 6 10 5"
+        },
+        {
+          "id": "environment-printed-subtotal",
+          "sourceLabel": "Environment (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "environment-climate-change-water-shortages-concern",
+            "environment-overreaction-climate-change-carbon-tax-sceptical"
+          ],
+          "share": 5,
+          "unit": "percent",
+          "evidence": "2 10 (5)"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "0 0 1 0 0 0 0"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 9,
+          "unit": "percent",
+          "evidence": "3 Quality of government/ politicians 13 15 9 11 10 10 9"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 9,
+          "unit": "percent",
+          "evidence": "4 7 8 11 6 7 8 9"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 7,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 3 3 3 5 6 7 7"
+        },
+        {
+          "id": "immigration-population-printed-subtotal",
+          "sourceLabel": "Immigration/ population (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "immigration-population-growth-concern",
+            "immigration-population-too-low-need-more-people-supportive"
+          ],
+          "share": 7,
+          "unit": "percent",
+          "evidence": "5 8 (7)"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "1 0 0 1 1 1 0"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "6 2 2 4 2 6 4 5"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "7 Health/ medical/ hospitals 4 5 2 5 3 4 3"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "8 Crime/ law and order 2 2 2 3 4 3 4"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "boat people/ illegal immigrants (negative 10 2 3 2 1 1 1"
+        },
+        {
+          "id": "asylum-seekers-printed-subtotal",
+          "sourceLabel": "Asylum seekers (printed subtotal)",
+          "role": "printed-subtotal",
+          "componentIds": [
+            "asylum-seekers-negative-comment",
+            "asylum-seekers-poor-treatment-sympathy-refugees"
+          ],
+          "share": 2,
+          "unit": "percent",
+          "evidence": "9 2 (2)"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "sympathy towards refugees/ boat people/ 3 1 2 2 1 1 1"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "10 Education/ schools 3 4 2 4 4 2 1"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "11 Racism 1 1 2 4 2 1 2"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "12 Defence/ national security/ terrorism 0 1 10 9 7 1* 1"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "13 Indigenous issues 0 1 1 1 1 0 1"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "14 Industrial relations/ trade unions 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "15 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know",
+          "sourceLabel": "Other/ nothing/ don’t know",
+          "role": "coded-category",
+          "share": 24,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know 12 16 10 12 14 18* 24"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 102
+      }
+    },
+    {
+      "id": "2019-rdd",
+      "reportYear": 2019,
+      "wave": "2019-rdd",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem; separate parallel-mode estimate.",
+      "sampleDesign": {
+        "mode": "Random Digit Dialling (RDD) telephone survey",
+        "tableModeColumn": "RDD",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 1500,
+        "evidence": "N (unweighted) 2.001 2,000 1,200 1,526 1,501 1,500 2,236 1,500 1,500 2,260 2,033",
+        "source": {
+          "reportId": "scanlon-2019",
+          "anchor": "Table 16, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2019",
+        "anchor": "Table 16",
+        "caption": "Table 16: ‘What do you think is the most important problem facing Australia today?’, 2011-19 (percentage, RDD and LinA)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2019-FINAL.pdf",
+        "doi": "10.26193/IMUXSD",
+        "textSha256": "6dcf6a36f0b13e2141660515e29db5830c1a7ac811014dcc7695c3f7696decb7"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 28,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 26 36 33 34 33 28 26 27 28 29 29"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 19,
+          "unit": "percent",
+          "evidence": "Environment – climate change/ water shortages (concern) 11 4 5 6 7 5 6 10 19* 5 17*"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 8,
+          "unit": "percent",
+          "evidence": "6 5 7 8 11 6 7 8 8 9 10"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5 4 3 3 3 5 6 7 6 7 10*"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "Quality of government/ politicians 13 13 13 15 9 11 10 10 6* 9 6"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "Health/ medical/ hospitals 4 3 4 5 2 5 3 4 5 3 4"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "Housing shortage/ affordability/ interest rates 3 2 2 2 4 2 6 4 4 5 4"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Crime/ law and order 2 1 2 2 2 3 4 3 2 4 2"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Education/ schools 1 2 3 4 2 4 4 2 2 1 1"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Defence/ national security/ terrorism 1 1 0 1 10 9 7 1 2 1 2"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "4 8 10 2 3 2 1 1 1 1 1"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "3 4 3 1 2 2 1 1 1 1 0"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "2 1 1 0 0 1 1 1 0 0 0"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Racism 2 1 1 1 2 4 2 1 1 2 2"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "6 7 0 0 1 0 0 0 1 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "0 0 0 0 1 0 0 0 1 0 0"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Indigenous issues 1 0 0 1 1 1 1 0 0 1 0"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Industrial relations/ trade unions 1 0 0 0 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know-decline",
+          "sourceLabel": "Other/ nothing/ don’t know/ decline",
+          "role": "coded-category",
+          "share": 15,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know/ decline 11 8 12 16 10 12 14 18 15 24 12"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 102
+      }
+    },
+    {
+      "id": "2019-lina",
+      "reportYear": 2019,
+      "wave": "2019-lina",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem; separate parallel-mode estimate.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "tableModeColumn": "LinA",
+        "fieldwork": {}
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 2033,
+        "evidence": "N (unweighted) 2.001 2,000 1,200 1,526 1,501 1,500 2,236 1,500 1,500 2,260 2,033",
+        "source": {
+          "reportId": "scanlon-2019",
+          "anchor": "Table 16, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2019",
+        "anchor": "Table 16",
+        "caption": "Table 16: ‘What do you think is the most important problem facing Australia today?’, 2011-19 (percentage, RDD and LinA)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2019-FINAL.pdf",
+        "doi": "10.26193/IMUXSD",
+        "textSha256": "6dcf6a36f0b13e2141660515e29db5830c1a7ac811014dcc7695c3f7696decb7"
+      },
+      "categories": [
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 29,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 26 36 33 34 33 28 26 27 28 29 29"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 17,
+          "unit": "percent",
+          "evidence": "Environment – climate change/ water shortages (concern) 11 4 5 6 7 5 6 10 19* 5 17*"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 10,
+          "unit": "percent",
+          "evidence": "6 5 7 8 11 6 7 8 8 9 10"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 10,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5 4 3 3 3 5 6 7 6 7 10*"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "Quality of government/ politicians 13 13 13 15 9 11 10 10 6* 9 6"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "Health/ medical/ hospitals 4 3 4 5 2 5 3 4 5 3 4"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "Housing shortage/ affordability/ interest rates 3 2 2 2 4 2 6 4 4 5 4"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Crime/ law and order 2 1 2 2 2 3 4 3 2 4 2"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Education/ schools 1 2 3 4 2 4 4 2 2 1 1"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Defence/ national security/ terrorism 1 1 0 1 10 9 7 1 2 1 2"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "4 8 10 2 3 2 1 1 1 1 1"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "3 4 3 1 2 2 1 1 1 1 0"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "2 1 1 0 0 1 1 1 0 0 0"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Racism 2 1 1 1 2 4 2 1 1 2 2"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "6 7 0 0 1 0 0 0 1 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "0 0 0 0 1 0 0 0 1 0 0"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Indigenous issues 1 0 0 1 1 1 1 0 0 1 0"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Industrial relations/ trade unions 1 0 0 0 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know-decline",
+          "sourceLabel": "Other/ nothing/ don’t know/ decline",
+          "role": "coded-category",
+          "share": 12,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know/ decline 11 8 12 16 10 12 14 18 15 24 12"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2020-july",
+      "reportYear": 2020,
+      "wave": "2020-july",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem; the July wave is not combined with November.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "tableModeColumn": "July 2020",
+        "fieldwork": {
+          "start": "2020-07-14",
+          "end": "2020-07-27"
+        }
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 3090,
+        "evidence": "N (unweighted) 2.001 2,000 1,200 1,526 1,501 1,500 2,236 1,500 1,500 2,260 2,033 3,090 2,793",
+        "source": {
+          "reportId": "scanlon-2020",
+          "anchor": "Table 10, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2020",
+        "anchor": "Table 10",
+        "caption": "Table 10: ‘What do you think is the most important problem facing Australia today?’, 2011-19 (percentage, RDD) 2018-2020 (percentage, LinA)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/SC2020-Report-Final.pdf",
+        "doi": "10.26193/QTQOK6",
+        "textSha256": "794dd3c23b64aca6b6256850bf23dddbdeccf61d8570482ffd71d29108affb0e"
+      },
+      "categories": [
+        {
+          "id": "covid-19-including-impact-on-economy",
+          "sourceLabel": "COVID-19, including impact on the economy",
+          "role": "coded-category",
+          "share": 63,
+          "unit": "percent",
+          "evidence": "COVID-19, including impact on the economy 63 32"
+        },
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 15,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 26 36 33 34 33 28 26 27 28 29 29 15 24"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "Environment – climate change/ water shortages (concern) 11 4 5 6 7 5 6 10 19 5 17 5 13"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "6 5 7 8 11 6 7 8 8 9 10 2 6"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5 4 3 3 3 5 6 7 6 7 10 2 3"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Quality of government/ politicians 13 13 13 15 9 11 10 10 6 9 6 2 4"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Health/ medical/ hospitals 4 3 4 5 2 5 3 4 5 3 4 1 2"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Housing shortage/ affordability/ interest rates 3 2 2 2 4 2 6 4 4 5 4 1 1"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Crime/ law and order 2 1 2 2 2 3 4 3 2 4 2 0 1"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Education/ schools 1 2 3 4 2 4 4 2 2 1 1 0 1"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Defence/ national security/ terrorism 1 1 0 1 10 9 7 1 2 1 2 1 3"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "4 8 10 2 3 2 1 1 1 1 1 0 0"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "3 4 3 1 2 2 1 1 1 1 0 0 0"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Immigration/population – too low/ need more people (supportive) 2 1 1 0 0 1 1 1 0 0 0 0 0"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Racism 2 1 1 1 2 4 2 1 1 2 2 1 1"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "6 7 0 0 1 0 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Women's issues (e.g. equal pay/opportunity, violence, etc.) 0 0 0 0 1 0 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Indigenous issues 1 0 0 1 1 1 1 0 0 1 0 0 0"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Industrial relations/ trade unions 1 0 0 0 0 0 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know-decline",
+          "sourceLabel": "Other/ nothing/ don’t know/ decline",
+          "role": "coded-category",
+          "share": 7,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know/ decline 11 8 12 16 10 12 14 18 15 24 12 7 8"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2020-november",
+      "reportYear": 2020,
+      "wave": "2020-november",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem; the November wave is not combined with July.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "tableModeColumn": "November 2020",
+        "fieldwork": {
+          "start": "2020-11-09",
+          "end": "2020-11-23"
+        }
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 2793,
+        "evidence": "N (unweighted) 2.001 2,000 1,200 1,526 1,501 1,500 2,236 1,500 1,500 2,260 2,033 3,090 2,793",
+        "source": {
+          "reportId": "scanlon-2020",
+          "anchor": "Table 10, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2020",
+        "anchor": "Table 10",
+        "caption": "Table 10: ‘What do you think is the most important problem facing Australia today?’, 2011-19 (percentage, RDD) 2018-2020 (percentage, LinA)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/SC2020-Report-Final.pdf",
+        "doi": "10.26193/QTQOK6",
+        "textSha256": "794dd3c23b64aca6b6256850bf23dddbdeccf61d8570482ffd71d29108affb0e"
+      },
+      "categories": [
+        {
+          "id": "covid-19-including-impact-on-economy",
+          "sourceLabel": "COVID-19, including impact on the economy",
+          "role": "coded-category",
+          "share": 32,
+          "unit": "percent",
+          "evidence": "COVID-19, including impact on the economy 63 32"
+        },
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 24,
+          "unit": "percent",
+          "evidence": "Economy/ unemployment/ poverty 26 36 33 34 33 28 26 27 28 29 29 15 24"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 13,
+          "unit": "percent",
+          "evidence": "Environment – climate change/ water shortages (concern) 11 4 5 6 7 5 6 10 19 5 17 5 13"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "6 5 7 8 11 6 7 8 8 9 10 2 6"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "Immigration/ population growth (concern) 5 4 3 3 3 5 6 7 6 7 10 2 3"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "Quality of government/ politicians 13 13 13 15 9 11 10 10 6 9 6 2 4"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "Health/ medical/ hospitals 4 3 4 5 2 5 3 4 5 3 4 1 2"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Housing shortage/ affordability/ interest rates 3 2 2 2 4 2 6 4 4 5 4 1 1"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Crime/ law and order 2 1 2 2 2 3 4 3 2 4 2 0 1"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Education/ schools 1 2 3 4 2 4 4 2 2 1 1 0 1"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "Defence/ national security/ terrorism 1 1 0 1 10 9 7 1 2 1 2 1 3"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "4 8 10 2 3 2 1 1 1 1 1 0 0"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "3 4 3 1 2 2 1 1 1 1 0 0 0"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Immigration/population – too low/ need more people (supportive) 2 1 1 0 0 1 1 1 0 0 0 0 0"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Racism 2 1 1 1 2 4 2 1 1 2 2 1 1"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "6 7 0 0 1 0 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Women's issues (e.g. equal pay/opportunity, violence, etc.) 0 0 0 0 1 0 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Indigenous issues 1 0 0 1 1 1 1 0 0 1 0 0 0"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Industrial relations/ trade unions 1 0 0 0 0 0 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know-decline",
+          "sourceLabel": "Other/ nothing/ don’t know/ decline",
+          "role": "coded-category",
+          "share": 8,
+          "unit": "percent",
+          "evidence": "Other/ nothing/ don’t know/ decline 11 8 12 16 10 12 14 18 15 24 12 7 8"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 99
+      }
+    },
+    {
+      "id": "2021-july",
+      "reportYear": 2021,
+      "wave": "2021-july",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "tableModeColumn": "July 2021",
+        "fieldwork": {
+          "start": "2021-07-12",
+          "end": "2021-07-26"
+        }
+      },
+      "coverage": {
+        "kind": "full-printed-distribution",
+        "includesOtherNothingDontKnow": true,
+        "completeCodedDistribution": true
+      },
+      "base": {
+        "kind": "printed first-mention table base",
+        "unweightedN": 3572,
+        "evidence": "N (unweighted) 2.001 2,000 1,200 1,526 1,501 1,500 2,236 1,500 1,500 2,260 2,033 3,090 2,793 3,572",
+        "source": {
+          "reportId": "scanlon-2021",
+          "anchor": "Table 8, N (unweighted)"
+        },
+        "validResponseN": null,
+        "note": "The printed N includes the Other/nothing/don’t know response row; it is not replaced by an inferred valid-only denominator."
+      },
+      "source": {
+        "reportId": "scanlon-2021",
+        "anchor": "Table 8",
+        "caption": "Table 8 \u0007‘What do you think is the most important problem facing Australia today?’, 2011-19 (percentage, RDD) 2018-2021 (percentage, LinA)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping_Social_Cohesion_2021_Report_0.pdf",
+        "doi": "10.26193/232RSY",
+        "textSha256": "59feda6044ee17f8d1a26bdd4f64f2370551d2b482e2834a016c336a28d04867"
+      },
+      "categories": [
+        {
+          "id": "covid-19-including-impact-on-economy",
+          "sourceLabel": "COVID-19, including impact on the economy",
+          "role": "coded-category",
+          "share": 59,
+          "unit": "percent",
+          "evidence": "63 32 59*"
+        },
+        {
+          "id": "economy-unemployment-poverty",
+          "sourceLabel": "Economy/ unemployment/ poverty",
+          "role": "coded-category",
+          "share": 9,
+          "unit": "percent",
+          "evidence": "26 36 33 34 33 28 26 27 28 29 29 15 24 9*"
+        },
+        {
+          "id": "environment-climate-change-water-shortages-concern",
+          "sourceLabel": "Environment – climate change/ water shortages (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 9,
+          "unit": "percent",
+          "evidence": "change/water 11 4 5 6 7 5 6 10 19 5 17 5 13 9*"
+        },
+        {
+          "id": "social-issues-family-childcare-drugs-direction",
+          "sourceLabel": "Social issues – family breakdown, child care, drug use, lack of personal direction",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "6 5 7 8 11 6 7 8 8 9 10 2 6 4*"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/ population growth (concern)",
+          "role": "coded-category",
+          "polarity": "concern",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "5 4 3 3 3 5 6 7 6 7 10 2 3 1*"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government/ politicians",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "13 13 13 15 9 11 10 10 6 9 6 2 4 4"
+        },
+        {
+          "id": "health-medical-hospitals",
+          "sourceLabel": "Health/ medical/ hospitals",
+          "role": "coded-category",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "4 3 4 5 2 5 3 4 5 3 4 1 2 3"
+        },
+        {
+          "id": "housing-shortage-affordability-interest-rates",
+          "sourceLabel": "Housing shortage/ affordability/ interest rates",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "affordability/interest 3 2 2 2 4 2 6 4 4 5 4 1 1 2"
+        },
+        {
+          "id": "crime-law-and-order",
+          "sourceLabel": "Crime/ law and order",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Crime/law and order 2 1 2 2 2 3 4 3 2 4 2 0 1 0"
+        },
+        {
+          "id": "education-schools",
+          "sourceLabel": "Education/ schools",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Education/schools 1 2 3 4 2 4 4 2 2 1 1 0 1 0"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence/ national security/ terrorism",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "1 1 0 1 10 9 7 1 2 1 2 1 3 2"
+        },
+        {
+          "id": "asylum-seekers-negative-comment",
+          "sourceLabel": "Asylum seekers – too many/ refugees/ boat people/ illegal immigrants (negative comment)",
+          "role": "coded-category",
+          "polarity": "negative-comment",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "boat people/illegal 4 8 10 2 3 2 1 1 1 1 1 0 0 0"
+        },
+        {
+          "id": "asylum-seekers-poor-treatment-sympathy-refugees",
+          "sourceLabel": "Asylum seekers – poor treatment, sympathy towards refugees/ boat people/ illegal immigrants",
+          "role": "coded-category",
+          "polarity": "sympathetic",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "towards refugees/ 3 4 3 1 2 2 1 1 1 1 0 0 0 0"
+        },
+        {
+          "id": "immigration-population-too-low-need-more-people-supportive",
+          "sourceLabel": "Immigration/population – too low/ need more people (supportive)",
+          "role": "coded-category",
+          "polarity": "supportive",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "– too low/need more 2 1 1 0 0 1 1 1 0 0 0 0 0 0"
+        },
+        {
+          "id": "racism",
+          "sourceLabel": "Racism",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Racism 2 1 1 1 2 4 2 1 1 2 2 1 1 1"
+        },
+        {
+          "id": "environment-overreaction-climate-change-carbon-tax-sceptical",
+          "sourceLabel": "Environment – overreaction to climate change/ carbon tax (sceptical)",
+          "role": "coded-category",
+          "polarity": "sceptical",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "6 7 0 0 1 0 0 0 1 0 0 0 0 0"
+        },
+        {
+          "id": "womens-issues-equal-pay-opportunity-violence",
+          "sourceLabel": "Women's issues (e.g. equal pay/opportunity, violence, etc.)",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "equal pay/opportunity, 0 0 0 0 1 0 0 0 1 0 0 0 0 0"
+        },
+        {
+          "id": "indigenous-issues",
+          "sourceLabel": "Indigenous issues",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "Indigenous issues 1 0 0 1 1 1 1 0 0 1 0 0 0 0"
+        },
+        {
+          "id": "industrial-relations-trade-unions",
+          "sourceLabel": "Industrial relations/ trade unions",
+          "role": "coded-category",
+          "share": 0,
+          "unit": "percent",
+          "evidence": "1 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        },
+        {
+          "id": "other-nothing-dont-know-decline",
+          "sourceLabel": "Other/ nothing/ don’t know/ decline",
+          "role": "coded-category",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "11 8 12 16 10 12 14 18 15 24 12 7 8 6"
+        }
+      ],
+      "distributionTotal": {
+        "printed": 100,
+        "computedFromNonSubtotals": 100
+      }
+    },
+    {
+      "id": "2022-july",
+      "reportYear": 2022,
+      "wave": "2022-july",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "fieldwork": {
+          "start": "2022-07-11",
+          "end": "2022-07-24"
+        }
+      },
+      "coverage": {
+        "kind": "selected-problems",
+        "completeCodedDistribution": false,
+        "includesOtherNothingDontKnow": false
+      },
+      "base": {
+        "kind": "weighted adult shares; no separate first-mention unweighted N printed",
+        "unweightedN": null,
+        "validResponseN": null,
+        "surveySampleN": 5757,
+        "surveySampleAnchor": "Appendix A, Sample",
+        "note": "The report figure/prose does not print a separate valid first-mention denominator; the overall survey N is not substituted for it."
+      },
+      "source": {
+        "reportId": "scanlon-2022",
+        "anchor": "Figure 16   The most important problem facing Australia, 2018, 2020, and 2022 surveys",
+        "caption": "Figure 16 The most important problem facing Australia, 2018, 2020, and 2022 surveys",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/MSC-2022_Report.pdf",
+        "doi": "10.26193/TZXG2J",
+        "textSha256": "938ff0a7b224a1ca3694c43d67935bb3bb9912e44178776117bcf914119c282b"
+      },
+      "categories": [
+        {
+          "id": "covid-19-pandemic-recovery",
+          "sourceLabel": "The COVID-19 pandemic & recovery",
+          "role": "coded-category",
+          "share": 9,
+          "unit": "percent",
+          "evidence": "THE COVID-19 PANDEMIC & 63% RECOVERY 9% 29%"
+        },
+        {
+          "id": "economy-unemployment-jobs-deficit-poverty",
+          "sourceLabel": "Economic issues, e.g. unemployment, jobs, deficit, poverty",
+          "role": "coded-category",
+          "share": 39,
+          "unit": "percent",
+          "evidence": "ECONOMIC ISSUES, E.G. UNEMPLOYMENT, 15% JOBS, DEFICIT, POVERTY 39% 5%"
+        },
+        {
+          "id": "environment-climate-change-water",
+          "sourceLabel": "Environment, climate change & water",
+          "role": "coded-category",
+          "share": 17,
+          "unit": "percent",
+          "evidence": "ENVIRONMENT, CLIMATE CHANGE & WATER 5% 17% 5%"
+        },
+        {
+          "id": "housing-shortages-affordability-interest-rates",
+          "sourceLabel": "Housing shortages, affordability & interest rates",
+          "role": "coded-category",
+          "share": 6,
+          "unit": "percent",
+          "evidence": "HOUSING SHORTAGES, AFFORDABILITY & INTEREST RATES 1% 6% 9%"
+        },
+        {
+          "id": "social-issues-drug-use-family-breakdown-childcare",
+          "sourceLabel": "Social issues: drug use, family breakdown, childcare",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "SOCIAL ISSUES: DRUG USE, 2% FAMILY BREAKDOWN, CHILDCARE 4% 9%"
+        },
+        {
+          "id": "quality-of-government-politicians",
+          "sourceLabel": "Quality of government & politicians",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "QUALITY OF GOVERNMENT & 2% POLITICIANS 4% July 2018 July 2020 July 2022 3%"
+        },
+        {
+          "id": "health-hospitals",
+          "sourceLabel": "Health & hospitals",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "HEALTH & HOSPITALS 1% 4% 1%"
+        },
+        {
+          "id": "defence-national-security-terrorism",
+          "sourceLabel": "Defence, national security & terrorism",
+          "role": "coded-category",
+          "share": 3,
+          "unit": "percent",
+          "evidence": "DEFENCE, NATIONAL SECURITY & 1% TERRORISM 3% 7%"
+        },
+        {
+          "id": "immigration-population-growth-concern",
+          "sourceLabel": "Immigration/population growth (concern)",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "IMMIGRATION/POPULATION 2% GROWTH (CONCERN) 1%",
+          "polarity": "concern"
+        }
+      ],
+      "distributionTotal": {
+        "printed": null,
+        "computedFromNonSubtotals": null,
+        "note": "Selected/most-common categories only; no distribution total is inferred."
+      }
+    },
+    {
+      "id": "2023-july",
+      "reportYear": 2023,
+      "wave": "2023-july",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "questionNote": "The three percentages are read from the adjacent prose because the time-series chart does not print every category value in extractable text.",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "fieldwork": {
+          "reported": "July 2023"
+        }
+      },
+      "coverage": {
+        "kind": "selected-problems-in-prose",
+        "completeCodedDistribution": false,
+        "includesOtherNothingDontKnow": false
+      },
+      "base": {
+        "kind": "weighted adult shares; no separate first-mention unweighted N printed",
+        "unweightedN": null,
+        "validResponseN": null,
+        "surveySampleN": 7454,
+        "surveySampleAnchor": "Appendix A and Table A1",
+        "note": "The report figure/prose does not print a separate valid first-mention denominator; the overall survey N is not substituted for it."
+      },
+      "source": {
+        "reportId": "scanlon-2023",
+        "anchor": "Figure 3",
+        "caption": "Figure 3 \u0007\u0007’What do you think is the most important problem facing Australia today?’ proportion of population, 2007 to 2018 (telephone surveys) and 2018 to 2023 (online and telephone)",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/2023-Mapping-Social-Cohesion-Report-1.pdf",
+        "doi": "10.26193/AOFDPA",
+        "textSha256": "afe8434887aad15fc153c32005002736b4398debcbedfee3bb0bbf257aeaabea"
+      },
+      "categories": [
+        {
+          "id": "economic-issues",
+          "sourceLabel": "Economic issues",
+          "role": "coded-category",
+          "share": 48,
+          "unit": "percent",
+          "evidence": "In 2023, almost half of us (48 per cent) think that not pay their rent or mortgage payments and 22 per cent economic issues are the most important set of problems"
+        },
+        {
+          "id": "housing-affordability-shortages",
+          "sourceLabel": "Housing affordability and shortages",
+          "role": "coded-category",
+          "share": 14,
+          "unit": "percent",
+          "evidence": "The next most commonly cited problem was housing affordability and shortages, cited by Australians continue to report a high degree of happiness 14 per cent of people"
+        },
+        {
+          "id": "environment-climate-change-water",
+          "sourceLabel": "Environment, climate change and water",
+          "role": "coded-category",
+          "share": 11,
+          "unit": "percent",
+          "evidence": "environment. One-in-ten (11 per cent) people cited an Single parent families, members of group households and issue related to the environment, climate change and those who live alone are the most likely to report feeling water as the most important problem facing Australia"
+        }
+      ],
+      "distributionTotal": {
+        "printed": null,
+        "computedFromNonSubtotals": null,
+        "note": "Selected/most-common categories only; no distribution total is inferred."
+      }
+    },
+    {
+      "id": "2024-july",
+      "reportYear": 2024,
+      "wave": "2024-july",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "questionNote": "Question wording is printed in Figure 5; the eight national values are read from Figure 7a, not the World panel.",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone",
+        "fieldwork": {
+          "reported": "July 2024"
+        }
+      },
+      "coverage": {
+        "kind": "eight-most-cited-problems",
+        "completeCodedDistribution": false,
+        "includesOtherNothingDontKnow": false
+      },
+      "base": {
+        "kind": "weighted adult shares; no separate first-mention unweighted N printed",
+        "unweightedN": null,
+        "validResponseN": null,
+        "surveySampleN": 7965,
+        "surveySampleAnchor": "Appendix A and Table A1",
+        "note": "The report figure/prose does not print a separate valid first-mention denominator; the overall survey N is not substituted for it."
+      },
+      "source": {
+        "reportId": "scanlon-2024",
+        "anchor": "Figure 7    The most important problem facing Australia and the world today",
+        "caption": "Figure 7 The most important problem facing Australia and the world today, most commonly cited, Life in AustraliaTM, 2024",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2024-Report.pdf",
+        "doi": null,
+        "textSha256": "60c185aa8c675d9679c5b26033fe0baec274b979c83f7af48f14065cf84269c9"
+      },
+      "categories": [
+        {
+          "id": "economy",
+          "sourceLabel": "The economy",
+          "role": "coded-category",
+          "share": 49,
+          "unit": "percent",
+          "evidence": "1. The economy 49 1. Defence, national"
+        },
+        {
+          "id": "housing-affordability",
+          "sourceLabel": "Housing affordability",
+          "role": "coded-category",
+          "share": 14,
+          "unit": "percent",
+          "evidence": "2. Housing affordability 14 2. The environment 19"
+        },
+        {
+          "id": "environment",
+          "sourceLabel": "The environment",
+          "role": "coded-category",
+          "share": 7,
+          "unit": "percent",
+          "evidence": "3. The environment 7 3. The economy 18"
+        },
+        {
+          "id": "social-issues",
+          "sourceLabel": "Social issues",
+          "role": "coded-category",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "4. Social issues 5 4. Government &"
+        },
+        {
+          "id": "government-politics",
+          "sourceLabel": "Government & politics",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "5. Government & politics 4 5. Social issues 4"
+        },
+        {
+          "id": "crime",
+          "sourceLabel": "Crime",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "6. Crime 4 6. Immigration /"
+        },
+        {
+          "id": "immigration-population",
+          "sourceLabel": "Immigration / population",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "4 7. Crime 2"
+        },
+        {
+          "id": "health",
+          "sourceLabel": "Health",
+          "role": "coded-category",
+          "share": 2,
+          "unit": "percent",
+          "evidence": "8. Health 2 8. Health 1"
+        }
+      ],
+      "distributionTotal": {
+        "printed": null,
+        "computedFromNonSubtotals": null,
+        "note": "Selected/most-common categories only; no distribution total is inferred."
+      }
+    },
+    {
+      "id": "2025-july",
+      "reportYear": 2025,
+      "wave": "2025-july",
+      "question": null,
+      "questionNote": "The 2025 report reproduces the MIP result but not the full question wording; no wording is back-filled from another wave.",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem.",
+      "sampleDesign": {
+        "mode": "Life in Australia panel, online and telephone; separate ORU non-probability-panel pilot",
+        "fieldwork": {
+          "reported": "July 2025"
+        },
+        "note": "The 2025 report separately describes its Life in Australia respondents, a targeted Polaron survey and an ORU pilot. Its total-population MIP sentence does not identify a separate valid first-mention N or which panel components form that exact base."
+      },
+      "coverage": {
+        "kind": "selected-problems-in-prose",
+        "completeCodedDistribution": false,
+        "includesOtherNothingDontKnow": false
+      },
+      "base": {
+        "kind": "weighted adult shares; no separate first-mention unweighted N printed",
+        "unweightedN": null,
+        "validResponseN": null,
+        "note": "The report figure/prose does not print a separate valid first-mention denominator; the overall survey N is not substituted for it."
+      },
+      "source": {
+        "reportId": "scanlon-2025",
+        "anchor": "total population,",
+        "caption": "total population, 58 per cent cite economic and housing issues and 5 per cent cite immigration",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/SI0001_MappingSocialCohesion_2025_v6.pdf",
+        "doi": null,
+        "textSha256": "7fe5985e1e4d04f7063017be3d17c431f93e0382bc2514dd53c0e93a48d9a3e3"
+      },
+      "categories": [
+        {
+          "id": "economic-and-housing-issues-printed-combination",
+          "sourceLabel": "Economic and housing issues (printed combined category)",
+          "role": "printed-combined-category",
+          "share": 58,
+          "unit": "percent",
+          "evidence": "problem. In the divisions. total population, 58 per cent cite economic and housing issues and 5 per cent cite immigration as the most important problem.",
+          "note": "The report does not separately print the two components here; they are not derived."
+        },
+        {
+          "id": "immigration",
+          "sourceLabel": "Immigration",
+          "role": "coded-category",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "problem. In the divisions. total population, 58 per cent cite economic and housing issues and 5 per cent cite immigration as the most important problem."
+        }
+      ],
+      "distributionTotal": {
+        "printed": null,
+        "computedFromNonSubtotals": null,
+        "note": "Selected/most-common categories only; no distribution total is inferred."
+      }
+    },
+    {
+      "id": "2026-june-july",
+      "reportYear": 2026,
+      "wave": "2026-june-july",
+      "question": "What do you think is the most important problem facing Australia today?",
+      "responseFormat": "Open-ended; first-mentioned problem",
+      "mentionRule": "Open-ended first problem.",
+      "sampleDesign": {
+        "mode": "Blended Life in Australia probability panel and ORU non-probability boost, online and telephone",
+        "fieldwork": {
+          "start": "2026-06-29",
+          "end": "2026-07-21",
+          "note": "Overall span; Life in Australia closed 12 July and ORU closed 21 July (Technical Report Table B1)."
+        }
+      },
+      "coverage": {
+        "kind": "most-common-problems-total-series",
+        "completeCodedDistribution": false,
+        "includesOtherNothingDontKnow": false
+      },
+      "base": {
+        "kind": "weighted adult shares; no separate first-mention unweighted N printed",
+        "unweightedN": null,
+        "validResponseN": null,
+        "surveySampleN": 10020,
+        "surveySampleAnchor": "Technical Report, Introduction and Table B1",
+        "note": "Figure 5 prints weighted Total/subgroup shares but not a separate first-mention unweighted N. The national blended N is read from the Technical Report, not assumed to be a valid-response N."
+      },
+      "source": {
+        "reportId": "scanlon-2026",
+        "anchor": "Figure 5",
+        "caption": "Figure 5. ‘What do you think is the most important problem facing Australia today?’ Weighted % of adults citing most common problems, 2026",
+        "url": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+        "doi": null,
+        "textSha256": "a87e41ac8ec66d28f0e8bd63168299d31087fbe5c909420e1fba9c9bf090db8d"
+      },
+      "categories": [
+        {
+          "id": "cost-of-living-inflation",
+          "sourceLabel": "Cost of living / inflation",
+          "role": "coded-category",
+          "share": 36,
+          "unit": "percent",
+          "evidence": "36",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 1
+        },
+        {
+          "id": "housing-affordability-shortages",
+          "sourceLabel": "Housing affordability & shortages",
+          "role": "coded-category",
+          "share": 11,
+          "unit": "percent",
+          "evidence": "11",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 2
+        },
+        {
+          "id": "other-economic-issues",
+          "sourceLabel": "Other economic issues",
+          "role": "coded-category",
+          "share": 10,
+          "unit": "percent",
+          "evidence": "10",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 3
+        },
+        {
+          "id": "immigration",
+          "sourceLabel": "Immigration",
+          "role": "coded-category",
+          "share": 9,
+          "unit": "percent",
+          "evidence": "9",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 4
+        },
+        {
+          "id": "government-politicians",
+          "sourceLabel": "The Government and politicians",
+          "role": "coded-category",
+          "share": 7,
+          "unit": "percent",
+          "evidence": "7",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 5
+        },
+        {
+          "id": "social-gender-issues",
+          "sourceLabel": "Social & gender issues (gender equality, violence against women, drugs, childcare, family)",
+          "role": "coded-category",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "5",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 6
+        },
+        {
+          "id": "environment-climate-change",
+          "sourceLabel": "The environment & climate change",
+          "role": "coded-category",
+          "share": 5,
+          "unit": "percent",
+          "evidence": "5",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 7
+        },
+        {
+          "id": "crime-law-order",
+          "sourceLabel": "Crime, law & order",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "4",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 8
+        },
+        {
+          "id": "right-wing-politics-racism-united-states",
+          "sourceLabel": "Right wing politics, racism & the influence of the United States",
+          "role": "coded-category",
+          "share": 4,
+          "unit": "percent",
+          "evidence": "4",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 9
+        },
+        {
+          "id": "national-security-terrorism-world-peace",
+          "sourceLabel": "National security, terrorism & world peace",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "1",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 10
+        },
+        {
+          "id": "health-education",
+          "sourceLabel": "Health & education",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "1",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 11
+        },
+        {
+          "id": "social-media-misinformation-artificial-intelligence",
+          "sourceLabel": "Social media, misinformation & Artificial Intelligence",
+          "role": "coded-category",
+          "share": 1,
+          "unit": "percent",
+          "evidence": "Social media, misinformation 1",
+          "figureSeries": "Total",
+          "figureGroupReadOrder": 12
+        }
+      ],
+      "distributionTotal": {
+        "printed": null,
+        "computedFromNonSubtotals": null,
+        "note": "Selected/most-common categories only; no distribution total is inferred."
+      }
+    }
+  ],
+  "coverage": {
+    "reportYears": [
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "waves": 19,
+    "fullPrintedDistributions": 14,
+    "selectedOrMostCommonDistributions": 5,
+    "categoryRows": 325,
+    "categoryRowsByWave": {
+      "2011": 21,
+      "2012": 21,
+      "2013": 21,
+      "2014": 21,
+      "2015": 21,
+      "2016": 22,
+      "2017": 22,
+      "2018-rdd": 22,
+      "2018-lina": 22,
+      "2019-rdd": 19,
+      "2019-lina": 19,
+      "2020-july": 20,
+      "2020-november": 20,
+      "2021-july": 20,
+      "2022-july": 9,
+      "2023-july": 3,
+      "2024-july": 8,
+      "2025-july": 2,
+      "2026-june-july": 12
+    }
+  },
+  "limitations": [
+    "ADA Anubis blocked the dataset metadata API on checked 2011, 2012 and 2023 deposit requests. No respondent files or codebooks were available; valid-only respondent denominators and raw column derivations therefore remain unavailable.",
+    "The 2011 report's Table 6 N cell is malformed in text extraction. Its base is independently read from the 2012 report Table 11's 2011 column and explicitly sourced there, not guessed.",
+    "The 2022–2026 public reports print selected, ranked or most-common MIP categories rather than a full coded distribution with Other/nothing/don’t know and Total. Those five waves are explicitly marked incomplete; no residual or missing category shares are derived.",
+    "In 2025 the combined economic-and-housing figure is retained as a printed combined category. It is not split into economic and housing estimates, and the exact MIP panel/valid-response base is not separately identified in the report."
+  ]
+}

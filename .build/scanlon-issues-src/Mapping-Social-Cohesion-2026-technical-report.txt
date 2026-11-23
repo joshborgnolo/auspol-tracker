@@ -1,0 +1,2567 @@
+                     Mapping Social
+                     Cohesion 2026
+                                     Technical Report
+
+
+        Australian National University & Social Research
+                             Centre
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report              1
+   Table of contents
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report   2
+   Introduction
+
+   The following report provides technical information related to the administration and analysis of the
+   Mapping Social Cohesion 2026 study.
+
+   The Social Research Centre and the Australian National University were separately contracted by the
+   Scanlon Foundation Research Institute to administer and analyse the Mapping Social Cohesion
+   survey. The Social Research Centre managed the survey, including its administration to the Life in
+   AustraliaTM panel and had oversight of its administration to the Online Research Unit panel and
+   through Polaron Connect.
+
+   The Australian National University conducted the analysis of the survey and the writing of the
+   report, for all but the qualitative chapter. The Scanlon Foundation Research Institute conducted the
+   qualitative component of the study in-house under the leadership of Trish Prentice, including the
+   conduct of all interviews and were the sole authors of the qualitative chapter.
+
+   This report is split into five parts.
+
+    >    Part A provides a summary of the Mapping Social Cohesion 2026 study. Part A was authored by
+         the Australian National University.
+
+    >    Part B describes the administration of the Mapping Social Cohesion 2026 survey and was
+         authored by the Social Research Centre.
+
+    >    Part C describes the redevelopment of the Scanlon Index of social cohesion in 2021 and that is
+         now used in the main report to track social cohesion over time. Part C was authored by Andrew
+         Ward, Benjamin Phillips, Wendy Heywood and Ashleigh Buttigieg from the Social Research
+         Centre.
+
+    >    Part D provides detailed results from analyses reported in the main report, including data tables
+         with margins of error and regression results. Part D was authored by the Australian National
+         University.
+    >    Part E provides the Discussion Guide from the qualitative research. The Discussion Guide was
+         created by the Scanlon Foundation Research Institute.
+
+   Further details and data are published in the Australian Data Archive. Interested researchers are
+   able to apply to access the unit record survey data for each wave of the survey going back to 2007
+   (without cost). https://dataverse.ada.edu.au/dataverse/scs
+
+   Data from each wave are published in the Archive after a 12 month embargo period from the public
+   release of the Mapping Social Cohesion report. Interested parties are also able to freely access other
+   survey documentation from the Australian Data Archive, including data dictionaries and survey
+   questionnaires.
+
+   For other queries, including related to data provision and analysis, please contact the Scanlon
+   Foundation Research Institute, info@scanloninstitute.org.au.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                3
+   PART A: Summary
+   Australian National University
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report   4
+   Introduction
+   The Scanlon Foundation Research Institute’s Mapping Social Cohesion series has been the pre-
+   eminent source of information on social cohesion in Australia for almost two decades. The 2024
+   study is the 20th in the series, following the benchmark survey in 2007 and annual surveys since
+   2009 (and two in 2020, after COVID-19 hit). The 2026 study combines a nationally-representative
+   survey of 10,020 Australians with additional targeted boost surveys of 251 mostly overseas-born
+   Australians and 47 in-depth qualitative interviews. The targeted boost surveys and interviews
+   provide rich information and insights and ensure the Mapping Social Cohesion study is representing
+   the diversity and complexity of contemporary Australia.
+
+
+   The Mapping Social Cohesion survey
+   The centrepiece of the Mapping Social Cohesion 2026 was a nationally-representative survey with
+   more than 10,000 Australian adults (aged 18 years and over). Since 2018, most survey respondents
+   have come from the Social Research Centre’s Life in AustraliaTM panel. The Life in AustraliaTM panel
+   is a probability-based panel, meaning that people are invited at random to join (and once on the
+   panel can be asked to complete a survey up to once a month). Like every year, panel members were
+   invited to complete the 2026 Mapping Social Cohesion survey in the middle of the year, in June and
+   July. Most people complete the survey through an online questionnaire (99%), though they can also
+   complete the survey by phone.
+
+   More information on the Life in AustraliaTM panel and the history of the Mapping Social Cohesion
+   survey is provided in Part B of this report.
+
+   In the current political environment, it has also been important to ensure the study is representing
+   the diversity of political opinion in Australia today – in addition to Australia’s migrant, ethnic and
+   wider demographic and socioeconomic diversity. The Life in AustraliaTM panel performs well on
+   these fronts, though there are always difficulties with panels in capturing and representing newly
+   arrived populations (including recent immigrants), those that are less socially and politically
+   engaged, as well as certain groups of conservative-minded people who often shy away from social
+   surveys and political polling.
+
+   Social, demographic and political representation has been enhanced in this year’s Mapping Social
+   Cohesion study through boost surveys of key population groups. These boosts were designed so that
+   the total pool of respondents matched the outcome of the 2025 Federal Election in who they said
+   they voted for. In addition to 7,343 respondents from Life in AustraliaTM, we recruited 2,677
+   respondents in four key population groups:
+   1. People who voted for the Coalition at the election,
+   2. People who voted for a party outside the Coalition, Labor, the Greens or an Independent,
+   3. People who were eligible to vote but did not vote and
+   4. People who are not Australian citizens and ineligible to vote.
+
+   These additional respondents were sourced through another panel provider, the Online Research
+   Unit (ORU), the same panel used by other social surveys including ANU Poll. The ORU panel is a non-
+   probability
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                               5
+   The strategy proved successful. We met our targets and the voting patterns of our respondents
+   match very well to the 2025 Federal Election. The survey is also predicting voting intentions well,
+   with for example, approximately one-quarter of Mapping Social Cohesion survey respondents
+   indicating a voting preference for Pauline Hanson’s One Nation party, similar to what the political
+   polls were suggesting at the time. Our estimates of social and community participation also closely
+   match data from similar questions in the Australian Bureau of Statistics’ General Social Survey 2025
+   (see Figure 35 in the main report).
+
+   We refer to the combined sample from Life in AustraliaTM and the ORU as the blended sample in the
+   main report.
+
+   We ran a pilot study of this blended approach in 2025 as well and use the results to measure changes
+   in social cohesion between 2025 and 2026. It is important to note though we made improvements to
+   the design of the blended approach in 2026 that affects the comparability of the results between
+   years. Firstly, Independent voters were included in group 2 (see above) in 2025, though in response
+   to an over-sampling on the ORU boost, we removed Independent voters from group 2 in 2026.
+   Secondly, groups 3 and 4 were combined into a single non-voting boost group in 2025. However, in
+   response to an oversampling of Australian citizens who did not vote, we separated this group into
+   two to ensure we had an adequate sample of non-Australian citizens. We did not detect any
+   substantive effects of these tweaks on the results in preparing this year's report and are confident
+   that the blended samples are approximately comparable between 2025 and 2026 and are giving us a
+   good indication of changes in social cohesion over the last year.
+
+   The number of respondents to the main 2026 Mapping Social Cohesion survey are shown in Table
+   A1 for the main demographic and socioeconomic groups used throughout this report.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                             6
+   Table A1 Number of Mapping Social Cohesion survey respondents, blended sample, 2026
+
+                                  Female            Male             Persons
+     GENDER
+                                  5,756             4,429            10,271
+
+                                  65+               55-64            45-54            35-44         25-34               18-24
+     AGE
+                                  3,447             1,946            1,677            1,640         1,183               378
+
+                                                                                      South         Western
+                                  NSW               Victoria         Queensland
+                                                                                      Australia     Australia
+     STATE
+                                  2,914             2,772            1,905            876           1,124
+
+
+     CAPITAL CITY/ REST           Capital city      Rest of state*
+     OF STATE
+                                  7,163             3,108
+
+                                  Postgraduate      Bachelor         Certificate/
+                                                                                      Year 12       Up to Year 11
+     HIGHEST EDUCATION            degree            degree           diploma
+
+                                  3,075             2,563            2,725            874           900
+
+                                  Prosperous/                                         Struggling
+                                                    Reasonably       Just getting
+                                  very                                                to pay
+                                                    comfortable*     along
+     FINANCIAL SITUATION          comfortable                                         bills/ poor
+
+                                  1,940             4,728            2,674            929
+
+                                                    Liberal/
+     VOTE AT 2025                 Labor                              Greens           One Nation    Independent
+                                                    National
+     ELECTION
+                                  2,533             2,348            900              756            520
+                                                    Liberal/
+     VOTING PREFERENCE            Labor                              Greens           One Nation    Independent
+                                                    National
+     2026
+                                  2,767             1,984            1,246            2,412         936
+
+                                                    Foreign          Foreign
+                                  Australian
+     WHERE BORN & FIRST                             born/            born/ non-
+                                  born
+                                                    English          English
+     LANGUAGE
+                                  6,406             2,269            1,545
+
+                                  Couple no         Couple                            Group
+                                                                     Single parent                  Live alone
+                                  children          parent                            household
+     HOUSEHOLD TYPE
+                                  3,420             2,765            693              286           2,279
+
+                                  Own outright      Mortgage         Rent
+     HOUSING TENURE
+                                  4,228             3,363            2,258
+
+                                  Quintile 1                                                        Quintile 5
+     NEIGHBOURHOOD                (High             Quintile 2       Quintile 3       Quintile 4    (Low
+                                  disadvantage)                                                     disadvantage)
+     DISADVANTAGE
+                                  1,365             1,787            2,112            2,424         2,581
+   * Includes a small number of respondents who did not respond to the question. Combined with this category to avoid
+   disclosure of the small number.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                                 7
+   Targeted boost surveys
+   As in every year since 2023, targeted boost surveys were conducted In 2026 to ensure greater
+   representation across specific migrant groups. Respondents were recruited through Polaron
+   Connect. Three migrant groups were targeted: people from India, the Middle East and north Africa
+   and sub-Saharan Africa.
+
+   Respondents to the targeted boost surveys received a shorter version of the Mapping Social
+   Cohesion questionnaire. The shortened version was designed to take approximately 10 minutes on
+   average to complete, roughly half the length of the full questionnaire. The boost surveys were
+   delivered in one of four different languages, English, Arabic, Punjabi and Swahili. These languages
+   were selected as they were estimated to provide the widest coverage of the Australian population in
+   the three targeted groups (India, the Middle East and North Africa, and sub-Saharan Africa) based on
+   data from the 2021 Census on a) the languages that people speak at home and b) their proficiency in
+   English (as reported by the household).
+
+   A total of 251 boost surveys were conducted and the results added to the responses of Life in
+   AustraliaTM members. The boost surveys strengthen our ability to report on the wellbeing and
+   perceived cohesion of specific migrant groups. The total number of respondents who completed a
+   survey in 2024 are shown in Table A2 for three targeted countries or regions of origin, other
+   overseas places and Australia.
+
+
+   Table A2 Number of respondents by region of birth, blended survey and targeted boost surveys,
+   2026
+
+
+                                                                 Blended   Targeted
+   Country/region of birth                                                              Total
+                                                                  survey    boost
+
+
+   Europe, the Americas and New Zealand                             *         *         2,176
+
+   Africa & the Middle East                                       288        137         425
+
+   East Asia & the Pacific                                          *         *          777
+
+   South and central Asia                                         345        97          457
+
+   Australia                                                        *         *         6,406
+   * not disclosed due to a small number in one or more cells.
+
+
+   The Mapping Social Cohesion time series
+   Our ability to track social cohesion and its indicators over time have been impacted by changes in
+   the ways the Mapping Social Cohesion survey has been administered over time. The Mapping Social
+   Cohesion survey was first administered to Life in AustraliaTM in 2018. Prior to Life in AustraliaTM, the
+   first 10 surveys in the Mapping Social Cohesion series were administered firstly to landline
+   telephone numbers, and then to landline and mobile numbers, employing Random Digit Dialling
+   (RDD). In 2018 and 2019, the survey was undertaken both via RDD and the Life in AustraliaTM panel.
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                 8
+   Between 2020 and 2024, the survey was administered to Life in AustraliaTM, with boost surveys of
+   immigrant populations in 2023 and 2024. As described above, the Mapping Social Cohesion survey
+   was administered to a blended sample of respondents from Life in AustraliaTM and the non-
+   probability ORU panel in 2025 and 2026.
+
+   We can measure the effects of changes in survey administration on social cohesion indicators. The
+   parallel administration in 2018 and 2019 of the Mapping Social Cohesion Survey via both Random
+   Digit Dialling (RDD) and the Life in AustraliaTM panel provided an understanding of the impact of the
+   data collection mode on the results. Generally speaking, Life in AustraliaTM members report lower
+   levels of social cohesion than were reported through the RDD survey, likely because respondents to
+   the largely online Life in AustraliaTM survey are more comfortable reporting financial stress and
+   unhappiness than when they had to speak to a person over the telephone.
+
+   We calculate the effect of the shift to the mostly online Life in AustraliaTM panel by taking the average
+   value of any given indicator in 2018 on 2019 from the RDD surveys and subtracting it from the same
+   average from Life in AustraliaTM panellists. For example, if a weighted average of 60% of RDD
+   respondents had a great sense of belonging across 2018 and 2019, compared with 50% of Life in
+   AustraliaTM respondents, we estimate the mode effect or the effect of shifting to Life in AustraliaTM to
+   be -10 percentage points (i.e. 50 – 60).
+
+   We can estimate the effect of shifting to the blended sample in 2025 in a similar way. Specifically, we
+   can calculate indicators in 2025 and 2026 based just on Life in AustraliaTM and with the blended
+   sample. We show this in the main report by presenting the two estimates for 2025. As can be seen,
+   differences are generally small or non-existent. We attribute the differences that we do find to the
+   overall more politically conservative composition of the blended sample. Given this composition is
+   strongly aligned with the outcome of the 2025 Federal election (held less than two months prior to
+   the survey), we believe the blended samples provide the best estimates of the true state of social
+   cohesion in Australia.
+
+
+   Weighting of survey results
+   Survey data are weighted to adjust for the chance of being sampled in the survey and to ensure the
+   demographic and socioeconomic profile of respondents mirrors the Australian population as closely
+   as possible.
+
+   This involves assigning each respondent a weight so that the sum of weights across a set of
+   demographic indicators line up with benchmarks set by population and census data created by the
+   Australian Bureau of Statistics. The benchmarks included in the weighting solution are: state or
+   territory of residence, whether lives in a capital city or elsewhere in the state, gender, age, highest
+   education (bachelor’s degree or below), language spoken at home (English or other), dwelling
+   tenure, and household composition. More information is available in Part B of this report.
+
+
+   Inferring social cohesion for all of Australia
+   Of course, we do not survey all Australians and random errors and variation mean that we cannot be
+   certain that survey results will be true for the whole population. We use statistics to estimate the
+   maximum size of this potential error based on the weights used and the number of respondents in
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                  9
+   each group. We provide margins of error in Part D of this report for the key results provided in the
+   main report. The margins of error tell us the range in which we believe with 95 per cent confidence
+   that the true estimate lies for the whole population.
+
+    > For example, if 50 per cent of male respondents to the survey say that people generally can be
+         trusted (after applying weights), the margin of error of 2.2 indicates that we are 95 per cent
+         confident that the proportion of all Australian males who trust others is within 2.2 percentage
+         points of 50 per cent. In other words, we are 95 per cent confident that between 47.8 per cent
+         and 52.2 per cent of all Australian males think that people generally can be trusted.
+
+    With the large size of the Mapping Social Cohesion survey, margins of error at the national level are
+    small. Generally, they range up to 1.5 points. This means that differences in national results of two
+    or more points across years are generally statistically significant. For example, if the proportion of
+    people who trust the Federal Government declines from 40% in one year to 36% in the next, this
+    will be statistically significant. Significance in this context means that the differences are likely to be
+    real and more than just random statistical chance. It does not mean they are large or important
+    differences.
+
+
+   In-depth qualitative interviews
+   The 2024 Mapping Social Cohesion study included 47 in-depth interviews with Australian adults.
+   Interview participants were recruited through the Farron Research company. The number of
+   interview participants are listed in Table A3 by participants’ age, gender, state of residence, and vote
+   in the last federal election. All interviews were conducted in English.
+
+
+   Ethics approval
+   The 2026 Mapping Social Cohesion survey (incorporating also the targeted surveys) was approved
+   by the Australian National University Human Research Ethics Committee (Protocol number
+   2025/152).
+
+   The in-depth qualitative interviews were also approved by the Australian National University
+   Human Research Ethics Committee under a separate ethics protocol (Protocol number 2026/238).
+
+   Past iterations of the study were approved by the human research ethical review boards of Monash
+   University (2007 to 2021) and the Australian National University (2022-2026).
+
+
+   The Scanlon Index of Social Cohesion
+   As every year, the 2026 Mapping Social Cohesion report publishes estimates of social cohesion based
+   on the Scanlon Index of Social Cohesion. Developed by Professor Andrew Markus from Monash
+   University and colleagues, the index has been used to measure social cohesion in Australia since
+   2007 and is now one of the most important and long-running barometers of Australia’s social well-
+   being. The Index was renamed from the Scanlon-Monash Index of Social Cohesion in 2025. This is a
+   simplification, though we continue to recognise and celebrate the contribution of Monash University
+   and particularly Professor Markus.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                     10
+   The original Scanlon Index of Social Cohesion is constructed by aggregating responses to 17 survey
+   questions on the Mapping Social Cohesion survey. Responses are organised into the following five
+   core measures or domains of social cohesion:
+
+    > Belonging: the sense of pride and belonging people have in Australia and in Australian life and
+         culture.
+
+    > Worth: the degree of emotional and material well-being across society, as measured through
+         levels of happiness and financial satisfaction.
+
+    > Social inclusion and justice: perceptions of economic fairness in Australian society and trust
+         in the Federal Government.
+
+    > Participation: active engagement in political activities and the political process, including
+         through voting, signing a petition, contacting Members of Parliament, and attending protests.
+
+    > Acceptance and rejection: attitudes to immigrant diversity, support for ethnic minorities, and
+         experience of discrimination.
+
+   In 2021, the Social Research Centre was commissioned to re-develop the Scanlon Index of Social
+   Cohesion. The objective was to enhance the robustness and statistical validity of the measurement of
+   social cohesion and provide greater capacity to examine how expressed levels of cohesion vary
+   across individuals and groups in society.
+
+   The re-developed index is comprised of an expanded set of 29 questions across the five domains of
+   social cohesion. The new index is based on a rigorous and robust methodology, designed to build on
+   the original index and strengthen our understanding of social cohesion. The particular areas in
+   which the new index expands this understanding are as follows:
+
+    > The original index design measured social cohesion in the Belonging domain as the sense of
+         pride and belonging in Australia and Australian life and culture. The new index measures
+         belonging at national and neighbourhood levels, as well as on a personal level through
+         individual social connectedness.
+
+    > ‘Participation’ in the original index design exclusively refers to political participation, or
+         engagement in political activities and the political process. The new index combines
+         engagement in political activities with measures of participation in social, community, religious,
+         civic, and political groups.
+
+   The re-developed Index of Social Cohesion provides new power to examine how social cohesion
+   varies over time and across society. However, several questions in the new index were only asked
+   for the first time in 2021. For this reason, the original index design based on the smaller set of 17
+   questions continues to be used in this report to track social cohesion between 2007 and 2025.
+
+   The new index is used to track changes between 2025 and 2026. To do this, we anchor 2025 scores
+   on the new Index against scores on the old Index. For example, if on the new index, scores declined
+   by 3% between 2025 and 2026, we apply a 3% reduction to the 2025 score on the old Index to arrive
+   at the 2026 score. Thus, the levels of social cohesion are set equivalent to the old Index in 2025, with
+   proportional changes after 2025 determined by the new Index.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                 11
+   The survey questions used to construct the historical and new indices of social cohesion are listed in
+   Table A4. A detailed description of the development of the new Index is provided in Part C of this
+   report.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                               12
+   Table A4 Domains and items in the new and historical Scanlon Index of Social Cohesion
+
+                                                                                          Historical    New
+     Domain and question
+                                                                                            index      index
+
+     Domain 1: Sense of belonging
+
+     To what extent do you take pride in the Australian way of life and culture?             Yes        Yes
+     To what extent do you have a sense of belonging in Australia?                           Yes        Yes
+     Do you agree or disagree with the following statements?
+       'In the modern world, maintaining the Australian way of life and culture is
+                                                                                             Yes        No
+     important'
+       'I feel like I belong in my neighbourhood'                                            No         Yes
+       'My neighbourhood has a strong sense of community'                                    No         Yes
+     How often do you feel isolated from others?                                             No         Yes
+     How safe do you feel at home by yourself during the day?                                No         Yes
+
+     Domain 2: Sense of worth
+
+     How satisfied or dissatisfied are you with your present financial situation?            Yes        Yes
+     To what extent do you feel that people treat you with respect?                          No         Yes
+     Taking all things into consideration, would you say that over the last year you
+                                                                                             Yes        Yes
+     have been very happy, happy, unhappy, or very unhappy?
+     During the past 30 days, about how often did you feel the things you do in your
+                                                                                             No         Yes
+     life were worthwhile?
+     Over the last 12 months, how often is the following statement true…
+     'You / your household went without meals because there wasn’t enough money              No         Yes
+     for food'
+
+     Domain 3: Social inclusion and justice
+
+     To what extent do you agree or disagree with the following statements?
+       'Australia is a land of economic opportunity where in the long run, hard work
+                                                                                             Yes        Yes
+     brings a better life'
+       'In Australia today, the gap between those with high incomes and those with
+                                                                                             Yes        No
+     low incomes is too large'
+        'People living on low incomes in Australia receive enough financial support
+                                                                                             No         Yes
+     from the government'
+
+       'Overall, everyone in Australia has a fair chance of getting the jobs they seek'      No         Yes
+
+       'Elections are fair'                                                                  No         Yes
+     How often do you think the government in Canberra can be trusted to do the
+                                                                                             Yes        No
+     right thing for the Australian people?
+     How often do you think government leaders in Australia abuse their power?               No         Yes
+     In your opinion, how often do the courts make fair, impartial decisions based on
+                                                                                             No         Yes
+     the evidence made available to them?
+
+     Domain 4: Participation
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                  13
+                                                                                         Historical    New
+     Domain and question
+                                                                                           index      index
+     Please indicate which, if any, of the following you have done over the last three
+     years or so?
+       1. Voted in an election                                                              Yes        No
+       2. Signed a petition                                                                 Yes        No
+       3. Written or spoken to a Federal or State Member of Parliament                      Yes        Yes
+       4. Joined a boycott of a product or company                                          Yes        Yes
+       5. Attended a protest, march, or demonstration                                       Yes        No
+       6. Posted or shared anything about politics online                                   No         Yes
+     In the last 12 months, have you been actively involved in any community
+                                                                                            No         Yes
+     support groups?
+     In the last 12 months, have you been actively involved in any social or religious
+                                                                                            No         Yes
+     groups?
+     In the last 12 months, have you been actively involved in any civic or political
+                                                                                            No         Yes
+     groups?
+     In the last 4 weeks, did you help anyone (not living with you) with any of the
+     following activities?
+     • Providing transport or running errands                                               No         Yes
+     • Any teaching, coaching, or practical advice
+     • Providing any emotional support
+
+     Domain 5: Acceptance and rejection
+
+     How strongly do you agree or disagree with the following statements?
+       'The relationship between Aboriginal and Torres Strait Islanders and the
+                                                                                            No         Yes
+     wider Australian community is very important for Australia as a nation'
+       'It is important for Indigenous histories and cultures to be included in the
+                                                                                            No         Yes
+     school curriculum'
+        'Accepting immigrants from many different countries makes Australia
+                                                                                            Yes        Yes
+     stronger'
+       'Ethnic minorities in Australia should be given Australian government
+                                                                                            Yes        Yes
+     assistance to maintain their customs and traditions'
+     Have you experienced discrimination because of your skin colour, ethnic origin,
+                                                                                            Yes        No
+     or religion over the last 12 months?
+     In three or four years, do you think that your life in Australia will be much
+                                                                                            Yes        No
+     improved, a little improved, about the same, a little worse, or much worse?
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                 14
+                   PART B: Survey
+                   administration
+                                   Social Research Centre
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report               15
+   Introduction
+
+   Project background
+   The Scanlon Foundation Research Institute commissioned the Social Research Centre to administer the
+   Mapping Social Cohesion Survey. The aims of the survey were to look at the Australian community’s
+   attitudes towards various aspects of social cohesion and assess changes in these attitudes over time.
+
+   The survey was conducted on the 155th wave of Life in Australia™, the Social Research Centre’s probability-
+   based online panel, along with a non-probability panel boost through the Online Research Unit (ORU).
+
+
+   Project overview
+   Key project statistics for the survey are summarised in Table B1.
+
+
+   Table B1 Summary of key statistics
+
+                                                Life in           Life in Australia™          Life in
+                                               Australia™              (Online)             Australia™
+Field                                           (Total)                                      (Offline)    The ORU
+
+Invited to complete survey                          9,488                 9,419                   69          -
+Total Interviews achieved                           7,343                 7,299                   44       2,677
+Average interview duration (mins)                   17.4                   17.4                  30.8       22.7
+Completion rate (%)                                 77.4                   77.5                  63.8         -
+Main fieldwork start date                        29-Jun-26              29-Jun-26             29-Jun-26   1-Jul-26
+Main fieldwork finish date                        12-Jul-26             12-Jul-26             12-Jul-26   21-Jul-26
+
+
+
+   About Life in Australia™
+   In 2016, the Social Research Centre established Australia’s first national probability-based online panel:
+   Life in Australia™ (Kaczmirek et al., 2019). The panel is the most methodologically rigorous online panel
+   in Australia and is one of only a small number worldwide.1 Members of the panel are recruited via random
+   digit dialling (RDD) or address-based sampling (A-BS) and agreed to provide their contact details to take
+   part in surveys on a regular basis. What separates Life in Australia™ from other online panels is the use of
+   sampling frames for which units have known probability of selection and the fact that people cannot enrol
+   unless invited to participate.
+
+
+   Ethics and quality assurance
+   This research was undertaken in accordance with ISO 20252:2019 Market, Opinion and Social Research
+   Standard, The Research Society (formerly AMSRS) Code of Professional Behaviour, the Australian Privacy
+   Principles and the Privacy (Market and Social Research) Code 2021.
+
+   The Social Research Centre is an accredited Company Partner of The Research Society with all senior staff
+   as full members and several senior staff QPMR accredited. The Social Research Centre is also a member of
+
+
+
+   1 Others include the Pew Research Center American Trends Panel, NORC AmeriSpeak and GESIS Panel.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                         16
+   the Australian Data and Insights Association (ADIA formerly known as AMSRO) and bound by the Market
+   and Social Research Privacy Principles/Code.
+
+   As explained in Part A, the survey has been approved in every year by the human research ethics
+   committees of Monash University (2007–2021) and the Australian National University (2022–2026).
+
+
+   Questionnaire design and testing
+
+   The questionnaire was developed by Monash University and the Scanlon Foundation in 2007 and is
+   maintained and updated by the Australian National University in collaboration with the Scanlon
+   Foundation Research Institute. The Social Research Centre performs a review role. Prior to fieldwork
+   starting, standard operational testing procedures were applied to ensure that the script truly reflected
+   the agreed final electronic version of the questionnaire. These included:
+
+   •      programming the skips and sequencing instructions as per the final questionnaire
+   •      rigorous checking of the questionnaire in ‘practice mode’ by the Social Research Centre project
+          coordinator and the project quality supervisor, including checks of the on-screen presentation of
+          questions and response frames on a range of devices
+   •      randomly allocating dummy data to each field in the questionnaire and examining the resultant
+          frequency counts to check the structural integrity of the script.
+
+   No formal pilot testing was undertaken in 2026. However, a soft launch was undertaken to confirm the
+   integrity of the questionnaire. This involved initiating a small number of offline records on the first
+   planned day of fieldwork. The interviewing team was de-briefed and top-line data reviewed.
+
+
+   Methodology
+
+   Sample design and size
+   The in-scope population for the survey was adults aged 18+ years residing in Australia. The survey was
+   administered to a large subset of active Life in Australia™ members, who served as the primary sampling
+   frame. A non-probability panel boost was also used to recruit additional respondents, including Coalition
+   voters, minor party and independent voters, non-voters, people ineligible to vote in the 2025 Australian
+   Federal Election, and non-citizens.
+
+
+   Life in Australia™ panellists have been recruited using a variety of probability sampling frames and
+   survey modes. These are summarised in Table B2.
+
+
+
+
+   Table B2 Summary of Life in Australia™ recruitment, 2026
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                  17
+                Sampling                                             Panel members              Recruitment Rate*                 Profile Rate
+    Year          frame            Recruitment mode(s)                 profiled (n)                    %                               %
+
+   2016      DFRDD                CATI                                      3,322                       20.0                          77.7
+
+   2018      Mobile RDD           CATI                                        267                       12.1                          69.7
+
+   2019      A-BS                 CAWI / CATI                               1,810                       10.8                         100.0
+   2020      A-BS                 Mail push-to-web / CATI                     309                         6.1                        100.0
+
+   2020      Mobile RDD           IVR                                         158                         1.6                        100.0
+
+   2020      Mobile RDD           SMS push-to-web                             145                         3.1                        100.0
+   2021      SMS                  SMS push-to-web                             510                         3.4                        100.0
+
+   2021      A-BS                 CAWI / CATI                               3,715                         7.7                        100.0
+   2023      SMS                  SMS push-to-web                           4,164                         2.6                        100.0
+
+   2024      SMS                  SMS push-to-web                           3,267                         1.8                        100.0
+
+   2025      SMS                  SMS push-to-web                           1,969                       1.36                         100.0
+
+     Notes: A-BS = address-based sampling; CATI = computer-assisted telephone interviewing; CAWI = computer-
+     assisted web interviewing; DFRDD = dual-frame (landline and mobile) RDD; IVR = interactive voice response; RDD =
+     random digit dialling; SMS = short message service (i.e., text message).
+
+     * AAPOR RR3. See Callegaro and DiSogra (2008) for details on outcome rates for online panels; profile rates are of
+     questionable relevance for non-CATI modes.
+
+
+
+   Dual-frame RDD (2016)
+   Initial recruitment in 2016 used a dual-frame random digit dialling sample design, with a
+   30:70 split between the landline RDD sample frame and mobile phone RDD sample frame.
+   For the landline sample, an alternating next / last birthday method was used to randomly
+   select respondents from households where two or more in-scope persons were present. For
+   mobile sample, the phone answerer was the selected respondent. Only one member per
+   household was invited to join the panel. RDD sample was supplied by SamplePages2 Mobile
+   and landline coverage in Australia in 2017–18 was 98% (Phillips et al., 2019), including the
+   1% error rate from RDD vendor checks for number working status.
+
+
+
+
+   2 SamplePages selects numbers randomly from the Australian Communication and Media Authority’s register of
+
+   numbers, which shows all allocated (i.e., potentially in use) blocks of mobile numbers. For mobile RDD, SamplePages
+   does not use a list-assisted approach (Brick et al., 1995); a pure RDD sample is drawn. A list-assisted approach is used for
+   landline RDD. Before release to the Social Research Centre, sampled numbers undergo HLR/SS7 look-up to check for
+   active status (a process sometimes called ‘pulsing’ or ‘pinging’), with inactive numbers not being provided to the Social
+   Research Centre. SamplePages reported a 1% false negative rate for these checks for active status.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                                                18
+   Mobile RDD (2018)
+   In 2018, the panel was refreshed using only mobile RDD sample. Only online participants
+   that were under 55 years old were recruited, in order to balance the demographics (the age
+   profile of panel members was older than that of the Australian population). The recruitment
+   rate (RECR) for the replenishment was 12.1%. For both the recruitment in 2016 and panel
+   refreshment in 2018, the RDD sample was provided by SamplePages. Mobile coverage in
+   Australia in 2017–18 was 93% (Phillips et al., 2019), again with a 1% error rate from
+   working number look-up as part of SamplePages’ processes.
+
+   Address-based sampling (2019, 2020, 2021)
+   Between October-December 2019, the panel was expanded. This recruitment used address-
+   based sampling (A-BS; Link et al., 2005) with push-to-web methodology (Dillman, 2017).3
+   Only online participants were recruited in order to balance the demographics (the age
+   profile of panel members was older and more educated than that of the Australian
+   population). The sampling frame used was the Geo-coded National Address File (G-NAF),
+   Australia’s authoritative list of addresses, and is assumed to cover all Australian addresses.4
+   An ‘any adult’ approach to selection was applied; i.e., one adult per household with no
+   attempt to impose a selection routine.5 The G--NAF is an open-source file that is built and
+   maintained by Geoscape Australia (Australian Government, 2023). Later rounds of
+   recruitment took place in 2020 (with IVR and SMS push-to-web as described below) and
+   2021, the panel was expanded using the A-BS sampling frame and push-to-web and CATI
+   methodology, as described above. Offline respondents were recruited in 2021 (a call-in
+   number was provided). Coverage is estimated at 96.1% of addresses due to the Social
+   Research Centre’s exclusion of certain addresses that have a low probability of being
+   residential.
+
+   Interactive voice response (2020)
+   Interactive voice response (IVR) push-to-web makes brief use of IVR (an automated call) to
+   briefly describe the reason for the call; people who are interested are then sent a link to the
+   profile survey via SMS. IVR coverage is estimated at 97%, based on 98% mobile coverage
+   (Australian Communications and Media Authority, 2022a) and the 1% working number
+   look-up error rate referred to above.6
+
+
+
+
+   3 Addresses matched to telephone numbers received reminder calls; respondents who received a reminder call could join
+   the panel via telephone, with the panel profile being collected via CATI.
+   4 The homeless population in 2016 (Australian Bureau of Statistics, 2018b) living in improvised dwellings (𝑁 = 8,200), supported
+   accommodation (𝑁 = 21,235) and boarding houses (𝑁 = 17,503) are assumed inaccessible via address-based sampling, amounted to
+   0.2% of the total Australian population of all ages (𝑁 = 23,401,891) (Australian Bureau of Statistics, 2023). The most recent official
+   statistics on internet usage are for the 2016-17 financial year, when 86.1% of adults used the internet (Australian Bureau of
+   Statistics, 2018a). Indicative of trends since then, internet usage was excluded from the 2021 Census of Population and Housing on
+   the rationale that internet access via smartphones was effectively universal.
+   5 In the interest of response maximisation, a decision was made to allow any responsible adult within the household to complete the
+   survey rather than apply a within-household selection procedure. This decision was based on the knowledge that within-household
+   selection methods have been found to add a layer of complexity that increases non-response (Battaglia et al., 2008). Thus, while a
+   within-household selection method may be desired as a means of minimising coverage error, this is overshadowed by the potential
+   to increase non-response error. The accuracy of within-household selection procedures applied to address-based sampling studies
+   has also been questioned (Olson, Stange, & Smyth, 2014).
+   6 SamplePages was the mobile RDD sample supplier.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                                               19
+   SMS push-to-web (2020, 2021, 2023‒25)
+   SMS push-to-web uses SMS as the mode of invitation, with respondents invited to click a link to
+   complete the profile survey in CAWI mode. As described in footnote 4, above, no up-to-date official
+   statistics on internet access are available, apart from those derived from Life in Australia™; the
+   Australian Communications and Media Authority (2022b) estimates 99% internet coverage, using
+   Life in Australia™ data; we assume that non-internet users overlapped with those without mobile
+   phones.
+
+   In April 2021, the panel was refreshed. This recruitment used an RDD mobile sample frame with
+   SMS invitation. Only online participants were recruited. SMS coverage is estimated at 95%, based on
+   96% mobile coverage (Australian Communications and Media Authority, 2022a) and the 1%
+   working number look-up error rate referred to above.7
+
+   In February-March 2023, February-March 2024, and February 2025, the panel was expanded using
+   an RDD mobile sampling frame and SMS push-to-web, as described above. Coverage is as described
+   above.
+
+   Over time some panellists have withdrawn from future participation in the panel, while others are
+   retired due to non-response or poor-quality responses.
+
+
+   Sample selection
+   A stratified random sample was drawn from Life in Australia™ panellists on strata defined by past
+   voting behaviour and citizenship status (Labor Party voters, Australian Greens voters, Coalition
+   voters, minor party voters, independent voters, citizen non-voters, and non-citizens).
+
+   The methodology adopted for the non-probability panel boost was online only data collection,
+   including invitation and multiple reminders sent via email. Four groups of respondents were
+   targeted in the boost survey recruitment: Coalition voters, minor party voters, citizen non-voters
+   and non-citizens. The non-probability panel boost survey was conducted concurrently with the Life
+   in Australia™ survey.
+
+   The final sample profile along with comparison to ABS benchmarks is shown below in Table B3.
+
+
+
+
+   7 SamplePages was the mobile RDD sample supplier.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                            20
+   Table B3 Sample profile (unweighted)
+
+                             Online members          Offline members      Total
+     Subgroup                  (completed)              (completed)    (completed)   Benchmark8
+
+     Male                             40.6                    29.5          40.6         49.0
+     Female                           58.4                    70.5          58.5         51.0
+     18-24 years                        2.8                    0.0           2.8         11.0
+     25-34 years                      11.4                     0.0          11.3         18.8
+     35-44 years                      16.8                     0.0          16.7         17.5
+     45-54 years                      16.9                     2.3          16.8         16.2
+     55-64 years                      18.7                    11.4          18.6         14.9
+     65-74 years                      20.9                    22.7          20.9         12.0
+     75 years or more                 12.6                    63.6          12.9           9.5
+     Sydney                           18.2                    18.2          18.2         20.6
+     Rest of NSW                      11.0                    15.9          11.0         11.3
+     Melbourne                        20.9                    15.9          20.9         19.7
+     Rest of VIC                        6.9                    4.5           6.9           6.3
+     Brisbane                           9.9                    9.1           9.9           9.7
+     Rest of QLD                        9.3                    9.1           9.3         10.4
+     Adelaide                           6.4                    4.5           6.3           5.4
+     Rest of SA                         1.8                    0.0           1.8           1.6
+     Perth                              8.4                    6.8           8.4           8.1
+     Rest of WA                         1.9                    6.8           2.0           2.2
+     Hobart                             1.3                    4.5           1.3           0.9
+     Rest of TAS                        1.2                    2.3           1.2           1.2
+     Darwin                             0.4                    0.0           0.4           0.6
+     Rest of NT                         0.1                    0.0           0.1           0.3
+     ACT                               2.2                     2.3           2.2           1.7
+
+
+   Contact methodology
+   The contact methodology adopted for online Life in Australia™ members is an initial survey
+   invitation via email and SMS (where available), followed by multiple email reminders and a
+   reminder SMS. Up to 5 reminders in different modes (including email, SMS, and telephone)
+   were administered within the fieldwork period. Telephone non-response of online panel
+   members who have not yet competed the survey commences in the second week of
+   fieldwork and consists of reminder calls encouraging completion of the online survey.
+
+   Offline members with a valid mobile telephone number were also sent a short SMS
+   invitation that contained a link to the survey as well as the reminder SMS halfway through
+   fieldwork.
+
+   The exact contact dates are shown below in Table B4.
+
+
+
+
+   8 Australian Bureau of Statistics (September 2021 ERPS).
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                     21
+   Table B4 Summary of contact schedule
+
+               Contact type                 Date                       Population
+               Phone interviews             29-Jun-26 - 12-Jul-26      Offline only
+               SMS                          29-Jun-26                  Both
+               Email                        29-Jun-26                  Online only
+               SMS                          30-Jun-26                  Both
+               Email                        30-Jun-26                  Online only
+               Email                        3-Jul-26                   Online only
+               Reminder calls               7-Jul-26 - 12-Jul-26       Online only
+               Email                        7-Jul-26                   Online only
+
+
+   The following call procedures were implemented:
+
+   •     A 4-call regime for mobile sample with an upper limit of 6 calls and a 6-call regime for landline
+         sample, with an upper limit of 9 call attempts
+
+   •     For mobile phones, capping the maximum number of unanswered call attempts to no more than four
+         so as to avoid appearing overzealous in our attempts to achieve interviews
+
+   •     Contact attempts were spread over weekday evenings (6:30 pm to 8:30 pm), weekday late
+         afternoon/early evening (4:30 pm to 6:30 pm), Saturdays (11 am to 5 pm) and Sundays (11 am to 5
+         pm) (weekdays between 9 am to 4:30 pm are typically reserved for appointment management)
+
+   •     Appointments were set for any time that the call centre is operational (weekdays between 9 am to
+         8:30 pm; weekends 11 am to 5 pm)
+
+   •     1800 number operation to address sample member queries and support the response maximisation
+         effort and the establishment of a respondent page on our website (with responses to frequently asked
+         questions).
+
+   Life in Australia™ members were able to request an email to complete the survey online. Interviewing
+   was conducted in English only.
+
+   The contact methodology adopted for the ORU panel was an invitation email, followed by a reminder
+   email sent out daily during the fieldwork period from 1st to 21st July.
+
+
+   Incentives
+   Life in Australia™ members were offered an incentive to complete the survey. The incentives offered for
+   completing the Life in Australia™ survey had a value of $10. The incentive options were:
+
+   •     Coles / Myer gift card
+
+   •     Points redeemable as an electronic gift card from GiftPay
+
+   •     Charitable donation to a designated charity:
+   o     Rural Aid
+   o     StreetSmart Australia
+
+   o     The Man Cave
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                   22
+   o       Djirra
+
+   o       Love your Sister
+
+   All members could choose to donate the amount to a nominated charity or could opt out of
+   receiving an incentive.
+
+   ORU panellists who completed the survey were credited with points to their loyalty accounts upon
+   completion of the survey.
+
+
+   Other Life in Australia™ response maximisation procedures
+   Other procedures to maximise response for the survey included:
+
+   • Leaving messages on answering machines and voicemails.
+
+   • Operation of an 1800 number throughout the survey period, to help establish survey bona fides,
+   address sample members’ queries, and encourage response.
+
+   • Provision of the Social Research Centre / Life in Australia™ website upon request.
+
+   • Focus on interviewer training and respondent liaison techniques during interviewer briefing and
+     throughout fieldwork.
+
+
+   Life in Australia™ CATI fieldwork
+   Interviewer briefing
+   All interviewers and supervisors selected to work on the survey attended a two-hour briefing session,
+   which focused on all aspects of survey administration, including:
+
+       •    Survey context and background, including a detailed explanation of Life in Australia™.
+
+       •    Survey procedures and sample management protocols.
+
+       •    The importance of respondent liaison procedures.
+
+       •    Strategies to maintain co-operation.
+
+       •    Detailed examination of the survey questionnaire, with a focus on the use of pre-coded
+            response lists and item-specific data quality issues.
+
+   After the initial briefing session, interviewers engaged in comprehensive practice interviewing. A total of
+   14 interviewers were briefed on the survey.
+
+
+   Fieldwork quality control procedures
+   The in-field quality monitoring techniques applied to this project included:
+       •    Monitoring (by remote listening) of each interviewer within their first three shifts, whereby
+            the supervisor listened in to at least 75 per cent of the interview and provided comprehensive
+            feedback on data quality issues and respondent liaison technique.
+       •    Validation of ten telephone surveys conducted via remote monitoring (covering the
+            interviewers’ approach and commitment-gaining skills, as well as the conduct of the
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                    23
+          interviews).
+     •    Field team de-briefing after the first shift and, thereafter, whenever there was important
+          information to impart to the field team in relation to data quality, consistency of interview
+          administration, techniques to avoid refusals, appointment-making conventions, or project
+          performance.
+     •    Examination of ‘Other (specify)’ responses.
+     •    Monitoring of timestamps for segments of the survey and overall time taken to complete the
+          survey.
+     •    Monitoring of the interview-to-refusal ratio by interviewer.
+
+
+   Response outcomes
+   Completion rate
+   The Social Research Centre uses standard industry definitions for calculating outcome
+   rates (American Association for Public Opinion Research, 2023; Callegaro & DiSogra,
+   2008). The completion rate (COMR) represents completed interviews as a proportion of
+   all Life in Australia™ members invited to participate in this survey. The overall
+   completion rate for the Life in Australia™ survey was 77.4% (online population = 77.5%;
+   offline population = 63.8%).
+
+   A completion rate could not be calculated for the ORU non-probability boost survey, as the number of
+   invited participants was not reported. The boost survey achieved 2,677 completes.
+
+
+   Life in Australia™ cumulative response rate
+   Completion rates only tell part of the story. The panellists invited to participate in this
+   survey had to agree to participate in Life in Australia™ in the first place, then provide
+   essential details to join the panel by completing the panel profile and finally remain in the
+   panel until they were invited to complete this survey.
+
+   The cumulative response rate (CUMRR2) takes account of non-response at each point. It is
+   the product of the recruitment rate (RECR), the profile rate (PROR), the retention rate
+   (RETR) and the completion rate: CUMRR2 = RECR × PROR × RETR × COMR. The recruitment
+   rate is the rate at which eligible individuals agree to join the panel. The profile rate is the
+   rate at which initially consenting individuals complete the panel profile, thus joining the
+   panel. The retention rate is the proportion of active panellists at the time of this survey out
+   of all those who joined the panel.
+
+   Because Life in Australia™ is made up of panellists recruited at different points in time, the
+   recruitment, profile, and retention rates shown are weighted in proportion to the
+   composition of the panellists invited to complete this survey.
+
+   The cumulative response rate for this survey is 2.4% (see Table B5).
+
+   Table B5 Summary of panel outcome rates
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                             24
+               Code          Name                             %
+               RECR          Recruitment rate                  6.3
+               PROR          Profile rate                     97.5
+               RETR          Retention rate                   50.2
+               COMR          Completion rate                  77.4
+               CUMRR2        Cumulative response rate 2        2.4
+
+
+
+   Data processing and outputs
+
+   Coding
+   Open-ended questions and back-coding of questions with an ‘Other (specify)’ option was
+   undertaken by experienced, fully briefed coders. Outputs were validated in accordance
+   with ISO 20252 procedures, using an independent validation approach.
+
+
+   Data quality checks for online completes
+   Data quality checks for online completes consisted of checks for:
+
+   •     Logic checks
+   •     Proportion of ‘don’t know’ and ‘refused’ responses
+   •     Speeding
+   •     Straightlining
+   •     Verbatim responses to open-ended questions
+
+   We consider all these indicators when determining whether a respondent is removed for poor data
+   quality. Data quality indicators other than verbatim responses are used to identify potentially
+   problematic cases. Generally, verbatim responses are decisive, with those indicating thoughtful
+   engagement with the survey being kept and others being removed (e.g. nonsense responses like
+   ‘asdfgh,’ non sequiturs, swearing).
+
+   Data quality is tracked for panel members over time and those with repeated issues are retired from
+   the Life in Australia™.
+
+   After data quality checks, 48 cases from the non-probability panel were removed due to poor
+   quality and were not counted toward the completion rate. No cases were removed from the Life in
+   Australia™ panel.
+
+
+   Weighting
+   Life in Australia™ panel only approach to weighting
+   Overview
+   Sample surveys are a commonly used method for drawing inferences about a population based on
+   responses from just a subset of it. To be able to draw such inferences requires a probability sample –
+   one in which each element of the population has a known, non-zero chance of selection. Since some
+   units in the population may not have a chance of selection (for instance, persons without a telephone
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                               25
+   have no chance of selection for a telephone survey) and there may be different rates of response
+   across unit characteristics, many sample surveys yield subsets that imperfectly cover their target
+   populations despite the best possible sample design and data collection practices (Valliant et al.,
+   2013). In such situations, weighting can reduce the extent of any biases introduced through non-
+   coverage.
+
+   For Life in Australia™, the approach for deriving weights generally consists of the following steps:
+
+    •    Compute a base weight for each respondent as the product of three weights:
+
+    a. Their enrolment weight, accounting for the initial chances of selection and subsequent
+       post-stratification to key demographic benchmarks
+
+    b. An adjustment for probability of selection into the sample of the specific survey.
+
+    c.   Their response propensity weight, estimated from enrolment information available
+         for both respondents and nonrespondents to the present survey.
+
+    •    Adjust the base weights so that they satisfy the latest population
+         benchmarks for several demographic characteristics.
+
+   The first step is essential in providing the statistical framework necessary for making population
+   inferences from a sample survey. The second step accounts for the selection of the sample for the
+   specific survey, which varies by stratum. The third step accounts for nonresponse bias and ensures
+   that survey estimates are consistent with other sources. Each step in the weighting will now be
+   covered in turn.
+
+   Enrolment weights
+   Members of Life in Australia™ were originally recruited through a national dual-frame telephone
+   survey in 2015, and subsequent replenishment rounds conducted through a variety of mechanisms,
+   including mobile telephone, address-based sampling, SMS and IVR (interactive voice
+   response).Design weights for original recruits were derived as the inverse of their probability of
+   selection, based on the approach of Best (2010), and then adjusted to reflect the population
+   distributions for sex, location, age group, highest level of education, household internet access and
+   telephone status. The method for adjusting the design weights was generalised regression (GREG)
+   weighting which uses non-linear optimisation to minimise the distance between the design and
+   adjusted weights, subject to the weights meeting the benchmarks (Deville and Särndal, 1993).
+
+   As more panellists were recruited, the method for calculating the panel weights was simplified to use
+   a model-based approach (Valliant et al., 2000; Elliott and Valliant, 2017). Such methods9 avoid the
+   increasingly cumbersome calculation of selection probabilities for multiple recruitment rounds
+   involving multiple sampling frames, the increasing complexity of weighting, and the decreasing
+   efficiency of the weights, at the same time as generating weights that align with population totals for
+   a wide range of characteristics.
+
+
+
+   9 So-called “superpopulation” models are equivalent to generalised regression if the inverse selection probabilities are all set to 1.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                                               26
+   Response propensity weights
+   As is typical for a panel survey, not all members respond to all waves, some withdraw or are retired
+   from the panel and new members are recruited. To limit the impact of such events on the
+   representativeness of estimates made from respondents, enrolment weights were adjusted through
+   the use of propensity scores (Rosenbaum and Rubin, 1983). These were calculated by means of a
+   logistic regression model predicting the likelihood of a panel member participating in the current
+   wave, conditional on characteristics available for both respondents and non-respondents. The
+   model incorporates a wide range of demographic, attitudinal and behavioural characteristics
+   collected from all panel members.
+
+   To reduce the impact of very low or very high values, the predicted probabilities were collapsed into
+   classes (after Cochran, 1968), with propensity scores assigned as the mean probability within each
+   class. The base weights were then calculated as the ratio of the enrolment weight to the propensity
+   class score.
+
+   Adjusted weights
+   To ensure that estimates made from the dataset are representative of Australians aged 18
+   years or older, the base weights were adjusted using GREG weighting so that, as described
+   above, their distribution matches external benchmarks for the key demographic
+   parameters. The adjustment variables were determined from a number of considerations:
+
+    •    Which variables are most associated with response propensity?
+
+    •    Which variables are most associated with key outcome variables?
+
+   With these in mind, the characteristics used for adjustment are shown in Table B6. Benchmarks for
+   these variables were sourced from official Australian Bureau of Statistics sources including the
+   2021 Census, supplemented by the latest Demographic Statistics, and the 2020-21 National Health
+   Survey.
+
+   Large differences in weights may lead to large variances in survey estimates, and so limiting these
+   variations can improve the precision of estimates. The use of constraints in GREG weighting aims to
+   reduce the variance at the same time as limiting increases in the bias. The method applied is
+   incorporated directly in the calibration process. The impact of setting bounds on the weights is
+   assessed by comparing the weighting efficiency (Kish, 1992) of adjusted weights for different
+   constraints. Bounded weights are generally preferred when their efficiency is close to that of the
+   unbounded weights.
+
+   For this survey, there were 7,343 respondents aged 18+ years and the weighting efficiency was
+   54.43%, representing an effective base of 3,997.
+
+   Treatment of missing values
+   The regression weighting approach used to adjust the base weights requires that there are no
+   missing values across the adjustment variables or values other than those for which there are
+   reliable benchmarks. Like most surveys, however, some Life in Australia™ respondents did not
+   provide answers to all questions commonly used for weighting.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                              27
+   A statistical model (Stekhoven and Buehlmann, 2012) was applied to each item with missing values
+   to impute the most likely value for a respondent, conditional upon their other responses. Given the
+   very low prevalence of missing values overall (generally much less than 5% for any item), the
+   imputation process is expected to have a negligible impact on weighted estimates made from the
+   dataset.
+
+   Precision of estimates
+   Estimates made from the survey should be seen as a point-in-time approximation of the underlying
+   population. It may be that if the survey were repeated again at a different time, a slightly different
+   subset of persons would take part and give a slightly different set of responses. To account for the
+   natural variation that would occur through many hypothetical replications of a survey, it is
+   common to associate a level of precision with estimates made from the one survey that we have
+   observed. One such metric is the “margin of error” for a survey estimate, which is used to form a
+   “confidence interval” around the estimate. An example of these concepts is contained in the
+   following statement:
+
+   An estimated 50% of persons agreed with survey statement X, with a margin of error of ± 1.2%. This
+   leads to a 95% confidence interval for X of 48.8% to 51.2%.
+
+   This means that if our survey were repeated many times and the weights, estimates, margins of error
+   and confidence intervals calculated for each survey, then 95% of the confidence intervals would
+   contain the true population value.
+
+   Another often-reported metric is the “relative standard error” of an estimate, which expresses the
+   precision of an estimate as a proportion of the estimate itself. Ideally, the ratio of the precision10 to the
+   estimate should be small (much less than 25%), indicating that the amount of uncertainty is small
+   relative to the estimate.
+
+   Estimates with RSEs greater than 25% should be used with caution and those with RSEs greater than
+   50% should be considered too unreliable for general use.
+
+   For this survey, the margins of error and relative standard errors for a range of estimates are shown in
+   Table B7. These may be used to compare the uncertainty of estimates derived from the survey – an
+   estimate with a margin of error of ± 1.2% may be reported with considerably more confidence than an
+   estimate with a margin of error of ± 12%, for example.
+
+
+
+
+   10 Specifically, the estimate’s standard error.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                                      28
+Mapping Social Cohesion 2026 Technical Report   29
+   Table B6 Characteristics used for adjusting base weights, with benchmark totals and data sources
+
+
+                                                                 Benchmark        Benchmark
+       Category                                                   Target (#)      Target (%)      Source
+ Number of adults in the household                                                                  (B)
+ One                                                               3,503,072          16.1
+ Three or more                                                     6,283,750          28.8
+ Two                                                             12,004,751           55.1
+ Age group by Highest education                                                                       (A)
+ 18-24 years                                                       2,503,809          11.5
+ 25-34 years x Bachelor or above                                   1,799,842           8.3
+ 25-34 years x Below Bachelor                                      2,290,039          10.5
+ 35-44 years x Bachelor or above                                   1,714,112           7.9
+ 35-44 years x Below Bachelor                                      2,217,335          10.2
+ 45-54 years x Bachelor or above                                   1,089,681           5.0
+ 45-54 years x Below Bachelor                                      2,248,032          10.3
+ 55-64 years x Bachelor or above                                    773,839            3.6
+ 55-64 years x Below Bachelor                                      2,316,630          10.6
+ 65+ years x Bachelor or above                                      854,283            3.9
+ 65+ years x Below Bachelor                                        3,983,971          18.3
+ Gender                                                                                               (A)
+ Man or male                                                     10,717,575           49.2
+ Woman or female                                                 11,073,998           50.8
+ Language other than English spoken at home                                                           (A)
+ No                                                              16,543,607           75.9
+ Yes                                                               5,247,966          24.1
+ Geographic location                                                                                  (A)
+ Capital city                                                    14,613,795           67.1
+ Rest of state                                                     7,177,778          32.9
+ State or territory of residence                                                                      (A)
+ ACT                                                                384,802            1.8
+ NSW                                                               6,788,905          31.2
+ NT                                                                 201,017            0.9
+ QLD                                                               4,444,846          20.4
+ SA                                                                1,524,057           7.0
+ TAS                                                                463,150            2.1
+ VIC                                                               5,598,052          25.7
+ WA                                                                2,386,744          11.0
+       Sources:
+
+  (A) Census 2021 with ERP updates
+  (B) National Health Survey, 2020-21
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                               30
+   Table 7 Margin of error (MoE) and relative standard error (RSE) of estimates
+
+                    Proportion of respondents in an item
+                                  category                 RSE (%)   MoE (%)
+                  0-5%                                     12.0      0.5
+                  5-10%                                    5.4       0.8
+                  10-25%                                   3.3       1.0
+                  25-35%                                   2.1       1.2
+                  35-50%                                   1.6       1.2
+                  50-75%                                   1.0       1.2
+                  75-100%                                  0.4       0.7
+
+
+
+   Life in Australia™ and non-probability blended panels approach to weighting
+   The 2026 Mapping Social Cohesion survey consisted of two components that were combined for
+   weighting purposes:
+
+      •       A random (probability) sample of Australians aged 18+ years old from Life in Australia™.
+
+      •       A convenience (non-probability) sample of conservative voters, minor party voters, citizen
+              non-voters, and non-citizens aged 18 years and older was used to support extended
+              reporting and analysis.
+
+   The usual approach to weighting random (probability) samples is a two-step process that aims to
+   reduce biases caused by non-coverage and non-response and to align weighted sample estimates
+   with external data about the target population (Kalton and Flores-Cervantes, 2003). First, base
+   weights are calculated to account for each respondent’s initial chance of selection and for the
+   survey’s response rate. Next, the base weights are adjusted to align respondents with the
+   population on key socio-demographic characteristics. Refer to Särndal et al. (1992) for detailed
+   information about model-assisted survey sampling and estimation, and to Valliant et al. (2018) for a
+   contemporary treatment of weighting and estimation for sample surveys.
+
+   The convenience (non-probability) sample used a non-random mechanism to recruit participants to
+   the survey, which means that the design-based approach just described does not apply. Refer to
+   Elliott and Valliant (2017) for a discussion and further references about the challenges of making
+   inferences from non-random samples. There are several methods for weighting such samples and
+   making estimates from them, however (refer to Valliant, 2020). One of these methods, and that used
+   here, is “quasi-randomisation” which requires a reference sample chosen at random from the target
+   population. This reference sample is used to estimate pseudo-selection probabilities for the
+   convenience sample, to adjust for selection bias. For this survey, the reference sample were the
+   probability cases from Life in Australia™.
+
+   The combined sample then had two base weights – a probability-based one for Life in Australia™
+   cases and an estimated one for convenience cases. To derive the adjusted weights, consideration
+   then had to be given to the characteristics on which to align the base weights with the population.
+   The choice of characteristics was guided by two factors:
+
+          •    Which characteristics are most different between the probability and convenience samples?
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                              31
+        •   Which characteristics are most associated with the survey’s key questionnaire items?
+
+   With these factors in mind, the set of characteristics used to adjust the weights are those shown in
+   Table 1, including past voting behaviour. The table also includes the corresponding population
+   counts and percentages, obtained from Census 2021 TableBuilder (Australian Bureau of Statistics,
+   2021), the National Health Survey (ABS, 2022), and the 2025 federal election results (AEC, 2025).
+   These population figures were adjusted to align with the latest Estimated Resident Population
+   (ERP) estimates (ABS, June 2025), ensuring that all counts represent the Australian population
+   aged 18 years and over.
+
+   The method used to adjust the base weights was regression calibration (Deville et al., 1993),
+   implemented in R (R Core Team, 2023) using the survey package (Lumley, 2021). For more
+   information on weighting of sample surveys, refer to Valliant et al. (2018).
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report                                                             32
+Table 8 Characteristics used for adjusting base weights, with population distribution
+and data sources
+
+                                                                                Benchmark           Benchmark
+                                Category                                         Target (#)          Target (%)            Source
+Number of adults in the household                                                                                           (B)
+One                                                                                 3,503,072                 16.08
+Two or More                                                                        18,288,501                 83.92
+Age group by Highest education                                                                                              (A)
+18-24 years                                                                          2,503,809                11.49
+25-34 years x Bachelor or above                                                      1,799,842                 8.26
+25-34 years x Below Bachelor                                                         2,290,039                10.51
+35-44 years x Bachelor or above                                                      1,714,112                 7.87
+35-44 years x Below Bachelor                                                         2,217,335                10.18
+45-54 years x Bachelor or above                                                      1,089,681                    5
+45-54 years x Below Bachelor                                                         2,248,032                10.32
+55-64 years x Bachelor or above                                                        773,839                 3.55
+55-64 years x Below Bachelor                                                         2,316,630                10.63
+65+ years x Bachelor or above                                                          854283                  3.92
+65+ years x Below Bachelor                                                           3,983,971                18.28
+Gender                                                                                                                      (A)
+Man or male                                                                        11,073,998                 50.82
+Woman or female                                                                    10,717,575                 49.18
+Language other than English spoken at home                                                                                  (A)
+Yes                                                                                 5,247,966                 24.08
+No                                                                                 16,543,607                 75.92
+Geographic location                                                                                                         (A)
+Capital city                                                                       14,613,795                 67.06
+Rest of state                                                                       7,177,778                 32.94
+State or territory of residence                                                                                             (A)
+NSW                                                                                  6,788,905                31.15
+VIC                                                                                  5,598,052                25.69
+QLD                                                                                  4,444,846                 20.4
+SA                                                                                   1,524,057                 6.99
+WA                                                                                   2,386,744                10.95
+TAS                                                                                    463,150                 2.13
+NT                                                                                     201,017                 0.92
+ACT                                                                                    384,802                 1.77
+2025 Federal Election Vote                                                                                                  (C)
+Liberal-National Coalition                                                           5,017,966                23.03
+Australian Labor Party                                                               5,450,333                25.01
+The Greens                                                                           1,923,933                 8.83
+Other party                                                                          3,376,308                15.49
+Non-voter                                                                            6,023,033                27.64
+      Sources:
+
+ (A) Census 2021 with ERP updates
+ (B) National Health Survey, 2020-21
+ (C) AEC 2025
+
+      Note that there were small numbers of ‘Don’t know’, ‘Refused’ or ‘Other’ responses to some items. Since there were
+      no corresponding categories in Census TableBuilder, such values were imputed using a statistical model
+      (Stekhoven and Buehlmann, 2012). Given the very low prevalence of these responses, the imputation process is
+      expected to have a negligible impact on estimates made using the weights.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                                  33
+References
+  American Association for Public Opinion Research. (2023). Standard definitions: Final dispositions of
+    case codes and outcome rates for surveys (10th ed.). https://aapor.org/wp-
+    content/uploads/2023/05/Standards-Definitions-10th-edition.pdf
+
+  Australian Bureau of Statistics. (2018b). 81460DO002_201617 Household use of information technology,
+     Australia, 2016-17 [Data set]. https://www.abs.gov.au/statistics/industry/technology-and-
+     innovation/household-use-information-technology/latest-release
+
+  Australian Bureau of Statistics (2021). Counting Persons, Place of Usual Residence [Census
+     TableBuilder]. Accessed 14 February 2024.
+
+  Australian Bureau of Statistics. (2023). Census of population and housing [Data set].
+     https://www.abs.gov.au/statistics/microdata-tablebuilder
+
+  Australian Bureau of Statistics (June 2024) 'National, state and territory population tables' [Estimated
+     resident population, by age and sex–at 30 June 2024], National, state and territory population
+     [https://www.abs.gov.au/statistics/people/population/national-state-and-territory-
+     population/latest-release], accessed 19 February 2025.
+
+Australian Bureau of Statistics (2024). National Health Survey, 2022 [TableBuilder]. Accessed 10 July
+    2024.
+
+  Australian Communications and Media Authority. (2022a). Communications and media in Australia:
+     How we communicate. Belconnen: ACMA. https://www.acma.gov.au/publications/2022-
+     12/report/communications-and-media-australia-how-we-communicate
+
+  Australian Communications and Media Authority. (2022b). Communications and media in Australia:
+     How we use the internet. https://www.acma.gov.au/publications/2022-
+     12/report/communications-and-media-australia-how-we-use-internet
+
+  Australian Electoral Commission. (2025, June 10). 2025 Federal Election – House of Representatives
+     results. AEC Tally Room. https://results.aec.gov.au/31496/Website/HouseDefault-31496.htm.
+     Accessed 8 August 2025.
+
+  Australian Government. (2023). Geoscape geocoded national address file (G-NAF).
+     https://data.gov.au/data/dataset/geocoded-national-address-file-g-naf
+
+  Battaglia, M., Link, M. W., Frankel, M. R., Osborn, L., & Mokdad, A. H. (2008). An evaluation of respondent
+     selection methods for household mail surveys. Public Opinion Quarterly, 72(3), 459–469.
+     https://doi.org/10.1093/poq/nfn026
+
+Best, J. (2010, May 15). First-stage weights for overlapping dual frame telephone surveys [Conference
+   presentation]. American Association for Public Opinion Research 65th annual conference, Chicago, IL,
+   United States.
+
+Brick, J. M., Waksberg, J., Kulp, D., & Starer, A. (1995). Bias in list-assisted telephone samples. Public
+   Opinion Quarterly, 59(2), 218–235. https://doi.org/10.1086/269470
+
+Callegaro, M., & DiSogra, C. (2008). Computing response metrics for online panels. Public Opinion
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                             34
+    Quarterly, 72(5), 1008–1032. https://doi.org/10.1093/poq/nfn065
+
+Cochran, W. G. (1968). The effectiveness of adjustment by subclassification in removing bias in
+   observational studies. Biometrics, 24(2), 295. https://doi.org/10.2307/2528036
+
+Deville, J.-C., Särndal, C.-E., & Sautory, O. (1993). Generalized raking procedures in survey sampling.
+   Journal of the American Statistical Association, 88(423), 1013–1020.
+   https://doi.org/10.1080/01621459.1993.10476369
+
+Dillman, D. A. (2017). The promise and challenge of pushing respondents to the web in mixed-mode
+    surveys. Survey Methodology, 43(1), 3–30. https://www150.statcan.gc.ca/n1/pub/12-001-
+    x/2017001/article/14836-eng.htm
+
+Elliott, M. R., & Valliant, R. (2017). Inference for nonprobability samples. Statistical Science, 32(2), 249–
+    264. https://doi.org/10.1214/16-STS598
+
+Kaczmirek, L., Phillips, B., Pennay, D., & Neiger, D. (2019). Building a probability-based online panel: Life in
+   Australia™ (CSRM & SRC Methods Paper No. 2/2019). Australian National University.
+   https://csrm.cass.anu.edu.au/research/publications/building-probability-based-online-panel-life-
+   australia
+
+Kalton, G. and I. Flores-Cervantes (2003). Weighting methods. Journal of Official Statistics 19(2), 81 97.
+
+Kish, L. (1992) Weighting for unequal Pi. Journal of Official Statistics 8(2), 183-200.
+
+Link, M., Battaglia, M. P., Frankel, M. R., Osborn, L., & Mokdad, A. H. (2008). A comparison of address-
+   based sampling (ABS) versus random-digit dialing (RDD) for general population surveys. Public
+   Opinion Quarterly, 72(1), 6–21. https://doi.org/10.1093/poq/nfn003
+
+Lumley, T. (2021) survey: analysis of complex survey samples. R package version 4.0. https://cran.r-
+  project.org/package=survey.
+
+Olson, K., Stange, M., & Smyth, J. (2014). Assessing within-household selection methods in household
+   surveys. Public Opinion Quarterly, 78(3), 656–678. https://doi.org/10.1093/poq/nfu022
+
+Phillips, B., Barton, J., Pennay, D., & Neiger, D. (2019). Socio-demographic characteristics of telephone
+   access in Australia: Implications for survey research. The Social Research Centre.
+
+Rosenbaum, P. R., & Rubin, D. B. (1983). The central role of the propensity score in observational studies
+   for causal effects. Biometrika, 70(1), 41–55. https://doi.org/10.1093/biomet/70.1.41
+
+R Core Team (2023). R: A language and environment for statistical computing. R Foundation for
+   Statistical Computing, Vienna, Austria. https://www.R-project.org/.
+
+Särndal, C.-E., B. Swensson and J. Wretman (1992). Model Assisted Survey Sampling. Springer-Verlag
+   Publishing. DOI: 10.1007/978-1-4612-4378-6.
+
+Stekhoven, D. J., & Bühlmann, P. (2012). MissForest—non-parametric missing value imputation for
+   mixed-type data. Bioinformatics, 28(1), 112–118. https://doi.org/10.1093/bioinformatics/btr597
+
+Valliant, R. (2020). Comparing alternatives to estimation from nonprobability samples. Journal of Survey
+   Statistics and Methodology 8(2), 231–263. DOI: 10.1093/jssam/smz003
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                35
+Valliant, R., Dever, J. A., & Kreuter, F. (2018). Practical Tools for Designing and Weighting Survey Samples.
+   Springer International Publishing. https://doi.org/10.1007/978-3-319-93632-1
+
+Valliant, R., Dorfman, A. H., & Royall, R. M. (2000). Finite population sampling and inference: a prediction
+   approach. John Wiley.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                36
+  PART C: Redevelopment
+   of the Scanlon Index of
+       social cohesion
+                                   Social Research Centre
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                            37
+Introduction
+The Social Research Centre (SRC) was contracted to redevelop the Scanlon-Monash Index (SMI).
+The SMI is a major product of the Scanlon Foundation Research Institute and Monash University’s
+Mapping Social Cohesion Surveys, which have been fielded in Australia since 2007 and annually
+since 2009 (Scanlon Foundation Research Institute 2021). These surveys provide an important and
+widely read source of information on social cohesion, immigration and population issues. A prime
+objective of the surveys is to further the understanding of the social impact of Australia’s
+increasingly diverse immigration program.
+
+The aim of redevelopment was to develop robust individual-level index scores that follow widely
+accepted means of psychometric scale construction.
+
+This report summarises a quantitative assessment of items measuring aspects of social cohesion,
+based on responses obtained from two rounds of online surveys. This represented the final stage in
+the redevelopment of a questionnaire suitable for measuring social cohesion across the Australian
+adult population and followed a literature review and cognitive testing of selections from a bank of
+items. Details of these previous stages are available separately so findings will not be described in
+detail here.
+
+
+The Scanlon-Monash Index
+The original SMI was developed based on a literature review of measures of social cohesion (Markus &
+Dharmalingam 2007) and was organised around five domains:
+
+1.      Belonging – shared values, identification with Australia, trust.
+
+2.      Social justice and equity – evaluation of national priorities.
+
+3.      Participation – voluntary work, political and co-operative involvement.
+
+4.      Acceptance (and rejection), legitimacy – experience of discrimination, attitudes towards minorities,
+        newcomers.
+
+5.      Worth – life satisfaction and happiness, future expectations.
+
+In 2009, exploratory factor analysis was undertaken of both the 2007 and 2009 data, guiding the
+assignment of items to indices (Markus & Arnup 2009). The SMI was developed in the second wave of the
+Mapping Social Cohesion Surveys. The aim of the index was to ‘heighten awareness of shifts in opinion
+which may call for closer attention and analysis’ (Markus & Arnup 2009:42). The scaling procedure
+adopted was based on the weighted proportions of respondents who gave certain answers.
+
+An earlier attempt to develop an individual-level scale by the SRC in 2019 indicated that the existing items
+did not form a suitable basis for a scale.
+
+
+
+Development of candidate items
+The initial step in index development was to review extended descriptions of scale
+domains and sub-domains provided by the client to ensure that the SRC understand
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                          38
+the rationale for the indexes. The full list of domains and sub-domains as originally
+specified was as follows:
+
+1 . Belonging
+        a. National, including identification with Australia
+        b. Local / community, including identification with one’s local
+        community, quality of life, social networks in one’s neighbourhood,
+        safety
+2. Worth
+          a. Ability to contribute, has a voice11
+          b. Feels respected and valued
+          c. Financial situation
+          d. Life satisfaction
+3. Social justice and equity
+          a. Economic, including perception of economic opportunity, availability of
+          support for people on low incomes, perception of wealth inequality
+          b. Institutional, including trust in government and other institutions, belief
+          in the beneficence of government, access to services, perception of
+          corruption, fair elections, rule of law
+4. Participation
+          a. Political participation
+          b. Social participation, including charitable donations, involvement with civil society
+          organisations
+                       12
+          c. Isolation
+5. Acceptance and rejection
+           a. Acceptance of cultural diversity including Indigenous Australians
+           and diversity with respect to sexuality, experience of discrimination
+                                                13
+           b. Future of life in Australia            (i.e. positive or negative expectations)
+
+The SRC then, in conjunction with the client, searched for existing items. The
+sources of items included the following:
+
+  •     Existing SMI items
+  •     Other Mapping Social Cohesion Survey items, other than SMI items
+  •     ACT General Health Survey
+
+
+11 No items are included on the final index from this sub-domain.
+12 Isolation was changed from the Participation to the Belonging domain in Round 2 of testing based on its empirical
+
+relationships with other items.
+13 Future of life in Australia was dropped based on its empirical relationships with other items.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                       39
+  •     Asian Barometer Survey (Wave 4)
+  •     Australian Reconciliation Barometer
+  •     Civic Engagement Supplement to the U.S. Current Population Survey (2013)
+  •     General Social Survey (2019)
+  •     European Social Survey (Waves 5, 7, 9)
+  •     Kessler Psychological Distress Scale (Kessler et al. 2002)
+  •     UCLA Loneliness Scale (Hughes et al. 2008; Russell 2996)
+  •     U.S. General Social Survey
+  •     VicHealth Community Indicators Survey
+  •     World Values Survey (Wave 6)
+
+Questions were re-worded where necessary, particularly when wording was not appropriate to the
+contemporary Australian environment. Greater deference was given to item wording from Australian
+sources, particularly the General Social Survey and Mapping Social Cohesion Surveys.
+
+These were supplemented, where needed, by items written by the client or the SRC, although this
+was generally a last resort when no suitable items were identified. To the greatest extent possible,
+new items were written in a similar fashion to other items in order to integrate them as seamlessly
+as possible.
+
+The aim of item development was to ensure that sufficient numbers of items were asked that there
+was a critical mass for each domain and sub-domain.
+
+
+Cognitive testing
+Cognitive testing was next undertaken to gain an understanding of how people understand, mentally
+process and respond to questionnaire items, with a special emphasis on potential breakdowns in this
+process. In March 2021, the SRC undertook cognitive testing of a selection of survey items. Fourteen
+items were identified for testing from the survey as well as some exploratory testing of the term
+‘Social Cohesion’. Each question was reviewed for comprehension (‘do I understand the question?’),
+judgement (‘can I easily make a judgement about what response to give?’), retrieval (‘can I remember
+the information required to give an answer?’) and response (‘do I feel inclined to give an accurate and
+honest response?’).
+
+In total, eight cognitive interviews were completed with ‘general community’ participants from
+across Australia. The survey was tested in an ‘online’ format to mirror the dominant mode of the
+2021 Mapping Social Cohesion survey. ‘Online’ testing involved participants reading the questions
+from an online draft version shared through the moderator’s screen.
+
+Recruitment was conducted through SRC’s dedicated qualitative participant database. Each
+participant received $85 to reimburse them for their time. For this research, participants were
+purposively recruited, with an aim to obtaining an even spread across ages, gender, educational level,
+employment status, locations (metro and regional) and cultural and linguistic background. Table C1
+provides an overview of some key sample demographics.
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                       40
+Table C1 Sample demographics
+
+ Characteristic                  Value                                         No of participants
+                                 Male                                                  4
+ Gender
+                                 Female                                                4
+                                 18-24 years                                           2
+                                 25-34 years                                           2
+ Age
+                                 35-54 years                                           2
+                                 55+                                                   2
+
+ Culturally and                  Yes                                                   4
+ Linguistically Diverse          No                                                    4
+                                 NSW                                                   3
+                                 Queensland                                            2
+ Location (State)
+                                 WA                                                    1
+                                 Victoria                                              2
+                                 Senior Secondary Certificate of Education             2
+ Highest Educational
+                                 Diploma, Advanced Diploma, Associate Degree           3
+ level
+                                 Undergraduate Degree                                  3
+                                 Not working, not looking for work                     1
+                                 Studying                                              1
+ Employment Status               Looking for work; studying                            1
+                                 Part time or casual employment                        1
+                                 Full time employment                                  4
+
+
+
+
+Scale validation
+Scale validation took place in two rounds: an initial round to cull poorly performing items and a
+second round to confirm the final placement of items.
+
+At the outset, there were 133 items across 5 domains of social cohesion:
+1. Acceptance and rejection (24 items);
+2. Belonging (21 items);
+3. Participation (50 items);
+4. Social justice and equity (20 items); and
+5. Worth (18 items).
+
+The aim of the assessment was to arrive at a reduced set of items that can be used to score
+respondents on each of these domains as well as to generate an overall score for social cohesion.
+The assessment applied statistical methods to the survey data to achieve this aim:
+
+ •     Exploratory factor analysis was used to confirm and refine the theoretical themes into which
+       items were organised and to identify items that did not align as well as others; and
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                      41
+ •    The Rasch measurement model (Wright and Masters, 1982; Bond and Fox, 2001) was used to
+      identify items that were answered unpredictably by respondents or that did not contribute
+      usefully to measuring the underlying social cohesion construct and its aspects.
+
+
+Data collection
+Data were collected in two rounds via an online non-probability panel. A total of 300 panellists
+aged 18 years and older took part in each round of data collection. Round 1 included a total of 133
+items and took place between 27 – 29 April 2021. Round 2 included a total of 76 items and took
+place between 24 – 26 May 2021. Final questionnaires for Round 1 and Round 2 can be found in
+Appendix C and Appendix D, respectively.
+
+
+Statistical assessment
+Following each round of data collection, responses were analysed through the use of factor analysis
+and the Rasch measurement model. Results from Round 1 of collection were used to produce a
+reduced questionnaire for Round 2, after which a final instrument was developed for
+administration on Life in Australia™ in July 2021. This section briefly outlines the analytical
+approach for each round and summarises the results of the analyses.
+
+Tables of item frequencies are too voluminous to include in this report, but a summary of
+respondents for each item along with the mean and standard deviation14 of response categories is
+shown in Table 8.
+
+
+Exploratory factor analysis
+Exploratory factor analysis examines correlations between item responses to identify items that are
+related through their response patterns. It is a data reduction technique that seeks to represent a
+large number of items by a smaller number of factors. It is a long-standing, widely used technique
+and no further details about it are provided here. To explore the social cohesion construct and its
+separate themes, correlations between item responses were calculated and factor loadings were
+produced for a range of solutions.
+
+Ideally, loadings for an item should be high (closer to 1) for a single factor and low (closer to 0) for all
+the others. We chose a rotation (the oblique ‘promax’) that maximised the number of items that met
+this idealised situation.
+
+
+
+
+14 Rating scales are ordered categories rather than absolute numbers so means and standard deviations are merely
+
+indicative.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                   42
+Rasch analysis15
+The Rasch model is a tool for constructing measures from rating scale responses and for evaluating
+how well questionnaire items contribute to an underlying trait (or construct) and how consistently
+respondents answer the items. Since the model is less well known than factor analysis, some details
+about it and the outputs it generates are provided here.
+
+The model assumes that there exists an underlying quantitative trait for which persons can
+experience something to a small or a large degree. On this assumption, a set of items is developed
+and administered so as to measure each person’s position on the construct.
+
+The model uses observed patterns of response to estimate the probability that a person at a given
+position on the construct will select a particular category for an item. This probability is directly
+related to the difference between a person’s position on the construct and the item’s position. A
+person’s position can be most accurately pinpointed when there is a mix of items, ones that are
+relatively easy for them to endorse (agree with, for example) and ones that are harder for them to
+endorse. In the same way, an item’s position is measured most accurately when it attracts a range of
+responses (some people agree with it, for instance, and others disagree).
+
+A good measurement instrument is one which contains some items that are easier to endorse, some
+items that are harder to endorse, and a predictable progression in between. The Rasch model
+provides a number of statistics summarising how well items and persons meet this progression.
+Items or persons that deviate significantly from our expectation are evidence of items that measure
+different constructs or of persons that answer questions in unexpected ways. Both of these are
+undesirable and degrade the quality of derived measures.
+
+While some amount of statistical noise in response patterns is to be expected for real-world data,
+including items with excessive variation will reduce the quality of measures derived from the items.
+Items answered very predictably by respondents (as manifested by low mean square errors) can be
+seen as redundant. Although low variation does not adversely affect the quality of measures, it is
+suggestive of items whose responses can be predicted very easily and so may not contribute usefully
+to measurement.
+
+
+Scale summaries
+Finally, the combined performance of items for each theme, as well as overall, were assessed
+through three summary statistics – Cronbach’s alpha, the person separation index, and the item
+separation index. These metrics summarise the joint performance of a set of items, rather than of
+individual items, and are indicative of the usefulness of scale scores.
+
+We see from the alpha and item separation metrics that the overall social cohesion scale as well as
+
+
+15 Summarised in Linacre (2017) as follows: “Rasch analysis is a method for obtaining objective, fundamental,
+
+additive measures (qualified by standard errors and quality-control fit statistics) from stochastic observations of
+ordered category responses. Georg Rasch, a Danish mathematician, formulated this approach in 1953 to analyse
+responses to a series of reading tests (Rasch G, Probabilistic Models for Some Intelligence and Attainment Tests,
+Chicago: MESA Press, 1992, with Foreword and Afterword by B.D. Wright).”
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                      43
+each of the sub-scales were all adequately measured by the items administered at each round. The
+precision of person scores, summarised by the person separation, fell below the desirable threshold
+for Round 2 but this is to be expected given that the total items fell from 133 to 76. The precision
+was lowest in Round 2 for the Participation theme – although it had 24 items, many of these were
+on a Yes/No scale, which gave little opportunity to discriminate between respondents.
+
+
+Removal of items at each round
+Following factor and Rasch analysis of responses to each round, items were considered for removal
+from the instrument using the following criteria:
+
+ •    Cross-loading in the factor analysis, where an item was flagged for omission if it loaded highly
+      across more than one factor;
+
+ •    Misfit in the Rasch model, where an item was flagged if it had very high mean square errors
+      (suggestive of considerable unpredictability in person responses);
+
+ •    Redundancy in the Rasch model, where an item was flagged if it had very low mean square
+      errors (suggestive of high predictability in person responses);
+
+ •    Cronbach alpha, where an item was flagged if its omission would improve the alpha value for a
+      scale; and
+
+ •    Other considerations (face validity, approximately equal numbers of items across domains,
+      better or worse question wording, etc).
+
+
+Final set of items
+Through the analyses and considerations described above, the final set of items are shown in the
+Table C2. It should be noted the items to be administered on the July wave of Life in Australia™
+differ slightly. Following testing, changes were made to items q02_d and q80_d to capture
+participation in organisations at a more general level (community support groups, social or
+religious groups and civic or political groups). Mid-points were also re-added to rating scales for
+items that appeared in the previous SMI. The final set of items administered on Life in Australia™
+are shown in Table C3.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                         44
+Table C2 Final set of items following index redevelopment
+
+ ID            Domains and items                                                              Sub-domain
+
+               Acceptance and Rejection
+
+
+ ar4_a         AR4. The relationship between Aboriginal and Torres Strait Islanders and       Acceptance of cultural
+               the wider Australian community is very important for Australia as a            diversity
+               nation
+
+ ar4_c         AR4. It is important for Indigenous histories and cultures to be included in   Acceptance of cultural
+               the school curriculum                                                          diversity
+ c10_a         C10. We should do more to learn about the customs and heritage of              Acceptance of cultural
+               different ethnic and cultural groups in this country                           diversity
+ c2_a          C2. Accepting immigrants from many different countries makes Australia         Acceptance of cultural
+               stronger                                                                       diversity
+ c2_b          C2. Ethnic minorities in Australia SHOULD be given Australian government       Acceptance of cultural
+               assistance to maintain their customs and traditions                            diversity
+               Belonging
+
+
+ bl1_a         BL1. I feel like I belong in my neighbourhood                                  Local / community
+
+ bl1_b         BL1. My neighbourhood has a strong sense of community                          Local / community
+
+ bl4_b         BL4. At home by yourself during the day                                        Local / community
+
+ c7            C7. To what extent do you take pride in the Australian way of life and         National
+               culture?
+ c8            C8. And to what extent do you have a sense of belonging in Australia?          National
+               Would you say…
+ p3_c          P3. How often do you feel isolated from others?                                Isolation
+
+               Participation
+
+
+ b4_3          B4. Written or spoken to a Federal or State Member of Parliament               Political participation
+
+ b4_5          B4. Joined a boycott of a product or company                                   Political participation
+
+ b4_10         B4. Posted or shared anything about politics online                            Political participation
+
+ q02_d         Q02. Craft or practical hobby group                                            Social participation
+
+ q80_d         Q80. Any teaching, coaching or practical advice                                Social participation
+
+               Social Justice and Equity
+
+
+ a1_b          A1. People living on low incomes in Australia receive enough financial         Economic
+               support from the government
+ a1_d          A1. Australia is a land of economic opportunity where in the long run, hard    Economic
+               work brings a better life
+ d28           D28. In your opinion, how often do the courts make fair, impartial             Institutional
+               decisions based on the evidence made available to them? Would you say…
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                        45
+ g6_b          G6. Overall, everyone in Australia has a fair chance of getting the jobs they   Economic
+               seek
+ q112          Q112. How often do you think government leaders in Australia abuse their        Institutional
+               power?
+ q228e_b       Q228E. Election officials are fair                                              Institutional
+
+               Worth
+
+
+ a5            A5. Now a question about your own financial circumstances. How satisfied        Financial situation
+               or dissatisfied are you with your present financial situation?
+ d22           D22. To what extent do you feel that people treat you with respect?             Feels respected and valued
+
+
+ e2            E2. Taking ALL things into consideration, would you say that over the last      Life satisfaction
+               year YOU have been...?
+ w2            W2. During the past 30 days, about how often did you feel…the things you        Life satisfaction
+               do in your life were worthwhile?
+ w3_b          W3. Went without meals                                                          Financial situation
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                      46
+Table C3 Final set of items for administration on Life in Australia™
+
+ ID                            Domains and items                                               Sub-domain
+
+                               Acceptance and Rejection
+ ar4_a                         AR4. The relationship between Aboriginal and Torres Strait      Acceptance of cultural
+                               Islanders and the wider Australian community is very            diversity
+                               important for Australia as a nation
+
+ ar4_c                         AR4. It is important for Indigenous histories and cultures to be Acceptance of cultural
+                               included in the school curriculum                                diversity
+ c10_a                         C10. We should do more to learn about the customs and           Acceptance of cultural
+                               heritage of different ethnic and cultural groups in this        diversity
+                               country
+
+ c2_a                          C2. Accepting immigrants from many different countries          Acceptance of cultural
+                               makes Australia stronger                                        diversity
+ c2_b                          C2. Ethnic minorities in Australia SHOULD be given              Acceptance of cultural
+                               Australian government assistance to maintain their customs      diversity
+                               and traditions
+
+                               Belonging
+ f2_e                          BL1. I feel like I belong in my neighbourhood                   Local / community
+
+ f2_f                          BL1. My neighbourhood has a strong sense of community           Local / community
+
+ bl4_b                         BL4. At home by yourself during the day                         Local / community
+
+ c7                            C7. To what extent do you take pride in the Australian way of   National
+                               life and culture?
+ c8                            C8. And to what extent do you have a sense of belonging in      National
+                               Australia? Would you say…
+ p3                            P3. How often do you feel isolated from others?                 Isolation
+
+                               Participation
+ b4_3                          B4. Written or spoken to a Federal or State Member of           Political participation
+                               Parliament
+ b4_5                          B4. Joined a boycott of a product or company                    Political participation
+
+ b4_10                         B4. Posted or shared anything about politics online             Political participation
+
+ q01a (updated)                Q01a. In the last 12 months, have you been actively involved    Social participation
+                               in any community support groups, such as…
+                                           §     Service clubs, including Rotary, Lions, the
+                                                 Masons and the RSL
+                                           §     Welfare organisation
+                                           §     Education and training group
+                                            §   Parenting / children / youth group
+                                            §   Health promotion and support group
+                                            §   State Emergency Services and rural or
+                                                country fire services
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                         47
+ q02a (updated)                Q02a. In the last 12 months have you actively been included       Social participation
+                               in any social or religious groups?
+                                          §     Sport or physical recreation group
+                                          §     Arts or heritage group
+                                          §     Religious or spiritual group or organisation
+                                          §     Craft or hobby group
+                                          §     Adult education group
+                                          §     Ethnic / multicultural club
+
+ q03a (updated)                Q03a. In the last 12 months, have you been actively involved      Social participation
+                               in any civic or political groups
+                                           §    Trade union, professional / technical
+                                                association
+                                           §    Political party
+                                           §    Environmental or animal welfare group
+                                           §    Human and civil rights group
+                                           §    Body corporate or tenants' association
+                                           §    Consumer organisation
+
+ q80 (updated)                 Q80. In the last 4 weeks, did you help anyone [not living with    Social participation
+                               you] with any of the following activities:
+                                    •    Providing transport or running errands
+                                    •    Any teaching, coaching or practical advice
+                                    •    Providing any emotional support
+
+                               Social Justice and Equity
+ a1_b                          A1. People living on low incomes in Australia receive enough      Economic
+                               financial support from the government
+ a1_d                          A1. Australia is a land of economic opportunity where in the      Economic
+                               long run, hard work brings a better life
+ d28                           D28. In your opinion, how often do the courts make fair,          Institutional
+                               impartial decisions based on the evidence made available to
+                               them? Would you say…
+
+ g6                            G6. Overall, everyone in Australia has a fair chance of getting   Economic
+                               the jobs they seek
+ q112                          Q112. How often do you think government leaders in                Institutional
+                               Australia abuse their power?
+ q228e                         Q228E. Elections are fair                                         Institutional
+
+                               Worth
+ a5                            A5. Now a question about your own financial circumstances.        Financial situation
+                               How satisfied or dissatisfied are you with your present
+                               financial situation?
+
+ d22                           D22. To what extent do you feel that people treat you with        Feels respected and valued
+                               respect?
+ e2                            E2. Taking ALL things into consideration, would you say that      Life satisfaction
+                               over the last year YOU have been...?
+ w2                            W2. During the past 30 days, about how often did you              Life satisfaction
+                               feel…the things you do in your life were worthwhile?
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                        48
+ w3_b (updated)                W3. Over the last 12 months, how often is the following        Financial situation
+                               statement true of you / your household… You / your
+                               household went without meals because there wasn’t enough
+                               money for food
+
+
+
+
+Implementation on Life in Australia™
+The final set of items was administered on Life in Australia™ in July 2021, and responses were collected
+from almost 3,600 persons.
+
+All items performed well according to the Rasch model diagnostics. There was a fall in the precision of
+domain scores compared to Round 1, but this is to be expected given the aim of deriving an abbreviated
+instrument that minimises respondent burden.
+
+Domain scores have been scaled so they cover the range 0-100 for each respondent, where 0 is the
+theoretical minimum score a respondent can achieve for these items and 100 is the theoretical maximum
+score16. This means that the average score for each domain will be on a different scale from the existing
+SMI values.
+
+
+
+Summary
+This section has summarised the analysis of responses from two rounds of online
+surveys to assess the measurement properties of a bank of items related to social
+cohesion. The original set of 133 items from Round 1 was reduced to 76 items for
+administration in Round 2, following which 29 items remained for the main data
+collection on Life in Australia™ in July 2021.
+
+Decisions on the exclusion of items was made on the basis of several considerations:
+
+ •    Cross-loading in the factor analysis;
+
+ •    Misfit or redundancy in the Rasch model;
+
+ •    Cronbach alpha; and
+
+ •    Discussion between the client and SRC where multiple similar items were deemed
+      suitable for inclusion.
+
+
+
+References
+Bond, T.G, and Fox, C.M. (2001) Applying the Rasch Model: Fundamental Measurement in the Human
+        Sciences. Mahwah NJ: Lawrence Erlbaum Assoc.
+
+Hughes, M.E., Waite, L.J., Hawkley, L.C., and Cacioppo, J.T. (2004). A Short Scale for Measuring Loneliness
+
+
+16 To be assigned to the extreme scores, a respondent must (1) answer all items in a domain, and (2) select the
+extreme rating for all items (lowest rating for minimum score and highest rating for maximum score).
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                    49
+          in Large Surveys: Results From Two Population-Based Studies. Research in Aging 26(6), 655–
+          672.
+
+Kessler, R.C., Andrews, G., Colpe, L.J., Hiripi, E., Mroczek, D.K., Normand, S.-L.T., Walters, E.E., & Zaslavsky,
+         A. (2002). Short screening scales to monitor population prevalances and trends in nonspecific
+         psychological distress. Psychological Medicine 32(6), 959–976.
+
+Linacre, J. M. (2017). Winsteps® Rasch measurement computer program User's Guide. Beaverton,
+         Oregon: https://www.winsteps.com.
+
+Markus, A. (2021). 2020 Mapping Social Cohesion report. Melbourne: Scanlon Foundation Research
+        Institute. https://scanlonfoundation.org.au/current-research/ (accessed 5 July 2021).
+
+          Markus, A., and Arnup, J. (2009). Mapping Social Cohesion: the 2009 Scanlon Foundation Surveys.
+          Clayton, VIC: Monash University.
+
+Markus, A., and Dharmalingam, A. (2007). Mapping Social Cohesion: the Scanlon Foundation Surveys.
+        Clayton, VIC: Monash University.
+
+Russell, D. (1996). UCLA Loneliness Scale (Version 3): Reliability, validity, and factor structure. Journal of
+         Personality Assessment, 66(1), 20–40.
+
+Wright, B.D. and Masters, G.N. (1982) Rating Scale Analysis. Chicago: MESA Press.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                 50
+ PART D: Detailed results
+  from Mapping Social
+     Cohesion 2026
+                          Australian National University
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                           51
+Mapping Social Cohesion 2026 Technical Report
+                                                52
+Table D1 ‘There has been a lot of discussion recently about social cohesion in Australia. To what
+extent are the following important for living in a cohesive society?’ Weighted % of adults who say to
+a great extent by current voting preference (95% margins of error), 2026
+
+                                                                  Voting preference in 2026
+                                                                  Labor        Coalition     One Nation      Greens
+                                                                    Weighted % of adults (95% margin of error)
+ Everyone has the opportunity to be happy and have a
+                                                                   55 (2.7)     49 (2.9)       46 (2.5)      60 (4.1)
+ good life
+ People are safe and communities are protected from
+                                                                   52 (2.7)     45 (2.9)       43 (2.5)      57 (4.1)
+ harm
+ People respect others despite their different beliefs and
+                                                                   50 (2.7)     41 (2.8)       31 (2.3)      54 (4.1)
+ ideas
+ Everyone feels they belong and has a place in society             45 (2.7)     38 (2.8)       29 (2.3)       50 (4)
+ Everyone has the opportunity to have a say on
+                                                                   41 (2.6)     33 (2.7)       30 (2.2)       45 (4)
+ government decisions
+ People participate in their communities                           23 (2.2)     21 (2.3)       16 (1.8)      24 (3.2)
+
+ People agree with each other on big social issues                 12 (1.7)     13 (1.9)       12 (1.6)      10 (2.2)
+
+ People come from similar cultural backgrounds                     7 (1.3)       9 (1.5)       15 (1.7)       7 (1.8)
+
+Notes: voting preference is based on who respondents said they would vote for if an election were held today. Table
+provides estimates and margins of error from Figure 2 of the main report.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                        53
+Table D2 Belief that social cohesion is declining and pessimism in Australia's future by
+sociodemographic characteristics, Weighted % of adults (95% margins of error), 2026
+
+                                        % believes social         % pessimistic or
+                                        cohesion has              very pessimistic
+                                        declined in the last 3-   about Australia's
+                                        4 years                   future
+ Gender
+ Male                                                 64 (1.9)                 47 (1.9)
+ Female                                               57 (1.8)                 48 (1.8)
+ Age
+ 18-24                                                49 (5.6)                 45 (5.5)
+ 25-34                                                52 (3.6)                 51 (3.6)
+ 35-44                                                54 (3.0)                 48 (3.0)
+ 45-54                                                63 (3.0)                 49 (3.1)
+ 55-64                                                69 (2.5)                 49 (2.7)
+ 65+                                                  71 (2.0)                 45 (2.2)
+ Household
+ Live alone                                           60 (2.7)                 50 (2.7)
+ Couple no children                                   67 (2.1)                 46 (2.1)
+ Couple parent family                                 59 (2.4)                 47 (2.4)
+ Single parent family                                 55 (5.3)                 53 (5.2)
+ Place of birth & first language
+ Australia                                            65 (2.0)                 52 (2.1)
+ Overseas & English                                   61 (2.3)                 45 (2.3)
+ Overseas & non-English                               42 (2.8)                 35 (2.8)
+ Post-school qualifications
+ Certification II or less                             57 (1.7)                 52 (1.7)
+ Certificate III/IV or Diploma                        63 (2.7)                 50 (2.8)
+ University degree                                    60 (3.3)                 42 (3.2)
+ Housing tenure
+ Own outright                                         69 (2.8)                 47 (2.8)
+ Mortgage                                             59 (2.2)                 47 (2.2)
+ Rent                                                 51 (1.9)                 50 (1.9)
+ Voting preference
+ Labor                                                51 (2.7)                 25 (2.4)
+ Coalition                                            57 (3.0)                 42 (2.9)
+ Greens                                               61 (4.0)                 53 (4.0)
+ One Nation                                           73 (2.4)                 68 (2.4)
+ Region
+ Capital city                                         59 (2.5)                 47 (2.5)
+ Rest of state                                        63 (2.5)                 50 (2.6)
+ State
+ NSW                                                  60 (4.5)                 47 (4.4)
+ Victoria                                             63 (3.9)                 51 (4.0)
+ Queensland                                           60 (1.3)                 48 (1.3)
+ South Australia                                      58 (1.6)                 48 (1.6)
+ Western Australia                                    58 (2.3)                 45 (2.4)
+ Total                                                60 (1.3)                 48 (1.3)
+
+Notes: Some categories, e.g. Tasmania, not shown due to small sample sizes and wide ranges of uncertainty. Voting is
+based on who people said they would vote for if there were an election today. Table provides estimates and margins of
+error from Figure 4 of the main report.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                        54
+Table D3 ‘How often do you think the government in Canberra can be trusted to do the right thing
+for the Australian people?’ Weighted % of adults who say almost always or most of the time (95%
+margin of error), 2025 and 2026
+
+                                            2025        2026
+ Gender
+ Male                                    38 (1.7)    32 (1.8)
+ Female                                  36 (1.6)    30 (1.7)
+ Age
+ 18-24                                   45 (4.8)    41 (5.5)
+ 25-34                                   36 (3.1)    31 (3.3)
+ 35-44                                   36 (2.6)    30 (2.7)
+ 45-54                                   34 (2.7)    29 (2.8)
+ 55-64                                   36 (2.5)    29 (2.4)
+ 65+                                     37 (2.1)    31 (2.0)
+ Household
+ Live alone                              34 (2.3)    28 (2.4)
+ Couple no children                      38 (2.0)    32 (2.0)
+ Couple parent family                    39 (2.2)    32 (2.3)
+ Single parent family                    27 (4.0)    24 (4.4)
+ Place of birth & first language
+ Australia                               35 (1.9)    28 (2.0)
+ Overseas & English                      37 (2.0)    32 (2.1)
+ Overseas & non-English                  44 (2.4)    42 (2.5)
+ Post-school qualifications
+ Certification II or less                33 (1.4)    28 (1.5)
+ Certificate III/IV or Diploma           34 (2.7)    27 (2.6)
+ University degree                       44 (3.3)    39 (3.3)
+ Housing tenure
+ Own outright                            39 (2.4)    32 (2.6)
+ Mortgage                                38 (1.9)    33 (2.0)
+ Rent                                    34 (1.8)    28 (1.9)
+ Voting preference 2026
+ Labor                                   62 (2.7)    62 (2.7)
+ Coalition                               34 (2.6)    29 (2.8)
+ Greens                                  31 (3.6)    29 (3.6)
+ Independent                             30 (3.0)    29 (4.2)
+ One Nation                              17 (2.4)     8 (1.5)
+ Region
+ Capital city                            39 (2.2)    32 (2.3)
+ Rest of state                           33 (2.3)    29 (2.3)
+ State
+ NSW                                     40 (3.7)    33 (4.2)
+ Victoria                                35 (3.8)    29 (3.8)
+ Queensland                              32 (1.2)    27 (1.2)
+ South Australia                         31 (1.4)    30 (1.5)
+ Western Australia                       41 (2.0)    35 (2.1)
+ Total                                   37 (1.2)    31 (1.2)
+
+Notes: Some categories, e.g. Tasmania, not shown due to small sample sizes and wide ranges of uncertainty. Voting is
+based on who people said they would vote for if there were an election today. Table provides estimates and margins of
+error from Figure 10 of the main report.
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                        55
+Table D4 Indicators of institutional trust by voting preference, 2024–2026
+
+                   Voting preference in 2026
+               Labor                 Coalition                     Greens                 One Nation
+ Trust government all/most of the time
+          2024                54 (3.4)                  35 (3.9)               25 (4.3)                 17 (2.7)
+          2025                61 (2.6)                  36 (2.9)               31 (3.5)                 18 (2.4)
+          2026                62 (2.7)                  29 (2.9)               29 (3.6)                   9 (1.6)
+ Believes the system of government in Australia needs major change or to be replaced
+          2024                29 (3.1)                  36 (4.0)               52 (4.9)                 62 (3.4)
+          2025                22 (2.3)                  40 (2.9)               44 (3.9)                 63 (3.0)
+          2026                21 (2.3)                  41 (3.0)               47 (4.0)                 73 (2.4)
+ Takes pride in the Australian way of life and culture to a great extent
+          2024                74 (3.2)                  67 (4.0)               61 (4.8)                 45 (3.5)
+          2025                80 (2.3)                  62 (2.9)               68 (3.7)                 40 (3.0)
+          2026                81 (2.2)                  63 (3.0)               63 (3.9)                 35 (2.6)
+ Agrees that accepting immigrants from many different countries has made Australia stronger
+          2024                17 (2.7)                  23 (3.5)               38 (4.8)                 49 (3.5)
+          2025                14 (2.0)                  27 (2.6)               32 (3.7)                 52 (3.1)
+          2026                16 (2.1)                  29 (2.8)               34 (3.8)                 64 (2.6)
+ Agrees that immigrants can make just as good a citizen as the Australia-born
+          2024                66 (3.2)                  57 (4.1)               53 (4.9)                 40 (3.4)
+          2025                65 (2.6)                  55 (2.9)               55 (3.9)                 38 (3.0)
+          2026                68 (2.6)                  57 (3.0)               54 (4.0)                 32 (2.6)
+
+Notes: Voting is based on who people said they would vote for in 2026 if there were an election today if they completed
+the 2026 survey, otherwise who they voted for in the 2025 Federal election (if they completed the 2025 survey) or who
+they voted for in the 2022 election (if they only completed the 2024 survey). Table provides estimates and margins of
+error from Figure 11 of the main report.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                          56
+Table D5 Mixed effects regression results predicting institutional trust by voting preference in 2026,
+financial stress and social media use, 2025 and 2026
+
+
+                                                                                         95% confidence
+                                                                     Robust                 interval
+                                                                    standard
+                                                    Coefficient       error    p-value   Lower    Upper
+ Voting preference (ref. Labor)
+    Coalition                                              -10.51       1.25    <0.001   -12.96    -8.06
+    Greens                                                  -8.19       1.51    <0.001   -11.16    -5.23
+    Independent                                            -11.34       1.67    <0.001   -14.62    -8.06
+    One Nation                                             -28.68       1.34    <0.001   -31.31   -26.06
+    Other                                                   -9.99       2.04    <0.001     -14     -5.99
+ Voting preference x social media use (ref. everyday)
+    Labor x weekly                                          1.79         0.8     0.030     0.22     3.35
+    Labor x less than weekly                                1.24        0.71     0.080    -0.14     2.63
+    Coalition x weekly                                      -0.48       1.06     0.650    -2.55      1.6
+    Coalition x less than weekly                            -2.03       0.92     0.030    -3.82    -0.23
+    Greens x weekly                                         -3.14       1.34     0.020    -5.77    -0.51
+    Greens x less than weekly                                -2.8       1.53     0.070    -5.81      0.2
+    Independent x weekly                                    1.76        1.34     0.190    -0.88      4.4
+    Independent x less than weekly                          0.71        1.33     0.590    -1.89     3.31
+    One Nation x weekly                                     -0.53       1.04     0.610    -2.56      1.5
+    One Nation x less than weekly                           0.19        1.04     0.860    -1.84     2.22
+    Other x weekly                                          -3.74       1.92     0.050    -7.51     0.03
+    Other x less than weekly                                -3.11       1.57     0.050    -6.19    -0.02
+ Voting preference x social media use x year (ref. 2026)
+    Labor x daily x 2024                                    -3.94       0.97    <0.001    -5.83    -2.04
+    Labor x weekly x 2025                                   -0.67       0.81     0.410    -2.27     0.92
+    Labor x weekly x 2024                                   -4.58       1.49    <0.001     -7.5    -1.66
+    Labor x weekly x 2025                                   -2.53       1.15     0.030    -4.78    -0.27
+    Labor x less than weekly x 2024                         -3.97       1.07    <0.001    -6.06    -1.88
+    Labor x less than weekly                                -0.44          1     0.660     -2.4     1.53
+    Coalition x daily x 2024                                1.56         1.3     0.230    -0.99     4.12
+    Coalition x weekly x 2025                               2.65        1.14     0.020      0.4     4.89
+    Coalition x weekly x 2024                               1.71        2.02     0.400    -2.25     5.67
+    Coalition x weekly x 2025                               1.43        1.67     0.390    -1.84      4.7
+    Coalition x less than weekly x 2024                     3.91        1.31    <0.001     1.33     6.48
+    Coalition x less than weekly x 2025                     3.72        1.28    <0.001     1.21     6.23
+    Greens x daily x 2024                                    -3.9       1.67     0.020    -7.18    -0.62
+    Greens x weekly x 2025                                  -1.06       1.27     0.400    -3.54     1.42
+    Greens x weekly x 2024                                  0.95        2.16     0.660    -3.28     5.19
+    Greens x weekly x 2025                                  1.56        1.95     0.420    -2.26     5.37
+    Greens x less than weekly x 2024                        -0.56       2.37     0.810     -5.2     4.08
+    Greens x less than weekly                                  3        2.17     0.170    -1.24     7.25
+    Independent x daily x 2024                              0.46        1.53     0.770    -2.54     3.46
+    Independent x weekly x 2025                             1.57        1.47     0.280     -1.3     4.44
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                           57
+    Independent x weekly x 2024                             1.25    2.17    0.560       -3      5.5
+    Independent x weekly x 2025                             -1.55   2.03    0.450    -5.53    2.43
+    Independent x less than weekly x 2024                   1.88    2.06    0.360    -2.17    5.92
+    Independent x less than weekly                          2.62    1.71    0.130    -0.72    5.96
+    One Nation x daily x 2024                               6.58    1.24   <0.001    4.16     9.01
+    One Nation x weekly x 2025                              7.39    1.16   <0.001    5.13     9.66
+    One Nation x weekly x 2024                              7.28    1.77   <0.001      3.8   10.76
+    One Nation x weekly x 2025                              7.39    1.58   <0.001      4.3   10.48
+    One Nation x less than weekly x 2024                    6.12    1.53   <0.001    3.12     9.13
+    One Nation x less than weekly                           7.05    1.45   <0.001    4.22     9.89
+    Other x daily x 2024                                    -2.86   2.31    0.220     -7.4    1.67
+    Other x weekly x 2025                                   0.55    1.98    0.780    -3.34    4.43
+    Other x weekly x 2024                                   -1.03   3.33    0.760    -7.56    5.51
+    Other x weekly x 2025                                   -0.18   2.84    0.950    -5.74    5.39
+    Other x less than weekly x 2024                         -1.36   2.74    0.620    -6.72    4.01
+    Other x less than weekly                                3.49    2.11    0.100    -0.65    7.62
+ Voting preference x financial stress
+    Labor                                                  -16.65    1.7   <0.001   -19.97   -13.32
+    Coalition                                              -15.39   2.11   <0.001   -19.52   -11.26
+    Greens                                                 -16.43   2.33   <0.001   -20.98   -11.87
+    Independent                                            -17.02   3.07   <0.001   -23.04   -11.01
+    One Nation                                             -10.61   1.97   <0.001   -14.48    -6.75
+    Other                                                  -23.89   3.45   <0.001   -30.66   -17.13
+ Voting preference x year (ref. 2026) x financial stress
+    Labor x 2024                                            1.76    2.03    0.390    -2.22    5.74
+    Labor x 2025                                            2.82    1.82    0.120    -0.75    6.38
+    Coalition x 2024                                        0.55    2.78    0.840     -4.9    6.01
+    Coalition x 2025                                        -0.53   2.55    0.840    -5.54    4.47
+    Greens x 2024                                             0.9   3.08    0.770    -5.15    6.94
+    Greens x 2025                                           2.69    2.45    0.270    -2.11    7.49
+    Independent x 2024                                      -1.61   3.44    0.640    -8.35    5.12
+    Independent x 2025                                      3.09    2.84    0.280    -2.48    8.66
+    One Nation x 2024                                       -0.07   2.34    0.980    -4.66    4.51
+    One Nation x 2025                                       -4.53   2.18    0.040    -8.79    -0.26
+    Other x 2024                                            5.37    4.01    0.180     -2.5   13.23
+    Other x 2025                                            2.99     3.4    0.380    -3.66    9.65
+ Age group (ref. 18-24 years)
+    25-34 years                                             -2.17   0.82    0.010    -3.78    -0.57
+    35-44 years                                             -1.04   0.84    0.220    -2.67      0.6
+    45-54 years                                             0.29    0.87    0.740    -1.41    1.99
+    55-64 years                                               2.2   0.86    0.010    0.51     3.89
+    65-74 years                                               2.4   0.88    0.010    0.67     4.13
+    75 or more years                                        4.57    0.96   <0.001    2.68     6.46
+    NA                                                      7.04    1.05   <0.001    4.98       9.1
+ Highest education (ref. University degree)
+    Certificate/diploma                                     -1.44   0.41   <0.001    -2.24    -0.64
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                      58
+    Year 12                                                    0.1         0.61        0.870       -1.1       1.3
+    Year 11 or below                                         -2.89         0.62      <0.001       -4.09     -1.68
+    NA                                                          -4         1.09      <0.001       -6.14     -1.86
+ City of residence (ref. Sydney)
+    Melbourne                                                -2.43         0.64      <0.001       -3.68     -1.17
+    Brisbane                                                 -1.53         0.81        0.060      -3.13      0.06
+    Adelaide                                                 -0.14         0.88        0.870      -1.87      1.58
+    Perth                                                     1.21         0.83        0.140      -0.41      2.83
+    Other                                                    -0.86         0.56        0.120      -1.96      0.24
+ Gender (ref. male)
+    Woman or female                                          -2.21         0.41      <0.001       -3.02      -1.4
+    Non-binary                                               -1.21         1.81        0.500      -4.75      2.33
+ Married or co-habiting (ref. single)                         0.51         0.33        0.120      -0.13      1.14
+ Period of immigrant arrival (ref. Australia-born)
+    Prior to 1973                                            -0.78          0.7        0.260      -2.16      0.59
+    1973–1995                                                -1.27         0.73        0.080       -2.7      0.15
+    1996–2009                                                 0.37         0.75        0.620       -1.1      1.85
+    2010 onwards                                              4.24         0.64      <0.001       2.99        5.5
+ Phone survey (ref. online)                                  -2.17         2.64        0.410      -7.35      3.01
+ Non-probability panel (ref. probability)                    -3.96          0.5      <0.001       -4.95     -2.97
+ Intercept                                                  72.56          1.11      <0.001      70.39     74.73
+ Variance of random effects                                178.09          4.56                 169.37    187.26
+ Residual variance                                          68.59           1.8                  65.14     72.21
+ Individuals                                                9,910
+ Observations                                              20,486
+ Wald Ӽ2                                                   80,553    p <0.001
+Notes: regression results are used as the basis for the modelled estimates in Figure 12 and Table D6. The model is
+run on pooled data from 2024, 2025 and 2026 and includes a random effect for individual respondents. Trust in
+institutions is calculated from respondents' trust in the Federal Government, elections, the system of Government, the
+courts and political leaders in Australia. See Figure 11 and note 48 of the main report for the wording of these questions.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                         59
+Table D6 Modelled estimates of institutional trust by voting preference in 2026, financial stress and
+social media use, 2025 and 2026
+
+                                                                Voting preference
+                                                Labor       Coalition   Greens       One Nation
+ Financially prosperous
+                                     2025        68 (1.3)    61 (1.9)     60 (2.1)       47 (1.9)
+                                     2026        69 (1.2)    58 (1.5)     60 (2.0)       41 (1.8)
+ High financial stress
+                                     2025        59 (1.6)    49 (2.3)     50 (2.0)       37 (1.9)
+                                     2026        58 (1.6)    47 (2.0)     48 (2.0)       33 (1.6)
+
+ Use social media daily
+                                     2025        63 (0.9)    55 (1.3)     55 (1.4)       42 (1.3)
+                                     2026        63 (0.9)    53 (1.2)     55 (1.4)       37 (1.2)
+ Uses social media less than weekly
+                                     2025        65 (1.7)    54 (1.9)     56 (2.9)       42 (2.6)
+                                     2026        64 (1.3)    51 (1.7)     52 (2.9)       37 (1.8)
+Notes: Trust in institutions is calculated from respondents' trust in the Federal Government, elections, the system of
+Government, the courts and political leaders in Australia. See Figure 11 and note 48 of the main report for the wording of
+these questions. This table provides estimates and margins of error from Figure 12 of the main report. Results are based
+on the regression model reported in Table D5.
+
+
+
+
+Mapping Social Cohesion 2026 Technical Report
+                                                                                                                       60
+

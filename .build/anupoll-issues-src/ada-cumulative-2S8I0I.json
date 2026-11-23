@@ -1,0 +1,1179 @@
+{
+  "status": "OK",
+  "data": {
+    "id": 4600,
+    "identifier": "2S8I0I",
+    "persistentUrl": "https://doi.org/10.26193/2S8I0I",
+    "protocol": "doi",
+    "authority": "10.26193",
+    "separator": "/",
+    "publisher": "ADA Dataverse",
+    "publicationDate": "2018-11-22",
+    "storageIdentifier": "file://10.26193/2S8I0I",
+    "guestbookId": 2,
+    "datasetType": "dataset",
+    "locks": [],
+    "latestVersion": {
+      "id": 800,
+      "datasetId": 4600,
+      "datasetPersistentId": "doi:10.26193/2S8I0I",
+      "datasetType": "dataset",
+      "storageIdentifier": "file://10.26193/2S8I0I",
+      "versionNumber": 1,
+      "internalVersionNumber": 8,
+      "versionMinorNumber": 0,
+      "versionState": "RELEASED",
+      "latestVersionPublishingState": "RELEASED",
+      "deaccessionLink": "",
+      "distributionDate": "2017-02-24",
+      "UNF": "UNF:6:TDooCfQjPLLSENhbcg/CJQ==",
+      "lastUpdateTime": "2018-11-22T04:54:33Z",
+      "releaseTime": "2018-11-22T04:54:33Z",
+      "createTime": "2018-11-22T04:41:46Z",
+      "publicationDate": "2018-11-22",
+      "citationDate": "2018-11-22",
+      "guestbookId": 2,
+      "termsOfUse": "&lt;b&gt;Conditions of Use&lt;/b&gt;&lt;br/&gt;\r\n\r\nI acknowledge that:\r\n&lt;br/&gt;&lt;br/&gt;\r\n1. Use of the material is restricted to use for analytical purposes and that this means that I can only use the material to produce information of an analytical nature.\r\n&lt;br/&gt;&lt;br/&gt;\r\nExamples of such uses are:\r\n(a) the manipulation of data to produce means, correlations or other descriptive summary measures;\r\n(b) the estimation of population characteristics from sample data;\r\n(c) the use of data as input to mathematical models and for other types of analyses (e.g. factor analysis); and\r\n(d) to provide graphical and pictorial representation of characteristics of the population or sub-sets of the population.\r\n\r\n&lt;br/&gt;&lt;br/&gt;\r\n2. The material is not to be used for any non-analytical purposes, or for commercial or financial gain, without the express written permission of the Australian Data Archive.\r\n&lt;br/&gt;\r\nExamples of non-analytical purposes are:\r\n(a) transmitting or allowing access to the data in part or whole to any other person / Department / Organisation not a party to this undertaking; and\r\n(b) attempting to match unit record data in whole or in part with any other information for the purposes of attempting to identify individuals.\r\n\r\n&lt;br/&gt;&lt;br/&gt;\r\n3. Outputs (such as statistics, tables and graphs) obtained from analysis of these data may be further disseminated provided that I:\r\n&lt;br/&gt;\r\n(a) acknowledge both the original depositors and the Australian Data Archive;\r\n(b) acknowledge another archive where the data file is made available through the Australian Data Archive by another archive; and\r\n(c) declare that those who carried out the original analysis and collection of the data bear no responsibility for the further analysis or interpretation of it.\r\n\r\n&lt;br/&gt;&lt;br/&gt;\r\n4. Use of the material is solely at my risk and I indemnify the Australian Data Archive and its host institution, The Australian National University.\r\n&lt;br/&gt;&lt;br/&gt;\r\n\r\n5. The Australian Data Archive and its host institution, The Australian National University, shall not be held liable for any breach of this undertaking.\r\n&lt;br/&gt;&lt;br/&gt;\r\n\r\n6. The Australian Data Archive and its host institution, The Australian National University, shall not be held responsible for the accuracy and completeness of the material supplied.",
+      "confidentialityDeclaration": "You will also need to complete a signed General Undertaking form if this is the first time you will be downloading data from the Australian Data Archive.",
+      "specialPermissions": "None",
+      "restrictions": "The depositor may be informed (by the archive) of use being made of the data, in order to comment on that use and make contact with colleagues of similar interests.",
+      "citationRequirements": "All manuscripts based in whole or in part on these data should: \r\n(i) identify the data and original investigators by using the recommended bibliographic reference to the data file; \r\n(ii) acknowledge the Australian Data Archive and, where the data are made available through the Australian Data Archive by another archive, acknowledge that archive; \r\n(iii) declare that those who carried out the original analysis and collection of the data bear no responsibility for the further analysis or interpretation of them.",
+      "depositorRequirements": "In order to assemble essential information about archival resources and to facilitate the exchange of information about users’ research activities, individuals are required to email ADA (ada@anu.edu.au) with the bibliographic details and, where available, online links to any published work (including journal articles, books or book chapters, conference presentations, theses or any other publications or outputs) based wholly or in part on the material.",
+      "disclaimer": "Use of the material is solely at the user's risk. The depositor, The Australian National University and the Australian Data Archive shall not be held responsible for the accuracy and completeness of the material supplied.",
+      "termsOfAccess": "To request download access for this data set, please select the file(s) and click the \"Request Access\" button (Note: you need to be a registered user and logged in to make an access request).",
+      "fileAccessRequest": true,
+      "metadataBlocks": {
+        "citation": {
+          "displayName": "Citation Metadata",
+          "name": "citation",
+          "fields": [
+            {
+              "typeName": "title",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015"
+            },
+            {
+              "typeName": "alternativeURL",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "http://politicsir.cass.anu.edu.au/research/projects/electoral-surveys/anupoll"
+            },
+            {
+              "typeName": "otherId",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "otherIdAgency": {
+                    "typeName": "otherIdAgency",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian Data Archive"
+                  },
+                  "otherIdValue": {
+                    "typeName": "otherIdValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "01368"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "author",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "authorName": {
+                    "typeName": "authorName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "McAllister, Ian"
+                  },
+                  "authorAffiliation": {
+                    "typeName": "authorAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian National University"
+                  }
+                },
+                {
+                  "authorName": {
+                    "typeName": "authorName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Sheppard, Jill"
+                  },
+                  "authorAffiliation": {
+                    "typeName": "authorAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian National University"
+                  },
+                  "authorIdentifierScheme": {
+                    "typeName": "authorIdentifierScheme",
+                    "multiple": false,
+                    "typeClass": "controlledVocabulary",
+                    "value": "ORCID"
+                  },
+                  "authorIdentifier": {
+                    "typeName": "authorIdentifier",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "0000-0002-9150-2780"
+                  }
+                },
+                {
+                  "authorName": {
+                    "typeName": "authorName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Pennay, Darren"
+                  },
+                  "authorAffiliation": {
+                    "typeName": "authorAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Social Research Centre"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "datasetContact",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "datasetContactName": {
+                    "typeName": "datasetContactName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian Data Archive"
+                  },
+                  "datasetContactAffiliation": {
+                    "typeName": "datasetContactAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian National University"
+                  },
+                  "datasetContactEmail": {
+                    "typeName": "datasetContactEmail",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "ada@anu.edu.au"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "dsDescription",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "dsDescriptionValue": {
+                    "typeName": "dsDescriptionValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "ANUpoll is a survey of Australian public opinion. The topic of each survey is an issue of national importance. The ANUpoll differs from other opinion polls by placing public opinion in a broad policy context, and by benchmarking Australia against international opinion. The ANUpoll is also able to follow trends in opinions over many decades. ANU Polls are typically conducted three times a year, or about every four months.\r\n\r\nThis dataset is a combined file of ANUpolls datasets with time series variables only. Some questions have appeared in every poll in order to provide information about changes in opinion over time. ANU Polls data from March 2008 to December 2015 are included in the dataset. Paradata on the interviewers of the Social Research Centre, the data collector, are also added. The standard ANU Poll questions cover issues such as the most important problems in Australia and demographic characteristics of the sample. Demographic and background variables include gender, age, household composition, country of birth, highest level of education, employment status and income. This research is used to monitor changes in public opinion over time, as well as to enable methodological research on the interviewer effect."
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "subject",
+              "multiple": true,
+              "typeClass": "controlledVocabulary",
+              "value": [
+                "Social Sciences"
+              ]
+            },
+            {
+              "typeName": "keyword",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australians"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                },
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Demographic factors"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                },
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Demography"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                },
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "National characteristics"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                },
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Public opinion"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                },
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Research"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                },
+                {
+                  "keywordValue": {
+                    "typeName": "keywordValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Surveys"
+                  },
+                  "keywordVocabulary": {
+                    "typeName": "keywordVocabulary",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "APAIS"
+                  },
+                  "keywordVocabularyURI": {
+                    "typeName": "keywordVocabularyURI",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://vocabularyserver.com/apais/index.php"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "topicClassification",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "topicClassValue": {
+                    "typeName": "topicClassValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian Studies"
+                  }
+                },
+                {
+                  "topicClassValue": {
+                    "typeName": "topicClassValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Social Science"
+                  }
+                },
+                {
+                  "topicClassValue": {
+                    "typeName": "topicClassValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Polls"
+                  }
+                },
+                {
+                  "topicClassValue": {
+                    "typeName": "topicClassValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "ANUPoll"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "language",
+              "multiple": true,
+              "typeClass": "controlledVocabulary",
+              "value": [
+                "English"
+              ]
+            },
+            {
+              "typeName": "producer",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "producerName": {
+                    "typeName": "producerName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Pennay, Darren"
+                  },
+                  "producerAffiliation": {
+                    "typeName": "producerAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Social Research Centre"
+                  },
+                  "producerAbbreviation": {
+                    "typeName": "producerAbbreviation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "SRC"
+                  },
+                  "producerURL": {
+                    "typeName": "producerURL",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://www.srcentre.com.au/"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "productionPlace",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "Canberra, Australia"
+              ]
+            },
+            {
+              "typeName": "contributor",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "contributorType": {
+                    "typeName": "contributorType",
+                    "multiple": false,
+                    "typeClass": "controlledVocabulary",
+                    "value": "Data Collector"
+                  },
+                  "contributorName": {
+                    "typeName": "contributorName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Social Research Centre"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "grantNumber",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "grantNumberAgency": {
+                    "typeName": "grantNumberAgency",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian National University"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "distributor",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "distributorName": {
+                    "typeName": "distributorName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian Data Archive"
+                  },
+                  "distributorAffiliation": {
+                    "typeName": "distributorAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Australian National University"
+                  },
+                  "distributorAbbreviation": {
+                    "typeName": "distributorAbbreviation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "ADA"
+                  },
+                  "distributorURL": {
+                    "typeName": "distributorURL",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "http://www.ada.edu.au/"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "distributionDate",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "2017-02-24"
+            },
+            {
+              "typeName": "depositor",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Sheppard, Jill"
+            },
+            {
+              "typeName": "dateOfDeposit",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "2017-01-20"
+            },
+            {
+              "typeName": "timePeriodCovered",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "timePeriodCoveredStart": {
+                    "typeName": "timePeriodCoveredStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-03-18"
+                  },
+                  "timePeriodCoveredEnd": {
+                    "typeName": "timePeriodCoveredEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2015-03-15"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "dateOfCollection",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-03-18"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-04-02"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-06-20"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-07-06"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-09-05"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2008-09-21"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2009-03-17"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2009-04-01"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2009-06-09"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2009-07-02"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2009-08-31"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2009-09-15"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2010-03-16"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2010-04-01"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2010-06-15"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2010-07-02"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2010-12-02"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2010-12-16"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2011-04-27"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2011-05-10"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2011-07-12"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2011-07-25"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2011-09-05"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2011-09-18"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2012-08-20"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2012-09-09"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2013-07-09"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2013-07-23"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2013-12-02"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2013-12-15"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2014-05-12"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2014-05-25"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2014-06-23"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2014-07-09"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2014-09-22"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2014-10-05"
+                  }
+                },
+                {
+                  "dateOfCollectionStart": {
+                    "typeName": "dateOfCollectionStart",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2015-03-02"
+                  },
+                  "dateOfCollectionEnd": {
+                    "typeName": "dateOfCollectionEnd",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "2015-03-15"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "kindOfData",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "Survey data"
+              ]
+            },
+            {
+              "typeName": "series",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "seriesName": {
+                    "typeName": "seriesName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "ANU Poll"
+                  },
+                  "seriesInformation": {
+                    "typeName": "seriesInformation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "The purpose of ANU Polls is to assess Australians’ opinions on important and topical issues, with an emphasis on international comparisons. These polls are typically conducted three times a year, or about every four months. Some questions appear in every poll in order to provide information about changes in opinion over time. The majority of questions appear in one poll only."
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "software",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "softwareName": {
+                    "typeName": "softwareName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Stata"
+                  },
+                  "softwareVersion": {
+                    "typeName": "softwareVersion",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "12.0"
+                  }
+                },
+                {
+                  "softwareName": {
+                    "typeName": "softwareName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "SPSS"
+                  },
+                  "softwareVersion": {
+                    "typeName": "softwareVersion",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "24.0"
+                  }
+                },
+                {
+                  "softwareName": {
+                    "typeName": "softwareName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "SAS"
+                  },
+                  "softwareVersion": {
+                    "typeName": "softwareVersion",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "9.4"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "relatedDatasets",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "&lt;a href=\"https://dataverse.ada.edu.au/dataverse/anupoll\"&gt;ANU Polls Studies&lt;/a&gt;"
+              ]
+            }
+          ]
+        },
+        "socialscience": {
+          "displayName": "Social Science and Humanities Metadata",
+          "name": "socialscience",
+          "fields": [
+            {
+              "typeName": "unitOfAnalysis",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "Individual"
+              ]
+            },
+            {
+              "typeName": "universe",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "Adults (18 years of age or over) who are residents of private households in Australia"
+              ]
+            },
+            {
+              "typeName": "timeMethod",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Repeated cross-sectional study"
+            },
+            {
+              "typeName": "dataCollector",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Social Research Centre"
+            },
+            {
+              "typeName": "samplingProcedure",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "One-stage stratified (Landline population, for the data collected between 2008 and 2015)&lt;br&gt;\r\nSimple random sample (Mobile population, for the data collected between 2013 and 2015)"
+            },
+            {
+              "typeName": "collectionMode",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "Telephone interview"
+              ]
+            },
+            {
+              "typeName": "researchInstrument",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Structured"
+            },
+            {
+              "typeName": "weighting",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "For the data collected between 2008 and 2012, the weighting variable is based on age (18 to 34 years, 35 to 54 years, and 55 years and over) by sex distribution within state / territory.&lt;br&gt;\r\nFor the data collected between 2013 and 2015, the weighting approach that was employed for the national weight involved a two-stage process; the first stage consisted of applying a design weight to adjust for an individual's chance of selection based on three possible factors including the number of in-scope sample members in a household, the number of landlines in the household used for private calls; and/or having a mobile phone. The second step was to apply a post stratification weight to ensure the final sample was weighted to relevant population benchmarks for age, gender, location and telephony status.&lt;br&gt;\r\nFor more details, please see &lt;a href=\"https://dataverse.ada.edu.au/dataverse/anupoll\"&gt;ANU Poll studies&lt;/a&gt;."
+            },
+            {
+              "typeName": "cleaningOperations",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "The data were checked by the archive for missing variable and value labels, out of range values and wild codes, logical inconsistencies, and confidentiality."
+            },
+            {
+              "typeName": "responseRate",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Response rate for ANU Polls conducted between 2008 and 2012 is defined as completed interviews as a proportion of sample members who could be contacted within the call cycle and were not identified as out of scope. Response rates varied between 30.3% (ANU Poll 2008: Environment) and 45.1% (ANU Poll 2010: Australia's Future).&lt;br&gt;\r\nFor ANU Polls conducted between 2013 and 2015, AAPOR Response Rate 3 was reported. The RR3 relies on estimating the proportion of cases of unknown eligibility that may have been eligible for the survey and including this estimate in the denominator for the calculation of the survey response rate. The AAPOR RR3 overall response rates varied between 23.4% (ANU Poll 2015: National Identity) and 30.0% (ANU Poll 2014: Changing Views of Governance).&lt;br&gt;\r\nFor more details, please see &lt;a href=\"https://dataverse.ada.edu.au/dataverse/anupoll\"&gt;ANU Poll studies&lt;/a&gt;."
+            },
+            {
+              "typeName": "socialScienceNotes",
+              "multiple": false,
+              "typeClass": "compound",
+              "value": {
+                "socialScienceNotesSubject": {
+                  "typeName": "socialScienceNotesSubject",
+                  "multiple": false,
+                  "typeClass": "primitive",
+                  "value": "Geographic Unit:"
+                },
+                "socialScienceNotesText": {
+                  "typeName": "socialScienceNotesText",
+                  "multiple": false,
+                  "typeClass": "primitive",
+                  "value": "State"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "files": [
+        {
+          "description": "",
+          "label": "1. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015 - Data Dictionary.xlsx",
+          "restricted": true,
+          "version": 9,
+          "datasetVersionId": 800,
+          "categories": [
+            "Data Dictionary",
+            "Documentation"
+          ],
+          "dataFile": {
+            "id": 4601,
+            "persistentId": "",
+            "filename": "1. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015 - Data Dictionary.xlsx",
+            "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "friendlyType": "MS Excel Spreadsheet",
+            "filesize": 44265,
+            "description": "",
+            "categories": [
+              "Data Dictionary",
+              "Documentation"
+            ],
+            "storageIdentifier": "file://16739b95943-041d24f48f4d",
+            "rootDataFileId": -1,
+            "md5": "152b3ee70630faa566f36ae04a4575f2",
+            "checksum": {
+              "type": "MD5",
+              "value": "152b3ee70630faa566f36ae04a4575f2"
+            },
+            "tabularData": false,
+            "creationDate": "2018-11-22",
+            "publicationDate": "2018-11-22",
+            "lastUpdateTime": "2018-11-22T04:54:33Z",
+            "fileAccessRequest": true
+          }
+        },
+        {
+          "description": "SAS formats (.sas)",
+          "label": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sas",
+          "restricted": true,
+          "version": 5,
+          "datasetVersionId": 800,
+          "categories": [
+            "Data",
+            "SAS"
+          ],
+          "dataFile": {
+            "id": 4602,
+            "persistentId": "",
+            "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sas",
+            "contentType": "application/x-sas",
+            "friendlyType": "SAS",
+            "filesize": 16641,
+            "description": "SAS formats (.sas)",
+            "categories": [
+              "Data",
+              "SAS"
+            ],
+            "storageIdentifier": "file://16739b95e51-fdeb1feab280",
+            "rootDataFileId": -1,
+            "md5": "6a2bd3abf568620c07120ca5b4ce9981",
+            "checksum": {
+              "type": "MD5",
+              "value": "6a2bd3abf568620c07120ca5b4ce9981"
+            },
+            "tabularData": false,
+            "creationDate": "2018-11-22",
+            "publicationDate": "2018-11-22",
+            "lastUpdateTime": "2018-11-22T04:54:33Z",
+            "fileAccessRequest": true
+          }
+        },
+        {
+          "description": "SAS data file (.sas7bdat)",
+          "label": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sas7bdat",
+          "restricted": true,
+          "version": 5,
+          "datasetVersionId": 800,
+          "categories": [
+            "Data",
+            "SAS"
+          ],
+          "dataFile": {
+            "id": 4603,
+            "persistentId": "",
+            "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sas7bdat",
+            "contentType": "application/x-sas-system",
+            "friendlyType": "SAS System",
+            "filesize": 9504256,
+            "description": "SAS data file (.sas7bdat)",
+            "categories": [
+              "Data",
+              "SAS"
+            ],
+            "storageIdentifier": "file://16739b96421-06d638b3faf1",
+            "rootDataFileId": -1,
+            "md5": "5afd1995ba5e1f80b96aa168a56949a0",
+            "checksum": {
+              "type": "MD5",
+              "value": "5afd1995ba5e1f80b96aa168a56949a0"
+            },
+            "tabularData": false,
+            "creationDate": "2018-11-22",
+            "publicationDate": "2018-11-22",
+            "lastUpdateTime": "2018-11-22T04:54:33Z",
+            "fileAccessRequest": true
+          }
+        },
+        {
+          "description": "Original data file: SPSS (.sav)",
+          "label": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sav",
+          "restricted": true,
+          "version": 5,
+          "datasetVersionId": 800,
+          "categories": [
+            "Data",
+            "SPSS"
+          ],
+          "dataFile": {
+            "id": 4604,
+            "persistentId": "",
+            "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.sav",
+            "contentType": "application/x-spss-sav",
+            "friendlyType": "SPSS Binary",
+            "filesize": 2772667,
+            "description": "Original data file: SPSS (.sav)",
+            "categories": [
+              "Data",
+              "SPSS"
+            ],
+            "storageIdentifier": "file://16739b96994-064069a2c009",
+            "rootDataFileId": -1,
+            "md5": "cf6103659f02b97f8453e51b42e6c524",
+            "checksum": {
+              "type": "MD5",
+              "value": "cf6103659f02b97f8453e51b42e6c524"
+            },
+            "tabularData": false,
+            "creationDate": "2018-11-22",
+            "publicationDate": "2018-11-22",
+            "lastUpdateTime": "2018-11-22T04:54:33Z",
+            "fileAccessRequest": true
+          }
+        },
+        {
+          "description": "Original data file: Stata (.dta)",
+          "label": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.tab",
+          "restricted": true,
+          "version": 6,
+          "datasetVersionId": 800,
+          "categories": [
+            "Data",
+            "Stata"
+          ],
+          "dataFile": {
+            "id": 4605,
+            "persistentId": "",
+            "filename": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.tab",
+            "contentType": "text/tab-separated-values",
+            "friendlyType": "Tab-Delimited",
+            "filesize": 3092978,
+            "description": "Original data file: Stata (.dta)",
+            "categories": [
+              "Data",
+              "Stata"
+            ],
+            "storageIdentifier": "file://16739b97029-09e5181cbde0",
+            "originalFileFormat": "application/x-stata",
+            "originalFormatLabel": "Stata Binary",
+            "originalFileSize": 9207073,
+            "originalFileName": "2. ANU Polls Waves 1-19 Cumulative Time-Series, 2008-2015.dta",
+            "UNF": "UNF:6:TDooCfQjPLLSENhbcg/CJQ==",
+            "rootDataFileId": -1,
+            "md5": "6c9d44f6e207149de30ea9dc60658c01",
+            "checksum": {
+              "type": "MD5",
+              "value": "6c9d44f6e207149de30ea9dc60658c01"
+            },
+            "tabularData": true,
+            "creationDate": "2018-11-22",
+            "publicationDate": "2018-11-22",
+            "lastUpdateTime": "2018-11-22T04:54:33Z",
+            "fileAccessRequest": true
+          }
+        }
+      ]
+    }
+  }
+}

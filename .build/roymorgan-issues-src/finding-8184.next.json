@@ -1,0 +1,844 @@
+{
+  "props": {
+    "pageProps": {
+      "findingData": {
+        "postBy": {
+          "id": "cG9zdDo3ODg2",
+          "__typename": "Post",
+          "findingTopics": {
+            "nodes": [
+              {
+                "name": "Most Important Issues"
+              },
+              {
+                "name": "Public Opinion"
+              },
+              {
+                "name": "Special Poll"
+              }
+            ]
+          },
+          "findings": {
+            "findingNumber": 8184,
+            "hideMarginOfError": null,
+            "listingImage": {
+              "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/10022343/Untitled-design-2022-08-10T122332.163.png",
+              "mediaDetails": {
+                "height": 288,
+                "width": 328,
+                "meta": {
+                  "title": ""
+                }
+              }
+            },
+            "pdfDownload": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000407/8184-Most-Important-Problems-Facing-Australia-World-October-2019.pdf",
+              "slug": "8184-most-important-problems-facing-australia-world-october-2019"
+            },
+            "pdfDownloadCustomLabel": {
+              "useCustomLabel": null,
+              "customLabel": null
+            },
+            "additionalPdfs": null,
+            "summary": "New in-depth research from Roy Morgan shows a record high 41% of Australians regard Environmental problems as the major concern facing Australia – up 17% points since June.\r\n",
+            "releaseDate": "04/11/2019",
+            "relatedFindings": null,
+            "relatedProducts": null
+          },
+          "excerpt": "",
+          "archiveName": "Findings",
+          "archiveUri": "/findings",
+          "content": "\n<p class=\"wp-block-paragraph\"><strong>New in-depth research from Roy Morgan shows a record high 41% of Australians regard Environmental problems as the major concern facing Australia – up 17% points since June.</strong></p>\n\n\n\n<p class=\"wp-block-paragraph\">A further 22% (down 12% points) cited Economic problems. This is the lowest level of concern for Economic issues since April 2006, prior to the Global Financial Crisis.</p>\n\n\n\n<p class=\"wp-block-paragraph\">Environmental problems are also clearly regarded as the biggest concern facing the World. An unchanged 46% of Australians mentioned some form of Environmental concern as the most important problem facing the World – nearly three times as many as the 16% who mentioned Economic problems.</p>\n\n\n\n<p class=\"wp-block-paragraph\">This is the first time Environmental problems have topped the list of concerns facing both&nbsp;<strong>Australia</strong>&nbsp;and the&nbsp;<strong>World</strong>&nbsp;since February 2011 when massive floods hit Queensland, and its capital city Brisbane, as well as soon after the devastating Black Saturday bush fires in 2009 that killed over 170 Victorians.</p>\n\n\n\n<p class=\"wp-block-paragraph\">These are the key findings from a special Roy Morgan online survey of 1,054 Australians aged 14+ who were asked: “<em>What do you think is the most important problem facing the <strong>World</strong> today?” </em>and then<em> “What do you think is the most important problem facing <strong>Australia</strong> today</em>?”</p>\n\n\n\n<h3 class=\"wp-block-heading\"><strong>Most important problems facing Australia</strong></h3>\n\n\n\n<figure class=\"wp-block-image size-full\"><img loading=\"lazy\" decoding=\"async\" width=\"700\" height=\"425\" src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000211/8184-c1.png\" alt=\"\" class=\"wp-image-7888\" srcset=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000211/8184-c1.png 700w, https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000211/8184-c1-300x182.png 300w\" sizes=\"auto, (max-width: 700px) 100vw, 700px\" /></figure>\n\n\n\n<p class=\"wp-block-paragraph\" style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>\n\n\n\n<p class=\"wp-block-paragraph\">Environmental issues in October 2019 are dominated by concerns about Global warming/Climate change (25%) with the environmental concerns of the Drought (6%) and Water conservation/ Murray-Darling basin water problems (5%) the other key concerns raised.</p>\n\n\n\n<p class=\"wp-block-paragraph\">The key Economic concerns raised include Economic problems (7%), Unemployment (4%), Poverty and the gap between rich and poor (3%) and Cost of living/Rising prices/ Lack of wage growth (2%).<br><strong><br>These further themes emerged:</strong></p>\n\n\n\n<ul class=\"wp-block-list\"><li>12% of respondents mentioned Social issues including Social apathy/Family breakdowns/ Moral decline, Educational issues, Greed, Crime/Law and Order, Social welfare/Welfare dependency;</li><li>Government, Politics and Leadership issues were mentioned by 9% of Australians;</li><li>Religion, Immigration and Human Rights which includes the contentious issues surrounding asylum seekers and refugees were mentioned by almost 7% of Australians;</li><li>Under 4% mentioned issues surrounding the Energy Crisis, Energy and Power supply, Electricity grid and Fossil fuel.</li></ul>\n\n\n\n<h3 class=\"wp-block-heading\"><strong>Global warming and Climate change dominate global concerns</strong></h3>\n\n\n\n<p class=\"wp-block-paragraph\">When considering the wider&nbsp;<strong>World</strong>&nbsp;quantified thematic analysis of the verbatim responses&nbsp;<em>of a nationally representative sample of 1,054 Australians</em>&nbsp;found the Environment mentioned by just under 46% of Australians, led by the issue of Global warming (36%) and including Pollution/Rubbish, Famine/Food shortages, Water conservation/Murray-Darling water problems was the primary theme to emerge.</p>\n\n\n\n<p class=\"wp-block-paragraph\">A further 16% of Australians mentioned Economic issues led by Poverty and the gap between rich and poor (5%) and Over-population (5%). A further 6% mentioned concerns including Economic problems, Cost of living issues, Unemployment and Globalisation/ Fairer world trade and Trade wars.</p>\n\n\n\n<p class=\"wp-block-paragraph\">Other themes to emerge include a range of Social issues mentioned by 13% of respondents including Social apathy, Moral decline, Family breakdowns, Crime, Law and order, Drugs and drug abuse, Education and Social welfare. Government/Leadership problems and Terrorism/War/Security problems were each mentioned by 9% of respondents.</p>\n\n\n\n<h3 class=\"wp-block-heading\"><strong>Most important issues facing the World</strong></h3>\n\n\n\n<figure class=\"wp-block-image size-full\"><img loading=\"lazy\" decoding=\"async\" width=\"700\" height=\"425\" src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000304/8184-c2.png\" alt=\"\" class=\"wp-image-7890\" srcset=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000304/8184-c2.png 700w, https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000304/8184-c2-300x182.png 300w\" sizes=\"auto, (max-width: 700px) 100vw, 700px\" /></figure>\n\n\n\n<p class=\"wp-block-paragraph\" style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>\n\n\n\n<h3 class=\"wp-block-heading\"><strong>Michele Levine, Chief Executive Officer, Roy Morgan, says:</strong></h3>\n\n\nBlock Quote\n\n\n<p class=\"wp-block-paragraph\" style=\"font-size:14px\">The research was conducted in Australia online during mid-October 2019 with a nationally representative sample of 1,054 men and women aged 14 or over. Respondents were asked: “<em>What do you think is the most important problem facing the&nbsp;<strong>World&nbsp;</strong>today</em>?” and “<em>What do you think is the most important problem facing&nbsp;<strong>Australia</strong>&nbsp;today</em>?”</p>\n\n\n\n<p class=\"wp-block-paragraph\">These findings come from a special Roy Morgan study of Australians’ attitudes towards issues facing <strong>Australia</strong> and the <strong>World</strong> in the future. The research conducted was both <strong>qualitative</strong> (in that people were asked to use their own words) and <strong>quantitative</strong> (in that the ‘open-ended’ responses were analysed and ‘coded’ so that the results could be counted and reported as percentages).</p>\n\n\n\n<h3 class=\"wp-block-heading\"><strong>Comparison of leading concerns Facing Australia and the World – October 2019</strong></h3>\n\n\n\n<figure class=\"wp-block-image size-full\"><img loading=\"lazy\" decoding=\"async\" width=\"700\" height=\"234\" src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000256/8184-c3.png\" alt=\"\" class=\"wp-image-7889\" srcset=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000256/8184-c3.png 700w, https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000256/8184-c3-300x100.png 300w\" sizes=\"auto, (max-width: 700px) 100vw, 700px\" /></figure>\n\n\n\n<p class=\"wp-block-paragraph\" style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>\n\n\n\n<p class=\"wp-block-paragraph\">A full breakdown of what each broad category comprises can be viewed below.</p>\n\n\n\n<p class=\"wp-block-paragraph\">More information about the breakdown of these issues amongst different age groups, genders, states and regions, generations and Roy Morgan’s leading market segmentation tools are available for purchase.</p>\n\n\n\n<p class=\"wp-block-paragraph\"><strong>For comments or more information please contact:</strong><br><strong>Roy Morgan &#8211; Enquiries</strong><br>Office: +61 (03) 9224 5309<br><a href=\"mailto:askroymorgan@roymorgan.com\"><span style=\"text-decoration: underline\" class=\"underline\">askroymorgan@roymorgan.com</span></a></p>\n",
+          "date": "2022-04-20T00:10:07",
+          "featuredImage": {
+            "node": {
+              "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/10022329/Untitled-design-2022-08-10T122317.666.png",
+              "mediaDetails": {
+                "height": 450,
+                "width": 670
+              }
+            }
+          },
+          "seo": {
+            "metaDesc": "",
+            "title": "Environmental issues seen as the biggest problem facing Australia – for the first time since February 2011 - Roy Morgan Research",
+            "opengraphAuthor": "",
+            "opengraphTitle": "Environmental issues seen as the biggest problem facing Australia – for the first time since February 2011 - Roy Morgan Research",
+            "opengraphDescription": "",
+            "opengraphImage": {
+              "altText": "",
+              "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/10022329/Untitled-design-2022-08-10T122317.666.png",
+              "srcSet": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/10022329/Untitled-design-2022-08-10T122317.666-300x201.png 300w, https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/10022329/Untitled-design-2022-08-10T122317.666.png 670w"
+            },
+            "opengraphUrl": "https://roymorgan.com/environmental-issues-seen-as-the-biggest-problem-facing-australia-for-the-first-time-since-february-2011/",
+            "opengraphSiteName": "Roy Morgan Research",
+            "opengraphPublishedTime": "2022-04-20T00:10:07+00:00",
+            "opengraphModifiedTime": "2022-08-10T02:23:49+00:00",
+            "twitterTitle": "",
+            "twitterDescription": "",
+            "twitterImage": null
+          },
+          "template": {
+            "templateName": "Default"
+          },
+          "title": "Environmental issues seen as the biggest problem facing Australia – for the first time since February 2011",
+          "slug": "environmental-issues-seen-as-the-biggest-problem-facing-australia-for-the-first-time-since-february-2011",
+          "blocks": [
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>New in-depth research from Roy Morgan shows a record high 41% of Australians regard Environmental problems as the major concern facing Australia – up 17% points since June.</strong></p>",
+              "originalContent": "<p><strong>New in-depth research from Roy Morgan shows a record high 41% of Australians regard Environmental problems as the major concern facing Australia – up 17% points since June.</strong></p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>A further 22% (down 12% points) cited Economic problems. This is the lowest level of concern for Economic issues since April 2006, prior to the Global Financial Crisis.</p>",
+              "originalContent": "<p>A further 22% (down 12% points) cited Economic problems. This is the lowest level of concern for Economic issues since April 2006, prior to the Global Financial Crisis.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Environmental problems are also clearly regarded as the biggest concern facing the World. An unchanged 46% of Australians mentioned some form of Environmental concern as the most important problem facing the World – nearly three times as many as the 16% who mentioned Economic problems.</p>",
+              "originalContent": "<p>Environmental problems are also clearly regarded as the biggest concern facing the World. An unchanged 46% of Australians mentioned some form of Environmental concern as the most important problem facing the World – nearly three times as many as the 16% who mentioned Economic problems.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>This is the first time Environmental problems have topped the list of concerns facing both&nbsp;<strong>Australia</strong>&nbsp;and the&nbsp;<strong>World</strong>&nbsp;since February 2011 when massive floods hit Queensland, and its capital city Brisbane, as well as soon after the devastating Black Saturday bush fires in 2009 that killed over 170 Victorians.</p>",
+              "originalContent": "<p>This is the first time Environmental problems have topped the list of concerns facing both&nbsp;<strong>Australia</strong>&nbsp;and the&nbsp;<strong>World</strong>&nbsp;since February 2011 when massive floods hit Queensland, and its capital city Brisbane, as well as soon after the devastating Black Saturday bush fires in 2009 that killed over 170 Victorians.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>These are the key findings from a special Roy Morgan online survey of 1,054 Australians aged 14+ who were asked: “<em>What do you think is the most important problem facing the <strong>World</strong> today?” </em>and then<em> “What do you think is the most important problem facing <strong>Australia</strong> today</em>?”</p>",
+              "originalContent": "<p>These are the key findings from a special Roy Morgan online survey of 1,054 Australians aged 14+ who were asked: “<em>What do you think is the most important problem facing the <strong>World</strong> today?” </em>and then<em> “What do you think is the most important problem facing <strong>Australia</strong> today</em>?”</p>"
+            },
+            {
+              "name": "core/heading",
+              "saveContent": "<h3><strong>Most important problems facing Australia</strong></h3>",
+              "originalContent": "<h3><strong>Most important problems facing Australia</strong></h3>"
+            },
+            {
+              "name": "core/image",
+              "saveContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000211/8184-c1.png\" alt=\"\" class=\"wp-image-7888\"/></figure>",
+              "originalContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000211/8184-c1.png\" alt=\"\" class=\"wp-image-7888\"/></figure>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>",
+              "originalContent": "<p style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Environmental issues in October 2019 are dominated by concerns about Global warming/Climate change (25%) with the environmental concerns of the Drought (6%) and Water conservation/ Murray-Darling basin water problems (5%) the other key concerns raised.</p>",
+              "originalContent": "<p>Environmental issues in October 2019 are dominated by concerns about Global warming/Climate change (25%) with the environmental concerns of the Drought (6%) and Water conservation/ Murray-Darling basin water problems (5%) the other key concerns raised.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>The key Economic concerns raised include Economic problems (7%), Unemployment (4%), Poverty and the gap between rich and poor (3%) and Cost of living/Rising prices/ Lack of wage growth (2%).<br><strong><br>These further themes emerged:</strong></p>",
+              "originalContent": "<p>The key Economic concerns raised include Economic problems (7%), Unemployment (4%), Poverty and the gap between rich and poor (3%) and Cost of living/Rising prices/ Lack of wage growth (2%).<br><strong><br>These further themes emerged:</strong></p>"
+            },
+            {
+              "name": "core/list",
+              "saveContent": "<ul><li>12% of respondents mentioned Social issues including Social apathy/Family breakdowns/ Moral decline, Educational issues, Greed, Crime/Law and Order, Social welfare/Welfare dependency;</li><li>Government, Politics and Leadership issues were mentioned by 9% of Australians;</li><li>Religion, Immigration and Human Rights which includes the contentious issues surrounding asylum seekers and refugees were mentioned by almost 7% of Australians;</li><li>Under 4% mentioned issues surrounding the Energy Crisis, Energy and Power supply, Electricity grid and Fossil fuel.</li></ul>",
+              "originalContent": "<ul><li>12% of respondents mentioned Social issues including Social apathy/Family breakdowns/ Moral decline, Educational issues, Greed, Crime/Law and Order, Social welfare/Welfare dependency;</li><li>Government, Politics and Leadership issues were mentioned by 9% of Australians;</li><li>Religion, Immigration and Human Rights which includes the contentious issues surrounding asylum seekers and refugees were mentioned by almost 7% of Australians;</li><li>Under 4% mentioned issues surrounding the Energy Crisis, Energy and Power supply, Electricity grid and Fossil fuel.</li></ul>"
+            },
+            {
+              "name": "core/heading",
+              "saveContent": "<h3><strong>Global warming and Climate change dominate global concerns</strong></h3>",
+              "originalContent": "<h3><strong>Global warming and Climate change dominate global concerns</strong></h3>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>When considering the wider&nbsp;<strong>World</strong>&nbsp;quantified thematic analysis of the verbatim responses&nbsp;<em>of a nationally representative sample of 1,054 Australians</em>&nbsp;found the Environment mentioned by just under 46% of Australians, led by the issue of Global warming (36%) and including Pollution/Rubbish, Famine/Food shortages, Water conservation/Murray-Darling water problems was the primary theme to emerge.</p>",
+              "originalContent": "<p>When considering the wider&nbsp;<strong>World</strong>&nbsp;quantified thematic analysis of the verbatim responses&nbsp;<em>of a nationally representative sample of 1,054 Australians</em>&nbsp;found the Environment mentioned by just under 46% of Australians, led by the issue of Global warming (36%) and including Pollution/Rubbish, Famine/Food shortages, Water conservation/Murray-Darling water problems was the primary theme to emerge.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>A further 16% of Australians mentioned Economic issues led by Poverty and the gap between rich and poor (5%) and Over-population (5%). A further 6% mentioned concerns including Economic problems, Cost of living issues, Unemployment and Globalisation/ Fairer world trade and Trade wars.</p>",
+              "originalContent": "<p>A further 16% of Australians mentioned Economic issues led by Poverty and the gap between rich and poor (5%) and Over-population (5%). A further 6% mentioned concerns including Economic problems, Cost of living issues, Unemployment and Globalisation/ Fairer world trade and Trade wars.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>Other themes to emerge include a range of Social issues mentioned by 13% of respondents including Social apathy, Moral decline, Family breakdowns, Crime, Law and order, Drugs and drug abuse, Education and Social welfare. Government/Leadership problems and Terrorism/War/Security problems were each mentioned by 9% of respondents.</p>",
+              "originalContent": "<p>Other themes to emerge include a range of Social issues mentioned by 13% of respondents including Social apathy, Moral decline, Family breakdowns, Crime, Law and order, Drugs and drug abuse, Education and Social welfare. Government/Leadership problems and Terrorism/War/Security problems were each mentioned by 9% of respondents.</p>"
+            },
+            {
+              "name": "core/heading",
+              "saveContent": "<h3><strong>Most important issues facing the World</strong></h3>",
+              "originalContent": "<h3><strong>Most important issues facing the World</strong></h3>"
+            },
+            {
+              "name": "core/image",
+              "saveContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000304/8184-c2.png\" alt=\"\" class=\"wp-image-7890\"/></figure>",
+              "originalContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000304/8184-c2.png\" alt=\"\" class=\"wp-image-7890\"/></figure>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>",
+              "originalContent": "<p style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>"
+            },
+            {
+              "name": "core/heading",
+              "saveContent": "<h3><strong>Michele Levine, Chief Executive Officer, Roy Morgan, says:</strong></h3>",
+              "originalContent": "<h3><strong>Michele Levine, Chief Executive Officer, Roy Morgan, says:</strong></h3>"
+            },
+            {
+              "name": "acf/block-quote",
+              "saveContent": "",
+              "originalContent": "",
+              "dynamicContent": "Block Quote",
+              "BlockQuote": {
+                "content": "<p><em data-rich-text-format-boundary=\"true\">“Environmental concerns have come to the fore in recent weeks as significant global protests including the Global Climate Strike in late September, the Extinction Rebellion protests in several Australian cities and internationally as well as the passionate UN address by Swedish teenage climate activist Greta Thunberg has grabbed attention, and headlines, around the world.<br data-rich-text-line-break=\"true\" /><br data-rich-text-line-break=\"true\" />“In Australia it means Environmental concerns are now regarded as the most important problems facing both the World (46%) and Australia (41%). This is the first time for over eight years Australians have thought so prominently about the environment.<br data-rich-text-line-break=\"true\" /><br data-rich-text-line-break=\"true\" />“Concerns about Global warming and Climate change are the most prominent issue mentioned but there is also significant concern about the Drought and water conservation and management in the parched Murray-Darling Basin that are widely referred to as the biggest problems facing Australia. Over 10% mentioned either of these.<br data-rich-text-line-break=\"true\" /><br data-rich-text-line-break=\"true\" />“The return of the Environment as a leading issue heading into 2020 is interesting as only one State is facing an election over the next year and that is Queensland. Queensland is of course home to the giant proposed (and approved) Adani-Carmichael coal mine which played a pivotal role in swinging votes to the L-NP at this year’s Federal Election.<br data-rich-text-line-break=\"true\" /><br data-rich-text-line-break=\"true\" />“Will it play a key role in another election in 12 months’ time?”</em></p>\n"
+              },
+              "attributes": {
+                "sidebarTitle": "",
+                "anchor": ""
+              }
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p style=\"font-size:14px\">The research was conducted in Australia online during mid-October 2019 with a nationally representative sample of 1,054 men and women aged 14 or over. Respondents were asked: “<em>What do you think is the most important problem facing the&nbsp;<strong>World&nbsp;</strong>today</em>?” and “<em>What do you think is the most important problem facing&nbsp;<strong>Australia</strong>&nbsp;today</em>?”</p>",
+              "originalContent": "<p style=\"font-size:14px\">The research was conducted in Australia online during mid-October 2019 with a nationally representative sample of 1,054 men and women aged 14 or over. Respondents were asked: “<em>What do you think is the most important problem facing the&nbsp;<strong>World&nbsp;</strong>today</em>?” and “<em>What do you think is the most important problem facing&nbsp;<strong>Australia</strong>&nbsp;today</em>?”</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>These findings come from a special Roy Morgan study of Australians’ attitudes towards issues facing <strong>Australia</strong> and the <strong>World</strong> in the future. The research conducted was both <strong>qualitative</strong> (in that people were asked to use their own words) and <strong>quantitative</strong> (in that the ‘open-ended’ responses were analysed and ‘coded’ so that the results could be counted and reported as percentages).</p>",
+              "originalContent": "<p>These findings come from a special Roy Morgan study of Australians’ attitudes towards issues facing <strong>Australia</strong> and the <strong>World</strong> in the future. The research conducted was both <strong>qualitative</strong> (in that people were asked to use their own words) and <strong>quantitative</strong> (in that the ‘open-ended’ responses were analysed and ‘coded’ so that the results could be counted and reported as percentages).</p>"
+            },
+            {
+              "name": "core/heading",
+              "saveContent": "<h3><strong>Comparison of leading concerns Facing Australia and the World – October 2019</strong></h3>",
+              "originalContent": "<h3><strong>Comparison of leading concerns Facing Australia and the World – October 2019</strong></h3>"
+            },
+            {
+              "name": "core/image",
+              "saveContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000256/8184-c3.png\" alt=\"\" class=\"wp-image-7889\"/></figure>",
+              "originalContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/04/20000256/8184-c3.png\" alt=\"\" class=\"wp-image-7889\"/></figure>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>",
+              "originalContent": "<p style=\"font-size:14px\">Source: Roy Morgan interviewed a representative cross-section of 1,054 Australians in October 2019.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>A full breakdown of what each broad category comprises can be viewed below.</p>",
+              "originalContent": "<p>A full breakdown of what each broad category comprises can be viewed below.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p>More information about the breakdown of these issues amongst different age groups, genders, states and regions, generations and Roy Morgan’s leading market segmentation tools are available for purchase.</p>",
+              "originalContent": "<p>More information about the breakdown of these issues amongst different age groups, genders, states and regions, generations and Roy Morgan’s leading market segmentation tools are available for purchase.</p>"
+            },
+            {
+              "name": "core/paragraph",
+              "saveContent": "<p><strong>For comments or more information please contact:</strong><br><strong>Roy Morgan - Enquiries</strong><br>Office: +61 (03) 9224 5309<br><a href=\"mailto:askroymorgan@roymorgan.com\"><span style=\"text-decoration: underline\" class=\"underline\">askroymorgan@roymorgan.com</span></a></p>",
+              "originalContent": "<p><strong>For comments or more information please contact:</strong><br><strong>Roy Morgan - Enquiries</strong><br>Office: +61 (03) 9224 5309<br><a href=\"mailto:askroymorgan@roymorgan.com\"><span style=\"text-decoration: underline\" class=\"underline\">askroymorgan@roymorgan.com</span></a></p>"
+            }
+          ]
+        },
+        "header": {
+          "generalSettings": {
+            "title": "Roy Morgan Research"
+          },
+          "themeSettings": {
+            "footerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135852/roy-morgan-logo-white-1.png"
+            },
+            "headerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135851/roy-morgan-logo-1.png"
+            },
+            "marginOfError": "<h3>Margin of Error</h3>\n<p>The margin of error to be allowed for in any estimate depends mainly on the number of interviews on which it is based. Margin of error gives indications of the likely range within which estimates would be 95% likely to fall, expressed as the number of percentage points above or below the actual estimate. Allowance for design effects (such as stratification and weighting) should be made as appropriate.</p>\n<table style=\"border-collapse: collapse; width: 100%;\">\n<tbody>\n<tr>\n<td style=\"width: 14.0299%; text-align: center;\"><strong>Sample Size</strong></td>\n<td style=\"width: 55.9701%; text-align: center;\"><strong>Percentage Estimate</strong></td>\n</tr>\n</tbody>\n</table>\n<table style=\"border-collapse: collapse; width: 100%; height: 192px;\">\n<tbody>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px;\"></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>40% &#8211; 60%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>25% or 75%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>10% or 90%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>5% or 95%</strong></td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">1,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±3.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±2.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">5,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.2</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.8</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">7,500</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.1</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.5</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">10,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">20,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">50,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.2</td>\n</tr>\n</tbody>\n</table>\n"
+          },
+          "menu": {
+            "name": "Header Menu",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "/products-and-tools",
+                  "label": "Products & Tools",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/products-and-tools#data-analysis",
+                        "label": "Data Analysis",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Asteroid",
+                              "path": "https://www.roymorgan.com/products-and-tools/asteroid/"
+                            },
+                            {
+                              "label": "Helix Personas Pixel™",
+                              "path": "https://www.roymorgan.com/products-and-tools/helix-personas-pixel"
+                            },
+                            {
+                              "label": "Live Mapping",
+                              "path": "https://www.roymorgan.com/products-and-tools/live-mapping"
+                            },
+                            {
+                              "label": "Reactor",
+                              "path": "https://www.roymorgan.com/products-and-tools/reactor"
+                            },
+                            {
+                              "label": "Roy Morgan WorkSpace™",
+                              "path": "https://www.roymorgan.com/products-and-tools/workspace"
+                            },
+                            {
+                              "label": "Single Source",
+                              "path": "https://www.roymorgan.com/products-and-tools/single-source/"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/products-and-tools/segmentation-analytics/",
+                        "label": "Segmentation Analytics",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Brand Equity Segmentation and Targeting – BEST",
+                              "path": "https://www.roymorgan.com/products-and-tools/brand-equity-segmentation-and-targeting-best/"
+                            },
+                            {
+                              "label": "Food Segments",
+                              "path": "https://www.roymorgan.com/products-and-tools/food-segments/"
+                            },
+                            {
+                              "label": "Helix Personas",
+                              "path": "https://www.helixpersonas.com.au/"
+                            },
+                            {
+                              "label": "Technology Adoption Segments",
+                              "path": "https://www.roymorgan.com/products-and-tools/technology-adoption-segments/"
+                            },
+                            {
+                              "label": "Values Segments",
+                              "path": "https://www.roymorgan.com/products-and-tools/values-segments/"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/products-and-tools#research",
+                        "label": "Research",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Customer Satisfaction Awards",
+                              "path": "https://www.roymorgan.com/products-and-tools/customer-satisfaction-awards/"
+                            },
+                            {
+                              "label": "Premium",
+                              "path": "https://www.roymorgan.com/products-and-tools/premium/"
+                            },
+                            {
+                              "label": "Risk",
+                              "path": "https://www.roymorgan.com/products-and-tools/risk/"
+                            },
+                            {
+                              "label": "Social Media",
+                              "path": "https://www.roymorgan.com/products-and-tools/social-media/"
+                            },
+                            {
+                              "label": "Young Australians Survey",
+                              "path": "https://www.roymorgan.com/products-and-tools/young-australians-survey/"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/products-and-tools/longitudinal-research",
+                        "label": "Longitudinal Research",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Centre for Longitudinal Research",
+                              "path": "https://www.roymorgan.com/products-and-tools/longitudinal-research"
+                            },
+                            {
+                              "label": "HILDA",
+                              "path": "/products-and-tools/hilda"
+                            },
+                            {
+                              "label": "Footprints in Time: The Longitudinal Study of Indigenous Children",
+                              "path": "https://www.roymorgan.com/products-and-tools/footprints-in-time"
+                            },
+                            {
+                              "label": "Growing Up in Australia",
+                              "path": "/products-and-tools/growing-up-in-australia"
+                            },
+                            {
+                              "label": "International Tobacco Control",
+                              "path": "https://www.roymorgan.com/products-and-tools/international-tobacco-control"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "/services",
+                  "label": "Services",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/services",
+                        "label": "What We Offer",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Advertising Research",
+                              "path": "/services/advertising-research"
+                            },
+                            {
+                              "label": "B2B Research",
+                              "path": "https://www.roymorgan.com/services/b2b-research/"
+                            },
+                            {
+                              "label": "Customised Research",
+                              "path": "/services/customised-research"
+                            },
+                            {
+                              "label": "Centre for Longitudinal Research",
+                              "path": "https://www.roymorgan.com/products-and-tools/longitudinal-research"
+                            },
+                            {
+                              "label": "International Interviewing",
+                              "path": "/services/international-interviewing"
+                            },
+                            {
+                              "label": "Online Research",
+                              "path": "/services/online-research"
+                            },
+                            {
+                              "label": "PitchPLANNER",
+                              "path": "/services/pitch-planner"
+                            },
+                            {
+                              "label": "Qualitative Research",
+                              "path": "/services/qualitative-research"
+                            },
+                            {
+                              "label": "Roy Morgan Research Community",
+                              "path": "https://www.roymorgan.com/roy-morgan-research-community"
+                            },
+                            {
+                              "label": "Telephone Interviewing",
+                              "path": "/services/telephone-interviewing"
+                            },
+                            {
+                              "label": "Web Audience Measure",
+                              "path": "/services/web-audience-measure-services"
+                            },
+                            {
+                              "label": "Who Called Me?",
+                              "path": "https://www.roymorgan.com/services/who-called-me"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/products-and-tools#major-studies",
+                        "label": "Major Studies",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Digital Universe",
+                              "path": "https://www.roymorgan.com/products-and-tools/digital-universe/"
+                            },
+                            {
+                              "label": "Government Policy",
+                              "path": "/products-and-tools/government-policy"
+                            },
+                            {
+                              "label": "State of the Nation",
+                              "path": "/products-and-tools/state-of-the-nation"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/newsletter",
+                        "label": "Subscribe",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "ABIX-Roy Morgan Daily News Summary",
+                              "path": "https://www.roymorgan.com/abix"
+                            },
+                            {
+                              "label": "Market Research Update",
+                              "path": "https://www.roymorgan.com/newsletter"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "/industries",
+                  "label": "Industries",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/industries",
+                        "label": "Fields",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Alcohol",
+                              "path": "https://www.roymorgan.com/industries/alcohol/"
+                            },
+                            {
+                              "label": "Automotive",
+                              "path": "https://www.roymorgan.com/industries/automotive/"
+                            },
+                            {
+                              "label": "Banking and Finance",
+                              "path": "https://www.roymorgan.com/industries/banking-and-finance/"
+                            },
+                            {
+                              "label": "Consumer Products",
+                              "path": "https://www.roymorgan.com/industries/consumer-products/"
+                            },
+                            {
+                              "label": "Economic, Political and Social",
+                              "path": "https://www.roymorgan.com/industries/economic-political-and-social/"
+                            },
+                            {
+                              "label": "Gambling",
+                              "path": "https://www.roymorgan.com/industries/gambling/"
+                            },
+                            {
+                              "label": "Media",
+                              "path": "https://www.roymorgan.com/industries/media/"
+                            },
+                            {
+                              "label": "Retail",
+                              "path": "https://www.roymorgan.com/industries/retail/"
+                            },
+                            {
+                              "label": "Superannuation",
+                              "path": "https://www.roymorgan.com/industries/superannuation/"
+                            },
+                            {
+                              "label": "Telecommunications and Technology",
+                              "path": "https://www.roymorgan.com/industries/telecommunications-and-technology/"
+                            },
+                            {
+                              "label": "Travel and Tourism",
+                              "path": "https://www.roymorgan.com/industries/travel-and-tourism/"
+                            },
+                            {
+                              "label": "Utilities",
+                              "path": "https://www.roymorgan.com/industries/utilities/"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "/findings",
+                  "label": "Findings",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "/findings",
+                        "label": "Search Findings",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Market Research",
+                              "path": "/findings?types=%2Cmarket-research"
+                            },
+                            {
+                              "label": "Economic",
+                              "path": "/findings?types=%2Ceconomic"
+                            },
+                            {
+                              "label": "Political",
+                              "path": "/findings?types=%2Cpolitical"
+                            },
+                            {
+                              "label": "Social",
+                              "path": "/findings?types=%2Csocial"
+                            },
+                            {
+                              "label": "Media",
+                              "path": "/findings?types=%2Cmedia"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/papers",
+                        "label": "Papers",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Readership",
+                              "path": "https://www.roymorgan.com/papers/readership"
+                            },
+                            {
+                              "label": "Media",
+                              "path": "https://www.roymorgan.com/papers/media"
+                            },
+                            {
+                              "label": "Victoria Day Council",
+                              "path": "https://www.roymorgan.com/papers/women-the-media-and-people-from-other-countries-who-have-made-victoria"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/readerships",
+                        "label": "Readerships",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Magazine Readership",
+                              "path": "https://www.roymorgan.com/readerships/australian-magazine-readership"
+                            },
+                            {
+                              "label": "Magazine Cross-Platform",
+                              "path": "https://www.roymorgan.com/readerships/magazine-cross-platform-audience"
+                            },
+                            {
+                              "label": "Newspaper Cross-Platform",
+                              "path": "https://www.roymorgan.com/readerships/newspaper-cross-platform-audience"
+                            },
+                            {
+                              "label": "NZ Readership",
+                              "path": "https://www.roymorgan.com/readerships/readership-in-new-zealand"
+                            },
+                            {
+                              "label": "Readership Archive",
+                              "path": "https://www.roymorgan.com/readerships/australian-readership-archive"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "path": "/morgan-poll",
+                        "label": "Morgan Poll Data Tables",
+                        "childItems": {
+                          "nodes": [
+                            {
+                              "label": "Federal Voting",
+                              "path": "https://www.roymorgan.com/morgan-poll/primary-voting-intention/"
+                            },
+                            {
+                              "label": "Consumer Confidence",
+                              "path": "https://www.roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-summary/"
+                            },
+                            {
+                              "label": "Business Confidence",
+                              "path": "https://www.roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence/"
+                            },
+                            {
+                              "label": "Unemployment",
+                              "path": "https://www.roymorgan.com/morgan-poll/unemployment-roy-morgan-unemployment-methodology/"
+                            },
+                            {
+                              "label": "New Zealand",
+                              "path": "https://www.roymorgan.com/morgan-poll/new-zealand-government-confidence/"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "path": "https://store.roymorgan.com/",
+                  "label": "Store",
+                  "childItems": {
+                    "nodes": []
+                  }
+                },
+                {
+                  "path": "https://www.roymorgan.com/about/",
+                  "label": "About",
+                  "childItems": {
+                    "nodes": [
+                      {
+                        "path": "https://www.roymorgan.com/about/history",
+                        "label": "History",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/michele-levine",
+                        "label": "Leadership",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/contact-us",
+                        "label": "Global Operations",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/certification",
+                        "label": "Certification",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      },
+                      {
+                        "path": "https://www.roymorgan.com/careers/",
+                        "label": "Careers",
+                        "childItems": {
+                          "nodes": []
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "slug": "header-menu"
+          },
+          "topmenu": {
+            "name": "Top Menu",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://store.roymorgan.com/",
+                  "label": "Shop"
+                },
+                {
+                  "path": "https://www.roymorgan.com/careers/",
+                  "label": "Careers"
+                },
+                {
+                  "path": "https://www.roymorgan.com/contact-us/",
+                  "label": "Contact Us"
+                }
+              ]
+            },
+            "slug": "top-menu"
+          }
+        },
+        "footer": {
+          "footerColOneMenu": {
+            "name": "Footer Menu Col One",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "/findings",
+                  "label": "Findings",
+                  "description": "Latest Press Releases and Morgan Poll updates"
+                },
+                {
+                  "path": "/newsletter",
+                  "label": "Newsletter",
+                  "description": "Stay informed of all the latest market research news and opinion poll results from Roy Morgan"
+                }
+              ]
+            },
+            "slug": "footer-menu-col-one"
+          },
+          "footerColTwoMenu": {
+            "name": "Footer Menu Col Two",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://www.roymorgan.com/contact-us/",
+                  "label": "Contact Us"
+                },
+                {
+                  "path": "https://store.roymorgan.com/",
+                  "label": "Store"
+                },
+                {
+                  "path": "https://www.roymorgan.com/abix/",
+                  "label": "ABIX"
+                }
+              ]
+            },
+            "slug": "footer-menu-col-two"
+          },
+          "footerColThreeMenu": {
+            "name": "Footer Menu Col Three",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://www.roymorgan.com/terms-of-use/",
+                  "label": "Terms of Use"
+                },
+                {
+                  "path": "https://www.roymorgan.com/quality-policy/",
+                  "label": "Quality Policy"
+                },
+                {
+                  "path": "/sitemap",
+                  "label": "Sitemap"
+                },
+                {
+                  "path": "https://www.roymorgan.com/privacy-policy/",
+                  "label": "Privacy Policy"
+                }
+              ]
+            },
+            "slug": "footer-menu-col-three"
+          },
+          "footerConnectMenu": {
+            "name": "Footer Menu Connect",
+            "menuItems": {
+              "nodes": [
+                {
+                  "path": "https://www.linkedin.com/company/roymorganaus/",
+                  "label": "LinkedIn"
+                },
+                {
+                  "path": "https://twitter.com/roymorganaus",
+                  "label": "Twitter"
+                },
+                {
+                  "path": "https://www.facebook.com/RoyMorganAus/",
+                  "label": "Facebook"
+                },
+                {
+                  "path": "https://www.youtube.com/c/roymorganaus",
+                  "label": "YouTube"
+                },
+                {
+                  "path": "https://www.instagram.com/roymorganaus/",
+                  "label": "Instagram"
+                }
+              ]
+            },
+            "slug": "footer-menu-connect"
+          },
+          "themeSettings": {
+            "footerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135852/roy-morgan-logo-white-1.png"
+            },
+            "headerLogo": {
+              "mediaItemUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/28135851/roy-morgan-logo-1.png"
+            },
+            "marginOfError": "<h3>Margin of Error</h3>\n<p>The margin of error to be allowed for in any estimate depends mainly on the number of interviews on which it is based. Margin of error gives indications of the likely range within which estimates would be 95% likely to fall, expressed as the number of percentage points above or below the actual estimate. Allowance for design effects (such as stratification and weighting) should be made as appropriate.</p>\n<table style=\"border-collapse: collapse; width: 100%;\">\n<tbody>\n<tr>\n<td style=\"width: 14.0299%; text-align: center;\"><strong>Sample Size</strong></td>\n<td style=\"width: 55.9701%; text-align: center;\"><strong>Percentage Estimate</strong></td>\n</tr>\n</tbody>\n</table>\n<table style=\"border-collapse: collapse; width: 100%; height: 192px;\">\n<tbody>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px;\"></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>40% &#8211; 60%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>25% or 75%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>10% or 90%</strong></td>\n<td style=\"width: 20%; height: 24px; text-align: center;\"><strong>5% or 95%</strong></td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">1,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±3.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±2.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">5,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.2</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.8</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">7,500</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.1</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.5</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">10,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±1.0</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.9</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">20,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.7</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.6</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n</tr>\n<tr style=\"height: 24px;\">\n<td style=\"width: 20%; height: 24px; text-align: center;\">50,000</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.4</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.3</td>\n<td style=\"width: 20%; height: 24px; text-align: center;\">±0.2</td>\n</tr>\n</tbody>\n</table>\n"
+          }
+        }
+      },
+      "slug": "environmental-issues-seen-as-the-biggest-problem-facing-australia-for-the-first-time-since-february-2011"
+    },
+    "__N_SSP": true
+  },
+  "page": "/findings/[slug]",
+  "query": {
+    "slug": "environmental-issues-seen-as-the-biggest-problem-facing-australia-for-the-first-time-since-february-2011"
+  },
+  "buildId": "R_VhJuIheJBm6ex3gCJWb",
+  "isFallback": false,
+  "isExperimentalCompile": false,
+  "gssp": true,
+  "scriptLoader": []
+}

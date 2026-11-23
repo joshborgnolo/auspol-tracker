@@ -1,0 +1,937 @@
+                                             JWS Research – True Issues 27 – March 2022
+
+
+
+
+Contents
+
+Survey methodology                      3
+
+What are the issues Australians care    4
+about?
+Are we headed in the right direction?   10
+
+How does the Australian Government      14
+perform on top issues?
+How are government, business and        18
+industry performing?
+How engaged are voters in the 2022      22
+Federal Election?
+
+
+
+
+                                                                                          2
+                                                                                            JWS Research – True Issues 27 – March 2022
+
+
+
+
+Survey methodology
+
+
+                                                                    National Online Survey
+
+                                           n=1,000 Australian adults
+                                           • Conducted Friday 4th – Tuesday 8th March 2022.
+                                           • Sample quotas on age, gender and location, with post-survey weighting to
+                                             actual age / gender / location proportions from 2016 Census.
+                                           • Maximum margin of error on n=1,000 is +/-3.1% at the 95% confidence
+                                             level.
+                                           • Differences of +/-1% for net scores are due to rounding.
+
+
+
+ Explanation of index scores:                                                                                      Index value
+                                                                  Rating            Survey           Index
+                                                                                                                   (percentage
+ To facilitate ease of reporting and comparison of results        category        percentage         factor
+                                                                                                                     x factor)
+ over time, an index score has been calculated for
+ performance measures (very good to very poor ratings).           Very good           5%              100                 5
+
+ The index score is represented as a score out of 100.            Good                17%              75                13
+
+ To calculate this score, the survey percentage result for        Average             40%              50                20
+ each scale category (excluding ‘don’t know’ responses) is        Poor                19%              25                 5
+ multiplied by an index factor to produce an index value for      Very poor           15%               0                 0
+ each category. These values are then summed to produce
+                                                                  Don't know          4%                -                 -
+ the index score, equating to 43 in this example.
+                                                                  Index score                                            43
+
+                                                                                                                                         3
+The research was conducted in compliance with AS-ISO 20252.
+What are the
+issues
+Australians care
+about?
+
+                   4
+                                                                                     JWS Research – True Issues 27 – March 2022
+
+
+Health, the environment and economy lead top of mind
+issues – concern is up on living costs, housing and rates
+As Australia moves further into its COVID-19 recovery     Total mentions of economic issues – the economy and
+and continues to respond to the devastating floods in     finances, employment and wages, cost of living and
+NSW and Queensland, health remains the leading top        housing and interest rates – are at 49% (a lower 39%
+of mind concern for Australians, followed by the          among 18 to 34 year olds).
+environment and climate change, and the economy.
+                                                          Heading into the expected May federal election, rising
+When asked to name up to three issues that personally     living costs are beginning to bite, particularly among 35
+interest or concern them the most, that the Australian    to 54 year olds managing the rising costs of mortgages
+Government should focus on, more than a third of          and child rearing in a period of low wage growth.
+Australians continue to describe issues related to
+                                                          Top of mind mentions of cost of living (16%) have risen
+hospitals, healthcare and ageing (37%, equal to
+                                                          five points in just the last four months (from 11% in
+November). This remains significantly down on last July
+                                                          November) and have doubled since last July (8%).
+(59%) when Australia was grappling with COVID-19
+                                                          Mentions of housing and interest rates have also
+winter outbreaks, lockdowns and the vaccine rollout.
+                                                          increased (14%, up from 10% in November) amid
+As Australians move on from the summer Omicron            ongoing media speculation about inflation and
+outbreaks and begin to carve out a ‘new normal’, just     mortgage rate rises in 2022.
+15% of adults mention the COVID-19 pandemic as a
+                                                          Concerns about employment and wages (14%) have
+key concern (down from 25% in November and 47% in
+                                                          become less top of mind, since peaking at 32% in
+July).
+                                                          November 2020 but remain a community priority.
+The environment and climate change (27%) remains
+                                                          Following the Russian invasion of Ukraine, foreign
+the second most important individual issue to
+                                                          affairs and trade (6%, up from 2%) is more top of mind
+Australians, ahead of the economy and finances (24%),
+                                                          for Australians than in November, as are general
+following summer bushfires in WA and amid the
+                                                          concerns about defence, security and terrorism (6%, up
+ongoing flood response in the eastern states.
+                                                          from 4%).
+
+
+
+                                                                                                                                  5
+                                                                                                                                                      JWS Research – True Issues 27 – March 2022
+
+
+Health continues to lead top of mind concerns, followed by
+the environment and economic issues
+
+                                         Most important issues the Australian Government should focus on
+                                                                             (Up to 3 issues – unprompted*)
+                                                                                                                                                             Nov        Jul       Feb
+                                                                                                                                                             2021      2021       2021
+
+      Hospitals, healthcare and ageing                                                                           37%        55+yrs: 49%                     37%▼      59%▲        45%
+
+
+    The environment / Climate change                                                              27%                                                       26%▲       20%        19%
+
+
+                     Economy and finances                                                    24%        55+yrs: 29%                                          22%      21%▼        26%▼
+
+
+                                    Cost of living                            16%▲          35-54yrs: 21%                                                   11%▲        8%        8%
+
+
+                                                                                                  15% of Australians mention the
+                Housing and interest rates                                 14%▲                                                                              10%        9%        9%
+                                                                                                  COVID-19 / coronavirus pandemic
+                                                                                                  (Nov 2021: 25%, Jul 2021: 47%,
+                                                                                                  Feb 2021: 32%, Nov 2020: 28%).
+                   Employment and wages                                       14%                                                                           15%▼      19%▼        25%▼
+
+
+                                  Law and order                      7%                                                                                      8%         6%        8%
+                                                                                                  TOTAL economy and finances
+                                                                                                  + cost of living + housing and
+        Defence, security and terrorism                          6%▲ 55+yrs: 11%                  interest rates + employment                                4%        3%▲        1%
+                                                                                                  and wages: 49%
+
+                   Foreign affairs and trade                     6%▲                                                                                         2%        2%▼        5%
+
+*Issues mentioned among fewer than 6% not shown.
+Significantly higher than the national total at the 95% confidence interval.
+Significantly ▲higher / ▼lower than previous True Issues wave at the 95% confidence interval.
+Q. What are the most important issues that you think the Australian Government should focus on? These would be the issues or problems that
+personally interest or concern you the most. Please describe up to three separate issues in the text boxes below. Please be as specific as you can.                                                6
+Base: All respondents (approximately n=1,000 per wave).
+                                                                                         JWS Research – True Issues 27 – March 2022
+
+
+Living costs and health lead prompted issues followed by
+the environment, economy – concern up on housing, rates
+Amid ongoing media coverage around the rising cost of         Generational differences persist. Hospitals, healthcare
+housing, groceries, petrol and energy, as well as             and ageing continues to dominate concerns among
+potentially imminent interest rate increases, cost of         those aged 55 years and over (77%).
+living (65%, up from 59%) is Australians’ top prompted
+                                                              In contrast, 18 to 34 and 35 to 54 year olds continue to
+priority for Federal Government attention.
+                                                              most want Government action on cost of living (60%
+Calls for action on living costs have been building over      and 74%, respectively).
+the past year, after taking a backseat to health during
+                                                              With these cohorts being more greatly impacted by
+the worst of the pandemic, and are now even stronger
+                                                              strong property prices and rising mortgage rates,
+than pre-COVID-19 (65%, higher than 59% in February
+                                                              housing and interest rates is a top five priority for more
+2020).
+                                                              than four in ten 18 to 34 year olds (instead of the
+However, as we continue to manage further COVID-19            economy and finances) and 35 to 54 year olds (instead
+outbreaks and emerging variants, hospitals, healthcare        of employment and wages).
+and ageing also remains a key concern for most
+Australians (61%, similar to 58% in November).
+Around four in ten adults remain concerned about the
+environment and climate change (42%), the economy
+and finances (42%) and employment and wages (38%),
+and these continue to round out the top five most
+important (prompted) issues to Australians.
+Sitting just outside this top five, and on the increase, is
+housing and interest rates (36%, up from 30% in
+November and ten points higher than in February
+2021).
+
+
+
+                                                                                                                                      7
+                                                                                                                                                 JWS Research – True Issues 27 – March 2022
+
+
+Living costs and health continue to lead prompted
+concerns, ahead of the economy, environment and jobs
+
+                                         Most important issues the Australian Government should focus on
+                                                                           (Top 5 most important – prompted)                            Mar                Nov         Jul       Feb
+                                                                                                                                        2022               2021       2021       2021
+                                               Cost of living                                                                          65%▲                59%        57%        53%
+                  Hospitals, healthcare and ageing                                                                                    61%                  58%        62%        58%
+                           The economy and finances                                                                  42%                                   41%▼       47%        45%
+            The environment and climate change                                                                       42%                                   41%        37%        37%
+                               Employment and wages                                                             38%                                        38%        39%▼       45%
+                            Housing and interest rates                                                     36%▲                                            30%        27%        26%
+                  Education, training and childcare                                            26%▼                                                        30%        27%        29%
+                    Defence, security and terrorism                                            23%                                                         20%        20%        19%
+                          Provision of public services                                         23%                                                         24%        25%        28%
+                                                       Energy                               20%                                 Top 10 results             21%        19%        20%
+                    Immigration and border security                                     17%                                                                20%▼       25%        22%
+                         Transport and infrastructure                                   17%                                                                15%        15%        16%
+          Community, family and social services                                     16%▼                                                                   21%        18%        19%▲
+                              Foreign affairs and trade                           12%                                                                      12%        12%        13%
+               Innovation, science and technology                              12%▼                                                                        15%        14%        14%
+                                        Population growth                         12%                                                                      13%        12%        12%
+            Agriculture and regional development                                 11%                                                                       12%        13%        13%
+                                  Business and industry                        10%▼                                                                        13%        15%        16%
+  Vision, leadership and quality of government                                  10%                                                                        12%        11%        9%
+                                  Mining and resources                        5%                                                                           6%         5%         5%▼
+Significantly ▲higher / ▼lower than previous True Issues wave at the 95% confidence interval.
+Q. From the following list, please select the five most important issues you think the Australian Government should focus on.                                                                 8
+Base: All respondents (approximately n=1,000 per wave).
+                                                                                                                                                  JWS Research – True Issues 27 – March 2022
+
+
+Healthcare most important to older adults, jobs and
+interest rates higher concerns among young adults
+
+                                          Highest ranked issues the Australian Government should focus on
+                                                                           (Top 5 most important – prompted)
+
+
+                                               Cost of living                                                                                     35-54 yrs: 74%, Qld: 73%,
+                                                                                                                                            65%
+                                                                                                                                                  Women: 70%
+
+                                                                                                                                               55+ yrs: 77%, Hhold income <$50K: 72%,
+                 Hospitals, health care and ageing                                                                                     61%
+                                                                                                                                               Women: 68%, Regions: 68%
+
+
+                           The economy and finances                                                                  42%        55+ yrs: 48%
+
+
+            The environment and climate change                                                                       42%
+
+
+                               Employment and wages                                                             38%        18-34 yrs: 50%
+
+
+                            Housing and interest rates                                                        36%       18-34 yrs: 44%
+
+
+                   Education, training and childcare                                              26%
+
+
+                    Defence, security and terrorism                                            23%        55+ yrs: 35%
+
+
+                          Provision of public services                                         23%
+
+
+                                                       Energy                               20%
+
+
+
+Significantly higher than the national total at the 95% confidence interval.
+Q. From the following list, please select the five most important issues you think the Australian Government should focus on.                                                                  9
+Base: All respondents (n=1,000).
+Are we headed in
+the right
+direction?
+
+                   10
+                                                                                       JWS Research – True Issues 27 – March 2022
+
+
+Confidence in the direction of national and state and
+territory economies continues to decline
+While public confidence in personal circumstances,         However, this is still a stronger position for the Coalition
+local communities, and business and industry is stable,    Government, compared to the period heading into their
+sentiment around national and state / territory            May 2019 election campaign (29% wrong direction,
+economies continues to decline. For the first time since   21% right direction in February 2019).
+July 2020, more Australians see the national economy
+                                                           Confidence in state and territory economies remains
+heading in the wrong direction, than see it heading in
+                                                           only a little stronger by comparison (33% right
+the right direction.
+                                                           direction) and has continued to edge off at a national
+Australians remain positive about their own personal       level over the past 12 months (from 34% in November,
+situation and local community. More than twice as          37% in July and 40% in February 2021).
+many think these are heading in the right direction
+                                                           As states and territories grapple with the fallout of
+(37% and 32%, respectively), as think they are heading
+                                                           COVID-19 summer outbreaks and two years of general
+in the wrong direction (16% for each).
+                                                           disruption, more adults now see these economies as
+While this optimism is unchanged from November, it is      heading in the wrong direction (28%, up from 23% in
+weaker than in February 2021, when more Australians        November).
+saw themselves and their communities heading in the
+                                                           Less disrupted by COVID-19 overall, a majority of WA
+right direction over the coming year (43% and 37%,
+                                                           residents (58%) continue to see their state economy as
+respectively).
+                                                           heading in the right direction.
+There is positive sentiment around business and
+                                                           In contrast, residents of other mainland states have
+industry. More adults see these heading in the right
+                                                           very mixed views, with around three in ten residents
+direction in 2022 (31%), than heading in the wrong
+                                                           seeing their state economy as heading in the right
+direction (17%).
+                                                           direction, and a similar number seeing it as heading in
+In contrast, there remain very mixed views on the          the wrong direction (NSW: 29% vs 29%; Victoria: 30%
+national economy with slightly more Australians seeing     vs 30%, Queensland: 31% vs 29%, SA: 32% vs 30%).
+this heading in the wrong direction (30%, up from 26%
+in November), than in the right direction (28%, similar
+to 27% in November).
+                                                                                                                                    11
+                                                                                                                                                 JWS Research – True Issues 27 – March 2022
+
+
+Australians are optimistic about their own situation and
+community and Australian business – but not our economies
+
+                                                          Direction of organisations and groups in Australia
+
+
+                                                                                                                                      Net direction
+                                                                                                                                     (right - wrong) Significantly higher among:
+                                                                                                                                                    Right direction: Hhold income
+       Your own personal                                                                                                                            $100K+: 49%
+                                                            37%                                  41%                  16%     6%          +21
+                situation                                                                                                                           Wrong direction: Hhold income
+                                                                                                                                                    <$50K+: 25%
+
+
+   Your local community                                   32%                               44%                     16%      8%           +16       Right direction: WA: 43%
+
+
+
+  Business and industry
+                                                         31%                              40%                    17%        12%           +14
+            in Australia
+
+
+   Your state or territory
+                                                          33%                          32%                      28%          8%           +5        Right direction: WA: 58%
+               economy
+
+
+
+        National economy                                28%                         34%                        30%           8%            -2       Right direction: Families: 35%
+
+
+
+                                                 Right direction                                 Neither right nor wrong direction
+                                                 Wrong direction                                 Not sure/ Don’t know
+
+
+
+
+Significantly higher than the national total at the 95% confidence interval.
+Q. Do you think each of the following is generally headed in the right or the wrong direction?                                                                                                12
+Base: All respondents (n=1,000).
+                                                                                                                                                      JWS Research – True Issues 27 – March 2022
+
+
+ Optimism continues to slide for national and state and
+ territory economies
+
+                                                           Direction of organisations and groups in Australia
+                                                              Net direction trend (right direction % - wrong direction %)
+
+                                 Malcolm Turnbull replaces                                  Scott Morrison replaces                                   COVID-19
+                                    Tony Abbott as PM                                       Malcom Turnbull as PM                                     Delta strain
+
+ 2013 election                                          2016 election                                           2019 election
+                                                                                                                                    COVID-19
+                                                                                                                                                      28
+                                                                                              24                             Bushfires          25          25                   Personal
+                                                                                                                                          23
+                                                                                                                                                21    21    22       20   21     situation
+       20                                                                                           19
+                                                                                      17                                             18
+             15                                                        16                                        16 17                    15
+                                                                                                                                                            16    15      16     Local
+14                  14                                   14     13                                                  15                                19                         community
+                                          12                                  12                                                                18          12
+                                                                                                                              11                                     11   14
+                                                  9                                   10      10    10    10                         10               14
+                             8                                                 8                                               8                                                  Business and
+                                                                        7                                                                 6     12
+        6            5       6      6                            6                                                6                                                  10   5       industry
+              3                     3      4      8      4                                          3     8            4                               9
+2       5            2       1                                          1             0        0           1                                                                      State / Territory
+        4                          -1     -2             -2                                                       -1                                         4                    economy
+                                                  -3                                                                                      3       2                  2
+                                                                               -4                                             -5     -5
+                                                                -6                                                     -4                                                            National
+        -8                                -8                                          -7                                                                                  -2
+             -9             -9                           -9                                   -8                  -8                                                                 economy
+                                                 -10                   -10
+                                  -12                                         -12                   -6                       -12
+                                                               -13                            -13                      -7            -7
+             -10     -9    -10            -10                                                                    -10                      -10
+-16                                                                                                       -11
+             -18                                                                                                             -13 -13
+                                                 -15                   -15
+                                                        -17                          -18
+-19                               -20
+                                                               -22            -21
+
+
+Jun    Nov   Mar     Jul   Nov     Mar    Jun    Nov    May     Aug    Nov    Mar     Jul     Apr   Aug   Nov    Feb   Jun    Nov   Feb   Jul   Nov   Feb   Jul   Nov     Mar
+ 13    13    14      14    14      15      15    15     16       16    16     17      17      18     18   18      19    19    19     20   20    20     21   21    21      22
+
+      2013            2014                 2015                  2016               2017             2018               2019               2020             2021          2022
+
+
+ Q. Do you think each of the following is generally headed in the right or the wrong direction?                                                                                                    13
+ Base: All respondents (approximately n=1,000 per wave).
+How does the
+Australian
+Government
+perform on top
+issues?
+
+                 14
+                                                                                       JWS Research – True Issues 27 – March 2022
+
+
+Government performance ratings have weakened further
+across many key areas since November
+Heading into its next campaign for re-election, the          Overall, the Government’s best performing area
+Morrison Government’s performance ratings have fallen        continues to be defence, security and terrorism (index
+further across most key areas since November, having         of 55).
+previously declined from July 2021.
+                                                             Notably, younger Australians, those with dependent
+The largest declines include key community pressure          children and higher income households typically rate
+points where the Government is already seen to be            the Government’s performance significantly above
+performing poorly, such as hospitals, healthcare and         average across many of these key areas of
+ageing (index of 41, down a further four points),            responsibility.
+housing and interest rates (index of 41, down a further
+                                                             Key mining states, WA and SA also rate the
+two points) and cost of living (index of 36, down a
+                                                             Government’s performance on mining and resources
+further two points).
+                                                             more favourably than those in other states.
+The Federal Government has also seen similar
+declines on innovation, science and technology (index
+of 50), transport and infrastructure (index of 49) and the
+economy and finances (index of 48), each down a
+further two points since November.
+On a positive note, small gains have been made in the
+Government’s traditionally better performing areas of
+business and industry (index of 54, up two points) and
+mining and resources (index of 53, up one point), as
+well as on foreign affairs and trade (index of 48, up one
+point). However, none have recovered back to the
+previously higher ratings they recorded in July.
+
+
+
+
+                                                                                                                                    15
+                                                                                                                                                   JWS Research – True Issues 27 – March 2022
+
+
+Government performance has continued to decline across
+most key areas to its poorest ratings of the last 12 months
+
+                                                            Australian Government performance on issues
+                                                                                       (Performance index#)                       Mar                        Nov        Jul       Feb
+                                                                                                                                  2022                       2021      2021       2021
+                    Defence, security and terrorism                                                                               55                          56        59         61
+                                Business and industry                                                                             54                          52        57         57
+                                 Mining and resources                                                                            53                           52        56         56
+                          Provision of public services                                                                           52                           52        55         55
+                    Immigration and border security                                                                              52                           53        53         54
+               Innovation, science and technology                                                                            50                               52        54         54
+            Agriculture and regional development                                                                             50                               50        52         52
+                         Transport and infrastructure                                                                       49                                51        54         53
+                            The COVID-19 pandemic                                                                           49                                 -         -          -
+                  Education, training and childcare                                                                         49           Top ten results      50        54         53
+                             Foreign affairs and trade                                                                      49                                48        52         51
+                                      Population growth                                                                     49                                49        53         50
+                          The economy and finances                                                                          48                                50        53         53
+           Community, family and social services                                                                            48                                49        51         53
+                              Employment and wages                                                                     45                                     46        48         48
+                                                    Energy                                                             44                                     45        48         46
+                                 Vision and leadership                                                             42                                         43        46         48
+                 Hospitals, health care and ageing                                                                41                                          45        48         50
+                           Housing and interest rates                                                             41                                          43        47         48
+             The environment and climate change                                                                   40                                          41        44         44
+                                            Cost of living                                                 36                                                 38        42         42
+# For an explanation of how index scores are calculated refer to the survey methodology section of this report.
+
+Q. How would you rate the performance of the Australian Government on each of the following issues?                                                                                             16
+Base: All respondents (approximately n=1,000 per wave).
+                                                                                                                                             JWS Research – True Issues 27 – March 2022
+
+
+Higher-income households, families and young adults rate
+Government performance higher in many key areas
+
+                                                 Top ranked issues for Australian Government performance
+                                                                                       (Performance index#)
+
+
+                                                                                                                               Families: 59, Hhold income $100K+: 59
+               Defence, security and terrorism                                                                         55
+                                                                                                                               Hhold income <$50K: 50
+
+
+                            Business and industry                                                                     54      Hhold income $100K+: 58
+
+
+                             Mining and resources                                                                     53     SA: 60, WA: 59, Families: 56
+
+
+                     Provision of public services                                                                 52         Hhold income $75K-$100K: 58 Families: 57, 18-34 yrs: 56
+                                                                                                                             Hhold income <$50K: 48
+
+
+              Immigration and border security                                                                                Hhold income $100K+: 56
+                                                                                                                  52
+                                                                                                                             Hhold income <$50K: 47
+
+
+         Innovation, science and technology                                                                                18-34 yrs: 56
+                                                                                                                 50
+                                                                                                                           55+ yrs: 47
+
+                                                                                                                           Hhold income $100K+: 55, Families: 54, 18-34 yrs: 53
+      Agriculture and regional development                                                                       50
+                                                                                                                           Regional: 46, Hhold income <$50K: 44
+
+                                                                                                                           Families: 56, Hhold income $75K-$100K: 54, 18-34 yrs: 54
+                    Transport and infrastructure                                                                 49
+                                                                                                                           NSW: 46, 55+ yrs: 45, Hhold income <$50K: 44
+
+
+                        The COVID-19 pandemic                                                                    49
+
+
+             Education, training and childcare                                                                   49
+
+
+#For an explanation of how index scores are calculated refer to the survey methodology section of this report.
+
+Significantly higher / lower than the national total at the 95% confidence interval.
+Q. How would you rate the performance of the Australian Government on each of the following issues?                                                                                       17
+Base: All respondents (approximately n=1,000 per wave).
+How are
+government,
+business and
+industry
+performing?
+
+               18
+                                                                                       JWS Research – True Issues 27 – March 2022
+
+
+Federal and State / Territory Government performance
+ratings continue to decline
+As the next Federal Budget and election looms, the          Also outperforming the Federal Government but slightly
+Morrison Government’s performance has fallen further        down after a year of relative stability, are business and
+since November (index of 47, down from 50) and now          industry (index of 56, down from 57) and local councils
+rates only slightly above pre-COVID-19 levels (index of     (index of 52, down from 54).
+45).
+                                                            As the states and territories find their new ‘COVID
+This extends its steady decline from a series high result   normal’, after two years of pandemic-related
+in July 2020 (index of 63) following its early COVID-19     restrictions, the WA State Government continues to
+response, back to the poorer sentiment recorded prior       significantly outperform other states with a performance
+to the pandemic (index scores below 50). However, the       index score of 74.
+Federal Government remains in a stronger position
+                                                            The rated performance of State Governments in
+now than going into its May 2019 election win (index of
+                                                            Queensland, Victoria and SA are in line with the
+43 in February 2019).
+                                                            national average (index of 55, 51 and 50, respectively)
+While the number of Australians who rate the Federal
+                                                            Following a difficult summer dealing with a major
+Government’s performance as very good or good
+                                                            Omicron outbreak and amid the state’s worst floods in
+(35%) has been maintained since November, this is
+                                                            40 years, rated performance of the NSW Government
+well below its July 2020 peak (58%), and ratings of its
+                                                            has fallen below the national average in March (index
+performance as very poor or poor continue to increase
+                                                            of 50, down from 56).
+(33%, up from 28% in November).
+State and Territory Governments continue to attract
+more positive performance ratings than their Federal
+counterpart, however their ratings have also been on
+the decline since a series high in November 2020
+(index of 64), falling a further three points since
+November (index of 54, down from 57).
+
+
+                                                                                                                                    19
+                                                                                                                                                 JWS Research – True Issues 27 – March 2022
+
+
+Business and industry, and state and local governments
+continue to outperform the Federal Government
+
+                                                      Performance of organisations and groups in Australia
+
+
+
+                                                                                                                                        Index
+                                                                                                                                        score#    Significantly different among:
+
+
+Business and industry                      5%               34%                                    47%                     7%2%5%        56
+
+
+
+Your State or Territory                                                                                                                           WA: 74, Hhold income $100K+: 59
+                                             11%                 33%                           30%                   15%    10% 1%       54
+         Government                                                                                                                               NSW: 50
+
+
+
+                                                                                                                                                  Hhold income $75K-$100K+: 58, Qld: 58
+    Your Local Council                      7%               31%                             37%                     14%    8% 3%        52
+                                                                                                                                                  Vic: 48
+
+
+
+          The Australian
+                                            7%             28%                         31%                     16%         17%     1%    47
+            Government
+
+
+                                              Very Good         Good        Average         Poor       Very Poor      Don't Know
+
+
+
+
+#For an explanation of how index scores are calculated refer to the research methodology section of this report.
+
+Significantly higher / lower than the national total at the 95% confidence interval.
+Q. How would you rate the current performance of each of the following organisations or groups in Australia?                                                                                  20
+Base: All respondents (n=1,000).
+                                                                                                                                                         JWS Research – True Issues 27 – March 2022
+
+
+Federal, State and Territory Government performance
+continue to decline, now just above pre-COVID-19 levels
+
+                                                       Performance of organisations and groups in Australia
+                                                                                           Index score trend#
+
+
+                                  Malcolm Turnbull replaces                             Scott Morrison replaces                                          COVID-19
+                                     Tony Abbott as PM                                  Malcom Turnbull as PM                                            Delta strain
+
+ 2013 election                                         2016 election                                             2019 election
+                                                                                                                                      COVID-19 64
+                                                                                                                                           63
+                                                                                                                                                          62
+                                                                                                                               Bushfires
+                                                                                                                                                                60
+                                                                                                                                                    62
+                                                                                                                                                          58
+                                                                                            57     57                                                                  57             Business and
+                                                                                                                                                                             56       industry
+                                                                                                                         55                  56     57   57     57     57
+                                                                                                          54                                                                 54       State / Territory
+                                                         53            53     53     53                                                53
+       52            52     52                                  52                                                 52                        55     55    55                          Government
+51                                  51    51     51                                                                             51                              54     54
+                                                                                            53                            53
+              49                                         52            52     52                   52                                  52                       52           52      Local Council
+      49                            51    51                   51                                                        49
+                     50     50                   50                                  47     47     47 50 49                     50     50                             50
+                                                         49                   46                       46                49
+48            48                    45    48                    45     45                                 45                   47                                                     The Australian
+       44                   44                                                                                                                                               47       Government
+                     43                   43     46
+              42                                                                            45                                  45     45
+41                          41                           44                                        44
+       43                                                                                                 43       43
+                                                 42                    42     42     42
+              41     41                                         41
+
+
+                                    37
+
+34
+
+
+Jun    Nov    Mar     Jul   Nov     Mar   Jun    Nov    May    Aug    Nov    Mar     Jul    Apr    Aug    Nov      Feb   Jun    Nov    Feb   Jul   Nov    Feb   Jul    Nov   Mar
+13     13     14      14    14      15    15     15     16     16     16     17      17     18     18     18       19    19     19     20    20    20     21    21     21    22
+
+  2013              2014                  2015                 2016              2017              2018                   2019               2020               2021         2022
+
+#For an explanation of how index scores are calculated refer to the survey methodology section of this report.
+
+Q. How would you rate the current performance of each of the following organisations or groups in Australia?                                                                                          21
+Base: All respondents (approximately n=1,000 per wave).
+How engaged are
+voters in the
+2022 Federal
+Election?
+
+                  22
+                                                                                       JWS Research – True Issues 27 – March 2022
+
+
+Majority of voters fairly certain or already decided on 2022
+vote – health, climate, economic concerns key factors
+With the ‘unofficial’ election campaign now well            Again, a range of economic concerns follow, including
+underway, more than four in ten voters are extremely        economic management (19%), cost of living (17%),
+(19%) or very interested (24%) in what is going on in       housing and interest rates (12%), and employment and
+Australian federal politics and the upcoming 2022           wages (9%). In total, 43% of voters mention at least
+Federal Election.                                           one of these issues as deciding their 2022 vote.
+Coinciding with increased concerns over cost of living,     One in ten voters mention issues related to COVID-19
+interest is strongest among voters in households            (10%) and almost as many mention vision and
+earning $75,000 to $100,000 per year, as well as            leadership (9%) as a decision factor, one of the
+among male voters (59% and 51%, respectively, are           Morrison Government’s poorer performing areas (index
+extremely or very interested). In contrast, female voters   score of 42).
+are less engaged in federal politics and the upcoming
+                                                            A majority of voters (60%) have largely decided which
+election, with only 35% extremely or very interested.
+                                                            party they will support at the upcoming federal election.
+The leading issues voters say will decide their 2022        This includes more than a third who have either already
+election vote are largely in line with those mentioned as   decided their vote (20%) or always vote the same way
+general concerns requiring Federal Government               (15%), and one in four who are fairly certain who they
+attention.                                                  will vote for (24%).
+When asked to name up to three issues that will decide      Three in ten voters (31%) are either less solid (16%
+their vote at the upcoming 2022 federal election, almost    leaning towards a particular party) or undecided (14%
+one in four voters describe issues related to the           have no leaning as yet). The balance (10%) did not
+environment and climate change (24%) and hospitals,         select a response.
+healthcare and ageing (23%). (This compares with
+                                                            Voters who are more interested in federal politics and
+health’s ten-point lead over the environment and
+                                                            the upcoming election are more likely to have a firmer
+climate change as a general unprompted issue or
+                                                            view of which party they will vote for. The votes of those
+concern).
+                                                            less engaged (only somewhat interested or not
+                                                            interested) are more likely to still be up for grabs.
+                                                                                                                                    23
+                                                                                                                                                 JWS Research – True Issues 27 – March 2022
+
+
+Men and households earning $75K-100K per year most
+interested in federal politics and the upcoming election
+
+                                   Interest in Australian federal politics and upcoming 2022 Federal Election
+
+
+
+                                                         TOTAL EXTREMELY + VERY                                                                        Hhold income $75K-$100K: 59%,
+                                                                                                                                                43%
+                                                                    INTERESTED                                                                         Men: 51%, Women: 35%
+
+
+                                                                       Extremely interested                             19%
+
+
+                                                                               Very interested                                24%
+
+
+                                                                      Somewhat interested                                               31%
+
+
+                                                                          Not that interested                   13%
+
+
+                                                                         Not at all interested              10%
+
+
+                                                             TOTAL NOT INTERESTED                                            23%
+
+
+                                                                                       Can’t say             3%
+
+
+
+
+Significantly higher / lower than the national total at the 95% confidence interval.
+Q. The next Federal Election is due by May this year. At the moment, how interested are you in what’s going on in Australian federal politics
+and the upcoming 2022 Federal Election?                                                                                                                                                       24
+Base: Eligible to vote (n=918).
+                                                                                                                                                JWS Research – True Issues 27 – March 2022
+
+
+Environment, health, economic management and cost of
+living most top of mind as deciding factors for 2022 election
+
+                              Most important issues that will decide vote at upcoming 2022 Federal Election
+                                                                           (Up to 3 issues – unprompted)
+
+                                               The environment and climate change                                                24%
+                                                                                                                                       55+ yrs: 35%, Hhold income <$50K+: 29%,
+                                                     Hospitals, healthcare and ageing                                           23%    Women: 28%, Regions: 28%
+                                                                 Economic management                                     19%      55+ yrs: 27%
+                                                                               Cost of living                         17%      35-54 yrs: 22%
+                                                             Housing and interest rates                       12%
+                                                                                  COVID-19                  10%
+                                                                Employment and wages                        9%
+                                                                    Vision and leadership                   9% 55+ yrs: 15%               TOTAL economic management
+                                                                                   Education                                              + cost of living + housing and
+                                                                                                       6%
+                                                                                                                                          interest rates + employment
+                                     Social issues (incl. inequality, poverty, drugs)                  6%                                 and wages: 43%
+                                                                    Defence and security               6% 55+ yrs: 11%
+                                                                                Immigration          5%
+                                                                             Foreign affairs         5%
+                                                            Provision of public services           4%       Hhold income <$50K+: 11%
+                                                                                      Energy       4%       Hhold income <$50K+: 8%
+                                                                             Law and order               3%
+                                                           Transport and infrastructure                  3%
+                                                             Disaster relief (incl. floods)            2% NSW: 4%
+                                      Freedoms (incl. freedom of speech, religion)                     2% Qld: 5%
+                                                                               Party-related           2%
+                                                    Support for business and industry                  2%
+                                          Local candidate / local community issues                    1%
+                                                        Planning for population growth                1%
+                                                                                        Other        5%
+Significantly higher than the national total at the 95% confidence interval.
+Q. What are the most important issues that will decide your vote at the upcoming 2022 Federal Election? Please describe up to three
+separate issues in the text boxes below. Please be as specific as you can.                                                                                                                   25
+Base: Eligible to vote (n=918).
+                                                                                                                         JWS Research – True Issues 27 – March 2022
+
+
+Majority of voters fairly certain or already decided on 2022
+election vote, but many votes still up for grabs
+
+                                                      Certainty of vote at upcoming 2022 Federal Election
+
+
+                                 60% at least fairly certain
+                                 which party will vote for
+                                           55+ yrs: 66%
+                                          35-54 yrs: 53%
+
+
+
+
+                                                                                 24%
+
+                                                20%
+                                                                                                  16%
+               15%                                                                                                     14%
+                                         SA: 31%
+                                                                                              Hhold income                                      10%
+                                                                                              $100K+: 22%
+                                                                                                                                          35-54 yrs: 14%
+
+
+    You will vote the same             You have already      You are fairly certain   You are leaning towards You are not yet leaning         Can’t say
+    way you always vote at          decided which party you which party you will vote voting for a particular towards any particular
+      Federal Elections                   will vote for               for                       party                 party
+
+
+
+
+Significantly higher than the national total at the 95% confidence interval.
+Q. Which one of these best describes you in relation to the upcoming 2022 Federal Election?                                                                           26
+Base: Eligible to vote (n=918).
+                                                                                                                                JWS Research – True Issues 27 – March 2022
+
+
+Those less interested in the upcoming election are more
+likely to be undecided in their vote
+
+                                                 Interest in Australian federal politics and certainty of vote
+                                                              at upcoming 2022 Federal Election
+
+
+                                                                             Extremely           Very      Somewhat      Not that      Not at all
+                                                             Total                                                                                    Can’t say*
+                                                                             interested       interested   interested   interested    interested
+
+   You will vote the same way you
+                                                             15%                 21%            15%          13%          14%            20%             0%
+   always vote at Federal Elections
+   You have already decided which
+                                                             20%                 35%            30%          13%           8%            12%             8%
+   party you will vote for
+   You are fairly certain which party
+                                                             24%                 22%            25%          29%          28%             8%             5%
+   you will vote for
+   You are leaning towards voting for a
+                                                             16%                 12%            17%          24%          16%             2%             9%
+   particular party
+   You are not yet leaning towards any
+                                                             14%                  7%             8%          16%          22%            31%             9%
+   particular party
+
+   Can’t say                                                 10%                  3%             5%           6%          12%            28%             70%
+
+
+
+
+Significantly higher / lower than the national total at the 95% confidence interval.
+Q. Which one of these best describes you in relation to the upcoming 2022 Federal Election?
+Base: Eligible to vote (n=918).                                                                                                                                              27
+*Caution: small sample size (n<30).
+THERE ARE
+OVER
+25 MILLION
+PEOPLE
+IN AUSTRALIA...
+FIND OUT
+WHAT THEY'RE
+THINKING.
+ Contact us                    Follow us
+ 03 8685 8555                  @JWSResearch
+
+
+ John Scales                   Mark Zuker
+ Founder                       Managing Director
+ jscales@jwsresearch.com       mzuker@jwsresearch.com
+
+ Katrina Cox                   Cassandra Marks
+ Director of Client Services   Account Manager
+ kcox@jwsresearch.com          cmarks@jwsresearch.com
+
+ Issued: 16th March 2022
+

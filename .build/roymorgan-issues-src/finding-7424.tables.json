@@ -1,0 +1,862 @@
+[
+  {
+    "id": "7424-table-0",
+    "finding": 7424,
+    "sourceTableIndex": 0,
+    "family": "open-nomination",
+    "heading": "Feb 2018",
+    "scope": "Australia",
+    "kind": "economic-vote-breakdown",
+    "population": "VOTING INTENTION",
+    "sourceHeaderRows": [
+      [
+        "Feb 2018",
+        "VOTING INTENTION"
+      ],
+      [
+        "L-NP",
+        "ALP",
+        "GREENS",
+        "IND/OTH",
+        "CAN’T SAY"
+      ],
+      [
+        "",
+        "%",
+        "%",
+        "%",
+        "%",
+        "%",
+        "%"
+      ]
+    ],
+    "columns": [
+      {
+        "heading": "Australia",
+        "dimension": "Australia",
+        "period": {
+          "label": "Feb 2018",
+          "month": "2018-02",
+          "basis": "month"
+        }
+      },
+      {
+        "heading": "L-NP",
+        "dimension": "VOTING INTENTION",
+        "period": {
+          "label": "Feb 2018",
+          "month": "2018-02",
+          "basis": "month"
+        }
+      },
+      {
+        "heading": "ALP",
+        "dimension": "VOTING INTENTION",
+        "period": {
+          "label": "Feb 2018",
+          "month": "2018-02",
+          "basis": "month"
+        }
+      },
+      {
+        "heading": "GREENS",
+        "dimension": "VOTING INTENTION",
+        "period": {
+          "label": "Feb 2018",
+          "month": "2018-02",
+          "basis": "month"
+        }
+      },
+      {
+        "heading": "IND/OTH",
+        "dimension": "VOTING INTENTION",
+        "period": {
+          "label": "Feb 2018",
+          "month": "2018-02",
+          "basis": "month"
+        }
+      },
+      {
+        "heading": "CAN’T SAY",
+        "dimension": "VOTING INTENTION",
+        "period": {
+          "label": "Feb 2018",
+          "month": "2018-02",
+          "basis": "month"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "sourceRow": 3,
+        "label": "TOTAL Financial problems, economy and cost of living comprising of:",
+        "kind": "printed-subtotal",
+        "cells": [
+          {
+            "raw": "9.6",
+            "kind": "number",
+            "share": 9.6
+          },
+          {
+            "raw": "12.2",
+            "kind": "number",
+            "share": 12.2
+          },
+          {
+            "raw": "7.8",
+            "kind": "number",
+            "share": 7.8
+          },
+          {
+            "raw": "1.1",
+            "kind": "number",
+            "share": 1.1
+          },
+          {
+            "raw": "20.7",
+            "kind": "number",
+            "share": 20.7
+          },
+          {
+            "raw": "3.3",
+            "kind": "number",
+            "share": 3.3
+          }
+        ]
+      },
+      {
+        "sourceRow": 4,
+        "label": "Economic problems",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "4.1",
+            "kind": "number",
+            "share": 4.1
+          },
+          {
+            "raw": "7.7",
+            "kind": "number",
+            "share": 7.7
+          },
+          {
+            "raw": "2.4",
+            "kind": "number",
+            "share": 2.4
+          },
+          {
+            "raw": "1.1",
+            "kind": "number",
+            "share": 1.1
+          },
+          {
+            "raw": "6.4",
+            "kind": "number",
+            "share": 6.4
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 5,
+        "label": "Housing affordability",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "2.4",
+            "kind": "number",
+            "share": 2.4
+          },
+          {
+            "raw": "2.2",
+            "kind": "number",
+            "share": 2.2
+          },
+          {
+            "raw": "2.9",
+            "kind": "number",
+            "share": 2.9
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "6.5",
+            "kind": "number",
+            "share": 6.5
+          },
+          {
+            "raw": "1.8",
+            "kind": "number",
+            "share": 1.8
+          }
+        ]
+      },
+      {
+        "sourceRow": 6,
+        "label": "Cost of living, rising prices and inflation",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "2.3",
+            "kind": "number",
+            "share": 2.3
+          },
+          {
+            "raw": "2.3",
+            "kind": "number",
+            "share": 2.3
+          },
+          {
+            "raw": "2.0",
+            "kind": "number",
+            "share": 2
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "5.0",
+            "kind": "number",
+            "share": 5
+          },
+          {
+            "raw": "1.4",
+            "kind": "number",
+            "share": 1.4
+          }
+        ]
+      },
+      {
+        "sourceRow": 7,
+        "label": "Financial or money problems",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.7",
+            "kind": "number",
+            "share": 0.7
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "0.6",
+            "kind": "number",
+            "share": 0.6
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "2.8",
+            "kind": "number",
+            "share": 2.8
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 8,
+        "label": "Unemployment",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "7.3",
+            "kind": "number",
+            "share": 7.3
+          },
+          {
+            "raw": "7.2",
+            "kind": "number",
+            "share": 7.2
+          },
+          {
+            "raw": "7.9",
+            "kind": "number",
+            "share": 7.9
+          },
+          {
+            "raw": "8.7",
+            "kind": "number",
+            "share": 8.7
+          },
+          {
+            "raw": "2.3",
+            "kind": "number",
+            "share": 2.3
+          },
+          {
+            "raw": "8.8",
+            "kind": "number",
+            "share": 8.8
+          }
+        ]
+      },
+      {
+        "sourceRow": 9,
+        "label": "Poverty and the gap between rich and poor",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "5.1",
+            "kind": "number",
+            "share": 5.1
+          },
+          {
+            "raw": "2.5",
+            "kind": "number",
+            "share": 2.5
+          },
+          {
+            "raw": "9.2",
+            "kind": "number",
+            "share": 9.2
+          },
+          {
+            "raw": "12.6",
+            "kind": "number",
+            "share": 12.6
+          },
+          {
+            "raw": "2.7",
+            "kind": "number",
+            "share": 2.7
+          },
+          {
+            "raw": "1.8",
+            "kind": "number",
+            "share": 1.8
+          }
+        ]
+      },
+      {
+        "sourceRow": 10,
+        "label": "Homelessness and lack of housing",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "2.0",
+            "kind": "number",
+            "share": 2
+          },
+          {
+            "raw": "0.8",
+            "kind": "number",
+            "share": 0.8
+          },
+          {
+            "raw": "2.2",
+            "kind": "number",
+            "share": 2.2
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "2.3",
+            "kind": "number",
+            "share": 2.3
+          },
+          {
+            "raw": "6.5",
+            "kind": "number",
+            "share": 6.5
+          }
+        ]
+      },
+      {
+        "sourceRow": 11,
+        "label": "Foreign ownership & investment and selling our assets",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "2.0",
+            "kind": "number",
+            "share": 2
+          },
+          {
+            "raw": "3.1",
+            "kind": "number",
+            "share": 3.1
+          },
+          {
+            "raw": "1.4",
+            "kind": "number",
+            "share": 1.4
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "2.4",
+            "kind": "number",
+            "share": 2.4
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 12,
+        "label": "TOTAL Other Economic Issues",
+        "kind": "printed-subtotal",
+        "cells": [
+          {
+            "raw": "6.3",
+            "kind": "number",
+            "share": 6.3
+          },
+          {
+            "raw": "12.5",
+            "kind": "number",
+            "share": 12.5
+          },
+          {
+            "raw": "2.3",
+            "kind": "number",
+            "share": 2.3
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "8.5",
+            "kind": "number",
+            "share": 8.5
+          },
+          {
+            "raw": "3.5",
+            "kind": "number",
+            "share": 3.5
+          }
+        ]
+      },
+      {
+        "sourceRow": 13,
+        "label": "Comprising of the below:",
+        "kind": "annotation",
+        "cells": [
+          {
+            "raw": "",
+            "kind": "blank",
+            "share": null
+          },
+          {
+            "raw": "",
+            "kind": "blank",
+            "share": null
+          },
+          {
+            "raw": "",
+            "kind": "blank",
+            "share": null
+          },
+          {
+            "raw": "",
+            "kind": "blank",
+            "share": null
+          },
+          {
+            "raw": "",
+            "kind": "blank",
+            "share": null
+          },
+          {
+            "raw": "",
+            "kind": "blank",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 14,
+        "label": "Globalisation and fairer world trade",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "1.2",
+            "kind": "number",
+            "share": 1.2
+          },
+          {
+            "raw": "2.1",
+            "kind": "number",
+            "share": 2.1
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "1.5",
+            "kind": "number",
+            "share": 1.5
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 15,
+        "label": "Over-population",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "1.0",
+            "kind": "number",
+            "share": 1
+          },
+          {
+            "raw": "2.9",
+            "kind": "number",
+            "share": 2.9
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "1.6",
+            "kind": "number",
+            "share": 1.6
+          }
+        ]
+      },
+      {
+        "sourceRow": 16,
+        "label": "General infrastructure: Water, Internet etc.",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.9",
+            "kind": "number",
+            "share": 0.9
+          },
+          {
+            "raw": "1.5",
+            "kind": "number",
+            "share": 1.5
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "3.2",
+            "kind": "number",
+            "share": 3.2
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 17,
+        "label": "Transport, transport infrastructure, road and rail",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.8",
+            "kind": "number",
+            "share": 0.8
+          },
+          {
+            "raw": "0.8",
+            "kind": "number",
+            "share": 0.8
+          },
+          {
+            "raw": "0.5",
+            "kind": "number",
+            "share": 0.5
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "3.1",
+            "kind": "number",
+            "share": 3.1
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 18,
+        "label": "Over-reliance on mining and the impact of mining",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.8",
+            "kind": "number",
+            "share": 0.8
+          },
+          {
+            "raw": "2.1",
+            "kind": "number",
+            "share": 2.1
+          },
+          {
+            "raw": "0.5",
+            "kind": "number",
+            "share": 0.5
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "0.7",
+            "kind": "number",
+            "share": 0.7
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 19,
+        "label": "Federal Budget",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.6",
+            "kind": "number",
+            "share": 0.6
+          },
+          {
+            "raw": "1.9",
+            "kind": "number",
+            "share": 1.9
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 20,
+        "label": "General taxation – Mining tax, resource tax etc.",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.5",
+            "kind": "number",
+            "share": 0.5
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "0.8",
+            "kind": "number",
+            "share": 0.8
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "1.9",
+            "kind": "number",
+            "share": 1.9
+          }
+        ]
+      },
+      {
+        "sourceRow": 21,
+        "label": "Farming, cut food imports and support our farmers",
+        "kind": "issue",
+        "cells": [
+          {
+            "raw": "0.5",
+            "kind": "number",
+            "share": 0.5
+          },
+          {
+            "raw": "1.2",
+            "kind": "number",
+            "share": 1.2
+          },
+          {
+            "raw": "0.5",
+            "kind": "number",
+            "share": 0.5
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          },
+          {
+            "raw": "–",
+            "kind": "dash",
+            "share": null
+          }
+        ]
+      },
+      {
+        "sourceRow": 22,
+        "label": "TOTAL ECONOMIC/ FINANCIAL ISSUES",
+        "kind": "printed-subtotal",
+        "cells": [
+          {
+            "raw": "32.3",
+            "kind": "number",
+            "share": 32.3
+          },
+          {
+            "raw": "38.3",
+            "kind": "number",
+            "share": 38.3
+          },
+          {
+            "raw": "30.8",
+            "kind": "number",
+            "share": 30.8
+          },
+          {
+            "raw": "22.4",
+            "kind": "number",
+            "share": 22.4
+          },
+          {
+            "raw": "38.7",
+            "kind": "number",
+            "share": 38.7
+          },
+          {
+            "raw": "23.9",
+            "kind": "number",
+            "share": 23.9
+          }
+        ]
+      }
+    ],
+    "checks": {
+      "totalRowResiduals": [],
+      "aggregateResiduals": [],
+      "economicTotalResiduals": [
+        {
+          "column": 0,
+          "reconstructed": 32.3,
+          "residual": 0,
+          "roundingTolerance": 0.350001
+        },
+        {
+          "column": 1,
+          "reconstructed": 38.3,
+          "residual": 0,
+          "roundingTolerance": 0.350001
+        },
+        {
+          "column": 2,
+          "reconstructed": 30.8,
+          "residual": 0,
+          "roundingTolerance": 0.350001
+        },
+        {
+          "column": 4,
+          "reconstructed": 38.9,
+          "residual": 0.2,
+          "roundingTolerance": 0.350001
+        }
+      ]
+    }
+  }
+]

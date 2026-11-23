@@ -74,9 +74,33 @@ esac
 log "$DLAST"
 DWARN="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^IPDIR_STATUS /, "")); console.log((s.failures || [])[0]?.error || "")' "$DLAST")"
 
+WOUT="$(node .build/ipsos-worries.mjs 2>&1)"
+WCODE=$?
+WLAST="$(echo "$WOUT" | tail -1)"
+case "$WLAST" in
+  IPWORRIES_STATUS*) ;;
+  *) log "FAIL ipsos-worries (exit $WCODE): $(node_error "$WOUT")"; exit 1 ;;
+esac
+[ $WCODE -eq 0 ] || { log "FAIL ipsos-worries (exit $WCODE): $(node_error "$WOUT")"; exit 1; }
+log "$WLAST"
+
+HOUT="$(node .build/ipsos-history.mjs --fetch 2>&1)"
+HCODE=$?
+HLAST="$(echo "$HOUT" | tail -1)"
+case "$HLAST" in
+  IPHISTORY_STATUS*) ;;
+  *) log "FAIL ipsos-history (exit $HCODE): $(node_error "$HOUT")"; exit 1 ;;
+esac
+[ $HCODE -eq 0 ] || { log "FAIL ipsos-history (exit $HCODE): $(node_error "$HOUT")"; exit 1; }
+log "$HLAST"
+HDOUT="$(node .build/ipsos-issues-history.mjs 2>&1)"
+HDCODE=$?
+log "$(echo "$HDOUT" | tail -1)"
+[ $HDCODE -eq 0 ] || { log "FAIL ipsos-issues-history (exit $HDCODE): $(node_error "$HDOUT")"; exit 1; }
+
 # The daily full run refreshes global direction even when no Issues Monitor
 # file moved. New caches alone trigger no build; changed figures do.
-if [ -z "$(git status --porcelain -- .build/ipsos-src .build/ipsos-direction-src data/ipsos-direction.json)" ]; then
+if [ -z "$(git status --porcelain -- .build/ipsos-src .build/ipsos-direction-src .build/ipsos-history-src data/ipsos-direction.json data/ipsos-worries.json data/ipsos-issues-history.json)" ]; then
   if [ -n "$WARN$DWARN" ]; then
     log "FAIL extract-ipsos (exit 1): ${WARN:-$DWARN}"
     exit 1
@@ -106,10 +130,10 @@ IPBAD="$(node -e '
                ...(s.unknown || []).filter((u) => u.startsWith("Ipsos "))];
   console.log(bad.join("; "));' "$ILAST")"
 
-if git diff --quiet -- data/issues.json data/ipsos-direction.json; then
+if git diff --quiet -- data/issues.json data/ipsos-direction.json data/ipsos-worries.json data/ipsos-issues-history.json; then
   # a statement or report that moves no figure (a month still waiting, or
   # dates that already matched): keep the file so it isn't fetched again
-  FILES=(.build/ipsos-src .build/ipsos-direction-src)
+  FILES=(.build/ipsos-src .build/ipsos-direction-src .build/ipsos-history-src data/ipsos-worries.json data/ipsos-issues-history.json)
   MSG="Cache Ipsos Issues Monitor files $(date '+%Y-%m-%d')"
 else
   log "new Ipsos figures; running validate/build/commit/push"
@@ -123,7 +147,7 @@ else
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/issues.json data/ipsos-direction.json .build/ipsos-src .build/ipsos-direction-src "${SITE_FILES[@]}")
+  FILES=(data/issues.json data/ipsos-direction.json data/ipsos-worries.json data/ipsos-issues-history.json .build/ipsos-src .build/ipsos-direction-src .build/ipsos-history-src "${SITE_FILES[@]}")
   MSG="Update Ipsos Issues Monitor $(date '+%Y-%m-%d')"
 fi
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }

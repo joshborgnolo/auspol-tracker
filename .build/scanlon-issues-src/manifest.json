@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "discovery": {
+    "hubUrl": "https://scanloninstitute.org.au/research/mapping-social-cohesion/",
+    "hubCapture": "report-hub.html"
+  },
+  "rawDataAccess": {
+    "host": "https://dataverse.ada.edu.au",
+    "status": "anubis-blocked",
+    "checkedApiUrls": [
+      "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:10.26193/PUIVYD",
+      "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:10.4225/87/VVSQGR",
+      "https://dataverse.ada.edu.au/api/datasets/:persistentId/?persistentId=doi:10.26193/AOFDPA"
+    ],
+    "challengeCapture": "ada-10.26193-PUIVYD-response.html",
+    "note": "The Dataverse API returned Anubis proof-of-work HTML instead of dataset metadata. No respondent-level files or codebooks were retrieved, and no column bindings were inferred."
+  },
+  "reports": [
+    {
+      "id": "scanlon-2011",
+      "reportYear": 2011,
+      "title": "Mapping Social Cohesion 2011",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-summary-report-2011.pdf",
+      "doi": "10.26193/PUIVYD",
+      "text": "mapping-social-cohesion-summary-report-2011.txt",
+      "pdfSha256": "c9facff529c0be986dba50c1e4f4dba0d1bbf32bb20fd048cb48cece6b06e16f"
+    },
+    {
+      "id": "scanlon-2012",
+      "reportYear": 2012,
+      "title": "Mapping Social Cohesion 2012: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-national-report-2012.pdf",
+      "doi": "10.4225/87/VVSQGR",
+      "text": "mapping-social-cohesion-national-report-2012.txt",
+      "pdfSha256": "ac5b84103b081e30a3a3d29eb743f5b487dbd12c4285e95bf82720eaa2ec192b"
+    },
+    {
+      "id": "scanlon-2013",
+      "reportYear": 2013,
+      "title": "Mapping Social Cohesion 2013: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/mapping-social-cohesion-national-report-2013.pdf",
+      "doi": "10.4225/87/0A2AYD",
+      "text": "mapping-social-cohesion-national-report-2013.txt",
+      "pdfSha256": "15d15c452316ee13c2c9b5494ff1875622fd9b3db011b689dcc7dbf4ac7b417d"
+    },
+    {
+      "id": "scanlon-2014",
+      "reportYear": 2014,
+      "title": "Mapping Social Cohesion 2014: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2014-Mapping-Social-Cohesion-Report.pdf",
+      "doi": "10.4225/87/1WAQES",
+      "text": "2014-Mapping-Social-Cohesion-Report.txt",
+      "pdfSha256": "f8b53d25fc123d588b0ede9a92a30934923b72567fa4b7296f254d18ff94e5a0"
+    },
+    {
+      "id": "scanlon-2015",
+      "reportYear": 2015,
+      "title": "Mapping Social Cohesion 2015: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2015-Mapping-Social-Cohesion-Report.pdf",
+      "doi": "10.4225/87/5K8KD7",
+      "text": "2015-Mapping-Social-Cohesion-Report.txt",
+      "pdfSha256": "b6b75be225d1c1f3d203f8cda06be27444d10442158f8fdbb52ed9e2b23f04fd"
+    },
+    {
+      "id": "scanlon-2016",
+      "reportYear": 2016,
+      "title": "Mapping Social Cohesion 2016: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2016-Mapping-Social-Cohesion-Report-FINAL-with-covers.pdf",
+      "doi": "10.4225/87/FYRCUZ",
+      "text": "2016-Mapping-Social-Cohesion-Report-FINAL-with-covers.txt",
+      "pdfSha256": "a30c4277f8e974bce5c45a9576c104a6fb7b02402f1473462c59abf7a543f1ef"
+    },
+    {
+      "id": "scanlon-2017",
+      "reportYear": 2017,
+      "title": "Mapping Social Cohesion 2017: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/ScanlonFoundation_MappingSocialCohesion_2017-1.pdf",
+      "doi": "10.26193/PPZHMC",
+      "text": "ScanlonFoundation_MappingSocialCohesion_2017-1.txt",
+      "pdfSha256": "4217e5813b0600dc861525996d58f4e2f790aa4d9d33c98ae225665e7663d412"
+    },
+    {
+      "id": "scanlon-2018",
+      "reportYear": 2018,
+      "title": "Mapping Social Cohesion 2018: National Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Social-Cohesion-2018-report-26-Nov.pdf",
+      "doi": "10.26193/GBRINL",
+      "text": "Social-Cohesion-2018-report-26-Nov.txt",
+      "pdfSha256": "eb4599220246fd2cf655ea1e631b3b570f35d327c91c1436432f3d4241343115"
+    },
+    {
+      "id": "scanlon-2019",
+      "reportYear": 2019,
+      "title": "Mapping Social Cohesion 2019",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2019-FINAL.pdf",
+      "doi": "10.26193/IMUXSD",
+      "text": "Mapping-Social-Cohesion-2019-FINAL.txt",
+      "pdfSha256": "355a2be2d52f93cc4e426214a9d1c7d639533cc564d24bfe3fa34aaeebdb2f45"
+    },
+    {
+      "id": "scanlon-2020",
+      "reportYear": 2020,
+      "title": "Mapping Social Cohesion 2020",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/SC2020-Report-Final.pdf",
+      "doi": "10.26193/QTQOK6",
+      "text": "SC2020-Report-Final.txt",
+      "pdfSha256": "50c4fff3ebbd7d6cbaddbbb88743291b99ffecd86f0413ff06d2554ebc46a1a7"
+    },
+    {
+      "id": "scanlon-2021",
+      "reportYear": 2021,
+      "title": "Mapping Social Cohesion 2021",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping_Social_Cohesion_2021_Report_0.pdf",
+      "doi": "10.26193/232RSY",
+      "text": "Mapping_Social_Cohesion_2021_Report_0.txt",
+      "pdfSha256": "b266301201ab870dfbe64de5a39eb34563dea0edf462c74a5cddfae812ffa3c4"
+    },
+    {
+      "id": "scanlon-2022",
+      "reportYear": 2022,
+      "title": "Mapping Social Cohesion 2022",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/MSC-2022_Report.pdf",
+      "doi": "10.26193/TZXG2J",
+      "text": "MSC-2022_Report.txt",
+      "pdfSha256": "4d70f564a026743ecfd2a00e64dd57d877e6e95608014b16a058bba089e5afa7"
+    },
+    {
+      "id": "scanlon-2023",
+      "reportYear": 2023,
+      "title": "Mapping Social Cohesion 2023",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/2023-Mapping-Social-Cohesion-Report-1.pdf",
+      "doi": "10.26193/AOFDPA",
+      "text": "2023-Mapping-Social-Cohesion-Report-1.txt",
+      "pdfSha256": "c8cb26a3500d9a521760e81e6da9f75e9912d86c64e50036dcd7edf6f1d4d3e0"
+    },
+    {
+      "id": "scanlon-2024",
+      "reportYear": 2024,
+      "title": "Mapping Social Cohesion 2024",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2024-Report.pdf",
+      "doi": null,
+      "text": "Mapping-Social-Cohesion-2024-Report.txt",
+      "pdfSha256": "4eef4d664d7d86192cba90a19f1f171d39af744e78553cac87a6ff4edab60eb3"
+    },
+    {
+      "id": "scanlon-2025",
+      "reportYear": 2025,
+      "title": "Mapping Social Cohesion 2025",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/SI0001_MappingSocialCohesion_2025_v6.pdf",
+      "doi": null,
+      "text": "SI0001_MappingSocialCohesion_2025_v6.txt",
+      "pdfSha256": "568c66983934bc0b6de24f594bbf75220ae65e9176cff3005f5a49581afbe26d"
+    },
+    {
+      "id": "scanlon-2026",
+      "reportYear": 2026,
+      "title": "Mapping Social Cohesion 2026",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf",
+      "doi": null,
+      "text": "SI_Mapping-Social-Cohesion_Report_2026.txt",
+      "pdfSha256": "372e2a0d39da2b7e05c417178462064909e6f40fb07e958f151e73eed1c875e3"
+    }
+  ],
+  "methodologyReports": [
+    {
+      "id": "scanlon-technical-2026",
+      "reportYear": 2026,
+      "title": "Mapping Social Cohesion 2026 Technical Report",
+      "url": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2026-technical-report.pdf",
+      "text": "Mapping-Social-Cohesion-2026-technical-report.txt",
+      "pdfSha256": "d175b9454e2449fc0dd72c3fd0a987a02144d6ddb0fbbf39f8e99f8d34c97715"
+    }
+  ]
+}

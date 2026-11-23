@@ -1,0 +1,2761 @@
+{
+  "schemaVersion": 1,
+  "generator": ".build/extract-freshwater-issues.mjs / ocrTable()",
+  "ocrProgram": ".build/ocr-image.swift invoked with accurate mode at 3x and 4x",
+  "comparison": "Every issue label, response column, printed value and cell value is independently coordinate-matched in both reads; generation throws unless both integer shares and labels agree exactly",
+  "sourceImages": {
+    "importance": {
+      "url": "https://freshwaterstrategy.com/wp-content/uploads/voter-priorities.png",
+      "cache": "2022-12-importance.png"
+    },
+    "management": {
+      "url": "https://freshwaterstrategy.com/wp-content/uploads/who-is-best-to-manage-each-voter-priority-1.png",
+      "cache": "2022-12-management.png"
+    }
+  },
+  "reads": {
+    "importance": [
+      {
+        "scale": 3,
+        "file": "2022-12-importance-ocr-3x-accurate.json"
+      },
+      {
+        "scale": 4,
+        "file": "2022-12-importance-ocr-4x-accurate.json"
+      }
+    ],
+    "management": [
+      {
+        "scale": 3,
+        "file": "2022-12-management-ocr-3x-accurate.json"
+      },
+      {
+        "scale": 4,
+        "file": "2022-12-management-ocr-4x-accurate.json"
+      }
+    ]
+  },
+  "cells": [
+    {
+      "measure": "importance",
+      "issue": "Cost of & standard of living",
+      "share": 71,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Cost of & standard of living",
+          "issueBox": {
+            "text": "Cost of & standard of living",
+            "x": 0.084,
+            "y": 0.208,
+            "w": 0.241,
+            "h": 0.023
+          },
+          "valueText": "71%",
+          "valueBox": {
+            "text": "71%",
+            "x": 0.755,
+            "y": 0.208,
+            "w": 0.04,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Cost of & standard of living",
+          "issueBox": {
+            "text": "Cost of & standard of living",
+            "x": 0.084,
+            "y": 0.207,
+            "w": 0.241,
+            "h": 0.024
+          },
+          "valueText": "71%",
+          "valueBox": {
+            "text": "71%",
+            "x": 0.755,
+            "y": 0.208,
+            "w": 0.04,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Housing & accommodation",
+      "share": 40,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.085,
+            "y": 0.259,
+            "w": 0.241,
+            "h": 0.019
+          },
+          "valueText": "40%",
+          "valueBox": {
+            "text": "40%",
+            "x": 0.549,
+            "y": 0.256,
+            "w": 0.043,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.085,
+            "y": 0.259,
+            "w": 0.241,
+            "h": 0.019
+          },
+          "valueText": "40%",
+          "valueBox": {
+            "text": "40%",
+            "x": 0.549,
+            "y": 0.256,
+            "w": 0.043,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Health & social care",
+      "share": 40,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.147,
+            "y": 0.305,
+            "w": 0.179,
+            "h": 0.016
+          },
+          "valueText": "40%",
+          "valueBox": {
+            "text": "40%",
+            "x": 0.549,
+            "y": 0.302,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.147,
+            "y": 0.305,
+            "w": 0.179,
+            "h": 0.016
+          },
+          "valueText": "40%",
+          "valueBox": {
+            "text": "40%",
+            "x": 0.549,
+            "y": 0.302,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Managing the economy",
+      "share": 37,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.116,
+            "y": 0.349,
+            "w": 0.212,
+            "h": 0.025
+          },
+          "valueText": "37%",
+          "valueBox": {
+            "text": "37%",
+            "x": 0.53,
+            "y": 0.347,
+            "w": 0.04,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.116,
+            "y": 0.349,
+            "w": 0.212,
+            "h": 0.025
+          },
+          "valueText": "37%",
+          "valueBox": {
+            "text": "37%",
+            "x": 0.53,
+            "y": 0.347,
+            "w": 0.04,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "The environment & climate change",
+      "share": 31,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "The environment & climate change",
+          "issueBox": {
+            "text": "The environment & climate change",
+            "x": 0.019,
+            "y": 0.392,
+            "w": 0.309,
+            "h": 0.028
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.491,
+            "y": 0.395,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "The environment & climate change",
+          "issueBox": {
+            "text": "The environment & climate change",
+            "x": 0.019,
+            "y": 0.392,
+            "w": 0.309,
+            "h": 0.028
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.491,
+            "y": 0.395,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Welfare & benefits",
+      "share": 19,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.163,
+            "y": 0.44,
+            "w": 0.165,
+            "h": 0.027
+          },
+          "valueText": "19%",
+          "valueBox": {
+            "text": "19%",
+            "x": 0.411,
+            "y": 0.442,
+            "w": 0.041,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.163,
+            "y": 0.44,
+            "w": 0.165,
+            "h": 0.025
+          },
+          "valueText": "19%",
+          "valueBox": {
+            "text": "19%",
+            "x": 0.411,
+            "y": 0.442,
+            "w": 0.041,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Tax & government spending",
+      "share": 18,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.079,
+            "y": 0.488,
+            "w": 0.248,
+            "h": 0.025
+          },
+          "valueText": "18%",
+          "valueBox": {
+            "text": "18%",
+            "x": 0.405,
+            "y": 0.488,
+            "w": 0.041,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.079,
+            "y": 0.488,
+            "w": 0.248,
+            "h": 0.025
+          },
+          "valueText": "18%",
+          "valueBox": {
+            "text": "18%",
+            "x": 0.405,
+            "y": 0.488,
+            "w": 0.041,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Crime & social order",
+      "share": 15,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.146,
+            "y": 0.533,
+            "w": 0.182,
+            "h": 0.025
+          },
+          "valueText": "15%",
+          "valueBox": {
+            "text": "15%",
+            "x": 0.386,
+            "y": 0.535,
+            "w": 0.041,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.146,
+            "y": 0.533,
+            "w": 0.182,
+            "h": 0.025
+          },
+          "valueText": "15%",
+          "valueBox": {
+            "text": "15%",
+            "x": 0.386,
+            "y": 0.535,
+            "w": 0.041,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Defence and national security",
+      "share": 14,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.063,
+            "y": 0.58,
+            "w": 0.265,
+            "h": 0.026
+          },
+          "valueText": "14%",
+          "valueBox": {
+            "text": "14%",
+            "x": 0.378,
+            "y": 0.581,
+            "w": 0.043,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.063,
+            "y": 0.579,
+            "w": 0.265,
+            "h": 0.027
+          },
+          "valueText": "14%",
+          "valueBox": {
+            "text": "14%",
+            "x": 0.378,
+            "y": 0.581,
+            "w": 0.043,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Education & training",
+      "share": 13,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.147,
+            "y": 0.628,
+            "w": 0.18,
+            "h": 0.025
+          },
+          "valueText": "13%",
+          "valueBox": {
+            "text": "13%",
+            "x": 0.373,
+            "y": 0.628,
+            "w": 0.041,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.147,
+            "y": 0.626,
+            "w": 0.181,
+            "h": 0.027
+          },
+          "valueText": "13%",
+          "valueBox": {
+            "text": "13%",
+            "x": 0.373,
+            "y": 0.628,
+            "w": 0.041,
+            "h": 0.019
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Family & community",
+      "share": 11,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.142,
+            "y": 0.674,
+            "w": 0.185,
+            "h": 0.025
+          },
+          "valueText": "11%",
+          "valueBox": {
+            "text": "11%",
+            "x": 0.35,
+            "y": 0.673,
+            "w": 0.051,
+            "h": 0.028
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.142,
+            "y": 0.674,
+            "w": 0.185,
+            "h": 0.025
+          },
+          "valueText": "11%",
+          "valueBox": {
+            "text": "11%",
+            "x": 0.35,
+            "y": 0.673,
+            "w": 0.051,
+            "h": 0.028
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Roads & transport",
+      "share": 10,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.165,
+            "y": 0.719,
+            "w": 0.165,
+            "h": 0.026
+          },
+          "valueText": "10%",
+          "valueBox": {
+            "text": "10%",
+            "x": 0.35,
+            "y": 0.715,
+            "w": 0.046,
+            "h": 0.029
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.165,
+            "y": 0.719,
+            "w": 0.165,
+            "h": 0.027
+          },
+          "valueText": "10%",
+          "valueBox": {
+            "text": "10%",
+            "x": 0.35,
+            "y": 0.715,
+            "w": 0.046,
+            "h": 0.029
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Immigration & asylum",
+      "share": 9,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.128,
+            "y": 0.767,
+            "w": 0.198,
+            "h": 0.025
+          },
+          "valueText": "9%",
+          "valueBox": {
+            "text": "9%",
+            "x": 0.35,
+            "y": 0.766,
+            "w": 0.036,
+            "h": 0.023
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.128,
+            "y": 0.767,
+            "w": 0.199,
+            "h": 0.025
+          },
+          "valueText": "9%",
+          "valueBox": {
+            "text": "9%",
+            "x": 0.35,
+            "y": 0.766,
+            "w": 0.036,
+            "h": 0.023
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Strikes & union-led industrial action",
+      "share": 4,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.014,
+            "y": 0.814,
+            "w": 0.313,
+            "h": 0.025
+          },
+          "valueText": "4%",
+          "valueBox": {
+            "text": "4%",
+            "x": 0.364,
+            "y": 0.812,
+            "w": 0.032,
+            "h": 0.022
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.014,
+            "y": 0.811,
+            "w": 0.314,
+            "h": 0.028
+          },
+          "valueText": "4%",
+          "valueBox": {
+            "text": "4%",
+            "x": 0.364,
+            "y": 0.814,
+            "w": 0.032,
+            "h": 0.02
+          }
+        }
+      ]
+    },
+    {
+      "measure": "importance",
+      "issue": "Other",
+      "share": 3,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-importance-ocr-3x-accurate.json",
+          "issueText": "Other",
+          "issueBox": {
+            "text": "Other",
+            "x": 0.274,
+            "y": 0.86,
+            "w": 0.055,
+            "h": 0.023
+          },
+          "valueText": "3%",
+          "valueBox": {
+            "text": "3%",
+            "x": 0.356,
+            "y": 0.859,
+            "w": 0.033,
+            "h": 0.023
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-importance-ocr-4x-accurate.json",
+          "issueText": "Other",
+          "issueBox": {
+            "text": "Other",
+            "x": 0.274,
+            "y": 0.86,
+            "w": 0.055,
+            "h": 0.023
+          },
+          "valueText": "3%",
+          "valueBox": {
+            "text": "3%",
+            "x": 0.356,
+            "y": 0.859,
+            "w": 0.033,
+            "h": 0.023
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Welfare & benefits",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 50,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.01,
+            "y": 0.193,
+            "w": 0.16,
+            "h": 0.016
+          },
+          "valueText": "50%",
+          "valueBox": {
+            "text": "50%",
+            "x": 0.34,
+            "y": 0.193,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.01,
+            "y": 0.193,
+            "w": 0.16,
+            "h": 0.016
+          },
+          "valueText": "50%",
+          "valueBox": {
+            "text": "50%",
+            "x": 0.34,
+            "y": 0.193,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Welfare & benefits",
+      "responseOption": "Neither / Unsure",
+      "share": 28,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.01,
+            "y": 0.193,
+            "w": 0.16,
+            "h": 0.016
+          },
+          "valueText": "28%",
+          "valueBox": {
+            "text": "28%",
+            "x": 0.728,
+            "y": 0.192,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.01,
+            "y": 0.193,
+            "w": 0.16,
+            "h": 0.016
+          },
+          "valueText": "28%",
+          "valueBox": {
+            "text": "28%",
+            "x": 0.728,
+            "y": 0.192,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Welfare & benefits",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 23,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.01,
+            "y": 0.193,
+            "w": 0.16,
+            "h": 0.016
+          },
+          "valueText": "23%",
+          "valueBox": {
+            "text": "23%",
+            "x": 0.941,
+            "y": 0.192,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Welfare & benefits",
+          "issueBox": {
+            "text": "Welfare & benefits",
+            "x": 0.01,
+            "y": 0.193,
+            "w": 0.16,
+            "h": 0.016
+          },
+          "valueText": "23%",
+          "valueBox": {
+            "text": "23%",
+            "x": 0.941,
+            "y": 0.192,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Health & social care",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 47,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.01,
+            "y": 0.246,
+            "w": 0.178,
+            "h": 0.016
+          },
+          "valueText": "47%",
+          "valueBox": {
+            "text": "47%",
+            "x": 0.34,
+            "y": 0.244,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.01,
+            "y": 0.246,
+            "w": 0.178,
+            "h": 0.016
+          },
+          "valueText": "47%",
+          "valueBox": {
+            "text": "47%",
+            "x": 0.34,
+            "y": 0.244,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Health & social care",
+      "responseOption": "Neither / Unsure",
+      "share": 30,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.01,
+            "y": 0.246,
+            "w": 0.178,
+            "h": 0.016
+          },
+          "valueText": "30%",
+          "valueBox": {
+            "text": "30%",
+            "x": 0.716,
+            "y": 0.246,
+            "w": 0.04,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.01,
+            "y": 0.246,
+            "w": 0.178,
+            "h": 0.016
+          },
+          "valueText": "30%",
+          "valueBox": {
+            "text": "30%",
+            "x": 0.716,
+            "y": 0.246,
+            "w": 0.04,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Health & social care",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 24,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.01,
+            "y": 0.246,
+            "w": 0.178,
+            "h": 0.016
+          },
+          "valueText": "24%",
+          "valueBox": {
+            "text": "24%",
+            "x": 0.941,
+            "y": 0.244,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Health & social care",
+          "issueBox": {
+            "text": "Health & social care",
+            "x": 0.01,
+            "y": 0.246,
+            "w": 0.178,
+            "h": 0.016
+          },
+          "valueText": "24%",
+          "valueBox": {
+            "text": "24%",
+            "x": 0.941,
+            "y": 0.244,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Family & community",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 45,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.008,
+            "y": 0.297,
+            "w": 0.181,
+            "h": 0.02
+          },
+          "valueText": "45%",
+          "valueBox": {
+            "text": "45%",
+            "x": 0.34,
+            "y": 0.298,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.008,
+            "y": 0.297,
+            "w": 0.181,
+            "h": 0.02
+          },
+          "valueText": "45%",
+          "valueBox": {
+            "text": "45%",
+            "x": 0.34,
+            "y": 0.298,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Family & community",
+      "responseOption": "Neither / Unsure",
+      "share": 32,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.008,
+            "y": 0.297,
+            "w": 0.181,
+            "h": 0.02
+          },
+          "valueText": "32%",
+          "valueBox": {
+            "text": "32%",
+            "x": 0.712,
+            "y": 0.298,
+            "w": 0.04,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.008,
+            "y": 0.297,
+            "w": 0.181,
+            "h": 0.02
+          },
+          "valueText": "32%",
+          "valueBox": {
+            "text": "32%",
+            "x": 0.712,
+            "y": 0.298,
+            "w": 0.04,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Family & community",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 23,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.008,
+            "y": 0.297,
+            "w": 0.181,
+            "h": 0.02
+          },
+          "valueText": "23%",
+          "valueBox": {
+            "text": "23%",
+            "x": 0.941,
+            "y": 0.297,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Family & community",
+          "issueBox": {
+            "text": "Family & community",
+            "x": 0.008,
+            "y": 0.297,
+            "w": 0.181,
+            "h": 0.02
+          },
+          "valueText": "23%",
+          "valueBox": {
+            "text": "23%",
+            "x": 0.941,
+            "y": 0.297,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Housing & accommodation",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 43,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.009,
+            "y": 0.349,
+            "w": 0.243,
+            "h": 0.02
+          },
+          "valueText": "43%",
+          "valueBox": {
+            "text": "43%",
+            "x": 0.338,
+            "y": 0.349,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.009,
+            "y": 0.349,
+            "w": 0.243,
+            "h": 0.02
+          },
+          "valueText": "43%",
+          "valueBox": {
+            "text": "43%",
+            "x": 0.338,
+            "y": 0.349,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Housing & accommodation",
+      "responseOption": "Neither / Unsure",
+      "share": 34,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.009,
+            "y": 0.349,
+            "w": 0.243,
+            "h": 0.02
+          },
+          "valueText": "34%",
+          "valueBox": {
+            "text": "34%",
+            "x": 0.705,
+            "y": 0.347,
+            "w": 0.04,
+            "h": 0.018
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.009,
+            "y": 0.349,
+            "w": 0.243,
+            "h": 0.02
+          },
+          "valueText": "34%",
+          "valueBox": {
+            "text": "34%",
+            "x": 0.705,
+            "y": 0.347,
+            "w": 0.04,
+            "h": 0.018
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Housing & accommodation",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 23,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.009,
+            "y": 0.349,
+            "w": 0.243,
+            "h": 0.02
+          },
+          "valueText": "23%",
+          "valueBox": {
+            "text": "23%",
+            "x": 0.941,
+            "y": 0.349,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Housing & accommodation",
+          "issueBox": {
+            "text": "Housing & accommodation",
+            "x": 0.009,
+            "y": 0.349,
+            "w": 0.243,
+            "h": 0.02
+          },
+          "valueText": "23%",
+          "valueBox": {
+            "text": "23%",
+            "x": 0.941,
+            "y": 0.349,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Education & training",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 43,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.008,
+            "y": 0.4,
+            "w": 0.18,
+            "h": 0.022
+          },
+          "valueText": "43%",
+          "valueBox": {
+            "text": "43%",
+            "x": 0.34,
+            "y": 0.401,
+            "w": 0.04,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.008,
+            "y": 0.4,
+            "w": 0.18,
+            "h": 0.022
+          },
+          "valueText": "43%",
+          "valueBox": {
+            "text": "43%",
+            "x": 0.34,
+            "y": 0.401,
+            "w": 0.04,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Education & training",
+      "responseOption": "Neither / Unsure",
+      "share": 31,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.008,
+            "y": 0.4,
+            "w": 0.18,
+            "h": 0.022
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.695,
+            "y": 0.4,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.008,
+            "y": 0.4,
+            "w": 0.18,
+            "h": 0.022
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.695,
+            "y": 0.4,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Education & training",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 26,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.008,
+            "y": 0.4,
+            "w": 0.18,
+            "h": 0.022
+          },
+          "valueText": "26%",
+          "valueBox": {
+            "text": "26%",
+            "x": 0.941,
+            "y": 0.401,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Education & training",
+          "issueBox": {
+            "text": "Education & training",
+            "x": 0.008,
+            "y": 0.4,
+            "w": 0.18,
+            "h": 0.022
+          },
+          "valueText": "26%",
+          "valueBox": {
+            "text": "26%",
+            "x": 0.941,
+            "y": 0.4,
+            "w": 0.04,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "The environment",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 42,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "The environment",
+          "issueBox": {
+            "text": "The environment",
+            "x": 0.009,
+            "y": 0.456,
+            "w": 0.152,
+            "h": 0.016
+          },
+          "valueText": "42%",
+          "valueBox": {
+            "text": "42%",
+            "x": 0.34,
+            "y": 0.453,
+            "w": 0.04,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "The environment",
+          "issueBox": {
+            "text": "The environment",
+            "x": 0.009,
+            "y": 0.456,
+            "w": 0.152,
+            "h": 0.016
+          },
+          "valueText": "42%",
+          "valueBox": {
+            "text": "42%",
+            "x": 0.34,
+            "y": 0.453,
+            "w": 0.04,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "The environment",
+      "responseOption": "Neither / Unsure",
+      "share": 38,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "The environment",
+          "issueBox": {
+            "text": "The environment",
+            "x": 0.009,
+            "y": 0.456,
+            "w": 0.152,
+            "h": 0.016
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.712,
+            "y": 0.453,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "The environment",
+          "issueBox": {
+            "text": "The environment",
+            "x": 0.009,
+            "y": 0.456,
+            "w": 0.152,
+            "h": 0.016
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.712,
+            "y": 0.453,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "The environment",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 20,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "The environment",
+          "issueBox": {
+            "text": "The environment",
+            "x": 0.009,
+            "y": 0.456,
+            "w": 0.152,
+            "h": 0.016
+          },
+          "valueText": "20%",
+          "valueBox": {
+            "text": "20%",
+            "x": 0.941,
+            "y": 0.453,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "The environment",
+          "issueBox": {
+            "text": "The environment",
+            "x": 0.009,
+            "y": 0.456,
+            "w": 0.152,
+            "h": 0.016
+          },
+          "valueText": "20%",
+          "valueBox": {
+            "text": "20%",
+            "x": 0.941,
+            "y": 0.453,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "The cost of & standards of living",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 41,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "The cost of & standards of living",
+          "issueBox": {
+            "text": "The cost of & standards of living",
+            "x": 0.009,
+            "y": 0.505,
+            "w": 0.29,
+            "h": 0.022
+          },
+          "valueText": "41%",
+          "valueBox": {
+            "text": "41%",
+            "x": 0.34,
+            "y": 0.506,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "The cost of & standards of living",
+          "issueBox": {
+            "text": "The cost of & standards of living",
+            "x": 0.009,
+            "y": 0.505,
+            "w": 0.29,
+            "h": 0.022
+          },
+          "valueText": "41%",
+          "valueBox": {
+            "text": "41%",
+            "x": 0.34,
+            "y": 0.506,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "The cost of & standards of living",
+      "responseOption": "Neither / Unsure",
+      "share": 32,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "The cost of & standards of living",
+          "issueBox": {
+            "text": "The cost of & standards of living",
+            "x": 0.009,
+            "y": 0.505,
+            "w": 0.29,
+            "h": 0.022
+          },
+          "valueText": "32%",
+          "valueBox": {
+            "text": "32%",
+            "x": 0.686,
+            "y": 0.507,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "The cost of & standards of living",
+          "issueBox": {
+            "text": "The cost of & standards of living",
+            "x": 0.009,
+            "y": 0.505,
+            "w": 0.29,
+            "h": 0.022
+          },
+          "valueText": "32%",
+          "valueBox": {
+            "text": "32%",
+            "x": 0.686,
+            "y": 0.507,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "The cost of & standards of living",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 27,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "The cost of & standards of living",
+          "issueBox": {
+            "text": "The cost of & standards of living",
+            "x": 0.009,
+            "y": 0.505,
+            "w": 0.29,
+            "h": 0.022
+          },
+          "valueText": "27%",
+          "valueBox": {
+            "text": "27%",
+            "x": 0.941,
+            "y": 0.506,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "The cost of & standards of living",
+          "issueBox": {
+            "text": "The cost of & standards of living",
+            "x": 0.009,
+            "y": 0.505,
+            "w": 0.29,
+            "h": 0.022
+          },
+          "valueText": "27%",
+          "valueBox": {
+            "text": "27%",
+            "x": 0.941,
+            "y": 0.506,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Strikes & union-led industrial action",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 38,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.009,
+            "y": 0.56,
+            "w": 0.31,
+            "h": 0.018
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.338,
+            "y": 0.558,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.009,
+            "y": 0.56,
+            "w": 0.31,
+            "h": 0.018
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.338,
+            "y": 0.558,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Strikes & union-led industrial action",
+      "responseOption": "Neither / Unsure",
+      "share": 36,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.009,
+            "y": 0.56,
+            "w": 0.31,
+            "h": 0.018
+          },
+          "valueText": "36%",
+          "valueBox": {
+            "text": "36%",
+            "x": 0.679,
+            "y": 0.56,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.009,
+            "y": 0.56,
+            "w": 0.31,
+            "h": 0.018
+          },
+          "valueText": "36%",
+          "valueBox": {
+            "text": "36%",
+            "x": 0.679,
+            "y": 0.56,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Strikes & union-led industrial action",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 26,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.009,
+            "y": 0.56,
+            "w": 0.31,
+            "h": 0.018
+          },
+          "valueText": "26%",
+          "valueBox": {
+            "text": "26%",
+            "x": 0.941,
+            "y": 0.558,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Strikes & union-led industrial action",
+          "issueBox": {
+            "text": "Strikes & union-led industrial action",
+            "x": 0.009,
+            "y": 0.56,
+            "w": 0.31,
+            "h": 0.018
+          },
+          "valueText": "26%",
+          "valueBox": {
+            "text": "26%",
+            "x": 0.941,
+            "y": 0.558,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Roads & transport",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 38,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.008,
+            "y": 0.611,
+            "w": 0.163,
+            "h": 0.021
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.34,
+            "y": 0.61,
+            "w": 0.04,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.008,
+            "y": 0.611,
+            "w": 0.163,
+            "h": 0.021
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.34,
+            "y": 0.61,
+            "w": 0.04,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Roads & transport",
+      "responseOption": "Neither / Unsure",
+      "share": 35,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.008,
+            "y": 0.611,
+            "w": 0.163,
+            "h": 0.021
+          },
+          "valueText": "35%",
+          "valueBox": {
+            "text": "35%",
+            "x": 0.676,
+            "y": 0.612,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.008,
+            "y": 0.611,
+            "w": 0.163,
+            "h": 0.021
+          },
+          "valueText": "35%",
+          "valueBox": {
+            "text": "35%",
+            "x": 0.676,
+            "y": 0.612,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Roads & transport",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 27,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.008,
+            "y": 0.611,
+            "w": 0.163,
+            "h": 0.021
+          },
+          "valueText": "27%",
+          "valueBox": {
+            "text": "27%",
+            "x": 0.941,
+            "y": 0.61,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Roads & transport",
+          "issueBox": {
+            "text": "Roads & transport",
+            "x": 0.008,
+            "y": 0.611,
+            "w": 0.163,
+            "h": 0.021
+          },
+          "valueText": "27%",
+          "valueBox": {
+            "text": "27%",
+            "x": 0.941,
+            "y": 0.61,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Tax & government spending",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 36,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.007,
+            "y": 0.662,
+            "w": 0.249,
+            "h": 0.022
+          },
+          "valueText": "36%",
+          "valueBox": {
+            "text": "36%",
+            "x": 0.34,
+            "y": 0.663,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.007,
+            "y": 0.662,
+            "w": 0.249,
+            "h": 0.022
+          },
+          "valueText": "36%",
+          "valueBox": {
+            "text": "36%",
+            "x": 0.34,
+            "y": 0.663,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Tax & government spending",
+      "responseOption": "Neither / Unsure",
+      "share": 36,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.007,
+            "y": 0.662,
+            "w": 0.249,
+            "h": 0.022
+          },
+          "valueText": "36%",
+          "valueBox": {
+            "text": "36%",
+            "x": 0.662,
+            "y": 0.663,
+            "w": 0.043,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.007,
+            "y": 0.662,
+            "w": 0.249,
+            "h": 0.022
+          },
+          "valueText": "36%",
+          "valueBox": {
+            "text": "36%",
+            "x": 0.662,
+            "y": 0.663,
+            "w": 0.043,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Tax & government spending",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 29,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.007,
+            "y": 0.662,
+            "w": 0.249,
+            "h": 0.022
+          },
+          "valueText": "29%",
+          "valueBox": {
+            "text": "29%",
+            "x": 0.941,
+            "y": 0.663,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Tax & government spending",
+          "issueBox": {
+            "text": "Tax & government spending",
+            "x": 0.007,
+            "y": 0.662,
+            "w": 0.249,
+            "h": 0.022
+          },
+          "valueText": "29%",
+          "valueBox": {
+            "text": "29%",
+            "x": 0.941,
+            "y": 0.663,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Managing the economy",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 34,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.01,
+            "y": 0.719,
+            "w": 0.209,
+            "h": 0.017
+          },
+          "valueText": "34%",
+          "valueBox": {
+            "text": "34%",
+            "x": 0.34,
+            "y": 0.717,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.01,
+            "y": 0.719,
+            "w": 0.209,
+            "h": 0.017
+          },
+          "valueText": "34%",
+          "valueBox": {
+            "text": "34%",
+            "x": 0.338,
+            "y": 0.717,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Managing the economy",
+      "responseOption": "Neither / Unsure",
+      "share": 33,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.01,
+            "y": 0.719,
+            "w": 0.209,
+            "h": 0.017
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.645,
+            "y": 0.715,
+            "w": 0.04,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.01,
+            "y": 0.719,
+            "w": 0.209,
+            "h": 0.017
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.645,
+            "y": 0.715,
+            "w": 0.04,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Managing the economy",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 33,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.01,
+            "y": 0.719,
+            "w": 0.209,
+            "h": 0.017
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.943,
+            "y": 0.715,
+            "w": 0.041,
+            "h": 0.019
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Managing the economy",
+          "issueBox": {
+            "text": "Managing the economy",
+            "x": 0.01,
+            "y": 0.719,
+            "w": 0.209,
+            "h": 0.017
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.943,
+            "y": 0.715,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Immigration & asylum",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 33,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.007,
+            "y": 0.772,
+            "w": 0.193,
+            "h": 0.017
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.34,
+            "y": 0.769,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.007,
+            "y": 0.772,
+            "w": 0.193,
+            "h": 0.017
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.34,
+            "y": 0.769,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Immigration & asylum",
+      "responseOption": "Neither / Unsure",
+      "share": 38,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.007,
+            "y": 0.772,
+            "w": 0.193,
+            "h": 0.017
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.653,
+            "y": 0.769,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.007,
+            "y": 0.772,
+            "w": 0.193,
+            "h": 0.017
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.653,
+            "y": 0.769,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Immigration & asylum",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 29,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.007,
+            "y": 0.772,
+            "w": 0.193,
+            "h": 0.017
+          },
+          "valueText": "29%",
+          "valueBox": {
+            "text": "29%",
+            "x": 0.941,
+            "y": 0.768,
+            "w": 0.042,
+            "h": 0.018
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Immigration & asylum",
+          "issueBox": {
+            "text": "Immigration & asylum",
+            "x": 0.007,
+            "y": 0.772,
+            "w": 0.193,
+            "h": 0.017
+          },
+          "valueText": "29%",
+          "valueBox": {
+            "text": "29%",
+            "x": 0.941,
+            "y": 0.768,
+            "w": 0.042,
+            "h": 0.018
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Defence and national security",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 32,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.008,
+            "y": 0.821,
+            "w": 0.261,
+            "h": 0.02
+          },
+          "valueText": "32%",
+          "valueBox": {
+            "text": "32%",
+            "x": 0.34,
+            "y": 0.823,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.008,
+            "y": 0.821,
+            "w": 0.261,
+            "h": 0.02
+          },
+          "valueText": "32%",
+          "valueBox": {
+            "text": "32%",
+            "x": 0.34,
+            "y": 0.823,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Defence and national security",
+      "responseOption": "Neither / Unsure",
+      "share": 33,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.008,
+            "y": 0.821,
+            "w": 0.261,
+            "h": 0.02
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.631,
+            "y": 0.821,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.008,
+            "y": 0.821,
+            "w": 0.261,
+            "h": 0.02
+          },
+          "valueText": "33%",
+          "valueBox": {
+            "text": "33%",
+            "x": 0.631,
+            "y": 0.821,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Defence and national security",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 35,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.008,
+            "y": 0.821,
+            "w": 0.261,
+            "h": 0.02
+          },
+          "valueText": "35%",
+          "valueBox": {
+            "text": "35%",
+            "x": 0.941,
+            "y": 0.821,
+            "w": 0.041,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Defence and national security",
+          "issueBox": {
+            "text": "Defence and national security",
+            "x": 0.008,
+            "y": 0.821,
+            "w": 0.261,
+            "h": 0.02
+          },
+          "valueText": "35%",
+          "valueBox": {
+            "text": "35%",
+            "x": 0.941,
+            "y": 0.821,
+            "w": 0.041,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Crime & social order",
+      "responseOption": "Albanese-led Labor government is best",
+      "share": 31,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.009,
+            "y": 0.876,
+            "w": 0.179,
+            "h": 0.015
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.34,
+            "y": 0.875,
+            "w": 0.038,
+            "h": 0.015
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.009,
+            "y": 0.876,
+            "w": 0.179,
+            "h": 0.015
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.34,
+            "y": 0.875,
+            "w": 0.038,
+            "h": 0.015
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Crime & social order",
+      "responseOption": "Neither / Unsure",
+      "share": 38,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.009,
+            "y": 0.876,
+            "w": 0.179,
+            "h": 0.015
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.641,
+            "y": 0.874,
+            "w": 0.04,
+            "h": 0.016
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.009,
+            "y": 0.876,
+            "w": 0.179,
+            "h": 0.015
+          },
+          "valueText": "38%",
+          "valueBox": {
+            "text": "38%",
+            "x": 0.641,
+            "y": 0.874,
+            "w": 0.04,
+            "h": 0.016
+          }
+        }
+      ]
+    },
+    {
+      "measure": "management",
+      "issue": "Crime & social order",
+      "responseOption": "Dutton-led Liberal government is best",
+      "share": 31,
+      "reads": [
+        {
+          "scale": 3,
+          "ocrCache": "2022-12-management-ocr-3x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.009,
+            "y": 0.876,
+            "w": 0.179,
+            "h": 0.015
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.941,
+            "y": 0.874,
+            "w": 0.041,
+            "h": 0.017
+          }
+        },
+        {
+          "scale": 4,
+          "ocrCache": "2022-12-management-ocr-4x-accurate.json",
+          "issueText": "Crime & social order",
+          "issueBox": {
+            "text": "Crime & social order",
+            "x": 0.009,
+            "y": 0.876,
+            "w": 0.179,
+            "h": 0.015
+          },
+          "valueText": "31%",
+          "valueBox": {
+            "text": "31%",
+            "x": 0.941,
+            "y": 0.874,
+            "w": 0.041,
+            "h": 0.017
+          }
+        }
+      ]
+    }
+  ]
+}
