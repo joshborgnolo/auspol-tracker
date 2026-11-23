@@ -4937,7 +4937,7 @@ const linksOf = (p) => {
     const h = hostOf(p.url);
     const key = Object.keys(CITE_LABEL).find((d) => onHost(h, [d]));
     out.push({ k: "cite", t: key ? CITE_LABEL[key] : "Report (" + h + ")", href: p.url, title: "The published report this poll’s figures were read from" });
-    if (REPORT_OVERVIEW.has(house)) out.push({ k: "overview", t: "Landing-page overview", href: REPORT_OVERVIEW.get(house),
+    if (REPORT_OVERVIEW.has(house)) out.push({ k: "overview", t: by + " landing-page overview", href: REPORT_OVERVIEW.get(house),
       title: "The publisher’s standing overview of this pollster’s coverage and latest reports" });
   }
   // the archived copy rides on the link it falls back for (§6a header)

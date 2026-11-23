@@ -237,7 +237,7 @@ for (const c of A.cycles) {
       assert.ok(cite >= 0, `${label} ${p.pollster} ${p.released}: report link is present`);
       const overview = p.links[cite + 1];
       assert.equal(overview?.k, "overview", `${label} ${p.pollster} ${p.released}: overview follows the report`);
-      assert.equal(overview.t, "Landing-page overview");
+      assert.equal(overview.t, "Newspoll landing-page overview");
       assert.equal(overview.href, href);
       assert.equal(p.links.filter((l) => l.k === "overview").length, 1, "one overview link per row");
     }
