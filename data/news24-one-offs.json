@@ -2769,30 +2769,49 @@
     "start": "2026-09-15",
     "end": "2026-09-22"
    },
-   "sample": 1500,
+   "sample": 1471,
+   "sampleEff": 862,
    "published": "2026-09-23T05:00",
-   "question": "Who is to blame for the September 2026 interest-rate rise — the government, the RBA, or both?",
-   "questionWordingSource": "later-article-reference",
-   "responseOptions": null,
-   "articleUrl": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+   "question": "The RBA is expected to raise interest rates again this month. Who do you think is most to blame?",
+   "questionWordingSource": "apc-methodology-statement",
+   "responseOptions": [
+    "The Federal Government",
+    "The Reserve Bank of Australia",
+    "Both the Federal Government and the Reserve Bank of Australia equally",
+    "Banks and other lenders",
+    "Unsure"
+   ],
+   "articleUrl": "https://www.news24.com.au/politics/australian-politics/treasurer-jim-chalmers-blasted-scott-morrison-when-rates-hit-035pc-heres-what-he-says-now/news-story/e6d8674df4efa29974f7aedf86a6a26e",
    "data": {
     "tables": [
      {
       "headers": [
        "All voters",
-       "Blame government or RBA or both"
+       "The Federal Government",
+       "The Reserve Bank of Australia",
+       "Both the Federal Government and the Reserve Bank of Australia equally",
+       "Banks and other lenders",
+       "Unsure"
       ],
       "rows": [
        [
         "",
-        "64"
+        "30",
+        "9",
+        "34",
+        "7",
+        "20"
        ]
       ]
      }
     ],
-    "prose": []
+    "prose": [
+     "The poll found 64 per cent of people blamed either the government alone or both the government and RBA for the rate increase.",
+     "Thirty per cent said the federal government was most to blame, while another 34 per cent blamed the government and RBA equally.",
+     "Just nine per cent blamed the Reserve Bank alone, seven per cent pointed to banks and other lenders, while 20 per cent were unsure."
+    ]
    },
-   "note": "Not present in the 21 Sep article body; the 2026-10-06 Pulse article reports 'the previous News24 Pulse found 64 per cent of voters blame either the government or the RBA, or both'. Likely a companion story."
+   "note": "Question wording and response options come from YouGov's 22 Sep 2026 APC methodology statement. News24's 1 Oct follow-up reports the results; its 64% combines only the Federal Government (30%) and both equally (34%) responses."
   },
   {
    "id": "household-financial-situation",

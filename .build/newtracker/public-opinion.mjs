@@ -2050,7 +2050,7 @@ const TITLES = {
   "election-commitments": "Should governments always keep their election promises?",
   "budget-2026-trust": "Has the budget changed people’s trust in the government?",
   /* cost of living and the economy */
-  "rate-hike-blame": "Who is to blame for the September 2026 rate rise?",
+  "rate-hike-blame": "Who is most to blame for an expected interest-rate rise?",
   "regulation-attitudes": "Does Australia have too much regulation, or too little?",
   "working-life-concerns": "Worries about working life over the next five years",
   "large-company-behaviour": "Are big companies behaving ethically?",
