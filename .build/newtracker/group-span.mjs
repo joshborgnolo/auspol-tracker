@@ -367,7 +367,11 @@ function pairAt(L, sm, ka, kb, PsB) {
 }
 
 /* -------------------------------------------------------------------- fit */
-export const SPAN_GRID = { w: [0.0003, 0.001, 0.003], s: [0.03, 0.1, 0.3], kappa: [0.7, 1, 1.41, 2], wmu: [0.0005, 0.0015, 0.0045] };
+/* ω reaches well past what any set picks (language, states and seat types
+   settle at 0.006, the rest at or below 0.003), so the walk's pace is the
+   readings' choice and not the grid's edge: with 0.003 the top, "Other
+   language" sat on its term-long average above the polls' recent run */
+export const SPAN_GRID = { w: [0.0003, 0.001, 0.003, 0.006, 0.012, 0.024], s: [0.03, 0.1, 0.3], kappa: [0.7, 1, 1.41, 2], wmu: [0.0005, 0.0015, 0.0045] };
 /* raw: one set's readings, each { group, house, day, src: "poll"|"aes"|"count",
    z, V, idx }. days: the days the caller wants each group's gap on. pair:
    [a, b] two days whose joint gap is wanted (the change since the election).
