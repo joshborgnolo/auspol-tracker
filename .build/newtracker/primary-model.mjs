@@ -373,7 +373,9 @@ export function logPost(v, ctx, kappa) {
   const f = runFilter(ctx.obs, ctx.L, ctx.events, th, { anchor: ctx.anchor, jumps: ctx.jumps, kappa, lone: ctx.L.lone });
   let lp = f.ll;
   for (let i = 0; i < v.length; i++) lp -= (v[i] - pr.mean[i]) ** 2 / (2 * pr.sd[i] ** 2);
-  return lp;
+  /* a settings vector the filter can't take (an overflow far out in a
+     direction the data don't pin) has no posterior weight */
+  return Number.isFinite(lp) ? lp : -Infinity;
 }
 function mapSearch(v0, ctx, kappa, { tol = 0.04, step0 = 0.7 } = {}) {
   const v = v0.slice(); let best = logPost(v, ctx, kappa), step = v.map(() => step0), evals = 1;
@@ -445,8 +447,8 @@ export function fitSettings(ctx, { start = null, M = 32, seed = 1, quick = false
       comps.push({ v: u, lp: logPost(u, ctx, kappa), lq: lq(u) });
     }
     /* self-normalised importance weights; the mode enters as a draw of q too */
-    const lw = comps.map((c) => c.lp - c.lq), mx = Math.max(...lw);
-    let z = 0; comps.forEach((c, i) => { c.w = Math.exp(lw[i] - mx); z += c.w; });
+    const lw = comps.map((c) => (Number.isFinite(c.lp) && Number.isFinite(c.lq) ? c.lp - c.lq : -Infinity)), mx = Math.max(...lw);
+    let z = 0; comps.forEach((c, i) => { c.w = Number.isFinite(mx) ? Math.exp(lw[i] - mx) : (i === 0 ? 1 : 0); z += c.w; });
     comps.forEach((c) => { c.w /= z; });
     ctx.laplace = { sd: Array.from({ length: n }, (_, i) => Math.sqrt(C[i * n + i])), ess: 1 / comps.reduce((a, c) => a + c.w * c.w, 0) };
   }
@@ -656,11 +658,13 @@ export function groupFilter(obs, houses, th, { t0, events, store = false }) {
     const t = events[e], dt = t - prev;
     if (dt > 0) for (let i = 0; i < D; i++) for (let j = 0; j < D; j++) P[i * N + j] += dt * w2 * iJ(i, j);
     while (oi < obs.length && obs[oi].day === t) {
-      const o = obs[oi++], b = hi.get(o.house), bo = b * D;
-      /* H = [I | … I at block b …] */
-      for (let r = 0; r < N; r++) for (let k = 0; k < D; k++) PH[r * D + k] = P[r * N + k] + P[r * N + bo + k];
-      for (let a = 0; a < D; a++) for (let c = 0; c < D; c++) S[a * D + c] = th.kappa * o.V[a * D + c] + PH[a * D + c] + PH[(bo + a) * D + c];
-      for (let a = 0; a < D; a++) v[a] = o.z[a] - x[a] - x[bo + a];
+      const o = obs[oi++], b = o.noLean ? null : hi.get(o.house), bo = b == null ? -1 : b * D;
+      /* H = [I | … I at block b …]; a reading with no lean of its own (the
+         count) sees γ alone, and its error is given (fixedV), not sampling */
+      const kv = o.fixedV ? 1 : th.kappa;
+      for (let r = 0; r < N; r++) for (let k = 0; k < D; k++) PH[r * D + k] = P[r * N + k] + (bo >= 0 ? P[r * N + bo + k] : 0);
+      for (let a = 0; a < D; a++) for (let c = 0; c < D; c++) S[a * D + c] = kv * o.V[a * D + c] + PH[a * D + c] + (bo >= 0 ? PH[(bo + a) * D + c] : 0);
+      for (let a = 0; a < D; a++) v[a] = o.z[a] - x[a] - (bo >= 0 ? x[bo + a] : 0);
       const ld = cholIn(S, D, Ls);
       tmp.set(v); cholSolveVec(Ls, D, tmp);
       let q = 0; for (let a = 0; a < D; a++) q += v[a] * tmp[a];
@@ -707,12 +711,16 @@ function crossGamma(sm, a, b) {               // Cov(γ_a, γ_b), a ≤ b, D×D
    days and of (γ_a, γ_b) for each pair. raw: readings of this set. */
 export function fitSet(raw, { t0, t1, days, pairs = [], nDraw = 2000, seed = 1, grid = GRID }) {
   const byGroup = new Map();
-  for (const r of raw) { const o = gapObs(r); if (!o || o.day > t1) continue; (byGroup.get(r.group) || byGroup.set(r.group, []).get(r.group)).push({ ...o, src: r }); }
+  for (const r of raw) {
+    const o = r.zV ? { z: Float64Array.from(r.zV.z), V: Float64Array.from(r.zV.V), day: r.day, house: r.house, noLean: !!r.noLean, fixedV: true } : gapObs(r);
+    if (!o || o.day > t1) continue;
+    (byGroup.get(r.group) || byGroup.set(r.group, []).get(r.group)).push({ ...o, src: r });
+  }
   const groups = [...byGroup.keys()], G = groups.length;
   const temper = G > 1 ? (G - 1) / G : 1;
   const prep = groups.map((g) => {
     const obs = byGroup.get(g).sort((a, b) => a.day - b.day);
-    const houses = [...new Set(obs.map((o) => o.house))];
+    const houses = [...new Set(obs.filter((o) => !o.noLean).map((o) => o.house))];
     const tFirst = Math.min(obs[0].day, t0) - 1;
     const evs = [...new Set([tFirst, ...obs.map((o) => o.day), ...days.filter((d) => d >= tFirst && d <= t1), ...pairs.flat().filter((d) => d >= tFirst && d <= t1), t1])].sort((a, b) => a - b);
     return { g, obs, houses, tFirst, events: evs };
@@ -773,6 +781,11 @@ export function fitSet(raw, { t0, t1, days, pairs = [], nDraw = 2000, seed = 1, 
 }
 
 /* ============================================================== anchors */
+/* the polls' final consensus (this model, election eve) minus the count at
+   the 2007–2025 elections, mean and spread in points (spread = sd·√(1+1/n),
+   the mean's own doubt included; One Nation from the three elections it was
+   polled apart) – .build/analysis/primary-bayes run-history.mjs */
+export const PRIM_MISS = { alp: [1.03, 2.16], lnp: [-0.70, 2.19], grn: [0.56, 0.70], onp: [0.78, 1.26], oth: [-1.22, 1.25] };
 /* the prior on the election day: the count moved by the polls' average miss
    at past elections (miss: { party: [mean, sd] } in points, the polls'
    final consensus minus the count), on the log-ratio scale */
@@ -784,4 +797,33 @@ export function anchorFrom(result, miss, parties = PARTIES) {
   const cov = new Float64Array(D * D);
   for (let i = 0; i < D; i++) for (let j = 0; j < D; j++) cov[i * D + j] = (i === j ? sd[i] ** 2 : 0) + sd[D] ** 2;
   return { mean, cov };
+}
+
+/* ============================================================ undecided */
+/* The undecided share on one basis (can't say with no leaner asked, or
+   still undecided after a leaner) is the same model with two categories,
+   undecided and decided: each pollster's lean on it (its own wording) drifts,
+   the regular pollsters average zero, each counting once. There is no count
+   to start from, so the prior on the first day is wide around the first
+   readings. readings: [{ house, day, n (all respondents), und, idx }].
+   Returns monthly summaries at `months` [{ ym, day }], today and a month
+   ago, each house's lean, and (pairs) the change between two days. */
+export const UND_PARTIES = ["und", "dec"];
+export function fitUndecided(readings, { t0, t1, months, pairs = [], nDraw = 2000, seed = 20261126, M = 16, minCore = 4 }) {
+  const rs = readings.filter((r) => r.und > 0 && r.und < 50 && r.day > t0 && r.day <= t1).map((r, i) => {
+    const vals = [r.und, 100 - r.und];
+    return { ...r, idx: r.idx ?? i, cats: [[0], [1]], vals, full: true, step: stepOf([r.und]) };
+  });
+  if (rs.length < 2) return null;
+  const first = rs.slice(0, Math.min(5, rs.length)).map((r) => r.und).sort((a, b) => a - b)[Math.floor(Math.min(5, rs.length) / 2)];
+  const anchor = { mean: Float64Array.from([Math.log(first / (100 - first))]), cov: Float64Array.from([0.4 ** 2]) };
+  const days = months.map((m) => m.day).filter((d) => d > t0 && d <= t1);
+  const fit = fitPrimary(rs, { t0, t1, anchor, jumps: new Set(), parties: UND_PARTIES, days, pairs, nDraw, seed, M, minCore });
+  const colU = (draws) => { const n = draws.length / 2, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * draws[i * 2]; return o; };
+  const sum = (c) => { const lo = quant(c, 0.025), hi = quant(c, 0.975); return { v: mean(c), lo, hi, ci: (hi - lo) / 2 }; };
+  const out = months.filter((m) => m.day > t0 && m.day <= t1).map((m) => ({ ym: m.ym, day: m.day, ...sum(colU(fit.shares(m.day))) }));
+  const pairOut = pairs.map(([a, b]) => { const c = colU(fit.pair(a, b)); return { a, b, ...sum(c), pUp: mean(c.map((v) => (v > 0 ? 1 : 0))) }; });
+  const leans = Object.fromEntries(fit.L.houses.map((h) => { const s = sum(colU(fit.lean(h))); return [h, s]; }));
+  return { months: out, now: sum(colU(fit.shares(t1))), pairs: pairOut, leans, core: fit.L.core, houses: [...new Set(rs.map((r) => r.house))],
+    n: rs.length, ess: fit.ctx.laplace ? fit.ctx.laplace.ess : null, kappa: Object.fromEntries(fit.settings.kappa) };
 }

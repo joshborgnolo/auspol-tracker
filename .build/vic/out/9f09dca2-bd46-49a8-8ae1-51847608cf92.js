@@ -351,6 +351,20 @@ window.AUSPOL = (function () {
      emptiness to offer a retry. Two tries, one beat apart; on the second miss
      the promise is dropped (never settled to {}), so calling again really
      does refetch. */
+  /* the past terms' primary vote by group (build.mjs's group-history sidecar),
+     fetched the first time a group view opens a window behind this term;
+     D.groupHistory answers null until it lands */
+  let _groupHist = null, _groupHistPromise = null;
+  const loadGroupHistory = () => {
+    if (_groupHist) return Promise.resolve(_groupHist);
+    if (!_groupHistPromise) {
+      const url = window.AP_GROUP_HIST;
+      _groupHistPromise = (url ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("group history HTTP " + r.status)))) : Promise.resolve(null))
+        .then((j) => { _groupHist = j; return j; })
+        .catch((e) => { console.error("group history failed to load", e); _groupHistPromise = null; return null; });
+    }
+    return _groupHistPromise;
+  };
   let _cycleSource = null;
   let _cyclePromise = null;
   const loadCycleSource = () => {
@@ -465,6 +479,9 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
+    // null until loadGroupHistory() has resolved (federal; the sidecar build.mjs ships)
+    get groupHistory() { return _groupHist; },
+    loadGroupHistory,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,

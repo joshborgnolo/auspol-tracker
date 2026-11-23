@@ -19,7 +19,7 @@ import { bonhamReplica } from "./bonham-replica.mjs";
 import { kalmanRun, kalmanFit } from "./kalman.mjs";
 import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as dmean, quant as dquant } from "./direction-model.mjs";
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
-import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
+import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
 
@@ -1015,7 +1015,7 @@ for (const k of PRIMARY_KEYS) {
    is the count moved by it.
    PRIM_JUMPS: changes of prime minister or opposition leader this term,
    where the shares may step. */
-const PRIM_MISS = { alp: [1.03, 2.16], lnp: [-0.70, 2.19], grn: [0.56, 0.70], onp: [0.78, 1.26], oth: [-1.22, 1.25] };
+// PRIM_MISS lives in primary-model.mjs (one copy for this file and build-group-history.mjs)
 const PRIM_JUMPS = ["2025-05-13", "2026-02-12"];   // Ley, then Taylor, lead the Liberals
 /* the D-base houses (POLL_BASES, §5b: undecided set aside, no leaner) – a
    printed undecided share there is out of the shares' base */
@@ -1045,7 +1045,8 @@ const PRIMM = (() => {
   const anchor = anchorFrom(ELECTION, PRIM_MISS);
   const jumps = new Set(PRIM_JUMPS.map(pmDay));
   const eventDays = POLLS.map((p) => Math.round((pmDay(p.dateStart || p.date) + pmDay(p.date)) / 2));
-  const fit = fitPrimary(readings, { t0, t1, anchor, jumps, days: [...months.map((m) => m.day), t1 - 30], pairs: [[t1, t1 - 30]], eventDays,
+  const emDay = Math.min(pmDay(ELECTION.date.slice(0, 7) + "-15"), t1);   // the election month's middle (§7gm's lines start there)
+  const fit = fitPrimary(readings, { t0, t1, anchor, jumps, days: [...months.map((m) => m.day), t1 - 30, emDay], pairs: [[t1, t1 - 30]], eventDays,
     trend: true, nDraw: +(process.env.PRIM_NDRAW || 2000), seed: 20261123 });
   const P = PM_PARTIES.length;
   const colOf = (draws, q) => { const n = draws.length / P, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * draws[i * P + q]; return o; };
@@ -1080,7 +1081,7 @@ const PRIMM = (() => {
     + ` | now ${PM_PARTIES.map((k) => `${k} ${r1(now[k].v)} ±${r1(now[k].ci)}`).join(" ")}`
     + ` | ESS ${fit.ctx.laplace ? fit.ctx.laplace.ess.toFixed(1) : "-"} of ${s.comps.length}`
     + ` | κ ${JSON.stringify(Object.fromEntries([...s.kappa].filter(([h]) => !fit.L.lone.has(h))))}`);
-  return { fit, readings, t0, t1, months, at, now, prev, chg, pAhead, leanNow, leanMonths,
+  return { fit, readings, t0, t1, months, emDay, at, now, prev, chg, pAhead, leanNow, leanMonths,
     byKey: new Map(readings.map((r) => [r.key, r])) };
 })();
 const aggPrimary = MONTHS.map((ym) => {
@@ -3823,8 +3824,67 @@ const softAge = softAgeWaves.length >= 2 * SOFT_AGE_POOL ? (() => {
     base: { from: first[0].dateLabel, to: first[SOFT_AGE_POOL - 1].dateLabel, ...softAgePooled(first) },
   };
 })() : null;
+/* ---- 5bm. the undecided lines on the model (federal) ---------------------
+   The two undecided bases the pollsters print – can't say with no leaner
+   asked (Roy Morgan, Spectre) and still undecided after a leaner (Newspoll,
+   RedBridge, DemosAU, Fox & Hedgehog; Essential keeps its own in the base)
+   – each on the primary model with two categories (primary-model.mjs
+   fitUndecided): each pollster's lean on it (its own wording) drifts, the
+   regular pollsters average zero, each counting once, and the band is the
+   posterior's. The line replaces the monthly average, whose level jumped
+   with whichever pollsters reported that month (RedBridge reads 1.6 above
+   the average pollster after its leaner, Fox & Hedgehog 2.0 below). The
+   tile's figure, its change on a month and since the term's first month
+   come from the same draws. Past terms are fitted the same way, term by
+   term, by .build/build-undecided-history.mjs into
+   data/undecided-history-model.json (their polls do not change), read here
+   for the panel's window. After preferences and soft stay as they were:
+   other questions, one house each. */
+const UNDM = JUR ? null : (() => {
+  const tStart = Date.now();
+  const t0 = pmDay(ELECTION.date), t1 = pmDay(LATEST_ISO);
+  const months = MONTHS.map((ym) => ({ ym, day: ym === LATEST_ISO.slice(0, 7) ? t1 : Math.min(pmDay(ym + "-15"), t1) })).filter((m) => m.day > t0);
+  const out = {};
+  for (const id of ["first", "leaner"]) {
+    const readings = undecidedRows.filter((r) => r.u.basis === id && !/^EMRS/.test(r.p.pollster)).map(({ p, u }, i) => {
+      const s = pmDay(p.dateStart || p.date), e = pmDay(p.date);
+      return { house: p.pollster, day: Math.round((s + e) / 2), n: rowN(p) / HL_DEFF, und: u.v, idx: i };
+    }).sort((a, b) => a.day - b.day);
+    if (readings.length < 4) continue;
+    const firstMonth = months.find((m) => m.day >= readings[0].day) || months[0];
+    const fit = fitUndecided(readings, { t0, t1, months, pairs: [[t1, t1 - 30], [t1, firstMonth.day]], seed: id === "first" ? 20261126 : 20261127 });
+    if (fit) out[id] = { ...fit, firstYm: firstMonth.ym };
+  }
+  console.log(`undecided model: ${Object.entries(out).map(([id, f]) => `${id} ${r1(f.now.v)} [${r1(f.now.lo)}, ${r1(f.now.hi)}] (${f.n} polls, zero ${f.core.join("/") || "–"})`).join(" | ")} in ${((Date.now() - tStart) / 1000).toFixed(1)}s`);
+  return out;
+})();
+for (const s of undecidedSeries) {
+  const f = UNDM && UNDM[s.id];
+  if (!f) continue;
+  const [mo, since] = f.pairs;
+  s.monthly = f.months.map((m) => ({ ym: m.ym, x: mx(m.ym), v: r1(m.v), lo: r1(m.lo), hi: r1(m.hi), ci: r1(m.ci),
+    k: s.polls.filter((d) => d.ym === m.ym).length }));
+  s.now = { v: r1(f.now.v), ci95: r1(f.now.ci), lo: r1(f.now.lo), hi: r1(f.now.hi), n: s.polls.filter((d) => ddays(refNow, Date.parse(d.released)) <= SPARSE_K.window).length,
+    chg: r1(mo.v), changeCi95: r1(mo.ci), changeSig: mo.lo > 0 || mo.hi < 0, pUp: r2(mo.pUp),
+    since: { from: f.firstYm, chg: r1(since.v), lo: r1(since.lo), hi: r1(since.hi), sig: since.lo > 0 || since.hi < 0, pUp: r2(since.pUp) },
+    model: true };
+  s.leans = Object.fromEntries(Object.entries(f.leans).map(([h, l]) => [h, { v: r1(l.v), lo: r1(l.lo), hi: r1(l.hi) }]));
+  s.zero = f.core;
+  s.model = true;
+}
+/* the past terms' modelled lines (build-undecided-history.mjs) and the polls
+   behind them, for the panel's window; federal only */
+const undecidedHistory = JUR ? null : (() => {
+  let M = null, W = null;
+  try { M = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "undecided-history-model.json"), "utf8")); } catch { return null; }
+  try { W = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "undecided-history.json"), "utf8")); } catch { return null; }
+  const polls = W.waves.filter((w) => w.und > 0 && (w.basis === "first" || w.basis === "leaner") && w.end < ELECTION.date)
+    .map((w) => ({ x: dx(w.end), v: w.und, basis: w.basis, pollster: w.house, dateLabel: fwLabel(w.start, w.end), released: w.end, sample: w.n ?? null }));
+  return { terms: M.terms, polls, built: M.built, src: M.src || null };
+})();
 const undecided = undecidedSeries.length ? {
   series: undecidedSeries,
+  ...(undecidedHistory ? { history: undecidedHistory } : {}),
   softAge,
   softResolve,
   n: undecidedRows.length,
@@ -6413,7 +6473,9 @@ for (const r of individualPolls) {
   own). */
 const DEMO_STATE_ELECTION = {
 
-  x: mx("2025-05"),
+  /* polling day itself, where the all-voters ring sits: the group lines
+     (§7gm) start in the election month, and a dotted lead-in joins them */
+  x: JUR ? mx("2025-05") : dx(ELECTION.date),
   groups: {
     "Nat": [34.56, 31.82, 6.4, 12.2, 15.01],
     "NSW": [35.2, 31.53, 6.02, 11.06, 16.19],
@@ -6437,7 +6499,9 @@ const DEMO_STATE_ELECTION = {
    other election display. Keys are the location set's group labels. */
 const DEMO_LOC_ELECTION = {
 
-  x: mx("2025-05"),
+  /* polling day itself, where the all-voters ring sits: the group lines
+     (§7gm) start in the election month, and a dotted lead-in joins them */
+  x: JUR ? mx("2025-05") : dx(ELECTION.date),
   groups: {
     "Nat": [34.56, 31.82, 6.4, 12.2, 15.01],
     "Inner metro": [38.35, 27.98, 3.49, 16.5, 13.68],
@@ -6550,6 +6614,9 @@ const DEMO_RESOLVE_BETA = (() => {
    election day. Backtest (predicting each new poll's group figures from
    the waves before it, this term): error 1.65 v 2.03 points for the
    pooled-gap construction it replaces. */
+/* a pollster consensus gap's error against a counted one, a party (§7g's
+   DEMO_INSTR, defined from it below) */
+const GROUP_INSTR = 1.5;
 const GROUPM = (() => {
   if (JUR || !PRIMM || !DEMOGRAPHICS || !Array.isArray(DEMOGRAPHICS.waves)) return null;
   const tStart = Date.now();
@@ -6591,7 +6658,41 @@ const GROUPM = (() => {
     for (const set of DEMO_SETS) { const gs = []; for (const group of set.groups) { const g = h[set.id] && h[set.id][group] && normE(h[set.id][group]); if (g) gs.push([group, g]); } if (gs.length) sets.push([set.id, gs]); }
     add("election", w.pollster, w.date, tot, reads, sets);
   }
-  const { t0, t1, months } = PRIMM, P = PM_PARTIES.length, D = P - 1;
+  /* the Australian Election Study 2025: each group's vote at the election
+     against the AES's own total, read on polling day as one more house
+     with its own (shrunk) reading of each gap – the AES and the polls
+     disagree beyond sampling on several groups (gender, the Coalition's age
+     gradient), and the model weighs it as it weighs a pollster. Its group
+     samples are weighted (design effect ~1.5). */
+  const AES25 = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "aes-2025-groups.json"), "utf8")); } catch { return null; } })();
+  const t0E = pmDay(ELECTION.date);
+  if (AES25 && AES25.all) for (const set of DEMO_SETS) for (const group of set.groups) {
+    const g = AES25.sets && AES25.sets[set.id] && AES25.sets[set.id][group];
+    if (!g || !g.n || DEMO_KEYS.some((k) => g[k] == null)) continue;
+    raw.push({ src: "aes", set: set.id, group, house: "AES 2025", day: t0E, n: g.n / 1.5, s: DEMO_SHARE[group], g: toPM(g), t: toPM(AES25.all), rel: ELECTION.date });
+  }
+  /* the count, where it was cut (each state's and each AEC region class's
+     result against the nation's): polling day's gap itself, with the error
+     a pollster's consensus gap shows against a counted one (DEMO_INSTR, 1.5
+     points a party), and no lean of its own */
+  const natE = DEMO_STATE_ELECTION.groups.Nat;
+  for (const [E, setId] of [[DEMO_STATE_ELECTION, "state"], [DEMO_LOC_ELECTION, "location"]]) for (const [group, arr] of Object.entries(E.groups)) {
+    if (group === "Nat" || !DEMO_SETS.some((st) => st.id === setId && st.groups.includes(group))) continue;
+    const gs = toPM(Object.fromEntries(DEMO_KEYS.map((k, i) => [k, arr[i]]))).map((v) => Math.max(v, 0.5) / 100);
+    const ns = toPM(Object.fromEntries(DEMO_KEYS.map((k, i) => [k, natE[i]]))).map((v) => Math.max(v, 0.5) / 100);
+    const sg = gs.reduce((a, b) => a + b, 0), sn = ns.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < gs.length; i++) { gs[i] /= sg; ns[i] /= sn; }
+    const Dd = gs.length - 1, z = [], V = [], e2 = (GROUP_INSTR / 100) ** 2;
+    for (let k = 0; k < Dd; k++) z.push(Math.log(gs[k] / gs[Dd]) - Math.log(ns[k] / ns[Dd]));
+    for (let a = 0; a < Dd; a++) for (let b = 0; b < Dd; b++) V.push(e2 * ((a === b ? 1 / (gs[a] * gs[a]) : 0) + 1 / (gs[Dd] * gs[Dd])));
+    raw.push({ src: "count", set: setId, group, house: "Count", day: t0E, noLean: true, zV: { z, V }, rel: ELECTION.date });
+  }
+  const { t0, t1, months: monthsP, emDay } = PRIMM, P = PM_PARTIES.length, D = P - 1;
+  /* every group's line can start in the election month (its middle, where
+     the election marks sit), as the polls at and after the election, the
+     AES and the count place each gap there */
+  const emYm = ELECTION.date.slice(0, 7);
+  const months = [{ ym: emYm, day: emDay }, ...monthsP.filter((m) => m.ym !== emYm)];
   const days = [...new Set([...months.map((m) => m.day), t1, t0])];
   /* the national figures' draws on the log-ratio scale, at each day */
   const natAt = new Map(days.filter((d) => d !== t0).map((d) => {
@@ -6616,11 +6717,14 @@ const GROUPM = (() => {
         }
         return Object.fromEntries(PM_PARTIES.map((k, q) => { const lo = pmQuant(cols[q], 0.025), hi = pmQuant(cols[q], 0.975); return [k, { v: pmMean(cols[q]), ci: (hi - lo) / 2 }]; }));
       };
-      const firstTerm = Math.min(...g.obs.filter((o) => o.src.src === "term").map((o) => o.day));
+      /* from the election month where polling day has a reading (polls at
+         the election, the AES, the count), else from the group's first poll */
+      const firstTerm = g.obs.some((o) => o.src.src !== "term") ? emDay : Math.min(...g.obs.filter((o) => o.src.src === "term").map((o) => o.day));
       out.set(setId + "|" + group, {
         now: sumAt(t1, (i) => natAt.get(t1)[i]),
         election: sumAt(t0, () => resAlr),
         monthly: months.filter((m) => m.day >= firstTerm - 15).map((m) => ({ ym: m.ym, s: sumAt(m.day, (i) => natAt.get(m.day)[i]) })).filter((m) => m.s),
+        sources: [...new Set(g.obs.map((o) => o.src.src))],
         houses: g.houses, beta: g.beta,
       });
     }
@@ -6715,7 +6819,7 @@ const DEMO_ELECTION = (() => {
    ends - measured from this, about 40% of the two instruments' difference
    would read as change. Per party: [the estimate, its 95% margin, the
    polls' figure or null, the AES's or null - both on the result's scale]. */
-const DEMO_INSTR = 1.5;
+const DEMO_INSTR = GROUP_INSTR;
 const DEMO_VOTE_MIN = 10;
 const DEMO_VOTE = (() => {
   if (!DEMO_ELECTION && !DEMO_AES) return null;
@@ -6748,7 +6852,16 @@ const DEMO_VOTE = (() => {
     };
   }
   if (!Object.keys(sets).length) return null;
-  return { x: E.x, elec: ELEC, instr: DEMO_INSTR, aesSrc: DEMO_AES ? DEMO_AES.src : null, sets };
+  /* federal: the mark is the group model's estimate for polling day (§7gm),
+     which already weighs the polls before and after it, the AES and the
+     count; the polls' and the AES's own figures stay on the tip */
+  if (GROUPM) for (const [setId, st] of Object.entries(sets)) for (const [group, cell] of Object.entries(st.groups)) {
+    const gm = GROUPM.get(setId + "|" + group), ge = gm && gm.election;
+    if (!ge) continue;
+    for (const k of DEMO_KEYS) if (cell[k]) cell[k] = [r1(ELEC_T * ge[k].v / 100), r1(ge[k].ci), cell[k][2], cell[k][3]];
+    cell.model = true;
+  }
+  return { x: E.x, elec: ELEC, instr: DEMO_INSTR, aesSrc: DEMO_AES ? DEMO_AES.src : null, sets, ...(GROUPM ? { model: true } : {}) };
 })();
 
 /* One figure per group and party, built as the headline is. Each poll says
@@ -10607,6 +10720,20 @@ window.AUSPOL = (function () {
      emptiness to offer a retry. Two tries, one beat apart; on the second miss
      the promise is dropped (never settled to {}), so calling again really
      does refetch. */
+  /* the past terms' primary vote by group (build.mjs's group-history sidecar),
+     fetched the first time a group view opens a window behind this term;
+     D.groupHistory answers null until it lands */
+  let _groupHist = null, _groupHistPromise = null;
+  const loadGroupHistory = () => {
+    if (_groupHist) return Promise.resolve(_groupHist);
+    if (!_groupHistPromise) {
+      const url = window.AP_GROUP_HIST;
+      _groupHistPromise = (url ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("group history HTTP " + r.status)))) : Promise.resolve(null))
+        .then((j) => { _groupHist = j; return j; })
+        .catch((e) => { console.error("group history failed to load", e); _groupHistPromise = null; return null; });
+    }
+    return _groupHistPromise;
+  };
   let _cycleSource = null;
   let _cyclePromise = null;
   const loadCycleSource = () => {
@@ -10721,6 +10848,9 @@ window.AUSPOL = (function () {
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
+    // null until loadGroupHistory() has resolved (federal; the sidecar build.mjs ships)
+    get groupHistory() { return _groupHist; },
+    loadGroupHistory,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,

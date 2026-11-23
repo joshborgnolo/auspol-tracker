@@ -8977,11 +8977,39 @@ function infoTerms(D) {
         term. <b>By age</b> pools Resolve’s not-firm share by age band the same way, {agePool} polls
         at a time; Resolve publishes no count for each band, so a band’s sample is the poll’s
         effective sample times the band’s share of adults.</span>
-        <span className="info-p"><b>How it’s built.</b> Each pollster’s figure answers its own
-        question, so none takes a house adjustment. The lines are monthly averages weighted by
-        sample size, and the all-voters figures pool the last six weeks of polls. A change since
-        the election is tested within each pollster’s own polls, with the bar raised for testing
-        several lines at once.</span></>) },
+        {(() => {
+          const US = (D.undecided && D.undecided.series) || [], uf = US.find((x) => x.id === "first"), ul = US.find((x) => x.id === "leaner");
+          const UH = D.undecided && D.undecided.history;
+          if (!(uf && uf.model)) return (
+            <span className="info-p"><b>How it’s built.</b> Each pollster’s figure answers its own
+            question, so none takes a house adjustment. The lines are monthly averages weighted by
+            sample size, and the all-voters figures pool the last six weeks of polls. A change since
+            the election is tested within each pollster’s own polls, with the bar raised for testing
+            several lines at once.</span>);
+          return (<>
+            <span className="info-p"><b>How the undecided lines are built.</b> Pollsters ask the
+            question two ways. Some take “can’t say” with no follow-up ({undWho("first")});
+            others first ask undecided voters which way they lean, and count only those still
+            undecided after that ({undWho("leaner") || "Newspoll, RedBridge, DemosAU and Fox & Hedgehog"}). The second
+            is a smaller share, so each way is its own line. Each line is estimated with the same
+            kind of model as the {xref("primary-vote", "decidedness", "primary vote")}: the share
+            moves a little each day, and each pollster reads it through a lean of its own – its
+            wording – which the model works out alongside the share. So a month is no longer high
+            just because the pollster that reads highest happened to report in it. The level is set
+            by the pollsters with four or more polls in the term, each counting once. The shaded band is the
+            line’s {xref("interval", "decidedness", "95% interval")}, and a change counts as
+            significant only when its own 95% interval excludes zero.</span>
+            {UH ? <span className="info-p"><b>Past terms.</b> The bar over the charts steps back
+            through every term since {UH.terms[0].from.slice(0, 4)}. Each past term is estimated the same way from that
+            term’s polls, so its line ends at its election and its level is set by that term’s own
+            pollsters. A pollster that changed how it polls (Newspoll from phone to online, Roy Morgan
+            from face-to-face to online) is a different pollster for this purpose.</span> : null}
+            <span className="info-p"><b>The other lines.</b> After preferences and not firm are one
+            question from one or two pollsters each, so they stay monthly averages weighted by sample
+            size, tested within each pollster’s own polls with the bar raised for testing several
+            lines at once.</span>
+          </>);
+        })()}</>) },
       entries: [] },
     { id: "s-mood", title: "Economic sentiment", nav: "Sentiment",
       lead: { id: "mood", body: (

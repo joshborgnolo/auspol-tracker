@@ -50,6 +50,12 @@ const RD_PEL_WHEN = RD_PEL_MODEL ? "for polling day, from the tables before and 
 const rdVoteSub = (grp, c) => {
   const polls = grp.polls ? grp.polls.n + " poll" + (grp.polls.n === 1 ? "" : "s") + " from " + rdList(grp.polls.houses.map(demoHouse)) : "";
   const aes = grp.aesN != null ? grp.aesN.toLocaleString() + " respondents in this group" : "";
+  /* federal: the mark is the group model's estimate for polling day, which
+     weighs the polls before and after it, the AES and (where cut) the count;
+     the AES's own reading stays quoted */
+  if (RD_PEL_MODEL) return "The model’s estimate for polling day, ±" + c[1].toFixed(1) + ", from the polls before and after the election"
+    + (polls ? " (" + polls + " in the six weeks before)" : "")
+    + (c[3] != null ? " and the Australian Election Study 2025 (" + aes + ", which read " + c[3].toFixed(1) + ")" : "");
   return c[2] != null && c[3] != null
     ? (RD_PEL_MODEL ? "Polls, read for polling day " : "Polls in the six weeks before polling day ") + c[2].toFixed(1) + " (" + polls + "); Australian Election Study " + c[3].toFixed(1) + " (" + aes + "); weighted together, ±" + c[1].toFixed(1)
     : c[2] != null
@@ -117,12 +123,44 @@ function RdPrimary({ rangeId, setRangeId }) {
   /* nothing in the three-week window under the subset: the headline quotes
      nothing, the monthly chart still draws (story override below) */
   const pvxDry = !!(pvx && !pvx.now);
-  /* The window bar stands in for the range tabs on the all-voters view with
-     every pollster: a group's figures and a pollster subset exist for this
-     term only, so those views keep the tabs. /vic/ keeps them too - it has
-     no past terms. */
-  const vwOn = !window.JUR && !G && !pvx;
-  const histOn = !!(vwOn && vw.hist && VH);
+  /* A group's past terms (data/group-history-model.json, built by
+     .build/build-group-history.mjs: each past term's national model moved by
+     the group's modelled gap, from that term's crosstabs and the AES at both
+     elections), fetched the first time a group view opens a window behind
+     this term, and shaped as the vote history is so the history scene draws
+     them exactly as it draws all voters' terms: one line per party per term,
+     its band, no count rings (no count cuts a group). */
+  const [ghTick, setGhTick] = useState(0);
+  const ghAvail = !window.JUR && !!window.AP_GROUP_HIST;
+  const VHg = React.useMemo(() => {
+    const GH = D.groupHistory;
+    if (!G || !GH || !GH.terms) return null;
+    const KG = ["alp", "lnp", "onp", "grn", "oth"];
+    const terms = GH.terms.map((t) => {
+      const c = t.sets && t.sets[sel.setId] && t.sets[sel.setId][sel.label];
+      if (!c) return null;
+      const series = {};
+      KG.forEach((k, i) => {
+        const rows = c.months.filter((m) => m[1 + i] != null).map((m) => [D.mx(m[0]), m[1 + i], m[1 + i], m[6 + i], null]);
+        if (rows.length >= 2) series[k] = rows;
+      });
+      return { year: t.year, a: confIsoX(t.from), b: confIsoX(t.to), lanes: Object.keys(series), open: {}, close: {}, series, miss: {}, src: t.year, houses: c.houses };
+    }).filter(Boolean);
+    return terms.length ? { terms } : null;
+  }, [G, ghTick, sel && sel.setId, sel && sel.label]);
+  /* The window bar stands in for the range tabs on the all-voters view and
+     on a group's (whose past terms load on demand); a pollster subset exists
+     for this term only, so it keeps the tabs, as /vic/ does - it has no past
+     terms. */
+  const vwOn = !window.JUR && !pvx && (!G || ghAvail);
+  const VHuse = G ? VHg : VH;
+  React.useEffect(() => {
+    if (!G || !vw.hist || D.groupHistory || !ghAvail) return undefined;
+    let live = true;
+    D.loadGroupHistory().then(() => { if (live) setGhTick((n) => n + 1); });
+    return () => { live = false; };
+  }, [!!G, !!vw.hist]);
+  const histOn = !!(vwOn && vw.hist && VHuse);
   const vwWin = rdVwWin(rangeId, histOn ? vw.hist : null, vwTerms);
   const xDomain = histOn ? [vwWin.a, vwWin.b] : rangeDomain(rangeId);
   const vwAtNow = !histOn || xDomain[1] >= vwHi - 1 / 24;
@@ -329,7 +367,7 @@ function RdPrimary({ rangeId, setRangeId }) {
       const f = fallers[0];
       dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost "
         + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its")
-        + (pelGrp ? " vote at the election, by the polls’ own reading then." : aesGrp ? " vote at the election, by the Australian Election Study’s reading." : " election-night vote.");
+        + (pelGrp ? (RD_PEL_MODEL ? " vote at the election, by the model’s estimate for polling day." : " vote at the election, by the polls’ own reading then.") : aesGrp ? " vote at the election, by the Australian Election Study’s reading." : " election-night vote.");
       /* a generation's AES baseline compares across instruments: the polls'
          figure is the generation cuts of one or two houses alone (user call
          2026-11-02) - the margins measure sampling, not that */
@@ -596,8 +634,8 @@ function RdPrimary({ rangeId, setRangeId }) {
   const vhLong = histOn && vhSpan > RD_VH_LONG;
   const vhStyle = (k) => ({ label: k === "oth" ? "Others & independents" : D.PARTIES[k].name, color: D.PARTIES[k].color,
     width: vhLong ? (k === "oth" ? 1.4 : 1.6) : k === "oth" ? 2 : 2.5, dashed: k === "oth", dash: k === "oth" ? "6 4" : undefined, opacity: hideC[k] ? 0 : 1 });
-  const vhL = histOn ? rdVhLines(VH, ["alp", "lnp", "grn", "onp", "oth"], xDomain[0], xDomain[1], vhStyle, { long: vhLong }) : null;
-  const vhDotsOn = histOn && vhSpan <= 4.6;
+  const vhL = histOn ? rdVhLines(VHuse, ["alp", "lnp", "grn", "onp", "oth"], xDomain[0], xDomain[1], vhStyle, { long: vhLong }) : null;
+  const vhDotsOn = histOn && !G && vhSpan <= 4.6;
   const vhHideKey = Object.keys(hideC).filter((k) => hideC[k]).sort().join("|");
   const vhScatter = React.useMemo(() => {
     if (!vhDotsOn) return [];
@@ -660,7 +698,7 @@ function RdPrimary({ rangeId, setRangeId }) {
       .filter((q) => q.x >= xDomain[0] - 1e-6 && q.x <= xDomain[1] + 1e-6).sort((p, q) => p.x - q.x);
     const curYear = (vwTerms.find((t) => t.current) || {}).year;
     const bridges = L.series.some((sr) => sr.dash === RD_VH_BRIDGE);
-    const unmeasured = VH.terms.filter((t) => t.miss.alp == null && t.b > xDomain[0] && t.a < xDomain[1]);
+    const unmeasured = G ? [] : VH.terms.filter((t) => t.miss.alp == null && t.b > xDomain[0] && t.a < xDomain[1]);
     return {
       series: (curIn ? chartSeries.map((sr) => ({ ...sr, ...(vwAtNow ? {} : { endLabel: null }), ...(vhLong ? { rdWidth: sr.id === "oth" ? 1.4 : 1.6 } : {}) })) : []).concat(L.series),
       areas: (curIn && !vhLong ? areas : []).concat(L.areas),
@@ -677,7 +715,14 @@ function RdPrimary({ rangeId, setRangeId }) {
         const q = spine[i];
         if (!q) return [];
         if (q.count || q.elec) return [{ label: "", value: "The election result" }];
-        if (!q.cur) return [{ label: "", value: "Drawn through the election results" }];
+        if (!q.cur) {
+          /* a past month's own 95% intervals, party by party, as this term's
+             months carry theirs */
+          const ciAt = (k) => { for (const t of VHuse.terms) { const m = (t.series[k] || []).find((r) => Math.abs(r[0] - q.x) < 1e-6); if (m && m[3] != null) return m[3]; } return null; };
+          const cis = visible.map((p) => ciAt(p.id));
+          return [{ label: "", value: G ? "The model’s estimate for " + sel.who + " that term" : "Drawn through the election results" }]
+            .concat(cis.some((c) => c != null) ? [{ label: "95% intervals", value: cis.map((c) => (c == null ? "–" : "±" + c.toFixed(1))).join(" ") }] : []);
+        }
         const d = pts.find((r) => r.x === q.x);
         return d && d.ci ? visible.map((p) => ({ label: "95% intervals", value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"), rowLabel: p.name })) : [];
       },
@@ -970,7 +1015,12 @@ function RdPrimary({ rangeId, setRangeId }) {
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
-          copy={H ? {
+          copy={H && G ? {
+            title: "First-preference vote for each party, " + sel.who, span: confWinYears(vwWin, vwTerms, vwHi),
+            sub: "Each term is the model’s estimate for " + sel.who + ": that term’s national primaries moved by the group’s gap, from the pollsters’ group tables and the Australian Election Study at each election.",
+            caption: "Lines are the model’s estimates at each month’s middle, shaded bands their 95% intervals; a term with few group tables leans on the Australian Election Study at its two elections, and its band widens between them.",
+            legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })),
+          } : H ? {
             title: "First-preference vote for each party", span: confWinYears(vwWin, vwTerms, vwHi),
             sub: "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "")
               + ". Monthly averages of the polls, adjusted for each pollster’s lean.",
@@ -1018,7 +1068,8 @@ function RdPrimary({ rangeId, setRangeId }) {
         )}
         {/* what the past terms' lines are, beside them */}
         {H && (
-          <p className="rd-note">Past terms are drawn through the election results at both ends. By polling day the polls typically miss Labor’s result by about {VH.rms.alp.toFixed(1)} points and the Coalition’s by {VH.rms.lnp.toFixed(1)}, so every month of a past term is moved by part of its closing election’s miss: two-fifths of it from the first month, rising evenly to all of it on polling day. {vhLong ? "Over a dozen years or more the bands are left off; a shorter window shows them, with the doubt about when the miss arose. " : "The shaded band includes the doubt about when the miss arose. "}{vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is the polls alone: no election has measured it yet. " : ""}{H.unmeasured.length ? "No dated poll fell in the final three weeks before the " + rdList(H.unmeasured.map((t) => String(t.src))) + " elections, so " + (H.unmeasured.length === 1 ? "that term is" : "those terms are") + " the polls alone." : ""}</p>
+          G ? <p className="rd-note">Each past term is the model’s estimate for {sel.who}: that term’s national primaries, from every poll with each pollster’s lean taken out, moved by the group’s gap from all voters, from the pollsters’ group tables and the Australian Election Study at the term’s two elections. Where few pollsters published group tables, the line leans on the two Election Studies and its band widens between them. A line ends at each election; the next term starts from its own polls.</p>
+          : <p className="rd-note">Past terms are drawn through the election results at both ends. By polling day the polls typically miss Labor’s result by about {VH.rms.alp.toFixed(1)} points and the Coalition’s by {VH.rms.lnp.toFixed(1)}, so every month of a past term is moved by part of its closing election’s miss: two-fifths of it from the first month, rising evenly to all of it on polling day. {vhLong ? "Over a dozen years or more the bands are left off; a shorter window shows them, with the doubt about when the miss arose. " : "The shaded band includes the doubt about when the miss arose. "}{vhDotsOn ? "The dots are the polls as published. " : ""}{curIn ? "This term is the polls alone: no election has measured it yet. " : ""}{H.unmeasured.length ? "No dated poll fell in the final three weeks before the " + rdList(H.unmeasured.map((t) => String(t.src))) + " elections, so " + (H.unmeasured.length === 1 ? "that term is" : "those terms are") + " the polls alone." : ""}</p>
         )}
         {/* the lift mapping, where the dots are read - the glossary's "The
             group views" paragraph is the deep version; a dot's tooltip
@@ -1026,7 +1077,9 @@ function RdPrimary({ rangeId, setRangeId }) {
         {G && (
           <p className="rd-note">Each dot is one poll’s reading of {sel.who} less that poll’s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll’s in All polls’ Demographics view.{sel.tabId === "income" ? " " + rdCap(D.demoIncome.sets[0].note) + "." : ""}</p>
         )}
-        <RdKey className="rd-ckey" items={H ? [
+        <RdKey className="rd-ckey" items={H && G ? [
+          { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" },
+        ] : H ? [
           vhDotsOn ? { kind: "dot", color: "var(--ink-3)", label: "One poll, as published" } : null,
           vhLong ? { kind: "line", color: "var(--ink-3)", label: "Monthly average" }
             : { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
@@ -1034,7 +1087,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           H.bridges ? { kind: "dots", color: "var(--ink-3)", label: "No polls" } : null,
         ] : [
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-          { kind: "lineband", color: "var(--ink-3)", label: KAL ? (narrow ? "Trend, 95% interval" : "Trend and its 95% interval") : PMD && !G ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+          { kind: "lineband", color: "var(--ink-3)", label: KAL ? (narrow ? "Trend, 95% interval" : "Trend and its 95% interval") : PMD && (!G || (T && T.model)) ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           base ? { kind: "ring", label: rdElecYear + " election result" } : null,
           evOn ? { kind: "diamond", color: "var(--ink-3)", label: RD_VOTE_LABEL } : null,
         ]}>
@@ -6651,6 +6704,14 @@ function RdUndecided({ rangeId }) {
     setView(nxt);
     return true;
   }, [U, D, view]);
+  /* the window over this term and the past terms (gen-data §5bm's history):
+     the direction panel's machinery, opening on this term */
+  const TERMS_U = React.useMemo(() => confTermsOf(D), [D]);
+  const curTermU = TERMS_U.find((t) => t.current) || TERMS_U[TERMS_U.length - 1];
+  const nowXU = D.domain ? D.domain.x1 : null;
+  const [winU, setWinU] = useState(() => (curTermU && nowXU != null ? confTermWin(curTermU, nowXU) : null));
+  const [dragU, setDragU] = useState(false);
+  const onWinU = React.useCallback((w, phase) => { setWinU(w); setDragU(phase === "drag"); }, []);
   if (!U || !U.series.length) return null;
   const F = D.firmness, A = U.softAge;
   const byId = {};
@@ -6658,7 +6719,26 @@ function RdUndecided({ rangeId }) {
   const first = byId.first, tpp = byId.tpp, leaner = byId.leaner, soft = byId.soft;
   const softResolve = U.softResolve;
   const nowOf = (s) => (s ? (s.now ? s.now.v : s.latest.v) : null);
-  const xDomain = rangeDomain(rangeId);
+  const H = U.history && U.history.terms && U.history.terms.length ? U.history : null;
+  const histOn = !!(H && winU && nowXU != null);
+  const hx = (ym) => D.mx(ym);
+  const extU = histOn ? { lo: Math.min(...H.terms.flatMap((t) => Object.values(t.series).flatMap((sr) => sr.months.map((m) => hx(m[0]))))) - 0.3, hi: nowXU } : null;
+  const vTermsU = histOn ? confViewTerms(TERMS_U, extU.lo, extU.hi) : null;
+  const winC = histOn ? (winU.kind === "term-carry" ? { kind: "custom", a: Math.max(extU.lo, winU.a), b: winU.b } : confClampWin(winU, vTermsU, extU.lo, extU.hi, nowXU)) : null;
+  const winShownU = histOn ? (winU.kind === "term-carry" ? { ...winC, kind: "term-carry", year: winU.year } : winC) : null;
+  const xDomain = histOn ? [winC.a, winC.b] : rangeDomain(rangeId);
+  /* the window reaches today: the readouts quote today's figures; a past
+     window quotes each line's last month inside it */
+  const atNowU = !histOn || winC.b >= nowXU - 1 / 24;
+  const inWinU = (x) => x >= xDomain[0] - 0.02 && x <= xDomain[1] + 0.02;
+  /* the past terms' lines and polls on one basis, inside the window */
+  const histLines = (basis) => !histOn ? [] : H.terms.map((t) => {
+    const sr = t.series[basis];
+    if (!sr) return null;
+    const pts = sr.months.map((m) => ({ ym: m[0], x: hx(m[0]), v: m[1], lo: m[2], hi: m[3] })).filter((q) => inWinU(q.x));
+    return pts.length >= 2 ? { id: basis + "-" + t.year, basis, year: t.year, pts, houses: sr.houses, zero: sr.zero } : null;
+  }).filter(Boolean);
+  const histDots = (basis) => (!histOn ? [] : H.polls.filter((q) => q.basis === basis && inWinU(q.x)));
   /* the axis opens on the election tick, as the 2PP, primary, mood and
      direction charts do - data-driven so /vic/ never sees the federal mark */
   const base = (D.aggPrimary || []).find((d) => d.election) || null;
@@ -6683,7 +6763,10 @@ function RdUndecided({ rangeId }) {
     const head = rdCap(rdOneIn(u)) + " is undecided"
       + (sf != null ? ", " + rdOneInShare(sf) + " might change their mind" : "")
       + firmestTail + ".";
-    const moves = [["undecided", first], ["soft", soft]].map(([nm, s]) => ({ nm, s, f: slopeOf(s) })).filter((m) => m.f);
+    /* a modelled line moves when its change since the term's first month
+       clears its own 95% interval (the posterior of the difference); the
+       soft share keeps its within-house slope, Bonferroni across the two */
+    const moves = [["undecided", first], ["soft", soft]].map(([nm, s]) => ({ nm, s, f: s && s.now && s.now.since ? { p: s.now.since.sig ? 0 : 1, b: s.now.since.chg } : slopeOf(s) })).filter((m) => m.f);
     const movedSig = moves.filter((m) => m.f.p < 0.05 / moves.length);
     /* the dek is the movement verdict alone (user trim, 2026-09-28): the
        house range and latest-figure sentences it used to append were cut */
@@ -6696,46 +6779,70 @@ function RdUndecided({ rangeId }) {
   const u = nowOf(first), sf = nowOf(softResolve);
   const und100 = Math.round(u), soft100 = Math.round(sf * (100 - u) / 100), firm100 = 100 - und100 - soft100;
   const moved = moves100 => moves100;
+  const COLb = (id) => (id === "soft" || id === "leaner" ? "var(--ink-2)" : id === "tpp" ? "var(--ink-3)" : "var(--ink)");
   const panel = (list, lo, hi, step, key, title, meta) => {
-    const drawn = list.map((s) => ({ s, pts: filterPts(s.monthly, xDomain[0]), dots: s.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) }))
+    const drawnNow = list.map((s) => ({ s, pts: filterPts(s.monthly, xDomain[0]).filter((q) => q.x <= xDomain[1] + 0.02), dots: s.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) }))
       .filter((d) => d.pts.length >= 2);
+    /* the past terms' lines, one per term and basis, each its own segment
+       (a term's line ends at its election), tones and dashes as the
+       basis's own line today */
+    const like = (basis) => list.find((s) => s.id === basis) || { id: basis, label: basis === "first" ? "First preference" : "After leaner", dashed: basis === "leaner" };
+    const drawnPast = key !== "und" ? [] : ["first", "leaner"].flatMap((b) => histLines(b).map((h) => ({
+      s: { ...like(b), id: h.id, basisId: b, houses: h.houses }, pts: h.pts, dots: [], past: h })));
+    const drawn = drawnNow.concat(drawnPast);
     if (!drawn.length) return null;
+    const pastDots = key !== "und" ? [] : ["first", "leaner"].flatMap((b) => histDots(b).map((q) => ({ x: q.x, y: q.v, color: COLb(b), label: like(b).label, meta: q })));
+    /* each modelled line's 95% band */
+    const bands = drawn.filter((d) => d.pts[0].lo != null).map((d) => ({
+      id: "band-" + d.s.id, color: COLb(d.s.basisId || d.s.id), className: "ci-band", edge: false, smooth: false,
+      points: d.pts.map((q) => ({ x: q.x, y0: q.lo, y1: q.hi })) }));
+    /* what each readout quotes: today's figure while the window reaches
+       today, else the basis's last month inside the window */
+    const readOf = (s) => {
+      if (atNowU) return { v: nowOf(s), ci: s.now ? s.now.ci95 : null, when: null };
+      const cand = drawn.filter((d) => (d.s.basisId || d.s.id) === s.id).flatMap((d) => d.pts).sort((a, b) => a.x - b.x);
+      const q = cand[cand.length - 1];
+      return q ? { v: q.v, ci: q.lo != null ? (q.hi - q.lo) / 2 : null, when: monthLabelFull(q.ym) } : null;
+    };
+    const readList = (atNowU ? list : list.concat(["first", "leaner"].filter((b) => !list.some((s) => s.id === b)).map(like))).filter((s) => readOf(s));
     /* the board's tones: first preference in ink, after preferences a
        lighter grey (dashed), not firm between. Their polls wear the same
        tones, and after preferences' as open rings - six Essential readings
        carry that line, so they stay on show, but told apart */
-    const COL = (s) => (s.id === "soft" || s.id === "leaner" ? "var(--ink-2)" : s.id === "tpp" ? "var(--ink-3)" : "var(--ink)");
+    const COL = (s) => COLb(s.basisId || s.id);
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find((d) => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
     return (
       <div className="card rd-card rd-un-panel" key={key}>
         <div className="rd-un-ptitle"><b>{title}</b><span>{meta}</span></div>
-        {list.map((s) => (
+        {readList.map((s) => { const r = readOf(s); return (
           <div key={s.id} className="rd-un-read">
             <RdSwatch kind={s.dashed ? "dash" : "line"} color={COL(s)} />
             <div>
-              <div className="rd-un-rtop"><b>{s.id === "soft" ? "Might still change" : s.label}</b><span className="rd-un-rv">{nowOf(s).toFixed(1)}%</span>{s.now && <span className="rd-un-rci">±{s.now.ci95.toFixed(1)}</span>}</div>
+              <div className="rd-un-rtop"><b>{s.id === "soft" ? "Might still change" : s.label}</b><span className="rd-un-rv">{r.v.toFixed(1)}%</span>{r.ci != null && <span className="rd-un-rci">±{r.ci.toFixed(1)}</span>}{r.when && <span className="rd-un-rci">{r.when}</span>}</div>
               <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "leaner" ? "Still undecided after the leaner. Some houses keep them in the published figures; others set them aside. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
             </div>
           </div>
-        ))}
+        ); })}
         <TrendChart key={"rd-un-" + key} heightPx={narrow ? 200 : 230} padPx={{ l: 36, r: 10, t: 14, b: 28 }}
           xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, step)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline
-          series={drawn.map((d) => ({ id: d.s.id, label: d.s.label, color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: 3.5, points: series(d.pts, "v") }))}
+          xTicks={histOn ? confWinTicks(winC, vTermsU, nowXU) : rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline driven={dragU}
+          series={drawn.map((d) => ({ id: d.s.id, label: d.s.label + (d.past ? " (" + d.past.year + " term)" : ""), color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: d.past ? 0 : 3.5, endCap: !d.past, points: series(d.pts, "v") }))}
+          areas={bands}
           spine={series(drawn[0].pts, "v")}
-          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), hollow: d.s.id === "tpp", label: d.s.label, meta: q })))} pollFacet="twopp"
+          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), hollow: d.s.id === "tpp", label: d.s.label, meta: q }))).concat(pastDots)} pollFacet="twopp"
           notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "%, " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
           tooltipTitle={(i) => { const p = drawn[0].pts[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={(v) => v.toFixed(1)}
           /* the readouts over the chart say which line is which; the copy
              leaves them behind, so its key says it, with the figures */
           copy={{ title: key === "und" ? "Undecided voters" : "Voters who might still change their mind",
+                  ...(histOn ? { span: confWinYears(winC, vTermsU, nowXU) } : {}),
                   sub: key === "und" ? "Share of all voters who can’t say who they’d vote for, month by month"
-                    : "Share of voters naming a party who say they could still change their mind, month by month", caption: drawn.some((d) => d.s.id === "tpp")
-                    ? "Each dot is one poll, open rings for after preferences; lines are monthly averages."
+                    : "Share of voters naming a party who say they could still change their mind, month by month", caption: key === "und"
+                    ? "Each dot is one poll" + (drawn.some((d) => d.s.id === "tpp") ? ", open rings for after preferences" : "") + "; the undecided lines are a model of every poll with each pollster’s lean taken out, shaded with their 95% intervals" + (drawn.some((d) => d.s.id === "tpp") ? "; after preferences is a monthly average" : "") + (drawnPast.length ? ". Each term’s lines end at its election." : ".")
                     : "Each dot is one poll; lines are monthly averages.",
-                  legend: drawn.map((d) => ({ label: (d.s.id === "soft" ? "Might still change" : d.s.label) + " " + nowOf(d.s).toFixed(1) + "%",
-                                              color: COL(d.s), kind: d.s.dashed ? "dashed" : "line" })) }} />
+                  legend: readList.map((s) => ({ label: (s.id === "soft" ? "Might still change" : s.label) + " " + readOf(s).v.toFixed(1) + "%",
+                                              color: COL(s), kind: s.dashed ? "dashed" : "line" })) }} />
       </div>
     );
   };
@@ -6824,13 +6931,13 @@ function RdUndecided({ rangeId }) {
      series (the dek only sentences undecided and firmness), Holm across
      whatever has a fit; the fold-out lists every series, fit or not */
   const unSig = (() => {
-    const ss = [first, tpp, soft].filter(Boolean).map((s) => ({ s, pts: s.monthly ? filterPts(s.monthly, xDomain[0]) : [], fit: slopeOf(s) }));
+    const ss = [first, leaner, tpp, soft].filter(Boolean).map((s) => ({ s, pts: s.monthly || [], fit: s.now && s.now.since ? null : slopeOf(s), since: s.now && s.now.since ? s.now.since : null }));
     const ok = ss.filter((x) => x.fit), won = [];
     for (const [i, f] of [...ok].sort((a, b) => a.fit.p - b.fit.p).entries()) {
       if (f.fit.p >= 0.05 / (ok.length - i)) break;
       won.push(f.s.id);
     }
-    return ss.map((x) => ({ ...x, sig: won.includes(x.s.id) }));
+    return ss.map((x) => ({ ...x, sig: x.since ? x.since.sig : won.includes(x.s.id) }));
   })();
 
   const views = [{ id: "all", label: "All voters" }].concat(F ? [{ id: "party", label: "By party" }] : [], A ? [{ id: "age", label: "By age" }] : []);
@@ -6845,7 +6952,7 @@ function RdUndecided({ rangeId }) {
   };
   const pickView = (id) => { pinUn(); setView(id); };
   return (
-    <RdSec id="undecided" cls="rd-un" title="Decidedness" meta={rdList(U.houses) + ", since the 2025 election"}>
+    <RdSec id="undecided" cls="rd-un" title="Decidedness" meta={rdList(U.houses) + ", since the 2025 election" + (histOn ? "; undecided back to " + H.terms[0].from.slice(0, 4) : "")}>
       {story && <RdHed head={story.head} dek={story.dek} />}
       <RdTabs swipe value={view} onChange={pickView} options={views} ariaLabel="Decidedness among" className="rd-un-tabs" />
       {/* each view is its own measure from its own pollsters: a switch
@@ -6880,20 +6987,24 @@ function RdUndecided({ rangeId }) {
             )}
             <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(softResolve.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
           </div>
-          <RdSub head={(() => { const m = [slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
-                 dek="Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
+          <RdSub head={(() => { const m = [first && first.now && first.now.since ? { p: first.now.since.sig ? 0 : 1 } : slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
+                 dek={(first && first.model ? "Each dot is one poll, open rings for after preferences. The undecided lines are a model of every poll, each pollster’s lean taken out, shaded with their 95% intervals; the others are monthly averages." : "Each dot is one poll, open rings for after preferences; lines are monthly averages.") + " Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales."} />
+          {histOn && <RdConfWinBar win={winShownU} terms={vTermsU} lo={extU.lo} hi={extU.hi} nowX={nowXU} onWin={onWinU} />}
           <div className="rd-un-panels">
-            {panel([first, tpp, leaner].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
+            {panel([first, tpp, leaner].filter(Boolean), 0, 12, 5, "und", "Undecided", "% of all voters")}
             {soft && panel([soft], 0, Math.ceil((soft.hi + 1) / 10) * 10, 10, "soft", "Soft", "% of voters who named a party")}
           </div>
+          {histOn && <RdConfStrip lines={[{ color: "var(--ink-2)", points: H.terms.flatMap((t) => (t.series.first ? t.series.first.months.map((m) => ({ x: hx(m[0]), y: m[1] })) : [])).concat((first ? first.monthly : []).map((m) => ({ x: m.x, y: m.v }))) }]}
+                                  lo={extU.lo} hi={extU.hi} win={winC} terms={vTermsU} onWin={onWinU} narrow={narrow} label="Undecided voters, can’t say who they’d vote for, every term on file" />}
           <RdTsig summary="Trend-significance table"
-            heads={["Series", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
+            heads={["Series", "Line, first month → last, %", "Change", "Test", "Significant"]}
             sets={[{ key: "main", rows: unSig.map((x) => ({
-              key: x.s.id, name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Soft" : "Undecided", sig: x.sig,
+              key: x.s.id, name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Soft" : x.s.id === "leaner" ? "Undecided, after leaner" : "Undecided", sig: x.sig,
               cells: [x.pts.length >= 2 ? rdTsSgn(x.pts[0].v) + " → " + rdTsSgn(x.pts[x.pts.length - 1].v) : "–",
-                x.fit ? rdTsSgn(x.fit.b, true) : "–", x.fit ? rdTsSgn(x.fit.t) : "–", x.sig ? "Yes" : "No"],
+                x.since ? rdTsSgn(x.since.chg, true) + " since " + monthLabelFull(x.since.from) : x.fit ? rdTsSgn(x.fit.b, true) + " pts/yr" : "–",
+                x.since ? "95% interval " + rdTsSgn(x.since.lo, true) + " to " + rdTsSgn(x.since.hi, true) : x.fit ? "slope t " + rdTsSgn(x.fit.t) : "–", x.sig ? "Yes" : "No"],
             })) }]}
-            note={"One trend test per series: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the series. Yes means the slope clears 95% since the 2025 election; the dek above reads the same tests. Undecided counts all voters, “Might still change” those who named a party, so the two panels’ figures sit on different scales."}
+            note={(first && first.model ? "The two undecided lines are tested on the model’s own change since their first month: Yes when its 95% interval excludes zero. After preferences and soft keep one trend test each: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the two." : "One trend test per series: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the series. Yes means the slope clears 95% since the 2025 election.") + " The dek above reads the same tests. Undecided counts all voters, “Might still change” those who named a party, so the two panels’ figures sit on different scales."}
           />
           <RdFoot how={{ term: "undecided", from: "Decidedness" }}>{changeFoot}</RdFoot>
         </>

@@ -1799,6 +1799,20 @@ writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
    document, and the browser resolves the cycle-source fetch against the
    page's own URL. */
 parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("/assets/" + cycleSrcName)};<\/script>`);
+/* The past terms' primary vote by group (data/group-history-model.json,
+   .build/build-group-history.mjs) gets the same treatment: only a reader who
+   opens a group view on a window behind this term needs it. Federal only. */
+if (!VIC) {
+  const ghPath = path.join(ROOT, "data", "group-history-model.json");
+  const ghJson = fs.existsSync(ghPath) ? fs.readFileSync(ghPath, "utf8") : null;
+  const name = ghJson ? `group-history.${hash8(Buffer.from(ghJson))}.json` : null;
+  for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
+    if (/^group-history\..*\.json$/.test(old) && old !== name && !sweepKeep(`assets/${old}`))
+      fs.unlinkSync(path.join(ROOT, "assets", old));
+  }
+  if (ghJson) writeAtomic(path.join(ROOT, "assets", name), ghJson);
+  parts.push(`<script>window.AP_GROUP_HIST=${name ? JSON.stringify("/assets/" + name) : "null"};<\/script>`);
+} else parts.push(`<script>window.AP_GROUP_HIST=null;<\/script>`);
 /* The questions behind the ☰ menu's Public opinion page get the same
    treatment as the cycle-source rows: a hashed sidecar outside the main
    payload (nobody but that page's reader needs it), gen-data's

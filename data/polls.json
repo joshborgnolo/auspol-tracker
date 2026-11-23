@@ -2068,6 +2068,7 @@
       "client": "AFR",
       "sample": 1997,
       "sampleEff": 1641,
+      "undecidedLeaner": 8,
       "alp": 34,
       "lnp": 29,
       "grn": 11,
@@ -2509,6 +2510,7 @@
     },
     {
       "date": "2025-12-02",
+      "published": "2025-12-02",
       "dateStart": "2025-11-26",
       "pollster": "YouGov",
       "client": "News24",
@@ -2665,6 +2667,7 @@
     },
     {
       "date": "2025-12-23",
+      "published": "2025-12-23",
       "dateStart": "2025-12-16",
       "pollster": "YouGov",
       "client": "News24",
@@ -4265,6 +4268,7 @@
     {
       "date": "2026-05-13",
       "published": "2026-05-17T21:29",
+      "dateStart": "2026-05-13",
       "pollster": "Wolf & Smith",
       "client": "Amplify",
       "sample": 1002,
