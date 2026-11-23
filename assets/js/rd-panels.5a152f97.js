@@ -422,10 +422,25 @@ function RdPrimary({
     y: evOf("alp") ? evOf("alp")[0] : evPts[0].y
   } : null;
   const elecStop = gElecStop || evStop;
-  const curOnly = histOn && xDomain[0] >= curTermA - 1e-6;
-  const evs = !histOn || curOnly ? rdChartEvents(D.events, xDomain[0], xDomain[1]) : rdVwElections(vwWin, vwTerms);
-  const elecRules = histOn && !curOnly && evs.length > 6;
-  const badges = narrow && (!histOn || curOnly) ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
+  const elections = histOn ? rdVwElections(vwWin, vwTerms) : [];
+  const termScale = xDomain[1] - xDomain[0] <= 4;
+  const evs = React.useMemo(() => {
+    if (!histOn || xDomain[0] >= curTermA) return rdChartEvents(D.events, ...xDomain);
+    if (!termScale) return elections;
+    const byDate = new Map();
+    for (const term of vwTerms) {
+      for (const event of cycleChartEvents(term, D)) {
+        const x = confIsoX(event.date);
+        if (x >= xDomain[0] && x <= xDomain[1]) byDate.set(event.date, {
+          ...event,
+          x
+        });
+      }
+    }
+    return [...byDate.values(), ...elections].sort((a, b) => a.x - b.x);
+  }, [histOn, xDomain[0], xDomain[1], vwWin.kind, curTermA, D.events, vwTerms]);
+  const elecRules = histOn && !termScale && elections.length > 6;
+  const badges = narrow && !elecRules ? rdEventBadges("p1", evs, ...xDomain) : null;
   const [evtOpen, setEvtOpen] = useState(null);
   const pickEv = e => {
     setEvtOpen(cur => cur && cur.e === e ? cur : {
@@ -586,10 +601,11 @@ function RdPrimary({
           value: "Drawn through the election results"
         }];
         const d = pts.find(r => r.x === q.x);
-        return d && d.ci ? [{
+        return d && d.ci ? visible.map(p => ({
           label: "95% intervals",
-          value: visible.map(p => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ")
-        }] : [];
+          value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"),
+          rowLabel: p.name
+        })) : [];
       },
       bridges,
       unmeasured,
@@ -881,10 +897,11 @@ function RdPrimary({
         label: "",
         value: "The election result"
       }] : [];
-      return [{
+      return visible.map(p => ({
         label: "95% intervals",
-        value: visible.map(p => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ")
-      }];
+        value: "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–"),
+        rowLabel: p.name
+      }));
     },
     fmt: (v, pt) => (G && pt && pt.gv != null ? pt.gv : v).toFixed(1),
     copy: H ? {
@@ -1469,14 +1486,14 @@ function RdLeadership({
   const ciRows = (series, i, spine) => {
     const r = spine[i];
     if (!r) return [];
-    const cs = series.map(s => {
+    return series.map(s => {
       const p = s.points.find(q => q.ym === r.ym);
-      return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null;
+      return p && p.ci != null ? {
+        label: "95% intervals",
+        value: "±" + p.ci.toFixed(1),
+        rowLabel: s.label
+      } : null;
     }).filter(Boolean);
-    return cs.length ? [{
-      label: "95% intervals",
-      value: cs.join(", ")
-    }] : [];
   };
   const leadSeries = kept("leadSeries", () => J ? (() => {
     const runs = [...runsJ("lead_ley", r => (r.alb_who || "") + "|" + (r.ley_who || "")).map(x => ({
@@ -2006,15 +2023,19 @@ function RdLeadership({
       extraRows: i => {
         const r = spine[i];
         if (!r) return [];
-        const cs = leaders.map(Ld => {
-          const row = pts.find(p => p.ym === r.ym);
-          const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci";
-          return row && row[k] != null ? "±" + row[k].toFixed(1) : null;
-        }).filter(Boolean);
-        return cs.length ? [{
-          label: "95% intervals",
-          value: cs.join(", ")
-        }] : [];
+        return drawn.flatMap(({
+          Ld,
+          runs: rs
+        }) => rs.map(d => {
+          const sid = Ld.id + (J ? "-" + d.era.who : d.era ? "-" + d.era : "");
+          const s = series.find(x => x.id === sid);
+          const row = d.rows.find(p => p.ym === r.ym);
+          return s && row && row.ci != null ? {
+            label: "95% intervals",
+            value: "±" + row.ci.toFixed(1),
+            rowLabel: s.label
+          } : null;
+        })).filter(Boolean);
       }
     });
   };
@@ -2452,9 +2473,10 @@ const TRUST_COLOR = {
   "oecd-avg": "var(--macro-gdppc)",
   "essential-parliament": "var(--ink-3)",
   edelman: "var(--trust-edelman)",
-  "edelman-avg": "var(--trust-edelman)"
+  "edelman-avg": "var(--trust-edelman)",
+  australiascan: "var(--macro-prod)"
 };
-const TRUST_NOTE_ORDER = ["anupoll", "scanlon", "aes", "oecd-au", "edelman", "mckinnon", "essential", "essential-parliament"];
+const TRUST_NOTE_ORDER = ["anupoll", "scanlon", "aes", "oecd-au", "edelman", "mckinnon", "essential", "essential-parliament", "australiascan"];
 const TRUST_HOUSE_NOTES = {
   anupoll: {
     paraphrase: true,
@@ -2506,9 +2528,15 @@ const TRUST_HOUSE_NOTES = {
     answers: "A lot, some, little, none at all, and unsure, each printed; a lot or some counts, with the unsure (6% in December 2023) kept in the base.",
     method: "Essential’s online panel, about 1,000 adults; six waves, August 2020 – December 2023.",
     role: "other"
+  },
+  australiascan: {
+    question: "How much confidence do you have in each of the following? Would you say you had a great deal of confidence, some confidence or little or no confidence in the federal government?",
+    answers: "A great deal, some, little or none; the first two count. Murray Goot’s tables don’t say how non-answers were counted.",
+    method: "AMR–Quantum Harris’s AustraliaSCAN (later Quantum Australia), about 2,000 adults a wave, 1993–1999: December–February in 1994–95 and 1995–96, July–September from 1996; the 1993 wave’s months aren’t stated. From Goot’s Table 6a.",
+    role: "soft"
   }
 };
-const trustRoleText = q => q.role === "ref" ? "The line is printed on the terms of its current panel, which also counts once among the surveys setting the level. Its Life in Australia waves count as a survey of their own, read through a wide lean." : q.role === "scanlon" ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways." : q.role === "other" ? "Asks about the parliament, not the government, so it is read through a wide lean of its own: it shows how trust moved, never where it stands." : "Sets the line’s level with the other surveys, each counting once.";
+const trustRoleText = q => q.role === "soft" ? "Its middle answer counts as confident, so it reads about 20 points above the rest; read through a wide lean of its own, it shows how trust moved in the 1990s, never where it stood." : q.role === "ref" ? "The line is printed on the terms of its current panel, which also counts once among the surveys setting the level. Its Life in Australia waves count as a survey of their own, read through a wide lean." : q.role === "scanlon" ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways." : q.role === "other" ? "Asks about the parliament, not the government, so it is read through a wide lean of its own: it shows how trust moved, never where it stands." : "Sets the line’s level with the other surveys, each counting once.";
 const TRUST_ELECTIONS = [{
   date: "2022-05-21",
   label: "May 2022"
@@ -2789,7 +2817,8 @@ function RdTrustModel() {
       const m = lineW[i];
       return m ? [{
         label: "95% interval",
-        value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1)
+        value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1),
+        rowLabel: "trust-model"
       }] : [];
     },
     fmt: v => v.toFixed(1),
@@ -3162,7 +3191,8 @@ function RdTrustSeparate() {
       const r = R[i];
       return r ? [{
         label: "95% interval",
-        value: "±" + r.ci.toFixed(1)
+        value: "±" + r.ci.toFixed(1),
+        rowLabel: line.house
       }, ...(r.panel && line.panels ? [{
         label: "Panel",
         value: line.panels.find(p => p.id === r.panel).label
@@ -4047,7 +4077,12 @@ function RdDirectionView({
       const d = monthAt((chartMonths[i] || {}).x);
       return d && d.rightCi != null ? [{
         label: "95% intervals",
-        value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1)
+        value: "±" + d.rightCi.toFixed(1),
+        rowLabel: "Right direction"
+      }, {
+        label: "95% intervals",
+        value: "±" + d.wrongCi.toFixed(1),
+        rowLabel: "Wrong track"
       }] : [];
     },
     fmt: v => v.toFixed(1),
@@ -5727,14 +5762,14 @@ function RdDemographics({
     });
     const ciRows = (rs, label) => i => {
       const ym = c.allPts[i] && c.allPts[i].ym;
-      const cs = rs.map(r => {
+      return rs.map(r => {
         const d = r.l.pts.find(q => q.ym === ym);
-        return d && d.ci != null ? (rs.length > 1 ? r.l.g.label + " " : "") + "±" + d.ci.toFixed(1) : null;
+        return d && d.ci != null ? {
+          label,
+          value: "±" + d.ci.toFixed(1),
+          rowLabel: r.l.g.label
+        } : null;
       }).filter(Boolean);
-      return cs.length ? [{
-        label: label,
-        value: cs.join(", ")
-      }] : [];
     };
     const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.label + (d.part != null ? "|" + d.part : "")) : null;
     const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
@@ -7016,7 +7051,8 @@ function RdSwitching({
       tooltipTitle: i => pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "",
       extraRows: i => pts[i] && pts[i].ci != null ? [{
         label: "95% interval",
-        value: "±" + pts[i].ci.toFixed(1)
+        value: "±" + pts[i].ci.toFixed(1),
+        rowLabel: r.noun
       }] : [],
       fmt: v => v.toFixed(1),
       copy: {
@@ -7374,7 +7410,8 @@ function RdSwitching({
       tooltipTitle: i => pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "",
       extraRows: i => pts[i] && pts[i].ci != null ? [{
         label: "95% interval",
-        value: "±" + pts[i].ci.toFixed(1)
+        value: "±" + pts[i].ci.toFixed(1),
+        rowLabel: LONG[c.id]
       }] : [],
       fmt: v => v.toFixed(1),
       copy: {
@@ -10598,7 +10635,7 @@ function RdMacro({
   const union = [Math.min(prevWin.current.a, win.a) - 0.1, Math.max(prevWin.current.b, win.b) + 0.1];
   const cur = terms.find(t => t.current);
   const isCur = win.kind === "term" && cur && win.year === cur.year;
-  const MACRO_ECONDS_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const MACRO_ECONDS_OFF = ["2025-05-20", "2025-12-08", "2026-01-22", "2026-02-12"];
   const evs = isCur ? rdChartEvents(D.events, win.a, nowX).filter(e => !MACRO_ECONDS_OFF.includes(e.date)) : confElectionEvents(win, terms);
   const badges = isCur && evs.length ? rdEventBadges("macro", evs, win.a, win.b) : null;
   const topN = narrow ? 1 : 2;
@@ -11169,7 +11206,7 @@ function RdConfidence({
   };
   const dek = lanes.map(sent).join(" ");
   const mStory = isMacro ? macroStory(D) : null;
-  const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const CONF_OFF = ["2025-05-20", "2025-12-08", "2026-01-22", "2026-02-12"];
   const elecEvs = isCur ? [] : confElectionEvents(win, vTerms);
   const elecRules = elecEvs.length > 6;
   const evs = isCur ? rdChartEvents(D.events, win.a, nowX).filter(e => !CONF_OFF.includes(e.date)) : elecRules ? [] : elecEvs;
