@@ -59,7 +59,7 @@
   <link rel="preload" href="../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../assets/js/rd.1758f840.js" as="script">
   <link rel="preload" href="../assets/js/rd-hero.4eeadf29.js" as="script">
-  <link rel="preload" href="../assets/js/rd-panels.4ee0df21.js" as="script">
+  <link rel="preload" href="../assets/js/rd-panels.a627c8ac.js" as="script">
   <link rel="preload" href="../assets/js/rd-polls.cf08e27d.js" as="script">
   <link rel="preload" href="../assets/js/rd-cycles.0b1f8462.js" as="script">
   <link rel="preload" href="../assets/js/rd-allpolls.de5a2de0.js" as="script">
@@ -5020,6 +5020,20 @@ body.rd .rd-wv-key { margin-top: 16px; }
 body.rd .rd-wv-keytxt { color: var(--ink-3); }
 body.rd .rd-wv-charts { display: flex; gap: 32px; margin-top: 20px; }
 body.rd .rd-wv-chart { min-width: 0; }
+body.rd .rd-wv-gap-set { margin-top: 24px; min-width: 0; }
+body.rd .rd-wv-gap-set h5 { margin: 0; font: inherit; }
+body.rd .rd-wv-gap-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; font-size: 14px; color: var(--ink-2); }
+body.rd .rd-wv-gap-choice .rd-pv-sel { margin: 0; max-width: 100%; min-height: 40px; }
+body.rd .rd-wv-gap-formula { margin: 12px 0 6px; font-size: 15px; font-weight: 600; color: var(--ink); }
+body.rd .rd-wv-gap-directions { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+body.rd .rd-wv-gap-note { margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: var(--ink-3); }
+body.rd .rd-wv-gap-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 30px; margin-top: 24px; }
+body.rd .rd-wv-gap-panel { min-width: 0; }
+body.rd .rd-wv-gap-panel .rd-sm-top > span:first-child { display: flex; align-items: center; gap: 7px; }
+body.rd .rd-wv-gap-date { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+body.rd .rd-wv-gap-empty { min-height: 170px; margin: 0; display: flex; align-items: center; font-size: 14px; color: var(--ink-3); }
+@media (min-width: 1100px) { body.rd .rd-wv-gap-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) { body.rd .rd-wv-gap-grid { grid-template-columns: minmax(0, 1fr); row-gap: 24px; } }
 body.rd .rd-wv-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px; row-gap: 16px; margin-top: 8px; }
 body.rd .rd-wv-panel .rd-sm-top { font-size: 13px; }
 body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
@@ -7010,7 +7024,7 @@ body.rd #cyc-summary > h2.sr-only + .rd-cc { margin-top: 0; }
   <script src="../assets/js/wm-story.63f19861.js"></script>
   <script src="../assets/js/rd.1758f840.js"></script>
   <script src="../assets/js/rd-hero.4eeadf29.js"></script>
-  <script src="../assets/js/rd-panels.4ee0df21.js"></script>
+  <script src="../assets/js/rd-panels.a627c8ac.js"></script>
   <script src="../assets/js/rd-polls.cf08e27d.js"></script>
   <script src="../assets/js/rd-cycles.0b1f8462.js"></script>
   <script src="../assets/js/rd-allpolls.de5a2de0.js"></script>

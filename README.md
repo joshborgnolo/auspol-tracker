@@ -27,6 +27,20 @@ undecided-inclusive 2PP, two polls whose published shares don't total 100) are
 recorded in the data as `pollsterRules` / `sumNote`, so anything it reports is
 new and worth looking at.
 
+### Demographic gaps
+
+Under **Who votes for whom**, the existing group charts are followed by
+party-by-party gap charts for each set, including generations, states,
+language, work status and the standardised income bands. The charts subtract
+the named reference group's monthly primary vote from the comparison group's
+figure; gender is women's minus men's. Multi-category sets offer every other
+category against the same reference. Scales are symmetric about zero and
+fixed across parties, comparison choices and time windows within a set.
+Tooltips give both underlying shares. Missing months break the line; the
+charts do not infer uncertainty intervals for differences from the separate
+group intervals. Run `node .build/test-demographic-gaps.mjs` for the numeric
+and data-coverage checks (also included in `npm test`).
+
 ### Pollster conventions worth knowing
 
 - **Roy Morgan** publishes two ALP-v-L/NP 2PPs. The **respondent-allocated** one is

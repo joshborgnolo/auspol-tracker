@@ -4413,6 +4413,150 @@ const RD_SOLO_NAME = { Tas: "Tasmania", ACT: "the ACT", NT: "the NT" };
    the other way, so the last group keeps the most contrast in both) */
 const rdRamp = (party, n, i) => (n < 2 ? "var(--" + party + ")" : "var(--ramp-" + party + "-" + (1 + Math.round((i * 3) / (n - 1))) + ")");
 
+/* Gap views reuse the very same monthly primary-vote estimates as the
+   group charts. A fixed, named reference makes every comparison legible;
+   states and work status are categories, never positions on a ladder. */
+const RD_GAP_REFS = {
+  age: { ref: "55+", compare: "18–34", title: "Age" },
+  generation: { ref: "Boomers", compare: "Gen Z", title: "Generation" },
+  gender: { ref: "Men", compare: "Women", title: "Gender" },
+  education: { ref: "Year 12 or less", compare: "University", title: "Education" },
+  state: { ref: "NSW", compare: "Vic", title: "State", note: "NSW, the largest state, is the reference; states are not ranked." },
+  location: { ref: "Inner metro", compare: "Rural", title: "Location" },
+  housing: { ref: "Own outright", compare: "Renting", title: "Housing" },
+  language: { ref: "English only", compare: "Other language", title: "Language at home" },
+  working: { ref: "Full time", compare: "Part time", title: "Work status", note: "Full-time workers are the reference; work categories are not ranked." },
+  income: { ref: "Lower earners (bottom 50%)", compare: "Higher earners (top 15%)", title: "Income",
+    note: "The existing standardised income bands combine household and personal income; the middle 35% is outside this comparison." },
+};
+const rdGapFmt = (v) => {
+  const r = Math.round(v * 10) / 10;
+  return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(1);
+};
+/* Join exact months, retaining real zero shares and omitting missing
+   parties. Never interpolate one group's absent month to manufacture a gap. */
+function rdGapPoints(group, reference, order, party, mx) {
+  const i = order.indexOf(party);
+  if (i < 0 || !group || !reference) return [];
+  const base = new Map((reference.monthly || []).map((r) => [r[0], r[1 + i]]));
+  return (group.monthly || []).flatMap((r) => {
+    const a = r[1 + i], b = base.get(r[0]);
+    return Number.isFinite(a) && Number.isFinite(b)
+      ? [{ ym: r[0], x: mx(r[0]), y: Math.round((a - b) * 10) / 10, groupVote: a, referenceVote: b }] : [];
+  }).sort((a, b) => a.x - b.x);
+}
+/* Missing months break the stroke, even when the model/average is ragged. */
+function rdGapRuns(points) {
+  const runs = [];
+  const month = (ym) => Number(ym.slice(0, 4)) * 12 + Number(ym.slice(5, 7));
+  for (const p of points) {
+    const last = runs[runs.length - 1];
+    if (!last || month(p.ym) !== month(last[last.length - 1].ym) + 1) runs.push([p]);
+    else last.push(p);
+  }
+  return runs;
+}
+function rdGapSet(st, order, mx) {
+  const def = RD_GAP_REFS[st.id];
+  if (!def) return null;
+  const reference = st.groups.find((g) => g.label === def.ref);
+  if (!reference) return null;
+  const comparisons = st.groups.filter((g) => g !== reference).map((g) => ({
+    group: g, parties: order.map((party) => ({ party, points: rdGapPoints(g, reference, order, party, mx) })),
+  })).filter((c) => c.parties.some((p) => p.points.length));
+  if (!comparisons.length) return null;
+  const points = comparisons.flatMap((c) => c.parties.flatMap((p) => p.points));
+  /* One symmetrical scale for ALL parties and choices over the full
+     history. Neither switching comparison nor shortening time rescales it. */
+  const limit = Math.max(5, Math.ceil((Math.max(...points.map((p) => Math.abs(p.y))) + 1) / 5) * 5);
+  return { def, reference, comparisons, limit, firstX: Math.min(...points.map((p) => p.x)) };
+}
+function RdDemographicGapSet({ st, order, rangeId, model }) {
+  const { D, rangeDomain, monthLabelFull } = window.AP;
+  const narrow = useNarrow(MQ_PHONE);
+  const data = React.useMemo(() => rdGapSet(st, order, D.mx), [st, order, D]);
+  const [choice, setChoice] = useState("");
+  if (!data) return null;
+  const { def, reference, comparisons, limit, firstX } = data;
+  const selected = comparisons.find((c) => c.group.label === choice)
+    || comparisons.find((c) => c.group.label === def.compare) || comparisons[0];
+  const group = selected.group;
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
+  const ticks = [-limit, -limit / 2, 0, limit / 2, limit];
+  const who = (g) => DEMO_WHO[g.label] || RD_DEMO_SHORT[g.label] || g.label;
+  const formula = st.id === "gender" ? "Women’s primary vote − men’s primary vote · percentage points"
+    : group.label + " − " + reference.label + " · primary vote, percentage points";
+  const title = def.title + " gap in primary voting intention";
+  const explanation = "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
+  /* Reserve the widest end label in every panel so equal dates align,
+     even when one party's signed figure is longer than another's. */
+  const padSeries = selected.parties.flatMap((p) => {
+    const visible = p.points.filter((pt) => pt.x >= x0 && pt.x <= x1);
+    const last = visible[visible.length - 1];
+    return last ? [{ points: [last], endLabel: rdGapFmt(last.y) + " pp" }] : [];
+  });
+  return (
+    <div className="card rd-card rd-wv-gap-set" role="group" aria-label={title}>
+      <div className="rd-chead"><h5 className="rd-chead-t">{title}</h5></div>
+      {comparisons.length > 1 && <label className="rd-wv-gap-choice">
+        Compare
+        <select className="rd-pv-sel" aria-label={def.title + " comparison group"} value={group.label}
+                onChange={(e) => setChoice(e.target.value)}>
+          {comparisons.map((c) => <option key={c.group.label} value={c.group.label}>{c.group.label}</option>)}
+        </select>
+        <span>Reference: <b>{reference.label}</b></span>
+      </label>}
+      <p className="rd-wv-gap-formula">{formula}</p>
+      <p className="rd-wv-gap-directions">{explanation}</p>
+      {def.note && <p className="rd-wv-gap-note">{def.note}</p>}
+      <div className="rd-wv-gap-grid">
+        {DEMO_PARTIES.map((pp) => {
+          const party = selected.parties.find((p) => p.party === pp.id);
+          const points = (party ? party.points : []).filter((p) => p.x >= x0 && p.x <= x1);
+          const last = points[points.length - 1];
+          const color = D.PARTIES[pp.id].color;
+          return (
+            <div className="rd-sm rd-wv-gap-panel" key={pp.id}>
+              <div className="rd-sm-top"><span><i className="rd-sw" style={{ background: color }}></i>{pp.label}</span>
+                <span className="rd-wv-gap-date">{last ? rdMonthYear(last.ym) : ""}</span></div>
+              {points.length ? <TrendChart key={st.id + "|" + group.label + "|" + pp.id}
+                heightPx={narrow ? 180 : 170} padPx={{ l: 36, r: 6, t: 12, b: 26 }}
+                xDomain={[x0, x1]} yDomain={[-limit, limit]} xTicks={rdXTicks(x0, x1, true)}
+                yTicks={ticks} yTickFmt={(v) => v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, "")}
+                refLines={[{ y: 0, color: "var(--ink-3)" }]}
+                series={rdGapRuns(points).map((run, i, runs) => ({
+                  id: pp.id + "-" + i, label: "Gap", color, points: run, smooth: false, rdWidth: 2.25,
+                  endLabel: i === runs.length - 1 ? rdGapFmt(last.y) + " pp" : null,
+                }))}
+                spine={points} padSeries={padSeries} fmt={rdGapFmt} unit=" pp"
+                tooltipTitle={(i) => points[i] ? monthLabelFull(points[i].ym) : ""}
+                extraRows={(i) => points[i] ? [
+                  { label: group.label, value: points[i].groupVote.toFixed(1) + "%" },
+                  { label: reference.label, value: points[i].referenceVote.toFixed(1) + "%" },
+                ] : []}
+                ariaLabel={pp.label + ". " + formula + ". " + explanation}
+                copy={{ title: pp.label + ": " + title.toLowerCase(), sub: formula,
+                  caption: explanation + " " + (model ? "Difference of group model estimates." : "Difference of monthly group averages."),
+                  legend: [{ label: "Gap", color, kind: "line" }, { label: "Equal support", color: "var(--ink-3)", kind: "line" }] }}
+              /> : <p className="rd-wv-gap-empty">No comparable monthly figures in this period.</p>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+const RdDemographicGaps = React.memo(function RdDemographicGaps({ tab, order, rangeId, model }) {
+  return (
+    <div className="rd-wv-gaps">
+      <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups, in percentage points." />
+      <p className="rd-wv-gap-note">{model ? "Lines subtract the existing group model estimates." : "Lines subtract the existing monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Intervals for the differences are not available.</p>
+      {tab.sets.map((st) => <RdDemographicGapSet key={st.id} st={st} order={order} rangeId={rangeId} model={model} />)}
+    </div>
+  );
+});
+
 function RdDemographics({ rangeId = "all" }) {
   const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
@@ -5055,6 +5199,7 @@ function RdDemographics({ rangeId = "all" }) {
         { kind: "ring", label: rdElecYear + " election result" },
       ].concat(D.demoVote && tab.sets.some((st) => D.demoVote.sets[st.id] && Object.values(D.demoVote.sets[st.id].groups).some((g) => g[party] != null))
         ? [{ kind: "diamond", color: "var(--ink-3)", label: RD_VOTE_LABEL }] : [])} />
+      <RdDemographicGaps key={tab.id} tab={tab} order={T.order} rangeId={rangeId} model={T.model && tab.id !== "income"} />
       {sigSets.length > 0 && (
         <details className="rd-evdrop rd-tsig">
           <summary>Trend-significance table</summary>
