@@ -9,6 +9,20 @@
    their return into the redesign's layout, built from the parts below. Every
    style these parts use lives in rd.css, scoped to body.rd. */
 
+/* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
+   article before the methodology PDF; a Resolve wave filed from the monitor
+   csv before the SMH article carries its dates): the poll sits on the charts
+   by a provisional window, but every label says just "TBC" (user call
+   2026-10-11), linking where the house will publish the dates (gen-data's
+   fieldUrl). rdFieldTxt is the plain-text form for tooltips and labels;
+   rdFieldTbc the linked one. */
+const rdFieldTxt = (q) => (q && q.fieldPending ? "TBC" : (q && (q.field || q.dateLabel)) || "");
+function rdFieldTbc(p, tabIndex) {
+  const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
+  return p.fieldUrl
+    ? <a className="rd-tbc" href={p.fieldUrl} target="_blank" rel="noopener noreferrer" title={note} tabIndex={tabIndex} onClick={(e) => e.stopPropagation()}>TBC</a>
+    : <span title={note}>TBC</span>;
+}
 /* ---------------------------------------------------------------- sections
    A dark rule over a sentence-case section title, with the title's meta
    beside it; then the section's finding as a serif headline and its deck.
