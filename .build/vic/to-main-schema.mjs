@@ -140,6 +140,13 @@ export const VIC_JURISDICTION = {
      hand call. jumpSd: how far opinion may move at once on a
      change of Premier or Opposition Leader. leanSd: the prior on each
      pollster's lean (the site's shrinkage, about 1.5 polls' worth). */
+  /* Since 2026-11-23 (user list: "/vic/ on the model") the lines and figures
+     are the site's Bayesian model, as the federal page's (gen-data §2m, §2t):
+     each pollster's drifting lean, the regular pollsters averaging zero, a
+     damped trend, a step at each change of Premier or Opposition Leader,
+     the term opening on the 2022 count. The Kalman settings below stay for
+     the record and for a build with model: false. */
+  model: true,
   kalman: {
     jumpSd: 2,
     leanSd: 1.6,

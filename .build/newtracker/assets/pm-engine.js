@@ -108,7 +108,8 @@ function predictStep(x, Pm, L, th, dt, jmp) {
 const LOG2PI = Math.log(2 * Math.PI);
 /* th: { w: Float64Array(P) per-party daily sd on log shares, d, s, J }
    opts: { anchor: { mean: Float64Array(D), cov: Float64Array(D*D) }, jumps: Set(day),
-           kappa: Map, store, rounding } */
+           kappa: Map, store, rounding, lin: Float64Array(events × N) – a path
+           to linearise folded readings at (filterSmooth's later passes) } */
 function runFilter(obs, L, events, th, opts) {
   const { N, D, P, nb } = L;
   const x = new Float64Array(N), Pm = new Float64Array(N * N);
@@ -127,7 +128,8 @@ function runFilter(obs, L, events, th, opts) {
   const qinfo = store ? new Float64Array(events.length * 2) : null;   // [dt, jump]
   const upd = store ? [] : null;                                       // per obs: { k, H, R, zlin }
   const U = new Float64Array(N * D), PH = new Float64Array(N * 4), S = new Float64Array(16), Ls = new Float64Array(16), Kg = new Float64Array(N * 4);
-  const mu = new Float64Array(D), pr = new Float64Array(P), Jm = new Float64Array(4 * D), V = new Float64Array(D * D);
+  const mu = new Float64Array(D), ml = new Float64Array(D), pr = new Float64Array(P), Jm = new Float64Array(4 * D), V = new Float64Array(D * D);
+  const lin = opts.lin || null;
   let ll = 0, prev = null, oi = 0, nObs = 0;
   for (let ev = 0; ev < events.length; ev++) {
     const t = events[ev];
@@ -139,11 +141,15 @@ function runFilter(obs, L, events, th, opts) {
     }
     while (oi < obs.length && obs[oi].day === t) {
       const o = obs[oi++], c = L.coef.get(o.house), nzb = L.nz.get(o.house);
-      /* predicted log-ratios for this house */
+      /* predicted log-ratios for this house, and the point the reading is
+         linearised at: the prediction, or for a folded reading on a later
+         pass the previous pass's smoothed path at this day */
       for (let k = 0; k < D; k++) { let s = 0; for (const b of nzb) s += c[b] * x[b * D + k]; mu[k] = s; }
-      let mx = 0; for (let k = 0; k < D; k++) mx = Math.max(mx, mu[k]);
+      if (lin && o.cats.length < P) { const lo = ev * N; for (let k = 0; k < D; k++) { let s = 0; for (const b of nzb) s += c[b] * lin[lo + b * D + k]; ml[k] = s; } }
+      else ml.set(mu);
+      let mx = 0; for (let k = 0; k < D; k++) mx = Math.max(mx, ml[k]);
       let z = Math.exp(-mx); pr[P - 1] = z;
-      for (let k = 0; k < D; k++) { pr[k] = Math.exp(mu[k] - mx); z += pr[k]; }
+      for (let k = 0; k < D; k++) { pr[k] = Math.exp(ml[k] - mx); z += pr[k]; }
       for (let k = 0; k < P; k++) pr[k] /= z;
       const cats = o.cats, C = cats.length, m = C - 1, refc = cats[C - 1];
       const Pc = cats.map((cc) => cc.reduce((a, k) => a + pr[k], 0)), Pref = Pc[C - 1];
@@ -154,8 +160,8 @@ function runFilter(obs, L, events, th, opts) {
       const v = new Float64Array(m), zlin = new Float64Array(m);
       for (let ci = 0; ci < m; ci++) {
         const g = Math.log(Pc[ci] / Pref), yo = Math.log(o.vals[ci] / o.vals[C - 1]);
-        v[ci] = yo - g;
-        let jm = 0; for (let k = 0; k < D; k++) jm += Jm[ci * D + k] * mu[k];
+        let jm = 0, jd = 0; for (let k = 0; k < D; k++) { jm += Jm[ci * D + k] * ml[k]; jd += Jm[ci * D + k] * (mu[k] - ml[k]); }
+        v[ci] = yo - g - jd;
         zlin[ci] = yo - g + jm;
       }
       /* R: κ · multinomial on the category log-ratios + rounding */
@@ -231,6 +237,30 @@ function smooth(f, L, th) {
     for (let i = 0; i < N; i++) for (let j = 0; j <= i; j++) { let s = 0; for (let l = 0; l < N; l++) s += T[i * N + l] * Gk[j * N + l]; const v = Pf[i * N + j] + s; Po[i * N + j] = v; Po[j * N + i] = v; }
   }
   return { xs, Ps, G, E, N };
+}
+
+/* The filter and smoother, iterated when a reading folds a party into
+   others. The extended filter reads such a poll as a straight line through
+   the point it predicted before the poll; when a later poll moves that
+   point a long way (One Nation printed for the first time after a year
+   inside others), the line was drawn at the wrong place and the folded
+   total no longer matches what the poll printed. Each further pass draws
+   the line through the previous pass's smoothed path instead (the
+   iterated extended smoother), until the path stops moving (largest
+   change under 0.001 on the log-ratio scale) or after `passes` re-runs.
+   Polls that print every party are linear on this scale, so a term with
+   no folded reading is untouched. */
+function filterSmooth(obs, L, events, th, opts, passes = 3) {
+  let f = runFilter(obs, L, events, th, { ...opts, store: true }), sm = smooth(f, L, th);
+  if (!obs.some((o) => o.cats.length < L.P)) return { f, sm, passes: 0 };
+  let k = 0;
+  for (; k < passes; k++) {
+    const f2 = runFilter(obs, L, events, th, { ...opts, store: true, lin: sm.xs }), sm2 = smooth(f2, L, th);
+    let dmax = 0; for (let i = 0; i < sm.xs.length; i++) dmax = Math.max(dmax, Math.abs(sm2.xs[i] - sm.xs[i]));
+    f = f2; sm = sm2;
+    if (dmax < 1e-3) { k++; break; }
+  }
+  return { f, sm, passes: k };
 }
 
 /* Cov(x_a, x_b | all) for a ≤ b: G_a … G_{b−1} Ps_b, flat N×N */
@@ -311,5 +341,5 @@ function tppChgOut(r) {
    Returns monthly summaries at `months` [{ ym, day }], today and a month
    ago, each house's lean, and (pairs) the change between two days. */
   window.AP = window.AP || {};
-  window.AP.pmEngine = { prepare, runFilter, smooth, softmaxAlr, alrOf, makeLayout, PARTIES, DEFF, tppRead, tppNowOut, tppChgOut };
+  window.AP.pmEngine = { prepare, runFilter, smooth, filterSmooth, softmaxAlr, alrOf, makeLayout, PARTIES, DEFF, tppRead, tppNowOut, tppChgOut };
 })();

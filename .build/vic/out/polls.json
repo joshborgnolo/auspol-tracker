@@ -85,6 +85,7 @@
         }
       ]
     },
+    "model": true,
     "kalman": {
       "jumpSd": 2,
       "leanSd": 1.6,

@@ -203,27 +203,39 @@
     const th = { ...M.th, w: Float64Array.from(M.th.w) };
     const kappa = new Map(Object.entries(M.kappa));
     const anchor = { mean: Float64Array.from(M.anchor.mean), cov: Float64Array.from(M.anchor.cov) };
-    const f = E.runFilter(prep.obs, prep.L, events, th, { anchor, jumps, kappa, lone: prep.L.lone, store: true });
-    const sm = E.smooth(f, prep.L, th);
+    const { sm } = E.filterSmooth(prep.obs, prep.L, events, th, { anchor, jumps, kappa, lone: prep.L.lone });
     const N = prep.L.N, Dd = prep.L.D, ev = new Map(events.map((d, i) => [d, i]));
     const sharesAt = (day) => {
       const k = ev.get(day);
       if (k == null) return null;
       const eta = sm.xs.subarray(k * N, k * N + Dd), p = E.softmaxAlr(eta), o = { ci: {} };
-      PK.forEach((key, a) => {
+      /* the delta method on a sum of shares (weights c over the five) */
+      const band = (c) => {
         let v = 0;
         for (let i = 0; i < Dd; i++) for (let j = 0; j < Dd; j++) {
-          const ji = p[a] * ((a === i ? 1 : 0) - p[i]), jj = p[a] * ((a === j ? 1 : 0) - p[j]);
+          let ji = 0, jj = 0;
+          for (let a = 0; a < c.length; a++) if (c[a]) { ji += c[a] * p[a] * ((a === i ? 1 : 0) - p[i]); jj += c[a] * p[a] * ((a === j ? 1 : 0) - p[j]); }
           v += ji * sm.Ps[k * N * N + i * N + j] * jj;
         }
-        o[key] = r1(100 * p[a]); o.ci[key] = r1(196 * Math.sqrt(v));
-      });
+        return r1(196 * Math.sqrt(v));
+      };
+      PK.forEach((key, a) => { o[key] = r1(100 * p[a]); o.ci[key] = band(PK.map((_, b) => (b === a ? 1 : 0))); });
+      /* a state build: before One Nation's first separate reading, others
+         includes it and One Nation has no line (the build's own rule) */
+      if (M.onFirst != null && day < M.onFirst) {
+        const qo = PK.indexOf("onp"), qx = PK.indexOf("oth");
+        o.oth = r1(100 * (p[qo] + p[qx])); o.ci.oth = band(PK.map((_, b) => (b === qo || b === qx ? 1 : 0)));
+        o.onp = null; delete o.ci.onp;
+      }
       return o;
     };
     const live = (day) => readings.filter((r) => day - r.day >= 0 && day - r.day <= M.window).length;
     const have = new Set();
     for (const q of D.individualPolls || []) if (!sel || sel.has(q.pollster)) have.add(q.ym);
-    const months = M.months.filter(([ym]) => have.has(ym)).map(([ym, day]) => { const o = sharesAt(day); return { ym, x: D.mx(ym), ...o }; });
+    /* federally the months the ticked houses polled in; a state build's line
+       carries on through empty months from the set's first poll (M.carry) */
+    const firstYm = [...have].sort()[0];
+    const months = M.months.filter(([ym]) => (M.carry ? ym >= firstYm : have.has(ym))).map(([ym, day]) => { const o = sharesAt(day); return { ym, x: D.mx(ym), ...o }; });
     const nowS = live(M.t1) ? sharesAt(M.t1) : null;
     const now = nowS ? { ...Object.fromEntries(PK.map((k) => [k, nowS[k]])), n: live(M.t1) } : null;
     const nowAt = (ref) => {

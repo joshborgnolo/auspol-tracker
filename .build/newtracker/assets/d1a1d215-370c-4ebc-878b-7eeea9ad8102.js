@@ -9362,7 +9362,80 @@ function infoTerms(D) {
         differ by more than chance allows.</>) } : faqs.find((f) => f.id === "newest-poll-not-headline"),
       faqs.find((f) => f.id === "more-menu-figures"),
     ].filter(Boolean);
-    const vMethod = KAL ? [
+    /* since 2026-11-23 the Victorian page runs on the federal page's model
+       (gen-data §2m, §2t); the Kalman entries stay for a build without it */
+    const VMOD = !!(L.method && L.method.kind === "model");
+    const vMethod = VMOD ? [
+      { id: "weighted-aggregate", term: "Model estimate", body: (
+        <>How the headline and every line on this page are built, with the same model as the
+        federal page. Victoria publishes only a poll or two a month, so rather than average each
+        month’s polls, the model draws one line through all of them. It treats opinion as drifting
+        from day to day, with some momentum, and each poll as a reading of it, off by its
+        pollster’s {xref("house-effect", "model estimate", "lean")} and by chance.
+        <span className="info-p"><b>How much a poll counts.</b> Larger samples count for more.
+        Where a pollster publishes an {xref("effective-sample", "model estimate", "effective sample")},
+        that figure is used. Otherwise the raw sample is discounted by 1.6, roughly what weighting
+        costs the pollsters that do publish, and capped at 3,000. A pollster whose polls scatter
+        more than their samples imply counts for a little less.</span>
+        <span className="info-p"><b>Where it starts.</b> The line opens on the {eY} count, moved by
+        how far the final polls have typically missed at federal elections since 2007, so it
+        starts where the polls would have been, not where the votes were.</span>
+        <span className="info-p"><b>Leaders.</b> On a change of Premier or Opposition Leader the
+        line may step at once.</span>
+        <span className="info-p"><b>The line and the headline.</b> The line uses every poll, earlier
+        and later, so a month’s point can shift a little as later polls come in. The headline is
+        the model’s estimate today, and the line ends on it.</span>
+        <span className="info-p"><b>Months with no poll.</b> The line carries on through them, and
+        its 95% interval widens until the next poll arrives.</span>
+        <span className="info-p"><b>Two-party figures.</b> The implied figures are the model’s
+        primary votes read through the {eY} election’s preference flows; the pollsters’ published
+        figures get a model of their own, built the same way.</span>
+        <span className="info-p"><b>One Nation.</b> Victoria’s pollsters counted One Nation among
+        others until it surged. Those polls still count: the model reads them as a figure for One
+        Nation and others together. The One Nation line starts with the first poll that printed it
+        on its own; before that, others includes it.</span>
+        {working(<span className="info-p">The model works on each party’s share relative to
+          others, on the log scale. Opinion follows a random walk with a damped trend, its daily
+          spread fitted party by party; each pollster’s lean drifts slowly, and the regular
+          pollsters’ leans sum to zero. A poll reads the line plus its pollster’s lean, with its
+          sampling error scaled by that pollster’s fitted noise, plus the rounding of what it
+          printed. The settings are averaged over their uncertainty; the line, its 95% interval
+          and the change on a month ago come from simulations of the fitted model.</span>)}</>) },
+      { id: "house-effect", term: "House effect", body: (
+        <>A pollster’s consistent lean relative to the others. The model estimates each pollster’s
+        lean alongside the line, from all its polls this term, lets it drift slowly, and takes it
+        out; the regular pollsters’ leans average zero, so a miss every pollster shares leaves
+        every lean at zero. A pollster with one poll has no lean measured: its poll counts, with
+        the doubt about its lean added to its error. Each line gets its own leans, since a
+        pollster that leans to Labor on the two-party figure need not on a primary vote.</>) },
+      method.find((m) => m.id === "monthly-average"),
+      { id: "interval", term: "95% interval", body: (
+        <>How far a figure could plausibly be off by chance. For the two-party figure against the
+        Coalition today, that’s ±{hl.ci.toFixed(1)} points on each party’s share, and
+        ±{(2 * hl.ci).toFixed(1)} on the lead. It is the model’s own interval: it narrows where
+        polls come thick and widens through months with none.
+        <span className="info-p">Unfortunately, it can’t see an error every poll shares. When the
+        whole industry leans one way, the interval has no way to know.</span></>) },
+      method.find((m) => m.id === "margin-of-error"),
+      { id: "effective-sample", term: "Effective sample", body: (
+        <>What a sample is worth once weighting is counted. A pollster’s
+        {" "}{xref("apc-statement", "effective sample", "APC statement")} gives one for each poll,
+        shown as {eff} beside its sample, and it sets how much the poll counts in the
+        {" "}{xref("weighted-aggregate", "effective sample", "model")}.</>) },
+      method.find((m) => m.id === "significance"),
+      { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
+        <>It depends on where they sit.
+        <ul className="info-list">
+          <li><strong>Beside a current figure:</strong> the model’s move over the past month. It
+          counts as a change only when its 95% interval leaves out zero; otherwise the figure says
+          “within the margin”.</li>
+          <li><strong>On the primary-vote figures:</strong> the change since the {eY} election,
+          where the lines on that chart begin.</li>
+          <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
+          pollster’s own previous poll.</li>
+        </ul>
+        Most say what they are measured against beside them, or when you point at them.</>) },
+    ].filter(Boolean) : KAL ? [
       { id: "weighted-aggregate", term: "Smoothed trend", body: (
         <>How the headline and every line on this page are built. Victoria publishes only a poll
         or two a month, so rather than average each month’s polls, the site draws a smoothed trend

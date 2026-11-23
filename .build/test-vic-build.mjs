@@ -95,8 +95,28 @@ const asked = D.individualPolls.filter((q) => q.ppm || q.ppmSets || (q.appr && q
 assert.ok(asked.length && asked.every((q) => q.who && q.who.alb && q.who.opp), "every leadership poll names who held each office");
 const early = asked.find((q) => q.released < "2023-09-27");
 if (early) assert.equal(early.who.alb, "Andrews", "a 2023 poll asks about Andrews, not today's Premier");
-// the lines are the Kalman smoother's trend (gen-data §1a), and say so
-assert.equal(D.latest.method.kind, "kalman", "Victoria's figures are the trend's");
+// the lines are the primary-vote model's (gen-data §2m, since 2026-11-23;
+// the Kalman trend of §1a before), and say so
+assert.equal(D.latest.method.kind, "model", "Victoria's figures are the model's");
+assert.ok(D.latest.primaryModel && D.latest.primaryModel.method === "bayes", "the primary model's summary ships");
+/* the line sits among the polls: through the long stretch when Victoria's
+   pollsters folded One Nation into others (2023–25), the polls average
+   within a point and a half of the line on each party they printed – the
+   extended filter's straight-line reading of a folded poll is redrawn at
+   the smoothed path (filterSmooth), without which Labor's line ran 4–9
+   points under every poll */
+const lineBy = new Map(D.aggPrimary.filter((m) => !m.election).map((m) => [m.ym, m]));
+for (const k of ["alp", "lnp", "grn"]) {
+  const res = D.individualPolls.filter((q) => q.p && q.p[k] != null && q.ym < "2026-01" && lineBy.has(q.ym))
+    .map((q) => q.p[k] - lineBy.get(q.ym)[k]);
+  const m = res.reduce((a, b) => a + b, 0) / res.length;
+  assert.ok(res.length > 30 && Math.abs(m) < 1.5, `2023–25 polls average ${m.toFixed(2)} pts off the ${k} line (${res.length} polls)`);
+}
+/* no One Nation line before a poll printed it apart; others includes it there */
+const onYm = D.individualPolls.filter((q) => q.p && q.p.onp != null).map((q) => q.ym).sort()[0];
+const months = [...lineBy.values()];
+assert.ok(months.filter((m) => m.ym < onYm).every((m) => m.onp == null && m.oth > 14), "before One Nation's first separate reading the line has none, and others carries it");
+assert.ok(months.filter((m) => m.ym > onYm).every((m) => m.onp > 0), "after it, One Nation has a line of its own");
 const line = D.synth2pp.filter((m) => !m.election);
 assert.equal(line[line.length - 1].alp, D.synthLatest.alp, "the 2PP line ends on the headline");
 const moves = line.slice(1).map((m, i) => Math.abs(m.alp - line[i].alp));

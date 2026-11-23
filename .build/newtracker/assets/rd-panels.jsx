@@ -415,19 +415,28 @@ function RdPrimary({ rangeId, setRangeId }) {
     const L = pts.filter((d) => d[id] != null);
     return lateParties.includes(id) && L.length > 1 && L[0].election ? L.slice(1) : L;
   };
-  const chartSeries = (partsChart || []).slice().reverse().map((p) => ({
-    id: p.id, label: p.name, color: p.color, points: series(live(p.id), p.id),
+  /* /vic/'s Others holds One Nation until the month a poll first printed it
+     apart, and only its own share after: two measures, so the line and band
+     break there (a run before, ending without a cap, and the line proper
+     after) rather than join a month of others-with-One-Nation to a month of
+     others alone. Federally no party starts late, so nothing splits */
+  const othSplit = lateParties.includes("onp") ? firstPolled.onp.x : null;
+  const runsOf = (id, rows) => (id === "oth" && othSplit != null
+    ? [["oth-inc", rows.filter((d) => d.x < othSplit)], ["oth", rows.filter((d) => d.x >= othSplit)]]
+    : [[id, rows]]);
+  const chartSeries = (partsChart || []).slice().reverse().flatMap((p) => runsOf(p.id, live(p.id)).map(([sid, rows]) => ({
+    id: sid, label: sid === "oth-inc" ? p.name + ", One Nation included" : p.name, color: p.color, points: series(rows, p.id),
     rdWidth: p.id === "oth" ? 2 : 2.5,
-    opacity: hideC[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
-  }));
+    opacity: hideC[p.id] ? 0 : 1, rdCap: 4,
+    ...(sid === "oth-inc" ? { endCap: false, endLabel: null } : { endLabel: narrow ? ABBR[p.id] : SHORT[p.id] }),
+  }))).filter((sr) => sr.id !== "oth-inc" || sr.points.length);
   /* a party toggled off keeps its band, its dots and its election ring on
      the chart at nothing, so they fade out with its line (and back in),
      rather than vanishing the frame the line starts to fade */
-  const areas = (partsChart || []).map((p) => ({
-    id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false, hidden: !!hideC[p.id],
-    points: pts.filter((d) => d.ci && d.ci[p.id] != null && d[p.id] != null)
-      .map((d) => ({ x: d.x, y0: d[p.id] - d.ci[p.id], y1: d[p.id] + d.ci[p.id] })),
-  })).filter((a) => a.points.length >= 2);
+  const areas = (partsChart || []).flatMap((p) => runsOf(p.id, pts.filter((d) => d.ci && d.ci[p.id] != null && d[p.id] != null)).map(([sid, rows]) => ({
+    id: "ci-" + sid, color: p.color, className: "ci-band", edge: false, hidden: !!hideC[p.id],
+    points: rows.map((d) => ({ x: d.x, y0: d[p.id] - d.ci[p.id], y1: d[p.id] + d.ci[p.id] })),
+  }))).filter((a) => a.points.length >= 2);
   /* group mode's per-poll dots: each wave's own reading of the group, sat
      against its month's all-voters figure - exactly the point §7g's pooling
      averages (never the raw group share, so a wave from a house that leans
@@ -600,7 +609,7 @@ function RdPrimary({ rangeId, setRangeId }) {
   /* /vic/'s lines are a smoothed trend through every poll (gen-data §1a) */
   /* federal: the lines are the primary model's (gen-data §2m) – its estimate at
      each month's middle, the band its 95% interval */
-  const PMD = !window.JUR && !!(D.latest && D.latest.primaryModel);
+  const PMD = !!(D.latest && D.latest.primaryModel);
   const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
   const meta = G
     ? (T.model ? "Modelled from every poll this term; " + rdList(G.houses.map(demoHouse)) + " in the last " + T.window : "Pooled from the last " + T.window + " of " + rdList(G.houses.map(demoHouse)) + " polls")
@@ -710,7 +719,7 @@ function RdPrimary({ rangeId, setRangeId }) {
       label: D.PARTIES[d.id].name + " included in Others" + (d.vote != null ? " (" + d.vote + "%)" : ""),
     }));
     return {
-      series: (curIn ? chartSeries.map((sr) => ({ ...sr, ...(vwAtNow ? {} : { endLabel: null }), ...(vhLong ? { rdWidth: sr.id === "oth" ? 1.4 : 1.6 } : {}) })) : []).concat(L.series),
+      series: (curIn ? chartSeries.map((sr) => ({ ...sr, ...(vwAtNow ? {} : { endLabel: null }), ...(vhLong ? { rdWidth: sr.id === "oth" || sr.id === "oth-inc" ? 1.4 : 1.6 } : {}) })) : []).concat(L.series),
       areas: (curIn && !vhLong ? areas : []).concat(L.areas),
       marks: (curIn ? marks : []).concat(vhMarks),
       scatter: (curIn && vhDotsOn ? shownScatter : []).concat(vhScatter, lone),
