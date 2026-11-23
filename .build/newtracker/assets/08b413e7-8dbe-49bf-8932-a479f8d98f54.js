@@ -373,8 +373,8 @@ function TrendChart(props) {
                 `marks` ring (border in each row's colour) rather than the
                 solid square – the tooltip marks an election result the way
                 the chart does. Null on every other chart.
-       snapToMarks – a direct ring hover chooses that mark's x on a dense
-                monthly spine, so subpixel movement cannot jump to a month. */
+       snapToMarks – a direct hover on a count ring, landmark axis label or
+                election rule chooses that x on a dense monthly spine. */
     marks = [], notes = [], baseline = false, ringAtX = null, snapToMarks = false,
     /* brackets – [{x, y0, y1, dx?, lines: [strong, plain]}] a span between two
        readings at one month, measured off the chart with its words to the left */
@@ -809,7 +809,7 @@ function TrendChart(props) {
     cancelHoverLeave();
     if (dotSrc.current === "touch") setDotFrom(null, null);   // mouse takes over a stale touch pick
     const p = toVB(e);
-    const markX = snapToMarks && e.target.closest?.(".rd-ring[data-spine-x]")?.getAttribute("data-spine-x");
+    const markX = snapToMarks ? e.target.closest?.("[data-spine-x]")?.getAttribute("data-spine-x") : null;
     if (markX != null) { showSpine(nearestSpine(sx(Number(markX)))); return; }
     const near = nearestDot(p, MOUSE_PICK_PX);
     if (near) {
@@ -835,6 +835,14 @@ function TrendChart(props) {
 
   const handleMouseLeave = (event) => {
     if (event?.relatedTarget instanceof Node && ref.current?.contains(event.relatedTarget)) return;
+    /* Safari can report a misleading relatedTarget while the pointer remains
+       on an SVG child. Rect containment distinguishes a genuine chart exit
+       from a move between its drawn elements. */
+    if (event && ref.current && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)
+        && ref.current.contains(document.elementFromPoint(event.clientX, event.clientY))) {
+      cancelHoverLeave();
+      return;
+    }
     /* Safari also reports some moves between SVG children with no
        relatedTarget. Let the next movement disprove a real chart exit before
        hiding the guide; a genuine exit still clears after this short delay. */
@@ -1724,6 +1732,7 @@ function TrendChart(props) {
           };
           const lab = (t, op, k) => (
             <text key={k} x={sx(t.x)} y={rd ? H - pad.b + PX(20) : H - 10} className={"axis-label x" + (t.strong ? " strong" : "")}
+                  data-spine-x={snapToMarks && t.strong ? t.x : undefined}
                   style={op != null && op < 1 ? { fontSize: axisUnits, opacity: op } : { fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
           );
           const now = thin(xTicks);
@@ -1860,7 +1869,7 @@ function TrendChart(props) {
           </g>
         ))}
         {vlines.map((v, i) => (v.x < win[0] || v.x > win[1]) ? null : (
-          <line key={"vl" + i} x1={sx(v.x)} x2={sx(v.x)} y1={pad.t} y2={H - pad.b} className={"rd-vline" + (v.cls ? " " + v.cls : "")} />
+          <line key={"vl" + i} x1={sx(v.x)} x2={sx(v.x)} y1={pad.t} y2={H - pad.b} className={"rd-vline" + (v.cls ? " " + v.cls : "")} data-spine-x={snapToMarks ? v.x : undefined} />
         ))}
         {/* hover guide – kept mounted; glides between months while a hover
             is live, rests where it last read between them (guideOn above) */}
