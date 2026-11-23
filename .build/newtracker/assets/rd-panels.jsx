@@ -2249,7 +2249,7 @@ const TRUST_HOUSE_NOTES = {
   australiascan: {
     question: "How much confidence do you have in each of the following? Would you say you had a great deal of confidence, some confidence or little or no confidence in the federal government?",
     answers: "A great deal, some, little or none; the first two count. Murray Goot’s tables don’t say how non-answers were counted.",
-    method: "AMR–Quantum Harris’s AustraliaSCAN (later Quantum Australia), about 2,000 adults a wave, 1993–1999: December–February in 1994–95 and 1995–96, July–September from 1996; the 1993 wave’s months aren’t stated. From Goot’s Table 6a.",
+    method: "AMR–Quantum Harris’s AustraliaSCAN (later Quantum Australia), from Goot’s Table 6a: national surveys of adults aged 18+ are documented for 1994/95–1999; 1993’s population and fieldwork months aren’t stated, so its dot sits at mid-year. Fieldwork was December–February in 1994–95 and 1995/96, then July–September. The printed n is the wave sample size; this battery’s mode and weighting are unverified. The last report is AustraliaSCAN 2000* (* probable correction: Goot repeats AustraliaSCAN 1999 for both 1998 and 1999, but separately cites the 2000 Management Report; the original report was not inspected).",
     role: "soft",
   },
 };
