@@ -8608,9 +8608,13 @@ function infoTerms(D) {
         { id: "trust-government", term: "Trust in government", body: (D.trustGov && D.trustGov.model ? (
           <>The National mood section’s second view: how far Australians trust the federal
           government. No pollster asks it every month and every survey words it its own way, so
-          the line is a model of all of them at once, like direction’s, printed on ANUpoll’s terms:
-          the share with “a great deal” or “quite a lot” of confidence in the Federal Government in
-          Canberra, as ANUpoll’s current panel asks it.
+          the line is a model of all of them at once, like direction’s, printed on the Australian
+          Election Study’s terms: the share who say people in government can usually or sometimes be
+          trusted to do the right thing. The AES has asked that since 1969 (Don Aitkin’s surveys in
+          1969 and 1979, the AES since 1993), so on its terms the history is sharpest; it asks only
+          after elections, so today’s figure rests on the more frequent surveys, read through their
+          leans against it. Changes are measured on the pooled level with the AES’s lean held at
+          today’s value, so they are movement in trust, not one survey’s drift.
           <span className="info-p"><b>The surveys.</b> ANUpoll (about every three months since
           January 2020; ANU’s reports print only their latest wave, so earlier waves are read off
           their charts, to within about 0.3 of a point), Scanlon’s Mapping Social Cohesion (yearly
@@ -8629,9 +8633,11 @@ function infoTerms(D) {
           beyond their samples are estimated from the readings. The line’s{" "}
           {xref("interval", "trust-government", "95% interval")} gives a 95% chance the figure lies
           inside, under the model’s assumptions; a change is significant only when its own
-          interval excludes zero. Before the line begins the interval is wider than ±{(D.trustGov.model.bandMax || 20) / 2}{" "}
-          points – each survey’s lean against ANUpoll is measured where they overlap, since 2020, and is
-          less sure the further back it goes – so earlier readings show only as dots, moved onto ANUpoll’s terms. The two global averages,
+          interval excludes zero. The line is solid where its interval is under ±{(D.trustGov.model.bandMax || 20) / 2}{" "}
+          points; earlier it is wider – before the 1990s the only readings are Don Aitkin’s 1969 and 1979
+          surveys – so the line turns dashed, with a fainter band, while the interval stays under
+          ±{(D.trustGov.model.bandFaint || 36) / 2} points, and before that readings show only as dots, moved onto the AES’s terms.
+          The dashed stretch is better read for how trust moved than for where it stood. The two global averages,
           the OECD’s and Edelman’s, are moved onto the same terms the way the Ipsos world figure is
           on the direction chart: each by its own survey’s lean in Australia, assuming, as any such
           comparison must, that its Australian and international samples lean alike. They answer

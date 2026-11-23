@@ -2122,10 +2122,10 @@ function RdDirection({ rangeId }) {
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   const tQuestion = "Trust and confidence in the federal government";
-  const tHouses = hasTrust ? rdList(D.trustGov.series.filter((s) => s.role !== "line" && !/-avg$/.test(s.id)).map((s) => s.house)) : "";
+  const tHouses = hasTrust ? rdList(D.trustGov.series.filter((s) => !/-avg$/.test(s.id)).map((s) => s.house)) : "";
   const meta = v === "direction"
     ? (narrow ? question : question + (asked ? ", " + asked : ""))
-    : (narrow ? tQuestion : tQuestion + ", ANUpoll with " + tHouses);
+    : (narrow ? tQuestion : tQuestion + ", " + tHouses);
   return (
     <RdSec id="direction" cls="rd-dir" title="National mood" meta={meta}>
       {hasTrust && (
@@ -2221,10 +2221,12 @@ const TRUST_HOUSE_NOTES = {
     role: "soft",
   },
 };
-const trustRoleText = (q) => q.role === "soft"
+const trustRoleText = (q, isRef) => isRef
+  ? "The line is printed on its terms, and it counts once among the surveys setting the level."
+  : q.role === "soft"
   ? "Its middle answer counts as confident, so it reads about 20 points above the rest; read through a wide lean of its own, it shows how trust moved in the 1990s, never where it stood."
   : q.role === "ref"
-  ? "The line is printed on the terms of its current panel, which also counts once among the surveys setting the level. Its Life in Australia waves count as a survey of their own, read through a wide lean."
+  ? "Its current panel sets the line’s level with the other surveys, each counting once. Its Life in Australia waves count as a survey of their own, read through a wide lean."
   : q.role === "scanlon"
     ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways."
     : q.role === "other"
@@ -2235,10 +2237,17 @@ const TRUST_ELECTIONS = [{ date: "2022-05-21", label: "May 2022" }, { date: "202
 const trustDx = (iso) => { const [y, m, d] = iso.split("-").map(Number); return y + (m - 1 + (d - 1) / 30.5) / 12; };
 const trustMonth = (ym) => { const [y, m] = ym.split("-").map(Number); return window.AP.D.monthNameFull(m) + " " + y; };
 /* Trust in government with the model (gen-data §5t, trust-model.mjs): one
-   line from every survey, printed on ANUpoll's terms, its 95% band; every
-   survey's readings as printed on the Since-2020 view, moved onto ANUpoll's
-   terms by each survey's lean on the long view. Without a model the views
-   fall back to RdTrustSeparate (each survey on its own question). */
+   line from every survey, printed on the reference survey's terms (M.ref:
+   the AES since 2026-11-23, ANUpoll's current panel before), its 95% band;
+   every survey's readings moved onto those terms by its lean. Without a
+   model the view falls back to RdTrustSeparate (each survey on its own
+   question). TRUST_REF_WORDS words each reference. */
+const TRUST_REF_WORDS = {
+  AES: { terms: "the AES’s terms", head: " Australians say people in government can be trusted to do the right thing", k: "Say people in government can be trusted", title: "Trust in government", key: "Trust",
+    measure: "the share who say people in government can usually or sometimes be trusted to do the right thing, as the Australian Election Study asks it after each election" },
+  ANUpoll: { terms: "ANUpoll’s terms", head: " Australians have confidence in the federal government", k: "Confidence in the federal government", title: "Confidence in the federal government", key: "Confidence",
+    measure: "the share with a great deal or quite a lot of confidence in the Federal Government in Canberra, as ANUpoll’s current panel asks it" },
+};
 function RdTrust() {
   const { D } = window.AP;
   if (!D.trustGov.model) return <RdTrustSeparate />;
@@ -2251,6 +2260,7 @@ function RdTrustModel() {
   const S = Object.fromEntries(D.trustGov.series.map((s) => [s.id, s]));
   const pts = (n) => Math.abs(n).toFixed(1);
   const color = TRUST_COLOR.anupoll;
+  const RW = TRUST_REF_WORDS[M.ref] || TRUST_REF_WORDS.ANUpoll;
   const credit = (s, r) => ({ pollster: r.survey || s.house, dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""), sample: r.n || null });
 
   /* ---- the window: the direction panel's machinery (term / 10 yrs / 25 yrs /
@@ -2264,7 +2274,7 @@ function RdTrustModel() {
   const onWin = React.useCallback((w, phase) => { setWinS(w); setDragging(phase === "drag"); }, []);
   const adjDotsAll = Object.entries(M.adj).flatMap(([sid, rs]) => rs.map((r, i) => {
     const s = S[sid], orig = s && s.readings[i];
-    return { sid, x: r.x, y: r.v, color: TRUST_COLOR[sid] || "var(--ink-3)", label: ((orig && orig.survey) || (s ? s.house : sid)) + ", on ANUpoll’s terms",
+    return { sid, x: r.x, y: r.v, color: TRUST_COLOR[sid] || "var(--ink-3)", label: ((orig && orig.survey) || (s ? s.house : sid)) + ", on " + RW.terms,
       sub: orig ? "Printed: " + orig.v + "% (" + s.measure.split(" (")[0].toLowerCase() + ")" : undefined,
       meta: s && orig ? credit(s, orig) : { pollster: sid }, hollow: !!(orig && (orig.panel === "lia" || orig.mode === "tel")), size: 1.1 };
   }));
@@ -2279,23 +2289,32 @@ function RdTrustModel() {
   const inW = (x) => x >= xDomain[0] - 0.05 && x <= xDomain[1] + 0.05;
   const lineAll = M.months.filter((m) => m.ym >= M.firstOn);
   const lineW = lineAll.filter((m) => inW(m.x));
+  /* the dashed early stretch: band 25–36 points wide, joined to the solid line */
+  const firstFaint = M.firstFaint && M.firstFaint < M.firstOn ? M.firstFaint : null;
+  const earlyAll = firstFaint ? M.months.filter((m) => m.ym >= firstFaint && m.ym <= M.firstOn) : [];
+  const earlyW = earlyAll.filter((m) => inW(m.x));
+  const hoverW = earlyW.filter((m) => m.ym < M.firstOn).concat(lineW);
   const dots = adjDotsAll.filter((d) => inW(d.x));
   const oecd = (M.oecdAvgAdj || []).filter((r) => inW(r.x));
   const edel = (M.edelmanAvgAdj || []).filter((r) => inW(r.x));
   const series = [
-    { id: "trust-model", label: "Confidence, every survey on ANUpoll’s terms", color, points: lineW.map((m) => ({ x: m.x, y: m.v })), rdWidth: 2.5, endCap: false, smooth: false,
-      endLabel: narrow || !isCur ? null : "Confidence" },
-    ...(oecd.length >= 2 ? [{ id: "oecd-avg-adj", label: "OECD average, on ANUpoll’s terms", color: TRUST_COLOR["oecd-avg"], points: oecd.map((r) => ({ x: r.x, y: r.v })), rdWidth: 1.5, dash: "4 4", endCap: false, smooth: false, interpHover: true }] : []),
-    ...(edel.length >= 2 ? [{ id: "edelman-avg-adj", label: "Edelman global average, on ANUpoll’s terms", color: TRUST_COLOR["edelman-avg"], points: edel.map((r) => ({ x: r.x, y: r.v })), rdWidth: 1.5, dash: "4 4", endCap: false, smooth: false, interpHover: true }] : []),
+    ...(earlyW.length >= 2 ? [{ id: "trust-model-early", label: RW.key + ", every survey on " + RW.terms + " (less sure)", color, points: earlyW.map((m) => ({ x: m.x, y: m.v })), rdWidth: 1.75, dash: "5 4", endCap: false, smooth: false }] : []),
+    { id: "trust-model", label: RW.key + ", every survey on " + RW.terms, color, points: lineW.map((m) => ({ x: m.x, y: m.v })), rdWidth: 2.5, endCap: false, smooth: false,
+      endLabel: narrow || !isCur ? null : RW.key },
+    ...(oecd.length >= 2 ? [{ id: "oecd-avg-adj", label: "OECD average, on " + RW.terms, color: TRUST_COLOR["oecd-avg"], points: oecd.map((r) => ({ x: r.x, y: r.v })), rdWidth: 1.5, dash: "4 4", endCap: false, smooth: false, interpHover: true }] : []),
+    ...(edel.length >= 2 ? [{ id: "edelman-avg-adj", label: "Edelman global average, on " + RW.terms, color: TRUST_COLOR["edelman-avg"], points: edel.map((r) => ({ x: r.x, y: r.v })), rdWidth: 1.5, dash: "4 4", endCap: false, smooth: false, interpHover: true }] : []),
   ];
-  const areas = lineW.length >= 2 ? [{ id: "trust-ci", color, className: "ci-band", edge: false, smooth: false, points: lineW.map((m) => ({ x: m.x, y0: m.lo, y1: m.hi })) }] : [];
+  const areas = [
+    ...(earlyW.length >= 2 ? [{ id: "trust-ci-early", color, className: "ci-band rd-ci-faint", edge: false, smooth: false, points: earlyW.map((m) => ({ x: m.x, y0: m.lo, y1: m.hi })) }] : []),
+    ...(lineW.length >= 2 ? [{ id: "trust-ci", color, className: "ci-band", edge: false, smooth: false, points: lineW.map((m) => ({ x: m.x, y0: m.lo, y1: m.hi })) }] : []),
+  ];
   const vals = dots.map((d) => d.y).concat(areas.flatMap((a) => a.points.flatMap((p) => [p.y0, p.y1])), oecd.map((r) => r.v), edel.map((r) => r.v));
   const lo = Math.floor(Math.min(...(vals.length ? vals : [20])) / 10) * 10, hi = Math.ceil(Math.max(...(vals.length ? vals : [60])) / 10) * 10;
   const yd = useConfChase([lo, hi], dragging);
   const elecEvs = !isCur ? confElectionEvents(win, vTerms) : [];
   const elecRules = elecEvs.length > 6;
   const evs = !isCur ? (elecRules ? [] : elecEvs) : [];
-  const stripLines = [{ color: "var(--ink-2)", points: lineAll.map((m) => ({ x: m.x, y: m.v })) }];
+  const stripLines = [{ color: "var(--ink-2)", points: earlyAll.filter((m) => m.ym < M.firstOn).concat(lineAll).map((m) => ({ x: m.x, y: m.v })) }];
 
   /* ---- words: every claim off the model's own posteriors -----------------
      head: today's share; "the lowest since <month>" only when today sits
@@ -2306,7 +2325,7 @@ function RdTrustModel() {
   const firstOnName = trustMonth(M.firstOn);
   const bandHalf = String((M.bandMax || 20) / 2);
   const rank = (x) => !x ? "" : x.record ? ", the lowest since the line begins in " + firstOnName : ", the lowest since " + trustMonth(x.since);
-  const head = plainShare(now.v) + " Australians have confidence in the federal government" + rank(now.low2020);
+  const head = plainShare(now.v) + RW.head + rank(now.low2020);
   const Y = now.year, E = now.election;
   const sYear = Y.sig ? (Y.chg < 0 ? "Down " : "Up ") + pts(Y.chg) + " points on a year ago" : "Not significantly changed on a year ago";
   const elecLabel = E ? trustMonth(E.date.slice(0, 7)) : "";
@@ -2323,13 +2342,13 @@ function RdTrustModel() {
   const dek = sYear + sElec + "." + (sameWay ? " " + sigOther.s.house + "’s own " + trustMonth(sigOther.a.date) + " survey reports a significant " + (sigOther.a.v < sigOther.b.v ? "fall" : "rise") + " too, " + pts(sigOther.a.v - sigOther.b.v) + " points in a year." : "");
   const otherNames = rdList(Object.keys(M.adj).filter((sid) => S[sid] && sid !== "anupoll").map((sid) => S[sid].house));
   const brk = M.breaks || {};
-  const spine = lineW.map((m) => ({ x: m.x, y: m.v }));
+  const spine = hoverW.map((m) => ({ x: m.x, y: m.v }));
   return (
     <>
       <RdHed head={head} dek={dek} />
       <div className="rd-dir-figs">
         <div className="rd-dir-fig"><span className="rd-dir-v" style={{ color }}>{now.v.toFixed(1)}<span className="rd-dir-pct">%</span></span>
-          <span className="rd-dir-k" style={{ color }}>Confidence in the federal government</span></div>
+          <span className="rd-dir-k" style={{ color }}>{RW.k}</span></div>
         <div className="rd-dir-fig rd-r rd-trust-meta"><span>{trustMonth(now.ym)}</span><span>95% interval {now.lo.toFixed(0)}–{now.hi.toFixed(0)}%</span></div>
       </div>
       <div className="rd-dir-bar" role="img" aria-label={`Confidence ${now.v}%, 95% interval ${now.lo} to ${now.hi}, ${trustMonth(now.ym)}`}>
@@ -2342,27 +2361,28 @@ function RdTrustModel() {
       <RdConfWinBar win={winShown} terms={vTerms} lo={ext.lo} hi={ext.hi} nowX={nowX} onWin={onWin} />
       <div className="card rd-card rd-dir-chart rd-trust-chart">
         <div className="rd-chead"><span className="rd-chead-t">{narrow
-          ? "Confidence in the federal government, %"
-          : "Confidence in the federal government, %, every survey on ANUpoll’s terms"}</span></div>
-        {narrow && <RdKey items={[{ kind: "line", color, label: "Confidence" }]} className="rd-tpp-legend" />}
+          ? RW.title + ", %"
+          : RW.title + ", %, every survey on " + RW.terms}</span></div>
+        {narrow && <RdKey items={[{ kind: "line", color, label: RW.key }]} className="rd-tpp-legend" />}
         <TrendChart key="rd-trust-m" heightPx={narrow ? 280 : 360}
           padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
           xDomain={xDomain} yDomain={yd} yTicks={confTicksIn(yd, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
           xTicks={xTicks} baseline driven={dragging}
           series={series} spine={spine} areas={areas} scatter={dots}
           events={evs} vlines={elecRules ? elecEvs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
-          tooltipTitle={(i) => (lineW[i] ? trustMonth(lineW[i].ym) : "")}
-          extraRows={(i) => { const m = lineW[i]; return m ? [{ label: "95% interval", value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1), rowLabel: "trust-model" }] : []; }}
+          tooltipTitle={(i) => (hoverW[i] ? trustMonth(hoverW[i].ym) : "")}
+          extraRows={(i) => { const m = hoverW[i]; return m ? [{ label: "95% interval", value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1), rowLabel: "trust-model" }] : []; }}
           fmt={(v) => v.toFixed(1)}
-          copy={{ title: "Confidence in the federal government", span: confWinYears(win, vTerms, nowX),
-                  sub: head + ". Every survey pooled, on ANUpoll’s terms: the share with a great deal or quite a lot of confidence in the Federal Government in Canberra.",
-                  caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval; drawn from " + firstOnName + ", where that interval narrows under ±" + bandHalf + " points. Dots: each survey’s readings on the same terms (" + otherNames + " and ANUpoll; open dots are ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecd.length >= 2 || edel.length >= 2 ? " Dashed: " + [oecd.length >= 2 ? "the OECD average" : null, edel.length >= 2 ? "Edelman’s global average" : null].filter(Boolean).join(" and ") + ", each moved onto the same terms by its own survey’s lean in Australia." : ""),
-                  legend: [{ label: "Confidence, every survey on ANUpoll’s terms", color, kind: "line" }, { label: "Each survey’s readings, on the same terms", color: "var(--ink-3)", kind: "ring" }] }}
+          copy={{ title: RW.title, span: confWinYears(win, vTerms, nowX),
+                  sub: head + ". Every survey pooled, on " + RW.terms + ": " + RW.measure + ".",
+                  caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval; drawn from " + firstOnName + ", where that interval narrows under ±" + bandHalf + " points" + (firstFaint ? ", and dashed, with a fainter band, from " + trustMonth(firstFaint) + ", where it is wider (under ±" + (M.bandFaint / 2) + ")" : "") + ". Dots: each survey’s readings on the same terms (" + otherNames + "; open dots are ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecd.length >= 2 || edel.length >= 2 ? " Dashed: " + [oecd.length >= 2 ? "the OECD average" : null, edel.length >= 2 ? "Edelman’s global average" : null].filter(Boolean).join(" and ") + ", each moved onto the same terms by its own survey’s lean in Australia." : ""),
+                  legend: [{ label: RW.key + ", every survey on " + RW.terms, color, kind: "line" }, { label: "Each survey’s readings, on the same terms", color: "var(--ink-3)", kind: "ring" }] }}
         />
         <RdConfStrip lines={stripLines} lo={ext.lo} hi={ext.hi} win={win} terms={vTerms} onWin={onWin}
-                     narrow={narrow} label="Confidence in the federal government, every survey on ANUpoll’s terms" />
+                     narrow={narrow} label={RW.title + ", every survey on " + RW.terms} />
         <RdKey className="rd-ckey" items={[
-          { kind: "lineband", color, label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval, from " + firstOnName },
+          { kind: "lineband", color, label: "Every survey pooled, on " + RW.terms + ", with its 95% interval, from " + firstOnName },
+          earlyW.length >= 2 ? { kind: "dash", color, label: "The same before " + firstOnName + ", less sure: its interval is up to ±" + (M.bandFaint / 2) + " points" } : null,
           ...Object.keys(M.adj).filter((sid) => S[sid] && dots.some((d) => d.sid === sid))
             .map((sid) => ({ kind: "dot", color: TRUST_COLOR[sid] || "var(--ink-3)", label: S[sid].house + (sid === "anupoll" ? " (open: its earlier panel)" : sid === "scanlon" ? " (open: its telephone years)" : "") })),
           oecd.length >= 2 ? { kind: "dash", color: TRUST_COLOR["oecd-avg"], label: "OECD average, moved onto the same terms by the OECD survey’s lean in Australia" } : null,
@@ -2371,9 +2391,9 @@ function RdTrustModel() {
         ].filter(Boolean)} />
       </div>
       <HowTo paras={[
-        <>Every survey asks its own question – ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Edelman how far people trust “government in general” to do what is right on a nine-point scale, Essential about trust in the national government and in the federal parliament – so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on ANUpoll’s terms: the share with a great deal or quite a lot of confidence, as ANUpoll’s current panel asks it. Each dot is one survey’s reading moved onto those terms by its lean; point at one for the figure as printed.</>,
-        <>The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll’s opt-in panel since 2024 reads about {pts(brk.anupoll || 0)} points below its earlier panel at the same level of trust, and Scanlon’s telephone years read about {pts(brk.scanlon || 0)} points {brk.scanlon < 0 ? "below" : "above"} its online panel. No survey responds more or less sharply than ANUpoll’s once its lean is taken out.</>,
-        <>The shading is the line’s 95% interval: a 95% chance trust lies inside, under the model’s assumptions. A change is called significant only when its own 95% interval excludes zero. Before {firstOnName} the interval is wider than ±{bandHalf} points – each survey’s lean against ANUpoll is measured where they overlap, since 2020, and the further back from there, the less sure it is – so the line starts there and earlier readings show only as dots. The two global averages are moved onto the same terms the way the Ipsos world figure is on the direction chart: each by its own survey’s lean in Australia. Each covers whichever countries took part – the OECD’s 22 in 2021 and 38 in 2025, Edelman’s 26 to 28 a year – so part of their movement is who was counted. They also count different worlds: the OECD’s are its members, while Edelman’s include China, Saudi Arabia, the UAE and India, where its readings have run from 75 to 90% in recent years – which helps explain why Edelman’s average usually sits above Australia’s line and the OECD’s below it.</>,
+        <>Every survey asks its own question – ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Edelman how far people trust “government in general” to do what is right on a nine-point scale, Essential about trust in the national government and in the federal parliament – so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on {RW.terms}: {RW.measure}. {M.ref === "AES" ? "The AES has asked its question since 1969, longer than any other survey, so on its terms the history is sharpest; but it asks only after elections, last in May 2025, so today’s figure rests on how the more frequent surveys have moved since, read through their leans against it, and its interval is wider than any one poll’s. " : ""}Each dot is one survey’s reading moved onto those terms by its lean; point at one for the figure as printed.</>,
+        <>The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll’s opt-in panel since 2024 reads about {pts(brk.anupoll || 0)} points below its earlier panel at the same level of trust, and Scanlon’s telephone years read about {pts(brk.scanlon || 0)} points {brk.scanlon < 0 ? "below" : "above"} its online panel. No survey responds more or less sharply than the others once its lean is taken out. Changes – on a year ago, since the election – are measured on the pooled level with the {M.ref === "AES" ? "AES’s" : "reference’s"} lean held at today’s value, so they are movement in trust, not one survey’s drift.</>,
+        <>The shading is the line’s 95% interval: a 95% chance trust lies inside, under the model’s assumptions. A change is called significant only when its own 95% interval excludes zero. Before {firstOnName} the interval is wider than ±{bandHalf} points – {M.ref === "AES" ? "before the 1990s the only readings are Don Aitkin’s 1969 and 1979 surveys, the AES’s forerunners, a decade apart" : "each survey’s lean against ANUpoll is measured where they overlap, since 2020, and the further back from there, the less sure it is"} – so the line turns dashed, with a fainter band{firstFaint ? <>, back to {trustMonth(firstFaint)}, where the interval is still under ±{M.bandFaint / 2}; before that readings show only as dots</> : null}. The dashed stretch is better read for how trust moved than for where it stood. The two global averages are moved onto the same terms the way the Ipsos world figure is on the direction chart: each by its own survey’s lean in Australia. Each covers whichever countries took part – the OECD’s 22 in 2021 and 38 in 2025, Edelman’s 26 to 28 a year – so part of their movement is who was counted. They also count different worlds: the OECD’s are its members, while Edelman’s include China, Saudi Arabia, the UAE and India, where its readings have run from 75 to 90% in recent years – which helps explain why Edelman’s average usually sits above Australia’s line and the OECD’s below it.</>,
         <>The bar over the chart sets the window, as on the direction chart: it opens on this term; ‹ and › step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the line in miniature with the governments beneath it – drag the window, drag its edges to resize, or tap a spot to jump.</>,
       ]} />
       <details className="view-how hint-how rd-dirq">
@@ -2385,7 +2405,7 @@ function RdTrustModel() {
               <p className="rd-dirq-q">{q.paraphrase ? q.question : "“" + q.question + "”"}</p>
               {q.answers && <p className="rd-dirq-l"><span className="rd-dirq-k">Answers</span>{q.answers}</p>}
               {q.method && <p className="rd-dirq-l"><span className="rd-dirq-k">Method</span>{q.method}</p>}
-              <p className="rd-dirq-l"><span className="rd-dirq-k">In the line</span>{trustRoleText(q)}</p>
+              <p className="rd-dirq-l"><span className="rd-dirq-k">In the line</span>{trustRoleText(q, (M.ref === "AES" && id === "aes") || (M.ref === "ANUpoll" && id === "anupoll"))}</p>
             </section>
           ); })}
         </div>

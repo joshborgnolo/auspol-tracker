@@ -3082,9 +3082,13 @@ const trustGov = (() => {
   /* ---- 5t. one line from every survey (trust-model.mjs, 2026-11-22) -----
      ANUpoll, Scanlon, the AES, the OECD survey, Edelman, Essential and
      McKinnon, each through its own lean (ANUpoll's and Scanlon's earlier
-     panels as surveys of their own), printed on ANUpoll's terms. The OECD
+     panels as surveys of their own), printed on the AES's terms (TRUST_REF). The OECD
      and Edelman global averages are moved onto the same terms by their own
      survey's lean in Australia. */
+  /* the survey whose terms the line is printed on: the AES since 2026-11-23
+     (user decision; it reaches back to 1969, so history sharpens and the
+     present widens), ANUpoll's current panel before */
+  const TRUST_REF = "AES";
   const TRUST_N = { "ANUpoll (Life in Australia)": 3000, ANUpoll: 3500, Essential: 1000, "Essential (federal parliament)": 1000, McKinnon: 4300, "Scanlon (telephone)": 1500, Scanlon: 3500, AES: 2000, "OECD Australia": 2000, Edelman: 1150, AustraliaSCAN: 2000 };
   const houseOf = (s, r) => s.id === "anupoll" ? (r.panel === "lia" ? "ANUpoll (Life in Australia)" : "ANUpoll")
     : s.id === "scanlon" ? (r.mode === "tel" ? "Scanlon (telephone)" : "Scanlon")
@@ -3110,9 +3114,13 @@ const trustGov = (() => {
   const afterElec = lastElec && anu.readings.find((r) => r.date > lastElec.slice(0, 7));
   const yearAgo = tLast - 365, elecDay = afterElec ? TDAY(afterElec.date) : null;
   const t0 = Date.now();
-  const fit = fitTrust(readings, { core: new Set(["ANUpoll", "Essential", "McKinnon", "Scanlon", "AES", "OECD Australia", "Edelman"]), ref: "ANUpoll",
+  const fit = fitTrust(readings, { core: new Set(["ANUpoll", "Essential", "McKinnon", "Scanlon", "AES", "OECD Australia", "Edelman"]), ref: TRUST_REF,
     days: [...months.map((m) => m.day), yearAgo, ...(elecDay ? [elecDay] : [])], nDraw: 1000 });
   const at = (day) => fit.draws.map((d) => d.v[fit.slotOfDay.get(day)]);
+  /* changes are measured on the pooled level with the reference's lean held
+     at today's value, so a change is movement in trust, not the reference
+     survey's own drift (2026-11-23) */
+  const atPooled = (day) => fit.draws.map((d) => 100 / (1 + Math.exp(-(d.m[fit.slotOfDay.get(day)] + d.hRef))));
   const S = (a) => ({ v: r1(tmean(a)), lo: r1(tquant(a, 0.025)), hi: r1(tquant(a, 0.975)) });
   /* the line is drawn from the start of the run of months, ending now, whose
      95% band is under BAND_MAX points: 20 at first (user decision 2026-11-22),
@@ -3120,10 +3128,16 @@ const trustGov = (() => {
      runs 18–23 points wide; the month of the pandemic jump itself (its band
      widens for a moment by design) doesn't break the run */
   const BAND_MAX = 25;
-  const mRows = months.map(({ ym, day }) => { const s = S(at(day)); return { ym, x: mx(ym), ...s, on: s.hi - s.lo < BAND_MAX }; });
+  /* earlier, the line is drawn dashed with a fainter band where its band is
+     under BAND_FAINT points – from 1993, when AustraliaSCAN and the AES give
+     yearly-ish readings (user ask 2026-11-23: "extended drawn") */
+  const BAND_FAINT = 36;
+  const mRows = months.map(({ ym, day }) => { const s = S(at(day)); return { ym, x: mx(ym), ...s, on: s.hi - s.lo < BAND_MAX, faint: s.hi - s.lo < BAND_FAINT }; });
   const jumpYms = new Set(["2020-03"]);
   let firstOn = mRows.length - 1;
   while (firstOn > 0 && (mRows[firstOn - 1].on || jumpYms.has(mRows[firstOn - 1].ym))) firstOn--;
+  let firstFaint = firstOn;
+  while (firstFaint > 0 && mRows[firstFaint - 1].faint) firstFaint--;
   const nowA = at(tLast), diffS = (a, b) => { const d = a.map((v, i) => v - b[i]); const s = S(d); return { chg: s.v, lo: s.lo, hi: s.hi, sig: s.lo > 0 || s.hi < 0, pUp: r2(d.filter((v) => v > 0).length / d.length) }; };
   /* "the lowest since <month>": the latest earlier month whose line sits at
      or below today's, provided today sits significantly below every month
@@ -3142,22 +3156,22 @@ const trustGov = (() => {
   const leanAdj = (house, day) => fit.leanAt(house, day);
   const adj = {};
   for (const r of readings) (adj[r.sid] ||= []).push({ date: r.date, x: mx(r.date), v: r1(trustTerms(r.v, leanAdj(r.house, r.day))) });
-  /* a global average moves onto ANUpoll's terms by its own survey's lean in
+  /* a global average moves onto the reference's terms by its own survey's lean in
      Australia, as the Ipsos world figure does on the direction chart */
   const avgAdj = (sid, house) => { const s = series.find((x) => x.id === sid); return s ? s.readings.map((r) => ({ date: r.date, x: mx(r.date), v: r1(trustTerms(r.v, leanAdj(house, TDAY(r.date)))), printed: r.v, countries: r.countries })) : []; };
   const oecdAvgAdj = avgAdj("oecd-avg", "OECD Australia"), edelmanAvgAdj = avgAdj("edelman-avg", "Edelman");
   const brk = (a, b, day) => r1(trustTerms(50, -leanAdj(a, day)) - trustTerms(50, -leanAdj(b, day)));
   const model = {
-    ref: "ANUpoll", method: "bayes", draws: fit.n, months: mRows, firstOn: mRows[firstOn].ym, bandMax: BAND_MAX,
+    ref: TRUST_REF, method: "bayes", draws: fit.n, months: mRows, firstOn: mRows[firstOn].ym, bandMax: BAND_MAX, firstFaint: mRows[firstFaint].ym, bandFaint: BAND_FAINT,
     now: { ym: ymOfDay(tLast), x: mx(ymOfDay(tLast)), ...S(nowA),
-      year: { from: ymOfDay(yearAgo), ...diffS(nowA, at(yearAgo)) },
-      ...(elecDay ? { election: { date: lastElec, ym: afterElec.date, ...diffS(nowA, at(elecDay)) } } : {}),
+      year: { from: ymOfDay(yearAgo), ...diffS(nowA, atPooled(yearAgo)) },
+      ...(elecDay ? { election: { date: lastElec, ym: afterElec.date, ...diffS(nowA, atPooled(elecDay)) } } : {}),
       low2020: extreme("2020-01", true), high2020: extreme("2020-01", false), lowOn: extreme(mRows[firstOn].ym, true) },
     adj, oecdAvgAdj, edelmanAvgAdj,
     /* how far an earlier panel read above the current one, in points near 50% */
     breaks: { anupoll: brk("ANUpoll (Life in Australia)", "ANUpoll", TDAY("2024-01")), scanlon: brk("Scanlon (telephone)", "Scanlon", TDAY("2018-07")) },
   };
-  console.log(`trust model: ${readings.length} readings in ${((Date.now() - t0) / 1000).toFixed(1)}s | now ${model.now.v} [${model.now.lo}, ${model.now.hi}] on ANUpoll's terms`
+  console.log(`trust model: ${readings.length} readings in ${((Date.now() - t0) / 1000).toFixed(1)}s | now ${model.now.v} [${model.now.lo}, ${model.now.hi}] on ${TRUST_REF}'s terms`
     + ` | year ${model.now.year.chg} [${model.now.year.lo}, ${model.now.year.hi}] | line from ${model.firstOn} | breaks ANU ${model.breaks.anupoll} Scanlon ${model.breaks.scanlon}`
     + ` | best ${JSON.stringify(fit.best)}${fit.edges.length ? " | GRID EDGE " + fit.edges : ""}`);
   return { series, model };

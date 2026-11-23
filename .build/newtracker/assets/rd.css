@@ -302,6 +302,7 @@ body.rd .rd-note-text {
   paint-order: stroke; stroke: var(--chart-bg); stroke-linejoin: round;
 }
 body.rd .ci-band { opacity: var(--band-opacity); }
+body.rd .ci-band.rd-ci-faint { opacity: calc(var(--band-opacity) * 0.5); }
 body.rd .guide { stroke-width: 1; }
 body.rd .chart-copy-btn { opacity: 1; }
 /* the chart's own name, over it: what is plotted and in what unit */

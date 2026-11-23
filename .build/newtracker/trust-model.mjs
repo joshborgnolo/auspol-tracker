@@ -148,11 +148,13 @@ export function fitTrust(readings, { core, ref, days, nDraw = 2000, seed = 20261
   const rng = makeRng(seed), draws = [];
   for (const { r, n } of allocate(rows, nDraw)) {
     const f = runFilter(obs, L, events, r.th, { ...opts, store: true });
-    const batch = Array.from({ length: n }, () => ({ v: new Float64Array(S), leans: {} }));
+    const batch = Array.from({ length: n }, () => ({ v: new Float64Array(S), m: new Float64Array(S), hRef: 0, leans: {} }));
     ffbs(f, N, n, keep, rng, (d, k, x) => {
       const s = keep.get(k); let h = 0;
       for (let i = 0; i < N; i++) h += refRow[i] * x[i];
       batch[d].v[s] = 100 * logistic(x[0] + h);                 // on the reference survey's terms
+      batch[d].m[s] = x[0];                                       // the pooled level (logit), free of any lean
+      if (s === lastSlot) batch[d].hRef = h;                      // the reference's lean today
       if (s === lastSlot) for (const hs of L.houses) { const lr = L.leanRow.get(hs); let v = 0; for (let i = 0; i < N; i++) v += lr[i] * x[i]; batch[d].leans[hs] = v - h; }
     });
     draws.push(...batch);
