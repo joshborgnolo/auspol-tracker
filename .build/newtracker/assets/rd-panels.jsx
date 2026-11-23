@@ -703,11 +703,11 @@ function RdPrimary({ rangeId, setRangeId }) {
     const bridges = L.series.some((sr) => sr.dash === RD_VH_BRIDGE);
     const unmeasured = G ? [] : VH.terms.filter((t) => t.miss.alp == null && t.b > xDomain[0] && t.a < xDomain[1]);
     const inclusions = ["grn", "onp"].map((k) => {
-      const m = vhMarks.find((q) => q.dotColor === D.PARTIES[k].color);
-      return m ? { id: k, vote: k === "grn" ? 0 : m.dotVote } : null;
-    }).filter(Boolean).map((d, i, a) => ({
+      const m = vhMarks.filter((q) => q.dotColor === D.PARTIES[k].color);
+      return m.length ? { id: k, vote: m.length === 1 ? m[0].dotVote : null } : null;
+    }).filter(Boolean).map((d) => ({
       kind: "ring", color: D.PARTIES.oth.color, dotColor: D.PARTIES[d.id].color,
-      label: D.PARTIES[d.id].name + " included in Others" + (a.length === 1 && d.vote != null ? " (" + d.vote + "%)" : ""),
+      label: D.PARTIES[d.id].name + " included in Others" + (d.vote != null ? " (" + d.vote + "%)" : ""),
     }));
     return {
       series: (curIn ? chartSeries.map((sr) => ({ ...sr, ...(vwAtNow ? {} : { endLabel: null }), ...(vhLong ? { rdWidth: sr.id === "oth" ? 1.4 : 1.6 } : {}) })) : []).concat(L.series),

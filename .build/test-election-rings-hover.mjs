@@ -33,6 +33,7 @@ const greenX = history.terms.find((t) => t.year === 1993).a;
 const greenRings = result.marks.filter((m) => m.x === greenX);
 assert.equal(greenRings.length, 2, "the Greens-definition change also retains both counted rings");
 assert.equal(greenRings.filter((m) => m.dotColor === "var(--grn)").length, 1, "the Greens-inclusive ring gets the green centre");
+assert.equal(greenRings.find((m) => m.dotColor === "var(--grn)").dotVote, 1.9, "the Greens-inclusive ring carries the recorded 1993 vote, not the prior term's zero");
 assert.equal(greenRings.filter((m) => !m.dotColor).length, 1, "the Greens-excluding ring stays hollow");
 
 const synthetic = rdVhLines({ terms: [

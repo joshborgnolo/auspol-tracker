@@ -222,8 +222,9 @@ const inclusionKeys = await page.evaluate(() => [...document.querySelectorAll("#
   text: el.textContent,
   circles: [...el.querySelectorAll("svg circle")].map((c) => ({ fill: c.style.fill, stroke: c.style.stroke })),
 })));
+const expectedAllKeys = { Greens: "Greens included in Others (1.9%)", "One Nation": "One Nation included in Others" };
 for (const party of ["Greens", "One Nation"]) {
-  const item = inclusionKeys.find((k) => k.text === party + " included in Others");
+  const item = inclusionKeys.find((k) => k.text === expectedAllKeys[party]);
   check("primary key explains " + party + " included in Others", !!item,
     JSON.stringify(inclusionKeys.map((k) => k.text)));
   check("primary " + party + " inclusion key mirrors ring and centre dot",
@@ -249,18 +250,17 @@ await page.evaluate(() => {
   };
 });
 await page.click("#primary-vote .chart > .chart-copy-btn");
-await page.waitForFunction(() => ["Greens included in Others", "One Nation included in Others"]
-  .every((label) => window.__copyKeyOps.some((o) => o.text === label)), { timeout: 15000 });
+await page.waitForFunction((wanted) => wanted.every((label) => window.__copyKeyOps.some((o) => o.text === label)), { timeout: 15000 }, Object.values(expectedAllKeys));
 const copyKeyOps = await page.evaluate(() => window.__copyKeyOps);
 for (const party of ["Greens", "One Nation"]) {
-  const at = copyKeyOps.findIndex((o) => o.text === party + " included in Others");
+  const at = copyKeyOps.findIndex((o) => o.text === expectedAllKeys[party]);
   const arcs = copyKeyOps.slice(0, at).filter((o) => o.op === "arc").slice(-2);
   check("copy-card key keeps the " + party + " centre dot",
     arcs.length === 2 && arcs[0].r === 5 && arcs[1].r === 1.5 && arcs[0].x === arcs[1].x && arcs[0].y === arcs[1].y && !!arcs[1].fill,
     JSON.stringify(arcs));
 }
 
-/* a lone inclusion key names its vote; two keys stay unannotated (above) */
+/* each party gets a vote only while it has one visible inclusion marker */
 const inclusionTitles = () => page.evaluate(() => [...document.querySelectorAll("#primary-vote .rd-key .rd-key-item")]
   .map((el) => el.textContent).filter((s) => s.includes("included in Others")));
 await page.evaluate(() => {
@@ -271,14 +271,20 @@ await sleep(900);
 const onKey = await inclusionTitles();
 check("2001: lone One Nation inclusion key carries its 4.3% vote",
   onKey.length === 1 && onKey[0] === "One Nation included in Others (4.3%)", JSON.stringify(onKey));
+await page.evaluate(() => rdVwPut({ kind: "custom", a: 1990.8, b: 2002.5 }, false));
+await sleep(900);
+const oneEachKeys = await inclusionTitles();
+check("one Greens and one One Nation marker: both labels carry their votes",
+  oneEachKeys.length === 2 && oneEachKeys.includes("Greens included in Others (1.9%)") && oneEachKeys.includes("One Nation included in Others (4.3%)"),
+  JSON.stringify(oneEachKeys));
 await page.evaluate(() => {
   const t = AUSPOL.voteHistory.terms.find((q) => q.year === 1990);
   rdVwPut({ kind: "term", year: t.year, a: t.a, b: t.b }, false);
 });
 await sleep(900);
 const grnKey = await inclusionTitles();
-check("1990–93: lone Greens inclusion key carries its specified zero vote",
-  grnKey.length === 1 && grnKey[0] === "Greens included in Others (0%)", JSON.stringify(grnKey));
+check("1993: lone Greens inclusion key carries its 1.9% vote",
+  grnKey.length === 1 && grnKey[0] === "Greens included in Others (1.9%)", JSON.stringify(grnKey));
 
 await browser.close();
 server.close();
