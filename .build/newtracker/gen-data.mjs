@@ -3083,10 +3083,10 @@ const trustGov = (() => {
      panels as surveys of their own), printed on ANUpoll's terms. The OECD
      and Edelman global averages are moved onto the same terms by their own
      survey's lean in Australia. */
-  const TRUST_N = { "ANUpoll (Life in Australia)": 3000, ANUpoll: 3500, Essential: 1000, "Essential (federal parliament)": 1000, McKinnon: 4300, "Scanlon (telephone)": 1500, Scanlon: 3500, AES: 2000, "OECD Australia": 2000, Edelman: 1150 };
+  const TRUST_N = { "ANUpoll (Life in Australia)": 3000, ANUpoll: 3500, Essential: 1000, "Essential (federal parliament)": 1000, McKinnon: 4300, "Scanlon (telephone)": 1500, Scanlon: 3500, AES: 2000, "OECD Australia": 2000, Edelman: 1150, AustraliaSCAN: 2000 };
   const houseOf = (s, r) => s.id === "anupoll" ? (r.panel === "lia" ? "ANUpoll (Life in Australia)" : "ANUpoll")
     : s.id === "scanlon" ? (r.mode === "tel" ? "Scanlon (telephone)" : "Scanlon")
-    : ({ essential: "Essential", "essential-parliament": "Essential (federal parliament)", mckinnon: "McKinnon", aes: "AES", "oecd-au": "OECD Australia", edelman: "Edelman" })[s.id] || null;
+    : ({ essential: "Essential", "essential-parliament": "Essential (federal parliament)", mckinnon: "McKinnon", aes: "AES", "oecd-au": "OECD Australia", edelman: "Edelman", australiascan: "AustraliaSCAN" })[s.id] || null;
   const TDAY = (ym) => Math.floor(Date.parse(ym + "-15T00:00:00Z") / 86400000);
   const readings = [];
   for (const s of series) for (const r of s.readings) {

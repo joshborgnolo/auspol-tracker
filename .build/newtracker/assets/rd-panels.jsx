@@ -2100,7 +2100,7 @@ function RdDirection({ rangeId }) {
 const TRUST_COLOR = {
   anupoll: "var(--mood-pos)", essential: "var(--macro-cpi)", mckinnon: "var(--ink-2)",
   scanlon: "var(--confidence-main)", aes: "var(--confidence-alt)", "oecd-au": "var(--macro-gdppc)", "oecd-avg": "var(--macro-gdppc)",
-  "essential-parliament": "var(--ink-3)", edelman: "var(--trust-edelman)", "edelman-avg": "var(--trust-edelman)",
+  "essential-parliament": "var(--ink-3)", edelman: "var(--trust-edelman)", "edelman-avg": "var(--trust-edelman)", australiascan: "var(--macro-prod)",
 };
 /* How each survey asks (RdTrustModel), read from each source 2026-11-23:
    ANU's June 2026 report, Scanlon's 2026 report (Figure 8 and its method),
@@ -2108,7 +2108,7 @@ const TRUST_COLOR = {
    detailed findings and 2026 key findings, Edelman's 2012–2026 reports,
    Essential's report data (E1008, E309). `paraphrase`: the source prints no
    verbatim wording, so the question is described, not quoted. */
-const TRUST_NOTE_ORDER = ["anupoll", "scanlon", "aes", "oecd-au", "edelman", "mckinnon", "essential", "essential-parliament"];
+const TRUST_NOTE_ORDER = ["anupoll", "scanlon", "aes", "oecd-au", "edelman", "mckinnon", "essential", "essential-parliament", "australiascan"];
 const TRUST_HOUSE_NOTES = {
   anupoll: {
     paraphrase: true,
@@ -2161,8 +2161,16 @@ const TRUST_HOUSE_NOTES = {
     method: "Essential’s online panel, about 1,000 adults; six waves, August 2020 – December 2023.",
     role: "other",
   },
+  australiascan: {
+    question: "How much confidence do you have in each of the following? Would you say you had a great deal of confidence, some confidence or little or no confidence in the federal government?",
+    answers: "A great deal, some, little or none; the first two count. Murray Goot’s tables don’t say how non-answers were counted.",
+    method: "AMR–Quantum Harris’s AustraliaSCAN (later Quantum Australia), about 2,000 adults a wave, 1993–1999: December–February in 1994–95 and 1995–96, July–September from 1996; the 1993 wave’s months aren’t stated. From Goot’s Table 6a.",
+    role: "soft",
+  },
 };
-const trustRoleText = (q) => q.role === "ref"
+const trustRoleText = (q) => q.role === "soft"
+  ? "Its middle answer counts as confident, so it reads about 20 points above the rest; read through a wide lean of its own, it shows how trust moved in the 1990s, never where it stood."
+  : q.role === "ref"
   ? "The line is printed on the terms of its current panel, which also counts once among the surveys setting the level. Its Life in Australia waves count as a survey of their own, read through a wide lean."
   : q.role === "scanlon"
     ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways."
