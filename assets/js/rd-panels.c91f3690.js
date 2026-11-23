@@ -595,11 +595,11 @@ function RdPrimary({
       party: q.party,
       op: hideC[q.party] ? 0 : undefined,
       meta: {
-        pollster: "Monthly average",
+        pollster: VH.model ? "Model estimate" : "Monthly average",
         dateLabel: rdVhMonth(q.x),
         pre: true
       },
-      sub: "Drawn through the election results; the " + q.note
+      sub: "Drawn through the election results; the " + (VH.model ? q.note.replace("polls ", "polls’ model ") : q.note)
     }));
     const curStops = curIn ? pts.filter(d => d.x >= xDomain[0] - 1e-6).map(d => ({
       x: d.x,
@@ -973,8 +973,8 @@ function RdPrimary({
     } : H ? {
       title: "First-preference vote for each party",
       span: confWinYears(vwWin, vwTerms, vwHi),
-      sub: "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "") + ". Monthly averages of the polls, adjusted for each pollster’s lean.",
-      caption: (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + " are monthly averages moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals" + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
+      sub: "Past terms drawn through the election results at both ends" + (curIn ? "; this term is the polls alone" : "") + (VH.model ? ". The model’s estimates, each pollster’s lean taken out." : ". Monthly averages of the polls, adjusted for each pollster’s lean."),
+      caption: (vhDotsOn ? "Each dot is one poll as published; lines" : "Lines") + (VH.model ? " are the model’s estimates" : " are monthly averages") + " moved toward each past term’s closing result by part of the polls’ miss there, shaded bands their 95% intervals" + " with the doubt about when the miss arose." + (PMD ? " This term’s lines are the model’s." : "") + (H.bridges ? " Dotted stretches are months no one polled." : ""),
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
@@ -1038,11 +1038,11 @@ function RdPrimary({
     } : null, vhLong ? {
       kind: "line",
       color: "var(--ink-3)",
-      label: "Monthly average"
+      label: VH.model ? "Model estimate" : "Monthly average"
     } : {
       kind: "lineband",
       color: "var(--ink-3)",
-      label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval"
+      label: VH.model ? narrow ? "Model, 95% interval" : "Model estimate and its 95% interval" : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval"
     }, {
       kind: "ring",
       label: "Election result"
@@ -2509,8 +2509,8 @@ function RdDirection({
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   const tQuestion = "Trust and confidence in the federal government";
-  const tHouses = hasTrust ? rdList(D.trustGov.series.filter(s => s.role !== "line" && !/-avg$/.test(s.id)).map(s => s.house)) : "";
-  const meta = v === "direction" ? narrow ? question : question + (asked ? ", " + asked : "") : narrow ? tQuestion : tQuestion + ", ANUpoll with " + tHouses;
+  const tHouses = hasTrust ? rdList(D.trustGov.series.filter(s => !/-avg$/.test(s.id)).map(s => s.house)) : "";
+  const meta = v === "direction" ? narrow ? question : question + (asked ? ", " + asked : "") : narrow ? tQuestion : tQuestion + ", " + tHouses;
   return React.createElement(RdSec, {
     id: "direction",
     cls: "rd-dir",
@@ -2608,7 +2608,7 @@ const TRUST_HOUSE_NOTES = {
     role: "soft"
   }
 };
-const trustRoleText = q => q.role === "soft" ? "Its middle answer counts as confident, so it reads about 20 points above the rest; read through a wide lean of its own, it shows how trust moved in the 1990s, never where it stood." : q.role === "ref" ? "The line is printed on the terms of its current panel, which also counts once among the surveys setting the level. Its Life in Australia waves count as a survey of their own, read through a wide lean." : q.role === "scanlon" ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways." : q.role === "other" ? "Asks about the parliament, not the government, so it is read through a wide lean of its own: it shows how trust moved, never where it stands." : "Sets the line’s level with the other surveys, each counting once.";
+const trustRoleText = (q, isRef) => isRef ? "The line is printed on its terms, and it counts once among the surveys setting the level." : q.role === "soft" ? "Its middle answer counts as confident, so it reads about 20 points above the rest; read through a wide lean of its own, it shows how trust moved in the 1990s, never where it stood." : q.role === "ref" ? "Its current panel sets the line’s level with the other surveys, each counting once. Its Life in Australia waves count as a survey of their own, read through a wide lean." : q.role === "scanlon" ? "Its online panel sets the line’s level with the other surveys, each counting once. Its telephone years count as a survey of their own, read through a wide lean placed by 2018, when it was run both ways." : q.role === "other" ? "Asks about the parliament, not the government, so it is read through a wide lean of its own: it shows how trust moved, never where it stands." : "Sets the line’s level with the other surveys, each counting once.";
 const TRUST_ELECTIONS = [{
   date: "2022-05-21",
   label: "May 2022"
@@ -2623,6 +2623,24 @@ const trustDx = iso => {
 const trustMonth = ym => {
   const [y, m] = ym.split("-").map(Number);
   return window.AP.D.monthNameFull(m) + " " + y;
+};
+const TRUST_REF_WORDS = {
+  AES: {
+    terms: "the AES’s terms",
+    head: " Australians say people in government can be trusted to do the right thing",
+    k: "Say people in government can be trusted",
+    title: "Trust in government",
+    key: "Trust",
+    measure: "the share who say people in government can usually or sometimes be trusted to do the right thing, as the Australian Election Study asks it after each election"
+  },
+  ANUpoll: {
+    terms: "ANUpoll’s terms",
+    head: " Australians have confidence in the federal government",
+    k: "Confidence in the federal government",
+    title: "Confidence in the federal government",
+    key: "Confidence",
+    measure: "the share with a great deal or quite a lot of confidence in the Federal Government in Canberra, as ANUpoll’s current panel asks it"
+  }
 };
 function RdTrust() {
   const {
@@ -2641,6 +2659,7 @@ function RdTrustModel() {
   const S = Object.fromEntries(D.trustGov.series.map(s => [s.id, s]));
   const pts = n => Math.abs(n).toFixed(1);
   const color = TRUST_COLOR.anupoll;
+  const RW = TRUST_REF_WORDS[M.ref] || TRUST_REF_WORDS.ANUpoll;
   const credit = (s, r) => ({
     pollster: r.survey || s.house,
     dateLabel: r.field || trustMonth(r.date) + (r.approxDate ? " (approx.)" : ""),
@@ -2663,7 +2682,7 @@ function RdTrustModel() {
       x: r.x,
       y: r.v,
       color: TRUST_COLOR[sid] || "var(--ink-3)",
-      label: (orig && orig.survey || (s ? s.house : sid)) + ", on ANUpoll’s terms",
+      label: (orig && orig.survey || (s ? s.house : sid)) + ", on " + RW.terms,
       sub: orig ? "Printed: " + orig.v + "% (" + s.measure.split(" (")[0].toLowerCase() + ")" : undefined,
       meta: s && orig ? credit(s, orig) : {
         pollster: sid
@@ -2695,12 +2714,28 @@ function RdTrustModel() {
   const inW = x => x >= xDomain[0] - 0.05 && x <= xDomain[1] + 0.05;
   const lineAll = M.months.filter(m => m.ym >= M.firstOn);
   const lineW = lineAll.filter(m => inW(m.x));
+  const firstFaint = M.firstFaint && M.firstFaint < M.firstOn ? M.firstFaint : null;
+  const earlyAll = firstFaint ? M.months.filter(m => m.ym >= firstFaint && m.ym <= M.firstOn) : [];
+  const earlyW = earlyAll.filter(m => inW(m.x));
+  const hoverW = earlyW.filter(m => m.ym < M.firstOn).concat(lineW);
   const dots = adjDotsAll.filter(d => inW(d.x));
   const oecd = (M.oecdAvgAdj || []).filter(r => inW(r.x));
   const edel = (M.edelmanAvgAdj || []).filter(r => inW(r.x));
-  const series = [{
+  const series = [...(earlyW.length >= 2 ? [{
+    id: "trust-model-early",
+    label: RW.key + ", every survey on " + RW.terms + " (less sure)",
+    color,
+    points: earlyW.map(m => ({
+      x: m.x,
+      y: m.v
+    })),
+    rdWidth: 1.75,
+    dash: "5 4",
+    endCap: false,
+    smooth: false
+  }] : []), {
     id: "trust-model",
-    label: "Confidence, every survey on ANUpoll’s terms",
+    label: RW.key + ", every survey on " + RW.terms,
     color,
     points: lineW.map(m => ({
       x: m.x,
@@ -2709,10 +2744,10 @@ function RdTrustModel() {
     rdWidth: 2.5,
     endCap: false,
     smooth: false,
-    endLabel: narrow || !isCur ? null : "Confidence"
+    endLabel: narrow || !isCur ? null : RW.key
   }, ...(oecd.length >= 2 ? [{
     id: "oecd-avg-adj",
-    label: "OECD average, on ANUpoll’s terms",
+    label: "OECD average, on " + RW.terms,
     color: TRUST_COLOR["oecd-avg"],
     points: oecd.map(r => ({
       x: r.x,
@@ -2725,7 +2760,7 @@ function RdTrustModel() {
     interpHover: true
   }] : []), ...(edel.length >= 2 ? [{
     id: "edelman-avg-adj",
-    label: "Edelman global average, on ANUpoll’s terms",
+    label: "Edelman global average, on " + RW.terms,
     color: TRUST_COLOR["edelman-avg"],
     points: edel.map(r => ({
       x: r.x,
@@ -2737,7 +2772,18 @@ function RdTrustModel() {
     smooth: false,
     interpHover: true
   }] : [])];
-  const areas = lineW.length >= 2 ? [{
+  const areas = [...(earlyW.length >= 2 ? [{
+    id: "trust-ci-early",
+    color,
+    className: "ci-band rd-ci-faint",
+    edge: false,
+    smooth: false,
+    points: earlyW.map(m => ({
+      x: m.x,
+      y0: m.lo,
+      y1: m.hi
+    }))
+  }] : []), ...(lineW.length >= 2 ? [{
     id: "trust-ci",
     color,
     className: "ci-band",
@@ -2748,7 +2794,7 @@ function RdTrustModel() {
       y0: m.lo,
       y1: m.hi
     }))
-  }] : [];
+  }] : [])];
   const vals = dots.map(d => d.y).concat(areas.flatMap(a => a.points.flatMap(p => [p.y0, p.y1])), oecd.map(r => r.v), edel.map(r => r.v));
   const lo = Math.floor(Math.min(...(vals.length ? vals : [20])) / 10) * 10,
     hi = Math.ceil(Math.max(...(vals.length ? vals : [60])) / 10) * 10;
@@ -2758,7 +2804,7 @@ function RdTrustModel() {
   const evs = !isCur ? elecRules ? [] : elecEvs : [];
   const stripLines = [{
     color: "var(--ink-2)",
-    points: lineAll.map(m => ({
+    points: earlyAll.filter(m => m.ym < M.firstOn).concat(lineAll).map(m => ({
       x: m.x,
       y: m.v
     }))
@@ -2766,7 +2812,7 @@ function RdTrustModel() {
   const firstOnName = trustMonth(M.firstOn);
   const bandHalf = String((M.bandMax || 20) / 2);
   const rank = x => !x ? "" : x.record ? ", the lowest since the line begins in " + firstOnName : ", the lowest since " + trustMonth(x.since);
-  const head = plainShare(now.v) + " Australians have confidence in the federal government" + rank(now.low2020);
+  const head = plainShare(now.v) + RW.head + rank(now.low2020);
   const Y = now.year,
     E = now.election;
   const sYear = Y.sig ? (Y.chg < 0 ? "Down " : "Up ") + pts(Y.chg) + " points on a year ago" : "Not significantly changed on a year ago";
@@ -2788,7 +2834,7 @@ function RdTrustModel() {
   const dek = sYear + sElec + "." + (sameWay ? " " + sigOther.s.house + "’s own " + trustMonth(sigOther.a.date) + " survey reports a significant " + (sigOther.a.v < sigOther.b.v ? "fall" : "rise") + " too, " + pts(sigOther.a.v - sigOther.b.v) + " points in a year." : "");
   const otherNames = rdList(Object.keys(M.adj).filter(sid => S[sid] && sid !== "anupoll").map(sid => S[sid].house));
   const brk = M.breaks || {};
-  const spine = lineW.map(m => ({
+  const spine = hoverW.map(m => ({
     x: m.x,
     y: m.v
   }));
@@ -2811,7 +2857,7 @@ function RdTrustModel() {
     style: {
       color
     }
-  }, "Confidence in the federal government")), React.createElement("div", {
+  }, RW.k)), React.createElement("div", {
     className: "rd-dir-fig rd-r rd-trust-meta"
   }, React.createElement("span", null, trustMonth(now.ym)), React.createElement("span", null, "95% interval ", now.lo.toFixed(0), "\u2013", now.hi.toFixed(0), "%"))), React.createElement("div", {
     className: "rd-dir-bar",
@@ -2847,11 +2893,11 @@ function RdTrustModel() {
     className: "rd-chead"
   }, React.createElement("span", {
     className: "rd-chead-t"
-  }, narrow ? "Confidence in the federal government, %" : "Confidence in the federal government, %, every survey on ANUpoll’s terms")), narrow && React.createElement(RdKey, {
+  }, narrow ? RW.title + ", %" : RW.title + ", %, every survey on " + RW.terms)), narrow && React.createElement(RdKey, {
     items: [{
       kind: "line",
       color,
-      label: "Confidence"
+      label: RW.key
     }],
     className: "rd-tpp-legend"
   }), React.createElement(TrendChart, {
@@ -2884,9 +2930,9 @@ function RdTrustModel() {
       x: e.x,
       cls: "rd-conf-evrule"
     })) : [],
-    tooltipTitle: i => lineW[i] ? trustMonth(lineW[i].ym) : "",
+    tooltipTitle: i => hoverW[i] ? trustMonth(hoverW[i].ym) : "",
     extraRows: i => {
-      const m = lineW[i];
+      const m = hoverW[i];
       return m ? [{
         label: "95% interval",
         value: m.lo.toFixed(1) + "–" + m.hi.toFixed(1),
@@ -2895,12 +2941,12 @@ function RdTrustModel() {
     },
     fmt: v => v.toFixed(1),
     copy: {
-      title: "Confidence in the federal government",
+      title: RW.title,
       span: confWinYears(win, vTerms, nowX),
-      sub: head + ". Every survey pooled, on ANUpoll’s terms: the share with a great deal or quite a lot of confidence in the Federal Government in Canberra.",
-      caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval; drawn from " + firstOnName + ", where that interval narrows under ±" + bandHalf + " points. Dots: each survey’s readings on the same terms (" + otherNames + " and ANUpoll; open dots are ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecd.length >= 2 || edel.length >= 2 ? " Dashed: " + [oecd.length >= 2 ? "the OECD average" : null, edel.length >= 2 ? "Edelman’s global average" : null].filter(Boolean).join(" and ") + ", each moved onto the same terms by its own survey’s lean in Australia." : ""),
+      sub: head + ". Every survey pooled, on " + RW.terms + ": " + RW.measure + ".",
+      caption: "Line: a model of every survey, each moved by its own lean, shaded with its 95% interval; drawn from " + firstOnName + ", where that interval narrows under ±" + bandHalf + " points" + (firstFaint ? ", and dashed, with a fainter band, from " + trustMonth(firstFaint) + ", where it is wider (under ±" + M.bandFaint / 2 + ")" : "") + ". Dots: each survey’s readings on the same terms (" + otherNames + "; open dots are ANUpoll’s earlier panel and Scanlon’s telephone years)." + (oecd.length >= 2 || edel.length >= 2 ? " Dashed: " + [oecd.length >= 2 ? "the OECD average" : null, edel.length >= 2 ? "Edelman’s global average" : null].filter(Boolean).join(" and ") + ", each moved onto the same terms by its own survey’s lean in Australia." : ""),
       legend: [{
-        label: "Confidence, every survey on ANUpoll’s terms",
+        label: RW.key + ", every survey on " + RW.terms,
         color,
         kind: "line"
       }, {
@@ -2917,14 +2963,18 @@ function RdTrustModel() {
     terms: vTerms,
     onWin: onWin,
     narrow: narrow,
-    label: "Confidence in the federal government, every survey on ANUpoll\u2019s terms"
+    label: RW.title + ", every survey on " + RW.terms
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "lineband",
       color,
-      label: "Every survey pooled, on ANUpoll’s terms, with its 95% interval, from " + firstOnName
-    }, ...Object.keys(M.adj).filter(sid => S[sid] && dots.some(d => d.sid === sid)).map(sid => ({
+      label: "Every survey pooled, on " + RW.terms + ", with its 95% interval, from " + firstOnName
+    }, earlyW.length >= 2 ? {
+      kind: "dash",
+      color,
+      label: "The same before " + firstOnName + ", less sure: its interval is up to ±" + M.bandFaint / 2 + " points"
+    } : null, ...Object.keys(M.adj).filter(sid => S[sid] && dots.some(d => d.sid === sid)).map(sid => ({
       kind: "dot",
       color: TRUST_COLOR[sid] || "var(--ink-3)",
       label: S[sid].house + (sid === "anupoll" ? " (open: its earlier panel)" : sid === "scanlon" ? " (open: its telephone years)" : "")
@@ -2942,7 +2992,7 @@ function RdTrustModel() {
       label: "A faint rule is a federal election; the strip beneath carries the governments"
     } : null].filter(Boolean)
   })), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Every survey asks its own question \u2013 ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Edelman how far people trust \u201Cgovernment in general\u201D to do what is right on a nine-point scale, Essential about trust in the national government and in the federal parliament \u2013 so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on ANUpoll\u2019s terms: the share with a great deal or quite a lot of confidence, as ANUpoll\u2019s current panel asks it. Each dot is one survey\u2019s reading moved onto those terms by its lean; point at one for the figure as printed."), React.createElement(React.Fragment, null, "The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll\u2019s opt-in panel since 2024 reads about ", pts(brk.anupoll || 0), " points below its earlier panel at the same level of trust, and Scanlon\u2019s telephone years read about ", pts(brk.scanlon || 0), " points ", brk.scanlon < 0 ? "below" : "above", " its online panel. No survey responds more or less sharply than ANUpoll\u2019s once its lean is taken out."), React.createElement(React.Fragment, null, "The shading is the line\u2019s 95% interval: a 95% chance trust lies inside, under the model\u2019s assumptions. A change is called significant only when its own 95% interval excludes zero. Before ", firstOnName, " the interval is wider than \xB1", bandHalf, " points \u2013 each survey\u2019s lean against ANUpoll is measured where they overlap, since 2020, and the further back from there, the less sure it is \u2013 so the line starts there and earlier readings show only as dots. The two global averages are moved onto the same terms the way the Ipsos world figure is on the direction chart: each by its own survey\u2019s lean in Australia. Each covers whichever countries took part \u2013 the OECD\u2019s 22 in 2021 and 38 in 2025, Edelman\u2019s 26 to 28 a year \u2013 so part of their movement is who was counted. They also count different worlds: the OECD\u2019s are its members, while Edelman\u2019s include China, Saudi Arabia, the UAE and India, where its readings have run from 75 to 90% in recent years \u2013 which helps explain why Edelman\u2019s average usually sits above Australia\u2019s line and the OECD\u2019s below it."), React.createElement(React.Fragment, null, "The bar over the chart sets the window, as on the direction chart: it opens on this term; \u2039 and \u203A step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the line in miniature with the governments beneath it \u2013 drag the window, drag its edges to resize, or tap a spot to jump.")]
+    paras: [React.createElement(React.Fragment, null, "Every survey asks its own question \u2013 ANUpoll how much confidence people have in the Federal Government in Canberra, Scanlon whether it can be trusted to do the right thing, the AES whether people in government can be trusted, the OECD and McKinnon for a score out of 10, Edelman how far people trust \u201Cgovernment in general\u201D to do what is right on a nine-point scale, Essential about trust in the national government and in the federal parliament \u2013 so each has a lean of its own, measured against the others. The line is a model of all of them at once, printed on ", RW.terms, ": ", RW.measure, ". ", M.ref === "AES" ? "The AES has asked its question since 1969, longer than any other survey, so on its terms the history is sharpest; but it asks only after elections, last in May 2025, so today’s figure rests on how the more frequent surveys have moved since, read through their leans against it, and its interval is wider than any one poll’s. " : "", "Each dot is one survey\u2019s reading moved onto those terms by its lean; point at one for the figure as printed."), React.createElement(React.Fragment, null, "The model treats trust as moving a little each month, with room for a sudden shift at each federal election and change of prime minister and at the start of the pandemic in March 2020, when confidence jumped. A survey that changed how it polls counts as a new survey: ANUpoll\u2019s opt-in panel since 2024 reads about ", pts(brk.anupoll || 0), " points below its earlier panel at the same level of trust, and Scanlon\u2019s telephone years read about ", pts(brk.scanlon || 0), " points ", brk.scanlon < 0 ? "below" : "above", " its online panel. No survey responds more or less sharply than the others once its lean is taken out. Changes \u2013 on a year ago, since the election \u2013 are measured on the pooled level with the ", M.ref === "AES" ? "AES’s" : "reference’s", " lean held at today\u2019s value, so they are movement in trust, not one survey\u2019s drift."), React.createElement(React.Fragment, null, "The shading is the line\u2019s 95% interval: a 95% chance trust lies inside, under the model\u2019s assumptions. A change is called significant only when its own 95% interval excludes zero. Before ", firstOnName, " the interval is wider than \xB1", bandHalf, " points \u2013 ", M.ref === "AES" ? "before the 1990s the only readings are Don Aitkin’s 1969 and 1979 surveys, the AES’s forerunners, a decade apart" : "each survey’s lean against ANUpoll is measured where they overlap, since 2020, and the further back from there, the less sure it is", " \u2013 so the line turns dashed, with a fainter band", firstFaint ? React.createElement(React.Fragment, null, ", back to ", trustMonth(firstFaint), ", where the interval is still under \xB1", M.bandFaint / 2, "; before that readings show only as dots") : null, ". The dashed stretch is better read for how trust moved than for where it stood. The two global averages are moved onto the same terms the way the Ipsos world figure is on the direction chart: each by its own survey\u2019s lean in Australia. Each covers whichever countries took part \u2013 the OECD\u2019s 22 in 2021 and 38 in 2025, Edelman\u2019s 26 to 28 a year \u2013 so part of their movement is who was counted. They also count different worlds: the OECD\u2019s are its members, while Edelman\u2019s include China, Saudi Arabia, the UAE and India, where its readings have run from 75 to 90% in recent years \u2013 which helps explain why Edelman\u2019s average usually sits above Australia\u2019s line and the OECD\u2019s below it."), React.createElement(React.Fragment, null, "The bar over the chart sets the window, as on the direction chart: it opens on this term; \u2039 and \u203A step a term at a time, Term, 10 yrs, 25 yrs and All widen it, and the strip underneath is the line in miniature with the governments beneath it \u2013 drag the window, drag its edges to resize, or tap a spot to jump.")]
   }), React.createElement("details", {
     className: "view-how hint-how rd-dirq"
   }, React.createElement("summary", null, "How each survey asks"), React.createElement("div", {
@@ -2976,7 +3026,7 @@ function RdTrustModel() {
       className: "rd-dirq-l"
     }, React.createElement("span", {
       className: "rd-dirq-k"
-    }, "In the line"), trustRoleText(q)));
+    }, "In the line"), trustRoleText(q, M.ref === "AES" && id === "aes" || M.ref === "ANUpoll" && id === "anupoll")));
   }))), React.createElement(RdFoot, {
     how: {
       term: "trust-government",
@@ -5181,6 +5231,7 @@ function rdDemoShift(dt, T, party) {
   const pct = v => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
   const named = new Set();
   const elecSentence = () => {
+    if (dt.model) return null;
     const pass = (dt.elec || []).filter(r => (r.claim ?? r.sig) && !named.has(r.group)).sort((a, b) => Math.abs(b.d) / b.ci - Math.abs(a.d) / a.ci);
     if (!pass.length) return null;
     const sgnE = v => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
@@ -6326,9 +6377,9 @@ function RdDemographics({
     scope: "col"
   }, "Change vs all voters, pts"), React.createElement("th", {
     scope: "col"
-  }, "t, gap"), React.createElement("th", {
+  }, sigSets.some(x => x.rows.some(r => r.model)) ? "z, gap" : "t, gap"), React.createElement("th", {
     scope: "col"
-  }, "t, ratio"), React.createElement("th", {
+  }, sigSets.some(x => x.rows.some(r => r.model)) ? "z, ratio" : "t, ratio"), React.createElement("th", {
     scope: "col"
   }, "Significant"))), sigSets.map(s => React.createElement("tbody", {
     key: s.key
@@ -6343,10 +6394,12 @@ function RdDemographics({
   }, React.createElement("th", {
     scope: "row"
   }, r.group, r.thin ? " †" : ""), React.createElement("td", null, sgn1(r.g0), " \u2192 ", sgn1(r.g1)), React.createElement("td", null, sgn1(r.a0), " \u2192 ", sgn1(r.a1)), React.createElement("td", null, sgn1(r.rel, true)), React.createElement("td", null, r.tAbs == null ? "–" : sgn1(r.tAbs)), React.createElement("td", null, r.tLR == null ? "–" : sgn1(r.tLR)), React.createElement("td", {
-    className: r.sig ? "rd-tsig-yes" : ""
-  }, r.sig ? "Yes" : "No"))))))), React.createElement("p", {
+    className: r.sig && !(r.check && r.check.conflict) ? "rd-tsig-yes" : ""
+  }, !r.sig ? "No" : r.check && r.check.conflict ? "Withheld" : "Yes"))))))), sigSets.some(x => x.rows.some(r => r.model)) ? React.createElement("p", {
     className: "rd-note rd-tsig-note"
-  }, "Support figures are fitted monthly trends over each set\u2019s window, not single polls. A group\u2019s change vs all voters is its fitted change less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " national fitted change, in points; a move counts as significant only when both trend tests \u2014 on the group\u2019s gap to all voters and on its ratio \u2014 clear a t statistic of 1.96, in the same direction. \u2020 Seven or fewer monthly readings: the trend summary above hedges these (\u201Cappears to\u201D)."), elecSets.length > 0 && React.createElement(React.Fragment, null, React.createElement("div", {
+  }, "Support figures are the model\u2019s, at polling day and today. A group\u2019s change vs all voters is its change less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " national change, read from the model\u2019s draws of the group\u2019s gap on both days together. z is that change over its own standard error, on the point gap and on the ratio to all voters; a group has moved only when both 95% intervals exclude zero in the same direction, so a group that has merely kept pace with a party growing everywhere has not. Where Resolve\u2019s own election-day and current waves measure the same change for age or gender, a move they contradict beyond both margins is withheld.") : React.createElement("p", {
+    className: "rd-note rd-tsig-note"
+  }, "Support figures are fitted monthly trends over each set\u2019s window, not single polls. A group\u2019s change vs all voters is its fitted change less ", party === "oth" ? "minor parties’ and independents’" : pName + "’s", " national fitted change, in points; a move counts as significant only when both trend tests \u2014 on the group\u2019s gap to all voters and on its ratio \u2014 clear a t statistic of 1.96, in the same direction. \u2020 Seven or fewer monthly readings: the trend summary above hedges these (\u201Cappears to\u201D)."), elecSets.length > 0 && !(D.demoTrend && D.demoTrend[party] && D.demoTrend[party].model) && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-tsig-wrap"
   }, React.createElement("table", {
     className: "rd-tsig-table"
