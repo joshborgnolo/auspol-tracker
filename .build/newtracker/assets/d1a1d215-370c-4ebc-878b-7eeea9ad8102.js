@@ -6875,7 +6875,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         facet={facet} onFacet={onFacet} measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} setTppBasis={setTppBasis}
         consM={consM} setConsM={setConsM} confBus={confBus} setConfBus={setConfBus}
         q={q} setQ={setQ} sel={sel} setSel={setSelT} toggleHouse={toggleHouse} range={range} setRange={setRangeT}
-        tagSel={tagSel} setTagSel={setTagSelT} toggleTag={toggleTag}
+        tagSel={tagSel} setTagSel={setTagSelT} toggleTag={toggleTag} pop={pop} setPop={setPop}
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
         ofTotal={totalAll} ofHouses={housesAll.length} demSplit={demSplit} setDemSplit={setDemSplit} />

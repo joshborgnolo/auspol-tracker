@@ -6,7 +6,7 @@
    extended to (MRP|SMS|pooled), matching gen-data.mjs's housesTracked one).
 
    Checks, desktop (1366px) then phone (390px):
-   - the desktop .rd-ap-sel-house options contain "Newspoll" and "Roy Morgan"
+   - the desktop Pollster menu options contain "Newspoll" and "Roy Morgan"
      but no option containing "(pooled)";
    - selecting "Newspoll" leaves exactly the option's own (N) rows, a folded
      "Newspoll (pooled)" row is visible in the table, the pill reads plain
@@ -26,7 +26,7 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".json": "applica
 const server = createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end(); }
@@ -49,19 +49,18 @@ try {
   await page.setViewport({ width: 1366, height: 900 });
   page.on("pageerror", (e) => console.log("PAGEERROR", String(e).slice(0, 200)));
   await page.goto(`http://127.0.0.1:${PORT}/allpolls/`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector(".rd-ap-sel-house", { timeout: 20000 });
+  await page.waitForSelector(".rd-ap-pops .ap-popbtn");
+  await page.click(".rd-ap-pops .ap-popbtn");
+  await page.waitForSelector(".rd-ap-pops .ap-check");
 
   const desk = await page.evaluate(async () => {
-    const sel = document.querySelector(".rd-ap-sel-house");
-    const opts = [...sel.options].map((o) => o.textContent.trim());
-    const pollsterOpts = opts.filter((t) => !t.includes("✕") && t !== "Pollster");
+    const rows = [...document.querySelectorAll(".rd-ap-pops .ap-check")];
+    const label = row => row.querySelector(".ap-check-lab").textContent.trim();
+    const pollsterOpts = rows.map(label);
     const pooledLive = window.AP.D.individualPolls.filter((p) => / \(pooled\)$/.test(p.pollster)).length;
-    /* React-controlled native select: set via the prototype setter, then
-       dispatch a bubbling change. */
-    const np = [...sel.options].find((o) => o.textContent.trim().startsWith("Newspoll ("));
-    const npN = np ? Number(/\((\d+)\)$/.exec(np.textContent.trim())[1]) : null;
-    Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value").set.call(sel, np.value);
-    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    const np = rows.find(row => label(row) === "Newspoll");
+    const npN = Number(np.querySelector(".ap-check-n").textContent);
+    np.click();
     await new Promise((r) => setTimeout(r, 400));
     const count = Number(document.querySelector(".rd-ap-count b")?.textContent);
     const rowsText = [...document.querySelectorAll(".rd-ap-table")].map((t) => t.textContent).join(" ");
@@ -71,9 +70,9 @@ try {
              w: new URLSearchParams(location.search).get("w"),
              pills };
   });
-  ok("desktop: Pollster options include plain Newspoll", desk.pollsterOpts.some((t) => t.startsWith("Newspoll (")), JSON.stringify(desk.pollsterOpts));
+  ok("desktop: Pollster options include plain Newspoll", desk.pollsterOpts.some((t) => t === "Newspoll"), JSON.stringify(desk.pollsterOpts));
   ok("desktop: no option carries (pooled)", !desk.pollsterOpts.some((t) => t.includes("(pooled)")), JSON.stringify(desk.pollsterOpts));
-  ok("desktop: Roy Morgan appears as its base name", desk.pollsterOpts.some((t) => t.startsWith("Roy Morgan (")), JSON.stringify(desk.pollsterOpts));
+  ok("desktop: Roy Morgan appears as its base name", desk.pollsterOpts.some((t) => t === "Roy Morgan"), JSON.stringify(desk.pollsterOpts));
   ok("live data still has pooled waves to fold", desk.pooledLive > 0, "individualPolls has none — probe would be vacuous");
   ok("desktop: Newspoll option count == filtered row count", desk.npN != null && desk.count === desk.npN, `option ${desk.npN} vs row count ${desk.count}`);
   ok("desktop: a Newspoll (pooled) row is visible under the Newspoll filter", desk.hasPooledNewspollRow);

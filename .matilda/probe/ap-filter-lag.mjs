@@ -20,13 +20,13 @@ const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css
 const server = createServer(async (req, res) => {
   try {
     let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-    if (p === "/") p = "/index.html";
+    if (p.endsWith("/")) p += "index.html";
     res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" });
     res.end(await readFile(join(ROOT, p)));
   } catch { res.writeHead(404); res.end(); }
 });
 await new Promise((r) => server.listen(0, r));
-const URL0 = `http://127.0.0.1:${server.address().port}/index.html`;
+const URL0 = `http://127.0.0.1:${server.address().port}/`;
 const browser = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--no-sandbox"] });
 const page = await browser.newPage();
 const cdp = await page.createCDPSession();
@@ -47,17 +47,22 @@ await page.goto(URL0 + "allpolls/", { waitUntil: "networkidle0" });
 await sleep(1500);
 await page.evaluate(() => { window.__lt.length = 0; });
 
+const openMenu = async (name) => {
+  await page.evaluate((name) => {
+    const label = [...document.querySelectorAll(".rd-ap-pops .ap-popbtn-lab")].find(el => el.textContent === name);
+    const button = label.closest("button");
+    if (button.getAttribute("aria-expanded") !== "true") button.click();
+  }, name);
+  await page.waitForSelector('.rd-ap-pops .ap-panel[aria-label="' + name + '"]');
+};
 const pick = async (cls, value, label, profile) => {
+  await openMenu(cls);
   if (profile) await cdp.send("Profiler.start");
   const r = await page.evaluate(async ({ cls, value }) => {
-    const sel = document.querySelector(cls);
-    if (!sel) return { err: "no select " + cls };
-    const opt = [...sel.options].find((o) => o.value === value);
-    if (!opt) return { err: "no option " + value };
+    const labels = document.querySelectorAll(".rd-ap-pops .ap-check-lab, .rd-ap-pops .ap-clear");
+    const item = [...labels].find(el => el.firstChild.textContent === value);
     const t0 = performance.now();
-    const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value").set;
-    setter.call(sel, value);
-    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    item.closest("button").click();
     const free = await new Promise((res) => setTimeout(() => res(performance.now()), 0));
     await new Promise((res) => setTimeout(res, 400));
     const t1 = performance.now();
@@ -88,10 +93,10 @@ const pick = async (cls, value, label, profile) => {
 };
 
 console.log("CPU throttle " + RATE + "x, desktop 1366");
-await pick(".rd-ap-sel-house", "Fox & Hedgehog", "house tick   ", true);
-await pick(".rd-ap-sel-house", "Fox & Hedgehog", "house untick ");
-await pick(".rd-ap-sel-time", "6", "time 6mo     ");
-await pick(".rd-ap-sel-inc", "aprv", "includes tick");
-await pick(".rd-ap-sel-inc", "__clear", "includes clr ");
+await pick("Pollster", "Fox & Hedgehog", "house tick   ", true);
+await pick("Pollster", "Fox & Hedgehog", "house untick ");
+await pick("Time", "Last 6 months", "time 6mo     ");
+await pick("Includes", "Leader approval", "includes tick");
+await pick("Includes", "Clear", "includes clr ");
 await browser.close();
 server.close();
