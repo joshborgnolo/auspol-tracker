@@ -7323,6 +7323,8 @@ function RdUndecided({ rangeId }) {
     };
 
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find((d) => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
+    const guideMonths = [...new Map(drawn.flatMap((d) => d.pts).map((q) => [q.x, { x: q.x, y: q.v, ym: q.ym }])).values()]
+      .sort((a, b) => a.x - b.x);
     return (
       <div className={"card rd-card rd-un-panel rd-un-p-" + key} key={key}>
         <div className="rd-un-ptitle"><b>{title}</b><span>{meta}</span></div>
@@ -7345,10 +7347,10 @@ function RdUndecided({ rangeId }) {
             ...(d.past ? {} : { endLabel: { first: "Asked once", leaner: "Follow-up", tpp: "Preferences", soft: "Resolve", softRB: "RedBridge" }[d.s.id] }),
             points: series(d.pts, "v") }))}
           areas={bands}
-          spine={series(drawn[0].pts, "v")}
+          spine={guideMonths}
           scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), label: READ_TOP[d.s.id] || d.s.label, meta: q }))).concat(pastDots)} pollFacet="twopp"
           notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "%, " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
-          tooltipTitle={(i) => { const p = drawn[0].pts[i]; return p ? monthLabelFull(p.ym) : ""; }}
+          tooltipTitle={(i) => { const p = guideMonths[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={(v) => v.toFixed(1)}
           /* the readouts over the chart say which line is which; the copy
              leaves them behind, so its key says it, with the figures */

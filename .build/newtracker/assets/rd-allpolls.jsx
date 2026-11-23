@@ -295,20 +295,9 @@ function rdEffNote(p) {
     ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>{word}</a>
     : <span title={note}>{word}</span>}</>;
 }
-/* Fieldwork not yet published (a DemosAU wave filed from the Capital Brief
-   article before the methodology PDF; a Resolve wave filed from the monitor
-   csv before the SMH article carries its dates): the poll sits on the charts
-   by a provisional window, but every label says just "TBC" (user call
-   2026-10-11), linking where the house will publish the dates (gen-data's
-   fieldUrl). rdFieldTxt is the plain-text form for tooltips and labels;
-   rdFieldTbc the linked one. */
 const rdFieldTxt = (q) => (q && q.fieldPending ? "TBC" : (q && (q.field || q.dateLabel)) || "");
-function rdFieldTbc(p, tabIndex) {
-  const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
-  return p.fieldUrl
-    ? <a className="rd-tbc" href={p.fieldUrl} target="_blank" rel="noopener noreferrer" title={note} tabIndex={tabIndex} onClick={(e) => e.stopPropagation()}>TBC</a>
-    : <span title={note}>TBC</span>;
-}
+/* The linked form, rdFieldTbc, is in shared rd.jsx so early renders can use it. */
+
 /* A poll's header, one wording wherever a poll is opened (All polls, Latest
    and next polls): when it was in the field, how many were asked, and who
    published it when, as one running sentence. "a sample of 1,500" with the

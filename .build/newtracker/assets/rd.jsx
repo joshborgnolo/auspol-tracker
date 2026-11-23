@@ -9,6 +9,15 @@
    their return into the redesign's layout, built from the parts below. Every
    style these parts use lives in rd.css, scoped to body.rd. */
 
+/* Pending fieldwork is shared by the early masthead and later poll views,
+   not by the late-loaded All-polls view alone. */
+function rdFieldTbc(p, tabIndex) {
+  const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
+  return p.fieldUrl
+    ? <a className="rd-tbc" href={p.fieldUrl} target="_blank" rel="noopener noreferrer" title={note} tabIndex={tabIndex} onClick={(e) => e.stopPropagation()}>TBC</a>
+    : <span title={note}>TBC</span>;
+}
+
 /* ---------------------------------------------------------------- sections
    A dark rule over a sentence-case section title, with the title's meta
    beside it; then the section's finding as a serif headline and its deck.
@@ -1237,7 +1246,7 @@ function rdEventReveal(id) {
   });
 }
 
-Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade,
+Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade, rdFieldTbc,
                         rdTabsKey, rdTabFocus, rdDigitKey, useHoverClaim,
                         rdSpaceClaimOn, rdSpaceClaimOff, rdSpaceDominant,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,

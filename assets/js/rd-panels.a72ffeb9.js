@@ -1803,7 +1803,9 @@ function RdLeadership({
     rdWidth: 2.5,
     endLabel: "over " + han.short
   }].filter(s => s.points.length));
+  const neitherH = new Set(LMOD && LMOD.neither || []);
   const leadDots = kept("leadDots", () => D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => ["at", "ah"].map(mode => {
+    if (neitherH.has(q.pollster)) return null;
     const c = ppmMatch(q, mode);
     if (!c || c.alb == null) return null;
     const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
@@ -2169,6 +2171,16 @@ function RdLeadership({
     };
   };
   const histPpm = histOn ? histScene("ppm") : null;
+  const neitherNote = (() => {
+    if (!neitherH.size || histPpm && histPpm.long) return "";
+    const a = histPpm && histPpm.win ? histPpm.win.a : xDomain[0],
+      b = histPpm && histPpm.win ? histPpm.win.b : xDomain[1];
+    const hs = [...new Set(D.individualPolls.filter(q => neitherH.has(q.pollster) && q.x >= a && q.x <= b && ["at", "ah"].some(m => {
+      const c = ppmMatch(q, m);
+      return c && c.alb != null;
+    })).map(q => q.pollster.split("/")[0]))];
+    return hs.length ? " " + rdList(hs) + "’s head-to-head polls aren’t drawn: they offered “Neither”, which took the opposition leader’s backers far more than the prime minister’s." : "";
+  })();
   const histLead = histPpm ? (() => {
     const vals = histPpm.series.flatMap(s => s.points.flatMap(q => histPpm.long ? [q.y] : [q.lo, q.hi])).concat(histPpm.dots.map(d => d.y), histPpm.lone.map(d => d.y), histPpm.long ? [] : leadDots.map(d => d.y));
     const fit = fitDomain(vals.length ? vals : [-20, 20], 10, 0);
@@ -2197,7 +2209,7 @@ function RdLeadership({
         span: confWinYears(vwWin, vwTerms, vwHi),
         sub: "Points ahead of the opposition leader among those who chose one of the two, each pairing its own line",
         legend: [],
-        caption: keyDots + " " + keyLead + "."
+        caption: keyDots + " " + keyLead + "." + neitherNote
       }
     };
   })() : null;
@@ -2238,7 +2250,7 @@ function RdLeadership({
       title: J ? "The " + J.office.alb + "’s lead as preferred " + J.office.alb : pm.short + "’s lead as preferred prime minister",
       sub: "Points ahead of each rival when voters are asked to choose between the two, month by month",
       legend: [],
-      caption: keyDots + " " + keyLead + "."
+      caption: keyDots + " " + keyLead + "." + neitherNote
     }
   };
   const ppmPadSeries = leadSeries.concat(threeSeries);
@@ -2896,7 +2908,7 @@ function RdLeadership({
     items: []
   }, React.createElement("span", {
     className: "rd-ld-keytxt"
-  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + (histOn ? "; each pairing is its own line." : ", which lets one chart carry both head-to-head contests.") : keyLead + (LMOD ? "; three-way figures are shares of those who named one of the three." : "; three-way figures are shares of all respondents.")))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + apprBy(true) + "." : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".", React.createElement(RdTabs, {
+  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + (histOn ? "; each pairing is its own line." : ", which lets one chart carry both head-to-head contests.") + neitherNote : keyLead + (LMOD ? "; three-way figures are shares of those who named one of the three." : "; three-way figures are shares of all respondents.") + neitherNote))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + apprBy(true) + "." : "Approve minus disapprove of the job each leader is doing. " + apprBy(false) + ".", React.createElement(RdTabs, {
     swipe: true,
     value: metric,
     onChange: pickMetric,
@@ -9926,6 +9938,11 @@ function RdUndecided({
       softRB: "Named a party or a lean but call their vote soft or very soft, not solid."
     };
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find(d => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
+    const guideMonths = [...new Map(drawn.flatMap(d => d.pts).map(q => [q.x, {
+      x: q.x,
+      y: q.v,
+      ym: q.ym
+    }])).values()].sort((a, b) => a.x - b.x);
     return React.createElement("div", {
       className: "card rd-card rd-un-panel rd-un-p-" + key,
       key: key
@@ -9983,7 +10000,7 @@ function RdUndecided({
         points: series(d.pts, "v")
       })),
       areas: bands,
-      spine: series(drawn[0].pts, "v"),
+      spine: guideMonths,
       scatter: drawn.flatMap(d => d.dots.map(q => ({
         x: q.x,
         y: q.v,
@@ -10001,7 +10018,7 @@ function RdUndecided({
         size: 11
       }] : [],
       tooltipTitle: i => {
-        const p = drawn[0].pts[i];
+        const p = guideMonths[i];
         return p ? monthLabelFull(p.ym) : "";
       },
       fmt: v => v.toFixed(1),
