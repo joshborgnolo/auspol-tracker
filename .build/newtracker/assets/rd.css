@@ -4222,6 +4222,20 @@ body.rd .rd-ldg-lead { grid-area: lead; min-width: 0; align-self: start; }
 body.rd .rd-ldg-side { grid-area: side; min-width: 0; align-self: start; }
 body.rd .rd-ldg-also { grid-area: also; min-width: 0; align-self: start; }
 body.rd .rd-ldg-lead .rd-apd-demwrap { padding-bottom: 0; border-bottom: 0; }
+/* DemosAU's two modelled One Nation switch-rate matrices: one table per
+   recalled-2025-vote cohort, side by side where their six columns fit. */
+body.rd .rd-apd-on25 { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); }
+body.rd .rd-apd-on25-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-top: 12px; }
+body.rd .rd-apd-on25-tag { display: block; margin-bottom: 6px; font-size: 12px; color: var(--ink-3); }
+body.rd .rd-apd-on25-t { table-layout: fixed; font-size: 13px; }
+body.rd .rd-apd-on25-t caption { padding-bottom: 10px; font-size: 15px; font-weight: 600; line-height: 1.35; color: var(--ink); text-align: left; }
+body.rd .rd-apd-on25-t th:first-child { width: 54px; }
+body.rd .rd-apd-on25-t .rd-apd-on25-loc th { padding-top: 12px; border-bottom: 1px solid var(--line-2); font-weight: 600; color: var(--ink); }
+body.rd .rd-apd-on25-t :is(th, td) { padding-right: 5px; }
+body.rd .rd-apd-on25 > .rd-apd-note { display: block; margin-top: 10px; }
+@media (max-width: 900px) {
+  body.rd .rd-apd-on25-cols { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+}
 /* headings speak the drawer's heading voice (.rd-apd-h) */
 body.rd .rd-ldg-h { margin: 0 0 10px; font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
 body.rd .rd-ldg-chg { margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--ink-3); white-space: nowrap; }

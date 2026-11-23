@@ -1161,6 +1161,41 @@ function RdApIssMini({ p }) {
   );
 }
 
+const RD_AP_ON25_EDUC = ["Less than year 12", "Year 12", "TAFE", "Undergraduate", "Postgraduate"];
+const RD_AP_ON25_LOCS = [["Inner metro", "Inner metro"], ["Outer metro", "Outer metro"], ["Reg & Rur", "Rural/regional"]];
+const RD_AP_ON25_AGES = ["18–34", "35–54", "55+"];
+function RdApOnp2025({ data }) {
+  if (!data) return null;
+  return (
+    <div className="rd-apd-on25">
+      <span className="rd-apd-h">One Nation’s support within 2025 voting cohorts</span>
+      <div className="rd-apd-on25-cols">
+        {[["lnp", "Coalition"], ["alp", "Labor"]].filter(([k]) => data[k]).map(([k, party]) => (
+          <div key={k} className="rd-apd-on25-set">
+            <span className="rd-apd-on25-tag">Modelled, MRP estimates</span>
+            <table className="rd-ldg-t rd-apd-on25-t">
+              <caption>One Nation share of 2025 {party} voters</caption>
+              <thead><tr><th scope="col">Age cohort</th>{RD_AP_ON25_EDUC.map((ed) => <th key={ed} scope="col" className="num">{ed}</th>)}</tr></thead>
+              {RD_AP_ON25_LOCS.filter(([loc]) => data[k][loc]).map(([loc, label]) => (
+                <tbody key={loc}>
+                  <tr className="rd-apd-on25-loc"><th scope="rowgroup" colSpan={RD_AP_ON25_EDUC.length + 1}>{label}</th></tr>
+                  {RD_AP_ON25_AGES.filter((age) => data[k][loc][age]).map((age) => (
+                    <tr key={age}>
+                      <th scope="row">{age}</th>
+                      {RD_AP_ON25_EDUC.map((ed) => <td key={ed} className="num">{rdApNum(data[k][loc][age][ed])}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              ))}
+            </table>
+          </div>
+        ))}
+      </div>
+      <span className="rd-apd-sub rd-apd-note">Each figure is the modelled One Nation share of that recalled-2025-vote group, by location, age and education, %. These are switch rates, not the primary-vote shares above.</span>
+    </div>
+  );
+}
+
 function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSplit, setDemSplit, onFacet }) {
   const D = window.AUSPOL;
   const d = p.dir;
@@ -1315,7 +1350,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     }
     const head = <div className="rd-apd-demr rd-apd-demh" role="row"><span></span>{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}</div>;
     const all = tot && <div className="rd-apd-demr rd-apd-demall" role="row"><span role="rowheader">All voters</span>{cols.map((k) => { const tv = tot[K.indexOf(k.id)]; return <span key={k.id} role="cell">{tv == null ? "—" : rdApNum(tv)}</span>; })}</div>;
-    return (
+    return (<>
       <div className="rd-apd-demwrap">
         <span className="rd-apd-h">The vote by group, {p.grp.r === "measured from the charts" ? "measured off " + p.pollster + "’s charts" : "as " + p.pollster + " printed it"}</span>
         <div className="rd-apd-demcols">
@@ -1338,7 +1373,8 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
         </div>
         <span className="rd-apd-sub rd-apd-note">Primary vote within each group, %. Shaded: five points or more above the poll’s all-voters figure; faded: five or more below.{pr ? " Marked: " + pr.a + " and " + pr.b + ", the two groups the row compares." : ""}</span>
       </div>
-    );
+      <RdApOnp2025 data={p.grp.onp2025} />
+    </>);
   })();
   /* …and How it counts tells that table's story: what the house printed,
      which of its groups feed the pooled Who votes for whom figures (the rest
@@ -2243,6 +2279,7 @@ function rdLgLines(p, { onM, demSplit }) {
       {pr && <U lbl>{pr.lab}</U>}
       {pr && rdLgPrims().filter((k) => pr.gap[k.id] != null).map((k) => <U key={k.id}>{pty(k.id, sg(pr.gap[k.id]))}</U>)}
       <U soft>{nG} groups in {rdNumWord(nC)} breakdown{nC === 1 ? "" : "s"}</U>
+      {p.grp.onp2025 && <U soft>plus One Nation by 2025 vote, place, age and education</U>}
     </> });
   }
   const seats = p.seats && p.seats.p ? rdLgPrims().filter((k) => p.seats.p[k.id]) : [];

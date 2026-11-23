@@ -229,6 +229,10 @@ window.AUSPOL = (function () {
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
      the share of each party's voters certain of their vote. */
   const firmness = null;
+  /* The completed terms' decidedness readings: national soft share, Resolve
+     age bands and RedBridge party cohorts, kept outside the current-term
+     pools above. */
+  const decidednessHistory = null;
   /* Where One Nation's gains came from (§5b): per wave, each 2025-vote
      group's part of what One Nation drew from outside its own 2025 vote,
      from DemosAU's and YouGov's vote-switching tables. */
@@ -462,7 +466,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {
