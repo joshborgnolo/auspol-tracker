@@ -5659,7 +5659,7 @@ function RdDemographics({
   const vals = tab.sets.flatMap(st => st.groups.flatMap(g => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)].concat(g.px && g.px[party] || []))).concat([all]);
   const hi = Math.max(10, Math.ceil(Math.max(...vals) / 10) * 10);
   const xp = v => Math.max(0, Math.min(hi, v)) / hi * 100;
-  const signedD = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const ratioD = v => (v / all).toFixed(1) + "×";
   const dotSet = (st, idx) => React.createElement("div", {
     className: "rd-wv-set",
     key: "s" + idx,
@@ -5753,7 +5753,7 @@ function RdDemographics({
       } : undefined,
       title: rowTitle
     }, React.createElement(RollNum, {
-      value: signedD(d)
+      value: ratioD(v)
     })));
   }));
   const axis = React.createElement("div", {
@@ -6375,7 +6375,7 @@ function RdDemographics({
     }]
   }, React.createElement("span", {
     className: "rd-key-item rd-wv-keytxt"
-  }, "Right-hand column: difference from all voters, in points")), tab.sets.some(st => st.bands) ? React.createElement("div", {
+  }, "Right-hand column: ratio to all voters")), tab.sets.some(st => st.bands) ? React.createElement("div", {
     className: "rd-wv-bands"
   }, tab.sets.flatMap(st => st.bands ? st.houses.filter(h => st.bands[h]).map(h => ({
     h,
@@ -8978,7 +8978,7 @@ function RdUndecided({
   const H = U.history && U.history.terms && U.history.terms.length ? U.history : null;
   const histOn = !!((H || DH) && winU && nowXU != null);
   const hx = ym => D.mx(ym);
-  const historyXU = (H ? H.terms.flatMap(t => Object.values(t.series).flatMap(sr => sr.months.map(m => hx(m[0])))) : []).concat(DH ? DH.soft.terms.flatMap(t => t.monthly.map(m => m.x)) : []);
+  const historyXU = (H ? H.terms.flatMap(t => Object.values(t.series).flatMap(sr => sr.months.map(m => hx(m[0])))) : []).concat(H ? H.polls.map(p => p.x) : []).concat(DH ? DH.soft.terms.flatMap(t => t.monthly.map(m => m.x)) : []);
   const extU = histOn ? {
     lo: Math.min(nowXU, ...historyXU) - 0.3,
     hi: nowXU

@@ -4609,7 +4609,7 @@ function RdDemographics({ rangeId = "all" }) {
   const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)].concat((g.px && g.px[party]) || []))).concat([all]);
   const hi = Math.max(10, Math.ceil(Math.max(...vals) / 10) * 10);
   const xp = (v) => (Math.max(0, Math.min(hi, v)) / hi) * 100;
-  const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const ratioD = (v) => (v / all).toFixed(1) + "×";
   const dotSet = (st, idx) => (
     <div className="rd-wv-set" key={"s" + idx} role="table" aria-label={(st.label || tab.label) + ": " + pPoss + " share of each group’s vote"}>
       <div className="rd-wv-sethead" role="row">
@@ -4645,7 +4645,7 @@ function RdDemographics({ rangeId = "all" }) {
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ "--x": xp(v), background: sig ? pColor : undefined, borderColor: pColor }} aria-hidden="true"></span>
             </span>
             <span role="cell" className="rd-wv-v" title={rowTitle}><b><RollNum value={v.toFixed(1)} />%</b> <span>±<RollNum value={ci.toFixed(1)} /></span></span>
-            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined} title={rowTitle}><RollNum value={signedD(d)} /></span>
+            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined} title={rowTitle}><RollNum value={ratioD(v)} /></span>
           </div>
         );
       })}
@@ -5026,7 +5026,7 @@ function RdDemographics({ rangeId = "all" }) {
           { kind: "dot-open", color: pColor, label: "Within the margin" },
           { kind: "whisker", color: pColor, label: "95% interval" },
           { kind: "dot", color: pColor, label: T.model ? "One poll in the last " + T.window : "One poll pooled" },
-        ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
+        ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: ratio to all voters</span></RdKey>
         {/* the house's own end brackets each tilt was read from, spelled
            out by house since no two houses' brackets agree (the dek says
            why up front; it also names the basis, so a house's own basis
