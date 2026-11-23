@@ -1587,7 +1587,7 @@ function RdHero(p) {
                                refLines: [{ y: 50, color: "var(--ink-faint)" }], notes } : null} morphT={HH ? 1 : t}
           xTicks={HH ? HH.ticks : rdElectionTicks(xDomain[0], xDomain[1], narrow, elec ? elec.x : null)} baseline
           refLines={[{ y: 50, color: "var(--ink-faint)" }]}
-          notes={notes} marks={HH ? HH.marks : marks} ringAtX={HH ? null : ringOn ? elec.x : null}
+          notes={notes} marks={HH ? HH.marks : marks} ringAtX={HH ? null : ringOn ? elec.x : null} snapToMarks
           events={HH ? (HH.elecRules ? [] : HH.evs) : events} eventsFrom={HH ? null : eventsWas} eventMix={HH ? 1 : t}
           vlines={HH && HH.elecRules ? HH.evs.map((e) => ({ x: e.x, cls: "rd-conf-evrule" })) : []}
           evt={evtOpen} onEvt={setEvtOpen}

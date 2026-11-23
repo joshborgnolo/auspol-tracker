@@ -372,8 +372,10 @@ function TrendChart(props) {
        ringAtX – a spine x whose guide-tooltip swatches are drawn as the
                 `marks` ring (border in each row's colour) rather than the
                 solid square – the tooltip marks an election result the way
-                the chart does. Null on every other chart. */
-    marks = [], notes = [], baseline = false, ringAtX = null,
+                the chart does. Null on every other chart.
+       snapToMarks – a direct ring hover chooses that mark's x on a dense
+                monthly spine, so subpixel movement cannot jump to a month. */
+    marks = [], notes = [], baseline = false, ringAtX = null, snapToMarks = false,
     /* brackets – [{x, y0, y1, dx?, lines: [strong, plain]}] a span between two
        readings at one month, measured off the chart with its words to the left */
     brackets = [],
@@ -807,6 +809,8 @@ function TrendChart(props) {
     cancelHoverLeave();
     if (dotSrc.current === "touch") setDotFrom(null, null);   // mouse takes over a stale touch pick
     const p = toVB(e);
+    const markX = snapToMarks && e.target.closest?.(".rd-ring[data-spine-x]")?.getAttribute("data-spine-x");
+    if (markX != null) { showSpine(nearestSpine(sx(Number(markX)))); return; }
     const near = nearestDot(p, MOUSE_PICK_PX);
     if (near) {
       if (near !== dot) { setHover(null); setEvt(null); setDotFrom("mouse", near); onHoverIndex && onHoverIndex(null); }
@@ -1966,7 +1970,8 @@ function TrendChart(props) {
             ) : (
               <>
                 <circle cx={x} cy={y} r={PX(m.r || 5)} className="rd-ring"
-                        style={m.color ? { stroke: m.color } : null} />
+                        style={m.color ? { stroke: m.color } : null}
+                        data-spine-x={snapToMarks ? m.x : undefined} />
                 {m.dotColor && <circle cx={x} cy={y} r={PX(1.35)} className="rd-ring-inclusion"
                                        style={{ fill: m.dotColor, stroke: "none" }} />}
               </>

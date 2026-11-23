@@ -254,6 +254,7 @@ function TrendChart(props) {
     notes = [],
     baseline = false,
     ringAtX = null,
+    snapToMarks = false,
     brackets = [],
     vlines = []
   } = props;
@@ -598,6 +599,11 @@ function TrendChart(props) {
     cancelHoverLeave();
     if (dotSrc.current === "touch") setDotFrom(null, null);
     const p = toVB(e);
+    const markX = snapToMarks && e.target.closest?.(".rd-ring[data-spine-x]")?.getAttribute("data-spine-x");
+    if (markX != null) {
+      showSpine(nearestSpine(sx(Number(markX))));
+      return;
+    }
     const near = nearestDot(p, MOUSE_PICK_PX);
     if (near) {
       if (near !== dot) {
@@ -1820,7 +1826,8 @@ function TrendChart(props) {
       className: "rd-ring",
       style: m.color ? {
         stroke: m.color
-      } : null
+      } : null,
+      "data-spine-x": snapToMarks ? m.x : undefined
     }), m.dotColor && React.createElement("circle", {
       cx: x,
       cy: y,

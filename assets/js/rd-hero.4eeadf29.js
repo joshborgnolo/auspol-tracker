@@ -2226,6 +2226,7 @@ function RdHero(p) {
     notes: notes,
     marks: HH ? HH.marks : marks,
     ringAtX: HH ? null : ringOn ? elec.x : null,
+    snapToMarks: true,
     events: HH ? HH.elecRules ? [] : HH.evs : events,
     eventsFrom: HH ? null : eventsWas,
     eventMix: HH ? 1 : t,
