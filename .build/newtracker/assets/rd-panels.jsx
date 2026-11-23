@@ -4421,11 +4421,11 @@ const RD_GAP_REFS = {
   generation: { ref: "Boomers", compare: "Gen Z", title: "Generation" },
   gender: { ref: "Men", compare: "Women", title: "Gender" },
   education: { ref: "Year 12 or less", compare: "University", title: "Education" },
-  state: { ref: "NSW", compare: "Vic", title: "State", note: "NSW, the largest state, is the reference; states are not ranked." },
+  state: { ref: "NSW", compare: "Vic", title: "State" },
   location: { ref: "Inner metro", compare: "Rural", title: "Location" },
   housing: { ref: "Own outright", compare: "Renting", title: "Housing" },
   language: { ref: "English only", compare: "Other language", title: "Language at home" },
-  working: { ref: "Full time", compare: "Part time", title: "Work status", note: "Full-time workers are the reference; work categories are not ranked." },
+  working: { ref: "Full time", compare: "Part time", title: "Work status" },
   income: { ref: "Lower earners (bottom 50%)", compare: "Higher earners (top 15%)", title: "Income",
     note: "The existing standardised income bands combine household and personal income; the middle 35% is outside this comparison." },
 };
@@ -4435,14 +4435,14 @@ const rdGapFmt = (v) => {
 };
 /* Join exact months, retaining real zero shares and omitting missing
    parties. Never interpolate one group's absent month to manufacture a gap. */
-function rdGapPoints(group, reference, order, party, mx) {
+function rdGapPoints(group, reference, order, party, mx, relative = false) {
   const i = order.indexOf(party);
   if (i < 0 || !group || !reference) return [];
   const base = new Map((reference.monthly || []).map((r) => [r[0], r[1 + i]]));
   return (group.monthly || []).flatMap((r) => {
     const a = r[1 + i], b = base.get(r[0]);
-    return Number.isFinite(a) && Number.isFinite(b)
-      ? [{ ym: r[0], x: mx(r[0]), y: Math.round((a - b) * 10) / 10, groupVote: a, referenceVote: b }] : [];
+    return Number.isFinite(a) && Number.isFinite(b) && (!relative || b > 0)
+      ? [{ ym: r[0], x: mx(r[0]), y: relative ? 100 * (a - b) / b : Math.round((a - b) * 10) / 10, groupVote: a, referenceVote: b }] : [];
   }).sort((a, b) => a.x - b.x);
 }
 /* Missing months break the stroke, even when the model/average is ragged. */
@@ -4456,13 +4456,13 @@ function rdGapRuns(points) {
   }
   return runs;
 }
-function rdGapSet(st, order, mx) {
+function rdGapSet(st, order, mx, refLabel, relative) {
   const def = RD_GAP_REFS[st.id];
   if (!def) return null;
-  const reference = st.groups.find((g) => g.label === def.ref);
+  const reference = st.groups.find((g) => g.label === (refLabel || def.ref));
   if (!reference) return null;
   const comparisons = st.groups.filter((g) => g !== reference).map((g) => ({
-    group: g, parties: order.map((party) => ({ party, points: rdGapPoints(g, reference, order, party, mx) })),
+    group: g, parties: order.map((party) => ({ party, points: rdGapPoints(g, reference, order, party, mx, relative) })),
   })).filter((c) => c.parties.some((p) => p.points.length));
   if (!comparisons.length) return null;
   const points = comparisons.flatMap((c) => c.parties.flatMap((p) => p.points));
@@ -4471,10 +4471,12 @@ function rdGapSet(st, order, mx) {
   const limit = Math.max(5, Math.ceil((Math.max(...points.map((p) => Math.abs(p.y))) + 1) / 5) * 5);
   return { def, reference, comparisons, limit, firstX: Math.min(...points.map((p) => p.x)) };
 }
-function RdDemographicGapSet({ st, order, rangeId, model }) {
+function RdDemographicGapSet({ st, order, rangeId, model, relative }) {
   const { D, rangeDomain, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
-  const data = React.useMemo(() => rdGapSet(st, order, D.mx), [st, order, D]);
+  const [refLabel, setRefLabel] = useState("");
+  const unit = relative ? "%" : " pp";
+  const data = React.useMemo(() => rdGapSet(st, order, D.mx, refLabel, relative), [st, order, D, refLabel, relative]);
   const [choice, setChoice] = useState("");
   if (!data) return null;
   const { def, reference, comparisons, limit, firstX } = data;
@@ -4485,7 +4487,8 @@ function RdDemographicGapSet({ st, order, rangeId, model }) {
   const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
   const ticks = [-limit, -limit / 2, 0, limit / 2, limit];
   const who = (g) => DEMO_WHO[g.label] || RD_DEMO_SHORT[g.label] || g.label;
-  const formula = st.id === "gender" ? "Women’s primary vote − men’s primary vote · percentage points"
+  const formula = relative ? group.label + " compared with " + reference.label + " · percentage difference relative to " + reference.label
+    : st.id === "gender" && reference.label === "Men" ? "Women’s primary vote − men’s primary vote · percentage points"
     : group.label + " − " + reference.label + " · primary vote, percentage points";
   const title = def.title + " gap in primary voting intention";
   const explanation = "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
@@ -4494,19 +4497,23 @@ function RdDemographicGapSet({ st, order, rangeId, model }) {
   const padSeries = selected.parties.flatMap((p) => {
     const visible = p.points.filter((pt) => pt.x >= x0 && pt.x <= x1);
     const last = visible[visible.length - 1];
-    return last ? [{ points: [last], endLabel: rdGapFmt(last.y) + " pp" }] : [];
+    return last ? [{ points: [last], endLabel: rdGapFmt(last.y) + unit }] : [];
   });
   return (
     <div className="card rd-card rd-wv-gap-set" role="group" aria-label={title}>
       <div className="rd-chead"><h5 className="rd-chead-t">{title}</h5></div>
-      {comparisons.length > 1 && <label className="rd-wv-gap-choice">
+      <div className="rd-wv-gap-choice">
         Compare
         <select className="rd-pv-sel" aria-label={def.title + " comparison group"} value={group.label}
                 onChange={(e) => setChoice(e.target.value)}>
           {comparisons.map((c) => <option key={c.group.label} value={c.group.label}>{c.group.label}</option>)}
         </select>
-        <span>Reference: <b>{reference.label}</b></span>
-      </label>}
+        Reference
+        <select className="rd-pv-sel" aria-label={def.title + " reference group"} value={reference.label}
+                onChange={(e) => { setChoice(e.target.value === group.label ? reference.label : group.label); setRefLabel(e.target.value); }}>
+          {st.groups.map((g) => <option key={g.label} value={g.label}>{g.label}</option>)}
+        </select>
+      </div>
       <p className="rd-wv-gap-formula">{formula}</p>
       <p className="rd-wv-gap-directions">{explanation}</p>
       {def.note && <p className="rd-wv-gap-note">{def.note}</p>}
@@ -4520,16 +4527,16 @@ function RdDemographicGapSet({ st, order, rangeId, model }) {
             <div className="rd-sm rd-wv-gap-panel" key={pp.id}>
               <div className="rd-sm-top"><span><i className="rd-sw" style={{ background: color }}></i>{pp.label}</span>
                 <span className="rd-wv-gap-date">{last ? rdMonthYear(last.ym) : ""}</span></div>
-              {points.length ? <TrendChart key={st.id + "|" + group.label + "|" + pp.id}
+              {points.length ? <TrendChart key={st.id + "|" + group.label + "|" + reference.label + "|" + unit + "|" + pp.id}
                 heightPx={narrow ? 180 : 170} padPx={{ l: 36, r: 6, t: 12, b: 26 }}
                 xDomain={[x0, x1]} yDomain={[-limit, limit]} xTicks={rdXTicks(x0, x1, true)}
                 yTicks={ticks} yTickFmt={(v) => v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, "")}
                 refLines={[{ y: 0, color: "var(--ink-3)" }]}
                 series={rdGapRuns(points).map((run, i, runs) => ({
                   id: pp.id + "-" + i, label: "Gap", color, points: run, smooth: false, rdWidth: 2.25,
-                  endLabel: i === runs.length - 1 ? rdGapFmt(last.y) + " pp" : null,
+                  endLabel: i === runs.length - 1 ? rdGapFmt(last.y) + unit : null,
                 }))}
-                spine={points} padSeries={padSeries} fmt={rdGapFmt} unit=" pp"
+                spine={points} padSeries={padSeries} fmt={rdGapFmt} unit={unit}
                 tooltipTitle={(i) => points[i] ? monthLabelFull(points[i].ym) : ""}
                 extraRows={(i) => points[i] ? [
                   { label: group.label, value: points[i].groupVote.toFixed(1) + "%" },
@@ -4548,11 +4555,15 @@ function RdDemographicGapSet({ st, order, rangeId, model }) {
   );
 }
 const RdDemographicGaps = React.memo(function RdDemographicGaps({ tab, order, rangeId, model }) {
+  const [relative, setRelative] = useState(false);
   return (
     <div className="rd-wv-gaps">
-      <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups, in percentage points." />
-      <p className="rd-wv-gap-note">{model ? "Lines subtract the existing group model estimates." : "Lines subtract the existing monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Intervals for the differences are not available.</p>
-      {tab.sets.map((st) => <RdDemographicGapSet key={st.id} st={st} order={order} rangeId={rangeId} model={model} />)}
+      <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups." />
+      <div className="rd-chips" role="group" aria-label="Gap measure">
+        {[false, true].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (%)" : "Absolute (pp)"}</button>)}
+      </div>
+      <p className="rd-wv-gap-note">{relative && "The gap is divided by the reference group’s vote share and expressed as a percentage. Months with a zero reference share are omitted. "}{model ? "Lines subtract the existing group model estimates." : "Lines subtract the existing monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Intervals for the differences are not available.</p>
+      {tab.sets.map((st) => <RdDemographicGapSet key={st.id} st={st} order={order} rangeId={rangeId} model={model} relative={relative} />)}
     </div>
   );
 });

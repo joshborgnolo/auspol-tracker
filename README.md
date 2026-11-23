@@ -33,7 +33,9 @@ Under **Who votes for whom**, the existing group charts are followed by
 party-by-party gap charts for each set, including generations, states,
 language, work status and the standardised income bands. The charts subtract
 the named reference group's monthly primary vote from the comparison group's
-figure; gender is women's minus men's. Multi-category sets offer every other
+figure; gender defaults to women's minus men's. Either group can be the reference.
+Relative mode divides the signed difference by the reference share and expresses
+it as a percentage, omitting months where the reference share is zero. Multi-category sets offer every other
 category against the same reference. Scales are symmetric about zero and
 fixed across parties, comparison choices and time windows within a set.
 Tooltips give both underlying shares. Missing months break the line; the
