@@ -5986,6 +5986,28 @@ function rdGapRuns(points) {
   }
   return runs;
 }
+function rdGapChanged(group, reference, order, party, relative) {
+  const i = order.indexOf(party) + 1;
+  const refs = new Map(reference.monthly.map(row => [row[0], row]));
+  const pairs = group.monthly.map(row => [row, refs.get(row[0])]).filter(([a, b]) => b && [a, b].every(r => Number.isFinite(r[i]) && Number.isFinite(r[i + order.length]) && r[i + order.length] >= 0) && (!relative || b[i] > 0));
+  if (pairs.length < 2) return false;
+  const tail = 0.05 / (4 * pairs.length);
+  let z = 1.96;
+  while (Math.exp(-z * z / 2) / (z * Math.sqrt(2 * Math.PI)) > tail) z += 0.01;
+  const bounds = r => {
+    const width = (r[i + order.length] + 0.05) * z / 1.96 + 0.05;
+    return [Math.max(0, r[i] - width), Math.min(100, r[i] + width)];
+  };
+  let lower = -Infinity,
+    upper = Infinity;
+  for (const [a, b] of pairs) {
+    const [al, ah] = bounds(a),
+      [bl, bh] = bounds(b);
+    lower = Math.max(lower, relative ? al / bh : al - bh);
+    upper = Math.min(upper, relative ? bl > 0 ? ah / bl : Infinity : ah - bl);
+  }
+  return lower > upper;
+}
 function rdGapSet(st, order, mx, refLabel, relative) {
   const def = RD_GAP_REFS[st.id];
   if (!def) return null;
@@ -5995,6 +6017,7 @@ function rdGapSet(st, order, mx, refLabel, relative) {
     group: g,
     parties: order.map(party => ({
       party,
+      changed: rdGapChanged(g, reference, order, party, relative),
       points: rdGapPoints(g, reference, order, party, mx, relative)
     }))
   })).filter(c => c.parties.some(p => p.points.length));
@@ -6112,10 +6135,13 @@ function RdDemographicGapSet({
     className: "rd-wv-gap-directions"
   }, explanation), def.note && React.createElement("p", {
     className: "rd-wv-gap-note"
-  }, def.note), React.createElement("div", {
+  }, def.note), !selected.parties.some(p => p.changed) && React.createElement("p", {
+    className: "rd-wv-gap-note"
+  }, "No party meets the 95% change threshold for this comparison."), React.createElement("div", {
     className: "rd-wv-gap-grid"
   }, DEMO_PARTIES.map(pp => {
     const party = selected.parties.find(p => p.party === pp.id);
+    if (!party?.changed) return null;
     const points = (party ? party.points : []).filter(p => p.x >= x0 && p.x <= x1);
     const last = points[points.length - 1];
     const color = D.PARTIES[pp.id].color;
@@ -6196,7 +6222,7 @@ const RdDemographicGaps = React.memo(function RdDemographicGaps({
   rangeId,
   model
 }) {
-  const [relative, setRelative] = useState(false);
+  const [relative, setRelative] = useState(true);
   return React.createElement("div", {
     className: "rd-wv-gaps"
   }, React.createElement(RdSub, {
@@ -6214,7 +6240,7 @@ const RdDemographicGaps = React.memo(function RdDemographicGaps({
     onClick: () => setRelative(r)
   }, r ? "Relative (×)" : "Absolute (pp)"))), React.createElement("p", {
     className: "rd-wv-gap-note"
-  }, relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. ", model ? "Lines use the group model estimates." : "Lines use the monthly group averages.", " All parties and comparisons within each set share the same scales. Hover, tap or use the chart\u2019s arrow keys to see both groups\u2019 primary votes. Intervals for the differences are not available."), tab.sets.map(st => React.createElement(RdDemographicGapSet, {
+  }, relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. ", model ? "Lines use the group model estimates." : "Lines use the monthly group averages.", " All parties and comparisons within each set share the same scales. Hover, tap or use the chart\u2019s arrow keys to see both groups\u2019 primary votes. Only parties showing a change over the available months in this measure are shown. The approximate 95% test accounts for checking the whole series."), tab.sets.map(st => React.createElement(RdDemographicGapSet, {
     key: st.id,
     st: st,
     order: order,
@@ -9938,6 +9964,11 @@ function RdUndecided({
       softRB: "Named a party or a lean but call their vote soft or very soft, not solid."
     };
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find(d => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
+    const guideMonths = [...new Map(drawn.flatMap(d => d.pts).map(q => [q.x, {
+      x: q.x,
+      y: q.v,
+      ym: q.ym
+    }])).values()].sort((a, b) => a.x - b.x);
     return React.createElement("div", {
       className: "card rd-card rd-un-panel rd-un-p-" + key,
       key: key
@@ -9995,7 +10026,7 @@ function RdUndecided({
         points: series(d.pts, "v")
       })),
       areas: bands,
-      spine: series(drawn[0].pts, "v"),
+      spine: guideMonths,
       scatter: drawn.flatMap(d => d.dots.map(q => ({
         x: q.x,
         y: q.v,
@@ -10013,7 +10044,7 @@ function RdUndecided({
         size: 11
       }] : [],
       tooltipTitle: i => {
-        const p = drawn[0].pts[i];
+        const p = guideMonths[i];
         return p ? monthLabelFull(p.ym) : "";
       },
       fmt: v => v.toFixed(1),
