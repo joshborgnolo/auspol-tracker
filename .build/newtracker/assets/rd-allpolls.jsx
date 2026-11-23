@@ -1168,14 +1168,13 @@ function RdApOnp2025({ data }) {
   if (!data) return null;
   return (
     <div className="rd-apd-on25">
-      <span className="rd-apd-h">One Nation’s support within 2025 voting cohorts</span>
+      <span className="rd-apd-h">One Nation’s support within 2025 voting cohorts – modelled, MRP estimates</span>
       <div className="rd-apd-on25-cols">
         {[["lnp", "Coalition"], ["alp", "Labor"]].filter(([k]) => data[k]).map(([k, party]) => (
           <div key={k} className="rd-apd-on25-set">
-            <span className="rd-apd-on25-tag">Modelled, MRP estimates</span>
             <table className="rd-ldg-t rd-apd-on25-t">
               <caption>One Nation share of 2025 {party} voters</caption>
-              <thead><tr><th scope="col">Age cohort</th>{RD_AP_ON25_EDUC.map((ed) => <th key={ed} scope="col" className="num">{ed}</th>)}</tr></thead>
+              <thead><tr><th scope="col">Age</th>{RD_AP_ON25_EDUC.map((ed) => <th key={ed} scope="col" className="num">{ed}</th>)}</tr></thead>
               {RD_AP_ON25_LOCS.filter(([loc]) => data[k][loc]).map(([loc, label]) => (
                 <tbody key={loc}>
                   <tr className="rd-apd-on25-loc"><th scope="rowgroup" colSpan={RD_AP_ON25_EDUC.length + 1}>{label}</th></tr>

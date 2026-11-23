@@ -49,7 +49,8 @@ try {
       const tables = [...document.querySelectorAll(".rd-ap-open .rd-apd-on25-t")];
       return {
         captions: tables.map((table) => table.caption.textContent.replace(/\s+/g, " ")),
-        labels: tables.map((table) => table.parentElement.querySelector(".rd-apd-on25-tag")?.textContent),
+        heading: document.querySelector(".rd-ap-open .rd-apd-on25 > .rd-apd-h")?.textContent,
+        ages: tables.map((table) => table.tHead.rows[0].cells[0].textContent),
         rows: tables.map((table) => [...table.tBodies].flatMap((body) => [...body.rows].filter((row) => !row.classList.contains("rd-apd-on25-loc"))).length),
         values: tables.map((table) => [...table.querySelectorAll("td")].map((cell) => cell.textContent)),
         expected: payload ? ["lnp", "alp"].map((cohort) => Object.values(payload[cohort]).flatMap((ages) => Object.values(ages).flatMap((cells) => Object.values(cells).map(String)))) : [],
@@ -58,8 +59,9 @@ try {
         columns: getComputedStyle(document.querySelector(".rd-ap-open .rd-apd-on25-cols")).gridTemplateColumns,
       };
     });
+    check(JSON.stringify(result.heading) === JSON.stringify("One Nation’s support within 2025 voting cohorts – modelled, MRP estimates"), `${width}: the section heading carries the estimate note`);
     check(JSON.stringify(result.captions) === JSON.stringify(["One Nation share of 2025 Coalition voters", "One Nation share of 2025 Labor voters"]), `${width}: both report captions render`);
-    check(result.labels.every((label) => label === "Modelled, MRP estimates"), `${width}: both tables carry the Modelled, MRP estimates label`);
+    check(result.ages.every((age) => age === "Age"), `${width}: both cohort columns read Age`);
     check(JSON.stringify(result.rows) === JSON.stringify([9, 9]), `${width}: three locations × three ages in each table`);
     check(result.values.every((values, i) => JSON.stringify(values) === JSON.stringify(result.expected[i])), `${width}: all 45 cells per cohort match the data bundle (90 total)`);
     check(result.note.includes("switch rates, not the primary-vote shares"), `${width}: the table's denominator is explicit`);
