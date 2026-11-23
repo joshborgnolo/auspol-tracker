@@ -449,8 +449,8 @@ export function validate(D) {
     (r.extra || []).forEach((e, j) => {
       const whereX = `${where} extra[${j}]`;
       for (const [k, v] of Object.entries(e))
-        if (shareBad(v)) errors.push({ type: "share-range", poll: whereX, detail: `${k} = ${v} (bounds 0–100)` });
-      const sumX = Object.values(e).reduce((s, v) => s + v, 0);
+        if (typeof v === "number" && shareBad(v)) errors.push({ type: "share-range", poll: whereX, detail: `${k} = ${v} (bounds 0–100)` });
+      const sumX = Object.values(e).filter((v) => typeof v === "number").reduce((s, v) => s + v, 0);
       if (sumX > 101)
         errors.push({ type: "ppm-sum", poll: whereX, detail: `Σ = ${sumX.toFixed(1)} (ceiling 100)` });
     });

@@ -36,6 +36,10 @@ leader).
     question: that is a different measure with no uncommitted remainder.
   - `ppm3A`, `ppm3O`, `ppm3H`: the THREE-WAY contest that adds the One
     Nation leader.
+  - `ppm2A`, `ppm2O`: the separate forced-choice "two prime minister
+    preferred" (2PMP) contest between the prime minister and opposition
+    leader. Its two shares sum to 100 with no uncommitted remainder. Keep
+    it distinct from the traditional two-way and the three-way contest.
 
 ## Rules
 
@@ -79,4 +83,4 @@ JSON object and nothing else:
 
 Field keys: `alp`, `lnp`, `grn`, `onp`, `ind`, `oth`, `tpp_alp`, `pmApp`,
 `pmDis`, `pmNet`, `oppApp`, `oppDis`, `oppNet`, `hanApp`, `hanDis`,
-`hanNet`, `ppmA`, `ppmO`, `ppm3A`, `ppm3O`, `ppm3H`.
+`hanNet`, `ppmA`, `ppmO`, `ppm3A`, `ppm3O`, `ppm3H`, `ppm2A`, `ppm2O`.

@@ -1959,6 +1959,7 @@ function RdLgLeaders({ p, note }) {
   const named = (s) => ["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null);
   const twos = sets.filter((s) => named(s).length === 2).length;
   const setLab = (s) => {
+    if (s.label) return s.label;
     const n = named(s);
     if (n.length >= 3) return "Three-way";
     return twos > 1 ? rdLgWho(p, "alb") + " v " + rdLgWho(p, n.find((k) => k !== "alb")) : "Head to head";

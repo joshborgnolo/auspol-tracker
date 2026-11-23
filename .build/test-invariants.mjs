@@ -223,4 +223,43 @@ for (const c of A.cycles) {
   assert.ok(tabs.includes("p.dlp ?? null, p.dem ?? null, p.und ?? null, pastNote(p, src),"), "each past voting-intention row fills them");
 }
 
-console.log(`PASS: invariants – ${A.cycles.length} cycles inside their caps, finite-figure sweep, feed vocabulary, changelog tags, np-project purity, past rows' bases`);
+// ---- Newspoll's publisher overview rides beside every wave's report --------------------
+{
+  const href = "https://www.theaustralian.com.au/topics/newspoll";
+  const isNewspoll = (p) => p.pollster.replace(/\s*\(.*\)$/, "") === "Newspoll";
+  const canonicalCount = JSON.parse(read("data/polls.json")).polls.filter(isNewspoll).length;
+  for (const [label, rows] of [["All polls", A.individualPolls], ["Latest polls", A.pollsterTable]]) {
+    const newspolls = rows.filter(isNewspoll);
+    assert.ok(newspolls.length > 0, `${label} has Newspoll rows`);
+    if (label === "All polls") assert.equal(newspolls.length, canonicalCount, "every canonical Newspoll row is covered, pooled waves included");
+    for (const p of newspolls) {
+      const cite = p.links.findIndex((l) => l.k === "cite");
+      assert.ok(cite >= 0, `${label} ${p.pollster} ${p.released}: report link is present`);
+      const overview = p.links[cite + 1];
+      assert.equal(overview?.k, "overview", `${label} ${p.pollster} ${p.released}: overview follows the report`);
+      assert.equal(overview.t, "Landing-page overview");
+      assert.equal(overview.href, href);
+      assert.equal(p.links.filter((l) => l.k === "overview").length, 1, "one overview link per row");
+    }
+  }
+  assert.ok(A.individualPolls.every((p) => isNewspoll(p) || p.links.every((l) => l.k !== "overview")),
+    "the Newspoll-only overview does not leak onto another house");
+}
+
+// ---- Newspoll's 2PMP is not the traditional preferred-PM chart pair ---------------
+for (const [label, rows] of [["All polls", A.individualPolls], ["Latest polls", A.pollsterTable]]) {
+  const p = rows.find((q) => q.pollster === "Newspoll" && q.released === "2026-11-19");
+  assert.ok(p, `${label} carries the latest Newspoll`);
+  const twoPmp = p.ppmSets.find((s) => s.label === "Two-PM preferred");
+  assert.ok(twoPmp, `${label} names the separate forced-choice contest`);
+  assert.deepEqual([twoPmp.alb, twoPmp.taylor, twoPmp.unc], [47, 53, 0], `${label} reports the article's 53–47 2PMP result`);
+  assert.ok(!p.ppmSets.some((s) => s.alb === 41 && s.taylor === 42), `${label} drops the traditional chart pair from the 2PMP slot`);
+  const three = p.ppmSets.find((s) => s.label == null && s.hanson != null && s.taylor != null);
+  assert.deepEqual([three?.alb, three?.taylor, three?.hanson], [44, 28, 28], `${label} keeps the distinct three-way result`);
+}
+{
+  const src = read(path.join(".build", "newtracker", "assets", "rd-allpolls.jsx"));
+  assert.ok(src.includes("if (s.label) return s.label;"), "the expanded leadership table honours the 2PMP label");
+}
+
+console.log(`PASS: invariants – ${A.cycles.length} cycles inside their caps, finite-figure sweep, feed vocabulary, changelog tags, np-project purity, past rows' bases, Newspoll overview links and separate 2PMP`);

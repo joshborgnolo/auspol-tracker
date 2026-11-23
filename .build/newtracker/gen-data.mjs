@@ -3693,16 +3693,17 @@ function buildPpm(date, firm) {
   // every preferred-PM contest this poll published, as its own set – the main
   // row, any extra contests (7th element), then the Albanese-v-Hanson H2. Each
   // is a distinct MEASURE (two-way vs three-way etc.), never merged.
-  const contest = (alb, opp, han) => {
+  const contest = (alb, opp, han, kind = null) => {
     const s = { alb };
     if (opp != null) s[oppKey(p.oppName)] = opp;
     if (han != null) s.hanson = han;
+    if (kind === "2pmp") s.label = "Two-PM preferred";
     s.unc = Math.max(0, Math.round(100 - (alb + (opp || 0) + (han || 0))));
     return s;
   };
   const sets = [contest(p.alb, p.opp, p.han)];
   if (Array.isArray(p.extra)) {
-    for (const c of p.extra) sets.push(contest(c.alb, c.opp ?? null, c.hanson ?? c.han ?? null));
+    for (const c of p.extra) sets.push(contest(c.alb, c.opp ?? null, c.hanson ?? c.han ?? null, c.kind ?? null));
   }
   const h2 = H2_BY.get(k);
   if (h2) sets.push({ alb: h2.alb, hanson: h2.han, unc: Math.max(0, 100 - h2.alb - h2.han) });
@@ -3783,6 +3784,8 @@ const TPP_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
    every wave. */
 const RELEASE_HUB = new Map(Object.entries(D.pollsterRules || {})
   .filter(([, r]) => r && r.releaseHub).map(([firm, r]) => [firm, r.releaseHub]));
+const REPORT_OVERVIEW = new Map(Object.entries(D.pollsterRules || {})
+  .filter(([, r]) => r && r.overviewUrl).map(([firm, r]) => [firm, r.overviewUrl]));
 /* What each house's primary-vote shares are OF, printed beside every sample
    ("1,500 D"): D = decided voters, undecideds set aside with no leaner
    question; D+L = decided plus leaners (undecideds asked which way they
@@ -4934,6 +4937,8 @@ const linksOf = (p) => {
     const h = hostOf(p.url);
     const key = Object.keys(CITE_LABEL).find((d) => onHost(h, [d]));
     out.push({ k: "cite", t: key ? CITE_LABEL[key] : "Report (" + h + ")", href: p.url, title: "The published report this poll’s figures were read from" });
+    if (REPORT_OVERVIEW.has(house)) out.push({ k: "overview", t: "Landing-page overview", href: REPORT_OVERVIEW.get(house),
+      title: "The publisher’s standing overview of this pollster’s coverage and latest reports" });
   }
   // the archived copy rides on the link it falls back for (§6a header)
   for (const l of out) waybackAnnotate(l);

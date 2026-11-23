@@ -77,7 +77,7 @@ import { execFileSync } from "node:child_process";
 import { fetchText, fetchWithCookies, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 import { IG_SLUG, IG_EMBED, igWindow, infogramLive, infogramStatic, attachTarget,
   IG_DAY_WINDOW, IG_STA_WINDOW } from "./infogram.mjs";
-import { paragraphsOf, readArticle, prevNewspoll, NP_READ_FIELDS } from "./newspoll-read.mjs";
+import { paragraphsOf, readArticle, prevNewspoll, preferredPpmExtra, NP_READ_FIELDS } from "./newspoll-read.mjs";
 import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
@@ -586,7 +586,7 @@ async function discover() {
 // ------------------------------------------------------------- merge/guard
 const FIELDS = ["alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp",
   "pmNet", "oppNet", "pmApp", "pmDis", "oppApp", "oppDis", "ppmA", "ppmO", "ppmH",
-  "hanNet", "hanApp", "hanDis", "ppm3A", "ppm3H", "ppm3O", "sample", "undecidedLeaner"];
+  "hanNet", "hanApp", "hanDis", "ppm3A", "ppm3H", "ppm3O", "ppm2A", "ppm2O", "sample", "undecidedLeaner"];
 function mergeCluster(recs) {
   const m = { conflicts: [] };
   for (const k of ["date", "dateStart"]) {
@@ -622,6 +622,10 @@ function guardCluster(m, clusterPub) {
   if (m.ppm3A != null) check(`ppm3A=${m.ppm3A} in 15–80`, m.ppm3A >= 15 && m.ppm3A <= 80);
   if (m.ppm3O != null) check(`ppm3O=${m.ppm3O} in 5–70`, m.ppm3O >= 5 && m.ppm3O <= 70);
   if (m.ppm3H != null) check(`ppm3H=${m.ppm3H} in 5–70`, m.ppm3H >= 5 && m.ppm3H <= 70);
+  if (m.ppm2A != null) check(`ppm2A=${m.ppm2A} in 15–80`, m.ppm2A >= 15 && m.ppm2A <= 80);
+  if (m.ppm2O != null) check(`ppm2O=${m.ppm2O} in 5–70`, m.ppm2O >= 5 && m.ppm2O <= 70);
+  if (m.ppm2A != null && m.ppm2O != null)
+    check(`2PMP Σ=${(m.ppm2A + m.ppm2O).toFixed(1)} =100`, Math.abs(m.ppm2A + m.ppm2O - 100) <= 0.5);
   // An equal pair means the subject's figure got misattributed to a trailing
   // candidate — the failure mode the enumeration rejection targets.
   if (m.ppmA != null && m.ppmA === m.ppmO) errs.push(`ppm tie ${m.ppmA}/${m.ppmO} — parse suspect`);
@@ -926,12 +930,13 @@ try {
       ...(m.undecidedLeaner != null ? { undecidedLeaner: m.undecidedLeaner } : {}), url: ausUrl ?? best.url,
     });
     // Canonical Newspoll ppm row: the three-way shares are the headline
-    // fields; the PM–OL head-to-head pairs off in `extra`.
+    // fields; its reported 2PMP pair (or, otherwise, the traditional PM–OL
+    // head-to-head) stays a separately labelled contest in `extra`.
     const ppmTri = m.ppm3A != null && m.ppm3O != null;
     if ((ppmTri || (m.ppmA != null && m.ppmO != null)) && date >= LEADERS.pm.from)
       newPpm.push({ date, firm: "Newspoll", alb: ppmTri ? m.ppm3A : m.ppmA, opp: ppmTri ? m.ppm3O : m.ppmO,
         oppName: era?.oppName ?? null, han: ppmTri ? m.ppm3H : m.ppmH ?? null,
-        extra: ppmTri && m.ppmA != null && m.ppmO != null ? [{ alb: m.ppmA, opp: m.ppmO }] : null });
+        extra: preferredPpmExtra(m, ppmTri) });
     if ((m.pmNet != null || m.oppNet != null) && date >= LEADERS.pm.from) {
       const detail = {};
       if (m.pmApp != null && m.pmDis != null) detail.alb = { app: m.pmApp, dis: m.pmDis };

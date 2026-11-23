@@ -33,8 +33,15 @@ import { askMatildaJson } from "./matilda-json.mjs";
 const PROMPT = ".build/newspoll-read-prompt.md";
 export const NP_READ_FIELDS = ["alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp",
   "pmApp", "pmDis", "pmNet", "oppApp", "oppDis", "oppNet", "hanApp", "hanDis", "hanNet",
-  "ppmA", "ppmO", "ppm3A", "ppm3O", "ppm3H"];
+  "ppmA", "ppmO", "ppm3A", "ppm3O", "ppm3H", "ppm2A", "ppm2O"];
 const NETS = new Set(["pmNet", "oppNet", "hanNet"]);
+
+export function preferredPpmExtra(m, threeWay) {
+  if (!threeWay) return null;
+  if (m.ppm2A != null && m.ppm2O != null) return [{ alb: m.ppm2A, opp: m.ppm2O, kind: "2pmp" }];
+  if (m.ppmA != null && m.ppmO != null) return [{ alb: m.ppmA, opp: m.ppmO }];
+  return null;
+}
 
 // ------------------------------------------------------------- text
 const decode = (s) => s.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n))
@@ -100,6 +107,7 @@ function lex(field, era) {
   const han = new RegExp(`\\b(${era.third}|one nation leader)\\b`, "i");
   const sat = /satisf|approv|rating|performance|net\b/i;
   const better = /better|preferred|prime minister|\bpm\b|contest|head-to-head|one-on-one/i;
+  const twoPmp = /\b2PMP\b|two prime minister preferred/i;
   return {
     alp: [/\b(labor|alp|albanese government)\b/i], lnp: [/\b(coalition|liberals?|lnp|nationals)\b/i], grn: [/\bgreens\b/i],
     onp: [/\bone nation\b/i], ind: [/\b(others?|independents?)\b/i], oth: [/\bothers?\b|\bminor\b/i],
@@ -108,6 +116,7 @@ function lex(field, era) {
     oppApp: [opp, sat], oppDis: [opp, sat], oppNet: [opp, sat],
     hanApp: [han, sat], hanDis: [han, sat], hanNet: [han, sat],
     ppmA: [better], ppmO: [better], ppm3A: [better], ppm3O: [better], ppm3H: [better, han],
+    ppm2A: [twoPmp, pm], ppm2O: [twoPmp, opp],
   }[field];
 }
 // does the quote's own change phrase take `from` to `value`? "fell a point
@@ -194,11 +203,13 @@ export function verifyReading(reading, paras, prev, era) {
   // but not the net (Ley, Jul 2025: 35/42), the net follows
   for (const [a, d, n] of [["pmApp", "pmDis", "pmNet"], ["oppApp", "oppDis", "oppNet"], ["hanApp", "hanDis", "hanNet"]])
     if (ok[n] == null && ok[a] != null && ok[d] != null) { ok[n] = Math.round((ok[a] - ok[d]) * 10) / 10; verdict[n] = "satisfied − dissatisfied (net not stated)"; }
-  for (const set of [["ppmA", "ppmO"], ["ppm3A", "ppm3O", "ppm3H"]]) {
+  for (const set of [["ppmA", "ppmO"], ["ppm3A", "ppm3O", "ppm3H"], ["ppm2A", "ppm2O"]]) {
     const vals = set.map((k) => ok[k]).filter((v) => v != null);
     if (vals.reduce((s, v) => s + v, 0) > 100.5)
       for (const k of set) if (ok[k] != null) { delete ok[k]; verdict[k] = "REJECTED: the contest's shares sum past 100"; }
   }
+  if (ok.ppm2A != null && ok.ppm2O != null && Math.abs(ok.ppm2A + ok.ppm2O - 100) > 0.5)
+    for (const k of ["ppm2A", "ppm2O"]) { delete ok[k]; verdict[k] = "REJECTED: 2PMP is a forced-choice pair and must sum to 100"; }
   if (ok.ppmA != null && ok.ppmA === ok.ppm3A && ok.ppmO != null && ok.ppmO === ok.ppm3O)
     for (const k of ["ppmA", "ppmO"]) { delete ok[k]; verdict[k] = "REJECTED: two-way contest identical to the three-way"; }
   if (ok.tpp_alp != null) ok.tpp_lnp = Math.round((100 - ok.tpp_alp) * 10) / 10;
@@ -236,12 +247,15 @@ export function prevNewspoll(D, before) {
   const near = (sec) => (D[sec] ?? []).find((r) => r.firm === "Newspoll" && r.date === p.date);
   const ap = near("approval"), pp = near("ppm");
   const threeWay = pp && pp.han != null && Array.isArray(pp.extra) && pp.extra.length;
+  const traditional = pp?.extra?.find((c) => c.kind !== "2pmp");
+  const twoPmp = pp?.extra?.find((c) => c.kind === "2pmp");
   return {
     date: p.date, alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, ind: p.ind, oth: p.oth, tpp_alp: p.tpp_alp,
     pmNet: ap?.alb, oppNet: ap?.opp, hanNet: ap?.han,
     pmApp: ap?.detail?.alb?.app, pmDis: ap?.detail?.alb?.dis, oppApp: ap?.detail?.opp?.app, oppDis: ap?.detail?.opp?.dis,
     hanApp: ap?.detail?.han?.app, hanDis: ap?.detail?.han?.dis,
     ppm3A: threeWay ? pp.alb : null, ppm3O: threeWay ? pp.opp : null, ppm3H: threeWay ? pp.han : null,
-    ppmA: threeWay ? pp.extra[0].alb : pp?.alb, ppmO: threeWay ? pp.extra[0].opp : pp?.opp,
+    ppmA: threeWay ? traditional?.alb : pp?.alb, ppmO: threeWay ? traditional?.opp : pp?.opp,
+    ppm2A: twoPmp?.alb, ppm2O: twoPmp?.opp,
   };
 }

@@ -42,7 +42,8 @@
       "site": "https://www.roymorgan.com/findings"
     },
     "Newspoll": {
-      "site": "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false"
+      "site": "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false",
+      "overviewUrl": "https://www.theaustralian.com.au/topics/newspoll"
     },
     "DemosAU": {
       "release": {
@@ -7614,8 +7615,9 @@
       "han": 28,
       "extra": [
         {
-          "alb": 41,
-          "opp": 42
+          "alb": 47,
+          "opp": 53,
+          "kind": "2pmp"
         }
       ]
     }

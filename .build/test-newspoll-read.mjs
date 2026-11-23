@@ -4,7 +4,7 @@
 // made-up text in The Australian's style; the readings are what Matilda
 // would answer, right and wrong. (The Matilda call itself was backtested on
 // the laptop against the 15 Newspoll stories of Jul 2025–Sep 2026.)
-import { numbersIn, verifyReading, prevNewspoll } from "./newspoll-read.mjs";
+import { numbersIn, verifyReading, prevNewspoll, preferredPpmExtra } from "./newspoll-read.mjs";
 
 let fails = 0;
 const eq = (name, got, want) => {
@@ -79,6 +79,17 @@ v = verifyReading({ scope: "newspoll", fields: { ppm3A: cite(1, "Mr Albanese dro
 eq("a three-way heading governs a later change sentence in its paragraph", v.ok.ppm3A, 44);
 v = read({ ppmA: cite(8, "a 53 per cent to 47 per cent 2PMP lead over Mr Albanese", 47), ppmO: cite(8, "Mr Taylor holds a 53 per cent to 47 per cent 2PMP lead", 53) });
 eq("the separate 2PMP contest is not filed as traditional preferred PM", [v.ok.ppmA, v.ok.ppmO], [undefined, undefined]);
+v = read({ ppm2A: cite(8, "a 53 per cent to 47 per cent 2PMP lead over Mr Albanese", 47), ppm2O: cite(8, "Mr Taylor holds a 53 per cent to 47 per cent 2PMP lead", 53) });
+eq("2PMP files as its own Albanese–Taylor pair", [v.ok.ppm2A, v.ok.ppm2O], [47, 53]);
+v = read({ ppm2A: cite(4, "with 42 per cent backing the Labor leader", 42) });
+eq("traditional preferred PM cannot be filed as 2PMP", v.ok.ppm2A, undefined);
+v = verifyReading({ scope: "newspoll", fields: { ppm2A: cite(1, "47 per cent 2PMP lead over Mr Albanese", 47), ppm2O: cite(1, "Mr Taylor holds a 52 per cent", 52) } },
+  ["x".repeat(40), "Mr Taylor holds a 52 per cent to 47 per cent 2PMP lead over Mr Albanese."], {}, era);
+eq("the forced-choice 2PMP pair must sum to 100", [v.ok.ppm2A, v.ok.ppm2O], [undefined, undefined]);
+eq("2PMP takes the labelled-extra slot ahead of the traditional chart pair",
+  preferredPpmExtra({ ppm2A: 47, ppm2O: 53, ppmA: 41, ppmO: 42 }, true), [{ alb: 47, opp: 53, kind: "2pmp" }]);
+eq("the traditional pair remains the fallback when 2PMP was not asked",
+  preferredPpmExtra({ ppmA: 41, ppmO: 42 }, true), [{ alb: 41, opp: 42 }]);
 v = read({ hanNet: cite(7, "net rating was minus 15", -15), hanApp: cite(7, "44 per cent satisfied", 44), hanDis: cite(7, "51 per cent dissatisfied", 51) });
 eq("satisfied − dissatisfied ≠ net refuses the leader's figures", v.ok, {});
 v = read({ hanDis: cite(2, "62 per cent dissatisfied", 62) });
@@ -99,8 +110,11 @@ const D = {
   approval: [{ firm: "Newspoll", date: "2026-08-28", alb: -21, opp: -18, han: -5, detail: { alb: { app: 37, dis: 58 } } }],
   ppm: [{ firm: "Newspoll", date: "2026-08-28", alb: 45, opp: 24, han: 31, extra: [{ alb: 44, opp: 40 }] }],
 };
-const p = prevNewspoll(D, "2026-09-14");
+let p = prevNewspoll(D, "2026-09-14");
 eq("previous wave in reader field names", [p.alp, p.pmNet, p.pmApp, p.ppm3H, p.ppmA, p.ppmO], [29, -21, 37, 31, 44, 40]);
+D.ppm[0].extra.push({ alb: 47, opp: 53, kind: "2pmp" });
+p = prevNewspoll(D, "2026-09-14");
+eq("previous 2PMP does not masquerade as the traditional pair", [p.ppmA, p.ppmO, p.ppm2A, p.ppm2O], [44, 40, 47, 53]);
 
 if (fails) { console.error(`${fails} failure(s)`); process.exit(1); }
 console.log("all newspoll-read checks pass");
