@@ -85,9 +85,11 @@
                  Male/Female, 18-34/35-54/55+), already crawled weekly into
                  data/essential-report.csv by extract-essential-report.mjs;
                  the wave is matched to the poll row on date (within five
-                 days) and headline primaries. Independents/other and
-                 undecided fold together into oth, as the poll rows' ind
-                 field does.
+                 days) and headline primaries. Independents/other is oth;
+                 the printed undecided rides beside as `und` (never in
+                 oth), so the groups pool on decided voters as the poll
+                 rows do. Re-read from the CSV every run (local, cheap),
+                 so a change to the reader reaches every filed wave.
      Roy Morgan– three recurring formats carry public breakdowns, all
                  hand-entered in ROYMORGAN_DEMO below and verified against
                  the release text, figure by figure (Wikipedia's
@@ -126,10 +128,12 @@
                  the full table, re-verified against source every run) and
                  merged in beneath NEWSPOLL_DEMO's hand-entered keys – see
                  the Newspoll loop below. "No
-                 tertiary" spans Year-12-or-less AND TAFE-or-trade voters,
-                 so no common education group holds every wave's school row
-                 – harmonize drops the dim unless the wave prints a school
-                 row of its own. Newspoll cuts no Tas/ACT/NT, so its states
+                 tertiary" is school-level only: the table prints TAFE as
+                 its own row beside it, and the three rows average back to
+                 the total (weights about 0.28/0.35/0.38), so harmonize
+                 reads it as Year 12 or less, as the 2025 election file
+                 does (2026-11-23; until then it was kept out, on the
+                 mistaken reading that it also held TAFE). Newspoll cuts no Tas/ACT/NT, so its states
                  join NSW/Vic/Qld/SA/WA only. Not in HOUSES: a pooled row
                  whose breakdowns stay unentered, and a quarter gone
                  quiet, surface as `reminders` (the watch at the end of
@@ -1764,7 +1768,7 @@ try {
   for (const p of candidates) {
     const k = key(p);
     if (KNOWN_SKIP[k]) { skipped.push({ pollster: p.pollster, date: p.date, reason: KNOWN_SKIP[k] }); continue; }
-    if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
+    if (!refresh && have.has(k) && p.pollster !== "Essential") { waves.push(have.get(k)); continue; }
     const base = { pollster: p.pollster, date: p.date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
                    sample: p.sample ?? null, article: p.url ?? null };
     try {

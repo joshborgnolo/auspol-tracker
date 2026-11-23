@@ -7575,7 +7575,32 @@ function infoTerms(D) {
           : " – within the half-point tolerance, so nothing is rescaled."}</p>
     </div>
   ) : null;
-  const tppWork = swT && swT.rows.length ? (
+  /* the published 2PP's model (gen-data §2t): as the primary's working, each
+     recent poll's Labor share of its published pair (rebased to 100 where
+     undecided stayed inside), the house's lean then, the share less the lean,
+     the line at its fieldwork without it, and its pull on today's figure */
+  const tppWorkModel = swT && swT.model && swT.rows.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>Labor</th><th>lean</th><th>less lean</th><th>line without it</th><th>pull</th></tr></thead>
+        <tbody>
+          {swT.rows.map((r) => (
+            <tr key={r.firm + r.fw}>
+              <td>{r.firm}</td><td>{r.fw}</td><td>{r.mid}</td><td>{r.pair}</td><td>{F(r.x)}</td>
+              <td>{r.lean == null ? "–" : F(r.lean)}</td><td>{r.adj == null ? "–" : F(r.adj)}</td>
+              <td>{r.level == null ? "–" : F(r.level)}</td><td>{r.pull == null ? "–" : (r.pull > 0 ? "+" : "") + F(r.pull)}</td>
+            </tr>
+          ))}
+          <tr className="info-work-sum"><td colSpan="9">
+            Labor’s published two-party figure today: {swT.v.toFixed(1)}, with a 95% interval of {swT.lo.toFixed(1)} to {swT.hi.toFixed(1)},
+            {" "}from all {swT.polls} published pairs since the election ({swT.houses} pollsters). These are the {swT.k} in the 21 days to {swT.ref}.
+          </td></tr>
+        </tbody>
+      </table>
+      <p className="info-work-note">A pair published with undecided voters still inside it is rebased to 100 first. A pollster that publishes no pair adds no row.</p>
+    </div>
+  ) : null;
+  const tppWork = swT && swT.model ? tppWorkModel : swT && swT.rows.length ? (
     <div className="info-work-wrap">
       <table className="info-work">
         <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>of pair</th><th>lean</th><th>xᵢ</th><th>d</th><th>nᵢ</th><th>m</th><th>wᵢ</th></tr></thead>
@@ -8176,6 +8201,7 @@ function infoTerms(D) {
         pollster’s lean on its own figure taken out, the regular pollsters averaging zero, the
         term opening on the counted 2PP. The figures can step at a change of leader. A change on a
         month ago is called significant when its 95% interval leaves out zero.</span>) : null}
+        {L.method && L.method.kind === "model" && tppWorkModel ? working(tppWorkModel) : null}
         <span className="info-p"><b>Published figures</b> are {L.method && L.method.kind === "model" ? "modelled" : "averaged"} as Labor’s share of the
         two. Essential leaves {xref("decidedness", "two-party preferred", "undecided")} voters
         inside its pair, which falls short of 100 by that share; averaged as published, it would mix

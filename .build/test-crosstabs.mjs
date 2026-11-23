@@ -514,8 +514,8 @@ const essCsv = ["date,dataset,question,visual,answer,value_pct",
   essRow("Male", "One Nation", 29), essRow("Male", "Independent or Other Party", 8), essRow("Male", "Undecided", 4),
   "2026-09-30,primary,\"Some other question\",Overall,Labor,50"].join("\n");
 const mini = essentialWaves(essCsv).get("2026-09-30");
-assert.deepEqual(mini.total, { alp: 29, lnp: 22, grn: 12, onp: 25, oth: 12 }, "Independent/other and undecided fold into oth");
-assert.deepEqual(mini.dims.gender.Men, { alp: 26, lnp: 24, grn: 9, onp: 29, oth: 12 });
+assert.deepEqual(mini.total, { alp: 29, lnp: 22, grn: 12, onp: 25, oth: 9, und: 3 }, "Independent/other is oth; undecided rides beside, never folded in");
+assert.deepEqual(mini.dims.gender.Men, { alp: 26, lnp: 24, grn: 9, onp: 29, oth: 8, und: 4 });
 assert.equal(Object.keys(mini.dims).length, 1, "age bars absent are simply absent; another question's row is ignored");
 // the matcher: five days, nearest agreeing wave, nothing waved past 0.6 off
 const mkWave = (a, l, o, g) => ({ total: { alp: a, lnp: l, onp: o, grn: g, oth: 10 }, dims: {} });
@@ -533,8 +533,8 @@ for (const p of polls.filter((x) => x.pollster === "Essential" && x.date >= "202
   assert.equal(totalProblem(w.total, p), null, `Essential ${p.date}: Overall matches the published primaries`);
 }
 const essSep = ew.get(essentialMatch(ew, poll("Essential", "2026-09-29")));
-assert.deepEqual(essSep.dims.age["55+"], { alp: 25, lnp: 28, onp: 28, grn: 4, oth: 15 });
-assert.deepEqual(essSep.dims.gender.Men, { alp: 29, lnp: 25, onp: 28, grn: 9, oth: 9 });
+assert.deepEqual(essSep.dims.age["55+"], { alp: 25, lnp: 28, onp: 28, grn: 4, oth: 10, und: 5 });
+assert.deepEqual(essSep.dims.gender.Men, { alp: 29, lnp: 25, onp: 28, grn: 9, oth: 6, und: 3 });
 
 // ---- the gate --------------------------------------------------------------------------
 assert.equal(sharesProblem({ Men: { alp: 50, lnp: 48 } }), null, "rounding passes");

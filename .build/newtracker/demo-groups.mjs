@@ -446,7 +446,7 @@ export function harmonize(w, opts) {
   if (e) {
     const school = RB_SCHOOL.every(([l]) => e[l])
       ? Object.fromEntries(KEYS.map((k) => [k, RB_SCHOOL.reduce((t, [l, wt]) => t + (+e[l][k] || 0) * wt, 0)]))
-      : e["School"] || e["Year 12 or less"];
+      : e["School"] || e["Year 12 or less"] || e["No tertiary"];   // Newspoll prints TAFE apart, so its "No tertiary" is school-level (2026-11-23)
     put("education", "Year 12 or less", school);
     put("education", "TAFE or trade", e["TAFE"] || e["TAFE or college"] || e["TAFE or trade"]);
     put("education", "University", e["University"]);

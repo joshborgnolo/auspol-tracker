@@ -428,12 +428,15 @@ export function totalProblem(total, poll) {
 /* extract-essential-report.mjs crawls every report weekly and keeps each
    wave's "Primary Vote" chart as Overall, Male/Female and 18-34/35-54/55+
    bars – the demographics file reads the same CSV the assimilator reads.
-   Independents/other party and undecided fold into oth, the fold the
-   polls.json rows' ind field already carries. */
+   Independents/other party is oth; the Undecided bar is kept beside the
+   parties as `und`, never folded into oth, so a cell is the shares as
+   printed (summing to 100 with und) and every reader that takes the five
+   parties to 100 (demoNorm, harmonize, the group model's log-ratios) sets
+   the undecided aside – the decided-voter basis the poll rows have had
+   since 2026-11-21 (undecidedIn, gen-data poolPrim). */
 const ESS_ANSWER = { Labor: "alp", "TOTAL: Coalition": "lnp", Greens: "grn", "One Nation": "onp" };
 const ESS_VISUAL = { Male: ["gender", "Men"], Female: ["gender", "Women"],
   "18-34": ["age", "18–34"], "35-54": ["age", "35–54"], "55+": ["age", "55+"] };
-const ESS_FOLD = ["Independent or Other Party", "Undecided"];
 export function essentialWaves(csvText) {
   const lines = csvText.trim().split("\n");
   const header = lines[0].split(",");
@@ -447,7 +450,8 @@ export function essentialWaves(csvText) {
     const target = vis === "Overall" ? w.total
       : ESS_VISUAL[vis] ? (((w.dims[ESS_VISUAL[vis][0]] ||= {})[ESS_VISUAL[vis][1]] ||= {})) : null;
     if (target && ESS_ANSWER[answer]) target[ESS_ANSWER[answer]] = pct;
-    else if (target && ESS_FOLD.includes(answer)) target.oth = +((target.oth || 0) + pct).toFixed(1);
+    else if (target && answer === "Independent or Other Party") target.oth = pct;
+    else if (target && answer === "Undecided") target.und = pct;
     waves.set(f[ix("date")], w);
   }
   return waves;

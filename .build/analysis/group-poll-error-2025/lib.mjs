@@ -40,10 +40,14 @@ export const HOUSE = {
 };
 const ROUND_V = 1 / 12; // variance of a figure printed to the nearest point
 
-/* a poll cell as decided voters' shares; One Nation and others only where the house printed One Nation */
+/* a poll cell as decided voters' shares; One Nation and others only where the house printed One Nation.
+   DemosAU prints its party shares with undecided already excluded and the undecided share beside them
+   ("undecideds excluded from Party PV%", its Nov 2024 report), so its UND is not taken out again
+   (fixed 2026-11-23; no release in the election file's window was affected) */
+const UND_BESIDE = new Set(["DemosAU"]);
 export function sharesOf(r) {
   if (r.alp == null || r.lnp == null) return null;
-  const d = r.und > 0 ? (100 - r.und) / 100 : 1;
+  const d = r.und > 0 && !UND_BESIDE.has(HOUSE[r.pollster]) ? (100 - r.und) / 100 : 1;
   const s = { alp: r.alp / d, lnp: r.lnp / d, grn: r.grn == null ? null : r.grn / d, onp: r.onp == null ? null : r.onp / d };
   s.oth = s.grn != null && s.onp != null ? 100 - s.alp - s.lnp - s.grn - s.onp : null;
   return s;
