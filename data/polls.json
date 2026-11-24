@@ -63449,5 +63449,31 @@
     "1996|Morgan": "Morgan's face-to-face waves from May 1993 to mid-1994 (aeforecasts mirror) print no Greens column and fold the Democrats into others, so 13 of them add to only 91–97. The rest of 100 is not in the source: the mirror doesn't say whether it is the Greens and independents or undecideds left in the base.",
     "1990|Quadrant": "Quadrant's 5 November 1988 poll, as the aeforecasts mirror holds it: Labor 38, Coalition 36, Democrats 5 and nothing else, so its shares add to 79. The source doesn't say what the other 21 points are; undecideds left in the base is the likeliest reading, but it is unconfirmed.",
     "2019|YouGov-Galaxy Exit": "The 2019 election-day exit poll as filed: Labor 38, Coalition 39, Greens 10 and others 10, adding to 97, with no One Nation figure."
-  }
+  },
+  "fallbackApproval": [
+    {
+      "date": "2026-11-15",
+      "firm": "Newspoll",
+      "alb": -31,
+      "opp": -9,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 33,
+          "dis": 64
+        },
+        "opp": {
+          "app": 37,
+          "dis": 46
+        }
+      },
+      "provisional": {
+        "source": "Poll Bludger",
+        "feedId": "86",
+        "feedDate": "2026-11-22 16:51:49.659379+00:00",
+        "filed": "2026-11-24T01:50Z"
+      }
+    }
+  ]
 }

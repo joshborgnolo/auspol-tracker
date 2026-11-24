@@ -7,7 +7,7 @@
     },
     "imp": 50.6,
     "pub": 48.4,
-    "on": 51.2,
+    "on": 51.3,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -221,89 +221,47 @@
       "2026-11-15|Roy Morgan",
       "2026-11-17|YouGov",
       "2026-11-19|Newspoll",
-      "2026-11-20|DemosAU"
+      "2026-11-22|DemosAU"
     ],
     "moves": {
-      "alp|state|Non-NSW/Vic/Qld": 1,
-      "alp|state|Vic": -1,
-      "alp|working|Retired": 1,
-      "grn|working|Full time": -1,
       "lnp|education|University": 1,
-      "lnp|education|Year 12 or less": -1,
-      "lnp|language|Other language": 1,
-      "lnp|location|Inner metro": 1,
-      "lnp|state|Qld": -1,
+      "lnp|housing|Renting": -1,
       "lnp|state|Vic": 1,
-      "onp|state|Non-NSW/Vic/Qld": -1,
-      "onp|state|SA": -1,
-      "onp|working|Part time": -1,
+      "onp|generation|Gen Z": 1,
+      "onp|location|Inner metro": 1,
+      "onp|state|WA": -1,
       "oth|generation|Gen Z": 1
     },
     "movesMeta": {
-      "alp|state|Non-NSW/Vic/Qld": {
-        "party": "alp",
-        "group": "Non-NSW/Vic/Qld",
-        "setLabel": "By state"
-      },
-      "alp|state|Vic": {
-        "party": "alp",
-        "group": "Vic",
-        "setLabel": "By state"
-      },
-      "alp|working|Retired": {
-        "party": "alp",
-        "group": "Retired",
-        "setLabel": "By work status"
-      },
-      "grn|working|Full time": {
-        "party": "grn",
-        "group": "Full time",
-        "setLabel": "By work status"
-      },
       "lnp|education|University": {
         "party": "lnp",
         "group": "University",
         "setLabel": "Education"
       },
-      "lnp|education|Year 12 or less": {
+      "lnp|housing|Renting": {
         "party": "lnp",
-        "group": "Year 12 or less",
-        "setLabel": "Education"
-      },
-      "lnp|language|Other language": {
-        "party": "lnp",
-        "group": "Other language",
-        "setLabel": "By language at home"
-      },
-      "lnp|location|Inner metro": {
-        "party": "lnp",
-        "group": "Inner metro",
-        "setLabel": "By location"
-      },
-      "lnp|state|Qld": {
-        "party": "lnp",
-        "group": "Qld",
-        "setLabel": "By state"
+        "group": "Renting",
+        "setLabel": "By housing"
       },
       "lnp|state|Vic": {
         "party": "lnp",
         "group": "Vic",
         "setLabel": "By state"
       },
-      "onp|state|Non-NSW/Vic/Qld": {
+      "onp|generation|Gen Z": {
         "party": "onp",
-        "group": "Non-NSW/Vic/Qld",
-        "setLabel": "By state"
+        "group": "Gen Z",
+        "setLabel": "By generation"
       },
-      "onp|state|SA": {
+      "onp|location|Inner metro": {
         "party": "onp",
-        "group": "SA",
-        "setLabel": "By state"
+        "group": "Inner metro",
+        "setLabel": "By location"
       },
-      "onp|working|Part time": {
+      "onp|state|WA": {
         "party": "onp",
-        "group": "Part time",
-        "setLabel": "By work status"
+        "group": "WA",
+        "setLabel": "By state"
       },
       "oth|generation|Gen Z": {
         "party": "oth",
@@ -314,27 +272,27 @@
     "prim": {
       "alp": 26.9,
       "grn": 13.3,
-      "lnp": 24.6,
-      "onp": 25,
-      "oth": 10.1
+      "lnp": 24.7,
+      "onp": 24.9,
+      "oth": 10.2
     },
     "leaders": {
-      "alb_fav": -25.3,
-      "alb_net": -24.6,
-      "hanson_fav": -3.2,
+      "alb_fav": -25.6,
+      "alb_net": -25,
+      "hanson_fav": -3.3,
       "hanson_net": 0.3,
-      "taylor_fav": 4.4,
-      "taylor_net": -1.4
+      "taylor_fav": 4.3,
+      "taylor_net": -1.5
     },
     "lean": {
       "key": "alp_lnp|imp",
       "v": {
-        "DemosAU": 0,
+        "DemosAU": -0.1,
         "Essential": -0.2,
-        "Fox & Hedgehog": -0.8,
+        "Fox & Hedgehog": -0.9,
         "Freshwater": -0.4,
         "Newspoll": 1.5,
-        "RedBridge/Accent": -0.2,
+        "RedBridge/Accent": -0.3,
         "Resolve": 0.6,
         "Roy Morgan": 0.8,
         "Spectre Strategy": -1.3,
@@ -1065,6 +1023,96 @@
       "label": "24 Nov 2026",
       "kind": "finding",
       "text": "NSW voters (by state) no longer break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Renting voters (by housing) now break significantly away from the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Gen Z voters (by generation) now break significantly toward One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Inner metro voters (by location) now break significantly toward One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "WA voters (by state) now break significantly away from One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Non-NSW/Vic/Qld voters (by state) no longer break significantly toward Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Vic voters (by state) no longer break significantly away from Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Retired voters (by work status) no longer break significantly toward Labor, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Full time voters (by work status) no longer break significantly away from the Greens, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Year 12 or less voters (by education) no longer break significantly away from the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Other language voters (by language at home) no longer break significantly toward the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Inner metro voters (by location) no longer break significantly toward the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Qld voters (by state) no longer break significantly away from the Coalition, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Non-NSW/Vic/Qld voters (by state) no longer break significantly away from One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "SA voters (by state) no longer break significantly away from One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "finding",
+      "text": "Part time voters (by work status) no longer break significantly away from One Nation, relative to all voters."
     }
   ]
 }
