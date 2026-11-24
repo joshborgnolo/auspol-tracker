@@ -2715,6 +2715,16 @@
     "n": 1024,
     "fwStart": "2026-11-09",
     "fwEnd": "2026-11-15"
+   },
+   {
+    "date": "2026-11-24",
+    "v": 66.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/10115-anz-roy-morgan-consumer-confidence-november-24",
+    "slug": "10115-anz-roy-morgan-consumer-confidence-november-24",
+    "n": 1044,
+    "fwStart": "2026-11-16",
+    "fwEnd": "2026-11-22"
    }
   ]
  },

@@ -7,7 +7,7 @@
     },
     "imp": 50.6,
     "pub": 48.4,
-    "on": 51.3,
+    "on": 51.4,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -271,7 +271,7 @@
     },
     "prim": {
       "alp": 26.9,
-      "grn": 13.3,
+      "grn": 13.4,
       "lnp": 24.7,
       "onp": 24.9,
       "oth": 10.2
@@ -287,14 +287,14 @@
     "lean": {
       "key": "alp_lnp|imp",
       "v": {
-        "DemosAU": -0.1,
+        "DemosAU": 0,
         "Essential": -0.2,
-        "Fox & Hedgehog": -0.9,
+        "Fox & Hedgehog": -0.8,
         "Freshwater": -0.4,
         "Newspoll": 1.5,
         "RedBridge/Accent": -0.3,
         "Resolve": 0.6,
-        "Roy Morgan": 0.8,
+        "Roy Morgan": 0.9,
         "Spectre Strategy": -1.3,
         "YouGov": 0.1
       }
@@ -328,7 +328,7 @@
     "sigMeta": {},
     "conf": {
       "business": 81.7,
-      "consumer": 66.6,
+      "consumer": 66.7,
       "demosauConsumer": 38.7,
       "nabBusiness": -15,
       "westpacConsumer": 78.2
@@ -1125,6 +1125,12 @@
       "label": "24 Nov 2026",
       "kind": "meta",
       "text": "Vote switching is now estimated with a model that reads every table since February, rather than six-week averages (see Info). Today’s figures moved by 3 points at most: 2025 Coalition voters backing One Nation 34.9 → 34.6, Labor voters 11.2 → 12.7; the Coalition’s part of One Nation’s gain 57.0 → 55.3, Labor’s 19.8 → 22.1; Greens voters sticking with the Greens 82.1 → 84.9. Where Labor’s voters are going now also names small moves to the Greens and to others since February, beside the move to the Coalition."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "conf",
+      "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 66.6 → 66.7."
     }
   ]
 }
