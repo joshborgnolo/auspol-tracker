@@ -30,6 +30,7 @@ const RD_CYC_UNIT = {
   oppnet: "Points, approve minus disapprove.",
   pmlead: "Points, the prime minister’s net approval minus the higher of the opposition leader’s and Pauline Hanson’s.",
   ppmm: "Points, the prime minister’s share minus the rival’s.",
+  ppmmD: "Points, the prime minister’s share minus the rival’s among those who chose one of the two.",
 };
 const RD_CYC_TITLE_CHG = {
   tpp: "The government’s two-party share, change since its election, points",
@@ -258,7 +259,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   const copyTitle = (RD_CYC_COPY[M.key] || title) + (chg ? ": change since " + (M.key === "tpp" || M.key === "primary" || M.key === "oppr" ? "the election" : "the first reading") : " through each term");
   const copySub = "This term set against " + (banded ? "the middle half and middle 80% of " + bandN + " past terms"
       + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "past terms")
-    + " at the same point, month by month from each election. " + (M.unit === "%" && !chg ? "Per cent of the vote." : RD_CYC_UNIT[M.key] || "Points.");
+    + " at the same point, month by month from each election. " + (M.unit === "%" && !chg ? "Per cent of the vote." : (M.key === "ppmm" && window.AP.D.leaderModel ? RD_CYC_UNIT.ppmmD : RD_CYC_UNIT[M.key]) || "Points.");
   return (
     <div className="card rd-card rd-cyc-chart" ref={cardRef}>
       <div className="rd-chead">
@@ -1468,7 +1469,7 @@ function RdPastCycles(p) {
         {srcFailed && <p className="rd-note">The individual polls behind the past terms didn’t load; the monthly lines are unaffected. <button type="button" className="rd-link rd-link-in" onClick={retrySource}>Try again</button></p>}
         {summary}
         <div className="rd-foot">
-          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office. Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings {RD_CYC_CITE("add", 1)} {RD_CYC_CITE("little", 2)} or {RD_CYC_CITE("no", 0)} predictive value on top of voting-intention data.</span>
+          <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. {D.leaderModel ? "Votes are averaged month by month the way this term’s are; the leaders’ lines are the leadership model’s, and where a term changed leader each person has their own line." : "Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office."} Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings {RD_CYC_CITE("add", 1)} {RD_CYC_CITE("little", 2)} or {RD_CYC_CITE("no", 0)} predictive value on top of voting-intention data.</span>
           <span className="rd-grow"></span>
           <button type="button" className="rd-how rd-cyc-csv" onClick={exportSource}><DownloadIcon /> Source polls, CSV</button>
           <RdHow term="past-cycles" from="Past cycles" />
@@ -1493,19 +1494,21 @@ function RdPastCycles(p) {
           Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election’s counted result to the term’s first poll; the dotted end of a past line runs from its final poll to the closing election’s count.
         </RdFoot>
       </RdSec>
-      <RdSec id="cyc-leaders" title="Leadership" meta="Net approval since 1972 and preferred PM since 1984, for whoever held the office"
+      <RdSec id="cyc-leaders" title="Leadership" meta={"Net approval since 1971 and preferred PM since 1987, for whoever held the office" + (D.leaderModel ? ", on the leadership model" : "")}
              tools={chipBand(2)}>
         {leadStory && <RdHed head={leadStory.head} dek={leadStory.dek} />}
         <div className="rd-cyc-one">{chart("net", false)}</div>
         <div className="rd-cyc-one">{chart("pmlead", false)}</div>
         <div className="rd-cyc-two rd-cyc-subs">
-          <div><RdSub head="Preferred prime minister" dek="The prime minister’s lead over the opposition leader on the question of who would make the better PM. Asked since 1984." />{chart("ppmm", true, "leaders")}</div>
+          <div><RdSub head="Preferred prime minister" dek={"The prime minister’s lead over the opposition leader on the question of who would make the better PM" + (D.leaderModel ? ", among those who chose one of the two" : "") + ". Asked since 1987."} />{chart("ppmm", true, "leaders")}</div>
           <div><RdSub head="Opposition leader’s net approval" dek="Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972." />{chart("oppnet", true, "leaders")}</div>
         </div>
         <RdEventList list={PAIRS.leaders.list} inline onPick={pickEvOf.leaders} openKey={openKeyOf(["ppmm", "oppnet"])} />
         {bandKey("leaders")}
-        <RdFoot how={{ term: "approval", from: "Past cycles" }}>
-          Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out. The prime minister’s lead rates him against the stronger of the opposition leader and Pauline Hanson at each reading - Hanson only from this term’s polls, so every earlier term’s rival is the opposition leader.
+        <RdFoot how={D.leaderModel ? { term: "leadership", from: "Past cycles" } : { term: "approval", from: "Past cycles" }}>
+          {D.leaderModel
+            ? "Every line is the leadership model’s estimate of what the average pollster would find, each pollster’s lean taken out: the same lines the leadership charts draw. Each person’s line runs from their first poll to their last, and where a term changed leader each has their own. The earliest terms’ ratings are the Morgan Gallup Poll’s. Net approval is on the approval pollsters’ scale; favourability pollsters move the line but don’t set its level. Preferred PM is the lead among those who chose one of the two. The prime minister’s net approval lead rates him against the stronger of the opposition leader and Pauline Hanson each month - Hanson only this term, so every earlier term’s rival is the opposition leader."
+            : "Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out. The prime minister’s lead rates him against the stronger of the opposition leader and Pauline Hanson at each reading - Hanson only from this term’s polls, so every earlier term’s rival is the opposition leader."}
         </RdFoot>
       </RdSec>
       {accuracy}

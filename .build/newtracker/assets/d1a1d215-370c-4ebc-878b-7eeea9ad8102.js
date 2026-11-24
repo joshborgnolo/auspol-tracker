@@ -1077,7 +1077,9 @@ const CYC_METRICS = [
      therefore the first READING, never election day, and the zero line is
      labelled for that. */
   { key: "ppmm", title: "Preferred prime minister",
-    sub: "PM’s lead on the preferred-PM question",
+    /* on the leadership model (federal) the lead is among those who chose
+       one of the two, the leadership chart's basis */
+    get sub() { return window.AP && window.AP.D && window.AP.D.leaderModel ? "PM’s lead on the preferred-PM question, among those who chose one of the two" : "PM’s lead on the preferred-PM question"; },
     unit: "", fmt: fmtSigned1,
     step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
   /* The tap-to-define "net approval" link is composed into the card title at
@@ -1791,8 +1793,8 @@ function cycleChartEvents(cycle, D) {
 }
 
 /* ---- the readings behind a cycle's line --------------------------------
-   These charts are monthly averages, and an average is a claim about polls
-   the reader cannot see. Narrow the board to three terms or fewer and they
+   These charts are estimates from polls (vote lines monthly averages, leader
+   lines the leadership model's), a claim about polls the reader cannot see. Narrow the board to three terms or fewer and they
    appear: the cloud under a line is what the line is made of, and how much
    it is scattering is half of what a term's trajectory means.
 
@@ -1837,6 +1839,7 @@ function rivalOfMonth(D, ym) {
 function cycleReadings(c, M, D) {
   const out = [];
   const key = M.key, isOpp = M.leader === "opp";
+  const LM = !window.JUR && D.leaderModel && D.leaderModel.ratings ? D.leaderModel : null;
   if (c.current) {
     const mOf = (iso) => (Date.parse(iso) - Date.parse(c.eDate)) / 86400000 / MS_MONTH_C;
     for (const p of D.individualPolls) {
@@ -1871,7 +1874,11 @@ function cycleReadings(c, M, D) {
         const s = p.ppmSets ? p.ppmSets[0] : p.ppm;
         const ok = s && Object.keys(s).find((k) => !["alb", "unc", "hanson"].includes(k));
         if (ok == null || s[ok] == null || s.alb == null) continue;
-        y = s.alb - s[ok];
+        /* on the leadership model the line is the lead among those who
+           chose one of the two, so the dot is too; a head-to-head offering
+           "Neither" (D.leaderModel.neither) isn't that number and isn't drawn */
+        if (LM) { if ((LM.neither || []).includes(p.pollster) || !(s.alb + s[ok] > 0)) continue; y = +(100 * (s.alb - s[ok]) / (s.alb + s[ok])).toFixed(2); }
+        else y = s.alb - s[ok];
       }
       if (y == null) continue;
       out.push({ x: mOf(p.released), y, iso: p.released,
@@ -1899,7 +1906,8 @@ function cycleReadings(c, M, D) {
     // can report approval as favourability while its ppm readings stand)
     for (const r of src.approval) {
       if (r.pmPpm == null || r.oppPpm == null || !inCycleRange(r.m)) continue;
-      out.push({ x: r.m, y: r.pmPpm - r.oppPpm, iso: r.date, meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
+      if (LM && !(r.pmPpm + r.oppPpm > 0)) continue;
+      out.push({ x: r.m, y: LM ? +(100 * (r.pmPpm - r.oppPpm) / (r.pmPpm + r.oppPpm)).toFixed(2) : r.pmPpm - r.oppPpm, iso: r.date, meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
     }
   } else if (key === "pmlead") {
     /* past terms rated nobody but the two offices, so the wave's strongest
@@ -9212,17 +9220,24 @@ function infoTerms(D) {
         <>Every term since 1972, lined up on its own election day, so a given month is the same
         distance into every term. Compare this term with every past term, or only those whose
         government was re-elected or ousted, as a level or as the change since the election.
-        <span className="info-p"><b>How it’s built.</b> Past terms are averaged month by month the
-        way this term is. A month with no poll is filled in from the months either side, dashed on
-        a drawn term. A line’s dotted start runs from the election’s count to the term’s first
-        poll, and its dotted end from the final poll to the next election’s count.</span>
+        <span className="info-p"><b>How it’s built.</b> {D.leaderModel ? <>Votes are averaged month
+        by month the way this term’s are. The leaders’ lines are the
+        {" "}{xref("leadership", "past cycles", "leadership model’s")} estimates, the same lines the
+        leadership charts draw: each person’s line starts at their first poll and ends at their
+        last, and a term that changed leader draws each person apart.</> : <>Past terms are averaged
+        month by month the way this term is.</>} A month with no poll is filled in from the months
+        either side, dashed on a drawn term. A vote line’s dotted start runs from the election’s
+        count to the term’s first poll, and its dotted end from the final poll to the next
+        election’s count.</span>
         <span className="info-p"><b>The measures.</b> Two-party preferred is implied from each
         poll’s primary votes, through the
         {" "}{xref("last-election-flows", "past cycles", "flows of the election that opened its term")}.
         The primary vote is the governing party’s and the main opposition party’s. The leaders are
-        rated by net approval since 1972 and preferred prime minister since 1984, following
-        whoever held the office; the earliest terms’ ratings are the Morgan Gallup Poll’s, and
-        favourability ratings are left out. How the final polls have done scores the polls against each
+        rated by net approval since 1971 and preferred prime minister since 1987, following
+        whoever held the office; the earliest terms’ ratings are the Morgan Gallup Poll’s.
+        {D.leaderModel ? <> Net approval is on the approval pollsters’ scale. Preferred prime
+        minister is the lead among those who chose one of the two, as on the leadership
+        charts.</> : <> Favourability ratings are left out.</>} How the final polls have done scores the polls against each
         result (see {xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?")}).
         The CSV download holds every poll behind the terms shown.</span></>) },
       entries: [

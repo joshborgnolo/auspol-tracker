@@ -9148,18 +9148,30 @@ const LDM = JUR ? null : (() => {
     return { v, houses: hs, from: Math.min(...S.obs.filter((o) => hs.includes(o.house)).map((o) => o.t)) };
   };
   const ymOfDay = (d) => ISOd(d).slice(0, 7);
+  /* Past cycles' month days (ldCycleLines): every term's election day plus
+     whole months (MS_MONTH), read off each series that spans them. Within
+     half a month of a series' first or last reading the day reads that end,
+     as a poll in the month's half-month either side counted for it */
+  const CYC_DAYS = [];
+  CYC_META.forEach((c, i) => {
+    const e0 = DAYn(c.eDate), next = CYC_META[i + 1], end = next ? DAYn(next.eDate) : t1 + 31;
+    for (let k = 0; ; k++) { const d = Math.round(e0 + k * MS_MONTH); if (d > end + 16) break; CYC_DAYS.push(d); }
+  });
+  const cycDaysOf = (S) => CYC_DAYS.filter((d) => d >= S.t0 - MS_MONTH / 2 && d <= S.t1 + MS_MONTH / 2);
+  const evalDays = (S, cd) => [...S.outDays, ...cd.map((d) => Math.min(S.t1, Math.max(S.t0, d)))];
   const rSeries = RS.map((S) => {
-    const fc = favCoefOf(S);
-    const mm = ldMoments(S, stR, S.outDays, fc ? { main: null, fav: fc.v } : { main: null });
+    const fc = favCoefOf(S), cd = cycDaysOf(S), n = S.outDays.length;
+    const mm = ldMoments(S, stR, evalDays(S, cd), fc ? { main: null, fav: fc.v } : { main: null });
     const months = S.outDays.map((d, j) => ({ d, v: 100 * mm.main[j].m, ci: 196 * mm.main[j].sd, ...(fc && d >= fc.from ? { fv: 100 * mm.fav[j].m, fci: 196 * mm.fav[j].sd } : {}) }));
-    return { S, fc, months };
+    return { S, fc, months, cyc: new Map(cd.map((d, j) => [d, 100 * mm.main[n + j].m])) };
   });
   const pSeries = PS.map((S) => {
-    const mm = ldMoments(S, stP, S.outDays);
+    const cd = cycDaysOf(S), n = S.outDays.length;
+    const mm = ldMoments(S, stP, evalDays(S, cd));
     const sh = (z) => 100 / (1 + Math.exp(-z));
     /* the lead among those who chose, 2s − 1, with its interval read through the logistic */
     const months = S.outDays.map((d, j) => { const m = mm.main[j].m, sd = mm.main[j].sd; return { d, v: 2 * sh(m) - 100, lo: 2 * sh(m - 1.96 * sd) - 100, hi: 2 * sh(m + 1.96 * sd) - 100 }; });
-    return { S, months };
+    return { S, months, cyc: new Map(cd.map((d, j) => [d, 2 * sh(mm.main[n + j].m) - 100])) };
   });
   const T2 = Date.now();
   /* ---- this term: draws for the readouts (now, a month ago, the change) ---- */
@@ -9806,6 +9818,62 @@ const debiasTerm = (pts, strat) => {
 };
 const eraIndex = (spl) => (p) => splIsos(spl).filter((b) => b <= p.iso).length;
 
+/* Past cycles' leader lines on the leadership model (§4m), so a term reads
+   here as it does on the leadership chart. Month m of a term is read off the
+   model's line for whoever held the office on that day (a rating series is a
+   person in an office, a preferred-PM series a PM–opposition-leader
+   pairing), evaluated on that day (§4m's CYC_DAYS); a series has no value
+   more than half a month before its first reading or after its last. Preferred PM is the lead among those who
+   chose one of the two, the leadership chart's basis. Each person (pairing)
+   is its own run, and a term with two or more is split into them (the eras
+   the charts draw); the pooled line under them, which fits the domain, the
+   change-since base and the peer average, joins the runs across a handover
+   gap and holds its last value to the term's end, as cycleSeries' lines do.
+   obs: a reading of the run's series landed in the month. */
+function ldCycleLines(c, months) {
+  if (!LDM) return null;
+  const e0 = Date.parse(c.eDate) / 86400000;
+  const dayOf = (k) => Math.round(e0 + k * MS_MONTH);      // = §4m's CYC_DAYS
+  const isoOf = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+  const atSt = (list, iso) => list.find((x) => iso >= x.from && iso < x.to) || null;
+  const rById = new Map(LDM.rSeries.map((x) => [x.S.id, x])), pById = new Map(LDM.pSeries.map((x) => [x.S.id, x]));
+  const han = LDM.rSeries.find((x) => x.S.role === "han") || null, h2h = LDM.pSeries.find((x) => x.S.contest === "alb-han") || null;
+  const seriesAt = (kind, iso) => {
+    const P = atSt(LDM.PM_ST, iso), O = atSt(LDM.OPP_ST, iso);
+    if (kind === "pm") return P ? rById.get("pm:" + P.person + ":" + P.from) : null;
+    if (kind === "opp") return O ? rById.get("opp:" + O.person + ":" + O.from) : null;
+    if (kind === "ppm") return P && O ? pById.get("pm-opp:" + P.person + ":" + P.from + ":" + O.person + ":" + O.from) : null;
+    return kind === "han" ? han : h2h;
+  };
+  const nameOf = (X) => (X.S.contest ? X.S.pm + " v " + X.S.opp : X.S.person);
+  const fromOf = (X) => (X.S.contest ? X.S.id.split(":").filter((q) => /^\d{4}-\d\d-\d\d$/.test(q)).sort().pop() : X.S.from);
+  const grid = (kind) => {
+    const runs = new Map();
+    const raw = months.map((k, i) => {
+      const d = dayOf(k), X = seriesAt(kind, isoOf(d));
+      if (!X) return null;
+      const v = X.cyc.get(d);
+      if (v == null) return null;
+      if (!runs.has(X.S.id)) {
+        const seen = new Set(X.S.obs.map((o) => Math.round(monthsSince(o.raw.date, c.eDate))));
+        runs.set(X.S.id, { X, vals: months.map(() => null), obs: months.map((m) => seen.has(m)), first: i });
+      }
+      runs.get(X.S.id).vals[i] = r1(v);
+      return { v, id: X.S.id };
+    });
+    const known = {}; raw.forEach((r, i) => { if (r) known[i] = r.v; });
+    const ks = Object.keys(known).map(Number);
+    const filled = fillSeries(known, months.map((_, i) => i));
+    const vals = months.map((_, i) => (!ks.length || i < ks[0] ? null : r1(filled[i])));
+    const obs = months.map((_, i) => !!raw[i] && runs.get(raw[i].id).obs[i]);
+    const rs = [...runs.values()].sort((a, b) => a.first - b.first);
+    for (const r of rs) r.obs = r.obs.map((b, i) => b && r.vals[i] != null);
+    const eras = rs.length > 1 ? rs.map((r, j) => ({ name: nameOf(r.X), from: j ? fromOf(r.X) : null, months, vals: r.vals, obs: r.obs })) : null;
+    return { vals, obs, eras, first: rs.length ? nameOf(rs[0].X) : null };
+  };
+  return { pm: grid("pm"), opp: grid("opp"), ppm: grid("ppm"), han: grid("han"), ppmh: grid("ppmh") };
+}
+
 const CYCLE_DEFS = CYC_META.map((c) => {
   let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts, ppmhPts = [];
   if (c.current) {
@@ -9938,7 +10006,10 @@ const CYCLE_DEFS = CYC_META.map((c) => {
      the other aligned grids hold their values. The per-wave dots beside
      the line are one wave's own pair difference and can sit off it in a
      mixed-house month - the usual dots-vs-line split, not a bug. */
-  const netA = align(net), oppA = align(opp), hanA = sparseSeries(hanPts, months, cap);
+  /* federal: the leader lines are the leadership model's (ldCycleLines) */
+  const LC = ldCycleLines(c, months);
+  const netA = LC ? LC.pm.vals : align(net), oppA = LC ? LC.opp.vals : align(opp);
+  const hanA = LC ? LC.han.vals : sparseSeries(hanPts, months, cap);
   const leadGrid = months.map((m, i) => {
     const n = netA[i], o = oppA[i], h = hanA[i];
     const rival = Math.max(o != null ? o : -Infinity, h != null ? h : -Infinity);
@@ -9951,7 +10022,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
      handover dates, like preferred PM's), and its iso need only invert
      monthsSince - a boundary month's pairing is whoever held office on
      the month's nominal date. */
-  const leadObs = alignObs(net).map((b, i) => b && alignObs(opp)[i]);
+  const netO = LC ? LC.pm.obs : alignObs(net), oppO = LC ? LC.opp.obs : alignObs(opp);
+  const leadObs = netO.map((b, i) => b && oppO[i]);
   const monthIso = (m) => new Date(Date.parse(c.eDate) + m * MS_MONTH * 86400000).toISOString().slice(0, 10);
   const leadPts = months.map((m, i) =>
     leadGrid[i] != null && leadObs[i] ? { m, v: leadGrid[i], iso: monthIso(m), n: 1, obs: true } : null).filter(Boolean);
@@ -9959,24 +10031,24 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: !!c.current,
     eDate: c.eDate,
     ...(endRes ? { endRes } : {}),
-    months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
+    months, primary: prim.vals, tpp: tpp.vals, net: netA, oppnet: oppA,
     oppr: oppr.vals,
-    ppmm: align(ppmm),
+    ppmm: LC ? LC.ppm.vals : align(ppmm),
     pmlead: leadGrid,
     // the null-padded form align() can't produce alone: with no ONP readings
     // on record (2010/13), s.months is empty and align has nothing to index
     onp: onp.months.length ? align(onp) : months.map(() => null),
-    obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp),
-           oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm), pmlead: leadObs },
+    obs: { primary: prim.obs, tpp: tpp.obs, net: netO, oppnet: oppO,
+           oppr: oppr.obs, onp: alignObs(onp), ppmm: LC ? LC.ppm.obs : alignObs(ppmm), pmlead: leadObs },
     han: hanA,
     // like Hanson's: this-term-only readings, sparse over the month grid
-    ppmh: sparseSeries(ppmhPts, months, cap),
-    netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
+    ppmh: LC ? LC.ppmh.vals : sparseSeries(ppmhPts, months, cap),
+    netEras: LC ? LC.pm.eras : eraSeries(netPts, c.pmSpl, cap), oppEras: LC ? LC.opp.eras : eraSeries(oppPts, c.oppSpl, cap),
     tppEras: c.current ? rivalEras(tppPts, c, cap) : null,
-    ppmEras: ppmErasFor(c, ppmPts, cap),
+    ppmEras: LC ? LC.ppm.eras : ppmErasFor(c, ppmPts, cap),
     // pairing name for the single-line legend when the pairing never
     // changed inside the measured window (e.g. "Albanese v Dutton")
-    ppmPair: ppmPts.length ? ppmPairName(c, ppmPts[0].iso) : null,
+    ppmPair: LC ? LC.ppm.first : ppmPts.length ? ppmPairName(c, ppmPts[0].iso) : null,
     // the lead's own pairing splice and name, on the same union-of-splices
     // grid as preferred PM's (the pairing changes when EITHER office does)
     pmleadEras: ppmErasFor(c, leadPts, cap),
@@ -10001,8 +10073,11 @@ const CYCLE_DEFS = CYC_META.map((c) => {
       primary: primaryNow ? primaryNow[cur.gov] : null, oppr: primaryNow ? primaryNow[cur.opp] : null,
       onp: primaryNow ? primaryNow.onp : null,
       net: leaderNow.alb_net ? leaderNow.alb_net.v : null, oppnet: leaderNow.taylor_net ? leaderNow.taylor_net.v : null,
-      han: leaderNow.hanson_net ? leaderNow.hanson_net.v : null, ppmm: ppmMarginNow ? ppmMarginNow.v : null,
-      ppmh: ppmHMarginNow ? ppmHMarginNow.v : null,
+      han: leaderNow.hanson_net ? leaderNow.hanson_net.v : null,
+      /* preferred PM on the model's basis where it runs: the lead among
+         those who chose, read off the shares the leadership panel's bars print */
+      ppmm: LDM ? (LDM.pnow.taylor ? r1(2 * LDM.pnow.taylor.share.v - 100) : null) : ppmMarginNow ? ppmMarginNow.v : null,
+      ppmh: LDM ? (LDM.pnow.hanson ? r1(2 * LDM.pnow.hanson.share.v - 100) : null) : ppmHMarginNow ? ppmHMarginNow.v : null,
       /* the figure its chart opens on - the live pools' lead over the
          stronger of the leader of the opposition and Hanson */
       pmlead: leaderNow.alb_net && leaderNow.taylor_net
