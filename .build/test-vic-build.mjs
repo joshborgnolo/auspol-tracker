@@ -18,6 +18,8 @@ assert.ok(pollRowCoversWitness(dated, { firm: "example", fwEnd: "2026-11-15" }),
 assert.ok(pollRowCoversWitness(dated, { firm: "example", fwEnd: "2026-11-20" }), "publication-date match");
 assert.ok(!pollRowCoversWitness(dated, { firm: "other", fwEnd: "2026-11-20" }), "a different house never matches");
 assert.ok(!pollRowCoversWitness({ firm: "example", fwEnd: "2026-11-13" }, { firm: "example", fwEnd: "2026-11-20" }), "nearby waves do not merge without an explicit publication date");
+assert.ok(pollRowCoversWitness({ firm: "yougov-mrp", fwEnd: "2026-11-23" }, { firm: "yougov", fwEnd: "2026-11-23" }), "YouGov's MRP matches its firm-only witnesses");
+assert.ok(pollRowCoversWitness({ firm: "agenda-c-synesis-antenna", fwEnd: "2026-11-18" }, { firm: "agenda-c-synesis", fwEnd: "2026-11-18" }), "Agenda C's full name covers the CSV's abbreviated firm");
 const SCRATCH = fs.mkdtempSync(path.join(os.tmpdir(), "vic-build-"));
 const OUT = path.join(SCRATCH, "index.html");
 const FED = ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "assets/favicon.svg",
@@ -99,6 +101,12 @@ if (early) assert.equal(early.who.alb, "Andrews", "a 2023 poll asks about Andrew
 // the Kalman trend of §1a before), and say so
 assert.equal(D.latest.method.kind, "model", "Victoria's figures are the model's");
 assert.ok(D.latest.primaryModel && D.latest.primaryModel.method === "bayes", "the primary model's summary ships");
+const youGovVic = D.individualPolls.find((q) => q.pollster === "YouGov (MRP)" && q.released === "2026-11-23");
+assert.equal(JSON.stringify(youGovVic?.tpp3), JSON.stringify({ alp: 38, lnp: 37, onp: 25 }), "YouGov's MRP three-party split survives the schema fold");
+for (const [slot, v] of [["alb", 19], ["taylor", 34], ["hanson", 19], ["unc", 28]])
+  assert.equal(youGovVic?.ppm[slot], v, `YouGov's preferred-Premier ${slot} joins its poll`);
+const agendaVic = D.individualPolls.find((q) => q.pollster === "Agenda C Synesis" && q.released === "2026-11-18");
+assert.equal(agendaVic?.sampleEff, 1381, "Agenda C's published effective sample rides the row");
 /* the line sits among the polls: through the long stretch when Victoria's
    pollsters folded One Nation into others (2023–25), the polls average
    within a point and a half of the line on each party they printed – the

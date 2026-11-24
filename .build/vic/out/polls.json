@@ -128,7 +128,7 @@
   },
   "meta": {
     "source": "data/vic-polls.json",
-    "generated": "2026-11-21"
+    "generated": "2026-11-24"
   },
   "metricRules": {
     "favFirms": [
@@ -139,6 +139,7 @@
     "overrides": {}
   },
   "pollsterRules": {
+    "Agenda C Synesis": {},
     "DemosAU": {},
     "Freshwater": {},
     "Lighthouse": {},
@@ -1521,6 +1522,81 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.onenewsaustralia.com/australian-poll-tracker/"
+    },
+    {
+      "date": "2026-11-18",
+      "dateStart": "2026-11-10",
+      "pollster": "Agenda C Synesis",
+      "client": null,
+      "sample": 1772,
+      "sampleEff": 1381,
+      "alp": 25,
+      "lnp": 33,
+      "grn": 11,
+      "onp": 24,
+      "ind": 7,
+      "oth": null,
+      "tpp_alp": 41,
+      "tpp_lnp": 59,
+      "url": "https://www.news24.com.au/politics/australian-politics/coalition-leads-labor-5941-in-explosive-victorian-election-poll-despite-primary-vote-of-just-33-per-cent/news-story/11ba5269566fc953ec9a83bb238e454d"
+    },
+    {
+      "date": "2026-11-19",
+      "dateStart": "2026-11-18",
+      "pollster": "Roy Morgan",
+      "client": null,
+      "sample": 1563,
+      "alp": 22.5,
+      "lnp": 31,
+      "grn": 13,
+      "onp": 20,
+      "ind": 5,
+      "oth": 8.5,
+      "tpp_alp": 45,
+      "tpp_lnp": 55,
+      "url": "https://www.roymorgan.com/findings/10393-victorian-state-voting-intention-november-2026",
+      "tpp3": {
+        "alp": 43,
+        "lnp": 35,
+        "onp": 22
+      }
+    },
+    {
+      "date": "2026-11-20",
+      "dateStart": "2026-11-13",
+      "pollster": "RedBridge/Accent",
+      "client": "Australian Financial Review",
+      "sample": 1507,
+      "alp": 22,
+      "lnp": 33,
+      "grn": 15,
+      "onp": 23,
+      "ind": 7,
+      "oth": null,
+      "tpp_alp": 42,
+      "tpp_lnp": 58,
+      "url": "https://www.afr.com/politics/victorian-labor-hurtling-towards-historic-electoral-wipeout-20261122-p61fzt"
+    },
+    {
+      "date": "2026-11-23",
+      "dateStart": "2026-11-06",
+      "pollster": "YouGov (MRP)",
+      "client": "News24/Herald Sun",
+      "sample": 3890,
+      "alp": 20,
+      "lnp": 31,
+      "grn": 16,
+      "onp": 21,
+      "ind": 4,
+      "oth": 9,
+      "tpp_alp": 42,
+      "tpp_lnp": 58,
+      "url": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66",
+      "tpp3": {
+        "alp": 38,
+        "lnp": 37,
+        "onp": 25
+      }
     }
   ],
   "ppm": [
@@ -1972,6 +2048,16 @@
       "oppName": "Wilson",
       "pmName": "Carroll",
       "han": 11,
+      "extra": null
+    },
+    {
+      "date": "2026-11-23",
+      "firm": "YouGov (MRP)",
+      "alb": 19,
+      "opp": 34,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 19,
       "extra": null
     }
   ],
@@ -2501,6 +2587,48 @@
       "pmName": "Carroll",
       "han": null,
       "detail": null
+    },
+    {
+      "date": "2026-11-20",
+      "firm": "RedBridge/Accent",
+      "alb": -24,
+      "opp": 8,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": -5,
+      "detail": {
+        "alb": {
+          "app": 20,
+          "dis": 44
+        },
+        "opp": {
+          "app": 37,
+          "dis": 29
+        },
+        "han": {
+          "app": 21,
+          "dis": 26
+        }
+      }
+    },
+    {
+      "date": "2026-11-23",
+      "firm": "YouGov (MRP)",
+      "alb": -29,
+      "opp": 12,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 30,
+          "dis": 59
+        },
+        "opp": {
+          "app": 50,
+          "dis": 38
+        }
+      }
     }
   ],
   "ppmHeadToHead": [],
@@ -2563,6 +2691,24 @@
       "date": "2026-11-10",
       "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 55,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-11-18",
+      "firm": "Agenda C Synesis",
+      "alpVsOnp_alp": 50,
+      "lnpVsOnp_lnp": 68
+    },
+    {
+      "date": "2026-11-19",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 54,
+      "lnpVsOnp_lnp": 69
+    },
+    {
+      "date": "2026-11-20",
+      "firm": "RedBridge/Accent",
+      "alpVsOnp_alp": 50,
       "lnpVsOnp_lnp": null
     }
   ],

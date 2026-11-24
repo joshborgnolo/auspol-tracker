@@ -1,8 +1,8 @@
 {
-  "generated": "2026-11-21",
+  "generated": "2026-11-24",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-21 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-21 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-24 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-24 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -2046,9 +2046,157 @@
         "onenewsaustralia"
       ],
       "sourceUrl": "https://www.onenewsaustralia.com/australian-poll-tracker/"
+    },
+    {
+      "firmRaw": "Agenda C Synesis/Antenna",
+      "firm": "agenda-c-synesis-antenna",
+      "client": null,
+      "sample": 1772,
+      "sampleEff": 1381,
+      "dateLabel": "10–18 Nov",
+      "fwStart": "2026-11-10",
+      "fwEnd": "2026-11-18",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 33,
+        "grn": 11,
+        "onp": 24,
+        "ind": null,
+        "oth": 7
+      },
+      "tpp2": {
+        "alp": 41
+      },
+      "alt": {
+        "alpVOnp": 50,
+        "lnpVOnp": 68
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker",
+        "news24"
+      ],
+      "sourceUrl": "https://www.news24.com.au/politics/australian-politics/coalition-leads-labor-5941-in-explosive-victorian-election-poll-despite-primary-vote-of-just-33-per-cent/news-story/11ba5269566fc953ec9a83bb238e454d"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 1563,
+      "dateLabel": "18–19 Nov",
+      "fwStart": "2026-11-18",
+      "fwEnd": "2026-11-19",
+      "approxDate": false,
+      "primary": {
+        "alp": 22.5,
+        "lnp": 31,
+        "grn": 13,
+        "onp": 20,
+        "ind": 5,
+        "oth": 8.5
+      },
+      "tpp2": {
+        "alp": 45
+      },
+      "alt": {
+        "alpVOnp": 54,
+        "lnpVOnp": 69
+      },
+      "provenance": [
+        "roymorgan",
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/10393-victorian-state-voting-intention-november-2026"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 1507,
+      "dateLabel": "13–20 Nov",
+      "fwStart": "2026-11-13",
+      "fwEnd": "2026-11-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 22,
+        "lnp": 33,
+        "grn": 15,
+        "onp": 23,
+        "ind": null,
+        "oth": 7
+      },
+      "tpp2": {
+        "alp": 42
+      },
+      "alt": {
+        "alpVOnp": 50
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker",
+        "pollbludger"
+      ],
+      "sourceUrl": "https://www.afr.com/politics/victorian-labor-hurtling-towards-historic-electoral-wipeout-20261122-p61fzt"
+    },
+    {
+      "firmRaw": "YouGov (MRP)",
+      "firm": "yougov-mrp",
+      "client": "News24/Herald Sun",
+      "sample": 3890,
+      "dateLabel": "6–23 Nov",
+      "fwStart": "2026-11-06",
+      "fwEnd": "2026-11-23",
+      "approxDate": false,
+      "primary": {
+        "alp": 20,
+        "lnp": 31,
+        "grn": 16,
+        "onp": 21,
+        "ind": 4,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 42
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker",
+        "news24",
+        "pollbludger"
+      ],
+      "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66"
     }
   ],
   "threeParty": [
+    {
+      "dateLabel": "6–23 Nov 2026",
+      "fwEnd": "2026-11-23",
+      "firm": "yougov-mrp",
+      "sample": 3890,
+      "alp": 38,
+      "lnp": 37,
+      "onp": 25,
+      "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "dateLabel": "18–19 Nov 2026",
+      "fwEnd": "2026-11-19",
+      "firm": "roymorgan",
+      "sample": 1563,
+      "alp": 43,
+      "lnp": 35,
+      "onp": 22,
+      "sourceUrl": "https://www.roymorgan.com/findings/10393-victorian-state-voting-intention-november-2026",
+      "provenance": [
+        "roymorgan"
+      ]
+    },
     {
       "dateLabel": "26-29 Oct 2026",
       "fwEnd": "2026-10-29",
@@ -4158,6 +4306,96 @@
       ]
     },
     {
+      "series": "approval",
+      "dateLabel": "13–20 Nov 2026",
+      "date": "2026-11-20",
+      "fwStart": "2026-11-13",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1507,
+      "leader": "carroll",
+      "pos": 20,
+      "neg": 44,
+      "dk": 36,
+      "net": -24,
+      "sourceUrl": "https://www.afr.com/politics/victorian-labor-hurtling-towards-historic-electoral-wipeout-20261122-p61fzt",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "13–20 Nov 2026",
+      "date": "2026-11-20",
+      "fwStart": "2026-11-13",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1507,
+      "leader": "wilson",
+      "pos": 37,
+      "neg": 29,
+      "dk": 34,
+      "net": 8,
+      "sourceUrl": "https://www.afr.com/politics/victorian-labor-hurtling-towards-historic-electoral-wipeout-20261122-p61fzt",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "13–20 Nov 2026",
+      "date": "2026-11-20",
+      "fwStart": "2026-11-13",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1507,
+      "leader": "pickering",
+      "pos": 21,
+      "neg": 26,
+      "dk": 53,
+      "net": -5,
+      "sourceUrl": "https://www.afr.com/politics/victorian-labor-hurtling-towards-historic-electoral-wipeout-20261122-p61fzt",
+      "provenance": [
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6–23 Nov 2026",
+      "date": "2026-11-23",
+      "fwStart": "2026-11-06",
+      "firm": "yougov-mrp",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 3890,
+      "leader": "carroll",
+      "pos": 30,
+      "neg": 59,
+      "dk": 11,
+      "net": -29,
+      "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66",
+      "provenance": [
+        "news24"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6–23 Nov 2026",
+      "date": "2026-11-23",
+      "fwStart": "2026-11-06",
+      "firm": "yougov-mrp",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 3890,
+      "leader": "wilson",
+      "pos": 50,
+      "neg": 38,
+      "dk": 12,
+      "net": 12,
+      "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66",
+      "provenance": [
+        "news24"
+      ]
+    },
+    {
       "series": "preferredPremier",
       "dateLabel": "30 Oct–5 Nov 2026",
       "date": "2026-11-05",
@@ -4215,6 +4453,24 @@
       "sourceUrl": "https://www.afr.com/politics/victorian-coalition-position-strengthens-labor-reduced-to-rump-in-new-poll-20261111-p61d0z",
       "provenance": [
         "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "6–23 Nov 2026",
+      "date": "2026-11-23",
+      "fwStart": "2026-11-06",
+      "firm": "yougov-mrp",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 3890,
+      "values": {
+        "carroll": 19,
+        "wilson": 34,
+        "pickering": 19
+      },
+      "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66",
+      "provenance": [
+        "news24"
       ]
     }
   ]

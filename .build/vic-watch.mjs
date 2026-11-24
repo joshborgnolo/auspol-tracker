@@ -570,9 +570,13 @@ const emitBackfill = async () => {
   console.log(JSON.stringify({ polls, threeParty, leadership }, null, 2));
 };
 
+/* Witnesses identify YouGov only by firm, and abbreviate Agenda C/Antenna;
+   both product names remain exact in the dataset's same-date checks. */
+const comparisonFirm = (f) => ({ yougov: "yougov-mrp", "agenda-c-synesis": "agenda-c-synesis-antenna" })[f] || f;
+
 /* A corrected fieldwork window and the witness's publication date describe the
    same wave; only an explicit publication date may bridge the two. */
-const pollRowCoversWitness = (p, w) => p.firm === w.firm && (p.fwEnd === w.fwEnd || p.published === w.fwEnd);
+const pollRowCoversWitness = (p, w) => comparisonFirm(p.firm) === comparisonFirm(w.firm) && (p.fwEnd === w.fwEnd || p.published === w.fwEnd);
 
 const crossCheck = async () => {
   const ours = JSON.parse(readFileSync(DATA_FILE, "utf8"));
@@ -594,9 +598,9 @@ const crossCheck = async () => {
     process.exit(1);
   }
   const missingPolls = wikiPolls.filter((w) => !ours.polls.some((p) => pollRowCoversWitness(p, w))).map((w) => ({ firm: w.firm, fwEnd: w.fwEnd, pollster: w.firmRaw }));
-  const csvMissing = csvRows.filter((c) => !ours.polls.some((p) => p.firm === c.firm && closeDate(p.fwEnd, c.fwEnd))).map((c) => ({ firm: c.firm, fwEnd: c.fwEnd }));
-  const haveLead = new Set(ours.leadership.map((l) => `${l.series}|${l.firm}|${l.date}|${l.leader || l.pair}`));
-  const missingLead = leaders.filter((l) => !haveLead.has(`${l.series}|${l.firm}|${l.date}|${l.leader || l.pair}`)).map((l) => ({ series: l.series, firm: l.firm, date: l.date }));
+  const csvMissing = csvRows.filter((c) => !ours.polls.some((p) => comparisonFirm(p.firm) === comparisonFirm(c.firm) && closeDate(p.fwEnd, c.fwEnd))).map((c) => ({ firm: c.firm, fwEnd: c.fwEnd }));
+  const haveLead = new Set(ours.leadership.map((l) => `${l.series}|${comparisonFirm(l.firm)}|${l.date}|${l.leader || l.pair}`));
+  const missingLead = leaders.filter((l) => !haveLead.has(`${l.series}|${comparisonFirm(l.firm)}|${l.date}|${l.leader || l.pair}`)).map((l) => ({ series: l.series, firm: l.firm, date: l.date }));
   const findings = { missingPolls, csvMissing, missingLead };
   const n = missingPolls.length + csvMissing.length + missingLead.length;
   if (FLAG("json")) console.log(JSON.stringify({ missing: n, ...findings }));

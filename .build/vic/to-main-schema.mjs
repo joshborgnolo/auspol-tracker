@@ -93,6 +93,7 @@ const HOUSE = {
   "Resolve": "Resolve", "RedBridge/Accent": "RedBridge/Accent", "DemosAU/Premier National": "DemosAU",
   "Freshwater": "Freshwater", "Roy Morgan": "Roy Morgan", "Newspoll": "Newspoll",
   "Wolf & Smith": "Wolf & Smith", "YouGov (MRP)": "YouGov (MRP)",
+  "Agenda C Synesis/Antenna": "Agenda C Synesis",
   /* News Corp's internal research/data-analytics unit, branded the
      "Lighthouse Political Monitor" in the Herald Sun from Nov 2026 — a
      distinct house from Newspoll (filed short like "Resolve" for the
@@ -178,6 +179,7 @@ export function vicToMain(src) {
       date: r.fwEnd, dateStart: r.fwStart && r.fwStart !== r.fwEnd ? r.fwStart : null, pollster,
       client: r.client || (r.firmRaw === "DemosAU/Premier National" ? "Premier National" : null),
       sample: r.sample,
+      ...(r.sampleEff != null ? { sampleEff: r.sampleEff } : {}),
       alp: q.alp ?? null, lnp: q.lnp ?? null, grn: q.grn ?? null, onp: q.onp ?? null,
       ind: merged ? (q.oth ?? null) : q.ind, oth: merged ? null : (q.oth ?? null),
       tpp_alp: r.tpp2 && r.tpp2.alp != null ? r.tpp2.alp : null,

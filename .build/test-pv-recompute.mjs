@@ -82,8 +82,9 @@ const fresh = (mutate, data = A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js")) => {
   for (let i = 0; i < serverMonths.length; i++) for (const k of KEYS) {
     const a = eng.months[i], b = serverMonths[i];
     if (b[k] == null) { assert.equal(a[k], null, `vic re-run ${b.ym} ${k}: no line, as the build`); continue; }
-    assert.ok(Math.abs(a[k] - b[k]) <= 0.4, `vic re-run ${b.ym} ${k}: ${a[k]} ≈ ${b[k]}`);
-    assert.ok(Math.abs(a.ci[k] - b.ci[k]) <= 0.6, `vic re-run ${b.ym} ${k} ci: ${a.ci[k]} ≈ ${b.ci[k]}`);
+    // Exact one-decimal boundaries need a floating-point epsilon, not a wider tolerance.
+    assert.ok(Math.abs(a[k] - b[k]) <= 0.4 + 1e-9, `vic re-run ${b.ym} ${k}: ${a[k]} ≈ ${b[k]}`);
+    assert.ok(Math.abs(a.ci[k] - b.ci[k]) <= 0.6 + 1e-9, `vic re-run ${b.ym} ${k} ci: ${a.ci[k]} ≈ ${b.ci[k]}`);
   }
   const counts = new Map();
   for (const q of AP.D.individualPolls) if (!q.noAgg) counts.set(q.pollster, (counts.get(q.pollster) || 0) + 1);
