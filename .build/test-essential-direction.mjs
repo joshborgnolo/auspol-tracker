@@ -12,7 +12,7 @@
         byte for byte, with figure-for-figure spot pins on the first wave
         (2022-06-14), a mid-series wave (2024-10-21), the curated outlier (csv
         2026-01-28 → dirRow 2026-01-23, the CSV−5 curation deviation) and the
-        latest wave (2026-09-29); a re-run is changed:false;
+        latest standalone mood wave (2026-11-24); a re-run is changed:false;
      2. guards refuse to write: a wave cell gone missing, a cell sum drifting
         past the print tolerance, a wave's cells scatterable beyond the
         WAVE_GAP cluster window, and a reproduced TOTAL cell that no longer
@@ -64,7 +64,7 @@ const writeCsv = (tmp, lines) => {
   const r = runIn({});
   assert.equal(r.code, 0, `clean run: ${r.status}`);
   const st = JSON.parse(r.status.slice("ESS_DIR_STATUS ".length));
-  assert.equal(st.waves, 52, "52 mood clusters in the committed CSV");
+  assert.equal(st.waves, 53, "53 mood clusters in the committed CSV");
   assert.equal(st.reconciled, Object.keys(STORE.waves).length, "every wave reconciles against polls.json");
   assert.equal(st.guards, 0);
   assert.equal(r.written, true, "first run writes");
@@ -107,16 +107,16 @@ const writeCsv = (tmp, lines) => {
     dirRow: "2026-01-23",
   }, "the csv-5 curated outlier resolves its row");
 
-  // the latest wave
-  assert.deepEqual(STORE.waves["2026-09-29"], {
-    csv: "2026-09-30",
-    Men: { r: 29, w: 61, u: 10 },
-    Women: { r: 21, w: 59, u: 20 },
-    "18–34": { r: 28, w: 55, u: 17 },
-    "35–54": { r: 23, w: 62, u: 15 },
-    "55+": { r: 24, w: 62, u: 14 },
-    total: { r: 25, w: 60, u: 15 },
-    dirRow: "2026-09-29",
+  // the latest wave (a standalone mood-and-approval report, with no VI chart)
+  assert.deepEqual(STORE.waves["2026-11-24"], {
+    csv: "2026-11-25",
+    Men: { r: 26, w: 60, u: 14 },
+    Women: { r: 22, w: 60, u: 19 },
+    "18–34": { r: 29, w: 45, u: 25 },
+    "35–54": { r: 23, w: 64, u: 13 },
+    "55+": { r: 20, w: 68, u: 12 },
+    total: { r: 24, w: 60, u: 16 },
+    dirRow: "2026-11-24",
   }, "latest wave figures");
 
   // every wave carries a cell for every band with shares that sum to print

@@ -1,18 +1,45 @@
 {
-  "generatedAt": "2026-10-27T21:12:42.819Z",
+  "generatedAt": "2026-11-24T23:32:28.407Z",
   "horizon": "2025-09-29",
-  "retro": [
+  "retro": [],
+  "added": [],
+  "addedAppr": [
     {
-      "date": "2026-10-27",
-      "fixes": [
-        "url https://www.theguardian.com/australia-news/2026/oct/28/guardian-essential-poll-labor-albanese-one-nation-hanson-coalition-ntwnfb",
-        "published 2026-10-28T01:00 (Guardian's datePublished; replaces synthetic –)"
-      ]
+      "csvWave": "2026-11-25",
+      "row": {
+        "date": "2026-11-24",
+        "firm": "Essential",
+        "alb": -28,
+        "opp": -7,
+        "oppName": "Taylor",
+        "han": null,
+        "detail": {
+          "alb": {
+            "app": 32,
+            "dis": 60
+          },
+          "opp": {
+            "app": 35,
+            "dis": 42
+          }
+        }
+      }
     }
   ],
-  "added": [],
-  "addedAppr": [],
-  "addedDir": [],
+  "addedDir": [
+    {
+      "csvWave": "2026-11-25",
+      "row": {
+        "date": "2026-11-24",
+        "dateStart": "2026-11-19",
+        "pollster": "Essential",
+        "right": 24,
+        "wrong": 60,
+        "unsure": 16,
+        "url": "https://essentialreport.com.au/reports/25th-november-2026"
+      }
+    }
+  ],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
@@ -80,6 +107,7 @@
     "2026-07-28",
     "2026-09-01",
     "2026-09-30",
+    "2026-10-26",
     "2026-10-28"
   ],
   "skippedApprFigureDup": [
@@ -95,7 +123,7 @@
     "2026-02-25",
     "2026-03-25",
     "2026-04-29",
-    "2026-05-27",
+    "2026-05-26",
     "2026-06-30",
     "2026-07-28",
     "2026-09-01",

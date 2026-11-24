@@ -277,12 +277,12 @@
       "oth": 10.2
     },
     "leaders": {
-      "alb_fav": -25.6,
-      "alb_net": -25,
+      "alb_fav": -27.2,
+      "alb_net": -26.7,
       "hanson_fav": -3.3,
       "hanson_net": 0.3,
-      "taylor_fav": 4.3,
-      "taylor_net": -1.5
+      "taylor_fav": 2.8,
+      "taylor_net": -3.4
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -300,9 +300,9 @@
       }
     },
     "dir": {
-      "right": 23,
-      "wrong": 62.4,
-      "net": -39.5
+      "right": 23.3,
+      "wrong": 62.1,
+      "net": -38.8
     },
     "issLead": {
       "climate": "alp",
@@ -324,8 +324,12 @@
       "immigration": "Immigration",
       "security": "National security"
     },
-    "sig": {},
-    "sigMeta": {},
+    "sig": {
+      "lead|alb_net": -1
+    },
+    "sigMeta": {
+      "lead|alb_net": "Albanese’s net approval"
+    },
     "conf": {
       "business": 81.7,
       "consumer": 66.7,
@@ -1131,6 +1135,12 @@
       "label": "24 Nov 2026",
       "kind": "conf",
       "text": "Economic sentiment: ANZ–Roy Morgan consumer confidence 66.6 → 66.7."
+    },
+    {
+      "date": "2026-11-25",
+      "label": "25 Nov 2026",
+      "kind": "finding",
+      "text": "The fall in Albanese’s net approval over the past month is now statistically significant."
     }
   ]
 }

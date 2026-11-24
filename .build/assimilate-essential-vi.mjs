@@ -389,9 +389,11 @@ for (const waveDate of [...vi.keys()].sort()) {
 }
 
 // --- insert pass: leader approval -> "approval" array (nets like curated) ---
+// Approval and mood reports can stand alone, without a voting-intention chart.
 const existingAppr = D.approval.filter((r) => r.firm === "Essential");
 const addedAppr = [], skippedApprDateDup = [], skippedApprFigureDup = [];
-for (const waveDate of [...vi.keys()].sort()) {
+const approvalDates = new Set([...appWaves.alb.keys(), ...appWaves.opp.keys()]);
+for (const waveDate of [...approvalDates].sort()) {
   const date = iso(Date.parse(waveDate) - DAY);
   if (date <= horizon) continue;
   const parts = {};
@@ -428,7 +430,7 @@ for (const waveDate of [...vi.keys()].sort()) {
 // --- insert pass: national mood -> "direction" array ---
 const existingDir = D.direction.filter((r) => r.pollster === "Essential");
 const addedDir = [], skippedDirDateDup = [], skippedDirFigureDup = [];
-for (const waveDate of [...vi.keys()].sort()) {
+for (const waveDate of [...mood.keys()].sort()) {
   const date = iso(Date.parse(waveDate) - DAY);
   if (date <= horizon) continue;
   const mDate = near([...mood.keys()], waveDate);
