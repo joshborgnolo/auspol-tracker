@@ -62,6 +62,9 @@ for (const gap of built.sourceGaps) {
 }
 console.log("2. Partial-coverage and explicit 1–26 recovery-gap contract: OK");
 
+/* CI's runner has no poppler: there the cached text twin is still pinned by its
+   SHA-256 below, and only its re-derivation from the PDF is skipped */
+const HAVE_PDFTOTEXT = !spawnSync("pdftotext", ["-v"]).error;
 const cacheFiles = fs.readdirSync(SRC).sort();
 assert.deepEqual(cacheFiles, ["source-index.json", ...range(27, 43).flatMap((w) => [`wave-${w}.pdf`, `wave-${w}.txt`])].sort());
 for (const source of index.sources) {
@@ -71,12 +74,14 @@ for (const source of index.sources) {
   assert.equal(pdf.length, source.pdfBytes, `${source.wave}: byte count`);
   assert.equal(sha256(pdf), source.sha256, `${source.wave}: PDF hash`);
   assert.equal(sha256(Buffer.from(text)), source.textSha256, `${source.wave}: text hash`);
-  const converted = execFileSync("pdftotext", ["-layout", path.join(SRC, source.pdf), "-"], { encoding: "utf8", maxBuffer: 1 << 27 });
-  assert.equal(converted, text, `${source.wave}: cached text is exactly pdftotext -layout of the cached PDF`);
+  if (HAVE_PDFTOTEXT) {
+    const converted = execFileSync("pdftotext", ["-layout", path.join(SRC, source.pdf), "-"], { encoding: "utf8", maxBuffer: 1 << 27 });
+    assert.equal(converted, text, `${source.wave}: cached text is exactly pdftotext -layout of the cached PDF`);
+  }
   assert.match(text, new RegExp(`True Issues ${source.wave}`), `${source.wave}: report identity`);
   assert.ok(wave(source.wave), `${source.wave}: cache participates in full build`);
 }
-console.log("3. Every cached PDF, SHA-256 and pdftotext twin reproduces and parses offline: OK");
+console.log("3. Every cached PDF, SHA-256 and " + (HAVE_PDFTOTEXT ? "pdftotext twin reproduces" : "text twin pinned (pdftotext not installed: re-derivation skipped)") + " and parses offline: OK");
 
 const ROW_COUNTS = {
   27: [9, 20, 21], 28: [12, 22, 24], 29: [9, 22, 23], 30: [11, 22, 23],
