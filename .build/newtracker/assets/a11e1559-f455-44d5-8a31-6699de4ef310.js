@@ -2762,8 +2762,8 @@ function issTrendVerdict(D, it, dots) {
     down.length ? `${houseList(down, Infinity)} ${has(down)} lost ground significantly` : null,
   ].filter(Boolean).join(", and ") + ".";
 }
-function IssuesPanel({ rangeId = "all" }) {
-  if (window.AP.rd) return <RdIssues rangeId={rangeId} />;
+function IssuesPanel({ rangeId = "all", setRangeId }) {
+  if (window.AP.rd) return <RdIssues rangeId={rangeId} setRangeId={setRangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   /* the chart's box: beside the rows it gets their height, full width it is

@@ -7784,9 +7784,8 @@ function infoTerms(D) {
           ))}
         </tbody>
       </table>
-      <p className="info-work-note">The polls in the six-week window, newest first. A poll’s weight
-        is its sample, halving every 14 days and fading out by day 42; a pollster with several polls
-        in the window counts for the square root of their number.</p>
+      <p className="info-work-note">The latest who’s-best polls, from the last six weeks, newest
+        first; the model reads every poll back to the first.</p>
     </div>
   ) : null;
   /* The issues panel's working: the polls its six-week window holds and
@@ -7835,9 +7834,7 @@ function infoTerms(D) {
             ))}
           </tbody>
         </table>
-        <p className="info-work-note">Each poll’s gap to the other pollster’s polls in the four weeks
-          either side, averaged over every poll so far with a weight that halves every 90 days. Each
-          pollster’s figures move half the gap toward the other’s before they are pooled.</p>
+        <p className="info-work-note">Each pollster’s lean on the issue today, from the model (RedBridge’s minus Ipsos’s at the line’s level); the line sits midway between the two.</p>
       </> : null}
     </div>
   ) : null;
@@ -8976,113 +8973,152 @@ function infoTerms(D) {
     { id: "s-issues", title: "The issues", nav: "Issues",
       lead: { id: "issues", body: (
         <>Two questions pollsters ask about the issues: which ones matter most, and which party
-        would handle each best. The panel turns each into one figure per issue.
+        would handle each best. The panel turns each into one line per issue, from one model that
+        reads every poll that asks.
         <span className="info-p"><b>What matters.</b> RedBridge and Ipsos ask every month for each
         voter’s three most important issues, from lists of 14 and 19, and the panel shows the share
         putting each issue among their three. Their wordings give steadily different
         answers.{gapUp && gapDown && gapUp.v > 0 && gapDown.v < 0 ? <> RedBridge’s figure for
         {" "}{issPhrase(gapUp.id)} runs {Math.round(gapUp.v)} points above Ipsos’s, and its figure
         for {issPhrase(gapDown.id)} {Math.round(-gapDown.v)} points below.</> : null} Nothing shows
-        which is right, so each poll is moved half the pollsters’ average gap toward the other
-        before the two are pooled over six weeks. The grey bars sit midway between the two, and
-        don’t jump when one pollster’s poll leaves the window. The What matters view draws the
-        same two adjusted series as a monthly line across the whole term, so a move can be read
-        against the months before it. Ipsos publishes about three weeks
-        after its fieldwork, so its latest poll is in the window for only part of each month.
-        DemosAU, Spectre and SEC Newgate ask versions that can’t be pooled, but DemosAU and Spectre
-        side with Ipsos on health: in 2026 Spectre had it at 18 to 20%, and 1 to 3% named it the
-        biggest issue at DemosAU, against 7 to 10% ranking it first at RedBridge.</span>
-        <span className="info-p"><b>Who’s best.</b> Six pollsters ask which party would handle an
-        issue best, each in its own words and with its own list of answers. What every version
-        shares is the choice between Labor, the Coalition and One Nation, so each poll is read as
-        those three parties’ shares of the voters who named one of them: 25, 20 and 20 of all
-        voters become 38, 31 and 31. The shares are pooled over six weeks, after taking off each
-        pollster’s lean, shrunk toward zero where it rests on few polls: Ipsos and Resolve have
-        offered all three parties only since mid-2026
-        {ISS && ISS.leanMax ? <>, and the largest lean taken off today is
-        {" "}{Math.abs(ISS.leanMax.v).toFixed(1)} points</> : null}. The panel shows the eight issues
-        most pollsters ask: the cost of living, housing, health, economic management, immigration,
-        climate change, crime, and national security, each matched across pollsters’ wordings.</span>
+        which is right, so the panel’s figure sits midway between them. Other polls ask in other
+        ways, and they count too: the Australian Election Study and ANUpoll ask for the one most
+        important issue, JWS Research for five, SEC Newgate an open question that counts every issue
+        a voter mentions, and Ipsos’s What Worries the World and Freshwater for three from lists of
+        their own. Each pollster’s usual distance from the line is measured issue by issue and taken
+        off, so what a poll adds is whether an issue is rising or falling. That works because, on
+        the scale the model uses (log-odds), a share asked one way moves step for step with a share
+        asked another: RedBridge prints both its first-ranked and its top-three shares for the same
+        voters, and within an issue the first moves 0.98 for each 1 of the second.</span>
+        <span className="info-p"><b>Further back.</b> The window above each chart reaches back to
+        1990. Before RedBridge began in December 2025 the line follows Ipsos’s question – monthly
+        since 2012, and its yearly averages for 2010 and 2011 – moved by half the gap the two
+        pollsters show today. Ipsos asks about the environment but not climate change by name, so
+        climate change’s line follows Ipsos’s environment figures. Before 2010 only the AES (after
+        each election) and ANUpoll (2008 to 2015) asked, so those years rest on a handful of polls
+        and carry wide bands. A dotted stretch is one no poll asked about for months, where the line
+        is the model’s bridge.</span>
+        <span className="info-p"><b>Who’s best.</b> Pollsters ask which party would handle an
+        issue best, each in its own words and with its own list of answers. What the current
+        versions share is the choice between Labor, the Coalition and One Nation, so the panel shows
+        those three parties’ shares of the voters who named one of them: 25, 20 and 20 of all voters
+        become 38, 31 and 31. The model follows two lines per issue, Labor against the Coalition and
+        One Nation against the two, and reads the three shares off both. A poll that didn’t offer One
+        Nation by name still counts toward the first: every poll before late 2025, Resolve’s until
+        July 2026 and Ipsos’s until June 2026. Each pollster’s lean is measured and taken off, and the
+        level is the average of the three that ask every month, RedBridge, Resolve and
+        Ipsos{ISS && ISS.leanMax ? <>; the largest lean taken off today is
+        {" "}{Math.abs(ISS.leanMax.v).toFixed(1)} points</> : null}. The long view compares Labor
+        with the Coalition alone: Ipsos since 2013 (for its month’s five top issues), Resolve since
+        2021, Freshwater in 2024 and 2025, the Lowy Institute’s foreign-policy questions, and the
+        AES’s preferred party policy after each election. The panel shows the eight issues most
+        pollsters ask: the cost of living, housing, health, economic management, immigration,
+        climate change, crime, and national security, each matched across pollsters’
+        wordings.</span>
         <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer,
         and every answer that names no party: about a quarter to two fifths of voters on most
         issues, and more than half on climate change with RedBridge and YouGov, where many choose
         the Greens. RedBridge puts the Greens first on climate change, and the panel says so beside
         its rows.</span>
         <span className="info-p"><b>Ahead, or no clear lead.</b> A party is ahead on an issue when
-        its lead over the next party is larger than that lead’s own 95% margin. The lead and its
-        margin are worked out together, because both shares come from the same voters: when one
-        rises, the other tends to fall.</span>
-        <span className="info-p"><b>Changes over time.</b> The sentence under the chart asks whether
-        any party has gained or lost ground on the issue. Ipsos and Resolve joined the three-party
-        question only in June and July 2026, so a line can move just because one of them arrived.
-        The test therefore compares each pollster only with itself, with the bar raised for testing
-        three parties at once (see {xref("significance", "issues", "Significant")}). A pollster
-        with a single poll, such as DemosAU, is left out of it.</span>
+        it leads the next party in at least 97.5% of the model’s draws, so that its lead’s 95%
+        interval sits clear of zero. The shares are drawn together, because they come from the same
+        voters: when one rises, the others tend to fall.</span>
+        <span className="info-p"><b>Changes over time.</b> A figure such as “up 2 points on a month
+        ago” is the model’s own: its line today against thirty days before, tested on the same
+        draws. The sentence over each chart asks a separate question, whether a party or an issue
+        has moved over the term, and compares each pollster only with itself, with the bar raised
+        for testing several at once (see {xref("significance", "issues", "Significant")}). A
+        pollster with a single poll, such as DemosAU, is left out of it.</span>
         <span className="info-p"><b>By group.</b> RedBridge’s tables give each group’s share
         putting an issue in its top three, by vote, generation, gender, where people live, home
         ownership, and education. A group’s margin comes from its share of the poll, so One Nation
         voters, about a quarter of RedBridge’s sample, carry margins of about 6 points. The group
         views join those tables into one line per group across RedBridge’s monthly polls, against
-        RedBridge’s own all-voters line — which can sit off the pooled line in All voters, as that
-        line pools RedBridge with Ipsos. A group’s change over the term is a line through its
+        RedBridge’s own all-voters line — which can sit off the model’s line in All voters, as that
+        line also reads Ipsos and the rest. A group’s change over the term is a line through its
         monthly figures, with the bar raised for the number of groups tested.</span>
-        <span className="info-p"><b>Limits.</b> Unfortunately, the two pollsters that ask what
-        matters every month ask different questions, and nothing shows which is closer to how
-        people will vote. The grey bars simply sit midway between them. And the three-party shares
-        can’t show a party gaining ground among voters who had named no one.</span>
+        <span className="info-p"><b>Limits.</b> Unfortunately, the pollsters ask different
+        questions, and nothing shows which is closer to how people will vote: the level is the
+        regular pollsters’ average by convention, and a line’s movements are what the polls agree
+        on. Before 2008 the AES alone carries the line, every three years. And the three-party
+        shares can’t show a party gaining ground among voters who had named no one.</span>
         {working(<>
           <span className="info-p"><b>What matters, as asked.</b> RedBridge: “If a federal
           election were held today, which of the following issues would be most important to you
           when deciding who will receive your vote? Please rank your top 3.” Ipsos: “What would you
-          say are the three most important issues facing Australia today?” As a check: DemosAU asks
-          every month, “In your opinion, what is the biggest issue facing Australia today?”, taking
-          one answer in the voter’s own words and sorting the answers into categories generated by
-          AI, which change from month to month. Spectre asks about every three months for up to
-          three of 14 issues, several of them bundled, such as “health and aged care”. Every two
-          months SEC Newgate asks, “What are the main issues facing Australians that are most
-          important to you right now?”, and counts every issue each voter mentions.</span>
+          say are the three most important issues facing Australia today?” JWS Research: “From the
+          following list, please select the five most important issues you think the Australian
+          Government should focus on.” SEC Newgate, every two months: “What are the main issues
+          facing Australians that are most important to you right now?”, counting every issue each
+          voter mentions. Ipsos’s What Worries the World: “Which three of the following topics do you
+          find the most worrying in your country?” Freshwater (2022 to 2025): “Which of the following
+          do you think are the most important issues for the Federal government to focus on at this
+          time? Please pick up to three.” ANUpoll (2008 to 2015): “What do you think is the most
+          important problem facing Australia today?”, one answer in the voter’s own words. The AES,
+          after each election: the most important issue in the campaign, one from a list that
+          changes from election to election. Not in the model: DemosAU’s monthly “biggest issue
+          facing Australia today?”, whose AI-generated categories change from month to month, and
+          Spectre’s up to three of 14 bundled issues; neither is kept as figures here.</span>
           <span className="info-p"><b>Who’s best, as asked.</b> Resolve asks every month, “Which
           party do you think would perform best in each of these areas?”, offering the Liberals,
-          Labor, One Nation (since July 2026), someone else, and undecided. RedBridge asks every
-          month, “Which of the following do you believe is best able to deal with…”, offering
-          Labor, the Liberals, the Nationals, the Greens, One Nation, all about equal, none of
-          these, and not sure. Ipsos asks every month, “Please select the political party that you
-          believe is most capable of managing each of the following issues,” for its month’s five
-          top issues, offering Labor, the Coalition, the Greens, One Nation (since June 2026),
-          other, don’t know, and none. YouGov asked in August 2026, “Which party is best at
-          handling…”, and DemosAU in February 2026, “Which political party do you trust more to
-          handle the following issues?”, both offering Labor, the Coalition, One Nation, the Greens,
-          and don’t know. Every two months SEC Newgate asks, “Which of the following do you think
-          would be the best party to manage the cost of living?” It lists all four parties from May
-          2026, when One Nation and the Greens joined and “neither” and “can’t say” disappeared from
-          the printed table; its pooled waves are those from that month on.</span>
+          Labor, One Nation (since July 2026), someone else, and undecided; its figures since April
+          2021 count. RedBridge asks every month, “Which of the following do you believe is best able
+          to deal with…”, offering Labor, the Liberals, the Nationals, the Greens, One Nation, all
+          about equal, none of these, and not sure. Ipsos asks every month, “Please select the
+          political party that you believe is most capable of managing each of the following
+          issues,” for its month’s five top issues, offering Labor, the Coalition, the Greens (not
+          2016 to 2019), One Nation (since June 2026), other, don’t know, and none; its figures since
+          2013 count. YouGov asked “Which party is best at handling…”, and DemosAU in February 2026,
+          “Which political party do you trust more to handle the following issues?”, both offering
+          Labor, the Coalition, One Nation, the Greens, and don’t know. SEC Newgate asks every two
+          months, “Which of the following do you think would be the best party to manage the cost of
+          living?” Freshwater asked which government would best manage each issue (an Albanese-led
+          Labor government, a Dutton-led Coalition government, or neither); the Lowy Institute,
+          “Which party, either the Labor Party or the Liberal–National Coalition, do you personally
+          think would do a better job at handling each of these issues”; and the AES, whose policies,
+          Labor’s or the Coalition’s, voters prefer on each issue.</span>
           <span className="info-p"><b>Matching issues.</b> RedBridge’s “the rate of immigration” is
           Resolve’s “immigration and refugees”, Ipsos’s “defence, foreign affairs and terrorism”
-          counts as national security, and DemosAU’s “Medicare” as health.</span>
-          <span className="info-p"><b>Pooling.</b> Shares are weighted as the headline’s polls are,
-          so newer and larger polls count for more, and each pollster’s lean is measured as the
-          headline’s are.</span>
-          <span className="info-p"><b>Top three, two pollsters:</b> with g = RedBridge’s figure minus
-          Ipsos’s on average, each RedBridge poll’s share x counts as x − g ÷ 2 and each Ipsos poll’s
-          as x + g ÷ 2, and the results pool like the shares below. g is measured poll by poll,
-          against the other pollster’s polls within four weeks, and averaged with a weight that
-          halves every 90 days.</span>
+          counts as national security, and DemosAU’s “Medicare” as health. A bundle that holds an
+          issue (JWS’s “the environment and climate change”, ANUpoll’s “economy/jobs”) counts as that
+          issue, its own lean absorbing the difference; when a pollster changes a bundle (JWS split
+          “housing and interest rates” in 2023), the two versions lean apart.</span>
+          <span className="info-p"><b>The model.</b> For each issue, a line that moves a little
+          each day (a random walk on the log-odds scale), with a larger step allowed when COVID
+          arrived for what matters, and at changes of prime minister or government for who’s best.
+          Each poll reads the line plus its pollster’s lean, which may drift slowly, plus sampling
+          error at the poll’s effective sample (a design effect of 1.6) and the printed figure’s
+          rounding; each pollster’s spread beyond that is measured too. The line follows one
+          pollster’s question through time (Ipsos’s; Resolve’s for who’s best on immigration,
+          national security and climate change, which Ipsos seldom asks; RedBridge’s for One Nation),
+          and today’s level is the regular pollsters’ average. How fast lines and leans move is
+          estimated from the polls. Every figure is a summary of 1,000 seeded draws, so the same
+          polls always print the same figures.</span>
+          <span className="info-p"><b>Tested.</b> Predicting every poll from those fielded before
+          it, the model misses Ipsos’s top-three figures by 2.0 points on average against 2.2 for
+          Ipsos’s own previous poll, with 95% of polls inside its 95% intervals; this term it
+          matches the six-week pool it replaced (1.9 against 1.9 for RedBridge and Ipsos); on Labor
+          against the Coalition it misses Resolve and Ipsos by 2.6 to 2.8 points against 2.9 to 3.1
+          for each pollster’s previous poll.</span>
           <span className="info-p"><b>Three-party share:</b> for each party p, s = 100 × p ÷
-          (Labor + Coalition + One Nation), from the poll’s published shares.</span>
-          <span className="info-p"><b>Lead:</b> the leader’s share minus the next party’s, pooled
-          like the shares. As a difference of two shares of one sample, its sampling variance is
-          (a + b − (a − b)²) ÷ n, where a and b are the two shares as fractions.</span>
+          (Labor + Coalition + One Nation), from the poll’s published shares; the model’s lines are
+          d = log(Labor ÷ Coalition) and o = log(One Nation ÷ (Labor + Coalition)), whose sampling
+          errors are independent.</span>
           <span className="info-p"><b>A check.</b> Every table is checked before it’s used. A
           salience row’s three ranks must add up to its top-three share, and every best-party row
           must add up to 100, give or take rounding. RedBridge prints each month twice, in its own
           report and again in the next, and the two must agree. Ipsos’s 19 shares must add up to
-          about 300, three per voter, and Ipsos prints each month again in every later report that
-          year: every printing must agree.</span>
+          about 300, three per voter. Ipsos reprints each month in later reports: the month’s own
+          report is used, else a reprint from within eleven months (a later one can carry the next
+          year’s figure under a label without a year).</span>
           <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
           (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning
-          Herald), Ipsos’s Issues Monitor reports and methodology statements (ipsos.com), YouGov’s
-          News24 Pulse charts, and DemosAU’s report for February 2026. For the check, DemosAU’s and
-          Spectre’s reports.</span>
+          Herald), Ipsos’s Issues Monitor and What Worries the World reports and methodology
+          statements (ipsos.com), JWS Research’s True Issues reports, SEC Newgate’s Mood of the
+          Nation, the AFR’s Freshwater Strategy polls, the Lowy Institute Poll, ANU’s ANUpoll
+          reports, the Australian Election Study’s trends report, YouGov’s News24 Pulse charts, and
+          DemosAU’s report for February 2026.</span>
           {issWork}
         </>)}</>) },
       entries: [] },

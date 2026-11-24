@@ -1672,6 +1672,16 @@ body.rd .rd-cwin-spans { display: inline-flex; flex-wrap: wrap; gap: 8px; }
 body.rd .rd-chip.rd-cwin-span { padding: 0 13px; font-size: 13.5px; }
 body.rd .rd-chip.rd-cwin-span[aria-pressed="true"] { color: var(--ink); }
 body.rd .rd-cwin + .rd-xf .rd-confidence-chart, body.rd .rd-cwin + * .rd-confidence-chart { margin-top: 24px; }
+/* the issues' trust card: the window bar at the card's top; beside the issue
+   rows (two columns from 1136px) the narrow column takes the phone's one-row
+   chip strip */
+body.rd .rd-is-chart .rd-cwin { margin: 0 0 16px; }
+@media (min-width: 1136px) {
+  body.rd .rd-is-chart .rd-cwin { gap: 10px; }
+  body.rd .rd-is-chart .rd-cwin-tools { width: 100%; }
+  body.rd .rd-is-chart .rd-cwin-spans { display: flex; width: 100%; flex-wrap: nowrap; gap: 6px; }
+  body.rd .rd-is-chart .rd-chip.rd-cwin-span { flex: 1 1 0; justify-content: center; padding: 0 4px; }
+}
 body.rd .rd-cstrip { margin-top: 18px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 body.rd .rd-cstrip-svg { display: block; overflow: visible; touch-action: pan-y; }
 body.rd .rd-cstrip-grid { stroke: var(--line-2); stroke-width: 1; }

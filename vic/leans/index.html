@@ -34,7 +34,7 @@
   <link rel="preload" href="/assets/fonts/ss3mark-wordmark.78676a6f.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/js/react.d949f1c3.js" as="script">
   <link rel="preload" href="../../assets/js/react-dom.35f4f974.js" as="script">
-  <link rel="preload" href="../../assets/js/data-vic.b39330b1.js" as="script">
+  <link rel="preload" href="../../assets/js/data-vic.2a1fa129.js" as="script">
   <link rel="preload" href="../../assets/js/data-vic-late.a1765b7e.js" as="script">
   <link rel="preload" href="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js" as="script">
   <link rel="preload" href="../../assets/js/np-project.e5d67d57.js" as="script">
@@ -44,18 +44,18 @@
   <link rel="preload" href="../../assets/js/copy-poll.feb389c5.js" as="script">
   <link rel="preload" href="../../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.a8c68e6d.js" as="script">
   <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js" as="script">
-  <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.f78d695f.js" as="script">
+  <link rel="preload" href="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.c2b96ed7.js" as="script">
   <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js" as="script">
-  <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.7c9501d3.js" as="script">
+  <link rel="preload" href="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.58a813b4.js" as="script">
   <link rel="preload" href="../../assets/js/wm-story.63f19861.js" as="script">
   <link rel="preload" href="../../assets/js/rd.a0430ee7.js" as="script">
   <link rel="preload" href="../../assets/js/rd-hero.ed8b9eaa.js" as="script">
-  <link rel="preload" href="../../assets/js/rd-panels.c8a0fc51.js" as="script">
+  <link rel="preload" href="../../assets/js/rd-panels.62cad0eb.js" as="script">
   <link rel="preload" href="../../assets/js/rd-polls.cf08e27d.js" as="script">
   <link rel="preload" href="../../assets/js/rd-cycles.c6677d13.js" as="script">
   <link rel="preload" href="../../assets/js/rd-allpolls.a7573049.js" as="script">
   <link rel="preload" href="../../assets/js/rd-public-opinion.246dfe2a.js" as="script">
-  <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.60141a41.js" as="script">
+  <link rel="preload" href="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.d4c36caa.js" as="script">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"vicpol tracker – Pollster leans","url":"https://auspoltracker.com/vic/leans/","description":"How each Victorian pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.","inLanguage":"en-AU","isPartOf":{"@type":"WebSite","name":"auspol tracker","url":"https://auspoltracker.com/"},"publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/"}}</script>
   <style>
 @font-face {
@@ -4865,6 +4865,13 @@ body.rd .rd-cwin-spans { display: inline-flex; flex-wrap: wrap; gap: 8px; }
 body.rd .rd-chip.rd-cwin-span { padding: 0 13px; font-size: 13.5px; }
 body.rd .rd-chip.rd-cwin-span[aria-pressed="true"] { color: var(--ink); }
 body.rd .rd-cwin + .rd-xf .rd-confidence-chart, body.rd .rd-cwin + * .rd-confidence-chart { margin-top: 24px; }
+body.rd .rd-is-chart .rd-cwin { margin: 0 0 16px; }
+@media (min-width: 1136px) {
+  body.rd .rd-is-chart .rd-cwin { gap: 10px; }
+  body.rd .rd-is-chart .rd-cwin-tools { width: 100%; }
+  body.rd .rd-is-chart .rd-cwin-spans { display: flex; width: 100%; flex-wrap: nowrap; gap: 6px; }
+  body.rd .rd-is-chart .rd-chip.rd-cwin-span { flex: 1 1 0; justify-content: center; padding: 0 4px; }
+}
 body.rd .rd-cstrip { margin-top: 18px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 body.rd .rd-cstrip-svg { display: block; overflow: visible; touch-action: pan-y; }
 body.rd .rd-cstrip-grid { stroke: var(--line-2); stroke-width: 1; }
@@ -6966,10 +6973,11 @@ body.rd #cyc-summary > h2.sr-only + .rd-cc { margin-top: 0; }
   <script>window.AP_INITIAL_TAB="leans";</script>
   <script>window.AP_CYCLE_SRC=null;</script>
   <script>window.AP_GROUP_HIST=null;</script>
+  <script>window.AP_ISSUES_HIST=null;</script>
   <script>window.AP_ONEOFF_SRC=null;</script>
   <script src="../../assets/js/react.d949f1c3.js"></script>
   <script src="../../assets/js/react-dom.35f4f974.js"></script>
-  <script src="../../assets/js/data-vic.b39330b1.js"></script>
+  <script src="../../assets/js/data-vic.2a1fa129.js"></script>
   <script src="../../assets/js/data-vic-late.a1765b7e.js"></script>
   <script src="../../assets/js/ed2260de-5b11-4bd5-8a8d-a391156c05ee.cb9adf03.js"></script>
   <script src="../../assets/js/np-project.e5d67d57.js"></script>
@@ -6979,18 +6987,18 @@ body.rd #cyc-summary > h2.sr-only + .rd-cc { margin-top: 0; }
   <script src="../../assets/js/copy-poll.feb389c5.js"></script>
   <script src="../../assets/js/08b413e7-8dbe-49bf-8932-a479f8d98f54.a8c68e6d.js"></script>
   <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310.4354f871.js"></script>
-  <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.f78d695f.js"></script>
+  <script src="../../assets/js/a11e1559-f455-44d5-8a31-6699de4ef310-late.c2b96ed7.js"></script>
   <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102.beedce36.js"></script>
-  <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.7c9501d3.js"></script>
+  <script src="../../assets/js/d1a1d215-370c-4ebc-878b-7eeea9ad8102-late.58a813b4.js"></script>
   <script src="../../assets/js/wm-story.63f19861.js"></script>
   <script src="../../assets/js/rd.a0430ee7.js"></script>
   <script src="../../assets/js/rd-hero.ed8b9eaa.js"></script>
-  <script src="../../assets/js/rd-panels.c8a0fc51.js"></script>
+  <script src="../../assets/js/rd-panels.62cad0eb.js"></script>
   <script src="../../assets/js/rd-polls.cf08e27d.js"></script>
   <script src="../../assets/js/rd-cycles.c6677d13.js"></script>
   <script src="../../assets/js/rd-allpolls.a7573049.js"></script>
   <script src="../../assets/js/rd-public-opinion.246dfe2a.js"></script>
-  <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.60141a41.js"></script>
+  <script src="../../assets/js/73de0c58-f11f-4793-9f90-77e583ab051b.d4c36caa.js"></script>
 
 
 </body></html>

@@ -22,6 +22,8 @@ import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as 
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
 import { ratingSeries as ldRatingSeries, ppmSeries as ldPpmSeries, fitSettings as ldFit, lineMoments as ldMoments, drawReads as ldDrawReads, houseCoef as ldHouseCoef } from "./leader-model.mjs";
 import { tppRead, tppNowOut, tppChgOut } from "./primary-model.mjs";
+import { buildSeries as imBuildSeries, fitFamily as imFit, drawSeries as imDrawSeries, lineMoments as imMoments, salObs as imSalObs, ownObs as imOwnObs, expit as imExpit, quant as imQuant, WIDE_SAL as IM_WIDE_SAL, WIDE_OWN as IM_WIDE_OWN } from "./issue-model.mjs";
+import { buildReadings as buildIssueReadings, ELECTION_DAYS as IM_ELECTION_DAYS } from "./issue-readings.mjs";
 import { fitSpan, gapReading, countReading, nestCats, nestCoords, nestShares, drawMix, makeRng as gsRng } from "./group-span.mjs";
 import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
@@ -89,6 +91,7 @@ const DATA_ASSET = path.join(OUT_DIR, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js")
 const CYCLE_SOURCE_ASSET = path.join(OUT_DIR, "cycle-source.json");
 const ONEOFFS_ASSET = path.join(OUT_DIR, "oneoffs-source.json");
 const GROUP_HIST_ASSET = path.join(OUT_DIR, "group-history.json");
+const ISSUES_HIST_ASSET = path.join(OUT_DIR, "issues-history.json");
 
 /* ---- canonical dataset ------------------------------------------------
    data/polls.json is the single source of truth. It used to be scraped out of
@@ -8237,6 +8240,191 @@ const issueGroupShare = (set, g, p) => {
   if (set === "housing") return { "Own outright": 0.32, Mortgage: 0.36, "Renting and other": 0.32 }[g] || null;
   return DEMO_SHARE[g] || null;
 };
+/* ---- 7hm. the issues model (issue-model.mjs; readings from every issue
+   store by issue-readings.mjs) -------------------------------------------
+   What matters: one line per issue, the share who would put it in their top
+   three, on the scale of the average regular top-three pollster (RedBridge
+   and Ipsos, each counting once). Every other way of asking – the one most
+   important issue (AES, ANUpoll), pick five (JWS Research), an open question
+   (SEC Newgate), Ipsos's other list (What Worries the World), Freshwater's
+   up-to-three – reads the same line through a lean of its own per issue. The
+   line follows Ipsos's question through time (Ipsos's "environment" for
+   climate change: Ipsos asks no climate item), and today's level is the two
+   regular pollsters' average: the line moved by half the gap between them
+   measured today, one constant for every month.
+   Who is best: Labor v the Coalition (d = log of Labor's to the Coalition's
+   share) and One Nation v the two (o), each its own line, the three shares
+   read off both; d follows Ipsos's question through time (Resolve's for
+   immigration, national security and climate change, which Ipsos seldom
+   asks), o RedBridge's; today's level is the average of the three regular
+   pollsters, RedBridge, Resolve and Ipsos. Settings on a grid, κ per house;
+   figures are summaries of 1,000 seeded draws per line. Backtest (each poll
+   predicted from those fielded before it, 2008–2026): Ipsos's top three 2.0
+   points v 2.2 for its own previous reading, 95% intervals covering 95%;
+   this term's RedBridge and Ipsos 1.90 v 1.90 for the six-week pool it
+   replaced; Labor v Coalition 2.6–2.8 v 2.9–3.1. */
+const IM_SAL_ANCHOR = (k) => (k === "climate" ? "Ipsos (environment)" : "Ipsos");
+const IM_SAL_CONV = ["RedBridge/Accent", "Ipsos"];
+const IM_D_ANCHOR = (k) => (["immigration", "security", "climate"].includes(k) ? "Resolve" : "Ipsos");
+const IM_OWN_CONV = ["RedBridge/Accent", "Resolve", "Ipsos"];
+const IM_GRID_SAL = { w: [0.013, 0.019, 0.028], d: [0.004, 0.008, 0.016], tau: [0, 0.08], J: [0, 0.4, 0.8], s: [0.25] };
+const IM_GRID_D = { w: [0.008, 0.012, 0.018], d: [0.003, 0.006, 0.012], tau: [0, 0.03], J: [0.1, 0.2, 0.4], s: [0.1] };
+const IM_GRID_O = { w: [0.012, 0.018, 0.027], d: [0.0002, 0.0008, 0.003, 0.008], tau: [0, 0.03], J: [0], s: [0.1] };
+const IM_NDRAW = +(process.env.IM_NDRAW || 1000);
+const ISSM = (() => {
+  if (!ISSUES_FILE) return null;
+  const T0 = Date.now();
+  const DAYn = (iso) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000);
+  const ISOd = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+  const pollOf = (w) => POLLS.find((q) => q.pollster === w.pollster && q.date === w.date) || null;
+  const { sal, own } = buildIssueReadings({ root: ROOT, issuesFile: ISSUES_FILE, pollOf, rowN, keys: ISSUE_SHARED });
+  const t1 = DAYn(LATEST_ISO), tPrev = t1 - 30;
+  /* changes of prime minister or government, where who is trusted can turn
+     at once; COVID's arrival for what matters */
+  const PM_DAYS = ["2007-11-24", "2010-06-24", "2013-06-27", "2013-09-07", "2015-09-15", "2018-08-24", "2022-05-21"].map(DAYn);
+  const COVID = DAYn("2020-03-15");
+  /* output days: the 15th of every month from a line's first reading (the
+     latest poll day in the current month), plus the latest poll day and the
+     day thirty before it */
+  const ymOfDay = (d) => ISOd(d).slice(0, 7);
+  const monthList = (a) => {
+    const out = [];
+    for (let y = +ymOfDay(a).slice(0, 4), m = +ymOfDay(a).slice(5, 7); ; m === 12 ? (y++, m = 1) : m++) {
+      const ym = `${y}-${String(m).padStart(2, "0")}`;
+      if (ym > ymOfDay(t1)) break;
+      out.push({ ym, day: Math.max(a, Math.min(DAYn(ym + "-15"), t1)) });
+    }
+    return out;
+  };
+  const outDays = (a) => [...new Set([...monthList(a).map((m) => m.day), t1, tPrev])].sort((x, y) => x - y);
+  const salRows = sal.map((r, i) => { const o = imSalObs(r.p, r.n, r.step); return { day: r.day, house: r.house, issue: r.issue, y: o.y, v: o.v + (r.avg ? 0.004 : 0), i, raw: r }; });
+  const dRows = [], oRows = [];
+  own.forEach((r, i) => {
+    const ob = imOwnObs(r, r.n, r.step);
+    dRows.push({ day: r.day, house: r.house, issue: r.issue, ...ob.d, i, raw: r });
+    if (ob.o) oRows.push({ day: r.day, house: r.house, issue: r.issue, ...ob.o, i, raw: r });
+  });
+  const SS = imBuildSeries(salRows, { core: (k) => new Set([IM_SAL_ANCHOR(k)]), wide: IM_WIDE_SAL, p0: 1.5, minCore: 1, jumps: [COVID], outDays });
+  const SD = imBuildSeries(dRows, { core: (k) => new Set([IM_D_ANCHOR(k)]), wide: IM_WIDE_OWN, p0: 1, minCore: 1, jumps: PM_DAYS, outDays });
+  const SO = imBuildSeries(oRows, { core: () => new Set(["RedBridge/Accent"]), wide: IM_WIDE_OWN, p0: 1, minCore: 1, outDays });
+  for (const S of [...SS, ...SD, ...SO]) if (S.t1 < t1) S.t1 = t1;
+  const stS = imFit(SS, IM_GRID_SAL), stD = imFit(SD, IM_GRID_D), stO = imFit(SO, IM_GRID_O);
+  const edges = [...stS.edges.map((e) => "salience " + e), ...stD.edges.map((e) => "Labor v Coalition " + e), ...stO.edges.map((e) => "One Nation " + e)];
+  if (edges.length) console.warn("issues model: settings on a grid edge –", edges.join(", "));
+  const T1 = Date.now();
+  /* one line's published draws: the line plus the convention houses' mean
+     lean today (the anchor's lean is zero), and the smoothed lean of every
+     house at each of its reading days (to move a dot onto the line) */
+  const pubOf = (S, st, conv, seed) => {
+    const days = outDays(S.t0);
+    const dr = imDrawSeries(S, st, { nDraw: IM_NDRAW, seed, keepDays: days });
+    const hs = conv.filter((h) => h === S.core[0] || dr.leans.has(h));
+    const shift = new Float64Array(IM_NDRAW);
+    for (const h of hs) if (h !== S.core[0]) { const a = dr.leans.get(h); for (let i = 0; i < IM_NDRAW; i++) shift[i] += a[i] / hs.length; }
+    const at = (d) => { const a = dr.at(d); if (!a) return null; const o = new Float64Array(IM_NDRAW); for (let i = 0; i < IM_NDRAW; i++) o[i] = a[i] + shift[i]; return o; };
+    let sMean = 0; for (const v of shift) sMean += v / IM_NDRAW;
+    /* the leans today, each house's own (mean over draws, log scale) */
+    const leanNow = new Map([[S.core[0], 0], ...[...dr.leans].map(([h, a]) => [h, a.reduce((x, y) => x + y, 0) / a.length])]);
+    const coefs = {}, rDays = [...new Set(S.obs.map((o) => o.t))];
+    for (const [h, lr] of S.lean) if (!S.lone.has(h) && h !== S.core[0]) coefs[h] = lr;
+    const lm = Object.keys(coefs).length ? imMoments(S, st, rDays, coefs) : {};
+    const dayIdx = new Map(rDays.map((d, j) => [d, j]));
+    const leanAt = (h, d) => (h === S.core[0] ? 0 : lm[h] ? lm[h][dayIdx.get(d)].m : leanNow.get(h) ?? 0);
+    return { S, days, at, sMean, leanNow, leanAt, hs, months: monthList(S.t0) };
+  };
+  const q3 = (a, f) => { const t = Float64Array.from(a, f); return [imQuant(t, 0.5), imQuant(t, 0.025), imQuant(t, 0.975)]; };
+  const pct = (x) => 100 * imExpit(x);
+  /* ---- what matters ---- */
+  const salience = {};
+  SS.forEach((S, si) => {
+    const k = S.key, P = pubOf(S, stS, IM_SAL_CONV, 7301 + si);
+    const now = P.at(t1), prev = P.at(tPrev);
+    const [v, lo, hi] = q3(now, pct);
+    const chgD = Float64Array.from(now, (x, i) => pct(x) - pct(prev[i]));
+    const [chg, cLo, cHi] = q3(chgD, (x) => x);
+    let up = 0; for (const x of chgD) if (x > 0) up++;
+    /* the steady gap between the two regular pollsters today, RedBridge minus Ipsos (points) */
+    const g = P.leanNow.has("RedBridge/Accent") && P.leanNow.has("Ipsos") ? (() => {
+      const m = imQuant(Float64Array.from(now), 0.5) - P.sMean;
+      return pct(m + P.leanNow.get("RedBridge/Accent")) - pct(m + P.leanNow.get("Ipsos"));
+    })() : null;
+    const months = P.months.map(({ ym, day }) => { const a = P.at(day); const [m, l, h] = q3(a, pct); return [ym, r1(m), r1(l), r1(h)]; });
+    /* every reading, moved onto the line: printed log-odds less the house's
+       lean that day plus today's convention shift */
+    const dots = S.obs.map((o) => {
+      const r = o.raw.raw || o.raw;
+      const adj = pct(o.y - P.leanAt(o.house, o.t) + P.sMean);
+      return [r2(dx(r.date)), o.house, r.date, r.p, Math.round(r.n), r1(adj), r.fmt, r.avg ? 1 : 0];
+    });
+    salience[k] = { v: r1(v), lo: r1(lo), hi: r1(hi), ci: r1((hi - lo) / 2), chg: r1(chg), chgLo: r1(cLo), chgHi: r1(cHi),
+      pUp: Math.round(1000 * up / IM_NDRAW) / 1000, changeSig: cLo > 0 || cHi < 0, gap: g != null ? r1(g) : null,
+      leans: Object.fromEntries([...P.leanNow].map(([h, l]) => [h, r2(l)])), houses: S.houses, months, dots };
+  });
+  /* ---- who is best ---- */
+  const ownership = {};
+  const OWN3q = ["alp", "lnp", "onp"];
+  SD.forEach((S, si) => {
+    const k = S.key, Pd = pubOf(S, stD, IM_OWN_CONV, 7401 + si);
+    const So = SO.find((x) => x.key === k), Po = So ? pubOf(So, stO, IM_OWN_CONV, 7501 + si) : null;
+    const share3 = (dd, oo) => { const on = imExpit(oo), a = (1 - on) * imExpit(dd); return { alp: 100 * a, lnp: 100 * (1 - on - a), onp: 100 * on }; };
+    const draws3 = (day) => {
+      const dd = Pd.at(day), oo = Po && Po.at(day);
+      if (!dd || !oo) return null;
+      const out = { alp: new Float64Array(IM_NDRAW), lnp: new Float64Array(IM_NDRAW), onp: new Float64Array(IM_NDRAW) };
+      for (let i = 0; i < IM_NDRAW; i++) { const s3 = share3(dd[i], oo[i]); for (const q of OWN3q) out[q][i] = s3[q]; }
+      return out;
+    };
+    const months2 = Pd.months.map(({ ym, day }) => { const [m, l, h] = q3(Pd.at(day), pct); return [ym, r1(m), r1(l), r1(h)]; });
+    const o0 = Po ? Po.months[0].ym : null;
+    const months3 = Po ? Pd.months.filter((m) => m.ym >= o0).map(({ ym, day }) => {
+      const D3 = draws3(day); if (!D3) return null;
+      const b = OWN3q.map((q) => q3(D3[q], (x) => x));
+      return [ym, ...b.map((x) => r1(x[0])), ...b.map((x) => r1((x[2] - x[1]) / 2))];
+    }).filter(Boolean) : [];
+    let cur = null;
+    const N3 = draws3(t1), P3 = draws3(tPrev);
+    if (N3) {
+      const v = {}, ci = {}, lo = {}, hi = {}, chg = {}, chgSig = {};
+      for (const q of OWN3q) {
+        const [m, l, h] = q3(N3[q], (x) => x); v[q] = r1(m); lo[q] = r1(l); hi[q] = r1(h); ci[q] = r1((h - l) / 2);
+        if (P3) { const c = Float64Array.from(N3[q], (x, i) => x - P3[q][i]); const [cm, cl, ch] = q3(c, (x) => x); chg[q] = r1(cm); chgSig[q] = cl > 0 || ch < 0; }
+      }
+      const order = [...OWN3q].sort((a, b) => imQuant(N3[b], 0.5) - imQuant(N3[a], 0.5));
+      const gapOf = (a, b) => { const gd = Float64Array.from(N3[a], (x, i) => x - N3[b][i]); const [m, l, h] = q3(gd, (x) => x); let pos = 0; for (const x of gd) if (x > 0) pos++; return { m, l, h, p: pos / IM_NDRAW }; };
+      const G1 = gapOf(order[0], order[1]), leadSig = G1.p >= 0.975;
+      const G2 = leadSig ? null : gapOf(order[1], order[2]);
+      cur = { v, ci, lo, hi, chg, chgSig, lead: order[0], runner: order[1], third: order[2],
+        gap: r1(G1.m), gapCi: r1((G1.h - G1.l) / 2), gapLo: r1(G1.l), gapHi: r1(G1.h), pLead: Math.round(1000 * G1.p) / 1000, leadSig,
+        ...(G2 ? { gap2: r1(G2.m), gap2Ci: r1((G2.h - G2.l) / 2), pairSig: G2.p >= 0.975 } : {}) };
+    }
+    /* a three-way share figure at a given month (the parked change view) */
+    const at3 = (ym) => {
+      const m = Pd.months.find((x) => x.ym === ym); if (!m) return null;
+      const D3 = draws3(m.day); if (!D3) return null;
+      const order = [...OWN3q].sort((a, b) => imQuant(D3[b], 0.5) - imQuant(D3[a], 0.5));
+      const p = (a, b) => { let n = 0; for (let i = 0; i < IM_NDRAW; i++) if (D3[a][i] > D3[b][i]) n++; return n / IM_NDRAW; };
+      const leadSig = p(order[0], order[1]) >= 0.975;
+      return { lead: order[0], runner: order[1], third: order[2], leadSig, ...(leadSig ? {} : { pairSig: p(order[1], order[2]) >= 0.975 }) };
+    };
+    /* each house's lean on each party's share today, the leading party's
+       figure as the rail quotes it: its shares at the line plus its leans,
+       less the line's */
+    const leanShares = (h) => {
+      const dm = imQuant(Pd.at(t1), 0.5), om = Po ? imQuant(Po.at(t1), 0.5) : null;
+      if (om == null) return null;
+      const ld = Pd.leanNow.get(h), lo_ = Po.leanNow.get(h);
+      if (ld == null) return null;
+      const base = share3(dm, om), hs = share3(dm + ld - Pd.sMean, om + (lo_ ?? Po.sMean) - Po.sMean);
+      return Object.fromEntries(OWN3q.map((q) => [q, r1(hs[q] - base[q])]));
+    };
+    const dots2 = S.obs.map((o) => { const r = o.raw.raw || o.raw; return [r2(dx(r.date)), o.house, r.date, r1(100 * r.alp / (r.alp + r.lnp))]; });
+    ownership[k] = { cur, months2, months3, at3, leanShares, houses: [...new Set([...S.houses, ...(So ? So.houses : [])])], dots2 };
+  });
+  const T2 = Date.now();
+  console.log(`issues model: ${sal.length} what-matters readings (${new Set(sal.map((r) => r.house)).size} question forms), ${own.length} who-is-best; salience ${JSON.stringify(stS.best)}, d ${JSON.stringify(stD.best)}, o ${JSON.stringify(stO.best)}; fit ${T1 - T0} ms, lines ${T2 - T1} ms`);
+  return { salience, ownership, t1, settings: { sal: stS.best, d: stD.best, o: stO.best },
+           kappa: { sal: Object.fromEntries(stS.kappa), d: Object.fromEntries(stD.kappa), o: Object.fromEntries(stO.kappa) } };
+})();
 const issues = (() => {
   const F = ISSUES_FILE;
   if (!F || !Array.isArray(F.ownership) || !Array.isArray(F.salience)) return null;
@@ -8274,37 +8462,12 @@ const issues = (() => {
     }
     if (used && inWin(mid)) wavesIn.push({ w, p, d: ddays(refNow, mid) });
   }
-  // each house's lean on each party's three-way share, per issue, measured as the headline's are
-  const ownHE = Object.fromEntries(Object.entries(own).map(([k, o]) =>
-    [k, Object.fromEntries(OWN3.map((q) => [q, houseEffectsFor(o[q])]))]));
-  const lead = (k, rows, a, b) => {
-    /* the leader's margin over the runner-up, as its own measure: a
-       difference of two shares of one sample, variance (pa + pb − (pa − pb)²)/n,
-       less the difference of the two parties' leans */
-    const diff = rows.alp.map((r) => {
-      const pa = r.s3[a] / 100, pb = r.s3[b] / 100;
-      return { mid: r.mid, x: r.s3[a] - r.s3[b], n: r.n, firm: r.firm, pq: Math.max(0, 1e4 * (pa + pb - (pa - pb) ** 2)) };
-    });
-    const he = { at: (firm, t) => heV(ownHE[k][a], firm, t) - heV(ownHE[k][b], firm, t) };
-    return weightedWithSe(nowcastPts(diff, he, refNow, SPARSE_K));
-  };
   /* the Who's-trusted change view's snapshot month: November 2025, when
      RedBridge's six-issue set is the month's only three-party reading –
      crime, economy and everything else tile "Not polled" (user's call
      2026-10-10, over April 2026, which sat too close to now to show
      movement) */
   const SNAP0 = "2025-11";
-  const leadAt = (k, rows, a, b, ym) => {
-    /* `lead`, pooled for one calendar month rather than nowcast – the same
-       diff measure and variance, monthWithSe in place of nowcastPts, so a
-       tile's verdict is the row verdict's own test on the month's waves */
-    const diff = rows.alp.filter((r) => r.ym === ym).map((r) => {
-      const pa = r.s3[a] / 100, pb = r.s3[b] / 100;
-      return { ym: r.ym, x: r.s3[a] - r.s3[b], n: r.n, firm: r.firm, pq: Math.max(0, 1e4 * (pa + pb - (pa - pb) ** 2)) };
-    });
-    const he = { at: (firm, t) => heV(ownHE[k][a], firm, t) - heV(ownHE[k][b], firm, t) };
-    return monthWithSe(diff, he, ym);
-  };
   // ---- what matters: RedBridge's and Ipsos's top three, all voters
   const salRows = {}, salR1 = {};
   for (const w of F.salience) {
@@ -8318,7 +8481,6 @@ const issues = (() => {
       if (v.r1 != null) (salR1[k] ||= []).push({ ...base, x: v.r1 });
     }
   }
-  const salLean = Object.fromEntries(Object.entries(salRows).map(([k, rs]) => [k, pairLeanFor(rs)]));
   const houseName = (f) => (f === "RedBridge/Accent" ? "RedBridge" : f);
   /* each house's newest poll on the issue, as published, for the reader to
      see the two apart: within two months of the newest poll, so a house that
@@ -8327,71 +8489,46 @@ const issues = (() => {
     const r = salRows[k].filter((x) => x.firm === f && x.mid <= refNow).sort((a, b) => b.mid - a.mid)[0];
     return r && ddays(refNow, r.mid) <= 61 ? { house: houseName(f), v: r.x, date: r.date } : null;
   }).filter(Boolean);
+  /* today's figure from the issues model (§7hm): the line's median and 95%
+     interval, its change on thirty days before (tested on the draws), and
+     RedBridge's first-rank share as RedBridge's own (one house, no lean) */
   const salNow = (k) => {
-    const r = salRows[k] && currentReading(salRows[k], salLean[k], SPARSE_K);
-    if (!r) return null;
+    const m = ISSM && ISSM.salience[k];
+    if (!m) return null;
     const r1v = salR1[k] && currentReading(salR1[k], null, SPARSE_K);
-    const g = salLean[k].gapAt(refNow);
-    return { v: r.v, ci: r.ci95, r1: r1v ? r1v.v : null, by: salBy(k),
-             // the steady gap between the two houses, first named minus second
-             ...(g != null ? { gap: { houses: salLean[k].firms.map(houseName), v: r1(g) } } : {}),
-             ...(r.chg != null ? { chg: r.chg, changeSig: r.changeSig } : {}) };
+    return { v: m.v, ci: m.ci, lo: m.lo, hi: m.hi, r1: r1v ? r1v.v : null, by: salBy(k),
+             // the steady gap between the two regular houses today, RedBridge minus Ipsos
+             ...(m.gap != null ? { gap: { houses: ["RedBridge", "Ipsos"], v: m.gap } } : {}),
+             chg: m.chg, changeSig: m.changeSig, chgLo: m.chgLo, chgHi: m.chgHi };
   };
+  const E0 = ymOf(ELECTION.date);
   const list = ISSUE_SHARED.map((k) => {
-    const o = own[k];
+    const o = own[k], MO = ISSM && ISSM.ownership[k], MS = ISSM && ISSM.salience[k];
+    /* who is best today, from the issues model (§7hm): the three shares'
+       medians and 95% intervals, the leader's margin over the runner-up
+       tested on the draws (leadSig: ahead in 97.5% of them), and where it
+       isn't, whether the runner-up is clear of the third (pairSig) */
     let ownNow = null;
-    if (o) {
-      const est = Object.fromEntries(OWN3.map((q) => [q, currentReading(o[q], ownHE[k][q], SPARSE_K)]));
-      if (OWN3.every((q) => est[q])) {
-        const order = [...OWN3].sort((a, b) => est[b].v - est[a].v);
-        const L = lead(k, o, order[0], order[1]);
-        const leadSig = !!(L && L.v > 1.96 * L.se);
-        const L2 = leadSig ? null : lead(k, o, order[1], order[2]);
-        ownNow = {
-          v: Object.fromEntries(OWN3.map((q) => [q, est[q].v])),
-          ci: Object.fromEntries(OWN3.map((q) => [q, est[q].ci95])),
-          chg: Object.fromEntries(OWN3.map((q) => [q, est[q].chg ?? null])),
-          chgSig: Object.fromEntries(OWN3.map((q) => [q, !!est[q].changeSig])),
-          n: est.alp.n, lead: order[0], runner: order[1], third: order[2],
-          gap: L ? r1(L.v) : null, gapCi: L ? r1(1.96 * L.se) : null, leadSig,
-          ...(L2 ? { gap2: r1(L2.v), gap2Ci: r1(1.96 * L2.se), pairSig: L2.v > 1.96 * L2.se } : {}),
-          houses: [...new Set(o.alp.filter((r) => inWin(r.mid)).map((r) => r.firm === "RedBridge/Accent" ? "RedBridge" : r.firm))],
-        };
-      }
+    if (MO && MO.cur) {
+      const c = MO.cur;
+      ownNow = { v: c.v, ci: c.ci, lo: c.lo, hi: c.hi, chg: c.chg, chgSig: c.chgSig,
+        n: o ? Math.round(o.alp.filter((r) => inWin(r.mid)).reduce((a, r) => a + r.n, 0)) : null,
+        lead: c.lead, runner: c.runner, third: c.third, gap: c.gap, gapCi: c.gapCi, gapLo: c.gapLo, gapHi: c.gapHi, pLead: c.pLead, leadSig: c.leadSig,
+        ...(c.gap2 != null ? { gap2: c.gap2, gap2Ci: c.gap2Ci, pairSig: c.pairSig } : {}),
+        houses: o ? [...new Set(o.alp.filter((r) => inWin(r.mid)).map((r) => houseName(r.firm)))] : [] };
     }
-    /* [ym, alp, lnp, onp, ±alp, ±lnp, ±onp] – the monthly line, pooled as
-       every monthly line here is (monthWithSe), from the first month the
-       three-way question was asked */
-    const monthly = o ? MONTHS.map((ym) => {
-      const m = OWN3.map((q) => monthWithSe(o[q], ownHE[k][q], ym));
-      return m.every(Boolean) ? [ym, ...m.map((e) => r1(e.v)), ...m.map((e) => r1(1.96 * e.se))] : null;
-    }).filter(Boolean) : [];
-    /* the change view's snapshot tile: the row verdict's lead test pooled
-       on the snapshot month's own waves (the "now" tile reuses own, which
-       the Who's-trusted rows already print - the two can never disagree) */
-    const m0 = monthly.find((m) => m[0] === SNAP0);
-    let snap = null;
-    if (o && m0) {
-      const v0 = Object.fromEntries(OWN3.map((q, i) => [q, m0[1 + i]]));
-      const ord = [...OWN3].sort((a, b) => v0[b] - v0[a]);
-      const L0 = leadAt(k, o, ord[0], ord[1], SNAP0);
-      const leadSig0 = !!(L0 && L0.v > 1.96 * L0.se);
-      const L3 = leadSig0 ? null : leadAt(k, o, ord[1], ord[2], SNAP0);
-      snap = { lead: ord[0], runner: ord[1], third: ord[2], leadSig: leadSig0,
-               ...(L3 ? { pairSig: L3.v > 1.96 * L3.se } : {}) };
-    }
-    /* the What-matters trend chart's line and dots: salience pooled month by
-       month with the pair's half-gap lean, exactly as the trust rows' `monthly`
-       – plus the raw waves themselves ([x, house, wave-date, share, n]), the
-       chart's dots and the client-side trend tests' input. The house is the
-       poll name verbatim (never houseName()'s short form): the client joins
-       each dot to its archive row by pollster|released, as the trust
-       chart's dots do */
-    const salM = (salRows[k] || []).length ? MONTHS.map((ym) => {
-      const m = monthWithSe(salRows[k], salLean[k], ym);
-      return m ? [ym, r1(m.v), r1(1.96 * m.se)] : null;
-    }).filter(Boolean) : [];
-    const salD = (salRows[k] || []).map((r) => [r2(dx(r.date)), r.firm, r.date, r1(r.x), Math.round(r.n)]);
+    /* [ym, alp, lnp, onp, ±alp, ±lnp, ±onp] – the model's month by month,
+       from the first month One Nation was offered by name (the three shares
+       need it); the half-widths are half the 95% interval */
+    const monthly = MO ? MO.months3 : [];
+    /* the parked change view's snapshot month, on the model's draws */
+    const snap = MO ? MO.at3(SNAP0) : null;
+    /* What matters' term view: the model's months since the election as
+       [ym, v, ±, lo, hi], and every reading this term moved onto the line as
+       [x, house, wave date, printed share, n, moved share, question form] –
+       the printed share feeds the client's within-house trend tests */
+    const salM = MS ? MS.months.filter((m) => m[0] >= E0).map((m) => [m[0], m[1], r1((m[3] - m[2]) / 2), m[2], m[3]]) : [];
+    const salD = MS ? MS.dots.filter((d) => d[2] >= ELECTION.date && !d[7]).map((d) => d.slice(0, 7)) : [];
     return { id: k, label: F.issues[k], imp: salNow(k), own: ownNow, monthly,
              ...(salM.length ? { salMonthly: salM } : {}), ...(salD.length ? { salDots: salD } : {}),
              ...(snap ? { snap } : {}),
@@ -8456,10 +8593,9 @@ const issues = (() => {
   }
   // the largest lean taken off a three-way share today, from a house with a poll in the window (the Info entry)
   let leanMax = null;
-  for (const it of list) if (it.own) for (const q of OWN3) for (const f of Object.keys(ownHE[it.id][q].evidenceN)) {
-    if (!own[it.id][q].some((r) => r.firm === f && inWin(r.mid))) continue;
-    const v = heV(ownHE[it.id][q], f, refNow);
-    if (Math.abs(v) >= 0.05 && (!leanMax || Math.abs(v) > Math.abs(leanMax.v))) leanMax = { house: houseName(f), party: q, issue: it.id, v: r1(v) };
+  for (const it of list) if (it.own && ISSM && ISSM.ownership[it.id]) for (const f of new Set(own[it.id].alp.filter((r) => inWin(r.mid)).map((r) => r.firm))) {
+    const ls = ISSM.ownership[it.id].leanShares(f);
+    if (ls) for (const q of OWN3) if (Math.abs(ls[q]) >= 0.05 && (!leanMax || Math.abs(ls[q]) > Math.abs(leanMax.v))) leanMax = { house: houseName(f), party: q, issue: it.id, v: ls[q] };
   }
   /* credited: the houses with a poll in the window, and each house whose
      newest poll sets the grey bars' level through its gap to the other,
@@ -8484,12 +8620,8 @@ const issues = (() => {
     if (!iss || !iss.top || !iss.sal) continue;
     const p = pollOf(w) || { date: w.date, dateStart: w.dateStart };
     const plus = iss.plus || (iss.plus = { w: inWin(midMs(p)) ? 1 : 0 });
-    const lean = salLean[iss.top];
-    if (lean) {
-      const i = lean.firms.indexOf(w.pollster);
-      const g = i >= 0 ? lean.gapAt(refNow) : null;
-      if (g != null) plus.pair = i === 0 ? r1(g) : r1(-g);
-    }
+    const g = ISSM && ISSM.salience[iss.top] ? ISSM.salience[iss.top].gap : null;
+    if (g != null && (w.pollster === "RedBridge/Accent" || w.pollster === "Ipsos")) plus.pair = w.pollster === "RedBridge/Accent" ? g : r1(-g);
   }
   for (const w of F.ownership) {
     const iss = ISS_BY.get(w.date + "|" + w.pollster);
@@ -8501,7 +8633,8 @@ const issues = (() => {
     const k = iss.top, sh = k && w.issues[k];
     if (sh && OWN3.every((q) => sh[q] != null)) {
       const q = OWN3.reduce((a, b) => (sh[b] > sh[a] ? b : a));
-      const v = heV(ownHE[k][q], w.pollster, refNow);
+      const ls = ISSM && ISSM.ownership[k] ? ISSM.ownership[k].leanShares(w.pollster) : null;
+      const v = ls ? ls[q] : 0;
       plus.lead = q;
       if (Math.abs(v) >= 0.05) plus.lean = r1(v);
     }
@@ -8521,6 +8654,17 @@ const issues = (() => {
                                  newest: gNewest, window: SPARSE_K.label } : null,
   };
 })();
+/* The issues' long view (build.mjs's issues-history sidecar, fetched when a
+   window behind this term opens): per issue, what matters month by month as
+   far back as any poll reaches, with every reading moved onto the line, and
+   Labor's share of those naming Labor or the Coalition, month by month, with
+   each poll's printed two-way share. */
+const ISSUES_HIST = ISSM ? {
+  issues: Object.fromEntries(ISSUE_SHARED.map((k) => [k, {
+    sal: ISSM.salience[k] ? { months: ISSM.salience[k].months, dots: ISSM.salience[k].dots } : null,
+    own: ISSM.ownership[k] ? { months: ISSM.ownership[k].months2, dots: ISSM.ownership[k].dots2 } : null,
+  }])),
+} : null;
 if (issues) {
   // three-way shares are shares of one whole: a pooled set that doesn't make 100 is a bug
   for (const it of issues.list) if (it.own) {
@@ -11946,6 +12090,19 @@ window.AUSPOL = (function () {
     }
     return _groupHistPromise;
   };
+  /* the issues' long view (build.mjs's issues-history sidecar), fetched the
+     first time an Issues chart opens a window behind this term */
+  let _issuesHist = null, _issuesHistPromise = null;
+  const loadIssuesHistory = () => {
+    if (_issuesHist) return Promise.resolve(_issuesHist);
+    if (!_issuesHistPromise) {
+      const url = window.AP_ISSUES_HIST;
+      _issuesHistPromise = (url ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("issue-history HTTP " + r.status)))) : Promise.resolve(null))
+        .then((j) => { _issuesHist = j; return j; })
+        .catch((e) => { console.error("issue-history sidecar failed to load", e); _issuesHistPromise = null; return null; });
+    }
+    return _issuesHistPromise;
+  };
   let _cycleSource = null;
   let _cyclePromise = null;
   const loadCycleSource = () => {
@@ -12063,6 +12220,9 @@ window.AUSPOL = (function () {
     // null until loadGroupHistory() has resolved (federal; the sidecar build.mjs ships)
     get groupHistory() { return _groupHist; },
     loadGroupHistory,
+    // null until loadIssuesHistory() has resolved (federal)
+    get issuesHistory() { return _issuesHist; },
+    loadIssuesHistory,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,
@@ -12083,6 +12243,8 @@ if (!JUR) writeAtomic(ONEOFFS_ASSET, JSON.stringify(oneOffsSource));
 /* the past terms by group (§7gm GROUP_HIST): build.mjs ships it as the
    lazily fetched group-history sidecar; "null" when the model couldn't run */
 if (!JUR) writeAtomic(GROUP_HIST_ASSET, JSON.stringify(GROUP_HIST));
+/* the issues' long view (§7hm ISSUES_HIST): the lazily fetched issues-history sidecar */
+if (!JUR) writeAtomic(ISSUES_HIST_ASSET, JSON.stringify(ISSUES_HIST));
 
 /* ---- sanity summary ---------------------------------------------------- */
 console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {

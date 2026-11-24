@@ -93,16 +93,19 @@ function eventsOf(S, extra = []) {
   for (const d of extra) if (d >= S.t0) ev.add(d);
   return [...ev].sort((a, b) => a - b);
 }
-/* process noise over a step: q = [m var, m·f cov, f var, lean var] */
+/* process noise over a step: q = [m var, m·f cov, f var, lean var, regular lean var] */
 function stepQ(S, th, dt, jmp) {
   const k = th.kf ?? 1, rho = th.rho ?? 1, w2 = th.w * th.w * dt + (jmp ? th.J * th.J : 0);
-  return [w2, S.Lv === 2 ? rho * k * w2 : 0, S.Lv === 2 ? k * k * w2 : 0, dt * th.d * th.d];
+  /* q[4]: the regular houses' leans may drift at their own pace (th.dc, the
+     issues model's; absent, they drift as every other lean does) */
+  const dc = th.dc ?? th.d;
+  return [w2, S.Lv === 2 ? rho * k * w2 : 0, S.Lv === 2 ? k * k * w2 : 0, dt * th.d * th.d, dt * dc * dc];
 }
 function addQ(P, S, q) {
   const N = S.N;
   P[0] += q[0];
   if (S.Lv === 2) { P[1] += q[1]; P[N] += q[1]; P[N + 1] += q[2]; }
-  for (let i = S.Lv; i < N; i++) P[i * N + i] += q[3];
+  for (let i = S.Lv; i < N; i++) P[i * N + i] += S.coreIdx.has(i) ? q[4] : q[3];
 }
 
 export function runFilter(S, th, kappa, opts = {}) {
@@ -113,14 +116,14 @@ export function runFilter(S, th, kappa, opts = {}) {
   for (let i = S.Lv; i < N; i++) P[i * N + i] = (S.coreIdx.has(i) ? th.s : S.wide) ** 2;
   const tau2 = th.tau * th.tau, wide2 = S.wide * S.wide;
   const store = !!opts.store;
-  const xs = store ? new Float64Array(events.length * N) : null, Ps = store ? new Float64Array(events.length * NN) : null, qs = store ? new Float64Array(events.length * 4) : null;
+  const xs = store ? new Float64Array(events.length * N) : null, Ps = store ? new Float64Array(events.length * NN) : null, qs = store ? new Float64Array(events.length * 5) : null;
   const pred = opts.pred ? new Map() : null;
   const Ph = new Float64Array(N);
   let ll = 0, prev = null, oi = 0;
   const obs = S.obs;
   for (let ev = 0; ev < events.length; ev++) {
     const t = events[ev];
-    let q = [0, 0, 0, 0];
+    let q = [0, 0, 0, 0, 0];
     if (prev != null) {
       let jmp = false; for (const jd of S.jumps) if (jd > prev && jd <= t) jmp = true;
       q = stepQ(S, th, t - prev, jmp); addQ(P, S, q);
@@ -136,12 +139,12 @@ export function runFilter(S, th, kappa, opts = {}) {
       for (let i = 0; i < N; i++) x[i] += (Ph[i] / Sv) * v;
       for (let i = 0; i < N; i++) { const a = Ph[i] / Sv, r = i * N; for (let j = 0; j < N; j++) P[r + j] -= a * Ph[j]; }
     }
-    if (store) { xs.set(x, ev * N); Ps.set(P, ev * NN); qs.set(q, ev * 4); }
+    if (store) { xs.set(x, ev * N); Ps.set(P, ev * NN); qs.set(q, ev * 5); }
     prev = t;
   }
   return { ll, events, xs, Ps, qs, pred, x: Float64Array.from(x), P: Float64Array.from(P) };
 }
-const qAt = (f, k) => f.qs.subarray(k * 4, k * 4 + 4);
+const qAt = (f, k) => f.qs.subarray(k * 5, k * 5 + 5);
 
 export function smooth(f, S) {
   const N = S.N, E = f.events.length, NN = N * N;

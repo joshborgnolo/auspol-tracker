@@ -1113,6 +1113,12 @@
       "label": "24 Nov 2026",
       "kind": "finding",
       "text": "Part time voters (by work status) no longer break significantly away from One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "meta",
+      "text": "The issues are now estimated with a model that reads every poll that asks, however it asks, rather than six-week averages of two or three pollsters (see Info), and the issue charts run back to 1990. No lead or significant change moved with the method, and today’s figures shifted by a few points at most: the cost of living in voters’ top three 71.8 → 71.8, Labor’s lead on health +8.3 → +11.2, One Nation’s on immigration +20.9 → +18.8."
     }
   ]
 }

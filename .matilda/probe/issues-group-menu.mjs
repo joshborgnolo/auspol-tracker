@@ -153,7 +153,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const d = document.querySelector("#issues .rd-iw details.rd-tsig");
     return d ? { text: d.textContent, rows: d.querySelectorAll("tbody tr").length, head: (d.querySelector("thead th") || {}).textContent || "" } : null;
   });
-  ok("B: trend table names both pollsters", !!tsig && /Pollster/.test(tsig.head) && /Ipsos/.test(tsig.text) && /RedBridge/.test(tsig.text) && tsig.rows === 2,
+  /* since the issues model (2026-11-24) every pollster asking this term has a row, RedBridge and Ipsos among them */
+  ok("B: trend table names the pollsters", !!tsig && /Pollster/.test(tsig.head) && /Ipsos/.test(tsig.text) && /RedBridge/.test(tsig.text) && tsig.rows >= 2,
      tsig ? `${tsig.rows} rows, head ${tsig.head.slice(0, 20)}` : "no fold");
   /* into a group set */
   ok("click Vote", await clickTab(page, "Vote"), "Vote tab present");
@@ -259,7 +260,9 @@ for (const vw of [320, 341, 360, 400]) {
   await page.waitForSelector("#issues .rd-iw svg", { timeout: 15000 });
   await sleep(800);
   const dot = await page.evaluate(() => {
-    const svg = document.querySelector("#issues .rd-iw svg");
+    /* the chart's svg, not the window bar's arrow icons */
+    const svg = [...document.querySelectorAll("#issues .rd-iw svg")].find((s) => s.querySelector("circle.scatter-dot"));
+    if (!svg) return null;
     svg.scrollIntoView({ block: "center" });
     const cs = [...svg.querySelectorAll("circle.scatter-dot")].filter((c) => c.getAttribute("fill") !== "var(--chart-bg)");
     if (!cs.length) return null;

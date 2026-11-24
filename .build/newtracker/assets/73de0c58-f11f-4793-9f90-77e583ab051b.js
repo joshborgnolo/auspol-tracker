@@ -2191,7 +2191,8 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
         {/* what voters say matters, and which party they trust with it -
             the reasons behind the vote, before the page turns to those who
             haven't settled on one */}
-        <IssuesMemo rangeId={rangeId} />
+        {/* the issues join the vote charts' window too (rd-hero.jsx): its range and the model's long view */}
+        <IssuesMemo rangeId={window.AP.rd ? heroRange : rangeId} setRangeId={setRangeId} />
       </>}
       {tail >= 6 && <>
         {/* closes the page: the electorate's mood rather than its party

@@ -6022,6 +6022,33 @@ function RdSwitching({ rangeId }) {
 /* ======================================================================
    The issues
    ====================================================================== */
+/* the issues' long view reaches back to the first AES (1990) */
+const RD_IS_FIRST = 1990;
+/* how each question form reads, for a moved dot's tooltip */
+const RD_IS_FMT = { first: "the one most important issue", top5: "pick five", open: "open question, any number of mentions" };
+/* the model's house names as a reader knows them */
+const rdIsHouse = (h) => ({ "RedBridge/Accent": "RedBridge", "Ipsos (environment)": "Ipsos (environment)", "Ipsos What Worries the World": "Ipsos What Worries the World",
+  "SEC Newgate (unprompted)": "SEC Newgate", "JWS Research (health and ageing)": "JWS Research", "JWS Research (housing and rates)": "JWS Research",
+  "AES": "the AES", "Freshwater Strategy": "Freshwater" }[h] || h);
+const rdIsYm = (ym) => (ym ? window.AP.D.monthNameFull(+ym.slice(5, 7)) + " " + ym.slice(0, 4) : "");
+const r1is = (v) => Math.round(v * 10) / 10;
+/* A long view's line in runs: a month within four months of a reading is
+   polled and drawn solid; a stretch further from any reading (between AES
+   elections before 2008, say) is the model's bridge, drawn dotted, as the
+   vote history's unpolled stretches are. Runs share their end months so the
+   line never breaks. */
+function rdIsRuns(pts, dots) {
+  const xs = dots.map((d) => d[0]).sort((a, b) => a - b);
+  const near = (x) => { let lo = 0, hi = xs.length; while (lo < hi) { const m = (lo + hi) >> 1; if (xs[m] < x) lo = m + 1; else hi = m; }
+    return (lo < xs.length && xs[lo] - x <= 1 / 3) || (lo > 0 && x - xs[lo - 1] <= 1 / 3); };
+  const runs = [];
+  for (const d of pts) {
+    const bridge = !near(d.x), last = runs[runs.length - 1];
+    if (last && last.bridge === bridge) last.pts.push(d);
+    else runs.push({ bridge, pts: last ? [last.pts[last.pts.length - 1], d] : [d] });
+  }
+  return runs.filter((r) => r.pts.length >= 2 || runs.length === 1);
+}
 /* the slope test behind issTrendVerdict, kept as figures so a headline can
    be written from it */
 function rdIssTrend(D, it, dots) {
@@ -6044,7 +6071,7 @@ function rdIssTrend(D, it, dots) {
   return { ym, up: sig.filter((f) => f.fit.b > 0).map((f) => f.q), down: sig.filter((f) => f.fit.b < 0).map((f) => f.q), tested: fits.length, byParty };
 }
 
-function RdIssues({ rangeId = "all" }) {
+function RdIssues({ rangeId = "all", setRangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
   const narrow = useNarrow("(max-width: 760px)");
   const I = D.issues;
@@ -6170,20 +6197,65 @@ function RdIssues({ rangeId = "all" }) {
     };
   }, [view, matView, I]);
   const stripW = useRdWidth(stripRef, 150);
+  /* The vote charts' shared window (rd-hero.jsx) over both issue charts: inside
+     this term the range tabs' window; behind it (a past term, ten years, every
+     year on record) the issues model's long view, fetched the first time it is
+     asked for (gen-data §7hm's issues-history sidecar). Federal only. */
+  const vw = useRdVw();
+  const vwTerms = React.useMemo(() => confTermsOf(D), [D]);
+  const vwOn = !window.JUR && !!setRangeId && !!window.AP_ISSUES_HIST && !!D.loadIssuesHistory;
+  const histOn = !!(vwOn && vw.hist);
+  const [, setIhTick] = useState(0);
+  React.useEffect(() => {
+    if (!histOn || D.issuesHistory) return undefined;
+    let live = true;
+    D.loadIssuesHistory().then(() => { if (live) setIhTick((n) => n + 1); });
+    return () => { live = false; };
+  }, [histOn]);
+  const trCard = React.useRef(null);
   if (!I || !I.list || !I.list.length) return null;
+  const IH = histOn && D.issuesHistory && D.issuesHistory.issues ? D.issuesHistory.issues : null;
+  const vwWin = rdVwWin(rangeId, IH ? vw.hist : null, vwTerms);
+  const vwLo = RD_IS_FIRST, vwHi = D.domain.x1;
+  const vhLong = !!IH && vwWin.b - vwWin.a > RD_VH_LONG;
   const P = I.parties;
   const list = I.list;
   const it = list.find((x) => x.id === selId) || list[0];
   const top = list[0];
   const pName = (q) => D.PARTIES[q].name, pColor = (q) => D.PARTIES[q].color;
-  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const [rangeLo, rangeHi] = IH ? [vwWin.a, vwWin.b] : rangeDomain(rangeId);
 
   /* ---- one issue's chart and its trend ------------------------------------ */
-  const chartFor = (x) => {
+  /* the long view: Labor's and the Coalition's shares of those naming either
+     as best, month by month as far back as any poll asked (One Nation, first
+     offered in late 2025, is in this term's three-way view) */
+  const chartForH = (x) => {
+    const H = IH[x.id] && IH[x.id].own;
+    if (!H || !H.months.length) return null;
+    const xDomain = [vwWin.kind === "all" ? Math.max(rangeLo, D.mx(H.months[0][0]) - 0.1) : rangeLo, rangeHi];
+    const P2 = ["alp", "lnp"];
+    const pts = H.months.map((m) => ({ ym: m[0], x: D.mx(m[0]), alp: m[1], lnp: r1is(100 - m[1]), lo: m[2], hi: m[3] }))
+      .filter((d) => d.x >= xDomain[0] - 1 / 12 && d.x <= xDomain[1] + 1 / 12);
+    if (pts.length < 2) return null;
+    const dotsIn = H.dots.filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]);
+    const scatter = vhLong ? [] : dotsIn.flatMap((d) => P2.map((q) => ({ x: d[0], y: q === "alp" ? d[3] : 100 - d[3], color: pColor(q), label: pName(q),
+      meta: { pollster: d[1], released: d[2], dateLabel: rdDate(d[2], true), pre: true }, sub: "Share of those naming Labor or the Coalition, as printed" })));
+    const runs = rdIsRuns(pts, H.dots);
+    const areas = P2.map((q) => ({ id: "ci-" + q, color: pColor(q), className: "ci-band", edge: false,
+      points: pts.map((d) => (q === "alp" ? { x: d.x, y0: d.lo, y1: d.hi } : { x: d.x, y0: 100 - d.hi, y1: 100 - d.lo })) }));
+    const ser = P2.flatMap((q) => runs.map((r, j) => ({ id: q + ":" + j, label: pName(q), color: pColor(q), rdWidth: vhLong ? 1.6 : 2.2, endCap: false,
+      ...(r.bridge ? { dash: RD_VH_BRIDGE } : {}), points: r.pts.map((d) => ({ x: d.x, y: d[q] })),
+      ...(j === runs.length - 1 ? { endLabel: ISS_PARTY_CAP[q] } : {}) })));
+    const vals = pts.flatMap((d) => [d.lo, d.hi, 100 - d.lo, 100 - d.hi]).concat(scatter.map((d) => d.y));
+    const d0 = Math.max(0, Math.floor((Math.min(...vals) + 0.6) / 10) * 10), d1 = Math.min(100, Math.ceil((Math.max(...vals) - 0.6) / 10) * 10);
+    return { xDomain, pts, dots: [], scatter, areas, domain: [d0, d1], trend: null, parties: P2, hist: true, series: ser,
+             first: H.months[0][0] };
+  };
+  const chartForTerm = (x, lo = rangeLo, hi = rangeHi) => {
     const monthPts = (x.monthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]),
       ...Object.fromEntries(P.map((q, i) => [q, m[1 + i]])), ...Object.fromEntries(P.map((q, i) => ["ci_" + q, m[1 + P.length + i]])) }));
     if (!monthPts.length) return null;
-    const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
+    const xDomain = [Math.max(lo, monthPts[0].x - 0.06), hi];
     const pts = filterPts(monthPts, xDomain[0]);
     const byRow = new Map([...D.individualPolls, ...(D.issuesOnlyPolls || [])].map((q) => [q.pollster + "|" + q.released, q]));
     const dots = (x.dots || []).filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map((d) => {
@@ -6197,6 +6269,7 @@ function RdIssues({ rangeId = "all" }) {
     const d0 = Math.max(0, Math.floor((Math.min(...vals) + 0.6) / 10) * 10), d1 = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
     return { xDomain, pts, dots, scatter, areas, domain: [d0, d1], trend: rdIssTrend(D, x, dots) };
   };
+  const chartFor = (x) => (IH ? chartForH(x) : chartForTerm(x));
   const ch = chartFor(it);
   /* mid-switch: both issues' months on one grid, interpolated, with the x
      window, the y range and the bands travelling too, and the dots of a poll
@@ -6206,7 +6279,7 @@ function RdIssues({ rangeId = "all" }) {
     const draw = { xDomain: ch.xDomain, domain: ch.domain, pts: ch.pts, areas: ch.areas, scatter: ch.scatter, scatterOut: [], scatterMove: [], fade: 1, clip: null };
     const m = issMorph;
     const a = m && list.find((x) => x.id === m.from), A = a && chartFor(a);
-    if (!m || !A) return draw;
+    if (!m || !A || ch.hist || A.hist) return draw;
     const t = m.t;
     const bl = window.AP.blendRows(A.pts, ch.pts, t, P.concat(P.map((q) => "ci_" + q)));
     if (!bl) return draw;
@@ -6220,7 +6293,8 @@ function RdIssues({ rangeId = "all" }) {
       scatter: cross.scatter, scatterOut: cross.scatterOut, scatterMove: cross.scatterMove, fade: t,
     };
   })();
-  const chTop = it === top ? ch : chartFor(top);
+  /* the head's trend test reads this term's chart whatever the window */
+  const chTop = !IH && it === top ? ch : chartForTerm(top, ...rangeDomain(rangeId));
   const since = (tr) => tr ? D.monthNameFull(+tr.ym.slice(5)) + (Number(tr.ym.slice(0, 4)) === new Date(Date.parse(D.latest.updatedISO)).getUTCFullYear() ? "" : " " + tr.ym.slice(0, 4)) : "";
   const trendHead = (x, c) => {
     const tr = c && c.trend;
@@ -6510,7 +6584,7 @@ function RdIssues({ rangeId = "all" }) {
     if (gtab || !matX || !matX.salDots || !matX.salDots.length) return null;
     const rows = [...new Set(matX.salDots.map((d) => d[1]))].map((h) => {
       const s = matX.salDots.filter((d) => d[1] === h);
-      return { key: h, name: h, first: s[0][3], last: s[s.length - 1][3],
+      return { key: h, name: rdIsHouse(h), first: s[0][3], last: s[s.length - 1][3],
         fit: withinHouseSlope(s.map((d) => ({ h, t: d[0], w: d[4], y: d[3] }))) };
     });
     const tested = rows.filter((r) => r.fit);
@@ -6544,22 +6618,33 @@ function RdIssues({ rangeId = "all" }) {
   const matChartFor = (x) => {
     if (!x) return null;
     if (!gtab) {
-      const mPts = (x.salMonthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]), v: m[1], ci: m[2] }));
+      /* the model's months ([ym, v, lo, hi] in the long view; [ym, v, ±, lo,
+         hi] this term) and every reading moved onto the line: a dot's height
+         is its printed share less its pollster's lean that day, its tooltip
+         the share as printed */
+      const H = IH && IH[x.id] && IH[x.id].sal;
+      const mPts = IH ? (H ? H.months.map((m) => ({ ym: m[0], x: D.mx(m[0]), v: m[1], lo: m[2], hi: m[3] })) : [])
+        : (x.salMonthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]), v: m[1], lo: m[3] != null ? m[3] : m[1] - m[2], hi: m[4] != null ? m[4] : m[1] + m[2] }));
       if (!mPts.length) return null;
-      const xDomain = [Math.max(rangeLo, mPts[0].x - 0.06), rangeHi];
-      const pts = filterPts(mPts, xDomain[0]);
-      if (!pts.length) return null;
+      const xDomain = IH ? [vwWin.kind === "all" ? Math.max(rangeLo, mPts[0].x - 0.1) : rangeLo, rangeHi] : [Math.max(rangeLo, mPts[0].x - 0.06), rangeHi];
+      const pts = IH ? mPts.filter((d) => d.x >= xDomain[0] - 1 / 12 && d.x <= xDomain[1] + 1 / 12) : filterPts(mPts, xDomain[0]);
+      if (pts.length < (IH ? 2 : 1)) return null;
       const byRow = new Map([...D.individualPolls, ...(D.issuesOnlyPolls || [])].map((q) => [q.pollster + "|" + q.released, q]));
-      const dots = (x.salDots || []).filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map((d) => {
-        const meta = byRow.get(d[1] + "|" + d[2]) || { pollster: d[1], released: d[2], sample: d[4] };
-        return { x: d[0], pollster: d[1], date: d[2], y: d[3], meta };
+      const raw = IH ? H.dots.filter((d) => !d[7]) : (x.salDots || []);
+      const dots = (IH && vhLong ? [] : raw).filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map((d) => {
+        const row = byRow.get(d[1] + "|" + d[2]);
+        const meta = row || { pollster: rdIsHouse(d[1]), released: d[2], sample: d[4], dateLabel: rdDate(d[2], true), pre: true };
+        return { x: d[0], pollster: d[1], date: d[2], y: d[5] != null ? d[5] : d[3], printed: d[3], fmt: d[6], meta };
       });
-      const scatter = dots.map((d) => ({ x: d.x, y: d.y, color: "var(--ink-3)", label: d.pollster, meta: d.meta }));
+      const scatter = dots.map((d) => ({ x: d.x, y: d.y, color: "var(--ink-3)", label: "On the line’s scale", meta: d.meta,
+        sub: "Printed " + d.printed + "%" + (RD_IS_FMT[d.fmt] ? " (" + RD_IS_FMT[d.fmt] + ")" : "") + (Math.abs(d.y - d.printed) >= 0.5 ? ", moved by its pollster’s lean" : "") }));
       const areas = pts.length >= 2 ? [{ id: "ci-v", color: "var(--ink)", className: "ci-band", edge: false,
-        points: pts.map((d) => ({ x: d.x, y0: d.v - d.ci, y1: d.v + d.ci })) }] : [];
-      const vals = pts.flatMap((d) => [d.v - d.ci, d.v + d.ci]).concat(dots.map((d) => d.y));
+        points: pts.map((d) => ({ x: d.x, y0: d.lo, y1: d.hi })) }] : [];
+      const vals = pts.flatMap((d) => [d.lo, d.hi]).concat(dots.map((d) => d.y));
       const d0 = Math.max(0, Math.floor((Math.min(...vals) + 0.6) / 10) * 10), d1 = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
-      return { xDomain, pts, scatter, areas, keys: ["v", "ci"], domain: [d0, d1], group: false };
+      const runs = IH ? rdIsRuns(pts, H.dots) : null;
+      return { xDomain, pts, scatter, areas, keys: ["v", "lo", "hi"], domain: [d0, d1], group: false, hist: !!IH, runs,
+               houses: [...new Set(raw.filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map((d) => d[1]))], first: mPts[0].ym };
     }
     if (!gtab.tr || !gtab.issues.includes(x.id)) return null;
     const allW = (gtab.tr.all || {})[x.id] || [];
@@ -6591,7 +6676,7 @@ function RdIssues({ rangeId = "all" }) {
     const m = issMorph;
     const A = m && m.from && m.from !== matIssue ? list.find((x) => x.id === m.from) : null;
     const a = A && matChartFor(A);
-    if (!a || a.group !== matCh.group) return base;
+    if (!a || a.group !== matCh.group || a.hist || matCh.hist) return base;
     const t = m.t;
     const bl = window.AP.blendRows(a.pts, matCh.pts, t, matCh.keys);
     if (!bl) return base;
@@ -6599,7 +6684,7 @@ function RdIssues({ rangeId = "all" }) {
       pts: bl.rows, clip: bl.clip, fade: t };
     if (!matCh.group) {
       draw.areas = bl.rows.length >= 2 ? [{ id: "ci-v", color: "var(--ink)", className: "ci-band", edge: false, clipX: bl.clip,
-        points: bl.rows.filter((d) => d.v != null && d.ci != null).map((d) => ({ x: d.x, y0: d.v - d.ci, y1: d.v + d.ci })) }] : [];
+        points: bl.rows.filter((d) => d.v != null && d.lo != null).map((d) => ({ x: d.x, y0: d.lo, y1: d.hi })) }] : [];
       const cross = window.AP.crossClouds(a.scatter || [], base.scatter, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label);
       draw.scatter = cross.scatter; draw.scatterOut = cross.scatterOut; draw.scatterMove = cross.scatterMove;
     } else {
@@ -6608,8 +6693,10 @@ function RdIssues({ rangeId = "all" }) {
     return draw;
   })();
   const matSeries = matDraw ? (!gtab
-    ? [{ id: "v", label: "All voters", color: "var(--ink)", rdWidth: 2.2, endCap: false, clipX: matDraw.clip,
-        points: matDraw.pts.filter((d) => d.v != null).map((d) => ({ x: d.x, y: d.v })) }]
+    ? (matCh.hist ? matCh.runs.map((r, j) => ({ id: "v:" + j, label: "All voters", color: "var(--ink)", rdWidth: vhLong ? 1.6 : 2.2, endCap: false,
+        ...(r.bridge ? { dash: RD_VH_BRIDGE } : {}), points: r.pts.map((d) => ({ x: d.x, y: d.v })) }))
+      : [{ id: "v", label: "All voters", color: "var(--ink)", rdWidth: 2.2, endCap: false, clipX: matDraw.clip,
+        points: matDraw.pts.filter((d) => d.v != null).map((d) => ({ x: d.x, y: d.v })) }])
     : (() => {
         /* the end-of-line label belongs on a line that lives at the chart's
            last wave: a combined-era row the house no longer splits
@@ -6637,6 +6724,7 @@ function RdIssues({ rangeId = "all" }) {
   const matTrendHead = (() => {
     if (!matX) return null;
     if (!gtab) {
+      if (matCh && matCh.hist) return null;
       const fit = salFitOf(matX), since = matSince(matX);
       if (!since) return null;
       if (fit && fit.p < 0.05) return (ISS_SHORT[matIssue] || matX.label) + " has " + (fit.b > 0 ? "climbed" : "fallen") + " significantly since " + since;
@@ -6653,7 +6741,9 @@ function RdIssues({ rangeId = "all" }) {
   })();
   const matSetWords = { vote: "vote intention", generation: "age", gender: "gender", education: "education", location: "where they live", housing: "home ownership" };
   const matTitle = (matX ? (I.labels[matIssue] || matX.label) : "") + " in voters’ top three" + (gtab ? " by " + (matSetWords[gtab.id] || "group") : "") + ", %";
-  const matSource = (gtab ? (G && G.house) || "RedBridge" : "RedBridge and Ipsos") + ", monthly" + (matSince(matX) ? " since " + matSince(matX) : "");
+  const matSource = gtab ? ((G && G.house) || "RedBridge") + ", monthly" + (matSince(matX) ? " since " + matSince(matX) : "")
+    : matCh && matCh.hist ? rdCap(rdList([...new Set(matCh.houses.map(rdIsHouse))])) + ", on one scale"
+    : "Every poll that asks, on one scale, monthly since " + rdIsYm(matCh ? matCh.first : (matX && matX.salMonthly && matX.salMonthly[0] ? matX.salMonthly[0][0] : ""));
   /* Switching the grouping or the issue rewrites the head and dek above the
      control row; scrolled past them, the row and everything under it would
      ride the story block's height glide. rdPinScroll holds the spot: the
@@ -6672,7 +6762,7 @@ function RdIssues({ rangeId = "all" }) {
   );
   return (
     <RdSec id="issues" cls="rd-is" title="The issues"
-           meta={"What voters say matters most, and who they think is best on it, " + rdList(I.houses) + ", last " + I.window}>
+           meta={"What voters say matters most, and who they think is best on it: every poll that asks, on one model, latest from " + rdList(I.houses)}>
       {tabs}
       {/* the two views ask different things of different charts, so a
           switch crossfades them (RdCrossfade) rather than cutting */}
@@ -6725,25 +6815,35 @@ function RdIssues({ rangeId = "all" }) {
               {list.filter((x) => x.grnTop).map((x) => <p key={"g" + x.id} className="rd-note">{x.grnTop.house} also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}% of all voters, {pName(x.grnTop.next)} next on {Math.round(x.grnTop.nextV)}%).</p>)}
             </div>
             {ch && (
-              <div className="card rd-card rd-is-chart">
+              <div className="card rd-card rd-is-chart" ref={trCard}>
+                {vwOn && <RdVoteWinBar rangeId={rangeId} setRangeId={setRangeId} hist={histOn ? vw.hist : null} terms={vwTerms}
+                                       lo={vwLo} hi={vwHi} ready pin={() => { if (trCard.current) rdPinScroll(trCard.current); }} />}
                 <div className="rd-is-ctop"><span>{it.label}</span></div>
                 {trendHead(it, ch) && <h4 className="rd-is-chead">{trendHead(it, ch)}</h4>}
-                <p className="rd-is-csub">Who voters think is best, month by month, % of those naming Labor, the Coalition or One Nation</p>
-                <TrendChart key="rd-is-chart" heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: 12, b: 28 }}
+                <p className="rd-is-csub">{ch.hist
+                  ? "Who voters think is best, month by month, % of those naming Labor or the Coalition (One Nation, offered by name since late 2025, is in This term’s view)"
+                  : "Who voters think is best, month by month, % of those naming Labor, the Coalition or One Nation"}</p>
+                <TrendChart key="rd-is-chart" heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: ch.hist ? 34 : 12, b: 28 }}
                   xDomain={chDraw.xDomain} yDomain={chDraw.domain} yTicks={rdYTicks(ch.domain[0], ch.domain[1], 10)}
-                  yTickFmt={(v) => (v === ch.domain[1] ? v + "%" : String(v))} xTicks={rdXTicks(ch.xDomain[0], ch.xDomain[1], true)} baseline
-                  series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), rdWidth: 2.2, endCap: false, clipX: chDraw.clip,
+                  yTickFmt={(v) => (v === ch.domain[1] ? v + "%" : String(v))}
+                  xTicks={ch.hist ? rdVwTicks({ ...vwWin, a: ch.xDomain[0] }, vwTerms) : rdXTicks(ch.xDomain[0], ch.xDomain[1], true)} baseline
+                  {...(ch.hist ? { events: rdVwElections({ ...vwWin, a: ch.xDomain[0] }, vwTerms), yTickEmph: 50 } : {})}
+                  series={ch.hist ? ch.series : P.map((q) => ({ id: q, label: pName(q), color: pColor(q), rdWidth: 2.2, endCap: false, clipX: chDraw.clip,
                     points: chDraw.pts.filter((d) => d[q] != null).map((d) => ({ x: d.x, y: d[q] })), endLabel: ISS_PARTY_CAP[q] }))}
-                  areas={chDraw.areas} spine={series(ch.pts, P[0])} scatter={chDraw.scatter} scatterOut={chDraw.scatterOut}
-                  scatterMove={chDraw.scatterMove} fade={chDraw.fade} driven={!!issMorph} pollFacet="issues"
+                  areas={chDraw.areas} spine={series(ch.pts, (ch.parties || P)[0])} scatter={chDraw.scatter} scatterOut={chDraw.scatterOut}
+                  scatterMove={chDraw.scatterMove} fade={chDraw.fade} driven={!!issMorph} pollFacet={(mm) => (mm && mm.pre ? null : "issues")}
                   tooltipTitle={(i) => (ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "")} fmt={(v) => Math.round(v) + ""}
-                  copy={{ title: "Which party voters think is best on " + it.label.charAt(0).toLowerCase() + it.label.slice(1),
+                  copy={ch.hist ? { title: "Which party voters think is best on " + it.label.charAt(0).toLowerCase() + it.label.slice(1) + ", Labor v the Coalition",
+                          sub: "Share naming each as best on the issue, of those naming Labor or the Coalition, month by month",
+                          caption: "Each dot is one poll as printed; lines are the model’s estimates for the average pollster, shaded bands their 95% intervals, dotted where no poll asked for months." }
+                        : { title: "Which party voters think is best on " + it.label.charAt(0).toLowerCase() + it.label.slice(1),
                           sub: "Share naming each party as best on the issue, of those naming Labor, the Coalition or One Nation, month by month",
-                          caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." }} />
-                <RdKey className="rd-ckey" items={[{ kind: "dot", color: "var(--ink-3)", label: "One poll" }, { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and 95% interval" }]} />
+                          caption: "Each dot is one poll as printed; lines are the model’s estimates for the average pollster, shaded bands their 95% intervals." }} />
+                <RdKey className="rd-ckey" items={[...(vhLong && ch.hist ? [] : [{ kind: "dot", color: "var(--ink-3)", label: "One poll" }]), { kind: "lineband", color: "var(--ink-3)", label: "Model estimate and 95% interval" }]} />
                 <HowTo label="How to read these figures" paras={[
-                  <>The grey bar is how many voters put the issue among their three most important. RedBridge and Ipsos both ask every month, in different words, and their figures sit a steady distance apart, so each poll is moved half that distance toward the other before the two are pooled.</>,
-                  <>The dots split the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers, and each offers a different set, so only these three can be pooled.</>,
+                  <>The grey bar is how many voters put the issue among their three most important, on the scale of RedBridge’s and Ipsos’s questions averaged. Polls that ask in other ways – the one most important issue, pick five, an open question – count too: each pollster’s usual distance from that scale is measured issue by issue and taken off.</>,
+                  <>The dots split the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers, and each offers a different set, so only these three are compared. The lines are one model’s estimate for the average pollster: it measures each pollster’s lean and moves only as far as the polls together show.</>,
+                  ...(ch.hist ? [<>Before late 2025 no pollster offered One Nation by name, so the long view compares Labor with the Coalition alone: Ipsos since 2013, Resolve since 2021, Freshwater, the Lowy Institute and the AES’s “party whose policies are closest” besides. A dotted stretch is one no poll asked about for months, where the line is the model’s bridge.</>] : []),
                 ]} />
                 {ch.trend && ch.trend.byParty && (
                   <RdTsig summary="Trend-significance table"
@@ -6761,7 +6861,7 @@ function RdIssues({ rangeId = "all" }) {
             )}
           </div>
           <RdFoot how={{ term: "issues", from: "The issues" }}>
-            Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. Pick an issue to follow it in the chart.
+            Figures come from one model fitted to every poll that asks, each pollster’s lean measured and taken off. “Ahead” means the leader is ahead in at least 97.5% of the model’s draws; “behind” names a party clearly third. Pick an issue to follow it in the chart.
           </RdFoot>
           </>
           ) : (
@@ -6794,17 +6894,21 @@ function RdIssues({ rangeId = "all" }) {
             <div className="rd-iw-chips" role="group" aria-label="Issue">
               {(gtab ? gtab.issues : list.map((x) => x.id)).map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={matIssue === k} onClick={() => pickWhom(k)}><RdTabW t={ISS_SHORT[k] || I.labels[k] || k} /></button>)}
             </div>
+            {!gtab && vwOn && <RdVoteWinBar rangeId={rangeId} setRangeId={setRangeId} hist={histOn ? vw.hist : null} terms={vwTerms}
+                                            lo={vwLo} hi={vwHi} ready pin={() => { if (iwCard.current) rdPinScroll(iwCard.current); }} />}
             <p className="rd-iw-src"><b>{matTitle}</b><br />{matSource}</p>
             {matDraw ? (
               <>
                 {matTrendHead && <h4 className="rd-is-chead">{matTrendHead}</h4>}
-                <TrendChart key={gtab ? "rd-im-g" : "rd-im"} heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: 12, b: 28 }}
+                <TrendChart key={gtab ? "rd-im-g" : "rd-im"} heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: matCh && matCh.hist ? 34 : 12, b: 28 }}
                   xDomain={matDraw.xDomain} yDomain={matDraw.domain} yTicks={rdYTicks(matDraw.domain[0], matDraw.domain[1], 10)}
-                  yTickFmt={(v) => (v === matDraw.domain[1] ? v + "%" : String(v))} xTicks={rdXTicks(matDraw.xDomain[0], matDraw.xDomain[1], true)} baseline
+                  yTickFmt={(v) => (v === matDraw.domain[1] ? v + "%" : String(v))}
+                  xTicks={matCh && matCh.hist ? rdVwTicks({ ...vwWin, a: matDraw.xDomain[0] }, vwTerms) : rdXTicks(matDraw.xDomain[0], matDraw.xDomain[1], true)} baseline
+                  {...(matCh && matCh.hist ? { events: rdVwElections({ ...vwWin, a: matDraw.xDomain[0] }, vwTerms) } : {})}
                   series={matSeries}
                   areas={matDraw.areas} spine={series(matDraw.pts, gtab ? "all" : "v")}
                   scatter={matDraw.scatter} scatterOut={matDraw.scatterOut} scatterMove={matDraw.scatterMove}
-                  fade={matDraw.fade} driven={!!issMorph} pollFacet={!gtab ? "issues" : undefined}
+                  fade={matDraw.fade} driven={!!issMorph} pollFacet={!gtab ? (mm) => (mm && mm.pre ? null : "issues") : undefined}
                   tooltipTitle={!gtab ? (i) => (matCh.pts[i] ? monthLabelFull(matCh.pts[i].ym) : "") : (i) => { const d = matCh.pts[i] && matCh.pts[i]._d; return d ? rdDate(d, true) : ""; }}
                   fmt={(v) => Math.round(v) + ""}
                   copy={gtab ? {
@@ -6813,10 +6917,10 @@ function RdIssues({ rangeId = "all" }) {
                     caption: "Each line is one group of voters across " + (G ? G.house : "RedBridge") + "’s monthly polls; the grey line is all voters in the same polls." } : {
                     title: "What matters to voters: " + (ISS_SHORT[matIssue] || matIssue),
                     sub: "Share putting " + (ISS_PHRASE[matIssue] || matIssue) + " in their top three issues, month by month",
-                    caption: "Each dot is one poll; the line is the monthly average of the two pollsters’ adjusted figures, the band its 95% interval." }} />
+                    caption: "Each dot is one poll, moved by its pollster’s measured lean onto the scale of RedBridge’s and Ipsos’s questions averaged; the line is the model’s estimate, the band its 95% interval" + (matCh && matCh.hist ? ", dotted where no poll asked for months." : ".") }} />
               </>
             ) : <p className="rd-note">No poll has published these figures for {ISS_SHORT[matIssue] || matIssue}.</p>}
-            {!gtab && <RdKey className="rd-ckey" items={[{ kind: "dot", color: "var(--ink-3)", label: "One poll" }, { kind: "lineband", color: "var(--ink)", label: "Monthly average and 95% interval" }]} />}
+            {!gtab && <RdKey className="rd-ckey" items={[...(matCh && matCh.hist && vhLong ? [] : [{ kind: "dot", color: "var(--ink-3)", label: narrow ? "One poll, lean taken off" : "One poll, its pollster’s lean taken off" }]), { kind: "lineband", color: "var(--ink)", label: "Model estimate and 95% interval" }]} />}
             {/* group mode names every line's colour here: the end-of-line
                 labels can only sit on lines that reach the chart's edge, and
                 past a stack of them the engine draws none - so this row is
@@ -6826,13 +6930,13 @@ function RdIssues({ rangeId = "all" }) {
             <HowTo label="How to read these figures" paras={gtab ? [
               <>Only {G ? G.house : "RedBridge"} publishes what matters by group, and only for {gtab ? rdNumWord(gtab.issues.length) : "these"} issues. Each line joins its monthly polls; the grey line is all voters in the same polls, so the gaps between a group and the grey line are the ones to read. The further right a line ends, the more that group cares than voters generally.</>,
             ] : [
-              <>RedBridge and Ipsos both ask every month, in different words – a ranked top three of fourteen against any three of nineteen – and their figures sit a steady distance apart. Each poll is moved half that distance toward the other before the two are pooled.</>,
-              <>The dots are the polls as published; the line is the monthly average of the adjusted polls, the band its 95% interval.</>,
+              <>The line is the share of voters who would put the issue among their three most important, on the scale of RedBridge’s and Ipsos’s questions averaged – a ranked top three of fourteen and any three of nineteen. Polls asking another way count too: the AES and ANUpoll ask for the one most important issue, JWS Research for five, SEC Newgate an open question, Ipsos’s What Worries the World and Freshwater three of their own lists. Each pollster’s usual distance from the line is measured issue by issue and taken off, so what each adds is its movement.</>,
+              <>Each dot is one poll moved by that distance (its tooltip gives the share as printed); the band is the model’s 95% interval. Before RedBridge began in December 2025 the line follows Ipsos (Ipsos’s environment item for climate change, which it doesn’t ask about by name), moved by half the gap the two show today; before Ipsos began in 2010, the AES and ANUpoll carry it, much less surely.</>,
             ]} />
-            {!gtab && salTsig && <RdTsig summary="Trend-significance table"
+            {!gtab && salTsig && !(matCh && matCh.hist) && <RdTsig summary="Trend-significance table"
               heads={["Pollster", "Share, first → last, %", "Slope, pts/yr", "t", "Significant"]}
               sets={salTsig}
-              note={"Each pollster’s share naming " + (ISS_PHRASE[matIssue] || matIssue) + " as a top-three issue is fitted with one straight line across its monthly waves, weighted by sample, Holm’s correction across the two pollsters – Yes means the drift clears 95%. First and last are the published waves, unsmoothed."} />}
+              note={"Each pollster’s share naming " + (ISS_PHRASE[matIssue] || matIssue) + " is fitted with one straight line across its own polls this term, weighted by sample, Holm’s correction across the pollsters – Yes means the drift clears 95%. First and last are the published figures, unsmoothed, each on its pollster’s own question."} />}
             {gtab && matTsigSet && <RdTsig summary="Trend-significance table"
               heads={["Group", "Share, first → last, %", "Slope, pts/yr", "t", "Significant"]}
               sets={[matTsigSet]}
@@ -6840,7 +6944,7 @@ function RdIssues({ rangeId = "all" }) {
           </div>
           <RdFoot how={{ term: "issues", from: "The issues" }}>
             {gtab ? <>Only {G ? G.house : "RedBridge"} publishes what matters by group, and only for these {rdNumWord(gtab.issues.length)} issues, so a group view leaves the other pollster behind and its all-voters line can sit off the pooled one in All voters.</>
-            : <>RedBridge and Ipsos both ask every month, in different words; after each poll is moved half the steady gap between the two, the line is their monthly average and the band its interval. Pooling is over the last {I.window} for the figures in Who’s trusted; the trend here is the whole term so far.</>}
+            : <>One model reads every poll that asks what matters, however it asks, each pollster’s lean measured and taken off; the line is its estimate for the average of RedBridge and Ipsos, the band its 95% interval. The window above reaches back as far as any poll asked.</>}
           </RdFoot>
         </>
       )}

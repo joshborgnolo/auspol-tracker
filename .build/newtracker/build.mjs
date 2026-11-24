@@ -107,7 +107,7 @@ finally { console.log = _mutelog; console.warn = _mutewarn; }
    line reads them by name, so if either is missing or empty the diagnosis
    belongs here, not in a readFileSync ENOENT two hundred lines later. */
 for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json",
-                   ...(VIC ? [] : ["oneoffs-source.json", "group-history.json"])]) {
+                   ...(VIC ? [] : ["oneoffs-source.json", "group-history.json", "issues-history.json"])]) {
   const exists = fs.existsSync(DA(rel));
   if (!exists || fs.statSync(DA(rel)).size === 0) {
     console.error(`\n.build/newtracker/${"assets/" + rel} is ${exists ? "empty" : "missing"} after gen-data – build stopped`);
@@ -1815,6 +1815,21 @@ if (!VIC) {
   if (ghJson) writeAtomic(path.join(ROOT, "assets", name), ghJson);
   parts.push(`<script>window.AP_GROUP_HIST=${name ? JSON.stringify("/assets/" + name) : "null"};<\/script>`);
 } else parts.push(`<script>window.AP_GROUP_HIST=null;<\/script>`);
+/* The issues' long view (gen-data §7hm's issues-history.json): what matters
+   and who is best as far back as the polls reach – only a reader who opens an
+   Issues window behind this term needs it. Federal only. */
+if (!VIC) {
+  const ihPath = DA("issues-history.json");
+  const ihRaw = fs.existsSync(ihPath) ? fs.readFileSync(ihPath, "utf8") : null;
+  const ihJson = ihRaw && ihRaw.trim() !== "null" ? ihRaw : null;
+  const name = ihJson ? `issues-history.${hash8(Buffer.from(ihJson))}.json` : null;
+  for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
+    if (/^issues-history\..*\.json$/.test(old) && old !== name && !sweepKeep(`assets/${old}`))
+      fs.unlinkSync(path.join(ROOT, "assets", old));
+  }
+  if (ihJson) writeAtomic(path.join(ROOT, "assets", name), ihJson);
+  parts.push(`<script>window.AP_ISSUES_HIST=${name ? JSON.stringify("/assets/" + name) : "null"};<\/script>`);
+} else parts.push(`<script>window.AP_ISSUES_HIST=null;<\/script>`);
 /* The questions behind the ☰ menu's Public opinion page get the same
    treatment as the cycle-source rows: a hashed sidecar outside the main
    payload (nobody but that page's reader needs it), gen-data's

@@ -381,6 +381,19 @@ window.AUSPOL = (function () {
     }
     return _groupHistPromise;
   };
+  /* the issues' long view (build.mjs's issues-history sidecar), fetched the
+     first time an Issues chart opens a window behind this term */
+  let _issuesHist = null, _issuesHistPromise = null;
+  const loadIssuesHistory = () => {
+    if (_issuesHist) return Promise.resolve(_issuesHist);
+    if (!_issuesHistPromise) {
+      const url = window.AP_ISSUES_HIST;
+      _issuesHistPromise = (url ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("issue-history HTTP " + r.status)))) : Promise.resolve(null))
+        .then((j) => { _issuesHist = j; return j; })
+        .catch((e) => { console.error("issue-history sidecar failed to load", e); _issuesHistPromise = null; return null; });
+    }
+    return _issuesHistPromise;
+  };
   let _cycleSource = null;
   let _cyclePromise = null;
   const loadCycleSource = () => {
@@ -498,6 +511,9 @@ window.AUSPOL = (function () {
     // null until loadGroupHistory() has resolved (federal; the sidecar build.mjs ships)
     get groupHistory() { return _groupHist; },
     loadGroupHistory,
+    // null until loadIssuesHistory() has resolved (federal)
+    get issuesHistory() { return _issuesHist; },
+    loadIssuesHistory,
     // the /public-opinion/ page's questions, on the same contract
     get oneOffs() { return _oneOffs || {}; },
     loadOneOffs, publicOpinionTopics, publicOpinionLatest, publicOpinionByRow, house, seatModel,
