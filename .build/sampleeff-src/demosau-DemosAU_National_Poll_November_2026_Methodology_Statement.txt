@@ -1,0 +1,146 @@
+Methodology Statement
+  DEMOSAU NATIONAL POLL FOR CAPITAL BRIEF, NOVEMBER 2026
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Capital Brief
+
+  Fieldwork dates                                         18–22 November 2026
+
+  Mode of data collection                                 Internet panels
+
+  Target population                                       Australian residents 18+ eligible to vote at elections
+
+  Sample size                                             1,464
+
+  Is voting intention published?                          Yes, in this report
+
+  Effective sample size after weighting applied           711
+
+  Margin of error associated with effective sample size   ±3.7%
+
+  Variables used in weighting                             Age x gender, education, personal income, residential tenure, language, state x region, 2025 Federal Vote, Left-Right
+                                                          Self ID.
+
+  Weighting method used                                   Rim Weighting
+
+  Full question text, responses categories and            As per following pages
+  randomisation
+
+  Source of sample                                        Internet panels
+
+  Positioning of voting intention questions in            First substantive questions after demographic questions
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were asked a leaner question. Remaining undecided voters were excluded from final totals.
+
+  2PP calculation method                                  N/A
+
+
+
+
+                                                                                                                                                                                  1
+Questionnaire
+  Q. If a Federal Election was held today, which one of the following would you vote for?          Q. Who is your preferred Prime Minister?
+  Answers randomly listed except Don’t Know kept last                                              Answers randomly listed except Don’t Know kept last
+  Labor (with Anthony Albanese as Leader)                                                          Anthony Albanese (Labor)
+  Liberal National Coalition (with Angus Taylor as Leader)                                         Angus Taylor (Liberal)
+  The Greens (with David Shoebridge as Leader)                                                     Pauline Hanson (One Nation)
+  One Nation (with Pauline Hanson as Leader)                                                       Don’t Know
+  Any Other Candidate
+  Don’t Know                                                                                       Q. Out of these options, who is your preferred Prime Minister?
+                                                                                                   Only asked of respondents who answered Taylor or Hanson above
+  If respondent chose Don’t Know they were asked:                                                  Answers randomly listed except Don’t Know kept last
+  Q. Being undecided, if a Federal Election was held today, which one of the following would you   Answers if answered Taylor to initial Preferred Prime Minister question
+  have a slight leaning towards?
+                                                                                                   Anthony Albanese (Labor)
+  Answers randomly listed except Don’t Know kept last. Answers as per above.                       Pauline Hanson (One Nation)
+                                                                                                   Don’t Know
+  Q. What is your opinion on the following political parties or groups?
+                                                                                                   Answers if answered Hanson to initial Preferred Prime Minister question
+  Parties randomly listed, answer order randomly flipped
+                                                                                                   Anthony Albanese (Labor)
+  Answers: Positive, Neutral, Negative                                                             Angus Taylor (Liberal)
+  Parties/Groups Tested                                                                            Don’t Know
+  Labor
+  Liberals                                                                                         Q. What is your opinion on the following people?
+  One Nation                                                                                       People randomly listed, answer order randomly flipped
+  Greens                                                                                           Answers: Positive, Neutral, Negative
+  Nationals
+                                                                                                   People Tested
+  Teal Independents
+                                                                                                   Anthony Albanese (Prime Minister, Labor)
+                                                                                                   Angus Taylor (Opposition Leader, Liberal)
+                                                                                                   Pauline Hanson (One Nation Leader)
+                                                                                                   David Shoebridge (Greens Leader)
+
+
+
+
+                                                                                                                                                                             2
+Questionnaire
+  Q. Which political party do you trust more to handle the following issues?           Q. Do you agree or disagree with the following descriptions of Anthony Albanese?
+  Issues randomly listed, answer order randomly listed with Don’t Know kept last       Q. Do you agree or disagree with the following descriptions of Pauline Hanson?
+  Answers: Labor, The Liberal National Coalition, One Nation, The Greens, Don’t Know   Q. Do you agree or disagree with the following descriptions of Angus Taylor?
+  Issues Tested                                                                        Answers to all 3 as per below. Attributes randomly listed, answer order randomly flipped
+  Economic management                                                                  Answers: Agree, Don’t Know, Disagree
+  Immigration
+                                                                                       Attributes Tested
+  Medicare
+                                                                                       Arrogant
+  Climate Change
+                                                                                       Likeable
+  Cost of living
+                                                                                       Trustworthy
+  Inflation
+                                                                                       In touch with ordinary Australians
+  Tax policy
+                                                                                       Competent
+  Housing
+                                                                                       Has a vision for Australia
+  National Security
+                                                                                       Decisive and strong
+  Energy policy
+                                                                                       In control of their party
+  Aged Care
+  Foreign Relations
+  Artificial Intelligence
+
+  Q. In your opinion, what is the biggest issue facing Australia today?
+  Open-ended answer
+
+
+
+
+                                                                                                                                                                                  3
+Questionnaire
+  Q. Do you agree or disagree with this statement: The federal government should reduce            Q. Please indicate whether you agree or disagree with these statements about artificial
+  government spending to help lower inflation.                                                     intelligence (AI)
+  Answer order randomly flipped except Unsure kept last                                            Statements randomly listed, answer order randomly flipped
+  Strongly agree                                                                                   Answers: Agree, Don’t know, Disagree
+  Agree                                                                                            Statements Tested
+  Don’t know                                                                                       I generally understand how AI works
+  Disagree                                                                                         On balance, I think AI will be good for humanity
+  Strongly disagree                                                                                I’m scared for the future because of AI
+  Unsure                                                                                           With appropriate government regulations, AI can be safe
+
+  If respondent answered Strongly agree or Agree to the above they were asked the following
+  question:
+  Q. Please indicate whether you would support cutting spending in each of the following federal
+  budget areas to reduce inflation pressures
+  Answer order randomly flipped, areas randomly ordered
+  Answers: Yes, No
+  Areas Tested
+  Defence
+  The NDIS
+  Healthcare
+  Education
+  Pensions
+  Unemployment benefits
+  Support for immigrants
+
+
+
+
+                                                                                                                                                                                             4
+

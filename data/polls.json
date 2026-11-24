@@ -6756,6 +6756,7 @@
       "pollster": "DemosAU",
       "client": "Capital Brief",
       "sample": 1464,
+      "sampleEff": 711,
       "alp": 27,
       "lnp": 25,
       "grn": 12,
@@ -6764,7 +6765,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/"
+      "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_National_Poll_November_2026_Methodology_Statement.pdf"
     }
   ],
   "ppm": [
