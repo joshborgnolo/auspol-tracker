@@ -4604,6 +4604,23 @@ window.AUSPOL = function () {
     }
     return _groupHistPromise;
   };
+  let _issuesHist = null,
+    _issuesHistPromise = null;
+  const loadIssuesHistory = () => {
+    if (_issuesHist) return Promise.resolve(_issuesHist);
+    if (!_issuesHistPromise) {
+      const url = window.AP_ISSUES_HIST;
+      _issuesHistPromise = (url ? fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error("issue-history HTTP " + r.status))) : Promise.resolve(null)).then(j => {
+        _issuesHist = j;
+        return j;
+      }).catch(e => {
+        console.error("issue-history sidecar failed to load", e);
+        _issuesHistPromise = null;
+        return null;
+      });
+    }
+    return _issuesHistPromise;
+  };
   let _cycleSource = null;
   let _cyclePromise = null;
   const loadCycleSource = () => {
@@ -4979,6 +4996,9 @@ window.AUSPOL = function () {
     lead: c.lead,
     oppLead: c.oppLead,
     current: c.current,
+    ...(c.voteModel ? {
+      voteModel: true
+    } : {}),
     eDate: c.eDate,
     ...(c.endRes ? {
       endRes: c.endRes
@@ -5216,6 +5236,10 @@ window.AUSPOL = function () {
       return _groupHist;
     },
     loadGroupHistory,
+    get issuesHistory() {
+      return _issuesHist;
+    },
+    loadIssuesHistory,
     get oneOffs() {
       return _oneOffs || {};
     },

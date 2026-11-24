@@ -9261,8 +9261,11 @@ function infoTerms(D) {
         <>Every term since 1972, lined up on its own election day, so a given month is the same
         distance into every term. Compare this term with every past term, or only those whose
         government was re-elected or ousted, as a level or as the change since the election.
-        <span className="info-p"><b>How it’s built.</b> {D.leaderModel ? <>Votes are averaged month
-        by month the way this term’s are. The leaders’ lines are the
+        <span className="info-p"><b>How it’s built.</b> {D.leaderModel ? <>Past terms’ vote lines are
+        the ones the two-party and primary charts draw: the model’s estimate of the polls, moved
+        toward each election’s count (see {xref("two-party-preferred", "past cycles", "two-party preferred")}), so a
+        term shows the vote rather than the polls’ misses; the dots are the polls themselves. This
+        term’s line is the polls’ current estimate. The leaders’ lines are the
         {" "}{xref("leadership", "past cycles", "leadership model’s")} estimates, the same lines the
         leadership charts draw: each person’s line starts at their first poll and ends at their
         last, and a term that changed leader draws each person apart.</> : <>Past terms are averaged

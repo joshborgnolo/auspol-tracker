@@ -11393,6 +11393,56 @@ const voteHistory = JUR ? null : (() => {
   return { w0: VH_W0, rms: Object.fromEntries(Object.entries(V).map(([k, v]) => [k, v == null ? null : r2(Math.sqrt(v))])), terms, ...(vhmUsed ? { model: true } : {}) };
 })();
 
+/* Past cycles' vote lines are the vote history's (§8v): each past term's
+   model line moved toward its closing count, the line the 2PP and primary
+   charts draw for that term, so a term reads the same on both pages. Month
+   m is the history read at that day, between its monthly points; month 0
+   stays the opening count, and the lead-in from it to the first point is
+   filled as before. The dots stay the polls themselves. A lane the history
+   doesn't carry (One Nation where few polls named it) keeps the monthly
+   average. */
+if (voteHistory) for (const c of CYCLE_DEFS) {
+  if (c.current) continue;
+  const T = voteHistory.terms.find((t) => t.year === c.year);
+  if (!T || !T.series.alp || !T.series.alp.length) continue;
+  /* a history that starts well after the term's first poll would draw a
+     straight lead-in over real polls: such a term keeps its monthly averages */
+  const firstObs = c.obs.primary.indexOf(true);
+  if (firstObs > 0 && T.series.alp[0][0] > dx(c.eDate) + (firstObs + 1.5) * MS_MONTH / 365.25) { console.warn("cycles: " + c.year + " vote history starts late – monthly averages kept"); continue; }
+  const e0 = Date.parse(c.eDate);
+  const xOf = (m) => dx(new Date(e0 + m * MS_MONTH * 86400000).toISOString().slice(0, 10));
+  const read = (lane, flip) => {
+    const S = T.series[lane];
+    if (!S || !S.length) return null;
+    const half = 0.5 / 12;
+    const at = (x) => {
+      if (x < S[0][0] - half || x > S[S.length - 1][0] + half) return null;
+      if (x <= S[0][0]) return S[0][1];
+      if (x >= S[S.length - 1][0]) return S[S.length - 1][1];
+      let j = 0; while (S[j + 1][0] < x) j++;
+      const a = S[j], b = S[j + 1];
+      return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+    };
+    return c.months.map((m) => { const v = at(xOf(m)); return v == null ? null : flip ? 100 - v : v; });
+  };
+  const put = (key, vals) => {
+    if (!vals || !c[key]) return;
+    const known = {};
+    if (c[key][0] != null) known[0] = c[key][0];          // the opening count
+    vals.forEach((v, i) => { if (v != null && i > 0) known[i] = v; });
+    const ks = Object.keys(known).map(Number);
+    if (ks.length < 2) return;
+    const last = Math.max(...ks), first = Math.min(...ks);
+    const filled = fillSeries(known, c.months.map((_, i) => i));
+    c[key] = c.months.map((_, i) => (i < first ? null : i > last ? c[key][i] : r1(filled[i])));
+  };
+  put("primary", read(c.gov));
+  put("oppr", read(c.opp));
+  put("tpp", read("tpp", c.gov !== "alp"));
+  if (T.lanes.includes("onp")) put("onp", read("onp"));
+  c.voteModel = true;
+}
+
 /* ---- 8d. the change log ---------------------------------------------------
    The Info tab's change log: what moved the two-party preferred estimate,
    and which statistical findings appeared or fell away. Since 2026-10-12
@@ -12160,7 +12210,7 @@ window.AUSPOL = (function () {
      ledger's "Public opinion" line reads it - null off the federal page */
   const publicOpinionByRow = ${JSON.stringify(oneOffsSource ? oneOffsSource.byRow : null)};
   const cycles = CYCLE_DEFS.map((c) => ({
-    year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
+    year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current, ...(c.voteModel ? { voteModel: true } : {}),
     eDate: c.eDate,
     ...(c.endRes ? { endRes: c.endRes } : {}),
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],

@@ -464,17 +464,25 @@ function LeadershipSection({ rangeId, setRangeId }) {
     leaders.forEach((L) => { byId[L.id] = L; });
     const pm = byId.alb, op = byId.taylor, hn = byId.hanson;
     if (!pm || !op || !hn) return null;
-    const pmP = leaderReading(D.leaderMonths, "alb_pref");
-    const opP = leaderReading(D.leaderMonths, "taylor_pref");
+    /* on the leadership model: the shares of those who chose one of the
+       two, as the leadership panel prints them, and "level" where the
+       model's lead is inside its 95% interval */
+    const LMD = D.leaderModel && D.leaderNow && D.leaderNow.alb_prefD ? D.leaderNow : null;
+    const pmP = LMD ? LMD.alb_prefD : leaderReading(D.leaderMonths, "alb_pref");
+    const opP = LMD ? LMD.taylor_prefD : leaderReading(D.leaderMonths, "taylor_pref");
     const nets = [pm, op, hn].map((L) => ({ L, r: leaderReading(D.leaderMonths, L.id + "_net") }));
     if (!pmP || !opP || nets.some((n) => !n.r)) return null;
     const r0 = Math.round;
     const ahead = pmP.v - opP.v >= 0;
-    const ppmPart = (ahead ? pm.short : op.short) + " leads " + (ahead ? op.short : pm.short)
+    const LT = LMD && D.leaderLead ? D.leaderLead.taylor : null;
+    const level = !!LT && Math.abs(LT.v) <= LT.ci95;
+    const ppmPart = level ? pm.short + " and " + op.short + " are level as preferred prime minister, "
+        + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v))
+      : (ahead ? pm.short : op.short) + " leads " + (ahead ? op.short : pm.short)
       + " " + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v))
       + " as preferred prime minister";
     const neg = nets.filter((n) => n.r.v < 0);
-    const pref = (ahead ? pm.short : op.short) + " preferred as PM";
+    const pref = level ? pm.short + " and " + op.short + " level as preferred PM" : (ahead ? pm.short : op.short) + " preferred as PM";
     ldHead = neg.length === nets.length ? pref + ", but all three leaders net-negative"
       : !neg.length ? pref + ", and all three leaders net-positive" : pref;
     if (neg.length === nets.length) {
@@ -495,7 +503,9 @@ function LeadershipSection({ rangeId, setRangeId }) {
       <Story head={ldLead && ldHead} dek={ldLead} />
       <HowTo label="How to read these charts" cls="leadership-note" paras={[
         <>The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.</>,
-        <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
+        D.leaderModel ? <>Every line is the leadership model’s estimate of what the average pollster
+        would find, each pollster’s lean taken out. Preferred PM counts those who chose one of the
+        two leaders.</> : <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
         the way the vote series are; the preferred-PM lines join published readings as they came,
         unadjusted.</>,
         <>Preferred PM is put to voters as two separate two-way contests – against the opposition

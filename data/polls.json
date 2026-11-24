@@ -58199,12 +58199,6 @@
         "oppPpm": 35
       },
       {
-        "date": "2013-08-17",
-        "firm": "Lonergan",
-        "pmNet": -19,
-        "oppNet": null
-      },
-      {
         "date": "2013-08-18",
         "firm": "Newspoll",
         "pmNet": -19,
@@ -61843,7 +61837,7 @@
       {
         "date": "2022-12-18",
         "firm": "Freshwater",
-        "pmNet": null,
+        "pmNet": 17,
         "oppNet": null,
         "pmPpm": 55,
         "oppPpm": 29

@@ -356,9 +356,13 @@ for (const c of candidates) {
   report.inserted.push({ where: `${bucket} ${row.date} · ${firm}`, row });
 }
 
-/* GL (government-leader approval) pass */
+/* GL (government-leader approval) pass. GL_COPIES: rows whose figures are
+   another house's same-weekend reading copied across (Lonergan 2013-08-17's
+   35/54 is Newspoll's 35/54; its voting intention is its own), not imported */
+const GL_COPIES = new Set(["2013-08-17|Lonergan"]);
 for (const c of candidates) {
   if (c.glApp == null || c.glDis == null) continue;
+  if (GL_COPIES.has(c.date + "|" + c.remote)) continue;
   if (c.date <= OLDEST_ELECTION) continue; // pre-first-bucket approvals: CSV-only (already counted by VI pass when it had VI)
   const bucket = bucketFor(c.date);
   const firm = firmFor(c.remote, bucket === null ? null : Number(bucket));

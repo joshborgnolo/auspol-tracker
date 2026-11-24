@@ -2013,7 +2013,7 @@ function RdPastCycles(p) {
     className: "rd-foot"
   }, React.createElement("span", {
     className: "rd-foot-text"
-  }, "Each term is lined up on its own election day, so month ", m, " is the same distance into every one of them. ", D.leaderModel ? "Votes are averaged month by month the way this term’s are; the leaders’ lines are the leadership model’s, and where a term changed leader each person has their own line." : "Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office.", " Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings ", RD_CYC_CITE("add", 1), " ", RD_CYC_CITE("little", 2), " or ", RD_CYC_CITE("no", 0), " predictive value on top of voting-intention data."), React.createElement("span", {
+  }, "Each term is lined up on its own election day, so month ", m, " is the same distance into every one of them. ", D.leaderModel ? "Past terms’ vote lines are the ones the two-party and primary charts draw: the model’s estimate of the polls, moved toward each election’s count, so they show the vote rather than the polls’ misses (the dots are the polls themselves). This term’s line is the polls’ current estimate, since its count is still to come. The leaders’ lines are the leadership model’s, and where a term changed leader each person has their own line." : "Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office.", " Comparing with governments that were re-elected or ousted adds context, not a forecast. Preferred-PM and net-approval ratings ", RD_CYC_CITE("add", 1), " ", RD_CYC_CITE("little", 2), " or ", RD_CYC_CITE("no", 0), " predictive value on top of voting-intention data."), React.createElement("span", {
     className: "rd-grow"
   }), React.createElement("button", {
     type: "button",
@@ -2037,7 +2037,7 @@ function RdPastCycles(p) {
       term: "last-election-flows",
       from: "Past cycles"
     }
-  }, "Every line is the implied two-party figure: each poll\u2019s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The ", cur.year, " term follows ", govIn, "\u2019s main rival, as the headline does: the Coalition, unless One Nation runs ", govIn, " clearly closer after preferences. Each line\u2019s dotted start runs from the election\u2019s counted result to the term\u2019s first poll, and a past line\u2019s dotted end runs from its final poll to the closing election\u2019s count.")), React.createElement(RdSec, {
+  }, "Every line is the implied two-party figure: each poll\u2019s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The ", cur.year, " term follows ", govIn, "\u2019s main rival, as the headline does: the Coalition, unless One Nation runs ", govIn, " clearly closer after preferences. Each line\u2019s dotted start runs from the election\u2019s counted result to the term\u2019s first poll, and a past line\u2019s dotted end runs from its final poll to the closing election\u2019s count.", (cycles || []).some(c => c.voteModel || c.raw && c.raw.voteModel) ? " A past term’s line is the one the two-party and primary charts draw for it: the model’s estimate of the polls, moved toward the closing count over the term, so it shows the vote rather than the polls’ final miss. The dots are the polls themselves." : "")), React.createElement(RdSec, {
     id: "cyc-primary",
     title: "Primary vote",
     meta: "First preferences for the governing party and the main opposition party",
@@ -2057,7 +2057,7 @@ function RdPastCycles(p) {
       term: "what-am-i-looking-at",
       from: "Past cycles"
     }
-  }, "Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election\u2019s counted result to the term\u2019s first poll; the dotted end of a past line runs from its final poll to the closing election\u2019s count.")), React.createElement(RdSec, {
+  }, "Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election\u2019s counted result to the term\u2019s first poll; the dotted end of a past line runs from its final poll to the closing election\u2019s count.", (cycles || []).some(c => c.voteModel || c.raw && c.raw.voteModel) ? " A past term’s line is the one the two-party and primary charts draw for it: the model’s estimate of the polls, moved toward the closing count over the term, so it shows the vote rather than the polls’ final miss. The dots are the polls themselves." : "")), React.createElement(RdSec, {
     id: "cyc-leaders",
     title: "Leadership",
     meta: "Net approval since 1971 and preferred PM since 1987, for whoever held the office" + (D.leaderModel ? ", on the leadership model" : ""),

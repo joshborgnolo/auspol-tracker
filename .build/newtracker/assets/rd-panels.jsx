@@ -1387,15 +1387,17 @@ function RdLeadership({ rangeId, setRangeId }) {
     const head = !oppSig ? pm.short + " and " + opp.short + " are level as preferred PM" + (fallSig ? ", and " + pm.short + "’s net approval has " + moved : "")
       : leads ? pm.short + " still leads as preferred PM" + (fallSig ? ", but his net approval has " + moved : "")
       : opp.short + " leads as preferred PM" + (fallSig ? ", and " + pm.short + "’s net approval has " + moved : "");
-    const leyRows = LM.filter((r) => r.alb_pref != null && r.ley_pref != null);
-    const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + r.alb_pref - r.ley_pref, 0) / leyRows.length : null;
+    /* on the model the past leads are its monthly leads (lead_*), the same
+       basis as today's; otherwise the published monthly shares */
+    const leyRows = LMOD ? LM.filter((r) => r.lead_ley != null) : LM.filter((r) => r.alb_pref != null && r.ley_pref != null);
+    const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + (LMOD ? r.lead_ley : r.alb_pref - r.ley_pref), 0) / leyRows.length : null;
     const hanLead = aH != null && h != null ? aH - h : null;
     const hanSig = hanLead != null && leadTest(LL.hanson, PK.aH, PK.h);
     /* "held steady since it was first measured": the running lead within its
        own margin of the contest's first monthly reading */
-    const hanRows = LM.filter((r) => r.alb_prefH != null && r.hanson_prefH != null);
+    const hanRows = LMOD ? LM.filter((r) => r.lead_hanson != null) : LM.filter((r) => r.alb_prefH != null && r.hanson_prefH != null);
     const hanSteady = hanLead != null && hanRows.length > 0
-      && Math.abs(hanLead - (hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= (LL.hanson ? LL.hanson.ci95 : 4);
+      && Math.abs(hanLead - (LMOD ? hanRows[0].lead_hanson : hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= (LL.hanson ? LL.hanson.ci95 : 4);
     /* "narrowed": the Ley-era average lead (many months, a small margin) down
        by more than the current lead's own margin */
     const narrowed = leyLead != null && leads && leyLead - lead > (LL.taylor ? LL.taylor.ci95 : 4);

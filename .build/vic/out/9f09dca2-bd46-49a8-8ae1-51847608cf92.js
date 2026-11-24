@@ -451,7 +451,7 @@ window.AUSPOL = (function () {
      ledger's "Public opinion" line reads it - null off the federal page */
   const publicOpinionByRow = null;
   const cycles = CYCLE_DEFS.map((c) => ({
-    year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
+    year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current, ...(c.voteModel ? { voteModel: true } : {}),
     eDate: c.eDate,
     ...(c.endRes ? { endRes: c.endRes } : {}),
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],

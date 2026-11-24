@@ -73,8 +73,11 @@ export function buildVoteHistory({ log = () => {} } = {}) {
       const kk = und != null ? 100 / (100 - und) : 1;
       const y = {};
       for (const k of lanes) y[k] = p[k] != null ? p[k] * kk : null;
-      if (lanes.some((k) => y[k] == null)) return;
-      y.oth = 100 - lanes.reduce((s, k) => s + y[k], 0);
+      /* a poll that doesn't name a lane (One Nation before its founding,
+         the Greens in some early-1990s polls) folds it into everyone else
+         (categoriesOf), rather than being dropped: dropping them started
+         the 1993 and 1996 terms months after their first polls */
+      y.oth = 100 - lanes.reduce((s, k) => s + (y[k] ?? 0), 0);
       if (!(y.oth > 0.2)) y.oth = 0.2;
       const c = categoriesOf(y, parties);
       if (!c) return;
