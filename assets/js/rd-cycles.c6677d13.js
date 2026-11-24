@@ -2076,7 +2076,7 @@ function RdPastCycles(p) {
     dek: "The prime minister’s lead over the opposition leader on the question of who would make the better PM" + (D.leaderModel ? ", among those who chose one of the two" : "") + ". Asked since 1987."
   }), chart("ppmm", true, "leaders")), React.createElement("div", null, React.createElement(RdSub, {
     head: "Opposition leader\u2019s net approval",
-    dek: "Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972."
+    dek: "Approve minus disapprove, for whoever led the opposition at the time. Rated since 1971."
   }), chart("oppnet", true, "leaders"))), React.createElement(RdEventList, {
     list: PAIRS.leaders.list,
     inline: true,

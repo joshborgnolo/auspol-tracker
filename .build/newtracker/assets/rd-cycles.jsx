@@ -1501,7 +1501,7 @@ function RdPastCycles(p) {
         <div className="rd-cyc-one">{chart("pmlead", false)}</div>
         <div className="rd-cyc-two rd-cyc-subs">
           <div><RdSub head="Preferred prime minister" dek={"The prime minister’s lead over the opposition leader on the question of who would make the better PM" + (D.leaderModel ? ", among those who chose one of the two" : "") + ". Asked since 1987."} />{chart("ppmm", true, "leaders")}</div>
-          <div><RdSub head="Opposition leader’s net approval" dek="Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972." />{chart("oppnet", true, "leaders")}</div>
+          <div><RdSub head="Opposition leader’s net approval" dek="Approve minus disapprove, for whoever led the opposition at the time. Rated since 1971." />{chart("oppnet", true, "leaders")}</div>
         </div>
         <RdEventList list={PAIRS.leaders.list} inline onPick={pickEvOf.leaders} openKey={openKeyOf(["ppmm", "oppnet"])} />
         {bandKey("leaders")}
