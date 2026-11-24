@@ -19,6 +19,11 @@ on:
     - cron: '0 16 * * 2'                # Wed 03:00 — follow-up
     - cron: '0 17 * * 2'                # Wed 04:00 — follow-up
     - cron: '0 18 * * 2'                # Wed 05:00 — follow-up
+    - cron: '0,30 21 * * 2'             # Wed 08:00–08:30 — late report page, every 30 min
+    - cron: '0,30 22 * * 2'             # Wed 09:00–09:30 — late report page, every 30 min
+    - cron: '0,30 23 * * 2'             # Wed 10:00–10:30 — late report page, every 30 min
+    - cron: '0,30 0 * * 3'              # Wed 11:00–11:30 — late report page, every 30 min
+    - cron: '0 1 * * 3'                 # Wed 12:00 — late report page, every 30 min
     - cron: '30 11 * * 3'               # Wed 22:30 — late backstop
     - cron: '0 8 * * 4'                 # Thu 19:00 — next-day
     # tune-schedules:end

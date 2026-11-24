@@ -116,9 +116,10 @@ const TARGETS = [
   // crawl weekly), so it combs like the rest. It still stops at the habitual
   // hour; the hourly follow-ups cover the occasional late file. Its daily
   // sweep sits AFTER the morning cluster (a long holder of the writers queue
-  // in the middle of it once got np-score cancelled).
+  // in the middle of it once got np-score cancelled). Its report page can
+  // trail the charts by hours, so a late-morning comb covers that second drop.
   { workflow: "essential-update.yml", houses: ["Essential"], mode: "dense", sweep: "07:45",
-    chaseOutliers: false, phase: 0 },
+    chaseOutliers: false, phase: 0, lateReport: { window: ["08:00", "12:00"], step: 30 } },
   // shares its Sunday evening with Resolve: phased 5 min off Resolve's comb
   { workflow: "redbridge-update.yml", houses: ["RedBridge/Accent"], mode: "dense", sweep: "07:20",
     // evening PDF drops — the standing second daily check
@@ -358,6 +359,10 @@ function layout(target, m) {
     const eve = (d + 6) % 7;
     for (let t = toMins(target.eve.window[0]); t <= toMins(target.eve.window[1]); t += target.eve.step)
       addP(eve, t, `drop eve (files ~9pm the evening before its stamped date), every ${target.eve.step} min`);
+  }
+  if (target.lateReport?.window) {
+    for (let t = toMins(target.lateReport.window[0]); t <= toMins(target.lateReport.window[1]); t += target.lateReport.step)
+      addP(d, t, `late report page, every ${target.lateReport.step} min`);
   }
   // follow-ups on the hour from the last comb slot, then the evening backstop
   const firstHour = ceilTo(lastSlot + 1, 60);

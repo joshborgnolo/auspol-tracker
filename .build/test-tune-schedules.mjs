@@ -38,6 +38,10 @@ const polls = [
   ...["2026-08-12T05:00", "2026-08-26T05:00", "2026-09-09T05:00",
       "2026-09-23T05:00", "2026-10-07T05:00", "2026-10-21T05:00", "2026-11-04T05:00"]
     .map((p) => poll("YouGov", p)),
+  // Essential: Wednesday charts, with the report page arriving hours later
+  ...["2026-08-12T01:00", "2026-08-26T01:00", "2026-09-09T01:00",
+      "2026-09-23T01:00", "2026-10-07T01:00", "2026-10-21T01:00", "2026-11-04T01:00"]
+    .map((p) => poll("Essential", p)),
   // Fox & Hedgehog: declared stopped
   poll("Fox & Hedgehog", "2026-05-31T06:42"),
 ];
@@ -115,6 +119,13 @@ const eve = yg.filter((c) => /drop eve/.test(c.note));
 assert.ok(eve.length >= 3, "drop-eve comb spans the evening " + JSON.stringify(yg));
 assert.ok(eve.every((c) => c.cron.endsWith(" * * 2")), "drop-eve slots are Tuesdays");
 assert.ok(readFileSync(path.join(dir, "news24-update.yml"), "utf8").includes("Wed habit"), "habit day measured from the stamps");
+
+// Essential's report page lands hours after its charts: Wednesday 08:00–12:00
+// Sydney every 30 min, including the UTC-day change mid-morning.
+const essLate = crons(readFileSync(path.join(dir, "essential-update.yml"), "utf8"))
+  .filter((c) => /late report page/.test(c.note));
+assert.deepEqual(essLate.map((c) => c.cron),
+  ["0,30 22 * * 2", "0,30 23 * * 2", "0,30 0 * * 3", "0,30 1 * * 3", "0 2 * * 3"], JSON.stringify(essLate));
 
 // DemosAU: no weekday → trimmed daily bracket (05:00–08:51 once the midnight
 // and 20:30 strays are set aside): 04:50, 08:30 (median floor), 10:00
