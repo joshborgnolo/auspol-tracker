@@ -262,6 +262,10 @@ window.AUSPOL = (function () {
   /* Composition trend (§7gb): per party, the groups that have moved toward
      or away from it out of proportion to the all-voters line. */
   const demoTrend = null;
+  /* Gaps between groups (§7gb): per set, the pairs whose relative gap has
+     moved since the election, Holm-adjusted across the set's pairs and
+     parties, and how many were tested. */
+  const demoGaps = null;
   /* The By-state panels' 2025 election marks (§7g): each group's result per
      party, in order, with the election's mid-month x. */
   const demoStateElection = {"x":2025.375,"groups":{"Nat":[34.56,31.82,6.4,12.2,15.01],"NSW":[35.2,31.53,6.02,11.06,16.19],"Vic":[33.95,32.2,5.79,13.59,14.48],"Qld":[30.98,34.91,7.84,11.76,14.5],"SA":[38.31,28.45,6.15,13.42,13.68],"WA":[35.59,31.55,7.61,11.97,13.28],"ACT/NT/Tas":[40.95,24.52,3.97,12.49,18.07],"Non-NSW/Vic/Qld":[37.64,29.01,6.34,12.55,14.45]}};
@@ -471,7 +475,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

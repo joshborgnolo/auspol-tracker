@@ -4315,40 +4315,118 @@ function DpRug({ items, color, dxp, fmt }) {
     </span>
   );
 }
-/* Each row compares a group's share with the national share for the same
-   party. The model pairs election-day and latest draws before taking the
-   ratio of those ratios. Legacy trend fits have no such posterior. */
-function rdRelativeFinding(row) {
-  const c = row.ratioChange;
-  return row.model && c && !row.check?.conflict && (c.low > 1 || c.high < 1);
+/* ---- the composition change: which groups have moved out of step --------
+   Written from D.demoTrend (gen-data §7gb) by fixed rules, so it re-words
+   itself as the polls move. The user's rulings behind it (2026-11-24, after
+   a rewrite that dropped this copy for a bare table):
+   - Only RELATIVE moves count: a group's share of the party's vote over the
+     national share, on polling day and now (the group model's draws of both
+     days together). A party rising everywhere widens every gap in points
+     without changing who votes for it, so a points move alone is no claim.
+   - "Significant" is 95% after Holm's correction across every group tested
+     for the party (33 today): a strongest-of-33 claim on a plain 95% bar
+     would name one or two groups by chance in a typical month. A move that
+     clears 95% on its own only is in the table, never in the copy.
+   - A move Resolve's own waves contradict beyond both margins (age,
+     gender) is withheld (gen-data's same-house check).
+   Head: the strongest move, with a second one merged in when it runs the
+   same way from another set ("holding up better in Victoria and among
+   university graduates"); the verb reads against the party's national
+   line, so a group "holding up better" in a falling party may still have
+   fallen. Dek: the national move, then up to three moves as "times as
+   likely as all voters", the opposite direction in a sentence of its own,
+   and a count of any more. With none: the national move, the null result,
+   and the nearest miss if it would have cleared 95% on its own - the
+   reader is told why it isn't named. The shapes "losing voters faster in",
+   "holding up better in" and "The composition of …'s vote" are the user's
+   (dictated 2026-09-29 and 2026-09-30). */
+const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "The Greens", oth: "Others & independents" };
+const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "ACT/NT/Tas": "Tasmania, the ACT and the NT", "Non-NSW/Vic/Qld": "SA, WA, Tasmania and the territories" };
+const RD_TREND_LOC = { "Inner metro": "the inner suburbs", "Outer metro": "the outer suburbs", Provincial: "provincial areas", Rural: "rural areas" };
+/* where a move happened, for the head: "in Victoria", "among renters" */
+const rdShiftWhere = (m) => (m.set === "state" ? "in " + (RD_TREND_STATE[m.group] || m.group)
+  : m.set === "location" ? "in " + (RD_TREND_LOC[m.group] || m.group)
+  : "among " + (RD_DEMO_SHORT[m.group] || m.group));
+/* who moved, as the dek's subject: "voters in Victoria", "renters" */
+const rdShiftWho = (m) => DEMO_WHO[m.group] || RD_DEMO_SHORT[m.group] || m.group;
+const rdX2 = (v) => v.toFixed(2);
+function rdDemoShift(dt, party) {
+  if (!dt || !dt.rows || !dt.rows.length) return null;
+  const nameT = RD_TREND_NAME[party], nameD = DEMO_VOTE_FOR[party];
+  const plural = party === "oth" || party === "grn";
+  const isAre = plural ? "are" : "is", it = plural ? "them" : "it";
+  const voteOf = party === "oth" ? "the vote for others & independents" : nameD + (/s$/.test(nameD) ? "’" : "’s") + " vote";
+  const pct = (v) => v.toFixed(1) + "%";
+  const elecYm = dt.windowYm;
+  const ref = dt.rows.find((r) => r.model) || dt.rows[0];
+  const n = ref.a1 - ref.a0;
+  const natDir = n < -1 ? -1 : n > 1 ? 1 : 0;
+  const natClause = natDir < 0 ? "fallen from " + pct(ref.a0) + " to " + pct(ref.a1)
+    : natDir > 0 ? "risen from " + pct(ref.a0) + " to " + pct(ref.a1) : "held near " + pct(ref.a1);
+  const since = (m) => (m.from && m.from !== elecYm ? " since " + rdMonthYear(m.from) : "");
+  const moves = dt.moves || [];
+  const tested = dt.tested || dt.rows.length;
+  if (!moves.length) {
+    const near = dt.rows.filter((r) => r.sigAlone && !(r.check && r.check.conflict)).sort((a, b) => a.p - b.p)[0];
+    return {
+      head: "The composition of " + voteOf + " hasn’t changed significantly since the election",
+      dek: "Since the election, " + voteOf + " has " + natClause + " nationally, and no group’s support relative to all voters has changed significantly."
+        + (near ? " The largest move, among " + rdShiftWho(near) + " (" + rdX2(near.r0) + " to " + rdX2(near.r1)
+          + " times as likely as all voters to back " + it + since(near) + "), clears 95% on its own but not once all " + tested + " groups tested are allowed for." : ""),
+    };
+  }
+  /* the head's verb, read against the national line (and the group's own
+     line where the national verb would misdescribe it) */
+  const verb = (m) => {
+    const toward = m.dir > 0, own = m.g1 - m.g0;
+    if (natDir < 0) return toward ? "holding up better" : "losing voters faster";
+    if (natDir > 0) return toward ? "gaining faster" : own < -0.5 ? "losing ground" : "gaining more slowly";
+    return toward ? "gaining ground" : "losing ground";
+  };
+  const top = moves[0];
+  const second = moves.slice(1).find((m) => m.dir === top.dir && m.set !== top.set && verb(m) === verb(top));
+  const head = nameT + " " + isAre + " " + verb(top) + " " + rdShiftWhere(top) + (second ? " and " + rdShiftWhere(second) : "");
+  const shown = moves.slice(0, 3);
+  const same = shown.filter((m) => m.dir === top.dir), other = shown.filter((m) => m.dir !== top.dir);
+  const clause = (m, i) => (i === 0 ? rdShiftWho(m) + " have gone from " + rdX2(m.r0) + " to " + rdX2(m.r1) + " times as likely as all voters to back " + nameD + since(m)
+    : rdShiftWho(m) + " from " + rdX2(m.r0) + " to " + rdX2(m.r1) + " times" + since(m));
+  const s1 = "Since the election, as " + voteOf + " has " + natClause + " nationally, " + rdSerial(same.map(clause), "and") + ".";
+  const s2 = other.length ? " " + rdCap(rdSerial(other.map((m, i) => rdShiftWho(m) + (i === 0 ? " have gone the other way, from " : " from ")
+    + rdX2(m.r0) + " to " + rdX2(m.r1) + " times" + since(m)), "and")) + "." : "";
+  const more = moves.length - shown.length;
+  const s3 = more > 0 ? " " + (more === 1 ? "One more group has" : rdCap(rdNumWord(more)) + " more groups have") + " also shifted; the table lists every group tested." : "";
+  return { head, dek: s1 + s2 + s3 };
 }
-function rdChangeFactor(v) {
-  // Keep near-parity bounds distinguishable from 1×.
-  const rounded = Number(v.toFixed(2));
-  if (rounded === 1 && v !== 1) return v > 1 ? "just above 1×" : "just below 1×";
-  return rounded + "×";
-}
-function RdRelativeFindings({ rows, partyName }) {
-  const findings = rows.filter(rdRelativeFinding).sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
-  if (!findings.length) return null;
-  const first = findings[0];
-  const label = r => RD_STATE_NAME[r.group] || r.group;
-  const ratio = (g, a) => (g / a).toFixed(2) + "×";
-  const summary = findings.slice(0, 2).map(r =>
-    label(r) + " " + ratio(r.g0, r.a0) + " → " + ratio(r.g1, r.a1)
-  ).join(" · ");
-  return <>
-    <RdSub head={"Where support for " + partyName + " changed relative to its national vote"}
-      dek={"Group share divided by national share, " + rdMonthYear(first.from) + " to " + rdMonthYear(first.to) + ". " + summary + "."} />
-    <RdTsig summary="Model estimates and uncertainty"
-      heads={["Group", "Group vote, start → end", "National vote, start → end", "Change in relative support", "95% credible interval"]}
-      sets={[{ key: "findings", rows: findings.map(r => ({
-        key: r.set + "|" + r.group, name: label(r),
-        cells: [[r.g0, r.g1], [r.a0, r.a1]].map(pair => pair.map(v => v.toFixed(1) + "%").join(" → ")).concat(
-          rdChangeFactor(r.ratioChange.factor), rdChangeFactor(r.ratioChange.low) + " to " + rdChangeFactor(r.ratioChange.high))
-      })) }]}
-      note="The Bayesian model compares each group’s support relative to the national vote on election day and at the latest estimate. A change factor of 1× means the group kept pace nationally. Each group shown has a 95% credible interval entirely above or below 1×. The interval applies to that group’s comparison." />
-  </>;
+/* the battery behind the copy: every group tested for the party, in the
+   tabs' own order, pass or fail */
+function RdDemoShiftTable({ dt, party, pName, tabs }) {
+  if (!dt || !dt.rows || !dt.rows.length) return null;
+  const tested = dt.tested || dt.rows.length;
+  const order = tabs.flatMap((t) => t.sets.map((s) => s.id));
+  const bySet = new Map();
+  for (const r of dt.rows) {
+    if (!bySet.has(r.set)) bySet.set(r.set, { key: r.set, label: r.setLabel, since: r.model ? "" : "since " + rdMonthYear(r.from), rows: [] });
+    bySet.get(r.set).rows.push(r);
+  }
+  const sets = [...bySet.values()].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
+  /* an interval end that rounds to 1.00 without being 1 keeps a third
+     decimal, so "on its own: Yes" never sits beside a bound of 1.00 */
+  const f1 = (v) => v.toFixed(1), f2 = (v) => v.toFixed(2), fi = (v) => (v.toFixed(2) === "1.00" && Math.abs(v - 1) > 5e-4 ? v.toFixed(3) : v.toFixed(2));
+  const income = dt.rows.find((r) => !r.model);
+  return (
+    <RdTsig summary={"Every group tested, " + (tested) + " in all"}
+      heads={["Group", "Support, election → now, %", "Times as likely as all voters, election → now", "Change, with 95% interval", "Significant, all " + tested + " allowed for"]}
+      sets={sets.map((s) => ({ key: s.key, label: s.label, since: s.since, rows: s.rows.map((r) => {
+        const withheld = r.sig && r.check && r.check.conflict;
+        return { key: r.group, name: r.group, sig: r.sig && !withheld,
+          cells: [f1(r.g0) + " → " + f1(r.g1),
+            r.r0 != null ? f2(r.r0) + " → " + f2(r.r1) : "–",
+            r.lr != null ? f2(Math.exp(r.lr)) + "× (" + fi(Math.exp(r.lrLo)) + "–" + fi(Math.exp(r.lrHi)) + ")" : "–",
+            withheld ? "Withheld" : r.sig ? "Yes" : r.sigAlone ? "Only on its own" : "No"] };
+      }) }))}
+      note={"A group’s support here is its share of " + (party === "oth" ? "the vote for others & independents" : pName + "’s vote") + " over the national share: 1.20 means its voters are 1.2 times as likely as all voters to back " + (party === "oth" || party === "grn" ? "them" : "it") + ". Both ends come from the group model’s draws of polling day and today together. A group has shifted when the 95% interval of the change in that ratio excludes no change (1.00). Moves in points don’t count: a party rising everywhere widens every gap in points without changing who votes for it. With " + tested + " groups tested, one or two would clear a plain 95% bar by chance in a typical month even if none had moved, so the copy above names a shift only if it still clears 95% after Holm’s correction for all " + tested + ": the chance that any shift it names is a false alarm is then under 1 in 20. “Only on its own” marks a change that clears 95% alone but not once all " + tested + " are allowed for. Where Resolve’s own polls measure the same change for age or gender and disagree beyond both margins, the shift is withheld."
+        + (income ? " The income bands, which the model doesn’t cover, are tested on the trend in their monthly averages since " + rdMonthYear(income.from) + "." : "")} />
+  );
 }
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
@@ -4401,34 +4479,50 @@ function rdGapRuns(points) {
   }
   return runs;
 }
-/* Screen the entire displayed history of one party/comparison. Widen both
-   groups' published normal-equivalent margins simultaneously (Bonferroni).
-   Intersect the monthly feasible contrasts: an empty intersection rules out
-   every constant contrast, including constant gaps far from parity. No
-   assumption of independence across groups or months is needed. */
-function rdGapChanged(group, reference, order, party, relative) {
-  const i = order.indexOf(party) + 1;
-  const refs = new Map(reference.monthly.map(row => [row[0], row]));
-  const pairs = group.monthly.map(row => [row, refs.get(row[0])]).filter(([a, b]) =>
-    b && [a, b].every(r => Number.isFinite(r[i]) && Number.isFinite(r[i + order.length]) && r[i + order.length] >= 0)
-    && (!relative || b[i] > 0));
-  if (pairs.length < 2) return false;
-  // Upper bound on the standard normal tail (Mills' inequality).
-  const tail = 0.05 / (4 * pairs.length);
-  let z = 1.96;
-  while (Math.exp(-z*z/2) / (z*Math.sqrt(2*Math.PI)) > tail) z += 0.01;
-  const bounds = r => {
-    // Shares and margins are published to one decimal place.
-    const width = (r[i + order.length] + 0.05) * z / 1.96 + 0.05;
-    return [Math.max(0, r[i] - width), Math.min(100, r[i] + width)];
-  };
-  let lower = -Infinity, upper = Infinity;
-  for (const [a, b] of pairs) {
-    const [al, ah] = bounds(a), [bl, bh] = bounds(b);
-    lower = Math.max(lower, relative ? al / bh : al - bh);
-    upper = Math.min(upper, relative ? (bl > 0 ? ah / bl : Infinity) : ah - bl);
-  }
-  return lower > upper;
+/* The gap charts show only comparisons whose RELATIVE gap has moved since
+   the election (gen-data §7gb demoGaps: the group model's draws, Holm
+   across every pair and party in the set; the income bands on their
+   monthly trend). Absolute view draws the same comparisons in points; a
+   points move alone never qualifies (user ruling 2026-11-24). Each pass
+   comes both ways round; a set opens on its strongest change - the one
+   the section's dek names - turned so the set's default reference (or
+   comparison) keeps its side. */
+function rdGapOrient(r, def) {
+  if (r.b === def.ref || r.a === def.compare) return { cmp: r.a, ref: r.b, r0: r.r0, r1: r.r1 };
+  if (r.a === def.ref || r.b === def.compare) return { cmp: r.b, ref: r.a, r0: 1 / r.r0, r1: 1 / r.r1 };
+  return { cmp: r.a, ref: r.b, r0: r.r0, r1: r.r1 };
+}
+function rdGapOptions(st, tests) {
+  const def = RD_GAP_REFS[st.id], t = tests && tests[st.id];
+  if (!def || !t || !t.pass) return null;
+  const has = (l) => st.groups.some((g) => g.label === l);
+  const pass = t.pass.filter((r) => has(r.a) && has(r.b));
+  if (!pass.length) return null;
+  const pairs = pass.flatMap((r) => [
+    { cmp: r.a, ref: r.b, party: r.party, r0: r.r0, r1: r.r1, p: r.p },
+    { cmp: r.b, ref: r.a, party: r.party, r0: 1 / r.r0, r1: 1 / r.r1, p: r.p }]);
+  return { tested: t.tested, pass, pairs, start: { ...rdGapOrient(pass[0], def), party: pass[0].party, p: pass[0].p } };
+}
+/* A card's scale: the comparisons it draws (only changed ones are), over
+   their whole history so a shorter window never rescales it, always
+   holding the parity line (1× or 0), padded and on round steps. A set-wide
+   scale reached 6–9× wherever any pair was far apart and flattened the
+   very moves these charts are shown for. */
+function rdGapDomain(ys, relative) {
+  const base = relative ? 1 : 0;
+  const lo0 = Math.min(base, ...ys), hi0 = Math.max(base, ...ys);
+  const span = Math.max(hi0 - lo0, relative ? 0.2 : 4);
+  const step = (relative ? [0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5] : [1, 2, 5, 10, 20]).find((st) => span / st <= 3) || (relative ? 5 : 20);
+  let lo = Math.floor((lo0 - span * 0.08) / step) * step;
+  const hi = Math.ceil((hi0 + span * 0.08) / step) * step;
+  if (relative) lo = Math.max(0, lo);
+  const r = (v) => Math.round(v * 1000) / 1000;
+  let ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(r(v));
+  /* parity is always labelled; a step that skips it (2×, 5×) gives way
+     around it */
+  if (!ticks.includes(base)) ticks = ticks.filter((t) => Math.abs(t - base) > step * 0.45).concat(base).sort((a, b) => a - b);
+  return { lo: r(lo), hi: r(hi), ticks };
 }
 function rdGapSet(st, order, mx, refLabel, relative) {
   const def = RD_GAP_REFS[st.id];
@@ -4445,37 +4539,33 @@ function rdGapSet(st, order, mx, refLabel, relative) {
   const limit = relative ? Math.max(2, Math.ceil(Math.max(...points.map((p) => p.y)))) : Math.max(5, Math.ceil((Math.max(...points.map((p) => Math.abs(p.y))) + 1) / 5) * 5);
   return { def, reference, comparisons, limit, firstX: Math.min(...points.map((p) => p.x)) };
 }
-function rdGapReferences(st, order) {
-  if (!RD_GAP_REFS[st.id]) return [];
-  return st.groups.map(reference => ({
-    reference,
-    comparisons: st.groups.filter(g => g !== reference).map(group => ({
-      group, parties: order.filter(party => rdGapChanged(group, reference, order, party, true))
-    })).filter(c => c.parties.length)
-  })).filter(r => r.comparisons.length);
-}
-function RdDemographicGapSet({ st, references, order, rangeId, model, relative }) {
+function RdDemographicGapSet({ st, opts, order, rangeId, model, relative }) {
   const { D, rangeDomain, monthLabelFull } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
   const [refLabel, setRefLabel] = useState("");
+  const [choice, setChoice] = useState("");
+  const [gapPop, setGapPop] = useState(null);
   const format = relative ? (v) => String(Number(v.toFixed(2))) : rdGapFmt;
   const measure = relative ? "Factor" : "Gap";
   const unit = relative ? "×" : " pp";
-  const eligible = references.find(r => r.reference.label === refLabel)
-    || references.find(r => r.reference.label === RD_GAP_REFS[st.id].ref) || references[0];
-  const data = React.useMemo(() => rdGapSet(st, order, D.mx, eligible.reference.label, relative), [st, order, D, eligible, relative]);
-  const [choice, setChoice] = useState("");
-  const [gapPop, setGapPop] = useState(null);
+  /* only groups in a comparison that changed can be picked, either side */
+  const refs = st.groups.filter((g) => opts.pairs.some((x) => x.ref === g.label));
+  const refName = refs.some((g) => g.label === refLabel) ? refLabel : opts.start.ref;
+  const cmps = st.groups.filter((g) => opts.pairs.some((x) => x.ref === refName && x.cmp === g.label));
+  const cmpName = cmps.some((g) => g.label === choice) ? choice
+    : refName === opts.start.ref && cmps.some((g) => g.label === opts.start.cmp) ? opts.start.cmp : cmps[0].label;
+  const changes = opts.pairs.filter((x) => x.ref === refName && x.cmp === cmpName);
+  const parties = changes.map((x) => x.party);
+  const data = React.useMemo(() => rdGapSet(st, order, D.mx, refName, relative), [st, order, D, refName, relative]);
   if (!data) return null;
-  const { def, reference, limit, firstX } = data;
-  const comparisons = data.comparisons.filter(c => eligible.comparisons.some(e => e.group === c.group));
-  const selected = comparisons.find((c) => c.group.label === choice)
-    || comparisons.find((c) => c.group.label === def.compare) || comparisons[0];
+  const { def, reference, firstX } = data;
+  const selected = data.comparisons.find((c) => c.group.label === cmpName);
+  if (!selected) return null;
   const group = selected.group;
-  const parties = eligible.comparisons.find(c => c.group === group).parties;
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
-  const ticks = relative ? [...new Set([0, 1, limit / 2, limit])].sort((a, b) => a - b) : [-limit, -limit / 2, 0, limit / 2, limit];
+  const dom = rdGapDomain(selected.parties.filter((p) => parties.includes(p.party)).flatMap((p) => p.points.map((pt) => pt.y)), relative);
+  const ticks = dom.ticks;
   const who = (g) => DEMO_WHO[g.label] || RD_DEMO_SHORT[g.label] || g.label;
   const formula = relative ? group.label + " ÷ " + reference.label + " · primary vote ratio"
     : st.id === "gender" && reference.label === "Men" ? "Women’s primary vote − men’s primary vote · percentage points"
@@ -4484,27 +4574,31 @@ function RdDemographicGapSet({ st, references, order, rangeId, model, relative }
   const explanation = relative ? "Above 1× means higher support among " + who(group) + ". Below 1× means higher support among " + who(reference) + ". At 1× support is equal." : "Positive: higher among " + who(group) + ". Negative: higher among " + who(reference) + ". Zero: equal support.";
   /* Reserve the widest end label in every panel so equal dates align,
      even when one party's signed figure is longer than another's. */
-  const padSeries = selected.parties.flatMap((p) => {
+  const padSeries = selected.parties.filter((p) => parties.includes(p.party)).flatMap((p) => {
     const visible = p.points.filter((pt) => pt.x >= x0 && pt.x <= x1);
     const last = visible[visible.length - 1];
     return last ? [{ points: [last], endLabel: format(last.y) + unit }] : [];
   });
+  const pickRef = (l) => {
+    /* keep the comparison group when it changed against the new reference
+       too; a swap of the two sides keeps the pair */
+    const next = l === cmpName ? refName : cmpName;
+    setChoice(opts.pairs.some((x) => x.ref === l && x.cmp === next) ? next : "");
+    setRefLabel(l);
+    setGapPop(null);
+  };
   return (
     <div className="card rd-card rd-wv-gap-set" role="group" aria-label={title}>
       <div className="rd-chead"><h5 className="rd-chead-t">{title}</h5></div>
       <div className="rd-wv-gap-choice">
         <FilterPop id="compare" label="Compare" summary={group.label} on={false} open={gapPop} setOpen={setGapPop}>
           <div className="ap-poplist" role="radiogroup" aria-label={def.title + " comparison group"}>
-            {comparisons.map((c) => <PopRow key={c.group.label} radio on={group.label === c.group.label} label={c.group.label} onClick={() => { setChoice(c.group.label); setGapPop(null); }} />)}
+            {cmps.map((g) => <PopRow key={g.label} radio on={group.label === g.label} label={g.label} onClick={() => { setChoice(g.label); setGapPop(null); }} />)}
           </div>
         </FilterPop>
         <FilterPop id="reference" label="Reference" summary={reference.label} on={false} open={gapPop} setOpen={setGapPop}>
           <div className="ap-poplist" role="radiogroup" aria-label={def.title + " reference group"}>
-            {references.map(({reference: g}) => <PopRow key={g.label} radio on={reference.label === g.label} label={g.label} onClick={() => {
-              setChoice(g.label === group.label ? reference.label : group.label);
-              setRefLabel(g.label);
-              setGapPop(null);
-            }} />)}
+            {refs.map((g) => <PopRow key={g.label} radio on={reference.label === g.label} label={g.label} onClick={() => pickRef(g.label)} />)}
           </div>
         </FilterPop>
       </div>
@@ -4518,14 +4612,16 @@ function RdDemographicGapSet({ st, references, order, rangeId, model, relative }
           const points = (party ? party.points : []).filter((p) => p.x >= x0 && p.x <= x1);
           const last = points[points.length - 1];
           const color = D.PARTIES[pp.id].color;
+          const ch = changes.find((x) => x.party === pp.id);
           return (
             <div className="rd-sm rd-wv-gap-panel" key={pp.id}>
               <div className="rd-sm-top"><span><i className="rd-sw" style={{ background: color }}></i>{pp.label}</span>
-                <span className="rd-wv-gap-date">{last ? rdMonthYear(last.ym) : ""}</span></div>
+                {/* the tested change itself: the model's ratio on polling day and today */}
+                <span className="rd-wv-gap-date">{relative && ch ? ch.r0.toFixed(2) + "× → " + ch.r1.toFixed(2) + "× since the election" : last ? rdMonthYear(last.ym) : ""}</span></div>
               {points.length ? <TrendChart key={st.id + "|" + group.label + "|" + reference.label + "|" + unit + "|" + pp.id}
                 heightPx={narrow ? 180 : 170} padPx={{ l: 36, r: 6, t: 12, b: 26 }}
-                xDomain={[x0, x1]} yDomain={[relative ? 0 : -limit, limit]} xTicks={rdXTicks(x0, x1, true)}
-                yTicks={ticks} yTickFmt={(v) => relative ? v + "×" : v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, "")}
+                xDomain={[x0, x1]} yDomain={[dom.lo, dom.hi]} xTicks={rdXTicks(x0, x1, true)}
+                yTicks={ticks} yTickFmt={(v) => relative ? Number(v.toFixed(2)) + "×" : v === 0 ? "0" : rdGapFmt(v).replace(/\.0$/, "")}
                 refLines={[{ y: relative ? 1 : 0, color: "var(--ink-3)" }]}
                 series={rdGapRuns(points).map((run, i, runs) => ({
                   id: pp.id + "-" + i, label: measure, color, points: run, smooth: false, rdWidth: 2.25,
@@ -4550,18 +4646,29 @@ function RdDemographicGapSet({ st, references, order, rangeId, model, relative }
   );
 }
 const RdDemographicGaps = React.memo(function RdDemographicGaps({ tab, order, rangeId, model }) {
+  const { D } = window.AP;
   const [relative, setRelative] = useState(true);
-  const sets = React.useMemo(() => tab.sets.map(st => ({ st, references: rdGapReferences(st, order) }))
-    .filter(set => set.references.length), [tab, order]);
+  const sets = React.useMemo(() => tab.sets.map((st) => ({ st, opts: rdGapOptions(st, D.demoGaps) })).filter((x) => x.opts), [tab, D]);
   if (!sets.length) return null;
+  /* the dek: the change each card opens on, strongest first (at most two
+     named), and a count of the rest the cards' menus hold */
+  const opening = sets.map((x) => x.opts.start).sort((a, b) => a.p - b.p);
+  const short = (l) => ({ "Gen Z": "Gen Z voters", "Gen X": "Gen X voters" })[l] || RD_DEMO_SHORT[l] || l;
+  const said = opening.slice(0, 2).map((c, i) => short(c.cmp) + (i === 0 ? " have gone from " : " from ")
+    + rdX2(c.r0) + " to " + rdX2(c.r1) + " times as likely as " + short(c.ref)
+    + (i > 0 && c.party === opening[0].party ? "" : " to back " + DEMO_VOTE_FOR[c.party]));
+  const passed = sets.reduce((a, x) => a + x.opts.pass.length, 0), tested = sets.reduce((a, x) => a + x.opts.tested, 0);
+  const more = passed - said.length;
+  const dek = "Since the election, " + rdSerial(said, "and") + "."
+    + (more > 0 ? " " + (more === 1 ? "One more comparison has" : rdCap(rdNumWord(more)) + " more comparisons have") + " changed too; the charts’ menus list them." : "");
   return (
     <div className="rd-wv-gaps">
-      <RdSub head="Demographic gaps over time" dek="How each party’s primary vote differs between groups." />
+      <RdSub head="Gaps between groups that have changed since the election" dek={dek} />
       <div className="rd-chips" role="group" aria-label="Gap measure">
-        {[false, true].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (×)" : "Absolute (pp)"}</button>)}
+        {[true, false].map((r) => <button type="button" className="rd-chip" key={String(r)} aria-pressed={relative === r} onClick={() => setRelative(r)}>{r ? "Relative (×)" : "Absolute (pp)"}</button>)}
       </div>
-      <p className="rd-wv-gap-note">{relative && "A factor of 1.6× means the party’s vote share is 1.6 times as high in the comparison group as in the reference group. Months with a zero reference share are omitted. "}{model ? "Lines use the group model estimates." : "Lines use the monthly group averages."} All parties and comparisons within each set share the same scales. Hover, tap or use the chart’s arrow keys to see both groups’ primary votes. Both views show only comparisons where relative support changed over the available months. The approximate 95% test accounts for checking the whole series.</p>
-      {sets.map(({ st, references }) => <RdDemographicGapSet key={st.id} st={st} references={references} order={order} rangeId={rangeId} model={model} relative={relative} />)}
+      <p className="rd-wv-gap-note">{"Drawn only where a gap’s ratio has changed significantly since the election: 95%, after Holm’s correction for every pair of groups and every party in the set (" + passed + " of " + tested + " on this tab). The absolute view shows the same comparisons in points; a change in points alone never qualifies. "}{model ? "Lines are the group model’s monthly estimates" : "Lines are the monthly group averages"}; the charts in a card share one scale. Hover or tap for both groups’ votes.</p>
+      {sets.map(({ st, opts }) => <RdDemographicGapSet key={st.id} st={st} opts={opts} order={order} rangeId={rangeId} model={model} relative={relative} />)}
     </div>
   );
 });
@@ -4722,7 +4829,11 @@ function RdDemographics({ rangeId = "all" }) {
      grouping tabs, income tab included) over the tab's dek (rdDemoDek) ------ */
   const story = { head: rdDemoHead(T, party).head, dek: rdDemoDek(T, tab, party) };
 
-  const trendRows = (D.demoTrend?.[party]?.rows || []).filter(row => row.tab === tab.id);
+  /* ---- the composition change since the election: which groups have moved
+     out of step with the party's national line (rdDemoShift, from gen-data
+     §7gb's demoTrend - a late table, so it lands a beat after first paint) */
+  const dtP = D.demoTrend && D.demoTrend[party];
+  const shift = rdDemoShift(dtP, party);
 
   /* ---- the dot plot, every set on one scale -------------------------------- */
   const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)].concat((g.px && g.px[party]) || []))).concat([all]);
@@ -5160,7 +5271,10 @@ function RdDemographics({ rangeId = "all" }) {
           </div>
         ) : null}
       </div>
-      <RdRelativeFindings rows={trendRows} partyName={pName} />
+      {/* the composition change heads the change-over-time charts, its
+          battery folded under it (beside the claim it backs) */}
+      {shift && <RdSub head={shift.head} dek={shift.dek} glide />}
+      {shift && <RdDemoShiftTable dt={dtP} party={party} pName={pName} tabs={T.tabs} />}
       {/* keyed on the grouping: a switch of it brings the charts in fresh,
           faded rather than cut (a party switch keeps them and morphs) */}
       <div className="rd-wv-charts rd-wv-enter" key={"wv-" + tab.id}>{charts.map(chartOf)}</div>

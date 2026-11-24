@@ -40,7 +40,9 @@ const CYC_METRICS = [{
 }, {
   key: "ppmm",
   title: "Preferred prime minister",
-  sub: "PM’s lead on the preferred-PM question",
+  get sub() {
+    return window.AP && window.AP.D && window.AP.D.leaderModel ? "PM’s lead on the preferred-PM question, among those who chose one of the two" : "PM’s lead on the preferred-PM question";
+  },
   unit: "",
   fmt: fmtSigned1,
   step: 10,
@@ -725,6 +727,7 @@ function cycleReadings(c, M, D) {
   const out = [];
   const key = M.key,
     isOpp = M.leader === "opp";
+  const LM = !window.JUR && D.leaderModel && D.leaderModel.ratings ? D.leaderModel : null;
   if (c.current) {
     const mOf = iso => (Date.parse(iso) - Date.parse(c.eDate)) / 86400000 / MS_MONTH_C;
     for (const p of D.individualPolls) {
@@ -743,7 +746,10 @@ function cycleReadings(c, M, D) {
         const s = p.ppmSets ? p.ppmSets[0] : p.ppm;
         const ok = s && Object.keys(s).find(k => !["alb", "unc", "hanson"].includes(k));
         if (ok == null || s[ok] == null || s.alb == null) continue;
-        y = s.alb - s[ok];
+        if (LM) {
+          if ((LM.neither || []).includes(p.pollster) || !(s.alb + s[ok] > 0)) continue;
+          y = +(100 * (s.alb - s[ok]) / (s.alb + s[ok])).toFixed(2);
+        } else y = s.alb - s[ok];
       }
       if (y == null) continue;
       out.push({
@@ -780,9 +786,10 @@ function cycleReadings(c, M, D) {
   } else if (key === "ppmm") {
     for (const r of src.approval) {
       if (r.pmPpm == null || r.oppPpm == null || !inCycleRange(r.m)) continue;
+      if (LM && !(r.pmPpm + r.oppPpm > 0)) continue;
       out.push({
         x: r.m,
-        y: r.pmPpm - r.oppPpm,
+        y: LM ? +(100 * (r.pmPpm - r.oppPpm) / (r.pmPpm + r.oppPpm)).toFixed(2) : r.pmPpm - r.oppPpm,
         iso: r.date,
         meta: {
           pollster: r.firm,
@@ -6962,9 +6969,9 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "The headline."), " It names a group only when the group\u2019s figure sits clear of all voters\u2019 by more than its margin, and names each trait at most once each way. On a scale such as age or education, a lean at both ends is one fact: a party with older voters is named for them, not also for its missing young ones. A gap that stops short of the far end is a fact of its own, and states, which have no order, are named both ways. The age bands lead the generations. A generation replaces its band only when its gap is clearly the larger, and when the two disagree, age is left out. Up to five claims make the headline: those that most change the make-up of the party\u2019s voters."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Changes over time."), " The sentence under each chart asks whether a group has moved towards or away from the party, relative to all voters. The point-gap alone can\u2019t say. When a party grows everywhere, a group keeping its usual share of the party\u2019s vote sees its gap widen by arithmetic alone: a group at two-thirds of the national figure sits 3 points under when the party is on 8%, and 9 under at 27%. So each group is tested on its gap in points and on its ratio to all voters, which holds steady for a group merely keeping pace, and a change counts only when both pass, in the same direction. ", D.latest && D.latest.primaryModel ? React.createElement(React.Fragment, null, "Both tests read the model: the group\u2019s gap on polling day and today, drawn together from the model\u2019s simulations, so the change has an interval of its own. A change counts when its 95% interval, on the gap and on the ratio, stays clear of zero.") : React.createElement(React.Fragment, null, "Each test is a line through the monthly readings, tighter months counting for more. A group needs five monthly readings to be tested, and on seven or fewer the sentence hedges (\u201Cappears to\u201D).")), React.createElement("span", {
+      }, React.createElement("b", null, "Changes over time."), " The heading and sentence above the charts ask whether a group has moved towards or away from the party, relative to all voters. Only the ratio counts: the group\u2019s share of the party\u2019s vote over the national share. When a party grows everywhere, a group keeping its usual share of the party\u2019s vote sees its gap in points widen by arithmetic alone: a group at two-thirds of the national figure sits 3 points under when the party is on 8%, and 9 under at 27%, while its ratio holds at 0.67. ", D.latest && D.latest.primaryModel ? React.createElement(React.Fragment, null, "The ratio is read from the model: the group\u2019s share and the national share on polling day and today, drawn together from the model\u2019s simulations, so the change has an interval of its own.") : React.createElement(React.Fragment, null, "The ratio\u2019s change is a line through the monthly readings, tighter months counting for more, and a group needs five monthly readings to be tested."), " Every group is tested for each party, more than 30 in all, and on a plain 95% test one or two would pass by chance in a typical month even if none had moved. So a change counts only when its 95% interval stays clear of no change after Holm\u2019s correction for every group tested: the chance that any change the sentence names is a false alarm is then under 1 in 20. The table under the sentence lists every group with both verdicts. The charts of gaps between groups follow the same rule, corrected across every pair of groups and every party in the set, and appear only where a gap has changed."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Since the election."), " The sentence also asks whether a group has moved since the 2025 election, on the same two tests. ", D.latest && D.latest.primaryModel ? React.createElement(React.Fragment, null, "It starts from the model\u2019s figure for the group on polling day: the 2025 count moved by the group\u2019s gap then, which the pollsters\u2019 tables before and after the election place (and, for the states and seat types, the count itself). The group\u2019s line starts there.") : React.createElement(React.Fragment, null, "It starts from the polls\u2019 own figure for the group over the six weeks before polling day: the pollsters\u2019 published tables then, pooled just as today\u2019s figures are, and drawn on the charts as an open triangle."), " Both ends are the same polls, so a difference is movement. The Australian Election Study, a survey after the election of how people voted, is drawn beside it as a diamond. At the election it read several groups differently from the polls by more than both margins, among them Labor\u2019s and the Greens\u2019 gender gaps, so it is the starting point only for generations, which no pollster cut before the election."), React.createElement("span", {
+      }, React.createElement("b", null, "Since the election."), " The change is measured from the 2025 election. ", D.latest && D.latest.primaryModel ? React.createElement(React.Fragment, null, "It starts from the model\u2019s figure for the group on polling day: the 2025 count moved by the group\u2019s gap then, which the pollsters\u2019 tables before and after the election place (and, for the states and seat types, the count itself). The group\u2019s line starts there.") : React.createElement(React.Fragment, null, "It starts from the polls\u2019 own figure for the group over the six weeks before polling day: the pollsters\u2019 published tables then, pooled just as today\u2019s figures are, and drawn on the charts as an open triangle."), " Both ends are the same polls, so a difference is movement. The Australian Election Study, a survey after the election of how people voted, is drawn beside it as a diamond. At the election it read several groups differently from the polls by more than both margins, among them Labor\u2019s and the Greens\u2019 gender gaps, so it is the starting point only for generations, which no pollster cut before the election."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Limits."), " The margins can\u2019t see pollsters defining or weighting a group differently, and a pollster that joins the series part-way, reading a group its own way, can move a monthly line by that alone. The test looks for steady change, so a rise and a fall within the period cancel out."), working(React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
@@ -7113,9 +7120,9 @@ function infoTerms(D) {
       id: "past-cycles",
       body: React.createElement(React.Fragment, null, "Every term since 1972, lined up on its own election day, so a given month is the same distance into every term. Compare this term with every past term, or only those whose government was re-elected or ousted, as a level or as the change since the election.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "How it\u2019s built."), " Past terms are averaged month by month the way this term is. A month with no poll is filled in from the months either side, dashed on a drawn term. A line\u2019s dotted start runs from the election\u2019s count to the term\u2019s first poll, and its dotted end from the final poll to the next election\u2019s count."), React.createElement("span", {
+      }, React.createElement("b", null, "How it\u2019s built."), " ", D.leaderModel ? React.createElement(React.Fragment, null, "Votes are averaged month by month the way this term\u2019s are. The leaders\u2019 lines are the", " ", xref("leadership", "past cycles", "leadership model’s"), " estimates, the same lines the leadership charts draw: each person\u2019s line starts at their first poll and ends at their last, and a term that changed leader draws each person apart.") : React.createElement(React.Fragment, null, "Past terms are averaged month by month the way this term is."), " A month with no poll is filled in from the months either side, dashed on a drawn term. A vote line\u2019s dotted start runs from the election\u2019s count to the term\u2019s first poll, and its dotted end from the final poll to the next election\u2019s count."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "The measures."), " Two-party preferred is implied from each poll\u2019s primary votes, through the", " ", xref("last-election-flows", "past cycles", "flows of the election that opened its term"), ". The primary vote is the governing party\u2019s and the main opposition party\u2019s. The leaders are rated by net approval since 1972 and preferred prime minister since 1984, following whoever held the office; the earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s, and favourability ratings are left out. How the final polls have done scores the polls against each result (see ", xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?"), "). The CSV download holds every poll behind the terms shown."))
+      }, React.createElement("b", null, "The measures."), " Two-party preferred is implied from each poll\u2019s primary votes, through the", " ", xref("last-election-flows", "past cycles", "flows of the election that opened its term"), ". The primary vote is the governing party\u2019s and the main opposition party\u2019s. The leaders are rated by net approval since 1971 and preferred prime minister since 1987, following whoever held the office; the earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s.", D.leaderModel ? React.createElement(React.Fragment, null, " Net approval is on the approval pollsters\u2019 scale. Preferred prime minister is the lead among those who chose one of the two, as on the leadership charts.") : React.createElement(React.Fragment, null, " Favourability ratings are left out."), " How the final polls have done scores the polls against each result (see ", xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?"), "). The CSV download holds every poll behind the terms shown."))
     },
     entries: [{
       id: "last-election-flows",

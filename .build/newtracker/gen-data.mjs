@@ -7861,8 +7861,58 @@ const demoTrend = (() => {
     return { slope, t: slope / Math.sqrt((sse / (n - 2)) / Sxx), at };
   };
   const rr = (v) => Math.round(v * 100) / 100;
+  /* Two-sided tail probabilities. zTail: P(|Z| > z), Abramowitz & Stegun
+     7.1.26 (error under 1.5e-7). tTail: P(|T| > t) on df degrees of freedom,
+     the regularised incomplete beta I_x(df/2, 1/2) at x = df/(df + t²) by its
+     continued fraction (Numerical Recipes betacf). tQ: the two-sided 95%
+     point of t, by bisection on tTail. */
+  const zTail = (z) => {
+    const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + 0.3275911 * x);
+    return t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
+  };
+  const lgam = (x) => {
+    const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    let y = x, tmp = x + 5.5, ser = 1.000000000190015;
+    tmp -= (x + 0.5) * Math.log(tmp);
+    for (const ci of c) ser += ci / ++y;
+    return -tmp + Math.log(2.5066282746310005 * ser / x);
+  };
+  const betacf = (a, b, x) => {
+    let c = 1, d = 1 - (a + b) * x / (a + 1);
+    d = 1 / (Math.abs(d) < 1e-30 ? 1e-30 : d);
+    let h = d;
+    for (let m = 1; m <= 200; m++) {
+      const m2 = 2 * m;
+      let aa = m * (b - m) * x / ((a + m2 - 1) * (a + m2));
+      d = 1 + aa * d; d = 1 / (Math.abs(d) < 1e-30 ? 1e-30 : d); c = 1 + aa / c; c = Math.abs(c) < 1e-30 ? 1e-30 : c; h *= d * c;
+      aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + m2 + 1));
+      d = 1 + aa * d; d = 1 / (Math.abs(d) < 1e-30 ? 1e-30 : d); c = 1 + aa / c; c = Math.abs(c) < 1e-30 ? 1e-30 : c;
+      const del = d * c; h *= del;
+      if (Math.abs(del - 1) < 3e-12) break;
+    }
+    return h;
+  };
+  const ibeta = (a, b, x) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    const bt = Math.exp(lgam(a + b) - lgam(a) - lgam(b) + a * Math.log(x) + b * Math.log(1 - x));
+    return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b;
+  };
+  const tTail = (t, df) => ibeta(df / 2, 0.5, df / (df + t * t));
+  const tQ = (df) => { let lo = 1.9, hi = 15; for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (tTail(m, df) > 0.05) lo = m; else hi = m; } return (lo + hi) / 2; };
+  /* Holm's step-down adjustment: each p times the number of tests not yet
+     passed, held non-decreasing in rank. A family's claims at padj < 0.05
+     carry under a 1-in-20 chance of naming ANY false move, whatever the
+     dependence between the tests (states nest, age bands and generations
+     overlap). */
+  const holm = (items) => {
+    const live = items.filter((r) => Number.isFinite(r.p)).sort((a, b) => a.p - b.p);
+    let run = 0;
+    live.forEach((r, k) => { run = Math.max(run, Math.min(1, (live.length - k) * r.p)); r.padj = run; });
+    return live.length;
+  };
   const out = {};
-  /* the income tab's two standard bands run the same two-stage test from
+  /* the income tab's two standard bands run the relative test from
      their own iRowsT months (a pooled release counted once, as every set
      here). Appended as a tab of the loop's own shape, so an earnings
      proportionality break takes its place beside the harmonised groups' –
@@ -7874,9 +7924,9 @@ const demoTrend = (() => {
   for (let pid = 0; pid < KEYS.length; pid++) {
     const party = KEYS[pid];
     const moves = [];
-    // rows: every group with enough monthly points, PASS OR FAIL, so the
-    // Who-votes trend-significance table can show the whole test battery;
-    // `moves` above it stays the dek's significant-only list, unchanged
+    // rows: every group tested, PASS OR FAIL, so the Who-votes table can
+    // show the whole battery; `moves` is the copy's list: the rows whose
+    // Holm-adjusted relative change clears 95% and isn't withheld
     const rows = [];
     let windowYm = null;
     for (const tab of trendTabs) {
@@ -7886,21 +7936,21 @@ const demoTrend = (() => {
           /* the test's own months (DEMO_TEST_MONTHLY): the drawn line's,
              except that a pooled release counts once, not once per part */
           /* federal: the group model's own move against all voters since
-             polling day (§7gm since), significant when both the point gap's
-             and the log ratio's 95% intervals exclude zero the same way */
+             polling day (§7gm since), on the log ratio alone – the group's
+             share over the national share, then and now, from the two days'
+             draws together. Absolute moves don't count (user ruling
+             2026-11-24): a party growing everywhere widens every point gap
+             with no change in who its voters are */
           const gmS = GROUPM && GROUPM.get(st.id + "|" + g.label), sv = gmS && gmS.since && gmS.since[party];
           if (sv) {
-            const sigG = sv.gap.lo > 0 || sv.gap.hi < 0, sigR = sv.lr.lo > 0 || sv.lr.hi < 0;
-            const sig = sigG && sigR && Math.sign(sv.gap.v) === Math.sign(sv.lr.v);
             const fromYm = ELECTION.date.slice(0, 7), toYm = demographics.allMonthly[demographics.allMonthly.length - 1][0];
             if (!windowYm || fromYm < windowYm) windowYm = fromYm;
-            const row = { tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label, from: fromYm, to: toYm,
+            rows.push({ tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label, from: fromYm, to: toYm,
               dir: sv.lr.v >= 0 ? 1 : -1, tAbs: rr(sv.gap.z), tLR: rr(sv.lr.z), thin: false, months: (g.monthly || []).length,
-              g0: rr(sv.g0), g1: rr(sv.g1), a0: rr(sv.a0), a1: rr(sv.a1), rel: rr(sv.gap.v), sig, model: true,
-              ratioChange: { factor: Math.exp(sv.lr.v), low: Math.exp(sv.lr.lo), high: Math.exp(sv.lr.hi) },
-              gapLo: rr(sv.gap.lo), gapHi: rr(sv.gap.hi), lrLo: rr(sv.lr.lo), lrHi: rr(sv.lr.hi) };
-            rows.push(row);
-            if (sig) moves.push({ ...row, r0: rr(sv.g0 / sv.a0), r1: rr(sv.g1 / sv.a1) });
+              g0: rr(sv.g0), g1: rr(sv.g1), a0: rr(sv.a0), a1: rr(sv.a1), rel: rr(sv.gap.v), model: true,
+              r0: rr(sv.g0 / sv.a0), r1: rr(sv.g1 / sv.a1),
+              lr: +sv.lr.v.toFixed(4), lrLo: +sv.lr.lo.toFixed(4), lrHi: +sv.lr.hi.toFixed(4), p: zTail(sv.lr.z),
+              gapLo: rr(sv.gap.lo), gapHi: rr(sv.gap.hi) });
             continue;
           }
           const tm = DEMO_TEST_MONTHLY.get(st.id + "|" + g.label) || g.monthly || [];
@@ -7927,12 +7977,19 @@ const demoTrend = (() => {
           const lo = Math.min(...xs), hi = Math.max(...xs);
           const gl = wls(xs, gs, ws), al = wls(xs, as, ws);
           const g0 = rr(gl.at(lo)), g1 = rr(gl.at(hi)), a0 = rr(al.at(lo)), a1 = rr(al.at(hi));
-          /* both tests must pass AND agree on the direction: a growing party
-             can lift a low group's ratio while its point gap still widens
-             (One Nation among graduates, Oct 2026: t on the gap −3.0, on the
-             ratio +2.6), and that is no move either way - the copy would read
-             "towards" with a negative figure */
-          const sig = !!(f1 && f2 && Math.abs(f1.t) >= 1.96 && Math.abs(f2.t) >= 1.96 && Math.sign(f1.t) === Math.sign(f2.t));
+          /* the relative test (user ruling 2026-11-24: absolute moves don't
+             count – a party growing everywhere widens every point gap): the
+             slope of log(group / all voters) across the window, as a change
+             from the first fitted month to the last, its 95% interval on
+             Student's t with the fit's own degrees of freedom */
+          let lrv = null, lrLo = null, lrHi = null, p = null, r0 = null, r1 = null;
+          if (f2) {
+            const lx0 = Math.min(...lx), lx1 = Math.max(...lx), span = lx1 - lx0, df = lx.length - 2;
+            lrv = f2.slope * span;
+            const se = Math.abs(f2.slope / f2.t) * span, q = tQ(df);
+            lrLo = lrv - q * se; lrHi = lrv + q * se; p = tTail(f2.t, df);
+            r0 = rr(Math.exp(f2.at(lx0))); r1 = rr(Math.exp(f2.at(lx1)));
+          }
           rows.push({
             tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
             from: demographics.allMonthly[lo][0], to: demographics.allMonthly[hi][0],
@@ -7940,21 +7997,16 @@ const demoTrend = (() => {
             tAbs: f1 ? rr(f1.t) : null, tLR: f2 ? rr(f2.t) : null,
             // seven or fewer monthly points: a handful of waves, one or two houses
             thin: xs.length <= 7, months: xs.length,
-            g0, g1, a0, a1, rel: rr((g1 - g0) - (a1 - a0)), sig,
-          });
-          if (!sig) continue;
-          moves.push({
-            tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
-            dir: f2.t > 0 ? 1 : -1,
-            tAbs: rr(f1.t), tLR: rr(f2.t),
-            thin: xs.length <= 7, months: xs.length,
-            g0, g1, a0, a1,
-            r0: rr(Math.exp(f2.at(Math.min(...lx)))), r1: rr(Math.exp(f2.at(Math.max(...lx)))),
+            g0, g1, a0, a1, rel: rr((g1 - g0) - (a1 - a0)), r0, r1,
+            ...(f2 ? { lr: +lrv.toFixed(4), lrLo: +lrLo.toFixed(4), lrHi: +lrHi.toFixed(4), p } : {}),
           });
         }
       }
     }
-    moves.sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
+    /* one family per party: every group tested, Holm-adjusted (above) */
+    const tested = holm(rows);
+    /* on the model, the same-house check (the election test's below) can
+       withhold a move: rows carry it once elecRows is built */
     /* The election test (user rulings 2026-11-02 and 2026-11-03), beside
        – never inside – the slope test above: for every group with an
        election-time figure, has its gap from all voters moved since the
@@ -8038,22 +8090,83 @@ const demoTrend = (() => {
           claim: sig && !(check && check.conflict) });
       }
     }
-    /* on the model the slope test and the election test measure one thing
+    /* on the model the change test and the election test measure one thing
        (the move since polling day), so a move the same-house check
-       contradicts is dropped from the moves as it is from the claims */
+       contradicts is withheld from the moves as it is from the claims */
     const modelMoves = rows.some((r) => r.model);
     if (modelMoves) for (const r of rows) {
       const e = elecRows.find((q) => q.set === r.set && q.group === r.group);
       if (e && e.check) r.check = e.check;
     }
-    if (modelMoves) for (let i = moves.length - 1; i >= 0; i--) {
-      const e = elecRows.find((q) => q.set === moves[i].set && q.group === moves[i].group);
-      if (e && e.check && e.check.conflict) { moves[i].conflict = true; moves.splice(i, 1); }
+    /* a move: its relative change clears 95% after Holm across the party's
+       tested groups, and no same-house reading contradicts it */
+    for (const r of rows) {
+      r.sigAlone = Number.isFinite(r.p) && r.p < 0.05;
+      r.sig = Number.isFinite(r.padj) && r.padj < 0.05;
+      if (r.p != null) { r.p = +r.p.toPrecision(3); r.padj = +r.padj.toPrecision(3); }
+      if (r.sig && !(r.check && r.check.conflict)) moves.push(r);
     }
-    out[party] = { windowYm, moves, rows, elec: elecRows, ...(modelMoves ? { model: true } : {}) };
+    moves.sort((a, b) => a.p - b.p);
+    out[party] = { windowYm, moves, rows, tested, elec: elecRows, ...(modelMoves ? { model: true } : {}) };
   }
+  /* ---- the gap charts' test (Who votes for whom, "Gaps between groups"):
+     has one group's vote moved against another's, relative to it, since
+     the election? On the model it is the two groups' own relative moves
+     differenced – log(gA/gB) then and now is log(gA/all) less log(gB/all),
+     so the national line cancels exactly – with the groups' posteriors
+     independent, as the model fits them (one walk per group). The income
+     bands, off the model, take the slope of log(gA/gB) across their months,
+     as their test against all voters does. A set's family is every pair
+     of its groups (a state never against its own bucket) times every
+     party, Holm-adjusted; only the pairs that pass are shipped, with the
+     family's size. A pair is stored once, a before b in the set's order. */
+  const NEST = { SA: "Non-NSW/Vic/Qld", WA: "Non-NSW/Vic/Qld", "ACT/NT/Tas": "Non-NSW/Vic/Qld" };
+  const gapTests = {};
+  for (const tab of trendTabs) for (const st of tab.sets) {
+    const fam = [], G = st.groups;
+    for (let i = 0; i < G.length; i++) for (let j = i + 1; j < G.length; j++) {
+      const A = G[i].label, B = G[j].label;
+      if (NEST[A] === B || NEST[B] === A) continue;
+      for (let pid = 0; pid < KEYS.length; pid++) {
+        const party = KEYS[pid];
+        const sa = GROUPM && GROUPM.get(st.id + "|" + A)?.since?.[party];
+        const sb = GROUPM && GROUPM.get(st.id + "|" + B)?.since?.[party];
+        if (sa && sb) {
+          const sd = (x) => (x.lr.hi - x.lr.lo) / 3.92;
+          const d = sa.lr.v - sb.lr.v, se = Math.hypot(sd(sa), sd(sb));
+          if (!(se > 0)) continue;
+          fam.push({ a: A, b: B, party, r0: sa.g0 / sb.g0, r1: sa.g1 / sb.g1, lr: d, lo: d - 1.96 * se, hi: d + 1.96 * se, p: zTail(d / se), model: true });
+          continue;
+        }
+        const ma = DEMO_TEST_MONTHLY.get(st.id + "|" + A), mb = new Map((DEMO_TEST_MONTHLY.get(st.id + "|" + B) || []).map((r) => [r[0], r]));
+        if (!ma) continue;
+        const lx = [], ly = [], lw = [];
+        for (const ra of ma) {
+          const rb = mb.get(ra[0]), ga = ra[1 + pid], gb = rb && rb[1 + pid];
+          if (!rb || !(ga > 0.05) || !(gb > 0.05) || !ymIdx.has(ra[0])) continue;
+          const va = (Math.max(0.5, ra[6 + pid]) / 1.96 / ga) ** 2, vb = (Math.max(0.5, rb[6 + pid]) / 1.96 / gb) ** 2;
+          lx.push(ymIdx.get(ra[0])); ly.push(Math.log(ga / gb)); lw.push(1 / (va + vb));
+        }
+        const f = lx.length >= 5 ? wls(lx, ly, lw) : null;
+        if (!f || !Number.isFinite(f.t)) continue;
+        const x0 = Math.min(...lx), x1 = Math.max(...lx), span = x1 - x0, df = lx.length - 2;
+        const d = f.slope * span, se = Math.abs(f.slope / f.t) * span, q = tQ(df);
+        fam.push({ a: A, b: B, party, r0: Math.exp(f.at(x0)), r1: Math.exp(f.at(x1)), lr: d, lo: d - q * se, hi: d + q * se, p: tTail(f.t, df),
+          from: demographics.allMonthly[x0][0], to: demographics.allMonthly[x1][0] });
+      }
+    }
+    const m = holm(fam);
+    if (!m) continue;
+    gapTests[st.id] = { tested: m, pass: fam.filter((r) => r.padj < 0.05).sort((x, y) => x.p - y.p).map((r) => ({
+      a: r.a, b: r.b, party: r.party, r0: rr(r.r0), r1: rr(r.r1), lr: +r.lr.toFixed(4), lo: +r.lo.toFixed(4), hi: +r.hi.toFixed(4),
+      p: +r.p.toPrecision(3), padj: +r.padj.toPrecision(3), ...(r.model ? { model: true } : { from: r.from, to: r.to }) })) };
+  }
+  out._gaps = gapTests;
   return out;
 })();
+/* the gap charts' pair tests, shipped apart from the per-party map */
+const demoGaps = demoTrend ? demoTrend._gaps : null;
+if (demoTrend) delete demoTrend._gaps;
 
 /* ---- 7h. the issues: what matters, and who is trusted with it --------------
    data/issues.json (.build/issues.mjs) – each house's issue questions, per
@@ -11714,6 +11827,10 @@ window.AUSPOL = (function () {
   /* Composition trend (§7gb): per party, the groups that have moved toward
      or away from it out of proportion to the all-voters line. */
   const demoTrend = ${JSON.stringify(demoTrend)};
+  /* Gaps between groups (§7gb): per set, the pairs whose relative gap has
+     moved since the election, Holm-adjusted across the set's pairs and
+     parties, and how many were tested. */
+  const demoGaps = ${JSON.stringify(demoGaps)};
   /* The By-state panels' 2025 election marks (§7g): each group's result per
      party, in order, with the election's mid-month x. */
   const demoStateElection = ${JSON.stringify(DEMO_STATE_ELECTION)};
@@ -11923,7 +12040,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

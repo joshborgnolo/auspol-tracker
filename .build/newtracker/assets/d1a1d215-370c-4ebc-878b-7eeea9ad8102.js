@@ -8831,22 +8831,27 @@ function infoTerms(D) {
         The age bands lead the generations. A generation replaces its band only when its gap is
         clearly the larger, and when the two disagree, age is left out. Up to five claims make the
         headline: those that most change the make-up of the party’s voters.</span>
-        <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks
-        whether a group has moved towards or away from the party, relative to all voters. The
-        point-gap alone can’t say. When a party grows everywhere, a group keeping its usual share
-        of the party’s vote sees its gap widen by arithmetic alone: a group at two-thirds of the
-        national figure sits 3 points under when the party is on 8%, and 9 under at 27%. So each
-        group is tested on its gap in points and on its ratio to all voters, which holds steady for
-        a group merely keeping pace, and a change counts only when both pass, in the same
-        direction. {D.latest && D.latest.primaryModel
-        ? <>Both tests read the model: the group’s gap on polling day and today, drawn together
-        from the model’s simulations, so the change has an interval of its own. A change counts
-        when its 95% interval, on the gap and on the ratio, stays clear of zero.</>
-        : <>Each test is a line
-        through the monthly readings, tighter months counting for more. A group needs five monthly
-        readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</>}</span>
-        <span className="info-p"><b>Since the election.</b> The sentence also asks whether a group
-        has moved since the 2025 election, on the same two tests. {D.latest && D.latest.primaryModel
+        <span className="info-p"><b>Changes over time.</b> The heading and sentence above the
+        charts ask whether a group has moved towards or away from the party, relative to all
+        voters. Only the ratio counts: the group’s share of the party’s vote over the national
+        share. When a party grows everywhere, a group keeping its usual share of the party’s vote
+        sees its gap in points widen by arithmetic alone: a group at two-thirds of the national
+        figure sits 3 points under when the party is on 8%, and 9 under at 27%, while its ratio
+        holds at 0.67. {D.latest && D.latest.primaryModel
+        ? <>The ratio is read from the model: the group’s share and the national share on polling
+        day and today, drawn together from the model’s simulations, so the change has an interval
+        of its own.</>
+        : <>The ratio’s change is a line through the monthly readings, tighter months counting for
+        more, and a group needs five monthly readings to be tested.</>} Every group is tested for
+        each party, more than 30 in all, and on a plain 95% test one or two would pass by chance in a
+        typical month even if none had moved. So a change counts only when its 95% interval stays
+        clear of no change after Holm’s correction for every group tested: the chance that any
+        change the sentence names is a false alarm is then under 1 in 20. The table under the
+        sentence lists every group with both verdicts. The charts of gaps between groups follow
+        the same rule, corrected across every pair of groups and every party in the set, and
+        appear only where a gap has changed.</span>
+        <span className="info-p"><b>Since the election.</b> The change is measured from the 2025
+        election. {D.latest && D.latest.primaryModel
         ? <>It starts from the model’s figure for the group on polling day: the 2025 count moved by
         the group’s gap then, which the pollsters’ tables before and after the election place (and,
         for the states and seat types, the count itself). The group’s line starts there.</>

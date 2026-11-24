@@ -11,7 +11,7 @@
       overlap questions of 2026-10-11: Gen Z v 18–34, opposite leans on one
       scale v across states, 55+ beside Gen X and Boomers;
    3. 300 randomised payloads - invariants that must hold for any pool;
-   4. composition-trend cases on mutated demoTrend moves.
+   4. composition-change cases on built demoTrend payloads.
    Usage: BASE=<checkout> node .matilda/probe/wv-copy-rules.mjs */
 import { createRequire } from "module";
 import path from "path";
@@ -244,38 +244,53 @@ const rnd = await page.evaluate(() => {
 });
 check(rnd.length === 0, "300 random pools x 5 parties: no invariant broken (" + rnd.length + " issues)", rnd.slice(0, 6));
 
-/* ---- 4. the composition trend ------------------------------------------ */
-console.log("\n4. composition trend");
+/* ---- 4. the composition change ----------------------------------------
+   rdDemoShift on the live payload and on built ones (rules: rd-panels.jsx,
+   the comment above RD_TREND_NAME - relative moves only, Holm across every
+   group tested, the national line sets the verb) */
+console.log("\n4. composition change");
 const tr = await page.evaluate(() => {
-  const _d = window.AUSPOL.demographics, _i = window.AUSPOL.demoIncome, DT = window.AUSPOL.demoTrend;
-  const T = _d && _i ? { ..._d, tabs: [..._d.tabs, _i] } : _d;
-  const mv = (o) => ({ tab: "place", set: "state", setLabel: "By state", dir: 1, tAbs: 3, tLR: 3, thin: false, months: 12, g0: 30, g1: 30, a0: 30, a1: 25, ...o });
-  const mk = (moves) => ({ windowYm: "2025-07", moves, rows: [] });
+  const DT = window.AUSPOL.demoTrend;
+  const row = (o) => ({ tab: "place", set: "state", setLabel: "By state", group: "Vic", from: "2025-05", to: "2026-11", model: true,
+    g0: 30, g1: 27, a0: 30, a1: 24, r0: 1, r1: 1.125, lr: Math.log(1.125), lrLo: 0.05, lrHi: 0.2, dir: 1, p: 0.001, padj: 0.03, sig: true, sigAlone: true, ...o });
+  const mk = (rows) => ({ windowYm: "2025-05", rows, tested: 33, moves: rows.filter((r) => r.sig && !(r.check && r.check.conflict)).sort((x, y) => x.p - y.p) });
+  const quiet = (o) => row({ sig: false, sigAlone: false, p: 0.3, padj: 1, ...o });
   const out = {};
-  out.payloadAgree = Object.values(DT).every((d) => d.moves.every((m) => Math.sign(m.tAbs) === Math.sign(m.tLR)));
-  out.live = ["onp", "alp", "lnp", "grn", "oth"].map((p) => rdDemoShift(DT[p], T, p));
-  out.bucket = rdDemoShift(mk([mv({ group: "Non-NSW/Vic/Qld" })]), T, "alp");
-  out.trio = rdDemoShift(mk([mv({ group: "ACT/NT/Tas" })]), T, "alp");
-  out.rising = rdDemoShift(mk([mv({ group: "Vic", dir: -1, tAbs: -3, tLR: -3, g0: 10, g1: 20, a0: 8, a1: 27 })]), T, "onp");
-  out.slower = rdDemoShift(mk([mv({ tab: "place", set: "location", group: "Rural", g0: 30, g1: 27, a0: 30, a1: 24 })]), T, "lnp");
-  out.lnpGroup = rdDemoShift(mk([mv({ tab: "home", set: "housing", group: "Renting", dir: -1, tAbs: -3, tLR: -3, g0: 25, g1: 15, a0: 25, a1: 20 })]), T, "lnp");
-  out.thinHeld = rdDemoShift(mk([
-    mv({ group: "Vic", tLR: 5 }), mv({ tab: "home", set: "housing", group: "Renting", tLR: 4 }), mv({ tab: "home", set: "language", group: "Other language", tLR: 3.5 }),
-    mv({ tab: "home", set: "working", group: "Retired", thin: true, tLR: 3 })]), T, "alp");
-  out.allThin = rdDemoShift(mk([mv({ group: "Vic", thin: true })]), T, "alp");
+  out.payload = Object.entries(DT).flatMap(([p, d]) => d.rows.filter((r) => (r.sig !== (r.padj < 0.05)) || (r.sig && !(r.lrLo > 0 || r.lrHi < 0))).map((r) => p + "/" + r.group))
+    .concat(Object.entries(DT).flatMap(([p, d]) => d.moves.filter((m) => !m.sig || (m.check && m.check.conflict)).map((m) => p + "/" + m.group + " (move)")));
+  out.live = ["onp", "alp", "lnp", "grn", "oth"].map((p) => rdDemoShift(DT[p], p));
+  out.none = rdDemoShift(mk([quiet({}), quiet({ group: "Qld", sigAlone: true, p: 0.006, padj: 0.2, r0: 1.1, r1: 0.96, dir: -1 })]), "lnp");
+  out.noneClean = rdDemoShift(mk([quiet({})]), "alp");
+  out.falling = rdDemoShift(mk([row({ p: 0.0001 }), row({ tab: "education", set: "education", setLabel: "Education", group: "University", p: 0.0004, r0: 0.98, r1: 1.09 }),
+    row({ tab: "home", set: "housing", setLabel: "By housing", group: "Renting", dir: -1, p: 0.001, r0: 0.69, r1: 0.6, lrLo: -0.2, lrHi: -0.05 })]), "lnp");
+  out.awayFirst = rdDemoShift(mk([row({ group: "Qld", dir: -1, p: 0.0001, r0: 1.1, r1: 0.9 }), row({ group: "Vic", p: 0.0003 })]), "lnp");
+  out.risingSlower = rdDemoShift(mk([row({ group: "WA", dir: -1, g0: 7.6, g1: 25.4, a0: 6.4, a1: 24.9, r0: 1.19, r1: 1.02 })]), "onp");
+  out.risingFell = rdDemoShift(mk([row({ group: "WA", dir: -1, g0: 12, g1: 10, a0: 6.4, a1: 24.9, r0: 1.9, r1: 0.4 })]), "onp");
+  out.flat = rdDemoShift(mk([row({ tab: "place", set: "location", group: "Rural", a0: 12, a1: 12.5, g0: 10, g1: 13 })]), "grn");
+  out.many = rdDemoShift(mk(["NSW", "Vic", "Qld", "SA", "WA"].map((g, i) => row({ group: g, p: 0.0001 * (i + 1) }))), "alp");
+  out.income = rdDemoShift(mk([row({ tab: "income", set: "income", setLabel: "By income", group: "Higher earners (top 15%)", model: undefined, from: "2025-08" })]), "oth");
+  out.withheld = rdDemoShift(mk([row({ check: { conflict: true } })]), "alp");
   return out;
 });
-check(tr.payloadAgree, "gen-data: every demoTrend move's two tests agree in sign");
-for (const s of tr.live) if (s) check(!/The composition of The /.test(s.head) && !/ {2}|undefined/.test(s.head + s.dek), "live trend copy is clean: " + s.head, s);
-check(/losing voters faster in the eastern-mainland states/.test(tr.bucket.head) && /away from the eastern-mainland states, and towards the non-eastern-mainland states \(\+5 points relative to all Labor voters\)/.test(tr.bucket.dek),
-  "bucket move: complement named as the eastern mainland, figure on the moving side only", tr.bucket);
-check(!/South Australia, Western Australia/.test(tr.trio.dek) && /towards Tasmania, the ACT and the NT/.test(tr.trio.dek), "trio move: no five-state complement list", tr.trio);
-check(/gaining more slowly in Victoria/.test(tr.rising.head), "a rising party's away move: 'gaining more slowly', never 'losing voters faster'", tr.rising);
-check(/falling more slowly than the national vote/.test(tr.slower.dek) && /relative to the overall decrease/.test(tr.slower.dek), "a group falling slower than its party: 'falling more slowly', not 'rising'", tr.slower);
-check(/^The composition of the Coalition’s vote is shifting$/.test(tr.lnpGroup.head) && /^Since July 2025, the composition of the Coalition’s vote has shifted away from renters/.test(tr.lnpGroup.dek), "lnp: lower-case article mid-sentence; an opening group sentence names its subject", tr.lnpGroup);
-check(!/appears/.test(tr.thinHeld.dek), "a thin move stays out while a solid set was left out for room", tr.thinHeld);
-check(/is unchanged$/.test(tr.allThin.head), "all-thin -> the unchanged pair", tr.allThin);
-console.log("     " + tr.bucket.head + " / " + tr.bucket.dek + "\n     " + tr.slower.dek);
+check(tr.payload.length === 0, "gen-data: significant = Holm-adjusted p under 0.05 with an interval clear of no change; moves never withheld", tr.payload);
+for (const s of tr.live) if (s) check(!/ {2}|undefined|NaN/.test(s.head + s.dek) && /^Since the election, /.test(s.dek), "live copy is clean: " + s.head, s);
+check(/^The composition of the Coalition’s vote hasn’t changed significantly since the election$/.test(tr.none.head)
+  && /fallen from 30\.0% to 24\.0% nationally, and no group’s support relative to all voters has changed significantly\./.test(tr.none.dek)
+  && /The largest move, among voters in Queensland \(1\.10 to 0\.96 times as likely as all voters to back it\), clears 95% on its own but not once all 33 groups tested are allowed for\./.test(tr.none.dek),
+  "no move: the null head, the national line, and the nearest miss with why it isn't named", tr.none);
+check(!/largest move/.test(tr.noneClean.dek), "no move and no near miss: no near-miss sentence", tr.noneClean);
+check(tr.falling.head === "The Coalition is holding up better in Victoria and among university graduates", "a falling party: 'holding up better', a same-way second move merged", tr.falling);
+check(/as the Coalition’s vote has fallen from 30\.0% to 24\.0% nationally, voters in Victoria have gone from 1\.00 to 1\.13 times as likely as all voters to back the Coalition and university graduates from 0\.98 to 1\.09 times\. Renters have gone the other way, from 0\.69 to 0\.60 times\.$/.test(tr.falling.dek),
+  "the dek: national line, ratios both ends, the other direction in its own sentence", tr.falling);
+check(tr.awayFirst.head === "The Coalition is losing voters faster in Queensland", "an opposite-direction move never merges into the head", tr.awayFirst);
+check(/^One Nation is gaining more slowly in Western Australia$/.test(tr.risingSlower.head), "a rising party, group rising less: 'gaining more slowly'", tr.risingSlower);
+check(/^One Nation is losing ground in Western Australia$/.test(tr.risingFell.head), "a rising party, group falling: 'losing ground', never 'gaining more slowly'", tr.risingFell);
+check(/^The Greens are gaining ground in rural areas$/.test(tr.flat.head) && /the Greens’ vote has held near 12\.5% nationally/.test(tr.flat.dek), "a flat party: 'gaining ground'; the Greens plural", tr.flat);
+check(/Two more groups have also shifted; the table lists every group tested\.$/.test(tr.many.dek), "more than three moves: three named, the rest counted", tr.many);
+check(/^Others & independents are /.test(tr.income.head) && /to back others & independents since August 2025/.test(tr.income.dek) && /the vote for others & independents has/.test(tr.income.dek),
+  "off-model income move: its own window named; others & independents worded", tr.income);
+check(/hasn’t changed significantly/.test(tr.withheld.head), "a withheld move is never claimed", tr.withheld);
+console.log("     " + tr.falling.head + " / " + tr.falling.dek + "\n     " + tr.none.dek);
 
 await browser.close();
 if (fails.length) { console.error("\n" + fails.length + " FAILURES"); process.exit(1); }

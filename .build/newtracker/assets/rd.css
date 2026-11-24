@@ -1954,6 +1954,8 @@ body.rd .rd-wv-keytxt { color: var(--ink-3); }
 body.rd .rd-wv-charts { display: flex; gap: 32px; margin-top: 20px; }
 body.rd .rd-wv-chart { min-width: 0; }
 /* Party-by-party demographic gaps sit below the existing group charts. */
+body.rd .rd-wv-gaps > .rd-chips { margin-top: 14px; }
+body.rd .rd-wv-gaps > .rd-wv-gap-note { max-width: 860px; }
 body.rd .rd-wv-gap-set { margin-top: 24px; min-width: 0; }
 body.rd .rd-wv-gap-set h5 { margin: 0; font: inherit; }
 body.rd .rd-wv-gap-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; font-size: 14px; color: var(--ink-2); }
