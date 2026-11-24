@@ -1119,6 +1119,12 @@
       "label": "24 Nov 2026",
       "kind": "meta",
       "text": "The issues are now estimated with a model that reads every poll that asks, however it asks, rather than six-week averages of two or three pollsters (see Info), and the issue charts run back to 1990. No lead or significant change moved with the method, and today’s figures shifted by a few points at most: the cost of living in voters’ top three 71.8 → 71.8, Labor’s lead on health +8.3 → +11.2, One Nation’s on immigration +20.9 → +18.8."
+    },
+    {
+      "date": "2026-11-24",
+      "label": "24 Nov 2026",
+      "kind": "meta",
+      "text": "Vote switching is now estimated with a model that reads every table since February, rather than six-week averages (see Info). Today’s figures moved by 3 points at most: 2025 Coalition voters backing One Nation 34.9 → 34.6, Labor voters 11.2 → 12.7; the Coalition’s part of One Nation’s gain 57.0 → 55.3, Labor’s 19.8 → 22.1; Greens voters sticking with the Greens 82.1 → 84.9. Where Labor’s voters are going now also names small moves to the Greens and to others since February, beside the move to the Coalition."
     }
   ]
 }

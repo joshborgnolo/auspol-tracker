@@ -109,7 +109,7 @@ const readPanel = async (width) => {
   const p = await readPanel(1280);
   if (p.err) { console.log("FAIL desktop render  " + p.err); fails++; }
   else {
-    ok("head swaps to the rate sentence", new RegExp(`^(?:Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
+    ok("head swaps to the rate sentence", new RegExp(`^(?:About |More than |Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
     ok("head names the HIGHER-rate party", p.head.includes(P[hi]) && !p.head.includes(P[hi] === "Coalition" ? "Labor" : "Coalition"), P[hi] + " rate " + now[hi].rate.toFixed(1));
     ok("dek carries the flocked-ratio sentence", p.dek.includes(`${P[hi]} voters have flocked to One Nation at ${RATIO_WORDS} the rate of ${P[lo]} voters`), p.dek.slice(0, 140));
     /* the old head's gain-share sentence, computed exactly: the top source
@@ -141,7 +141,7 @@ const readPanel = async (width) => {
   const p = await readPanel(390);
   if (p.err) { console.log("FAIL phone render  " + p.err); fails++; }
   else {
-    ok("phone head swaps to the rate sentence", new RegExp(`^(?:Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
+    ok("phone head swaps to the rate sentence", new RegExp(`^(?:About |More than |Almost |Nearly |Just over |Over )?[A-Za-z]+ in [a-z]+ 2025 ${P[hi]} voters now back One Nation$`).test(p.head), JSON.stringify(p.head));
     ok("phone rows render ≈ pts labels", p.moRows.length >= 4 && p.moRows.every((t) => t.startsWith("≈")), JSON.stringify(p.moRows));
     ok("phone rows 1 and 2 both say “of ON's gain”", p.moRows.slice(0, 2).every((t) => /points of ON.s gain/.test(t)), JSON.stringify(p.moRows.slice(0, 3)));
     ok("phone dek carries the flocked-ratio sentence", p.dek.includes(P[hi]) && p.dek.includes(RATIO_WORDS), p.dek.slice(0, 120));

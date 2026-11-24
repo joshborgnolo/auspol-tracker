@@ -7708,6 +7708,21 @@ function infoTerms(D) {
   const ONS = D.onSources;
   const onsWaves = ONS ? ONS.waves : [];
   const onsYg = [...onsWaves].reverse().find((w) => w.pollster === "YouGov") || null;
+  /* who publishes the tables, and (on the model) the month they start and
+     how far the regular pollsters sit apart on Coalition voters */
+  const ONS_NAME = { "RedBridge/Accent": "RedBridge" };
+  const onsHouseList = ONS ? [...new Set(onsWaves.map((w) => ONS_NAME[w.pollster] || w.pollster))] : [];
+  const onsHouses = onsHouseList.length < 3 ? onsHouseList.join(" and ") : onsHouseList.slice(0, -1).join(", ") + " and " + onsHouseList[onsHouseList.length - 1];
+  const onsSince = ONS && ONS.since && D.monthNameFull ? D.monthNameFull(+ONS.since.slice(5, 7)) : "February";
+  const onsGap = (() => {
+    const L = ONS && ONS.leans ? Object.entries(ONS.leans).filter(([, l]) => l && l.lnp != null) : [];
+    if (L.length !== 2) return null;
+    const [[h1, l1], [h2, l2]] = L[0][1].lnp >= L[1][1].lnp ? L : [L[1], L[0]];
+    const gap = l1.lnp - l2.lnp, nm = (h) => ONS_NAME[h] || h;
+    return gap >= 1
+      ? <> {nm(h1)}’s tables find about {Math.round(gap)} points more of 2025 Coalition voters backing One Nation than {nm(h2)}’s, so the panel’s figure sits midway between them.</>
+      : <> {nm(h1)}’s and {nm(h2)}’s tables agree within a point on Coalition voters, and the panel’s figure sits midway between them.</>;
+  })();
   const onsWork = onsWaves.length ? (
     <div className="info-work-wrap">
       <table className="info-work">
@@ -8958,24 +8973,46 @@ function infoTerms(D) {
     { id: "s-switching", title: "Where One Nation’s voters are coming from", nav: "Vote switching",
       lead: { id: "vote-switching", body: (
         <>How people who voted for each party in 2025 say they would vote now, from the tables
-        DemosAU and YouGov publish with a row for each 2025 vote.
+        {" "}{onsHouses} publish with a row for each 2025 vote.
         <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
         now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
         points of the national vote One Nation has drawn from the group, and each group’s part of
         the total is the share the panel shows.{onsYg ? <> In YouGov’s latest poll, {onsYg.toOn.lnp}%
         of Coalition voters backing One Nation is worth {onsYg.pts.lnp.toFixed(1)} points, and
         {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null} The
-        panel’s other view shows how much of each party’s 2025 vote One Nation has taken. As a
-        check, adding the One Nation voters it kept rebuilds every poll’s published One Nation vote
-        to within about a point.</span>
+        panel’s other views show where each party’s 2025 voters have gone: how many stayed, and how
+        many went to each other party. As a check, adding the One Nation voters it kept rebuilds
+        every poll’s published One Nation vote to within about a point.</span>
+        {ONS && ONS.model ? <>
+        <span className="info-p"><b>How the figures are estimated.</b> Each 2025 group’s row (the
+        share that stayed, and the shares gone to each other party) comes from a model that reads
+        every table since {onsSince}, the way the primary vote’s model reads the polls. A row’s five
+        shares move together and always add to 100. Each day’s figure drifts a little from the day
+        before’s, so a table counts for less as it ages. Each row is weighed by the size of its
+        group: a poll’s Greens row rests on about a third as many respondents as its Coalition row,
+        so it says less. Each pollster’s usual distance from the others is measured and taken
+        out.{onsGap}
+        {" "}A pollster with a single table counts too, but its distance is left open, so it moves
+        the figures little. One Nation’s gain split is worked out from the same draws, so its
+        interval carries every row’s uncertainty.</span>
+        <span className="info-p"><b>Changes.</b> A line’s change since {onsSince} compares today with
+        the first month, read from the same draws. It is called only when its 95% interval excludes
+        zero after Holm’s correction across the lines it is picked from: the four parties in One
+        Nation’s view, the five destinations in each party’s own.</span>
+        <span className="info-p"><b>How well it works.</b> Predicting each table from the ones
+        published before it, the model missed by 2.2 points a figure on average, against 2.3 for
+        the six-week averages it replaced. Its 95% intervals caught 97% of the next table’s figures,
+        against 93% for the averages.</span></> : null}
         <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory
         drifts toward how they feel now, which can blur the very switching being measured. Each
-        2025 group is only a few hundred respondents in a poll, so the figures pool each group’s
-        share over the last six weeks before working out the split; the lines do the same month by
-        month. Voters who can’t recall a 2025 vote, or didn’t vote, are left out. Other parties and
-        independents are counted together, because DemosAU doesn’t separate them.</span>
-        <span className="info-p"><b>A third source.</b> Newspoll publishes only Labor’s row: its
-        September poll found 15% of Labor’s 2025 voters now back One Nation (
+        2025 group is only a few hundred respondents in a poll, and the tables arrive about once a
+        week between the pollsters.{ONS && ONS.model ? " So the model can’t tell a quick real move from a noisy table, and its intervals allow for both. Unfortunately, that makes them wider than the averages’ were." : " So the figures pool each group’s share over the last six weeks before working out the split; the lines do the same month by month."}
+        {" "}Voters who can’t recall a 2025 vote, or didn’t vote, are left out. Other parties and
+        independents are counted together, because DemosAU doesn’t separate them. A table that
+        leaves out a 2025 group is left out.</span>
+        <span className="info-p"><b>Newspoll.</b> Newspoll publishes only some rows of its table, so
+        it stays out of the figures. Its September poll found 15% of Labor’s 2025 voters now back
+        One Nation (
         <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
            target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
         and YouGov’s 15%.</span>
@@ -8983,7 +9020,8 @@ function infoTerms(D) {
           <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
           from Sky News Pulse until July 2026 and News24 Pulse since. DemosAU prints its table only
           as a chart, so its figures are measured from the chart in each report, and match every
-          label the chart prints. Each poll’s figures are in the All polls export.</span>
+          label the chart prints.{onsWaves.some((w) => w.pollster === "RedBridge/Accent") ? " RedBridge’s table is measured from its chart the same way, and its undecided cell is set aside." : ""} Each
+          poll’s figures are in the All polls export.</span>
           {onsWork}
         </>)}</>) },
       entries: [] },

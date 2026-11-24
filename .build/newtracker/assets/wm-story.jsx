@@ -378,9 +378,10 @@ function buildDialStory(D) {
   };
 
   /* ---- the bars' exchange -------------------------------------------------
-     D.switchFlows pools every complete vote-switching table: how many points
-     of the 2025 vote have moved from each party to each other since the
-     election, everyone else as one group ("oth", no bar of its own). Month
+     D.switchFlows is the switching model's table today (gen-data §5bm): how
+     many points of the 2025 vote have moved from each party to each other
+     since the election, everyone else as one group ("oth", no bar of its
+     own). Month
      by month the replay scales that pattern to how far the vote has moved
      so far - by the aggregate, so not at all on election day - and
      reconciles it to the bars (gpReconcile): the exchange always nets to

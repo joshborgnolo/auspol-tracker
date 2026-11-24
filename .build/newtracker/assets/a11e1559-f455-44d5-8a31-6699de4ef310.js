@@ -2059,8 +2059,9 @@ function OnSourcesPanel({ rangeId }) {
   const yTicks = [];
   for (let v = 10; v < hi; v += 10) yTicks.push(v);
   const spine = drawn.reduce((a, d) => (d.pts.length > a.length ? d.pts : a), []);
-  /* The readings are the current reading (gen-data: each group's rate pooled
-     over six weeks as the headline pools polls, then split), not the latest
+  /* The readings are the current reading (gen-data §5bm: the switching
+     model's estimate today; before it, each group's rate pooled over six
+     weeks as the headline pools polls, then split), not the latest
      poll or calendar month – one wave's split rests on a few hundred
      respondents per group, and early in a month the month is one wave. The
      latest month stands in only if the window holds no poll. */
@@ -2163,12 +2164,12 @@ function OnSourcesPanel({ rangeId }) {
           .concat([{ label: "Shading: 95% interval", color: "var(--ink-3)", kind: "shade" }]) }}
       />
       <HowTo paras={[
-        <>Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages, shaded by their 95% interval; the
-        figures above pool the last {S.now ? S.now.window : "six weeks"} of polls.{" "}
+        <>Each dot is one poll’s {rated ? "figure" : "split"} and the lines are {S.model ? "a model’s estimates for the average pollster, month by month" : "monthly averages"}, shaded by their 95% interval; the
+        figures above {S.model ? "are its estimates today, from every table since the first" : "pool the last " + (S.now ? S.now.window : "six weeks") + " of polls"}.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
           How it’s worked out</button></>,
-        <>Newer polls count for more in the figures above.</>,
+        S.model ? <>Each pollster’s usual distance from the others is measured and taken out, so the lines sit midway between the pollsters that publish a table regularly.</> : <>Newer polls count for more in the figures above.</>,
         <>The two views come from the same tables. “Of each party’s voters” is the share of each
         party’s 2025 voters now backing One Nation. Weighted by that party’s share of the 2025 vote,
         it becomes the party’s part of One Nation’s gain, so 38% of Coalition voters counts for far

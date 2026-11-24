@@ -35,7 +35,22 @@ async function run(mutate, read, before) {
   await page.evaluateOnNewDocument((src) => {
     const fn = src ? new Function("A", src) : null;
     let held;
-    Object.defineProperty(window, "AUSPOL", { configurable: true, get: () => held, set: (v) => { held = v; try { if (fn) fn(v); } catch (e) { console.error(e); } } });
+    /* the dataset lands in two halves (build.mjs splitDataset): the late
+       half assigns its tables (onSources, undecided, issues…) onto the
+       object afterwards, over empty stand-ins, so the mutation runs again
+       as each one lands (its statements are plain assignments, safe to
+       repeat) */
+    const apply = () => { try { if (fn) fn(held); } catch (e) { /* a table still to land */ } };
+    Object.defineProperty(window, "AUSPOL", { configurable: true, get: () => held, set: (v) => {
+      held = v;
+      if (v && typeof v === "object") for (const k of Object.keys(v)) {
+        const s0 = v[k];
+        if (!(s0 && typeof s0 === "object" && Object.keys(s0).length === 0)) continue;
+        let cur = s0;
+        Object.defineProperty(v, k, { configurable: true, enumerable: true, get: () => cur, set: (x) => { cur = x; apply(); } });
+      }
+      apply();
+    } });
   }, mutate || "");
   await page.goto("file://" + path.join(BASE, "index.html"), { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector("#leadership .rd-hed", { timeout: 30000 });
@@ -71,10 +86,14 @@ const pri0 = await run(null, read("primary-vote"));
 check(/The Coalition, on [\d.]+%, has lost/.test(pri0.dek), "live: the Coalition's fall clears its margin and is said", pri0.dek);
 
 console.log("Vote switching");
-const sw = await run(`const s = A.onSources.series.find((x) => x.id === "alp"); s.rate.now.v = 36; s.rate.now.ci95 = 4;`, read("switching"));
+/* on the switching model the apart test is the difference's own interval
+   (onSources.compare, from the joint draws): mutate it with the rates */
+const sw = await run(`const s = A.onSources.series.find((x) => x.id === "alp"); s.rate.now.v = 36; s.rate.now.ci95 = 4;
+  if (A.onSources.compare) Object.assign(A.onSources.compare, { diff: -1.4, diffLo: -7, diffHi: 4.2, apart: false });`, read("switching"));
 check(/at much the same rate/.test(sw.dek) && !/times the rate/.test(sw.dek), "rates inside each other's margins -> 'much the same rate'", sw.dek);
 const sw2 = await run(`const s = A.onSources.series.find((x) => x.id === "alp"); s.rate.now.v = 35.5; s.rate.now.ci95 = 1;
-  const c = A.onSources.series.find((x) => x.id === "lnp"); c.rate.now.ci95 = 1;`, read("switching"));
+  const c = A.onSources.series.find((x) => x.id === "lnp"); c.rate.now.v = 38; c.rate.now.ci95 = 1;
+  if (A.onSources.compare) Object.assign(A.onSources.compare, { diff: 2.5, diffLo: 1.1, diffHi: 3.9, apart: true });`, read("switching"));
 check(/moved to One Nation faster than Labor voters/.test(sw2.dek) && !/about 1 times/.test(sw2.dek), "apart but under 1.25x -> 'faster than', never 'about 1 times'", sw2.dek);
 
 console.log("Decidedness by age");

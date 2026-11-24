@@ -5409,10 +5409,11 @@ function RdSwitching({ rangeId }) {
   const LONG = { lnp: "Coalition voters", alp: "Labor voters", oth: "Others & independents", grn: "Greens voters" };
   const VOTED = { lnp: "for the Coalition", alp: "Labor", oth: "for another party or an independent", grn: "Green" };
   const VOTERS25 = { lnp: "2025 Coalition voters", alp: "2025 Labor voters", oth: "2025 minor-party and independent voters", grn: "2025 Greens voters" };
-  /* One Nation's own 2025 voters: the share still backing it, pooled over
-     the same polls as the rates */
+  /* One Nation's own 2025 voters: the share still backing it – the model's
+     figure (gen-data §5bm), else pooled over the same polls as the rates */
   const recent = (S.waves || []).slice(-(S.now && S.now.n ? S.now.n : 5));
-  const keptPct = recent.length ? recent.reduce((s, w) => s + w.keptPct * (w.sample || 1), 0) / recent.reduce((s, w) => s + (w.sample || 1), 0) : null;
+  const keptPct = S.kept && S.kept.now ? S.kept.now.v
+    : recent.length ? recent.reduce((s, w) => s + w.keptPct * (w.sample || 1), 0) / recent.reduce((s, w) => s + (w.sample || 1), 0) : null;
   const cols = ["lnp", "alp", "oth", "grn"].filter((id) => byId[id]).map((id) => {
     const sr = byId[id];
     const w = id === "oth" ? (Wt.oth || 0) + (Wt.ind || 0) : Wt[id];
@@ -5447,7 +5448,9 @@ function RdSwitching({ rangeId }) {
      and as a ratio only from 1.25 up, to the nearest half (timesWords): a
      ratio of two pooled rates is rarely known finer than that */
   const ratio = hiC && loC ? hiC.rate / loC.rate : null;
-  const ratesApart = hiC && loC && hiC.rate - loC.rate > Math.hypot(hiC.rateCi || 0, loC.rateCi || 0);
+  /* on the model the difference's own 95% interval decides (the two groups
+     are separate respondents, so it is close to the margins combined) */
+  const ratesApart = hiC && loC && (S.compare ? S.compare.apart : hiC.rate - loC.rate > Math.hypot(hiC.rateCi || 0, loC.rateCi || 0));
   const dek = (!hiC || !loC) ? null
     : (!ratesApart ? "Coalition and Labor voters have moved to One Nation at much the same rate. "
       : ratio < 1.25 ? nm(hiC) + " voters have moved to One Nation faster than " + nm(loC) + " voters. "
@@ -5464,9 +5467,16 @@ function RdSwitching({ rangeId }) {
     const v = w.toOn ? w.toOn[id] : null;
     return v == null ? null : { x: D.mx(w.date.slice(0, 7)) + ((+w.date.slice(8, 10) - 15) / 365), y: v, h: w.pollster, w: w.sample || 1000, meta: { pollster: w.pollster, released: w.date, dateLabel: w.dateLabel || "", sample: w.sample } };
   }).filter(Boolean);
-  const fits = cols.map((c) => ({ c, fit: withinHouseSlope(pollRate(c.id).map((d) => ({ h: d.h, t: d.x, w: d.w, y: d.y }))) })).filter((f) => f.fit);
+  /* the trend test: on the model (S.model), each rate's change since the
+     first month from the model's draws, Holm-adjusted across the four in
+     gen-data (rate.trend); the fallback fits one slope within each pollster */
+  const MODEL = !!S.model;
+  const fits = MODEL
+    ? cols.filter((c) => c.sr.rate.trend).map((c) => ({ c, fit: { b: c.sr.rate.trend.chg, p: c.sr.rate.trend.padj, tr: c.sr.rate.trend } }))
+    : cols.map((c) => ({ c, fit: withinHouseSlope(pollRate(c.id).map((d) => ({ h: d.h, t: d.x, w: d.w, y: d.y }))) })).filter((f) => f.fit);
   const sig = [];
-  for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+  if (MODEL) sig.push(...fits.filter((f) => f.fit.tr.sig));
+  else for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
     if (f.fit.p >= 0.05 / (fits.length - i)) break;
     sig.push(f);
   }
@@ -5476,13 +5486,14 @@ function RdSwitching({ rangeId }) {
   const VOTERS = { lnp: "Coalition voters", alp: "Labor voters", grn: "Greens voters", oth: "minor-party and independent voters" };
   const subHead = rdTrendLine(cols.filter((c) => sig.some((f) => f.c === c)).map((c) => ({
     first: "the share of 2025 " + VOTERS[c.id] + " backing One Nation", later: "the share of " + VOTERS[c.id],
-    b: sig.find((f) => f.c === c).fit.b, from: c.sr.rate.monthly[0].v, to: c.rate })),
+    b: sig.find((f) => f.c === c).fit.b, from: MODEL ? c.sr.rate.trend.from : c.sr.rate.monthly[0].v, to: MODEL ? c.sr.rate.trend.to : c.rate })),
     sinceM, "No party’s rate has clearly changed",
     sig.length < cols.length ? "Among " + rdList(cols.filter((c) => !sig.some((f) => f.c === c)).map((c) => c.id === "oth" ? "minor-party" : VOTERS[c.id].replace(/ voters$/, ""))) + " voters, there’s no clear change." : "");
   const ks = cols.flatMap((c) => c.sr.rate.monthly.map((m) => m.k)).filter((k) => k != null);
   const kLo = Math.min(...ks), kHi = Math.max(...ks);
-  const subDek = "Each chart tracks the share of one party’s 2025 voters now backing One Nation. Each dot is one poll; each line is a monthly average, with its 95% interval shaded. "
-    + rdPollsPerMonth(kLo, kHi);
+  const subDek = "Each chart tracks the share of one party’s 2025 voters now backing One Nation. "
+    + (MODEL ? "Each dot is one poll as printed; each line is the model’s estimate for the average pollster, month by month, with its 95% interval shaded."
+      : "Each dot is one poll; each line is a monthly average, with its 95% interval shaded. " + rdPollsPerMonth(kLo, kHi));
   const monthsIn = D.MONTHS.filter((ym) => D.mx(ym) >= x0 && D.mx(ym) <= x1 + 0.01);
   const smTicks = monthsIn.length ? [monthsIn[0], monthsIn[Math.floor((monthsIn.length - 1) / 2)], monthsIn[monthsIn.length - 1]]
     .filter((v, i, a) => a.indexOf(v) === i).map((ym) => ({ x: D.mx(ym), label: D.monthName(Number(ym.slice(5))) })) : [];
@@ -5536,7 +5547,7 @@ function RdSwitching({ rangeId }) {
      reads far enough out to say directly; the ladder's wording inside it */
   const goShareWords = (p) => (rdFracSnap(p).err < 0.025 || p >= 15 ? rdFraction(p) : "about one in " + Math.max(2, Math.round(100 / p)));
   const goRows = goRow ? goRow.dests.filter((d) => d.now && d.now.v > 0)
-    .map((d) => ({ id: d.id, ...goWords(d.id), now: d.now, monthly: d.monthly, polls: d.polls })) : [];
+    .map((d) => ({ id: d.id, ...goWords(d.id), now: d.now, monthly: d.monthly, polls: d.polls, trend: d.trend })) : [];
   const goKept = goRows.find((r) => r.id === "kept");
   /* "more than half" / "almost half" claim a side of 50 the poll can't
      always back: inside the 95% range of 50 it reads "about half" */
@@ -5551,7 +5562,11 @@ function RdSwitching({ rangeId }) {
      exact enough; the finer ladder below), with its share of the leavers
      while it is most of them; then the next destinations of 5% or more as
      figures - a "similar" pair while they sit inside each other's margins */
-  const goApart = (a, b) => a.now.v - b.now.v > Math.hypot(a.now.ci95 || 0, b.now.ci95 || 0);
+  /* two destinations share one cohort's sample, so their difference has its
+     own margin (wider than the two combined): the model's draws decide it
+     (goRow.apart); the fallback combines the margins */
+  const goApart = (a, b) => (goRow && goRow.apart ? !!goRow.apart[a.id + "|" + b.id] && a.now.v > b.now.v
+    : a.now.v - b.now.v > Math.hypot(a.now.ci95 || 0, b.now.ci95 || 0));
   const goBig = (v) => (v >= 20 ? plainShare(v) : rdCap(rdFraction(v)));
   const goVerb = (w) => (/\bone in\b/i.test(w) ? " has" : /of$/.test(w) ? " them have" : " have");
   const goPc = (r) => Math.round(r.now.v) + "%";
@@ -5576,10 +5591,13 @@ function RdSwitching({ rangeId }) {
     x: p.x, y: p.v, h: p.pollster, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3),
     meta: { pollster: p.pollster, released: p.released, dateLabel: p.dateLabel || "", sample: p.sample } }));
   const goDotsClipped = (r) => goDots(r).filter((d) => d.x >= x0 && d.x <= x1 + 0.02);
-  const goFits = goRows.map((r) => ({
-    r, fit: withinHouseSlope(r.polls.map((p) => ({ h: p.pollster, t: p.x, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3), y: p.v }))) })).filter((f) => f.fit);
+  const goFits = MODEL
+    ? goRows.filter((r) => r.trend).map((r) => ({ r, fit: { b: r.trend.chg, p: r.trend.padj, tr: r.trend } }))
+    : goRows.map((r) => ({
+      r, fit: withinHouseSlope(r.polls.map((p) => ({ h: p.pollster, t: p.x, w: (p.sample || 1000) * (goRow ? goRow.weight / 100 : 0.3), y: p.v }))) })).filter((f) => f.fit);
   const goSig = [];
-  for (const [i, f] of [...goFits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+  if (MODEL) goSig.push(...goFits.filter((f) => f.fit.tr.sig));
+  else for (const [i, f] of [...goFits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
     if (f.fit.p >= 0.05 / (goFits.length - i)) break;
     goSig.push(f);
   }
@@ -5590,7 +5608,7 @@ function RdSwitching({ rangeId }) {
   const goSigOf = (r) => goSig.find((f) => f.r === r);
   const goSubHead = rdTrendLine(goRows.filter(goSigOf).map((r) => ({
     first: "the share of " + GO_COHORT_W[V] + " " + goWhere(r), later: "the share " + goWhere(r),
-    b: goSigOf(r).fit.b, from: r.monthly.length ? r.monthly[0].v : null, to: r.now.v })),
+    b: goSigOf(r).fit.b, from: MODEL ? r.trend.from : r.monthly.length ? r.monthly[0].v : null, to: MODEL ? r.trend.to : r.now.v })),
     goSinceM, "No share has clearly changed",
     goSig.length && goSig.length < goRows.length ? "No other share has clearly changed." : "");
   const goKs = goRows.flatMap((r) => r.monthly.map((m) => m.k)).filter((k) => k != null);
@@ -5600,8 +5618,8 @@ function RdSwitching({ rangeId }) {
   const goScale = goKept && gd1 && goKept.now.v >= 2 * gd1.now.v
     ? "Each chart has its own scale, because far more stay with " + GO_OWN[V] + " than go anywhere else."
     : "Each chart has its own scale.";
-  const goSubDek = "Each dot is one poll; each line is a monthly average, with its 95% interval shaded. "
-    + (gkLo ? rdPollsPerMonth(gkLo, gkHi) + " " : "") + goScale;
+  const goSubDek = (MODEL ? "Each dot is one poll as printed; each line is the model’s estimate for the average pollster, month by month, with its 95% interval shaded. "
+    : "Each dot is one poll; each line is a monthly average, with its 95% interval shaded. " + (gkLo ? rdPollsPerMonth(gkLo, gkHi) + " " : "")) + goScale;
   /* the destinations drawn the came-from view's way: on a laptop the five
      are full-height columns sized by their share of the cohort, wearing the
      mosaic's garment (name/size lines above, the figure and its 95% rows
@@ -5813,7 +5831,7 @@ function RdSwitching({ rangeId }) {
                 fmt={(v) => v.toFixed(1)}
                 copy={{ title: GO_COHORT_W[V] + " now backing " + r.noun,
                         sub: "Share of those who voted " + (V === "lnp" ? "for the Coalition" : "Labor") + " at the 2025 election who now say they would vote " + r.noun + ", month by month",
-                        legend: [{ label: "Monthly average", color: r.color, kind: "line" }, { label: "95% interval", color: r.color, kind: "band" }] }}
+                        legend: [{ label: MODEL ? "Model estimate" : "Monthly average", color: r.color, kind: "line" }, { label: "95% interval", color: r.color, kind: "band" }] }}
               />
             </div>
           );
@@ -5821,8 +5839,19 @@ function RdSwitching({ rangeId }) {
       </div>
       <RdKey className="rd-ckey rd-sm-key" items={[
         { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-        { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+        { kind: "lineband", color: "var(--ink-3)", label: MODEL ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
       ]} />
+      {MODEL ? (
+      <RdTsig summary="Trend-significance table"
+        heads={[GO_HALF[V] + " voters’ destination", "Model, " + goSinceM + " → now, %", "Change, pts", "95% interval", "Significant"]}
+        sets={[{ key: "main", rows: goRows.map((r) => {
+          const tr = r.trend, sg = !!(tr && tr.sig);
+          return { key: r.id, name: r.nm + (r.id === "kept" ? ", kept" : ""), sig: sg,
+            cells: tr ? [rdTsSgn(tr.from) + " → " + rdTsSgn(tr.to), rdTsSgn(tr.chg, true), rdTsSgn(tr.lo, true) + " to " + rdTsSgn(tr.hi, true), sg ? "Yes" : "No"] : ["–", "–", "–", "No"] };
+        }) }]}
+        note={"Each line is the model’s estimate for the average pollster. A destination’s change since " + goSinceM + " compares today with the first month in the model’s draws, Holm’s correction applied across the five destinations, so Yes means the change clears 95% – the test behind the “since " + goSinceM + "” line above."}
+      />
+      ) : (
       <RdTsig summary="Trend-significance table"
         heads={[GO_HALF[V] + " voters’ destination", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
         sets={[{ key: "main", rows: goRows.map((r) => {
@@ -5832,6 +5861,7 @@ function RdSwitching({ rangeId }) {
         }) }]}
         note={"Shares are pooled across pollsters; a destination’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample and the cohort’s share of it), Holm’s correction applied across the five destinations, so Yes means the slope clears 95% — the test behind the “since " + goSinceM + "” line above."}
       />
+      )}
       <RdFoot how={{ term: "vote-switching", from: { lnp: "Where the Coalition’s voters are going", alp: "Where Labor’s voters are going", grn: "Where the Greens’ voters are going" }[V] }}>
         2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. Where a house prints an undecided cell for a cohort the row is re-scaled to its decided shares.
       </RdFoot>
@@ -5954,13 +5984,19 @@ function RdSwitching({ rangeId }) {
      title's party-word button and Space do (dblCycle is RdSec's) */
   return (
     <RdSec id="switching" cls="rd-sw" title={cycTitle} dblCycle={cyc}
-           meta={"How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
+           meta={MODEL ? "How 2025 voters say they’d vote now, modelled from every table since " + sinceM + "; " + rdList((S.now && S.now.houses) || []) + " in the last " + S.now.window
+             : "How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
       {V === "onp" ? (
         <>
       {head && <RdHed head={head} dek={dek} />}
       <div className="card rd-card rd-mo-wrap" ref={boxRef}>
         {mosaic}
-        <p className="rd-note rd-mo-note">Points are shares of all voters. About {Math.round(gained)} gained from other parties{keptPts != null ? ", plus " + Math.round(keptPts) + " kept," : ""} add up to {Math.round(gained + (keptPts || 0))} of One Nation’s {onNow.toFixed(1)} points today.</p>
+        {/* the tables' total (gained + kept) is a different source from the
+            primary vote, and can run above it: "26 of 24.9" would claim a
+            part larger than its whole, so past the figure it reads "beside" */}
+        <p className="rd-note rd-mo-note">Points are shares of all voters. About {Math.round(gained)} gained from other parties{keptPts != null ? ", plus " + Math.round(keptPts) + " kept," : ""}{Math.round(gained + (keptPts || 0)) > onNow + 0.5
+          ? <> make {Math.round(gained + (keptPts || 0))} points, beside One Nation’s {onNow.toFixed(1)} today.</>
+          : <> add up to {Math.round(gained + (keptPts || 0))} of One Nation’s {onNow.toFixed(1)} points today.</>}</p>
         <div className="rd-key rd-mo-key">
           <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp)" />Switched to One Nation</span>
           <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp-deep)" />Already One Nation in 2025</span>
@@ -5993,7 +6029,7 @@ function RdSwitching({ rangeId }) {
                 fmt={(v) => v.toFixed(1)}
                 copy={{ title: VOTERS25[c.id] + " now backing One Nation",
                         sub: "Share of those who voted " + VOTED[c.id] + " at the 2025 election who now say they would vote One Nation, month by month",
-                        legend: [{ label: "Monthly average", color: c.color, kind: "line" }, { label: "95% interval", color: c.color, kind: "band" }] }}
+                        legend: [{ label: MODEL ? "Model estimate" : "Monthly average", color: c.color, kind: "line" }, { label: "95% interval", color: c.color, kind: "band" }] }}
               />
             </div>
           );
@@ -6001,8 +6037,19 @@ function RdSwitching({ rangeId }) {
       </div>
       <RdKey className="rd-ckey rd-sm-key" items={[
         { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-        { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+        { kind: "lineband", color: "var(--ink-3)", label: MODEL ? (narrow ? "Model, 95% interval" : "Model estimate and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
       ]} />
+      {MODEL ? (
+      <RdTsig summary="Trend-significance table"
+        heads={["Party’s 2025 voters", "Model, " + sinceM + " → now, %", "Change, pts", "95% interval", "Significant"]}
+        sets={[{ key: "main", rows: cols.map((c) => {
+          const tr = c.sr.rate.trend, sg = !!(tr && tr.sig);
+          return { key: c.id, name: LONG[c.id], sig: sg,
+            cells: tr ? [rdTsSgn(tr.from) + " → " + rdTsSgn(tr.to), rdTsSgn(tr.chg, true), rdTsSgn(tr.lo, true) + " to " + rdTsSgn(tr.hi, true), sg ? "Yes" : "No"] : ["–", "–", "–", "No"] };
+        }) }]}
+        note={"Each line is the model’s estimate for the average pollster. A party’s change since " + sinceM + " compares today with the first month in the model’s draws, Holm’s correction applied across the four parties, so Yes means the change clears 95% – the test behind the “since " + sinceM + "” line above."}
+      />
+      ) : (
       <RdTsig summary="Trend-significance table"
         heads={["Party’s 2025 voters", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
         sets={[{ key: "main", rows: cols.map((c) => {
@@ -6012,6 +6059,7 @@ function RdSwitching({ rangeId }) {
         }) }]}
         note={"Rates are pooled across pollsters; a party’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the four parties, so Yes means the slope clears 95% — the test behind the “since " + sinceM + "” line above."}
       />
+      )}
       <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters are coming from" }}>
         2025 vote is as respondents recall it, but Redbridge notes that vote recall often contains a great deal of error, as many voters struggle to remember, and are uncertain, how they voted at the last election. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
       </RdFoot>

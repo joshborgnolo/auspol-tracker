@@ -22,6 +22,7 @@ import { fitDirection, FORMAT as DIR_FORMAT, leanHouse as dirLeanHouse, mean as 
 import { fitTrust, mean as tmean, quant as tquant, toTerms as trustTerms } from "./trust-model.mjs";
 import { ratingSeries as ldRatingSeries, ppmSeries as ldPpmSeries, fitSettings as ldFit, lineMoments as ldMoments, drawReads as ldDrawReads, houseCoef as ldHouseCoef } from "./leader-model.mjs";
 import { tppRead, tppNowOut, tppChgOut } from "./primary-model.mjs";
+import { fitSwitch, colOf as swCol, pOf as swP, mean as swMean, quant as swQuant } from "./switch-model.mjs";
 import { buildSeries as imBuildSeries, fitFamily as imFit, drawSeries as imDrawSeries, lineMoments as imMoments, salObs as imSalObs, ownObs as imOwnObs, expit as imExpit, quant as imQuant, WIDE_SAL as IM_WIDE_SAL, WIDE_OWN as IM_WIDE_OWN } from "./issue-model.mjs";
 import { buildReadings as buildIssueReadings, ELECTION_DAYS as IM_ELECTION_DAYS } from "./issue-readings.mjs";
 import { fitSpan, gapReading, countReading, nestCats, nestCoords, nestShares, drawMix, makeRng as gsRng } from "./group-span.mjs";
@@ -4470,7 +4471,9 @@ const confidenceOnlyPolls = (() => {
      row with no One Nation cell is a 0.
    - An MRP taken to reuse its house's own waves (reusesWaves) sits out, as
      it sits out of the aggregates: its respondents already count through
-     those waves. Its table still reaches the CSV export (VS_BY_POLL). */
+     those waves. Its table still reaches the CSV export (VS_BY_POLL).
+   This section reads the tables; every figure the panel prints comes from
+   the switching model (§5bm below). */
 const VOTE_SWITCHING = (() => {
   if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")); }
@@ -4554,211 +4557,230 @@ const onSourceWaves = (() => {
     };
   }).filter(Boolean).sort((a, b) => a.x - b.x);
 })();
-/* The lines and the readings pool the RATES, not each wave's split. Each
-   2025 group's share now voting One Nation (and the share of its own 2025
-   voters it kept) is its own series, averaged as the site averages
-   everything else: the monthly construction for the lines (sample-weighted,
-   a house's repeat waves as sqrt(m)), the six-week nowcast for the readings
-   (two houses publish, about one poll a week between them). The split is
-   then worked out from the pooled rates. Pooling each wave's split instead
-   would weight a poll's Greens-voter figure as heavily as its Coalition-
-   voter figure, when it rests on a third as many respondents – so each rate
-   carries the sample its group is: the poll's n times the group's 2025 share.
-   No house adjustment: two houses give no consensus to measure a lean
-   against, the rule every thin series here follows. Each reading's margin
-   comes from the rates' margins through the split (groups are separate
-   respondents, so independent). */
-const ON_GAIN_KEYS = ["lnp", "alp", "grn", "oth"];
-const onRateRows = (() => {
-  const out = { lnp: [], alp: [], grn: [], oth: [], onp: [] };
-  if (!onSourceWaves.length) return out;
+/* ---- 5bm. the switching model (switch-model.mjs) -------------------------
+   Every figure the panel and the replay print – each 2025 group's share now
+   backing One Nation, One Nation's gain split and the share of its own 2025
+   voters it kept, where the Coalition's, Labor's and the Greens' 2025 voters
+   are going, the masthead replay's switching table – comes from one model of
+   the five groups' rows (the module's header has the construction and the
+   evidence; the prototype, backtest and fake-data check are in
+   .build/analysis/switch-bayes/). Until 2026-11-24 each figure was its own
+   six-week pool with no house adjustment.
+   - It reads the tables the recipe read (onSourceWaves: every 2025 group
+     printed – the user's complete-tables ruling – and an MRP reusing its
+     house's waves left out), each row closed over the five: RedBridge's
+     undecided cell out, the independents and YouGov's Community Strong cell
+     in with others, YouGov's independents' and other parties' rows folded
+     at their 2025 weights. DemosAU's can't-recall group is a row, not a
+     column, and stays out.
+   - A row's sample is the poll's (rowN, on the site's design effect) times
+     the group's 2025 share: both houses weight to the 2025 result.
+   - A line runs from the first table's month, each month at its middle and
+     the current month at the newest poll of any kind (every line on the
+     page ends there); its band is the 95% interval.
+   - The change on a month ago and the change since the first month are the
+     same draws read at two days. A "since February" claim needs Holm's
+     correction across the lines it is chosen from: the four rates in One
+     Nation's view, a cohort's five destinations in its own.
+   - The gain split is worked out draw by draw (each group's points of the
+     national vote are its 2025 share times its rate), so its interval
+     carries every row's uncertainty – the recipe pushed the rates' margins
+     through a first-order formula.
+   - Two houses publish regularly, and each counts once: a figure sits
+     midway between YouGov's and DemosAU's (a lean each is measured, not
+     assumed); RedBridge's one table leans as it likes and moves nothing. */
+const SWITCH_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+const SW_SHARE25 = VOTE_SWITCHING && VOTE_SWITCHING.weights2025
+  ? (({ alp, lnp, grn, onp, ind, oth }) => ({ alp, lnp, grn, onp, oth: ind + oth }))(VOTE_SWITCHING.weights2025) : null;
+/* a printed row as the five, closed to 100: und/dnr out, any other cell
+   (independents, Community Strong) with others */
+const swClosed = (r) => {
+  if (!r) return null;
+  const colOf = (k) => (k === "und" || k === "dnr" ? null : SWITCH_KEYS.includes(k) ? k : "oth");
+  const o = Object.fromEntries(SWITCH_KEYS.map((k) => [k, 0]));
+  for (const [k, v] of Object.entries(r)) { const c = colOf(k); if (c && Number.isFinite(v)) o[c] += v; }
+  const s = SWITCH_KEYS.reduce((t, k) => t + o[k], 0);
+  return s > 0 ? Object.fromEntries(SWITCH_KEYS.map((k) => [k, (100 * o[k]) / s])) : null;
+};
+const SW_TABLES = (() => {
+  if (!onSourceWaves.length || !SW_SHARE25) return [];
   const W = VOTE_SWITCHING.weights2025;
-  const share2025 = { lnp: W.lnp, alp: W.alp, grn: W.grn, oth: W.ind + W.oth, onp: W.onp };
-  for (const w of onSourceWaves) {
-    const p = POLL_BY_KEY.get(w.date + "|" + w.pollster);
-    const n = rowN(p || { sample: w.sample }), mid = midMs(p || { dateStart: w.dateStart, date: w.date });
-    for (const k of Object.keys(out)) {
-      const x = k === "onp" ? w.keptPct : w.toOn[k];
-      if (x != null) out[k].push({ ym: ymOf(w.date), mid, x, n: n * share2025[k] / 100, firm: w.pollster });
-    }
-  }
-  return out;
+  const byKey = new Map(VOTE_SWITCHING.waves.map((w) => [w.date + "|" + w.pollster, w]));
+  return onSourceWaves.map((sw) => {
+    const R = byKey.get(sw.date + "|" + sw.pollster)?.rows || {};
+    const rows = Object.fromEntries(["alp", "lnp", "grn", "onp"].map((g) => [g, swClosed(R[g])]));
+    if (R.ind) {
+      const a = swClosed(R.ind), b = swClosed(R.oth);
+      rows.oth = a && b ? Object.fromEntries(SWITCH_KEYS.map((k) => [k, (W.ind * a[k] + W.oth * b[k]) / (W.ind + W.oth)])) : null;
+    } else rows.oth = swClosed(R.oth);
+    if (SWITCH_KEYS.some((g) => !rows[g])) return null;
+    const p = POLL_BY_KEY.get(sw.date + "|" + sw.pollster);
+    const s = pmDay(sw.dateStart || sw.date), e = pmDay(sw.date);
+    return { key: sw.date + "|" + sw.pollster, house: sw.pollster, date: sw.date, ym: sw.ym, day: Math.round((s + e) / 2),
+             n: rowN(p || { sample: sw.sample }), rows };
+  }).filter(Boolean);
 })();
-/* Where a 2025 cohort's voters are GOING: each destination share pooled
-   like the gain rates above (six-week nowcast, month-by-month lines), each
-   wave's row weighted by the cohort's share of that poll's sample. Derived
-   from the same waves' dest rows, so the wave set and weights are §5b's
-   own; unlike the gain split, nothing here needs re-weighting through the
-   2025 result – a cohort's destination row is already conditional on it. */
-const goRateRows = (() => {
-  const out = {};
-  for (const c of GO_COHORTS) out[c] = Object.fromEntries(GO_DESTS[c].map((d) => [d, []]));
-  if (!onSourceWaves.length) return out;
-  const W = VOTE_SWITCHING.weights2025;
-  for (const w of onSourceWaves) {
-    const p = POLL_BY_KEY.get(w.date + "|" + w.pollster);
-    const n = rowN(p || { sample: w.sample }), mid = midMs(p || { dateStart: w.dateStart, date: w.date });
-    for (const c of GO_COHORTS) {
-      if (!w.dest?.[c]) continue;
-      for (const d of GO_DESTS[c]) out[c][d].push({ ym: w.ym, mid, x: w.dest[c][d], n: n * W[c] / 100, firm: w.pollster });
+const swR3 = (v) => Math.round(v * 1000) / 1000;
+const SWM = (() => {
+  if (!SW_TABLES.length) return null;
+  const T0 = Date.now();
+  const t1 = pmDay(LATEST_ISO), t0 = Math.min(...SW_TABLES.map((t) => t.day)) - 1;
+  const firstYm = new Date((t0 + 1) * 86400000).toISOString().slice(0, 7), curYm = LATEST_ISO.slice(0, 7);
+  const months = MONTHS.filter((ym) => ym >= firstYm)
+    .map((ym) => ({ ym, day: ym === curYm ? t1 : Math.min(Math.max(pmDay(ym + "-15"), t0 + 1), t1) }));
+  const first = months[0].day, prev = t1 - 30;
+  const fit = fitSwitch(SW_TABLES, { share2025: SW_SHARE25, t0, t1, days: [...months.map((m) => m.day), prev],
+    jumps: new Set(PRIM_JUMPS.map(pmDay)), nDraw: +(process.env.SW_NDRAW || 2000), seed: 20261124, M: 64 });
+  const qi = (k) => SWITCH_KEYS.indexOf(k);
+  /* one cell's draws (points) at a day; the gain split's draws for a group */
+  const cell = (c, k, d) => swCol(fit.shares(c, d), qi(k));
+  const GAIN = ["lnp", "alp", "grn", "oth"];
+  const gainAt = (d) => {
+    const rate = Object.fromEntries(GAIN.map((g) => [g, cell(g, "onp", d)])), n = rate.lnp.length;
+    const pts = Object.fromEntries(GAIN.map((g) => [g, rate[g].map((v) => SW_SHARE25[g] * v / 100)]));
+    const drawn = Float64Array.from({ length: n }, (_, i) => GAIN.reduce((t, g) => t + pts[g][i], 0));
+    const share = Object.fromEntries(GAIN.map((g) => [g, pts[g].map((v, i) => 100 * v / drawn[i])]));
+    return { pts, share, drawn };
+  };
+  const sm = (a) => { const lo = swQuant(a, 0.025), hi = swQuant(a, 0.975); return { v: swMean(a), lo, hi, ci: (hi - lo) / 2 }; };
+  const diff = (a, b) => a.map((v, i) => v - b[i]);
+  /* a current reading in the panels' shape: today, a month ago and the
+     change between them (the same draws at both days) */
+  const reading = (nowA, prevA) => {
+    const s = sm(nowA), p = sm(prevA), dA = diff(nowA, prevA), d = sm(dA);
+    return { v: r1(s.v), ci95: r1(s.ci), lo: r1(s.lo), hi: r1(s.hi), prev: r1(p.v),
+             chg: r1(d.v), changeCi95: r1(d.ci), changeLo: r1(d.lo), changeHi: r1(d.hi), changeSig: d.lo > 0 || d.hi < 0,
+             pUp: r2(swMean(dA.map((v) => (v > 0 ? 1 : 0)))), method: "bayes" };
+  };
+  const kOf = (ym) => SW_TABLES.filter((t) => t.ym === ym).length;
+  const line = (f) => months.map((m) => { const s = sm(f(m.day)); return { ym: m.ym, x: mx(m.ym), v: r1(s.v), ci95: r1(s.ci), lo: r1(s.lo), hi: r1(s.hi), k: kOf(m.ym) }; });
+  /* change since the first month, Holm-adjusted across a family of lines */
+  const sinceFamily = (items) => {
+    const rows = items.map(({ id, f }) => {
+      const a = f(t1), b = f(first), d = diff(a, b), s = sm(d);
+      return { id, from: r1(swMean(b)), to: r1(swMean(a)), chg: r1(s.v), lo: r1(s.lo), hi: r1(s.hi), p: swP(d) };
+    });
+    const ord = rows.map((r, i) => i).sort((a, b) => rows[a].p - rows[b].p);
+    let run = 0;
+    ord.forEach((i, j) => { run = Math.max(run, Math.min(1, (rows.length - j) * rows[i].p)); rows[i].padj = run; });
+    return Object.fromEntries(rows.map((r) => [r.id, { ...r, p: swR3(r.p), padj: swR3(r.padj), sig: r.padj < 0.05 }]));
+  };
+  const gNow = gainAt(t1), gPrev = gainAt(prev);
+  const rates = Object.fromEntries(GAIN.map((g) => [g, {
+    now: reading(cell(g, "onp", t1), cell(g, "onp", prev)),
+    monthly: line((d) => cell(g, "onp", d)),
+  }]));
+  const gains = Object.fromEntries(GAIN.map((g) => [g, {
+    now: { ...reading(gNow.share[g], gPrev.share[g]), pts: r1(swMean(gNow.pts[g])) },
+    monthly: months.map((m) => { const s = sm(gainAt(m.day).share[g]); return { ym: m.ym, x: mx(m.ym), v: r1(s.v), ci95: r1(s.ci), k: kOf(m.ym) }; }),
+  }]));
+  const kept = { now: reading(cell("onp", "onp", t1), cell("onp", "onp", prev)), monthly: line((d) => cell("onp", "onp", d)) };
+  const rateTrend = sinceFamily(GAIN.map((g) => ({ id: g, f: (d) => cell(g, "onp", d) })));
+  /* Coalition v Labor rates, today: the difference and the ratio */
+  const rl = cell("lnp", "onp", t1), ra = cell("alp", "onp", t1), dLA = sm(diff(rl, ra)), rr = sm(rl.map((v, i) => v / ra[i]));
+  const compare = { diff: r1(dLA.v), diffLo: r1(dLA.lo), diffHi: r1(dLA.hi), apart: dLA.lo > 0 || dLA.hi < 0,
+                    ratio: r2(rr.v), ratioLo: r2(rr.lo), ratioHi: r2(rr.hi) };
+  /* where a cohort's voters are going: GO_DESTS order (kept first) */
+  const destParty = (c, dId) => (dId === "kept" ? c : dId);
+  const going = Object.fromEntries(GO_COHORTS.map((c) => {
+    const f = (dId) => (d) => cell(c, destParty(c, dId), d);
+    const dests = Object.fromEntries(GO_DESTS[c].map((dId) => [dId, { now: reading(f(dId)(t1), f(dId)(prev)), monthly: line(f(dId)) }]));
+    const apart = {};
+    for (const a of GO_DESTS[c]) for (const b of GO_DESTS[c]) if (a !== b) {
+      const s = sm(diff(f(a)(t1), f(b)(t1)));
+      apart[a + "|" + b] = s.lo > 0 || s.hi < 0;
     }
-  }
-  return out;
+    return [c, { dests, apart, trend: sinceFamily(GO_DESTS[c].map((dId) => ({ id: dId, f: f(dId) }))) }];
+  }));
+  /* each regular house's lean on the One Nation rates today (its printed
+     share minus the line), for Info */
+  const leans = Object.fromEntries(fit.houses.filter((h) => !fit.lone.has(h)).map((h) => [h, Object.fromEntries(
+    [...GAIN, "onp"].map((g) => { const l = fit.lean(g, h); return [g === "onp" ? "kept" : g, l ? r1(swMean(swCol(l, qi("onp")))) : null]; }))]));
+  /* the switching table today, for the replay: points of the 2025 vote
+     each 2025 group now gives each party */
+  const table = Object.fromEntries(SWITCH_KEYS.map((g) => {
+    const d = fit.shares(g, t1);
+    return [g, Object.fromEntries(SWITCH_KEYS.map((k) => [k, r2(SW_SHARE25[g] * swMean(swCol(d, qi(k))) / 100)]))];
+  }));
+  const th = fit.theta;
+  console.log(`switching model: ${SW_TABLES.length} tables (${[...new Set(SW_TABLES.map((t) => t.house))].join(", ")}) in ${((Date.now() - T0) / 1000).toFixed(1)}s`
+    + ` | Coalition→ON ${rates.lnp.now.v} ±${rates.lnp.now.ci95}, Labor→ON ${rates.alp.now.v} ±${rates.alp.now.ci95}, kept ${kept.now.v}`
+    + ` | ESS ${fit.settings.ess.toFixed(1)} of 64 | κ ${JSON.stringify(Object.fromEntries([...fit.settings.kappa].filter(([h]) => !fit.lone.has(h))))}`
+    + ` | ω ${SWITCH_KEYS.map((k) => k + " " + th["w_" + k].toPrecision(2)).join(" ")}`);
+  return { t1, first, firstYm, months, rates, gains, kept, rateTrend, compare, going, leans, table, drawn: r1(swMean(gNow.drawn)) };
 })();
-const going = !onSourceWaves.length ? [] : GO_COHORTS.map((c) => ({
-  id: c,
-  weight: VOTE_SWITCHING.weights2025[c],
-  dests: GO_DESTS[c].map((d) => ({
-    id: d,
-    now: currentReading(goRateRows[c][d], null, SPARSE_K),
-    monthly: MONTHS.map((ym) => {
-      const m = monthWithSe(goRateRows[c][d], null, ym);
-      return m && { ym, x: mx(ym), v: r1(m.v), ci95: r1(1.96 * m.se), k: m.n };
-    }).filter(Boolean),
-    polls: onSourceWaves.filter((w) => w.dest?.[c]).map((w) => ({
-      x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
-      sample: w.sample ?? null, v: w.dest[c][d],
-    })),
-  })),
-}));
-// the split from pooled rates: est[k] = { v: % of group k now One Nation, se }
-function onSplit(est) {
-  if (ON_GAIN_KEYS.some((k) => !est[k])) return null;
-  const W = VOTE_SWITCHING.weights2025;
-  const share2025 = { lnp: W.lnp, alp: W.alp, grn: W.grn, oth: W.ind + W.oth };
-  const pts = {}, vr = {};
-  for (const k of ON_GAIN_KEYS) {
-    pts[k] = share2025[k] * est[k].v / 100;
-    vr[k] = (share2025[k] / 100) ** 2 * est[k].se ** 2;
-  }
-  const drawn = ON_GAIN_KEYS.reduce((t, k) => t + pts[k], 0);
-  if (!(drawn > 0)) return null;
-  const share = {}, se = {};
-  for (const k of ON_GAIN_KEYS) {
-    const sg = pts[k] / drawn;
-    share[k] = 100 * sg;
-    se[k] = (100 / drawn) * Math.sqrt((1 - sg) ** 2 * vr[k] + sg ** 2 * ON_GAIN_KEYS.filter((h) => h !== k).reduce((t, h) => t + vr[h], 0));
-  }
-  return { share, se, pts, drawn };
-}
-const onSplitAt = (ref) => onSplit(Object.fromEntries(ON_GAIN_KEYS.map((k) => [k, weightedWithSe(nowcastPts(onRateRows[k], null, ref, SPARSE_K))])));
-const onMonthly = MONTHS.map((ym) => {
-  const est = Object.fromEntries(ON_GAIN_KEYS.map((k) => [k, monthWithSe(onRateRows[k], null, ym)]));
-  const sp = onSplit(est);
-  return sp && { ym, x: mx(ym), sp, k: onSourceWaves.filter((w) => w.ym === ym).length };
-}).filter(Boolean);
-const onNow = onSplitAt(refNow), onPrev = onSplitAt(refNow - 30 * 86400000);
-const onSources = onSourceWaves.length ? {
+const onSources = onSourceWaves.length && SWM ? {
+  model: true,
   series: ON_SOURCE_GROUPS.map((g) => {
     const polls = onSourceWaves.map((w) => ({
       x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
       sample: w.sample ?? null, v: w.share[g.id], pts: w.pts[g.id],
     }));
-    const monthly = onMonthly.map((m) => ({ ym: m.ym, x: m.x, v: r1(m.sp.share[g.id]), ci95: r1(1.96 * m.sp.se[g.id]), k: m.k }));
-    let now = null;
-    if (onNow) {
-      now = { v: r1(onNow.share[g.id]), ci95: r1(1.96 * onNow.se[g.id]), pts: r1(onNow.pts[g.id]) };
-      if (onPrev) {
-        const seChg = Math.sqrt(onNow.se[g.id] ** 2 + onPrev.se[g.id] ** 2);
-        Object.assign(now, { prev: r1(onPrev.share[g.id]), chg: r1(onNow.share[g.id] - onPrev.share[g.id]),
-                             changeCi95: r1(1.96 * seChg),
-                             changeSig: Math.abs(onNow.share[g.id] - onPrev.share[g.id]) > 1.96 * seChg });
-      }
-    }
-    /* The panel's other view: the rates themselves - the share of this
-       group's 2025 voters now backing One Nation - before any split. The
-       reading is built as every current reading is (six-week window, change
-       on 30 days earlier), the line month by month inside its 95% interval,
-       a dot per poll. A month rests on two to four polls and a group on its
-       share of each, so the band is what says a one-month jump is noise. */
+    /* the panel's two views of a group: its part of One Nation's gain
+       (now, monthly), and its rate - the share of its 2025 voters now
+       backing One Nation - before any split (rate: now, monthly, a dot
+       per poll as printed) */
     const rate = {
-      now: currentReading(onRateRows[g.id], null, SPARSE_K),
-      monthly: MONTHS.map((ym) => {
-        const m = monthWithSe(onRateRows[g.id], null, ym);
-        return m && { ym, x: mx(ym), v: r1(m.v), ci95: r1(1.96 * m.se), k: m.n };
-      }).filter(Boolean),
+      ...SWM.rates[g.id],
       polls: onSourceWaves.filter((w) => w.toOn[g.id] != null).map((w) => ({
         x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
         sample: w.sample ?? null, v: w.toOn[g.id],
       })),
+      trend: SWM.rateTrend[g.id],
     };
-    return { ...g, polls, monthly, n: polls.length, now, rate };
+    return { ...g, polls, monthly: SWM.gains[g.id].monthly, n: polls.length, now: SWM.gains[g.id].now, rate };
   }),
-  // the readings' window: how many waves it held, and whose
-  now: onNow ? { drawn: r1(onNow.drawn), window: SPARSE_K.label,
-                 n: weightedWithSe(nowcastPts(onRateRows.lnp, null, refNow, SPARSE_K))?.n ?? 0,
-                 houses: [...new Set(onRateRows.lnp.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))] } : null,
+  /* One Nation's own 2025 voters still with it */
+  kept: { ...SWM.kept, polls: onSourceWaves.map((w) => ({ x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date, sample: w.sample ?? null, v: w.keptPct })) },
+  compare: SWM.compare,
+  since: SWM.firstYm,
+  leans: SWM.leans,
+  /* the tables behind the figures: how many, whose, and who published in
+     the last six weeks (the section's meta line) */
+  now: { drawn: SWM.drawn, window: SPARSE_K.label, tables: SW_TABLES.length,
+         n: SW_TABLES.filter((t) => { const d = SWM.t1 - t.day; return d >= 0 && d <= SPARSE_K.window; }).length,
+         houses: [...new Set(SW_TABLES.filter((t) => { const d = SWM.t1 - t.day; return d >= 0 && d <= SPARSE_K.window; }).map((t) => t.house))] },
   waves: onSourceWaves.map(({ x, ym, ...w }) => ({ dateLabel: fwLabel(w.dateStart, w.date), ...w })),
   houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
   weights: VOTE_SWITCHING.weights2025,
-  /* the reverse read, for the panel's Coalition and Labor views: each
-     cohort's 2025 voters as destination shares (kept/onp/cross/grn/oth),
-     pooled nowcast + month-by-month, with a dot per poll – goDestRow's
-     folds documented there */
-  going,
+  /* the reverse read, for the panel's Coalition, Labor and Greens views:
+     each cohort's 2025 voters as destination shares (kept, then GO_DESTS),
+     the model's now and month-by-month line, a dot per poll as printed
+     (goDestRow's folds documented there); apart: which two destinations'
+     shares differ beyond their joint 95% interval today; trend: the change
+     since the first month, Holm across the five */
+  going: GO_COHORTS.map((c) => ({
+    id: c,
+    weight: VOTE_SWITCHING.weights2025[c],
+    apart: SWM.going[c].apart,
+    dests: GO_DESTS[c].map((d) => ({
+      id: d,
+      ...SWM.going[c].dests[d],
+      trend: SWM.going[c].trend[d],
+      polls: onSourceWaves.filter((w) => w.dest?.[c]).map((w) => ({
+        x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
+        sample: w.sample ?? null, v: w.dest[c][d],
+      })),
+    })),
+  })),
 } : null;
 
-/* The whole table, pooled, for the masthead dial's replay (wm-story.jsx),
-   whose four primary bars trade mass in these proportions. Each table the
-   panel uses (every 2025 group printed; an MRP reusing its house's waves
-   left out) gives each 2025 group's split now across Labor, the Coalition,
-   the Greens, One Nation and everyone else. Each cell is pooled across the
-   tables as the panel's rates are - each table weighted by the respondents
-   its group is, a house's repeats deflated to sqrt(m) - then each group's
-   row is closed to 100.
-   - Everyone else is one group on both sides: other parties and
-     independents, YouGov's two groups folded at their 2025 weights and its
-     Community Strong column with them. Undecided (RedBridge prints it as a
-     current vote) is dropped and the row closed over the rest, as the
-     primaries are and as goDestRow does; voters with no 2025 vote to
-     recall are left out, as in the panel.
-   - One pool over the whole run, not month by month: each table already
-     counts the switching from the election to its date, and the panel's
-     rates have held since February, so months apart the cells differ by
-     sampling noise - which the replay would animate as voters changing
-     their minds back and forth.
+/* The switching table, for the masthead dial's replay (wm-story.jsx), whose
+   four primary bars trade mass in these proportions: the model's table
+   today (§5bm) – each 2025 group's row as points of the 2025 vote now with
+   Labor, the Coalition, the Greens, One Nation and everyone else.
+   - Everyone else is one group on both sides, as in the model's rows.
+   - One table, not month by month: each table already counts the switching
+     from the election to its date, and the replay spreads one pattern over
+     the months, scaled to each month's movement (buildDialStory), so the
+     exchange never animates the month-to-month wobble of the estimates.
+     Until 2026-11-24 the pattern was every table pooled at once; the model's
+     table today is the same question answered with the latest evidence.
    flows[i][j]: points of the 2025 vote now with party j that voted for
    group i in 2025 (i = j: kept). */
-const SWITCH_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
-const switchFlows = (() => {
-  if (!onSourceWaves.length) return null;
-  const W = VOTE_SWITCHING.weights2025;
-  const share2025 = { alp: W.alp, lnp: W.lnp, grn: W.grn, onp: W.onp, oth: W.ind + W.oth };
-  const colOf = (k) => (k === "und" || k === "dnr" ? null : SWITCH_KEYS.includes(k) ? k : "oth");
-  const closed = (r) => {
-    if (!r) return null;
-    const o = Object.fromEntries(SWITCH_KEYS.map((k) => [k, 0]));
-    for (const [k, v] of Object.entries(r)) { const c = colOf(k); if (c && Number.isFinite(v)) o[c] += v; }
-    const s = SWITCH_KEYS.reduce((t, k) => t + o[k], 0);
-    return s > 0 ? Object.fromEntries(SWITCH_KEYS.map((k) => [k, (100 * o[k]) / s])) : null;
-  };
-  const byKey = new Map(VOTE_SWITCHING.waves.map((w) => [w.date + "|" + w.pollster, w]));
-  const tables = onSourceWaves.map((sw) => {
-    const R = byKey.get(sw.date + "|" + sw.pollster)?.rows || {};
-    const rows = Object.fromEntries(["alp", "lnp", "grn", "onp"].map((g) => [g, closed(R[g])]));
-    if (R.ind) {
-      const a = closed(R.ind), b = closed(R.oth);
-      rows.oth = a && b ? Object.fromEntries(SWITCH_KEYS.map((k) => [k, (W.ind * a[k] + W.oth * b[k]) / (W.ind + W.oth)])) : null;
-    } else rows.oth = closed(R.oth);
-    if (SWITCH_KEYS.some((g) => !rows[g])) return null;
-    const p = POLL_BY_KEY.get(sw.date + "|" + sw.pollster);
-    return { firm: sw.pollster, date: sw.date, n: rowN(p || { sample: sw.sample }), rows };
-  }).filter(Boolean);
-  if (!tables.length) return null;
-  const m = new Map();
-  for (const t of tables) m.set(t.firm, (m.get(t.firm) || 0) + 1);
-  const flows = {};
-  for (const g of SWITCH_KEYS) {
-    const rate = Object.fromEntries(SWITCH_KEYS.map((c) => [c, weightedWithSe(tables.map((t) => {
-      const n = (t.n * share2025[g]) / 100;
-      return { w: n / Math.sqrt(m.get(t.firm)), x: t.rows[g][c], n };
-    })).v]));
-    const s = SWITCH_KEYS.reduce((t, c) => t + rate[c], 0);
-    flows[g] = Object.fromEntries(SWITCH_KEYS.map((c) => [c, r2((share2025[g] * rate[c]) / s)]));
-  }
-  return { keys: SWITCH_KEYS, flows, tables: tables.length, from: tables[0].date, to: tables[tables.length - 1].date,
-           houses: [...m.keys()] };
-})();
+const switchFlows = SWM ? { keys: SWITCH_KEYS, flows: SWM.table, tables: SW_TABLES.length,
+  from: SW_TABLES[0].date, to: SW_TABLES[SW_TABLES.length - 1].date,
+  houses: [...new Set(SW_TABLES.map((t) => t.house))], model: true } : null;
 
 /* ---- 5c. the vote by group: the tables ---------------------------------------
    data/demographics.json (.build/demographics.mjs) – each house's groups, per
