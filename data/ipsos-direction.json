@@ -22234,6 +22234,267 @@
           "sampleApprox": true
         }
       ]
+    },
+    {
+      "month": "2026-11",
+      "start": "2026-10-23",
+      "end": "2026-11-06",
+      "fieldwork": "October 23rd 2026 - November 6th 2026",
+      "source": "Ipsos What Worries the World",
+      "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+      "australia": {
+        "right": 35,
+        "wrong": 65,
+        "sample": 1000,
+        "sampleApprox": true
+      },
+      "globalAverage": {
+        "right": 37,
+        "wrong": 63,
+        "sample": 24025
+      },
+      "countries": [
+        {
+          "code": "SG",
+          "name": "Singapore",
+          "right": 76,
+          "wrong": 24,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "MY",
+          "name": "Malaysia",
+          "right": 68,
+          "wrong": 32,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "IN",
+          "name": "India",
+          "right": 66,
+          "wrong": 34,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "HU",
+          "name": "Hungary",
+          "right": 61,
+          "wrong": 39,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "BR",
+          "name": "Brazil",
+          "right": 52,
+          "wrong": 48,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "CA",
+          "name": "Canada",
+          "right": 46,
+          "wrong": 54,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "CO",
+          "name": "Colombia",
+          "right": 45,
+          "wrong": 55,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "PE",
+          "name": "Peru",
+          "right": 41,
+          "wrong": 59,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "KR",
+          "name": "South Korea",
+          "right": 41,
+          "wrong": 59,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "MX",
+          "name": "Mexico",
+          "right": 41,
+          "wrong": 59,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "PL",
+          "name": "Poland",
+          "right": 40,
+          "wrong": 60,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "IE",
+          "name": "Ireland",
+          "right": 39,
+          "wrong": 61,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "TH",
+          "name": "Thailand",
+          "right": 39,
+          "wrong": 61,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "AR",
+          "name": "Argentina",
+          "right": 39,
+          "wrong": 61,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "ID",
+          "name": "Indonesia",
+          "right": 37,
+          "wrong": 63,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "IL",
+          "name": "Israel",
+          "right": 35,
+          "wrong": 65,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "AU",
+          "name": "Australia",
+          "right": 35,
+          "wrong": 65,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "SE",
+          "name": "Sweden",
+          "right": 32,
+          "wrong": 68,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "JP",
+          "name": "Japan",
+          "right": 32,
+          "wrong": 68,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "TR",
+          "name": "Türkiye",
+          "right": 29,
+          "wrong": 71,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "CL",
+          "name": "Chile",
+          "right": 29,
+          "wrong": 71,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "ES",
+          "name": "Spain",
+          "right": 29,
+          "wrong": 71,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "GB",
+          "name": "Great Britain",
+          "right": 28,
+          "wrong": 72,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "US",
+          "name": "US",
+          "right": 26,
+          "wrong": 74,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "ZA",
+          "name": "South Africa",
+          "right": 26,
+          "wrong": 74,
+          "sample": 500,
+          "sampleApprox": true
+        },
+        {
+          "code": "IT",
+          "name": "Italy",
+          "right": 24,
+          "wrong": 76,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "NL",
+          "name": "Netherlands",
+          "right": 22,
+          "wrong": 78,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "BE",
+          "name": "Belgium",
+          "right": 22,
+          "wrong": 78,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "DE",
+          "name": "Germany",
+          "right": 16,
+          "wrong": 84,
+          "sample": 1000,
+          "sampleApprox": true
+        },
+        {
+          "code": "FR",
+          "name": "France",
+          "right": 6,
+          "wrong": 94,
+          "sample": 1000,
+          "sampleApprox": true
+        }
+      ]
     }
   ]
 }

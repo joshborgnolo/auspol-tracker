@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-11-23T22:01:36.929Z",
+  "generatedAt": "2026-11-24T20:38:14.741Z",
   "discoveryPages": [
     "https://www.ipsos.com/en/what-worries-world",
     "https://www.ipsos.com/en/topic/what-worries-world"
@@ -82,6 +82,22 @@
       "bytes": 2429877,
       "sha256": "e7b716325b744c418dcb1cdc89e8c31a44bf485a3d6131a2bf7d19f34d76d16f",
       "fetchedAt": "2026-11-21T22:41:59.200Z"
+    },
+    {
+      "id": "What-Worries-the-World-November-26-75160296",
+      "url": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+      "retrievedUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+      "recovery": "original",
+      "discoveryArticles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "articles": [
+        "https://resources.ipsos.com/What-Worries-The-World-2026-Download.html"
+      ],
+      "text": "What-Worries-the-World-November-26-75160296.txt",
+      "bytes": 1619663,
+      "sha256": "15e7c44a77f2f9a626d7cd0ecee8753e320cb8450b978588f697dfee7b9e8653",
+      "fetchedAt": "2026-11-24T20:38:14.738Z"
     },
     {
       "id": "What-Worries-the-World-October-26-f75b5835",

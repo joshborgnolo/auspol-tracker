@@ -35595,16 +35595,248 @@
           ]
         }
       ]
+    },
+    {
+      "month": "2026-11",
+      "start": "2026-10-23",
+      "end": "2026-11-06",
+      "fieldwork": "October 23rd 2026 - November 6th 2026",
+      "source": "Ipsos What Worries the World",
+      "sources": [
+        {
+          "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+          "originalUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+          "capture": "What-Worries-the-World-November-26-75160296.txt",
+          "sha256": "15e7c44a77f2f9a626d7cd0ecee8753e320cb8450b978588f697dfee7b9e8653"
+        }
+      ],
+      "sample": {
+        "globalAverage": 24025,
+        "australia": 1000,
+        "australiaApprox": true
+      },
+      "australia": [
+        {
+          "issue": "inflation",
+          "label": "Inflation",
+          "share": 49,
+          "read": "top concern by country",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        }
+      ],
+      "globalAverage": [
+        {
+          "issue": "unemployment",
+          "label": "Unemployment and jobs",
+          "share": 29,
+          "changeMonth": 0,
+          "changeYear": 1,
+          "read": "global top-five table + global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "corruption",
+          "label": "Financial/political corruption",
+          "share": 26,
+          "changeMonth": -1,
+          "changeYear": -1,
+          "read": "global top-five table + global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "inequality",
+          "label": "Poverty & social inequality",
+          "share": 28,
+          "changeMonth": -1,
+          "changeYear": 0,
+          "read": "global top-five table + global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "crime",
+          "label": "Crime & violence",
+          "share": 30,
+          "changeMonth": -1,
+          "changeYear": -4,
+          "read": "global top-five table + global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "healthcare",
+          "label": "Healthcare",
+          "share": 23,
+          "changeMonth": 1,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "education",
+          "label": "Education",
+          "share": 13,
+          "changeMonth": 0,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "taxes",
+          "label": "Taxes",
+          "share": 18,
+          "changeMonth": 0,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "immigration",
+          "label": "Immigration control",
+          "share": 17,
+          "changeMonth": 0,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "moralDecline",
+          "label": "Moral decline",
+          "share": 11,
+          "changeMonth": 1,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "inflation",
+          "label": "Inflation",
+          "share": 32,
+          "changeMonth": 1,
+          "changeYear": 2,
+          "read": "global top-five table",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "extremism",
+          "label": "Rise of extremism",
+          "share": 11,
+          "changeMonth": 1,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "environment",
+          "label": "Threats against the environment",
+          "share": 8,
+          "changeMonth": 0,
+          "changeYear": 1,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "climate",
+          "label": "Climate change",
+          "share": 17,
+          "changeMonth": 0,
+          "changeYear": 4,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        },
+        {
+          "issue": "militaryConflict",
+          "label": "Military conflict between nations",
+          "share": 11,
+          "changeMonth": -1,
+          "changeYear": 0,
+          "read": "global worry list",
+          "sources": [
+            {
+              "sourceUrl": "https://resources.ipsos.com/rs/297-CXJ-795/images/What-Worries-the-World-November-26.pdf?version=0",
+              "capture": "What-Worries-the-World-November-26-75160296.txt"
+            }
+          ]
+        }
+      ]
     }
   ],
   "coverage": {
-    "reports": 103,
-    "waves": 96,
-    "wavesWithAustralia": 95,
-    "australiaObservations": 941,
-    "globalObservations": 1572,
+    "reports": 104,
+    "waves": 97,
+    "wavesWithAustralia": 96,
+    "australiaObservations": 942,
+    "globalObservations": 1586,
     "first": "2016-09",
-    "last": "2026-10"
+    "last": "2026-11"
   },
   "unread": []
 }
