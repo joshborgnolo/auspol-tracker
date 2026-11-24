@@ -507,7 +507,7 @@ function chartDots(m) {
     else head = `${noun}: a median ${fu(md)} across the ${vin.length} seats`;
     dek = `The median seat sat at ${fu(md)}; the middle half of the seats ran from ${fu(lo)} to ${fu(hi)}.`;
   }
-  const notes = `Each block is a seat, coloured by who ${chHeld(m)} it, stacked by its figure: a histogram whose blocks you can point at.${nat != null ? ` The upright line marks ${chPlace(m)}.` : ""}${miss ? ` ${miss} seat${miss > 1 ? "s have" : " has"} no figure here and ${miss > 1 ? "are" : "is"} left out.` : ""}`;
+  const notes = `Each block is a seat, coloured by who ${chHeld(m)} it, stacked by its figure.${nat != null ? ` The upright line marks ${chPlace(m)}.` : ""}${miss ? ` ${miss} seat${miss > 1 ? "s have" : " has"} no figure here and ${miss > 1 ? "are" : "is"} left out.` : ""}`;
   const draw = (w, h) => {
     if (!all.length) return { svg: "", pts: [] };
     // the national line's label owns a band above the stacks: the tallest stack (and the selected seat's ring) stops short of it

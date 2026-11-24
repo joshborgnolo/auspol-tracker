@@ -1638,9 +1638,9 @@ function RdHero(p) {
         ] : keyItems} />
       </div>
       <RdFoot how={KAL || TPMH ? { term: "weighted-aggregate", from: "Two-party preferred" } : { href: "/flows-explained/" }}>
-        {KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago. The chart follows the matchup chosen above."
-          : TPMH ? "Figures are the model’s estimates from every poll this term, each pollster’s lean taken out, and can step at a change of leader. Changes are on a month ago, read from the model’s simulations. The chart follows the matchup chosen above."
-          : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above."}
+        {KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago."
+          : TPMH ? "Figures are the model’s estimates from every poll this term, each pollster’s lean taken out, and can step at a change of leader. Changes are on a month ago, read from the model’s simulations."
+          : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago."}
         {extOn && isCoal && <> BludgerTrack’s line is its published trend. Bonham’s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025.</>}
         {extOn && isOn && <> Bonham’s line is his published shadow-2PP, averaged by month like ours. He converts each poll’s primary votes with his own estimates of 2025 preferences and averages the latest ten polls, at most two from each pollster. Our flows differ, so the two lines need not agree.</>}
       </RdFoot>

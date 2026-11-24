@@ -7639,7 +7639,7 @@ function infoTerms(D) {
     .filter((y) => y >= accFirst && y <= accLast && !acc.cycles.some((c) => c.year === y)) : [];
   const accSpan = acc ? (
     <>the {acc.cycles.length} elections from {accFirst} to {accLast} with final polls on
-    record{accGaps.length ? <> (none survive for {accGaps.join(" or ")})</> : null}</>) : null;
+    record{accGaps.length ? <> (none survive for {accGaps.length > 1 ? accGaps.slice(0, -1).join(", ") + " or " + accGaps[accGaps.length - 1] : accGaps[0]})</> : null}</>) : null;
   const accShared = acc ? acc.cycles.filter((c) => c.n >= 2 && c.sameSide)
     .sort((a, b) => b.absErr - a.absErr)[0] : null;
   /* Term-to-term links: the same hi-term tap-to-define treatment the hero
@@ -7920,8 +7920,18 @@ function infoTerms(D) {
      pollster-by-pollster lists, data checks and source lists sit in each
      entry's "Show the working" fold. An id merged into another lives on in
      INFO_ALIAS, so no link breaks. */
+  const MODEL_HL = !!(L.method && L.method.kind === "model");
   const faqs = [
-    { id: "what-am-i-looking-at", q: "What am I looking at?", a: (
+    { id: "what-am-i-looking-at", q: "What am I looking at?", a: MODEL_HL ? (
+      <>In the main chart, each dot is one published poll, placed at the midpoint of its
+      fieldwork. The line is the model’s estimate at each month, drawn through every poll with
+      each pollster’s {xref("house-effect", "what am i looking at", "lean")} taken out, and its
+      {" "}{xref("interval", "what am i looking at", "95% interval")} is shaded around it. Where two
+      bands overlap, the polls can’t separate the parties that month. The figure at the top is the
+      model’s estimate today (see
+      {" "}{xref("two-party-preferred", "what am i looking at", "Two-party preferred")}). Other
+      charts follow the same pattern. A dash (—) in a table means the pollster didn’t ask that
+      question.</>) : (
       <>In the main chart, each dot is one published poll, placed at the midpoint of its
       fieldwork. The line is a monthly average of the polls, weighted by sample size and adjusted
       for each pollster’s {xref("house-effect", "what am i looking at", "lean")}, with its
@@ -7938,8 +7948,17 @@ function infoTerms(D) {
       {" "}{sources}. A pollster’s MRP or SMS polls count under its own name. All polls files each
       one with its fieldwork dates, sample size, a link to the release and, where one exists, its
       {" "}{xref("apc-statement", "where does data come from", "APC statement")}. Past cycles holds
-      every term back to 1972.</>) },
-    { id: "headline-how", q: "How is the headline worked out?", a: (
+      every term back to 1943.</>) },
+    { id: "headline-how", q: "How is the headline worked out?", a: MODEL_HL ? (
+      <>It is a model’s estimate for today, drawn from every poll since the 2025 election with
+      each pollster’s usual lean taken out (see
+      {" "}{xref("two-party-preferred", "how is the headline worked out", "Two-party preferred")}).
+      Rather than average the pollsters’ own two-party figures, each worked out a different way,
+      it reads every poll’s primary votes through one fixed
+      {" "}{xref("preference-flows", "how is the headline worked out", "preference table")} (see
+      {" "}{xref("implied-2pp", "how is the headline worked out", "Implied 2PP")}). The headline
+      follows the rival Labor is doing worse against
+      {headFig ? <>: today {headFig.rival}, at {headFig.a.toFixed(1)}–{headFig.b.toFixed(1)}</> : null}.</>) : (
       <>It averages the last three weeks of polls, counting newer and larger polls for more,
       after taking out each pollster’s usual lean (see
       {" "}{xref("weighted-aggregate", "how is the headline worked out", "Weighted aggregate")}).
@@ -7987,11 +8006,11 @@ function infoTerms(D) {
     { id: "newest-poll-not-headline", q: "Why doesn’t the newest poll match the headline?", a: (
       <>Usually neither is wrong. A poll is one pollster’s reading of one week, and chance alone
       can put it off by its {xref("margin-of-error", "newest poll", "margin of error")}, so two
-      honest polls of an unchanged electorate will differ too. The headline pools every recent
-      poll after removing each pollster’s
+      honest polls of an unchanged electorate will differ too. The headline pools every
+      {MODEL_HL ? "" : "recent "}poll after removing each pollster’s
       {" "}{xref("house-effect", "newest poll", "house effect")}, its habit of leaning one way. One
-      poll moves it by its weight, not its news value: its
-      {" "}{xref("aggregate-effect", "newest poll", "aggregate effect")} shows how much.
+      poll moves it by its weight, not its news value{MODEL_HL ? "." : <>: its
+      {" "}{xref("aggregate-effect", "newest poll", "aggregate effect")} shows how much.</>}
       {" "}{xref("poll-disagreement", "newest poll", "Poll disagreement")} tests whether the polls
       differ by more than chance allows.</>) },
     /* the More menu's figure column (2026-10-18): its rules, in words -
@@ -8089,8 +8108,7 @@ function infoTerms(D) {
     { id: "monthly-average", term: "Monthly average", body: (
       <>What a contest gets when too few pollsters ask it to measure their
       {" "}{xref("house-effect", "monthly average", "house effects")}: a plain average of each
-      month’s polls, with no adjustments. The two-party section says which kind it is showing,
-      so an unadjusted average is never mistaken for the adjusted one.</>) },
+      month’s polls, with no adjustments. The two-party section says which kind it is showing.</>) },
     { id: "interval", term: "95% interval", body: (
       <>How far a figure could plausibly be off by chance. For the two-party figure against the
       Coalition today, that’s ±{hl.ci.toFixed(1)} points on each party’s share, and
@@ -8524,7 +8542,7 @@ function infoTerms(D) {
           return (<>
             <span className="info-p"><b>Past terms.</b> The arrows over the chart, and its 10 yrs
             and All views, run the primary vote back to 1943. {VHi && VHi.model ? "Each past term is estimated with the same model as this term, each pollster’s lean taken out, and then drawn through the election" : "Each past term is built month by month, with each pollster’s lean taken out, and then drawn through the election"}
-            results at both ends. Unfortunately, the polls miss on polling day: by about
+            {" "}results at both ends. Unfortunately, the polls miss on polling day: by about
             {" "}{VHi ? VHi.rms.alp.toFixed(1) : "1.7"} points for Labor and {VHi ? VHi.rms.lnp.toFixed(1) : "1.9"} for
             the Coalition, as a root mean square over past elections. So each month of a past term
             is moved toward its closing result by part of that election’s miss: two-fifths of it
@@ -8542,7 +8560,7 @@ function infoTerms(D) {
             <span className="info-p">A past term’s Others is whatever its election counted as
             others, so it holds the Greens before 1993 and One Nation from 2001 to 2016.
             {gap.length ? <> No dated poll fell in the final three weeks before the {gap[0]}
-            to {gap[gap.length - 1]} elections, so those terms are the polls alone.</> : null} Over
+            {" "}to {gap[gap.length - 1]} elections, so those terms are the polls alone.</> : null} Over
             a dozen years or more the chart leaves the bands off; a shorter window shows them.</span>
           </>);
         })()}</>) },
@@ -8729,8 +8747,7 @@ function infoTerms(D) {
           before it, and Scanlon’s online panel since 2018 against its telephone years.</span>
           <span className="info-p"><b>How it’s built.</b> Trust is treated as moving a little each
           month, with room for a sudden shift at each federal election and change of prime
-          minister and at the start of the pandemic in March 2020 – the evidence for that last jump
-          is overwhelming. How fast trust moves, how far leans drift and how noisy the surveys are
+          minister and at the start of the pandemic in March 2020. How fast trust moves, how far leans drift and how noisy the surveys are
           beyond their samples are estimated from the readings. The line’s{" "}
           {xref("interval", "trust-government", "95% interval")} gives a 95% chance the figure lies
           inside, under the model’s assumptions; a change is significant only when its own
@@ -9169,8 +9186,7 @@ function infoTerms(D) {
             each way, so the gap also carries their other differences. Each line is estimated with the same
             kind of model as the {xref("primary-vote", "decidedness", "primary vote")}: the share
             moves a little each day, and each pollster reads it through a lean of its own – its
-            wording – which the model works out alongside the share. So a month is no longer high
-            just because the pollster that reads highest happened to report in it. The level is set
+            wording – which the model works out alongside the share. The level is set
             by the pollsters with four or more polls in the term, each counting once. The shaded band is the
             line’s {xref("interval", "decidedness", "95% interval")}, and a change counts as
             significant only when its own 95% interval excludes zero.</span>
@@ -9201,10 +9217,10 @@ function infoTerms(D) {
         index, monthly; DemosAU’s national Consumer Sentiment Index, from November
         2026; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
         Business Survey. The consumer lanes and the business pair sit in two views, switched by
-        the tabs over the chart — the consumer lanes open first. The chart opens at the May
+        the tabs over the chart. The chart opens at the May
         2025 election, on this term. The bar over it steps back a term at a time, or widens to
         10 or 25 years or the whole record, and the strip under the chart moves the window
-        anywhere along it; the window holds as you switch tabs. Each house’s live releases
+        anywhere along it. Each house’s live releases
         run back to 2019 (the Roy Morgan series), 2022 (Westpac–MI) and April 2025 (NAB), and
         its own monthly history runs on behind them: ANZ–Roy Morgan’s consumer index to 1973,
         Westpac–MI’s to 1974, NAB’s printed net balance to 1997 and Roy Morgan’s business index
@@ -9367,10 +9383,11 @@ function infoTerms(D) {
           whose polls lean the same way again and again is showing its
           {" "}{xref("house-effect", "poll lean", "house effect")}.</>) },
         { id: "aggregate-effect", term: "Aggregate effect", body: (
-          <>How much one poll moves the headline. The poll’s breakdown recalculates the
-          {" "}{xref("weighted-aggregate", "aggregate effect", "weighted aggregate")} without it:
-          “+0.1 for ALP” means today’s two-party figure is a tenth of a point higher because this
-          poll is in the window. One line appears for each figure the poll feeds: the published
+          <>How much one poll moves the three-week {xref("weighted-aggregate", "aggregate effect", "weighted aggregate")}
+          {L.method && L.method.kind === "model" ? <> of the two-party figures; the headline itself comes from the
+          model</> : <>, which sets the headline</>}.
+          The poll’s breakdown recalculates that aggregate without it: “+0.1 for ALP” means it is a
+          tenth of a point higher because this poll is in the window. One line appears for each figure the poll feeds: the published
           two-party figure, the {xref("implied-2pp", "aggregate effect", "implied 2PP")}, and Labor
           v One Nation where the poll asked it. A poll older than 21 days moves nothing now, and
           says so, with what it was worth when published where that can still be worked out. House
@@ -9383,8 +9400,7 @@ function infoTerms(D) {
           A poll’s breakdown links it, and its effective sample sets the poll’s weight in the
           {" "}{xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Newspoll, YouGov,
           Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one. Where a pollster
-          publishes none, the {eff} column shows a dash: the site doesn’t invent a figure the
-          pollster never published.</>) },
+          publishes none, the {eff} column shows a dash.</>) },
         { id: "mrp", term: "MRP", body: (
           <>Multilevel regression and post-stratification: a model that estimates each seat
           separately instead of applying one national swing everywhere. Seat figures appear only
@@ -9419,11 +9435,8 @@ function infoTerms(D) {
     <>
       <p className="info-about-p">auspol tracker is an unofficial aggregator of Australian federal
       political polls. It collects published polls, adjusts each for its pollster’s lean, weights
-      them by recency and sample size, and pools them into aggregate estimates. To be clear, the
-      site runs no polls of its own; it only gathers and presents those published by others. It
-      aims to cut through the noise and give a clear view of Australian political sentiment: how
-      Australians intend to vote, and their views on leaders, issues, and our country’s
-      direction.</p>
+      them into aggregate estimates. The site runs no polls of its own. It covers how Australians
+      intend to vote, and their views on leaders, issues, and the country’s direction.</p>
       <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, mostly
       by automated checks but also manually by me (some guy). Every figure is rebuilt when a new
       poll lands.</p>
@@ -9899,8 +9912,7 @@ function infoTerms(D) {
             the question order. It is the pollster’s own publication; nothing is lodged with the
             council. A poll’s breakdown links it, and its effective sample sets the poll’s weight in
             the {xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Where a pollster
-            publishes none, the {eff} column shows a dash: the site doesn’t invent a figure the
-            pollster never published.</>) },
+            publishes none, the {eff} column shows a dash.</>) },
           ...fedAll.filter((e) => e.id === "mrp" || e.id === "poll-disagreement" || e.id === "house-lean"),
         ] },
     ];
@@ -9909,8 +9921,7 @@ function infoTerms(D) {
         <p className="info-about-p">{J.brand} tracker is the Victorian edition of auspol tracker,
         an unofficial aggregator of Victorian state political polls. It collects published polls,
         adjusts each for its pollster’s lean, weights them by recency and sample size, and pools
-        them into aggregate estimates. To be clear, the site runs no polls of its own; it only
-        gathers and presents those published by others. It aims to give a clear view of how
+        them into aggregate estimates. The site runs no polls of its own. It covers how
         Victorians intend to vote at the {J.nextElection.label.replace(/^\w+day /, "")} election,
         and what they think of the leaders.</p>
         <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, and

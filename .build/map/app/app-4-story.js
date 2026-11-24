@@ -2016,7 +2016,7 @@ function storyBooth(m, j) {
   if (!Number.isNaN(b.tpp[j]) && swingHere == null) after += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
   const loc = raw.location && raw.location[j];
   if (loc) after += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
-  else if (raw.lat[j] == null) after += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
+  else if (raw.lat[j] == null) after += `<p class="st-note">No reliable fixed location has been matched.</p>`;
   if (!tc) after += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
   // (a place with no count of its own has no finding: its name is already its title)
   let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed === ds(b.name[j]) ? "" : hed, dek, figs);

@@ -630,7 +630,7 @@ assert.ok(ap.includes('const TP_NSWLC = (TP_HIST && TP_HIST.nswLc) || null;')
     && ap.includes('<option value="nswlc">{TP_NSWLC.label}</option>')
     && ap.includes('lc={lcView}'),
   "the 2PP Upper menu gains the ONE state-council twin: nswlc rides lcView widened off the twoPP file, offered from its own State-elections section, legal under Upper alone");
-assert.ok(ap.includes('IMPLIED, never an AEC count')
+assert.ok(ap.includes('Implied, not an AEC count')
     && ap.includes('(impBank ? "Implied two-party preferred, " : "Two-party preferred, ")')
     && ap.includes('key={"ex-2pp-" + (house || "") + (lc ? "lc" : "") + (stateKey || "") + (classKey || "")}')
     && ap.includes('...(senAll ? [senAll, ...Object.keys(senAll.states || {}).map((k) => senAll.states[k])] : [])')

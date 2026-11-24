@@ -848,7 +848,21 @@ if (favNow === "stale") console.log("  favicon PNG: drawn from an older glyph â€
    otherwise drift in two files' worth of copies). Called with the caller's
    own L/prim/acc, so buildStaticSummary's output is unchanged. */
 function ssAboutBlock(L, prim, acc) {
-  return `      <h2>About this tracker</h2>
+  return `      <h2>About this tracker</h2>${L.method.kind === "model" ? `
+      <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
+        election. The two-party figures and the primary vote come from one model fitted to every poll
+        this term: each party&#8217;s share moves a little each day, and each pollster reads it through
+        a lean of its own plus sampling error, which the model works out alongside the shares. The
+        leaders&#8217; ratings, the direction of the country, the issues, decidedness and the vote by
+        group run on models of the same kind. Larger polls count for more: each poll&#8217;s weight
+        rests on its published effective sample where the house publishes one &#8211; Newspoll, YouGov,
+        Essential, DemosAU, RedBridge/Accent, and Fox &amp; Hedgehog do, in their Australian Polling
+        Council methodology statements &#8211; and otherwise on its raw sample, discounted by 1.6 for
+        weighting and capped at 3,000.</p>
+      <p>The headline carries a 95% interval, the middle 95% of the model&#8217;s simulations:
+        currently about &#177;${L.alp2ppCi95.toFixed(1)} points on each share, from
+        ${L.method.nPolls} polls. It cannot cover error the whole industry shares: no aggregate can
+        see a lean every poll in it carries. Movement smaller than the interval is marked as such.</p>` : `
       <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
         election. The two-party and primary-vote aggregates are weighted means: recent and larger
         polls count for more, and each pollster&#8217;s figure is adjusted for its own lean against
@@ -871,8 +885,8 @@ function ssAboutBlock(L, prim, acc) {
         on ${L.method.nPolls} polls across ${L.method.windowDays} days (effective sample
         ${L.alp2ppNEff} after weighting). It cannot cover error the whole industry shares: an
         aggregate has no way to see a lean every poll in it carries. Movement smaller than the
-        interval is marked as such.</p>${acc ? `
-      <p>That caveat is not idle. Across the ${acc.cycles.length} elections from
+        interval is marked as such.</p>`}${acc ? `
+      <p>Across the ${acc.cycles.length} elections from
         ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year} the final polls missed
         the two-party result by ${acc.meanAbs} points on average &#8211; at ${accWorst(acc)}.
         Past cycles carries the full record, house by house.</p>` : ""}
@@ -881,7 +895,14 @@ function ssAboutBlock(L, prim, acc) {
       <p>On the two-party chart each dot by default is one poll&#8217;s implied figure &#8211;
         its primaries re-allocated at the 2025 election&#8217;s counted flows &#8211; and the
         switch under the heading swaps the whole series to the pollsters&#8217; own published
-        figures, dots and all. Elsewhere each dot is one published poll. The lines are monthly
+        figures, dots and all. Elsewhere each dot is one published poll. ${L.method.kind === "model"
+        ? `The lines are the models&#8217; monthly estimates, shaded with the 95% interval around
+        them. Where the two bands meet, that month&#8217;s lead is inside its own margin of error.
+        The leaders&#8217; lines are one per leader per office, and the direction chart&#8217;s line
+        reaches back to 2007, before this term. The miniature strip beneath it (with each government
+        in power marked) carries the same line&#8217;s net, right direction less wrong track. A
+        &#8220;&#8212;&#8221; in any table means the pollster didn&#8217;t ask that question.</p>`
+        : `The lines are monthly
         aggregates, shaded with the 95%
         interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
         margin of error. Leadership questions are asked irregularly, so those lines are monthly
@@ -895,7 +916,7 @@ function ssAboutBlock(L, prim, acc) {
         back through its Government Confidence
         Rating tables; the line breaks where it printed nothing for more than a quarter. The miniature strip
         beneath (with each government in power marked) carries the same line&#8217;s net, right direction less wrong track. A &#8220;&#8212;&#8221; in any
-        table means the pollster didn&#8217;t ask that question.</p>
+        table means the pollster didn&#8217;t ask that question.</p>`}
       <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
         figure into a seat count assumes a uniform swing, and with One Nation near
         ${Math.round(prim.onp)}% of the primary vote the assumption fails in exactly the seats that
@@ -1081,13 +1102,16 @@ function buildStaticSummary() {
         so every poll that publishes primaries counts, not only those that file a
         two-party figure. The pollsters&#8217; own respondent-allocated figures
         aggregate to ${L.pub.alp2pp.toFixed(1)}&#8211;${L.pub.lnp2pp.toFixed(1)}, and
-        the live chart switches between the two` : ""}. The aggregate is a sample- and
-        recency-weighted,
+        the live chart switches between the two` : ""}. ${L.method.kind === "model"
+          ? `The figure is a model&#8217;s estimate from all ${L.method.nPolls} polls this term, each
+        pollster&#8217;s lean taken out, carrying a 95% interval of &#177;${L.alp2ppCi95.toFixed(1)}
+        points on each share.`
+          : `The aggregate is a sample- and recency-weighted,
         house-effect-adjusted mean over a ${L.method.windowDays}-day window
         (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
         &#177;${L.alp2ppCi95.toFixed(1)} points on each share from ${L.method.nPolls} polls. Repeat waves from
         one house inside a window or a calendar month count for the square root of their number,
-        so three weekly waves count as 1.7, not 3.</p>
+        so three weekly waves count as 1.7, not 3.`}</p>
 
       ${/* The ALP v ON implied nowcast (latest.onImp, null when thin) â€“ the
            second contest the page headlines, so the article carries it too.
@@ -1133,8 +1157,7 @@ ${ssAboutBlock(L, prim, acc)}
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
       <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregator of published federal opinion polling.
-        Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
-        sound, and informative, but they are, in the end, estimates only. Federal polling archives
+        The aggregate figures are estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/provenance/">here</a> for
         safekeeping and convenience.</p>
     </article>`;
@@ -1189,6 +1212,10 @@ function buildStaticSummaryVic() {
           ? `The figure is a smoothed trend (a Kalman smoother) through every poll this term,
         each counted by its sample and adjusted for its pollster&#8217;s lean, carrying a 95% interval
         of &#177;${L.alp2ppCi95.toFixed(1)} points on each share.`
+          : L.method.kind === "model"
+          ? `The figure is a model&#8217;s estimate from all ${L.method.nPolls} polls this term, each
+        pollster&#8217;s lean taken out, carrying a 95% interval of &#177;${L.alp2ppCi95.toFixed(1)}
+        points on each share.`
           : `The aggregate is a sample- and recency-weighted,
         house-effect-adjusted mean over a ${L.method.windowDays}-day window
         (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
@@ -1278,8 +1305,7 @@ function ssTail(esc, sources) {
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
       <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregator of published federal opinion polling.
-        Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
-        sound, and informative, but they are, in the end, estimates only. Federal polling archives
+        The aggregate figures are estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/provenance/">here</a> for
         safekeeping and convenience.</p>`;
 }

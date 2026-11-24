@@ -1901,8 +1901,7 @@ function MethodNote({ onInfo }) {
           </p>
           )}
           <p className="disclaimer">
-            Best efforts are made to make the aggregate figures transparent, trustworthy,
-            statistically sound, and informative, but they are, in the end, estimates only.
+            The aggregate figures are estimates only.
           </p>
         </div>
         <div className="colo-ways">

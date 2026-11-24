@@ -7541,7 +7541,7 @@ function chartDots(m) {
     else head = `${noun}: a median ${fu(md)} across the ${vin.length} seats`;
     dek = `The median seat sat at ${fu(md)}; the middle half of the seats ran from ${fu(lo)} to ${fu(hi)}.`;
   }
-  const notes = `Each block is a seat, coloured by who ${chHeld(m)} it, stacked by its figure: a histogram whose blocks you can point at.${nat != null ? ` The upright line marks ${chPlace(m)}.` : ""}${miss ? ` ${miss} seat${miss > 1 ? "s have" : " has"} no figure here and ${miss > 1 ? "are" : "is"} left out.` : ""}`;
+  const notes = `Each block is a seat, coloured by who ${chHeld(m)} it, stacked by its figure.${nat != null ? ` The upright line marks ${chPlace(m)}.` : ""}${miss ? ` ${miss} seat${miss > 1 ? "s have" : " has"} no figure here and ${miss > 1 ? "are" : "is"} left out.` : ""}`;
   const draw = (w, h) => {
     if (!all.length) return { svg: "", pts: [] };
     // the national line's label owns a band above the stacks: the tallest stack (and the selected seat's ring) stops short of it
@@ -12040,7 +12040,7 @@ function storyBooth(m, j) {
   if (!Number.isNaN(b.tpp[j]) && swingHere == null) after += `<p class="st-note">This place wasn’t used at the previous election, so it has no swing.</p>`;
   const loc = raw.location && raw.location[j];
   if (loc) after += `<p class="st-note">Approximate location, matched by name to the AEC’s ${loc[0]} venue record${loc[1] ? ` (${esc(loc[1])})` : ""} and checked against the ${m.year} electorate boundary. The venue may have moved between elections.</p>`;
-  else if (raw.lat[j] == null) after += `<p class="st-note">No reliable fixed location has been matched. This polling place’s recorded votes remain available here.</p>`;
+  else if (raw.lat[j] == null) after += `<p class="st-note">No reliable fixed location has been matched.</p>`;
   if (!tc) after += `<p class="st-note">No polling-place final preference count is available for this election.</p>`;
   // (a place with no count of its own has no finding: its name is already its title)
   let h = head(b.name[j], `${esc(TYPE[b.ty[j]] || "Polling place")}${where ? " · " + ds(where) : ""}`, hed === ds(b.name[j]) ? "" : hed, dek, figs);
