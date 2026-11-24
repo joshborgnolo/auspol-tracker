@@ -52001,3 +52001,150 @@ preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undec
 preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,gender,VIC,2026-11-08,28.72,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
 preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,gender,Male,2026-11-08,22.76,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
 preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,gender,Female,2026-11-08,34.36,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,region,VIC,2026-11-23,20.02,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,age,age-18-34,2026-11-23,25.06,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,age,age-35-54,2026-11-23,19.35,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,age,age-55+,2026-11-23,16.66,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,gender,VIC,2026-11-23,20.02,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,gender,Male,2026-11-23,24.15,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ALP,gender,Female,2026-11-23,16.05,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,region,VIC,2026-11-23,31.02,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,age,age-18-34,2026-11-23,19.81,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,age,age-35-54,2026-11-23,31.96,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,age,age-55+,2026-11-23,39.01,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,gender,VIC,2026-11-23,31.02,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,gender,Male,2026-11-23,34.96,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,LNP,gender,Female,2026-11-23,27.22,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,region,VIC,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,age,age-18-34,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,age,age-35-54,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,age,age-55+,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,gender,VIC,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,gender,Male,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Liberals,gender,Female,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,region,VIC,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,age,age-18-34,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,age,age-35-54,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,age,age-55+,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,gender,VIC,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,gender,Male,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Nationals,gender,Female,2026-11-23,0,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,region,VIC,2026-11-23,48.94,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,age,age-18-34,2026-11-23,55.11,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,age,age-35-54,2026-11-23,48.68,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,age,age-55+,2026-11-23,44.31,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,gender,VIC,2026-11-23,48.94,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,gender,Male,2026-11-23,40.87,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,Total Others,gender,Female,2026-11-23,56.72,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,region,VIC,2026-11-23,13.07,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,age,age-18-34,2026-11-23,19.35,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,age,age-35-54,2026-11-23,15.17,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,age,age-55+,2026-11-23,6.17,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,gender,VIC,2026-11-23,13.07,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,gender,Male,2026-11-23,10.15,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,GRN,gender,Female,2026-11-23,15.88,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,region,VIC,2026-11-23,4.19,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,age,age-18-34,2026-11-23,1.15,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,age,age-35-54,2026-11-23,5.37,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,age,age-55+,2026-11-23,5.51,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,gender,VIC,2026-11-23,4.19,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,gender,Male,2026-11-23,3.18,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,IND,gender,Female,2026-11-23,5.16,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,region,VIC,2026-11-23,7.01,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,age,age-18-34,2026-11-23,10.66,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,age,age-35-54,2026-11-23,4.88,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,age,age-55+,2026-11-23,6.07,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,gender,VIC,2026-11-23,7.01,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,gender,Male,2026-11-23,5.15,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,OTH,gender,Female,2026-11-23,8.8,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,region,VIC,2026-11-23,24.66,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,age,age-18-34,2026-11-23,23.93,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,age,age-35-54,2026-11-23,23.24,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,age,age-55+,2026-11-23,26.54,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,gender,VIC,2026-11-23,24.66,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,gender,Male,2026-11-23,22.38,
+primary_vote_vic,Q29VIC,VIC primary vote by demographics,detail bar and timeseries chart,ONP,gender,Female,2026-11-23,26.86,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,region,VIC,2026-11-23,16.93,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,age,age-18-34,2026-11-23,20.04,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,age,age-35-54,2026-11-23,20.98,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,age,age-55+,2026-11-23,10.75,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,gender,VIC,2026-11-23,16.93,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,gender,Male,2026-11-23,17.41,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL SOFT,gender,Female,2026-11-23,16.46,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,region,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,age,age-18-34,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,age,age-35-54,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,age,age-55+,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,gender,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,gender,Male,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor soft,gender,Female,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,region,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,age,age-18-34,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,age,age-35-54,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,age,age-55+,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,gender,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,gender,Male,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition soft,gender,Female,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,region,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,age,age-18-34,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,age,age-35-54,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,age,age-55+,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,gender,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,gender,Male,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other soft,gender,Female,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,region,VIC,2026-11-23,83.06,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,age,age-18-34,2026-11-23,79.95,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,age,age-35-54,2026-11-23,79.01,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,age,age-55+,2026-11-23,89.24,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,gender,VIC,2026-11-23,83.06,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,gender,Male,2026-11-23,82.58,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,TOTAL HARD,gender,Female,2026-11-23,83.53,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,region,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,age,age-18-34,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,age,age-35-54,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,age,age-55+,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,gender,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,gender,Male,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Labor hard,gender,Female,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,region,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,age,age-18-34,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,age,age-35-54,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,age,age-55+,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,gender,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,gender,Male,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Coalition hard,gender,Female,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,region,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,age,age-18-34,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,age,age-35-54,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,age,age-55+,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,gender,VIC,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,gender,Male,2026-11-23,0,
+vote_firmness_vic,Q29VIC,How firm are you with your vote?,yes no bar / Q29VIC,Other hard,gender,Female,2026-11-23,0,
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,region,VIC,2026-11-23,22.69,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,age,age-18-34,2026-11-23,29.31,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,age,age-35-54,2026-11-23,18.68,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,age,age-55+,2026-11-23,20.99,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,gender,VIC,2026-11-23,22.69,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,gender,Male,2026-11-23,24.05,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Ben Carroll,gender,Female,2026-11-23,21.4,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,region,VIC,2026-11-23,33.81,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,age,age-18-34,2026-11-23,22.29,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,age,age-35-54,2026-11-23,33.76,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,age,age-55+,2026-11-23,43.42,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,gender,VIC,2026-11-23,33.81,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,gender,Male,2026-11-23,37.04,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Jess Wilson,gender,Female,2026-11-23,30.74,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,region,VIC,2026-11-23,18.91,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,age,age-18-34,2026-11-23,20.02,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,age,age-35-54,2026-11-23,20.45,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,age,age-55+,2026-11-23,16.52,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,gender,VIC,2026-11-23,18.91,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,gender,Male,2026-11-23,16.71,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Warren Pickering,gender,Female,2026-11-23,20.98,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,region,VIC,2026-11-23,24.58,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,age,age-18-34,2026-11-23,28.35,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,age,age-35-54,2026-11-23,27.09,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,age,age-55+,2026-11-23,19.05,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,gender,VIC,2026-11-23,24.58,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,gender,Male,2026-11-23,22.17,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
+preferred_premier_vic,Q32VIC,Preferred VIC premier,two group preffered bar,Undecided,gender,Female,2026-11-23,26.85,Ben Carroll; Jess Wilson; Warren Pickering; Undecided
