@@ -1454,12 +1454,12 @@ function RdLeadership({
     const round5 = v => Math.round(v / 5) * 5;
     const moved = (fall > 0 ? "fallen " : "risen ") + round5(Math.abs(fall)) + " points";
     const head = !oppSig ? pm.short + " and " + opp.short + " are level as preferred PM" + (fallSig ? ", and " + pm.short + "’s net approval has " + moved : "") : leads ? pm.short + " still leads as preferred PM" + (fallSig ? ", but his net approval has " + moved : "") : opp.short + " leads as preferred PM" + (fallSig ? ", and " + pm.short + "’s net approval has " + moved : "");
-    const leyRows = LM.filter(r => r.alb_pref != null && r.ley_pref != null);
-    const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + r.alb_pref - r.ley_pref, 0) / leyRows.length : null;
+    const leyRows = LMOD ? LM.filter(r => r.lead_ley != null) : LM.filter(r => r.alb_pref != null && r.ley_pref != null);
+    const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + (LMOD ? r.lead_ley : r.alb_pref - r.ley_pref), 0) / leyRows.length : null;
     const hanLead = aH != null && h != null ? aH - h : null;
     const hanSig = hanLead != null && leadTest(LL.hanson, PK.aH, PK.h);
-    const hanRows = LM.filter(r => r.alb_prefH != null && r.hanson_prefH != null);
-    const hanSteady = hanLead != null && hanRows.length > 0 && Math.abs(hanLead - (hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= (LL.hanson ? LL.hanson.ci95 : 4);
+    const hanRows = LMOD ? LM.filter(r => r.lead_hanson != null) : LM.filter(r => r.alb_prefH != null && r.hanson_prefH != null);
+    const hanSteady = hanLead != null && hanRows.length > 0 && Math.abs(hanLead - (LMOD ? hanRows[0].lead_hanson : hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= (LL.hanson ? LL.hanson.ci95 : 4);
     const narrowed = leyLead != null && leads && leyLead - lead > (LL.taylor ? LL.taylor.ci95 : 4);
     let dek = narrowed ? (oppSig ? "His" : pm.short + "’s") + " lead over the opposition leader has narrowed from " + signed0(leyLead) + " under Ley to " + signed0(lead) + " under " + opp.short + (oppSig ? "." : ", inside the margin of error.") : !oppSig ? "He and " + opp.short + " are level head to head, " + r1(a) + "–" + r1(o) + "." : (leads ? "He leads " : "He trails ") + opp.short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + " head to head.";
     if (hanLead != null && !hanSig) dek += " Head to head with " + han.short + ", the two are level.";else if (hanLead != null && hanLead > 0) dek += " Over " + han.short + (oppSig && hanLead > lead ? " his lead is greater (" + signed0(hanLead) + ")" + (hanSteady ? ", and has held steady since it was first measured." : ".") : " he leads by " + r1(hanLead) + " points" + (hanSteady ? ", a lead that has held steady since it was first measured." : "."));else if (hanLead != null) dek += " " + han.short + " leads him by " + r1(-hanLead) + " points head to head.";
@@ -9935,7 +9935,6 @@ function RdUndecided({
       past: h
     })));
     const drawn = drawnNow.concat(drawnPast);
-    if (!drawn.length) return null;
     const pastDots = key === "soft" ? histSoftDots().map(q => ({
       x: q.x,
       y: q.v,
@@ -9949,6 +9948,7 @@ function RdUndecided({
       label: like(b).label,
       meta: q
     })));
+    if (!drawn.length && !pastDots.length) return null;
     const bands = drawn.filter(d => d.pts[0].lo != null).map(d => ({
       id: "band-" + d.s.id,
       color: COLb(d.s.basisId || d.s.id),
@@ -9976,6 +9976,7 @@ function RdUndecided({
       } : null;
     };
     const readList = (atNowU ? list : list.concat((key === "und" ? ["first", "leaner"] : ["soft", "softRB"]).filter(b => !list.some(s => s.id === b)).map(like))).filter(s => readOf(s));
+    const housesOf = s => atNowU ? s.houses : [...new Set(drawn.filter(d => (d.s.basisId || d.s.id) === s.id).flatMap(d => d.s.houses || []))];
     const COL = s => COLb(s.basisId || s.id);
     const READ_SUB = {
       first: "Can’t say who they’d vote for. These pollsters ask once, with no follow-up: ",
@@ -10011,8 +10012,10 @@ function RdUndecided({
         className: "rd-un-rci"
       }, "\xB1", r.ci.toFixed(1)), r.when && React.createElement("span", {
         className: "rd-un-rci"
-      }, r.when)), React.createElement("p", null, READ_SUB[s.id] || "", s.kind === "soft" ? "" : rdList(s.houses) + ".")));
-    }), React.createElement(TrendChart, {
+      }, r.when)), React.createElement("p", null, READ_SUB[s.id] || "", s.kind === "soft" ? "" : rdList(housesOf(s)) + ".")));
+    }), !readList.length && React.createElement("p", {
+      className: "rd-note rd-un-few"
+    }, "Too few polls printed an undecided share in these years to draw a line. Each dot is one that did."), React.createElement(TrendChart, {
       key: "rd-un-" + key,
       heightPx: narrow ? 200 : 230,
       padPx: {
@@ -10298,6 +10301,7 @@ function RdUndecided({
   const undList = [first, leaner, tpp].filter(Boolean);
   const undChartHi = Math.max(12, Math.ceil((Math.max(0, ...undList.map(s => Math.max(s.hi, s.now && s.now.hi != null ? s.now.hi : 0))) + 1) / 5) * 5);
   const softChartHi = softList.length ? Math.ceil((Math.max(...softList.map(s => s.hi), ...softList.map(s => s.now ? s.now.hi : 0), ...(DH ? DH.soft.terms.flatMap(t => t.polls.map(p => p.v)) : [])) + 1) / 10) * 10 : 0;
+  const softPanel = view === "all" && softList.length > 0 ? panel(softList, 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party") : null;
   const pinUn = () => {
     const sec = document.getElementById("undecided");
     rdPinScroll(sec && sec.querySelector(".rd-un-tabs"));
@@ -10391,7 +10395,7 @@ function RdUndecided({
     dek: "Each dot is one poll and each line a model of its polls, shaded with its 95% interval, so a month with few polls is filled in rather than jumping to whoever reported. Undecided voters are counted out of all voters and soft voters out of those who named a party, so the two charts have different scales."
   }), React.createElement("div", {
     className: "rd-un-panels"
-  }, panel(undList, 0, undChartHi, 5, "und", "Undecided", "% of all voters"), softList.length > 0 && panel(softList, 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party"), gapsBlock || (softNote ? React.createElement("span", null) : null), softNote), histOn && H && React.createElement(RdConfStrip, {
+  }, panel(undList, 0, undChartHi, 5, "und", "Undecided", "% of all voters"), softPanel, gapsBlock || (softPanel && softNote ? React.createElement("span", null) : null), softPanel && softNote), histOn && H && React.createElement(RdConfStrip, {
     lines: [{
       color: "var(--ink-2)",
       points: H.terms.flatMap(t => t.series.first ? t.series.first.months.map(m => ({

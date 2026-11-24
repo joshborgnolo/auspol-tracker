@@ -7169,9 +7169,11 @@ function RdUndecided({ rangeId }) {
     })) : key !== "und" ? [] : ["first", "leaner"].flatMap((b) => histLines(b).map((h) => ({
       s: { ...like(b), id: h.id, basisId: b, houses: h.houses }, pts: h.pts, dots: [], past: h })));
     const drawn = drawnNow.concat(drawnPast);
-    if (!drawn.length) return null;
     const pastDots = key === "soft" ? histSoftDots().map((q) => ({ x: q.x, y: q.v, color: COLb(q.basis), label: like(q.basis).label, meta: q }))
       : key !== "und" ? [] : ["first", "leaner"].flatMap((b) => histDots(b).map((q) => ({ x: q.x, y: q.v, color: COLb(b), label: like(b).label, meta: q })));
+    /* a window of years with too few printed shares for a line still shows
+       the polls that printed one */
+    if (!drawn.length && !pastDots.length) return null;
     /* each modelled line's 95% band */
     const bands = drawn.filter((d) => d.pts[0].lo != null).map((d) => ({
       id: "band-" + d.s.id, color: COLb(d.s.basisId || d.s.id), className: "ci-band", edge: false, smooth: false,
@@ -7185,6 +7187,8 @@ function RdUndecided({ rangeId }) {
       return q ? { v: q.v, ci: q.lo != null ? (q.hi - q.lo) / 2 : null, when: monthLabelFull(q.ym) } : null;
     };
     const readList = (atNowU ? list : list.concat((key === "und" ? ["first", "leaner"] : ["soft", "softRB"]).filter((b) => !list.some((s) => s.id === b)).map(like))).filter((s) => readOf(s));
+    /* a past window names the pollsters behind the lines it shows, not today's */
+    const housesOf = (s) => (atNowU ? s.houses : [...new Set(drawn.filter((d) => (d.s.basisId || d.s.id) === s.id).flatMap((d) => d.s.houses || []))]);
     /* each line and its polls wear the line's own colour */
     const COL = (s) => COLb(s.basisId || s.id);
     const READ_SUB = {
@@ -7206,10 +7210,11 @@ function RdUndecided({ rangeId }) {
             <RdSwatch kind="line" color={COL(s)} />
             <div>
               <div className="rd-un-rtop"><b>{READ_TOP[s.id] || s.label}</b><span className="rd-un-rv">{r.v.toFixed(1)}%</span>{r.ci != null && <span className="rd-un-rci">±{r.ci.toFixed(1)}</span>}{r.when && <span className="rd-un-rci">{r.when}</span>}</div>
-              <p>{READ_SUB[s.id] || ""}{s.kind === "soft" ? "" : rdList(s.houses) + "."}</p>
+              <p>{READ_SUB[s.id] || ""}{s.kind === "soft" ? "" : rdList(housesOf(s)) + "."}</p>
             </div>
           </div>
         ); })}
+        {!readList.length && <p className="rd-note rd-un-few">Too few polls printed an undecided share in these years to draw a line. Each dot is one that did.</p>}
 
         <TrendChart key={"rd-un-" + key} heightPx={narrow ? 200 : 230} padPx={{ l: 36, r: 10, t: 14, b: 28 }}
           xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, step)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
@@ -7357,6 +7362,8 @@ function RdUndecided({ rangeId }) {
      near 12, its band and polls higher) needs more, in steps of 5 */
   const undChartHi = Math.max(12, Math.ceil((Math.max(0, ...undList.map((s) => Math.max(s.hi, s.now && s.now.hi != null ? s.now.hi : 0))) + 1) / 5) * 5);
   const softChartHi = softList.length ? Math.ceil((Math.max(...softList.map((s) => s.hi), ...softList.map((s) => s.now ? s.now.hi : 0), ...(DH ? DH.soft.terms.flatMap((t) => t.polls.map((p) => p.v)) : [])) + 1) / 10) * 10 : 0;
+  /* the soft chart, and the note under it, only where it has lines or polls */
+  const softPanel = view === "all" && softList.length > 0 ? panel(softList, 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party") : null;
   /* The views are pages of their own, so the row walks them by arrow keys
      and, on a phone, by a sideways swipe on or just under it (without
      swipe the gesture turns the page instead). Scrolled past the head and
@@ -7408,9 +7415,9 @@ function RdUndecided({ rangeId }) {
                  dek={"Each dot is one poll and each line a model of its polls, shaded with its 95% interval, so a month with few polls is filled in rather than jumping to whoever reported. Undecided voters are counted out of all voters and soft voters out of those who named a party, so the two charts have different scales."} />
           <div className="rd-un-panels">
             {panel(undList, 0, undChartHi, 5, "und", "Undecided", "% of all voters")}
-            {softList.length > 0 && panel(softList, 0, softChartHi, 10, "soft", "Soft", "% of voters who named a party")}
-            {gapsBlock || (softNote ? <span /> : null)}
-            {softNote}
+            {softPanel}
+            {gapsBlock || (softPanel && softNote ? <span /> : null)}
+            {softPanel && softNote}
           </div>
           {histOn && H && <RdConfStrip lines={[{ color: "var(--ink-2)", points: H.terms.flatMap((t) => (t.series.first ? t.series.first.months.map((m) => ({ x: hx(m[0]), y: m[1] })) : [])).concat((first ? first.monthly : []).map((m) => ({ x: m.x, y: m.v }))) }]}
                                   lo={extU.lo} hi={extU.hi} win={winC} terms={vTermsU} onWin={onWinU} narrow={narrow} label="Undecided voters, can’t say who they’d vote for, every term on file" />}

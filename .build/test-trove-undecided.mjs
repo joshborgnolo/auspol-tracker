@@ -6,9 +6,8 @@ import { readFileSync } from "node:fs";
 
 const W = JSON.parse(readFileSync("data/undecided-history.json", "utf8"));
 const M = JSON.parse(readFileSync("data/undecided-history-model.json", "utf8"));
-const gallup = W.waves.filter((w) => w.house === "APOP Gallup" || w.house === "Morgan Gallup");
+const gallup = W.waves.filter((w) => (w.house === "APOP Gallup" || w.house === "Morgan Gallup") && w.src.startsWith("data/trove-primary-vote.csv"));
 assert.equal(gallup.length, 25, "all and only the source's explicit undecided cells");
-assert.equal(W.waves.length, 1144);
 for (const w of gallup) {
   assert.equal(w.basis, "first", `${w.end}: raw first-preference question`);
   assert.ok(["printed-month", "publication-week"].includes(w.dateBasis), `${w.end}: unasserted fieldwork dates stay dated by publication convention`);
@@ -23,7 +22,7 @@ for (const [date, und] of [
   assert.ok(w, `${date}: Gallup wave present`);
   assert.equal(w.und, und, `${date}: Trove value`);
 }
-const troveTerms = M.terms.filter((t) => t.year < 2000);
+const troveTerms = M.terms.filter((t) => t.year < 1960);
 assert.deepEqual(troveTerms.map((t) => [t.year, t.series.first.n]), [[1949, 5], [1954, 10], [1955, 4]],
   "only the stronger runs meet the model's four-wave threshold");
 for (const t of troveTerms) {

@@ -9178,7 +9178,14 @@ function infoTerms(D) {
             through every term since {UH.terms[0].from.slice(0, 4)}. Each past term is estimated the same way from that
             term’s polls, so its line ends at its election and its level is set by that term’s own
             pollsters. A pollster that changed how it polls (Newspoll from phone to online, Roy Morgan
-            from face-to-face to online) is a different pollster for this purpose.</span> : null}
+            from face-to-face to online) is a different pollster for this purpose. The readings are
+            the undecided shares the pollsters printed: Gallup’s in the newspapers of 1946–55 and
+            1972–73, the Morgan Gallup Poll’s column in The Bulletin from 1973 to 1984, Roy Morgan’s
+            releases from 1997 to 2002, Newspoll’s release notes from 2001, and the pollsters’ own
+            tables from 2004. In the years between,
+            the sources that can be read today either leave the undecided out without saying how
+            many there were or have not been digitised, so those terms show a few dots or
+            none.</span> : null}
             <span className="info-p"><b>The one-pollster lines.</b> After preferences and the two soft
             lines are each one pollster’s polls through the same model, with no lean to take out: each poll counts as a sample of its size, the share
             moves a little each day, and a month with no poll is filled in from the months around it
