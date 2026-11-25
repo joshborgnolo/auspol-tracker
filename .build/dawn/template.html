@@ -20,7 +20,7 @@
    LAYOUT phone: one snapped screen per section (title, figures, chart, notes); laptop: same order, side panel for figures
    DATA the site's own models (gen-data §13, built by .build/dawn/build.mjs): a trial design, linked from nowhere */
 @font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("{{FONT}}") format("woff2")}
-:root{--tbd:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+:root{--tbd:0px;--ext:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}}
 :root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}
 *{box-sizing:border-box;min-width:0}
@@ -60,15 +60,16 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 
 /* hero */
 @supports (height:100dvh){:root{--tbd:calc(100lvh - 100dvh)}}
-.hero{position:relative;height:100vh;height:100lvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
-.tbd{position:absolute;left:0;bottom:0;width:0;height:var(--tbd)}
+@media (pointer:coarse){:root{--ext:120px}}
+.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
+.tbd{position:absolute;left:0;bottom:0;width:0;height:calc(var(--tbd) + var(--ext))}
 .sky{position:absolute;inset:0;background:linear-gradient(to bottom,var(--z) 0%,var(--m) 42%,var(--l) 74%,var(--h) 100%)}
 .wash{position:absolute;inset:0}
 .wash.rise{background:radial-gradient(120% 55% at 50% var(--sy),rgba(255,138,72,calc(var(--wa1)*.8)) 0%,rgba(255,110,80,calc(var(--wa1)*.36)) 32%,rgba(170,110,170,calc(var(--wa1)*.15)) 55%,transparent 75%),linear-gradient(to top,rgba(255,150,110,calc(var(--ba1)*.8)) 0%,rgba(230,140,160,calc(var(--ba1)*.4)) 12%,transparent 30%)}
 .wash.set{background:radial-gradient(120% 55% at 50% var(--sy),rgba(255,120,50,var(--wa2)) 0%,rgba(250,80,90,calc(var(--wa2)*.5)) 30%,rgba(180,80,160,calc(var(--wa2)*.25)) 55%,transparent 80%),linear-gradient(to top,rgba(255,110,70,var(--ba2)) 0%,rgba(225,90,140,calc(var(--ba2)*.6)) 14%,rgba(140,80,170,calc(var(--ba2)*.25)) 28%,transparent 42%)}
 .stars{position:absolute;inset:0;opacity:var(--st)}
 .stars canvas{position:absolute;inset:0;display:block}
-.sun{--d:min(72vw,38vh);position:absolute;left:50%;width:var(--d);height:var(--d);bottom:calc(var(--d)*-.5 + var(--tbd));transform:translate(-50%,var(--ty));border-radius:50%;will-change:transform}
+.sun{--d:min(72vw,38vh);position:absolute;left:50%;width:var(--d);height:var(--d);bottom:calc(var(--d)*-.5 + var(--tbd) + var(--ext));transform:translate(-50%,var(--ty));border-radius:50%;will-change:transform}
 .halo{position:absolute;inset:-110%;border-radius:50%;background:radial-gradient(circle closest-side,rgba(255,150,70,.5) 0%,rgba(255,120,60,.26) 24%,rgba(255,110,90,.09) 46%,transparent 70%)}
 .limb{position:absolute;inset:-16%;border-radius:50%;background:radial-gradient(circle closest-side,#ff5a1c 0%,#ff6c22 72%,#ff8a2e 79%,#ffa040 84%,rgba(255,160,70,.45) 91%,rgba(255,170,90,0) 100%)}
 .grain{position:absolute;inset:0;z-index:1;pointer-events:none;background-repeat:repeat;background-size:128px 128px;opacity:.22}
@@ -115,7 +116,7 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .core{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle closest-side at 50% 46%,var(--c1) 0%,var(--c2) 62%,var(--c3) 90%,#ee4420 97%,rgba(255,96,30,0) 100%)}
 
 /* sections */
-.sec{position:relative;height:100vh;height:100lvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbd)) var(--g)}
+.sec{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));background:var(--bg);scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbd) + var(--ext)) var(--g)}
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
 .dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:60ch;text-wrap:pretty}
@@ -208,7 +209,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[hidden]{display:none}
 svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
-@media (max-height:600px){.sec{height:auto;min-height:100vh;min-height:100lvh;overflow:visible}.fig{min-height:260px}}
+@media (max-height:600px){.sec{height:auto;min-height:calc(100vh + var(--ext));min-height:calc(100lvh + var(--ext));overflow:visible}.fig{min-height:260px}}
 @media (min-width:900px){
 .sec{padding-top:calc(var(--navh) + 20px);padding-bottom:24px}
 .flow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd ctl" "fig fig" "note note" "src src"}
@@ -417,7 +418,7 @@ const pickMode=()=>skyPref==='rise'||skyPref==='set'?skyPref:((h)=>h>=4&&h<15?'r
 function paint(p){
   const s=SC[mode],H=hero.clientHeight,d=sun.offsetWidth||1;
   // rise no higher than the figures allow: the limb stays clear of them on short screens
-  const off=tbdEl?tbdEl.offsetHeight:0;   // the toolbar's overlay at the foot: the horizon sits above it
+  const off=tbdEl?tbdEl.offsetHeight:0;   // the toolbar's overlay and the panel's overrun at the foot: the horizon sits above them
   const rise=Math.max(0,Math.min(H*.13,H-off-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
   let t,ts,tk,y,wa,ba,st;
   if(mode==='rise'){
@@ -444,7 +445,7 @@ function paint(p){
    the browsers that read it); past the hero both go back to the page's */
 const tbdEl=document.getElementById('tbd'),metaTheme=document.querySelector('meta[name=theme-color]');
 let tintOn=null;
-function tintTo(c){document.documentElement.style.backgroundColor=c||'';if(metaTheme)metaTheme.content=c||getComputedStyle(document.body).backgroundColor||'#fbf6f1'}
+function tintTo(c){document.documentElement.style.backgroundColor=c||'';document.body.style.backgroundColor=c||'';if(metaTheme)metaTheme.content=c||getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#fbf6f1'}
 function tintTop(on){if(on===tintOn)return;tintOn=on;tintTo(on?(sky.style.getPropertyValue('--z')||'#0a1230'):'')}
 function frame(ts){if(t0===null)t0=ts;const p=Math.min(1,(ts-t0)/SC[mode].dur);paint(p);if(p<1)raf=requestAnimationFrame(frame);else done=true}
 function play(){mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;cancelAnimationFrame(raf);t0=null;done=false;if(reduce){paint(1);done=true;return}paint(0);raf=requestAnimationFrame(frame)}
