@@ -32,7 +32,8 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 
 /* nav */
 .nav{position:fixed;inset:0 0 auto 0;z-index:20;height:calc(var(--navh) + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(6px,env(safe-area-inset-right),calc((100vw - 1180px)/2 - 12px)) 0 var(--col);display:flex;align-items:center;gap:4px;color:var(--ink);background:var(--bg);transition:background-color .3s,color .3s}
-.nav.over{background:transparent;color:#f3f0ff}
+.nav.over{background:var(--navz,transparent);color:#f3f0ff}
+.nav.over:has(.burger[aria-expanded=true]){background:transparent}
 .links{display:flex;gap:20px;margin:0 6px 0 auto}
 .links a,.mark{color:inherit;text-decoration:none}
 .links a{font-size:15px;opacity:.7;padding:12px 0;position:relative}
@@ -249,7 +250,6 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <ul>
     <li><a href="#votes">votes</a></li>
     <li><a href="polls/">polls</a></li>
-    <li><a href="next/">next polls</a></li>
     <li><span class="soon">seats <small>soon</small></span></li>
     <li><span class="soon">leaders <small>soon</small></span></li>
     <li><span class="soon">states <small>soon</small></span></li>
@@ -436,7 +436,7 @@ function paint(p){
    the browsers that read it); past the hero both go back to the page's */
 const tbdEl=document.getElementById('tbd'),metaTheme=document.querySelector('meta[name=theme-color]');
 let tintOn=null;
-function tintTo(c){document.documentElement.style.backgroundColor=c||'';document.body.style.backgroundColor=c||'';if(metaTheme)metaTheme.content=c||getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#fbf6f1'}
+function tintTo(c){document.documentElement.style.backgroundColor=c||'';if(c)document.documentElement.style.setProperty('--navz',c);document.body.style.backgroundColor=c||'';if(metaTheme)metaTheme.content=c||getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#fbf6f1'}
 function tintTop(on){if(on===tintOn)return;tintOn=on;tintTo(on?(sky.style.getPropertyValue('--z')||'#0a1230'):'')}
 function frame(ts){if(t0===null)t0=ts;const p=Math.min(1,(ts-t0)/SC[mode].dur);paint(p);if(p<1)raf=requestAnimationFrame(frame);else done=true}
 function play(){mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;cancelAnimationFrame(raf);t0=null;done=false;if(reduce){paint(1);done=true;return}paint(0);raf=requestAnimationFrame(frame)}

@@ -156,7 +156,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const NX = JSON.parse(nh.match(/<script id="next-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
   ok(NX.pollCadence.length >= 5 && NX.pollCadence.every((c) => c.tracked !== "confidence"), "every house on a pattern, the confidence gauges left out");
   ok(!!NX.score && NX.score.overall.n > 0, "np-score's record rides along");
-  ok(/href="\.\.\/next\/"/.test(ph) && /href="\.\.\/polls\/"/.test(nh) && /href="next\/"/.test(html), "the two polls pages link each other, and the menu reaches it");
+  ok(/href="\.\.\/next\/"/.test(ph) && /href="\.\.\/polls\/"/.test(nh) && !/>next polls</.test(html + ph + nh), "the two polls pages link each other through their tabs; no menu lists next polls");
   const outside = [html, ph, nh].flatMap((h) => [...h.matchAll(/(?:href|src)="(\/[^"]*)"/g)].map((m) => m[1]))
     .filter((u) => u !== "/assets/favicon.svg" && u !== `/assets/fonts/${font}`);
   eq(outside.length, 0, "every local reference stays inside dawn/ " + outside.join(", "));
