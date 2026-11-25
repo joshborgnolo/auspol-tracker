@@ -48,11 +48,13 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   };
   const histName = side("dawn-hist.json", "hist");
   const groupsName = fs.existsSync(path.join(assets, "dawn-groups.json")) ? side("dawn-groups.json", "groups") : "";
-  /* a group's past terms: the file the site's own pages already fetch
-     (build.mjs names it by the same hash) */
+  /* a group's past terms: gen-data's group-history.json, the file the site's
+     own pages fetch, in a sidecar of this page's own. Pointing at the site's
+     copy tore the tree whenever a commit made without this page renamed it
+     (about ten times a month): the page's references stay inside dawn/,
+     bar the favicon and the font */
   const ghPath = path.join(assets, "group-history.json");
-  const ghName = fs.existsSync(ghPath) ? `group-history.${hash8(fs.readFileSync(ghPath))}.json` : null;
-  const ghUrl = ghName && fs.existsSync(path.join(root, "assets", ghName)) ? "/assets/" + ghName : "";
+  const ghUrl = fs.existsSync(ghPath) && fs.readFileSync(ghPath, "utf8").trim() !== "null" ? side("group-history.json", "ghist") : "";
   /* the browser copy of the primary model, for the pollster menu */
   const enginePath = path.join(assets, "pm-engine.js");
   const engine = fs.existsSync(enginePath) ? fs.readFileSync(enginePath, "utf8").replace(/<\/script/gi, "<\\/script") : "";

@@ -126,6 +126,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/const STARS=\[/.test(html), "the sky's stars");
   ok(/window\.AP\.pmEngine\s*=/.test(html), "the browser copy of the model, for the pollster menu");
   ok(!!r.groups && fs.existsSync(path.join(tmp, "dawn", r.groups)) && html.includes(`href="${r.groups}"`), "the vote-by-group sidecar beside the page, named by it");
+  ok(/^ghist\.[0-9a-f]{8}\.json$/.test(r.ghist) && fs.existsSync(path.join(tmp, "dawn", r.ghist)) && html.includes(`href="${r.ghist}"`), "the groups' past terms in a sidecar of the page's own");
   ok(!/href="#lead"/.test(html) && /href="polls\/"/.test(html), "one votes link, and the polls page");
   /* the polls page: every poll a dot can open has its row */
   ok(!!r.polls && fs.existsSync(r.polls), "the polls page is built");
@@ -137,6 +138,12 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(D0.polls.every((q) => keys.has(q.k)), "every chart poll's dot has a row to open");
   ok(PL.every((q, i) => !i || PL[i - 1].d >= q.d), "newest first");
   ok(/href="\.\.\/#votes"/.test(ph), "the polls page leads back to the votes pages");
+  /* the pages point inside dawn/ but for the favicon and the face: a site
+     asset renamed by a commit made without this page would tear the tree */
+  const outside = [html, ph].flatMap((h) => [...h.matchAll(/(?:href|src)="(\/[^"]*)"/g)].map((m) => m[1]))
+    .filter((u) => u !== "/assets/favicon.svg" && u !== `/assets/fonts/${font}`);
+  eq(outside.length, 0, "every local reference stays inside dawn/ " + outside.join(", "));
+  ok(/class="logo"/.test(html) && /class="logo"/.test(ph) && /\.nav:not\(\.over\) \.logo\{/.test(html), "the mark's sun, shown once the hero has gone");
   fs.rmSync(tmp, { recursive: true, force: true });
 }
 /* linked from nowhere */

@@ -454,6 +454,14 @@ stage_dataset() {
   # file. Stage assets/ whole (adds, renames and deletions) — the wrappers
   # only get here on a clean tree, so nothing foreign rides along.
   git add assets/ >> "$LOG" 2>&1 || true
+  # /dawn/ joined 2026-11-25: every federal build writes the trial page
+  # (.build/dawn/build.mjs) from the four dawn-*.json gen-data rewrites, so a
+  # commit that missed them would leave the tree dirty for the next launchd
+  # slot. Stage dawn/ whole (the pages, and the hashed sidecars' adds and
+  # deletions) and the intermediates, each in its own add: a pathspec that
+  # matched nothing there must never cost the dataset above its staging.
+  git add dawn/ >> "$LOG" 2>&1 || true
+  git add .build/newtracker/assets/dawn-*.json >> "$LOG" 2>&1 || true
 }
 
 # ---------------------------------------------------------------------------

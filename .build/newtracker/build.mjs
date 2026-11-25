@@ -2558,8 +2558,10 @@ writeAtomic(path.join(ROOT, "robots.txt"),
 
 /* ---- 5d. /dawn/ – the trial design, on this build's data ---------------
    .build/dawn/build.mjs: a page linked from nowhere. A failure there is
-   reported and never stops the site's own build. */
-if (!process.env.BUILD_OUT) {
+   reported and never stops the site's own build. Federal only: the vic
+   build's GEN_OUT carries no dawn-*.json. git-push-main.sh's stage_dataset
+   stages what this writes, so every refresh commit carries it. */
+if (!process.env.BUILD_OUT && !VIC) {
   try {
     const { buildDawn } = await import("../dawn/build.mjs");
     const r = buildDawn({ root: ROOT, assets: GEN_OUT, keep: sweepKeep, write: (f, s) => writeAtomic(f, s) });
