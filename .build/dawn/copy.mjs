@@ -89,9 +89,9 @@ export function tppStory(D) {
   if (both.length < 3) return { head: "Labor’s two-party vote against each rival", dek: "" };
   const f = both[0], l = both[both.length - 1];
   const on0 = f.a, on1 = l.a, co0 = coBy[f.ym].a, co1 = coBy[l.ym].a, gap = on1 - co1;
-  const gapCi = Math.hypot(l.ci95 || 0, coBy[l.ym].ci95 || 0);
-  const head = Math.abs(gap) < 1 || Math.abs(gap) <= gapCi ? "One Nation now runs Labor as close as the Coalition does"
-    : gap < 0 ? "One Nation now runs Labor closer than the Coalition does" : "The Coalition still runs Labor closer than One Nation does";
+  /* Hand-curated headline (owner's wording, 25 Nov 2026), kept separate
+     from the data-led comparison in the dek below. */
+  const head = "Labor retains a narrow 2PP lead over both rivals";
   const verb = (a, b) => (b < a ? (a - b >= 10 ? "plunged" : "fallen") : "risen");
   const pc = (v) => Math.round(v) + "%";
   let dek = "Labor’s 2PP against One Nation has " + (Math.round(on0) === Math.round(on1) ? "held near " + pc(on1) + " since " + monthYear(f.ym)
@@ -135,15 +135,7 @@ export function verdicts(D) {
 }
 const RIVAL = { lnp: "the Coalition", on: "One Nation" };
 export function flowsHead(D) {
-  const V = verdicts(D), s = (c) => (V[c].who === "alp" ? "L" : V[c].who ? "R" : "T");
-  const a = s("lnp"), b = s("on");
-  if (a === b) return "After preferences, " + (a === "L" ? "Labor leads either rival" : a === "T" ? "Labor is level with either rival" : "both rivals lead Labor");
-  /* the contest with a verdict goes first */
-  const [c1, c2] = a === "T" ? ["on", "lnp"] : b === "T" ? ["lnp", "on"] : a === "L" ? ["lnp", "on"] : ["on", "lnp"];
-  const v1 = s(c1), v2 = s(c2);
-  const p1 = v1 === "L" ? "Labor leads " + RIVAL[c1] : "Labor trails " + RIVAL[c1];
-  const p2 = v2 === "T" ? "is level with " + RIVAL[c2] : v2 === "L" ? "leads " + RIVAL[c2] : "trails " + RIVAL[c2];
-  return "After preferences, " + p1 + (v2 === "T" || v1 !== v2 ? " but " : " and ") + p2;
+  return "Two-party preferred";
 }
 
 /* the line under the flow diagram, per contest: how preferences move the

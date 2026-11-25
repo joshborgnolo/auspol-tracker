@@ -96,30 +96,19 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const D3 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5] });
   ok(/election, %\.$/.test(votesDek(D3)), "nothing else clears: the dek describes the chart alone");
 }
-/* the two-party story (the site's rule) */
+/* the two-party story's curated heading (owner's wording, 25 Nov 2026) */
 {
   const st = (onLast, coLast, ciOn = 1, ciCo = 1) => { const D = clone(); const m = D.months; m.on[m.on.length - 1] = [m.on[m.on.length - 1][0], onLast, ciOn]; m.imp[m.imp.length - 1] = [m.imp[m.imp.length - 1][0], coLast, ciCo]; return tppStory(D).head; };
-  eq(st(51, 51.5), "One Nation now runs Labor as close as the Coalition does", "inside a point: as close");
-  eq(st(50, 53, 1, 1), "One Nation now runs Labor closer than the Coalition does", "a gap past both margins: closer");
-  eq(st(54, 51, 1, 1), "The Coalition still runs Labor closer than One Nation does", "the other way");
-  eq(st(50, 52.5, 2, 2), "One Nation now runs Labor as close as the Coalition does", "a gap inside the combined margin: as close");
+  eq(st(51, 51.5), "Labor retains a narrow 2PP lead over both rivals", "the heading stays curated inside a point");
+  eq(st(50, 53, 1, 1), "Labor retains a narrow 2PP lead over both rivals", "and when the rivals pull apart");
+  eq(st(54, 51, 1, 1), "Labor retains a narrow 2PP lead over both rivals", "whichever rival runs closer");
 }
-/* the flow diagram's verdicts, all nine pairs */
+/* the flow diagram's curated heading; its numerical verdicts stay live */
 {
   const set = (lnp, on) => { const D = clone(); const i = D.tpp.imp.v.length - 1; D.tpp.imp.v[i] = lnp[0]; D.tpp.imp.ci[i] = lnp[1]; D.tpp.on.v[i] = on[0]; D.tpp.on.cs[i] = on[1]; D.tpp.on.cf[i] = 0; return D; };
   const L_ = [54, 1], T_ = [50.5, 1.4], R_ = [46, 1];
-  const cases = [
-    [L_, L_, "After preferences, Labor leads either rival"],
-    [T_, T_, "After preferences, Labor is level with either rival"],
-    [R_, R_, "After preferences, both rivals lead Labor"],
-    [L_, T_, "After preferences, Labor leads the Coalition but is level with One Nation"],
-    [T_, L_, "After preferences, Labor leads One Nation but is level with the Coalition"],
-    [L_, R_, "After preferences, Labor leads the Coalition but trails One Nation"],
-    [R_, L_, "After preferences, Labor leads One Nation but trails the Coalition"],
-    [R_, T_, "After preferences, Labor trails the Coalition but is level with One Nation"],
-    [T_, R_, "After preferences, Labor trails One Nation but is level with the Coalition"],
-  ];
-  for (const [a, b, want] of cases) eq(flowsHead(set(a, b)), want, "flows head " + JSON.stringify([a, b]));
+  const cases = [[L_, L_], [T_, T_], [R_, R_], [L_, T_], [T_, L_], [L_, R_], [R_, L_], [R_, T_], [T_, R_]];
+  for (const [a, b] of cases) eq(flowsHead(set(a, b)), "Two-party preferred", "flows heading " + JSON.stringify([a, b]));
   ok(verdicts(set(T_, T_)).lnp.margin === 2.8, "the margin as the site prints it: twice the interval");
 }
 /* the note under the diagram */
@@ -163,6 +152,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(primaryYMax([60.01]), 70, "a reading actually above 60 still reaches the next rung");
   const C = copyFor(D0);
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
+  ok(html.includes("% of the vote received after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
+  ok(html.includes(".votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}") && html.includes(".votes .ctl .opts{margin-top:0;flex-shrink:0}"), "the time window and chart filters share a wrapping row");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
   ok(!html.includes(".skyset") && !html.includes('role="radiogroup" aria-label="Sky"'), "Sky’s Auto, Sunrise and Sunset controls are absent");

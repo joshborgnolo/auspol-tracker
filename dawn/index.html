@@ -199,6 +199,8 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .pick select{width:9.6em;text-overflow:ellipsis}
 .pbtn b{font-weight:600}
 .pick select:disabled,.pbtn:disabled{opacity:.45;cursor:default}
+.votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
+.votes .ctl .opts{margin-top:0;flex-shrink:0}
 .pop{position:absolute;z-index:6;top:38px;left:0;min-width:220px;max-height:min(60vh,420px);overflow:auto;background:var(--bg);border:1px solid var(--rule);border-radius:14px;box-shadow:0 12px 32px rgb(20 10 40/.16);padding:6px}
 .pop button{display:flex;align-items:center;gap:9px;width:100%;font:500 14px/1.2 var(--sans);color:var(--ink);background:none;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;text-align:left}
 .pop button:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
@@ -307,8 +309,8 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 <section class="sec" id="flows" data-sec="votes" aria-labelledby="flows-h">
   <div class="wrap flow">
     <header class="hd">
-      <h2 id="flows-h">After preferences, Labor is level with either rival</h2>
-      <p class="dek">Where first preferences end up once minor parties’ votes are distributed, % of the vote</p>
+      <h2 id="flows-h">Two-party preferred</h2>
+      <p class="dek">% of the vote received after minor-party votes are distributed</p>
     </header>
     <div class="ctl">
       <div class="vs" data-duel role="radiogroup" aria-label="Contest: Labor against">
@@ -329,7 +331,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 <section class="sec" id="tpp" data-sec="votes" aria-labelledby="tpp-h">
   <div class="wrap tpp">
     <header class="hd">
-      <h2 id="tpp-h">One Nation now runs Labor as close as the Coalition does</h2>
+      <h2 id="tpp-h">Labor retains a narrow 2PP lead over both rivals</h2>
       <p class="dek">Labor’s 2PP against One Nation has plunged from 63% in June 2025 to 51% now; against the Coalition, from 57% to 50%. Since July the two contests have run within a point of each other.</p>
     </header>
     <div class="ctl">
