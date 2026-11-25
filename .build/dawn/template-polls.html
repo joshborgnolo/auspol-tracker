@@ -101,11 +101,28 @@ ol{list-style:none;margin:0;padding:0}
 .f.wide{flex-basis:100%}
 .row.flash>button{background:var(--hi)}
 .empty{color:var(--mute);font-size:15px;padding:24px 4px}
+.sigw{max-width:920px}
+.sig-say{margin-bottom:10px}
+.sig-row{display:grid;gap:10px}
+.sig-tri{display:block;width:280px;max-width:100%;height:auto;overflow:visible}
+.sig-text{font-size:13px;line-height:1.5}
+.sig-text p+p{margin-top:8px}
+.tri-kite{fill-opacity:.12;stroke:none}
+.tri-grid{stroke:var(--mute);stroke-opacity:.18;stroke-width:.75}
+.tri-edge{fill:none;stroke:var(--ink2);stroke-width:1}
+.tri-med{stroke:var(--ink);stroke-width:1.25}
+.tri-med.dash{stroke:var(--mute);stroke-width:1;stroke-dasharray:3 3}
+.tri-blob{fill-opacity:.62;stroke:none}
+.tri-blobline{fill:none;stroke:var(--ink);stroke-opacity:.55;stroke-width:1}
+.tri-dot{fill:#fff;stroke:var(--ink);stroke-width:1.25}
+.tri-v{font:600 13px var(--sans)}
+@media (min-width:700px){.sig-row{grid-template-columns:280px minmax(0,1fr);gap:22px}}
 /* a poll opened */
 .det{padding:4px 4px 18px;display:grid;gap:12px;font-size:14px;color:var(--ink2)}
 .det[hidden]{display:none}
 .det p{margin:0;line-height:1.45}
 .det h3{font:600 13px/1.2 var(--sans);color:var(--ink);margin:6px 0 0}
+.det .nocaps{white-space:nowrap;text-transform:none}
 .det a{color:var(--ink);text-underline-offset:2px}
 .lk{display:flex;flex-wrap:wrap;gap:6px 16px}
 .lk a.pend{color:var(--mute);text-decoration-style:dotted}
@@ -249,6 +266,7 @@ function primMoe(p,v,und){
 }
 const shareMoe=(p,v)=>{const n=nEff(p);if(v==null||!n)return null;const s=Math.max(0,Math.min(100,+v))/100;return 196*Math.sqrt(s*(1-s)/n)};
 const diffMoe=(p,a,b)=>{const n=nEff(p);if(a==null||b==null||!n)return null;const x=+a/100,y=+b/100;return 196*Math.sqrt(Math.max(0,x+y-(x-y)*(x-y))/n)};
+/*{{SIGTRIANGLE}}*/
 const DEM_SHARE={Women:.51,Men:.49,'18–34':.30,'55+':.36,'65+':.22,'50+':.44,'Gen Z':.21,Boomers:.21,University:.26,School:.45,'Year 12 or less':.45,'High School':.45,'No tertiary':.74,'Inner metro':.30,Rural:.24,'Regional or rural':.40,'Capital cities':.67,'Regional/rural areas':.33,Renting:.31,'Renting and other':.33,'Own outright':.31};
 const gapMoe=(p,pr,k)=>{const sa=DEM_SHARE[pr.a],sb=DEM_SHARE[pr.b],va=pr.A[k],vb=pr.B[k];let n=nEff(p);if(!sa||!sb||va==null||vb==null||!n)return null;if(p.u&&p.u.label==='excluded'&&p.u.v>0)n*=1-p.u.v/100;const x=va/100,y=vb/100;return 196*Math.sqrt(x*(1-x)/(n*sa)+y*(1-y)/(n*sb))};
 
@@ -343,10 +361,10 @@ function render(){
 }
 /* a poll opened: what it is and where it was published, every link it has, then what it says, facet by facet,
    the open facet first, and its primaries against the model's that week */
+/*{{POLLHEADING}}*/
 function detail(p){
   const b=[],sec=[];
-  const eff=p.se?' (effective '+Number(p.se).toLocaleString('en-AU')+')':p.eb==='TBC'?' (effective sample still to come)':p.eb==='missing'?' (no effective sample filed)':/^~/.test(p.eb||'')?' (effective about '+Number(p.eb.slice(1)).toLocaleString('en-AU')+', from the design effect)':'';
-  b.push(`<p>Fieldwork ${p.tbc?'to be confirmed':esc(p.f||'')+' '+p.d.slice(0,4)}${p.c?(/^self/i.test(p.c)?' · self-published':' · for '+esc(p.c)):''}${p.pub?' · released '+esc(fdate(p.pub)):''}${p.n?' · '+Number(p.n).toLocaleString('en-AU')+' respondents'+(p.b?' ('+esc(p.b)+')':'')+eff:''}.</p>`);
+  b.push('<p>'+pollHeading(p,DATA.deff)+'</p>');
   if(p.links&&p.links.length)b.push('<div class="lk">'+p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener"${l.pending?' class="pend"':''}${l.title?` title="${esc(l.title)}"`:''}>${esc(l.t)}${l.pending?'':' ↗'}</a>`).join('')+'</div>');
   if(p.na)b.push(`<p><b>Not counted.</b> ${esc(p.na)}</p>`);
   if(p.conf)sec.push(['confidence',`<h3>${esc(p.conf.lab)}</h3><p>${num(p.conf.v)}${p.conf.chg!=null?', '+sg(p.conf.chg)+' on the release before':''}${p.conf.vs?'; '+p.conf.vs+' is neutral':''}.</p>`]);
@@ -358,6 +376,7 @@ function detail(p){
     const c=p.chg&&p.chg.d,ref=c&&p.chg.r&&(p.chg.r.pAlp||Object.values(p.chg.r)[0]);
     if(c&&['pAlp','pLnp','pGrn','pOnp','pOth'].some(k=>c[k]!=null))s+=`<p>Against ${esc(p.h)}’s poll before${ref?' ('+esc(fday(ref))+')':''}: `+[['alp','pAlp'],['onp','pOnp'],['lnp','pLnp'],['grn','pGrn'],['oth','pOth']].filter(([,ck])=>c[ck]!=null).map(([k,ck])=>ABBR[k]+' '+sg(c[ck])).join(', ')+'.</p>';
     if(p.u&&p.u.v!=null)s+=`<p>${num(p.u.v)}% undecided, ${p.u.label==='included'?'kept in the shares':'left out of the shares'}.</p>`;
+    if(F==='primary')s+=sigMark(p,nEff(p));
     sec.push(['primary',s]);
   }
   const tp=[];if(p.i!=null)tp.push('Labor '+num(p.i)+' against the Coalition');if(p.io!=null)tp.push(num(p.io)+' against One Nation');

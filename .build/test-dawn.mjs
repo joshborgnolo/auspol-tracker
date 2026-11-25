@@ -18,6 +18,8 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
+import { pollHeading } from "./dawn/poll-heading.mjs";
+import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
 import { buildDawn, flowTotals, readScore } from "./dawn/build.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "..");
@@ -47,6 +49,56 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   eq(age(36 * 3600000), "Latest poll is Essential’s, 2 days ago.");
   for (const pub of [undefined, null, "", "2026-11-25"]) eq(latestPollLine({ latestPoll: { h: "Essential", pub } }, at), "Latest poll is Essential’s.", "no age when the clock time is unknown");
   eq(latestPollLine({}, at), "", "no latest-poll clause when no poll is on record");
+}
+
+/* which gaps are real: Dawn's ternary calculation against the ledger's own */
+{
+  const source = fs.readFileSync(path.join(A, "rd-allpolls.jsx"), "utf8");
+  const fn = source.slice(source.indexOf("function rdSigTri("), source.indexOf("let rdSigSeq"));
+  const reference = (p, n) => vm.runInNewContext(fn + ";rdSigTri", { RD_SIG_TRI: ["alp", "lnp", "onp"], rdIsMrp: (r) => / \(MRP\)$/.test(r.h || ""), rdNEff: () => n, window: { AUSPOL: { undecidedCellOf: (r) => r.u } } })(p);
+  for (const u of [null, { label: "excluded", v: 10 }, { label: "included", v: 10 }]) {
+    const p = { h: "Essential", k: "verify", p: { alp: 37, lnp: 31, onp: 11.5, grn: 7 }, u };
+    const t = sigTriangle(p, 1000), r = reference(p, 1000), label = "with " + (u ? u.label : "no undecided share");
+    ok(!!t && !!r, label);
+    eq(t.s, r.s, "the three-way combined share " + label);
+    t.pr.forEach((v, i) => eq(v, r.pr[i], "renormalised share " + i + " " + label));
+    t.cov.forEach((row, i) => row.forEach((v, j) => eq(v, r.cov(i, j), "covariance " + i + j + " " + label)));
+    t.pairs.forEach((x, i) => { eq(x.m, r.pairs[i].m, "pairwise margin " + i + " " + label); eq(x.sig, r.pairs[i].sig, "its significance " + label); });
+    eq(t.lo, r.lo, "the same zoom " + label);
+    eq(t.of100.join(","), r.of100.join(","), "three whole shares still add to 100 " + label);
+    eq(t.of100.reduce((a, v) => a + v, 0), 100, "the rounded shares sum to exactly 100");
+  }
+  for (const p of [{}, { alp: 34, lnp: 33 }, { alp: 0, lnp: 33, onp: 22 }]) eq(sigTriangle({ h: "Essential", p }, 1000), null, "no triangle without all three positive shares");
+  eq(sigTriangle({ h: "DemosAU (MRP)", p: { alp: 34, lnp: 33, onp: 22 } }, 1000), null, "a modelled-region projection is not a sampled poll triangle");
+  eq(sigTriangle({ h: "Essential", p: { alp: 34, lnp: 33, onp: 22 } }, 0), null, "nor without a sample");
+  eq(sigMark({ h: "Essential", p: { alp: 34, lnp: 33, onp: 22 } }, 0), "", "no empty diagram where no sample exists");
+  const m = sigMark({ h: "Essential", k: "x", p: { alp: 40, lnp: 30, onp: 25 } }, 1200);
+  ok(m.includes("Which gaps are real") && m.includes('role="img"'), "the diagram and its accessible label");
+  ok(m.includes("Labor 42, Coalition 32, One Nation 26"), "the three rounded shares read correctly out of their combined 95");
+  eq((m.match(/class="tri-blob"/g) || []).length, 3, "the ellipse is clipped into each party's corner");
+  eq((m.match(/class="tri-blobline"/g) || []).length, 1, "with one outline for the whole ellipse");
+  ok(m.includes("Labor is ahead of both, beyond the margin"), "the narrative reads off the pairwise tests");
+}
+
+/* an opened poll's header, in the main ledger's sentence form */
+{
+  const E = { h: "Essential", c: "The Guardian", d: "2026-11-24", f: "19–24 Nov", pub: "2026-11-25", n: 1017, b: "A", se: 793 };
+  eq(pollHeading(E), 'Conducted on 19–24 Nov from a sample of <span class="nocaps">1,017 (A) (eff. 793)</span>, published by The Guardian on Wed 25 Nov.');
+  ok(pollHeading({ ...E, se: null }).includes("1,017 (A)</span>"), "a raw sample without an effective figure");
+  ok(pollHeading({ ...E, se: null, eb: "TBC" }).includes("(eff. TBC)"), "an effective sample still to come");
+  ok(pollHeading({ ...E, se: null, eb: "missing" }).includes("(eff. missing)"), "the older, unfiled effective sample stays named");
+  ok(pollHeading({ ...E, se: null, eb: "~790" }).includes("(eff. ~790)") && pollHeading({ ...E, se: null, eb: "~790" }).includes("title=\"Estimated from the raw sample"), "the approximate effective figure and its meaning");
+  ok(pollHeading({ ...E, se: null, eb: null, h: "Roy Morgan", c: "Self-published", n: 1500 }, 1.5).includes("(eff. ~1,000)"), "the design-effect estimate for a house that files no effective sample");
+  ok(pollHeading({ ...E, c: "Self-published" }).includes("published by Essential"), "a self-published wave names its house, not Self-published");
+  ok(pollHeading({ ...E, c: "NEWS24" }).includes("published by the NEWS24"), "an unlisted client takes the article, as on the main ledger");
+  ok(pollHeading({ ...E, c: "News24" }).includes("published by News24"), "bare client names do not acquire an article");
+  ok(pollHeading({ ...E, c: "Blueprint Institute" }).includes("commissioned by the Blueprint Institute"), "a non-masthead client commissions a poll, named with the main ledger's article");
+  ok(pollHeading({ ...E, tbc: true }).startsWith("Conducted on dates TBC from a sample"), "pending fieldwork uses the main header's exact form");
+  ok(pollHeading({ ...E, n: null }).includes("an unpublished sample") && !pollHeading({ ...E, n: null }).includes("null"), "a withheld sample stays unpublished, not zero or null");
+  ok(!pollHeading({ ...E, n: null, eb: "TBC" }).includes("(eff."), "no effective tag hangs off an unpublished sample");
+  ok(pollHeading({ ...E, pub: "2026-11-25T13:00" }).endsWith("Wed 25 Nov, 1 pm."), "an hourly publication stamp where one is known");
+  ok(!pollHeading({ ...E, pub: null }).includes("published by The Guardian on "), "no invented publication date");
+  ok(pollHeading({ ...E, c: "Consumer Confidence", h: "Roy Morgan", conf: { v: 90 } }).includes("published by Roy Morgan"), "a confidence lane does not present its product line as a publisher");
 }
 
 /* ---- 1. the data ends on the site's figures ---------------------------- */
@@ -144,6 +196,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/\.menu-on \.twin\{visibility:hidden\}/.test(html) && !/\.nav\{[^}]*background:var\(--bg\)/.test(html), "the open menu shows through the bar; the bar itself has no fill");
   ok(/if\(i0===0&&iS<=1\)\{const c=EST\[k\]\[0\]\.m;pts\.push\(\{x:ELX,y:c\}\)/.test(html) && /const open=\(c,a,band\)=>c==='lnp'&&cnt0!=null/.test(html), "this term's primary and Labor v Coalition lines open on the 2025 count");
   ok(/<clipPath id="\$\{cid\}"><rect x="\$\{ML\}" y="\$\{MT-8\}" width="\$\{PW\}"/.test(html), "lines and bands clip at the plot's edges");
+  ok(!html.includes("cursor:crosshair"), "chart hover has no crosshair cursor");
+  ok(html.includes("const MT=TIPH+EVH+(evs.length&&!narrow?8:0)"), "eight extra pixels after desktop event labels, and only there");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
   ok(!!scale, "the primaries chart's y-axis rule is in the page");
   const primaryYMax = new Function("ys", `return ${scale[1]}`);
@@ -166,6 +220,9 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(!!r.polls && fs.existsSync(r.polls), "the polls page is built");
   const ph = fs.readFileSync(r.polls, "utf8");
   ok(!/\{\{[A-Za-z]+\}\}/.test(ph), "every polls-page placeholder filled");
+  const pollScript = ph.match(/<script>([\s\S]*?)<\/script>/);
+  ok(!!pollScript, "the ledger's whole client is present");
+  new vm.Script(pollScript[1]);
   const PL = JSON.parse(ph.match(/<script id="polls-data" type="application\/json">([\s\S]*?)<\/script>/)[1]).polls;
   const keys = new Set(PL.map((q) => q.k));
   eq(keys.size, PL.length, "each poll's address is its own");
