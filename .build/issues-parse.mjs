@@ -619,7 +619,7 @@ export function daOwnership(txt) {
   const ls = lines(txt);
   const i = ls.findIndex((l) => /Which political party do you trust more to handle the following issues/.test(l));
   if (i < 0) return null;
-  const hi = ls.findIndex((l, j) => j > i && j <= i + 5 && /Labor/.test(l) && /One Nation/.test(l));
+  const hi = ls.findIndex((l, j) => j > i && j <= i + 5 && /Labor/.test(l) && /One Nation/.test(l) && !/^\s*Answers:/i.test(l));
   if (hi < 0) return null;
   const head = ls[hi].trim().split(/\s{2,}/);
   const cols = head.map((h) => DA_ANSWER[norm(h)] || null);

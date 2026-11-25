@@ -259,6 +259,7 @@ assert.deepEqual(da.issues.health, { grn: 10, alp: 31, unsure: 22, lnp: 20, onp:
 assert.ok(da.issues.inflation && da.issues.agedcare, "inflation and aged care keep issues of their own");
 for (const [k, sh] of Object.entries(da.issues)) assert.equal(ownershipProblem(sh), null, `DemosAU ${k} passes the gate`);
 assert.equal(daOwnership(daRep("Capital-BriefDemosAU-Federal-Poll-August-2026")), null, "a report without the table");
+assert.equal(daOwnership(daRep("DemosAU_National_Poll_November_2026_Methodology_Statement")), null, "a questionnaire's answer list is not a table header");
 
 // ---- SEC Newgate: the G4 best-party-on-cost-of-living bank feeds ownership ------
 // one pooled row per Wave-25-era month onward (May 2026 on, when One Nation and

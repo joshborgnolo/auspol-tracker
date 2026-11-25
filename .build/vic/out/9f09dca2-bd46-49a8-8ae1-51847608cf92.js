@@ -194,7 +194,7 @@ window.AUSPOL = (function () {
   /* direction readings with no voting-intention poll to join onto (SEC
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
-  const directionOnlyPolls = [];
+  const directionOnlyPolls = [{"ym":"2025-03","x":2025.2028538812785,"day":13,"pollster":"jws-research","field":"13 Mar","dateLabel":"13 Mar","released":"2025-03-13","sample":null,"client":"Self-published","p":{},"appr":{"alb":{"app":21,"dis":54},"taylor":null,"hanson":null,"albNet":-33,"taylorNet":null,"hansonNet":null,"oppName":null,"metricBy":{"alb":"approval","taylor":"approval","hanson":"approval"},"who":{"alb":"Allan","opp":"Battin","han":null}},"chg":null,"links":[]},{"ym":"2026-08","x":2026.5921232876713,"day":3,"pollster":"Roy Morgan","field":"3 Aug","dateLabel":"3 Aug","released":"2026-08-03","sample":null,"client":"Self-published","p":{},"appr":{"alb":{"app":51,"dis":43},"taylor":{"app":58.5,"dis":38.5},"hanson":{"app":35,"dis":58.5},"albNet":8,"taylorNet":20,"hansonNet":-23.5,"oppName":"Wilson","metricBy":{"alb":"approval","taylor":"approval","hanson":"approval"},"who":{"alb":"Carroll","opp":"Wilson","han":"Pickering"}},"chg":null,"links":[]}];
   /* Ipsos's issues waves (§5i): the one house on the page with no voting-
      intention or direction row for its issue questions to ride on, so they
      are rows of their own for the All-polls table's issues facet – every
