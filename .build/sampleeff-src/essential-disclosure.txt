@@ -112,7 +112,7 @@ Statement randomisation
 
 
 
-Page 2 / 19
+Page 2 / 16
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -169,7 +169,7 @@ Page 2 / 19
 
 
 
-Page 3 / 19
+Page 3 / 16
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -219,7 +219,7 @@ Page 3 / 19
 
 
 
-Page 4 / 19
+Page 4 / 16
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -273,7 +273,7 @@ Page 4 / 19
 
 
 
-Page 5 / 19
+Page 5 / 16
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -329,7 +329,7 @@ Page 5 / 19
 
 
 
-Page 6 / 19
+Page 6 / 16
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -385,8 +385,13 @@ Page 6 / 19
 
 
 
-Page 7 / 19
-Questionnaire Content (26 August 2026)
+Page 7 / 16
+   25-Nov-26       18-Nov-26      23-Nov-26       National   1,017   78%   793   ±3.5%
+
+
+
+
+Questionnaire Content (18 November 2026)
 
 
 ASK ALL
@@ -436,14 +441,16 @@ D3.      In which one of the following areas do you live?
          11. Hobart
          12. Tasmania other than Hobart
          13. Darwin
-         14. Northern Territory other than Darwin
+
+
+
+Page 8 / 16
+         14. Northern Territory other than Darwin
          15. Australian Capital Territory
          16. Other [TERMINATE]
 
 
-
-Page 8 / 19
-D4.      What is your postcode?
+D4.      What is your postcode?
 
          4-DIGIT OPEN-BOX. VALIDATE POSTCODES BASED ON D3
 
@@ -493,13 +500,15 @@ Q43. Did you vote in the May 2025 federal election, or were you unable to do so 
 
          1. Yes, voted
          2. No, unable to
-         3. Not enrolled to vote
 
 
 
 
-Page 9 / 19
-ASK IF Q41=1 or 2
+Page 9 / 16
+         3. Not enrolled to vote
+
+
+ASK IF Q41=1 or 2
 Q21. If a federal election was held tomorrow, to which party would you give your first preference vote in
        the House of Representatives (Lower House)?
 
@@ -548,18 +557,17 @@ Q23. Well which party are you currently leaning towards?
          10. Don’t know
 
 
-
 ASK IF Q21=6-9 OR Q23=6-9
 Q24. Following your first preference vote, which of the following would you preference higher in the House
        of Representatives (Lower House)?
 
-         SINGLE RESPONSE. RANDOMISE 1 & 2
 
 
 
+Page 10 / 16
+         SINGLE RESPONSE. RANDOMISE 1 & 2
 
-Page 10 / 19
-         1. Labor
+         1. Labor
          2. Liberal/National Coalition
          3. Unsure
 
@@ -611,12 +619,11 @@ Q17. At the most recent Federal election (held on 3 May 2025), to which party di
          10. Don’t know
 
 
-PAGE BREAK
 
 
-
-Page 11 / 19
-ASK ALL
+Page 11 / 16
+PAGE BREAK
+ASK ALL
 Q37. Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?
 
          SINGLE RESPONSE
@@ -667,229 +674,136 @@ E563A. Why do you think that Australia is heading in the right direction?
 OPEN ENDED
 
 
-ASK IF CODE 2 SELECTED AT E563
+
+
+Page 12 / 16
+ASK IF CODE 2 SELECTED AT E563
 
 E563B. Why do you think that Australia is heading in the wrong direction?
 
+OPEN ENDED
+
+
+E46. Do you believe that there is fairly conclusive evidence that climate change is happening and caused by
+human activity or do you believe that the evidence is still not in and we may just be witnessing a normal
+fluctuation in the earth’s climate which happens from time to time?
+
+
+         SINGLE RESPONSE. RANDOMISE STATEMENTS 1 & 2. ANCHOR STATEMENT 3.
+
+         1. Climate change is happening and is caused by human activity
+         2. We are just witnessing a normal fluctuation in the earth’s climate
+         3. Don’t know
 
 
 
-Page 12 / 19
-OPEN ENDED
-E724. Do you think social and economic inequality in Australia is increasing, decreasing or staying about
-      the same?
+E47. As far as you know, do you think Australia is doing enough, not enough or too much to address climate
+change?
+
 
          SINGLE RESPONSE
 
-         1.    Increasing a lot
-         2.    Increasing a little
-         3.    Staying about the same
-         4.    Decreasing a little
-         5.    Decreasing a lot
-         6.    Don’t know
+         1.    Not doing enough
+         2.    Doing enough
+         3.    Doing too much
+         4.    Don’t know
 
 
-E290.    To what extent do you agree or disagree with the following statements about gender equality in
-         Australia?
+E1187. Data centres are large facilities that store and process the computing power needed for things like
+cloud storage, streaming and Artificial Intelligence (AI). To what extent would you support or oppose a new
+data centre being built in your local area?
 
-         a.    Strongly disagree
-         b.    Somewhat disagree
-         c.    Somewhat agree
-         d.    Strongly agree
-         e.    Unsure
-
-         SINGLE RESPONSE PER OPTION. RANDOMISE ANSWER OPTIONS
-
-         1.    There should be laws that require equal salaries for men and women in the same position
-         2.    Although there has been significant progress on gender equality there is still a long way to go
-         3.    Work to achieve gender equality today benefits mostly well-to-do people
-         4.    Gender equality has already been mostly achieved
-         5.    Gender equality, meaning that men and women are equal, has come far enough already
-
-
-
-E535.    Which party do you trust most to…?
-
-         a.    Coalition
-         b.    Labor
-         c.    One Nation
-         d.    No difference
-
-         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
-
-         1. Manage the economy generally
-         2. Ensure the economy works in the interests of everyday Australians
-
-
-
-E1204. Has the cost of living impacted any of the following for you?
-   1. Very negative impact
-   2. Somewhat negative impact
-   3. No impact
-   4. Somewhat positive impact
-   5. Very positive impact
-   6. Prefer not to say
-
-
-
-
-Page 13 / 19
-CARROUSEL WITH FOLLOWING. RANDOMISED. SINGLE RESPONSE PER TILE
-   a. Sleep
-   b. Mental health
-   c. Relationships
-   d. Physical health
-
-
-E1205. Which of the following do you blame most for the rising cost of living?
-Please rank up to your top 3 you, where 1 is what you blame the most.
-
-RANK TOP 1-3. RANDOMISE CODES 1-6
-
-         1.    Supermarkets price gouging
-         2.    Government spending too much
-         3.    Wage rising too fast
-         4.    High immigration and population growth
-         5.    Global events such as the war in the Middle East
-         6.    Extreme weather events e.g., flooding, drought, bushfires
-         7.    Don’t know EXCLUSIVE
-
-
-E1124. In general, do you want Australia to be more or less like the USA?
-
-    1. More like the USA
-    2. The current situation is about right
-    3. Less like the USA
-
-E1207. The two main parties in the United States are the Republican Party (the party of Presidents Donald
-Trump, George W. Bush and Ronald Reagan) and the Democratic Party (the party of Presidents Joe Biden,
-Barack Obama and Bill Clinton).
-
-The United States will hold its midterm elections on 3 November. Americans will vote for members of
-Congress, which is made up of the House of Representatives and the Senate. Congress passes laws that
-can support or limit the President. Republicans currently control both.
-
-Which of the following outcomes would you prefer from the US midterm elections?
-
-SINGLE RESPONSE. RANDOMISE CODES 1 AND 2.
-
-    1.   Republicans control both the House and the Senate
-    2.   Democrats control both the House and the Senate
-    3.   Control is split between the two parties
-    4.   I don’t have a preference
-    5.   I don’t know enough to say
-
-
-E1206. If One Nation were leading the federal government, do you think each of the following would be
-better, worse or about the same as it is now?
-
-
-         1. Much better
-
-
-
-Page 14 / 19
-         2.    Somewhat better
-         3.    About the same
-         4.    Somewhat worse
-         5.    Much worse
-         6.    Unsure
-
-CARROUSEL WITH FOLLOWING. RANDOMISED
-   a. Energy prices
-   b. Cost of groceries
-   c. Management of the economy
-   d. Government spending and debt
-   e. Housing affordability
-   f. Community safety
-   g. Relationships with trading partners like the US and China
-   h. The government’s ability to manage a sudden crisis such as a global pandemic
-   i. Management of immigration levels
-   j. How well different communities get along with each other in Australia
-
-
-
-PAGE BREAK
-ASK ALL
-E156. How would you describe your level of interest in the Melbourne Cup?
 
          SINGLE RESPONSE
 
-         1.    High interest
-         2.    Moderate interest
-         3.    Low interest
-         4.    No interest
-         5.    Don’t know
+         1.       Strongly support
+         2.       Somewhat support
+         3.       Neither support nor oppose
+         4.       Somewhat oppose
+         5.       Strongly oppose
+         6.       Unsure
 
 
-E355.    Which of the following best describes your regular betting activity?
+E1188. If a data centre were to be built in your local area, which of the following, if any, would you be most
+concerned about? Please rank up to your top 3.
 
-         SINGLE RESPONSE
-         1. I regularly bet on horse races and will place a bet on the Melbourne Cup
-         2. I rarely bet on horse races but will watch the Melbourne Cup and place a bet
-         3. I will watch the Melbourne Cup but will not place a bet
-         4. I am not interested in the Melbourne Cup and will not place a bet
+RANK. RANDOMISE
 
-PAGE BREAK
-ASK ALL
-E157. To what extent do you agree or disagree with the following statements about the Melbourne Cup?
-
-         a.    Strongly disagree
-         b.    Somewhat disagree
-         c.    Neither agree, nor disagree
-         d.    Somewhat agree
-         e.    Strongly agree
-
-         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
-
-         1. The Melbourne Cup is a unique part of Australia’s national identity
-         2. The Melbourne Cup normalises animal cruelty
+        1.        Its impact on local water supply
+        2.        Its impact on energy demand and electricity prices
+        3.        Noise
 
 
 
-Page 15 / 19
-         3. The Melbourne Cup promotes unhealthy gambling behaviour
-         4. I am less interested in the Melbourne Cup than I used to be
+
+Page 13 / 16
+         4.        Its impact on the value of your property
+         5.        Impact on the local environment and wildlife
+         6.        Increased traffic or disruption during the construction
+         7.        General concerns about the growth of AI
+         8.        Other (please specify)
+         9.        I would not have any particular concerns
 
 
-ASK ALL
+E509. To what extent would you support or oppose using nuclear energy sources for the following?
 
-E1208. The Queensland Government has announced plans to introduce changes to the industrial relations
-system that would give the government additional powers to stop workers from taking protected industrial
-action.
+         a.    Strongly support
+         b.    Somewhat support
+         c.    Neither support nor oppose
+         d.    Somewhat oppose
+         e.    Strongly oppose
+         f.    Don’t know
 
-The additional measures include a 30-day limit on action and additional powers to stop action if the
-government deems it is not in the public interest.
+         SINGLE RESPONSE. RANDOMISE OPTIONS.
 
-Prior to this, to what extent were you aware of the Queensland Government’s planned changes?
+         1. To power a submarine fleet for the Royal Australian Navy
+         2. To establish Australia’s nuclear weapon capabilities
+         3. To supply power to Australian households and businesses
 
-         1.    Know a lot about them
-         2.    Know a little about them
-         3.    Heard of them, but know nothing more
-         4.    Never heard of them
-         5.    Unsure
 
-ASK ALL
+E1210. Which of the following do you think is most likely to cause the end of human civilisation?
 
-E1209. To what extent do you agree or disagree with the following statements about the Queensland
-Government’s proposed changes to the industrial relations system?
+          SINGLE RESPONSE. RANDOMISE OPTIONS
 
-         a.    Strongly disagree
-         b.    Somewhat disagree
-         c.    Neither agree nor disagree
-         d.    Somewhat agree
-         e.    Strongly agree
-         f.    Unsure
+    1. Nuclear war
+    2. Artificial intelligence (AI)
+    3. Climate change
 
-         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
+E1211. How much confidence do you have in the federal government to manage the risks of each of the
+following?
 
-         1. The proposed changes will make it harder for workers, including teachers, nurses, transport and
-            local government workers, to achieve improvements to their wages and conditions.
-         2. The proposed changes are necessary to stop unions from causing public harm.
-         3. Governments need to have greater powers to stop workers taking industrial action.
-         4. The proposed changes will only impact a small number of workers.
-         5. The proposed changes will impact workers across the state.
+    1.    A lot of confidence
+    2.    Some confidence
+    3.    A little confidence
+    4.    No confidence
+    5.    Unsure
 
+          SINGLE RESPONSE. RANDOMISE OPTIONS
+
+    1. Nuclear war
+    2. Artificial intelligence (AI)
+    3. Climate change
+
+
+E1212. For each of the following, would you like to see them receive more, less, or the same amount as the
+current level of government funding?
+
+SINGLE RESPONSE. RANDOMISE 1 AND 2
+
+    1. More funding
+
+
+
+Page 14 / 16
+      2. Less funding
+      3. About the same funding
+
+RANDOMISE. GRID.
+   a. AUKUS submarines
+   b. Early learning
+   c. Aged care
+   d. Solar energy and battery storage subsidies
+   e. Private health insurance rebates
 
 
 Thank you for your time so far, we only have a few more questions.
@@ -902,11 +816,7 @@ D23.  In what year were you born?
 
 D6.      What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
          that your household usually receives (GROSS – before tax and superannuation deductions)?
-
-
-
-Page 16 / 19
-         SINGLE RESPONSE
+         SINGLE RESPONSE
 
          1. $3,500 or more per week ($182,000 or more per year)
          2. $3,000-$3,499 per week ($156,000-$181,999 per year)
@@ -939,38 +849,13 @@ D7.      What is your current employment status?
          8. Beneficiary/Welfare
          9. Retired
          10. Look after the house full time
-         11. Other (please specify)
+
+
+
+Page 15 / 16
+         11. Other (please specify)
          12. Refuse to answer
 
-ASK IF CODES 1-3 SELECTED AT D7
-C1138. Which industry do you mainly work in? If you have more than one job, please answer for the job
-where you work the most hours.
-SINGLE SELECT
-   1. Agriculture, forestry or fishing
-   2. Mining
-   3. Manufacturing
-   4. Electricity, gas, water or waste services
-   5. Construction
-   6. Wholesale trade
-   7. Retail trade
-   8. Accommodation or food services (including hospitality)
-   9. Transport, postal or warehousing
-   10. Information, media or telecommunications
-   11. Financial or insurance services
-   12. Rental, hiring or real estate services
-   13. Professional, scientific or technical services
-   14. Administrative or support services (including cleaning and security)
-   15. Public administration or safety
-
-
-
-
-Page 17 / 19
-    16. Education or training
-    17. Health care or social assistance (including aged care and disability support)
-    18. Arts or recreation services
-    19. Other services
-    20. Prefer not to say
 
 
 
@@ -1006,8 +891,6 @@ D26.     Do you currently own an investment property?
          2. No
 
 
-
-
 D21.     Which of the following applies to you?
 
          a. Yes
@@ -1025,6 +908,5 @@ D21.     Which of the following applies to you?
 
 
 
-Page 18 / 19
-Page 19 / 19
+Page 16 / 16
 

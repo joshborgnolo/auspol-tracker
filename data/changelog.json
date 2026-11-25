@@ -3,9 +3,9 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 50.4
+      "alp": 50.3
     },
-    "imp": 50.4,
+    "imp": 50.3,
     "pub": 48.4,
     "on": 50.8,
     "momSig": false,
@@ -284,12 +284,12 @@
       "oth": 10
     },
     "leaders": {
-      "alb_fav": -27.2,
-      "alb_net": -26.8,
+      "alb_fav": -27.3,
+      "alb_net": -26.9,
       "hanson_fav": -3.2,
       "hanson_net": 0.5,
-      "taylor_fav": 2.9,
-      "taylor_net": -3.3
+      "taylor_fav": 2.8,
+      "taylor_net": -3.5
     },
     "lean": {
       "key": "alp_lnp|imp",
@@ -299,8 +299,8 @@
         "Fox & Hedgehog": -0.8,
         "Freshwater": -0.4,
         "Newspoll": 1.5,
-        "RedBridge/Accent": -0.2,
-        "Resolve": 0.7,
+        "RedBridge/Accent": -0.3,
+        "Resolve": 0.6,
         "Roy Morgan": 0.9,
         "Spectre Strategy": -1.3,
         "YouGov": 0.1
@@ -308,8 +308,8 @@
     },
     "dir": {
       "right": 23.3,
-      "wrong": 62.1,
-      "net": -38.8
+      "wrong": 62,
+      "net": -38.7
     },
     "issLead": {
       "climate": "alp",
@@ -331,8 +331,12 @@
       "immigration": "Immigration",
       "security": "National security"
     },
-    "sig": {},
-    "sigMeta": {},
+    "sig": {
+      "lead|alb_net": -1
+    },
+    "sigMeta": {
+      "lead|alb_net": "Albanese’s net approval"
+    },
     "conf": {
       "business": 81.7,
       "consumer": 66.7,
@@ -1187,6 +1191,12 @@
       "label": "25 Nov 2026",
       "kind": "finding",
       "text": "University voters (by education) now break significantly toward One Nation, relative to all voters."
+    },
+    {
+      "date": "2026-11-25",
+      "label": "25 Nov 2026",
+      "kind": "finding",
+      "text": "The fall in Albanese’s net approval over the past month is now statistically significant."
     }
   ]
 }
