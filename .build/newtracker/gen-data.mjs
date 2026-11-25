@@ -12369,7 +12369,9 @@ if (!JUR) writeAtomic(ISSUES_HIST_ASSET, JSON.stringify(ISSUES_HIST));
    draws per component, their own seed), so nothing the site prints moves;
    the last week is the site's figure for today, from the fit's own draws.
    A failure here is reported and leaves the page on its last good data. */
-const DAWN_ASSET = path.join(OUT_DIR, "dawn-data.json"), DAWN_HIST_ASSET = path.join(OUT_DIR, "dawn-hist.json");
+const DAWN_ASSET = path.join(OUT_DIR, "dawn-data.json"), DAWN_HIST_ASSET = path.join(OUT_DIR, "dawn-hist.json"), DAWN_GROUPS_ASSET = path.join(OUT_DIR, "dawn-groups.json"), DAWN_POLLS_ASSET = path.join(OUT_DIR, "dawn-polls.json");
+/* a poll's address on the /dawn/polls/ page: its house and its fieldwork's last day (unique, as validate.mjs keeps them) */
+const dawnKey = (q) => q.pollster.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + q.released;
 if (!JUR && PRIMM && TPM) {
   try {
     const tW = Date.now();
@@ -12468,7 +12470,7 @@ if (!JUR && PRIMM && TPM) {
       return !b ? null : typeof b === "string" ? b : (b[facet] || b.primary);
     };
     const polls = individualPolls.filter((q) => !q.noAgg && (q.p || q.alpN != null)).map((q) => {
-      const o = { h: q.pollster, m: q.fmid, f: q.field };
+      const o = { k: dawnKey(q), h: q.pollster, m: q.fmid, f: q.field };
       /* primaries only where the model reads them, so the dots are its polls */
       if (q.p && PRIMM.byKey.has(q.released + "|" + q.pollster)) o.p = PM_PARTIES.map((k) => (q.p[k] != null ? q.p[k] : null));
       if (q.sample != null) o.n = q.sample;
@@ -12512,7 +12514,30 @@ if (!JUR && PRIMM && TPM) {
       events: events.filter((e) => e.major || KEPT.includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
       terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
         .sort((a, b) => (a.e < b.e ? -1 : 1)),
+      /* the pollster menu: the model's browser spec (§2m primModel), re-run
+         on the ticked houses by the browser copy of the model (pm-engine.js),
+         and the houses it offers (the aggregable ones, first seen first) */
+      pm: primModel, pvHouses,
+      /* the group menu's names; the groups themselves are a sidecar */
+      groupMenu: demographics && demographics.tabs ? [...demographics.tabs, ...(demoIncome ? [demoIncome] : [])]
+        .map((t) => ({ label: t.label, groups: t.sets.flatMap((st) => st.groups.map((g) => g.label)) })) : null,
     };
+    /* the vote by group (§7gm, the Who-votes panel's own lines): each group's
+       monthly line and its estimate for polling day, the counts where the AEC
+       cut the group (states, seat types), and each poll's reading of each
+       group beside the same poll's all-voters figure (the gap the group model
+       reads) – a pooled release's parts left out */
+    const groupsOut = demographics && demographics.tabs ? {
+      order: demographics.order,
+      tabs: [...demographics.tabs, ...(demoIncome ? [demoIncome] : [])].map((t) => ({ id: t.id, label: t.label,
+        sets: t.sets.map((st) => ({ id: st.id, groups: st.groups.map((g) => ({ label: g.label, monthly: g.monthly || [], el: g.el || null })) })) })),
+      counted: { ...((DEMO_STATE_ELECTION || {}).groups || {}), ...((DEMO_LOC_ELECTION || {}).groups || {}) },
+      groups: DEMO_GROUPS,
+      polls: individualPolls.filter((q) => q.grp && q.grp.v && q.grp.t && !q.grp.sp).map((q) => ({
+        k: dawnKey(q), m: q.fmid, h: q.pollster, f: q.field, ...(q.sample != null ? { n: q.sample } : {}), t: q.grp.t,
+        v: Object.fromEntries(q.grp.v.map((v, i) => [i, v]).filter(([, v]) => v)),
+      })),
+    } : null;
     /* the past terms (the vote history, §8v) and their polls as the site
        draws them (rd-panels vhScatter): exit polls, counts and the modelled
        YouGov wave left out, a base that kept undecided voters put on a
@@ -12534,6 +12559,36 @@ if (!JUR && PRIMM && TPM) {
     }
     writeAtomic(DAWN_ASSET, JSON.stringify(dawn));
     writeAtomic(DAWN_HIST_ASSET, JSON.stringify({ terms: voteHistory.terms, rms: voteHistory.rms, polls: histPolls }));
+    writeAtomic(DAWN_GROUPS_ASSET, JSON.stringify(groupsOut));
+    /* the polls page: every poll this term, newest first, as printed, beside
+       the model's figures for the week of its fieldwork's middle (the line
+       the charts draw), and whether it counts */
+    const dayOfIso = (iso) => Math.floor(Date.parse(iso + "T00:00:00Z") / 86400000);
+    const nearW = (iso) => { const d = dayOfIso(iso); let bi = 0, bd = 1e9; weeks.forEach((w, i) => { const g = Math.abs(w - d); if (g < bd) { bd = g; bi = i; } }); return bi + 1; };
+    const pollsPage = individualPolls.slice().sort((a, b) => (a.released === b.released ? (a.pollster < b.pollster ? -1 : 1) : a.released < b.released ? 1 : -1)).map((q) => {
+      const o = { k: dawnKey(q), h: q.pollster, f: q.field, d: q.released, m: q.fmid };
+      if (q.client) o.c = q.client;
+      if (q.published) o.pub = q.published;
+      if (q.sample != null) o.n = q.sample;
+      const b1 = baseOf(q, "primary"), b2 = baseOf(q, "twopp");
+      if (b1) o.b = b1;
+      if (b2 && b2 !== b1) o.b2 = b2;
+      if (q.p) o.p = PM_PARTIES.map((k) => (q.p[k] != null ? q.p[k] : null));
+      if (q.undecided != null) o.u = q.undecided;
+      if (q.alpImp != null) o.i = q.alpImp;
+      if (q.alpOnImp != null) o.io = q.alpOnImp;
+      if (q.alpN != null) o.t = q.alpN;
+      if (q.tppAlt && q.tppAlt.alp != null) o.to = q.tppAlt.alp;
+      if (q.noAgg) o.na = q.noAggWhy || "It does not count towards the aggregates.";
+      if (q.fieldPending) o.tbc = 1;
+      const src = (q.links || []).find((l) => l.k === "cite") || null;
+      if (q.url || q.releaseUrl) o.url = q.url || q.releaseUrl;
+      if (src && src.t) o.ut = src.t;
+      if (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null || q.appr.hansonNet != null)) o.ap = [q.appr.albNet ?? null, q.appr.taylorNet ?? null, q.appr.hansonNet ?? null];
+      if (q.fmid >= ELECTION.date && q.fmid <= isoD(t1)) { const w = nearW(q.fmid); o.mw = PM_PARTIES.map((k) => r1(prim[k].v[w])); }
+      return o;
+    });
+    writeAtomic(DAWN_POLLS_ASSET, JSON.stringify(pollsPage));
     console.log(`dawn: ${weeks.length} weeks, ${polls.length} polls in ${((Date.now() - tW) / 1000).toFixed(1)}s`);
   } catch (e) {
     console.error("dawn data: skipped –", e && e.stack ? e.stack : e);

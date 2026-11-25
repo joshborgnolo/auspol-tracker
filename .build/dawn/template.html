@@ -9,6 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
 <link rel="prefetch" href="{{HIST}}" as="fetch" crossorigin data-hist>
+<link rel="alternate" type="application/json" href="{{GROUPS}}" data-groups>
+<link rel="alternate" type="application/json" href="{{GHIST}}" data-ghist>
 <style>
 /* VOICE calm, plain and numerate: a quiet morning paper, not a trading screen
    IDEA the day's light: you arrive at dawn (or dusk), then read the figures in morning light
@@ -130,6 +132,9 @@ svg .vl{fill:var(--ink);font-weight:600;font-size:15px}
 svg .dt{fill:var(--ink);font-weight:600}
 svg .an{fill:var(--ink2)}
 svg .big{fill:var(--ink);font-weight:600;font-size:26px;letter-spacing:-.01em}
+svg .big2{font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums;stroke-width:6px}
+svg .big2 .pc{font-size:.46em;font-weight:500;letter-spacing:0}
+svg .vv{font-family:var(--serif);font-style:italic;fill:var(--mute)}
 svg .fs{fill:var(--mute)}
 svg .ab{font-size:12px;font-weight:600}
 svg .rf{font-size:12px;fill:var(--mute)}
@@ -161,8 +166,9 @@ svg .el{font-size:12px;fill:var(--ink2)}
 /* the readout above the plot: a week, a poll or an event, never over the lines */
 .tip{position:absolute;top:0;left:0;z-index:1;max-width:100%;pointer-events:none;font-size:13px;line-height:1.3;color:var(--ink2);white-space:nowrap}
 .tip b{font-weight:600;color:var(--ink)}
+.tip a.tipgo{pointer-events:auto;color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:2px;margin-left:4px}
 .tip .t2{display:block;color:var(--mute);overflow:hidden;text-overflow:ellipsis}
-.tip.idle{color:var(--mute)}
+.tip.idle{color:var(--mute);white-space:normal}
 /* compare toggles and the outside lines' key */
 .keys{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:13px;color:var(--mute)}
 .chk{display:inline-flex;align-items:center;gap:7px;font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;padding:6px 0;cursor:pointer}
@@ -175,6 +181,30 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .ext a:hover{text-decoration:underline}
 .sw{display:inline-block;width:14px;height:2px;border-radius:1px;background:var(--c)}
 .sw.dash{background:linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px,var(--c) 8px)}
+/* the chart's options: who is counted, which pollsters, and how past terms are drawn */
+.opts{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:8px}
+.pick{position:relative;display:inline-flex;align-items:center}
+.pick select,.pbtn{font:500 13.5px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:32px;padding:0 30px 0 12px;cursor:pointer;-webkit-appearance:none;appearance:none;max-width:100%}
+.pick select{background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 15px) 14px,calc(100% - 10px) 14px;background-size:5px 5px;background-repeat:no-repeat}
+.pbtn{padding:0 12px;display:inline-flex;align-items:center;gap:5px}
+.pbtn span,.pick .pl{color:var(--mute);font-weight:500;font-size:13.5px}
+.pick select{width:9.6em;text-overflow:ellipsis}
+.pbtn b{font-weight:600}
+.pick select:disabled,.pbtn:disabled{opacity:.45;cursor:default}
+.pop{position:absolute;z-index:6;top:38px;left:0;min-width:220px;max-height:min(60vh,420px);overflow:auto;background:var(--bg);border:1px solid var(--rule);border-radius:14px;box-shadow:0 12px 32px rgb(20 10 40/.16);padding:6px}
+.pop button{display:flex;align-items:center;gap:9px;width:100%;font:500 14px/1.2 var(--sans);color:var(--ink);background:none;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;text-align:left}
+.pop button:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.pop button i{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--rule2);display:grid;place-items:center;flex:none}
+.pop button[aria-checked=true] i{background:var(--ink);border-color:var(--ink)}
+.pop button[aria-checked=true] i::after{content:"";width:7px;height:4px;border:solid var(--bg);border-width:0 0 1.6px 1.6px;transform:translateY(-1px) rotate(-45deg)}
+.pop .all{color:var(--ink2);border-bottom:1px solid var(--rule);border-radius:9px 9px 0 0;margin-bottom:4px}
+.tgl{display:inline-flex;align-items:center;gap:8px;font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;padding:6px 0;cursor:pointer}
+.tgl i{position:relative;width:30px;height:18px;border-radius:9px;background:color-mix(in srgb,var(--ink) 16%,transparent);flex:none;transition:background-color .2s}
+.tgl i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--bg);box-shadow:0 1px 2px rgb(20 10 40/.25);transition:transform .2s}
+.tgl[aria-checked=true] i{background:var(--ink)}
+.tgl[aria-checked=true] i::after{transform:translateX(12px)}
+.tgl[hidden]{display:none}
+svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
 @media (max-height:600px){.sec{height:auto;min-height:100svh;overflow:visible}.fig{min-height:260px}}
 @media (min-width:900px){
@@ -203,7 +233,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
   <a class="mark" href="#top">auspol tracker</a>
   <nav class="links" aria-label="Sections">
     <a href="#votes" data-sec="votes">votes</a>
-    <a href="#lead" data-sec="lead">lead</a>
+    <a href="polls/" data-sec="polls">polls</a>
   </nav>
   <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
 </header>
@@ -211,7 +241,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
 <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
   <ul>
     <li><a href="#votes">votes</a></li>
-    <li><a href="#lead">lead</a></li>
+    <li><a href="polls/">polls</a></li>
     <li><span class="soon">seats <small>soon</small></span></li>
     <li><span class="soon">leaders <small>soon</small></span></li>
     <li><span class="soon">states <small>soon</small></span></li>
@@ -251,41 +281,19 @@ svg .el{font-size:12px;fill:var(--ink2)}
       <h2 id="votes-h">{{votesHead}}</h2>
       <p class="dek">{{votesDek}}</p>
     </header>
-    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div>
+      <div class="opts">
+        <label class="pick"><span class="pl">Among&nbsp;</span><select id="grp-sel"></select></label>
+        <div class="pick"><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><span>Pollsters</span><b id="pv-name">All</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
+        <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span>Inferred support</span></button>
+      </div></div>
     <div class="fig" id="votes-fig"><div class="tip" aria-live="polite"></div><svg id="votes-svg" tabindex="0" aria-label="Line chart of the estimated first-preference vote by party. Use the left and right arrow keys to read values week by week."></svg></div>
     <p class="src" id="votes-src">Dots are polls; lines are the model’s weekly estimates, each pollster’s lean taken out, with 95% bands. Rings are the 2025 count. Tap a dot for its poll, a number for its event.</p>
     <div class="sr"><table id="votes-table"></table></div>
   </div>
 </section>
 
-<section class="sec" id="lead" data-sec="lead" aria-labelledby="lead-h">
-  <div class="wrap tpp">
-    <header class="hd">
-      <h2 id="lead-h">{{tppHead}}</h2>
-      <p class="dek">{{tppDek}}</p>
-    </header>
-    <div class="ctl">
-      <div class="vs" data-duel role="radiogroup" aria-label="Contest: Labor against">
-        <span class="me">Labor</span><span class="v">v</span>
-        <button type="button" role="radio" aria-checked="true" data-r="lnp">Coalition</button>
-        <span class="or" aria-hidden="true">/</span>
-        <button type="button" role="radio" aria-checked="false" data-r="on">One Nation</button>
-        <span class="mebar" aria-hidden="true"></span><span class="bar" aria-hidden="true"></span>
-      </div>
-    </div>
-    <div class="ctl ctl2"><div class="win" data-win aria-label="Time window" role="group"></div></div>
-    <div class="fig" id="tpp-fig"><div class="tip" aria-live="polite"></div><svg id="tpp-svg" tabindex="0" aria-label="Line chart of Labor’s two-party-preferred vote. Use the left and right arrow keys to read values week by week."></svg></div>
-    <div class="keys">
-      <button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-pub"><i></i>Published 2PP</button>
-      <button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-ext"><i></i>Outside estimates</button>
-      <span class="ext" id="ext-key" hidden></span>
-    </div>
-    <p class="src" id="tpp-src"></p>
-    <div class="sr"><table id="tpp-table"></table></div>
-  </div>
-</section>
-
-<section class="sec" id="lead-flows" data-sec="lead" aria-labelledby="flows-h">
+<section class="sec" id="flows" data-sec="votes" aria-labelledby="flows-h">
   <div class="wrap flow">
     <header class="hd">
       <h2 id="flows-h">{{flowsHead}}</h2>
@@ -306,9 +314,38 @@ svg .el{font-size:12px;fill:var(--ink2)}
     <div class="sr"><table id="flow-table"></table></div>
   </div>
 </section>
+
+<section class="sec" id="tpp" data-sec="votes" aria-labelledby="tpp-h">
+  <div class="wrap tpp">
+    <header class="hd">
+      <h2 id="tpp-h">{{tppHead}}</h2>
+      <p class="dek">{{tppDek}}</p>
+    </header>
+    <div class="ctl">
+      <div class="vs" data-duel role="radiogroup" aria-label="Contest: Labor against">
+        <span class="me">Labor</span><span class="v">v</span>
+        <button type="button" role="radio" aria-checked="true" data-r="lnp">Coalition</button>
+        <span class="or" aria-hidden="true">/</span>
+        <button type="button" role="radio" aria-checked="false" data-r="on">One Nation</button>
+        <span class="mebar" aria-hidden="true"></span><span class="bar" aria-hidden="true"></span>
+      </div>
+    </div>
+    <div class="ctl ctl2"><div class="win" data-win aria-label="Time window" role="group"></div>
+      <div class="opts"><button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span>Inferred support</span></button></div></div>
+    <div class="fig" id="tpp-fig"><div class="tip" aria-live="polite"></div><svg id="tpp-svg" tabindex="0" aria-label="Line chart of Labor’s two-party-preferred vote. Use the left and right arrow keys to read values week by week."></svg></div>
+    <div class="keys">
+      <button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-pub"><i></i>Published 2PP</button>
+      <button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-ext"><i></i>Outside estimates</button>
+      <span class="ext" id="ext-key" hidden></span>
+    </div>
+    <p class="src" id="tpp-src"></p>
+    <div class="sr"><table id="tpp-table"></table></div>
+  </div>
+</section>
 </main>
 
 <script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>/*{{PMENGINE}}*/</script>
 <script>
 {
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -439,7 +476,13 @@ const POLLS=DATA.polls.map(p=>({...p,x:isoX(p.m),cur:true}));
 const EVENTS=DATA.events.map(e=>({...e,x:isoX(e.d)}));
 const TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].e):null}));
 const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
-let HIST=null,histP=null;
+let HIST=null,histP=null,GROUPS=null,groupsP=null,GHIST=null,ghistP=null;
+/* the chart's options: a group ('' is every voter), a set of pollsters (empty is every one), measured support */
+let GRP='',PVSEL=new Set(),MEASURED=false,SUBW=null;
+const linkOf=sel=>($(sel)||{}).href;
+const getJson=u=>u&&!/%7B%7B|\{\{/.test(u)?fetch(u).then(r=>r.ok?r.json():null).catch(()=>null):Promise.resolve(null);
+const loadGroups=()=>groupsP||(groupsP=getJson(linkOf('link[data-groups]')).then(g=>{GROUPS=g;return g}));
+const loadGHist=()=>ghistP||(ghistP=getJson(linkOf('link[data-ghist]')).then(g=>{GHIST=g;return g}));
 /* the past terms: a sidecar the page prefetches, read when a window first reaches behind this term */
 const HIST_URL=($('link[data-hist]')||{}).href;
 const loadHist=()=>histP||(histP=HIST_URL&&!/\{\{/.test(HIST_URL)?fetch(HIST_URL).then(r=>r.ok?r.json():null).then(h=>{HIST=h;return h}).catch(()=>null):Promise.resolve(null));
@@ -517,17 +560,18 @@ winBars.forEach(el=>{
   });
 });
 function paintWinBars(){
-  const act=winActive(WIN),prev=winStep(WIN,-1),next=winStep(WIN,1),unit=WIN.kind==='term'?'term':'stretch';
+  const act=winActive(WIN),subOn=!!PVSEL.size,prev=subOn?null:winStep(WIN,-1),next=subOn?null:winStep(WIN,1),unit=WIN.kind==='term'?'term':'stretch';
   winBars.forEach(el=>{
     const [p,n]=$$('.step',el);p.disabled=!prev;n.disabled=!next;
     p.setAttribute('aria-label',WIN.kind==='term'?'Previous term':'Earlier '+unit);n.setAttribute('aria-label',WIN.kind==='term'?'Next term':'Later '+unit);
     /* the long windows wait for the past terms, as the site's bar does */
-    $$('.seg button',el).forEach(b=>{b.setAttribute('aria-checked',String(b.dataset.w===act));b.disabled=!HIST&&(b.dataset.w==='10'||b.dataset.w==='all')});
+    $$('.seg button',el).forEach(b=>{b.setAttribute('aria-checked',String(b.dataset.w===act));b.disabled=(!HIST||subOn)&&(b.dataset.w==='10'||b.dataset.w==='all')});
   });
 }
 function setWin(w){
-  WIN=w;paintWinBars();paintKeys();tppSrc();votesSrc();
+  WIN=w;paintWinBars();paintKeys();tppSrc();votesSrc();paintMeasured();
   if(!inCur(w)&&!HIST)loadHist().then(()=>{paintWinBars();charts.forEach(c=>c.draw())});
+  if(!inCur(w)&&GRP&&!GHIST)loadGHist().then(()=>votes.draw());
   charts.forEach(c=>{c.clear();c.draw()});
 }
 
@@ -578,8 +622,12 @@ function chart(o){
       }
       if(ok){evMode='lab';EVH=placed.some(p=>p.r)?38:22}
     }
+    if(S.govs&&!evs.length)EVH=22;
     const MT=TIPH+EVH,MB=24,PH=H-MT-MB,y=v=>MT+PH*(S.y1-v)/(S.y1-S.y0);
     let s='';
+    if(S.govs)S.govs.forEach(g=>{const ga=Math.max(ML,x(g.a)),gb=Math.min(W-MR,x(g.b));if(gb-ga<1)return;
+      s+=`<rect x="${P1(ga)}" y="${MT}" width="${P1(gb-ga)}" height="${PH}" style="fill:var(--${g.gov==='alp'?'alp':'lnp'})" fill-opacity=".075"/>`;
+      const nm=govName(g,gb-ga-6);if(nm)s+=`<text x="${P1((ga+gb)/2)}" y="${MT-7}" text-anchor="middle" class="gv" style="fill:var(--${g.gov==='alp'?'alp':'lnp'})">${esc(nm)}</text>`});
     ticks.forEach((v,i)=>{const yy=Math.round(y(v))+.5;s+=`<line x1="${ML}" x2="${W-MR+4}" y1="${yy}" y2="${yy}" stroke="var(--rule)"/><text x="${ML-8}" y="${yy}" dy=".35em" text-anchor="end">${tl[i]}</text>`});
     /* reference lines (50% on the two-party chart) */
     for(const r of S.refs||[]){const yy=Math.round(y(r.y))+.5;s+=`<line x1="${ML}" x2="${W-MR+4}" y1="${yy}" y2="${yy}" stroke="var(--rule2)" stroke-dasharray="3 3"/>`;if(r.up)s+=`<text x="${ML+6}" y="${yy-7}" class="rf">${esc(r.up)}</text>`;if(r.dn)s+=`<text x="${ML+6}" y="${yy+16}" class="rf">${esc(r.dn)}</text>`}
@@ -626,10 +674,10 @@ function chart(o){
   }
   /* the readout above the plot */
   function setTip(html,cx,cls){
-    tip.className='tip'+(cls?' '+cls:'');tip.innerHTML=html;
+    tip.className='tip'+(cls?' '+cls:'');tip.style.maxWidth=cls==='idle'?(L.W-L.ML)+'px':'';tip.innerHTML=html;
     const w=Math.min(tip.offsetWidth,L.W);tip.style.left=P1(cx==null?L.ML:Math.max(0,Math.min(L.W-w,cx-w/2)))+'px';
   }
-  function idle(){if(!L)return;const ww=winWords(WIN);setTip(`${esc(ww.head)}${ww.sub?' · '+esc(ww.sub):''}`,null,'idle')}
+  function idle(){if(!L)return;const ww=winWords(WIN),md=o.mode?o.mode():'';setTip(`${esc(ww.head)}${ww.sub?' · '+esc(ww.sub):''}${md?' · '+esc(md):''}`,null,'idle')}
   function show(kind,i,quiet){
     mode=kind;cur=i;const {S,x,y,MT,PH,W,ML,MR,sg,eg}=L;let s='';
     if(kind==='stop'){
@@ -646,7 +694,7 @@ function chart(o){
       const its=same.map(q=>({q,y0:q.py}));relax(its,16,MT+8,MT+PH-4);const right=cx<ML+(W-ML-MR)*.6;
       its.forEach(t=>{s+=`<text x="${P1(right?cx+9:cx-9)}" y="${P1(t.y)}" dy=".35em" text-anchor="${right?'start':'end'}" class="dt">${esc(t.q.txt)}</text>`});
       same.forEach(q=>{s+=`<circle cx="${P1(q.px)}" cy="${P1(q.py)}" r="4.5" fill="var(--bg)" style="stroke:${q.color}" stroke-width="2"/><circle cx="${P1(q.px)}" cy="${P1(q.py)}" r="2" style="fill:${q.color}"/>`});
-      const p=d.poll;setTip(`<b>${esc(p.who)}</b> · ${esc(p.when)}${p.n?' · '+esc(p.n):''}`,cx);
+      const p=d.poll;setTip(`<b>${esc(p.who)}</b> · ${esc(p.when)}${p.n?' · '+esc(p.n):''}${p.k?` <a class="tipgo" href="polls/#p-${encodeURIComponent(p.k)}">Open in polls ›</a>`:''}`,cx);
       eg.style.opacity=.2;
     }else if(kind==='ev'){
       const a=L.evAt[i];
@@ -673,7 +721,7 @@ function chart(o){
     const b=svg.getBoundingClientRect(),xv=S.x0+(cx-b.left-L.ML)/L.PW*(S.x1-S.x0);let bi=0,bd=1e9;S.stops.forEach((t,i)=>{const d=Math.abs(t.x-xv);if(d<bd){bd=d;bi=i}});return bi;
   }
   let down=null;
-  svg.addEventListener('pointerdown',e=>{if(!L)return;clearTimeout(tmo);down={x:e.clientX,y:e.clientY,moved:false};const h=hit(e.clientX,e.clientY,e.pointerType!=='mouse');if(h)show(h[0],h[1])});
+  svg.addEventListener('pointerdown',e=>{if(!L)return;clearTimeout(tmo);down={x:e.clientX,y:e.clientY,moved:false};const h=hit(e.clientX,e.clientY,e.pointerType!=='mouse');if(h&&h[0]==='dot'&&mode==='dot'&&e.pointerType!=='mouse'&&L.dots[cur]&&L.dots[cur].poll===L.dots[h[1]].poll&&L.dots[h[1]].poll.k)down.again=true;if(h)show(h[0],h[1])});
   svg.addEventListener('pointermove',e=>{
     if(!L)return;
     if(e.pointerType==='mouse'&&!e.buttons){const h=hit(e.clientX,e.clientY,false);if(h&&(h[0]!==mode||h[1]!==cur))show(h[0],h[1]);return}
@@ -683,7 +731,7 @@ function chart(o){
     if(down&&down.moved){const i=nearStop(e.clientX);if(i!=null&&(i!==cur||mode!=='stop'))show('stop',i)}
   });
   svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')clear()});
-  svg.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'){clearTimeout(tmo);tmo=setTimeout(clear,mode==='stop'?2400:5200)}down=null});
+  svg.addEventListener('pointerup',e=>{if(L&&down&&!down.moved){if(down.again){location.href='polls/#p-'+encodeURIComponent(L.dots[cur].poll.k);return}if(e.pointerType==='mouse'&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<6){const h=hit(e.clientX,e.clientY,false),k=h&&h[0]==='dot'&&L.dots[h[1]].poll.k;if(k){location.href='polls/#p-'+encodeURIComponent(k);return}}}if(e.pointerType!=='mouse'){clearTimeout(tmo);tmo=setTimeout(clear,mode==='stop'?2400:5200)}down=null});
   svg.addEventListener('pointercancel',()=>{down=null;clear()});
   svg.addEventListener('keydown',e=>{
     if(!L||!L.S.stops.length)return;const k=e.key,n=L.S.stops.length-1,c=mode==='stop'&&cur!=null?cur:n;
@@ -700,17 +748,18 @@ const pollWhen=p=>{const y=+p.m.slice(0,4);return (p.tbc?'fieldwork TBC':p.f+(y!
 const pollN=(p,facet)=>p.n?'n = '+Number(p.n).toLocaleString('en-AU')+(facet==='twopp'&&p.b2?' '+p.b2:p.b?' '+p.b:''):'';
 const LONG=12;
 /* the past terms' lines through their two counts (the site's rdVhLines), runs split where nobody polled for a quarter */
-function pastLanes(lanes,a,b,colorOf,long){
+function pastLanes(lanes,a,b,colorOf,long,VH=HIST,measured=false){
   const lines=[],bands=[],rings=[],stops=new Map();
-  if(!HIST)return {lines,bands,rings,stops};
-  for(const t of HIST.terms){
+  if(!VH)return {lines,bands,rings,stops};
+  for(const t of VH.terms){
     if(t.b<a-.05||t.a>b+.05)continue;
     for(const k of lanes){
       if(!t.lanes.includes(k))continue;
-      const pts=[],col=colorOf(k);
-      if(t.open[k]!=null)pts.push({x:t.a,y:t.open[k],count:t.year});
-      for(const m of t.series[k]||[])pts.push({x:m[0],y:m[1],ci:m[3]});
-      if(t.close[k]!=null)pts.push({x:t.b,y:t.close[k],count:t.src});
+      const pts=[],col=colorOf(k),counts=[],est=t.est||[false,false];
+      /* a polling day the count never cut (a group's) is the model's estimate: a point of the line with its band */
+      if(t.open[k]!=null){const q=est[0]?{x:t.a,y:t.open[k],ci:(t.openCi||{})[k],estAt:t.year}:{x:t.a,y:t.open[k],count:t.year};if(measured&&!est[0])counts.push(q);else pts.push(q)}
+      for(const m of t.series[k]||[])pts.push({x:m[0],y:m[measured?2:1],ci:m[measured?5:3]});
+      if(t.close[k]!=null){const q=est[1]?{x:t.b,y:t.close[k],ci:(t.closeCi||{})[k],estAt:t.src}:{x:t.b,y:t.close[k],count:t.src};if(measured&&!est[1])counts.push(q);else pts.push(q)}
       const runs=[[]];pts.forEach((p,i)=>{if(i&&p.x-pts[i-1].x>.26)runs.push([]);runs[runs.length-1].push(p)});
       runs.forEach((r,i)=>{
         if(r.length>=2)lines.push({color:col,pts:r,w:long?1.5:2.25,thin:long});
@@ -718,51 +767,101 @@ function pastLanes(lanes,a,b,colorOf,long){
         const bd=long?[]:r.filter(p=>p.ci!=null||p.count);
         if(bd.length>=2)bands.push({color:col,pts:bd.map(p=>({x:p.x,lo:p.y-(p.ci||0),hi:p.y+(p.ci||0)}))});
       });
-      for(const p of pts){
+      for(const p of pts.concat(counts)){
         if(p.count)rings.push({x:p.x,y:p.y,color:col,r:long?3:4.5});
-        const key=p.x.toFixed(4);if(!stops.has(key))stops.set(key,{x:p.x,label:p.count?p.count+' election':xMonth(p.x,true),items:[]});
+        const key=p.x.toFixed(4),at=p.count||p.estAt;if(!stops.has(key))stops.set(key,{x:p.x,label:at?at+' election':xMonth(p.x,true),sub:p.estAt&&!p.count?'the model’s estimate':'',items:[]});
         stops.get(key).items.push({color:col,y:p.y,v:p.y,ring:!!p.count,k});
       }
     }
   }
   return {lines,bands,rings,stops};
 }
+let ghCache=null;
+function groupVH(){
+  const gi=GRP&&GROUPS?GIDX[GRP]:null;if(!gi||!GHIST||!GHIST.terms)return null;
+  if(ghCache&&ghCache.key===GRP)return ghCache.vh;
+  const KG=['alp','lnp','onp','grn','oth'];
+  const terms=GHIST.terms.map(t=>{const c=t.sets&&t.sets[gi.setId]&&t.sets[gi.setId][GRP];if(!c)return null;
+    const series={},open={},close={},openCi={},closeCi={};
+    KG.forEach((k,i)=>{const rows=c.months.filter(m=>m[1+i]!=null).map(m=>[m[0],m[1+i],m[1+i],m[6+i],null,m[6+i]]);
+      if(c.open&&c.open[i]!=null){open[k]=c.open[i];openCi[k]=c.open[5+i]}
+      if(c.close&&c.close[i]!=null){close[k]=c.close[i];closeCi[k]=c.close[5+i]}
+      if(rows.length+(open[k]!=null?1:0)+(close[k]!=null?1:0)>=2)series[k]=rows});
+    return {year:t.year,src:t.src,a:t.a,b:t.b,lanes:Object.keys(series),open,close,openCi,closeCi,est:[!c.counted[0],!c.counted[1]],series}}).filter(Boolean);
+  ghCache={key:GRP,vh:{terms}};return ghCache.vh;
+}
+let GIDX={};
 function pastPolls(a,b,fn){
   const out=[];if(!HIST)return out;
   for(const t of HIST.terms){if(t.b<a||t.a>b)continue;for(const r of HIST.polls[t.year]||[]){const x=isoX(r[0]);if(x<a||x>b)continue;fn(r,x,t,out)}}
   return out;
 }
+function govBlocks(a,b){
+  const out=[],{hi}=REACH();
+  TERMS.forEach(t=>{const ta=Math.max(t.a,a),tb=Math.min(t.b!=null?t.b:hi,b);if(tb<=ta)return;
+    const pms=t.pm.split('→').map(x=>x.trim()).filter(Boolean),last=out[out.length-1];
+    if(last&&last.gov===t.gov&&Math.abs(last.b-ta)<.02){last.b=tb;pms.forEach(q=>{if(last.pms[last.pms.length-1]!==q)last.pms.push(q)})}
+    else out.push({gov:t.gov,a:ta,b:tb,pms:pms.slice()})});
+  return out;
+}
+const govName=(g,w)=>{const pm=g.pms,ends=pm.length>2&&pm[0]!==pm[pm.length-1]?pm[0]+'–'+pm[pm.length-1]:null;
+  return [pm.length<=3?pm.join('–'):null,ends,g.gov==='alp'?'Labor':'Coalition'].filter(Boolean).find(s=>tw(s,'500 11.5px')<=w)||''};
 const elecEvents=(a,b)=>b-a>20?[]:TERMS.filter(t=>t.a>a+.04&&t.a<b-.04).map((t,i)=>({x:t.a,s:t.year+' election',l:t.year+' federal election',t:'Won by '+(t.gov==='alp'?'Labor':'the Coalition')+', led by '+t.pm.split('→')[0].trim()+'.',d:t.e,n:i+1}));
 
-/* the primary vote */
+/* the primary vote: every voter week by week, a group month by month (the Who-votes model), or the model
+   re-run on the ticked pollsters week by week */
+const ymX2=ym=>{const [y,m]=ym.split('-').map(Number);return y+(m-.5)/12};
+const nearWeek=x=>{let bi=1,bd=1e9;for(let i=1;i<=LAST;i++){const d=Math.abs(GX[i]-x);if(d<bd){bd=d;bi=i}}return bi};
 function primScene(narrow){
   const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
   const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
   const S={x0,x1,ys:10,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[]};
-  const order=[...PK].sort((p,q)=>EST[q][LAST].m-EST[p][LAST].m);
-  if(cur){
-    const i0=GX.findIndex(gx=>gx>=x0-1e-6);
+  const g=GRP&&GROUPS?GIDX[GRP]:null,sub=!g&&PVSEL.size&&SUBW?SUBW:null;
+  if(cur&&g){
+    /* a group: its model's monthly line from polling day (the count where the AEC cut the group, else the
+       model's estimate for the day), each poll's reading of the group set against every voter that week */
+    const O=GROUPS.order,oi=k=>O.indexOf(k),cnt=GROUPS.counted[GRP]||null;
+    const pts=Object.fromEntries(PK.map(k=>[k,[]]));
+    if(ELX>=x0-1e-6&&(g.el||cnt))PK.forEach(k=>{const v=cnt?cnt[oi(k)]:g.el[oi(k)],ci=cnt?0:(g.el?g.el[5+oi(k)]:0);if(v!=null)pts[k].push({x:ELX,y:v,lo:v-ci,hi:v+ci,el:1})});
+    for(const r of g.monthly){const x=ymX2(r[0]);if(x<x0-1e-6||x<=ELX)continue;PK.forEach(k=>{const v=r[1+oi(k)],ci=r[1+O.length+oi(k)];if(v!=null)pts[k].push({x,y:v,lo:v-(ci||0),hi:v+(ci||0)})})}
+    const lastV=k=>{const q=pts[k];return q.length?q[q.length-1].y:-1};
+    const order=[...PK].sort((p,q)=>lastV(q)-lastV(p));
+    for(const k of PK){if(pts[k].length<2)continue;if(!long)S.bands.push({color:COLOR(k),pts:pts[k].map(q=>({x:q.x,lo:q.lo,hi:q.hi})),smooth:true});S.lines.push({color:COLOR(k),pts:pts[k],smooth:true,w:long?1.6:2.25,thin:long})}
+    if(cnt&&ELX>=x0-1e-6)PK.forEach(k=>{const v=cnt[oi(k)];if(v!=null)S.rings.push({x:ELX,y:v,color:COLOR(k),r:long?3:4.5})});
+    if(span<=4.6){const gi=GROUPS.groups.indexOf(GRP);GROUPS.polls.forEach(q=>{const v=q.v[gi];if(!v)return;const x=isoX(q.m);if(x<x0||x>x1)return;const w=nearWeek(x),poll={who:q.h,when:pollWhen({m:q.m,f:q.f}),n:q.n?'n = '+Number(q.n).toLocaleString('en-AU')+' in all':'',k:q.k};
+      PK.forEach((k,j)=>{if(v[j]==null||q.t[j]==null)return;S.dots.push({x,y:EST[k][w].m+(v[j]-q.t[j]),color:COLOR(k),poll,txt:ABBR[k]+' '+f1(v[j])})})})}
+    const xs=[...new Set(PK.flatMap(k=>pts[k].map(q=>q.x.toFixed(4))))].map(Number).sort((p,q)=>p-q);
+    xs.forEach(x=>{const items=order.map(k=>{const q=pts[k].find(r=>Math.abs(r.x-x)<1e-6);return q?{color:COLOR(k),y:q.y,v:q.y,ring:!!(q.el&&cnt)}:null}).filter(Boolean);
+      if(items.length)S.stops.push({x,label:Math.abs(x-ELX)<1e-6?'2025 election':xMonth(x,true),sub:Math.abs(x-ELX)<1e-6?(cnt?'the count':'the model’s estimate'):'',items})});
+    S.ends=order.filter(k=>pts[k].length).map(k=>({color:COLOR(k),y:lastV(k),name:NAME[k],abbr:ABBR[k],v:lastV(k)}));
+    S.endX=Math.max(...PK.map(k=>pts[k].length?pts[k][pts[k].length-1].x:-1e9));
+  }else if(cur){
+    const src=k=>sub?sub[k]:null,val=(k,i)=>sub?sub[k][i]:EST[k][i];
+    const i0=GX.findIndex(gx=>gx>=x0-1e-6),iS=sub?Math.max(1,sub.from):1;
+    const last=k=>val(k,LAST).m,order=[...PK].sort((p,q)=>last(q)-last(p));
     for(const k of PK){
-      const pts=[],bd=[];for(let i=Math.max(1,i0);i<=LAST;i++){pts.push({x:GX[i],y:EST[k][i].m});bd.push({x:GX[i],lo:EST[k][i].lo,hi:EST[k][i].hi})}
+      const pts=[],bd=[];for(let i=Math.max(iS,i0);i<=LAST;i++){const q=val(k,i);if(!q)continue;pts.push({x:GX[i],y:q.m});bd.push({x:GX[i],lo:q.lo,hi:q.hi})}
       if(!long)S.bands.push({color:COLOR(k),pts:bd,smooth:true});
       S.lines.push({color:COLOR(k),pts,smooth:true,w:long?1.6:2.25,thin:long});
       if(ELX>=x0-1e-6)S.rings.push({x:ELX,y:ANCH[k],color:COLOR(k),r:long?3:4.5});
     }
-    if(span<=4.6)POLLS.forEach(p=>{if(!p.p||p.x<x0||p.x>x1)return;const poll={who:p.h,when:pollWhen(p),n:pollN(p,'primary')};PK.forEach((k,j)=>{const v=p.p[j];if(v!=null)S.dots.push({x:p.x,y:v,color:COLOR(k),poll,txt:ABBR[k]+' '+v})})});
-    for(let i=Math.max(0,i0);i<=LAST;i++){if(i===0&&ELX<x0-1e-6)continue;const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);
-      S.stops.push({x:GX[i],label:i===0?'2025 election':fdate(G[i]),sub:i===0?'the count':ev?ev.s:'',items:order.map(k=>({color:COLOR(k),y:EST[k][i].m,v:EST[k][i].m,ring:i===0}))})}
-    S.ends=order.map(k=>({color:COLOR(k),y:EST[k][LAST].m,name:NAME[k],abbr:ABBR[k],v:EST[k][LAST].m}));
+    if(span<=4.6)POLLS.forEach(p=>{if(!p.p||p.x<x0||p.x>x1||(PVSEL.size&&!PVSEL.has(p.h)))return;const poll={who:p.h,when:pollWhen(p),n:pollN(p,'primary'),k:p.k};PK.forEach((k,j)=>{const v=p.p[j];if(v!=null)S.dots.push({x:p.x,y:v,color:COLOR(k),poll,txt:ABBR[k]+' '+v})})});
+    for(let i=Math.max(0,i0);i<=LAST;i++){if(i===0&&ELX<x0-1e-6)continue;if(i>0&&i<iS)continue;const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);
+      S.stops.push({x:GX[i],label:i===0?'2025 election':fdate(G[i]),sub:i===0?'the count':ev?ev.s:'',items:order.map(k=>{const q=i===0?EST[k][0]:val(k,i);return {color:COLOR(k),y:q.m,v:q.m,ring:i===0}})})}
+    S.ends=order.map(k=>({color:COLOR(k),y:last(k),name:NAME[k],abbr:ABBR[k],v:last(k)}));
     S.endX=NOWX;
   }
   if(!curOnly){
-    const P=pastLanes(PK,a,b,COLOR,long);
+    const VH=g?groupVH():HIST,P=pastLanes(PK,a,b,COLOR,long,VH,!g&&MEASURED);
     S.lines.unshift(...P.lines);S.bands.unshift(...P.bands);S.rings.push(...P.rings);
     const st=[...P.stops.values()].filter(t=>t.x>=a-1e-6&&t.x<=b+1e-6&&t.x<CUR.a-1e-4);
     S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
-    if(span<=4.6)pastPolls(a,b,(r,x,t,out)=>{const poll={who:r[1],when:r[2]?xMonth(x,true):fdate(r[0])};PK.forEach((k,j)=>{const v=r[3+j];if(v!=null)S.dots.push({x,y:v,color:COLOR(k),poll,txt:ABBR[k]+' '+f1(v)})})});
-    if(!cur){S.ends=[];}
+    if(span<=4.6&&!g)pastPolls(a,b,(r,x,t,out)=>{const poll={who:r[1],when:r[2]?xMonth(x,true):fdate(r[0])};PK.forEach((k,j)=>{const v=r[3+j];if(v!=null)S.dots.push({x,y:v,color:COLOR(k),poll,txt:ABBR[k]+' '+f1(v)})})});
+    if(!cur)S.ends=[];
   }
-  S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):elecEvents(a,b);
+  /* governments behind a window longer than a term; their names stand in for the elections */
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):S.govs?[]:elecEvents(a,b);
   const ys=[...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.map(p=>p.hi)),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=0;S.y1=Math.max(40,Math.ceil((Math.max(...ys,0)+.5)/10)*10);
   return S;
@@ -799,7 +898,7 @@ function tppScene(narrow){
     if(!long)S.bands.push({color:RCOL[curOnly?main:'lnp'],pts:M.bd,smooth:true});
     S.lines.push({color:RCOL[curOnly?main:'lnp'],pts:M.pts,smooth:true,w:long?1.6:2.6,thin:long});
     if((curOnly?main:'lnp')==='lnp'||OTH==='lnp')if(ELX>=x0-1e-6)S.rings.push({x:ELX,y:DATA.election.tpp,color:RCOL.lnp,r:long?3:4.5});
-    if(span<=4.6){const key=(curOnly?main:'lnp')==='lnp'?'i':'io';POLLS.forEach(p=>{if(p[key]==null||p.x<x0||p.x>x1)return;S.dots.push({x:p.x,y:p[key],color:RCOL[curOnly?main:'lnp'],poll:{who:p.h,when:pollWhen(p),n:pollN(p,'twopp')},txt:f1(p[key])})})}
+    if(span<=4.6){const key=(curOnly?main:'lnp')==='lnp'?'i':'io';POLLS.forEach(p=>{if(p[key]==null||p.x<x0||p.x>x1)return;S.dots.push({x:p.x,y:p[key],color:RCOL[curOnly?main:'lnp'],poll:{who:p.h,when:pollWhen(p),n:pollN(p,'twopp'),k:p.k},txt:f1(p[key])})})}
     if(ELX>=x0-1e-6)S.stops.push({x:ELX,label:'2025 election',sub:'the count',items:[{color:RCOL.lnp,y:DATA.election.tpp,v:DATA.election.tpp,ring:true,tc:RCOL.lnp}]});
     for(let i=i0;i<=LAST;i++){const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);const items=[{color:RCOL[curOnly?main:'lnp'],y:M.pts[i-i0].y,v:M.pts[i-i0].y,tc:RCOL[curOnly?main:'lnp']},{color:RCOL[curOnly?OTH:'on'],y:O.pts[i-i0].y,v:O.pts[i-i0].y,tc:RCOL[curOnly?OTH:'on']}];
       for(const e of extras){const v=along(e.pts,GX[i]);if(v!=null)items.push({color:e.color,y:v,v,tc:e.color,txt:e.name+' '+f1(v)})}
@@ -810,14 +909,15 @@ function tppScene(narrow){
     S.endX=NOWX;
   }
   if(!curOnly){
-    const P=pastLanes(['tpp'],a,b,()=>RCOL.lnp,long);
+    const P=pastLanes(['tpp'],a,b,()=>RCOL.lnp,long,HIST,MEASURED);
     S.lines.unshift(...P.lines);S.bands.unshift(...P.bands);S.rings.push(...P.rings);
     const st=[...P.stops.values()].filter(t=>t.x>=a-1e-6&&t.x<=b+1e-6&&t.x<CUR.a-1e-4).map(t=>({...t,items:t.items.map(q=>({...q,tc:RCOL.lnp}))}));
     S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
     if(span<=4.6)pastPolls(a,b,(r,x)=>{const v=r[8];if(v!=null)S.dots.push({x,y:v,color:RCOL.lnp,poll:{who:r[1],when:r[2]?xMonth(x,true):fdate(r[0])},txt:f1(v)})});
     if(!cur)S.ends=[];
   }
-  S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):elecEvents(a,b);
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):S.govs?[]:elecEvents(a,b);
   const ys=[50,...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=Math.floor((Math.min(...ys)+.3)/5)*5;S.y1=Math.ceil((Math.max(...ys)-.3)/5)*5;
   if(S.y1-S.y0<10)S.y1=S.y0+10;
@@ -918,7 +1018,7 @@ rpBtn.addEventListener('click',e=>{
 });
 
 /* ---------- section 2: the primary vote, week by week ---------- */
-const votes=chart({fig:$('#votes-fig'),svg:$('#votes-svg'),scene:primScene});
+const votes=chart({fig:$('#votes-fig'),svg:$('#votes-svg'),scene:primScene,mode:()=>GRP?'among '+GRP:PVSEL.size?$('#pv-name').textContent:''});
 
 /* ---------- section 3: Labor's two-party vote, week by week ---------- */
 const tpp=chart({fig:$('#tpp-fig'),svg:$('#tpp-svg'),scene:tppScene});
@@ -928,10 +1028,13 @@ const tppSrc=()=>{
   const c=RIV,cur=inCur(WIN);
   $('#tpp-src').textContent=(cur?(c==='lnp'?'Dots are polls, each one’s primary votes run through the 2025 election’s preference flows; the line is the model’s weekly estimate with its 95% band. The ring is the 2025 count.'
     :'Dots are polls, each one’s primary votes run through the site’s flows for Labor against One Nation (no election has counted that pair); the band adds the doubt about those flows to the model’s.')
-    :'Past terms are monthly, Labor against the Coalition, drawn through the election results at both ends. This term is weekly.')+' Tap a dot for its poll.';
+    :MEASURED?'Past terms are the polls’ own monthly figures, Labor against the Coalition, before the election adjustment; the rings are the results. This term is weekly.':'Past terms are monthly, Labor against the Coalition, drawn through the election results at both ends. This term is weekly.')+' Tap a dot for its poll.';
 };
 const votesSrc=()=>{
   const cur=inCur(WIN);
+  if(GRP){$('#votes-src').textContent='Lines are the vote-by-group model’s monthly estimates for '+GRP+', with 95% bands; dots are each poll’s reading of the group, set against every voter that week.'+((GROUPS&&GROUPS.counted[GRP])?' Rings are the 2025 count.':' The lines open on the model’s estimate for polling day.');return}
+  if(PVSEL.size){const hs=[...PVSEL],list=hs.length<2?hs[0]:hs.slice(0,-1).join(', ')+' and '+hs[hs.length-1];$('#votes-src').textContent='Lines are the model re-run on '+list+' alone, week by week, with 95% bands; dots are their polls. Rings are the 2025 count.';return}
+  if(!cur&&MEASURED){$('#votes-src').textContent='Past terms are the polls’ own monthly figures, before the election adjustment; the rings are the election results. This term is weekly.';return}
   $('#votes-src').textContent=cur?'Dots are polls; lines are the model’s weekly estimates, each pollster’s lean taken out, with 95% bands. Rings are the 2025 count. Tap a dot for its poll, a number for its event.'
     :'Past terms are monthly, drawn through the election results at both ends (the rings): each month is moved by part of the polls’ miss at the election that closed its term. This term is weekly.'+((winRange(WIN)[1]-winRange(WIN)[0])<=4.6?' Tap a dot for its poll.':'');
 };
@@ -951,6 +1054,64 @@ function paintKeys(){
 }
 btnPub.addEventListener('click',()=>{CMP_PUB=!CMP_PUB;paintKeys();tpp.clear();tpp.draw()});
 btnExt.addEventListener('click',()=>{CMP_EXT=!CMP_EXT;paintKeys();tpp.clear();tpp.draw()});
+
+/* ---------- the primary chart's options ---------- */
+/* who is counted: any Who-votes group, the groups themselves read the first time one is picked */
+const grpSel=$('#grp-sel'),pvBtn=$('#pv-btn'),pvPop=$('#pv-pop'),pvName=$('#pv-name');
+grpSel.innerHTML='<option value="">All voters</option>'+(DATA.groupMenu||[]).map(t=>`<optgroup label="${esc(t.label)}">${t.groups.map(gl=>`<option value="${esc(gl)}">${esc(gl)}</option>`).join('')}</optgroup>`).join('');
+if(!DATA.groupMenu)grpSel.closest('.pick').hidden=true;
+const indexGroups=()=>{GIDX={};if(GROUPS)GROUPS.tabs.forEach(t=>t.sets.forEach(st=>st.groups.forEach(g=>{GIDX[g.label]={...g,setId:st.id,tab:t.label}})))};
+function afterGrp(){pvBtn.disabled=!!GRP;if(GRP&&!inCur(WIN)&&!GHIST)loadGHist().then(()=>votes.draw());paintMeasured();votesSrc();votes.clear();votes.draw()}
+grpSel.addEventListener('change',()=>{GRP=grpSel.value;if(GRP&&!GROUPS)loadGroups().then(()=>{indexGroups();afterGrp()});afterGrp()});
+/* which pollsters: the model re-run in the browser on the ticked houses' polls alone (the site's pollster
+   menu, pv-agg.js pmAgg), at the build's settings, read week by week; the band is the smoother's, carried
+   to the shares by the delta method. Every house ticked is every house: the published figures. */
+function subsetWeekly(houses){
+  const M=DATA.pm,E=window.AP&&window.AP.pmEngine;if(!M||!E)return null;
+  const sel=new Set(houses),readings=M.obs.filter(o=>sel.has(o[0])).map((o,idx)=>({house:o[0],day:o[1],n:o[2],step:o[3],cats:o[4],vals:o[5],idx}));
+  if(!readings.length)return null;
+  const prep=E.prepare(readings,{t0:M.t0,t1:M.t1,minCore:M.minCore,trend:true});
+  const jumps=new Set(M.jumps.filter(d=>d>M.t0&&d<=M.t1)),day=iso=>Math.floor(Date.parse(iso+'T00:00:00Z')/864e5),wd=G.map(day);
+  const first=Math.min(...readings.map(r=>r.day));
+  const events=[...new Set([M.t0,...prep.obs.map(o=>o.day),...wd.slice(1),M.t1,...jumps])].filter(d=>d>=M.t0&&d<=M.t1).sort((a,b)=>a-b);
+  const th={...M.th,w:Float64Array.from(M.th.w)},kappa=new Map(Object.entries(M.kappa)),anchor={mean:Float64Array.from(M.anchor.mean),cov:Float64Array.from(M.anchor.cov)};
+  const {sm}=E.filterSmooth(prep.obs,prep.L,events,th,{anchor,jumps,kappa,lone:prep.L.lone});
+  const N=prep.L.N,Dd=prep.L.D,ev=new Map(events.map((d,i)=>[d,i])),out=Object.fromEntries(PK.map(k=>[k,new Array(G.length).fill(null)]));
+  out.from=null;
+  for(let i=1;i<=LAST;i++){
+    if(wd[i]<first)continue;const kk=ev.get(wd[i]);if(kk==null)continue;
+    const p=E.softmaxAlr(sm.xs.subarray(kk*N,kk*N+Dd)),Pk=kk*N*N;
+    PK.forEach((key,a)=>{let v=0;for(let r=0;r<Dd;r++){const jr=p[a]*((a===r?1:0)-p[r]);for(let c=0;c<Dd;c++)v+=jr*sm.Ps[Pk+r*N+c]*p[a]*((a===c?1:0)-p[c])}
+      const m=100*p[a],ci=196*Math.sqrt(Math.max(0,v));out[key][i]={m,lo:m-ci,hi:m+ci}});
+    if(out.from==null)out.from=i;
+  }
+  return out.from==null?null:out;
+}
+pvPop.innerHTML='<button type="button" class="all" data-h="">Every pollster</button>'+(DATA.pvHouses||[]).map(h=>`<button type="button" role="checkbox" aria-checked="false" data-h="${esc(h)}"><i></i>${esc(h)}</button>`).join('');
+if(!DATA.pm||!window.AP||!window.AP.pmEngine)pvBtn.closest('.pick').hidden=true;
+const pvClose=()=>{pvPop.hidden=true;pvBtn.setAttribute('aria-expanded','false')};
+pvBtn.addEventListener('click',e=>{e.stopPropagation();const open=pvPop.hidden;pvPop.hidden=!open;pvBtn.setAttribute('aria-expanded',String(open))});
+document.addEventListener('click',e=>{if(!pvPop.hidden&&!e.target.closest('#pv-pop')&&!e.target.closest('#pv-btn'))pvClose()});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!pvPop.hidden){pvClose();pvBtn.focus()}});
+function applyPv(){
+  $$('button[data-h]',pvPop).forEach(b=>{if(b.dataset.h)b.setAttribute('aria-checked',String(PVSEL.has(b.dataset.h)))});
+  const n=PVSEL.size,all=(DATA.pvHouses||[]).length;
+  pvName.textContent=!n?'All':n===1?[...PVSEL][0]:n+' of '+all;
+  grpSel.disabled=!!n;
+  if(n&&!inCur(WIN))WIN={kind:'term',year:CUR.year};
+  SUBW=n?subsetWeekly([...PVSEL]):null;
+  paintWinBars();paintMeasured();votesSrc();votes.clear();votes.draw();
+}
+pvPop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();const h=b.dataset.h;
+  if(!h)PVSEL.clear();else if(PVSEL.has(h))PVSEL.delete(h);else PVSEL.add(h);
+  if(PVSEL.size===(DATA.pvHouses||[]).length)PVSEL.clear();
+  pvName.textContent='…';setTimeout(applyPv,20)});
+/* how past terms are drawn: through their election results (inferred), or the polls' own figures (measured) */
+const mBtns=$$('[data-measured]');
+function paintMeasured(){const hist=!inCur(WIN);mBtns.forEach(b=>{b.hidden=!hist||(!!GRP&&!!b.closest('#votes'));b.setAttribute('aria-checked',String(MEASURED));$('span',b).textContent=MEASURED?'Measured support':'Inferred support';
+  b.title=MEASURED?'Switch to inferred support: past terms moved toward their election results':'Switch to measured support: past terms left at the polls’ own figures'})}
+mBtns.forEach(b=>b.addEventListener('click',()=>{MEASURED=!MEASURED;paintMeasured();votesSrc();tppSrc();charts.forEach(c=>{c.clear();c.draw()})}));
+paintMeasured();
 
 /* screen-reader tables, one row a month */
 function table(el,label,cols,rowOf){
@@ -972,37 +1133,57 @@ const toLab=(k,F)=>k==='alp'?1:k===RIV?(RIV==='lnp'?FL.cnr/PV.lnp:0):F[k];
 const rivName=k=>k==='lnp'?'the Coalition':'One Nation';
 const NOTES={{FLOWNOTES}};
 function flowNote(){$('#flow-note').textContent=NOTES[RIV]}
+/* labels spread along one line: each as near its own spot as the others allow, none touching,
+   all inside lo–hi; false when they cannot all fit */
+function spread(a,lo,hi,pad){
+  const need=a.reduce((t,p)=>t+p.w,0)+pad*(a.length-1);if(need>hi-lo)return false;
+  a.forEach(p=>p.x=p.c);
+  for(let it=0;it<60;it++){let moved=false;for(let i=1;i<a.length;i++){const d=(a[i-1].w+a[i].w)/2+pad,g=a[i].x-a[i-1].x;if(g<d-1e-6){const m=(d-g)/2;a[i-1].x-=m;a[i].x+=m;moved=true}}if(!moved)break}
+  for(let i=0;i<a.length;i++)a[i].x=Math.max(a[i].x,i?a[i-1].x+(a[i-1].w+a[i].w)/2+pad:lo+a[i].w/2);
+  for(let i=a.length-1;i>=0;i--)a[i].x=Math.min(a[i].x,i<a.length-1?a[i+1].x-(a[i+1].w+a[i].w)/2-pad:hi-a[i].w/2);
+  return true;
+}
+let flowFull=true;
+/* the flows top to bottom: each party's first preferences along the top, Labor's share of its
+   preferences peeling left and its rival's right, into the two totals at the foot, set large and facing */
 function sankey(){
   const fig=$('#flow-fig'),svg=$('#flow-svg'),W0=fig.clientWidth,H=fig.clientHeight;if(!W0||!H)return;
-  const F=FLOWS[RIV],W=Math.min(W0,860),ox=(W0-W)/2;
+  const F=FLOWS[RIV],W=Math.min(W0,860),ox=(W0-W)/2,narrow=W<520,P=v=>v.toFixed(1);
   const split=Object.keys(F).sort((a,b)=>F[b]-F[a]),src=['alp',...split,RIV];
   const lab=src.reduce((s,k)=>s+PV[k]*toLab(k,F),0);
-  const gL=Math.max(8,Math.min(14,H*.022)),gR=gL*2.4,k=(H-Math.max(gL*(src.length-1),gR)-6)/100;
+  const gS=narrow?8:12,gD=gS*2.4,k=(W-gS*(src.length-1))/100;
   const third=s=>{if(s===RIV)return '';const f=toLab(s,F);return f>0&&f<1?Math.round(f*100)+'% to Labor':''};
-  const LW=Math.ceil(Math.max(...src.map(s=>Math.max(tw(FNAME[s],'500 14px'),tw('00.0%','600 15px'),tw(third(s),'13px')))))+12;
-  const RW=Math.ceil(Math.max(tw(FNAME.alp,'500 14px'),tw(FNAME[RIV],'500 14px'),tw('00.0%','600 26px')))+12;
-  const NW=10,xL=ox+LW,xR=ox+W-RW-NW,x0=xL+NW,x1=xR,xm=(x0+x1)/2,P=v=>v.toFixed(1);
-  let y=(H-(100*k+gL*(src.length-1)))/2;const nodes={};
-  src.forEach(s=>{const h=PV[s]*k;nodes[s]={y0:y,y1:y+h};y+=h+gL});
-  const hL=lab*k,hR=(100-lab)*k,yr=(H-(hL+hR+gR))/2,tL={y0:yr,y1:yr+hL,c:yr},tR={y0:yr+hL+gR,y1:yr+hL+gR+hR,c:yr+hL+gR};
-  const rib=[];
+  const nodes={};let xx=ox;src.forEach(s=>{const w=PV[s]*k;nodes[s]={x0:xx,x1:xx+w};xx+=w+gS});
+  const fN=narrow?13:14,fV=narrow?15:17,fF=narrow?12:13;
+  const mk=full=>src.map(s=>({s,c:(nodes[s].x0+nodes[s].x1)/2,w:Math.max(tw(FNAME[s],`500 ${fN}px`),tw(f1(PV[s])+'%',`600 ${fV}px`),full&&third(s)?tw(third(s),`${fF}px`):0)}));
+  let labs=mk(true);flowFull=spread(labs,ox,ox+W,narrow?5:10);
+  if(!flowFull){labs=mk(false);spread(labs,ox,ox+W,4)}
+  const lines=flowFull&&src.some(s=>third(s))?3:2,yN=fN,yV=yN+fV+3,yF=yV+fF+4,LH=(lines===3?yF:yV)+8;
+  const NW=narrow?8:10,yS=LH+6,y0=yS+NW;
+  /* the foot: the two totals, Labor's under the left bar and the rival's under the right, facing */
+  const fB=Math.round(Math.max(34,Math.min(64,W*.115))),fM=narrow?14:15,DW=narrow?12:14;
+  const yBig=H-Math.round(fB*.12),yNm=yBig-fB*.86-6,yD=yNm-fM-10-DW,y1=yD;
+  const dx0=ox+(gS*(src.length-1)-gD)/2,dl1=dx0+lab*k,dr0=dl1+gD,dr1=dx0+100*k+gD,ym=(y0+y1)/2;
+  const rib=[],tL={c:dx0},tR={c:dr0};
   src.forEach(s=>{
-    const n=nodes[s],f=toLab(s,F);let c=n.y0;
+    const n=nodes[s],f=toLab(s,F);let c=n.x0;
     const a=PV[s]*f*k,b=PV[s]*(1-f)*k;
-    if(a>0){rib.push({s,t:'alp',sy0:c,sy1:c+a,ty0:tL.c,ty1:tL.c+a,v:PV[s]*f,f});tL.c+=a;c+=a}
-    if(b>0){rib.push({s,t:RIV,sy0:c,sy1:c+b,ty0:tR.c,ty1:tR.c+b,v:PV[s]*(1-f),f:1-f});tR.c+=b}
+    if(a>0){rib.push({s,t:'alp',sx0:c,sx1:c+a,tx0:tL.c,tx1:tL.c+a,v:PV[s]*f,f});tL.c+=a;c+=a}
+    if(b>0){rib.push({s,t:RIV,sx0:c,sx1:c+b,tx0:tR.c,tx1:tR.c+b,v:PV[s]*(1-f),f:1-f});tR.c+=b}
   });
   let o='<g class="ribs">';
-  rib.forEach((r,i)=>{if(r.v<.2)return;o+=`<path class="rb" data-i="${i}" d="M${P(x0)} ${P(r.sy0)}C${P(xm)} ${P(r.sy0)} ${P(xm)} ${P(r.ty0)} ${P(x1)} ${P(r.ty0)}L${P(x1)} ${P(r.ty1)}C${P(xm)} ${P(r.ty1)} ${P(xm)} ${P(r.sy1)} ${P(x0)} ${P(r.sy1)}Z" style="fill:var(--${r.s})"/>`});
+  /* a flow under a fifth of a point would be a hairline across the diagram; it stays in the table */
+  rib.forEach((r,i)=>{if(r.v<.2)return;o+=`<path class="rb" data-i="${i}" d="M${P(r.sx0)} ${P(y0)}C${P(r.sx0)} ${P(ym)} ${P(r.tx0)} ${P(ym)} ${P(r.tx0)} ${P(y1)}L${P(r.tx1)} ${P(y1)}C${P(r.tx1)} ${P(ym)} ${P(r.sx1)} ${P(ym)} ${P(r.sx1)} ${P(y0)}Z" style="fill:var(--${r.s})"/>`});
   o+='</g>';
-  src.forEach(s=>{const n=nodes[s];o+=`<rect x="${P(xL)}" y="${P(n.y0)}" width="${NW}" height="${P(n.y1-n.y0)}" rx="2" style="fill:var(--${s})"/>`});
-  [[tL,'alp'],[tR,RIV]].forEach(([t,c])=>{o+=`<rect x="${P(xR)}" y="${P(t.y0)}" width="${NW}" height="${P(t.y1-t.y0)}" rx="2" style="fill:var(--${c})"/>`});
-  const labs=src.map(s=>({s,y0:(nodes[s].y0+nodes[s].y1)/2,h:third(s)?50:34}));
-  relax(labs,52,26,H-26);
-  labs.forEach(l=>{const t=third(l.s),top=l.y-l.h/2;
-    o+=`<text x="${P(xL-8)}" y="${P(top+13)}" text-anchor="end" class="nm">${FNAME[l.s]}</text><text x="${P(xL-8)}" y="${P(top+31)}" text-anchor="end" class="vl">${f1(PV[l.s])}%</text>`;
-    if(t)o+=`<text x="${P(xL-8)}" y="${P(top+47)}" text-anchor="end" class="fs">${t}</text>`});
-  [[tL,'alp',lab],[tR,RIV,100-lab]].forEach(([t,c,v])=>{const cy=(t.y0+t.y1)/2;o+=`<text x="${P(xR+NW+8)}" y="${P(cy-8)}" class="nm">${FNAME[c]}</text><text x="${P(xR+NW+8)}" y="${P(cy+18)}" class="big">${f1(v)}%</text>`});
+  src.forEach(s=>{const n=nodes[s];o+=`<rect x="${P(n.x0)}" y="${P(yS)}" width="${P(n.x1-n.x0)}" height="${NW}" rx="2" style="fill:var(--${s})"/>`});
+  labs.forEach(l=>{const t=lines===3?third(l.s):'',n=nodes[l.s];
+    if(Math.abs(l.x-l.c)>2)o+=`<path d="M${P(l.x)} ${P(LH-4)}L${P(l.c)} ${P(yS-2)}" fill="none" stroke="var(--rule2)"/>`;
+    o+=`<text x="${P(l.x)}" y="${yN}" text-anchor="middle" class="nm" style="font-size:${fN}px">${FNAME[l.s]}</text><text x="${P(l.x)}" y="${yV}" text-anchor="middle" class="vl" style="font-size:${fV}px">${f1(PV[l.s])}%</text>`;
+    if(t)o+=`<text x="${P(l.x)}" y="${yF}" text-anchor="middle" class="fs" style="font-size:${fF}px">${t}</text>`});
+  o+=`<rect x="${P(dx0)}" y="${P(yD)}" width="${P(dl1-dx0)}" height="${DW}" rx="3" style="fill:var(--alp)"/><rect x="${P(dr0)}" y="${P(yD)}" width="${P(dr1-dr0)}" height="${DW}" rx="3" style="fill:var(--${RIV})"/>`;
+  o+=`<text x="${P(dx0)}" y="${P(yNm)}" class="nm" style="font-size:${fM}px">${FNAME.alp}</text><text x="${P(dr1)}" y="${P(yNm)}" text-anchor="end" class="nm" style="font-size:${fM}px">${FNAME[RIV]}</text>`;
+  o+=`<text x="${P(dx0-fB*.04)}" y="${P(yBig)}" class="big2" style="font-size:${fB}px;fill:var(--alp)">${f1(lab)}<tspan class="pc">%</tspan></text><text x="${P(dr1)}" y="${P(yBig)}" text-anchor="end" class="big2" style="font-size:${fB}px;fill:var(--${RIV})">${f1(100-lab)}<tspan class="pc">%</tspan></text>`;
+  o+=`<text x="${P((dl1+dr0)/2)}" y="${P(yBig-fB*.08)}" text-anchor="middle" class="vv" style="font-size:${Math.round(fB*.5)}px">v</text>`;
   svg.innerHTML=o;
   svg.setAttribute('aria-label',`Sankey diagram: after preferences, Labor ${f1(lab)}%, ${FNAME[RIV]} ${f1(100-lab)}%.`);
   const paths=$$('.rb',svg);
@@ -1015,8 +1196,11 @@ function sankey(){
     p.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'){show(+p.dataset.i);flowHold=setTimeout(hide,2600)}});
   });
   $('#flow-table').innerHTML=`<caption>Preference flows, Labor v ${FNAME[RIV]}, points of the vote</caption><tr><th>Party</th><th>First preferences</th><th>To Labor</th><th>To ${FNAME[RIV]}</th></tr>`+src.map(s=>`<tr><td>${FNAME[s]}</td><td>${f1(PV[s])}</td><td>${f1(PV[s]*toLab(s,F))}</td><td>${f1(PV[s]*(1-toLab(s,F)))}</td></tr>`).join('')+`<tr><td>Total after preferences</td><td>100</td><td>${f1(lab)}</td><td>${f1(100-lab)}</td></tr>`;
+  flowSrc();
 }
-const flowSrc=()=>{$('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+(RIV==='lnp'?'; flows as counted at the 2025 election.':'; flows are the site’s estimate, as no election has counted Labor against One Nation.')+' Tap or hover over a flow to see its size.'};
+/* where a phone has no room for each party's share to Labor on the drawing, the note under it names them */
+const flowSrc=()=>{const F=FLOWS[RIV],sh=Object.keys(F).sort((a,b)=>F[b]-F[a]).map(s=>FNAME[s]+' '+Math.round(F[s]*100)+'%').join(', ');
+  $('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+(RIV==='lnp'?'; flows as counted at the 2025 election':'; flows are the site’s estimate, as no election has counted Labor against One Nation')+(flowFull?'.':' (to Labor: '+sh+').')+' Tap or hover over a flow to see its size.'};
 new ResizeObserver(sankey).observe($('#flow-fig'));
 /* the contest: one choice for both lead pages */
 const duels=$$('[data-duel]');

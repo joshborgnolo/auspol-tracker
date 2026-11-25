@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6f1">
+<meta name="robots" content="noindex">
+<title>polls · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/* VOICE the morning paper's poll ledger: every poll this term, plainly, newest first
+   IDEA the results column of a broadsheet, one line a poll, the figures as printed
+   PICTURE each poll's five figures in party colour; opened, its figures against the model's that week
+   COLOUR warm white ground, indigo ink, the parties' own colours for figures only
+   TYPE Georgia for the head and the months, Commissioner for names and figures
+   LAYOUT phone: two lines a poll; laptop: one row a poll in aligned columns */
+@font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("{{FONT}}") format("woff2")}
+:root{color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--hi:#fff1d6;--navh:52px;--g:max(18px,env(safe-area-inset-left));--col:max(var(--g),calc((100vw - 1180px)/2));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--hi:#2c2a4a}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--hi:#2c2a4a}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--navh) + 44px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* nav, as the votes pages' */
+.nav{position:sticky;top:0;z-index:20;height:calc(var(--navh) + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(6px,env(safe-area-inset-right),calc((100vw - 1180px)/2 - 12px)) 0 var(--col);display:flex;align-items:center;gap:4px;background:var(--bg);border-bottom:1px solid var(--rule)}
+.links{display:flex;gap:20px;margin:0 6px 0 auto}
+.links a,.mark{color:inherit;text-decoration:none}
+.links a{font-size:15px;opacity:.7;padding:12px 0;position:relative}
+.links a[aria-current]{opacity:1}
+.links a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:9px;height:1.5px;border-radius:1px;background:currentColor}
+.mark{font-weight:600;font-size:16px;letter-spacing:-.01em;padding:12px 0;white-space:nowrap}
+.burger{width:44px;height:44px;flex:none;border:0;background:none;color:inherit;display:grid;place-items:center;cursor:pointer;padding:0;border-radius:10px}
+.burger b{display:grid;gap:5px}
+.burger i{display:block;width:20px;height:1.6px;border-radius:2px;background:currentColor;transition:transform .3s,opacity .2s}
+.burger[aria-expanded=true] i:nth-child(1){transform:translateY(6.6px) rotate(45deg)}
+.burger[aria-expanded=true] i:nth-child(2){opacity:0}
+.burger[aria-expanded=true] i:nth-child(3){transform:translateY(-6.6px) rotate(-45deg)}
+.menu{position:fixed;inset:0;z-index:15;background:#0b1433;color:#f3f0ff;padding:calc(var(--navh) + env(safe-area-inset-top) + 20px) var(--g) calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:24px;overflow:auto}
+.menu[hidden]{display:none}
+.menu ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.menu a,.menu .soon{font:400 clamp(30px,8.6vw,44px)/1.18 var(--serif);letter-spacing:-.015em;color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px}
+.menu .soon{color:#8f95bd}
+.menu .soon small{font:500 12.5px/1 var(--sans);letter-spacing:0;color:#9aa0c6;border:1px solid #39416d;border-radius:99px;padding:5px 9px}
+.nav.open{color:#f3f0ff;background:transparent;border-color:transparent}
+/* the page */
+main{padding:0 max(18px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) var(--g)}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{padding:clamp(22px,4vh,44px) 0 6px}
+h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.dek{margin:8px 0 0;font-size:clamp(15px,3.9vw,17px);line-height:1.45;color:var(--ink2);max-width:62ch;text-wrap:pretty}
+.ctl{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin:16px 0 4px}
+.pick select{font:500 14px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:36px;padding:0 32px 0 14px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 16px) 16px,calc(100% - 11px) 16px;background-size:5px 5px;background-repeat:no-repeat;max-width:100%}
+.seg{display:inline-flex;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.seg button{font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 14px;height:32px;cursor:pointer}
+.seg button[aria-checked=true]{background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--rule),0 1px 2px rgb(20 10 40/.08)}
+.count{font-size:13.5px;color:var(--mute)}
+/* the ledger */
+.month{position:sticky;top:calc(var(--navh) + env(safe-area-inset-top));z-index:5;background:var(--bg);display:flex;align-items:baseline;gap:10px;padding:14px 0 6px;border-bottom:1px solid var(--rule2);margin-top:10px}
+.month h2{font:400 21px/1.2 var(--serif);margin:0}
+.month span{font-size:13px;color:var(--mute)}
+.heads{display:none}
+ol{list-style:none;margin:0;padding:0}
+.row{border-bottom:1px solid var(--rule)}
+.row>button{all:unset;box-sizing:border-box;display:grid;width:100%;cursor:pointer;padding:10px 4px;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who n" "fig fig";row-gap:5px;column-gap:10px;border-radius:8px;transition:background-color .6s}
+.row>button:focus-visible{outline:2px solid var(--ink2);outline-offset:-2px}
+.row>button:hover{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.who{grid-area:who;display:flex;align-items:baseline;gap:8px;min-width:0}
+.who b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .fw{color:var(--mute);font-size:14px;white-space:nowrap}
+.n{grid-area:n;font-size:13px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums;align-self:baseline}
+.fig{grid-area:fig;display:flex;flex-wrap:wrap;gap:4px 14px;font-variant-numeric:tabular-nums}
+.f{white-space:nowrap;font-size:14.5px}
+.f i{font-style:normal;color:var(--mute);font-size:12.5px;margin-right:4px}
+.f b{font-weight:600;color:var(--c)}
+.f.tp b{color:var(--ink)}
+.tag{font-size:12px;color:var(--mute);border:1px solid var(--rule2);border-radius:99px;padding:1px 7px;white-space:nowrap}
+body[data-view=tpp] .f.pr,body[data-view=pr] .f.tp{display:none}
+.row.flash>button{background:var(--hi)}
+/* a poll opened */
+.det{padding:4px 4px 16px;display:grid;gap:12px;font-size:14px;color:var(--ink2)}
+.det[hidden]{display:none}
+.det p{margin:0;line-height:1.45}
+.det a{color:var(--ink);text-underline-offset:2px}
+.vs{display:grid;grid-template-columns:5.6em minmax(0,1fr) 7.2em;align-items:center;column-gap:10px;row-gap:6px;max-width:560px}
+.vs .nm{font-weight:500;color:var(--ink2);white-space:nowrap}
+.vs .tr{position:relative;height:14px}
+.vs .tr::before{content:"";position:absolute;left:0;right:0;top:6.5px;height:1px;background:var(--rule)}
+.vs .tr s{position:absolute;top:1px;width:2px;height:12px;margin-left:-1px;background:var(--ink);opacity:.55}
+.vs .tr i{position:absolute;top:2px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--c)}
+.vs .vl{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:13.5px}
+.vs .vl b{font-weight:600;color:var(--ink)}
+.vs .vl span{color:var(--mute)}
+.key{font-size:12.5px;color:var(--mute);display:flex;gap:14px;flex-wrap:wrap}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:9px;height:9px;border-radius:50%;background:var(--ink2);display:inline-block}
+.key s{width:2px;height:11px;background:var(--ink);opacity:.55;display:inline-block}
+.note{font-size:13.5px;color:var(--mute);margin:28px 0 0;line-height:1.5;max-width:70ch}
+@media (min-width:900px){
+.heads{display:grid;position:sticky;top:calc(var(--navh) + env(safe-area-inset-top) + 47px);z-index:4;background:var(--bg);padding:6px 4px;font-size:12.5px;color:var(--mute);border-bottom:1px solid var(--rule)}
+.heads,.row>button{grid-template-columns:minmax(150px,1.5fr) minmax(130px,1.1fr) 7.4rem repeat(5,3.1rem) 2.6rem 4.2rem 4.2rem 3.6rem;grid-template-areas:none;column-gap:12px;align-items:baseline}
+.heads span{text-align:right}.heads span:first-child,.heads span:nth-child(2){text-align:left}
+.who,.n,.fig{grid-area:auto}
+.who{display:contents}
+.who b{grid-column:1}.who .fw{grid-column:2;font-size:14px}
+.n{grid-column:3;text-align:right}
+.fig{display:contents}
+.f{text-align:right;font-size:15px}
+.f i{display:none}
+body[data-view] .f.pr,body[data-view] .f.tp{display:block}
+.f.gap{display:block}
+.ctl .seg{display:none}
+}
+@media (max-width:899px){.f.gap{display:none}}
+@media (prefers-reduced-motion:reduce){.row>button{transition:none}}
+</style>
+</head>
+<body data-view="pr">
+<header class="nav" id="nav">
+  <a class="mark" href="../">auspol tracker</a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="./" aria-current="page">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="./">polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><span class="soon">leaders <small>soon</small></span></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><span class="soon">pollsters <small>soon</small></span></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+<main>
+  <div class="wrap">
+    <header class="hd">
+      <h1>{{pollsHead}}</h1>
+      <p class="dek">{{pollsDek}}</p>
+    </header>
+    <div class="ctl">
+      <label class="pick"><span class="sr">Pollster</span><select id="house"></select></label>
+      <div class="seg" role="radiogroup" aria-label="Figures"><button type="button" role="radio" aria-checked="true" data-v="pr">Primary</button><button type="button" role="radio" aria-checked="false" data-v="tpp">2PP</button></div>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="heads" aria-hidden="true"><span>Pollster</span><span>Fieldwork</span><span>Sample</span><span id="hd-p"></span><span></span><span>v L/NP</span><span>v ON</span><span>Printed</span></div>
+    <div id="list"></div>
+    <p class="note">Figures are as each pollster printed them; the 2PP figures are its primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own), and “Printed” is the pollster’s own two-party figure where it gave one. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option. Opened, a poll sets its figures beside the model’s for the week of its fieldwork’s middle.</p>
+  </div>
+</main>
+<script id="polls-data" type="application/json">{{POLLS}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const P=JSON.parse($('#polls-data').textContent);
+const ORDER={{ORDER}};                     // parties by today's standing: alp, onp, lnp, grn, oth
+const PK=['alp','lnp','grn','onp','oth'];  // the data's order
+const ABBR={alp:'ALP',lnp:'L/NP',grn:'GRN',onp:'ON',oth:'OTH'},NAME={alp:'Labor',lnp:'Coalition',grn:'Greens',onp:'One Nation',oth:'Others'},CV={alp:'alp',lnp:'lnp',grn:'grn',onp:'on',oth:'oth'};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],MONF=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fdate=iso=>{const [y,m,d]=iso.slice(0,10).split('-').map(Number);return d+' '+MON[m-1]+' '+y};
+const f1=v=>(Math.round(v*10)/10).toFixed(1);
+const num=v=>v==null?'–':Number.isInteger(v)?String(v):f1(v);
+const nTxt=p=>p.n?Number(p.n).toLocaleString('en-AU')+(p.b?' '+p.b:''):'';
+$('#hd-p').outerHTML=ORDER.map(k=>`<span>${ABBR[k]}</span>`).join('');
+/* the pollster filter: every house, with its count */
+const houses=[...new Set(P.map(p=>p.h))].sort((a,b)=>P.filter(p=>p.h===b).length-P.filter(p=>p.h===a).length||a.localeCompare(b));
+const sel=$('#house');
+sel.innerHTML=`<option value="">Every pollster (${P.length})</option>`+houses.map(h=>`<option value="${esc(h)}">${esc(h)} (${P.filter(p=>p.h===h).length})</option>`).join('');
+function render(){
+  const h=sel.value,rows=P.filter(p=>!h||p.h===h),byM=new Map();
+  rows.forEach(p=>{const ym=p.d.slice(0,7);(byM.get(ym)||byM.set(ym,[]).get(ym)).push(p)});
+  let s='';
+  for(const [ym,list] of byM){
+    const [y,m]=ym.split('-').map(Number);
+    s+=`<section aria-label="${MONF[m-1]} ${y}"><div class="month"><h2>${MONF[m-1]} ${y}</h2><span>${list.length} poll${list.length===1?'':'s'}</span></div><ol>`;
+    for(const p of list){
+      const figs=ORDER.map(k=>{const v=p.p?p.p[PK.indexOf(k)]:null;return `<span class="f pr" style="--c:var(--${CV[k]})"><i>${ABBR[k]}</i><b>${num(v)}</b></span>`}).join('');
+      const tpp=`<span class="f gap"></span><span class="f tp"><i>v L/NP</i><b>${p.i!=null?f1(p.i):'–'}</b></span><span class="f tp"><i>v ON</i><b>${p.io!=null?f1(p.io):'–'}</b></span><span class="f tp"><i>printed</i><b>${p.t!=null?num(p.t):'–'}</b></span>`;
+      const yr=+p.d.slice(0,4),cur=new Date().getFullYear();
+      s+=`<li class="row" id="p-${esc(p.k)}"><button type="button" aria-expanded="false" aria-controls="d-${esc(p.k)}"><span class="who"><b>${esc(p.h)}</b><span class="fw">${p.tbc?'fieldwork TBC':esc(p.f)+(yr!==cur?' '+yr:'')}${p.na?' <span class="tag">not counted</span>':''}</span></span><span class="n">${esc(nTxt(p))}</span><span class="fig">${figs}${tpp}</span></button><div class="det" id="d-${esc(p.k)}" hidden></div></li>`;
+    }
+    s+='</ol></section>';
+  }
+  $('#list').innerHTML=s||'<p class="dek">No polls from this pollster this term.</p>';
+  $('#count').textContent=h?rows.length+' of '+P.length+' polls':'';
+}
+/* a poll opened: its particulars, then each figure on one scale with the model's for the same week */
+function detail(p){
+  const bits=[];
+  bits.push(`<p>Fieldwork ${p.tbc?'to be confirmed':esc(p.f)+' '+p.d.slice(0,4)}${p.c?(/^self/i.test(p.c)?' · self-published':' · for '+esc(p.c)):''}${p.pub?' · released '+esc(fdate(p.pub)):''}${p.n?' · '+Number(p.n).toLocaleString('en-AU')+' respondents'+(p.b?' ('+esc(p.b)+')':''):''}${p.u!=null?' · '+p.u+'% undecided':''}.</p>`);
+  if(p.na)bits.push(`<p><b>Not counted.</b> ${esc(p.na)}</p>`);
+  if(p.p&&p.mw){
+    const mx=Math.max(45,...p.p.filter(v=>v!=null),...p.mw)+2,pc=v=>(v/mx*100).toFixed(2)+'%';
+    bits.push('<div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[j],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div>');
+    bits.push('<div class="key"><span><i></i>this poll</span><span><s></s>the model that week</span></div>');
+  }
+  const tp=[];if(p.i!=null)tp.push('Labor '+f1(p.i)+' against the Coalition');if(p.io!=null)tp.push(f1(p.io)+' against One Nation');
+  if(tp.length)bits.push(`<p>After preferences by the 2025 flows: ${tp.join(', ')}${p.t!=null?'; the pollster printed '+num(p.t)+(p.b2?' ('+esc(p.b2)+')':''):''}${p.to!=null?', and '+num(p.to)+' against One Nation':''}.</p>`);
+  const net=v=>(v>0?'+':v<0?'−':'')+Math.abs(v);
+  if(p.ap){const ls=['Albanese','Taylor','Hanson'].map((nm,i)=>p.ap[i]!=null?nm+' '+net(p.ap[i]):null).filter(Boolean);if(ls.length)bits.push(`<p>Net approval: ${ls.join(', ')}.</p>`)}
+  if(p.url)bits.push(`<p><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.ut||'The published release')} ↗</a></p>`);
+  return bits.join('');
+}
+function toggle(li,open){
+  const b=$('button',li),d=$('.det',li),p=P.find(q=>'p-'+q.k===li.id);if(!p)return;
+  const on=open==null?b.getAttribute('aria-expanded')!=='true':open;
+  if(on&&!d.innerHTML)d.innerHTML=detail(p);
+  d.hidden=!on;b.setAttribute('aria-expanded',String(on));
+}
+$('#list').addEventListener('click',e=>{const b=e.target.closest('.row>button');if(!b)return;toggle(b.parentElement)});
+sel.addEventListener('change',render);
+$$('.seg button').forEach(b=>b.addEventListener('click',()=>{document.body.dataset.view=b.dataset.v;$$('.seg button').forEach(x=>x.setAttribute('aria-checked',String(x===b)))}));
+/* arriving from a chart's dot: open that poll, bring it into view, and mark it a moment */
+function arrive(){
+  const id=decodeURIComponent(location.hash.slice(1));if(!id.startsWith('p-'))return;
+  let li=document.getElementById(id);
+  if(!li&&sel.value){sel.value='';render();li=document.getElementById(id)}
+  if(!li)return;
+  toggle(li,true);
+  li.scrollIntoView({block:'center',behavior:'instant'});
+  li.classList.add('flash');setTimeout(()=>li.classList.remove('flash'),1600);
+}
+render();arrive();addEventListener('hashchange',arrive);
+/* the menu */
+const burger=$('#burger'),menu=$('#menu'),nav=$('#nav');
+const setMenu=o=>{menu.hidden=!o;burger.setAttribute('aria-expanded',String(o));nav.classList.toggle('open',o);document.documentElement.style.overflow=o?'hidden':''};
+burger.addEventListener('click',()=>setMenu(menu.hidden));
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){setMenu(false);burger.focus()}});
+}
+</script>
+</body>
+</html>

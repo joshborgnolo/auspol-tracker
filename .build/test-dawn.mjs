@@ -124,6 +124,19 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
+  ok(/window\.AP\.pmEngine\s*=/.test(html), "the browser copy of the model, for the pollster menu");
+  ok(!!r.groups && fs.existsSync(path.join(tmp, "dawn", r.groups)) && html.includes(`href="${r.groups}"`), "the vote-by-group sidecar beside the page, named by it");
+  ok(!/href="#lead"/.test(html) && /href="polls\/"/.test(html), "one votes link, and the polls page");
+  /* the polls page: every poll a dot can open has its row */
+  ok(!!r.polls && fs.existsSync(r.polls), "the polls page is built");
+  const ph = fs.readFileSync(r.polls, "utf8");
+  ok(!/\{\{[A-Za-z]+\}\}/.test(ph), "every polls-page placeholder filled");
+  const PL = JSON.parse(ph.match(/<script id="polls-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  const keys = new Set(PL.map((q) => q.k));
+  eq(keys.size, PL.length, "each poll's address is its own");
+  ok(D0.polls.every((q) => keys.has(q.k)), "every chart poll's dot has a row to open");
+  ok(PL.every((q, i) => !i || PL[i - 1].d >= q.d), "newest first");
+  ok(/href="\.\.\/#votes"/.test(ph), "the polls page leads back to the votes pages");
   fs.rmSync(tmp, { recursive: true, force: true });
 }
 /* linked from nowhere */
