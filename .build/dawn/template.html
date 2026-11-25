@@ -53,10 +53,6 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .menu a,.menu .soon{font:400 clamp(30px,8.6vw,44px)/1.18 var(--serif);letter-spacing:-.015em;color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px}
 .menu .soon{color:#8f95bd}
 .menu .soon small{font:500 12.5px/1 var(--sans);letter-spacing:0;color:#9aa0c6;border:1px solid #39416d;border-radius:99px;padding:5px 9px}
-.skyset{margin-top:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#b4b9da}
-.skyset span{margin-right:8px}
-.skyset button{font:500 14px/1 var(--sans);color:#d9dcf2;background:none;border:1px solid #39416d;border-radius:99px;padding:0 14px;height:38px;cursor:pointer}
-.skyset button[aria-checked=true]{background:#f3f0ff;color:#0b1433;border-color:#f3f0ff}
 
 /* hero */
 @supports (height:100dvh){:root{--tbd:calc(100lvh - 100dvh)}}
@@ -261,12 +257,6 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <li><span class="soon">flows <small>soon</small></span></li>
     <li><span class="soon">method <small>soon</small></span></li>
   </ul>
-  <div class="skyset" role="radiogroup" aria-label="Sky">
-    <span>sky</span>
-    <button type="button" role="radio" data-sky="auto" id="sky-auto">auto</button>
-    <button type="button" role="radio" data-sky="rise" id="sky-rise">sunrise</button>
-    <button type="button" role="radio" data-sky="set" id="sky-set">sunset</button>
-  </div>
 </div>
 
 <main>
@@ -1293,10 +1283,6 @@ document.addEventListener('click',e=>{
   const t=document.getElementById(a.getAttribute('href').slice(1));if(!t)return;
   e.preventDefault();closeMenu();t.scrollIntoView({behavior:reduce?'auto':'smooth'});
 });
-const skyBtns=$$('.skyset button');
-const markSky=()=>skyBtns.forEach(b=>b.setAttribute('aria-checked',String(b.dataset.sky===skyPref)));
-skyBtns.forEach(b=>b.addEventListener('click',()=>{skyPref=b.dataset.sky;store.set('apt-sky',skyPref);markSky();closeMenu();hero.scrollIntoView({behavior:'auto'});play()}));
-markSky();
 }
 </script>
 </body>
