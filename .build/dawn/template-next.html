@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6f1">
+<meta name="robots" content="noindex">
+<title>next polls · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/* VOICE the morning paper's "coming up" box: who is due, when, and how far to trust the date
+   IDEA a pollster's calendar read off its own habits, the way a regular reader knows Newspoll lands Sunday night
+   PICTURE the weeks ahead day by day; each pollster's releases either side of today, dots out, rings to come
+   COLOUR warm white ground, indigo ink; red only for a date that has passed with no poll
+   TYPE Georgia for the head and the sections, Commissioner for names, dates and hours
+   LAYOUT phone: one column, the strips full width; laptop: name, rhythm, strip and next date in one row */
+@font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("{{FONT}}") format("woff2")}
+:root{color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--pos:#1f7a78;--neg:#7a5340;--hi:#fff1d6;--navh:52px;--g:max(18px,env(safe-area-inset-left));--col:max(var(--g),calc((100vw - 1180px)/2));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--pos:#3aa7a4;--neg:#b7836a;--hi:#2c2a4a}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--pos:#3aa7a4;--neg:#b7836a;--hi:#2c2a4a}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--navh) + 70px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* nav, as the votes pages' */
+.nav{position:sticky;top:0;z-index:20;height:calc(var(--navh) + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(6px,env(safe-area-inset-right),calc((100vw - 1180px)/2 - 12px)) 0 var(--col);display:flex;align-items:center;gap:4px;background:var(--bg);box-shadow:0 1px 0 var(--rule)}
+.links{display:flex;gap:20px;margin:0 6px 0 auto}
+.links a,.mark{color:inherit;text-decoration:none}
+.links a{font-size:15px;opacity:.7;padding:12px 0;position:relative}
+.links a[aria-current]{opacity:1}
+.links a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:9px;height:1.5px;border-radius:1px;background:currentColor}
+.mark{font-weight:600;font-size:16px;letter-spacing:-.01em;padding:12px 0;white-space:nowrap}
+.burger{width:44px;height:44px;flex:none;border:0;background:none;color:inherit;display:grid;place-items:center;cursor:pointer;padding:0;border-radius:10px}
+.burger b{display:grid;gap:5px}
+.burger i{display:block;width:20px;height:1.6px;border-radius:2px;background:currentColor;transition:transform .3s,opacity .2s}
+.burger[aria-expanded=true] i:nth-child(1){transform:translateY(6.6px) rotate(45deg)}
+.burger[aria-expanded=true] i:nth-child(2){opacity:0}
+.burger[aria-expanded=true] i:nth-child(3){transform:translateY(-6.6px) rotate(-45deg)}
+.menu{position:fixed;inset:0;z-index:15;background:#0b1433;color:#f3f0ff;padding:calc(var(--navh) + env(safe-area-inset-top) + 20px) var(--g) calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:24px;overflow:auto}
+.menu[hidden]{display:none}
+.menu ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.menu a,.menu .soon{font:400 clamp(30px,8.6vw,44px)/1.18 var(--serif);letter-spacing:-.015em;color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px}
+.menu .soon{color:#8f95bd}
+.menu .soon small{font:500 12.5px/1 var(--sans);letter-spacing:0;color:#9aa0c6;border:1px solid #39416d;border-radius:99px;padding:5px 9px}
+.nav.open{color:#f3f0ff;background:transparent;box-shadow:none}
+/* the page */
+main{padding:0 max(18px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) var(--g)}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{padding:clamp(22px,4vh,44px) 0 6px}
+h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.dek{margin:8px 0 0;font-size:clamp(15px,3.9vw,17px);line-height:1.45;color:var(--ink2);max-width:62ch;text-wrap:pretty}
+/* the polls pages' own switch: every poll on record, or the ones still to come */
+.sub{display:flex;gap:20px;margin:0 0 12px}
+.sub a{font-size:15px;color:inherit;text-decoration:none;opacity:.7;padding:4px 0;position:relative}
+.sub a[aria-current]{opacity:1}
+.sub a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;border-radius:1px;background:currentColor}
+.blk{margin-top:clamp(28px,5vh,52px)}
+.blk>h2{font:400 clamp(22px,5.6vw,29px)/1.15 var(--serif);letter-spacing:-.005em;margin:0}
+.blk>.bd{margin:6px 0 0;font-size:14.5px;line-height:1.45;color:var(--ink2);max-width:66ch;text-wrap:pretty}
+/* the weeks ahead */
+.wk{margin-top:18px}
+.wk>h3{font:600 14.5px/1.2 var(--sans);margin:0;padding:0 0 8px;border-bottom:1px solid var(--rule2);display:flex;gap:10px;align-items:baseline}
+.wk>h3 span{font-weight:400;font-size:13px;color:var(--mute)}
+.wk.late>h3{color:var(--alp)}
+.day{display:grid;grid-template-columns:8.4rem minmax(0,1fr);column-gap:16px;padding:11px 0;border-bottom:1px solid var(--rule)}
+.dl b{display:block;font-weight:600;font-size:15px}
+.dl span{font-size:13px;color:var(--mute)}
+.its{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.its.flat{padding:11px 0;border-bottom:1px solid var(--rule)}
+.it{display:grid;grid-template-columns:16px minmax(0,1fr) auto;column-gap:10px;align-items:baseline}
+.it .g{width:10px;height:10px;border-radius:50%;border:1.6px solid var(--ink);align-self:center;box-sizing:border-box}
+.it .g.tr{border-style:dotted}
+.it .g.late{border-color:var(--alp);background:var(--alp)}
+.it .g.win{width:14px;height:9px;border:0;border-radius:5px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+.it .nm{min-width:0}
+.it .nm b{font-weight:600}
+.it .nm small{font-size:13px;color:var(--mute);margin-left:7px}
+.it .wh{font-size:14px;color:var(--ink2);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.it .sb{grid-column:2/4;font-size:13px;color:var(--mute);margin-top:1px}
+.empty{color:var(--mute);font-size:15px;padding:16px 0}
+#agenda{max-width:780px}
+@media (max-width:560px){.day{grid-template-columns:1fr;row-gap:7px}.dl{display:flex;gap:8px;align-items:baseline}.dl b{display:inline}}
+/* each pollster's rhythm */
+.grp{font:600 14.5px/1.2 var(--sans);margin:26px 0 0;padding:0 0 8px;border-bottom:1px solid var(--rule2)}
+.rws{list-style:none;margin:0;padding:0}
+.axis{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"st";padding:14px 4px 2px;color:var(--mute)}
+.rw{border-bottom:1px solid var(--rule)}
+.rw>button{all:unset;box-sizing:border-box;width:100%;cursor:pointer;padding:12px 4px;border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"nm nx" "rh rh" "st st";column-gap:12px;row-gap:5px}
+.rw>button:hover{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.rw>button:focus-visible{outline:2px solid var(--ink2);outline-offset:-2px}
+.rw .nm{grid-area:nm;min-width:0}
+.rw .nm b{font-weight:600}
+.rw .nm small{display:block;font-size:13px;color:var(--mute)}
+.rw .rh{grid-area:rh;font-size:13.5px;color:var(--ink2)}
+.rw .nx{grid-area:nx;text-align:right}
+.rw .nx b{font-weight:600;white-space:nowrap}
+.rw .nx small{display:block;font-size:13px;color:var(--mute);white-space:nowrap}
+.rw .nx.miss b,.rw .nx.miss small{color:var(--alp)}
+.rw.subr>button{padding-left:22px}
+.rw.subr .nm b{font-weight:500}
+.st{grid-area:st;display:block;min-width:0;height:26px}
+.st svg{display:block;width:100%;height:26px;overflow:visible}
+.axis .st,.axis .st svg{height:16px}
+.st text{font:400 11.5px var(--sans);fill:var(--mute)}
+.key{font-size:12.5px;color:var(--mute);display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{display:inline-block;width:9px;height:9px;border-radius:50%;box-sizing:border-box}
+.key .k-out{background:var(--ink2)}
+.key .k-due{border:1.5px solid var(--ink)}
+.key .k-late{background:var(--alp)}
+.key .k-win{width:16px;height:9px;border-radius:5px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+/* a pollster opened: its working */
+.det{padding:2px 4px 18px;display:grid;gap:10px;font-size:14px;color:var(--ink2);max-width:72ch}
+.det[hidden]{display:none}
+.det p{margin:0;line-height:1.45}
+.det h3{font:600 13px/1.2 var(--sans);color:var(--ink);margin:6px 0 0}
+.det a{color:var(--ink);text-underline-offset:2px}
+.rl{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-variant-numeric:tabular-nums}
+.rl span{color:var(--mute)}
+/* the record */
+.tb{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;margin-top:12px}
+.tb th,.tb td{padding:6px 18px 6px 0;text-align:right;white-space:nowrap;border-bottom:1px solid var(--rule)}
+.tb th:first-child,.tb td:first-child{text-align:left}
+.tb thead th{font-weight:500;color:var(--mute);font-size:12.5px;border-bottom-color:var(--rule2)}
+.tb td small{color:var(--mute)}
+.scroll{overflow-x:auto}
+.note{font-size:13.5px;color:var(--mute);margin:32px 0 0;line-height:1.5;max-width:72ch}
+@media (min-width:900px){
+.rw>button,.axis{grid-template-columns:minmax(140px,1.05fr) minmax(170px,1.25fr) minmax(0,3fr) 11.5rem;grid-template-areas:"nm rh st nx";align-items:center;column-gap:16px}
+.axis{grid-template-areas:". . st ."}
+.rw.subr>button{padding-left:4px}
+.rw.subr .nm{padding-left:16px}
+}
+/* the mark's sun: the hero in miniature, on its sky, beside the name once the hero has scrolled away */
+:root{--lz:#0b1640;--lm:#23498f;--ll:#c98a8f;--lh:#f2b07f}
+:root[data-sky=set]{--lz:#141a4c;--lm:#3b3a8c;--ll:#b4588f;--lh:#ff8a5a}
+.mark{display:inline-flex;align-items:center}
+.logo{display:block;width:0;height:26px;flex:none;opacity:0;transform:scale(.55);margin-right:0;border-radius:50%;transition:width .4s cubic-bezier(.3,.9,.3,1),margin-right .4s cubic-bezier(.3,.9,.3,1),opacity .3s,transform .4s cubic-bezier(.3,.9,.3,1)}
+.nav .logo{width:26px;opacity:1;transform:none;margin-right:9px}
+@media (prefers-reduced-motion:reduce){.logo{transition:none}}
+</style>
+</head>
+<body>
+<header class="nav" id="nav">
+  <a class="mark" href="../"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><radialGradient id="lgL" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6c22"/><stop offset=".7" stop-color="#ff7a28"/><stop offset=".8" stop-color="#ffa040"/><stop offset=".9" stop-color="#ffb24e" stop-opacity=".55"/><stop offset="1" stop-color="#ffb24e" stop-opacity="0"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="16" r="14" fill="url(#lgH)"/><circle cx="16" cy="16" r="9.8" fill="url(#lgL)"/><circle cx="16" cy="16" r="7" fill="url(#lgC)" stroke="#ff9a3a" stroke-width="1.5"/></g></svg>auspol tracker</a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/" aria-current="page">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><a href="./">next polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><span class="soon">leaders <small>soon</small></span></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><span class="soon">pollsters <small>soon</small></span></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+<main>
+  <div class="wrap">
+    <header class="hd">
+      <nav class="sub" aria-label="Polls"><a href="../polls/">All polls</a><a href="./" aria-current="page">Next expected</a></nav>
+      <h1 id="head">Next expected polls</h1>
+      <p class="dek" id="dek">Each pollster’s next date, worked out from its own record when the page loads.</p>
+    </header>
+    <section class="blk" aria-labelledby="ag-h">
+      <h2 id="ag-h">The next four weeks</h2>
+      <div id="agenda"><noscript><p class="empty">The dates are worked out in the browser, so this page needs JavaScript.</p></noscript></div>
+    </section>
+    <section class="blk" aria-labelledby="rh-h">
+      <h2 id="rh-h">Each pollster’s rhythm</h2>
+      <p class="bd">Seven weeks either side of today. Open a pollster for how its date is worked out.</p>
+      <div class="key" aria-hidden="true"><span><i class="k-out"></i>out</span><span><i class="k-due"></i>expected</span><span><i class="k-win"></i>a window</span><span><i class="k-late"></i>passed, no poll yet</span></div>
+      <div id="rows"></div>
+    </section>
+    <section class="blk" id="rec" aria-labelledby="rec-h">
+      <h2 id="rec-h">How these dates have done</h2>
+      <p class="bd" id="rec-d"></p>
+      <div class="scroll"><table class="tb" id="rec-t"></table></div>
+      <p class="bd" id="rec-n"></p>
+    </section>
+    <p class="note">Each date comes from the pollster’s own record: the median gap between its last releases, the weekday it keeps, and the hours its releases have come out, all Sydney time. A date that passes with no poll on record shows as late for two days, then counts as skipped and the next date takes over; a skip the pollster confirms moves it on at once. A monthly pollster with no fixed day gets the span of days it has used. Nobody publishes between 23 December and 8 January, so a date there gives way to the window pollsters returned across last summer, 9 January to 1 February. Direction and issues surveys are listed, never counted as polls. The dates are the site’s, the same ones its Latest and next polls table shows.</p>
+  </div>
+</main>
+<script id="next-data" type="application/json">{{NEXT}}</script>
+<script>window.AP=window.AP||{};(function(){var d=JSON.parse(document.getElementById('next-data').textContent);window.AP.D={pollCadence:d.pollCadence||[],subCadence:d.subCadence||[]};})();</script>
+<script>/*{{NPPROJECT}}*/</script>
+<script>/*{{NEXTCOPY}}*/</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ND=JSON.parse($('#next-data').textContent),W=window.AP.nextWords,DAY=W.DAY;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* the mark's sky follows the votes pages': sunrise by day, sunset in the evening, or the reader's choice */
+{let pref='auto';try{pref=localStorage.getItem('apt-sky')||'auto'}catch(e){}const h=new Date().getHours();document.documentElement.dataset.sky=pref==='rise'||pref==='set'?pref:h>=4&&h<15?'rise':'set'}
+const TRACK={direction:'Mood of the Nation',issues:'Issues Monitor'};   // the site's names for the two monitors (RD_CAL_TRACK)
+const TRACKW={direction:'a direction survey',issues:'an issues survey'};
+const SUB_RE=/^(.*\S)\s+\((MRP|pooled)\)$/;
+const CAD=new Map([...(ND.pollCadence||[]),...(ND.subCadence||[])].map(c=>[c.pollster,c]));
+const relN=h=>(ND.rel[h]||[]).length;
+const AHEAD=28,BACK=49,FWD=49;
+let OPEN=null,SW=0,PR=null;
+/* the site's projection on the reader's Sydney clock: polls and the two monitors, then the MRP and pooled series */
+function project(){
+  const P=window.AP.nextPolls(null,{horizonDays:FWD,includeTracked:true});
+  const S=(ND.subCadence||[]).length?window.AP.nextPolls(null,{cadence:ND.subCadence,horizonDays:FWD}):{rows:[]};
+  return {P,S,t0:P.t0,now:P.nowMs};
+}
+const clientOf=h=>{const m=SUB_RE.exec(h),c=ND.clients[m?m[1]:h];return c?(/^self/i.test(c)?'self-published':c):''};
+const tagOf=r=>r.tracked?(TRACK[r.tracked]||''):clientOf(r.pollster);
+const isLate=r=>r.loose?r.missed:(r.overdue&&r.inDays<0);
+const rhythmOf=r=>SUB_RE.test(r.pollster)?W.subRhythm(r,relN(r.pollster)):W.rhythm(r);
+
+/* ---- the weeks ahead: late slots first, then each day's, then the windows, then anyone further out ---- */
+function item(r,ctx,pr){
+  const nw=W.nextWords(r,pr.now,SUB_RE.test(r.pollster));
+  let wh,sb;
+  if(ctx==='d'){
+    wh=r.overdue?'not out yet':(W.inHours(r,pr.now)||W.hourWords(r)||'');
+    const alt=W.altOf(r);
+    sb=[rhythmOf(r),r.tracked?TRACKW[r.tracked]:'',alt?'or '+W.wdm(alt):''].filter(Boolean).join(' · ');
+  }else{wh=nw.date;sb=[nw.sub,r.tracked?TRACKW[r.tracked]:''].filter(Boolean).join(' · ')}
+  const g=ctx==='late'?'late':r.loose?'win':'';
+  const tag=tagOf(r);
+  return `<li class="it"><i class="g ${g}${r.tracked?' tr':''}" aria-hidden="true"></i><span class="nm"><b>${esc(r.pollster)}</b>${tag?`<small>${esc(tag)}</small>`:''}</span><span class="wh">${esc(wh)}</span>${sb?`<span class="sb">${esc(sb)}</span>`:''}</li>`;
+}
+const flat=(h,items,cls)=>`<div class="wk${cls?' '+cls:''}"><h3>${h}</h3><ul class="its flat">${items.join('')}</ul></div>`;
+function agenda(pr){
+  const {t0}=pr,all=[...pr.P.rows,...pr.S.rows];
+  const late=all.filter(isLate);
+  const dated=all.filter(r=>!r.loose&&!isLate(r)&&r.inDays<=AHEAD);
+  const wins=all.filter(r=>r.loose&&!r.missed&&r.opensIn<=AHEAD);
+  const shown=new Set([...late,...dated,...wins].map(r=>r.pollster));
+  const further=all.filter(r=>r.ahead===0&&!shown.has(r.pollster));
+  let s='';
+  if(late.length)s+=flat('Late',late.map(r=>item(r,'late',pr)),'late');
+  const wkOf=ms=>ms-((new Date(ms).getUTCDay()+6)%7)*DAY,w0=wkOf(t0),weeks=new Map();
+  dated.sort((a,b)=>a.release-b.release||(a.releaseMins??1440)-(b.releaseMins??1440));
+  for(const r of dated){const w=wkOf(r.release);if(!weeks.has(w))weeks.set(w,new Map());const days=weeks.get(w);if(!days.has(r.release))days.set(r.release,[]);days.get(r.release).push(r)}
+  for(const [w,days] of weeks){
+    let d='';
+    for(const [day,rs] of days){const n=Math.round((day-t0)/DAY);
+      d+=`<div class="day"><div class="dl"><b>${n===0?'Today':n===1?'Tomorrow':W.WDF[new Date(day).getUTCDay()]}</b><span>${n<=1?W.wdm(day):W.dm(day)}</span></div><ul class="its">${rs.map(r=>item(r,'d',pr)).join('')}</ul></div>`}
+    s+=`<div class="wk"><h3>${w===w0?'This week':w===w0+7*DAY?'Next week':'Week of '+W.dm(w)}<span>${W.span(w,w+6*DAY)}</span></h3>${d}</div>`;
+  }
+  if(wins.length)s+=flat('In a window',wins.map(r=>item(r,'w',pr)));
+  if(further.length)s+=flat('Further out',further.map(r=>item(r,'f',pr)));
+  return s||'<p class="empty">Nothing is on the schedule.</p>';
+}
+
+/* ---- each pollster's rhythm: its strip seven weeks either side of today, and its next date ---- */
+const ord=n=>n+(n%100>=11&&n%100<=13?'th':['th','st','nd','rd'][n%10]||'th');
+function rhythmWords(r,sub){
+  if(sub)return W.subRhythm(r,relN(r.pollster));
+  const p=[];
+  if(r.monthEnd&&r.releaseDow!=null)p.push('monthly','the '+W.WDF[r.releaseDow]+' nearest the month’s end');
+  else if(r.calMonth)p.push('monthly','no fixed day');
+  else{p.push(W.rhythm(r));if(r.releaseDow!=null&&!W.irregular(r))p.push(W.WDF[r.releaseDow]+'s')}
+  const hw=W.hourWords(r);if(hw)p.push(hw);
+  return p.join(' · ');
+}
+function span2(pr){const a=pr.t0-BACK*DAY,b=pr.t0+(FWD+1)*DAY;return {a,b,x:ms=>((ms-a)/(b-a))*SW}}
+function monthsIn(a,b){const out=[];let d=new Date(a);let m=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1);while(m<b){out.push(m);d=new Date(m);m=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)}return out}
+function strip(h,rows,c,pr){
+  const {a,b,x}=span2(pr),w=SW,H=26,cy=13,f=v=>v.toFixed(1);
+  let s=`<svg viewBox="0 0 ${w} ${H}" width="${w}" height="${H}" aria-hidden="true" focusable="false">`;
+  for(const m of monthsIn(a,b))s+=`<line x1="${f(x(m))}" x2="${f(x(m))}" y1="4" y2="${H-4}" stroke="var(--rule)"/>`;
+  s+=`<line x1="0" x2="${w}" y1="${cy}" y2="${cy}" stroke="var(--rule)"/>`;
+  const out=new Set([...(ND.rel[h]||[]),...(c.recent||[]).map(q=>q.pub).filter(Boolean)].map(d=>String(d).slice(0,10)));
+  for(const d of out){const ms=Date.parse(d);if(ms>=a&&ms<=pr.now)s+=`<circle cx="${f(x(ms+DAY/2))}" cy="${cy}" r="3.3" fill="var(--ink2)"/>`}
+  const next=rows.find(r=>r.ahead===0)||rows[0];
+  for(const m of next.missedSlots||[])if(m>=a)s+=`<path d="M${f(x(m+DAY/2)-3)} ${cy-3}l6 6m0-6l-6 6" stroke="var(--mute)" stroke-width="1.3"/>`;
+  for(const r of rows){
+    if(r.loose){const o=Math.max(a,r.release-r.spread*DAY),e=Math.min(b,r.release+(r.spread+1)*DAY);
+      if(e>o)s+=`<rect x="${f(x(o))}" y="${cy-5}" width="${f(x(e)-x(o))}" height="10" rx="5" fill="${r.missed?'var(--alp)':'var(--ink)'}" fill-opacity="${r.missed?'.3':'.18'}"/>`;continue}
+    const ms=r.release+DAY/2;if(ms>b||ms<a)continue;
+    const late=r.overdue;
+    s+=`<circle cx="${f(x(ms))}" cy="${cy}" r="3.9" fill="${late?'var(--alp)':'var(--bg)'}" stroke="${late?'var(--alp)':'var(--ink)'}" stroke-width="1.5"${r.ahead&&!late?' stroke-opacity=".55"':''}/>`;
+  }
+  const first=next.loose?next.release-next.spread*DAY:next.release;
+  if(first>b)s+=`<path d="M${w-8} ${cy-4.5}l4.5 4.5-4.5 4.5" fill="none" stroke="var(--ink2)" stroke-width="1.6"/>`;
+  s+=`<line x1="${f(x(pr.now))}" x2="${f(x(pr.now))}" y1="0" y2="${H}" stroke="var(--ink)" stroke-opacity=".5"/>`;
+  return s+'</svg>';
+}
+function axis(pr){
+  const {a,b,x}=span2(pr),tx=x(pr.now),f=v=>v.toFixed(1);
+  let s=`<svg viewBox="0 0 ${SW} 16" width="${SW}" height="16" aria-hidden="true" focusable="false">`;
+  for(const m of monthsIn(a,b)){const mx=x(m),d=new Date(m),lab=W.MON[d.getUTCMonth()]+(d.getUTCMonth()===0?' '+d.getUTCFullYear():'');let lx=mx+3;
+    if(lx<tx+20&&lx+lab.length*6.4>tx-20){if(mx>=tx-20)lx=tx+22;else continue}
+    if(lx+lab.length*6.4<=SW)s+=`<text x="${f(lx)}" y="12">${lab}</text>`}
+  s+=`<text x="${f(tx)}" y="12" text-anchor="middle" style="fill:var(--ink)">today</text>`;
+  return `<div class="axis" aria-hidden="true"><span class="st">${s}</svg></span></div>`;
+}
+const idOf=h=>'r-'+h.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+function row(h,rows,pr,sub){
+  const c=CAD.get(h)||rows[0],next=rows.find(r=>r.ahead===0)||rows[0],nw=W.nextWords(next,pr.now,sub),id=idOf(h),on=OPEN===h;
+  const tag=sub?'':tagOf(next),nm=h;
+  return `<li class="rw${sub?' subr':''}" id="${id}"><button type="button" aria-expanded="${on}" aria-controls="${id}-d" data-h="${esc(h)}"><span class="nm"><b>${esc(nm)}</b>${tag?`<small>${esc(tag)}</small>`:''}</span><span class="rh">${esc(rhythmWords(next,sub))}</span><span class="st">${strip(h,rows,c,pr)}</span><span class="nx${nw.missed||isLate(next)?' miss':''}"><b>${esc(nw.date)}</b><small>${esc(nw.sub)}</small></span></button><div class="det" id="${id}-d"${on?'':' hidden'}>${on?detail(h,rows,c,pr,sub):''}</div></li>`;
+}
+function rhythms(pr){
+  const by=new Map(),subBy=new Map();
+  for(const r of pr.P.rows){if(!by.has(r.pollster))by.set(r.pollster,[]);by.get(r.pollster).push(r)}
+  for(const r of pr.S.rows){if(!subBy.has(r.pollster))subBy.set(r.pollster,[]);subBy.get(r.pollster).push(r)}
+  const subsOf=new Map(),orphans=[];
+  for(const h of subBy.keys()){const m=SUB_RE.exec(h);if(m&&by.has(m[1])){if(!subsOf.has(m[1]))subsOf.set(m[1],[]);subsOf.get(m[1]).push(h)}else orphans.push(h)}
+  const lateFirst=(x,y)=>(isLate(by.get(y)[0])?1:0)-(isLate(by.get(x)[0])?1:0);
+  const hs=[...by.keys()].sort(lateFirst),polls=hs.filter(h=>!by.get(h)[0].tracked),tracked=hs.filter(h=>by.get(h)[0].tracked);
+  let s=axis(pr)+'<ol class="rws">'+polls.map(h=>row(h,by.get(h),pr,false)+(subsOf.get(h)||[]).map(x=>row(x,subBy.get(x),pr,true)).join('')).join('')+orphans.map(x=>row(x,subBy.get(x),pr,true)).join('')+'</ol>';
+  if(tracked.length)s+='<h3 class="grp">Direction and issues surveys</h3><ol class="rws">'+tracked.map(h=>row(h,by.get(h),pr,false)).join('')+'</ol>';
+  return s;
+}
+/* a pollster opened: how its date is worked out, its last releases, its skips, and how its dates have done */
+const slotLab=s=>{const m=/^(.*) (\d\d)$/.exec(s||'');if(!m)return s;const yy=String(new Date(PR.t0).getUTCFullYear()).slice(2);return m[2]===yy?m[1]:m[1]+' 20'+m[2]};
+const yearless=t=>String(t||'').replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d\d\b/g,'$1');
+/* a ledger line in words: np-score's verdict, the publication date only where it says something the slot doesn't */
+const verdictWords=e=>{
+  const pub=(/published (\w{3} \d{1,2} \w{3})/.exec(yearless(e.note))||[])[1],slot=slotLab(e.slot),off=/\((\d+)d (late|early)\)/.exec(e.note||'');
+  if(e.verdict==='hit')return !pub||pub===slot.replace(/ 20\d\d$/,'')?'on the day':'inside its window, out '+pub;
+  if(e.verdict==='miss')return 'missed: out '+(off?(off[1]==='1'?'a day':W.num(+off[1])+' days')+' '+off[2]:'')+(pub?', '+pub:'');
+  return e.verdict==='skip'?'skipped, as the pollster confirmed':e.verdict==='pending'?'still to come':'not scored';
+};
+function sentence(r,c,sub){
+  if(sub)return `Released ${W.subRhythm(r,relN(r.pollster))}, ${W.num(relN(r.pollster))} time${relN(r.pollster)===1?'':'s'} on record.`;
+  if(r.monthEnd&&r.releaseDow!=null)return `Once a month, on the ${W.WDF[r.releaseDow]} nearest the month’s end.`;
+  if(r.calMonth)return 'Once a month, on no fixed day'+(c.calDays?`: between the ${ord(c.calDays[0])} and the ${ord(c.calDays[1])} of the month so far.`:'.');
+  if(W.irregular(r))return `No steady rhythm: its last releases came about ${Math.round(c.cadence)} days apart, give or take ${Math.round(c.spread)}.`;
+  const g=c.gapsUsed;
+  return `${W.rhythm(r).replace(/^./,x=>x.toUpperCase())}: a median of ${c.cadence} days between ${g?'its last '+g+' releases':'its releases'}, give or take ${c.spread===1?'a day':c.spread+' days'}${r.releaseDow!=null?`, on ${W.WDF[r.releaseDow]}s`:''}.`;
+}
+function detail(h,rows,c,pr,sub){
+  const next=rows.find(r=>r.ahead===0)||rows[0],b=[`<p>${esc(sentence(next,c,sub))}</p>`];
+  if(c.eveningBeforeMins!=null)b.push(`<p>Readable from about ${W.clockLabel(c.eveningBeforeMins)} the evening before its printed date, Sydney time.</p>`);
+  else{const hw=W.hourWords(next);if(hw&&c.releaseTimed)b.push(`<p>Out ${esc(hw)}, Sydney time, going by the ${c.releaseTimed} releases with a recorded hour.</p>`)}
+  const more=rows.filter(r=>r.ahead>0&&!r.overdue);
+  if(more.length)b.push(`<p>After that: ${more.map(r=>r.loose?W.span(r.release-r.spread*DAY,r.release+r.spread*DAY):W.wdm(r.release)).join(', ')}, each a looser bet than the one before.</p>`);
+  if(c.recent&&c.recent.length)b.push('<h3>Its last releases</h3><ul class="rl">'+c.recent.slice().reverse().map(q=>{const d=W.wdm(Date.parse(q.pub));return `<li>${q.url?`<a href="${esc(q.url)}" target="_blank" rel="noopener">${d} ↗</a>`:d}${q.gap?` <span>${q.gap} days after the one before</span>`:''}</li>`}).join('')+'</ul>');
+  const conf=(c.skipped||[]).filter(d=>Date.parse(d)>=pr.t0-180*DAY),assumed=next.missedSlots||[];
+  if(conf.length)b.push(`<p>Skips the pollster confirmed: ${conf.map(d=>W.wdm(Date.parse(d))).join(', ')}.</p>`);
+  if(assumed.length)b.push(`<p>Passed with no poll on record: ${assumed.map(W.wdm).join(', ')}. Two days on, a missed date counts as skipped and the next takes over.</p>`);
+  const L=ND.score&&ND.score.ledger&&ND.score.ledger[h];
+  if(L&&L.length){const sc=L.filter(e=>e.verdict==='hit'||e.verdict==='miss'),hit=sc.filter(e=>e.verdict==='hit').length;
+    b.push(`<h3>How its dates have done</h3><p>${sc.length?`${hit} of ${sc.length} landed inside their window${ND.score.sinceLabel?' since '+esc(ND.score.sinceLabel):''}.`:'None scored yet.'}</p><ul class="rl">`+L.slice().reverse().filter((e,i,a)=>!i||e.slot!==a[i-1].slot||e.verdict!==a[i-1].verdict).slice(0,6).map(e=>`<li>${esc(slotLab(e.slot))} <span>${esc(verdictWords(e))}</span></li>`).join('')+'</ul>')}
+  if(c.site)b.push(`<p><a href="${esc(c.site)}" target="_blank" rel="noopener">Where ${esc(sub?SUB_RE.exec(h)[1]:h)} publishes first ↗</a></p>`);
+  return b.join('');
+}
+
+/* ---- the record: np-score's report, as built ---- */
+function record(){
+  const S=ND.score;if(!S||!S.overall){$('#rec').hidden=true;return}
+  const o=S.overall;
+  $('#rec-d').textContent=`Since ${S.sinceLabel||'September'} the site has logged each pollster’s next date before it came. ${o.h} of ${o.n} landed inside their window, and ${o.err===0?'at least half came out on the very day projected':'the median miss, from the window’s centre to the day the poll came out, was '+(o.err===1?'one day':W.num(o.err)+' days')}.${o.rolledN?` Of the dates moved on by a confirmed skip, ${o.rolledH} of ${o.rolledN} landed too.`:''}`;
+  const rows=Object.entries(S.houses).filter(([,v])=>v.prim||v.rolled).sort((x,y)=>((y[1].prim||[0,0])[1]-(x[1].prim||[0,0])[1])||x[0].localeCompare(y[0]));
+  const fr=v=>v?`${v[0]} of ${v[1]}`:'–';
+  $('#rec-t').innerHTML=`<thead><tr><th>Pollster</th><th>Landed</th><th>Median miss</th><th>After a skip</th></tr></thead><tbody>${rows.map(([h,v])=>`<tr><td>${esc(h)}</td><td>${fr(v.prim)}</td><td>${v.err==null?'–':v.err===1?'1 day':v.err+' days'}</td><td>${fr(v.rolled)}</td></tr>`).join('')}</tbody>`;
+  $('#rec-n').textContent='A weekly pollster’s window is its one day, a monthly one’s can run a fortnight, so how often each lands doesn’t compare across pollsters. The median miss does.';
+}
+
+/* ---- drawing, and redrawing as the clock and the width move ---- */
+function measure(){const st=$('#rows .rw .st')||$('#rows .axis .st');return st?Math.round(st.getBoundingClientRect().width):0}
+function render(){
+  PR=project();
+  const c=W.copy(PR.P,ND.score);
+  $('#head').textContent=c.head;$('#dek').textContent=c.dek;
+  $('#agenda').innerHTML=agenda(PR);
+  if(!SW)SW=600;
+  $('#rows').innerHTML=rhythms(PR);
+  const w=measure();if(w&&Math.abs(w-SW)>1){SW=w;$('#rows').innerHTML=rhythms(PR)}
+}
+$('#rows').addEventListener('click',e=>{const b=e.target.closest('.rw>button');if(!b)return;const h=b.dataset.h,on=OPEN!==h;
+  if(OPEN&&OPEN!==h){const o=document.getElementById(idOf(OPEN));if(o){o.querySelector('button').setAttribute('aria-expanded','false');const d=o.querySelector('.det');d.hidden=true;d.innerHTML=''}}
+  OPEN=on?h:null;const li=b.parentElement,d=li.querySelector('.det');b.setAttribute('aria-expanded',String(on));
+  if(on){const sub=li.classList.contains('subr'),rows=[...PR.P.rows,...PR.S.rows].filter(r=>r.pollster===h);d.innerHTML=detail(h,rows,CAD.get(h)||rows[0],PR,sub);d.hidden=false}else{d.hidden=true;d.innerHTML=''}});
+let rt=0;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(()=>{const w=measure();if(w&&Math.abs(w-SW)>1){SW=w;$('#rows').innerHTML=rhythms(PR)}},80)}).observe($('#rows'));
+record();render();
+setInterval(render,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+/* the menu */
+const burger=$('#burger'),menu=$('#menu'),nav=$('#nav');
+const setMenu=o=>{menu.hidden=!o;burger.setAttribute('aria-expanded',String(o));nav.classList.toggle('open',o);document.documentElement.style.overflow=o?'hidden':''};
+burger.addEventListener('click',()=>setMenu(menu.hidden));
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){setMenu(false);burger.focus()}});
+}
+</script>
+</body>
+</html>

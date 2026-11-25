@@ -12369,7 +12369,7 @@ if (!JUR) writeAtomic(ISSUES_HIST_ASSET, JSON.stringify(ISSUES_HIST));
    draws per component, their own seed), so nothing the site prints moves;
    the last week is the site's figure for today, from the fit's own draws.
    A failure here is reported and leaves the page on its last good data. */
-const DAWN_ASSET = path.join(OUT_DIR, "dawn-data.json"), DAWN_HIST_ASSET = path.join(OUT_DIR, "dawn-hist.json"), DAWN_GROUPS_ASSET = path.join(OUT_DIR, "dawn-groups.json"), DAWN_POLLS_ASSET = path.join(OUT_DIR, "dawn-polls.json");
+const DAWN_ASSET = path.join(OUT_DIR, "dawn-data.json"), DAWN_HIST_ASSET = path.join(OUT_DIR, "dawn-hist.json"), DAWN_GROUPS_ASSET = path.join(OUT_DIR, "dawn-groups.json"), DAWN_POLLS_ASSET = path.join(OUT_DIR, "dawn-polls.json"); const DAWN_NEXT_ASSET = path.join(OUT_DIR, "dawn-next.json");
 /* a poll's address on the /dawn/polls/ page: its house and its fieldwork's last day (unique, as validate.mjs keeps them) */
 const dawnKey = (q) => q.pollster.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + q.released;
 if (!JUR && PRIMM && TPM) {
@@ -12644,6 +12644,32 @@ if (!JUR && PRIMM && TPM) {
     console.log(`dawn: ${weeks.length} weeks, ${polls.length} polls in ${((Date.now() - tW) / 1000).toFixed(1)}s`);
   } catch (e) {
     console.error("dawn data: skipped –", e && e.stack ? e.stack : e);
+  }
+}
+/* The next-polls page: the cadence table the site's projection walks (np-project.js runs in the
+   page, so its dates are always the reader's today, not the build's), each house's MRP or pooled
+   series, every house's publication dates for the strips either side of today, and who each house
+   polls for. The economic-confidence gauges stay out: they are no poll, and this page has no
+   sentiment panel to list them under (the site lists them under Economic sentiment's own calendar). */
+if (!JUR) {
+  try {
+    const rel = {};
+    for (const q of individualPolls.concat(directionOnlyPolls || [], issuesOnlyPolls || [])) {
+      const d = String(q.published || q.released || "").slice(0, 10);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) (rel[q.pollster] ||= new Set()).add(d);
+    }
+    const clients = {};
+    for (const q of individualPolls.slice().sort((a, b) => (a.released < b.released ? -1 : 1))) if (q.client) clients[q.pollster] = q.client;
+    const nextPage = {
+      pollCadence: pollCadence.filter((c) => c.tracked !== "confidence"),
+      subCadence,
+      rel: Object.fromEntries(Object.entries(rel).map(([h, set]) => [h, [...set].sort()])),
+      clients,
+    };
+    writeAtomic(DAWN_NEXT_ASSET, JSON.stringify(nextPage));
+    console.log(`dawn next: ${nextPage.pollCadence.length} houses on a pattern, ${subCadence.length} sub-series`);
+  } catch (e) {
+    console.error("dawn next data: skipped –", e && e.stack ? e.stack : e);
   }
 }
 

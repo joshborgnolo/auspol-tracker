@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6f1">
+<meta name="robots" content="noindex">
+<title>next polls · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="/assets/fonts/commissioner-latin.737ec8f2.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* VOICE the morning paper's "coming up" box: who is due, when, and how far to trust the date
+   IDEA a pollster's calendar read off its own habits, the way a regular reader knows Newspoll lands Sunday night
+   PICTURE the weeks ahead day by day; each pollster's releases either side of today, dots out, rings to come
+   COLOUR warm white ground, indigo ink; red only for a date that has passed with no poll
+   TYPE Georgia for the head and the sections, Commissioner for names, dates and hours
+   LAYOUT phone: one column, the strips full width; laptop: name, rhythm, strip and next date in one row */
+@font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("/assets/fonts/commissioner-latin.737ec8f2.woff2") format("woff2")}
+:root{color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--pos:#1f7a78;--neg:#7a5340;--hi:#fff1d6;--navh:52px;--g:max(18px,env(safe-area-inset-left));--col:max(var(--g),calc((100vw - 1180px)/2));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--pos:#3aa7a4;--neg:#b7836a;--hi:#2c2a4a}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--pos:#3aa7a4;--neg:#b7836a;--hi:#2c2a4a}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--navh) + 70px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* nav, as the votes pages' */
+.nav{position:sticky;top:0;z-index:20;height:calc(var(--navh) + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(6px,env(safe-area-inset-right),calc((100vw - 1180px)/2 - 12px)) 0 var(--col);display:flex;align-items:center;gap:4px;background:var(--bg);box-shadow:0 1px 0 var(--rule)}
+.links{display:flex;gap:20px;margin:0 6px 0 auto}
+.links a,.mark{color:inherit;text-decoration:none}
+.links a{font-size:15px;opacity:.7;padding:12px 0;position:relative}
+.links a[aria-current]{opacity:1}
+.links a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:9px;height:1.5px;border-radius:1px;background:currentColor}
+.mark{font-weight:600;font-size:16px;letter-spacing:-.01em;padding:12px 0;white-space:nowrap}
+.burger{width:44px;height:44px;flex:none;border:0;background:none;color:inherit;display:grid;place-items:center;cursor:pointer;padding:0;border-radius:10px}
+.burger b{display:grid;gap:5px}
+.burger i{display:block;width:20px;height:1.6px;border-radius:2px;background:currentColor;transition:transform .3s,opacity .2s}
+.burger[aria-expanded=true] i:nth-child(1){transform:translateY(6.6px) rotate(45deg)}
+.burger[aria-expanded=true] i:nth-child(2){opacity:0}
+.burger[aria-expanded=true] i:nth-child(3){transform:translateY(-6.6px) rotate(-45deg)}
+.menu{position:fixed;inset:0;z-index:15;background:#0b1433;color:#f3f0ff;padding:calc(var(--navh) + env(safe-area-inset-top) + 20px) var(--g) calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:24px;overflow:auto}
+.menu[hidden]{display:none}
+.menu ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.menu a,.menu .soon{font:400 clamp(30px,8.6vw,44px)/1.18 var(--serif);letter-spacing:-.015em;color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px}
+.menu .soon{color:#8f95bd}
+.menu .soon small{font:500 12.5px/1 var(--sans);letter-spacing:0;color:#9aa0c6;border:1px solid #39416d;border-radius:99px;padding:5px 9px}
+.nav.open{color:#f3f0ff;background:transparent;box-shadow:none}
+/* the page */
+main{padding:0 max(18px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) var(--g)}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{padding:clamp(22px,4vh,44px) 0 6px}
+h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.dek{margin:8px 0 0;font-size:clamp(15px,3.9vw,17px);line-height:1.45;color:var(--ink2);max-width:62ch;text-wrap:pretty}
+/* the polls pages' own switch: every poll on record, or the ones still to come */
+.sub{display:flex;gap:20px;margin:0 0 12px}
+.sub a{font-size:15px;color:inherit;text-decoration:none;opacity:.7;padding:4px 0;position:relative}
+.sub a[aria-current]{opacity:1}
+.sub a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;border-radius:1px;background:currentColor}
+.blk{margin-top:clamp(28px,5vh,52px)}
+.blk>h2{font:400 clamp(22px,5.6vw,29px)/1.15 var(--serif);letter-spacing:-.005em;margin:0}
+.blk>.bd{margin:6px 0 0;font-size:14.5px;line-height:1.45;color:var(--ink2);max-width:66ch;text-wrap:pretty}
+/* the weeks ahead */
+.wk{margin-top:18px}
+.wk>h3{font:600 14.5px/1.2 var(--sans);margin:0;padding:0 0 8px;border-bottom:1px solid var(--rule2);display:flex;gap:10px;align-items:baseline}
+.wk>h3 span{font-weight:400;font-size:13px;color:var(--mute)}
+.wk.late>h3{color:var(--alp)}
+.day{display:grid;grid-template-columns:8.4rem minmax(0,1fr);column-gap:16px;padding:11px 0;border-bottom:1px solid var(--rule)}
+.dl b{display:block;font-weight:600;font-size:15px}
+.dl span{font-size:13px;color:var(--mute)}
+.its{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.its.flat{padding:11px 0;border-bottom:1px solid var(--rule)}
+.it{display:grid;grid-template-columns:16px minmax(0,1fr) auto;column-gap:10px;align-items:baseline}
+.it .g{width:10px;height:10px;border-radius:50%;border:1.6px solid var(--ink);align-self:center;box-sizing:border-box}
+.it .g.tr{border-style:dotted}
+.it .g.late{border-color:var(--alp);background:var(--alp)}
+.it .g.win{width:14px;height:9px;border:0;border-radius:5px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+.it .nm{min-width:0}
+.it .nm b{font-weight:600}
+.it .nm small{font-size:13px;color:var(--mute);margin-left:7px}
+.it .wh{font-size:14px;color:var(--ink2);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.it .sb{grid-column:2/4;font-size:13px;color:var(--mute);margin-top:1px}
+.empty{color:var(--mute);font-size:15px;padding:16px 0}
+#agenda{max-width:780px}
+@media (max-width:560px){.day{grid-template-columns:1fr;row-gap:7px}.dl{display:flex;gap:8px;align-items:baseline}.dl b{display:inline}}
+/* each pollster's rhythm */
+.grp{font:600 14.5px/1.2 var(--sans);margin:26px 0 0;padding:0 0 8px;border-bottom:1px solid var(--rule2)}
+.rws{list-style:none;margin:0;padding:0}
+.axis{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"st";padding:14px 4px 2px;color:var(--mute)}
+.rw{border-bottom:1px solid var(--rule)}
+.rw>button{all:unset;box-sizing:border-box;width:100%;cursor:pointer;padding:12px 4px;border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"nm nx" "rh rh" "st st";column-gap:12px;row-gap:5px}
+.rw>button:hover{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.rw>button:focus-visible{outline:2px solid var(--ink2);outline-offset:-2px}
+.rw .nm{grid-area:nm;min-width:0}
+.rw .nm b{font-weight:600}
+.rw .nm small{display:block;font-size:13px;color:var(--mute)}
+.rw .rh{grid-area:rh;font-size:13.5px;color:var(--ink2)}
+.rw .nx{grid-area:nx;text-align:right}
+.rw .nx b{font-weight:600;white-space:nowrap}
+.rw .nx small{display:block;font-size:13px;color:var(--mute);white-space:nowrap}
+.rw .nx.miss b,.rw .nx.miss small{color:var(--alp)}
+.rw.subr>button{padding-left:22px}
+.rw.subr .nm b{font-weight:500}
+.st{grid-area:st;display:block;min-width:0;height:26px}
+.st svg{display:block;width:100%;height:26px;overflow:visible}
+.axis .st,.axis .st svg{height:16px}
+.st text{font:400 11.5px var(--sans);fill:var(--mute)}
+.key{font-size:12.5px;color:var(--mute);display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{display:inline-block;width:9px;height:9px;border-radius:50%;box-sizing:border-box}
+.key .k-out{background:var(--ink2)}
+.key .k-due{border:1.5px solid var(--ink)}
+.key .k-late{background:var(--alp)}
+.key .k-win{width:16px;height:9px;border-radius:5px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+/* a pollster opened: its working */
+.det{padding:2px 4px 18px;display:grid;gap:10px;font-size:14px;color:var(--ink2);max-width:72ch}
+.det[hidden]{display:none}
+.det p{margin:0;line-height:1.45}
+.det h3{font:600 13px/1.2 var(--sans);color:var(--ink);margin:6px 0 0}
+.det a{color:var(--ink);text-underline-offset:2px}
+.rl{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-variant-numeric:tabular-nums}
+.rl span{color:var(--mute)}
+/* the record */
+.tb{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;margin-top:12px}
+.tb th,.tb td{padding:6px 18px 6px 0;text-align:right;white-space:nowrap;border-bottom:1px solid var(--rule)}
+.tb th:first-child,.tb td:first-child{text-align:left}
+.tb thead th{font-weight:500;color:var(--mute);font-size:12.5px;border-bottom-color:var(--rule2)}
+.tb td small{color:var(--mute)}
+.scroll{overflow-x:auto}
+.note{font-size:13.5px;color:var(--mute);margin:32px 0 0;line-height:1.5;max-width:72ch}
+@media (min-width:900px){
+.rw>button,.axis{grid-template-columns:minmax(140px,1.05fr) minmax(170px,1.25fr) minmax(0,3fr) 11.5rem;grid-template-areas:"nm rh st nx";align-items:center;column-gap:16px}
+.axis{grid-template-areas:". . st ."}
+.rw.subr>button{padding-left:4px}
+.rw.subr .nm{padding-left:16px}
+}
+/* the mark's sun: the hero in miniature, on its sky, beside the name once the hero has scrolled away */
+:root{--lz:#0b1640;--lm:#23498f;--ll:#c98a8f;--lh:#f2b07f}
+:root[data-sky=set]{--lz:#141a4c;--lm:#3b3a8c;--ll:#b4588f;--lh:#ff8a5a}
+.mark{display:inline-flex;align-items:center}
+.logo{display:block;width:0;height:26px;flex:none;opacity:0;transform:scale(.55);margin-right:0;border-radius:50%;transition:width .4s cubic-bezier(.3,.9,.3,1),margin-right .4s cubic-bezier(.3,.9,.3,1),opacity .3s,transform .4s cubic-bezier(.3,.9,.3,1)}
+.nav .logo{width:26px;opacity:1;transform:none;margin-right:9px}
+@media (prefers-reduced-motion:reduce){.logo{transition:none}}
+</style>
+</head>
+<body>
+<header class="nav" id="nav">
+  <a class="mark" href="../"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><radialGradient id="lgL" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6c22"/><stop offset=".7" stop-color="#ff7a28"/><stop offset=".8" stop-color="#ffa040"/><stop offset=".9" stop-color="#ffb24e" stop-opacity=".55"/><stop offset="1" stop-color="#ffb24e" stop-opacity="0"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="16" r="14" fill="url(#lgH)"/><circle cx="16" cy="16" r="9.8" fill="url(#lgL)"/><circle cx="16" cy="16" r="7" fill="url(#lgC)" stroke="#ff9a3a" stroke-width="1.5"/></g></svg>auspol tracker</a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/" aria-current="page">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><a href="./">next polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><span class="soon">leaders <small>soon</small></span></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><span class="soon">pollsters <small>soon</small></span></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+<main>
+  <div class="wrap">
+    <header class="hd">
+      <nav class="sub" aria-label="Polls"><a href="../polls/">All polls</a><a href="./" aria-current="page">Next expected</a></nav>
+      <h1 id="head">Next expected polls</h1>
+      <p class="dek" id="dek">Each pollster’s next date, worked out from its own record when the page loads.</p>
+    </header>
+    <section class="blk" aria-labelledby="ag-h">
+      <h2 id="ag-h">The next four weeks</h2>
+      <div id="agenda"><noscript><p class="empty">The dates are worked out in the browser, so this page needs JavaScript.</p></noscript></div>
+    </section>
+    <section class="blk" aria-labelledby="rh-h">
+      <h2 id="rh-h">Each pollster’s rhythm</h2>
+      <p class="bd">Seven weeks either side of today. Open a pollster for how its date is worked out.</p>
+      <div class="key" aria-hidden="true"><span><i class="k-out"></i>out</span><span><i class="k-due"></i>expected</span><span><i class="k-win"></i>a window</span><span><i class="k-late"></i>passed, no poll yet</span></div>
+      <div id="rows"></div>
+    </section>
+    <section class="blk" id="rec" aria-labelledby="rec-h">
+      <h2 id="rec-h">How these dates have done</h2>
+      <p class="bd" id="rec-d"></p>
+      <div class="scroll"><table class="tb" id="rec-t"></table></div>
+      <p class="bd" id="rec-n"></p>
+    </section>
+    <p class="note">Each date comes from the pollster’s own record: the median gap between its last releases, the weekday it keeps, and the hours its releases have come out, all Sydney time. A date that passes with no poll on record shows as late for two days, then counts as skipped and the next date takes over; a skip the pollster confirms moves it on at once. A monthly pollster with no fixed day gets the span of days it has used. Nobody publishes between 23 December and 8 January, so a date there gives way to the window pollsters returned across last summer, 9 January to 1 February. Direction and issues surveys are listed, never counted as polls. The dates are the site’s, the same ones its Latest and next polls table shows.</p>
+  </div>
+</main>
+<script id="next-data" type="application/json">{"pollCadence":[{"pollster":"Roy Morgan","last":"2026-11-16","cadence":7.5,"loose":false,"spread":1,"spreadEarly":2,"spreadLate":0.5,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":956,"releaseTo":1046,"releaseMid":993,"releaseTimed":12,"releaseVals":null,"releaseMins":993,"releaseDow":1,"releaseDowN":0,"declared":["day"],"waves":52,"site":"https://www.roymorgan.com/findings","skipped":[],"skippedMonths":[],"recent":[{"field":"2026-09-27","pub":"2026-09-29","mins":925,"url":"https://www.roymorgan.com/findings/10363-federal-voting-intention-september-29-2026","since":"2026-09-21","gap":8},{"field":"2026-10-11","pub":"2026-10-12","mins":1035,"url":"https://www.roymorgan.com/findings/10366-federal-voting-intention-october-12-2026","since":"2026-09-29","gap":13},{"field":"2026-10-25","pub":"2026-10-26","mins":1087,"url":"https://www.roymorgan.com/findings/10376-federal-voting-intention-october-26-2026","since":"2026-10-12","gap":14},{"field":"2026-11-08","pub":"2026-11-09","mins":1046,"url":"https://www.roymorgan.com/findings/10377-federal-voting-intention-november-9-2026","since":"2026-10-26","gap":14},{"field":"2026-11-15","pub":"2026-11-16","mins":1001,"url":"https://www.roymorgan.com/findings/10387-federal-voting-intention-november-16-2026","since":"2026-11-09","gap":7}],"gapsUsed":8,"slotsSkipped":3},{"pollster":"YouGov","last":"2026-11-18","cadence":14,"loose":false,"spread":1,"spreadEarly":0,"spreadLate":0,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":300,"releaseTo":300,"releaseMid":300,"releaseTimed":12,"releaseVals":null,"releaseMins":300,"releaseDow":3,"releaseDowN":12,"declared":["evening-before availability"],"eveningBeforeMins":1260,"waves":27,"site":"https://www.news24.com.au/politics/australian-politics","skipped":[],"skippedMonths":[],"recent":[{"field":"2026-09-22","pub":"2026-09-23","mins":300,"url":"https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209","since":"2026-09-09","gap":14},{"field":"2026-10-06","pub":"2026-10-07","mins":300,"url":"https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20","since":"2026-09-23","gap":14},{"field":"2026-10-20","pub":"2026-10-21","mins":320,"url":"https://www.news24.com.au/politics/australian-politics/unclear-who-forms-government-albanese-loses-twopartypreferred-lead-as-one-nation-remains-ahead-in-primary-vote/news-story/f82666671e83cb159897d384d413ecae","since":"2026-10-07","gap":14},{"field":"2026-11-03","pub":"2026-11-04","mins":300,"url":"https://www.news24.com.au/politics/australian-politics/albaneses-poll-nightmare-deepens-as-voters-turn-on-labor-and-angus-taylor-takes-over-as-preferred-pm/news-story/756ce5bbfcc617e4c05a17856655861b","since":"2026-10-21","gap":14},{"field":"2026-11-17","pub":"2026-11-18","mins":300,"url":"https://www.news24.com.au/politics/australian-politics/labor-falls-to-jointrecord-low-primary-vote-with-just-one-in-five-voters-backing-the-government-on-its-handling-of-the-costofliving-crisis/news-story/304fb361a9e6e88a934d384edcc8fb13","since":"2026-11-04","gap":14}],"gapsUsed":8},{"pollster":"Newspoll","last":"2026-11-22","cadence":21,"loose":false,"spread":1,"spreadEarly":0,"spreadLate":0,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":1200,"releaseTo":1260,"releaseMid":1200,"releaseTimed":12,"releaseVals":null,"releaseMins":1200,"releaseDow":0,"releaseDowN":12,"declared":[],"waves":21,"site":"https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false","skipped":[],"skippedMonths":[],"recent":[{"field":"2026-08-28","pub":"2026-08-30","mins":1200,"url":"https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b","since":"2026-08-09","gap":21},{"field":"2026-09-17","pub":"2026-09-20","mins":1260,"url":"https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455","since":"2026-08-30","gap":21},{"field":"2026-10-08","pub":"2026-10-11","mins":1285,"url":"https://www.theaustralian.com.au/nation/politics/terrible-20s-albanese-taylor-and-hanson-all-stuck-below-30-per-cent-primary-vote-in-newspoll/news-story/70c714118c3eb262e222be862e0a1850","since":"2026-09-20","gap":21},{"field":"2026-10-29","pub":"2026-11-01","mins":1200,"url":"https://www.theaustralian.com.au/nation/politics/newspoll-labor-slumps-as-voters-mark-down-jim-chalmers/news-story/7b4064ac2f0cb1bb1944e6409216eae9","since":"2026-10-11","gap":21},{"field":"2026-11-19","pub":"2026-11-22","mins":1200,"url":"https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e","since":"2026-11-01","gap":21}],"gapsUsed":8},{"pollster":"Resolve","last":"2026-11-08","cadence":28,"loose":false,"spread":4,"spreadEarly":0,"spreadLate":7,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":1070,"releaseTo":1080,"releaseMid":1080,"releaseTimed":12,"releaseVals":null,"releaseMins":1080,"releaseDow":0,"releaseDowN":11,"declared":[],"waves":18,"site":"https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html","skipped":[],"skippedMonths":[],"recent":[{"field":"2026-07-11","pub":"2026-07-12","mins":1070,"url":"https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html","since":"2026-06-14","gap":28},{"field":"2026-08-15","pub":"2026-08-16","mins":1079,"url":"https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html","since":"2026-07-12","gap":35},{"field":"2026-09-12","pub":"2026-09-13","mins":1080,"url":"https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html","since":"2026-08-16","gap":28},{"field":"2026-10-10","pub":"2026-10-11","mins":1080,"url":"https://www.smh.com.au/politics/federal/voters-cool-on-hanson-as-albanese-wears-the-blame-for-cost-of-living-20261011-p614hp.html","since":"2026-09-13","gap":28},{"field":"2026-11-07","pub":"2026-11-08","mins":1080,"url":"https://www.smh.com.au/politics/federal/only-one-in-five-voters-trust-albanese-now-as-blame-sticks-for-cost-of-living-20261108-p61cbo.html","since":"2026-10-11","gap":28}],"gapsUsed":8},{"pollster":"Essential","last":"2026-11-25","cadence":28,"loose":false,"spread":4,"spreadEarly":0,"spreadLate":7,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":60,"releaseTo":60,"releaseMid":60,"releaseTimed":12,"releaseVals":null,"releaseMins":60,"releaseDow":3,"releaseDowN":12,"declared":[],"waves":15,"site":"https://www.theguardian.com/australia-news/essential-poll","skipped":["2026-08-26"],"skippedMonths":[],"recent":[{"field":"2026-07-27","pub":"2026-07-29","mins":60,"url":"https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus","since":"2026-07-01","gap":28},{"field":"2026-08-31","pub":"2026-09-02","mins":60,"url":"https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb","since":"2026-07-29","gap":35},{"field":"2026-09-29","pub":"2026-09-30","mins":60,"url":"https://www.theguardian.com/australia-news/2026/sep/29/guardian-essential-poll-coalitions-primary-vote-sinks-to-lowest-ever-as-majority-support-hardline-immigration-ideas","since":"2026-09-02","gap":28},{"field":"2026-10-27","pub":"2026-10-28","mins":60,"url":"https://www.theguardian.com/australia-news/2026/oct/28/guardian-essential-poll-labor-albanese-one-nation-hanson-coalition-ntwnfb","since":"2026-09-30","gap":28},{"field":"2026-11-24","pub":"2026-11-25","mins":60,"url":"https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition","since":"2026-10-28","gap":28}],"gapsUsed":8},{"pollster":"RedBridge/Accent","last":"2026-11-08","cadence":31.5,"loose":false,"spread":4,"spreadEarly":0,"spreadLate":7,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":1080,"releaseTo":1080,"releaseMid":1080,"releaseTimed":12,"releaseVals":null,"releaseMins":1080,"releaseDow":0,"releaseDowN":10,"declared":["month-end rhythm"],"monthEnd":true,"monthEndKept":5,"monthEndN":8,"waves":18,"site":"https://www.afr.com/topic/redbridge-accent-poll-6ikd","skipped":["2026-09-27","2026-11-01"],"skippedMonths":[],"recent":[{"field":"2026-06-26","pub":"2026-06-28","mins":1080,"url":"https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9","since":"2026-05-31","gap":28},{"field":"2026-07-30","pub":"2026-08-02","mins":1080,"url":"https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6","since":"2026-06-28","gap":35},{"field":"2026-08-28","pub":"2026-08-30","mins":1080,"url":"https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn","since":"2026-08-02","gap":28},{"field":"2026-10-02","pub":"2026-10-04","mins":1080,"url":"https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5","since":"2026-08-30","gap":35},{"field":"2026-11-06","pub":"2026-11-08","mins":1080,"url":"https://www.afr.com/politics/federal/blow-for-pm-as-coalition-closes-in-on-labor-20261108-p61cbv","since":"2026-10-04","gap":35}],"gapsUsed":8},{"pollster":"DemosAU","last":"2026-11-24","cadence":33,"loose":true,"spread":12,"spreadEarly":12,"spreadLate":12,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":300,"releaseTo":1200,"releaseMid":517,"releaseTimed":12,"releaseVals":null,"releaseMins":517,"releaseDow":null,"releaseDowN":0,"declared":["calendar-month rhythm"],"calMonth":true,"calDays":[1,27],"minPubGap":18,"waves":12,"site":"https://www.capitalbrief.com/topic/polling/","skipped":[],"skippedMonths":["2026-10"],"recent":[{"field":"2026-07-08","pub":"2026-07-13","mins":524,"url":"https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/","since":"2026-06-22","gap":21},{"field":"2026-08-20","pub":"2026-08-24","mins":531,"url":"https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/","since":"2026-07-13","gap":42},{"field":"2026-09-14","pub":"2026-09-17","mins":510,"url":"https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/","since":"2026-08-24","gap":24},{"field":"2026-10-26","pub":"2026-11-01","mins":1200,"url":"https://www.capitalbrief.com/article/coalition-gets-crucial-polling-boost-ahead-of-bruising-week-for-labor-1cdc69fb-9d9a-4995-9640-6f8e3304cb8c/","since":"2026-09-17","gap":45},{"field":"2026-11-22","pub":"2026-11-24","mins":300,"url":"https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/","since":"2026-11-01","gap":23}],"gapsUsed":8},{"pollster":"Ipsos","tracked":"issues","last":"2026-11-09","cadence":33,"loose":false,"spread":9,"spreadEarly":8,"spreadLate":10,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseMid":null,"releaseTimed":0,"releaseVals":null,"releaseMins":null,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":10,"site":"https://www.ipsos.com/en-au/issuesmonitor","skipped":[],"skippedMonths":[],"recent":[{"field":"2026-07-23","pub":"2026-07-23","mins":null,"url":"https://www.ipsos.com/sites/default/files/IM_Nat_Jun_26_v4_0.pdf","since":"2026-06-10","gap":43},{"field":"2026-08-05","pub":"2026-08-05","mins":null,"url":"https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-08/IM_Nat_Jul_26_v2.pdf","since":"2026-07-23","gap":13},{"field":"2026-09-02","pub":"2026-09-02","mins":null,"url":"https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-09/IM_Nat_Aug_26_v1.pdf","since":"2026-08-05","gap":28},{"field":"2026-10-09","pub":"2026-10-09","mins":null,"url":"https://www.ipsos.com/sites/default/files/IM_Nat_Sep_26_V3.pdf","since":"2026-09-02","gap":37},{"field":"2026-11-09","pub":"2026-11-09","mins":null,"url":"https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-11/IM_Nat_Oct_26_v3.pdf","since":"2026-10-09","gap":31}],"gapsUsed":8},{"pollster":"SEC Newgate","tracked":"direction","last":"2026-09-22","cadence":60,"loose":true,"spread":26,"spreadEarly":13,"spreadLate":39,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseMid":null,"releaseTimed":0,"releaseVals":null,"releaseMins":null,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":7,"site":"https://www.secnewgate.com.au/news-views/?_category=research","skipped":[],"skippedMonths":[],"recent":[{"field":"2025-11-03","pub":"2025-11-10","mins":1044,"url":"https://www.secnewgate.com.au/wp-content/uploads/2025/11/SEC-Newgate-Mood-of-the-Nation-Report-November-2025.pdf","since":"2025-09-24","gap":47},{"field":"2026-02-09","pub":"2026-02-17","mins":1011,"url":"https://www.secnewgate.com.au/wp-content/uploads/2026/02/SEC-Newgate-Mood-of-the-Nation-Report-February-2026-1.pdf","since":"2025-11-10","gap":99},{"field":"2026-05-18","pub":"2026-05-27","mins":783,"url":"https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf","since":"2026-02-17","gap":99},{"field":"2026-07-13","pub":"2026-07-21","mins":1010,"url":"https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf","since":"2026-05-27","gap":55},{"field":"2026-09-14","pub":"2026-09-22","mins":929,"url":"https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf","since":"2026-07-21","gap":63}],"gapsUsed":6},{"pollster":"Spectre Strategy","last":"2026-11-09","cadence":120,"loose":false,"spread":26,"spreadEarly":21,"spreadLate":30,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":553,"releaseTo":745,"releaseMid":633,"releaseTimed":5,"releaseVals":null,"releaseMins":633,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":5,"site":"https://www.spectrestrategy.com/blog-3-1","skipped":[],"skippedMonths":[],"recent":[{"field":"2025-07-01","pub":"2025-07-08","mins":675,"url":"https://www.spectrestrategy.com/blog-3-1/austalian-federal-polling-update-july-2025","since":null,"gap":null},{"field":"2025-11-17","pub":"2025-11-20","mins":630,"url":"https://www.spectrestrategy.com/blog-3-1/australian-federal-polling-update-november-2025","since":"2025-07-08","gap":135},{"field":"2026-04-08","pub":"2026-04-19","mins":745,"url":"https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026","since":"2025-11-20","gap":150},{"field":"2026-07-23","pub":"2026-07-27","mins":633,"url":"https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw","since":"2026-04-19","gap":99},{"field":"2026-11-03","pub":"2026-11-09","mins":553,"url":"https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-november-2026-lrxjw-682xb","since":"2026-07-27","gap":105}],"gapsUsed":4}],"subCadence":[{"pollster":"Newspoll (pooled)","sub":"Newspoll","last":"2026-09-27","cadence":92,"loose":true,"noSummer":true,"spread":8,"spreadEarly":6,"spreadLate":9,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseMid":null,"releaseTimed":0,"releaseVals":null,"releaseMins":null,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":5,"site":null,"skipped":[],"skippedMonths":[],"recent":[{"field":"2025-09-11","pub":"2025-09-21","mins":1140,"url":"https://www.theaustralian.com.au/nation/politics/newspoll-men-young-voters-desert-coalition/news-story/a4900d97e061d1e17f19af7cde5db432","since":null,"gap":null},{"field":"2025-11-20","pub":"2025-12-25","mins":1140,"url":"https://www.theaustralian.com.au/nation/politics/key-groups-shift-from-coalition-to-pauline-hanson-newspoll-finds/news-story/8826bb431e5ebcd98764193fa481603c","since":"2025-09-21","gap":95},{"field":"2026-03-26","pub":"2026-04-05","mins":1140,"url":"https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-to-lead-labor-and-coalition-in-queensland/news-story/8e578a11d7ab609c38221490203dfc59","since":"2025-12-25","gap":101},{"field":"2026-06-26","pub":"2026-07-03","mins":1140,"url":"https://www.theaustralian.com.au/nation/politics/labor-and-anthony-albanese-on-the-slide-in-three-states-newspoll-finds/news-story/04a868def1628a7d516955cdd4bb5222","since":"2026-04-05","gap":89},{"field":"2026-09-18","pub":"2026-09-27","mins":1200,"url":"https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6","since":"2026-07-03","gap":86}],"gapsUsed":4},{"pollster":"DemosAU (MRP)","sub":"DemosAU","last":"2026-10-12","cadence":108,"loose":true,"noSummer":true,"spread":26,"spreadEarly":31,"spreadLate":21,"basis":"published","lag":0,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseMid":null,"releaseTimed":0,"releaseVals":null,"releaseMins":null,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":4,"site":"https://www.capitalbrief.com/topic/polling/","skipped":[],"skippedMonths":[],"recent":[{"field":"2025-11-11","pub":"2025-12-02","mins":690,"url":"https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL.pdf","since":null,"gap":null},{"field":"2026-03-03","pub":"2026-03-20","mins":446,"url":"https://www.capitalbrief.com/article/nationals-face-total-wipeout-as-one-nation-leads-with-male-voters-ae82f323-94e9-436a-b6b1-6dc1ec8cab6a/","since":"2025-12-02","gap":108},{"field":"2026-07-11","pub":"2026-07-27","mins":430,"url":"https://demosau.com/news/new-mrp-model-points-to-hung-parliament/","since":"2026-03-20","gap":129},{"field":"2026-09-19","pub":"2026-10-12","mins":537,"url":"https://www.capitalbrief.com/newsletter/hanson-slips-in-latest-capital-brief-poll-9d5b141e-3f50-4e8b-80e2-c248274752bc/","since":"2026-07-27","gap":77}],"gapsUsed":3}],"rel":{"Roy Morgan":["2025-06-03","2025-06-24","2025-06-30","2025-07-28","2025-08-25","2025-09-23","2025-10-21","2025-11-18","2025-12-16","2026-01-12","2026-01-20","2026-01-27","2026-02-02","2026-02-09","2026-02-13","2026-02-16","2026-02-24","2026-03-02","2026-03-10","2026-03-16","2026-03-23","2026-03-30","2026-04-07","2026-04-13","2026-04-20","2026-04-28","2026-05-04","2026-05-11","2026-05-18","2026-05-25","2026-06-01","2026-06-09","2026-06-15","2026-06-22","2026-06-29","2026-07-06","2026-07-13","2026-07-20","2026-07-27","2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31","2026-09-07","2026-09-14","2026-09-21","2026-09-29","2026-10-12","2026-10-26","2026-11-09","2026-11-16"],"RedBridge/Accent":["2025-07-02","2025-09-13","2025-10-10","2025-11-16","2025-12-01","2025-12-14","2026-02-01","2026-02-18","2026-03-01","2026-03-29","2026-04-01","2026-05-03","2026-05-31","2026-06-28","2026-08-02","2026-08-30","2026-10-04","2026-11-08"],"Spectre Strategy":["2025-07-08","2025-11-20","2026-04-19","2026-07-27","2026-11-09"],"DemosAU":["2025-07-09","2026-01-09","2026-01-27","2026-02-23","2026-04-17","2026-05-22","2026-06-22","2026-07-13","2026-08-24","2026-09-17","2026-11-01","2026-11-24"],"Newspoll":["2025-07-20","2025-08-18","2025-09-14","2025-10-05","2025-11-02","2025-11-23","2026-01-19","2026-02-08","2026-03-01","2026-03-29","2026-04-19","2026-05-17","2026-06-07","2026-06-28","2026-07-19","2026-08-09","2026-08-30","2026-09-20","2026-10-11","2026-11-01","2026-11-15","2026-11-22"],"Resolve":["2025-07-20","2025-08-17","2025-09-14","2025-10-12","2025-11-09","2025-12-07","2025-12-22","2026-01-18","2026-02-12","2026-02-15","2026-03-15","2026-04-19","2026-05-17","2026-06-14","2026-07-12","2026-08-16","2026-09-13","2026-10-11","2026-11-08"],"YouGov (MRP)":["2025-09-02","2025-11-20"],"Wolf & Smith":["2025-08-05","2026-05-17"],"Newspoll (pooled)":["2025-09-21","2025-12-25","2026-04-05","2026-07-03","2026-09-27"],"Essential":["2025-05-13","2025-07-31","2025-08-28","2025-09-30","2025-10-29","2025-11-26","2025-12-10","2026-01-28","2026-02-25","2026-03-25","2026-04-29","2026-05-27","2026-07-01","2026-07-29","2026-09-02","2026-09-30","2026-10-28","2026-11-25"],"YouGov":["2025-09-30","2025-10-30","2025-12-02","2025-12-23","2026-01-27","2026-02-11","2026-02-25","2026-03-11","2026-03-20","2026-03-24","2026-04-07","2026-04-22","2026-05-06","2026-05-20","2026-06-03","2026-06-17","2026-07-01","2026-07-15","2026-07-29","2026-08-12","2026-08-26","2026-09-09","2026-09-23","2026-10-07","2026-10-21","2026-11-04","2026-11-18"],"Freshwater":["2025-11-01","2026-01-21","2026-04-15","2026-05-03","2026-05-17"],"DemosAU (MRP)":["2025-12-02","2026-03-20","2026-07-27","2026-10-12"],"Fox & Hedgehog":["2026-01-09","2026-02-21","2026-03-28","2026-05-31"],"EMRS (Tas)":["2026-02-20","2026-08-22","2026-11-21"],"RedBridge/Accent (MRP)":["2026-05-22"],"Roy Morgan (SMS)":["2026-05-14"],"Agenda C Synesis":["2026-05-29"],"Roy Morgan (pooled)":["2026-09-15"],"Morning Consult":["2025-05-08","2025-06-09","2025-07-10","2025-09-05","2025-10-04","2025-11-09","2025-12-11","2026-01-01","2026-02-05","2026-04-04"],"SEC Newgate":["2025-07-29","2025-09-24","2025-11-10","2026-02-17","2026-05-27","2026-07-21","2026-09-22"],"Ipsos":["2025-12-07","2026-02-13","2026-03-02","2026-03-27","2026-05-01","2026-06-10","2026-07-23","2026-08-05","2026-09-02","2026-10-09","2026-11-09"]},"clients":{"Roy Morgan":"Self-published","RedBridge/Accent":"AFR","Spectre Strategy":"Self-published","DemosAU":"Capital Brief","Newspoll":"The Australian","Resolve":"SMH/Age","YouGov (MRP)":"Climate Council","Wolf & Smith":"Amplify","Newspoll (pooled)":"The Australian","Essential":"The Guardian","YouGov":"News24","Freshwater":"The Chronicle","DemosAU (MRP)":"Self-published","Fox & Hedgehog":"Daily Telegraph","EMRS (Tas)":"Self-published","RedBridge/Accent (MRP)":"AFR","Roy Morgan (SMS)":"Self-published","Agenda C Synesis":"News.com.au","Roy Morgan (pooled)":"Self-published"},"score":{"overall":{"h":14,"n":18,"rate":78,"err":0,"rolledH":6,"rolledN":6,"skip":6,"void":10,"pending":8},"houses":{"Essential":{"prim":null,"err":null,"rolled":[1,1],"skip":0,"void":3},"Roy Morgan":{"prim":[3,4],"err":0,"rolled":[3,3],"skip":0,"void":3},"YouGov":{"prim":[3,4],"err":0,"rolled":null,"skip":0,"void":2},"DemosAU":{"prim":[1,3],"err":17,"rolled":null,"skip":1,"void":0},"Resolve":{"prim":[3,3],"err":0,"rolled":null,"skip":0,"void":0},"Newspoll":{"prim":[4,4],"err":0,"rolled":null,"skip":0,"void":1},"RedBridge/Accent":{"prim":null,"err":null,"rolled":[2,2],"skip":5,"void":0},"Spectre Strategy":{"prim":null,"err":null,"rolled":null,"skip":0,"void":1}},"ledger":{"Essential":[{"logged":"2026-09-01 14:45","slot":"Wed 2 Sep 26","window":"Wed 26 Aug 26 - Wed 9 Sep 26","rolled":true,"verdict":"hit","note":"published Wed 2 Sep 26"},{"logged":"2026-09-02 09:17","slot":"Wed 30 Sep 26","window":"Wed 23 Sep 26 - Wed 7 Oct 26","rolled":false,"verdict":"void","note":"superseded with no wave and no skip - estimate re-measured?"},{"logged":"2026-09-30 07:15","slot":"Wed 28 Oct 26","window":"Wed 21 Oct 26 - Wed 4 Nov 26","rolled":false,"verdict":"void","note":"anchor 2026-09-29 matches no recorded wave - data corrected?"},{"logged":"2026-10-28 07:16","slot":"Wed 25 Nov 26","window":"Wed 18 Nov 26 - Wed 2 Dec 26","rolled":false,"verdict":"void","note":"anchor 2026-10-27 matches no recorded wave - data corrected?"},{"logged":"2026-11-25 14:32","slot":"Wed 20 Jan 27","window":"Sat 9 Jan 27 - Mon 1 Feb 27","rolled":false,"verdict":"pending","note":"open; window closes Mon 1 Feb 27"}],"Roy Morgan":[{"logged":"2026-09-01 14:45","slot":"Mon 7 Sep 26","window":"Mon 7 Sep 26 - Mon 7 Sep 26","rolled":false,"verdict":"hit","note":"published Mon 7 Sep 26"},{"logged":"2026-09-08 06:00 (reconstructed)","slot":"Mon 14 Sep 26","window":"Mon 14 Sep 26 - Mon 14 Sep 26","rolled":false,"verdict":"hit","note":"published Mon 14 Sep 26"},{"logged":"2026-09-15 09:53","slot":"Mon 21 Sep 26","window":"Mon 21 Sep 26 - Mon 21 Sep 26","rolled":false,"verdict":"hit","note":"published Mon 21 Sep 26"},{"logged":"2026-09-23 09:35","slot":"Mon 28 Sep 26","window":"Mon 28 Sep 26 - Mon 28 Sep 26","rolled":false,"verdict":"miss","note":"published Tue 29 Sep 26 (1d late)"},{"logged":"2026-09-30 07:15","slot":"Mon 5 Oct 26","window":"Mon 5 Oct 26 - Mon 5 Oct 26","rolled":false,"verdict":"void","note":"superseded with no wave and no skip - estimate re-measured?"},{"logged":"2026-10-10 07:16","slot":"Mon 12 Oct 26","window":"Mon 12 Oct 26 - Mon 12 Oct 26","rolled":true,"verdict":"hit","note":"published Mon 12 Oct 26"},{"logged":"2026-10-13 07:15","slot":"Mon 19 Oct 26","window":"Mon 19 Oct 26 - Mon 19 Oct 26","rolled":false,"verdict":"void","note":"superseded with no wave and no skip - estimate re-measured?"},{"logged":"2026-10-22 07:15","slot":"Mon 26 Oct 26","window":"Mon 26 Oct 26 - Mon 26 Oct 26","rolled":true,"verdict":"hit","note":"published Mon 26 Oct 26"},{"logged":"2026-10-27 10:51","slot":"Mon 2 Nov 26","window":"Mon 2 Nov 26 - Mon 2 Nov 26","rolled":false,"verdict":"void","note":"superseded with no wave and no skip - estimate re-measured?"},{"logged":"2026-11-05 07:15","slot":"Mon 9 Nov 26","window":"Mon 9 Nov 26 - Mon 9 Nov 26","rolled":true,"verdict":"hit","note":"published Mon 9 Nov 26"},{"logged":"2026-11-10 07:16","slot":"Mon 23 Nov 26","window":"Mon 23 Nov 26 - Mon 23 Nov 26","rolled":false,"verdict":"pending","note":"open; window closes Mon 23 Nov 26"}],"YouGov":[{"logged":"2026-09-01 14:45","slot":"Wed 9 Sep 26","window":"Wed 9 Sep 26 - Wed 9 Sep 26","rolled":false,"verdict":"hit","note":"published Wed 9 Sep 26"},{"logged":"2026-09-15 09:53","slot":"Wed 23 Sep 26","window":"Wed 23 Sep 26 - Wed 23 Sep 26","rolled":false,"verdict":"hit","note":"published Wed 23 Sep 26"},{"logged":"2026-09-23 22:35","slot":"Wed 7 Oct 26","window":"Wed 7 Oct 26 - Wed 7 Oct 26","rolled":false,"verdict":"void","note":"superseded with no wave and no skip - estimate re-measured?"},{"logged":"2026-10-07 07:16","slot":"Wed 21 Oct 26","window":"Wed 21 Oct 26 - Wed 21 Oct 26","rolled":false,"verdict":"void","note":"anchor 2026-10-06 matches no recorded wave - data corrected?"},{"logged":"2026-10-21 10:10","slot":"Wed 4 Nov 26","window":"Wed 4 Nov 26 - Wed 4 Nov 26","rolled":false,"verdict":"hit","note":"published Wed 4 Nov 26"},{"logged":"2026-11-04 07:17","slot":"Tue 17 Nov 26","window":"Tue 17 Nov 26 - Tue 17 Nov 26","rolled":false,"verdict":"miss","note":"published Wed 18 Nov 26 (1d late)"},{"logged":"2026-11-18 07:16","slot":"Tue 1 Dec 26","window":"Tue 1 Dec 26 - Tue 1 Dec 26","rolled":false,"verdict":"pending","note":"open; window closes Tue 1 Dec 26"}],"DemosAU":[{"logged":"2026-09-01 14:45","slot":"2026-09 (month)","window":"Wed 9 Sep 26 - Sun 27 Sep 26","rolled":false,"verdict":"hit","note":"published Thu 17 Sep 26"},{"logged":"2026-09-19 02:33","slot":"2026-10 (month)","window":"Fri 9 Oct 26 - Tue 27 Oct 26","rolled":false,"verdict":"skip","note":"confirmed absent at the publisher (2026-10)"},{"logged":"2026-10-28 07:16","slot":"2026-11 (month)","window":"Mon 9 Nov 26 - Fri 27 Nov 26","rolled":false,"verdict":"miss","note":"published Sun 1 Nov 26 (17d early)"},{"logged":"2026-11-02 07:16","slot":"2026-12 (month)","window":"Tue 1 Dec 26 - Sun 27 Dec 26","rolled":false,"verdict":"miss","note":"published Tue 24 Nov 26 (20d early)"},{"logged":"2026-11-24 15:46","slot":"2026-12 (month)","window":"Sat 12 Dec 26 - Sun 27 Dec 26","rolled":false,"verdict":"pending","note":"open; window closes Sun 27 Dec 26"}],"Resolve":[{"logged":"2026-09-01 14:45","slot":"Sun 13 Sep 26","window":"Sun 6 Sep 26 - Sun 20 Sep 26","rolled":false,"verdict":"hit","note":"published Sun 13 Sep 26"},{"logged":"2026-09-15 09:53","slot":"Sun 11 Oct 26","window":"Sun 4 Oct 26 - Sun 18 Oct 26","rolled":false,"verdict":"hit","note":"published Sun 11 Oct 26"},{"logged":"2026-10-12 07:16","slot":"Sun 8 Nov 26","window":"Sun 1 Nov 26 - Sun 15 Nov 26","rolled":false,"verdict":"hit","note":"published Sun 8 Nov 26"},{"logged":"2026-11-09 07:16","slot":"Sun 6 Dec 26","window":"Sun 29 Nov 26 - Sun 13 Dec 26","rolled":false,"verdict":"pending","note":"open; window closes Sun 13 Dec 26"}],"Newspoll":[{"logged":"2026-09-01 14:45","slot":"Sun 20 Sep 26","window":"Sun 13 Sep 26 - Sun 27 Sep 26","rolled":false,"verdict":"hit","note":"published Sun 20 Sep 26"},{"logged":"2026-09-23 09:35","slot":"Sun 11 Oct 26","window":"Sun 11 Oct 26 - Sun 11 Oct 26","rolled":false,"verdict":"void","note":"superseded with no wave and no skip - estimate re-measured?"},{"logged":"2026-09-24 09:39","slot":"Sun 11 Oct 26","window":"Sun 4 Oct 26 - Sun 18 Oct 26","rolled":false,"verdict":"hit","note":"published Sun 11 Oct 26"},{"logged":"2026-10-12 07:16","slot":"Sun 1 Nov 26","window":"Sun 25 Oct 26 - Sun 8 Nov 26","rolled":false,"verdict":"hit","note":"published Sun 1 Nov 26"},{"logged":"2026-11-02 07:16","slot":"Sun 22 Nov 26","window":"Sun 22 Nov 26 - Sun 22 Nov 26","rolled":false,"verdict":"hit","note":"published Sun 22 Nov 26"},{"logged":"2026-11-23 07:16","slot":"Sun 13 Dec 26","window":"Sun 13 Dec 26 - Sun 13 Dec 26","rolled":false,"verdict":"pending","note":"open; window closes Sun 13 Dec 26"}],"RedBridge/Accent":[{"logged":"2026-09-01 14:45","slot":"Sun 27 Sep 26","window":"Sun 20 Sep 26 - Sun 4 Oct 26","rolled":false,"verdict":"skip","note":"confirmed absent at the publisher"},{"logged":"2026-09-02 09:17","slot":"Sun 27 Sep 26","window":"Fri 18 Sep 26 - Tue 6 Oct 26","rolled":false,"verdict":"skip","note":"confirmed absent at the publisher"},{"logged":"2026-09-03 09:18","slot":"Sun 27 Sep 26","window":"Sun 20 Sep 26 - Sun 4 Oct 26","rolled":false,"verdict":"skip","note":"confirmed absent at the publisher"},{"logged":"2026-09-24 09:39","slot":"Sun 27 Sep 26","window":"Sun 27 Sep 26 - Sun 27 Sep 26","rolled":false,"verdict":"skip","note":"confirmed absent at the publisher"},{"logged":"2026-09-28 07:15","slot":"Sun 4 Oct 26","window":"Sun 4 Oct 26 - Sun 4 Oct 26","rolled":true,"verdict":"hit","note":"published Sun 4 Oct 26"},{"logged":"2026-10-05 07:16","slot":"Sun 1 Nov 26","window":"Sun 25 Oct 26 - Sun 8 Nov 26","rolled":false,"verdict":"skip","note":"confirmed absent at the publisher"},{"logged":"2026-11-02 07:16","slot":"Sun 8 Nov 26","window":"Sun 1 Nov 26 - Sun 15 Nov 26","rolled":true,"verdict":"hit","note":"published Sun 8 Nov 26"},{"logged":"2026-11-09 07:16","slot":"Sun 29 Nov 26","window":"Sun 22 Nov 26 - Sun 6 Dec 26","rolled":false,"verdict":"pending","note":"open; window closes Sun 6 Dec 26"}],"Spectre Strategy":[{"logged":"2026-09-23 22:35","slot":"Thu 10 Dec 26","window":"Sun 22 Nov 26 - Mon 28 Dec 26","rolled":false,"verdict":"void","note":"anchor 2026-07-23 matches no recorded wave - data corrected?"},{"logged":"2026-11-10 07:16","slot":"Tue 9 Mar 27","window":"Thu 11 Feb 27 - Sun 4 Apr 27","rolled":false,"verdict":"pending","note":"open; window closes Sun 4 Apr 27"}]},"since":"2026-09-01","sinceLabel":"1 September","lastRun":"2026-11-25 03:32Z (2026-11-25 14:32 Sydney)"}}</script>
+<script>window.AP=window.AP||{};(function(){var d=JSON.parse(document.getElementById('next-data').textContent);window.AP.D={pollCadence:d.pollCadence||[],subCadence:d.subCadence||[]};})();</script>
+<script>/* ====================================================================
+   NEXT EXPECTED POLLS – the projection
+
+   Sits under Latest polls and answers the obvious next question: when does
+   the next one land? Each house's own recent rhythm drives it – see
+   pollCadence in gen-data for how cadence and publication lag are measured.
+
+   Lives in the PLAIN layer (ahead of every component that consumes it, and
+   after ed2260de sets window.AP) so there is EXACTLY ONE implementation:
+   the page runs it from here, and .build/newtracker/sim-next-polls.mjs
+   evals this same file against mocked Sydney clocks instead of mirroring
+   it. Top-level consts of a classic script land in the shared global
+   lexical scope, so the panel bundle's DAY_MS references (and 73de0c58's
+   easternNow call) keep resolving from here. Never re-declare these names
+   in a later script – a duplicate top-level const is a parse error for the
+   whole script.
+
+   Dates are computed here rather than at build time so the panel stays
+   right as the page ages: a slot whose moment has passed without that
+   release being added is marked overdue where it stands, not rolled
+   forward onto a date nobody has published on the strength of a guess. The
+   one bound on that is NP_ASSUME_SKIP_DAYS below: a dated slot that stays
+   unrecorded past its grace is treated as one that did not happen, and the
+   projection names the house's next plausible date instead. The vacated
+   slot dates ride the rows as `missedSlots` so a renderer can leave a mark
+   where a promised date came and went; publisher-confirmed absences stay
+   unrecorded, as before.
+   ==================================================================== */
+const DAY_MS = 86400000;
+const NP_HORIZON_DAYS = 28;   // how far out a house's 2nd, 3rd… slots reach
+/* A poll CAN run a day or two late (Roy Morgan files the odd Tuesday after
+   its Monday), so two full days of grace: a dated slot still unrecorded
+   three mornings on is treated as skipped - the house's next plausible date
+   takes the row, rolled to exactly as a publisher-confirmed absence rolls
+   it (the walk's skip step). The bar shows "1 day overdue", then "2 days
+   overdue", and on the third morning the slot is gone rather than counting
+   red forever. Only a DATE can break a promise this way: a loose window
+   (a calendar-month bracket, the summer resumption) has no single day to
+   miss and keeps its seat until the wave is recorded. */
+const NP_ASSUME_SKIP_DAYS = 2;
+/* A house nobody has timed keeps its whole day: with no hour recorded there is
+   no moment to say has passed, so the row stays "today" until today is over
+   rather than being rolled off the list by an hour we invented for it. */
+const NP_UNTIMED_MINS = 24 * 60;
+/* A TIMED house counts to its measured mid-hour while its recorded clock
+   times span no more than two hours - Resolve's 6pm, Morgan's 4pm-ish,
+   Newspoll's 7-9pm mid-8pm, RedBridge's 6-or-8pm, YouGov's 5-6am all fit.
+   A span past that keeps no one hour: Essential files somewhere across
+   1:00-4:36am (216 minutes), and counting the slot down to any single hour
+   of that morning is a claim the record doesn't make. (The Next-expected
+   panel's inHours has always counted releaseMins for every timed house;
+   this gate is what grants the ticker the same count.) */
+const NP_COUNT_SPAN = 2 * 60;
+/* "Now", in the frame this schedule is written in.
+
+   Every date on this page is an Australian calendar date and every release
+   hour is an eastern one, so "today" has to be Sydney's today - not the
+   reader's. A reader in London at 11pm on the 25th is looking at a schedule
+   that is already on the 26th, and was being told a poll due in four hours
+   was "tomorrow". The day comes back as UTC midnight, which is the frame
+   Date.parse("YYYY-MM-DD") produces and the frame everything here compares
+   in, and the clock as minutes past it. */
+/* one formatter, made once: building an Intl formatter is the slow part of
+   asking the time, and every render of the tab bar and the polls table asks */
+let npEastFmt = null;
+function easternNow() {
+  const d = new Date();
+  try {
+    const p = {};
+    npEastFmt = npEastFmt || new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    });
+    for (const x of npEastFmt.formatToParts(d)) p[x.type] = x.value;
+    // some engines still render midnight as hour 24 rather than 0
+    return { day: Date.UTC(+p.year, +p.month - 1, +p.day), mins: (+p.hour % 24) * 60 + +p.minute };
+  } catch (e) {
+    return { day: Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()),
+             mins: d.getHours() * 60 + d.getMinutes() };
+  }
+}
+
+/* THE SUMMER BREAK. Nobody publishes federal voting intention between
+   Christmas and the second week of January: across the 22 summers since
+   2004/05 in the record, at most one poll per summer closed fieldwork
+   between 22 Dec and 5 Jan, and in 2025/26 not one house published between
+   23 Dec and 8 Jan. Where the houses come BACK is not a rhythm - last
+   summer Roy Morgan on 12 Jan, Resolve 18 Jan, Newspoll 19 Jan, YouGov
+   27 Jan, Essential 28 Jan, RedBridge 1 Feb. So a dated slot that falls in
+   the dead zone is not a date at all: it becomes the resumption window, 9
+   Jan to 1 Feb, as a loose row (every window consumer already reads that
+   shape - see the calendar-month path), and the walk stops there. The
+   walk-forward backtest had slots touching Dec/Jan hitting 3 of 8.
+   Month-day strings, eastern calendar dates. */
+const NP_SUMMER_DEAD = ["12-23", "01-08"];   // no federal release inside, inclusive
+const NP_SUMMER_BACK = ["01-09", "02-01"];   // the span last summer's houses resumed across
+function npInSummer(ms) {
+  const md = new Date(ms).toISOString().slice(5, 10);
+  return md >= NP_SUMMER_DEAD[0] || md <= NP_SUMMER_DEAD[1];
+}
+
+/* A MONTH-END rhythm (RedBridge/Accent for the AFR): one wave a month, out
+   on the house's weekday nearest the month's last day - Sun 1 Mar, 29 Mar,
+   3 May, 31 May, 28 Jun, 2 Aug, 30 Aug 2026, every 2026 release. Measured
+   as an interval it is 28 or 35 days and a weekly-snapped ±, which drifts
+   against the calendar; stated as the rule it has been exact. Declared in
+   pollsterRules (release.monthEnd); the rule's own record is measured by
+   gen-data, which runs THIS function (so the two cannot drift apart).
+
+   From a release at `fromMs`, the slot is the `dow` nearest the last day of
+   the month AFTER the month-end that release belonged to (the month-end
+   nearest it: 1 Mar belongs to February's). Nearest in whole days, so the
+   distances are 3 and 4 and never tie. UTC-midnight day stamps in and out,
+   the frame everything here compares in. */
+function npMonthEndSlot(fromMs, dow) {
+  const d = new Date(fromMs);
+  const y = d.getUTCFullYear(), m = d.getUTCMonth();
+  const endPrev = Date.UTC(y, m, 0), endThis = Date.UTC(y, m + 1, 0);
+  const base = new Date(fromMs - endPrev < endThis - fromMs ? endPrev : endThis);
+  const target = Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 2, 0);
+  let k = dow - new Date(target).getUTCDay();
+  if (k > 3) k -= 7;
+  if (k < -3) k += 7;
+  return target + k * DAY_MS;
+}
+
+/* The window a row counts with must be the one its ± claims, and for a
+   weekday house that is whole weeks, not days. Essential's gaps scatter
+   ±4 days, but no Sunday or Friday filing can come of that – the only
+   dates the wave can land on are this Wednesday or the ones either side,
+   i.e. ±1 week. Measuring in raw days puts the window's far edge on a day
+   the house cannot publish: Essential's row was counting down to a Sunday
+   when the wave is really open until the Wednesday after. Houses with no
+   weekday habit (and loose houses, whose raw span IS the claim) keep the
+   day spread. Same +3 as the label: the snap itself can move 3 days. */
+function spreadDays(c, sp) {
+  return c.releaseDow != null && !c.loose ? 7 * Math.floor((sp + 3) / 7) : sp;
+}
+
+/* The projection, lifted out of the panel because the tab bar runs it too.
+   Two places working out "when is the next poll" from the same cadence table
+   would drift apart the moment either changed, and a countdown in the navbar
+   has to be the same claim the panel makes. Moved, not rewritten.
+   `nowOverride` ({day, mins}) is the sim/health-check seam: the page never
+   passes it and always reads the live Sydney clock. */
+/* The same minute gives the same answer, and nothing downstream edits it, so
+   the page's clock keeps one projection per minute: a switch re-renders the
+   tab bar and the polls table, and each used to work the schedule out afresh.
+   `opts.horizonDays` widens the horizon a caller asks for (the Latest-polls
+   calendar lays two months of slots out of the one projection); the memo
+   keys on the pair, so the default call's cache is never poisoned by a
+   wider one. `opts.includeTracked` admits gen-data's `tracked` cadence rows -
+   the direction and issues monitors and the economic-confidence gauges,
+   which schedule releases but file no poll; every other consumer keeps the
+   default false, because a tab-bar countdown or a "next poll" that includes
+   a national-mood survey or a confidence index is a mis-speak, labelled or
+   not. The two calendar folds then split the tracked rows between them:
+   Latest polls keeps direction/issues, Economic sentiment keeps
+   confidence. */
+let npProjMemo = null;
+function npProject(nowOverride, opts) {
+  const horizonDays = opts && opts.horizonDays != null ? opts.horizonDays : NP_HORIZON_DAYS;
+  const tracked = !!(opts && opts.includeTracked);
+  /* opts.cadence projects a supplied list instead of D.pollCadence - the
+     Latest-and-next table's sub-rows pass D.subCadence (a house's MRP or
+     pooled series), which no other consumer walks. Not memoised: one
+     caller, a handful of rows */
+  if (opts && opts.cadence) return npProjectAt(nowOverride || easternNow(), horizonDays, true, opts.cadence);
+  if (!nowOverride) {
+    const e = easternNow(), k = e.day + e.mins * 60000;
+    if (npProjMemo && npProjMemo.k === k && npProjMemo.h === horizonDays && npProjMemo.t === tracked) return npProjMemo.v;
+    const v = npProjectAt(e, horizonDays, tracked);
+    npProjMemo = { k, h: horizonDays, t: tracked, v };
+    return v;
+  }
+  return npProjectAt(nowOverride, horizonDays, tracked);
+}
+function npProjectAt(nowOverride, horizonDays, includeTracked, series) {
+  const { D } = window.AP;
+  const cad = (series || D.pollCadence || []).filter((c) => includeTracked || !c.tracked);
+  if (!cad.length) return { rows: [], t0: 0, nowMs: 0 };
+  const eNow = nowOverride || easternNow();
+  const t0 = eNow.day;
+  const nowMs = t0 + eNow.mins * 60000;
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+
+  /* A four-week horizon rather than a fixed count: it answers "what lands this
+     month" and sizes itself to how busy the field actually is. A weekly house
+     appears four times inside it, a monthly one once – which is the honest
+     shape of the schedule, not a repetition bug. The horizon bounds how many
+     FURTHER slots of the walk show, never the first: every house holds one
+     standing next slot no matter how far out it sits (Spectre Strategy's is
+     ~twenty weeks away for most of the year), because a panel that stays
+     silent on a slow house only pretends not to know when it lands next. */
+  const rows = [];
+  const horizon = t0 + (horizonDays || NP_HORIZON_DAYS) * DAY_MS;
+  cad.forEach((c) => {
+    /* eveningBeforeMins (gen-data, from pollsterRules.release.eveningBefore):
+       the house's wave is readable the EVENING BEFORE its canon stamp -
+       News24's wave drops ~9pm Tuesday while its byline, rewritten overnight,
+       reads next-morning 5:00AM. Everything gen-data measures (habit day,
+       releaseMins, the anchors) is read off those canon stamps, so the row
+       arrives claiming a Wednesday-morning release a reader has never seen.
+       Shift the projection onto the eve it can act on: the stamped
+       "Wednesday 5am" becomes "Tuesday 9pm", and the walker, the overdue
+       arithmetic and every label downstream then run on the true
+       availability. The measured span/anchors are stamp facts and would
+       contradict the shifted day, so the declared drop time replaces them. */
+    if (c.eveningBeforeMins != null && c.releaseDow != null)
+      c = { ...c,
+        releaseDow: (c.releaseDow + 6) % 7,
+        releaseMins: c.eveningBeforeMins,
+        releaseFrom: c.eveningBeforeMins, releaseTo: c.eveningBeforeMins,
+        releaseMid: c.eveningBeforeMins, releaseVals: null };
+    /* A CALENDAR-MONTH rhythm (DemosAU) has no day to project: one wave per
+       month on no particular day of it, so the slot IS the month - the
+       day-of-month range the house has actually filed on (calDays, measured
+       by gen-data over the published sequence; the bare month where it is
+       absent) of the month after the last recorded wave. Shaped here as a
+       loose window whose centre and spread are the range's own mid and
+       half-span, so every window consumer (the panel's span and "open now",
+       the bar's countdown, the missed count from the close) reads it
+       without a special case of its own. */
+    if (c.calMonth) {
+      const ld = new Date(Date.parse(c.last));
+      let sm = (ld.getUTCMonth() + 1) % 12;
+      let sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
+      let open, close;
+      for (;;) {
+        /* A slot month named in `skippedMonths` was confirmed absent at the
+           publisher by the house's agent - the month-grain counterpart of the
+           dated path's `skipped` roll below, and the same off-ramp from the
+           never-rolled-forward-on-a-guess rule: the slot steps one month at a
+           time to the next UNVERIFIED month rather than holding red on a
+           window verified never filed. */
+        if (!(c.skippedMonths || []).includes(`${sy}-${String(sm + 1).padStart(2, "0")}`)) {
+          const lastDay = Date.UTC(sy, sm + 1, 0); // the next month's day 0 = this slot's last day
+          /* Day-of-month bounds cannot re-open a window before the shortest
+             recorded interval between releases has passed. The floor follows
+             the last release, not an arbitrary minimum day of this month. */
+          const nextOpen = Math.max(Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1),
+            Date.parse(c.last) + (c.minPubGap ?? 0) * DAY_MS);
+          /* a habit reaching past the 28th is not owed a day a shorter month
+             doesn't have: clamp the close to the slot month's own last day */
+          const nextClose = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
+          if (nextOpen <= nextClose) {
+            open = nextOpen;
+            close = nextClose;
+            break;
+          }
+          /* If the interval floor falls after this month's close, roll to a
+             month that can contain a positive-width window. This is a schedule
+             constraint, not a claimed publisher-confirmed absence. */
+        }
+        sm += 1;
+        if (sm > 11) { sm = 0; sy += 1; }
+      }
+      const calSpread = (close - open) / 2 / DAY_MS;
+      const release = (open + close) / 2;
+      const missed = close < t0;
+      /* The next window is the house's standing claim and holds its seat
+         whatever the horizon - the dated walk's i === 0 rule below - and a
+         MOOT slot keeps its seat until a release moves the anchor, the
+         hold-the-slot rule everything else obeys */
+      rows.push({
+        ...c, field: open, release, missed, ahead: 0,
+        overdue: missed,
+        spread: calSpread, winHalf: calSpread,
+        inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((open - t0) / DAY_MS),
+        closesIn: Math.round((close - t0) / DAY_MS),
+      });
+      return;
+    }
+    /* A house that keeps a weekday is projected onto it. Interval alone put
+       Essential on a Thursday and YouGov on a Tuesday, when between them they
+       have published on a Wednesday thirteen times out of fourteen dated
+       releases - the interval is a median over waves whose fieldwork has
+       shifted by a day or two, and it carries that drift into the answer.
+       Nudged to the NEAREST matching weekday, never more than three days, so
+       this corrects a rounding error rather than overriding the cadence: a
+       house whose interval says three weeks does not get moved a fortnight to
+       land on a Wednesday. Uses the same getDay() the row is printed with, so
+       the date shown always falls on the weekday claimed for it. */
+    const snap = (ms) => {
+      if (c.releaseDow == null) return ms;
+      let d = c.releaseDow - new Date(ms).getUTCDay();
+      if (d > 3) d -= 7;
+      if (d < -3) d += 7;
+      return ms + d * DAY_MS;
+    };
+    // the moment a projected release is expected, which is the date plus the
+    // hour the house keeps – the thing that is compared against now
+    const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
+    const relOf = (f) => dayFloor(snap(f + c.lag * DAY_MS));
+
+    /* The next slot after the last recorded release. A slot whose moment has
+       passed without that release being added is overdue, not wrong: the
+       wave may already be out and simply not entered yet, or it may be
+       running late, and this page cannot tell which. Either way the honest
+       row is the one the data on record actually supports, left where it is
+       and marked overdue - for two days of grace, after which a DATED slot
+       is reckoned a skipped one and the walk moves to the house's next
+       plausible date (NP_ASSUME_SKIP_DAYS; the roll the skip lists take,
+       below). A slot leaves the two ways the record can no longer back it:
+       a new release moves `c.last` past it, or the sky has sat on it past
+       its grace. */
+    /* a month-end house steps month-end to month-end, not by interval:
+       its slot IS the release day, so field and release coincide (and the
+       slot-relative tails below need no weekday-snap shift) */
+    const monthEnd = !!c.monthEnd && c.releaseDow != null;
+    const stepFrom = (rel) => npMonthEndSlot(rel, c.releaseDow);
+    let field = monthEnd ? stepFrom(Date.parse(c.last)) : Date.parse(c.last) + c.cadence * DAY_MS;
+    let release = monthEnd ? field : relOf(field);
+    /* A slot named in `skipped` was confirmed absent at the publisher by the
+       house's agent, the morning after it passed - so it is not an open bet
+       and not overdue, it just isn't coming. Roll to the house's next
+       possible release date: one week on for a dated house (the only step a
+       weekly-slipping house can take; Essential's 28-day cadence slips to
+       35, not 56), a full cadence otherwise. The honest row then is the
+       next UNVERIFIED expectation, not a "(or N days ago)" asterisk on a
+       release verified never filed. */
+    /* A month-end house's late step is a week too: RedBridge's record is 28
+       or 35 days and nothing else (29 Mar -> 3 May, 28 Jun -> 2 Aug), so a
+       confirmed-absent Sunday rolls to the Sunday after it. Skip that one as
+       well and the wave is not late any more, it is gone - the slot is the
+       next month-end's, stepped from the original slot. */
+    let rolled = false;
+    /* every ASSUMED skip's vacated slot, so a renderer can leave a mark
+       where a promised date came and went (confirmed absentees in the
+       skipped lists deliberately leave no trace) */
+    const missedSlots = [];
+    {
+      const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+      let meSlot = release;
+      /* One roll step, shared by the confirmed absentees (skipped lists) and
+         the assumed ones (a dated slot past its grace, below): a month-end
+         house's first step is its measured late week, its second the next
+         month-end; a dated house's is one week; anyone else's a cadence. */
+      const rollOn = () => {
+        rolled = true;
+        if (monthEnd) {
+          if (release === meSlot) release = meSlot + 7 * DAY_MS;
+          else release = meSlot = stepFrom(meSlot);
+          field = release;
+          return;
+        }
+        field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
+        release = relOf(field);
+      };
+      while ((c.skipped || []).includes(isoDay(release))) rollOn();
+      /* The assumed skip: a dated slot still unrecorded past its grace is
+         one the wave did not keep, so the walk moves on to the next
+         plausible date rather than counting red forever (the bar's "1 day
+         overdue" / "2 days overdue" are the grace showing). Only a DATED
+         promise can break this way - a loose window names no single day and
+         holds its seat until the wave lands; and a slot in the summer break
+         is no date to be late for (rolling it would manufacture a January
+         date that reads overdue inside the resumption window), so a roll
+         stops at the break and the summer branch below shapes it instead. */
+      if (!c.loose)
+        while (!npInSummer(release) && release + NP_ASSUME_SKIP_DAYS * DAY_MS < t0) {
+          missedSlots.push(release);
+          rollOn();
+        }
+    }
+    /* A loose house earns its place when its WINDOW opens inside the horizon,
+       not when its centre falls inside it: DemosAU's next centre is 30 days
+       out and its window opens in 13, so testing the centre would hide a house
+       that may well file next week. */
+    const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
+    /* i === 0 rides past the horizon on purpose: the next slot is the house's
+       one standing claim, and dropping it because it sits more than four
+       weeks out is how a quarterly house went unmentioned on the panel for
+       most of the year. The horizon's job ends at slot two. */
+    for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
+      /* a slot in the summer break: the house's next claim is the
+         resumption window (NP_SUMMER_BACK of the January after), shaped as
+         a loose row; a further slot there is not projected at all */
+      /* (noSummer: a series that publishes from waves already in hand -
+         the pooled Newspoll quarter came out on 26 Dec 2025) */
+      if (!c.noSummer && npInSummer(release)) {
+        if (i === 0) {
+          const d = new Date(release);
+          const y = d.getUTCFullYear() + (d.getUTCMonth() === 11 ? 1 : 0);
+          const at = (md) => Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3, 5));
+          const open = at(NP_SUMMER_BACK[0]), close = at(NP_SUMMER_BACK[1]);
+          const half = (close - open) / 2 / DAY_MS;
+          const missed = close < t0;
+          rows.push({
+            ...c, field, release: (open + close) / 2, ahead: 0,
+            loose: true, summer: true, overdue: missed, missed,
+            spread: half, winHalf: half, slotEarly: null, slotLate: null, rolled: false,
+            missedSlots: missedSlots.length ? missedSlots.slice() : null,
+            inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
+            opensIn: Math.round((open - t0) / DAY_MS),
+            closesIn: Math.round((close - t0) / DAY_MS),
+          });
+        }
+        break;
+      }
+      const overdue = due(release) <= nowMs;
+      /* Each further wave is one more interval of drift, so the window widens
+         as sqrt(waves) – the second Essential is a looser bet than the first.
+         A house on a fixed weekly schedule barely moves; an erratic one
+         visibly fans out, which is the point. */
+      const sp = Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)));
+      /* The window is measured in the units the ± states it in – whole
+         weeks for a weekday house (Essential's ±4 days is a ±1 week claim),
+         raw days for everyone else. See spreadDays. */
+      const winHalf = spreadDays(c, sp);
+      /* The tails a label names as alternatives must re-reference to THIS
+         slot, not to the median interval they were measured around.
+         Essential's median gap is 31.5 days with ±3.5 of scatter, but the
+         projected slot snaps back 3.5 days to the 28-day Wednesday – the
+         nearest end of the record – so relative to the slot the only
+         alternative the record offers is the 35-day Wednesday a WEEK LATE;
+         the symmetric ± it carried named a 21-day Wednesday the house has
+         never filed on. slotEarly/slotLate rebase the measured tails by how
+         far the weekday snap moved this slot (zero when it sits exactly a
+         cadence of weeks out: tail 2+ slots stay symmetric, which is right
+         – a 63-day claim's alternatives genuinely are 56 and 70). Only a
+         dated house gets the pair; everyone else's tails stay as measured.
+         Clamped at zero, since an alternative cannot sit off the record. */
+      const slotShift = c.releaseDow != null && !c.loose && c.spreadEarly != null
+        ? (release - (field + c.lag * DAY_MS)) / DAY_MS
+        : null;
+      rows.push({
+        ...c, field, release, overdue, ahead: i,
+        spread: sp, winHalf,
+        slotEarly: slotShift == null ? null : Math.max(0, c.spreadEarly + slotShift),
+        slotLate: slotShift == null ? null : Math.max(0, c.spreadLate - slotShift),
+        /* This slot already landed on the house's measured late step because
+           a confirmed skip pushed it there: it IS the late alternative the
+           ± would name. Flag it so the row labels don't offer a further
+           +1-week date the record never shows (Essential slips 28→35, and
+           the rolled 35-day slot then had 42 named as its miss) - only the
+           first row of a walk can sit on it. */
+        rolled: rolled && i === 0,
+        missedSlots: missedSlots.length ? missedSlots.slice() : null,
+        inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
+        /* Overdue is not missed while the ± window is still open: the row
+           counts on toward the far edge of it, and is only red once that too
+           has passed. */
+        closesIn: Math.round((release + winHalf * DAY_MS - t0) / DAY_MS),
+        missed: overdue && release + winHalf * DAY_MS < t0,
+      });
+      // an overdue slot isn't a base to project the next one from – that
+      // would stack a guess on a slot nothing has confirmed yet
+      if (overdue || c.loose) break;   // loose: one window per house, same reason
+      if (monthEnd) { field = release = stepFrom(release); continue; }
+      field += c.cadence * DAY_MS;
+      release = dayFloor(snap(field + c.lag * DAY_MS));
+    }
+  });
+  /* Ordered by when each entry's wave is assumed to land – for a dated row
+     that is the date, for a window the day it opens. An overdue row whose
+     window is still open sorts at the FAR edge, not the date just missed:
+     the assumption is that its poll has not been published, and while the
+     window stays open the soonest it can land is that edge – so Essential
+     sits under "in 3 days" and "in 5 days", at its own "in 6 days", instead
+     of claiming the top of the list with yesterday's slot. A missed row –
+     edge passed, dated OR loose – drops to the foot: there is no date left
+     to give it. (Loose rows used to keep their window-open date here, which
+     put a house whose window closed months ago at the TOP of the list.) */
+  const first = (r) => (r.missed ? Infinity
+    : r.loose ? r.release - r.spread * DAY_MS
+    : r.overdue ? r.release + (r.winHalf != null ? r.winHalf : r.spread) * DAY_MS
+    : r.release);
+  rows.sort((a, b) => first(a) - first(b));
+  return { rows, t0, nowMs };
+}
+window.AP.nextPolls = npProject;
+
+/* ====================================================================
+   THE NEXT-POLL ROLL – what the tab bar's countdown shows
+
+   Moved here from the main page's NextPollTicker so that every bar that
+   carries the countdown – the main page's and the satellites' (site-shell.js
+   runs this file) – builds the same roll from the same projection. The
+   ticker keeps the fit pass (how much of the roll the bar has room for);
+   the roll itself, and every phrase in it, is here.
+   ==================================================================== */
+const TN_DAY = 86400000;
+const tnUntil = (ms) => {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
+  const h = Math.round(mins / 60);
+  if (h < 36) return h + (h === 1 ? " hour" : " hours");
+  const d = Math.round(h / 24);
+  if (d < 14) return d + (d === 1 ? " day" : " days");
+  const w = Math.round(d / 7);
+  return w + (w === 1 ? " week" : " weeks");
+};
+function npTickerItems(proj) {
+  const rows = proj ? proj.rows : [];
+  const nowMs = proj ? proj.nowMs : 0;
+  const t0 = proj ? proj.t0 : 0;
+  /* A house that keeps a weekday can only publish ON that weekday, and the
+     countdown has to respect that or it says something impossible. Essential
+     files on Wednesdays; projected onto Wed 26 Aug and missed, its +-7 day
+     window was still technically open on the Monday after, so this used to
+     read "any time" - naming a moment that cannot happen until Wednesday. The
+     next slot is the next Wednesday, and that is what it counts to.
+
+     The window's EARLY edge still does the work it should: it decides which
+     slot is the EARLIEST plausible one, and the answer is the first matching
+     weekday on or after that. Roy Morgan, due at midnight today on a Monday
+     schedule, is still today rather than a week away.
+
+     Houses with no weekday habit keep the plain window: the earliest the wave
+     could land, or "any time" once that has passed. */
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+  const targetOf = (r) => {
+    const half = r.winHalf || 0;
+    if (r.releaseDow == null)
+      return { at: Math.max(r.release - half * TN_DAY, nowMs), byDay: false };
+    /* The window's EARLY edge is measured, not mirrored: no weekday house has
+       ever filed a slot early, so counting to release - ±half names a date
+       with no precedent - Resolve was counting down to Sun 6 Sep when its
+       real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
+       countdown on the projected day itself. The projection's slotEarly
+       (tails rebased to the slot's own place in the record) is the same
+       measure relative to the slot, and takes precedence where it exists. */
+    const widen = Math.sqrt((r.ahead || 0) + 1);
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null
+      ? 7 * Math.floor((se * widen + 3) / 7)
+      : half;
+    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
+    t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
+    return { at: t, byDay: true };
+  };
+
+  /* A house whose slot is a WINDOW rather than a date - DemosAU's
+     calendar-month bracket - only belongs on the bar while the window is
+     open: before the bracket opens, a countdown to its edge misreads a day
+     range as a date; after it closes unrecorded, the panel's red row is
+     where the lateness is told. While the window IS open the row reads
+     "any day now" and sits at the tail of the roll - "some time in the
+     next N days" is weaker information than every dated count the bar
+     carries, so every slot leads it. */
+  const isWindowRow = (r) => r.loose && r.releaseDow == null;
+  const windowOpen = (r) => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
+  const windowItems = rows
+    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
+    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
+
+  /* A slot whose whole tolerance has passed without its release being
+     recorded leads the bar in red, counting the days it is late - the same
+     claim the panel's red row makes, on the same `missed` flag. A late
+     WINDOW counts from its close - and a window, having no date it could
+     break, is the only lateness that can persist here; a late DAY counts
+     from the day itself, matching the number the panel prints, and only
+     for the two days of grace NP_ASSUME_SKIP_DAYS grants a dated slot
+     before the projection treats it as skipped and moves the expectation
+     on ("1 day overdue", "2 days overdue", gone on the third morning -
+     never "N days" into double figures). A row leaves for a real reason
+     only: the release recorded, or the slot reckoned skipped. */
+  const overdueItems = rows
+    .filter((r) => r.missed && !isWindowRow(r))
+    .map((r) => {
+      const days = Math.round(
+        (t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
+      return {
+        firm: r.pollster, site: r.site, overdue: true, days,
+        when: days === 1 ? "1 day overdue" : days + " days overdue",
+      };
+    })
+    .sort((a, b) => b.days - a.days);
+
+  /* Re-sorted on the rolled target rather than left in the panel's order.
+     The panel sorts a missed wave by the slot it missed, because a reader
+     looking at the schedule wants to see it is late; the bar is answering
+     "what lands next", and after rolling, a Monday house due today comes
+     before a Wednesday one that slipped a week.
+
+     Two slots on the SAME day break their day-floor tie on the house's
+     due moment - a weekday target carries no hour of its own (it is the
+     slot's midnight by design), but the houses still land in an order on
+     the day: a Sunday 6pm wave before a Sunday 9pm one, rather than
+     whichever came first in the cadence rows. A house nobody has timed
+     keeps its 24*60 day-end default, so a vague "today" trails the
+     same-day counts that can name their hour. */
+  const dueOf = (it) => it.t.at + (it.t.byDay
+    ? (it.r.releaseMins == null ? 24 * 60 : it.r.releaseMins) * 60000
+    : 0);
+  const upcomingItems = rows
+    .filter((r) => !r.missed && !isWindowRow(r))
+    .map((r) => ({ r, t: targetOf(r) }))
+    .sort((a, b) => dueOf(a) - dueOf(b))
+    /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
+       soonest from EVERY house, and a weekly house's second slot inside the
+       coming week only repeats a name instead of adding another house to
+       the roll. There is no count or day-window cap here - how much of the
+       roll actually shows is a space decision measured live on the bar
+       itself (the fit pass below). */
+    .filter(((seen) => ({ r }) =>
+      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
+    .map(({ r, t }) => {
+      const half = r.winHalf || 0;
+      let when;
+      if (t.byDay) {
+        const days = Math.round((t.at - t0) / TN_DAY);
+        /* "Any moment now" starts when the publication window does - the slot
+           date plus the hour the house keeps - not at the day's first minute:
+           Roy Morgan files Mondays after four, and a 9am reader told the wave
+           is moments away is being lied to for seven hours. An untimed house
+           has no hour to open at, so it keeps its whole day (the projection's
+           same 24*60 default): "today" throughout. */
+        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
+        /* The same hour that lets the slot say "any moment now" lets the wait
+           before it count itself: a house with a measured (or declared) hour
+           and under twelve of them to go reads "5 hours" - minutes in the
+           last hour, both from tnUntil, bare like the day counts beside it
+           ("2 days") - instead of the vaguer "today". A house nobody has
+           timed has no hour to count to and keeps "today", and twelve hours
+           plus out the day is still the honest claim. */
+        const left = dueMs - nowMs;
+        /* ...unless the house keeps no one hour - a recorded span past two
+           hours (NP_COUNT_SPAN). Essential files somewhere across 1-4:36am,
+           so its slot morning reads "any moment now" for as long as the
+           wait to the EARLIEST hour is no longer than the house's own span
+           of hours, and "today" before that - the span's span is the honest
+           window. A two-hours-or-less habit counts to the measured MID
+           instead: Newspoll's 7-9pm mid-8pm and RedBridge's 6-or-8pm used
+           to sit out here beside Essential (the bar was a span of one hour
+           or more), a rule that called an evening house hourless for filing
+           at 7pm the once - and left the ticker vaguer than the panel,
+           which has counted the same mid for every timed house all along
+           (rd-polls.jsx inHours). */
+        const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom > NP_COUNT_SPAN;
+        /* "Any moment now" EXPIRES when the house's own filing band shuts
+           - and then the whole ITEM does: a shut band resolves the
+           evening. The phrase claims the release is dropping as it
+           speaks, and a house whose measured filing hours have closed is
+           plainly not about to (a 9:44pm promise over Newspoll's 7-9pm
+           window, 11 Oct 2026); but the rest of its evening can't offer
+           "today" either - the wait is settled and there is no maybe, so
+           the slot LEAVES THE BAR until its day ends rather than linger
+           as "today (maybe)". The slot DAY is untouched - the row holds
+           its overdue grace and the roll walk as before, and the red
+           overdue items flag it from tomorrow; only the countdown item
+           goes. */
+        const bandShut = r.releaseTo != null && nowMs > t.at + r.releaseTo * 60000;
+        if (days === 0 && bandShut) return null;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+             : hourless ? (t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000
+               ? "any moment now" : "today")
+             : r.releaseMins != null && Math.round(left / 3600000) < 12
+             ? tnUntil(left) : "today")
+             : days === 1 ? "tomorrow"
+             /* exact day counts past "tomorrow" - the panel's own phrasing
+                ("in 12 days") - so the bar and the panel name the same slot
+                the same way; tnUntil's week rounding ("2 weeks") made them
+                disagree */
+             : days + " days";
+      } else {
+        /* No day pinned, so nothing is "moment" away - the wave is due some
+           DAY inside a measured range, and the countdown says so. ("Moment"
+           is the weekday houses' word above: theirs is a date with an hour.)
+           Sub-day resolution only inside 36 hours; past that, the same exact
+           day count the weekday houses get */
+        when = t.at <= nowMs ? "any day now"
+             : Math.round((t.at - nowMs) / 3600000) < 36
+             ? tnUntil(t.at - nowMs)
+             : Math.round((t.at - t0) / TN_DAY) + " days";
+      }
+      /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
+         house can only file on its weekday, so every alternative date is a
+         slot of its own, a week apart: the hedge belongs only while two
+         slots from now on are both in play – a window wider than a week, or
+         a slot rolled more than one slot-week past the projected one (a
+         one-week roll is just the old window's own far edge, still this
+         wave). A still-open window after a missed slot is not future doubt
+         – its earlier dates are past days the wave publicly did not land
+         on, so Essential rolled from a missed 26 Aug to 2 Sep reads
+         "2 days", full stop. (r.overdue reads "slot moment passed" and
+         fires on exactly that case – it is npProject's missed + still-open
+         flag, not future doubt.) Non-weekday houses keep the day-spread
+         rule. "any moment/day now" is left alone - it already says what
+         the hedge would. */
+      /* ...and a weekday house whose record names a LATER slot than the one
+         counted - Newspoll's Sunday or the one after, Essential's Wednesday
+         or the next - is hedged too: "tomorrow (maybe)", since the bar says
+         the earliest date, not the only one. The late alternative is the
+         panel's own (slotLate, widened by sqrt(waves), in whole weeks); a
+         rolled slot already sits on it, and a count past the slot, inside
+         the window, is nearer the far edge by as much. */
+      const lateW = r.releaseDow != null && !r.rolled
+        ? Math.floor(((r.slotLate != null ? r.slotLate : r.spreadLate || 0) * Math.sqrt((r.ahead || 0) + 1) + 3) / 7)
+        : 0;
+      const laterSlot = t.byDay && lateW >= 1 && t.at < r.release + lateW * 7 * TN_DAY;
+      const maybe = when !== "any moment now" && when !== "any day now" &&
+        (half > 7 || !!r.loose || laterSlot ||
+         (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
+         (r.releaseDow == null && half > 0));
+      return { firm: r.pollster, when, maybe, site: r.site };
+    })
+    /* the shut-band slots nulled above are gone from the roll entirely
+       (their houses' LATER slots were already evicted one-per-house) */
+    .filter(Boolean);
+
+  /* Overdue leads: an already-blown forecast is more news than any
+     countdown. The tail is the fit pass's business - the candidate list is
+     the whole roll (one slot per house, nearest first), and the bar shows
+     as much of it as clears the neighbours. Window-house rows trail it all:
+     "any day now" is weaker information than every dated count. */
+  const items = [...overdueItems, ...upcomingItems, ...windowItems];
+  return items;
+}
+window.AP.nextPollItems = npTickerItems;
+window.AP.npMonthEndSlot = npMonthEndSlot;
+</script>
+<script>/* auspol tracker /dawn/next/ – the next expected polls, in words.
+
+   A classic script, no imports: the page inlines it after np-project.js (the site's one projection,
+   window.AP.nextPolls), and test-dawn evals these same two files against mocked Sydney clocks, the
+   way .build/newtracker/sim-next-polls.mjs evals np-project.js. Every slot's date and countdown is
+   the site's own wording – rd-polls.jsx's nextWords, a11e1559's clockLabel, releaseLabel and
+   cadenceLabel – carried over unchanged, so this page and the site's Latest-and-next table cannot
+   drift into two house styles for one claim.
+
+   THE HEAD names what lands next on the schedule. Polls only: a direction or issues survey (a
+   tracked row) is no next poll, and nor is a house's MRP or pooled re-cut. In this order:
+     today   a slot due today whose hour hasn't passed: "Newspoll is due tonight" – tonight from 5 pm,
+             this afternoon from noon, this morning before, by the hours the house has recorded;
+             plain "today" for an untimed house, or hours that straddle two of those
+     notout  due today, its hour passed, not yet on record: "Newspoll was due today and isn't out yet"
+     late    a dated slot passed inside its two days' grace, or a window shut within the week:
+             "Roy Morgan is a day late"
+     next    the soonest slot still ahead, when it is a date: "due tomorrow", "due on Sunday" (inside
+             six days), "due on 12 January"
+     window  when the soonest is a window: "DemosAU is expected 12–27 December", or once it has
+             opened "DemosAU's window is open"
+     summer  when the soonest is the summer resumption: "Polls return after the summer break"
+     none    nothing on the schedule: "No polls are scheduled"
+   Houses sharing the slot are named together ("A and B", "A, B and C"); four or more are counted.
+
+   THE DEK: a sentence of the head's detail (the hour; the week-late date the house's record offers;
+   how long a window stays open), the next four weeks' count, and the projection's own record from
+   np-score's report, a fact of the build. */
+(function () {
+  "use strict";
+  const AP = (window.AP = window.AP || {});
+  const DAY = 86400000;
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const MONF = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const WDF = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const WD3 = WDF.map((w) => w.slice(0, 3));
+  const NUM = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  const num = (n) => NUM[n] || String(n);
+  const at = (ms) => new Date(ms);
+  const dm = (ms) => at(ms).getUTCDate() + " " + MON[at(ms).getUTCMonth()];
+  const dmf = (ms) => at(ms).getUTCDate() + " " + MONF[at(ms).getUTCMonth()];
+  const wdm = (ms) => WD3[at(ms).getUTCDay()] + " " + dm(ms);
+  const span = (a, b) => (at(a).getUTCMonth() === at(b).getUTCMonth() ? at(a).getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b));
+  const spanF = (a, b) => (at(a).getUTCMonth() === at(b).getUTCMonth() ? at(a).getUTCDate() + "–" + dmf(b) : dmf(a) + " – " + dmf(b));
+
+  /* ---- the site's clock and rhythm words (a11e1559), unchanged ---------------------------- */
+  function clockParts(mins) {
+    const h = Math.floor(mins / 60), mi = mins % 60;
+    const ap = h < 12 ? "am" : "pm";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return { num: mi ? `${h12}:${String(mi).padStart(2, "0")}` : `${h12}`, ap };
+  }
+  function clockLabel(mins) { const c = clockParts(mins); return `${c.num} ${c.ap}`; }
+  const RELEASE_TIGHT_MINS = 120;
+  function releaseLabel(from, to, mid, vals) {
+    if (from == null || to == null) return null;
+    if (from === to) return clockLabel(from);
+    if (vals && vals.length >= 2) {
+      const ps = vals.map(clockParts);
+      return ps.every((p) => p.ap === ps[0].ap)
+        ? `${ps.slice(0, -1).map((p) => p.num).join(", ")} or ${ps[ps.length - 1].num} ${ps[0].ap}`
+        : vals.slice(0, -1).map(clockLabel).join(", ") + ` or ${clockLabel(vals[vals.length - 1])}`;
+    }
+    if (to - from > RELEASE_TIGHT_MINS) return clockLabel(Math.round(mid != null ? mid : (from + to) / 2));
+    const a = clockParts(from), b = clockParts(to);
+    return a.ap === b.ap ? `${a.num}–${b.num} ${b.ap}` : `${clockLabel(from)}–${clockLabel(to)}`;
+  }
+  function cadenceLabel(d) {
+    if (d >= 6.5 && d <= 7.5) return "weekly";
+    if (d >= 13 && d <= 15) return "fortnightly";
+    if (d >= 20 && d <= 22) return "every 3 weeks";
+    if (d >= 27 && d <= 32) return "monthly";
+    if (d >= 40 && d <= 48) return "every 6 weeks";
+    return `every ${Math.round(d)} days`;
+  }
+
+  /* ---- a slot in words: rd-polls.jsx's, unchanged ------------------------------------------ */
+  const when = (n) => (n === -1 ? "yesterday" : n < 0 ? -n + " days overdue" : n === 0 ? "today" : n === 1 ? "tomorrow" : "in " + n + " days");
+  function inHours(r, nowMs) {
+    if (r.inDays !== 0 || r.releaseMins == null) return null;
+    const ms = r.release + r.releaseMins * 60000 - nowMs;
+    if (ms <= 0 || Math.round(ms / 3600000) >= 12) return null;
+    const mins = Math.max(1, Math.round(ms / 60000));
+    if (mins < 60) return "in " + mins + " min" + (mins === 1 ? "" : "s");
+    const h = Math.round(mins / 60);
+    return "in " + h + " hour" + (h === 1 ? "" : "s");
+  }
+  function hourWords(r) {
+    if (r.releaseFrom == null || r.releaseTo == null) return null;
+    if (r.releaseVals && r.releaseVals.length >= 2) return releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid, r.releaseVals);
+    if (r.releaseTo - r.releaseFrom <= 20) return clockLabel(r.releaseFrom);
+    return "about " + clockLabel(Math.round((r.releaseMid != null ? r.releaseMid : (r.releaseFrom + r.releaseTo) / 2) / 60) * 60);
+  }
+  /* the one real alternative a dated house's record offers: a week late (or early) */
+  function altOf(r) {
+    if (!r || r.rolled || r.loose) return null;
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+    if (r.releaseDow == null || se == null) return null;
+    const widen = Math.sqrt(r.ahead + 1);
+    const earlyW = Math.floor((se * widen + 3) / 7), lateW = Math.floor((sl * widen + 3) / 7);
+    if (earlyW === 0 && lateW >= 1) return r.release + lateW * 7 * DAY;
+    if (lateW === 0 && earlyW >= 1) return r.release - earlyW * 7 * DAY;
+    return null;
+  }
+  const irregular = (r) => !!r && r.cadence > 60;
+  const rhythm = (r) => (!r ? "" : irregular(r) ? "irregular" : r.calMonth ? "monthly" : cadenceLabel(r.cadence));
+  /* a sub-series' rhythm: quarterly where it is, else the interval in months; with too few releases
+     to measure, how many there have been */
+  function subRhythm(r, releases) {
+    const c = r && r.cadence;
+    if (!c) return num(releases) + (releases === 1 ? " release" : " releases");
+    if (c >= 80 && c <= 100) return "quarterly";
+    if (c < 45) return cadenceLabel(c);
+    const m = Math.round((c / 30.44) * 2) / 2;
+    return "every " + Math.floor(m) + (m % 1 ? "½" : "") + " months";
+  }
+  /* the Next column: a date and, under it, how far off and the hour or the week-late alternative */
+  function nextWords(r, nowMs, sub) {
+    if (!r) return { date: "—", sub: sub ? "too few releases to project" : "" };
+    if (r.loose && !irregular(r)) {
+      const a = r.release - r.spread * DAY, b = r.release + r.spread * DAY;
+      return { date: span(a, b), sub: r.missed ? when(r.closesIn) : r.opensIn <= 0 ? "window open now" : "window opens " + when(r.opensIn), missed: r.missed, win: true };
+    }
+    if (irregular(r)) return r.missed
+      ? { date: "About " + dm(r.release), sub: when(r.closesIn), missed: true }
+      : { date: "About " + dm(r.release), sub: "give or take " + Math.round(r.spread) + " days", far: true };
+    if (r.missed) return { date: wdm(r.release), sub: when(r.closesIn), missed: true };
+    if (r.overdue) {
+      const edge = r.release + r.winHalf * DAY;
+      return { date: wdm(edge), sub: when(r.closesIn) + (r.inDays === 0 ? ", not out yet" : ", due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago")) };
+    }
+    const alt = altOf(r), hr = hourWords(r);
+    return { date: wdm(r.release), sub: (inHours(r, nowMs) || when(r.inDays)) + (alt ? ", or " + dm(alt) : hr ? ", " + hr : "") };
+  }
+
+  /* ---- the head and dek -------------------------------------------------------------------- */
+  const names = (rs) => {
+    const xs = rs.map((r) => r.pollster);
+    return xs.length === 1 ? xs[0] : xs.length === 2 ? xs[0] + " and " + xs[1] : xs.length === 3 ? xs[0] + ", " + xs[1] + " and " + xs[2] : num(xs.length) + " polls";
+  };
+  const isAre = (rs, one, many) => (rs.length === 1 ? one : many);
+  const atH = (h) => (/^\d/.test(h) ? "at " + h : h);   // "at 6 pm", "about 8 pm"
+  const Cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  const partOf = (m) => (m < 12 * 60 ? "this morning" : m < 17 * 60 ? "this afternoon" : "tonight");
+  /* the one part of the day every named house's recorded hours fall in, else none */
+  function dayPart(rs) {
+    const parts = new Set();
+    for (const r of rs) {
+      if (r.releaseFrom == null || r.releaseTo == null) return null;
+      parts.add(partOf(r.releaseFrom)); parts.add(partOf(r.releaseTo));
+    }
+    return parts.size === 1 ? [...parts][0] : null;
+  }
+  function copy(proj, score) {
+    const { rows, t0 } = proj;
+    const polls = rows.filter((r) => !r.tracked);
+    const R = polls.filter((r) => r.ahead === 0);
+    const dated = (r) => !r.loose;
+    const today = R.filter((r) => dated(r) && r.inDays === 0 && !r.overdue);
+    const notOut = R.filter((r) => dated(r) && r.inDays === 0 && r.overdue);
+    const lateBy = (r) => (dated(r) ? -r.inDays : -r.closesIn);
+    const late = R.filter((r) => (dated(r) ? r.inDays < 0 && r.overdue : r.missed && r.closesIn >= -7));
+    const ahead = R.filter((r) => !r.overdue && !r.missed);
+    let kind, head, lead = [];
+    if (today.length) {
+      kind = "today"; lead = today;
+      head = names(today) + isAre(today, " is", " are") + " due " + (dayPart(today) || "today");
+    } else if (notOut.length) {
+      kind = "notout"; lead = notOut;
+      head = names(notOut) + isAre(notOut, " was due today and isn’t out yet", " were due today and aren’t out yet");
+    } else if (late.length) {
+      kind = "late"; lead = late;
+      const ds = [...new Set(late.map(lateBy))];
+      head = names(late) + isAre(late, " is ", " are ") + (ds.length === 1 ? (ds[0] === 1 ? "a day" : num(ds[0]) + " days") + " late" : "late");
+    } else if (ahead.length) {
+      const f = ahead[0];
+      if (dated(f)) {
+        kind = "next"; lead = ahead.filter((r) => dated(r) && r.release === f.release);
+        const n = f.inDays;
+        head = names(lead) + isAre(lead, " is", " are") + " due " + (n === 1 ? "tomorrow" : n <= 6 ? "on " + WDF[at(f.release).getUTCDay()] : "on " + dmf(f.release));
+      } else if (f.summer) {
+        kind = "summer"; lead = [f]; head = "Polls return after the summer break";
+      } else {
+        kind = "window"; lead = [f];
+        head = f.opensIn <= 0 ? f.pollster + "’s window is open" : f.pollster + " is expected " + spanF(f.release - f.spread * DAY, f.release + f.spread * DAY);
+      }
+    } else { kind = "none"; head = "No polls are scheduled"; }
+    head = head.charAt(0).toUpperCase() + head.slice(1);   // "Four polls are due today"
+
+    const s = [];
+    const one = lead.length === 1 ? lead[0] : null;
+    if (kind === "today" || kind === "next") {
+      const alt = one && kind === "next" ? altOf(one) : null;
+      const hrs = lead.map((r) => [r, hourWords(r)]);
+      if (alt) s.push("Its record has it slipping a week at times, to " + dmf(alt) + ".");
+      else if (one && hrs[0][1]) s.push("It usually lands " + atH(hrs[0][1]) + ", Sydney time.");
+      else if (lead.length > 1 && hrs.every(([, h]) => h)) s.push(hrs.map(([r, h], i) => r.pollster + (i ? " " : " usually lands ") + atH(h)).join(", ") + ", Sydney time.");
+    } else if (kind === "notout" && one) {
+      const hr = hourWords(one), edge = one.release + one.winHalf * DAY;
+      s.push((hr ? "It usually lands " + atH(hr) + "." : "") + (one.winHalf > 0 ? (hr ? " " : "") + "Its window stays open until " + wdm(edge) + "." : ""));
+    } else if (kind === "late" && one) {
+      s.push(dated(one) ? "It was due on " + WDF[at(one.release).getUTCDay()] + (lateBy(one) >= 2 ? "; from tomorrow, its next date takes over." : "; after two days without it, its next date takes over.")
+        : "Its window shut on " + dmf(one.release + one.spread * DAY) + ".");
+    } else if (kind === "window" && one) {
+      s.push(one.opensIn > 0 ? "Its window opens " + when(one.opensIn) + "." : "It could land any day until " + dmf(one.release + one.spread * DAY) + ".");
+    } else if (kind === "summer") {
+      s.push("Nobody publishes between 23 December and 8 January; last summer the pollsters came back between 9 January and 1 February.");
+    }
+    const four = polls.filter((r) => !r.missed && (r.loose ? r.opensIn <= 28 : r.inDays >= 0 && r.inDays <= 28));
+    const houses = new Set(four.map((r) => r.pollster)).size;
+    s.push(!four.length ? "No poll is expected in the next four weeks."
+      : four.length > 10 ? "Over the next four weeks, " + four.length + " polls are expected, from " + houses + " pollsters."
+      : Cap(four.length === 1 ? "one poll is" : num(four.length) + " polls are") + " expected over the next four weeks" + (houses > 1 ? ", from " + num(houses) + " pollsters." : "."));
+    const o = score && score.overall;
+    if (o && o.n >= 5) s.push("Each date comes from the pollster’s own rhythm; since " + (score.sinceLabel || "September") + ", " + o.h + " of " + o.n + " have landed inside their window.");
+    return { kind, head, dek: s.filter(Boolean).join(" "), lead: lead.map((r) => r.pollster), t0 };
+  }
+
+  AP.nextWords = { DAY, MON, MONF, WDF, WD3, num, dm, dmf, wdm, span, spanF, clockLabel, releaseLabel, cadenceLabel,
+    when, inHours, hourWords, altOf, irregular, rhythm, subRhythm, nextWords, copy };
+})();
+</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ND=JSON.parse($('#next-data').textContent),W=window.AP.nextWords,DAY=W.DAY;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* the mark's sky follows the votes pages': sunrise by day, sunset in the evening, or the reader's choice */
+{let pref='auto';try{pref=localStorage.getItem('apt-sky')||'auto'}catch(e){}const h=new Date().getHours();document.documentElement.dataset.sky=pref==='rise'||pref==='set'?pref:h>=4&&h<15?'rise':'set'}
+const TRACK={direction:'Mood of the Nation',issues:'Issues Monitor'};   // the site's names for the two monitors (RD_CAL_TRACK)
+const TRACKW={direction:'a direction survey',issues:'an issues survey'};
+const SUB_RE=/^(.*\S)\s+\((MRP|pooled)\)$/;
+const CAD=new Map([...(ND.pollCadence||[]),...(ND.subCadence||[])].map(c=>[c.pollster,c]));
+const relN=h=>(ND.rel[h]||[]).length;
+const AHEAD=28,BACK=49,FWD=49;
+let OPEN=null,SW=0,PR=null;
+/* the site's projection on the reader's Sydney clock: polls and the two monitors, then the MRP and pooled series */
+function project(){
+  const P=window.AP.nextPolls(null,{horizonDays:FWD,includeTracked:true});
+  const S=(ND.subCadence||[]).length?window.AP.nextPolls(null,{cadence:ND.subCadence,horizonDays:FWD}):{rows:[]};
+  return {P,S,t0:P.t0,now:P.nowMs};
+}
+const clientOf=h=>{const m=SUB_RE.exec(h),c=ND.clients[m?m[1]:h];return c?(/^self/i.test(c)?'self-published':c):''};
+const tagOf=r=>r.tracked?(TRACK[r.tracked]||''):clientOf(r.pollster);
+const isLate=r=>r.loose?r.missed:(r.overdue&&r.inDays<0);
+const rhythmOf=r=>SUB_RE.test(r.pollster)?W.subRhythm(r,relN(r.pollster)):W.rhythm(r);
+
+/* ---- the weeks ahead: late slots first, then each day's, then the windows, then anyone further out ---- */
+function item(r,ctx,pr){
+  const nw=W.nextWords(r,pr.now,SUB_RE.test(r.pollster));
+  let wh,sb;
+  if(ctx==='d'){
+    wh=r.overdue?'not out yet':(W.inHours(r,pr.now)||W.hourWords(r)||'');
+    const alt=W.altOf(r);
+    sb=[rhythmOf(r),r.tracked?TRACKW[r.tracked]:'',alt?'or '+W.wdm(alt):''].filter(Boolean).join(' · ');
+  }else{wh=nw.date;sb=[nw.sub,r.tracked?TRACKW[r.tracked]:''].filter(Boolean).join(' · ')}
+  const g=ctx==='late'?'late':r.loose?'win':'';
+  const tag=tagOf(r);
+  return `<li class="it"><i class="g ${g}${r.tracked?' tr':''}" aria-hidden="true"></i><span class="nm"><b>${esc(r.pollster)}</b>${tag?`<small>${esc(tag)}</small>`:''}</span><span class="wh">${esc(wh)}</span>${sb?`<span class="sb">${esc(sb)}</span>`:''}</li>`;
+}
+const flat=(h,items,cls)=>`<div class="wk${cls?' '+cls:''}"><h3>${h}</h3><ul class="its flat">${items.join('')}</ul></div>`;
+function agenda(pr){
+  const {t0}=pr,all=[...pr.P.rows,...pr.S.rows];
+  const late=all.filter(isLate);
+  const dated=all.filter(r=>!r.loose&&!isLate(r)&&r.inDays<=AHEAD);
+  const wins=all.filter(r=>r.loose&&!r.missed&&r.opensIn<=AHEAD);
+  const shown=new Set([...late,...dated,...wins].map(r=>r.pollster));
+  const further=all.filter(r=>r.ahead===0&&!shown.has(r.pollster));
+  let s='';
+  if(late.length)s+=flat('Late',late.map(r=>item(r,'late',pr)),'late');
+  const wkOf=ms=>ms-((new Date(ms).getUTCDay()+6)%7)*DAY,w0=wkOf(t0),weeks=new Map();
+  dated.sort((a,b)=>a.release-b.release||(a.releaseMins??1440)-(b.releaseMins??1440));
+  for(const r of dated){const w=wkOf(r.release);if(!weeks.has(w))weeks.set(w,new Map());const days=weeks.get(w);if(!days.has(r.release))days.set(r.release,[]);days.get(r.release).push(r)}
+  for(const [w,days] of weeks){
+    let d='';
+    for(const [day,rs] of days){const n=Math.round((day-t0)/DAY);
+      d+=`<div class="day"><div class="dl"><b>${n===0?'Today':n===1?'Tomorrow':W.WDF[new Date(day).getUTCDay()]}</b><span>${n<=1?W.wdm(day):W.dm(day)}</span></div><ul class="its">${rs.map(r=>item(r,'d',pr)).join('')}</ul></div>`}
+    s+=`<div class="wk"><h3>${w===w0?'This week':w===w0+7*DAY?'Next week':'Week of '+W.dm(w)}<span>${W.span(w,w+6*DAY)}</span></h3>${d}</div>`;
+  }
+  if(wins.length)s+=flat('In a window',wins.map(r=>item(r,'w',pr)));
+  if(further.length)s+=flat('Further out',further.map(r=>item(r,'f',pr)));
+  return s||'<p class="empty">Nothing is on the schedule.</p>';
+}
+
+/* ---- each pollster's rhythm: its strip seven weeks either side of today, and its next date ---- */
+const ord=n=>n+(n%100>=11&&n%100<=13?'th':['th','st','nd','rd'][n%10]||'th');
+function rhythmWords(r,sub){
+  if(sub)return W.subRhythm(r,relN(r.pollster));
+  const p=[];
+  if(r.monthEnd&&r.releaseDow!=null)p.push('monthly','the '+W.WDF[r.releaseDow]+' nearest the month’s end');
+  else if(r.calMonth)p.push('monthly','no fixed day');
+  else{p.push(W.rhythm(r));if(r.releaseDow!=null&&!W.irregular(r))p.push(W.WDF[r.releaseDow]+'s')}
+  const hw=W.hourWords(r);if(hw)p.push(hw);
+  return p.join(' · ');
+}
+function span2(pr){const a=pr.t0-BACK*DAY,b=pr.t0+(FWD+1)*DAY;return {a,b,x:ms=>((ms-a)/(b-a))*SW}}
+function monthsIn(a,b){const out=[];let d=new Date(a);let m=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1);while(m<b){out.push(m);d=new Date(m);m=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)}return out}
+function strip(h,rows,c,pr){
+  const {a,b,x}=span2(pr),w=SW,H=26,cy=13,f=v=>v.toFixed(1);
+  let s=`<svg viewBox="0 0 ${w} ${H}" width="${w}" height="${H}" aria-hidden="true" focusable="false">`;
+  for(const m of monthsIn(a,b))s+=`<line x1="${f(x(m))}" x2="${f(x(m))}" y1="4" y2="${H-4}" stroke="var(--rule)"/>`;
+  s+=`<line x1="0" x2="${w}" y1="${cy}" y2="${cy}" stroke="var(--rule)"/>`;
+  const out=new Set([...(ND.rel[h]||[]),...(c.recent||[]).map(q=>q.pub).filter(Boolean)].map(d=>String(d).slice(0,10)));
+  for(const d of out){const ms=Date.parse(d);if(ms>=a&&ms<=pr.now)s+=`<circle cx="${f(x(ms+DAY/2))}" cy="${cy}" r="3.3" fill="var(--ink2)"/>`}
+  const next=rows.find(r=>r.ahead===0)||rows[0];
+  for(const m of next.missedSlots||[])if(m>=a)s+=`<path d="M${f(x(m+DAY/2)-3)} ${cy-3}l6 6m0-6l-6 6" stroke="var(--mute)" stroke-width="1.3"/>`;
+  for(const r of rows){
+    if(r.loose){const o=Math.max(a,r.release-r.spread*DAY),e=Math.min(b,r.release+(r.spread+1)*DAY);
+      if(e>o)s+=`<rect x="${f(x(o))}" y="${cy-5}" width="${f(x(e)-x(o))}" height="10" rx="5" fill="${r.missed?'var(--alp)':'var(--ink)'}" fill-opacity="${r.missed?'.3':'.18'}"/>`;continue}
+    const ms=r.release+DAY/2;if(ms>b||ms<a)continue;
+    const late=r.overdue;
+    s+=`<circle cx="${f(x(ms))}" cy="${cy}" r="3.9" fill="${late?'var(--alp)':'var(--bg)'}" stroke="${late?'var(--alp)':'var(--ink)'}" stroke-width="1.5"${r.ahead&&!late?' stroke-opacity=".55"':''}/>`;
+  }
+  const first=next.loose?next.release-next.spread*DAY:next.release;
+  if(first>b)s+=`<path d="M${w-8} ${cy-4.5}l4.5 4.5-4.5 4.5" fill="none" stroke="var(--ink2)" stroke-width="1.6"/>`;
+  s+=`<line x1="${f(x(pr.now))}" x2="${f(x(pr.now))}" y1="0" y2="${H}" stroke="var(--ink)" stroke-opacity=".5"/>`;
+  return s+'</svg>';
+}
+function axis(pr){
+  const {a,b,x}=span2(pr),tx=x(pr.now),f=v=>v.toFixed(1);
+  let s=`<svg viewBox="0 0 ${SW} 16" width="${SW}" height="16" aria-hidden="true" focusable="false">`;
+  for(const m of monthsIn(a,b)){const mx=x(m),d=new Date(m),lab=W.MON[d.getUTCMonth()]+(d.getUTCMonth()===0?' '+d.getUTCFullYear():'');let lx=mx+3;
+    if(lx<tx+20&&lx+lab.length*6.4>tx-20){if(mx>=tx-20)lx=tx+22;else continue}
+    if(lx+lab.length*6.4<=SW)s+=`<text x="${f(lx)}" y="12">${lab}</text>`}
+  s+=`<text x="${f(tx)}" y="12" text-anchor="middle" style="fill:var(--ink)">today</text>`;
+  return `<div class="axis" aria-hidden="true"><span class="st">${s}</svg></span></div>`;
+}
+const idOf=h=>'r-'+h.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+function row(h,rows,pr,sub){
+  const c=CAD.get(h)||rows[0],next=rows.find(r=>r.ahead===0)||rows[0],nw=W.nextWords(next,pr.now,sub),id=idOf(h),on=OPEN===h;
+  const tag=sub?'':tagOf(next),nm=h;
+  return `<li class="rw${sub?' subr':''}" id="${id}"><button type="button" aria-expanded="${on}" aria-controls="${id}-d" data-h="${esc(h)}"><span class="nm"><b>${esc(nm)}</b>${tag?`<small>${esc(tag)}</small>`:''}</span><span class="rh">${esc(rhythmWords(next,sub))}</span><span class="st">${strip(h,rows,c,pr)}</span><span class="nx${nw.missed||isLate(next)?' miss':''}"><b>${esc(nw.date)}</b><small>${esc(nw.sub)}</small></span></button><div class="det" id="${id}-d"${on?'':' hidden'}>${on?detail(h,rows,c,pr,sub):''}</div></li>`;
+}
+function rhythms(pr){
+  const by=new Map(),subBy=new Map();
+  for(const r of pr.P.rows){if(!by.has(r.pollster))by.set(r.pollster,[]);by.get(r.pollster).push(r)}
+  for(const r of pr.S.rows){if(!subBy.has(r.pollster))subBy.set(r.pollster,[]);subBy.get(r.pollster).push(r)}
+  const subsOf=new Map(),orphans=[];
+  for(const h of subBy.keys()){const m=SUB_RE.exec(h);if(m&&by.has(m[1])){if(!subsOf.has(m[1]))subsOf.set(m[1],[]);subsOf.get(m[1]).push(h)}else orphans.push(h)}
+  const lateFirst=(x,y)=>(isLate(by.get(y)[0])?1:0)-(isLate(by.get(x)[0])?1:0);
+  const hs=[...by.keys()].sort(lateFirst),polls=hs.filter(h=>!by.get(h)[0].tracked),tracked=hs.filter(h=>by.get(h)[0].tracked);
+  let s=axis(pr)+'<ol class="rws">'+polls.map(h=>row(h,by.get(h),pr,false)+(subsOf.get(h)||[]).map(x=>row(x,subBy.get(x),pr,true)).join('')).join('')+orphans.map(x=>row(x,subBy.get(x),pr,true)).join('')+'</ol>';
+  if(tracked.length)s+='<h3 class="grp">Direction and issues surveys</h3><ol class="rws">'+tracked.map(h=>row(h,by.get(h),pr,false)).join('')+'</ol>';
+  return s;
+}
+/* a pollster opened: how its date is worked out, its last releases, its skips, and how its dates have done */
+const slotLab=s=>{const m=/^(.*) (\d\d)$/.exec(s||'');if(!m)return s;const yy=String(new Date(PR.t0).getUTCFullYear()).slice(2);return m[2]===yy?m[1]:m[1]+' 20'+m[2]};
+const yearless=t=>String(t||'').replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d\d\b/g,'$1');
+/* a ledger line in words: np-score's verdict, the publication date only where it says something the slot doesn't */
+const verdictWords=e=>{
+  const pub=(/published (\w{3} \d{1,2} \w{3})/.exec(yearless(e.note))||[])[1],slot=slotLab(e.slot),off=/\((\d+)d (late|early)\)/.exec(e.note||'');
+  if(e.verdict==='hit')return !pub||pub===slot.replace(/ 20\d\d$/,'')?'on the day':'inside its window, out '+pub;
+  if(e.verdict==='miss')return 'missed: out '+(off?(off[1]==='1'?'a day':W.num(+off[1])+' days')+' '+off[2]:'')+(pub?', '+pub:'');
+  return e.verdict==='skip'?'skipped, as the pollster confirmed':e.verdict==='pending'?'still to come':'not scored';
+};
+function sentence(r,c,sub){
+  if(sub)return `Released ${W.subRhythm(r,relN(r.pollster))}, ${W.num(relN(r.pollster))} time${relN(r.pollster)===1?'':'s'} on record.`;
+  if(r.monthEnd&&r.releaseDow!=null)return `Once a month, on the ${W.WDF[r.releaseDow]} nearest the month’s end.`;
+  if(r.calMonth)return 'Once a month, on no fixed day'+(c.calDays?`: between the ${ord(c.calDays[0])} and the ${ord(c.calDays[1])} of the month so far.`:'.');
+  if(W.irregular(r))return `No steady rhythm: its last releases came about ${Math.round(c.cadence)} days apart, give or take ${Math.round(c.spread)}.`;
+  const g=c.gapsUsed;
+  return `${W.rhythm(r).replace(/^./,x=>x.toUpperCase())}: a median of ${c.cadence} days between ${g?'its last '+g+' releases':'its releases'}, give or take ${c.spread===1?'a day':c.spread+' days'}${r.releaseDow!=null?`, on ${W.WDF[r.releaseDow]}s`:''}.`;
+}
+function detail(h,rows,c,pr,sub){
+  const next=rows.find(r=>r.ahead===0)||rows[0],b=[`<p>${esc(sentence(next,c,sub))}</p>`];
+  if(c.eveningBeforeMins!=null)b.push(`<p>Readable from about ${W.clockLabel(c.eveningBeforeMins)} the evening before its printed date, Sydney time.</p>`);
+  else{const hw=W.hourWords(next);if(hw&&c.releaseTimed)b.push(`<p>Out ${esc(hw)}, Sydney time, going by the ${c.releaseTimed} releases with a recorded hour.</p>`)}
+  const more=rows.filter(r=>r.ahead>0&&!r.overdue);
+  if(more.length)b.push(`<p>After that: ${more.map(r=>r.loose?W.span(r.release-r.spread*DAY,r.release+r.spread*DAY):W.wdm(r.release)).join(', ')}, each a looser bet than the one before.</p>`);
+  if(c.recent&&c.recent.length)b.push('<h3>Its last releases</h3><ul class="rl">'+c.recent.slice().reverse().map(q=>{const d=W.wdm(Date.parse(q.pub));return `<li>${q.url?`<a href="${esc(q.url)}" target="_blank" rel="noopener">${d} ↗</a>`:d}${q.gap?` <span>${q.gap} days after the one before</span>`:''}</li>`}).join('')+'</ul>');
+  const conf=(c.skipped||[]).filter(d=>Date.parse(d)>=pr.t0-180*DAY),assumed=next.missedSlots||[];
+  if(conf.length)b.push(`<p>Skips the pollster confirmed: ${conf.map(d=>W.wdm(Date.parse(d))).join(', ')}.</p>`);
+  if(assumed.length)b.push(`<p>Passed with no poll on record: ${assumed.map(W.wdm).join(', ')}. Two days on, a missed date counts as skipped and the next takes over.</p>`);
+  const L=ND.score&&ND.score.ledger&&ND.score.ledger[h];
+  if(L&&L.length){const sc=L.filter(e=>e.verdict==='hit'||e.verdict==='miss'),hit=sc.filter(e=>e.verdict==='hit').length;
+    b.push(`<h3>How its dates have done</h3><p>${sc.length?`${hit} of ${sc.length} landed inside their window${ND.score.sinceLabel?' since '+esc(ND.score.sinceLabel):''}.`:'None scored yet.'}</p><ul class="rl">`+L.slice().reverse().filter((e,i,a)=>!i||e.slot!==a[i-1].slot||e.verdict!==a[i-1].verdict).slice(0,6).map(e=>`<li>${esc(slotLab(e.slot))} <span>${esc(verdictWords(e))}</span></li>`).join('')+'</ul>')}
+  if(c.site)b.push(`<p><a href="${esc(c.site)}" target="_blank" rel="noopener">Where ${esc(sub?SUB_RE.exec(h)[1]:h)} publishes first ↗</a></p>`);
+  return b.join('');
+}
+
+/* ---- the record: np-score's report, as built ---- */
+function record(){
+  const S=ND.score;if(!S||!S.overall){$('#rec').hidden=true;return}
+  const o=S.overall;
+  $('#rec-d').textContent=`Since ${S.sinceLabel||'September'} the site has logged each pollster’s next date before it came. ${o.h} of ${o.n} landed inside their window, and ${o.err===0?'at least half came out on the very day projected':'the median miss, from the window’s centre to the day the poll came out, was '+(o.err===1?'one day':W.num(o.err)+' days')}.${o.rolledN?` Of the dates moved on by a confirmed skip, ${o.rolledH} of ${o.rolledN} landed too.`:''}`;
+  const rows=Object.entries(S.houses).filter(([,v])=>v.prim||v.rolled).sort((x,y)=>((y[1].prim||[0,0])[1]-(x[1].prim||[0,0])[1])||x[0].localeCompare(y[0]));
+  const fr=v=>v?`${v[0]} of ${v[1]}`:'–';
+  $('#rec-t').innerHTML=`<thead><tr><th>Pollster</th><th>Landed</th><th>Median miss</th><th>After a skip</th></tr></thead><tbody>${rows.map(([h,v])=>`<tr><td>${esc(h)}</td><td>${fr(v.prim)}</td><td>${v.err==null?'–':v.err===1?'1 day':v.err+' days'}</td><td>${fr(v.rolled)}</td></tr>`).join('')}</tbody>`;
+  $('#rec-n').textContent='A weekly pollster’s window is its one day, a monthly one’s can run a fortnight, so how often each lands doesn’t compare across pollsters. The median miss does.';
+}
+
+/* ---- drawing, and redrawing as the clock and the width move ---- */
+function measure(){const st=$('#rows .rw .st')||$('#rows .axis .st');return st?Math.round(st.getBoundingClientRect().width):0}
+function render(){
+  PR=project();
+  const c=W.copy(PR.P,ND.score);
+  $('#head').textContent=c.head;$('#dek').textContent=c.dek;
+  $('#agenda').innerHTML=agenda(PR);
+  if(!SW)SW=600;
+  $('#rows').innerHTML=rhythms(PR);
+  const w=measure();if(w&&Math.abs(w-SW)>1){SW=w;$('#rows').innerHTML=rhythms(PR)}
+}
+$('#rows').addEventListener('click',e=>{const b=e.target.closest('.rw>button');if(!b)return;const h=b.dataset.h,on=OPEN!==h;
+  if(OPEN&&OPEN!==h){const o=document.getElementById(idOf(OPEN));if(o){o.querySelector('button').setAttribute('aria-expanded','false');const d=o.querySelector('.det');d.hidden=true;d.innerHTML=''}}
+  OPEN=on?h:null;const li=b.parentElement,d=li.querySelector('.det');b.setAttribute('aria-expanded',String(on));
+  if(on){const sub=li.classList.contains('subr'),rows=[...PR.P.rows,...PR.S.rows].filter(r=>r.pollster===h);d.innerHTML=detail(h,rows,CAD.get(h)||rows[0],PR,sub);d.hidden=false}else{d.hidden=true;d.innerHTML=''}});
+let rt=0;new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(()=>{const w=measure();if(w&&Math.abs(w-SW)>1){SW=w;$('#rows').innerHTML=rhythms(PR)}},80)}).observe($('#rows'));
+record();render();
+setInterval(render,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+/* the menu */
+const burger=$('#burger'),menu=$('#menu'),nav=$('#nav');
+const setMenu=o=>{menu.hidden=!o;burger.setAttribute('aria-expanded',String(o));nav.classList.toggle('open',o);document.documentElement.style.overflow=o?'hidden':''};
+burger.addEventListener('click',()=>setMenu(menu.hidden));
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){setMenu(false);burger.focus()}});
+}
+</script>
+</body>
+</html>

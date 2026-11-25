@@ -31,6 +31,46 @@ export function flowTotals(D) {
   };
 }
 
+/* np-score's record of the projection, read from the report it regenerates every day
+   (data/np-report.md). Importing the scorer is no way in: loading it runs its CLI, which appends
+   to the ledger it reads. Returns null when the report is missing or its overall line has
+   changed shape, and the page then leaves its record out (test-dawn notices first). */
+export function readScore(file) {
+  if (!fs.existsSync(file)) return null;
+  const md = fs.readFileSync(file, "utf8");
+  const ov = md.match(/\*\*Overall: (\d+)\/(\d+) \((\d+)%\) primary · median midpoint error ([\d.]+)d · (\d+)\/(\d+) rolled · (\d+) skip · (\d+) void · (\d+) pending\*\*/);
+  if (!ov) return null;
+  const sect = (h) => ((md.split("\n## " + h)[1] || "").split("\n## ")[0]);
+  const cells = (line) => line.split("|").slice(1, -1).map((c) => c.trim());
+  const frac = (c) => { const m = /^(\d+)\/(\d+)/.exec(c); return m ? [+m[1], +m[2]] : null; };
+  const n0 = (c) => (c === "–" || c === "" ? 0 : +c);
+  const houses = {};
+  for (const line of sect("Hit rate").split("\n")) {
+    if (!line.startsWith("|")) continue;
+    const c = cells(line);
+    if (c.length !== 6 || c[0] === "house" || /^-+$/.test(c[0])) continue;
+    houses[c[0]] = { prim: frac(c[1]), err: c[2] === "–" ? null : parseFloat(c[2]), rolled: frac(c[3]), skip: n0(c[4]), void: n0(c[5]) };
+  }
+  const ledger = {};
+  let since = null;
+  for (const line of sect("Ledger").split("\n")) {
+    if (!line.startsWith("|")) continue;
+    const c = cells(line);
+    if (c.length !== 6 || c[0].startsWith("logged") || /^-+$/.test(c[0])) continue;
+    const i = c[5].indexOf(" - ");
+    (ledger[c[1]] ||= []).push({ logged: c[0], slot: c[2], window: c[3], rolled: c[4] === "yes",
+      verdict: (i < 0 ? c[5] : c[5].slice(0, i)).trim(), note: i < 0 ? "" : c[5].slice(i + 3).trim() });
+    const d = c[0].slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d) && (!since || d < since)) since = d;
+  }
+  const [, sm, sd] = (since || "").split("-").map(Number);
+  return {
+    overall: { h: +ov[1], n: +ov[2], rate: +ov[3], err: +ov[4], rolledH: +ov[5], rolledN: +ov[6], skip: +ov[7], void: +ov[8], pending: +ov[9] },
+    houses, ledger, since, sinceLabel: since ? sd + " " + MONF[sm - 1] : null,
+    lastRun: (md.match(/^Last run: (.+)$/m) || [])[1] || null,
+  };
+}
+
 export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path.join(root, ".build", "newtracker", "assets"),
                             keep = () => false, write = (f, s) => fs.writeFileSync(f, s) } = {}) {
   const D = JSON.parse(fs.readFileSync(path.join(assets, "dawn-data.json"), "utf8"));
@@ -95,7 +135,26 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     pollsFile = path.join(out, "polls", "index.html");
     write(pollsFile, ph);
   }
-  return { polls: pollsFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+  /* the next-polls page (template-next.html): the site's projection, np-project.js, runs in the
+     page on the reader's own Sydney clock and next-copy.js words it; the page carries the cadence
+     table, the houses' release dates and np-score's record of how the dates have done */
+  const nextPath = path.join(assets, "dawn-next.json"), npPath = path.join(assets, "np-project.js");
+  let nextFile = null;
+  if (fs.existsSync(nextPath) && fs.existsSync(npPath)) {
+    const ND = JSON.parse(fs.readFileSync(nextPath, "utf8"));
+    ND.score = readScore(path.join(root, "data", "np-report.md"));
+    const js = (f) => fs.readFileSync(f, "utf8").replace(/<\/script/gi, "<\\/script");
+    let nh = fs.readFileSync(path.join(HERE, "template-next.html"), "utf8")
+      .replace(/\{\{FONT\}\}/g, "/assets/fonts/" + font)
+      .replace("{{NEXT}}", () => JSON.stringify(ND).replace(/</g, "\\u003c"));
+    const leftN = nh.replace("/*{{NPPROJECT}}*/", "").replace("/*{{NEXTCOPY}}*/", "").match(/\{\{[A-Za-z]+\}\}/);
+    if (leftN) throw new Error("dawn: next template placeholder left unfilled: " + leftN[0]);
+    nh = nh.replace("/*{{NPPROJECT}}*/", () => js(npPath)).replace("/*{{NEXTCOPY}}*/", () => js(path.join(HERE, "next-copy.js")));
+    fs.mkdirSync(path.join(out, "next"), { recursive: true });
+    nextFile = path.join(out, "next", "index.html");
+    write(nextFile, nh);
+  }
+  return { polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

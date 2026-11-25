@@ -4,15 +4,20 @@
    2. every branch of the copy rules (copy.mjs) on mutated data, so a head
       can only claim what clears its margin;
    3. the built page: every placeholder filled, its data parses, its past
-      terms' sidecar is on disk, the heads are today's rules.
+      terms' sidecar is on disk, the heads are today's rules;
+   4. the next-polls page: the site's projection (np-project.js) and its words
+      (next-copy.js) evaluated together on mocked Sydney clocks across the
+      coming weeks, every head on its rule, and the branches no schedule this
+      year reaches on hand-built rows; np-score's report read whole.
    Run: node .build/test-dawn.mjs */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor } from "./dawn/copy.mjs";
-import { buildDawn, flowTotals } from "./dawn/build.mjs";
+import { buildDawn, flowTotals, readScore } from "./dawn/build.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "..");
 const A = path.join(HERE, "newtracker", "assets");
@@ -112,6 +117,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const font = fs.readdirSync(path.join(ROOT, "assets", "fonts")).find((f) => /^commissioner-latin\./.test(f));
   ok(!!font, "the site serves the face the page asks for");
   fs.copyFileSync(path.join(ROOT, "assets", "fonts", font), path.join(tmp, "assets", "fonts", font));
+  fs.mkdirSync(path.join(tmp, "data"), { recursive: true });
+  if (fs.existsSync(path.join(ROOT, "data", "np-report.md"))) fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
   const r = buildDawn({ root: tmp, assets: A });
   const html = fs.readFileSync(r.file, "utf8");
   ok(!/\{\{[A-Za-z]+\}\}|\/\*\{\{STARS\}\}\*\//.test(html), "every placeholder filled");
@@ -140,15 +147,77 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/href="\.\.\/#votes"/.test(ph), "the polls page leads back to the votes pages");
   /* the pages point inside dawn/ but for the favicon and the face: a site
      asset renamed by a commit made without this page would tear the tree */
-  const outside = [html, ph].flatMap((h) => [...h.matchAll(/(?:href|src)="(\/[^"]*)"/g)].map((m) => m[1]))
+  ok(!!r.next && fs.existsSync(r.next), "the next-polls page is built");
+  const nh = fs.readFileSync(r.next, "utf8");
+  ok(!/\{\{[A-Za-z]+\}\}/.test(nh), "every next-page placeholder filled");
+  ok(/window\.AP\.nextPolls\s*=\s*npProject/.test(nh) && /AP\.nextWords\s*=/.test(nh), "the site's projection and its words, inlined");
+  const NX = JSON.parse(nh.match(/<script id="next-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  ok(NX.pollCadence.length >= 5 && NX.pollCadence.every((c) => c.tracked !== "confidence"), "every house on a pattern, the confidence gauges left out");
+  ok(!!NX.score && NX.score.overall.n > 0, "np-score's record rides along");
+  ok(/href="\.\.\/next\/"/.test(ph) && /href="\.\.\/polls\/"/.test(nh) && /href="next\/"/.test(html), "the two polls pages link each other, and the menu reaches it");
+  const outside = [html, ph, nh].flatMap((h) => [...h.matchAll(/(?:href|src)="(\/[^"]*)"/g)].map((m) => m[1]))
     .filter((u) => u !== "/assets/favicon.svg" && u !== `/assets/fonts/${font}`);
   eq(outside.length, 0, "every local reference stays inside dawn/ " + outside.join(", "));
   ok(/class="logo"/.test(html) && /class="logo"/.test(ph) && /\.nav:not\(\.over\) \.logo\{/.test(html), "the mark's sun, shown once the hero has gone");
   fs.rmSync(tmp, { recursive: true, force: true });
+}
+/* ---- 4. the next-polls page: the projection and its words on mocked clocks -------- */
+{
+  const ND = JSON.parse(fs.readFileSync(path.join(A, "dawn-next.json"), "utf8"));
+  const ctx = vm.createContext({ Intl, console });
+  ctx.window = ctx;
+  ctx.AP = { D: { pollCadence: ND.pollCadence, subCadence: ND.subCadence } };
+  vm.runInContext(fs.readFileSync(path.join(A, "np-project.js"), "utf8"), ctx, { filename: "np-project.js" });
+  vm.runInContext(fs.readFileSync(path.join(HERE, "dawn", "next-copy.js"), "utf8"), ctx, { filename: "next-copy.js" });
+  const W = ctx.AP.nextWords, DAY = 86400000;
+  const score = readScore(path.join(ROOT, "data", "np-report.md"));
+  if (fs.existsSync(path.join(ROOT, "data", "np-report.md"))) {
+    ok(!!score, "np-score's report reads: its overall line has the shape the reader expects");
+    ok(score.overall.n >= score.overall.h && Object.keys(score.houses).length > 0 && Object.keys(score.ledger).length > 0 && !!score.sinceLabel, "its houses, its ledger and when it began");
+  }
+  const RULE = {
+    today: /^.+ (is|are) due (tonight|this afternoon|this morning|today)$/,
+    notout: /^.+ (was due today and isn’t out yet|were due today and aren’t out yet)$/,
+    late: /^.+ (is|are) (a day |\w+ days )?late$/,
+    next: /^.+ (is|are) due (tomorrow|on (Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day|on \d{1,2} [A-Z][a-z]+)$/,
+    window: /^(.+ is expected \d{1,2}[–\d ]*[A-Z][a-z]+.*|.+’s window is open)$/,
+    summer: /^Polls return after the summer break$/,
+    none: /^No polls are scheduled$/,
+  };
+  /* sweep the coming eleven weeks at four times of day, the clock as the page reads it (Sydney) */
+  const today = Date.UTC(...new Date().toISOString().slice(0, 10).split("-").map((v, i) => +v - (i === 1 ? 1 : 0)));
+  const seen = {};
+  for (let d = 0; d < 77; d++) for (const mins of [6 * 60, 12 * 60 + 30, 19 * 60, 22 * 60 + 30]) {
+    const proj = ctx.AP.nextPolls({ day: today + d * DAY, mins }, { horizonDays: 49, includeTracked: true });
+    const c = W.copy(proj, score);
+    assert.ok(RULE[c.kind] && RULE[c.kind].test(c.head), `head off its rule (${c.kind}): ${c.head}`);
+    assert.ok(/next four weeks/.test(c.dek), "the dek counts the four weeks: " + c.dek);
+    assert.ok(!proj.rows.filter((r) => r.tracked).some((r) => c.lead.includes(r.pollster)), "no direction or issues survey is ever the next poll");
+    (seen[c.kind] ||= c.head);
+  }
+  n++;
+  for (const k of ["today", "next", "summer"]) ok(!!seen[k], `the sweep reaches the ${k} head (${Object.keys(seen).join(", ")})`);
+  ok(!!(seen.late || seen.notout), "the sweep reaches a slot passed with no poll on record");
+  /* the branches no schedule this year need reach, on hand-built rows */
+  const T = today, row = (o) => ({ ahead: 0, loose: false, overdue: false, missed: false, inDays: 0, release: T, spread: 0, winHalf: 0, opensIn: 0, closesIn: 0, cadence: 14, ...o });
+  const C = (rows) => W.copy({ rows, t0: T, nowMs: T + 9 * 3600000 }, null);
+  eq(C([row({ pollster: "A", releaseFrom: 19 * 60, releaseTo: 20 * 60 }), row({ pollster: "B", releaseFrom: 18 * 60, releaseTo: 18 * 60 })]).head, "A and B are due tonight", "two due tonight");
+  eq(C([row({ pollster: "A", releaseFrom: 9 * 60, releaseTo: 10 * 60 }), row({ pollster: "B", releaseFrom: 18 * 60, releaseTo: 18 * 60 })]).head, "A and B are due today", "hours that straddle the day: today");
+  eq(C([row({ pollster: "A" })]).head, "A is due today", "an untimed house: today");
+  eq(C([row({ pollster: "A", overdue: true, releaseFrom: 480, releaseTo: 480 })]).head, "A was due today and isn’t out yet", "its hour passed");
+  eq(C([row({ pollster: "A", inDays: -1, overdue: true, missed: true, release: T - DAY }), row({ pollster: "B", inDays: -2, overdue: true, release: T - 2 * DAY })]).head, "A and B are late", "late by different days");
+  eq(C([row({ pollster: "A", inDays: 3, release: T + 3 * DAY })]).head, "A is due on " + W.WDF[new Date(T + 3 * DAY).getUTCDay()], "inside the week: the weekday");
+  eq(C([row({ pollster: "A", inDays: 12, release: T + 12 * DAY })]).head, "A is due on " + W.dmf(T + 12 * DAY), "further out: the date");
+  eq(C([row({ pollster: "A", loose: true, inDays: 9, release: T + 9 * DAY, spread: 4, opensIn: 5, closesIn: 13 })]).head, "A is expected " + W.spanF(T + 5 * DAY, T + 13 * DAY), "a window ahead");
+  eq(C([row({ pollster: "A", loose: true, inDays: 2, release: T + 2 * DAY, spread: 4, opensIn: -2, closesIn: 6 })]).head, "A’s window is open", "a window open");
+  eq(C([row({ pollster: "A", loose: true, summer: true, inDays: 40, release: T + 40 * DAY, spread: 11, opensIn: 29, closesIn: 51 })]).head, "Polls return after the summer break", "the summer break");
+  eq(C([]).head, "No polls are scheduled", "nothing on the schedule");
+  eq(C([row({ pollster: "A", tracked: "direction", inDays: 1, release: T + DAY }), row({ pollster: "B", inDays: 5, release: T + 5 * DAY })]).lead.join(), "B", "a direction survey is no next poll");
+  eq(C([row({ pollster: "A" }), row({ pollster: "B" }), row({ pollster: "C" }), row({ pollster: "D" })]).head, "Four polls are due today", "four or more are counted");
 }
 /* linked from nowhere */
 {
   const hits = ["index.html", "info/index.html", "allpolls/index.html"].filter((f) => fs.existsSync(path.join(ROOT, f)) && /href="\/?dawn\//.test(fs.readFileSync(path.join(ROOT, f), "utf8")));
   eq(hits.length, 0, "no page links /dawn/");
 }
-console.log(`PASS: dawn – ${n} checks: data ends on the site's figures, every copy branch, the built page`);
+console.log(`PASS: dawn – ${n} checks: data ends on the site's figures, every copy branch, the built pages, the next polls on mocked clocks`);
