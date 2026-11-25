@@ -1,32 +1,16 @@
 {
-  "generatedAt": "2026-11-25T01:54:53.747Z",
+  "generatedAt": "2026-11-25T02:21:13.007Z",
   "horizon": "2025-09-29",
-  "retro": [],
-  "added": [
+  "retro": [
     {
-      "csvWave": "2026-11-25",
-      "tppWave": "2026-11-25",
-      "row": {
-        "date": "2026-11-24",
-        "published": "2026-11-26T01:00",
-        "dateStart": "2026-11-19",
-        "pollster": "Essential",
-        "client": "The Guardian",
-        "sample": null,
-        "alp": 26,
-        "lnp": 25,
-        "grn": 13,
-        "onp": 26,
-        "ind": 5,
-        "undecidedIn": 5,
-        "oth": null,
-        "tpp_alp": 45,
-        "tpp_lnp": 51,
-        "releaseUrl": "https://essentialreport.com.au/reports/25th-november-2026",
-        "assimilated": true
-      }
+      "date": "2026-11-24",
+      "fixes": [
+        "url https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
+        "published 2026-11-25T01:00 (Guardian's datePublished; replaces synthetic 2026-11-26T01:00)"
+      ]
     }
   ],
+  "added": [],
   "addedAppr": [],
   "addedDir": [],
   "healedApproval": [],
@@ -42,7 +26,8 @@
     "2026-07-28",
     "2026-09-01",
     "2026-09-30",
-    "2026-10-28"
+    "2026-10-28",
+    "2026-11-25"
   ],
   "skippedFigureDup": [
     {
