@@ -130,7 +130,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   /* ---- one entry per pollster ------------------------------------------- */
   const byP = new Map();
-  D.pollsterTable.forEach((r) => byP.set(r.pollster, { poll: r, proj: [] }));
+  const latestRows = facet === "leadership" ? D.pollsterTable.map((r) => r.leadershipLatest || r) : D.pollsterTable;
+  latestRows.forEach((r) => byP.set(r.pollster, { poll: r, proj: [] }));
   proj.rows.forEach((r, i) => {
     if (!byP.has(r.pollster)) {
       const last = D.individualPolls.filter((q) => q.pollster === r.pollster)

@@ -2683,32 +2683,43 @@ for (const p of POLLS)
    three national-mood-only waves of May–Aug 2025 (its VI series paused
    between the election and the 2025-09-30 wave) join by the same rule.
    Shaped like an individualPolls row, with empty stubs where the wave
-   measured nothing (p / appr), so the views' per-row readers never
-   special-case them; the facet itself keeps them out of the voting and
-   leadership tabs. */
-const directionOnlyPolls = DIR
-  .filter((d) => MONTH_SET.has(ymOf(d.date)))
-  .filter((d) => !POLL_BY_KEY.has(d.date + "|" + d.pollster))
-  .map((d) => {
-    const ym = ymOf(d.date), fym = d.dateStart ? ymOf(d.dateStart) : null;
-    const field = fwLabel(d.dateStart, d.date);
-    return {
-      ym, x: mx(ym) + (dayOf(d.date) - 15) / 365, day: dayOf(d.date),
-      pollster: d.pollster,
-      ...(fym != null && fym !== ym ? { fym } : {}),
-      field, dateLabel: field, released: d.date, sample: d.sample ?? null,
-      ...(d.dateStart ? { fmid: fmidIso(d.dateStart, d.date) } : {}),
-      ...(d.url ? { url: d.url } : {}),
-      ...(d.published ? { published: d.published } : {}),
-      ...(d.methodUrl ? { methodUrl: d.methodUrl } : {}),
-      // SEC Newgate's APC statements file an effective sample; carried like a poll row's
-      ...(d.sampleEff != null ? { sampleEff: d.sampleEff } : {}),
-      client: CLIENT_BY_HOUSE.get(d.pollster) || "Self-published",
-      p: {}, appr: {}, chg: null,
-      dir: DIR_BY.get(d.date + "|" + d.pollster),
-    };
-  })
-  .sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
+   measured nothing (p / appr), and merged by house+date so one report can
+   carry both mood and ratings. Preferred-PM enrichment is applied after
+   its helper definitions below. The historic dataset key stays for consumers;
+   the facets include each supplemental row only for measures it owns. */
+const auxiliaryWaves = new Map();
+for (const d of DIR) {
+  if (d.date < ELECTION.date || POLL_BY_KEY.has(d.date + "|" + d.pollster)) continue;
+  const w = auxiliaryWaves.get(d.date + "|" + d.pollster) || { date: d.date, pollster: d.pollster };
+  w.direction = d;
+  auxiliaryWaves.set(d.date + "|" + d.pollster, w);
+}
+for (const a of APPR_BY.values()) {
+  if (a.date < ELECTION.date || POLL_BY_KEY.has(a.date + "|" + a.firm)) continue;
+  const w = auxiliaryWaves.get(a.date + "|" + a.firm) || { date: a.date, pollster: a.firm };
+  w.approval = a;
+  auxiliaryWaves.set(a.date + "|" + a.firm, w);
+}
+const directionOnlyPolls = [...auxiliaryWaves.values()].map((w) => {
+  const d = w.direction || {}, a = w.approval || {};
+  const ym = ymOf(w.date), fym = d.dateStart ? ymOf(d.dateStart) : null;
+  const field = fwLabel(d.dateStart, w.date);
+  const meta = Object.keys(d).length ? d : a;
+  return {
+    ym, x: mx(ym) + (dayOf(w.date) - 15) / 365, day: dayOf(w.date),
+    pollster: w.pollster,
+    ...(fym != null && fym !== ym ? { fym } : {}),
+    field, dateLabel: field, released: w.date, sample: d.sample ?? a.sample ?? null,
+    ...(d.dateStart ? { fmid: fmidIso(d.dateStart, w.date) } : {}),
+    ...(meta.url ? { url: meta.url } : {}),
+    ...(meta.published ? { published: meta.published } : {}),
+    ...(meta.methodUrl ? { methodUrl: meta.methodUrl } : {}),
+    ...(d.sampleEff != null ? { sampleEff: d.sampleEff } : {}),
+    client: CLIENT_BY_HOUSE.get(w.pollster) || "Self-published",
+    p: {}, appr: buildAppr(w.date, w.pollster), chg: null,
+    ...(d.right != null ? { dir: DIR_BY.get(w.date + "|" + w.pollster) } : {}),
+  };
+}).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
 /* ---- 5dh. national direction BACK HISTORY, one house at a time ----------
    data/direction-history.json (rebuilt by .build/backfill-direction-history.mjs)
@@ -3741,6 +3752,7 @@ function buildPpm(date, firm) {
   if (h2) sets.push({ alb: h2.alb, hanson: h2.han, unc: Math.max(0, 100 - h2.alb - h2.han) });
   return sets.length > 1 ? { ppmSets: sets } : { ppm: sets[0] };
 }
+for (const p of directionOnlyPolls) Object.assign(p, buildPpm(p.released, p.pollster));
 function buildAppr(date, firm) {
   const a = APPR_BY.get(date + "|" + firm);
   if (!a) return { alb: null, taylor: null, hanson: null, albNet: null, taylorNet: null, hansonNet: null, oppName: null, metric: null, ...(JUR ? { who: whoAt(date) } : {}) };
@@ -5581,6 +5593,32 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(p.seats ? { seats: seatsOut(p.seats) } : {}),
   };
 }).sort((a, b) => b.released.localeCompare(a.released));
+
+/* Leadership's Latest card may come from a report that measured no VI. It
+   replaces only that measure's row; primaries and 2PP keep the latest vote
+   release rather than showing a dash-only card against a newer date. */
+const hasLeadReading = (p) => ["albNet", "taylorNet", "hansonNet"].some((k) => p.appr?.[k] != null) || !!p.ppm || !!p.ppmSets;
+const latestAuxLead = new Map();
+for (const p of directionOnlyPolls) {
+  if (!hasLeadReading(p) || (latestMs - Date.parse(p.released)) / 86400000 > LATEST_WINDOW_DAYS) continue;
+  const house = canon(p.pollster), prev = latestAuxLead.get(house);
+  if (!prev || prev.released < p.released) latestAuxLead.set(house, p);
+}
+for (const p of pollsterTable) {
+  const q = latestAuxLead.get(canon(p.pollster));
+  if (!q || q.released < p.released) continue;
+  const date = new Date(q.released + "T00:00:00Z"), day = date.getUTCDate();
+  p.leadershipLatest = {
+    pollster: q.pollster, client: q.client, field: q.field, released: q.released,
+    releasedLabel: `${day} ${monthName(date.getUTCMonth() + 1)}`,
+    published: q.published, pubSort: q.published || q.released,
+    ...(q.published ? { publishedLabel: `${dayOf(q.published)} ${monthName(Number(q.published.slice(5, 7)))}` } : {}),
+    sample: q.sample ?? null, p: {}, appr: q.appr,
+    ...(q.ppm ? { ppm: q.ppm } : {}), ...(q.ppmSets ? { ppmSets: q.ppmSets } : {}),
+    ...(q.dir ? { dir: q.dir } : {}), ...(q.url ? { url: q.url } : {}),
+    ...(q.methodUrl ? { methodUrl: q.methodUrl } : {}), links: q.links || [], chg: null,
+  };
+}
 
 /* ---- 7b. headline 2PP – trailing 21d, 7d half-life, debiased ----------- */
 const headlineTpp = (ref) => {
@@ -9300,7 +9338,8 @@ const LDM = JUR ? null : (() => {
   const T0 = Date.now();
   const DAYn = (iso) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000);
   const ISOd = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
-  const t1 = DAYn(LATEST_ISO);
+  // A leadership-only release can postdate the newest voting-intention row.
+  const t1 = DAYn([...apprAgg, ...ppm].reduce((m, r) => r.date > m ? r.date : m, LATEST_ISO));
   const ELEC_DAYS = Object.values(ELECTIONS).map((e) => e && e.date).filter(Boolean).map(DAYn);
   const PARTY_OF = { Whitlam: "alp", Hayden: "alp", Hawke: "alp", Keating: "alp", Beazley: "alp", Crean: "alp", Latham: "alp", Rudd: "alp", Gillard: "alp", Shorten: "alp", Albanese: "alp",
     Gorton: "lnp", McMahon: "lnp", Snedden: "lnp", Fraser: "lnp", Peacock: "lnp", Howard: "lnp", Hewson: "lnp", Downer: "lnp", Nelson: "lnp", Turnbull: "lnp", Abbott: "lnp", Morrison: "lnp", Dutton: "lnp", Ley: "lnp", Taylor: "lnp", Hanson: "onp" };

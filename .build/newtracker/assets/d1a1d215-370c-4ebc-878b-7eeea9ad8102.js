@@ -6253,7 +6253,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
            house's rows exist only on the direction facet (an issues-only one
            likewise on the issues facet), so its selection is stale anywhere
            else */
-        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : view === "confidence" ? housesConf : houses;
+        const known = view === "direction" || view === "leadership" ? housesDir : view === "issues" ? housesIss : view === "confidence" ? housesConf : houses;
         return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter((h) => known.includes(h));
       })(),
       has: (() => {
@@ -6454,20 +6454,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const toggleHouse = (h) => React.startTransition(() => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; }));
 
-  /* The direction-only rows land here (why/what they are is at dirOnlyAll
-     above): every count, panel option and filter below derives from this
-     one merged list, so a SEC Newgate wave is rankable, searchable and
-     self-scoping on its facet and invisible everywhere else. The
-     confidence facet is the one that REPLACES the row set rather than
-     adding to it: its release rows share no month with a poll because
-     they live beside none – a release is a gauge's own event, and every
-     column it doesn't borrow from the poll world is empty by design. The
-     build is memoised – it composes every row's lean, tags and search
-     haystack, and the filter pipeline below keys its own memo on the
-     result's identity, so the rows rebuild when an input moves, never on
-     a keystroke. */
+  /* Auxiliary-measure rows merge only into facets whose fields they own:
+     direction waves there, leadership waves under Leadership, never a
+     stand-in primary/2PP row because no such question was asked. */
   const rows = React.useMemo(() => {
-    const dirOnly = facet === "direction" ? dirOnlyAll
+    const dirOnly = facet === "direction" ? dirOnlyAll.filter((p) => p.dir)
+      : facet === "leadership" ? dirOnlyAll.filter((p) => p.appr && ["albNet", "taylorNet", "hansonNet"].some((k) => p.appr[k] != null) || p.ppm || p.ppmSets)
       : facet === "issues" ? dirOnlyAll.filter((p) => p.iss) : [];
     const issOnly = facet === "issues" ? issOnlyAll : [];
     const confOnly = facet === "confidence"
@@ -6579,7 +6571,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll, confBus]);
   const housesV = facet === "issues" ? housesIss
     : (facet === "confidence" && confOnlyAll.length) ? housesConf
-    : (facet === "direction" && dirOnlyAll.length) ? housesDir : houses;
+    : ((facet === "direction" || facet === "leadership") && dirOnlyAll.length) ? housesDir : houses;
 
   // only offer tag filters for data types actually present in the archive, so
   // e.g. "3PP" appears as a chip only once a three-cornered poll exists

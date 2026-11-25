@@ -4846,7 +4846,8 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       default: return 0;
     }
   };
-  const rows = [...D.pollsterTable].sort((a, b) => {
+  const latestRows = facet === "leadership" ? D.pollsterTable.map((r) => r.leadershipLatest || r) : D.pollsterTable;
+  const rows = [...latestRows].sort((a, b) => {
     const va = getVal(a, sort.key), vb = getVal(b, sort.key);
     if (va < vb) return -sort.dir;
     if (va > vb) return sort.dir;
@@ -4855,7 +4856,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   // range by when polls came OUT, matching the Published column - `released`
   // (fieldwork end) lags publication by a day for next-day houses (Roy Morgan)
-  const newest = [...D.pollsterTable].sort((a, b) => b.pubSort.localeCompare(a.pubSort));
+  const newest = [...latestRows].sort((a, b) => b.pubSort.localeCompare(a.pubSort));
   const fmtWin = (iso) => {
     const [, m, d] = iso.slice(0, 10).split("-").map(Number);
     return `${d} ${D.monthNameFull(m)}`;

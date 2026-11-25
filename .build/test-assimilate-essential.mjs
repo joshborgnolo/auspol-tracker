@@ -14,7 +14,7 @@ const HEADER = "dataset,question_id,question,visual,answer,dimension,key,date,va
 const row = (dataset, question_id, question, answer, value, date = "2026-11-25") =>
   `${dataset},${question_id},${question},${question.endsWith("Vote+") || question === "2PP+" ? "Overall" : "Trend"},${answer},,,${date},${value},`;
 
-function fixture(extraRows = []) {
+function fixture(extraRows = [], { mood = true } = {}) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "essential-assimilate-"));
   fs.mkdirSync(path.join(cwd, "data"), { recursive: true });
   fs.mkdirSync(path.join(cwd, ".build", "essential-src"), { recursive: true });
@@ -36,7 +36,7 @@ function fixture(extraRows = []) {
     row("national_mood", "E563", "National mood (Trend)", "Unsure", 16),
     ...extraRows,
   ];
-  fs.writeFileSync(path.join(cwd, "data", "essential-report.csv"), [HEADER, ...csvRows].join("\n") + "\n");
+  fs.writeFileSync(path.join(cwd, "data", "essential-report.csv"), [HEADER, ...csvRows.filter((r) => mood || !r.startsWith("national_mood,"))].join("\n") + "\n");
   fs.writeFileSync(path.join(cwd, ".build", "essential-src", "report-index.json"), JSON.stringify({
     "2026-11-24": "https://essentialreport.com.au/reports/25th-november-2026",
   }));
@@ -56,11 +56,13 @@ function run(cwd) {
   assert.equal(first.status.approval, 1, "a mood-and-approval-only wave files its leaders");
   assert.equal(first.status.direction, 1, "a mood-and-approval-only wave files national mood");
   assert.equal(first.status.changed, true);
-  const approval = first.data.approval.at(-1);
+  const { url: approvalUrl, published: approvalPublished, ...approval } = first.data.approval.at(-1);
   assert.deepEqual(approval, {
     date: "2026-11-24", firm: "Essential", alb: -28, opp: -7, oppName: "Taylor", han: null,
     detail: { alb: { app: 32, dis: 60 }, opp: { app: 35, dis: 42 } },
   });
+  assert.equal(approvalUrl, "https://essentialreport.com.au/reports/25th-november-2026");
+  assert.ok(approvalPublished == null || approvalPublished === "2026-11-26T01:00");
   const { published, ...direction } = first.data.direction.at(-1);
   assert.deepEqual(direction, {
     date: "2026-11-24", dateStart: "2026-11-19", pollster: "Essential", right: 24, wrong: 60, unsure: 16,
@@ -69,6 +71,18 @@ function run(cwd) {
   assert.ok(published == null || published === "2026-11-26T01:00", "the embargoed stamp is withheld or exact");
   assert.equal(first.data.polls.length, 1, "no poll row is invented without primaries");
   assert.equal(run(cwd).status.changed, false, "a second run files no duplicates");
+  fs.rmSync(cwd, { recursive: true, force: true });
+}
+
+{
+  const cwd = fixture([], { mood: false });
+  const first = run(cwd);
+  assert.equal(first.status.approval, 1, "approval without VI or mood still files");
+  assert.equal(first.status.direction, 0);
+  const approval = first.data.approval.at(-1);
+  assert.equal(approval.url, "https://essentialreport.com.au/reports/25th-november-2026");
+  assert.ok(approval.published == null || approval.published === "2026-11-26T01:00");
+  assert.equal(run(cwd).status.changed, false, "the healed row is stable too");
   fs.rmSync(cwd, { recursive: true, force: true });
 }
 

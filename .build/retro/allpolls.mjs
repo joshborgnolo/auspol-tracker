@@ -221,7 +221,7 @@ export function retroData(dataset, { pages, built }) {
     return Object.keys(o).length ? o : null;
   };
 
-  const rows = P.map((p, i) => {
+  const factsOf = (p, i) => {
     const q = p.p || {};
     const pb = {
       lnp: p.alp != null && p.lnp != null ? [p.alp, p.lnp] : null,
@@ -264,7 +264,8 @@ export function retroData(dataset, { pages, built }) {
     if (p.alpImp == null || p.alpOnImp == null) r.none = none;
     for (const k of ["lnp", "on"]) if (r.me[k] != null) r.me[k] = +r.me[k].toFixed(3);
     return r;
-  });
+  };
+  const rows = P.map(factsOf);
 
   /* the waves that ask no voting question - SEC Newgate's direction readings
      (with its concerns and best party on the cost of living) and Ipsos's
@@ -272,7 +273,7 @@ export function retroData(dataset, { pages, built }) {
      facets add them; and the economic gauges' releases are the Confidence
      tab's rows instead of polls, each in its consumer or business lane.
      Their indices run on from the polls' so a row is always one row */
-  const xrows = [...dirOnly, ...issuesOnly].map((p, j) => ({ ...base(p, P.length + j), dir: dirOf(p), iss: issOf(p) }));
+  const xrows = [...dirOnly, ...issuesOnly].map((p, j) => factsOf(p, P.length + j));
   const crows = confAll.filter((p) => p.conf).map((p, j) => {
     const c = p.conf;
     return { ...base(p, P.length + xrows.length + j),

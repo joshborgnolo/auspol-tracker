@@ -479,6 +479,20 @@ for (const r of D.direction.filter((r) => r.pollster === "Essential")) {
   const truth = truthByWave.get(iso(Date.parse(r.date) + DAY))?.published;
   if (truth && truth !== r.published) { r.published = truth; correctedDir.push(r.date); }
 }
+// Standalone ratings need their own provenance too; they cannot borrow a
+// VI row's release or publication date that this wave never had.
+const healedApproval = [];
+for (const r of D.approval.filter((r) => r.firm === "Essential" && (r.url == null || r.published == null))) {
+  const csvWave = iso(Date.parse(r.date) + DAY);
+  if (near([...vi.keys()], csvWave)) continue;
+  const rel = releaseFor(csvWave);
+  if (!rel) continue;
+  let touchedRow = false;
+  if (r.url == null) { r.url = rel; touchedRow = true; }
+  const stamp = publishedFor(csvWave);
+  if (r.published == null && embargoed(stamp)) { r.published = stamp; touchedRow = true; }
+  if (touchedRow) healedApproval.push(r.date);
+}
 
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
 console.log(`VI waves in CSV: ${vi.size} (2PP waves: ${tppDates.length} · approval waves: alb ${appWaves.alb.size} / opp ${appWaves.opp.size} · mood waves: ${mood.size})`);
@@ -492,6 +506,7 @@ addedAppr.forEach((x) => console.log(`  + approval ${x.row.date} (csv ${x.csvWav
 addedDir.forEach((x) => console.log(`  + direction ${x.row.date} (csv ${x.csvWave}): right ${x.row.right} wrong ${x.row.wrong} unsure ${x.row.unsure}`));
 healedDir.forEach((d) => console.log(`  ~ direction ${d}: url + published`));
 correctedDir.forEach((d) => console.log(`  ~ direction ${d}: published corrected to the wave's Guardian stamp`));
+healedApproval.forEach((d) => console.log(`  ~ approval ${d}: url + published`));
 skippedFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} duplicates curated row ${x.matchesRow} (same figures)`));
 skippedApprFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} approval duplicates ${x.matchesRow} (same figures)`));
 skippedDirFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} direction duplicates ${x.matchesRow} (same figures)`));
@@ -499,7 +514,7 @@ skippedNullCore.forEach((x) => console.log(`  ! csv ${x.csvWave}: null core prim
 console.log(`skipped: ${skippedDateDup.length} date-dup, ${skippedFigureDup.length} figure-dup, ${skippedPreHorizon.length} at/before horizon ${horizon}, ${skippedNullCore.length} null-core refused`);
 console.log(`skipped approval: ${skippedApprDateDup.length} date-dup, ${skippedApprFigureDup.length} figure-dup · direction: ${skippedDirDateDup.length} date-dup, ${skippedDirFigureDup.length} figure-dup`);
 
-const touched = added.length + retro.length + addedAppr.length + addedDir.length + healedDir.length + correctedDir.length;
+const touched = added.length + retro.length + addedAppr.length + addedDir.length + healedDir.length + correctedDir.length + healedApproval.length;
 if (APPLY && touched) {
   const out = JSON.stringify(D, null, 2) + "\n";
   writeAtomic("data/polls.json", out);
@@ -509,7 +524,7 @@ if (APPLY && touched) {
   mkdirSync(".build/essential-src", { recursive: true });
   writeFileSync(".build/essential-src/assimilate-vi-proof.json", JSON.stringify({
     generatedAt: new Date().toISOString(), horizon, retro, added,
-    addedAppr, addedDir, skippedDateDup, skippedFigureDup, skippedPreHorizon, skippedNullCore,
+    addedAppr, addedDir, healedApproval, skippedDateDup, skippedFigureDup, skippedPreHorizon, skippedNullCore,
     skippedApprDateDup, skippedApprFigureDup, skippedDirDateDup, skippedDirFigureDup,
   }, null, 2) + "\n");
 }

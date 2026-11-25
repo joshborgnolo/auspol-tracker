@@ -278,4 +278,21 @@ for (const [label, rows] of [["All polls", A.individualPolls], ["Latest polls", 
   if (sep) assert.ok(!sep.links.some((l) => l.t.includes("running data series")), `${label}: older releases keep their old label`);
 }
 
+// ---- Auxiliary-measure waves feed their own facets, never VI ------------
+{
+  const ess = A.directionOnlyPolls.find((p) => p.pollster === "Essential" && p.released === "2026-11-24");
+  assert.deepEqual([ess.appr.albNet, ess.appr.taylorNet], [-28, -7]);
+  assert.deepEqual([ess.appr.alb.app, ess.appr.alb.dis, ess.appr.taylor.app, ess.appr.taylor.dis], [32, 60, 35, 42]);
+  assert.equal(ess.dir.right, 24);
+  assert.ok(ess.url && ess.published, "a standalone approval/mood release keeps its provenance");
+  assert.ok(!A.individualPolls.some((p) => p.pollster === "Essential" && p.released === ess.released), "no duplicate phantom-VI row");
+  const latest = A.pollsterTable.find((p) => p.pollster === "Essential");
+  assert.deepEqual([latest.released, latest.leadershipLatest.released], ["2026-10-27", "2026-11-24"], "Latest follows the measure instead of replacing VI");
+  assert.equal(A.leaderModel.t1, ess.released, "the leadership model sees newer measure-only waves");
+  // Each wave's source cohorts form all seven dimensions and 19 groups.
+  const dem = JSON.parse(read("data/demographics.json")).waves.find((w) => w.pollster === "DemosAU" && w.date === "2026-11-22");
+  assert.deepEqual(Object.keys(dem.dims).sort(), ["age", "education", "gender", "housing", "income", "language", "location"].sort());
+  assert.equal(Object.values(dem.dims).flatMap((g) => Object.keys(g)).length, 19);
+}
+
 console.log(`PASS: invariants – ${A.cycles.length} cycles inside their caps, finite-figure sweep, feed vocabulary, changelog tags, np-project purity, past rows' bases, Newspoll overview links and separate 2PMP`);

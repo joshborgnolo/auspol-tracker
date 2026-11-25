@@ -15953,6 +15953,165 @@
     "grn": 15,
     "oth": 13
    }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-11-22",
+   "dateStart": "2026-11-18",
+   "dateEnd": "2026-11-22",
+   "sample": 1464,
+   "article": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
+   "source": "https://demosau.com/wp-content/uploads/DemosAU/national-poll-nov-2026v2.html",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 28,
+      "grn": 11,
+      "lnp": 26,
+      "onp": 22,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 25,
+      "grn": 14,
+      "lnp": 25,
+      "onp": 24,
+      "oth": 12
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 26,
+      "grn": 20,
+      "lnp": 23,
+      "onp": 15,
+      "oth": 16
+     },
+     "35–54": {
+      "alp": 30,
+      "grn": 15,
+      "lnp": 24,
+      "onp": 25,
+      "oth": 6
+     },
+     "55+": {
+      "alp": 24,
+      "grn": 7,
+      "lnp": 28,
+      "onp": 25,
+      "oth": 16
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 26,
+      "grn": 11,
+      "lnp": 26,
+      "onp": 24,
+      "oth": 13
+     },
+     "TAFE": {
+      "alp": 26,
+      "grn": 12,
+      "lnp": 25,
+      "onp": 25,
+      "oth": 12
+     },
+     "University": {
+      "alp": 29,
+      "grn": 16,
+      "lnp": 25,
+      "onp": 17,
+      "oth": 13
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 24,
+      "grn": 13,
+      "lnp": 24,
+      "onp": 23,
+      "oth": 16
+     },
+     "$45–125k": {
+      "alp": 29,
+      "grn": 13,
+      "lnp": 25,
+      "onp": 23,
+      "oth": 10
+     },
+     "$125k+": {
+      "alp": 28,
+      "grn": 13,
+      "lnp": 34,
+      "onp": 16,
+      "oth": 9
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 38,
+      "grn": 13,
+      "lnp": 23,
+      "onp": 13,
+      "oth": 13
+     },
+     "Outer metro": {
+      "alp": 22,
+      "grn": 13,
+      "lnp": 28,
+      "onp": 26,
+      "oth": 11
+     },
+     "Regional or rural": {
+      "alp": 22,
+      "grn": 10,
+      "lnp": 25,
+      "onp": 28,
+      "oth": 15
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 28,
+      "grn": 19,
+      "lnp": 15,
+      "onp": 23,
+      "oth": 15
+     },
+     "Mortgage": {
+      "alp": 28,
+      "grn": 12,
+      "lnp": 29,
+      "onp": 23,
+      "oth": 8
+     },
+     "Own outright": {
+      "alp": 24,
+      "grn": 8,
+      "lnp": 31,
+      "onp": 22,
+      "oth": 15
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 24,
+      "grn": 12,
+      "lnp": 26,
+      "onp": 24,
+      "oth": 14
+     },
+     "Other language": {
+      "alp": 35,
+      "grn": 17,
+      "lnp": 24,
+      "onp": 18,
+      "oth": 6
+     }
+    }
+   }
   }
  ],
  "skipped": [

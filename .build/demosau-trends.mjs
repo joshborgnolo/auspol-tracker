@@ -174,3 +174,104 @@ export function trendDims(data, poll) {
   }
   return { dims, unknown, total };
 }
+
+/* The per-wave interactive release carries its full table pool in
+   script#poll-data. Its VI option order differs from DA_ALL, so the JSON
+   option map, not array position, assigns party ids. */
+export function parseInteractive(html) {
+  let data = html;
+  if (typeof html !== "object" || !data) {
+    const blocks = [...String(html).matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+      .filter((m) => /\bid=["']poll-data["']/.test(m[1]) && /\btype=["']application\/json["']/.test(m[1]));
+    if (blocks.length !== 1) throw new Error(`interactive poll: expected one poll-data block, found ${blocks.length}`);
+    data = JSON.parse(blocks[0][2]);
+  }
+  const q = data.questions?.find((r) => r.question === "vi" && r.kind === "vote");
+  if (!q) throw new Error("interactive poll: no voting-intention question");
+  const opts = (data.options || []).filter((r) => r.question === "vi").sort((a, b) => a.pos - b.pos);
+  const partyAt = new Map(), partyByShort = { Labor: "alp", Coalition: "lnp", "One Nation": "on", Greens: "grn", Other: "oth" };
+  for (const [i, o] of opts.entries()) {
+    if (o.role === "p") {
+      if (!partyByShort[o.short]) throw new Error(`interactive poll: unmapped party option ${o.short}`);
+      partyAt.set(i, partyByShort[o.short]);
+    } else if (o.role !== "dkx" || !/^don.?t know$/i.test(o.short)) {
+      throw new Error(`interactive poll: unmapped answer ${o.short}`);
+    }
+    if (o.pos !== i + 1) throw new Error("interactive poll: option positions moved");
+  }
+  if (partyAt.size !== DA_ALL.length || ![...partyAt.values()].every((p) => DA_ALL.includes(p)))
+    throw new Error("interactive poll: party map does not cover the five published shares");
+  const dkIndex = opts.findIndex((o) => o.role === "dkx");
+  if (dkIndex < 0) throw new Error("interactive poll: no undecided-after-leaner answer");
+  const values = (group) => {
+    const v = data.results?.vi?.[group];
+    if (!Array.isArray(v) || v.length !== opts.length || v.some((x) => !Number.isFinite(x) || x < 0 || x > 100))
+      throw new Error(`interactive poll: invalid VI row ${group}`);
+    return Object.fromEntries([...partyAt].map(([i, p]) => [p, v[i]]));
+  };
+  const total = values("total");
+  const meta = (data.vote_meta || []).find((r) => r.question === "vi");
+  const totalDk = data.results.vi.total[dkIndex];
+  if (!meta || !Number.isFinite(meta.dk) || meta.dk !== totalDk)
+    throw new Error("interactive poll: DK metadata and the national answer disagree");
+  const unknown = (data.groups || []).filter((g) => g.group !== "total" && TREND_GROUPS[g.group] && !(g.group in (data.results.vi || {})));
+  if (unknown.length) throw new Error(`interactive poll: cohort rows missing for ${unknown.map((g) => g.group).join(", ")}`);
+  const oct = { meta: { poll: "interactive" }, results: [{ q: "vi", group: "total", values: total }] };
+  for (const gid of Object.keys(TREND_GROUPS)) if (gid in (data.results.vi || {})) oct.results.push({ q: "vi", group: gid, values: values(gid) });
+  return { data, oct, meta, dkIndex, opts, total };
+}
+
+export function interactiveDims(read) {
+  return trendDims({ oct: read.oct }, "interactive");
+}
+
+/* Optional canonical-row reconciliation. When the caller expects this URL to
+   be a particular wave, every available witness must agree before any fact
+   is used. Previous-wave inventory is a required check for the DK backfill. */
+export function interactiveFacts(read, { row = null, previous = null } = {}) {
+  const total = Object.fromEntries(DA_ALL.map((p) => [p === "on" ? "onp" : p, read.total[p]]));
+  if (row) {
+    for (const k of ["alp", "lnp", "grn", "onp"]) if (row[k] !== total[k])
+      throw new Error(`interactive poll: ${k} ${total[k]} differs from the canonical ${row[k]}`);
+    if (total.oth !== (row.ind ?? row.oth)) throw new Error("interactive poll: Other differs from the canonical row");
+    const survey = read.data.survey?.[0];
+    for (const [r, v, key] of [[row.sample, survey?.sample_size, "sample"], [row.sampleEff, survey?.effective_sample_size, "effective sample"]])
+      if (r != null && r !== v) throw new Error(`interactive poll: ${key} ${v} differs from canonical ${r}`);
+  }
+  const previousMeta = read.data.prev_poll?.[0];
+  let undecidedLeaner = null;
+  if (previous) {
+    if (!previousMeta || previousMeta.fieldwork_end !== previous.date || !Number.isFinite(read.meta.prev_dk) ||
+        previous.undecidedLeaner == null || read.meta.prev_dk !== previous.undecidedLeaner)
+      throw new Error("interactive poll: previous wave does not reconcile with the canonical inventory");
+    undecidedLeaner = read.meta.dk;
+    const change = (read.data.changes || []).find((r) => r.question === "vi" && r.group === "total" && r.pos === read.dkIndex + 1);
+    if (!change || change.change !== undecidedLeaner - read.meta.prev_dk)
+      throw new Error("interactive poll: printed undecided change does not reconcile");
+  }
+  return { total, undecidedLeaner };
+}
+
+export function interactiveCache(url) {
+  const u = new URL(url);
+  if (u.protocol !== "https:" || u.hostname !== "demosau.com" || !u.pathname.startsWith("/wp-content/uploads/DemosAU/") || !u.pathname.endsWith(".html"))
+    throw new Error("interactive poll: not a DemosAU interactive release URL");
+  return path.join(ROOT, ".build", "demosau-src", path.basename(u.pathname, ".html") + ".interactive.json");
+}
+
+export async function loadInteractive(url, { net = false, writeCache = true } = {}) {
+  const file = interactiveCache(url);
+  if (!net && fs.existsSync(file)) {
+    const cached = JSON.parse(fs.readFileSync(file, "utf8"));
+    if (cached.url !== url || cached.schema !== 1) throw new Error(`interactive poll: cache/source mismatch at ${path.relative(ROOT, file)}`);
+    return parseInteractive(cached.data);
+  }
+  if (!net) throw new Error(`interactive poll: no committed cache at ${path.relative(ROOT, file)}`);
+  const html = (await fetchBuffer(url)).toString("utf8"), read = parseInteractive(html);
+  const text = JSON.stringify({ schema: 1, url, data: read.data }, null, 2) + "\n";
+  if (writeCache && (!fs.existsSync(file) || fs.readFileSync(file, "utf8") !== text)) {
+    fs.writeFileSync(file + ".tmp", text);
+    fs.renameSync(file + ".tmp", file);
+  }
+  return read;
+}

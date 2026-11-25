@@ -142,6 +142,7 @@ import { join } from "node:path";
 import { fetchBuffer, passSgCaptcha, FETCH_TRIES } from "./demosau-fetch.mjs";
 import { readDemosau, planCapitalBrief } from "./demosau-read.mjs";
 import { parseSeats } from "./demosau-seats.mjs";
+import { loadInteractive, interactiveFacts } from "./demosau-trends.mjs";
 import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
@@ -841,6 +842,44 @@ try {
   const newPpmRows = [];
   const newApprovalRows = [];
   const matched = new Set();
+
+  /* The per-wave interactive publishes all-voters undecided and the cohort
+     tables. Its own news post is discovery only: the interactive then has
+     to reconcile with the canonical wave before supplying any fact. */
+  const supplement = existing.filter((e) => e.pollster === "DemosAU" && e.undecidedLeaner == null)
+    .sort((a, b) => a.date.localeCompare(b.date)).slice(-2);
+  if (supplement.length) {
+    let posts = null;
+    try { posts = JSON.parse((await fetchBuffer(POSTS_URL)).toString("utf8")); }
+    catch (e) { status.notes.push(`DemosAU interactive discovery failed: ${e?.message || e}`); }
+    for (const e of supplement) {
+      let interactive = /^https:\/\/demosau\.com\/wp-content\/uploads\/DemosAU\/.+\.html$/i.test(e.releaseUrl || "") ? e.releaseUrl : null;
+      if (!interactive && posts && e.published) {
+        for (const po of [].concat(posts)) {
+          const text = String(po?.content?.rendered || "").replace(/<[^>]+>/g, " ");
+          if (Math.abs(Date.parse(String(po?.date || "").slice(0, 10)) - Date.parse(e.published.slice(0, 10))) > 4 * DAY) continue;
+          if (![e.alp, e.lnp, e.onp].every((v) => new RegExp(`\\b${v}%`).test(text))) continue;
+          const match = text.match(/href="(https:\/\/demosau\.com\/wp-content\/uploads\/DemosAU\/[^"]+\.html)"/i);
+          if (match) { interactive = match[1]; break; }
+        }
+      }
+      if (!interactive) continue;
+      try {
+        const previous = existing.filter((p) => p.pollster === "DemosAU" && p.date < e.date)
+          .sort((a, b) => b.date.localeCompare(a.date))[0];
+        const read = await loadInteractive(interactive, { net: true, writeCache: !CHECK });
+        const facts = interactiveFacts(read, { row: e, previous });
+        if (facts.undecidedLeaner == null) continue;
+        if (!e.releaseUrl || !/\.html$/i.test(e.releaseUrl)) { e.releaseUrl = interactive; status.fieldworkFilled.push({ releaseUrl: interactive, date: e.date }); }
+        e.undecidedLeaner = facts.undecidedLeaner;
+        touched = true;
+        status.backfilled.push({ date: e.date, section: "undecidedLeaner", value: facts.undecidedLeaner, via: interactive });
+      } catch (err) {
+        guardFails.push(`${interactive}: ${err?.message || err}`);
+      }
+    }
+  }
+
   for (const c of candidates) {
     const slug = decodeURIComponent(c.url.split("/").pop().replace(/\.pdf$/i, ""));
     const w = await loadWave(c.url, slug, c.isMRP);

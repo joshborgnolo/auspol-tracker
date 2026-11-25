@@ -7,7 +7,8 @@
 
    Run: node .build/test-demosau-trends.mjs */
 import assert from "node:assert";
-import { loadTrends, pollOf, trendDims, trendSwitches, octRowOf, gateTrends, TREND_GROUPS, PV_FROM, DA_ALL } from "./demosau-trends.mjs";
+import { loadTrends, pollOf, trendDims, trendSwitches, octRowOf, gateTrends, TREND_GROUPS, PV_FROM, DA_ALL, parseInteractive, loadInteractive, interactiveDims, interactiveFacts } from "./demosau-trends.mjs";
+import { dimsProblem, totalProblem } from "./crosstab-parse.mjs";
 
 const data = await loadTrends();
 const eq = assert.deepEqual.bind(assert);
@@ -67,5 +68,33 @@ for (const [gid, pair] of Object.entries(TREND_GROUPS)) {
     `${gid} maps to a (dim, label) pair`);
 }
 eq(Object.keys(PV_FROM).sort(), ["pv_alp", "pv_grn", "pv_lnp", "pv_on", "pv_oth"]);
+
+// -- the November interactive: label-mapped parties and all 19 cohorts ----
+const interactiveUrl = "https://demosau.com/wp-content/uploads/DemosAU/national-poll-nov-2026v2.html";
+const interactive = await loadInteractive(interactiveUrl);
+const idims = interactiveDims(interactive);
+eq(Object.keys(idims.dims).sort(), ["age", "education", "gender", "housing", "income", "language", "location"].sort());
+eq(Object.values(idims.dims).flatMap((g) => Object.keys(g)).length, 19);
+eq(idims.total, { alp: 27, lnp: 25, grn: 12, onp: 23, oth: 13 }, "One Nation and Greens are identified by label, not array order");
+eq(idims.dims.gender.Men, { alp: 28, grn: 11, lnp: 26, onp: 22, oth: 13 });
+eq(idims.dims.language["Other language"], { alp: 35, grn: 17, lnp: 24, onp: 18, oth: 6 });
+eq(idims.dims.housing["Own outright"], { alp: 24, grn: 8, lnp: 31, onp: 22, oth: 15 });
+eq(idims.unknown, []);
+assert(!dimsProblem(idims.dims), "every interactive cohort sums to its printed decided base");
+assert(!totalProblem(idims.total, { alp: 27, lnp: 25, grn: 12, onp: 23, ind: 13 }));
+const row = { date: "2026-11-22", alp: 27, lnp: 25, grn: 12, onp: 23, ind: 13, sample: 1464, sampleEff: 711 };
+eq(interactiveFacts(interactive, { row, previous: { date: "2026-10-26", undecidedLeaner: 6 } }), { total: idims.total, undecidedLeaner: 6 });
+eq(interactive.data.tpp, [], "no 2PP is invented from the undecided row");
+assert.throws(() => interactiveFacts(interactive, { previous: { date: "2026-10-26", undecidedLeaner: 5 } }), /previous wave/);
+assert.throws(() => interactiveFacts(interactive, { row: { ...row, onp: 24 } }), /onp/);
+const moved = structuredClone(interactive.data);
+moved.vote_meta[0].prev_dk = 5;
+assert.throws(() => interactiveFacts(parseInteractive(moved), { previous: { date: "2026-10-26", undecidedLeaner: 6 } }), /previous wave/);
+const unknown = structuredClone(interactive.data);
+unknown.options.find((o) => o.question === "vi" && o.short === "Greens").short = "Green supporters";
+assert.throws(() => parseInteractive(unknown), /unmapped party/);
+assert.throws(() => parseInteractive("not an interactive release"), /expected one poll-data block/);
+const cacheOnly = await loadInteractive(interactiveUrl);
+eq(cacheOnly.data, interactive.data, "cached reads reproduce the source data without a network call");
 
 console.log("all demosau-trends checks pass");

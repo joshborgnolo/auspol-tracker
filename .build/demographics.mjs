@@ -210,7 +210,7 @@ import { ROOT, youGovSource, youGovCrosstab, demosauReport, resolveData } from "
 import { youGovDims, DEMOS_DIM, demosLabel, demosauMrpDemo, redbridgeTable, resolveWaves, essentialWaves, essentialMatch, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
 import { measureCharts, FIT_LIMIT, layoutText } from "./demosau-charts.mjs";
 import { watchReminders } from "./demo-watch.mjs";
-import { loadTrends, pollOf as trendsPollOf, trendDims, TRENDS_URL } from "./demosau-trends.mjs";
+import { loadTrends, pollOf as trendsPollOf, trendDims, TRENDS_URL, loadInteractive, interactiveDims, interactiveFacts } from "./demosau-trends.mjs";
 
 const OUT = path.join(ROOT, "data", "demographics.json");
 
@@ -1783,6 +1783,23 @@ try {
         push({ ...base, source: t.source, read: "published table", dims: d.dims, total: d.total });
         console.log(`${k}: ${Object.entries(d.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
       } else if (p.pollster === "DemosAU") {
+        /* A per-wave interactive carries native cohort tables, before the
+           standing trends page or a report-PDF chart is consulted. */
+        if (p.releaseUrl && /\.html(?:$|\?)/i.test(p.releaseUrl)) {
+          try {
+            const read = await loadInteractive(p.releaseUrl, { net: true });
+            interactiveFacts(read, { row: p });
+            const { dims, unknown, total } = interactiveDims(read);
+            const bad = dimsProblem(dims) || totalProblem(total, p);
+            if (bad) throw new Error(bad);
+            if (unknown.length) throw new Error(unknown.join("; "));
+            push({ ...base, source: p.releaseUrl, read: "published table", dims });
+            console.log(`${k}: ${Object.keys(dims).join(", ")} (the interactive release)`);
+            continue;
+          } catch (e) {
+            console.log(`${k}: interactive release could not supply its cohorts – ${String(e.message || e).slice(0, 120)}`);
+          }
+        }
         /* The house's poll-trends page is its standing release form for
            every table since January 2026 (the same data the report PDF
            printed, as exact figures). Read it first and file what it

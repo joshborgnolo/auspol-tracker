@@ -1548,7 +1548,8 @@
       "right": 24,
       "wrong": 60,
       "unsure": 16,
-      "url": "https://essentialreport.com.au/reports/25th-november-2026"
+      "url": "https://essentialreport.com.au/reports/25th-november-2026",
+      "published": "2026-11-26T01:00"
     }
   ],
   "polls": [
@@ -6776,7 +6777,8 @@
       "tpp_lnp": null,
       "url": "https://www.capitalbrief.com/article/exclusive-albanese-suffers-polling-hit-as-voters-blame-labor-for-the-economy-24fd0409-8d67-45e8-9b09-b7ce23e19ef8/",
       "releaseUrl": "https://demosau.com/wp-content/uploads/DemosAU/national-poll-nov-2026v2.html",
-      "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_National_Poll_November_2026_Methodology_Statement.pdf"
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_National_Poll_November_2026_Methodology_Statement.pdf",
+      "undecidedLeaner": 6
     }
   ],
   "ppm": [
@@ -7722,7 +7724,9 @@
       "opp": null,
       "oppName": null,
       "han": null,
-      "detail": null
+      "detail": null,
+      "url": "https://essentialreport.com.au/reports/13-may-2025",
+      "published": "2025-05-13T01:00"
     },
     {
       "date": "2025-06-09",
@@ -7807,7 +7811,9 @@
           "app": 33,
           "dis": 35
         }
-      }
+      },
+      "url": "https://essentialreport.com.au/reports/30-july-2025",
+      "published": "2025-07-31T01:00"
     },
     {
       "date": "2025-08-14",
@@ -7861,7 +7867,9 @@
           "app": 35,
           "dis": 37
         }
-      }
+      },
+      "url": "https://essentialreport.com.au/reports/27-august-2025",
+      "published": "2025-08-28T01:00"
     },
     {
       "date": "2025-09-05",
@@ -9863,7 +9871,9 @@
           "app": 35,
           "dis": 42
         }
-      }
+      },
+      "url": "https://essentialreport.com.au/reports/25th-november-2026",
+      "published": "2026-11-26T01:00"
     }
   ],
   "ppmHeadToHead": [
