@@ -172,6 +172,16 @@ body[data-f=demographics] .cols,body[data-f=demographics] .row>button{grid-templ
 body[data-f=confidence] .cols,body[data-f=confidence] .row>button{grid-template-columns:minmax(150px,1.4fr) minmax(118px,1fr) 7.4rem 6rem 6rem minmax(0,1fr)}
 body[data-f=issues] .f,body[data-f=direction] .f.wide{text-align:left}
 }
+@media (min-width:1200px){
+#list{width:max-content;max-width:100%}
+body[data-f=primary] .cols,body[data-f=primary] .row>button{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem repeat(5,5.1rem) 5.6rem}
+body[data-f=twopp] .cols,body[data-f=twopp] .row>button{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem 9.6rem 5rem 5rem max-content}
+body[data-f=leaders] .cols,body[data-f=leaders] .row>button{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem 12.5rem repeat(3,5.6rem) max-content}
+body[data-f=direction] .cols,body[data-f=direction] .row>button{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem repeat(3,5.4rem) 5.8rem max-content}
+body[data-f=issues] .cols,body[data-f=issues] .row>button{grid-template-columns:minmax(130px,max-content) minmax(110px,max-content) 6.6rem repeat(6,minmax(5.6rem,max-content))}}
+body[data-f=demographics] .cols,body[data-f=demographics] .row>button{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem repeat(5,5.4rem) max-content}
+body[data-f=confidence] .cols,body[data-f=confidence] .row>button{grid-template-columns:minmax(150px,max-content) minmax(118px,max-content) 7.4rem 6rem 6rem max-content}
+}
 @media (prefers-reduced-motion:reduce){.row>button{transition:none}}
 /* the mark's sun: the hero in miniature, on its sky, beside the name once the hero has scrolled away */
 :root{--lz:#0b1640;--lm:#23498f;--ll:#c98a8f;--lh:#f2b07f}
