@@ -45,3 +45,4 @@
 {"ts":"2026-11-17T20:16:30.643Z","syd":"2026-11-18 07:16","pollster":"YouGov","kind":"dated","anchor":"2026-11-18","release":"2026-12-01","open":"2026-12-01","close":"2026-12-01","winHalf":0,"rolled":false,"ahead":0}
 {"ts":"2026-11-22T20:16:45.023Z","syd":"2026-11-23 07:16","pollster":"Newspoll","kind":"dated","anchor":"2026-11-22","release":"2026-12-13","open":"2026-12-13","close":"2026-12-13","winHalf":0,"rolled":false,"ahead":0}
 {"ts":"2026-11-24T04:46:23.214Z","syd":"2026-11-24 15:46","pollster":"DemosAU","kind":"calMonth","anchor":"2026-11-24","release":"2026-12-19","open":"2026-12-12","close":"2026-12-27","winHalf":7.5,"rolled":false,"ahead":0}
+{"ts":"2026-11-25T03:32:36.152Z","syd":"2026-11-25 14:32","pollster":"Essential","kind":"summer","anchor":"2026-11-25","release":"2027-01-20","open":"2027-01-09","close":"2027-02-01","winHalf":11.5,"rolled":false,"ahead":0}
