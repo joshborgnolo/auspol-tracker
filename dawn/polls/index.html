@@ -56,7 +56,7 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .tabs::-webkit-scrollbar{display:none}
 .tabs button{font:500 14px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 14px;height:34px;cursor:pointer;white-space:nowrap;flex:none}
 .tabs button[aria-selected=true]{background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--rule),0 1px 2px rgb(20 10 40/.08)}
-.ctl{display:flex;align-items:center;flex-wrap:wrap;gap:10px 12px;margin:12px 0 4px}
+.ctl{display:flex;align-items:center;flex-wrap:wrap;gap:10px 12px;margin:12px 0 10px}
 .search{position:relative;flex:1 1 220px;max-width:340px}
 .search input{width:100%;font:400 15px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:36px;padding:0 14px 0 34px;-webkit-appearance:none;appearance:none}
 .search input::placeholder{color:var(--mute)}
@@ -69,7 +69,7 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .fopt[hidden]{display:none}
 .fdek{font-size:14.5px;color:var(--ink2);margin:10px 0 0;max-width:70ch}
 /* the ledger: each month a section, its bar sticky under the nav, carrying the column names */
-.month{position:sticky;top:calc(var(--navh) + env(safe-area-inset-top));z-index:5;background:var(--bg);box-shadow:0 -14px 0 var(--bg),0 1px 0 var(--rule2);margin-top:12px}
+.month{position:sticky;top:calc(var(--navh) + env(safe-area-inset-top));z-index:5;background:var(--bg);box-shadow:0 -3px 0 var(--bg),0 1px 0 var(--rule2);margin-top:12px}
 .mrow{display:flex;align-items:baseline;gap:10px;padding:12px 0 7px}
 .mrow h2{font:400 21px/1.2 var(--serif);margin:0}
 .mrow span{font-size:13px;color:var(--mute)}
