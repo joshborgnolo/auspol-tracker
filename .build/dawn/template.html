@@ -59,7 +59,7 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .skyset button[aria-checked=true]{background:#f3f0ff;color:#0b1433;border-color:#f3f0ff}
 
 /* hero */
-.hero{position:relative;height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
+.hero{position:relative;height:100vh;height:100svh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
 .sky{position:absolute;inset:0;background:linear-gradient(to bottom,var(--z) 0%,var(--m) 42%,var(--l) 74%,var(--h) 100%)}
 .wash{position:absolute;inset:0}
 .wash.rise{background:radial-gradient(120% 55% at 50% var(--sy),rgba(255,138,72,calc(var(--wa1)*.8)) 0%,rgba(255,110,80,calc(var(--wa1)*.36)) 32%,rgba(170,110,170,calc(var(--wa1)*.15)) 55%,transparent 75%),linear-gradient(to top,rgba(255,150,110,calc(var(--ba1)*.8)) 0%,rgba(230,140,160,calc(var(--ba1)*.4)) 12%,transparent 30%)}
@@ -113,7 +113,7 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .core{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle closest-side at 50% 46%,var(--c1) 0%,var(--c2) 62%,var(--c3) 90%,#ee4420 97%,rgba(255,96,30,0) 100%)}
 
 /* sections */
-.sec{position:relative;height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) var(--g)}
+.sec{position:relative;height:100vh;height:100svh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) var(--g)}
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
 .dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:60ch;text-wrap:pretty}
@@ -206,7 +206,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[hidden]{display:none}
 svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
-@media (max-height:600px){.sec{height:auto;min-height:100svh;overflow:visible}.fig{min-height:260px}}
+@media (max-height:600px){.sec{height:auto;min-height:100svh;min-height:100dvh;overflow:visible}.fig{min-height:260px}}
 @media (min-width:900px){
 .sec{padding-top:calc(var(--navh) + 20px);padding-bottom:24px}
 .flow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd ctl" "fig fig" "note note" "src src"}
@@ -238,7 +238,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 </head>
 <body>
 <header class="nav over" id="nav">
-  <a class="mark" href="#top"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="27" r="14" fill="url(#lgH)"/><circle cx="16" cy="27.6" r="8.6" fill="url(#lgC)"/></g></svg>auspol tracker</a>
+  <a class="mark" href="#top"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="16" r="14" fill="url(#lgH)"/><circle cx="16" cy="16" r="7.4" fill="url(#lgC)"/></g></svg>auspol tracker</a>
   <nav class="links" aria-label="Sections">
     <a href="#votes" data-sec="votes">votes</a>
     <a href="polls/" data-sec="polls">polls</a>
@@ -276,7 +276,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   </div>
   <div class="grain" id="grain" aria-hidden="true"></div>
   <div class="now" id="now">
-    <h2>The primaries</h2>
+    <h2>Primaries</h2>
     <p class="now-d">Estimated first preferences at <span id="now-date">{{asOf}}</span>. Whiskers mark the 2025 election; = means a statistical tie.</p>
     <div class="pv-h"><span aria-hidden="true">since 2025</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week since the 2025 election"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
     <div class="pv still" id="pv" role="table" aria-label="Estimated primary vote, %, and change since the 2025 election"></div>
@@ -630,12 +630,28 @@ function chart(o){
       }
       if(ok){evMode='lab';EVH=placed.some(p=>p.r)?38:22}
     }
-    if(S.govs&&!evs.length)EVH=22;
+    /* the governments' names: the prime ministers', inside the term when they fit; a term too narrow
+       for them carries them beside it, on the lowest row with room, as near its middle as the neighbours allow;
+       only a name with room on neither row falls back to the party */
+    let GV=[];const GVF=W<600?10.5:11.5;
+    if(S.govs&&!evs.length){const fz=`500 ${GVF}px`,gap=W<600?5:8,rows=[[],[],[]];
+      const free=(r,a,b)=>rows[r].every(([p,q])=>b+gap<=p||a>=q+gap);
+      /* each government's prime ministers: inside its term where they fit; the rest, narrowest term first,
+         beside their term on the lowest row with room; the party only where no row has */
+      const B=S.govs.map(g=>{const ga=Math.max(ML,x(g.a)),gb=Math.min(W-MR,x(g.b));if(gb-ga<1)return null;
+        const pm=g.pms,c=[...new Set([pm.length<=3?pm.join('–'):null,pm.length>1&&pm[0]!==pm[pm.length-1]?pm[0]+'–'+pm[pm.length-1]:null,pm.length===1?pm[0]:null].filter(Boolean))];
+        return {g,ga,gb,c,mid:(ga+gb)/2,nm:'',r:0,cx:(ga+gb)/2}}).filter(Boolean);
+      B.forEach(v=>{const t=v.c.find(t=>tw(t,fz)<=v.gb-v.ga-6);if(t){const w=tw(t,fz);v.nm=t;rows[0].push([v.mid-w/2,v.mid+w/2])}});
+      const place=(v,list)=>{for(const r of [0,1,2])for(const t of list){const w=tw(t,fz),lo=Math.max(ML+w/2,v.ga-w/2+4),hi=Math.min(W-MR-w/2,v.gb+w/2-4);
+          for(let d=0;d<=Math.max(v.mid-lo,hi-v.mid);d+=2)for(const cx of [v.mid-d,v.mid+d])if(cx>=lo&&cx<=hi&&free(r,cx-w/2,cx+w/2)){rows[r].push([cx-w/2,cx+w/2]);Object.assign(v,{nm:t,r,cx});return true}}return false};
+      /* nearest free spot along the lowest row that still overlaps the term: the shortest full form, then the first prime minister, then the party */
+      B.filter(v=>!v.nm).sort((u,v)=>(u.gb-u.ga)-(v.gb-v.ga)).forEach(v=>{place(v,v.c.slice().sort((a,b)=>tw(a,fz)-tw(b,fz)))||place(v,[v.g.pms[0]])||place(v,[v.g.gov==='alp'?'Labor':'Coalition'])});
+      GV=B;EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r))}
     const MT=TIPH+EVH,MB=24,PH=H-MT-MB,y=v=>MT+PH*(S.y1-v)/(S.y1-S.y0);
     let s='';
-    if(S.govs)S.govs.forEach(g=>{const ga=Math.max(ML,x(g.a)),gb=Math.min(W-MR,x(g.b));if(gb-ga<1)return;
-      s+=`<rect x="${P1(ga)}" y="${MT}" width="${P1(gb-ga)}" height="${PH}" style="fill:var(--${g.gov==='alp'?'alp':'lnp'})" fill-opacity=".075"/>`;
-      const nm=govName(g,gb-ga-6);if(nm)s+=`<text x="${P1((ga+gb)/2)}" y="${MT-7}" text-anchor="middle" class="gv" style="fill:var(--${g.gov==='alp'?'alp':'lnp'})">${esc(nm)}</text>`});
+    GV.forEach(({g,ga,gb,nm,r,cx})=>{const col=`var(--${g.gov==='alp'?'alp':'lnp'})`;
+      s+=`<rect x="${P1(ga)}" y="${MT}" width="${P1(gb-ga)}" height="${PH}" style="fill:${col}" fill-opacity=".075"/>`;
+      if(nm)s+=`<text x="${P1(cx)}" y="${MT-7-r*14}" text-anchor="middle" class="gv" style="fill:${col};font-size:${GVF}px">${esc(nm)}</text>`});
     ticks.forEach((v,i)=>{const yy=Math.round(y(v))+.5;s+=`<line x1="${ML}" x2="${W-MR+4}" y1="${yy}" y2="${yy}" stroke="var(--rule)"/><text x="${ML-8}" y="${yy}" dy=".35em" text-anchor="end">${tl[i]}</text>`});
     /* reference lines (50% on the two-party chart) */
     for(const r of S.refs||[]){const yy=Math.round(y(r.y))+.5;s+=`<line x1="${ML}" x2="${W-MR+4}" y1="${yy}" y2="${yy}" stroke="var(--rule2)" stroke-dasharray="3 3"/>`;if(r.up)s+=`<text x="${ML+6}" y="${yy-7}" class="rf">${esc(r.up)}</text>`;if(r.dn)s+=`<text x="${ML+6}" y="${yy+16}" class="rf">${esc(r.dn)}</text>`}
@@ -763,6 +779,8 @@ const pollWhen=p=>{const y=+p.m.slice(0,4);return (p.tbc?'fieldwork TBC':p.f+(y!
 const pollN=(p,facet)=>p.n?'n = '+Number(p.n).toLocaleString('en-AU')+(facet==='twopp'&&p.b2?' '+p.b2:p.b?' '+p.b:''):'';
 const LONG=12;
 /* the past terms' lines through their two counts (the site's rdVhLines), runs split where nobody polled for a quarter */
+/* the y-axis fits both readings of the past terms, so the measured switch moves lines, never the scale */
+const laneYs=Q=>[...Q.lines.flatMap(l=>l.pts.map(q=>q.y)),...Q.bands.flatMap(b=>b.pts.flatMap(q=>[q.hi,q.lo]))].filter(v=>v!=null&&isFinite(v));
 function pastLanes(lanes,a,b,colorOf,long,VH=HIST,measured=false){
   const lines=[],bands=[],rings=[],stops=new Map();
   if(!VH)return {lines,bands,rings,stops};
@@ -817,6 +835,8 @@ function govBlocks(a,b){
     const pms=t.pm.split('→').map(x=>x.trim()).filter(Boolean),last=out[out.length-1];
     if(last&&last.gov===t.gov&&Math.abs(last.b-ta)<.02){last.b=tb;pms.forEach(q=>{if(last.pms[last.pms.length-1]!==q)last.pms.push(q)})}
     else out.push({gov:t.gov,a:ta,b:tb,pms:pms.slice()})});
+  /* a caretaker who leads the next government (Fraser, Nov–Dec 1975) is that government's name, not this one's */
+  out.forEach((g,i)=>{const n=out[i+1];if(n&&g.pms.length>1&&g.pms[g.pms.length-1]===n.pms[0])g.pms.pop()});
   return out;
 }
 const govName=(g,w)=>{const pm=g.pms,ends=pm.length>2&&pm[0]!==pm[pm.length-1]?pm[0]+'–'+pm[pm.length-1]:null;
@@ -868,6 +888,7 @@ function primScene(narrow){
   }
   if(!curOnly){
     const VH=g?groupVH():HIST,P=pastLanes(PK,a,b,COLOR,long,VH,!g&&MEASURED);
+    if(!g)S.yAlt=laneYs(pastLanes(PK,a,b,COLOR,long,VH,!MEASURED));
     S.lines.unshift(...P.lines);S.bands.unshift(...P.bands);S.rings.push(...P.rings);
     const st=[...P.stops.values()].filter(t=>t.x>=a-1e-6&&t.x<=b+1e-6&&t.x<CUR.a-1e-4);
     S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
@@ -877,7 +898,7 @@ function primScene(narrow){
   /* governments behind a window longer than a term; their names stand in for the elections */
   if(span>8)S.govs=govBlocks(a,b);
   S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):S.govs?[]:elecEvents(a,b);
-  const ys=[...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.map(p=>p.hi)),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
+  const ys=[...(S.yAlt||[]),...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.map(p=>p.hi)),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=0;S.y1=Math.max(40,Math.ceil((Math.max(...ys,0)+.5)/10)*10);
   return S;
 }
@@ -925,6 +946,7 @@ function tppScene(narrow){
   }
   if(!curOnly){
     const P=pastLanes(['tpp'],a,b,()=>RCOL.lnp,long,HIST,MEASURED);
+    S.yAlt=laneYs(pastLanes(['tpp'],a,b,()=>RCOL.lnp,long,HIST,!MEASURED));
     S.lines.unshift(...P.lines);S.bands.unshift(...P.bands);S.rings.push(...P.rings);
     const st=[...P.stops.values()].filter(t=>t.x>=a-1e-6&&t.x<=b+1e-6&&t.x<CUR.a-1e-4).map(t=>({...t,items:t.items.map(q=>({...q,tc:RCOL.lnp}))}));
     S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
@@ -933,7 +955,7 @@ function tppScene(narrow){
   }
   if(span>8)S.govs=govBlocks(a,b);
   S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):S.govs?[]:elecEvents(a,b);
-  const ys=[50,...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
+  const ys=[50,...(S.yAlt||[]),...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=Math.floor((Math.min(...ys)+.3)/5)*5;S.y1=Math.ceil((Math.max(...ys)-.3)/5)*5;
   if(S.y1-S.y0<10)S.y1=S.y0+10;
   return S;
