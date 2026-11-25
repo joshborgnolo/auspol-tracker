@@ -143,6 +143,9 @@ ol{list-style:none;margin:0;padding:0}
 .tb th,.tb td{padding:3px 12px 3px 0;text-align:right;white-space:nowrap}
 .tb th:first-child,.tb td:first-child{text-align:left;font-weight:500;color:var(--ink2)}
 .tb thead th{font-weight:500;color:var(--mute);font-size:12.5px}
+.demo-cols{display:grid;grid-template-columns:1fr;align-items:start;gap:20px}
+@media (min-width:700px){.demo-cols[data-cols="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}.demo-cols[data-cols="3"]{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){.demo-cols[data-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .scroll{overflow-x:auto}
 .note{font-size:13.5px;color:var(--mute);margin:28px 0 0;line-height:1.5;max-width:72ch}
 @media (min-width:900px){
@@ -177,7 +180,7 @@ body[data-f=issues] .f,body[data-f=direction] .f.wide{text-align:left}
 .logo{display:block;width:0;height:26px;flex:none;opacity:0;transform:scale(.55);margin-right:0;border-radius:50%;transition:width .4s cubic-bezier(.3,.9,.3,1),margin-right .4s cubic-bezier(.3,.9,.3,1),opacity .3s,transform .4s cubic-bezier(.3,.9,.3,1)}
 .nav .logo{width:26px;opacity:1;transform:none;margin-right:9px}
 @media (prefers-reduced-motion:reduce){.logo{transition:none}}
-
+/*{{FILTERSCSS}}*/
 </style>
 </head>
 <body data-f="primary">
@@ -227,6 +230,7 @@ body[data-f=issues] .f,body[data-f=direction] .f.wide{text-align:left}
 {
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const DATA=JSON.parse($('#polls-data').textContent);
+/*{{FILTERSJS}}*/
 /* the mark's sky follows the votes pages': sunrise by day, sunset in the evening, or the reader's choice */
 {let pref='auto';try{pref=localStorage.getItem('apt-sky')||'auto'}catch(e){}const h=new Date().getHours();document.documentElement.dataset.sky=pref==='rise'||pref==='set'?pref:h>=4&&h<15?'rise':'set'}
 const ORDER={{ORDER}};                     // parties by today's standing
@@ -371,7 +375,7 @@ function detail(p){
   if(p.p&&Object.keys(p.p).length){
     let s='<h3>Primary vote, %</h3>';
     if(p.mw){const vals=ORDER.map(k=>p.p[k]).filter(v=>v!=null),mx=Math.max(45,...vals,...p.mw)+2,pc=v=>(v/mx*100).toFixed(2)+'%';
-      s+='<div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[k],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div><div class="key"><span><i></i>this poll</span><span><s></s>the model that week</span></div>'}
+      s+='<div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[k],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div><div class="key"><span><i></i>this poll</span><span><s></s>the model '+(p.d===DATA.asOf?'this week':'that week')+'</span></div>'}
     else s+='<p>'+ORDER.map(k=>p.p[k]!=null?NAME[k]+' '+num(p.p[k]):'').filter(Boolean).join(', ')+'.</p>';
     const c=p.chg&&p.chg.d,ref=c&&p.chg.r&&(p.chg.r.pAlp||Object.values(p.chg.r)[0]);
     if(c&&['pAlp','pLnp','pGrn','pOnp','pOth'].some(k=>c[k]!=null))s+=`<p>Against ${esc(p.h)}’s poll before${ref?' ('+esc(fday(ref))+')':''}: `+[['alp','pAlp'],['onp','pOnp'],['lnp','pLnp'],['grn','pGrn'],['oth','pOth']].filter(([,ck])=>c[ck]!=null).map(([k,ck])=>ABBR[k]+' '+sg(c[ck])).join(', ')+'.</p>';
@@ -390,7 +394,12 @@ function detail(p){
     if(ids.length)s+=`<div class="scroll"><table class="tb"><thead><tr><th>Best on${p.iss.q?' ('+esc(p.iss.q)+')':''}</th>${['alp','onp','lnp','grn'].map(k=>`<th>${ABBR[k]}</th>`).join('')}</tr></thead><tbody>${ids.map(id=>`<tr><td>${esc(ISSL[id]||(DATA.issL||{})[id]||id)}</td>${['alp','onp','lnp','grn'].map(k=>`<td>${num(p.iss.own[id][k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
     if(p.iss.sal)s+='<p>What matters most: '+p.iss.sal.slice(0,6).map(([l,v])=>esc(l)+' '+num(v)).join(', ')+'.</p>';
     sec.push(['issues',s])}
-  if(p.grp&&p.grp.d&&Object.keys(p.grp.d).length){const s='<h3>The vote by group</h3><div class="scroll"><table class="tb"><thead><tr><th></th>'+ORDER.map(k=>`<th>${ABBR[k]}</th>`).join('')+'</tr></thead><tbody>'+Object.values(p.grp.d).map(rows=>rows.map(([lab,v])=>`<tr><td>${esc(lab)}</td>${ORDER.map(k=>`<td>${num(v[PK.indexOf(k)])}</td>`).join('')}</tr>`).join('')).join('<tr><td colspan="6" style="height:6px"></td></tr>')+'</tbody></table></div>';sec.push(['demographics',s])}
+  if(p.grp&&p.grp.d&&Object.keys(p.grp.d).length){
+    const parts=Object.values(p.grp.d),per=Math.ceil(parts.length/Math.min(3,parts.length));
+    const columns=Array.from({length:Math.min(3,parts.length)},(_,i)=>parts.slice(i*per,(i+1)*per));
+    const s='<h3>The vote by group</h3><div class="demo-cols" data-cols="'+columns.length+'">'+columns.map(groups=>'<div class="scroll"><table class="tb"><thead><tr><th></th>'+ORDER.map(k=>`<th>${ABBR[k]}</th>`).join('')+'</tr></thead><tbody>'+groups.map(rows=>rows.map(([lab,v])=>`<tr><td>${esc(lab)}</td>${ORDER.map(k=>`<td>${num(v[PK.indexOf(k)])}</td>`).join('')}</tr>`).join('')).join('<tr><td colspan="6" style="height:6px"></td></tr>')+'</tbody></table></div>').join('')+'</div>';
+    sec.push(['demographics',s]);
+  }
   sec.sort((x,y)=>(x[0]===F?-1:y[0]===F?1:0));
   return b.concat(sec.map(x=>x[1])).join('');
 }
@@ -419,6 +428,8 @@ function arrive(){
 }
 const want=new URLSearchParams(location.search).get('facet');
 if(want&&FACETS[want]){F=want;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x.dataset.f===F)))}
+filterSelect({select:sel,label:"Pollster"});
+filterSelect({select:splitSel,label:"Demographic split"});
 fillHouses();render();arrive();addEventListener('hashchange',arrive);
 $('#note').textContent='Figures are as each pollster printed them, each with its 95% margin: for the primaries the model’s own account of a poll’s noise on its effective sample, for the rest the sampling margin on that sample. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the effective sample, the house’s own where it files one, “~” where the site estimates it from the design effect. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
 /* the menu */

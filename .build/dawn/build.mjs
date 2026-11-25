@@ -109,8 +109,12 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   const fill = { HIST: histName, GROUPS: groupsName, GHIST: ghUrl, FONT: "/assets/fonts/" + font, asOf: esc(C.asOf), latestPoll: esc(latestPollLine(D)), votesHead: esc(C.votesHead), votesDek: esc(C.votesDek),
                  tppHead: esc(C.tppHead), tppDek: esc(C.tppDek), flowsHead: esc(C.flowsHead) };
   html = html.replace(/\{\{(HIST|GROUPS|GHIST|FONT|asOf|latestPoll|votesHead|votesDek|tppHead|tppDek|flowsHead)\}\}/g, (m, k) => fill[k]);
+  const filterStyle = fs.readFileSync(path.join(HERE, "filter-select.css"), "utf8");
+  const filterScript = fs.readFileSync(path.join(HERE, "filter-select.mjs"), "utf8").replaceAll("export function", "function");
   html = html.replace("/*{{PMENGINE}}*/", () => engine);
   html = html.replace("/*{{POLLMETA}}*/", () => fs.readFileSync(path.join(HERE, "poll-meta.mjs"), "utf8").replaceAll("export function", "function"));
+  html = html.replace("/*{{FILTERSCSS}}*/", () => filterStyle);
+  html = html.replace("/*{{FILTERSJS}}*/", () => "const filterSelect=(()=>{" + filterScript + "return filterSelect;})();");
   html = html.replace("{{FLOWNOTES}}", () => JSON.stringify(notes).replace(/</g, "\\u003c"));
   html = html.replace("{{DATA}}", () => json);
   html = html.replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
@@ -132,7 +136,9 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     ph = ph.replace(/\{\{(FONT|pollsHead|pollsDek)\}\}/g, (m, k) => fillP[k]).replace("{{ORDER}}", () => JSON.stringify(order))
       .replace("{{POLLS}}", () => JSON.stringify(PD).replace(/</g, "\\u003c"))
       .replace("/*{{SIGTRIANGLE}}*/", () => fs.readFileSync(path.join(HERE, "sig-triangle.mjs"), "utf8").replaceAll("export function", "function"))
-      .replace("/*{{POLLHEADING}}*/", () => "const pollHeading=(()=>{" + fs.readFileSync(path.join(HERE, "poll-heading.mjs"), "utf8").replaceAll("export function", "function") + "return pollHeading;})();");
+      .replace("/*{{POLLHEADING}}*/", () => "const pollHeading=(()=>{" + fs.readFileSync(path.join(HERE, "poll-heading.mjs"), "utf8").replaceAll("export function", "function") + "return pollHeading;})();")
+      .replace("/*{{FILTERSCSS}}*/", () => filterStyle)
+      .replace("/*{{FILTERSJS}}*/", () => "const filterSelect=(()=>{" + filterScript + "return filterSelect;})();");
     const leftP = ph.match(/\{\{[A-Za-z]+\}\}/);
     if (leftP) throw new Error("dawn: polls template placeholder left unfilled: " + leftP[0]);
     fs.mkdirSync(path.join(out, "polls"), { recursive: true });

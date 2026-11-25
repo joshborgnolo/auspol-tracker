@@ -57,7 +57,10 @@ export function votesHead(D) {
   const m = ms[0], N = NAMES[m.k];
   if (m.chg > 0) {
     const k = Math.floor(m.lo / m.E + 1e-9);
-    if (k >= 2) return { head: cap(N.poss) + " vote has " + (MULT[k] ? "more than " + MULT[k] : "grown more than fivefold"), lead: m };
+    if (k >= 2) {
+      const head = cap(N.poss) + " vote has " + (MULT[k] ? "more than " + MULT[k] : "grown more than fivefold");
+      return { head: head + (m.k === "onp" && k === 3 ? ", but the Coalition is enjoying a rate-rise bounce" : ""), lead: m };
+    }
     return { head: N.start + (N.pl ? " are" : " is") + " up " + f1(m.chg) + " points since the election", lead: m };
   }
   const lost = 1 - m.hi / m.E, fr = FRACT.find(([f]) => lost >= f - 1e-9);

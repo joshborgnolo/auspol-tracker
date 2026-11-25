@@ -129,7 +129,7 @@ const flat = () => Object.fromEntries(D0.parties.map((k) => [k, [E[k], E[k] - 1,
 eq(votesHead(withNow(flat())).head, "The primary vote is much where it was at the election", "nothing clears: much the same");
 const grow = (k, f, lo) => withNow({ ...flat(), [k]: [E[k] * f, E[k] * lo, E[k] * f + 2] });
 eq(votesHead(grow("onp", 2.6, 2.1)).head, "One Nation’s vote has more than doubled", "doubled, read off the interval's lower end");
-eq(votesHead(grow("onp", 3.9, 3.6)).head, "One Nation’s vote has more than tripled", "tripled");
+eq(votesHead(grow("onp", 3.9, 3.6)).head, "One Nation’s vote has more than tripled, but the Coalition is enjoying a rate-rise bounce", "tripled, followed by the Coalition's rate-rise bounce");
 eq(votesHead(grow("onp", 4.6, 4.2)).head, "One Nation’s vote has more than quadrupled", "quadrupled");
 eq(votesHead(grow("onp", 6, 5.4)).head, "One Nation’s vote has grown more than fivefold", "fivefold");
 eq(votesHead(grow("onp", 2.2, 1.9)).head, "One Nation is up " + r1(E.onp * 1.2).toFixed(1) + " points since the election", "a point estimate past double whose interval is not: points");

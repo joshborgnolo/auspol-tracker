@@ -225,6 +225,12 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .flow .fig{grid-area:fig;margin-top:18px}
 .flow .note{grid-area:note}
 .flow .src{grid-area:src}
+.flow-single{grid-area:fig;display:flex;flex-direction:column;min-height:0}
+.flow-single[hidden],.flow-pair[hidden]{display:none}
+.flow-pair{grid-area:fig;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:18px;min-height:0}
+.flow-match{margin:0;display:flex;flex-direction:column;min-height:0}
+.flow-match h3{margin:0 0 10px;font:500 13px var(--sans);color:var(--mute)}
+.flow-match .fig{flex:1;min-height:0;margin-top:0}
 .tpp{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd ctl" "win win" "fig fig" "keys keys" "src src"}
 .tpp .hd{grid-area:hd}
 .tpp .ctl{grid-area:ctl;align-self:end;margin:0 0 4px}
@@ -243,7 +249,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .logo{display:block;width:0;height:26px;flex:none;opacity:0;transform:scale(.55);margin-right:0;border-radius:50%;transition:width .4s cubic-bezier(.3,.9,.3,1),margin-right .4s cubic-bezier(.3,.9,.3,1),opacity .3s,transform .4s cubic-bezier(.3,.9,.3,1)}
 .nav:not(.over) .logo{width:26px;opacity:1;transform:none;margin-right:9px}
 @media (prefers-reduced-motion:reduce){.logo{transition:none}}
-
+/*{{FILTERSCSS}}*/
 </style>
 </head>
 <body>
@@ -312,7 +318,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
       <h2 id="flows-h">{{flowsHead}}</h2>
       <p class="dek">% of the vote received after minor-party votes are distributed</p>
     </header>
-    <div class="ctl">
+    <div class="ctl" id="flow-ctl">
       <div class="vs" data-duel role="radiogroup" aria-label="Contest: Labor against">
         <span class="me">Labor</span><span class="v">v</span>
         <button type="button" role="radio" aria-checked="true" data-r="lnp">Coalition</button>
@@ -321,10 +327,14 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
         <span class="mebar" aria-hidden="true"></span><span class="bar" aria-hidden="true"></span>
       </div>
     </div>
-    <div class="fig" id="flow-fig"><svg id="flow-svg" role="img" aria-label="Sankey diagram of first preferences flowing to Labor or its rival"></svg></div>
+    <div class="flow-pair" id="flow-pair" hidden>
+      <figure class="flow-match"><h3>Labor v Coalition</h3><div class="fig" id="flow-lnp"><svg id="flow-svg-lnp" role="img" aria-label="Preferences, Labor v Coalition"></svg></div></figure>
+      <figure class="flow-match"><h3>Labor v One Nation</h3><div class="fig" id="flow-on"><svg id="flow-svg-on" role="img" aria-label="Preferences, Labor v One Nation"></svg></div></figure>
+    </div>
+    <div class="flow-single" id="flow-single"><div class="fig" id="flow-fig"><svg id="flow-svg" role="img" aria-label="Sankey diagram of first preferences flowing to Labor or its rival"></svg></div></div>
     <p class="note" id="flow-note" aria-live="polite" style="min-height:2.8em">&nbsp;</p>
     <p class="src" id="flow-src"></p>
-    <div class="sr"><table id="flow-table"></table></div>
+    <div class="sr"><table id="flow-table"></table><table id="flow-table-lnp"></table><table id="flow-table-on"></table></div>
   </div>
 </section>
 
@@ -366,6 +376,7 @@ const root=document.documentElement;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 /*{{POLLMETA}}*/
+/*{{FILTERSJS}}*/
 const DATA=JSON.parse($('#dawn-data').textContent);
 const paintLatestPoll=()=>{$('#now-latest').textContent=latestPollLine(DATA)};
 paintLatestPoll();setInterval(paintLatestPoll,60000);
@@ -1132,6 +1143,7 @@ if(!DATA.groupMenu)grpSel.closest('.pick').hidden=true;
 const indexGroups=()=>{GIDX={};if(GROUPS)GROUPS.tabs.forEach(t=>t.sets.forEach(st=>st.groups.forEach(g=>{GIDX[g.label]={...g,setId:st.id,tab:t.label}})))};
 function afterGrp(){pvBtn.disabled=!!GRP;if(GRP&&!inCur(WIN)&&!GHIST)loadGHist().then(()=>votes.draw());paintMeasured();votesSrc();votes.clear();votes.draw()}
 grpSel.addEventListener('change',()=>{GRP=grpSel.value;if(GRP&&!GROUPS)loadGroups().then(()=>{indexGroups();afterGrp()});afterGrp()});
+filterSelect({select:grpSel,label:"Subpopulation",disabled:()=>PVSEL.size>0});
 /* which pollsters: the model re-run in the browser on the ticked houses' polls alone (the site's pollster
    menu, pv-agg.js pmAgg), at the build's settings, read week by week; the band is the smoother's, carried
    to the shares by the delta method. Every house ticked is every house: the published figures. */
@@ -1156,14 +1168,19 @@ function subsetWeekly(houses){
   }
   return out.from==null?null:out;
 }
-pvPop.innerHTML='<button type="button" class="all" data-h="">Every pollster</button>'+(DATA.pvHouses||[]).map(h=>`<button type="button" role="checkbox" aria-checked="false" data-h="${esc(h)}"><i></i>${esc(h)}</button>`).join('');
 if(!DATA.pm||!window.AP||!window.AP.pmEngine)pvBtn.closest('.pick').hidden=true;
-const pvClose=()=>{pvPop.hidden=true;pvBtn.setAttribute('aria-expanded','false')};
-pvBtn.addEventListener('click',e=>{e.stopPropagation();const open=pvPop.hidden;pvPop.hidden=!open;pvBtn.setAttribute('aria-expanded',String(open))});
-document.addEventListener('click',e=>{if(!pvPop.hidden&&!e.target.closest('#pv-pop')&&!e.target.closest('#pv-btn'))pvClose()});
-addEventListener('keydown',e=>{if(e.key==='Escape'&&!pvPop.hidden){pvClose();pvBtn.focus()}});
+filterSelect({trigger:pvBtn,popup:pvPop,textElement:pvName,label:"Pollsters",multiple:true,
+  options:()=>[{label:"Every pollster",value:"",data:{h:""}},...(DATA.pvHouses||[]).map(h=>({label:h,value:h,data:{h:h}}))],
+  selected:()=>PVSEL,
+  summary:()=>{const n=PVSEL.size;return !n?'All':n===1?[...PVSEL][0]:n+' of '+(DATA.pvHouses||[]).length},
+  onPick:h=>{
+    if(!h)PVSEL.clear();else if(PVSEL.has(h))PVSEL.delete(h);else PVSEL.add(h);
+    if(PVSEL.size===(DATA.pvHouses||[]).length)PVSEL.clear();
+    pvName.textContent='…';setTimeout(applyPv,20);
+  }
+});
 function applyPv(){
-  $$('button[data-h]',pvPop).forEach(b=>{if(b.dataset.h)b.setAttribute('aria-checked',String(PVSEL.has(b.dataset.h)))});
+  $$('button[data-h]',pvPop).forEach(b=>{if(b.dataset.h)b.setAttribute('aria-selected',String(PVSEL.has(b.dataset.h)))});
   const n=PVSEL.size,all=(DATA.pvHouses||[]).length;
   pvName.textContent=!n?'All':n===1?[...PVSEL][0]:n+' of '+all;
   grpSel.disabled=!!n;
@@ -1171,10 +1188,6 @@ function applyPv(){
   SUBW=n?subsetWeekly([...PVSEL]):null;
   paintWinBars();paintMeasured();votesSrc();votes.clear();votes.draw();
 }
-pvPop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();const h=b.dataset.h;
-  if(!h)PVSEL.clear();else if(PVSEL.has(h))PVSEL.delete(h);else PVSEL.add(h);
-  if(PVSEL.size===(DATA.pvHouses||[]).length)PVSEL.clear();
-  pvName.textContent='…';setTimeout(applyPv,20)});
 /* how past terms are drawn: through their election results (inferred), or the polls' own figures (measured) */
 const mBtns=$$('[data-measured]');
 function paintMeasured(){const hist=!inCur(WIN);mBtns.forEach(b=>{b.hidden=!hist||(!!GRP&&!!b.closest('#votes'));b.setAttribute('aria-checked',String(MEASURED));$('span',b).textContent=MEASURED?'Measured support':'Inferred support';
@@ -1198,7 +1211,7 @@ let flowHold=0;
 /* today's shares, unrounded, so the totals are the two-party figures the chart ends on */
 const PV={alp:DATA.nowShares.alp,lnp:DATA.nowShares.lnp,on:DATA.nowShares.onp,grn:DATA.nowShares.grn,oth:DATA.nowShares.oth};
 /* the three-cornered term: points of the Coalition's own vote that reach Labor where both its parties run */
-const toLab=(k,F)=>k==='alp'?1:k===RIV?(RIV==='lnp'?FL.cnr/PV.lnp:0):F[k];
+const toLab=(k,F,rival=RIV)=>k==='alp'?1:k===rival?(rival==='lnp'?FL.cnr/PV.lnp:0):F[k];
 const rivName=k=>k==='lnp'?'the Coalition':'One Nation';
 const NOTES={{FLOWNOTES}};
 function flowNote(){$('#flow-note').textContent=NOTES[RIV]}
@@ -1215,13 +1228,13 @@ function spread(a,lo,hi,pad){
 let flowFull=true;
 /* the flows top to bottom: each party's first preferences along the top, Labor's share of its
    preferences peeling left and its rival's right, into the two totals at the foot, set large and facing */
-function sankey(){
-  const fig=$('#flow-fig'),svg=$('#flow-svg'),W0=fig.clientWidth,H=fig.clientHeight;if(!W0||!H)return;
+function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
+  const RIV=rival,W0=fig.clientWidth,H=fig.clientHeight;if(!W0||!H)return;
   const F=FLOWS[RIV],W=Math.min(W0,860),ox=(W0-W)/2,narrow=W<520,P=v=>v.toFixed(1);
   const split=Object.keys(F).sort((a,b)=>F[b]-F[a]),src=['alp',...split,RIV];
-  const lab=src.reduce((s,k)=>s+PV[k]*toLab(k,F),0);
+  const lab=src.reduce((s,k)=>s+PV[k]*toLab(k,F,RIV),0);
   const gS=narrow?8:12,gD=gS*2.4,k=(W-gS*(src.length-1))/100;
-  const third=s=>{if(s===RIV)return '';const f=toLab(s,F);return f>0&&f<1?Math.round(f*100)+'% to Labor':''};
+  const third=s=>{if(s===RIV)return '';const f=toLab(s,F,RIV);return f>0&&f<1?Math.round(f*100)+'% to Labor':''};
   const nodes={};let xx=ox;src.forEach(s=>{const w=PV[s]*k;nodes[s]={x0:xx,x1:xx+w};xx+=w+gS});
   const fN=narrow?13:14,fV=narrow?15:17,fF=narrow?12:13;
   const mk=full=>src.map(s=>({s,c:(nodes[s].x0+nodes[s].x1)/2,w:Math.max(tw(FNAME[s],`500 ${fN}px`),tw(f1(PV[s])+'%',`600 ${fV}px`),full&&third(s)?tw(third(s),`${fF}px`):0)}));
@@ -1235,7 +1248,7 @@ function sankey(){
   const dx0=ox+(gS*(src.length-1)-gD)/2,dl1=dx0+lab*k,dr0=dl1+gD,dr1=dx0+100*k+gD,ym=(y0+y1)/2;
   const rib=[],tL={c:dx0},tR={c:dr0};
   src.forEach(s=>{
-    const n=nodes[s],f=toLab(s,F);let c=n.x0;
+    const n=nodes[s],f=toLab(s,F,RIV);let c=n.x0;
     const a=PV[s]*f*k,b=PV[s]*(1-f)*k;
     if(a>0){rib.push({s,t:'alp',sx0:c,sx1:c+a,tx0:tL.c,tx1:tL.c+a,v:PV[s]*f,f});tL.c+=a;c+=a}
     if(b>0){rib.push({s,t:RIV,sx0:c,sx1:c+b,tx0:tR.c,tx1:tR.c+b,v:PV[s]*(1-f),f:1-f});tR.c+=b}
@@ -1264,17 +1277,24 @@ function sankey(){
     p.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hide()});
     p.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'){show(+p.dataset.i);flowHold=setTimeout(hide,2600)}});
   });
-  $('#flow-table').innerHTML=`<caption>Preference flows, Labor v ${FNAME[RIV]}, points of the vote</caption><tr><th>Party</th><th>First preferences</th><th>To Labor</th><th>To ${FNAME[RIV]}</th></tr>`+src.map(s=>`<tr><td>${FNAME[s]}</td><td>${f1(PV[s])}</td><td>${f1(PV[s]*toLab(s,F))}</td><td>${f1(PV[s]*(1-toLab(s,F)))}</td></tr>`).join('')+`<tr><td>Total after preferences</td><td>100</td><td>${f1(lab)}</td><td>${f1(100-lab)}</td></tr>`;
-  flowSrc();
+  $('#flow-table'+(fig.id==='flow-fig'?'':'-'+RIV)).innerHTML=`<caption>Preference flows, Labor v ${FNAME[RIV]}, points of the vote</caption><tr><th>Party</th><th>First preferences</th><th>To Labor</th><th>To ${FNAME[RIV]}</th></tr>`+src.map(s=>`<tr><td>${FNAME[s]}</td><td>${f1(PV[s])}</td><td>${f1(PV[s]*toLab(s,F,RIV))}</td><td>${f1(PV[s]*(1-toLab(s,F,RIV)))}</td></tr>`).join('')+`<tr><td>Total after preferences</td><td>100</td><td>${f1(lab)}</td><td>${f1(100-lab)}</td></tr>`;
+  if(fig.id==='flow-fig')flowSrc();
 }
 /* where a phone has no room for each party's share to Labor on the drawing, the note under it names them */
-const flowSrc=()=>{const F=FLOWS[RIV],sh=Object.keys(F).sort((a,b)=>F[b]-F[a]).map(s=>FNAME[s]+' '+Math.round(F[s]*100)+'%').join(', ');
-  $('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+(RIV==='lnp'?'; flows as counted at the 2025 election':'; flows are the site’s estimate, as no election has counted Labor against One Nation')+(flowFull?'.':' (to Labor: '+sh+').')+' Tap or hover over a flow to see its size.'};
-new ResizeObserver(sankey).observe($('#flow-fig'));
+const flowSrc=()=>{const F=FLOWS[RIV],wide=matchMedia('(min-width:900px)').matches,sh=Object.keys(F).sort((a,b)=>F[b]-F[a]).map(s=>FNAME[s]+' '+Math.round(F[s]*100)+'%').join(', ');
+  $('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+(wide?'; Coalition flows are counted at the 2025 election, One Nation flows are the site’s estimate':RIV==='lnp'?'; flows as counted at the 2025 election':'; flows are the site’s estimate, as no election has counted Labor against One Nation')+(matchMedia('(min-width:900px)').matches||flowFull?'.':' (to Labor: '+sh+').')+' Tap or hover over a flow to see its size.'};
+function drawFlows(){
+  const wide=matchMedia('(min-width:900px)').matches;
+  $('#flow-ctl').hidden=wide;$('#flow-single').hidden=wide;$('#flow-pair').hidden=!wide;
+  if(wide){sankey('lnp',$('#flow-lnp'),$('#flow-svg-lnp'));sankey('on',$('#flow-on'),$('#flow-svg-on'))}
+  else sankey();
+  slideAll();flowNote();flowSrc();
+}
+new ResizeObserver(drawFlows).observe($('#flows'));
 /* the contest: one choice for both lead pages */
 const duels=$$('[data-duel]');
-function slideAll(){duels.forEach(duel=>{const me=$('.me',duel),mb=$('.mebar',duel),thumb=$('.bar',duel);mb.style.width=me.offsetWidth+'px';mb.style.transform=`translateX(${me.offsetLeft}px)`;const b=$(`button[data-r="${RIV}"]`,duel);thumb.style.width=b.offsetWidth+'px';thumb.style.transform=`translateX(${b.offsetLeft}px)`})}
-function setRiv(r){RIV=r;duels.forEach(duel=>{duel.dataset.r=r;$$('button',duel).forEach(x=>x.setAttribute('aria-checked',String(x.dataset.r===r)))});slideAll();sankey();flowNote();flowSrc();paintKeys();tppSrc();tpp.clear();tpp.draw()}
+function slideAll(){duels.forEach(duel=>{if(duel.hidden)return;const me=$('.me',duel),mb=$('.mebar',duel),thumb=$('.bar',duel);mb.style.width=me.offsetWidth+'px';mb.style.transform=`translateX(${me.offsetLeft}px)`;const b=$(`button[data-r="${RIV}"]`,duel);thumb.style.width=b.offsetWidth+'px';thumb.style.transform=`translateX(${b.offsetLeft}px)`})}
+function setRiv(r){RIV=r;duels.forEach(duel=>{duel.dataset.r=r;$$('button',duel).forEach(x=>x.setAttribute('aria-checked',String(x.dataset.r===r)))});drawFlows();paintKeys();tppSrc();tpp.clear();tpp.draw()}
 duels.forEach(duel=>{
   duel.dataset.r=RIV;
   $$('button',duel).forEach(b=>{
@@ -1285,7 +1305,7 @@ duels.forEach(duel=>{
 });
 slideAll();flowNote();flowSrc();paintKeys();tppSrc();
 
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{charts.forEach(c=>c.draw());sankey();slideAll()});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{charts.forEach(c=>c.draw());drawFlows()});
 /* the past terms arrive once the page is idle, so a step back never waits */
 (window.requestIdleCallback||(f=>setTimeout(f,1500)))(()=>loadHist().then(()=>paintWinBars()));
 

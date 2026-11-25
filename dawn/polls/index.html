@@ -143,6 +143,9 @@ ol{list-style:none;margin:0;padding:0}
 .tb th,.tb td{padding:3px 12px 3px 0;text-align:right;white-space:nowrap}
 .tb th:first-child,.tb td:first-child{text-align:left;font-weight:500;color:var(--ink2)}
 .tb thead th{font-weight:500;color:var(--mute);font-size:12.5px}
+.demo-cols{display:grid;grid-template-columns:1fr;align-items:start;gap:20px}
+@media (min-width:700px){.demo-cols[data-cols="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}.demo-cols[data-cols="3"]{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){.demo-cols[data-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .scroll{overflow-x:auto}
 .note{font-size:13.5px;color:var(--mute);margin:28px 0 0;line-height:1.5;max-width:72ch}
 @media (min-width:900px){
@@ -177,6 +180,19 @@ body[data-f=issues] .f,body[data-f=direction] .f.wide{text-align:left}
 .logo{display:block;width:0;height:26px;flex:none;opacity:0;transform:scale(.55);margin-right:0;border-radius:50%;transition:width .4s cubic-bezier(.3,.9,.3,1),margin-right .4s cubic-bezier(.3,.9,.3,1),opacity .3s,transform .4s cubic-bezier(.3,.9,.3,1)}
 .nav .logo{width:26px;opacity:1;transform:none;margin-right:9px}
 @media (prefers-reduced-motion:reduce){.logo{transition:none}}
+.fd-trigger{display:inline-flex;align-items:center;justify-content:space-between;gap:9px;min-height:32px;padding:4px 10px 4px 14px;border:1px solid var(--rule);border-radius:8px;background:var(--bg);color:var(--ink);font:500 13.5px/1.25 var(--sans);cursor:pointer;max-width:100%}
+.fd-trigger:hover{background:color-mix(in srgb,var(--ink) 5%,var(--bg))}
+.fd-trigger:disabled{opacity:.45;cursor:default}
+.fd-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-chev{width:18px;height:18px;flex:none;transition:transform .16s}
+.fd-trigger[aria-expanded="true"] .fd-chev{transform:rotate(180deg)}
+.fd-pop{position:absolute;z-index:30;top:calc(100% + 6px);left:0;width:max-content;min-width:max(100%,220px);max-width:calc(100vw - 2 * var(--g));max-height:min(60vh,420px);overflow:auto;display:grid;align-self:start;gap:2px;padding:8px;background:var(--bg);border:1px solid var(--rule2);border-radius:16px;box-shadow:0 4px 24px rgb(20 10 40/.1);font-size:13.5px}
+.fd-pop[hidden]{display:none}
+.fd-opt{display:block;width:100%;padding:5px 12px;border:0;border-radius:8px;background:none;color:var(--ink);font:400 13.5px/1.35 var(--sans);text-align:left;cursor:pointer}
+.fd-opt:hover,.fd-opt:focus-visible{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.fd-opt[aria-selected="true"]{background:color-mix(in srgb,var(--ink) 10%,transparent)}
+.fd-opt:disabled{opacity:.4;cursor:default}
+.fd-group{padding:8px 12px 3px;color:var(--mute);font-size:11px;font-weight:600}
 
 </style>
 </head>
@@ -227,6 +243,111 @@ body[data-f=issues] .f,body[data-f=direction] .f.wide{text-align:left}
 {
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const DATA=JSON.parse($('#polls-data').textContent);
+const filterSelect=(()=>{function nativeOptions(select) {
+  return [...select.children].flatMap(e => {
+    if (e.tagName === "OPTGROUP") return [...e.children].map(o => ({ value: o.value, label: o.textContent, group: e.label, disabled: o.disabled }));
+    return [{ value: e.value, label: e.textContent, disabled: e.disabled }];
+  });
+}
+
+/* Dawn's shared selector: the trigger and listbox, not the choice itself.
+   An ordinary select can supply the native change contract; the pollster
+   menu supplies its own set and callback instead. */
+function filterSelect(cfg) {
+  const select = cfg.select, multi = !!cfg.multiple;
+  const trigger = cfg.trigger || document.createElement("button");
+  const root = cfg.root || (select ? select.closest(".pick") : trigger.parentNode);
+  const pop = cfg.popup || document.createElement("div");
+  const labelFor = cfg.label || (select && select.getAttribute("aria-label")) || "Filter";
+  const selected = cfg.selected || (() => select.value);
+  const optionsOf = cfg.options || (() => nativeOptions(select));
+  let shown = [], active = 0;
+  if (!cfg.trigger) { trigger.type = "button"; root.appendChild(trigger); }
+  if (select) select.hidden = true;
+  let text = trigger.querySelector(".fd-text");
+  if (cfg.textElement) text = cfg.textElement;
+  if (!text) { text = document.createElement("span"); text.className = "fd-text"; trigger.appendChild(text); }
+  trigger.classList.add("fd-trigger");
+  trigger.setAttribute("role", "combobox");
+  trigger.setAttribute("aria-haspopup", "listbox");
+  trigger.setAttribute("aria-label", labelFor);
+  pop.classList.remove("pop");
+  pop.classList.add("fd-pop"); pop.setAttribute("role", "listbox");
+  pop.setAttribute("aria-label", labelFor); pop.hidden = true;
+  if (select) pop.id = select.id + "-pop";
+  for (let i = 0; i < 10; i++) if (!pop.id) { const id = "filter-" + labelFor.toLowerCase().replace(/[^a-z0-9]+/g, "-") + (i ? "-" + i : ""); if (!document.getElementById(id)) { pop.id = id; break; } }
+  trigger.setAttribute("aria-controls", pop.id);
+  trigger.setAttribute("aria-expanded", "false");
+  if (multi) pop.setAttribute("aria-multiselectable", "true");
+  pop.tabIndex = -1;
+  if (!pop.parentNode) root.appendChild(pop);
+  if (!trigger.querySelector(".fd-chev")) {
+    const chev = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    chev.classList.add("fd-chev"); chev.setAttribute("viewBox", "0 0 20 20"); chev.setAttribute("aria-hidden", "true");
+    chev.innerHTML = '<path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    trigger.appendChild(chev);
+  }
+  const valueChosen = value => { const v = selected(); return multi ? (value ? v.has(value) : v.size === 0) : v === value; };
+  const focusCurrent = () => { const b = pop.querySelector('[role="option"][tabindex="0"]'); if (b) b.focus({ preventScroll: true }); };
+  function refresh() {
+    shown = optionsOf() || [];
+    if (cfg.disabled) { trigger.disabled = !!cfg.disabled(); if (trigger.disabled) close(false); }
+    if (!trigger.disabled) text.textContent = cfg.summary ? cfg.summary(shown) : ((shown.find(o => valueChosen(o.value)) || shown[0] || {}).label || "");
+    if (pop.hidden) return;
+    pop.replaceChildren();
+    let lastGroup;
+    shown.forEach((o, i) => {
+      if (o.group && o.group !== lastGroup) { const h = document.createElement("div"); h.className = "fd-group"; h.textContent = o.group; h.setAttribute("aria-hidden", "true"); pop.appendChild(h); lastGroup = o.group; }
+      const b = document.createElement("button"); b.type = "button"; b.className = "fd-opt";
+      b.setAttribute("role", "option"); b.dataset.value = o.value; b.textContent = o.label;
+      if (o.data) for (const [k, v] of Object.entries(o.data)) b.dataset[k] = v;
+      b.setAttribute("aria-selected", String(valueChosen(o.value)));
+      b.disabled = !!o.disabled; if (o.disabled) b.setAttribute("aria-disabled", "true");
+      if (i === active && !o.disabled) b.tabIndex = 0; else b.tabIndex = -1;
+      b.addEventListener("focus", () => { active = i; [...pop.children].forEach(x => { if (x.matches('[role="option"]')) x.tabIndex = x === b ? 0 : -1; }); });
+      b.addEventListener("click", () => {
+        active = i;
+        if (select) { select.value = o.value; select.dispatchEvent(new Event("change", { bubbles: true })); }
+        if (cfg.onPick) cfg.onPick(o.value);
+        if (!multi) close(true); else refresh();
+      });
+      pop.appendChild(b);
+    });
+  }
+  function place() {
+    pop.style.left = "0px";
+    const r = pop.getBoundingClientRect(), overflow = Math.min(0, innerWidth - 18 - r.right);
+    pop.style.left = overflow + "px";
+  }
+  function open() {
+    if (trigger.disabled) return;
+    if (cfg.beforeOpen && cfg.beforeOpen() === false) return;
+    if (active >= shown.length || !shown[active] || shown[active].disabled) active = Math.max(0, shown.findIndex((o, i) => valueChosen(o.value) && !o.disabled), 0);
+    pop.hidden = false; trigger.setAttribute("aria-expanded", "true"); refresh(); place(); focusCurrent();
+  }
+  function close(restore) { pop.hidden = true; trigger.setAttribute("aria-expanded", "false"); if (restore) trigger.focus({ preventScroll: true }); }
+  trigger.addEventListener("click", () => pop.hidden ? open() : close(true));
+  trigger.addEventListener("keydown", e => { if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (pop.hidden) { if (e.key === "ArrowUp") active = Math.max(0, shown.length - 1); open(); } else move(e.key === "ArrowDown" ? 1 : -1); } });
+  pop.addEventListener("keypress", e => { if (e.key === "Escape") { e.preventDefault(); close(true); } });
+  function move(delta) {
+    if (!shown.length) return;
+    for (let i = 0; i < shown.length; i++) { active = (active + delta + shown.length) % shown.length; if (!shown[active].disabled) { focusCurrent(); return; } }
+  }
+  pop.addEventListener("keydown", e => {
+    if (e.key === "Escape") { e.preventDefault(); close(true); return; }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); move(e.key === "ArrowDown" ? 1 : -1); }
+    if (e.key === "Home" || e.key === "End") { e.preventDefault(); active = e.key === "Home" ? -1 : shown.length; move(e.key === "Home" ? 1 : -1); }
+  });
+  document.addEventListener("click", e => { if (!pop.hidden && !e.composedPath().includes(pop) && !trigger.contains(e.target)) close(false); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !pop.hidden) { e.preventDefault(); close(true); } });
+  if (select) {
+    select.addEventListener("change", refresh);
+    if (typeof MutationObserver !== "undefined") new MutationObserver(refresh).observe(select, { childList: true, attributes: true, attributeFilter: ["disabled"] });
+  }
+  refresh();
+  return { trigger, popup: pop, refresh, close };
+}
+return filterSelect;})();
 /* the mark's sky follows the votes pages': sunrise by day, sunset in the evening, or the reader's choice */
 {let pref='auto';try{pref=localStorage.getItem('apt-sky')||'auto'}catch(e){}const h=new Date().getHours();document.documentElement.dataset.sky=pref==='rise'||pref==='set'?pref:h>=4&&h<15?'rise':'set'}
 const ORDER=["alp","onp","lnp","grn","oth"];                     // parties by today's standing
@@ -488,7 +609,7 @@ function detail(p){
   if(p.p&&Object.keys(p.p).length){
     let s='<h3>Primary vote, %</h3>';
     if(p.mw){const vals=ORDER.map(k=>p.p[k]).filter(v=>v!=null),mx=Math.max(45,...vals,...p.mw)+2,pc=v=>(v/mx*100).toFixed(2)+'%';
-      s+='<div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[k],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div><div class="key"><span><i></i>this poll</span><span><s></s>the model that week</span></div>'}
+      s+='<div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[k],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div><div class="key"><span><i></i>this poll</span><span><s></s>the model '+(p.d===DATA.asOf?'this week':'that week')+'</span></div>'}
     else s+='<p>'+ORDER.map(k=>p.p[k]!=null?NAME[k]+' '+num(p.p[k]):'').filter(Boolean).join(', ')+'.</p>';
     const c=p.chg&&p.chg.d,ref=c&&p.chg.r&&(p.chg.r.pAlp||Object.values(p.chg.r)[0]);
     if(c&&['pAlp','pLnp','pGrn','pOnp','pOth'].some(k=>c[k]!=null))s+=`<p>Against ${esc(p.h)}’s poll before${ref?' ('+esc(fday(ref))+')':''}: `+[['alp','pAlp'],['onp','pOnp'],['lnp','pLnp'],['grn','pGrn'],['oth','pOth']].filter(([,ck])=>c[ck]!=null).map(([k,ck])=>ABBR[k]+' '+sg(c[ck])).join(', ')+'.</p>';
@@ -507,7 +628,12 @@ function detail(p){
     if(ids.length)s+=`<div class="scroll"><table class="tb"><thead><tr><th>Best on${p.iss.q?' ('+esc(p.iss.q)+')':''}</th>${['alp','onp','lnp','grn'].map(k=>`<th>${ABBR[k]}</th>`).join('')}</tr></thead><tbody>${ids.map(id=>`<tr><td>${esc(ISSL[id]||(DATA.issL||{})[id]||id)}</td>${['alp','onp','lnp','grn'].map(k=>`<td>${num(p.iss.own[id][k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
     if(p.iss.sal)s+='<p>What matters most: '+p.iss.sal.slice(0,6).map(([l,v])=>esc(l)+' '+num(v)).join(', ')+'.</p>';
     sec.push(['issues',s])}
-  if(p.grp&&p.grp.d&&Object.keys(p.grp.d).length){const s='<h3>The vote by group</h3><div class="scroll"><table class="tb"><thead><tr><th></th>'+ORDER.map(k=>`<th>${ABBR[k]}</th>`).join('')+'</tr></thead><tbody>'+Object.values(p.grp.d).map(rows=>rows.map(([lab,v])=>`<tr><td>${esc(lab)}</td>${ORDER.map(k=>`<td>${num(v[PK.indexOf(k)])}</td>`).join('')}</tr>`).join('')).join('<tr><td colspan="6" style="height:6px"></td></tr>')+'</tbody></table></div>';sec.push(['demographics',s])}
+  if(p.grp&&p.grp.d&&Object.keys(p.grp.d).length){
+    const parts=Object.values(p.grp.d),per=Math.ceil(parts.length/Math.min(3,parts.length));
+    const columns=Array.from({length:Math.min(3,parts.length)},(_,i)=>parts.slice(i*per,(i+1)*per));
+    const s='<h3>The vote by group</h3><div class="demo-cols" data-cols="'+columns.length+'">'+columns.map(groups=>'<div class="scroll"><table class="tb"><thead><tr><th></th>'+ORDER.map(k=>`<th>${ABBR[k]}</th>`).join('')+'</tr></thead><tbody>'+groups.map(rows=>rows.map(([lab,v])=>`<tr><td>${esc(lab)}</td>${ORDER.map(k=>`<td>${num(v[PK.indexOf(k)])}</td>`).join('')}</tr>`).join('')).join('<tr><td colspan="6" style="height:6px"></td></tr>')+'</tbody></table></div>').join('')+'</div>';
+    sec.push(['demographics',s]);
+  }
   sec.sort((x,y)=>(x[0]===F?-1:y[0]===F?1:0));
   return b.concat(sec.map(x=>x[1])).join('');
 }
@@ -536,6 +662,8 @@ function arrive(){
 }
 const want=new URLSearchParams(location.search).get('facet');
 if(want&&FACETS[want]){F=want;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x.dataset.f===F)))}
+filterSelect({select:sel,label:"Pollster"});
+filterSelect({select:splitSel,label:"Demographic split"});
 fillHouses();render();arrive();addEventListener('hashchange',arrive);
 $('#note').textContent='Figures are as each pollster printed them, each with its 95% margin: for the primaries the model’s own account of a poll’s noise on its effective sample, for the rest the sampling margin on that sample. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the effective sample, the house’s own where it files one, “~” where the site estimates it from the design effect. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
 /* the menu */
