@@ -91,7 +91,8 @@ run_assimilator() {
   esac
 }
 
-# Two data-change triggers: a changed CSV (a new wave has landed), or a
+# Three data-change triggers: a changed CSV (a new wave has landed), a
+# recent row still waiting on its Guardian url (below), or a
 # drifted report index (Essential published the wave's release page after
 # the charts updated, so retro-fill can now complete the row). Retro-fill is
 # gated on the extractor's actual index-rewrite line rather than run every
@@ -126,6 +127,22 @@ elif echo "$EXTRACT_OUT" | grep -q '^updated .*report-index\.json'; then
     else
       log "index commit produced nothing; carrying on"
     fi
+  fi
+elif node -e '
+  // A third trigger: the Guardian write-up lands hours after the charts, and
+  // neither the CSV nor the report index moves when it does, so a row filed
+  // on chart night kept its synthetic published stamp (label day + 1) and no
+  // url (2026-11-24 wave: stamped 26 Nov, a day in the future). While a
+  // recent assimilated row still lacks its Guardian url, re-run retro-fill.
+  const d = JSON.parse(require("fs").readFileSync("data/polls.json", "utf8"));
+  const cut = new Date(Date.now() - 21 * 864e5).toISOString().slice(0, 10);
+  process.exit(d.polls.some((p) => p.pollster === "Essential" && p.assimilated && !p.url && p.date >= cut) ? 0 : 1);
+'; then
+  log "a recent Essential row still lacks its Guardian url; running assimilator retro-fill"
+  run_assimilator || exit 1
+  if echo "$ASSIM_LAST" | grep -q '"changed":true'; then
+    DATA_CHANGED=true
+    MSG="Retro-fill late-arriving Essential fields $(date '+%Y-%m-%d')"
   fi
 fi
 
