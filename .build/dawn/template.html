@@ -226,11 +226,19 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .votes .fig{margin-top:8px}
 }
 @media (prefers-reduced-motion:reduce){.sun{will-change:auto}.nav,.burger i{transition:none}}
+/* the mark's sun: the hero in miniature, on its sky, beside the name once the hero has scrolled away */
+:root{--lz:#0b1640;--lm:#23498f;--ll:#c98a8f;--lh:#f2b07f}
+:root[data-sky=set]{--lz:#141a4c;--lm:#3b3a8c;--ll:#b4588f;--lh:#ff8a5a}
+.mark{display:inline-flex;align-items:center}
+.logo{display:block;width:0;height:26px;flex:none;opacity:0;transform:scale(.55);margin-right:0;border-radius:50%;transition:width .4s cubic-bezier(.3,.9,.3,1),margin-right .4s cubic-bezier(.3,.9,.3,1),opacity .3s,transform .4s cubic-bezier(.3,.9,.3,1)}
+.nav:not(.over) .logo{width:26px;opacity:1;transform:none;margin-right:9px}
+@media (prefers-reduced-motion:reduce){.logo{transition:none}}
+
 </style>
 </head>
 <body>
 <header class="nav over" id="nav">
-  <a class="mark" href="#top">auspol tracker</a>
+  <a class="mark" href="#top"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="27" r="14" fill="url(#lgH)"/><circle cx="16" cy="27.6" r="8.6" fill="url(#lgC)"/></g></svg>auspol tracker</a>
   <nav class="links" aria-label="Sections">
     <a href="#votes" data-sec="votes">votes</a>
     <a href="polls/" data-sec="polls">polls</a>
@@ -428,7 +436,7 @@ function paint(p){
   const r=mode==='rise';st2.setProperty('--wa1',(r?wa:0).toFixed(3));st2.setProperty('--ba1',(r?ba:0).toFixed(3));st2.setProperty('--wa2',(r?0:wa).toFixed(3));st2.setProperty('--ba2',(r?0:ba).toFixed(3));st2.setProperty('--st',st.toFixed(3));
 }
 function frame(ts){if(t0===null)t0=ts;const p=Math.min(1,(ts-t0)/SC[mode].dur);paint(p);if(p<1)raf=requestAnimationFrame(frame);else done=true}
-function play(){mode=pickMode();sky.dataset.mode=mode;cancelAnimationFrame(raf);t0=null;done=false;if(reduce){paint(1);done=true;return}paint(0);raf=requestAnimationFrame(frame)}
+function play(){mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;cancelAnimationFrame(raf);t0=null;done=false;if(reduce){paint(1);done=true;return}paint(0);raf=requestAnimationFrame(frame)}
 hero.addEventListener('click',e=>{if(!e.target.closest('.now')&&!rpOn)play()});
 /* a full day for the replay: phase 0 is midnight, .25 sunrise, .5 noon, .75 sunset */
 const mixO=(a,b,t)=>Object.fromEntries(Object.keys(a).map(k=>[k,mixc(a[k],b[k],t)]));

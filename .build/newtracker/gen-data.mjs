@@ -12560,34 +12560,86 @@ if (!JUR && PRIMM && TPM) {
     writeAtomic(DAWN_ASSET, JSON.stringify(dawn));
     writeAtomic(DAWN_HIST_ASSET, JSON.stringify({ terms: voteHistory.terms, rms: voteHistory.rms, polls: histPolls }));
     writeAtomic(DAWN_GROUPS_ASSET, JSON.stringify(groupsOut));
-    /* the polls page: every poll this term, newest first, as printed, beside
-       the model's figures for the week of its fieldwork's middle (the line
-       the charts draw), and whether it counts */
+    /* the polls page (the site's All polls, redrawn): every poll this term
+       with the direction-only and issues-only waves, newest first, each as
+       printed, with what each facet reads off it – primaries, two-party
+       figures and their leans, leaders, direction, issues, the vote by
+       group – and the confidence releases apart; beside each poll the
+       model's figures for the week of its fieldwork's middle. The effective
+       sample's tag (TBC, missing, estimated, n/a) and the undecided cell
+       follow the site's own rules (d1a1d215 rdEffTbc/rdEffMissing/
+       rdEffEstimate, undecidedCellOf), read at build time. */
     const dayOfIso = (iso) => Math.floor(Date.parse(iso + "T00:00:00Z") / 86400000);
     const nearW = (iso) => { const d = dayOfIso(iso); let bi = 0, bd = 1e9; weeks.forEach((w, i) => { const g = Math.abs(w - d); if (g < bd) { bd = g; bi = i; } }); return bi + 1; };
-    const pollsPage = individualPolls.slice().sort((a, b) => (a.released === b.released ? (a.pollster < b.pollster ? -1 : 1) : a.released < b.released ? 1 : -1)).map((q) => {
+    const effPool = individualPolls.concat(issuesOnlyPolls || []);
+    const nowMs = Date.parse(isoD(t1) + "T12:00:00Z") + 2 * 86400000;
+    const APPROX_EFF = new Set(["Roy Morgan", "Spectre Strategy", "Resolve", "EMRS (Tas)"]);
+    const effTag = (q) => {
+      if (q.conf || q.sampleEff != null) return null;
+      if (/ \(MRP\)$/.test(q.pollster || "")) return "n/a";
+      if (q.published) {
+        const age = nowMs - Date.parse(q.published.slice(0, 10)), rel = Date.parse(q.released);
+        if (age < 21 * 86400000 && effPool.some((o) => o.pollster === q.pollster && o.sampleEff != null && o.released < q.released && Date.parse(o.released) >= rel - 90 * 86400000)) return "TBC";
+        if (age >= 21 * 86400000 && effPool.some((o) => o.pollster === q.pollster && o.sampleEff != null && Math.abs(Date.parse(o.released) - rel) < 120 * 86400000)) return "missing";
+      }
+      if (q.sample && APPROX_EFF.has(q.pollster)) return "~" + Math.round(q.sample / HL_DEFF / 10) * 10;
+      return null;
+    };
+    const undCell = (q) => {
+      const base = baseOf(q, "primary");
+      if (base === "F") return { v: 0, label: "not allowed" };
+      const v = typeof q.undIn === "number" ? q.undIn : q.undecidedLeaner != null ? q.undecidedLeaner : q.undecidedBasis === "soft" ? null : q.undecided;
+      if (v == null) return q.pollster === "DemosAU (MRP)" && base === "D+L" ? { v: null, label: "excluded" } : null;
+      const inc = base === "A" || typeof q.undIn === "number";
+      return { v: Math.round(v * 2) / 2, label: inc ? "included" : "excluded" };
+    };
+    const R1o = (o) => (o ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, typeof v === "number" ? r1(v) : v])) : o);
+    const ydOf = (q) => {
+      if (!q.yd) return null;
+      const o = {};
+      for (const k of ["imp", "onimp", "lnp", "onp"]) if (q.yd[k] && q.yd[k].v != null) o[k] = [r2(q.yd[k].v), q.yd[k].he != null ? r2(q.yd[k].he) : null];
+      return Object.keys(o).length ? o : null;
+    };
+    const trim = (q) => {
       const o = { k: dawnKey(q), h: q.pollster, f: q.field, d: q.released, m: q.fmid };
       if (q.client) o.c = q.client;
       if (q.published) o.pub = q.published;
       if (q.sample != null) o.n = q.sample;
+      if (q.sampleEff != null) o.se = q.sampleEff;
+      const et = effTag(q); if (et) o.eb = et;
       const b1 = baseOf(q, "primary"), b2 = baseOf(q, "twopp");
       if (b1) o.b = b1;
       if (b2 && b2 !== b1) o.b2 = b2;
-      if (q.p) o.p = PM_PARTIES.map((k) => (q.p[k] != null ? q.p[k] : null));
-      if (q.undecided != null) o.u = q.undecided;
+      if (q.p && Object.keys(q.p).length) o.p = q.p;
+      const u = undCell(q); if (u) o.u = u;
       if (q.alpImp != null) o.i = q.alpImp;
       if (q.alpOnImp != null) o.io = q.alpOnImp;
       if (q.alpN != null) o.t = q.alpN;
       if (q.tppAlt && q.tppAlt.alp != null) o.to = q.tppAlt.alp;
+      const yd = ydOf(q); if (yd) o.yd = yd;
+      if (q.appr && (q.appr.alb || q.appr.taylor || q.appr.hanson)) o.ap = { alb: q.appr.alb || null, taylor: q.appr.taylor || null, hanson: q.appr.hanson || null, mb: q.appr.metricBy || null };
+      if (q.ppm) o.ppm = q.ppm;
+      if (q.ppmSets) o.ppms = q.ppmSets;
+      if (q.dir) o.dir = { right: q.dir.right, wrong: q.dir.wrong, unsure: q.dir.unsure, net: q.dir.net, ...(q.dir.chg ? { chg: q.dir.chg, ref: q.dir.ref } : {}), ...(q.dir.bg ? { bg: q.dir.bg } : {}) };
+      if (q.iss) o.iss = { ...(q.iss.own ? { own: q.iss.own } : {}), ...(q.iss.bp ? { bp: q.iss.bp } : {}), ...(q.iss.sal ? { sal: q.iss.sal } : {}), ...(q.iss.q ? { q: q.iss.q } : {}) };
+      if (q.grp) o.grp = { d: q.grp.d || {}, v: (q.grp.v || []).map((v) => (v ? v.map((x) => (x == null ? null : r1(x))) : null)), ...(q.grp.n ? { n: q.grp.n } : {}), ...(q.grp.ar ? { ar: q.grp.ar } : {}) };
+      if (q.links && q.links.length) o.links = q.links.map((l) => ({ k: l.k, t: l.t, href: l.href, ...(l.pending ? { pending: 1 } : {}), ...(l.title ? { title: l.title } : {}) }));
+      else if (q.url) o.links = [{ k: "release", t: "The release", href: q.url }];
       if (q.noAgg) o.na = q.noAggWhy || "It does not count towards the aggregates.";
       if (q.fieldPending) o.tbc = 1;
-      const src = (q.links || []).find((l) => l.k === "cite") || null;
-      if (q.url || q.releaseUrl) o.url = q.url || q.releaseUrl;
-      if (src && src.t) o.ut = src.t;
-      if (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null || q.appr.hansonNet != null)) o.ap = [q.appr.albNet ?? null, q.appr.taylorNet ?? null, q.appr.hansonNet ?? null];
-      if (q.fmid >= ELECTION.date && q.fmid <= isoD(t1)) { const w = nearW(q.fmid); o.mw = PM_PARTIES.map((k) => r1(prim[k].v[w])); }
+      if (q.chg && q.chg.d) o.chg = q.chg;
+      if (q.p && q.fmid >= ELECTION.date && q.fmid <= isoD(t1)) { const w = nearW(q.fmid); o.mw = PM_PARTIES.map((k) => r1(prim[k].v[w])); }
       return o;
-    });
+    };
+    const seen = new Set(), all = [];
+    for (const q of individualPolls.concat(directionOnlyPolls || [], issuesOnlyPolls || [])) { const k = dawnKey(q); if (seen.has(k)) continue; seen.add(k); all.push(trim(q)); }
+    all.sort((x, y) => (x.d === y.d ? (x.h < y.h ? -1 : 1) : x.d < y.d ? 1 : -1));
+    const confRel = (confidenceOnlyPolls || []).map((q) => ({ k: dawnKey(q) + "-" + (q.conf && q.conf.k || "c"), h: q.pollster, f: q.field, d: q.released, m: q.fmid, ...(q.client ? { c: q.client } : {}),
+      ...(q.published ? { pub: q.published } : {}), ...(q.sample != null ? { n: q.sample } : {}), ...(baseOf(q, "primary") ? { b: baseOf(q, "primary") } : {}),
+      conf: { k: q.conf.k, lab: q.conf.lab, v: q.conf.v, chg: q.conf.chg != null ? q.conf.chg : q.conf.chgCalc != null ? q.conf.chgCalc : null, vs: q.conf.vs },
+      ...(q.links ? { links: q.links.map((l) => ({ k: l.k, t: l.t, href: l.href })) } : {}) }))
+      .sort((x, y) => (x.d === y.d ? (x.h < y.h ? -1 : 1) : x.d < y.d ? 1 : -1));
+    const pollsPage = { polls: all, conf: confRel, groups: DEMO_GROUPS, kappa: primModel ? primModel.kappa : {}, deff: HL_DEFF, asOf: isoD(t1) };
     writeAtomic(DAWN_POLLS_ASSET, JSON.stringify(pollsPage));
     console.log(`dawn: ${weeks.length} weeks, ${polls.length} polls in ${((Date.now() - tW) / 1000).toFixed(1)}s`);
   } catch (e) {

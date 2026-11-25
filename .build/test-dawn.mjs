@@ -131,7 +131,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(!!r.polls && fs.existsSync(r.polls), "the polls page is built");
   const ph = fs.readFileSync(r.polls, "utf8");
   ok(!/\{\{[A-Za-z]+\}\}/.test(ph), "every polls-page placeholder filled");
-  const PL = JSON.parse(ph.match(/<script id="polls-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  const PL = JSON.parse(ph.match(/<script id="polls-data" type="application\/json">([\s\S]*?)<\/script>/)[1]).polls;
   const keys = new Set(PL.map((q) => q.k));
   eq(keys.size, PL.length, "each poll's address is its own");
   ok(D0.polls.every((q) => keys.has(q.k)), "every chart poll's dot has a row to open");

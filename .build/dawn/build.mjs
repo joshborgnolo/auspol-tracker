@@ -15,6 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { copyFor, flowNote, MONF } from "./copy.mjs";
+import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -76,7 +77,8 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   const pollsPath = path.join(assets, "dawn-polls.json");
   let pollsFile = null;
   if (fs.existsSync(pollsPath)) {
-    const PL = JSON.parse(fs.readFileSync(pollsPath, "utf8")), L = D.weeks.length - 1;
+    const PD = JSON.parse(fs.readFileSync(pollsPath, "utf8")), PL = PD.polls, L = D.weeks.length - 1;
+    PD.issL = ISSUE_NAMES;   // each issue by the name the site gives it
     const order = [...D.parties].sort((a, b) => D.prim[b].v[L] - D.prim[a].v[L]);
     const [ey, em] = D.election.date.split("-").map(Number);
     const houses = new Set(PL.map((q) => q.h.replace(/\s*\(.*\)$/, "")));
@@ -84,7 +86,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
                     pollsDek: esc(`From ${houses.size} pollsters, newest first, each as printed. Open a poll for its details and the model’s figures for the same week.`) };
     let ph = fs.readFileSync(path.join(HERE, "template-polls.html"), "utf8");
     ph = ph.replace(/\{\{(FONT|pollsHead|pollsDek)\}\}/g, (m, k) => fillP[k]).replace("{{ORDER}}", () => JSON.stringify(order))
-      .replace("{{POLLS}}", () => JSON.stringify(PL).replace(/</g, "\\u003c"));
+      .replace("{{POLLS}}", () => JSON.stringify(PD).replace(/</g, "\\u003c"));
     const leftP = ph.match(/\{\{[A-Za-z]+\}\}/);
     if (leftP) throw new Error("dawn: polls template placeholder left unfilled: " + leftP[0]);
     fs.mkdirSync(path.join(out, "polls"), { recursive: true });
