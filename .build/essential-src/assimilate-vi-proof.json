@@ -1,16 +1,35 @@
 {
-  "generatedAt": "2026-11-25T01:09:30.817Z",
+  "generatedAt": "2026-11-25T01:54:53.747Z",
   "horizon": "2025-09-29",
   "retro": [],
-  "added": [],
+  "added": [
+    {
+      "csvWave": "2026-11-25",
+      "tppWave": "2026-11-25",
+      "row": {
+        "date": "2026-11-24",
+        "published": "2026-11-26T01:00",
+        "dateStart": "2026-11-19",
+        "pollster": "Essential",
+        "client": "The Guardian",
+        "sample": null,
+        "alp": 26,
+        "lnp": 25,
+        "grn": 13,
+        "onp": 26,
+        "ind": 5,
+        "undecidedIn": 5,
+        "oth": null,
+        "tpp_alp": 45,
+        "tpp_lnp": 51,
+        "releaseUrl": "https://essentialreport.com.au/reports/25th-november-2026",
+        "assimilated": true
+      }
+    }
+  ],
   "addedAppr": [],
   "addedDir": [],
-  "healedApproval": [
-    "2025-05-11",
-    "2025-07-29",
-    "2025-08-26",
-    "2026-11-24"
-  ],
+  "healedApproval": [],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",

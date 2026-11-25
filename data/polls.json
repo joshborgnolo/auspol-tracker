@@ -6779,6 +6779,25 @@
       "releaseUrl": "https://demosau.com/wp-content/uploads/DemosAU/national-poll-nov-2026v2.html",
       "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_National_Poll_November_2026_Methodology_Statement.pdf",
       "undecidedLeaner": 6
+    },
+    {
+      "date": "2026-11-24",
+      "published": "2026-11-26T01:00",
+      "dateStart": "2026-11-19",
+      "pollster": "Essential",
+      "client": "The Guardian",
+      "sample": null,
+      "alp": 26,
+      "lnp": 25,
+      "grn": 13,
+      "onp": 26,
+      "ind": 5,
+      "undecidedIn": 5,
+      "oth": null,
+      "tpp_alp": 45,
+      "tpp_lnp": 51,
+      "releaseUrl": "https://essentialreport.com.au/reports/25th-november-2026",
+      "assimilated": true
     }
   ],
   "ppm": [

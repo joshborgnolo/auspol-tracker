@@ -280,14 +280,16 @@ for (const [label, rows] of [["All polls", A.individualPolls], ["Latest polls", 
 
 // ---- Auxiliary-measure waves feed their own facets, never VI ------------
 {
-  const ess = A.directionOnlyPolls.find((p) => p.pollster === "Essential" && p.released === "2026-11-24");
+  const ess = A.individualPolls.find((p) => p.pollster === "Essential" && p.released === "2026-11-24");
   assert.deepEqual([ess.appr.albNet, ess.appr.taylorNet], [-28, -7]);
   assert.deepEqual([ess.appr.alb.app, ess.appr.alb.dis, ess.appr.taylor.app, ess.appr.taylor.dis], [32, 60, 35, 42]);
   assert.equal(ess.dir.right, 24);
-  assert.ok(ess.url && ess.published, "a standalone approval/mood release keeps its provenance");
-  assert.ok(!A.individualPolls.some((p) => p.pollster === "Essential" && p.released === ess.released), "no duplicate phantom-VI row");
+  assert.deepEqual([ess.alp, ess.lnp, ess.p.alp, ess.p.lnp, ess.p.grn, ess.p.onp], [45, 51, 26, 25, 13, 26]);
+  assert.ok(ess.releaseUrl && ess.published, "the running-series wave keeps its provenance");
+  assert.ok(!A.directionOnlyPolls.some((p) => p.pollster === "Essential" && p.released === ess.released), "a real VI wave suppresses auxiliary duplication");
   const latest = A.pollsterTable.find((p) => p.pollster === "Essential");
-  assert.deepEqual([latest.released, latest.leadershipLatest.released], ["2026-10-27", "2026-11-24"], "Latest follows the measure instead of replacing VI");
+  assert.equal(latest.released, "2026-11-24");
+  assert.equal((latest.leadershipLatest || latest).released, "2026-11-24", "Latest follows the measure instead of replacing VI");
   assert.equal(A.leaderModel.t1, ess.released, "the leadership model sees newer measure-only waves");
   // Each wave's source cohorts form all seven dimensions and 19 groups.
   const dem = JSON.parse(read("data/demographics.json")).waves.find((w) => w.pollster === "DemosAU" && w.date === "2026-11-22");

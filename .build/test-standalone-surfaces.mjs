@@ -48,9 +48,9 @@ try {
   assert.ok(ld.includes("−28") && ld.includes("−7"), ld);
   const primary = await page.evaluate(() => {
     const r = window.AUSPOL.pollsterTable.find((p) => p.pollster === "Essential");
-    return { released: r.released, alp: r.p.alp, latestReleased: r.leadershipLatest.released };
+    return { released: r.released, alp: r.p.alp, latestReleased: r.leadershipLatest?.released ?? null };
   });
-  assert.deepEqual(primary, { released: "2026-10-27", alp: 28, latestReleased: "2026-11-24" }, "VI and leadership candidates stay distinct");
+  assert.deepEqual(primary, { released: "2026-11-24", alp: 26, latestReleased: null }, "a real VI wave needs no auxiliary fallback");
 
   const open = async (pollster, date, facet) => {
     await page.evaluate(({ pollster, date, facet }) => window.AP.openPoll(`${pollster}|${date}`, facet, "non-VI regression"), { pollster, date, facet });

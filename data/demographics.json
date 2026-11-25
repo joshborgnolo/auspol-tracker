@@ -16112,6 +16112,70 @@
      }
     }
    }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-11-24",
+   "dateStart": "2026-11-19",
+   "dateEnd": "2026-11-24",
+   "sample": null,
+   "article": null,
+   "source": "https://essentialreport.com.au/reports/25th-november-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 28,
+      "lnp": 21,
+      "grn": 28,
+      "onp": 12,
+      "oth": 3,
+      "und": 8
+     },
+     "35–54": {
+      "alp": 27,
+      "lnp": 23,
+      "grn": 9,
+      "onp": 33,
+      "oth": 4,
+      "und": 4
+     },
+     "55+": {
+      "alp": 23,
+      "lnp": 30,
+      "grn": 5,
+      "onp": 31,
+      "oth": 8,
+      "und": 3
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 26,
+      "lnp": 25,
+      "grn": 7,
+      "onp": 30,
+      "oth": 7,
+      "und": 5
+     },
+     "Women": {
+      "alp": 26,
+      "lnp": 25,
+      "grn": 19,
+      "onp": 22,
+      "oth": 4,
+      "und": 5
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 25,
+    "grn": 13,
+    "onp": 26,
+    "oth": 5,
+    "und": 5
+   }
   }
  ],
  "skipped": [

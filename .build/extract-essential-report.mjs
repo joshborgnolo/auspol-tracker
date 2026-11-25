@@ -100,6 +100,7 @@
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import vm from "node:vm";
+import { shouldCrawlReport } from "./essential-series.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -482,7 +483,7 @@ try {
   const fullWhy = FORCE ? "--force" : !existsSync(OUT) ? "no CSV yet" : !saved?.pages ? "no per-page record yet"
     : fullAgeDays > FULL_EVERY_DAYS ? `last full crawl ${Number.isFinite(fullAgeDays) ? fullAgeDays.toFixed(1) + "d" : "never"} ago` : null;
   const recent = (r) => (Date.now() - Date.parse(r.date)) / 86400000 <= RECENT_REPORT_DAYS;
-  const crawlReports = fullWhy ? reports : reports.filter((r) => saved.pages[`r${r.id}`] !== r.modified || recent(r));
+  const crawlReports = fullWhy ? reports : reports.filter((r) => shouldCrawlReport(r, saved.pages, recent));
   const crawlQuestions = fullWhy ? questions : questions.filter((q) => saved.pages[`q${q.id}`] !== q.modified);
   const mode = fullWhy ? "full" : "incremental";
   console.log(`preflight: crawling — ${reason}; ${mode}${fullWhy ? ` (${fullWhy})` : ""}: ${crawlReports.length}/${reports.length} reports, ${crawlQuestions.length}/${questions.length} question pages`);

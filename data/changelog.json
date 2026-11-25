@@ -3,11 +3,11 @@
     "lead": {
       "pair": "alp_lnp",
       "basis": "imp",
-      "alp": 50.6
+      "alp": 50.3
     },
-    "imp": 50.6,
+    "imp": 50.3,
     "pub": 48.4,
-    "on": 51.2,
+    "on": 50.8,
     "momSig": false,
     "flows": {
       "grn": 88.2,
@@ -221,7 +221,8 @@
       "2026-11-15|Roy Morgan",
       "2026-11-17|YouGov",
       "2026-11-19|Newspoll",
-      "2026-11-22|DemosAU"
+      "2026-11-22|DemosAU",
+      "2026-11-24|Essential"
     ],
     "moves": {
       "lnp|education|University": 1,
@@ -230,7 +231,6 @@
       "onp|generation|Gen Z": 1,
       "onp|location|Inner metro": 1,
       "onp|state|WA": -1,
-      "oth|age|18–34": 1,
       "oth|generation|Gen Z": 1
     },
     "movesMeta": {
@@ -264,11 +264,6 @@
         "group": "WA",
         "setLabel": "By state"
       },
-      "oth|age|18–34": {
-        "party": "oth",
-        "group": "18–34",
-        "setLabel": "By age"
-      },
       "oth|generation|Gen Z": {
         "party": "oth",
         "group": "Gen Z",
@@ -276,39 +271,39 @@
       }
     },
     "prim": {
-      "alp": 26.9,
-      "grn": 13.3,
-      "lnp": 24.7,
-      "onp": 25,
-      "oth": 10.1
+      "alp": 26.5,
+      "grn": 13.4,
+      "lnp": 24.5,
+      "onp": 25.6,
+      "oth": 10
     },
     "leaders": {
-      "alb_fav": -27.4,
-      "alb_net": -27,
+      "alb_fav": -27.3,
+      "alb_net": -26.9,
       "hanson_fav": -3.2,
       "hanson_net": 0.5,
-      "taylor_fav": 2.7,
-      "taylor_net": -3.6
+      "taylor_fav": 2.8,
+      "taylor_net": -3.4
     },
     "lean": {
       "key": "alp_lnp|imp",
       "v": {
         "DemosAU": 0,
-        "Essential": -0.2,
+        "Essential": -0.5,
         "Fox & Hedgehog": -0.8,
         "Freshwater": -0.4,
-        "Newspoll": 1.5,
-        "RedBridge/Accent": -0.3,
+        "Newspoll": 1.6,
+        "RedBridge/Accent": -0.2,
         "Resolve": 0.6,
-        "Roy Morgan": 0.8,
-        "Spectre Strategy": -1.3,
+        "Roy Morgan": 0.9,
+        "Spectre Strategy": -1.2,
         "YouGov": 0.1
       }
     },
     "dir": {
       "right": 23.3,
       "wrong": 62.1,
-      "net": -38.8
+      "net": -38.7
     },
     "issLead": {
       "climate": "alp",
@@ -330,14 +325,8 @@
       "immigration": "Immigration",
       "security": "National security"
     },
-    "sig": {
-      "lead|alb_fav": -1,
-      "lead|alb_net": -1
-    },
-    "sigMeta": {
-      "lead|alb_fav": "Albanese’s net favourability",
-      "lead|alb_net": "Albanese’s net approval"
-    },
+    "sig": {},
+    "sigMeta": {},
     "conf": {
       "business": 81.7,
       "consumer": 66.7,
@@ -1161,6 +1150,31 @@
       "label": "25 Nov 2026",
       "kind": "finding",
       "text": "18–34 voters (by age) now break significantly toward others, relative to all voters."
+    },
+    {
+      "date": "2026-11-25",
+      "label": "25 Nov 2026",
+      "kind": "poll",
+      "text": "Essential (fieldwork 19–24 Nov) added — the two-party preferred estimate moved 50.6 → 50.3 (Labor v the Coalition, implied flows). Primary votes: Labor 26.9 → 26.5, the Coalition 24.7 → 24.5, One Nation 25.0 → 25.6, the Greens 13.3 → 13.4, others 10.1 → 10.0. Leader ratings: Albanese’s net approval −27.0 → −26.9, Albanese’s net favourability −27.4 → −27.3, Taylor’s net approval −3.6 → −3.4, Taylor’s net favourability +2.7 → +2.8. House effect (Labor v the Coalition, implied flows; positive leans Labor): Essential −0.2 → −0.5.",
+      "url": "https://essentialreport.com.au/reports/25th-november-2026"
+    },
+    {
+      "date": "2026-11-25",
+      "label": "25 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in Albanese’s net favourability is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-25",
+      "label": "25 Nov 2026",
+      "kind": "finding",
+      "text": "The month-on-month fall in Albanese’s net approval is no longer statistically significant."
+    },
+    {
+      "date": "2026-11-25",
+      "label": "25 Nov 2026",
+      "kind": "finding",
+      "text": "18–34 voters (by age) no longer break significantly toward others, relative to all voters."
     }
   ]
 }
