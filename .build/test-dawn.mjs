@@ -1,0 +1,134 @@
+/* test-dawn.mjs – the /dawn/ trial design (.build/dawn/, gen-data §13).
+   1. its data ends on the site's own figures: the last week's primaries are
+      latest.primary, and the two-party lines end on the site's implied lines;
+   2. every branch of the copy rules (copy.mjs) on mutated data, so a head
+      can only claim what clears its margin;
+   3. the built page: every placeholder filled, its data parses, its past
+      terms' sidecar is on disk, the heads are today's rules.
+   Run: node .build/test-dawn.mjs */
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import assert from "node:assert/strict";
+import { fileURLToPath } from "node:url";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor } from "./dawn/copy.mjs";
+import { buildDawn, flowTotals } from "./dawn/build.mjs";
+
+const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "..");
+const A = path.join(HERE, "newtracker", "assets");
+const D0 = JSON.parse(fs.readFileSync(path.join(A, "dawn-data.json"), "utf8"));
+const clone = () => JSON.parse(JSON.stringify(D0));
+const r1 = (v) => Math.round(v * 10) / 10;
+let n = 0;
+const ok = (c, m) => { assert.ok(c, m); n++; };
+const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
+
+/* ---- 1. the data ends on the site's figures ---------------------------- */
+const asset = fs.readFileSync(path.join(A, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+const grab = (name) => { const m = asset.match(new RegExp(`const ${name} = (.*);\\n`)); assert.ok(m, "data asset lacks " + name); return JSON.parse(m[1]); };
+const latest = grab("latest"), synth = grab("synth2pp"), synthOn = grab("synthOn"), events = grab("events");
+const L = D0.weeks.length - 1;
+for (const k of D0.parties) {
+  eq(r1(D0.prim[k].v[L]), latest.primary[k], `last week's ${k} is the site's headline`);
+  eq(D0.prim[k].v.length, D0.weeks.length, `${k}: one value a week`);
+  ok(D0.prim[k].lo.every((lo, i) => lo <= D0.prim[k].v[i] && D0.prim[k].v[i] <= D0.prim[k].hi[i]), `${k}: every week inside its band`);
+}
+eq(D0.weeks[L], latest.updatedISO, "the last week is the newest poll's day");
+eq(D0.tpp.imp.v.length, L, "two-party weeks start a week after polling day");
+eq(r1(D0.tpp.imp.v[L - 1]), synth[synth.length - 1].alp, "implied v Coalition ends on the site's line");
+eq(r1(D0.tpp.on.v[L - 1]), synthOn[synthOn.length - 1].a, "implied v One Nation ends on the site's line");
+eq(D0.events.length, events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).length, "the events the site's charts mark");
+const T = flowTotals(D0);
+eq(r1(T.lnp), r1(D0.tpp.imp.v[L - 1]), "the flow diagram's total is the chart's last implied figure");
+eq(r1(T.on), r1(D0.tpp.on.v[L - 1]), "against One Nation too");
+ok(D0.rank.length === D0.weeks.length && D0.rank.every((r) => r.length === D0.parties.length), "a ranking every week");
+
+/* ---- 2. the copy rules, branch by branch -------------------------------- */
+/* set today's primaries: { k: [v, lo, hi] }, the count left as it is */
+const withNow = (o) => { const D = clone(); for (const [k, [v, lo, hi]] of Object.entries(o)) { D.prim[k].v[L] = v; D.prim[k].lo[L] = lo; D.prim[k].hi[L] = hi; } return D; };
+const E = Object.fromEntries(D0.parties.map((k) => [k, D0.prim[k].v[0]]));   // the count
+const flat = () => Object.fromEntries(D0.parties.map((k) => [k, [E[k], E[k] - 1, E[k] + 1]]));
+eq(votesHead(withNow(flat())).head, "The primary vote is much where it was at the election", "nothing clears: much the same");
+const grow = (k, f, lo) => withNow({ ...flat(), [k]: [E[k] * f, E[k] * lo, E[k] * f + 2] });
+eq(votesHead(grow("onp", 2.6, 2.1)).head, "One Nation’s vote has more than doubled", "doubled, read off the interval's lower end");
+eq(votesHead(grow("onp", 3.9, 3.6)).head, "One Nation’s vote has more than tripled", "tripled");
+eq(votesHead(grow("onp", 4.6, 4.2)).head, "One Nation’s vote has more than quadrupled", "quadrupled");
+eq(votesHead(grow("onp", 6, 5.4)).head, "One Nation’s vote has grown more than fivefold", "fivefold");
+eq(votesHead(grow("onp", 2.2, 1.9)).head, "One Nation is up " + r1(E.onp * 1.2).toFixed(1) + " points since the election", "a point estimate past double whose interval is not: points");
+const fall = (k, v, hi) => withNow({ ...flat(), [k]: [v, v - 1, hi] });
+eq(votesHead(fall("lnp", E.lnp * 0.4, E.lnp * 0.48)).head, "The Coalition has lost more than half of its election vote", "half, read off the upper end");
+eq(votesHead(fall("lnp", E.lnp * 0.6, E.lnp * 0.66)).head, "The Coalition has lost more than a third of its election vote", "a third");
+eq(votesHead(fall("lnp", E.lnp * 0.7, E.lnp * 0.74)).head, "The Coalition has lost more than a quarter of its election vote", "a quarter");
+eq(votesHead(fall("lnp", E.lnp * 0.76, E.lnp * 0.8)).head, "The Coalition has lost more than a fifth of its election vote", "a fifth");
+eq(votesHead(fall("lnp", E.lnp - 3, E.lnp - 1)).head, "The Coalition is down 3.0 points since the election", "a small fall: points");
+eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 points since the election", "a plural name takes a plural verb");
+{
+  const D = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], lnp: [E.lnp - 4, E.lnp - 5, E.lnp - 3] });
+  ok(votesDek(D).endsWith("Labor is down 5.0 points and the Coalition 4.0."), "two falls share a verb: " + votesDek(D));
+  const D2 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], grn: [E.grn + 2, E.grn + 1, E.grn + 3] });
+  ok(votesDek(D2).endsWith("Labor is down 5.0 points; the Greens are up 2.0."), "a fall and a rise: " + votesDek(D2));
+  const D3 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5] });
+  ok(/election, %\.$/.test(votesDek(D3)), "nothing else clears: the dek describes the chart alone");
+}
+/* the two-party story (the site's rule) */
+{
+  const st = (onLast, coLast, ciOn = 1, ciCo = 1) => { const D = clone(); const m = D.months; m.on[m.on.length - 1] = [m.on[m.on.length - 1][0], onLast, ciOn]; m.imp[m.imp.length - 1] = [m.imp[m.imp.length - 1][0], coLast, ciCo]; return tppStory(D).head; };
+  eq(st(51, 51.5), "One Nation now runs Labor as close as the Coalition does", "inside a point: as close");
+  eq(st(50, 53, 1, 1), "One Nation now runs Labor closer than the Coalition does", "a gap past both margins: closer");
+  eq(st(54, 51, 1, 1), "The Coalition still runs Labor closer than One Nation does", "the other way");
+  eq(st(50, 52.5, 2, 2), "One Nation now runs Labor as close as the Coalition does", "a gap inside the combined margin: as close");
+}
+/* the flow diagram's verdicts, all nine pairs */
+{
+  const set = (lnp, on) => { const D = clone(); const i = D.tpp.imp.v.length - 1; D.tpp.imp.v[i] = lnp[0]; D.tpp.imp.ci[i] = lnp[1]; D.tpp.on.v[i] = on[0]; D.tpp.on.cs[i] = on[1]; D.tpp.on.cf[i] = 0; return D; };
+  const L_ = [54, 1], T_ = [50.5, 1.4], R_ = [46, 1];
+  const cases = [
+    [L_, L_, "After preferences, Labor leads either rival"],
+    [T_, T_, "After preferences, Labor is level with either rival"],
+    [R_, R_, "After preferences, both rivals lead Labor"],
+    [L_, T_, "After preferences, Labor leads the Coalition but is level with One Nation"],
+    [T_, L_, "After preferences, Labor leads One Nation but is level with the Coalition"],
+    [L_, R_, "After preferences, Labor leads the Coalition but trails One Nation"],
+    [R_, L_, "After preferences, Labor leads One Nation but trails the Coalition"],
+    [R_, T_, "After preferences, Labor trails the Coalition but is level with One Nation"],
+    [T_, R_, "After preferences, Labor trails One Nation but is level with the Coalition"],
+  ];
+  for (const [a, b, want] of cases) eq(flowsHead(set(a, b)), want, "flows head " + JSON.stringify([a, b]));
+  ok(verdicts(set(T_, T_)).lnp.margin === 2.8, "the margin as the site prints it: twice the interval");
+}
+/* the note under the diagram */
+{
+  const D = clone();
+  ok(/^Preferences (widen|narrow) Labor’s lead over the Coalition from \d+\.\d points on first preferences to \d+\.\d/.test(flowNote(D, "lnp", flowTotals(D).lnp)), "today's note");
+  D.nowShares = { ...D.nowShares, alp: 24, lnp: 26 };
+  ok(/^Preferences turn Labor’s 2\.0-point deficit against the Coalition on first preferences into a/.test(flowNote(D, "lnp", 52)), "a deficit turned: " + flowNote(D, "lnp", 52));
+  ok(/inside the ±/.test(flowNote(D0, "lnp", 50.6)) === (verdicts(D0).lnp.who === null), "inside the margin exactly when the verdict is level");
+}
+
+/* ---- 3. the built page --------------------------------------------------- */
+{
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  const font = fs.readdirSync(path.join(ROOT, "assets", "fonts")).find((f) => /^commissioner-latin\./.test(f));
+  ok(!!font, "the site serves the face the page asks for");
+  fs.copyFileSync(path.join(ROOT, "assets", "fonts", font), path.join(tmp, "assets", "fonts", font));
+  const r = buildDawn({ root: tmp, assets: A });
+  const html = fs.readFileSync(r.file, "utf8");
+  ok(!/\{\{[A-Za-z]+\}\}|\/\*\{\{STARS\}\}\*\//.test(html), "every placeholder filled");
+  ok(fs.existsSync(path.join(tmp, "dawn", r.hist)), "the past terms' sidecar is beside the page");
+  ok(html.includes(`href="${r.hist}"`), "and the page names it");
+  ok(html.includes(`/assets/fonts/${font}`), "the face from the site's fonts");
+  const data = JSON.parse(html.match(/<script id="dawn-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  eq(data.weeks.length, D0.weeks.length, "the page carries the data");
+  const C = copyFor(D0);
+  for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
+  ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
+  ok(/const STARS=\[/.test(html), "the sky's stars");
+  fs.rmSync(tmp, { recursive: true, force: true });
+}
+/* linked from nowhere */
+{
+  const hits = ["index.html", "info/index.html", "allpolls/index.html"].filter((f) => fs.existsSync(path.join(ROOT, f)) && /href="\/?dawn\//.test(fs.readFileSync(path.join(ROOT, f), "utf8")));
+  eq(hits.length, 0, "no page links /dawn/");
+}
+console.log(`PASS: dawn – ${n} checks: data ends on the site's figures, every copy branch, the built page`);

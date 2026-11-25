@@ -2556,6 +2556,19 @@ writeAtomic(path.join(ROOT, "sitemap.xml"), sitemapXml);
 writeAtomic(path.join(ROOT, "robots.txt"),
   `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
+/* ---- 5d. /dawn/ – the trial design, on this build's data ---------------
+   .build/dawn/build.mjs: a page linked from nowhere. A failure there is
+   reported and never stops the site's own build. */
+if (!process.env.BUILD_OUT) {
+  try {
+    const { buildDawn } = await import("../dawn/build.mjs");
+    const r = buildDawn({ root: ROOT, assets: GEN_OUT, keep: sweepKeep, write: (f, s) => writeAtomic(f, s) });
+    console.log(`built dawn/index.html · ${(r.bytes / 1024).toFixed(0)} KB · ${r.weeks} weeks`);
+  } catch (e) {
+    console.error("dawn: not built –", e && e.message ? e.message : e);
+  }
+}
+
 /* ---- 6. report --------------------------------------------------------- */
 import zlib from "node:zlib";
 const size = fs.statSync(OUT).size;

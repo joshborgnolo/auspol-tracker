@@ -26,7 +26,7 @@ import { fitSwitch, colOf as swCol, pOf as swP, mean as swMean, quant as swQuant
 import { buildSeries as imBuildSeries, fitFamily as imFit, drawSeries as imDrawSeries, lineMoments as imMoments, salObs as imSalObs, ownObs as imOwnObs, expit as imExpit, quant as imQuant, WIDE_SAL as IM_WIDE_SAL, WIDE_OWN as IM_WIDE_OWN } from "./issue-model.mjs";
 import { buildReadings as buildIssueReadings, ELECTION_DAYS as IM_ELECTION_DAYS } from "./issue-readings.mjs";
 import { fitSpan, gapReading, countReading, nestCats, nestCoords, nestShares, drawMix, makeRng as gsRng } from "./group-span.mjs";
-import { fitPrimary, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
+import { fitPrimary, drawsAt, fitSet as fitGroupSet, anchorFrom, categoriesOf as pmCategories, stepOf as pmStep, softmaxAlr as pmSoftmax, alrOf as pmAlr, unpack as pmUnpack, fitUndecided, PRIM_MISS, mean as pmMean, quant as pmQuant, PARTIES as PM_PARTIES } from "./primary-model.mjs";
 import { stateOf, flowsOf, initChangelog, diffChangelog } from "../changelog.mjs";
 import { readStores as readOneOffStores, buildPublicOpinion, HOUSES as PUBOP_HOUSES } from "./public-opinion.mjs";
 
@@ -12357,6 +12357,188 @@ if (!JUR) writeAtomic(ONEOFFS_ASSET, JSON.stringify(oneOffsSource));
 if (!JUR) writeAtomic(GROUP_HIST_ASSET, JSON.stringify(GROUP_HIST));
 /* the issues' long view (§7hm ISSUES_HIST): the lazily fetched issues-history sidecar */
 if (!JUR) writeAtomic(ISSUES_HIST_ASSET, JSON.stringify(ISSUES_HIST));
+
+/* ---- 13. the /dawn/ trial design's data (federal) ----------------------
+   A trial design for the site (.build/dawn/, built by build.mjs into
+   /dawn/, linked from nowhere) reads the models week by week: the five
+   primaries with their 95% bands and each week's ranking, Labor's
+   two-party vote against each rival (implied, and the published pair),
+   each poll that counts, the marked events, and the past terms for its
+   time window. The weekly points are drawn apart from every figure above
+   (primary-model.mjs drawsAt: the same settings and the same number of
+   draws per component, their own seed), so nothing the site prints moves;
+   the last week is the site's figure for today, from the fit's own draws.
+   A failure here is reported and leaves the page on its last good data. */
+const DAWN_ASSET = path.join(OUT_DIR, "dawn-data.json"), DAWN_HIST_ASSET = path.join(OUT_DIR, "dawn-hist.json");
+if (!JUR && PRIMM && TPM) {
+  try {
+    const tW = Date.now();
+    const { fit, t0, t1 } = PRIMM, P = PM_PARTIES.length;
+    const isoD = (d) => new Date(d * 86400000).toISOString().slice(0, 10), x4 = (x) => Math.round(x * 1e4) / 1e4;
+    /* two places for the lines (a tenth draws them in steps), chosen so the
+       page's tenth is the site's: 26.849 ships as 26.84, never 26.85 */
+    const r2t = (v) => { let o = r2(v); if (r1(o) !== r1(v)) o = r2(o + (r1(v) > r1(o) ? 0.01 : -0.01)); return o; };
+    /* the weeks: back from the newest poll's day to the first poll, so the
+       last point is today's figure and the first sits on the first poll */
+    const d0 = Math.min(...PRIMM.readings.map((r) => r.day));
+    const weeks = [];
+    for (let d = t1; d >= Math.max(d0, t0 + 1); d -= 7) weeks.unshift(d);
+    const wd = drawsAt(fit, weeks.filter((d) => d !== t1), { seed: 20261201 });
+    const drawsOf = (d) => (d === t1 ? fit.shares(t1) : wd.get(d));
+    const colQ = (dr, q) => { const n = dr.length / P, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * dr[i * P + q]; return o; };
+    /* week 0 is polling day: the count itself, no band */
+    const prim = Object.fromEntries(PM_PARTIES.map((k) => [k, { v: [r1(ELECTION[k] ?? 0)], lo: [r1(ELECTION[k] ?? 0)], hi: [r1(ELECTION[k] ?? 0)] }]));
+    /* each week's ranking, as the primary panel ranks today (rd-panels
+       levelRuns): order by share, and a party joins the group above while
+       the chance that group's leader is ahead of it is under 97.5% (a
+       two-sided 95% test, the chances read to two places as the site's
+       pAhead is); a group of two or more is a tie, ranked from its first
+       place. Stored per party in PM_PARTIES order, negative when tied. */
+    const rankOf = (vals, pa) => {
+      const ord = PM_PARTIES.map((k, q) => q).sort((a, b) => vals[b] - vals[a]);
+      const runs = [];
+      for (const q of ord) {
+        const r = runs[runs.length - 1];
+        if (r && pa(r[0], q) < 0.975) r.push(q); else runs.push([q]);
+      }
+      const out = new Array(P); let pos = 1;
+      for (const r of runs) { for (const q of r) out[q] = r.length > 1 ? -pos : pos; pos += r.length; }
+      return out;
+    };
+    const rank = [rankOf(PM_PARTIES.map((k) => ELECTION[k] ?? 0), (a, b) => ((ELECTION[PM_PARTIES[a]] ?? 0) > (ELECTION[PM_PARTIES[b]] ?? 0) ? 1 : 0))];
+    for (const d of weeks) {
+      const dr = drawsOf(d), n = dr.length / P, means = [];
+      PM_PARTIES.forEach((k, q) => {
+        const c = colQ(dr, q), m = pmMean(c);
+        means.push(m);
+        prim[k].v.push(r2t(m)); prim[k].lo.push(r2(pmQuant(c, 0.025))); prim[k].hi.push(r2(pmQuant(c, 0.975)));
+      });
+      const pa = (a, b) => { let w = 0; for (let i = 0; i < n; i++) if (dr[i * P + a] > dr[i * P + b]) w++; return r2(w / n); };
+      rank.push(rankOf(means, pa));
+    }
+    /* Labor's two-party vote, read off the same draws as the site reads it
+       (gen-data §2t, primary-model.mjs tppRead): the implied pair against
+       the Coalition through the 2025 flows plus the three-cornered term,
+       against One Nation through FP_ON with the table's own range (cf)
+       added to the model's interval (cs) in quadrature; today from §2t */
+    const vec = (o) => PM_PARTIES.map((k) => o[k] ?? 0);
+    const F_IMP = vec({ alp: 1, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth });
+    const F_ON = vec({ alp: 1, lnp: FP_ON.lnp, grn: FP_ON.grn, oth: FP_ON.oth });
+    const BANDW = vec({ lnp: FP_ON_BAND.lnp, grn: FP_ON_BAND.grn, oth: FP_ON_BAND.oth });
+    const linRead = (dr, f) => {
+      const n = dr.length / P; let s = 0, s2 = 0;
+      for (let i = 0; i < n; i++) { let t = 0; for (let q = 0; q < P; q++) t += f[q] * dr[i * P + q]; s += t; s2 += t * t; }
+      const m = s / n;
+      return { m: 100 * m, sd: 100 * Math.sqrt(Math.max(0, (s2 - n * m * m) / (n - 1))) };
+    };
+    const meanVec = (dr) => { const n = dr.length / P, m = new Array(P).fill(0); for (let i = 0; i < n; i++) for (let q = 0; q < P; q++) m[q] += dr[i * P + q] / n; return m; };
+    const imp = { v: [], ci: [] }, on = { v: [], cs: [], cf: [] };
+    for (const d of weeks) {
+      if (d === t1) {
+        imp.v.push(r2t(TPM.imp.now.v)); imp.ci.push(r2(TPM.imp.now.ci));
+        on.v.push(r2t(TPM.on.now.v)); on.cs.push(r2(TPM.on.now.ci)); on.cf.push(r2(TPM.cf.get(t1)));
+        continue;
+      }
+      const dr = drawsOf(d), a = linRead(dr, F_IMP), b = linRead(dr, F_ON), m = meanVec(dr);
+      imp.v.push(r2t(a.m + FLOW_3CNR)); imp.ci.push(r2(1.96 * a.sd));
+      on.v.push(r2t(b.m)); on.cs.push(r2(1.96 * b.sd)); on.cf.push(r2(100 * m.reduce((t, s, q) => t + s * BANDW[q], 0)));
+    }
+    /* the published pair: its own two-category fit (§2t), the same weeks
+       from its first poll on */
+    const pf = TPM.pub && TPM.pub.fit;
+    const pub = pf ? (() => {
+      const first = Math.min(...pf.obs.map((o) => o.day));
+      const ws = weeks.filter((d) => d >= first);
+      const pd = drawsAt(pf, ws.filter((d) => d !== t1), { seed: 20261202 });
+      const out = { from: weeks.indexOf(ws[0]), v: [], lo: [], hi: [] };
+      for (const d of ws) {
+        if (d === t1) { out.v.push(r2t(TPM.pub.now.v)); out.lo.push(r2(TPM.pub.now.lo)); out.hi.push(r2(TPM.pub.now.hi)); continue; }
+        const dr = pd.get(d), n = dr.length / 2, c = new Float64Array(n);
+        for (let i = 0; i < n; i++) c[i] = 100 * dr[i * 2];
+        out.v.push(r2t(pmMean(c))); out.lo.push(r2(pmQuant(c, 0.025))); out.hi.push(r2(pmQuant(c, 0.975)));
+      }
+      return out;
+    })() : null;
+    /* each poll that counts (the model reads it at its fieldwork's middle):
+       printed primaries, its implied and published two-party figures, and
+       what its shares are of (POLL_BASES, as the site's pollBaseOf reads) */
+    const baseOf = (q, facet) => {
+      if (q.pollster === "DemosAU" && q.undecided != null) return "D";
+      const b = pollBases[q.pollster];
+      return !b ? null : typeof b === "string" ? b : (b[facet] || b.primary);
+    };
+    const polls = individualPolls.filter((q) => !q.noAgg && (q.p || q.alpN != null)).map((q) => {
+      const o = { h: q.pollster, m: q.fmid, f: q.field };
+      /* primaries only where the model reads them, so the dots are its polls */
+      if (q.p && PRIMM.byKey.has(q.released + "|" + q.pollster)) o.p = PM_PARTIES.map((k) => (q.p[k] != null ? q.p[k] : null));
+      if (q.sample != null) o.n = q.sample;
+      const b1 = baseOf(q, "primary"), b2 = baseOf(q, "twopp");
+      if (b1) o.b = b1;
+      if (b2 && b2 !== b1) o.b2 = b2;
+      if (q.alpImp != null) o.i = q.alpImp;
+      if (q.alpOnImp != null) o.io = q.alpOnImp;
+      if (q.alpN != null) o.t = q.alpN;
+      if (q.tppAlt && q.tppAlt.alp != null) o.to = q.tppAlt.alp;
+      if (q.fieldPending) o.tbc = 1;
+      return o;
+    });
+    /* the events the site's charts mark (rd.jsx rdChartEvents: the major
+       ones and two kept by hand) */
+    const KEPT = ["2026-02-12", "2025-12-08"];
+    const dawn = {
+      v: 1, asOf: isoD(t1), updated: latest.updated, published: latest.publishedISO,
+      election: { date: ELECTION.date, tpp: ELECTION.tpp_alp },
+      parties: PM_PARTIES, weeks: [ELECTION.date, ...weeks.map(isoD)], prim, rank,
+      pAhead: PRIMM.pAhead,
+      tpp: { imp, on, pub },
+      /* the site's monthly two-party lines on the implied basis, which its
+         chart story is written from (rd-hero.jsx story) */
+      months: {
+        imp: agg2ppSynth.filter((m) => !m.election).map((m) => [m.ym, m.alp, m.ci95]),
+        on: agg2ppSynthOn.filter((m) => !m.election).map((m) => [m.ym, m.a, m.ci95]),
+      },
+      pubOn: (alt2pp.alp_on || []).map((m) => [m.ym, m.a, m.ci95]),
+      ext: {
+        bt: extAgg.bt ? extAgg.bt.points.map((p) => [x4(p.x), r2(p.y)]) : null,
+        kb: extAgg.bonham && extAgg.bonham.line ? extAgg.bonham.line.map((p) => [x4(p.x), r2(p.y)]) : null,
+        kbsh: extAgg.bonham && extAgg.bonham.shadow ? extAgg.bonham.shadow.map((p) => [x4(p.x), r2(p.y)]) : null,
+        btFeed: extAgg.bt ? extAgg.bt.feed : null, kbSite: extAgg.bonham ? extAgg.bonham.site : null,
+      },
+      flows: { lnp: { grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth }, on: { lnp: FP_ON.lnp, grn: FP_ON.grn, oth: FP_ON.oth }, onBand: FP_ON_BAND, cnr: FLOW_3CNR },
+      /* today's shares unrounded, so the flow diagram's totals are the
+         two-party figures the chart ends on */
+      nowShares: Object.fromEntries(PM_PARTIES.map((k) => [k, +PRIMM.now[k].v.toFixed(4)])),
+      polls,
+      events: events.filter((e) => e.major || KEPT.includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
+      terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
+        .sort((a, b) => (a.e < b.e ? -1 : 1)),
+    };
+    /* the past terms (the vote history, §8v) and their polls as the site
+       draws them (rd-panels vhScatter): exit polls, counts and the modelled
+       YouGov wave left out, a base that kept undecided voters put on a
+       decided basis, others as what the drawn parties leave */
+    const histPolls = {};
+    for (const t of voteHistory.terms) {
+      const drawn = t.lanes.filter((k) => k !== "oth" && k !== "tpp");
+      const rows = [];
+      for (const r of (cycleSource[t.year] && cycleSource[t.year].polls) || []) {
+        if (r.firm === "Election" || /exit/i.test(r.firm || "") || r.firm === "YouGov MRP") continue;
+        const x = dx(r.date);
+        if (x <= t.a || x > t.b) continue;
+        const kk = r.und != null ? 100 / (100 - r.und) : 1, v = {};
+        for (const k of drawn) v[k] = r[k] != null ? r[k] * kk : null;
+        v.oth = drawn.every((k) => v[k] != null) ? 100 - drawn.reduce((a, k) => a + v[k], 0) : null;
+        rows.push([r.date, r.firm || "", r.dateApprox ? 1 : 0, ...PM_PARTIES.map((k) => (v[k] != null ? r1(v[k]) : null)), r.imp_alp != null ? r1(r.imp_alp) : null]);
+      }
+      histPolls[t.year] = rows;
+    }
+    writeAtomic(DAWN_ASSET, JSON.stringify(dawn));
+    writeAtomic(DAWN_HIST_ASSET, JSON.stringify({ terms: voteHistory.terms, rms: voteHistory.rms, polls: histPolls }));
+    console.log(`dawn: ${weeks.length} weeks, ${polls.length} polls in ${((Date.now() - tW) / 1000).toFixed(1)}s`);
+  } catch (e) {
+    console.error("dawn data: skipped –", e && e.stack ? e.stack : e);
+  }
+}
 
 /* ---- sanity summary ---------------------------------------------------- */
 console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {

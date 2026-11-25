@@ -608,6 +608,32 @@ export function fitPrimary(readings, opts) {
   return { parties, L, obs, cnt, events, settings: S, ctx, nDraw, shares: (d) => sh.get(d), pair: (a, b) => pairDraws.get(a + "|" + b), lean: (h) => leanDraws.get(h),
     influence, leanPath, levelAt, best, timing: { settings: T1 - T0, draws: T2 - T1, loo: T3 - T2 } };
 }
+/* drawsAt: a fitted model's posterior at further days (the /dawn/ trial
+   page's weekly points), drawn apart from the fit so none of its own
+   figures moves: each component of the settings' mixture keeps the number
+   of draws it had in the fit, its smoother re-runs on an event grid that
+   also holds `days` (no reading there, so only prediction steps split), and
+   the draws come from their own seed. Returns Map(day → Float64Array(nDraw·P)). */
+export function drawsAt(fit, days, { seed = 20261201 } = {}) {
+  const { L, obs, ctx, settings: S, nDraw, parties } = fit, P = parties.length, D = P - 1, N = L.N;
+  const t0 = fit.events[0], t1 = fit.events[fit.events.length - 1];
+  const want = [...new Set(days)].filter((d) => d >= t0 && d <= t1).sort((a, b) => a - b);
+  const events = [...new Set([...fit.events, ...want])].sort((a, b) => a - b);
+  const evIdx = new Map(events.map((d, i) => [d, i]));
+  const rng = makeRng(seed), Lbuf = new Float64Array(4 * D * D), etaIdx = Array.from({ length: D }, (_, k) => k);
+  const out = new Map(want.map((d) => [d, new Float64Array(nDraw * P)]));
+  let di = 0;
+  for (const { c, n } of allocate(S.comps, nDraw)) {
+    const th = unpack(c.v, P, ctx.prior.names);
+    const { sm } = filterSmooth(obs, L, events, th, { anchor: ctx.anchor, jumps: ctx.jumps, kappa: S.kappa, lone: L.lone });
+    for (const d of want) {
+      const k = evIdx.get(d), x = sm.xs.subarray(k * N, k * N + D), C = block(sm.Ps.subarray(k * N * N, (k + 1) * N * N), N, etaIdx, etaIdx), o = out.get(d);
+      for (let j = 0; j < n; j++) o.set(softmaxAlr(mvnDraw(x, C, D, rng, Lbuf)), (di + j) * P);
+    }
+    di += n;
+  }
+  return out;
+}
 /* summaries over draws for party q */
 export function col(draws, P, q) { const n = draws.length / P, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = draws[i * P + q]; return o; }
 
