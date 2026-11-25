@@ -20,7 +20,7 @@
    LAYOUT phone: one snapped screen per section (title, figures, chart, notes); laptop: same order, side panel for figures
    DATA the site's own models (gen-data §13, built by .build/dawn/build.mjs): a trial design, linked from nowhere */
 @font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("{{FONT}}") format("woff2")}
-:root{color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+:root{--tbd:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}}
 :root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}
 *{box-sizing:border-box;min-width:0}
@@ -59,14 +59,16 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .skyset button[aria-checked=true]{background:#f3f0ff;color:#0b1433;border-color:#f3f0ff}
 
 /* hero */
-.hero{position:relative;height:100vh;height:100svh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
+@supports (height:100dvh){:root{--tbd:calc(100lvh - 100dvh)}}
+.hero{position:relative;height:100vh;height:100lvh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
+.tbd{position:absolute;left:0;bottom:0;width:0;height:var(--tbd)}
 .sky{position:absolute;inset:0;background:linear-gradient(to bottom,var(--z) 0%,var(--m) 42%,var(--l) 74%,var(--h) 100%)}
 .wash{position:absolute;inset:0}
 .wash.rise{background:radial-gradient(120% 55% at 50% var(--sy),rgba(255,138,72,calc(var(--wa1)*.8)) 0%,rgba(255,110,80,calc(var(--wa1)*.36)) 32%,rgba(170,110,170,calc(var(--wa1)*.15)) 55%,transparent 75%),linear-gradient(to top,rgba(255,150,110,calc(var(--ba1)*.8)) 0%,rgba(230,140,160,calc(var(--ba1)*.4)) 12%,transparent 30%)}
 .wash.set{background:radial-gradient(120% 55% at 50% var(--sy),rgba(255,120,50,var(--wa2)) 0%,rgba(250,80,90,calc(var(--wa2)*.5)) 30%,rgba(180,80,160,calc(var(--wa2)*.25)) 55%,transparent 80%),linear-gradient(to top,rgba(255,110,70,var(--ba2)) 0%,rgba(225,90,140,calc(var(--ba2)*.6)) 14%,rgba(140,80,170,calc(var(--ba2)*.25)) 28%,transparent 42%)}
 .stars{position:absolute;inset:0;opacity:var(--st)}
 .stars canvas{position:absolute;inset:0;display:block}
-.sun{--d:min(72vw,38vh);position:absolute;left:50%;width:var(--d);height:var(--d);bottom:calc(var(--d)*-.5);transform:translate(-50%,var(--ty));border-radius:50%;will-change:transform}
+.sun{--d:min(72vw,38vh);position:absolute;left:50%;width:var(--d);height:var(--d);bottom:calc(var(--d)*-.5 + var(--tbd));transform:translate(-50%,var(--ty));border-radius:50%;will-change:transform}
 .halo{position:absolute;inset:-110%;border-radius:50%;background:radial-gradient(circle closest-side,rgba(255,150,70,.5) 0%,rgba(255,120,60,.26) 24%,rgba(255,110,90,.09) 46%,transparent 70%)}
 .limb{position:absolute;inset:-16%;border-radius:50%;background:radial-gradient(circle closest-side,#ff5a1c 0%,#ff6c22 72%,#ff8a2e 79%,#ffa040 84%,rgba(255,160,70,.45) 91%,rgba(255,170,90,0) 100%)}
 .grain{position:absolute;inset:0;z-index:1;pointer-events:none;background-repeat:repeat;background-size:128px 128px;opacity:.22}
@@ -113,7 +115,7 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .core{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle closest-side at 50% 46%,var(--c1) 0%,var(--c2) 62%,var(--c3) 90%,#ee4420 97%,rgba(255,96,30,0) 100%)}
 
 /* sections */
-.sec{position:relative;height:100vh;height:100svh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) var(--g)}
+.sec{position:relative;height:100vh;height:100lvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbd)) var(--g)}
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
 .dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:60ch;text-wrap:pretty}
@@ -206,7 +208,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[hidden]{display:none}
 svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
-@media (max-height:600px){.sec{height:auto;min-height:100svh;min-height:100dvh;overflow:visible}.fig{min-height:260px}}
+@media (max-height:600px){.sec{height:auto;min-height:100vh;min-height:100lvh;overflow:visible}.fig{min-height:260px}}
 @media (min-width:900px){
 .sec{padding-top:calc(var(--navh) + 20px);padding-bottom:24px}
 .flow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd ctl" "fig fig" "note note" "src src"}
@@ -238,7 +240,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 </head>
 <body>
 <header class="nav over" id="nav">
-  <a class="mark" href="#top"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="16" r="14" fill="url(#lgH)"/><circle cx="16" cy="16" r="7.4" fill="url(#lgC)"/></g></svg>auspol tracker</a>
+  <a class="mark" href="#top"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="lgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--lz)"/><stop offset=".5" style="stop-color:var(--lm)"/><stop offset=".82" style="stop-color:var(--ll)"/><stop offset="1" style="stop-color:var(--lh)"/></linearGradient><radialGradient id="lgH" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9a4a" stop-opacity=".8"/><stop offset=".55" stop-color="#ff7a45" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a45" stop-opacity="0"/></radialGradient><radialGradient id="lgC" cx=".5" cy=".46" r=".5"><stop offset="0" stop-color="#ec4426"/><stop offset=".62" stop-color="#d42a22"/><stop offset=".9" stop-color="#b9181c"/><stop offset="1" stop-color="#ff7a2e"/></radialGradient><radialGradient id="lgL" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6c22"/><stop offset=".7" stop-color="#ff7a28"/><stop offset=".8" stop-color="#ffa040"/><stop offset=".9" stop-color="#ffb24e" stop-opacity=".55"/><stop offset="1" stop-color="#ffb24e" stop-opacity="0"/></radialGradient><clipPath id="lgK"><circle cx="16" cy="16" r="16"/></clipPath></defs><g clip-path="url(#lgK)"><rect width="32" height="32" fill="url(#lgS)"/><circle cx="9" cy="7" r=".75" fill="#fff" opacity=".85"/><circle cx="21.5" cy="5" r=".55" fill="#fff" opacity=".7"/><circle cx="26" cy="11" r=".45" fill="#fff" opacity=".6"/><circle cx="16" cy="16" r="14" fill="url(#lgH)"/><circle cx="16" cy="16" r="9.8" fill="url(#lgL)"/><circle cx="16" cy="16" r="7" fill="url(#lgC)" stroke="#ff9a3a" stroke-width="1.5"/></g></svg>auspol tracker</a>
   <nav class="links" aria-label="Sections">
     <a href="#votes" data-sec="votes">votes</a>
     <a href="polls/" data-sec="polls">polls</a>
@@ -272,7 +274,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <div class="stars" id="stars"></div>
     <div class="wash rise"></div>
     <div class="wash set"></div>
-    <div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
   </div>
   <div class="grain" id="grain" aria-hidden="true"></div>
   <div class="now" id="now">
@@ -415,7 +417,8 @@ const pickMode=()=>skyPref==='rise'||skyPref==='set'?skyPref:((h)=>h>=4&&h<15?'r
 function paint(p){
   const s=SC[mode],H=hero.clientHeight,d=sun.offsetWidth||1;
   // rise no higher than the figures allow: the limb stays clear of them on short screens
-  const rise=Math.max(0,Math.min(H*.13,H-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
+  const off=tbdEl?tbdEl.offsetHeight:0;   // the toolbar's overlay at the foot: the horizon sits above it
+  const rise=Math.max(0,Math.min(H*.13,H-off-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
   let t,ts,tk,y,wa,ba,st;
   if(mode==='rise'){
     t=1-Math.pow(1-p,3);ts=t;tk=Math.min(1,t*1.1);
@@ -432,9 +435,17 @@ function paint(p){
   for(const k in s.a)st2.setProperty('--'+k,rgb(mixc(s.a[k],s.b[k],tk)));
   for(const k in s.c0)st2.setProperty('--'+k,rgb(mixc(s.c0[k],s.c1[k],ts)));
   st2.setProperty('--ty',y.toFixed(1)+'px');
-  st2.setProperty('--sy',Math.min(104,100-((d*.5-y)/H*100)).toFixed(2)+'%');
+  st2.setProperty('--sy',Math.min(104,100-((d*.5-y+off)/H*100)).toFixed(2)+'%');
+  if(tintOn)tintTo(st2.getPropertyValue('--z'));
   const r=mode==='rise';st2.setProperty('--wa1',(r?wa:0).toFixed(3));st2.setProperty('--ba1',(r?ba:0).toFixed(3));st2.setProperty('--wa2',(r?0:wa).toFixed(3));st2.setProperty('--ba2',(r?0:ba).toFixed(3));st2.setProperty('--st',st.toFixed(3));
 }
+/* the status bar's strip: iOS 26 Safari tints it from the page's background, not theme-color, so
+   while the hero fills the screen the root takes the sky's top colour (and theme-color follows, for
+   the browsers that read it); past the hero both go back to the page's */
+const tbdEl=document.getElementById('tbd'),metaTheme=document.querySelector('meta[name=theme-color]');
+let tintOn=null;
+function tintTo(c){document.documentElement.style.backgroundColor=c||'';if(metaTheme)metaTheme.content=c||getComputedStyle(document.body).backgroundColor||'#fbf6f1'}
+function tintTop(on){if(on===tintOn)return;tintOn=on;tintTo(on?(sky.style.getPropertyValue('--z')||'#0a1230'):'')}
 function frame(ts){if(t0===null)t0=ts;const p=Math.min(1,(ts-t0)/SC[mode].dur);paint(p);if(p<1)raf=requestAnimationFrame(frame);else done=true}
 function play(){mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;cancelAnimationFrame(raf);t0=null;done=false;if(reduce){paint(1);done=true;return}paint(0);raf=requestAnimationFrame(frame)}
 hero.addEventListener('click',e=>{if(!e.target.closest('.now')&&!rpOn)play()});
@@ -1263,6 +1274,7 @@ let menuOpen=false,ticking=false;
 function onScroll(){
   ticking=false;
   nav.classList.toggle('over',menuOpen||hero.getBoundingClientRect().bottom>40);
+  tintTop(nav.classList.contains('over'));
   const mid=innerHeight/2;let cur=null;
   for(const s of secs){const b=s.getBoundingClientRect();if(b.top<=mid&&b.bottom>mid)cur=s.dataset.sec||null}
   links.forEach(a=>{if(a.dataset.sec===cur)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')});
