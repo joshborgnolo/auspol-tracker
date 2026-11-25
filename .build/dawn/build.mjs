@@ -15,6 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { copyFor, flowNote, MONF } from "./copy.mjs";
+import { latestPollLine } from "./poll-meta.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -105,10 +106,11 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   const notes = { lnp: flowNote(D, "lnp", T.lnp), on: flowNote(D, "on", T.on) };
   const json = JSON.stringify(D).replace(/</g, "\\u003c");
   let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
-  const fill = { HIST: histName, GROUPS: groupsName, GHIST: ghUrl, FONT: "/assets/fonts/" + font, asOf: esc(C.asOf), votesHead: esc(C.votesHead), votesDek: esc(C.votesDek),
+  const fill = { HIST: histName, GROUPS: groupsName, GHIST: ghUrl, FONT: "/assets/fonts/" + font, asOf: esc(C.asOf), latestPoll: esc(latestPollLine(D)), votesHead: esc(C.votesHead), votesDek: esc(C.votesDek),
                  tppHead: esc(C.tppHead), tppDek: esc(C.tppDek), flowsHead: esc(C.flowsHead) };
-  html = html.replace(/\{\{(HIST|GROUPS|GHIST|FONT|asOf|votesHead|votesDek|tppHead|tppDek|flowsHead)\}\}/g, (m, k) => fill[k]);
+  html = html.replace(/\{\{(HIST|GROUPS|GHIST|FONT|asOf|latestPoll|votesHead|votesDek|tppHead|tppDek|flowsHead)\}\}/g, (m, k) => fill[k]);
   html = html.replace("/*{{PMENGINE}}*/", () => engine);
+  html = html.replace("/*{{POLLMETA}}*/", () => fs.readFileSync(path.join(HERE, "poll-meta.mjs"), "utf8").replaceAll("export function", "function"));
   html = html.replace("{{FLOWNOTES}}", () => JSON.stringify(notes).replace(/</g, "\\u003c"));
   html = html.replace("{{DATA}}", () => json);
   html = html.replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());

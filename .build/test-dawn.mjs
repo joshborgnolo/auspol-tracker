@@ -17,6 +17,7 @@ import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor } from "./dawn/copy.mjs";
+import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { buildDawn, flowTotals, readScore } from "./dawn/build.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "..");
@@ -27,6 +28,26 @@ const r1 = (v) => Math.round(v * 10) / 10;
 let n = 0;
 const ok = (c, m) => { assert.ok(c, m); n++; };
 const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
+
+/* the latest poll's publication age, rounded in the unit the reader is given */
+{
+  const P = { latestPoll: { h: "Essential", pub: "2026-11-25T01:00" } };
+  const at = pollPublishedMs(P.latestPoll.pub), age = (ms) => latestPollLine(P, at + ms);
+  eq(at, Date.parse("2026-11-24T14:00:00Z"), "the publication stamp is Sydney wall time, in daylight saving");
+  eq(pollPublishedMs("2026-07-25T01:00"), Date.parse("2026-07-24T15:00:00Z"), "and outside daylight saving");
+  eq(pollPublishedMs("2026-11-25T01:00:00+11:00"), at, "an explicit zone reads the same instant");
+  eq(age(29000), "Latest poll is Essential’s, 0 minutes ago.");
+  eq(age(31000), "Latest poll is Essential’s, 1 minute ago.");
+  eq(age(59 * 60000 + 29000), "Latest poll is Essential’s, 59 minutes ago.");
+  eq(age(59 * 60000 + 31000), "Latest poll is Essential’s, 60 minutes ago.");
+  eq(age(3600000), "Latest poll is Essential’s, 1 hour ago.");
+  eq(age(3 * 3600000 + 31 * 60000), "Latest poll is Essential’s, 4 hours ago.");
+  eq(age(23 * 3600000 + 31 * 60000), "Latest poll is Essential’s, 24 hours ago.");
+  eq(age(86400000), "Latest poll is Essential’s, 1 day ago.");
+  eq(age(36 * 3600000), "Latest poll is Essential’s, 2 days ago.");
+  for (const pub of [undefined, null, "", "2026-11-25"]) eq(latestPollLine({ latestPoll: { h: "Essential", pub } }, at), "Latest poll is Essential’s.", "no age when the clock time is unknown");
+  eq(latestPollLine({}, at), "", "no latest-poll clause when no poll is on record");
+}
 
 /* ---- 1. the data ends on the site's figures ---------------------------- */
 const asset = fs.readFileSync(path.join(A, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
@@ -127,6 +148,12 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes(`/assets/fonts/${font}`), "the face from the site's fonts");
   const data = JSON.parse(html.match(/<script id="dawn-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
   eq(data.weeks.length, D0.weeks.length, "the page carries the data");
+  const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
+  ok(!!scale, "the primaries chart's y-axis rule is in the page");
+  const primaryYMax = new Function("ys", `return ${scale[1]}`);
+  eq(primaryYMax([59.76]), 60, "July 1975's measured peak leaves the All-view axis at 60, not 70");
+  eq(primaryYMax([59.32]), 60, "the inferred support peak uses the same axis");
+  eq(primaryYMax([60.01]), 70, "a reading actually above 60 still reaches the next rung");
   const C = copyFor(D0);
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");

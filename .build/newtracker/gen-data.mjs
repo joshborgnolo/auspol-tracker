@@ -12489,6 +12489,7 @@ if (!JUR && PRIMM && TPM) {
     const KEPT = ["2026-02-12", "2025-12-08"];
     const dawn = {
       v: 1, asOf: isoD(t1), updated: latest.updated, published: latest.publishedISO,
+      latestPoll: NEWEST_PUB && { h: NEWEST_PUB.pollster, ...(NEWEST_PUB.published ? { pub: NEWEST_PUB.published } : {}) },
       election: { date: ELECTION.date, tpp: ELECTION.tpp_alp },
       parties: PM_PARTIES, weeks: [ELECTION.date, ...weeks.map(isoD)], prim, rank,
       pAhead: PRIMM.pAhead,
