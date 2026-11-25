@@ -125,11 +125,15 @@ const MANIFEST = [
   { id: "gov-action-environment", ds: "government_action_on_environmental_issues" },
   { id: "tax-system-views", ds: "views_on_current_tax_system" },
   { id: "government-funding-increases", ds: "support_and_opposition_for_increasing_government_funding" },
+  { id: "government-funding-preferences", ds: "government_funding_perceptions",
+    also: ["e1212_for_each_of_the_following_would_you_like_to_see_them_receive_more_less_or_the_same_amount_as_the_current_level_of_government_funding", "e1212_for_each_of_the_following_would_you_like_to_see_them_receive_more_less_or_the_same_amount_as_the_current_level_of_government_funding_by_gender", "e1212_for_each_of_the_following_would_you_like_to_see_them_receive_more_less_or_the_same_amount_as_the_current_level_of_government_funding_by_age", "e1212_for_each_of_the_following_would_you_like_to_see_them_receive_more_less_or_the_same_amount_as_the_current_level_of_government_funding_by_voting_intention"] },
   { id: "issue-importance", ds: "importance_of_issues" },
 
   /* climate & the energy transition */
-  { id: "climate-acceptance", ds: "climate_change_acceptance", note: "The long-running acceptance trend (believes in climate change; caused by humans)." },
-  { id: "climate-action", ds: "addressing_climate_change", note: "Trend read: is Australia doing enough on climate change." },
+  { id: "climate-acceptance", ds: "climate_change_acceptance", also: ["climate_change_acceptance_trend", "climate_change_acceptance_gender", "climate_change_acceptance_by_age", "climate_change_acceptance_voting_intention"], note: "The long-running acceptance trend (believes in climate change; caused by humans)." },
+  { id: "climate-action", ds: "addressing_climate_change", also: ["addressing_climate_change_trend", "addressing_climate_change_by_gender", "addressing_climate_change_by_age", "addressing_climate_change_by_voting_intention"], note: "Trend read: is Australia doing enough on climate change." },
+  { id: "nuclear-energy", ds: "support_for_using_nuclear_energy_sources",
+    also: ["to_what_extent_would_you_support_or_oppose_using_nuclear_energy_sources_for_the_following_trend", "to_what_extent_would_you_support_or_oppose_using_nuclear_energy_sources_for_the_following", "to_what_extent_would_you_support_or_oppose_using_nuclear_energy_sources_for_the_following_by_gender", "to_what_extent_would_you_support_or_oppose_using_nuclear_energy_sources_for_the_following_by_age", "to_what_extent_would_you_support_or_oppose_using_nuclear_energy_sources_for_the_following_by_voting_intention"] },
   { id: "net-zero-2050", ds: "support_for_net_zero_by_2050" },
   { id: "emissions-targets-views", ds: "views_on_emissions_reduction_targets" },
   { id: "emissions-target-2035", ds: "views_on_australia_s_2035_emissions_reduction_target" },
@@ -230,8 +234,9 @@ const MANIFEST = [
   { id: "public-health-confidence", ds: "confidence_in_australia_s_public_health_system" },
 
   /* data centres */
-  { id: "data-centre-local", ds: "support_for_new_data_centre_being_built_in_local_area" },
-  { id: "data-centre-concerns", ds: "top_concerns_about_data_centres" },
+  { id: "data-centre-local", ds: "support_for_new_data_centre_being_built_in_local_area",
+    also: ["e1187_to_what_extent_would_you_support_or_oppose_a_new_data_centre_being_built_in_your_local_area_trend", "e1187_to_what_extent_would_you_support_or_oppose_a_new_data_centre_being_built_in_your_local_area", "e1187_to_what_extent_would_you_support_or_oppose_a_new_data_centre_being_built_in_your_local_area_by_gender", "e1187_to_what_extent_would_you_support_or_oppose_a_new_data_centre_being_built_in_your_local_area_by_age", "e1187_to_what_extent_would_you_support_or_oppose_a_new_data_centre_being_built_in_your_local_area_by_voting_intention"] },
+  { id: "data-centre-concerns", ds: "top_concerns_about_data_centres", also: ["biggest_concerns_about_data_centres"] },
 
   /* abortion */
   { id: "abortion-views", ds: "views_on_abortion" },
@@ -301,6 +306,12 @@ const MANIFEST = [
   { id: "us-midterms", ds: "views_on_us_midterms" },
   { id: "qld-ir-awareness", ds: "awareness_of_the_queensland_governments_planned_changes_to_the_industrial_relations_system", note: "State-politics read (theme-cut: a federal page does not carry it)." },
   { id: "qld-ir-support", ds: "agreement_to_the_statements_about_the_queensland_governments_proposed_changes", note: "State-politics read (theme-cut: a federal page does not carry it)." },
+
+  /* the 2026-11-24 wave's reads */
+  { id: "government-risk-confidence", ds: "confidence_in_the_federal_government_to_manage_risks",
+    also: ["e1211_how_much_confidence_do_you_have_in_the_federal_government_to_manage_the_risks_of_each_of_the_following", "e1211_how_much_confidence_do_you_have_in_the_federal_government_to_manage_the_risks_of_each_of_the_following_by_gender", "e1211_how_much_confidence_do_you_have_in_the_federal_government_to_manage_the_risks_of_each_of_the_following_by_age", "e1211_how_much_confidence_do_you_have_in_the_federal_government_to_manage_the_risks_of_each_of_the_following_by_voting_intention"] },
+  { id: "human-civilisation-cause", ds: "likely_cause_of_the_end_of_human_civilisation",
+    also: ["which_of_the_following_do_you_think_is_most_likely_to_cause_the_end_of_human_civilisation", "which_of_the_following_do_you_think_is_most_likely_to_cause_the_end_of_human_civilisation_by_gender", "which_of_the_following_do_you_think_is_most_likely_to_cause_the_end_of_human_civilisation_by_age", "which_of_the_following_do_you_think_is_most_likely_to_cause_the_end_of_human_civilisation_by_voting_intention"] },
 ];
 const EXCLUDE = {
   primary: "primary voting intention – channelled into polls.json",

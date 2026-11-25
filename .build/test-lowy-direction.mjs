@@ -65,9 +65,9 @@ const payload = decodedDirection(js, "directionLowy");
 assert.equal(payload.waves.length, 2);
 assert.equal(payload.waves[0].x > 2017 && payload.waves[0].x < 2018, true);
 const world = decodedDirection(js, "directionWorld");
-assert.equal(world.waves.length, 90);
+assert.equal(world.waves.length, 91, "the series includes Ipsos's November 2026 wave");
 const latestAustralia = world.waves.at(-1);
-assert.deepEqual([latestAustralia.auRight, latestAustralia.auWrong], [36, 64]);
+assert.deepEqual([latestAustralia.auRight, latestAustralia.auWrong], [35, 65]);
 assert.notEqual(latestAustralia.auRight, latestAustralia.worldRight,
   "the main chart's Australia reading is never filled by the global average");
 const dirPreEncoded = js.match(/const directionPre = JSON.parse\(("(?:\\[\s\S]|[^"\\])*")\);/);

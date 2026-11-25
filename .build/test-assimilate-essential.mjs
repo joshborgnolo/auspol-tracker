@@ -61,10 +61,12 @@ function run(cwd) {
     date: "2026-11-24", firm: "Essential", alb: -28, opp: -7, oppName: "Taylor", han: null,
     detail: { alb: { app: 32, dis: 60 }, opp: { app: 35, dis: 42 } },
   });
-  assert.deepEqual(first.data.direction.at(-1), {
+  const { published, ...direction } = first.data.direction.at(-1);
+  assert.deepEqual(direction, {
     date: "2026-11-24", dateStart: "2026-11-19", pollster: "Essential", right: 24, wrong: 60, unsure: 16,
     url: "https://essentialreport.com.au/reports/25th-november-2026",
   });
+  assert.ok(published == null || published === "2026-11-26T01:00", "the embargoed stamp is withheld or exact");
   assert.equal(first.data.polls.length, 1, "no poll row is invented without primaries");
   assert.equal(run(cwd).status.changed, false, "a second run files no duplicates");
   fs.rmSync(cwd, { recursive: true, force: true });

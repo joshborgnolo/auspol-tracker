@@ -1087,6 +1087,8 @@ export const FEATURES = {
     { kind: "split", title: "Is the 2035 emissions target too ambitious?", ref: R("emissions-target-2035", "essential"),
       sides: { a: ["Too ambitious"], b: ["Not ambitious enough"], m: ["About right"] }, names: ["too ambitious", "not ambitious enough"] },
     { kind: "stack", mode: "waves", key: "climate-cause", title: "Is climate change caused by people?", ref: R("climate-acceptance", "essential"),
+      // The November wave publishes demographic cuts but no all-voters figure.
+      skipWaves: ["2026-11-24"],
       sides: { a: /caused by human activity/i, b: /normal fluctuation/i }, names: ["caused by people", "natural fluctuation"] },
     { kind: "stack", mode: "waves", key: "climate-effort", title: "Is Australia doing enough on climate change?", ref: R("climate-action", "essential"),
       sides: { a: ["Not doing enough"], b: ["Doing too much"], m: ["Doing enough", "Don’t know"] }, names: ["not doing enough", "doing too much"] },

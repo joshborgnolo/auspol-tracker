@@ -5106,8 +5106,9 @@ const linksOf = (p) => {
   const at = PENDING_AT[p.pollster] || {};
   const waiting = NEWEST_OF.get(p.pollster) === p.date && (Date.parse(LATEST_ISO) - Date.parse(p.date)) / 86400000 <= PENDING_DAYS;
   const both = rel && p.methodUrl === rel;
+  const runningData = house === "DemosAU" && p.date >= "2026-10-26";
   const out = [];
-  if (rel) out.push({ k: "release", t: by + "’s release" + (both ? ", with methodology" : ""), href: rel,
+  if (rel) out.push({ k: "release", t: by + "’s release" + (runningData ? " (with running data series)" : "") + (both ? ", with methodology" : ""), href: rel,
     title: both ? by + "’s own release of this poll, which includes its APC methodology statement" : by + "’s own release of this poll" });
   else if (waiting && at.release) out.push({ k: "release", pending: true, t: by + "’s release" + (at.release === at.method ? (at.oneDoc ? ", with methodology" : " and methodology") : "") + ": not yet out", href: at.release,
     title: by + " hasn’t posted this poll’s release yet. This opens the page where it files them." });

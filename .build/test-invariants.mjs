@@ -262,4 +262,20 @@ for (const [label, rows] of [["All polls", A.individualPolls], ["Latest polls", 
   assert.ok(src.includes("if (s.label) return s.label;"), "the expanded leadership table honours the 2PMP label");
 }
 
+// ---- DemosAU's interactive releases name their running data series ---------------------
+for (const [label, rows] of [["All polls", A.individualPolls], ["Latest polls", A.pollsterTable]]) {
+  const oct = rows.find((p) => p.pollster === "DemosAU" && p.released === "2026-10-26");
+  const nov = rows.find((p) => p.pollster === "DemosAU" && p.released === "2026-11-22");
+  for (const [p, hasMethod] of [[oct, false], [nov, true]]) {
+    if (!p) { assert.equal(label, "Latest polls"); continue; }
+    const release = p.links.find((l) => l.k === "release");
+    assert.equal(release?.t, "DemosAU’s release (with running data series)", `${label} ${p.released}: release label`);
+    const method = p.links.find((l) => l.k === "method");
+    assert.equal(Boolean(method), hasMethod, `${label} ${p.released}: methodology link only when DemosAU published one`);
+    if (hasMethod) assert.equal(method.t, "APC methodology");
+  }
+  const sep = rows.find((p) => p.pollster === "DemosAU" && p.released === "2026-09-14");
+  if (sep) assert.ok(!sep.links.some((l) => l.t.includes("running data series")), `${label}: older releases keep their old label`);
+}
+
 console.log(`PASS: invariants – ${A.cycles.length} cycles inside their caps, finite-figure sweep, feed vocabulary, changelog tags, np-project purity, past rows' bases, Newspoll overview links and separate 2PMP`);

@@ -484,16 +484,16 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
     assert.ok(hay.includes("wolfsmith"), "search includes the store key as a resilient name alias");
   }
   const all = dated(out.topics);
-  const midterms = (e) => e.q?.id === "us-midterms" && e.q.house === "essential";
+  const latestReading = (e) => e.q?.id === "human-civilisation-cause" && e.q.house === "essential";
   const newestFirst = (es) => es.every((e, i) => !i || es[i - 1].date >= e.date);
   const groups = [
-    split(dated([out.topics.find((t) => t.id === "trump-us")])),
+    split(dated([out.topics.find((t) => t.id === "tech-society")])),
     pollsters(out.topics, out.houses).find((g) => g.id === "p-essential"),
-    months(out.topics).find((g) => g.entries.some(midterms)),
+    months(out.topics).find((g) => g.entries.some(latestReading)),
   ];
   for (const g of groups) {
-    assert.ok(g.entries.some(midterms), "US midterms is in the main display in every view");
-    assert.ok(!g.more.some(midterms), "US midterms is not also behind More");
+    assert.ok(g.entries.some(latestReading), "the November one-off is in the main display in every view");
+    assert.ok(!g.more.some(latestReading), "the November one-off is not also behind More");
     assert.ok(newestFirst(g.entries), "main results run newest first across display kinds");
   }
   for (const gs of [months(out.topics), pollsters(out.topics, out.houses)]) {

@@ -11,14 +11,14 @@ const built = buildWorriesData(manifest, SRC);
 const at = (ym) => built.waves.find((w) => w.month === ym);
 const issue = (w, scope, key) => w[scope].find((r) => r.issue === key);
 
-assert.equal(manifest.sources.length, 103);
+assert.equal(manifest.sources.length, 104);
 assert.equal(built.unread.length, 0);
-assert.equal(built.waves.length, 96);
+assert.equal(built.waves.length, 97);
 assert.equal(built.coverage.first, "2016-09");
-assert.equal(built.coverage.last, "2026-10");
-assert.equal(built.coverage.wavesWithAustralia, 95);
-assert.equal(built.coverage.australiaObservations, 941);
-assert.equal(built.coverage.globalObservations, 1572);
+assert.equal(built.coverage.last, "2026-11");
+assert.equal(built.coverage.wavesWithAustralia, 96);
+assert.equal(built.coverage.australiaObservations, 942);
+assert.equal(built.coverage.globalObservations, 1586);
 assert.equal(built.question, WORRIES_QUESTION);
 console.log("1. Every cached report reads; full-corpus coverage: OK");
 
@@ -62,7 +62,7 @@ console.log("2. Country tables, COVID labels and conflicting reprints: OK");
   assert.equal(issue(w, "australia", "environment").share, 7);
   assert.equal(issue(w, "australia", "credit").share, 1);
 }
-for (const [ym, share] of [["2026-06", 46], ["2026-07", 45], ["2026-08", 49], ["2026-09", 44], ["2026-10", 45]]) {
+for (const [ym, share] of [["2026-06", 46], ["2026-07", 45], ["2026-08", 49], ["2026-09", 44], ["2026-10", 45], ["2026-11", 49]]) {
   assert.equal(at(ym).australia.length, 1);
   assert.equal(issue(at(ym), "australia", "inflation").share, share);
 }
