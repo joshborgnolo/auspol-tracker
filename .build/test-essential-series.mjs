@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { shouldCrawlReport } from "./essential-series.mjs";
+import { guardianMetadataOf } from "./essential-guardian-parse.mjs";
 
 const before = { r1: "2026-09-29T22:04:46", r2: "2026-10-27T10:05:00" };
 assert.equal(shouldCrawlReport(
@@ -31,4 +32,6 @@ for (const [dataset, id, expected] of [
     return [cells[4], Number(cells[8])];
   })), expected);
 }
+const guardian = guardianMetadataOf('{"datePublished":"2026-11-24T09:00:00.000+11:00"}<p>This month’s Guardian Essential poll, of 1,087 people taken last week, gives equal weight to an and AI data centres.</p>');
+assert.deepEqual(guardian, { publishedAt: "2026-11-24T09:00:00.000+11:00", sample: 1087 }, "Guardian sample and publication stamp are read, not inferred");
 console.log("test-essential-series: ok");

@@ -25852,7 +25852,7 @@
    "tables": [
     {
      "title": null,
-     "source": "https://essentialreport.com.au/reports/28-july-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "rows": [
       [
        "Strongly support",
@@ -25882,7 +25882,7 @@
     },
     {
      "title": "By gender",
-     "source": "https://essentialreport.com.au/reports/28-july-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "headers": [
       "",
       "Male",
@@ -25923,7 +25923,7 @@
     },
     {
      "title": "By age",
-     "source": "https://essentialreport.com.au/reports/28-july-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "headers": [
       "",
       "18-34",
@@ -25971,7 +25971,7 @@
     },
     {
      "title": "By voting intention",
-     "source": "https://essentialreport.com.au/reports/28-july-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "headers": [
       "",
       "Labor",
@@ -34535,7 +34535,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "Climate change acceptance",
@@ -34708,7 +34708,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "Addressing climate change",
@@ -34853,7 +34853,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "If a data centre were to be built in your local area, which of the following, if any, would you be most concerned about?",
@@ -35136,7 +35136,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "'E1187 - To what extent would you support or oppose a new data centre being built in your local area?",
@@ -35145,7 +35145,7 @@
    "tables": [
     {
      "title": null,
-     "source": "https://essentialreport.com.au/reports/25th-november-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "rows": [
       [
        "Strongly support",
@@ -35175,7 +35175,7 @@
     },
     {
      "title": "By gender",
-     "source": "https://essentialreport.com.au/reports/25th-november-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "headers": [
       "",
       "Male",
@@ -35216,7 +35216,7 @@
     },
     {
      "title": "By age",
-     "source": "https://essentialreport.com.au/reports/25th-november-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "headers": [
       "",
       "18-34",
@@ -35264,7 +35264,7 @@
     },
     {
      "title": "By voting intention",
-     "source": "https://essentialreport.com.au/reports/25th-november-2026",
+     "source": "https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
      "headers": [
       "",
       "Labor",
@@ -35325,7 +35325,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "For each of the following, would you like to see them receive more, less, or the same amount as the current level of government funding?",
@@ -35534,7 +35534,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "How much confidence do you have in the federal government to manage the risks of each of the following?",
@@ -35695,7 +35695,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "Which of the following do you think is most likely to cause the end of human civilisation?",
@@ -35818,7 +35818,7 @@
    "dateStart": "2026-11-19",
    "dateEnd": "2026-11-24",
    "published": "2026-11-25T01:00",
-   "sample": null,
+   "sample": 1087,
    "sampleEff": null,
    "url": "https://essentialreport.com.au/reports/25th-november-2026",
    "question": "To what extent would you support or oppose using nuclear energy sources for the following?",

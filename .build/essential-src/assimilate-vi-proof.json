@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-11-25T02:21:13.007Z",
+  "generatedAt": "2026-11-25T02:43:50.412Z",
   "horizon": "2025-09-29",
   "retro": [
     {
       "date": "2026-11-24",
       "fixes": [
-        "url https://www.theguardian.com/australia-news/2026/nov/25/guardian-essential-poll-anthony-albaneses-ai-datacentres-labor-one-nation-coalition",
-        "published 2026-11-25T01:00 (Guardian's datePublished; replaces synthetic 2026-11-26T01:00)"
+        "sample 1087 (Guardian's reported n)"
       ]
     }
   ],

@@ -52,6 +52,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { THEMES as ADHOC_THEMES } from "./newtracker/adhoc-themes.mjs";
+import { appendDatawrapperTable } from "./essential-datawrapper.mjs";
 
 const MANIFEST = [
   /* immigration */
@@ -899,6 +900,9 @@ if (DECISIONS_PATH) {
   const fresh = applyDecisionsFile(manifestDs);
   if (fresh.size) { MANIFEST_ALL = buildManifestAll(); manifestDs = seedDs(MANIFEST_ALL); }
 }
+// The local-data-centre support table lives only in the Guardian's Datawrapper,
+// not the publisher's Flourish mirror. Feed its verified source rows here.
+await appendDatawrapperTable(corpus, { writeCache: !CHECK });
 const entries = [];
 for (const st of MANIFEST_ALL) {
   const ids = [st.ds, ...(st.also || [])];
@@ -1086,7 +1090,7 @@ for (const st of MANIFEST_ALL) {
     const avd = avByWave.get(w);
     const avRowsList = avd ? overallTableRows([...avd.values()]) : [];
     const row = WAVE_ROW.get(w);
-    qMeta.url = (row && (row.releaseUrl || row.url)) || reportIndex[w] || null;
+    qMeta.url = rows.find((r) => r.url)?.url || (row && (row.releaseUrl || row.url)) || reportIndex[w] || null;
     entries.push(buildEntry(st, w, avRowsList, foldByWave.get(w), qMeta, seriesByWave.get(w) || null));
   }
 }

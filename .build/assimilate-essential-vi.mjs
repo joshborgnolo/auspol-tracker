@@ -58,6 +58,7 @@
 // updater can run it on index drift without dirtying the working tree).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { writeAtomic } from "./atomic-write.mjs";
+import { guardianMetadataOf } from "./essential-guardian-parse.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const DAY = 86400000;
@@ -217,17 +218,18 @@ const sydneyStamp = (utcIso) => {
   }).formatToParts(new Date(utcIso)).map((x) => [x.type, x.value]));
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
 };
-const guardianPublished = async (url) => {
+const guardianArticleFacts = async (url) => {
   try {
     const res = await fetch(url, {
       headers: { "user-agent": "Mozilla/5.0 (auspol-tracker essential assimilator)" },
       signal: AbortSignal.timeout(20000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = (await res.text()).match(/"datePublished"\s*:\s*"([^"]+)"/i)?.[1];
-    return raw ? sydneyStamp(raw) : null;
+    const html = await res.text();
+    const facts = guardianMetadataOf(html);
+    return { published: facts.publishedAt ? sydneyStamp(facts.publishedAt) : null, sample: facts.sample };
   } catch (e) {
-    console.log(`WARNING: could not read the Guardian publication time from ${url} (${e.message}); keeping the recorded stamp`);
+    console.log(`WARNING: could not read the Guardian publication and sample metadata from ${url} (${e.message}); keeping the recorded stamp`);
     return null;
   }
 };
@@ -307,11 +309,15 @@ for (let i = 0; i < D.polls.length; i++) {
   // by the Guardian article's own datePublished; corrected and hand-set
   // stamps differ from the guess, so each URL is fetched at most once
   const syn = publishedFor(csvWave);
-  if (GUARDIAN_RE.test(p.url ?? "") && (p.published == null || p.published === syn)) {
-    const truth = await guardianPublished(p.url);
-    if (truth && truth !== p.published) {
-      fixes.push(`published ${truth} (Guardian's datePublished; replaces synthetic ${p.published ?? "–"})`);
-      p.published = truth;
+  if (GUARDIAN_RE.test(p.url ?? "") && (p.sample == null || p.published == null || p.published === syn)) {
+    const facts = await guardianArticleFacts(p.url);
+    if (facts?.published && facts.published !== p.published) {
+      fixes.push(`published ${facts.published} (Guardian's datePublished; replaces synthetic ${p.published ?? "–"})`);
+      p.published = facts.published;
+    }
+    if (p.sample == null && facts?.sample != null) {
+      p.sample = facts.sample;
+      fixes.push(`sample ${facts.sample} (Guardian's reported n)`);
     }
   }
   if (p.dateStart == null) { p.dateStart = fieldworkStart(p.date); fixes.push(`dateStart ${p.dateStart}`); }
