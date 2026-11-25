@@ -148,6 +148,13 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes(`/assets/fonts/${font}`), "the face from the site's fonts");
   const data = JSON.parse(html.match(/<script id="dawn-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
   eq(data.weeks.length, D0.weeks.length, "the page carries the data");
+  /* the bar's backdrop is the sky drawn again inside .sky (so it inherits the sky's colours), clipped as the hero
+     is, slid one px per px of scroll; this term's lines open on the 2025 count; lines stop at the plot's edges */
+  ok(/<div class="sky"[\s\S]*?<div class="twin"><div class="tsky"[\s\S]*?<\/div>\s*<div class="grain" id="grain"/.test(html), "the bar's sky sits inside the hero's sky");
+  ok(/\.tsky\{[^}]*overflow:hidden/.test(html) && /translateY\(-8192px\)/.test(html) && /animation-range:0px 8192px/.test(html), "the bar's sky is clipped like the hero and slides with the scroll");
+  ok(/\.menu-on \.twin\{visibility:hidden\}/.test(html) && !/\.nav\{[^}]*background:var\(--bg\)/.test(html), "the open menu shows through the bar; the bar itself has no fill");
+  ok(/if\(i0===0&&iS<=1\)\{const c=EST\[k\]\[0\]\.m;pts\.push\(\{x:ELX,y:c\}\)/.test(html) && /const open=\(c,a,band\)=>c==='lnp'&&cnt0!=null/.test(html), "this term's primary and Labor v Coalition lines open on the 2025 count");
+  ok(/<clipPath id="\$\{cid\}"><rect x="\$\{ML\}" y="\$\{MT-8\}" width="\$\{PW\}"/.test(html), "lines and bands clip at the plot's edges");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
   ok(!!scale, "the primaries chart's y-axis rule is in the page");
   const primaryYMax = new Function("ys", `return ${scale[1]}`);
