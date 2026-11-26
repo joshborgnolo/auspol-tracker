@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
+import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
 import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
 import { buildDawn, flowTotals, readScore } from "./dawn/build.mjs";
@@ -135,8 +136,8 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
 /* an opened poll's header, in the main ledger's sentence form */
 {
   const E = { h: "Essential", c: "The Guardian", d: "2026-11-24", f: "19–24 Nov", pub: "2026-11-25", n: 1017, b: "A", se: 793 };
-  eq(pollHeading(E), 'Conducted on 19–24 Nov from a sample of <span class="nocaps">1,017 (A) (eff. 793)</span>, published by The Guardian on Wed 25 Nov.');
-  ok(pollHeading({ ...E, se: null }).includes("1,017 (A)</span>"), "a raw sample without an effective figure");
+  eq(pollHeading(E), 'Conducted on 19–24 Nov from a sample of <span class="nocaps">1,017 (<span class="sample-base">A</span>) (eff. 793)</span>, published by The Guardian on Wed 25 Nov.');
+  ok(pollHeading({ ...E, se: null }).includes('1,017 (<span class="sample-base">A</span>)</span>'), "a raw sample without an effective figure");
   ok(pollHeading({ ...E, se: null, eb: "TBC" }).includes("(eff. TBC)"), "an effective sample still to come");
   ok(pollHeading({ ...E, se: null, eb: "missing" }).includes("(eff. missing)"), "the older, unfiled effective sample stays named");
   ok(pollHeading({ ...E, se: null, eb: "~790" }).includes("(eff. ~790)") && pollHeading({ ...E, se: null, eb: "~790" }).includes("title=\"Estimated from the raw sample"), "the approximate effective figure and its meaning");
@@ -151,6 +152,18 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   ok(pollHeading({ ...E, pub: "2026-11-25T13:00" }).endsWith("Wed 25 Nov, 1 pm."), "an hourly publication stamp where one is known");
   ok(!pollHeading({ ...E, pub: null }).includes("published by The Guardian on "), "no invented publication date");
   ok(pollHeading({ ...E, c: "Consumer Confidence", h: "Roy Morgan", conf: { v: 90 } }).includes("published by Roy Morgan"), "a confidence lane does not present its product line as a publisher");
+}
+
+/* The ledger prints percentile bounds. A change uses the uncertainty in both waves. */
+{
+  const [low, high] = credibleBounds([1, 1]);
+  ok(Math.abs(low - 2.5) < 1e-7 && Math.abs(high - 97.5) < 1e-7, "equal-tailed bounds of a uniform posterior");
+  const old = sharePosterior(25, 900, 1, 1);
+  eq(significantChange(sharePosterior(26, 900, 1, 1), old), false, "one point is inside this change interval");
+  eq(significantChange(sharePosterior(35, 900, 1, 1), old), true, "a clear rise");
+  eq(significantChange(old, sharePosterior(35, 900, 1, 1)), true, "reversing the waves gives a clear fall");
+  eq(significantChange(old, sharePosterior(25, 0, 1, 1)), null, "no verdict without both samples");
+  ok(credibleBounds(sharePosterior(0, 900, 1, 1))[1] < 1, "a sampled zero has a small upper bound");
 }
 
 /* ---- 1. the data ends on the site's figures ---------------------------- */

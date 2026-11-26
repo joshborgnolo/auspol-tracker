@@ -15,6 +15,14 @@ const out = stamp => {
   return s;
 };
 
+export function houseName(house) {
+  return house === "EMRS (Tas)" ? "EMRS" : house;
+}
+
+export function sampleBase(code) {
+  return `<span class="sample-base">${esc(code)}</span>`;
+}
+
 /* The main ledger's rdPollHead, over Dawn's schema. p.eb already carries
    the TBC/missing verdict reached while the wave is filed. */
 export function pollHeading(p, deff) {
@@ -26,10 +34,10 @@ export function pollHeading(p, deff) {
     const efficiency = p.se != null ? "(eff. " + N(p.se) + ")"
       : p.eb === "TBC" ? "(eff. TBC)" : p.eb === "missing" ? "(eff. missing)"
       : estimate != null ? "(eff. ~" + N(estimate) + ")" : "";
-    sample += `<span class="nocaps"${estimate != null ? ' title="Estimated from the raw sample and the site’s design effect; the house publishes no effective sample"' : ""}>${N(p.n)}${p.b ? ` (${esc(p.b)})` : ""}${efficiency ? ` ${efficiency}` : ""}</span>`;
+    sample += `<span class="nocaps"${estimate != null ? ' title="Estimated from the raw sample and the site’s design effect; the house publishes no effective sample"' : ""}>${N(p.n)}${p.b ? ` (${sampleBase(p.b)})` : ""}${efficiency ? ` ${efficiency}` : ""}</span>`;
   }
   const self = p.conf || !(p.c && !/^self/i.test(p.c));
-  const by = (!self && COMMISSIONED[p.c] ? "commissioned by " : "published by ") + (self ? p.h : client(p.c));
+  const by = (!self && COMMISSIONED[p.c] ? "commissioned by " : "published by ") + (self ? houseName(p.h) : client(p.c));
   const when = out(p.pub);
   const field = p.tbc ? "dates TBC" : esc(p.f || (Number(p.d.slice(8, 10)) + " " + MONTH[Number(p.d.slice(5, 7)) - 1]));
   return `Conducted on ${field} from ${sample}, ${esc(by)}${when ? " on " + when : ""}.`;

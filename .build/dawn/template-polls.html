@@ -77,23 +77,6 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .count{font-size:13.5px;color:var(--mute);margin-left:auto}
 .fopt[hidden]{display:none}
 .fdek{font-size:14.5px;color:var(--ink2);margin:10px 0 0;max-width:70ch}
-/* the ledger: each month a section, its bar sticky under the nav, carrying the column names */
-.month{position:sticky;top:calc(var(--navh) + env(safe-area-inset-top));z-index:5;background:var(--bg);box-shadow:0 -3px 0 var(--bg),0 1px 0 var(--rule2);margin-top:12px}
-.mrow{display:flex;align-items:baseline;gap:10px;padding:12px 0 7px}
-.mrow h2{font:400 21px/1.2 var(--serif);margin:0}
-.mrow span{font-size:13px;color:var(--mute)}
-.cols{display:none}
-ol{list-style:none;margin:0;padding:0}
-.row{border-bottom:1px solid var(--rule)}
-.row>button{all:unset;box-sizing:border-box;display:grid;width:100%;cursor:pointer;padding:10px 4px;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"who fw n" "fig fig fig";row-gap:5px;column-gap:8px;border-radius:8px;transition:background-color .6s}
-.row>button:focus-visible{outline:2px solid var(--ink2);outline-offset:-2px}
-.row>button:hover{background:color-mix(in srgb,var(--ink) 3%,transparent)}
-.who{grid-area:who;display:flex;align-items:baseline;gap:8px;min-width:0}
-.who b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.who small,.fw small,.n small{display:none}
-.fw{grid-area:fw;color:var(--mute);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:baseline}
-.n{grid-area:n;font-size:13px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums;align-self:baseline;text-align:right}
-.fig{grid-area:fig;display:flex;flex-wrap:wrap;gap:4px 14px;font-variant-numeric:tabular-nums;align-items:baseline}
 .f{white-space:nowrap;font-size:14.5px}
 .f>i{font-style:normal;color:var(--mute);font-size:12.5px;margin-right:4px}
 .f b{font-weight:600;color:var(--c,var(--ink))}
@@ -103,7 +86,7 @@ ol{list-style:none;margin:0;padding:0}
 .bar{display:flex;height:6px;border-radius:3px;overflow:hidden;width:100%;min-width:90px;max-width:220px;margin-top:3px;background:var(--rule)}
 .bar i{display:block;height:100%}
 .f.wide{flex-basis:100%}
-.row.flash>button{background:var(--hi)}
+.poll.flash{background:var(--hi)}
 .empty{color:var(--mute);font-size:15px;padding:24px 4px}
 .sigw{max-width:920px}
 .sig-say{margin-bottom:10px}
@@ -152,54 +135,91 @@ ol{list-style:none;margin:0;padding:0}
 @media (min-width:900px){.demo-cols[data-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .scroll{overflow-x:auto}
 .note{font-size:13.5px;color:var(--mute);margin:28px 0 0;line-height:1.5;max-width:72ch}
-@media (max-width:899.98px){
-.fig{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,6rem),1fr));gap:6px 10px}
-.fig>.f{min-width:0}
-.fig>.f>i{display:block;margin:0;white-space:normal}
-.fig .lab{white-space:normal}
-.fig>.wide{grid-column:1/-1}
-.fig>.f:empty{display:none}
+.measure-line{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 15px;border-top:1px solid var(--rule2);padding:13px 0 9px;margin-top:17px}
+.measure-line h2{font:500 16px/1.3 var(--sans);margin:0}
+#method-key,.interval-toggle{font-size:12px;color:var(--mute)}
+.interval-toggle{display:inline-flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer}
+.interval-toggle[hidden]{display:none}
+.interval-toggle input{accent-color:var(--ink);margin:0}
+
+.ledger{width:100%;table-layout:fixed;border-spacing:0;border-collapse:separate;font-size:14.5px;line-height:1.35;font-variant-numeric:tabular-nums}
+.ledger+.ledger{margin-top:18px}
+.sample-base{font-variant-caps:all-small-caps;letter-spacing:.035em}
+.rival-pick{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)}
+.poll-col{width:16%}.date-col{width:15%}.sample-col{width:10%}
+.ledger>thead{position:sticky;top:calc(var(--navh) + env(safe-area-inset-top));z-index:4;background:var(--bg)}
+.month-title th{text-align:left;font-weight:400;padding:12px 0 8px}
+.month-title h2{display:inline;font:400 22px/1.2 var(--serif);letter-spacing:-.02em}
+.month-title span{font:400 12px var(--sans);margin-left:10px;color:var(--mute)}
+.headings th{text-align:right;font-size:12px;font-weight:500;color:var(--ink2);vertical-align:bottom;border-bottom:1px solid var(--rule2);padding:4px 6px 8px}
+.headings th:nth-child(-n+2),.basis{text-align:left}
+.headings th:first-child{padding-left:0}
+.measure-head abbr,.short-date,.short-sample,.basis-label{display:none}
+.poll>th,.poll>td{padding:10px 6px;vertical-align:top;border-bottom:1px solid var(--rule)}
+.poll>th{padding-left:0;text-align:left;font-weight:400}
+.poll{cursor:pointer}
+.poll:hover,.poll.open{background:color-mix(in srgb,var(--ink) 3%,var(--bg))}
+.expand{border:0;padding:0;background:none;font:600 15px/1.35 var(--sans);color:var(--ink);cursor:pointer;text-align:left}
+.chev{display:inline-block;width:6px;height:6px;margin:0 8px 2px 2px;transform:rotate(-45deg);border:solid var(--mute);border-width:0 1px 1px 0}
+.expand[aria-expanded=true] .chev{transform:rotate(45deg)}
+.poll small{display:block;color:var(--mute);font-size:12px;margin-top:3px}
+.poll th small{padding-left:16px}
+.flag{display:block;color:var(--ink2);font-size:11.5px;padding-left:16px}
+.sample,.value{text-align:right}.sample,.date,.basis{font-size:13px;color:var(--ink2)}
+.poll .number{white-space:nowrap;color:color-mix(in srgb,var(--c) 77%,var(--ink));font-size:16px;font-weight:600}
+.fraction{display:inline-block;width:1.45ch;text-align:left}
+body[data-f=primary] .measure-head:not(:last-child){padding-right:calc(6px + 1.45ch)}
+.value em,.basis em{white-space:nowrap;display:block;font:400 11.5px/1.3 var(--sans);color:var(--mute);margin-top:3px}
+body[data-f=primary]:not(.intervals-on) .poll em{display:none}
+.poll>.basis,body[data-f=primary] .headings th:last-child{text-align:left;padding-left:14px}
+.ledger .other-cell .f{display:block;white-space:normal;text-align:inherit}
+.other-cell .f>i{display:none}
+.ledger .bar{min-width:0}
+.extra>td{padding:0;border-bottom:1px solid var(--rule2)}
+.extra[hidden]{display:none}
+.extra .det{padding:20px clamp(12px,2vw,26px);border-left:2px solid var(--rule2);background:color-mix(in srgb,var(--ink) 2%,var(--bg))}
+.det h3{font:400 20px/1.2 var(--serif)}
+.det details{border-top:1px solid var(--rule);padding-top:9px}
+.det summary{font-weight:500;cursor:pointer}
+.det details>div{display:grid;gap:9px;margin-top:10px}
+.det .lk>a:first-child{font-weight:600}
+.det .vs{width:100%}
+body[data-f=issues] .headings th:nth-child(n+4),body[data-f=issues] .other-cell{text-align:left}
+@media (max-width:64em){
+.ctl{display:flex;gap:6px 8px}.ctl .search{flex:1 1 9rem;min-width:7rem}.search input{font-size:16px}
+.ctl .pick{max-width:100%}.ctl .count{flex-basis:100%;margin:0}
+.measure-line{margin-top:10px;padding-top:10px;gap:5px 8px}
+#method-key:not(:empty){order:3;flex-basis:100%}
+.ledger{display:block}.ledger>colgroup{display:none}
+.ledger>thead,.ledger>tbody,.ledger .extra,.extra>td,.month-title,.month-title th{display:block}
+.ledger>thead{padding-top:2px}.month-title th{padding:9px 0 5px}
+.ledger .extra[hidden]{display:none}
+.headings{display:none}
+.poll{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr));gap:5px 10px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.poll>th,.poll>td{border:0;padding:0}
+.poll>th{grid-column:1/-1}.poll th small,.poll .sample,.poll .date{display:none}
+.short-date{display:inline;color:var(--mute);font-size:12.5px;margin-left:10px}
+.short-sample{display:inline;font-size:12px;color:var(--mute);margin-left:10px;white-space:nowrap}
+.poll .other-cell{text-align:left}
+.other-cell .f>i{display:block;margin:0;white-space:normal}
+.other-cell:has(.wide){grid-column:1/-1}
+.other-cell:has(.f:empty){display:none}
+body[data-f=primary] .poll,body[data-f=primary] .headings{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:6px}
+body[data-f=primary] .headings{border-bottom:1px solid var(--rule2)}
+body[data-f=primary] .headings th{display:none}
+body[data-f=primary] .headings .measure-head:not(:last-child){display:block;text-align:right;padding:3px 1.45ch 5px 0;border:0}
+.measure-head abbr{display:inline;text-decoration:none}.measure-head>span{display:none}
+.poll>.basis{grid-column:1/-1;text-align:left;padding:0;color:var(--mute);font-size:12px}
+.basis-label{display:inline}.basis em{display:inline;margin-left:5px}
+.det .vs{grid-template-columns:minmax(4.7em,auto) minmax(10px,1fr) auto}
 }
-@media (min-width:900px){
-.cols{display:grid;padding:2px 4px 7px;font-size:12.5px;color:var(--mute);align-items:end}
-.cols span{text-align:right}.cols span:nth-child(-n+3){text-align:left}.cols span:nth-child(3){text-align:right}
-.cols,.row>button{grid-template-areas:none;column-gap:12px;align-items:baseline}
-.who,.fw,.n,.fig{grid-area:auto}
-.who{display:block;grid-column:1}
-.who small,.fw small,.n small{display:block;font-size:12.5px;color:var(--mute);font-weight:400;white-space:nowrap}
-.fw{grid-column:2;display:block;overflow:visible}
-.n{grid-column:3}
-.fig{display:contents}
-.f{text-align:right;font-size:15px}
-.f>i{display:none}
-.fig .f>em{display:block;margin-left:0}
-.f .lab{text-align:right}
-.f.wide{flex-basis:auto;text-align:left}
-.row>button{padding:9px 4px}
-body[data-f=primary] .cols,body[data-f=primary] .row>button{grid-template-columns:minmax(140px,1.3fr) minmax(118px,1fr) 7.4rem repeat(5,5.1rem) 5.6rem}
-body[data-f=twopp] .cols,body[data-f=twopp] .row>button{grid-template-columns:minmax(140px,1.3fr) minmax(118px,1fr) 7.4rem 9.6rem 5rem 5rem minmax(0,1fr)}
-body[data-f=leaders] .cols,body[data-f=leaders] .row>button{grid-template-columns:minmax(140px,1.3fr) minmax(118px,1fr) 7.4rem 12.5rem repeat(3,5.6rem) minmax(0,1fr)}
-body[data-f=direction] .cols,body[data-f=direction] .row>button{grid-template-columns:minmax(140px,1.3fr) minmax(118px,1fr) 7.4rem repeat(3,5.4rem) 5.8rem minmax(140px,1fr)}
-body[data-f=issues] .cols,body[data-f=issues] .row>button{grid-template-columns:minmax(130px,1.2fr) minmax(110px,1fr) 6.6rem repeat(6,minmax(5.6rem,1fr))}
-body[data-f=demographics] .cols,body[data-f=demographics] .row>button{grid-template-columns:minmax(140px,1.3fr) minmax(118px,1fr) 7.4rem repeat(5,5.4rem) minmax(0,1fr)}
-body[data-f=confidence] .cols,body[data-f=confidence] .row>button{grid-template-columns:minmax(150px,1.4fr) minmax(118px,1fr) 7.4rem 6rem 6rem minmax(0,1fr)}
-body[data-f=issues] .f,body[data-f=direction] .f.wide{text-align:left}
-}
-@media (min-width:1200px){
-#list{display:grid;width:fit-content;max-width:100%;column-gap:12px;padding-inline:4px}
-#list>section,#list .month,#list>section>ol,#list .row,#list .cols,#list .row>button{display:grid;grid-template-columns:subgrid;grid-column:1/-1}
-#list .cols,#list .row>button{padding-inline:0}
-#list .mrow,#list .det,#list .empty{grid-column:1/-1}
-#list .det[hidden]{display:none}
-body[data-f=primary] #list{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem repeat(5,5.1rem) 5.6rem}
-body[data-f=twopp] #list{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem 9.6rem 5rem 5rem max-content}
-body[data-f=leaders] #list{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem 12.5rem repeat(3,5.6rem) max-content}
-body[data-f=direction] #list{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem repeat(3,5.4rem) 5.8rem max-content}
-body[data-f=issues] #list{grid-template-columns:minmax(130px,max-content) minmax(110px,max-content) 6.6rem repeat(6,minmax(5.6rem,max-content))}
-body[data-f=demographics] #list{grid-template-columns:minmax(140px,max-content) minmax(118px,max-content) 7.4rem repeat(5,5.4rem) max-content}
-body[data-f=confidence] #list{grid-template-columns:minmax(150px,max-content) minmax(118px,max-content) 7.4rem 6rem 6rem max-content}
-}
-@media (prefers-reduced-motion:reduce){.row>button{transition:none}}
+@media(max-width:19em){body[data-f=primary] .headings{display:none}body[data-f=primary] .poll{grid-template-columns:repeat(auto-fit,minmax(3.8em,1fr))}.poll .value[data-party]::before{content:attr(data-party);display:block;font-size:11px;color:var(--mute)}}
+.rival-toggle{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 13px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
+.rival-toggle::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.rival-toggle[data-r=on]{color:var(--on)}
+.rival-toggle[data-r=lnp]{background:color-mix(in srgb,var(--lnp) 10%,var(--bg))}
+.rival-toggle[data-r=on]{background:color-mix(in srgb,var(--on) 12%,var(--bg))}
+@media(max-width:899px){.rival-toggle{gap:4px;padding:4px 7px;font-size:12px}.rival-toggle::before{width:7px;height:7px}}
 /* the mark's sun: the hero in miniature, on its sky, beside the name once the hero has scrolled away */
 :root{--lz:#0b1640;--lm:#23498f;--ll:#c98a8f;--lh:#f2b07f}
 :root[data-sky=set]{--lz:#141a4c;--lm:#3b3a8c;--ll:#b4588f;--lh:#ff8a5a}
@@ -243,11 +263,13 @@ body[data-f=confidence] #list{grid-template-columns:minmax(150px,max-content) mi
     <div class="ctl">
       <label class="search"><span class="sr">Search</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search a pollster, a date or a figure" autocomplete="off" enterkeyhint="search"></label>
       <label class="pick"><span class="pl">Take&nbsp;</span><select id="house"></select></label>
-      <div class="seg fopt" role="radiogroup" aria-label="Contest" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-c="lnp">v Coalition</button><button type="button" role="radio" aria-checked="false" data-c="on">v One Nation</button></div>
+      <div class="pick"><span class="pl">Sort by&nbsp;</span><select id="sort" aria-label="Sort by"><option value="fieldwork">fieldwork date</option><option value="publication">publication date</option></select></div>
+      <div class="rival-pick fopt" data-for="twopp" hidden>Labor v <button type="button" class="rival-toggle" id="rival" role="switch" aria-label="Labor versus One Nation" aria-checked="false" data-r="lnp">Coalition</button></div>
       <div class="seg fopt" role="radiogroup" aria-label="Two-party basis" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-b="imp">Implied</button><button type="button" role="radio" aria-checked="false" data-b="pub">Published</button></div>
       <label class="pick fopt" data-for="demographics"><span class="sr">Split by</span><select id="split"></select></label>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
+    <div class="measure-line"><h2 id="measure"></h2><span id="method-key"></span><label class="interval-toggle fopt" data-for="primary"><input id="intervals" type="checkbox">95% credible intervals</label></div>
     <div id="list"></div>
     <p class="note" id="note"></p>
   </div>
@@ -271,7 +293,7 @@ const f1=v=>(Math.round(v*10)/10).toFixed(1);
 const num=v=>v==null?'–':Number.isInteger(+v)?String(v):f1(v);
 const sg=v=>v==null?'–':(v>0?'+':v<0?'−':'')+(Math.abs(v)<10&&!Number.isInteger(Math.round(v*10)/10)?f1(Math.abs(v)):num(Math.abs(Math.round(v*10)/10)));
 const pm=m=>m==null||!isFinite(m)||m<=0?'':`<em>±${m.toFixed(1)}</em>`;
-const POLLS=DATA.polls,CONF=DATA.conf,YR=+DATA.asOf.slice(0,4);
+const POLLS=DATA.polls,CONF=DATA.conf;
 
 /* ---------- each figure's ± at 95%: the site's rules (rd-allpolls.jsx) ----------
    a primary share: a Beta credible interval on a Jeffreys prior, var = κ·s(1−s)/n + step²/12, n the effective
@@ -280,20 +302,55 @@ const POLLS=DATA.polls,CONF=DATA.conf,YR=+DATA.asOf.slice(0,4);
    right minus wrong, an issue lead): (a + b − (a−b)²)/n; a group gap: each group's estimated sample (the poll's
    effective sample times the group's share of adults) */
 const nEff=p=>/ \(MRP\)$/.test(p.h)?0:(p.se||(p.n?p.n/DATA.deff:0));
-const lg=x=>{const g=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let a=1.000000000190015;for(let k=0;k<6;k++)a+=g[k]/++y;return -t+Math.log(2.5066282746310005*a/x)};
-const bcf=(a,b,x)=>{const T=1e-30;let c=1,d=1-(a+b)*x/(a+1);if(Math.abs(d)<T)d=T;d=1/d;let h=d;for(let m=1;m<=200;m++){const m2=2*m;let aa=m*(b-m)*x/((a-1+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<T)d=T;c=1+aa/c;if(Math.abs(c)<T)c=T;d=1/d;h*=d*c;aa=-(a+m)*(a+b+m)*x/((a+m2)*(a+1+m2));d=1+aa*d;if(Math.abs(d)<T)d=T;c=1+aa/c;if(Math.abs(c)<T)c=T;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-12)break}return h};
-const ib=(a,b,x)=>{if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lg(a+b)-lg(a)-lg(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*bcf(a,b,x)/a:1-bt*bcf(b,a,1-x)/b};
-const bq=(a,b,q)=>{let lo=0,hi=1;for(let k=0;k<50;k++){const m=(lo+hi)/2;if(ib(a,b,m)<q)lo=m;else hi=m}return (lo+hi)/2};
+/*{{POLLINTERVALS}}*/
 const stepOf=p=>{const vs=Object.values(p.p||{}).filter(v=>typeof v==='number');if(!vs.length||vs.every(v=>Math.abs(v-Math.round(v))<1e-6))return 1;return vs.every(v=>Math.abs(v*2-Math.round(v*2))<1e-6)?.5:.1};
-const ciMemo=new Map();
-function primMoe(p,v,und){
-  if(v==null)return null;let n=nEff(p);if(!n)return null;
-  if(!und&&p.u&&p.u.label==='excluded'&&p.u.v>0)n*=1-p.u.v/100;
-  const s=Math.max(0,Math.min(100,+v))/100;if(!(s>0))return null;
-  const kap=!und&&DATA.kappa&&DATA.kappa[p.h]!=null?DATA.kappa[p.h]:1,step=stepOf(p)/100,key=s.toFixed(4)+'|'+Math.round(n)+'|'+kap+'|'+step;
-  if(ciMemo.has(key))return ciMemo.get(key);
-  const vr=kap*s*(1-s)/n+step*step/12,m=Math.max(1,s*(1-s)/vr),lo=bq(s*m+.5,(1-s)*m+.5,.025),hi=bq(s*m+.5,(1-s)*m+.5,.975),r=50*(hi-lo);
-  ciMemo.set(key,r);return r;
+function primaryPosterior(p,v,und=false){
+  let n=nEff(p);
+  if(v==null||!n)return null;
+  if(!und&&p.u?.label==='excluded'&&p.u.v>0)n*=1-p.u.v/100;
+  if(n<=0)return null;
+  return sharePosterior(v,n,und?1:DATA.kappa[p.h]??1,stepOf(p));
+}
+const intervalCache=new Map();
+function intervalText(p,v,und){
+  const shape=primaryPosterior(p,v,und);
+  if(!shape)return '';
+  const key=shape.join('|');
+  if(!intervalCache.has(key)){
+    intervalCache.set(key,credibleBounds(shape).map(f1).join('–'));
+  }
+  return intervalCache.get(key);
+}
+function intervalMarkup(p,v,und){
+  const interval=intervalText(p,v,und);
+  return interval?'<em>'+interval+'</em>':'';
+}
+function changeSummary(p){
+  if(!p.chg?.d)return '';
+  const byReference=new Map();
+  for(const k of ORDER){
+    const key='p'+k[0].toUpperCase()+k.slice(1),delta=p.chg.d[key];
+    if(delta==null)continue;
+    const ref=p.chg.r?.[key]||'';
+    if(!byReference.has(ref))byReference.set(ref,[]);
+    byReference.get(ref).push({k,delta});
+  }
+  return [...byReference].map(([ref,changes])=>{
+    const prior=POLLS.find(row=>row.h===p.h&&row.d===ref&&row.p);
+    const overlaps=prior&&p.fieldStart&&p.fieldStart<=prior.d;
+    const significant=[],unknown=[];
+    for(const {k} of changes){
+      const status=prior&&!overlaps?significantChange(primaryPosterior(p,p.p[k]),primaryPosterior(prior,prior.p[k])):null;
+      if(status===true)significant.push(ABBR[k]);
+      if(status==null)unknown.push(ABBR[k]);
+    }
+    const verdict=[];
+    if(significant.length)verdict.push(significant.join(', ')+' significant');
+    else if(unknown.length<changes.length)verdict.push('none significant'+(unknown.length?' among those assessed':''));
+    if(unknown.length)verdict.push(overlaps?'significance unavailable for overlapping fieldwork':'significance unavailable'+(unknown.length<changes.length?' for '+unknown.join(', '):''));
+    const comparison=byReference.size===1?'last poll':'poll of '+(ref?fdate(ref):'unknown date');
+    return '<p>Against '+esc(houseName(p.h))+'’s '+comparison+', '+changes.map(({k,delta})=>ABBR[k]+' '+sg(delta)).join(', ')+' ('+verdict.join('; ')+').</p>';
+  }).join('');
 }
 const shareMoe=(p,v)=>{const n=nEff(p);if(v==null||!n)return null;const s=Math.max(0,Math.min(100,+v))/100;return 196*Math.sqrt(s*(1-s)/n)};
 const diffMoe=(p,a,b)=>{const n=nEff(p);if(a==null||b==null||!n)return null;const x=+a/100,y=+b/100;return 196*Math.sqrt(Math.max(0,x+y-(x-y)*(x-y))/n)};
@@ -328,67 +385,129 @@ let F='primary',CONTEST='lnp',BASIS='imp',SPLIT='age';
 const tpKey=()=>CONTEST==='lnp'?(BASIS==='imp'?'i':'t'):(BASIS==='imp'?'io':'to');
 const ydKey=()=>CONTEST==='lnp'?(BASIS==='imp'?'imp':'lnp'):(BASIS==='imp'?'onimp':'onp');
 const FACETS={
-  primary:{label:'Primary',rows:()=>POLLS.filter(p=>p.p&&Object.keys(p.p).length),cols:()=>[...ORDER.map(k=>ABBR[k]),'Und'],
-    fig:p=>ORDER.map(k=>{const v=p.p[k];return `<span class="f" style="--c:var(--${CV[k]})"><i>${ABBR[k]}</i><b>${num(v)}</b>${pm(primMoe(p,v))}</span>`}).join('')
-      +(p.u?`<span class="f"><i>und</i><b style="--c:var(--ink2)">${p.u.v==null?'–':num(p.u.v)}</b>${p.u.v?pm(primMoe(p,p.u.v,true)):''}<span class="lab">${esc(p.u.label)}</span></span>`:'<span class="f"><i>und</i><b>–</b></span>'),
+  primary:{label:'Primary',rows:()=>POLLS.filter(p=>p.p&&Object.keys(p.p).length),cols:()=>[...ORDER.map(k=>NAME[k]),'Undecided'],
     hay:p=>ORDER.map(k=>num(p.p[k])).join(' ')},
-  twopp:{label:'2PP',rows:()=>POLLS.filter(p=>p[tpKey()]!=null),cols:()=>['Labor v '+(CONTEST==='lnp'?'Coalition':'One Nation'),'Lean','House lean',''],
+  twopp:{label:'2PP',rows:()=>POLLS.filter(p=>p[tpKey()]!=null),cols:()=>['Labor v '+(CONTEST==='lnp'?'Coalition':'One Nation'),'Lean','House lean'],
     fig:p=>{const v=p[tpKey()],y=p.yd&&p.yd[ydKey()],lean=y?v-y[0]:null,he=y?y[1]:null,rc=CONTEST==='lnp'?'lnp':'on',pub=BASIS==='imp'?p[CONTEST==='lnp'?'t':'to']:null;
-      return `<span class="f"><i>${CONTEST==='lnp'?'v L/NP':'v ON'}</i><b style="--c:var(--alp)">${num(v)}</b> – <b style="--c:var(--${rc})">${num(Math.round((100-v)*10)/10)}</b>${pub!=null?`<span class="lab">published ${num(pub)}–${num(Math.round((100-pub)*10)/10)}</span>`:''}</span>`
-        +`<span class="f"><i>lean</i><b style="--c:${lean==null||Math.abs(lean)<.05?'var(--ink2)':lean>0?'var(--alp)':'var(--'+rc+')'}">${lean==null?'–':sg(Math.round(lean*10)/10)}</b></span><span class="f"><i>house</i><b style="--c:var(--ink2)">${he==null?'–':sg(Math.round(he*10)/10)}</b></span><span class="f"></span>`},
+      return [`<span class="f"><i>${CONTEST==='lnp'?'v L/NP':'v ON'}</i><b style="--c:var(--alp)">${num(v)}</b> – <b style="--c:var(--${rc})">${num(Math.round((100-v)*10)/10)}</b>${pub!=null?`<span class="lab">published ${num(pub)}–${num(Math.round((100-pub)*10)/10)}</span>`:''}</span>`
+        ,`<span class="f"><i>lean</i><b style="--c:${lean==null||Math.abs(lean)<.05?'var(--ink2)':lean>0?'var(--alp)':'var(--'+rc+')'}">${lean==null?'–':sg(Math.round(lean*10)/10)}</b></span>`,`<span class="f"><i>house</i><b style="--c:var(--ink2)">${he==null?'–':sg(Math.round(he*10)/10)}</b></span>`]},
     hay:p=>num(p[tpKey()])},
-  leaders:{label:'Leaders',rows:()=>POLLS.filter(p=>ppmOf(p)||LEAD.some(([k])=>netOf(p,k))),cols:()=>['Better PM','Alb','Tay','Han',''],
-    fig:p=>{const pp=ppmOf(p);let s=`<span class="f"><i>better PM</i>${pp?pp.ks.map((k,i)=>`${i?' – ':''}<b style="--c:var(--${LEAD.find(l=>l[0]===k)[2]})">${num(pp.s[k])}</b>`).join('')+`<span class="lab">${esc(pp.lab)}</span>`:'<b>–</b><span class="lab">not asked</span>'}</span>`;
-      LEAD.forEach(([k,nm,c])=>{const n=netOf(p,k);s+=`<span class="f"><i>${nm}</i><b style="--c:var(--${c})">${n?sg(n.v):'–'}</b>${n?pm(n.m):''}${n&&n.fav?'<span class="lab">favourability</span>':''}</span>`});return s+'<span class="f"></span>'},
+  leaders:{label:'Leaders',rows:()=>POLLS.filter(p=>ppmOf(p)||LEAD.some(([k])=>netOf(p,k))),cols:()=>['Better PM','Alb','Tay','Han'],
+    fig:p=>{const pp=ppmOf(p);const cells=[`<span class="f"><i>better PM</i>${pp?pp.ks.map((k,i)=>`${i?' – ':''}<b style="--c:var(--${LEAD.find(l=>l[0]===k)[2]})">${num(pp.s[k])}</b>`).join('')+`<span class="lab">${esc(pp.lab)}</span>`:'<b>–</b><span class="lab">not asked</span>'}</span>`];
+      LEAD.forEach(([k,nm,c])=>{const n=netOf(p,k);cells.push(`<span class="f"><i>${nm}</i><b style="--c:var(--${c})">${n?sg(n.v):'–'}</b>${n?pm(n.m):''}${n&&n.fav?'<span class="lab">favourability</span>':''}</span>`)});return cells},
     hay:p=>LEAD.map(([k])=>{const n=netOf(p,k);return n?n.v:''}).join(' ')},
   direction:{label:'Direction',rows:()=>POLLS.filter(p=>p.dir&&p.dir.right!=null),cols:()=>['Right','Wrong','Unsure','Net','Right direction, unsure, wrong track'],
     fig:p=>{const d=p.dir,ch=k=>d.chg&&d.chg[k]!=null?`<span class="lab">${d.chg[k]>0?'▲':d.chg[k]<0?'▼':''} ${num(Math.abs(d.chg[k]))}</span>`:'';
-      return `<span class="f"><i>right</i><b style="--c:var(--pos)">${num(d.right)}</b>${pm(shareMoe(p,d.right))}${ch('right')}</span><span class="f"><i>wrong</i><b style="--c:var(--neg)">${num(d.wrong)}</b>${pm(shareMoe(p,d.wrong))}${ch('wrong')}</span><span class="f"><i>unsure</i><b style="--c:var(--ink2)">${num(d.unsure)}</b>${pm(shareMoe(p,d.unsure))}${ch('unsure')}</span>`
-        +`<span class="f"><i>net</i><b>${sg(d.net!=null?d.net:d.right-d.wrong)}</b>${pm(diffMoe(p,d.right,d.wrong))}</span><span class="f wide"><span class="bar" aria-hidden="true"><i style="width:${d.right}%;background:var(--pos)"></i><i style="width:${d.unsure||0}%;background:var(--rule2)"></i><i style="width:${d.wrong}%;background:var(--neg)"></i></span></span>`},
+      return [`<span class="f"><i>right</i><b style="--c:var(--pos)">${num(d.right)}</b>${pm(shareMoe(p,d.right))}${ch('right')}</span>`,`<span class="f"><i>wrong</i><b style="--c:var(--neg)">${num(d.wrong)}</b>${pm(shareMoe(p,d.wrong))}${ch('wrong')}</span>`,`<span class="f"><i>unsure</i><b style="--c:var(--ink2)">${num(d.unsure)}</b>${pm(shareMoe(p,d.unsure))}${ch('unsure')}</span>`
+        ,`<span class="f"><i>net</i><b>${sg(d.net!=null?d.net:d.right-d.wrong)}</b>${pm(diffMoe(p,d.right,d.wrong))}</span>`,`<span class="f wide"><span class="bar" aria-hidden="true"><i style="width:${d.right}%;background:var(--pos)"></i><i style="width:${d.unsure||0}%;background:var(--rule2)"></i><i style="width:${d.wrong}%;background:var(--neg)"></i></span></span>`]},
     hay:p=>[p.dir.right,p.dir.wrong,p.dir.unsure].join(' ')},
   issues:{label:'Issues',rows:()=>POLLS.filter(p=>ISS.some(id=>issOwn(p,id))),cols:()=>ISS.map(id=>ISSL[id]),
     fig:p=>ISS.map(id=>{const own=issOwn(p,id),L=issLead(own);if(!L)return `<span class="f"><i>${ISSL[id]}</i><b style="--c:var(--mute)">–</b></span>`;
       const c=CV[L.who],bars=['alp','onp','lnp','grn','oth'].filter(k=>own[k]!=null).map(k=>`<i style="width:${own[k]}%;background:var(--${CV[k]})"></i>`).join('');
-      return `<span class="f"><i>${ISSL[id]}</i>${L.level?'<b style="--c:var(--ink2)">Level</b>':`<b style="--c:var(--${c})">${ABBR[L.who]} +${num(Math.round(L.lead*10)/10)}</b>`}${pm(diffMoe(p,L.v,L.b))}<span class="bar" aria-hidden="true" style="min-width:60px">${bars}</span></span>`}).join(''),
+      return `<span class="f"><i>${ISSL[id]}</i>${L.level?'<b style="--c:var(--ink2)">Level</b>':`<b style="--c:var(--${c})">${ABBR[L.who]} +${num(Math.round(L.lead*10)/10)}</b>`}${pm(diffMoe(p,L.v,L.b))}<span class="bar" aria-hidden="true" style="min-width:60px">${bars}</span></span>`}),
     hay:p=>ISS.map(id=>{const L=issLead(issOwn(p,id));return L?ABBR[L.who]:''}).join(' ')},
-  demographics:{label:'Demographics',rows:()=>POLLS.filter(p=>pairOf(p,SPLIT)),cols:()=>[...ORDER.map(k=>ABBR[k]),''],
-    fig:p=>{const pr=pairOf(p,SPLIT);return ORDER.map(k=>{const g=pr.gap[k];return `<span class="f" style="--c:var(--${CV[k]})"><i>${ABBR[k]}</i><b>${g==null?'–':sg(Math.round(g*10)/10)}</b>${g==null?'':pm(gapMoe(p,pr,k))}</span>`}).join('')+`<span class="f wide"><span class="lab" style="text-align:left">${esc(pr.lab)}, in points</span></span>`},
+  demographics:{label:'Demographics',rows:()=>POLLS.filter(p=>pairOf(p,SPLIT)),cols:()=>[...ORDER.map(k=>ABBR[k]),'Groups'],
+    fig:p=>{const pr=pairOf(p,SPLIT);return [...ORDER.map(k=>{const g=pr.gap[k];return `<span class="f" style="--c:var(--${CV[k]})"><i>${ABBR[k]}</i><b>${g==null?'–':sg(Math.round(g*10)/10)}</b>${g==null?'':pm(gapMoe(p,pr,k))}</span>`}),`<span class="f wide"><span class="lab" style="text-align:left">${esc(pr.lab)}, in points</span></span>`]},
     hay:p=>{const pr=pairOf(p,SPLIT);return pr?pr.lab:''}},
-  confidence:{label:'Confidence',rows:()=>CONF,cols:()=>['Figure','Change',''],noun:'release',
-    fig:p=>`<span class="f"><i>figure</i><b>${num(p.conf.v)}</b></span><span class="f"><i>change</i><b style="--c:${p.conf.chg>0?'var(--pos)':p.conf.chg<0?'var(--neg)':'var(--ink2)'}">${p.conf.chg==null?'–':sg(p.conf.chg)}</b></span><span class="f wide"><span class="lab" style="text-align:left">${esc(p.conf.lab)}${p.conf.vs?' · neutral at '+p.conf.vs:''}</span></span>`,
+  confidence:{label:'Confidence',rows:()=>CONF,cols:()=>['Figure','Change','Series'],noun:'release',
+    fig:p=>[`<span class="f"><i>figure</i><b>${num(p.conf.v)}</b></span>`,`<span class="f"><i>change</i><b style="--c:${p.conf.chg>0?'var(--pos)':p.conf.chg<0?'var(--neg)':'var(--ink2)'}">${p.conf.chg==null?'–':sg(p.conf.chg)}</b></span>`,`<span class="f wide"><span class="lab" style="text-align:left">${esc(p.conf.lab)}${p.conf.vs?' · neutral at '+p.conf.vs:''}</span></span>`],
     hay:p=>[p.conf.v,p.conf.lab].join(' ')},
 };
 const FDEK={issues:'The party voters rate best on each issue, and its lead on the runner-up; a lead inside the margin is level.',demographics:'Each poll’s own gap between two groups, party by party: the first group less the second.',confidence:'Each confidence or sentiment release, as the bank or pollster published it.'};
 /* the sample: the count and what the shares are of, the effective sample beneath (the house’s, still to come, missing, or estimated) */
-const nTxt=p=>p.n?Number(p.n).toLocaleString('en-AU')+(F==='twopp'&&p.b2?' '+p.b2:p.b?' '+p.b:''):'–';
+function sampleMarkup(p){
+  const basis=(F==='twopp'&&p.b2)||p.b;
+  return p.n?Number(p.n).toLocaleString('en-AU')+(basis?' '+sampleBase(basis):''):'–';
+}
 const effTxt=p=>p.se?'eff. '+Number(p.se).toLocaleString('en-AU'):p.eb?(/^~/.test(p.eb)?'eff. ~'+Number(p.eb.slice(1)).toLocaleString('en-AU'):'eff. '+p.eb):'';
 const tabs=$('#tabs'),sel=$('#house'),q=$('#q'),splitSel=$('#split');
 tabs.innerHTML=Object.entries(FACETS).map(([id,f])=>`<button type="button" role="tab" aria-selected="${id===F}" data-f="${id}">${f.label}</button>`).join('');
 splitSel.innerHTML=SPLITS.map(s=>`<option value="${s.id}">Split by ${s.label.toLowerCase()}</option>`).join('');
 function houses(rows){const c=new Map();rows.forEach(p=>c.set(p.h,(c.get(p.h)||0)+1));return [...c].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))}
-function fillHouses(){const fa=FACETS[F],rows=fa.rows(),cur=sel.value;sel.innerHTML=`<option value="">all pollsters</option>`+houses(rows).map(([h])=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');sel.value=houses(rows).some(([h])=>h===cur)?cur:''}
+function fillHouses(){const fa=FACETS[F],rows=fa.rows(),cur=sel.value;sel.innerHTML=`<option value="">all pollsters</option>`+houses(rows).map(([h])=>`<option value="${esc(h)}">${esc(houseName(h))}</option>`).join('');sel.value=houses(rows).some(([h])=>h===cur)?cur:''}
 /* search: a pollster, its client, a date in any of the ways it is written, or a figure */
-const hayOf=p=>[p.h,p.c||'',p.f||'',fdate(p.d),fday(p.d),MONF[+p.d.slice(5,7)-1]+' '+p.d.slice(0,4),p.d,FACETS[F].hay(p)].join(' ').toLowerCase();
+function hayOf(p){
+  const dates=[fieldDate(p),p.pub].filter(Boolean).map(date=>[date,monthLabel(date.slice(0,7)),date.length>=10?fdate(date):''].join(' '));
+  return [p.h,p.c||'',p.f||'',...dates,FACETS[F].hay(p)].join(' ').toLowerCase();
+}
+function undecided(p){
+  if(p.u?.label==='not allowed'||p.b==='F')return 'Forced choice';
+  if(!p.u)return 'Unreported';
+  const share=p.u.v==null?'Share unreported · ':num(p.u.v)+'% ';
+  return share+p.u.label;
+}
+function resultCells(p){
+  if(F==='primary'){
+    const cells=ORDER.map(k=>{
+      const v=p.p[k],[whole,fraction]=num(v).split('.');
+      return `<td class="value" data-party="${ABBR[k]}" style="--c:var(--${CV[k]})"><b class="number">${whole}<span class="fraction">${fraction?'.'+fraction:''}</span></b>${intervalMarkup(p,v)}</td>`;
+    });
+    cells.push(`<td class="basis"><span class="basis-label">Undecided · </span>${esc(undecided(p))}${p.u?.label==='not allowed'?'':intervalMarkup(p,p.u?.v,true)}</td>`);
+    return cells.join('');
+  }
+  return FACETS[F].fig(p).map(cell=>'<td class="value other-cell">'+cell+'</td>').join('');
+}
+const facetTitle={primary:'First preferences (%)',twopp:'Two-party preferred (%)',leaders:'Leadership',direction:'National direction',issues:'Issue ownership',demographics:'Demographic gaps (points)',confidence:'Confidence'};
+const compact=matchMedia('(max-width:64em)'),intervalSwitch=$('#intervals');
+let intervalPreference;
+function setIntervals(){
+  intervalSwitch.checked=intervalPreference??!compact.matches;
+  document.body.classList.toggle('intervals-on',intervalSwitch.checked);
+}
+intervalSwitch.addEventListener('change',()=>{intervalPreference=intervalSwitch.checked;setIntervals()});
+compact.addEventListener('change',setIntervals);setIntervals();
+
+const sortSelect=$('#sort');
+function fieldDate(p){return p.conf?p.fieldEnd||'':p.tbc?'':p.d}
+function sortDate(p){return sortSelect.value==='publication'?p.pub||'':fieldDate(p)}
+function monthLabel(ym){
+  if(!ym)return sortSelect.value==='publication'?'Publication date unknown':'Fieldwork date unknown';
+  return MONF[Number(ym.slice(5,7))-1]+' '+ym.slice(0,4);
+}
+function dateCells(p){
+  const published=sortSelect.value==='publication',ym=sortDate(p).slice(0,7);
+  const field=fieldDate(p),stamp=p.pub||'';
+  const yearNeeded=iso=>iso&&iso.slice(0,4)!==ym.slice(0,4);
+  const release=stamp?(yearNeeded(stamp)?fdate(stamp):fday(stamp)):'unknown';
+  const fieldwork=field?(p.f||fday(field))+(yearNeeded(field)&&!(p.f||'').includes(field.slice(0,4))?' '+field.slice(0,4):''):'Unknown';
+  return published?{main:stamp?release:'Unknown',sub:field?'Fieldwork '+fieldwork:'Fieldwork unknown',mobile:stamp?'Published '+release:'Publication date unknown'}
+    :{main:fieldwork,sub:stamp?'Published '+release:'Publication date unknown',mobile:field?fieldwork:'Fieldwork unknown'};
+}
+function rowMarkup(p,colCount){
+  const id=esc(p.k),house=esc(houseName(p.h)),dates=dateCells(p),sample=sampleMarkup(p);
+  const flag=/Tasmanian voters only/i.test(p.na||'')?'Tasmania only':p.na?'Outside aggregate':'';
+  const client=p.c&&!/^self.published$/i.test(p.c)?'<small>'+esc(p.c)+'</small>':'';
+  return `<tr class="poll" id="p-${id}"><th scope="row"><button class="expand" type="button" aria-label="${house}, ${esc(dates.mobile)}, details" aria-controls="d-${id}" aria-expanded="false"><span class="chev" aria-hidden="true"></span>${house}</button><span class="short-date">${esc(dates.mobile)}</span><span class="short-sample">${p.n?'n '+sample:''}</span>${flag?'<span class="flag">'+flag+'</span>':''}${client}</th><td class="date">${esc(dates.main)}<small>${esc(dates.sub)}</small></td><td class="sample">${sample}<small>${esc(effTxt(p))}</small></td>${resultCells(p)}</tr>
+    <tr class="extra" id="d-${id}" hidden><td colspan="${colCount}"><div class="det"></div></td></tr>`;
+}
 function render(){
-  const fa=FACETS[F],all=fa.rows(),h=sel.value,terms=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const rows=all.filter(p=>(!h||p.h===h)&&(!terms.length||terms.every(t=>hayOf(p).includes(t))));
+  const fa=FACETS[F],all=fa.rows(),house=sel.value,terms=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const rows=all.filter(p=>(!house||p.h===house)&&terms.every(term=>hayOf(p).includes(term)));
+  rows.sort((a,b)=>sortDate(b).localeCompare(sortDate(a))||b.d.localeCompare(a.d)||a.h.localeCompare(b.h));
   document.body.dataset.f=F;
   $$('.fopt').forEach(e=>e.hidden=e.dataset.for!==F);
   const fd=$('#fdek');fd.hidden=!FDEK[F];fd.textContent=FDEK[F]||'';
-  const cols=`<div class="cols" aria-hidden="true"><span>Pollster</span><span>Fieldwork</span><span>Sample</span>${fa.cols().map(c=>`<span>${esc(c)}</span>`).join('')}</div>`;
-  const byM=new Map();rows.forEach(p=>{const ym=p.d.slice(0,7);(byM.get(ym)||byM.set(ym,[]).get(ym)).push(p)});
-  let s='';const noun=fa.noun||'poll';
-  for(const [ym,list] of byM){
-    const [y,m]=ym.split('-').map(Number);
-    s+=`<section aria-label="${MONF[m-1]} ${y}"><div class="month"><div class="mrow"><h2>${MONF[m-1]} ${y}</h2><span>${list.length} ${noun}${list.length===1?'':'s'}</span></div>${cols}</div><ol>`;
-    for(const p of list){
-      const yr=+p.d.slice(0,4);
-      s+=`<li class="row" id="p-${esc(p.k)}"><button type="button" aria-expanded="false" aria-controls="d-${esc(p.k)}"><span class="who"><b>${esc(p.h)}</b>${p.c?`<small>${esc(p.c)}</small>`:''}</span><span class="fw">${p.tbc?'fieldwork TBC':esc(p.f||fday(p.d))+(yr!==YR?' '+yr:'')}${p.na?' <span class="tag">not counted</span>':''}<small>released ${esc(fday(p.pub||p.d))}</small></span><span class="n">${esc(nTxt(p))}<small>${esc(effTxt(p))}</small></span><span class="fig">${fa.fig(p)}</span></button><div class="det" id="d-${esc(p.k)}" hidden></div></li>`;
-    }
-    s+='</ol></section>';
+  $('#measure').textContent=facetTitle[F];
+  $('#method-key').textContent=F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
+  const noun=fa.noun||'poll',count=house||terms.length?rows.length+' of '+all.length:rows.length;
+  $('#count').textContent=count+' '+noun+(all.length===1?'':'s')+(F==='primary'?' with primary votes':'');
+  const months=new Map();
+  for(const p of rows){
+    const month=sortDate(p).slice(0,7);
+    if(!months.has(month))months.set(month,[]);
+    months.get(month).push(p);
   }
-  $('#list').innerHTML=s||`<p class="empty">No ${noun}s match${terms.length?' “'+esc(q.value.trim())+'”':''}.</p>`;
-  $('#count').textContent=rows.length+' of '+all.length+' '+noun+(all.length===1?'':'s');
+  const labels=fa.cols(),colCount=3+labels.length,dateLabel=sortSelect.value==='publication'?'Published':'Fieldwork';
+  const headers=labels.map((label,i)=>{
+    const abbr=F==='primary'&&i<ORDER.length?`<abbr title="${esc(label)}">${ABBR[ORDER[i]]}</abbr>`:'';
+    return `<th scope="col" class="measure-head"><span>${esc(label)}</span>${abbr}</th>`;
+  }).join('');
+  const tables=[];
+  for(const [ym,list] of months){
+    const month=monthLabel(ym);
+    tables.push(`<table class="ledger" aria-label="${esc(facetTitle[F]+', '+month)}"><colgroup><col class="poll-col"><col class="date-col"><col class="sample-col">${labels.map(()=>'<col>').join('')}</colgroup><thead><tr class="month-title"><th colspan="${colCount}"><h2>${month}</h2><span>${list.length} ${noun}${list.length===1?'':'s'}</span></th></tr><tr class="headings"><th scope="col">Pollster</th><th scope="col">${dateLabel}</th><th scope="col">Sample</th>${headers}</tr></thead><tbody>${list.map(p=>rowMarkup(p,colCount)).join('')}</tbody></table>`);
+  }
+  $('#list').innerHTML=tables.join('')||'<p class="empty">No matches. Try another pollster or search term.</p>';
 }
 /* a poll opened: what it is and where it was published, every link it has, then what it says, facet by facet,
    the open facet first, and its primaries against the model's that week */
@@ -400,18 +519,25 @@ function detail(p){
   if(p.na)b.push(`<p><b>Not counted.</b> ${esc(p.na)}</p>`);
   if(p.conf)sec.push(['confidence',`<h3>${esc(p.conf.lab)}</h3><p>${num(p.conf.v)}${p.conf.chg!=null?', '+sg(p.conf.chg)+' on the release before':''}${p.conf.vs?'; '+p.conf.vs+' is neutral':''}.</p>`]);
   if(p.p&&Object.keys(p.p).length){
-    let s='<h3>Primary vote, %</h3>';
+    let s='<h3>First preferences (%)</h3>';
     if(p.mw){const vals=ORDER.map(k=>p.p[k]).filter(v=>v!=null),mx=Math.max(45,...vals,...p.mw)+2,pc=v=>(v/mx*100).toFixed(2)+'%';
-      s+='<div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[k],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div><div class="key"><span><i></i>this poll</span><span><s></s>the model '+(p.d===DATA.asOf?'this week':'that week')+'</span></div>'}
+      s+='<div class="key"><span><i></i>This poll</span><span><s></s>Tracker that week</span></div><div class="vs">'+ORDER.map(k=>{const j=PK.indexOf(k),v=p.p[k],m=p.mw[j];if(v==null)return '';return `<span class="nm">${NAME[k]}</span><span class="tr" style="--c:var(--${CV[k]})"><s style="left:${pc(m)}"></s><i style="left:${pc(v)}"></i></span><span class="vl"><b>${num(v)}</b> <span>v ${f1(m)}</span></span>`}).join('')+'</div>'}
     else s+='<p>'+ORDER.map(k=>p.p[k]!=null?NAME[k]+' '+num(p.p[k]):'').filter(Boolean).join(', ')+'.</p>';
-    const c=p.chg&&p.chg.d,ref=c&&p.chg.r&&(p.chg.r.pAlp||Object.values(p.chg.r)[0]);
-    if(c&&['pAlp','pLnp','pGrn','pOnp','pOth'].some(k=>c[k]!=null))s+=`<p>Against ${esc(p.h)}’s poll before${ref?' ('+esc(fday(ref))+')':''}: `+[['alp','pAlp'],['onp','pOnp'],['lnp','pLnp'],['grn','pGrn'],['oth','pOth']].filter(([,ck])=>c[ck]!=null).map(([k,ck])=>ABBR[k]+' '+sg(c[ck])).join(', ')+'.</p>';
-    if(p.u&&p.u.v!=null)s+=`<p>${num(p.u.v)}% undecided, ${p.u.label==='included'?'kept in the shares':'left out of the shares'}.</p>`;
-    if(F==='primary')s+=sigMark(p,nEff(p));
+    s+=changeSummary(p);
+    s+='<p>Undecided · '+esc(undecided(p))+'.</p>';
+    const intervals=ORDER.filter(k=>p.p[k]!=null).map(k=>{
+      const ci=intervalText(p,p.p[k]);
+      return ci?NAME[k]+' '+ci+'%':'';
+    }).filter(Boolean);
+    if(intervals.length)s+='<p>95% credible intervals: '+intervals.join(', ')+'.</p>';
+    if(F==='primary'){
+      const gaps=sigMark(p,nEff(p));
+      if(gaps)s+='<details><summary>How certain are the gaps between parties?</summary><div>'+gaps+'</div></details>';
+    }
     sec.push(['primary',s]);
   }
   const tp=[];if(p.i!=null)tp.push('Labor '+num(p.i)+' against the Coalition');if(p.io!=null)tp.push(num(p.io)+' against One Nation');
-  if(tp.length||p.t!=null||p.to!=null){let s='<h3>Two-party preferred</h3><p>'+(tp.length?'Implied by the 2025 flows: '+tp.join(', ')+'.':'')+(p.t!=null?' Published: '+num(p.t)+'–'+num(Math.round((100-p.t)*10)/10)+' against the Coalition'+(p.b2?' ('+esc(p.b2)+')':'')+'.':'')+(p.to!=null?' Published against One Nation: '+num(p.to)+'.':'')+'</p>';
+  if(tp.length||p.t!=null||p.to!=null){let s='<h3>Two-party preferred</h3><p>'+(tp.length?'Implied by the 2025 flows: '+tp.join(', ')+'.':'')+(p.t!=null?' Published: '+num(p.t)+'–'+num(Math.round((100-p.t)*10)/10)+' against the Coalition'+(p.b2?' ('+sampleBase(p.b2)+')':'')+'.':'')+(p.to!=null?' Published against One Nation: '+num(p.to)+'.':'')+'</p>';
     const y=p.yd&&(p.yd.imp||p.yd.lnp);if(y&&p.i!=null&&p.yd.imp)s+=`<p>Against the line at its fieldwork, estimated without it (${f1(p.yd.imp[0])}): ${sg(Math.round((p.i-p.yd.imp[0])*10)/10)}; the house’s lean then ${p.yd.imp[1]!=null?sg(Math.round(p.yd.imp[1]*10)/10):'–'}.</p>`;
     sec.push(['twopp',s])}
   const pp=ppmOf(p),nets=LEAD.map(([k,nm])=>{const a=p.ap&&p.ap[k];return a&&a.app!=null?`${nm} ${num(a.app)} approve, ${num(a.dis)} disapprove (net ${sg(a.app-a.dis)})`:null}).filter(Boolean);
@@ -428,20 +554,31 @@ function detail(p){
     sec.push(['demographics',s]);
   }
   sec.sort((x,y)=>(x[0]===F?-1:y[0]===F?1:0));
-  return b.concat(sec.map(x=>x[1])).join('');
+  const first=sec.shift();
+  return (first?first[1]:'')+'<details><summary>Sources and fieldwork</summary><div>'+b.join('')+'</div></details>'+sec.map(([k,html])=>'<details><summary>'+esc(facetTitle[k])+'</summary><div>'+html+'</div></details>').join('');
 }
 function toggle(li,open){
-  const btn=$('button',li),d=$('.det',li),pool=F==='confidence'?CONF:POLLS,p=pool.find(r=>'p-'+r.k===li.id);if(!p)return;
+  const btn=$('button',li),d=li.nextElementSibling,pool=F==='confidence'?CONF:POLLS,p=pool.find(r=>'p-'+r.k===li.id);if(!p)return;
   const on=open==null?btn.getAttribute('aria-expanded')!=='true':open;
-  if(on)d.innerHTML=detail(p);
+  if(on&&!$('.det',d).hasChildNodes())$('.det',d).innerHTML=detail(p);
+  li.classList.toggle('open',on);
   d.hidden=!on;btn.setAttribute('aria-expanded',String(on));
 }
-$('#list').addEventListener('click',e=>{const b=e.target.closest('.row>button');if(b)toggle(b.parentElement)});
-tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.f===F)return;F=b.dataset.f;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x===b)));fillHouses();render();history.replaceState(null,'',F==='primary'?location.pathname:'?facet='+F)});
+$('#list').addEventListener('click',e=>{const row=e.target.closest('tr.poll');if(row)toggle(row)});
+tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.f===F)return;F=b.dataset.f;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x===b)));fillHouses();render();if(/^https?:$/.test(location.protocol))history.replaceState(null,'',F==='primary'?location.pathname:'?facet='+F)});
 sel.addEventListener('change',render);
+sortSelect.addEventListener('change',render);
+$('#rival').addEventListener('click',e=>{
+  const button=e.currentTarget;
+  CONTEST=CONTEST==='lnp'?'on':'lnp';
+  button.dataset.r=CONTEST;
+  button.textContent=CONTEST==='lnp'?'Coalition':'One Nation';
+  button.setAttribute('aria-checked',String(CONTEST==='on'));
+  fillHouses();render();
+});
 let qt=0;q.addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(render,120)});
 splitSel.addEventListener('change',()=>{SPLIT=splitSel.value;fillHouses();render()});
-$$('.seg[data-for=twopp] button').forEach(b=>b.addEventListener('click',()=>{const g=b.parentElement;$$('button',g).forEach(x=>x.setAttribute('aria-checked',String(x===b)));if(b.dataset.c)CONTEST=b.dataset.c;if(b.dataset.b)BASIS=b.dataset.b;fillHouses();render()}));
+$$('.seg[data-for=twopp] button').forEach(b=>b.addEventListener('click',()=>{const g=b.parentElement;$$('button',g).forEach(x=>x.setAttribute('aria-checked',String(x===b)));BASIS=b.dataset.b;fillHouses();render()}));
 /* arriving from a chart's dot: open that poll, bring it into view, and mark it a moment */
 function arrive(){
   const id=decodeURIComponent(location.hash.slice(1));if(!id.startsWith('p-'))return;
@@ -456,9 +593,10 @@ function arrive(){
 const want=new URLSearchParams(location.search).get('facet');
 if(want&&FACETS[want]){F=want;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x.dataset.f===F)))}
 filterSelect({select:sel,label:"Pollster"});
+filterSelect({select:sortSelect,label:"Sort by"});
 filterSelect({select:splitSel,label:"Demographic split"});
 fillHouses();render();arrive();addEventListener('hashchange',arrive);
-$('#note').textContent='Figures are as each pollster printed them, each with its 95% margin: for the primaries the model’s own account of a poll’s noise on its effective sample, for the rest the sampling margin on that sample. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the effective sample, the house’s own where it files one, “~” where the site estimates it from the design effect. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
+$('#note').textContent='Primary vote shares are as published. Their 95% credible intervals account for effective sample size, pollster noise and rounding. A change from the same pollster’s last poll is significant when its 95% credible interval excludes zero, treating the two samples as independent. Where fieldwork overlaps, the comparison is left unclassified. Other measures marked ± show approximate 95% sampling uncertainty. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the effective sample, the house’s own where it files one, “~” where the site estimates it from the design effect. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
 /* the menu */
 const burger=$('#burger'),menu=$('#menu'),nav=$('#nav');
 const setMenu=o=>{menu.hidden=!o;burger.setAttribute('aria-expanded',String(o));nav.classList.toggle('open',o);document.documentElement.style.overflow=o?'hidden':''};

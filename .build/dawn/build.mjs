@@ -146,7 +146,8 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     ph = ph.replace(/\{\{(FONT|pollsHead|pollsDek)\}\}/g, (m, k) => fillP[k]).replace("{{ORDER}}", () => JSON.stringify(order))
       .replace("{{POLLS}}", () => JSON.stringify(PD).replace(/</g, "\\u003c"))
       .replace("/*{{SIGTRIANGLE}}*/", () => fs.readFileSync(path.join(HERE, "sig-triangle.mjs"), "utf8").replaceAll("export function", "function"))
-      .replace("/*{{POLLHEADING}}*/", () => "const pollHeading=(()=>{" + fs.readFileSync(path.join(HERE, "poll-heading.mjs"), "utf8").replaceAll("export function", "function") + "return pollHeading;})();")
+      .replace("/*{{POLLINTERVALS}}*/", () => fs.readFileSync(path.join(HERE, "poll-intervals.mjs"), "utf8").replaceAll("export function", "function"))
+      .replace("/*{{POLLHEADING}}*/", () => "const {pollHeading,houseName,sampleBase}=(()=>{" + fs.readFileSync(path.join(HERE, "poll-heading.mjs"), "utf8").replaceAll("export function", "function") + "return {pollHeading,houseName,sampleBase};})();")
       .replace("/*{{FILTERSCSS}}*/", () => filterStyle)
       .replace("/*{{FILTERSJS}}*/", () => "const filterSelect=(()=>{" + filterScript + "return filterSelect;})();");
     const leftP = ph.match(/\{\{[A-Za-z]+\}\}/);
