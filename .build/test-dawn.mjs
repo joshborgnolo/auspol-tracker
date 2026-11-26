@@ -184,11 +184,11 @@ eq(votesHead(fall("lnp", E.lnp - 3, E.lnp - 1)).head, "The Coalition is down 3.0
 eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 points since the election", "a plural name takes a plural verb");
 {
   const D = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], lnp: [E.lnp - 4, E.lnp - 5, E.lnp - 3] });
-  ok(votesDek(D).endsWith("election, %"), "no secondary movement sentence: " + votesDek(D));
+  ok(votesDek(D).endsWith("election"), "no secondary movement sentence: " + votesDek(D));
   const D2 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], grn: [E.grn + 2, E.grn + 1, E.grn + 3] });
-  ok(votesDek(D2).endsWith("election, %"), "the caption stays one sentence under mixed changes: " + votesDek(D2));
+  ok(votesDek(D2).endsWith("election"), "the caption stays one sentence under mixed changes: " + votesDek(D2));
   const D3 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5] });
-  eq(votesDek(D3), "% of each party’s first-preference vote since the May 2025 election, %", "only the measure-label sentence remains");
+  eq(votesDek(D3), "% of each party’s first-preference vote since the May 2025 election", "only the measure-label sentence remains");
 }
 /* the two-party story's curated heading (owner's wording, 25 Nov 2026) */
 {
