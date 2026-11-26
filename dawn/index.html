@@ -20,15 +20,15 @@
    LAYOUT phone: one snapped screen per section (title, figures, chart, notes); laptop: same order, side panel for figures
    DATA the site's own models (gen-data §13, built by .build/dawn/build.mjs): a trial design, linked from nowhere */
 @font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("/assets/fonts/commissioner-latin.737ec8f2.woff2") format("woff2")}
-:root{--tbd:0px;--ext:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+:root{--tbd:0px;--tbs:0px;--ext:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}}
 :root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}
 *{box-sizing:border-box;min-width:0}
 html{height:100%;scroll-snap-type:y mandatory;-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
 @media (min-width:900px) and (pointer:fine){html{scroll-snap-type:y proximity}}
 :focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;white-space:nowrap;contain:strict;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* nav */
 .nav{position:fixed;inset:0 0 auto 0;z-index:20;height:calc(var(--navh) + env(safe-area-inset-top));padding:env(safe-area-inset-top) max(6px,env(safe-area-inset-right),calc((100vw - 1180px)/2 - 12px)) 0 var(--col);display:flex;align-items:center;gap:4px;color:var(--ink);transition:color .3s}
@@ -56,6 +56,9 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 
 /* hero */
 @supports (height:100dvh){:root{--tbd:calc(100lvh - 100dvh)}}
+/* the chart panels allow for the toolbar at its tallest (svh), never its size right now (dvh): sized
+   by dvh, every scroll that folded the toolbar away stretched the charts */
+@supports (height:100svh){:root{--tbs:calc(100lvh - 100svh)}}
 @media (pointer:coarse){:root{--ext:120px}}
 .hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;background:#070d24;cursor:pointer}
 .tbd{position:absolute;left:0;bottom:0;width:0;height:calc(var(--tbd) + var(--ext))}
@@ -121,7 +124,7 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .core{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle closest-side at 50% 46%,var(--c1) 0%,var(--c2) 62%,var(--c3) 90%,#ee4420 97%,rgba(255,96,30,0) 100%)}
 
 /* sections */
-.sec{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));background:var(--bg);scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbd) + var(--ext)) var(--g)}
+.sec{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));background:var(--bg);scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbs) + var(--ext)) var(--g)}
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
 .dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:60ch;text-wrap:pretty}
@@ -201,6 +204,21 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .pick select:disabled,.pbtn:disabled{opacity:.45;cursor:default}
 .votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
 .votes .ctl .opts{margin-top:0;flex-shrink:0}
+/* on a phone the options give way and wrap, or the past terms' switch runs off the screen */
+@media (max-width:899px){.votes .ctl .opts{flex-shrink:1;max-width:100%}}
+/* and on a narrow one the past terms' switch costs the chart no row: the pickers drop their lead words
+   ("All pollsters" says what "Pollsters All" said) and the switch says one word; on the two-party chart
+   it takes the place of the two comparisons, which only this term has */
+@media (max-width:599px){
+.votes .opts{gap:8px}
+.votes .pick .pl,.votes .pbtn>span:not(.fd-text){display:none}
+.votes .pbtn.counted b::after{content:" pollsters"}
+.votes .pick .fd-trigger,.votes .pbtn{padding-left:12px;padding-right:8px;gap:4px}
+.tgl em{display:none}
+.tpp .ctl2 .opts{display:none}
+.tpp .keys .tgl-ph:not([hidden]){display:inline-flex}
+.tpp .keys.past .chk{display:none}
+}
 .pop{position:absolute;z-index:6;top:38px;left:0;min-width:220px;max-height:min(60vh,420px);overflow:auto;background:var(--bg);border:1px solid var(--rule);border-radius:14px;box-shadow:0 12px 32px rgb(20 10 40/.16);padding:6px}
 .pop button{display:flex;align-items:center;gap:9px;width:100%;font:500 14px/1.2 var(--sans);color:var(--ink);background:none;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;text-align:left}
 .pop button:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
@@ -214,6 +232,8 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[aria-checked=true] i{background:var(--ink)}
 .tgl[aria-checked=true] i::after{transform:translateX(12px)}
 .tgl[hidden]{display:none}
+.tgl b{font-weight:500}.tgl em{font-style:normal}
+.tgl-ph:not([hidden]){display:none}
 svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
 @media (max-height:600px){.sec{height:auto;min-height:calc(100vh + var(--ext));min-height:calc(100lvh + var(--ext));overflow:visible}.fig{min-height:260px}}
@@ -317,7 +337,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
       <div class="opts">
         <label class="pick"><span class="pl">Among&nbsp;</span><select id="grp-sel"></select></label>
         <div class="pick"><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><span>Pollsters</span><b id="pv-name">All</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
-        <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span>Inferred support</span></button>
+        <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button>
       </div></div>
     <div class="fig" id="votes-fig"><div class="tip" aria-live="polite"></div><svg id="votes-svg" tabindex="0" aria-label="Line chart of the estimated first-preference vote by party. Use the left and right arrow keys to read values week by week."></svg></div>
     <p class="src" id="votes-src">Dots are polls; lines are the model’s weekly estimates, each pollster’s lean taken out, with 95% bands. Rings are the 2025 count. Tap a dot for its poll, a number for its event.</p>
@@ -367,11 +387,12 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
       </div>
     </div>
     <div class="ctl ctl2"><div class="win" data-win aria-label="Time window" role="group"></div>
-      <div class="opts"><button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span>Inferred support</span></button></div></div>
+      <div class="opts"><button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button></div></div>
     <div class="fig" id="tpp-fig"><div class="tip" aria-live="polite"></div><svg id="tpp-svg" tabindex="0" aria-label="Line chart of Labor’s two-party-preferred vote. Use the left and right arrow keys to read values week by week."></svg></div>
     <div class="keys">
       <button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-pub"><i></i>Published 2PP</button>
       <button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-ext"><i></i>Outside estimates</button>
+      <button type="button" class="tgl tgl-ph" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button>
       <span class="ext" id="ext-key" hidden></span>
     </div>
     <p class="src" id="tpp-src"></p>
@@ -1106,6 +1127,16 @@ function xTicks(a,b,w,narrow){
   if(w.kind==='term'&&!(TERMS.find(t=>t.year===w.year)||CUR).current){
     out.push({x:a,s:'Election',strong:1});for(let k=1;k<=3;k++)if(a+k<b-.3)out.push({x:a+k,s:k===1?'1 yr':k+' yrs'});out.push({x:b,s:'Election',strong:1});return out;
   }
+  if(a>=CUR.a-.02&&span<=4.6){
+    /* months at their middles from the election on, the year on each January and on the first
+       unless "Election" has just given it */
+    const step=span>2.5?12:span>1.1?(narrow?4:2):span>.6?(narrow?3:2):span>.3?(narrow?2:1):1,ms=[],el=ELX>=a-.01&&ELX<=b;
+    for(let m=Math.floor(a*12);m<=Math.floor(b*12);m++){const y=Math.floor(m/12),mo=m-y*12,x=y+(mo+.5)/12;if(mo%step||x<a-.02||x>b)continue;ms.push({x,y,mo})}
+    const yr=y=>narrow?' ’'+String(y).slice(2):' '+y;
+    const rest=ms.map((t,i)=>({x:t.x,y:t.y,s:MON[t.mo]+(t.mo===0||i===0?yr(t.y):'')})).filter(t=>!el||t.x-ELX>Math.max(.1,span*.06));
+    if(el&&rest.length&&rest[0].y===Math.floor(ELX))rest[0].s=rest[0].s.split(' ')[0];
+    return el?[{x:ELX,s:'Election',strong:1},...rest]:rest;
+  }
   if(span<=2.6){
     const every=span<=.8?1:narrow?6:3;
     if(ELX>=a-1e-6&&ELX<=b)out.push({x:ELX,s:'Election',strong:1});
@@ -1177,13 +1208,13 @@ function chart(o){
     const evAt=[];
     if(evs.length){
       if(evMode==='lab')placed.forEach(p=>{const ty=TIPH+13+p.r*16,nudged=!p.end&&p.l>p.ex+4.5;evAt.push({e:p.e,ex:p.ex,cx:(p.l+p.h)/2,cy:ty-4,w:p.h-p.l});
-        s+=`<line class="evr" x1="${P1(p.ex)}" x2="${P1(p.ex)}" y1="${nudged?ty+3:ty-9}" y2="${MT+PH}" stroke="var(--ink2)" stroke-opacity=".35" stroke-dasharray="1 3"/>`;
+        s+=`<line class="evr" x1="${P1(p.ex)}" x2="${P1(p.ex)}" y1="${nudged?ty+3:ty-9}" y2="${MT+PH}" stroke="var(--ink2)" stroke-opacity=".6" stroke-dasharray="1 3"/>`;
         if(nudged)s+=`<path d="M${P1(p.ex)} ${ty+3}H${P1(p.l-2)}" stroke="var(--ink2)" stroke-opacity=".45" fill="none"/>`;
         s+=`<text x="${P1(p.l)}" y="${ty}" class="el">${esc(p.e.s)}</text>`});
       else{
         const cy=TIPH+11,ms=evs.map((e,i)=>({e,n:e.n||i+1,ex:x(e.x),y0:x(e.x)}));
         relax(ms,17,ML+8,W-MR+2);
-        ms.forEach(m=>{evAt.push({e:m.e,ex:m.ex,cx:m.y,cy,w:16,num:true});s+=`<line class="evr" x1="${P1(m.ex)}" x2="${P1(m.ex)}" y1="${cy+11}" y2="${MT+PH}" stroke="var(--ink2)" stroke-opacity=".35" stroke-dasharray="1 3"/>`;if(Math.abs(m.y-m.ex)>1)s+=`<path d="M${P1(m.y)} ${cy+8}L${P1(m.ex)} ${cy+13}" stroke="var(--ink2)" stroke-opacity=".5" fill="none"/>`;s+=`<circle cx="${P1(m.y)}" cy="${cy}" r="8" fill="var(--bg)" stroke="var(--ink2)" stroke-opacity=".55"/><text x="${P1(m.y)}" y="${cy}" dy=".36em" text-anchor="middle" class="en">${m.n}</text>`});
+        ms.forEach(m=>{evAt.push({e:m.e,ex:m.ex,cx:m.y,cy,w:16,num:true});s+=`<line class="evr" x1="${P1(m.ex)}" x2="${P1(m.ex)}" y1="${cy+11}" y2="${MT+PH}" stroke="var(--ink2)" stroke-opacity=".6" stroke-dasharray="1 3"/>`;if(Math.abs(m.y-m.ex)>1)s+=`<path d="M${P1(m.y)} ${cy+8}L${P1(m.ex)} ${cy+13}" stroke="var(--ink2)" stroke-opacity=".5" fill="none"/>`;s+=`<circle cx="${P1(m.y)}" cy="${cy}" r="8" fill="var(--bg)" stroke="var(--ink2)" stroke-opacity=".55"/><text x="${P1(m.y)}" y="${cy}" dy=".36em" text-anchor="middle" class="en">${m.n}</text>`});
       }
     }
     const cid=svg.id+'-clip';
@@ -1197,7 +1228,6 @@ function chart(o){
     for(const c in byCol)s+=`<g style="fill:${c};fill-opacity:var(--dot)">`+byCol[c].map(d=>`<circle cx="${P1(d.px)}" cy="${P1(d.py)}" r="${d.r||dr}"/>`).join('')+'</g>';
     s+=`</g><g clip-path="url(#${cid})">`;
     for(const l of S.lines||[]){if(l.pts.length<2)continue;const pts=l.pts.map(q=>[x(q.x),y(q.y)]),d=l.smooth?curve(pts):'M'+pts.map(p=>P1(p[0])+' '+P1(p[1])).join('L');
-      if(!l.thin)s+=`<path d="${d}" fill="none" stroke="var(--bg)" stroke-width="${(l.w||2.25)+3.25}" stroke-linejoin="round"/>`;
       s+=`<path d="${d}" fill="none" style="stroke:${l.color}" stroke-width="${l.w||2.25}" stroke-linejoin="round" stroke-linecap="round"${l.dash?` stroke-dasharray="${l.dash}"`:''}${l.op!=null?` stroke-opacity="${l.op}"`:''}/>`}
     s+=`</g><g clip-path="url(#${cid}m)">`;
     /* a ring is a count inside the window: a past term reaching past the edge doesn't bring half a ring with it */
@@ -1300,13 +1330,17 @@ const pollWhen=p=>{const y=+p.m.slice(0,4);return (p.tbc?'fieldwork TBC':p.f+(y!
 const pollN=(p,facet)=>p.n?'n = '+Number(p.n).toLocaleString('en-AU')+(facet==='twopp'&&p.b2?' '+p.b2:p.b?' '+p.b:''):'';
 const LONG=12;
 /* the past terms' lines through their two counts (the site's rdVhLines), runs split where nobody polled for a quarter */
+/* the main site's line weights (rd-panels vhStyle): Others a little lighter, long windows thinner */
+const primW=(k,long)=>long?(k==='oth'?1.4:1.6):k==='oth'?2:2.5;
 /* the y-axis fits both readings of the past terms, so the measured switch moves lines, never the scale */
 const laneYs=Q=>[...Q.lines.flatMap(l=>l.pts.map(q=>q.y)),...Q.bands.flatMap(b=>b.pts.flatMap(q=>[q.hi,q.lo]))].filter(v=>v!=null&&isFinite(v));
 function pastLanes(lanes,a,b,colorOf,long,VH=HIST,measured=false){
   const lines=[],bands=[],rings=[],stops=new Map();
   if(!VH)return {lines,bands,rings,stops};
   for(const t of VH.terms){
-    if(t.b<a-.05||t.a>b+.05)continue;
+    /* a term that only touches the window's edge stays out: its rings and readings would double the
+       election's, and its Others may count different parties */
+    if(t.b<=a+.01||t.a>=b-.01)continue;
     for(const k of lanes){
       if(!t.lanes.includes(k))continue;
       const pts=[],col=colorOf(k),counts=[],est=t.est||[false,false];
@@ -1316,7 +1350,7 @@ function pastLanes(lanes,a,b,colorOf,long,VH=HIST,measured=false){
       if(t.close[k]!=null){const q=est[1]?{x:t.b,y:t.close[k],ci:(t.closeCi||{})[k],estAt:t.src}:{x:t.b,y:t.close[k],count:t.src};if(measured&&!est[1])counts.push(q);else pts.push(q)}
       const runs=[[]];pts.forEach((p,i)=>{if(i&&p.x-pts[i-1].x>.26)runs.push([]);runs[runs.length-1].push(p)});
       runs.forEach((r,i)=>{
-        if(r.length>=2)lines.push({color:col,pts:r,w:long?1.5:2.25,thin:long});
+        if(r.length>=2)lines.push({color:col,pts:r,w:primW(k,long),thin:long});
         if(i)lines.push({color:col,pts:[runs[i-1][runs[i-1].length-1],r[0]],w:long?1.2:1.5,dash:'0.5 4',thin:true});
         const bd=long?[]:r.filter(p=>p.ci!=null||p.count);
         if(bd.length>=2)bands.push({color:col,pts:bd.map(p=>({x:p.x,lo:p.y-(p.ci||0),hi:p.y+(p.ci||0)}))});
@@ -1324,7 +1358,8 @@ function pastLanes(lanes,a,b,colorOf,long,VH=HIST,measured=false){
       for(const p of pts.concat(counts)){
         if(p.count)rings.push({x:p.x,y:p.y,color:col,r:long?3:4.5});
         const key=p.x.toFixed(4),at=p.count||p.estAt;if(!stops.has(key))stops.set(key,{x:p.x,label:at?at+' election':xMonth(p.x,true),sub:p.estAt&&!p.count?'the model’s estimate':'',items:[]});
-        stops.get(key).items.push({color:col,y:p.y,v:p.y,ring:!!p.count,k});
+        const its=stops.get(key).items,had=its.findIndex(q=>q.k===k),it={color:col,y:p.y,v:p.y,ring:!!p.count,k};
+        if(had<0)its.push(it);else if(it.ring&&!its[had].ring)its[had]=it;
       }
     }
   }
@@ -1362,7 +1397,15 @@ function govBlocks(a,b){
 }
 const govName=(g,w)=>{const pm=g.pms,ends=pm.length>2&&pm[0]!==pm[pm.length-1]?pm[0]+'–'+pm[pm.length-1]:null;
   return [pm.length<=3?pm.join('–'):null,ends,g.gov==='alp'?'Labor':'Coalition'].filter(Boolean).find(s=>tw(s,'500 11.5px')<=w)||''};
-const elecEvents=(a,b)=>b-a>20?[]:TERMS.filter(t=>t.a>a+.04&&t.a<b-.04).map((t,i)=>({x:t.a,s:t.year+' election',l:t.year+' federal election',t:'Won by '+(t.gov==='alp'?'Labor':'the Coalition')+', led by '+t.pm.split('→')[0].trim()+'.',d:t.e,n:i+1}));
+const elecEvents=(a,b)=>b-a>20?[]:TERMS.filter(t=>t.a>a+.04&&t.a<b-.04).map(t=>({x:t.a,s:t.year+' election',l:t.year+' federal election',t:'Won by '+(t.gov==='alp'?'Labor':'the Coalition')+', led by '+t.pm.split('→')[0].trim()+'.',d:t.e}));
+/* a window's events: this term's own, and, on a window no longer than a term, each past term's
+   (the main site's Past cycles list); longer windows mark the elections alone */
+const PAST_EVENTS=[{"d":"1945-07-13","s":"Chifley sworn in","l":"Chifley becomes prime minister","t":"Ben Chifley takes office after John Curtin’s death and Frank Forde’s eight days as caretaker prime minister."},{"d":"1947-08-16","s":"Bank nationalisation","l":"Chifley announces bank nationalisation","t":"Ben Chifley announces plans to bring the private banks into public ownership."},{"d":"1951-03-09","s":"Communist Party ban struck down","l":"High Court overturns the Communist Party ban","t":"The High Court strikes down the Menzies government’s law dissolving the Communist Party."},{"d":"1951-09-22","s":"Communism referendum defeated","l":"Voters reject new powers over communism","t":"A narrow majority votes against giving the Commonwealth express power to legislate against communism."},{"d":"1954-04-13","s":"Petrov affair","l":"Menzies announces Petrov’s defection","t":"Robert Menzies tells Parliament that Soviet diplomat Vladimir Petrov has defected and announces a royal commission into espionage."},{"d":"1955-04-07","s":"Labor split","l":"Victorian expulsions divide Labor","t":"Labor expels Victorian members associated with the anti-communist Movement. The breakaway party later becomes the Democratic Labor Party."},{"d":"1957-07-06","s":"Japan trade agreement","l":"Australia signs a trade agreement with Japan","t":"Trade minister John McEwen signs an agreement with Japan that opens the way for closer postwar trade."},{"d":"1960-03-07","s":"Evatt → Calwell","l":"Calwell becomes opposition leader","t":"Arthur Calwell succeeds H. V. Evatt as federal Labor leader."},{"d":"1962-08-03","s":"Advisers reach Vietnam","l":"Australian Army advisers arrive in South Vietnam","t":"Thirty Australian Army advisers arrive in Saigon to join their commander and train South Vietnamese forces."},{"d":"1965-04-29","s":"Vietnam troop commitment","l":"Menzies commits a battalion to Vietnam","t":"Robert Menzies tells Parliament that Australia will send an infantry battalion to South Vietnam."},{"d":"1967-05-27","s":"1967 referendum","l":"Voters approve the Aboriginal affairs amendment","t":"Voters remove the constitutional exclusion of Aboriginal people from population counts and give the Commonwealth power to make special laws for them."},{"d":"1967-12-17","s":"Holt disappears","l":"Harold Holt disappears at Cheviot Beach","t":"Prime minister Harold Holt disappears while swimming near Portsea, Victoria."},{"d":"1970-05-08","s":"Vietnam Moratorium","l":"First national Vietnam Moratorium","t":"Australians march against the Vietnam War in coordinated demonstrations across the country."},{"d":"1972-12-20","s":"McMahon → Snedden","l":"Snedden replaces McMahon as opposition leader","t":"Billy Snedden defeats Nigel Bowen 30–29 for the Liberal leadership after William McMahon stands down following the 1972 election defeat, becoming opposition leader."},{"d":"1974-04-11","s":"Double dissolution","l":"Whitlam calls a double dissolution election","t":"With the Senate threatening to block supply, both houses are dissolved on Gough Whitlam’s advice, sending the government to an early election on 18 May."},{"d":"1975-03-21","s":"Snedden → Fraser","l":"Fraser replaces Snedden as opposition leader","t":"Malcolm Fraser defeats Billy Snedden 37–27 in a Liberal leadership spill, becoming opposition leader."},{"d":"1975-10-16","s":"Supply blocked","l":"The Senate blocks supply","t":"Two days after the Loans Affair forces Rex Connor’s resignation, the Coalition-controlled Senate defers the budget bills, starting the crisis that ends in the Dismissal."},{"d":"1975-11-11","s":"The Dismissal","l":"Kerr dismisses Whitlam; Fraser caretaker prime minister","t":"Governor-General Sir John Kerr dismisses the Whitlam government after the Senate blocks supply and commissions Malcolm Fraser as caretaker prime minister pending the 13 December election; Whitlam leads the opposition through the campaign."},{"d":"1976-11-28","s":"Dollar devalued","l":"The dollar is devalued 17.5%","t":"The Fraser government devalues the Australian dollar by 17.5 per cent as foreign reserves drain away."},{"d":"1977-05-15","s":"Democrats launched","l":"Don Chipp launches the Australian Democrats","t":"Former Liberal minister Don Chipp launches the Australian Democrats at Melbourne Town Hall, a new home for voters leaving both major parties."},{"d":"1977-12-22","s":"Whitlam → Hayden","l":"Hayden replaces Whitlam as opposition leader","t":"Bill Hayden defeats Lionel Bowen 36–28 for the Labor leadership after Gough Whitlam resigns following the 1977 election defeat, becoming opposition leader."},{"d":"1977-12-22","s":"Whitlam → Hayden","l":"Hayden replaces Whitlam as opposition leader","t":"Bill Hayden defeats Lionel Bowen 36–28 for the Labor leadership after Gough Whitlam resigns following the 1977 election defeat, becoming opposition leader."},{"d":"1978-08-15","s":"Tax surcharge budget","l":"Howard’s first budget adds a tax surcharge","t":"Treasurer John Howard’s first budget imposes a temporary income tax surcharge, months after the Coalition won the 1977 election promising tax cuts."},{"d":"1981-04-30","s":"Razor Gang cuts","l":"The Razor Gang’s spending cuts","t":"The Fraser government’s Review of Commonwealth Functions – the Razor Gang – announces cuts to public services and programs."},{"d":"1982-04-08","s":"Peacock challenges Fraser","l":"Peacock mounts a leadership challenge","t":"Andrew Peacock, having resigned from cabinet a year earlier, challenges Malcolm Fraser for the Liberal leadership and loses the ballot 54 votes to 27."},{"d":"1982-07-16","s":"Hawke challenges Hayden","l":"Hawke challenges Hayden for the Labor leadership","t":"Bob Hawke challenges Bill Hayden for the Labor leadership and loses the ballot 42 votes to 37."},{"d":"1983-02-03","s":"Hayden → Hawke","l":"Hawke replaces Hayden as opposition leader","t":"Bill Hayden resigns the Labor leadership and Bob Hawke is elected unopposed as his replacement on the morning Malcolm Fraser calls the March 1983 election."},{"d":"1983-03-11","s":"Fraser → Peacock","l":"Peacock replaces Fraser as opposition leader","t":"Andrew Peacock defeats John Howard 36–20 for the Liberal leadership after Malcolm Fraser resigns following the 1983 election defeat, becoming opposition leader."},{"d":"1983-12-12","s":"Dollar floated","l":"The Australian dollar floats","t":"The Hawke government lets the foreign exchange market set the value of the Australian dollar."},{"d":"1984-02-01","s":"Medicare begins","l":"Medicare comes into effect","t":"The Hawke government introduces Medicare, Australia’s universal health insurance scheme."},{"d":"1985-09-05","s":"Peacock → Howard","l":"Howard replaces Peacock as opposition leader","t":"Andrew Peacock resigns the Liberal leadership after the party room refuses to remove John Howard as his deputy; Howard is elected leader 57 votes to 6, becoming opposition leader."},{"d":"1986-05-14","s":"Banana republic","l":"Keating’s “banana republic” warning","t":"Treasurer Paul Keating warns that Australia risks becoming a banana republic without economic reform, and the dollar falls sharply."},{"d":"1987-02-28","s":"Joh for Canberra","l":"Queensland Nationals quit the Coalition","t":"Backing Premier Joh Bjelke-Petersen’s bid for Canberra, the Queensland National Party decides to pull its 12 federal MPs out of the Coalition, splitting the conservative vote before the July election."},{"d":"1987-10-20","s":"Share market crash","l":"The Black Monday share market crash","t":"The global crash reaches Australia and the All Ordinaries falls 25% in a day, its biggest one-day drop."},{"d":"1989-05-09","s":"Howard → Peacock","l":"Peacock replaces Howard as opposition leader","t":"Andrew Peacock defeats John Howard in a Liberal leadership spill, becoming opposition leader."},{"d":"1989-08-18","s":"Pilots’ dispute","l":"The pilots’ dispute grounds domestic flights","t":"Domestic airline pilots begin a campaign for a 29.5% pay rise and resign en masse; the Hawke government brings in the RAAF to keep planes flying."},{"d":"1990-11-29","s":"Recession we had to have","l":"Keating: “the recession Australia had to have”","t":"Treasurer Paul Keating announces that Australia is in recession, calling it “a recession that Australia had to have”."},{"d":"1991-06-03","s":"Keating’s first challenge","l":"Keating challenges Hawke and loses","t":"Paul Keating challenges Bob Hawke for the Labor leadership, loses the ballot 66 votes to 44, and goes to the backbench."},{"d":"1991-11-21","s":"Fightback!","l":"Hewson releases Fightback!","t":"Opposition leader John Hewson releases Fightback!, the Coalition’s platform built around a 15% goods and services tax."},{"d":"1991-12-20","s":"Hawke → Keating","l":"Keating replaces Hawke as prime minister","t":"Paul Keating defeats Bob Hawke in a Labor leadership spill at his second attempt and is sworn in as prime minister."},{"d":"1992-02-26","s":"One Nation statement","l":"Keating’s One Nation statement","t":"Prime Minister Paul Keating answers Fightback! with One Nation, an economic statement of infrastructure spending and promised income tax cuts."},{"d":"1993-08-17","s":"L-A-W tax cuts deferred","l":"The budget defers the promised tax cuts","t":"Months after Labor won the 1993 election promising tax cuts that were “L-A-W law”, the Dawkins budget raises indirect taxes and defers the second round of cuts."},{"d":"1994-05-23","s":"Hewson → Downer","l":"Downer replaces Hewson as opposition leader","t":"Alexander Downer defeats John Hewson in a Liberal leadership spill, becoming opposition leader."},{"d":"1995-01-30","s":"Downer → Howard","l":"Howard replaces Downer as opposition leader","t":"John Howard replaces Alexander Downer as Liberal leader and opposition leader after Downer resigns."},{"d":"1996-04-28","s":"Port Arthur massacre","l":"The Port Arthur massacre","t":"A gunman kills 35 people at Port Arthur in Tasmania; within weeks the Howard government and the states agree on national gun laws."},{"d":"1996-09-10","s":"Hanson’s maiden speech","l":"Pauline Hanson’s maiden speech","t":"Independent MP Pauline Hanson’s first speech in parliament, on immigration and Indigenous policy, draws national attention; she founds One Nation the following April."},{"d":"1998-06-13","s":"One Nation’s Qld breakthrough","l":"One Nation wins 11 seats in Queensland","t":"One Nation takes 22.7% of the vote and 11 seats at the Queensland state election."},{"d":"1998-08-13","s":"GST unveiled","l":"Howard unveils the GST","t":"The Howard government releases A New Tax System, its tax package built on a 10% goods and services tax, and takes it to an election weeks later."},{"d":"2000-07-01","s":"GST begins","l":"The GST starts","t":"The 10% goods and services tax comes into force."},{"d":"2001-08-26","s":"Tampa","l":"The Tampa affair","t":"The Norwegian freighter Tampa rescues 433 asylum seekers; the Howard government refuses to let them land, and SAS troops board the ship three days later."},{"d":"2001-09-11","s":"September 11","l":"The September 11 attacks","t":"Terrorist attacks on New York and Washington; John Howard, in Washington at the time, invokes the ANZUS treaty."},{"d":"2001-11-22","s":"Beazley → Crean","l":"Crean replaces Beazley as opposition leader","t":"Kim Beazley resigns after Labor’s 2001 election defeat and Simon Crean is elected unopposed as Labor leader."},{"d":"2002-10-12","s":"Bali bombings","l":"The Bali bombings","t":"Terrorist bombings in Kuta, Bali, kill 202 people, 88 of them Australians."},{"d":"2003-03-20","s":"Iraq war","l":"Australia joins the invasion of Iraq","t":"Australian forces join the US-led invasion of Iraq."},{"d":"2003-12-02","s":"Crean → Latham","l":"Latham replaces Crean as opposition leader","t":"Mark Latham defeats Kim Beazley 47–45 in a Labor leadership ballot after Simon Crean resigns, becoming opposition leader."},{"d":"2005-01-28","s":"Latham → Beazley","l":"Beazley replaces Latham as opposition leader","t":"Mark Latham resigns the Labor leadership and leaves parliament; Kim Beazley is elected unopposed as his replacement."},{"d":"2006-03-27","s":"WorkChoices","l":"WorkChoices comes into force","t":"The Howard government’s WorkChoices industrial relations laws take effect; the unions’ campaign against them runs through to the 2007 election."},{"d":"2006-12-04","s":"Beazley → Rudd","l":"Rudd replaces Beazley as opposition leader","t":"Kevin Rudd defeats Kim Beazley 49–39 in a Labor leadership spill, becoming opposition leader."},{"d":"2007-11-07","s":"Campaign rate rise","l":"The Reserve Bank raises rates mid-campaign","t":"The Reserve Bank raises the cash rate to 6.75% seventeen days before the election – the first rate rise during a federal election campaign."},{"d":"2008-02-13","s":"The Apology","l":"The Apology to the Stolen Generations","t":"Prime Minister Kevin Rudd apologises in parliament to the Stolen Generations."},{"d":"2008-09-15","s":"Global financial crisis","l":"Lehman Brothers collapses","t":"The collapse of Lehman Brothers turns the credit crunch into a global financial crisis; the Rudd government answers with bank guarantees and stimulus payments."},{"d":"2008-09-16","s":"Nelson → Turnbull","l":"Turnbull replaces Nelson as opposition leader","t":"Malcolm Turnbull defeats Brendan Nelson 45–41 in a Liberal leadership spill, becoming opposition leader."},{"d":"2009-12-01","s":"Turnbull → Abbott","l":"Abbott replaces Turnbull as opposition leader","t":"Tony Abbott defeats Malcolm Turnbull 42–41 in a Liberal leadership spill over emissions trading, becoming opposition leader."},{"d":"2010-04-27","s":"ETS shelved, mining tax","l":"Rudd shelves the ETS and targets miners","t":"Kevin Rudd shelves the emissions trading scheme until at least 2013, and on 2 May announces a resource super profits tax on mining."},{"d":"2010-06-24","s":"Rudd → Gillard","l":"Gillard replaces Rudd as prime minister","t":"Kevin Rudd stands down rather than contest a Labor leadership spill and Julia Gillard is sworn in as prime minister."},{"d":"2010-12-15","s":"Refugee tragedy","l":"Boat sinks off Christmas Island","t":"A boat carrying refugees sinks off Christmas Island, killing 48 people aboard and provoking criticism of the Gillard government’s refugee policy."},{"d":"2011-02-24","s":"Carbon pricing scheme","l":"Gillard announces a carbon pricing scheme","t":"Prime Minister Julia Gillard announces a fixed price on carbon pollution from 1 July 2012 to combat climate change; the Clean Energy Act 2011 is enacted on 18 November."},{"d":"2012-02-27","s":"Rudd challenge fails","l":"Gillard defeats Rudd’s challenge","t":"Julia Gillard defeats Kevin Rudd’s challenge for the Labor leadership 71 votes to 31."},{"d":"2013-06-27","s":"Gillard → Rudd","l":"Rudd replaces Gillard as prime minister","t":"Kevin Rudd defeats Julia Gillard in a Labor leadership spill and is sworn in as prime minister."},{"d":"2013-11-18","s":"Indonesia spy row","l":"Indonesia recalls ambassador over spying revelations","t":"Indonesia recalls its ambassador after leaked documents reveal Australia spied on president Susilo Bambang Yudhoyono."},{"d":"2014-05-13","s":"Hockey’s first budget","l":"Joe Hockey delivers the 2014 federal budget","t":"Treasurer Joe Hockey delivers the Abbott government’s first federal budget with deep cuts to health, education, and welfare."},{"d":"2015-01-26","s":"Prince Philip knighted","l":"Abbott announces knighthood for Prince Philip","t":"Prime Minister Tony Abbott awards Prince Philip a knighthood in the Order of Australia, drawing widespread ridicule."},{"d":"2015-09-15","s":"Abbott → Turnbull","l":"Turnbull replaces Abbott as prime minister","t":"Malcolm Turnbull defeats Tony Abbott in a Liberal leadership spill and is sworn in as prime minister."},{"d":"2017-10-17","s":"Clean Energy Target dumped","l":"Coalition dumps the Clean Energy Target","t":"The Coalition dumps the Clean Energy Target in favour of Malcolm Turnbull’s new plan, a National Energy Guarantee."},{"d":"2017-11-15","s":"Marriage survey Yes vote","l":"Marriage postal survey returns a Yes vote","t":"The Australian Marriage Law Postal Survey delivers a national Yes vote for same-sex marriage."},{"d":"2018-07-28","s":"Super Saturday by-elections","l":"Super Saturday by-elections return every incumbent","t":"Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman, and Perth, and Centre Alliance holds Mayo, with the Coalition winning none."},{"d":"2018-08-21","s":"Dutton challenges Turnbull","l":"Dutton mounts a leadership challenge","t":"Home Affairs minister Peter Dutton challenges Malcolm Turnbull for the Liberal leadership, losing the spill 48 votes to 35."},{"d":"2018-08-24","s":"Turnbull → Morrison","l":"Morrison replaces Turnbull as prime minister","t":"Malcolm Turnbull resigns and Scott Morrison defeats Peter Dutton in the Liberal leadership spill, becoming prime minister."},{"d":"2019-05-27","s":"Shorten → Albanese","l":"Albanese replaces Shorten as opposition leader","t":"Anthony Albanese is elected unopposed as Labor leader, after Bill Shorten resigns in the wake of the 2019 federal election defeat."},{"d":"2019-11-09","s":"Bushfire emergency","l":"Queensland declares a state of emergency","t":"Queensland declares a state of emergency amid catastrophic bushfire conditions – two days before NSW follows."},{"d":"2020-03-11","s":"COVID-19 pandemic","l":"WHO declares COVID-19 a pandemic","t":"The World Health Organization declares the COVID-19 outbreak a pandemic."},{"d":"2021-02-15","s":"Higgins allegations","l":"Brittany Higgins goes public","t":"Former Liberal staffer Brittany Higgins goes public with allegations that she was raped inside Parliament House."},{"d":"2023-10-14","s":"Voice referendum defeated","l":"Voice to Parliament referendum defeated","t":"Australians vote No to enshrining an Aboriginal and Torres Strait Islander Voice to Parliament in the Constitution – the proposal fails nationally and in every state."},{"d":"2023-11-07","s":"RBA cash rate hits 4.35%","l":"RBA hikes the cash rate to a 12-year high","t":"The RBA board hikes the cash rate 25 basis points to 4.35% – the central bank’s 13th rate rise since May 2022, widely anticipated by economists."},{"d":"2025-03-28","s":"Election called","l":"Albanese announces the federal election","t":"Albanese announces the federal election, kicking off a campaign that produced a dramatic rise in Labor support."}].map(e=>({...e,x:isoX(e.d)}));
+function winEvents(a,b,curOnly){
+  const own=EVENTS.filter(e=>e.x>=a-.02&&e.x<=b+.02);
+  const list=curOnly?own:b-a>4.6?elecEvents(a,b):[...PAST_EVENTS.filter(e=>e.x>=a&&e.x<=b),...(b>CUR.a+1e-3?own:[]),...elecEvents(a,b)].sort((p,q)=>p.x-q.x);
+  return list.map((e,i)=>({...e,n:i+1}));
+}
 
 /* the primary vote: every voter week by week, a group month by month (the Who-votes model), or the model
    re-run on the ticked pollsters week by week */
@@ -1382,7 +1425,7 @@ function primScene(narrow){
     for(const r of g.monthly){const x=ymX2(r[0]);if(x<x0-1e-6||x<=ELX)continue;PK.forEach(k=>{const v=r[1+oi(k)],ci=r[1+O.length+oi(k)];if(v!=null)pts[k].push({x,y:v,lo:v-(ci||0),hi:v+(ci||0)})})}
     const lastV=k=>{const q=pts[k];return q.length?q[q.length-1].y:-1};
     const order=[...PK].sort((p,q)=>lastV(q)-lastV(p));
-    for(const k of PK){if(pts[k].length<2)continue;if(!long)S.bands.push({color:COLOR(k),pts:pts[k].map(q=>({x:q.x,lo:q.lo,hi:q.hi})),smooth:true});S.lines.push({color:COLOR(k),pts:pts[k],smooth:true,w:long?1.6:2.25,thin:long})}
+    for(const k of PK){if(pts[k].length<2)continue;if(!long)S.bands.push({color:COLOR(k),pts:pts[k].map(q=>({x:q.x,lo:q.lo,hi:q.hi})),smooth:true});S.lines.push({color:COLOR(k),pts:pts[k],smooth:true,w:primW(k,long),thin:long})}
     if(cnt&&ELX>=x0-1e-6)PK.forEach(k=>{const v=cnt[oi(k)];if(v!=null)S.rings.push({x:ELX,y:v,color:COLOR(k),r:long?3:4.5})});
     if(span<=4.6){const gi=GROUPS.groups.indexOf(GRP);GROUPS.polls.forEach(q=>{const v=q.v[gi];if(!v)return;const x=isoX(q.m);if(x<x0||x>x1)return;const w=nearWeek(x),poll={who:q.h,when:pollWhen({m:q.m,f:q.f}),n:q.n?'n = '+Number(q.n).toLocaleString('en-AU')+' in all':'',k:q.k};
       PK.forEach((k,j)=>{if(v[j]==null||q.t[j]==null)return;S.dots.push({x,y:EST[k][w].m+(v[j]-q.t[j]),color:COLOR(k),poll,txt:ABBR[k]+' '+f1(v[j])})})})}
@@ -1401,7 +1444,7 @@ function primScene(narrow){
       if(i0===0&&iS<=1){const c=EST[k][0].m;pts.push({x:ELX,y:c});bd.push({x:ELX,lo:c,hi:c})}
       for(let i=Math.max(iS,i0);i<=LAST;i++){const q=val(k,i);if(!q)continue;pts.push({x:GX[i],y:q.m});bd.push({x:GX[i],lo:q.lo,hi:q.hi})}
       if(!long)S.bands.push({color:COLOR(k),pts:bd,smooth:true});
-      S.lines.push({color:COLOR(k),pts,smooth:true,w:long?1.6:2.25,thin:long});
+      S.lines.push({color:COLOR(k),pts,smooth:true,w:primW(k,long),thin:long});
       if(ELX>=x0-1e-6)S.rings.push({x:ELX,y:ANCH[k],color:COLOR(k),r:long?3:4.5});
     }
     if(span<=4.6)POLLS.forEach(p=>{if(!p.p||p.x<x0||p.x>x1||(PVSEL.size&&!PVSEL.has(p.h)))return;const poll={who:p.h,when:pollWhen(p),n:pollN(p,'primary'),k:p.k};PK.forEach((k,j)=>{const v=p.p[j];if(v!=null)S.dots.push({x:p.x,y:v,color:COLOR(k),poll,txt:ABBR[k]+' '+v})})});
@@ -1421,7 +1464,7 @@ function primScene(narrow){
   }
   /* governments behind a window longer than a term; their names stand in for the elections */
   if(span>8)S.govs=govBlocks(a,b);
-  S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):S.govs?[]:elecEvents(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const ys=[...(S.yAlt||[]),...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.map(p=>p.hi)),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=0;S.y1=Math.max(40,Math.ceil(Math.max(...ys,0)/10)*10);
   return S;
@@ -1459,7 +1502,7 @@ function tppScene(narrow){
     }
     S.lines.push(...extras);
     if(!long)S.bands.push({color:RCOL[curOnly?main:'lnp'],pts:open(curOnly?main:'lnp',M.bd,true),smooth:true});
-    S.lines.push({color:RCOL[curOnly?main:'lnp'],pts:open(curOnly?main:'lnp',M.pts),smooth:true,w:long?1.6:2.6,thin:long});
+    S.lines.push({color:RCOL[curOnly?main:'lnp'],pts:open(curOnly?main:'lnp',M.pts),smooth:true,w:long?1.6:2.5,thin:long});
     if((curOnly?main:'lnp')==='lnp'||OTH==='lnp')if(ELX>=x0-1e-6)S.rings.push({x:ELX,y:DATA.election.tpp,color:RCOL.lnp,r:long?3:4.5});
     if(span<=4.6){const key=(curOnly?main:'lnp')==='lnp'?'i':'io';POLLS.forEach(p=>{if(p[key]==null||p.x<x0||p.x>x1)return;S.dots.push({x:p.x,y:p[key],color:RCOL[curOnly?main:'lnp'],poll:{who:p.h,when:pollWhen(p),n:pollN(p,'twopp'),k:p.k},txt:f1(p[key])})})}
     if(ELX>=x0-1e-6)S.stops.push({x:ELX,label:'2025 election',sub:'the count',items:[{color:RCOL.lnp,y:DATA.election.tpp,v:DATA.election.tpp,ring:true,tc:RCOL.lnp}]});
@@ -1481,7 +1524,7 @@ function tppScene(narrow){
     if(!cur)S.ends=[];
   }
   if(span>8)S.govs=govBlocks(a,b);
-  S.events=curOnly?EVENTS.filter(e=>e.x>=x0-.02&&e.x<=x1+.02).map((e,i)=>({...e,n:i+1})):S.govs?[]:elecEvents(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const ys=[50,...(S.yAlt||[]),...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(b=>b.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...S.rings.map(r=>r.y)];
   S.y0=Math.floor((Math.min(...ys)+.3)/5)*5;S.y1=Math.ceil((Math.max(...ys)-.3)/5)*5;
   if(S.y1-S.y0<10)S.y1=S.y0+10;
@@ -1588,24 +1631,29 @@ const votes=chart({fig:$('#votes-fig'),svg:$('#votes-svg'),scene:primScene,mode:
 const tpp=chart({fig:$('#tpp-fig'),svg:$('#tpp-svg'),scene:tppScene});
 const charts=[votes,tpp];
 paintWinBars();
+/* does the window reach into this term? a past term's window ends on the election that opened it */
+const reachesNow=()=>winRange(WIN)[1]>CUR.a+1e-3;
+const dotsOn=()=>winRange(WIN)[1]-winRange(WIN)[0]<=4.6;
 const tppSrc=()=>{
-  const c=RIV,cur=inCur(WIN);
+  const c=RIV,cur=inCur(WIN),wk=reachesNow()?' This term is weekly.':'';
   $('#tpp-src').textContent=(cur?(c==='lnp'?'Dots are polls, each one’s primary votes run through the 2025 election’s preference flows; the line is the model’s weekly estimate with its 95% band. The ring is the 2025 count.'
     :'Dots are polls, each one’s primary votes run through the site’s flows for Labor against One Nation (no election has counted that pair); the band adds the doubt about those flows to the model’s.')
-    :MEASURED?'Past terms are the polls’ own monthly figures, Labor against the Coalition, before the election adjustment; the rings are the results. This term is weekly.':'Past terms are monthly, Labor against the Coalition, drawn through the election results at both ends. This term is weekly.')+' Tap a dot for its poll.';
+    :(MEASURED?'Past terms are the polls’ own monthly figures, Labor against the Coalition, before the election adjustment; the rings are the results.':'Past terms are monthly, Labor against the Coalition, drawn through the election results at both ends.')+wk)+(dotsOn()?' Tap a dot for its poll.':'');
 };
 const votesSrc=()=>{
   const cur=inCur(WIN);
-  if(GRP){$('#votes-src').textContent='Lines are the vote-by-group model’s monthly estimates for '+GRP+', with 95% bands; dots are each poll’s reading of the group, set against every voter that week.'+((GROUPS&&GROUPS.counted[GRP])?' Rings are the 2025 count.':' The lines open on the model’s estimate for polling day.');return}
+  if(GRP){const bands=winRange(WIN)[1]-winRange(WIN)[0]>LONG?'':', with 95% bands';$('#votes-src').textContent='Lines are the vote-by-group model’s monthly estimates for '+GRP+bands+(cur?'; dots are each poll’s reading of the group, set against every voter that week.'+((GROUPS&&GROUPS.counted[GRP])?' Rings are the 2025 count.':' The lines open on the model’s estimate for polling day.'):'.');return}
   if(PVSEL.size){const hs=[...PVSEL],list=hs.length<2?hs[0]:hs.slice(0,-1).join(', ')+' and '+hs[hs.length-1];$('#votes-src').textContent='Lines are the model re-run on '+list+' alone, week by week, with 95% bands; dots are their polls. Rings are the 2025 count.';return}
-  if(!cur&&MEASURED){$('#votes-src').textContent='Past terms are the polls’ own monthly figures, before the election adjustment; the rings are the election results. This term is weekly.';return}
+  const wk=reachesNow()?' This term is weekly.':'',tap=dotsOn()?' Tap a dot for its poll.':'';
+  if(!cur&&MEASURED){$('#votes-src').textContent='Past terms are the polls’ own monthly figures, before the election adjustment; the rings are the election results.'+wk+tap;return}
   $('#votes-src').textContent=cur?'Dots are polls; lines are the model’s weekly estimates, each pollster’s lean taken out, with 95% bands. Rings are the 2025 count. Tap a dot for its poll, a number for its event.'
-    :'Past terms are monthly, drawn through the election results at both ends (the rings): each month is moved by part of the polls’ miss at the election that closed its term. This term is weekly.'+((winRange(WIN)[1]-winRange(WIN)[0])<=4.6?' Tap a dot for its poll.':'');
+    :'Past terms are monthly. Each month is moved by part of the polls’ miss at the term’s closing election, so the lines meet the results (rings).'+wk+tap;
 };
 const extKey=$('#ext-key'),btnPub=$('#cmp-pub'),btnExt=$('#cmp-ext');
 function paintKeys(){
   const cur=inCur(WIN);
   btnPub.disabled=btnExt.disabled=!cur;
+  btnPub.parentNode.classList.toggle('past',!cur);
   btnPub.setAttribute('aria-checked',String(CMP_PUB));btnExt.setAttribute('aria-checked',String(CMP_EXT));
   const last=a=>a&&a.length?f1(a[a.length-1][1])+'%':'';
   const items=[];
@@ -1663,7 +1711,10 @@ filterSelect({trigger:pvBtn,popup:pvPop,textElement:pvName,label:"Pollsters",mul
     pvName.textContent='…';setTimeout(applyPv,20);
   }
 });
+const pvCounted=()=>pvBtn.classList.toggle('counted',PVSEL.size!==1);
+pvCounted();
 function applyPv(){
+  pvCounted();
   $$('button[data-h]',pvPop).forEach(b=>{if(b.dataset.h)b.setAttribute('aria-selected',String(PVSEL.has(b.dataset.h)))});
   const n=PVSEL.size,all=(DATA.pvHouses||[]).length;
   pvName.textContent=!n?'All':n===1?[...PVSEL][0]:n+' of '+all;
@@ -1674,7 +1725,7 @@ function applyPv(){
 }
 /* how past terms are drawn: through their election results (inferred), or the polls' own figures (measured) */
 const mBtns=$$('[data-measured]');
-function paintMeasured(){const hist=!inCur(WIN);mBtns.forEach(b=>{b.hidden=!hist||(!!GRP&&!!b.closest('#votes'));b.setAttribute('aria-checked',String(MEASURED));$('span',b).textContent=MEASURED?'Measured support':'Inferred support';
+function paintMeasured(){const hist=!inCur(WIN);mBtns.forEach(b=>{b.hidden=!hist||(!!GRP&&!!b.closest('#votes'));b.setAttribute('aria-checked',String(MEASURED));$('span b',b).textContent=MEASURED?'Measured':'Inferred';
   b.title=MEASURED?'Switch to inferred support: past terms moved toward their election results':'Switch to measured support: past terms left at the polls’ own figures'})}
 mBtns.forEach(b=>b.addEventListener('click',()=>{MEASURED=!MEASURED;paintMeasured();votesSrc();tppSrc();charts.forEach(c=>{c.clear();c.draw()})}));
 paintMeasured();

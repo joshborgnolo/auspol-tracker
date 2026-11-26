@@ -13,6 +13,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import { copyFor, flowNote, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
@@ -30,6 +31,15 @@ export function flowTotals(D) {
     lnp: s.alp + s.grn * F.lnp.grn + s.onp * F.lnp.onp + s.oth * F.lnp.oth + F.cnr,
     on: s.alp + s.grn * F.on.grn + s.lnp * F.on.lnp + s.oth * F.on.oth,
   };
+}
+
+/* the past terms' events, the list the main site's charts mark on a past term (Past cycles'
+   CYC_EVENTS), read from its script so the two pages can't differ */
+export function pastEvents(file) {
+  const src = fs.readFileSync(file, "utf8"), at = src.indexOf("const CYC_EVENTS = {"), end = src.indexOf("\n};", at);
+  if (at < 0 || end < 0) throw new Error("dawn: CYC_EVENTS not found in " + file);
+  const table = vm.runInNewContext("(" + src.slice(src.indexOf("{", at), end + 2) + ")");
+  return Object.values(table).flat().map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })).sort((x, y) => (x.d < y.d ? -1 : 1));
 }
 
 /* np-score's record of the projection, read from the report it regenerates every day
@@ -116,6 +126,8 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   html = html.replace("/*{{FILTERSCSS}}*/", () => filterStyle);
   html = html.replace("/*{{FILTERSJS}}*/", () => "const filterSelect=(()=>{" + filterScript + "return filterSelect;})();");
   html = html.replace("{{FLOWNOTES}}", () => JSON.stringify(notes).replace(/</g, "\\u003c"));
+  const past = pastEvents(path.join(HERE, "..", "newtracker", "assets", "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js"));
+  html = html.replace("{{PASTEVENTS}}", () => JSON.stringify(past).replace(/</g, "\\u003c"));
   html = html.replace("{{DATA}}", () => json);
   html = html.replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
   const left = html.match(/\{\{[A-Za-z]+\}\}/);
