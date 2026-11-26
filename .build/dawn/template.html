@@ -696,9 +696,11 @@ function chart(o){
     const ML=Math.ceil(Math.max(...tl.map(s=>tw(s,'13px'))))+8;
     const ends=S.ends||[];
     const MR=!ends.length?10:narrow?Math.ceil(Math.max(...ends.map(e=>tw(e.abbr,'600 12px'))))+14:Math.ceil(Math.max(...ends.map(e=>Math.max(tw(e.name,'500 13px'),e.v!=null?tw('00.0','600 15px'):0))))+22;
-    const TIPH=34,PW=W-ML-MR,x=v=>ML+PW*(v-S.x0)/(S.x1-S.x0);
+    const evs=S.events||[];
+    const TIPH=34+(evs.length&&!narrow?8:0); // space below the two-line event readout
+    const PW=W-ML-MR,x=v=>ML+PW*(v-S.x0)/(S.x1-S.x0);
     /* events: their short names over the plot where they fit in two rows, else numbered */
-    const evs=S.events||[];let evMode='num',EVH=evs.length?24:4;
+    let evMode='num',EVH=evs.length?24:4;
     const placed=[];
     if(evs.length&&!narrow){
       /* each name right of its rule in whichever of two rows needs the smaller nudge (a leader joins a
