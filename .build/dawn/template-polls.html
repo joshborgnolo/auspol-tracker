@@ -75,6 +75,10 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .seg button{font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 12px;height:30px;cursor:pointer;white-space:nowrap}
 .seg button[aria-checked=true]{background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--rule),0 1px 2px rgb(20 10 40/.08)}
 .count{font-size:13.5px;color:var(--mute);margin-left:auto}
+.vote-flip{all:unset;display:inline-flex;align-items:center;gap:6px;min-height:32px;cursor:pointer;font:500 13.5px/1 var(--sans);color:var(--ink)}
+.vote-flip span[aria-hidden]{color:var(--mute);font-weight:400}
+.vote-flip:hover .vote-label{text-decoration:underline;text-underline-offset:3px}
+.vote-flip:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:3px}
 .fopt[hidden],#vote-mode[hidden]{display:none}
 .fdek{font-size:14.5px;color:var(--ink2);margin:10px 0 0;max-width:70ch}
 .f{white-space:nowrap;font-size:14.5px}
@@ -264,7 +268,7 @@ body[data-f=primary] .headings .measure-head:not(:last-child){display:block;text
       <label class="search"><span class="sr">Search</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search a pollster, a date or a figure" autocomplete="off" enterkeyhint="search"></label>
       <label class="pick"><span class="pl">Take&nbsp;</span><select id="house"></select></label>
       <div class="pick"><span class="pl">Sort by&nbsp;</span><select id="sort" aria-label="Sort by"><option value="fieldwork">fieldwork date</option><option value="publication">publication date</option></select></div>
-      <button type="button" class="fd-trigger fopt" data-for="primary" id="vote-mode" aria-label="Voting consideration" aria-pressed="false">Voting intention ⇄</button>
+      <button type="button" class="vote-flip fopt" data-for="primary" id="vote-mode" title="Switch to voting consideration"><span class="vote-label">Voting intention</span> <span aria-hidden="true">⇄</span></button>
       <div class="rival-pick fopt" data-for="twopp" hidden>Labor v <button type="button" class="rival-toggle" id="rival" role="switch" aria-label="Labor versus One Nation" aria-checked="false" data-r="lnp">Coalition</button></div>
       <div class="seg fopt" role="radiogroup" aria-label="Two-party basis" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-b="imp">Implied</button><button type="button" role="radio" aria-checked="false" data-b="pub">Published</button></div>
       <label class="pick fopt" data-for="demographics"><span class="sr">Split by</span><select id="split"></select></label>
@@ -408,7 +412,7 @@ function ranges(p){
   ].filter(([shares])=>shares);
 }
 const FACETS={
-  primary:{label:'Primary',rows:()=>POLLS.filter(p=>p.p&&Object.keys(p.p).length||consideration&&p.cons),cols:()=>[...ORDER.map(k=>NAME[k]),consideration?'Response':'Undecided'],
+  primary:{label:'Primary',rows:()=>POLLS.filter(p=>consideration?p.cons:p.p&&Object.keys(p.p).length),cols:()=>[...ORDER.map(k=>NAME[k]),consideration?'Response':'Undecided'],
     hay:p=>consideration&&p.cons?ranges(p).map(([shares,label])=>label+' '+Object.values(shares).join(' ')).join(' '):ORDER.map(k=>num(p.p[k])).join(' ')},
   twopp:{label:'2PP',rows:()=>POLLS.filter(p=>p[tpKey()]!=null),cols:()=>['Labor v '+(CONTEST==='lnp'?'Coalition':'One Nation'),'Lean','House lean'],
     fig:p=>{const v=p[tpKey()],y=p.yd&&p.yd[ydKey()],lean=y?v-y[0]:null,he=y?y[1]:null,rc=CONTEST==='lnp'?'lnp':'on',pub=BASIS==='imp'?p[CONTEST==='lnp'?'t':'to']:null;
@@ -518,7 +522,7 @@ function render(){
   $('.interval-toggle').hidden=F!=='primary'||consideration;
   const measure=showingConsideration?'Voting consideration (%)':facetTitle[F];
   $('#measure').textContent=measure;
-  $('#method-key').textContent=showingConsideration?'Polls without a consideration question show voting intention.':F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
+  $('#method-key').textContent=showingConsideration?'Polls that asked which parties voters would consider supporting.':F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
   const noun=fa.noun||'poll',count=house||terms.length?rows.length+' of '+all.length:rows.length;
   $('#count').textContent=count+' '+noun+(all.length===1?'':'s')+(F==='primary'&&!consideration?' with primary votes':'');
   const months=new Map();
@@ -605,8 +609,8 @@ sel.addEventListener('change',render);
 sortSelect.addEventListener('change',render);
 $('#vote-mode').addEventListener('click',e=>{
   consideration=!consideration;
-  e.currentTarget.textContent=(consideration?'Voting consideration':'Voting intention')+' ⇄';
-  e.currentTarget.setAttribute('aria-pressed',String(consideration));
+  e.currentTarget.querySelector('.vote-label').textContent=consideration?'Voting consideration':'Voting intention';
+  e.currentTarget.title=consideration?'Switch to voting intention':'Switch to voting consideration';
   fillHouses();render();
 });
 $('#rival').addEventListener('click',e=>{
