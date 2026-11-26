@@ -621,6 +621,11 @@ const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU
    methodUrl, so they join the pool directly from direction[]. */
 const secNeeds = (D.direction || []).filter((d) => d.pollster === "SEC Newgate" && d.sampleEff == null && d.methodUrl);
 const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sampleEff == null).concat(secNeeds);
+/* A Newspoll release chart can carry the exclusion before its APC statement
+   exists. Only that first statement may supersede the chart's figure; a
+   mismatch on an already statement-backed row remains a hard conflict. */
+const npAwaitingFirstStatement = new Set(D.polls.filter((p) =>
+  p.pollster === "Newspoll" && p.sampleEff == null && p.methodUrl == null));
 
 const records = [];
 const errors = [];
@@ -865,7 +870,13 @@ for (const p of D.polls) {
   const want = wants[0];
   if (!(want >= 0 && want <= 50)) { errors.push(`leaner exclusion: ${p.date} Newspoll ${want} out of range`); continue; }
   if (p.undecidedLeaner != null) {
-    if (p.undecidedLeaner !== want) errors.push(`leaner exclusion: ${p.date} Newspoll statement=${want} vs file=${p.undecidedLeaner}`);
+    if (p.undecidedLeaner === want) continue;
+    if (!npAwaitingFirstStatement.has(p)) {
+      errors.push(`leaner exclusion: ${p.date} Newspoll statement=${want} vs file=${p.undecidedLeaner}`);
+      continue;
+    }
+    p.undecidedLeaner = want;
+    leanerFilled.push(p.date);
     continue;
   }
   const es = Object.entries(p), at = Object.keys(p).indexOf("url");

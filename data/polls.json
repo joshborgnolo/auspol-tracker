@@ -6748,6 +6748,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1229,
+      "sampleEff": 881,
       "alp": 27,
       "lnp": 22,
       "grn": 14,
@@ -6757,7 +6758,8 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-lose-faith-in-anthony-albanese-angus-taylor-now-preferred-prime-minister/news-story/90905fa4caacd9f45e3b8694cf4a197e",
-      "undecidedLeaner": 7
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/29512003/NewspollMethodologyStatement23November2026byPyxis-WPUE81Z70vMWIidssO-lkw.pdf",
+      "undecidedLeaner": 6
     },
     {
       "date": "2026-11-22",

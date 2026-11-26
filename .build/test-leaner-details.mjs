@@ -19,6 +19,10 @@ assert.ok(parseRedBridgeLeaner("the methodology text moved").error, "a lost RedB
 const scratch = mkdtempSync(path.join(tmpdir(), "newspoll-leaner-"));
 const out = path.join(scratch, "polls.json");
 const before = JSON.parse(readFileSync("data/polls.json", "utf8"));
+const november = before.polls.find((p) => p.pollster === "Newspoll" && p.date === "2026-11-19");
+delete november.sampleEff;
+delete november.methodUrl;
+november.undecidedLeaner = 7;
 let missing = 0;
 for (const p of before.polls) {
   if (p.pollster === "Newspoll" && p.sampleEff != null) { delete p.undecidedLeaner; missing++; }
@@ -35,12 +39,17 @@ const run = () => {
 const first = run();
 assert.ok(first.leaner >= 1, "cached Newspoll statements stamp their leaner-excluded share");
 const stamped = JSON.parse(readFileSync(out, "utf8"));
-assert.equal(stamped.polls.find((p) => p.pollster === "Newspoll" && p.date === "2026-11-19").undecidedLeaner, 7, "the release's live-chart leaner exclusion survives");
+assert.equal(stamped.polls.find((p) => p.pollster === "Newspoll" && p.date === "2026-11-19").undecidedLeaner, 6, "the first APC statement supersedes the release chart's figure");
 const latest = stamped.polls.filter((p) => p.pollster === "Newspoll" && p.sampleEff != null).sort((a, b) => b.date.localeCompare(a.date))[0];
 assert.equal(latest.date, "2026-10-29");
 assert.equal(latest.undecidedLeaner, 5);
 const beforeSecondRun = readFileSync(out, "utf8");
 assert.equal(run().changed, false, "the second cached backfill is a no-op");
 assert.equal(readFileSync(out, "utf8"), beforeSecondRun, "and leaves the data file byte-identical");
+
+const conflict = JSON.parse(beforeSecondRun);
+conflict.polls.find((p) => p.pollster === "Newspoll" && p.date === latest.date).undecidedLeaner++;
+writeFileSync(out, JSON.stringify(conflict, null, 2) + "\n");
+assert.throws(run, (e) => e.status === 2, "a mismatch on a statement-backed wave remains fatal");
 
 console.log("PASS: RedBridge and Newspoll leaner exclusions parse, backfill and reconcile automatically");
