@@ -12624,6 +12624,9 @@ if (!JUR && PRIMM && TPM) {
       if (q.ppmSets) o.ppms = q.ppmSets;
       if (q.dir) o.dir = { right: q.dir.right, wrong: q.dir.wrong, unsure: q.dir.unsure, net: q.dir.net, ...(q.dir.chg ? { chg: q.dir.chg, ref: q.dir.ref } : {}), ...(q.dir.bg ? { bg: q.dir.bg } : {}) };
       if (q.iss) o.iss = { ...(q.iss.own ? { own: q.iss.own } : {}), ...(q.iss.bp ? { bp: q.iss.bp } : {}), ...(q.iss.sal ? { sal: q.iss.sal } : {}), ...(q.iss.q ? { q: q.iss.q } : {}) };
+      for (const key of ["cons", "consBasis", "consLoose", "consNot", "consNever"]) {
+        if (q[key]) o[key] = q[key];
+      }
       if (q.grp) o.grp = { d: q.grp.d || {}, v: (q.grp.v || []).map((v) => (v ? v.map((x) => (x == null ? null : r1(x))) : null)), ...(q.grp.n ? { n: q.grp.n } : {}), ...(q.grp.ar ? { ar: q.grp.ar } : {}) };
       if (q.links && q.links.length) o.links = q.links.map((l) => ({ k: l.k, t: l.t, href: l.href, ...(l.pending ? { pending: 1 } : {}), ...(l.title ? { title: l.title } : {}) }));
       else if (q.url) o.links = [{ k: "release", t: "The release", href: q.url }];

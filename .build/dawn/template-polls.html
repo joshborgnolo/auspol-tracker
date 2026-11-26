@@ -75,7 +75,7 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .seg button{font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 12px;height:30px;cursor:pointer;white-space:nowrap}
 .seg button[aria-checked=true]{background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--rule),0 1px 2px rgb(20 10 40/.08)}
 .count{font-size:13.5px;color:var(--mute);margin-left:auto}
-.fopt[hidden]{display:none}
+.fopt[hidden],#vote-mode[hidden]{display:none}
 .fdek{font-size:14.5px;color:var(--ink2);margin:10px 0 0;max-width:70ch}
 .f{white-space:nowrap;font-size:14.5px}
 .f>i{font-style:normal;color:var(--mute);font-size:12.5px;margin-right:4px}
@@ -264,6 +264,7 @@ body[data-f=primary] .headings .measure-head:not(:last-child){display:block;text
       <label class="search"><span class="sr">Search</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search a pollster, a date or a figure" autocomplete="off" enterkeyhint="search"></label>
       <label class="pick"><span class="pl">Take&nbsp;</span><select id="house"></select></label>
       <div class="pick"><span class="pl">Sort by&nbsp;</span><select id="sort" aria-label="Sort by"><option value="fieldwork">fieldwork date</option><option value="publication">publication date</option></select></div>
+      <button type="button" class="fd-trigger fopt" data-for="primary" id="vote-mode" aria-label="Voting consideration" aria-pressed="false">Voting intention ⇄</button>
       <div class="rival-pick fopt" data-for="twopp" hidden>Labor v <button type="button" class="rival-toggle" id="rival" role="switch" aria-label="Labor versus One Nation" aria-checked="false" data-r="lnp">Coalition</button></div>
       <div class="seg fopt" role="radiogroup" aria-label="Two-party basis" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-b="imp">Implied</button><button type="button" role="radio" aria-checked="false" data-b="pub">Published</button></div>
       <label class="pick fopt" data-for="demographics"><span class="sr">Split by</span><select id="split"></select></label>
@@ -396,9 +397,19 @@ const ppmOf=p=>{const s=(p.ppms&&p.ppms[0])||p.ppm;if(!s)return null;const ks=['
 let F='primary',CONTEST='lnp',BASIS='imp',SPLIT='age';
 const tpKey=()=>CONTEST==='lnp'?(BASIS==='imp'?'i':'t'):(BASIS==='imp'?'io':'to');
 const ydKey=()=>CONTEST==='lnp'?(BASIS==='imp'?'imp':'lnp'):(BASIS==='imp'?'onimp':'onp');
+let consideration=false;
+function ranges(p){
+  if(!p.cons)return [];
+  return [
+    [p.consLoose,p.h==='Essential'?'Would consider (definitely or open)':'Would consider (≥4/10)'],
+    [p.cons,p.consBasis||'Would consider'],
+    [p.consNot,'Would not consider (≤3/10)'],
+    [p.consNever,p.h==='Essential'?'Would never vote':'Would never vote (0/10)']
+  ].filter(([shares])=>shares);
+}
 const FACETS={
-  primary:{label:'Primary',rows:()=>POLLS.filter(p=>p.p&&Object.keys(p.p).length),cols:()=>[...ORDER.map(k=>NAME[k]),'Undecided'],
-    hay:p=>ORDER.map(k=>num(p.p[k])).join(' ')},
+  primary:{label:'Primary',rows:()=>POLLS.filter(p=>p.p&&Object.keys(p.p).length||consideration&&p.cons),cols:()=>[...ORDER.map(k=>NAME[k]),consideration?'Response':'Undecided'],
+    hay:p=>consideration&&p.cons?ranges(p).map(([shares,label])=>label+' '+Object.values(shares).join(' ')).join(' '):ORDER.map(k=>num(p.p[k])).join(' ')},
   twopp:{label:'2PP',rows:()=>POLLS.filter(p=>p[tpKey()]!=null),cols:()=>['Labor v '+(CONTEST==='lnp'?'Coalition':'One Nation'),'Lean','House lean'],
     fig:p=>{const v=p[tpKey()],y=p.yd&&p.yd[ydKey()],lean=y?v-y[0]:null,he=y?y[1]:null,rc=CONTEST==='lnp'?'lnp':'on',pub=BASIS==='imp'?p[CONTEST==='lnp'?'t':'to']:null;
       return [`<span class="f"><i>${CONTEST==='lnp'?'v L/NP':'v ON'}</i><b style="--c:var(--alp)">${num(v)}</b> – <b style="--c:var(--${rc})">${num(Math.round((100-v)*10)/10)}</b>${pub!=null?`<span class="lab">published ${num(pub)}–${num(Math.round((100-pub)*10)/10)}</span>`:''}</span>`
@@ -451,16 +462,18 @@ function undecided(p){
 }
 function resultCells(p){
   if(F==='primary'){
+    const tier=consideration&&ranges(p)[0],shares=tier?tier[0]:p.p;
     const cells=ORDER.map(k=>{
-      const v=p.p[k],[whole,fraction]=num(v).split('.');
-      return `<td class="value" data-party="${ABBR[k]}" style="--c:var(--${CV[k]})"><b class="number">${whole}<span class="fraction">${fraction?'.'+fraction:''}</span></b>${intervalMarkup(p,v)}</td>`;
+      const v=shares[k],[whole,fraction]=num(v).split('.');
+      return `<td class="value" data-party="${ABBR[k]}" style="--c:var(--${CV[k]})"><b class="number">${whole}<span class="fraction">${fraction?'.'+fraction:''}</span></b>${consideration?'':intervalMarkup(p,v)}</td>`;
     });
-    cells.push(`<td class="basis"><span class="basis-label">Undecided · </span>${esc(undecided(p))}${p.u?.label==='not allowed'?'':intervalMarkup(p,p.u?.v,true)}</td>`);
+    if(consideration)cells.push('<td class="basis">'+esc(tier?tier[1]:'Voting intention')+'</td>');
+    else cells.push(`<td class="basis"><span class="basis-label">Undecided · </span>${esc(undecided(p))}${p.u?.label==='not allowed'?'':intervalMarkup(p,p.u?.v,true)}</td>`);
     return cells.join('');
   }
   return FACETS[F].fig(p).map(cell=>'<td class="value other-cell">'+cell+'</td>').join('');
 }
-const facetTitle={primary:'First preferences (%)',twopp:'Two-party preferred (%)',leaders:'Leadership',direction:'National direction',issues:'Issue ownership',demographics:'Demographic gaps (points)',confidence:'Confidence'};
+const facetTitle={consideration:'Voting consideration',primary:'First preferences (%)',twopp:'Two-party preferred (%)',leaders:'Leadership',direction:'National direction',issues:'Issue ownership',demographics:'Demographic gaps (points)',confidence:'Confidence'};
 const compact=matchMedia('(max-width:64em)'),intervalSwitch=$('#intervals');
 let intervalPreference;
 function setIntervals(){
@@ -501,10 +514,13 @@ function render(){
   $$('.fopt').forEach(e=>e.hidden=e.dataset.for!==F);
   $('#offcut-pick').hidden=F!=='demographics'||SPLIT!=='country';
   const fd=$('#fdek');fd.hidden=!FDEK[F];fd.textContent=FDEK[F]||'';
-  $('#measure').textContent=facetTitle[F];
-  $('#method-key').textContent=F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
+  const showingConsideration=consideration&&F==='primary';
+  $('.interval-toggle').hidden=F!=='primary'||consideration;
+  const measure=showingConsideration?'Voting consideration (%)':facetTitle[F];
+  $('#measure').textContent=measure;
+  $('#method-key').textContent=showingConsideration?'Polls without a consideration question show voting intention.':F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
   const noun=fa.noun||'poll',count=house||terms.length?rows.length+' of '+all.length:rows.length;
-  $('#count').textContent=count+' '+noun+(all.length===1?'':'s')+(F==='primary'?' with primary votes':'');
+  $('#count').textContent=count+' '+noun+(all.length===1?'':'s')+(F==='primary'&&!consideration?' with primary votes':'');
   const months=new Map();
   for(const p of rows){
     const month=sortDate(p).slice(0,7);
@@ -519,7 +535,7 @@ function render(){
   const tables=[];
   for(const [ym,list] of months){
     const month=monthLabel(ym);
-    tables.push(`<table class="ledger" aria-label="${esc(facetTitle[F]+', '+month)}"><colgroup><col class="poll-col"><col class="date-col"><col class="sample-col">${labels.map(()=>'<col>').join('')}</colgroup><thead><tr class="month-title"><th colspan="${colCount}"><h2>${month}</h2><span>${list.length} ${noun}${list.length===1?'':'s'}</span></th></tr><tr class="headings"><th scope="col">Pollster</th><th scope="col">${dateLabel}</th><th scope="col">Sample</th>${headers}</tr></thead><tbody>${list.map(p=>rowMarkup(p,colCount)).join('')}</tbody></table>`);
+    tables.push(`<table class="ledger" aria-label="${esc(measure+', '+month)}"><colgroup><col class="poll-col"><col class="date-col"><col class="sample-col">${labels.map(()=>'<col>').join('')}</colgroup><thead><tr class="month-title"><th colspan="${colCount}"><h2>${month}</h2><span>${list.length} ${noun}${list.length===1?'':'s'}</span></th></tr><tr class="headings"><th scope="col">Pollster</th><th scope="col">${dateLabel}</th><th scope="col">Sample</th>${headers}</tr></thead><tbody>${list.map(p=>rowMarkup(p,colCount)).join('')}</tbody></table>`);
   }
   $('#list').innerHTML=tables.join('')||'<p class="empty">No matches. Try another pollster or search term.</p>';
 }
@@ -568,6 +584,11 @@ function detail(p){
     sec.push(['demographics',s]);
   }
   sec.sort((x,y)=>(x[0]===F?-1:y[0]===F?1:0));
+  if(p.cons){
+    const names={...NAME,ind:'Independent',none:'None'};
+    const readings=ranges(p).map(([shares,label])=>'<p><b>'+esc(label)+'</b> · '+Object.entries(shares).map(([k,v])=>esc(names[k]||k)+' '+num(v)+'%').join(', ')+'.</p>').join('');
+    sec.splice(F==='primary'&&consideration?0:sec.length,0,['consideration','<h3>Voting consideration</h3>'+readings]);
+  }
   const first=sec.shift();
   return (first?first[1]:'')+'<details><summary>Sources and fieldwork</summary><div>'+b.join('')+'</div></details>'+sec.map(([k,html])=>'<details><summary>'+esc(facetTitle[k])+'</summary><div>'+html+'</div></details>').join('');
 }
@@ -582,6 +603,12 @@ $('#list').addEventListener('click',e=>{const row=e.target.closest('tr.poll');if
 tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.f===F)return;F=b.dataset.f;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x===b)));fillHouses();render();if(/^https?:$/.test(location.protocol))history.replaceState(null,'',F==='primary'?location.pathname:'?facet='+F)});
 sel.addEventListener('change',render);
 sortSelect.addEventListener('change',render);
+$('#vote-mode').addEventListener('click',e=>{
+  consideration=!consideration;
+  e.currentTarget.textContent=(consideration?'Voting consideration':'Voting intention')+' ⇄';
+  e.currentTarget.setAttribute('aria-pressed',String(consideration));
+  fillHouses();render();
+});
 $('#rival').addEventListener('click',e=>{
   const button=e.currentTarget;
   CONTEST=CONTEST==='lnp'?'on':'lnp';
