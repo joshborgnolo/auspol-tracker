@@ -281,6 +281,23 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .nav:not(.over) .logo{opacity:1;transform:none}
 .nav:not(.over) .mk{transform:none}
 @media (prefers-reduced-motion:reduce){.logo,.mark .mk,.mk>span{transition:none}}
+/* where scroll timelines run, the logo emerges with the scroll itself, on the same timeline that slides the bar's
+   sky, over the 90px before the hero leaves (ending before the next panel's snap); the ink crosses where the
+   bar's sky edge passes the name, as the links' colour does: no timed transition is
+   started at a threshold, so nothing can start late or restart (the timed one stuttered on iPhone). With the menu
+   open, the class states hold as before */
+@keyframes lgIn{from{opacity:.001;transform:scale(.55)}to{opacity:1;transform:none}}
+@keyframes mkIn{from{transform:translateX(-35px)}to{transform:none}}
+@keyframes inkL{from{opacity:1}to{opacity:.001}}
+@keyframes inkD{from{opacity:.001}to{opacity:1}}
+@supports (animation-timeline:scroll()){
+  .logo,.mark .mk,.mk>span{transition:none;animation-duration:1ms;animation-duration:auto;animation-fill-mode:both;animation-timeline:scroll(root block)}
+  .logo,.mark .mk{animation-timing-function:cubic-bezier(.33,1,.68,1);animation-range:calc(100vh + var(--ext) - env(safe-area-inset-top) - 98px) calc(100vh + var(--ext) - env(safe-area-inset-top) - 8px);animation-range:calc(100lvh + var(--ext) - env(safe-area-inset-top) - 98px) calc(100lvh + var(--ext) - env(safe-area-inset-top) - 8px)}
+  .mk>span{animation-timing-function:linear;animation-range:calc(100vh + var(--ext) - env(safe-area-inset-top) - 40px) calc(100vh + var(--ext) - env(safe-area-inset-top) - 12px);animation-range:calc(100lvh + var(--ext) - env(safe-area-inset-top) - 40px) calc(100lvh + var(--ext) - env(safe-area-inset-top) - 12px)}
+  .logo{animation-name:lgIn}.mark .mk{animation-name:mkIn}.mk-l{animation-name:inkL}.mk-d{animation-name:inkD}
+  .menu-on .logo,.menu-on .mark .mk,.menu-on .mk>span{animation:none}
+}
+@media (prefers-reduced-motion:reduce){.logo,.mark .mk,.mk>span{animation:none}}
 .fd-trigger{display:inline-flex;align-items:center;justify-content:space-between;gap:9px;min-height:32px;padding:4px 10px 4px 14px;border:1px solid var(--rule);border-radius:8px;background:var(--bg);color:var(--ink);font:500 13.5px/1.25 var(--sans);cursor:pointer;max-width:100%}
 .fd-trigger:hover{background:color-mix(in srgb,var(--ink) 5%,var(--bg))}
 .fd-trigger:disabled{opacity:.45;cursor:default}
