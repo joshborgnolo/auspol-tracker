@@ -98,7 +98,7 @@ export function tppStory(D) {
   const runLen = both.length - k, phrase = pointsPhrase(Math.max(worst, 0.01));
   if (runLen >= 3 && phrase && k > 0) {
     const [yy, mm] = both[k].ym.split("-").map(Number);
-    dek += " Since " + MONF[mm - 1] + (yy === Number(l.ym.slice(0, 4)) ? "" : " " + yy) + " the two contests have run within " + phrase + " of each other.";
+    dek += " The two contests have run within " + phrase + " of each other since " + MONF[mm - 1] + (yy === Number(l.ym.slice(0, 4)) ? "" : " " + yy) + ".";
   }
   return { head, dek };
 }

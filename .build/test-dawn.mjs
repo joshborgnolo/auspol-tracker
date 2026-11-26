@@ -206,6 +206,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(st(51, 51.5), "Labor retains a narrow 2PP lead over both rivals", "the heading stays curated inside a point");
   eq(st(50, 53, 1, 1), "Labor retains a narrow 2PP lead over both rivals", "and when the rivals pull apart");
   eq(st(54, 51, 1, 1), "Labor retains a narrow 2PP lead over both rivals", "whichever rival runs closer");
+  ok(/The two contests have run within .+ of each other since [A-Z][a-z]+(?: \d{4})?\.$/.test(tppStory(D0).dek), "the comparison ends with its dynamic starting month");
 }
 /* the flow diagram's curated heading; its numerical verdicts stay live */
 {
