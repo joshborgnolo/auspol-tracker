@@ -25,11 +25,13 @@
      for a line that starts there, "since taking the job" for a leader who
      took over this term, else since the month of the first rating. None
      clears: "much where they started".
-     The favourability chart's head is the same rule on its own lines.
+     The favourability chart's head is the same rule on its own lines. The
+     preferred-PM head says who leads each running pairing, or that the two
+     are level (ppmHead).
    - The mood page's direction head says the larger side's share as the
      nearest plain fraction (the site's plainShare), "the most this term"
      only when no week of the term's line reads higher. Its trust head says
-     the model's share the same way, "the lowest since <month>" only when
+     the model's share in tenths (tenthShare), "the lowest since <month>" only when
      the model's own test says so (trust.now.low2020, as the site's head).
      The trust dek names a change on a year ago only when its 95% interval
      excludes zero.
@@ -199,16 +201,38 @@ export function moodDek(M) {
   const [y, mo] = M.election.date.split("-").map(Number);
   return "% saying the country is heading in the right direction and % saying it is on the wrong track, since the " + MONF[mo - 1] + " " + y + " election";
 }
+/* trust reads in tenths, from the nearer side (the owner's wording for 27.4: "Fewer than three in
+   ten"): "Fewer than" the ten above from the half-way point up, else "More than" the ten below, and
+   "About" within half a point of either */
+export function tenthShare(v) {
+  const near = Math.round(v / 10), under = Math.floor(v / 10);
+  if (near > 0 && Math.abs(v - 10 * near) < 0.5) return "About " + COUNT[near] + " in ten";
+  if (v - 10 * under >= 5 || !under) return "Fewer than " + COUNT[under + 1] + " in ten";
+  return "More than " + COUNT[under] + " in ten";
+}
 export function trustHead(M) {
   const now = M.trust.now, low = now.low2020;
   const rank = !low ? "" : low.record ? ", the lowest on record here" : ", the lowest since " + monthYear(low.since);
-  return plainShare(now.v) + " Australians say people in government can be trusted to do the right thing" + rank;
+  return tenthShare(now.v) + " Australians say people in government can be trusted to do the right thing" + rank;
 }
 export function trustDek(M) {
   const Y = M.trust.now.year;
   const change = Y.sig ? (Y.chg < 0 ? "Down " : "Up ") + f1(Math.abs(Y.chg)) + " points on a year earlier" : "Not significantly changed on a year earlier";
   return "% saying people in government can usually or sometimes be trusted to do the right thing. " + change + ".";
 }
+
+/* preferred prime minister: a leader "leads" only when the 95% interval of the lead among those who
+   chose excludes zero, else the two are "level"; the opposition leader's pairing is said first */
+export function ppmHead(L) {
+  const pairs = L.ppm.series.filter((p) => !p.to && p.lead).sort((a, b) => (a.contest === "alb-han") - (b.contest === "alb-han"));
+  if (!pairs.length) return "Preferred prime minister";
+  const who = pairs.map((p) => ({ p, ahead: p.lead.lo > 0 ? p.pm : p.lead.hi < 0 ? p.opp : null }));
+  if (who.length > 1 && who.every((w) => w.ahead === w.p.pm)) return who[0].p.pm + " leads both " + who.map((w) => w.p.opp).join(" and ") + " as preferred prime minister";
+  const say = ({ p, ahead }) => (ahead ? ahead + " leads " + (ahead === p.pm ? p.opp : p.pm) : p.pm + " and " + p.opp + " are level");
+  const [first, ...rest] = who;
+  return say(first) + " as preferred prime minister" + rest.map((w) => "; " + say(w)).join("");
+}
+export const ppmDek = (L) => "% preferring each as prime minister, of those who chose one of the two, " + sinceElection(L);
 
 export function copyFor(D) {
   const st = tppStory(D);

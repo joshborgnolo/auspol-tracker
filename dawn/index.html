@@ -1213,6 +1213,7 @@ function xTicks(a,b,w,narrow){
   return out;
 }
 
+const pollHref=p=>POLLS_HREF+(p.q||'')+'#p-'+encodeURIComponent(p.k);
 function chart(o){
   const fig=o.fig,svg=o.svg,tip=$('.tip',fig);
   let L=null,cur=null,tmo=0,mode=null,dwell=0;
@@ -1346,7 +1347,7 @@ function chart(o){
       const its=same.map(q=>({q,y0:q.py}));relax(its,16,MT+8,MT+PH-4);const right=cx<ML+(W-ML-MR)*.6;
       its.forEach(t=>{s+=`<text x="${P1(right?cx+9:cx-9)}" y="${P1(t.y)}" dy=".35em" text-anchor="${right?'start':'end'}" class="dt">${esc(t.q.txt)}</text>`});
       same.forEach(q=>{s+=`<circle cx="${P1(q.px)}" cy="${P1(q.py)}" r="4.5" fill="var(--bg)" style="stroke:${q.color}" stroke-width="2"/><circle cx="${P1(q.px)}" cy="${P1(q.py)}" r="2" style="fill:${q.color}"/>`});
-      const p=d.poll;setTip(`<b>${esc(p.who)}</b> · ${esc(p.when)}${p.n?' · '+esc(p.n):''}${p.k?` <a class="tipgo" href="${POLLS_HREF}#p-${encodeURIComponent(p.k)}">Open in polls ›</a>`:''}`,cx);
+      const p=d.poll;setTip(`<b>${esc(p.who)}</b> · ${esc(p.when)}${p.n?' · '+esc(p.n):''}${p.k?` <a class="tipgo" href="${pollHref(p)}">Open in polls ›</a>`:''}`,cx);
       eg.style.opacity=.2;
     }else if(kind==='ev'){
       const a=L.evAt[i];
@@ -1365,6 +1366,9 @@ function chart(o){
     /* a poll's dot when the pointer is clearly nearer it than any line (by 1.5px, a finger's 4px):
        the primaries' five lines run through a dozen dots a week, and a hand that rides a line a pixel
        or two off it must keep reading the weeks; on or by a line, that week */
+    /* a scene whose lines run through its dots (S.direct): a pointer on a linked dot is on that poll,
+       line or no line. A hand riding a line still reads the weeks (a crossed dot waits for a rest) */
+    if(S.direct){const R=touch?12:5;let bi=-1,bd=R*R;dots.forEach((d,j)=>{const q=(d.px-px)**2+(d.py-py)**2;if(d.poll.k&&q<=bd){bd=q;bi=j}});if(bi>=0)return ['dot',bi]}
     const i=nearStop(cx);
     if(dots.length){const R=touch?13:7;let bi=-1,bd=R*R;dots.forEach((d,j)=>{const q=(d.px-px)**2+(d.py-py)**2;if(q<bd){bd=q;bi=j}});
       if(bi>=0){const st=i!=null?S.stops[i]:null,dl=st&&Math.abs(x(st.x)-px)<12?Math.min(...st.items.map(t=>Math.abs(L.y(t.y)-py))):1e9;if(Math.sqrt(bd)+(touch?4:1.5)<dl)return ['dot',bi]}}
@@ -1380,6 +1384,7 @@ function chart(o){
     if(!L)return;
     if(e.pointerType==='mouse'&&!e.buttons){
       clearTimeout(dwell);const h=hit(e.clientX,e.clientY,false);
+      svg.style.cursor=h&&h[0]==='dot'&&L.dots[h[1]].poll.k?'pointer':'';
       /* riding a line: a dot the pointer crosses waits for it to rest there, and the weeks read on */
       if(h&&h[0]==='dot'&&mode==='stop'){const i=nearStop(e.clientX);if(i!=null&&i!==cur)show('stop',i);
         const X=e.clientX,Y=e.clientY;dwell=setTimeout(()=>{if(!L)return;const g=hit(X,Y,false);if(g&&g[0]==='dot')show('dot',g[1])},160);return}
@@ -1390,7 +1395,7 @@ function chart(o){
     if(down&&down.moved){const i=nearStop(e.clientX);if(i!=null&&(i!==cur||mode!=='stop'))show('stop',i)}
   });
   svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')clear()});
-  svg.addEventListener('pointerup',e=>{if(L&&down&&!down.moved){if(down.again){location.href=POLLS_HREF+'#p-'+encodeURIComponent(L.dots[cur].poll.k);return}if(e.pointerType==='mouse'&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<6){const h=hit(e.clientX,e.clientY,false),k=h&&h[0]==='dot'&&L.dots[h[1]].poll.k;if(k){location.href=POLLS_HREF+'#p-'+encodeURIComponent(k);return}}}if(e.pointerType!=='mouse'){clearTimeout(tmo);tmo=setTimeout(clear,mode==='stop'?2400:5200)}down=null});
+  svg.addEventListener('pointerup',e=>{if(L&&down&&!down.moved){if(down.again){location.href=pollHref(L.dots[cur].poll);return}if(e.pointerType==='mouse'&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<6){const h=hit(e.clientX,e.clientY,false),k=h&&h[0]==='dot'&&L.dots[h[1]].poll.k;if(k){location.href=pollHref(h&&L.dots[h[1]].poll);return}}}if(e.pointerType!=='mouse'){clearTimeout(tmo);tmo=setTimeout(clear,mode==='stop'?2400:5200)}down=null});
   svg.addEventListener('pointercancel',()=>{down=null;clear()});
   svg.addEventListener('keydown',e=>{
     if(!L||!L.S.stops.length)return;const k=e.key,n=L.S.stops.length-1,c=mode==='stop'&&cur!=null?cur:n;
@@ -1398,6 +1403,9 @@ function chart(o){
     else if(k==='Home'){e.preventDefault();show('stop',0)}else if(k==='End'){e.preventDefault();show('stop',n)}else if(k==='Escape')clear();
   });
   svg.addEventListener('blur',clear);
+  /* a press on the readout's link must not take focus from the chart: the blur above would rewrite
+     the readout, and the link would be gone before its click */
+  tip.addEventListener('mousedown',e=>e.preventDefault());
   new ResizeObserver(draw).observe(fig);
   return {draw,clear};
 }

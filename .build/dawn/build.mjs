@@ -15,7 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, moodHead, moodDek, trustHead, trustDek, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
@@ -212,7 +212,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     return file;
   };
   const leadFile = sunPage({ asset: "dawn-leaders.json", template: "template-leaders.html", dir: "leadership-ratings",
-    fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, favHead: (L) => favHead(L).head, favDek } });
+    fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, ppmHead, ppmDek, favHead: (L) => favHead(L).head, favDek } });
   const moodFile = sunPage({ asset: "dawn-mood.json", template: "template-mood.html", dir: "mood",
     fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek } });
   return { leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };

@@ -12754,16 +12754,49 @@ if (!JUR && LDM && leaderModel) {
       m: s.m.filter((m) => m[0] < dx(ELECTION.date) && m.length > 3).map((m) => [m[0], m[3], m[4]]) })).filter((s) => s.m.length);
     const favFirstX = Math.min(...favHistory.map((s) => s.m[0][0]));
     const byDay = (a, b) => (a[0] < b[0] ? -1 : 1);
+    /* preferred prime minister, the model's basis (§4m): the PM's share of those who chose one of the
+       two, a line a pairing. Questions that offer "Neither" lean the line but are not drawn */
+    const shr = (z) => 100 / (1 + Math.exp(-z));
+    /* a pairing ends when either of its two leaves office (each reading carries that day) */
+    const endOf = (S) => S.obs[0].raw.to || "2099-01-01";
+    const pairs = LDM.pSeries.filter(({ S }) => endOf(S) > ELECTION.date && S.t1 >= eDay).map(({ S }) => {
+      const running = S.outDays.includes(t1);
+      const idx = weeks.map((d, i) => i).filter((i) => weeks[i] >= S.t0 && weeks[i] <= S.t1 && isoD(weeks[i]) < endOf(S));
+      const mm = ldMoments(S, LDM.stP, idx.map((i) => weeks[i])).main;
+      const key = S.contest === "alb-han" ? "hanson" : "taylor";
+      const out = { contest: S.contest, pm: S.pm, opp: S.opp, pmParty: S.pmParty, oppParty: S.oppParty, ...(endOf(S) < "2099" ? { to: endOf(S) } : {}), i0: idx[0], v: [], lo: [], hi: [] };
+      idx.forEach((i, j) => {
+        const now = running && weeks[i] === t1 && LDM.pnow[key] ? LDM.pnow[key].share : null;
+        out.v.push(r2t(now ? now.v : shr(mm[j].m)));
+        out.lo.push(r2(now ? now.v - now.ci95 : shr(mm[j].m - 1.96 * mm[j].sd))); out.hi.push(r2(now ? now.v + now.ci95 : shr(mm[j].m + 1.96 * mm[j].sd)));
+      });
+      if (running && LDM.pnow[key]) { const L = LDM.pnow[key].lead; out.lead = { v: L.v, lo: L.lo, hi: L.hi }; }
+      return out;
+    });
+    const ppmPolls = [], ppmPast = [];
+    for (const { S } of LDM.pSeries) for (const o of S.obs) {
+      const r = o.raw; if (r.kind === "neither" || !(r.a + r.b > 0)) continue;
+      const house = r.house.replace(" (2PMP)", ""), v = r1((100 * r.a) / (r.a + r.b));
+      if (r.date < ELECTION.date) { if (S.contest === "pm-opp") ppmPast.push([isoD(o.t), house, v, S.pm, S.pmParty, S.opp, S.oppParty]); continue; }
+      const at = pairs.findIndex((p) => p.contest === S.contest && p.opp === S.opp);
+      if (at < 0) continue;
+      const P = POLL_BY_KEY.get(r.date + "|" + house), key = dawnKey({ pollster: house, released: r.date });
+      ppmPolls.push({ ...(onPage.has(key) ? { k: key } : {}), h: house, m: isoD(o.t), f: onPage.has(key) ? onPage.get(key).field : null, ...(P && P.sample != null ? { n: P.sample } : {}),
+        s: at, v, a: r.a, b: r.b, ...(r.kind === "2pmp" ? { forced: 1 } : {}) });
+    }
+    const ppmHistory = leaderModel.ppm.filter((s) => s.contest === "pm-opp").map((s) => ({ pm: s.pm, opp: s.opp, pmParty: s.pmParty, oppParty: s.oppParty,
+      m: s.m.filter((m) => m[0] < dx(ELECTION.date)).map((m) => [m[0], r1(50 + m[1] / 2), r1(50 + m[2] / 2), r1(50 + m[3] / 2)]) })).filter((s) => s.m.length);
     writeAtomic(DAWN_LEAD_ASSET, JSON.stringify({
       v: 1, asOf: isoD(t1), latestPoll: newest ? { h: newest.pollster, ...(newest.published ? { pub: newest.published } : {}) } : null,
       election: { date: ELECTION.date }, weeks: weeks.map(isoD), series: series.map((s) => s.out), rank,
       polls, history, people: people.map(({ key, ...p }) => p), past: past.sort(byDay), firstX: Math.floor(firstX * 100) / 100,
+      ppm: { series: pairs, polls: ppmPolls, history: ppmHistory, past: ppmPast.sort(byDay), firstX: Math.floor(Math.min(...ppmHistory.map((s) => s.m[0][0])) * 100) / 100 },
       fav: { series: favSeries, polls: favPolls, history: favHistory, past: favPast.sort(byDay), firstX: Math.floor(favFirstX * 100) / 100 },
       terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
         .sort((a, b) => (a.e < b.e ? -1 : 1)),
       events: events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
     }));
-    console.log(`dawn leaders: ${series.length} leaders this term over ${W} weeks, ${history.length} past runs, ${polls.length} + ${past.length} readings; favourability ${favSeries.length} lines from ${Math.floor(favFirstX)}, ${favPolls.length} + ${favPast.length}`);
+    console.log(`dawn leaders: ${series.length} leaders this term over ${W} weeks, ${history.length} past runs, ${polls.length} + ${past.length} readings; favourability ${favSeries.length} lines from ${Math.floor(favFirstX)}, ${favPolls.length} + ${favPast.length}; preferred PM ${pairs.length} pairings, ${ppmPolls.length} + ${ppmPast.length}`);
   } catch (e) {
     console.error("dawn leaders data: skipped –", e && e.stack ? e.stack : e);
   }

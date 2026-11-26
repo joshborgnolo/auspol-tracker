@@ -22,7 +22,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare } from "./dawn/copy.mjs";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
@@ -475,6 +475,21 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(favHead(fall).head, "Albanese’s net favourability has fallen 12.0 points since the election", "the favourability head");
   eq(leadersDek(L0), "% approving each leader’s job performance less % disapproving, since the May 2025 election", "the owner's wording, job performance");
   eq(favDek(L0), "% having a favourable opinion of each leader less % unfavourable, since the May 2025 election", "the owner's wording, favourability");
+  /* preferred prime minister: today's shares are the site's, and the head's every branch */
+  const SITE_PPM = { "pm-opp": "alb_prefD", "alb-han": "alb_prefHD" };
+  for (const p of L0.ppm.series.filter((q) => !q.to)) {
+    eq(r1(p.v[p.v.length - 1]), now[SITE_PPM[p.contest]].v, `Albanese v ${p.opp} today is the site's figure`);
+    eq(p.i0 + p.v.length - 1, LW, `Albanese v ${p.opp} reaches the last week`);
+  }
+  ok(L0.ppm.polls.every((p) => L0.ppm.series[p.s] && p.v > 0 && p.v < 100), "every preferred-PM dot belongs to a pairing, on the two-way basis");
+  const pair = (contest, opp, lo, hi, to) => ({ contest, pm: "Albanese", opp, lead: { v: (lo + hi) / 2, lo, hi }, ...(to ? { to } : {}) });
+  const PH = (...series) => ppmHead({ ppm: { series } });
+  eq(PH(pair("alb-han", "Hanson", 6, 20), pair("pm-opp", "Taylor", -9, 5)), "Albanese and Taylor are level as preferred prime minister; Albanese leads Hanson", "level and ahead, the opposition first");
+  eq(PH(pair("pm-opp", "Taylor", 2, 12), pair("alb-han", "Hanson", 6, 20)), "Albanese leads both Taylor and Hanson as preferred prime minister");
+  eq(PH(pair("pm-opp", "Taylor", -14, -2), pair("alb-han", "Hanson", -3, 5)), "Taylor leads Albanese as preferred prime minister; Albanese and Hanson are level");
+  eq(PH(pair("pm-opp", "Ley", 2, 12, "2026-02-13"), pair("pm-opp", "Taylor", -9, 5)), "Albanese and Taylor are level as preferred prime minister", "a pairing that has ended says nothing");
+  eq(PH(), "Preferred prime minister");
+  eq(ppmDek(L0), "% preferring each as prime minister, of those who chose one of the two, since the May 2025 election");
   /* the built page */
   const base = fs.readFileSync(path.join(HERE, "dawn", "template.html"), "utf8");
   for (const k of ["css", "logo", "sky", "dates", "window", "chart", "events", "odometer", "nav"]) ok(sharedBlock(base, k).length > 100, `template.html marks the shared block ${k}`);
@@ -492,10 +507,17 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   new vm.Script(js); n++;
   ok(built.includes(leadersHead(L0).head) && built.includes(leadersDek(L0)), "the head and dek are today's rules");
   ok(built.includes(favHead(L0).head) && built.includes(favDek(L0)) && /id="fav-svg"/.test(built), "the favourability chart and its words");
-  eq((built.match(/data-win aria-label/g) || []).length, 2, "two charts, a window each");
+  eq((built.match(/data-win aria-label/g) || []).length, 3, "three charts, a window each");
+  ok(built.indexOf('id="ratings-svg"') < built.indexOf('id="ppm-svg"') && built.indexOf('id="ppm-svg"') < built.indexOf('id="fav-svg"'), "preferred PM sits between job performance and favourability");
+  ok(built.includes(ppmHead(L0)) && built.includes(ppmDek(L0)), "the preferred-PM words");
   ok(built.includes("function windowedChart("), "each chart its own window");
   ok(/name="robots" content="noindex"/.test(built), "unlisted");
   ok(built.includes("const POLLS_HREF='../polls/'"), "its dots open the polls page");
+  ok(built.includes("tip.addEventListener('mousedown',e=>e.preventDefault());"), "the readout's link survives its own press");
+  ok(built.includes("direct:true};") && built.includes("q:'?facet=leaders'"), "a pressed dot opens its poll on the Leaders view");
+  const rows = new Set(JSON.parse(fs.readFileSync(path.join(A, "dawn-polls.json"), "utf8")).polls.map((p) => p.k));
+  ok(L0.polls.concat(L0.fav.polls, L0.ppm.polls).every((p) => rows.has(p.k)), "every rating dot this term has a row in the polls table");
+  ok(/<div class="cols still" id="pv"/.test(built) && /\.cl-bar\{/.test(built) && built.includes("r.style.transform=`translateX("), "the hero is a column chart that trades places sideways");
   for (const f of ["template.html", "template-polls.html", "template-next.html"]) ok(/href="(\.\.\/)?leadership-ratings\/">leadership ratings</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists the page`);
 }
 /* the mood */
@@ -521,7 +543,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const sunny = copy(); sunny.right.v = sunny.right.v.map(() => 70); sunny.right.v[W] = 58; sunny.wrong.v = sunny.wrong.v.map(() => 30);
   eq(moodHead(sunny), "Almost three in five say Australia is heading in the right direction", "the right direction ahead");
   const t = copy(); t.trust.now = { v: 26, low2020: null, year: { chg: -1, sig: false } };
-  eq(trustHead(t), "More than one in four Australians say people in government can be trusted to do the right thing");
+  eq(trustHead(t), "Fewer than three in ten Australians say people in government can be trusted to do the right thing");
+  for (const [v, w] of [[27.4, "Fewer than three in ten"], [25, "Fewer than three in ten"], [24.9, "More than two in ten"], [30.4, "About three in ten"], [29.6, "About three in ten"], [32, "More than three in ten"], [4, "Fewer than one in ten"], [7, "Fewer than one in ten"]]) eq(tenthShare(v), w, "trust in tenths at " + v);
   ok(trustDek(t).endsWith("Not significantly changed on a year earlier."), "no change claimed inside the interval");
   t.trust.now = { v: 26, low2020: { since: "2020-01" }, year: { chg: 5.25, sig: true } };
   ok(trustHead(t).endsWith(", the lowest since January 2020"), "the model's own superlative");
@@ -539,6 +562,9 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
   ok([moodHead(M0), moodDek(M0), trustHead(M0), trustDek(M0)].every((w) => built.includes(w)), "mood: its words are today's rules");
   ok(/name="robots" content="noindex"/.test(built), "mood: unlisted");
+  ok(built.includes("direct:true};") && built.includes("q:'?facet=direction'"), "mood: a pressed dot opens its poll on the Direction view");
+  const rows = new Set(JSON.parse(fs.readFileSync(path.join(A, "dawn-polls.json"), "utf8")).polls.map((p) => p.k));
+  ok(M0.polls.every((p) => (p.k ? rows.has(p.k) : p.h === "Ipsos" || p.h === "McKinnon")), "mood: only Ipsos and McKinnon, which the polls table doesn't carry, have no row");
   ok(/class="md-bar"[^>]*><i class="y"><\/i><i class="u"><\/i><i class="n"><\/i><\/div>/.test(built) && /\.md-bar\{[^}]*border-radius:999px;overflow:hidden/.test(built), "the hero is one rounded bar: right, unsure, wrong");
   ok(/--yes:#0b8f8c;--no:#8e1f41;--neu:#a7a2ae/.test(built), "turquoise, burgundy and grey");
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html"]) ok(/href="(\.\.\/)?mood\/">mood</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists the mood page`);

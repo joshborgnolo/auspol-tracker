@@ -12,19 +12,39 @@
 <link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
 <style>
 /*{{SHARED:css}}*/
-/* net ratings run both ways, so a row's bar leaves a zero mark: left when more disapprove, right when more
-   approve. The figures carry a sign and no %, and each row names the office under the leader */
-.ld .pr{grid-template-columns:minmax(0,1fr) calc(var(--fs)*3.15) 3.7em;transition:transform .34s cubic-bezier(.3,.9,.3,1)}
-.ld.still .pr{transition:none}
-.ld .pn{white-space:normal;line-height:1.25}
-.ld .pn small{display:block;white-space:nowrap;margin-left:calc(clamp(15px,4.3vw,19px)*1.75);font-size:13px;font-weight:400;color:rgb(238 238 255/.62)}
-.ld .pb::before{content:"";position:absolute;left:var(--z0);top:-1px;width:1px;height:14px;transform:translateX(-50%);background:rgb(238 238 255/.5)}
-.ld .pb i{left:var(--bl);width:var(--bw)}
-.ld .pb i.neg{border-radius:3px 0 0 3px}
-.ld .pb s,.ld .pb s.up{background:#fff;box-shadow:0 0 0 .5px rgb(8 16 50/.45)}
-.ld .pb s.in{background:none;box-shadow:none}
-.ld .pb s.ci::after{left:auto;right:-.75px}
+/* the hero is a column chart: a column a leader, highest first, up from the zero line when more approve
+   and down when more disapprove. The figure rides the column's end; the white line is where the leader
+   started, or, switched, the 95% interval */
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:4px}
+.cl{display:flex;flex-direction:column;min-width:0;transition:transform .34s cubic-bezier(.3,.9,.3,1)}
+.cols.still .cl{transition:none}
+.cl-plot{position:relative;height:clamp(150px,34vh,340px)}
+/* the scale sits inside the plot, leaving room for a figure beyond either end */
+.cl-area{position:absolute;left:0;right:0;top:34px;bottom:34px}
+.cl-area::before{content:"";position:absolute;left:0;right:0;top:var(--z0);height:1px;background:rgb(238 238 255/.5)}
+.cl-bar{position:absolute;left:50%;width:min(66%,104px);transform:translateX(-50%);top:var(--bt);height:max(3px,var(--bh));background:var(--c);border-radius:9px 9px 0 0;box-shadow:0 0 18px color-mix(in srgb,var(--c) 40%,transparent);transition:top .2s linear,height .2s linear}
+.cl-bar.neg{border-radius:0 0 9px 9px}
+.cl-mark{position:absolute;left:50%;width:1.5px;transform:translateX(-50%);top:var(--mt);height:var(--mh);background:#fff;box-shadow:0 0 0 .5px rgb(8 16 50/.45);transition:top .2s linear,height .2s linear}
+/* since the start: one line across the column at the start's level (--se: the end of the stem it sits on) */
+.cl-mark::after,.cl-mark.ci::before{content:"";position:absolute;left:50%;transform:translateX(-50%);height:2px;background:#fff;box-shadow:0 0 0 .5px rgb(8 16 50/.45)}
+.cl-mark::after{top:calc(var(--se) - 1px);width:min(calc(var(--cw)*.82),128px)}
+.cl-mark.ci::after{top:-1px;width:18px}
+.cl-mark.ci::before{bottom:-1px;width:18px}
+.cl-val{position:absolute;left:0;right:0;top:var(--vt);margin-top:var(--vm);text-align:center;font-weight:600;font-size:var(--fs);line-height:1;letter-spacing:-.012em;font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px 10px rgb(4 10 40/.65);transition:top .2s linear}
+.cols.live .cl-bar,.cols.live .cl-mark,.cols.live .cl-val{transition:none}
+.cl-lab{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:4px 2px 0;text-shadow:0 1px 8px rgb(4 10 40/.75)}
+.cl-n{font-size:clamp(15px,4.3vw,19px);font-weight:500;white-space:nowrap}
+.cl-n .rk{min-width:0;margin-right:.35em}
+.cl-lab small{font-size:12.5px;line-height:1.25;color:rgb(238 238 255/.62)}
+.cl-d{font-size:clamp(13.5px,3.8vw,16px);font-weight:500;color:rgb(238 238 255/.82);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cols-key{display:flex;justify-content:flex-end}
+/* a short screen keeps the names clear of the sun */
+@media(max-height:660px){.ld-hero .now-d{font-size:13px}.cl-plot{height:max(136px,26vh)}.cl-area{top:28px;bottom:28px}.cl-lab{gap:0}}
+@media(max-width:359px){.cl-lab small{font-size:11.5px}}
 .leaders .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
+.leaders .ctl .opts{margin-top:0}
+.leaders .rival-toggle{min-height:32px;font-size:13.5px}
+.leaders .rival-toggle:disabled{opacity:.55}
 @media (min-width:900px){.leaders .ctl{margin-top:16px}.leaders .fig{margin-top:8px}}
 </style>
 </head>
@@ -53,7 +73,7 @@
 </div>
 
 <main>
-<section class="hero" id="top" aria-label="Leadership ratings">
+<section class="hero ld-hero" id="top" aria-label="Leadership ratings">
   <i class="snap" aria-hidden="true"></i>
   <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
     <div class="stars" id="stars"></div>
@@ -66,10 +86,10 @@
   <div class="now" id="now">
     <h1 class="sr">auspol tracker: Australian federal leadership ratings</h1>
     <h2>Leadership ratings</h2>
-    <p class="now-d">Estimated net approval at <span id="now-date">{{asOf}}</span>: the share who approve less the share who disapprove. <span id="now-latest">{{latestPoll}}</span> <span id="whisk-note">Whiskers mark where each leader started</span>; = means a statistical tie.</p>
+    <p class="now-d">Estimated net approval at <span id="now-date">{{asOf}}</span>: the share who approve less the share who disapprove. <span id="now-latest">{{latestPoll}}</span> <span id="whisk-note">White lines mark where each leader started</span>; = means a statistical tie.</p>
     <div class="now-mode"><button type="button" class="flip" id="pv-whisker-mode"><span id="pv-whisker-label">Change since each started</span> <span aria-hidden="true">⇄</span></button></div>
-    <div class="pv-h"><span id="range-label" aria-hidden="true">change</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
-    <div class="pv ld still" id="pv" role="table" aria-label="Estimated net approval of each leader"></div>
+    <div class="pv-h"><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
+    <div class="cols still" id="pv" role="table" aria-label="Estimated net approval of each leader"></div>
   </div>
 </section>
 
@@ -84,6 +104,21 @@
     <div class="fig" id="ratings-fig"><div class="tip" aria-live="polite"></div><svg id="ratings-svg" tabindex="0" aria-label="Line chart of each leader’s estimated net approval. Use the left and right arrow keys to read values."></svg></div>
     <p class="src" id="ratings-src"></p>
     <div class="sr"><table id="ratings-table"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="ppm" data-sec="leaders" aria-labelledby="ppm-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes leaders">
+    <header class="hd">
+      <h2 id="ppm-h">{{ppmHead}}</h2>
+      <p class="dek">{{ppmDek}}</p>
+    </header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div>
+      <div class="opts"><div class="pick"><span class="pl">Against&nbsp;</span><button type="button" class="rival-toggle" id="ppm-rival" data-r="lnp">Taylor</button></div></div></div>
+    <div class="fig" id="ppm-fig"><div class="tip" aria-live="polite"></div><svg id="ppm-svg" tabindex="0" aria-label="Line chart of preferred prime minister: the share choosing each of two leaders. Use the left and right arrow keys to read values."></svg></div>
+    <p class="src" id="ppm-src"></p>
+    <div class="sr"><table id="ppm-table"></table></div>
   </div>
 </section>
 
@@ -153,7 +188,7 @@ const lineW=long=>long?1.4:2.5;
 function ratingScene(M,narrow){
   const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
   const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
-  const S={x0,x1,ys:10,fmt:sgn,tick:v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0',lines:[],bands:[],dots:[],rings:[],stops:[],refs:[{y:0}],ends:[],names:[]};
+  const S={x0,x1,ys:10,fmt:sgn,tick:v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0',lines:[],bands:[],dots:[],rings:[],stops:[],refs:[{y:0}],ends:[],names:[],direct:true};
   const dots=span<=4.6;
   /* a line with no label at the right edge is named where it has room: at the middle of the stretch in view */
   const nameLine=(who,col,pts)=>{const v=pts.filter(p=>p.x>=x0-1e-6&&p.x<=x1+1e-6);if(v.length<2)return;
@@ -171,7 +206,7 @@ function ratingScene(M,narrow){
     S.ends.sort((p,q)=>q.v-p.v);S.endX=NOWX;
     if(dots){const memo=new Map();for(const p of M.polls){const x=isoX(p.m);if(x<x0||x>x1)continue;const s=M.series[p.s];if(!s)continue;
       const key=p.k||p.m+'|'+p.h;
-      if(!memo.has(key))memo.set(key,{who:p.h,when:p.f?p.f+(+p.m.slice(0,4)!==YR?' '+p.m.slice(0,4):''):fdate(p.m),n:p.n?'n = '+Number(p.n).toLocaleString('en-AU'):'',k:p.k});
+      if(!memo.has(key))memo.set(key,{who:p.h,when:p.f?p.f+(+p.m.slice(0,4)!==YR?' '+p.m.slice(0,4):''):fdate(p.m),n:p.n?'n = '+Number(p.n).toLocaleString('en-AU'):'',k:p.k,q:'?facet=leaders'});
       S.dots.push({x,y:p.net,color:COLOR(s.party),poll:memo.get(key),txt:s.person+' '+net(p.net)})}}
     for(let i=0;i<=LAST;i++){if(!inWin(i))continue;
       const items=M.series.map(s=>{const q=at(s,i);return q?{color:COLOR(s.party),y:q.m,v:q.m,tc:COLOR(s.party),txt:s.person+' '+sgn(q.m)}:null}).filter(Boolean).sort((p,q)=>q.v-p.v);
@@ -214,16 +249,21 @@ function ratingScene(M,narrow){
 
 /* ---------- the leaders, highest first, rolled week by week ---------- */
 /*{{SHARED:odometer}}*/
-/* the bars' scale: every week's figure and interval, so a replay never leaves it */
-const AX0=Math.floor(Math.min(0,...DATA.series.flatMap(s=>s.lo))/10)*10,AX1=Math.ceil(Math.max(0,...DATA.series.flatMap(s=>s.hi))/10)*10;
-const px=v=>(v-AX0)/(AX1-AX0)*100,pc=v=>v.toFixed(2)+'%';
+/* the columns' scale: every week's figure and interval, so a replay never leaves it */
+/* fitted to every week's figure and today's intervals: room for the widest early interval would leave
+   the columns adrift in empty sky (one can run a little past, into the figures' margin, in a replay) */
+const FIT=DATA.series.flatMap(s=>[...s.v,...(s.to?[]:[s.lo[s.lo.length-1],s.hi[s.hi.length-1]])]);
+const AX0=Math.floor(Math.min(0,...FIT)/5)*5,AX1=Math.ceil(Math.max(0,...FIT)/5)*5;
+const py=v=>(AX1-v)/(AX1-AX0)*100,pc=v=>v.toFixed(2)+'%';
 const pv=$('#pv');
 const OFF=OFFICES.filter(o=>holder(o,LAST));
-pv.style.setProperty('--z0',pc(px(0)));
-pv.innerHTML=OFF.map(o=>`<div class="pr" role="row" data-k="${o}"><span class="pn" role="rowheader"><span class="rk" aria-hidden="true"></span><span class="sr"></span><span class="who"></span><small>${OFFNAME[o]}</small></span><span class="pval" role="cell"><span class="sr"></span><b class="rv" aria-hidden="true"></b></span><span class="pd" role="cell"><span class="sr"></span><b class="rv" aria-hidden="true" style="font-weight:inherit"></b></span><span class="pb" aria-hidden="true"><i></i><s><b></b></s></span></div>`).join('');
-const rowOf=Object.fromEntries($$('.pr',pv).map(r=>[r.dataset.k,r]));
-const RV={},DV={},DS={},SB={},BAR={},RK={};
-OFF.forEach(o=>{const r=rowOf[o];RV[o]=$('.pval .rv',r);DV[o]=$('.pd .rv',r);DS[o]=$('.pd .sr',r);SB[o]=$('.pb s',r);BAR[o]=$('.pb i',r);RK[o]=$('.rk',r);mkOdo(RV[o],true);mkOdo(DV[o],true);mkRoll(RK[o],[{a:[' ','=']},{a:[...'123']}])});
+pv.style.setProperty('--z0',pc(py(0)));
+pv.innerHTML=OFF.map(o=>`<div class="cl" role="row" data-k="${o}"><div class="cl-plot"><div class="cl-area"><i class="cl-bar" aria-hidden="true"></i><s class="cl-mark" aria-hidden="true"></s><span class="cl-val" role="cell"><span class="sr"></span><b class="rv" aria-hidden="true"></b></span></div></div><div class="cl-lab"><span class="cl-n" role="rowheader"><span class="rk" aria-hidden="true"></span><span class="sr"></span><span class="who"></span></span><small>${OFFNAME[o]}</small><span class="cl-d" role="cell"><span class="sr"></span><b class="rv" aria-hidden="true" style="font-weight:inherit"></b></span></div></div>`).join('');
+const rowOf=Object.fromEntries($$('.cl',pv).map(r=>[r.dataset.k,r]));
+const RV={},DV={},DS={},MK={},BAR={},RK={};
+OFF.forEach(o=>{const r=rowOf[o];RV[o]=$('.cl-val .rv',r);DV[o]=$('.cl-d .rv',r);DS[o]=$('.cl-d .sr',r);MK[o]=$('.cl-mark',r);BAR[o]=$('.cl-bar',r);RK[o]=$('.rk',r);mkOdo(RV[o],true);mkOdo(DV[o],true);mkRoll(RK[o],[{a:[' ','=']},{a:[...'123']}])});
+/* a column's width, which the start line is cut to */
+new ResizeObserver(()=>pv.style.setProperty('--cw',(pv.clientWidth/OFF.length)+'px')).observe(pv);
 /* the replay opens on the first week every office has a rating (One Nation's leader and the
    opposition leader were first asked about weeks after polling day) */
 const FIRST=Math.max(0,G.findIndex((g,i)=>OFF.every(o=>holder(o,i))));
@@ -233,35 +273,37 @@ let ciMode=false;
 /* one office's figures in week j, in tenths; th is where that week's leader started */
 const weekVals=(o,j)=>{const s=holder(o,j),q=at(s,j);return {w:ten(q.m),lo:ten(q.lo),hi:ten(q.hi),th:ten(s.v[0]),half:(q.hi-q.lo)*5}};
 function renderW(snap=false){
-  OFF.forEach(o=>{const {w,lo,hi,th}=shown[o],half=snap?Math.round(shown[o].half):shown[o].half,r=rowOf[o],z=px(0),v=px(w/10);
+  OFF.forEach(o=>{const {w,lo,hi,th}=shown[o],half=snap?Math.round(shown[o].half):shown[o].half,r=rowOf[o],neg=w<0;
     odoSet(RV[o],w);odoSet(DV[o],ciMode?half:w-th,ciMode);
     DS[o].textContent=ciMode?`±${f1(half/10)} points, 95% credible interval`:sgn((w-th)/10)+' points since they started';
-    r.style.setProperty('--bl',pc(Math.min(z,v)));r.style.setProperty('--bw',pc(Math.abs(v-z)));BAR[o].classList.toggle('neg',w<0);
-    /* since the start: the line covers only what lies beyond the bar, out to the start's tick; a start
-       inside the bar is its tick alone */
-    const b0=Math.min(0,w),b1=Math.max(0,w),inside=th>=b0&&th<=b1,from=ciMode?lo:inside?th:th<b0?th:b1,to=ciMode?hi:inside?th:th<b0?b0:th;
-    r.style.setProperty('--l',pc(px(from/10)));r.style.setProperty('--d',pc(px(to/10)-px(from/10)));
-    SB[o].className=ciMode?'ci':(th<(inside?w:b0)?'up':'dn')+(inside?' in':'');
-    SB[o].style.setProperty('--m',(ciMode&&hi>lo?100*(w-lo)/(hi-lo):50).toFixed(2)+'%');
+    const y=t=>py(t/10);
+    r.style.setProperty('--bt',pc(y(Math.max(0,w))));r.style.setProperty('--bh',pc(y(Math.min(0,w))-y(Math.max(0,w))));BAR[o].classList.toggle('neg',neg);
+    /* since the start: a line at the start's level, with a stem back to the column's end when it lies
+       beyond the column; switched, the interval from end to end */
+    const b0=Math.min(0,w),b1=Math.max(0,w),inside=th>=b0&&th<=b1,from=ciMode?lo:inside?th:Math.min(th,th<b0?b0:b1),to=ciMode?hi:inside?th:Math.max(th,th<b0?b0:b1);
+    r.style.setProperty('--mt',pc(y(to)));r.style.setProperty('--mh',pc(y(from)-y(to)));
+    MK[o].classList.toggle('ci',ciMode);MK[o].style.setProperty('--se',!ciMode&&!inside&&th<b0?'100%':'0%');
+    /* the figure clears the column and its line, beyond the end away from zero */
+    const reach=ciMode?(neg?lo:hi):(neg?Math.min(w,th):Math.max(w,th));
+    r.style.setProperty('--vt',pc(y(reach)));r.style.setProperty('--vm',neg?'7px':'calc(-1em - 7px)');
   });
 }
 const modeBtn=$('#pv-whisker-mode'),modeLabel=$('#pv-whisker-label');
 function paintWhiskMode(){
   const now=ciMode?'95% credible intervals':'Change since each started',next=ciMode?'change since each leader started':'95% credible intervals';
-  modeLabel.textContent=now;modeBtn.title='Switch the whiskers to '+next;
-  modeBtn.setAttribute('aria-label','Whiskers show '+now.replace(/^C/,'c')+'; switch them to '+next);
-  $('#range-label').textContent=ciMode?'intervals':'change';
-  $('#whisk-note').textContent=ciMode?'Whiskers mark 95% credible intervals':'Whiskers mark where each leader started';
+  modeLabel.textContent=now;modeBtn.title='Switch the white lines to '+next;
+  modeBtn.setAttribute('aria-label','The white lines show '+now.replace(/^C/,'c')+'; switch them to '+next);
+  $('#whisk-note').textContent=ciMode?'White lines mark 95% credible intervals':'White lines mark where each leader started';
 }
 modeBtn.addEventListener('click',ev=>{ev.stopPropagation();ciMode=!ciMode;paintWhiskMode();renderW(true)});
 const nowDate=$('#now-date');
 function setWeek(j,instant){
-  const rk=DATA.rank[j],order=[...OFF].sort((p,q)=>at(holder(q,j),j).m-at(holder(p,j),j).m),dom=[...pv.children],rh=dom[0].offsetHeight;
+  const rk=DATA.rank[j],order=[...OFF].sort((p,q)=>at(holder(q,j),j).m-at(holder(p,j),j).m),dom=[...pv.children],cw=dom[0].offsetWidth;
   OFF.forEach(o=>{const r=rowOf[o],s=holder(o,j),n=rk[OFFICES.indexOf(o)],eq=n<0;
     rollTo(RK[o],[eq?'=':' ',String(Math.abs(n))],instant);
     $('.who',r).textContent=s.person;r.style.setProperty('--c',`var(--h-${CV[s.party]||'oth'})`);
-    $('.pn .sr',r).textContent=`ranked ${eq?'equal ':''}${Math.abs(n)}: `;$('.pval .sr',r).textContent=sgn(at(s,j).m);
-    r.style.transform=`translateY(${(order.indexOf(o)-dom.indexOf(r))*rh}px)`;
+    $('.cl-n .sr',r).textContent=`ranked ${eq?'equal ':''}${Math.abs(n)}: `;$('.cl-val .sr',r).textContent=sgn(at(s,j).m);
+    r.style.transform=`translateX(${(order.indexOf(o)-dom.indexOf(r))*cw}px)`;
   });
   nowDate.textContent=fdate(G[j]);return order;
 }
@@ -301,7 +343,89 @@ rpBtn.addEventListener('click',e=>{
   });
 });
 
-/* ---------- the two charts over time: job performance, then favourability ---------- */
+/* ---------- preferred prime minister: each side's share of those who chose one of the two ---------- */
+const PPM=DATA.ppm;
+const PNAMES={opp:(PPM.series.find(p=>p.contest==='pm-opp'&&!p.to)||{}).opp,han:(PPM.series.find(p=>p.contest==='alb-han')||{}).opp};
+let AGAINST='opp';
+/* Labor v One Nation has been asked only this term: a window wholly before it is always the PM v the opposition leader */
+const againstNow=()=>PNAMES.han&&winRange(WIN)[1]>CUR.a+1e-3?AGAINST:'opp';
+function ppmScene(narrow){
+  const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6,vs=againstNow();
+  const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
+  const S={x0,x1,ys:10,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[{y:50}],ends:[],names:[],direct:true};
+  const dots=span<=4.6,inWin=i=>GX[i]>=x0-1e-6&&GX[i]<=x1+1e-6;
+  const nameLine=(who,col,pts)=>{const v=pts.filter(p=>p.x>=x0-1e-6&&p.x<=x1+1e-6);if(v.length>1)S.names.push({s:who,color:col,pts:v,span:v[v.length-1].x-v[0].x})};
+  /* the two sides of a pairing, as [name, party, a share of the PM's turned into this side's] */
+  const sides=p=>[[p.pm,p.pmParty,v=>v],[p.opp,p.oppParty,v=>100-v]];
+  const mine=p=>(vs==='han')===(p.contest==='alb-han');
+  if(cur){
+    const stops=new Map();
+    PPM.series.forEach(p=>{if(!mine(p))return;
+      sides(p).forEach(([who,party,f],si)=>{
+        const col=COLOR(party),pts=[],bd=[];
+        for(let k=0;k<p.v.length;k++){const i=p.i0+k;if(!inWin(i))continue;const v=f(p.v[k]),u=f(p.lo[k]),w=f(p.hi[k]);pts.push({x:GX[i],y:v});bd.push({x:GX[i],lo:Math.min(u,w),hi:Math.max(u,w)});
+          if(!stops.has(i)){const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);stops.set(i,{x:GX[i],label:fdate(G[i]),sub:ev?ev.s:'',items:[]})}
+          stops.get(i).items.push({color:col,tc:col,y:v,v,txt:who+' '+f1(v)})}
+        if(!pts.length)return;
+        if(!long)S.bands.push({color:col,pts:bd,smooth:true});
+        S.lines.push({color:col,pts,smooth:true,w:lineW(long),thin:long});
+        if(!p.to){const v=f(p.v[p.v.length-1]);S.ends.push({color:col,y:v,name:who,abbr:who,v})}else if(si)nameLine(who,col,pts);
+      })});
+    S.ends.sort((p,q)=>q.v-p.v);S.endX=NOWX;
+    S.stops=[...stops.values()].sort((p,q)=>p.x-q.x);S.stops.forEach(t=>t.items.sort((p,q)=>q.v-p.v));
+    if(dots){const memo=new Map();for(const q of PPM.polls){const x=isoX(q.m);if(x<x0||x>x1)continue;const p=PPM.series[q.s];if(!p||!mine(p))continue;
+      const key=q.k||q.m+'|'+q.h;
+      if(!memo.has(key))memo.set(key,{who:q.h,when:q.f?q.f+(+q.m.slice(0,4)!==YR?' '+q.m.slice(0,4):''):fdate(q.m),n:p.pm+' '+q.a+', '+p.opp+' '+q.b+' as printed',k:q.k,q:'?facet=leaders'});
+      sides(p).forEach(([who,party,f])=>S.dots.push({x,y:f(q.v),color:COLOR(party),poll:memo.get(key),txt:who+' '+f1(f(q.v))}))}}
+  }
+  if(!curOnly){
+    const past=[],stops=new Map();
+    for(const h of PPM.history){
+      if(!h.m.length||h.m[h.m.length-1][0]<a-.05||h.m[0][0]>b+.05)continue;
+      sides(h).forEach(([who,party,f])=>{
+        const col=COLOR(party),all=h.m.map(m=>({x:m[0],y:f(m[1]),lo:Math.min(f(m[2]),f(m[3])),hi:Math.max(f(m[2]),f(m[3]))}));
+        const runs=[[]];all.forEach((p,i)=>{if(i&&p.x-all[i-1].x>.52)runs.push([]);runs[runs.length-1].push(p)});
+        for(const r of runs){if(r.length<2)continue;past.push({color:col,pts:r,w:long?1.2:2.25,thin:long});if(!long)S.bands.push({color:col,pts:r})}
+        nameLine(who,col,all);
+        for(const p of all){if(p.x<a-1e-6||p.x>b+1e-6||(cur&&p.x>=ELX))continue;const key=p.x.toFixed(2);
+          if(!stops.has(key))stops.set(key,{x:p.x,label:xMonth(p.x,true),sub:'',items:[]});
+          stops.get(key).items.push({color:col,tc:col,y:p.y,v:p.y,txt:who+' '+f1(p.y)})}
+      });
+    }
+    S.lines.unshift(...past);
+    const st=[...stops.values()];st.forEach(t=>t.items.sort((p,q)=>q.v-p.v));
+    S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
+    if(dots){const memo=new Map();for(const r of PPM.past){const x=isoX(r[0]);if(x<a||x>b)continue;const key=r[0]+'|'+r[1];
+      if(!memo.has(key))memo.set(key,{who:r[1],when:fdate(r[0]),n:''});
+      S.dots.push({x,y:r[2],color:COLOR(r[4]),poll:memo.get(key),txt:r[3]+' '+f1(r[2])},{x,y:100-r[2],color:COLOR(r[6]),poll:memo.get(key),txt:r[5]+' '+f1(100-r[2])})}}
+    if(!cur)S.ends=[];
+  }
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  const ys=[50,...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(q=>q.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y)];
+  S.y0=Math.floor((Math.min(...ys)+.3)/10)*10;S.y1=Math.ceil((Math.max(...ys)-.3)/10)*10;
+  return S;
+}
+function ppmSrc(c){
+  useWindow(c);
+  const [a,b]=winRange(WIN),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
+  const lines=curOnly?'Lines are the model’s weekly estimates':'Past terms are the model’s monthly estimates'+(cur?' (this term is weekly)':'');
+  $('#ppm-src').textContent=lines+' of each leader’s share of those who chose one of the two'+bands+(cur?'':'; each pair is the prime minister and the opposition leader')+'.'
+    +(dots?' Dots are individual polls, put on the same basis.'+(cur?' Tap a dot for its poll'+(curOnly?', a number for its event.':'.'):''):'');
+}
+/* the contest pill: blue for the opposition leader, orange for One Nation's */
+function paintRival(c){
+  useWindow(c);
+  const b=$('#ppm-rival'),vs=againstNow(),can=!!(PNAMES.opp&&PNAMES.han)&&winRange(WIN)[1]>CUR.a+1e-3;
+  b.disabled=!can;b.dataset.r=vs==='han'?'on':'lnp';
+  /* wholly before this term the pairs are many: the pill says whose they are */
+  b.textContent=winRange(WIN)[1]>CUR.a+1e-3?PNAMES[vs]:'opposition leader';
+  const next=PNAMES[vs==='opp'?'han':'opp'];
+  b.setAttribute('aria-label',can?'Against '+PNAMES[vs]+'; switch to '+next:'Against the opposition leader: no other pairing in this time window');
+  b.title=can?'Switch to '+next:'';
+}
+
+/* ---------- the charts over time: job performance, preferred prime minister, favourability ---------- */
 const ASKED={ratings:'approval of, or satisfaction with, each leader’s job performance',fav:'whether voters see each leader favourably or unfavourably'};
 function noteFor(id,c){
   const [a,b]=(useWindow(c),winRange(WIN)),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
@@ -312,11 +436,19 @@ function noteFor(id,c){
 const lineChart=(id,M,lo)=>{const c={};
   return windowedChart({section:$('#'+id),lo,src:()=>{if(c.w)noteFor(id,c.w)},
     make:use=>chart({fig:$('#'+id+'-fig'),svg:$('#'+id+'-svg'),scene:n=>ratingScene(M,n),use})})};
-const charts=[['ratings',APPROVAL,DATA.firstX],['fav',FAV,FAV.firstX]].map(([id,M,lo])=>{
-  const w=lineChart(id,M,lo);noteFor(id,w);w.src=()=>noteFor(id,w);return w.chart});
+const ownNote=(w,note)=>{w.src=()=>note(w);w.src();return w.chart};
+const wRatings=lineChart('ratings',APPROVAL,DATA.firstX);
+let wPpm=null;
+const ppmNotes=()=>{ppmSrc(wPpm);paintRival(wPpm)};
+wPpm=windowedChart({section:$('#ppm'),lo:PPM.firstX,src:()=>{if(wPpm)ppmNotes()},make:use=>chart({fig:$('#ppm-fig'),svg:$('#ppm-svg'),scene:ppmScene,use})});
+ppmNotes();
+$('#ppm-rival').addEventListener('click',()=>{AGAINST=againstNow()==='opp'?'han':'opp';ppmNotes();wPpm.chart.clear();wPpm.chart.draw()});
+const wFav=lineChart('fav',FAV,FAV.firstX);
+const charts=[ownNote(wRatings,w=>noteFor('ratings',w)),wPpm.chart,ownNote(wFav,w=>noteFor('fav',w))];
 
 /* screen-reader tables, one row a month */
 {const idx=[];let lm=-1;G.forEach((d,i)=>{const m=+d.slice(5,7);if(m!==lm){idx.push(i);lm=m}});if(idx[idx.length-1]!==LAST)idx.push(LAST);
+$('#ppm-table').innerHTML=`<caption>Preferred prime minister, share of those who chose one of the two, %</caption><tr><th>Week of</th>${PPM.series.map(p=>`<th>${esc(p.pm)} v ${esc(p.opp)}</th>`).join('')}</tr>`+idx.map(i=>`<tr><td>${fdate(G[i])}</td>${PPM.series.map(p=>{const q=at(p,i);return `<td>${q?f1(q.m)+'–'+f1(100-q.m):''}</td>`}).join('')}</tr>`).join('');
 for(const [id,M,what] of [['ratings',APPROVAL,'net approval'],['fav',FAV,'net favourability']])
 $('#'+id+'-table').innerHTML=`<caption>Estimated ${what}, points</caption><tr><th>Week of</th>${M.series.map(s=>`<th>${esc(s.person)}</th>`).join('')}</tr>`+idx.map(i=>`<tr><td>${fdate(G[i])}</td>${M.series.map(s=>{const q=at(s,i);return `<td>${q?sgn(q.m):''}</td>`}).join('')}</tr>`).join('')}
 

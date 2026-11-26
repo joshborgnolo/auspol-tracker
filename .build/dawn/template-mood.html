@@ -161,10 +161,10 @@ const axis=(S,ys,step)=>{const lo=Math.min(...ys),hi=Math.max(...ys);S.ys=step;S
 function dirScene(narrow){
   const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
   const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
-  const S={x0,x1,ys:10,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[]};
+  const S={x0,x1,ys:10,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[],direct:true};
   const dots=span<=4.6,inWin=i=>GX[i]>=x0-1e-6&&GX[i]<=x1+1e-6;
   const memo=new Map();
-  const poll=(key,who,when,n,k)=>{if(!memo.has(key))memo.set(key,{who,when,n,k});return memo.get(key)};
+  const poll=(key,who,when,n,k)=>{if(!memo.has(key))memo.set(key,{who,when,n,k,q:'?facet=direction'});return memo.get(key)};
   const dot=(x,r,w,sat,p)=>{S.dots.push({x,y:r,color:'var(--yes)',poll:p,txt:(sat?'Satisfied ':'Right ')+r},{x,y:w,color:'var(--no)',poll:p,txt:(sat?'Dissatisfied ':'Wrong ')+w})};
   if(cur){
     for(const s of SIDES){
