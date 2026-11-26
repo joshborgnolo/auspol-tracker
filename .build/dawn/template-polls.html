@@ -267,6 +267,7 @@ body[data-f=primary] .headings .measure-head:not(:last-child){display:block;text
       <div class="rival-pick fopt" data-for="twopp" hidden>Labor v <button type="button" class="rival-toggle" id="rival" role="switch" aria-label="Labor versus One Nation" aria-checked="false" data-r="lnp">Coalition</button></div>
       <div class="seg fopt" role="radiogroup" aria-label="Two-party basis" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-b="imp">Implied</button><button type="button" role="radio" aria-checked="false" data-b="pub">Published</button></div>
       <label class="pick fopt" data-for="demographics"><span class="sr">Split by</span><select id="split"></select></label>
+      <div class="pick fopt" id="offcut-pick" hidden><select id="offcut"></select></div>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
     <div class="measure-line"><h2 id="measure"></h2><span id="method-key"></span><label class="interval-toggle fopt" data-for="primary"><input id="intervals" type="checkbox">95% credible intervals</label></div>
@@ -360,6 +361,16 @@ const gapMoe=(p,pr,k)=>{const sa=DEM_SHARE[pr.a],sb=DEM_SHARE[pr.b],va=pr.A[k],v
 
 /* ---------- the facets' readings: the site's rules ---------- */
 /* the vote by group: two of a poll's own groups, tried in order (d1a1d215 DEM_SPLITS / demPairOf) */
+const OFFCUTS=[
+  ["birth", "Birth country", [["Vietnam", "Australia", "Vietnam-born v Australia-born"], ["Mainland China", "Australia", "China-born v Australia-born"], ["South Africa", "Australia", "South Africa-born v Australia-born"], ["United Kingdom", "Australia", "UK-born v Australia-born"]]],
+  ["religion", "Religion", [["Christian", "No religion", "Christian v no religion"], ["Protestant", "No religion", "Protestant v no religion"]]],
+  ["working", "Working status", [["Full time", "Retired", "Full time v retired"]]],
+  ["children", "Children at home", [["Children under 18", "No children", "Children at home v none"]]],
+  ["class", "Self-assessed class", [["Working class", "Well off", "Working class v well off"]]],
+  ["electorate", "Tasmanian electorates", [["Braddon", "Clark", "Braddon v Clark"]]],
+  ["occupation", "Occupation", [["Professional and managerial", "Blue collar", "Managerial v blue collar"]]],
+  ["stress", "Financial stress", [["No stress at all", "A great deal of stress", "No stress v a great deal of stress"]]],
+];
 const SPLITS=[
   {id:'age',label:'Age',pairs:[['18–34','55+','18–34 v 55+'],['Gen Z','Boomers','Gen Z v boomers'],['18–34','65+','18–34 v 65+'],['18–34','50+','18–34 v 50+']]},
   {id:'gender',label:'Gender',pairs:[['Women','Men','Women v men']]},
@@ -367,10 +378,11 @@ const SPLITS=[
   {id:'place',label:'Place',pairs:[['Inner metro','Rural','Inner metro v rural'],['Inner metro','Regional or rural','Inner metro v regional'],['Capital cities','Regional/rural areas','Capital v regional/rural']]},
   {id:'home',label:'Home',pairs:[['Renting','Own outright','Renters v owners'],['Renting and other','Own outright','Renters v owners']]},
   {id:'income',label:'Income',pairs:[['$150k+','Under $50k','$150k+ v <$50k'],['$125k+','Under $45k','$125k+ v <$45k'],['$100k or more','Under $100k','$100k+ v <$100k'],['$3,000+ a week','Under $1,000 a week','$3k+ v <$1k a week']]},
+  {id:'country',label:'Offcuts',pairs:OFFCUTS.flatMap(family=>family[2])},
 ];
 const groupsOf=p=>{const g=p.grp;if(!g)return null;const m={};for(const rows of Object.values(g.d||{}))for(const [lab,v] of rows)m[lab]=Object.fromEntries(PK.map((k,i)=>[k,v[i]]));
   (g.v||[]).forEach((v,i)=>{const lab=DATA.groups[i];if(v&&!m[lab]&&!(g.ar||[]).includes(lab))m[lab]=Object.fromEntries(PK.map((k,j)=>[k,v[j]]))});return m};
-const pairOf=(p,split)=>{const sp=SPLITS.find(s=>s.id===split),m=sp?groupsOf(p):null;if(!m)return null;for(const [a,b,lab] of sp.pairs)if(m[a]&&m[b])return {a,b,lab,A:m[a],B:m[b],gap:Object.fromEntries(PK.map(k=>[k,m[a][k]!=null&&m[b][k]!=null?m[a][k]-m[b][k]:null]))};return null};
+const pairOf=(p,split)=>{const sp=SPLITS.find(s=>s.id===split),m=sp?groupsOf(p):null;if(!m)return null;const pairs=split==='country'&&offcutSel.value?OFFCUTS.find(([id])=>id===offcutSel.value)[2]:sp.pairs;for(const [a,b,lab] of pairs)if(m[a]&&m[b])return {a,b,lab,A:m[a],B:m[b],gap:Object.fromEntries(PK.map(k=>[k,m[a][k]!=null&&m[b][k]!=null?m[a][k]-m[b][k]:null]))};return null};
 /* issues: who voters rate best on the six issues most waves ask (d1a1d215 ISS_MAP / issOwnOf / issLeadOf) */
 const ISS=['col','housing','health','immigration','crime','economy'],ISSL={col:'Cost of living',housing:'Housing',health:'Health',immigration:'Immigration',crime:'Crime',economy:'Economy'};
 const issOwn=(p,id)=>{const i=p.iss;if(!i)return null;if(i.own&&i.own[id])return i.own[id];if(id==='col'&&i.bp)return {alp:i.bp.alp,lnp:i.bp.lnp,onp:i.bp.onp,grn:i.bp.grn,oth:i.bp.rest};return null};
@@ -420,9 +432,10 @@ function sampleMarkup(p){
   return p.n?Number(p.n).toLocaleString('en-AU')+(basis?' '+sampleBase(basis):''):'–';
 }
 const effTxt=p=>p.se?'eff. '+Number(p.se).toLocaleString('en-AU'):p.eb?(/^~/.test(p.eb)?'eff. ~'+Number(p.eb.slice(1)).toLocaleString('en-AU'):'eff. '+p.eb):'';
-const tabs=$('#tabs'),sel=$('#house'),q=$('#q'),splitSel=$('#split');
+const tabs=$('#tabs'),sel=$('#house'),q=$('#q'),splitSel=$('#split'),offcutSel=$('#offcut');
+offcutSel.innerHTML='<option value="">All offcuts</option>'+OFFCUTS.map(([id,label])=>`<option value="${id}">${esc(label)}</option>`).join('');
 tabs.innerHTML=Object.entries(FACETS).map(([id,f])=>`<button type="button" role="tab" aria-selected="${id===F}" data-f="${id}">${f.label}</button>`).join('');
-splitSel.innerHTML=SPLITS.map(s=>`<option value="${s.id}">Split by ${s.label.toLowerCase()}</option>`).join('');
+splitSel.innerHTML=SPLITS.map(s=>`<option value="${s.id}">${s.id==='country'?'Offcuts':'Split by '+s.label.toLowerCase()}</option>`).join('');
 function houses(rows){const c=new Map();rows.forEach(p=>c.set(p.h,(c.get(p.h)||0)+1));return [...c].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))}
 function fillHouses(){const fa=FACETS[F],rows=fa.rows(),cur=sel.value;sel.innerHTML=`<option value="">all pollsters</option>`+houses(rows).map(([h])=>`<option value="${esc(h)}">${esc(houseName(h))}</option>`).join('');sel.value=houses(rows).some(([h])=>h===cur)?cur:''}
 /* search: a pollster, its client, a date in any of the ways it is written, or a figure */
@@ -486,6 +499,7 @@ function render(){
   rows.sort((a,b)=>sortDate(b).localeCompare(sortDate(a))||b.d.localeCompare(a.d)||a.h.localeCompare(b.h));
   document.body.dataset.f=F;
   $$('.fopt').forEach(e=>e.hidden=e.dataset.for!==F);
+  $('#offcut-pick').hidden=F!=='demographics'||SPLIT!=='country';
   const fd=$('#fdek');fd.hidden=!FDEK[F];fd.textContent=FDEK[F]||'';
   $('#measure').textContent=facetTitle[F];
   $('#method-key').textContent=F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
@@ -577,6 +591,7 @@ $('#rival').addEventListener('click',e=>{
   fillHouses();render();
 });
 let qt=0;q.addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(render,120)});
+offcutSel.addEventListener('change',()=>{fillHouses();render()});
 splitSel.addEventListener('change',()=>{SPLIT=splitSel.value;fillHouses();render()});
 $$('.seg[data-for=twopp] button').forEach(b=>b.addEventListener('click',()=>{const g=b.parentElement;$$('button',g).forEach(x=>x.setAttribute('aria-checked',String(x===b)));BASIS=b.dataset.b;fillHouses();render()}));
 /* arriving from a chart's dot: open that poll, bring it into view, and mark it a moment */
@@ -594,6 +609,7 @@ const want=new URLSearchParams(location.search).get('facet');
 if(want&&FACETS[want]){F=want;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x.dataset.f===F)))}
 filterSelect({select:sel,label:"Pollster"});
 filterSelect({select:sortSelect,label:"Sort by"});
+filterSelect({select:offcutSel,label:"Offcut breakdown"});
 filterSelect({select:splitSel,label:"Demographic split"});
 fillHouses();render();arrive();addEventListener('hashchange',arrive);
 $('#note').textContent='Primary vote shares are as published. Their 95% credible intervals account for effective sample size, pollster noise and rounding. A change from the same pollster’s last poll is significant when its 95% credible interval excludes zero, treating the two samples as independent. Where fieldwork overlaps, the comparison is left unclassified. Other measures marked ± show approximate 95% sampling uncertainty. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the effective sample, the house’s own where it files one, “~” where the site estimates it from the design effect. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
