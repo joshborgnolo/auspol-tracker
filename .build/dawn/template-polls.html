@@ -21,7 +21,7 @@
 :root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--pos:#3aa7a4;--neg:#b7836a;--hi:#2c2a4a}
 *{box-sizing:border-box;min-width:0}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--navh) + 70px)}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+body{margin:0;touch-action:manipulation;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* nav, as the votes pages' */
@@ -65,6 +65,8 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .search{position:relative;flex:1 1 220px;max-width:340px}
 .search input{width:100%;font:400 15px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:36px;padding:0 14px 0 34px;-webkit-appearance:none;appearance:none}
 .search input::placeholder{color:var(--mute)}
+/* iPhone Safari zooms the page into any field set under 16px, and leaves it zoomed */
+@media (pointer:coarse){.search input{font-size:16px}}
 .search svg{position:absolute;left:12px;top:11px;width:14px;height:14px;color:var(--mute)}
 .pick select{font:500 14px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:36px;padding:0 32px 0 14px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 16px) 16px,calc(100% - 11px) 16px;background-size:5px 5px;background-repeat:no-repeat;max-width:100%}
 .seg{display:inline-flex;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
