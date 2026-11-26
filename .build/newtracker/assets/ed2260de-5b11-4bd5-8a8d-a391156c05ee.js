@@ -146,10 +146,17 @@ window.AP = (function () {
      perfectly-agreeing houses scatter, because each one is a sample.  So
      every measure reports three numbers at each point in time:
 
-       sigma   weighted SD of poll residuals about a LOCAL LINEAR trend
-               through the window (pp).  Linear rather than a flat mean –
-               otherwise genuine movement during the window is booked as
-               "disagreement".
+       sigma   weighted SD of poll residuals about the MODEL'S LINE (pp):
+               the consensus line the page's own figures are read from
+               (the primary model's shares and their reads through the
+               flow table, the published pairs' own fits - modelLine
+               below), at each poll's fieldwork.  Residuals keep each
+               house's lean - a house sitting off the consensus IS the
+               disagreement - and genuine movement is the line's, never
+               booked as disagreement.  Since 2026-11-27; before, a local
+               linear trend through the window, which a measure with no
+               model line (the old design's leadership nets, a build with
+               no model) still uses.
        floor   the spread sampling error ALONE would produce:
                sqrt( Sw·DEFF·p(1−p)/n ⁄ Sw ).  Every poll in the archive
                carries a sample size, so this is computable everywhere.
@@ -228,6 +235,52 @@ window.AP = (function () {
       val: (p) => p.alpImp, share: (p) => p.alpImp,
       get flows() { return window.AUSPOL.flowTables.lnp; } },
   ];
+  /* each vote measure's model line: the primary model's shares (D.tppLin,
+     PARTIES order alp lnp grn onp oth); the implied pairs those shares read
+     through the flow table in force (D.flowTables - a reader's own, after
+     the More menu's editor, which calls resetDiscord), exactly the build's
+     tppRead; the published pairs their own fits' lines (D.pubLine, carried
+     in the dataset's first half so the menu can read it on open) */
+  const PM_Q = { alp: 0, lnp: 1, grn: 2, onp: 3, oth: 4 };
+  const LINE_OF = {
+    tpp_alp_imp: "imp", rd_lnp_imp: "imp", tpp_alp: "lnp",
+    tpp_alpon_imp: "onimp", rd_on_imp: "onimp", tpp_alpon: "onp",
+    p_alp: ["alp"], p_lnp: ["lnp"], p_onp: ["onp"], p_grn: ["grn"], rd_right: ["lnp", "onp"],
+  };
+  function modelLine(id) {
+    const src = LINE_OF[id];
+    if (!src) return null;
+    let pts = null;
+    const L = D.tppLin && D.tppLin.line;
+    if (Array.isArray(src)) {
+      if (!L || !L.length) return null;
+      pts = L.map(([iso, v]) => [dayOf(iso), 100 * src.reduce((t, k) => t + v[PM_Q[k]], 0)]);
+    } else if (src === "imp" || src === "onimp") {
+      const FT = D.flowTables, T = FT && FT[src === "imp" ? "lnp" : "onp"];
+      /* the trend is a Kalman line on /vic/, which this mirror doesn't carry */
+      if (!L || !L.length || !T || (D.latest && D.latest.method && D.latest.method.kind === "kalman")) return null;
+      const c = src === "imp" ? FT.cnr || 0 : 0;
+      pts = L.map(([iso, v]) => [dayOf(iso), 100 * Object.keys(PM_Q).reduce((t, k) => t + v[PM_Q[k]] * (T[k] || 0), 0) + c]);
+    } else {
+      const P = D.pubLine && D.pubLine[src];
+      if (!P || !P.length) return null;
+      pts = P.filter((d) => d[1] != null).map(([iso, v]) => [dayOf(iso), v]);
+    }
+    if (pts.length < 2) return null;
+    /* linear between the days the line was printed, flat past its ends;
+       from: its first day (the term's opening) */
+    const f = (t) => {
+      if (t <= pts[0][0]) return pts[0][1];
+      const n = pts.length - 1;
+      if (t >= pts[n][0]) return pts[n][1];
+      let lo = 0, hi = n;
+      while (hi - lo > 1) { const m = (lo + hi) >> 1; if (pts[m][0] <= t) lo = m; else hi = m; }
+      const [t0, v0] = pts[lo], [t1, v1] = pts[hi];
+      return t1 === t0 ? v0 : v0 + (v1 - v0) * (t - t0) / (t1 - t0);
+    };
+    f.from = pts[0][0];
+    return f;
+  }
   /* the variance of a respondent's flow to Labor over a poll's primaries */
   const flowVar = (p, F) => {
     const q = p.p || {};
@@ -241,6 +294,11 @@ window.AP = (function () {
 
   function discordPoints(m) {
     const pts = [];
+    const line = modelLine(m.id);
+    /* the model's line starts at the term's opening; a poll before it (the
+       chart's earlier window) has no line to sit against, so the measure's
+       old local trend stands in only where the line is absent altogether */
+    const lineFrom = line ? line.from : null;
     D.individualPolls.forEach((p) => {
       const y = m.val(p);
       if (y == null) return;
@@ -252,7 +310,10 @@ window.AP = (function () {
         ? (DISC.DEFF * (DISC.ENGAGED - (y / 100) * (y / 100)) / n) * 1e4
         : fv != null ? (DISC.DEFF * fv / n) * 1e4
         : (DISC.DEFF * (m.share(p) / 100) * (1 - m.share(p) / 100) / n) * 1e4;
-      pts.push({ t: dayOf(p.released), y, house: p.pollster, sv, k: m.stratum ? m.stratum(p) : "_" });
+      /* the poll sits on the line at its fieldwork's middle, as the model reads it */
+      const tf = p.dateStart && p.date ? (dayOf(p.dateStart) + dayOf(p.date)) / 2 : dayOf(p.date || p.released);
+      pts.push({ t: dayOf(p.released), y, house: p.pollster, sv, k: m.stratum ? m.stratum(p) : "_",
+                 ...(line && tf >= lineFrom ? { e: y - line(tf) } : {}) });
     });
 
     return D.MONTHS.map((ym) => {
@@ -265,6 +326,12 @@ window.AP = (function () {
 
       let Se = 0, Sfl = 0, Sw = 0, Sw2 = 0, dofUsed = 0;
       const houses = new Set();
+      /* on the model: every poll in the window against the line, no
+         parameter fitted in the window (the line was fitted to the whole
+         term), so no degrees of freedom are spent here */
+      if (line && win.every((q) => q.e != null)) {
+        win.forEach((q) => { const w = wOf(q); Se += w * q.e * q.e; Sfl += w * q.sv; Sw += w; Sw2 += w * w; houses.add(q.house); });
+      } else {
       const strata = [];
       win.forEach((q) => { if (strata.indexOf(q.k) < 0) strata.push(q.k); });
       strata.forEach((k) => {
@@ -284,6 +351,7 @@ window.AP = (function () {
         });
         dofUsed += 2;                                // the stratum's own intercept + slope
       });
+      }
 
       if (!Sw) return { ym, x, sigma: null };
       const neff = (Sw * Sw) / Sw2;
@@ -300,7 +368,9 @@ window.AP = (function () {
     });
   }
 
-  const _disc = {};
+  let _disc = {};
+  /* a reader's own flow table moves the implied lines (pv-agg setFlows) */
+  const resetDiscord = () => { _disc = {}; };
   function discord(id) {
     if (!_disc[id]) {
       const m = DISCORD_MEASURES.filter((d) => d.id === id)[0];
@@ -856,7 +926,7 @@ window.AP = (function () {
            pollRowKey, morphEase, MORPH_MS, MORPH_CSS, morphClock, morphRawOf, reduceMotion, useMorph, useValueMorph,
            useKeyClock, blendScene,
            blendRows, crossClouds, mixC, blendDomain,
-           discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
+           discord, discordFacet, discordRead, resetDiscord, DISCORD_MEASURES, DISC };
 })();
 
 /* ---- helpers the plain layer shares with the components ------------------

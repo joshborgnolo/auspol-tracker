@@ -4508,7 +4508,7 @@ function RdDisChart({ panel, pts, ms, yMax, first, W, H, phone, hover, setHover 
   };
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" className="rd-dis-svg"
-         aria-label={`${panel.name}: polls sit a typical ${e.sigma.toFixed(1)} points from their trend, against ${e.floor.toFixed(1)} from sampling error alone.`}
+         aria-label={`${panel.name}: polls sit a typical ${e.sigma.toFixed(1)} points from ${RD_AP_PM ? "the site’s estimate" : "their trend"}, against ${e.floor.toFixed(1)} from sampling error alone.`}
          onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
       {yt.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className="rd-dis-gl"></path>)}
       <path d={`M${x0} ${bot}H${x1}`} className="rd-dis-base"></path>
@@ -4612,7 +4612,7 @@ function RdDisagree() {
       <RdHed head={head} dek={dek} />
       <RdTabs swipe value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-dis-tabs"
               options={[{ id: "primary", label: "Primary vote" }, { id: "twopp", label: "Two-party" }]} />
-      <h4 className="rd-ap-ct rd-dis-ct">How far polls typically sit from {phone ? "their trend" : "the trend through them"}, points</h4>
+      <h4 className="rd-ap-ct rd-dis-ct">How far polls typically sit from {RD_AP_PM ? "the site’s estimate" : phone ? "their trend" : "the trend through them"}, points</h4>
       {/* primary vote and two-party are different measures, so a switch
           crossfades the panels rather than turning one into the other */}
       <RdCrossfade k={view}>
@@ -4649,26 +4649,26 @@ function RdDisagree() {
         })}
         {phone && (
           <div className="rd-dis-pkey">
-            <span className="rd-key-item"><RdSwatch kind="line" color="var(--ink-2)" />Typical distance of a poll from the trend through the polls</span>
+            <span className="rd-key-item"><RdSwatch kind="line" color="var(--ink-2)" />Typical distance of a poll from {RD_AP_PM ? "the site’s estimate" : "the trend through the polls"}</span>
             <span className="rd-key-item"><span className="rd-dis-keyfloor" aria-hidden="true"></span>What sampling error alone would produce</span>
           </div>
         )}
       </div>
       </RdCrossfade>
       {!phone && (
-        <RdKey className="rd-ckey rd-dis-key" items={[{ kind: "line", color: "var(--ink-2)", label: "Typical distance of a poll from the trend through the polls" }]}>
+        <RdKey className="rd-ckey rd-dis-key" items={[{ kind: "line", color: "var(--ink-2)", label: "Typical distance of a poll from " + (RD_AP_PM ? "the site’s estimate" : "the trend through the polls") }]}>
           <span className="rd-key-item"><span className="rd-dis-keyfloor" aria-hidden="true"></span>What sampling error alone would produce</span>
         </RdKey>
       )}
       <p className="rd-dis-scale">Within chance: under 1.2 times sampling error, A little beyond: 1.2 to 1.6, Well beyond: 1.6 or more, Under 0.8, tighter than chance, would suggest pollsters were steering towards each other.</p>
       <RdGlide watch={view}><HowTo label="How to read these charts" paras={[
-        <>Each chart follows one figure month by month. The line is how far a typical poll sits from the trend through all the polls around it; the shaded floor is how far it would sit if the pollsters all measured the same thing and differed only by the luck of who they reached.</>,
+        <>Each chart follows one figure month by month. The line is how far a typical poll sits from {RD_AP_PM ? "the site’s estimate of the vote at the time, which every pollster’s lean is part of" : "the trend through all the polls around it"}; the shaded floor is how far it would sit if the pollsters all measured the same thing and differed only by the luck of who they reached.</>,
         <>A line on the floor means the polls agree as well as their samples allow; a line well above it means they genuinely differ, in who they reach or how they weight. {view === "primary"
-          ? "The pollsters split the right’s vote differently while agreeing on its size, so the One Nation and Coalition vote added together has its own chart."
+          ? "The One Nation and Coalition vote added together has its own chart, to show whether the pollsters differ on the size of the right’s vote or only on how it splits."
           : "The implied figures read every poll through the same flows, so their spread is the pollsters disagreeing about primary votes; the published figures add each pollster’s own way of allocating preferences."}</>,
       ]} /></RdGlide>
       <RdFoot how={{ term: "poll-disagreement", from: "How much the polls disagree" }}>
-        Spread is how far each poll typically sits from the trend through the polls around it, with recent polls counting more; weighting by sample size would mute the small polls whose divergence is being measured. Sampling error is what each poll’s own sample predicts, with a design effect of {rdApDeff()}{view === "twopp" ? ", and for the implied figures from the spread of each respondent’s flow to Labor rather than a simple share" : ""}. Measured across all {D.individualPolls.length} polls.
+        Spread is how far each poll typically sits from {RD_AP_PM ? "the site’s estimate at its fieldwork" : "the trend through the polls around it"}, with recent polls counting more; weighting by sample size would mute the small polls whose divergence is being measured. Sampling error is what each poll’s own sample predicts, with a design effect of {rdApDeff()}{view === "twopp" ? ", and for the implied figures from the spread of each respondent’s flow to Labor rather than a simple share" : ""}. Measured across all {D.individualPolls.length} polls.
       </RdFoot>
     </section>
   );

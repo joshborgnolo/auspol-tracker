@@ -78,6 +78,9 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
     const lastOf = (id) => { const s = AP.discord(id).filter((d) => d.sigma != null); return s.length ? s[s.length - 1] : null; };
     const on = lastOf("p_onp"), co = lastOf("p_lnp"), right = lastOf("rd_right"), alp = lastOf("p_alp"), grn = lastOf("p_grn");
     const beyond = (d) => d && d.R >= 1.2;
+    /* what the spread is measured from: the model's line where the page has
+       one (the engine's modelLine), else the old local trend */
+    const FROM = D.latest.primaryModel && !(D.latest.method && D.latest.method.kind === "kalman") ? "the site’s estimate" : "the trend through them";
     /* the figure: the widest ratio among the parties the head names */
     const figOf = (ids) => {
       const top = ids.map((id) => [id, lastOf(id)]).filter(([, d]) => d && d.R != null)
@@ -89,7 +92,7 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const r = (on.R + co.R) / 2;
       const how = r < 1.3 ? "a little further than" : r < 1.75 ? "about half as much again as" : r < 2.25 ? "about twice as far as" : "more than twice as far as";
       head = "Pollsters agree on the size of the right’s vote but disagree on its split";
-      dek = `Polls of One Nation’s vote typically sit ${on.sigma.toFixed(1)} points from the trend through them, and polls of the Coalition’s ${co.sigma.toFixed(1)}: ${how} sampling error alone would put them. `
+      dek = `Polls of One Nation’s vote typically sit ${on.sigma.toFixed(1)} points from ${FROM}, and polls of the Coalition’s ${co.sigma.toFixed(1)}: ${how} sampling error alone would put them. `
         + `Add the two parties together, though, and their combined vote varies only as much as chance allows${alp && !beyond(alp) ? ", as Labor’s does" : ""}.`;
       fig = figOf(["p_onp", "p_lnp"].filter((id) => beyond(id === "p_onp" ? on : co)));
     } else {
@@ -97,12 +100,12 @@ const flFig = (v, dp) => (dp != null ? v.toFixed(dp) : Math.round(v * 10) % 10 =
       const wide = all.filter(([, d]) => beyond(d));
       if (!wide.length) {
         head = "The polls agree about as closely as sampling error allows";
-        dek = "Polls of every party’s vote sit about as far from the trend through them as their samples alone would put them"
+        dek = `Polls of every party’s vote sit about as far from ${FROM} as their samples alone would put them`
           + (all.some(([, d]) => d.R < 0.8) ? ", and some sit closer than chance allows, which can mean pollsters steering towards each other." : ".");
         fig = figOf(all.map(([, , id]) => id));
       } else {
         head = "The polls disagree on " + rdList(wide.map(([n]) => n)) + " vote";
-        dek = wide.map(([n, d]) => `Polls of ${n} vote typically sit ${d.sigma.toFixed(1)} points from the trend through them, against ${d.floor.toFixed(1)} from sampling error alone.`).join(" ");
+        dek = wide.map(([n, d]) => `Polls of ${n} vote typically sit ${d.sigma.toFixed(1)} points from ${FROM}, against ${d.floor.toFixed(1)} from sampling error alone.`).join(" ");
         fig = figOf(wide.map(([, , id]) => id));
       }
     }

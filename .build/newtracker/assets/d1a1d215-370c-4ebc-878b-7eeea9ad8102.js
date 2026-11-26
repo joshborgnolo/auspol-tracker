@@ -5272,7 +5272,7 @@ function VariancePanel({ facet, rangeId }) {
         allows, over 1.20× genuinely apart.
       </p>
       <HowTo cls="table-hint ap-var-note" paras={[
-        <>Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
+        <>Spread is the recency-weighted standard deviation of each poll’s distance from {view !== "leadership" && D.latest.primaryModel && !(D.latest.method && D.latest.method.kind === "kalman") ? "the site’s estimate at its fieldwork" : "a local trend"},
         in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
         small divergent polls being measured.</>,
         <>The floor is what a design effect of {window.AP.DISC.DEFF} and each poll’s own sample size predict.</>,
@@ -5286,10 +5286,10 @@ function VariancePanel({ facet, rangeId }) {
 // HOUSE LEAN – each pollster's house effect, traced month by month
 // ====================================================================
 /* Poll disagreement measures spread ACROSS houses; this panel traces the
-   lean each house carries against the rest – the same estimator the
-   aggregates subtract (±28-day consensus window, 90-day evidence half-life,
-   shrinkage while evidence is thin), read as a monthly time series rather
-   than as the standing figure the archive table carries. A line settling
+   lean each house carries against the rest – the same estimate the
+   aggregates subtract (federally the models' drifting leans, gen-data §2m/§2t;
+   elsewhere the ±28-day consensus window with a 90-day evidence half-life),
+   read as a monthly time series. A line settling
    onto zero is a house tracking the pack; one fading to zero is a house
    whose evidence has gone stale.
 
@@ -5536,10 +5536,14 @@ function HouseLeanPanel({ rangeId }) {
 
       <p className="table-hint ap-var-note">{meta.ground}</p>
       <HowTo cls="table-hint ap-var-note" paras={[
+        ...(window.AUSPOL.latest.method && window.AUSPOL.latest.method.kind === "model" ? [
+        <>Each point is the model’s estimate of the lean in that month. A lean may drift slowly, so a
+        house’s current method outranks its history; the right-hand edge is the lean the All-polls
+        table’s House-effect column shows.</>] : [
         <>Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a
         house’s current method outranks its history.</>,
         <>The All-polls table’s House-effect column instead pools each pollster’s whole history into
-        one standing figure, which is why its numbers won’t match the right-hand edge here.</>,
+        one standing figure, which is why its numbers won’t match the right-hand edge here.</>]),
       ]} />
     </section>
   );
@@ -7312,7 +7316,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         site prices no implied series for them).
         <span className="hint-wide"> {CANT_HOVER ? "Tap" : "Click"} the “{pubBasis ? "As published" : "Implied 2PP"}”
         heading to switch bases.</span><span className="hint-narrow"> The Basis switch above the table changes bases.</span></>,
-        <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP minus the average" : "implied 2PP minus the implied average"} of the
+        window.AUSPOL.latest.method && window.AUSPOL.latest.method.kind === "model"
+        ? <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP" : "implied 2PP"} minus the model’s line at its
+        fieldwork, estimated without it. <strong>House effect</strong> is how far a pollster systematically sits from the
+        cross-house consensus on {pubBasis ? "published" : "implied"} 2PP, as the model estimates it today: a lean that may
+        drift slowly, and stays near zero while the pollster has published few polls. The aggregates take it out, and it is a
+        property of the pollster, not of this one poll.</>
+        : <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP minus the average" : "implied 2PP minus the implied average"} of the
         other polls fielded within three weeks of it, weighted as the headline is. <strong>House effect</strong> is how far a pollster systematically sits from the
         cross-house consensus on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a
         90-day half-life, so its recent methods count for more, and shrunk toward zero while it has
@@ -8095,7 +8105,20 @@ function infoTerms(D) {
         publishes no pair adds no row.</span>
         {tppWork}</>)}
       </>)}</>) },
-    { id: "house-effect", term: "House effect", body: (
+    { id: "house-effect", term: "House effect", body: L.method && L.method.kind === "model" ? (
+      <>A pollster’s consistent lean relative to the others. The model estimates it together with
+      the vote: each poll reads the vote on its fieldwork days, plus its pollster’s lean, plus the
+      luck of its sample. The regular pollsters’ leans average zero, so a lean says how far a
+      pollster sits from the rest. A lean may drift slowly, so it follows the pollster’s current
+      methods, and one measured from few polls stays close to zero. Each figure gets its own lean,
+      since a pollster that leans to Labor on the two-party figure need not on a primary vote. The
+      headline is the line with every lean taken out. Because each lean is measured against the
+      other pollsters, it can’t show a miss they all share, as at the 2019 election: if every
+      pollster is out by the same amount, every lean still reads zero.
+      {" "}The Pollster leans page, in the More menu, shows each pollster’s {xref("house-lean", "house effect", "house lean")}.
+      {working(<span className="info-p">Poll j by pollster h reads the vote on its fieldwork days plus
+        h’s lean plus noise, on the log-ratio scale for the primaries. The regular pollsters’ leans
+        sum to zero, and each lean takes a small random step from one day to the next.</span>)}</>) : (
       <>A pollster’s consistent lean relative to the others. Each of its polls is compared with
       other pollsters’ polls taken around the same time, and the gaps are pooled with a 90-day
       half-life, so the lean tracks the pollster’s current methods. A lean measured from few polls

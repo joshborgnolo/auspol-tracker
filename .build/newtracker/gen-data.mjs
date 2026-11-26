@@ -1306,42 +1306,59 @@ const TPM = PRIMM ? (() => {
   const sig = (c) => ({ chg: c.v, lo: c.lo, hi: c.hi, sd: c.sd, ci: c.ci, sig: c.lo > 0 || c.hi < 0 });
   /* the nearest day the smoother kept (an event: a poll, a printed day) */
   const nearEv = (evs, d) => { let lo = 0, hi = evs.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (evs[m] <= d) lo = m; else hi = m; } return Math.abs(evs[lo] - d) <= Math.abs(evs[hi] - d) ? evs[lo] : evs[hi]; };
-  /* the published classic pair: its own two-category fit */
-  const pubRs = [];
-  tppRows.forEach((r, i) => {
-    const p = POLL_BY_KEY.get(r.key);
-    if (!p || !(r.x > 0 && r.x < 100)) return;
-    const s0 = pmDay(p.dateStart || p.date), e0 = pmDay(p.date);
-    pubRs.push({ key: r.key, house: r.firm, idx: i, start: s0, end: e0, day: Math.round((s0 + e0) / 2), n: r.n / HL_DEFF,
-      cats: [[0], [1]], vals: [r.x, 100 - r.x], full: true, step: pmStep([p.tpp_alp]), pub: p.published ? pmDay(p.published) : e0 });
-  });
-  pubRs.sort((a, b) => a.day - b.day || a.idx - b.idx);
-  const a0 = (ELECTION.tpp_alp + TPP_MISS[0]) / 100, sdl = (TPP_MISS[1] / 100) * (1 / a0 + 1 / (1 - a0));
-  const pf = pubRs.length >= 2 ? fitPrimary(pubRs, { t0, t1, anchor: { mean: Float64Array.from([Math.log(a0 / (1 - a0))]), cov: Float64Array.from([sdl * sdl]) },
-    jumps: new Set(PRIM_JUMPS.map(pmDay)), parties: ["alp", "lnp"], days: daysAll, pairs: [[t1, t1 - 30]], trend: true,
-    nDraw: +(process.env.PRIM_NDRAW || 2000), seed: 20261125, minCore: 4 }) : null;
-  const pub = pf && (() => {
-    const lin2 = (draws, withC) => { const n = draws.length / 2, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * draws[i * 2]; return o; };
-    const at = new Map(daysAll.map((d) => [d, sm(lin2(pf.shares(d)))]));
-    const pinf = new Map(pubRs.map((r) => [r.key, pf.influence(r.idx)]).filter(([, f]) => f));
-    return {
-      months: months.map(({ ym, day }) => ({ ym, day, ...at.get(day) })), now: at.get(t1), prev: at.get(t1 - 30),
-      chg: sig(sm(lin2(pf.pair(t1, t1 - 30)))), fit: pf,
-      lean: (h) => { const d = pf.lean(h); return d ? sm(lin2(d)) : null; },
-      leanMonths: (h) => pf.leanPath(h, months.map((m) => m.day)).map((l) => (l ? 100 * l[0] : null)),
-      leanAt: (h, day) => { const l = pf.leanPath(h, [nearEv(pf.events, day)])[0]; return l ? 100 * l[0] : null; },
-      yard: (key) => { const f = pinf.get(key); return f ? { v: 100 * f.level[0], he: f.he ? 100 * f.he[0] : null, dNow: 100 * f.dNow[0] } : null; },
-      levelAt: (day) => { const l = pf.levelAt(nearEv(pf.events, day)); return l ? 100 * l[0] : null; },
-      line: () => pf.events.filter((d) => d > t0 && d <= t1).map((d) => { const l = pf.levelAt(d); return l ? [new Date(d * 86400000).toISOString().slice(0, 10), r1(100 * l[0])] : null; }).filter(Boolean),
-      houses: pf.L.houses, lone: pf.L.lone, cnt: pf.cnt, keys: new Set(pubRs.map((r) => r.key)), n: pubRs.length,
-      kappa: Object.fromEntries([...pf.settings.kappa].filter(([h]) => !pf.L.lone.has(h))),
-      ess: pf.ctx.laplace ? pf.ctx.laplace.ess : null, M: pf.settings.comps.length,
-    };
-  })();
-  const out = { imp, on, s22, gap, prim, cf, pub };
+  /* each published pair on its own two-category fit: the classic pair, and
+     (2026-11-27, user ask "update those pages to the model") the published
+     Labor v One Nation figure, so its leans, its yardstick and the Poll
+     disagreement line against it come out of a model as every other basis
+     does. rows: altRowsFor's / tppRows' shape; field: the poll's printed
+     figure, for the rounding step; aPts/sdPts: the term-opening prior on
+     Labor's share, points */
+  const pubFit = (rows, field, aPts, sdPts, seed) => {
+    const pubRs = [];
+    rows.forEach((r, i) => {
+      const p = POLL_BY_KEY.get(r.key);
+      if (!p || !(r.x > 0 && r.x < 100)) return;
+      const s0 = pmDay(p.dateStart || p.date), e0 = pmDay(p.date);
+      pubRs.push({ key: r.key, house: r.firm, idx: i, start: s0, end: e0, day: Math.round((s0 + e0) / 2), n: r.n / HL_DEFF,
+        cats: [[0], [1]], vals: [r.x, 100 - r.x], full: true, step: pmStep([field(p) ?? r.x]), pub: p.published ? pmDay(p.published) : e0 });
+    });
+    pubRs.sort((a, b) => a.day - b.day || a.idx - b.idx);
+    const a0 = aPts / 100, sdl = (sdPts / 100) * (1 / a0 + 1 / (1 - a0));
+    let pf = null;
+    try {
+      pf = pubRs.length >= 2 ? fitPrimary(pubRs, { t0, t1, anchor: { mean: Float64Array.from([Math.log(a0 / (1 - a0))]), cov: Float64Array.from([sdl * sdl]) },
+        jumps: new Set(PRIM_JUMPS.map(pmDay)), parties: ["alp", "lnp"], days: daysAll, pairs: [[t1, t1 - 30]], trend: true,
+        nDraw: +(process.env.PRIM_NDRAW || 2000), seed, minCore: 4 }) : null;
+    } catch (e) { console.warn(`two-party model: published fit (seed ${seed}) failed – ${e.message}`); pf = null; }
+    return pf && (() => {
+      const lin2 = (draws, withC) => { const n = draws.length / 2, o = new Float64Array(n); for (let i = 0; i < n; i++) o[i] = 100 * draws[i * 2]; return o; };
+      const at = new Map(daysAll.map((d) => [d, sm(lin2(pf.shares(d)))]));
+      const pinf = new Map(pubRs.map((r) => [r.key, pf.influence(r.idx)]).filter(([, f]) => f));
+      return {
+        months: months.map(({ ym, day }) => ({ ym, day, ...at.get(day) })), now: at.get(t1), prev: at.get(t1 - 30),
+        chg: sig(sm(lin2(pf.pair(t1, t1 - 30)))), fit: pf,
+        lean: (h) => { const d = pf.lean(h); return d ? sm(lin2(d)) : null; },
+        leanMonths: (h) => pf.leanPath(h, months.map((m) => m.day)).map((l) => (l ? 100 * l[0] : null)),
+        leanAt: (h, day) => { const l = pf.leanPath(h, [nearEv(pf.events, day)])[0]; return l ? 100 * l[0] : null; },
+        yard: (key) => { const f = pinf.get(key); return f ? { v: 100 * f.level[0], he: f.he ? 100 * f.he[0] : null, dNow: 100 * f.dNow[0] } : null; },
+        levelAt: (day) => { const l = pf.levelAt(nearEv(pf.events, day)); return l ? 100 * l[0] : null; },
+        line: () => pf.events.filter((d) => d > t0 && d <= t1).map((d) => { const l = pf.levelAt(d); return l ? [new Date(d * 86400000).toISOString().slice(0, 10), r1(100 * l[0])] : null; }).filter(Boolean),
+        houses: pf.L.houses, lone: pf.L.lone, cnt: pf.cnt, keys: new Set(pubRs.map((r) => r.key)), n: pubRs.length,
+        kappa: Object.fromEntries([...pf.settings.kappa].filter(([h]) => !pf.L.lone.has(h))),
+        ess: pf.ctx.laplace ? pf.ctx.laplace.ess : null, M: pf.settings.comps.length,
+      };
+    })();
+  };
+  const pub = pubFit(tppRows, (p) => p.tpp_alp, ELECTION.tpp_alp + TPP_MISS[0], TPP_MISS[1], 20261125);
+  /* the published ALP-v-ON figure has no count to open on: the term opens on
+     the implied reading's first month, loosely (±5 points), so the houses'
+     own figures set the level from their first poll on */
+  const onpub = JUR ? null : pubFit(altAON.rows, (p) => (ALT_BY.get(p.date + "|" + p.pollster) || {}).ao, on.months[0].v, 5, 20261127);
+  const out = { imp, on, s22, gap, prim, cf, pub, onpub };
   console.log(`two-party model: implied ${r1(imp.now.v)} ±${r1(imp.now.ci)} (month ${imp.chg.chg >= 0 ? "+" : ""}${r1(imp.chg.chg)}, ${imp.chg.sig ? "significant" : "within the margin"}),`
     + ` ALP v ON ${r1(on.now.v)} ±${r1(on.now.ci)} + table ±${r1(cf.get(t1))}`
     + (pub ? `, published ${r1(pub.now.v)} ±${r1(pub.now.ci)} from ${pub.n} polls (ESS ${pub.ess ? pub.ess.toFixed(1) : "-"} of ${pub.M}; κ ${JSON.stringify(pub.kappa)})` : ", published: too few")
+    + (onpub ? `, published ALP v ON ${r1(onpub.now.v)} ±${r1(onpub.now.ci)} from ${onpub.n} polls (κ ${JSON.stringify(onpub.kappa)})` : ", published ALP v ON: too few")
     + ` in ${((Date.now() - T0) / 1000).toFixed(1)}s`);
   return out;
 })() : null;
@@ -1361,12 +1378,20 @@ const tpmHe = (m) => {
   return { at, snapshot, model: true };
 };
 const houseEffectM = TPM && TPM.pub ? tpmHe(TPM.pub) : houseEffect;
+const onpubEffectM = TPM && TPM.onpub ? tpmHe(TPM.onpub) : altAON.he;
 const synthEffectM = TPM ? tpmHe(TPM.imp) : synthEffect;
 const synthOnEffectM = TPM ? tpmHe(TPM.on) : synthOnEffect;
 if (TPM) {
   const kOf = (rows, ym) => rows.filter((r) => r.ym === ym).length;
   agg2ppSynth.splice(1, Infinity, ...TPM.imp.months.map((m) => ({ ym: m.ym, x: mx(m.ym), alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: kOf(tppRowsSynth, m.ym) })));
   if (TPM.pub) agg2pp.splice(1, Infinity, ...TPM.pub.months.map((m) => ({ ym: m.ym, x: mx(m.ym), alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: kOf(tppRows, m.ym) })));
+  /* the published ALP-v-ON line on its fit, from the month of the first poll
+     that publishes the pair (before it the line would be the prior alone) */
+  if (TPM.onpub) {
+    const first = Math.min(...altAON.rows.map((r) => r.mid));
+    alt2pp.alp_on.splice(0, Infinity, ...TPM.onpub.months.filter((m) => ymMidMs(m.ym) >= first - 15 * 86400000)
+      .map((m) => ({ ym: m.ym, x: mx(m.ym), a: r1(m.v), b: r1(100 - m.v), ci95: r1(m.ci), k: kOf(altAON.rows, m.ym) })));
+  }
   agg2ppSynthOn.splice(0, Infinity, ...TPM.on.months.map((m) => ({ ym: m.ym, x: mx(m.ym), a: r1(m.v), b: r1(100 - m.v), ...onMargin(m.ci, TPM.cf.get(m.day)), k: kOf(tppRowsSynthOn, m.ym) })));
   if (synthBand) synthBand.splice(1, Infinity, ...TPM.imp.months.map((m, i) => {
     const e = TPM.s22.months[i];
@@ -1421,7 +1446,7 @@ if (TPM) {
       .map((h) => { const lm = m.leanMonths(h); return [h, PRIMM.months.map((mm, i) => ({ ym: mm.ym, v: lm[i] }))
         .filter((o, i) => o.v != null && pmDay(PRIMM.months[i].ym + "-28") >= by.get(h).first).map((o) => ({ ym: o.ym, v: r1(o.v) }))]; }));
   };
-  put("imp", TPM.imp, tppRowsSynth); put("onimp", TPM.on, tppRowsSynthOn); put("tpp", TPM.pub, tppRows);
+  put("imp", TPM.imp, tppRowsSynth); put("onimp", TPM.on, tppRowsSynthOn); put("tpp", TPM.pub, tppRows); put("onpub", TPM.onpub, altAON.rows);
 }
 /* federal: each house's lean on each primary from the model – the smoothed
    lean at each month's middle (settings at their mode), from the month its
@@ -1477,8 +1502,8 @@ const effByKey = (() => {
      for the implied pairs, the published fit's for the published pair) */
   if (TPM) {
     const out = new Map();
-    const has = { lnp: new Set(tppRows.map((r) => r.key)), imp: new Set(tppRowsSynth.map((r) => r.key)), onimp: new Set(tppRowsSynthOn.map((r) => r.key)) };
-    const series = [["lnp", TPM.pub, TPM.pub && TPM.pub.now], ["imp", TPM.imp, TPM.imp.now], ["onimp", TPM.on, TPM.on.now]].filter(([, m]) => m);
+    const has = { lnp: new Set(tppRows.map((r) => r.key)), imp: new Set(tppRowsSynth.map((r) => r.key)), onimp: new Set(tppRowsSynthOn.map((r) => r.key)), onp: new Set(altAON.rows.map((r) => r.key)) };
+    const series = [["lnp", TPM.pub, TPM.pub && TPM.pub.now], ["imp", TPM.imp, TPM.imp.now], ["onimp", TPM.on, TPM.on.now], ["onp", TPM.onpub, TPM.onpub && TPM.onpub.now]].filter(([, m]) => m);
     for (const p of POLLS) {
       if (noAggPoll(p)) continue;
       const key = p.date + "|" + p.pollster, eff = {};
@@ -1727,7 +1752,7 @@ const yardBy = {
   lnp: TPM && TPM.pub ? yardModel(tppRows, TPM.pub) : yardSeries(tppRows, houseEffect, KF ? KF_NOW.tpp : null),
   imp: TPM ? yardModel(tppRowsSynth, TPM.imp) : yardSeries(tppRowsSynth, synthEffect, KF ? KF_NOW.imp : null),
   onimp: TPM ? yardModel(tppRowsSynthOn, TPM.on) : yardSeries(tppRowsSynthOn, synthOnEffect, KF ? KF_NOW.on : null),
-  onp: yardSeries(altAON.rows, altAON.adjusted ? altAON.he : null, null),
+  onp: TPM && TPM.onpub ? yardModel(altAON.rows, TPM.onpub) : yardSeries(altAON.rows, altAON.adjusted ? altAON.he : null, null),
 };
 const yardLine = Object.fromEntries(Object.entries(yardBy).map(([k, s]) => [k, s.line]));
 // which waves have a figure on each series (an SMS wave's yardstick is only
@@ -6130,7 +6155,11 @@ function altNowcast(s) {
   }
   return out;
 }
-const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
+/* federal: the published ALP-v-ON figure reads its model fit (§2t) */
+const onpubNow = (m) => m && {
+  a: r1(m.now.v), b: r1(100 - m.now.v), n: m.n, aPrev: r1(m.prev.v), se: r2(m.now.sd), ci95: r1(m.now.ci), nEff: m.n,
+  changeCi95: r1(m.chg.ci), changeSig: m.chg.sig, model: true };
+const altLatest = { alp_on: (TPM && onpubNow(TPM.onpub)) || altNowcast(altAON), lnp_on: altNowcast(altLON) };
 
 /* flowHistory – the preference-flow history chart's per-jurisdiction series,
    each the share of the bucket's ballots that ended with Labor at each
@@ -11548,7 +11577,7 @@ const changelog = JUR ? null : (() => {
   const leadBasis = rivalLead === "alp_on" ? (onImp ? "imp" : "pub") : (synthNow ? "imp" : "pub");
   /* the House effect column's figure on the headline's pairing and basis
      (the all-history snapshot the All polls table prints) */
-  const leanHe = { "alp_on|imp": synthOnEffectM, "alp_on|pub": altAON.he, "alp_lnp|imp": synthEffectM, "alp_lnp|pub": houseEffectM }[`${leadPair}|${leadBasis}`];
+  const leanHe = { "alp_on|imp": synthOnEffectM, "alp_on|pub": onpubEffectM, "alp_lnp|imp": synthEffectM, "alp_lnp|pub": houseEffectM }[`${leadPair}|${leadBasis}`];
   const lean = leanHe && typeof leanHe.snapshot === "function"
     ? { key: `${leadPair}|${leadBasis}`, v: Object.fromEntries(Object.entries(leanHe.snapshot(Infinity)).map(([h, o]) => [h, o.v])) }
     : null;
@@ -11833,6 +11862,11 @@ window.AUSPOL = (function () {
      national-direction net (dir). The poll's own comparison (its yd) leaves
      the poll out. */
   const yardLine = ${JSON.stringify({ ...yardLine, dir: dirYard.line })};
+  /* the published pairs' model lines once more, in the dataset's FIRST half
+     (yardLine is a late table): Poll disagreement measures each poll's
+     distance from them, and the More menu reads it before the late half can
+     land. The implied lines it derives from tppLin and the flow table */
+  const pubLine = ${JSON.stringify(TPM ? { lnp: yardLine.lnp, onp: yardLine.onp } : null)};
   // the leader-gap lines the same way (§4c), keyed rival|question
   const ldYardLine = ${JSON.stringify(ldYard.line)};
   // the first day under new office-holders on each of those lines: they break there
@@ -11945,7 +11979,7 @@ window.AUSPOL = (function () {
     primary: PRIMM ? Object.fromEntries(PRIMARY_KEYS.map((k) => [k, Object.fromEntries(Object.entries(PRIMM.leanNow)
       .map(([h, l]) => [h, { v: r1(l[k].v), n: PRIMM.fit.cnt[h] }]))]))
       : Object.fromEntries(Object.entries(primaryHE).map(([k, h]) => [k, h.snapshot(Infinity)])),
-    alp_on: altAON.he.snapshot(Infinity),
+    alp_on: onpubEffectM.snapshot(Infinity),
     appr: Object.fromEntries(Object.entries(apprHE).map(([lk, h]) => [lk, h.snapshot(Infinity)])),
     synth: synthEffectM.snapshot(Infinity),
     /* the ALP-v-ON twin of synth: a house's lean on the implied ALP–ON
@@ -12309,7 +12343,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, pubLine, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

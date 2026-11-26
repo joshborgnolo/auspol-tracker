@@ -1427,14 +1427,16 @@ ${ssBeyondBlock(esc)}
      live page's charts */
   const MENU_SS = {
     disagreement: ["Poll disagreement",
-      `How far the polls sit from the trend through them, month by month, set against the spread
+      `How far the polls sit from ${VIC ? "the trend through them" : "the site&#8217;s estimate"}, month by month, set against the spread
         sampling error alone would leave. Polls that scatter more widely than that disagree for
         reasons beyond chance &#8211; method, timing or a real shift; polls that sit closer than it
         may be leaning on one another. The live page charts the two-party and primary-vote measures.`],
     leans: ["Pollster leans",
-      `How each pollster leans: its polls against the other houses polling within weeks of them,
+      `${VIC ? `How each pollster leans: its polls against the other houses polling within weeks of them,
         pooled with recent polls counting for more, and shrunk toward zero while a house has published
-        few. The aggregate subtracts each lean as it stood at the time. The live page charts every
+        few. The aggregate subtracts each lean as it stood at the time.` : `How each pollster leans: how far its polls sit from the other houses&#8217;, as the
+        site&#8217;s model estimates it alongside the vote. A lean may drift slowly, and stays near zero
+        while a house has published few polls. The aggregate takes every lean out.`} The live page charts every
         house's lean month by month, on the two-party figure and on each party's primary vote.`],
     flows: ["Respondent-allocated preference flows",
       `Where minor-party preferences are flowing now. The two-party figures read every poll's
@@ -2018,7 +2020,7 @@ const withScriptPreloads = (doc) => {
       desc: `Every published ${VIC ? JV.adj : "Australian federal"} opinion poll since the ${VIC ? `${DATA.elections[JV.baseline].date.slice(0, 4)} Victorian` : "May 2025 federal"} election – primary votes, two-party preferred and leadership ratings, with fieldwork dates and samples, month by month.` },
     /* the ☰ menu's pages (TABS' menu entries), out of All polls 2026-10-15 */
     { id: "disagreement", label: "Poll disagreement",
-      desc: `How much the ${VIC ? JV.adj : "Australian federal"} polls disagree – how far they sit from the trend through them, month by month, against the spread sampling error alone would leave.` },
+      desc: `How much the ${VIC ? JV.adj : "Australian federal"} polls disagree – how far they sit from ${VIC ? "the trend through them" : "the site's estimate"}, month by month, against the spread sampling error alone would leave.` },
     { id: "leans", label: "Pollster leans",
       desc: `How each ${VIC ? JV.adj : "Australian federal"} pollster leans – its figures against the other houses polling at the same time, on the two-party and primary votes, month by month.` },
     { id: "flows", label: "Respondent-allocated preference flows",

@@ -799,6 +799,8 @@
       D.houseEffects = { ...kept.houseEffects, ...o.houseEffects };
       window.AP.flowsUser = { lnp: T.lnp, onp: T.onp };
     }
+    /* Poll disagreement reads the implied lines just swapped */
+    if (window.AP.resetDiscord) window.AP.resetDiscord();
     if (typeof window.dispatchEvent === "function")
       window.dispatchEvent(new CustomEvent("ap:flows", { detail: { custom, prevLead, lead: D.latest.rivalLead } }));
     return true;
