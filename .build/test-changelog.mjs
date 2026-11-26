@@ -207,49 +207,60 @@ assert.equal(seed.entries[0].label, "18 Jan 2029");
   assert.match(off[0].text, /no longer statistically significant/);
 }
 
-/* a who-votes-for-whom break appears */
+/* a who-votes-for-whom relative move appears */
 {
   const moves = { "onp|age|55+": 1 };
-  const meta = { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age" } };
+  const meta = { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age", model: true, r0: 0.4, r1: 0.48 } };
   const { appended } = diff(S(), S({ moves, movesMeta: meta }));
   assert.equal(appended.length, 1);
   assert.equal(appended[0].kind, "finding");
-  assert.match(appended[0].text, /^55\+ voters \(by age\) now break significantly toward One Nation, relative to all voters\.$/);
+  assert.equal(appended[0].text, "55+ voters (by age) now show a significant move toward One Nation relative to all voters since polling day (0.40× → 0.48× the national share).");
 }
 
-/* a break falls away */
+/* a move falls away */
 {
   const prev = S({
     moves: { "onp|age|55+": 1 },
-    movesMeta: { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age" } },
+    movesMeta: { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age", model: true, r0: 0.4, r1: 0.48 } },
   });
   const { appended } = diff(prev, S());
   assert.equal(appended.length, 1);
-  assert.match(appended[0].text, /^55\+ voters \(by age\) no longer break significantly toward One Nation, relative to all voters\.$/);
+  assert.equal(appended[0].text, "55+ voters (by age) no longer show a significant move toward One Nation relative to all voters since polling day.");
 }
 
-/* plain "Education"-style set labels lose no word */
+/* the 25 Nov graduate finding: below-average support can still move toward a
+   party, but the entry must show that this is a ratio change, not a level */
+{
+  const moves = { "onp|education|University": 1 };
+  const meta = { "onp|education|University": { party: "onp", group: "University", setLabel: "Education", model: true, r0: 0.54, r1: 0.64 } };
+  const { appended } = diff(S(), S({ moves, movesMeta: meta }));
+  assert.equal(appended[0].text, "University voters (by education) now show a significant move toward One Nation relative to all voters since polling day (0.54× → 0.64× the national share).");
+  assert.doesNotMatch(appended[0].text, /break significantly/);
+}
+
+/* the non-model fallback names its own, non-election measurement window */
 {
   const moves = { "grn|education|University": 1 };
-  const meta = { "grn|education|University": { party: "grn", group: "University", setLabel: "Education" } };
+  const meta = { "grn|education|University": { party: "grn", group: "University", setLabel: "Education", model: false } };
   const { appended } = diff(S(), S({ moves, movesMeta: meta }));
-  assert.match(appended[0].text, /^University voters \(by education\) now break significantly toward the Greens/);
+  assert.equal(appended[0].text, "University voters (by education) now show a significant move toward the Greens relative to all voters over the measured period.");
 }
 
 /* a direction flip ends the old finding and opens the new one */
 {
   const prev = S({
     moves: { "onp|age|55+": 1 },
-    movesMeta: { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age" } },
+    movesMeta: { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age", model: true } },
   });
   const next = S({
     moves: { "onp|age|55+": -1 },
-    movesMeta: { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age" } },
+    movesMeta: { "onp|age|55+": { party: "onp", group: "55+", setLabel: "By age", model: true, r0: 0.4, r1: 0.3 } },
   });
   const { appended } = diff(prev, next);
   assert.equal(appended.length, 2);
-  assert.match(appended[0].text, /no longer break significantly toward One Nation/);
-  assert.match(appended[1].text, /now break significantly away from One Nation/);
+  assert.match(appended[0].text, /no longer show a significant move toward One Nation/);
+  assert.match(appended[1].text, /now show a significant move away from One Nation/);
+  assert.match(appended[1].text, /0\.40× → 0\.30× the national share/);
 }
 
 /* everything that can fire on one day comes out in one entry set */

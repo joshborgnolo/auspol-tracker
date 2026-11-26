@@ -416,7 +416,7 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     }
   }
 
-  /* Who votes for whom proportionality-break findings came or went */
+  /* Who votes for whom relative-move findings came or went */
   const prevMoves = prevState.moves || {}, nextMoves = nextState.moves || {};
   const metaOf = (k) => nextState.movesMeta[k] || prevState.movesMeta[k] || {};
   /* demoTrend's set labels mix "Education" and "By state" forms - the parenthesis
@@ -426,26 +426,27 @@ export function diffChangelog(prevState, committed, nextState, iso, pollInfo = {
     const party = PARTY_NAME[m.party] || m.party || k.split("|")[0];
     const set = m.setLabel ? m.setLabel.toLowerCase().replace(/^by /, "") : null;
     const who = `${m.group || k.split("|")[2] || "?"}${set ? ` voters (by ${set})` : " voters"}`;
-    return { party, who };
+    return { party, who, model: m.model, r0: m.r0, r1: m.r1 };
+  };
+  const moveFinding = (k, dir, present) => {
+    const { party, who, model, r0, r1 } = whoOf(k);
+    const period = model === false ? "over the measured period" : "since polling day";
+    const ratio = present && Number.isFinite(r0) && Number.isFinite(r1)
+      ? ` (${r0.toFixed(2)}× → ${r1.toFixed(2)}× the national share)` : "";
+    return `${who} ${present ? "now" : "no longer"} show a significant move ${dir > 0 ? "toward" : "away from"} ${party} relative to all voters ${period}${ratio}.`;
   };
   for (const k of Object.keys(nextMoves).sort()) {
-    const { party, who } = whoOf(k);
     const dir = nextMoves[k];
     if (prevMoves[k] === dir) continue;
-    const toward = dir > 0;
     if (prevMoves[k] != null) {
       /* a direction flip: the old finding ended and a new one began */
-      appended.push(entry(iso, "finding",
-        `${who} no longer break significantly ${prevMoves[k] > 0 ? "toward" : "away from"} ${party}, relative to all voters.`));
+      appended.push(entry(iso, "finding", moveFinding(k, prevMoves[k], false)));
     }
-    appended.push(entry(iso, "finding",
-      `${who} now break significantly ${toward ? "toward" : "away from"} ${party}, relative to all voters.`));
+    appended.push(entry(iso, "finding", moveFinding(k, dir, true)));
   }
   for (const k of Object.keys(prevMoves).sort()) {
     if (nextMoves[k] != null) continue;
-    const { party, who } = whoOf(k);
-    appended.push(entry(iso, "finding",
-      `${who} no longer break significantly ${prevMoves[k] > 0 ? "toward" : "away from"} ${party}, relative to all voters.`));
+    appended.push(entry(iso, "finding", moveFinding(k, prevMoves[k], false)));
   }
 
   return {

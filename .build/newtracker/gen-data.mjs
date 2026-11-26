@@ -11560,7 +11560,8 @@ const changelog = JUR ? null : (() => {
     for (const m of (o && o.moves) || []) {
       const k = `${party}|${m.set}|${m.group}`;
       moves[k] = m.dir > 0 ? 1 : -1;
-      movesMeta[k] = { party, group: m.group, setLabel: m.setLabel };
+      movesMeta[k] = { party, group: m.group, setLabel: m.setLabel, model: !!m.model,
+        ...(Number.isFinite(m.r0) && Number.isFinite(m.r1) ? { r0: m.r0, r1: m.r1 } : {}) };
     }
   }
   const pollInfo = {};
