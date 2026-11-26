@@ -142,7 +142,7 @@ import { join } from "node:path";
 import { fetchBuffer, passSgCaptcha, FETCH_TRIES } from "./demosau-fetch.mjs";
 import { readDemosau, planCapitalBrief } from "./demosau-read.mjs";
 import { parseSeats } from "./demosau-seats.mjs";
-import { loadInteractive, interactiveFacts } from "./demosau-trends.mjs";
+import { loadInteractive, interactiveFacts, interactiveApproval } from "./demosau-trends.mjs";
 import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
@@ -517,33 +517,29 @@ function guardNewWave(w, isMRP) {
 // Difference of everything parseable against an existing curated row set for
 // the same wave. The hand-curated file stays authoritative: differences are
 // reported, never imposed. Returns { diffs, missingRows }.
-function leadershipDiffs(date, w, D) {
+function leadershipDiffs(date, w, D, isMRP = false) {
   const diffs = [], missingRows = [];
   const near = (arr) => arr.find((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, date)) <= 10);
-  if (w.ppm) {
-    const pm = near(D.ppm);
-    if (!pm) missingRows.push("ppm");
-    else {
-      if (pm.alb !== w.ppm.alb) diffs.push(`ppm.alb: pdf=${w.ppm.alb} vs file=${pm.alb}`);
-      if (pm.opp !== w.ppm.opp) diffs.push(`ppm.opp: pdf=${w.ppm.opp} vs file=${pm.opp}`);
-      if (pm.han !== w.ppm.han) diffs.push(`ppm.han: pdf=${w.ppm.han} vs file=${pm.han}`);
-      if (pm.oppName && w.oppName && pm.oppName !== w.oppName) diffs.push(`ppm.oppName: pdf=${w.oppName} vs file=${pm.oppName}`);
-      const xe = Array.isArray(pm.extra) && pm.extra[0];
-      if (w.ppmExtra && (!xe || xe.alb !== w.ppmExtra.alb || xe.opp !== w.ppmExtra.opp))
-        diffs.push(`ppm.extra: pdf=${JSON.stringify(w.ppmExtra)} vs file=${JSON.stringify(xe || null)}`);
-    }
+  const pm = near(D.ppm);
+  if (!pm && !isMRP) missingRows.push("ppm");
+  else if (w.ppm) {
+    if (pm.alb !== w.ppm.alb) diffs.push(`ppm.alb: pdf=${w.ppm.alb} vs file=${pm.alb}`);
+    if (pm.opp !== w.ppm.opp) diffs.push(`ppm.opp: pdf=${w.ppm.opp} vs file=${pm.opp}`);
+    if (pm.han !== w.ppm.han) diffs.push(`ppm.han: pdf=${w.ppm.han} vs file=${pm.han}`);
+    if (pm.oppName && w.oppName && pm.oppName !== w.oppName) diffs.push(`ppm.oppName: pdf=${w.oppName} vs file=${pm.oppName}`);
+    const xe = Array.isArray(pm.extra) && pm.extra[0];
+    if (w.ppmExtra && (!xe || xe.alb !== w.ppmExtra.alb || xe.opp !== w.ppmExtra.opp))
+      diffs.push(`ppm.extra: pdf=${JSON.stringify(w.ppmExtra)} vs file=${JSON.stringify(xe || null)}`);
   }
-  if (w.approval) {
-    const ap = near(D.approval);
-    if (!ap) missingRows.push("approval");
-    else {
-      for (const [k, role] of [["alb", "alb"], ["opp", "opp"], ["han", "han"]]) {
-        if (ap[k] !== w.approval[role].net) diffs.push(`approval.${k}: pdf=${w.approval[role].net} vs file=${ap[k]}`);
-        const d = ap.detail?.[role];
-        if (d) {
-          if (d.app !== w.approval[role].app) diffs.push(`approval.detail.${role}.app: pdf=${w.approval[role].app} vs file=${d.app}`);
-          if (d.dis !== w.approval[role].dis) diffs.push(`approval.detail.${role}.dis: pdf=${w.approval[role].dis} vs file=${d.dis}`);
-        }
+  const ap = near(D.approval);
+  if (!ap && !isMRP) missingRows.push("approval");
+  else if (w.approval) {
+    for (const [k, role] of [["alb", "alb"], ["opp", "opp"], ["han", "han"]]) {
+      if (ap[k] !== w.approval[role].net) diffs.push(`approval.${k}: pdf=${w.approval[role].net} vs file=${ap[k]}`);
+      const d = ap.detail?.[role];
+      if (d) {
+        if (d.app !== w.approval[role].app) diffs.push(`approval.detail.${role}.app: pdf=${w.approval[role].app} vs file=${d.app}`);
+        if (d.dis !== w.approval[role].dis) diffs.push(`approval.detail.${role}.dis: pdf=${w.approval[role].dis} vs file=${d.dis}`);
       }
     }
   }
@@ -842,11 +838,13 @@ try {
   const newPpmRows = [];
   const newApprovalRows = [];
   const matched = new Set();
+  const interactiveWaves = new Map();
 
-  /* The per-wave interactive publishes all-voters undecided and the cohort
-     tables. Its own news post is discovery only: the interactive then has
-     to reconcile with the canonical wave before supplying any fact. */
-  const supplement = existing.filter((e) => e.pollster === "DemosAU" && e.undecidedLeaner == null)
+  /* The per-wave interactive publishes all-voters undecided, cohort tables
+     and leader ratings. Its own news post is discovery only: the interactive
+     then has to reconcile with the canonical wave before supplying any fact. */
+  const supplement = existing.filter((e) => e.pollster === "DemosAU" &&
+    (e.undecidedLeaner == null || !D.approval.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, e.date)) <= 10)))
     .sort((a, b) => a.date.localeCompare(b.date)).slice(-2);
   if (supplement.length) {
     let posts = null;
@@ -867,9 +865,12 @@ try {
       try {
         const previous = existing.filter((p) => p.pollster === "DemosAU" && p.date < e.date)
           .sort((a, b) => b.date.localeCompare(a.date))[0];
+        const previousApproval = D.approval.filter((r) => r.firm === "DemosAU" && r.date < e.date)
+          .sort((a, b) => b.date.localeCompare(a.date))[0];
         const read = await loadInteractive(interactive, { net: true, writeCache: !CHECK });
         const facts = interactiveFacts(read, { row: e, previous });
-        if (facts.undecidedLeaner == null) continue;
+        interactiveWaves.set(e, { url: interactive, ...interactiveApproval(read, previousApproval) });
+        if (facts.undecidedLeaner == null || e.undecidedLeaner != null) continue;
         if (!e.releaseUrl || !/\.html$/i.test(e.releaseUrl)) { e.releaseUrl = interactive; status.fieldworkFilled.push({ releaseUrl: interactive, date: e.date }); }
         e.undecidedLeaner = facts.undecidedLeaner;
         touched = true;
@@ -929,7 +930,13 @@ try {
         status.fieldworkFilled.push({ seats: true, slug });
         touched = true;
       }
-      const led = leadershipDiffs(match.date, w, D);
+      const interactive = interactiveWaves.get(match);
+      if (!w.approval && interactive?.approval) {
+        w.approval = interactive.approval;
+        if (!w.oppName) w.oppName = interactive.oppName;
+        status.notes.push(`${slug}: leader ratings read from ${interactive.url}`);
+      }
+      const led = leadershipDiffs(match.date, w, D, c.isMRP);
       const diffs = [...viDiffs(match, w), ...led.diffs];
       // parseable leadership data for a wave whose section row is absent is
       // backfilled (same rows the new-wave branch would have written);

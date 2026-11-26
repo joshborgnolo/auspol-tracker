@@ -7,7 +7,7 @@
 
    Run: node .build/test-demosau-trends.mjs */
 import assert from "node:assert";
-import { loadTrends, pollOf, trendDims, trendSwitches, octRowOf, gateTrends, TREND_GROUPS, PV_FROM, DA_ALL, parseInteractive, loadInteractive, interactiveDims, interactiveFacts } from "./demosau-trends.mjs";
+import { loadTrends, pollOf, trendDims, trendSwitches, octRowOf, gateTrends, TREND_GROUPS, PV_FROM, DA_ALL, parseInteractive, loadInteractive, interactiveDims, interactiveFacts, interactiveApproval } from "./demosau-trends.mjs";
 import { dimsProblem, totalProblem } from "./crosstab-parse.mjs";
 
 const data = await loadTrends();
@@ -96,5 +96,22 @@ assert.throws(() => parseInteractive(unknown), /unmapped party/);
 assert.throws(() => parseInteractive("not an interactive release"), /expected one poll-data block/);
 const cacheOnly = await loadInteractive(interactiveUrl);
 eq(cacheOnly.data, interactive.data, "cached reads reproduce the source data without a network call");
+
+// -- November's all-voters ratings, and the printed change on October -----
+eq(interactiveApproval(interactive, { date: "2026-10-26", alb: -20, opp: 1, han: -14 }), {
+  approval: {
+    alb: { app: 30, dis: 45, net: -15 },
+    opp: { app: 31, dis: 27, net: 4 },
+    han: { app: 34, dis: 43, net: -9 },
+  },
+  oppName: "Taylor",
+});
+assert.throws(() => interactiveApproval(interactive, { date: "2026-10-26", alb: -19, opp: 1, han: -14 }), /alb.*previous wave/);
+const missingRating = structuredClone(interactive.data);
+delete missingRating.results.ppl2.total;
+assert.throws(() => interactiveApproval(parseInteractive(missingRating)), /opp all-voters row missing/);
+const wrongSum = structuredClone(interactive.data);
+wrongSum.results.ppl3.total[1] -= 2;
+assert.throws(() => interactiveApproval(parseInteractive(wrongSum)), /han sums to 98, not ~100/);
 
 console.log("all demosau-trends checks pass");

@@ -9880,6 +9880,28 @@
       }
     },
     {
+      "date": "2026-11-22",
+      "firm": "DemosAU",
+      "alb": -15,
+      "opp": 4,
+      "oppName": "Taylor",
+      "han": -9,
+      "detail": {
+        "alb": {
+          "app": 30,
+          "dis": 45
+        },
+        "opp": {
+          "app": 31,
+          "dis": 27
+        },
+        "han": {
+          "app": 34,
+          "dis": 43
+        }
+      }
+    },
+    {
       "date": "2026-11-24",
       "firm": "Essential",
       "alb": -28,

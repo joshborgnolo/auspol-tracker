@@ -252,6 +252,39 @@ export function interactiveFacts(read, { row = null, previous = null } = {}) {
   return { total, undecidedLeaner };
 }
 
+export function interactiveApproval(read, previousApproval = null) {
+  const people = (read.data.questions || []).filter((q) => q.battery === "ppl");
+  if (!people.length) return null;
+  const approval = {};
+  let oppName = null;
+  const r1 = (v) => Math.round(v * 10) / 10;
+  for (const q of people) {
+    const role = /Prime Minister, Labor\)$/.test(q.title) ? "alb"
+      : /Opposition Leader, Liberal\)$/.test(q.title) ? "opp"
+      : /One Nation Leader\)$/.test(q.title) ? "han" : null;
+    if (!role) continue;
+    if (q.kind !== "scale" || q.a_label !== "Positive" || q.b_label !== "Negative")
+      throw new Error(`interactive poll: leader ratings ${role} response labels changed`);
+    const vals = read.data.results?.[q.question]?.total;
+    if (!Array.isArray(vals) || vals.length !== 3 || vals.some((v) => !Number.isFinite(v) || v < 0 || v > 100))
+      throw new Error(`interactive poll: leader ratings ${role} all-voters row missing`);
+    const [app, neutral, dis] = vals;
+    if (Math.abs(app + neutral + dis - 100) > 1) throw new Error(`interactive poll: leader ratings ${role} sums to ${app + neutral + dis}, not ~100`);
+    const net = r1(app - dis);
+    if (previousApproval) {
+      const previousMeta = read.data.prev_poll?.[0];
+      const change = (read.data.changes || []).find((r) => r.question === q.question && r.group === "total" && r.pos === 0);
+      if (!previousMeta || previousMeta.fieldwork_end !== previousApproval.date || !change || r1(net - previousApproval[role]) !== change.change)
+        throw new Error(`interactive poll: leader ratings ${role} change does not reconcile with the previous wave`);
+    }
+    approval[role] = { app, dis, net };
+    if (role === "opp") oppName = q.title.split("(")[0].trim().split(/\s+/).pop();
+  }
+  if (!approval.alb || !approval.opp || !approval.han || !oppName)
+    throw new Error("interactive poll: incomplete leader ratings for the canonical leaders");
+  return { approval, oppName };
+}
+
 export function interactiveCache(url) {
   const u = new URL(url);
   if (u.protocol !== "https:" || u.hostname !== "demosau.com" || !u.pathname.startsWith("/wp-content/uploads/DemosAU/") || !u.pathname.endsWith(".html"))
