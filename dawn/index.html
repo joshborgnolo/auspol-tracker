@@ -132,6 +132,9 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 .sec{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));background:var(--bg);scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbs) + var(--ext)) var(--g)}
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
+/* the contest switch's box: the heading's font and one of its lines tall, so the pill sits centred on the heading's first line */
+.hd-sw{display:flex;align-items:center;height:1.06em;margin:0;font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif)}
+.hd-sw[hidden]{display:none}
 .dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:none;text-wrap:pretty}
 @media(min-width:900px){.now{max-width:600px}.dek{max-width:60ch}}
 .ctl{margin-top:12px}
@@ -229,22 +232,21 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[hidden]{display:none}
 .tgl b{font-weight:500}.tgl em{font-style:normal}
 .tgl-ph:not([hidden]){display:none}
-.rival-toggle{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 12px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
-.rival-toggle::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.rival-toggle{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 13px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
+.rival-toggle::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
 .rival-toggle[data-r=on]{color:var(--on)}
 .rival-toggle[data-r=lnp]{background:color-mix(in srgb,var(--lnp) 10%,var(--bg))}
 .rival-toggle[data-r=on]{background:color-mix(in srgb,var(--on) 12%,var(--bg))}
-#tpp-rival-toggle{display:none}
+.tpp .hd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;column-gap:24px}
+.tpp .hd .dek{grid-column:1/-1}
+.tpp .hd>h2{min-width:0}
 @media(max-width:899px){
-  #flows .hd,.tpp .hd{flex-wrap:wrap;align-items:baseline;gap:8px}
-  #flows .hd{display:flex}
-  .tpp .hd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+  #flows .hd{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px}
+  .tpp .hd{gap:8px}
   #flows .hd .dek{order:3;flex-basis:100%}
-  .tpp .hd .dek{grid-column:1/-1}
-  .tpp .hd>h2{min-width:0}
-  #flow-ctl,#tpp-rival-toggle{margin:0 0 0 auto;flex:none}
-  #tpp-rival-toggle{display:inline-flex}
-  .tpp>.ctl:not(.ctl2){display:none}
+  #flow-ctl,.tpp .hd-sw{margin:0 0 0 auto;flex:none}
+  .rival-toggle{gap:4px;padding:4px 7px;font-size:12px}
+  .rival-toggle::before{width:7px;height:7px}
 }
 svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
@@ -264,7 +266,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .flow-phone-title{margin:0 0 10px;font:500 13px var(--sans)}
 @media(min-width:900px){.flow-phone-title{display:none}}
 .flow-match .fig{flex:1;min-height:0;margin-top:0}
-.tpp{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd ctl" "win win" "fig fig" "keys keys" "src src"}
+.tpp{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd hd" "win win" "fig fig" "keys keys" "src src"}
 .tpp .hd{grid-area:hd}
 .tpp .ctl{grid-area:ctl;align-self:end;margin:0 0 4px}
 .tpp .ctl2{grid-area:win;margin-top:16px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
@@ -387,7 +389,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="wrap flow">
     <header class="hd">
       <h2 id="flows-h">Two-party preferred</h2>
-      <div class="ctl" id="flow-ctl">
+      <div class="ctl hd-sw" id="flow-ctl">
         <button type="button" id="rival-toggle" class="rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button>
       </div>
       <p class="dek">% of the vote received by the major parties after minor-party votes are distributed</p>
@@ -408,12 +410,9 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="wrap tpp">
     <header class="hd">
       <h2 id="tpp-h">Labor retains a narrow 2PP lead over both rivals</h2>
-      <button type="button" class="rival-toggle" id="tpp-rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button>
+      <div class="hd-sw"><button type="button" class="rival-toggle" id="tpp-rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button></div>
       <p class="dek">Labor’s 2PP against One Nation has plunged from 63% in June 2025 to 51% now; against the Coalition, from 57% to 50%. Since July the two contests have run within a point of each other.</p>
     </header>
-    <div class="ctl">
-      <button type="button" class="rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button>
-    </div>
     <div class="ctl ctl2"><div class="win" data-win aria-label="Time window" role="group"></div>
       <div class="opts"><button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button></div></div>
     <div class="fig" id="tpp-fig"><div class="tip" aria-live="polite"></div><svg id="tpp-svg" tabindex="0" aria-label="Line chart of Labor’s two-party-preferred vote. Use the left and right arrow keys to read values week by week."></svg></div>

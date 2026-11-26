@@ -240,8 +240,9 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/<clipPath id="\$\{cid\}"><rect x="\$\{ML\}" y="\$\{MT-8\}" width="\$\{PW\}"/.test(html), "lines and bands clip at the plot's edges");
   ok(!html.includes("cursor:crosshair"), "chart hover has no crosshair cursor");
   ok(html.includes('svg .vv{font-family:var(--sans);font-style:normal;fill:var(--mute)}'), "the chart's v separators use upright Commissioner");
-  ok(!html.includes("data-duel") && /<div class="ctl">\s*<button type="button" class="rival-toggle" role="switch"[^>]*>Coalition<\/button>/.test(html), "wide screens switch the 2PP contest with the phone's pill, not a text toggle");
-  ok(/\.rival-toggle\{[^}]*padding:4px 7px;[^}]*font:500 12px/.test(html), "the contest pill is small enough for One Nation beside the heading");
+  ok(!html.includes("data-duel") && /<h2 id="tpp-h">[^<]*<\/h2>\s*<div class="hd-sw"><button type="button" class="rival-toggle" id="tpp-rival-toggle"/.test(html) && (html.match(/class="rival-toggle"/g) || []).length === 2, "one contest pill in the 2PP heading row at every width, no text toggle");
+  ok(/\.hd-sw\{display:flex;align-items:center;height:1\.06em;margin:0;font:400 clamp\(25px,min\(7\.3vw,4\.6vh\),46px\)\/1\.06 var\(--serif\)\}/.test(html) && html.includes("h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);"), "the pill's box is one heading line tall in the heading's font, so it centres on that line");
+  ok(/\.rival-toggle\{[^}]*padding:5px 9px;[^}]*font:500 13px/.test(html) && /@media\(max-width:899px\)\{[^@]*\.rival-toggle\{gap:4px;padding:4px 7px;font-size:12px\}/.test(html), "full-size pill on wide screens, the smaller one only on phones");
   const polls = fs.readFileSync(path.join(path.dirname(r.file), "polls/index.html"), "utf8");
   ok(/<label class="pick"><span class="pl">Taking&nbsp;<\/span><select id="house">/.test(polls) && /\.pick\{position:relative/.test(polls), "the polls page's pollster menu reads like the chart's and opens under its button");
   ok(polls.includes('<option value="">all pollsters</option>') && !/Every pollster|\(\$\{n\}\)/.test(polls), "the polls page's pollster menu carries no counts");
