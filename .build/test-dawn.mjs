@@ -28,6 +28,8 @@ import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-i
 import { pollHeading } from "./dawn/poll-heading.mjs";
 import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
 import { disagreeData, engine } from "./dawn/disagree-data.mjs";
+import { emapData, groupOf, GROUPS, YEARS } from "./dawn/emap-data.mjs";
+import { emapChapeau, emapHead, closestHead, closestSeats } from "./dawn/copy.mjs";
 import { decidedData, decidedStory, partyStory, ageStory, ofHundred, oneIn, oneInShare } from "./dawn/decided-data.mjs";
 import { buildDawn, flowTotals, readScore, sharedBlock } from "./dawn/build.mjs";
 
@@ -733,6 +735,53 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/class="dc-bar"[^>]*><i[^>]*><\/i><i[^>]*><\/i><i[^>]*><\/i><\/div>/.test(built) && /\.dc-bar\{[^}]*border-radius:999px;overflow:hidden/.test(built), "the opening panel is one rounded bar: firm, soft, undecided");
   ok(/name="robots" content="noindex"/.test(built), "decidedness: unlisted");
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html", "template-disagree.html"]) ok(/href="(\.\.\/)?decidedness\/">decidedness</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists decidedness`);
+}
+/* electoral map */
+{
+  const E = emapData(ROOT);
+  const core = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "core-2025.json"), "utf8"));
+  eq(E.seats.length, 150, "every 2025 seat");
+  ok(E.seats.every((s) => s.d.startsWith("M") && s.d.length > 20 && s.box[2] > s.box[0] && s.box[3] > s.box[1]), "every seat has a shape");
+  ok(E.seats.every((s) => s.box[0] >= E.frame[0] && s.box[2] <= E.frame[0] + E.frame[2] && s.box[1] >= E.frame[1] && s.box[3] <= E.frame[1] + E.frame[3]), "every shape is inside the national view");
+  ok(E.frame[2] > 950 && E.frame[2] < 1010 && E.frame[3] < 1000, "no stray island shrinks the national view");
+  for (const D of core.divs) {
+    const s = E.seats.find((q) => q.n === D.n), t = D.tcp.map((q) => q[1]);
+    eq(s.votes, Math.abs(t[0] - t[1]), `${D.n}: the lead in votes`);
+    ok(Math.abs(s.m - (100 * Math.max(...t)) / (t[0] + t[1]) + 50) <= 0.006 && s.m >= 0, `${D.n}: the margin is the winner's share over 50`);
+  }
+  /* the House: the seat bar is the map's own count, at every election */
+  eq(E.history.length, YEARS.length);
+  const bar = Object.fromEntries(GROUPS.map(([k]) => [k, E.seats.filter((s) => groupOf(s.ab) === k).length]));
+  eq(JSON.stringify(E.history.at(-1).seats), JSON.stringify(bar), "the 2025 bar is the map's seats counted");
+  ok(E.history.every((h) => h.total >= 147 && h.total <= 151), "each House is whole");
+  eq(Object.values(E.today.seats).reduce((a, b) => a + b, 0), 150, "today's House");
+  /* heads on their rules */
+  const H = (seats) => ({ history: [{ seats }] });
+  eq(emapHead(H({ alp: 94, lnp: 43, ind: 10 })), "Labor won a majority: 94 seats to the Coalition’s 43");
+  eq(emapHead(H({ alp: 72, lnp: 73, ind: 5 })), "No party won a majority in the House", "73 of 150 is no majority");
+  eq(emapChapeau(H({ alp: 49, lnp: 95, ind: 4 })), "The Coalition won 95 of 148 seats:");
+  const S = (ms) => ({ seats: ms.map(([m, votes], i) => ({ n: "S" + i, m, votes })) });
+  eq(closestHead(S([[2, 4000], [1.4, 2000]])), "The closest seat was S1, won by 2,000 votes", "a margin of a point or more is not under one");
+  eq(closestHead(S([[0.2, 1], [3, 5000]])), "One seat had a margin under a point; the closest, S0, came down to 1 vote");
+  const close = closestSeats(E);
+  ok(close.length === 10 && close.every((s, i) => !i || s.m >= close[i - 1].m), "the ten closest, closest first");
+  /* the built page */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-map-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, "assets", "fonts"))) if (f.startsWith("commissioner")) fs.writeFileSync(path.join(tmp, "assets", "fonts", f), "");
+  fs.mkdirSync(path.join(tmp, "data"));
+  fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
+  const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).emap, "utf8");
+  fs.rmSync(tmp, { recursive: true, force: true });
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "electoral map: every placeholder filled");
+  new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
+  ok([emapHead(E), closestHead(E), emapChapeau(E)].every((w) => built.includes(w)), "electoral map: its heads are today's rules");
+  ok(built.includes('href="/map/"') && /name="robots" content="noindex"/.test(built), "electoral map: links the full map, unlisted");
+  ok(Buffer.byteLength(built) < 450e3, "electoral map: the page stays light");
+  for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html", "template-disagree.html", "template-decided.html"]) {
+    const src = fs.readFileSync(path.join(HERE, "dawn", f), "utf8");
+    ok(/href="(\.\.\/)?electoral-map\/">electoral map</.test(src) && !/seats <small>soon/.test(src), `${f}'s menu lists the electoral map`);
+  }
 }
 /* linked from nowhere */
 {

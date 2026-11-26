@@ -15,10 +15,11 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { disagreeData } from "./disagree-data.mjs";
 import { decidedData } from "./decided-data.mjs";
+import { emapData } from "./emap-data.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -225,6 +226,25 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     markup: { cyStats: cycleStatsHtml },
     /* which terms each chart opens with brought out */
     extra: (C) => ({ lit: Object.fromEntries(["primary", "net", "ppmm", "oppr"].map((k) => [k, cycleLit(C, k)])) }) });
+  /* the electoral map page: the main map's own 2025 results and boundaries (emap-data.mjs) */
+  let emapFile = null;
+  const mapRoot = path.resolve(HERE, "..", "..");
+  if (fs.existsSync(path.join(mapRoot, "map", "data", "core-2025.json"))) {
+    const EM = emapData(mapRoot);
+    EM.closest = closestSeats(EM).map((s) => s.n);
+    const words = { FONT: "/assets/fonts/" + font, chapeau: esc(emapChapeau(EM)), mapHead: esc(emapHead(EM)), closestHead: esc(closestHead(EM)) };
+    let h = fs.readFileSync(path.join(HERE, "template-emap.html"), "utf8")
+      .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "");
+    h = h.replace(/\{\{([A-Za-z]+)\}\}/g, (m, k) => (k in words ? words[k] : m))
+      .replace("{{PASTEVENTS}}", () => "[]")
+      .replace("{{DATA}}", () => JSON.stringify(EM).replace(/</g, "\\u003c"))
+      .replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
+    const unfilled = h.match(/\{\{[A-Za-z:]+\}\}/);
+    if (unfilled) throw new Error("dawn: template-emap.html placeholder left unfilled: " + unfilled[0]);
+    fs.mkdirSync(path.join(out, "electoral-map"), { recursive: true });
+    emapFile = path.join(out, "electoral-map", "index.html");
+    write(emapFile, h);
+  }
   /* the decidedness page: the main site's Decidedness figures (decided-data.mjs); a dot opens its
      poll where the polls page has a row for it */
   let decidedFile = null;
@@ -271,7 +291,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     disagreeFile = path.join(out, "poll-disagreement", "index.html");
     write(disagreeFile, h);
   }
-  return { decided: decidedFile, disagree: disagreeFile, cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+  return { emap: emapFile, decided: decidedFile, disagree: disagreeFile, cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

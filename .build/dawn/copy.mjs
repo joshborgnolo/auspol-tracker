@@ -379,6 +379,33 @@ export function spreadDek(P) {
   return s;
 }
 
+/* ---------- electoral map (emap-data.mjs) ----------
+   - the opening line names the largest group's seats: "won" at the election,
+     "holds" for the House as it sits;
+   - the map's head says a majority only when that group has more than half;
+   - the closest-seats head counts the seats with a margin (the winner's final
+     two-candidate share over 50) under a point, and names the closest with
+     its lead in votes. */
+const SEAT_NAMES = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", ind: "independents", oth: "others" };
+export function seatLeader(seats) {
+  const [k, n] = Object.entries(seats).sort((a, b) => b[1] - a[1])[0];
+  return { k, n, total: Object.values(seats).reduce((t, v) => t + v, 0) };
+}
+export function emapChapeau(E) { const l = seatLeader(E.history[E.history.length - 1].seats); return cap(SEAT_NAMES[l.k]) + " won " + l.n + " of " + l.total + " seats:"; }
+export function emapHead(E) {
+  const seats = E.history[E.history.length - 1].seats, l = seatLeader(seats), need = Math.floor(l.total / 2) + 1;
+  const [, second] = Object.entries(seats).sort((a, b) => b[1] - a[1]);
+  return l.n >= need ? cap(SEAT_NAMES[l.k]) + " won a majority: " + l.n + " seats to " + SEAT_NAMES[second[0]] + "’s " + second[1] : "No party won a majority in the House";
+}
+export const closestSeats = (E, n = 10) => [...E.seats].sort((a, b) => a.m - b.m).slice(0, n);
+export function closestHead(E) {
+  const under = E.seats.filter((s) => s.m < 1).length, c = closestSeats(E, 1)[0];
+  const votes = c.votes.toLocaleString("en-AU") + (c.votes === 1 ? " vote" : " votes");
+  if (!under) return "The closest seat was " + c.n + ", won by " + votes;
+  const NUM = ["", "One seat had a margin", "Two seats had margins", "Three seats had margins", "Four seats had margins", "Five seats had margins", "Six seats had margins", "Seven seats had margins", "Eight seats had margins", "Nine seats had margins", "Ten seats had margins"];
+  return (NUM[under] || under + " seats had margins") + " under a point; the closest, " + c.n + ", came down to " + votes;
+}
+
 export function copyFor(D) {
   const st = tppStory(D);
   return {

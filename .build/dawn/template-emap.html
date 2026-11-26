@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Electoral map · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+/* the parties on this page: independents their own teal, the rest of the crossbench grey */
+:root{--em-alp:var(--alp);--em-lnp:var(--lnp);--em-grn:var(--grn);--em-onp:var(--on);--em-ind:#14a3a0;--em-oth:var(--oth);--h-ind:#3fd1cc;--h-rest:#c9c6d8}
+/* the hero: the House as one rounded bar, with the line a majority needs */
+.em-chapeau{margin:clamp(8px,1.8vh,18px) 0 0;font:400 clamp(21px,min(6vw,3.4vh),32px)/1.15 var(--serif);color:#f6f4ff}
+.em-barwrap{position:relative;margin-top:clamp(2px,.6vh,6px);padding-bottom:22px}
+.em-bar{display:flex;height:clamp(26px,4.4vh,40px);border-radius:999px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.14),0 4px 22px rgb(4 10 40/.35);background:rgb(255 255 255/.12)}
+.em-bar i{display:block;flex:0 0 auto;width:var(--w);background:var(--c);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.em-maj{position:absolute;top:-5px;bottom:17px;left:var(--x);width:0;border-left:2px dashed #fff;transition:left .5s}
+.em-maj span{position:absolute;top:100%;left:0;transform:translateX(-50%);margin-top:3px;font-size:12px;white-space:nowrap;color:rgb(238 238 255/.8)}
+.em-list{list-style:none;margin:clamp(2px,.8vh,10px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:12px}
+.em-list li{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"n n" "v d";align-items:baseline;gap:2px 7px;padding:clamp(6px,1.2vh,12px) 0;border-top:1px solid rgb(238 238 255/.16)}
+.em-list span{grid-area:n;display:flex;align-items:center;gap:6px;font-size:clamp(12.5px,3.6vw,16px);white-space:nowrap}
+.em-list span::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.em-list b{grid-area:v;font-weight:600;font-size:clamp(28px,min(9vw,4.6vh),44px);line-height:1;font-variant-numeric:tabular-nums}
+.em-list small{grid-area:d;font-size:12.5px;color:rgb(238 238 255/.7);font-variant-numeric:tabular-nums}
+@media(max-width:359px){.em-list{column-gap:8px}.em-list span{font-size:11.5px;gap:4px}.em-list span::before{width:7px;height:7px}}
+@media(max-height:660px){.em-hero .now-d{font-size:13px}.em-chapeau{margin-top:6px;font-size:19px}.em-list li{padding:4px 0}.em-list b{font-size:24px}}
+
+/* the map panel */
+.em-ctl{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-top:10px}
+.em-find select{font:500 13.5px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:34px;padding:0 12px;max-width:100%}
+.em-places{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none;touch-action:pan-x pan-y}
+.em-places::-webkit-scrollbar{display:none}
+.em-places button{flex:none;font:500 13px/1 var(--sans);color:var(--ink2);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:30px;padding:0 12px;cursor:pointer}
+.em-places button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.em-card{margin-top:8px;min-height:62px;border:1px solid var(--rule);border-left:5px solid var(--c,var(--rule2));border-radius:10px;padding:7px 12px;font-size:13.5px;line-height:1.35;color:var(--ink2)}
+.em-card b{color:var(--ink);font-size:16px}
+.em-card a{color:var(--ink);font-weight:600;white-space:nowrap}
+.em-card .em-since{display:block;color:var(--ink)}
+.em-fig{flex:1 1 auto;min-height:220px;margin-top:6px}
+.em-fig svg{cursor:pointer;touch-action:pan-y;overflow:hidden!important}
+.em-fig path{stroke:var(--bg);stroke-width:.8px;vector-effect:non-scaling-stroke;fill:var(--c);fill-opacity:.9}
+.em-fig path:hover{fill-opacity:1}
+.em-fig path.sel{stroke:var(--ink);stroke-width:2.6px;fill-opacity:1}
+.em-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--mute)}
+.em-key{display:flex;flex-wrap:wrap;gap:4px 12px}
+.em-key span{display:inline-flex;align-items:center;gap:5px}
+.em-key i{width:10px;height:10px;border-radius:3px;background:var(--c)}
+.em-full{color:var(--ink);font-weight:600;white-space:nowrap}
+
+/* the closest seats */
+.em-close{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;flex:0 1 auto;min-height:0}
+.em-close li{flex:0 1 56px;min-height:38px;border-bottom:1px solid var(--rule)}
+.em-close button{all:unset;box-sizing:border-box;width:100%;height:100%;display:grid;grid-template-columns:minmax(0,11.5em) minmax(0,1fr) auto;align-items:center;column-gap:12px;cursor:pointer}
+.em-close button:focus-visible{outline:2px solid var(--ink)}
+.em-close .nm{min-width:0;line-height:1.2}
+.em-close .nm b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.em-close .nm small{display:block;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.em-close .tr{position:relative;height:10px;border-radius:5px;background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.em-close .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--c);min-width:3px}
+.em-close .v{text-align:right;line-height:1.2}
+.em-close .v b{display:block;font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.em-close .v small{font-size:11.5px;color:var(--mute);white-space:nowrap}
+@media(min-width:900px){.em-close button{grid-template-columns:minmax(0,20em) minmax(0,1fr) 9em;column-gap:28px}.em-close .nm b{font-size:16px}}
+@media(max-height:700px){.em-close li{min-height:32px}.em-close .nm small,.em-close .v small{display:none}}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
+    <li><a href="../past-cycles/">past cycles</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><a href="../poll-disagreement/">poll disagreement</a></li>
+    <li><a href="../decidedness/">decidedness</a></li>
+    <li><a href="#top" aria-current="page">electoral map</a></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero em-hero" id="top" aria-label="Electoral map">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1 class="sr">auspol tracker: the House of Representatives seat by seat</h1>
+    <h2>Electoral map</h2>
+    <p class="now-d">The House of Representatives: the seats each side won, election by election. <span id="em-date">May 2025</span>.</p>
+    <div class="now-mode"><button type="button" class="flip" id="pv-whisker-mode"><span id="pv-whisker-label">At the 2025 election</span> <span aria-hidden="true">⇄</span></button></div>
+    <p class="em-chapeau" id="em-chapeau">{{chapeau}}</p>
+    <div class="pv-h"><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay every election since 1993"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
+    <div class="em" id="pv">
+      <div class="em-barwrap"><div class="em-bar" id="em-bar" role="img"></div><div class="em-maj" id="em-maj"><span></span></div></div>
+      <ul class="em-list" id="em-list"></ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="map" data-sec="map" aria-labelledby="map-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes emp">
+    <header class="hd"><h2 id="map-h">{{mapHead}}</h2><p class="dek">Each of the 150 seats in the colour of whoever holds it. Pick a city to see its seats, and tap a seat.</p></header>
+    <div class="em-ctl">
+      <div class="seg" role="radiogroup" aria-label="Which House"><button type="button" role="radio" aria-checked="true" data-house="then">2025 result</button><button type="button" role="radio" aria-checked="false" data-house="now">Today</button></div>
+      <label class="em-find"><span class="sr">Find a seat</span><select id="em-find"></select></label>
+    </div>
+    <div class="em-places" role="group" aria-label="Zoom to" id="em-places"></div>
+    <div class="em-card" id="em-card" aria-live="polite"></div>
+    <div class="fig em-fig" id="em-fig"><svg id="em-svg" role="group" aria-label="Map of the House of Representatives seats"></svg></div>
+    <div class="em-foot"><span class="em-key" id="em-key"></span><a class="em-full" href="/map/">The full election map ↗</a></div>
+    <div class="sr"><table id="em-table"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="closest" data-sec="map" aria-labelledby="closest-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes emp">
+    <header class="hd"><h2 id="closest-h">{{closestHead}}</h2><p class="dek">The ten closest seats of 2025. A seat’s margin is how many points over 50% the winner finished in the final two-candidate count.</p></header>
+    <ol class="em-close" id="em-close"></ol>
+    <p class="src">A margin of 1 point means a 51% to 49% finish. Tap a seat to find it on the map.</p>
+  </div>
+</section>
+</main>
+
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const DATA=JSON.parse($('#dawn-data').textContent);
+
+/*{{SHARED:sky}}*/
+
+/*{{SHARED:dates}}*/
+const E=DATA;
+const GROUPS=[['alp','Labor'],['lnp','Coalition'],['grn','Greens'],['onp','One Nation'],['ind','Independents'],['oth','Others']];
+const HERO_C={alp:'var(--h-alp)',lnp:'var(--h-lnp)',grn:'var(--h-grn)',onp:'var(--h-on)',ind:'var(--h-ind)',oth:'var(--h-rest)'};
+const groupOf=ab=>ab==='ALP'?'alp':['LP','NP','LNP','CLP','LNQ'].includes(ab)?'lnp':ab==='GRN'?'grn':ab==='ON'?'onp':ab==='IND'?'ind':'oth';
+const PARTY={ALP:'Labor',LP:'Liberal',NP:'Nationals',LNP:'Liberal National',CLP:'Country Liberal',GRN:'Greens',ON:'One Nation',IND:'Independent',KAP:'Katter’s Australian',XEN:'Centre Alliance',CSA:'Community Strong Australia'};
+const party=ab=>PARTY[ab]||ab;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- the hero: the House as one bar, at each election and today ---------- */
+const H=E.history,LASTY=H.length-1;
+let today=false,yi=LASTY;
+const bar=$('#em-bar'),list=$('#em-list');
+bar.innerHTML=GROUPS.map(([k])=>`<i style="--c:${HERO_C[k]};--w:0%"></i>`).join('');
+list.innerHTML=GROUPS.map(([k,n])=>`<li style="--c:${HERO_C[k]}"><span>${n}</span><b></b><small></small></li>`).join('');
+function paintHouse(){
+  const now=today&&yi===LASTY,seats=now?E.today.seats:H[yi].seats,prev=now?H[LASTY].seats:yi?H[yi-1].seats:null,total=Object.values(seats).reduce((t,v)=>t+v,0),need=Math.floor(total/2)+1;
+  GROUPS.forEach(([k],i)=>{bar.children[i].style.setProperty('--w',(100*seats[k]/total)+'%');const li=list.children[i];$('b',li).textContent=seats[k];const d=prev?seats[k]-prev[k]:null;$('small',li).textContent=d==null?'':d>0?'+'+d:d<0?'−'+(-d):'–'});
+  const m=$('#em-maj');m.style.setProperty('--x',(100*need/total)+'%');$('span',m).textContent=need+' for a majority';
+  const lead=GROUPS.map(([k,n])=>[k,n,seats[k]]).sort((a,b)=>b[2]-a[2])[0];
+  $('#em-chapeau').textContent=(lead[0]==='lnp'?'The Coalition':lead[1])+(now?' holds ':' won ')+lead[2]+' of '+total+' seats:';
+  $('#em-date').textContent=now?'As it sits today, with '+E.today.changed+' seats changed since the election; the small figures are the change since then':MONF[+H[yi].date.slice(5,7)-1]+' '+H[yi].y+(yi?'; the small figures are the change from the election before':'');
+  bar.setAttribute('aria-label',GROUPS.map(([k,n])=>n+' '+seats[k]).join(', ')+'; '+need+' needed for a majority');
+}
+const modeBtn=$('#pv-whisker-mode'),modeLabel=$('#pv-whisker-label');
+function paintMode(){modeLabel.textContent=today?'The House today':'At the 2025 election';modeBtn.setAttribute('aria-label','Showing '+(today?'the House as it sits today':'the 2025 result')+'; switch to '+(today?'the 2025 result':'today'));modeBtn.title='Switch to '+(today?'the 2025 result':'the House today')}
+modeBtn.addEventListener('click',e=>{e.stopPropagation();if(rpOn)return;today=!today;paintMode();paintHouse()});
+paintMode();paintHouse();
+const rpBtn=$('#replay');let rpTimer=0;
+function finish(){clearTimeout(rpTimer);yi=LASTY;rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay every election since 1993');paintHouse();paintNow()}
+rpBtn.addEventListener('click',e=>{
+  e.stopPropagation();if(rpOn){finish();return}
+  rpOn=true;today=false;paintMode();rpBtn.setAttribute('aria-pressed','true');rpBtn.setAttribute('aria-label','Stop the replay');
+  const f0=dayFrac();let i=0;
+  const tick=()=>{yi=i;paintHouse();if(!reduce)paintCycle(f0+2*i/LASTY);if(i<LASTY){i++;rpTimer=setTimeout(tick,reduce?500:1100)}else rpTimer=setTimeout(finish,600)};tick();
+});
+
+/* ---------- the map ---------- */
+const svg=$('#em-svg'),fig=$('#em-fig');
+let house='then',picked=null,place='Australia';
+const abOf=s=>house==='now'&&s.now?s.now.ab:s.ab;
+const colOf=ab=>`var(--em-${groupOf(ab)})`;
+const BY=Object.fromEntries(E.seats.map(s=>[s.n,s]));
+svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+svg.innerHTML='<g id="em-seats">'+E.seats.map((s,i)=>`<path d="${s.d}" data-i="${i}" fill-rule="evenodd"><title>${esc(s.n)}</title></path>`).join('')+'</g>';
+const paths=$$('path[data-i]',svg);
+const AU=E.frame;
+let view=AU.slice(),anim=0;
+const setView=v=>{view=v;svg.setAttribute('viewBox',v.map(n=>n.toFixed(2)).join(' '))};
+function flyTo(v){
+  cancelAnimationFrame(anim);if(reduce){setView(v);return}
+  const from=view.slice(),t0=performance.now(),e=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  /* the width eases on its logarithm, so a fly to a city doesn't rush the end */
+  const step=ts=>{const t=Math.min(1,(ts-t0)/600),k=e(t),w=from[2]*Math.pow(v[2]/from[2],k),h=from[3]*Math.pow(v[3]/from[3],k),u=Math.abs(from[2]-v[2])<1e-3?k:(from[2]-w)/(from[2]-v[2]);
+    const cx=from[0]+from[2]/2+((v[0]+v[2]/2)-(from[0]+from[2]/2))*u,cy=from[1]+from[3]/2+((v[1]+v[3]/2)-(from[1]+from[3]/2))*u;
+    setView([cx-w/2,cy-h/2,w,h]);if(t<1)anim=requestAnimationFrame(step)};
+  anim=requestAnimationFrame(step);
+}
+function goPlace(name,fly=true){
+  place=name;const c=E.cities.find(q=>q.name===name),v=c?c.view:AU;
+  if(fly)flyTo(v);else setView(v);
+  $$('#em-places button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===name)));
+}
+$('#em-places').innerHTML=['Australia',...E.cities.map(c=>c.name)].map(n=>`<button type="button" data-p="${n}" aria-pressed="${n===place}">${n}</button>`).join('');
+$('#em-places').addEventListener('click',e=>{const b=e.target.closest('button');if(b)goPlace(b.dataset.p)});
+const mapHref=s=>'/map/#'+(house==='then'?'y=2025&':'')+'s='+encodeURIComponent(s.n);
+function card(){
+  const el=$('#em-card');
+  if(!picked){el.style.removeProperty('--c');el.innerHTML='Tap a seat to read it, or find one by name.';return}
+  const s=BY[picked];el.style.setProperty('--c',colOf(abOf(s)));
+  el.innerHTML=`<b>${esc(s.n)}</b> · ${s.st} · ${esc(s.cls.toLowerCase())}<br>2025: ${esc(s.who)} (${esc(party(s.ab))}) beat ${esc(s.vs)} (${esc(party(s.vsAb))}) by ${s.votes.toLocaleString('en-AU')} votes, a margin of ${s.m.toFixed(2)}. <a href="${mapHref(s)}">Full map ↗</a>`
+    +(s.now?`<span class="em-since">Now ${esc(s.now.who)}, ${esc(party(s.now.ab))}. ${s.now.text?esc(s.now.text)+(s.now.date?', '+fdate(s.now.date):'')+'.':''}</span>`:'');
+}
+function paintMap(){
+  paths.forEach(p=>{const s=E.seats[+p.dataset.i];p.style.setProperty('--c',colOf(abOf(s)));p.classList.toggle('sel',s.n===picked)});
+  if(picked){const p=paths.find(q=>E.seats[+q.dataset.i].n===picked);p.parentNode.appendChild(p)}
+  const have=new Set(E.seats.map(s=>groupOf(abOf(s))));
+  $('#em-key').innerHTML=GROUPS.filter(([k])=>have.has(k)).map(([k,n])=>`<span><i style="--c:var(--em-${k})"></i>${n}</span>`).join('');
+  card();
+}
+/* a seat picked from elsewhere is shown where it can be seen: in its city, or framed on its own */
+function show(name,fly=true){
+  picked=name;const s=BY[name];
+  if(s){const [x0,y0,x1,y1]=s.box,size=Math.max(x1-x0,y1-y0);
+    const city=E.cities.find(c=>{const [vx,vy,vw,vh]=c.view;return x0>=vx-4&&y0>=vy-4&&x1<=vx+vw+4&&y1<=vy+vh+4});
+    if(city&&size<14)goPlace(city.name,fly);
+    else if(size<90){const w=Math.max(size*3,24);place='';const v=[(x0+x1)/2-w/2,(y0+y1)/2-w/2,w,w];if(fly)flyTo(v);else setView(v);$$('#em-places button').forEach(b=>b.setAttribute('aria-pressed','false'))}
+    else goPlace('Australia',fly)}
+  $('#em-find').value=name||'';paintMap();
+}
+svg.addEventListener('click',e=>{
+  const p=e.target.closest('path[data-i]');if(!p){picked=null;$('#em-find').value='';paintMap();return}
+  const s=E.seats[+p.dataset.i];
+  /* a speck on the national map zooms into its city first: a finger can't tell its seats apart */
+  const r=p.getBoundingClientRect();
+  if(place==='Australia'&&Math.max(r.width,r.height)<14){const c=E.cities.find(c=>{const [vx,vy,vw,vh]=c.view;return s.at[0]>=vx&&s.at[0]<=vx+vw&&s.at[1]>=vy&&s.at[1]<=vy+vh});if(c){goPlace(c.name);return}}
+  picked=s.n;$('#em-find').value=s.n;paintMap();
+});
+$('#em-find').innerHTML='<option value="">Find a seat…</option>'+[...E.seats].sort((a,b)=>a.n.localeCompare(b.n)).map(s=>`<option value="${esc(s.n)}">${esc(s.n)} (${s.st})</option>`).join('');
+$('#em-find').addEventListener('change',e=>{if(e.target.value)show(e.target.value);else{picked=null;paintMap()}});
+$$('[data-house]').forEach(b=>b.addEventListener('click',()=>{house=b.dataset.house;$$('[data-house]').forEach(x=>x.setAttribute('aria-checked',String(x===b)));paintMap()}));
+goPlace('Australia',false);paintMap();
+$('#em-table').innerHTML='<caption>Every seat, 2025</caption><tr><th>Seat</th><th>State</th><th>Winner</th><th>Margin, points</th></tr>'+[...E.seats].sort((a,b)=>a.n.localeCompare(b.n)).map(s=>`<tr><td>${esc(s.n)}</td><td>${s.st}</td><td>${esc(s.who)}, ${esc(party(s.ab))}</td><td>${s.m.toFixed(2)}</td></tr>`).join('');
+
+/* ---------- the closest seats ---------- */
+const close=E.closest.map(n=>BY[n]),widest=Math.max(...close.map(s=>s.m));
+$('#em-close').innerHTML=close.map(s=>`<li><button type="button" data-n="${esc(s.n)}" style="--c:${colOf(s.ab)}"><span class="nm"><b>${esc(s.n)} <span style="font-weight:400;color:var(--mute)">${s.st}</span></b><small>${esc(party(s.ab))} beat ${esc(party(s.vsAb))}</small></span><span class="tr" aria-hidden="true"><i style="width:${(100*s.m/widest).toFixed(1)}%"></i></span><span class="v"><b>${s.m.toFixed(2)}</b><small>${s.votes.toLocaleString('en-AU')} votes</small></span></button></li>`).join('');
+$('#em-close').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;house='then';$$('[data-house]').forEach(x=>x.setAttribute('aria-checked',String(x.dataset.house==='then')));$('#map').scrollIntoView({behavior:reduce?'auto':'smooth'});show(b.dataset.n)});
+
+/*{{SHARED:nav}}*/
+}
+</script>
+</body>
+</html>
