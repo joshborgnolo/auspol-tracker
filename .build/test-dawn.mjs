@@ -269,6 +269,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/id="pv-whisker-mode" role="switch" aria-checked="false"/.test(html) && html.includes("Show change on May 2025") && html.includes("Show 95% credible intervals"), "the primary whisker switch names its two meanings");
   ok(html.includes("rangeLabel.textContent=ciMode?'intervals':'since 2025'"), "interval mode replaces the replay's since-2025 label");
   ok(html.includes(".pb s.ci::before{content:") && html.includes(".pb s.ci>b{position:absolute") && html.includes("<s><b></b></s>"), "intervals carry caps at both ends and a central mean marker");
+  ok(html.includes(".pb s.ci::after{left:auto;right:-.75px;top:-3.25px;height:8px") && html.includes(".pb s.ci>b{position:absolute;top:-5.25px;") && html.includes("width:1.5px;height:12px"), "interval end caps stay shorter than the central marker");
   ok(html.includes("curLo[k]=LOW[k][j];curHi[k]=HIGH[k][j];curHalf[k]=HALF[k][j]") && html.includes("[[curW,TEN],[curLo,LOW],[curHi,HIGH],[curHalf,HALF]]"), "the interval bounds and half-widths travel with the replay");
   const drawWhisk = (ciMode) => {
     const style = () => ({ values: {}, setProperty(k, v) { this.values[k] = v; } });
