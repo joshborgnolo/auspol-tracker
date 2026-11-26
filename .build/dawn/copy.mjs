@@ -333,6 +333,52 @@ export function cycleStatsHtml(C) {
   }).join("");
 }
 
+/* ---------- poll disagreement (disagree-data.mjs) ----------
+   - the opening line: the points between the widest and narrowest pollster on
+     the One Nation–Coalition split;
+   - the month-by-month chart's head compares that gap now with the first month
+     six pollsters or more were on it: "further apart" or "closer" only on a
+     point or more's change, else "about as far apart"; "though closer than at
+     <month>'s peak" where a month between ran a point or more wider;
+   - the spread chart's head names the split only when its polls sit furthest
+     beyond chance of all the primary measures, in points, and are beyond it
+     (1.2 times, the site's line); otherwise the main site's head stands. */
+export const splitGap = (rows, ym) => { const v = rows.map((r) => { const d = r.s.find((q) => q[0] === ym); return d ? d[1] : null; }).filter((x) => x != null); return v.length ? { n: v.length, gap: Math.round((Math.max(...v) - Math.min(...v)) * 10) / 10 } : { n: 0, gap: 0 }; };
+export function splitMonths(P) {
+  const yms = [...new Set(P.hero.flatMap((r) => r.s.map((d) => d[0])))].sort();
+  const from = yms.findIndex((ym) => splitGap(P.hero, ym).n >= Math.min(6, P.hero.length));
+  return yms.slice(Math.max(0, from)).map((ym) => ({ ym, ...splitGap(P.hero, ym) }));
+}
+const monthName = (ym, year) => MONF[+ym.slice(5, 7) - 1] + (year && ym.slice(0, 4) !== year ? " " + ym.slice(0, 4) : "");
+export const splitChapeau = (P) => { const m = splitMonths(P); return f1(m[m.length - 1].gap) + " points apart:"; };
+export function splitHead(P) {
+  const m = splitMonths(P);
+  if (m.length < 2) return "Where each pollster sits on the One Nation–Coalition split";
+  const first = m[0], now = m[m.length - 1], d = now.gap - first.gap, year = now.ym.slice(0, 4);
+  const peak = m.reduce((a, b) => (b.gap > a.gap ? b : a));
+  const was = d >= 1 ? "further apart on the split than in " : d <= -1 ? "closer on the split than in " : "about as far apart on the split as in ";
+  const tail = peak.gap - now.gap >= 1 && peak.ym !== first.ym && d > -1 ? ", though closer than at " + monthName(peak.ym, year) + "’s peak" : "";
+  return "Pollsters are " + was + monthName(first.ym, year) + tail;
+}
+export function splitDek(P) {
+  const m = splitMonths(P), first = m[0], now = m[m.length - 1];
+  return "Each pollster’s lean on One Nation’s lead over the Coalition, points, month by month. The widest and narrowest were " + f1(first.gap) + " points apart in " + monthName(first.ym, now.ym.slice(0, 4)) + " and are " + f1(now.gap) + " now.";
+}
+export function spreadNow(P) {
+  return P.spread.primary.map((s) => { const l = s.m[s.m.length - 1]; return l ? { id: s.id, name: s.name, sigma: l[1], floor: l[2], R: l[1] / l[2], excess: Math.sqrt(Math.max(0, l[1] * l[1] - l[2] * l[2])) } : null; }).filter(Boolean);
+}
+export function spreadHead(P) {
+  const rows = spreadNow(P), top = [...rows].sort((a, b) => b.excess - a.excess)[0];
+  return top && top.id === "split" && top.R >= 1.2 ? "Pollsters differ most on One Nation v the Coalition" : P.siteHead;
+}
+export function spreadDek(P) {
+  const by = Object.fromEntries(spreadNow(P).map((r) => [r.id, r])), sp = by.split, sum = by.rd_right;
+  if (!sp) return "How far a typical poll sits from the site’s estimate, against chance alone.";
+  let s = "On that split, a typical poll sits " + f1(sp.sigma) + " points from the site’s estimate; chance alone would put it " + f1(sp.floor) + " away.";
+  if (sum && sum.R >= 1.2) s += " The two parties’ combined vote also varies more than chance allows.";
+  return s;
+}
+
 export function copyFor(D) {
   const st = tppStory(D);
   return {

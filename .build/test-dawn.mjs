@@ -22,11 +22,13 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek, cycleRank, cycleRankLine, cycleHead, cycleDek, cycleLit, cycleChapeau, cycleStatsHtml, cycleNow, CYCLE_STATS } from "./dawn/copy.mjs";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek, cycleRank, cycleRankLine, cycleHead, cycleDek, cycleLit, cycleChapeau, cycleStatsHtml, cycleNow, CYCLE_STATS, splitChapeau, splitHead, splitDek, splitMonths, spreadHead, spreadDek, spreadNow } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
 import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
+import { disagreeData, engine } from "./dawn/disagree-data.mjs";
+import { decidedData, decidedStory, partyStory, ageStory, ofHundred, oneIn, oneInShare } from "./dawn/decided-data.mjs";
 import { buildDawn, flowTotals, readScore, sharedBlock } from "./dawn/build.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "..");
@@ -625,6 +627,112 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const weekly = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-weekly.json"), "utf8")), model = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-model.json"), "utf8"));
   eq(weekly.input, model.input, "the weekly history is built from the same inputs as the monthly model");
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html"]) ok(/href="(\.\.\/)?past-cycles\/">past cycles</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists past cycles`);
+}
+/* poll disagreement */
+{
+  const P = disagreeData(A, A), E = engine(A, A);
+  /* the figures are the main site's own: its engine, read straight */
+  const last = (rows) => rows[rows.length - 1];
+  for (const s of P.spread.primary.concat(P.spread.twopp).filter((x) => x.id !== "split")) {
+    const want = E.AP.discord(s.id).filter((d) => d.sigma != null).pop(), got = last(s.m);
+    ok(Math.abs(got[1] - want.sigma) < 0.006 && Math.abs(got[2] - want.floor) < 0.006, `${s.name}: the site's spread and chance floor`);
+  }
+  for (const [key, view, onM, pub] of [["split", "split"], ["tpp-lnp-imp", "tpp", false, false], ["tpp-on-pub", "tpp", true, true], ["lnp", "lnp", true, false], ["grn", "grn", true, false]]) {
+    const story = E.AP.leanStory(view, !!onM, !!pub);
+    eq(P.leans[key].head, story.head, `${key}: the site's lean head`);
+    eq(P.leans[key].rows.length, E.AP.leanRows(E.AP.leanKey(view, !!onM, !!pub)).length, `${key}: every pollster the site lists`);
+  }
+  /* the split: One Nation's lean less the Coalition's, and its own spread */
+  const HL = E.AP.leanSeries();
+  for (const r of P.hero) eq(r.v, last(HL.split[r.h]).v, `${r.h}: the split lean`);
+  ok(P.hero.every((r, i) => !i || P.hero[i - 1].v >= r.v), "the opening panel runs widest towards One Nation first");
+  const sp = P.spread.primary.find((x) => x.id === "split"), sum = P.spread.primary.find((x) => x.id === "rd_right");
+  ok(sp && sp.m.length && last(sp.m)[2] > last(sum.m)[2], "the split's sampling floor is a difference's, wider than the sum's");
+  /* the multinomial variance of the difference, checked by hand on one poll's shares */
+  const a = 0.25, b = 0.22, F = { onp: 1, lnp: -1, alp: 0, grn: 0, oth: 0 }, shares = { alp: 28, lnp: 22, onp: 25, grn: 13, oth: 12 };
+  const e1 = Object.entries(F).reduce((t, [k, v]) => t + (shares[k] / 100) * v, 0), e2 = Object.entries(F).reduce((t, [k, v]) => t + (shares[k] / 100) * v * v, 0);
+  ok(Math.abs((e2 - e1 * e1) - (a + b - (a - b) ** 2)) < 1e-12, "the swapped table gives the difference's variance");
+  ok(P.record && P.record.parties.grn.every((r) => !r.sig || r.p < 0.05), "an election-record lean is called only when its test passes");
+  /* the words */
+  const row = (h, ...vals) => ({ h, s: vals.map((v, i) => ["2025-0" + (6 + i), v]) });
+  const six = (a, b, c) => ({ hero: [row("A", a[0], b[0], c[0]), row("B", a[1], b[1], c[1]), ...["C", "D", "E", "F"].map((h) => row(h, 0, 0, 0))] });
+  eq(splitHead(six([1, -1], [2, -2], [2, -2])), "Pollsters are further apart on the split than in June");
+  eq(splitHead(six([1, -1], [4, -4], [2.5, -1.5])), "Pollsters are further apart on the split than in June, though closer than at July’s peak");
+  eq(splitHead(six([3, -3], [2, -2], [1, -1])), "Pollsters are closer on the split than in June");
+  eq(splitHead(six([1, -1], [1, -1], [1.3, -1.1])), "Pollsters are about as far apart on the split as in June", "under a point is no change");
+  eq(splitChapeau(P), splitMonths(P).slice(-1)[0].gap.toFixed(1) + " points apart:");
+  const fake = (spl, other) => ({ siteHead: "The site’s head", spread: { primary: [{ id: "split", m: [["2026-11", ...spl]] }, { id: "p_lnp", m: [["2026-11", ...other]] }, { id: "rd_right", m: [["2026-11", 1.5, 1.5]] }] } });
+  eq(spreadHead(fake([3, 2], [2, 1.5])), "Pollsters differ most on One Nation v the Coalition", "the split leads when it is furthest beyond chance in points");
+  eq(spreadHead(fake([2.2, 2], [3, 1.5])), "The site’s head", "else the main site's");
+  eq(spreadHead(fake([2.2, 2], [1.5, 1.5])), "The site’s head", "a split within chance is never headlined");
+  ok(!spreadDek(fake([3, 2], [2, 1.5])).includes("combined"), "the combined vote is mentioned only when it too is beyond chance");
+  /* the built page */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-dis-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, "assets", "fonts"))) if (f.startsWith("commissioner")) fs.writeFileSync(path.join(tmp, "assets", "fonts", f), "");
+  fs.mkdirSync(path.join(tmp, "data"));
+  fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
+  const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).disagree, "utf8");
+  fs.rmSync(tmp, { recursive: true, force: true });
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "disagreement: every placeholder filled");
+  new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
+  ok([splitHead(P), splitDek(P), spreadHead(P), spreadDek(P), splitChapeau(P)].every((w) => built.includes(w)), "disagreement: its words are today's rules");
+  ok(!/class="pd still"/.test(built) && /class="pdl still" id="pv"/.test(built), "the opening table doesn't take the votes page's .pd styles");
+  ok(/--cy7:/.test(built), "the pollsters' line colours are defined here");
+  ok(/name="robots" content="noindex"/.test(built), "disagreement: unlisted");
+  for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html"]) ok(/href="(\.\.\/)?poll-disagreement\/">poll disagreement</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists poll disagreement`);
+}
+/* decidedness */
+{
+  const rows = new Set(JSON.parse(fs.readFileSync(path.join(A, "dawn-polls.json"), "utf8")).polls.map((p) => p.k));
+  const K = (h, released) => h.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + released;
+  const P = decidedData(A, A, { keys: rows, key: K }), D = engine(A, A).D, U = D.undecided;
+  const by = Object.fromEntries(U.series.map((x) => [x.id, x]));
+  for (const x of P.und.concat(P.soft)) { eq(x.now, by[x.id].now.v, `${x.name}: today's figure is the site's`); eq(x.m.length, by[x.id].monthly.length, `${x.name}: every month`); }
+  /* of every 100, the site's arithmetic */
+  const o = ofHundred(by.first.now.v, by.soft.now.v);
+  eq(o.und, Math.round(by.first.now.v)); eq(o.soft, Math.round((by.soft.now.v * (100 - by.first.now.v)) / 100)); eq(o.firm + o.soft + o.und, 100, "a hundred voters");
+  ok(["firm", "soft", "und"].every((k) => P.hero.now[k] === o[k]), "the opening bar ends on today");
+  ok(P.hero.months.every((m) => m.firm + m.soft + m.und === 100), "every month's bar makes a hundred");
+  eq(oneIn(6.5), "about one voter in twenty"); eq(oneInShare(27), "about one in four"); eq(oneInShare(25.4), "one in four"); eq(oneIn(5.1), "one voter in twenty");
+  /* heads on their rules */
+  const line = (id, v, sig, chg = 0) => ({ id, now: { v, since: { sig, chg, from: "2025-06" } } });
+  const FF = (a, b) => ({ now: { onp: a, alp: b } });
+  const U0 = { series: [line("first", 5, false), line("leaner", 6, false), line("tpp", 12, false), line("soft", 25, false), line("softRB", 50, false)] };
+  const st = decidedStory(U0, FF({ v: 60, ci95: 2 }, { v: 50, ci95: 2 }));
+  eq(st.head, "One voter in twenty is undecided, one in four might change their mind, and the One Nation vote is firmest");
+  eq(st.dek, "None of the five measures has moved significantly since the 2025 election.");
+  ok(!decidedStory(U0, FF({ v: 52, ci95: 3 }, { v: 50, ci95: 3 })).head.includes("firmest"), "a party is firmest only when apart from the next");
+  U0.series[3] = line("soft", 25, true, -3);
+  eq(decidedStory(U0, null).dek, "Resolve’s soft share has fallen significantly since the 2025 election.");
+  const now = (v, ci95 = 2) => ({ v, ci95 });
+  const F0 = { now: { alp: now(50), lnp: now(44), onp: now(58), grn: now(44), oth: now(35), all: now(48) }, base: { alp: now(51), lnp: now(59), onp: now(51), grn: now(45), oth: now(36), all: now(52), from: "a", to: "b" } };
+  F0.now.from = "c"; F0.now.to = "d";
+  eq(partyStory(F0).head, "Coalition voters have softened since July 2025, while One Nation voters have hardened");
+  const flat = { now: { ...F0.now }, base: { ...F0.now, from: "a", to: "b" } };
+  eq(partyStory(flat).head, "No party’s voters have softened significantly since July 2025", "nothing claimed without a change that clears");
+  const age = (a, b, c) => ({ now: { "18-34": now(a), "35-54": now(b), "55+": now(c) }, base: { "18-34": now(a), "35-54": now(b), "55+": now(c) } });
+  eq(ageStory(age(34, 27, 20)).head, "Young voters are the least firm");
+  eq(ageStory(age(29, 28, 20)).head, "Young voters are less firm than older voters");
+  eq(ageStory(age(26, 25, 24)).head, "No age group is clearly less firm than the others");
+  /* the dots open real rows */
+  const keys = P.und.concat(P.soft).flatMap((x) => x.polls.filter((q) => q[4]).map((q) => q[4]));
+  ok(keys.length > 50 && keys.every((k) => rows.has(k)), "a dot's poll is a row of the polls table");
+  /* the built page */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-dec-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, "assets", "fonts"))) if (f.startsWith("commissioner")) fs.writeFileSync(path.join(tmp, "assets", "fonts", f), "");
+  fs.mkdirSync(path.join(tmp, "data"));
+  fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
+  const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).decided, "utf8");
+  fs.rmSync(tmp, { recursive: true, force: true });
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "decidedness: every placeholder filled");
+  new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
+  const S = decidedStory(U, D.firmness);
+  ok([S.head, S.dek, partyStory(D.firmness).head, ageStory(U.softAge).head].every((w) => built.includes(w)), "decidedness: its heads are today's rules");
+  ok(/class="dc-bar"[^>]*><i[^>]*><\/i><i[^>]*><\/i><i[^>]*><\/i><\/div>/.test(built) && /\.dc-bar\{[^}]*border-radius:999px;overflow:hidden/.test(built), "the opening panel is one rounded bar: firm, soft, undecided");
+  ok(/name="robots" content="noindex"/.test(built), "decidedness: unlisted");
+  for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html", "template-disagree.html"]) ok(/href="(\.\.\/)?decidedness\/">decidedness</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists decidedness`);
 }
 /* linked from nowhere */
 {

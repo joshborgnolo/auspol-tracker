@@ -15,8 +15,10 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
+import { disagreeData } from "./disagree-data.mjs";
+import { decidedData } from "./decided-data.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -223,7 +225,53 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     markup: { cyStats: cycleStatsHtml },
     /* which terms each chart opens with brought out */
     extra: (C) => ({ lit: Object.fromEntries(["primary", "net", "ppmm", "oppr"].map((k) => [k, cycleLit(C, k)])) }) });
-  return { cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+  /* the decidedness page: the main site's Decidedness figures (decided-data.mjs); a dot opens its
+     poll where the polls page has a row for it */
+  let decidedFile = null;
+  if (fs.existsSync(path.join(assets, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"))) {
+    const source = path.join(HERE, "..", "newtracker", "assets");
+    const rows = pollsPath && fs.existsSync(pollsPath) ? new Set(JSON.parse(fs.readFileSync(pollsPath, "utf8")).polls.map((p) => p.k)) : new Set();
+    const DC = decidedData(assets, source, { keys: rows, key: (h, released) => h.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + released });
+    DC.terms = (JSON.parse(fs.readFileSync(path.join(assets, "dawn-data.json"), "utf8")).terms);
+    DC.events = D.events;
+    const words = { FONT: "/assets/fonts/" + font, asOf: esc(fdate(DC.asOf)), latestPoll: esc(latestPollLine(DC)),
+      undecidedHead: esc(DC.story.head), undecidedDek: esc(DC.story.dek), softHead: "Voters who named a party but might change their mind", softDek: "% of those who named a party calling their vote soft, as two pollsters ask it",
+      partyHead: esc(DC.party ? DC.party.head : ""), partyDek: esc(DC.party ? DC.party.dek : ""), partyNote: esc(DC.party ? DC.party.note : ""),
+      ageHead: esc(DC.age ? DC.age.head : ""), ageDek: esc(DC.age ? DC.age.dek : ""), ageNote: esc(DC.age ? DC.age.note : "") };
+    let h = fs.readFileSync(path.join(HERE, "template-decided.html"), "utf8")
+      .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "");
+    h = h.replace(/\{\{([A-Za-z]+)\}\}/g, (m, k) => (k in words ? words[k] : m))
+      .replace("/*{{CHARTWINDOWS}}*/", () => fs.readFileSync(path.join(HERE, "chart-windows.js"), "utf8"))
+      .replace("/*{{POLLMETA}}*/", () => fs.readFileSync(path.join(HERE, "poll-meta.mjs"), "utf8").replaceAll("export function", "function"))
+      .replace("{{PASTEVENTS}}", () => JSON.stringify(past).replace(/</g, "\\u003c"))
+      .replace("{{DATA}}", () => JSON.stringify(DC).replace(/</g, "\\u003c"))
+      .replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
+    const unfilled = h.match(/\{\{[A-Za-z:]+\}\}/);
+    if (unfilled) throw new Error("dawn: template-decided.html placeholder left unfilled: " + unfilled[0]);
+    fs.mkdirSync(path.join(out, "decidedness"), { recursive: true });
+    decidedFile = path.join(out, "decidedness", "index.html");
+    write(decidedFile, h);
+  }
+  /* the poll disagreement page: the main site's own figures, its engine run here (disagree-data.mjs) */
+  let disagreeFile = null;
+  if (fs.existsSync(path.join(assets, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"))) {
+    const source = path.join(HERE, "..", "newtracker", "assets");
+    const PD = disagreeData(assets, source);
+    const tmpl = fs.readFileSync(path.join(HERE, "template-disagree.html"), "utf8");
+    const words = { FONT: "/assets/fonts/" + font, chapeau: esc(splitChapeau(PD)), splitHead: esc(splitHead(PD)), splitDek: esc(splitDek(PD)), spreadHead: esc(spreadHead(PD)), spreadDek: esc(spreadDek(PD)),
+                    leansHead: esc(PD.leans["tpp-lnp-imp"].head), leansDek: esc(PD.leans["tpp-lnp-imp"].dek) };
+    let h = tmpl.replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "");
+    h = h.replace(/\{\{([A-Za-z]+)\}\}/g, (m, k) => (k in words ? words[k] : m))
+      .replace("{{PASTEVENTS}}", () => JSON.stringify(past).replace(/</g, "\\u003c"))
+      .replace("{{DATA}}", () => JSON.stringify(PD).replace(/</g, "\\u003c"))
+      .replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
+    const unfilled = h.match(/\{\{[A-Za-z:]+\}\}/);
+    if (unfilled) throw new Error("dawn: template-disagree.html placeholder left unfilled: " + unfilled[0]);
+    fs.mkdirSync(path.join(out, "poll-disagreement"), { recursive: true });
+    disagreeFile = path.join(out, "poll-disagreement", "index.html");
+    write(disagreeFile, h);
+  }
+  return { decided: decidedFile, disagree: disagreeFile, cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Poll disagreement · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+/* the hero: one row a pollster, its bar running from the others towards One Nation or the Coalition */
+.pd-chapeau{margin:clamp(10px,2vh,20px) 0 0;font:400 clamp(21px,min(6vw,3.4vh),32px)/1.15 var(--serif);color:#f6f4ff}
+.pd-chapeau b{font-weight:400}
+.pd-axis{position:relative;display:grid;grid-template-columns:var(--nw) minmax(0,1fr) 3.1em;column-gap:10px;align-items:center;margin-top:clamp(4px,1.2vh,12px);font-size:12px;color:rgb(238 238 255/.7)}
+.pd-axis .l{grid-area:1/2;justify-self:start;color:var(--h-lnp)}
+.pd-axis .r{grid-area:1/2;justify-self:end;color:var(--h-on)}
+.pd-axis .rp{grid-area:1/3;justify-self:end}
+.now{--nw:clamp(112px,34vw,170px)}
+.pdl{position:relative}
+.pd-r{display:grid;grid-template-columns:var(--nw) minmax(0,1fr) 3.1em;column-gap:10px;align-items:center;padding:clamp(3px,.75vh,8px) 0;transition:transform .34s cubic-bezier(.3,.9,.3,1),opacity .3s}
+.pdl.still .pd-r{transition:none}
+.pd-r.off{opacity:.28}
+.pd-n{min-width:0;line-height:1.22}
+.pd-n b{display:block;font-weight:600;font-size:clamp(13.5px,3.8vw,17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-n small{display:block;font-size:clamp(10.5px,2.9vw,12.5px);color:rgb(238 238 255/.62);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pd-t{position:relative;height:14px}
+.pd-t::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:rgb(238 238 255/.45)}
+.pd-t i{position:absolute;top:2px;height:10px;left:var(--l);width:var(--w);background:var(--c);border-radius:0 5px 5px 0;box-shadow:0 0 14px color-mix(in srgb,var(--c) 45%,transparent);transition:left .2s linear,width .2s linear}
+.pd-t i.neg{border-radius:5px 0 0 5px}
+.pdl.live .pd-t i{transition:none}
+.pd-v{justify-self:end;font-weight:600;font-size:clamp(16px,4.6vw,21px);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-height:660px){.pd-hero .now-d{font-size:13px}.pd-chapeau{margin-top:6px;font-size:19px}.pd-r{padding:1.5px 0}.pd-n small{font-size:10px}.pd-n b{font-size:13px}.pd-v{font-size:15px}}
+
+/* the chart panels */
+.pd-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:12px}
+.pd-key{display:inline-flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--mute)}
+.pd-key span{display:inline-flex;align-items:center;gap:6px}
+.k-line{display:inline-block;width:14px;height:2.5px;border-radius:2px;background:var(--ink)}
+.k-floor{display:inline-block;width:14px;height:10px;background:color-mix(in srgb,var(--ink) 11%,transparent);border-top:1px dashed var(--mute)}
+.pd-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:10px 22px;margin-top:12px}
+.pd-card{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.pd-card h3{margin:0;font:600 13.5px/1.25 var(--sans);color:var(--c)}
+.pd-big{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.pd-big b{font-weight:600;font-size:clamp(20px,3.6vh,30px);line-height:1.1;font-variant-numeric:tabular-nums}
+.pd-big span{font-size:12px;color:var(--mute)}
+.pd-verdict{font-size:12px;font-weight:600;color:var(--ink2);line-height:1.25}
+.pd-card .fig{flex:1 1 0;min-height:0;margin-top:2px}
+@media(max-width:599px){.pd-grid{gap:8px 16px;margin-top:8px}.pd-card h3{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pd-big{gap:5px}.pd-big b{font-size:19px}.pd-big span{font-size:11px}.pd-verdict{font-size:11px}#spread .pd-key{font-size:11.5px}#spread .pd-ctl{margin-top:8px;gap:6px}#spread .dek{font-size:13.5px}#spread-src{font-size:11.5px}.pd-more{display:none}}
+@media(min-width:900px){.pd-grid{--cols:3}.pd-grid[data-v=twopp]{--cols:4}}
+@media(max-height:700px) and (max-width:899px){.pd-big span,.pd-verdict{font-size:11px}.pd-card h3{font-size:12px}}
+
+.pd-tabs{display:flex;gap:4px;margin-top:12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule);touch-action:pan-x pan-y}
+.pd-tabs::-webkit-scrollbar{display:none}
+/* the row runs on past a phone's edge: the fade says so */
+@media(max-width:599px){.pd-tabs{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);padding-right:30px}}
+.pd-tabs button{flex:none;font:500 14px/1 var(--sans);color:var(--ink2);background:none;border:0;border-bottom:2px solid transparent;padding:9px 11px;cursor:pointer}
+.pd-tabs button[aria-selected=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+.pd-sub{min-height:34px;margin-top:8px}
+.pd-sub [hidden]{display:none}
+.pd-sub .rival-toggle{min-height:32px}
+.pd-lhead,.pd-rows li{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 3.4em;column-gap:12px;align-items:center}
+.pd-lhead{margin-top:8px;font-size:12px;color:var(--mute);border-bottom:1px solid var(--rule);padding-bottom:4px}
+.pd-lhead>span:nth-child(3){justify-self:end}
+.pd-scale{display:flex;justify-content:space-between;gap:8px}
+.pd-scale b{font-weight:600;white-space:nowrap}
+.pd-since{display:none}
+.pd-rows{list-style:none;margin:0;padding:0;flex:0 1 auto;min-height:0;display:flex;flex-direction:column}
+.pd-rows li{flex:0 1 52px;min-height:26px;border-bottom:1px solid var(--rule)}
+.pd-nm{min-width:0;line-height:1.2}
+.pd-nm b{display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-nm small{font-size:11.5px;color:var(--mute);white-space:nowrap}
+.pd-bar{position:relative;height:12px}
+.pd-bar::before{content:"";position:absolute;left:50%;top:-5px;bottom:-5px;width:1.5px;background:var(--rule2)}
+.pd-bar i{position:absolute;top:0;height:12px;border-radius:2px;background:var(--c)}
+.pd-val{justify-self:end;font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.pd-spark{display:none;height:34px}
+.pd-spark svg{display:block;width:100%;height:100%;overflow:visible}
+@media(min-width:900px){.pd-lhead,.pd-rows li{grid-template-columns:minmax(0,13em) minmax(0,1.1fr) 4em minmax(0,1fr);column-gap:22px}.pd-since,.pd-spark{display:block}}
+@media(max-height:700px){.pd-rows li{min-height:22px}.pd-nm small{display:none}.pdp .src{font-size:11.5px}}
+@media(max-width:599px){.pdp .src{font-size:12px}}
+:root{--cy0:#cf3a2f;--cy1:#7e52a8;--cy2:#10998d;--cy3:#b9770a;--cy4:#2a5cb4;--cy5:#b0306b;--cy6:#4f7d1f;--cy7:#7a5230}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--cy0:#ff6a5c;--cy1:#b892e0;--cy2:#35c3b5;--cy3:#e0a33a;--cy4:#7aa2ff;--cy5:#e66aa2;--cy6:#8fc25a;--cy7:#c49a73}}
+:root[data-theme=dark]{--cy0:#ff6a5c;--cy1:#b892e0;--cy2:#35c3b5;--cy3:#e0a33a;--cy4:#7aa2ff;--cy5:#e66aa2;--cy6:#8fc25a;--cy7:#c49a73}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
+    <li><a href="../past-cycles/">past cycles</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><a href="#top" aria-current="page">poll disagreement</a></li>
+    <li><a href="../decidedness/">decidedness</a></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero pd-hero" id="top" aria-label="Poll disagreement">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1 class="sr">auspol tracker: how much the polls disagree</h1>
+    <h2>Poll disagreement</h2>
+    <p class="now-d">The polls’ biggest quarrel is how the right’s vote splits. Each bar is a pollster’s usual lean on One Nation’s lead over the Coalition, set against the others polling at the same time, <span id="now-date">now</span>.</p>
+    <p class="pd-chapeau"><b id="pd-gap">{{chapeau}}</b></p>
+    <div class="pd-axis"><span class="l" aria-hidden="true">◀ Coalition</span><span class="r" aria-hidden="true">One Nation ▶</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay month by month"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
+    <div class="pdl still" id="pv" role="table" aria-label="Each pollster’s lean on One Nation’s lead over the Coalition, points"></div>
+  </div>
+</section>
+
+<section class="sec" id="split" data-sec="disagree" aria-labelledby="split-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes pdp">
+    <header class="hd"><h2 id="split-h">{{splitHead}}</h2><p class="dek">{{splitDek}}</p></header>
+    <div class="fig" id="split-fig"><div class="tip" aria-live="polite"></div><svg id="split-svg" tabindex="0" aria-label="Line chart of each pollster’s lean on One Nation’s lead over the Coalition, month by month. Up and down arrows move between pollsters."></svg></div>
+    <p class="src" id="split-src">Above the dashed line a pollster puts One Nation further ahead of the Coalition than the others polling then; below it, further behind. Each lean is the model’s estimate at mid-month, an estimate with doubt of its own: gaps of under a point say little. Pollsters with no standing lean (fewer than three polls, or none lately) are left off.</p>
+    <div class="sr"><table id="split-table"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="spread" data-sec="disagree" aria-labelledby="spread-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes pdp">
+    <header class="hd"><h2 id="spread-h">{{spreadHead}}</h2><p class="dek">{{spreadDek}}</p></header>
+    <div class="pd-ctl"><div class="seg" role="radiogroup" aria-label="Measure"><button type="button" role="radio" aria-checked="true" data-sv="primary">Primary vote</button><button type="button" role="radio" aria-checked="false" data-sv="twopp">Two-party</button></div>
+      <span class="pd-key"><span><i class="k-line"></i>Typical distance of a poll from the estimate, points</span><span><i class="k-floor"></i>Chance alone</span></span></div>
+    <div class="pd-grid" id="spread-grid"></div>
+    <p class="src" id="spread-src">Month by month, recent polls counting most. Under 1.2 times chance is within chance; 1.2 to 1.6 a little beyond; 1.6 or more well beyond. Under 0.8 would mean pollsters sat closer together than their samples allow. <span class="pd-more">The main site’s Poll disagreement figures, plus the split, measured the same way.</span></p>
+  </div>
+</section>
+
+<section class="sec" id="leans" data-sec="disagree" aria-labelledby="leans-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes pdp">
+    <header class="hd"><h2 id="leans-h">{{leansHead}}</h2><p class="dek" id="leans-dek">{{leansDek}}</p></header>
+    <div class="pd-tabs" role="tablist" aria-label="Measure" id="lean-tabs"></div>
+    <div class="pd-ctl pd-sub">
+      <button type="button" class="rival-toggle" id="lean-rival" data-r="lnp">Coalition</button>
+      <button type="button" class="chk" role="checkbox" aria-checked="false" id="lean-pub"><i></i>Published figures</button>
+      <button type="button" class="pbtn" id="lean-base">Against other pollsters ⇄</button>
+    </div>
+    <div class="pd-lhead" aria-hidden="true"><span></span><span class="pd-scale"><b id="lean-neg"></b><b id="lean-pos"></b></span><span>Now</span><span class="pd-since" id="lean-since">Since the election</span></div>
+    <ol class="pd-rows" id="lean-rows"></ol>
+    <p class="src" id="leans-src"></p>
+  </div>
+</section>
+</main>
+
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const DATA=JSON.parse($('#dawn-data').textContent);
+
+/*{{SHARED:sky}}*/
+
+/*{{SHARED:dates}}*/
+/*{{SHARED:format}}*/
+const MON3=ym=>MON[+ym.slice(5,7)-1],ymWords=ym=>MONF[+ym.slice(5,7)-1]+' '+ym.slice(0,4);
+const signed=v=>Math.abs(v)<.05?'0.0':sgn(v);
+const HERO=DATA.hero;
+const YMS=[...new Set(HERO.flatMap(r=>r.s.map(d=>d[0])))].sort();
+const FIRST=Math.max(0,YMS.findIndex(ym=>HERO.filter(r=>r.s.some(d=>d[0]===ym)).length>=Math.min(6,HERO.length)));
+const MONTHSET=YMS.slice(FIRST),LASTM=MONTHSET.length-1;
+const at=(r,ym)=>{const d=r.s.find(q=>q[0]===ym);return d?d[1]:null};
+
+/* ---------- the hero: each pollster's lean on the split, replayed month by month ---------- */
+const pv=$('#pv');
+const BM=Math.ceil(Math.max(...HERO.flatMap(r=>r.s.map(d=>Math.abs(d[1]))))+.2);
+pv.innerHTML=HERO.map(r=>`<div class="pd-r" role="row" data-h="${esc(r.h)}"><span class="pd-n" role="rowheader"><b>${esc(r.h)}</b><small>${r.poll?`latest: ON ${r.poll.on}, L/NP ${r.poll.lnp}`:''}</small></span><span class="pd-t" aria-hidden="true"><i></i></span><span class="pd-v" role="cell"><span class="sr"></span><b aria-hidden="true" style="font-weight:inherit"></b></span></div>`).join('');
+const rowEls=Object.fromEntries($$('.pd-r',pv).map(e=>[e.dataset.h,e]));
+/* values in a month, or between two (the replay) */
+const shown={};
+function paintRows(){
+  for(const r of HERO){const e=rowEls[r.h],v=shown[r.h],bar=$('.pd-t i',e),off=v==null;
+    e.classList.toggle('off',off);
+    const w=off?0:Math.min(50,Math.abs(v)/BM*50),neg=!off&&v<0;
+    bar.style.setProperty('--l',(neg?50-w:50)+'%');bar.style.setProperty('--w',w+'%');bar.style.setProperty('--c',neg?'var(--h-lnp)':'var(--h-on)');bar.classList.toggle('neg',neg);
+    $('.pd-v b',e).textContent=off?'–':Math.abs(v).toFixed(1);
+    $('.pd-v .sr',e).textContent=off?'not yet read':Math.abs(v).toFixed(1)+' points towards '+(neg?'the Coalition':'One Nation');}
+  const vals=Object.values(shown).filter(v=>v!=null);
+  $('#pd-gap').textContent=vals.length?(Math.max(...vals)-Math.min(...vals)).toFixed(1)+' points apart:':'';
+}
+const valsAt=i=>Object.fromEntries(HERO.map(r=>[r.h,at(r,MONTHSET[i])]));
+/* rows hold today's order through a replay: pollsters trading places would hide how they fan out */
+const nowDate=$('#now-date');
+const setDate=i=>{nowDate.textContent=i===LASTM?'now':'in '+ymWords(MONTHSET[i])};
+Object.assign(shown,valsAt(LASTM));paintRows();setDate(LASTM);pv.offsetHeight;pv.classList.remove('still');
+const rpBtn=$('#replay'),STEP=reduce?250:420;let rpRaf=0;
+function finish(){pv.classList.remove('live');Object.assign(shown,valsAt(LASTM));paintRows();setDate(LASTM);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay month by month');paintNow()}
+rpBtn.addEventListener('click',e=>{
+  e.stopPropagation();if(rpOn){cancelAnimationFrame(rpRaf);finish();return}
+  rpOn=true;rpBtn.setAttribute('aria-pressed','true');rpBtn.setAttribute('aria-label','Stop the replay');pv.classList.add('live');
+  const f0=dayFrac(),T=LASTM*STEP;let t0=null,last=-1;
+  const step=ts=>{
+    if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/T),fi=t*LASTM,i0=Math.min(LASTM,Math.floor(fi)),i1=Math.min(LASTM,i0+1),u=reduce?0:fi-i0,A=valsAt(i0),B=valsAt(i1);
+    for(const r of HERO){const a=A[r.h],b=B[r.h];shown[r.h]=a==null?(u>.5?b:null):b==null?a:a+(b-a)*u}
+    paintRows();const j=Math.round(fi);if(j!==last){setDate(j);last=j}
+    if(!reduce)paintCycle(f0+2*t);
+    if(t<1)rpRaf=requestAnimationFrame(step);else finish();
+  };
+  rpRaf=requestAnimationFrame(step);
+});
+
+/* ---------- the split, month by month: one line a pollster ---------- */
+const HCOL=Object.fromEntries(HERO.map((r,i)=>[r.h,`var(--cy${i%8})`]));
+function splitChart(){
+  const fig=$('#split-fig'),svg=$('#split-svg'),tip=$('.tip',fig);let L=null,hover=null;
+  const step=2,Y1=Math.ceil(Math.max(...HERO.flatMap(r=>r.s.map(d=>d[1])),1)/step)*step,Y0=Math.floor(Math.min(...HERO.flatMap(r=>r.s.map(d=>d[1])),-1)/step)*step;
+  function draw(){
+    const W=fig.clientWidth,H=fig.clientHeight;if(!W||!H)return;
+    const narrow=W<560,ticks=[];for(let v=Y0;v<=Y1+1e-9;v+=step)ticks.push(v);
+    const tl=ticks.map(v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0');
+    const ML=Math.ceil(Math.max(...tl.map(s=>tw(s,'13px'))))+8;
+    const short=h=>narrow?h.replace('/Accent','').replace(' Strategy',''):h;
+    const MR=Math.ceil(Math.max(...HERO.map(r=>tw(short(r.h)+(narrow?'':'  +0.0'),'600 12px'))))+14;
+    const MT=40,MB=24,PW=W-ML-MR,PH=H-MT-MB,x=i=>ML+PW*i/Math.max(1,LASTM),y=v=>MT+PH*(Y1-v)/(Y1-Y0);
+    const pts=r=>MONTHSET.map((ym,i)=>({i,v:at(r,ym)})).filter(p=>p.v!=null);
+    const path=r=>curve(pts(r).map(p=>[x(p.i),y(p.v)]));
+    let s='';
+    ticks.forEach((v,i)=>{const yy=Math.round(y(v))+.5;s+=`<line x1="${ML}" x2="${ML+PW}" y1="${yy}" y2="${yy}" stroke="${v===0?'var(--rule2)':'var(--rule)'}"${v===0?' stroke-dasharray="3 3"':''}/><text x="${ML-8}" y="${yy}" dy=".35em" text-anchor="end">${tl[i]}</text>`});
+    let lastR=-1e9;MONTHSET.forEach((ym,i)=>{const mo=+ym.slice(5,7),lab=(i===0||mo===1)?MON3(ym)+' ’'+ym.slice(2,4):MON3(ym);if(!(i===0||i===LASTM||mo===1||mo%3===1))return;const w=tw(lab,'13px'),L0=Math.max(ML-2,Math.min(W-w-2,x(i)-w/2));if(L0<lastR+12)return;lastR=L0+w;s+=`<text x="${P1(L0+w/2)}" y="${H-5}" text-anchor="middle">${lab}</text>`});
+    for(const r of HERO)s+=`<path d="${path(r)}" fill="none" style="stroke:${HCOL[r.h]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" data-h="${esc(r.h)}"/>`;
+    const ends=HERO.map(r=>{const p=pts(r).slice(-1)[0];return {r,p,y0:y(p.v)}});relax(ends,narrow?14:16,MT+4,MT+PH-4);
+    for(const q of ends){const ex=x(q.p.i),lx=ML+PW+9;
+      s+=`<circle cx="${P1(ex)}" cy="${P1(y(q.p.v))}" r="3.5" style="fill:${HCOL[q.r.h]}" stroke="var(--bg)" stroke-width="1.5"/>`;
+      if(Math.abs(q.y-q.y0)>3)s+=`<path d="M${P1(ex+4)} ${P1(q.y0)}L${P1(lx-3)} ${P1(q.y)}" fill="none" style="stroke:${HCOL[q.r.h]}" stroke-opacity=".55"/>`;
+      s+=`<text x="${P1(lx)}" y="${P1(q.y)}" dy=".35em" class="ab" style="fill:${HCOL[q.r.h]}">${esc(short(q.r.h))}${narrow?'':'  '+signed(q.p.v)}</text>`}
+    s+='<g class="scrub"></g>';svg.innerHTML=s;
+    L={W,H,ML,PW,MT,PH,x,y,path,pts,sg:$('.scrub',svg)};
+    if(hover)show(hover.h,hover.i);else idle();
+  }
+  const setTip=(h,cls)=>{tip.className='tip'+(cls?' '+cls:'');tip.style.maxWidth=(L.W-L.ML)+'px';tip.style.whiteSpace='normal';tip.innerHTML=h;tip.style.left=P1(L.ML)+'px'};
+  function idle(){if(!L)return;L.sg.innerHTML='';$$('path[data-h]',svg).forEach(p=>p.style.strokeOpacity='');setTip((matchMedia('(pointer:coarse)').matches?'Tap':'Point at')+' a line to read it','idle')}
+  function show(h,i){
+    const r=HERO.find(q=>q.h===h);if(!r||!L)return;const have=L.pts(r),p=have.reduce((a,b)=>Math.abs(b.i-i)<Math.abs(a.i-i)?b:a);hover={h,i:p.i};
+    $$('path[data-h]',svg).forEach(e=>e.style.strokeOpacity=e.dataset.h===h?'':'.2');
+    L.sg.innerHTML=`<path d="${L.path(r)}" fill="none" style="stroke:${HCOL[h]}" stroke-width="3.8" stroke-linecap="round"/><circle cx="${P1(L.x(p.i))}" cy="${P1(L.y(p.v))}" r="4.5" fill="var(--bg)" style="stroke:${HCOL[h]}" stroke-width="2"/>`;
+    const d=r.s.find(q=>q[0]===MONTHSET[p.i]);
+    setTip(`<b>${esc(h)}</b> · ${ymWords(MONTHSET[p.i])}: <b>${Math.abs(p.v).toFixed(1)}</b> to ${p.v<0?'the Coalition':'One Nation'}${d&&d.length>2?` (One Nation ${signed(d[2])}, Coalition ${signed(d[3])})`:''}`);
+  }
+  function hit(cx,cy,reach){const b=svg.getBoundingClientRect(),px=cx-b.left,py=cy-b.top,fi=Math.max(0,Math.min(LASTM,(px-L.ML)/L.PW*LASTM)),i0=Math.floor(fi),i1=Math.min(LASTM,i0+1),u=fi-i0;let best=null,bd=reach;
+    for(const r of HERO){const a=at(r,MONTHSET[i0]),z=at(r,MONTHSET[i1]);if(a==null&&z==null)continue;const v=a==null?z:z==null?a:a+(z-a)*u,d=Math.abs(L.y(v)-py);if(d<bd){bd=d;best=r.h}}
+    return best?[best,Math.round(fi)]:null}
+  const clear=()=>{hover=null;idle()};
+  svg.addEventListener('pointermove',e=>{if(!L||(e.pointerType!=='mouse'&&!e.buttons))return;const h=hit(e.clientX,e.clientY,18);if(h)show(h[0],h[1]);else if(e.pointerType==='mouse')clear()});
+  svg.addEventListener('pointerdown',e=>{if(!L)return;const h=hit(e.clientX,e.clientY,26);if(h)show(h[0],h[1]);else clear()});
+  svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')clear()});
+  svg.addEventListener('keydown',e=>{if(!L)return;const k=e.key,order=[...HERO].sort((a,b)=>b.v-a.v),ci=hover?order.findIndex(r=>r.h===hover.h):-1,m=hover?hover.i:LASTM;
+    if(k==='ArrowUp'||k==='ArrowDown'){e.preventDefault();show(order[Math.max(0,Math.min(order.length-1,ci+(k==='ArrowUp'?-1:1)))].h,m)}
+    else if((k==='ArrowLeft'||k==='ArrowRight')&&hover){e.preventDefault();show(hover.h,Math.max(0,Math.min(LASTM,m+(k==='ArrowLeft'?-1:1))))}
+    else if(k==='Escape')clear()});
+  new ResizeObserver(draw).observe(fig);
+  $('#split-table').innerHTML='<caption>Lean on One Nation’s lead over the Coalition, points</caption><tr><th>Month</th>'+HERO.map(r=>`<th>${esc(r.h)}</th>`).join('')+'</tr>'+MONTHSET.map(ym=>`<tr><td>${ymWords(ym)}</td>${HERO.map(r=>`<td>${at(r,ym)==null?'':signed(at(r,ym))}</td>`).join('')}</tr>`).join('');
+  return {draw};
+}
+
+/* ---------- spread against chance, small multiples ---------- */
+const verdict=R=>R<.8?'Tighter than chance':R<1.2?'Within chance':R<1.6?'A little beyond chance':'Well beyond chance';
+function spreadPanel(){
+  const grid=$('#spread-grid');let view='primary',charts=[];
+  function paint(){
+    const set=DATA.spread[view],yMax=Math.max(3,...set.flatMap(s=>s.m.flatMap(d=>[Math.ceil(d[1]),Math.ceil(d[2])])));
+    const yms=[...new Set(set.flatMap(s=>s.m.map(d=>d[0])))].sort();
+    grid.dataset.v=view;
+    grid.innerHTML=set.map((s,i)=>{const l=s.m[s.m.length-1],R=l?l[1]/l[2]:null;return `<div class="pd-card" style="--c:${s.color}"><h3>${esc(s.name)}</h3>${l?`<div class="pd-big"><b>${f1(l[1])}</b><span>chance ${f1(l[2])} · ${R.toFixed(1)}×</span></div><span class="pd-verdict">${verdict(R)}</span>`:'<span class="pd-verdict">Too few polls</span>'}<div class="fig"><svg data-i="${i}" role="img" aria-label="${esc(s.name)}${l?`: polls sit a typical ${f1(l[1])} points from the estimate, against ${f1(l[2])} from chance`:''}"></svg></div></div>`}).join('');
+    charts=$$('svg',grid).map(svg=>{const s=set[+svg.dataset.i],fig=svg.parentNode;
+      const draw=()=>{const W=fig.clientWidth,H=fig.clientHeight;if(!W||!H||!s.m.length)return;const x0=2,x1=W-6,top=4,bot=H-16,X=ym=>x0+yms.indexOf(ym)/Math.max(1,yms.length-1)*(x1-x0),Y=v=>bot-Math.min(v,yMax)/yMax*(bot-top);
+        const fl=s.m.map(d=>[X(d[0]),Y(d[2])]),ln=s.m.map(d=>[X(d[0]),Y(d[1])]),e=s.m[s.m.length-1];
+        let o='';for(let v=1;v<yMax;v++)o+=`<line x1="${x0}" x2="${x1}" y1="${P1(Y(v))}" y2="${P1(Y(v))}" stroke="var(--rule)"/>`;
+        o+=`<path d="M${P1(fl[0][0])} ${bot}${curve(fl,false)}L${P1(fl[fl.length-1][0])} ${bot}Z" style="fill:var(--ink);fill-opacity:.09"/><path d="${curve(fl)}" fill="none" stroke="var(--mute)" stroke-dasharray="3 3"/><line x1="${x0}" x2="${x1}" y1="${bot}" y2="${bot}" stroke="var(--rule2)"/><path d="${curve(ln)}" fill="none" style="stroke:${s.color}" stroke-width="2.4"${s.dash?' stroke-dasharray="5 3"':''} stroke-linecap="round"/><circle cx="${P1(X(e[0]))}" cy="${P1(Y(e[1]))}" r="3.2" style="fill:${s.color}"/>`;
+        o+=`<text x="${x0}" y="${H-3}" style="font-size:10.5px">${MON3(yms[0])} ’${yms[0].slice(2,4)}</text><text x="${x1}" y="${H-3}" text-anchor="end" style="font-size:10.5px">${MON3(yms[yms.length-1])}</text><text x="${x0}" y="${P1(Y(yMax)+9)}" style="font-size:10.5px">${yMax} pts</text><g class="hv"></g>`;
+        svg.innerHTML=o;
+        const hv=$('.hv',svg),read=cx=>{const b=svg.getBoundingClientRect(),px=cx-b.left;const d=s.m.reduce((a,c)=>Math.abs(X(c[0])-px)<Math.abs(X(a[0])-px)?c:a);const anchor=X(d[0])>W/2?'end':'start',tx=X(d[0])+(anchor==='end'?-6:6);
+          hv.innerHTML=`<line x1="${P1(X(d[0]))}" x2="${P1(X(d[0]))}" y1="${top}" y2="${bot}" stroke="var(--ink)" stroke-opacity=".35"/><circle cx="${P1(X(d[0]))}" cy="${P1(Y(d[1]))}" r="3.5" style="fill:${s.color}"/><text x="${P1(tx)}" y="${top+10}" text-anchor="${anchor}" class="dt" style="font-size:11px">${MON3(d[0])}: ${f1(d[1])} v ${f1(d[2])}</text>`};
+        svg.onpointermove=ev=>{if(ev.pointerType==='mouse'||ev.buttons)read(ev.clientX)};svg.onpointerdown=ev=>read(ev.clientX);svg.onpointerleave=ev=>{if(ev.pointerType==='mouse')hv.innerHTML=''};
+      };
+      new ResizeObserver(draw).observe(fig);return {draw}});
+  }
+  $$('#spread [data-sv]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.sv;$$('#spread [data-sv]').forEach(x=>x.setAttribute('aria-checked',String(x===b)));paint()}));
+  paint();
+  return {draw:()=>charts.forEach(c=>c.draw())};
+}
+
+/* ---------- how each pollster leans, a measure at a time ---------- */
+const PNAME={tpp:'Two-party',alp:'Labor',lnp:'Coalition',onp:'One Nation',grn:'Greens',oth:'Others'};
+const PCOL={alp:'var(--alp)',lnp:'var(--lnp)',onp:'var(--on)',on:'var(--on)',grn:'var(--grn)',oth:'var(--oth)'};
+const SITE_FROM=DATA.record?DATA.record.from:null;
+function leansPanel(){
+  let view='tpp',rival='lnp',pub=false,base='pack';
+  const tabs=$('#lean-tabs'),list=$('#lean-rows');
+  tabs.innerHTML=['tpp',...DATA.order].map(k=>`<button type="button" role="tab" data-k="${k}" aria-selected="${k===view}">${PNAME[k]}</button>`).join('');
+  /* the election reading's head, the main site's rule (rd-allpolls elStory) */
+  function recordStory(k,rows){
+    const whose={alp:'Labor’s',lnp:'the Coalition’s',onp:'One Nation’s',grn:'the Greens’',oth:'the others’'}[k],pts=v=>f1(Math.abs(v))+' point'+(f1(Math.abs(v))==='1.0'?'':'s'),els=n=>n+' election'+(n===1?'':'s'),way=v=>v>0?'above':'below';
+    const withRec=rows.filter(r=>r.n),few=rows.filter(r=>r.n<3).length;
+    const fewTail=!few?'':few===rows.length?' None of the pollsters here has three elections on record for it, the fewest a lean can be tested on.':` ${few} of the ${rows.length} pollsters here ${few===1?'has':'have'} fewer than three elections on record for it, too few to test.`;
+    if(!withRec.length)return {head:'No pollster here has a final poll on record for '+whose+' vote',dek:''};
+    const sig=rows.filter(r=>r.sig).sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
+    if(sig.length){const a=sig[0],rest=sig.slice(1);return {head:`${a.h} has put ${whose} vote ${way(a.v)} the result, by ${pts(a.v)} on average across ${els(a.n)}`,dek:(rest.length?(rest.length===1?'The only other lean clear of chance is ':'The other leans clear of chance: ')+rest.map(r=>`${r.h}’s, ${pts(r.v)} ${way(r.v)} across ${els(r.n)}`).join('; ')+'.':'No other pollster’s record on it is clear of chance.')+fewTail}}
+    const pool=withRec.filter(r=>r.p!=null),top=[...(pool.length?pool:withRec)].sort((a,b)=>Math.abs(b.v)-Math.abs(a.v))[0];
+    return {head:`No pollster’s record shows a lean on ${whose} vote beyond chance`,dek:(pool.length?`Of those with three elections or more, ${top.h} has been furthest off on average, ${pts(top.v)} ${way(top.v)} the result across ${els(top.n)}, within what its election-to-election misses allow.`:`${top.h} has been furthest off on average, ${pts(top.v)} ${way(top.v)} the result across ${els(top.n)}.`)+fewTail};
+  }
+  function paint(){
+    const tpp=view==='tpp',elect=!tpp&&base==='election'&&!!DATA.record;
+    const reading=tpp?DATA.leans[`tpp-${rival}-${pub?'pub':'imp'}`]:DATA.leans[view];
+    const rows=elect?DATA.record.parties[view]:reading.rows;
+    const story=elect?recordStory(view,rows):reading;
+    $('#leans-h').textContent=story.head||'How each pollster leans';$('#leans-dek').textContent=story.dek||'';
+    const rb=$('#lean-rival'),pb=$('#lean-pub'),bb=$('#lean-base');
+    rb.hidden=pb.hidden=!tpp;bb.hidden=tpp||!DATA.record;
+    rb.dataset.r=rival;rb.textContent=rival==='on'?'One Nation':'Coalition';rb.setAttribute('aria-label','Labor against '+rb.textContent+'; switch the rival');
+    pb.setAttribute('aria-checked',String(pub));
+    bb.textContent=(elect?'Against election results':'Against other pollsters')+' ⇄';
+    const posC=tpp?PCOL.alp:PCOL[view],negC=tpp?PCOL[rival]:PCOL[view];
+    $('#lean-neg').textContent=tpp?'◀ to '+(rival==='on'?'One Nation':'the Coalition'):'◀ lower';$('#lean-neg').style.color=negC;
+    $('#lean-pos').textContent=tpp?'to Labor ▶':'higher ▶';$('#lean-pos').style.color=posC;
+    $('#lean-since').textContent=elect?'Miss at each election since '+SITE_FROM:'Since the election';
+    const max=Math.max(1.2,...rows.filter(r=>r.n||!elect).map(r=>Math.abs(r.v))),smax=Math.max(1,...rows.flatMap(r=>r.s.map(d=>Math.abs(d[1]))));
+    list.innerHTML=rows.map(r=>{
+      const none=elect&&!r.n,v=r.v,w=Math.min(50,Math.abs(v)/max*50),col=v<0?negC:posC;
+      let sp='';
+      if(r.s.length){const H=34,W=200,y=q=>H/2-Math.max(-smax,Math.min(smax,q))/smax*(H/2-3);
+        if(elect){const yrs=DATA.record.years.map(Number),x=q=>4+(q-yrs[0])/Math.max(1,yrs[yrs.length-1]-yrs[0])*(W-8);
+          sp=r.s.map(d=>`<path d="M${P1(x(d[0]))} ${H/2}V${P1(y(d[1]))}" stroke="var(--ink2)" fill="none" vector-effect="non-scaling-stroke"/><path d="M${P1(x(d[0]))} ${P1(y(d[1]))}h0" style="stroke:${posC}" stroke-width="6" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>${d[0]}: final poll ${f1(d[2])}, result ${f1(d[3])}</title></path>`).join('')}
+        else{const ms=YMS,x=q=>4+Math.max(0,ms.indexOf(q))/Math.max(1,ms.length-1)*(W-10),pts=r.s.map(d=>[x(d[0]),y(d[1])]),e=pts[pts.length-1];
+          sp=pts.length>1?`<path d="${curve(pts)}" fill="none" stroke="var(--ink2)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`:'';sp+=`<path d="M${P1(e[0])} ${P1(e[1])}h0" style="stroke:${col}" stroke-width="7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`}
+        sp=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="M0 ${H/2}H${W}" stroke="var(--rule2)" stroke-dasharray="2 3" fill="none"/>${sp}</svg>`}
+      const words=none?'no record':Math.abs(v)<.05?'level':f1(Math.abs(v))+' points '+(tpp?'towards '+(v>0?'Labor':rival==='on'?'One Nation':'the Coalition'):v>0?'higher':'lower')+(elect?' than the result, on average':' than the others');
+      return `<li><span class="pd-nm"><b>${esc(r.h)}</b><small>${elect?(r.n?r.n+' election'+(r.n===1?'':'s')+(r.sig?' · clear of chance':''):'no final poll on record'):r.n+' polls'}</small></span><span class="pd-bar" role="img" aria-label="${words}">${none||Math.abs(v)<.05?'':`<i style="--c:${col};left:${v<0?50-w:50}%;width:${w}%"></i>`}</span><span class="pd-val" style="color:${none||Math.abs(v)<.05?'var(--mute)':col}">${none?'–':signed(v)}</span><span class="pd-spark">${sp}</span></li>`}).join('');
+    $('#leans-src').textContent=elect
+      ?'Each pollster’s final poll before each federal election since '+SITE_FROM+' that it polled, against the count; the figure is its mean miss. A lean is called clear of chance by a t-test on those misses, corrected for testing several pollsters at once (Holm), with at least three elections.'
+      :'A pollster’s lean is its usual gap to the others polling at the same time, which the site’s estimates take out. '+(tpp?(pub?'Published figures carry each pollster’s own way of handing out preferences.':'Every poll is read through the same preference flows, so these are differences in primary votes.'):'Pollsters with fewer than three polls, or none lately, are left off.');
+  }
+  tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.k;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x===b)));b.scrollIntoView({block:'nearest',inline:'nearest'});paint()});
+  $('#lean-rival').addEventListener('click',()=>{rival=rival==='lnp'?'on':'lnp';paint()});
+  $('#lean-pub').addEventListener('click',()=>{pub=!pub;paint()});
+  $('#lean-base').addEventListener('click',()=>{base=base==='pack'?'election':'pack';paint()});
+  paint();
+}
+
+const split=splitChart(),spreads=spreadPanel();leansPanel();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{split.draw();spreads.draw()});
+
+/*{{SHARED:nav}}*/
+}
+</script>
+</body>
+</html>

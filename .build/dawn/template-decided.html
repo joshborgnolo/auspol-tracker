@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Decidedness · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+:root{--dec-once:#7e3f7a;--dec-leaner:#a57708;--dec-pref:var(--ink);--dec-resolve:#0f8a8c;--dec-redbridge:#75707f;--h-firm:#f4f1ea;--h-soft:#8d93c9;--h-und:#eab14a}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--dec-once:#d08ccb;--dec-leaner:#dfae3c;--dec-resolve:#33c2c4;--dec-redbridge:#a8a3b6}}
+:root[data-theme=dark]{--dec-once:#d08ccb;--dec-leaner:#dfae3c;--dec-resolve:#33c2c4;--dec-redbridge:#a8a3b6}
+/* of every 100 voters: three figures over one rounded bar */
+.dc-chapeau{margin:clamp(14px,2.8vh,28px) 0 0;font:400 clamp(21px,min(6vw,3.4vh),32px)/1.15 var(--serif);color:#f6f4ff}
+.dc-figs{display:grid;grid-template-columns:1.5fr 1fr 1fr;align-items:end;gap:10px;margin-top:clamp(6px,1.4vh,14px)}
+.dc-f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dc-f:nth-child(2){align-items:center;text-align:center}
+.dc-f:nth-child(3){align-items:flex-end;text-align:right}
+.dc-k{display:flex;align-items:center;gap:7px;font-size:clamp(14px,4.1vw,18px);font-weight:500;white-space:nowrap}
+.dc-k::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.dc-v{font-weight:600;font-size:clamp(46px,min(15vw,9vh),84px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dc-bar{display:flex;height:clamp(18px,3.2vh,28px);margin-top:clamp(12px,2.2vh,22px);border-radius:999px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.14),0 4px 22px rgb(4 10 40/.35)}
+.dc-bar i{display:block;flex:0 0 auto;width:var(--w);transition:width .25s linear;background:var(--c)}
+.dc-bar i:last-child{flex:1 1 0}
+.dc.live .dc-bar i{transition:none}
+.dc-move{display:flex;justify-content:flex-end;margin:8px 0 0;font-size:clamp(13.5px,3.8vw,16px);font-weight:600;color:#fff}
+.dc-move span{border-top:1px solid rgb(238 238 255/.55);padding-top:5px;text-align:right;width:var(--mw);min-width:max-content}
+.dc-defs{list-style:none;margin:clamp(8px,1.8vh,18px) 0 0;padding:0;display:grid;gap:4px;font-size:clamp(13px,3.6vw,15px);line-height:1.35;color:rgb(238 238 255/.8)}
+.dc-defs b{color:#fff;font-weight:600}
+@media(max-height:660px){.dc-hero .now-d{font-size:13px}.dc-chapeau{margin-top:8px;font-size:19px}.dc-defs{display:none}.dc-v{font-size:44px}}
+.dcp .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
+@media (min-width:900px){.dcp .ctl{margin-top:16px}.dcp .fig{margin-top:8px}}
+/* where each line stands today, over its chart */
+.dc-reads{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:8px;font-size:13.5px;color:var(--ink2)}
+.dc-reads span{display:inline-flex;align-items:baseline;gap:6px}
+.dc-reads i{align-self:center;width:14px;height:3px;border-radius:2px;background:var(--c)}
+.dc-reads b{font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+.dc-reads small{color:var(--mute);font-size:12px}
+/* mid-2025 to now, a row a group: a ring for then, a dot for now */
+.sp{flex:0 1 auto;margin-top:14px;display:flex;flex-direction:column;min-height:0}
+.sp-r{display:grid;grid-template-columns:minmax(0,7.6em) minmax(0,1fr) 3.4em 3.6em;column-gap:10px;align-items:center;border-bottom:1px solid var(--rule);flex:0 1 64px;min-height:40px}
+.sp-h{flex:none;min-height:0;font-size:12px;color:var(--mute);padding-bottom:4px}
+.sp-h span:nth-child(n+3){justify-self:end}
+.sp-n{font-weight:600;font-size:14.5px;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-t{position:relative;height:100%;min-height:30px}
+.sp-t i,.sp-t s,.sp-t u{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.sp-t u{left:var(--x);width:0;height:100%;border-left:1px dashed var(--rule2)}
+.sp-t s{height:2px;transform:translateY(-50%);left:var(--a);width:var(--w);background:var(--c);opacity:.5}
+.sp-t i{width:12px;height:12px;border-radius:50%;left:var(--x);background:var(--c)}
+.sp-t i.was{background:var(--bg);border:2px solid var(--c)}
+.sp-v{justify-self:end;font-weight:600;font-size:16px;font-variant-numeric:tabular-nums}
+.sp-d{justify-self:end;font-size:13.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.sp-d.sig{color:var(--ink);font-weight:700}
+.sp-key{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:12.5px;color:var(--mute)}
+.sp-key span{display:inline-flex;align-items:center;gap:6px}
+.sp-key i{width:11px;height:11px;border-radius:50%;background:var(--ink2)}
+.sp-key i.was{background:var(--bg);border:2px solid var(--ink2)}
+@media(min-width:900px){.sp-r{grid-template-columns:minmax(0,11em) minmax(0,1fr) 4em 4em;column-gap:22px}.sp-n{font-size:16px}}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
+    <li><a href="../past-cycles/">past cycles</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><a href="../poll-disagreement/">poll disagreement</a></li>
+    <li><a href="#top" aria-current="page">decidedness</a></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero dc-hero" id="top" aria-label="Decidedness">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1 class="sr">auspol tracker: how decided voters are</h1>
+    <h2>Decidedness</h2>
+    <p class="now-d">How settled voters are at <span id="now-date">{{asOf}}</span>: who has named a party and means it, who might change, and who can’t yet say. <span id="now-latest">{{latestPoll}}</span></p>
+    <p class="dc-chapeau">Of every 100 voters:</p>
+    <div class="pv-h"><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay month by month"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
+    <div class="dc" id="pv">
+      <div class="dc-figs">
+        <div class="dc-f" style="--c:var(--h-firm)"><span class="dc-k">Firm</span><span class="dc-v" data-k="firm"></span></div>
+        <div class="dc-f" style="--c:var(--h-soft)"><span class="dc-k">Soft</span><span class="dc-v" data-k="soft"></span></div>
+        <div class="dc-f" style="--c:var(--h-und)"><span class="dc-k">Undecided</span><span class="dc-v" data-k="und"></span></div>
+      </div>
+      <div class="dc-bar" id="dc-bar" role="img"><i style="--c:var(--h-firm)"></i><i style="--c:var(--h-soft)"></i><i style="--c:var(--h-und)"></i></div>
+      <p class="dc-move"><span id="dc-move"></span></p>
+      <ul class="dc-defs"><li><b>Firm:</b> named a party and don’t expect to change</li><li><b>Soft:</b> named a party but might change</li><li><b>Undecided:</b> can’t say who they’d vote for</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="undecided" data-sec="decided" aria-labelledby="undecided-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes dcp">
+    <header class="hd"><h2 id="undecided-h">{{undecidedHead}}</h2><p class="dek">{{undecidedDek}}</p></header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="dc-reads" id="undecided-reads"></div>
+    <div class="fig" id="undecided-fig"><div class="tip" aria-live="polite"></div><svg id="undecided-svg" tabindex="0" aria-label="Line chart of the share of voters who are undecided, on three questions. Use the left and right arrow keys to read values."></svg></div>
+    <p class="src" id="undecided-src"></p>
+    <div class="sr"><table id="undecided-table"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="soft" data-sec="decided" aria-labelledby="soft-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes dcp">
+    <header class="hd"><h2 id="soft-h">{{softHead}}</h2><p class="dek">{{softDek}}</p></header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="dc-reads" id="soft-reads"></div>
+    <div class="fig" id="soft-fig"><div class="tip" aria-live="polite"></div><svg id="soft-svg" tabindex="0" aria-label="Line chart of the share of voters naming a party who call their vote soft. Use the left and right arrow keys to read values."></svg></div>
+    <p class="src" id="soft-src"></p>
+    <div class="sr"><table id="soft-table"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="party" data-sec="decided" aria-labelledby="party-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes dcp">
+    <header class="hd"><h2 id="party-h">{{partyHead}}</h2><p class="dek">{{partyDek}}</p></header>
+    <div class="sp" id="party-plot" role="table"></div>
+    <div class="sp-key"><span><i class="was"></i><em id="party-was" style="font-style:normal"></em></span><span><i></i><em id="party-is" style="font-style:normal"></em></span><span><b>Bold change: significant</b></span></div>
+    <p class="src" id="party-src">{{partyNote}}</p>
+  </div>
+</section>
+
+<section class="sec" id="age" data-sec="decided" aria-labelledby="age-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes dcp">
+    <header class="hd"><h2 id="age-h">{{ageHead}}</h2><p class="dek">{{ageDek}}</p></header>
+    <div class="sp" id="age-plot" role="table"></div>
+    <div class="sp-key"><span><i class="was"></i><em id="age-was" style="font-style:normal"></em></span><span><i></i><em id="age-is" style="font-style:normal"></em></span><span><b>Bold change: significant</b></span></div>
+    <p class="src" id="age-src">{{ageNote}}</p>
+  </div>
+</section>
+
+</main>
+
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+/*{{POLLMETA}}*/
+const DATA=JSON.parse($('#dawn-data').textContent);
+const paintLatestPoll=()=>{$('#now-latest').textContent=latestPollLine(DATA)};
+paintLatestPoll();setInterval(paintLatestPoll,60000);
+
+/*{{SHARED:sky}}*/
+
+/* ---------- the data: the main site's Decidedness figures ---------- */
+/*{{SHARED:dates}}*/
+const ELX=isoX(DATA.election.date),NOWX=isoX(DATA.asOf),YR=+DATA.asOf.slice(0,4);
+const EVENTS=DATA.events.map(e=>({...e,x:isoX(e.d)}));
+const ALL_TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].e):null}));
+const FIRSTX=Math.min(...[...DATA.undPast,...DATA.softPast].map(s=>s.m[0]?s.m[0][0]:ELX),...DATA.undPastPolls.map(p=>p[0]),ELX);
+const TERMS=ALL_TERMS.filter(t=>t.b==null||t.b>FIRSTX);
+const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
+const HIST={terms:[{a:0}]},PVSEL=new Set();
+const ymWords=ym=>MONF[+ym.slice(5,7)-1]+' '+ym.slice(0,4);
+
+/*{{SHARED:window}}*/
+/*{{CHARTWINDOWS}}*/
+
+const POLLS_HREF='../polls/';
+/*{{SHARED:chart}}*/
+
+/*{{SHARED:events}}*/
+
+/* ---------- the opening bar: of every 100 voters, month by month ---------- */
+/*{{SHARED:odometer}}*/
+const MONTHS_=DATA.hero.months,LAST=MONTHS_.length-1;
+const pv=$('#pv'),KEYS3=['firm','soft','und'];
+const FIG=Object.fromEntries(KEYS3.map(k=>[k,$(`.dc-v[data-k="${k}"]`)]));
+KEYS3.forEach(k=>{FIG[k].innerHTML='<span class="sr"></span><b aria-hidden="true" style="font-weight:inherit"></b>'});
+const ROLL=Object.fromEntries(KEYS3.map(k=>{const b=$('b',FIG[k]);mkRoll(b,[{a:[' ',...'123456789']},{a:[...'0123456789']}]);return [k,b]}));
+const bar=$('#dc-bar'),segs3=[...bar.children];
+function paintBar(v,instant){
+  /* whole voters, so the three always make a hundred */
+  const u=Math.round(v.und),s=Math.round(v.soft),w={und:u,soft:s,firm:100-u-s};
+  KEYS3.forEach((k,i)=>{const t=String(w[k]).padStart(2,' ');rollTo(ROLL[k],[t[0],t[1]],instant);$('.sr',FIG[k]).textContent=String(w[k]);segs3[i].style.setProperty('--w',v[k]+'%')});
+  const m=$('#dc-move');m.textContent=`${u+s} in 100 could still move`;m.style.setProperty('--mw',(u+s)+'%');
+  bar.setAttribute('aria-label',`Of every 100 voters, about ${w.firm} are firm, ${s} soft and ${u} undecided`);
+}
+const nowDate=$('#now-date');
+const setDate=i=>{nowDate.textContent=i===LAST?fdate(DATA.asOf):'mid-'+ymWords(MONTHS_[i].ym)};
+paintBar(MONTHS_[LAST],true);setDate(LAST);
+const rpBtn=$('#replay'),STEP=reduce?250:420;let rpRaf=0;
+function finish(){pv.classList.remove('live');paintBar(MONTHS_[LAST]);setDate(LAST);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay month by month');paintNow()}
+rpBtn.addEventListener('click',e=>{
+  e.stopPropagation();if(rpOn){cancelAnimationFrame(rpRaf);finish();return}
+  rpOn=true;rpBtn.setAttribute('aria-pressed','true');rpBtn.setAttribute('aria-label','Stop the replay');pv.classList.add('live');
+  const f0=dayFrac(),T=LAST*STEP;let t0=null,last=-1;
+  const step=ts=>{
+    if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/T),fi=t*LAST,i0=Math.min(LAST,Math.floor(fi)),i1=Math.min(LAST,i0+1),u=reduce?0:fi-i0,A=MONTHS_[i0],B=MONTHS_[i1];
+    paintBar(Object.fromEntries(KEYS3.map(k=>[k,A[k]+(B[k]-A[k])*u])));
+    const j=Math.round(fi);if(j!==last){setDate(j);last=j}
+    if(!reduce)paintCycle(f0+2*t);
+    if(t<1)rpRaf=requestAnimationFrame(step);else finish();
+  };
+  rpRaf=requestAnimationFrame(step);
+});
+
+/* ---------- the two charts over time ---------- */
+const LONG=12;
+function lineScene(spec,narrow){
+  const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
+  const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
+  const S={x0,x1,ys:5,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[],direct:true,tick:v=>v?v+'%':'0'};
+  const dots=span<=4.6,stops=new Map(),memo=new Map();
+  const stop=(x,label,item)=>{const k=x.toFixed(2);if(!stops.has(k))stops.set(k,{x,label,sub:'',items:[]});stops.get(k).items.push(item)};
+  const addPolls=(rows,colorOf,nameOf)=>{for(const q of rows){if(q[0]<x0||q[0]>x1)continue;const key=q[2]+'|'+q[3];
+    if(!memo.has(key))memo.set(key,{who:q[2],when:q[3],n:'',k:q[4]&&q[4].includes('-')?q[4]:undefined});
+    S.dots.push({x:q[0],y:q[1],color:colorOf(q),poll:memo.get(key),txt:nameOf(q)+' '+f1(q[1])})}};
+  const draw=(s,past)=>{
+    const pts=s.m.filter(q=>q[0]>=x0-.05&&q[0]<=x1+.05).map(q=>({x:q[0],y:q[1],lo:q[2],hi:q[3],ym:q[4]}));
+    if(pts.length<2)return;
+    if(!long)S.bands.push({color:s.color,pts,smooth:true});
+    S.lines.push({color:s.color,pts,smooth:true,w:long?1.3:2.3,thin:long});
+    for(const p of pts){if(p.x<x0-1e-6||p.x>x1+1e-6)continue;stop(p.x,ymWords(p.ym),{color:s.color,tc:s.color,y:p.y,v:p.y,txt:spec.short(s.id)+' '+f1(p.y)})}
+  };
+  if(!curOnly)for(const s of spec.past)draw(s,true);
+  if(cur)for(const s of spec.lines){draw(s);const last=s.m[s.m.length-1];S.ends.push({color:s.color,y:last[1],name:spec.short(s.id),abbr:spec.abbr(s.id),v:last[1]});S.endX=Math.max(S.endX||0,last[0])}
+  if(!ctxFits(S))S.ends=[];
+  if(dots){
+    if(cur)for(const s of spec.lines)addPolls(s.polls.filter(q=>q[0]>=CUR.a-.01),()=>s.color,()=>spec.short(s.id));
+    if(!curOnly)addPolls(spec.pastPolls,q=>spec.colorOf(q[4]),q=>spec.short(q[4]));
+  }
+  for(const t of stops.values())t.items.sort((p,q)=>q.v-p.v);
+  S.stops=[...stops.values()].sort((p,q)=>p.x-q.x);
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  const ys=[...S.lines.flatMap(l=>l.pts.filter(p=>p.x>=x0-.05&&p.x<=x1+.05).map(p=>p.y)),...S.bands.flatMap(q=>q.pts.filter(p=>p.x>=x0&&p.x<=x1).map(p=>p.hi)),...S.dots.map(d=>d.y)];
+  const hi=Math.max(...ys,10);S.ys=hi>40?10:5;S.y0=0;S.y1=Math.ceil((hi-.3)/S.ys)*S.ys;
+  return S;
+}
+const ctxFits=S=>S.ends.length>0;
+const COLOURS=Object.fromEntries([...DATA.und,...DATA.soft,...DATA.undPast,...DATA.softPast].map(s=>[s.id,s.color]));
+const SHORT={first:'Asked once',leaner:'Follow-up',tpp:'Preferences',soft:'Resolve',softRB:'RedBridge'},AB={first:'Once',leaner:'Follow-up',tpp:'Pref.',soft:'Resolve',softRB:'RedBridge'};
+const SPEC={
+  undecided:{lines:DATA.und,past:DATA.undPast,pastPolls:DATA.undPastPolls,colorOf:b=>COLOURS[b],short:id=>SHORT[id],abbr:id=>AB[id]},
+  soft:{lines:DATA.soft,past:DATA.softPast,pastPolls:DATA.softPastPolls,colorOf:b=>COLOURS[b],short:id=>SHORT[id],abbr:id=>AB[id]},
+};
+$('#undecided-reads').innerHTML=DATA.und.map(s=>`<span style="--c:${s.color}"><i></i>${esc(s.name)} <b>${f1(s.now)}%</b><small>±${f1(s.ci)}</small></span>`).join('');
+$('#soft-reads').innerHTML=DATA.soft.map(s=>`<span style="--c:${s.color}"><i></i>${esc(s.name)} <b>${f1(s.now)}%</b><small>±${f1(s.ci)}</small></span>`).join('');
+const listOf=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+function noteFor(id,c){
+  useWindow(c);const [a,b]=winRange(WIN),cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', shaded with its 95% interval':'';
+  let s='Each line is a model of the polls asking one question'+bands+'.';
+  if(id==='undecided'){s+=' Shares of all voters.';
+    if(cur)s+=' Asked once: '+listOf(DATA.und[0].houses)+'. After a follow-up on which way they lean: '+listOf(DATA.und[1].houses)+'. After preferences (between Labor and the Coalition): '+listOf(DATA.und[2].houses)+'.';
+    const g=DATA.gaps[0];if(cur&&g)s+=' '+g.an+' runs '+f1(Math.abs(g.v))+' points '+(g.v>=0?'above':'below')+' '+g.bn.toLowerCase()+', '+(g.sig?'a significant gap':'not a significant gap')+'.'}
+  else s+=' Shares of those who named a party. Resolve and RedBridge ask different questions with different answers to choose from, so compare each line with itself, not with the other.';
+  if(dots)s+=' Dots are polls'+(cur?'; tap one to open it':'')+'.';
+  $('#'+id+'-src').textContent=s;
+}
+const charts=['undecided','soft'].map(id=>{const spec=SPEC[id],lo=Math.min(...spec.past.map(s=>s.m[0]?s.m[0][0]:ELX),...spec.pastPolls.map(p=>p[0]),ELX);
+  const c={};const w=windowedChart({section:$('#'+id),lo,src:()=>{if(c.w)noteFor(id,c.w)},make:use=>chart({fig:$('#'+id+'-fig'),svg:$('#'+id+'-svg'),scene:n=>lineScene(spec,n),use})});
+  c.w=w;noteFor(id,w);
+  $('#'+id+'-table').innerHTML='<caption>This term, %</caption><tr><th>Month</th>'+spec.lines.map(s=>`<th>${esc(s.name)}</th>`).join('')+'</tr>'+spec.lines[0].m.map((q,i)=>`<tr><td>${ymWords(q[4])}</td>${spec.lines.map(s=>`<td>${s.m[i]?f1(s.m[i][1]):''}</td>`).join('')}</tr>`).join('');
+  return w.chart});
+
+/* ---------- mid-2025 to now, a row a group ---------- */
+function shiftPlot(id,rows,all,colorOf,was,is,title){
+  const vals=rows.flatMap(r=>[r.now,r.base]).concat(all!=null?[all]:[]),lo=Math.max(0,Math.floor((Math.min(...vals)-3)/10)*10),hi=Math.ceil((Math.max(...vals)+3)/10)*10,X=v=>(v-lo)/(hi-lo)*100;
+  $('#'+id+'-plot').setAttribute('aria-label',title);
+  $('#'+id+'-plot').innerHTML=`<div class="sp-r sp-h" role="row"><span></span><span>${lo}% to ${hi}%${all!=null?' · dashed: all voters, '+f1(all)+'%':''}</span><span>Now</span><span>Change</span></div>`+rows.map(r=>{
+    const d=r.now-r.base;
+    return `<div class="sp-r" role="row" style="--c:${colorOf(r.id)}"><span class="sp-n" role="rowheader">${esc(r.label)}</span><span class="sp-t" role="img" aria-label="from ${f1(r.base)}% to ${f1(r.now)}%">${all!=null?`<u style="--x:${X(all)}%"></u>`:''}<s style="--a:${Math.min(X(r.base),X(r.now))}%;--w:${Math.abs(X(r.now)-X(r.base))}%"></s><i class="was" style="--x:${X(r.base)}%"></i><i style="--x:${X(r.now)}%"></i></span><span class="sp-v" role="cell">${f1(r.now)}%</span><span class="sp-d${r.sig?' sig':''}" role="cell">${sgn(d)}${r.sig?'<span class="sr"> significant</span>':''}</span></div>`}).join('');
+  $('#'+id+'-was').textContent=was;$('#'+id+'-is').textContent=is;
+}
+if(DATA.party)shiftPlot('party',DATA.party.rows,DATA.party.all,k=>k==='oth'?'var(--oth)':k==='onp'?'var(--on)':`var(--${k})`,'Mid-2025 ('+DATA.party.from+')','Now ('+DATA.party.to+')','Share of each party’s voters calling their vote solid');else $('#party').remove();
+if(DATA.age)shiftPlot('age',DATA.age.rows,DATA.soft[0].now,()=>'var(--dec-resolve)','Mid-2025','Now','Share of each age group calling their vote soft');else $('#age').remove();
+
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
+
+/*{{SHARED:nav}}*/
+}
+</script>
+</body>
+</html>
