@@ -256,12 +256,13 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const C = copyFor(D0);
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
   ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
+  ok(html.includes(".flow-match h3{margin:0 0 10px;font:500 19.5px var(--sans);color:var(--mute)}") && html.includes(".flow-phone-title{margin:0 0 10px;font:500 19.5px var(--sans)}"), "the Sankey margin heading is 1.5× its former 13px size on both layouts");
   ok(html.includes(".votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}") && html.includes(".votes .ctl .opts{margin-top:0;flex-shrink:0}"), "the time window and chart filters share a wrapping row");
   ok(/<div class="pick"><span class="pl">Taking&nbsp;<\/span><button[^>]+id="pv-btn"[^>]*><b id="pv-name">all pollsters<\/b><\/button>/.test(html), "Taking is a separate prefix, not text inside the pollster button");
   ok(html.includes('label:"all pollsters"'), "the first pollster menu option uses lowercase all pollsters");
   ok(html.includes('<option value="">all voters</option>') && !html.includes('<option value="">All voters</option>'), "the all-voters option is sentence case");
   ok(html.includes('value="${esc(gl)}">${esc(dawnOptionLabel(gl))}</option>'), "menu labels are formatted separately from canonical option values");
-  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>'), "both party names in the margin keep their own colours");
+  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('<span data-party="${RIV}" style="color:var(--${RIV})">${RIV===\'lnp\'?\'the \':\'\'}${FNAME[RIV]}</span>'), "both party names in the margin keep their own colours, including the Coalition's article");
   ok(html.includes("color:var(--${lead>0?'alp':RIV})") && html.includes("header.style.color='var(--mute)'"), "only the signed lead follows the winner, with neutral connecting words");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
