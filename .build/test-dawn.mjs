@@ -239,7 +239,12 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/if\(i0===0&&iS<=1\)\{const c=EST\[k\]\[0\]\.m;pts\.push\(\{x:ELX,y:c\}\)/.test(html) && /const open=\(c,a,band\)=>c==='lnp'&&cnt0!=null/.test(html), "this term's primary and Labor v Coalition lines open on the 2025 count");
   ok(/<clipPath id="\$\{cid\}"><rect x="\$\{ML\}" y="\$\{MT-8\}" width="\$\{PW\}"/.test(html), "lines and bands clip at the plot's edges");
   ok(!html.includes("cursor:crosshair"), "chart hover has no crosshair cursor");
-  ok(html.includes('svg .vv{font-family:var(--sans);font-style:normal;fill:var(--mute)}') && html.includes('.vs .v{font-family:var(--sans);font-style:normal;color:var(--mute);font-size:.8em}'), "both v separators use upright Commissioner");
+  ok(html.includes('svg .vv{font-family:var(--sans);font-style:normal;fill:var(--mute)}'), "the chart's v separators use upright Commissioner");
+  ok(!html.includes("data-duel") && /<div class="ctl">\s*<button type="button" class="rival-toggle" role="switch"[^>]*>Coalition<\/button>/.test(html), "wide screens switch the 2PP contest with the phone's pill, not a text toggle");
+  ok(/\.rival-toggle\{[^}]*padding:4px 7px;[^}]*font:500 12px/.test(html), "the contest pill is small enough for One Nation beside the heading");
+  const polls = fs.readFileSync(path.join(path.dirname(r.file), "polls/index.html"), "utf8");
+  ok(/<label class="pick"><span class="pl">Taking&nbsp;<\/span><select id="house">/.test(polls) && /\.pick\{position:relative/.test(polls), "the polls page's pollster menu reads like the chart's and opens under its button");
+  ok(polls.includes('<option value="">all pollsters</option>') && !/Every pollster|\(\$\{n\}\)/.test(polls), "the polls page's pollster menu carries no counts");
   ok(html.includes("const MT=TIPH+EVH+(evs.length&&!narrow?8:0)"), "eight extra pixels after desktop event labels, and only there");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
   ok(!!scale, "the primaries chart's y-axis rule is in the page");

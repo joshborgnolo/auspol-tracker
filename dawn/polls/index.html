@@ -69,6 +69,8 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 @media (pointer:coarse){.search input{font-size:16px}}
 .search svg{position:absolute;left:12px;top:11px;width:14px;height:14px;color:var(--mute)}
 .pick select{font:500 14px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:36px;padding:0 32px 0 14px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 16px) 16px,calc(100% - 11px) 16px;background-size:5px 5px;background-repeat:no-repeat;max-width:100%}
+.pick{position:relative;display:inline-flex;align-items:center}
+.pick .pl{color:var(--mute);font-weight:500;font-size:13.5px}
 .seg{display:inline-flex;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .seg button{font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 12px;height:30px;cursor:pointer;white-space:nowrap}
 .seg button[aria-checked=true]{background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--rule),0 1px 2px rgb(20 10 40/.08)}
@@ -246,14 +248,14 @@ body[data-f=confidence] #list{grid-template-columns:minmax(150px,max-content) mi
   <div class="wrap">
     <header class="hd">
       <nav class="sub" aria-label="Polls"><a href="./" aria-current="page">All polls</a><a href="../next/">Next expected</a></nav>
-      <h1>Federal opinion polls</h1>
+      <h1>230 polls since the May 2025 election</h1>
       <p class="dek">From 16 pollsters, newest first, each as printed. Open a poll for its details and the model’s figures for the same week.</p>
     </header>
     <div class="tabs" role="tablist" aria-label="Facet" id="tabs"></div>
     <p class="fdek" id="fdek" hidden></p>
     <div class="ctl">
       <label class="search"><span class="sr">Search</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search a pollster, a date or a figure" autocomplete="off" enterkeyhint="search"></label>
-      <label class="pick"><span class="sr">Pollster</span><select id="house"></select></label>
+      <label class="pick"><span class="pl">Taking&nbsp;</span><select id="house"></select></label>
       <div class="seg fopt" role="radiogroup" aria-label="Contest" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-c="lnp">v Coalition</button><button type="button" role="radio" aria-checked="false" data-c="on">v One Nation</button></div>
       <div class="seg fopt" role="radiogroup" aria-label="Two-party basis" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-b="imp">Implied</button><button type="button" role="radio" aria-checked="false" data-b="pub">Published</button></div>
       <label class="pick fopt" data-for="demographics"><span class="sr">Split by</span><select id="split"></select></label>
@@ -562,7 +564,7 @@ const tabs=$('#tabs'),sel=$('#house'),q=$('#q'),splitSel=$('#split');
 tabs.innerHTML=Object.entries(FACETS).map(([id,f])=>`<button type="button" role="tab" aria-selected="${id===F}" data-f="${id}">${f.label}</button>`).join('');
 splitSel.innerHTML=SPLITS.map(s=>`<option value="${s.id}">Split by ${s.label.toLowerCase()}</option>`).join('');
 function houses(rows){const c=new Map();rows.forEach(p=>c.set(p.h,(c.get(p.h)||0)+1));return [...c].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))}
-function fillHouses(){const fa=FACETS[F],rows=fa.rows(),cur=sel.value;sel.innerHTML=`<option value="">Every pollster (${rows.length})</option>`+houses(rows).map(([h,n])=>`<option value="${esc(h)}">${esc(h)} (${n})</option>`).join('');sel.value=houses(rows).some(([h])=>h===cur)?cur:''}
+function fillHouses(){const fa=FACETS[F],rows=fa.rows(),cur=sel.value;sel.innerHTML=`<option value="">all pollsters</option>`+houses(rows).map(([h])=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');sel.value=houses(rows).some(([h])=>h===cur)?cur:''}
 /* search: a pollster, its client, a date in any of the ways it is written, or a figure */
 const hayOf=p=>[p.h,p.c||'',p.f||'',fdate(p.d),fday(p.d),MONF[+p.d.slice(5,7)-1]+' '+p.d.slice(0,4),p.d,FACETS[F].hay(p)].join(' ').toLowerCase();
 function render(){

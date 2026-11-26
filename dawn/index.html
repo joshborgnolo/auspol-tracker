@@ -161,17 +161,6 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .dim .rb{fill-opacity:.08}
 .dim .rb.on{fill-opacity:calc(var(--rib) + .22)}
 #flow-svg{touch-action:pan-y;cursor:default}
-.vs{position:relative;display:inline-flex;align-items:baseline;gap:10px;font:400 clamp(20px,5.6vw,24px)/1 var(--serif);color:var(--ink);padding-bottom:9px}
-.vs .bar,.vs .mebar{position:absolute;bottom:0;left:0;height:4px;border-radius:2px}
-.vs .mebar{background:var(--alp)}
-.vs .v{font-family:var(--sans);font-style:normal;color:var(--mute);font-size:.8em}
-.vs .or{color:var(--rule2)}
-.vs button{font:inherit;color:var(--mute);background:none;border:0;padding:10px 0;margin:-10px 0;cursor:pointer;transition:color .35s}
-.vs button:hover{color:var(--ink2)}
-.vs button[aria-checked=true]{color:var(--ink)}
-.vs .bar{width:0;background:var(--lnp);transition:transform .5s cubic-bezier(.3,1.25,.5,1),width .5s cubic-bezier(.3,1.25,.5,1),background-color .5s}
-.vs[data-r=on] .bar{background:var(--on)}
-@media (prefers-reduced-motion:reduce){.vs .bar{transition:none}}
 .note{margin:6px 0 0;font-size:13.5px;line-height:1.4;color:var(--ink2);text-wrap:pretty}
 .src{margin:5px 0 0;font-size:13px;line-height:1.4;color:var(--mute);text-wrap:pretty}
 
@@ -206,7 +195,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .pbtn{padding:0 12px;display:inline-flex;align-items:center;gap:5px}
 .pbtn span,.pick .pl{color:var(--mute);font-weight:500;font-size:13.5px}
 .pick select{width:9.6em;text-overflow:ellipsis}
-.pbtn b{font-weight:600}
+.pbtn b{font-weight:500}
 .pick select:disabled,.pbtn:disabled{opacity:.45;cursor:default}
 .votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
 .votes .ctl .opts{margin-top:0;flex-shrink:0}
@@ -240,14 +229,14 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[hidden]{display:none}
 .tgl b{font-weight:500}.tgl em{font-style:normal}
 .tgl-ph:not([hidden]){display:none}
-.rival-toggle{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 13px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
-.rival-toggle::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.rival-toggle{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 12px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
+.rival-toggle::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
 .rival-toggle[data-r=on]{color:var(--on)}
 .rival-toggle[data-r=lnp]{background:color-mix(in srgb,var(--lnp) 10%,var(--bg))}
 .rival-toggle[data-r=on]{background:color-mix(in srgb,var(--on) 12%,var(--bg))}
 #tpp-rival-toggle{display:none}
 @media(max-width:899px){
-  #flows .hd,.tpp .hd{flex-wrap:wrap;align-items:baseline;gap:8px 12px}
+  #flows .hd,.tpp .hd{flex-wrap:wrap;align-items:baseline;gap:8px}
   #flows .hd{display:flex}
   .tpp .hd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
   #flows .hd .dek{order:3;flex-basis:100%}
@@ -423,13 +412,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
       <p class="dek">Labor’s 2PP against One Nation has plunged from 63% in June 2025 to 51% now; against the Coalition, from 57% to 50%. Since July the two contests have run within a point of each other.</p>
     </header>
     <div class="ctl">
-      <div class="vs" data-duel role="radiogroup" aria-label="Contest: Labor against">
-        <span class="me">Labor</span><span class="v">v</span>
-        <button type="button" role="radio" aria-checked="true" data-r="lnp">Coalition</button>
-        <span class="or" aria-hidden="true">/</span>
-        <button type="button" role="radio" aria-checked="false" data-r="on">One Nation</button>
-        <span class="mebar" aria-hidden="true"></span><span class="bar" aria-hidden="true"></span>
-      </div>
+      <button type="button" class="rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button>
     </div>
     <div class="ctl ctl2"><div class="win" data-win aria-label="Time window" role="group"></div>
       <div class="opts"><button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button></div></div>
@@ -1902,27 +1885,17 @@ function drawFlows(){
   $('#flow-ctl').hidden=wide;$('#flow-fig').hidden=wide;$('#flow-pair').hidden=!wide;
   if(wide){sankey('lnp',$('#flow-lnp'),$('#flow-svg-lnp'));sankey('on',$('#flow-on'),$('#flow-svg-on'))}
   else sankey();
-  slideAll();flowNote();flowSrc();
+  flowNote();flowSrc();
 }
 new ResizeObserver(drawFlows).observe($('#flows'));
 /* the contest: one choice for both lead pages */
-const duels=$$('[data-duel]');
-function slideAll(){duels.forEach(duel=>{if(duel.hidden)return;const me=$('.me',duel),mb=$('.mebar',duel),thumb=$('.bar',duel);mb.style.width=me.offsetWidth+'px';mb.style.transform=`translateX(${me.offsetLeft}px)`;const b=$(`button[data-r="${RIV}"]`,duel);thumb.style.width=b.offsetWidth+'px';thumb.style.transform=`translateX(${b.offsetLeft}px)`})}
 function setRiv(r){
   $$('.rival-toggle').forEach(toggle=>{toggle.dataset.r=r;toggle.textContent=FNAME[r];
     toggle.setAttribute('aria-checked',String(r==='on'));toggle.setAttribute('aria-label',r==='lnp'?'Switch to One Nation':'Switch to Coalition')});
-  RIV=r;duels.forEach(duel=>{duel.dataset.r=r;$$('button',duel).forEach(x=>x.setAttribute('aria-checked',String(x.dataset.r===r)))});drawFlows();paintKeys();tppSrc();tpp.clear();tpp.draw()
+  RIV=r;drawFlows();paintKeys();tppSrc();tpp.clear();tpp.draw()
 }
 $$('.rival-toggle').forEach(toggle=>toggle.addEventListener('click',()=>setRiv(RIV==='lnp'?'on':'lnp')));
-duels.forEach(duel=>{
-  duel.dataset.r=RIV;
-  $$('button',duel).forEach(b=>{
-    b.addEventListener('click',()=>setRiv(b.dataset.r));
-    b.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();setRiv(RIV==='lnp'?'on':'lnp');$(`button[data-r="${RIV}"]`,duel).focus()}});
-  });
-  new ResizeObserver(slideAll).observe(duel);
-});
-slideAll();flowNote();flowSrc();paintKeys();tppSrc();
+flowNote();flowSrc();paintKeys();tppSrc();
 
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{charts.forEach(c=>c.draw());drawFlows()});
 /* the past terms arrive once the page is idle, so a step back never waits */
