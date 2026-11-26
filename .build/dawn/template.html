@@ -217,12 +217,11 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .votes .ctl .opts{margin-top:0;flex-shrink:0}
 /* on a phone the options give way and wrap, or the past terms' switch runs off the screen */
 @media (max-width:899px){.votes .ctl .opts{flex-shrink:1;max-width:100%}}
-/* and on a narrow one the past terms' switch costs the chart no row: the pickers drop their lead words
-   ("All pollsters" says what "Pollsters All" said) and the switch says one word; on the two-party chart
-   it takes the place of the two comparisons, which only this term has */
+/* on a narrow one the pickers wrap, retaining their lead words, and the past-terms
+   switch says one word; on the two-party chart it takes the place of the two comparisons */
 @media (max-width:599px){
 .votes .opts{gap:8px}
-.votes .pick .pl,.votes .pbtn>span:not(.fd-text){display:none}
+.votes .pbtn>span:not(.fd-text){display:none}
 .votes .pbtn.counted b::after{content:" pollsters"}
 .votes .pick .fd-trigger,.votes .pbtn{padding-left:12px;padding-right:8px;gap:4px}
 .tgl em{display:none}
@@ -385,10 +384,10 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div>
       <div class="opts">
         <label class="pick"><span class="pl">Among&nbsp;</span><select id="grp-sel"></select></label>
-        <div class="pick"><span class="pl">Take&nbsp;</span><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
-        <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button>
+        <div class="pick"><span class="pl">Taking&nbsp;</span><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
       </div></div>
     <div class="fig" id="votes-fig"><div class="tip" aria-live="polite"></div><svg id="votes-svg" tabindex="0" aria-label="Line chart of the estimated first-preference vote by party. Use the left and right arrow keys to read values week by week."></svg></div>
+    <div class="keys"><button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button></div>
     <p class="src" id="votes-src">Dots are polls; lines are the model’s weekly estimates, each pollster’s lean taken out, with 95% bands. Rings are the 2025 count. Tap a dot for its poll, a number for its event.</p>
     <div class="sr"><table id="votes-table"></table></div>
   </div>
