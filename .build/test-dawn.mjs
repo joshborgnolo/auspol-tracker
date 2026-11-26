@@ -266,7 +266,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(primaryYMax([59.76]), 60, "July 1975's measured peak leaves the All-view axis at 60, not 70");
   eq(primaryYMax([59.32]), 60, "the inferred support peak uses the same axis");
   eq(primaryYMax([60.01]), 70, "a reading actually above 60 still reaches the next rung");
-  ok(/id="pv-whisker-mode" role="switch" aria-checked="false"/.test(html) && html.includes("Show change on May 2025") && html.includes("Show 95% credible intervals"), "the primary whisker switch names its two meanings");
+  ok(/class="flip" id="pv-whisker-mode"/.test(html) && !/id="pv-whisker-mode"[^>]*role="switch"/.test(html) && html.includes("Change since May 2025</span> <span aria-hidden=\"true\">⇄") && html.includes("'95% credible intervals'"), "the primary whisker flip names the reading shown and swaps with ⇄");
   ok(html.includes("rangeLabel.textContent=ciMode?'intervals':'since 2025'"), "interval mode replaces the replay's since-2025 label");
   ok(html.includes(".pb s.ci::before{content:") && html.includes(".pb s.ci>b{position:absolute") && html.includes("<s><b></b></s>"), "intervals carry caps at both ends and a central mean marker");
   ok(html.includes(".pb s.ci::after{left:auto;right:-.75px;top:-3.25px;height:8px") && html.includes(".pb s.ci>b{position:absolute;top:-5.25px;") && html.includes("width:1.5px;height:12px"), "interval end caps stay shorter than the central marker");
