@@ -409,8 +409,8 @@ const FACETS={
       LEAD.forEach(([k,nm,c])=>{const n=netOf(p,k);cells.push(`<span class="f"><i>${nm}</i><b style="--c:var(--${c})">${n?sg(n.v):'–'}</b>${n?pm(n.m):''}${n&&n.fav?'<span class="lab">favourability</span>':''}</span>`)});return cells},
     hay:p=>LEAD.map(([k])=>{const n=netOf(p,k);return n?n.v:''}).join(' ')},
   direction:{label:'Direction',rows:()=>POLLS.filter(p=>p.dir&&p.dir.right!=null),cols:()=>['Right','Wrong','Unsure','Net','Right direction, unsure, wrong track'],
-    fig:p=>{const d=p.dir,ch=k=>d.chg&&d.chg[k]!=null?`<span class="lab">${d.chg[k]>0?'▲':d.chg[k]<0?'▼':''} ${num(Math.abs(d.chg[k]))}</span>`:'';
-      return [`<span class="f"><i>right</i><b style="--c:var(--pos)">${num(d.right)}</b>${pm(shareMoe(p,d.right))}${ch('right')}</span>`,`<span class="f"><i>wrong</i><b style="--c:var(--neg)">${num(d.wrong)}</b>${pm(shareMoe(p,d.wrong))}${ch('wrong')}</span>`,`<span class="f"><i>unsure</i><b style="--c:var(--ink2)">${num(d.unsure)}</b>${pm(shareMoe(p,d.unsure))}${ch('unsure')}</span>`
+    fig:p=>{const d=p.dir;
+      return [`<span class="f"><i>right</i><b style="--c:var(--pos)">${num(d.right)}</b>${pm(shareMoe(p,d.right))}</span>`,`<span class="f"><i>wrong</i><b style="--c:var(--neg)">${num(d.wrong)}</b>${pm(shareMoe(p,d.wrong))}</span>`,`<span class="f"><i>unsure</i><b style="--c:var(--ink2)">${num(d.unsure)}</b>${pm(shareMoe(p,d.unsure))}</span>`
         ,`<span class="f"><i>net</i><b>${sg(d.net!=null?d.net:d.right-d.wrong)}</b>${pm(diffMoe(p,d.right,d.wrong))}</span>`,`<span class="f wide"><span class="bar" aria-hidden="true"><i style="width:${d.right}%;background:var(--pos)"></i><i style="width:${d.unsure||0}%;background:var(--rule2)"></i><i style="width:${d.wrong}%;background:var(--neg)"></i></span></span>`]},
     hay:p=>[p.dir.right,p.dir.wrong,p.dir.unsure].join(' ')},
   issues:{label:'Issues',rows:()=>POLLS.filter(p=>ISS.some(id=>issOwn(p,id))),cols:()=>ISS.map(id=>ISSL[id]),
