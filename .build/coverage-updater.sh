@@ -25,22 +25,36 @@ mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
 
 # GitHub Actions may push data updates to main between local launchd slots;
-# the check is only meaningful against current main. Untracked files don't
-# count as dirty.
+# the check is only meaningful against current main. A failed sync is
+# inconclusive, never evidence of a missing poll. Untracked files do not count
+# as dirty themselves, but may still make the fast-forward fail.
+SYNC_ERROR=""
 if git diff --quiet && git diff --cached --quiet; then
-  git fetch -q origin main || true
-  git merge --ff-only origin/main >> "$LOG" 2>&1 || log "note: ff-only sync failed; checking against local main"
+  if ! git fetch -q origin main >> "$LOG" 2>&1; then
+    SYNC_ERROR="git fetch origin/main failed"
+  elif ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
+    SYNC_ERROR="could not fast-forward to origin/main"
+  fi
+else
+  SYNC_ERROR="local checkout has tracked changes"
 fi
 
-OUT="$(node .build/check-coverage.mjs 2>&1)"
-CODE=$?
-STATUS_LINE="$(echo "$OUT" | grep '^COVERAGE_STATUS' | tail -1)"
+if [ -n "$SYNC_ERROR" ]; then
+  OUT=""
+  CODE=1
+  STATUS_LINE=""
+  log "note: $SYNC_ERROR; coverage check inconclusive, no missing-poll alert"
+else
+  OUT="$(node .build/check-coverage.mjs 2>&1)"
+  CODE=$?
+  STATUS_LINE="$(echo "$OUT" | grep '^COVERAGE_STATUS' | tail -1)"
+fi
 
-if [ -z "$STATUS_LINE" ]; then
+if [ -z "$STATUS_LINE" ] && [ -z "$SYNC_ERROR" ]; then
   log "FAIL check-coverage (exit $CODE, no COVERAGE_STATUS line): $(echo "$OUT" | tail -1)"
   exit 1
 fi
-log "$STATUS_LINE"
+[ -n "$STATUS_LINE" ] && log "$STATUS_LINE"
 
 # exit 1 = inconclusive (Wikipedia unreachable, or its table changed shape).
 # Worth knowing about, but it is not evidence of a missing poll, so it must not

@@ -67,7 +67,9 @@ try {
   }
   if (!status.ref) throw new Error("no usable git ref in this checkout");
 
-  const log = git(["log", status.ref, "--format=%ct%x00%an%x00%s", "-z"]);
+  // Let git find the latest bot commit rather than buffering the whole history;
+  // the exact-author check below keeps this filter narrow.
+  const log = git(["log", status.ref, "-n", "1", "--author=github-actions\\[bot\\]", "--format=%ct%x00%an%x00%s", "-z"]);
   // Records are NUL-separated (subjects can contain newlines in theory);
   // fields are NUL-separated within a record.
   const recs = log.split("\0");
