@@ -68,19 +68,8 @@ export function votesHead(D) {
   return { head: N.start + (N.pl ? " are" : " is") + " down " + f1(-m.chg) + " points since the election", lead: m };
 }
 export function votesDek(D) {
-  const { lead } = votesHead(D);
   const [y, mo] = D.election.date.split("-").map(Number);
-  let dek = "% of each party’s first-preference vote since the " + MONF[mo - 1] + " " + y + " election, %.";
-  const rest = primaryMoves(D).filter((m) => m.sig && (!lead || m.k !== lead.k)).sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg)).slice(0, 2);
-  const dir = (m) => (m.chg > 0 ? "up" : "down"), be = (m) => (NAMES[m.k].pl ? "are" : "is");
-  if (rest.length === 1) dek += " " + NAMES[rest[0].k].start + " " + be(rest[0]) + " " + dir(rest[0]) + " " + f1(Math.abs(rest[0].chg)) + " points.";
-  else if (rest.length === 2) {
-    const [a, b] = rest;
-    dek += " " + NAMES[a.k].start + " " + be(a) + " " + dir(a) + " " + f1(Math.abs(a.chg)) + " points"
-      + (dir(a) === dir(b) ? " and " + NAMES[b.k].in + " " + f1(Math.abs(b.chg)) + "."
-        : "; " + NAMES[b.k].in + " " + be(b) + " " + dir(b) + " " + f1(Math.abs(b.chg)) + ".");
-  }
-  return dek;
+  return "% of each party’s first-preference vote since the " + MONF[mo - 1] + " " + y + " election, %.";
 }
 
 /* the two-party chart's story: the site's rule, word for word (rd-hero.jsx

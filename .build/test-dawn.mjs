@@ -62,14 +62,21 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
     { label: "Home", groups: ["Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired"] },
   ]);
   const options = label => split.find(t => t.label === label)?.groups || [];
-  eq(split.map(t => t.label).join("|"), "Age groups|Generation|States and Territories|Seat type|Home|Language at home", "separate menu headings");
-  eq(options("Age groups").join("|"), "18–34|35–54|55+", "age bands stay out of Generations");
+  eq(split.map(t => t.label).join("|"), "Age group|Generation|State or territory|Seat type|Home|Work status|Language at home", "separate menu headings");
+  eq(options("Age group").join("|"), "18–34|35–54|55+", "age bands stay out of Generations");
   eq(options("Generation").join("|"), "Gen Z|Millennials|Gen X|Boomers", "named generations stay together");
-  eq(options("States and Territories").join("|"), "NSW|Vic|Qld|SA|WA|ACT/NT/Tas|Non-NSW/Vic/Qld", "states and the combined remainder stay geographic");
+  eq(options("State or territory").join("|"), "NSW|Vic|Qld|SA|WA|ACT/NT/Tas|Non-NSW/Vic/Qld", "states and the combined remainder stay geographic");
   eq(options("Seat type").join("|"), "Inner metro|Outer metro|Provincial|Rural", "seat types have their own group");
+  eq(options("Home").join("|"), "Own outright|Mortgage|Renting", "Home retains only the tenure options");
+  eq(options("Work status").join("|"), "Full time|Part time|Retired", "the three employment options get their own category");
   eq(options("Language at home").join("|"), "English only|Other language", "languages get their own category");
   eq(options("Home").includes("English only"), false, "English only does not stay in Home");
   eq(options("Home").includes("Other language"), false, "Other language does not stay in Home");
+  const optionLabel = vm.runInNewContext(src.slice(src.indexOf("function dawnSubgroups("), src.indexOf("const grpSel=")) + ";dawnOptionLabel", {});
+  const ordinary = ["All voters", "All pollsters", "Men", "Women", "Inner metro", "Outer metro", "Provincial", "Rural", "Non-NSW/Vic/Qld", "Renting", "Full time", "Part time", "Retired", "Year 12 or less", "University", "Other language"];
+  eq(ordinary.map(optionLabel).join("|"), "all voters|all pollsters|men|women|inner metro|outer metro|provincial|rural|non-NSW/Vic/Qld|renting|full time|part time|retired|year 12 or less|university|other language", "ordinary menu labels start lowercase");
+  const proper = ["Gen Z", "Millennials", "Gen X", "Boomers", "Silent", "NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "English only", "TAFE or trade"];
+  eq(proper.map(optionLabel).join("|"), proper.join("|"), "proper nouns and abbreviations retain their capital letters");
 }
 
 /* a completed term does not repeat a month across its two dates */
@@ -177,11 +184,11 @@ eq(votesHead(fall("lnp", E.lnp - 3, E.lnp - 1)).head, "The Coalition is down 3.0
 eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 points since the election", "a plural name takes a plural verb");
 {
   const D = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], lnp: [E.lnp - 4, E.lnp - 5, E.lnp - 3] });
-  ok(votesDek(D).endsWith("Labor is down 5.0 points and the Coalition 4.0."), "two falls share a verb: " + votesDek(D));
+  ok(votesDek(D).endsWith("election, %."), "no secondary movement sentence: " + votesDek(D));
   const D2 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], grn: [E.grn + 2, E.grn + 1, E.grn + 3] });
-  ok(votesDek(D2).endsWith("Labor is down 5.0 points; the Greens are up 2.0."), "a fall and a rise: " + votesDek(D2));
+  ok(votesDek(D2).endsWith("election, %."), "the caption stays one sentence under mixed changes: " + votesDek(D2));
   const D3 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5] });
-  ok(votesDek(D3).startsWith("% of each party’s first-preference vote since the "), "each party’s first-preference vote names the measure");
+  eq(votesDek(D3), "% of each party’s first-preference vote since the May 2025 election, %.", "only the measure-label sentence remains");
 }
 /* the two-party story's curated heading (owner's wording, 25 Nov 2026) */
 {
@@ -243,6 +250,12 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
   ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
   ok(html.includes(".votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}") && html.includes(".votes .ctl .opts{margin-top:0;flex-shrink:0}"), "the time window and chart filters share a wrapping row");
+  ok(/<div class="pick"><span class="pl">Taking&nbsp;<\/span><button[^>]+id="pv-btn"[^>]*><b id="pv-name">all pollsters<\/b><\/button>/.test(html), "Taking is a separate prefix, not text inside the pollster button");
+  ok(html.includes('label:"all pollsters"'), "the first pollster menu option uses lowercase all pollsters");
+  ok(html.includes('<option value="">all voters</option>') && !html.includes('<option value="">All voters</option>'), "the all-voters option is sentence case");
+  ok(html.includes('value="${esc(gl)}">${esc(dawnOptionLabel(gl))}</option>'), "menu labels are formatted separately from canonical option values");
+  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>'), "both party names in the margin keep their own colours");
+  ok(html.includes("color:var(--${lead>0?'alp':RIV})") && html.includes("header.style.color='var(--mute)'"), "only the signed lead follows the winner, with neutral connecting words");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
   ok(!html.includes(".skyset") && !html.includes('role="radiogroup" aria-label="Sky"'), "Sky’s Auto, Sunrise and Sunset controls are absent");

@@ -372,7 +372,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div>
       <div class="opts">
         <label class="pick"><span class="pl">Among&nbsp;</span><select id="grp-sel"></select></label>
-        <div class="pick"><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><span>taking </span><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
+        <div class="pick"><span class="pl">Taking&nbsp;</span><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
         <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button>
       </div></div>
     <div class="fig" id="votes-fig"><div class="tip" aria-live="polite"></div><svg id="votes-svg" tabindex="0" aria-label="Line chart of the estimated first-preference vote by party. Use the left and right arrow keys to read values week by week."></svg></div>
@@ -1219,22 +1219,25 @@ function dawnSubgroups(tabs) {
   for(const tab of tabs||[]){
     const options=tab.groups;
     if(tab.label==="Age"){
-      add("Age groups",options.filter(g=>/^\d/.test(g)));
+      add("Age group",options.filter(g=>/^\d/.test(g)));
       add("Generation",options.filter(g=>!/^\d/.test(g)));
     }else if(tab.label==="Place"){
       const at=options.indexOf("Inner metro");
       const split=at<0?options.length:at;
-      add("States and Territories",options.slice(0,split));
+      add("State or territory",options.slice(0,split));
       add("Seat type",options.slice(split));
     }else if(tab.label==="Home"){
-      add("Home",options.filter(g=>g!=="English only"&&g!=="Other language"));
+      const work=["Full time","Part time","Retired"];
+      add("Home",options.filter(g=>g!=="English only"&&g!=="Other language"&&!work.includes(g)));
+      add("Work status",options.filter(g=>work.includes(g)));
       add("Language at home",options.filter(g=>g==="English only"||g==="Other language"));
     }else menu.push(tab);
   }
   return menu;
 }
+const dawnOptionLabel=s=>/^(?:NSW|Vic|Qld|SA|WA|ACT\/NT\/Tas|TAFE|English|Gen\b|Millennials|Boomers|Silent)\b/.test(s)?s:s.charAt(0).toLowerCase()+s.slice(1);
 const grpSel=$('#grp-sel'),pvBtn=$('#pv-btn'),pvPop=$('#pv-pop'),pvName=$('#pv-name');
-grpSel.innerHTML='<option value="">All voters</option>'+dawnSubgroups(DATA.groupMenu).map(t=>`<optgroup label="${esc(t.label)}">${t.groups.map(gl=>`<option value="${esc(gl)}">${esc(gl)}</option>`).join('')}</optgroup>`).join('');
+grpSel.innerHTML='<option value="">all voters</option>'+dawnSubgroups(DATA.groupMenu).map(t=>`<optgroup label="${esc(t.label)}">${t.groups.map(gl=>`<option value="${esc(gl)}">${esc(dawnOptionLabel(gl))}</option>`).join('')}</optgroup>`).join('');
 if(!DATA.groupMenu)grpSel.closest('.pick').hidden=true;
 const indexGroups=()=>{GIDX={};if(GROUPS)GROUPS.tabs.forEach(t=>t.sets.forEach(st=>st.groups.forEach(g=>{GIDX[g.label]={...g,setId:st.id,tab:t.label}})))};
 function afterGrp(){pvBtn.disabled=!!GRP;if(GRP&&!inCur(WIN)&&!GHIST)loadGHist().then(()=>votes.draw());paintMeasured();votesSrc();votes.clear();votes.draw()}
@@ -1266,7 +1269,7 @@ function subsetWeekly(houses){
 }
 if(!DATA.pm||!window.AP||!window.AP.pmEngine)pvBtn.closest('.pick').hidden=true;
 filterSelect({trigger:pvBtn,popup:pvPop,textElement:pvName,label:"Pollsters",multiple:true,
-  options:()=>[{label:"All pollsters",value:"",data:{h:""}},...(DATA.pvHouses||[]).map(h=>({label:h,value:h,data:{h:h}}))],
+  options:()=>[{label:"all pollsters",value:"",data:{h:""}},...(DATA.pvHouses||[]).map(h=>({label:h,value:h,data:{h:h}}))],
   selected:()=>PVSEL,
   summary:()=>{const n=PVSEL.size;return !n||n===(DATA.pvHouses||[]).length?"all pollsters":[...PVSEL].join(", ")},
   onPick:h=>{
@@ -1370,8 +1373,9 @@ function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
   if(header){
     const lead=lab-50;
     header.hidden=false;
-    header.textContent=lead===0?`Labor is level against ${RIV==='lnp'?'the ':''}${FNAME[RIV]}`:`Labor is ${lead>0?'+':''}${f1(lead)} against ${RIV==='lnp'?'the ':''}${FNAME[RIV]}`;
-    header.style.color=`var(--${lead>0?'alp':lead<0?RIV:'mute'})`;
+    const margin=lead===0?'level':`<span data-margin style="color:var(--${lead>0?'alp':RIV})">${(lead>0?'+':'')+f1(lead)}</span>`;
+    header.innerHTML=`<span data-party="alp" style="color:var(--alp)">Labor</span> is ${margin} against ${RIV==='lnp'?'the ':''}<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>`;
+    header.style.color='var(--mute)';
   }
   svg.setAttribute('aria-label',`Sankey diagram: after preferences, Labor ${f1(lab)}%, ${FNAME[RIV]} ${f1(100-lab)}%.`);
   const paths=$$('.rb',svg);
