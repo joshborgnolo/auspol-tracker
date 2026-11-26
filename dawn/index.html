@@ -1628,11 +1628,11 @@ const TEN=Object.fromEntries(PK.map(k=>[k,EST[k].map(q=>Math.round(q.m*10))])),L
 const HALF=Object.fromEntries(PK.map(k=>[k,EST[k].map(q=>(q.hi-q.lo)*5)]));
 let ciMode=false;
 const curW={},curLo={},curHi={},curHalf={};
-function renderW(){
-  PK.forEach(k=>{const w=curW[k],th=THEN[k],lo=curLo[k],hi=curHi[k],r=rowOf[k];
+function renderW(snap=false){
+  PK.forEach(k=>{const w=curW[k],th=THEN[k],lo=curLo[k],hi=curHi[k],half=snap?Math.round(curHalf[k]):curHalf[k],r=rowOf[k];
     const left=ciMode?lo:Math.min(w,th),width=ciMode?hi-lo:Math.abs(w-th);
-    odoSet(RV[k],w);odoSet(DV[k],ciMode?curHalf[k]:w-th,ciMode);
-    DS[k].textContent=ciMode?`±${f1(curHalf[k]/10)} percentage points, 95% credible interval`:sgn((w-th)/10)+' since 2025';
+    odoSet(RV[k],w);odoSet(DV[k],ciMode?half:w-th,ciMode);
+    DS[k].textContent=ciMode?`±${f1(half/10)} percentage points, 95% credible interval`:sgn((w-th)/10)+' since 2025';
     r.style.setProperty('--w',pc(w/10));r.style.setProperty('--l',pc(left/10));r.style.setProperty('--d',pc(width/10));
     SB[k].className=ciMode?'ci':th<w?'up':'dn';
     SB[k].style.setProperty('--m',(ciMode&&hi>lo?100*(w-lo)/(hi-lo):50).toFixed(2)+'%');
@@ -1648,7 +1648,7 @@ function paintWhiskMode(){
   whiskNote.textContent=ciMode?'Whiskers mark 95% credible intervals':'Whiskers mark the 2025 election';
   pv.setAttribute('aria-label',ciMode?'Estimated primary vote, %, and 95% credible interval half-width':'Estimated primary vote, %, and change since the 2025 election');
 }
-modeBtn.addEventListener('click',ev=>{ev.stopPropagation();ciMode=!ciMode;paintWhiskMode();renderW()});
+modeBtn.addEventListener('click',ev=>{ev.stopPropagation();ciMode=!ciMode;paintWhiskMode();renderW(true)});
 const nowDate=$('#now-date');
 function setDate(j){nowDate.textContent=j===0?'the 2025 election':fdate(G[j])}
 function setWeek(j,instant){
@@ -1661,16 +1661,16 @@ function setWeek(j,instant){
   setDate(j);return order;
 }
 function settle(j){pv.classList.add('still');const order=setWeek(j,true);order.forEach(k=>{pv.appendChild(rowOf[k]);rowOf[k].style.transform=''});pv.offsetHeight;pv.classList.remove('still')}
-PK.forEach(k=>{curW[k]=TEN[k][LAST];curLo[k]=LOW[k][LAST];curHi[k]=HIGH[k][LAST];curHalf[k]=HALF[k][LAST]});paintWhiskMode();renderW();settle(LAST);
+PK.forEach(k=>{curW[k]=TEN[k][LAST];curLo[k]=LOW[k][LAST];curHi[k]=HIGH[k][LAST];curHalf[k]=HALF[k][LAST]});paintWhiskMode();renderW(true);settle(LAST);
 const rpBtn=$('#replay'),STEP=reduce?120:200;let rpRaf=0;
 function tweenTo(j,ms,then){
   const fromW={...curW},fromLo={...curLo},fromHi={...curHi},fromHalf={...curHalf},e3=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;let t0=null;
   setWeek(j);
-  if(!ms){PK.forEach(k=>{curW[k]=TEN[k][j];curLo[k]=LOW[k][j];curHi[k]=HIGH[k][j];curHalf[k]=HALF[k][j]});renderW();then&&then();return}
+  if(!ms){PK.forEach(k=>{curW[k]=TEN[k][j];curLo[k]=LOW[k][j];curHi[k]=HIGH[k][j];curHalf[k]=HALF[k][j]});renderW(true);then&&then();return}
   const f=ts=>{if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/ms),e=e3(t);PK.forEach(k=>{curW[k]=fromW[k]+(TEN[k][j]-fromW[k])*e;curLo[k]=fromLo[k]+(LOW[k][j]-fromLo[k])*e;curHi[k]=fromHi[k]+(HIGH[k][j]-fromHi[k])*e;curHalf[k]=fromHalf[k]+(HALF[k][j]-fromHalf[k])*e});renderW();if(t<1)rpRaf=requestAnimationFrame(f);else then&&then()};
   rpRaf=requestAnimationFrame(f);
 }
-function finish(){pv.classList.remove('live');settle(LAST);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week since the 2025 election');paintNow()}
+function finish(){pv.classList.remove('live');settle(LAST);renderW(true);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week since the 2025 election');paintNow()}
 function stopReplay(){cancelAnimationFrame(rpRaf);tweenTo(LAST,reduce?0:700,finish)}
 rpBtn.addEventListener('click',e=>{
   e.stopPropagation();if(rpOn){stopReplay();return}

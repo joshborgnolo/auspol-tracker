@@ -271,15 +271,15 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes(".pb s.ci::before{content:") && html.includes(".pb s.ci>b{position:absolute") && html.includes("<s><b></b></s>"), "intervals carry caps at both ends and a central mean marker");
   ok(html.includes(".pb s.ci::after{left:auto;right:-.75px;top:-3.25px;height:8px") && html.includes(".pb s.ci>b{position:absolute;top:-5.25px;") && html.includes("width:1.5px;height:12px"), "interval end caps stay shorter than the central marker");
   ok(html.includes("curLo[k]=LOW[k][j];curHi[k]=HIGH[k][j];curHalf[k]=HALF[k][j]") && html.includes("[[curW,TEN],[curLo,LOW],[curHi,HIGH],[curHalf,HALF]]"), "the interval bounds and half-widths travel with the replay");
-  const drawWhisk = (ciMode) => {
+  const drawWhisk = (ciMode, snap = false, half = 12.8) => {
     const style = () => ({ values: {}, setProperty(k, v) { this.values[k] = v; } });
-    const row = style(), mark = style(), sb = { alp: { className: "", style: mark } }, ds = { alp: {} }, dv = { alp: {} }, fn = html.match(/function renderW\(\)\{[\s\S]*?\n\}/)[0];
+    const row = style(), mark = style(), sb = { alp: { className: "", style: mark } }, ds = { alp: {} }, dv = { alp: {} }, fn = html.match(/function renderW\(snap=false\)\{[\s\S]*?\n\}/)[0];
     let delta = 0, plusMinus = false;
     const odoSet = (el, w, pm) => { if (el === dv.alp) { delta = w; plusMinus = pm; } };
-    vm.runInNewContext(fn + ";renderW()", { PK: ["alp"], curW: { alp: 264.8 }, curLo: { alp: 251.9 }, curHi: { alp: 277.5 }, curHalf: { alp: 12.8 }, ciMode, THEN: { alp: 340 }, RV: { alp: {} }, DV: dv, DS: ds, SB: sb, rowOf: { alp: { style: row } }, odoSet, sgn: (v) => v.toFixed(1), f1: (v) => v.toFixed(1), pc: (v) => v });
+    vm.runInNewContext(fn + ";renderW(" + snap + ")", { PK: ["alp"], curW: { alp: 264.8 }, curLo: { alp: 251.9 }, curHi: { alp: 277.5 }, curHalf: { alp: half }, ciMode, THEN: { alp: 340 }, RV: { alp: {} }, DV: dv, DS: ds, SB: sb, rowOf: { alp: { style: row } }, odoSet, sgn: (v) => v.toFixed(1), f1: (v) => v.toFixed(1), pc: (v) => v });
     return { left: +row.values["--l"].toFixed(2), width: +row.values["--d"].toFixed(2), middle: parseFloat(mark.values["--m"]), klass: sb.alp.className, delta: +delta.toFixed(2), plusMinus, sr: ds.alp.textContent };
   };
-  const electionWhisk = drawWhisk(false), intervalWhisk = drawWhisk(true);
+  const electionWhisk = drawWhisk(false), intervalWhisk = drawWhisk(true), settledWhisk = drawWhisk(true, true, 6.5);
   eq(electionWhisk.left, 26.48, "the default starts at the estimate against the 2025 result");
   eq(electionWhisk.width, 7.52, "the default spans from the estimate to the 2025 result");
   eq(electionWhisk.klass, "dn", "the default marker points down from a lower estimate");
@@ -292,6 +292,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(intervalWhisk.delta, 12.8, "the interval figure is half the low-to-high span");
   eq(intervalWhisk.plusMinus, true, "the interval figure uses the plus-minus sign");
   eq(intervalWhisk.sr, "±1.3 percentage points, 95% credible interval", "the interval figure is named for screen readers");
+  eq(settledWhisk.delta, 7, "a settled half-width snaps to a whole tenth");
+  eq(settledWhisk.sr, "±0.7 percentage points, 95% credible interval", "the settled figure names the snapped tenth");
   const C = copyFor(D0);
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
   ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
