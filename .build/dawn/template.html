@@ -744,12 +744,22 @@ function chart(o){
           for(let d=0;d<=Math.max(v.mid-lo,hi-v.mid);d+=2)for(const cx of [v.mid-d,v.mid+d])if(cx>=lo&&cx<=hi&&free(r,cx-w/2,cx+w/2)){rows[r].push([cx-w/2,cx+w/2]);Object.assign(v,{nm:t,r,cx});return true}}return false};
       /* nearest free spot along the lowest row that still overlaps the term: the shortest full form, then the first prime minister, then the party */
       B.filter(v=>!v.nm).sort((u,v)=>(u.gb-u.ga)-(v.gb-v.ga)).forEach(v=>{place(v,v.c.slice().sort((a,b)=>tw(a,fz)-tw(b,fz)))||place(v,[v.g.pms[0]])||place(v,[v.g.gov==='alp'?'Labor':'Coalition'])});
-      GV=B;EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r))}
+      GV=B;EVH=22+14*Math.max(0,...GV.filter(v=>v.nm).map(v=>v.r));
+      /* on a phone, once any name would leave its term's middle or the first row, every name is slanted
+         instead, its foot on its own term. Feet stay 16px apart and each name inside the chart; a foot
+         moved off its term's middle for that is joined back to it */
+      if(W<600&&B.some(v=>v.r||!v.nm||Math.abs(v.cx-v.mid)>3)){
+        B.forEach(v=>{const q=v.g.pms,ends=q.length>2&&q[0]!==q[q.length-1]?q[0]+'–'+q[q.length-1]:null;v.nm=ends||v.c[0]||q[0];v.len=tw(v.nm,fz);v.r=0;v.slant=true;v.cx=Math.min(v.mid,W-10-v.len*.643)});
+        const F=B.slice().sort((u,v)=>u.mid-v.mid);
+        for(let i=F.length-2;i>=0;i--)F[i].cx=Math.min(F[i].cx,F[i+1].cx-16);
+        F.forEach((v,i)=>{v.cx=Math.max(v.cx,i?F[i-1].cx+16:ML)});
+        EVH=14+Math.ceil(Math.max(0,...F.map(v=>v.len))*.766)}}
     const MT=TIPH+EVH+(evs.length&&!narrow?8:0),MB=24,PH=H-MT-MB,y=v=>MT+PH*(S.y1-v)/(S.y1-S.y0);
     let s='';
-    GV.forEach(({g,ga,gb,nm,r,cx})=>{const col=`var(--${g.gov==='alp'?'alp':'lnp'})`;
+    GV.forEach(({g,ga,gb,nm,r,cx,mid,slant})=>{const col=`var(--${g.gov==='alp'?'alp':'lnp'})`;
       s+=`<rect x="${P1(ga)}" y="${MT}" width="${P1(gb-ga)}" height="${PH}" style="fill:${col}" fill-opacity=".075"/>`;
-      if(nm)s+=`<text x="${P1(cx)}" y="${MT-7-r*14}" text-anchor="middle" class="gv" style="fill:${col};font-size:${GVF}px">${esc(nm)}</text>`});
+      if(slant)s+=`<path d="${Math.abs(cx-mid)>3?`M${P1(mid)} ${MT}v-2L${P1(cx)} ${MT-6}`:`M${P1(cx)} ${MT}v-5`}" fill="none" style="stroke:${col}" stroke-width="1.5"/><text transform="translate(${P1(cx+3)} ${MT-8}) rotate(-50)" class="gv" style="fill:${col};font-size:${GVF}px">${esc(nm)}</text>`;
+      else if(nm)s+=`<text x="${P1(cx)}" y="${MT-7-r*14}" text-anchor="middle" class="gv" style="fill:${col};font-size:${GVF}px">${esc(nm)}</text>`});
     ticks.forEach((v,i)=>{const yy=Math.round(y(v))+.5;s+=`<line x1="${ML}" x2="${W-MR+4}" y1="${yy}" y2="${yy}" stroke="var(--rule)"/><text x="${ML-8}" y="${yy}" dy=".35em" text-anchor="end">${tl[i]}</text>`});
     /* reference lines (50% on the two-party chart) */
     for(const r of S.refs||[]){const yy=Math.round(y(r.y))+.5;s+=`<line x1="${ML}" x2="${W-MR+4}" y1="${yy}" y2="${yy}" stroke="var(--rule2)" stroke-dasharray="3 3"/>`;if(r.up)s+=`<text x="${ML+6}" y="${yy-7}" class="rf">${esc(r.up)}</text>`;if(r.dn)s+=`<text x="${ML+6}" y="${yy+16}" class="rf">${esc(r.dn)}</text>`}
