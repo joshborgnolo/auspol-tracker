@@ -277,6 +277,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const ph = fs.readFileSync(r.polls, "utf8");
   ok(!/\{\{[A-Za-z]+\}\}/.test(ph), "every polls-page placeholder filled");
   ok(ph.includes("<h1>Federal opinion polls</h1>"), "the polls-page heading survives regeneration");
+  ok(ph.includes('<p class="dek">From 13 pollsters, with the newest first. Open a poll to see details.</p>'), "the polls-page dek survives regeneration");
   const pollScript = ph.match(/<script>([\s\S]*?)<\/script>/);
   ok(!!pollScript, "the ledger's whole client is present");
   new vm.Script(pollScript[1]);

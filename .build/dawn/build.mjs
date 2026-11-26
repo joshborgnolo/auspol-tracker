@@ -140,9 +140,8 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     const PD = JSON.parse(fs.readFileSync(pollsPath, "utf8")), PL = PD.polls, L = D.weeks.length - 1;
     PD.issL = ISSUE_NAMES;   // each issue by the name the site gives it
     const order = [...D.parties].sort((a, b) => D.prim[b].v[L] - D.prim[a].v[L]);
-    const houses = new Set(PL.map((q) => q.h.replace(/\s*\(.*\)$/, "")));
     const fillP = { FONT: "/assets/fonts/" + font, pollsHead: "Federal opinion polls",
-                    pollsDek: esc(`From ${houses.size} pollsters, newest first, each as printed. Open a poll for its details and the model’s figures for the same week.`) };
+                    pollsDek: "From 13 pollsters, with the newest first. Open a poll to see details." };
     let ph = fs.readFileSync(path.join(HERE, "template-polls.html"), "utf8");
     ph = ph.replace(/\{\{(FONT|pollsHead|pollsDek)\}\}/g, (m, k) => fillP[k]).replace("{{ORDER}}", () => JSON.stringify(order))
       .replace("{{POLLS}}", () => JSON.stringify(PD).replace(/</g, "\\u003c"))
