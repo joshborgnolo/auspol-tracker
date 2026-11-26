@@ -65,7 +65,7 @@ body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.
 .wash.set{background:radial-gradient(120% 55% at 50% var(--sy),rgba(255,120,50,var(--wa2)) 0%,rgba(250,80,90,calc(var(--wa2)*.5)) 30%,rgba(180,80,160,calc(var(--wa2)*.25)) 55%,transparent 80%),linear-gradient(to top,rgba(255,110,70,var(--ba2)) 0%,rgba(225,90,140,calc(var(--ba2)*.6)) 14%,rgba(140,80,170,calc(var(--ba2)*.25)) 28%,transparent 42%)}
 .stars{position:absolute;inset:0;opacity:var(--st)}
 .stars canvas{position:absolute;inset:0;display:block}
-.sun{--d:min(72vw,38vh);position:absolute;left:50%;width:var(--d);height:var(--d);bottom:calc(var(--d)*-.5 + var(--tbd) + var(--ext));transform:translate(-50%,var(--ty));border-radius:50%;will-change:transform}
+.sun{--d:min(72vw,38vh);position:absolute;left:50%;width:var(--d);height:var(--d);bottom:calc(var(--d)*-.5 + var(--hz,calc(var(--tbd) + var(--ext))));transform:translate(-50%,var(--ty));border-radius:50%;will-change:transform}
 .halo{position:absolute;inset:-110%;border-radius:50%;background:radial-gradient(circle closest-side,rgba(255,150,70,.5) 0%,rgba(255,120,60,.26) 24%,rgba(255,110,90,.09) 46%,transparent 70%)}
 .limb{position:absolute;inset:-16%;border-radius:50%;background:radial-gradient(circle closest-side,#ff5a1c 0%,#ff6c22 72%,#ff8a2e 79%,#ffa040 84%,rgba(255,160,70,.45) 91%,rgba(255,170,90,0) 100%)}
 /* the bar's backdrop: the hero's sky drawn again behind the nav (same layers, same custom properties,
@@ -938,6 +938,10 @@ const pickMode=()=>skyPref==='rise'||skyPref==='set'?skyPref:((h)=>h>=4&&h<15?'r
 /* the sun stands still, set by the reader's clock: highest at noon, lowest (still on the horizon) at midnight */
 const dayFrac=()=>{const n=new Date();return (n.getHours()+n.getMinutes()/60+n.getSeconds()/3600)/24};
 const sunRise=(H,d,off)=>Math.max(0,Math.min(H*.13,H-off-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
+/* the horizon's lift over the toolbar, held per screen width: Safari's toolbar folding away on scroll changes
+   lvh − dvh (and fires resize), which would drop the sun; the largest lift seen at this width wins */
+let hzW=0,hzOff=0;
+function horizon(){const w=innerWidth,o=tbdEl?tbdEl.offsetHeight:0;if(w!==hzW){hzW=w;hzOff=o}else hzOff=Math.max(hzOff,o);sky.style.setProperty('--hz',hzOff+'px');return hzOff}
 function paintNow(){if(rpOn)return;mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;paintCycle(dayFrac())}
 /* the status bar's strip: iOS 26 Safari tints it from the page's background, not theme-color, so
    while the hero fills the screen the root takes the sky's top colour (and theme-color follows, for
@@ -954,7 +958,7 @@ let rpOn=false;
 function paintCycle(f){
   f-=Math.floor(f);let j=0;while(j<KF.length-2&&f>=KF[j+1][0])j++;
   const A=KF[j],B=KF[j+1];let t=(f-A[0])/(B[0]-A[0]);t=t*t*(3-2*t);
-  const H=hero.clientHeight,d=sun.offsetWidth||1,off=tbdEl?tbdEl.offsetHeight:0,rise=sunRise(H,d,off);
+  const H=hero.clientHeight,d=sun.offsetWidth||1,off=horizon(),rise=sunRise(H,d,off);
   // the sun only dips from its noon height to a cap on the horizon at midnight
   const sh=-Math.cos(2*Math.PI*f),h=(sh+1)/2,y=d*.15+(-rise-d*.15)*h,st2=sky.style;
   for(const k in NIGHT)st2.setProperty('--'+k,rgb(mixc(A[1][k],B[1][k],t)));
