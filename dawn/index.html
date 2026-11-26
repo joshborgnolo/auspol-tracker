@@ -240,6 +240,9 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tpp .hd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;column-gap:24px}
 .tpp .hd .dek{grid-column:1/-1}
 .tpp .hd>h2{min-width:0}
+.rival-toggle:disabled{cursor:default}
+.tpp .ctl2>.hd-sw{height:auto;font:inherit;flex:none}
+@media(min-width:900px){.tpp .ctl2>.hd-sw>.rival-toggle{min-height:32px;padding:5px 10px;font-size:13.5px}}
 @media(max-width:899px){
   #flows .hd{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px}
   .tpp .hd{gap:8px}
@@ -376,7 +379,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div>
       <div class="opts">
         <label class="pick"><span class="pl">Among&nbsp;</span><select id="grp-sel"></select></label>
-        <div class="pick"><span class="pl">Taking&nbsp;</span><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
+        <div class="pick"><span class="pl">Take&nbsp;</span><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
         <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button>
       </div></div>
     <div class="fig" id="votes-fig"><div class="tip" aria-live="polite"></div><svg id="votes-svg" tabindex="0" aria-label="Line chart of the estimated first-preference vote by party. Use the left and right arrow keys to read values week by week."></svg></div>
@@ -1504,6 +1507,10 @@ function primScene(narrow){
 /* Labor's two-party vote */
 let RIV='lnp',CMP_PUB=false,CMP_EXT=false;
 const TPP=DATA.tpp,EXT=DATA.ext;
+const hasTppRival=()=>{
+  const [a,b]=winRange(WIN);
+  return b>CUR.a&&Array.isArray(TPP.on?.v)&&GX.some((x,i)=>i>0&&x>=a&&x<=b&&Number.isFinite(TPP.on.v[i-1]));
+};
 /* the two-party series start a week after polling day: week i is entry i−1 */
 const tppMain=(c,i)=>c==='lnp'?{v:TPP.imp.v[i-1],ci:TPP.imp.ci[i-1]}:{v:TPP.on.v[i-1],ci:Math.hypot(TPP.on.cs[i-1],TPP.on.cf[i-1])};
 const ymX=ym=>{const [y,m]=ym.split('-').map(Number);return y+(m-.5)/12};
@@ -1513,7 +1520,7 @@ function tppScene(narrow){
   const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
   const S={x0,x1,ys:5,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[{y:50,up:'▲ Labor ahead',dn:'▼ Rival ahead'}],ends:[]};
   /* a window behind this term draws Labor against the Coalition through every past term */
-  const OTH=RIV==='lnp'?'on':'lnp',main=RIV;
+  const main=hasTppRival()?RIV:'lnp',OTH=main==='lnp'?'on':'lnp';
   if(cur){
     const i0=Math.max(1,GX.findIndex(gx=>gx>=x0-1e-6));
     const ser=c=>{const pts=[],bd=[];for(let i=i0;i<=LAST;i++){const m=tppMain(c,i);pts.push({x:GX[i],y:m.v});bd.push({x:GX[i],lo:m.v-m.ci,hi:m.v+m.ci})}return {pts,bd}};
@@ -1666,7 +1673,7 @@ paintWinBars();
 const reachesNow=()=>winRange(WIN)[1]>CUR.a+1e-3;
 const dotsOn=()=>winRange(WIN)[1]-winRange(WIN)[0]<=4.6;
 const tppSrc=()=>{
-  const c=RIV,cur=inCur(WIN),wk=reachesNow()?' This term is weekly.':'';
+  const c=hasTppRival()?RIV:'lnp',cur=inCur(WIN),wk=reachesNow()?' This term is weekly.':'';
   $('#tpp-src').textContent=(cur?(c==='lnp'?'Dots are polls, each one’s primary votes run through the 2025 election’s preference flows; the line is the model’s weekly estimate with its 95% band. The ring is the 2025 count.'
     :'Dots are polls, each one’s primary votes run through the site’s flows for Labor against One Nation (no election has counted that pair); the band adds the doubt about those flows to the model’s.')
     :(MEASURED?'Past terms are the polls’ own monthly figures, Labor against the Coalition, before the election adjustment; the rings are the results.':'Past terms are monthly, Labor against the Coalition, drawn through the election results at both ends.')+wk)+(dotsOn()?' Tap a dot for its poll.':'');
@@ -1682,15 +1689,19 @@ const votesSrc=()=>{
 };
 const extKey=$('#ext-key'),btnPub=$('#cmp-pub'),btnExt=$('#cmp-ext');
 function paintKeys(){
-  const cur=inCur(WIN);
+  const cur=inCur(WIN),enabled=hasTppRival(),rival=enabled?RIV:'lnp',toggle=$('#tpp-rival-toggle'),next=rival==='lnp'?'One Nation':'Coalition';
+  toggle.disabled=!enabled;toggle.dataset.r=rival;toggle.textContent=FNAME[rival];
+  toggle.setAttribute('aria-checked',String(enabled&&rival==='on'));
+  toggle.setAttribute('aria-label',enabled?'Switch to '+next:'Coalition: One Nation is unavailable for this time window');
+  toggle.title=enabled?'Switch to '+next:'One Nation is unavailable for this time window';
   btnPub.disabled=btnExt.disabled=!cur;
   btnPub.parentNode.classList.toggle('past',!cur);
   btnPub.setAttribute('aria-checked',String(CMP_PUB));btnExt.setAttribute('aria-checked',String(CMP_EXT));
   const last=a=>a&&a.length?f1(a[a.length-1][1])+'%':'';
   const items=[];
-  if(CMP_PUB&&cur)items.push(`<span><i class="sw dash" style="--c:${RCOL[RIV]}"></i> Pollsters’ published figures</span>`);
+  if(CMP_PUB&&cur)items.push(`<span><i class="sw dash" style="--c:${RCOL[rival]}"></i> Pollsters’ published figures</span>`);
   if(CMP_EXT&&cur){
-    if(RIV==='lnp'){if(EXT.kb)items.push(`<a href="https://${esc(EXT.kbSite||'')}" target="_blank" rel="noopener"><i class="sw" style="--c:var(--kb)"></i>Bonham ${last(EXT.kb)} ↗</a>`);if(EXT.bt)items.push(`<a href="https://${esc(EXT.btFeed||'')}" target="_blank" rel="noopener"><i class="sw" style="--c:var(--bt)"></i>BludgerTrack ${last(EXT.bt)} ↗</a>`)}
+    if(rival==='lnp'){if(EXT.kb)items.push(`<a href="https://${esc(EXT.kbSite||'')}" target="_blank" rel="noopener"><i class="sw" style="--c:var(--kb)"></i>Bonham ${last(EXT.kb)} ↗</a>`);if(EXT.bt)items.push(`<a href="https://${esc(EXT.btFeed||'')}" target="_blank" rel="noopener"><i class="sw" style="--c:var(--bt)"></i>BludgerTrack ${last(EXT.bt)} ↗</a>`)}
     else if(EXT.kbsh)items.push(`<a href="https://${esc(EXT.kbSite||'')}" target="_blank" rel="noopener"><i class="sw" style="--c:var(--kb)"></i>Bonham ${last(EXT.kbsh)} ↗</a>`);
   }
   extKey.innerHTML=items.join('');extKey.hidden=!items.length;
@@ -1796,7 +1807,7 @@ table($('#tpp-table'),'Labor’s two-party-preferred vote, %',['v Coalition','v 
 const FL=DATA.flows;
 const FLOWS={lnp:{grn:FL.lnp.grn,on:FL.lnp.onp,oth:FL.lnp.oth},on:{grn:FL.on.grn,lnp:FL.on.lnp,oth:FL.on.oth}};
 const FNAME={alp:'Labor',lnp:'Coalition',on:'One Nation',grn:'Greens',oth:'Others'};
-let flowHold=0;
+const sankeyClears=new Map();
 /* today's shares, unrounded, so the totals are the two-party figures the chart ends on */
 const PV={alp:DATA.nowShares.alp,lnp:DATA.nowShares.lnp,on:DATA.nowShares.onp,grn:DATA.nowShares.grn,oth:DATA.nowShares.oth};
 /* the three-cornered term: points of the Coalition's own vote that reach Labor where both its parties run */
@@ -1861,22 +1872,35 @@ function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
     const lead=lab-50;
     header.hidden=false;
     const margin=lead===0?'level':`<span data-margin style="color:var(--${lead>0?'alp':RIV})">${(lead>0?'+':'')+f1(lead)}</span>`;
-    header.innerHTML=`<span data-party="alp" style="color:var(--alp)">Labor</span> is ${margin} against <span data-party="${RIV}" style="color:var(--${RIV})">${RIV==='lnp'?'the ':''}${FNAME[RIV]}</span>`;
+    header.innerHTML=`<span data-party="alp" style="color:var(--alp)">Labor</span> is ${margin} against ${RIV==='lnp'?'the ':''}<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>`;
     header.style.color='var(--mute)';
   }
   svg.setAttribute('aria-label',`Sankey diagram: after preferences, Labor ${f1(lab)}%, ${FNAME[RIV]} ${f1(100-lab)}%.`);
   const paths=$$('.rb',svg);
-  const show=i=>{clearTimeout(flowHold);const r=rib[i];svg.classList.add('dim');paths.forEach(p=>p.classList.toggle('on',+p.dataset.i===i));
+  const show=i=>{const r=rib[i];svg.classList.add('dim');paths.forEach(p=>p.classList.toggle('on',+p.dataset.i===i));
     $('#flow-note').textContent=r.s===r.t?`${FNAME[r.s]}’s own first preferences: ${f1(r.v)} points.`:r.s===RIV&&r.t==='alp'?`${FNAME[r.s]} to Labor: ${f1(r.v)} points, where both Coalition parties run and one is excluded first.`:`${FNAME[r.s]} to ${FNAME[r.t]}: ${f1(r.v)} points, ${Math.round(r.f*100)}% of ${FNAME[r.s]} preferences.`};
   const hide=()=>{svg.classList.remove('dim');paths.forEach(p=>p.classList.remove('on'));flowNote()};
+  let chosen=null;
+  const clear=()=>{chosen=null;hide()};
+  sankeyClears.set(svg,clear);
+  svg.onclick=e=>{
+    sankeyClears.forEach((reset,other)=>{if(other!==svg)reset()});
+    const p=e.target.closest('.rb');
+    if(!p){clear();return}
+    const i=+p.dataset.i;
+    if(i===chosen)clear();else{chosen=i;show(i)}
+    e.stopPropagation();
+  };
   paths.forEach(p=>{
-    p.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')show(+p.dataset.i)});
-    p.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hide()});
-    p.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'){show(+p.dataset.i);flowHold=setTimeout(hide,2600)}});
+    p.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&chosen===null)show(+p.dataset.i)});
+    p.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&chosen===null)hide()});
   });
   $('#flow-table'+(fig.id==='flow-fig'?'':'-'+RIV)).innerHTML=`<caption>Preference flows, Labor v ${FNAME[RIV]}, points of the vote</caption><tr><th>Party</th><th>First preferences</th><th>To Labor</th><th>To ${FNAME[RIV]}</th></tr>`+src.map(s=>`<tr><td>${FNAME[s]}</td><td>${f1(PV[s])}</td><td>${f1(PV[s]*toLab(s,F,RIV))}</td><td>${f1(PV[s]*(1-toLab(s,F,RIV)))}</td></tr>`).join('')+`<tr><td>Total after preferences</td><td>100</td><td>${f1(lab)}</td><td>${f1(100-lab)}</td></tr>`;
   if(fig.id==='flow-fig')flowSrc();
 }
+document.addEventListener('click',e=>{
+  sankeyClears.forEach((clear,svg)=>{if(!svg.contains(e.target))clear()});
+});
 /* where a phone has no room for each party's share to Labor on the drawing, the note under it names them */
 const flowSrc=()=>{$('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+'; Coalition flows are counted at the 2025 election, One Nation flows are the site’s estimate. Tap or hover over a flow to see its size.'};
 function drawFlows(){
@@ -1887,6 +1911,12 @@ function drawFlows(){
   flowNote();flowSrc();
 }
 new ResizeObserver(drawFlows).observe($('#flows'));
+function placeRival(){
+  const box=$('.tpp .hd-sw'),header=$('#tpp .hd'),row=$('#tpp .ctl2');
+  if(matchMedia('(max-width:899px)').matches){if(box.parentElement!==header)header.insertBefore(box,header.querySelector('.dek'))}
+  else if(box.parentElement!==row||box.nextElementSibling!==row.querySelector('.opts'))row.insertBefore(box,row.querySelector('.opts'));
+}
+new ResizeObserver(placeRival).observe($('#tpp'));placeRival();
 /* the contest: one choice for both lead pages */
 function setRiv(r){
   $$('.rival-toggle').forEach(toggle=>{toggle.dataset.r=r;toggle.textContent=FNAME[r];

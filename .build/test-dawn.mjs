@@ -79,6 +79,16 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   eq(proper.map(optionLabel).join("|"), proper.join("|"), "proper nouns and abbreviations retain their capital letters");
 }
 
+/* the comparison switch only offers a rival where that series has readings */
+{
+  const src = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "dawn/template.html"), "utf8");
+  const logic = src.slice(src.indexOf("const hasTppRival="), src.indexOf("/* the two-party series start"));
+  const available = (start, end, v) => vm.runInNewContext(logic + ";hasTppRival()", { WIN: { a: start, b: end }, winRange: w => [w.a, w.b], CUR: { a: 2025 }, TPP: { on: { v } }, GX: [2025, 2026] });
+  eq(available(2022, 2024, [50.8]), false, "a past term with no One Nation comparison is Coalition-only");
+  eq(available(2025, 2026, [50.8]), true, "a current One Nation series keeps the switch available");
+  eq(available(2025, 2026, [null]), false, "a window with no One Nation reading does not enable it");
+}
+
 /* a completed term does not repeat a month across its two dates */
 {
   const src = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "dawn/template.html"), "utf8");
@@ -244,9 +254,11 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/\.hd-sw\{display:flex;align-items:center;height:1\.06em;margin:0;font:400 clamp\(25px,min\(7\.3vw,4\.6vh\),46px\)\/1\.06 var\(--serif\)\}/.test(html) && html.includes("h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);"), "the pill's box is one heading line tall in the heading's font, so it centres on that line");
   ok(/\.rival-toggle\{[^}]*padding:5px 9px;[^}]*font:500 13px/.test(html) && /@media\(max-width:899px\)\{[^@]*\.rival-toggle\{gap:4px;padding:4px 7px;font-size:12px\}/.test(html), "full-size pill on wide screens, the smaller one only on phones");
   const polls = fs.readFileSync(path.join(path.dirname(r.file), "polls/index.html"), "utf8");
-  ok(/<label class="pick"><span class="pl">Taking&nbsp;<\/span><select id="house">/.test(polls) && /\.pick\{position:relative/.test(polls), "the polls page's pollster menu reads like the chart's and opens under its button");
+  ok(/<label class="pick"><span class="pl">Take&nbsp;<\/span><select id="house">/.test(polls) && /\.pick\{position:relative/.test(polls), "the polls page's pollster menu uses Take");
   ok(polls.includes('<option value="">all pollsters</option>') && !/Every pollster|\(\$\{n\}\)/.test(polls), "the polls page's pollster menu carries no counts");
   ok(html.includes('Math.round(fB*.4)'), "the Sankey separator uses the smaller size");
+  ok(html.includes(".tpp .ctl2>.hd-sw>.rival-toggle{min-height:32px") && html.includes("row.insertBefore(box,row.querySelector('.opts'))"), "the compact pill and inferred support follow the year selector on desktop");
+  ok(html.includes("svg.onclick=e=>") && html.includes("if(i===chosen)clear()") && html.includes("if(!svg.contains(e.target))clear()"), "repeat and outside clicks clear a selected ribbon");
   ok(html.includes("const MT=TIPH+EVH+(evs.length&&!narrow?8:0)"), "eight extra pixels after desktop event labels, and only there");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
   ok(!!scale, "the primaries chart's y-axis rule is in the page");
@@ -259,11 +271,11 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
   ok(html.includes(".flow-match h3{margin:0 0 10px;font:500 19.5px var(--sans);color:var(--mute)}") && html.includes(".flow-phone-title{margin:0 0 10px;font:500 19.5px var(--sans)}"), "the Sankey margin heading is 1.5× its former 13px size on both layouts");
   ok(html.includes(".votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}") && html.includes(".votes .ctl .opts{margin-top:0;flex-shrink:0}"), "the time window and chart filters share a wrapping row");
-  ok(/<div class="pick"><span class="pl">Taking&nbsp;<\/span><button[^>]+id="pv-btn"[^>]*><b id="pv-name">all pollsters<\/b><\/button>/.test(html), "Taking is a separate prefix, not text inside the pollster button");
+  ok(/<div class="pick"><span class="pl">Take&nbsp;<\/span><button[^>]+id="pv-btn"[^>]*><b id="pv-name">all pollsters<\/b><\/button>/.test(html), "Take is a separate prefix, not text inside the pollster button");
   ok(html.includes('label:"all pollsters"'), "the first pollster menu option uses lowercase all pollsters");
   ok(html.includes('<option value="">all voters</option>') && !html.includes('<option value="">All voters</option>'), "the all-voters option is sentence case");
   ok(html.includes('value="${esc(gl)}">${esc(dawnOptionLabel(gl))}</option>'), "menu labels are formatted separately from canonical option values");
-  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('<span data-party="${RIV}" style="color:var(--${RIV})">${RIV===\'lnp\'?\'the \':\'\'}${FNAME[RIV]}</span>'), "both party names in the margin keep their own colours, including the Coalition's article");
+  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('against ${RIV===\'lnp\'?\'the \':\'\'}<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>'), "the margin colours only party names and the lead, not connecting words");
   ok(html.includes("color:var(--${lead>0?'alp':RIV})") && html.includes("header.style.color='var(--mute)'"), "only the signed lead follows the winner, with neutral connecting words");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
