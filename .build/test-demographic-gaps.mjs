@@ -87,12 +87,14 @@ for (const [party, dt] of Object.entries(D.demoTrend)) {
   const live = dt.rows.filter((r) => Number.isFinite(r.p));
   assert.equal(dt.tested, live.length, `${party}: the family is every group with a test`);
   for (const r of live) {
-    assert(r.padj >= r.p * 0.999 && r.padj <= 1, `${party}/${r.group}: Holm never lowers a p`);
-    assert.equal(r.sig, r.padj < 0.05, `${party}/${r.group}: significant means Holm-adjusted p under 0.05`);
-    assert.equal(r.sigAlone, r.p < 0.05);
+    const p = r.pRaw, padj = r.padjRaw;
+    assert(Number.isFinite(p) && Number.isFinite(padj), `${party}/${r.group}: the tests keep the unrounded probabilities`);
+    assert(padj >= p * 0.999 && padj <= 1, `${party}/${r.group}: Holm never lowers a p`);
+    assert.equal(r.sig, padj < 0.05, `${party}/${r.group}: significant means Holm-adjusted p under 0.05`);
+    assert.equal(r.sigAlone, p < 0.05);
     if (r.sig) assert(r.lrLo > 0 || r.lrHi < 0, `${party}/${r.group}: a significant change's interval excludes no change`);
   }
-  const ranked = live.slice().sort((x, y) => x.p - y.p);
+  const ranked = live.slice().sort((x, y) => x.pRaw - y.pRaw);
   ranked.forEach((r, i) => { if (i) assert(r.padj >= ranked[i - 1].padj * 0.999, `${party}: Holm keeps rank order`); });
   for (const m of dt.moves) {
     assert(m.sig && !(m.check && m.check.conflict), `${party}/${m.group}: a move is significant and not withheld`);

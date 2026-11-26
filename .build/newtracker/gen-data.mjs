@@ -8192,11 +8192,16 @@ const demoTrend = (() => {
       if (e && e.check) r.check = e.check;
     }
     /* a move: its relative change clears 95% after Holm across the party's
-       tested groups, and no same-house reading contradicts it */
+       tested groups, and no same-house reading contradicts it. Keep the
+       unrounded probabilities so a rounded boundary value cannot make the
+       emitted flags appear inconsistent to a correctness check. */
     for (const r of rows) {
       r.sigAlone = Number.isFinite(r.p) && r.p < 0.05;
       r.sig = Number.isFinite(r.padj) && r.padj < 0.05;
-      if (r.p != null) { r.p = +r.p.toPrecision(3); r.padj = +r.padj.toPrecision(3); }
+      if (r.p != null) {
+        r.pRaw = r.p; r.padjRaw = r.padj;
+        r.p = +r.p.toPrecision(3); r.padj = +r.padj.toPrecision(3);
+      }
       if (r.sig && !(r.check && r.check.conflict)) moves.push(r);
     }
     moves.sort((a, b) => a.p - b.p);
