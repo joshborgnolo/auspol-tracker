@@ -883,7 +883,7 @@ const DATA=JSON.parse($('#dawn-data').textContent);
 const paintLatestPoll=()=>{$('#now-latest').textContent=latestPollLine(DATA)};
 paintLatestPoll();setInterval(paintLatestPoll,60000);
 
-/* ---------- hero: sunrise by day, sunset in the evening ---------- */
+/* ---------- hero: the sky at the reader's hour ---------- */
 const hero=$('#top'),sky=$('#sky'),sun=$('#sun'),nowEl=$('#now');
 
 /* the real sky: every dot is a Hipparcos star to magnitude 6 (RA, Dec, magnitude, B-V; hundredths),
@@ -933,33 +933,12 @@ const SC={
   set:{a:{z:[16,44,100],m:[34,86,162],l:[90,142,208],h:[178,200,232]},b:{z:[8,12,40],m:[22,30,84],l:[52,52,124],h:[110,74,140]},c0:{c1:[236,58,36],c2:[212,34,30],c3:[182,22,26]},c1:{c1:[206,34,30],c2:[170,16,28],c3:[128,8,26]},dur:18000}
 };
 const mixc=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t)),rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
-let skyPref=store.get('apt-sky','auto'),mode='rise',raf=0,t0=null,done=false;
+let skyPref=store.get('apt-sky','auto'),mode='rise';
 const pickMode=()=>skyPref==='rise'||skyPref==='set'?skyPref:((h)=>h>=4&&h<15?'rise':'set')(new Date().getHours());
-function paint(p){
-  const s=SC[mode],H=hero.clientHeight,d=sun.offsetWidth||1;
-  // rise no higher than the figures allow: the limb stays clear of them on short screens
-  const off=tbdEl?tbdEl.offsetHeight:0;   // the toolbar's overlay and the panel's overrun at the foot: the horizon sits above them
-  const rise=Math.max(0,Math.min(H*.13,H-off-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
-  let t,ts,tk,y,wa,ba,st;
-  if(mode==='rise'){
-    t=1-Math.pow(1-p,3);ts=t;tk=Math.min(1,t*1.1);
-    y=d*.6+(-rise-d*.6)*t;
-    const glow=Math.sin(Math.min(1,t*1.25)*Math.PI*.9);
-    wa=.3+.5*glow;ba=.35*(1-t)+.12;st=Math.max(0,1-t*1.8);
-  }else{
-    t=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;ts=Math.min(1,t/.7);tk=Math.min(1,Math.max(0,(t-.25)/.75));
-    y=-rise+(d*.75+rise)*ts;
-    const sw=Math.sin(Math.min(1,t*1.4)*Math.PI*.75);
-    wa=Math.max(0,.4+.6*sw-.7*Math.max(0,t-.6)/.4);ba=.12+.5*Math.sin(Math.min(1,t)*Math.PI);st=Math.max(0,(t-.7)/.3);
-  }
-  const st2=sky.style;
-  for(const k in s.a)st2.setProperty('--'+k,rgb(mixc(s.a[k],s.b[k],tk)));
-  for(const k in s.c0)st2.setProperty('--'+k,rgb(mixc(s.c0[k],s.c1[k],ts)));
-  st2.setProperty('--ty',y.toFixed(1)+'px');
-  st2.setProperty('--sy',Math.min(104,100-((d*.5-y+off)/H*100)).toFixed(2)+'%');
-  if(tintOn)tintTo(st2.getPropertyValue('--z'));
-  const r=mode==='rise';st2.setProperty('--wa1',(r?wa:0).toFixed(3));st2.setProperty('--ba1',(r?ba:0).toFixed(3));st2.setProperty('--wa2',(r?0:wa).toFixed(3));st2.setProperty('--ba2',(r?0:ba).toFixed(3));st2.setProperty('--st',st.toFixed(3));
-}
+/* the sun stands still, set by the reader's clock: highest at noon, lowest (still on the horizon) at midnight */
+const dayFrac=()=>{const n=new Date();return (n.getHours()+n.getMinutes()/60+n.getSeconds()/3600)/24};
+const sunRise=(H,d,off)=>Math.max(0,Math.min(H*.13,H-off-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
+function paintNow(){if(rpOn)return;mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;paintCycle(dayFrac())}
 /* the status bar's strip: iOS 26 Safari tints it from the page's background, not theme-color, so
    while the hero fills the screen the root takes the sky's top colour (and theme-color follows, for
    the browsers that read it); past the hero both go back to the page's */
@@ -967,9 +946,6 @@ const tbdEl=document.getElementById('tbd'),metaTheme=document.querySelector('met
 let tintOn=null;
 function tintTo(c){document.documentElement.style.backgroundColor=c||'';document.body.style.backgroundColor=c||'';if(metaTheme)metaTheme.content=c||getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#fbf6f1'}
 function tintTop(on){if(on===tintOn)return;tintOn=on;tintTo(on?(sky.style.getPropertyValue('--z')||'#0a1230'):'')}
-function frame(ts){if(t0===null)t0=ts;const p=Math.min(1,(ts-t0)/SC[mode].dur);paint(p);if(p<1)raf=requestAnimationFrame(frame);else done=true}
-function play(){mode=pickMode();sky.dataset.mode=mode;root.dataset.sky=mode;cancelAnimationFrame(raf);t0=null;done=false;if(reduce){paint(1);done=true;return}paint(0);raf=requestAnimationFrame(frame)}
-hero.addEventListener('click',e=>{if(!e.target.closest('.now')&&!rpOn)play()});
 /* a full day for the replay: phase 0 is midnight, .25 sunrise, .5 noon, .75 sunset */
 const mixO=(a,b,t)=>Object.fromEntries(Object.keys(a).map(k=>[k,mixc(a[k],b[k],t)]));
 const NIGHT={z:[5,8,26],m:[12,18,56],l:[26,32,90],h:[44,44,104]};
@@ -978,14 +954,16 @@ let rpOn=false;
 function paintCycle(f){
   f-=Math.floor(f);let j=0;while(j<KF.length-2&&f>=KF[j+1][0])j++;
   const A=KF[j],B=KF[j+1];let t=(f-A[0])/(B[0]-A[0]);t=t*t*(3-2*t);
-  const H=hero.clientHeight,d=sun.offsetWidth||1,rise=Math.max(0,Math.min(H*.13,H-(nowEl.offsetTop+nowEl.offsetHeight)-16-.66*d));
-  const sh=-Math.cos(2*Math.PI*f),h=Math.min(1,Math.max(0,(sh+.15)/1.15)),y=d*.75+(-rise-d*.75)*h,st2=sky.style;
+  const H=hero.clientHeight,d=sun.offsetWidth||1,off=tbdEl?tbdEl.offsetHeight:0,rise=sunRise(H,d,off);
+  // the sun only dips from its noon height to a cap on the horizon at midnight
+  const sh=-Math.cos(2*Math.PI*f),h=(sh+1)/2,y=d*.15+(-rise-d*.15)*h,st2=sky.style;
   for(const k in NIGHT)st2.setProperty('--'+k,rgb(mixc(A[1][k],B[1][k],t)));
   for(const k in SC.rise.c0)st2.setProperty('--'+k,rgb(mixc(SC.rise.c0[k],SC.rise.c1[k],h)));
   const L=(i)=>(A[i]+(B[i]-A[i])*t).toFixed(3);
   st2.setProperty('--wa1',L(2));st2.setProperty('--ba1',L(3));st2.setProperty('--wa2',L(4));st2.setProperty('--ba2',L(5));
-  st2.setProperty('--ty',y.toFixed(1)+'px');st2.setProperty('--sy',Math.min(104,100-((d*.5-y)/H*100)).toFixed(2)+'%');
+  st2.setProperty('--ty',y.toFixed(1)+'px');st2.setProperty('--sy',Math.min(104,100-((d*.5-y+off)/H*100)).toFixed(2)+'%');
   st2.setProperty('--st',Math.min(1,Math.max(0,(-sh-.05)/.4)).toFixed(3));
+  if(tintOn)tintTo(st2.getPropertyValue('--z'));
 }
 /* film grain: one noise tile drawn once, light and dark specks, tiled over the sky */
 {const N=256,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),im=x.createImageData(N,N),d=im.data;
@@ -994,8 +972,8 @@ function paintCycle(f){
  x.putImageData(im,0,0);const u=`url(${c.toDataURL()})`;$('#grain').style.backgroundImage=u;$('#twin-grain').style.backgroundImage=u;}
 /* browsers without scroll timelines slide the bar's sky from the scroll event */
 if(!(window.CSS&&CSS.supports('animation-timeline','scroll()'))){const ts=$('#tsky'),f=()=>{ts.style.transform=`translateY(${-Math.min(Math.max(scrollY,0),hero.offsetHeight)}px)`};addEventListener('scroll',f,{passive:true});addEventListener('resize',f);f()}
-addEventListener('resize',()=>{if(done)paint(1)});
-play();
+addEventListener('resize',paintNow);
+paintNow();setInterval(paintNow,60000);
 
 /* ---------- the data: the site's models, week by week ---------- */
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1579,13 +1557,13 @@ function tweenTo(j,ms,then){
   const f=ts=>{if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/ms),e=e3(t);PK.forEach(k=>curW[k]=from[k]+(TEN[k][j]-from[k])*e);renderW();if(t<1)rpRaf=requestAnimationFrame(f);else then&&then()};
   rpRaf=requestAnimationFrame(f);
 }
-function finish(){pv.classList.remove('live');settle(LAST);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week since the 2025 election');mode=pickMode();sky.dataset.mode=mode;paint(1);done=true}
+function finish(){pv.classList.remove('live');settle(LAST);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week since the 2025 election');paintNow()}
 function stopReplay(){cancelAnimationFrame(rpRaf);tweenTo(LAST,reduce?0:700,finish)}
 rpBtn.addEventListener('click',e=>{
   e.stopPropagation();if(rpOn){stopReplay();return}
   rpOn=true;rpBtn.setAttribute('aria-pressed','true');rpBtn.setAttribute('aria-label','Stop the replay');
-  cancelAnimationFrame(raf);done=true;pv.classList.add('live');
-  const f0=mode==='rise'?.45:.84;
+  pv.classList.add('live');
+  const f0=dayFrac();
   tweenTo(0,reduce?0:700,()=>{
     const T=LAST*STEP;let t0=null,last=0;
     const step=ts=>{
