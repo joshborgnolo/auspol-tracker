@@ -69,7 +69,7 @@ export function votesHead(D) {
 }
 export function votesDek(D) {
   const [y, mo] = D.election.date.split("-").map(Number);
-  return "% of each party’s first-preference vote since the " + MONF[mo - 1] + " " + y + " election, %.";
+  return "% of each party’s first-preference vote since the " + MONF[mo - 1] + " " + y + " election, %";
 }
 
 /* the two-party chart's story: the site's rule, word for word (rd-hero.jsx

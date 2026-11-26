@@ -184,11 +184,11 @@ eq(votesHead(fall("lnp", E.lnp - 3, E.lnp - 1)).head, "The Coalition is down 3.0
 eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 points since the election", "a plural name takes a plural verb");
 {
   const D = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], lnp: [E.lnp - 4, E.lnp - 5, E.lnp - 3] });
-  ok(votesDek(D).endsWith("election, %."), "no secondary movement sentence: " + votesDek(D));
+  ok(votesDek(D).endsWith("election, %"), "no secondary movement sentence: " + votesDek(D));
   const D2 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], grn: [E.grn + 2, E.grn + 1, E.grn + 3] });
-  ok(votesDek(D2).endsWith("election, %."), "the caption stays one sentence under mixed changes: " + votesDek(D2));
+  ok(votesDek(D2).endsWith("election, %"), "the caption stays one sentence under mixed changes: " + votesDek(D2));
   const D3 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5] });
-  eq(votesDek(D3), "% of each party’s first-preference vote since the May 2025 election, %.", "only the measure-label sentence remains");
+  eq(votesDek(D3), "% of each party’s first-preference vote since the May 2025 election, %", "only the measure-label sentence remains");
 }
 /* the two-party story's curated heading (owner's wording, 25 Nov 2026) */
 {
@@ -239,6 +239,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/if\(i0===0&&iS<=1\)\{const c=EST\[k\]\[0\]\.m;pts\.push\(\{x:ELX,y:c\}\)/.test(html) && /const open=\(c,a,band\)=>c==='lnp'&&cnt0!=null/.test(html), "this term's primary and Labor v Coalition lines open on the 2025 count");
   ok(/<clipPath id="\$\{cid\}"><rect x="\$\{ML\}" y="\$\{MT-8\}" width="\$\{PW\}"/.test(html), "lines and bands clip at the plot's edges");
   ok(!html.includes("cursor:crosshair"), "chart hover has no crosshair cursor");
+  ok(html.includes('svg .vv{font-family:var(--sans);font-style:normal;fill:var(--mute)}') && html.includes('.vs .v{font-family:var(--sans);font-style:normal;color:var(--mute);font-size:.8em}'), "both v separators use upright Commissioner");
   ok(html.includes("const MT=TIPH+EVH+(evs.length&&!narrow?8:0)"), "eight extra pixels after desktop event labels, and only there");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
   ok(!!scale, "the primaries chart's y-axis rule is in the page");
