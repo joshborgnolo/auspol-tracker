@@ -89,6 +89,11 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 .now{position:absolute;z-index:2;left:var(--col);right:max(18px,env(safe-area-inset-right));top:calc(var(--navh) + env(safe-area-inset-top) + clamp(8px,2.4vh,40px));max-width:none;width:calc(100% - var(--col) - max(18px,env(safe-area-inset-right)));color:#f6f4ff;cursor:auto;text-shadow:0 1px 12px rgb(4 10 40/.38)}
 .now h2{font:400 clamp(30px,min(8.8vw,5.2vh),52px)/1.04 var(--serif);letter-spacing:-.018em;margin:0}
 .now-d{margin:6px 0 0;font-size:14px;line-height:1.4;color:rgb(238 238 255/.82);max-width:44ch}
+.now-mode{margin-top:6px}
+.now-mode .tgl{color:rgb(238 238 255/.82);padding:4px 0}
+.now-mode .tgl i{background:rgb(238 238 255/.22)}
+.now-mode .tgl i::after{background:#f6f4ff}
+.now-mode .tgl[aria-checked=true] i{background:rgb(238 238 255/.65)}
 .now{--fs:clamp(24px,min(7.6vw,4.2vh),40px)}
 .pr{display:grid;grid-template-columns:minmax(0,1fr) calc(var(--fs)*2.8) 3.7em;column-gap:14px}
 .pv-h{display:flex;justify-content:flex-end;align-items:center;gap:5px;margin-top:clamp(6px,1.6vh,20px);font-size:13px;color:rgb(238 238 255/.72)}
@@ -125,6 +130,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 .pb s.up{background:none;box-shadow:none}
 .pb s.up::after{left:-.75px}
 .pb s.dn::after{right:-.75px}
+.pb s.ci::after{left:var(--m);right:auto;transform:translateX(-50%)}
 @media (min-width:900px){.now-d{font-size:15px}}
 .core{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle closest-side at 50% 46%,var(--c1) 0%,var(--c2) 62%,var(--c3) 90%,#ee4420 97%,rgba(255,96,30,0) 100%)}
 
@@ -351,7 +357,8 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="grain" id="grain" aria-hidden="true"></div>
   <div class="now" id="now">
     <h2>Primaries</h2>
-    <p class="now-d">Estimated first preferences at <span id="now-date">{{asOf}}</span>. <span id="now-latest">{{latestPoll}}</span> Whiskers mark the 2025 election; = means a statistical tie.</p>
+    <p class="now-d">Estimated first preferences at <span id="now-date">{{asOf}}</span>. <span id="now-latest">{{latestPoll}}</span> <span id="whisk-note">Whiskers mark the 2025 election</span>; = means a statistical tie.</p>
+    <div class="now-mode"><button type="button" class="tgl" id="pv-whisker-mode" role="switch" aria-checked="false"><i aria-hidden="true"></i><span id="pv-whisker-label">Show change on May 2025</span></button></div>
     <div class="pv-h"><span aria-hidden="true">since 2025</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week since the 2025 election"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
     <div class="pv still" id="pv" role="table" aria-label="Estimated primary vote, %, and change since the 2025 election"></div>
   </div>
@@ -1107,15 +1114,25 @@ PK.forEach(k=>{const r=rowOf[k];RV[k]=$('.pval .rv',r);DV[k]=$('.pd .rv',r);SB[k
 /* each week's ranking (gen-data §13, as the site ranks today): a party ties with the group above while
    the chance that group's leader is ahead of it is under 97.5%; a tie is shown as =n */
 const ranks=i=>Object.fromEntries(PK.map((k,j)=>{const r=DATA.rank[i][j];return [k,{r:Math.abs(r),eq:r<0}]}));
-const TEN=Object.fromEntries(PK.map(k=>[k,EST[k].map(q=>Math.round(q.m*10))])),THEN=Object.fromEntries(PK.map(k=>[k,Math.round(ANCH[k]*10)]));
-const curW={};
+const TEN=Object.fromEntries(PK.map(k=>[k,EST[k].map(q=>Math.round(q.m*10))])),LOW=Object.fromEntries(PK.map(k=>[k,EST[k].map(q=>Math.round(q.lo*10))])),HIGH=Object.fromEntries(PK.map(k=>[k,EST[k].map(q=>Math.round(q.hi*10))])),THEN=Object.fromEntries(PK.map(k=>[k,Math.round(ANCH[k]*10)]));
+let ciMode=false;
+const curW={},curLo={},curHi={};
 function renderW(){
-  PK.forEach(k=>{const w=curW[k],th=THEN[k],r=rowOf[k];
+  PK.forEach(k=>{const w=curW[k],th=THEN[k],lo=curLo[k],hi=curHi[k],r=rowOf[k];
+    const left=ciMode?lo:Math.min(w,th),width=ciMode?hi-lo:Math.abs(w-th);
     odoSet(RV[k],w);odoSet(DV[k],w-th);
-    r.style.setProperty('--w',pc(w/10));r.style.setProperty('--l',pc(Math.min(w,th)/10));r.style.setProperty('--d',pc(Math.abs(w-th)/10));
-    SB[k].className=th<w?'up':'dn';
+    r.style.setProperty('--w',pc(w/10));r.style.setProperty('--l',pc(left/10));r.style.setProperty('--d',pc(width/10));
+    SB[k].className=ciMode?'ci':th<w?'up':'dn';
+    SB[k].style.setProperty('--m',(ciMode&&hi>lo?100*(w-lo)/(hi-lo):50).toFixed(2)+'%');
   });
 }
+const modeBtn=$('#pv-whisker-mode'),modeLabel=$('#pv-whisker-label'),whiskNote=$('#whisk-note');
+function paintWhiskMode(){
+  modeLabel.textContent=ciMode?'Show 95% credible intervals':'Show change on May 2025';
+  modeBtn.setAttribute('aria-checked',String(ciMode));
+  whiskNote.textContent=ciMode?'Whiskers mark 95% credible intervals':'Whiskers mark the 2025 election';
+}
+modeBtn.addEventListener('click',ev=>{ev.stopPropagation();ciMode=!ciMode;paintWhiskMode();renderW()});
 const nowDate=$('#now-date');
 function setDate(j){nowDate.textContent=j===0?'the 2025 election':fdate(G[j])}
 function setWeek(j,instant){
@@ -1128,13 +1145,13 @@ function setWeek(j,instant){
   setDate(j);return order;
 }
 function settle(j){pv.classList.add('still');const order=setWeek(j,true);order.forEach(k=>{pv.appendChild(rowOf[k]);rowOf[k].style.transform=''});pv.offsetHeight;pv.classList.remove('still')}
-PK.forEach(k=>curW[k]=TEN[k][LAST]);renderW();settle(LAST);
+PK.forEach(k=>{curW[k]=TEN[k][LAST];curLo[k]=LOW[k][LAST];curHi[k]=HIGH[k][LAST]});paintWhiskMode();renderW();settle(LAST);
 const rpBtn=$('#replay'),STEP=reduce?120:200;let rpRaf=0;
 function tweenTo(j,ms,then){
-  const from={...curW},e3=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;let t0=null;
+  const fromW={...curW},fromLo={...curLo},fromHi={...curHi},e3=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;let t0=null;
   setWeek(j);
-  if(!ms){PK.forEach(k=>curW[k]=TEN[k][j]);renderW();then&&then();return}
-  const f=ts=>{if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/ms),e=e3(t);PK.forEach(k=>curW[k]=from[k]+(TEN[k][j]-from[k])*e);renderW();if(t<1)rpRaf=requestAnimationFrame(f);else then&&then()};
+  if(!ms){PK.forEach(k=>{curW[k]=TEN[k][j];curLo[k]=LOW[k][j];curHi[k]=HIGH[k][j]});renderW();then&&then();return}
+  const f=ts=>{if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/ms),e=e3(t);PK.forEach(k=>{curW[k]=fromW[k]+(TEN[k][j]-fromW[k])*e;curLo[k]=fromLo[k]+(LOW[k][j]-fromLo[k])*e;curHi[k]=fromHi[k]+(HIGH[k][j]-fromHi[k])*e});renderW();if(t<1)rpRaf=requestAnimationFrame(f);else then&&then()};
   rpRaf=requestAnimationFrame(f);
 }
 function finish(){pv.classList.remove('live');settle(LAST);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week since the 2025 election');paintNow()}
@@ -1148,7 +1165,7 @@ rpBtn.addEventListener('click',e=>{
     const T=LAST*STEP;let t0=null,last=0;
     const step=ts=>{
       if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/T),fi=t*LAST,i0=Math.min(LAST,Math.floor(fi)),u=reduce?0:fi-i0;
-      PK.forEach(k=>{const A=TEN[k],q=n=>A[Math.max(0,Math.min(LAST,n))],p0=q(i0-1),p1=q(i0),p2=q(i0+1),p3=q(i0+2);curW[k]=p1+.5*u*(p2-p0+u*(2*p0-5*p1+4*p2-p3+u*(3*(p1-p2)+p3-p0)))});renderW();
+      PK.forEach(k=>{for(const [dest,src] of [[curW,TEN],[curLo,LOW],[curHi,HIGH]]){const A=src[k],q=n=>A[Math.max(0,Math.min(LAST,n))],p0=q(i0-1),p1=q(i0),p2=q(i0+1),p3=q(i0+2);dest[k]=p1+.5*u*(p2-p0+u*(2*p0-5*p1+4*p2-p3+u*(3*(p1-p2)+p3-p0)))}});renderW();
       const j=Math.min(LAST,Math.round(fi));if(j!==last){setWeek(j);last=j}
       if(!reduce)paintCycle(f0+4*t);
       if(t<1)rpRaf=requestAnimationFrame(step);else finish();
