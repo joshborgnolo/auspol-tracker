@@ -20,7 +20,7 @@
    DATA the site's own models (gen-data §13, built by .build/dawn/build.mjs): a trial design, linked from nowhere */
 html.wait{background:#0a1230}html.wait body{visibility:hidden}
 @font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("/assets/fonts/commissioner-latin.737ec8f2.woff2") format("woff2")}
-:root{--tbd:0px;--tbs:0px;--ext:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
+:root{--tbd:0px;--tbs:0px;--ext:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#cc1f1d;--h-lnp:#3f83ff;--h-on:#ff8a2e;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}}
 :root[data-theme=dark]{color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}
 *{box-sizing:border-box;min-width:0}
@@ -326,8 +326,6 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 /* the hero is a column chart: a column a leader, highest first, up from the zero line when more approve
    and down when more disapprove. The figure rides the column's end; the white line is where the leader
    started, or, switched, the 95% interval */
-/* Labor’s column is the sun’s own deep red: the other heroes’ lifted red reads orange at this size */
-.ld-hero{--h-alp:#cc1f1d}
 .cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:4px}
 .cl{display:flex;flex-direction:column;min-width:0;transition:transform .34s cubic-bezier(.3,.9,.3,1)}
 .cols.still .cl{transition:none}
