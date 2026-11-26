@@ -277,7 +277,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const ph = fs.readFileSync(r.polls, "utf8");
   ok(!/\{\{[A-Za-z]+\}\}/.test(ph), "every polls-page placeholder filled");
   ok(ph.includes("<h1>Federal opinion polls</h1>"), "the polls-page heading survives regeneration");
-  ok(ph.includes('<p class="dek">From 13 pollsters, with the newest first. Open a poll to see details.</p>'), "the polls-page dek survives regeneration");
+  ok(ph.includes('<p class="dek">From 13 pollsters, with the newest first. Open a poll for details.</p>'), "the polls-page dek survives regeneration");
   const pollScript = ph.match(/<script>([\s\S]*?)<\/script>/);
   ok(!!pollScript, "the ledger's whole client is present");
   new vm.Script(pollScript[1]);
@@ -292,6 +292,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(!!r.next && fs.existsSync(r.next), "the next-polls page is built");
   const nh = fs.readFileSync(r.next, "utf8");
   ok(!/\{\{[A-Za-z]+\}\}/.test(nh), "every next-page placeholder filled");
+  ok(nh.includes(".dek:empty{display:none}") && nh.includes(".hd + .blk{margin-top:clamp(16px,2vh,24px)}"), "the next-polls heading gap is tightened when the summary is empty");
   ok(/window\.AP\.nextPolls\s*=\s*npProject/.test(nh) && /AP\.nextWords\s*=/.test(nh), "the site's projection and its words, inlined");
   const NX = JSON.parse(nh.match(/<script id="next-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
   ok(NX.pollCadence.length >= 5 && NX.pollCadence.every((c) => c.tracked !== "confidence"), "every house on a pattern, the confidence gauges left out");

@@ -141,7 +141,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     PD.issL = ISSUE_NAMES;   // each issue by the name the site gives it
     const order = [...D.parties].sort((a, b) => D.prim[b].v[L] - D.prim[a].v[L]);
     const fillP = { FONT: "/assets/fonts/" + font, pollsHead: "Federal opinion polls",
-                    pollsDek: "From 13 pollsters, with the newest first. Open a poll to see details." };
+                    pollsDek: "From 13 pollsters, with the newest first. Open a poll for details." };
     let ph = fs.readFileSync(path.join(HERE, "template-polls.html"), "utf8");
     ph = ph.replace(/\{\{(FONT|pollsHead|pollsDek)\}\}/g, (m, k) => fillP[k]).replace("{{ORDER}}", () => JSON.stringify(order))
       .replace("{{POLLS}}", () => JSON.stringify(PD).replace(/</g, "\\u003c"))
