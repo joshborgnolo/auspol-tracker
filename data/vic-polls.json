@@ -1,8 +1,8 @@
 {
-  "generated": "2026-11-24",
+  "generated": "2026-11-26",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-24 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-24 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-26 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-26 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -2168,6 +2168,66 @@
         "pollbludger"
       ],
       "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "20-23 Nov",
+      "fwStart": "2026-11-20",
+      "fwEnd": "2026-11-23",
+      "approxDate": false,
+      "primary": {
+        "alp": 20,
+        "lnp": 31,
+        "grn": 13,
+        "onp": 25,
+        "ind": 4,
+        "oth": 7
+      },
+      "tpp2": {
+        "alp": 41
+      },
+      "alt": {
+        "lnpVOnp": 66
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker",
+        "pollbludger"
+      ],
+      "sourceUrl": "https://www.pollbludger.net/2026/11/25/resolve-strategic-labor-20-coalition-31-one-nation-25-in-victoria/",
+      "releaseUrl": "https://www.theage.com.au/politics/victoria/four-out-of-five-voters-want-anyone-but-labor-a-once-in-a-century-drubbing-looms-20261125-p61gug.html"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": "PremierNational",
+      "sample": 2092,
+      "sampleEff": 1321,
+      "dateLabel": "21–25 Nov 2026",
+      "fwStart": "2026-11-21",
+      "fwEnd": "2026-11-25",
+      "approxDate": false,
+      "primary": {
+        "alp": 19,
+        "lnp": 34,
+        "grn": 16,
+        "onp": 16,
+        "ind": 6,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 45
+      },
+      "alt": {},
+      "provenance": [
+        "demosau"
+      ],
+      "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
+      "releaseUrl": "https://demosau.com/news/coalition-in-election-winning-lead-in-final-demosau-premiernational-victorian-poll/",
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_Victoria_Poll_Late_November_2026_Methodology_Statement.pdf"
     }
   ],
   "threeParty": [
@@ -4471,6 +4531,98 @@
       "sourceUrl": "https://www.news24.com.au/politics/australian-politics/victorian-labor-headed-for-nightmare-state-election-recording-worst-vote-since-1902-as-coalition-set-for-landslide-victory/news-story/d5f3b4209cbfc3c3c03d8afc852d8c66",
       "provenance": [
         "news24"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "20–23 Nov 2026",
+      "date": "2026-11-23",
+      "fwStart": "2026-11-20",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "values": {
+        "carroll": 23,
+        "wilson": 34,
+        "pickering": 19
+      },
+      "dk": 25,
+      "net": 11,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/four-out-of-five-voters-want-anyone-but-labor-a-once-in-a-century-drubbing-looms-20261125-p61gug.html",
+      "provenance": [
+        "wikipedia",
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "21–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-11-21",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2092,
+      "values": {
+        "carroll": 28,
+        "wilson": 36,
+        "pickering": 15
+      },
+      "dk": 21,
+      "net": 8,
+      "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
+      "provenance": [
+        "demosau"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "21–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-11-21",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2092,
+      "leader": "carroll",
+      "pos": 18,
+      "neg": 50,
+      "net": -32,
+      "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
+      "provenance": [
+        "demosau"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "21–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-11-21",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2092,
+      "leader": "wilson",
+      "pos": 35,
+      "neg": 31,
+      "net": 4,
+      "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
+      "provenance": [
+        "demosau"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "21–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-11-21",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2092,
+      "leader": "pickering",
+      "pos": 22,
+      "neg": 43,
+      "net": -21,
+      "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
+      "provenance": [
+        "demosau"
       ]
     }
   ]

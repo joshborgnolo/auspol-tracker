@@ -128,7 +128,7 @@
   },
   "meta": {
     "source": "data/vic-polls.json",
-    "generated": "2026-11-24"
+    "generated": "2026-11-26"
   },
   "metricRules": {
     "favFirms": [
@@ -1597,6 +1597,42 @@
         "lnp": 37,
         "onp": 25
       }
+    },
+    {
+      "date": "2026-11-23",
+      "dateStart": "2026-11-20",
+      "pollster": "Resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "alp": 20,
+      "lnp": 31,
+      "grn": 13,
+      "onp": 25,
+      "ind": 4,
+      "oth": 7,
+      "tpp_alp": 41,
+      "tpp_lnp": 59,
+      "url": "https://www.pollbludger.net/2026/11/25/resolve-strategic-labor-20-coalition-31-one-nation-25-in-victoria/",
+      "releaseUrl": "https://www.theage.com.au/politics/victoria/four-out-of-five-voters-want-anyone-but-labor-a-once-in-a-century-drubbing-looms-20261125-p61gug.html"
+    },
+    {
+      "date": "2026-11-25",
+      "dateStart": "2026-11-21",
+      "pollster": "DemosAU",
+      "client": "PremierNational",
+      "sample": 2092,
+      "sampleEff": 1321,
+      "alp": 19,
+      "lnp": 34,
+      "grn": 16,
+      "onp": 16,
+      "ind": 6,
+      "oth": 9,
+      "tpp_alp": 45,
+      "tpp_lnp": 55,
+      "url": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
+      "releaseUrl": "https://demosau.com/news/coalition-in-election-winning-lead-in-final-demosau-premiernational-victorian-poll/",
+      "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_Victoria_Poll_Late_November_2026_Methodology_Statement.pdf"
     }
   ],
   "ppm": [
@@ -2058,6 +2094,26 @@
       "oppName": "Wilson",
       "pmName": "Carroll",
       "han": 19,
+      "extra": null
+    },
+    {
+      "date": "2026-11-23",
+      "firm": "Resolve",
+      "alb": 23,
+      "opp": 34,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 19,
+      "extra": null
+    },
+    {
+      "date": "2026-11-25",
+      "firm": "DemosAU",
+      "alb": 28,
+      "opp": 36,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": 15,
       "extra": null
     }
   ],
@@ -2629,6 +2685,29 @@
           "dis": 38
         }
       }
+    },
+    {
+      "date": "2026-11-25",
+      "firm": "DemosAU",
+      "alb": -32,
+      "opp": 4,
+      "oppName": "Wilson",
+      "pmName": "Carroll",
+      "han": -21,
+      "detail": {
+        "alb": {
+          "app": 18,
+          "dis": 50
+        },
+        "opp": {
+          "app": 35,
+          "dis": 31
+        },
+        "han": {
+          "app": 22,
+          "dis": 43
+        }
+      }
     }
   ],
   "ppmHeadToHead": [],
@@ -2710,6 +2789,12 @@
       "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 50,
       "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-11-23",
+      "firm": "Resolve",
+      "alpVsOnp_alp": null,
+      "lnpVsOnp_lnp": 66
     }
   ],
   "cyclePolls": {},
