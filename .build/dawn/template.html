@@ -86,7 +86,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 @keyframes twin{to{transform:translateY(-8192px)}}
 @supports (animation-timeline:scroll()){.tsky{animation-name:twin;animation-duration:1ms;animation-duration:auto;animation-timing-function:linear;animation-fill-mode:both;animation-timeline:scroll(root block);animation-range:0px 8192px}}
 .grain{position:absolute;inset:0;z-index:1;pointer-events:none;background-repeat:repeat;background-size:128px 128px;opacity:.22}
-.now{position:absolute;z-index:2;left:var(--col);right:max(18px,env(safe-area-inset-right));top:calc(var(--navh) + env(safe-area-inset-top) + clamp(8px,2.4vh,40px));max-width:none;color:#f6f4ff;cursor:auto;text-shadow:0 1px 12px rgb(4 10 40/.38)}
+.now{position:absolute;z-index:2;left:var(--col);right:max(18px,env(safe-area-inset-right));top:calc(var(--navh) + env(safe-area-inset-top) + clamp(8px,2.4vh,40px));max-width:none;width:calc(100% - var(--col) - max(18px,env(safe-area-inset-right)));color:#f6f4ff;cursor:auto;text-shadow:0 1px 12px rgb(4 10 40/.38)}
 .now h2{font:400 clamp(30px,min(8.8vw,5.2vh),52px)/1.04 var(--serif);letter-spacing:-.018em;margin:0}
 .now-d{margin:6px 0 0;font-size:14px;line-height:1.4;color:rgb(238 238 255/.82);max-width:44ch}
 .now{--fs:clamp(24px,min(7.6vw,4.2vh),40px)}
@@ -133,6 +133,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
 .dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:none;text-wrap:pretty}
+@media(min-width:900px){.now{max-width:600px}.dek{max-width:60ch}}
 .ctl{margin-top:12px}
 .seg{display:inline-flex;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .seg button{font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 12px;height:32px;cursor:pointer;white-space:nowrap}
@@ -239,6 +240,23 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tgl[hidden]{display:none}
 .tgl b{font-weight:500}.tgl em{font-style:normal}
 .tgl-ph:not([hidden]){display:none}
+.rival-toggle{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 13px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
+.rival-toggle::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.rival-toggle[data-r=on]{color:var(--on)}
+.rival-toggle[data-r=lnp]{background:color-mix(in srgb,var(--lnp) 10%,var(--bg))}
+.rival-toggle[data-r=on]{background:color-mix(in srgb,var(--on) 12%,var(--bg))}
+#tpp-rival-toggle{display:none}
+@media(max-width:899px){
+  #flows .hd,.tpp .hd{flex-wrap:wrap;align-items:baseline;gap:8px 12px}
+  #flows .hd{display:flex}
+  .tpp .hd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+  #flows .hd .dek{order:3;flex-basis:100%}
+  .tpp .hd .dek{grid-column:1/-1}
+  .tpp .hd>h2{min-width:0}
+  #flow-ctl,#tpp-rival-toggle{margin:0 0 0 auto;flex:none}
+  #tpp-rival-toggle{display:inline-flex}
+  .tpp>.ctl:not(.ctl2){display:none}
+}
 svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 
 @media (max-height:600px){.sec{height:auto;min-height:calc(100vh + var(--ext));min-height:calc(100lvh + var(--ext));overflow:visible}.fig{min-height:260px}}
@@ -254,11 +272,14 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .flow-pair{grid-area:fig;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:18px;min-height:0}
 .flow-match{margin:0;display:flex;flex-direction:column;min-height:0}
 .flow-match h3{margin:0 0 10px;font:500 13px var(--sans);color:var(--mute)}
+.flow-phone-title{margin:0 0 10px;font:500 13px var(--sans)}
+@media(min-width:900px){.flow-phone-title{display:none}}
 .flow-match .fig{flex:1;min-height:0;margin-top:0}
 .tpp{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto auto;column-gap:48px;grid-template-areas:"hd ctl" "win win" "fig fig" "keys keys" "src src"}
 .tpp .hd{grid-area:hd}
 .tpp .ctl{grid-area:ctl;align-self:end;margin:0 0 4px}
-.tpp .ctl2{grid-area:win;margin-top:16px}
+.tpp .ctl2{grid-area:win;margin-top:16px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.tpp .ctl2 .opts{margin-top:0}
 .tpp .fig{grid-area:fig;margin-top:8px}
 .tpp .keys{grid-area:keys}
 .tpp .src{grid-area:src}
@@ -351,7 +372,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div>
       <div class="opts">
         <label class="pick"><span class="pl">Among&nbsp;</span><select id="grp-sel"></select></label>
-        <div class="pick"><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><span>Pollsters</span><b id="pv-name">All</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
+        <div class="pick"><button type="button" class="pbtn" id="pv-btn" aria-haspopup="true" aria-expanded="false" aria-controls="pv-pop"><span>taking </span><b id="pv-name">all pollsters</b></button><div class="pop" id="pv-pop" role="group" aria-label="Pollsters" hidden></div></div>
         <button type="button" class="tgl" role="switch" aria-checked="false" data-measured hidden><i aria-hidden="true"></i><span><b>Inferred</b><em> support</em></span></button>
       </div></div>
     <div class="fig" id="votes-fig"><div class="tip" aria-live="polite"></div><svg id="votes-svg" tabindex="0" aria-label="Line chart of the estimated first-preference vote by party. Use the left and right arrow keys to read values week by week."></svg></div>
@@ -364,21 +385,16 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="wrap flow">
     <header class="hd">
       <h2 id="flows-h">{{flowsHead}}</h2>
-      <p class="dek">% of the vote received after minor-party votes are distributed</p>
-    </header>
-    <div class="ctl" id="flow-ctl">
-      <div class="vs" data-duel role="radiogroup" aria-label="Contest: Labor against">
-        <span class="me">Labor</span><span class="v">v</span>
-        <button type="button" role="radio" aria-checked="true" data-r="lnp">Coalition</button>
-        <span class="or" aria-hidden="true">/</span>
-        <button type="button" role="radio" aria-checked="false" data-r="on">One Nation</button>
-        <span class="mebar" aria-hidden="true"></span><span class="bar" aria-hidden="true"></span>
+      <div class="ctl" id="flow-ctl">
+        <button type="button" id="rival-toggle" class="rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button>
       </div>
-    </div>
+      <p class="dek">% of the vote received by the major parties after minor-party votes are distributed</p>
+    </header>
     <div class="flow-pair" id="flow-pair" hidden>
       <figure class="flow-match"><h3>Labor v Coalition</h3><div class="fig" id="flow-lnp"><svg id="flow-svg-lnp" role="img" aria-label="Preferences, Labor v Coalition"></svg></div></figure>
       <figure class="flow-match"><h3>Labor v One Nation</h3><div class="fig" id="flow-on"><svg id="flow-svg-on" role="img" aria-label="Preferences, Labor v One Nation"></svg></div></figure>
     </div>
+    <h3 class="flow-phone-title" id="flow-margin-head" hidden></h3>
     <div class="fig" id="flow-fig"><svg id="flow-svg" role="img" aria-label="Sankey diagram of first preferences flowing to Labor or its rival"></svg></div>
     <p class="note" id="flow-note" aria-live="polite" style="min-height:2.8em">&nbsp;</p>
     <p class="src" id="flow-src"></p>
@@ -390,6 +406,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="wrap tpp">
     <header class="hd">
       <h2 id="tpp-h">{{tppHead}}</h2>
+      <button type="button" class="rival-toggle" id="tpp-rival-toggle" role="switch" aria-checked="false" aria-label="Switch to One Nation" data-r="lnp">Coalition</button>
       <p class="dek">{{tppDek}}</p>
     </header>
     <div class="ctl">
@@ -534,6 +551,7 @@ const leap=y=>y%4===0&&(y%100!==0||y%400===0);
 const isoX=iso=>{const [y,m,d]=iso.split('-').map(Number);return y+(Date.UTC(y,m-1,d||1)-Date.UTC(y,0,1))/864e5/(leap(y)?366:365)};
 const fdate=iso=>{const [y,m,d]=iso.split('-').map(Number);return d+' '+MON[m-1]+' '+y};
 const xMonth=(x,full)=>{const y=Math.floor(x+1e-9);return (full?MONF:MON)[Math.max(0,Math.min(11,Math.floor((x-y)*12+1e-6)))]+' '+y};
+const monthSpan=(a,b)=>a+'–'+(a.slice(0,3)===b.slice(0,3)?b.slice(4):b);
 const PK=DATA.parties;                      // alp, lnp, grn, onp, oth
 const CV={alp:'alp',lnp:'lnp',grn:'grn',onp:'on',oth:'oth'};
 const COLOR=k=>`var(--${CV[k]||k})`;
@@ -613,7 +631,7 @@ function winZoom(w,id){
 function winWords(w){
   const [a,b]=winRange(w),{hi}=REACH(),nowEnd=b>=hi-1/24;
   if(w.kind==='term'){const t=TERMS.find(x=>x.year===w.year)||CUR;const s=x=>xMonth(isoX(x));
-    return t.current?{head:'This term',sub:t.pm+', since '+s(t.e)}:{head:'The '+t.year+' term',sub:t.pm.replace(/ → /g,', then ')+', '+s(t.e)+'–'+xMonth(t.b)}}
+    return t.current?{head:'This term',sub:t.pm+', since '+s(t.e)}:{head:'The '+t.year+' term',sub:t.pm.replace(/ → /g,', then ')+', '+monthSpan(s(t.e),xMonth(t.b))}}
   if(w.kind==='all')return {head:'Every year on record',sub:xMonth(a)+' to now'};
   if(nowEnd)return {head:'The last '+(w.years<1?Math.round(w.years*12)+' months':w.years+' years'),sub:xMonth(a)+' to now'};
   return {head:xMonth(a)+' to '+xMonth(b),sub:''};
@@ -765,7 +783,7 @@ function chart(o){
       if(narrow){relax(lab,15,MT+6,MT+PH-4);lab.forEach(t=>{eg+=`<text x="${P1(ex+8)}" y="${P1(t.y)}" dy=".35em" class="ab" style="fill:${t.color}">${esc(t.abbr)}</text>`})}
       else{const L2=ends.map(e=>({...e,y0:y(e.y)}));relax(L2,32,MT+10,MT+PH-14);L2.forEach(t=>{
         if(Math.abs(t.y-t.y0)>3)eg+=`<path d="M${P1(ex+6)} ${P1(t.y0)}L${P1(ex+10)} ${P1(t.y0)}L${P1(ex+15)} ${P1(t.y)}" fill="none" style="stroke:${t.color}" stroke-width="1" stroke-opacity=".8"/>`;
-        eg+=t.v!=null?`<text x="${P1(ex+18)}" y="${P1(t.y-6)}" class="nm">${esc(t.name)}</text><text x="${P1(ex+18)}" y="${P1(t.y+11)}" class="vl">${f1(t.v)}</text>`:`<text x="${P1(ex+18)}" y="${P1(t.y)}" dy=".35em" class="nm">${esc(t.name)}</text>`})}
+        eg+=t.v!=null?`<text x="${P1(ex+18)}" y="${P1(t.y-6)}" class="nm" style="fill:${t.color}">${esc(t.name)}</text><text x="${P1(ex+18)}" y="${P1(t.y+11)}" class="vl" style="fill:${t.color}">${f1(t.v)}</text>`:`<text x="${P1(ex+18)}" y="${P1(t.y)}" dy=".35em" class="nm" style="fill:${t.color}">${esc(t.name)}</text>`})}
       ends.forEach(e=>{if(e.dot!==false)eg+=`<circle cx="${P1(ex)}" cy="${P1(y(e.y))}" r="4" style="fill:${e.color}" stroke="var(--bg)" stroke-width="2"/>`});
     }
     s+=`<g class="ends">${eg}</g><g class="scrub"></g>`;
@@ -1248,22 +1266,22 @@ function subsetWeekly(houses){
 }
 if(!DATA.pm||!window.AP||!window.AP.pmEngine)pvBtn.closest('.pick').hidden=true;
 filterSelect({trigger:pvBtn,popup:pvPop,textElement:pvName,label:"Pollsters",multiple:true,
-  options:()=>[{label:"Every pollster",value:"",data:{h:""}},...(DATA.pvHouses||[]).map(h=>({label:h,value:h,data:{h:h}}))],
+  options:()=>[{label:"All pollsters",value:"",data:{h:""}},...(DATA.pvHouses||[]).map(h=>({label:h,value:h,data:{h:h}}))],
   selected:()=>PVSEL,
-  summary:()=>{const n=PVSEL.size;return !n?'All':n===1?[...PVSEL][0]:n+' of '+(DATA.pvHouses||[]).length},
+  summary:()=>{const n=PVSEL.size;return !n||n===(DATA.pvHouses||[]).length?"all pollsters":[...PVSEL].join(", ")},
   onPick:h=>{
     if(!h)PVSEL.clear();else if(PVSEL.has(h))PVSEL.delete(h);else PVSEL.add(h);
     if(PVSEL.size===(DATA.pvHouses||[]).length)PVSEL.clear();
     pvName.textContent='…';setTimeout(applyPv,20);
   }
 });
-const pvCounted=()=>pvBtn.classList.toggle('counted',PVSEL.size!==1);
+const pvCounted=()=>pvBtn.classList.toggle('counted',PVSEL.size>1);
 pvCounted();
 function applyPv(){
   pvCounted();
   $$('button[data-h]',pvPop).forEach(b=>{if(b.dataset.h)b.setAttribute('aria-selected',String(PVSEL.has(b.dataset.h)))});
   const n=PVSEL.size,all=(DATA.pvHouses||[]).length;
-  pvName.textContent=!n?'All':n===1?[...PVSEL][0]:n+' of '+all;
+  pvName.textContent=!n||n===all?'all pollsters':[...PVSEL].join(", ");
   grpSel.disabled=!!n;
   if(n&&!inCur(WIN))WIN={kind:'term',year:CUR.year};
   SUBW=n?subsetWeekly([...PVSEL]):null;
@@ -1341,13 +1359,20 @@ function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
   src.forEach(s=>{const n=nodes[s];o+=`<rect x="${P(n.x0)}" y="${P(yS)}" width="${P(n.x1-n.x0)}" height="${NW}" rx="2" style="fill:var(--${s})"/>`});
   labs.forEach(l=>{const t=lines===3?third(l.s):'',n=nodes[l.s];
     if(Math.abs(l.x-l.c)>2)o+=`<path d="M${P(l.x)} ${P(LH-4)}L${P(l.c)} ${P(yS-2)}" fill="none" stroke="var(--rule2)"/>`;
-    o+=`<text x="${P(l.x)}" y="${yN}" text-anchor="middle" class="nm" style="font-size:${fN}px">${FNAME[l.s]}</text><text x="${P(l.x)}" y="${yV}" text-anchor="middle" class="vl" style="font-size:${fV}px">${f1(PV[l.s])}%</text>`;
+    o+=`<text x="${P(l.x)}" y="${yN}" text-anchor="middle" class="nm" style="font-size:${fN}px;fill:var(--${l.s})">${FNAME[l.s]}</text><text x="${P(l.x)}" y="${yV}" text-anchor="middle" class="vl" style="font-size:${fV}px">${f1(PV[l.s])}%</text>`;
     if(t)o+=`<text x="${P(l.x)}" y="${yF}" text-anchor="middle" class="fs" style="font-size:${fF}px">${t}</text>`});
   o+=`<rect x="${P(dx0)}" y="${P(yD)}" width="${P(dl1-dx0)}" height="${DW}" rx="3" style="fill:var(--alp)"/><rect x="${P(dr0)}" y="${P(yD)}" width="${P(dr1-dr0)}" height="${DW}" rx="3" style="fill:var(--${RIV})"/>`;
-  o+=`<text x="${P(dx0)}" y="${P(yNm)}" class="nm" style="font-size:${fM}px">${FNAME.alp}</text><text x="${P(dr1)}" y="${P(yNm)}" text-anchor="end" class="nm" style="font-size:${fM}px">${FNAME[RIV]}</text>`;
+  o+=`<text x="${P(dx0)}" y="${P(yNm)}" class="nm" style="font-size:${fM}px;fill:var(--alp)">${FNAME.alp}</text><text x="${P(dr1)}" y="${P(yNm)}" text-anchor="end" class="nm" style="font-size:${fM}px;fill:var(--${RIV})">${FNAME[RIV]}</text>`;
   o+=`<text x="${P(dx0-fB*.04)}" y="${P(yBig)}" class="big2" style="font-size:${fB}px;fill:var(--alp)">${f1(lab)}<tspan class="pc">%</tspan></text><text x="${P(dr1)}" y="${P(yBig)}" text-anchor="end" class="big2" style="font-size:${fB}px;fill:var(--${RIV})">${f1(100-lab)}<tspan class="pc">%</tspan></text>`;
   o+=`<text x="${P((dl1+dr0)/2)}" y="${P(yBig-fB*.08)}" text-anchor="middle" class="vv" style="font-size:${Math.round(fB*.5)}px">v</text>`;
   svg.innerHTML=o;
+  const header=fig.closest('figure')?.querySelector('h3')||$('#flow-margin-head');
+  if(header){
+    const lead=lab-50;
+    header.hidden=false;
+    header.textContent=lead===0?`Labor is level against ${RIV==='lnp'?'the ':''}${FNAME[RIV]}`:`Labor is ${lead>0?'+':''}${f1(lead)} against ${RIV==='lnp'?'the ':''}${FNAME[RIV]}`;
+    header.style.color=`var(--${lead>0?'alp':lead<0?RIV:'mute'})`;
+  }
   svg.setAttribute('aria-label',`Sankey diagram: after preferences, Labor ${f1(lab)}%, ${FNAME[RIV]} ${f1(100-lab)}%.`);
   const paths=$$('.rb',svg);
   const show=i=>{clearTimeout(flowHold);const r=rib[i];svg.classList.add('dim');paths.forEach(p=>p.classList.toggle('on',+p.dataset.i===i));
@@ -1362,8 +1387,7 @@ function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
   if(fig.id==='flow-fig')flowSrc();
 }
 /* where a phone has no room for each party's share to Labor on the drawing, the note under it names them */
-const flowSrc=()=>{const F=FLOWS[RIV],wide=matchMedia('(min-width:900px)').matches,sh=Object.keys(F).sort((a,b)=>F[b]-F[a]).map(s=>FNAME[s]+' '+Math.round(F[s]*100)+'%').join(', ');
-  $('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+(wide?'; Coalition flows are counted at the 2025 election, One Nation flows are the site’s estimate':RIV==='lnp'?'; flows as counted at the 2025 election':'; flows are the site’s estimate, as no election has counted Labor against One Nation')+(matchMedia('(min-width:900px)').matches||flowFull?'.':' (to Labor: '+sh+').')+' Tap or hover over a flow to see its size.'};
+const flowSrc=()=>{$('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+'; Coalition flows are counted at the 2025 election, One Nation flows are the site’s estimate. Tap or hover over a flow to see its size.'};
 function drawFlows(){
   const wide=matchMedia('(min-width:900px)').matches;
   $('#flow-ctl').hidden=wide;$('#flow-fig').hidden=wide;$('#flow-pair').hidden=!wide;
@@ -1375,7 +1399,12 @@ new ResizeObserver(drawFlows).observe($('#flows'));
 /* the contest: one choice for both lead pages */
 const duels=$$('[data-duel]');
 function slideAll(){duels.forEach(duel=>{if(duel.hidden)return;const me=$('.me',duel),mb=$('.mebar',duel),thumb=$('.bar',duel);mb.style.width=me.offsetWidth+'px';mb.style.transform=`translateX(${me.offsetLeft}px)`;const b=$(`button[data-r="${RIV}"]`,duel);thumb.style.width=b.offsetWidth+'px';thumb.style.transform=`translateX(${b.offsetLeft}px)`})}
-function setRiv(r){RIV=r;duels.forEach(duel=>{duel.dataset.r=r;$$('button',duel).forEach(x=>x.setAttribute('aria-checked',String(x.dataset.r===r)))});drawFlows();paintKeys();tppSrc();tpp.clear();tpp.draw()}
+function setRiv(r){
+  $$('.rival-toggle').forEach(toggle=>{toggle.dataset.r=r;toggle.textContent=FNAME[r];
+    toggle.setAttribute('aria-checked',String(r==='on'));toggle.setAttribute('aria-label',r==='lnp'?'Switch to One Nation':'Switch to Coalition')});
+  RIV=r;duels.forEach(duel=>{duel.dataset.r=r;$$('button',duel).forEach(x=>x.setAttribute('aria-checked',String(x.dataset.r===r)))});drawFlows();paintKeys();tppSrc();tpp.clear();tpp.draw()
+}
+$$('.rival-toggle').forEach(toggle=>toggle.addEventListener('click',()=>setRiv(RIV==='lnp'?'on':'lnp')));
 duels.forEach(duel=>{
   duel.dataset.r=RIV;
   $$('button',duel).forEach(b=>{

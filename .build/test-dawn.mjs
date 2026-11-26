@@ -72,6 +72,20 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   eq(options("Home").includes("Other language"), false, "Other language does not stay in Home");
 }
 
+/* a completed term does not repeat a month across its two dates */
+{
+  const src = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "dawn/template.html"), "utf8");
+  const helpers = src.slice(src.indexOf("const MON="), src.indexOf("const PK=DATA.parties"));
+  const terms = src.slice(src.indexOf("const TERMS="), src.indexOf("let HIST="));
+  const bounds = src.slice(src.indexOf("const REACH="), src.indexOf("let WIN="));
+  const range = src.slice(src.indexOf("const winRange="), src.indexOf("const inCur="));
+  const words = src.slice(src.indexOf("function winWords("), src.indexOf("const winActive="));
+  const label = vm.runInNewContext(helpers + terms + "const HIST=null,NOWX=isoX(DATA.asOf);" + bounds + range + words + ";(w)=>winWords(w)", { DATA: { terms: D0.terms, asOf: D0.asOf } });
+  eq(label({ kind: "term", year: 2019 }).sub, "Morrison, May 2019–2022", "the end month is omitted when it repeats the opening month");
+  eq(label({ kind: "term", year: 2016 }).sub, "Turnbull, then Morrison, Jul 2016–May 2019", "different months are kept in full");
+  eq(label({ kind: "term", year: 2025 }).sub, "Albanese, since May 2025", "the current term keeps its open-ended wording");
+}
+
 /* which gaps are real: Dawn's ternary calculation against the ledger's own */
 {
   const source = fs.readFileSync(path.join(A, "rd-allpolls.jsx"), "utf8");
@@ -167,7 +181,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const D2 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5], alp: [E.alp - 5, E.alp - 6, E.alp - 4], grn: [E.grn + 2, E.grn + 1, E.grn + 3] });
   ok(votesDek(D2).endsWith("Labor is down 5.0 points; the Greens are up 2.0."), "a fall and a rise: " + votesDek(D2));
   const D3 = withNow({ ...flat(), onp: [E.onp * 3, E.onp * 2.5, E.onp * 3.5] });
-  ok(/election, %\.$/.test(votesDek(D3)), "nothing else clears: the dek describes the chart alone");
+  ok(votesDek(D3).startsWith("% of each party’s first-preference vote since the "), "each party’s first-preference vote names the measure");
 }
 /* the two-party story's curated heading (owner's wording, 25 Nov 2026) */
 {
@@ -227,7 +241,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(primaryYMax([60.01]), 70, "a reading actually above 60 still reaches the next rung");
   const C = copyFor(D0);
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
-  ok(html.includes("% of the vote received after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
+  ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
   ok(html.includes(".votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}") && html.includes(".votes .ctl .opts{margin-top:0;flex-shrink:0}"), "the time window and chart filters share a wrapping row");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");

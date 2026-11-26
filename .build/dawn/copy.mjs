@@ -70,7 +70,7 @@ export function votesHead(D) {
 export function votesDek(D) {
   const { lead } = votesHead(D);
   const [y, mo] = D.election.date.split("-").map(Number);
-  let dek = "Estimated first-preference vote since the " + MONF[mo - 1] + " " + y + " election, %.";
+  let dek = "% of each party’s first-preference vote since the " + MONF[mo - 1] + " " + y + " election, %.";
   const rest = primaryMoves(D).filter((m) => m.sig && (!lead || m.k !== lead.k)).sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg)).slice(0, 2);
   const dir = (m) => (m.chg > 0 ? "up" : "down"), be = (m) => (NAMES[m.k].pl ? "are" : "is");
   if (rest.length === 1) dek += " " + NAMES[rest[0].k].start + " " + be(rest[0]) + " " + dir(rest[0]) + " " + f1(Math.abs(rest[0].chg)) + " points.";
