@@ -12603,6 +12603,7 @@ if (!JUR && PRIMM && TPM) {
     };
     const trim = (q) => {
       const o = { k: dawnKey(q), h: q.pollster, f: q.field, d: q.released, m: q.fmid };
+      if (q.mid != null) o.fieldStart = new Date(2 * q.mid - Date.parse(q.released)).toISOString().slice(0, 10);
       if (q.client) o.c = q.client;
       if (q.published) o.pub = q.published;
       if (q.sample != null) o.n = q.sample;
@@ -12635,11 +12636,14 @@ if (!JUR && PRIMM && TPM) {
     const seen = new Set(), all = [];
     for (const q of individualPolls.concat(directionOnlyPolls || [], issuesOnlyPolls || [])) { const k = dawnKey(q); if (seen.has(k)) continue; seen.add(k); all.push(trim(q)); }
     all.sort((x, y) => (x.d === y.d ? (x.h < y.h ? -1 : 1) : x.d < y.d ? 1 : -1));
-    const confRel = (confidenceOnlyPolls || []).map((q) => ({ k: dawnKey(q) + "-" + (q.conf && q.conf.k || "c"), h: q.pollster, f: q.field, d: q.released, m: q.fmid, ...(q.client ? { c: q.client } : {}),
-      ...(q.published ? { pub: q.published } : {}), ...(q.sample != null ? { n: q.sample } : {}), ...(baseOf(q, "primary") ? { b: baseOf(q, "primary") } : {}),
-      conf: { k: q.conf.k, lab: q.conf.lab, v: q.conf.v, chg: q.conf.chg != null ? q.conf.chg : q.conf.chgCalc != null ? q.conf.chgCalc : null, vs: q.conf.vs },
-      ...(q.links ? { links: q.links.map((l) => ({ k: l.k, t: l.t, href: l.href })) } : {}) }))
-      .sort((x, y) => (x.d === y.d ? (x.h < y.h ? -1 : 1) : x.d < y.d ? 1 : -1));
+    const confRel = (confidenceOnlyPolls || []).map((q) => {
+      const wave = CONF_FILE[q.conf.k].rows.find((r) => r.date === q.released);
+      return { k: dawnKey(q) + "-" + q.conf.k, h: q.pollster, f: q.field, d: q.released, m: q.fmid,
+        fieldEnd: wave.fwEnd || wave.fwm || null, ...(q.client ? { c: q.client } : {}),
+        ...(q.published ? { pub: q.published } : {}), ...(q.sample != null ? { n: q.sample } : {}), ...(baseOf(q, "primary") ? { b: baseOf(q, "primary") } : {}),
+        conf: { k: q.conf.k, lab: q.conf.lab, v: q.conf.v, chg: q.conf.chg != null ? q.conf.chg : q.conf.chgCalc != null ? q.conf.chgCalc : null, vs: q.conf.vs },
+        ...(q.links ? { links: q.links.map((l) => ({ k: l.k, t: l.t, href: l.href })) } : {}) };
+    }).sort((x, y) => (x.d === y.d ? (x.h < y.h ? -1 : 1) : x.d < y.d ? 1 : -1));
     const pollsPage = { polls: all, conf: confRel, groups: DEMO_GROUPS, kappa: primModel ? primModel.kappa : {}, deff: HL_DEFF, asOf: isoD(t1) };
     writeAtomic(DAWN_POLLS_ASSET, JSON.stringify(pollsPage));
     console.log(`dawn: ${weeks.length} weeks, ${polls.length} polls in ${((Date.now() - tW) / 1000).toFixed(1)}s`);
