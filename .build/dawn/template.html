@@ -319,6 +319,9 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   .mk>span{animation-timing-function:linear;animation-range:calc(100vh + var(--ext) - env(safe-area-inset-top) - 40px) calc(100vh + var(--ext) - env(safe-area-inset-top) - 12px);animation-range:calc(100lvh + var(--ext) - env(safe-area-inset-top) - 40px) calc(100lvh + var(--ext) - env(safe-area-inset-top) - 12px)}
   .logo{animation-name:lgIn}.mark .mk{animation-name:mkIn}.mk-l{animation-name:inkL}.mk-d{animation-name:inkD}
   .menu-on .logo,.menu-on .mark .mk,.menu-on .mk>span{animation:none}
+  /* past the hero the landed state is plain style, not a held animation frame, so nothing that repaints or
+     re-resolves the timeline afterwards can drop the logo (the flip lands within 12px of the range's end) */
+  .nav:not(.over) .logo,.nav:not(.over) .mark .mk,.nav:not(.over) .mk>span{animation:none}
 }
 @media (prefers-reduced-motion:reduce){.logo,.mark .mk,.mk>span{animation:none}}
 /*{{FILTERSCSS}}*/
@@ -1456,12 +1459,14 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{charts.fo
 /* ---------- nav, menu, sky setting ---------- */
 const nav=$('#nav'),links=$$('.links a'),secs=$$('main > section'),burger=$('#burger'),menu=$('#menu');
 let menuOpen=false,ticking=false;
-let tintT=0;
 function onScroll(){
   ticking=false;
   // light lettering while the sky is behind the bar's middle
   const over=menuOpen||hero.getBoundingClientRect().bottom>nav.offsetHeight-26;
-  if(over!==nav.classList.contains('over')){nav.classList.toggle('over',over);clearTimeout(tintT);tintT=setTimeout(()=>tintTop(nav.classList.contains('over')),reduce?0:450)}
+  /* the status-bar strip turns with the bar, on the same frame: the logo rides the scroll timeline, so the
+     repaint can't cut into a timed entrance, and a delayed tint left a band of sky over a light bar (and
+     repainted the page after the logo had landed, which on iPhone dropped it) */
+  if(over!==nav.classList.contains('over')){nav.classList.toggle('over',over);tintTop(over)}
   const mid=innerHeight/2;let cur=null;
   for(const s of secs){const b=s.getBoundingClientRect();if(b.top<=mid&&b.bottom>mid)cur=s.dataset.sec||null}
   links.forEach(a=>{if(a.dataset.sec===cur)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')});
