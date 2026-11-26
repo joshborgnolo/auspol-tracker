@@ -53,7 +53,7 @@
 @media(min-width:900px){.pd-grid{--cols:3}.pd-grid[data-v=twopp]{--cols:4}}
 @media(max-height:700px) and (max-width:899px){.pd-big span,.pd-verdict{font-size:11px}.pd-card h3{font-size:12px}}
 
-.pd-tabs{display:flex;gap:4px;margin-top:12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule);touch-action:pan-x pan-y}
+.pd-tabs{display:flex;flex:none;gap:4px;margin-top:12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule);touch-action:pan-x pan-y}
 .pd-tabs::-webkit-scrollbar{display:none}
 /* the row runs on past a phone's edge: the fade says so */
 @media(max-width:599px){.pd-tabs{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);padding-right:30px}}
@@ -69,10 +69,10 @@
 .pd-scale b{font-weight:600;white-space:nowrap}
 .pd-since{display:none}
 .pd-rows{list-style:none;margin:0;padding:0;flex:0 1 auto;min-height:0;display:flex;flex-direction:column}
-.pd-rows li{flex:0 1 52px;min-height:26px;border-bottom:1px solid var(--rule)}
-.pd-nm{min-width:0;line-height:1.2}
+.pd-rows li{flex:0 1 52px;min-height:33px;border-bottom:1px solid var(--rule)}
+.pd-nm{min-width:0;font-size:12px;line-height:1.2}
 .pd-nm b{display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pd-nm small{font-size:11.5px;color:var(--mute);white-space:nowrap}
+.pd-nm small{display:block;font-size:11.5px;line-height:1.2;color:var(--mute);white-space:nowrap}
 .pd-bar{position:relative;height:12px}
 .pd-bar::before{content:"";position:absolute;left:50%;top:-5px;bottom:-5px;width:1.5px;background:var(--rule2)}
 .pd-bar i{position:absolute;top:0;height:12px;border-radius:2px;background:var(--c)}
@@ -165,7 +165,7 @@
       <button type="button" class="chk" role="checkbox" aria-checked="false" id="lean-pub"><i></i>Published figures</button>
       <button type="button" class="pbtn" id="lean-base">Against other pollsters ⇄</button>
     </div>
-    <div class="pd-lhead" aria-hidden="true"><span></span><span class="pd-scale"><b id="lean-neg"></b><b id="lean-pos"></b></span><span>Now</span><span class="pd-since" id="lean-since">Since the election</span></div>
+    <div class="pd-lhead" aria-hidden="true"><span></span><span class="pd-scale"><b id="lean-neg"></b><b id="lean-pos"></b></span><span id="lean-col">Now</span><span class="pd-since" id="lean-since">Since the election</span></div>
     <ol class="pd-rows" id="lean-rows"></ol>
     <p class="src" id="leans-src"></p>
   </div>
@@ -344,6 +344,7 @@ function leansPanel(){
     const posC=tpp?PCOL.alp:PCOL[view],negC=tpp?PCOL[rival]:PCOL[view];
     $('#lean-neg').textContent=tpp?'◀ to '+(rival==='on'?'One Nation':'the Coalition'):'◀ lower';$('#lean-neg').style.color=negC;
     $('#lean-pos').textContent=tpp?'to Labor ▶':'higher ▶';$('#lean-pos').style.color=posC;
+    $('#lean-col').textContent=elect?'Average':'Now';
     $('#lean-since').textContent=elect?'Miss at each election since '+SITE_FROM:'Since the election';
     const max=Math.max(1.2,...rows.filter(r=>r.n||!elect).map(r=>Math.abs(r.v))),smax=Math.max(1,...rows.flatMap(r=>r.s.map(d=>Math.abs(d[1]))));
     list.innerHTML=rows.map(r=>{

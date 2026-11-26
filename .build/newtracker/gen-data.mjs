@@ -10073,6 +10073,7 @@ const accuracy = accuracyCycles.length ? (() => {
    backtest, before which the houses' methods share nothing with today's.
    Per party, per house: one row per election, {year, poll, result, err}. */
 const ELECTION_LEAN_FROM = 1987;
+const ELECTION_LEAN_REST = ["oth", "dem", "dlp"];
 const electionLean = (() => {
   const parties = ["alp", "lnp", "grn", "onp", "oth"];
   const out = Object.fromEntries(parties.map((k) => [k, {}]));
@@ -10091,8 +10092,9 @@ const electionLean = (() => {
     let any = false;
     for (const [firm, p] of byHouse) {
       if (ACC_EXCLUDED.has(firm)) continue;
-      const restOf = (o) => Object.entries(o).filter(([k, v]) => !["date", "firm", "alp", "lnp", "grn", "onp"].includes(k)
-        && !/^tpp/.test(k) && typeof v === "number").reduce((t, [, v]) => t + v, 0);
+      /* the other parties, by name: a row carries numbers that are not votes
+         too (sample, sampleEff, Resolve's soft share) */
+      const restOf = (o) => ELECTION_LEAN_REST.reduce((t, k) => t + (o[k] || 0), 0);
       const tot = ["alp", "lnp", "grn", "onp"].reduce((t, k) => t + (p[k] || 0), 0) + restOf(p);
       if (!(tot > 50)) continue;
       const sc = (v) => (v * 100) / tot;
