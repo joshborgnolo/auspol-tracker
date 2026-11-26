@@ -250,8 +250,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
 .flow .fig{grid-area:fig;margin-top:18px}
 .flow .note{grid-area:note}
 .flow .src{grid-area:src}
-.flow-single{grid-area:fig;display:flex;flex-direction:column;min-height:0}
-.flow-single[hidden],.flow-pair[hidden]{display:none}
+.flow-pair[hidden]{display:none}
 .flow-pair{grid-area:fig;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:18px;min-height:0}
 .flow-match{margin:0;display:flex;flex-direction:column;min-height:0}
 .flow-match h3{margin:0 0 10px;font:500 13px var(--sans);color:var(--mute)}
@@ -393,7 +392,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
       <figure class="flow-match"><h3>Labor v Coalition</h3><div class="fig" id="flow-lnp"><svg id="flow-svg-lnp" role="img" aria-label="Preferences, Labor v Coalition"></svg></div></figure>
       <figure class="flow-match"><h3>Labor v One Nation</h3><div class="fig" id="flow-on"><svg id="flow-svg-on" role="img" aria-label="Preferences, Labor v One Nation"></svg></div></figure>
     </div>
-    <div class="flow-single" id="flow-single"><div class="fig" id="flow-fig"><svg id="flow-svg" role="img" aria-label="Sankey diagram of first preferences flowing to Labor or its rival"></svg></div></div>
+    <div class="fig" id="flow-fig"><svg id="flow-svg" role="img" aria-label="Sankey diagram of first preferences flowing to Labor or its rival"></svg></div>
     <p class="note" id="flow-note" aria-live="polite" style="min-height:2.8em">&nbsp;</p>
     <p class="src" id="flow-src"></p>
     <div class="sr"><table id="flow-table"></table><table id="flow-table-lnp"></table><table id="flow-table-on"></table></div>
@@ -1872,7 +1871,7 @@ const flowSrc=()=>{const F=FLOWS[RIV],wide=matchMedia('(min-width:900px)').match
   $('#flow-src').textContent='Primary votes are the model’s estimates at '+fdate(DATA.asOf)+(wide?'; Coalition flows are counted at the 2025 election, One Nation flows are the site’s estimate':RIV==='lnp'?'; flows as counted at the 2025 election':'; flows are the site’s estimate, as no election has counted Labor against One Nation')+(matchMedia('(min-width:900px)').matches||flowFull?'.':' (to Labor: '+sh+').')+' Tap or hover over a flow to see its size.'};
 function drawFlows(){
   const wide=matchMedia('(min-width:900px)').matches;
-  $('#flow-ctl').hidden=wide;$('#flow-single').hidden=wide;$('#flow-pair').hidden=!wide;
+  $('#flow-ctl').hidden=wide;$('#flow-fig').hidden=wide;$('#flow-pair').hidden=!wide;
   if(wide){sankey('lnp',$('#flow-lnp'),$('#flow-svg-lnp'));sankey('on',$('#flow-on'),$('#flow-svg-on'))}
   else sankey();
   slideAll();flowNote();flowSrc();
