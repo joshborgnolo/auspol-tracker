@@ -19,6 +19,12 @@
    - The two-party head is the site's own chart story (rd-hero.jsx story):
      which rival runs Labor closer, "as close" unless the gap between the
      two contests clears both their margins combined and is a point or more.
+   - The leadership ratings' head names the largest change among today's
+     leaders since each started the term whose 95% interval (from the
+     model's own draws of that change) excludes zero: "since the election"
+     for a line that starts there, "since taking the job" for a leader who
+     took over this term, else since the month of the first rating. None
+     clears: "much where they started".
    - The flow diagram's head reads each contest's verdict today: Labor or
      its rival ahead when the lead is outside the margin (twice the 95%
      interval, on the lead's scale, the flows' doubt added in quadrature
@@ -145,6 +151,24 @@ export function flowNote(D, c, two) {
   else if (one < 0) s = "Preferences turn Labor’s " + r(one) + "-point deficit against " + name + " on first preferences into a " + r(lead2) + "-point lead";
   else s = "Preferences turn Labor’s " + r(one) + "-point lead over " + name + " on first preferences into a " + r(lead2) + "-point deficit";
   return s + (inside ? ", inside the ±" + m + " margin." : ".");
+}
+
+/* the leadership ratings page (assets/dawn-leaders.json). Today's leaders are
+   the lines still running; since.lo and since.hi are the 95% interval of the
+   change since the line's first week */
+export function leaderMoves(L) {
+  return L.series.filter((s) => !s.to).map((s) => ({ ...s.since, person: s.person, party: s.party, i0: s.i0, from: s.from,
+    v: s.v[s.v.length - 1], start: s.v[0], sig: s.since.lo > 0 || s.since.hi < 0 }));
+}
+export function leadersHead(L) {
+  const m = leaderMoves(L).filter((x) => x.sig).sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg))[0];
+  if (!m) return { head: "The leaders\u2019 ratings are much where they started", lead: null };
+  const since = m.from > L.election.date ? "since taking the job" : m.i0 === 0 ? "since the election" : "since " + monthYear(L.weeks[m.i0].slice(0, 7));
+  return { head: m.person + "\u2019s net rating has " + (m.chg > 0 ? "risen " : "fallen ") + f1(Math.abs(m.chg)) + " points " + since, lead: m };
+}
+export function leadersDek(L) {
+  const [y, mo] = L.election.date.split("-").map(Number);
+  return "% approving each leader less % disapproving, since the " + MONF[mo - 1] + " " + y + " election";
 }
 
 export function copyFor(D) {

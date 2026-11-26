@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Leadership ratings · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+/* net ratings run both ways, so a row's bar leaves a zero mark: left when more disapprove, right when more
+   approve. The figures carry a sign and no %, and each row names the office under the leader */
+.ld .pr{grid-template-columns:minmax(0,1fr) calc(var(--fs)*3.15) 3.7em;transition:transform .34s cubic-bezier(.3,.9,.3,1)}
+.ld.still .pr{transition:none}
+.ld .pn{white-space:normal;line-height:1.25}
+.ld .pn small{display:block;white-space:nowrap;margin-left:calc(clamp(15px,4.3vw,19px)*1.75);font-size:13px;font-weight:400;color:rgb(238 238 255/.62)}
+.ld .pb::before{content:"";position:absolute;left:var(--z0);top:-1px;width:1px;height:14px;transform:translateX(-50%);background:rgb(238 238 255/.5)}
+.ld .pb i{left:var(--bl);width:var(--bw)}
+.ld .pb i.neg{border-radius:3px 0 0 3px}
+.ld .pb s,.ld .pb s.up{background:#fff;box-shadow:0 0 0 .5px rgb(8 16 50/.45)}
+.ld .pb s.in{background:none;box-shadow:none}
+.ld .pb s.ci::after{left:auto;right:-.75px}
+.leaders .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
+@media (min-width:900px){.leaders .ctl{margin-top:16px}.leaders .fig{margin-top:8px}}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><a href="#top" aria-current="page">leadership ratings</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><span class="soon">pollsters <small>soon</small></span></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero" id="top" aria-label="Leadership ratings">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1 class="sr">auspol tracker: Australian federal leadership ratings</h1>
+    <h2>Leadership ratings</h2>
+    <p class="now-d">Estimated net approval at <span id="now-date">{{asOf}}</span>: the share who approve less the share who disapprove. <span id="now-latest">{{latestPoll}}</span> <span id="whisk-note">Whiskers mark where each leader started</span>; = means a statistical tie.</p>
+    <div class="now-mode"><button type="button" class="flip" id="pv-whisker-mode"><span id="pv-whisker-label">Change since each started</span> <span aria-hidden="true">⇄</span></button></div>
+    <div class="pv-h"><span id="range-label" aria-hidden="true">change</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
+    <div class="pv ld still" id="pv" role="table" aria-label="Estimated net approval of each leader"></div>
+  </div>
+</section>
+
+<section class="sec" id="ratings" data-sec="leaders" aria-labelledby="ratings-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes leaders">
+    <header class="hd">
+      <h2 id="ratings-h">{{leadersHead}}</h2>
+      <p class="dek">{{leadersDek}}</p>
+    </header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="fig" id="ratings-fig"><div class="tip" aria-live="polite"></div><svg id="ratings-svg" tabindex="0" aria-label="Line chart of each leader’s estimated net approval. Use the left and right arrow keys to read values."></svg></div>
+    <p class="src" id="ratings-src"></p>
+    <div class="sr"><table id="ratings-table"></table></div>
+  </div>
+</section>
+</main>
+
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+/*{{POLLMETA}}*/
+const DATA=JSON.parse($('#dawn-data').textContent);
+const paintLatestPoll=()=>{$('#now-latest').textContent=latestPollLine(DATA)};
+paintLatestPoll();setInterval(paintLatestPoll,60000);
+
+/*{{SHARED:sky}}*/
+
+/* ---------- the data: the leader model, week by week ---------- */
+/*{{SHARED:dates}}*/
+const G=DATA.weeks,LAST=G.length-1,GX=G.map(isoX),NOWX=GX[LAST],ELX=GX[0];
+const YR=+DATA.asOf.slice(0,4);
+const EVENTS=DATA.events.map(e=>({...e,x:isoX(e.d)}));
+const ALL_TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].e):null}));
+/* only the terms the ratings reach */
+const TERMS=ALL_TERMS.filter(t=>t.b==null||t.b>DATA.firstX);
+const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
+const HIST={terms:[{a:DATA.firstX}]},PVSEL=new Set();
+const OFFICES=['pm','opp','han'];
+const OFFNAME={pm:'Prime minister',opp:'Opposition leader',han:'One Nation leader'};
+const CV={alp:'alp',lnp:'lnp',onp:'on'};
+const COLOR=p=>`var(--${CV[p]||'oth'})`;
+/* a series' figure in week i, null outside its weeks */
+const at=(s,i)=>i<s.i0||i>=s.i0+s.v.length?null:{m:s.v[i-s.i0],lo:s.lo[i-s.i0],hi:s.hi[i-s.i0]};
+const holder=(o,i)=>DATA.series.find(s=>s.role===o&&at(s,i));
+
+/*{{SHARED:window}}*/
+function setWin(w){WIN=w;paintWinBars();ratingsSrc();charts.forEach(c=>{c.clear();c.draw()})}
+
+/* ---------- the charts ---------- */
+const POLLS_HREF='../polls/';
+/*{{SHARED:chart}}*/
+
+/*{{SHARED:events}}*/
+
+/* ---------- what a window draws: this term week by week, past terms month by month ---------- */
+const LONG=12;
+const net=v=>sgn(v).replace(/\.0$/,'');
+const lineW=long=>long?1.4:2.5;
+function ratingScene(narrow){
+  const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
+  const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
+  const S={x0,x1,ys:10,fmt:sgn,tick:v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0',lines:[],bands:[],dots:[],rings:[],stops:[],refs:[{y:0}],ends:[],names:[]};
+  const dots=span<=4.6;
+  /* a line with no label at the right edge is named where it has room: at the middle of the stretch in view */
+  const nameLine=(who,col,pts)=>{const v=pts.filter(p=>p.x>=x0-1e-6&&p.x<=x1+1e-6);if(v.length<2)return;
+    S.names.push({s:who,color:col,pts:v,span:v[v.length-1].x-v[0].x})};
+  if(cur){
+    const inWin=i=>GX[i]>=x0-1e-6&&GX[i]<=x1+1e-6;
+    for(const s of DATA.series){
+      const col=COLOR(s.party),pts=[],bd=[];
+      for(let i=s.i0;i<s.i0+s.v.length;i++){if(!inWin(i))continue;const q=at(s,i);pts.push({x:GX[i],y:q.m});bd.push({x:GX[i],lo:q.lo,hi:q.hi})}
+      if(!pts.length)continue;
+      if(!long)S.bands.push({color:col,pts:bd,smooth:true});
+      S.lines.push({color:col,pts,smooth:true,w:lineW(long),thin:long});
+      if(s.to)nameLine(s.person,col,pts);else S.ends.push({color:col,y:s.v[s.v.length-1],name:s.person,abbr:s.person,v:s.v[s.v.length-1]});
+    }
+    S.ends.sort((p,q)=>q.v-p.v);S.endX=NOWX;
+    if(dots){const memo=new Map();for(const p of DATA.polls){const x=isoX(p.m);if(x<x0||x>x1)continue;const s=DATA.series[p.s];if(!s)continue;
+      const key=p.k||p.m+'|'+p.h;
+      if(!memo.has(key))memo.set(key,{who:p.h,when:p.f?p.f+(+p.m.slice(0,4)!==YR?' '+p.m.slice(0,4):''):fdate(p.m),n:p.n?'n = '+Number(p.n).toLocaleString('en-AU'):'',k:p.k});
+      S.dots.push({x,y:p.net,color:COLOR(s.party),poll:memo.get(key),txt:s.person+' '+net(p.net)})}}
+    for(let i=0;i<=LAST;i++){if(!inWin(i))continue;
+      const items=DATA.series.map(s=>{const q=at(s,i);return q?{color:COLOR(s.party),y:q.m,v:q.m,tc:COLOR(s.party),txt:s.person+' '+sgn(q.m)}:null}).filter(Boolean).sort((p,q)=>q.v-p.v);
+      if(!items.length)continue;const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);
+      S.stops.push({x:GX[i],label:fdate(G[i]),sub:ev?ev.s:'',items})}
+  }
+  if(!curOnly){
+    const past=[],stops=new Map();
+    for(const h of DATA.history){
+      const col=COLOR(h.party),all=h.m.map(m=>({x:m[0],y:m[1],ci:m[2]}));
+      /* a leader who served on into this term is one line: carried to this term's first week */
+      const on=cur&&DATA.series.find(s=>s.id===h.id);
+      if(on)all.push({x:GX[on.i0],y:on.v[0],ci:(on.hi[0]-on.lo[0])/2,join:1});
+      if(!all.length||all[all.length-1].x<a-.05||all[0].x>b+.05)continue;
+      /* split where nobody asked for half a year */
+      const runs=[[]];all.forEach((p,i)=>{if(i&&p.x-all[i-1].x>.52)runs.push([]);runs[runs.length-1].push(p)});
+      for(const r of runs){if(r.length<2)continue;past.push({color:col,pts:r,w:long?1.3:2.25,thin:long});
+        if(!long)S.bands.push({color:col,pts:r.map(p=>({x:p.x,lo:p.y-p.ci,hi:p.y+p.ci}))})}
+      if(!on)nameLine(h.person,col,all);
+      for(const p of all){if(p.join||p.x<a-1e-6||p.x>b+1e-6||(cur&&p.x>=ELX))continue;const key=p.x.toFixed(2);
+        if(!stops.has(key))stops.set(key,{x:p.x,label:xMonth(p.x,true),sub:'',items:[]});
+        stops.get(key).items.push({color:col,y:p.y,v:p.y,tc:col,txt:h.person+' '+sgn(p.y)})}
+    }
+    S.lines.unshift(...past);
+    const st=[...stops.values()];st.forEach(t=>t.items.sort((p,q)=>q.v-p.v));
+    S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
+    if(dots){const memo=new Map();for(const r of DATA.past){const x=isoX(r[0]);if(x<a||x>b)continue;const who=DATA.people[r[2]],key=r[0]+'|'+r[1];
+      if(!memo.has(key))memo.set(key,{who:r[1],when:fdate(r[0]),n:''});
+      S.dots.push({x,y:r[3],color:COLOR(who.party),poll:memo.get(key),txt:who.person+' '+net(r[3])})}}
+    if(!cur)S.ends=[];
+  }
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  const ys=[0,...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(q=>q.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y)];
+  const lo=Math.min(...ys),hi=Math.max(...ys);
+  S.ys=hi-lo>90?20:10;
+  S.y0=Math.floor((lo+.3)/S.ys)*S.ys;S.y1=Math.ceil((hi-.3)/S.ys)*S.ys;
+  return S;
+}
+
+/* ---------- the leaders, highest first, rolled week by week ---------- */
+/*{{SHARED:odometer}}*/
+/* the bars' scale: every week's figure and interval, so a replay never leaves it */
+const AX0=Math.floor(Math.min(0,...DATA.series.flatMap(s=>s.lo))/10)*10,AX1=Math.ceil(Math.max(0,...DATA.series.flatMap(s=>s.hi))/10)*10;
+const px=v=>(v-AX0)/(AX1-AX0)*100,pc=v=>v.toFixed(2)+'%';
+const pv=$('#pv');
+const OFF=OFFICES.filter(o=>holder(o,LAST));
+pv.style.setProperty('--z0',pc(px(0)));
+pv.innerHTML=OFF.map(o=>`<div class="pr" role="row" data-k="${o}"><span class="pn" role="rowheader"><span class="rk" aria-hidden="true"></span><span class="sr"></span><span class="who"></span><small>${OFFNAME[o]}</small></span><span class="pval" role="cell"><span class="sr"></span><b class="rv" aria-hidden="true"></b></span><span class="pd" role="cell"><span class="sr"></span><b class="rv" aria-hidden="true" style="font-weight:inherit"></b></span><span class="pb" aria-hidden="true"><i></i><s><b></b></s></span></div>`).join('');
+const rowOf=Object.fromEntries($$('.pr',pv).map(r=>[r.dataset.k,r]));
+const RV={},DV={},DS={},SB={},BAR={},RK={};
+OFF.forEach(o=>{const r=rowOf[o];RV[o]=$('.pval .rv',r);DV[o]=$('.pd .rv',r);DS[o]=$('.pd .sr',r);SB[o]=$('.pb s',r);BAR[o]=$('.pb i',r);RK[o]=$('.rk',r);mkOdo(RV[o],true);mkOdo(DV[o],true);mkRoll(RK[o],[{a:[' ','=']},{a:[...'123']}])});
+/* the replay opens on the first week every office has a rating (One Nation's leader and the
+   opposition leader were first asked about weeks after polling day) */
+const FIRST=Math.max(0,G.findIndex((g,i)=>OFF.every(o=>holder(o,i))));
+const ten=v=>Math.round(v*10);
+const shown={};
+let ciMode=false;
+/* one office's figures in week j, in tenths; th is where that week's leader started */
+const weekVals=(o,j)=>{const s=holder(o,j),q=at(s,j);return {w:ten(q.m),lo:ten(q.lo),hi:ten(q.hi),th:ten(s.v[0]),half:(q.hi-q.lo)*5}};
+function renderW(snap=false){
+  OFF.forEach(o=>{const {w,lo,hi,th}=shown[o],half=snap?Math.round(shown[o].half):shown[o].half,r=rowOf[o],z=px(0),v=px(w/10);
+    odoSet(RV[o],w);odoSet(DV[o],ciMode?half:w-th,ciMode);
+    DS[o].textContent=ciMode?`±${f1(half/10)} points, 95% credible interval`:sgn((w-th)/10)+' points since they started';
+    r.style.setProperty('--bl',pc(Math.min(z,v)));r.style.setProperty('--bw',pc(Math.abs(v-z)));BAR[o].classList.toggle('neg',w<0);
+    /* since the start: the line covers only what lies beyond the bar, out to the start's tick; a start
+       inside the bar is its tick alone */
+    const b0=Math.min(0,w),b1=Math.max(0,w),inside=th>=b0&&th<=b1,from=ciMode?lo:inside?th:th<b0?th:b1,to=ciMode?hi:inside?th:th<b0?b0:th;
+    r.style.setProperty('--l',pc(px(from/10)));r.style.setProperty('--d',pc(px(to/10)-px(from/10)));
+    SB[o].className=ciMode?'ci':(th<(inside?w:b0)?'up':'dn')+(inside?' in':'');
+    SB[o].style.setProperty('--m',(ciMode&&hi>lo?100*(w-lo)/(hi-lo):50).toFixed(2)+'%');
+  });
+}
+const modeBtn=$('#pv-whisker-mode'),modeLabel=$('#pv-whisker-label');
+function paintWhiskMode(){
+  const now=ciMode?'95% credible intervals':'Change since each started',next=ciMode?'change since each leader started':'95% credible intervals';
+  modeLabel.textContent=now;modeBtn.title='Switch the whiskers to '+next;
+  modeBtn.setAttribute('aria-label','Whiskers show '+now.replace(/^C/,'c')+'; switch them to '+next);
+  $('#range-label').textContent=ciMode?'intervals':'change';
+  $('#whisk-note').textContent=ciMode?'Whiskers mark 95% credible intervals':'Whiskers mark where each leader started';
+}
+modeBtn.addEventListener('click',ev=>{ev.stopPropagation();ciMode=!ciMode;paintWhiskMode();renderW(true)});
+const nowDate=$('#now-date');
+function setWeek(j,instant){
+  const rk=DATA.rank[j],order=[...OFF].sort((p,q)=>at(holder(q,j),j).m-at(holder(p,j),j).m),dom=[...pv.children],rh=dom[0].offsetHeight;
+  OFF.forEach(o=>{const r=rowOf[o],s=holder(o,j),n=rk[OFFICES.indexOf(o)],eq=n<0;
+    rollTo(RK[o],[eq?'=':' ',String(Math.abs(n))],instant);
+    $('.who',r).textContent=s.person;r.style.setProperty('--c',`var(--h-${CV[s.party]||'oth'})`);
+    $('.pn .sr',r).textContent=`ranked ${eq?'equal ':''}${Math.abs(n)}: `;$('.pval .sr',r).textContent=sgn(at(s,j).m);
+    r.style.transform=`translateY(${(order.indexOf(o)-dom.indexOf(r))*rh}px)`;
+  });
+  nowDate.textContent=fdate(G[j]);return order;
+}
+function settle(j){pv.classList.add('still');const order=setWeek(j,true);order.forEach(o=>{pv.appendChild(rowOf[o]);rowOf[o].style.transform=''});pv.offsetHeight;pv.classList.remove('still')}
+OFF.forEach(o=>shown[o]=weekVals(o,LAST));paintWhiskMode();renderW(true);settle(LAST);
+const rpBtn=$('#replay'),STEP=reduce?120:200;let rpRaf=0;
+const KEYS=['w','lo','hi','half'];
+function tweenTo(j,ms,then){
+  const from=Object.fromEntries(OFF.map(o=>[o,{...shown[o]}])),to=Object.fromEntries(OFF.map(o=>[o,weekVals(o,j)])),e3=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;let t0=null;
+  setWeek(j);
+  if(!ms){OFF.forEach(o=>shown[o]=to[o]);renderW(true);then&&then();return}
+  const f=ts=>{if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/ms),e=e3(t);OFF.forEach(o=>{shown[o].th=to[o].th;KEYS.forEach(k=>shown[o][k]=from[o][k]+(to[o][k]-from[o][k])*e)});renderW();if(t<1)rpRaf=requestAnimationFrame(f);else then&&then()};
+  rpRaf=requestAnimationFrame(f);
+}
+function finish(){pv.classList.remove('live');settle(LAST);OFF.forEach(o=>shown[o]=weekVals(o,LAST));renderW(true);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week');paintNow()}
+function stopReplay(){cancelAnimationFrame(rpRaf);tweenTo(LAST,reduce?0:700,finish)}
+rpBtn.addEventListener('click',e=>{
+  e.stopPropagation();if(rpOn){stopReplay();return}
+  rpOn=true;rpBtn.setAttribute('aria-pressed','true');rpBtn.setAttribute('aria-label','Stop the replay');
+  pv.classList.add('live');
+  const f0=dayFrac();
+  tweenTo(FIRST,reduce?0:700,()=>{
+    const span=LAST-FIRST,T=span*STEP;let t0=null,last=FIRST;
+    const step=ts=>{
+      if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/T),fi=FIRST+t*span,i0=Math.min(LAST,Math.floor(fi)),u=reduce?0:fi-i0;
+      OFF.forEach(o=>{
+        /* the spline stays inside one leader's weeks: a handover is a cut, never a glide */
+        const s=holder(o,i0),A=n=>weekVals(o,Math.max(Math.max(FIRST,s.i0),Math.min(s.i0+s.v.length-1,n))),P=[A(i0-1),A(i0),A(i0+1),A(i0+2)];
+        shown[o].th=P[1].th;
+        KEYS.forEach(k=>{const [p0,p1,p2,p3]=P.map(q=>q[k]);shown[o][k]=p1+.5*u*(p2-p0+u*(2*p0-5*p1+4*p2-p3+u*(3*(p1-p2)+p3-p0)))})});
+      renderW();
+      const j=Math.min(LAST,Math.round(fi));if(j!==last){setWeek(j);last=j}
+      if(!reduce)paintCycle(f0+4*t);
+      if(t<1)rpRaf=requestAnimationFrame(step);else finish();
+    };
+    rpRaf=requestAnimationFrame(step);
+  });
+});
+
+/* ---------- section 2: the ratings over time ---------- */
+function ratingsSrc(){
+  const [a,b]=winRange(WIN),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
+  const lines=curOnly?'Lines are the model’s weekly estimates':'Past terms are the model’s monthly estimates'+(cur?' (this term is weekly)':'');
+  $('#ratings-src').textContent=lines+' of each rating as the average pollster would report it, from approval and satisfaction questions'+bands+'.'
+    +(dots?' Dots are individual polls.'+(cur?' Tap a dot for its poll'+(curOnly?', a number for its event.':'.'):''):'');
+}
+const ratings=chart({fig:$('#ratings-fig'),svg:$('#ratings-svg'),scene:ratingScene});
+const charts=[ratings];
+paintWinBars();ratingsSrc();
+
+/* screen-reader table, one row a month */
+{const idx=[];let lm=-1;G.forEach((d,i)=>{const m=+d.slice(5,7);if(m!==lm){idx.push(i);lm=m}});if(idx[idx.length-1]!==LAST)idx.push(LAST);
+$('#ratings-table').innerHTML=`<caption>Estimated net approval, points</caption><tr><th>Week of</th>${DATA.series.map(s=>`<th>${esc(s.person)}</th>`).join('')}</tr>`+idx.map(i=>`<tr><td>${fdate(G[i])}</td>${DATA.series.map(s=>{const q=at(s,i);return `<td>${q?sgn(q.m):''}</td>`}).join('')}</tr>`).join('')}
+
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
+
+/*{{SHARED:nav}}*/
+}
+</script>
+</body>
+</html>

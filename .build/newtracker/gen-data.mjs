@@ -12654,6 +12654,92 @@ if (!JUR && PRIMM && TPM) {
     console.error("dawn data: skipped –", e && e.stack ? e.stack : e);
   }
 }
+/* The leadership ratings page (/dawn/leadership-ratings/): the leader model's
+   (§4m) net approval, week by week this term, one line per leader in an
+   office. The weeks run back from the model's newest day to polling day; a
+   week belongs to a leader from their first reading (Albanese's line runs
+   on from last term, so his starts at the election). Each week's figures
+   come from one set of draws a leader, so a change since a leader's start
+   has its own interval; the last week is the site's figure for today
+   (leaderNow). Past terms are the site's monthly lines (leaderModel), and
+   the dots every approval or satisfaction reading the lines are fitted to
+   (favourability and other scales set no level, so they are not drawn). */
+const DAWN_LEAD_ASSET = path.join(OUT_DIR, "dawn-leaders.json");
+if (!JUR && LDM && leaderModel) {
+  try {
+    const isoD = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+    const dayN = (iso) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000);
+    const t1 = LDM.t1, eDay = dayN(ELECTION.date);
+    const weeks = [];
+    for (let d = t1; d > eDay; d -= 7) weeks.unshift(d);
+    weeks.unshift(eDay);
+    const W = weeks.length, r2t = (v) => { let o = r2(v); if (r1(o) !== r1(v)) o = r2(o + (r1(v) > r1(o) ? 0.01 : -0.01)); return o; };
+    const q = (a, p) => { const s = Float64Array.from(a).sort(); const i = (s.length - 1) * p, lo = Math.floor(i); return s[lo] + (s[Math.min(lo + 1, s.length - 1)] - s[lo]) * (i - lo); };
+    const avg = (a) => { let t = 0; for (const v of a) t += v; return t / a.length; };
+    const NOWKEY = { Albanese: "alb_net", Taylor: "taylor_net", Hanson: "hanson_net" };
+    const cur = LDM.rSeries.filter(({ S }) => S.to > ELECTION.date && S.t1 >= eDay);
+    const series = cur.map(({ S }, k) => {
+      const running = S.outDays.includes(t1);
+      const idx = weeks.map((d, i) => i).filter((i) => weeks[i] >= S.t0 && weeks[i] <= S.t1 && isoD(weeks[i]) < S.to);
+      const dr = ldDrawReads(S, LDM.stR, idx.map((i) => weeks[i]), { net: null }, { nDraw: 2000, seed: 20261201 + k }).net.map((a) => a.map((x) => 100 * x));
+      const out = { id: S.id, role: S.role, person: S.person, party: S.party, from: S.from, ...(S.to < "2099" ? { to: S.to } : {}), i0: idx[0], v: [], lo: [], hi: [] };
+      idx.forEach((i, j) => {
+        const now = running && weeks[i] === t1 ? leaderNow[NOWKEY[S.person]] : null;
+        out.v.push(r2t(now ? now.v : avg(dr[j]))); out.lo.push(r2(now ? now.lo : q(dr[j], 0.025))); out.hi.push(r2(now ? now.hi : q(dr[j], 0.975)));
+      });
+      /* the change since the leader's first week, from the same draws */
+      const last = dr[dr.length - 1], diff = last.map((x, i) => x - dr[0][i]);
+      out.since = { chg: r1(r1(out.v[out.v.length - 1]) - r1(out.v[0])), lo: r1(q(diff, 0.025)), hi: r1(q(diff, 0.975)) };
+      return { out, dr, idx };
+    });
+    /* each week's ranking, the primaries' rule: a leader joins the group above
+       while the chance that group's first is ahead of them is under 97.5%.
+       offices: the prime minister, the opposition leader, One Nation's leader */
+    const OFF = ["pm", "opp", "han"];
+    const holder = (role, i) => series.findIndex((s) => s.out.role === role && s.idx.includes(i));
+    const rank = weeks.map((d, i) => {
+      const have = OFF.map((role, o) => ({ o, s: holder(role, i) })).filter((h) => h.s >= 0)
+        .map((h) => { const X = series[h.s], j = X.idx.indexOf(i); return { ...h, m: X.out.v[j], d: X.dr[j] }; })
+        .sort((a, b) => b.m - a.m);
+      const runs = [];
+      for (const h of have) {
+        const run = runs[runs.length - 1];
+        if (run) { const top = run[0]; let w = 0; for (let n = 0; n < h.d.length; n++) if (top.d[n] > h.d[n]) w++; if (r2(w / h.d.length) < 0.975) { run.push(h); continue; } }
+        runs.push([h]);
+      }
+      const out = [0, 0, 0]; let pos = 1;
+      for (const run of runs) { for (const h of run) out[h.o] = run.length > 1 ? -pos : pos; pos += run.length; }
+      return out;
+    });
+    /* the dots */
+    const onPage = new Map(individualPolls.concat(directionOnlyPolls || [], issuesOnlyPolls || []).map((x) => [dawnKey(x), x]));
+    const polls = [], past = [];
+    const people = [], pIx = (S) => { const key = S.person + "|" + S.party + "|" + S.role; let i = people.findIndex((p) => p.key === key); if (i < 0) { i = people.length; people.push({ key, person: S.person, party: S.party, role: S.role }); } return i; };
+    for (const { S } of LDM.rSeries) for (const o of S.obs) {
+      const r = o.raw; if (r.metric !== "approval" || r.format) continue;
+      if (r.date < ELECTION.date) { past.push([isoD(o.t), r.house, pIx(S), r.net]); continue; }
+      const P = POLL_BY_KEY.get(r.date + "|" + r.house), key = dawnKey({ pollster: r.house, released: r.date });
+      polls.push({ ...(onPage.has(key) ? { k: key } : {}), h: r.house, m: isoD(o.t), f: onPage.has(key) ? onPage.get(key).field : null, ...(P && P.sample != null ? { n: P.sample } : {}),
+        s: series.findIndex((s) => s.out.id === S.id), net: r.net, ...(r.R != null && r.W != null ? { r: r.R, w: r.W } : {}) });
+    }
+    const rated = individualPolls.concat(directionOnlyPolls || []).filter((x) => x.appr && (x.appr.alb != null || x.appr.taylor != null || x.appr.hanson != null));
+    const newest = rated.slice().sort((a, b) => ((a.published || a.released) < (b.published || b.released) ? 1 : -1))[0];
+    const history = leaderModel.ratings.filter((s) => s.from < ELECTION.date).map((s) => ({ id: s.id, role: s.role, person: s.person, party: s.party, from: s.from, ...(s.to ? { to: s.to } : {}),
+      m: s.m.filter((m) => m[0] < dx(ELECTION.date)).map((m) => m.slice(0, 3)) })).filter((s) => s.m.length);
+    const firstX = Math.min(...history.map((s) => s.m[0][0]));
+    writeAtomic(DAWN_LEAD_ASSET, JSON.stringify({
+      v: 1, asOf: isoD(t1), latestPoll: newest ? { h: newest.pollster, ...(newest.published ? { pub: newest.published } : {}) } : null,
+      election: { date: ELECTION.date }, weeks: weeks.map(isoD), series: series.map((s) => s.out), rank,
+      polls, history, people: people.map(({ key, ...p }) => p), past: past.sort((a, b) => (a[0] < b[0] ? -1 : 1)), firstX: Math.floor(firstX * 100) / 100,
+      terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
+        .sort((a, b) => (a.e < b.e ? -1 : 1)),
+      events: events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
+    }));
+    console.log(`dawn leaders: ${series.length} leaders this term over ${W} weeks, ${history.length} past runs, ${polls.length} + ${past.length} readings`);
+  } catch (e) {
+    console.error("dawn leaders data: skipped –", e && e.stack ? e.stack : e);
+  }
+}
 /* The next-polls page: the cadence table the site's projection walks (np-project.js runs in the
    page, so its dates are always the reader's today, not the build's), each house's MRP or pooled
    series, every house's publication dates for the strips either side of today, and who each house

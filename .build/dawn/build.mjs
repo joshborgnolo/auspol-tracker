@@ -15,7 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
@@ -31,6 +31,16 @@ export function flowTotals(D) {
     lnp: s.alp + s.grn * F.lnp.grn + s.onp * F.lnp.onp + s.oth * F.lnp.oth + F.cnr,
     on: s.alp + s.grn * F.on.grn + s.lnp * F.on.lnp + s.oth * F.on.oth,
   };
+}
+
+/* a block template.html marks for the other pages to share: its styles, the sky,
+   the mark, the chart and its time window, the rolling figures, the nav */
+export function sharedBlock(template, name) {
+  const html = name === "logo";
+  const open = html ? `<!--@shared ${name}-->` : `/*@shared ${name}*/`, close = html ? `<!--@end ${name}-->` : `/*@end ${name}*/`;
+  const a = template.indexOf(open), b = template.indexOf(close);
+  if (a < 0 || b < a || template.indexOf(open, a + 1) >= 0) throw new Error(`dawn: template.html must mark the shared block "${name}" once`);
+  return template.slice(a + open.length, b).replace(/^\n|\n$/g, "");
 }
 
 /* the past terms' events, the list the main site's charts mark on a past term (Past cycles'
@@ -175,7 +185,29 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     nextFile = path.join(out, "next", "index.html");
     write(nextFile, nh);
   }
-  return { polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+  /* the leadership ratings page (template-leaders.html): the sunrise and the long chart of the
+     votes page, drawn from the leader model; what the two pages share is read out of template.html */
+  const leadPath = path.join(assets, "dawn-leaders.json");
+  let leadFile = null;
+  if (fs.existsSync(leadPath)) {
+    const LD = JSON.parse(fs.readFileSync(leadPath, "utf8"));
+    const base = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
+    let lh = fs.readFileSync(path.join(HERE, "template-leaders.html"), "utf8")
+      .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k));
+    const fillL = { FONT: "/assets/fonts/" + font, asOf: esc(fdate(LD.asOf)), latestPoll: esc(latestPollLine(LD)), leadersHead: esc(leadersHead(LD).head), leadersDek: esc(leadersDek(LD)) };
+    lh = lh.replace(/\{\{(FONT|asOf|latestPoll|leadersHead|leadersDek)\}\}/g, (m, k) => fillL[k])
+      .replace("/*{{POLLMETA}}*/", () => fs.readFileSync(path.join(HERE, "poll-meta.mjs"), "utf8").replaceAll("export function", "function"))
+      .replace("{{PASTEVENTS}}", () => JSON.stringify(past).replace(/</g, "\\u003c"))
+      .replace("/*{{FILTERSCSS}}*/", "")
+      .replace("{{DATA}}", () => JSON.stringify(LD).replace(/</g, "\\u003c"))
+      .replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
+    const leftL = lh.match(/\{\{[A-Za-z:]+\}\}/);
+    if (leftL) throw new Error("dawn: leaders template placeholder left unfilled: " + leftL[0]);
+    fs.mkdirSync(path.join(out, "leadership-ratings"), { recursive: true });
+    leadFile = path.join(out, "leadership-ratings", "index.html");
+    write(leadFile, lh);
+  }
+  return { leaders: leadFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

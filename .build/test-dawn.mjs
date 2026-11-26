@@ -9,6 +9,9 @@
       (next-copy.js) evaluated together on mocked Sydney clocks across the
       coming weeks, every head on its rule, and the branches no schedule this
       year reaches on hand-built rows; np-score's report read whole.
+   5. the leadership ratings page: today's figures are the site's own, its
+      weeks and ranks hold together, every branch of its head, and the built
+      page whole with the blocks it shares with the votes page.
    Run: node .build/test-dawn.mjs */
 import fs from "node:fs";
 import os from "node:os";
@@ -16,12 +19,12 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor } from "./dawn/copy.mjs";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
 import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
-import { buildDawn, flowTotals, readScore } from "./dawn/build.mjs";
+import { buildDawn, flowTotals, readScore, sharedBlock } from "./dawn/build.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "..");
 const A = path.join(HERE, "newtracker", "assets");
@@ -424,6 +427,54 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(C([]).head, "No polls are scheduled", "nothing on the schedule");
   eq(C([row({ pollster: "A", tracked: "direction", inDays: 1, release: T + DAY }), row({ pollster: "B", inDays: 5, release: T + 5 * DAY })]).lead.join(), "B", "a direction survey is no next poll");
   eq(C([row({ pollster: "A" }), row({ pollster: "B" }), row({ pollster: "C" }), row({ pollster: "D" })]).head, "Four polls are due today", "four or more are counted");
+}
+/* the leadership ratings */
+{
+  const L0 = JSON.parse(fs.readFileSync(path.join(A, "dawn-leaders.json"), "utf8")), copy = () => JSON.parse(JSON.stringify(L0));
+  const data = fs.readFileSync(path.join(A, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const now = JSON.parse(data.match(/const leaderNow = (.*);\n/)[1]);
+  const KEY = { Albanese: "alb_net", Taylor: "taylor_net", Hanson: "hanson_net" }, LW = L0.weeks.length - 1;
+  const running = L0.series.filter((x) => !x.to);
+  eq(running.length, 3, "three leaders today");
+  for (const x of running) {
+    eq(r1(x.v[x.v.length - 1]), now[KEY[x.person]].v, `${x.person}'s last week is the site's figure`);
+    eq(x.i0 + x.v.length - 1, LW, `${x.person}'s line reaches the last week`);
+  }
+  for (const x of L0.series) ok(x.v.length === x.lo.length && x.v.length === x.hi.length && x.v.every((v, i) => x.lo[i] <= v && v <= x.hi[i]), `${x.id}: each week inside its interval`);
+  eq(L0.rank.length, L0.weeks.length, "a ranking for every week");
+  for (const o of ["pm", "opp"]) ok(L0.weeks.every((w, i) => L0.series.filter((x) => x.role === o && i >= x.i0 && i < x.i0 + x.v.length).length <= 1), `one ${o} a week`);
+  ok(L0.polls.every((p) => L0.series[p.s] && Number.isFinite(p.net)) && L0.past.every((p) => L0.people[p[2]]), "every dot belongs to a leader");
+  ok(L0.history.every((h) => h.m.every((m) => m[0] < 2025.4)), "the past lines stop at the election");
+  /* the head: only a change whose interval clears zero, the largest first */
+  const flat = copy(); for (const x of flat.series) x.since = { chg: 3, lo: -2, hi: 8 };
+  eq(leadersHead(flat).head, "The leaders’ ratings are much where they started", "nothing clears");
+  const one = copy(); for (const x of one.series) x.since = { chg: -30, lo: -40, hi: 1 };
+  const han = one.series.find((x) => x.person === "Hanson"); han.since = { chg: 12.34, lo: 1, hi: 20 };
+  ok(/^Hanson’s net rating has risen 12\.3 points since [A-Z][a-z]+ 20\d\d$/.test(leadersHead(one).head), "a smaller change that clears beats larger ones that don't; a first rating after polling day dates its start");
+  const took = copy(); for (const x of took.series) x.since = { chg: 0, lo: -1, hi: 1 }; took.series.find((x) => x.person === "Taylor").since = { chg: -9, lo: -15, hi: -3 };
+  eq(leadersHead(took).head, "Taylor’s net rating has fallen 9.0 points since taking the job", "a leader who took over");
+  const pm = copy(); for (const x of pm.series) x.since = { chg: 0, lo: -1, hi: 1 }; pm.series.find((x) => x.person === "Albanese").since = { chg: -20, lo: -28, hi: -12 };
+  eq(leadersHead(pm).head, "Albanese’s net rating has fallen 20.0 points since the election", "a line from polling day");
+  ok(leaderMoves(L0).every((m) => m.person !== "Ley"), "a leader who has gone leads no head");
+  /* the built page */
+  const base = fs.readFileSync(path.join(HERE, "dawn", "template.html"), "utf8");
+  for (const k of ["css", "logo", "sky", "dates", "window", "chart", "events", "odometer", "nav"]) ok(sharedBlock(base, k).length > 100, `template.html marks the shared block ${k}`);
+  assert.throws(() => sharedBlock(base, "missing")); n++;
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-lead-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, "assets", "fonts"))) if (f.startsWith("commissioner")) fs.writeFileSync(path.join(tmp, "assets", "fonts", f), "");
+  fs.mkdirSync(path.join(tmp, "data"));
+  fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
+  const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).leaders, "utf8");
+  fs.rmSync(tmp, { recursive: true, force: true });
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "every placeholder filled");
+  eq(JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]).asOf, L0.asOf, "its data parses");
+  const js = built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"));
+  new vm.Script(js); n++;
+  ok(built.includes(leadersHead(L0).head) && built.includes(leadersDek(L0)), "the head and dek are today's rules");
+  ok(/name="robots" content="noindex"/.test(built), "unlisted");
+  ok(built.includes("const POLLS_HREF='../polls/'"), "its dots open the polls page");
+  for (const f of ["template.html", "template-polls.html", "template-next.html"]) ok(/href="(\.\.\/)?leadership-ratings\/">leadership ratings</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists the page`);
 }
 /* linked from nowhere */
 {
