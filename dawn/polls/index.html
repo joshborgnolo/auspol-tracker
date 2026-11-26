@@ -752,7 +752,7 @@ function resultCells(p){
   }
   return FACETS[F].fig(p).map(cell=>'<td class="value other-cell">'+cell+'</td>').join('');
 }
-const facetTitle={consideration:'Voting consideration',primary:'First preferences (%)',twopp:'Two-party preferred (%)',leaders:'Leadership',direction:'National direction',issues:'Issue ownership',demographics:'Demographic gaps (points)',confidence:'Confidence'};
+const facetTitle={consideration:'Voting consideration',primary:'Voting intention (%)',twopp:'Two-party preferred (%)',leaders:'Leadership',direction:'National direction',issues:'Issue ownership',demographics:'Demographic gaps (points)',confidence:'Confidence'};
 const compact=matchMedia('(max-width:64em)'),intervalSwitch=$('#intervals');
 let intervalPreference;
 function setIntervals(){
@@ -799,7 +799,7 @@ function render(){
   $('#measure').textContent=measure;
   $('#measure-plain').textContent=facetTitle[F];
   $('#measure-plain').hidden=F==='primary';
-  $('#method-key').textContent=showingConsideration?'Polls that asked which parties voters would consider supporting.':F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
+  $('#method-key').innerHTML=showingConsideration?'Which parties voters <em>would consider</em> supporting':F==='primary'?'First preferences':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
   const noun=fa.noun||'poll',count=house||terms.length?rows.length+' of '+all.length:rows.length;
   $('#count').textContent=count+' '+noun+(all.length===1?'':'s')+(F==='primary'&&!consideration?' with primary votes':'');
   const months=new Map();

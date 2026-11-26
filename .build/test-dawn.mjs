@@ -347,6 +347,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const pollScript = ph.match(/<script>([\s\S]*?)<\/script>/);
   ok(!!pollScript, "the ledger's whole client is present");
   new vm.Script(pollScript[1]);
+  ok(ph.includes("primary:'Voting intention (%)'") && ph.includes("const measure=showingConsideration?'Voting consideration (%)':facetTitle[F]"), "the primary facet names voting intention and voting consideration");
+  ok(ph.includes("$('#method-key').innerHTML=showingConsideration?'Which parties voters <em>would consider</em> supporting':F==='primary'?'First preferences'"), "the primary subtitles distinguish first preferences with an italic would-consider phrase");
   const undecidedFor = vm.runInNewContext(ph.slice(ph.indexOf("function undecided(p){"), ph.indexOf("function resultCells(p){")) + ";undecided", { num: String });
   eq(undecidedFor({ h: "Resolve", b: "F", u: { v: 0, label: "not allowed" } }), "0%, forced choice", "Resolve shows its forced-choice zero");
   eq(undecidedFor({ h: "Another house", b: "F", u: { v: 0, label: "not allowed" } }), "Forced choice", "the Resolve wording change does not leak to other houses");
