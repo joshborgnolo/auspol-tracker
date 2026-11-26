@@ -12,7 +12,7 @@
 <link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
 <style>
 /*{{SHARED:css}}*/
-:root{--dec-once:#7e3f7a;--dec-leaner:#a57708;--dec-pref:var(--ink);--dec-resolve:#0f8a8c;--dec-redbridge:#75707f;--h-firm:#f4f1ea;--h-soft:#8d93c9;--h-und:#eab14a}
+:root{--dec-once:#7e3f7a;--dec-leaner:#a57708;--dec-pref:var(--ink);--dec-resolve:#0f8a8c;--dec-redbridge:#75707f;--h-firm:#f4f1ea;--h-soft:#b4bbf6;--h-und:#eab14a}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--dec-once:#d08ccb;--dec-leaner:#dfae3c;--dec-resolve:#33c2c4;--dec-redbridge:#a8a3b6}}
 :root[data-theme=dark]{--dec-once:#d08ccb;--dec-leaner:#dfae3c;--dec-resolve:#33c2c4;--dec-redbridge:#a8a3b6}
 /* of every 100 voters: three figures over one rounded bar */
@@ -21,9 +21,8 @@
 .dc-f{display:flex;flex-direction:column;gap:4px;min-width:0}
 .dc-f:nth-child(2){align-items:center;text-align:center}
 .dc-f:nth-child(3){align-items:flex-end;text-align:right}
-.dc-k{display:flex;align-items:center;gap:7px;font-size:clamp(14px,4.1vw,18px);font-weight:500;white-space:nowrap}
-.dc-k::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
-.dc-v{font-weight:600;font-size:clamp(46px,min(15vw,9vh),84px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dc-k{font-size:clamp(14px,4.1vw,18px);font-weight:600;white-space:nowrap;color:var(--c)}
+.dc-v{color:var(--c);font-weight:600;font-size:clamp(46px,min(15vw,9vh),84px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dc-bar{display:flex;height:clamp(18px,3.2vh,28px);margin-top:clamp(12px,2.2vh,22px);border-radius:999px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.14),0 4px 22px rgb(4 10 40/.35)}
 .dc-bar i{display:block;flex:0 0 auto;width:var(--w);transition:width .25s linear;background:var(--c)}
 .dc-bar i:last-child{flex:1 1 0}
@@ -31,7 +30,7 @@
 .dc-move{display:flex;justify-content:flex-end;margin:8px 0 0;font-size:clamp(13.5px,3.8vw,16px);font-weight:600;color:#fff}
 .dc-move span{border-top:1px solid rgb(238 238 255/.55);padding-top:5px;text-align:right;width:var(--mw);min-width:max-content}
 .dc-defs{list-style:none;margin:clamp(8px,1.8vh,18px) 0 0;padding:0;display:grid;gap:4px;font-size:clamp(13px,3.6vw,15px);line-height:1.35;color:rgb(238 238 255/.8)}
-.dc-defs b{color:#fff;font-weight:600}
+.dc-defs b{color:var(--c);font-weight:600}
 @media(max-height:660px){.dc-hero .now-d{font-size:13px}.dc-chapeau{margin-top:8px;font-size:19px}.dc-defs{display:none}.dc-v{font-size:44px}}
 .dcp .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
 @media (min-width:900px){.dcp .ctl{margin-top:16px}.dcp .fig{margin-top:8px}}
@@ -114,7 +113,7 @@
       </div>
       <div class="dc-bar" id="dc-bar" role="img"><i style="--c:var(--h-firm)"></i><i style="--c:var(--h-soft)"></i><i style="--c:var(--h-und)"></i></div>
       <p class="dc-move"><span id="dc-move"></span></p>
-      <ul class="dc-defs"><li><b>Firm:</b> named a party and don’t expect to change</li><li><b>Soft:</b> named a party but might change</li><li><b>Undecided:</b> can’t say who they’d vote for</li></ul>
+      <ul class="dc-defs"><li style="--c:var(--h-firm)"><b>Firm:</b> named a party and don’t expect to change</li><li style="--c:var(--h-soft)"><b>Soft:</b> named a party but might change</li><li style="--c:var(--h-und)"><b>Undecided:</b> can’t say who they’d vote for</li></ul>
     </div>
   </div>
 </section>
