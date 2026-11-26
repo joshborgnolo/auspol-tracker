@@ -310,7 +310,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(settledWhisk.sr, "±0.7 percentage points, 95% credible interval", "the settled figure names the snapped tenth");
   const C = copyFor(D0);
   for (const k of ["votesHead", "tppHead", "flowsHead"]) ok(html.includes(C[k].replace(/&/g, "&amp;")), k + " in the page");
-  ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed"), "the two-party explanatory dek uses the curated wording");
+  ok(html.includes("% of the vote received by the major parties after minor-party votes are distributed, under preference-flow assumptions"), "the two-party explanatory dek names its preference-flow assumptions");
   ok(html.includes(".flow-match h3{margin:0 0 10px;font:500 19.5px var(--sans);color:var(--mute)}") && html.includes(".flow-phone-title{margin:0 0 10px;font:500 19.5px var(--sans)}"), "the Sankey margin heading is 1.5× its former 13px size on both layouts");
   ok(html.includes(".votes .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}") && html.includes(".votes .ctl .opts{margin-top:0;flex-shrink:0}"), "the time window and chart filters share a wrapping row");
   ok(/<div class="pick"><span class="pl">Taking&nbsp;<\/span><button[^>]+id="pv-btn"[^>]*><b id="pv-name">all pollsters<\/b><\/button>/.test(html), "Taking is a separate prefix, not text inside the pollster button");
