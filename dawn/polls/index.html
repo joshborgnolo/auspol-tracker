@@ -141,6 +141,7 @@ h1{font:400 clamp(28px,7.3vw,46px)/1.06 var(--serif);letter-spacing:-.01em;margi
 .note{font-size:13.5px;color:var(--mute);margin:28px 0 0;line-height:1.5;max-width:72ch}
 .measure-line{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 15px;border-top:1px solid var(--rule2);padding:13px 0 9px;margin-top:17px}
 .measure-line h2{font:500 16px/1.3 var(--sans);margin:0}
+.measure-line .vote-flip{min-height:0;font:inherit}
 #method-key,.interval-toggle{font-size:12px;color:var(--mute)}
 .interval-toggle{display:inline-flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer}
 .interval-toggle[hidden]{display:none}
@@ -217,6 +218,7 @@ body[data-f=primary] .headings .measure-head:not(:last-child){display:block;text
 .basis-label{display:inline}.basis em{display:inline;margin-left:5px}
 .det .vs{grid-template-columns:minmax(4.7em,auto) minmax(10px,1fr) auto}
 }
+@media(max-width:40em){.ctl .search{flex:1 0 100%;max-width:none}.ctl .pick .pl{display:none}}
 @media(max-width:19em){body[data-f=primary] .headings{display:none}body[data-f=primary] .poll{grid-template-columns:repeat(auto-fit,minmax(3.8em,1fr))}.poll .value[data-party]::before{content:attr(data-party);display:block;font-size:11px;color:var(--mute)}}
 .rival-toggle{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid currentColor;border-radius:999px;background:var(--bg);color:var(--lnp);font:500 13px/1.3 var(--sans);white-space:nowrap;cursor:pointer}
 .rival-toggle::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
@@ -281,14 +283,13 @@ body[data-f=primary] .headings .measure-head:not(:last-child){display:block;text
       <label class="search"><span class="sr">Search</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search a pollster, a date or a figure" autocomplete="off" enterkeyhint="search"></label>
       <label class="pick"><span class="pl">Take&nbsp;</span><select id="house"></select></label>
       <div class="pick"><span class="pl">Sort by&nbsp;</span><select id="sort" aria-label="Sort by"><option value="fieldwork">fieldwork date</option><option value="publication">publication date</option></select></div>
-      <button type="button" class="vote-flip fopt" data-for="primary" id="vote-mode" title="Switch to voting consideration"><span class="vote-label">Voting intention</span> <span aria-hidden="true">⇄</span></button>
       <div class="rival-pick fopt" data-for="twopp" hidden>Labor v <button type="button" class="rival-toggle" id="rival" role="switch" aria-label="Labor versus One Nation" aria-checked="false" data-r="lnp">Coalition</button></div>
       <div class="seg fopt" role="radiogroup" aria-label="Two-party basis" data-for="twopp"><button type="button" role="radio" aria-checked="true" data-b="imp">Implied</button><button type="button" role="radio" aria-checked="false" data-b="pub">Published</button></div>
       <label class="pick fopt" data-for="demographics"><span class="sr">Split by</span><select id="split"></select></label>
       <div class="pick fopt" id="offcut-pick" hidden><select id="offcut"></select></div>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
-    <div class="measure-line"><h2 id="measure"></h2><span id="method-key"></span><label class="interval-toggle fopt" data-for="primary"><input id="intervals" type="checkbox">95% credible intervals</label></div>
+    <div class="measure-line"><h2 id="measure-plain" hidden></h2><h2 class="fopt" data-for="primary"><button type="button" class="vote-flip" id="vote-mode" title="Switch to voting consideration"><span class="vote-label" id="measure"></span> <span aria-hidden="true">⇄</span></button></h2><span id="method-key"></span><label class="interval-toggle fopt" data-for="primary"><input id="intervals" type="checkbox">95% credible intervals</label></div>
     <div id="list"></div>
     <p class="note" id="note"></p>
   </div>
@@ -715,12 +716,12 @@ const FACETS={
     hay:p=>[p.conf.v,p.conf.lab].join(' ')},
 };
 const FDEK={issues:'The party voters rate best on each issue, and its lead on the runner-up; a lead inside the margin is level.',demographics:'Each poll’s own gap between two groups, party by party: the first group less the second.',confidence:'Each confidence or sentiment release, as the bank or pollster published it.'};
-/* the sample: the count and what the shares are of, the effective sample beneath (the house’s, still to come, missing, or estimated) */
+/* the sample: the count and what the shares are of, the house's published effective sample beneath or undisclosed */
 function sampleMarkup(p){
   const basis=(F==='twopp'&&p.b2)||p.b;
   return p.n?Number(p.n).toLocaleString('en-AU')+(basis?' '+sampleBase(basis):''):'–';
 }
-const effTxt=p=>p.se?'eff. '+Number(p.se).toLocaleString('en-AU'):p.eb?(/^~/.test(p.eb)?'eff. ~'+Number(p.eb.slice(1)).toLocaleString('en-AU'):'eff. '+p.eb):'';
+const effTxt=p=>p.se != null?'eff. '+Number(p.se).toLocaleString('en-AU'):'eff. undisclosed';
 const tabs=$('#tabs'),sel=$('#house'),q=$('#q'),splitSel=$('#split'),offcutSel=$('#offcut');
 offcutSel.innerHTML='<option value="">All offcuts</option>'+OFFCUTS.map(([id,label])=>`<option value="${id}">${esc(label)}</option>`).join('');
 tabs.innerHTML=Object.entries(FACETS).map(([id,f])=>`<button type="button" role="tab" aria-selected="${id===F}" data-f="${id}">${f.label}</button>`).join('');
@@ -733,7 +734,7 @@ function hayOf(p){
   return [p.h,p.c||'',p.f||'',...dates,FACETS[F].hay(p)].join(' ').toLowerCase();
 }
 function undecided(p){
-  if(p.u?.label==='not allowed'||p.b==='F')return 'Forced choice';
+  if(p.u?.label==='not allowed'||p.b==='F')return p.h==='Resolve'?'0%, forced choice':'Forced choice';
   if(!p.u)return 'Unreported';
   const share=p.u.v==null?'Share unreported · ':num(p.u.v)+'% ';
   return share+p.u.label;
@@ -796,6 +797,8 @@ function render(){
   $('.interval-toggle').hidden=F!=='primary'||consideration;
   const measure=showingConsideration?'Voting consideration (%)':facetTitle[F];
   $('#measure').textContent=measure;
+  $('#measure-plain').textContent=facetTitle[F];
+  $('#measure-plain').hidden=F==='primary';
   $('#method-key').textContent=showingConsideration?'Polls that asked which parties voters would consider supporting.':F==='primary'?'As reported by each pollster':F==='twopp'?(BASIS==='imp'?'Estimated from preference flows':'As published by each pollster'):'';
   const noun=fa.noun||'poll',count=house||terms.length?rows.length+' of '+all.length:rows.length;
   $('#count').textContent=count+' '+noun+(all.length===1?'':'s')+(F==='primary'&&!consideration?' with primary votes':'');
@@ -821,7 +824,6 @@ function render(){
    the open facet first, and its primaries against the model's that week */
 const {pollHeading,houseName,sampleBase}=(()=>{const BARE = { "News24": 1, "Capital Brief": 1, "News.com.au": 1, "News Australia": 1, Amplify: 1 };
 const COMMISSIONED = { "Blueprint Institute": 1, "Climate Council": 1, "Australia Inst.": 1, Amplify: 1 };
-const APPROX = new Set(["Roy Morgan", "Spectre Strategy", "Resolve", "EMRS (Tas)"]);
 const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], N = v => Number(v).toLocaleString("en-AU");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -844,18 +846,13 @@ function sampleBase(code) {
   return `<span class="sample-base">${esc(code)}</span>`;
 }
 
-/* The main ledger's rdPollHead, over Dawn's schema. p.eb already carries
-   the TBC/missing verdict reached while the wave is filed. */
-function pollHeading(p, deff) {
-  let sample = "an unpublished sample", estimate = null;
+/* The main ledger's rdPollHead, over Dawn's schema. An effective sample is
+   shown only when the house publishes it. */
+function pollHeading(p) {
+  let sample = "an unpublished sample";
   if (p.n != null) {
-    sample = "a sample of ";
-    const eb = p.eb && String(p.eb).startsWith("~") ? Number(String(p.eb).slice(1)) : null;
-    estimate = p.se == null && eb == null && APPROX.has(p.h) ? Math.round(p.n / (deff || 1.6) / 10) * 10 : eb;
-    const efficiency = p.se != null ? "(eff. " + N(p.se) + ")"
-      : p.eb === "TBC" ? "(eff. TBC)" : p.eb === "missing" ? "(eff. missing)"
-      : estimate != null ? "(eff. ~" + N(estimate) + ")" : "";
-    sample += `<span class="nocaps"${estimate != null ? ' title="Estimated from the raw sample and the site’s design effect; the house publishes no effective sample"' : ""}>${N(p.n)}${p.b ? ` (${sampleBase(p.b)})` : ""}${efficiency ? ` ${efficiency}` : ""}</span>`;
+    const efficiency = p.se != null ? "(eff. " + N(p.se) + ")" : "(eff. undisclosed)";
+    sample = `a sample of <span class="nocaps">${N(p.n)}${p.b ? ` (${sampleBase(p.b)})` : ""} ${efficiency}</span>`;
   }
   const self = p.conf || !(p.c && !/^self/i.test(p.c));
   const by = (!self && COMMISSIONED[p.c] ? "commissioned by " : "published by ") + (self ? houseName(p.h) : client(p.c));
@@ -866,7 +863,7 @@ function pollHeading(p, deff) {
 return {pollHeading,houseName,sampleBase};})();
 function detail(p){
   const b=[],sec=[];
-  b.push('<p>'+pollHeading(p,DATA.deff)+'</p>');
+  b.push('<p>'+pollHeading(p)+'</p>');
   if(p.links&&p.links.length)b.push('<div class="lk">'+p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener"${l.pending?' class="pend"':''}${l.title?` title="${esc(l.title)}"`:''}>${esc(l.t)}${l.pending?'':' ↗'}</a>`).join('')+'</div>');
   if(p.na)b.push(`<p><b>Not counted.</b> ${esc(p.na)}</p>`);
   if(p.conf)sec.push(['confidence',`<h3>${esc(p.conf.lab)}</h3><p>${num(p.conf.v)}${p.conf.chg!=null?', '+sg(p.conf.chg)+' on the release before':''}${p.conf.vs?'; '+p.conf.vs+' is neutral':''}.</p>`]);
@@ -927,7 +924,6 @@ sel.addEventListener('change',render);
 sortSelect.addEventListener('change',render);
 $('#vote-mode').addEventListener('click',e=>{
   consideration=!consideration;
-  e.currentTarget.querySelector('.vote-label').textContent=consideration?'Voting consideration':'Voting intention';
   e.currentTarget.title=consideration?'Switch to voting intention':'Switch to voting consideration';
   fillHouses();render();
 });
@@ -961,7 +957,7 @@ filterSelect({select:sortSelect,label:"Sort by"});
 filterSelect({select:offcutSel,label:"Offcut breakdown"});
 filterSelect({select:splitSel,label:"Demographic split"});
 fillHouses();render();arrive();addEventListener('hashchange',arrive);
-$('#note').textContent='Primary vote shares are as published. Their 95% credible intervals account for effective sample size, pollster noise and rounding. A change from the same pollster’s last poll is significant when its 95% credible interval excludes zero, treating the two samples as independent. Where fieldwork overlaps, the comparison is left unclassified. Other measures marked ± show approximate 95% sampling uncertainty. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the effective sample, the house’s own where it files one, “~” where the site estimates it from the design effect. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
+$('#note').textContent='Primary vote shares are as published. Their 95% credible intervals account for effective sample size, pollster noise and rounding. A change from the same pollster’s last poll is significant when its 95% credible interval excludes zero, treating the two samples as independent. Where fieldwork overlaps, the comparison is left unclassified. Other measures marked ± show approximate 95% sampling uncertainty. n is the sample: D counts decided voters only, D+L decided voters and those leaning, A every respondent, F a forced choice with no undecided option; “eff.” is the house’s published effective sample, or “undisclosed” when it has not filed one. The 2PP is each poll’s primary votes run through the 2025 election’s preference flows (against One Nation, the site’s own) unless set to the pollster’s published figure; lean is the poll less the model’s line at its fieldwork, estimated without it.';
 /* the menu */
 const burger=$('#burger'),menu=$('#menu'),nav=$('#nav');
 const setMenu=o=>{menu.hidden=!o;burger.setAttribute('aria-expanded',String(o));nav.classList.toggle('open',o);document.documentElement.style.overflow=o?'hidden':''};

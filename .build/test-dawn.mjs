@@ -137,11 +137,11 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
 {
   const E = { h: "Essential", c: "The Guardian", d: "2026-11-24", f: "19–24 Nov", pub: "2026-11-25", n: 1017, b: "A", se: 793 };
   eq(pollHeading(E), 'Conducted on 19–24 Nov from a sample of <span class="nocaps">1,017 (<span class="sample-base">A</span>) (eff. 793)</span>, published by The Guardian on Wed 25 Nov.');
-  ok(pollHeading({ ...E, se: null }).includes('1,017 (<span class="sample-base">A</span>)</span>'), "a raw sample without an effective figure");
-  ok(pollHeading({ ...E, se: null, eb: "TBC" }).includes("(eff. TBC)"), "an effective sample still to come");
-  ok(pollHeading({ ...E, se: null, eb: "missing" }).includes("(eff. missing)"), "the older, unfiled effective sample stays named");
-  ok(pollHeading({ ...E, se: null, eb: "~790" }).includes("(eff. ~790)") && pollHeading({ ...E, se: null, eb: "~790" }).includes("title=\"Estimated from the raw sample"), "the approximate effective figure and its meaning");
-  ok(pollHeading({ ...E, se: null, eb: null, h: "Roy Morgan", c: "Self-published", n: 1500 }, 1.5).includes("(eff. ~1,000)"), "the design-effect estimate for a house that files no effective sample");
+  for (const eb of [null, "TBC", "missing", "~790"]) {
+    ok(pollHeading({ ...E, se: null, eb }).includes("(eff. undisclosed)"), "an unfiled effective sample is undisclosed, including " + eb);
+  }
+  ok(!pollHeading({ ...E, se: null, eb: "~790" }).includes("Estimated from the raw sample"), "no model-estimate tooltip remains on the raw sample");
+  ok(pollHeading({ ...E, se: null, eb: null, h: "Roy Morgan", c: "Self-published", n: 1500 }, 1.5).includes("(eff. undisclosed)"), "a design-effect estimate is not presented as the house's figure");
   ok(pollHeading({ ...E, c: "Self-published" }).includes("published by Essential"), "a self-published wave names its house, not Self-published");
   ok(pollHeading({ ...E, c: "NEWS24" }).includes("published by the NEWS24"), "an unlisted client takes the article, as on the main ledger");
   ok(pollHeading({ ...E, c: "News24" }).includes("published by News24"), "bare client names do not acquire an article");
@@ -336,9 +336,18 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(!/\{\{[A-Za-z]+\}\}/.test(ph), "every polls-page placeholder filled");
   ok(ph.includes("<h1>Federal opinion polls</h1>"), "the polls-page heading survives regeneration");
   ok(ph.includes('<p class="dek">From 13 pollsters, with the newest first. Open a poll for details.</p>'), "the polls-page dek survives regeneration");
+  ok(ph.includes("@media(max-width:40em){.ctl .search{flex:1 0 100%;max-width:none}.ctl .pick .pl{display:none}}"), "phone search is full-width above the compact pollster and date filters");
+  ok(ph.includes("const effTxt=p=>p.se != null?") && ph.includes(":'eff. undisclosed';"), "unfiled row-level effective samples read undisclosed");
+  ok(ph.includes('<div class="measure-line"><h2 id="measure-plain" hidden></h2><h2 class="fopt" data-for="primary"><button type="button" class="vote-flip" id="vote-mode"'), "the primary measure heading carries the voting-mode toggle");
+  const filterMarkup = ph.slice(ph.indexOf('<div class="ctl">'), ph.indexOf('<div class="measure-line">'));
+  ok(!filterMarkup.includes('id="vote-mode"'), "the filters do not duplicate the primary heading's toggle");
   const pollScript = ph.match(/<script>([\s\S]*?)<\/script>/);
   ok(!!pollScript, "the ledger's whole client is present");
   new vm.Script(pollScript[1]);
+  const undecidedFor = vm.runInNewContext(ph.slice(ph.indexOf("function undecided(p){"), ph.indexOf("function resultCells(p){")) + ";undecided", { num: String });
+  eq(undecidedFor({ h: "Resolve", b: "F", u: { v: 0, label: "not allowed" } }), "0%, forced choice", "Resolve shows its forced-choice zero");
+  eq(undecidedFor({ h: "Another house", b: "F", u: { v: 0, label: "not allowed" } }), "Forced choice", "the Resolve wording change does not leak to other houses");
+  eq(undecidedFor({}), "Unreported", "an unreported undecided value is unchanged");
   const PL = JSON.parse(ph.match(/<script id="polls-data" type="application\/json">([\s\S]*?)<\/script>/)[1]).polls;
   const keys = new Set(PL.map((q) => q.k));
   eq(keys.size, PL.length, "each poll's address is its own");

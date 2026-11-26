@@ -1,6 +1,5 @@
 const BARE = { "News24": 1, "Capital Brief": 1, "News.com.au": 1, "News Australia": 1, Amplify: 1 };
 const COMMISSIONED = { "Blueprint Institute": 1, "Climate Council": 1, "Australia Inst.": 1, Amplify: 1 };
-const APPROX = new Set(["Roy Morgan", "Spectre Strategy", "Resolve", "EMRS (Tas)"]);
 const MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], N = v => Number(v).toLocaleString("en-AU");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -23,18 +22,13 @@ export function sampleBase(code) {
   return `<span class="sample-base">${esc(code)}</span>`;
 }
 
-/* The main ledger's rdPollHead, over Dawn's schema. p.eb already carries
-   the TBC/missing verdict reached while the wave is filed. */
-export function pollHeading(p, deff) {
-  let sample = "an unpublished sample", estimate = null;
+/* The main ledger's rdPollHead, over Dawn's schema. An effective sample is
+   shown only when the house publishes it. */
+export function pollHeading(p) {
+  let sample = "an unpublished sample";
   if (p.n != null) {
-    sample = "a sample of ";
-    const eb = p.eb && String(p.eb).startsWith("~") ? Number(String(p.eb).slice(1)) : null;
-    estimate = p.se == null && eb == null && APPROX.has(p.h) ? Math.round(p.n / (deff || 1.6) / 10) * 10 : eb;
-    const efficiency = p.se != null ? "(eff. " + N(p.se) + ")"
-      : p.eb === "TBC" ? "(eff. TBC)" : p.eb === "missing" ? "(eff. missing)"
-      : estimate != null ? "(eff. ~" + N(estimate) + ")" : "";
-    sample += `<span class="nocaps"${estimate != null ? ' title="Estimated from the raw sample and the site’s design effect; the house publishes no effective sample"' : ""}>${N(p.n)}${p.b ? ` (${sampleBase(p.b)})` : ""}${efficiency ? ` ${efficiency}` : ""}</span>`;
+    const efficiency = p.se != null ? "(eff. " + N(p.se) + ")" : "(eff. undisclosed)";
+    sample = `a sample of <span class="nocaps">${N(p.n)}${p.b ? ` (${sampleBase(p.b)})` : ""} ${efficiency}</span>`;
   }
   const self = p.conf || !(p.c && !/^self/i.test(p.c));
   const by = (!self && COMMISSIONED[p.c] ? "commissioned by " : "published by ") + (self ? houseName(p.h) : client(p.c));
