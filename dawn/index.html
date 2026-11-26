@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun: Safari otherwise paints a frame
+     with the sun unplaced (off to the right) and uncoloured; the timeout is a failsafe. Restoring the scroll
+     is the page's own (by panel, at the foot of the script): iPhone Safari's landed a reload one panel down -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
 <meta name="robots" content="noindex">
 <title>auspol tracker</title>
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
@@ -19,6 +23,7 @@
    TYPE Georgia for findings, Commissioner for labels and figures
    LAYOUT phone: one snapped screen per section (title, figures, chart, notes); laptop: same order, side panel for figures
    DATA the site's own models (gen-data §13, built by .build/dawn/build.mjs): a trial design, linked from nowhere */
+html.wait{background:#0a1230}html.wait body{visibility:hidden}
 @font-face{font-family:"Commissioner";font-style:normal;font-weight:400 700;font-display:swap;src:url("/assets/fonts/commissioner-latin.737ec8f2.woff2") format("woff2")}
 :root{--tbd:0px;--tbs:0px;--ext:0px;color-scheme:light;--bg:#fbf6f1;--ink:#1d1b33;--ink2:#4a4660;--mute:#686477;--rule:#e8e0d7;--rule2:#c9bfb4;--alp:#cf3a2f;--lnp:#2a5cb4;--on:#dc6a16;--grn:#1d7a52;--oth:#8d8799;--kb:#7e52a8;--bt:#10998d;--dot:.24;--band:.11;--rib:.34;--h-alp:#ff5f55;--h-lnp:#7aa2ff;--h-on:#ffb862;--h-grn:#56cf96;--h-oth:#ebe8f3;--col:max(var(--g),calc((100vw - 1180px)/2));--navh:52px;--g:max(18px,env(safe-area-inset-left));--serif:Georgia,"Times New Roman",serif;--sans:"Commissioner","Helvetica Neue",Arial,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#14132a;--ink:#f3eee8;--ink2:#cbc6d6;--mute:#a39fb3;--rule:#2a2843;--rule2:#4a4764;--alp:#e65548;--lnp:#5b88e4;--on:#d6762a;--grn:#23906a;--oth:#8f8aa3;--kb:#a07ccb;--bt:#2bb3a6;--dot:.34;--band:.16;--rib:.44}}
@@ -1871,6 +1876,15 @@ document.addEventListener('click',e=>{
   const t=document.getElementById(a.getAttribute('href').slice(1));if(!t)return;
   e.preventDefault();closeMenu();t.scrollIntoView({behavior:reduce?'auto':'smooth'});
 });
+/* a reload reopens the panel it left, by panel rather than pixel, so the snap can't carry it to the next one */
+const panels=[hero,...$$('.sec')],panelAt=()=>{let k=0,b=1/0;panels.forEach((el,i)=>{const d=Math.abs(el.offsetTop-scrollY);if(d<b){b=d;k=i}});return k};
+const PKEY='dawn-panel:'+location.pathname;
+{let k=0;try{k=+sessionStorage.getItem(PKEY)||0}catch(e){}
+ if(!location.hash)scrollTo(0,k>0&&panels[k]?panels[k].offsetTop:0);}
+addEventListener('pagehide',()=>{try{sessionStorage.setItem(PKEY,String(panelAt()))}catch(e){}});
+/* the figures are in now, so the sun's clearance under them is final: place it, then show the page */
+paintNow();root.classList.remove('wait');
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(paintNow);
 }
 </script>
 </body>
