@@ -1,8 +1,8 @@
 {
-  "generated": "2026-11-26",
+  "generated": "2026-11-27",
   "sources": {
-    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-26 snapshot)",
-    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-26 snapshot)",
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-11-27 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-11-27 snapshot)",
     "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
   },
   "polls": [
@@ -2228,6 +2228,35 @@
       "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
       "releaseUrl": "https://demosau.com/news/coalition-in-election-winning-lead-in-final-demosau-premiernational-victorian-poll/",
       "methodUrl": "https://demosau.com/wp-content/uploads/2026/11/DemosAU_Victoria_Poll_Late_November_2026_Methodology_Statement.pdf"
+    },
+    {
+      "firmRaw": "Newspoll",
+      "firm": "newspoll",
+      "client": "The Australian",
+      "sample": 1506,
+      "sampleEff": 1130,
+      "dateLabel": "19 Oct–25 Nov 2026",
+      "fwStart": "2026-10-19",
+      "fwEnd": "2026-11-25",
+      "approxDate": false,
+      "primary": {
+        "alp": 20,
+        "lnp": 33,
+        "grn": 17,
+        "onp": 18,
+        "ind": null,
+        "oth": 12
+      },
+      "tpp2": {
+        "alp": 42.5
+      },
+      "alt": {},
+      "provenance": [
+        "newspoll",
+        "pollbludger"
+      ],
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/jess-wilson-opens-15point-newspoll-lead-as-victorian-labor-collapses/news-story/b8962613a919752e3d789fd8f1bec001",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/29512006/VictoriaNewspollMethodologyStatement26November2026byPyxis-OMSin1nZ6H_eB077oxzm2g.pdf"
     }
   ],
   "threeParty": [
@@ -4575,6 +4604,26 @@
       ]
     },
     {
+      "series": "preferredPremier",
+      "dateLabel": "19 Oct–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-10-19",
+      "firm": "newspoll",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1506,
+      "values": {
+        "carroll": 34,
+        "wilson": 51
+      },
+      "dk": 15,
+      "net": 17,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/jess-wilson-opens-15point-newspoll-lead-as-victorian-labor-collapses/news-story/b8962613a919752e3d789fd8f1bec001",
+      "provenance": [
+        "newspoll",
+        "pollbludger"
+      ]
+    },
+    {
       "series": "approval",
       "dateLabel": "21–25 Nov 2026",
       "date": "2026-11-25",
@@ -4623,6 +4672,44 @@
       "sourceUrl": "https://demosau.com/wp-content/uploads/DemosAU/vic-poll-end-nov-2026.html",
       "provenance": [
         "demosau"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19 Oct–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-10-19",
+      "firm": "newspoll",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1506,
+      "leader": "carroll",
+      "pos": 29,
+      "neg": 64,
+      "dk": 7,
+      "net": -35,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/jess-wilson-opens-15point-newspoll-lead-as-victorian-labor-collapses/news-story/b8962613a919752e3d789fd8f1bec001",
+      "provenance": [
+        "newspoll",
+        "pollbludger"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19 Oct–25 Nov 2026",
+      "date": "2026-11-25",
+      "fwStart": "2026-10-19",
+      "firm": "newspoll",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1506,
+      "leader": "wilson",
+      "pos": 49,
+      "neg": 43,
+      "dk": 8,
+      "net": 6,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/jess-wilson-opens-15point-newspoll-lead-as-victorian-labor-collapses/news-story/b8962613a919752e3d789fd8f1bec001",
+      "provenance": [
+        "newspoll",
+        "pollbludger"
       ]
     }
   ]
