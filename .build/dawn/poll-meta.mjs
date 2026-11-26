@@ -36,5 +36,8 @@ export function latestPollLine(D, nowMs = Date.now()) {
   const [n, unit] = age < 3600000 ? [Math.round(age / 60000), "minute"]
     : age < 86400000 ? [Math.round(age / 3600000), "hour"]
     : [Math.round(age / 86400000), "day"];
-  return `${s}, ${n} ${unit}${n === 1 ? "" : "s"} ago.`;
+  const phrase = n === 1
+    ? (unit === "day" ? "yesterday" : unit === "hour" ? "an hour" : "a minute")
+    : `${n < 10 ? ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][n] : n} ${unit}s`;
+  return `${s}, published ${phrase}${n === 1 && unit === "day" ? "." : " ago."}`;
 }

@@ -86,7 +86,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 @keyframes twin{to{transform:translateY(-8192px)}}
 @supports (animation-timeline:scroll()){.tsky{animation-name:twin;animation-duration:1ms;animation-duration:auto;animation-timing-function:linear;animation-fill-mode:both;animation-timeline:scroll(root block);animation-range:0px 8192px}}
 .grain{position:absolute;inset:0;z-index:1;pointer-events:none;background-repeat:repeat;background-size:128px 128px;opacity:.22}
-.now{position:absolute;z-index:2;left:var(--col);right:max(18px,env(safe-area-inset-right));top:calc(var(--navh) + env(safe-area-inset-top) + clamp(8px,2.4vh,40px));max-width:600px;color:#f6f4ff;cursor:auto;text-shadow:0 1px 12px rgb(4 10 40/.38)}
+.now{position:absolute;z-index:2;left:var(--col);right:max(18px,env(safe-area-inset-right));top:calc(var(--navh) + env(safe-area-inset-top) + clamp(8px,2.4vh,40px));max-width:none;color:#f6f4ff;cursor:auto;text-shadow:0 1px 12px rgb(4 10 40/.38)}
 .now h2{font:400 clamp(30px,min(8.8vw,5.2vh),52px)/1.04 var(--serif);letter-spacing:-.018em;margin:0}
 .now-d{margin:6px 0 0;font-size:14px;line-height:1.4;color:rgb(238 238 255/.82);max-width:44ch}
 .now{--fs:clamp(24px,min(7.6vw,4.2vh),40px)}
@@ -132,7 +132,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
 .sec{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));background:var(--bg);scroll-snap-align:start;scroll-snap-stop:always;display:flex;overflow:hidden;padding:calc(var(--navh) + env(safe-area-inset-top) + 4px) max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom) + var(--tbs) + var(--ext)) var(--g)}
 .wrap{width:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;min-height:0}
 h2{font:400 clamp(25px,min(7.3vw,4.6vh),46px)/1.06 var(--serif);letter-spacing:-.01em;margin:0;text-wrap:balance}
-.dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:60ch;text-wrap:pretty}
+.dek{margin:7px 0 0;font-size:clamp(14.5px,min(3.9vw,2.15vh),17px);line-height:1.42;color:var(--ink2);max-width:none;text-wrap:pretty}
 .ctl{margin-top:12px}
 .seg{display:inline-flex;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .seg button{font:500 13.5px/1 var(--sans);color:var(--ink2);background:none;border:0;border-radius:999px;padding:0 12px;height:32px;cursor:pointer;white-space:nowrap}
@@ -1196,8 +1196,28 @@ btnExt.addEventListener('click',()=>{CMP_EXT=!CMP_EXT;paintKeys();tpp.clear();tp
 
 /* ---------- the primary chart's options ---------- */
 /* who is counted: any Who-votes group, the groups themselves read the first time one is picked */
+function dawnSubgroups(tabs) {
+  const menu=[];
+  const add=(label,groups)=>{if(groups.length)menu.push({label,groups})};
+  for(const tab of tabs||[]){
+    const options=tab.groups;
+    if(tab.label==="Age"){
+      add("Age groups",options.filter(g=>/^\d/.test(g)));
+      add("Generation",options.filter(g=>!/^\d/.test(g)));
+    }else if(tab.label==="Place"){
+      const at=options.indexOf("Inner metro");
+      const split=at<0?options.length:at;
+      add("States and Territories",options.slice(0,split));
+      add("Seat type",options.slice(split));
+    }else if(tab.label==="Home"){
+      add("Home",options.filter(g=>g!=="English only"&&g!=="Other language"));
+      add("Language at home",options.filter(g=>g==="English only"||g==="Other language"));
+    }else menu.push(tab);
+  }
+  return menu;
+}
 const grpSel=$('#grp-sel'),pvBtn=$('#pv-btn'),pvPop=$('#pv-pop'),pvName=$('#pv-name');
-grpSel.innerHTML='<option value="">All voters</option>'+(DATA.groupMenu||[]).map(t=>`<optgroup label="${esc(t.label)}">${t.groups.map(gl=>`<option value="${esc(gl)}">${esc(gl)}</option>`).join('')}</optgroup>`).join('');
+grpSel.innerHTML='<option value="">All voters</option>'+dawnSubgroups(DATA.groupMenu).map(t=>`<optgroup label="${esc(t.label)}">${t.groups.map(gl=>`<option value="${esc(gl)}">${esc(gl)}</option>`).join('')}</optgroup>`).join('');
 if(!DATA.groupMenu)grpSel.closest('.pick').hidden=true;
 const indexGroups=()=>{GIDX={};if(GROUPS)GROUPS.tabs.forEach(t=>t.sets.forEach(st=>st.groups.forEach(g=>{GIDX[g.label]={...g,setId:st.id,tab:t.label}})))};
 function afterGrp(){pvBtn.disabled=!!GRP;if(GRP&&!inCur(WIN)&&!GHIST)loadGHist().then(()=>votes.draw());paintMeasured();votesSrc();votes.clear();votes.draw()}

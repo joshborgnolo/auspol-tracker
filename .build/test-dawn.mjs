@@ -38,17 +38,38 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   eq(at, Date.parse("2026-11-24T14:00:00Z"), "the publication stamp is Sydney wall time, in daylight saving");
   eq(pollPublishedMs("2026-07-25T01:00"), Date.parse("2026-07-24T15:00:00Z"), "and outside daylight saving");
   eq(pollPublishedMs("2026-11-25T01:00:00+11:00"), at, "an explicit zone reads the same instant");
-  eq(age(29000), "Latest poll is Essential’s, 0 minutes ago.");
-  eq(age(31000), "Latest poll is Essential’s, 1 minute ago.");
-  eq(age(59 * 60000 + 29000), "Latest poll is Essential’s, 59 minutes ago.");
-  eq(age(59 * 60000 + 31000), "Latest poll is Essential’s, 60 minutes ago.");
-  eq(age(3600000), "Latest poll is Essential’s, 1 hour ago.");
-  eq(age(3 * 3600000 + 31 * 60000), "Latest poll is Essential’s, 4 hours ago.");
-  eq(age(23 * 3600000 + 31 * 60000), "Latest poll is Essential’s, 24 hours ago.");
-  eq(age(86400000), "Latest poll is Essential’s, 1 day ago.");
-  eq(age(36 * 3600000), "Latest poll is Essential’s, 2 days ago.");
+  eq(age(29000), "Latest poll is Essential’s, published zero minutes ago.");
+  eq(age(31000), "Latest poll is Essential’s, published a minute ago.");
+  eq(age(59 * 60000 + 29000), "Latest poll is Essential’s, published 59 minutes ago.");
+  eq(age(59 * 60000 + 31000), "Latest poll is Essential’s, published 60 minutes ago.");
+  eq(age(3600000), "Latest poll is Essential’s, published an hour ago.");
+  eq(age(3 * 3600000 + 31 * 60000), "Latest poll is Essential’s, published four hours ago.");
+  eq(age(23 * 3600000 + 31 * 60000), "Latest poll is Essential’s, published 24 hours ago.");
+  eq(age(86400000), "Latest poll is Essential’s, published yesterday.");
+  eq(age(36 * 3600000), "Latest poll is Essential’s, published two days ago.");
+  eq(age(9 * 86400000), "Latest poll is Essential’s, published nine days ago.");
+  eq(age(10 * 86400000), "Latest poll is Essential’s, published 10 days ago.");
   for (const pub of [undefined, null, "", "2026-11-25"]) eq(latestPollLine({ latestPoll: { h: "Essential", pub } }, at), "Latest poll is Essential’s.", "no age when the clock time is unknown");
   eq(latestPollLine({}, at), "", "no latest-poll clause when no poll is on record");
+}
+
+/* subgroup categories are presentation-only; option values are untouched */
+{
+  const src = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "dawn/template.html"), "utf8");
+  const split = vm.runInNewContext(src.slice(src.indexOf("function dawnSubgroups("), src.indexOf("const grpSel=")) + ";dawnSubgroups", {})([
+    { label: "Age", groups: ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers"] },
+    { label: "Place", groups: ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural"] },
+    { label: "Home", groups: ["Own outright", "Mortgage", "Renting", "English only", "Other language", "Full time", "Part time", "Retired"] },
+  ]);
+  const options = label => split.find(t => t.label === label)?.groups || [];
+  eq(split.map(t => t.label).join("|"), "Age groups|Generation|States and Territories|Seat type|Home|Language at home", "separate menu headings");
+  eq(options("Age groups").join("|"), "18–34|35–54|55+", "age bands stay out of Generations");
+  eq(options("Generation").join("|"), "Gen Z|Millennials|Gen X|Boomers", "named generations stay together");
+  eq(options("States and Territories").join("|"), "NSW|Vic|Qld|SA|WA|ACT/NT/Tas|Non-NSW/Vic/Qld", "states and the combined remainder stay geographic");
+  eq(options("Seat type").join("|"), "Inner metro|Outer metro|Provincial|Rural", "seat types have their own group");
+  eq(options("Language at home").join("|"), "English only|Other language", "languages get their own category");
+  eq(options("Home").includes("English only"), false, "English only does not stay in Home");
+  eq(options("Home").includes("Other language"), false, "Other language does not stay in Home");
 }
 
 /* which gaps are real: Dawn's ternary calculation against the ledger's own */
