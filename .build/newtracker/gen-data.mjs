@@ -13014,6 +13014,8 @@ if (!JUR && LDM && PRIMM && TPM) {
       if (c.current) { net[at.length - 1] = leaderNow.alb_net.v; if (LDM.pnow.taylor) ppmm[at.length - 1] = r1(2 * LDM.pnow.taylor.share.v - 100); }
       const t = { year: c.year, gov: c.gov, opp: c.opp, ...(c.current ? { current: 1 } : {}), eDate: c.eDate,
         pm: holderAt(LDM.PM_ST, c, c.pm), govLead: partyLeader(LDM.PM_ST, c, c.gov, c.pm), oppParty: partyLeader(LDM.OPP_ST, c, c.opp, c.oppLead),
+        /* the two primary votes at the opening election, so a change can be read as a share of them */
+        base: { primary: base.primary == null ? null : r2(base.primary), oppr: base.oppr == null ? null : r2(base.oppr) },
         tpp: vote("tpp"), primary: vote("primary"), oppr: vote("oppr"), net: round(net), ppmm: round(ppmm),
         brk: { net: netBy.breaks(c.year), ppmm: ppmBy.breaks(c.year) } };
       /* this term's last vote figures are the printed ones, to the tenth */

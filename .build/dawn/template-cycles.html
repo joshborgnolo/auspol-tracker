@@ -78,7 +78,7 @@
   <div class="now" id="now">
     <h1 class="sr">auspol tracker: this term against past terms</h1>
     <h2>Past cycles</h2>
-    <p class="now-d">This term set against earlier ones, each read the same number of days after its election, at {{asOf}} for this one. “Worst” means the biggest fall or the lowest figure.</p>
+    <p class="now-d">This term set against earlier ones, each read the same number of days after its election, at {{asOf}} for this one. “Worst” means the biggest fall or the lowest figure. A party’s primary vote is ranked by the share of its own starting vote it has lost.</p>
     <p class="cy-chapeau">{{chapeau}}</p>
     <ul class="cy-stats">{{cyStats}}</ul>
   </div>
@@ -91,6 +91,7 @@
       <h2 id="primary-h">{{primaryHead}}</h2>
       <p class="dek">{{primaryDek}}</p>
     </header>
+    <div class="ctl"><div class="seg cy-mode" role="radiogroup" aria-label="Read the change as"><button type="button" role="radio" data-m="share" aria-checked="true">Share of starting vote</button><button type="button" role="radio" data-m="points" aria-checked="false" tabindex="-1">Points</button></div></div>
     <div class="fig" id="primary-fig"><div class="tip" aria-live="polite"></div><svg id="primary-svg" tabindex="0" aria-label="Line chart of the government’s change in primary vote, one line a term, by months since its election. Up and down arrows move between terms; Enter brings a term out."></svg></div>
     <div class="cy-keys"></div>
     <p class="src"></p>
@@ -133,6 +134,7 @@
       <h2 id="oppr-h">{{opprHead}}</h2>
       <p class="dek">{{opprDek}}</p>
     </header>
+    <div class="ctl"><div class="seg cy-mode" role="radiogroup" aria-label="Read the change as"><button type="button" role="radio" data-m="share" aria-checked="true">Share of starting vote</button><button type="button" role="radio" data-m="points" aria-checked="false" tabindex="-1">Points</button></div></div>
     <div class="fig" id="oppr-fig"><div class="tip" aria-live="polite"></div><svg id="oppr-svg" tabindex="0" aria-label="Line chart of the opposition’s change in primary vote, one line a term, by months since its election. Up and down arrows move between terms; Enter brings a term out."></svg></div>
     <div class="cy-keys"></div>
     <p class="src"></p>
@@ -163,12 +165,14 @@ const BY=Object.fromEntries(TERMS.map(t=>[t.year,t]));
 const COLOURS=8;
 const whoOf=(t,key)=>key==='oppr'?t.oppParty:key==='primary'?t.govLead:t.pm;
 const label=(t,key)=>t.year+' '+(whoOf(t,key)||'');
+/* the two primary charts read a change as a share of the starting vote, or in points: one choice for both */
+const VIEWS=DATA.views,modeCharts=[];
 const signed=v=>v==null?'–':sgn(v);
 const weeksAt=i=>Math.floor(DAYS[i]/7),monthsAt=i=>Math.floor(DAYS[i]/MONTH+.05);
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
 const whenAt=i=>i===0?'election day':'week '+weeksAt(i)+(monthsAt(i)?' ('+plural(monthsAt(i),'month')+' in)':'');
 /* a term's figure and the month it was last read, up to month M */
-const lastRead=(t,key)=>{for(let m=M;m>=0;m--)if(t[key][m]!=null)return {m,v:t[key][m]};return null};
+const lastRead=line=>{for(let m=M;m>=0;m--)if(line[m]!=null)return {m,v:line[m]};return null};
 const NOTES={
   primary:'Each line is one term’s estimate week by week from the primary vote model, less the government’s vote at the election that opened the term; past terms are moved part of the way toward the result that closed them.',
   oppr:'Each line is one term’s estimate week by week from the primary vote model, less the opposition’s vote at the election that opened the term; past terms are moved part of the way toward the result that closed them.',
@@ -178,26 +182,40 @@ const NOTES={
 
 function cycleChart(section){
   const key=section.dataset.key,fig=$('.fig',section),svg=$('svg',fig),tip=$('.tip',fig),keys=$('.cy-keys',section);
+  const views=VIEWS[key]||null;
+  let mode=views?'share':'points',own=false;
+  const isShare=()=>mode==='share';
+  /* a term's line in the reading chosen */
+  const memo=new Map(),ser=t=>{if(!isShare())return t[key];let a=memo.get(t.year);if(!a)memo.set(t.year,a=t[key].map(v=>v==null||!t.base[key]?null:100*v/t.base[key]));return a};
+  const fig1=v=>v==null?'–':signed(v)+(isShare()?'%':'');
+  /* the points behind a share, and the vote it is a share of */
+  const behind=(t,m)=>isShare()&&m?' ('+signed(t[key][m])+' points from '+t.base[key].toFixed(1)+'%)':'';
   const has=TERMS.filter(t=>t[key].some((v,m)=>m>0&&v!=null));
   /* the terms brought out, each with a colour of its own it keeps: this term's is always the first */
   const lit=new Map();
   const free=()=>{for(let i=1;i<COLOURS;i++)if(![...lit.values()].includes(i))return i;return COLOURS-1};
-  for(const y of DATA.lit[key])if(has.some(t=>t.year===y))lit.set(y,y===CUR.year?0:free());
+  const bring=list=>{lit.clear();for(const y of list)if(has.some(t=>t.year===y))lit.set(y,y===CUR.year?0:free())};
+  bring(DATA.lit[key]);
   let L=null,hover=null,hm=null,timer=0;
   const col=y=>`var(--cy${lit.get(y)})`;
-  const ys=has.flatMap(t=>t[key].filter(v=>v!=null));
-  const spread=Math.max(...ys,0)-Math.min(...ys,0),step=spread>60?20:spread>25?10:spread>12?5:2;
-  const Y0=Math.floor(Math.min(...ys,0)/step)*step,Y1=Math.ceil(Math.max(...ys,0)/step)*step;
+  let Y0,Y1,step;
+  function scale(){
+    const ys=has.flatMap(t=>ser(t).filter(v=>v!=null));
+    const spread=Math.max(...ys,0)-Math.min(...ys,0);
+    step=spread>120?40:spread>60?20:spread>25?10:spread>12?5:2;
+    Y0=Math.floor(Math.min(...ys,0)/step)*step;Y1=Math.ceil(Math.max(...ys,0)/step)*step;
+  }
+  scale();
   function draw(){
     const W=fig.clientWidth,H=fig.clientHeight;if(!W||!H)return;
     const narrow=W<560,ticks=[];for(let v=Y0;v<=Y1+1e-9;v+=step)ticks.push(v);
-    const tl=ticks.map(v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0');
+    const tl=ticks.map(v=>(v>0?'+'+v:v<0?'−'+Math.abs(v):'0')+(isShare()&&v?'%':''));
     const shown=has.filter(t=>lit.has(t.year));
     const ML=Math.ceil(Math.max(...tl.map(s=>tw(s,'13px'))))+8;
     const MR=Math.ceil(Math.max(0,...shown.map(t=>tw(narrow?String(t.year):label(t,key),'600 12px'))))+16;
     const MT=40,MB=24,PW=W-ML-MR,PH=H-MT-MB,x=m=>ML+PW*DAYS[m]/SPAN,y=v=>MT+PH*(Y1-v)/(Y1-Y0);
     const cut=t=>new Set((t.brk&&t.brk[key])||[]);
-    const path=t=>{let d='',pen=false;const b=cut(t);t[key].forEach((v,m)=>{if(v==null){pen=false;return}if(b.has(m))pen=false;d+=(pen?'L':'M')+P1(x(m))+' '+P1(y(v));pen=true});return d};
+    const path=t=>{let d='',pen=false;const b=cut(t);ser(t).forEach((v,m)=>{if(v==null){pen=false;return}if(b.has(m))pen=false;d+=(pen?'L':'M')+P1(x(m))+' '+P1(y(v));pen=true});return d};
     let s='';
     ticks.forEach((v,i)=>{const yy=Math.round(y(v))+.5;s+=`<line x1="${ML}" x2="${ML+PW}" y1="${yy}" y2="${yy}" stroke="${v===0?'var(--rule2)':'var(--rule)'}"${v===0?' stroke-dasharray="3 3"':''}/><text x="${ML-8}" y="${yy}" dy=".35em" text-anchor="end">${tl[i]}</text>`});
     /* months along the foot, and the end named to the week */
@@ -209,13 +227,13 @@ function cycleChart(section){
     for(const t of has)if(!lit.has(t.year))s+=`<path d="${path(t)}" fill="none" stroke="var(--mute)" stroke-opacity=".28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" data-y="${t.year}" class="cy-line"/>`;
     for(const t of [...shown].sort((a,b)=>(a.current?1:0)-(b.current?1:0)))s+=`<path d="${path(t)}" fill="none" style="stroke:${col(t.year)}" stroke-width="${t.current?3.4:2}" stroke-linejoin="round" stroke-linecap="round" data-y="${t.year}" class="cy-line lit"/>`;
     /* names at the lines' ends, spread so none cover another */
-    const ends=shown.map(t=>{const e=lastRead(t,key);return {t,e,y0:y(e.v)}});
+    const ends=shown.map(t=>{const e=lastRead(ser(t));return {t,e,y0:y(e.v)}});
     relax(ends,narrow?15:30,MT+6,MT+PH-8);
     for(const q of ends){const ex=x(q.e.m),lx=ML+PW+9;
       s+=`<circle cx="${P1(ex)}" cy="${P1(y(q.e.v))}" r="${q.t.current?4.5:3}" style="fill:${col(q.t.year)}" stroke="var(--bg)" stroke-width="1.5"/>`;
       if(Math.abs(q.y-q.y0)>3||q.e.m<M)s+=`<path d="M${P1(ex+4)} ${P1(q.y0)}L${P1(lx-3)} ${P1(q.y)}" fill="none" style="stroke:${col(q.t.year)}" stroke-opacity=".55"/>`;
       s+=narrow?`<text x="${P1(lx)}" y="${P1(q.y)}" dy=".35em" class="ab" style="fill:${col(q.t.year)}">${q.t.year}</text>`
-        :`<text x="${P1(lx)}" y="${P1(q.y-2)}" class="ab" style="fill:${col(q.t.year)}">${esc(label(q.t,key))}</text><text x="${P1(lx)}" y="${P1(q.y+12)}" style="fill:${col(q.t.year)};font-size:12px">${signed(q.e.v)}${q.e.m<M?', ended week '+weeksAt(q.e.m):''}</text>`}
+        :`<text x="${P1(lx)}" y="${P1(q.y-2)}" class="ab" style="fill:${col(q.t.year)}">${esc(label(q.t,key))}</text><text x="${P1(lx)}" y="${P1(q.y+12)}" style="fill:${col(q.t.year)};font-size:12px">${fig1(q.e.v)}${q.e.m<M?', ended week '+weeksAt(q.e.m):''}</text>`}
     s+='<g class="scrub"></g>';
     svg.innerHTML=s;
     L={W,H,ML,PW,MT,PH,x,y,narrow,sg:$('.scrub',svg),path};
@@ -225,10 +243,10 @@ function cycleChart(section){
   function idle(){if(!L)return;L.sg.innerHTML='';setTip(`${has.length} terms · ${matchMedia('(pointer:coarse)').matches?'Tap':'Point at'} a line to read it${L.narrow?'':', click it to bring it out or send it back'}`,'idle')}
   function show(year,m){
     const t=BY[year];if(!t||!L)return;hover=year;hm=m;
-    const at=m!=null&&t[key][m]!=null?m:lastRead(t,key).m,v=t[key][at],c=lit.has(year)?col(year):'var(--ink)';
+    const at=m!=null&&t[key][m]!=null?m:lastRead(ser(t)).m,v=ser(t)[at],c=lit.has(year)?col(year):'var(--ink)';
     L.sg.innerHTML=`<path d="${L.path(t)}" fill="none" style="stroke:${c}" stroke-width="${lit.has(year)?4:2.4}" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${P1(L.x(at))}" cy="${P1(L.y(v))}" r="4.5" fill="var(--bg)" style="stroke:${c}" stroke-width="2"/>`;
-    const end=t[key][M];
-    setTip(`<b>${esc(label(t,key))}</b>${t.current?' · this term':''} · ${whenAt(at)}: <b>${signed(v)}</b>${at!==M?(end!=null?` · at week ${weeksAt(M)}: ${signed(end)}`:' · the term ended or went unread before week '+weeksAt(M)):''}`);
+    const end=ser(t)[M];
+    setTip(`<b>${esc(label(t,key))}</b>${t.current?' · this term':''} · ${whenAt(at)}: <b>${fig1(v)}</b>${behind(t,at)}${at!==M?(end!=null?` · at week ${weeksAt(M)}: ${fig1(end)}`:' · the term ended or went unread before week '+weeksAt(M)):''}`);
   }
   const clear=()=>{hover=null;hm=null;idle()};
   /* the line nearest the pointer at that month, a brought-out one winning a near tie */
@@ -236,10 +254,10 @@ function cycleChart(section){
     const b=svg.getBoundingClientRect(),px=cx-b.left,py=cy-b.top,day=Math.max(0,Math.min(SPAN,(px-L.ML)/L.PW*SPAN));
     let m0=Math.min(M-1,Math.floor(day/7));const m1=m0+1,u=Math.max(0,Math.min(1,(day-DAYS[m0])/(DAYS[m1]-DAYS[m0]))),mf=m0+u;
     let best=null,bd=reach;
-    for(const t of has){const a=t[key][m0],z=t[key][m1];if(a==null&&z==null)continue;const v=a==null?z:z==null?a:a+(z-a)*u;const d=Math.abs(L.y(v)-py)-(lit.has(t.year)?3:0);if(d<bd){bd=d;best=t.year}}
+    for(const t of has){const a=ser(t)[m0],z=ser(t)[m1];if(a==null&&z==null)continue;const v=a==null?z:z==null?a:a+(z-a)*u;const d=Math.abs(L.y(v)-py)-(lit.has(t.year)?3:0);if(d<bd){bd=d;best=t.year}}
     return best==null?null:[best,Math.round(mf)];
   }
-  function toggle(year){if(year===CUR.year)return;if(lit.has(year))lit.delete(year);else{if(lit.size>=COLOURS)return;lit.set(year,free())}paintKeys();draw()}
+  function toggle(year){if(year===CUR.year)return;own=true;if(lit.has(year))lit.delete(year);else{if(lit.size>=COLOURS)return;lit.set(year,free())}paintKeys();draw()}
   svg.addEventListener('pointermove',e=>{if(!L||e.pointerType!=='mouse')return;const h=hit(e.clientX,e.clientY,16);svg.style.cursor=h&&h[0]!==CUR.year?'pointer':'';if(h)show(h[0],h[1]);else clear()});
   svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')clear()});
   svg.addEventListener('click',e=>{if(!L)return;const touch=e.pointerType&&e.pointerType!=='mouse',h=hit(e.clientX,e.clientY,touch?22:12);clearTimeout(timer);
@@ -249,7 +267,7 @@ function cycleChart(section){
     if(hover===h[0])toggle(h[0]);show(h[0],h[1]);timer=setTimeout(clear,6000)});
   svg.addEventListener('keydown',e=>{
     const k=e.key;if(!L)return;
-    if(k==='ArrowUp'||k==='ArrowDown'){e.preventDefault();const order=[...has].sort((a,b)=>lastRead(b,key).v-lastRead(a,key).v),i=order.findIndex(t=>t.year===(hover??CUR.year));show(order[Math.max(0,Math.min(order.length-1,i+(k==='ArrowUp'?-1:1)))].year,hm)}
+    if(k==='ArrowUp'||k==='ArrowDown'){e.preventDefault();const order=[...has].sort((a,b)=>lastRead(ser(b)).v-lastRead(ser(a)).v),i=order.findIndex(t=>t.year===(hover??CUR.year));show(order[Math.max(0,Math.min(order.length-1,i+(k==='ArrowUp'?-1:1)))].year,hm)}
     else if(k==='ArrowLeft'||k==='ArrowRight'){e.preventDefault();const y=hover??CUR.year;show(y,Math.max(0,Math.min(M,(hm??M)+(k==='ArrowLeft'?-1:1))))}
     else if(k==='Enter'||k===' '){e.preventDefault();if(hover!=null){toggle(hover);show(hover,hm)}}
     else if(k==='Escape')clear();
@@ -263,9 +281,25 @@ function cycleChart(section){
   }
   keys.addEventListener('click',e=>{const b=e.target.closest('.cy-chip');if(b&&!b.disabled){clear();toggle(+b.dataset.y)}});
   keys.addEventListener('change',e=>{if(e.target.value){clear();toggle(+e.target.value)}});
-  $('.src',section).textContent=NOTES[key]+' Terms are compared at the same number of days after their elections ('+SPAN+', '+plural(weeksAt(M),'week')+' and '+plural(SPAN%7,'day')+'). Ranks compare these estimates as they stand: terms a point or so apart are effectively level.';
-  $('table',section).innerHTML=`<caption>At ${weeksAt(M)} weeks, points</caption><tr><th>Term</th><th>Figure</th></tr>`+has.filter(t=>t[key][M]!=null).sort((a,b)=>a[key][M]-b[key][M]).map(t=>`<tr><td>${esc(label(t,key))}</td><td>${signed(t[key][M])}</td></tr>`).join('');
-  paintKeys();
+  function paintNotes(){
+    $('.src',section).textContent=NOTES[key]+(isShare()?' Each change is then divided by that party’s vote at the same election.':'')+' Terms are compared at the same number of days after their elections ('+SPAN+', '+plural(weeksAt(M),'week')+' and '+plural(SPAN%7,'day')+'). Ranks compare these estimates as they stand: terms '+(isShare()?'a few per cent of their starting votes apart':'a point or so apart')+' are effectively level.';
+    $('table',section).innerHTML=`<caption>At ${weeksAt(M)} weeks, ${isShare()?'% of the starting vote':'points'}</caption><tr><th>Term</th><th>Figure</th></tr>`+has.filter(t=>ser(t)[M]!=null).sort((a,b)=>ser(a)[M]-ser(b)[M]).map(t=>`<tr><td>${esc(label(t,key))}</td><td>${fig1(ser(t)[M])}${behind(t,M)}</td></tr>`).join('');
+  }
+  paintNotes();paintKeys();
+  /* the switch: the head, dek, scale, lines and terms brought out all change with it; once the reader has chosen terms, those stay */
+  if(views){
+    const seg=$('.cy-mode',section);
+    modeCharts.push(next=>{
+      if(next===mode)return;mode=next;hover=null;hm=null;clearTimeout(timer);
+      $('h2',section).textContent=views[mode].head;$('.dek',section).textContent=views[mode].dek;
+      if(!own)bring(views[mode].lit);
+      $$('button',seg).forEach(b=>{const on=b.dataset.m===mode;b.setAttribute('aria-checked',String(on));b.tabIndex=on?0:-1});
+      scale();paintNotes();paintKeys();draw();
+    });
+    const all=m=>modeCharts.forEach(f=>f(m));
+    seg.addEventListener('click',e=>{const b=e.target.closest('button');if(b)all(b.dataset.m)});
+    seg.addEventListener('keydown',e=>{if(!/^Arrow/.test(e.key))return;e.preventDefault();all(mode==='share'?'points':'share');$(`[data-m="${mode}"]`,seg).focus()});
+  }
   new ResizeObserver(draw).observe(fig);
   return {draw};
 }

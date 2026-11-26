@@ -239,7 +239,11 @@ export const ppmDek = (L) => "% preferring each as prime minister, of those who 
 /* ---------- past cycles (assets/dawn-cycles.json) ----------
    Every term at the month this one has reached. "Worst" is lowest: the
    biggest fall in a vote since the term's election, or the lowest leader
-   figure. A term as low or lower counts against this one. The rules:
+   figure. A party's primary vote is ranked by the share of its own starting
+   vote it has lost (terms have opened anywhere from the low 30s to above
+   50), with the ranks in points behind the charts' switch; the two-party
+   vote and the leader figures are ranked in points. A term as low or lower
+   counts against this one. The rules:
    - a vote that has not fallen: "No decline", unranked;
    - none as low: "worst on record", back to the first term with a figure;
    - half or more of past terms as low: its place, "9th worst of 30";
@@ -256,13 +260,21 @@ export const CYCLE_STATS = [
 ];
 /* the point every term is compared at: the last of the weekly grid, the days this term has run */
 export const cycleNow = (C) => C.days.length - 1;
-export function cycleRank(C, key) {
+/* the primary votes can be read in points or as a share of the starting vote */
+export const SHARE_KEYS = ["primary", "oppr"];
+export const cycleMode = (key) => (SHARE_KEYS.includes(key) ? "share" : "points");
+/* a term's figure at point m, in either reading */
+export const cycleValue = (t, key, m, mode = cycleMode(key)) => {
+  const v = t[key][m];
+  return v == null || mode !== "share" ? v : t.base && t.base[key] ? (100 * v) / t.base[key] : null;
+};
+export function cycleRank(C, key, mode = cycleMode(key)) {
   const st = CYCLE_STATS.find((s) => s.key === key), M = cycleNow(C);
-  const at = (t) => ({ year: t.year, who: t[st.who], v: t[key][M] });
+  const at = (t) => ({ year: t.year, who: t[st.who], v: cycleValue(t, key, M, mode), points: t[key][M] });
   const cur = at(C.terms.find((t) => t.current));
-  const past = C.terms.filter((t) => !t.current && t[key][M] != null).map(at);
+  const past = C.terms.filter((t) => !t.current).map(at).filter((p) => p.v != null);
   const worse = cur.v == null ? [] : past.filter((p) => p.v <= cur.v);
-  const out = { key, cur, past: past.length, first: past.length ? past[0].year : null, worse };
+  const out = { key, mode, cur, past: past.length, first: past.length ? past[0].year : null, worse };
   if (cur.v == null || !past.length) return { ...out, kind: "unread" };
   if (st.change && cur.v >= 0) return { ...out, kind: "gain" };
   if (!worse.length) return { ...out, kind: "record" };
@@ -290,9 +302,16 @@ const HEADS = {
   net: { who: "prime minister", did: "been rated this low", more: "been rated lower", thing: "The prime minister’s net approval" },
   ppmm: { who: "prime minister", did: "done this badly as preferred PM", more: "done worse as preferred PM", thing: "The prime minister’s preferred-PM lead" },
 };
-export function cycleHead(C, key) {
-  const r = cycleRank(C, key), H = HEADS[key], when = " " + C.months + " months in";
+export function cycleHead(C, key, mode = cycleMode(key)) {
+  const r = cycleRank(C, key, mode), H = HEADS[key], when = " " + C.months + " months in";
   const termOf = (w) => w.who + "’s " + w.year + " term";
+  if (mode === "share" && r.kind !== "gain" && r.kind !== "unread") {
+    const own = " share of its primary vote";
+    if (r.kind === "record") return "No " + H.who + " on record has lost a bigger" + own + when;
+    if (r.kind === "since") return "Not since " + termOf(r.W) + " has " + (H.who === "opposition" ? "an " : "a ") + H.who + " lost this big a" + own + when;
+    if (r.kind === "second") return "Only one " + H.who + (r.W ? " since " + termOf(r.W) : " on record") + " has lost a bigger" + own + when;
+    return "The share of its primary vote the " + H.who + " has lost is the " + ordinal(r.place) + " biggest of " + r.of + " terms" + when;
+  }
   if (r.kind === "record") return "No " + H.who + " on record has " + H.did + when;
   if (r.kind === "since") return "Not since " + termOf(r.W) + " has a " + H.who + " " + H.did + when;
   if (r.kind === "second") return "Only one " + H.who + (r.W ? " since " + termOf(r.W) : " on record") + " has " + H.more + when;
@@ -306,21 +325,46 @@ const CYCLE_DEKS = {
   ppmm: "The prime minister’s lead as preferred PM, points, among those who chose one of the two",
   oppr: "Change in the opposition’s primary vote since each election, points",
 };
-export function cycleDek(C, key) {
+const SHARE_DEKS = {
+  primary: "Change in the government’s primary vote since each election, as a % of the vote it won there",
+  oppr: "Change in the opposition’s primary vote since each election, as a % of the vote it won there",
+};
+/* past terms that have lost more points than this one but a smaller share, which
+   only a bigger starting vote can do: the share reading names them, so the
+   points they lost are never out of sight. Up to three by name, then a count. */
+export function morePoints(C, key) {
+  const r = cycleRank(C, key, "share"), M = cycleNow(C);
+  if (r.cur.v == null || r.cur.v >= 0) return [];
+  const who = CYCLE_STATS.find((s) => s.key === key).who;
+  return C.terms.filter((t) => !t.current && cycleValue(t, key, M, "share") != null && t[key][M] < r.cur.points && cycleValue(t, key, M, "share") > r.cur.v)
+    .map((t) => ({ year: t.year, who: t[who] }));
+}
+export function morePointsLine(C, key) {
+  const m = morePoints(C, key), side = key === "primary" ? "government" : "opposition";
+  if (!m.length) return "";
+  if (m.length > 3) return m.length + " past " + side + "s lost more points by this stage, but from bigger starting votes.";
+  const names = m.map((w) => w.who + "’s " + w.year + " term");
+  const list = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0];
+  return list + " lost more points by this stage, but from " + (m.length > 1 ? "bigger starting votes." : "a bigger starting vote.");
+}
+export function cycleDek(C, key, mode = cycleMode(key)) {
   const first = C.terms.find((t) => t[key].some((v, m) => m > 0 && v != null));
-  return CYCLE_DEKS[key] + ": the first " + C.months + " months of every term since " + (first ? first.year : "the record began");
+  const share = mode === "share" && SHARE_DEKS[key];
+  const lead = (share || CYCLE_DEKS[key]) + ": the first " + C.months + " months of every term since " + (first ? first.year : "the record began");
+  const more = share ? morePointsLine(C, key) : "";
+  return more ? lead + ". " + more : lead;
 }
 /* the terms a chart brings out: this one, the last, the one its rank names,
    then the worst at this month until there are five */
-export function cycleLit(C, key) {
-  const M = cycleNow(C), r = cycleRank(C, key);
-  const have = C.terms.filter((t) => !t.current && t[key][M] != null);
+export function cycleLit(C, key, mode = cycleMode(key)) {
+  const M = cycleNow(C), r = cycleRank(C, key, mode), val = (t) => cycleValue(t, key, M, mode);
+  const have = C.terms.filter((t) => !t.current && val(t) != null);
   const lit = [C.terms.find((t) => t.current).year];
   const add = (y) => { if (y != null && lit.length < 5 && !lit.includes(y)) lit.push(y); };
   const before = C.terms.filter((t) => !t.current);
   add(before.length ? before[before.length - 1].year : null);
   if (r.W) add(r.W.year);
-  for (const t of [...have].sort((a, b) => a[key][M] - b[key][M])) add(t.year);
+  for (const t of [...have].sort((a, b) => val(a) - val(b))) add(t.year);
   return lit;
 }
 export function cycleStatsHtml(C) {
@@ -329,7 +373,10 @@ export function cycleStatsHtml(C) {
   return CYCLE_STATS.map((s) => {
     const r = cycleRank(C, s.key);
     const unit = s.key === "tpp" && C.tppRival === "onp" ? "points, now against One Nation" : s.unit;
-    return `<li data-k="${s.key}"><span class="cy-k">${h(s.name)}<b>${h(cycleRankLine(r))}</b></span><span class="cy-v"><b>${signed(r.cur.v)}</b><small>${h(unit)}</small></span></li>`;
+    /* a primary vote shows its points, then the share its rank is read on */
+    const share = r.mode === "share" && r.cur.v != null;
+    const small = share ? "points, " + (r.cur.v > 0 ? "a gain of " : "") + Math.round(Math.abs(r.cur.v)) + "% of its " + C.election.date.slice(0, 4) + " vote" : unit;
+    return `<li data-k="${s.key}"><span class="cy-k">${h(s.name)}<b>${h(cycleRankLine(r))}</b></span><span class="cy-v"><b>${signed(share ? r.cur.points : r.cur.v)}</b><small>${h(small)}</small></span></li>`;
   }).join("");
 }
 

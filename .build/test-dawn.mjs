@@ -22,7 +22,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek, cycleRank, cycleRankLine, cycleHead, cycleDek, cycleLit, cycleChapeau, cycleStatsHtml, cycleNow, CYCLE_STATS, splitChapeau, splitHead, splitDek, splitMonths, spreadHead, spreadDek, spreadNow } from "./dawn/copy.mjs";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek, cycleRank, cycleRankLine, cycleHead, cycleDek, cycleLit, cycleMode, cycleChapeau, cycleStatsHtml, cycleNow, CYCLE_STATS, splitChapeau, splitHead, splitDek, splitMonths, spreadHead, spreadDek, spreadNow } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
@@ -593,7 +593,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(t74.brk.net.length >= 1, "a line breaks where the leader changes");
   eq(cycleChapeau(C0), C0.months + " months in:", "said in whole months");
   /* every branch of the rank */
-  const mk = (vals, now, key = "primary") => ({ months: 18, days: [0, 7], terms: [...vals.map((v, i) => ({ year: 1990 + 3 * i, govLead: "L" + i, pm: "L" + i, oppParty: "O" + i, [key]: [0, v] })), { year: 2025, current: 1, govLead: "Now", pm: "Now", oppParty: "Opp", [key]: [0, now] }] });
+  const mk = (vals, now, key = "primary") => ({ months: 18, days: [0, 7], terms: [...vals.map((v, i) => ({ base: { primary: 100, oppr: 100 }, year: 1990 + 3 * i, govLead: "L" + i, pm: "L" + i, oppParty: "O" + i, [key]: [0, v] })), { base: { primary: 100, oppr: 100 }, year: 2025, current: 1, govLead: "Now", pm: "Now", oppParty: "Opp", [key]: [0, now] }] });
   const line = (vals, now, key) => cycleRankLine(cycleRank(mk(vals, now, key), key || "primary"));
   eq(line([1, -2, 3, 0], -5), "Worst on record, back to 1990");
   eq(line([-9, 2, 1, 0], -5), "Worst since 1990 (L0)");
@@ -603,10 +603,24 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   eq(line([-9, 2], 1.5), "No decline", "a vote that rose is unranked");
   eq(line([-9, 20, 30, 10], 4, "net"), "Worst since 1990 (L0)", "a leader figure ranks whatever its sign");
   eq(line([-5, 2, 3, 4], -5), "Worst since 1990 (L0)", "a tie counts against this term");
-  eq(cycleHead(mk([1, 2, 3], -5), "primary"), "No government on record has lost this much primary vote 18 months in", "the record head");
-  eq(cycleHead(mk([-9, 2, 1, 0], -5), "primary"), "Not since L0’s 1990 term has a government lost this much primary vote 18 months in");
+  eq(cycleHead(mk([1, 2, 3], -5), "primary", "points"), "No government on record has lost this much primary vote 18 months in", "the record head");
+  eq(cycleHead(mk([1, 2, 3], -5), "primary"), "No government on record has lost a bigger share of its primary vote 18 months in", "the primary charts open on the share");
+  eq(cycleHead(mk([-9, 2, 1, 0], -5), "primary", "points"), "Not since L0’s 1990 term has a government lost this much primary vote 18 months in");
+  eq(cycleHead(mk([-9, 2, 1, 0], -5), "primary"), "Not since L0’s 1990 term has a government lost this big a share of its primary vote 18 months in");
   eq(cycleHead(mk([-9, 2, 1, 0, -6], -5, "net"), "net"), "Only one prime minister since L0’s 1990 term has been rated lower 18 months in");
   eq(cycleHead(mk([-9, 2, 1, 0], 2), "primary"), "The government’s primary vote has not fallen since the election, 18 months in");
+  /* 10 points from 50 is a smaller share than 8 from 32 */
+  const two = mk([-10, 2, 1], -8);
+  two.terms[0].base = { primary: 50 }; two.terms[3].base = { primary: 32 };
+  eq(cycleRankLine(cycleRank(two, "primary", "points")), "Worst since 1990 (L0)", "in points the bigger fall is worse");
+  eq(cycleRankLine(cycleRank(two, "primary")), "Worst on record, back to 1990", "as a share the smaller start loses more");
+  ok(cycleDek(two, "primary").endsWith(". L0’s 1990 term lost more points by this stage, but from a bigger starting vote."), "the share dek names a term that lost more points");
+  ok(!cycleDek(two, "primary", "points").includes("starting vote"), "and the points dek has no need to");
+  eq(cycleMode("net") + cycleMode("tpp") + cycleMode("ppmm"), "pointspointspoints", "only the primary votes are read as shares");
+  for (const k of ["primary", "oppr"]) {
+    ok(C0.terms.every((x) => x[k][N] == null || x.base[k] > 0), `${k}: every term read has its starting vote`);
+    eq(r1(cur.base[k]), r1(site[k][0]), `this term's ${k} starting vote is the site's`);
+  }
   for (const k of ["primary", "net", "ppmm", "oppr"]) {
     const lit = cycleLit(C0, k), prev = C0.terms.filter((x) => !x.current).slice(-1)[0], r = cycleRank(C0, k);
     ok(lit[0] === cur.year && lit.includes(prev.year) && (!r.W || lit.includes(r.W.year)) && lit.length === 5 && new Set(lit).size === 5, `${k}: this term, last term and the one the rank names are brought out`);
@@ -626,6 +640,9 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const order = ["primary", "net", "ppmm", "oppr"].map((k) => built.indexOf(`id="${k}-svg"`));
   ok(order.every((v, i) => v > 0 && (!i || v > order[i - 1])), "the four panels in the asked order");
   ok(/name="robots" content="noindex"/.test(built), "cycles: unlisted");
+  eq((built.match(/class="seg cy-mode"/g) || []).length, 2, "both primary charts carry the share / points switch");
+  const V = JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]).views;
+  for (const k of ["primary", "oppr"]) for (const m of ["share", "points"]) ok(V[k][m].head === cycleHead(C0, k, m) && V[k][m].dek === cycleDek(C0, k, m) && V[k][m].lit.join() === cycleLit(C0, k, m).join(), `${k} ${m}: the switch's words and terms`);
   const weekly = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-weekly.json"), "utf8")), model = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-model.json"), "utf8"));
   eq(weekly.input, model.input, "the weekly history is built from the same inputs as the monthly model");
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html"]) ok(/href="(\.\.\/)?past-cycles\/">past cycles</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists past cycles`);

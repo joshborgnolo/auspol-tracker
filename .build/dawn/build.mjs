@@ -15,7 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { disagreeData } from "./disagree-data.mjs";
 import { decidedData } from "./decided-data.mjs";
@@ -225,7 +225,9 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
             ppmHead: (C) => cycleHead(C, "ppmm"), ppmDek: (C) => cycleDek(C, "ppmm"), opprHead: (C) => cycleHead(C, "oppr"), opprDek: (C) => cycleDek(C, "oppr") },
     markup: { cyStats: cycleStatsHtml },
     /* which terms each chart opens with brought out */
-    extra: (C) => ({ lit: Object.fromEntries(["primary", "net", "ppmm", "oppr"].map((k) => [k, cycleLit(C, k)])) }) });
+    extra: (C) => ({ lit: Object.fromEntries(["primary", "net", "ppmm", "oppr"].map((k) => [k, cycleLit(C, k)])),
+      /* the primary charts' two readings: each one's head, dek and terms brought out */
+      views: Object.fromEntries(SHARE_KEYS.map((k) => [k, Object.fromEntries(["share", "points"].map((m) => [m, { head: cycleHead(C, k, m), dek: cycleDek(C, k, m), lit: cycleLit(C, k, m) }]))])) }) });
   /* the electoral map page: the main map's own 2025 results and boundaries (emap-data.mjs) */
   let emapFile = null;
   const mapRoot = path.resolve(HERE, "..", "..");
