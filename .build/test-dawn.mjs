@@ -246,6 +246,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const polls = fs.readFileSync(path.join(path.dirname(r.file), "polls/index.html"), "utf8");
   ok(/<label class="pick"><span class="pl">Taking&nbsp;<\/span><select id="house">/.test(polls) && /\.pick\{position:relative/.test(polls), "the polls page's pollster menu reads like the chart's and opens under its button");
   ok(polls.includes('<option value="">all pollsters</option>') && !/Every pollster|\(\$\{n\}\)/.test(polls), "the polls page's pollster menu carries no counts");
+  ok(html.includes('Math.round(fB*.4)'), "the Sankey separator uses the smaller size");
   ok(html.includes("const MT=TIPH+EVH+(evs.length&&!narrow?8:0)"), "eight extra pixels after desktop event labels, and only there");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
   ok(!!scale, "the primaries chart's y-axis rule is in the page");

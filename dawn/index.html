@@ -1854,7 +1854,7 @@ function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
   o+=`<rect x="${P(dx0)}" y="${P(yD)}" width="${P(dl1-dx0)}" height="${DW}" rx="3" style="fill:var(--alp)"/><rect x="${P(dr0)}" y="${P(yD)}" width="${P(dr1-dr0)}" height="${DW}" rx="3" style="fill:var(--${RIV})"/>`;
   o+=`<text x="${P(dx0)}" y="${P(yNm)}" class="nm" style="font-size:${fM}px;fill:var(--alp)">${FNAME.alp}</text><text x="${P(dr1)}" y="${P(yNm)}" text-anchor="end" class="nm" style="font-size:${fM}px;fill:var(--${RIV})">${FNAME[RIV]}</text>`;
   o+=`<text x="${P(dx0-fB*.04)}" y="${P(yBig)}" class="big2" style="font-size:${fB}px;fill:var(--alp)">${f1(lab)}<tspan class="pc">%</tspan></text><text x="${P(dr1)}" y="${P(yBig)}" text-anchor="end" class="big2" style="font-size:${fB}px;fill:var(--${RIV})">${f1(100-lab)}<tspan class="pc">%</tspan></text>`;
-  o+=`<text x="${P((dl1+dr0)/2)}" y="${P(yBig-fB*.08)}" text-anchor="middle" class="vv" style="font-size:${Math.round(fB*.5)}px">v</text>`;
+  o+=`<text x="${P((dl1+dr0)/2)}" y="${P(yBig-fB*.08)}" text-anchor="middle" class="vv" style="font-size:${Math.round(fB*.4)}px">v</text>`;
   svg.innerHTML=o;
   const header=fig.closest('figure')?.querySelector('h3')||$('#flow-margin-head');
   if(header){
