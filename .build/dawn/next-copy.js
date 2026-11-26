@@ -193,9 +193,8 @@
     if (kind === "today" || kind === "next") {
       const alt = one && kind === "next" ? altOf(one) : null;
       const hrs = lead.map((r) => [r, hourWords(r)]);
-      if (alt) s.push("Its record has it slipping a week at times, to " + dmf(alt) + ".");
-      else if (one && hrs[0][1]) s.push("It usually lands " + atH(hrs[0][1]) + ", Sydney time.");
-      else if (lead.length > 1 && hrs.every(([, h]) => h)) s.push(hrs.map(([r, h], i) => r.pollster + (i ? " " : " usually lands ") + atH(h)).join(", ") + ", Sydney time.");
+      if (!alt && one && hrs[0][1]) s.push("It usually lands " + atH(hrs[0][1]) + ", Sydney time.");
+      else if (!alt && lead.length > 1 && hrs.every(([, h]) => h)) s.push(hrs.map(([r, h], i) => r.pollster + (i ? " " : " usually lands ") + atH(h)).join(", ") + ", Sydney time.");
     } else if (kind === "notout" && one) {
       const hr = hourWords(one), edge = one.release + one.winHalf * DAY;
       s.push((hr ? "It usually lands " + atH(hr) + "." : "") + (one.winHalf > 0 ? (hr ? " " : "") + "Its window stays open until " + wdm(edge) + "." : ""));
@@ -207,13 +206,6 @@
     } else if (kind === "summer") {
       s.push("Nobody publishes between 23 December and 8 January; last summer the pollsters came back between 9 January and 1 February.");
     }
-    const four = polls.filter((r) => !r.missed && (r.loose ? r.opensIn <= 28 : r.inDays >= 0 && r.inDays <= 28));
-    const houses = new Set(four.map((r) => r.pollster)).size;
-    s.push(!four.length ? "No poll is expected in the next four weeks."
-      : four.length > 10 ? "Over the next four weeks, " + four.length + " polls are expected, from " + houses + " pollsters."
-      : Cap(four.length === 1 ? "one poll is" : num(four.length) + " polls are") + " expected over the next four weeks" + (houses > 1 ? ", from " + num(houses) + " pollsters." : "."));
-    const o = score && score.overall;
-    if (o && o.n >= 5) s.push("Each date comes from the pollster’s own rhythm; since " + (score.sinceLabel || "September") + ", " + o.h + " of " + o.n + " have landed inside their window.");
     return { kind, head, dek: s.filter(Boolean).join(" "), lead: lead.map((r) => r.pollster), t0 };
   }
 

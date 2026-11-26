@@ -332,7 +332,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
     const proj = ctx.AP.nextPolls({ day: today + d * DAY, mins }, { horizonDays: 49, includeTracked: true });
     const c = W.copy(proj, score);
     assert.ok(RULE[c.kind] && RULE[c.kind].test(c.head), `head off its rule (${c.kind}): ${c.head}`);
-    assert.ok(/next four weeks/.test(c.dek), "the dek counts the four weeks: " + c.dek);
+    assert.ok(!/next four weeks|own rhythm|slipping a week/.test(c.dek), "the dek omits the removed projection and accuracy summaries: " + c.dek);
     assert.ok(!proj.rows.filter((r) => r.tracked).some((r) => c.lead.includes(r.pollster)), "no direction or issues survey is ever the next poll");
     (seen[c.kind] ||= c.head);
   }
