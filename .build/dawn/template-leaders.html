@@ -44,6 +44,7 @@
     <li><a href="../polls/">polls</a></li>
     <li><span class="soon">seats <small>soon</small></span></li>
     <li><a href="#top" aria-current="page">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
     <li><span class="soon">states <small>soon</small></span></li>
     <li><span class="soon">pollsters <small>soon</small></span></li>
     <li><span class="soon">flows <small>soon</small></span></li>
@@ -85,6 +86,20 @@
     <div class="sr"><table id="ratings-table"></table></div>
   </div>
 </section>
+
+<section class="sec" id="fav" data-sec="leaders" aria-labelledby="fav-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes leaders">
+    <header class="hd">
+      <h2 id="fav-h">{{favHead}}</h2>
+      <p class="dek">{{favDek}}</p>
+    </header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="fig" id="fav-fig"><div class="tip" aria-live="polite"></div><svg id="fav-svg" tabindex="0" aria-label="Line chart of each leader’s estimated net favourability. Use the left and right arrow keys to read values."></svg></div>
+    <p class="src" id="fav-src"></p>
+    <div class="sr"><table id="fav-table"></table></div>
+  </div>
+</section>
 </main>
 
 <script id="dawn-data" type="application/json">{{DATA}}</script>
@@ -110,7 +125,7 @@ const ALL_TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].
 /* only the terms the ratings reach */
 const TERMS=ALL_TERMS.filter(t=>t.b==null||t.b>DATA.firstX);
 const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
-const HIST={terms:[{a:DATA.firstX}]},PVSEL=new Set();
+const HIST={terms:[{a:0}]},PVSEL=new Set();
 const OFFICES=['pm','opp','han'];
 const OFFNAME={pm:'Prime minister',opp:'Opposition leader',han:'One Nation leader'};
 const CV={alp:'alp',lnp:'lnp',onp:'on'};
@@ -118,9 +133,12 @@ const COLOR=p=>`var(--${CV[p]||'oth'})`;
 /* a series' figure in week i, null outside its weeks */
 const at=(s,i)=>i<s.i0||i>=s.i0+s.v.length?null:{m:s.v[i-s.i0],lo:s.lo[i-s.i0],hi:s.hi[i-s.i0]};
 const holder=(o,i)=>DATA.series.find(s=>s.role===o&&at(s,i));
+/* the two measures: net approval of each leader's job performance, and net favourability */
+const FAV=DATA.fav;
+const APPROVAL={series:DATA.series,polls:DATA.polls,history:DATA.history,past:DATA.past};
 
 /*{{SHARED:window}}*/
-function setWin(w){WIN=w;paintWinBars();ratingsSrc();charts.forEach(c=>{c.clear();c.draw()})}
+/*{{CHARTWINDOWS}}*/
 
 /* ---------- the charts ---------- */
 const POLLS_HREF='../polls/';
@@ -132,7 +150,7 @@ const POLLS_HREF='../polls/';
 const LONG=12;
 const net=v=>sgn(v).replace(/\.0$/,'');
 const lineW=long=>long?1.4:2.5;
-function ratingScene(narrow){
+function ratingScene(M,narrow){
   const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
   const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
   const S={x0,x1,ys:10,fmt:sgn,tick:v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0',lines:[],bands:[],dots:[],rings:[],stops:[],refs:[{y:0}],ends:[],names:[]};
@@ -142,7 +160,7 @@ function ratingScene(narrow){
     S.names.push({s:who,color:col,pts:v,span:v[v.length-1].x-v[0].x})};
   if(cur){
     const inWin=i=>GX[i]>=x0-1e-6&&GX[i]<=x1+1e-6;
-    for(const s of DATA.series){
+    for(const s of M.series){
       const col=COLOR(s.party),pts=[],bd=[];
       for(let i=s.i0;i<s.i0+s.v.length;i++){if(!inWin(i))continue;const q=at(s,i);pts.push({x:GX[i],y:q.m});bd.push({x:GX[i],lo:q.lo,hi:q.hi})}
       if(!pts.length)continue;
@@ -151,21 +169,21 @@ function ratingScene(narrow){
       if(s.to)nameLine(s.person,col,pts);else S.ends.push({color:col,y:s.v[s.v.length-1],name:s.person,abbr:s.person,v:s.v[s.v.length-1]});
     }
     S.ends.sort((p,q)=>q.v-p.v);S.endX=NOWX;
-    if(dots){const memo=new Map();for(const p of DATA.polls){const x=isoX(p.m);if(x<x0||x>x1)continue;const s=DATA.series[p.s];if(!s)continue;
+    if(dots){const memo=new Map();for(const p of M.polls){const x=isoX(p.m);if(x<x0||x>x1)continue;const s=M.series[p.s];if(!s)continue;
       const key=p.k||p.m+'|'+p.h;
       if(!memo.has(key))memo.set(key,{who:p.h,when:p.f?p.f+(+p.m.slice(0,4)!==YR?' '+p.m.slice(0,4):''):fdate(p.m),n:p.n?'n = '+Number(p.n).toLocaleString('en-AU'):'',k:p.k});
       S.dots.push({x,y:p.net,color:COLOR(s.party),poll:memo.get(key),txt:s.person+' '+net(p.net)})}}
     for(let i=0;i<=LAST;i++){if(!inWin(i))continue;
-      const items=DATA.series.map(s=>{const q=at(s,i);return q?{color:COLOR(s.party),y:q.m,v:q.m,tc:COLOR(s.party),txt:s.person+' '+sgn(q.m)}:null}).filter(Boolean).sort((p,q)=>q.v-p.v);
+      const items=M.series.map(s=>{const q=at(s,i);return q?{color:COLOR(s.party),y:q.m,v:q.m,tc:COLOR(s.party),txt:s.person+' '+sgn(q.m)}:null}).filter(Boolean).sort((p,q)=>q.v-p.v);
       if(!items.length)continue;const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);
       S.stops.push({x:GX[i],label:fdate(G[i]),sub:ev?ev.s:'',items})}
   }
   if(!curOnly){
     const past=[],stops=new Map();
-    for(const h of DATA.history){
+    for(const h of M.history){
       const col=COLOR(h.party),all=h.m.map(m=>({x:m[0],y:m[1],ci:m[2]}));
       /* a leader who served on into this term is one line: carried to this term's first week */
-      const on=cur&&DATA.series.find(s=>s.id===h.id);
+      const on=cur&&M.series.find(s=>s.id===h.id);
       if(on)all.push({x:GX[on.i0],y:on.v[0],ci:(on.hi[0]-on.lo[0])/2,join:1});
       if(!all.length||all[all.length-1].x<a-.05||all[0].x>b+.05)continue;
       /* split where nobody asked for half a year */
@@ -180,7 +198,7 @@ function ratingScene(narrow){
     S.lines.unshift(...past);
     const st=[...stops.values()];st.forEach(t=>t.items.sort((p,q)=>q.v-p.v));
     S.stops=st.concat(S.stops).sort((p,q)=>p.x-q.x);
-    if(dots){const memo=new Map();for(const r of DATA.past){const x=isoX(r[0]);if(x<a||x>b)continue;const who=DATA.people[r[2]],key=r[0]+'|'+r[1];
+    if(dots){const memo=new Map();for(const r of M.past){const x=isoX(r[0]);if(x<a||x>b)continue;const who=DATA.people[r[2]],key=r[0]+'|'+r[1];
       if(!memo.has(key))memo.set(key,{who:r[1],when:fdate(r[0]),n:''});
       S.dots.push({x,y:r[3],color:COLOR(who.party),poll:memo.get(key),txt:who.person+' '+net(r[3])})}}
     if(!cur)S.ends=[];
@@ -283,20 +301,24 @@ rpBtn.addEventListener('click',e=>{
   });
 });
 
-/* ---------- section 2: the ratings over time ---------- */
-function ratingsSrc(){
-  const [a,b]=winRange(WIN),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
+/* ---------- the two charts over time: job performance, then favourability ---------- */
+const ASKED={ratings:'approval of, or satisfaction with, each leader’s job performance',fav:'whether voters see each leader favourably or unfavourably'};
+function noteFor(id,c){
+  const [a,b]=(useWindow(c),winRange(WIN)),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
   const lines=curOnly?'Lines are the model’s weekly estimates':'Past terms are the model’s monthly estimates'+(cur?' (this term is weekly)':'');
-  $('#ratings-src').textContent=lines+' of each rating as the average pollster would report it, from approval and satisfaction questions'+bands+'.'
+  $('#'+id+'-src').textContent=lines+' of the average pollster’s figure, from questions on '+ASKED[id]+bands+'.'
     +(dots?' Dots are individual polls.'+(cur?' Tap a dot for its poll'+(curOnly?', a number for its event.':'.'):''):'');
 }
-const ratings=chart({fig:$('#ratings-fig'),svg:$('#ratings-svg'),scene:ratingScene});
-const charts=[ratings];
-paintWinBars();ratingsSrc();
+const lineChart=(id,M,lo)=>{const c={};
+  return windowedChart({section:$('#'+id),lo,src:()=>{if(c.w)noteFor(id,c.w)},
+    make:use=>chart({fig:$('#'+id+'-fig'),svg:$('#'+id+'-svg'),scene:n=>ratingScene(M,n),use})})};
+const charts=[['ratings',APPROVAL,DATA.firstX],['fav',FAV,FAV.firstX]].map(([id,M,lo])=>{
+  const w=lineChart(id,M,lo);noteFor(id,w);w.src=()=>noteFor(id,w);return w.chart});
 
-/* screen-reader table, one row a month */
+/* screen-reader tables, one row a month */
 {const idx=[];let lm=-1;G.forEach((d,i)=>{const m=+d.slice(5,7);if(m!==lm){idx.push(i);lm=m}});if(idx[idx.length-1]!==LAST)idx.push(LAST);
-$('#ratings-table').innerHTML=`<caption>Estimated net approval, points</caption><tr><th>Week of</th>${DATA.series.map(s=>`<th>${esc(s.person)}</th>`).join('')}</tr>`+idx.map(i=>`<tr><td>${fdate(G[i])}</td>${DATA.series.map(s=>{const q=at(s,i);return `<td>${q?sgn(q.m):''}</td>`}).join('')}</tr>`).join('')}
+for(const [id,M,what] of [['ratings',APPROVAL,'net approval'],['fav',FAV,'net favourability']])
+$('#'+id+'-table').innerHTML=`<caption>Estimated ${what}, points</caption><tr><th>Week of</th>${M.series.map(s=>`<th>${esc(s.person)}</th>`).join('')}</tr>`+idx.map(i=>`<tr><td>${fdate(G[i])}</td>${M.series.map(s=>{const q=at(s,i);return `<td>${q?sgn(q.m):''}</td>`}).join('')}</tr>`).join('')}
 
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
 

@@ -25,6 +25,14 @@
      for a line that starts there, "since taking the job" for a leader who
      took over this term, else since the month of the first rating. None
      clears: "much where they started".
+     The favourability chart's head is the same rule on its own lines.
+   - The mood page's direction head says the larger side's share as the
+     nearest plain fraction (the site's plainShare), "the most this term"
+     only when no week of the term's line reads higher. Its trust head says
+     the model's share the same way, "the lowest since <month>" only when
+     the model's own test says so (trust.now.low2020, as the site's head).
+     The trust dek names a change on a year ago only when its 95% interval
+     excludes zero.
    - The flow diagram's head reads each contest's verdict today: Labor or
      its rival ahead when the lead is outside the margin (twice the 95%
      interval, on the lead's scale, the flows' doubt added in quadrature
@@ -156,19 +164,50 @@ export function flowNote(D, c, two) {
 /* the leadership ratings page (assets/dawn-leaders.json). Today's leaders are
    the lines still running; since.lo and since.hi are the 95% interval of the
    change since the line's first week */
-export function leaderMoves(L) {
-  return L.series.filter((s) => !s.to).map((s) => ({ ...s.since, person: s.person, party: s.party, i0: s.i0, from: s.from,
+export function leaderMoves(L, series = L.series) {
+  return series.filter((s) => !s.to).map((s) => ({ ...s.since, person: s.person, party: s.party, i0: s.i0, from: s.from,
     v: s.v[s.v.length - 1], start: s.v[0], sig: s.since.lo > 0 || s.since.hi < 0 }));
 }
-export function leadersHead(L) {
-  const m = leaderMoves(L).filter((x) => x.sig).sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg))[0];
-  if (!m) return { head: "The leaders\u2019 ratings are much where they started", lead: null };
+function ratingHead(L, series, what, none) {
+  const m = leaderMoves(L, series).filter((x) => x.sig).sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg))[0];
+  if (!m) return { head: none, lead: null };
   const since = m.from > L.election.date ? "since taking the job" : m.i0 === 0 ? "since the election" : "since " + monthYear(L.weeks[m.i0].slice(0, 7));
-  return { head: m.person + "\u2019s net rating has " + (m.chg > 0 ? "risen " : "fallen ") + f1(Math.abs(m.chg)) + " points " + since, lead: m };
+  return { head: m.person + "\u2019s " + what + " has " + (m.chg > 0 ? "risen " : "fallen ") + f1(Math.abs(m.chg)) + " points " + since, lead: m };
 }
-export function leadersDek(L) {
-  const [y, mo] = L.election.date.split("-").map(Number);
-  return "% approving each leader less % disapproving, since the " + MONF[mo - 1] + " " + y + " election";
+export const leadersHead = (L) => ratingHead(L, L.series, "net rating", "The leaders\u2019 ratings are much where they started");
+export const favHead = (L) => ratingHead(L, L.fav.series, "net favourability", "The leaders\u2019 favourability is much where it started");
+const sinceElection = (L) => { const [y, mo] = L.election.date.split("-").map(Number); return "since the " + MONF[mo - 1] + " " + y + " election"; };
+export const leadersDek = (L) => "% approving each leader\u2019s job performance less % disapproving, " + sinceElection(L);
+export const favDek = (L) => "% having a favourable opinion of each leader less % unfavourable, " + sinceElection(L);
+
+/* a share as the nearest plain fraction a reader would say (the site's
+   plainShare): "About" within half a point of it */
+const PLAIN = [[1, 5], [1, 4], [1, 3], [2, 5], [1, 2], [3, 5], [2, 3], [7, 10], [3, 4], [4, 5], [9, 10]];
+const COUNT = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+export function plainShare(v) {
+  const [a, b] = PLAIN.reduce((best, f) => (Math.abs(v - 100 * f[0] / f[1]) < Math.abs(v - 100 * best[0] / best[1]) ? f : best));
+  const d = v - 100 * a / b;
+  const lead = Math.abs(d) < 0.5 ? "About" : d < 0 ? "Almost" : "More than";
+  return lead + " " + (a === 1 && b === 2 ? "half of" : COUNT[a] + " in " + COUNT[b]);
+}
+export function moodHead(M) {
+  const L = M.weeks.length - 1, wrongLeads = M.wrong.v[L] >= M.right.v[L], side = wrongLeads ? M.wrong : M.right;
+  const most = side.v[L] >= Math.max(...side.v) - 0.05;
+  return plainShare(side.v[L]) + " say Australia is " + (wrongLeads ? "on the wrong track" : "heading in the right direction") + (most ? ", the most this term" : "");
+}
+export function moodDek(M) {
+  const [y, mo] = M.election.date.split("-").map(Number);
+  return "% saying the country is heading in the right direction and % saying it is on the wrong track, since the " + MONF[mo - 1] + " " + y + " election";
+}
+export function trustHead(M) {
+  const now = M.trust.now, low = now.low2020;
+  const rank = !low ? "" : low.record ? ", the lowest on record here" : ", the lowest since " + monthYear(low.since);
+  return plainShare(now.v) + " Australians say people in government can be trusted to do the right thing" + rank;
+}
+export function trustDek(M) {
+  const Y = M.trust.now.year;
+  const change = Y.sig ? (Y.chg < 0 ? "Down " : "Up ") + f1(Math.abs(Y.chg)) + " points on a year earlier" : "Not significantly changed on a year earlier";
+  return "% saying people in government can usually or sometimes be trusted to do the right thing. " + change + ".";
 }
 
 export function copyFor(D) {

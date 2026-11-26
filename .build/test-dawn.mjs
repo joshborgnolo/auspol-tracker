@@ -11,7 +11,10 @@
       year reaches on hand-built rows; np-score's report read whole.
    5. the leadership ratings page: today's figures are the site's own, its
       weeks and ranks hold together, every branch of its head, and the built
-      page whole with the blocks it shares with the votes page.
+      page whole with the blocks it shares with the votes page; its
+      favourability chart the same;
+   6. the mood page: today's direction and trust are the site's own, every
+      branch of its heads and dek, and the built page.
    Run: node .build/test-dawn.mjs */
 import fs from "node:fs";
 import os from "node:os";
@@ -19,7 +22,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves } from "./dawn/copy.mjs";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
@@ -458,6 +461,20 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const pm = copy(); for (const x of pm.series) x.since = { chg: 0, lo: -1, hi: 1 }; pm.series.find((x) => x.person === "Albanese").since = { chg: -20, lo: -28, hi: -12 };
   eq(leadersHead(pm).head, "Albanese’s net rating has fallen 20.0 points since the election", "a line from polling day");
   ok(leaderMoves(L0).every((m) => m.person !== "Ley"), "a leader who has gone leads no head");
+  /* favourability: the same lines read through the favourability pollsters */
+  const KF = { Albanese: "alb_fav", Taylor: "taylor_fav", Hanson: "hanson_fav" };
+  for (const x of L0.fav.series.filter((q) => !q.to)) {
+    if (now[KF[x.person]]) eq(r1(x.v[x.v.length - 1]), now[KF[x.person]].v, `${x.person}'s favourability today is the site's figure`);
+    eq(x.i0 + x.v.length - 1, LW, `${x.person}'s favourability reaches the last week`);
+  }
+  for (const x of L0.fav.series) ok(x.v.length === x.lo.length && x.v.every((v, i) => x.lo[i] <= v && v <= x.hi[i]), `${x.id}: favourability inside its interval`);
+  ok(L0.fav.polls.every((p) => L0.fav.series[p.s] && Number.isFinite(p.net)) && L0.fav.past.every((p) => L0.people[p[2]]), "every favourability dot belongs to a leader");
+  const nofav = copy(); for (const x of nofav.fav.series) x.since = { chg: 2, lo: -3, hi: 7 };
+  eq(favHead(nofav).head, "The leaders’ favourability is much where it started", "no favourability change clears");
+  const fall = copy(); for (const x of fall.fav.series) x.since = { chg: 0, lo: -1, hi: 1 }; fall.fav.series.find((x) => x.person === "Albanese").since = { chg: -12, lo: -18, hi: -6 };
+  eq(favHead(fall).head, "Albanese’s net favourability has fallen 12.0 points since the election", "the favourability head");
+  eq(leadersDek(L0), "% approving each leader’s job performance less % disapproving, since the May 2025 election", "the owner's wording, job performance");
+  eq(favDek(L0), "% having a favourable opinion of each leader less % unfavourable, since the May 2025 election", "the owner's wording, favourability");
   /* the built page */
   const base = fs.readFileSync(path.join(HERE, "dawn", "template.html"), "utf8");
   for (const k of ["css", "logo", "sky", "dates", "window", "chart", "events", "odometer", "nav"]) ok(sharedBlock(base, k).length > 100, `template.html marks the shared block ${k}`);
@@ -474,9 +491,57 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const js = built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"));
   new vm.Script(js); n++;
   ok(built.includes(leadersHead(L0).head) && built.includes(leadersDek(L0)), "the head and dek are today's rules");
+  ok(built.includes(favHead(L0).head) && built.includes(favDek(L0)) && /id="fav-svg"/.test(built), "the favourability chart and its words");
+  eq((built.match(/data-win aria-label/g) || []).length, 2, "two charts, a window each");
+  ok(built.includes("function windowedChart("), "each chart its own window");
   ok(/name="robots" content="noindex"/.test(built), "unlisted");
   ok(built.includes("const POLLS_HREF='../polls/'"), "its dots open the polls page");
   for (const f of ["template.html", "template-polls.html", "template-next.html"]) ok(/href="(\.\.\/)?leadership-ratings\/">leadership ratings</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists the page`);
+}
+/* the mood */
+{
+  const M0 = JSON.parse(fs.readFileSync(path.join(A, "dawn-mood.json"), "utf8")), copy = () => JSON.parse(JSON.stringify(M0));
+  const data = fs.readFileSync(path.join(A, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const grabM = (name) => JSON.parse(data.match(new RegExp(`const ${name} = (.*);\n`))[1]);
+  const dir = grabM("directionNow"), tg = grabM("trustGov"), W = M0.weeks.length - 1;
+  eq(r1(M0.right.v[W]), dir.right, "today's right direction is the site's");
+  eq(r1(M0.wrong.v[W]), dir.wrong, "today's wrong track is the site's");
+  eq(M0.unsure[W], dir.unsure, "today's unsure is the site's");
+  eq(M0.trust.now.v, tg.model.now.v, "today's trust is the site's");
+  eq(M0.weeks[0], M0.election.date, "the weeks open on polling day");
+  for (const k of ["right", "wrong"]) ok(M0[k].v.length === M0.weeks.length && M0[k].v.every((v, i) => M0[k].lo[i] <= v && v <= M0[k].hi[i]), `${k}: a figure a week, inside its interval`);
+  ok(M0.weeks.every((w, i) => Math.abs(M0.right.v[i] + M0.wrong.v[i] + M0.unsure[i] - 100) < 0.2), "the bar's three parts make the whole every week");
+  ok(M0.polls.every((p) => p.m >= M0.election.date && p.r > 0 && p.w > 0) && M0.pastPolls.every((p) => p[0] < M0.election.date), "the dots divide at the election");
+  /* the heads: plain fractions, and a superlative only when the line bears it out */
+  eq(plainShare(62), "More than three in five"); eq(plainShare(58.9), "Almost three in five"); eq(plainShare(25.2), "About one in four"); eq(plainShare(50.1), "About half of");
+  const top = copy(); top.wrong.v = top.wrong.v.map(() => 55); top.right.v = top.right.v.map(() => 30); top.wrong.v[W] = 62;
+  eq(moodHead(top), "More than three in five say Australia is on the wrong track, the most this term", "today's is the term's highest");
+  top.wrong.v[3] = 63;
+  eq(moodHead(top), "More than three in five say Australia is on the wrong track", "a higher week drops the claim");
+  const sunny = copy(); sunny.right.v = sunny.right.v.map(() => 70); sunny.right.v[W] = 58; sunny.wrong.v = sunny.wrong.v.map(() => 30);
+  eq(moodHead(sunny), "Almost three in five say Australia is heading in the right direction", "the right direction ahead");
+  const t = copy(); t.trust.now = { v: 26, low2020: null, year: { chg: -1, sig: false } };
+  eq(trustHead(t), "More than one in four Australians say people in government can be trusted to do the right thing");
+  ok(trustDek(t).endsWith("Not significantly changed on a year earlier."), "no change claimed inside the interval");
+  t.trust.now = { v: 26, low2020: { since: "2020-01" }, year: { chg: 5.25, sig: true } };
+  ok(trustHead(t).endsWith(", the lowest since January 2020"), "the model's own superlative");
+  ok(trustDek(t).endsWith("Up 5.3 points on a year earlier."), "a significant rise is named");
+  /* the built page */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-mood-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, "assets", "fonts"))) if (f.startsWith("commissioner")) fs.writeFileSync(path.join(tmp, "assets", "fonts", f), "");
+  fs.mkdirSync(path.join(tmp, "data"));
+  fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
+  const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).mood, "utf8");
+  fs.rmSync(tmp, { recursive: true, force: true });
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "mood: every placeholder filled");
+  eq(JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]).asOf, M0.asOf, "mood: its data parses");
+  new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
+  ok([moodHead(M0), moodDek(M0), trustHead(M0), trustDek(M0)].every((w) => built.includes(w)), "mood: its words are today's rules");
+  ok(/name="robots" content="noindex"/.test(built), "mood: unlisted");
+  ok(/class="md-bar"[^>]*><i class="y"><\/i><i class="u"><\/i><i class="n"><\/i><\/div>/.test(built) && /\.md-bar\{[^}]*border-radius:999px;overflow:hidden/.test(built), "the hero is one rounded bar: right, unsure, wrong");
+  ok(/--yes:#0b8f8c;--no:#8e1f41;--neu:#a7a2ae/.test(built), "turquoise, burgundy and grey");
+  for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html"]) ok(/href="(\.\.\/)?mood\/">mood</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists the mood page`);
 }
 /* linked from nowhere */
 {

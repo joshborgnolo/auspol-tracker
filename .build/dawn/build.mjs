@@ -15,7 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, moodHead, moodDek, trustHead, trustDek, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
@@ -185,29 +185,37 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     nextFile = path.join(out, "next", "index.html");
     write(nextFile, nh);
   }
-  /* the leadership ratings page (template-leaders.html): the sunrise and the long chart of the
-     votes page, drawn from the leader model; what the two pages share is read out of template.html */
-  const leadPath = path.join(assets, "dawn-leaders.json");
-  let leadFile = null;
-  if (fs.existsSync(leadPath)) {
-    const LD = JSON.parse(fs.readFileSync(leadPath, "utf8"));
-    const base = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
-    let lh = fs.readFileSync(path.join(HERE, "template-leaders.html"), "utf8")
-      .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k));
-    const fillL = { FONT: "/assets/fonts/" + font, asOf: esc(fdate(LD.asOf)), latestPoll: esc(latestPollLine(LD)), leadersHead: esc(leadersHead(LD).head), leadersDek: esc(leadersDek(LD)) };
-    lh = lh.replace(/\{\{(FONT|asOf|latestPoll|leadersHead|leadersDek)\}\}/g, (m, k) => fillL[k])
+  /* the leadership ratings and mood pages (template-leaders.html, template-mood.html): the sunrise
+     and long charts of the votes page, drawn from the leader, direction and trust models; what the
+     pages share is read out of template.html, and chart-windows.js gives each chart its own window */
+  const base = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
+  const sunPage = ({ asset, template, dir, fill }) => {
+    const src = path.join(assets, asset);
+    if (!fs.existsSync(src)) return null;
+    const PG = JSON.parse(fs.readFileSync(src, "utf8"));
+    const words = { FONT: "/assets/fonts/" + font, asOf: esc(fdate(PG.asOf)), latestPoll: esc(latestPollLine(PG)),
+                    ...Object.fromEntries(Object.entries(fill).map(([k, f]) => [k, esc(f(PG))])) };
+    let h = fs.readFileSync(path.join(HERE, template), "utf8")
+      .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k))
+      .replace("/*{{FILTERSCSS}}*/", "");
+    h = h.replace(/\{\{([A-Za-z]+)\}\}/g, (m, k) => (k in words ? words[k] : m))
+      .replace("/*{{CHARTWINDOWS}}*/", () => fs.readFileSync(path.join(HERE, "chart-windows.js"), "utf8"))
       .replace("/*{{POLLMETA}}*/", () => fs.readFileSync(path.join(HERE, "poll-meta.mjs"), "utf8").replaceAll("export function", "function"))
       .replace("{{PASTEVENTS}}", () => JSON.stringify(past).replace(/</g, "\\u003c"))
-      .replace("/*{{FILTERSCSS}}*/", "")
-      .replace("{{DATA}}", () => JSON.stringify(LD).replace(/</g, "\\u003c"))
+      .replace("{{DATA}}", () => JSON.stringify(PG).replace(/</g, "\\u003c"))
       .replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
-    const leftL = lh.match(/\{\{[A-Za-z:]+\}\}/);
-    if (leftL) throw new Error("dawn: leaders template placeholder left unfilled: " + leftL[0]);
-    fs.mkdirSync(path.join(out, "leadership-ratings"), { recursive: true });
-    leadFile = path.join(out, "leadership-ratings", "index.html");
-    write(leadFile, lh);
-  }
-  return { leaders: leadFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+    const unfilled = h.match(/\{\{[A-Za-z:]+\}\}/);
+    if (unfilled) throw new Error("dawn: " + template + " placeholder left unfilled: " + unfilled[0]);
+    fs.mkdirSync(path.join(out, dir), { recursive: true });
+    const file = path.join(out, dir, "index.html");
+    write(file, h);
+    return file;
+  };
+  const leadFile = sunPage({ asset: "dawn-leaders.json", template: "template-leaders.html", dir: "leadership-ratings",
+    fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, favHead: (L) => favHead(L).head, favDek } });
+  const moodFile = sunPage({ asset: "dawn-mood.json", template: "template-mood.html", dir: "mood",
+    fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek } });
+  return { leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

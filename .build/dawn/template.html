@@ -348,6 +348,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
     <li><a href="polls/">polls</a></li>
     <li><span class="soon">seats <small>soon</small></span></li>
     <li><a href="leadership-ratings/">leadership ratings</a></li>
+    <li><a href="mood/">mood</a></li>
     <li><span class="soon">states <small>soon</small></span></li>
     <li><span class="soon">pollsters <small>soon</small></span></li>
     <li><span class="soon">flows <small>soon</small></span></li>
@@ -627,7 +628,7 @@ const winRange=w=>{const {lo,hi}=REACH();if(w.kind==='term'){const t=TERMS.find(
 const inCur=w=>winRange(w)[0]>=CUR.a-1e-6;
 function winStep(w,dir){
   const {lo,hi}=REACH();
-  if(w.kind==='term'){const i=TERMS.findIndex(t=>t.year===w.year),j=i+dir;if(i<0||j<0||j>=TERMS.length)return null;if(!HIST&&!TERMS[j].current)return null;return {kind:'term',year:TERMS[j].year}}
+  if(w.kind==='term'){const i=TERMS.findIndex(t=>t.year===w.year),j=i+dir;if(i<0||j<0||j>=TERMS.length||(dir<0&&TERMS[i].a<=lo+1e-3))return null;if(!HIST&&!TERMS[j].current)return null;return {kind:'term',year:TERMS[j].year}}
   if(w.kind==='all')return null;
   const wid=w.b-w.a,a=Math.max(lo,Math.min(hi-wid,w.a+dir*wid));
   return Math.abs(a-w.a)<1e-6?null:{kind:'span',years:w.years,a,b:a+wid};
@@ -660,9 +661,9 @@ winBars.forEach(el=>{
     setWin(nw);
   });
 });
-function paintWinBars(){
+function paintWinBars(els=winBars){
   const act=winActive(WIN),subOn=!!PVSEL.size,prev=subOn?null:winStep(WIN,-1),next=subOn?null:winStep(WIN,1),unit=WIN.kind==='term'?'term':'stretch';
-  winBars.forEach(el=>{
+  els.forEach(el=>{
     const [p,n]=$$('.step',el);p.disabled=!prev;n.disabled=!next;
     p.setAttribute('aria-label',WIN.kind==='term'?'Previous term':'Earlier '+unit);n.setAttribute('aria-label',WIN.kind==='term'?'Next term':'Later '+unit);
     /* the long windows wait for the past terms, as the site's bar does */
@@ -711,6 +712,7 @@ function chart(o){
   const fig=o.fig,svg=o.svg,tip=$('.tip',fig);
   let L=null,cur=null,tmo=0,mode=null,dwell=0;
   function draw(){
+    if(o.use)o.use();
     const W=fig.clientWidth,H=fig.clientHeight;if(!W||!H)return;
     const narrow=W<560,S=o.scene(narrow);
     const ticks=[];for(let v=Math.ceil(S.y0/S.ys-1e-9)*S.ys;v<=S.y1+1e-9;v+=S.ys)ticks.push(v);
@@ -782,7 +784,7 @@ function chart(o){
     const cid=svg.id+'-clip';
     /* lines and bands end at the plot's edges; dots and rings keep a margin, so one on an edge stays whole */
     s+=`<defs><clipPath id="${cid}"><rect x="${ML}" y="${MT-8}" width="${PW}" height="${PH+16}"/></clipPath><clipPath id="${cid}m"><rect x="${ML-6}" y="${MT-8}" width="${PW+12}" height="${PH+16}"/></clipPath></defs><g clip-path="url(#${cid})">`;
-    for(const b of S.bands||[]){if(b.pts.length<2)continue;const up=b.pts.map(q=>[x(q.x),y(q.hi)]),dn=b.pts.map(q=>[x(q.x),y(q.lo)]);s+=`<path d="${b.smooth?curve(up)+curveBack(dn):'M'+up.map(p=>P1(p[0])+' '+P1(p[1])).join('L')+'L'+dn.reverse().map(p=>P1(p[0])+' '+P1(p[1])).join('L')}Z" style="fill:${b.color};fill-opacity:var(--band)"/>`}
+    for(const b of S.bands||[]){if(b.pts.length<2)continue;const up=b.pts.map(q=>[x(q.x),y(q.hi)]),dn=b.pts.map(q=>[x(q.x),y(q.lo)]);s+=`<path d="${b.smooth?curve(up)+curveBack(dn):'M'+up.map(p=>P1(p[0])+' '+P1(p[1])).join('L')+'L'+dn.reverse().map(p=>P1(p[0])+' '+P1(p[1])).join('L')}Z" style="fill:${b.color};fill-opacity:${b.op||'var(--band)'}"/>`}
     const dr=narrow?2:2.4;
     const dots=(S.dots||[]).map(d=>({...d,px:x(d.x),py:y(d.y)}));
     const byCol={};dots.forEach(d=>{(byCol[d.color]=byCol[d.color]||[]).push(d)});
@@ -822,7 +824,7 @@ function chart(o){
     tip.className='tip'+(cls?' '+cls:'');tip.style.maxWidth=cls==='idle'?(L.W-L.ML)+'px':'';tip.innerHTML=html;
     const w=Math.min(tip.offsetWidth,L.W);tip.style.left=P1(cx==null?L.ML:Math.max(0,Math.min(L.W-w,cx-w/2)))+'px';
   }
-  function idle(){if(!L)return;const ww=winWords(WIN),md=o.mode?o.mode():'';setTip(`${esc(ww.head)}${ww.sub?' · '+esc(ww.sub):''}${md?' · '+esc(md):''}`,null,'idle')}
+  function idle(){if(!L)return;if(o.use)o.use();const ww=winWords(WIN),md=o.mode?o.mode():'';setTip(`${esc(ww.head)}${ww.sub?' · '+esc(ww.sub):''}${md?' · '+esc(md):''}`,null,'idle')}
   function show(kind,i,quiet){
     mode=kind;cur=i;const {S,x,y,MT,PH,W,ML,MR,sg,eg}=L;let s='';
     if(kind==='stop'){

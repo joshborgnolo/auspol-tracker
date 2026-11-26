@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Mood · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+/* the mood's own colours: turquoise for the right direction, burgundy for the wrong, grey between. The
+   hero's are lifted to hold on the night sky */
+:root{--yes:#0b8f8c;--no:#8e1f41;--neu:#a7a2ae;--h-yes:#3ad6cd;--h-no:#b02e58;--h-neu:#9b99aa}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--yes:#2cc3bd;--no:#cf5877;--neu:#77738a}}
+:root[data-theme=dark]{--yes:#2cc3bd;--no:#cf5877;--neu:#77738a}
+.md{margin-top:2px}
+.md-figs{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.md-f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.md-f.no{text-align:right;align-items:flex-end}
+.md-k{display:flex;align-items:center;gap:7px;font-size:clamp(14px,4.1vw,18px);font-weight:500;white-space:nowrap}
+.md-k::before,.md-u::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.md-v{font-weight:600;font-size:clamp(46px,min(15vw,9vh),84px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.md-v small{font-size:.4em;font-weight:500;opacity:.72;margin-left:2px;letter-spacing:0}
+.md-d{display:flex;align-items:baseline;gap:5px;font-size:clamp(13.5px,3.8vw,16px);color:rgb(238 238 255/.82);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* one bar for the whole sample, rounded at its ends: right, unsure, wrong */
+.md-bar{display:flex;height:clamp(18px,3.2vh,28px);margin-top:clamp(12px,2.2vh,22px);border-radius:999px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.14),0 4px 22px rgb(4 10 40/.35)}
+.md-bar i{display:block;flex:0 0 auto;width:var(--w);transition:width .2s linear}
+.md-bar .y{background:var(--h-yes)}.md-bar .u{background:var(--h-neu);flex:1 1 0}.md-bar .n{background:var(--h-no)}
+.md.live .md-bar i{transition:none}
+.md-u{display:flex;justify-content:center;align-items:center;gap:7px;margin:10px 0 0;font-size:clamp(13.5px,3.8vw,16px);color:rgb(238 238 255/.82);--c:var(--h-neu)}
+.md-u b{font-weight:600;font-variant-numeric:tabular-nums}
+.mood .ext[hidden]{display:none}
+.mood .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
+@media (min-width:900px){.mood .ctl{margin-top:16px}.mood .fig{margin-top:8px}}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="#top" aria-current="page">mood</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><span class="soon">pollsters <small>soon</small></span></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero" id="top" aria-label="Mood">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1 class="sr">auspol tracker: the national mood</h1>
+    <h2>Mood</h2>
+    <p class="now-d">Estimated shares at <span id="now-date">{{asOf}}</span> who say the country is heading in the right direction, and who say it is on the wrong track. <span id="now-latest">{{latestPoll}}</span></p>
+    <div class="now-mode"><button type="button" class="flip" id="pv-whisker-mode"><span id="pv-whisker-label">Change since May 2025</span> <span aria-hidden="true">⇄</span></button></div>
+    <div class="pv-h"><span id="range-label" aria-hidden="true">since 2025</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week since the 2025 election"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
+    <div class="md" id="pv">
+      <div class="md-figs">
+        <div class="md-f yes" data-k="right" style="--c:var(--h-yes)"><span class="md-k">Right direction</span><span class="md-v"><span class="sr"></span><b class="rv" aria-hidden="true"></b><small aria-hidden="true">%</small></span><span class="md-d"><span class="sr"></span><b class="rv" aria-hidden="true" style="font-weight:inherit"></b></span></div>
+        <div class="md-f no" data-k="wrong" style="--c:var(--h-no)"><span class="md-k">Wrong track</span><span class="md-v"><span class="sr"></span><b class="rv" aria-hidden="true"></b><small aria-hidden="true">%</small></span><span class="md-d"><span class="sr"></span><b class="rv" aria-hidden="true" style="font-weight:inherit"></b></span></div>
+      </div>
+      <div class="md-bar" id="md-bar" role="img"><i class="y"></i><i class="u"></i><i class="n"></i></div>
+      <p class="md-u">Unsure <b id="md-uns"></b></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="direction" data-sec="mood" aria-labelledby="direction-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes mood">
+    <header class="hd">
+      <h2 id="direction-h">{{dirHead}}</h2>
+      <p class="dek">{{dirDek}}</p>
+    </header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="fig" id="direction-fig"><div class="tip" aria-live="polite"></div><svg id="direction-svg" tabindex="0" aria-label="Line chart of the shares saying the country is heading in the right direction and on the wrong track. Use the left and right arrow keys to read values."></svg></div>
+    <p class="src" id="direction-src"></p>
+    <div class="sr"><table id="direction-table"></table></div>
+  </div>
+</section>
+
+<section class="sec" id="trust" data-sec="mood" aria-labelledby="trust-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes mood">
+    <header class="hd">
+      <h2 id="trust-h">{{trustHead}}</h2>
+      <p class="dek">{{trustDek}}</p>
+    </header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="fig" id="trust-fig"><div class="tip" aria-live="polite"></div><svg id="trust-svg" tabindex="0" aria-label="Line chart of trust in government. Use the left and right arrow keys to read values."></svg></div>
+    <div class="keys"><button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-glob"><i></i>Global averages</button><span class="ext" id="glob-key" hidden><span><i class="sw dash" style="--c:var(--lnp)"></i> OECD average</span><span><i class="sw dash" style="--c:var(--grn)"></i> Edelman’s global average</span></span></div>
+    <p class="src" id="trust-src"></p>
+    <div class="sr"><table id="trust-table"></table></div>
+  </div>
+</section>
+</main>
+
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+/*{{POLLMETA}}*/
+const DATA=JSON.parse($('#dawn-data').textContent);
+const paintLatestPoll=()=>{$('#now-latest').textContent=latestPollLine(DATA)};
+paintLatestPoll();setInterval(paintLatestPoll,60000);
+
+/*{{SHARED:sky}}*/
+
+/* ---------- the data: the direction and trust models ---------- */
+/*{{SHARED:dates}}*/
+const G=DATA.weeks,LAST=G.length-1,GX=G.map(isoX),NOWX=GX[LAST],ELX=GX[0];
+const YR=+DATA.asOf.slice(0,4);
+const EVENTS=DATA.events.map(e=>({...e,x:isoX(e.d)}));
+const TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].e):null}));
+const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
+const HIST={terms:[{a:0}]},PVSEL=new Set();
+const T=DATA.trust;
+
+/*{{SHARED:window}}*/
+/*{{CHARTWINDOWS}}*/
+
+/* ---------- the charts ---------- */
+const POLLS_HREF='../polls/';
+/*{{SHARED:chart}}*/
+
+/*{{SHARED:events}}*/
+
+/* ---------- right direction and wrong track: this term week by week, before it month by month ---------- */
+const LONG=12;
+const SIDES=[{k:'wrong',name:'Wrong track',abbr:'Wrong',color:'var(--no)'},{k:'right',name:'Right direction',abbr:'Right',color:'var(--yes)'}];
+const lineW=long=>long?1.4:2.5;
+const axis=(S,ys,step)=>{const lo=Math.min(...ys),hi=Math.max(...ys);S.ys=step;S.y0=Math.floor((lo+.3)/step)*step;S.y1=Math.ceil((hi-.3)/step)*step;if(S.y1-S.y0<2*step)S.y1=S.y0+2*step};
+function dirScene(narrow){
+  const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
+  const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
+  const S={x0,x1,ys:10,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[]};
+  const dots=span<=4.6,inWin=i=>GX[i]>=x0-1e-6&&GX[i]<=x1+1e-6;
+  const memo=new Map();
+  const poll=(key,who,when,n,k)=>{if(!memo.has(key))memo.set(key,{who,when,n,k});return memo.get(key)};
+  const dot=(x,r,w,sat,p)=>{S.dots.push({x,y:r,color:'var(--yes)',poll:p,txt:(sat?'Satisfied ':'Right ')+r},{x,y:w,color:'var(--no)',poll:p,txt:(sat?'Dissatisfied ':'Wrong ')+w})};
+  if(cur){
+    for(const s of SIDES){
+      const pts=[],bd=[];
+      for(let i=0;i<=LAST;i++){if(!inWin(i))continue;pts.push({x:GX[i],y:DATA[s.k].v[i]});bd.push({x:GX[i],lo:DATA[s.k].lo[i],hi:DATA[s.k].hi[i]})}
+      if(!long)S.bands.push({color:s.color,pts:bd,smooth:true});
+      S.lines.push({color:s.color,pts,smooth:true,w:lineW(long),thin:long});
+      S.ends.push({color:s.color,y:DATA[s.k].v[LAST],name:s.name,abbr:s.abbr,v:DATA[s.k].v[LAST]});
+    }
+    S.ends.sort((p,q)=>q.v-p.v);S.endX=NOWX;
+    if(dots)for(const p of DATA.polls){const x=isoX(p.m);if(x<x0||x>x1)continue;
+      dot(x,p.r,p.w,p.sat,poll(p.k||p.m+'|'+p.h,p.h,p.f?p.f+(+p.m.slice(0,4)!==YR?' '+p.m.slice(0,4):''):fdate(p.m),p.n?'n = '+Number(p.n).toLocaleString('en-AU'):'',p.k))}
+    for(let i=0;i<=LAST;i++){if(!inWin(i))continue;const ev=EVENTS.find(e=>Math.abs(e.x-GX[i])<3.5/365);
+      S.stops.push({x:GX[i],label:fdate(G[i]),sub:ev?ev.s:'',items:SIDES.map(s=>({color:s.color,tc:s.color,y:DATA[s.k].v[i],v:DATA[s.k].v[i],txt:s.abbr+' '+f1(DATA[s.k].v[i])}))})}
+  }
+  if(!curOnly){
+    const rows=DATA.past,past=[],bands=[],stops=[];
+    /* the record has long silences: a line never bridges months nobody asked (the site's quarter-long gap) */
+    const runs=[];rows.forEach((m,i)=>{if(!i||m[0]-rows[i-1][0]>=.26)runs.push([]);runs[runs.length-1].push(m)});
+    runs.forEach((run,ri)=>{
+      SIDES.forEach(s=>{const vi=s.k==='right'?1:2,ci=s.k==='right'?3:4;
+        const pts=run.map(m=>({x:m[0],y:m[vi],ci:m[ci]}));
+        if(cur&&ri===runs.length-1&&ELX-run[run.length-1][0]<.26)pts.push({x:ELX,y:DATA[s.k].v[0],ci:(DATA[s.k].hi[0]-DATA[s.k].lo[0])/2});
+        if(pts[pts.length-1].x<a-.05||pts[0].x>b+.05)return;
+        if(pts.length<2){S.rings.push({x:pts[0].x,y:pts[0].y,color:s.color,r:2.5});return}
+        past.push({color:s.color,pts,w:long?1.3:2.25,thin:long});
+        if(!long)bands.push({color:s.color,pts:pts.map(p=>({x:p.x,lo:p.y-p.ci,hi:p.y+p.ci}))})});
+      for(const m of run){if(m[0]<a-1e-6||m[0]>b+1e-6||(cur&&m[0]>=ELX))continue;
+        stops.push({x:m[0],label:MONF[+m[5].slice(5)-1]+' '+m[5].slice(0,4),sub:'',items:SIDES.map(s=>{const v=m[s.k==='right'?1:2];return {color:s.color,tc:s.color,y:v,v,txt:s.abbr+' '+f1(v)}}).sort((p,q)=>q.v-p.v)})}
+    });
+    S.lines.unshift(...past);S.bands.unshift(...bands);
+    S.stops=stops.concat(S.stops).sort((p,q)=>p.x-q.x);
+    if(dots)for(const r of DATA.pastPolls){const x=isoX(r[0]);if(x<a||x>b)continue;dot(x,r[2],r[3],r[4],poll(r[0]+'|'+r[1],r[1],fdate(r[0]),''))}
+    if(!cur)S.ends=[];
+  }
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  axis(S,[...S.lines.flatMap(l=>l.pts.map(p=>p.y)),...S.bands.flatMap(q=>q.pts.flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...(S.lines.length?[]:[30,50])],10);
+  return S;
+}
+
+/* ---------- trust in government: the model's monthly line, each survey's readings on its terms ---------- */
+let GLOBAL=false;
+const TC='var(--kb)';
+const ymWords=ym=>MONF[+ym.slice(5,7)-1]+' '+ym.slice(0,4);
+function trustScene(){
+  const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
+  const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
+  const S={x0,x1,ys:10,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[]};
+  const M=T.months.map(m=>({x:m[0],y:m[1],lo:m[2],hi:m[3],ym:m[4]}));
+  const inW=x=>x>=x0-1e-6&&x<=x1+1e-6;
+  /* solid where the line's 95% interval is narrow enough, dashed with a fainter band before (the site's) */
+  const solid=M.filter(m=>m.ym>=T.firstOn),early=M.filter(m=>m.ym<=T.firstOn);
+  if(early.length>1){S.lines.push({color:TC,pts:early,w:long?1.2:1.75,dash:'5 4',thin:true});S.bands.push({color:TC,pts:early,op:.06})}
+  if(solid.length>1){S.lines.push({color:TC,pts:solid,w:long?1.8:2.5,thin:long});S.bands.push({color:TC,pts:solid})}
+  const extras=[];
+  if(GLOBAL)for(const [rows,color,name] of [[T.oecd,'var(--lnp)','OECD average'],[T.edelman,'var(--grn)','Edelman average']]){
+    const pts=rows.map(([x,y])=>({x,y}));if(pts.length>1){extras.push({pts,color,name});S.lines.push({color,pts,w:1.5,dash:'4 4',thin:true})}}
+  const memo=new Map();
+  for(const d of T.dots){if(!inW(d.x))continue;const key=d.who+'|'+d.date;
+    if(!memo.has(key))memo.set(key,{who:d.who,when:d.field||ymWords(d.date),n:d.printed!=null?'printed as '+d.printed+'%':''});
+    S.dots.push({x:d.x,y:d.v,color:TC,poll:memo.get(key),txt:f1(d.v),r:long?2:3})}
+  for(const m of M){if(!inW(m.x))continue;const ev=!long&&EVENTS.find(e=>Math.abs(e.x-m.x)<.042);
+    const items=[{color:TC,tc:TC,y:m.y,v:m.y,txt:'Trust '+f1(m.y)}];
+    for(const e of extras){const v=along(e.pts,m.x);if(v!=null)items.push({color:e.color,tc:e.color,y:v,v,txt:e.name+' '+f1(v)})}
+    S.stops.push({x:m.x,label:ymWords(m.ym),sub:ev?ev.s:'',items})}
+  const last=M[M.length-1];
+  if(cur&&inW(last.x)){S.ends=[{color:TC,y:last.y,name:'Trust',abbr:'Trust',v:last.y}];S.endX=last.x}
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  const shown=S.bands.flatMap(q=>q.pts.filter(p=>inW(p.x)).flatMap(p=>[p.lo,p.hi]));
+  axis(S,[...shown,...S.dots.map(d=>d.y),...extras.flatMap(e=>e.pts.filter(p=>inW(p.x)).map(p=>p.y)),...(shown.length?[]:[20,40])],10);
+  return S;
+}
+
+/* ---------- the hero: one bar, rolled week by week ---------- */
+/*{{SHARED:odometer}}*/
+const pv=$('#pv'),SIDE=['right','wrong'];
+const box=k=>$(`.md-f[data-k="${k}"]`,pv);
+const RV={},DV={},DS={},VS={};
+SIDE.forEach(k=>{const el=box(k);RV[k]=$('.md-v .rv',el);VS[k]=$('.md-v .sr',el);DV[k]=$('.md-d .rv',el);DS[k]=$('.md-d .sr',el);mkOdo(RV[k],false);mkOdo(DV[k],true)});
+const ten=v=>Math.round(v*10);
+let ciMode=false,shown;
+const weekVals=j=>{const o={};for(const k of SIDE){const q=DATA[k];Object.assign(o,{[k]:ten(q.v[j]),[k+'Then']:ten(q.v[0]),[k+'Half']:(q.hi[j]-q.lo[j])*5})}return o};
+const bar=$('#md-bar'),[barY,,barN]=bar.children,uns=$('#md-uns');
+function renderW(snap=false){
+  for(const k of SIDE){const w=shown[k],half=snap?Math.round(shown[k+'Half']):shown[k+'Half'],chg=w-shown[k+'Then'];
+    odoSet(RV[k],w);odoSet(DV[k],ciMode?half:chg,ciMode);
+    VS[k].textContent=f1(w/10)+'%';DS[k].textContent=ciMode?`±${f1(half/10)} percentage points, 95% credible interval`:sgn(chg/10)+' points since the 2025 election'}
+  barY.style.setProperty('--w',(shown.right/10).toFixed(2)+'%');barN.style.setProperty('--w',(shown.wrong/10).toFixed(2)+'%');
+  const u=(1000-shown.right-shown.wrong)/10;
+  uns.textContent=f1(u)+'%';
+  bar.setAttribute('aria-label',`Right direction ${f1(shown.right/10)}%, unsure ${f1(u)}%, wrong track ${f1(shown.wrong/10)}%`);
+}
+const modeBtn=$('#pv-whisker-mode'),modeLabel=$('#pv-whisker-label');
+function paintWhiskMode(){
+  const now=ciMode?'95% credible intervals':'Change since May 2025',next=ciMode?'change since May 2025':'95% credible intervals';
+  modeLabel.textContent=now;modeBtn.title='Switch the small figures to '+next;
+  modeBtn.setAttribute('aria-label','The small figures show '+now.replace(/^C/,'c')+'; switch them to '+next);
+  $('#range-label').textContent=ciMode?'intervals':'since 2025';
+}
+modeBtn.addEventListener('click',ev=>{ev.stopPropagation();ciMode=!ciMode;paintWhiskMode();renderW(true)});
+const nowDate=$('#now-date');
+const setDate=j=>{nowDate.textContent=j===0?'the 2025 election':fdate(G[j])};
+shown=weekVals(LAST);paintWhiskMode();renderW(true);setDate(LAST);
+const rpBtn=$('#replay'),STEP=reduce?120:200;let rpRaf=0;
+function tweenTo(j,ms,then){
+  const from={...shown},to=weekVals(j),e3=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;let t0=null;
+  setDate(j);
+  if(!ms){shown=to;renderW(true);then&&then();return}
+  const f=ts=>{if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/ms),e=e3(t);for(const k in to)shown[k]=from[k]+(to[k]-from[k])*e;renderW();if(t<1)rpRaf=requestAnimationFrame(f);else then&&then()};
+  rpRaf=requestAnimationFrame(f);
+}
+function finish(){pv.classList.remove('live');shown=weekVals(LAST);renderW(true);setDate(LAST);rpOn=false;rpBtn.setAttribute('aria-pressed','false');rpBtn.setAttribute('aria-label','Replay week by week since the 2025 election');paintNow()}
+function stopReplay(){cancelAnimationFrame(rpRaf);tweenTo(LAST,reduce?0:700,finish)}
+rpBtn.addEventListener('click',e=>{
+  e.stopPropagation();if(rpOn){stopReplay();return}
+  rpOn=true;rpBtn.setAttribute('aria-pressed','true');rpBtn.setAttribute('aria-label','Stop the replay');
+  pv.classList.add('live');
+  const f0=dayFrac();
+  tweenTo(0,reduce?0:700,()=>{
+    const span=LAST*STEP;let t0=null,last=0;
+    const step=ts=>{
+      if(t0===null)t0=ts;const t=Math.min(1,(ts-t0)/span),fi=t*LAST,i0=Math.min(LAST,Math.floor(fi)),u=reduce?0:fi-i0;
+      const P=[i0-1,i0,i0+1,i0+2].map(n=>weekVals(Math.max(0,Math.min(LAST,n))));
+      for(const k in P[1]){const [p0,p1,p2,p3]=P.map(q=>q[k]);shown[k]=p1+.5*u*(p2-p0+u*(2*p0-5*p1+4*p2-p3+u*(3*(p1-p2)+p3-p0)))}
+      renderW();
+      const j=Math.min(LAST,Math.round(fi));if(j!==last){setDate(j);last=j}
+      if(!reduce)paintCycle(f0+4*t);
+      if(t<1)rpRaf=requestAnimationFrame(step);else finish();
+    };
+    rpRaf=requestAnimationFrame(step);
+  });
+});
+
+/* ---------- the two charts, each with its own window ---------- */
+function dirSrc(){
+  useWindow(wDir);
+  const [a,b]=winRange(WIN),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
+  const lines=curOnly?'Lines are the model’s weekly estimates':'Before this term the lines are the model’s monthly estimates'+(cur?' (this term is weekly)':'');
+  $('#direction-src').textContent=lines+' of what the average pollster asking this question would find'+bands+'.'
+    +(dots?' Dots are polls as printed; those that force a choice or ask about satisfaction sit apart from the lines.'+(cur?' Tap a dot for its poll'+(curOnly?', a number for its event.':'.'):''):'');
+}
+function trustSrc(){
+  useWindow(wTrust);
+  const [a]=winRange(WIN),early=a<isoX(T.firstOn+'-15');
+  $('#trust-src').textContent='The line is a model of every survey of trust in government, on the Australian Election Study’s terms, with its 95% band'+(early?'; dashed where the estimate is less certain':'')
+    +'. Dots are each survey’s readings moved onto the same terms. Surveys come a few times a year; the latest was '+ymWords(T.now.ym)+'.';
+}
+const dirFirst=DATA.past.length?DATA.past[0][0]:ELX,trustFirst=Math.min(T.months[0][0],T.dots[0].x);
+const make=(id,scene)=>use=>chart({fig:$('#'+id+'-fig'),svg:$('#'+id+'-svg'),scene,use});
+let wDir=null,wTrust=null;
+wDir=windowedChart({section:$('#direction'),lo:dirFirst,src:()=>{if(wDir)dirSrc()},make:make('direction',dirScene)});
+wTrust=windowedChart({section:$('#trust'),lo:trustFirst,src:()=>{if(wTrust)trustSrc()},make:make('trust',trustScene)});
+dirSrc();trustSrc();
+const charts=[wDir.chart,wTrust.chart];
+const glob=$('#cmp-glob');
+glob.addEventListener('click',()=>{GLOBAL=!GLOBAL;glob.setAttribute('aria-checked',String(GLOBAL));$('#glob-key').hidden=!GLOBAL;wTrust.chart.clear();wTrust.chart.draw()});
+
+/* screen-reader tables */
+{const idx=[];let lm=-1;G.forEach((d,i)=>{const m=+d.slice(5,7);if(m!==lm){idx.push(i);lm=m}});if(idx[idx.length-1]!==LAST)idx.push(LAST);
+$('#direction-table').innerHTML='<caption>Estimated national direction, %</caption><tr><th>Week of</th><th>Right direction</th><th>Wrong track</th><th>Unsure</th></tr>'+idx.map(i=>`<tr><td>${fdate(G[i])}</td><td>${f1(DATA.right.v[i])}</td><td>${f1(DATA.wrong.v[i])}</td><td>${f1(DATA.unsure[i])}</td></tr>`).join('');
+$('#trust-table').innerHTML='<caption>Estimated trust in government, %</caption><tr><th>Month</th><th>Trust</th></tr>'+T.months.filter(m=>+m[4].slice(0,4)>=CUR.year).map(m=>`<tr><td>${ymWords(m[4])}</td><td>${f1(m[1])}</td></tr>`).join('')}
+
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
+
+/*{{SHARED:nav}}*/
+}
+</script>
+</body>
+</html>

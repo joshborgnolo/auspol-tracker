@@ -12678,10 +12678,14 @@ if (!JUR && LDM && leaderModel) {
     const avg = (a) => { let t = 0; for (const v of a) t += v; return t / a.length; };
     const NOWKEY = { Albanese: "alb_net", Taylor: "taylor_net", Hanson: "hanson_net" };
     const cur = LDM.rSeries.filter(({ S }) => S.to > ELECTION.date && S.t1 >= eDay);
-    const series = cur.map(({ S }, k) => {
+    const NOWFAV = { Albanese: "alb_fav", Taylor: "taylor_fav", Hanson: "hanson_fav" };
+    const series = cur.map(({ S, fc }, k) => {
       const running = S.outDays.includes(t1);
       const idx = weeks.map((d, i) => i).filter((i) => weeks[i] >= S.t0 && weeks[i] <= S.t1 && isoD(weeks[i]) < S.to);
-      const dr = ldDrawReads(S, LDM.stR, idx.map((i) => weeks[i]), { net: null }, { nDraw: 2000, seed: 20261201 + k }).net.map((a) => a.map((x) => 100 * x));
+      /* favourability is the same draws read through the favourability pollsters' average (the series' fc) */
+      const reads = ldDrawReads(S, LDM.stR, idx.map((i) => weeks[i]), { net: null, ...(fc ? { fav: fc.v } : {}) }, { nDraw: 2000, seed: 20261201 + k });
+      const pts100 = (list) => list.map((a) => a.map((x) => 100 * x));
+      const dr = pts100(reads.net);
       const out = { id: S.id, role: S.role, person: S.person, party: S.party, from: S.from, ...(S.to < "2099" ? { to: S.to } : {}), i0: idx[0], v: [], lo: [], hi: [] };
       idx.forEach((i, j) => {
         const now = running && weeks[i] === t1 ? leaderNow[NOWKEY[S.person]] : null;
@@ -12690,8 +12694,22 @@ if (!JUR && LDM && leaderModel) {
       /* the change since the leader's first week, from the same draws */
       const last = dr[dr.length - 1], diff = last.map((x, i) => x - dr[0][i]);
       out.since = { chg: r1(r1(out.v[out.v.length - 1]) - r1(out.v[0])), lo: r1(q(diff, 0.025)), hi: r1(q(diff, 0.975)) };
-      return { out, dr, idx };
+      /* its line starts with the first favourability question about this leader */
+      let fav = null;
+      const fj = fc ? idx.map((i, j) => j).filter((j) => weeks[idx[j]] >= fc.from) : [];
+      if (fj.length > 1) {
+        const fd = pts100(reads.fav);
+        fav = { id: S.id, role: S.role, person: S.person, party: S.party, from: S.from, ...(S.to < "2099" ? { to: S.to } : {}), i0: idx[fj[0]], v: [], lo: [], hi: [] };
+        for (const j of fj) {
+          const now = running && weeks[idx[j]] === t1 ? leaderNow[NOWFAV[S.person]] : null;
+          fav.v.push(r2t(now ? now.v : avg(fd[j]))); fav.lo.push(r2(now ? now.lo : q(fd[j], 0.025))); fav.hi.push(r2(now ? now.hi : q(fd[j], 0.975)));
+        }
+        const f0 = fd[fj[0]], diff = fd[fj[fj.length - 1]].map((x, i) => x - f0[i]);
+        fav.since = { chg: r1(r1(fav.v[fav.v.length - 1]) - r1(fav.v[0])), lo: r1(q(diff, 0.025)), hi: r1(q(diff, 0.975)) };
+      }
+      return { out, dr, idx, fav };
     });
+    const favSeries = series.map((s) => s.fav).filter(Boolean);
     /* each week's ranking, the primaries' rule: a leader joins the group above
        while the chance that group's first is ahead of them is under 97.5%.
        offices: the prime minister, the opposition leader, One Nation's leader */
@@ -12715,29 +12733,110 @@ if (!JUR && LDM && leaderModel) {
     const onPage = new Map(individualPolls.concat(directionOnlyPolls || [], issuesOnlyPolls || []).map((x) => [dawnKey(x), x]));
     const polls = [], past = [];
     const people = [], pIx = (S) => { const key = S.person + "|" + S.party + "|" + S.role; let i = people.findIndex((p) => p.key === key); if (i < 0) { i = people.length; people.push({ key, person: S.person, party: S.party, role: S.role }); } return i; };
+    const favPolls = [], favPast = [];
     for (const { S } of LDM.rSeries) for (const o of S.obs) {
-      const r = o.raw; if (r.metric !== "approval" || r.format) continue;
-      if (r.date < ELECTION.date) { past.push([isoD(o.t), r.house, pIx(S), r.net]); continue; }
-      const P = POLL_BY_KEY.get(r.date + "|" + r.house), key = dawnKey({ pollster: r.house, released: r.date });
-      polls.push({ ...(onPage.has(key) ? { k: key } : {}), h: r.house, m: isoD(o.t), f: onPage.has(key) ? onPage.get(key).field : null, ...(P && P.sample != null ? { n: P.sample } : {}),
-        s: series.findIndex((s) => s.out.id === S.id), net: r.net, ...(r.R != null && r.W != null ? { r: r.R, w: r.W } : {}) });
+      const r = o.raw, isFav = r.metric === "fav";
+      if (!isFav && (r.metric !== "approval" || r.format)) continue;
+      const house = r.house.replace(" (likeability)", "");
+      if (r.date < ELECTION.date) { (isFav ? favPast : past).push([isoD(o.t), house, pIx(S), r.net]); continue; }
+      const P = POLL_BY_KEY.get(r.date + "|" + house), key = dawnKey({ pollster: house, released: r.date });
+      const at = (isFav ? favSeries : series.map((s) => s.out)).findIndex((s) => s.id === S.id);
+      if (at < 0) continue;
+      (isFav ? favPolls : polls).push({ ...(onPage.has(key) ? { k: key } : {}), h: house, m: isoD(o.t), f: onPage.has(key) ? onPage.get(key).field : null, ...(P && P.sample != null ? { n: P.sample } : {}),
+        s: at, net: r.net });
     }
     const rated = individualPolls.concat(directionOnlyPolls || []).filter((x) => x.appr && (x.appr.alb != null || x.appr.taylor != null || x.appr.hanson != null));
     const newest = rated.slice().sort((a, b) => ((a.published || a.released) < (b.published || b.released) ? 1 : -1))[0];
     const history = leaderModel.ratings.filter((s) => s.from < ELECTION.date).map((s) => ({ id: s.id, role: s.role, person: s.person, party: s.party, from: s.from, ...(s.to ? { to: s.to } : {}),
       m: s.m.filter((m) => m[0] < dx(ELECTION.date)).map((m) => m.slice(0, 3)) })).filter((s) => s.m.length);
     const firstX = Math.min(...history.map((s) => s.m[0][0]));
+    const favHistory = leaderModel.ratings.filter((s) => s.from < ELECTION.date).map((s) => ({ id: s.id, role: s.role, person: s.person, party: s.party, from: s.from, ...(s.to ? { to: s.to } : {}),
+      m: s.m.filter((m) => m[0] < dx(ELECTION.date) && m.length > 3).map((m) => [m[0], m[3], m[4]]) })).filter((s) => s.m.length);
+    const favFirstX = Math.min(...favHistory.map((s) => s.m[0][0]));
+    const byDay = (a, b) => (a[0] < b[0] ? -1 : 1);
     writeAtomic(DAWN_LEAD_ASSET, JSON.stringify({
       v: 1, asOf: isoD(t1), latestPoll: newest ? { h: newest.pollster, ...(newest.published ? { pub: newest.published } : {}) } : null,
       election: { date: ELECTION.date }, weeks: weeks.map(isoD), series: series.map((s) => s.out), rank,
-      polls, history, people: people.map(({ key, ...p }) => p), past: past.sort((a, b) => (a[0] < b[0] ? -1 : 1)), firstX: Math.floor(firstX * 100) / 100,
+      polls, history, people: people.map(({ key, ...p }) => p), past: past.sort(byDay), firstX: Math.floor(firstX * 100) / 100,
+      fav: { series: favSeries, polls: favPolls, history: favHistory, past: favPast.sort(byDay), firstX: Math.floor(favFirstX * 100) / 100 },
       terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
         .sort((a, b) => (a.e < b.e ? -1 : 1)),
       events: events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
     }));
-    console.log(`dawn leaders: ${series.length} leaders this term over ${W} weeks, ${history.length} past runs, ${polls.length} + ${past.length} readings`);
+    console.log(`dawn leaders: ${series.length} leaders this term over ${W} weeks, ${history.length} past runs, ${polls.length} + ${past.length} readings; favourability ${favSeries.length} lines from ${Math.floor(favFirstX)}, ${favPolls.length} + ${favPast.length}`);
   } catch (e) {
     console.error("dawn leaders data: skipped –", e && e.stack ? e.stack : e);
+  }
+}
+/* The mood page (/dawn/mood/): the national-direction model (§5m) week by
+   week since the election, its monthly months before that, and the trust
+   model's monthly line (§5t) with every survey on the line's terms. The
+   weeks come from a second run of the direction model over the same
+   readings, so the draws behind the site's printed figures stay as they
+   are; the last week is the site's figure for today (directionNow). */
+const DAWN_MOOD_ASSET = path.join(OUT_DIR, "dawn-mood.json");
+if (!JUR && DIRM && trustGov && trustGov.model) {
+  try {
+    const t1 = DIR_DAY(LATEST_ISO), eDay = DIR_DAY(ELECTION.date);
+    const weeks = [];
+    for (let d = t1; d > eDay; d -= 7) weeks.unshift(d);
+    weeks.unshift(eDay);
+    const wf = fitDirection(DIRM.readings, { t1, days: weeks, jumps: new Set(DIR_JUMPS.map(DIR_DAY)), nDraw: +(process.env.DIR_NDRAW || 2000) });
+    const r2t = (v) => { let o = r2(v); if (r1(o) !== r1(v)) o = r2(o + (r1(v) > r1(o) ? 0.01 : -0.01)); return o; };
+    const dN = DIRM.directionNow;
+    const wk = { right: { v: [], lo: [], hi: [] }, wrong: { v: [], lo: [], hi: [] }, unsure: [] };
+    for (const d of weeks) {
+      const sh = wf.shares(d), now = d === t1;
+      const R = now ? dN.right : dmean(sh.R), W = now ? dN.wrong : dmean(sh.W);
+      for (const [k, v, a] of [["right", R, sh.R], ["wrong", W, sh.W]]) {
+        const ci = now ? dN[k + "Ci"] : null;
+        wk[k].v.push(r2t(v)); wk[k].lo.push(r2(now ? v - ci : dquant(a, 0.025))); wk[k].hi.push(r2(now ? v + ci : dquant(a, 0.975)));
+      }
+      wk.unsure.push(now ? dN.unsure : r2(Math.max(0, 100 - R - W)));
+    }
+    /* the change since polling day, from the same draws */
+    const a0 = wf.shares(eDay), a1 = wf.shares(t1);
+    const since = Object.fromEntries([["right", "R"], ["wrong", "W"]].map(([k, K]) => {
+      const diff = a1[K].map((v, i) => v - a0[K][i]);
+      return [k, { chg: r1(r1(wk[k].v[wk[k].v.length - 1]) - r1(wk[k].v[0])), lo: r1(dquant(diff, 0.025)), hi: r1(dquant(diff, 0.975)) }];
+    }));
+    const onPage = new Map(individualPolls.concat(directionOnlyPolls || [], issuesOnlyPolls || []).map((x) => [dawnKey(x), x]));
+    /* the dots: every reading the model reads, as printed. A satisfaction
+       question's say so */
+    const SAT = new Set(["McKinnon", "Lowy Institute"]);
+    const polls = [], pastPolls = [];
+    for (const r of DIRM.readings) {
+      const mid = DIR_ISO(r.mid);
+      if (mid >= ELECTION.date) {
+        const key = dawnKey({ pollster: r.house, released: r.end }), P = onPage.get(key);
+        polls.push({ ...(P ? { k: key } : {}), h: r.house, m: mid, f: P && P.field ? P.field : r.label || null, ...(r.sample ? { n: r.sample } : {}), r: r.R, w: r.W, ...(SAT.has(r.house) ? { sat: 1 } : {}) });
+      } else pastPolls.push([mid, r.house, r.R, r.W, SAT.has(r.house) ? 1 : 0]);
+    }
+    /* [x, right, wrong, ± right, ± wrong, month]: Roy Morgan's months alone
+       before March 2022, the pooled months after, up to the election */
+    const past = DIRM.series.filter((m) => m.x < dx(ELECTION.date)).map((m) => [r2(m.x), m.right, m.wrong, m.rightCi, m.wrongCi, m.ym]);
+    const TM = trustGov.model, TS = Object.fromEntries(trustGov.series.map((x) => [x.id, x]));
+    const tDots = Object.entries(TM.adj).flatMap(([sid, rs]) => rs.map((r, i) => {
+      const src = TS[sid], o = src && src.readings[i];
+      return { x: r2(r.x), v: r.v, who: (o && o.survey) || (src ? src.house : sid), date: r.date, ...(o && o.field ? { field: o.field } : {}), ...(o ? { printed: o.v } : {}), ...(o && o.n ? { n: o.n } : {}) };
+    })).sort((a, b) => a.x - b.x);
+    const rated = individualPolls.concat(directionOnlyPolls || []).filter((x) => x.dir);
+    const newest = rated.slice().sort((a, b) => ((a.published || a.released) < (b.published || b.released) ? 1 : -1))[0];
+    writeAtomic(DAWN_MOOD_ASSET, JSON.stringify({
+      v: 1, asOf: DIR_ISO(t1), latestPoll: newest ? { h: newest.pollster, ...(newest.published ? { pub: newest.published } : {}) } : null,
+      election: { date: ELECTION.date }, weeks: weeks.map(DIR_ISO), ...wk, since, polls, past, pastPolls,
+      trust: {
+        ref: TM.ref, now: TM.now, firstOn: TM.firstOn, firstFaint: TM.firstFaint,
+        months: TM.months.filter((m) => m.ym >= TM.firstFaint).map((m) => [r2(m.x), m.v, m.lo, m.hi, m.ym]),
+        dots: tDots, oecd: TM.oecdAvgAdj.map((r) => [r2(r.x), r.v]), edelman: TM.edelmanAvgAdj.map((r) => [r2(r.x), r.v]),
+      },
+      terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
+        .sort((a, b) => (a.e < b.e ? -1 : 1)),
+      events: events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
+    }));
+    console.log(`dawn mood: ${weeks.length} weeks, ${polls.length} + ${pastPolls.length} direction readings, ${tDots.length} trust readings`);
+  } catch (e) {
+    console.error("dawn mood data: skipped –", e && e.stack ? e.stack : e);
   }
 }
 /* The next-polls page: the cadence table the site's projection walks (np-project.js runs in the
