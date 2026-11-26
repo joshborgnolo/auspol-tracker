@@ -12872,6 +12872,123 @@ if (!JUR && DIRM && trustGov && trustGov.model) {
     console.error("dawn mood data: skipped –", e && e.stack ? e.stack : e);
   }
 }
+/* The past cycles page (/dawn/past-cycles/): every term week by week up to
+   the day this term has reached, so "the same point" is the same number of
+   days after each election. Vote measures are changes since the election;
+   leader measures are levels.
+   - votes: past terms from the vote history's weekly readings
+     (data/vote-history-weekly.json: Past cycles' own model, moved toward
+     each closing count), this term from the primary and two-party models;
+     a past two-party figure the model does not carry (before 1987), or a
+     term the weekly file lacks, is read between Past cycles' monthly figures;
+   - leaders: the leadership model (§4m) on the day, for whoever held the
+     office then.
+   A term has no figure past its own end, or before its polls begin. This
+   term's last point is the figure the site quotes today. */
+const DAWN_CYCLES_ASSET = path.join(OUT_DIR, "dawn-cycles.json");
+if (!JUR && LDM && PRIMM && TPM) {
+  try {
+    const dayN = (iso) => Math.floor(Date.parse(iso.slice(0, 10) + "T00:00:00Z") / 86400000);
+    const isoD = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
+    const cur = CYCLE_DEFS.find((c) => c.current);
+    const curStart = dayN(cur.eDate), NOWD = dayN(LATEST_ISO) - curStart;
+    const at = [];
+    for (let d = 0; d < NOWD; d += 7) at.push(d);
+    at.push(NOWD);
+    /* completed calendar months, as a reader counts them ("18 months in") */
+    const monthsIn = (() => { const a = new Date(cur.eDate), b = new Date(LATEST_ISO.slice(0, 10)); let m = (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + b.getUTCMonth() - a.getUTCMonth(); if (b.getUTCDate() < a.getUTCDate()) m--; return m; })();
+    let WK = null;
+    try { WK = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-weekly.json"), "utf8")); } catch { /* monthly figures stand in */ }
+    const vhmInput = createHash("sha1").update(JSON.stringify({ e: D.elections, c: D.cyclePolls, b: D.cyclePollBases })).digest("hex").slice(0, 12);
+    if (WK && WK.input !== vhmInput) { console.warn("dawn cycles: data/vote-history-weekly.json is stale (run node .build/build-vote-history.mjs) – monthly figures stand in"); WK = null; }
+    const termEnd = new Map(CYCLE_DEFS.map((c, i) => [c.year, CYCLE_DEFS[i + 1] ? dayN(CYCLE_DEFS[i + 1].eDate) - dayN(c.eDate) : NOWD]));
+    /* Past cycles' monthly grid read between its months */
+    const between = (c, key, d) => {
+      const m = d / MS_MONTH, i0 = Math.floor(m), val = (k) => { const i = c.months.indexOf(k); return i >= 0 && c[key] ? c[key][i] : null; };
+      const a = val(i0), b = val(i0 + 1);
+      if (a == null) return null;
+      return b == null ? (m - i0 < 0.5 ? a : null) : a + (b - a) * (m - i0);
+    };
+    /* this term's vote at its own days, from its own models (separate draws) */
+    const t1 = dayN(LATEST_ISO), curDays = at.filter((d) => d > 0 && d < NOWD).map((d) => curStart + d);
+    const drawn = drawsAt(PRIMM.fit, curDays, { seed: 20261302 });
+    const P = PM_PARTIES.length, meanOf = (sh, f) => { const n = sh.length / P; let s = 0; for (let i = 0; i < n; i++) for (let q = 0; q < P; q++) s += f[q] * sh[i * P + q]; return (100 * s) / n; };
+    const oneHot = (k) => PM_PARTIES.map((p) => (p === k ? 1 : 0));
+    const eras = cur.tppEras, rivalNow = eras && eras.length ? eras[eras.length - 1].rival : "alp_lnp";
+    const F2 = PM_PARTIES.map((k) => (rivalNow === "alp_on" ? ({ alp: 1, lnp: FP_ON.lnp, grn: FP_ON.grn, oth: FP_ON.oth })[k] ?? 0 : ({ alp: 1, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth })[k] ?? 0));
+    const cnr = rivalNow === "alp_on" ? 0 : FLOW_3CNR;
+    const curVote = (key, d) => {
+      const count = cur[key][0], last = cur[key][cur[key].length - 1];
+      if (d === 0) return count;
+      if (d === NOWD) return last;
+      const sh = drawn.get(curStart + d);
+      if (!sh) return null;
+      return key === "tpp" ? meanOf(sh, F2) + cnr : meanOf(sh, oneHot(key === "primary" ? cur.gov : cur.opp));
+    };
+    const pastVote = (c, key, d) => {
+      if (d > termEnd.get(c.year)) return null;
+      if (d === 0) return c[key][0];
+      const W = WK && WK.terms.find((t) => t.year === c.year);
+      const lane = key === "tpp" ? "tpp" : key === "primary" ? c.gov : c.opp;
+      const row = W && c.voteModel ? W.lanes[lane] : null;
+      if (row) {
+        if (W.first > d + 31) return null;
+        const w = d / 7, i0 = Math.floor(w), a = row[i0], b = row[i0 + 1] ?? a;
+        if (a == null) return null;
+        const v = a + (b - a) * (w - i0);
+        return key === "tpp" && c.gov !== "alp" ? 100 - v : v;
+      }
+      /* before its first poll a monthly line has nothing to read */
+      const first = c.obs[key].indexOf(true);
+      return first < 0 || first * MS_MONTH > d + 31 ? null : between(c, key, d);
+    };
+    /* the leader lines, read on each term's own days */
+    const grids = new Map(CYCLE_DEFS.map((c) => [c.year, at.map((d) => (d > termEnd.get(c.year) ? null : dayN(c.eDate) + d))]));
+    const read = (list, settings, test, shape) => {
+      const out = new Map(CYCLE_DEFS.map((c) => [c.year, at.map(() => null)]));
+      const who = new Map(CYCLE_DEFS.map((c) => [c.year, at.map(() => null)]));
+      for (const { S } of list) {
+        if (!test(S)) continue;
+        const ends = S.obs[0].raw.to || "2099-01-01", starts = S.from || null;
+        const want = [];
+        for (const c of CYCLE_DEFS) grids.get(c.year).forEach((day, i) => {
+          if (day == null || day < S.t0 - MS_MONTH / 2 || day > S.t1 + MS_MONTH / 2 || isoD(day) >= ends || (starts && isoD(day) < starts)) return;
+          want.push([c.year, i, Math.min(S.t1, Math.max(S.t0, day))]);
+        });
+        if (!want.length) continue;
+        const mm = ldMoments(S, settings, want.map((w) => w[2])).main;
+        want.forEach(([year, i], j) => { out.get(year)[i] = shape(mm[j].m); who.get(year)[i] = S.id; });
+      }
+      /* where a line passes to another leader or pairing it breaks: one person's figure never jumps */
+      const breaks = (year) => { const ids = who.get(year); let last = null; const b = []; ids.forEach((id, i) => { if (id == null) return; if (last != null && id !== last) b.push(i); last = id; }); return b; };
+      return { get: (year) => out.get(year), breaks };
+    };
+    const netBy = read(LDM.rSeries, LDM.stR, (S) => S.role === "pm", (m) => 100 * m);
+    const ppmBy = read(LDM.pSeries, LDM.stP, (S) => S.contest === "pm-opp", (m) => 200 / (1 + Math.exp(-m)) - 100);
+    const holderAt = (list, c, name) => { const iso = isoD(dayN(c.eDate) + NOWD); const x = list.find((q) => iso >= q.from && iso < q.to); return x ? x.person : String(name || "").split(/\s*→\s*/).pop() || null; };
+    /* a vote line is a party's: it is named for that party's leader in the office then, or, where the
+       office had passed to the other side (Fraser's caretaker weeks of 1975), for the term's first */
+    const partyLeader = (list, c, party, name) => { const iso = isoD(dayN(c.eDate) + NOWD); const x = list.find((q) => iso >= q.from && iso < q.to); return x && (!x.party || x.party === party) ? x.person : String(name || "").split(/\s*→\s*/)[0] || null; };
+    const round = (a) => a.map((v) => (v == null ? null : r2(v)));
+    const terms = CYCLE_DEFS.map((c) => {
+      const base = { tpp: c.tpp[0], primary: c.primary[0], oppr: c.oppr[0] };
+      const vote = (key) => at.map((d) => { const v = c.current ? curVote(key, d) : pastVote(c, key, d); return v == null || base[key] == null ? null : r2(r1(v) === r1(base[key]) && d === 0 ? 0 : v - base[key]); });
+      const net = netBy.get(c.year).slice(), ppmm = ppmBy.get(c.year).slice();
+      if (c.current) { net[at.length - 1] = leaderNow.alb_net.v; if (LDM.pnow.taylor) ppmm[at.length - 1] = r1(2 * LDM.pnow.taylor.share.v - 100); }
+      const t = { year: c.year, gov: c.gov, opp: c.opp, ...(c.current ? { current: 1 } : {}), eDate: c.eDate,
+        pm: holderAt(LDM.PM_ST, c, c.pm), govLead: partyLeader(LDM.PM_ST, c, c.gov, c.pm), oppParty: partyLeader(LDM.OPP_ST, c, c.opp, c.oppLead),
+        tpp: vote("tpp"), primary: vote("primary"), oppr: vote("oppr"), net: round(net), ppmm: round(ppmm),
+        brk: { net: netBy.breaks(c.year), ppmm: ppmBy.breaks(c.year) } };
+      /* this term's last vote figures are the printed ones, to the tenth */
+      if (c.current) for (const k of ["tpp", "primary", "oppr"]) t[k][at.length - 1] = r1(c[k][c[k].length - 1] - base[k]);
+      return t;
+    }).sort((a, b) => (a.eDate < b.eDate ? -1 : 1));
+    writeAtomic(DAWN_CYCLES_ASSET, JSON.stringify({ v: 2, asOf: LATEST_ISO, election: { date: ELECTION.date }, months: monthsIn, days: at, tppRival: rivalNow === "alp_on" ? "onp" : "lnp", terms }));
+    console.log(`dawn cycles: ${terms.length} terms, ${NOWD} days in (${monthsIn} months), ${at.length} weekly points${WK ? "" : ", past votes read from monthly figures"}`);
+  } catch (e) {
+    console.error("dawn cycles data: skipped –", e && e.stack ? e.stack : e);
+  }
+}
 /* The next-polls page: the cadence table the site's projection walks (np-project.js runs in the
    page, so its dates are always the reader's today, not the build's), each house's MRP or pooled
    series, every house's publication dates for the strips either side of today, and who each house

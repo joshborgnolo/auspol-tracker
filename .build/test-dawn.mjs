@@ -22,7 +22,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
-import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek } from "./dawn/copy.mjs";
+import { votesHead, votesDek, tppStory, flowsHead, flowNote, verdicts, copyFor, leadersHead, leadersDek, leaderMoves, favHead, favDek, moodHead, moodDek, trustHead, trustDek, plainShare, tenthShare, ppmHead, ppmDek, cycleRank, cycleRankLine, cycleHead, cycleDek, cycleLit, cycleChapeau, cycleStatsHtml, cycleNow, CYCLE_STATS } from "./dawn/copy.mjs";
 import { latestPollLine, pollPublishedMs } from "./dawn/poll-meta.mjs";
 import { sharePosterior, credibleBounds, significantChange } from "./dawn/poll-intervals.mjs";
 import { pollHeading } from "./dawn/poll-heading.mjs";
@@ -568,6 +568,63 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(/class="md-bar"[^>]*><i class="y"><\/i><i class="u"><\/i><i class="n"><\/i><\/div>/.test(built) && /\.md-bar\{[^}]*border-radius:999px;overflow:hidden/.test(built), "the hero is one rounded bar: right, unsure, wrong");
   ok(/--yes:#0b8f8c;--no:#8e1f41;--neu:#a7a2ae/.test(built), "turquoise, burgundy and grey");
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html"]) ok(/href="(\.\.\/)?mood\/">mood</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists the mood page`);
+}
+/* past cycles */
+{
+  const C0 = JSON.parse(fs.readFileSync(path.join(A, "dawn-cycles.json"), "utf8")), N = cycleNow(C0);
+  const data = fs.readFileSync(path.join(A, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const defs = JSON.parse(data.match(/const CYCLE_DEFS = (.*);\n/)[1]), site = defs.find((c) => c.current), cur = C0.terms.find((x) => x.current);
+  const last = (a) => a[a.length - 1];
+  for (const k of ["tpp", "primary", "oppr"]) eq(cur[k][N], r1(last(site[k]) - site[k][0]), `this term's ${k} change is the site's`);
+  eq(cur.net[N], last(site.net), "this term's net approval is the site's");
+  eq(cur.ppmm[N], last(site.ppmm), "this term's preferred-PM lead is the site's");
+  /* week by week to the day */
+  ok(C0.days.every((d, i) => (i < N ? d === 7 * i : d >= 7 * (i - 1) && d < 7 * i + 1)), "a point a week, the last at the day this term has reached");
+  eq(C0.days[N], Math.round((Date.parse(C0.asOf.slice(0, 10)) - Date.parse(C0.election.date)) / 864e5), "that day is the newest poll's");
+  ok(C0.terms.every((x) => ["tpp", "primary", "oppr", "net", "ppmm"].every((k) => x[k].length === C0.days.length)), "every term on the same grid");
+  const t49 = C0.terms.find((x) => x.year === 1949), t72 = C0.terms.find((x) => x.year === 1972);
+  ok(t49.primary[N] == null && t72.primary[N] == null, "a term that had ended has no figure");
+  const t74 = C0.terms.find((x) => x.year === 1974);
+  eq(t74.govLead, "Whitlam", "a vote line is the elected government's, not the caretaker's");
+  ok(t74.brk.net.length >= 1, "a line breaks where the leader changes");
+  eq(cycleChapeau(C0), C0.months + " months in:", "said in whole months");
+  /* every branch of the rank */
+  const mk = (vals, now, key = "primary") => ({ months: 18, days: [0, 7], terms: [...vals.map((v, i) => ({ year: 1990 + 3 * i, govLead: "L" + i, pm: "L" + i, oppParty: "O" + i, [key]: [0, v] })), { year: 2025, current: 1, govLead: "Now", pm: "Now", oppParty: "Opp", [key]: [0, now] }] });
+  const line = (vals, now, key) => cycleRankLine(cycleRank(mk(vals, now, key), key || "primary"));
+  eq(line([1, -2, 3, 0], -5), "Worst on record, back to 1990");
+  eq(line([-9, 2, 1, 0], -5), "Worst since 1990 (L0)");
+  eq(line([-9, 2, 1, 0, 3, 4, -6], -5), "Second worst since 1990 (L0)", "only the last term was worse since then");
+  eq(line([1, 2, 3, 0, -6], -5), "Second worst on record, back to 1990");
+  eq(line([-9, -8, -7, 1], -5), "4th worst of 5 terms");
+  eq(line([-9, 2], 1.5), "No decline", "a vote that rose is unranked");
+  eq(line([-9, 20, 30, 10], 4, "net"), "Worst since 1990 (L0)", "a leader figure ranks whatever its sign");
+  eq(line([-5, 2, 3, 4], -5), "Worst since 1990 (L0)", "a tie counts against this term");
+  eq(cycleHead(mk([1, 2, 3], -5), "primary"), "No government on record has lost this much primary vote 18 months in", "the record head");
+  eq(cycleHead(mk([-9, 2, 1, 0], -5), "primary"), "Not since L0’s 1990 term has a government lost this much primary vote 18 months in");
+  eq(cycleHead(mk([-9, 2, 1, 0, -6], -5, "net"), "net"), "Only one prime minister since L0’s 1990 term has been rated lower 18 months in");
+  eq(cycleHead(mk([-9, 2, 1, 0], 2), "primary"), "The government’s primary vote has not fallen since the election, 18 months in");
+  for (const k of ["primary", "net", "ppmm", "oppr"]) {
+    const lit = cycleLit(C0, k), prev = C0.terms.filter((x) => !x.current).slice(-1)[0], r = cycleRank(C0, k);
+    ok(lit[0] === cur.year && lit.includes(prev.year) && (!r.W || lit.includes(r.W.year)) && lit.length === 5 && new Set(lit).size === 5, `${k}: this term, last term and the one the rank names are brought out`);
+  }
+  eq(CYCLE_STATS.map((x) => x.key).join(), "tpp,primary,net,ppmm,oppr", "the hero's five figures");
+  /* the built page */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dawn-cyc-"));
+  fs.mkdirSync(path.join(tmp, "assets", "fonts"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(ROOT, "assets", "fonts"))) if (f.startsWith("commissioner")) fs.writeFileSync(path.join(tmp, "assets", "fonts", f), "");
+  fs.mkdirSync(path.join(tmp, "data"));
+  fs.copyFileSync(path.join(ROOT, "data", "np-report.md"), path.join(tmp, "data", "np-report.md"));
+  const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).cycles, "utf8");
+  fs.rmSync(tmp, { recursive: true, force: true });
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "cycles: every placeholder filled");
+  new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
+  ok(built.includes(cycleStatsHtml(C0)) && built.includes(cycleChapeau(C0)) && ["primary", "net", "ppmm", "oppr"].every((k) => built.includes(cycleHead(C0, k)) && built.includes(cycleDek(C0, k))), "cycles: its words are today's rules");
+  const order = ["primary", "net", "ppmm", "oppr"].map((k) => built.indexOf(`id="${k}-svg"`));
+  ok(order.every((v, i) => v > 0 && (!i || v > order[i - 1])), "the four panels in the asked order");
+  ok(/name="robots" content="noindex"/.test(built), "cycles: unlisted");
+  const weekly = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-weekly.json"), "utf8")), model = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-history-model.json"), "utf8"));
+  eq(weekly.input, model.input, "the weekly history is built from the same inputs as the monthly model");
+  for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html"]) ok(/href="(\.\.\/)?past-cycles\/">past cycles</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists past cycles`);
 }
 /* linked from nowhere */
 {

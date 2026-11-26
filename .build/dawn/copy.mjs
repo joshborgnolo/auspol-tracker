@@ -35,6 +35,8 @@
      the model's own test says so (trust.now.low2020, as the site's head).
      The trust dek names a change on a year ago only when its 95% interval
      excludes zero.
+   - The past cycles page ranks this term against every earlier one at the
+     same month (cycleRank, below).
    - The flow diagram's head reads each contest's verdict today: Labor or
      its rival ahead when the lead is outside the margin (twice the 95%
      interval, on the lead's scale, the flows' doubt added in quadrature
@@ -233,6 +235,103 @@ export function ppmHead(L) {
   return say(first) + " as preferred prime minister" + rest.map((w) => "; " + say(w)).join("");
 }
 export const ppmDek = (L) => "% preferring each as prime minister, of those who chose one of the two, " + sinceElection(L);
+
+/* ---------- past cycles (assets/dawn-cycles.json) ----------
+   Every term at the month this one has reached. "Worst" is lowest: the
+   biggest fall in a vote since the term's election, or the lowest leader
+   figure. A term as low or lower counts against this one. The rules:
+   - a vote that has not fallen: "No decline", unranked;
+   - none as low: "worst on record", back to the first term with a figure;
+   - half or more of past terms as low: its place, "9th worst of 30";
+   - otherwise "worst since" the latest term as low, unless that is the term
+     just before this one, when "second worst since" the one before that
+     (or "second worst on record" where there is none).
+   Ranks compare point estimates, and the page says so. */
+export const CYCLE_STATS = [
+  { key: "tpp", name: "Government’s two-party vote", unit: "points since the election", change: true, who: "govLead" },
+  { key: "primary", name: "Government’s primary vote", unit: "points since the election", change: true, who: "govLead" },
+  { key: "net", name: "PM’s net approval", unit: "net points", who: "pm" },
+  { key: "ppmm", name: "PM’s lead as preferred PM", unit: "points", who: "pm" },
+  { key: "oppr", name: "Opposition’s primary vote", unit: "points since the election", change: true, who: "oppParty" },
+];
+/* the point every term is compared at: the last of the weekly grid, the days this term has run */
+export const cycleNow = (C) => C.days.length - 1;
+export function cycleRank(C, key) {
+  const st = CYCLE_STATS.find((s) => s.key === key), M = cycleNow(C);
+  const at = (t) => ({ year: t.year, who: t[st.who], v: t[key][M] });
+  const cur = at(C.terms.find((t) => t.current));
+  const past = C.terms.filter((t) => !t.current && t[key][M] != null).map(at);
+  const worse = cur.v == null ? [] : past.filter((p) => p.v <= cur.v);
+  const out = { key, cur, past: past.length, first: past.length ? past[0].year : null, worse };
+  if (cur.v == null || !past.length) return { ...out, kind: "unread" };
+  if (st.change && cur.v >= 0) return { ...out, kind: "gain" };
+  if (!worse.length) return { ...out, kind: "record" };
+  if (worse.length * 2 >= past.length) return { ...out, kind: "place", place: worse.length + 1, of: past.length + 1 };
+  const last = worse[worse.length - 1];
+  if (last.year !== past[past.length - 1].year) return { ...out, kind: "since", W: last };
+  return { ...out, kind: "second", W: worse.length > 1 ? worse[worse.length - 2] : null };
+}
+const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
+const tag = (w) => w.year + " (" + w.who + ")";
+export function cycleRankLine(r) {
+  if (r.kind === "record") return "Worst on record, back to " + r.first;
+  if (r.kind === "since") return "Worst since " + tag(r.W);
+  if (r.kind === "second") return r.W ? "Second worst since " + tag(r.W) : "Second worst on record, back to " + r.first;
+  if (r.kind === "place") return ordinal(r.place) + " worst of " + r.of + " terms";
+  if (r.kind === "gain") return "No decline";
+  return "Not yet read";
+}
+export const cycleChapeau = (C) => C.months + (C.months === 1 ? " month in:" : " months in:");
+
+/* each chart's head: the same rank, as a sentence */
+const HEADS = {
+  primary: { who: "government", did: "lost this much primary vote", more: "lost more primary vote", thing: "The government’s primary vote", up: "The government’s primary vote has not fallen since the election" },
+  oppr: { who: "opposition", did: "lost this much primary vote", more: "lost more primary vote", thing: "The opposition’s primary vote", up: "The opposition’s primary vote has not fallen since the election" },
+  net: { who: "prime minister", did: "been rated this low", more: "been rated lower", thing: "The prime minister’s net approval" },
+  ppmm: { who: "prime minister", did: "done this badly as preferred PM", more: "done worse as preferred PM", thing: "The prime minister’s preferred-PM lead" },
+};
+export function cycleHead(C, key) {
+  const r = cycleRank(C, key), H = HEADS[key], when = " " + C.months + " months in";
+  const termOf = (w) => w.who + "’s " + w.year + " term";
+  if (r.kind === "record") return "No " + H.who + " on record has " + H.did + when;
+  if (r.kind === "since") return "Not since " + termOf(r.W) + " has a " + H.who + " " + H.did + when;
+  if (r.kind === "second") return "Only one " + H.who + (r.W ? " since " + termOf(r.W) : " on record") + " has " + H.more + when;
+  if (r.kind === "place") return H.thing + " is the " + ordinal(r.place) + " worst of " + r.of + " terms" + when;
+  if (r.kind === "gain") return H.up + "," + when;
+  return H.thing + ", term by term";
+}
+const CYCLE_DEKS = {
+  primary: "Change in the government’s primary vote since each election, points",
+  net: "The prime minister’s net approval, % approving less % disapproving",
+  ppmm: "The prime minister’s lead as preferred PM, points, among those who chose one of the two",
+  oppr: "Change in the opposition’s primary vote since each election, points",
+};
+export function cycleDek(C, key) {
+  const first = C.terms.find((t) => t[key].some((v, m) => m > 0 && v != null));
+  return CYCLE_DEKS[key] + ": the first " + C.months + " months of every term since " + (first ? first.year : "the record began");
+}
+/* the terms a chart brings out: this one, the last, the one its rank names,
+   then the worst at this month until there are five */
+export function cycleLit(C, key) {
+  const M = cycleNow(C), r = cycleRank(C, key);
+  const have = C.terms.filter((t) => !t.current && t[key][M] != null);
+  const lit = [C.terms.find((t) => t.current).year];
+  const add = (y) => { if (y != null && lit.length < 5 && !lit.includes(y)) lit.push(y); };
+  const before = C.terms.filter((t) => !t.current);
+  add(before.length ? before[before.length - 1].year : null);
+  if (r.W) add(r.W.year);
+  for (const t of [...have].sort((a, b) => a[key][M] - b[key][M])) add(t.year);
+  return lit;
+}
+export function cycleStatsHtml(C) {
+  const h = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const signed = (v) => (v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1));
+  return CYCLE_STATS.map((s) => {
+    const r = cycleRank(C, s.key);
+    const unit = s.key === "tpp" && C.tppRival === "onp" ? "points, now against One Nation" : s.unit;
+    return `<li data-k="${s.key}"><span class="cy-k">${h(s.name)}<b>${h(cycleRankLine(r))}</b></span><span class="cy-v"><b>${signed(r.cur.v)}</b><small>${h(unit)}</small></span></li>`;
+  }).join("");
+}
 
 export function copyFor(D) {
   const st = tppStory(D);

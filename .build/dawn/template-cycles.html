@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Past cycles · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+/* the hero: where this term stands against every other at the same month */
+.cy-chapeau{margin:clamp(10px,2.2vh,22px) 0 0;font:400 clamp(21px,min(6vw,3.4vh),32px)/1.2 var(--serif);color:#f6f4ff}
+.cy-stats{list-style:none;margin:clamp(2px,.8vh,8px) 0 0;padding:0}
+.cy-stats li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:14px;padding:clamp(6px,1.25vh,13px) 0;border-top:1px solid rgb(238 238 255/.16)}
+.cy-stats li:first-child{border-top:0}
+.cy-k{display:flex;flex-direction:column;gap:2px;font-size:clamp(13px,3.6vw,15px);color:rgb(238 238 255/.74);line-height:1.3}
+.cy-k b{font-weight:600;font-size:clamp(15px,4.3vw,19px);color:#fff;line-height:1.25}
+.cy-v{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.cy-v b{font-weight:600;font-size:clamp(24px,min(7.4vw,4.2vh),40px);line-height:1;letter-spacing:-.012em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cy-v small{font-size:11.5px;line-height:1.25;color:rgb(238 238 255/.62);text-align:right}
+@media(max-height:660px){.cy .now-d{font-size:13px}.cy-chapeau{margin-top:6px;font-size:19px}.cy-stats li{padding:3px 0}.cy-k{font-size:12px;gap:0}.cy-k b{font-size:14px}.cy-v b{font-size:22px}.cy-v small{font-size:10.5px}}
+/* the term lines: grey, but for the ones brought out */
+.cyc .fig{margin-top:12px}
+.cy-keys{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:8px;font-size:13px;color:var(--mute)}
+.cy-chip{display:inline-flex;align-items:center;gap:7px;min-height:30px;padding:0 11px;font:500 13px/1.2 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;cursor:pointer}
+.cy-chip i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.cy-chip span{color:var(--mute);font-size:14px;line-height:1}
+.cy-chip[disabled]{cursor:default}
+/* on a phone the terms keep to one row, swiped sideways: stacked, they took the chart's height */
+@media(max-width:599px){.cy-keys{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;touch-action:pan-x pan-y}.cy-keys>*{flex:none}.cy-keys::-webkit-scrollbar{display:none}.cyc .src{font-size:12px}}
+.cy-pick{font:500 13px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:30px;padding:0 10px}
+:root{--cy0:#cf3a2f;--cy1:#7e52a8;--cy2:#10998d;--cy3:#b9770a;--cy4:#2a5cb4;--cy5:#b0306b;--cy6:#4f7d1f;--cy7:#7a5230}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--cy0:#ff6a5c;--cy1:#b892e0;--cy2:#35c3b5;--cy3:#e0a33a;--cy4:#7aa2ff;--cy5:#e66aa2;--cy6:#8fc25a;--cy7:#c49a73}}
+:root[data-theme=dark]{--cy0:#ff6a5c;--cy1:#b892e0;--cy2:#35c3b5;--cy3:#e0a33a;--cy4:#7aa2ff;--cy5:#e66aa2;--cy6:#8fc25a;--cy7:#c49a73}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><span class="soon">seats <small>soon</small></span></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
+    <li><a href="#top" aria-current="page">past cycles</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><span class="soon">pollsters <small>soon</small></span></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero cy" id="top" aria-label="Past cycles">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1 class="sr">auspol tracker: this term against past terms</h1>
+    <h2>Past cycles</h2>
+    <p class="now-d">This term set against earlier ones, each read the same number of days after its election, at {{asOf}} for this one. “Worst” means the biggest fall or the lowest figure.</p>
+    <p class="cy-chapeau">{{chapeau}}</p>
+    <ul class="cy-stats">{{cyStats}}</ul>
+  </div>
+</section>
+
+<section class="sec" id="primary" data-sec="cycles" data-key="primary" aria-labelledby="primary-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes cyc">
+    <header class="hd">
+      <h2 id="primary-h">{{primaryHead}}</h2>
+      <p class="dek">{{primaryDek}}</p>
+    </header>
+    <div class="fig" id="primary-fig"><div class="tip" aria-live="polite"></div><svg id="primary-svg" tabindex="0" aria-label="Line chart of the government’s change in primary vote, one line a term, by months since its election. Up and down arrows move between terms; Enter brings a term out."></svg></div>
+    <div class="cy-keys"></div>
+    <p class="src"></p>
+    <div class="sr"><table></table></div>
+  </div>
+</section>
+
+<section class="sec" id="net" data-sec="cycles" data-key="net" aria-labelledby="net-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes cyc">
+    <header class="hd">
+      <h2 id="net-h">{{netHead}}</h2>
+      <p class="dek">{{netDek}}</p>
+    </header>
+    <div class="fig" id="net-fig"><div class="tip" aria-live="polite"></div><svg id="net-svg" tabindex="0" aria-label="Line chart of the prime minister’s net approval, one line a term, by months since its election. Up and down arrows move between terms; Enter brings a term out."></svg></div>
+    <div class="cy-keys"></div>
+    <p class="src"></p>
+    <div class="sr"><table></table></div>
+  </div>
+</section>
+
+<section class="sec" id="ppmm" data-sec="cycles" data-key="ppmm" aria-labelledby="ppmm-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes cyc">
+    <header class="hd">
+      <h2 id="ppmm-h">{{ppmHead}}</h2>
+      <p class="dek">{{ppmDek}}</p>
+    </header>
+    <div class="fig" id="ppmm-fig"><div class="tip" aria-live="polite"></div><svg id="ppmm-svg" tabindex="0" aria-label="Line chart of the prime minister’s lead as preferred prime minister, one line a term, by months since its election. Up and down arrows move between terms; Enter brings a term out."></svg></div>
+    <div class="cy-keys"></div>
+    <p class="src"></p>
+    <div class="sr"><table></table></div>
+  </div>
+</section>
+
+<section class="sec" id="oppr" data-sec="cycles" data-key="oppr" aria-labelledby="oppr-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes cyc">
+    <header class="hd">
+      <h2 id="oppr-h">{{opprHead}}</h2>
+      <p class="dek">{{opprDek}}</p>
+    </header>
+    <div class="fig" id="oppr-fig"><div class="tip" aria-live="polite"></div><svg id="oppr-svg" tabindex="0" aria-label="Line chart of the opposition’s change in primary vote, one line a term, by months since its election. Up and down arrows move between terms; Enter brings a term out."></svg></div>
+    <div class="cy-keys"></div>
+    <p class="src"></p>
+    <div class="sr"><table></table></div>
+  </div>
+</section>
+
+</main>
+
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const DATA=JSON.parse($('#dawn-data').textContent);
+
+/*{{SHARED:sky}}*/
+
+/* ---------- one line a term, by months since its election ---------- */
+/*{{SHARED:dates}}*/
+/*{{SHARED:format}}*/
+/* the terms run week by week to the day this one has reached; M is that last point, and a point's
+   place along the axis is its days since the election. Said as "18 months", drawn to the week */
+const DAYS=DATA.days,M=DAYS.length-1,SPAN=DAYS[M],MONTH=30.4375,TERMS=DATA.terms,CUR=TERMS.find(t=>t.current),PREV=TERMS.filter(t=>!t.current).slice(-1)[0];
+const BY=Object.fromEntries(TERMS.map(t=>[t.year,t]));
+const COLOURS=8;
+const whoOf=(t,key)=>key==='oppr'?t.oppParty:key==='primary'?t.govLead:t.pm;
+const label=(t,key)=>t.year+' '+(whoOf(t,key)||'');
+const signed=v=>v==null?'–':sgn(v);
+const weeksAt=i=>Math.floor(DAYS[i]/7),monthsAt=i=>Math.floor(DAYS[i]/MONTH+.05);
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+const whenAt=i=>i===0?'election day':'week '+weeksAt(i)+(monthsAt(i)?' ('+plural(monthsAt(i),'month')+' in)':'');
+/* a term's figure and the month it was last read, up to month M */
+const lastRead=(t,key)=>{for(let m=M;m>=0;m--)if(t[key][m]!=null)return {m,v:t[key][m]};return null};
+const NOTES={
+  primary:'Each line is one term’s estimate week by week from the primary vote model, less the government’s vote at the election that opened the term; past terms are moved part of the way toward the result that closed them.',
+  oppr:'Each line is one term’s estimate week by week from the primary vote model, less the opposition’s vote at the election that opened the term; past terms are moved part of the way toward the result that closed them.',
+  net:'Each line is the model’s estimate week by week for whoever was prime minister then, from approval and satisfaction questions. A line starts where the questions do, and breaks where the prime minister changes.',
+  ppmm:'Each line is the model’s estimate week by week of the prime minister’s share less the opposition leader’s, among those who chose one of the two. A line breaks where either leader changes.',
+};
+
+function cycleChart(section){
+  const key=section.dataset.key,fig=$('.fig',section),svg=$('svg',fig),tip=$('.tip',fig),keys=$('.cy-keys',section);
+  const has=TERMS.filter(t=>t[key].some((v,m)=>m>0&&v!=null));
+  /* the terms brought out, each with a colour of its own it keeps: this term's is always the first */
+  const lit=new Map();
+  const free=()=>{for(let i=1;i<COLOURS;i++)if(![...lit.values()].includes(i))return i;return COLOURS-1};
+  for(const y of DATA.lit[key])if(has.some(t=>t.year===y))lit.set(y,y===CUR.year?0:free());
+  let L=null,hover=null,hm=null,timer=0;
+  const col=y=>`var(--cy${lit.get(y)})`;
+  const ys=has.flatMap(t=>t[key].filter(v=>v!=null));
+  const spread=Math.max(...ys,0)-Math.min(...ys,0),step=spread>60?20:spread>25?10:spread>12?5:2;
+  const Y0=Math.floor(Math.min(...ys,0)/step)*step,Y1=Math.ceil(Math.max(...ys,0)/step)*step;
+  function draw(){
+    const W=fig.clientWidth,H=fig.clientHeight;if(!W||!H)return;
+    const narrow=W<560,ticks=[];for(let v=Y0;v<=Y1+1e-9;v+=step)ticks.push(v);
+    const tl=ticks.map(v=>v>0?'+'+v:v<0?'−'+Math.abs(v):'0');
+    const shown=has.filter(t=>lit.has(t.year));
+    const ML=Math.ceil(Math.max(...tl.map(s=>tw(s,'13px'))))+8;
+    const MR=Math.ceil(Math.max(0,...shown.map(t=>tw(narrow?String(t.year):label(t,key),'600 12px'))))+16;
+    const MT=40,MB=24,PW=W-ML-MR,PH=H-MT-MB,x=m=>ML+PW*DAYS[m]/SPAN,y=v=>MT+PH*(Y1-v)/(Y1-Y0);
+    const cut=t=>new Set((t.brk&&t.brk[key])||[]);
+    const path=t=>{let d='',pen=false;const b=cut(t);t[key].forEach((v,m)=>{if(v==null){pen=false;return}if(b.has(m))pen=false;d+=(pen?'L':'M')+P1(x(m))+' '+P1(y(v));pen=true});return d};
+    let s='';
+    ticks.forEach((v,i)=>{const yy=Math.round(y(v))+.5;s+=`<line x1="${ML}" x2="${ML+PW}" y1="${yy}" y2="${yy}" stroke="${v===0?'var(--rule2)':'var(--rule)'}"${v===0?' stroke-dasharray="3 3"':''}/><text x="${ML-8}" y="${yy}" dy=".35em" text-anchor="end">${tl[i]}</text>`});
+    /* months along the foot, and the end named to the week */
+    const endMonths=DATA.months,every=endMonths>24?6:3,xd=d=>ML+PW*d/SPAN,extra=weeksAt(M)-Math.floor(endMonths*MONTH/7);
+    const endWords=endMonths+(narrow?' mo':' months')+(extra>0?(narrow?' '+extra+' wk':', '+plural(extra,'week')):''),endW=tw(endWords,'600 13px');
+    s+=`<text x="${ML}" y="${H-5}" class="dt">Election</text><text x="${P1(ML+PW)}" y="${H-5}" text-anchor="end" class="dt">${endWords}</text>`;
+    for(let m=every;m<=endMonths;m+=every){const px=xd(m*MONTH);if(px+tw(String(m),'13px')/2>ML+PW-endW-10||px<ML+tw('Election','600 13px')+12)continue;s+=`<text x="${P1(px)}" y="${H-5}" text-anchor="middle">${m}</text>`}
+    /* grey first, then those brought out, this term on top */
+    for(const t of has)if(!lit.has(t.year))s+=`<path d="${path(t)}" fill="none" stroke="var(--mute)" stroke-opacity=".28" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" data-y="${t.year}" class="cy-line"/>`;
+    for(const t of [...shown].sort((a,b)=>(a.current?1:0)-(b.current?1:0)))s+=`<path d="${path(t)}" fill="none" style="stroke:${col(t.year)}" stroke-width="${t.current?3.4:2}" stroke-linejoin="round" stroke-linecap="round" data-y="${t.year}" class="cy-line lit"/>`;
+    /* names at the lines' ends, spread so none cover another */
+    const ends=shown.map(t=>{const e=lastRead(t,key);return {t,e,y0:y(e.v)}});
+    relax(ends,narrow?15:30,MT+6,MT+PH-8);
+    for(const q of ends){const ex=x(q.e.m),lx=ML+PW+9;
+      s+=`<circle cx="${P1(ex)}" cy="${P1(y(q.e.v))}" r="${q.t.current?4.5:3}" style="fill:${col(q.t.year)}" stroke="var(--bg)" stroke-width="1.5"/>`;
+      if(Math.abs(q.y-q.y0)>3||q.e.m<M)s+=`<path d="M${P1(ex+4)} ${P1(q.y0)}L${P1(lx-3)} ${P1(q.y)}" fill="none" style="stroke:${col(q.t.year)}" stroke-opacity=".55"/>`;
+      s+=narrow?`<text x="${P1(lx)}" y="${P1(q.y)}" dy=".35em" class="ab" style="fill:${col(q.t.year)}">${q.t.year}</text>`
+        :`<text x="${P1(lx)}" y="${P1(q.y-2)}" class="ab" style="fill:${col(q.t.year)}">${esc(label(q.t,key))}</text><text x="${P1(lx)}" y="${P1(q.y+12)}" style="fill:${col(q.t.year)};font-size:12px">${signed(q.e.v)}${q.e.m<M?', ended week '+weeksAt(q.e.m):''}</text>`}
+    s+='<g class="scrub"></g>';
+    svg.innerHTML=s;
+    L={W,H,ML,PW,MT,PH,x,y,narrow,sg:$('.scrub',svg),path};
+    if(hover!=null)show(hover,hm);else idle();
+  }
+  function setTip(html,cls){tip.className='tip'+(cls?' '+cls:'');tip.style.maxWidth=(L.W-L.ML)+'px';tip.style.whiteSpace='normal';tip.innerHTML=html;tip.style.left=P1(L.ML)+'px'}
+  function idle(){if(!L)return;L.sg.innerHTML='';setTip(`${has.length} terms · ${matchMedia('(pointer:coarse)').matches?'Tap':'Point at'} a line to read it${L.narrow?'':', click it to bring it out or send it back'}`,'idle')}
+  function show(year,m){
+    const t=BY[year];if(!t||!L)return;hover=year;hm=m;
+    const at=m!=null&&t[key][m]!=null?m:lastRead(t,key).m,v=t[key][at],c=lit.has(year)?col(year):'var(--ink)';
+    L.sg.innerHTML=`<path d="${L.path(t)}" fill="none" style="stroke:${c}" stroke-width="${lit.has(year)?4:2.4}" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${P1(L.x(at))}" cy="${P1(L.y(v))}" r="4.5" fill="var(--bg)" style="stroke:${c}" stroke-width="2"/>`;
+    const end=t[key][M];
+    setTip(`<b>${esc(label(t,key))}</b>${t.current?' · this term':''} · ${whenAt(at)}: <b>${signed(v)}</b>${at!==M?(end!=null?` · at week ${weeksAt(M)}: ${signed(end)}`:' · the term ended or went unread before week '+weeksAt(M)):''}`);
+  }
+  const clear=()=>{hover=null;hm=null;idle()};
+  /* the line nearest the pointer at that month, a brought-out one winning a near tie */
+  function hit(cx,cy,reach){
+    const b=svg.getBoundingClientRect(),px=cx-b.left,py=cy-b.top,day=Math.max(0,Math.min(SPAN,(px-L.ML)/L.PW*SPAN));
+    let m0=Math.min(M-1,Math.floor(day/7));const m1=m0+1,u=Math.max(0,Math.min(1,(day-DAYS[m0])/(DAYS[m1]-DAYS[m0]))),mf=m0+u;
+    let best=null,bd=reach;
+    for(const t of has){const a=t[key][m0],z=t[key][m1];if(a==null&&z==null)continue;const v=a==null?z:z==null?a:a+(z-a)*u;const d=Math.abs(L.y(v)-py)-(lit.has(t.year)?3:0);if(d<bd){bd=d;best=t.year}}
+    return best==null?null:[best,Math.round(mf)];
+  }
+  function toggle(year){if(year===CUR.year)return;if(lit.has(year))lit.delete(year);else{if(lit.size>=COLOURS)return;lit.set(year,free())}paintKeys();draw()}
+  svg.addEventListener('pointermove',e=>{if(!L||e.pointerType!=='mouse')return;const h=hit(e.clientX,e.clientY,16);svg.style.cursor=h&&h[0]!==CUR.year?'pointer':'';if(h)show(h[0],h[1]);else clear()});
+  svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')clear()});
+  svg.addEventListener('click',e=>{if(!L)return;const touch=e.pointerType&&e.pointerType!=='mouse',h=hit(e.clientX,e.clientY,touch?22:12);clearTimeout(timer);
+    if(!h){clear();return}
+    if(!touch){toggle(h[0]);show(h[0],h[1]);return}
+    /* a finger reads a line first; a second tap on the same one brings it out or sends it back */
+    if(hover===h[0])toggle(h[0]);show(h[0],h[1]);timer=setTimeout(clear,6000)});
+  svg.addEventListener('keydown',e=>{
+    const k=e.key;if(!L)return;
+    if(k==='ArrowUp'||k==='ArrowDown'){e.preventDefault();const order=[...has].sort((a,b)=>lastRead(b,key).v-lastRead(a,key).v),i=order.findIndex(t=>t.year===(hover??CUR.year));show(order[Math.max(0,Math.min(order.length-1,i+(k==='ArrowUp'?-1:1)))].year,hm)}
+    else if(k==='ArrowLeft'||k==='ArrowRight'){e.preventDefault();const y=hover??CUR.year;show(y,Math.max(0,Math.min(M,(hm??M)+(k==='ArrowLeft'?-1:1))))}
+    else if(k==='Enter'||k===' '){e.preventDefault();if(hover!=null){toggle(hover);show(hover,hm)}}
+    else if(k==='Escape')clear();
+  });
+  /* the brought-out terms, each removable, and a menu for any other */
+  function paintKeys(){
+    const shown=has.filter(t=>lit.has(t.year)).sort((a,b)=>(b.current?1:0)-(a.current?1:0)||b.year-a.year);
+    const rest=has.filter(t=>!lit.has(t.year)).sort((a,b)=>b.year-a.year);
+    keys.innerHTML=shown.map(t=>`<button type="button" class="cy-chip" data-y="${t.year}" style="--c:${col(t.year)}"${t.current?' disabled':` aria-label="Send ${esc(label(t,key))} back to grey"`}><i></i>${esc(label(t,key))}${t.current?', this term':t.year===PREV.year?', last term':''}${t.current?'':'<span aria-hidden="true">×</span>'}</button>`).join('')
+      +(lit.size<COLOURS&&rest.length?`<select class="cy-pick" aria-label="Bring out another term"><option value="">Add a term…</option>${rest.map(t=>`<option value="${t.year}">${esc(label(t,key))}</option>`).join('')}</select>`:'');
+  }
+  keys.addEventListener('click',e=>{const b=e.target.closest('.cy-chip');if(b&&!b.disabled){clear();toggle(+b.dataset.y)}});
+  keys.addEventListener('change',e=>{if(e.target.value){clear();toggle(+e.target.value)}});
+  $('.src',section).textContent=NOTES[key]+' Terms are compared at the same number of days after their elections ('+SPAN+', '+plural(weeksAt(M),'week')+' and '+plural(SPAN%7,'day')+'). Ranks compare these estimates as they stand: terms a point or so apart are effectively level.';
+  $('table',section).innerHTML=`<caption>At ${weeksAt(M)} weeks, points</caption><tr><th>Term</th><th>Figure</th></tr>`+has.filter(t=>t[key][M]!=null).sort((a,b)=>a[key][M]-b[key][M]).map(t=>`<tr><td>${esc(label(t,key))}</td><td>${signed(t[key][M])}</td></tr>`).join('');
+  paintKeys();
+  new ResizeObserver(draw).observe(fig);
+  return {draw};
+}
+const charts=$$('section[data-key]').map(cycleChart);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
+
+/*{{SHARED:nav}}*/
+}
+</script>
+</body>
+</html>

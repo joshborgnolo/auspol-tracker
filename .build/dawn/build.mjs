@@ -15,7 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
@@ -189,12 +189,14 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
      and long charts of the votes page, drawn from the leader, direction and trust models; what the
      pages share is read out of template.html, and chart-windows.js gives each chart its own window */
   const base = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
-  const sunPage = ({ asset, template, dir, fill }) => {
+  const sunPage = ({ asset, template, dir, fill, markup = {}, extra = () => ({}) }) => {
     const src = path.join(assets, asset);
     if (!fs.existsSync(src)) return null;
-    const PG = JSON.parse(fs.readFileSync(src, "utf8"));
+    const raw = JSON.parse(fs.readFileSync(src, "utf8"));
+    const PG = { ...raw, ...extra(raw) };
     const words = { FONT: "/assets/fonts/" + font, asOf: esc(fdate(PG.asOf)), latestPoll: esc(latestPollLine(PG)),
-                    ...Object.fromEntries(Object.entries(fill).map(([k, f]) => [k, esc(f(PG))])) };
+                    ...Object.fromEntries(Object.entries(fill).map(([k, f]) => [k, esc(f(PG))])),
+                    ...Object.fromEntries(Object.entries(markup).map(([k, f]) => [k, f(PG)])) };
     let h = fs.readFileSync(path.join(HERE, template), "utf8")
       .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k))
       .replace("/*{{FILTERSCSS}}*/", "");
@@ -215,7 +217,13 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, ppmHead, ppmDek, favHead: (L) => favHead(L).head, favDek } });
   const moodFile = sunPage({ asset: "dawn-mood.json", template: "template-mood.html", dir: "mood",
     fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek } });
-  return { leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+  const cyclesFile = sunPage({ asset: "dawn-cycles.json", template: "template-cycles.html", dir: "past-cycles",
+    fill: { chapeau: cycleChapeau, primaryHead: (C) => cycleHead(C, "primary"), primaryDek: (C) => cycleDek(C, "primary"), netHead: (C) => cycleHead(C, "net"), netDek: (C) => cycleDek(C, "net"),
+            ppmHead: (C) => cycleHead(C, "ppmm"), ppmDek: (C) => cycleDek(C, "ppmm"), opprHead: (C) => cycleHead(C, "oppr"), opprDek: (C) => cycleDek(C, "oppr") },
+    markup: { cyStats: cycleStatsHtml },
+    /* which terms each chart opens with brought out */
+    extra: (C) => ({ lit: Object.fromEntries(["primary", "net", "ppmm", "oppr"].map((k) => [k, cycleLit(C, k)])) }) });
+  return { cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
