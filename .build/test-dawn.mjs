@@ -306,8 +306,8 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes('label:"all pollsters"'), "the first pollster menu option uses lowercase all pollsters");
   ok(html.includes('<option value="">all voters</option>') && !html.includes('<option value="">All voters</option>'), "the all-voters option is sentence case");
   ok(html.includes('value="${esc(gl)}">${esc(dawnOptionLabel(gl))}</option>'), "menu labels are formatted separately from canonical option values");
-  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('against ${RIV===\'lnp\'?\'the \':\'\'}<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>'), "the margin colours only party names and the lead, not connecting words");
-  ok(html.includes("color:var(--${lead>0?'alp':RIV})") && html.includes("header.style.color='var(--mute)'"), "only the signed lead follows the winner, with neutral connecting words");
+  ok(html.includes('<span data-party="alp" style="color:var(--alp)">Labor</span>') && html.includes('against <span data-party="${RIV}" style="color:var(--${RIV})">${RIV===\'lnp\'?\'the \':\'\'}${FNAME[RIV]}</span>'), "the Sankey margin colours 'the Coalition' as one party label");
+  ok(html.includes("color:var(--${lead>0?'alp':RIV})") && html.includes("header.style.color='var(--mute)'"), "the signed lead follows the winner, with the other connecting words neutral");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
   ok(!html.includes(".skyset") && !html.includes('role="radiogroup" aria-label="Sky"'), "Sky’s Auto, Sunrise and Sunset controls are absent");

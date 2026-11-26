@@ -1405,7 +1405,7 @@ function sankey(rival=RIV,fig=$('#flow-fig'),svg=$('#flow-svg')){
     const lead=lab-50;
     header.hidden=false;
     const margin=lead===0?'level':`<span data-margin style="color:var(--${lead>0?'alp':RIV})">${(lead>0?'+':'')+f1(lead)}</span>`;
-    header.innerHTML=`<span data-party="alp" style="color:var(--alp)">Labor</span> is ${margin} against ${RIV==='lnp'?'the ':''}<span data-party="${RIV}" style="color:var(--${RIV})">${FNAME[RIV]}</span>`;
+    header.innerHTML=`<span data-party="alp" style="color:var(--alp)">Labor</span> is ${margin} against <span data-party="${RIV}" style="color:var(--${RIV})">${RIV==='lnp'?'the ':''}${FNAME[RIV]}</span>`;
     header.style.color='var(--mute)';
   }
   svg.setAttribute('aria-label',`Sankey diagram: after preferences, Labor ${f1(lab)}%, ${FNAME[RIV]} ${f1(100-lab)}%.`);
