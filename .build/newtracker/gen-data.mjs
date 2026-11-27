@@ -3444,6 +3444,43 @@ const trustGov = (() => {
     + ` | best ${JSON.stringify(fit.best)}${fit.edges.length ? " | GRID EDGE " + fit.edges : ""}`);
   return { series, model };
 })();
+/* Life satisfaction stays on each survey's own published terms. Annual
+   sources can name only a year; those dots sit at the middle of that year,
+   while wave and fieldwork labels retain their printed precision. */
+const lifeSat = (() => {
+  if (JUR) return null;
+  let src;
+  try { src = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "life-satisfaction.json"), "utf8")); }
+  catch { return null; }
+  const xOf = (s) => {
+    const [y, m, d] = s.split("-").map(Number);
+    return y + (m ? m - 1 + (d ? (d - 0.5) / 31 : 0.5) : 0.5) / (m ? 12 : 1);
+  };
+  const series = (src.series || []).map((s) => ({
+    ...s,
+    readings: [...s.readings].sort((a, b) => a.date.localeCompare(b.date)).map((r) => ({ ...r, x: xOf(r.date) })),
+  })).filter((s) => s.readings.length);
+  let snapshots = src.snapshots || [];
+  if (!snapshots.length) {
+    try {
+      const demos = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demosau-one-offs.json"), "utf8"));
+      const d = (demos.one_offs || []).find((e) => e.id === "life-satisfaction");
+      const tables = d && d.data.tables || [];
+      const all = tables.find((t) => t.name === "All Respondents");
+      const scores = tables.find((t) => t.name === "Index scores");
+      const score = scores && scores.rows.find((r) => r[0] === "Life Satisfaction Score");
+      if (d && all && score) snapshots = [{
+        id: "demosau-life-satisfaction", house: "DemosAU", scaleMax: 100,
+        date: d.waveDate.slice(0, 7), field: "5 October – 24 November 2025",
+        n: d.sample, v: +score[1], source: d.articleUrl,
+        question: d.question,
+        note: "The five-point answer scale is printed separately from the 0–10 mean surveys; this snapshot is kept on DemosAU’s own 0–100 basis.",
+        distribution: all.rows.map((r) => ({ label: r[0], v: +r[1] })),
+      }];
+    } catch { /* a missing optional snapshot never blocks the series */ }
+  }
+  return series.length || snapshots.length ? { ...src, series, snapshots } : null;
+})();
 const directionStates = (() => {
   if (!SEC_STATES?.series) return null;
   // the states bank keys by month; the tip row resolves the wave-END month
@@ -12022,6 +12059,7 @@ window.AUSPOL = (function () {
   const directionStateNote = ${JSON.stringify(directionStateNote)};
   /* §5t: trust in the federal government, hand-filed, never pooled */
   const trustGov = ${JSON.stringify(trustGov)};
+  const lifeSat = ${JSON.stringify(lifeSat)};
   const directionHouseEffects = ${JSON.stringify(DIRM ? DIRM.houseEffects : { right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
   /* Ipsos' Global Average moved onto the panel's terms by Ipsos's lean on
      each wave's day (§5m), the main chart's dashed reference; null on /vic/ */
@@ -12351,7 +12389,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, tppLin, pubLine, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
+    agg2pp, aggPrimary, tppLin, pubLine, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, lefPollMiss, flowTables, flowHistory, primaryHistory, twoPPHistory, informalHistory, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, flowForced, direction, directionStates, directionGroups, directionStateNote, trustGov, lifeSat, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, dirHistory, directionPre, directionWorld, directionWorldAdj, directionLowy, favHouses, apprHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, leaderLead, leaderModel, undecided, confidence, confHistory, voteHistory, confDeep, macro, firmness, decidednessHistory, onSources, switchFlows, demographics, demoIncome, demoTrend, demoGaps, demoStateElection, demoLocElection, demoAes, demoElection, demoVote, demoGroups, issues, accuracy, electionLean,
     extAgg,
     individualPolls, pollBases, pollBaseOf, sampleTxt, sampleEl, pollsterTable, effTbcUrls, latest, cycles, events, showWorking, changelog, aggSpec, primModel, pvHouses,
     undecidedCellOf: (p) => {

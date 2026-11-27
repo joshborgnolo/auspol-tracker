@@ -1,0 +1,147 @@
+{
+  "_about": "Life satisfaction for the National mood section, hand-filed from primary reports. Every mean retains its survey's own scale, sample and panel; nothing is pooled, lean-adjusted or rescaled. Readings with only a year sit at mid-year. `quote` is the verbatim source sentence or table text proving that reading; `source` identifies it. DemosAU's separate 0–100 snapshot is derived from demosau-one-offs.json by gen-data, not duplicated here.",
+  "series": [
+    {
+      "id": "anupoll",
+      "house": "ANUpoll",
+      "shortMethod": "Latest reported wave",
+      "scaleMax": 10,
+      "role": "line",
+      "source": "https://polis.cass.anu.edu.au/research/publications/steady-not-recovering-wellbeing-democratic-attitudes-and-interpersonal-trust",
+      "question": "Overall, how satisfied are you with life as a whole these days?",
+      "answers": "0 means not at all satisfied and 10 means completely satisfied.",
+      "method": "ANUpoll’s national adult mean, not the ABS/HILDA series. The probability-recruited Life in Australia panel ran until January 2024; the opt-in ORU online panel began in October 2024. The empty months are intentional: only waves whose exact means appear in a primary text are filed, never values eyeballed from ANU’s image-only trend chart.",
+      "panels": [
+        {
+          "id": "lia",
+          "label": "Life in Australia",
+          "note": "ANU’s probability-recruited panel"
+        },
+        {
+          "id": "oru",
+          "label": "ORU online panel",
+          "note": "ANUpoll’s opt-in panel from October 2024"
+        }
+      ],
+      "readings": [
+        {
+          "date": "2020-04",
+          "v": 6.52,
+          "n": 3155,
+          "panel": "lia",
+          "quote": "Average life satisfaction reached a then-low of 6.52 in April 2020, fluctuated during the COVID-19 pandemic, and rose back to 6.78 by January 2023.",
+          "source": "https://www.anu.edu.au/news/all-news/most-australians-believe-life-was-better-50-years-ago-anupoll"
+        },
+        {
+          "date": "2023-01",
+          "v": 6.78,
+          "panel": "lia",
+          "quote": "Average life satisfaction reached a then-low of 6.52 in April 2020, fluctuated during the COVID-19 pandemic, and rose back to 6.78 by January 2023.",
+          "source": "https://www.anu.edu.au/news/all-news/most-australians-believe-life-was-better-50-years-ago-anupoll"
+        },
+        {
+          "date": "2026-03",
+          "v": 6.22,
+          "n": 3662,
+          "field": "11–26 March 2026",
+          "panel": "oru",
+          "quote": "Figure 1 shows that life satisfaction has remained steady between March and June 2026, continuing at a low value of 6.22. This is identical to the March 2026 estimate to two decimal places; there has clearly been no increase in life satisfaction over the period.",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2026/7/Steady-but-not-recovering---June-ANUpoll---For-web.pdf"
+        },
+        {
+          "date": "2026-06",
+          "v": 6.22,
+          "n": 3543,
+          "field": "18 June – 6 July 2026",
+          "panel": "oru",
+          "quote": "Figure 1 shows that life satisfaction has remained steady between March and June 2026, continuing at a low value of 6.22. This is identical to the March 2026 estimate to two decimal places; there has clearly been no increase in life satisfaction over the period.",
+          "source": "https://polis.cass.anu.edu.au/files/docs/2026/7/Steady-but-not-recovering---June-ANUpoll---For-web.pdf"
+        }
+      ]
+    },
+    {
+      "id": "hilda",
+      "house": "HILDA",
+      "shortMethod": "HILDA / ABS custom analysis",
+      "scaleMax": 10,
+      "role": "line",
+      "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction",
+      "questionSource": "https://hildaodd.app.unimelb.edu.au/VariableDetails.aspx?varn=losat&varw=1",
+      "question": "All things considered, how satisfied are you with your life?",
+      "answers": "0 to 10, where 0 means not at all satisfied and 10 completely satisfied.",
+      "method": "Annual Household, Income and Labour Dynamics in Australia Survey readings, printed to one decimal in the ABS’s custom analysis. HILDA tracks the same households over time rather than taking a fresh ANUpoll sample; 2014–2023 is the run published on this ABS table, not the complete HILDA history.",
+      "readings": [
+        { "date": "2014", "v": 7.9, "quote": "2014\n7.6\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2015", "v": 7.9, "quote": "2015\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2016", "v": 7.9, "quote": "2016\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2017", "v": 7.9, "quote": "2017\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2018", "v": 7.9, "quote": "2018\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2019", "v": 7.9, "quote": "2019\n7.5\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2020", "v": 7.9, "quote": "2020\n7.2\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2021", "v": 7.9, "quote": "2021\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2022", "v": 7.9, "quote": "2022\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" },
+        { "date": "2023", "v": 7.9, "quote": "2023\n7.9", "source": "https://www.abs.gov.au/statistics/measuring-what-matters/measuring-what-matters-themes-and-indicators/overall-life-satisfaction" }
+      ]
+    },
+    {
+      "id": "abs-gss",
+      "house": "ABS General Social Survey",
+      "shortMethod": "General Social Survey",
+      "scaleMax": 10,
+      "role": "dot",
+      "source": "https://www.abs.gov.au/statistics/people/people-and-communities/general-social-survey-summary-results-australia/latest-release",
+      "question": "Overall, on a scale from 0 to 10, how satisfied are you with life as a whole these days?",
+      "answers": "0 means not at all satisfied and 10 completely satisfied.",
+      "method": "The ABS General Social Survey, Australians aged 15 and over. Only 2014, 2019, 2020 and 2025 are printed here. The 2020 survey moved from face-to-face to online and telephone interviewing during COVID-19, which the ABS says may have affected comparisons; 2025 fieldwork was in May and June.",
+      "readings": [
+        {
+          "date": "2014",
+          "v": 7.6,
+          "quote": "overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+        },
+        {
+          "date": "2019",
+          "v": 7.5,
+          "quote": "overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+        },
+        {
+          "date": "2020",
+          "v": 7.2,
+          "quote": "overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+        },
+        {
+          "date": "2025",
+          "v": 7.1,
+          "field": "May – June 2025",
+          "quote": "Of Australians aged 15 years and over in 2025: overall life satisfaction was 7.1 out of 10, similar to 2020 (7.2), but lower than 2019 (7.5) and 2014 (7.6)",
+          "source": "https://www.abs.gov.au/statistics/people/people-and-communities"
+        }
+      ]
+    },
+    {
+      "id": "scanlon",
+      "house": "Scanlon Mapping Social Cohesion",
+      "shortMethod": "Mapping Social Cohesion",
+      "scaleMax": 10,
+      "role": "dot",
+      "source": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2024-Report.pdf",
+      "question": "Respondents ranked their overall life satisfaction on a scale of 0 to 10.",
+      "paraphrase": true,
+      "answers": "0 to 10; the report prints the national mean and the share giving each score band, not a categorical satisfied share.",
+      "method": "The 2024 Mapping Social Cohesion survey, 7,965 adults in July 2024, 99% online and 1% by telephone through the probability-recruited Life in Australia panel. This is Scanlon’s own reading, not the ABS figures its reports also quote.",
+      "readings": [
+        {
+          "date": "2024-07",
+          "v": 6.8,
+          "n": 7965,
+          "field": "July 2024",
+          "quote": "In 2024, survey respondents were also asked to rank their overall life satisfaction on a scale of 0 to 10. The average score respondents gave was 6.8.",
+          "source": "https://scanloninstitute.org.au/wp-content/uploads/Mapping-Social-Cohesion-2024-Report.pdf"
+        }
+      ]
+    }
+  ]
+}

@@ -1627,6 +1627,11 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
+body.rd .rd-life-snapshot { margin-top: 18px; }
+body.rd .rd-life-snapshot .rd-dir-figs { margin-top: 18px; }
+body.rd .rd-life-dist { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px 22px; margin: 16px 0; font-size: 13px; }
+body.rd .rd-life-dist > div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+body.rd .rd-life-dist b { font-variant-numeric: tabular-nums; }
 /* the group select and the printed state-extremes note beside/under the
    chart card (the select sits in the chead's right slot by flex) */
 body.rd .rd-dir-chart .rd-chead .rd-pv-sel { flex-shrink: 0; }

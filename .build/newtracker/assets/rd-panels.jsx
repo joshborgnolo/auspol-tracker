@@ -2370,35 +2370,151 @@ function rdRoughPts(v) {
   const tens = Math.floor(a / 10) * 10;
   return a - tens >= 2 ? "more than " + tens : "about " + tens;
 }
-/* The National mood section (2026-11-02, was "National direction"): the
-   direction question and trust in the federal government, two views of one
-   mood behind a tab row, as The issues section holds its two. Direction is
-   the data-rich view and opens first; Trust rests on far fewer readings and
-   says so. Without trust data the section is the direction view alone. */
+/* The National mood section: direction, trust in the federal government,
+   and life satisfaction on separate survey-by-survey terms. */
 function RdDirection({ rangeId }) {
   const { D } = window.AP;
   const narrow = useNarrow(MQ_PHONE);
   const [view, setView] = React.useState("direction");
   if (!D.direction.length) return null;
   const hasTrust = !!(D.trustGov && D.trustGov.series && D.trustGov.series.length);
-  const v = hasTrust ? view : "direction";
+  const hasLife = !!(D.lifeSat && D.lifeSat.series && D.lifeSat.series.length);
+  const v = (view === "trust" && hasTrust) || (view === "life" && hasLife) ? view : "direction";
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   const tQuestion = "Trust and confidence in the federal government";
   const tHouses = hasTrust ? rdList(D.trustGov.series.filter((s) => !/-avg$/.test(s.id)).map((s) => s.house)) : "";
+  const lifeHouses = hasLife ? rdList(D.lifeSat.series.map((s) => s.house)) : "";
   const meta = v === "direction"
     ? (narrow ? question : question + (asked ? ", " + asked : ""))
-    : (narrow ? tQuestion : tQuestion + ", " + tHouses);
+    : v === "trust" ? (narrow ? tQuestion : tQuestion + ", " + tHouses)
+    : (narrow ? "Life satisfaction" : "Life satisfaction, " + lifeHouses);
   return (
     <RdSec id="direction" cls="rd-dir" title="National mood" meta={meta}>
-      {hasTrust && (
+      {(hasTrust || hasLife) && (
         <RdTabs swipe value={v} onChange={setView} ariaLabel="View" className="rd-is-tabs rd-mood-tabs"
-                options={[{ id: "direction", label: "Direction" }, { id: "trust", label: "Trust in government" }]} />
+                options={[{ id: "direction", label: "Direction" },
+                  ...(hasTrust ? [{ id: "trust", label: "Trust in government" }] : []),
+                  ...(hasLife ? [{ id: "life", label: "Life satisfaction" }] : [])]} />
       )}
       <RdCrossfade k={v}>
-        {v === "direction" ? <RdDirectionView rangeId={rangeId} /> : <RdTrust />}
+        {v === "direction" ? <RdDirectionView rangeId={rangeId} /> : v === "trust" ? <RdTrust /> : <RdLifeSatisfaction />}
       </RdCrossfade>
     </RdSec>
+  );
+}
+
+const LIFE_SAT_COLOR = {
+  anupoll: "var(--mood-pos)",
+  hilda: "var(--confidence-main)",
+  "abs-gss": "var(--confidence-alt)",
+  scanlon: "var(--macro-cpi)",
+};
+function lifeWhen(s, r) {
+  return r.field || (r.date.length === 4 ? r.date : trustMonth(r.date.slice(0, 7)));
+}
+function RdLifeSatisfaction() {
+  const { D } = window.AP;
+  const narrow = useNarrow(MQ_PHONE);
+  const L = D.lifeSat;
+  const S = L.series.filter((s) => s.scaleMax === 10);
+  const ref = S.find((s) => s.id === "anupoll") || S[0];
+  const readings = ref.readings;
+  const now = readings[readings.length - 1], prev = readings[readings.length - 2];
+  const delta = prev ? now.v - prev.v : null;
+  const change = delta == null ? "The first published wave in this series."
+    : Math.abs(delta) < 0.005 ? "Unchanged from " + lifeWhen(ref, prev) + "."
+    : (delta < 0 ? "Down " : "Up ") + Math.abs(delta).toFixed(2) + " points since " + lifeWhen(ref, prev) + ".";
+  const head = ref.house + " life satisfaction is " + now.v.toFixed(2) + " out of 10";
+  const dek = change + " Each survey is published on its own terms: compare their directions, not their levels, and never blend them into one score.";
+  const lineRuns = S.filter((s) => s.role === "line").flatMap((s) => {
+    const runs = s.panels
+      ? s.panels.map((p) => ({ ...p, readings: s.readings.filter((r) => r.panel === p.id) }))
+      : [{ id: "all", readings: s.readings }];
+    return runs.filter((run) => run.readings.length >= 2).map((run, i) => ({
+      s, run, i, runs,
+    }));
+  });
+  const chartSeries = lineRuns.map(({ s, run, i, runs }) => ({
+    id: s.id + "-" + run.id,
+    label: s.house,
+    color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)",
+    points: run.readings.map((r) => ({ x: r.x, y: r.v, raw: r })),
+    rdWidth: s.id === "anupoll" ? 2.5 : 2,
+    endCap: false,
+    smooth: false,
+    endLabel: narrow || i !== runs.length - 1 ? null : s.house,
+  }));
+  const dots = S.flatMap((s) => s.readings.map((r) => ({
+    x: r.x, y: r.v, raw: r.v,
+    color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)",
+    label: s.house,
+    hollow: s.role !== "line" || (r.panel && r.panel !== "oru"),
+    size: s.role === "line" ? 1.2 : 1.5,
+    meta: { pollster: s.house, dateLabel: lifeWhen(s, r), sample: r.n || null },
+  })));
+  const x0 = Math.floor(Math.min(...dots.map((d) => d.x)));
+  const x1 = Math.max(...dots.map((d) => d.x)) + 0.7;
+  const vals = dots.map((d) => d.y);
+  const y0 = Math.floor((Math.min(...vals) - 0.15) * 2) / 2;
+  const y1 = Math.ceil((Math.max(...vals) + 0.15) * 2) / 2;
+  const yTicks = [];
+  for (let v = y0; v <= y1 + 0.01; v += 0.5) yTicks.push(v);
+  const xTicks = [];
+  for (let y = Math.ceil(x0 / 5) * 5; y < x1; y += narrow ? 10 : 5) xTicks.push({ x: y, label: String(y) });
+  const snapshots = L.snapshots || [];
+  return (
+    <>
+      <RdHed head={head} dek={dek} />
+      <div className="rd-dir-figs">
+        <div className="rd-dir-fig"><span className="rd-dir-v" style={{ color: LIFE_SAT_COLOR[ref.id] || "var(--ink-3)" }}>{now.v.toFixed(2)}<span className="rd-dir-pct">/10</span></span>
+          <span className="rd-dir-k" style={{ color: LIFE_SAT_COLOR[ref.id] || "var(--ink-3)" }}>{ref.house} mean life satisfaction</span></div>
+        <div className="rd-dir-fig rd-r rd-trust-meta"><span>{lifeWhen(ref, now)}</span><span>{now.n ? "n = " + now.n.toLocaleString() : ref.shortMethod || "Published national mean"}</span></div>
+      </div>
+      <div className="card rd-card rd-dir-chart rd-trust-chart rd-life-chart">
+        <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Life satisfaction, mean score /10" : "Life satisfaction, mean score /10, each published survey on its own terms"}</span></div>
+        {narrow && <RdKey className="rd-tpp-legend" items={S.map((s) => ({ kind: s.role === "line" ? "line" : "dot-open", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", label: s.house }))} />}
+        <TrendChart key="rd-life-satisfaction" heightPx={narrow ? 280 : 360}
+          padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 100, t: 40, b: 30 }}
+          xDomain={[x0, x1]} yDomain={[y0, y1]} yTicks={yTicks} yTickFmt={(v) => (v === y1 ? v.toFixed(1) + "/10" : v.toFixed(1))}
+          xTicks={xTicks} baseline series={chartSeries} scatter={dots} fmt={(v) => String(v)}
+          copy={{ title: "Life satisfaction", span: x0 + "–" + Math.floor(x1),
+            sub: head + ". Published national mean scores on 0–10 scales.",
+            caption: "Lines join readings within a survey and panel; open dots are single or differently sampled surveys. Each source retains its published level; there is no pooled score.",
+            legend: S.map((s) => ({ label: s.house, color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", kind: s.role === "line" ? "line" : "ring" })) }}
+        />
+        <RdKey className="rd-ckey" items={S.map((s) => ({ kind: s.role === "line" ? "line" : "dot-open", color: LIFE_SAT_COLOR[s.id] || "var(--ink-3)", label: s.house + (s.panels ? " (open dots: Life in Australia panel)" : "") }))} />
+      </div>
+      <details className="view-how hint-how rd-dirq">
+        <summary>How each survey asks</summary>
+        <div className="rd-dirq-grid">
+          {S.map((s) => (
+            <section className="rd-dirq-house" key={s.id} id={"life-" + s.id}>
+              <h5 className="rd-dirq-name">{s.house} <a className="rd-link" href={s.source} target="_blank" rel="noopener noreferrer">source<span className="plink-mark">↗</span></a></h5>
+              <p className="rd-dirq-q">{s.paraphrase ? s.question : "“" + s.question + "”"}</p>
+              <p className="rd-dirq-l"><span className="rd-dirq-k">Answers</span>{s.answers}</p>
+              <p className="rd-dirq-l"><span className="rd-dirq-k">Method</span>{s.method}</p>
+            </section>
+          ))}
+        </div>
+      </details>
+      {snapshots.map((s) => (
+        <section className="card rd-card rd-life-snapshot" key={s.id}>
+          <div className="rd-chead"><span className="rd-chead-t">{s.house} life satisfaction, a separate 0–100 score</span></div>
+          <div className="rd-dir-figs">
+            <div className="rd-dir-fig"><span className="rd-dir-v">{s.v.toFixed(1)}<span className="rd-dir-pct">/100</span></span>
+              <span className="rd-dir-k">{s.house} Life Satisfaction Score</span></div>
+            <div className="rd-dir-fig rd-r rd-trust-meta"><span>{s.field || lifeWhen(s, s)}</span><span>{s.n ? "n = " + s.n.toLocaleString() : ""}</span></div>
+          </div>
+          <p>{s.note}</p>
+          <div className="rd-life-dist">
+            {(s.distribution || []).map((r) => <div key={r.label}><span>{r.label}</span><b>{r.v.toFixed(1)}%</b></div>)}
+          </div>
+          <p><a className="rd-link" href={s.source} target="_blank" rel="noopener noreferrer">{s.house} report and cohort breakdowns<span className="plink-mark">↗</span></a></p>
+        </section>
+      ))}
+      <RdFoot how={{ term: "life-satisfaction", from: "National mood" }}>No pooled score: the chart keeps each published mean separate. DemosAU’s 0–100 index sits outside the 0–10 chart rather than being rescaled.</RdFoot>
+    </>
   );
 }
 
