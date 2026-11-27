@@ -12640,7 +12640,8 @@ const phoneMQ = typeof matchMedia === "function" ? matchMedia("(max-width: 860px
 const SEARCH_EL = $(".mp-search");
 function placeSearch() {
   const sx = SEARCH_EL, stage = $("#stage"), el = $("#legend");
-  if (!sx || !stage || !el) return;
+  // (the Dawn page seats the field itself, with its two menus)
+  if (!sx || !stage || !el || dawnOn()) return;
   // full screen keeps it atop the map: in the top bar's plate, by the way out (a laptop's and a phone's alike)
   placeFoot();
   if (FS.on && FS.sbox) {

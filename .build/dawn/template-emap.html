@@ -54,6 +54,12 @@ html.mp-dawn .mp .mp-legend.dm-slot{display:block;order:0;min-height:0;margin:0;
 .dm-map #dm-opts{margin-top:8px}
 .dm-map #dm-opts .lg-sub{display:flex;flex-flow:row wrap;align-items:baseline;gap:2px 16px;margin:0;padding:0;border:0}
 .dm-map #dm-opts .lg-sub .lg-t{width:auto;font-size:13.5px;color:var(--ink2)}
+/* the search, a Dawn pill with its matches dropping over the map; 16px, or iOS zooms the page to type */
+.mp .dm-ctl .mp-search{grid-column:1/-1;order:0;width:100%;margin:0;align-self:end;z-index:5}
+.mp .dm-ctl .mp-search label{display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;border:1px solid var(--rule);border-radius:999px;background:var(--bg);color:var(--mute)}
+.mp .dm-ctl .mp-search label:focus-within{border-color:var(--ink2)}
+.mp .dm-ctl .mp-search input{flex:1;min-width:0;height:36px;font:500 16px/1 var(--sans);color:var(--ink)}
+.mp .dm-ctl .sugg{top:44px;max-height:min(420px,48vh);border-radius:16px;border-color:var(--rule)}
 /* the cities, as Dawn's chips */
 .mp #dm-places .lg-jump{display:flex;flex-wrap:nowrap;gap:6px;margin:8px 0 0;overflow-x:auto;scrollbar-width:none;touch-action:pan-x pan-y}
 #dm-places .lg-jump::-webkit-scrollbar{display:none}
@@ -63,7 +69,7 @@ html.mp-dawn .mp .mp-legend.dm-slot{display:block;order:0;min-height:0;margin:0;
 .dm-view .mp-stage,.dm-view.mp-view .mp-stage{flex:1 1 0;height:auto;min-height:200px;border-radius:16px;overflow:hidden;border:1px solid var(--rule)}
 html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border-color:var(--rule)}
 /* what the Dawn page leaves to the full map */
-.mp-search,.dm-view #legend,.dm-view #frames-jump,.dm-view #time,.dm-view #mapfoot,.mp-off,.mp-zoom .fs-btn,.mp-zoom [data-fs]{display:none!important}
+.dm-view #legend,.dm-view #frames-jump,.dm-view #time,.dm-view #mapfoot,.mp-off,.mp-zoom .fs-btn,.mp-zoom [data-fs]{display:none!important}
 /* how it's drawn: one segmented row under the map */
 .dm-foot{margin-top:8px}
 .mp #dm-draw .lg-draw{display:flex;flex-wrap:nowrap;align-items:center;gap:0;margin:0;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
@@ -88,8 +94,8 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
 .mp .dm-notes.none{display:none}
 .mp .dm-notes .lg-note,.mp .dm-notes .lg-undrawn{display:block;margin:0 0 6px;font-size:13px;line-height:1.45;color:var(--mute)}
 .dm-full{display:inline-block;margin-top:12px;color:var(--ink);font-weight:600;font-size:13.5px}
-@media(min-width:900px){.dm-ctl{grid-template-columns:repeat(2,minmax(0,16em))}#dm-draw .lg-draw{max-width:560px;margin:0 auto}.dm-map h2{min-height:1.06em}}
-@media(max-height:700px){.dm-ctl label>span:first-child{display:none}.dm-ctl{margin-top:8px}.dm-ctl .pick select{height:34px;background-position:calc(100% - 17px) 15px,calc(100% - 12px) 15px}#dm-places{display:none}.dm-view .mp-stage,.dm-view.mp-view .mp-stage{min-height:150px}.dm-more{height:28px;margin-top:2px}}
+@media(min-width:900px){.dm-ctl{grid-template-columns:repeat(2,minmax(0,16em)) minmax(0,22em)}.mp .dm-ctl .mp-search{grid-column:3;justify-self:end;width:100%}#dm-draw .lg-draw{max-width:560px;margin:0 auto}.dm-map h2{min-height:1.06em}}
+@media(max-height:700px){.dm-ctl label>span:first-child{display:none}.dm-ctl{margin-top:8px;row-gap:6px}.mp .dm-ctl .mp-search label{height:34px}.mp .dm-ctl .mp-search input{height:32px}.dm-ctl .pick select{height:34px;background-position:calc(100% - 17px) 15px,calc(100% - 12px) 15px}#dm-places{display:none}.dm-view .mp-stage,.dm-view.mp-view .mp-stage{min-height:150px}.dm-more{height:28px;margin-top:2px}}
 
 /* the closest seats */
 .em-close{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;flex:0 1 auto;min-height:0}
@@ -166,6 +172,12 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
     <div class="dm-ctl">
       <label><span>Election</span><span class="pick"><select id="dm-year" aria-label="Election"></select></span></label>
       <label><span>Basis</span><span class="pick"><select id="dm-basis" aria-label="Basis: what the map's colours show"></select></span></label>
+      <!-- the full map's own search: seats, members, towns and polling places -->
+      <div class="mp-search">
+        <label><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
+          <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search a seat, member or place" aria-label="Search seats, members, suburbs and polling places" aria-controls="sugg" aria-expanded="false"></label>
+        <div class="sugg" id="sugg" role="listbox" hidden></div>
+      </div>
     </div>
     <div class="mp-legend dm-slot none" id="dm-opts"></div>
     <div class="dm-slot none" id="dm-places"></div>
@@ -180,7 +192,7 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
         <div class="mp-tip" id="tip" hidden></div>
       </div>
       <div class="mp-foot" id="mapfoot" hidden></div>
-      <div class="mp-legend" id="legend" hidden><div class="mp-search"><input id="q" type="search" aria-label="Search seats" tabindex="-1"><div class="sugg" id="sugg" hidden></div></div></div>
+      <div class="mp-legend" id="legend" hidden></div>
       <div class="mp-frames" id="frames-jump"></div>
       <div class="mp-time" id="time"></div>
     </div>
