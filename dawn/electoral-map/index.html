@@ -216,6 +216,9 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .votes .ctl .opts{margin-top:0;flex-shrink:0}
 /* on a phone the options give way and wrap, or the past terms' switch runs off the screen */
 @media (max-width:899px){.votes .ctl .opts{flex-shrink:1;max-width:100%}}
+/* Reserve the comparison key's worst-case wrapped height so a new link cannot
+   shrink the plot under it. */
+@media (min-width:600px) and (max-width:899px){.tpp .keys{min-height:52.5px;align-content:flex-start}}
 /* on a narrow one the pickers wrap, retaining their lead words, and the past-terms
    switch says one word; on the two-party chart it takes the place of the two comparisons */
 @media (max-width:599px){
@@ -227,6 +230,7 @@ svg .el{font-size:12px;fill:var(--ink2)}
 .tpp .ctl2 .opts{display:none}
 .tpp .keys .tgl-ph:not([hidden]){display:inline-flex}
 .tpp .keys.past .chk{display:none}
+.tpp .keys{min-height:84px;align-content:flex-start}
 }
 .pop{position:absolute;z-index:6;top:38px;left:0;min-width:220px;max-height:min(60vh,420px);overflow:auto;background:var(--bg);border:1px solid var(--rule);border-radius:14px;box-shadow:0 12px 32px rgb(20 10 40/.16);padding:6px}
 .pop button{display:flex;align-items:center;gap:9px;width:100%;font:500 14px/1.2 var(--sans);color:var(--ink);background:none;border:0;border-radius:9px;padding:9px 10px;cursor:pointer;text-align:left}

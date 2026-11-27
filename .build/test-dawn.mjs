@@ -282,6 +282,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(polls.includes('<option value="">all pollsters</option>') && !/Every pollster|\(\$\{n\}\)/.test(polls), "the polls page's pollster menu carries no counts");
   ok(html.includes('Math.round(fB*.4)'), "the Sankey separator uses the smaller size");
   ok(html.includes(".tpp .ctl2>.hd-sw>.rival-toggle{min-height:32px") && html.includes("row.insertBefore(box,row.querySelector('.opts'))"), "the compact pill and inferred support follow the year selector on desktop");
+  ok(html.includes("@media (min-width:600px) and (max-width:899px){.tpp .keys{min-height:52.5px") && html.includes(".tpp .keys{min-height:84px;align-content:flex-start}"), "comparison keys reserve their tablet and phone rows before the toggles appear");
   ok(html.includes("svg.onclick=e=>") && html.includes("if(i===chosen)clear()") && html.includes("if(!svg.contains(e.target))clear()"), "repeat and outside clicks clear a selected ribbon");
   ok(html.includes("const MT=TIPH+EVH+(evs.length&&!narrow?8:0)"), "eight extra pixels after desktop event labels, and only there");
   const scale = html.match(/S\.y0=0;S\.y1=([^;]+);/);
