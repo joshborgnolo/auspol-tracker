@@ -335,6 +335,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes("color:var(--${lead>0?'alp':RIV})") && html.includes("header.style.color='var(--mute)'"), "the signed lead follows the winner, with the other connecting words neutral");
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
+  ok(!/\.hero\{[^}]*cursor:pointer/.test(html), "the non-clickable sun and hero do not show a pointer cursor");
   ok(!html.includes(".skyset") && !html.includes('role="radiogroup" aria-label="Sky"'), "Sky’s Auto, Sunrise and Sunset controls are absent");
   ok(html.includes("const pickMode=") && html.includes("sky.dataset.mode=mode"), "Sky stays automatic by local time instead of a menu choice");
   ok(/window\.AP\.pmEngine\s*=/.test(html), "the browser copy of the model, for the pollster menu");
