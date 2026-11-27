@@ -343,5 +343,6 @@ addEventListener("resize", () => { if (RT.drop && !RT.drop.hidden) rtCloseMenu()
 {
   let want = rtIsOn();
   try { want = want || /[#&]retro=1(&|$)/.test(location.hash) || localStorage.getItem(RT_KEY) === "1"; } catch (e) {}
-  if (want) rtSet(true, { persist: false, boot: true });
+  // (the Dawn page has its own look, whatever the reader chose on /map/)
+  if (want && !dawnOn()) rtSet(true, { persist: false, boot: true });
 }

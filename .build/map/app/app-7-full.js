@@ -174,7 +174,7 @@ function fsMid(p = stagePads()) { return [p.l + (Wpx - p.l - p.r) / 2, p.t + (Hp
 
 /* ----- in ----- */
 function fsEnter(o = {}) {
-  if (FS.on || FS.leaving || !M()) return;
+  if (FS.on || FS.leaving || !M() || dawnOn()) return; // (the Dawn page keeps the map in its panel)
   fsBuild();
   const stage = $("#stage"), r0 = stage.getBoundingClientRect(), T0 = T;
   const framed = S.view !== "map" || atLastFit() || !!flight || T.k <= HOME.k * 1.001;

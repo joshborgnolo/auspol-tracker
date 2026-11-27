@@ -10,6 +10,10 @@
 <title>Electoral map · auspol tracker</title>
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<!-- the page opens on the last election; a link's own hash is kept (the map reads it) -->
+<script>document.documentElement.classList.add('mp-dawn');if(!/=/.test(location.hash))history.replaceState(null,'','#y={{LASTY}}')</script>
+<!-- the full map's stylesheet, then Dawn's own, which wins where they meet -->
+<link rel="stylesheet" href="{{MAPCSS}}">
 <style>
 /*{{SHARED:css}}*/
 /* the parties on this page: independents their own teal, the rest of the crossbench grey */
@@ -30,27 +34,62 @@
 @media(max-width:359px){.em-list{column-gap:8px}.em-list span{font-size:11.5px;gap:4px}.em-list span::before{width:7px;height:7px}}
 @media(max-height:660px){.em-hero .now-d{font-size:13px}.em-chapeau{margin-top:6px;font-size:19px}.em-list li{padding:4px 0}.em-list b{font-size:24px}}
 
-/* the map panel */
-.em-ctl{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-top:10px}
-.em-find select{font:500 13.5px/1 var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:34px;padding:0 12px;max-width:100%}
-.em-places{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none;touch-action:pan-x pan-y}
-.em-places::-webkit-scrollbar{display:none}
-.em-places button{flex:none;font:500 13px/1 var(--sans);color:var(--ink2);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:30px;padding:0 12px;cursor:pointer}
-.em-places button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.em-card{margin-top:8px;min-height:62px;border:1px solid var(--rule);border-left:5px solid var(--c,var(--rule2));border-radius:10px;padding:7px 12px;font-size:13.5px;line-height:1.35;color:var(--ink2)}
-.em-card b{color:var(--ink);font-size:16px}
-.em-card a{color:var(--ink);font-weight:600;white-space:nowrap}
-.em-card .em-since{display:block;color:var(--ink)}
-.em-fig{flex:1 1 auto;min-height:220px;margin-top:6px}
-.em-fig svg{cursor:pointer;touch-action:pan-y;overflow:hidden!important}
-.em-fig path{stroke:var(--bg);stroke-width:.8px;vector-effect:non-scaling-stroke;fill:var(--c);fill-opacity:.9}
-.em-fig path:hover{fill-opacity:1}
-.em-fig path.sel{stroke:var(--ink);stroke-width:2.6px;fill-opacity:1}
-.em-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--mute)}
-.em-key{display:flex;flex-wrap:wrap;gap:4px 12px}
-.em-key span{display:inline-flex;align-items:center;gap:5px}
-.em-key i{width:10px;height:10px;border-radius:3px;background:var(--c)}
-.em-full{color:var(--ink);font-weight:600;white-space:nowrap}
+/* the map's own type, set in Dawn's face (its canvas asks for it by name) */
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:300 700;font-display:swap;src:url("{{FONT}}") format("woff2")}
+/* the map's colour tokens, in Dawn's */
+:root{--ink-2:var(--ink2);--ink-3:var(--mute);--ink-faint:var(--rule2);--line:var(--rule);--line-2:var(--rule);--accent:var(--ink);--surface:var(--bg);--pin-top:0px;--m-alp:var(--alp);--m-lnp:var(--lnp);--m-grn:var(--grn);--m-onp:var(--on);--m-ind:var(--em-ind);--m-csa:var(--kb);--m-oth:var(--oth)}
+body{display:block;min-height:100%;font-size:16px;line-height:1.5;font-feature-settings:normal}
+/* the map's marks aren't the page's chart type */
+.mp svg text,.mp-tip svg text{paint-order:normal;stroke:none}
+
+/* the map panel: heading, the two menus, the map, then how it's drawn */
+.dm-map h2{min-height:2.12em;display:flex;align-items:flex-end}
+.dm-ctl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.dm-ctl label{display:block;min-width:0}
+.dm-ctl label>span:first-child{display:block;font-size:12px;color:var(--mute);margin:0 0 3px 12px}
+.dm-ctl .pick{display:flex}
+.dm-ctl .pick select{width:100%;height:38px;font-size:15px;background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px}
+.dm-slot.none{display:none}
+html.mp-dawn .mp .mp-legend.dm-slot{display:block;order:0;min-height:0;margin:0;padding:0;border:0}
+.dm-map #dm-opts{margin-top:8px}
+.dm-map #dm-opts .lg-sub{display:flex;flex-flow:row wrap;align-items:baseline;gap:2px 16px;margin:0;padding:0;border:0}
+.dm-map #dm-opts .lg-sub .lg-t{width:auto;font-size:13.5px;color:var(--ink2)}
+/* the cities, as Dawn's chips */
+.mp #dm-places .lg-jump{display:flex;flex-wrap:nowrap;gap:6px;margin:8px 0 0;overflow-x:auto;scrollbar-width:none;touch-action:pan-x pan-y}
+#dm-places .lg-jump::-webkit-scrollbar{display:none}
+#dm-places .lg-jump>b{display:none}
+.mp #dm-places .lg-jump .mp-ca,.mp #dm-places .lg-jump button{flex:none;font:500 13px/1 var(--sans);color:var(--ink2);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:30px;padding:0 12px}
+.dm-view.mp-view{position:relative;top:auto;grid-column:auto;grid-row:auto;height:auto;min-height:0;max-height:none;flex:1 1 auto;margin-top:8px}
+.dm-view .mp-stage,.dm-view.mp-view .mp-stage{flex:1 1 0;height:auto;min-height:200px;border-radius:16px;overflow:hidden;border:1px solid var(--rule)}
+html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border-color:var(--rule)}
+/* what the Dawn page leaves to the full map */
+.mp-search,.dm-view #legend,.dm-view #frames-jump,.dm-view #time,.dm-view #mapfoot,.mp-off,.mp-zoom .fs-btn,.mp-zoom [data-fs]{display:none!important}
+/* how it's drawn: one segmented row under the map */
+.dm-foot{margin-top:8px}
+.mp #dm-draw .lg-draw{display:flex;flex-wrap:nowrap;align-items:center;gap:0;margin:0;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.mp #dm-draw .lg-draw>span,.mp #dm-draw .lg-jgap,.mp #dm-draw .lg-jtoggle{display:none!important}
+.mp #dm-draw .lg-draw button{flex:1 1 0;min-width:0;display:flex;justify-content:center;align-items:center;height:34px;padding:0 2px;border:0;border-radius:999px;font:500 13.5px/1 var(--sans);color:var(--ink2);text-decoration:none}
+.mp #dm-draw .lg-draw button[aria-pressed=true]{border-bottom:0;font-weight:500;background:var(--bg);color:var(--ink);box-shadow:0 0 0 1px var(--rule),0 1px 2px rgb(20 10 40/.08)}
+.mp #dm-draw .lg-draw button:disabled{opacity:.38;cursor:default}
+#dm-draw .tw::after{display:none}
+.mp #dm-draw .lg-draw button .tw{text-decoration:none!important}
+.dm-more{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:32px;margin-top:4px;border:0;background:none;font:500 13.5px/1 var(--sans);color:var(--ink2);cursor:pointer}
+.dm-more b{font-weight:600;color:var(--ink)}
+
+/* the page below: what the map says of the seat chosen */
+.dm-seat{height:auto;min-height:calc(100vh + var(--ext));min-height:calc(100lvh + var(--ext));display:block;overflow:visible;scroll-snap-align:start;padding-top:calc(var(--navh) + env(safe-area-inset-top) + 10px)}
+.dm-seat .wrap{display:block;max-width:720px}
+.dm-back{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0;border:0;background:none;font:500 13.5px/1 var(--sans);color:var(--ink2);cursor:pointer}
+.dm-hint{margin:4px 0 12px;font-size:14.5px;color:var(--ink2)}
+.dm-seat .mp-story{grid-column:auto;grid-row:auto;padding:0}
+.dm-seat .mp-story .st-head h2{font:400 clamp(26px,7.4vw,38px)/1.08 var(--serif);letter-spacing:-.012em}
+.dm-notes{margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)}
+.mp .dm-notes{margin-top:18px!important;padding-top:12px!important;border-top:1px solid var(--rule)!important}
+.mp .dm-notes.none{display:none}
+.mp .dm-notes .lg-note,.mp .dm-notes .lg-undrawn{display:block;margin:0 0 6px;font-size:13px;line-height:1.45;color:var(--mute)}
+.dm-full{display:inline-block;margin-top:12px;color:var(--ink);font-weight:600;font-size:13.5px}
+@media(min-width:900px){.dm-ctl{grid-template-columns:repeat(2,minmax(0,16em))}#dm-draw .lg-draw{max-width:560px;margin:0 auto}.dm-map h2{min-height:1.06em}}
+@media(max-height:700px){.dm-ctl label>span:first-child{display:none}.dm-ctl{margin-top:8px}.dm-ctl .pick select{height:34px;background-position:calc(100% - 17px) 15px,calc(100% - 12px) 15px}#dm-places{display:none}.dm-view .mp-stage,.dm-view.mp-view .mp-stage{min-height:150px}.dm-more{height:28px;margin-top:2px}}
 
 /* the closest seats */
 .em-close{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;flex:0 1 auto;min-height:0}
@@ -120,19 +159,47 @@
   </div>
 </section>
 
-<section class="sec" id="map" data-sec="map" aria-labelledby="map-h">
+<section class="sec mp" id="map" data-sec="map" aria-labelledby="map-h">
   <i class="snap" aria-hidden="true"></i>
-  <div class="wrap votes emp">
-    <header class="hd"><h2 id="map-h">{{mapHead}}</h2><p class="dek">Each of the 150 seats in the colour of whoever holds it. Pick a city to see its seats, and tap a seat.</p></header>
-    <div class="em-ctl">
-      <div class="seg" role="radiogroup" aria-label="Which House"><button type="button" role="radio" aria-checked="true" data-house="then">2025 result</button><button type="button" role="radio" aria-checked="false" data-house="now">Today</button></div>
-      <label class="em-find"><span class="sr">Find a seat</span><select id="em-find"></select></label>
+  <div class="wrap votes emp dm-map">
+    <header class="hd"><h2 id="map-h">{{mapHead}}</h2></header>
+    <div class="dm-ctl">
+      <label><span>Election</span><span class="pick"><select id="dm-year" aria-label="Election"></select></span></label>
+      <label><span>Basis</span><span class="pick"><select id="dm-basis" aria-label="Basis: what the map's colours show"></select></span></label>
     </div>
-    <div class="em-places" role="group" aria-label="Zoom to" id="em-places"></div>
-    <div class="em-card" id="em-card" aria-live="polite"></div>
-    <div class="fig em-fig" id="em-fig"><svg id="em-svg" role="group" aria-label="Map of the House of Representatives seats"></svg></div>
-    <div class="em-foot"><span class="em-key" id="em-key"></span><a class="em-full" href="/map/">The full election map ↗</a></div>
-    <div class="sr"><table id="em-table"></table></div>
+    <div class="mp-legend dm-slot none" id="dm-opts"></div>
+    <div class="dm-slot none" id="dm-places"></div>
+    <div class="mp-view dm-view" id="view">
+      <div class="mp-stage" id="stage">
+        <canvas id="cv" class="grab" aria-label="Map of the federal electoral divisions. Tap a seat; its figures are on the page below."></canvas>
+        <div class="mp-loading" id="loading">Loading the map</div>
+        <div class="mp-filter" id="filterpill" hidden></div>
+        <div class="mp-zoom" id="zoomer"><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zback" aria-label="Back to the whole map" title="Back to the whole map" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5 4 10l5 5M4 10h11a5.5 5.5 0 0 1 0 11h-2.5"/></svg></button></div>
+        <div class="mp-credit" id="credit" hidden><span class="mp-credit-long">Streets: </span>Powered by <a href="https://www.esri.com/" rel="noopener">Esri</a> · <span class="mp-credit-long">Esri, </span>TomTom, Garmin, © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a><span class="mp-credit-long"> contributors</span></div>
+        <div class="mp-list" id="list" hidden></div>
+        <div class="mp-tip" id="tip" hidden></div>
+      </div>
+      <div class="mp-foot" id="mapfoot" hidden></div>
+      <div class="mp-legend" id="legend" hidden><div class="mp-search"><input id="q" type="search" aria-label="Search seats" tabindex="-1"><div class="sugg" id="sugg" hidden></div></div></div>
+      <div class="mp-frames" id="frames-jump"></div>
+      <div class="mp-time" id="time"></div>
+    </div>
+    <div class="dm-foot">
+      <div class="mp-legend dm-slot none" id="dm-draw"></div>
+      <button type="button" class="dm-more" id="dm-more"><span id="dm-more-t">Tap a seat; its figures are below</span> <span aria-hidden="true">↓</span></button>
+    </div>
+    <!-- parts of the full map's page its script expects, unused here -->
+    <div class="mp-off" hidden><button type="button" id="fsgo" tabindex="-1"></button><div class="mp-sec"><div class="rd-eyebrow"><span id="mp-meta"></span></div></div><div class="mp-lensrow"><div id="lenses"></div></div></div>
+  </div>
+</section>
+
+<section class="sec mp dm-seat" id="seat" data-sec="map" aria-label="The seat chosen">
+  <div class="wrap">
+    <button type="button" class="dm-back" id="dm-back"><span aria-hidden="true">↑</span> The map</button>
+    <p class="dm-hint" id="dm-hint">Tap a seat on the map to read it here. Until then, this is the whole country.</p>
+    <article class="mp-story" id="story" aria-live="polite"></article>
+    <div class="mp-legend dm-slot dm-notes none" id="dm-notes"></div>
+    <a class="dm-full" id="dm-full" href="/map/">The full election map ↗</a>
   </div>
 </section>
 
@@ -194,80 +261,44 @@ rpBtn.addEventListener('click',e=>{
   const tick=()=>{yi=i;paintHouse();if(!reduce)paintCycle(f0+2*i/LASTY);if(i<LASTY){i++;rpTimer=setTimeout(tick,reduce?500:1100)}else rpTimer=setTimeout(finish,600)};tick();
 });
 
-/* ---------- the map ---------- */
-const svg=$('#em-svg'),fig=$('#em-fig');
-let house='then',picked=null,place='Australia';
-const abOf=s=>house==='now'&&s.now?s.now.ab:s.ab;
-const colOf=ab=>`var(--em-${groupOf(ab)})`;
-const BY=Object.fromEntries(E.seats.map(s=>[s.n,s]));
-svg.setAttribute('preserveAspectRatio','xMidYMid meet');
-svg.innerHTML='<g id="em-seats">'+E.seats.map((s,i)=>`<path d="${s.d}" data-i="${i}" fill-rule="evenodd"><title>${esc(s.n)}</title></path>`).join('')+'</g>';
-const paths=$$('path[data-i]',svg);
-const AU=E.frame;
-let view=AU.slice(),anim=0;
-const setView=v=>{view=v;svg.setAttribute('viewBox',v.map(n=>n.toFixed(2)).join(' '))};
-function flyTo(v){
-  cancelAnimationFrame(anim);if(reduce){setView(v);return}
-  const from=view.slice(),t0=performance.now(),e=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-  /* the width eases on its logarithm, so a fly to a city doesn't rush the end */
-  const step=ts=>{const t=Math.min(1,(ts-t0)/600),k=e(t),w=from[2]*Math.pow(v[2]/from[2],k),h=from[3]*Math.pow(v[3]/from[3],k),u=Math.abs(from[2]-v[2])<1e-3?k:(from[2]-w)/(from[2]-v[2]);
-    const cx=from[0]+from[2]/2+((v[0]+v[2]/2)-(from[0]+from[2]/2))*u,cy=from[1]+from[3]/2+((v[1]+v[3]/2)-(from[1]+from[3]/2))*u;
-    setView([cx-w/2,cy-h/2,w,h]);if(t<1)anim=requestAnimationFrame(step)};
-  anim=requestAnimationFrame(step);
-}
-function goPlace(name,fly=true){
-  place=name;const c=E.cities.find(q=>q.name===name),v=c?c.view:AU;
-  if(fly)flyTo(v);else setView(v);
-  $$('#em-places button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.p===name)));
-}
-$('#em-places').innerHTML=['Australia',...E.cities.map(c=>c.name)].map(n=>`<button type="button" data-p="${n}" aria-pressed="${n===place}">${n}</button>`).join('');
-$('#em-places').addEventListener('click',e=>{const b=e.target.closest('button');if(b)goPlace(b.dataset.p)});
-const mapHref=s=>'/map/#'+(house==='then'?'y=2025&':'')+'s='+encodeURIComponent(s.n);
-function card(){
-  const el=$('#em-card');
-  if(!picked){el.style.removeProperty('--c');el.innerHTML='Tap a seat to read it, or find one by name.';return}
-  const s=BY[picked];el.style.setProperty('--c',colOf(abOf(s)));
-  el.innerHTML=`<b>${esc(s.n)}</b> · ${s.st} · ${esc(s.cls.toLowerCase())}<br>2025: ${esc(s.who)} (${esc(party(s.ab))}) beat ${esc(s.vs)} (${esc(party(s.vsAb))}) by ${s.votes.toLocaleString('en-AU')} votes, a margin of ${s.m.toFixed(2)}. <a href="${mapHref(s)}">Full map ↗</a>`
-    +(s.now?`<span class="em-since">Now ${esc(s.now.who)}, ${esc(party(s.now.ab))}. ${s.now.text?esc(s.now.text)+(s.now.date?', '+fdate(s.now.date):'')+'.':''}</span>`:'');
-}
-function paintMap(){
-  paths.forEach(p=>{const s=E.seats[+p.dataset.i];p.style.setProperty('--c',colOf(abOf(s)));p.classList.toggle('sel',s.n===picked)});
-  if(picked){const p=paths.find(q=>E.seats[+q.dataset.i].n===picked);p.parentNode.appendChild(p)}
-  const have=new Set(E.seats.map(s=>groupOf(abOf(s))));
-  $('#em-key').innerHTML=GROUPS.filter(([k])=>have.has(k)).map(([k,n])=>`<span><i style="--c:var(--em-${k})"></i>${n}</span>`).join('');
-  card();
-}
-/* a seat picked from elsewhere is shown where it can be seen: in its city, or framed on its own */
-function show(name,fly=true){
-  picked=name;const s=BY[name];
-  if(s){const [x0,y0,x1,y1]=s.box,size=Math.max(x1-x0,y1-y0);
-    const city=E.cities.find(c=>{const [vx,vy,vw,vh]=c.view;return x0>=vx-4&&y0>=vy-4&&x1<=vx+vw+4&&y1<=vy+vh+4});
-    if(city&&size<14)goPlace(city.name,fly);
-    else if(size<90){const w=Math.max(size*3,24);place='';const v=[(x0+x1)/2-w/2,(y0+y1)/2-w/2,w,w];if(fly)flyTo(v);else setView(v);$$('#em-places button').forEach(b=>b.setAttribute('aria-pressed','false'))}
-    else goPlace('Australia',fly)}
-  $('#em-find').value=name||'';paintMap();
-}
-svg.addEventListener('click',e=>{
-  const p=e.target.closest('path[data-i]');if(!p){picked=null;$('#em-find').value='';paintMap();return}
-  const s=E.seats[+p.dataset.i];
-  /* a speck on the national map zooms into its city first: a finger can't tell its seats apart */
-  const r=p.getBoundingClientRect();
-  if(place==='Australia'&&Math.max(r.width,r.height)<14){const c=E.cities.find(c=>{const [vx,vy,vw,vh]=c.view;return s.at[0]>=vx&&s.at[0]<=vx+vw&&s.at[1]>=vy&&s.at[1]<=vy+vh});if(c){goPlace(c.name);return}}
-  picked=s.n;$('#em-find').value=s.n;paintMap();
+/* ---------- the map: the full election map's own engine (/map/map.js), run in Dawn's dress.
+   It says what it's showing with a dawn-map event; the page's menus and heading follow ---------- */
+const mapSec=$('#map'),seatSec=$('#seat'),yearSel=$('#dm-year'),basisSel=$('#dm-basis');
+const go=el=>el.scrollIntoView({behavior:reduce?'auto':'smooth'});
+const BASIS={informal:'Informality'};
+const yv=v=>v==='now'?v:+v;
+let shown=null;
+document.addEventListener('dawn-map',e=>{
+  const d=shown=e.detail;
+  const yh=d.years.join();if(yearSel.dataset.k!==yh){yearSel.dataset.k=yh;yearSel.innerHTML=[...d.years].reverse().map(y=>`<option value="${y}">${y==='now'?'Today':y+' election'}</option>`).join('')}
+  yearSel.value=String(d.year);
+  const bh=d.lenses.map(l=>l.id).filter(i=>i!=='senpref').join();
+  if(basisSel.dataset.k!==bh){basisSel.dataset.k=bh;basisSel.innerHTML=d.lenses.filter(l=>l.id!=='senpref').map(l=>`<option value="${l.id}">${BASIS[l.id]||l.label}</option>`).join('')}
+  basisSel.value=d.lens;
+  if(E.heads[d.year])$('#map-h').textContent=E.heads[d.year];
+  $('#dm-more-t').innerHTML=d.seat?`<b>${esc(d.seat)}</b>: details below`:d.level==='state'?'The state’s figures are below':'Tap a seat; its figures are below';
+  $('#dm-hint').hidden=d.level!=='aus';
+  $('#dm-full').href='/map/'+location.hash;
 });
-$('#em-find').innerHTML='<option value="">Find a seat…</option>'+[...E.seats].sort((a,b)=>a.n.localeCompare(b.n)).map(s=>`<option value="${esc(s.n)}">${esc(s.n)} (${s.st})</option>`).join('');
-$('#em-find').addEventListener('change',e=>{if(e.target.value)show(e.target.value);else{picked=null;paintMap()}});
-$$('[data-house]').forEach(b=>b.addEventListener('click',()=>{house=b.dataset.house;$$('[data-house]').forEach(x=>x.setAttribute('aria-checked',String(x===b)));paintMap()}));
-goPlace('Australia',false);paintMap();
-$('#em-table').innerHTML='<caption>Every seat, 2025</caption><tr><th>Seat</th><th>State</th><th>Winner</th><th>Margin, points</th></tr>'+[...E.seats].sort((a,b)=>a.n.localeCompare(b.n)).map(s=>`<tr><td>${esc(s.n)}</td><td>${s.st}</td><td>${esc(s.who)}, ${esc(party(s.ab))}</td><td>${s.m.toFixed(2)}</td></tr>`).join('');
+yearSel.addEventListener('change',()=>window.__map&&__map.setYear(yv(yearSel.value)));
+basisSel.addEventListener('change',()=>window.__map&&__map.setLens(basisSel.value));
+$('#dm-more').addEventListener('click',()=>go(seatSec));
+$('#dm-back').addEventListener('click',()=>go(mapSec));
+/* the map's own links in the seat's figures fly the map; the reader stays on the figures, at their top */
+$('#story').addEventListener('click',e=>{if(e.target.closest('[data-go]')&&seatSec.getBoundingClientRect().top<0)go(seatSec)});
 
 /* ---------- the closest seats ---------- */
+const BY=Object.fromEntries(E.seats.map(s=>[s.n,s]));
+const colOf=ab=>`var(--em-${groupOf(ab)})`;
 const close=E.closest.map(n=>BY[n]),widest=Math.max(...close.map(s=>s.m));
 $('#em-close').innerHTML=close.map(s=>`<li><button type="button" data-n="${esc(s.n)}" style="--c:${colOf(s.ab)}"><span class="nm"><b>${esc(s.n)} <span style="font-weight:400;color:var(--mute)">${s.st}</span></b><small>${esc(party(s.ab))} beat ${esc(party(s.vsAb))}</small></span><span class="tr" aria-hidden="true"><i style="width:${(100*s.m/widest).toFixed(1)}%"></i></span><span class="v"><b>${s.m.toFixed(2)}</b><small>${s.votes.toLocaleString('en-AU')} votes</small></span></button></li>`).join('');
-$('#em-close').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;house='then';$$('[data-house]').forEach(x=>x.setAttribute('aria-checked',String(x.dataset.house==='then')));$('#map').scrollIntoView({behavior:reduce?'auto':'smooth'});show(b.dataset.n)});
+$('#em-close').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||!window.__map)return;const M=window.__map;go(mapSec);await M.setYear(E.lastYear);const i=M.M().byName.get(b.dataset.n);if(i!=null)M.goDiv(i,{fly:true})});
 
 /*{{SHARED:nav}}*/
 }
 </script>
+<script src="/map/vendor/d3-7.9.0.min.js"></script>
+<script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
+<script src="{{MAPJS}}"></script>
 </body>
 </html>

@@ -75,7 +75,7 @@ assert.ok(!/^(<{7}|={7}|>{7})($| )/m.test(page), "map/index.html carries no git 
 // block's two identical arms and the map's IIFE ran twice on the live page
 assert.equal(page.split('src="/map/map.js?v=').length - 1, 1, "the page loads map.js exactly once");
 const part = (f) => R(".build/map/app/" + f);
-const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-2d-near.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js", "app-8-retro.js"].map(part).join("\n");
+const js = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-2d-near.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js", "app-8-retro.js", "app-9-dawn.js"].map(part).join("\n");
 // era-impossible options drop from the frame's own menus: the IRSAD
 // 'Advantage and disadvantage' index before the 2001-census four-index
 // suite, and One Nation's family option before its April 1997 formation
@@ -3324,8 +3324,8 @@ for (const y of ["sa22", "sa26"]) {
   assert.ok(map2.includes("const q = FS.on ? FS.ins : { l: 0, r: 0, b: 0 }, L = q.l + 4, R = Wpx - q.r - 4, B = Hpx - q.b - 4;"), "the island boxes stay off the plates");
   assert.ok(ui.includes('if (FS.on) p.set("fs", "1");') && ui.includes('fsFromURL = p.get("fs") === "1";') && fsj.includes('history.pushState({ mpFs: 1 }, "", location.href)'), "full screen rides the hash, and its own history entry makes Back the way out");
   assert.ok(ui.includes('QLD_YEARS.has(y) ? "Queensland" ') && !ui.includes('VIC_YEARS.has(m.year) ? "Victorian" : "South Australian"'), "each jurisdiction names itself in the stamp and the eyebrow (Queensland's arm, Western Australia's arm amongst them)");
-  assert.ok(fsj.includes("if (FS.on || FS.leaving || !M()) return;") && fsj.includes("fsUnpark(true);"), "the way in parks the page's own elements; the way out sends them home ahead of the stage");
-  assert.ok(base.includes("if (!PHONE.matches || y == null || FS.on) return;") && base.includes("if (!spot || !PHONE.matches || FS.on) return null;"), "the phone's walk hold stands down in full screen (no page to hold)");
+  assert.ok(fsj.includes("if (FS.on || FS.leaving || !M() || dawnOn()) return;") && fsj.includes("fsUnpark(true);"), "the way in parks the page's own elements; the way out sends them home ahead of the stage");
+  assert.ok(base.includes("if (!PHONE.matches || y == null || FS.on || dawnOn()) return;") && base.includes("if (!spot || !PHONE.matches || FS.on) return null;"), "the phone's walk hold stands down in full screen (no page to hold)");
   assert.ok(css.includes(".fs:not(.phone) .mp-legend { min-height: 0 !important; }"), "the wide panel's key takes its own height (its hold is the page stage's)");
   assert.ok(!/\.fs[^{]*\{[^}]*text-transform:\s*uppercase/.test(css), "no small caps in the full-screen plates");
 }

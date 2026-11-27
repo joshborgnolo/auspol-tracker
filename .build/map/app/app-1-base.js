@@ -80,7 +80,7 @@ function tokenRGB(v) {
   return null;
 }
 // (the retro view keeps the light paper whatever the theme: the era had no dark mode)
-const isDark = () => { const r = document.documentElement; if (r.classList.contains("mp-retro")) return false; return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
+const isDark = () => { const r = document.documentElement; if (r.classList.contains("mp-retro")) return false; if (dawnOn()) return r.dataset.theme === "dark" || (r.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches); return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
 function readTheme() {
   const dk = isDark();
   // oklch tokens come back from getComputedStyle as oklch(); compute them here instead
@@ -119,6 +119,7 @@ function readTheme() {
   T.seaInk = dk ? lch(0.7, 0.06, 236) : lch(0.5, 0.085, 246);
   // the retro view's flat palette over these (app-8-retro.js)
   if (typeof retroTheme === "function" && typeof rtIsOn === "function" && rtIsOn()) retroTheme(T);
+  if (dawnOn()) dawnTheme(T);
   return T;
 }
 
@@ -950,7 +951,8 @@ function storyBlocks() {
 function walkAim(y) {
   walkSpot = null;
   // (full screen has no page to hold: its story scrolls in its own panel)
-  if (!PHONE.matches || y == null || FS.on) return;
+  // (nor the Dawn page: its figures are a page of their own, and the map's page must not move)
+  if (!PHONE.matches || y == null || FS.on || dawnOn()) return;
   for (const sel of FIXED_SPOTS) {
     const el = $(sel), r = el && !el.hidden && el.getBoundingClientRect();
     if (r && y >= r.top && y < r.bottom) { walkSpot = { el, at: performance.now() }; return; }

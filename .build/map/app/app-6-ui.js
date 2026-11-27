@@ -147,6 +147,7 @@ function renderLegend() {
   el.style.minHeight = "";
   // (the hint line is born empty: fill it now, or the strip shrinks a line and grows back, moving the map)
   updateHint();
+  dawnSync();
 }
 /* where the search field sits: on a laptop's map it leads the strip (its first
    child: the strip's own CSS stands it beside Jump to where the strip is wide,
@@ -591,7 +592,7 @@ function legendHTML(m) {
   { const sub = h.slice(subAt); h = h.slice(0, subAt) + (sub ? `<div class="lg-sub">${sub}</div>` : ""); }
   // the two filters, State and Seat type, in every view (map, chamber, list) — on a
   // phone, with the map's Draw and Jump to, as one tidy grid of menus instead
-  const tight = panelMQ.matches;
+  const tight = panelMQ.matches && !dawnOn();
   h += tight ? compactPanelHTML(m) : filterHTML(m);
   // in the chamber, a year with a seating plan can show the members where they sit or sorted by the lens
   if (S.view === "chamber" && m.seating) {
@@ -816,7 +817,8 @@ function jumpHTML() {
    aggressively" at one zoom). Holding its line instead would only leave a hole, and the
    cities stay good jump targets at any depth. Zooming never resizes the stage. */
 function jumpRowVis(cit) {
-  if (cit) cit.hidden = S.view !== "map" || selDiv() != null;
+  // (the Dawn page keeps its cities row up, over the map)
+  if (cit) cit.hidden = !dawnOn() && (S.view !== "map" || selDiv() != null);
 }
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
@@ -1072,6 +1074,9 @@ function setView(v, quiet) {
   if (!quiet) renderStory(true);
   schedule();
 }
+// the previous election's ballot rankings, still to come: only where it has any (2004's
+// previous, 2001, has none — waiting on it sent the Senate and Preferences lenses round for ever)
+const spPrevOwed = (y) => { const p = prevYearOf(spYear(y)); return p != null && spYear(p) != null && !SPD[spYear(p)]; };
 function setLens(id) {
   if (S.lens === id) return;
   // the Preferences tab, clicked while it reads the Senate's ballots, stays where it is
@@ -1080,7 +1085,7 @@ function setLens(id) {
   // the Senate's head-figure decks in pairs, vote primaries, ballot trip and
   // the chamber for its seats — for the Senate lens, and for the Preferences
   // tab's Senate-ballot reading on a federal frame (user call 2026-11-10)
-  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) || (SI_YEARS.has(svYear(S.year)) && !SI[svYear(S.year)]))) {
+  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || spPrevOwed(S.year))) || (SI_YEARS.has(svYear(S.year)) && !SI[svYear(S.year)]))) {
     const spot = takeSpot();
     showLoading(true);
     Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year), loadSenateFloor()]).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
@@ -1089,7 +1094,7 @@ function setLens(id) {
   }
   // ... and the Senate's ballot rankings themselves where no federal decks go
   // (about 300KB a year, gzipped — New South Wales's upper-house years too)
-  if (id === "senpref" && spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) {
+  if (id === "senpref" && spYear(S.year) != null && (!SPD[spYear(S.year)] || spPrevOwed(S.year))) {
     const spot = takeSpot();
     showLoading(true);
     loadSenatePrefsPair(S.year).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })

@@ -234,7 +234,14 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   if (fs.existsSync(path.join(mapRoot, "map", "data", "core-2025.json"))) {
     const EM = emapData(mapRoot);
     EM.closest = closestSeats(EM).map((s) => s.n);
-    const words = { FONT: "/assets/fonts/" + font, chapeau: esc(emapChapeau(EM)), mapHead: esc(emapHead(EM)), closestHead: esc(closestHead(EM)) };
+    /* the map panel's heading for each election in its menu */
+    const heads = Object.fromEntries(EM.history.map((h) => [h.y, emapHead({ history: [h] })]));
+    heads.now = emapHead({ history: [EM.today] }).replace(/ won a majority/, " holds a majority").replace(/^No party won a majority in the House$/, "No party holds a majority in the House");
+    EM.heads = heads;
+    EM.lastYear = EM.history.at(-1).y;
+    /* the full map's script and styles, by content, so a cached copy never outlives a change */
+    const asset = (f) => "/map/" + f + "?v=" + crypto.createHash("sha256").update(fs.readFileSync(path.join(mapRoot, "map", f))).digest("hex").slice(0, 8);
+    const words = { MAPCSS: asset("map.css"), MAPJS: asset("map.js"), LASTY: EM.lastYear, FONT: "/assets/fonts/" + font, chapeau: esc(emapChapeau(EM)), mapHead: esc(heads[EM.lastYear]), closestHead: esc(closestHead(EM)) };
     let h = fs.readFileSync(path.join(HERE, "template-emap.html"), "utf8")
       .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "");
     h = h.replace(/\{\{([A-Za-z]+)\}\}/g, (m, k) => (k in words ? words[k] : m))

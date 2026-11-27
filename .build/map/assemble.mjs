@@ -15,6 +15,7 @@
      app-6-ui.js       legend, timeline, tooltip, search, URL, events, boot
      app-7-full.js     the full-screen view: plates over the stage, the elections dock
      app-8-retro.js    the retro view: the map as a desktop program from about 2000
+     app-9-dawn.js     the same map on the Dawn page (/dawn/electoral-map/)
      page.css          the page's own styles (its palette is inline in the page)
      retro.css         the retro view's look (html.mp-retro), after page.css and
                        the retro pages' shared chrome, .build/retro/chrome.css
@@ -45,7 +46,7 @@ stampPrevTpp(ROOT);
 // lanes, what a frame loads first), written before the data stamps are taken
 writeCores(ROOT);
 const part = (f) => fs.readFileSync(path.join(HERE, "app", f), "utf8");
-const app = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-2d-near.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js", "app-8-retro.js"].map(part).join("\n");
+const app = ["app-1-base.js", "app-2-map.js", "app-2b-draw.js", "app-2c-chart.js", "app-2d-near.js", "app-3-chamber.js", "app-3b-senate.js", "app-3c-sa.js", "app-4-story.js", "app-5-list.js", "app-6-ui.js", "app-7-full.js", "app-8-retro.js", "app-9-dawn.js"].map(part).join("\n");
 // each data file's hash goes into the script, so it fetches the data it shipped with (data-stamp.mjs)
 // and each election's eyebrow facts, so the eyebrow's floor reads every year's real line (data-stamp.mjs)
 // the retro pages' shared drop-downs ride after the app (.build/retro/select.client.js: the era's combo box in the retro view)

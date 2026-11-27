@@ -82,7 +82,7 @@ function tokenRGB(v) {
   return null;
 }
 // (the retro view keeps the light paper whatever the theme: the era had no dark mode)
-const isDark = () => { const r = document.documentElement; if (r.classList.contains("mp-retro")) return false; return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
+const isDark = () => { const r = document.documentElement; if (r.classList.contains("mp-retro")) return false; if (dawnOn()) return r.dataset.theme === "dark" || (r.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches); return r.classList.contains("sh-dark") || (!r.classList.contains("sh-light") && matchMedia("(prefers-color-scheme: dark)").matches); };
 function readTheme() {
   const dk = isDark();
   // oklch tokens come back from getComputedStyle as oklch(); compute them here instead
@@ -121,6 +121,7 @@ function readTheme() {
   T.seaInk = dk ? lch(0.7, 0.06, 236) : lch(0.5, 0.085, 246);
   // the retro view's flat palette over these (app-8-retro.js)
   if (typeof retroTheme === "function" && typeof rtIsOn === "function" && rtIsOn()) retroTheme(T);
+  if (dawnOn()) dawnTheme(T);
   return T;
 }
 
@@ -952,7 +953,8 @@ function storyBlocks() {
 function walkAim(y) {
   walkSpot = null;
   // (full screen has no page to hold: its story scrolls in its own panel)
-  if (!PHONE.matches || y == null || FS.on) return;
+  // (nor the Dawn page: its figures are a page of their own, and the map's page must not move)
+  if (!PHONE.matches || y == null || FS.on || dawnOn()) return;
   for (const sel of FIXED_SPOTS) {
     const el = $(sel), r = el && !el.hidden && el.getBoundingClientRect();
     if (r && y >= r.top && y < r.bottom) { walkSpot = { el, at: performance.now() }; return; }
@@ -5392,7 +5394,7 @@ canvas.addEventListener("touchcancel", () => { touchPace = null; });
 // at the whole-country fit (a zoomed-in map pans instead). Native controls
 // keep their own gestures (zoom and city buttons, form fields, links), and
 // the list view's own rows
-swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list, .cls-vote-scroll"));
+swipeWatch($(".mp-fig") || $("#view"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list, .cls-vote-scroll"));
 // Safari's own pinch events. On a Mac they are the trackpad's pinch; iOS sends
 // them alongside the touches, which d3 (or the home pinch) already follows,
 // so while fingers are down they are left alone
@@ -12624,6 +12626,7 @@ function renderLegend() {
   el.style.minHeight = "";
   // (the hint line is born empty: fill it now, or the strip shrinks a line and grows back, moving the map)
   updateHint();
+  dawnSync();
 }
 /* where the search field sits: on a laptop's map it leads the strip (its first
    child: the strip's own CSS stands it beside Jump to where the strip is wide,
@@ -13068,7 +13071,7 @@ function legendHTML(m) {
   { const sub = h.slice(subAt); h = h.slice(0, subAt) + (sub ? `<div class="lg-sub">${sub}</div>` : ""); }
   // the two filters, State and Seat type, in every view (map, chamber, list) — on a
   // phone, with the map's Draw and Jump to, as one tidy grid of menus instead
-  const tight = panelMQ.matches;
+  const tight = panelMQ.matches && !dawnOn();
   h += tight ? compactPanelHTML(m) : filterHTML(m);
   // in the chamber, a year with a seating plan can show the members where they sit or sorted by the lens
   if (S.view === "chamber" && m.seating) {
@@ -13293,7 +13296,8 @@ function jumpHTML() {
    aggressively" at one zoom). Holding its line instead would only leave a hole, and the
    cities stay good jump targets at any depth. Zooming never resizes the stage. */
 function jumpRowVis(cit) {
-  if (cit) cit.hidden = S.view !== "map" || selDiv() != null;
+  // (the Dawn page keeps its cities row up, over the map)
+  if (cit) cit.hidden = !dawnOn() && (S.view !== "map" || selDiv() != null);
 }
 /* State filters and election links show their current selection. */
 function renderJumpSel() {
@@ -13549,6 +13553,9 @@ function setView(v, quiet) {
   if (!quiet) renderStory(true);
   schedule();
 }
+// the previous election's ballot rankings, still to come: only where it has any (2004's
+// previous, 2001, has none — waiting on it sent the Senate and Preferences lenses round for ever)
+const spPrevOwed = (y) => { const p = prevYearOf(spYear(y)); return p != null && spYear(p) != null && !SPD[spYear(p)]; };
 function setLens(id) {
   if (S.lens === id) return;
   // the Preferences tab, clicked while it reads the Senate's ballots, stays where it is
@@ -13557,7 +13564,7 @@ function setLens(id) {
   // the Senate's head-figure decks in pairs, vote primaries, ballot trip and
   // the chamber for its seats — for the Senate lens, and for the Preferences
   // tab's Senate-ballot reading on a federal frame (user call 2026-11-10)
-  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) || (SI_YEARS.has(svYear(S.year)) && !SI[svYear(S.year)]))) {
+  if ((id === "senate" || id === "senpref") && svYear(S.year) != null && (!SV[svYear(S.year)] || (prevYearOf(svYear(S.year)) != null && !SV[prevYearOf(svYear(S.year))]) || !SENY[S.year] || (prevYearOf(S.year) != null && !SENY[prevYearOf(S.year)]) || (spYear(S.year) != null && (!SPD[spYear(S.year)] || spPrevOwed(S.year))) || (SI_YEARS.has(svYear(S.year)) && !SI[svYear(S.year)]))) {
     const spot = takeSpot();
     showLoading(true);
     Promise.all([loadSenateDeck(S.year), loadSenatePrefsPair(S.year), loadSenatePair(S.year), loadSenateFloor()]).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
@@ -13566,7 +13573,7 @@ function setLens(id) {
   }
   // ... and the Senate's ballot rankings themselves where no federal decks go
   // (about 300KB a year, gzipped — New South Wales's upper-house years too)
-  if (id === "senpref" && spYear(S.year) != null && (!SPD[spYear(S.year)] || (prevYearOf(spYear(S.year)) != null && !SPD[prevYearOf(spYear(S.year))]))) {
+  if (id === "senpref" && spYear(S.year) != null && (!SPD[spYear(S.year)] || spPrevOwed(S.year))) {
     const spot = takeSpot();
     showLoading(true);
     loadSenatePrefsPair(S.year).then(() => { showLoading(false); walkSpot = spot && { ...spot, at: performance.now() }; setLens(id); })
@@ -14659,7 +14666,7 @@ function fsMid(p = stagePads()) { return [p.l + (Wpx - p.l - p.r) / 2, p.t + (Hp
 
 /* ----- in ----- */
 function fsEnter(o = {}) {
-  if (FS.on || FS.leaving || !M()) return;
+  if (FS.on || FS.leaving || !M() || dawnOn()) return; // (the Dawn page keeps the map in its panel)
   fsBuild();
   const stage = $("#stage"), r0 = stage.getBoundingClientRect(), T0 = T;
   const framed = S.view !== "map" || atLastFit() || !!flight || T.k <= HOME.k * 1.001;
@@ -15490,7 +15497,54 @@ addEventListener("resize", () => { if (RT.drop && !RT.drop.hidden) rtCloseMenu()
 {
   let want = rtIsOn();
   try { want = want || /[#&]retro=1(&|$)/.test(location.hash) || localStorage.getItem(RT_KEY) === "1"; } catch (e) {}
-  if (want) rtSet(true, { persist: false, boot: true });
+  // (the Dawn page has its own look, whatever the reader chose on /map/)
+  if (want && !dawnOn()) rtSet(true, { persist: false, boot: true });
+}
+
+/* =============================== the Dawn page ===============================
+   /dawn/electoral-map/ (.build/dawn/template-emap.html) runs this same map under
+   html.mp-dawn. The page brings its own election and basis menus and its own
+   layout; here the canvas takes Dawn's colours, and each rebuild of the key is
+   dealt out to the page's slots. Declarations only: boot calls these before this
+   part has run. */
+function dawnOn() { return typeof document !== "undefined" && document.documentElement.classList.contains("mp-dawn"); }
+// Dawn's warm paper, indigo ink and party colours (template.html's :root), over readTheme's
+function dawnTheme(T) {
+  const dk = T.dark, h = (light, dark) => hex(dk ? dark : light);
+  T.bg = h("#fbf6f1", "#14132a"); T.surface = h("#fffbf7", "#1b1a34");
+  T.ink = h("#1d1b33", "#f3eee8"); T.ink2 = h("#4a4660", "#cbc6d6"); T.ink3 = h("#686477", "#a39fb3");
+  T.faint = h("#c9bfb4", "#4a4764"); T.line = h("#e8e0d7", "#2a2843"); T.line2 = h("#efe8e0", "#232139");
+  const P = dk
+    ? { alp: "#e65548", lnp: "#5b88e4", grn: "#23906a", onp: "#d6762a", ind: "#2bb3a6", csa: "#a07ccb", oth: "#8f8aa3", nxt: "#d6762a", dem: "#2bb3a6" }
+    : { alp: "#cf3a2f", lnp: "#2a5cb4", grn: "#1d7a52", onp: "#dc6a16", ind: "#14a3a0", csa: "#7e52a8", oth: "#8d8799", nxt: "#dc6a16", dem: "#10998d" };
+  T.party = {}; for (const k in P) T.party[k] = hex(P[k]);
+  T.mid = h("#e6dfe4", "#3a3753"); T.nodata = h("#efe9e2", "#211f39"); T.hatch = h("#c9bfb4", "#4a4764");
+  T.seam = dk ? T.bg : [255, 255, 255]; T.seamA = dk ? 0.7 : 0.9;
+  T.coast = h("#8b8498", "#8d89a8"); T.state = h("#2b2844", "#e4e0ee");
+  T.floor = h("#f4ece4", "#1d1c36");
+  // the sea is the morning sky's own pale blue-violet; at night, the sky's navy
+  T.sea = h("#ecebf6", "#0d1230"); T.seaLine = h("#d6d6ec", "#232a54");
+  T.seaMark = h("#8d8cb4", "#6e76a8"); T.seaInk = h("#5f628f", "#9aa3d4");
+}
+/* the key's rows, dealt to the page: the basis's own settings over the map, the cities
+   over them, Draw under the map, and the notes down with the seat's figures. The rows
+   move as they are, so the map's own clicks and menus still work on them */
+function dawnSync() {
+  if (!dawnOn()) return;
+  const el = $("#legend"), m = M(); if (!el || !m) return;
+  const slot = (id, nodes) => { const s = $(id); if (s) { s.replaceChildren(...nodes); s.classList.toggle("none", !nodes.length); } };
+  const sub = el.querySelector(".lg-sub"), notes = [];
+  if (sub) { notes.push(...sub.querySelectorAll(":scope > .lg-note")); notes.forEach((n) => n.remove()); }
+  notes.push(...el.querySelectorAll(":scope > .lg-dn, :scope > .lg-note, :scope > .lg-shapes"), ...el.querySelectorAll(":scope > .lg-foot .lg-shapes"));
+  slot("#dm-opts", sub && sub.textContent.trim() ? [sub] : []);
+  slot("#dm-draw", [...el.querySelectorAll(":scope > .lg-draw")]);
+  slot("#dm-places", [...el.querySelectorAll(":scope > #cities")]);
+  slot("#dm-notes", notes);
+  const s = S.sel;
+  document.dispatchEvent(new CustomEvent("dawn-map", { detail: {
+    year: S.year, years: YEARS_FED, lens: S.lens === "senpref" ? "flow" : S.lens, lenses: yearLenses(S.year),
+    level: s.level, seat: s.level === "div" || s.level === "booth" ? dn(m.divs[s.div].n) : "",
+  } }));
 }
 
 })();

@@ -758,9 +758,6 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const E = emapData(ROOT);
   const core = JSON.parse(fs.readFileSync(path.join(ROOT, "map", "data", "core-2025.json"), "utf8"));
   eq(E.seats.length, 150, "every 2025 seat");
-  ok(E.seats.every((s) => s.d.startsWith("M") && s.d.length > 20 && s.box[2] > s.box[0] && s.box[3] > s.box[1]), "every seat has a shape");
-  ok(E.seats.every((s) => s.box[0] >= E.frame[0] && s.box[2] <= E.frame[0] + E.frame[2] && s.box[1] >= E.frame[1] && s.box[3] <= E.frame[1] + E.frame[3]), "every shape is inside the national view");
-  ok(E.frame[2] > 950 && E.frame[2] < 1010 && E.frame[3] < 1000, "no stray island shrinks the national view");
   for (const D of core.divs) {
     const s = E.seats.find((q) => q.n === D.n), t = D.tcp.map((q) => q[1]);
     eq(s.votes, Math.abs(t[0] - t[1]), `${D.n}: the lead in votes`);
@@ -791,10 +788,19 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).emap, "utf8");
   fs.rmSync(tmp, { recursive: true, force: true });
   ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "electoral map: every placeholder filled");
-  new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
+  const own = built.lastIndexOf("<script>") + 8;
+  new vm.Script(built.slice(own, built.indexOf("</script>", own))); n++;
+  /* the map is /map/'s own engine, in Dawn's dress, with the page's menus and rows around it */
+  ok(/classList\.add\('mp-dawn'\)/.test(built) && /<script src="\/map\/map\.js\?v=[0-9a-f]{8}"><\/script>/.test(built) && /href="\/map\/map\.css\?v=[0-9a-f]{8}"/.test(built), "electoral map: runs the full map's own script and styles");
+  for (const id of ["dm-year", "dm-basis", "dm-opts", "dm-places", "dm-draw", "stage", "cv", "story", "legend", "dm-notes"]) ok(built.includes(`id="${id}"`), `electoral map: #${id}`);
+  const engine = fs.readFileSync(path.join(ROOT, "map", "map.js"), "utf8");
+  ok(engine.includes('new CustomEvent("dawn-map"') && engine.includes("if (dawnOn()) dawnTheme(T);"), "electoral map: the engine carries its Dawn half");
+  const data = JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]);
+  for (const y of [...YEARS, "now"]) ok(typeof data.heads[y] === "string" && data.heads[y].length > 20, `electoral map: a heading for ${y}`);
+  ok(!/ won /.test(data.heads.now), "electoral map: today's House holds, it didn't win");
   ok([emapHead(E), closestHead(E), emapChapeau(E)].every((w) => built.includes(w)), "electoral map: its heads are today's rules");
   ok(built.includes('href="/map/"') && /name="robots" content="noindex"/.test(built), "electoral map: links the full map, unlisted");
-  ok(Buffer.byteLength(built) < 450e3, "electoral map: the page stays light");
+  ok(Buffer.byteLength(built) < 200e3, "electoral map: the page stays light");
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html", "template-disagree.html", "template-decided.html"]) {
     const src = fs.readFileSync(path.join(HERE, "dawn", f), "utf8");
     ok(/href="(\.\.\/)?electoral-map\/">electoral map</.test(src) && !/seats <small>soon/.test(src), `${f}'s menu lists the electoral map`);

@@ -3504,7 +3504,7 @@ canvas.addEventListener("touchcancel", () => { touchPace = null; });
 // at the whole-country fit (a zoomed-in map pans instead). Native controls
 // keep their own gestures (zoom and city buttons, form fields, links), and
 // the list view's own rows
-swipeWatch($(".mp-fig"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list, .cls-vote-scroll"));
+swipeWatch($(".mp-fig") || $("#view"), (dir, y) => { if (S.view === "chamber" || (S.view === "map" && T.k <= HOME.k * 1.001)) { walkAim(y); walkYear(dir, true); } }, (t) => !t.closest("button, a, input, select, textarea, .mp-list, .cls-vote-scroll"));
 // Safari's own pinch events. On a Mac they are the trackpad's pinch; iOS sends
 // them alongside the touches, which d3 (or the home pinch) already follows,
 // so while fingers are down they are left alone
