@@ -336,7 +336,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok(html.includes('name="robots" content="noindex"'), "a trial: kept out of search");
   ok(/const STARS=\[/.test(html), "the sky's stars");
   ok(!/\.hero\{[^}]*cursor:pointer/.test(html), "the non-clickable sun and hero do not show a pointer cursor");
-  ok(html.includes('y="${Math.round(y(S.y1))+8}" class="rf"') && html.includes('y="${Math.round(y(S.y0))-7}" class="rf"'), "2PP outcome labels sit at the chart's upper and lower bounds");
+  ok(html.includes("function settleOutcomeLabels(svg, upLimit, dnLimit)") && html.includes("if (!touches(label)) continue;"), "2PP labels keep their normal positions unless a data series touches them");
   ok(!html.includes(".skyset") && !html.includes('role="radiogroup" aria-label="Sky"'), "Sky’s Auto, Sunrise and Sunset controls are absent");
   ok(html.includes("const pickMode=") && html.includes("sky.dataset.mode=mode"), "Sky stays automatic by local time instead of a menu choice");
   ok(/window\.AP\.pmEngine\s*=/.test(html), "the browser copy of the model, for the pollster menu");
