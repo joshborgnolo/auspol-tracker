@@ -789,6 +789,7 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).emap, "utf8");
   fs.rmSync(tmp, { recursive: true, force: true });
   ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "electoral map: every placeholder filled");
+  ok(built.includes("section.hero{margin-top:0}"), "electoral map: map.css's own .hero rule can't push the sunrise down");
   const own = built.lastIndexOf("<script>") + 8;
   new vm.Script(built.slice(own, built.indexOf("</script>", own))); n++;
   /* the map is /map/'s own engine, in Dawn's dress, with the page's menus and rows around it */
