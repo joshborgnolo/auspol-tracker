@@ -1,7 +1,7 @@
 {
- "_about": "SEC Newgate 'Mood of the Nation' one-off and rotating survey questions that do NOT channel into the auspol-tracker data model (voting intention/leader trackers are not SEC Newgate products; national direction IS channelled via polls.json direction[] and is excluded, as are the committed mood/priority pipelines). Compiled by reading the seven committed report text dumps in .build/secnewgate-src/ (Jul 2025 through Sep 2026, waves 21-27); waves before 21 are unaudited and stay out.",
- "generated": "2026-10-17",
- "_readme": "Two-store convention: a question gets ONE id; every wave that asked it files a dated reading under it (identical ids across waves are the series, e.g. immigration-level in waves 24/26/27). Entry metadata (waveDate/sample/published/url/methodUrl) comes from the matching polls.json direction[] row for the wave. Every figure in every table was token-verified present in the report text dump at filing time; notes cite value orders inline. Rendering contract (read before editing): tables[0] is always width-1 (one value per entity) so the /ad-hocs/ headline strip renders it as labelled bars; multi-value tables carry 'columns' parallel to 'values'; gen-data.mjs maps columns->headers and entities->rows like the News24 store. Width-1 tables may omit 'columns'. width-1 headline tables whose rows were derived from a wider printed row mark the derivation in their title. trump-sentiment (filed 2026-10-17 at user request for the cross-house Trump series): the standing sentiment module (old N22 renumbered N24 then N30) printed as a chart strip only in each report; all seven waves' totals and scale rows are printed in the reports' 'Level of positivity or negativity' trend strips and token-verified. Total columns are the report's own printed TOTAL POSITIVE/NEGATIVE (July 2025's printed totals 15/70 are rounded before its scale rows). No demographic table is printed for this module; highlights quoted in notes come from each report's section prose.",
+ "_about": "SEC Newgate 'Mood of the Nation' one-off and rotating survey questions that do NOT channel into the auspol-tracker data model (voting intention/leader trackers are not SEC Newgate products; national direction IS channelled via polls.json direction[] and is excluded, as are the committed mood/priority pipelines). Compiled by reading the eight committed report text dumps in .build/secnewgate-src/ (Jul 2025 through Nov 2026, waves 21-28); waves before 21 are unaudited and stay out.",
+ "generated": "2026-11-28",
+ "_readme": "Two-store convention: a question gets ONE id; every wave that asked it files a dated reading under it (identical ids across waves are the series, e.g. immigration-level in waves 24/26/27). Entry metadata (waveDate/sample/published/url/methodUrl) comes from the matching polls.json direction[] row for the wave. Every figure in every table was token-verified present in the report text dump at filing time; notes cite value orders inline. Rendering contract (read before editing): tables[0] is always width-1 (one value per entity) so the /ad-hocs/ headline strip renders it as labelled bars; multi-value tables carry 'columns' parallel to 'values'; gen-data.mjs maps columns->headers and entities->rows like the News24 store. Width-1 tables may omit 'columns'. width-1 headline tables whose rows were derived from a wider printed row mark the derivation in their title. trump-sentiment (filed 2026-10-17 at user request for the cross-house Trump series): the standing sentiment module (old N22 renumbered N24 then N30; T33 in wave 28) printed as a chart strip only in each report; all eight waves' totals and scale rows are printed in the reports' 'Level of positivity or negativity' trend strips and token-verified. Total columns are the report's own printed TOTAL POSITIVE/NEGATIVE (July 2025's printed totals 15/70 are rounded before its scale rows). Group splits are printed at total-positive and total-negative level rather than for the detailed scale; notes quote group figures from that table alongside the section prose.",
  "entries": [
   {
    "id": "fed-govt-priorities",
@@ -6197,6 +6197,840 @@
        "name": "Very negative",
        "values": [
         54
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "immigration-level",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N27"
+   ],
+   "question": "Do you personally think that the current level of immigration in Australia is…?",
+   "notes": "55% say immigration is too high, down from 57% in September and July's peak of 62%; 33% say about right and 5% too low. One Nation supporters are highest at 93% against 28% of Greens supporters, and 64% of those 65+ say too high against 39% of 18–34s.",
+   "tables": [
+    {
+     "title": "Current level of immigration in Australia (%) — Nov '26",
+     "source": "PDF p. 28",
+     "entities": [
+      {
+       "name": "Too high",
+       "values": [
+        55
+       ]
+      },
+      {
+       "name": "About right",
+       "values": [
+        33
+       ]
+      },
+      {
+       "name": "Too low",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        7
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trump-sentiment",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "T33"
+   ],
+   "question": "Overall, do you feel positive or negative towards US President Donald Trump?",
+   "notes": "72% feel negative towards Donald Trump (58% very negative) and 13% positive. Positive sentiment is 30% among One Nation supporters and 10% among Coalition supporters, against 2% of Greens supporters and 6% of Labor supporters.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF p. 36",
+     "entities": [
+      {
+       "name": "% TOTAL: Positive",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "% TOTAL: Negative",
+       "values": [
+        72
+       ]
+      },
+      {
+       "name": "Very positive",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Somewhat positive",
+       "values": [
+        8
+       ]
+      },
+      {
+       "name": "Neither positive nor negative",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "Somewhat negative",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Very negative",
+       "values": [
+        58
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-security",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "T31"
+   ],
+   "question": "Australia, the United States and the United Kingdom have formed a long-term security partnership known as AUKUS. The agreement aims to strengthen defence and security cooperation in the Indo-Pacific region, including helping Australia acquire nuclear-powered submarines and access advanced defence technologies. Do you support or oppose Australia's involvement in the AUKUS partnership?",
+   "notes": "45% support AUKUS, down 10 points from 55% in September, while 21% oppose it (up from 17%). Support is strongest among 65+ voters (59%), One Nation supporters (53%) and Coalition supporters (61%); among Greens voters 23% support it and 38% oppose it.",
+   "tables": [
+    {
+     "title": "Support for Australia's involvement in AUKUS — November 2026",
+     "source": "PDF p. 37",
+     "columns": [
+      "Wave",
+      "Strongly support",
+      "Somewhat support",
+      "Neither",
+      "Somewhat oppose",
+      "Strongly oppose",
+      "Total support",
+      "Total oppose"
+     ],
+     "entities": [
+      {
+       "name": "November 2026",
+       "values": [
+        17,
+        28,
+        33,
+        12,
+        9,
+        45,
+        21
+       ]
+      },
+      {
+       "name": "September 2026",
+       "values": [
+        20,
+        34,
+        28,
+        10,
+        7,
+        55,
+        17
+       ]
+      },
+      {
+       "name": "July 2026",
+       "values": [
+        20,
+        32,
+        29,
+        11,
+        9,
+        52,
+        19
+       ]
+      },
+      {
+       "name": "May 2026",
+       "values": [
+        24,
+        28,
+        29,
+        10,
+        8,
+        53,
+        19
+       ]
+      },
+      {
+       "name": "November 2025",
+       "values": [
+        25,
+        35,
+        23,
+        11,
+        6,
+        59,
+        17
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "large-company-behaviour",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "F35a"
+   ],
+   "question": "Overall, do you agree or disagree with the following statements about the current behaviour of large companies operating in Australia (i.e. Australia's \"corporate sector\")?",
+   "notes": "18% agree corporates are behaving ethically and doing the right thing, down from 21% in July, while 44% disagree (up from 39%). The November report prints only these totals and demographic splits.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF p. 29",
+     "entities": [
+      {
+       "name": "Agree",
+       "values": [
+        18
+       ]
+      },
+      {
+       "name": "Disagree",
+       "values": [
+        44
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "personal-standard-of-living",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N28"
+   ],
+   "question": "Thinking about your own personal standard of living. To what extent do you believe your own personal standard of living will improve, stay the same or worsen during 2027?",
+   "notes": "More Australians expect their standard of living to worsen (44%) than improve (16%) during 2027, substantially more pessimistic than February's 37% and 23%. Improvement expectations fall with age, from 27% of 18–34s to 7% of those 65+.",
+   "tables": [
+    {
+     "title": "Change in standard of living in 2027",
+     "source": "PDF p. 30",
+     "entities": [
+      {
+       "name": "Improve a lot",
+       "values": [
+        2
+       ]
+      },
+      {
+       "name": "Improve a little",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Stay the same",
+       "values": [
+        39
+       ]
+      },
+      {
+       "name": "Worsen a little",
+       "values": [
+        31
+       ]
+      },
+      {
+       "name": "Worsen a lot",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "Total improve",
+       "values": [
+        16
+       ]
+      },
+      {
+       "name": "Total worsen",
+       "values": [
+        44
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "disaster-response-confidence",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N32"
+   ],
+   "question": "Overall, how confident are you in the ability of governments to respond and assist if a natural disaster was to occur in your local area?",
+   "notes": "70% are confident governments would respond to a local natural disaster (13% very and 57% somewhat confident), up from 64% in July. A further 23% are not very confident and 7% not at all confident.",
+   "tables": [
+    {
+     "title": "Confidence in government response to a local natural disaster",
+     "source": "PDF p. 34",
+     "columns": [
+      "Response",
+      "Very confident",
+      "Somewhat confident",
+      "Not very confident",
+      "Not at all confident",
+      "Total confident"
+     ],
+     "entities": [
+      {
+       "name": "November 2026",
+       "values": [
+        13,
+        57,
+        23,
+        7,
+        70
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "australia-operating",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N21"
+   ],
+   "question": "Now thinking about all aspects of Australia and how it is operating as a country today. Which one of the following comes closest to your view?",
+   "notes": "52% think Australia is operating reasonably well but needs changes or improvements, 44% think it is not operating well and needs fundamental changes, and just 4% think it is operating very well overall.",
+   "tables": [
+    {
+     "title": null,
+     "source": "PDF p. 25",
+     "columns": [
+      "Response",
+      "Share"
+     ],
+     "entities": [
+      {
+       "name": "Australia is operating very well overall",
+       "values": [
+        4
+       ]
+      },
+      {
+       "name": "Australia is operating reasonably well overall but does need some changes or improvements",
+       "values": [
+        52
+       ]
+      },
+      {
+       "name": "Australia is not operating well and needs fundamental changes or improvements",
+       "values": [
+        44
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "australia-life-sentiment",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N22"
+   ],
+   "question": "To what extent do you agree or disagree with each of the following?",
+   "notes": "89% agree they care about Australia's future direction, but only 37% are optimistic about it, 35% think the system works fairly for people like them, and 34% are confident in their future financial security. Shares printed here are each statement's total agreement.",
+   "tables": [
+    {
+     "title": "Agreement with each statement",
+     "source": "PDF p. 26",
+     "columns": [
+      "Statement",
+      "Total agree"
+     ],
+     "entities": [
+      {
+       "name": "You care about the future direction of Australia",
+       "values": [
+        89
+       ]
+      },
+      {
+       "name": "You feel a strong sense of belonging in Australia",
+       "values": [
+        61
+       ]
+      },
+      {
+       "name": "Australia offers people like you a good quality of life",
+       "values": [
+        57
+       ]
+      },
+      {
+       "name": "You are optimistic about the future direction of Australia",
+       "values": [
+        37
+       ]
+      },
+      {
+       "name": "You feel that the system in Australia works fairly for people like you",
+       "values": [
+        35
+       ]
+      },
+      {
+       "name": "You are confident that you will be financially secure in the future",
+       "values": [
+        34
+       ]
+      },
+      {
+       "name": "People like you are well represented in Australia's political system",
+       "values": [
+        30
+       ]
+      },
+      {
+       "name": "People like you can influence the decisions that government makes",
+       "values": [
+        29
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "national-risks",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N23"
+   ],
+   "question": "In the next 5-10 years, how much of a risk, if any, do you think each of the following poses to Australia?",
+   "notes": "Cyber attacks are the most common major concern (72%), followed by global economic instability (67%). The percentages shown are the printed total risk (major plus minor) for each area.",
+   "tables": [
+    {
+     "title": "Risk perceived in the next 5–10 years",
+     "source": "PDF p. 31",
+     "columns": [
+      "Risk",
+      "Total risk"
+     ],
+     "entities": [
+      {
+       "name": "Cyber attacks on Australian governments, businesses or infrastructure",
+       "values": [
+        94
+       ]
+      },
+      {
+       "name": "Global economic instability",
+       "values": [
+        92
+       ]
+      },
+      {
+       "name": "Disruption to Australia's energy or fuel supplies",
+       "values": [
+        91
+       ]
+      },
+      {
+       "name": "Disruption to critical supply chains",
+       "values": [
+        91
+       ]
+      },
+      {
+       "name": "Australia's dependence on other countries for critical goods or technologies",
+       "values": [
+        90
+       ]
+      },
+      {
+       "name": "Social instability within Australia",
+       "values": [
+        89
+       ]
+      },
+      {
+       "name": "Foreign interference in Australian politics or institutions",
+       "values": [
+        87
+       ]
+      },
+      {
+       "name": "Terrorism",
+       "values": [
+        86
+       ]
+      },
+      {
+       "name": "Military conflict with another country",
+       "values": [
+        76
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "self-reliance-importance",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N24"
+   ],
+   "question": "Thinking about goods, services and capabilities that are important to Australia. How important do you think it is for Australia to meet its own needs in each of the following areas, without relying too heavily on other countries?",
+   "notes": "Food production tops self-reliance at 96% total important, followed by medicines and essential medical supplies and fuel and energy supplies, each at 95%. Defence equipment and military technology is lowest, though 85% still consider it important.",
+   "tables": [
+    {
+     "title": "Importance of self-reliance in essential areas",
+     "source": "PDF p. 32",
+     "columns": [
+      "Area",
+      "Total important"
+     ],
+     "entities": [
+      {
+       "name": "Food production",
+       "values": [
+        96
+       ]
+      },
+      {
+       "name": "Medicines and essential medical supplies",
+       "values": [
+        95
+       ]
+      },
+      {
+       "name": "Fuel and energy supplies",
+       "values": [
+        95
+       ]
+      },
+      {
+       "name": "Manufacturing of essential goods",
+       "values": [
+        94
+       ]
+      },
+      {
+       "name": "Telecommunications and digital infrastructure",
+       "values": [
+        93
+       ]
+      },
+      {
+       "name": "Critical minerals",
+       "values": [
+        90
+       ]
+      },
+      {
+       "name": "Defence equipment and military technology",
+       "values": [
+        85
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "institutional-trust",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "N31"
+   ],
+   "question": "How much do you trust each of the following to act in the best interests of people like you in Australia?",
+   "notes": "The police (85%) and public health system (83%) are most trusted to act in people's best interests. Just 26% trust social media companies, and 41% trust insurance companies.",
+   "tables": [
+    {
+     "title": "Trust to act in people's best interests",
+     "source": "PDF p. 33",
+     "columns": [
+      "Institution",
+      "Total trust"
+     ],
+     "entities": [
+      {
+       "name": "The police",
+       "values": [
+        85
+       ]
+      },
+      {
+       "name": "The public health system",
+       "values": [
+        83
+       ]
+      },
+      {
+       "name": "Superannuation funds",
+       "values": [
+        73
+       ]
+      },
+      {
+       "name": "The legal system",
+       "values": [
+        68
+       ]
+      },
+      {
+       "name": "Local councils",
+       "values": [
+        67
+       ]
+      },
+      {
+       "name": "The ABC",
+       "values": [
+        65
+       ]
+      },
+      {
+       "name": "State Government",
+       "values": [
+        59
+       ]
+      },
+      {
+       "name": "Banks",
+       "values": [
+        56
+       ]
+      },
+      {
+       "name": "Electricity companies",
+       "values": [
+        53
+       ]
+      },
+      {
+       "name": "Federal Government",
+       "values": [
+        50
+       ]
+      },
+      {
+       "name": "Commercial news organisations",
+       "values": [
+        45
+       ]
+      },
+      {
+       "name": "Insurance companies",
+       "values": [
+        41
+       ]
+      },
+      {
+       "name": "Social media companies",
+       "values": [
+        26
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aukus-security-impact",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "T32"
+   ],
+   "question": "Overall, what impact, if any do you think the AUKUS partnership will have on Australia's security?",
+   "notes": "51% think AUKUS will make Australia more secure, 24% no difference, 11% less secure and 15% don't know. The two more-secure categories print 14% and 38% (52 combined) but both the chart and group table print 51 for more secure; the six detailed rows sum to 102 after independent rounding. These figures are kept as printed, not adjusted to reconcile them.",
+   "tables": [
+    {
+     "title": "Expected security impact of AUKUS",
+     "source": "PDF p. 38",
+     "columns": [
+      "Response",
+      "Share"
+     ],
+     "entities": [
+      {
+       "name": "Make Australia a lot more secure",
+       "values": [
+        14
+       ]
+      },
+      {
+       "name": "Make Australia a little more secure",
+       "values": [
+        38
+       ]
+      },
+      {
+       "name": "Make no difference to Australia's security",
+       "values": [
+        24
+       ]
+      },
+      {
+       "name": "Make Australia a little less secure",
+       "values": [
+        6
+       ]
+      },
+      {
+       "name": "Make Australia a lot less secure",
+       "values": [
+        5
+       ]
+      },
+      {
+       "name": "Don't know",
+       "values": [
+        15
+       ]
+      },
+      {
+       "name": "More secure (printed total)",
+       "values": [
+        51
+       ]
+      },
+      {
+       "name": "Less secure (printed total)",
+       "values": [
+        11
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "us-china-relationship-priority",
+   "waveDate": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "dateEnd": "2026-11-23",
+   "published": "2026-11-27T17:16",
+   "sample": 1524,
+   "url": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "codes": [
+    "T34"
+   ],
+   "question": "Thinking about Australia's relationship with the United States and China. Which of the following comes closest to your view?",
+   "notes": "66% want Australia to maintain strong relationships with both China and the United States, while 13% would prioritise China and 9% the United States.",
+   "tables": [
+    {
+     "title": "Preferred relationships with the United States and China",
+     "source": "PDF p. 39",
+     "columns": [
+      "Response",
+      "Share"
+     ],
+     "entities": [
+      {
+       "name": "Australia should prioritise its relationship with the United States",
+       "values": [
+        9
+       ]
+      },
+      {
+       "name": "Australia should prioritise its relationship with China",
+       "values": [
+        13
+       ]
+      },
+      {
+       "name": "Australia should maintain strong relationships with both countries as much as possible",
+       "values": [
+        66
+       ]
+      },
+      {
+       "name": "None / don't know",
+       "values": [
+        12
        ]
       }
      ]

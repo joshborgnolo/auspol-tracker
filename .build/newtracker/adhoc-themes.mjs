@@ -80,6 +80,8 @@ export const THEME_OF = {
   "trump-favourability": "trump-us",
   // essential+secnewgate
   "aukus-security": "trump-us",
+  "aukus-security-impact": "trump-us",
+  "us-china-relationship-priority": "trump-us",
   // secnewgate
   "trump-sentiment": "trump-us",
   "trump-description": "trump-us",
@@ -339,6 +341,8 @@ export const THEME_OF = {
   "iran-military-action-support": "war-security",
   "china-economic-relationship": "war-security",
   "economy-important-country": "war-security",
+  "national-risks": "war-security",
+  "self-reliance-importance": "war-security",
 
   /* bondi-cohesion */
   // essential
@@ -512,6 +516,9 @@ export const THEME_OF = {
   "information-trust": "trust-democracy",
   "fed-govt-priorities": "trust-democracy",
   "disaster-response-confidence": "trust-democracy",
+  "australia-operating": "trust-democracy",
+  "australia-life-sentiment": "trust-democracy",
+  "institutional-trust": "trust-democracy",
 
   /* cut */
   // demosau

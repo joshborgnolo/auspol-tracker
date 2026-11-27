@@ -295,6 +295,18 @@ assert.deepEqual(tableRows({ rows: [["Yes", 70], ["No", 15], ["Yes", 72, 68], ["
   const trump = out.topics.find((t) => t.id === "trump-us").blocks.find((b) => b.kind === "tracker");
   const sec = trump.panels.find((p) => p.house === "secnewgate").points.find((q) => q.field.end === "2025-11-03");
   assert.equal(sec.v, -39, "SEC Newgate's November 2025 net quotes its printed 60% negative (21 - 60), not the parts' 59");
+  for (const [topic, v] of [["immigration", 55], ["trump-us", -59]]) {
+    const block = out.topics.find((t) => t.id === topic).blocks.find((b) => b.kind === "tracker");
+    const latest = block.panels.find((p) => p.house === "secnewgate").points.at(-1);
+    assert.equal(latest.v, v, `${topic}: the November 2026 SEC Newgate reading reaches its tracker`);
+    assert.equal(latest.field.end, "2026-11-23");
+    assert.equal(latest.pub, "2026-11-27");
+  }
+  const aukus = out.topics.find((t) => t.id === "trump-us").blocks.find((b) => b.id === "aukus");
+  assert.equal(aukus.src.wave, "2026-11-23", "the AUKUS battery advances to the newest wave");
+  const aukusNov = aukus.rows.find((r) => r.label === "November 2026");
+  assert.equal(aukusNov.a, 45);
+  assert.equal(aukusNov.b, 21);
   /* the stores as filed: a trend chart's month point sits with the report
      that asked the question (happiness was asked on 30 Sep 2026 only; the
      Melbourne Cup each late-October Cup-eve report), and no all-voters grid
