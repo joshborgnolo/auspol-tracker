@@ -60,7 +60,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
    by dvh, every scroll that folded the toolbar away stretched the charts */
 @supports (height:100svh){:root{--tbs:calc(100lvh - 100svh)}}
 @media (pointer:coarse){:root{--ext:120px}}
-.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));overflow:clip;background:#070d24;cursor:pointer}
+.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));overflow:clip;background:#070d24}
 /* only a panel's top edge snaps. A panel is taller than the screen (--ext, the toolbar), and a snap area
    taller than the screen scrolls freely inside it: a lazy swipe was spent on the blank strip at its foot.
    The panels clip with overflow:clip: hidden would make each a scroller, which keeps .snap to itself */
@@ -772,6 +772,40 @@ function xTicks(a,b,w,narrow){
   return out;
 }
 
+function settleOutcomeLabels(svg, upLimit, dnLimit) {
+  const labels = $$(".rf", svg);
+  if (!labels.length) return;
+  const data = $$(".series,.series-band,.series-dot,.ends circle", svg).map((el) => ({
+    el, length: el.getTotalLength(), pad: 1 + (parseFloat(getComputedStyle(el).strokeWidth) || 0) / 2,
+  }));
+  const touches = (label) => {
+    if (!data.length) return false;
+    const b = label.getBBox();
+    return data.some((d) => {
+      for (const at of [...Array(Math.ceil(d.length / 2)).keys(), d.length]) {
+        const p = d.el.getPointAtLength(at), qx = Math.max(b.x, Math.min(p.x, b.x + b.width)), qy = Math.max(b.y, Math.min(p.y, b.y + b.height));
+        if (p.x >= b.x - d.pad && p.x <= b.x + b.width + d.pad && p.y >= b.y - d.pad && p.y <= b.y + b.height + d.pad && Math.hypot(p.x - qx, p.y - qy) <= d.pad) return true;
+      }
+      return false;
+    });
+  };
+  for (const label of labels) {
+    if (!touches(label)) continue;
+    const home = Number(label.getAttribute("y")), preferred = label.textContent.startsWith("▲") ? -1 : 1;
+    for (let step = 1; step <= 160; step++) {
+      let reachedLimit = false;
+      for (const direction of [preferred, -preferred]) {
+        const limit = direction < 0 ? upLimit : dnLimit;
+        const at = direction < 0 ? Math.max(limit, home - step * 4) : Math.min(limit, home + step * 4);
+        label.setAttribute("y", String(at));
+        if (!touches(label)) break;
+        if (at === limit) reachedLimit = true;
+      }
+      if (!touches(label) || reachedLimit) break;
+    }
+  }
+}
+
 const pollHref=p=>POLLS_HREF+(p.q||'')+'#p-'+encodeURIComponent(p.k);
 function chart(o){
   const fig=o.fig,svg=o.svg,tip=$('.tip',fig);
@@ -849,18 +883,18 @@ function chart(o){
     const cid=svg.id+'-clip';
     /* lines and bands end at the plot's edges; dots and rings keep a margin, so one on an edge stays whole */
     s+=`<defs><clipPath id="${cid}"><rect x="${ML}" y="${MT-8}" width="${PW}" height="${PH+16}"/></clipPath><clipPath id="${cid}m"><rect x="${ML-6}" y="${MT-8}" width="${PW+12}" height="${PH+16}"/></clipPath></defs><g clip-path="url(#${cid})">`;
-    for(const b of S.bands||[]){if(b.pts.length<2)continue;const up=b.pts.map(q=>[x(q.x),y(q.hi)]),dn=b.pts.map(q=>[x(q.x),y(q.lo)]);s+=`<path d="${b.smooth?curve(up)+curveBack(dn):'M'+up.map(p=>P1(p[0])+' '+P1(p[1])).join('L')+'L'+dn.reverse().map(p=>P1(p[0])+' '+P1(p[1])).join('L')}Z" style="fill:${b.color};fill-opacity:${b.op||'var(--band)'}"/>`}
+    for(const b of S.bands||[]){if(b.pts.length<2)continue;const up=b.pts.map(q=>[x(q.x),y(q.hi)]),dn=b.pts.map(q=>[x(q.x),y(q.lo)]);s+=`<path class="series-band" d="${b.smooth?curve(up)+curveBack(dn):'M'+up.map(p=>P1(p[0])+' '+P1(p[1])).join('L')+'L'+dn.reverse().map(p=>P1(p[0])+' '+P1(p[1])).join('L')}Z" style="fill:${b.color};fill-opacity:${b.op||'var(--band)'}"/>`}
     const dr=narrow?2:2.4;
     const dots=(S.dots||[]).map(d=>({...d,px:x(d.x),py:y(d.y)}));
     const byCol={};dots.forEach(d=>{(byCol[d.color]=byCol[d.color]||[]).push(d)});
     s+=`</g><g clip-path="url(#${cid}m)">`;
-    for(const c in byCol)s+=`<g style="fill:${c};fill-opacity:var(--dot)">`+byCol[c].map(d=>`<circle cx="${P1(d.px)}" cy="${P1(d.py)}" r="${d.r||dr}"/>`).join('')+'</g>';
+    for(const c in byCol)s+=`<g style="fill:${c};fill-opacity:var(--dot)">`+byCol[c].map(d=>`<circle class="series-dot" cx="${P1(d.px)}" cy="${P1(d.py)}" r="${d.r||dr}"/>`).join('')+'</g>';
     s+=`</g><g clip-path="url(#${cid})">`;
     for(const l of S.lines||[]){if(l.pts.length<2)continue;const pts=l.pts.map(q=>[x(q.x),y(q.y)]),d=l.smooth?curve(pts):'M'+pts.map(p=>P1(p[0])+' '+P1(p[1])).join('L');
-      s+=`<path d="${d}" fill="none" style="stroke:${l.color}" stroke-width="${l.w||2.25}" stroke-linejoin="round" stroke-linecap="round"${l.dash?` stroke-dasharray="${l.dash}"`:''}${l.op!=null?` stroke-opacity="${l.op}"`:''}/>`}
+      s+=`<path class="series" d="${d}" fill="none" style="stroke:${l.color}" stroke-width="${l.w||2.25}" stroke-linejoin="round" stroke-linecap="round"${l.dash?` stroke-dasharray="${l.dash}"`:''}${l.op!=null?` stroke-opacity="${l.op}"`:''}/>`}
     s+=`</g><g clip-path="url(#${cid}m)">`;
     /* a ring is a count inside the window: a past term reaching past the edge doesn't bring half a ring with it */
-    for(const r of S.rings||[])if(r.x>=S.x0-1e-6&&r.x<=S.x1+1e-6)s+=`<circle cx="${P1(x(r.x))}" cy="${P1(y(r.y))}" r="${r.r||4.5}" fill="var(--bg)" style="stroke:${r.color}" stroke-width="${r.r&&r.r<4?1.5:2}"/>`;
+    for(const r of S.rings||[])if(r.x>=S.x0-1e-6&&r.x<=S.x1+1e-6)s+=`<circle class="series-dot" cx="${P1(x(r.x))}" cy="${P1(y(r.y))}" r="${r.r||4.5}" fill="var(--bg)" style="stroke:${r.color}" stroke-width="${r.r&&r.r<4?1.5:2}"/>`;
     s+='</g>';
     /* names for lines with no label at the right edge (past leaders), the longest line first: at its
        middle, else further along it, above the line or below, wherever no other name is */
@@ -881,6 +915,7 @@ function chart(o){
     }
     s+=`<g class="ends">${eg}</g><g class="scrub"></g>`;
     svg.innerHTML=s;
+    settleOutcomeLabels(svg, Math.round(y(S.y1)) + 18, Math.round(y(S.y0)) - 18);
     L={W,H,ML,MR,MT,MB,PH,PW,TIPH,x,y,S,dots,evAt,narrow,eg:$('.ends',svg),sg:$('.scrub',svg)};
     if(mode&&cur!=null)show(mode,cur,true);else idle();
   }

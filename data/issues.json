@@ -21600,6 +21600,34 @@
      "onp": 25.04
     }
    }
+  },
+  {
+   "pollster": "SEC Newgate",
+   "date": "2026-11-23",
+   "dateStart": "2026-11-20",
+   "sample": 1524,
+   "sampleEff": null,
+   "source": "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf",
+   "read": "report",
+   "question": "best party to manage the cost of living",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "oth",
+    "unsure"
+   ],
+   "note": "One Nation and the Greens options from this wave; 'neither/someone else' and 'can't say' are not shown separately – oth is the two combined",
+   "issues": {
+    "col": {
+     "alp": 20,
+     "lnp": 21,
+     "onp": 19,
+     "grn": 13,
+     "oth": 27
+    }
+   }
   }
  ],
  "dropped": [

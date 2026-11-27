@@ -63,6 +63,10 @@
    {
     "month": "2026-09",
     "mention": 9
+   },
+   {
+    "month": "2026-11",
+    "mention": 7
    }
   ],
   "Cost of living": [
@@ -109,6 +113,10 @@
    {
     "month": "2026-09",
     "mention": 68
+   },
+   {
+    "month": "2026-11",
+    "mention": 71
    }
   ],
   "Crime": [
@@ -154,6 +162,10 @@
    },
    {
     "month": "2026-09",
+    "mention": 20
+   },
+   {
+    "month": "2026-11",
     "mention": 20
    }
   ],
@@ -245,6 +257,10 @@
    {
     "month": "2026-09",
     "mention": 11
+   },
+   {
+    "month": "2026-11",
+    "mention": 10
    }
   ],
   "Grocery prices": [
@@ -337,6 +353,10 @@
    {
     "month": "2026-09",
     "mention": 13
+   },
+   {
+    "month": "2026-11",
+    "mention": 10
    }
   ],
   "Housing affordability": [
@@ -383,6 +403,10 @@
    {
     "month": "2026-09",
     "mention": 32
+   },
+   {
+    "month": "2026-11",
+    "mention": 25
    }
   ],
   "Immigration & population": [
@@ -429,6 +453,10 @@
    {
     "month": "2026-09",
     "mention": 17
+   },
+   {
+    "month": "2026-11",
+    "mention": 12
    }
   ],
   "Inflation": [
@@ -509,6 +537,18 @@
    {
     "month": "2026-05",
     "mention": 7
+   },
+   {
+    "month": "2026-07",
+    "mention": 5
+   },
+   {
+    "month": "2026-09",
+    "mention": 4
+   },
+   {
+    "month": "2026-11",
+    "mention": 9
    }
   ],
   "Petrol prices": [
@@ -535,6 +575,10 @@
    {
     "month": "2026-09",
     "mention": 6
+   },
+   {
+    "month": "2026-11",
+    "mention": 8
    }
   ],
   "Social equality": [
@@ -601,6 +645,14 @@
    {
     "month": "2026-07",
     "mention": 6
+   },
+   {
+    "month": "2026-09",
+    "mention": 4
+   },
+   {
+    "month": "2026-11",
+    "mention": 8
    }
   ]
  },
@@ -646,6 +698,13 @@
    "onp": 22,
    "lnp": 16,
    "grn": 12,
+   "rest": 27
+  },
+  "2026-11": {
+   "alp": 20,
+   "onp": 19,
+   "lnp": 21,
+   "grn": 13,
    "rest": 27
   }
  },
