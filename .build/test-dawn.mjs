@@ -14,7 +14,9 @@
       page whole with the blocks it shares with the votes page; its
       favourability chart the same;
    6. the mood page: today's direction and trust are the site's own, every
-      branch of its heads and dek, and the built page.
+      branch of its heads and dek, and the built page;
+  12. the public opinion page: a slide a finding off the site's sidecar, the
+      site's styles and component carried whole, and the built page.
    Run: node .build/test-dawn.mjs */
 import fs from "node:fs";
 import os from "node:os";
@@ -29,7 +31,8 @@ import { pollHeading } from "./dawn/poll-heading.mjs";
 import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
 import { disagreeData, engine } from "./dawn/disagree-data.mjs";
 import { emapData, groupOf, GROUPS, YEARS } from "./dawn/emap-data.mjs";
-import { emapChapeau, emapHead, closestHead, closestSeats } from "./dawn/copy.mjs";
+import { heroSlides, newestPublished, pubopCss, HERO_ROWS } from "./dawn/po-data.mjs";
+import { emapChapeau, emapHead, opinionLede, closestHead, closestSeats } from "./dawn/copy.mjs";
 import { decidedData, decidedStory, partyStory, ageStory, ofHundred, oneIn, oneInShare } from "./dawn/decided-data.mjs";
 import { buildDawn, flowTotals, readScore, sharedBlock } from "./dawn/build.mjs";
 
@@ -815,6 +818,50 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
     const src = fs.readFileSync(path.join(HERE, "dawn", f), "utf8");
     ok(/href="(\.\.\/)?electoral-map\/">electoral map</.test(src) && !/seats <small>soon/.test(src), `${f}'s menu lists the electoral map`);
   }
+}
+/* 12. the public opinion page: the site's own catalogue component, styles and
+   sidecar under a sunrise of its findings */
+{
+  const src = JSON.parse(fs.readFileSync(path.join(A, "oneoffs-source.json"), "utf8"));
+  const topics = src.topics.filter((t) => t.finding);
+  const slides = heroSlides(src);
+  eq(slides.length, topics.length, "opinion: a slide for every topic's finding");
+  const share = (v) => v == null || (Number.isFinite(v) && v >= 0 && v <= 100);
+  for (const [i, sl] of slides.entries()) {
+    const t = topics[i], b = t.blocks.find((x) => x.id === t.finding.of);
+    ok(sl.id === t.id && sl.text === t.finding.text && sl.meta === t.finding.meta && b, `opinion: ${t.id} states the site's finding over the block it reads`);
+    ok(sl.of.startsWith(b.title), `opinion: ${t.id} names the figures under it`);
+    if (sl.kind === "two") ok(sl.a === b.a && sl.b === b.b, `opinion: ${t.id}'s two shares are the block's`);
+    else {
+      ok(sl.rows.length > 0 && sl.rows.length <= HERO_ROWS, `opinion: ${t.id}'s rows fit the sunrise`);
+      ok(sl.rows.every((r) => sl.kind === "list" ? share(r.v) && r.v != null : share(r.a) && r.a != null && share(r.b)), `opinion: ${t.id}'s rows carry shares`);
+    }
+    if (sl.kind === "pairs") eq(sl.rows.length + sl.more, b.kind === "tracker" ? b.panels.length : b.rows.length, `opinion: ${t.id} counts the polls it leaves below`);
+  }
+  const tcss = pubopCss(fs.readFileSync(path.join(HERE, "newtracker", "template.html"), "utf8"));
+  ok(/\.pubop-bar\s*\{/.test(tcss) && /@media[^{]*\{[^@]*\.pubop-row\s*\{/.test(tcss) && !tcss.includes(".pubop-ss"), "opinion: the site's rules come across, media queries kept, the static article's left out");
+  eq((tcss.match(/\{/g) || []).length, (tcss.match(/\}/g) || []).length, "opinion: the lifted rules are whole");
+  const file = path.join(ROOT, "dawn", "public-opinion", "index.html");
+  const built = fs.readFileSync(file, "utf8");
+  ok(/name="robots" content="noindex"/.test(built), "opinion: unlisted");
+  ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "opinion: every placeholder filled");
+  ok(built.includes(opinionLede(src, newestPublished(src))), "opinion: today's lede");
+  const data = JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]);
+  eq(JSON.stringify(data.slides), JSON.stringify(slides), "opinion: the page's slides are today's");
+  const po = built.match(/href="\.\.\/(po\.[0-9a-f]{8}\.json)"/)[1], app = built.match(/src="\.\.\/(po-app\.[0-9a-f]{8}\.js)"/)[1];
+  eq(fs.readFileSync(path.join(ROOT, "dawn", po), "utf8"), fs.readFileSync(path.join(A, "oneoffs-source.json"), "utf8"), "opinion: its sidecar is the site's own");
+  const code = fs.readFileSync(path.join(ROOT, "dawn", app), "utf8");
+  new vm.Script(code); n++;
+  ok(code.includes("PublicOpinionBody") && code.includes("function rdTabsKey("), "opinion: its script is the site's component and the helpers it borrows");
+  /* every global the component takes from the app it was written for, the page provides */
+  const jsx = fs.readFileSync(path.join(A, "rd-public-opinion.jsx"), "utf8");
+  for (const g of ["TrendChart", "useNarrow", "MQ_PHONE"]) ok(!jsx.includes(g) || built.includes(`window.${g}=`), `opinion: the page provides ${g}`);
+  const polls = new Set(JSON.parse(fs.readFileSync(path.join(A, "dawn-polls.json"), "utf8")).polls.map((p) => p.k));
+  ok(data.rows.length > 0 && data.rows.every((k) => polls.has(k)), "opinion: a chart's dot links only a poll the polls page has");
+  const own = built.indexOf("<script>\n{") + 8;
+  new vm.Script(built.slice(own, built.indexOf("</script>", own))); n++;
+  for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html", "template-disagree.html", "template-decided.html", "template-emap.html"])
+    ok(/href="(\.\.\/)?public-opinion\/">public opinion</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists public opinion`);
 }
 /* linked from nowhere */
 {

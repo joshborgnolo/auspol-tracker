@@ -15,11 +15,12 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, opinionLede, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { disagreeData } from "./disagree-data.mjs";
 import { decidedData } from "./decided-data.mjs";
 import { emapData } from "./emap-data.mjs";
+import { heroSlides, newestPublished, pubopCss, pubopApp } from "./po-data.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -300,7 +301,40 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     disagreeFile = path.join(out, "poll-disagreement", "index.html");
     write(disagreeFile, h);
   }
-  return { emap: emapFile, decided: decidedFile, disagree: disagreeFile, cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
+  /* the public opinion page (po-data.mjs): the site's own catalogue component, styles and sidecar under
+     a sunrise of its findings. Its script and data are sidecars of this page's own, hashed */
+  let opinionFile = null;
+  const oneOffsPath = path.join(assets, "oneoffs-source.json");
+  if (fs.existsSync(oneOffsPath)) {
+    const newtracker = path.join(HERE, "..", "newtracker");
+    const src = JSON.parse(fs.readFileSync(oneOffsPath, "utf8"));
+    const hashed = (stem, ext, body) => {
+      const buf = Buffer.from(body), name = `${stem}.${hash8(buf)}.${ext}`;
+      if (!fs.existsSync(path.join(out, name)) || !fs.readFileSync(path.join(out, name)).equals(buf)) write(path.join(out, name), buf);
+      for (const f of fs.readdirSync(out))
+        if (new RegExp(`^${stem}\\.[0-9a-f]{8}\\.${ext}$`).test(f) && f !== name && !keep(`dawn/${f}`)) fs.unlinkSync(path.join(out, f));
+      return name;
+    };
+    const poJson = hashed("po", "json", fs.readFileSync(oneOffsPath, "utf8"));
+    const poApp = hashed("po-app", "js", pubopApp(newtracker));
+    const rows = fs.existsSync(pollsPath) ? JSON.parse(fs.readFileSync(pollsPath, "utf8")).polls.map((p) => p.k) : [];
+    const linked = new Set(src.topics.flatMap((t) => t.blocks.flatMap((b) => (b.panels || []).flatMap((p) => p.points.filter((q) => q.rk)
+      .map((q) => q.rk.split("|")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + q.rk.split("|")[1])))));
+    const PO = { asOf: D.asOf, terms: D.terms, slides: heroSlides(src), rows: rows.filter((k) => linked.has(k)) };
+    const words = { FONT: "/assets/fonts/" + font, lede: esc(opinionLede(src, newestPublished(src))), POJSON: poJson, POAPP: poApp };
+    let h = fs.readFileSync(path.join(HERE, "template-public-opinion.html"), "utf8")
+      .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "")
+      .replace("/*{{PUBOPCSS}}*/", () => pubopCss(fs.readFileSync(path.join(newtracker, "template.html"), "utf8")));
+    h = h.replace(/\{\{([A-Za-z]+)\}\}/g, (m, k) => (k in words ? words[k] : m))
+      .replace("{{DATA}}", () => JSON.stringify(PO).replace(/</g, "\\u003c"))
+      .replace("/*{{STARS}}*/", () => fs.readFileSync(path.join(HERE, "stars.js"), "utf8").trim());
+    const unfilled = h.match(/\{\{[A-Za-z:]+\}\}/);
+    if (unfilled) throw new Error("dawn: template-public-opinion.html placeholder left unfilled: " + unfilled[0]);
+    fs.mkdirSync(path.join(out, "public-opinion"), { recursive: true });
+    opinionFile = path.join(out, "public-opinion", "index.html");
+    write(opinionFile, h);
+  }
+  return { opinion: opinionFile, emap: emapFile, decided: decidedFile, disagree: disagreeFile, cycles: cyclesFile, leaders: leadFile, mood: moodFile, polls: pollsFile, next: nextFile, file: path.join(out, "index.html"), bytes: Buffer.byteLength(html), hist: histName, groups: groupsName, ghist: ghUrl, weeks: D.weeks.length };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

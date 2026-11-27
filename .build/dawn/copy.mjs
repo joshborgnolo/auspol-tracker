@@ -462,3 +462,12 @@ export function copyFor(D) {
     flowsHead: flowsHead(D),
   };
 }
+
+/* the public opinion page's lede: what is on it and how fresh it is, counted from the page's own data
+   (the Australian Election Study is counted apart, as the catalogue counts it) */
+export function opinionLede(src, newest) {
+  const houses = Object.keys(src.houses).filter((h) => !src.longRun || h !== src.longRun.house).length;
+  const topics = src.topics.filter((t) => t.blocks.length || t.more.length).length;
+  return "What else Australians tell the pollsters: " + src.counts.questions + " questions from " + houses + " pollsters, in " + topics + " topics."
+    + (newest ? " The newest was published on " + fdate(newest) + "." : "");
+}

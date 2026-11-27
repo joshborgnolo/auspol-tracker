@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Public opinion · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+/* the page's two sides, the site's: turquoise for the agreeing, burgundy for the disagreeing. The sunrise's
+   are lifted to hold on the night sky. --pubop-* are the site's tracker inks (a family of wording each) */
+:root{--yes:#0b8f8c;--no:#8e1f41;--h-yes:#3ad6cd;--h-no:#e06a8e;--pubop-w0:var(--kb);--pubop-w1:#a57708;--pubop-c2:#3f8a52;--pubop-c3:#7c828c}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--yes:#2cc3bd;--no:#cf5877;--pubop-w1:#c99b2c;--pubop-c2:#63ac75;--pubop-c3:#9aa0aa}}
+:root[data-theme=dark]{--yes:#2cc3bd;--no:#cf5877;--pubop-w1:#c99b2c;--pubop-c2:#63ac75;--pubop-c3:#9aa0aa}
+/* a long page under one panel: a mandatory snap would hold the reader at its top */
+html{scroll-snap-type:y proximity}
+/* the sunrise: one topic's finding at a time, over the figures it reads */
+.pf{margin-top:clamp(10px,2.4vh,26px)}
+.pf-bar{display:flex;align-items:center;gap:8px}
+.pf-topic{flex:1 1 auto;font-size:14px;font-weight:600;color:rgb(238 238 255/.86)}
+.pf-topic small{font:400 13px/1 var(--sans);color:rgb(238 238 255/.66);margin-left:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pf-bar button{flex:none;width:44px;height:36px;display:grid;place-items:center;padding:0;border:1px solid rgb(238 238 255/.28);border-radius:999px;background:rgb(8 14 44/.22);color:#fff;cursor:pointer}
+.pf-bar button:hover{background:rgb(255 255 255/.12)}
+.pf-bar svg{width:15px;height:15px}
+.pf-body{touch-action:pan-y}
+.pf-text{margin:10px 0 0;font:400 clamp(22px,min(6.4vw,3.7vh),34px)/1.16 var(--serif);letter-spacing:-.008em;color:#fff;text-wrap:balance}
+.pf-of{margin:clamp(8px,1.6vh,16px) 0 0;font-size:13.5px;line-height:1.4;color:rgb(238 238 255/.78)}
+.pf-two{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:10px}
+.pf-two>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.pf-two>div+div{align-items:flex-end;text-align:right}
+.pf-two span{font-size:clamp(14px,3.9vw,17px);font-weight:600;color:var(--c)}
+.pf-two b{font-weight:600;font-size:clamp(44px,min(13vw,8vh),76px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.pf-two small{font-size:.4em;font-weight:500;opacity:.72;margin-left:2px;letter-spacing:0}
+.pf-line{display:flex;height:clamp(16px,2.8vh,24px);margin-top:12px;border-radius:999px;overflow:hidden;box-shadow:0 0 0 1px rgb(255 255 255/.14),0 4px 22px rgb(4 10 40/.35);background:rgb(238 238 255/.24)}
+.pf-line i{display:block;flex:0 0 auto;width:var(--w);background:var(--c)}
+.pf-line i+i{margin-left:auto}
+.pf-rows{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:clamp(4px,.9vh,10px)}
+.pf-ends{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;font-weight:600}
+.pf-pair{display:grid;grid-template-columns:minmax(0,7.4em) 2.1em minmax(0,1fr) 2.1em;align-items:center;column-gap:8px;font-size:14px}
+.pf-pair .n{line-height:1.15}
+.pf-pair .n small{display:block;font-size:11.5px;color:rgb(238 238 255/.64)}
+.pf-pair b{font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.pf-pair b:first-of-type{text-align:right}
+.pf-pair .pf-line{height:10px;margin:0;box-shadow:none}
+.pf-one{display:grid;grid-template-columns:minmax(0,1fr) 2.8em;column-gap:10px;row-gap:3px;align-items:baseline;font-size:14.5px;line-height:1.25}
+.pf-one b{font-weight:600;font-size:18px;text-align:right;font-variant-numeric:tabular-nums}
+.pf-one .pf-line{grid-column:1/-1;height:7px;margin:0;box-shadow:none;--c:#f4f1ea}
+.pf-meta{margin:clamp(8px,1.4vh,14px) 0 0;font-size:12.5px;color:rgb(238 238 255/.66)}
+.pf-go{display:inline-flex;align-items:center;min-height:40px;font-size:14.5px;font-weight:600;color:#fff;text-underline-offset:4px}
+@media(min-width:900px){.pf{max-width:600px}}
+@media(max-height:700px){.po-hero .now-d{font-size:13px}.pf{margin-top:8px}.pf-text{font-size:20px;margin-top:6px}.pf-two b{font-size:42px}.pf-rows{gap:3px}.pf-pair .n small{display:none}}
+
+/* the catalogue: the site's own (its rules are poured in below, by selector), on Dawn's ground and inks */
+.po{background:var(--bg);scroll-snap-align:start;padding:calc(var(--navh) + env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) var(--g);min-height:calc(100vh + var(--ext))}
+.po .wrap{display:block}
+.pubop{--surface:var(--bg);--ink-2:var(--ink2);--ink-3:var(--mute);--ink-faint:color-mix(in srgb,var(--mute) 78%,var(--bg));--line:var(--rule);--line-2:color-mix(in srgb,var(--rule) 70%,var(--bg));--accent:var(--kb);--mood-pos:var(--yes);--mood-neg:var(--no)}
+/*{{PUBOPCSS}}*/
+/* Dawn's voice over the site's: findings in the serif's regular weight, figures in the sans */
+.pubop-hl{font-weight:400;font-size:clamp(25px,6.6vw,34px);line-height:1.12}
+.pubop-lv{font-family:var(--sans);font-size:24px;letter-spacing:-.01em}
+.pubop-fn{color:var(--ink-faint)}
+.po-fig{margin-top:6px;flex:none;min-height:0;--dot:.9}
+.po-fig .tip.idle{visibility:hidden}
+.pubop-chart{display:block}
+.pubop-ledger summary,.pubop-wd summary,.pubop-cuts>summary,.pubop-more>summary,.pubop-mi>summary{min-height:30px}
+.po noscript p{margin:24px 0;color:var(--mute)}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
+    <li><a href="#top" aria-current="page">public opinion</a></li>
+    <li><a href="../past-cycles/">past cycles</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><a href="../poll-disagreement/">poll disagreement</a></li>
+    <li><a href="../decidedness/">decidedness</a></li>
+    <li><a href="../electoral-map/">electoral map</a></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero" id="top" aria-label="Public opinion: the findings">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+    <div class="now" id="now">
+    <h1 class="sr">auspol tracker: public opinion beyond voting intention</h1>
+    <h2>Public opinion</h2>
+    <p class="now-d">{{lede}}</p>
+    <div class="pf" id="pf" role="group" aria-roledescription="carousel" aria-label="The findings, topic by topic">
+      <div class="pf-bar"><span class="pf-topic"><span id="pf-topic"></span><small id="pf-n"></small></span><button type="button" id="pf-prev" aria-label="Previous finding"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5L5.5 8L10 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" id="pf-next" aria-label="Next finding"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8L6 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="pf-body" id="pf-body" aria-live="polite">
+        <p class="pf-text" id="pf-text"></p>
+        <p class="pf-of" id="pf-of"></p>
+        <div id="pf-vis"></div>
+        <p class="pf-meta" id="pf-meta"></p>
+      </div>
+      <a class="pf-go" id="pf-go" href="#questions"></a>
+    </div>
+  </div>
+</section>
+
+<section class="po" id="questions" aria-label="The questions, topic by topic">
+  <div class="wrap" id="public-opinion">
+    <div id="po-root"><noscript><p>The questions are drawn in the browser, so this page needs JavaScript.</p></noscript></div>
+  </div>
+</section>
+</main>
+
+<link data-po rel="prefetch" href="../{{POJSON}}" as="fetch" crossorigin>
+<script id="dawn-data" type="application/json">{{DATA}}</script>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const DATA=JSON.parse($('#dawn-data').textContent);
+
+/*{{SHARED:sky}}*/
+
+/*{{SHARED:dates}}*/
+const TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].e):null}));
+const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
+const ELX=isoX(CUR.e),NOWX=isoX(DATA.asOf),HIST={terms:[{a:0}]},PVSEL=new Set(),EVENTS=[];
+
+/*{{SHARED:window}}*/
+
+/* ---------- the charts: Dawn's, standing in for the site's TrendChart ---------- */
+const POLLS_HREF='../polls/';
+/*{{SHARED:chart}}*/
+
+const SHORT_FACET={twopp:'',primary:''};
+const pollKey=m=>m.pollster.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+m.released;
+const ROWS=new Set(DATA.rows);
+/* the component's chart props as a Dawn scene: a line a series, a dot a reading, a stop a date */
+function sceneOf(p,narrow){
+  const [x0,x1]=p.xDomain,[y0,y1]=p.yDomain,long=!p.series.some(s=>s.endLabel&&p.series.length>3)&&x1-x0>12;
+  const ys=p.yTicks.length>1?p.yTicks[1]-p.yTicks[0]:y1-y0;
+  const note=new Map((p.notes||[]).map(n=>[n.y,n.text]));
+  const fmt=p.fmt||f1;
+  const S={x0,x1,y0,y1,ys,fmt,direct:true,lines:[],bands:[],dots:[],rings:[],stops:[],ends:[],tags:[],
+    tick:v=>note.has(v)?note.get(v):v===y0?'':String(v),
+    refs:(p.refLines||[]).map(r=>({y:r.y}))};
+  for(const s of p.series){
+    S.lines.push({color:s.color,pts:s.points,w:long?1.6:2.1,smooth:false,thin:long});
+    const last=s.points[s.points.length-1];
+    if(s.endLabel&&last)S.tags.push({s:s.endLabel,color:s.color,x:last.x,y:last.y});
+  }
+  const memo=new Map();
+  for(const d of p.scatter||[]){
+    const m=d.meta||{},id=m.pollster+'|'+m.dateLabel;
+    if(!memo.has(id)){const k=m.released&&ROWS.has(pollKey(m))?pollKey(m):'';
+      memo.set(id,{who:m.pollster,when:m.dateLabel||'',n:m.sample?'n = '+Number(m.sample).toLocaleString('en-AU'):'',k,q:k&&m.facet&&!(m.facet in SHORT_FACET)?'?facet='+m.facet:''})}
+    S.dots.push({x:d.x,y:d.y,color:d.color,poll:memo.get(id),txt:(m.released?'':d.label+' ')+fmt(d.y),r:narrow?2.8:3.4});
+  }
+  (p.spine||[]).forEach((at,i)=>{
+    const here=(p.scatter||[]).filter(d=>d.x===at.x);if(!here.length)return;
+    const extra=p.extraRows?p.extraRows(i):[];
+    S.stops.push({x:at.x,label:p.tooltipTitle?p.tooltipTitle(i):'',sub:extra.map(r=>r.label+' '+r.value).join(' · '),
+      items:here.map(d=>({color:d.color,tc:d.color,y:d.y,v:d.y,txt:(here.length>1?(d.meta&&d.meta.released?d.meta.pollster:d.label)+' ':'')+fmt(d.y)})).sort((a,b)=>b.y-a.y)});
+  });
+  return S;
+}
+let FIGS=0;
+window.TrendChart=function TrendChart(p){
+  const fig=React.useRef(null),made=React.useRef(null),props=React.useRef(p);props.current=p;
+  const [id]=React.useState(()=>'po-chart-'+(++FIGS));
+  React.useEffect(()=>{
+    if(!made.current)made.current=chart({fig:fig.current,svg:$('svg',fig.current),use:()=>{WIN={kind:'all'}},scene:narrow=>sceneOf(props.current,narrow)});
+    made.current.clear();made.current.draw();
+  });
+  const label=(p.copy&&p.copy.title||'Chart')+'. Use the left and right arrow keys to read values.';
+  return React.createElement('div',{className:'fig po-fig',ref:fig,style:{height:p.heightPx+30}},
+    React.createElement('div',{className:'tip','aria-live':'polite'}),
+    React.createElement('svg',{id,tabIndex:0,'aria-label':label}));
+};
+window.MQ_PHONE='(max-width: 640px)';
+window.useNarrow=function(q){
+  const [on,set]=React.useState(()=>matchMedia(q).matches);
+  React.useEffect(()=>{const m=matchMedia(q),f=()=>set(m.matches);m.addEventListener('change',f);return ()=>m.removeEventListener('change',f)},[q]);
+  return on;
+};
+const PO_URL=$('link[data-po]').href;
+window.AP={D:{loadOneOffs:()=>fetch(PO_URL).then(r=>r.ok?r.json():null).catch(()=>null)}};
+
+/* ---------- the sunrise: the findings, one at a time ---------- */
+const SL=DATA.slides;
+let at=Math.max(0,SL.findIndex(s=>'#pubop-'+s.id===location.hash));
+const fig=v=>v==null?'–':String(Math.round(v));
+const pct=v=>v==null?'0%':Math.max(0,Math.min(100,v))+'%';
+const line=(a,b)=>`<div class="pf-line" aria-hidden="true"><i style="--w:${pct(a)};--c:var(--h-yes)"></i>${b==null?'':`<i style="--w:${pct(b)};--c:var(--h-no)"></i>`}</div>`;
+function visual(s){
+  if(s.kind==='two')return `<div class="pf-two">${[[s.a,s.names[0],'--h-yes'],[s.b,s.names[1],'--h-no']].map(([v,n,c])=>`<div style="--c:var(${c})"><span>${esc(n.charAt(0).toUpperCase()+n.slice(1))}</span><b>${fig(v)}<small>%</small></b></div>`).join('')}</div>`+line(s.a,s.b);
+  if(s.kind==='list'){const top=Math.max(50,...s.rows.map(r=>r.v));return `<ul class="pf-rows">${s.rows.map(r=>`<li class="pf-one"><span>${esc(r.label)}</span><b>${fig(r.v)}%</b><div class="pf-line" aria-hidden="true"><i style="--w:${pct(r.v/top*100)}"></i></div></li>`).join('')}</ul>`}
+  return `<div class="pf-ends"><span style="color:var(--h-yes)">${esc(s.names[0])}, %</span><span style="color:var(--h-no)">${esc(s.names[1])}, %</span></div><ul class="pf-rows">${s.rows.map(r=>`<li class="pf-pair"><span class="n">${esc(r.label)}<small>${esc(r.when)}</small></span><b>${fig(r.a)}</b>${line(r.a,r.b)}<b>${fig(r.b)}</b></li>`).join('')}</ul>`;
+}
+function paintSlide(){
+  const s=SL[at];
+  $('#pf-topic').textContent=s.topic;$('#pf-n').textContent=(at+1)+' of '+SL.length;
+  $('#pf-text').textContent=s.text;$('#pf-of').textContent=s.of;
+  $('#pf-vis').innerHTML=visual(s);
+  $('#pf-meta').textContent=s.meta+(s.more?' · '+s.more+' more below':'');
+  const go=$('#pf-go');go.textContent='All the questions on this topic ↓';go.setAttribute('href','#pubop-'+s.id);
+}
+/* the box holds its tallest finding, so the buttons and the sun keep still as the reader steps through */
+function sizeSlides(){
+  const body=$('#pf-body'),was=at;body.style.minHeight='';let h=0;
+  for(at=0;at<SL.length;at++){paintSlide();h=Math.max(h,body.offsetHeight)}
+  at=was;paintSlide();
+  if(innerHeight>=700)body.style.minHeight=h+'px';
+}
+const step=d=>{at=(at+d+SL.length)%SL.length;paintSlide()};
+$('#pf-prev').addEventListener('click',()=>step(-1));
+$('#pf-next').addEventListener('click',()=>step(1));
+$('#pf').addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowLeft'?-1:1)}});
+{let from=null;const b=$('#pf-body');
+ b.addEventListener('pointerdown',e=>{from=e.pointerType==='mouse'?null:[e.clientX,e.clientY]});
+ b.addEventListener('pointerup',e=>{if(!from)return;const dx=e.clientX-from[0],dy=e.clientY-from[1];from=null;if(Math.abs(dx)>44&&Math.abs(dx)>Math.abs(dy)*1.4)step(dx<0?1:-1)});
+ b.addEventListener('pointercancel',()=>{from=null})}
+sizeSlides();
+let wide=innerWidth;addEventListener('resize',()=>{if(innerWidth!==wide){wide=innerWidth;sizeSlides();paintNow()}});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sizeSlides);
+
+/* a topic's link: the catalogue may be searching, or running by pollster or recency, and draws its topics
+   a few a frame, so put it back by issue and wait for the topic */
+function goTopic(id){
+  const x=$('#po-root .pubop-x');if(x)x.click();
+  let tries=0,sorted=false;
+  const seek=()=>{
+    const el=document.getElementById('pubop-'+id),tab=$('#po-root .pubop-sort-b');
+    if(!sorted&&tab){sorted=true;if(tab.getAttribute('aria-pressed')!=='true')tab.click()}
+    else if(el&&el.matches('.pubop-topic')){el.scrollIntoView({behavior:reduce?'auto':'smooth'});return}
+    if(++tries<180)requestAnimationFrame(seek);
+  };
+  seek();
+}
+$('#pf-go').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();goTopic(SL[at].id)});
+
+/*{{SHARED:nav}}*/
+
+/* back from a poll, or a reload: return to the same spot once the catalogue is tall enough to hold it */
+{const KEY='dawn-po-y';
+ addEventListener('pagehide',()=>{try{sessionStorage.setItem(KEY,String(Math.round(scrollY)))}catch(e){}});
+ const how=(performance.getEntriesByType('navigation')[0]||{}).type;
+ let y=0;try{y=+sessionStorage.getItem(KEY)||0}catch(e){}
+ if(!location.hash&&y>innerHeight*.5&&(how==='reload'||how==='back_forward')){
+   const t0=performance.now();let stop=false;
+   for(const ev of ['wheel','touchstart','keydown'])addEventListener(ev,()=>{stop=true},{once:true,passive:true});
+   const seek=()=>{if(stop)return;if(root.scrollHeight>=y+innerHeight){scrollTo(0,y);return}if(performance.now()-t0<6000)requestAnimationFrame(seek)};
+   requestAnimationFrame(seek)}}
+}
+</script>
+<script src="../{{POAPP}}"></script>
+<script>ReactDOM.createRoot(document.getElementById('po-root')).render(React.createElement(window.PublicOpinionBody));</script>
+</body>
+</html>
