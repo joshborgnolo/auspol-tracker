@@ -101,11 +101,11 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
 .dm-seat{height:auto;min-height:calc(100vh + var(--ext));min-height:calc(100lvh + var(--ext));display:block;overflow:visible;scroll-snap-align:start;padding-top:calc(var(--navh) + env(safe-area-inset-top) + 10px)}
 .dm-seat .wrap{display:block;max-width:720px}
 /* the figures' lists of seats share a class name with the top bar's links: theirs stay lists */
-.dm-seat .links{display:block;gap:0;margin:0}
+:is(.dm-seat,.dm-info) .links{display:block;gap:0;margin:0}
 .dm-back{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0;border:0;background:none;font:500 13.5px/1 var(--sans);color:var(--ink2);cursor:pointer}
 .dm-hint{margin:4px 0 12px;font-size:14.5px;color:var(--ink2)}
-.dm-seat .mp-story{grid-column:auto;grid-row:auto;padding:0}
-.dm-seat .mp-story .st-head h2{font:400 clamp(26px,7.4vw,38px)/1.08 var(--serif);letter-spacing:-.012em}
+:is(.dm-seat,.dm-info) .mp-story{grid-column:auto;grid-row:auto;padding:0}
+:is(.dm-seat,.dm-info) .mp-story .st-head h2{font:400 clamp(26px,7.4vw,38px)/1.08 var(--serif);letter-spacing:-.012em}
 .dm-notes{margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)}
 .mp .dm-notes{margin-top:18px!important;padding-top:12px!important;border-top:1px solid var(--rule)!important}
 .mp .dm-notes.none{display:none}
@@ -113,6 +113,32 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
 .dm-full{display:inline-block;margin-top:12px;color:var(--ink);font-weight:600;font-size:13.5px}
 @media(min-width:900px){.dm-ctl{grid-template-columns:repeat(2,minmax(0,16em)) minmax(0,22em)}.mp .dm-ctl .mp-search{grid-column:3;justify-self:end;width:100%}#dm-draw .lg-draw{max-width:560px;margin:0 auto}.dm-map h2{min-height:1.06em}}
 @media(max-height:700px){.dm-ctl label>span:first-child{display:none}.dm-ctl{margin-top:8px;row-gap:6px}.mp .dm-ctl .mp-search label{height:34px}.mp .dm-ctl .mp-search input{height:32px}.dm-ctl .pick select{height:34px;background-position:calc(100% - 17px) 15px,calc(100% - 12px) 15px}#dm-places{display:none}.dm-view .mp-stage,.dm-view.mp-view .mp-stage{min-height:150px}.dm-more{height:28px;margin-top:2px}.dm-filters{margin-top:6px;gap:4px}html.mp-dawn .mp .dm-filters .lg-jump button{height:28px}}
+
+/* big screens: one screen holds both. The map is a square as tall as the screen allows, on the right;
+   on the left the heading, menus and chips, then the figures of the seat chosen (moved up from the
+   page below by the script, which asks the same question), in a column that scrolls by itself. The
+   square leaves that column 400px at least; the page's width follows, so the top bar still lines up */
+.dm-side{display:contents}
+.dm-info{display:none}
+@media (min-width:1100px) and (min-height:600px){
+:root{--em-sq:min(calc(100vh - var(--navh) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 92px),calc(100vw - 2*var(--g) - 440px));--em-w:max(1180px,calc(var(--em-sq) + 40px + min(640px,calc(100vw - 2*var(--g) - 40px - var(--em-sq)))));--col:max(var(--g),calc((100vw - var(--em-w))/2))}
+.nav{padding-right:max(6px,env(safe-area-inset-right),calc(var(--col) - 12px))}
+.wrap{max-width:var(--em-w)}
+.wrap.dm-map{display:grid;grid-template-columns:minmax(0,1fr) var(--em-sq);grid-template-rows:var(--em-sq) 48px;column-gap:40px;align-content:start}
+.dm-side{display:block;grid-column:1;grid-row:1/3;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:12px;scrollbar-width:thin;scrollbar-color:var(--rule2) transparent}
+.dm-view.mp-view{grid-column:2;grid-row:1;height:var(--em-sq);margin:0}
+.dm-foot{grid-column:2;grid-row:2;min-width:0}
+.dm-map h2{min-height:2.12em;align-items:flex-start;text-wrap:balance}
+.dm-ctl{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mp .dm-ctl .mp-search{grid-column:1/-1}
+/* the chips wrap, beside their label: a mouse can't swipe a row along */
+.dm-filters{flex-direction:column;flex-wrap:nowrap;gap:8px;margin-top:12px}
+html.mp-dawn .mp .dm-filters .lg-jump.lg-row.lg-row{position:relative;flex-wrap:wrap!important;overflow:visible;row-gap:6px;padding-left:5.2em!important}
+html.mp-dawn .mp .dm-filters .lg-jump.lg-row>b{position:absolute;left:0;top:1px;height:30px;width:5.2em;margin:0!important}
+html.mp-dawn .mp .dm-filters .lg-jump .mp-ca{display:contents}
+.dm-info{display:block;margin-top:20px;padding-bottom:8px}
+.dm-seat,.dm-more{display:none}
+}
 
 /* the closest seats */
 .em-close{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;flex:0 1 auto;min-height:0}
@@ -185,6 +211,8 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
 <section class="sec mp" id="map" data-sec="map" aria-labelledby="map-h">
   <i class="snap" aria-hidden="true"></i>
   <div class="wrap votes emp dm-map">
+    <!-- on a big screen, the left column; elsewhere its parts sit in the panel as if it weren't there -->
+    <div class="dm-side" id="dm-side">
     <header class="hd"><h2 id="map-h">{{mapHead}}</h2></header>
     <div class="dm-ctl">
       <label><span>Election</span><span class="pick"><select id="dm-year" aria-label="Election"></select></span></label>
@@ -198,9 +226,11 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
     </div>
     <div class="mp-legend dm-slot none" id="dm-opts"></div>
     <div class="dm-filters"><div class="mp-legend dm-slot none" id="dm-filters"></div><div class="dm-slot none" id="dm-places"></div></div>
+    <div class="dm-info" id="dm-info"></div>
+    </div>
     <div class="mp-view dm-view" id="view">
       <div class="mp-stage" id="stage">
-        <canvas id="cv" class="grab" aria-label="Map of the federal electoral divisions. Tap a seat; its figures are on the page below."></canvas>
+        <canvas id="cv" class="grab" aria-label="Map of the federal electoral divisions. Tap a seat to read its figures."></canvas>
         <div class="mp-loading" id="loading">Loading the map</div>
         <div class="mp-filter" id="filterpill" hidden></div>
         <div class="mp-zoom" id="zoomer"><button type="button" id="zin" aria-label="Zoom in" title="Zoom in"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zout" aria-label="Zoom out" title="Zoom out"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M2 7h10" stroke="currentColor" stroke-width="1.7"/></svg></button><button type="button" id="zback" aria-label="Back to the whole map" title="Back to the whole map" hidden><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5 4 10l5 5M4 10h11a5.5 5.5 0 0 1 0 11h-2.5"/></svg></button></div>
@@ -296,9 +326,18 @@ const mapSec=$('#map'),seatSec=$('#seat'),yearSel=$('#dm-year'),basisSel=$('#dm-
 const go=el=>el.scrollIntoView({behavior:reduce?'auto':'smooth'});
 const BASIS={informal:'Informality'};
 const yv=v=>v==='now'?v:+v;
+/* on a big screen the seat's figures sit in the column left of the map, not on the page below
+   (the same question the stylesheet asks); they move whole, so the map's clicks still work on them */
+const big=matchMedia('(min-width:1100px) and (min-height:600px)'),side=$('#dm-side'),info=$('#dm-info');
+const figures=['#dm-hint','#story','#dm-notes','#dm-full'].map(q=>$(q));
+const placeFigures=()=>(big.matches?info:$('.wrap',seatSec)).append(...figures);
+big.addEventListener('change',placeFigures);placeFigures();
+/* a new choice is read from its top: the column goes back there if it had been read past it */
+const sideUp=()=>{const d=info.getBoundingClientRect().top-side.getBoundingClientRect().top;if(d<0)side.scrollBy({top:d,behavior:reduce?'auto':'smooth'})};
 let shown=null;
 document.addEventListener('dawn-map',e=>{
-  const d=shown=e.detail;
+  const was=shown,d=shown=e.detail;
+  if(big.matches&&was&&(was.level!==d.level||was.seat!==d.seat))sideUp();
   const yh=d.years.join();if(yearSel.dataset.k!==yh){yearSel.dataset.k=yh;yearSel.innerHTML=[...d.years].reverse().map(y=>`<option value="${y}">${y==='now'?'Today':y+' election'}</option>`).join('')}
   yearSel.value=String(d.year);
   const bh=d.lenses.map(l=>l.id).filter(i=>i!=='senpref').join();
@@ -314,7 +353,7 @@ basisSel.addEventListener('change',()=>window.__map&&__map.setLens(basisSel.valu
 $('#dm-more').addEventListener('click',()=>go(seatSec));
 $('#dm-back').addEventListener('click',()=>go(mapSec));
 /* the map's own links in the seat's figures fly the map; the reader stays on the figures, at their top */
-$('#story').addEventListener('click',e=>{if(e.target.closest('[data-go]')&&seatSec.getBoundingClientRect().top<0)go(seatSec)});
+$('#story').addEventListener('click',e=>{if(!e.target.closest('[data-go]'))return;if(big.matches)sideUp();else if(seatSec.getBoundingClientRect().top<0)go(seatSec)});
 
 /* ---------- the closest seats ---------- */
 const BY=Object.fromEntries(E.seats.map(s=>[s.n,s]));

@@ -2911,8 +2911,9 @@ function seaSpots(m, hb, A, p) {
     const st = $("#stage").getBoundingClientRect();
     let top = 4;
     // (only what stands ON the stage is in the boxes' way: the strip's rows end above it, and since
-    //  2026-11-13 the hint reads under it — measured as an obstacle there, it pushed every box off the foot)
-    for (const el of [cities, hint]) { const r = el.getBoundingClientRect(); if (el.offsetHeight && r.bottom > st.top && r.top < st.bottom) top = Math.max(top, r.bottom - st.top + 14); }
+    //  2026-11-13 the hint reads under it — measured as an obstacle there, it pushed every box off the foot;
+    //  and on the Dawn page's big screens the cities stand beside the stage, level with it but not on it)
+    for (const el of [cities, hint]) { const r = el.getBoundingClientRect(); if (el.offsetHeight && r.bottom > st.top && r.top < st.bottom && r.right > st.left && r.left < st.right) top = Math.max(top, r.bottom - st.top + 14); }
     seaTop = { w: Wpx, top };
   }
   const top = FS.on ? (isPhone() ? FS.ins.t : p.t) + (isPhone() ? 4 : 22) : seaTop.w === Wpx ? seaTop.top : isPhone() ? 4 : p.t + 22;
