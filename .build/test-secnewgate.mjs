@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf, gridTileCount, motnStatementsOf, motnStatementYm }
+import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, reconcileStateTables, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf, gridTileCount, motnStatementsOf, motnStatementYm }
   from "./extract-secnewgate.mjs";
 
 const SRC = ".build/secnewgate-src";
@@ -23,7 +23,7 @@ for (const s of specials) {
   assert.equal(s.sidecar.wave, null, `${s.slug}: a special's sidecar carries wave: null`);
   assert.ok(fs.existsSync(path.join(SRC, s.slug + ".txt")), `${s.slug}: its report text is cached with it`);
 }
-assert.equal(reports.length, 7, "the cached wave set (Jul 2025 on)");
+assert.equal(reports.length, 8, "the cached wave set (Jul 2025 on)");
 
 // ---- the cache facts, pinned ------------------------------------------------
 assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.date, r.sidecar.dateStart, r.sidecar.sample]), [
@@ -34,6 +34,7 @@ assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.date, r.sidecar.d
   [25, "2026-05-18", "2026-05-13", 1210],
   [26, "2026-07-13", "2026-07-02", 1975],
   [27, "2026-09-14", "2026-09-08", 1659],
+  [28, "2026-11-23", "2026-11-20", 1524],
 ], "the sidecars the extractor wrote");
 assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.url, r.sidecar.published]), [
   [21, "https://www.secnewgate.com.au/wp-content/uploads/2025/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2025.pdf", "2025-07-29T16:58"],
@@ -43,6 +44,7 @@ assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.url, r.sidecar.pu
   [25, "https://www.secnewgate.com.au/wp-content/uploads/2026/05/SEC-Newgate-Mood-of-the-Nation-Report-May-2026-1.pdf", "2026-05-27T13:03"],
   [26, "https://www.secnewgate.com.au/wp-content/uploads/2026/07/SEC-Newgate-Mood-of-the-Nation-Report-July-2026.pdf", "2026-07-21T16:50"],
   [27, "https://www.secnewgate.com.au/wp-content/uploads/2026/09/SEC-Newgate-Mood-of-the-Nation-September-2026-Report.pdf", "2026-09-22T15:29"],
+  [28, "https://www.secnewgate.com.au/wp-content/uploads/2026/11/SEC-Newgate-Mood-of-the-Nation-Report-Nov-2026-W28.pdf", "2026-11-27T17:16"],
 ], "the sidecar release links (the report PDFs their posts 301 to) and publish stamps (site-local times)");
 assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.method]), [
   [21, "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf"],
@@ -52,6 +54,7 @@ assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.method]), [
   [25, "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf"],
   [26, "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf"],
   [27, "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf"],
+  [28, undefined],
 ], "the sidecar APC statement links off the disclosure library");
 
 // ---- titleMonthOf ------------------------------------------------------------
@@ -113,7 +116,7 @@ for (const { slug, sidecar } of reports) {
   assert.deepEqual([meta.date, meta.dateStart, meta.sample],
     [sidecar.date, sidecar.dateStart, sidecar.sample], `${slug}: fieldwork + sample`);
   assert.deepEqual(meta.problems, [], `${slug}: methodology clean`);
-  assert.equal(directionPageOf(text), 8, `${slug}: the direction chart's page`);
+  assert.equal(directionPageOf(text), sidecar.wave === 28 ? 7 : 8, `${slug}: the direction chart's page`);
 
   const chart = directionChartOf(fs.readFileSync(path.join(SRC, slug + ".bbox.html"), "utf8"));
   assert.equal(chart.columns.length, sidecar.wave, `${slug}: one column per wave of the series`);
@@ -121,10 +124,10 @@ for (const { slug, sidecar } of reports) {
   const last = chart.columns[chart.columns.length - 1];
   sidecar.endpoint = { right: last.right, wrong: last.wrong };
 }
-// the seven endpoints, pinned
+// the eight endpoints, pinned
 assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.endpoint.wrong, r.sidecar.endpoint.right]), [
   [21, 56, 44], [22, 59, 41], [23, 61, 39], [24, 63, 37],
-  [25, 66, 34], [26, 68, 32], [27, 68, 32],
+  [25, 66, 34], [26, 68, 32], [27, 68, 32], [28, 73, 27],
 ]);
 
 // ---- stateTableOf against the cache: the per-state direction table -------------
@@ -139,10 +142,16 @@ const STATE_COLUMNS = {
   25: ["2022-03", "2025-11", "2026-02", "2026-05"],
   26: ["2022-03", "2026-02", "2026-05", "2026-07"],
   27: ["2022-03", "2026-05", "2026-07", "2026-09"],
+  28: ["2022-03", "2026-07", "2026-09", "2026-11"],
 };
+const rawStateTables = new Map(reports.map(({ slug, sidecar }) => [sidecar.wave, {
+  ym: sidecar.date.slice(0, 7),
+  table: stateTableOf(fs.readFileSync(path.join(SRC, slug + ".bbox.html"), "utf8")),
+}]));
+const stateTables = reconcileStateTables(rawStateTables);
 const stateRights = {}, statePairs = {};
 for (const { slug, sidecar } of reports) {
-  const t = stateTableOf(fs.readFileSync(path.join(SRC, slug + ".bbox.html"), "utf8"));
+  const t = stateTables.get(sidecar.wave).table;
   assert.deepEqual(t.problems, [], `${slug}: state table clean`);
   assert.deepEqual(t.columns, STATE_COLUMNS[sidecar.wave], `${slug}: anchor + trailing tracking waves`);
   assert.deepEqual(Object.keys(t.states), ["NSW", "VIC", "QLD", "SA", "WA"], `${slug}: the five mainland states`);
@@ -154,6 +163,14 @@ for (const { slug, sidecar } of reports) {
     for (const [ym, v] of Object.entries(row.cells)) ((stateRights[st] ||= {})[ym] ||= []).push(v);
     (statePairs[st] ||= {})[ownYm] = { right: row.right, wrong: row.wrong };
   }
+}
+// wave 28 printed July and September under stale May and July labels; only
+// unanimous agreement with every state's own reports permits relabelling
+{
+  const conflict = structuredClone(rawStateTables);
+  conflict.get(28).table.states.NSW.cells["2026-05"] = 39;
+  assert.deepEqual(reconcileStateTables(conflict).get(28).table.columns,
+    rawStateTables.get(28).table.columns, "a value mismatch preserves the reprint-conflict guard");
 }
 // the trailing reprint columns repeat the waves' own values verbatim – no
 // state-direction revisions on file
@@ -179,8 +196,8 @@ for (const [st, months] of Object.entries(stateRights))
     "the banked state series matches the cached reports (rerun extract-secnewgate.mjs)");
   assert.deepEqual(banked.series.NSW.map((e) => e.month), [
     "2022-03", "2025-02", "2025-04", "2025-07", "2025-09",
-    "2025-11", "2026-02", "2026-05", "2026-07", "2026-09",
-  ], "the anchor, the two pre-horizon reprints and the seven cached waves");
+    "2025-11", "2026-02", "2026-05", "2026-07", "2026-09", "2026-11",
+  ], "the anchor, the two pre-horizon reprints and the eight cached waves");
   assert.ok(banked.series.NSW.every((e) => (e.wrong == null) === (e.month < "2025-07")),
     "before the 2025-07 cache horizon the entries are right-direction-only reprints");
   assert.deepEqual(banked.series.VIC.find((e) => e.month === "2026-09"),
@@ -202,6 +219,7 @@ const CONCERN_COLUMNS = {
   25: ["2022-03", "2026-02", "2026-04", "2026-05"],
   26: ["2022-03", "2026-04", "2026-05", "2026-07"],
   27: ["2022-03", "2026-05", "2026-07", "2026-09"],
+  28: ["2022-03", "2026-07", "2026-09", "2026-11"],
 };
 const concernMentions = {};   // label -> ym -> [mention...]
 for (const { slug, sidecar } of reports) {
@@ -234,11 +252,11 @@ for (const [lbl, months] of Object.entries(concernMentions))
     "the banked concerns series matches the cached reports (rerun extract-secnewgate.mjs)");
   assert.deepEqual(banked.series["Cost of living"].map((e) => e.month), [
     "2022-03", "2025-02", "2025-04", "2025-07", "2025-09", "2025-11",
-    "2026-02", "2026-04", "2026-05", "2026-07", "2026-09",
-  ], "all eleven B1 months incl. 2026-04 (the special's, via reprint)");
+    "2026-02", "2026-04", "2026-05", "2026-07", "2026-09", "2026-11",
+  ], "all twelve B1 months incl. 2026-04 (the special's, via reprint)");
   assert.deepEqual(banked.series["Cost of living"][banked.series["Cost of living"].length - 1],
-    { month: "2026-09", mention: 68 }, "September 2026's top concern");
-  assert.equal(banked.series["Crime"][banked.series["Crime"].length - 1].mention, 20, "crime second at 20");
+    { month: "2026-11", mention: 71 }, "November 2026's top concern");
+  assert.equal(banked.series["Crime"][banked.series["Crime"].length - 1].mention, 20, "crime steady at 20");
   assert.equal(banked.series["Immigration & population"].find((e) => e.month === "2025-11").mention, 13,
     "immigration & population, Nov 2025");
 }
@@ -257,6 +275,7 @@ const G4_SHAPES = {
   25: { alp: 23, onp: 20, lnp: 17, grn: 9, rest: 31 },
   26: { alp: 24, onp: 23, lnp: 14, grn: 10, rest: 29 },
   27: { alp: 23, onp: 22, lnp: 16, grn: 12, rest: 27 },
+  28: { alp: 20, onp: 19, lnp: 21, grn: 13, rest: 27 },
 };
 const g4ByMonth = {};  // ym -> shares
 for (const { slug, sidecar } of reports) {
@@ -274,24 +293,24 @@ for (const { slug, sidecar } of reports) {
 }
 
 // data/sec-issues.json's bestParty block carries exactly what the cached
-// reports print, keyed in month order across all seven waves
+// reports print, keyed in month order across all eight waves
 {
   const banked = JSON.parse(fs.readFileSync("data/sec-issues.json", "utf8"));
   assert.deepEqual(banked.bestParty, g4ByMonth,
     "the banked bestParty block matches the cached reports (rerun extract-secnewgate.mjs)");
   assert.deepEqual(Object.keys(banked.bestParty).sort(), Object.keys(g4ByMonth).sort(),
-    "all seven wave months – and nothing from the April 2026 special");
+    "all eight wave months – and nothing from the April 2026 special");
   assert.equal("2026-04" in banked.bestParty, false, "the special prints no G4 column");
 }
 
 // ---- gridPageOf / heatGridOf against the cache: the B6 Political Heat
 // Score grid ("Tracking the importance of 36 national priorities", page 4
-// in every wave), parsed by bbox GEOMETRY off <slug>.grid.bbox.html – the
-// -layout text reflows the six tile columns into one another. Labels bank
+// in reports that carry one), parsed by bbox GEOMETRY off <slug>.grid.bbox.html
+// – the -layout text reflows the six tile columns into one another. Labels bank
 // verbatim, so the university→University case flip (May 2026) shows as
 // one changed key between waves.
 const heatByMonth = {};   // ym -> { label: heat }
-for (const { slug, sidecar } of reports) {
+for (const { slug, sidecar } of reports.filter(({ slug }) => fs.existsSync(path.join(SRC, slug + ".grid.bbox.html")))) {
   const text = fs.readFileSync(path.join(SRC, slug + ".txt"), "utf8");
   const grid = fs.readFileSync(path.join(SRC, slug + ".grid.bbox.html"), "utf8");
   const info = gridPageOf(text);
@@ -335,13 +354,13 @@ assert.ok(!Object.keys(heatByMonth["2026-05"]).some((l) => l.includes("affordabl
 }
 
 // data/sec-issues.json's heatScore block carries exactly what the cached
-// grid pages print, keyed in month order across all seven waves
+// grid pages print, keyed in month order across every cached grid
 {
   const banked = JSON.parse(fs.readFileSync("data/sec-issues.json", "utf8"));
   assert.deepEqual(banked.heatScore, heatByMonth,
     "the banked heatScore block matches the cached grid pages (rerun extract-secnewgate.mjs)");
   assert.deepEqual(Object.keys(banked.heatScore).sort(), Object.keys(heatByMonth).sort(),
-    "all seven wave months, heat scores only (the EI half stays out)");
+    "all cached grid months, heat scores only (the EI half stays out)");
 }
 
 // a special asks no direction question at all
@@ -432,8 +451,8 @@ assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2
   // statement percentage (× its filed sample), date-keyed
   assert.deepEqual(Object.fromEntries((D.direction || []).filter((d) => d.pollster === "SEC Newgate").map((d) => [d.date, d.sampleEff])), {
     "2025-07-16": 1187, "2025-09-15": 970, "2025-11-03": 954, "2026-02-09": 1170,
-    "2026-05-18": 653, "2026-07-13": 1244, "2026-09-14": 1095,
-  }, "every SEC wave carries its statement's effective sample");
+    "2026-05-18": 653, "2026-07-13": 1244, "2026-09-14": 1095, "2026-11-23": undefined,
+  }, "every SEC wave's statement-derived effective sample (wave 28's statement is pending)");
 }
 
 console.log("test-secnewgate: all assertions passed");

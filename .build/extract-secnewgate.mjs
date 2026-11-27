@@ -394,6 +394,36 @@ export function stateTableOf(bboxHtml) {
   return { columns: columns.map((c) => c.ym), states, problems };
 }
 
+/* A report can roll the state table's values forward without its historical
+   labels. Infer the expected trailing dates from the preceding tracking
+   waves, but relabel only when every state's cell then agrees with those
+   waves' own reports; any other mismatch stays a reprint conflict. */
+export function reconcileStateTables(byWave) {
+  const aligned = new Map(), own = {};
+  for (const [wave, x] of [...byWave.entries()].sort((a, b) => a[0] - b[0])) {
+    let table = x.table;
+    const previous = [...aligned.values()].slice(-2).map((y) => y.ym);
+    const expected = [...table.columns];
+    const at = expected.length - previous.length - 1;
+    if (previous.length && at > 0) {
+      expected.splice(at, previous.length, ...previous);
+      if (expected.some((ym, i) => ym !== table.columns[i])) {
+        const states = {};
+        let matches = true;
+        for (const [st, row] of Object.entries(table.states)) {
+          const cells = Object.fromEntries(table.columns.map((ym, i) => [expected[i], row.cells[ym]]));
+          if (previous.some((ym) => own[st]?.[ym] !== cells[ym])) { matches = false; break; }
+          states[st] = { ...row, cells };
+        }
+        if (matches) table = { ...table, columns: expected, states };
+      }
+    }
+    aligned.set(wave, { ...x, table });
+    for (const [st, row] of Object.entries(table.states)) (own[st] ||= {})[x.ym] = row.right;
+  }
+  return aligned;
+}
+
 /* The "Unprompted concerns and priorities" page's B1 table, banked into
    data/sec-issues.json (no panel reads it yet – the Issues panel pools
    forced top-three salience, and this is an open-ended multi-mention
@@ -906,9 +936,10 @@ async function main() {
       }
       byWave.set(side.wave, { table, ym: side.date.slice(0, 7) });
     }
+    const alignedByWave = reconcileStateTables(byWave);
     const rights = {};   // state -> ym -> [{ wave, right }] sightings, wave order
     const pairs = {};    // state -> ym -> { right, wrong } from the wave's own report
-    for (const [wave, x] of [...byWave.entries()].sort((a, b) => a[0] - b[0])) {
+    for (const [wave, x] of [...alignedByWave.entries()].sort((a, b) => a[0] - b[0])) {
       for (const [st, row] of Object.entries(x.table.states)) {
         for (const ym of x.table.columns) {
           if (row.cells[ym] == null) continue;
