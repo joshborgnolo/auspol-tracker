@@ -19,6 +19,13 @@ const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct
 const month = (iso) => MON[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4);
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
+/* a poll's key on Dawn's polls page: pollster and release */
+export const rowKey = (rk) => { const [house, released] = rk.split("|"); return house.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + released; };
+
+/* the site's byRow pairing (gen-data §8e, the poll ledger's "Public opinion" line) under Dawn's keys:
+   what else a release asked – the pollster's store, how many questions, their topics, and the wave to mark */
+export const rowQuestions = (src) => new Map(Object.entries(src.byRow || {}).map(([rk, b]) => [rowKey(rk), { h: b.h, n: b.n, t: b.t, w: b.w[0] }]));
+
 /* as many rows as the sunrise holds on a phone */
 export const HERO_ROWS = 6;
 

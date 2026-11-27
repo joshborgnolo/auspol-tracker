@@ -31,7 +31,7 @@ import { pollHeading } from "./dawn/poll-heading.mjs";
 import { sigTriangle, sigMark } from "./dawn/sig-triangle.mjs";
 import { disagreeData, engine } from "./dawn/disagree-data.mjs";
 import { emapData, groupOf, GROUPS, YEARS } from "./dawn/emap-data.mjs";
-import { heroSlides, newestPublished, pubopCss, HERO_ROWS } from "./dawn/po-data.mjs";
+import { heroSlides, newestPublished, rowQuestions, pubopCss, HERO_ROWS } from "./dawn/po-data.mjs";
 import { emapChapeau, emapHead, opinionLede, closestHead, closestSeats } from "./dawn/copy.mjs";
 import { decidedData, decidedStory, partyStory, ageStory, ofHundred, oneIn, oneInShare } from "./dawn/decided-data.mjs";
 import { buildDawn, flowTotals, readScore, sharedBlock } from "./dawn/build.mjs";
@@ -862,6 +862,13 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   new vm.Script(built.slice(own, built.indexOf("</script>", own))); n++;
   for (const f of ["template.html", "template-polls.html", "template-next.html", "template-leaders.html", "template-mood.html", "template-cycles.html", "template-disagree.html", "template-decided.html", "template-emap.html"])
     ok(/href="(\.\.\/)?public-opinion\/">public opinion</.test(fs.readFileSync(path.join(HERE, "dawn", f), "utf8")), `${f}'s menu lists public opinion`);
+  /* each release that asked more links to its questions from its poll */
+  const by = rowQuestions(src), pollsPage = fs.readFileSync(path.join(ROOT, "dawn", "polls", "index.html"), "utf8");
+  eq([...by.keys()].filter((k) => !polls.has(k)).join(" "), "", "opinion: every release with questions has its row on the polls page");
+  const carried = JSON.parse(pollsPage.match(/<script id="polls-data" type="application\/json">(.*?)<\/script>/s)[1]).polls.filter((p) => p.po);
+  ok(by.size > 0 && carried.length === by.size && carried.every((p) => JSON.stringify(p.po) === JSON.stringify(by.get(p.k))), "opinion: the polls page carries each release's questions");
+  ok(pollsPage.includes('href="../public-opinion/?pollster=') && built.includes("window.AP.pubopGo('pubop-p-'+from"), "opinion: a poll's link, and the trip that answers it");
+  ok(jsx.includes("window.AP.pubopGo = (h, wave)"), "opinion: the component still offers the trip");
 }
 /* linked from nowhere */
 {
