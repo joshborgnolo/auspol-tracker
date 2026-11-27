@@ -798,6 +798,11 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   /* the map is /map/'s own engine, in Dawn's dress, with the page's menus and rows around it */
   ok(/classList\.add\('mp-dawn'\)/.test(built) && /<script src="\/map\/map\.js\?v=[0-9a-f]{8}"><\/script>/.test(built) && /href="\/map\/map\.css\?v=[0-9a-f]{8}"/.test(built), "electoral map: runs the full map's own script and styles");
   for (const id of ["dm-year", "dm-basis", "dm-opts", "dm-filters", "dm-places", "dm-draw", "stage", "cv", "story", "legend", "dm-notes", "q", "sugg"]) ok(built.includes(`id="${id}"`), `electoral map: #${id}`);
+  /* big screens: the square map, and the figures in the column beside it. The script that moves them asks the stylesheet's question */
+  const big = "(min-width:1100px) and (min-height:600px)";
+  ok(built.includes(`@media ${big}{`) && built.includes(`matchMedia('${big}')`), "electoral map: the layout and the script switch on the same screens");
+  ok(built.includes(".dm-view.mp-view{grid-column:2;grid-row:1;height:var(--em-sq);margin:0}") && built.includes("grid-template-columns:minmax(0,1fr) var(--em-sq)"), "electoral map: the big screen's map is square, on the right");
+  ok(built.includes('id="dm-side"') && built.indexOf('id="dm-info"') < built.indexOf('id="view"') && built.includes("(big.matches?info:$('.wrap',seatSec)).append(...figures)"), "electoral map: the seat's figures move into the left column");
   const engine = fs.readFileSync(path.join(ROOT, "map", "map.js"), "utf8");
   ok(engine.includes('new CustomEvent("dawn-map"') && engine.includes("if (dawnOn()) dawnTheme(T);"), "electoral map: the engine carries its Dawn half");
   const data = JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]);

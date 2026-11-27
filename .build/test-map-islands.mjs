@@ -10,7 +10,8 @@
      since 2026-11-13 the hint reads under it. Measured as an obstacle there,
      the hint's foot pushed every box off the stage's foot (the four far
      islands lost their boxes on a laptop until the measure asked where the
-     element stands).
+     element stands). Beside the stage is off it too: the Dawn page's big
+     screens stand the cities in a column left of the square map.
    The slice runs in a bare vm with stub chrome; the numbers below track a
    1512×980 stage at the full-screen fit (HOME k 0.895 over a 1000×830 box).
    Run: node .build/test-map-islands.mjs */
@@ -29,10 +30,10 @@ const slice = app.slice(i, j);
 const prelude = `
 let Wpx = 1512, Hpx = 980;
 const FS = { on: false, ins: { t: 60, r: 14, b: 78, l: 406 } };
-let hintAt = [324, 341], citiesAt = [192, 287];
-const hint = { textContent: "zoom", offsetHeight: 17, getBoundingClientRect: () => ({ top: hintAt[0], bottom: hintAt[1] }) };
-const cities = { hidden: false, offsetHeight: 95, getBoundingClientRect: () => ({ top: citiesAt[0], bottom: citiesAt[1] }) };
-const $ = (s) => (s === "#hint" ? hint : s === "#cities" ? cities : { getBoundingClientRect: () => ({ top: 0, bottom: 980 }) });
+let hintAt = [324, 341], citiesAt = [192, 287], citiesX = [0, 1512];
+const hint = { textContent: "zoom", offsetHeight: 17, getBoundingClientRect: () => ({ top: hintAt[0], bottom: hintAt[1], left: 0, right: 1512 }) };
+const cities = { hidden: false, offsetHeight: 95, getBoundingClientRect: () => ({ top: citiesAt[0], bottom: citiesAt[1], left: citiesX[0], right: citiesX[1] }) };
+const $ = (s) => (s === "#hint" ? hint : s === "#cities" ? cities : { getBoundingClientRect: () => ({ top: 0, bottom: 980, left: 0, right: 1512 }) });
 const isPhone = () => false;
 const HOME = { k: 0.895, x: 485, y: 96 };
 const ISL_PAIRS = [["christmas", "cocos"], ["norfolk", "lordhowe"]];
@@ -61,6 +62,11 @@ const tail = `
   const yClear = y();
   if (!(seaTop.w === Wpx && seaTop.top === 4)) throw new Error("a hint under the stage, or a strip above it, was read as an obstacle on it (got " + JSON.stringify(seaTop) + ")");
   if (yClear > 200) throw new Error("the boxes left their sea spots for chrome that isn't on the stage (got y=" + yClear + ")");
+  // the Dawn page's big screens: the cities in a column left of the stage, level with it but not on it
+  citiesAt = [310, 380]; citiesX = [-640, -40]; seaMemo = null; seaTop = { w: 0, top: 4 };
+  const yBeside = y();
+  if (!(seaTop.top === 4)) throw new Error("cities beside the stage were read as an obstacle on it (got " + JSON.stringify(seaTop) + ")");
+  if (yBeside > 200) throw new Error("the boxes left their sea spots for cities beside the stage (got y=" + yBeside + ")");
 })();`;
 
 vm.runInContext(prelude + slice + tail, vm.createContext({}));
