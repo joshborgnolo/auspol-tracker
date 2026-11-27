@@ -15,7 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, opinionLede, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
+import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, lifeHead, lifeDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, opinionLede, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { disagreeData } from "./disagree-data.mjs";
 import { decidedData } from "./decided-data.mjs";
@@ -220,7 +220,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   const leadFile = sunPage({ asset: "dawn-leaders.json", template: "template-leaders.html", dir: "leadership-ratings",
     fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, ppmHead, ppmDek, favHead: (L) => favHead(L).head, favDek } });
   const moodFile = sunPage({ asset: "dawn-mood.json", template: "template-mood.html", dir: "mood",
-    fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek } });
+    fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek, lifeHead, lifeDek } });
   const cyclesFile = sunPage({ asset: "dawn-cycles.json", template: "template-cycles.html", dir: "past-cycles",
     fill: { chapeau: cycleChapeau, primaryHead: (C) => cycleHead(C, "primary"), primaryDek: (C) => cycleDek(C, "primary"), netHead: (C) => cycleHead(C, "net"), netDek: (C) => cycleDek(C, "net"),
             ppmHead: (C) => cycleHead(C, "ppmm"), ppmDek: (C) => cycleDek(C, "ppmm"), opprHead: (C) => cycleHead(C, "oppr"), opprDek: (C) => cycleDek(C, "oppr") },

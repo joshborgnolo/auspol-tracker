@@ -36,6 +36,17 @@
 .mood .ext[hidden]{display:none}
 .mood .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
 @media (min-width:900px){.mood .ctl{margin-top:16px}.mood .fig{margin-top:8px}}
+.life-notes{font-size:clamp(13.5px,3.6vw,15px);line-height:1.55;margin-top:18px}
+.life-notes details{border-top:1px solid rgb(155 163 192/.24);padding-top:14px}
+.life-sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:16px}
+.life-sources h3{font-size:1em;margin:0 0 7px}.life-sources p{margin:6px 0 0}.life-sources .q{font-weight:500}
+.life-snapshot{border-top:1px solid rgb(155 163 192/.24);margin-top:20px;padding-top:18px}
+.life-snapshot h3{margin:0 0 8px;font-size:1.15em}
+.life-score{font-size:clamp(30px,min(10vw,5vh),46px);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.life-score small{font-weight:400;font-size:.48em;letter-spacing:0}
+.life-dist{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px 20px;margin-top:12px}
+.life-dist div{display:flex;justify-content:space-between;gap:12px}
+.life-dist b{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -121,6 +132,32 @@
     <div class="sr"><table id="trust-table"></table></div>
   </div>
 </section>
+
+<section class="sec" id="life" data-sec="mood" aria-labelledby="life-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes mood">
+    <header class="hd">
+      <h2 id="life-h">{{lifeHead}}</h2>
+      <p class="dek">{{lifeDek}}</p>
+    </header>
+    <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
+    <div class="fig" id="life-fig"><div class="tip" aria-live="polite"></div><svg id="life-svg" tabindex="0" aria-label="Published mean life satisfaction scores, separately by survey. Use the left and right arrow keys to read values."></svg></div>
+    <div class="keys" id="life-key"></div>
+    <p class="src" id="life-src"></p>
+    <div class="life-notes">
+      <details><summary>How each survey asks</summary><div class="life-sources" id="life-sources"></div></details>
+      <section class="life-snapshot" id="life-snapshot" aria-labelledby="demo-h">
+        <h3 id="demo-h">DemosAU’s Life Satisfaction Score, on a separate 0–100 scale</h3>
+        <div class="life-score"><span id="demo-v"></span><small>/100</small></div>
+        <p id="demo-meta"></p>
+        <div class="life-dist" id="demo-dist"></div>
+        <p id="demo-note"></p>
+        <p><a id="demo-link" target="_blank" rel="noopener noreferrer">DemosAU’s report and cohort breakdowns ↗</a></p>
+      </section>
+    </div>
+    <div class="sr"><table id="life-table"></table></div>
+  </div>
+</section>
 </main>
 
 <script id="dawn-data" type="application/json">{{DATA}}</script>
@@ -145,7 +182,7 @@ const EVENTS=DATA.events.map(e=>({...e,x:isoX(e.d)}));
 const TERMS=DATA.terms.map((t,i,a)=>({...t,a:isoX(t.e),b:a[i+1]?isoX(a[i+1].e):null}));
 const CUR=TERMS.find(t=>t.current)||TERMS[TERMS.length-1];
 const HIST={terms:[{a:0}]},PVSEL=new Set();
-const T=DATA.trust;
+const T=DATA.trust,LIFE=DATA.life;
 
 /*{{SHARED:window}}*/
 /*{{CHARTWINDOWS}}*/
@@ -243,6 +280,39 @@ function trustScene(){
   return S;
 }
 
+/* ---------- life satisfaction: each published survey kept on its own terms ---------- */
+const LIFE_COLOR={anupoll:'var(--yes)',hilda:'var(--lnp)','abs-gss':'var(--no)',scanlon:'var(--grn)'};
+const lifeDate=r=>r.field||(r.date.length===4?r.date:ymWords(r.date.slice(0,7)));
+function lifeScene(){
+  const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
+  const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
+  const S={x0,x1,ys:.5,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[]},memo=new Map();
+  const inW=x=>x>=x0-1e-6&&x<=x1+1e-6;
+  for(const s of LIFE.series){
+    const color=LIFE_COLOR[s.id]||TC;
+    const runs=s.panels?s.panels.map(()=>[]):[s.readings];
+    for(const r of s.readings){
+      if(s.panels)runs[s.panels.findIndex(p=>p.id===r.panel)].push(r);
+      if(!inW(r.x))continue;
+      const key=s.id+'|'+r.date;
+      if(!memo.has(key))memo.set(key,{who:s.house,when:lifeDate(r),n:r.n?'n = '+r.n.toLocaleString('en-AU'):(r.sample?'n = '+r.sample.toLocaleString('en-AU'):'')});
+      S.dots.push({x:r.x,y:r.v,color,poll:memo.get(key),txt:String(r.v),r:long?2:3});
+      S.stops.push({x:r.x,label:s.house,sub:lifeDate(r),items:[{color,tc:color,y:r.v,v:r.v,txt:r.v+' / 10'}]});
+    }
+    if(s.role==='line')runs.forEach((pts,i)=>{
+      if(pts.length<2)return;
+      S.lines.push({color,pts,w:long?1.4:2.25,thin:long,dash:s.panels&&i===0?'4 3':null});
+    });
+  }
+  S.stops.sort((p,q)=>p.x-q.x);
+  const ref=LIFE.series.find(s=>s.id==='anupoll')||LIFE.series[0],last=ref.readings.at(-1);
+  if(cur&&inW(last.x)){S.ends=[{color:LIFE_COLOR[ref.id]||TC,y:last.v,name:'Life satisfaction',abbr:'Satisfaction',v:last.v}];S.endX=last.x}
+  if(span>8)S.govs=govBlocks(a,b);
+  S.events=!curOnly&&S.govs?[]:winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
+  axis(S,[...S.lines.flatMap(l=>l.pts.filter(p=>inW(p.x)).map(p=>p.y)),...S.dots.map(d=>d.y),[5,8]],.5);
+  return S;
+}
+
 /* ---------- the hero: one bar, rolled week by week ---------- */
 /*{{SHARED:odometer}}*/
 const pv=$('#pv'),SIDE=['right','wrong'];
@@ -303,7 +373,7 @@ rpBtn.addEventListener('click',e=>{
   });
 });
 
-/* ---------- the two charts, each with its own window ---------- */
+/* ---------- the three charts, each with its own window ---------- */
 function dirSrc(){
   useWindow(wDir);
   const [a,b]=winRange(WIN),curOnly=a>=CUR.a-1e-6,cur=b>CUR.a+1e-3,dots=b-a<=4.6,bands=b-a<=LONG?', with 95% bands':'';
@@ -317,20 +387,47 @@ function trustSrc(){
   $('#trust-src').textContent='The line is a model of every survey of trust in government, on the Australian Election Study’s terms, with its 95% band'+(early?'; dashed where the estimate is less certain':'')
     +'. Dots are each survey’s readings moved onto the same terms. Surveys come a few times a year; the latest was '+ymWords(T.now.ym)+'.';
 }
+function lifeSrc(){
+  useWindow(wLife);
+  $('#life-src').textContent='Every point is a published mean; lines join readings only within one survey and panel. The surveys’ samples and panels differ, so never pool their levels. Annual HILDA and ABS readings sit at the middle of their year. DemosAU’s separate 0–100 index is not rescaled into this chart.';
+}
 const dirFirst=DATA.past.length?DATA.past[0][0]:ELX,trustFirst=Math.min(T.months[0][0],T.dots[0].x);
+const lifeFirst=LIFE?Math.min(...LIFE.series.flatMap(s=>s.readings.map(r=>r.x))):CUR.a;
 const make=(id,scene)=>use=>chart({fig:$('#'+id+'-fig'),svg:$('#'+id+'-svg'),scene,use});
-let wDir=null,wTrust=null;
+let wDir=null,wTrust=null,wLife=null;
 wDir=windowedChart({section:$('#direction'),lo:dirFirst,src:()=>{if(wDir)dirSrc()},make:make('direction',dirScene)});
 wTrust=windowedChart({section:$('#trust'),lo:trustFirst,src:()=>{if(wTrust)trustSrc()},make:make('trust',trustScene)});
-dirSrc();trustSrc();
-const charts=[wDir.chart,wTrust.chart];
+if(LIFE){
+  const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+  $('#life-key').innerHTML=LIFE.series.map(s=>`<span><i class="sw" style="--c:${LIFE_COLOR[s.id]||TC}"></i> ${esc(s.house)}</span>`).join('');
+  $('#life-sources').innerHTML=LIFE.series.map(s=>`<section><h3>${esc(s.house)} <a href="${esc(s.source)}" target="_blank" rel="noopener noreferrer">source ↗</a></h3><p class="q">${s.paraphrase?esc(s.question):'“'+esc(s.question)+'”'}</p><p><b>Answers:</b> ${esc(s.answers)}</p><p><b>Method:</b> ${esc(s.method)}</p></section>`).join('');
+  const snap=(LIFE.snapshots||[])[0];
+  if(snap){
+    $('#demo-v').textContent=snap.v.toFixed(1);
+    $('#demo-meta').textContent=snap.field+', n = '+snap.n.toLocaleString('en-AU');
+    $('#demo-dist').innerHTML=snap.distribution.map(r=>`<div><span>${esc(r.label)}</span><b>${r.v.toFixed(1)}%</b></div>`).join('');
+    $('#demo-note').textContent=snap.note;
+    $('#demo-link').href=snap.source;
+  }else $('#life-snapshot').hidden=true;
+  wLife=windowedChart({section:$('#life'),lo:lifeFirst,src:()=>{if(wLife)lifeSrc()},make:make('life',lifeScene)});
+  lifeSrc();
+}else $('#life').hidden=true;
+const charts=[wDir.chart,wTrust.chart];if(wLife)charts.push(wLife.chart);
 const glob=$('#cmp-glob');
 glob.addEventListener('click',()=>{GLOBAL=!GLOBAL;glob.setAttribute('aria-checked',String(GLOBAL));$('#glob-key').hidden=!GLOBAL;wTrust.chart.clear();wTrust.chart.draw()});
 
 /* screen-reader tables */
 {const idx=[];let lm=-1;G.forEach((d,i)=>{const m=+d.slice(5,7);if(m!==lm){idx.push(i);lm=m}});if(idx[idx.length-1]!==LAST)idx.push(LAST);
 $('#direction-table').innerHTML='<caption>Estimated national direction, %</caption><tr><th>Week of</th><th>Right direction</th><th>Wrong track</th><th>Unsure</th></tr>'+idx.map(i=>`<tr><td>${fdate(G[i])}</td><td>${f1(DATA.right.v[i])}</td><td>${f1(DATA.wrong.v[i])}</td><td>${f1(DATA.unsure[i])}</td></tr>`).join('');
-$('#trust-table').innerHTML='<caption>Estimated trust in government, %</caption><tr><th>Month</th><th>Trust</th></tr>'+T.months.filter(m=>+m[4].slice(0,4)>=CUR.year).map(m=>`<tr><td>${ymWords(m[4])}</td><td>${f1(m[1])}</td></tr>`).join('')}
+$('#trust-table').innerHTML='<caption>Estimated trust in government, %</caption><tr><th>Month</th><th>Trust</th></tr>'+T.months.filter(m=>+m[4].slice(0,4)>=CUR.year).map(m=>`<tr><td>${ymWords(m[4])}</td><td>${f1(m[1])}</td></tr>`).join('');
+if(LIFE){
+  const table=$('#life-table'),cap=document.createElement('caption');cap.textContent='Published mean life satisfaction, separately by survey';table.append(cap);
+  const head=table.insertRow();for(const label of ['Survey','Wave','Mean /10']){const c=document.createElement('th');c.scope='col';c.textContent=label;head.append(c)}
+  for(const s of LIFE.series)for(const r of [...s.readings].reverse()){
+    const row=table.insertRow(),vals=[s.house,lifeDate(r),r.v.toFixed(2)];
+    vals.forEach((v,i)=>{const c=document.createElement(i?'td':'th');if(!i)c.scope='row';c.textContent=v;row.append(c)});
+  }
+}}
 
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
 

@@ -223,6 +223,25 @@ export function trustDek(M) {
   return "% saying people in government can usually or sometimes be trusted to do the right thing. " + change + ".";
 }
 
+const lifeWhen = (r) => r.field || (r.date.length === 4 ? r.date : monthYear(r.date.slice(0, 7)));
+const lifeCurrent = (M) => {
+  const s = M.life.series.find((x) => x.id === "anupoll") || M.life.series[0];
+  return { s, now: s.readings.at(-1), prev: s.readings.at(-2) };
+};
+export function lifeHead(M) {
+  if (!M.life) return "Life satisfaction";
+  const { s, now } = lifeCurrent(M);
+  return s.house + " life satisfaction averaged " + now.v.toFixed(2) + " out of 10 in its latest wave";
+}
+export function lifeDek(M) {
+  if (!M.life) return "";
+  const { s, now, prev } = lifeCurrent(M), delta = prev ? now.v - prev.v : null;
+  const change = delta == null ? "The first printed wave on file."
+    : Math.abs(delta) < 0.005 ? "Unchanged from " + lifeWhen(prev) + "."
+    : (delta < 0 ? "Down " : "Up ") + Math.abs(delta).toFixed(2) + " points since " + lifeWhen(prev) + ".";
+  return change + " Each survey’s mean stays on its own terms; there is no pooled score or cross-source trend.";
+}
+
 /* preferred prime minister: a leader "leads" only when the 95% interval of the lead among those who
    chose excludes zero, else the two are "level"; the opposition leader's pairing is said first */
 export function ppmHead(L) {

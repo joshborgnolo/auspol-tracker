@@ -12943,6 +12943,7 @@ if (!JUR && DIRM && trustGov && trustGov.model) {
         months: TM.months.filter((m) => m.ym >= TM.firstFaint).map((m) => [r2(m.x), m.v, m.lo, m.hi, m.ym]),
         dots: tDots, oecd: TM.oecdAvgAdj.map((r) => [r2(r.x), r.v]), edelman: TM.edelmanAvgAdj.map((r) => [r2(r.x), r.v]),
       },
+      life: lifeSat ? { series: lifeSat.series, snapshots: lifeSat.snapshots || [] } : null,
       terms: CYCLE_DEFS.filter((c) => c.eDate).map((c) => ({ year: c.year, gov: c.gov, pm: c.pm || "", e: c.eDate, ...(c.current ? { current: 1 } : {}) }))
         .sort((a, b) => (a.e < b.e ? -1 : 1)),
       events: events.filter((e) => e.major || ["2026-02-12", "2025-12-08"].includes(e.date)).map((e) => ({ d: e.date, s: e.short, l: e.label, t: e.desc })),
