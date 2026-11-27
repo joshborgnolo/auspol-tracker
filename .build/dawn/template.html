@@ -65,7 +65,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
    by dvh, every scroll that folded the toolbar away stretched the charts */
 @supports (height:100svh){:root{--tbs:calc(100lvh - 100svh)}}
 @media (pointer:coarse){:root{--ext:120px}}
-.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));overflow:clip;background:#070d24;cursor:pointer}
+.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));overflow:clip;background:#070d24}
 /* only a panel's top edge snaps. A panel is taller than the screen (--ext, the toolbar), and a snap area
    taller than the screen scrolls freely inside it: a lazy swipe was spent on the blank strip at its foot.
    The panels clip with overflow:clip: hidden would make each a scroller, which keeps .snap to itself */

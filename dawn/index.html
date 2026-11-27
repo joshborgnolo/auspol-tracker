@@ -65,7 +65,7 @@ body{margin:0;touch-action:manipulation;min-height:100%;background:var(--bg);col
    by dvh, every scroll that folded the toolbar away stretched the charts */
 @supports (height:100svh){:root{--tbs:calc(100lvh - 100svh)}}
 @media (pointer:coarse){:root{--ext:120px}}
-.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));overflow:clip;background:#070d24;cursor:pointer}
+.hero{position:relative;height:calc(100vh + var(--ext));height:calc(100lvh + var(--ext));overflow:clip;background:#070d24}
 /* only a panel's top edge snaps. A panel is taller than the screen (--ext, the toolbar), and a snap area
    taller than the screen scrolls freely inside it: a lazy swipe was spent on the blank strip at its foot.
    The panels clip with overflow:clip: hidden would make each a scroller, which keeps .snap to itself */
@@ -380,7 +380,7 @@ svg .gv{font-size:11.5px;font-weight:500;stroke-width:3px}
   <div class="grain" id="grain" aria-hidden="true"></div>
   <div class="now" id="now">
     <h2>Primaries</h2>
-    <p class="now-d">Estimated first preferences at <span id="now-date">24 Nov 2026</span>. <span id="now-latest">Latest poll is Essential’s, published two days ago.</span> <span id="whisk-note">Whiskers mark the 2025 election</span>; = means a statistical tie.</p>
+    <p class="now-d">Estimated first preferences at <span id="now-date">24 Nov 2026</span>. <span id="now-latest">Latest poll is Essential’s, published three days ago.</span> <span id="whisk-note">Whiskers mark the 2025 election</span>; = means a statistical tie.</p>
     <div class="now-mode"><button type="button" class="flip" id="pv-whisker-mode" aria-label="Whiskers show change since May 2025; switch them to 95% credible intervals" title="Switch the whiskers to 95% credible intervals"><span id="pv-whisker-label">Change since May 2025</span> <span aria-hidden="true">⇄</span></button></div>
     <div class="pv-h"><span id="range-label" aria-hidden="true">since 2025</span><button type="button" class="rp" id="replay" aria-pressed="false" aria-label="Replay week by week since the 2025 election"><svg class="i1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5"/><path d="M4.4 1.9v2.8h2.8"/></svg><svg class="i2" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1.4" fill="currentColor"/></svg></button></div>
     <div class="pv still" id="pv" role="table" aria-label="Estimated primary vote, %, and change since the 2025 election"></div>
