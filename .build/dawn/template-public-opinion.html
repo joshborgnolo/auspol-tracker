@@ -64,6 +64,8 @@ html{scroll-snap-type:y proximity}
 .pubop-hl{font-weight:400;font-size:clamp(25px,6.6vw,34px);line-height:1.12}
 .pubop-lv{font-family:var(--sans);font-size:24px;letter-spacing:-.01em}
 .pubop-fn{color:var(--ink-faint)}
+/* the mark on a release's questions, arrived at from its poll: in sentence case */
+.pubop-wvh-t{text-transform:none;letter-spacing:0;font-size:12.5px}
 .po-fig{margin-top:6px;flex:none;min-height:0;--dot:.9}
 .po-fig .tip.idle{visibility:hidden}
 .pubop-chart{display:block}
@@ -265,12 +267,21 @@ $('#pf-go').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();
 
 /*{{SHARED:nav}}*/
 
+/* from a poll's "What else this poll asked": the site's own trip (AP.pubopGo) turns the catalogue to that
+   pollster and marks that release's questions. The component offers it once it has mounted */
+const trip=new URLSearchParams(location.search),from=trip.get('pollster');
+if(from){
+  let tries=0;
+  const seek=()=>{if(window.AP.pubopGo){window.AP.pubopGo('pubop-p-'+from,trip.get('wave'));return}if(++tries<300)requestAnimationFrame(seek)};
+  requestAnimationFrame(seek);
+}
+
 /* back from a poll, or a reload: return to the same spot once the catalogue is tall enough to hold it */
 {const KEY='dawn-po-y';
  addEventListener('pagehide',()=>{try{sessionStorage.setItem(KEY,String(Math.round(scrollY)))}catch(e){}});
  const how=(performance.getEntriesByType('navigation')[0]||{}).type;
  let y=0;try{y=+sessionStorage.getItem(KEY)||0}catch(e){}
- if(!location.hash&&y>innerHeight*.5&&(how==='reload'||how==='back_forward')){
+ if(!location.hash&&!from&&y>innerHeight*.5&&(how==='reload'||how==='back_forward')){
    const t0=performance.now();let stop=false;
    for(const ev of ['wheel','touchstart','keydown'])addEventListener(ev,()=>{stop=true},{once:true,passive:true});
    const seek=()=>{if(stop)return;if(root.scrollHeight>=y+innerHeight){scrollTo(0,y);return}if(performance.now()-t0<6000)requestAnimationFrame(seek)};

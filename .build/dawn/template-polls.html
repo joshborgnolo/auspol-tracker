@@ -188,6 +188,7 @@ body[data-f=primary]:not(.intervals-on) .poll em{display:none}
 .det summary{font-weight:500;cursor:pointer}
 .det details>div{display:grid;gap:9px;margin-top:10px}
 .det .lk>a:first-child{font-weight:600}
+.det .po-line a{font-weight:600;display:inline-block;padding:4px 0;margin-right:8px}
 .det .vs{width:100%}
 body[data-f=issues] .headings th:nth-child(n+4),body[data-f=issues] .other-cell{text-align:left}
 @media (max-width:64em){
@@ -611,7 +612,9 @@ function detail(p){
     sec.splice(F==='primary'&&consideration?0:sec.length,0,['consideration','<h3>Voting consideration</h3>'+readings+'<p>'+ (considerationInterval(p,Object.values(p.cons)[0],p.cons)?'Parentheses show approximate 95% credible intervals for each response, using the effective sample size and allowing for rounding.':'95% credible intervals are unavailable for this wave.')+'</p>']);
   }
   const first=sec.shift();
-  return (first?first[1]:'')+'<details><summary>Sources and fieldwork</summary><div>'+b.join('')+'</div></details>'+sec.map(([k,html])=>'<details><summary>'+esc(facetTitle[k])+'</summary><div>'+html+'</div></details>').join('');
+  /* what else the release asked, and the way to those questions (the site's "Public opinion" line) */
+  const more=p.po?`<p class="po-line"><a href="../public-opinion/?pollster=${encodeURIComponent(p.po.h)}&amp;wave=${encodeURIComponent(p.po.w)}" data-k="${esc(p.k)}">What else this poll asked ›</a> <span>${p.po.n} question${p.po.n===1?'':'s'}: ${p.po.t.map(esc).join(', ')}</span></p>`:'';
+  return (first?first[1]:'')+more+'<details><summary>Sources and fieldwork</summary><div>'+b.join('')+'</div></details>'+sec.map(([k,html])=>'<details><summary>'+esc(facetTitle[k])+'</summary><div>'+html+'</div></details>').join('');
 }
 function toggle(li,open){
   const btn=$('button',li),d=li.nextElementSibling,pool=F==='confidence'?CONF:POLLS,p=pool.find(r=>'p-'+r.k===li.id);if(!p)return;
@@ -621,6 +624,8 @@ function toggle(li,open){
   d.hidden=!on;btn.setAttribute('aria-expanded',String(on));
 }
 $('#list').addEventListener('click',e=>{const row=e.target.closest('tr.poll');if(row)toggle(row)});
+/* leaving for the questions: the address names this poll, so coming back opens it again */
+$('#list').addEventListener('click',e=>{const a=e.target.closest('.po-line a');if(a&&/^https?:$/.test(location.protocol))history.replaceState(null,'',location.pathname+location.search+'#p-'+encodeURIComponent(a.dataset.k))});
 tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.f===F)return;F=b.dataset.f;$$('button',tabs).forEach(x=>x.setAttribute('aria-selected',String(x===b)));fillHouses();render();if(/^https?:$/.test(location.protocol))history.replaceState(null,'',F==='primary'?location.pathname:'?facet='+F)});
 sel.addEventListener('change',render);
 sortSelect.addEventListener('change',render);

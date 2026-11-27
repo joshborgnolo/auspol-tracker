@@ -20,7 +20,7 @@ import { latestPollLine } from "./poll-meta.mjs";
 import { disagreeData } from "./disagree-data.mjs";
 import { decidedData } from "./decided-data.mjs";
 import { emapData } from "./emap-data.mjs";
-import { heroSlides, newestPublished, pubopCss, pubopApp } from "./po-data.mjs";
+import { heroSlides, newestPublished, rowKey, rowQuestions, pubopCss, pubopApp } from "./po-data.mjs";
 import { ISSUES as ISSUE_NAMES } from "../issues-parse.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -153,6 +153,12 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   if (fs.existsSync(pollsPath)) {
     const PD = JSON.parse(fs.readFileSync(pollsPath, "utf8")), PL = PD.polls, L = D.weeks.length - 1;
     PD.issL = ISSUE_NAMES;   // each issue by the name the site gives it
+    /* the releases that asked the public opinion page's questions too: each row's way there */
+    const asked = path.join(assets, "oneoffs-source.json");
+    if (fs.existsSync(asked)) {
+      const by = rowQuestions(JSON.parse(fs.readFileSync(asked, "utf8")));
+      for (const p of PL) if (by.has(p.k)) p.po = by.get(p.k);
+    }
     const order = [...D.parties].sort((a, b) => D.prim[b].v[L] - D.prim[a].v[L]);
     const fillP = { FONT: "/assets/fonts/" + font, pollsHead: "Federal opinion polls",
                     pollsDek: "From 13 pollsters, with the newest first. Open a poll for details." };
@@ -319,7 +325,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     const poApp = hashed("po-app", "js", pubopApp(newtracker));
     const rows = fs.existsSync(pollsPath) ? JSON.parse(fs.readFileSync(pollsPath, "utf8")).polls.map((p) => p.k) : [];
     const linked = new Set(src.topics.flatMap((t) => t.blocks.flatMap((b) => (b.panels || []).flatMap((p) => p.points.filter((q) => q.rk)
-      .map((q) => q.rk.split("|")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + q.rk.split("|")[1])))));
+      .map((q) => rowKey(q.rk))))));
     const PO = { asOf: D.asOf, terms: D.terms, slides: heroSlides(src), rows: rows.filter((k) => linked.has(k)) };
     const words = { FONT: "/assets/fonts/" + font, lede: esc(opinionLede(src, newestPublished(src))), POJSON: poJson, POAPP: poApp };
     let h = fs.readFileSync(path.join(HERE, "template-public-opinion.html"), "utf8")
