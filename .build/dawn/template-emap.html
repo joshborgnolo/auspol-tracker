@@ -42,6 +42,9 @@ body{display:block;min-height:100%;font-size:16px;line-height:1.5;font-feature-s
 /* map.css has an old rule of its own for .hero (18px off the top), which pushed the sunrise down the
    page: a pale strip behind the bar, and the bar's copy of the sky out of step with the sky */
 section.hero{margin-top:0}
+/* once the sunrise has left the screen the bar is the page's plain ground, whatever the sky copy's
+   scroll-linked slide is doing (laptop Safari left the bar coloured here, now and then, after a reload) */
+.sunk .tsky{visibility:hidden}
 /* the map's marks aren't the page's chart type */
 .mp svg text,.mp-tip svg text{paint-order:normal;stroke:none}
 
@@ -321,6 +324,17 @@ $('#em-close').innerHTML=close.map(s=>`<li><button type="button" data-n="${esc(s
 $('#em-close').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||!window.__map)return;const M=window.__map;go(mapSec);await M.setYear(E.lastYear);const i=M.M().byName.get(b.dataset.n);if(i!=null)M.goDiv(i,{fly:true})});
 
 /*{{SHARED:nav}}*/
+
+/* this page grows after it opens (the map fills in the seat's figures, and each seat chosen changes
+   them), which no other Dawn page does. So the bar doesn't rest on the sky copy's slide past the
+   sunrise, and the slide is started afresh whenever the page's height changes */
+const sunk=()=>root.classList.toggle('sunk',hero.getBoundingClientRect().bottom<=.5);
+addEventListener('scroll',sunk,{passive:true});addEventListener('resize',sunk);addEventListener('pageshow',sunk);sunk();
+let tall=0;
+new ResizeObserver(()=>{
+  const h=document.body.offsetHeight;if(h===tall)return;tall=h;
+  const t=$('#tsky');t.style.animationName='none';void t.offsetHeight;t.style.animationName='';sunk();
+}).observe(document.body);
 }
 </script>
 <script src="/map/vendor/d3-7.9.0.min.js"></script>
