@@ -40,7 +40,9 @@ const wordsOf = (bbox) => [...bbox.matchAll(/<word xMin="([\d.]+)" yMin="([\d.]+
    pdftotext printed for that month. */
 export function secDirectionSeries(bboxHtml, svg) {
   const words = wordsOf(bboxHtml);
-  const axis = words.filter((w) => /^(?:30|40|50|60|70)$/.test(w.text) && w.x1 < 65 && w.y0 < 225)
+  /* Newer reports rescale this axis (Nov 2026 is 35–75 rather than 30–70);
+     the printed tick values, not a fixed era's range, are the calibration. */
+  const axis = words.filter((w) => /^(?:[1-9]\d|100)$/.test(w.text) && w.x1 < 65 && w.y0 < 225)
     .map((w) => ({ v: +w.text, y: (w.y0 + w.y1) / 2 })).sort((a, b) => a.v - b.v);
   if (axis.length < 3) throw new Error("SEC direction chart: fewer than three y-axis anchors");
   const n = axis.length;

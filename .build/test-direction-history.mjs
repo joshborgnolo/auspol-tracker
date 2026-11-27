@@ -166,7 +166,7 @@ assert.ok(m, "dirHistory is present in the payload");
 const payload = JSON.parse(JSON.parse(m[1]));
 assert.ok(payload && payload.houses && payload.houses["Roy Morgan"], "Roy Morgan's run is on the page");
 assert.ok(payload.houses.Essential, "Essential's national-mood run comes from the live rows");
-assert.equal(payload.houses["SEC Newgate"]?.length, 27, "all 27 SEC waves reach the monthly payload");
+assert.equal(payload.houses["SEC Newgate"]?.length, 28, "all 28 SEC waves reach the monthly payload, including November 2026");
 const secFirst = waves.find((w) => w.pollster === "SEC Newgate" && w.month === "2022-03");
 assert.deepEqual([secFirst.start, secFirst.end, secFirst.sample], ["2022-03-07", "2022-03-11", 1204]);
 assert.equal(waves.find((w) => w.pollster === "Essential" && w.end === "2022-04-19").sampleEff, 971);

@@ -273,7 +273,7 @@ assert.equal(daOwnership(daRep("DemosAU_National_Poll_November_2026_Methodology_
   const data = JSON.parse(fs.readFileSync("data/issues.json", "utf8"));
   const rows = data.ownership.filter((r) => r.pollster === "SEC Newgate");
   const eras = Object.keys(bank).filter((ym) => ym >= "2026-05");
-  assert.deepEqual(eras, ["2026-05", "2026-07", "2026-09"], "the One-Nation-era bank months");
+  assert.deepEqual(eras, ["2026-05", "2026-07", "2026-09", "2026-11"], "the One-Nation-era bank months");
   assert.equal(rows.length, eras.length, "one ownership row per pooled wave");
   for (const ym of eras) {
     const dir = dirs.find((d) => d.date.slice(0, 7) === ym);
@@ -282,7 +282,7 @@ assert.equal(daOwnership(daRep("DemosAU_National_Poll_November_2026_Methodology_
     assert.ok(row, `${ym}: its ownership row exists`);
     assert.deepEqual([row.dateStart, row.sample, row.source], [dir.dateStart, dir.sample, dir.url],
       `${ym}: dates, sample and link are the direction row's`);
-    assert.equal(row.sampleEff, { "2026-05": 653, "2026-07": 1244, "2026-09": 1095 }[ym],
+    assert.equal(row.sampleEff, { "2026-05": 653, "2026-07": 1244, "2026-09": 1095, "2026-11": null }[ym],
       `${ym}: the wave's statement-published effective sample rides the direction row`);
     assert.deepEqual(Object.keys(row.issues), ["col"], `${ym}: the one issue it asks about`);
     const b = bank[ym];
