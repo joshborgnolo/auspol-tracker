@@ -23,18 +23,25 @@ function dawnTheme(T) {
   T.sea = h("#ecebf6", "#0d1230"); T.seaLine = h("#d6d6ec", "#232a54");
   T.seaMark = h("#8d8cb4", "#6e76a8"); T.seaInk = h("#5f628f", "#9aa3d4");
 }
-/* the key's rows, dealt to the page: the basis's own settings over the map, the cities
-   over them, Draw under the map, and the notes down with the seat's figures. The rows
+/* the key's rows, dealt to the page: the basis's own settings over the map, with the
+   State, Seat type and city chips, Draw under the map, and the notes down with the seat's figures. The rows
    move as they are, so the map's own clicks and menus still work on them */
 function dawnSync() {
   if (!dawnOn()) return;
   const el = $("#legend"), m = M(); if (!el || !m) return;
-  const slot = (id, nodes) => { const s = $(id); if (s) { s.replaceChildren(...nodes); s.classList.toggle("none", !nodes.length); } };
+  // (a row of chips the reader has scrolled along stays there through the rebuild)
+  const slot = (id, nodes) => {
+    const s = $(id); if (!s) return;
+    const at = new Map([...s.children].map((n) => [n.id, n.scrollLeft]));
+    s.replaceChildren(...nodes); s.classList.toggle("none", !nodes.length);
+    for (const n of nodes) if (at.get(n.id)) n.scrollLeft = at.get(n.id);
+  };
   const sub = el.querySelector(".lg-sub"), notes = [];
   if (sub) { notes.push(...sub.querySelectorAll(":scope > .lg-note")); notes.forEach((n) => n.remove()); }
   notes.push(...el.querySelectorAll(":scope > .lg-dn, :scope > .lg-note, :scope > .lg-shapes"), ...el.querySelectorAll(":scope > .lg-foot .lg-shapes"));
   slot("#dm-opts", sub && sub.textContent.trim() ? [sub] : []);
   slot("#dm-draw", [...el.querySelectorAll(":scope > .lg-draw")]);
+  slot("#dm-filters", [...el.querySelectorAll(":scope > .lg-filter")]);
   slot("#dm-places", [...el.querySelectorAll(":scope > #cities")]);
   slot("#dm-notes", notes);
   const s = S.sel;

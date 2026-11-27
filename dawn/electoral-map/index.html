@@ -371,11 +371,19 @@ html.mp-dawn .mp .mp-legend.dm-slot{display:block;order:0;min-height:0;margin:0;
 .mp .dm-ctl .mp-search label:focus-within{border-color:var(--ink2)}
 .mp .dm-ctl .mp-search input{flex:1;min-width:0;height:36px;font:500 16px/1 var(--sans);color:var(--ink)}
 .mp .dm-ctl .sugg{top:44px;max-height:min(420px,48vh);border-radius:16px;border-color:var(--rule)}
-/* the cities, as Dawn's chips */
-.mp #dm-places .lg-jump{display:flex;flex-wrap:nowrap;gap:6px;margin:8px 0 0;overflow-x:auto;scrollbar-width:none;touch-action:pan-x pan-y}
-#dm-places .lg-jump::-webkit-scrollbar{display:none}
-#dm-places .lg-jump>b{display:none}
-.mp #dm-places .lg-jump .mp-ca,.mp #dm-places .lg-jump button{flex:none;font:500 13px/1 var(--sans);color:var(--ink2);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:30px;padding:0 12px}
+/* State, Seat type and the cities, as Dawn's chips: a labelled row each, scrolling sideways */
+.dm-filters{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.dm-filters #dm-filters{display:contents!important}
+.dm-filters #dm-filters.none{display:none!important}
+html.mp-dawn .mp .dm-filters .mp-legend .lg-jump.lg-row,html.mp-dawn .mp .dm-filters .lg-jump.lg-row{display:flex!important;column-gap:6px!important;flex-wrap:nowrap;align-items:center;gap:6px;width:auto;margin:0!important;padding:1px 0!important;overflow-x:auto;scrollbar-width:none;touch-action:pan-x pan-y}
+.dm-filters .lg-jump::-webkit-scrollbar{display:none}
+html.mp-dawn .mp .dm-filters .lg-jump.lg-row>b{display:flex!important;align-items:center;align-self:stretch;position:sticky;left:0;z-index:1;flex:none;width:5.2em;margin:0 -6px 0 0!important;padding:0!important;border-radius:0;background:var(--bg);font:500 12px/1 var(--sans);color:var(--mute);text-align:left}
+.mp .dm-filters .lg-jump .mp-ca{flex:none;display:flex}
+html.mp-dawn .mp .dm-filters .lg-jump button{flex:none;display:inline-flex;align-items:center;gap:5px;font:500 13px/1 var(--sans);color:var(--ink2);background:var(--bg);border:1px solid var(--rule);border-radius:999px;height:30px;padding:0 11px;text-decoration:none}
+html.mp-dawn .mp .dm-filters .lg-jump button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:500}
+.dm-filters .tw::after{display:none}
+html.mp-dawn .mp .dm-filters .lg-jump button .tw{text-decoration:none!important}
+@media(min-width:900px){.dm-filters{flex-direction:row;flex-wrap:wrap;column-gap:28px}html.mp-dawn .mp .dm-filters .lg-jump.lg-row>b{width:auto;margin:0!important}.dm-filters #dm-places{flex-basis:100%}}
 .dm-view.mp-view{position:relative;top:auto;grid-column:auto;grid-row:auto;height:auto;min-height:0;max-height:none;flex:1 1 auto;margin-top:8px}
 .dm-view .mp-stage,.dm-view.mp-view .mp-stage{flex:1 1 0;height:auto;min-height:200px;border-radius:16px;overflow:hidden;border:1px solid var(--rule)}
 html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border-color:var(--rule)}
@@ -396,6 +404,8 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
 /* the page below: what the map says of the seat chosen */
 .dm-seat{height:auto;min-height:calc(100vh + var(--ext));min-height:calc(100lvh + var(--ext));display:block;overflow:visible;scroll-snap-align:start;padding-top:calc(var(--navh) + env(safe-area-inset-top) + 10px)}
 .dm-seat .wrap{display:block;max-width:720px}
+/* the figures' lists of seats share a class name with the top bar's links: theirs stay lists */
+.dm-seat .links{display:block;gap:0;margin:0}
 .dm-back{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0;border:0;background:none;font:500 13.5px/1 var(--sans);color:var(--ink2);cursor:pointer}
 .dm-hint{margin:4px 0 12px;font-size:14.5px;color:var(--ink2)}
 .dm-seat .mp-story{grid-column:auto;grid-row:auto;padding:0}
@@ -406,7 +416,7 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
 .mp .dm-notes .lg-note,.mp .dm-notes .lg-undrawn{display:block;margin:0 0 6px;font-size:13px;line-height:1.45;color:var(--mute)}
 .dm-full{display:inline-block;margin-top:12px;color:var(--ink);font-weight:600;font-size:13.5px}
 @media(min-width:900px){.dm-ctl{grid-template-columns:repeat(2,minmax(0,16em)) minmax(0,22em)}.mp .dm-ctl .mp-search{grid-column:3;justify-self:end;width:100%}#dm-draw .lg-draw{max-width:560px;margin:0 auto}.dm-map h2{min-height:1.06em}}
-@media(max-height:700px){.dm-ctl label>span:first-child{display:none}.dm-ctl{margin-top:8px;row-gap:6px}.mp .dm-ctl .mp-search label{height:34px}.mp .dm-ctl .mp-search input{height:32px}.dm-ctl .pick select{height:34px;background-position:calc(100% - 17px) 15px,calc(100% - 12px) 15px}#dm-places{display:none}.dm-view .mp-stage,.dm-view.mp-view .mp-stage{min-height:150px}.dm-more{height:28px;margin-top:2px}}
+@media(max-height:700px){.dm-ctl label>span:first-child{display:none}.dm-ctl{margin-top:8px;row-gap:6px}.mp .dm-ctl .mp-search label{height:34px}.mp .dm-ctl .mp-search input{height:32px}.dm-ctl .pick select{height:34px;background-position:calc(100% - 17px) 15px,calc(100% - 12px) 15px}#dm-places{display:none}.dm-view .mp-stage,.dm-view.mp-view .mp-stage{min-height:150px}.dm-more{height:28px;margin-top:2px}.dm-filters{margin-top:6px;gap:4px}html.mp-dawn .mp .dm-filters .lg-jump button{height:28px}}
 
 /* the closest seats */
 .em-close{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;flex:0 1 auto;min-height:0}
@@ -491,7 +501,7 @@ html.mp-dawn:not(.mp-retro) .mp-view:not(.fs) .mp-zoom{border-radius:12px;border
       </div>
     </div>
     <div class="mp-legend dm-slot none" id="dm-opts"></div>
-    <div class="dm-slot none" id="dm-places"></div>
+    <div class="dm-filters"><div class="mp-legend dm-slot none" id="dm-filters"></div><div class="dm-slot none" id="dm-places"></div></div>
     <div class="mp-view dm-view" id="view">
       <div class="mp-stage" id="stage">
         <canvas id="cv" class="grab" aria-label="Map of the federal electoral divisions. Tap a seat; its figures are on the page below."></canvas>
@@ -759,6 +769,6 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(paintNow);
 </script>
 <script src="/map/vendor/d3-7.9.0.min.js"></script>
 <script src="/map/vendor/topojson-client-3.1.0.min.js"></script>
-<script src="/map/map.js?v=3e390cdb"></script>
+<script src="/map/map.js?v=f4700793"></script>
 </body>
 </html>
