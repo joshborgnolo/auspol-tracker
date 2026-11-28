@@ -48,11 +48,14 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
 /* demographics' comparison sentences name every party in its Dawn colour */
 {
   const css = fs.readFileSync(path.join(HERE, "dawn", "template-demographics.html"), "utf8");
-  const src = fs.readFileSync(path.join(HERE, "dawn", "demographics.mjs"), "utf8");
+  const { demographicsMarkup } = await import("./dawn/demographics.mjs");
   for (const [key, token] of [["alp", "alp"], ["onp", "on"], ["lnp", "lnp"], ["grn", "grn"]]) {
     ok(css.includes(`.finding .party-name.${key}{color:var(--${token})}`), `demographics: ${key}'s finding text uses the Dawn ${token} colour`);
   }
-  eq((src.match(/class="party-name \$\{(?:high|low)\.key\}"/g) || []).length, 2, "both the high and low comparison parties carry their colour class");
+  const findings = demographicsMarkup.findings().split('<div id="finding-').slice(1);
+  eq(findings.length, 5, "one comparison per facet");
+  for (const finding of findings)
+    eq((finding.match(/class="party-name (alp|onp|lnp|grn)"/g) || []).length, 2, "both comparison parties carry their colour class");
 }
 
 /* the latest poll's publication age, rounded in the unit the reader is given */

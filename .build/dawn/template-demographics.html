@@ -18,7 +18,12 @@
 .facets button{font:600 14px var(--sans);padding:7px 11px;border:1px solid #ffffff75;color:inherit;border-radius:24px;background:#0b193755;cursor:pointer}
 .facets button[aria-pressed=true]{color:#101b38;background:#f6f4ff}
 .finding{max-width:540px}
-.finding p{font:400 clamp(18px,2.7vh,24px)/1.22 var(--serif);margin:14px 0 0;max-width:41ch}
+.takeaway{margin-top:clamp(10px,2vh,20px)}
+.takeaway-context{margin:0 0 5px;max-width:54ch;font:500 clamp(14px,1.9vh,16px)/1.35 var(--sans);text-wrap:pretty}
+.takeaway ul{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+.takeaway li{font:400 clamp(18px,min(5.2vw,2.9vh),25px)/1.2 var(--serif)}
+.takeaway strong{font-weight:600;white-space:nowrap}
+.takeaway .party-name{white-space:nowrap}
 .finding .party-name.alp{color:var(--alp)}
 .finding .party-name.onp{color:var(--on)}
 .finding .party-name.lnp{color:var(--lnp)}
@@ -36,23 +41,29 @@
 .bar-line{display:flex;align-items:center;height:16px}
 .bar{height:8px;flex-shrink:0}
 .bar-line b{margin-left:5px;font:600 13px/1 var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
-@media(max-height:650px){.facets{margin:6px 0}.party-row{padding:3px 0}.finding p{margin-top:6px}}
+@media(max-height:650px){.facets{margin:6px 0}.party-row{padding:3px 0}.takeaway{margin-top:6px}}
 @media(max-height:520px){.hero{height:auto;min-height:100lvh;padding:calc(var(--navh) + 12px) var(--g) 32px}.hero .now{position:relative;inset:auto;width:auto}}
-.chart-link{display:block;min-height:0;flex:1;margin:14px 0;text-align:center}
-.chart-link img{width:100%;height:100%;object-fit:contain;object-position:top left}
+.chart-panel{height:auto;min-height:100svh;overflow:visible}
+.demo-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,4vh,40px) clamp(24px,5vw,72px);margin:clamp(16px,3vh,32px) 0}
+.demo-party{min-width:0;--row:2.35rem;--gutter:18px}
+.demo-party h3{display:flex;align-items:center;gap:8px;font:600 18px/1.2 var(--sans);margin:0 0 8px}
+.demo-party h3::before{content:"";width:14px;height:4px;background:var(--party)}
+.demo-series{position:relative;padding-left:var(--gutter)}
+.demo-row{display:grid;grid-template-columns:clamp(6em,10vw,9em) minmax(0,1fr) 3.4em;align-items:center;gap:8px;height:var(--row);font-size:14px;line-height:1.15}
+.demo-row b{text-align:right;font-variant-numeric:tabular-nums}
+.demo-track{height:18px;position:relative;border-left:1px solid var(--rule2)}
+.demo-fill{display:block;height:100%;background:var(--party);opacity:.63}
+.demo-interval{position:absolute;top:50%;height:8px;transform:translateY(-50%);border-inline:1.5px solid var(--ink)}
+.demo-interval::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1.5px solid var(--ink)}
+.demo-arc{position:absolute;right:calc(100% - var(--gutter) + 4px);width:calc(3px + var(--span)*3px);top:calc((var(--start) + .5)*var(--row));height:calc(var(--span)*var(--row));border:1.5px solid var(--party);border-right:0;border-radius:100% 0 0 100%}
+.chart-panel .src{margin:4px 0}
+@media(max-width:720px){.demo-plots{grid-template-columns:1fr;gap:20px}.demo-party{--row:1.95rem}}
 .chart-panel details{font-size:14px;width:fit-content;max-width:100%}
 .chart-panel summary{cursor:pointer;color:var(--ink2);padding:5px 0}
 .chart-panel table{border-collapse:collapse;font-variant-numeric:tabular-nums}
 .chart-panel th,.chart-panel td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--rule)}
 .chart-panel th:first-child{text-align:left}
-.mobile-plots,.chart-note{display:none}
-@media(max-width:650px){
-.chart-panel{height:auto;min-height:100svh;overflow:visible}
-.chart-link{flex:none}.chart-link img{display:none}
-.mobile-plots{display:grid;gap:1px;padding:6px 0}
-.mobile-plots svg{width:100%;height:auto;display:block}
-.chart-note{display:block;margin:0 0 5px;color:var(--mute);font-size:13px}
-.chart-panel th,.chart-panel td{padding:5px 3px}.chart-panel table{font-size:12px}}
+@media(max-width:650px){.chart-panel th,.chart-panel td{padding:5px 3px}.chart-panel table{font-size:12px}}
 </style>
 </head>
 <body>
