@@ -38,7 +38,7 @@ function finding({ id, groups, subject, baseline, votes }, index) {
   return `<div id="finding-${id}" class="finding"${index ? " hidden" : ""}>
     <div class="bar-key"><span><i class="hatched"></i>${groups[0]}</span><span><i class="solid"></i>${groups.at(-1)}</span></div>
     <div class="party-plot">${rows}</div>
-    <p>${subject} are <strong>${high.ratio.toFixed(1)} times</strong> as likely as ${baseline} to back ${high.party}, but <strong>${low.ratio.toFixed(2)} times</strong> as likely to back ${low.party}.</p>
+    <p>${subject} are <strong>${high.ratio.toFixed(1)} times</strong> as likely as ${baseline} to back <span class="party-name ${high.key}">${high.party}</span>, but <strong>${low.ratio.toFixed(2)} times</strong> as likely to back <span class="party-name ${low.key}">${low.party}</span>.</p>
   </div>`;
 }
 

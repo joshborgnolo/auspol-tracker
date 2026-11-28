@@ -45,6 +45,16 @@ let n = 0;
 const ok = (c, m) => { assert.ok(c, m); n++; };
 const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
 
+/* demographics' comparison sentences name every party in its Dawn colour */
+{
+  const css = fs.readFileSync(path.join(HERE, "dawn", "template-demographics.html"), "utf8");
+  const src = fs.readFileSync(path.join(HERE, "dawn", "demographics.mjs"), "utf8");
+  for (const [key, token] of [["alp", "alp"], ["onp", "on"], ["lnp", "lnp"], ["grn", "grn"]]) {
+    ok(css.includes(`.finding .party-name.${key}{color:var(--${token})}`), `demographics: ${key}'s finding text uses the Dawn ${token} colour`);
+  }
+  eq((src.match(/class="party-name \$\{(?:high|low)\.key\}"/g) || []).length, 2, "both the high and low comparison parties carry their colour class");
+}
+
 /* the latest poll's publication age, rounded in the unit the reader is given */
 {
   const P = { latestPoll: { h: "Essential", pub: "2026-11-25T01:00" } };
