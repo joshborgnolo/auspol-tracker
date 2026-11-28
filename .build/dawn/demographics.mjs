@@ -45,6 +45,9 @@ const charts = [
     votes: [[28.4,24.2,24.1,31.4,27.9,32.3],[24.3,22.9,30.2,20.9,25.2,18.1],[23,29.5,23.8,22.5,24.8,20.4],[11.4,14.6,12.5,16.1,13.6,13.5]] },
 ];
 
+const demographicOrder = ["generation", "age", "education", "state-territory", "seat-type", "language"];
+charts.sort((a, b) => demographicOrder.indexOf(a.id) - demographicOrder.indexOf(b.id));
+
 // Both bars start at zero. Keep the same scale when switching comparisons.
 const scaleMax = Math.ceil(Math.max(...charts.flatMap(chart => chart.votes.flat())) / 10) * 10;
 const partyKeys = ["alp", "onp", "lnp", "grn"];

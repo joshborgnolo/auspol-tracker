@@ -61,6 +61,8 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   }
   const findings = demographicsMarkup.findings().split('<div id="finding-').slice(1);
   eq(findings.length, 6, "one comparison per facet");
+  eq([...demographicsMarkup.buttons().matchAll(/aria-controls="finding-([^"]+)"/g)].map((m) => m[1]).join(","),
+    "generation,age,education,state-territory,seat-type,language", "demographic facets and panels use strongest-contrast order");
   const panels = demographicsMarkup.panels();
   const widths = [...panels.matchAll(/class="gg-whisker" d="M([\d.]+) [\d.]+H([\d.]+)/g)];
   eq(widths.length, 88, "one interval per demographic estimate");
