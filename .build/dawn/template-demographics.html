@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<!-- held hidden on the sky's navy until the script has placed the sun, as on the votes page -->
+<script>if('scrollRestoration' in history)history.scrollRestoration='manual';document.documentElement.classList.add('wait');setTimeout(function(){document.documentElement.classList.remove('wait')},3000)</script>
+<meta name="robots" content="noindex">
+<title>Demographics · auspol tracker</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preload" href="{{FONT}}" as="font" type="font/woff2" crossorigin>
+<style>
+/*{{SHARED:css}}*/
+
+.now h1{font:400 clamp(32px,6vh,52px)/1.04 var(--serif);margin:0}
+.facets{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0}
+.facets button{font:600 14px var(--sans);padding:7px 11px;border:1px solid #ffffff75;color:inherit;border-radius:24px;background:#0b193755;cursor:pointer}
+.facets button[aria-pressed=true]{color:#101b38;background:#f6f4ff}
+.finding{font:400 clamp(23px,4.2vh,36px)/1.2 var(--serif);margin:0;max-width:34ch}
+.finding strong{font-weight:600}
+.chart-link{display:block;min-height:0;flex:1;margin:14px 0;text-align:center}
+.chart-link img{width:100%;height:100%;object-fit:contain;object-position:top left}
+.chart-panel details{font-size:14px;width:fit-content;max-width:100%}
+.chart-panel summary{cursor:pointer;color:var(--ink2);padding:5px 0}
+.chart-panel table{border-collapse:collapse;font-variant-numeric:tabular-nums}
+.chart-panel th,.chart-panel td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--rule)}
+.chart-panel th:first-child{text-align:left}
+.mobile-plots,.chart-note{display:none}
+@media(max-width:650px){
+.chart-panel{height:auto;min-height:100svh;overflow:visible}
+.chart-link{flex:none}.chart-link img{display:none}
+.mobile-plots{display:grid;gap:1px;background:#fff1e5;padding:6px 0}
+.mobile-plots svg{width:100%;height:auto;display:block}
+.chart-note{display:block;margin:0 0 5px;color:var(--mute);font-size:13px}
+.chart-panel th,.chart-panel td{padding:5px 3px}.chart-panel table{font-size:12px}}
+</style>
+</head>
+<body>
+<header class="nav over" id="nav">
+  <a class="mark" href="../">/*{{SHARED:logo}}*/<span class="mk"><span class="mk-l">auspol tracker</span><span class="mk-d" aria-hidden="true">auspol tracker</span></span></a>
+  <nav class="links" aria-label="Sections">
+    <a href="../#votes">votes</a>
+    <a href="../polls/">polls</a>
+  </nav>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="More"><b><i></i><i></i><i></i></b></button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="More" hidden>
+  <ul>
+    <li><a href="../#votes">votes</a></li>
+    <li><a href="../polls/">polls</a></li>
+    <li><a href="../leadership-ratings/">leadership ratings</a></li>
+    <li><a href="../mood/">mood</a></li>
+    <li><a href="../public-opinion/">public opinion</a></li>
+    <li><a href="#top" aria-current="page">demographics</a></li>
+    <li><a href="../past-cycles/">past cycles</a></li>
+    <li><span class="soon">states <small>soon</small></span></li>
+    <li><a href="../poll-disagreement/">poll disagreement</a></li>
+    <li><a href="../decidedness/">decidedness</a></li>
+    <li><a href="../electoral-map/">electoral map</a></li>
+    <li><span class="soon">flows <small>soon</small></span></li>
+    <li><span class="soon">method <small>soon</small></span></li>
+  </ul>
+</div>
+
+<main>
+<section class="hero" id="top" aria-label="Demographics">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="sky" id="sky" data-mode="rise" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="wash rise"></div>
+    <div class="wash set"></div>
+    <div class="tbd" id="tbd" aria-hidden="true"></div><div class="sun" id="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div>
+    <div class="twin"><div class="tsky" id="tsky"><div class="stars"><canvas id="twin-cv"></canvas></div><div class="wash rise"></div><div class="wash set"></div><div class="sun"><div class="halo"></div><div class="limb"></div><div class="core"></div></div><div class="grain" id="twin-grain"></div></div></div>
+  </div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="now" id="now">
+    <h1>Demographics</h1>
+    <p class="now-d">First preferences in November 2026</p>
+    <div class="facets" role="group" aria-label="Compare voters by demographic">{{buttons}}</div>
+    <div aria-live="polite">{{findings}}</div>
+  </div>
+</section>
+{{panels}}
+</main>
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}}};
+/*{{SHARED:sky}}*/
+/*{{SHARED:nav}}*/
+for(const button of $$('.facets button')){
+  button.addEventListener('click',()=>{
+    for(const tab of $$('.facets button')){
+      const selected=tab===button;
+      tab.setAttribute('aria-pressed',String(selected));
+      document.getElementById(tab.getAttribute('aria-controls')).hidden=!selected;
+    }
+    paintNow();
+  });
+}
+}
+</script>
+</body>
+</html>
