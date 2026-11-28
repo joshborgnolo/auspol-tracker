@@ -15,6 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import { immigrationModel } from "./immigration-model.mjs";
 import { cohesionModel } from "./cohesion-model.mjs";
 import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, lifeHead, lifeDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, opinionLede, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
@@ -337,7 +338,8 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     const rows = fs.existsSync(pollsPath) ? JSON.parse(fs.readFileSync(pollsPath, "utf8")).polls.map((p) => p.k) : [];
     const linked = new Set(src.topics.flatMap((t) => t.blocks.flatMap((b) => (b.panels || []).flatMap((p) => p.points.filter((q) => q.rk)
       .map((q) => rowKey(q.rk))))));
-    const PO = { asOf: D.asOf, terms: D.terms, slides: heroSlides(src), rows: rows.filter((k) => linked.has(k)) };
+    const immigration = src.topics.find(t=>t.id==="immigration")?.blocks.find(b=>b.id==="immigration-less");
+    const PO = { immigration: immigration ? immigrationModel(immigration) : null, asOf: D.asOf, terms: D.terms, slides: heroSlides(src), rows: rows.filter((k) => linked.has(k)) };
     const words = { FONT: "/assets/fonts/" + font, lede: esc(opinionLede(src, newestPublished(src))), POJSON: poJson, POAPP: poApp };
     let h = fs.readFileSync(path.join(HERE, "template-public-opinion.html"), "utf8")
       .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "")

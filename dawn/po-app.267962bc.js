@@ -318,6 +318,7 @@ function rdTabsKey(options, onChange) {
     btns[j].focus({ preventScroll: true });
   };
 }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 const {
   useState: pubopUseState,
   useEffect: pubopUseEffect,
@@ -1181,7 +1182,110 @@ function PubOpItem({
   })));
 }
 function PubOpTracker(props) {
+  if (props.c.id === "immigration-less" && window.dawnImmigration) return React.createElement(PubOpImmigration, _extends({}, props, {
+    model: window.dawnImmigration
+  }));
   return props.c.form === "longrun" ? React.createElement(PubOpLongRun, props) : React.createElement(PubOpPollsTracker, props);
+}
+function PubOpImmigration({
+  c,
+  houses,
+  topic,
+  model
+}) {
+  const [raw, setRaw] = React.useState(false);
+  const narrow = useNarrow(MQ_PHONE);
+  const {
+      trend,
+      rows,
+      sources
+    } = model,
+    latest = trend[trend.length - 1];
+  const colour = "var(--pubop-w0)",
+    fmt = v => v.toFixed(1) + "%";
+  const points = trend.map(q => ({
+      x: q.x,
+      y: q.v
+    })),
+    first = points[0].x;
+  const yearTicks = [];
+  for (let y = Math.ceil(first / 2) * 2; y <= latest.x; y += narrow ? 4 : 2) yearTicks.push({
+    x: y,
+    label: String(y)
+  });
+  const lo = Math.floor(Math.min(...trend.map(q => q.lo), ...rows.map(q => q.v)) / 10) * 10;
+  const hi = Math.ceil(Math.max(...trend.map(q => q.hi), ...rows.map(q => q.v)) / 10) * 10;
+  const yTicks = Array.from({
+    length: (hi - lo) / 10 + 1
+  }, (_, i) => lo + 10 * i);
+  const month = x => new Date(Date.UTC(Math.floor(x), Math.min(11, Math.floor(x % 1 * 12)), 15)).toLocaleDateString("en-AU", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC"
+  });
+  const name = r => r.house === "lowy" ? "Lowy" : pubopHouse(r, houses);
+  return React.createElement("div", {
+    className: "pubop-tracker"
+  }, React.createElement("label", null, "View ", React.createElement("select", {
+    value: raw ? "polls" : "estimate",
+    onChange: e => setRaw(e.target.value === "polls")
+  }, React.createElement("option", {
+    value: "estimate"
+  }, "Model estimate"), React.createElement("option", {
+    value: "polls"
+  }, "Pollster comparison"))), raw ? React.createElement(PubOpPollsTracker, {
+    c: c,
+    houses: houses,
+    topic: topic
+  }) : React.createElement(React.Fragment, null, React.createElement("p", {
+    className: "pubop-tlab"
+  }, "What share of Australians think immigration is too high?"), React.createElement("p", {
+    className: "pubop-tdek"
+  }, React.createElement("b", null, fmt(latest.v)), " on Scanlon\u2019s current question in ", month(latest.x), ". The 95% credible interval is ", fmt(latest.lo), "\u2013", fmt(latest.hi), "."), React.createElement("div", {
+    className: "card rd-card pubop-chart"
+  }, React.createElement(TrendChart, {
+    heightPx: narrow ? 260 : 330,
+    series: [{
+      label: "Estimate",
+      color: colour,
+      points
+    }],
+    credibleBand: trend,
+    spine: points,
+    xDomain: [first - .15, latest.x + .15],
+    yDomain: [lo, hi],
+    yTicks: yTicks,
+    xTicks: yearTicks,
+    notes: yTicks.map(y => ({
+      y,
+      text: y + "%"
+    })),
+    fmt: fmt,
+    tooltipTitle: i => month(points[i].x),
+    scatter: rows.map(r => ({
+      x: r.x,
+      y: r.v,
+      label: "Published",
+      color: "var(--mute)",
+      meta: {
+        pollster: name(r),
+        dateLabel: r.label
+      }
+    })),
+    copy: {
+      title: "Immigration is too high, estimated share"
+    }
+  })), React.createElement("p", {
+    className: "pubop-tdek"
+  }, "Dots show published readings. The line estimates the share who would give this answer on Scanlon\u2019s current survey. Shading gives its 95% credible interval."), React.createElement("details", {
+    className: "pubop-ledger"
+  }, React.createElement("summary", null, "Surveys and method"), React.createElement("p", null, "The model allows opinion to move over time and each survey to read higher or lower. Scanlon\u2019s telephone, Life in Australia and blended surveys have separate offsets, as do Lowy\u2019s earlier and later methods. Annual archive readings are positioned approximately within each year."), React.createElement("p", null, model.pooled ? "Questions asking whether numbers should fall also contribute, each on its own survey’s terms." : "Only questions about whether the current level is too high contribute. Polls asking whether numbers should fall appear in the pollster comparison."), React.createElement("p", null, React.createElement("a", {
+    href: sources.scanlon
+  }, "Scanlon, figure 17"), " \xB7 ", React.createElement("a", {
+    href: sources.lowy
+  }, "Lowy, immigration rate")), React.createElement("table", null, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Survey"), React.createElement("th", null, "Wave"), React.createElement("th", null, "Published share"))), React.createElement("tbody", null, rows.slice().reverse().map(r => React.createElement("tr", {
+    key: r.key + r.x
+  }, React.createElement("td", null, name(r)), React.createElement("td", null, r.label), React.createElement("td", null, r.v, "%"))))))));
 }
 function PubOpPollsTracker({
   c,

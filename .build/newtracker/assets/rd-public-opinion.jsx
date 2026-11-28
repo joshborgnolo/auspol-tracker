@@ -617,7 +617,43 @@ function PubOpItem({ c, houses, topic }) {
    beside the chart gives each pollster's latest. A dot is one poll; the
    readout follows the dates the polls ended. */
 function PubOpTracker(props) {
+  if (props.c.id === "immigration-less" && window.dawnImmigration) return <PubOpImmigration {...props} model={window.dawnImmigration} />;
   return props.c.form === "longrun" ? <PubOpLongRun {...props} /> : <PubOpPollsTracker {...props} />;
+}
+function PubOpImmigration({ c, houses, topic, model }) {
+  const [raw,setRaw]=React.useState(false);
+  const narrow=useNarrow(MQ_PHONE);
+  const {trend,rows,sources}=model, latest=trend[trend.length-1];
+  const colour="var(--pubop-w0)", fmt=v=>v.toFixed(1)+"%";
+  const points=trend.map(q=>({x:q.x,y:q.v})), first=points[0].x;
+  const yearTicks=[];
+  for(let y=Math.ceil(first/2)*2;y<=latest.x;y+=narrow?4:2)yearTicks.push({x:y,label:String(y)});
+  const lo=Math.floor(Math.min(...trend.map(q=>q.lo),...rows.map(q=>q.v))/10)*10;
+  const hi=Math.ceil(Math.max(...trend.map(q=>q.hi),...rows.map(q=>q.v))/10)*10;
+  const yTicks=Array.from({length:(hi-lo)/10+1},(_,i)=>lo+10*i);
+  const month=x=>new Date(Date.UTC(Math.floor(x),Math.min(11,Math.floor((x%1)*12)),15)).toLocaleDateString("en-AU",{month:"short",year:"numeric",timeZone:"UTC"});
+  const name=r=>r.house==="lowy"?"Lowy":pubopHouse(r,houses);
+  return <div className="pubop-tracker">
+    <label>View <select value={raw?"polls":"estimate"} onChange={e=>setRaw(e.target.value==="polls")}>
+      <option value="estimate">Model estimate</option><option value="polls">Pollster comparison</option>
+    </select></label>
+    {raw?<PubOpPollsTracker c={c} houses={houses} topic={topic}/>:<>
+      <p className="pubop-tlab">What share of Australians think immigration is too high?</p>
+      <p className="pubop-tdek"><b>{fmt(latest.v)}</b> on Scanlon’s current question in {month(latest.x)}. The 95% credible interval is {fmt(latest.lo)}–{fmt(latest.hi)}.</p>
+      <div className="card rd-card pubop-chart"><TrendChart heightPx={narrow?260:330} series={[{label:"Estimate",color:colour,points}]}
+        credibleBand={trend} spine={points} xDomain={[first-.15,latest.x+.15]} yDomain={[lo,hi]} yTicks={yTicks} xTicks={yearTicks}
+        notes={yTicks.map(y=>({y,text:y+"%"}))} fmt={fmt} tooltipTitle={i=>month(points[i].x)}
+        scatter={rows.map(r=>({x:r.x,y:r.v,label:"Published",color:"var(--mute)",meta:{pollster:name(r),dateLabel:r.label}}))}
+        copy={{title:"Immigration is too high, estimated share"}}/></div>
+      <p className="pubop-tdek">Dots show published readings. The line estimates the share who would give this answer on Scanlon’s current survey. Shading gives its 95% credible interval.</p>
+      <details className="pubop-ledger"><summary>Surveys and method</summary>
+        <p>The model allows opinion to move over time and each survey to read higher or lower. Scanlon’s telephone, Life in Australia and blended surveys have separate offsets, as do Lowy’s earlier and later methods. Annual archive readings are positioned approximately within each year.</p>
+        <p>{model.pooled?"Questions asking whether numbers should fall also contribute, each on its own survey’s terms.":"Only questions about whether the current level is too high contribute. Polls asking whether numbers should fall appear in the pollster comparison."}</p>
+        <p><a href={sources.scanlon}>Scanlon, figure 17</a> · <a href={sources.lowy}>Lowy, immigration rate</a></p>
+        <table><thead><tr><th>Survey</th><th>Wave</th><th>Published share</th></tr></thead><tbody>{rows.slice().reverse().map(r=><tr key={r.key+r.x}><td>{name(r)}</td><td>{r.label}</td><td>{r.v}%</td></tr>)}</tbody></table>
+      </details>
+    </>}
+  </div>;
 }
 function PubOpPollsTracker({ c, houses, topic }) {
   const narrow = useNarrow(MQ_PHONE);
