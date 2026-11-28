@@ -48,6 +48,7 @@ const charts = [
 // Both bars start at zero. Keep the same scale when switching comparisons.
 const scaleMax = Math.ceil(Math.max(...charts.flatMap(chart => chart.votes.flat())) / 10) * 10;
 const partyKeys = ["alp", "onp", "lnp", "grn"];
+const partyShortNames = { alp: "ALP", onp: "ON", lnp: "L/NP", grn: "GRN" };
 
 function finding({ id, groups, subject, baseline, votes, comparison = [0, groups.length - 1] }, index) {
   const [base, target] = comparison;
@@ -70,7 +71,7 @@ function finding({ id, groups, subject, baseline, votes, comparison = [0, groups
     <div class="party-plot">${rows}</div>
     <div class="takeaway">
       <p class="takeaway-context">Compared with ${baseline}, ${subject} are</p>
-      <ul>${[high, low].map(p => `<li><strong>${likelihood(p)}</strong> to back <span class="party-name ${p.key}">${p.party}</span></li>`).join("")}</ul>
+      <ul>${[high, low].map(p => `<li><strong>${likelihood(p)}</strong> to back <span class="party-name ${p.key}">${partyShortNames[p.key]}</span></li>`).join("")}</ul>
     </div>
   </div>`;
 }

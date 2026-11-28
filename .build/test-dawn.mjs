@@ -65,8 +65,12 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   const widths = [...panels.matchAll(/class="demo-interval" style="left:[^;]+;width:([\d.]+)%"/g)];
   eq(widths.length, 88, "one interval per demographic estimate");
   ok(widths.every(match => Number(match[1]) > 0), "every plotted interval has positive width");
-  for (const finding of findings)
+  const shortNames = { alp: "ALP", onp: "ON", lnp: "L/NP", grn: "GRN" };
+  for (const finding of findings) {
     eq((finding.match(/class="party-name (alp|onp|lnp|grn)"/g) || []).length, 2, "both comparison parties carry their colour class");
+    for (const [, key, name] of finding.matchAll(/<span class="party-name (alp|onp|lnp|grn)">([^<]+)<\/span>/g))
+      eq(name, shortNames[key], `${key} is abbreviated only in the comparison sentence`);
+  }
 }
 
 /* the latest poll's publication age, rounded in the unit the reader is given */
