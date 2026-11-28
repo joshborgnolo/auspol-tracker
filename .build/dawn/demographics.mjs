@@ -56,7 +56,7 @@ function finding({ id, groups, subject, baseline, votes, comparison = [0, groups
     gap: shares[target] - shares[base], ratio: shares[target] / shares[base],
   })).sort((a, b) => b.gap - a.gap);
   const high = differences[0], low = differences.at(-1);
-  const likelihood = p => p.ratio >= 2 ? `${p.ratio.toFixed(1)} times as likely`
+  const likelihood = p => p.ratio >= 2 ? `${p.ratio.toFixed(1)}× as likely`
     : `${Math.round(Math.abs(p.ratio - 1) * 100)}% ${p.gap > 0 ? "more" : "less"} likely`;
   const rows = differences.toSorted((a, b) => Math.abs(b.gap) - Math.abs(a.gap)).map(p => {
     const bars = [p.first, p.last].map((value, i) =>
