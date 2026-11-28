@@ -1,0 +1,12 @@
+{
+  "scanlon": {
+    "source": "https://scanloninstitute.org.au/wp-content/uploads/SI_Mapping-Social-Cohesion_Report_2026.pdf#page=61",
+    "note": "Figure 17, annual series. Telephone to 2017, Life in Australia from 2018, blended from 2025. For modelling, annual waves are placed at midyear.",
+    "rows": [[2007,36],[2009,37],[2010,47],[2011,39],[2012,38],[2013,42],[2014,35],[2015,35],[2016,34],[2017,37],[2018,44],[2019,42],[2020,38],[2021,31],[2022,24],[2023,33],[2024,49],[2025,50],[2026,59]]
+  },
+  "lowy": {
+    "source": "https://poll.lowyinstitute.org/charts/immigration-rate/",
+    "note": "Immigration rate, too high. Annual results placed in autumn. Separate polling methods before and after 2018.",
+    "rows": [[2014,37],[2017,40],[2018,54],[2019,47],[2024,48],[2025,53],[2026,55]]
+  }
+}

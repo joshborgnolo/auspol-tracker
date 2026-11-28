@@ -176,6 +176,7 @@ function sceneOf(p,narrow){
     const last=s.points[s.points.length-1];
     if(s.endLabel&&last)S.tags.push({s:s.endLabel,color:s.color,x:last.x,y:last.y});
   }
+  if(p.credibleBand) S.bands.push({color:p.series[0].color,pts:p.credibleBand});
   const memo=new Map();
   for(const d of p.scatter||[]){
     const m=d.meta||{},id=m.pollster+'|'+m.dateLabel;
@@ -184,6 +185,11 @@ function sceneOf(p,narrow){
     S.dots.push({x:d.x,y:d.y,color:d.color,poll:memo.get(id),txt:(m.released?'':d.label+' ')+fmt(d.y),r:narrow?2.8:3.4});
   }
   (p.spine||[]).forEach((at,i)=>{
+    if(p.credibleBand){
+      const q=p.credibleBand[i];
+      S.stops.push({x:at.x,label:p.tooltipTitle(i),sub:'95% interval '+fmt(q.lo)+'–'+fmt(q.hi),items:[{y:at.y,v:at.y,color:p.series[0].color}]});
+      return;
+    }
     const here=(p.scatter||[]).filter(d=>d.x===at.x);if(!here.length)return;
     const extra=p.extraRows?p.extraRows(i):[];
     S.stops.push({x:at.x,label:p.tooltipTitle?p.tooltipTitle(i):'',sub:extra.map(r=>r.label+' '+r.value).join(' · '),
@@ -211,6 +217,7 @@ window.useNarrow=function(q){
   return on;
 };
 const PO_URL=$('link[data-po]').href;
+window.dawnImmigration=DATA.immigration;
 window.AP={D:{loadOneOffs:()=>fetch(PO_URL).then(r=>r.ok?r.json():null).catch(()=>null)}};
 
 /* ---------- the sunrise: the findings, one at a time ---------- */

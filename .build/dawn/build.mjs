@@ -16,6 +16,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import { immigrationModel } from "./immigration-model.mjs";
 import { cohesionModel } from "./cohesion-model.mjs";
 import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, lifeHead, lifeDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, opinionLede, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
@@ -96,6 +97,52 @@ export function readScore(file) {
     houses, ledger, since, sinceLabel: since ? sd + " " + MONF[sm - 1] : null,
     lastRun: (md.match(/^Last run: (.+)$/m) || [])[1] || null,
   };
+}
+
+function moodQuestionPanels({ lifeHistory }) {
+  const panelSource = fs.readFileSync(path.resolve(HERE, "../newtracker/assets/rd-panels.jsx"), "utf8");
+  // These are the same literal question guides rendered by National mood.
+  const notes = name => {
+    const start = panelSource.indexOf("const " + name + " = {");
+    const end = panelSource.indexOf("\n};", start);
+    if (start < 0 || end < 0) throw new Error("Missing Mood question guide: " + name);
+    return vm.runInNewContext("(" + panelSource.slice(panelSource.indexOf("{", start), end + 2) + ")");
+  };
+  const read = file => JSON.parse(fs.readFileSync(path.resolve(HERE, "../../data", file), "utf8"));
+  const trustNotes = notes("TRUST_HOUSE_NOTES");
+  const cohesion = read("social-cohesion.json");
+  const groups = {
+    direction: Object.entries(notes("DIRECTION_HOUSE_NOTES")).map(([house, q]) => ({ house, ...q })),
+    trust: read("trust-government.json").series.filter(s => trustNotes[s.id])
+      .map(s => ({ ...s, url: s.source, ...trustNotes[s.id] })),
+    life: [...read("life-satisfaction.json").series, ...Array.from(new Set(lifeHistory.map(s => s.house)), house => {
+      const entries = lifeHistory.filter(s => s.house === house);
+      return { house, question: entries[0].question, answers: entries[0].answers ||
+        "Published scale: " + [...new Set(entries.map(s => s.scale))].join(" or ") + ".",
+        links: entries.map(s => ({ url: s.source, label: s.readings[0][0].slice(0, 4) +
+          (s.readings.length > 1 ? "–" + s.readings.at(-1)[0].slice(0, 4) : "") + " source ↗" })) };
+    })],
+    cohesion: [
+      { house: "SEC Newgate", question: "Thinking about social cohesion – by that we mean the way in which different people and groups in society get along and feel connected to one another. How would you rate the level of social cohesion in Australia at the current time?",
+        answers: "Excellent, very good, good, fair, poor or very poor. The chart groups the first three and the last two responses.", url: cohesion.secSource },
+      { house: "Scanlon Foundation Research Institute", question: "To what extent do you have a sense of belonging in Australia?",
+        answers: "This is one question in the belonging domain. The index combines responses across belonging, worth, social inclusion and justice, participation, and acceptance.", url: cohesion.scanlonSource },
+    ],
+  };
+  const titles = { direction: "National direction", trust: "Trust in government", life: "Life satisfaction", cohesion: "Social cohesion" };
+  return Object.entries(groups).map(([id, entries]) => {
+    const rows = entries.map(q => {
+      const url = q.url || q.source;
+      const links = q.links || (url ? [{ url, label: "Source ↗" }] : []);
+      const sources = links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`).join(" · ");
+      return `<section class="q-survey"><h3>${esc(q.house)}</h3><p>${esc(q.question)}</p>
+        ${q.answers ? `<p class="q-answers">${esc(q.answers)}</p>` : ""}
+        ${sources}</section>`;
+    }).join("");
+    return `<dialog class="q-panel" id="questions-${id}" aria-labelledby="questions-${id}-title">
+      <header><h2 id="questions-${id}-title">${titles[id]} questions</h2><form method="dialog"><button class="pbtn" autofocus>Close</button></form></header>
+      <div class="q-list">${rows}</div></dialog>`;
+  }).join("\n");
 }
 
 export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path.join(root, ".build", "newtracker", "assets"),
@@ -238,8 +285,15 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
         const poll = polls.find(r => r.date.startsWith(date));
         return [date, good, poor, poll?.sampleEff || (poll?.sample || 1500) / 1.6];
       });
-      return { cohesion: { ...cohesion, trend: cohesionModel(waves) } };
+      const lifeHistory = read("life-satisfaction-history.json").series;
+      const demos = read("demosau-one-offs.json").one_offs.find(s => s.id === "life-satisfaction");
+      const score = demos.data.tables.find(t => t.name === "Index scores").rows.find(r => r[0] === "Life Satisfaction Score");
+      lifeHistory.push({ key: "demos", house: "DemosAU", question: demos.question,
+        answers: "Five responses from very satisfied to very unsatisfied. DemosAU converts these to an index out of 100.",
+        scale: "0–100", source: demos.articleUrl, readings: [[demos.waveDate, Number(score[1])]] });
+      return { cohesion: { ...cohesion, trend: cohesionModel(waves) }, lifeHistory };
     },
+    markup: { questionPanels: moodQuestionPanels },
     fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek, lifeHead, lifeDek } });
   const cyclesFile = sunPage({ asset: "dawn-cycles.json", template: "template-cycles.html", dir: "past-cycles",
     fill: { chapeau: cycleChapeau, primaryHead: (C) => cycleHead(C, "primary"), primaryDek: (C) => cycleDek(C, "primary"), netHead: (C) => cycleHead(C, "net"), netDek: (C) => cycleDek(C, "net"),
@@ -340,7 +394,8 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
     const rows = fs.existsSync(pollsPath) ? JSON.parse(fs.readFileSync(pollsPath, "utf8")).polls.map((p) => p.k) : [];
     const linked = new Set(src.topics.flatMap((t) => t.blocks.flatMap((b) => (b.panels || []).flatMap((p) => p.points.filter((q) => q.rk)
       .map((q) => rowKey(q.rk))))));
-    const PO = { asOf: D.asOf, terms: D.terms, slides: heroSlides(src), rows: rows.filter((k) => linked.has(k)) };
+    const immigration = src.topics.find(t=>t.id==="immigration")?.blocks.find(b=>b.id==="immigration-less");
+    const PO = { immigration: immigration ? immigrationModel(immigration) : null, asOf: D.asOf, terms: D.terms, slides: heroSlides(src), rows: rows.filter((k) => linked.has(k)) };
     const words = { FONT: "/assets/fonts/" + font, lede: esc(opinionLede(src, newestPublished(src))), POJSON: poJson, POAPP: poApp };
     let h = fs.readFileSync(path.join(HERE, "template-public-opinion.html"), "utf8")
       .replace(/\/\*\{\{SHARED:([a-z]+)\}\}\*\//g, (m, k) => sharedBlock(base, k)).replace("/*{{FILTERSCSS}}*/", "")

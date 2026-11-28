@@ -14,9 +14,9 @@
 /*{{SHARED:css}}*/
 /* the mood's own colours: turquoise for the right direction, burgundy for the wrong, grey between. The
    hero's are lifted to hold on the night sky */
-:root{--yes:#0b8f8c;--no:#8e1f41;--neu:#a7a2ae;--h-yes:#3ad6cd;--h-no:#b02e58;--h-neu:#9b99aa}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--yes:#2cc3bd;--no:#cf5877;--neu:#77738a}}
-:root[data-theme=dark]{--yes:#2cc3bd;--no:#cf5877;--neu:#77738a}
+:root{--life:#916800;--yes:#0b8f8c;--no:#8e1f41;--neu:#a7a2ae;--h-yes:#3ad6cd;--h-no:#b02e58;--h-neu:#9b99aa}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--life:#f4c94c;--yes:#2cc3bd;--no:#cf5877;--neu:#77738a}}
+:root[data-theme=dark]{--life:#f4c94c;--yes:#2cc3bd;--no:#cf5877;--neu:#77738a}
 .md{margin-top:2px}
 .md-figs{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
 .md-f{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -34,9 +34,22 @@
 .md-u{display:flex;justify-content:center;align-items:center;gap:7px;margin:10px 0 0;font-size:clamp(13.5px,3.8vw,16px);color:rgb(238 238 255/.82);--c:var(--h-neu)}
 .md-u b{font-weight:600;font-variant-numeric:tabular-nums}
 #scanlon-key{color:var(--grn)}
+#life-svg{--dot:.75}
+#life-model-key{align-items:center;gap:5px}
+.life-key::before{content:"●";color:var(--c);margin-right:.35em}
 .mood .chk[hidden],.mood .ext[hidden]{display:none}
 .mood .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
 @media (min-width:900px){.mood .ctl{margin-top:16px}.mood .fig{margin-top:8px}}
+.q-open{font:inherit;color:var(--ink2);border:0;padding:0;background:none;text-decoration:underline;text-underline-offset:.16em;cursor:pointer}
+.q-panel{box-sizing:border-box;width:min(39rem,calc(100% - 2rem));max-height:80dvh;margin:auto;padding:0;border:1px solid var(--rule);border-radius:16px;color:var(--ink);background:var(--bg);box-shadow:0 12px 64px rgb(0 0 0/.2);overscroll-behavior:contain}
+.q-panel::backdrop{background:rgb(12 16 35/.52)}
+.q-panel header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--rule)}
+.q-panel h2{margin:0;font:normal clamp(21px,4vw,28px)/1.12 Georgia,serif}
+.q-panel form{margin:0}.q-list{padding:0 20px}
+.q-survey{padding:16px 0}.q-survey+.q-survey{border-top:1px solid var(--rule)}
+.q-survey h3{margin:0 0 6px;font:600 15px/1.3 var(--sans)}.q-survey p{margin:0 0 6px;font:400 15px/1.45 var(--sans)}
+.q-survey .q-answers,.q-survey a{color:var(--ink2);font:400 13px/1.45 var(--sans)}
+#cohesion .pick[hidden]{display:none}#cohesion .pick select{width:auto}
 </style>
 </head>
 <body>
@@ -104,7 +117,7 @@
     </header>
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
     <div class="fig" id="direction-fig"><div class="tip" aria-live="polite"></div><svg id="direction-svg" tabindex="0" aria-label="Line chart of the shares saying the country is heading in the right direction and on the wrong track. Use the left and right arrow keys to read values."></svg></div>
-    <p class="src" id="direction-src"></p>
+    <p class="src"><span id="direction-src"></span> See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-direction">here</button>.</p>
     <div class="sr"><table id="direction-table"></table></div>
   </div>
 </section>
@@ -119,7 +132,7 @@
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
     <div class="fig" id="trust-fig"><div class="tip" aria-live="polite"></div><svg id="trust-svg" tabindex="0" aria-label="Line chart of trust in government. Use the left and right arrow keys to read values."></svg></div>
     <div class="keys"><button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-glob"><i></i>Global averages</button><span class="ext" id="glob-key" hidden><span><i class="sw dash" style="--c:var(--lnp)"></i> OECD average</span><span><i class="sw dash" style="--c:var(--grn)"></i> Edelman’s global average</span></span></div>
-    <p class="src" id="trust-src"></p>
+    <p class="src"><span id="trust-src"></span> See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-trust">here</button>.</p>
     <div class="sr"><table id="trust-table"></table></div>
   </div>
 </section>
@@ -133,8 +146,14 @@
     </header>
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
     <div class="fig" id="life-fig"><div class="tip" aria-live="polite"></div><svg id="life-svg" tabindex="0" aria-label="Line chart of average life satisfaction out of 10. Use the left and right arrow keys to read values."></svg></div>
-    <div class="keys"><button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-hilda"><i></i>HILDA, as printed</button><span class="ext" id="hilda-key" hidden><span><i class="sw dash" style="--c:var(--lnp)"></i> HILDA’s annual average</span></span><span class="ext" id="scanlon-key" hidden>● Scanlon, as printed</span></div>
-    <p class="src" id="life-src"></p>
+    <div class="keys">
+      <span class="ext" id="life-model-key"><i class="sw" style="--c:var(--life)"></i> Bayesian estimate</span>
+      <button type="button" class="chk" role="checkbox" aria-checked="true" id="cmp-hilda"><i></i>HILDA</button>
+      <span class="ext" id="hilda-key" hidden><span><i class="sw dash" style="--c:var(--lnp)"></i> HILDA’s annual average</span></span>
+      <span class="ext life-key" id="scanlon-key" style="--c:var(--grn)" hidden>Scanlon</span>
+      <span class="ext" id="life-history-key"></span>
+    </div>
+    <p class="src"><span id="life-src"></span> See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-life">here</button>.</p>
     <div class="sr"><table id="life-table"></table></div>
   </div>
 </section>
@@ -142,14 +161,17 @@
   <i class="snap" aria-hidden="true"></i>
   <div class="wrap votes mood">
     <header class="hd"><h2 id="cohesion-h">Social cohesion</h2><p id="cohesion-dek" class="dek"></p></header>
-    <div class="ctl"><select aria-label="Cohesion measure" id="cohesion-view"><option value="sec">Public perceptions</option><option value="index">Scanlon index</option></select>
-      <select aria-label="Scanlon domain" id="cohesion-domain" hidden></select></div>
+    <div class="ctl"><div class="seg" role="radiogroup" aria-label="Cohesion measure" id="cohesion-view">
+      <button type="button" role="radio" data-measure="sec" aria-checked="true">Public perceptions</button>
+      <button type="button" role="radio" data-measure="index" aria-checked="false" tabindex="-1">Scanlon index</button></div>
+      <label class="pick" hidden><select aria-label="Scanlon domain" id="cohesion-domain"></select></label></div>
     <div class="fig" id="cohesion-fig"><div class="tip" aria-live="polite"></div><svg id="cohesion-svg" tabindex="0" aria-label="Social cohesion over time. Use the arrow keys to read values."></svg></div>
-    <p class="src"><span id="cohesion-note"></span> <a id="cohesion-source">Source</a></p>
+    <p class="src"><span id="cohesion-note"></span> <a id="cohesion-source">Source</a>. See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-cohesion">here</button>.</p>
     <div class="sr"><table id="cohesion-table"></table></div>
   </div>
 </section>
 </main>
+{{questionPanels}}
 
 <script id="dawn-data" type="application/json">{{DATA}}</script>
 <script>
@@ -271,30 +293,62 @@ function trustScene(){
   return S;
 }
 
-/* ---------- life satisfaction: the model's monthly line on ANUpoll's terms, each of its surveys' readings
-   moved onto them. HILDA isn't in the line: it rides as printed behind its switch ---------- */
-let HILDA=false;
+let HILDA=true;
 const f2=v=>v.toFixed(2);
+const LC='var(--life)';
+const lifeKeys={
+  archive:['Historical surveys','var(--ink2)'],wvs:['World Values Survey','var(--kb)'],
+  phone:['Australian Unity · phone','var(--bt)'],online:['Australian Unity · online','var(--on)'],
+  anuFigure:['ANUpoll · chart reading','var(--alp)'],demos:['DemosAU index','var(--no)']
+};
+const historyDots=DATA.lifeHistory.flatMap(s=>s.readings.filter(([date])=>
+  s.key!=='anuFigure'||!LF.dots.some(d=>d.who==='ANUpoll'&&d.date===date)
+).map(([date,printed,converted])=>{
+  const [label,color]=lifeKeys[s.key];
+  const yearOnly=date.length===4;
+  const x=yearOnly?Number(date)+.5:isoX(date.length===7?date+'-15':date);
+  const when=yearOnly?date:date.length===7?ymWords(date):fdate(date);
+  const y=converted??(s.scale==='0–100'?printed/10:printed);
+  return {x,y,key:s.key,color,label:s.key==='anuFigure'?'ANUpoll':label,
+    poll:{who:s.house,when,n:(s.key==='anuFigure'?'Figure 1, approximate mean ':s.key==='demos'?'Index ':'Published ')+printed+' ('+s.scale+')'},txt:s.key==='anuFigure'?'≈'+y.toFixed(1):f2(y),r:3};
+}));
 function lifeScene(){
   const [a,b]=winRange(WIN),span=b-a,long=span>LONG,cur=b>CUR.a,curOnly=a>=CUR.a-1e-6;
   const x0=curOnly&&WIN.kind==='term'?ELX-.01:a,x1=b;
   const S={x0,x1,ys:.5,lines:[],bands:[],dots:[],rings:[],stops:[],refs:[],ends:[],fmt:f2,tick:v=>v.toFixed(1)};
   const M=LF.months.map(m=>({x:m[0],y:m[1],lo:m[2],hi:m[3],ym:m[4]}));
   const inW=x=>x>=x0-1e-6&&x<=x1+1e-6;
-  if(M.length>1){S.lines.push({color:TC,pts:M,w:long?1.8:2.5,thin:long});S.bands.push({color:TC,pts:M})}
+  if(M.length>1){S.lines.push({color:LC,pts:M,w:long?1.8:2.5,thin:long});S.bands.push({color:LC,pts:M})}
   const hp=HILDA?LF.hilda.map(r=>({x:r.x,y:r.v,year:r.date})):[];
   if(hp.length>1)S.lines.push({color:'var(--lnp)',pts:hp,w:1.5,dash:'4 4',thin:true});
-  for(const d of LF.dots){if(!inW(d.x))continue;
-    S.dots.push({x:d.x,y:d.v,color:TC,poll:{who:d.who,when:d.field||ymWords(d.date),n:'printed as '+d.printed},txt:f2(d.v),r:long?2:3})}
-  for(const r of LF.scanlon.filter(r=>inW(r.x))){
-    S.dots.push({x:r.x,y:r.v,color:'var(--grn)',poll:{who:'Scanlon, as printed',when:ymWords(r.date)},txt:f2(r.v),r:3});
+  S.dots.push(...historyDots.filter(d=>inW(d.x)));
+  for(const d of LF.dots.filter(d=>inW(d.x))){
+    S.dots.push({x:d.x,y:d.v,color:LC,poll:{who:d.who,when:d.field||ymWords(d.date),n:'Published '+d.printed+' (0–10)'},txt:f2(d.v),r:long?2:3});
   }
-  for(const m of M){if(!inW(m.x))continue;const ev=!long&&EVENTS.find(e=>Math.abs(e.x-m.x)<.042);
-    const items=[{color:TC,tc:TC,y:m.y,v:m.y,txt:'Estimate '+f2(m.y)}];
-    const h=along(hp,m.x);if(h!=null)items.push({color:'var(--lnp)',tc:'var(--lnp)',y:h,v:h,txt:'HILDA '+f2(h)});
-    S.stops.push({x:m.x,label:ymWords(m.ym),sub:ev?ev.s:'',items})}
+  for(const r of LF.scanlon.filter(r=>inW(r.x))){
+    S.dots.push({x:r.x,y:r.v,color:'var(--grn)',poll:{who:'Scanlon',when:ymWords(r.date)},txt:f2(r.v),r:3});
+  }
+  for(const r of hp.filter(r=>inW(r.x))){
+    S.dots.push({x:r.x,y:r.y,color:'var(--lnp)',poll:{who:'HILDA',when:r.year},txt:f2(r.y),r:2.5});
+  }
+  const stops=new Map();
+  function addStop(x,label,item,sub=''){
+    if(!stops.has(x))stops.set(x,{x,label,sub,items:[]});
+    stops.get(x).items.push(item);
+  }
+  for(const m of M.filter(m=>inW(m.x))){
+    const ev=!long&&EVENTS.find(e=>Math.abs(e.x-m.x)<.042);
+    addStop(m.x,ymWords(m.ym),{color:LC,tc:LC,y:m.y,v:m.y,txt:'Estimate '+f2(m.y)},ev?.s);
+  }
+  for(const d of S.dots){
+    const stop=stops.get(d.x);
+    const who=d.poll.who+(d.poll.n?' · '+d.poll.n:'');
+    addStop(d.x,d.poll.when,{color:d.color,tc:d.color,y:d.y,v:d.y,txt:(d.key==='archive'?'Survey':d.label||d.poll.who)+' '+d.txt});
+    stops.get(d.x).sub=[stop?.sub,who].filter(Boolean).join(' · ');
+  }
+  S.stops=[...stops.values()].sort((l,r)=>l.x-r.x);
   const last=M[M.length-1];
-  if(cur&&inW(last.x)){S.ends=[{color:TC,y:last.y,name:'Estimate',abbr:'Est.',v:last.y}];S.endX=last.x}
+  if(cur&&inW(last.x)){S.ends=[{color:LC,y:last.y,name:'Estimate',abbr:'Est.',v:last.y}];S.endX=last.x}
   if(span>8){S.govs=govBlocks(a,b);S.govShade=1}
   S.events=winEvents(curOnly?x0:a,curOnly?x1:b,curOnly);
   const shown=[...S.bands.flatMap(q=>q.pts.filter(p=>inW(p.x)).flatMap(p=>[p.lo,p.hi])),...S.dots.map(d=>d.y),...hp.filter(p=>inW(p.x)).map(p=>p.y)];
@@ -380,24 +434,34 @@ function trustSrc(){
 function lifeSrc(){
   useWindow(wLife);
   const [a,b]=winRange(WIN);
+  const hasModel=LF.months.some(([x])=>x>=a&&x<=b);
+  $('#life-model-key').hidden=!hasModel;
   const hasHilda=LF.hilda.length>1&&LF.hilda[0].x<=b&&LF.hilda.at(-1).x>=a;
   $('#cmp-hilda').hidden=!hasHilda;
   $('#hilda-key').hidden=!(hasHilda&&HILDA);
   $('#scanlon-key').hidden=!LF.scanlon.some(r=>r.x>=a&&r.x<=b);
-  $('#life-src').textContent='The line is a model of ANUpoll and the ABS General Social Survey, on the terms of ANUpoll’s current panel, with its 95% band; it starts with ANUpoll’s first wave. Their survey dots use the same scale. HILDA, which has barely moved while they fell, is not in the line. The latest reading was '+ymWords(LF.latestPrint.ym)+'.';
+  const keys=new Set(historyDots.filter(d=>d.x>=a&&d.x<=b).map(d=>d.key));
+  $('#life-history-key').innerHTML=Object.entries(lifeKeys).filter(([key])=>keys.has(key)).map(([, [label,color]])=>
+    `<span class="life-key" style="--c:${color}">${label}</span>`).join('');
+  $('#life-src').textContent='The gold line combines ANUpoll and ABS surveys on ANUpoll’s current scale. Its 95% credible interval is shaded.'+
+    (WIN.kind==='all'?' Surveys go back to 1948. The model starts in October 2019.':' Select All for survey readings back to 1948. The model starts in October 2019.')+
+    (keys.has('archive')?' Early dots use the World Database of Happiness’s 0–10 conversions.':'')+
+    (keys.has('anuFigure')?' ANUpoll chart readings are approximate and use each wave’s original scale.':'')+
+    (keys.has('demos')?' DemosAU’s five-category index is divided by ten.':'');
 }
 const dirFirst=DATA.past.length?DATA.past[0][0]:ELX,trustFirst=Math.min(T.months[0][0],T.dots[0].x);
 const make=(id,scene)=>use=>chart({fig:$('#'+id+'-fig'),svg:$('#'+id+'-svg'),scene,use});
-const lifeFirst=Math.min(LF.months[0][0],LF.dots[0].x,...LF.hilda.map(r=>r.x),...LF.scanlon.map(r=>r.x));
+const lifeFirst=Math.min(...historyDots.map(d=>Math.floor(d.x)),LF.months[0][0],LF.dots[0].x,...LF.hilda.map(r=>r.x),...LF.scanlon.map(r=>r.x));
 let wDir=null,wTrust=null,wLife=null;
 wDir=windowedChart({section:$('#direction'),lo:dirFirst,src:()=>{if(wDir)dirSrc()},make:make('direction',dirScene)});
 wTrust=windowedChart({section:$('#trust'),lo:trustFirst,src:()=>{if(wTrust)trustSrc()},make:make('trust',trustScene)});
 wLife=windowedChart({section:$('#life'),lo:lifeFirst,src:()=>{if(wLife)lifeSrc()},make:make('life',lifeScene)});
 dirSrc();trustSrc();lifeSrc();
 const C=DATA.cohesion, view=$('#cohesion-view'), domain=$('#cohesion-domain');
+let cohesionMeasure='sec';
 C.domains.forEach((name,i)=>domain.add(new Option(name,i+1)));
 function cohesionScene(){
-  const isIndex=view.value==='index', col=Number(domain.value);
+  const isIndex=cohesionMeasure==='index', col=Number(domain.value);
   const rows=isIndex?C.scanlon:C.trend;
   const S={lines:[],bands:[],dots:[],ends:[],stops:[],ys:isIndex?5:10};
   const xs=rows.map(r=>isIndex?r[0]:isoX(r.date+'-15'));
@@ -424,10 +488,10 @@ function cohesionScene(){
   S.events=winEvents(S.x0,S.x1,S.x0>=CUR.a-1e-6);
   return S;
 }
-const cohesionChart=chart({fig:$('#cohesion-fig'),svg:$('#cohesion-svg'),scene:cohesionScene,use:()=>{WIN={kind:'all'};HIST.terms[0].a=view.value==='index'?C.scanlon[0][0]:isoX(C.sec[0][0]+'-15')}});
+const cohesionChart=chart({fig:$('#cohesion-fig'),svg:$('#cohesion-svg'),scene:cohesionScene,use:()=>{WIN={kind:'all'};HIST.terms[0].a=cohesionMeasure==='index'?C.scanlon[0][0]:isoX(C.sec[0][0]+'-15')}});
 function updateCohesion(){
-  const index=view.value==='index',col=Number(domain.value),last=C.trend.at(-1),annual=C.scanlon.at(-1);
-  domain.hidden=!index;
+  const index=cohesionMeasure==='index',col=Number(domain.value),last=C.trend.at(-1),annual=C.scanlon.at(-1);
+  domain.parentElement.hidden=!index;
   $('#cohesion-dek').textContent=index?C.domains[col-1]+' scored '+annual[col]+' in '+annual[0]+' (2007 = 100).':
     'In '+ymWords(last.date)+', '+last.g+'% rated cohesion good or better and '+last.b+'% rated it poor or very poor.';
   $('#cohesion-note').textContent=index?'Annual index points. Scanlon linked its redesigned 2026 index to 2025. The 2020 reading is from July.':
@@ -438,7 +502,36 @@ function updateCohesion(){
   $('#cohesion-table').innerHTML='<tr>'+header.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');
   cohesionChart.clear();cohesionChart.draw();
 }
-view.addEventListener('change',updateCohesion);domain.addEventListener('change',updateCohesion);updateCohesion();
+const measures=$$('button',view);
+function chooseMeasure(button){
+  cohesionMeasure=button.dataset.measure;
+  for(const choice of measures){
+    choice.setAttribute('aria-checked',String(choice===button));
+    choice.tabIndex=choice===button?0:-1;
+  }
+  updateCohesion();
+}
+measures.forEach((button,i)=>{
+  button.addEventListener('click',()=>chooseMeasure(button));
+  button.addEventListener('keydown',event=>{
+    const destinations={ArrowLeft:1-i,ArrowRight:1-i,ArrowUp:1-i,ArrowDown:1-i,Home:0,End:1};
+    if(!(event.key in destinations))return;
+    event.preventDefault();
+    const target=measures[destinations[event.key]];
+    target.focus();chooseMeasure(target);
+  });
+});
+$$('.q-open').forEach(trigger=>{
+  const panel=document.getElementById(trigger.getAttribute('aria-controls'));
+  trigger.addEventListener('click',()=>{panel.showModal();panel.scrollTop=0});
+  panel.addEventListener('close',()=>trigger.focus({preventScroll:true}));
+  panel.addEventListener('click',event=>{
+    if(event.target!==panel)return;
+    const r=panel.getBoundingClientRect();
+    if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)panel.close();
+  });
+});
+domain.addEventListener('change',updateCohesion);updateCohesion();
 const charts=[wDir.chart,wTrust.chart,wLife.chart,cohesionChart];
 const hilda=$('#cmp-hilda');
 hilda.addEventListener('click',()=>{HILDA=!HILDA;hilda.setAttribute('aria-checked',String(HILDA));lifeSrc();wLife.chart.clear();wLife.chart.draw()});
@@ -448,7 +541,15 @@ glob.addEventListener('click',()=>{GLOBAL=!GLOBAL;glob.setAttribute('aria-checke
 /* screen-reader tables */
 {const idx=[];let lm=-1;G.forEach((d,i)=>{const m=+d.slice(5,7);if(m!==lm){idx.push(i);lm=m}});if(idx[idx.length-1]!==LAST)idx.push(LAST);
 $('#direction-table').innerHTML='<caption>Estimated national direction, %</caption><tr><th>Week of</th><th>Right direction</th><th>Wrong track</th><th>Unsure</th></tr>'+idx.map(i=>`<tr><td>${fdate(G[i])}</td><td>${f1(DATA.right.v[i])}</td><td>${f1(DATA.wrong.v[i])}</td><td>${f1(DATA.unsure[i])}</td></tr>`).join('');
-$('#life-table').innerHTML='<caption>Estimated average life satisfaction, out of 10</caption><tr><th>Month</th><th>Life satisfaction</th></tr>'+LF.months.filter(m=>+m[4].slice(0,4)>=CUR.year).map(m=>`<tr><td>${ymWords(m[4])}</td><td>${f2(m[1])}</td></tr>`).join('');
+const lifeRows=[
+  ...LF.months.map(([x,v,,,ym])=>[x,ymWords(ym),'Bayesian estimate',f2(v),'']),
+  ...historyDots.map(d=>[d.x,d.poll.when,d.poll.who,d.txt,d.poll.n]),
+  ...LF.dots.map(d=>[d.x,d.field||ymWords(d.date),d.who,f2(d.v),String(d.printed)]),
+  ...LF.hilda.map(d=>[d.x,d.date,'HILDA',f2(d.v),String(d.v)]),
+  ...LF.scanlon.map(d=>[d.x,ymWords(d.date),'Scanlon',f2(d.v),String(d.v)])
+].sort((a,b)=>a[0]-b[0]);
+$('#life-table').innerHTML='<caption>Life satisfaction estimates and survey readings</caption><tr><th>Date</th><th>Series</th><th>Plotted out of 10</th><th>Published score</th></tr>'+
+  lifeRows.map(row=>'<tr>'+row.slice(1).map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('');
 $('#trust-table').innerHTML='<caption>Estimated trust in government, %</caption><tr><th>Month</th><th>Trust</th></tr>'+T.months.filter(m=>+m[4].slice(0,4)>=CUR.year).map(m=>`<tr><td>${ymWords(m[4])}</td><td>${f1(m[1])}</td></tr>`).join('')}
 
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>charts.forEach(c=>c.draw()));
