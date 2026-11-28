@@ -44,20 +44,12 @@
 @media(max-height:650px){.facets{margin:6px 0}.party-row{padding:3px 0}.takeaway{margin-top:6px}}
 @media(max-height:520px){.hero{height:auto;min-height:100lvh;padding:calc(var(--navh) + 12px) var(--g) 32px}.hero .now{position:relative;inset:auto;width:auto}}
 .chart-panel{height:auto;min-height:100svh;overflow:visible}
-.demo-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,4vh,40px) clamp(24px,5vw,72px);margin:clamp(16px,3vh,32px) 0}
-.demo-party{min-width:0;--row:2.35rem;--gutter:18px}
-.demo-party h3{display:flex;align-items:center;gap:8px;font:600 18px/1.2 var(--sans);margin:0 0 8px}
-.demo-party h3::before{content:"";width:14px;height:4px;background:var(--party)}
-.demo-series{position:relative;padding-left:var(--gutter)}
-.demo-row{display:grid;grid-template-columns:clamp(6em,10vw,9em) minmax(0,1fr) 3.4em;align-items:center;gap:8px;height:var(--row);font-size:14px;line-height:1.15}
-.demo-row b{text-align:right;font-variant-numeric:tabular-nums}
-.demo-track{height:18px;position:relative;border-left:1px solid var(--rule2)}
-.demo-fill{display:block;height:100%;background:var(--party);opacity:.63}
-.demo-interval{position:absolute;top:50%;height:8px;transform:translateY(-50%);border-inline:1.5px solid var(--ink)}
-.demo-interval::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1.5px solid var(--ink)}
-.demo-arc{position:absolute;right:calc(100% - var(--gutter) + 4px);width:calc(3px + var(--span)*3px);top:calc((var(--start) + .5)*var(--row));height:calc(var(--span)*var(--row));border:1.5px solid var(--party);border-right:0;border-radius:100% 0 0 100%}
+.gg-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px;margin:20px 0}
+.gg-party{display:block;width:100%;height:auto}
+.gg-party text{font:400 27px var(--sans);fill:var(--ink2);stroke:none}
+.gg-party .gg-name{font-size:29px;font-weight:700;fill:var(--ink)}
 .chart-panel .src{margin:4px 0}
-@media(max-width:720px){.demo-plots{grid-template-columns:1fr;gap:20px}.demo-party{--row:1.95rem}}
+@media(max-width:720px){.gg-plots{grid-template-columns:1fr}}
 .chart-panel details{font-size:14px;width:fit-content;max-width:100%}
 .chart-panel summary{cursor:pointer;color:var(--ink2);padding:5px 0}
 .chart-panel table{border-collapse:collapse;font-variant-numeric:tabular-nums}

@@ -62,9 +62,11 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
   const findings = demographicsMarkup.findings().split('<div id="finding-').slice(1);
   eq(findings.length, 6, "one comparison per facet");
   const panels = demographicsMarkup.panels();
-  const widths = [...panels.matchAll(/class="demo-interval" style="left:[^;]+;width:([\d.]+)%"/g)];
+  const widths = [...panels.matchAll(/class="gg-whisker" d="M([\d.]+) [\d.]+H([\d.]+)/g)];
   eq(widths.length, 88, "one interval per demographic estimate");
-  ok(widths.every(match => Number(match[1]) > 0), "every plotted interval has positive width");
+  ok(widths.every(match => Number(match[2]) > Number(match[1])), "every plotted interval has positive width");
+  eq((panels.match(/<svg class="gg-party"/g) || []).length, 24, "four inline ggplot panels per facet");
+  ok(!/<(?:img|image)\b/.test(panels), "plots are drawn directly in the page");
   const shortNames = { alp: "ALP", onp: "ON", lnp: "L/NP", grn: "GRN" };
   for (const finding of findings) {
     eq((finding.match(/class="party-name (alp|onp|lnp|grn)"/g) || []).length, 2, "both comparison parties carry their colour class");

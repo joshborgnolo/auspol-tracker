@@ -77,30 +77,41 @@ function finding({ id, groups, subject, baseline, votes, comparison = [0, groups
 }
 
 function panel({ id, label, groups, votes, halfWidths, pairs, headline, sources }) {
+  // Coordinates in the original ggplot panels, relative to each party heading.
+  const colours = ["#f34c59", "#f88c35", "#258fda", "#30aa72"];
+  const axis = 237, track = 458, step = 61;
+  const scale = value => value * track / 65;
   const plots = votes.map((shares, partyIndex) => {
     const name = parties[partyIndex].replace(/^the /, "");
-    const rows = shares.map((value, i) => {
-      const half = halfWidths[partyIndex][i];
-      const interval = `${(value - half).toFixed(1)}–${(value + half).toFixed(1)}%`;
-      return `<div class="demo-row" title="${groups[i]} · ${value}% (95% interval ${interval})">
-        <span>${groups[i]}</span><span class="demo-track" aria-hidden="true">
-          <i class="demo-fill" style="width:${100 * value / scaleMax}%"></i>
-          <i class="demo-interval" style="left:${100 * (value - half) / scaleMax}%;width:${200 * half / scaleMax}%"></i>
-        </span><b>${value.toFixed(1)}%</b><span class="sr">Approximate 95% credible interval ${interval}</span>
-      </div>`;
+    const colour = colours[partyIndex];
+    const bottom = 101 + (groups.length - 1) * step;
+    const ticks = Array.from({length: 7}, (_, i) => {
+      const x = axis + scale(10 * i);
+      return `<text x="${x}" y="21" text-anchor="middle">${10 * i}</text><path d="M${x} 33V${bottom}" stroke="#53473f" stroke-opacity=".24" stroke-width="1.5"/>`;
     }).join("");
-    const arcs = pairs[partyIndex].map(([from, to]) =>
-      `<i class="demo-arc" style="--start:${from};--span:${to - from}" title="${groups[from]} and ${groups[to]}"><span class="sr">${name}: ${groups[from]} and ${groups[to]} have a credible difference.</span></i>`
-    ).join("");
-    return `<section class="demo-party" style="--party:var(--${["alp","on","lnp","grn"][partyIndex]})">
-      <h3>${name}</h3><div class="demo-series">${arcs}${rows}</div></section>`;
+    const backgrounds = [], bars = [];
+    shares.forEach((value, i) => {
+      const y = 49 + step * i, mid = y + 21;
+      const half = halfWidths[partyIndex][i];
+      const low = axis + scale(value - half), high = axis + scale(value + half);
+      const rect = (width, fill) => `<rect x="${axis}" y="${y}" width="${width}" height="42" fill="${fill}"/><path d="M${axis+width} ${y}H${axis}v42h${width}" fill="none" stroke="#69625f" stroke-width="1.5"/>`;
+      backgrounds.push(rect(track, "#e9dcd2"));
+      bars.push(`<g><title>${groups[i]} · ${value}% (95% interval ${(value-half).toFixed(1)}–${(value+half).toFixed(1)}%)</title>
+        <text x="43" y="${mid+10}">${groups[i]}</text>${rect(scale(value), colour)}
+        <path class="gg-whisker" d="M${low} ${mid}H${high}M${low} ${mid-5}v10M${high} ${mid-5}v10" stroke="#352e2b" stroke-width="2"/></g>`);
+    });
+    const arcs = pairs[partyIndex].map(([from, to]) => {
+      const distance = to - from;
+      return `<path d="M35 ${70+step*from}a${12+8*(distance-1)} ${step*distance/2} 0 0 0 0 ${distance*step}" fill="none" stroke="${colour}" stroke-width="2.8"><title>${groups[from]} and ${groups[to]}</title></path>`;
+    }).join("");
+    return `<svg class="gg-party" viewBox="-20 -12 736 ${bottom+42}" role="img" aria-label="${name} first preferences by ${label.toLowerCase()}"><text class="gg-name" x="0" y="23">${name}</text>${backgrounds.join("")}${ticks}${bars.join("")}${arcs}</svg>`;
   }).join("");
   const table = groups.map((g, i) => `<tr><th scope="row">${g}</th>${votes.map(v => `<td>${v[i]}%</td>`).join("")}</tr>`).join("");
   return `<section id="${id}" class="sec chart-panel" aria-labelledby="heading-${id}">
     <i class="snap" aria-hidden="true"></i><div class="wrap">
     <header class="hd"><h2 id="heading-${id}">${label}</h2><p class="dek">${headline}</p></header>
-    <div class="demo-plots">${plots}</div>
-    <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Brackets connect selected groups whose 95% interval for the difference excludes zero.</p>
+    <div class="gg-plots">${plots}</div>
+    <p class="src">Estimated first preferences, November 2026. Whiskers show approximate 95% credible intervals. Curves connect selected groups whose 95% interval for the difference excludes zero.</p>
     <p class="src">AusPol Tracker estimates from ${sources}, 24 November 2026.</p>
     <details><summary>View vote shares</summary><table><caption class="sr">Estimated first preferences by ${label.toLowerCase()}, November 2026</caption>
     <thead><tr><th scope="col">${label}</th>${["Labor","One Nation","Coalition","Greens"].map(p => `<th scope="col">${p}</th>`).join("")}</tr></thead>
