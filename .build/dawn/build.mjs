@@ -15,6 +15,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import { cohesionModel } from "./cohesion-model.mjs";
 import { copyFor, flowNote, leadersHead, leadersDek, favHead, favDek, ppmHead, ppmDek, moodHead, moodDek, trustHead, trustDek, lifeHead, lifeDek, cycleChapeau, cycleStatsHtml, cycleHead, cycleDek, cycleLit, SHARE_KEYS, splitChapeau, splitHead, splitDek, spreadHead, spreadDek, emapChapeau, emapHead, opinionLede, closestHead, closestSeats, fdate, MONF } from "./copy.mjs";
 import { latestPollLine } from "./poll-meta.mjs";
 import { disagreeData } from "./disagree-data.mjs";
@@ -226,6 +227,16 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
   const leadFile = sunPage({ asset: "dawn-leaders.json", template: "template-leaders.html", dir: "leadership-ratings",
     fill: { leadersHead: (L) => leadersHead(L).head, leadersDek, ppmHead, ppmDek, favHead: (L) => favHead(L).head, favDek } });
   const moodFile = sunPage({ asset: "dawn-mood.json", template: "template-mood.html", dir: "mood",
+    extra: () => {
+      const read = name => JSON.parse(fs.readFileSync(path.resolve(HERE, "../../data", name), "utf8"));
+      const cohesion = read("social-cohesion.json");
+      const polls = read("polls.json").direction.filter(r => r.pollster === "SEC Newgate");
+      const waves = cohesion.sec.map(([date, good, poor]) => {
+        const poll = polls.find(r => r.date.startsWith(date));
+        return [date, good, poor, poll?.sampleEff || (poll?.sample || 1500) / 1.6];
+      });
+      return { cohesion: { ...cohesion, trend: cohesionModel(waves) } };
+    },
     fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek, lifeHead, lifeDek } });
   const cyclesFile = sunPage({ asset: "dawn-cycles.json", template: "template-cycles.html", dir: "past-cycles",
     fill: { chapeau: cycleChapeau, primaryHead: (C) => cycleHead(C, "primary"), primaryDek: (C) => cycleDek(C, "primary"), netHead: (C) => cycleHead(C, "net"), netDek: (C) => cycleDek(C, "net"),

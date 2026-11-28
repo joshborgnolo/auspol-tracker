@@ -137,6 +137,17 @@
     <div class="sr"><table id="life-table"></table></div>
   </div>
 </section>
+<section class="sec" id="cohesion" data-sec="mood" aria-labelledby="cohesion-h">
+  <i class="snap" aria-hidden="true"></i>
+  <div class="wrap votes mood">
+    <header class="hd"><h2 id="cohesion-h">Social cohesion</h2><p id="cohesion-dek" class="dek"></p></header>
+    <div class="ctl"><select aria-label="Cohesion measure" id="cohesion-view"><option value="sec">Public perceptions</option><option value="index">Scanlon index</option></select>
+      <select aria-label="Scanlon domain" id="cohesion-domain" hidden></select></div>
+    <div class="fig" id="cohesion-fig"><div class="tip" aria-live="polite"></div><svg id="cohesion-svg" tabindex="0" aria-label="Social cohesion over time. Use the arrow keys to read values."></svg></div>
+    <p class="src"><span id="cohesion-note"></span> <a id="cohesion-source">Source</a></p>
+    <div class="sr"><table id="cohesion-table"></table></div>
+  </div>
+</section>
 </main>
 
 <script id="dawn-data" type="application/json">{{DATA}}</script>
@@ -382,7 +393,51 @@ wDir=windowedChart({section:$('#direction'),lo:dirFirst,src:()=>{if(wDir)dirSrc(
 wTrust=windowedChart({section:$('#trust'),lo:trustFirst,src:()=>{if(wTrust)trustSrc()},make:make('trust',trustScene)});
 wLife=windowedChart({section:$('#life'),lo:lifeFirst,src:()=>{if(wLife)lifeSrc()},make:make('life',lifeScene)});
 dirSrc();trustSrc();lifeSrc();
-const charts=[wDir.chart,wTrust.chart,wLife.chart];
+const C=DATA.cohesion, view=$('#cohesion-view'), domain=$('#cohesion-domain');
+C.domains.forEach((name,i)=>domain.add(new Option(name,i+1)));
+function cohesionScene(){
+  const isIndex=view.value==='index', col=Number(domain.value);
+  const rows=isIndex?C.scanlon:C.trend;
+  const S={lines:[],bands:[],dots:[],ends:[],stops:[],ys:isIndex?5:10};
+  const xs=rows.map(r=>isIndex?r[0]:isoX(r.date+'-15'));
+  S.x0=xs[0];S.x1=xs.at(-1);
+  const series=isIndex?[[C.domains[col-1],TC]]:[['Good or better','var(--yes)','good','g'],['Poor or very poor','var(--no)','poor','b']];
+  const values=[];
+  for(const [name,color,key,raw] of series){
+    const pts=rows.map((r,i)=>{
+      const x=xs[i],q=isIndex?{v:r[col]}:r[key],printed=isIndex?r[col]:r[raw];
+      values.push(printed,q.lo??q.v,q.hi??q.v);
+      const label=isIndex?String(r[0]):ymWords(r.date);
+      const sub=isIndex?'Scanlon index':'Survey: fair ≈'+(100-r.g-r.b)+'%, net '+sgn(r.g-r.b)+' pts';
+      if(!S.stops[i])S.stops[i]={x,label,sub,items:[]};
+      S.stops[i].items.push({y:q.v,color,txt:isIndex?String(q.v):f1(q.v)+'% ('+f1(q.lo)+'–'+f1(q.hi)+')'});
+      S.dots.push({x,y:printed,color,r:3,poll:{who:name,when:label},txt:String(printed)+(isIndex?'':'%')});
+      return {x,y:q.v,lo:q.lo,hi:q.hi};
+    });
+    S.lines.push({color,pts,w:2});if(!isIndex)S.bands.push({color,pts});
+    const v=pts.at(-1).y;
+    S.ends.push({name,abbr:isIndex?'Index':key==='good'?'Good+':'Poor',color,y:v,v});
+  }
+  S.endX=S.x1;S.y0=Math.floor((Math.min(...values)-1)/S.ys)*S.ys;S.y1=Math.ceil((Math.max(...values)+1)/S.ys)*S.ys;
+  S.tick=v=>String(v)+(isIndex?'':'%');S.fmt=v=>isIndex?String(v):f1(v)+'%';
+  return S;
+}
+const cohesionChart=chart({fig:$('#cohesion-fig'),svg:$('#cohesion-svg'),scene:cohesionScene,use:()=>{WIN={kind:'all'};HIST.terms[0].a=view.value==='index'?C.scanlon[0][0]:isoX(C.sec[0][0]+'-15')}});
+function updateCohesion(){
+  const index=view.value==='index',col=Number(domain.value),last=C.trend.at(-1),annual=C.scanlon.at(-1);
+  domain.hidden=!index;
+  $('#cohesion-dek').textContent=index?C.domains[col-1]+' scored '+annual[col]+' in '+annual[0]+' (2007 = 100).':
+    'In '+ymWords(last.date)+', '+last.g+'% rated cohesion good or better and '+last.b+'% rated it poor or very poor.';
+  $('#cohesion-note').textContent=index?'Annual index points. Scanlon linked its redesigned 2026 index to 2025. The 2020 reading is from July.':
+    'Dots show SEC Newgate’s surveys. Lines estimate how Australians would rate cohesion on its question. Shading shows 95% credible intervals at survey dates.';
+  $('#cohesion-source').href=index?C.scanlonSource:C.secSource;
+  const header=index?['Year',C.domains[col-1]]:['Wave','Good or better (%)','Fair (approx. %)','Poor or very poor (%)','Net (pts)'];
+  const rows=index?C.scanlon.map(r=>[r[0],r[col]]):C.sec.map(([d,g,p])=>[d,g,100-g-p,p,g-p]);
+  $('#cohesion-table').innerHTML='<tr>'+header.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');
+  cohesionChart.clear();cohesionChart.draw();
+}
+view.addEventListener('change',updateCohesion);domain.addEventListener('change',updateCohesion);updateCohesion();
+const charts=[wDir.chart,wTrust.chart,wLife.chart,cohesionChart];
 const hilda=$('#cmp-hilda');
 hilda.addEventListener('click',()=>{HILDA=!HILDA;hilda.setAttribute('aria-checked',String(HILDA));lifeSrc();wLife.chart.clear();wLife.chart.draw()});
 const glob=$('#cmp-glob');
