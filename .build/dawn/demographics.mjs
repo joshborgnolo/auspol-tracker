@@ -3,7 +3,7 @@ const parties = ["Labor", "One Nation", "the Coalition", "the Greens"];
 const charts = [
   { id: "generation", label: "Generation", subject: "Boomers", baseline: "Gen Z voters",
     groups: ["Gen Z", "Millennials", "Gen X", "Boomers"],
-    headline: "Greens support ranges from 34% among Gen Z to 4% among Boomers",
+    headline: "Labor is the only party with even intergenerational appeal",
     sources: "YouGov and RedBridge/Accent",
     halfWidths: [[2.9, 2.7, 2.6, 2.6], [1.9, 2.6, 2.7, 2.6], [2.2, 2.5, 2.7, 3.1], [2.7, 2.1, 1.3, 0.8]],
     pairs: [[], [[0, 1], [1, 2], [1, 3]], [[0, 1], [1, 2], [2, 3]], [[0, 1], [1, 2], [2, 3]]],
