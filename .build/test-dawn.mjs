@@ -49,8 +49,15 @@ const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
 {
   const css = fs.readFileSync(path.join(HERE, "dawn", "template-demographics.html"), "utf8");
   const { demographicsMarkup } = await import("./dawn/demographics.mjs");
-  for (const [key, token] of [["alp", "alp"], ["onp", "on"], ["lnp", "lnp"], ["grn", "grn"]]) {
-    ok(css.includes(`.finding .party-name.${key}{color:var(--${token})}`), `demographics: ${key}'s finding text uses the Dawn ${token} colour`);
+  ok(/\.takeaway \.party-name\{[^}]*color:#fff[;}]/.test(css), "comparison party names have white lettering");
+  for (const key of ["alp", "onp", "lnp", "grn"]) {
+    const rule = css.split(".finding .party-name." + key + "{")[1]?.split("}")[0];
+    const hex = /background:#([0-9a-f]{6})/.exec(rule)?.[1];
+    ok(hex, key + " has a party-coloured background");
+    const linear = hex.match(/../g).map(pair => parseInt(pair, 16) / 255)
+      .map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const luminance = 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    ok(1.05 / (luminance + 0.05) >= 4.5, key + " has sufficient contrast with white");
   }
   const findings = demographicsMarkup.findings().split('<div id="finding-').slice(1);
   eq(findings.length, 6, "one comparison per facet");
