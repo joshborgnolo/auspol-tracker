@@ -583,6 +583,10 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   ok([moodHead(M0), moodDek(M0), trustHead(M0), trustDek(M0), lifeHead(M0), lifeDek(M0)].every((w) => built.includes(w)), "mood: its words are today's rules");
   ok(built.includes('id="life-svg"') && built.includes("wLife=windowedChart"), "mood: life satisfaction has its own chart window");
   eq((built.match(/S\.govShade=1/g) || []).length, 3, "direction, trust and life satisfaction opt into retained government shading under long-window events");
+  for (const id of ["direction", "trust", "life", "cohesion"]) {
+    ok(built.includes('aria-controls="questions-' + id + '"') && built.includes('<dialog class="q-panel" id="questions-' + id + '"'), "mood: question link opens the guide for " + id);
+  }
+  ok(built.includes('class="seg" role="radiogroup" aria-label="Cohesion measure"'), "mood: cohesion uses the Dawn segmented control");
   ok(built.includes("S.events=winEvents("), "mood: every long-range mood view has event data, including cohesion's all-history view");
   ok(built.includes("S.govs&&(!evs.length||S.govShade)"), "the shared renderer can preserve government fills under event rules");
   ok(built.includes("if(evs.length)B.forEach(v=>v.nm='')"), "government names yield to event names when both would collide");

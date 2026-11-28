@@ -37,6 +37,16 @@
 .mood .chk[hidden],.mood .ext[hidden]{display:none}
 .mood .ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
 @media (min-width:900px){.mood .ctl{margin-top:16px}.mood .fig{margin-top:8px}}
+.q-open{font:inherit;color:var(--ink2);border:0;padding:0;background:none;text-decoration:underline;text-underline-offset:.16em;cursor:pointer}
+.q-panel{box-sizing:border-box;width:min(39rem,calc(100% - 2rem));max-height:80dvh;margin:auto;padding:0;border:1px solid var(--rule);border-radius:16px;color:var(--ink);background:var(--bg);box-shadow:0 12px 64px rgb(0 0 0/.2);overscroll-behavior:contain}
+.q-panel::backdrop{background:rgb(12 16 35/.52)}
+.q-panel header{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--rule)}
+.q-panel h2{margin:0;font:normal clamp(21px,4vw,28px)/1.12 Georgia,serif}
+.q-panel form{margin:0}.q-list{padding:0 20px}
+.q-survey{padding:16px 0}.q-survey+.q-survey{border-top:1px solid var(--rule)}
+.q-survey h3{margin:0 0 6px;font:600 15px/1.3 var(--sans)}.q-survey p{margin:0 0 6px;font:400 15px/1.45 var(--sans)}
+.q-survey .q-answers,.q-survey a{color:var(--ink2);font:400 13px/1.45 var(--sans)}
+#cohesion .pick[hidden]{display:none}#cohesion .pick select{width:auto}
 </style>
 </head>
 <body>
@@ -103,7 +113,7 @@
     </header>
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
     <div class="fig" id="direction-fig"><div class="tip" aria-live="polite"></div><svg id="direction-svg" tabindex="0" aria-label="Line chart of the shares saying the country is heading in the right direction and on the wrong track. Use the left and right arrow keys to read values."></svg></div>
-    <p class="src" id="direction-src"></p>
+    <p class="src"><span id="direction-src"></span> See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-direction">here</button>.</p>
     <div class="sr"><table id="direction-table"></table></div>
   </div>
 </section>
@@ -118,7 +128,7 @@
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
     <div class="fig" id="trust-fig"><div class="tip" aria-live="polite"></div><svg id="trust-svg" tabindex="0" aria-label="Line chart of trust in government. Use the left and right arrow keys to read values."></svg></div>
     <div class="keys"><button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-glob"><i></i>Global averages</button><span class="ext" id="glob-key" hidden><span><i class="sw dash" style="--c:var(--lnp)"></i> OECD average</span><span><i class="sw dash" style="--c:var(--grn)"></i> Edelman’s global average</span></span></div>
-    <p class="src" id="trust-src"></p>
+    <p class="src"><span id="trust-src"></span> See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-trust">here</button>.</p>
     <div class="sr"><table id="trust-table"></table></div>
   </div>
 </section>
@@ -133,7 +143,7 @@
     <div class="ctl"><div class="win" data-win aria-label="Time window" role="group"></div></div>
     <div class="fig" id="life-fig"><div class="tip" aria-live="polite"></div><svg id="life-svg" tabindex="0" aria-label="Line chart of average life satisfaction out of 10. Use the left and right arrow keys to read values."></svg></div>
     <div class="keys"><button type="button" class="chk" role="checkbox" aria-checked="false" id="cmp-hilda"><i></i>HILDA, as printed</button><span class="ext" id="hilda-key" hidden><span><i class="sw dash" style="--c:var(--lnp)"></i> HILDA’s annual average</span></span><span class="ext" id="scanlon-key" hidden>● Scanlon, as printed</span></div>
-    <p class="src" id="life-src"></p>
+    <p class="src"><span id="life-src"></span> See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-life">here</button>.</p>
     <div class="sr"><table id="life-table"></table></div>
   </div>
 </section>
@@ -141,14 +151,17 @@
   <i class="snap" aria-hidden="true"></i>
   <div class="wrap votes mood">
     <header class="hd"><h2 id="cohesion-h">Social cohesion</h2><p id="cohesion-dek" class="dek"></p></header>
-    <div class="ctl"><select aria-label="Cohesion measure" id="cohesion-view"><option value="sec">Public perceptions</option><option value="index">Scanlon index</option></select>
-      <select aria-label="Scanlon domain" id="cohesion-domain" hidden></select></div>
+    <div class="ctl"><div class="seg" role="radiogroup" aria-label="Cohesion measure" id="cohesion-view">
+      <button type="button" role="radio" data-measure="sec" aria-checked="true">Public perceptions</button>
+      <button type="button" role="radio" data-measure="index" aria-checked="false" tabindex="-1">Scanlon index</button></div>
+      <label class="pick" hidden><select aria-label="Scanlon domain" id="cohesion-domain"></select></label></div>
     <div class="fig" id="cohesion-fig"><div class="tip" aria-live="polite"></div><svg id="cohesion-svg" tabindex="0" aria-label="Social cohesion over time. Use the arrow keys to read values."></svg></div>
-    <p class="src"><span id="cohesion-note"></span> <a id="cohesion-source">Source</a></p>
+    <p class="src"><span id="cohesion-note"></span> <a id="cohesion-source">Source</a>. See the questions the pollsters ask <button type="button" class="q-open" aria-haspopup="dialog" aria-controls="questions-cohesion">here</button>.</p>
     <div class="sr"><table id="cohesion-table"></table></div>
   </div>
 </section>
 </main>
+{{questionPanels}}
 
 <script id="dawn-data" type="application/json">{{DATA}}</script>
 <script>
@@ -394,9 +407,10 @@ wTrust=windowedChart({section:$('#trust'),lo:trustFirst,src:()=>{if(wTrust)trust
 wLife=windowedChart({section:$('#life'),lo:lifeFirst,src:()=>{if(wLife)lifeSrc()},make:make('life',lifeScene)});
 dirSrc();trustSrc();lifeSrc();
 const C=DATA.cohesion, view=$('#cohesion-view'), domain=$('#cohesion-domain');
+let cohesionMeasure='sec';
 C.domains.forEach((name,i)=>domain.add(new Option(name,i+1)));
 function cohesionScene(){
-  const isIndex=view.value==='index', col=Number(domain.value);
+  const isIndex=cohesionMeasure==='index', col=Number(domain.value);
   const rows=isIndex?C.scanlon:C.trend;
   const S={lines:[],bands:[],dots:[],ends:[],stops:[],ys:isIndex?5:10};
   const xs=rows.map(r=>isIndex?r[0]:isoX(r.date+'-15'));
@@ -423,10 +437,10 @@ function cohesionScene(){
   S.events=winEvents(S.x0,S.x1,S.x0>=CUR.a-1e-6);
   return S;
 }
-const cohesionChart=chart({fig:$('#cohesion-fig'),svg:$('#cohesion-svg'),scene:cohesionScene,use:()=>{WIN={kind:'all'};HIST.terms[0].a=view.value==='index'?C.scanlon[0][0]:isoX(C.sec[0][0]+'-15')}});
+const cohesionChart=chart({fig:$('#cohesion-fig'),svg:$('#cohesion-svg'),scene:cohesionScene,use:()=>{WIN={kind:'all'};HIST.terms[0].a=cohesionMeasure==='index'?C.scanlon[0][0]:isoX(C.sec[0][0]+'-15')}});
 function updateCohesion(){
-  const index=view.value==='index',col=Number(domain.value),last=C.trend.at(-1),annual=C.scanlon.at(-1);
-  domain.hidden=!index;
+  const index=cohesionMeasure==='index',col=Number(domain.value),last=C.trend.at(-1),annual=C.scanlon.at(-1);
+  domain.parentElement.hidden=!index;
   $('#cohesion-dek').textContent=index?C.domains[col-1]+' scored '+annual[col]+' in '+annual[0]+' (2007 = 100).':
     'In '+ymWords(last.date)+', '+last.g+'% rated cohesion good or better and '+last.b+'% rated it poor or very poor.';
   $('#cohesion-note').textContent=index?'Annual index points. Scanlon linked its redesigned 2026 index to 2025. The 2020 reading is from July.':
@@ -437,7 +451,36 @@ function updateCohesion(){
   $('#cohesion-table').innerHTML='<tr>'+header.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('');
   cohesionChart.clear();cohesionChart.draw();
 }
-view.addEventListener('change',updateCohesion);domain.addEventListener('change',updateCohesion);updateCohesion();
+const measures=$$('button',view);
+function chooseMeasure(button){
+  cohesionMeasure=button.dataset.measure;
+  for(const choice of measures){
+    choice.setAttribute('aria-checked',String(choice===button));
+    choice.tabIndex=choice===button?0:-1;
+  }
+  updateCohesion();
+}
+measures.forEach((button,i)=>{
+  button.addEventListener('click',()=>chooseMeasure(button));
+  button.addEventListener('keydown',event=>{
+    const destinations={ArrowLeft:1-i,ArrowRight:1-i,ArrowUp:1-i,ArrowDown:1-i,Home:0,End:1};
+    if(!(event.key in destinations))return;
+    event.preventDefault();
+    const target=measures[destinations[event.key]];
+    target.focus();chooseMeasure(target);
+  });
+});
+$$('.q-open').forEach(trigger=>{
+  const panel=document.getElementById(trigger.getAttribute('aria-controls'));
+  trigger.addEventListener('click',()=>{panel.showModal();panel.scrollTop=0});
+  panel.addEventListener('close',()=>trigger.focus({preventScroll:true}));
+  panel.addEventListener('click',event=>{
+    if(event.target!==panel)return;
+    const r=panel.getBoundingClientRect();
+    if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)panel.close();
+  });
+});
+domain.addEventListener('change',updateCohesion);updateCohesion();
 const charts=[wDir.chart,wTrust.chart,wLife.chart,cohesionChart];
 const hilda=$('#cmp-hilda');
 hilda.addEventListener('click',()=>{HILDA=!HILDA;hilda.setAttribute('aria-checked',String(HILDA));lifeSrc();wLife.chart.clear();wLife.chart.draw()});

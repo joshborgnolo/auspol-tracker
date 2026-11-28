@@ -53,8 +53,18 @@ try {
         if (width > 1000 && range === "10") assert.ok(result.labels.some((label) => / election$/.test(label)), `${id}: 10-year election names are not hidden by government labels`);
       }
     }
+    if (views.cohesion) {
+      for (const id of [...views.ids, "cohesion"]) {
+        const trigger = `#${id} .q-open`;
+        await page.click(trigger);
+        const panel = `#questions-${id}[open]`;
+        assert.ok(await page.$(panel + " .q-survey a"), id + ": question panel has a survey source");
+        await page.keyboard.press("Escape");
+        assert.ok(await page.$eval(trigger, b => b === document.activeElement), id + ": focus returns to the question link");
+      }
+    }
     if (views.cohesion) for (const chosen of ["sec", "index"]) {
-      await page.select("#cohesion-view", chosen);
+      await page.click(`#cohesion-view [data-measure="${chosen}"]`);
       await settle(250);
       const cohesion = await page.evaluate(() => ({
         markers: document.querySelectorAll("#cohesion-svg .evr").length,

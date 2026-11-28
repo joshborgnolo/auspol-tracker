@@ -98,6 +98,44 @@ export function readScore(file) {
   };
 }
 
+function moodQuestionPanels() {
+  const panelSource = fs.readFileSync(path.resolve(HERE, "../newtracker/assets/rd-panels.jsx"), "utf8");
+  // These are the same literal question guides rendered by National mood.
+  const notes = name => {
+    const start = panelSource.indexOf("const " + name + " = {");
+    const end = panelSource.indexOf("\n};", start);
+    if (start < 0 || end < 0) throw new Error("Missing Mood question guide: " + name);
+    return vm.runInNewContext("(" + panelSource.slice(panelSource.indexOf("{", start), end + 2) + ")");
+  };
+  const read = file => JSON.parse(fs.readFileSync(path.resolve(HERE, "../../data", file), "utf8"));
+  const trustNotes = notes("TRUST_HOUSE_NOTES");
+  const cohesion = read("social-cohesion.json");
+  const groups = {
+    direction: Object.entries(notes("DIRECTION_HOUSE_NOTES")).map(([house, q]) => ({ house, ...q })),
+    trust: read("trust-government.json").series.filter(s => trustNotes[s.id])
+      .map(s => ({ ...s, url: s.source, ...trustNotes[s.id] })),
+    life: read("life-satisfaction.json").series,
+    cohesion: [
+      { house: "SEC Newgate", question: "Thinking about social cohesion – by that we mean the way in which different people and groups in society get along and feel connected to one another. How would you rate the level of social cohesion in Australia at the current time?",
+        answers: "Excellent, very good, good, fair, poor or very poor. The chart groups the first three and the last two responses.", url: cohesion.secSource },
+      { house: "Scanlon Foundation Research Institute", question: "To what extent do you have a sense of belonging in Australia?",
+        answers: "This is one question in the belonging domain. The index combines responses across belonging, worth, social inclusion and justice, participation, and acceptance.", url: cohesion.scanlonSource },
+    ],
+  };
+  const titles = { direction: "National direction", trust: "Trust in government", life: "Life satisfaction", cohesion: "Social cohesion" };
+  return Object.entries(groups).map(([id, entries]) => {
+    const rows = entries.map(q => {
+      const url = q.url || q.source;
+      return `<section class="q-survey"><h3>${esc(q.house)}</h3><p>${esc(q.question)}</p>
+        ${q.answers ? `<p class="q-answers">${esc(q.answers)}</p>` : ""}
+        ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>` : ""}</section>`;
+    }).join("");
+    return `<dialog class="q-panel" id="questions-${id}" aria-labelledby="questions-${id}-title">
+      <header><h2 id="questions-${id}-title">${titles[id]} questions</h2><form method="dialog"><button class="pbtn" autofocus>Close</button></form></header>
+      <div class="q-list">${rows}</div></dialog>`;
+  }).join("\n");
+}
+
 export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path.join(root, ".build", "newtracker", "assets"),
                             keep = () => false, write = (f, s) => fs.writeFileSync(f, s) } = {}) {
   const D = JSON.parse(fs.readFileSync(path.join(assets, "dawn-data.json"), "utf8"));
@@ -238,6 +276,7 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
       });
       return { cohesion: { ...cohesion, trend: cohesionModel(waves) } };
     },
+    markup: { questionPanels: moodQuestionPanels },
     fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek, lifeHead, lifeDek } });
   const cyclesFile = sunPage({ asset: "dawn-cycles.json", template: "template-cycles.html", dir: "past-cycles",
     fill: { chapeau: cycleChapeau, primaryHead: (C) => cycleHead(C, "primary"), primaryDek: (C) => cycleDek(C, "primary"), netHead: (C) => cycleHead(C, "net"), netDek: (C) => cycleDek(C, "net"),
