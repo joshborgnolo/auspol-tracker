@@ -578,7 +578,15 @@ eq(votesHead(fall("grn", E.grn - 3, E.grn - 1)).head, "The Greens are down 3.0 p
   const built = fs.readFileSync(buildDawn({ root: tmp, assets: A }).mood, "utf8");
   fs.rmSync(tmp, { recursive: true, force: true });
   ok(!/\{\{[A-Za-z:]+\}\}/.test(built), "mood: every placeholder filled");
-  eq(JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]).asOf, M0.asOf, "mood: its data parses");
+  const moodData = JSON.parse(built.match(/<script id="dawn-data" type="application\/json">(.*?)<\/script>/s)[1]);
+  eq(moodData.asOf, M0.asOf, "mood: its data parses");
+  const readings = moodData.lifeHistory.flatMap(s => s.readings.map(([date, raw, converted]) =>
+    ({ date, key: s.key, raw, value: converted ?? (s.scale === "0–100" ? raw / 10 : raw) })));
+  ok(readings.every(r => Number.isFinite(r.value) && r.value >= 0 && r.value <= 10), "all historical scores are on the plotted scale");
+  eq(readings.find(r => r.date === "1948").value, 6.68, "Gallup's three-category responses use the archive's conversion");
+  eq(readings.find(r => r.key === "phone" && r.date === "2024-06").value, 7.5, "the 2024 phone sample is retained");
+  eq(readings.find(r => r.key === "online" && r.date === "2024-06").value.toFixed(2), "6.77", "the parallel online sample has its own score");
+  eq(moodData.life.months[0][4], "2019-10", "historical dots do not extend the fitted line");
   new vm.Script(built.slice(built.lastIndexOf("<script>") + 8, built.lastIndexOf("</script>"))); n++;
   ok([moodHead(M0), moodDek(M0), trustHead(M0), trustDek(M0), lifeHead(M0), lifeDek(M0)].every((w) => built.includes(w)), "mood: its words are today's rules");
   ok(built.includes('id="life-svg"') && built.includes("wLife=windowedChart"), "mood: life satisfaction has its own chart window");

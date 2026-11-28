@@ -1,0 +1,178 @@
+{
+  "note": "Readings give the survey year or month, the published mean, and (where supplied) the archive’s converted 0–10 value. For Australian Unity, a 0–100 result is ten times the average response on its 0–10 question.",
+  "series": [
+    {
+      "key": "anuFigure",
+      "house": "ANUpoll (chart readings)",
+      "question": "ANUpoll asks respondents to rate their satisfaction with life as a whole these days.",
+      "answers": "These additional waves come from Figure 1 of the June 2026 report. Dots show the original panel’s mean, read to the nearest tenth. Only published numerical means enter the Bayesian fit.",
+      "scale": "0–10",
+      "source": "https://polis.cass.anu.edu.au/files/docs/2026/7/Steady-but-not-recovering---June-ANUpoll---For-web.pdf",
+      "readings": [
+        ["2020-05", 6.8],
+        ["2020-08", 6.6],
+        ["2022-04", 6.7],
+        ["2022-08", 6.8],
+        ["2023-04", 6.7],
+        ["2023-08", 6.6],
+        ["2023-10", 6.7],
+        ["2024-01", 6.6],
+        ["2024-10", 6.5],
+        ["2025-09", 6.5],
+        ["2025-10", 6.4]
+      ]
+    },
+    {
+      "key": "archive",
+      "house": "Australian Gallup Poll (1948)",
+      "question": "Respondents rated how satisfied they were with the way they were getting on.",
+      "scale": "1–3",
+      "source": "https://worlddatabaseofhappiness.eur.nl/studies/nipo-1949-study-au-1948-2181/",
+      "readings": [
+        ["1948", 2.02, 6.68]
+      ]
+    },
+    {
+      "key": "archive",
+      "house": "Kettering / Gallup (1975)",
+      "question": "Respondents rated their satisfaction with life as a whole.",
+      "scale": "0–10",
+      "source": "https://worlddatabaseofhappiness.eur.nl/distributional-findings/gallup-1976-study-au-1975-3187/",
+      "readings": [
+        ["1975", 7.91]
+      ]
+    },
+    {
+      "key": "archive",
+      "house": "Leisure Development Centre (1979)",
+      "question": "Respondents rated their overall satisfaction with their present life.",
+      "scale": "1–5",
+      "source": "https://worlddatabaseofhappiness.eur.nl/distributional-findings/leisure-development-cen-1980-study-au-1979-519/",
+      "readings": [
+        ["1979", 4.18, 7.23]
+      ]
+    },
+    {
+      "key": "wvs",
+      "house": "World Values Survey",
+      "question": "Respondents rated how satisfied they were with their life as a whole, taking everything into account.",
+      "scale": "1–10",
+      "source": "https://worlddatabaseofhappiness.eur.nl/nations/australia-11/distributional-findings/",
+      "readings": [
+        ["1981", 7.88, 7.65],
+        ["1995", 7.55, 7.28],
+        ["2005", 7.28, 6.98],
+        ["2012", 7.2, 6.89],
+        ["2018", 7.28, 6.98]
+      ]
+    },
+    {
+      "key": "archive",
+      "house": "Australian National Social Science Survey (1984)",
+      "question": "Respondents rated their satisfaction with life as a whole.",
+      "scale": "1–10",
+      "source": "https://worlddatabaseofhappiness.eur.nl/nations/australia-11/distributional-findings/",
+      "readings": [
+        ["1984", 8.2, 8.0]
+      ]
+    },
+    {
+      "key": "archive",
+      "house": "Yoshino survey (2007)",
+      "question": "Respondents rated how satisfied or dissatisfied they were with their current life.",
+      "scale": "1–5",
+      "source": "https://worlddatabaseofhappiness.eur.nl/studies/yoshino-2008-study-au-2007-5484/",
+      "readings": [
+        ["2007", 4.22, 7.25]
+      ]
+    },
+    {
+      "key": "phone",
+      "house": "Australian Unity / Deakin (phone)",
+      "question": "Thinking about your own life and personal circumstances, how satisfied are you with your life as a whole?",
+      "scale": "0–100",
+      "source": "https://www.australianunity.com.au/-/media/RebrandCorporate/Documents/Annual-Reports/Wellbeing-Index/Housing-affordability-Part-B-The-Tables.pdf",
+      "readings": [
+        ["2001-04", 75.23],
+        ["2001-09", 77.0],
+        ["2002-03", 78.19],
+        ["2002-08", 77.15],
+        ["2002-11", 77.68],
+        ["2003-03", 78.23],
+        ["2003-06", 78.23],
+        ["2003-08", 77.97],
+        ["2003-11", 77.69],
+        ["2004-02", 77.36],
+        ["2004-05", 77.72],
+        ["2004-08", 79.12],
+        ["2005-05", 76.81],
+        ["2005-10", 77.54],
+        ["2006-05", 76.44],
+        ["2006-10", 77.33],
+        ["2007-04", 77.58],
+        ["2007-10", 78.33],
+        ["2008-04", 77.0],
+        ["2008-10", 77.02],
+        ["2009-05", 78.22],
+        ["2009-09", 78.63],
+        ["2010-04", 78.52],
+        ["2010-09", 78.54],
+        ["2011-04", 77.95],
+        ["2011-09", 77.02],
+        ["2012-04", 77.12],
+        ["2012-09", 77.78],
+        ["2013-04", 76.96],
+        ["2013-08", 77.18],
+        ["2014-09", 78.25],
+        ["2015-08", 77.58]
+      ]
+    },
+    {
+      "key": "phone",
+      "house": "Australian Unity / Deakin (phone)",
+      "question": "Thinking about your own life and personal circumstances, how satisfied are you with your life as a whole?",
+      "scale": "0–10",
+      "source": "https://worlddatabaseofhappiness.eur.nl/publications/happiness-in-australia-2001-2023-17912/",
+      "readings": [
+        ["2016-04", 7.73],
+        ["2017-04", 7.6],
+        ["2018-04", 7.55],
+        ["2019-05", 7.52],
+        ["2020-05", 7.63],
+        ["2021-06", 7.54],
+        ["2022-06", 7.45],
+        ["2023", 7.46]
+      ]
+    },
+    {
+      "key": "phone",
+      "house": "Australian Unity / Deakin (phone)",
+      "question": "Thinking about your own life and personal circumstances, how satisfied are you with your life as a whole?",
+      "scale": "0–100",
+      "source": "https://newsreel.com.au/wp-content/uploads/2024/11/Australian-Unity-Wellbeing-Index-2024.pdf",
+      "readings": [
+        ["2024-06", 75]
+      ]
+    },
+    {
+      "key": "online",
+      "house": "Australian Unity / Deakin (online)",
+      "question": "Thinking about your own life and personal circumstances, how satisfied are you with your life as a whole?",
+      "scale": "0–100",
+      "source": "https://newsreel.com.au/wp-content/uploads/2024/11/Australian-Unity-Wellbeing-Index-2024.pdf",
+      "readings": [
+        ["2024-06", 67.7]
+      ]
+    },
+    {
+      "key": "online",
+      "house": "Australian Unity / Deakin (online)",
+      "question": "Thinking about your own life and personal circumstances, how satisfied are you with your life as a whole?",
+      "scale": "0–100",
+      "source": "https://newsreel.com.au/wp-content/uploads/2025/10/The-Australian-Unity-Wellbing-Index.pdf",
+      "readings": [
+        ["2025-06", 68.8]
+      ]
+    }
+  ]
+}

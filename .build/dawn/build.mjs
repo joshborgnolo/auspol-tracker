@@ -98,7 +98,7 @@ export function readScore(file) {
   };
 }
 
-function moodQuestionPanels() {
+function moodQuestionPanels({ lifeHistory }) {
   const panelSource = fs.readFileSync(path.resolve(HERE, "../newtracker/assets/rd-panels.jsx"), "utf8");
   // These are the same literal question guides rendered by National mood.
   const notes = name => {
@@ -114,7 +114,13 @@ function moodQuestionPanels() {
     direction: Object.entries(notes("DIRECTION_HOUSE_NOTES")).map(([house, q]) => ({ house, ...q })),
     trust: read("trust-government.json").series.filter(s => trustNotes[s.id])
       .map(s => ({ ...s, url: s.source, ...trustNotes[s.id] })),
-    life: read("life-satisfaction.json").series,
+    life: [...read("life-satisfaction.json").series, ...Array.from(new Set(lifeHistory.map(s => s.house)), house => {
+      const entries = lifeHistory.filter(s => s.house === house);
+      return { house, question: entries[0].question, answers: entries[0].answers ||
+        "Published scale: " + [...new Set(entries.map(s => s.scale))].join(" or ") + ".",
+        links: entries.map(s => ({ url: s.source, label: s.readings[0][0].slice(0, 4) +
+          (s.readings.length > 1 ? "–" + s.readings.at(-1)[0].slice(0, 4) : "") + " source ↗" })) };
+    })],
     cohesion: [
       { house: "SEC Newgate", question: "Thinking about social cohesion – by that we mean the way in which different people and groups in society get along and feel connected to one another. How would you rate the level of social cohesion in Australia at the current time?",
         answers: "Excellent, very good, good, fair, poor or very poor. The chart groups the first three and the last two responses.", url: cohesion.secSource },
@@ -126,9 +132,11 @@ function moodQuestionPanels() {
   return Object.entries(groups).map(([id, entries]) => {
     const rows = entries.map(q => {
       const url = q.url || q.source;
+      const links = q.links || (url ? [{ url, label: "Source ↗" }] : []);
+      const sources = links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`).join(" · ");
       return `<section class="q-survey"><h3>${esc(q.house)}</h3><p>${esc(q.question)}</p>
         ${q.answers ? `<p class="q-answers">${esc(q.answers)}</p>` : ""}
-        ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>` : ""}</section>`;
+        ${sources}</section>`;
     }).join("");
     return `<dialog class="q-panel" id="questions-${id}" aria-labelledby="questions-${id}-title">
       <header><h2 id="questions-${id}-title">${titles[id]} questions</h2><form method="dialog"><button class="pbtn" autofocus>Close</button></form></header>
@@ -274,7 +282,13 @@ export function buildDawn({ root = path.resolve(HERE, "..", ".."), assets = path
         const poll = polls.find(r => r.date.startsWith(date));
         return [date, good, poor, poll?.sampleEff || (poll?.sample || 1500) / 1.6];
       });
-      return { cohesion: { ...cohesion, trend: cohesionModel(waves) } };
+      const lifeHistory = read("life-satisfaction-history.json").series;
+      const demos = read("demosau-one-offs.json").one_offs.find(s => s.id === "life-satisfaction");
+      const score = demos.data.tables.find(t => t.name === "Index scores").rows.find(r => r[0] === "Life Satisfaction Score");
+      lifeHistory.push({ key: "demos", house: "DemosAU", question: demos.question,
+        answers: "Five responses from very satisfied to very unsatisfied. DemosAU converts these to an index out of 100.",
+        scale: "0–100", source: demos.articleUrl, readings: [[demos.waveDate, Number(score[1])]] });
+      return { cohesion: { ...cohesion, trend: cohesionModel(waves) }, lifeHistory };
     },
     markup: { questionPanels: moodQuestionPanels },
     fill: { dirHead: moodHead, dirDek: moodDek, trustHead, trustDek, lifeHead, lifeDek } });
